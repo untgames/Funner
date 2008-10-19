@@ -15,7 +15,7 @@ SYSTEMLIB.SOURCES.COMPILER_CFLAGS        :=
 SYSTEMLIB.SOURCES.COMPILER_DEFINES       :=
 SYSTEMLIB.SOURCES.IMPORTS                := compile.static.mak
 SYSTEMLIB.SOURCES.win32.SOURCE_DIRS      := sources/platform/win32
-SYSTEMLIB.SOURCES.win32.COMPILER_CFLAGS  := -wd4355
+SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS  := -wd4355
 SYSTEMLIB.SOURCES.no_windows.SOURCE_DIRS := sources/platform/no_windows
 SYSTEMLIB.SOURCES.carbon.SOURCE_DIRS     := sources/platform/carbon
 

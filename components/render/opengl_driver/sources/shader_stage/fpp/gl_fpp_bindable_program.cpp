@@ -33,148 +33,153 @@ FppBindableProgram::FppBindableProgram
   ProgramParametersLayout* parameters_layout)
    : ContextObject (context_manager)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::FppBindableProgram::FppBindableProgram";
-  
-    //получение базового состояния фиксированной программы шейдинга
-  
-  fpp_state = program.GetBaseState ();  
-  
-  identity_matrix (view_object_matrix);
-
-    //обновление хэшей
-
-  UpdateHashes ();  
-
-    //обработка ситуации отсутствия параметров
-
-  if (!parameters_layout || !parameters_layout->GetParametersCount ())
-    return;
-
-    //резервирование памяти для хранения параметров и групп
-  
-  parameters.reserve (parameters_layout->GetParametersCount ());
-  groups.reserve     (parameters_layout->GetGroupsCount ());
-  
-    //преобразование параметров
-    
-  const ProgramParameter*      src_params = parameters_layout->GetParameters ();
-  const ProgramParameterGroup* src_groups = parameters_layout->GetGroups ();  
-    
-  for (size_t i=0, count=parameters_layout->GetGroupsCount (); i<count; i++)
+  try
   {
-    const ProgramParameterGroup& src_group = src_groups [i];
+      //получение базового состояния фиксированной программы шейдинга
     
-    size_t start_parameters_count = parameters.size ();
+    fpp_state = program.GetBaseState ();  
     
-    for (size_t j=0; j<src_group.count; j++)
+    identity_matrix (view_object_matrix);
+
+      //обновление хэшей
+
+    UpdateHashes ();  
+
+      //обработка ситуации отсутствия параметров
+
+    if (!parameters_layout || !parameters_layout->GetParametersCount ())
+      return;
+
+      //резервирование памяти для хранения параметров и групп
+    
+    parameters.reserve (parameters_layout->GetParametersCount ());
+    groups.reserve     (parameters_layout->GetGroupsCount ());
+    
+      //преобразование параметров
+      
+    const ProgramParameterGroup* src_groups = parameters_layout->GetGroups ();  
+      
+    for (size_t i=0, count=parameters_layout->GetGroupsCount (); i<count; i++)
     {
-      const ProgramParameter& src_param = src_group.parameters [j];
-      Parameter               dst_param;
+      const ProgramParameterGroup& src_group = src_groups [i];
       
-        //поиск параметра в шейдере        
-
-      dst_param.location = program.FindDynamicParameter (src_param.name);
-      dst_param.offset   = src_param.offset;
-
-      if (!dst_param.location)
-        continue; //если параметр отсутствует - игнорируем его 
-
-        //проверка соответствия типов
+      size_t start_parameters_count = parameters.size ();
+      
+      for (size_t j=0; j<src_group.count; j++)
+      {
+        const ProgramParameter& src_param = src_group.parameters [j];
+        Parameter               dst_param;
         
-      const FppDynamicParameter& dyn_param = *dst_param.location;
+          //поиск параметра в шейдере        
 
-      bool check_status = false;
+        dst_param.location = program.FindDynamicParameter (src_param.name);
+        dst_param.offset   = src_param.offset;
 
-      switch (src_param.type)
-      {
-        case ProgramParameterType_Int:
-          check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 1;
-          break;
-        case ProgramParameterType_Float:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 1;
-          break;
-        case ProgramParameterType_Int2:
-          check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 2;
-          break;
-        case ProgramParameterType_Float2:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 2;
-          break;
-        case ProgramParameterType_Int3:
-          check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 3;
-          break;
-        case ProgramParameterType_Float3:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 3;
-          break;
-        case ProgramParameterType_Int4:
-          check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 4;
-          break;
-        case ProgramParameterType_Float4:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 4;
-          break;
-        case ProgramParameterType_Float2x2:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 4;
-          break;
-        case ProgramParameterType_Float3x3:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 9;
-          break;
-        case ProgramParameterType_Float4x4:
-          check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 16;
-          break;
-        default:
-          LogPrintf ("Internal error: undefined program parameter type %d", src_param.type);
-          continue;
-      }
-      
-      switch (dyn_param.type)
-      {
-        case FppDynamicParameterType_Int:
-          dst_param.size = dyn_param.count * sizeof (int);
-          break;
-        case FppDynamicParameterType_Float:
-          dst_param.size = dyn_param.count * sizeof (float);
-          break;         
-        default:
-          dst_param.size = 0;
-          break;
-      }
-      
-      if (!check_status)
-      {
-        const char* dyn_param_type_name;
+        if (!dst_param.location)
+          continue; //если параметр отсутствует - игнорируем его 
 
+          //проверка соответствия типов
+          
+        const FppDynamicParameter& dyn_param = *dst_param.location;
+
+        bool check_status = false;
+
+        switch (src_param.type)
+        {
+          case ProgramParameterType_Int:
+            check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 1;
+            break;
+          case ProgramParameterType_Float:
+            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 1;
+            break;
+          case ProgramParameterType_Int2:
+            check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 2;
+            break;
+          case ProgramParameterType_Float2:
+            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 2;
+            break;
+          case ProgramParameterType_Int3:
+            check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 3;
+            break;
+          case ProgramParameterType_Float3:
+            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 3;
+            break;
+          case ProgramParameterType_Int4:
+            check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 4;
+            break;
+          case ProgramParameterType_Float4:
+            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 4;
+            break;
+          case ProgramParameterType_Float2x2:
+            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 4;
+            break;
+          case ProgramParameterType_Float3x3:
+            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 9;
+            break;
+          case ProgramParameterType_Float4x4:
+            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 16;
+            break;
+          default:
+            LogPrintf ("Internal error: undefined program parameter type %d", src_param.type);
+            continue;
+        }
+        
         switch (dyn_param.type)
         {
-          case FppDynamicParameterType_Int:    dyn_param_type_name = "int"; break;
-          case FppDynamicParameterType_Float:  dyn_param_type_name = "float"; break;         
-          default:                             dyn_param_type_name = "__unknown__"; break;
+          case FppDynamicParameterType_Int:
+            dst_param.size = dyn_param.count * sizeof (int);
+            break;
+          case FppDynamicParameterType_Float:
+            dst_param.size = dyn_param.count * sizeof (float);
+            break;         
+          default:
+            dst_param.size = 0;
+            break;
+        }
+        
+        if (!check_status)
+        {
+          const char* dyn_param_type_name;
+
+          switch (dyn_param.type)
+          {
+            case FppDynamicParameterType_Int:    dyn_param_type_name = "int"; break;
+            case FppDynamicParameterType_Float:  dyn_param_type_name = "float"; break;         
+            default:                             dyn_param_type_name = "__unknown__"; break;
+          }
+
+          LogPrintf ("Shader parameter '%s' declaration %sx%u mismatch with layout definition %s",
+                     src_param.name, dyn_param_type_name, dyn_param.count, get_name (src_param.type));
+
+          continue;
         }
 
-        LogPrintf ("Shader parameter '%s' declaration %sx%u mismatch with layout definition %s",
-                   src_param.name, dyn_param_type_name, dyn_param.count, get_name (src_param.type));
+          //добавляем созданный параметр
 
-        continue;
+        parameters.push_back (dst_param);
       }
-
-        //добавляем созданный параметр
-
-      parameters.push_back (dst_param);
-    }
-    
-      //добавление новой группы
       
-    size_t group_parameters_count = parameters.size () - start_parameters_count;
+        //добавление новой группы
+        
+      size_t group_parameters_count = parameters.size () - start_parameters_count;
 
-    if (!group_parameters_count)
-      continue; //игнорируем пустые группы
+      if (!group_parameters_count)
+        continue; //игнорируем пустые группы
 
-    Group dst_group;
+      Group dst_group;
 
-    dst_group.slot       = src_group.slot;
-    dst_group.data_hash  = 0;
-    dst_group.count      = group_parameters_count;
-    dst_group.parameters = &parameters [start_parameters_count];
+      dst_group.slot       = src_group.slot;
+      dst_group.data_hash  = 0;
+      dst_group.count      = group_parameters_count;
+      dst_group.parameters = &parameters [start_parameters_count];
 
-    groups.push_back (dst_group);
+      groups.push_back (dst_group);
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::FppBindableProgram::FppBindableProgram");
+    throw;
   }
 }
 
@@ -559,6 +564,8 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
             glEnable   (coord_gen_mode);
             glTexGeni  (coord, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
             glTexGenfv (coord, GL_EYE_PLANE, &texmap.texgen [i][0]);
+            break;
+          default:
             break;
         }
       }

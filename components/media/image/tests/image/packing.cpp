@@ -217,7 +217,7 @@ int main ()
 
       unsigned char* colors = &image.color.red;
 
-      colors [i%3] = unsigned char (rand () % 128 + 127);
+      colors [i%3] = (unsigned char)(rand () % 128 + 127);
 
       images.push_back (image);
     }  

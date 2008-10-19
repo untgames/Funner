@@ -51,7 +51,7 @@ render::mid_level::renderer2d::ITexture* Renderer2D::CreateTexture (const media:
   }
 }
 
-render::mid_level::renderer2d::ITexture* Renderer2D::CreateTexture (size_t width, size_t height, media::PixelFormat pixel_format)
+render::mid_level::renderer2d::ITexture* Renderer2D::CreateTexture (size_t width, size_t height, render::mid_level::PixelFormat pixel_format)
 {
   try
   {

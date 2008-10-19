@@ -99,28 +99,36 @@ bool is_pov_pressed (DWORD pov_status)
 
 BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance, LPVOID device)
 {
-/*  printf ("Device object:\n");
-  printf ("  name is '%s'\n", object_instance->tszName);
-  printf ("  type is '%s'\n", object_type_name (object_instance->guidType));
-  printf ("  offset is %d\n", object_instance->dwOfs);
-  
-  printf ("  dwType is: ");
-  print_didft_type (object_instance->dwType & 0xff0000ff);
-  printf ("\n");
+  try
+  {
+  /*  printf ("Device object:\n");
+    printf ("  name is '%s'\n", object_instance->tszName);
+    printf ("  type is '%s'\n", object_type_name (object_instance->guidType));
+    printf ("  offset is %d\n", object_instance->dwOfs);
+    
+    printf ("  dwType is: ");
+    print_didft_type (object_instance->dwType & 0xff0000ff);
+    printf ("\n");
 
-  printf ("  flags is: ");
-  print_flags (object_instance->dwFlags);
-  printf ("\n");
-  
-  printf ("  dwFFMaxForce is %d\n", object_instance->dwFFMaxForce);
-  printf ("  dwFFForceResolution is %d\n", object_instance->dwFFForceResolution);*/
+    printf ("  flags is: ");
+    print_flags (object_instance->dwFlags);
+    printf ("\n");
+    
+    printf ("  dwFFMaxForce is %d\n", object_instance->dwFFMaxForce);
+    printf ("  dwFFForceResolution is %d\n", object_instance->dwFFForceResolution);*/
 
-  ObjectType object_type = get_object_type (object_instance->dwType & 0xff0000ff);
+    ObjectType object_type = get_object_type (object_instance->dwType & 0xff0000ff);
 
-  if (object_type != ObjectType_Unknown)
-    ((OtherDevice*)device)->RegisterObject (object_instance->tszName, object_instance->dwOfs, object_type);
+    if (object_type != ObjectType_Unknown)
+      ((OtherDevice*)device)->RegisterObject (object_instance->tszName, object_instance->dwOfs, object_type);
+  }
+  catch (...)
+  {
+    //добавить протоколирование!!
+    ///подавление всех исключений    
+  }
 
-  return DIENUM_CONTINUE;
+  return DIENUM_CONTINUE;    
 }
 
 }
@@ -129,13 +137,27 @@ BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance
     онструктор/деструктор
 */
 
-OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevice8* in_direct_input_device_interface, REFGUID rguid, 
-                          const DebugLogHandler& in_debug_log_handler, const char* device_type, const char* init_string)
-  : name (in_name), device_interface (in_direct_input_device_interface, false),
-    poll_timer (xtl::bind (&OtherDevice::PollDevice, this), 10), device_lost (false), debug_log_handler (in_debug_log_handler),
-    events_buffer_size (16), event_string_buffer (1024), current_axis (0), current_button (0), current_pov (0), current_unknown (0)
+OtherDevice::OtherDevice
+ (Window*                window,
+  const char*            in_name,
+  IDirectInputDevice8*   in_direct_input_device_interface,
+  REFGUID                rguid, 
+  const DebugLogHandler& in_debug_log_handler,
+  const char*            device_type,
+  const char*            init_string)
+  : name (in_name),
+    device_interface (in_direct_input_device_interface, false),
+    poll_timer (xtl::bind (&OtherDevice::PollDevice, this), 10),
+    device_lost (false),
+    debug_log_handler (in_debug_log_handler),
+    events_buffer_size (16),
+    event_string_buffer (1024),
+    current_axis (0),
+    current_button (0),
+    current_pov (0),
+    current_unknown (0)
 {
-  static const char* METHOD_NAME = "input::low_level::direct_input_driver::OtherDevice::OtherDevice";
+  static const char* METHOD_NAME = "input::low_level::direct_input_driver::OtherDevice::OtherDevice";  
 
   if (!init_string)
     init_string = "";
@@ -158,7 +180,7 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
   if (device_data_size % 4)
     device_data_size += 4 - device_data_size % 4;
 
-  xtl::uninitialized_storage<DIOBJECTDATAFORMAT> objects_data_format (objects.size ());
+  xtl::uninitialized_storage<DIOBJECTDATAFORMAT> objects_data_format (objects.size ());  
 
   size_t i = 0;
   for (ObjectsMap::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter, i++)
@@ -265,6 +287,8 @@ OtherDevice::OtherDevice (Window* window, const char* in_name, IDirectInputDevic
         case ObjectType_POV:
           iter->second.last_value = *(DWORD*)&(initial_device_data.data ()[iter->second.offset]);
           break;
+        default:
+          break;
       }
     }
   }
@@ -340,6 +364,8 @@ void OtherDevice::SetProperty (const char* name, float value)
 
       break;
     }
+    default:
+      break;
   }
 
   property_iter->second.value = value;
@@ -374,9 +400,17 @@ float OtherDevice::GetProperty (const char* name)
 
 void OtherDevice::RegisterObject (const char* name, size_t offset, ObjectType type)
 {
-  stl::wstring unicode_name = common::towstring (name);
+  stl::wstring unicode_name;
+  int          length = strlen (name);
 
-  RegisterObject (unicode_name.c_str (), offset, type);
+  unicode_name.fast_resize (length);
+
+  int result_size = mbstowcs (&unicode_name [0], name, length);
+  
+  if (result_size < 0) unicode_name.fast_resize (result_size);
+  else                 unicode_name.clear ();
+
+  RegisterObject (unicode_name.c_str (), offset, type);  
 }
 
 void OtherDevice::RegisterObject (const wchar_t* unicode_name, size_t offset, ObjectType type)
@@ -394,7 +428,7 @@ void OtherDevice::RegisterObject (const wchar_t* unicode_name, size_t offset, Ob
 
   ObjectsMap::iterator iter = objects.insert_pair (offset, ObjectData (object_name.c_str (), unicode_name, offset, type)).first;
 
-  objects_names.insert_pair (object_name.c_str (), iter);
+  objects_names.insert_pair (object_name.c_str (), iter);  
 }
 
 /*
@@ -569,6 +603,8 @@ void OtherDevice::PollDevice ()
             }
           }
           break;
+        default:
+          break;
       }
 
       iter->second.last_value = events_buffer.data ()[i].dwData;
@@ -619,6 +655,8 @@ void OtherDevice::PollDevice ()
                 ProcessEvent (event_string_buffer.data ());
               }
             }
+            break;
+          default:
             break;
         }
       }

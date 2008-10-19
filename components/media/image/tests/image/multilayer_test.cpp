@@ -52,19 +52,10 @@ int main ()
     printf ("multilayer image width - %u, height - %u, depth - %u\n", img.Width(), img.Height(), img.Depth());
     img.Resize (1000, 1000, 6);
     printf ("new multilayer image width - %u, height - %u, depth - %u\n", img.Width(), img.Height(), img.Depth());
-    
-    FileHash file_hash;
 
     img.Save("results/multilayer_image.bmp.skybox");
 
-    FileSystem::GetFileHash ("results/multilayer_image_down.bmp",file_hash);
-
-    printf ("File 'results/multilayer_image_down.bmp' hash: {");
-
-    for (size_t i=0;i<15;i++)
-      printf ("%02x,",file_hash.md5 [i]);
-
-    printf ("%02x}\n",file_hash.md5 [15]);
+    printf ("File 'results/multilayer_image_up.bmp' size: %u\n", FileSystem::GetFileSize ("results/multilayer_image_down.bmp"));
   }
   catch (std::exception& exception)               
   {                                               

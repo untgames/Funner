@@ -100,7 +100,6 @@ struct TestApplication::Impl
   {
     try
     {
-      static clock_t last     = 0;  
       static size_t  last_fps = 0, frames_count = 0;
 
       if (clock () - last_fps > CLK_TCK)

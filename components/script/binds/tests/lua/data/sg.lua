@@ -445,7 +445,7 @@ function test_text_line ()
   print ("Color = " .. tostring (text_line1.Color))
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
 
-  text_line1.Text = "Не юникод текст"
+  text_line1.Text = "Non-unicode text"
 
   print ("Text = " .. text_line1.Text)
   print ("TextUnicode = " .. tostring (text_line1.TextUnicode))

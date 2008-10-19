@@ -36,6 +36,7 @@ inline basic_string<T,Traits,Alloc>::basic_string (size_type count,value_type c,
 
 template <class T,class Traits,class Alloc>
 inline basic_string<T,Traits,Alloc>::basic_string (const basic_string& s)
+  : allocator (s.allocator)
 {
   _init (s.begin (),s.end ());
 }

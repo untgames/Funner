@@ -123,7 +123,7 @@ TestStatus test_texture_format (ITexture* texture, PixelFormat test_format)
 
     for (size_t i = 0; i < tex_desc.layers; i++)
     {  
-      size_t mips_count = get_mips_count (tex_desc.width, tex_desc.height);
+      size_t volatile mips_count = get_mips_count (tex_desc.width, tex_desc.height);
 
       if (is_compressed (tex_desc.format))
         mips_count -= 2;

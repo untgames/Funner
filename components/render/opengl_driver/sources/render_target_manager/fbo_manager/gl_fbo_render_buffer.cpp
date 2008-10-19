@@ -164,6 +164,8 @@ size_t FboRenderBuffer::GetFrameBufferId ()
           glFramebufferRenderbufferEXT (GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, render_buffer_id);
 
         break;
+      default:
+        break;
     }
 
       //настройка буферов рисования и чтения      
@@ -177,6 +179,8 @@ size_t FboRenderBuffer::GetFrameBufferId ()
       case RenderTargetType_DepthStencil:
         glDrawBuffer (GL_NONE);
         glReadBuffer (GL_NONE);
+        break;
+      default:
         break;
     }    
     

@@ -1,17 +1,5 @@
 #include "shared.h"
 
-//загрузка текстового файла в строку
-stl::string load_text_file (const char* file_name)
-{
-  common::InputFile file (file_name);
-  
-  stl::string buffer (file.Size (), ' ');
-
-  file.Read (&buffer [0], file.Size ());
-
-  return buffer;
-}
-
 //получение ортографической матрицы проекции
 math::mat4f get_ortho_proj (float left, float right, float bottom, float top, float znear, float zfar)
 {

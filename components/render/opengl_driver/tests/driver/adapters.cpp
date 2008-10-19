@@ -20,8 +20,7 @@ int main ()
 
     for (size_t i=0; i<driver->GetAdaptersCount (); i++)
     {
-      IAdapter*      adapter    = driver->GetAdapter (i);
-      IPropertyList* properties = adapter->GetProperties ();
+      IAdapter* adapter = driver->GetAdapter (i);
 
       printf ("  adapter #%u:\n", i);
       printf ("    name:        '%s'\n", adapter->GetName ());

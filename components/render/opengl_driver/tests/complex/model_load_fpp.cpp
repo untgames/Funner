@@ -106,7 +106,7 @@ struct Model
           
           memset (&desc, 0, sizeof desc);
           
-          desc.size         = ib.Size () * sizeof size_t;
+          desc.size         = ib.Size () * sizeof (size_t);
           desc.usage_mode   = UsageMode_Default;
           desc.bind_flags   = BindFlag_IndexBuffer;
           desc.access_flags = AccessFlag_ReadWrite;
@@ -399,8 +399,6 @@ void idle (Test& test)
   if (test.window.IsClosed ())
     return;    
 
-  static const   float DT = 0.01f;
-  static float   t = 0;
   static clock_t last = 0;
   static float angle;
   
@@ -490,11 +488,11 @@ int main ()
     };
 
     static ProgramParameter shader_parameters[] = {
-      {"myProjMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, proj_tm)},
-      {"myViewMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, view_tm)},
-      {"myObjectMatrix", ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, object_tm)},
-      {"lightPos", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_pos)},
-      {"lightDir", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_dir)},
+      {"myProjMatrix", ProgramParameterType_Float4x4, 0, 1, TEST_OFFSETOF (MyShaderParameters, proj_tm)},
+      {"myViewMatrix", ProgramParameterType_Float4x4, 0, 1, TEST_OFFSETOF (MyShaderParameters, view_tm)},
+      {"myObjectMatrix", ProgramParameterType_Float4x4, 0, 1, TEST_OFFSETOF (MyShaderParameters, object_tm)},
+      {"lightPos", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, light_pos)},
+      {"lightDir", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, light_dir)},
     };
     
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
@@ -506,7 +504,7 @@ int main ()
     
     memset (&cb_desc, 0, sizeof cb_desc);
     
-    cb_desc.size         = sizeof MyShaderParameters;
+    cb_desc.size         = sizeof (MyShaderParameters);
     cb_desc.usage_mode   = UsageMode_Default;
     cb_desc.bind_flags   = BindFlag_ConstantBuffer;
     cb_desc.access_flags = AccessFlag_ReadWrite;

@@ -48,12 +48,16 @@ class ComponentManagerImpl
         return;
 
       size_t name_hash = strihash (name);
+      
+      ComponentList::iterator iter, end;
 
-      for (ComponentList::iterator iter=components.begin (), end=components.end (); iter != end; ++iter)
+      for (iter=components.begin (), end=components.end (); iter != end; ++iter)
         if (iter->component == component || iter->name_hash == name_hash)
           return;
 
-      components.push_back (ComponentNode (name, component));
+      for (iter=components.begin (), end=components.end (); iter != end && strcmp (name, iter->name) > 0; ++iter);
+
+      components.insert (iter, ComponentNode (name, component));
     }
 
       //отмена регистрации компонента

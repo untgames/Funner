@@ -7,19 +7,19 @@ center = 0 0 0
 size = 0 0 0
 radius = 0
 empty = 1
-pxnynz corner = 17 -24 7.44999980927
-minimum = -10 -24 7.44999980927
-maximum = 17 32 14.5900001526
-center = 3.5 4 11.0200004578
-size = 27 56 7.14000034332
+pxnynz corner = 17 -24 7.45
+minimum = -10 -24 7.45
+maximum = 17 32 14.59
+center = 3.5 4 11.02
+size = 27 56 7.14
 radius = 31.28889465332
 empty = 0
 box2 minimum = -5 -4 -3
 box2 maximum = 4 5 6
 box3 minimum = -10 -24 -3
-box3 maximum = 17 32 14.5900001526
-box3 minimum = -20 -48 14.8999996185
-box3 maximum = 34 64 29.1800003052
+box3 maximum = 17 32 14.59
+box3 minimum = -20 -48 14.9
+box3 maximum = 34 64 29.18
 box3 volume = 86365.4453125 = 86365.4453125
 box1 volume = 0
 is box2 intersects box3 ? 0

@@ -14,13 +14,13 @@ int main ()
     common::LogFilter filter ("*", &my_log);
     
       //инициализация приложения
-
-    MyApplication::Instance ();  
+      
+    MyApplication application;
     
-    MyApplication::Instance ().SetView (create_test_game_view ());
+    application.SetView (create_test_game_view ());
 
       //запуск приложения
-      
+
     syslib::Application::Run ();
 
       //завершение приложения
@@ -30,6 +30,6 @@ int main ()
   catch (std::exception& e)
   {
     printf ("Exception caught: %s\n", e.what ());
-    return 1;
+    return 0;
   }
 }

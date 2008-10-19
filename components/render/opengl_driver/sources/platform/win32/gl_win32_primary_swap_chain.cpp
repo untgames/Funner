@@ -195,8 +195,8 @@ struct PrimarySwapChain::Impl: private IWindowListener
     if (!GetWindowRect (output_window, &window_rect))
       raise_error ("GetWindowRect");
 
-    return window_rect.left == 0 && window_rect.top == 0 && window_rect.right - window_rect.left == mode_desc.width &&
-           window_rect.bottom - window_rect.top == mode_desc.height && desc.frame_buffer.color_bits >= mode_desc.color_bits;
+    return window_rect.left == 0 && window_rect.top == 0 && size_t (window_rect.right - window_rect.left) == mode_desc.width &&
+           size_t (window_rect.bottom - window_rect.top) == mode_desc.height && desc.frame_buffer.color_bits >= mode_desc.color_bits;
   }  
   
 ///Обмен текущего заднего буфера и переднего буфера

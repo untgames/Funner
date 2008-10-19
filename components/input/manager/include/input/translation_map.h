@@ -22,16 +22,19 @@ namespace input
 class TranslationMap
 {
   public:
-    class Translator
+    class ITranslator
     {
       public:
         virtual const char* InputEvent  () = 0;
         virtual const char* Replacement () = 0;
         virtual const char* Tag         () = 0;
+        
+      protected:
+        virtual ~ITranslator () {}
     };
 
     typedef xtl::function<void (const char* event)> EventHandler;
-    typedef xtl::iterator<Translator> Iterator;
+    typedef xtl::iterator<ITranslator> Iterator;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онструкторы / деструктор / присваивание

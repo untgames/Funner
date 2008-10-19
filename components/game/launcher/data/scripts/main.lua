@@ -34,10 +34,11 @@ Application.InitRender () --необходимо вызывать до Application.SetScreen (screen
 
 viewport = Render.Viewport.Create ()
 
+viewport:SetArea (0, 0, 100, 100)
+
 viewport.Name = "Viewport1"
 viewport.RenderPath = "Render2d"
 
-viewport:SetArea (0, 0, 100, 100);
 viewport.Camera = camera
 
 screen = Render.Screen.Create ()
@@ -117,9 +118,9 @@ function idle (dt)
   sprite:Translate ((velocity ['+x'] - velocity ['-x']) * dt * velocity_x,
                     (velocity ['+y'] - velocity ['-y']) * dt * velocity_y, 0)
 
-  if (current_text_length > string.len (text_string)) then current_text_length = 1 end
+--  if (current_text_length > string.len (text_string)) then current_text_length = 1 end
 
 --  text_line.Text = string.char (string.byte (text_string, 1, current_text_length))
 
-  current_text_length = current_text_length + 1
+--  current_text_length = current_text_length + 1
 end

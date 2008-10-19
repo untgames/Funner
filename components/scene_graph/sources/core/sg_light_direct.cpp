@@ -4,7 +4,7 @@ using namespace scene_graph;
 using namespace math;
 using namespace bound_volumes;
 
-const float INFINITY = 1e9;  //если радиус/расстояние источника света превышает эту величину, устанавливаются бесконечные bv
+const float LIGHT_INFINITY = 1.0e+9f;  //если радиус/расстояние источника света превышает эту величину, устанавливаются бесконечные bv
 
 /*
     Описание реализации DirectLight
@@ -60,7 +60,7 @@ float DirectLight::Radius () const
 
 void DirectLight::UpdateBoundsCore ()
 {
-  if (Range () >= INFINITY || impl->radius >= INFINITY)
+  if (Range () >= LIGHT_INFINITY || impl->radius >= LIGHT_INFINITY)
     SetInfiniteBounds ();
   else
     SetBoundBox (axis_aligned_box <float> (-impl->radius, -impl->radius, 0, impl->radius, impl->radius, Range ()));

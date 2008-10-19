@@ -75,7 +75,7 @@ void RenderableSpriteModel::Update ()
     {
         //получение материала из кэша
 
-      SpriteMaterial* material = impl->render.GetMaterial (model->Material ());
+      SpriteMaterial* material = impl->render.GetMaterial (model->Material ());      
       
         //преобразование режима смешивания цветов
 
@@ -112,7 +112,7 @@ void RenderableSpriteModel::Update ()
       ITexture* texture = impl->render.GetTexture (material->Image (), need_alpha, impl->query);
       
         //проверка корректности данных - получение размеров текстуры и тайла
-
+        
       if (material->IsTiled ())
       {        
         size_t texture_width  = texture->GetWidth (),

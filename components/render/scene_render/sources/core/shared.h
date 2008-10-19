@@ -99,7 +99,7 @@ class RenderManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void LogPrintf (const char* format, ...);
 
-  private:    
+  private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация целей рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +161,7 @@ class RenderTargetImpl: public xtl::reference_counter
 ///Создание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static Pointer Create (mid_level::IRenderTarget* color_attachment, mid_level::IRenderTarget* depth_stencil_attachment);
-    static Pointer Create (RenderManager& render_manager, mid_level::IRenderTarget* color_attachment, mid_level::IRenderTarget* depth_stencil_attachment);
+    static Pointer Create (render::RenderManager& render_manager, mid_level::IRenderTarget* color_attachment, mid_level::IRenderTarget* depth_stencil_attachment);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Целевые буферы рендеринга
@@ -204,10 +204,16 @@ class RenderTargetImpl: public xtl::reference_counter
     void CaptureImage (const char* image_name);
 
   private:    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация в менеджере рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Register   (render::RenderManager&);
+    void Unregister (render::RenderManager&);
+
     RenderTargetImpl (mid_level::IRenderTarget* render_target, mid_level::IRenderTarget* depth_stencil_target);
   
     RenderTargetImpl (const RenderTargetImpl&); //no impl
-    RenderTargetImpl& operator = (const RenderTargetImpl&); //no impl
+    RenderTargetImpl& operator = (const RenderTargetImpl&); //no impl    
 
   private:
     struct Impl;

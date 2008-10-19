@@ -48,26 +48,26 @@ struct ActionMap::Impl : public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void ProcessEvent (const char* event) const
     {
-      vector<string> event_components;
+      StringArray event_components;
       
       split_event (event, event_components);
       
-      if (event_components.empty ())
+      if (event_components.IsEmpty ())
         return;
 
-      HandlerMap::const_iterator iter = handlers.find (event_components[0]);
+      HandlerMap::const_iterator iter = handlers.find (event_components [0]);
 
       if (iter == handlers.end ())
         return;
       
       vector<const char*> args;
 
-      args.reserve (event_components.size () - 1);
+      args.reserve (event_components.Size () - 1);
 
-      for (size_t i = 1; i < event_components.size (); i++)
-        args.push_back (event_components[i].c_str ());
+      for (size_t i = 1; i < event_components.Size (); i++)
+        args.push_back (event_components [i]);
       
-      iter->second (event_components[0].c_str (), event_components.size () - 1, &args[0]);
+      iter->second (event_components [0], event_components.Size () - 1, &args[0]);
     }
 
   private:

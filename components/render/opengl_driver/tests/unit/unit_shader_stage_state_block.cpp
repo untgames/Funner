@@ -7,9 +7,6 @@ const char* SHADER_FILE_NAME = "data/fpp_shader.wxf";
 struct MyShaderParameters
 {
   math::vec3f light_position;
-  int         bump_texture_slot;
-  int         diffuse_texture_slot;  
-  math::mat4f transform;
 };
 
 struct State
@@ -47,33 +44,27 @@ int main ()
   
   try
   {
-    Test test;
-    
-    static ProgramParameter shader_parameters[] = {
-      {"LightPosition", ProgramParameterType_Float3, 3, 1, offsetof (MyShaderParameters, light_position)},
-      {"bump_sampler2d", ProgramParameterType_Int, 3, 1, offsetof (MyShaderParameters, bump_texture_slot)},
-      {"diffuse_sampler2d", ProgramParameterType_Int, 3, 1, offsetof (MyShaderParameters, diffuse_texture_slot)},      
-      {"Transform", ProgramParameterType_Float4x4, 3, 1, offsetof (MyShaderParameters, transform)}
-    };
+    Test test;        
 
-    stl::string shader_source;
-    
-    common::FileSystem::LoadTextFile (SHADER_FILE_NAME, shader_source);
-
-    ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
-    
     ShaderDesc shader_descs [] = {
-      {"fpp_shader", ~0, shader_source.c_str (), "fpp", ""},
-    }; 
+      {"fpp_shader", ~0, "", "fpp", ""},
+    };    
 
-    ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));
-    ProgramParametersLayoutPtr program_parameters_layout (test.device->CreateProgramParametersLayout (program_parameters_layout_desc));
+    ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));        
+
+    static ProgramParameter shader_parameters [] = {
+      {"LightPosition", ProgramParameterType_Float3, 3, 1, 0},
+    };    
+    
+    ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof (shader_parameters) / sizeof (*shader_parameters), shader_parameters};
+
+    ProgramParametersLayoutPtr program_parameters_layout (test.device->CreateProgramParametersLayout (program_parameters_layout_desc));        
 
     BufferDesc cb_desc;
     
     memset (&cb_desc, 0, sizeof cb_desc);
     
-    cb_desc.size         = sizeof MyShaderParameters;
+    cb_desc.size         = sizeof (MyShaderParameters);
     cb_desc.usage_mode   = UsageMode_Default;
     cb_desc.bind_flags   = BindFlag_ConstantBuffer;
     cb_desc.access_flags = AccessFlag_ReadWrite;

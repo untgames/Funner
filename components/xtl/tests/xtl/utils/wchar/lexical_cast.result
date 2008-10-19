@@ -46,7 +46,7 @@ exception 'bad_lexical_cast' accepted
 conversion to wstring:
 expression 'L"123" == lexical_cast<stl::wstring>(123)' is true
 expression 'L"1.23" == lexical_cast<stl::wstring>(1.23)' is true
-expression 'L"1.111111111" == lexical_cast<stl::wstring>(1.111111111)' is true
+expression 'L"1.11111" == lexical_cast<stl::wstring>(1.11111)' is true
 expression 'L"1" == lexical_cast<stl::wstring>(true)' is true
 expression 'L"0" == lexical_cast<stl::wstring>(false)' is true
 expression 'L"A" == lexical_cast<stl::wstring>(L'A')' is true

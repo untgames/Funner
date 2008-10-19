@@ -2,7 +2,7 @@
 
 using namespace script;
 
-const size_t BAD_VALUE = 12;
+const int BAD_VALUE = 12;
 
 const char* lua_f = 
 "function test1 (object)\nreturn object:get_id()+object.id\nend\n"

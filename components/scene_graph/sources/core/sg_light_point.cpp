@@ -4,7 +4,7 @@ using namespace scene_graph;
 using namespace math;
 using namespace bound_volumes;
 
-const float INFINITY = 1e9;  //если радиус/расстояние источника света превышает эту величину, устанавливаются бесконечные bv
+const float LIGHT_INFINITY = 1e9;  //если радиус/расстояние источника света превышает эту величину, устанавливаются бесконечные bv
 
 /*
     Конструктор / деструктор
@@ -33,7 +33,7 @@ PointLight::Pointer PointLight::Create ()
 
 void PointLight::UpdateBoundsCore ()
 {
-  if (Range () >= INFINITY)
+  if (Range () >= LIGHT_INFINITY)
     SetInfiniteBounds ();
   else;
     SetBoundBox (axis_aligned_box <float> (-Range (), -Range (), -Range (), Range (), Range (), Range ()));

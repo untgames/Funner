@@ -19,6 +19,8 @@ int main ()
     write (stream, "\n");
     write (stream, 3.14f, "###.000");
     write (stream, "\n");
+    write (stream, 3.14f, ".000");
+    write (stream, "\n");    
     write (stream, 3.14f, "-000.0");
     write (stream, "\n");
     write (stream, true, "alpha");

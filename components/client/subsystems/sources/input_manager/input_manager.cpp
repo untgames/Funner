@@ -79,7 +79,7 @@ class InputManagerSubsystem : public IEngineSubsystem, public IEngineEventListen
 
       for (size_t i = 0; i < DriverManager::DriversCount (); i++)
       {
-        IDriver *current_driver = DriverManager::Driver (i);
+        IDriver * volatile current_driver = DriverManager::Driver (i);
 
         for (size_t j = 0; j < current_driver->GetDevicesCount (); j++)
         {

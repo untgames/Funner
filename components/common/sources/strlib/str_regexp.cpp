@@ -1,4 +1,6 @@
+#include <xtl/uninitialized_storage.h>
 #include <common/strlib.h>
+#include <common/singleton.h>
 #include <locale.h>
 #include <pcre.h>
 
@@ -14,6 +16,17 @@ static const unsigned char* loc_tables = NULL;
 
 namespace
 {
+
+typedef xtl::uninitialized_storage<int> OffsetBuffer;
+
+struct OffsetBufferHolder
+{
+  OffsetBuffer buffer;
+
+  OffsetBufferHolder () : buffer (MAX_TOKENS * 3) {}
+};
+
+typedef Singleton<OffsetBufferHolder> OffsetBufferSingleton;
 
 int parse_internal (const char* str,const char* pattern,const char* flags,int* offset_buf=0,size_t max_buf_size=0)
 {
@@ -107,29 +120,33 @@ int parse_internal (const char* str,const char* pattern,const char* flags,int* o
 
 }
 
-vector<string> parse (const char* str,const char* pattern,const char* flags)
-{  
-  int offset [MAX_TOKENS*3]; //требование библиотеки  
+StringArray parse (const char* str,const char* pattern,const char* flags)
+{
+  OffsetBuffer& offset_buffer = OffsetBufferSingleton::Instance ().buffer;
 
-  int tokens_count = parse_internal (str,pattern,flags,offset,MAX_TOKENS*3);
+  int* offset = offset_buffer.data ();  
 
-  vector<string> res;
+  int tokens_count = parse_internal (str,pattern,flags,offset,offset_buffer.size ());
+  
+  StringArray res;  
 
   if (tokens_count <= 0)
     return res;    
 
-  res.reserve (tokens_count);  
+  res.Reserve (tokens_count);
 
-//  for (int i=1;i<tokens_count;i++)
   for (int i=0;i<tokens_count;i++)
-    res.push_back (string (str+offset [2*i],str+offset [2*i+1]));    
-
+    res.Add (string (str+offset [2*i],str+offset [2*i+1]).c_str ());
+    
   return res;
 }
 
 string replace (const char* str,const char* pattern,const char* replacement,const char* flags)
 {
-  int offset [MAX_TOKENS*3]; //требование библиотеки
+  OffsetBuffer& offset_buffer = OffsetBufferSingleton::Instance ().buffer;
+  
+  int* offset = offset_buffer.data ();
+
   int tokens_count = parse_internal (str,pattern,flags,offset,MAX_TOKENS*3);
 
   if (tokens_count <= 0)

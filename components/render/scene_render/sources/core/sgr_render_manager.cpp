@@ -81,17 +81,16 @@ class RenderManager::Impl: private mid_level::IRendererListener
 
           //построение множества имён путей рендеринга
           
-        typedef stl::vector<stl::string>   StringArray;
         typedef stl::hash_set<stl::string> StringSet;
           
         StringSet                    path_names;
-        StringArray                  path_masks        = common::split (render_path_masks);
+        common::StringArray          path_masks        = common::split (render_path_masks);
         SceneRenderManager::Iterator render_path_begin = SceneRenderManager::CreateIterator ();
 
-        for (StringArray::iterator iter=path_masks.begin (), end=path_masks.end (); iter!=end; ++iter)
+        for (size_t i=0, count=path_masks.Size (); i<count; i++)
         {
-          const char* render_path_mask = iter->c_str ();      
-          
+          const char* render_path_mask = path_masks [i]; 
+
           if (!strchr (render_path_mask, '*') && !strchr (render_path_mask, '?'))
           {
             path_names.insert (render_path_mask);

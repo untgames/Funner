@@ -49,7 +49,7 @@ int main ()
     
       //создание текстуры
     
-    Texture2dPtr texture (renderer->CreateTexture (400, 300, media::PixelFormat_RGBA8), false);
+    Texture2dPtr texture (renderer->CreateTexture (400, 300, PixelFormat_RGBA8), false);
     
       //создание примитивов
     

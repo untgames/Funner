@@ -113,8 +113,7 @@ void idle (TestApplication& app, TestScene& scene)
         return;
 
       SpriteModel::SpriteDesc* sprite         = scene.sprite_list->Sprites ();
-      size_t                   sprites_count  = scene.sprite_list->SpritesCount ();            
-      ParticleFrame&           particle_frame = *scene.particle_system.frames [scene.current_particle_frame];
+      ParticleFrame& particle_frame = *scene.particle_system.frames [scene.current_particle_frame];
 
       for (ParticleArray::iterator  pos_iter = particle_frame.particles.begin (); pos_iter!=particle_frame.particles.end (); ++pos_iter, ++sprite)
       {
@@ -152,6 +151,11 @@ void idle (TestApplication& app, TestScene& scene)
   }
 }
 
+void log_print (const char* log, const char* message)
+{
+  printf ("%s: %s\n", log, message);
+}
+
 int main (int argc, char* argv [])
 {
   if (argc >= 2)
@@ -160,6 +164,8 @@ int main (int argc, char* argv [])
   }
 
   printf ("Results of test_particles:\n");
+  
+  common::LogFilter filter ("*", &log_print);
 
   try
   {    

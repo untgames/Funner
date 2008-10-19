@@ -60,7 +60,13 @@ template <class T> typename range_const_iterator<T>::type         const_end    (
 template <class T> typename range_const_reverse_iterator<T>::type const_rbegin (const T&);
 template <class T> typename range_const_reverse_iterator<T>::type const_rend   (const T&);
 
+namespace type_traits
+{
+
 #include <xtl/detail/type_traits/cv.inl>
+
+}
+
 #include <xtl/detail/range_traits.inl>
 
 }

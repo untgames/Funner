@@ -13,7 +13,7 @@ void controls_detector_saver (const char* file_name, const ControlsDetector& sou
 
   for (ControlsDetector::Iterator iter=source_detector.CreateIterator (); iter; ++iter)
   {    
-    ControlsDetector::Filter& filter = *iter;
+    ControlsDetector::IFilter& filter = *iter;
 
     XmlWriter::Scope scope (writer, "Filter");
 

@@ -39,217 +39,7 @@ const char* get_al_error_message (ALenum error)
   }
 }
 
-//получение текстового имени константы OpenALContext
-const char* get_alc_constant_name (ALCenum value)
-{
-  switch (value)
-  {
-    case ALC_ATTRIBUTES_SIZE                       : return "ALC_ATTRIBUTES_SIZE";
-    case ALC_ALL_ATTRIBUTES                        : return "ALC_ALL_ATTRIBUTES";
-    case ALC_MAJOR_VERSION                         : return "ALC_MAJOR_VERSION";
-    case ALC_MINOR_VERSION                         : return "ALC_MINOR_VERSION";
-    case ALC_CAPTURE_SAMPLES                       : return "ALC_CAPTURE_SAMPLES";
-    case ALC_DEFAULT_DEVICE_SPECIFIER              : return "ALC_DEFAULT_DEVICE_SPECIFIER";
-    case ALC_DEVICE_SPECIFIER                      : return "ALC_DEVICE_SPECIFIER";
-    case ALC_EXTENSIONS                            : return "ALC_EXTENSIONS";
-    case ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER      : return "ALC_CAPTURE_DEFAULT_DEVICE_SPECIFIER";
-    case ALC_CAPTURE_DEVICE_SPECIFIER              : return "ALC_CAPTURE_DEVICE_SPECIFIER";
-    case ALC_EFX_MAJOR_VERSION                     : return "ALC_EFX_MAJOR_VERSION";
-    case ALC_EFX_MINOR_VERSION                     : return "ALC_EFX_MINOR_VERSION";
-    case ALC_MAX_AUXILIARY_SENDS                   : return "ALC_MAX_AUXILIARY_SENDS";
-    default                                        : return 0;
-  }
-}
-//размерность массива аргументов
-size_t get_array_size (ALenum param)
-{
-  switch (param)
-  {
-    case AL_POSITION:
-    case AL_DIRECTION:
-    case AL_ORIENTATION:
-    case AL_VELOCITY:    return 3;
-    default:             return 0;
-  }
-}
-
-/*
-    Обёртки для информативности вывода
-*/
-
-//обёртка для вывода названий констант OpenAL
-struct EnumWrapper
-{
-  EnumWrapper (ALenum in_value) : value (in_value) {}
-  
-  operator ALenum () const { return value; }
-  
-  ALenum value;
-};
-
-inline EnumWrapper make_wrapper (ALenum value)
-{
-  return EnumWrapper (value);
-}
-
-//обёртка для вывода названий констант OpenALContext
-struct ContextEnumWrapper
-{
-  ContextEnumWrapper (ALCenum in_value) : value (in_value) {}
-  
-  operator ALCenum () const { return value; }
-  
-  ALCenum value;
-};
-
-inline ContextEnumWrapper make_alc_wrapper (ALCenum value)
-{
-  return ContextEnumWrapper (value);
-}
-
-//обёртка для печати массивов
-template <class T> struct ArrayWrapper
-{
-  ArrayWrapper (size_t in_size, T* in_array) : size (in_size), array (in_array) {}
-  
-  operator T* () const { return array; }
-
-  size_t size;
-  T*     array;
-};
-
-template <class T>
-inline ArrayWrapper<T> make_wrapper (size_t size, T* array)
-{
-  return ArrayWrapper<T> (size, array);
-}
-
-/*
-    Печать аргументов
-*/
-
-template <size_t Size> struct ArgumentsCount {};
-
-template <class Tuple>
-inline void dump_arguments (const Tuple& args, string& result)
-{
-  dump_arguments (args, result, ArgumentsCount<tuple_size<Tuple>::value> ());
-}
-
-template <class Tuple>
-inline void dump_arguments (const Tuple& args, string& result, ArgumentsCount<0>)
-{
-}
-
-template <class Tuple>
-inline void dump_arguments (const Tuple& args, string& result, ArgumentsCount<1>)
-{
-  dump_argument (get<0> (args), result);
-}
-
-template <class Tuple>
-inline void dump_arguments (const Tuple& args, string& result, ArgumentsCount<2>)
-{
-  dump_argument       (get<0> (args), result);
-  dump_comma_argument (get<1> (args), result);
-}
-
-template <class Tuple>
-inline void dump_arguments (const Tuple& args, string& result, ArgumentsCount<3>)
-{
-  dump_argument       (get<0> (args), result);
-  dump_comma_argument (get<1> (args), result);
-  dump_comma_argument (get<2> (args), result);
-}
-
-template <class Tuple>
-inline void dump_arguments (const Tuple& args, string& result, ArgumentsCount<4>)
-{
-  dump_argument       (get<0> (args), result);
-  dump_comma_argument (get<1> (args), result);
-  dump_comma_argument (get<2> (args), result);
-  dump_comma_argument (get<3> (args), result);
-}
-
-template <class Tuple>
-inline void dump_arguments (const Tuple& args, string& result, ArgumentsCount<5>)
-{
-  dump_argument       (get<0> (args), result);
-  dump_comma_argument (get<1> (args), result);
-  dump_comma_argument (get<2> (args), result);
-  dump_comma_argument (get<3> (args), result);
-  dump_comma_argument (get<4> (args), result);
-}
-
-template <class T>
-inline void dump_comma_argument (const T& value, string& result)
-{
-  result += ',';
-
-  dump_argument (value, result);
-}
-
-inline void dump_argument (int value, string& result)
-{
-  result += format ("%d", value);  
-}
-
-inline void dump_argument (size_t value, string& result)
-{
-  result += format ("%u", value);  
-}
-
-inline void dump_argument (double value, string& result)
-{
-  result += format ("%.3f", value);
-}
-
-inline void dump_argument (float value, string& result)
-{
-  result += format ("%.3f", value);
-}
-
-inline void dump_argument (const void* ptr, string& result)
-{
-  result += ptr ? "pointer" : "null";
-}
-
-inline void dump_argument (const EnumWrapper& arg, string& result)
-{
-  const char* name = get_al_constant_name (arg.value);
-  
-  if (!name) result += format ("ALenum (%d)", arg.value);
-  else       result += name;
-}
-
-inline void dump_argument (const ContextEnumWrapper& arg, string& result)
-{
-  const char* name = get_alc_constant_name (arg.value);
-  
-  if (!name) result += format ("ALCenum (%d)", arg.value);
-  else       result += name;
-}
-
-template <class T>
-inline void dump_argument (const ArrayWrapper<T>& arg, string& result)
-{
-  result += '{';
-
-  if (arg.size)
-  {
-    dump_argument (arg.array [0], result);
-    
-    for (size_t i=1; i<arg.size; i++)
-    {
-      result += ',';
-      
-      dump_argument (arg.array [i], result);
-    }
-  }
-
-  result += '}';
-}
-
+//настройки инициализации контекста
 struct ContextInitProperties
 {
   size_t frequency;
@@ -265,136 +55,54 @@ void process_init_string (const char* property, const char* value, ContextInitPr
 
 }
 
-namespace sound
-{
-
-namespace low_level
-{
-
-namespace openal
-{
-
-//получение текстового имени константы OpenAL
-const char* get_al_constant_name (ALenum value)
-{
-  switch (value)
-  {
-    case AL_SOURCE_RELATIVE                        : return "AL_SOURCE_RELATIVE";
-    case AL_CONE_INNER_ANGLE                       : return "AL_CONE_INNER_ANGLE";
-    case AL_CONE_OUTER_ANGLE                       : return "AL_CONE_OUTER_ANGLE";
-    case AL_PITCH                                  : return "AL_PITCH";
-    case AL_POSITION                               : return "AL_POSITION";
-    case AL_DIRECTION                              : return "AL_DIRECTION";
-    case AL_VELOCITY                               : return "AL_VELOCITY";
-    case AL_LOOPING                                : return "AL_LOOPING";
-    case AL_BUFFER                                 : return "AL_BUFFER";
-    case AL_GAIN                                   : return "AL_GAIN";
-    case AL_MIN_GAIN                               : return "AL_MIN_GAIN";
-    case AL_MAX_GAIN                               : return "AL_MAX_GAIN";
-    case AL_ORIENTATION                            : return "AL_ORIENTATION";
-    case AL_CHANNEL_MASK                           : return "AL_CHANNEL_MASK";
-    case AL_SOURCE_STATE                           : return "AL_SOURCE_STATE";
-    case AL_INITIAL                                : return "AL_INITIAL";
-    case AL_PLAYING                                : return "AL_PLAYING";
-    case AL_PAUSED                                 : return "AL_PAUSED";
-    case AL_STOPPED                                : return "AL_STOPPED";
-    case AL_BUFFERS_QUEUED                         : return "AL_BUFFERS_QUEUED";
-    case AL_BUFFERS_PROCESSED                      : return "AL_BUFFERS_PROCESSED";
-    case AL_SEC_OFFSET                             : return "AL_SEC_OFFSET";
-    case AL_SAMPLE_OFFSET                          : return "AL_SAMPLE_OFFSET";
-    case AL_BYTE_OFFSET                            : return "AL_BYTE_OFFSET";
-    case AL_SOURCE_TYPE                            : return "AL_SOURCE_TYPE";
-    case AL_STATIC                                 : return "AL_STATIC";
-    case AL_STREAMING                              : return "AL_STREAMING";
-    case AL_UNDETERMINED                           : return "AL_UNDETERMINED";
-    case AL_FORMAT_MONO8                           : return "AL_FORMAT_MONO8";
-    case AL_FORMAT_MONO16                          : return "AL_FORMAT_MONO16";
-    case AL_FORMAT_STEREO8                         : return "AL_FORMAT_STEREO8";
-    case AL_FORMAT_STEREO16                        : return "AL_FORMAT_STEREO16";
-    case AL_REFERENCE_DISTANCE                     : return "AL_REFERENCE_DISTANCE";
-    case AL_ROLLOFF_FACTOR                         : return "AL_ROLLOFF_FACTOR";
-    case AL_CONE_OUTER_GAIN                        : return "AL_CONE_OUTER_GAIN";
-    case AL_MAX_DISTANCE                           : return "AL_MAX_DISTANCE";
-    case AL_FREQUENCY                              : return "AL_FREQUENCY";
-    case AL_BITS                                   : return "AL_BITS";
-    case AL_CHANNELS                               : return "AL_CHANNELS";
-    case AL_SIZE                                   : return "AL_SIZE";
-    case AL_UNUSED                                 : return "AL_UNUSED";
-    case AL_PENDING                                : return "AL_PENDING";
-    case AL_PROCESSED                              : return "AL_PROCESSED";
-    case AL_INVALID_NAME                           : return "AL_INVALID_NAME";
-//    case AL_ILLEGAL_ENUM                           : return "AL_ILLEGAL_ENUM";
-    case AL_INVALID_ENUM                           : return "AL_INVALID_ENUM";
-    case AL_INVALID_VALUE                          : return "AL_INVALID_VALUE";
-//    case AL_ILLEGAL_COMMAND                        : return "AL_ILLEGAL_COMMAND";
-    case AL_INVALID_OPERATION                      : return "AL_INVALID_OPERATION";
-    case AL_OUT_OF_MEMORY                          : return "AL_OUT_OF_MEMORY";
-    case AL_VENDOR                                 : return "AL_VENDOR";
-    case AL_VERSION                                : return "AL_VERSION";
-    case AL_RENDERER                               : return "AL_RENDERER";
-    case AL_EXTENSIONS                             : return "AL_EXTENSIONS";
-    case AL_DOPPLER_FACTOR                         : return "AL_DOPPLER_FACTOR";
-    case AL_DOPPLER_VELOCITY                       : return "AL_DOPPLER_VELOCITY";
-    case AL_SPEED_OF_SOUND                         : return "AL_SPEED_OF_SOUND";
-    case AL_DISTANCE_MODEL                         : return "AL_DISTANCE_MODEL";
-    case AL_NONE                                   : return "AL_NONE";
-    case AL_INVERSE_DISTANCE                       : return "AL_INVERSE_DISTANCE";
-    case AL_INVERSE_DISTANCE_CLAMPED               : return "AL_INVERSE_DISTANCE_CLAMPED";
-    case AL_LINEAR_DISTANCE                        : return "AL_LINEAR_DISTANCE";
-    case AL_LINEAR_DISTANCE_CLAMPED                : return "AL_LINEAR_DISTANCE_CLAMPED";
-    case AL_EXPONENT_DISTANCE                      : return "AL_EXPONENT_DISTANCE";
-    case AL_EXPONENT_DISTANCE_CLAMPED              : return "AL_EXPONENT_DISTANCE_CLAMPED";
-    default                                        : return 0;
-  }
-}
-
-}
-
-}
-
-}
-
 /*
     Конструктор / деструктор
 */
 
 OpenALContext::OpenALContext (const char* device_name, const char* init_string)
-  : debug_log_state (false)
 {
-  if (!device_name)
-    throw xtl::make_null_argument_exception ("sound::low_level::OpenALContext::OpenALContext", "device_name");
-    
-  if (!xstrcmp (device_name, "default"))
-    device_name = 0;
-
-  if (!init_string)
-    throw xtl::make_null_argument_exception ("sound::low_level::OpenALContext::OpenALContext", "init_string");
-    
-  device = alcOpenDevice (device_name);
-  
-  if (!device) 
-    throw xtl::format_exception<OpenALException> ("sound::low_level::OpenALContext::OpenALContext", "Can't open device '%s'", device_name);
-
-  efx_present = alcIsExtensionPresent ("ALC_EXT_EFX") == ALC_TRUE;
-
-  ContextInitProperties properties;
-
-  common::parse_init_string (init_string, xtl::bind (&process_init_string, _1, _2, ref (properties)));
-
-  ALint attribs[4] = {0};
-
-  if (properties.frequency)
+  try
   {
-    attribs[0] = ALC_FREQUENCY;
-    attribs[1] = properties.frequency;
+    if (!device_name)
+      throw xtl::make_null_argument_exception ("", "device_name");
+
+    if (!xstrcmp (device_name, "default"))
+      device_name = 0;
+
+    if (!init_string)
+      throw xtl::make_null_argument_exception ("", "init_string");
+      
+    ContextInitProperties properties;
+
+    common::parse_init_string (init_string, xtl::bind (&process_init_string, _1, _2, ref (properties)));      
+
+    device = alcOpenDevice (device_name);
+
+    if (!device) 
+      throw xtl::format_exception<OpenALException> ("", "Can't open device '%s'", device_name);
+
+    efx_present = alcIsExtensionPresent ("ALC_EXT_EFX") == ALC_TRUE;
+
+    ALint attribs[4] = {0};
+
+    if (properties.frequency)
+    {
+      attribs[0] = ALC_FREQUENCY;
+      attribs[1] = properties.frequency;
+    }
+
+    context = alcCreateContext (device, attribs);
+
+    if (!context)
+    {
+      alcCloseDevice (device);
+      throw xtl::format_exception<OpenALException> ("", "Can't create context. %s", get_alc_error_message (alcGetError (device)));
+    }    
   }
-
-  context = alcCreateContext (device, attribs);
-
-  if (!context)
+  catch (xtl::exception& exception)
   {
-    alcCloseDevice (device);
-    throw xtl::format_exception<OpenALException> ("OpenALDevice::OpenALDevice", "Can't create context. %s", get_alc_error_message (alcGetError (device)));
+    exception.touch ("sound::low_level::OpenALContext::OpenALContext");
+    throw;
   }
 }
 
@@ -456,7 +164,7 @@ void OpenALContext::LogPrintf (const char* message, ...)
     va_list list;
 
     va_start (list, message);
-    
+
     log_handler (vformat (message, list).c_str ());
   }
   catch (...)
@@ -469,102 +177,32 @@ void OpenALContext::LogPrintf (const char* message, ...)
     Проверка ошибок после вызова функции
 */
 
-template <class Tuple>
-void OpenALContext::CheckErrors (const char* function_name, const Tuple& args)
+void OpenALContext::CheckErrors (const char* function_name)
 {
   ALenum error = alGetError ();
-  
+
   try
   {
     if (error != AL_NO_ERROR)
-    {
-      string args_string;
-      
-      dump_arguments (args, args_string);
-      
-      LogPrintf ("Error at call %s(%s). %s", function_name, args_string.c_str (), get_al_error_message (error));
-    }
-    else if (debug_log_state)
-    {
-      string args_string;          
-
-      dump_arguments (args, args_string);
-
-      LogPrintf ("%s(%s)", function_name, args_string.c_str ());
-    }
+      LogPrintf ("Error at call %s. %s", function_name, get_al_error_message (error));
   }
   catch (...)
   {
-    LogPrintf ("Error at call %s(...). %s", function_name, get_al_error_message (error));
   }
 }
 
-template <class Tuple>
-void OpenALContext::ContextCheckErrors (const char* function_name, const Tuple& args)
+void OpenALContext::ContextCheckErrors (const char* function_name)
 {
   ALCenum error = alcGetError (device);
   
   try
   {
     if (error != ALC_NO_ERROR)
-    {
-      string args_string;
-      
-      dump_arguments (args, args_string);
-      
-      LogPrintf ("Error at call %s(%s). %s", function_name, args_string.c_str (), get_al_error_message (error));
-    }
-    else if (debug_log_state)
-    {
-      string args_string;          
-
-      dump_arguments (args, args_string);
-
-      LogPrintf ("%s(%s)", function_name, args_string.c_str ());
-    }
+      LogPrintf ("Error at call %s. %s", function_name, get_al_error_message (error));
   }
   catch (...)
   {
-    LogPrintf ("Error at call %s(...). %s", function_name, get_al_error_message (error));
   }
-}
-
-/*
-    Диспетчеры обращений к OpenAL
-*/
-
-template <class Fn, class Tuple>
-void OpenALContext::Dispatch (const char* function_name, Fn fn, const Tuple& args)
-{
-  apply<void> (fn, args);
-  CheckErrors (function_name, args);
-}
-
-template <class Ret, class Fn, class Tuple>
-Ret OpenALContext::Dispatch (const char* function_name, Fn fn, const Tuple& args)
-{
-  Ret result = apply<Ret> (fn, args);
-
-  CheckErrors (function_name, args);
-
-  return result;
-}
-
-template <class Fn, class Tuple>
-void OpenALContext::ContextDispatch (const char* function_name, Fn fn, const Tuple& args)
-{
-  apply<void> (fn, args);
-  ContextCheckErrors (function_name, args);
-}
-
-template <class Ret, class Fn, class Tuple>
-Ret OpenALContext::ContextDispatch (const char* function_name, Fn fn, const Tuple& args)
-{
-  Ret result = apply<Ret> (fn, args);
-
-  ContextCheckErrors (function_name, args);
-
-  return result;
 }
 
 /*
@@ -573,347 +211,347 @@ Ret OpenALContext::ContextDispatch (const char* function_name, Fn fn, const Tupl
 
 void OpenALContext::alEnable (ALenum capability)
 {
-  Dispatch ("alEnable", &::alEnable, tie (make_wrapper (capability)));
+  ::alEnable (capability); CheckErrors ("alEnable");
 }
 
 void OpenALContext::alDisable (ALenum capability)
 {
-  Dispatch ("alDisable", &::alDisable, tie (make_wrapper (capability)));
+  ::alDisable (capability); CheckErrors ("alDisable");
 }
 
 ALboolean OpenALContext::alIsEnabled (ALenum capability)
 {
-  return Dispatch<ALboolean> ("alIsEnabled", &::alIsEnabled, tie (make_wrapper (capability)));
+  ALboolean result = ::alIsEnabled (capability); CheckErrors ("alIsEnabled"); return result;
 }
 
 const ALchar* OpenALContext::alGetString (ALenum param)
 {
-  return Dispatch<const ALchar*> ("alGetString", &::alGetString, tie (make_wrapper (param)));
+  const ALchar* result = ::alGetString (param); CheckErrors ("alGetString"); return result;
 }
 
 void OpenALContext::alGetBooleanv (ALenum param, ALboolean* data)
 {
-  Dispatch ("alGetBooleanv", &::alGetBooleanv, tie (make_wrapper (param), data));
+  ::alGetBooleanv (param, data); CheckErrors ("alGetBooleanv");
 }
 
 void OpenALContext::alGetIntegerv (ALenum param, ALint* data)
 {
-  Dispatch ("alGetIntegerv", &::alGetIntegerv, tie (make_wrapper (param), data));
+  ::alGetIntegerv (param, data); CheckErrors ("alGetIntegerv");
 }
 
 void OpenALContext::alGetFloatv (ALenum param, ALfloat* data)
 {
-  Dispatch ("alGetFloatv", &::alGetFloatv, tie (make_wrapper (param), data));
+  ::alGetFloatv (param, data); CheckErrors ("alGetFloatv");
 }
 
 void OpenALContext::alGetDoublev (ALenum param, ALdouble* data)
 {
-  Dispatch ("alGetDoublev", &::alGetDoublev, tie (make_wrapper (param), data));
+  ::alGetDoublev (param, data); CheckErrors ("alGetDoublev");
 }
 
 ALboolean OpenALContext::alGetBoolean (ALenum param)
 {
-  return Dispatch<ALboolean> ("alGetBoolean", &::alGetBoolean, tie (make_wrapper (param)));
+  ALboolean result = ::alGetBoolean (param); CheckErrors ("alGetBoolean"); return result;
 }
 
 ALint OpenALContext::alGetInteger (ALenum param)
 {
-  return Dispatch<ALint> ("alGetInteger", &::alGetInteger, tie (make_wrapper (param)));
+  ALint result = ::alGetInteger (param); CheckErrors ("alGetInteger"); return result;
 }
 
 ALfloat OpenALContext::alGetFloat (ALenum param)
 {
-  return Dispatch<ALfloat> ("alGetFloat", &::alGetFloat, tie (make_wrapper (param)));
+  ALfloat result = ::alGetFloat (param); CheckErrors ("alGetFloat"); return result;
 }
 
 ALdouble OpenALContext::alGetDouble (ALenum param)
 {
-  return Dispatch<ALdouble> ("alGetDouble", &::alGetDouble, tie (make_wrapper (param)));
+  ALdouble result = ::alGetDouble (param); CheckErrors ("alGetDouble"); return result;
 }
 
 void OpenALContext::alGenSources (ALsizei n, ALuint* sources)
 {
-  Dispatch ("alGenSources", &::alGenSources, tie (n, sources));
+  ::alGenSources (n, sources); CheckErrors ("alGenSources");
 }
 
 void OpenALContext::alDeleteSources (ALsizei n, const ALuint* sources)
 {
-  Dispatch ("alDeleteSources", &::alDeleteSources, tie (n, make_wrapper (n, sources)));
+  ::alDeleteSources (n, sources); CheckErrors ("alDeleteSources");
 }
 
 ALboolean OpenALContext::alIsSource (ALuint sid)
 {
-  return Dispatch<ALboolean> ("alIsSource", &::alIsSource, tie (sid));
+  ALboolean result = ::alIsSource (sid); CheckErrors ("alIsSource"); return result;
 }
 
 void OpenALContext::alGetSourcef (ALuint sid, ALenum param, ALfloat* value)
 {
-  Dispatch ("alGetSourcef", &::alGetSourcef, tie (sid, make_wrapper (param), value));
+  ::alGetSourcef (sid, param, value); CheckErrors ("alGetSourcef");
 }
 
 void OpenALContext::alGetSource3f (ALuint sid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3)
 {
-  Dispatch ("alGetSource3f", &::alGetSource3f, tie (sid, make_wrapper (param), value1, value2, value3));
+  ::alGetSource3f (sid, param, value1, value2, value3); CheckErrors ("alGetSource3f");
 }
 
 void OpenALContext::alGetSourcefv (ALuint sid, ALenum param, ALfloat* values)
 {
-  Dispatch ("alGetSourcefv", &::alGetSourcefv, tie (sid, make_wrapper (param), values));
+  ::alGetSourcefv (sid, param, values); CheckErrors ("alGetSourcefv");
 }
 
 void OpenALContext::alGetSourcei (ALuint sid, ALenum param, ALint* value)
 {
-  Dispatch ("alGetSourcei", &::alGetSourcei, tie (sid, make_wrapper (param), value));
+  ::alGetSourcei (sid, param, value); CheckErrors ("alGetSourcei");
 }
 
 void OpenALContext::alGetSource3i (ALuint sid, ALenum param, ALint* value1, ALint* value2, ALint* value3)
 {
-  Dispatch ("alGetSource3i", &::alGetSource3i, tie (sid, make_wrapper (param), value1, value2, value3));
+  ::alGetSource3i (sid, param, value1, value2, value3); CheckErrors ("alGetSource3i");
 }
 
 void OpenALContext::alGetSourceiv (ALuint sid, ALenum param, ALint* values)
 {
-  Dispatch ("alGetSourceiv", &::alGetSourceiv, tie (sid, make_wrapper (param), values));
+  ::alGetSourceiv (sid, param, values); CheckErrors ("alGetSourceiv");
 }
 
 void OpenALContext::alSourcef (ALuint sid, ALenum param, ALfloat value)
 {
-  Dispatch ("alSourcef", &::alSourcef, tie (sid, make_wrapper (param), value));
+  ::alSourcef (sid, param, value); CheckErrors ("alSourcef");
 }
 
 void OpenALContext::alSource3f (ALuint sid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3)
 {
-  Dispatch ("alSource3f", &::alSource3f, tie (sid, make_wrapper (param), value1, value2, value3));
+  ::alSource3f (sid, param, value1, value2, value3); CheckErrors ("alSource3f");
 }
 
 void OpenALContext::alSourcefv (ALuint sid, ALenum param, const ALfloat* values)
 {
-  Dispatch ("alSourcefv", &::alSourcefv, tie (sid, make_wrapper (param), make_wrapper (get_array_size (param), values)));
+  ::alSourcefv (sid, param, values); CheckErrors ("alSourcefv");
 }
 
 void OpenALContext::alSourcei (ALuint sid, ALenum param, ALint value)
 {
-  Dispatch ("alSourcei", &::alSourcei, tie (sid, make_wrapper (param), value));
+  ::alSourcei (sid, param, value); CheckErrors ("alSourcei");
 }
 
 void OpenALContext::alSource3i (ALuint sid, ALenum param, ALint value1, ALint value2, ALint value3)
 {
-  Dispatch ("alSource3i", &::alSource3i, tie (sid, make_wrapper (param), value1, value2, value3));
+  ::alSource3i (sid, param, value1, value2, value3); CheckErrors ("alSource3i");
 }
 
 void OpenALContext::alSourceiv (ALuint sid, ALenum param, const ALint* values)
 {
-  Dispatch ("alSourceiv", &::alSourceiv, tie (sid, make_wrapper (param), make_wrapper (get_array_size (param), values)));
+  ::alSourceiv (sid, param, values); CheckErrors ("alSourceiv");
 }
 
 void OpenALContext::alSourcePlayv (ALsizei ns, const ALuint *sids)
 {
-  Dispatch ("alSourcePlayv", &::alSourcePlayv, tie (ns, make_wrapper (ns, sids)));
+  ::alSourcePlayv (ns, sids); CheckErrors ("alSourcePlayv");
 }
 
 void OpenALContext::alSourceStopv (ALsizei ns, const ALuint *sids)
 {
-  Dispatch ("alSourceStopv", &::alSourceStopv, tie (ns, make_wrapper (ns, sids)));
+  ::alSourceStopv (ns, sids); CheckErrors ("alSourceStopv");
 }
 
 void OpenALContext::alSourceRewindv (ALsizei ns, const ALuint *sids)
 {
-  Dispatch ("alSourceRewindv", &::alSourceRewindv, tie (ns, make_wrapper (ns, sids)));
+  ::alSourceRewindv (ns, sids); CheckErrors ("alSourceRewindv");
 }
 
 void OpenALContext::alSourcePausev (ALsizei ns, const ALuint *sids)
 {
-  Dispatch ("alSourcePausev", &::alSourcePausev, tie (ns, make_wrapper (ns, sids)));
+  ::alSourcePausev (ns, sids); CheckErrors ("alSourcePausev");
 }
 
 void OpenALContext::alSourcePlay (ALuint sid)
 {
-  Dispatch ("alSourcePlay", &::alSourcePlay, tie (sid));
+  ::alSourcePlay (sid); CheckErrors ("alSourcePlay");
 }
 
 void OpenALContext::alSourceStop (ALuint sid)
 {
-  Dispatch ("alSourceStop", &::alSourceStop, tie (sid));
+  ::alSourceStop (sid); CheckErrors ("alSourceStop");
 }
 
 void OpenALContext::alSourceRewind (ALuint sid)
 {
-  Dispatch ("alSourceRewind", &::alSourceRewind, tie (sid));
+  ::alSourceRewind (sid); CheckErrors ("alSourceRewind");
 }
 
 void OpenALContext::alSourcePause (ALuint sid)
 {
-  Dispatch ("alSourcePause", &::alSourcePause, tie (sid));
+  ::alSourcePause (sid); CheckErrors ("alSourcePause");
 }
 
 void OpenALContext::alSourceQueueBuffers (ALuint sid, ALsizei n, const ALuint* buffers)
 {
-  Dispatch ("alSourceQueueBuffers", &::alSourceQueueBuffers, tie (sid, n, make_wrapper (n, buffers)));
+  ::alSourceQueueBuffers (sid, n, buffers); CheckErrors ("alSourceQueueBuffers");
 }
 
 void OpenALContext::alSourceUnqueueBuffers (ALuint sid, ALsizei n, ALuint* buffers)
 {
-  Dispatch ("alSourceUnqueueBuffers", &::alSourceUnqueueBuffers, tie (sid, n, buffers));
+  ::alSourceUnqueueBuffers (sid, n, buffers); CheckErrors ("alSourceUnqueueBuffers");
 }
 
 void OpenALContext::alListenerf (ALenum param, ALfloat value)
 {
-  Dispatch ("alListenerf", &::alListenerf, tie (make_wrapper (param), value));
+  ::alListenerf (param, value); CheckErrors ("alListenerf");
 }
 
 void OpenALContext::alListener3f (ALenum param, ALfloat value1, ALfloat value2, ALfloat value3)
 {
-  Dispatch ("alListener3f", &::alListener3f, tie (make_wrapper (param), value1, value2, value3));
+  ::alListener3f (param, value1, value2, value3); CheckErrors ("alListener3f");
 }
 
 void OpenALContext::alListenerfv (ALenum param, const ALfloat* values)
 {
-  Dispatch ("alListenerfv", &::alListenerfv, tie (make_wrapper (param), make_wrapper (get_array_size (param), values)));
+  ::alListenerfv (param, values); CheckErrors ("alListenerfv");
 }
 
 void OpenALContext::alListeneri (ALenum param, ALint value)
 {
-  Dispatch ("alListeneri", &::alListeneri, tie (make_wrapper (param), value));
+  ::alListeneri (param, value); CheckErrors ("alListeneri");
 }
 
 void OpenALContext::alListener3i (ALenum param, ALint value1, ALint value2, ALint value3)
 {
-  Dispatch ("alListener3i", &::alListener3i, tie (make_wrapper (param), value1, value2, value3));
+  ::alListener3i (param, value1, value2, value3); CheckErrors ("alListener3i");
 }
 
 void OpenALContext::alListeneriv (ALenum param, const ALint* values)
 {
-  Dispatch ("alListeneriv", &::alListeneriv, tie (make_wrapper (param), make_wrapper (get_array_size (param), values)));
+  ::alListeneriv (param, values); CheckErrors ("alListeneriv");
 }
 
 void OpenALContext::alGetListenerf (ALenum param, ALfloat* value)
 {
-  Dispatch ("alGetListenerf", &::alGetListenerf, tie (make_wrapper (param), value));
+  ::alGetListenerf (param, value); CheckErrors ("alGetListenerf");
 }
 
 void OpenALContext::alGetListener3f (ALenum param, ALfloat *value1, ALfloat *value2, ALfloat *value3)
 {
-  Dispatch ("alGetListener3f", &::alGetListener3f, tie (make_wrapper (param), value1, value2, value3));
+  ::alGetListener3f (param, value1, value2, value3); CheckErrors ("alGetListener3f");
 }
 
 void OpenALContext::alGetListenerfv (ALenum param, ALfloat* values)
 {
-  Dispatch ("alGetListenerfv", &::alGetListenerfv, tie (make_wrapper (param), values));
+  ::alGetListenerfv (param, values); CheckErrors ("alGetListenerfv");
 }
 
 void OpenALContext::alGetListeneri (ALenum param, ALint* value)
 {
-  Dispatch ("alGetListeneri", &::alGetListeneri, tie (make_wrapper (param), value));
+  ::alGetListeneri (param, value); CheckErrors ("alGetListeneri");
 }
 
 void OpenALContext::alGetListener3i (ALenum param, ALint *value1, ALint *value2, ALint *value3)
 {
-  Dispatch ("alGetListener3i", &::alGetListener3i, tie (make_wrapper (param), value1, value2, value3));
+  ::alGetListener3i (param, value1, value2, value3); CheckErrors ("alGetListener3i");
 }
 
 void OpenALContext::alGetListeneriv (ALenum param, ALint* values)
 {
-  Dispatch ("alGetListeneriv", &::alGetListeneriv, tie (make_wrapper (param), values));
+  ::alGetListeneriv (param, values); CheckErrors ("alGetListeneriv");
 }
 
 void OpenALContext::alGenBuffers (ALsizei n, ALuint* buffers)
 {
-  Dispatch ("alGenBuffers", &::alGenBuffers, tie (n, buffers));
+  ::alGenBuffers (n, buffers); CheckErrors ("alGenBuffers");
 }
 
 void OpenALContext::alDeleteBuffers (ALsizei n, const ALuint* buffers)
 {
-  Dispatch ("alDeleteBuffers", &::alDeleteBuffers, tie (n, make_wrapper (n, buffers)));
+  ::alDeleteBuffers (n, buffers); CheckErrors ("alDeleteBuffers");
 }
 
 ALboolean OpenALContext::alIsBuffer (ALuint bid)
 {
-  return Dispatch<ALboolean> ("alIsBuffer", &::alIsBuffer, tie (bid));
+  ALboolean result = ::alIsBuffer (bid); CheckErrors ("alIsBuffer"); return result;
 }
 
 void OpenALContext::alBufferData (ALuint buffer, ALenum format, const ALvoid *data, ALsizei size, ALsizei freq)
 {
-  Dispatch ("alBufferData", &::alBufferData, tie (buffer, make_wrapper (format), data, size, freq));
+  ::alBufferData (buffer, format, data, size, freq); CheckErrors ("alBufferData");
 }
 
 void OpenALContext::alBufferf (ALuint bid, ALenum param, ALfloat value)
 {
-  Dispatch ("alBufferf", &::alBufferf, tie (bid, make_wrapper (param), value));
+  ::alBufferf (bid, param, value); CheckErrors ("alBufferf");
 }
 
 void OpenALContext::alBuffer3f (ALuint bid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3)
 {
-  Dispatch ("alBuffer3f", &::alBuffer3f, tie (bid, make_wrapper (param), value1, value2, value3));
+  ::alBuffer3f (bid, param, value1, value2, value3); CheckErrors ("alBuffer3f");
 }
 
 void OpenALContext::alBufferfv (ALuint bid, ALenum param, const ALfloat* values)
 {
-  Dispatch ("alBufferfv", &::alBufferfv, tie (bid, param, make_wrapper (get_array_size (param), values)));
+  ::alBufferfv (bid, param, values); CheckErrors ("alBufferfv");
 }
 
 void OpenALContext::alBufferi (ALuint bid, ALenum param, ALint value)
 {
-  Dispatch ("alBufferi", &::alBufferi, tie (bid, make_wrapper (param), value));
+  ::alBufferi (bid, param, value); CheckErrors ("alBufferi");
 }
 
 void OpenALContext::alBuffer3i (ALuint bid, ALenum param, ALint value1, ALint value2, ALint value3)
 {
-  Dispatch ("alBuffer3i", &::alBuffer3i, tie (bid, make_wrapper (param), value1, value2, value3));
+  ::alBuffer3i (bid, param, value1, value2, value3); CheckErrors ("alBuffer3i");
 }
 
 void OpenALContext::alBufferiv (ALuint bid, ALenum param, const ALint* values)
 {
-  Dispatch ("alBufferiv", &::alBufferiv, tie (bid, make_wrapper (param), make_wrapper (get_array_size (param), values)));
+  ::alBufferiv (bid, param, values); CheckErrors ("alBufferiv");
 }
 
 void OpenALContext::alGetBufferf (ALuint bid, ALenum param, ALfloat* value)
 {
-  Dispatch ("alGetBufferf", &::alGetBufferf, tie (bid, make_wrapper (param), value));
+  ::alGetBufferf (bid, param, value); CheckErrors ("alGetBufferf");
 }
 
 void OpenALContext::alGetBuffer3f (ALuint bid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3)
 {
-  Dispatch ("alGetBuffer3f", &::alGetBuffer3f, tie (bid, make_wrapper (param), value1, value2, value3));
+  ::alGetBuffer3f (bid, param, value1, value2, value3); CheckErrors ("alGetBuffer3f");
 }
 
 void OpenALContext::alGetBufferfv (ALuint bid, ALenum param, ALfloat* values)
 {
-  Dispatch ("alGetBufferfv", &::alGetBufferfv, tie (bid, make_wrapper (param), values));
+  ::alGetBufferfv (bid, param, values); CheckErrors ("alGetBufferfv");
 }
 
 void OpenALContext::alGetBufferi (ALuint bid, ALenum param, ALint* value)
 {
-  Dispatch ("alGetBufferi", &::alGetBufferi, tie (bid, make_wrapper (param), value));
+  ::alGetBufferi (bid, param, value); CheckErrors ("alGetBufferi");
 }
 
 void OpenALContext::alGetBuffer3i (ALuint bid, ALenum param, ALint* value1, ALint* value2, ALint* value3)
 {
-  Dispatch ("alGetBuffer3i", &::alGetBuffer3i, tie (bid, make_wrapper (param), value1, value2, value3));
+  ::alGetBuffer3i (bid, param, value1, value2, value3); CheckErrors ("alGetBuffer3i");
 }
 
 void OpenALContext::alGetBufferiv (ALuint bid, ALenum param, ALint* values)
 {
-  Dispatch ("alGetBufferiv", &::alGetBufferiv, tie (bid, make_wrapper (param), values));
+  ::alGetBufferiv (bid, param, values); CheckErrors ("alGetBufferiv");
 }
 
 void OpenALContext::alDopplerFactor (ALfloat value)
 {
-  Dispatch ("alDopplerFactor", &::alDopplerFactor, tie (value));
+  ::alDopplerFactor (value); CheckErrors ("alDopplerFactor");
 }
 
 void OpenALContext::alDopplerVelocity (ALfloat value)
 {
-  Dispatch ("alDopplerVelocity", &::alDopplerVelocity, tie (value));
+  ::alDopplerVelocity (value); CheckErrors ("alDopplerVelocity");
 }
 
 void OpenALContext::alSpeedOfSound (ALfloat value)
 {
-  Dispatch ("alSpeedOfSound", &::alSpeedOfSound, tie (value));
+  ::alSpeedOfSound (value); CheckErrors ("alSpeedOfSound");
 }
 
 void OpenALContext::alDistanceModel (ALenum distanceModel)
 {
-  Dispatch ("alDistanceModel", &::alDistanceModel, tie (make_wrapper (distanceModel)));
+  ::alDistanceModel (distanceModel); CheckErrors ("alDistanceModel");
 }
 
 /*
@@ -922,10 +560,16 @@ void OpenALContext::alDistanceModel (ALenum distanceModel)
 
 ALCboolean OpenALContext::alcIsExtensionPresent (const ALCchar *extname)
 {
-  return ContextDispatch<ALCboolean> ("alcIsExtensionPresent", &::alcIsExtensionPresent, tie (device, extname));
+  ALCboolean volatile result = ::alcIsExtensionPresent (device, extname);
+
+  ContextCheckErrors ("alcIsExtensionPresent");
+
+  return result;
 }
 
 void OpenALContext::alcGetIntegerv (ALCenum param, ALCsizei size, ALCint *data)
 {
-  ContextDispatch ("alcGetIntegerv", &::alcGetIntegerv, tie (device, make_alc_wrapper (param), size, data));
+  ::alcGetIntegerv (device, param, size, data);  
+
+  ContextCheckErrors ("alcGetIntegerv");
 }

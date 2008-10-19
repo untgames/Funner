@@ -8,6 +8,8 @@
 
 #include <render/screen.h>
 
+//!!добавить тесты RenderTarget на смену SceneRender::SetRenderer
+
 namespace media
 {
 
@@ -102,8 +104,8 @@ class SceneRender
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор целей рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t       RenderTargetsCount () const;
-    RenderTarget RenderTarget       (size_t index) const;
+    size_t               RenderTargetsCount () const;
+    render::RenderTarget RenderTarget       (size_t index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка функции отладочного протоколирования

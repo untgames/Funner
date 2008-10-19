@@ -10,7 +10,7 @@ int main ()
     
     DriverManager::RegisterDriver ("test_drv", get_pointer (driver));
     
-    IDevice* device = DriverManager::CreateDevice ("*_drv", "*");
+    DriverManager::CreateDevice ("*_drv", "*");
   }
   catch (std::exception& exception)
   {

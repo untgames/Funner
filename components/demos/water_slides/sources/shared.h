@@ -7,9 +7,11 @@
 
 #include <stl/auto_ptr.h>
 //#include <stl/algorithm>
+#include <stl/vector>
 
+#include <xtl/connection.h>
 #include <xtl/intrusive_ptr.h>
-#include <xtl/shared_ptr.h>
+#include <xtl/reference_counter.h>
 #include <xtl/function.h>
 #include <xtl/bind.h>
 
@@ -17,6 +19,8 @@
 #include <common/streams.h>
 #include <common/strlib.h>
 #include <common/log.h>
+#include <common/time.h>
+#include <common/parser.h>
 
 #include <mathlib.h>
 
@@ -54,7 +58,7 @@ typedef scene_graph::Listener::Pointer                            ListenerPtr;
 typedef scene_graph::SoundEmitter::Pointer                        SoundEmitterPtr;
 
 //интерфейс игрового отображения
-class IGameView
+class IGameView: public xtl::reference_counter
 {
   public:
     virtual ~IGameView () {}
@@ -73,7 +77,7 @@ class IGameView
     virtual void OnMouse (syslib::WindowEvent event, int x, int y) {}
 };
 
-typedef xtl::shared_ptr<IGameView> GameView;
+typedef xtl::intrusive_ptr<IGameView> GameView;
 
 //класс конфигурационного файла
 class Configuration
@@ -105,9 +109,6 @@ class MyApplication
       //получение количества милисекунд, прошедших от момента запуска приложения
     static size_t Milliseconds ();  
 
-      //получение экземпляра приложения
-    static MyApplication& Instance ();
-
       //протоколирование
     void LogMessage        (const char* message);
     void LogFormatMessage  (const char* format, ...);
@@ -117,13 +118,11 @@ class MyApplication
     void            SetView (const GameView&);
     const GameView& View    () const;    
 
-    const ::Configuration& Configuration () const;
-
-  private:
       //конструкторы / деструктор / присваивание
     MyApplication  ();
     ~MyApplication ();
 
+  private:    
     MyApplication  (const MyApplication&); // no impl
     MyApplication& operator = (const MyApplication&); //no impl
 
@@ -131,9 +130,6 @@ class MyApplication
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
-
-//загрузка текстового файла в строку
-stl::string load_text_file (const char* name);
 
 //получение ортографической матрицы проекции
 math::mat4f get_ortho_proj (float left, float right, float bottom, float top, float znear, float zfar);

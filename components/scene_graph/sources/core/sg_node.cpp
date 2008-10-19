@@ -1056,6 +1056,8 @@ void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt i
           LookTo (vec3f (0, 0, 1), cross (vec3f (0, 0, 1), local_dir), NodeTransformSpace_Local);
           break;
         }
+        default:
+          break;
       }
 
       break;
@@ -1073,6 +1075,8 @@ void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt i
         }
         case NodeOrt_Z:
           LookTo (vec3f (0, 0, 1), local_dir, NodeTransformSpace_Local);
+          break;
+        default:
           break;
       }
 
@@ -1098,8 +1102,12 @@ void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt i
           LookTo (z, y, NodeTransformSpace_Local);
           break;
         }
+        default:
+          break;
       }
       
+      break;
+    default:
       break;
   }
 }

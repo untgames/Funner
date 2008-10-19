@@ -88,7 +88,7 @@ size_t get_next_higher_power_of_two (size_t k)
 
   k--;
 
-  for (int i=1; i < sizeof (size_t) * 8; i *= 2)
+  for (size_t i=1; i < sizeof (size_t) * 8; i *= 2)
           k |= k >> i;
 
   return k + 1;
@@ -320,8 +320,8 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
       {
         media::KerningInfo kerning_info;
 
-        kerning_info.x_kerning = (float)kerning.x / 64.f;
-        kerning_info.y_kerning = (float)kerning.y / 64.f;
+        kerning_info.x_kerning = float (kerning.x >> 6);
+        kerning_info.y_kerning = float (kerning.y >> 6);
 
         font.InsertKerning (i, j, kerning_info);
       }

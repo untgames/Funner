@@ -35,9 +35,9 @@ struct Color3f
   float red, green, blue;  
 };
 
-struct Color4f: public Color3f
+struct Color4f
 {
-  float alpha;
+  float red, green, blue, alpha;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,8 +1,9 @@
 #ifndef XTL_TOKEN_PARSER_HEADER
 #define XTL_TOKEN_PARSER_HEADER
 
+#include <wchar.h> //cwchar имеет проблемы компил€ции на mingw 3.4.5
+
 #include <cctype>
-#include <cwchar>
 #include <cstdlib>
 #include <cstring>
 

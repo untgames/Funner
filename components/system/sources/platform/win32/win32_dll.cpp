@@ -54,8 +54,6 @@ void Platform::UnloadLibrary (dll_t handle)
 
 void* Platform::GetSymbol (dll_t handle, const char* symbol_name)
 {
-  static const char* METHOD_NAME = "syslib::Win32Platform::GetSymbol";
-
   HMODULE library = (HMODULE)handle;
 
   if (!library)
@@ -64,7 +62,7 @@ void* Platform::GetSymbol (dll_t handle, const char* symbol_name)
   if (!symbol_name)
     throw xtl::make_null_argument_exception ("", "symbol_name");
 
-  void* address = GetProcAddress (library, symbol_name);
+  void* address = (void*)GetProcAddress (library, symbol_name);
   
     //сбрасываем все ошибки
 

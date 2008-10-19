@@ -6,11 +6,9 @@ int main ()
   
   try
   {
-    xtl::com_ptr<IDriver> driver (new TestDriver, false);
+    DriverManager::RegisterDriver ("test_drv",  xtl::com_ptr<IDriver> (new TestDriver, false).get ());
     
-    DriverManager::RegisterDriver ("test_drv", get_pointer (driver));
-    
-    IDevice* device = DriverManager::CreateDevice ("*_drv", "*");
+    DriverManager::CreateDevice ("*_drv", "*");
   }
   catch (std::exception& exception)
   {

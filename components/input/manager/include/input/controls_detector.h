@@ -19,15 +19,18 @@ class ControlsDetector
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Фильтр
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    class Filter
+    class IFilter
     {
       public:
         virtual const char* Action      () = 0;
         virtual const char* EventMask   () = 0;
         virtual const char* Replacement () = 0;
+        
+      protected:
+        virtual ~IFilter () {}
     };
 
-    typedef xtl::iterator<Filter> Iterator;    
+    typedef xtl::iterator<IFilter> Iterator;    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание

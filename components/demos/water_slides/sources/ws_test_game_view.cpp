@@ -1,7 +1,5 @@
 #include "shared.h"
 
-#pragma pack(1)
-
 using namespace render::low_level;
 
 namespace
@@ -75,9 +73,14 @@ class TestView: public IGameView
 {
   public:
     TestView () : update_timer (xtl::bind (&TestView::OnTime, this), 10),
-      water_gen (false), current_device (0), prev_field (&water_field [0]), next_field (&water_field [1]),
+      water_gen (false), 
+      prev_field (&water_field [0]),
+      next_field (&water_field [1]),
+      current_device (0),
       listener (scene_graph::Listener::Create ()),
-      sound_emitter (scene_graph::SoundEmitter::Create ("drop")), boat_x (50), boat_y (50)
+      sound_emitter (scene_graph::SoundEmitter::Create ("drop")),
+      boat_x (50),
+      boat_y (50)
     {
       memset (vertices, 0, sizeof vertices);
       memset (water_field, 0, sizeof water_field);
@@ -126,7 +129,7 @@ class TestView: public IGameView
     void OnDraw ()
     {
       if (!current_device)
-        return;        
+        return;                
 
       UpdateShaderParameters ();        
       
@@ -177,7 +180,7 @@ class TestView: public IGameView
       
       memset (&vb_desc, 0, sizeof vb_desc);
       
-      vb_desc.size         = GRID_SIZE * GRID_SIZE * sizeof Vertex;
+      vb_desc.size         = GRID_SIZE * GRID_SIZE * sizeof (Vertex);
       vb_desc.usage_mode   = UsageMode_Default;
       vb_desc.bind_flags   = BindFlag_VertexBuffer;
       vb_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
@@ -188,14 +191,14 @@ class TestView: public IGameView
       
       memset (&ib_desc, 0, sizeof ib_desc);
       
-      ib_desc.size         = indices.size () * sizeof size_t;
+      ib_desc.size         = indices.size () * sizeof (size_t);
       ib_desc.usage_mode   = UsageMode_Default;
       ib_desc.bind_flags   = BindFlag_IndexBuffer;
       ib_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
 
       index_buffer = BufferPtr (current_device->CreateBuffer (ib_desc), false);
 
-      index_buffer->SetData (0, indices.size () * sizeof size_t, &indices [0]);
+      index_buffer->SetData (0, indices.size () * sizeof (size_t), &indices [0]);
       
       static size_t rect_indices [] = {0, 1, 2, 3, 0, 2};
       
@@ -240,7 +243,7 @@ class TestView: public IGameView
       
       memset (&cb_desc, 0, sizeof cb_desc);
       
-      cb_desc.size         = sizeof ShaderParameters;
+      cb_desc.size         = sizeof (ShaderParameters);
       cb_desc.usage_mode   = UsageMode_Default;
       cb_desc.bind_flags   = BindFlag_ConstantBuffer;
       cb_desc.access_flags = AccessFlag_ReadWrite;
@@ -330,7 +333,7 @@ class TestView: public IGameView
     {
       static size_t last = MyApplication::Milliseconds ();
       
-      float dt = (MyApplication::Milliseconds () - last) / 1000.0f;
+//      float dt = (MyApplication::Milliseconds () - last) / 1000.0f;
       
 //      if (dt > WATER_UPDATE_TIME)
       {
@@ -375,12 +378,12 @@ class TestView: public IGameView
 
           for (int i=-3; i<4; i++)
           {
-            if (i+i1+3 >= GRID_SIZE)
+            if (i+i1+3 >= (int)GRID_SIZE)
               continue;
             
             for (int j=-3; j<4; j++)
             {
-              if (j+j1+3 >= GRID_SIZE)
+              if (j+j1+3 >= (int)GRID_SIZE)
                 continue;
 
               float v = 6.0f - i * i - j * j;
@@ -402,7 +405,9 @@ class TestView: public IGameView
   private:
     ProgramPtr LoadShader (const char* name)
     {
-      stl::string shader_source = load_text_file (name);
+      stl::string shader_source;
+      
+      common::FileSystem::LoadTextFile (name, shader_source);
       
       ShaderDesc shader_desc = {name, size_t (-1), shader_source.c_str (), "fpp", ""};
 
@@ -468,7 +473,8 @@ class TestView: public IGameView
   
     static void PrintShaderError (const char* message)
     {
-      MyApplication::Instance ().LogFormatMessage ("%s", message);
+      printf ("shader error: %s\n", message);
+//      MyApplication::Instance ().LogFormatMessage ("%s", message);
     }
   
     void UpdateShaderParameters ()
@@ -493,9 +499,9 @@ class TestView: public IGameView
     {
       int i, j;
 
-      for (i=1; i<GRID_SIZE-1; i++)
+      for (i=1; i<(int)GRID_SIZE-1; i++)
       {
-        for (j=1; j<GRID_SIZE-1; j++)
+        for (j=1; j<(int)GRID_SIZE-1; j++)
         {
           Vertex& v = vertices [i][j];
 
@@ -522,7 +528,7 @@ class TestView: public IGameView
 
       stl::swap (next_field, prev_field);
 
-      vertex_buffer->SetData (0, GRID_SIZE * GRID_SIZE * sizeof Vertex, vertices);
+      vertex_buffer->SetData (0, GRID_SIZE * GRID_SIZE * sizeof (Vertex), vertices);
     }
     
   private:
@@ -565,5 +571,5 @@ class TestView: public IGameView
 //создание тестового игрового отображения
 GameView create_test_game_view ()
 {
-  return GameView (new TestView);
+  return GameView (new TestView, false);
 }

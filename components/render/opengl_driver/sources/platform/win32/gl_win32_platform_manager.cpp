@@ -133,7 +133,7 @@ class PlatformManagerImpl
           if (!in_adapter)
             throw xtl::format_exception<xtl::null_argument_exception> ("", "Null argument 'adapters[%u]'", i);
             
-          Adapter* adapter = dynamic_cast<Adapter*> (in_adapter);
+          Adapter* volatile adapter = dynamic_cast<Adapter*> (in_adapter);
           
           if (!adapter)
             throw xtl::format_exception<xtl::argument_exception> ("", "Invalid argument 'adapters[%u]'. Wrong type '%s'",

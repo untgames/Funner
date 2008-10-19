@@ -171,16 +171,16 @@ void RenderView::GetProperty (const char*, size_t buffer_size, char* value_buffe
 void RenderView::Draw ()
 {
   if (!camera)
-    return;
-    
+    return;    
+
     //очистка кадра
 
   frame->Clear ();
 
-    //установка матриц вида и проекции
+    //установка матриц вида и проекции    
 
   frame->SetProjection (camera->ProjectionMatrix ());
-  frame->SetViewPoint  (camera->WorldPosition ());  
+  frame->SetViewPoint  (camera->WorldPosition ());
 
     //обход сцены
 

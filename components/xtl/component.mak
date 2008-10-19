@@ -24,7 +24,7 @@ XTL.TR1.TESTS.LIBS                :=
 XTL.TR1.TESTS.COMPILER_CFLAGS     :=
 XTL.TR1.TESTS.COMPILER_DEFINES    := __MYSTL_STANDALONE__
 XTL.TR1.TESTS.msvc.SOURCE_DIRS    := tests/tr1/functional/msvc
-XTL.TR1.TYPE_TRAITS_TESTS.cygwin.g++.COMPILER_CFLAGS := --no-warn
+XTL.TR1.TYPE_TRAITS_TESTS.cygwin.COMPILER_CFLAGS := --no-warn
 
 #Öåëü ¹3 - XTL tests
 XTL.XTL.TESTS.TYPE                 := test-suite

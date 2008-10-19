@@ -1,13 +1,13 @@
 Results of node_transform_world_scale_test:
-set scale result: local=[1.00 2.00 3.00] world=[1.00 2.00 3.00]
+set scale result: local=[+1.00 +2.00 +3.00] world=[+1.00 +2.00 +3.00]
 translate parent
-parent position: local=[0.00 2.00 0.00] world=[0.00 2.00 0.00]
-node scale: local=[1.00 2.00 3.00] world=[1.00 2.00 3.00]
+parent position: local=[+0.00 +2.00 +0.00] world=[+0.00 +2.00 +0.00]
+node scale: local=[+1.00 +2.00 +3.00] world=[+1.00 +2.00 +3.00]
 rotate parent
-parent orientation: local=[30.0 0.0 0.0] world=[30.0 0.0 0.0]
-node scale: local=[1.00 2.00 3.00] world=[1.00 2.00 3.00]
+parent orientation: local=[+1.0 +0.3 +0.0 +0.0] world=[+1.0 +0.3 +0.0 +0.0]
+node scale: local=[+1.00 +2.00 +3.00] world=[+1.00 +2.00 +3.00]
 scale parent
-parent scale: local=[2.00 3.00 -1.00] world=[2.00 3.00 -1.00]
-node scale: local=[1.00 2.00 3.00] world=[2.00 6.00 -3.00]
+parent scale: local=[+2.00 +3.00 -1.00] world=[+2.00 +3.00 -1.00]
+node scale: local=[+1.00 +2.00 +3.00] world=[+2.00 +6.00 -3.00]
 no parent-scale inherit
-node scale: local=[1.00 2.00 3.00] world=[1.00 2.00 3.00]
+node scale: local=[+1.00 +2.00 +3.00] world=[+1.00 +2.00 +3.00]

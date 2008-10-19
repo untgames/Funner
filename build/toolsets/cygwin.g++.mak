@@ -10,7 +10,7 @@ CYGHOME := /$(subst :,,$(call convert_path,$(CYGHOME)))
 ###################################################################################################
 #Константы
 ###################################################################################################
-PROFILES      += cygwin.g++ unistd
+PROFILES      += cygwin unistd
 CYGWIN_BIN    := $(CYGHOME)/bin
 COMPILER_GCC  := export PATH=$(CYGWIN_BIN):$$PATH && gcc
 LINKER_GCC    := export PATH=$(CYGWIN_BIN):$$PATH && g++

@@ -77,7 +77,7 @@ void test_conversion_to_wstring()
 {
     TEST (L"123" == lexical_cast<stl::wstring>(123));
     TEST (L"1.23" == lexical_cast<stl::wstring>(1.23));
-    TEST (L"1.111111111" == lexical_cast<stl::wstring>(1.111111111));
+    TEST (L"1.11111" == lexical_cast<stl::wstring>(1.11111));
     TEST (L"1" == lexical_cast<stl::wstring>(true));
     TEST (L"0" == lexical_cast<stl::wstring>(false));
 

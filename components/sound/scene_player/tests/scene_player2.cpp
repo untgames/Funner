@@ -32,7 +32,7 @@ void TimerHandler (SoundEmitterPtr sound_emitter)
 {
   volume_angle += 0.02f;
 
-  sound_emitter->SetGain (abs (sin ((float)volume_angle)));
+  sound_emitter->SetGain (fabs (sin ((float)volume_angle)));
 }
 
 int main ()

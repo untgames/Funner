@@ -1,6 +1,8 @@
 #ifndef RENDER_GL_DRIVER_CONTEXT_CAPS_HEADER
 #define RENDER_GL_DRIVER_CONTEXT_CAPS_HEADER
 
+#include <shared/gl/gl_types.h>
+#include <shared/gl/glext.h>
 #include <shared/extensions.h>
 
 namespace render

@@ -41,10 +41,10 @@ const char* Renderer::GetDescription ()
 
 ITexture* Renderer::CreateTexture (const media::Image& image)
 {
-  return CreateTexture (image.Width (), image.Height (), image.Format ());
+  return CreateTexture (image.Width (), image.Height (), get_format (image.Format ()));
 }
 
-ITexture* Renderer::CreateTexture (size_t width, size_t height, media::PixelFormat pixel_format)
+ITexture* Renderer::CreateTexture (size_t width, size_t height, PixelFormat pixel_format)
 {
   return new Texture (width, height, pixel_format);
 }

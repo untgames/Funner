@@ -13,7 +13,7 @@ void translation_map_saver (const char* file_name, const TranslationMap& source_
 
   for (TranslationMap::Iterator iter=source_map.CreateIterator (); iter; ++iter)
   {    
-    TranslationMap::Translator& translator = *iter;
+    TranslationMap::ITranslator& translator = *iter;
 
     XmlWriter::Scope scope (writer, "Translation");
 

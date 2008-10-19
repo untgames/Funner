@@ -13,16 +13,48 @@ const char* LOG_NAME = "render.low_level.opengl"; //имя протокола
 
 }
 
+namespace render
+{
+
+namespace low_level
+{
+
+namespace opengl
+{
+
 /*
     Описание реализации протокола
 */
 
-struct Log::Impl: public xtl::reference_counter
+class LogImpl: public xtl::reference_counter
 {
-  common::Log log; //протокол
-  
-  Impl () : log (LOG_NAME) {}
+  public:
+    common::Log log; //протокол
+
+    LogImpl () : log (LOG_NAME) {}
 };
+
+}
+
+}
+
+}
+
+namespace
+{
+
+/*
+    Хранилище для реализации протокола
+*/
+
+struct ImplHolder
+{
+  ImplHolder () : impl (new LogImpl, false) {}
+
+  xtl::intrusive_ptr<LogImpl> impl;
+};
+
+}
 
 /*
     Конструкторы / деструктор / присваивание
@@ -30,13 +62,6 @@ struct Log::Impl: public xtl::reference_counter
 
 Log::Log ()
 {
-  struct ImplHolder
-  {
-    ImplHolder () : impl (new Impl, false) {}
-    
-    xtl::intrusive_ptr<Impl> impl;
-  };
-
   typedef common::Singleton<ImplHolder> ImplSingleton;
 
   impl = ImplSingleton::Instance ().impl.get ();

@@ -115,8 +115,8 @@ void SceneRender::SetRenderer
 {
   try
   {
-    RenderManagerPtr new_manager = new RenderManager (driver_name_mask, renderer_name_mask, render_path_masks,
-      xtl::bind (&Impl::LogMessage, &*impl, _1), xtl::bind (&Impl::CreateRenderQuery, &*impl, _1, _2, _3));      
+    RenderManagerPtr new_manager (new RenderManager (driver_name_mask, renderer_name_mask, render_path_masks,
+      xtl::bind (&Impl::LogMessage, &*impl, _1), xtl::bind (&Impl::CreateRenderQuery, &*impl, _1, _2, _3)));
 
     new_manager->DrawTransactionManager ().SetMaxDrawDepth (impl->max_draw_depth);
 

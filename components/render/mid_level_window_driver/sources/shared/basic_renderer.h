@@ -167,7 +167,7 @@ class Renderer2D
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     mid_level::renderer2d::ITexture*   CreateTexture   (const media::Image& image);
-    mid_level::renderer2d::ITexture*   CreateTexture   (size_t width, size_t height, media::PixelFormat pixel_format);
+    mid_level::renderer2d::ITexture*   CreateTexture   (size_t width, size_t height, PixelFormat pixel_format);
     mid_level::renderer2d::IPrimitive* CreatePrimitive ();
     mid_level::renderer2d::IFrame*     CreateFrame     ();
 

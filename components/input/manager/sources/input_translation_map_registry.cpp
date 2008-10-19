@@ -1,17 +1,16 @@
 #include "shared.h"
 
 using namespace input;
+using namespace common;
 
 namespace
 {
-
-typedef stl::vector<stl::string> StringArray;
 
 struct RegistryNode
 {
   public:
 ///Регистрация / удаление трансляторов
-    void Register (StringArray::iterator current_node, StringArray::iterator last_node, const char* in_translation_map, const char* in_profile)
+    void Register (const StringArray& tokens, size_t current_node, size_t last_node, const char* in_translation_map, const char* in_profile)
     {
       if (current_node == last_node)
       {
@@ -21,20 +20,20 @@ struct RegistryNode
         return;
       }
 
-      NodeMap::iterator iter = children.find (current_node->c_str ());
+      NodeMap::iterator iter = children.find (tokens [current_node]);
 
       if (iter == children.end ())
-          iter = children.insert_pair (current_node->c_str (), RegistryNodePtr (new RegistryNode ())).first;
+          iter = children.insert_pair (tokens [current_node], RegistryNodePtr (new RegistryNode ())).first;
 
-      iter->second->Register (current_node + 1, last_node, in_translation_map, in_profile);
+      iter->second->Register (tokens, current_node + 1, last_node, in_translation_map, in_profile);
     }
    
-    void Unregister (StringArray::iterator current_node, StringArray::iterator last_node)
+    void Unregister (const StringArray& tokens, size_t current_node, size_t last_node)
     {
       if (current_node == last_node)
         return;
 
-      NodeMap::iterator iter = children.find (current_node->c_str ());
+      NodeMap::iterator iter = children.find (tokens [current_node]);
 
       if (iter == children.end ())
         return;
@@ -47,34 +46,34 @@ struct RegistryNode
           iter->second->translation_map.clear ();
       }
       else
-        iter->second->Unregister (current_node + 1, last_node);
+        iter->second->Unregister (tokens, current_node + 1, last_node);
     }
 
 ///Поиск трансляторов
-    const char* Find (StringArray::iterator current_node, StringArray::iterator last_node)
+    const char* Find (const StringArray& tokens, size_t current_node, size_t last_node)
     {
       if (current_node == last_node)
         return GetTranslationMap ();
 
-      NodeMap::iterator iter = children.find (current_node->c_str ());
+      NodeMap::iterator iter = children.find (tokens [current_node]);
 
       if (iter == children.end ())
         return 0;
 
-      return iter->second->Find (current_node + 1, last_node);
+      return iter->second->Find (tokens, current_node + 1, last_node);
     }
 
-    const char* FindNearest (StringArray::iterator current_node, StringArray::iterator last_node)
+    const char* FindNearest (const StringArray& tokens, size_t current_node, size_t last_node)
     {
       if (current_node == last_node)
         return GetTranslationMap ();
 
-      NodeMap::iterator iter = children.find (current_node->c_str ());
+      NodeMap::iterator iter = children.find (tokens [current_node]);
 
       if (iter == children.end ())
         return GetTranslationMap ();
 
-      const char* find_result = iter->second->FindNearest (current_node + 1, last_node);
+      const char* find_result = iter->second->FindNearest (tokens, current_node + 1, last_node);
 
       if (find_result)
         return find_result;
@@ -142,7 +141,7 @@ struct TranslationMapRegistry::Impl : public xtl::reference_counter
       {
         ParseProfile (profile, profile_nodes);
 
-        root.Register (profile_nodes.begin (), profile_nodes.end (), translation_map, profile);
+        root.Register (profile_nodes, 0, profile_nodes.Size (), translation_map, profile);
       }
       catch (xtl::exception& exception)
       {
@@ -164,7 +163,7 @@ struct TranslationMapRegistry::Impl : public xtl::reference_counter
         return;
       }
 
-      root.Unregister (profile_nodes.begin (), profile_nodes.end ());
+      root.Unregister (profile_nodes, 0, profile_nodes.Size ());
     }
 
 ///Поиск трансляторов
@@ -176,7 +175,7 @@ struct TranslationMapRegistry::Impl : public xtl::reference_counter
       {
         ParseProfile (profile, profile_nodes);
 
-        return root.Find (profile_nodes.begin (), profile_nodes.end ());
+        return root.Find (profile_nodes, 0, profile_nodes.Size ());
       }
       catch (xtl::exception& exception)
       {
@@ -193,7 +192,7 @@ struct TranslationMapRegistry::Impl : public xtl::reference_counter
       {
         ParseProfile (profile, profile_nodes);
 
-        return root.FindNearest (profile_nodes.begin (), profile_nodes.end ());
+        return root.FindNearest (profile_nodes, 0, profile_nodes.Size ());
       }
       catch (xtl::exception& exception)
       {
@@ -223,11 +222,10 @@ struct TranslationMapRegistry::Impl : public xtl::reference_counter
       if (*profile == '\0')
         throw xtl::make_argument_exception ("", "profile", profile, "Empty profile");
 
-
       profile_nodes = common::split (profile, ".", "", "");
 
-      for (StringArray::iterator iter = profile_nodes.begin (), end = profile_nodes.end (); iter != end; ++iter)
-        if (iter->empty ())
+      for (size_t i=0, count=profile_nodes.Size (); i<count; i++)
+        if (!*profile_nodes [i])
           throw xtl::make_argument_exception ("", "profile", profile, "Profile contains empty node");
     }
 

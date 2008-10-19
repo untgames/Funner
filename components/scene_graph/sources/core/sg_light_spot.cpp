@@ -4,7 +4,7 @@ using namespace scene_graph;
 using namespace math;
 using namespace bound_volumes;
 
-const float INFINITY = 1e9;  //если радиус/расстояние источника света превышает эту величину, устанавливаются бесконечные bv
+const float LIGHT_INFINITY = 1e9;  //если радиус/расстояние источника света превышает эту величину, устанавливаются бесконечные bv
 
 /*
     Описание реализации SpotLight
@@ -72,7 +72,7 @@ float SpotLight::Exponent () const
 
 void SpotLight::UpdateBoundsCore ()
 {
-  if (Range () >= INFINITY)
+  if (Range () >= LIGHT_INFINITY)
     SetInfiniteBounds ();
   else
   {

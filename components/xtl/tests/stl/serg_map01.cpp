@@ -27,7 +27,7 @@ int main ()
   map <int, int>::const_iterator first, last;
   first = m1.begin ();
   last = ++m1.begin ();
-  map <int, int> m4 (first, ++last);
+  map <int, int> m4 (first, ++last);  
 
   // Create a map m5 by copying the range m4[First, Last) and with the allocator of map m2
   map <int, int>::allocator_type m2_Alloc = m2.get_allocator ();

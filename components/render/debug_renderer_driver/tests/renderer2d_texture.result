@@ -4,7 +4,7 @@ Create color-buffer 800x600 (id=4)
 Create depth-stencil-buffer 800x600 (id=5)
 Create frame-buffer (id=3)
 Create 2D renderer (id=2)
-Create texture 400x300 format=4 (id=6)
+Create texture 400x300 format=PixelFormat_RGBA8 (id=6)
 check texture size: 400x300
 Capture image from texture (id=6)
 check image after capture: 400x300x1 (format=4)

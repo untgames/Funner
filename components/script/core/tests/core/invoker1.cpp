@@ -1,8 +1,8 @@
 #include "shared.h"
 
-char* f (float x, const char* y)
+char* f (float x, const char* y, int z, size_t w)
 {
-  printf ("f(%g,%s)\n", x, y);
+  printf ("f(%g,%s,%d,%u)\n", x, y, z, w);
 
   return "all ok";
 }
@@ -19,6 +19,8 @@ int main ()
     stack.PushSymbol ("dummy");
     stack.Push (3.0f);
     stack.Push ("Hello world");
+    stack.Push (12);
+    stack.Push (100);
 
     f1 (stack);
 

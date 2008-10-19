@@ -151,7 +151,9 @@ inline void to_string (stl::string& buffer, const double& value)
   
   char char_buffer [MAX_REAL_STRING_SIZE];
   
-  xsnprintf (char_buffer, sizeof (char_buffer), "%.12g", value);
+  static const double EPS = 1.0e-06;
+  
+  xsnprintf (char_buffer, sizeof (char_buffer), value < - EPS || value > EPS ? "%.6g" : "0", value);
   
   char_buffer [MAX_REAL_STRING_SIZE - 1] = 0;
   

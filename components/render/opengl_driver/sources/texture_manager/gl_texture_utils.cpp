@@ -140,7 +140,7 @@ size_t get_next_higher_power_of_two (size_t k)
 
   k--;
 
-  for (int i=1; i < sizeof (size_t) * 8; i *= 2)
+  for (size_t i=1; i < sizeof (size_t) * 8; i *= 2)
           k |= k >> i;
 
   return k + 1;

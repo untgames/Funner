@@ -198,8 +198,6 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
     table_name (name),
     is_global (table_name == GLOBAL_LIBRARY_NAME)
 {
-  static const char* METHOD_NAME = "script::lua::Library::Library";
-
     //регистрация обработчиков удаления пользовательских типов данных    
 
   static const luaL_reg common_meta_table [] = {
@@ -238,6 +236,14 @@ Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry
 
     on_unregister_invoker_connection = registry.RegisterEventHandler (InvokerRegistryEvent_OnUnregisterInvoker,
       xtl::bind (&Library::UnregisterInvoker, this, _2));
+  }
+  catch (xtl::exception& exception)
+  {
+    Destroy ();
+    
+    exception.touch ("script::lua::Library::Library");
+    
+    throw;
   }
   catch (...)
   {

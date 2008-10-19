@@ -51,12 +51,12 @@ class TestEntity: public Entity
 
 inline void dump (const vec3f& v)
 {
-  printf ("[%.2f %.2f %.2f]", v.x, v.y, v.z);
+  printf ("[%+.2f %+.2f %+.2f]", v.x, v.y, v.z);
 }
 
 inline void dump (const quatf& q)
 {
-  float pitch, yaw, roll;
+/*  float pitch, yaw, roll;
   
   quat2EulerAngle (q, pitch, yaw, roll);
   
@@ -64,7 +64,9 @@ inline void dump (const quatf& q)
   yaw   = fmod (rad2deg (yaw), 360.0f);
   roll  = fmod (rad2deg (roll), 360.0f);
 
-  printf ("[%.1f %.1f %.1f]", pitch, yaw, roll);
+  printf ("[%+.1f %+.1f %+.1f]", pitch, yaw, roll);*/
+  
+  printf ("[%+.1f %+.1f %+.1f %+.1f]", q.w, q.x, q.y, q.z);
 }
 
 inline void dump_position (Node& node)

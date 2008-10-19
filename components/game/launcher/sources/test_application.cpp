@@ -90,7 +90,7 @@ void log_print (const char* message)
 
 void log_handler (const char* log_name, const char* event)
 {
-  printf ("log %s event: '%s'\n", log_name, event);
+  printf ("%s: %s\n", log_name, event);
 }
 
 void do_file (const char* file_name, Shell& shell)
@@ -226,6 +226,10 @@ struct TestApplication::Impl
   {
     app_idle_connection.disconnect ();
     syslib::Application::Exit (0);
+    render::mid_level::WindowDriver::UnregisterAllWindows (MID_LEVEL_RENDERER_NAME);
+    render.ResetRenderer ();
+    Screen ().Swap (screen);
+    RenderTarget ().Swap (render_target);
   }
 
   void OnIdle ()
@@ -260,7 +264,6 @@ struct TestApplication::Impl
   {
     try
     {
-      static clock_t last     = 0;  
       static size_t  last_fps = 0, frames_count = 0;
     
       if (clock () - last_fps > CLK_TCK)
@@ -392,7 +395,7 @@ TestApplication::TestApplication (const char* start_script_name)
 
     printf ("Init direct input driver input...\n");
 
-    input::low_level::IDriver* direct_input_driver = input::low_level::DriverManager::FindDriver ("DirectInput8");
+/*    input::low_level::IDriver* direct_input_driver = input::low_level::DriverManager::FindDriver ("DirectInput8");
 
     if (direct_input_driver)
     {
@@ -404,7 +407,7 @@ TestApplication::TestApplication (const char* start_script_name)
 
         impl->device_connections.push_back (impl->input_devices.back ()->RegisterEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, &impl->translation_map, _1, event_handler)));
       }
-    }
+    }*/
 
     printf ("Started\n");
 

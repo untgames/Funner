@@ -1,6 +1,6 @@
 #include "shared.h"
 
-#if defined (_MSC_VER) || defined (__CYGWIN__)
+#if defined (_WIN32)
   const char* LIBRARY_NAME = "kernel32.dll";
   const char* SYMBOL_NAME  = "LoadLibraryA";
 #elif defined (__APPLE__)

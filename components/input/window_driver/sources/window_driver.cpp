@@ -67,7 +67,6 @@ class Driver: virtual public IDriver, public xtl::reference_counter
           return new Device ((*iter)->window, name);
 
       throw xtl::make_argument_exception ("input::low_level::window::Driver::CreateDevice", "name", name);
-      return 0;
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +97,9 @@ class Driver: virtual public IDriver, public xtl::reference_counter
         if (!strcmp ((*iter)->device_name.c_str (), device_name))
           throw xtl::make_argument_exception ("input::low_level::window::Driver::RegisterDevice", "device_name", device_name, "Name already registered");
 
-      device_entries.push_back (DeviceEntryPtr (new DeviceEntry (device_name, &window, window.RegisterEventHandler (WindowEvent_OnDestroy, xtl::bind (&Driver::DestroyWindowHandler, this, _1, _2, _3)))));
+      xtl::auto_connection c = window.RegisterEventHandler (WindowEvent_OnDestroy, xtl::bind (&Driver::DestroyWindowHandler, this, _1, _2, _3));
+
+      device_entries.push_back (DeviceEntryPtr (new DeviceEntry (device_name, &window, c), false));
 
       if (device_entries.size () == 1)
         DriverManager::RegisterDriver (GetDescription (), this);
@@ -150,19 +151,21 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     }
 
   private:
-    struct DeviceEntry
+    struct DeviceEntry: public xtl::reference_counter
     {
       string               device_name;
       Window*              window;
       xtl::auto_connection on_window_destroy_connection;
 
-      DeviceEntry (const char* in_device_name, Window* in_window, xtl::connection& in_connection) 
-        : device_name (in_device_name), window (in_window), on_window_destroy_connection (in_connection)
-        {}
+      DeviceEntry (const char* in_device_name, Window* in_window, xtl::connection& in_connection)
+        : device_name (in_device_name), window (in_window)
+      {
+        on_window_destroy_connection.swap (in_connection);
+      }
     };
 
-    typedef xtl::shared_ptr<DeviceEntry> DeviceEntryPtr;
-    typedef vector<DeviceEntryPtr>       DeviceEntries;
+    typedef xtl::intrusive_ptr<DeviceEntry> DeviceEntryPtr;
+    typedef vector<DeviceEntryPtr>          DeviceEntries;
 
   private:
     DeviceEntries   device_entries;

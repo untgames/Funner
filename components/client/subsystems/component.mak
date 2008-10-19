@@ -82,9 +82,8 @@ CLIENT.SUBSYSTEMS.TESTS.COMPILER_CFLAGS  :=
 CLIENT.SUBSYSTEMS.TESTS.COMPILER_DEFINES :=
 CLIENT.SUBSYSTEMS.TESTS.IMPORTS          := ../../common/compile.static.mak ../../system/compile.static.mak \
                                             ../window_manager/compile.static.mak ../core/compile.static.mak \
-                                            ../../render/opengl_driver/link.static.mak ../../common/configurator.link.static.mak \
-                                            ../../sound/scene_player/link.static.mak ../../media/sound/link.static.mak \
-                                            ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
                                             window_renderer.link.static.mak scene_render.link.static.mak scene_player.link.static.mak \
                                             direct_input_driver.link.static.mak window_input_driver.link.static.mak input_manager.link.static.mak \
-                                            ../../input/manager/xkeymap.link.static.mak ../../input/manager/xkeyreg.link.static.mak
+                                            ../../input/manager/xkeymap.link.static.mak ../../input/manager/xkeyreg.link.static.mak \
+                                            ../../render/opengl_driver/link.static.mak ../../common/configurator.link.static.mak \
+                                            ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak

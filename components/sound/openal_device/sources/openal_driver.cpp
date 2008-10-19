@@ -25,8 +25,8 @@ class Driver : virtual public IDriver, public xtl::reference_counter
     {
       try
       {
-        const char* devices_names;
-
+        const char* devices_names = 0;
+        
         if (alcIsExtensionPresent (NULL, "ALC_ENUMERATE_ALL_EXT"))
           devices_names = alcGetString (NULL, ALC_ALL_DEVICES_SPECIFIER);
         else if (alcIsExtensionPresent (NULL, "ALC_ENUMERATION_EXT"))

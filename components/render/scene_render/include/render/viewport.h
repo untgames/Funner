@@ -7,6 +7,8 @@
 
 #include <render/common.h>
 
+//реакция на Swap - оповещение слушателей, не менять слушателей, либо убрать Swap!!
+
 namespace xtl
 {
 
@@ -176,15 +178,6 @@ class Viewport
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (Viewport&, Viewport&);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка/чтение типизированных свойств
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> void set_property (Viewport&, const char* name, const T& value);
-template <class T> T    get_property (Viewport&, const char* name);
-template <class T> T    get_property (Viewport&, const char* name, const T& default_value);
-
-#include <render/detail/viewport.inl>
 
 }
 

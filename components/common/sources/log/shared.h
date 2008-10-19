@@ -8,6 +8,7 @@
 #include <stl/list>
 #include <stl/set>
 #include <stl/string>
+#include <stl/vector>
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>

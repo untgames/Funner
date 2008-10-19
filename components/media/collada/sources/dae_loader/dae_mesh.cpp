@@ -423,7 +423,7 @@ void DaeParser::ParseMeshSource (Parser::Iterator iter, MeshSourceMap& sources)
 {
   try
   {
-    const char* id = get<const char*> (*iter, "id");
+    const char* volatile id = get<const char*> (*iter, "id");
 
     Parser::Iterator accessor_iter = get_first_child (*iter, "technique_common.accessor");
 

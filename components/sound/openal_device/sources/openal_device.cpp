@@ -59,17 +59,16 @@ void process_init_string (const char* property, const char* value, OpenALDeviceP
 
 OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, const char* init_string)
  : context (device_name, init_string),
-   buffer_update_frequency (SOURCE_BUFFERS_UPDATE_FREQUENCY),
-   source_properties_update_frequency ((size_t)(1.f / DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD)),
-   listener_properties_update_frequency ((size_t)(1.f / DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD)),
    buffer_timer   (xtl::bind (&OpenALDevice::BufferUpdate, this), SOURCE_BUFFERS_UPDATE_MILLISECONDS),
    listener_timer (xtl::bind (&OpenALDevice::ListenerUpdate, this), (size_t)(DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD * 1000)),
    source_timer   (xtl::bind (&OpenALDevice::SourceUpdate, this), (size_t)(DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD * 1000)),
-   listener_need_update (false),
-   sample_buffer (MAX_SOUND_SAMPLE_RATE * MAX_SOUND_CHANNELS * MAX_SOUND_BYTES_PER_SAMPLE / SOURCE_BUFFERS_UPDATE_FREQUENCY / (SOURCE_BUFFERS_COUNT - 2)),
-   ref_count (1),
-   is_muted (false), 
-   gain (1.0f),
+   listener_need_update (false),      
+   sample_buffer (MAX_SOUND_SAMPLE_RATE * MAX_SOUND_CHANNELS * MAX_SOUND_BYTES_PER_SAMPLE / SOURCE_BUFFERS_UPDATE_FREQUENCY / (SOURCE_BUFFERS_COUNT - 2)),      
+   gain (1.0f),   
+   is_muted (false),       
+   buffer_update_frequency (SOURCE_BUFFERS_UPDATE_FREQUENCY),   
+   source_properties_update_frequency ((size_t)(1.f / DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD)),   
+   listener_properties_update_frequency ((size_t)(1.f / DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD)),   
    first_active_source (0),
    al_buffers_pool_size (0)
 {
@@ -78,7 +77,7 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
   context.MakeCurrent ();
 
   char *extensions = (char*)context.alGetString (AL_EXTENSIONS);
-  int  compare_value;
+  size_t  compare_value;
 
   info.eax_major_version = 0;
   info.eax_minor_version = 0;
@@ -92,7 +91,7 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
       if (isdigit (*extensions))
       {
         compare_value = atoi (extensions);
-        if (compare_value > (int)info.eax_major_version)
+        if (compare_value > info.eax_major_version)
         {
           info.eax_major_version = compare_value;
           extensions = strstr (extensions, ".");
@@ -103,7 +102,7 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
           info.eax_major_version = compare_value;
           extensions = strstr (extensions, ".");
           compare_value = atoi (++extensions);
-          if (compare_value > (int)info.eax_minor_version)
+          if (compare_value > info.eax_minor_version)
             info.eax_minor_version = compare_value;
         }
       }
@@ -198,13 +197,12 @@ void OpenALDevice::ClearALData ()
 
 void OpenALDevice::AddRef ()
 {
-  ref_count++;
+  addref (this);
 }
 
 void OpenALDevice::Release ()
 {
-  if (!--ref_count)
-    delete this;
+  release (this);
 }
 
 /*
@@ -533,10 +531,6 @@ void OpenALDevice::SetIntegerParam (const char* name, int value)
     listener_properties_update_frequency = (size_t)value;
     listener_timer.SetPeriod ((size_t)(1000.0f / value));    
   }
-  else if (!xstrcmp (name, "al_debug_log"))
-  {
-    context.SetDebugLogState (value != 0);
-  }
   else
   {
     throw xtl::make_argument_exception ("sound::low_level::OpenALDevice::SetIntegerParam", "name", name);
@@ -551,7 +545,6 @@ int OpenALDevice::GetIntegerParam (const char* name)
   if      (!xstrcmp (name, "buffer_update_frequency"))   return static_cast<int> (buffer_update_frequency);
   else if (!xstrcmp (name, "source_update_frequency"))   return static_cast<int> (source_properties_update_frequency);
   else if (!xstrcmp (name, "listener_update_frequency")) return static_cast<int> (listener_properties_update_frequency);
-  else if (!xstrcmp (name, "al_debug_log"))              return context.GetDebugLogState ();
   else
   {
     throw xtl::make_argument_exception ("sound::low_level::OpenALDevice::GetIntegerParam", "name", name);
@@ -600,8 +593,18 @@ const char* OpenALDevice::GetStringParam (const char* name)
   if (!xstrcmp (name, "al_distance_model")) 
   {
     context.MakeCurrent ();
-
-    return openal::get_al_constant_name (context.alGetInteger (AL_DISTANCE_MODEL));
+    
+    switch (context.alGetInteger (AL_DISTANCE_MODEL))
+    {
+      default:
+      case AL_NONE:                      return "AL_NONE";
+      case AL_INVERSE_DISTANCE:          return "AL_INVERSE_DISTANCE";
+      case AL_INVERSE_DISTANCE_CLAMPED:  return "AL_INVERSE_DISTANCE_CLAMPED";
+      case AL_LINEAR_DISTANCE:           return "AL_LINEAR_DISTANCE";
+      case AL_LINEAR_DISTANCE_CLAMPED:   return "AL_LINEAR_DISTANCE_CLAMPED";
+      case AL_EXPONENT_DISTANCE:         return "AL_EXPONENT_DISTANCE";
+      case AL_EXPONENT_DISTANCE_CLAMPED: return "AL_EXPONENT_DISTANCE_CLAMPED";
+    }
   }
   else
     throw xtl::make_argument_exception ("sound::low_level::OpenALDevice::GetStringParam", "name", name);

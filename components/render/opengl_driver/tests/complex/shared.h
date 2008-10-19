@@ -39,6 +39,16 @@
 
 using namespace render::low_level;
 
+/*
+    ѕолучение смещени€ пол€ в структуре (аналог offsetof, компилируемый без предупреждений на gcc)
+*/
+
+#ifdef _MSC_VER
+  #define TEST_OFFSETOF(X,Y) offsetof(X,Y)
+#else
+  #define TEST_OFFSETOF(X,Y) (reinterpret_cast<size_t> (&(static_cast<X*> (0)->*(&X::Y))))
+#endif
+
 typedef xtl::com_ptr<IDriver>                  DriverPtr;
 typedef xtl::com_ptr<ISwapChain>               SwapChainPtr;
 typedef xtl::com_ptr<IDevice>                  DevicePtr;

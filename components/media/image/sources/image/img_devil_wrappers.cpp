@@ -16,15 +16,15 @@ const char* LOG_NAME = "media.image.devil"; //имя потока протоколирования
     Протоколирование исключения
 */
 
+struct LogHolder
+{
+  LogHolder () : log (LOG_NAME) {}
+  
+  Log log;
+};
+
 Log& get_log ()
 {
-  struct LogHolder
-  {
-    LogHolder () : log (LOG_NAME) {}
-    
-    Log log;
-  };
-
   typedef common::Singleton<LogHolder> LogHolderSingleton;
   
   return LogHolderSingleton::Instance ().log;

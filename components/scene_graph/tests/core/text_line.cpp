@@ -28,7 +28,7 @@ int main ()
   printf ("TextLine horizontal alignment = '%s', vertical_alignment = '%s'\n", get_name (text_line->HorizontalAlignment ()), get_name (text_line->VerticalAlignment ()));
 
   text_line->SetColor (0.1f, 0.2f, 0.3f, 0.4f);
-  text_line->SetText  ("Не юникод текст");
+  text_line->SetText  ("Non-unicode text");
   text_line->SetFont  ("font");
   text_line->SetAlignment (TextLineAlignment_Center, TextLineAlignment_Bottom);
 
@@ -38,7 +38,7 @@ int main ()
   printf ("TextLine font name = '%s'\n", text_line->Font ());
   printf ("TextLine horizontal alignment = '%s', vertical_alignment = '%s'\n", get_name (text_line->HorizontalAlignment ()), get_name (text_line->VerticalAlignment ()));
 
-  text_line->SetText (L"Юникод текст");
+  text_line->SetText (L"Unicode text");
 
   printf ("TextLine text = '%s'\n", text_line->Text ());
   printf ("TextLine unicode text = '%S'\n", text_line->TextUnicode ());

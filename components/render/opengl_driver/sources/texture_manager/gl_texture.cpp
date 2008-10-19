@@ -22,8 +22,8 @@ Texture::Texture
   size_t                in_mips_count)
     : BindableTexture (in_context_manager),
       desc (in_desc),
-      texture_id (0),
       target (in_target),
+      texture_id (0),      
       mips_count (in_mips_count),
       binded_sampler_hash (0)
 {

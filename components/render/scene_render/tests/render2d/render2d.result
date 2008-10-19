@@ -7,7 +7,7 @@ Create 2D renderer (id=2)
 data/materials.xmtl(1): warning: not yet implement. Encoding='utf-8'
 Create frame2d (id=7)
 Create primitive (id=8)
-Create texture 171x128 format=1 (id=9)
+Create texture 171x128 format=PixelFormat_RGB8 (id=9)
 Begin draw frames (id=2, frame_id=0)
 Begin draw frame (id=6)
 Set render targets: render-target=4, depth-stencil-target=5

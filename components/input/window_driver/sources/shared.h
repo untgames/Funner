@@ -12,8 +12,8 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/function.h>
+#include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
-#include <xtl/shared_ptr.h>
 #include <xtl/signal.h>
 #include <xtl/string.h>
 #include <xtl/trackable.h>

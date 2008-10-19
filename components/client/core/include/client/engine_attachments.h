@@ -98,10 +98,14 @@ class EngineAttachments
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T> struct IAttachment
+    template <class T> class IAttachment
     {
-      virtual T&          Value () = 0;
-      virtual const char* Name  () = 0;
+      public:
+        virtual T&          Value () = 0;
+        virtual const char* Name  () = 0;
+        
+      protected:
+        virtual ~IAttachment () {}
     };
 
     typedef xtl::iterator<IAttachment<render::Screen> >        ScreenIterator;

@@ -278,14 +278,20 @@ struct InputStage::Impl: public ContextObject
       
     void Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_indices_layout)  
     {
-      static const char* METHOD_NAME = "render::low_level::opengl::InputStage::Impl::Bind";
+      try
+      {
+        InputLayout* layout = state.GetInputLayout ();    
 
-      InputLayout* layout = state.GetInputLayout ();    
+        if (!layout)
+          layout = default_layout.get ();
 
-      if (!layout)
-        layout = default_layout.get ();
-
-      layout->Bind (base_vertex, base_index, state.GetVertexBuffers (), state.GetIndexBuffer (), out_indices_layout);
+        layout->Bind (base_vertex, base_index, state.GetVertexBuffers (), state.GetIndexBuffer (), out_indices_layout);
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("render::low_level::opengl::InputStage::Impl::Bind");
+        throw;
+      }
     }
 
   private:

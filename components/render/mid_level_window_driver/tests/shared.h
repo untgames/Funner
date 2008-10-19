@@ -18,6 +18,8 @@
 #include <common/var_registry.h>
 #include <common/var_registry_container.h>
 
+#include <media/image.h>
+
 #include <syslib/application.h>
 #include <syslib/window.h>
 
@@ -27,8 +29,6 @@
 #include <render/mid_level/driver.h>
 #include <render/mid_level/window_driver.h>
 #include <render/mid_level/renderer2d.h>
-
-#include <media/image.h>
 
 using namespace render::mid_level;
 using namespace render::mid_level::renderer2d;
@@ -308,6 +308,8 @@ class BasicTest
       render_windows[0]->Renderer ()->AttachListener (&renderer_listener);
     }    
     
+    virtual ~BasicTest () {}
+    
 ///Получение объектов визуализации
     renderer2d::IRenderer* Renderer () 
     { 
@@ -443,4 +445,3 @@ float frand (float min_value=0.0f, float max_value=1.0f)
 }
 
 #endif
-

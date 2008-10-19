@@ -93,9 +93,9 @@ namespace
 {
 
 inline bool*       begin (StateBlockMask& mask)       { return (bool*)&mask; }
-inline bool*       end   (StateBlockMask& mask)       { return (bool*)((char*)&mask + sizeof StateBlockMask); }
+inline bool*       end   (StateBlockMask& mask)       { return &mask.predication + 1; } //change if StateBlockMask changed
 inline const bool* begin (const StateBlockMask& mask) { return (const bool*)&mask; }
-inline const bool* end   (const StateBlockMask& mask) { return (const bool*)((char*)&mask + sizeof StateBlockMask); }
+inline const bool* end   (const StateBlockMask& mask) { return &mask.predication + 1; } //change if StateBlockMask changed
 
 template <class Fn>
 StateBlockMask& for_each (StateBlockMask& left, const StateBlockMask& right, Fn fn)

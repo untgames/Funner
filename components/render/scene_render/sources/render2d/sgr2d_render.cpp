@@ -407,23 +407,21 @@ TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& 
 TexturePtr Render::CreateDynamicTexture (const char* name, RenderQueryPtr& out_query)
 {
     //разбор запроса динамического рендеринга
-    
-  typedef stl::vector<stl::string> StringArray;
-    
-  StringArray tokens = common::parse (name , "dynamic *\\( *([[:digit:]]*) *, *([[:digit:]]*) *, *'(.*)' *\\).*");
-  
-  if (tokens.size () != 4)
+
+  common::StringArray tokens = common::parse (name , "dynamic *\\( *([[:digit:]]*) *, *([[:digit:]]*) *, *'(.*)' *\\).*");
+
+  if (tokens.Size () != 4)
     throw xtl::make_argument_exception ("render::render2d::Render::CreateDynamicTexture", "name", name,
-      "Wrong format. Expected: dynamic(<width>,<height>,'<query_string>')");
+      "Wrong format. Expected: dynamic(<width>,<height>,'<query_string>')");      
 
-  size_t texture_width  = xtl::io::get<size_t> (tokens [1].c_str ()),
-         texture_height = xtl::io::get<size_t> (tokens [2].c_str ());
+  size_t texture_width  = xtl::io::get<size_t> (tokens [1]),
+         texture_height = xtl::io::get<size_t> (tokens [2]);
 
-  const char* query_string = tokens [3].c_str ();
+  const char* query_string = tokens [3];
   
     //создание динамической текстуры и вспомогательного буфера глубины
-    
-  TexturePtr       texture (renderer->CreateTexture (texture_width, texture_height, media::PixelFormat_RGBA8), false);    
+
+  TexturePtr       texture (renderer->CreateTexture (texture_width, texture_height, render::mid_level::PixelFormat_RGBA8), false);    
   RenderTargetPtr  depth_stencil_buffer (renderer->CreateDepthStencilBuffer (texture_width, texture_height), false);
                   
     //создание запроса

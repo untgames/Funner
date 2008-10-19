@@ -40,7 +40,7 @@ int main ()
     
     memset (&vb_desc, 0, sizeof vb_desc);
     
-    vb_desc.size         = sizeof MyVertex * VERTICES_COUNT;
+    vb_desc.size         = sizeof (MyVertex) * VERTICES_COUNT;
     vb_desc.usage_mode   = UsageMode_Default;
     vb_desc.bind_flags   = BindFlag_VertexBuffer;
     vb_desc.access_flags = AccessFlag_Read | AccessFlag_Write;

@@ -1,0 +1,11 @@
+Results of str_array1_test:
+default constructor (size=0, empty=true, capacity=16, buffer_size=256): {}
+data: not-null
+after add (size=3, empty=false, capacity=16, buffer_size=256): {1, 2, 3}
+after reserve (size=3, empty=false, capacity=120, buffer_size=1024): {1, 2, 3}
+after remove (size=2, empty=false, capacity=120, buffer_size=1024): {1, 4}
+s1 after operator + (size=2, empty=false, capacity=120, buffer_size=1024): {1, 4}
+s2 after operator + (size=3, empty=false, capacity=3, buffer_size=19): {1, 4, 5}
+s1 after clear (size=0, empty=true, capacity=120, buffer_size=1024): {}
+s1 after swap (size=3, empty=false, capacity=3, buffer_size=19): {1, 4, 5}
+s2 after swap (size=0, empty=true, capacity=120, buffer_size=1024): {}

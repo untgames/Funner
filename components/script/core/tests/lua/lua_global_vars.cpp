@@ -55,9 +55,10 @@ int main ()
     
     xtl::shared_ptr<Environment> env (new Environment);
 
-    InvokerRegistry& object_registry = env->CreateLibrary ("A");
-    InvokerRegistry& enum_registry   = env->CreateLibrary ("A.B.C.MyEnum");
-    InvokerRegistry& var_registry    = env->CreateLibrary ("A.B.C.MyVar");
+    env->CreateLibrary ("A");
+
+    InvokerRegistry& enum_registry = env->CreateLibrary ("A.B.C.MyEnum");
+    InvokerRegistry& var_registry  = env->CreateLibrary ("A.B.C.MyVar");
 
     env->RegisterType<A> ("A");    
 

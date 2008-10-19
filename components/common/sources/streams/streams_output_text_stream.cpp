@@ -249,6 +249,8 @@ namespace
 void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SIZE])
 {
   char* pos = buffer;
+  
+  bool has_sign = false;
 
   *pos++ = '%';
 
@@ -258,6 +260,7 @@ void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SI
     case '-':
       *pos++ = '+';
       format++;
+      has_sign = true;
       break;
   }
 
@@ -266,15 +269,31 @@ void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SI
   if (dot)
   {
     const char* frac_format = dot + 1;
-    size_t      frac_size   = strlen (frac_format);
-
-    xtl::xsnprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%u.%uf",
-                             *format == '0' ? "0" : "", dot - format + frac_size + 1, frac_size);
+    size_t      frac_size   = strlen (frac_format),    
+                width       = dot - format + frac_size + 1;
+                
+    if (has_sign && *frac_format != '0')
+    {
+      width++;
+      frac_size++;
+    }
+    
+    if (dot - format)
+    {
+      xtl::xsnprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%u.%u%s",
+        *format == '0' ? "0" : "", width, frac_size, *frac_format == '0' ? "f" : "g");      
+    }
+    else
+    {
+      xtl::xsnprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s.%u%s", *format == '0' ? "0" : "", frac_size,
+        *frac_format == '0' ? "f" : "g");
+    }
   }
   else
   {
-    xtl::xsnprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%ug",
-                             *format == '0' ? "0" : "", strlen (format));
+    size_t width = strlen (format);
+    
+    xtl::xsnprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%ug", *format == '0' ? "0" : "", width);
   }
 }
 

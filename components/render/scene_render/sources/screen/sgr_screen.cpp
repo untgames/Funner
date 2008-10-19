@@ -46,7 +46,7 @@ struct Screen::Impl: public xtl::reference_counter
   template <class Fn>
   void Notify (Fn fn)
   {
-    for (ListenerArray::iterator iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
+    for (ListenerArray::iterator volatile iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
     {
       try
       {

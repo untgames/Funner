@@ -79,7 +79,7 @@ int main ()
     
     for (int i=0; i<2; i++)
     {    
-      size_t tex_size = tex_sizes [i];
+      size_t volatile tex_size = tex_sizes [i];
       
       for (int dim=0; dim<TextureDimension_Num; dim++)
       {
@@ -151,7 +151,7 @@ int main ()
     
     views.push_back (ViewPtr ()); //добавление пустого отображения
     
-    for (TextureList::iterator iter=textures.begin (); iter!=textures.end (); ++iter)
+    for (TextureList::iterator volatile iter=textures.begin (); iter!=textures.end (); ++iter)
     {
       TexturePtr texture = *iter;
       

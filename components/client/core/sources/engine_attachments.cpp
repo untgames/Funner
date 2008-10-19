@@ -81,12 +81,7 @@ struct EngineAttachments::Impl: public xtl::reference_counter
 ///Перебор экранов
     ScreenIterator CreateScreenIterator ()
     {
-      struct Selector
-      {
-        IAttachment<render::Screen>& operator () (ScreenAttachments::value_type& value) const { return *value.second; }
-      };
-      
-      return ScreenIterator (screen_attachments.begin (), screen_attachments.begin (), screen_attachments.end (), Selector ());
+      return ScreenIterator (screen_attachments.begin (), screen_attachments.begin (), screen_attachments.end (), ScreenSelector ());
     }
 
 ///Установка слушателя
@@ -152,12 +147,7 @@ struct EngineAttachments::Impl: public xtl::reference_counter
 ///Перебор слушателей
     ListenerIterator CreateListenerIterator ()
     {
-      struct Selector
-      {
-        IAttachment<scene_graph::Listener>& operator () (ListenerAttachments::value_type& value) const { return *value.second; }
-      };
-      
-      return ListenerIterator (listener_attachments.begin (), listener_attachments.begin (), listener_attachments.end (), Selector ());
+      return ListenerIterator (listener_attachments.begin (), listener_attachments.begin (), listener_attachments.end (), ListenerSelector ());
     }
     
 ///Регистрация обработчика событий ввода
@@ -223,12 +213,7 @@ struct EngineAttachments::Impl: public xtl::reference_counter
 ///Перебор обработчиков событий ввода
     InputHandlerIterator CreateInputHandlerIterator ()
     {
-      struct Selector
-      {
-        IAttachment<const InputHandler>& operator () (InputHandlerAttachments::value_type& value) const { return *value.second; }
-      };
-      
-      return InputHandlerIterator (input_attachments.begin (), input_attachments.begin (), input_attachments.end (), Selector ());
+      return InputHandlerIterator (input_attachments.begin (), input_attachments.begin (), input_attachments.end (), InputHandlerSelector ());
     }
 
 ///Работа со слушателями событий
@@ -305,7 +290,7 @@ struct EngineAttachments::Impl: public xtl::reference_counter
       stl::string    name;
       render::Screen screen;
       
-      ScreenAttachment (const char* in_name, render::Screen& in_screen) : name (in_name), screen (in_screen) {}      
+      ScreenAttachment (const char* in_name, render::Screen& in_screen) : name (in_name), screen (in_screen) {}                  
 
       const char*     Name  () { return name.c_str (); }
       render::Screen& Value () { return screen; }
@@ -333,7 +318,6 @@ struct EngineAttachments::Impl: public xtl::reference_counter
       const InputHandler& Value () { return handler; }
     };    
 
-  private:
     typedef xtl::intrusive_ptr<ScreenAttachment>                                 ScreenAttachmentPtr;
     typedef stl::hash_map<stl::hash_key<const char*>, ScreenAttachmentPtr>       ScreenAttachments;
     typedef xtl::intrusive_ptr<ListenerAttachment>                               ListenerAttachmentPtr;
@@ -341,6 +325,21 @@ struct EngineAttachments::Impl: public xtl::reference_counter
     typedef xtl::intrusive_ptr<InputHandlerAttachment>                           InputHandlerAttachmentPtr;
     typedef stl::hash_map<stl::hash_key<const char*>, InputHandlerAttachmentPtr> InputHandlerAttachments;
     typedef stl::hash_set<IEngineEventListener*>                                 EventListenerSet;    
+    
+    struct ScreenSelector
+    {
+      IAttachment<render::Screen>& operator () (ScreenAttachments::value_type& value) const { return *value.second; }
+    };    
+    
+    struct ListenerSelector
+    {
+      IAttachment<scene_graph::Listener>& operator () (ListenerAttachments::value_type& value) const { return *value.second; }
+    };    
+    
+    struct InputHandlerSelector
+    {
+      IAttachment<const InputHandler>& operator () (InputHandlerAttachments::value_type& value) const { return *value.second; }
+    };    
 
   private:
     ScreenAttachments       screen_attachments;

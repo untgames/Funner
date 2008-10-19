@@ -79,9 +79,6 @@ class OpenALContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление отладочным протоколированием
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetDebugLogState (bool state) { debug_log_state = state; }
-    bool GetDebugLogState () const { return debug_log_state; }
-    
     void              SetDebugLog (const LogHandler&);
     const LogHandler& GetDebugLog () const { return log_handler; }
 
@@ -171,28 +168,10 @@ class OpenALContext
     void LogPrintf (const char* message, ...);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Диспетчеры обращений к OpenAL
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class Fn, class Tuple>
-    void Dispatch (const char* function_name, Fn fn, const Tuple& args);
-
-    template <class Ret, class Fn, class Tuple>
-    Ret Dispatch (const char* function_name, Fn fn, const Tuple& args);
-
-    template <class Fn, class Tuple>
-    void ContextDispatch (const char* function_name, Fn fn, const Tuple& args);
-
-    template <class Ret, class Fn, class Tuple>
-    Ret ContextDispatch (const char* function_name, Fn fn, const Tuple& args);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка ошибок после вызова функции
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class Tuple>
-    void CheckErrors (const char* function_name, const Tuple& args);
-
-    template <class Tuple>
-    void ContextCheckErrors (const char* function_name, const Tuple& args);
+    void CheckErrors (const char* function_name);
+    void ContextCheckErrors (const char* function_name);
 
   private:
     OpenALContext (const OpenALContext&); //no impl
@@ -203,13 +182,12 @@ class OpenALContext
     ALCcontext* context;         //контекст OpenAL
     LogHandler  log_handler;     //функтор протоколирования
     bool        efx_present;     //наличие EFX
-    bool        debug_log_state; //нужно ли отладочное протоколирование вызовов OpenAL
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Cистема воспроизведения звука, реализованная через OpenAL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class OpenALDevice : public sound::low_level::IDevice
+class OpenALDevice : public sound::low_level::IDevice, public xtl::reference_counter
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -361,7 +339,6 @@ class OpenALDevice : public sound::low_level::IDevice
     Listener       listener;                                   //слушатель
     bool           listener_need_update;                       //слушатель требует обновления
     SampleBuffer   sample_buffer;                              //буфер сэмплирования        
-    size_t         ref_count;                                  //количество ссылок на устройство    
     float          gain;                                       //коэффициент усиления
     bool           is_muted;                                   //флг блокировки проигрывания
     ChannelsArray  channels;                                   //каналы проигрывания

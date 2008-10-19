@@ -1,7 +1,5 @@
 #include "shared.h"
 
-#include <stdio.h>
-
 using namespace syslib;
 using namespace common;
 
@@ -43,13 +41,14 @@ struct WindowImpl
 
 void GetEventContext (HWND wnd, WindowEventContext& context)
 {
-  RECT window_rect;
+  RECT window_rect, client_rect;
 
   memset (&context, 0, sizeof (context));
 
   context.handle = wnd;
   
   GetWindowRect (wnd, &window_rect);
+  GetClientRect (wnd, &client_rect);
   
   context.window_rect.left   = window_rect.left;
   context.window_rect.right  = window_rect.right;
@@ -59,7 +58,15 @@ void GetEventContext (HWND wnd, WindowEventContext& context)
   POINT cursor_position;
   
   GetCursorPos (&cursor_position);
-  ScreenToClient (wnd, &cursor_position);  
+  ScreenToClient (wnd, &cursor_position);
+  
+  if (cursor_position.x < client_rect.left)   cursor_position.x = client_rect.left;
+  if (cursor_position.y < client_rect.top)    cursor_position.y = client_rect.top;
+  if (cursor_position.x > client_rect.right)  cursor_position.x = client_rect.right;
+  if (cursor_position.y > client_rect.bottom) cursor_position.y = client_rect.bottom;  
+  
+  context.cursor_position.x = cursor_position.x;
+  context.cursor_position.y = cursor_position.y;
 
   context.keyboard_alt_pressed        = (GetKeyState (VK_MENU) & 2) != 0;
   context.keyboard_control_pressed    = (GetKeyState (VK_CONTROL) & 2) != 0;
@@ -268,10 +275,12 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       
       impl->Notify (window_handle, WindowEvent_OnMouseVerticalWheel, context);
       return 0;
+#ifdef WM_MOUSEHWHEEL      
     case WM_MOUSEHWHEEL: //изменилось положение горизонтального колеса мыши
       context.mouse_horisontal_wheel_delta = float (GET_WHEEL_DELTA_WPARAM (wparam)) / float (WHEEL_DELTA);
       impl->Notify (window_handle, WindowEvent_OnMouseHorisontalWheel, context);
       return 0;
+#endif
     case WM_LBUTTONDOWN: //нажата левая кнопка мыши
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);    
@@ -312,11 +321,11 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     {
       WindowEvent event;
       
-      switch (GET_XBUTTON_WPARAM (wparam))
+      switch (HIWORD (wparam))
       {
-        case XBUTTON1: event = WindowEvent_OnXButton1Down; break;
-        case XBUTTON2: event = WindowEvent_OnXButton2Down; break;
-        default:       return 1;
+        case 1:  event = WindowEvent_OnXButton1Down; break;
+        case 2:  event = WindowEvent_OnXButton2Down; break;
+        default: return 1;
       }
 
       context.cursor_position.x = LOWORD (lparam);
@@ -329,12 +338,12 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     case WM_XBUTTONUP: //отпущена X кнопка мыши
     {
       WindowEvent event;
-      
-      switch (GET_XBUTTON_WPARAM (wparam))
+
+      switch (HIWORD (wparam))
       {
-        case XBUTTON1: event = WindowEvent_OnXButton1Up; break;
-        case XBUTTON2: event = WindowEvent_OnXButton2Up; break;
-        default:       return 1;
+        case 1:  event = WindowEvent_OnXButton1Up; break;
+        case 2:  event = WindowEvent_OnXButton2Up; break;
+        default: return 1;
       }
       
       context.cursor_position.x = LOWORD (lparam);
@@ -348,11 +357,11 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     {
       WindowEvent event;
       
-      switch (GET_XBUTTON_WPARAM (wparam))
+      switch (HIWORD (wparam))
       {
-        case XBUTTON1: event = WindowEvent_OnXButton1DoubleClick; break;
-        case XBUTTON2: event = WindowEvent_OnXButton2DoubleClick; break;
-        default:       return 1;
+        case 1:  event = WindowEvent_OnXButton1DoubleClick; break;
+        case 2:  event = WindowEvent_OnXButton2DoubleClick; break;
+        default: return 1;
       }
       
       context.cursor_position.x = LOWORD (lparam);
@@ -483,7 +492,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
     
       //создание окна
    
-    WindowImpl* window_impl = new WindowImpl (handler, user_data);
+    WindowImpl* volatile window_impl = new WindowImpl (handler, user_data);
 
     try
     {    
@@ -597,15 +606,15 @@ void Platform::SetWindowRect (window_t handle, const Rect& rect)
     
     UINT flags = SWP_NOACTIVATE;
     
-    if (window_rect.right - window_rect.left == rect.right - rect.left &&
-        window_rect.bottom - window_rect.top == rect.bottom - rect.top)
+    if (size_t (window_rect.right - window_rect.left) == size_t (rect.right - rect.left) &&
+        size_t (window_rect.bottom - window_rect.top) == size_t (rect.bottom - rect.top))
     {
         //изменять размеры окна не нужно
 
       flags |= SWP_NOSIZE;
     }
     
-    if (window_rect.left == rect.left && window_rect.top == rect.top)
+    if ((size_t)window_rect.left == rect.left && (size_t)window_rect.top == rect.top)
     {
         //изменять положение окна не нужно
 

@@ -110,8 +110,9 @@ void test_conversion_to_string()
     TEST ("A" == lexical_cast<stl::string>('A'));
     TEST (" " == lexical_cast<stl::string>(' '));
     TEST ("123" == lexical_cast<stl::string>(123));
-    TEST ("1.23" == lexical_cast<stl::string>(1.23));
-    TEST ("1.111111111" == lexical_cast<stl::string>(1.111111111));
+    TEST ("1.23" == lexical_cast<stl::string>(1.23));    
+    
+    TEST ("1.11111" == lexical_cast<stl::string>(1.11111));
    
     TEST ("1" == lexical_cast<stl::string>(true));
     TEST ("0" == lexical_cast<stl::string>(false));

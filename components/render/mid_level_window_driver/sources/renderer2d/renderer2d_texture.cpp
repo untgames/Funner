@@ -26,8 +26,23 @@ render::low_level::PixelFormat get_pixel_format (media::PixelFormat format)
     case media::PixelFormat_L8:    return render::low_level::PixelFormat_A8;
     case media::PixelFormat_LA8:   return render::low_level::PixelFormat_LA8;
     default:
-      throw xtl::format_not_supported_exception ("render::mid_level::window_driver::renderer2d::get_pixel_format",
+      throw xtl::format_not_supported_exception ("render::mid_level::window_driver::renderer2d::get_pixel_format(media::PixelFormat)",
         "Unsupported image format %s", media::get_format_name (format));
+  }
+}
+
+render::low_level::PixelFormat get_pixel_format (render::mid_level::PixelFormat format)
+{
+  switch (format)
+  {
+    case render::mid_level::PixelFormat_RGB8:  return render::low_level::PixelFormat_RGB8;
+    case render::mid_level::PixelFormat_RGBA8: return render::low_level::PixelFormat_RGBA8;
+    case render::mid_level::PixelFormat_A8:
+    case render::mid_level::PixelFormat_L8:    return render::low_level::PixelFormat_A8;
+    case render::mid_level::PixelFormat_LA8:   return render::low_level::PixelFormat_LA8;
+    default:
+      throw xtl::make_argument_exception ("render::mid_level::window_driver::renderer2d::get_pixel_format(render::mid_level::PixelFormat)",
+        "format", format);
   }
 }
 
@@ -94,39 +109,41 @@ size_t ImageTexture::GetHeight ()
 }
 
 /*
-   Формат
-*/
-
-media::PixelFormat ImageTexture::GetFormat ()
-{
-  render::low_level::TextureDesc texture_desc;
-
-  texture->GetDesc (texture_desc);
-
-  switch (texture_desc.format)
-  {
-    case render::low_level::PixelFormat_RGB8:  return media::PixelFormat_RGB8;
-    case render::low_level::PixelFormat_RGBA8: return media::PixelFormat_RGBA8;
-    default:
-      throw xtl::format_not_supported_exception ("render::mid_level::window_driver::ImageTexture::GetFormat", "Texture uses incompatible format %s", render::low_level::get_name (texture_desc.format));
-  }
-}
-
-/*
    Копирование образа текстуры в картинку
 */
 
 void ImageTexture::CaptureImage (media::Image& image)
 {
-  static const char* METHOD_NAME = "render::mid_level::window_driver::ImageTexture::CaptureImage";
-  
-  render::low_level::TextureDesc texture_desc;
+  try
+  {  
+    render::low_level::TextureDesc texture_desc;
 
-  texture->GetDesc (texture_desc);
+    texture->GetDesc (texture_desc);    
+    
+    media::PixelFormat image_format;
 
-  media::Image (texture_desc.width, texture_desc.height, 1, GetFormat ()).Swap (image);
+    switch (texture_desc.format)
+    {
+      case render::low_level::PixelFormat_RGB8:
+        image_format = media::PixelFormat_RGB8;
+        break;
+      case render::low_level::PixelFormat_RGBA8:
+        image_format = media::PixelFormat_RGBA8;
+        break;
+      default:
+        throw xtl::format_not_supported_exception ("render::mid_level::window_driver::ImageTexture::CaptureImage(media::Image&)",
+          "Texture uses incompatible format %s", render::low_level::get_name (texture_desc.format));
+    }    
 
-  texture->GetData (0, 0, 0, 0, texture_desc.width, texture_desc.height, texture_desc.format, image.Bitmap ());
+    media::Image (texture_desc.width, texture_desc.height, 1, image_format).Swap (image);
+
+    texture->GetData (0, 0, 0, 0, texture_desc.width, texture_desc.height, texture_desc.format, image.Bitmap ());
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::mid_level::window_driver::ImageTexture::CaptureImage");
+    throw;
+  }
 }
 
 /*
@@ -148,7 +165,7 @@ render::low_level::ITexture* ImageTexture::GetTexture ()
    Конструктор / деструктор
 */
 
-RenderTargetTexture::RenderTargetTexture (render::low_level::IDevice& device, size_t width, size_t height, media::PixelFormat format)
+RenderTargetTexture::RenderTargetTexture (render::low_level::IDevice& device, size_t width, size_t height, render::mid_level::PixelFormat format)
   : RenderTarget (CreateView (device, width, height, format).get (), RenderTargetType_Color)
 {
 }
@@ -158,10 +175,10 @@ RenderTargetTexture::RenderTargetTexture (render::low_level::IDevice& device, si
 */
 
 RenderTargetTexture::ViewPtr RenderTargetTexture::CreateView
- (render::low_level::IDevice& device,
-  size_t                      width,
-  size_t                      height,
-  media::PixelFormat          format)
+ (render::low_level::IDevice&   device,
+  size_t                         width,
+  size_t                         height,
+  render::mid_level::PixelFormat format)
 {
   try
   {

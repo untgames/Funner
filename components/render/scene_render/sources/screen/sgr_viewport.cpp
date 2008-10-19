@@ -80,7 +80,7 @@ struct Viewport::Impl: public xtl::reference_counter
   template <class Fn>
   void Notify (Fn fn)
   {
-    for (ListenerArray::iterator iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
+    for (ListenerArray::iterator volatile iter=listeners.begin (), end=listeners.end (); iter!=end; ++iter)
     {
       try
       {
@@ -430,14 +430,19 @@ void Viewport::RemoveAllProperties ()
     Перечисление переменных рендеринга
 */
 
+namespace
+{
+
+struct ViewportPropertySelector
+{
+  const IViewportProperty& operator () (const PropertyMap::value_type& value) const { return *value.second; }
+};
+
+}
+
 Viewport::PropertyIterator Viewport::CreatePropertyIterator () const
 {
-  struct PropertySelector
-  {
-    const IViewportProperty& operator () (const PropertyMap::value_type& value) const { return *value.second; }
-  };
-
-  return PropertyIterator (impl->properties.begin (), impl->properties.begin (), impl->properties.end (), PropertySelector ());
+  return PropertyIterator (impl->properties.begin (), impl->properties.begin (), impl->properties.end (), ViewportPropertySelector ());
 }
 
 /*

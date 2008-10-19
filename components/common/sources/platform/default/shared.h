@@ -7,11 +7,13 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 
-#ifdef _MSC_VER
+#ifdef _WIN32
   #include <io.h>
   #include <direct.h>
 
-  #pragma warning (disable : 4996) //declare deprecated
+  #ifdef _MSC_VER
+    #pragma warning (disable : 4996) //declare deprecated
+  #endif
 
 #elif __GNUC__
   #include <unistd.h>

@@ -429,7 +429,7 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
             SetContextCacheValue (CacheEntry_ClearStencilValue, stencil);
           }
 
-          if (GetContextCacheValue (CacheEntry_StencilWriteMask) != unsigned char (~0))
+          if (GetContextCacheValue (CacheEntry_StencilWriteMask) != (unsigned char)(~0))
           {
             glStencilMask (~0);
 

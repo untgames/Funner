@@ -128,14 +128,14 @@ struct TranslationMap::Impl : public xtl::reference_counter
       if (!handler)
         return;
       
-      vector<string> event_components;
+      StringArray event_components;
       
       split_event (event, event_components);
 
-      if (event_components.empty ())
+      if (event_components.IsEmpty ())
         return;
 
-      pair <ReplacerMap::const_iterator, ReplacerMap::const_iterator> range_pair = replacer_map.equal_range (event_components[0].c_str ());
+      pair <ReplacerMap::const_iterator, ReplacerMap::const_iterator> range_pair = replacer_map.equal_range (event_components [0]);
 
       if (range_pair.first == replacer_map.end ())
         return;
@@ -162,7 +162,7 @@ struct TranslationMap::Impl : public xtl::reference_counter
   private:
     struct translator_selector
     {
-      TranslationMap::Translator& operator () (ReplacerMap::value_type& value) const { return *value.second; }
+      TranslationMap::ITranslator& operator () (ReplacerMap::value_type& value) const { return *value.second; }
     };
 
       //создание итератора    

@@ -7,6 +7,12 @@ namespace
 {
 
 /*
+    Константы
+*/
+
+const char* FLOAT_FORMAT = ".###"; //количество знаков после запятой при выводе вещественных чисел
+
+/*
     Вспомогательный класс сохранения шрифтов
 */
 
@@ -88,8 +94,8 @@ class XmlFontSaver
 
       writer.WriteAttribute ("LeftGlyph", left_glyph_index);
       writer.WriteAttribute ("RightGlyph", right_glyph_index);
-      writer.WriteAttribute ("XKerning", kerning_info.x_kerning);
-      writer.WriteAttribute ("YKerning", kerning_info.y_kerning);
+      writer.WriteAttribute ("XKerning", kerning_info.x_kerning, FLOAT_FORMAT);
+      writer.WriteAttribute ("YKerning", kerning_info.y_kerning, FLOAT_FORMAT);
     }
     
   private:

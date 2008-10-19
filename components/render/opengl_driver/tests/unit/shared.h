@@ -32,6 +32,16 @@
 
 #include <media/image.h>
 
+/*
+    Получение смещения поля в структуре (аналог offsetof, компилируемый без предупреждений на gcc)
+*/
+
+#ifdef _MSC_VER
+  #define TEST_OFFSETOF(X,Y) offsetof(X,Y)
+#else
+  #define TEST_OFFSETOF(X,Y) (reinterpret_cast<size_t> (&(static_cast<X*> (0)->*(&X::Y))))
+#endif
+
 using namespace render::low_level;
 
 typedef xtl::com_ptr<IDriver>                  DriverPtr;

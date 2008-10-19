@@ -519,22 +519,22 @@ void convert_encoding(Encoding       source_encoding,
 stl::wstring towstring (const char* string, int length)
 {
   if (!string)
-    throw xtl::make_null_argument_exception ("common::towstring", "string");
+    throw xtl::make_null_argument_exception ("common::towstring", "string");    
 
   if (length == -1)
-    length = strlen (string);
+    length = strlen (string);        
 
   stl::wstring result;
 
   result.fast_resize (length);
 
-  int result_size =mbstowcs (&result [0], string, length);
+  int result_size = mbstowcs (&result [0], string, length);
 
   if (result_size < 0)
-    return L"(common::towstring error)";
+    return L"(common::towstring error)";   
 
   result.fast_resize (result_size);
-
+  
   return result;
 }
 

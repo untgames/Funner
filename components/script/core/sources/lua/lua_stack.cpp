@@ -93,6 +93,7 @@ float Stack::GetFloat (size_t index)
 int Stack::GetInteger (size_t index)
 {
   check_item (state, index, LUA_TNUMBER, "script::lua::Stack::GetInteger");
+
   return lua_tointeger (state, index);
 }
 

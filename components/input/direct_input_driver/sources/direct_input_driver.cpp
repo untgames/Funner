@@ -212,8 +212,6 @@ class Driver: virtual public IDriver, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RegisterDevices ()
     {
-      static const char* METHOD_NAME = "input::low_level::direct_input_driver::Driver::RegisterDevices";
-
       current_device_type = DirectInputDeviceType_GameControl;
       direct_input_interface->EnumDevices (DI8DEVCLASS_GAMECTRL, &enum_devices_callback, this, DIEDFL_ATTACHEDONLY);
 

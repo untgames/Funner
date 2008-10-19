@@ -131,8 +131,9 @@ class FppProgramParser
 
         //разбор атрибутов
 
-      size_t parsed_attributes_count = read_range (xtl::io::make_token_iterator (attributes, attributes + count),
-                                                   (T*)((char*)&base_state + offset));
+      Parser::AttributeIterator attr_iter = xtl::io::make_token_iterator (attributes, attributes + count);
+
+      size_t parsed_attributes_count = read_range (attr_iter, (T*)((char*)&base_state + offset));
 
       if (parsed_attributes_count != count)
         parser.Log ().Error (*iter, "Error at read attribute #%u", parsed_attributes_count);
@@ -243,9 +244,9 @@ class FppProgramParser
     {
       ParseMatrix4f (texmap_iter, "Transform", base_offset + offsetof (TexmapDesc, transform));
       ParseMatrix4f (texmap_iter, "Texgen",    base_offset + offsetof (TexmapDesc, transform));
-      ParseVector4f (texmap_iter, "TexgenU",   base_offset + offsetof (TexmapDesc, transform [0]));
-      ParseVector4f (texmap_iter, "TexgenV",   base_offset + offsetof (TexmapDesc, transform [1]));
-      ParseVector4f (texmap_iter, "TexgenW",   base_offset + offsetof (TexmapDesc, transform [2]));
+      ParseVector4f (texmap_iter, "TexgenU",   base_offset + offsetof (TexmapDesc, transform [0][0]));
+      ParseVector4f (texmap_iter, "TexgenV",   base_offset + offsetof (TexmapDesc, transform [1][0]));
+      ParseVector4f (texmap_iter, "TexgenW",   base_offset + offsetof (TexmapDesc, transform [2][0]));
       
       static const Tag2Value texcoord_sources [] = {
         {"Explicit",      TexcoordSource_Explicit},
@@ -353,7 +354,7 @@ class FppProgramParser
         
       for (Parser::Iterator light_iter = program_iter->First ("Light"); light_iter && light_index < FPP_MAX_LIGHTS_COUNT; ++light_iter, ++light_index)
       {
-        ParseLight (light_iter, offsetof (FppState, lights [light_index]));
+        ParseLight (light_iter, offsetof (FppState, lights [0]) + light_index * sizeof (LightDesc));
       }
 
         //разбор параметров текстурирования
@@ -367,7 +368,7 @@ class FppProgramParser
         Parser::Iterator texmap_iter = program_iter->First (texmap_name);
         
         if (texmap_iter)
-          ParseTexmap (texmap_iter, offsetof (FppState, maps [i]));
+          ParseTexmap (texmap_iter, offsetof (FppState, maps [0]) + i * sizeof (TexmapDesc));
       }
     }    
 

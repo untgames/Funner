@@ -1,5 +1,7 @@
 #include "shared.h"
 
+size_t last = 0;
+
 void test (Timer& timer)
 {
   try
@@ -8,13 +10,22 @@ void test (Timer& timer)
 
     count++;
 
-    printf ("#%lu: elapsed=%lu\n", count, timer.ElapsedMilliseconds () / 100 * 100); //точность до 1/10 секунды
+    if (common::milliseconds () - last < timer.Period () + 20) //точность до 1/50 секунды
+    {
+      printf ("#%lu: ok\n", count);
+    }
+    else
+    {
+      printf ("#%lu: fail (delay=%u msec)\n", count, common::milliseconds () - last);
+    }
 
     switch (count)
     {
       case 10: timer.SetPeriod (200); break;
       case 20: Application::Exit (0); break;
     }
+
+    last = common::milliseconds ();
   }
   catch (std::exception& exception)
   {
@@ -29,6 +40,8 @@ int main ()
   try
   {
     Timer timer (&test, 100);
+    
+    last = common::milliseconds ();
 
     Application::Run ();
 

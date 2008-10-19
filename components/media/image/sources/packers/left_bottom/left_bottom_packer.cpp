@@ -28,7 +28,7 @@ size_t get_next_higher_power_of_two (size_t k)
 
   k--;
 
-  for (int i=1; i < sizeof (size_t) * 8; i *= 2)
+  for (size_t i=1; i < sizeof (size_t) * 8; i *= 2)
           k |= k >> i;
 
   return k + 1;
@@ -105,33 +105,33 @@ class TileImageBuilder
     }
 
   private:
+    struct FreeSpace
+    {
+      size_t x_pos;
+      size_t y_pos;
+      size_t width;
+      size_t height;
+
+      FreeSpace (size_t in_x_pos, size_t in_y_pos, size_t in_width, size_t in_height)
+        : x_pos (in_x_pos), y_pos (in_y_pos), width (in_width), height (in_height)
+        {}
+
+      bool operator < (const FreeSpace& right) const
+      {
+        if      (x_pos < right.x_pos)   return true;
+        else if (x_pos > right.x_pos)   return false;
+        else if (y_pos < right.y_pos)   return true;
+        else if (y_pos > right.y_pos)   return false;
+        else if (width < right.width)   return true;
+        else if (width > right.width)   return false;
+        else if (height < right.height) return true;
+        else return false;
+      }
+    };
+
     bool PackImages (size_t result_image_horisontal_side, size_t result_image_vertical_side, math::vec2ui* out_origins, const IndexArray& indices)
     {
-      struct FreeSpace
-      {
-        size_t x_pos;
-        size_t y_pos;
-        size_t width;
-        size_t height;
-
-        FreeSpace (size_t in_x_pos, size_t in_y_pos, size_t in_width, size_t in_height)
-          : x_pos (in_x_pos), y_pos (in_y_pos), width (in_width), height (in_height)
-          {}
-
-        bool operator < (const FreeSpace& right) const
-        {
-          if      (x_pos < right.x_pos)   return true;
-          else if (x_pos > right.x_pos)   return false;
-          else if (y_pos < right.y_pos)   return true;
-          else if (y_pos > right.y_pos)   return false;
-          else if (width < right.width)   return true;
-          else if (width > right.width)   return false;
-          else if (height < right.height) return true;
-          else return false;
-        }
-      };
-
-      typedef set<FreeSpace, less<FreeSpace>> FreeSpacesSet;
+      typedef set<FreeSpace, less<FreeSpace> > FreeSpacesSet;
 
       FreeSpacesSet free_spaces;
 

@@ -46,9 +46,6 @@ void idle (Test& test)
   if (test.window.IsClosed ())
     return;
 
-  static const   float DT = 0.01f;
-  static float   t = 0;
-  static clock_t last = 0;
   static float angle;
 
 /*  if (clock () - last < CLK_TCK / 30)
@@ -100,7 +97,7 @@ int main ()
     
     memset (&vb_desc, 0, sizeof vb_desc);
            
-    vb_desc.size         = sizeof MyVertex * VERTICES_COUNT;
+    vb_desc.size         = sizeof (MyVertex) * VERTICES_COUNT;
     vb_desc.usage_mode   = UsageMode_Default;
     vb_desc.bind_flags   = BindFlag_VertexBuffer;
     vb_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
@@ -148,12 +145,12 @@ int main ()
     };
 
     static ProgramParameter shader_parameters[] = {
-      {"GrainSizeRecip", ProgramParameterType_Float, 0, 1, offsetof (MyShaderParameters, grain_size_recip)},
-      {"DarkColor", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, dark_color)},
-      {"colorSpread", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, color_spread)},
-      {"LightPosition", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_position)},
-      {"Scale", ProgramParameterType_Float, 0, 1, offsetof (MyShaderParameters, scale)},
-      {"Transform", ProgramParameterType_Float4x4, 1, 1, offsetof (MyShaderParameters2, transform)}
+      {"GrainSizeRecip", ProgramParameterType_Float, 0, 1, TEST_OFFSETOF (MyShaderParameters, grain_size_recip)},
+      {"DarkColor", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, dark_color)},
+      {"colorSpread", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, color_spread)},
+      {"LightPosition", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, light_position)},
+      {"Scale", ProgramParameterType_Float, 0, 1, TEST_OFFSETOF (MyShaderParameters, scale)},
+      {"Transform", ProgramParameterType_Float4x4, 1, 1, TEST_OFFSETOF (MyShaderParameters2, transform)}
     };
 
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
@@ -165,14 +162,14 @@ int main ()
     
     memset (&cb_desc, 0, sizeof cb_desc);
     
-    cb_desc.size         = sizeof MyShaderParameters;
+    cb_desc.size         = sizeof (MyShaderParameters);
     cb_desc.usage_mode   = UsageMode_Default;
     cb_desc.bind_flags   = BindFlag_ConstantBuffer;
     cb_desc.access_flags = AccessFlag_ReadWrite;
 
     BufferDesc cb_desc2 (cb_desc);
    
-    cb_desc2.size = sizeof MyShaderParameters2;
+    cb_desc2.size = sizeof (MyShaderParameters2);
  
     BufferPtr cb (test.device->CreateBuffer (cb_desc), false), cb2 (test.device->CreateBuffer (cb_desc2), false);
 

@@ -59,11 +59,6 @@ class SceneRenderManagerImpl
 ///Перебор путей рендеринга
     Iterator CreateIterator ()
     {
-      struct RenderPathSelector
-      {
-        SceneRenderManager::IRenderPath& operator () (RenderPathMap::value_type& v) const { return *v.second; }
-      };
-      
       LoadDefaultComponents ();
 
       return Iterator (paths.begin (), paths.begin (), paths.end (), RenderPathSelector ());        
@@ -132,6 +127,12 @@ class SceneRenderManagerImpl
 
     typedef xtl::intrusive_ptr<RenderPath>                           RenderPathPtr;
     typedef stl::hash_map<stl::hash_key<const char*>, RenderPathPtr> RenderPathMap;
+    
+///Селектор интерфейса пути рендеринга
+    struct RenderPathSelector
+    {
+      SceneRenderManager::IRenderPath& operator () (RenderPathMap::value_type& v) const { return *v.second; }
+    };    
 
   private:
     RenderPathMap paths; //карта путей рендеринга

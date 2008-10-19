@@ -41,4 +41,3 @@ ColorBlock::ColorBlock(const ColorBlock & block)
     color(i) = block.color(i);
   }
 }
-  

@@ -85,7 +85,7 @@ expression '"A" == lexical_cast<stl::string>('A')' is true
 expression '" " == lexical_cast<stl::string>(' ')' is true
 expression '"123" == lexical_cast<stl::string>(123)' is true
 expression '"1.23" == lexical_cast<stl::string>(1.23)' is true
-expression '"1.111111111" == lexical_cast<stl::string>(1.111111111)' is true
+expression '"1.11111" == lexical_cast<stl::string>(1.11111)' is true
 expression '"1" == lexical_cast<stl::string>(true)' is true
 expression '"0" == lexical_cast<stl::string>(false)' is true
 expression '"Test" == lexical_cast<stl::string>("Test")' is true

@@ -39,6 +39,9 @@ function viewport_test ()
   viewport1:SetArea (0, 0, 100, 100)
   viewport1:SetOrigin (0, 0)
   viewport1:SetSize (100, 100)
+  
+  print ("Area = (" .. tostring (viewport1.Area.Left) .. ", " .. tostring (viewport1.Area.Top) .. ", " .. tostring (viewport1.Area.Width) .. ", " .. tostring (viewport1.Area.Height) .. ")")
+  print ("Right = " .. tostring (viewport1.Area.Right) .. ", Bottom = " .. tostring (viewport1.Area.Bottom))
 
   viewport1:Deactivate ()
   print ("IsActive = " .. tostring (viewport1.Active))

@@ -355,13 +355,8 @@ class Texture: virtual public mid_level::renderer2d::ITexture, public RenderTarg
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Texture  (size_t width, size_t height, media::PixelFormat format);
+    Texture  (size_t width, size_t height, PixelFormat format);
     ~Texture ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Формат
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    media::PixelFormat GetFormat () { return format; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование образа текстуры в картинку
@@ -369,7 +364,7 @@ class Texture: virtual public mid_level::renderer2d::ITexture, public RenderTarg
     void CaptureImage (media::Image&);    
 
   private:
-    media::PixelFormat format;
+    PixelFormat format;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -495,12 +490,18 @@ class Renderer: virtual public mid_level::renderer2d::IRenderer, public BasicRen
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     mid_level::renderer2d::ITexture*   CreateTexture   (const media::Image& image);
-    mid_level::renderer2d::ITexture*   CreateTexture   (size_t width, size_t height, media::PixelFormat pixel_format);
+    mid_level::renderer2d::ITexture*   CreateTexture   (size_t width, size_t height, PixelFormat pixel_format);
     mid_level::renderer2d::IPrimitive* CreatePrimitive ();
     mid_level::renderer2d::IFrame*     CreateFrame     ();
 };
 
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Уnилиты
+///////////////////////////////////////////////////////////////////////////////////////////////////
+media::PixelFormat get_image_format (PixelFormat format);        //получение эквивалента формата
+PixelFormat        get_format       (media::PixelFormat format); //получение эквивалента формата
 
 }
 

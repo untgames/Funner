@@ -41,7 +41,7 @@ int main ()
     
     memset (&cb_desc, 0, sizeof cb_desc);
     
-    cb_desc.size         = sizeof MyShaderParameters;
+    cb_desc.size         = sizeof (MyShaderParameters);
     cb_desc.usage_mode   = UsageMode_Default;
     cb_desc.bind_flags   = BindFlag_ConstantBuffer;
     cb_desc.access_flags = AccessFlag_ReadWrite;    

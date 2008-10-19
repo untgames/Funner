@@ -297,12 +297,12 @@ inline string word (const char* str, size_t word_index, const char* delimiters, 
   return string (word.first, word.second - word.first, allocator);
 }
 
-inline void split (const char* str, const char* delimiters, const char* spaces, const char* brackets, string::allocator_type allocator, vector<string>& res)
+inline void split (const char* str, const char* delimiters, const char* spaces, const char* brackets, string::allocator_type allocator, StringArray& res)
 {
   if (!*str) //частный случай для пустой строки
     return;
 
-  res.reserve (8);
+  res.Reserve (8);
   
   WordParser parser (str, delimiters, spaces, brackets);
 
@@ -311,7 +311,7 @@ inline void split (const char* str, const char* delimiters, const char* spaces, 
     WordParser::Word word = parser.NextWord ();
 
     if (word.first != word.second || !parser.EndOfString ())
-      res.push_back (string (word.first, word.second - word.first, allocator));
+      res.Add (string (word.first, word.second - word.first, allocator).c_str ());
 
   } while (!parser.EndOfString ());
 }
@@ -328,18 +328,18 @@ string word (const string& str, size_t word_index, const char* delimiters, const
   return word (str.c_str (), word_index, delimiters, spaces, brackets, str.get_allocator ());
 }
 
-vector<string> split (const char* str, const char* delimiters, const char* spaces, const char* brackets)
+StringArray split (const char* str, const char* delimiters, const char* spaces, const char* brackets)
 {
-  vector<string> res;
+  StringArray res;
 
   split (str, delimiters, spaces, brackets, string::allocator_type (), res);
 
   return res;
 }
 
-vector<string> split (const string& str, const char* delimiters, const char* spaces, const char* brackets)
+StringArray split (const string& str, const char* delimiters, const char* spaces, const char* brackets)
 {
-  vector<string> res;
+  StringArray res;
 
   split (str.c_str (), delimiters, spaces, brackets, str.get_allocator (), res);
 

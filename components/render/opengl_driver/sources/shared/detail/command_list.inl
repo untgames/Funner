@@ -105,7 +105,7 @@ class Command: public ICommand
 template <class Fn>
 inline void CommandListBuilder::Add (Fn fn)
 {
-  AddCore (new detail::Command<Fn, 0> (fn));
+  AddCore (new detail::Command<Fn> (fn));
 }
 
 template <class Fn, class T1>

@@ -78,7 +78,7 @@ int main ()
 
     memset (&vb_desc, 0, sizeof vb_desc);
 
-    vb_desc.size         = sizeof MyVertex * VERTICES_COUNT;
+    vb_desc.size         = sizeof (MyVertex)* VERTICES_COUNT;
     vb_desc.usage_mode   = UsageMode_Default;
     vb_desc.bind_flags   = BindFlag_VertexBuffer;
     vb_desc.access_flags = AccessFlag_ReadWrite;
@@ -90,9 +90,9 @@ int main ()
     printf ("Set input-stage\n");
 
     VertexAttribute attributes [] = {
-      {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, normal), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, position), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Color, InputDataFormat_Vector4, InputDataType_UByte, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
+      {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, normal), sizeof (MyVertex)},
+      {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, position), sizeof (MyVertex)},
+      {VertexAttributeSemantic_Color, InputDataFormat_Vector4, InputDataType_UByte, 0, TEST_OFFSETOF (MyVertex, color), sizeof (MyVertex)},
     };
     
     InputLayoutDesc layout_desc;

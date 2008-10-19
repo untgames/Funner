@@ -95,7 +95,7 @@ class DynamicLibrary
       if (!name)
         return 0;
         
-      return GetProcAddress (module, name);
+      return (void*)::GetProcAddress (module, name);
     }
 
   private:
@@ -178,7 +178,7 @@ class AdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
 ///Определение адреса точки входа с приведением типов и проверкой корректности аргументов
     template <class Fn> void GetSymbol (const char* symbol, Fn& fn, bool check = true)
     {
-      fn = reinterpret_cast<Fn> (dll->GetSymbol (symbol));
+      fn = (Fn)dll->GetSymbol (symbol);
 
       if (!fn && check)
         throw xtl::format_operation_exception ("render::low_level::opengl::windows::AdapterLibrary::GetSymbol",
@@ -362,7 +362,7 @@ class WglAdapterLibrary: public AdapterLibrary
       const void* address = 0;
 
       if (!address && (search_flags & EntrySearch_Context))
-        address = fwglGetProcAddress (name);    
+        address = (void*)fwglGetProcAddress (name);    
         
       if (address)
         return address;
@@ -565,8 +565,7 @@ class IcdAdapterLibrary: public AdapterLibrary
         {
             //сохранение параметров текущего контекста
 
-          HGLRC current_context = AdapterLibrary::GetCurrentContext ();
-          HDC   current_dc      = AdapterLibrary::GetCurrentDC ();
+          HGLRC volatile current_context = AdapterLibrary::GetCurrentContext ();
 
             //оповещение об отмене текущего контекста
 
@@ -587,7 +586,7 @@ class IcdAdapterLibrary: public AdapterLibrary
 
           //установка текущего контекста
 
-        if (!fDrvSetContext (dc, context, &SetContextCallBack))
+        if (!fDrvSetContext (dc, context, (void*)&SetContextCallBack))
           raise_error ("DrvSetContext");
 
         current_library = this;
@@ -619,7 +618,7 @@ class IcdAdapterLibrary: public AdapterLibrary
       const void* address = 0;
 
       if (!address && (search_flags & EntrySearch_Context))
-        address = fDrvGetProcAddress (name);    
+        address = (void*)fDrvGetProcAddress (name);
         
       if (address)
         return address;
@@ -631,7 +630,7 @@ class IcdAdapterLibrary: public AdapterLibrary
         int icd_table_index = get_icd_table_index (name);
 
         if (icd_table && icd_table_index >= 0 && icd_table_index < (int)icd_table->size)
-          address = icd_table->table [icd_table_index];
+          address = (void*)icd_table->table [icd_table_index];
       }
 
       if (address)
@@ -738,7 +737,7 @@ AdapterLibraryPtr LibraryManager::LoadLibrary (const char* name)
       
     log.Printf ("...load library '%s'", name);
       
-    DynamicLibraryPtr dll = new DynamicLibrary (name);
+    DynamicLibraryPtr dll (new DynamicLibrary (name));
     
       //попытка найти уже загруженную библиотеку
 

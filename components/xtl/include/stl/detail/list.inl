@@ -416,7 +416,7 @@ inline void list<T,Allocator>::insert (iterator position,Iter first,Iter last)
 template <class T,class Allocator> 
 inline typename list<T,Allocator>::iterator list<T,Allocator>::erase (iterator position)
 {
-  Node *next_node = (Node*)position.node->next, *prev_node = (Node*)position.node->prev;
+  Node * volatile next_node = (Node*)position.node->next, * volatile prev_node = (Node*)position.node->prev;
   
   prev_node->next = next_node;
   next_node->prev = prev_node;

@@ -33,8 +33,9 @@ EventTranslator::EventTranslator (const char* input_event, const char* event_rep
 
   split_event (input_event, event_wildcard);
 
-  if (event_wildcard.empty ())
+  if (event_wildcard.IsEmpty ())
     throw xtl::make_argument_exception ("input::EventTranslator::EventTranslator", "input_event", input_event, "Empty input event");
+
   if (replacement_tokens.empty ())
     throw xtl::make_argument_exception ("input::EventTranslator::EventTranslator", "event_replacement", event_replacement, "Empty event replacement");
 }
@@ -47,24 +48,24 @@ EventTranslator::~EventTranslator ()
    Выполнение замены
 */
 
-bool EventTranslator::Replace (const vector<string>& event_components, string& result)
+bool EventTranslator::Replace (const common::StringArray& event_components, string& result)
 {
-  if (event_components.size () != event_wildcard.size ())
+  if (event_components.Size () != event_wildcard.Size ())
     return false;
 
-  for (size_t i = 0; i < event_components.size (); i++)
-    if (!wcimatch (event_components[i].c_str (), event_wildcard[i].c_str ()))
+  for (size_t i = 0; i < event_components.Size (); i++)
+    if (!wcimatch (event_components [i], event_wildcard [i]))
       return false;
 
   for (size_t i = 0; i < replacement_tokens.size (); i++)
   {
-    result.append (replacement_tokens[i].prefix);
+    result.append (replacement_tokens [i].prefix);
 
-    if (replacement_tokens[i].argument_index >= event_components.size ())
+    if (replacement_tokens [i].argument_index >= event_components.Size ())
       continue;
 
-    if (replacement_tokens[i].argument_index != NO_ARGUMENT)
-      result.append (event_components[replacement_tokens[i].argument_index]);  
+    if (replacement_tokens [i].argument_index != NO_ARGUMENT)
+      result.append (event_components [replacement_tokens[i].argument_index]);  
   }
       
   return true;

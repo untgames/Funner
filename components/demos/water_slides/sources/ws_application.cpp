@@ -43,7 +43,7 @@ struct MyApplication::Impl
       configuration (CONFIG_FILE_NAME),
       log_file (configuration.GetString ("LogFileName", DEFAULT_LOG_FILE_NAME)),
       log_stream (xtl::bind (&Impl::LogWriteBuffer, this, _1, _2)),
-      window (configuration.GetInteger ("FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) ? 
+      window (configuration.GetInteger ("FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) ?         
         syslib::WindowStyle_PopUp : syslib::WindowStyle_Overlapped, configuration.GetInteger ("WindowWidth", DEFAULT_WINDOW_WIDTH), configuration.GetInteger ("WindowHeight", DEFAULT_WINDOW_HEIGHT)),
       sound_manager (0),
       scene_player (0)
@@ -53,7 +53,8 @@ struct MyApplication::Impl
         sound_manager = new sound::SoundManager ("*", "*");
 
         LogMessage ("Loading sound declarations...");
-        sound_manager->LoadSoundLibrary (WATER_DROP_SOUND_NAME);
+
+        sound_manager->LoadSoundLibrary (WATER_DROP_SOUND_NAME);        
       }
       catch (...)
       {
@@ -109,7 +110,7 @@ struct MyApplication::Impl
       desc.swap_method               = SwapMethod_Discard;
       desc.fullscreen                = configuration.GetInteger ("FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) != 0;
       desc.window_handle             = window.Handle ();
-      
+
       render::low_level::DriverManager::CreateSwapChainAndDevice ("*", "*", desc, configuration.GetString ("DeviceInitString", DEFAULT_DEVICE_INIT_STRING),
         swap_chain, device);
       
@@ -126,7 +127,7 @@ struct MyApplication::Impl
       for (int i=syslib::WindowEvent_OnLeftButtonDown; i<=syslib::WindowEvent_OnMiddleButtonDoubleClick; i++)
         window.RegisterEventHandler ((syslib::WindowEvent)i, xtl::bind (&Impl::OnMouse, this, _2, _3));
         
-      window.RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Impl::OnMouse, this, _2, _3));        
+      window.RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Impl::OnMouse, this, _2, _3));
 
         //регистрация обработчиков событий приложения
         
@@ -178,26 +179,27 @@ struct MyApplication::Impl
 
       prefix += common::format (" : %03u] ", MyApplication::Milliseconds () % 1000);
 
-        //формирование набора строк для вывода в протокол
+        //формирование набора строк для вывода в протокол        
+        
 
-      stl::vector<stl::string> lines = split (message, "\n");
+      common::StringArray lines = split (message, "\n");
       
-      for (size_t i=0; i<lines.size (); i++)
+      for (size_t i=0; i<lines.Size (); i++)
       {
-        stl::string& line = lines [i];
+        const char* line = lines [i];
 
-        if (line.empty ())
+        if (!*line)
           continue;
 
         write (log_stream, prefix);
         write (log_stream, line);
         write (log_stream, "\r\n");
-      }
+      }      
 
         //сброс протокола на диск
 
       log_stream.Buffer ().Flush ();
-    }    
+    }
     
       //работа с игровым отображением
     void SetView (const GameView& view)
@@ -248,11 +250,6 @@ struct MyApplication::Impl
 
     const GameView& View () const { return current_view; }
 
-    const ::Configuration& Configuration () const
-    {
-      return configuration;
-    }
-
   private:
       //сброс буфера в файл-протолирования
     size_t LogWriteBuffer (const void* buffer, size_t size)
@@ -268,6 +265,10 @@ struct MyApplication::Impl
     void OnClose ()
     {
       syslib::Application::Exit (0);
+      
+      current_view = 0;
+      device = 0;
+      swap_chain = 0;
     }
   
       //обработчик изменения размеров окна
@@ -311,10 +312,10 @@ struct MyApplication::Impl
         clear_color.blue  = 0.7f;
         clear_color.alpha = 0;
 
-        device->ClearViews (ClearFlag_All, clear_color, 1.0f, 0);
+        device->ClearViews (ClearFlag_All, clear_color, 1.0f, 0);                
 
         if (current_view)
-          current_view->OnDraw ();
+          current_view->OnDraw ();        
        
         swap_chain->Present ();    
       }
@@ -375,7 +376,7 @@ struct MyApplication::Impl
       {
         LogMessage ("Exception at idle");
       }
-    }        
+    }
 
   private:
     ::Configuration     configuration;       //настрройки
@@ -395,23 +396,12 @@ struct MyApplication::Impl
 */
 
 MyApplication::MyApplication ()
+  : impl (new Impl)
 {
-  impl = new Impl;
 }
 
 MyApplication::~MyApplication ()
 {
-}
-
-/*
-    Получение экземпляра приложения
-*/
-
-MyApplication& MyApplication::Instance ()
-{
-  static MyApplication application;
-  
-  return application;
 }
 
 /*
@@ -446,7 +436,7 @@ void MyApplication::VLogFormatMessage (const char* format, va_list list)
 
 size_t MyApplication::Milliseconds ()
 {
-  return clock () * 1000 / CLOCKS_PER_SEC;
+  return common::milliseconds ();
 }
 
 /*
@@ -462,9 +452,3 @@ const GameView& MyApplication::View () const
 {
   return impl->View ();
 }
-
-const ::Configuration& MyApplication::Configuration () const
-{
-  return impl->Configuration ();
-}
-

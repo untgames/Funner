@@ -1,4 +1,4 @@
-#include <shared/context_caps.h>
+#include "shared.h"
 
 using namespace render::low_level::opengl;
 

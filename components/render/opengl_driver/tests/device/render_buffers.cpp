@@ -74,7 +74,7 @@ void print_line_diff (size_t width, size_t pixel_size, size_t pixel_used_size, c
   for (size_t i=0; i<width; i++, pixel1 += pixel_size, pixel2 += pixel_size)
   {
     for (size_t j=0; j<pixel_size; j++)
-      printf ("%02x", unsigned char (pixel2 [pixel_size-j-1] - pixel1 [pixel_size-j-1]));
+      printf ("%02x", (unsigned char)(pixel2 [pixel_size-j-1] - pixel1 [pixel_size-j-1]));
 
     printf (" ");
   }

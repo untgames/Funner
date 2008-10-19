@@ -20,7 +20,7 @@ void test_dispatch (IStack& stack, const SrcT& source)
 
     detail::push_argument (stack, source);
 
-    DstT dest = detail::get_argument<DstT> (stack, 1);
+    detail::get_argument<DstT> (stack, 1);
 
     printf ("ok\n");
   }

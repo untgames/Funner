@@ -255,7 +255,7 @@ class RendererDispatch: virtual public IRenderer2dDispatch, virtual public ILowL
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     render::mid_level::renderer2d::ITexture*   CreateTexture   (const media::Image& image);
-    render::mid_level::renderer2d::ITexture*   CreateTexture   (size_t width, size_t height, media::PixelFormat pixel_format);
+    render::mid_level::renderer2d::ITexture*   CreateTexture   (size_t width, size_t height, PixelFormat pixel_format);
     render::mid_level::renderer2d::IPrimitive* CreatePrimitive ();    
     render::mid_level::renderer2d::IFrame*     CreateFrame2d   ();        
     render::mid_level::ILowLevelFrame*         CreateLowLevelFrame ();

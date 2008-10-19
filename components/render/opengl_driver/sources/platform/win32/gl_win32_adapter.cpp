@@ -111,11 +111,11 @@ struct Adapter::Impl
     {
         //фильтрация строки багов адаптера
       
-      stl::vector<stl::string> tokens = common::split (value);
+      common::StringArray tokens = common::split (value);
 
-      for (size_t i=0; i<tokens.size (); i++)
+      for (size_t i=0; i<tokens.Size (); i++)
       {
-        const char* bug_name = tokens [i].c_str ();
+        const char* bug_name = tokens [i];
         
         if (!common::wcmatch ("GLBUG_*", bug_name))
         {

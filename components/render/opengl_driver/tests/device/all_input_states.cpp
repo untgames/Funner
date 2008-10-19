@@ -38,7 +38,7 @@ void print_input_layout_desc(const InputLayoutDesc& desc)
 
 void test_input_layout_desc(const InputLayoutDesc& desc, IDevice* device)
 {
-	total_tests++;
+  total_tests++;
   try
   {
     device->ISSetInputLayout(device->CreateInputLayout(desc));
@@ -54,7 +54,7 @@ void test_input_layout_desc(const InputLayoutDesc& desc, IDevice* device)
   }
   catch (xtl::argument_exception&)
   {
-  	wrong_tests++;
+    wrong_tests++;
   }
   catch (std::exception& exception)
   {
@@ -102,8 +102,6 @@ int main ()
     }
     
     desc.index_buffer_offset = 0;
-    bool next = true;
-    
     
     test.device.get()->ISSetVertexBuffer(0, test.device.get()->CreateBuffer(vertex));
     test.device.get()->ISSetIndexBuffer(test.device.get()->CreateBuffer(index));

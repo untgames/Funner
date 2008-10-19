@@ -8,7 +8,7 @@ using namespace input;
    Фильтр
 */
 
-class EventsFilter : public ControlsDetector::Filter
+class EventsFilter : public ControlsDetector::IFilter
 {
   public:
     EventsFilter (const char* in_action, const char* in_event_mask, const char* in_replacement) :
@@ -115,7 +115,7 @@ struct ControlsDetector::Impl : public xtl::reference_counter
 
     struct FilterSelector
     {
-      Filter& operator () (const FilterMap::value_type& value) { return *value.second; }
+      IFilter& operator () (const FilterMap::value_type& value) { return *value.second; }
     };
 
     struct DetectFunctor
@@ -127,7 +127,7 @@ struct ControlsDetector::Impl : public xtl::reference_counter
       {
         pair<FilterMap::iterator,FilterMap::iterator> filters_range = detector_impl->filters.equal_range (action_hash);
 
-        vector<string> event_components;
+        StringArray event_components;
 
         split_event (event, event_components);
 
@@ -139,14 +139,14 @@ struct ControlsDetector::Impl : public xtl::reference_counter
                      *replacement = filter.Replacement (),
                      *action      = filter.Action ();
 
-          vector<string> event_mask_components;
+          StringArray event_mask_components;
 
           split_event (event_mask, event_mask_components);
 
-          if (event_components.size () != event_mask_components.size ())
+          if (event_components.Size () != event_mask_components.Size ())
             continue;
 
-          if (event_components.empty () && event_mask_components.empty ())
+          if (event_components.IsEmpty () && event_mask_components.IsEmpty ())
           {
             handler (action, "", replacement);
             return;
@@ -154,22 +154,22 @@ struct ControlsDetector::Impl : public xtl::reference_counter
 
           size_t matches = 0;
 
-          for (; matches < event_components.size (); matches++)
-            if (!wcmatch (event_components [matches].c_str (), event_mask_components [matches].c_str ()))
+          for (; matches < event_components.Size (); matches++)
+            if (!wcmatch (event_components [matches], event_mask_components [matches]))
               break;
 
-          if (matches != event_components.size ())
+          if (matches != event_components.Size ())
             continue;
 
           string control_mask;
 
-          control_mask.reserve (event_components [0].size () + strlen (event_mask) + 2); // 2 - кавычки вокруг имени контрола
+          control_mask.reserve (strlen (event_components [0]) + strlen (event_mask) + 2); // 2 - кавычки вокруг имени контрола
 
           control_mask += '\'';
           control_mask += event_components [0];
           control_mask += '\'';
 
-          for (size_t i = 1; i < event_mask_components.size (); i++)
+          for (size_t i = 1; i < event_mask_components.Size (); i++)
           {
             control_mask += ' ';
             control_mask += event_mask_components [i];

@@ -12,7 +12,7 @@ RENDER.MID_LEVEL.SOURCES.LIB_DIRS         :=
 RENDER.MID_LEVEL.SOURCES.LIBS             := 
 RENDER.MID_LEVEL.SOURCES.COMPILER_CFLAGS  :=
 RENDER.MID_LEVEL.SOURCES.COMPILER_DEFINES := 
-RENDER.MID_LEVEL.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak
+RENDER.MID_LEVEL.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak ../../media/image/compile.static.mak
 
 #Öåëü ¹2 - RENDER system tests
 RENDER.MID_LEVEL.TESTS.TYPE             := test-suite
@@ -23,4 +23,4 @@ RENDER.MID_LEVEL.TESTS.LIBS             :=
 RENDER.MID_LEVEL.TESTS.DLLS             :=
 RENDER.MID_LEVEL.TESTS.DLL_DIRS         :=
 RENDER.MID_LEVEL.TESTS.COMPILER_CFLAGS  :=
-RENDER.MID_LEVEL.TESTS.IMPORTS          := compile.static.mak link.static.mak
+RENDER.MID_LEVEL.TESTS.IMPORTS          := compile.static.mak link.static.mak ../../media/image/compile.static.mak ../../media/image/link.static.mak

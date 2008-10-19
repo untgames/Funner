@@ -39,7 +39,7 @@ namespace input
     Транслятор событий
 */
 
-class EventTranslator: public TranslationMap::Translator
+class EventTranslator: public TranslationMap::ITranslator
 {
   public:
       //конструктор/деструктор
@@ -47,7 +47,7 @@ class EventTranslator: public TranslationMap::Translator
     ~EventTranslator ();
 
       //выполнение замены
-    bool Replace (const stl::vector<stl::string>& event_components, stl::string& result);
+    bool Replace (const common::StringArray& event_components, stl::string& result);
 
       //переопределение виртуальный функций - информация об объекте
     const char* InputEvent  () { return str_event_wildcard.c_str (); }
@@ -63,14 +63,14 @@ class EventTranslator: public TranslationMap::Translator
     typedef stl::vector<Token> TokenArray;  
 
   private:
-    stl::vector<stl::string> event_wildcard;
-    TokenArray               replacement_tokens;
-    stl::string              str_event_wildcard;
-    stl::string              str_event_replacement;
-    stl::string              str_tag;
+    common::StringArray event_wildcard;
+    TokenArray          replacement_tokens;
+    stl::string         str_event_wildcard;
+    stl::string         str_event_replacement;
+    stl::string         str_tag;
 };
 
-void split_event (const char* event, stl::vector<stl::string>& target_arguments);
+void split_event (const char* event, common::StringArray& target_arguments);
 
 }
 

@@ -271,7 +271,7 @@ IFrameBuffer* RenderTargetRegistry::CreateFrameBuffer (View* render_target_view,
       {
           //создание буфера
 
-        FrameBufferPtr frame_buffer = iter->creater (render_target_view, depth_stencil_view);
+        FrameBufferPtr frame_buffer (iter->creater (render_target_view, depth_stencil_view));
 
         FrameBufferHolderPtr holder (new FrameBufferHolder (frame_buffer), false);
         

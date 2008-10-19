@@ -131,12 +131,12 @@ RenderTarget* create_render_buffer (IDevice& device, size_t width, size_t height
   {
     default:
     case RenderTargetType_Color:
-      texture_desc.format     = PixelFormat_RGBA8;
+      texture_desc.format     = render::low_level::PixelFormat_RGBA8;
       texture_desc.bind_flags = BindFlag_RenderTarget;
 
       break;
     case RenderTargetType_DepthStencil:
-      texture_desc.format     = PixelFormat_D24S8;
+      texture_desc.format     = render::low_level::PixelFormat_D24S8;
       texture_desc.bind_flags = BindFlag_DepthStencil;
 
       break;
@@ -294,7 +294,7 @@ render::mid_level::renderer2d::ITexture* RendererDispatch::CreateTexture (const 
   return renderer2d->CreateTexture (image);
 }
 
-render::mid_level::renderer2d::ITexture* RendererDispatch::CreateTexture (size_t width, size_t height, media::PixelFormat pixel_format)
+render::mid_level::renderer2d::ITexture* RendererDispatch::CreateTexture (size_t width, size_t height, render::mid_level::PixelFormat pixel_format)
 {
   return renderer2d->CreateTexture (width, height, pixel_format);
 }

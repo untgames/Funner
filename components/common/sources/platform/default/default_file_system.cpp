@@ -157,7 +157,7 @@ filesize_t StdioFileSystem::FileSize (file_t file)
 
 void StdioFileSystem::FileResize (file_t file,filesize_t new_size)
 {
-#ifdef _MSC_VER
+#ifdef _WIN32
   if (chsize (fileno ((FILE*)file),new_size) == -1)
   {
     switch (errno)
@@ -224,7 +224,7 @@ void StdioFileSystem::Rename (const char* file_name,const char* new_name)
 
 void StdioFileSystem::Mkdir (const char* dir_name)
 {
-#ifdef _MSC_VER
+#ifdef _WIN32
   if (mkdir (dir_name))
   {
     switch (errno)
@@ -270,7 +270,7 @@ bool StdioFileSystem::GetFileInfo (const char* file_name,FileInfo& info)
     Поиск файлов
 */
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 
 void StdioFileSystem::Search (const char* mask,const FileSearchHandler& insert_handler)
 {

@@ -168,7 +168,7 @@ void dump_stack (lua_State* state, stl::string& buffer)
         break;
       case LUA_TUSERDATA:
       {
-        xtl::any* variant = reinterpret_cast<xtl::any*> (lua_touserdata (state, i));
+        xtl::any* volatile variant = reinterpret_cast<xtl::any*> (lua_touserdata (state, i));
         
         if (!variant)
         {

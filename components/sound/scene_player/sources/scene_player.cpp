@@ -51,7 +51,11 @@ struct ScenePlayerEmitter
 };
 
 ScenePlayerEmitter::ScenePlayerEmitter (const char* source_name, xtl::connection in_play_connection, xtl::connection in_stop_connection, xtl::connection in_update_connection)
-  : play_connection (in_play_connection), stop_connection (in_stop_connection), update_connection (in_update_connection), is_playing (false), play_start_offset (0.f)
+  : play_connection (in_play_connection),
+    stop_connection (in_stop_connection),
+    update_connection (in_update_connection),
+    play_start_offset (0.f),
+    is_playing (false)
   {
     emitter.SetSource (source_name);
   }

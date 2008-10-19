@@ -56,10 +56,12 @@ void keys (Window& window, WindowEvent event, const WindowEventContext& context)
       printf ("char '%C'\n", context.char_code);
       break;
     case WindowEvent_OnMouseVerticalWheel:
-      printf ("vertical wheel %.2f\n", context.mouse_vertical_wheel_delta);
+      printf ("vertical wheel %.2f (x=%u, y=%u)\n", context.mouse_vertical_wheel_delta,
+        context.cursor_position.x, context.cursor_position.y);
       break;
     case WindowEvent_OnMouseHorisontalWheel:
-      printf ("horizontal wheel %.2f\n", context.mouse_horisontal_wheel_delta);
+      printf ("horizontal wheel %.2f (x=%u, y=%u)\n", context.mouse_horisontal_wheel_delta,
+        context.cursor_position.x, context.cursor_position.y);      
       break;
     default:
       break;

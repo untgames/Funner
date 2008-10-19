@@ -161,14 +161,14 @@ class RenderableViewport::Impl: private IViewportListener, public xtl::reference
                      &screen_area     = screen->Area (),
                      &viewport_area   = viewport.Area ();
 
-          float x_scale  = float (renderable_area.width) / screen_area.width,
-                y_scale  = float (renderable_area.height) / screen_area.height;
+          float x_scale  = screen_area.width ? float (renderable_area.width) / screen_area.width : 0.0f,
+                y_scale  = screen_area.height ? float (renderable_area.height) / screen_area.height : 0.0f;
                 
           Rect result (int (renderable_area.left + (viewport_area.left - screen_area.left) * x_scale),
                        int (renderable_area.top + (viewport_area.top - screen_area.top) * y_scale),
                        size_t (ceil (viewport_area.width * x_scale)),
                        size_t (ceil (viewport_area.height * y_scale)));
-
+                       
           render_view->SetViewport (result);
 
           need_update_area = false;

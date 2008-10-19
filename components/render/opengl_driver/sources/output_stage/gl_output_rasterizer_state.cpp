@@ -124,6 +124,8 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
       cmd_list.Add (glEnable, GL_CULL_FACE);
       cmd_list.Add (glCullFace, GL_BACK);
       break;
+    default:
+      break;
   }
 
   cmd_list.Add (glFrontFace, in_desc.front_counter_clockwise ? GL_CW : GL_CCW);

@@ -205,8 +205,8 @@ void Primitive::UpdateRenderableSprites ()
       verts [2].texcoord = offset + size;
       verts [3].texcoord = math::vec2f (offset.x, offset.y + size.y);
 
-      const math::vec4ub color (unsigned char (src_sprite->color.x * 255.0f), unsigned char (src_sprite->color.y * 255.0f),
-                                unsigned char (src_sprite->color.z * 255.0f), unsigned char (src_sprite->color.w * 255.0f));
+      const math::vec4ub color ((unsigned char)(src_sprite->color.x * 255.0f), (unsigned char)(src_sprite->color.y * 255.0f),
+                                (unsigned char)(src_sprite->color.z * 255.0f), (unsigned char)(src_sprite->color.w * 255.0f));
       
       for (size_t i=0; i<SPRITE_VERTICES_COUNT; i++)
         verts [i].color = color;

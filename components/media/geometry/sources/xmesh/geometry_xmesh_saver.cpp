@@ -3,6 +3,17 @@
 using namespace common;
 using namespace media::geometry;
 
+namespace
+{
+
+/*
+    Константы
+*/
+
+const char* FLOAT_FORMAT = ".###"; //количество знаков после запятой при выводе вещественных чисел
+
+}
+
 namespace media
 {
 
@@ -17,7 +28,7 @@ void write (OutputTextStream& stream, const VertexWeight& weight)
 {
   write (stream, weight.joint_index);
   write (stream, " ");
-  write (stream, weight.joint_weight);
+  write (stream, weight.joint_weight, FLOAT_FORMAT);
 }
 
 void write (OutputTextStream& stream, const VertexInfluence& influence)
@@ -86,9 +97,9 @@ class XmlMeshLibrarySaver
 
         switch (attribute.type)
         {
-          case VertexAttributeType_Float2: writer.WriteData (MakeRange<math::vec2f> (vs, attribute.offset)); break;
-          case VertexAttributeType_Float3: writer.WriteData (MakeRange<math::vec3f> (vs, attribute.offset)); break;
-          case VertexAttributeType_Float4: writer.WriteData (MakeRange<math::vec4f> (vs, attribute.offset)); break;
+          case VertexAttributeType_Float2: writer.WriteData (MakeRange<math::vec2f> (vs, attribute.offset), FLOAT_FORMAT); break;
+          case VertexAttributeType_Float3: writer.WriteData (MakeRange<math::vec3f> (vs, attribute.offset), FLOAT_FORMAT); break;
+          case VertexAttributeType_Float4: writer.WriteData (MakeRange<math::vec4f> (vs, attribute.offset), FLOAT_FORMAT); break;
           case VertexAttributeType_Short2: writer.WriteData (MakeRange<math::vec2s> (vs, attribute.offset)); break;
           case VertexAttributeType_Short3: writer.WriteData (MakeRange<math::vec3s> (vs, attribute.offset)); break;
           case VertexAttributeType_Short4: writer.WriteData (MakeRange<math::vec4s> (vs, attribute.offset)); break;

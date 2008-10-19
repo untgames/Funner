@@ -196,6 +196,9 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
     case WindowEvent_OnXButton2Down:
     case WindowEvent_OnXButton2Up:
       window.SetCursorPosition (window_event_context.cursor_position.x, window_event_context.cursor_position.y);
+      break;
+    default:
+      break;
   }
 
   switch (event)
@@ -390,6 +393,8 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
     case WindowEvent_OnChar:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s char %C", CHAR_INPUT_CHANNEL, window_event_context.char_code);
       signals (message);
+      break;
+    default:
       break;
   }
 }

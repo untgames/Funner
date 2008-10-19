@@ -129,11 +129,7 @@ void scale_image_impl (size_t width, size_t height, const void* in_src, size_t n
   const T* src = static_cast<const T*> (in_src);
   T*       dst = static_cast<T*> (in_dst);
 
-  fixed src_width  = int2fixed (width),
-        src_height = int2fixed (height),
-        dst_width  = int2fixed (new_width),
-        dst_height = int2fixed (new_height),
-        dx         = float2fixed (float (width) / float (new_width)),
+  fixed dx         = float2fixed (float (width) / float (new_width)),
         dy         = float2fixed (float (height) / float (new_height)),
         src_y      = 0;
         

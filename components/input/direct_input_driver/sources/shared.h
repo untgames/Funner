@@ -136,8 +136,8 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
       stl::wstring                unicode_name;
       size_t                      offset;
       ObjectType                  type;
-      DWORD                       min_value;                          //минимальное значение (для объектов типа ось)
-      DWORD                       max_value;                          //максимальное значение (для объектов типа ось)
+      int                         min_value;                          //минимальное значение (для объектов типа ось)
+      int                         max_value;                          //максимальное значение (для объектов типа ось)
       bool                        bad_object;                         //true для объекта типа ось, если нельзя получить пределы значения
       ObjectPropertyMap::iterator properties[ObjectPropertyType_Num]; //свойства
       DWORD                       last_value;                         //последнее значение

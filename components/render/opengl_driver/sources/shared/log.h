@@ -10,6 +10,9 @@ namespace low_level
 namespace opengl
 {
 
+//implementation forward
+class LogImpl;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Протокол
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,11 +36,7 @@ class Log
     void VPrintf (const char* message, va_list list) const;
 
   private:
-
-
-  private:
-    struct Impl;
-    Impl* impl;
+    LogImpl* impl;
 };
 
 }

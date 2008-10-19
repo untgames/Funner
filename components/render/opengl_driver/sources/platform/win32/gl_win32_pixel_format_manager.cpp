@@ -24,7 +24,7 @@ IAdapterLibrary* default_library = 0; //библиотека, используемая для описания фо
 //перехват функции получения адреса
 PROC WINAPI GetProcAddressRedirect (HMODULE module, const LPCSTR name)
 {
-  void* proc = GetProcAddress (module, name);
+  void* proc = (void*)GetProcAddress (module, name);
   
   if (proc == &::SetPixelFormat)
     return reinterpret_cast<PROC> (xtl::implicit_cast<BOOL (WINAPI*)(HDC, int, LPPIXELFORMATDESCRIPTOR)> (&PixelFormatManager::SetPixelFormat));
@@ -38,7 +38,7 @@ PROC WINAPI GetProcAddressRedirect (HMODULE module, const LPCSTR name)
   if (proc == &::GetProcAddress)
     return reinterpret_cast<PROC> (&GetProcAddressRedirect);
     
-  return reinterpret_cast<PROC> (proc);
+  return (PROC)proc;
 }
 
 }
@@ -49,10 +49,10 @@ PROC WINAPI GetProcAddressRedirect (HMODULE module, const LPCSTR name)
 
 void PixelFormatManager::RedirectApiCalls (HMODULE module)
 {
-  redirect_dll_call (module, "gdi32.dll",    &::SetPixelFormat,      xtl::implicit_cast<BOOL (WINAPI*)(HDC, int, LPPIXELFORMATDESCRIPTOR)> (&PixelFormatManager::SetPixelFormat));
-  redirect_dll_call (module, "gdi32.dll",    &::GetPixelFormat,      &PixelFormatManager::GetPixelFormat);
-  redirect_dll_call (module, "gdi32.dll",    &::DescribePixelFormat, &PixelFormatManager::DescribePixelFormat);
-  redirect_dll_call (module, "kernel32.dll", &::GetProcAddress,      &GetProcAddressRedirect);
+  redirect_dll_call (module, "gdi32.dll",    (void*)&::SetPixelFormat,      (void*)xtl::implicit_cast<BOOL (WINAPI*)(HDC, int, LPPIXELFORMATDESCRIPTOR)> (&PixelFormatManager::SetPixelFormat));
+  redirect_dll_call (module, "gdi32.dll",    (void*)&::GetPixelFormat,      (void*)&PixelFormatManager::GetPixelFormat);
+  redirect_dll_call (module, "gdi32.dll",    (void*)&::DescribePixelFormat, (void*)&PixelFormatManager::DescribePixelFormat);
+  redirect_dll_call (module, "kernel32.dll", (void*)&::GetProcAddress,      (void*)&GetProcAddressRedirect);
 }
 
 /*

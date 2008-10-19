@@ -11,22 +11,69 @@ namespace
     Константы (имена библиотек)
 */
 
+const char* RENDER_RECT_LIBRARY     = "Render.Rect";
 const char* RENDER_VIEWPORT_LIBRARY = "Render.Viewport";
 const char* RENDER_SCREEN_LIBRARY   = "Render.Screen";
 
 /*
-    Создание вьюпорта
+    Утилиты
 */
 
+///Получение параметров области экрана и области вывода
+int    get_rect_left   (const Rect& rect)         { return rect.left; }
+int    get_rect_top    (const Rect& rect)         { return rect.top; }
+size_t get_rect_width  (const Rect& rect)         { return rect.width; }
+size_t get_rect_height (const Rect& rect)         { return rect.height; }
+int    get_rect_right  (const Rect& rect)         { return rect.left + rect.width; }
+int    get_rect_bottom (const Rect& rect)         { return rect.top + rect.height; }
+void   set_rect_left   (Rect& rect, int param)    { rect.left = param; }
+void   set_rect_top    (Rect& rect, int param)    { rect.top = param; }
+void   set_rect_width  (Rect& rect, size_t param) { rect.width = param; }
+void   set_rect_height (Rect& rect, size_t param) { rect.height = param; }
+
+///Создание прямоугольной области
+Rect create_empty_rect ()
+{
+  return Rect ();
+}
+
+Rect create_rect (int left, int top, size_t width, size_t height)
+{
+  return Rect (left, top, width, height);
+}
+
+///Регистрация библиотеки работы с прямоугольными областями
+void bind_rect_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (RENDER_RECT_LIBRARY);
+  
+    //регистрация функции создания
+    
+  lib.Register ("Create", make_invoker (make_invoker (&create_rect), make_invoker (&create_empty_rect)));
+  
+    //регистрация операций
+    
+  lib.Register ("get_Left",    make_invoker (&get_rect_left));
+  lib.Register ("get_Top",     make_invoker (&get_rect_top));
+  lib.Register ("get_Right",   make_invoker (&get_rect_right));
+  lib.Register ("get_Bottom",  make_invoker (&get_rect_bottom));  
+  lib.Register ("get_Width",   make_invoker (&get_rect_width));
+  lib.Register ("get_Height",  make_invoker (&get_rect_height));
+  lib.Register ("set_Left",    make_invoker (&set_rect_left));
+  lib.Register ("set_Top",     make_invoker (&set_rect_top));
+  lib.Register ("set_Width",   make_invoker (&set_rect_width));
+  lib.Register ("set_Height",  make_invoker (&set_rect_height));  
+  
+  environment.RegisterType<Rect> (RENDER_RECT_LIBRARY);
+}
+
+///Создание вьюпорта
 Viewport create_viewport ()
 {
   return Viewport ();
 }
 
-/*
-   Регистрация библиотеки работы с вьюпортами
-*/
-
+///Регистрация библиотеки работы с вьюпортами
 void bind_viewport_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (RENDER_VIEWPORT_LIBRARY);
@@ -52,6 +99,8 @@ void bind_viewport_library (Environment& environment)
   lib.Register ("set_BackgroundState", make_invoker (&Viewport::SetBackgroundState));
   lib.Register ("get_BackgroundState", make_invoker (&Viewport::BackgroundState));
   lib.Register ("get_Id",              make_invoker (&Viewport::Id));
+  lib.Register ("get_Area",            make_invoker (&Viewport::Area));
+  lib.Register ("set_Area",            make_invoker (implicit_cast<const Rect& (Viewport::*)() const> (&Viewport::Area)));
 
   lib.Register ("SetArea",             make_invoker (implicit_cast<void (Viewport::*) (int, int, size_t, size_t)> (&Viewport::SetArea)));
   lib.Register ("SetOrigin",           make_invoker (&Viewport::SetOrigin));
@@ -71,19 +120,13 @@ void bind_viewport_library (Environment& environment)
   environment.RegisterType<Viewport> (RENDER_VIEWPORT_LIBRARY);
 }
 
-/*
-    Создание рабочего стола
-*/
-
+///Создание экрана
 Screen create_screen ()
 {
   return Screen ();
 }
 
-/*
-   Регистрация библиотеки работы с рабочими столами
-*/
-
+///Регистрация библиотеки работы с рабочими столами
 void bind_screen_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (RENDER_SCREEN_LIBRARY);
@@ -131,6 +174,7 @@ void bind_render_library (Environment& environment)
 {
     //регистрация библиотек
   
+  bind_rect_library     (environment);
   bind_viewport_library (environment);
   bind_screen_library   (environment);
 }

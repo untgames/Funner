@@ -1,13 +1,13 @@
 #ifndef RENDER_MID_LEVEL_RENDERER2D_HEADER
 #define RENDER_MID_LEVEL_RENDERER2D_HEADER
 
+#include <render/mid_level/common.h>
 #include <render/mid_level/renderer.h>
 
 namespace media
 {
 
 //forward declarations
-enum PixelFormat;
 class Image;
 
 }
@@ -125,7 +125,7 @@ class IRenderer: virtual public mid_level::IRenderer
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual ITexture*   CreateTexture   (const media::Image& image) = 0;
-    virtual ITexture*   CreateTexture   (size_t width, size_t height, media::PixelFormat pixel_format) = 0;
+    virtual ITexture*   CreateTexture   (size_t width, size_t height, PixelFormat pixel_format) = 0;
     virtual IPrimitive* CreatePrimitive () = 0;
     virtual IFrame*     CreateFrame     () = 0;
 };

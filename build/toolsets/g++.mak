@@ -5,23 +5,25 @@
 ###################################################################################################
 #Константы
 ###################################################################################################
-LIB_SUFFIX   ?= .a
-OBJ_SUFFIX   ?= .o
-EXE_SUFFIX   ?= .exe
-DLL_SUFFIX   ?= .dll
-LIB_PREFIX   ?= lib
-COMPILER_GCC ?= gcc
-LINKER_GCC   ?= g++
-LIB_GCC      ?= ar
-PROFILES     += g++ haswchar
-DEFAULT_LIBS +=
+LIB_SUFFIX           ?= .a
+OBJ_SUFFIX           ?= .o
+EXE_SUFFIX           ?= .exe
+DLL_SUFFIX           ?= .dll
+LIB_PREFIX           ?= lib
+COMPILER_GCC         ?= gcc
+LINKER_GCC           ?= g++
+LIB_GCC              ?= ar
+PROFILES             += g++ haswchar
+DEFAULT_LIBS         +=
+COMMON_CFLAGS        += -Wno-format
+DISABLE_CPP_WARNINGS += -Wno-invalid-offsetof
 
 ###################################################################################################
 #Компиляция исходников (список исходников, список подключаемых каталогов, каталог с объектными файлами,
 #список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
 ###################################################################################################
 define tools.g++.c++compile
-$(call for_each_file,src,$1,echo $$src && $(COMPILER_GCC) $(COMMON_CFLAGS) -c -Wall -O7 -o "$3/$$(basename $$src $${src##*.})o" $(patsubst %,-I "%",$2) $5 $(patsubst %,-D %,$4) $$src)
+$(call for_each_file,src,$1,echo $$src && $(COMPILER_GCC) -c -Wall -O7 $(COMMON_CFLAGS) $(if $(filter %.c,$1),,$(DISABLE_CPP_WARNINGS)) -o "$3/$$(basename $$src $${src##*.})o" $(patsubst %,-I "%",$2) $5 $(patsubst %,-D %,$4) $$src)
 endef
 
 ###################################################################################################

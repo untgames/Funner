@@ -1,3 +1,7 @@
 Results of ogg_test:
-Hash 0: {3ad80fad6ecb3f0c4de53e28f8dcf335}
-Hash 1: {3ad80fad6ecb3f0c4de53e28f8dcf335}
+SamplesCount:  55167
+SizeInBytes:   220668
+Frequency:     22050
+Channels:      2
+BitsPerSample: 16
+Duration:      2.50

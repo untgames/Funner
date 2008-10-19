@@ -364,39 +364,10 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
 
       if (attribute_offsets.size () > 1)
       {
-        struct AttributeIterator: public stl::iterator<stl::forward_iterator_tag, const char*>
-        {
-          public:
-            AttributeIterator (const size_t* in_offset, const char* in_attributes) : offset (in_offset), attributes (in_attributes) {}
-
-            AttributeIterator& operator ++ () {
-              offset++;
-
-              return *this;
-            }
-
-            AttributeIterator operator ++ (int) {
-              AttributeIterator tmp = *this;
-
-              ++*this;
-
-              return tmp;
-            }
-
-            const char* operator * () const { return attributes + *offset; }
-
-            bool operator == (const AttributeIterator& iter) const { return offset == iter.offset; }
-            bool operator != (const AttributeIterator& iter) const { return offset != iter.offset; }
-
-          private:
-            const size_t* offset;
-            const char*   attributes;
-        };
-
         AttributeIterator start (&attribute_offsets [0], attributes.c_str ()),
                           finish (&*attribute_offsets.end (), attributes.c_str ());
-
-        writer.WriteData (xtl::make_iterator_range (start, finish));
+                          
+        writer.WriteData (xtl::make_const_ref (xtl::make_iterator_range (start, finish)));
       }
 
       for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
@@ -445,6 +416,35 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
   private:
     typedef stl::vector<size_t>  AttributeOffsetArray;
     typedef stl::vector<Pointer> ChildArray;
+    
+    struct AttributeIterator: public stl::iterator<stl::forward_iterator_tag, const char*>
+    {
+      public:
+        AttributeIterator (const size_t* in_offset, const char* in_attributes) : offset (in_offset), attributes (in_attributes) {}
+
+        AttributeIterator& operator ++ () {
+          offset++;
+
+          return *this;
+        }
+
+        AttributeIterator operator ++ (int) {
+          AttributeIterator tmp = *this;
+
+          ++*this;
+
+          return tmp;
+        }
+
+        const char* operator * () const { return attributes + *offset; }
+
+        bool operator == (const AttributeIterator& iter) const { return offset == iter.offset; }
+        bool operator != (const AttributeIterator& iter) const { return offset != iter.offset; }
+
+      private:
+        const size_t* offset;
+        const char*   attributes;
+    };    
 
   private:
     stl::string          name;                 //имя узла

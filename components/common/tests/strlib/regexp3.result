@@ -1,0 +1,6 @@
+Results of regexp3_test:
+parse 'dynamic (256 , 512,'test_query')???' (pattern='dynamic *\( *([[:digit:]]*) *, *([[:digit:]]*) *, *'(.*)' *\).*') on 4 tokens:
+    'dynamic (256 , 512,'test_query')???'
+    '256'
+    '512'
+    'test_query'

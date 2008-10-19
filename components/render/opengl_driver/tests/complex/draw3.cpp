@@ -47,8 +47,6 @@ void idle (Test& test)
   if (test.window.IsClosed ())
     return;
 
-  static const   float DT = 0.01f;
-  static float   t = 0;
   static clock_t last = 0;
   static float angle;
 
@@ -102,13 +100,13 @@ int main ()
       {{-1,  1, 0}, {0, 0, 1}, {0, 0}, {1, 0, 0}},
     };
     
-    static const size_t VERTICES_COUNT = sizeof verts / sizeof MyVertex;
+    static const size_t VERTICES_COUNT = sizeof (verts) / sizeof (MyVertex);
     
     BufferDesc vb_desc;
     
     memset (&vb_desc, 0, sizeof vb_desc);
            
-    vb_desc.size         = sizeof MyVertex * VERTICES_COUNT;
+    vb_desc.size         = sizeof (MyVertex) * VERTICES_COUNT;
     vb_desc.usage_mode   = UsageMode_Default;
     vb_desc.bind_flags   = BindFlag_VertexBuffer;
     vb_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
@@ -120,10 +118,10 @@ int main ()
     printf ("Set input-stage\n");
     
     VertexAttribute attributes [] = {
-      {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, normal), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, position), sizeof (MyVertex)},
-      {VertexAttributeSemantic_Color, InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (MyVertex, color), sizeof (MyVertex)},
-//      {VertexAttributeSemantic_TexCoord0, InputDataFormat_Vector2, InputDataType_Float, 0, offsetof (MyVertex, tc), sizeof (MyVertex)},
+      {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, normal), sizeof (MyVertex)},
+      {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, position), sizeof (MyVertex)},
+      {VertexAttributeSemantic_Color, InputDataFormat_Vector3, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, color), sizeof (MyVertex)},
+//      {VertexAttributeSemantic_TexCoord0, InputDataFormat_Vector2, InputDataType_Float, 0, TEST_OFFSETOF (MyVertex, tc), sizeof (MyVertex)},
     };
     
     InputLayoutDesc layout_desc;
@@ -151,10 +149,10 @@ int main ()
     };
 
     static ProgramParameter shader_parameters[] = {
-      {"LightPosition", ProgramParameterType_Float3, 0, 1, offsetof (MyShaderParameters, light_position)},
-      {"bump_sampler2d", ProgramParameterType_Int, 0, 1, offsetof (MyShaderParameters, bump_texture_slot)},
-      {"diffuse_sampler2d", ProgramParameterType_Int, 0, 1, offsetof (MyShaderParameters, diffuse_texture_slot)},      
-      {"Transform", ProgramParameterType_Float4x4, 1, 1, offsetof (MyShaderParameters2, transform)}
+      {"LightPosition", ProgramParameterType_Float3, 0, 1, TEST_OFFSETOF (MyShaderParameters, light_position)},
+      {"bump_sampler2d", ProgramParameterType_Int, 0, 1, TEST_OFFSETOF (MyShaderParameters, bump_texture_slot)},
+      {"diffuse_sampler2d", ProgramParameterType_Int, 0, 1, TEST_OFFSETOF (MyShaderParameters, diffuse_texture_slot)},      
+      {"Transform", ProgramParameterType_Float4x4, 1, 1, TEST_OFFSETOF (MyShaderParameters2, transform)}
     };
 
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
@@ -166,14 +164,14 @@ int main ()
     
     memset (&cb_desc, 0, sizeof cb_desc);
     
-    cb_desc.size         = sizeof MyShaderParameters;
+    cb_desc.size         = sizeof (MyShaderParameters);
     cb_desc.usage_mode   = UsageMode_Default;
     cb_desc.bind_flags   = BindFlag_ConstantBuffer;
     cb_desc.access_flags = AccessFlag_ReadWrite;
 
     BufferDesc cb_desc2 (cb_desc);
    
-    cb_desc2.size = sizeof MyShaderParameters2;
+    cb_desc2.size = sizeof (MyShaderParameters2);
  
     BufferPtr cb (test.device->CreateBuffer (cb_desc), false), cb2 (test.device->CreateBuffer (cb_desc2), false);
 

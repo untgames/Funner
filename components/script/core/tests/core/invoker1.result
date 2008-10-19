@@ -1,7 +1,9 @@
 Results of invoker1_test:
-f(3,Hello world)
-stack (size=4):
+f(3,Hello world,12,100)
+stack (size=6):
   item[0]: 'dummy'
   item[1]: '3'
   item[2]: 'Hello world'
-  item[3]: 'all ok'
+  item[3]: '12'
+  item[4]: '100'
+  item[5]: 'all ok'

@@ -24,8 +24,6 @@ int main ()
     
     xtl::shared_ptr<Environment> env (new Environment);
     
-    InvokerRegistry& registry = env->CreateLibrary ("my_library");
-
     Shell shell, lua_shell ("lua", env);
 
     printf ("shell interpreter name is '%s'\n", shell.InterpreterName ());
@@ -34,7 +32,7 @@ int main ()
     
     shell.Execute (lua_print_name, lua_print, strlen (lua_print));
 
-    shell.Swap (Shell ());
+    Shell ().Swap (shell);
 
     shell.SetInterpreter ("lua", env);
 

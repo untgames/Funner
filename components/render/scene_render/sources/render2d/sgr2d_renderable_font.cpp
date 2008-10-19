@@ -11,8 +11,8 @@ struct RenderableFont::Impl
   size_t        max_glyph_side; //размер самой большой стороны среди всех глифов (в пикселях)
 
   Impl (const char* font_name, Render& in_render)
-    : font (font_name),
-      render (in_render),
+    : render (in_render),
+      font (font_name),
       max_glyph_side (0)
   {
     size_t glyphs_count = font.GlyphsTableSize ();

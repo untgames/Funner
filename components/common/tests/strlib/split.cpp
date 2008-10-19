@@ -35,14 +35,14 @@ int main ()
 
   for (size_t i=0;i<tests_count;i++)
   {
-    vector<string> tokens = split (test [i].str,test [i].delimiters,test [i].spaces, test [i].brackets);
+    StringArray tokens = split (test [i].str,test [i].delimiters,test [i].spaces, test [i].brackets);
 
     printf ("split '%s' (delimiters='%s', spaces='%s', brackets='%s') on %lu tokens:\n",
             test [i].str,decompress (test [i].delimiters).c_str (),decompress (test [i].spaces).c_str (),
-            decompress (test [i].brackets).c_str (),tokens.size ());
+            decompress (test [i].brackets).c_str (),tokens.Size ());
 
-    for (size_t i=0;i<tokens.size ();i++)
-      printf ("    '%s'\n",tokens [i].c_str ());
+    for (size_t i=0;i<tokens.Size ();i++)
+      printf ("    '%s'\n",tokens [i]);
   }
 
   return 0;

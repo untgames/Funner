@@ -113,7 +113,7 @@ struct RenderTargetImpl::Impl: private IScreenListener
 
       if (render_manager)
       {
-        render_manager->UnregisterRenderTarget (&owner);
+        owner.Unregister (*render_manager);
 
         render_manager = 0;
       }
@@ -122,7 +122,7 @@ struct RenderTargetImpl::Impl: private IScreenListener
       {
           //регистрация в новом менеджере
 
-        new_render_manager->RegisterRenderTarget (&owner);
+        owner.Register (*new_render_manager);
 
           //изменение менеджера рендеринга
 
@@ -196,12 +196,8 @@ struct RenderTargetImpl::Impl: private IScreenListener
 ///Обновление цели рендеринга
     void Update ()
     {
-      static const char* METHOD_NAME = "render::RenderTargetImpl::Impl::Update";      
-
       if (!screen || !render_manager)
         return;        
-        
-      size_t transaction_id = 0;
 
       try
       { 
@@ -228,7 +224,7 @@ struct RenderTargetImpl::Impl: private IScreenListener
 
           //рисование областей вывода
 
-        for (ViewArray::iterator iter=views.begin (), end=views.end (); iter!=end; ++iter)
+        for (ViewArray::iterator volatile iter=views.begin (), end=views.end (); iter!=end; ++iter)
         {
           Viewport& viewport = iter->Viewport ();        
           
@@ -279,14 +275,6 @@ struct RenderTargetImpl::Impl: private IScreenListener
 ///Сортировка областей вывода
     void SortViews ()
     {
-      struct ViewComparator
-      {
-        bool operator () (const RenderableViewport& view1, const RenderableViewport& view2) const
-        {
-          return const_cast<RenderableViewport&> (view1).Viewport ().ZOrder () < const_cast<RenderableViewport&> (view2).Viewport ().ZOrder ();
-        }
-      };
-
       stl::sort (views.begin (), views.end (), ViewComparator ());
 
       need_reorder = false;    
@@ -390,6 +378,15 @@ struct RenderTargetImpl::Impl: private IScreenListener
     typedef xtl::com_ptr<render::mid_level::IClearFrame> ClearFramePtr;
     typedef stl::vector<RenderableViewport>              ViewArray;
     typedef xtl::com_ptr<mid_level::IRenderTarget>       AttachmentPtr;
+    
+///Функтор, используемый для упорядочивания областей вывода
+    struct ViewComparator
+    {
+      bool operator () (const RenderableViewport& view1, const RenderableViewport& view2) const
+      {
+        return const_cast<RenderableViewport&> (view1).Viewport ().ZOrder () < const_cast<RenderableViewport&> (view2).Viewport ().ZOrder ();
+      }
+    };    
 
   private:
     RenderTargetImpl&      owner;                     //владелец
@@ -566,4 +563,18 @@ void RenderTargetImpl::CaptureImage (const char* image_name)
     exception.touch ("render::RenderTargetImpl::CaptureImage(const char*)");
     throw;
   }
+}
+
+/*
+    Регистрация в менеджере рендеринга
+*/
+
+void RenderTargetImpl::Register (render::RenderManager& manager)
+{
+  manager.RegisterRenderTarget (this);
+}
+
+void RenderTargetImpl::Unregister (render::RenderManager& manager)
+{
+  manager.UnregisterRenderTarget (this);
 }

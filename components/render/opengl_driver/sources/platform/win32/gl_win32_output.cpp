@@ -192,7 +192,9 @@ void set_mode_desc (const char* device_name, DEVMODE* mode)
   
   switch (result)
   {
+#ifdef DISP_CHANGE_BADDUALVIEW
     case DISP_CHANGE_BADDUALVIEW: msg = "System is DualView capable"; break;
+#endif
     case DISP_CHANGE_BADFLAGS:    msg = "Invalid set of flags"; break;
     case DISP_CHANGE_BADMODE:     msg = "The graphics mode is not supported"; break;
     case DISP_CHANGE_BADPARAM:    msg = "Invalid parameter"; break;
