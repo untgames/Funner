@@ -54,6 +54,8 @@ void Platform::UnloadLibrary (dll_t handle)
 
 void* Platform::GetSymbol (dll_t handle, const char* symbol_name)
 {
+  static const char* METHOD_NAME = "syslib::Win32Platform::GetSymbol";
+
   HMODULE library = (HMODULE)handle;
 
   if (!library)
