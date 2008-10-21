@@ -13,7 +13,7 @@ int main()
   dump   (s2);
   printf ("\n");
 
-  printf ("volume: %.1f\n", volume (s2));
+  printf ("volume: %u\n", (size_t)volume (s2));
 
   printf        ("set_radius\n");
   s2.set_radius (5);
