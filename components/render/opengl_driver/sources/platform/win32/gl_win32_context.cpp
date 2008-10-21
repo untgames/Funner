@@ -112,13 +112,13 @@ Context::Context (ISwapChain* in_swap_chain)
       //создание контекста
 
     impl->context = impl->adapter->GetLibrary ().CreateContext (dc);    
-    
+
     impl->log.Printf ("Create context (id=%u)...", GetId ());
 
     if (!impl->context)
       raise_error ("wglCreateContext");
       
-    impl->log.Printf ("...context created successfull (handle=%08u)", impl->context);
+    impl->log.Printf ("...context created successfull (handle=%08X)", impl->context);
   }
   catch (xtl::exception& exception)
   {
@@ -146,7 +146,7 @@ Context::~Context ()
 
       //удаление контекста
       
-    impl->log.Printf ("...delete context (handle=%08u)", impl->context);
+    impl->log.Printf ("...delete context (handle=%08X)", impl->context);
 
     library.DeleteContext (impl->context);
 

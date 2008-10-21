@@ -237,9 +237,10 @@ class PixelFormatManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка / получение формата пикселей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static BOOL WINAPI SetPixelFormat (HDC dc, int pixel_format, DescribePixelFormatFn describe_pixel_format);
-    static BOOL WINAPI SetPixelFormat (HDC dc, int pixel_format, PIXELFORMATDESCRIPTOR* pfd);
-    static int  WINAPI GetPixelFormat (HDC dc);
+    static BOOL        SetPixelFormat  (HDC dc, int pixel_format, DescribePixelFormatFn describe_pixel_format);
+    static BOOL        CopyPixelFormat (HDC src_dc, HDC dst_dc);
+    static BOOL WINAPI SetPixelFormat  (HDC dc, int pixel_format, PIXELFORMATDESCRIPTOR* pfd);
+    static int  WINAPI GetPixelFormat  (HDC dc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание формата пикселей

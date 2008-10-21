@@ -94,6 +94,10 @@ struct TestApplication::Impl
   void OnClose ()
   {
     syslib::Application::Exit (0);
+
+    render.ResetRenderer ();
+
+    app_idle_connection.disconnect ();
   }
 
   void OnRedraw ()

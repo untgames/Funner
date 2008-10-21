@@ -228,8 +228,8 @@ struct TestApplication::Impl
     syslib::Application::Exit (0);
     render::mid_level::WindowDriver::UnregisterAllWindows (MID_LEVEL_RENDERER_NAME);
     render.ResetRenderer ();
-    Screen ().Swap (screen);
-    RenderTarget ().Swap (render_target);
+//    Screen ().Swap (screen);
+//    RenderTarget ().Swap (render_target);
   }
 
   void OnIdle ()

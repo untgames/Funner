@@ -1,9 +1,9 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := GAME.LAUNCHER.SOURCES
+TARGETS := GAME.LAUNCHER.SOURCES GAME.LAUNCHER.WIN32.SOURCES
 
-#Цель №2 - Game launcher
+#Game launcher
 GAME.LAUNCHER.SOURCES.TYPE          := application
 GAME.LAUNCHER.SOURCES.NAME          := game-launcher
 GAME.LAUNCHER.SOURCES.INCLUDE_DIRS  :=
@@ -31,3 +31,14 @@ GAME.LAUNCHER.SOURCES.IMPORTS       := ../../system/link.static.mak ../../system
                                        ../../input/direct_input_driver/link.static.mak \
                                        ../../input/manager/compile.static.mak ../../input/manager/link.static.mak ../../input/manager/xkeymap.link.static.mak \
                                        ../../common/configurator.link.static.mak
+
+#Game launcher
+GAME.LAUNCHER.WIN32.SOURCES.TYPE          := application
+GAME.LAUNCHER.WIN32.SOURCES.NAME          := game-launcher-win
+GAME.LAUNCHER.WIN32.SOURCES.INCLUDE_DIRS  :=
+GAME.LAUNCHER.WIN32.SOURCES.SOURCE_DIRS   := $(GAME.LAUNCHER.SOURCES.SOURCE_DIRS)
+GAME.LAUNCHER.WIN32.SOURCES.EXECUTION_DIR := $(GAME.LAUNCHER.SOURCES.EXECUTION_DIR)
+GAME.LAUNCHER.WIN32.SOURCES.LIBS          :=
+GAME.LAUNCHER.WIN32.SOURCES.LINK_INCLUDES :=
+GAME.LAUNCHER.WIN32.SOURCES.msvc.LINK_FLAGS := -subsystem:windows -entry:mainCRTStartup
+GAME.LAUNCHER.WIN32.SOURCES.IMPORTS       := $(GAME.LAUNCHER.SOURCES.IMPORTS)

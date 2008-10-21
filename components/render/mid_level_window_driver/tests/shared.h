@@ -423,7 +423,7 @@ class BasicTest
 ///Протоколирование
     static void LogMessage (const char* name, const char* message)
     {
-      printf ("Log message from log '%s': '%s'\n", name, message);
+      printf ("%s: %s\n", name, message);
     }
 
   private:

@@ -70,8 +70,10 @@ bool detect_texture3d_bug ()
 
 void detect_opengl_bugs (stl::string& extensions)
 {
-  if (detect_texture3d_bug ())
-    extensions += " GLBUG_texture3D_get_tex_image";
+    //определение бага отключено, из-за crash при вызове glGetTexImage на старых драйверах ATI
+
+//  if (detect_texture3d_bug ())
+//    extensions += " GLBUG_texture3D_get_tex_image";
 }
 
 }

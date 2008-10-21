@@ -110,6 +110,12 @@ void Texture3D::GetData
   PixelFormat target_format,
   void*       buffer)
 {  
+    /*
+        Функция всегда проходит через "ручное" копирование, поскольку определить баг на старых версиях драйверов ATI невозможно
+        из-за crash при вызове glGetTexImage
+    */
+
+/*
     //если баг работы функции glGetTexImage не обнаружен - копирование производится как и в общем случае
 
   static Extension BUG_Texture3D_GetTexImage = "GLBUG_texture3D_get_tex_image";
@@ -119,6 +125,8 @@ void Texture3D::GetData
     Texture::GetData (layer, mip_level, x, y, width, height, target_format, buffer);
     return;
   }
+
+*/
 
     //"ручное" копирование из внутреннего формата текстуры в требуемый
 

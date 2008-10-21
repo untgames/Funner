@@ -158,6 +158,48 @@ class AdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
 ///Получение текущего устройства вывода
     HDC GetCurrentDC () { return current_dc; }
 
+///Установка текущего контекста
+    void MakeCurrent (HDC new_dc, HGLRC new_context, IContextLostListener* new_listener)
+    {
+        //сброс текущего контекста
+
+      if (listener)
+      {
+        try
+        {
+          listener->OnLostCurrent ();
+        }
+        catch (...)
+        {
+          //подавление всех исключений
+        }
+      }
+
+        //проверка необходимости физической смены контекста (введена для обхода багов драйверов ATI)
+
+      if (current_dc != new_dc || current_context != new_context)
+      {
+          //сохранение параметров текущего контекста
+
+        HGLRC old_current_context = current_context;
+
+        current_dc      = 0;
+        current_context = 0;
+        listener        = 0;
+
+          //установка текущего контекста
+
+        MakeCurrentCore (new_dc, new_context, old_current_context);
+
+          //обновление параметров
+
+        current_dc      = new_dc;
+        current_context = new_context;
+      }
+
+      listener = new_listener;
+    }
+
 ///Получение имени библиотеки
     const char* GetName () { return dll->GetPath (); }
     
@@ -185,25 +227,8 @@ class AdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
           "Symbol '%s' not found in library '%s'", symbol, dll->GetPath ());
     }        
 
-///Оповещение о смене текущего контекста
-    void MakeCurrentNotify (HDC new_dc, HGLRC new_context, IContextLostListener* new_listener)
-    {
-      if (listener)
-      {
-        try
-        {
-          listener->OnLostCurrent ();
-        }
-        catch (...)
-        {
-          //подавление всех исключений
-        }
-      }
-
-      current_dc      = new_dc;
-      current_context = new_context;
-      listener        = new_listener;
-    }
+  private:
+    virtual void MakeCurrentCore (HDC new_dc, HGLRC new_context, HGLRC current_context) = 0; //реализация установки текущего контекста
     
   protected:
     Log log; //протокол
@@ -230,7 +255,8 @@ class WglAdapterLibrary: public AdapterLibrary
 {
   public:
 ///Конструктор
-    WglAdapterLibrary (DynamicLibraryPtr& dll) : AdapterLibrary (dll)
+    WglAdapterLibrary (DynamicLibraryPtr& dll) :
+      AdapterLibrary (dll)
     {
       try
       {
@@ -328,20 +354,16 @@ class WglAdapterLibrary: public AdapterLibrary
     }    
 
 ///Установка текущего контекста
-    void MakeCurrent (HDC dc, HGLRC context, IContextLostListener* listener)
+    void MakeCurrentCore (HDC dc, HGLRC context, HGLRC)
     {
       try
       {
-        MakeCurrentNotify (0, 0, 0);
-
         if (!fwglMakeCurrent (dc, context))
           raise_error ("wglMakeCurrent");
-
-        MakeCurrentNotify (dc, context, listener);
       }
       catch (xtl::exception& exception)
       {
-        exception.touch ("render::low_level::opengl::windows::WglAdapterLibrary::MakeCurrent");
+        exception.touch ("render::low_level::opengl::windows::WglAdapterLibrary::MakeCurrentCore");
         throw;
       }
     }    
@@ -550,7 +572,7 @@ class IcdAdapterLibrary: public AdapterLibrary
     }
 
 ///Установка текущего контекста
-    void MakeCurrent (HDC dc, HGLRC context, IContextLostListener* listener)
+    void MakeCurrentCore (HDC dc, HGLRC context, HGLRC current_context)
     {
       try
       {
@@ -559,17 +581,11 @@ class IcdAdapterLibrary: public AdapterLibrary
         if (current_library != this)
         {
           if (current_library)
-            current_library->MakeCurrent (0, 0, 0);
+            current_library->MakeCurrent (0, 0, 0); //вызывается не MakeCurrentCore, поскольку необходимо оповестить слушателей потери контекста
         }
         else
         {
-            //сохранение параметров текущего контекста
-
-          HGLRC volatile current_context = AdapterLibrary::GetCurrentContext ();
-
-            //оповещение об отмене текущего контекста
-
-          MakeCurrentNotify (0, 0, 0);
+            //освобождение текущего контекста
 
           current_icd_table = 0;
           current_library   = 0;
@@ -579,10 +595,7 @@ class IcdAdapterLibrary: public AdapterLibrary
         }
 
         if (!dc && !context)
-        {
-          MakeCurrentNotify (0, 0, listener);
           return;
-        }
 
           //установка текущего контекста
 
@@ -590,14 +603,10 @@ class IcdAdapterLibrary: public AdapterLibrary
           raise_error ("DrvSetContext");
 
         current_library = this;
-
-          //оповещение об установке текущего контекста
-
-        MakeCurrentNotify (dc, context, listener);
       }
       catch (xtl::exception& exception)
       {
-        exception.touch ("render::low_level::opengl::windows::IcdAdapterLibrary::MakeCurrent");
+        exception.touch ("render::low_level::opengl::windows::IcdAdapterLibrary::MakeCurrentСore");
         throw;
       }
     }    

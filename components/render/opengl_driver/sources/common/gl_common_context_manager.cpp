@@ -42,6 +42,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
         context->AttachListener (this);
 
           //выбор активного контекста          
+
         
         context->MakeCurrent (swap_chain);        
         
@@ -144,10 +145,10 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
         }
         
           //определение багов работы OpenGL
-          
+
         stl::string bug_string;
 
-        detect_opengl_bugs (bug_string);        
+        detect_opengl_bugs (bug_string);
 
         extensions.SetGroup (bug_string.c_str (), true);
         

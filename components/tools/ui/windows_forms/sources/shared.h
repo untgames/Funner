@@ -1,6 +1,7 @@
 #ifndef TOOLS_UI_WINDOWS_FORMS_SHARED_HEADER
 #define TOOLS_UI_WINDOWS_FORMS_SHARED_HEADER
 
+#define _WIN32_WINNT 0x0600 //for CoInitializeEx
 #include <cor.h>
 
 #include <stl/string>

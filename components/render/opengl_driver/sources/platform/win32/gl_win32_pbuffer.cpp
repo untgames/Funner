@@ -106,8 +106,13 @@ struct PBuffer::Impl
       output_context = wgl_extension_entries->GetPbufferDCARB (pbuffer);
 
       if (!output_context)
-        raise_error ("wglGetPbufferDCARB");            
-        
+        raise_error ("wglGetPbufferDCARB");
+
+        //установка формата пикселей
+
+      if (!PixelFormatManager::CopyPixelFormat (primary_device_context, output_context))
+        throw xtl::format_operation_exception ("render::low_level::opengl::PBuffer::Impl::Create", "PixelFormatManager::CopyPixelFormat failed");
+
         //получение размеров созданного PBuffer'а
         
       log.Printf ("...call wglQueryPBufferARB");

@@ -6,22 +6,22 @@ namespace
 {
 
 /*
-    Дескриптор формата пикселей контекста устройства
+    ─хёъЁшяЄюЁ ЇюЁьрЄр яшъёхыхщ ъюэЄхъёЄр єёЄЁющёЄтр
 */
 
 struct DcPixelFormat
 {
-  HDC                                       dc;           //контекст устройства
-  int                                       pixel_format; //формат пикселей
-  PixelFormatManager::DescribePixelFormatFn describe;     //функция, описывающая формат пикселей
-  DcPixelFormat*                            prev;         //предыдущий дескриптор
-  DcPixelFormat*                            next;         //следующий дескриптор
+  HDC                                       dc;           //ъюэЄхъёЄ єёЄЁющёЄтр
+  int                                       pixel_format; //ЇюЁьрЄ яшъёхыхщ
+  PixelFormatManager::DescribePixelFormatFn describe;     //ЇєэъЎш , юяшё√тр■∙р  ЇюЁьрЄ яшъёхыхщ
+  DcPixelFormat*                            prev;         //яЁхф√фє∙шщ фхёъЁшяЄюЁ
+  DcPixelFormat*                            next;         //ёыхфє■∙шщ фхёъЁшяЄюЁ
 };
 
-DcPixelFormat*   first           = 0; //первый элемент в списке форматов пикселей
-IAdapterLibrary* default_library = 0; //библиотека, используемая для описания формата пикселей "по умолчанию"
+DcPixelFormat*   first           = 0; //яхЁт√щ ¤ыхьхэЄ т ёяшёъх ЇюЁьрЄют яшъёхыхщ
+IAdapterLibrary* default_library = 0; //сшсышюЄхър, шёяюы№чєхьр  фы  юяшёрэш  ЇюЁьрЄр яшъёхыхщ "яю єьюыўрэш■"
 
-//перехват функции получения адреса
+//яхЁхїтрЄ ЇєэъЎшш яюыєўхэш  рфЁхёр
 PROC WINAPI GetProcAddressRedirect (HMODULE module, const LPCSTR name)
 {
   void* proc = (void*)GetProcAddress (module, name);
@@ -44,7 +44,7 @@ PROC WINAPI GetProcAddressRedirect (HMODULE module, const LPCSTR name)
 }
 
 /*
-    Перенаправление вызовов
+    ╧хЁхэряЁртыхэшх т√чютют
 */
 
 void PixelFormatManager::RedirectApiCalls (HMODULE module)
@@ -56,7 +56,7 @@ void PixelFormatManager::RedirectApiCalls (HMODULE module)
 }
 
 /*
-    Получение формата пикселей
+    ╧юыєўхэшх ЇюЁьрЄр яшъёхыхщ
 */
 
 int WINAPI PixelFormatManager::GetPixelFormat (HDC dc)
@@ -70,24 +70,24 @@ int WINAPI PixelFormatManager::GetPixelFormat (HDC dc)
 
 
 /*
-    Установка формата пикселей
+    ╙ёЄрэютър ЇюЁьрЄр яшъёхыхщ
 */
 
-BOOL WINAPI PixelFormatManager::SetPixelFormat (HDC dc, int pixel_format, DescribePixelFormatFn describe)
+BOOL PixelFormatManager::SetPixelFormat (HDC dc, int pixel_format, DescribePixelFormatFn describe)
 {
   try
   {
-      //проверка корректности аргументов
+      //яЁютхЁър ъюЁЁхъЄэюёЄш рЁуєьхэЄют
 
     if (!dc || !pixel_format || !describe)
       return FALSE;
 
-      //поиск дескриптора
+      //яюшёъ фхёъЁшяЄюЁр
       
     if (GetPixelFormat (dc))
       return FALSE;         
         
-      //добавление нового дескриптора
+      //фюсртыхэшх эютюую фхёъЁшяЄюЁр
 
     DcPixelFormat* desc = new DcPixelFormat;
 
@@ -105,7 +105,7 @@ BOOL WINAPI PixelFormatManager::SetPixelFormat (HDC dc, int pixel_format, Descri
   }
   catch (...)
   {
-    //подавление всех исключений
+    //яюфртыхэшх тёхї шёъы■ўхэшщ
 
     return FALSE;
   }
@@ -116,19 +116,28 @@ BOOL WINAPI PixelFormatManager::SetPixelFormat (HDC dc, int pixel_format, PIXELF
   return FALSE;
 }
 
+BOOL PixelFormatManager::CopyPixelFormat (HDC src_dc, HDC dst_dc)
+{
+  for (DcPixelFormat* iter=first; iter; iter=iter->next)
+    if (iter->dc == src_dc)
+      return SetPixelFormat (dst_dc, iter->pixel_format, iter->describe);
+
+  return FALSE;
+}
+
 /*
-    Описание формата пикселей
+    ╬яшёрэшх ЇюЁьрЄр яшъёхыхщ
 */
 
 int WINAPI PixelFormatManager::DescribePixelFormat (HDC dc, int pixel_format, UINT size, LPPIXELFORMATDESCRIPTOR pfd)
 {
-    //поиск вхождения контекста устройства
+    //яюшёъ тїюцфхэш  ъюэЄхъёЄр єёЄЁющёЄтр
 
   DcPixelFormat* iter = first;
 
   for (;iter && iter->dc != dc; iter=iter->next);
 
-    //если контекст не найден - описание формата невозможно
+    //хёыш ъюэЄхъёЄ эх эрщфхэ - юяшёрэшх ЇюЁьрЄр эхтючьюцэю
 
   if (!iter)
   {
@@ -142,7 +151,7 @@ int WINAPI PixelFormatManager::DescribePixelFormat (HDC dc, int pixel_format, UI
 }
 
 /*
-    Очистка ресурсов контекста устройства
+    ╬ўшёЄър ЁхёєЁёют ъюэЄхъёЄр єёЄЁющёЄтр
 */
 
 void PixelFormatManager::ReleasePixelFormat (HDC dc)
@@ -165,7 +174,7 @@ void PixelFormatManager::ReleasePixelFormat (HDC dc)
 }
 
 /*
-    Установка библиотеки "по умолчанию"
+    ╙ёЄрэютър сшсышюЄхъш "яю єьюыўрэш■"
 */
 
 void PixelFormatManager::SetDefaultLibrary (IAdapterLibrary* library)
