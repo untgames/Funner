@@ -1,0 +1,33 @@
+Results of engine_attachments1_test:
+screens={} listeners={} input_handlers={}
+OnSetScreen: attachment_name is 'ScreenAttachment1', screen name is 'Screen1'
+OnSetScreen: attachment_name is 'ScreenAttachment1', screen name is 'Screen2'
+OnSetListener: attachment_name is 'ListenerAttachment1', listener name is 'Listener1'
+OnSetListener: attachment_name is 'ListenerAttachment1', listener name is 'Listener2'
+screens={ScreenAttachment1::Screen2} listeners={ListenerAttachment1::Listener2} input_handlers={}
+OnRemoveScreen: attachment_name is 'ScreenAttachment1'
+OnRemoveListener: attachment_name is 'ListenerAttachment1'
+screens={} listeners={} input_handlers={}
+OnSetScreen: attachment_name is 'ScreenAttachment2', screen name is 'Screen2'
+OnSetScreen: attachment_name is 'ScreenAttachment1', screen name is 'Screen1'
+OnSetListener: attachment_name is 'ListenerAttachment2', listener name is 'Listener2'
+OnSetListener: attachment_name is 'ListenerAttachment1', listener name is 'Listener1'
+screens={ScreenAttachment2::Screen2, ScreenAttachment1::Screen1} listeners={ListenerAttachment2::Listener2, ListenerAttachment1::Listener1} input_handlers={}
+Listener 'ListenerAttachment2' name is 'Listener2'
+Screen 'ScreenAttachment1' name is 'Screen1'
+Listener 'asd' is 00000000
+Screen 'asd' is 00000000
+screens={ScreenAttachment2::Screen2, ScreenAttachment1::Screen1} listeners={ListenerAttachment2::Listener2, ListenerAttachment1::Listener1} input_handlers={}
+OnRemoveScreen: attachment_name is 'ScreenAttachment2'
+OnRemoveScreen: attachment_name is 'ScreenAttachment1'
+screens={} listeners={} input_handlers={}
+OnSetInputHandler: attachment_name is 'InputTranslatorAttachment1'
+OnSetInputHandler: attachment_name is 'InputTranslatorAttachment2'
+OnSetInputHandler: attachment_name is 'InputTranslatorAttachment3'
+screens={} listeners={} input_handlers={InputTranslatorAttachment1, InputTranslatorAttachment3, InputTranslatorAttachment2}
+OnRemoveInputHandler: attachment_name is 'InputTranslatorAttachment2'
+screens={} listeners={} input_handlers={InputTranslatorAttachment1, InputTranslatorAttachment3}
+OnRemoveInputHandler: attachment_name is 'InputTranslatorAttachment1'
+OnRemoveInputHandler: attachment_name is 'InputTranslatorAttachment3'
+screens={} listeners={} input_handlers={}
+OnDestroy

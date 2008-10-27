@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration>
+  <Subsystem4 Name = "4"/>
+  <Subsystem3 Name = "3"/>
+  <Subsystem2 Name = "2"/>
+  <Subsystem1 Name = "1"/>
+</Configuration>

@@ -1,0 +1,21 @@
+Results of engine1_test:
+Starting subsystem 'Subsystem2'. Engine startup params = 00000000
+Log 'client.engines.Engine1' message: 'Add subsystem 'Subsystem2''
+Starting subsystem 'Subsystem3'. Engine startup params = 00000000
+Log 'client.engines.Engine1' message: 'Add subsystem 'Subsystem3''
+Engine configuration branch name is 'Configuration'
+Engine subsystems count is 2
+OnSetScreen: attachment_name is 'ScreenAttachment', screen name is 'Screen'
+Starting subsystem 'Subsystem1'. Engine startup params = 00000000
+Log 'client.engines.Engine1' message: 'Add subsystem 'Subsystem1''
+Engine subsystems count is 3
+Engine subsystem 1 name is 'Subsystem3'
+OnRemoveScreen: attachment_name is 'ScreenAttachment'
+OnSetScreen: attachment_name is 'ScreenAttachment2', screen name is 'Screen'
+OnRemoveScreen: attachment_name is 'ScreenAttachment2'
+Log 'client.engines.Engine1' message: 'Remove susbsystem 'Subsystem1''
+Engine subsystems count is 2
+Log 'client.engines.Engine1' message: 'Remove susbsystem 'Subsystem2''
+Log 'client.engines.Engine1' message: 'Remove susbsystem 'Subsystem3''
+OnDestroy
+Engine tracked

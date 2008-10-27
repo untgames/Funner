@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration>
+  <SceneRender
+    DriverMask   = "*"
+    RendererMask = "*"
+    Log          = "render.scene_render"
+    >
+    <Screen1
+      Attachment   = "Screen1"
+      RenderTarget = "0"
+    />
+    <Screen2
+      Attachment   = "Screen2"
+      RenderTarget = "1"
+    />
+  </SceneRender>
+  <ScenePlayer
+    Attachment = "ScenePlayer1"
+    DriverMask = "*"
+    DeviceMask = "*"
+    InitString = ""
+  />
+  <InputManager
+    TranslationMapRegistry = "data/translation_map_registry.xkeyreg"
+  />
+  <DirectInputDriver
+    Load = "1"
+  />
+  <WindowManager>
+    <Window1
+      Style  = "Overlapped"
+      Width  = "300"
+      Height = "300"
+      Title  = "Window1"
+      Show   = "1"
+      >
+      <WindowRenderer 
+        RendererName = "MyRenderer"
+        ColorBits    = "24"
+        AlphaBits    = "0"
+        DepthBits    = "24"
+        StencilBits  = "8"
+        FullScreen   = "0"
+        BuffersCount = "2"
+        SwapMethod   = "Discard"
+        DriverMask   = "*"
+        AdapterMask  = "OpenGL32"
+        SamplesCount = "1024"
+        VSync        = "0"
+        FullScreen   = "0"
+      />
+      <WindowInputDriver
+        Load = "1"
+      />
+    </Window1>
+    <Window2
+      Style  = "Overlapped"
+      Width  = "300"
+      Height = "300"
+      Title  = "Window2"
+      Show   = "1"
+      >
+      <WindowRenderer 
+        RendererName = "MyRenderer"
+        ColorBits    = "24"
+        AlphaBits    = "0"
+        DepthBits    = "24"
+        StencilBits  = "8"
+        FullScreen   = "0"
+        BuffersCount = "2"
+        SwapMethod   = "Discard"
+        DriverMask   = "*"
+        AdapterMask  = "OpenGL32"
+        SamplesCount = "1024"
+        VSync        = "0"
+        FullScreen   = "0"
+      />
+      <WindowInputDriver
+        Load = "1"
+      />
+    </Window2>
+  </WindowManager>
+</Configuration>
