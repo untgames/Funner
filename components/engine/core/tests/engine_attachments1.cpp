@@ -1,164 +1,101 @@
 #include <cstdio>
 
-#include <xtl/connection.h>
-#include <xtl/exception.h>
-#include <xtl/function.h>
-#include <xtl/iterator.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/ref.h>
+#include <xtl/reference_counter.h>
+#include <xtl/shared_ptr.h>
 
-#include <sg/listener.h>
+#include <engine/attachments.h>
 
-#include <render/screen.h>
+using namespace engine;
 
-#include <client/engine_attachments.h>
-
-using namespace client;
-
-class ClientEventListener : public IEngineEventListener
+template <int TypeNumber> struct A: public xtl::reference_counter
 {
-  public:
-///События установки/удаления экрана
-    void OnSetScreen (const char* attachment_name, render::Screen& screen) 
-    {
-      printf ("OnSetScreen: attachment_name is '%s', screen name is '%s'\n", attachment_name, screen.Name ());
-    }
+  A (const A& a) : id (a.id) { printf ("A::A(const A&): id=%d\n", id); }
+  A (int in_id) : id (in_id) { printf ("A::A(int):      id=%d\n", id); }
+  ~A ()                      { printf ("A::~A():        id=%d\n", id); }
 
-    void OnRemoveScreen (const char* attachment_name) 
-    {
-      printf ("OnRemoveScreen: attachment_name is '%s'\n", attachment_name);
-    }
+  void AddRef () { addref (this); }
+  void Release () { release (this); }
 
-///События установки/удаления слушателя
-    void OnSetListener (const char* attachment_name, scene_graph::Listener& listener) 
-    {
-      printf ("OnSetListener: attachment_name is '%s', listener name is '%s'\n", attachment_name, listener.Name ());
-    }
-
-    void OnRemoveListener (const char* attachment_name) 
-    {
-      printf ("OnRemoveListener: attachment_name is '%s'\n", attachment_name);
-    }
-
-///События установки/удаления обработчика событий ввода
-    void OnSetInputHandler (const char* attachment_name, const InputHandler&)
-    {
-      printf ("OnSetInputHandler: attachment_name is '%s'\n", attachment_name);
-    }
-    
-    void OnRemoveInputHandler (const char* attachment_name)
-    {
-      printf ("OnRemoveInputHandler: attachment_name is '%s'\n", attachment_name);
-    }    
-
-///Событие удаления клиента
-    void OnDestroy () 
-    {
-      printf ("OnDestroy\n");
-    }
+  int id;
 };
 
-void input_event_handler (const char*)
-{
-}
+typedef A<1> A1;
+typedef A<2> A2;
 
-void dump (const EngineAttachments& client)
+class MyListener : public IAttachmentRegistryListener<A1>, public IAttachmentRegistryListener<A2>
 {
-  printf ("screens={");
-  
-  bool need_separator = false;
-  
-  for (EngineAttachments::ScreenIterator iter=client.CreateScreenIterator (); iter; ++iter, need_separator=true)
-    printf ("%s%s::%s", need_separator ? ", " : "", iter->Name (), iter->Value ().Name ());
-    
-  printf ("} listeners={");
-  
-  need_separator = false;
-  
-  for (EngineAttachments::ListenerIterator iter=client.CreateListenerIterator (); iter; ++iter, need_separator=true)
-    printf ("%s%s::%s", need_separator ? ", " : "", iter->Name (), iter->Value ().Name ());
-    
-  printf ("} input_handlers={");
-  
-  need_separator = false;
-  
-  for (EngineAttachments::InputHandlerIterator iter=client.CreateInputHandlerIterator (); iter; ++iter, need_separator=true)
-    printf ("%s%s", need_separator ? ", " : "", iter->Name ());
-    
-  printf ("}\n");
-}
+  public:
+    void OnRegisterAttachment (const char* name, A1& value)
+    {
+      printf ("OnRegisterAttachment(%s, A1=%d)\n", name, value.id);
+    }
+
+    void OnUnregisterAttachment (const char* name, A1& value)
+    {
+      printf ("OnUnregisterAttachment(%s, A1=%d)\n", name, value.id);
+    }
+
+    void OnRegisterAttachment (const char* name, A2& value)
+    {
+      printf ("OnRegisterAttachment(%s, A2=%d)\n", name, value.id);
+    }
+
+    void OnUnregisterAttachment (const char* name, A2& value)
+    {
+      printf ("OnUnregisterAttachment(%s, A2=%d)\n", name, value.id);
+    }    
+};
 
 int main ()
 {
   printf ("Results of engine_attachments1_test:\n");
-
-  ClientEventListener client_event_listener;
-  EngineAttachments client;
-
-  client.Attach (&client_event_listener);
-
-  dump (client);
-
-  scene_graph::Listener::Pointer listener1 = scene_graph::Listener::Create (), listener2 = scene_graph::Listener::Create ();
-
-  listener1->SetName ("Listener1");
-  listener2->SetName ("Listener2");
-
-  render::Screen screen1, screen2;
-
-  screen1.SetName ("Screen1");
-  screen2.SetName ("Screen2");
-
-  client.SetScreen ("ScreenAttachment1", screen1);
-  client.SetScreen ("ScreenAttachment1", screen2);
-
-  client.SetListener ("ListenerAttachment1", *listener1);
-  client.SetListener ("ListenerAttachment1", *listener2);
-
-  dump (client);
-
-  client.RemoveScreen ("ScreenAttachment1");
-  client.RemoveListener ("ListenerAttachment1");
-
-  dump (client);
-
-  client.SetScreen ("ScreenAttachment2", screen2);
-  client.SetScreen ("ScreenAttachment1", screen1);
-
-  client.SetListener ("ListenerAttachment2", *listener2);
-  client.SetListener ("ListenerAttachment1", *listener1);
   
-  dump (client);  
-
-  printf ("Listener 'ListenerAttachment2' name is '%s'\n", client.FindListener ("ListenerAttachment2")->Name ());
-  printf ("Screen 'ScreenAttachment1' name is '%s'\n", client.FindScreen ("ScreenAttachment1")->Name ());
-
-  printf ("Listener 'asd' is %p\n", client.FindListener ("asd"));
-  printf ("Screen 'asd' is %p\n", client.FindScreen ("asd"));
-
-  dump (client);  
-
-  client.Detach (&client_event_listener);
+  MyListener listener;  
   
-  client.RemoveAllListeners ();
+  try
+  {
+    A1 a11 = 1;
+    xtl::shared_ptr<A1> a12 (new A1 (2));
+    xtl::com_ptr<A2> a21 (new A2 (3), false);
+
+    printf ("Attach listener\n");    
+    
+    AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<A2>*> (&listener));    
+    
+    printf ("Register values\n");
+    
+    AttachmentRegistry::Register ("Value1", a11);
+    AttachmentRegistry::Register ("Value2", a12);
+    
+    AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<A1>*> (&listener), AttachmentRegistryAttachMode_ForceNotify);
+    
+    printf ("Change value 'Value1'\n");
+
+    AttachmentRegistry::Register ("Value1", a21);
+    
+    printf ("Unregister value 'Value2'\n");
+
+    AttachmentRegistry::Unregister ("Value2");
+    
+    printf ("Unregiser all A1 values\n");
+
+    AttachmentRegistry::UnregisterAll<A1> ();
+
+    printf ("Unregiser all A2 values\n");
+
+    AttachmentRegistry::UnregisterAll<A2> ();
+  }
+  catch (std::exception& exception)
+  {        
+    printf ("exception: %s\n", exception.what ());
+  }
   
-  client.Attach (&client_event_listener);
+  printf ("Detach listener\n");  
   
-  client.RemoveAllScreens ();
-
-  dump (client);
-
-  client.SetInputHandler ("InputTranslatorAttachment1", &input_event_handler);
-  client.SetInputHandler ("InputTranslatorAttachment2", &input_event_handler);
-  client.SetInputHandler ("InputTranslatorAttachment3", &input_event_handler);
-
-  dump (client);
-
-  client.RemoveInputHandler ("InputTranslatorAttachment2");
-
-  dump (client);
-
-  client.RemoveAllInputHandlers ();
-
-  dump (client);
+  AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<A1>*> (&listener));
+  AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<A2>*> (&listener));  
 
   return 0;
 }

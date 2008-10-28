@@ -1,32 +1,29 @@
-#ifndef CLIENT_CLIENT_SHARED_HEADER
-#define CLIENT_CLIENT_SHARED_HEADER
+#ifndef ENGINE_SHARED_HEADER
+#define ENGINE_SHARED_HEADER
 
 #include <stl/algorithm>
 #include <stl/auto_ptr.h>
-#include <stl/hash_set>
 #include <stl/hash_map>
-#include <stl/set>
+#include <stl/list>
 #include <stl/string>
 #include <stl/vector>
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
-#include <xtl/connection.h>
-#include <xtl/iterator.h>
+#include <xtl/function.h>
+#include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
-#include <xtl/signal.h>
-#include <xtl/trackable.h>
 
 #include <common/component.h>
 #include <common/log.h>
+#include <common/parser.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
-#include <input/translation_map.h>
+#include <engine/attachments.h>
+#include <engine/subsystem_manager.h>
 
-#include <client/engine.h>
-
-namespace client
+namespace engine
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +32,7 @@ namespace client
 class StartupManagerImpl
 {
   public:
-    typedef client::StartupManager::StartupHandler StartupHandler;
+    typedef engine::StartupManager::StartupHandler StartupHandler;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
@@ -46,14 +43,14 @@ class StartupManagerImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление/удаление обработчиков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterStartupHandler       (const char* node_name, const StartupHandler& startup_handler, size_t order);
+    void RegisterStartupHandler       (const char* node_name, const StartupHandler& startup_handler);
     void UnregisterStartupHandler     (const char* node_name);
     void UnregisterAllStartupHandlers ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Запуск обработчиков
+///Запуск подсистем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Startup (Engine& engine, size_t low_level, size_t high_level, IEngineStartupParams* engine_startup_params);
+    void Start (common::ParseNode& node, SubsystemManager& manager);
 
   private:
     struct Impl;

@@ -1,506 +1,389 @@
 #include "shared.h"
 
-using namespace client;
+using namespace engine;
+
+namespace engine
+{
 
 /*
-    Реализация клиента
+    Реализация менеджера точек привязки
 */
 
-struct EngineAttachments::Impl: public xtl::reference_counter
+class AttachmentRegistryImpl
 {
   public:
 ///Деструктор
-    ~Impl ()
+    ~AttachmentRegistryImpl ()
     {
-      RemoveAllScreens       ();
-      RemoveAllListeners     ();
-      RemoveAllInputHandlers ();
-      OnDestroyNotify        ();
+      UnregisterAll ();
     }
-
-///Установка экрана
-    void SetScreen (const char* attachment_name, render::Screen& screen)
+  
+///Регистрация точки привязки
+    void Register (const char* name, detail::IBasicAttachment* attachment)
     {
-      static const char* METHOD_NAME = "EngineAttachments::EngineAttachments::SetScreen";
+      static const char* METHOD_NAME = "engine::AttachmentRegistry::Register";
+      
+        //проверка корректности аргументов, захват ресурсов
+      
+      if (!attachment)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "attachment");
+      
+      AttachmentPtr         attachment_holder (attachment);
+      const std::type_info& type = attachment->GetType ();
 
-      if (!attachment_name)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "attachment_name");
+      if (!name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
-      ScreenAttachments::iterator iter = screen_attachments.find (attachment_name);
-
-      if (iter != screen_attachments.end ())
+        //поиск вхождения в карту точек привязки
+        
+      AttachmentMap::iterator iter = attachments.find (name);
+      
+      if (iter == attachments.end ())
       {
-        iter->second->screen = screen;
+          //добавление новой точки привязки
+
+        attachments.insert_pair (name, AttachmentEntryPtr (new AttachmentEntry (name, type, attachment_holder), false));
       }
       else
       {
-        screen_attachments.insert_pair (attachment_name, ScreenAttachmentPtr (new ScreenAttachment (attachment_name, screen), false));
+        AttachmentEntry& entry = *iter->second;
+
+        if (entry.type == &type) //если регистрация производится без изменения типа точки привязки
+        {
+          entry.attachment = attachment_holder;
+        }
+        else //регистрация производится с изменением типа точки привязки
+        {
+            //отмена регистрации предыдущей точки привязки
+            
+          UnregisterAttachmentNotify (entry.name.c_str (), *entry.type, entry.attachment.get ());
+
+            //изменение параметров точки привязки
+
+          entry.attachment = attachment_holder;
+          entry.type       = &type;
+        }
       }
 
-      OnSetScreenNotify (attachment_name, screen);
-    }
+        //оповещение об установке новой точки привязки
 
-///Удаление экрана
-    void RemoveScreen (const char* attachment_name)
-    {
-      if (!attachment_name)
-        return;
-
-      ScreenAttachments::iterator iter = screen_attachments.find (attachment_name);
-
-      if (iter == screen_attachments.end ())
-        return;
-
-      OnRemoveScreenNotify     (attachment_name);
-      screen_attachments.erase (iter);
-    }
-
-///Удаление всех экранов
-    void RemoveAllScreens ()
-    {
-      for (ScreenAttachments::iterator iter=screen_attachments.begin (), end=screen_attachments.end (); iter!=end; ++iter)
-        OnRemoveScreenNotify (iter->second->name.c_str ());
-
-      screen_attachments.clear ();
-    }
-
-///Поиск экрана
-    render::Screen* FindScreen (const char* attachment_name)
-    {
-      if (!attachment_name)
-        return 0;
-
-      ScreenAttachments::iterator iter = screen_attachments.find (attachment_name);
-
-      if (iter != screen_attachments.end ())
-        return &iter->second->screen;
-
-      return 0;
+      RegisterAttachmentNotify (name, type, attachment);      
     }
     
-///Перебор экранов
-    ScreenIterator CreateScreenIterator ()
+///Отмена регистрации точки привязки
+    void Unregister (const char* name)
     {
-      return ScreenIterator (screen_attachments.begin (), screen_attachments.begin (), screen_attachments.end (), ScreenSelector ());
+      if (!name)
+        return;
+
+        //поиск точки привязки
+
+      AttachmentMap::iterator iter = attachments.find (name);
+
+      if (iter == attachments.end ())
+        return;
+
+        //оповещение об удалении точки привязки
+
+      AttachmentEntry& entry = *iter->second;
+
+      UnregisterAttachmentNotify (entry.name.c_str (), *entry.type, entry.attachment.get ());
+
+        //удаление точки привязки
+
+      attachments.erase (iter);
     }
-
-///Установка слушателя
-    void SetListener (const char* attachment_name, scene_graph::Listener& listener)
+    
+///Отмена регистрации всех точек привязки определённого типа
+    void UnregisterAll (const std::type_info& type)
     {
-      static const char* METHOD_NAME = "client::EngineAttachments::SetListener";
+      for (AttachmentMap::iterator iter=attachments.begin (); iter!=attachments.end ();)
+        if (iter->second->type == &type)
+        {
+          AttachmentMap::iterator next = iter;
+          
+          ++next;
 
-      if (!attachment_name)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "attachment_name");
+            //оповещение об удалении точки привязки
 
-      ListenerAttachments::iterator iter = listener_attachments.find (attachment_name);
+          AttachmentEntry& entry = *iter->second;
 
-      if (iter != listener_attachments.end ())
+          UnregisterAttachmentNotify (entry.name.c_str (), *entry.type, entry.attachment.get ());
+
+            //удаление точки привязки
+
+          attachments.erase (iter);
+
+          iter = next;
+        }
+        else ++iter;
+    }
+    
+///Отмена регистрации всех точек привязки
+    void UnregisterAll ()
+    {
+      for (AttachmentMap::iterator iter=attachments.begin (); iter!=attachments.end ();)
       {
-        iter->second->listener = &listener;
+          //оповещение об удалении точки привязки
+
+        AttachmentEntry& entry = *iter->second;
+
+        UnregisterAttachmentNotify (entry.name.c_str (), *entry.type, entry.attachment.get ());
       }
-      else
-      {        
-        listener_attachments.insert_pair (attachment_name, ListenerAttachmentPtr (new ListenerAttachment (attachment_name, listener), false));
-      }
 
-      OnSetListenerNotify (attachment_name, listener);
+      attachments.clear ();
     }
 
-///Удаление слушателя
-    void RemoveListener (const char* attachment_name)
+///Поиск точки привязки
+    detail::IBasicAttachment* Find (const char* name, const std::type_info& type, bool raise_exception)
     {
-      if (!attachment_name)
-        return;
+      static const char* METHOD_NAME = "engine::AttachmentRegistryImpl::Find";
 
-      ListenerAttachments::iterator iter = listener_attachments.find (attachment_name);
+        //проверка корректности аргументов
 
-      if (iter == listener_attachments.end ())
-        return;
-
-      OnRemoveListenerNotify     (attachment_name);
-      listener_attachments.erase (iter);
-    }
-
-///Удаление всех слушателей
-    void RemoveAllListeners ()
-    {
-      for (ListenerAttachments::iterator iter=listener_attachments.begin (), end=listener_attachments.end (); iter!=end; ++iter)
-        OnRemoveListenerNotify (iter->second->name.c_str ());
-
-      listener_attachments.clear ();
-    }
-
-///Поиск слушателя по имени
-    scene_graph::Listener* FindListener (const char* attachment_name)
-    {
-      if (!attachment_name)
-        return 0;
-
-      ListenerAttachments::iterator iter = listener_attachments.find (attachment_name);
-
-      if (iter != listener_attachments.end ())
-        return iter->second->listener.get ();
-
-      return 0;
-    }
-    
-///Перебор слушателей
-    ListenerIterator CreateListenerIterator ()
-    {
-      return ListenerIterator (listener_attachments.begin (), listener_attachments.begin (), listener_attachments.end (), ListenerSelector ());
-    }
-    
-///Регистрация обработчика событий ввода
-    void SetInputHandler (const char* attachment_name, const InputHandler& handler)
-    {
-      static const char* METHOD_NAME = "EngineAttachments::EngineAttachments::SetScreen";
-
-      if (!attachment_name)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "attachment_name");
-
-      InputHandlerAttachments::iterator iter = input_attachments.find (attachment_name);
-
-      if (iter != input_attachments.end ())
+      if (!name)
       {
-        iter->second->handler = handler;
-      }
-      else
-      {
-        input_attachments.insert_pair (attachment_name, InputHandlerAttachmentPtr (new InputHandlerAttachment (attachment_name, handler), false));
-      }
+        if (raise_exception)
+          throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
-      OnSetInputHandlerNotify (attachment_name, handler);
-    }
-    
-///Удаление обработчика событий ввода
-    void RemoveInputHandler (const char* attachment_name)
-    {
-      if (!attachment_name)
-        return;
-        
-      InputHandlerAttachments::iterator iter = input_attachments.find (attachment_name);
-      
-      if (iter == input_attachments.end ())
-        return;
-        
-      OnRemoveInputHandlerNotify (attachment_name);
-      input_attachments.erase    (iter);
-    }
-    
-///Удаление всех обработчиков событий ввода
-    void RemoveAllInputHandlers ()
-    {
-      for (InputHandlerAttachments::iterator iter=input_attachments.begin (), end=input_attachments.end (); iter!=end; ++iter)
-        OnRemoveInputHandlerNotify (iter->second->name.c_str ());
-
-      input_attachments.clear ();
-    }
-    
-///Поиск обработчика событий ввода
-    const InputHandler* FindInputHandler (const char* attachment_name)
-    {
-      if (!attachment_name)
         return 0;
+      }
       
-      InputHandlerAttachments::iterator iter = input_attachments.find (attachment_name);
+        //поиск точки привязки по имени
       
-      if (iter != input_attachments.end ())
-        return &iter->second->handler;
+      AttachmentMap::iterator iter = attachments.find (name);
+
+      if (iter == attachments.end ())
+      {
+        if (raise_exception)
+          throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Attachment point not found");
+
+        return 0;
+      }
+      
+        //проверка типа точки привязки
         
-      return 0;
-    }
-    
-///Перебор обработчиков событий ввода
-    InputHandlerIterator CreateInputHandlerIterator ()
-    {
-      return InputHandlerIterator (input_attachments.begin (), input_attachments.begin (), input_attachments.end (), InputHandlerSelector ());
+      if (iter->second->type != &type)
+      {
+        if (raise_exception)
+          throw xtl::format_operation_exception (METHOD_NAME, "Attachment '%s' has incompatible type (requested_type='%s', attachment_type='%s')",
+            name, type.name (), iter->second->type->name ());
+
+        return 0;
+      }
+
+      return iter->second->attachment.get ();
     }
 
-///Работа со слушателями событий
-    void Attach (IEngineEventListener* listener)
+///Добавление слушателя событий
+    void Attach (const std::type_info& type, IBasicAttachmentRegistryListener* listener, AttachmentRegistryAttachMode mode)
     {
-      static const char* METHOD_NAME = "client::EngineAttachments::Attach";
+      static const char* METHOD_NAME = "engine::AttachmentRegistryImpl::Attach";
+      
+        //проверка корректности аргументов
 
       if (!listener)
         throw xtl::make_null_argument_exception (METHOD_NAME, "listener");
 
-      EventListenerSet::iterator iter = event_listeners.find (listener);
+      switch (mode)
+      {
+        case AttachmentRegistryAttachMode_Quiet:
+        case AttachmentRegistryAttachMode_ForceNotify:
+          break;
+        default:
+          throw xtl::make_argument_exception (METHOD_NAME, "mode", mode);
+      }
+      
+        //добавление слушателя
 
-      if (iter != event_listeners.end ())
-        throw xtl::format_operation_exception (METHOD_NAME, "Listener already attached");
-
-      event_listeners.insert (listener);
+      listeners.push_back (ListenerEntry (type, listener));      
+      
+        //принудительное оповещение о регистрации точек привязки
+        
+      if (mode == AttachmentRegistryAttachMode_ForceNotify)
+      {        
+        for (AttachmentMap::iterator iter=attachments.begin (); iter!=attachments.end (); ++iter)
+        {
+          AttachmentEntry& entry = *iter->second;
+          
+          if (entry.type == &type)
+          {
+            try
+            {
+              listener->OnRegisterAttachmentCore (entry.name.c_str (), entry.attachment.get ());
+            }
+            catch (...)
+            {
+              //подавление всех исключений
+            }
+          }
+        }
+      }
     }
-
-    void Detach (IEngineEventListener* listener)
+    
+///Удаление слушателя событий
+    void Detach (const std::type_info& type, IBasicAttachmentRegistryListener* listener, AttachmentRegistryAttachMode mode)
     {
+        //проверка корректности аргументов
+      
       if (!listener)
-        throw xtl::make_null_argument_exception ("client::EngineAttachments::Detach", "listener");
+        return;
+        
+      switch (mode)
+      {
+        case AttachmentRegistryAttachMode_Quiet:
+        case AttachmentRegistryAttachMode_ForceNotify:
+          break;
+        default:
+          return;
+      }        
+        
+      for (ListenerList::iterator iter=listeners.begin (); iter!=listeners.end ();)
+        if (iter->type == &type && iter->listener == listener)
+        {
+          ListenerList::iterator next = iter;
 
-      event_listeners.erase (listener);
+          ++next;
+          
+          IBasicAttachmentRegistryListener* listener = iter->listener;
+          
+            //принудительное оповещение об отмене регистрации точек привязки
+
+          if (mode == AttachmentRegistryAttachMode_ForceNotify)
+          {        
+            for (AttachmentMap::iterator iter=attachments.begin (); iter!=attachments.end (); ++iter)
+            {
+              AttachmentEntry& entry = *iter->second;
+
+              if (entry.type == &type)
+              {
+                try
+                {
+                  listener->OnRegisterAttachmentCore (entry.name.c_str (), entry.attachment.get ());
+                }
+                catch (...)
+                {
+                  //подавление всех исключений
+                }
+              }
+            }
+          }          
+
+            //удаление слушателя
+
+          listeners.erase (iter);
+
+          iter = next;
+        }
+        else ++iter;
+    }
+    
+  private:
+///Оповещение о регистрации точки привязки
+    void RegisterAttachmentNotify (const char* name, const std::type_info& type, detail::IBasicAttachment* attachment)
+    {
+      for (ListenerList::iterator iter=listeners.begin (); iter!=listeners.end (); ++iter)
+        if (iter->type == &type)
+        {
+          try
+          {
+            iter->listener->OnRegisterAttachmentCore (name, attachment);
+          }
+          catch (...)
+          {
+            //подавление всех исключений
+          }
+        }
+    }
+
+///Оповещение об удалении точки привязки
+    void UnregisterAttachmentNotify (const char* name, const std::type_info& type, detail::IBasicAttachment* attachment)
+    {
+      for (ListenerList::iterator iter=listeners.begin (); iter!=listeners.end (); ++iter)
+        if (iter->type == &type)
+        {
+          try
+          {
+            iter->listener->OnUnregisterAttachmentCore (name, attachment);
+          }
+          catch (...)
+          {
+            //подавление всех исключений
+          }
+        }
     }
 
   private:
-//Оповещение слушателей
-    void OnSetScreenNotify (const char* attachment_name, render::Screen& screen)
-    {
-      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
-        (*iter)->OnSetScreen (attachment_name, screen);
-    }
-    
-    void OnRemoveScreenNotify (const char* attachment_name)
-    {
-      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
-        (*iter)->OnRemoveScreen (attachment_name);
-    }
-    
-    void OnSetListenerNotify (const char* attachment_name, scene_graph::Listener& listener)
-    {
-      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
-        (*iter)->OnSetListener (attachment_name, listener);
-    }
-    
-    void OnRemoveListenerNotify (const char* attachment_name)
-    {
-      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
-        (*iter)->OnRemoveListener (attachment_name);
-    }
-    
-    void OnSetInputHandlerNotify (const char* attachment_name, const InputHandler& handler)
-    {
-      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
-        (*iter)->OnSetInputHandler (attachment_name, handler);
-    }
-    
-    void OnRemoveInputHandlerNotify (const char* attachment_name)
-    {
-      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
-        (*iter)->OnRemoveInputHandler (attachment_name);
-    }    
+    typedef stl::auto_ptr<detail::IBasicAttachment> AttachmentPtr;
 
-    void OnDestroyNotify ()
+    struct AttachmentEntry: public xtl::reference_counter
     {
-      for (EventListenerSet::iterator iter = event_listeners.begin (), end = event_listeners.end (); iter != end; ++iter)
-        (*iter)->OnDestroy ();
-    }
-   
-  private:
-    struct ScreenAttachment: public IAttachment<render::Screen>, public xtl::reference_counter
-    {
-      stl::string    name;
-      render::Screen screen;
-      
-      ScreenAttachment (const char* in_name, render::Screen& in_screen) : name (in_name), screen (in_screen) {}                  
+      stl::string           name;
+      AttachmentPtr         attachment;
+      const std::type_info* type;
 
-      const char*     Name  () { return name.c_str (); }
-      render::Screen& Value () { return screen; }
+      AttachmentEntry (const char* in_name, const std::type_info& in_type, AttachmentPtr& in_attachment) :
+        name (in_name), attachment (in_attachment), type (&in_type) {}
+    };  
+
+    struct ListenerEntry
+    {
+      IBasicAttachmentRegistryListener* listener;
+      const std::type_info*             type;
+
+      ListenerEntry (const std::type_info& in_type, IBasicAttachmentRegistryListener* in_listener) :
+        listener (in_listener), type (&in_type) {}
     };
-    
-    struct ListenerAttachment: public IAttachment<scene_graph::Listener>, public xtl::reference_counter
-    {
-      stl::string                    name;
-      scene_graph::Listener::Pointer listener;
-      
-      ListenerAttachment (const char* in_name, scene_graph::Listener& in_listener) : name (in_name), listener (&in_listener) {}
 
-      const char*            Name  () { return name.c_str (); }
-      scene_graph::Listener& Value () { return *listener; }
-    };
-    
-    struct InputHandlerAttachment: public IAttachment<const InputHandler>, public xtl::reference_counter
-    {
-      stl::string  name;
-      InputHandler handler;
-      
-      InputHandlerAttachment (const char* in_name, const InputHandler& in_handler) : name (in_name), handler (in_handler) {} 
-
-      const char*         Name  () { return name.c_str (); }
-      const InputHandler& Value () { return handler; }
-    };    
-
-    typedef xtl::intrusive_ptr<ScreenAttachment>                                 ScreenAttachmentPtr;
-    typedef stl::hash_map<stl::hash_key<const char*>, ScreenAttachmentPtr>       ScreenAttachments;
-    typedef xtl::intrusive_ptr<ListenerAttachment>                               ListenerAttachmentPtr;
-    typedef stl::hash_map<stl::hash_key<const char*>, ListenerAttachmentPtr>     ListenerAttachments;
-    typedef xtl::intrusive_ptr<InputHandlerAttachment>                           InputHandlerAttachmentPtr;
-    typedef stl::hash_map<stl::hash_key<const char*>, InputHandlerAttachmentPtr> InputHandlerAttachments;
-    typedef stl::hash_set<IEngineEventListener*>                                 EventListenerSet;    
-    
-    struct ScreenSelector
-    {
-      IAttachment<render::Screen>& operator () (ScreenAttachments::value_type& value) const { return *value.second; }
-    };    
-    
-    struct ListenerSelector
-    {
-      IAttachment<scene_graph::Listener>& operator () (ListenerAttachments::value_type& value) const { return *value.second; }
-    };    
-    
-    struct InputHandlerSelector
-    {
-      IAttachment<const InputHandler>& operator () (InputHandlerAttachments::value_type& value) const { return *value.second; }
-    };    
+    typedef xtl::intrusive_ptr<AttachmentEntry>                           AttachmentEntryPtr;
+    typedef stl::hash_map<stl::hash_key<const char*>, AttachmentEntryPtr> AttachmentMap;
+    typedef stl::list<ListenerEntry>                                      ListenerList;
 
   private:
-    ScreenAttachments       screen_attachments;
-    ListenerAttachments     listener_attachments;
-    InputHandlerAttachments input_attachments;
-    EventListenerSet        event_listeners;
+    AttachmentMap attachments; //карта точек привязки
+    ListenerList  listeners;   //слушатели
 };
 
-/*
-===================================================================================================
-    EngineAttachments
-===================================================================================================
-*/
+typedef common::Singleton<AttachmentRegistryImpl> AttachmentRegistrySingleton;
 
-/*
-    Конструктор / деструктор / присваивание
-*/
-
-EngineAttachments::EngineAttachments ()
-  : impl (new Impl)
-{
-}
-
-EngineAttachments::EngineAttachments (const EngineAttachments& source)
-  : impl (source.impl)
-{
-  addref (impl);
-}
-
-EngineAttachments::~EngineAttachments ()
-{
-  release (impl);
-}
-
-EngineAttachments& EngineAttachments::operator = (const EngineAttachments& source)
-{
-  EngineAttachments (source).Swap (*this);
-
-  return *this;
 }
 
 /*
-    Работа с экранами
+    Обёртки над вызовами методов AttachmentRegistry
 */
 
-void EngineAttachments::SetScreen (const char* attachment_name, render::Screen& screen)
+void AttachmentRegistry::RegisterCore (const char* name, detail::IBasicAttachment* attachment)
 {
-  impl->SetScreen (attachment_name, screen);
+  AttachmentRegistrySingleton::Instance ().Register (name, attachment);
 }
 
-void EngineAttachments::RemoveScreen (const char* attachment_name)
+void AttachmentRegistry::Unregister (const char* name)
 {
-  impl->RemoveScreen (attachment_name);
+  AttachmentRegistrySingleton::Instance ().Unregister (name);
 }
 
-void EngineAttachments::RemoveAllScreens ()
+void AttachmentRegistry::UnregisterAllCore (const std::type_info& type)
 {
-  impl->RemoveAllScreens ();
+  AttachmentRegistrySingleton::Instance ().UnregisterAll (type);
 }
 
-render::Screen* EngineAttachments::FindScreen (const char* attachment_name) const
+detail::IBasicAttachment* AttachmentRegistry::FindCore (const char* name, const std::type_info& type, bool raise_exception)
 {
-  return impl->FindScreen (attachment_name);
+  return AttachmentRegistrySingleton::Instance ().Find (name, type, raise_exception);
 }
 
-EngineAttachments::ScreenIterator EngineAttachments::CreateScreenIterator () const
+void AttachmentRegistry::AttachCore
+ (const std::type_info&             type,
+  IBasicAttachmentRegistryListener* listener,
+  AttachmentRegistryAttachMode      mode)
 {
-  return impl->CreateScreenIterator ();
+  AttachmentRegistrySingleton::Instance ().Attach (type, listener, mode);
 }
 
-/*
-    Работа со слушателями
-*/
-
-void EngineAttachments::SetListener (const char* attachment_name, scene_graph::Listener& listener)
+void AttachmentRegistry::DetachCore
+ (const std::type_info&             type,
+  IBasicAttachmentRegistryListener* listener,
+  AttachmentRegistryAttachMode      mode)
 {
-  impl->SetListener (attachment_name, listener);
-}
-
-void EngineAttachments::RemoveListener (const char* attachment_name)
-{
-  impl->RemoveListener (attachment_name);
-}
-
-void EngineAttachments::RemoveAllListeners ()
-{
-  impl->RemoveAllListeners ();
-}
-
-scene_graph::Listener* EngineAttachments::FindListener (const char* attachment_name) const
-{
-  return impl->FindListener (attachment_name);
-}
-
-EngineAttachments::ListenerIterator EngineAttachments::CreateListenerIterator () const
-{
-  return impl->CreateListenerIterator ();
-}
-
-/*
-    Работа с устройствами ввода
-*/
-
-void EngineAttachments::SetInputHandler (const char* attachment_name, const InputHandler& input_handler)
-{
-  impl->SetInputHandler (attachment_name, input_handler);
-}
-
-void EngineAttachments::RemoveInputHandler (const char* attachment_name)
-{
-  impl->RemoveInputHandler (attachment_name);
-}
-
-void EngineAttachments::RemoveAllInputHandlers ()
-{
-  impl->RemoveAllInputHandlers ();
-}
-
-const EngineAttachments::InputHandler* EngineAttachments::FindInputHandler (const char* attachment_name) const
-{
-  return impl->FindInputHandler (attachment_name);
-}
-
-EngineAttachments::InputHandlerIterator EngineAttachments::CreateInputHandlerIterator () const
-{
-  return impl->CreateInputHandlerIterator ();
-}
-
-/*
-    Работа со слушателями событий
-*/
-
-void EngineAttachments::Attach (IEngineEventListener* listener)
-{
-  impl->Attach (listener);
-}
-
-void EngineAttachments::Detach (IEngineEventListener* listener)
-{
-  impl->Detach (listener);
-}
-
-/*
-    Обмен
-*/
-
-void EngineAttachments::Swap (EngineAttachments& attachments)
-{
-  stl::swap (impl, attachments.impl);
-}
-
-namespace client
-{
-
-/*
-    Обмен
-*/
-
-void swap (EngineAttachments& attachments1, EngineAttachments& attachments2)
-{
-  attachments1.Swap (attachments2);
-}
-
+  AttachmentRegistrySingleton::Instance ().Detach (type, listener, mode);
 }

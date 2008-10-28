@@ -1,0 +1,19 @@
+Results of subsystem_manager_test:
+engine.SubsystemManager1: Start subsystems...
+Starting subsystem 'Subsystem22', value='4'
+engine.SubsystemManager1: Add subsystem 'Subsystem22'
+Starting subsystem 'Subsystem12', value='2'
+engine.SubsystemManager1: Add subsystem 'Subsystem12'
+Starting subsystem 'Subsystem21', value='3'
+engine.SubsystemManager1: Add subsystem 'Subsystem01'
+Starting subsystem 'Subsystem11', value='1'
+engine.SubsystemManager1: Add subsystem 'Subsystem11'
+engine.SubsystemManager1: Subsystems successfully started
+engine.SubsystemManager1: data/configuration.xml(1): warning: not yet implement. Encoding='windows-1251'
+Engine subsystems count is 4
+Remove subsystems by mask
+engine.SubsystemManager1: Remove susbsystem 'Subsystem22'
+Remove all subsystems
+engine.SubsystemManager1: Remove susbsystem 'Subsystem11'
+engine.SubsystemManager1: Remove susbsystem 'Subsystem01'
+engine.SubsystemManager1: Remove susbsystem 'Subsystem12'
