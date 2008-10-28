@@ -53,6 +53,14 @@ void log_handler (const char* log_name, const char* message)
   printf ("%s: %s\n", log_name, message);
 }
 
+void dump (const SubsystemManager& manager)
+{
+  printf ("Subsystems count is %u\n", manager.SubsystemsCount ());
+  
+  for (size_t i=0; i<manager.SubsystemsCount (); i++)
+    printf ("  #%u: '%s'\n", i+1, manager.Subsystem (i).Name ());
+}
+
 int main ()
 {
   printf ("Results of subsystem_manager_test:\n");
@@ -75,7 +83,7 @@ int main ()
 
     manager.Start (CONFIGURATION_FILE_NAME);
 
-    printf ("Engine subsystems count is %u\n", manager.SubsystemsCount ());
+    dump (manager);
     
     printf ("Remove subsystems by mask\n");
     
