@@ -195,6 +195,8 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
         CFStringGetBytes (char_code, char_code_range, kCFStringEncodingUTF32, '?', false, (UInt8*)&context.char_code,
                           sizeof (wchar_t), 0);
 
+        CFRelease (char_code);
+
         window_impl->Notify (window_handle, WindowEvent_OnChar, context);
 
         break;
@@ -580,6 +582,8 @@ void Platform::DestroyWindow (window_t handle)
 
 void Platform::SetWindowTitle (window_t handle, const wchar_t* title)
 {
+  CFStringRef new_title = 0;
+
   try
   {
     if (!title)
@@ -602,30 +606,31 @@ void Platform::SetWindowTitle (window_t handle, const wchar_t* title)
       else                       title_encoding = kCFStringEncodingUTF16BE;
     }
 
-    CFStringRef new_title = CFStringCreateWithBytes (0, (UInt8*)title, xtl::xstrlen (title) * sizeof (wchar_t),
-                                                     title_encoding, false);
+    new_title = CFStringCreateWithBytes (0, (UInt8*)title, xtl::xstrlen (title) * sizeof (wchar_t),
+                                         title_encoding, false);
 
     if (!new_title)
       throw xtl::format_operation_exception ("", "Can't create string with new title, CFStringCreateWithCharacters error");
 
     check_window_manager_error (SetWindowTitleWithCFString ((WindowRef)handle, new_title), "::SetWindowTitleWithCFString",
                                 "Can't set window title");
-
-    CFRelease (new_title);
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("syslib::CarbonPlatform::SetWindowTitle");
+    CFRelease (new_title);
     throw;
   }
+
+  CFRelease (new_title);
 }
 
 void Platform::GetWindowTitle (window_t handle, size_t buffer_size_in_chars, wchar_t* buffer)
 {
+  CFStringRef window_title;
+
   try
   {
-    CFStringRef window_title;
-
     check_window_manager_error (CopyWindowTitleAsCFString ((WindowRef)handle, &window_title), "::CopyWindowTitleAsCFString",
                                 "Can't get window title");
 
@@ -639,8 +644,11 @@ void Platform::GetWindowTitle (window_t handle, size_t buffer_size_in_chars, wch
   catch (xtl::exception& exception)
   {
     exception.touch ("syslib::CarbonPlatform::GetWindowTitle");
+    CFRelease (window_title);
     throw;
   }
+
+  CFRelease (window_title);
 }
 
 /*
