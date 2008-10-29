@@ -26,11 +26,11 @@ void input_event_handler (const char* event)
 int main ()
 {
   printf ("Results of window_driver1_test:\n");
-  
+
   try
   {
     Window window (WindowStyle_Overlapped, 400, 300);
-    
+
     window.SetTitle ("Test window");
 
     WindowDriver::RegisterDevice (window);
@@ -55,10 +55,10 @@ int main ()
 
     window.RegisterEventHandler (WindowEvent_OnClose, &on_window_close);
 
-    Application::Run ();        
+    Application::Run ();
 
-    return Application::GetExitCode ();    
-  }  
+    return Application::GetExitCode ();
+  }
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());

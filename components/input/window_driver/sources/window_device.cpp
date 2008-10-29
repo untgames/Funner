@@ -126,19 +126,19 @@ void Device::SetProperty (const char* name, float value)
     autocenter_cursor = value != 0;
     return;
   }
-  
+
   if (!xstrcmp (CURSOR_SENSITIVITY, name))
   {
     cursor_sensitivity = value;
     return;
   }
-  
+
   if (!xstrcmp (VERTICAL_WHEEL_SENSITIVITY, name))
   {
     vertical_wheel_sensitivity = value;
     return;
   }
-  
+
   if (!xstrcmp (HORISONTAL_WHEEL_SENSITIVITY, name))
   {
     horisontal_wheel_sensitivity = value;
@@ -152,11 +152,11 @@ float Device::GetProperty (const char* name)
 {
   if (!xstrcmp (AUTOCENTER_CURSOR, name))
   {
-    if (autocenter_cursor) 
+    if (autocenter_cursor)
       return 1.f;
     return 0.f;
   }
-  
+
   if (!xstrcmp (CURSOR_SENSITIVITY, name))
     return cursor_sensitivity;
 
@@ -180,29 +180,6 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
 
   switch (event)
   {
-    case WindowEvent_OnLeftButtonDoubleClick:
-    case WindowEvent_OnLeftButtonDown:
-    case WindowEvent_OnLeftButtonUp:
-    case WindowEvent_OnRightButtonDoubleClick:
-    case WindowEvent_OnRightButtonDown:
-    case WindowEvent_OnRightButtonUp:
-    case WindowEvent_OnMiddleButtonDoubleClick:
-    case WindowEvent_OnMiddleButtonDown:
-    case WindowEvent_OnMiddleButtonUp:
-    case WindowEvent_OnXButton1DoubleClick:
-    case WindowEvent_OnXButton1Down:
-    case WindowEvent_OnXButton1Up:
-    case WindowEvent_OnXButton2DoubleClick:
-    case WindowEvent_OnXButton2Down:
-    case WindowEvent_OnXButton2Up:
-      window.SetCursorPosition (window_event_context.cursor_position.x, window_event_context.cursor_position.y);
-      break;
-    default:
-      break;
-  }
-
-  switch (event)
-  {
     case WindowEvent_OnMouseMove:
     {
       if (x_cursor_pos == window_event_context.cursor_position.x && y_cursor_pos == window_event_context.cursor_position.y)
@@ -210,7 +187,7 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
 
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s at %u %u", CURSOR_AXIS_NAME, window_event_context.cursor_position.x, window_event_context.cursor_position.y);
       signals (message);
-      
+
       Rect client_rect = window.ClientRect ();
 
       size_t client_rect_width  = client_rect.right - client_rect.left;
@@ -266,7 +243,7 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
     case WindowEvent_OnMouseVerticalWheel:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY delta %f", WHEEL_AXIS_NAME, window_event_context.mouse_vertical_wheel_delta * vertical_wheel_sensitivity);
       signals (message);
-       
+
       if (window_event_context.mouse_vertical_wheel_delta > 0)
       {
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sYUp down", WHEEL_AXIS_NAME);
@@ -287,7 +264,7 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
     case WindowEvent_OnMouseHorisontalWheel:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX delta %f", WHEEL_AXIS_NAME, window_event_context.mouse_horisontal_wheel_delta * horisontal_wheel_sensitivity);
       signals (message);
-       
+
       if (window_event_context.mouse_horisontal_wheel_delta > 0)
       {
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sXRight down", WHEEL_AXIS_NAME);
