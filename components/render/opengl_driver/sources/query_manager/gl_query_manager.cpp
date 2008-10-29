@@ -12,7 +12,7 @@ namespace
 
 class QueryManagerState: public IStageState
 {
-  public:  
+  public:
 ///Конструктор
     QueryManagerState (QueryManagerState* in_main_state = 0) : main_state (in_main_state) {}
 
@@ -44,14 +44,14 @@ class QueryManagerState: public IStageState
       if (main_state)
         Copy (*main_state, mask);
     }
-    
+
 ///Восстановление состояния
     void Apply (const StateBlockMask& mask)
     {
       if (main_state)
         main_state->Copy (*this, mask);
     }
-    
+
   private:
 ///Копирование состояния
     void Copy (QueryManagerState& source, const StateBlockMask& mask)
@@ -86,7 +86,7 @@ struct QueryManager::Impl: public ContextObject, public QueryManagerState
     Impl (const ContextManager& manager) : ContextObject (manager)
     {
       SetContextCacheValue (CacheEntry_IsInQueryRanges, 0);
-    }    
+    }
 
 ///Создание предикатов
     IPredicate* CreatePredicate ()
@@ -97,27 +97,27 @@ struct QueryManager::Impl: public ContextObject, public QueryManagerState
 
       if (!GetCaps ().has_arb_occlusion_query)
         return new NullPredicate;
-        
+
         //установка текущего контекста
 
-      MakeContextCurrent ();        
+      MakeContextCurrent ();
 
         //получение количества битов в результате запроса
 
-      int query_counter_bits = 0;
+      GLint query_counter_bits = 0;
 
-      glGetQueryiv (GL_SAMPLES_PASSED, GL_QUERY_COUNTER_BITS, &query_counter_bits);     
+      glGetQueryiv (GL_SAMPLES_PASSED, GL_QUERY_COUNTER_BITS, &query_counter_bits);
 
       CheckErrors (METHOD_NAME);
-      
+
         //в случае невозможности получения корректного результата - создаём эмуляцию
 
       if (!query_counter_bits)
         return new NullPredicate;
-        
+
         //создание предиката
 
-      return new AsyncPredicate (GetContextManager ());      
+      return new AsyncPredicate (GetContextManager ());
     }
 };
 

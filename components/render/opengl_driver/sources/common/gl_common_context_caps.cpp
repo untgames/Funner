@@ -17,7 +17,7 @@ enum GlVersion
   GlVersion_1_5,
   GlVersion_2_0,
   GlVersion_2_1,
-  
+
   GlVersion_Num
 };
 
@@ -67,7 +67,7 @@ class StandartExtensionSet
 
       versions [GlVersion_2_1] |= versions [GlVersion_2_0];
 
-      versions [GlVersion_2_1].SetGroup ("GL_ARB_pixel_buffer_object GL_EXT_texture_sRGB", true);      
+      versions [GlVersion_2_1].SetGroup ("GL_ARB_pixel_buffer_object GL_EXT_texture_sRGB", true);
     }
 };
 
@@ -96,9 +96,9 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                    ARB_texture_border_clamp       = "GL_ARB_texture_border_clamp",
                    ARB_texture_compression        = "GL_ARB_texture_compression",
                    ARB_texture_cube_map           = "GL_ARB_texture_cube_map",
-                   ARB_texture_mirrored_repeat    = "GL_ARB_texture_mirrored_repeat",                   
+                   ARB_texture_mirrored_repeat    = "GL_ARB_texture_mirrored_repeat",
                    ARB_texture_non_power_of_two   = "GL_ARB_texture_non_power_of_two",
-                   ARB_texture_rectangle          = "GL_ARB_texture_rectangle",                   
+                   ARB_texture_rectangle          = "GL_ARB_texture_rectangle",
                    ARB_transpose_matrix           = "GL_ARB_transpose_matrix",
                    ARB_vertex_buffer_object       = "GL_ARB_vertex_buffer_object",
                    ARB_vertex_shader              = "GL_ARB_vertex_shader",
@@ -125,8 +125,8 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                                                "GL_VERSION_2_0", "GL_VERSION_2_1"};
 
     //получение маски доступных расширений
-    
-  ExtensionSet ext = available_extension_set;  
+
+  ExtensionSet ext = available_extension_set;
 
   const StandartExtensionSet& std_extension_set = StandartExtensionSet::Instance ();
 
@@ -149,7 +149,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_arb_texture_cube_map           = ext.Get (ARB_texture_cube_map) || ext.Get (EXT_texture_cube_map);
   has_arb_texture_mirrored_repeat    = ext.Get (ARB_texture_mirrored_repeat);
   has_arb_texture_non_power_of_two   = ext.Get (ARB_texture_non_power_of_two);
-  has_arb_texture_rectangle          = ext.Get (ARB_texture_rectangle) || ext.Get (NV_texture_rectangle);    
+  has_arb_texture_rectangle          = ext.Get (ARB_texture_rectangle) || ext.Get (NV_texture_rectangle);
   has_arb_transpose_matrix           = ext.Get (ARB_transpose_matrix);
   has_arb_vertex_buffer_object       = ext.Get (ARB_vertex_buffer_object);
   has_arb_vertex_shader              = ext.Get (ARB_vertex_shader);
@@ -167,10 +167,10 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ext_texture_filter_anisotropic = ext.Get (EXT_texture_filter_anisotropic);
   has_ext_texture_lod_bias           = ext.Get (EXT_texture_lod_bias);
   has_ext_texture3d                  = ext.Get (EXT_texture3D);
-  has_sgis_generate_mipmap           = ext.Get (SGIS_generate_mipmap);  
+  has_sgis_generate_mipmap           = ext.Get (SGIS_generate_mipmap);
   has_sgis_texture_lod               = ext.Get (SGIS_texture_lod);
 
-  glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);  
+  glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
 
   if (has_arb_texture_rectangle) glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, (GLint*)&max_rectangle_texture_size);
   if (has_arb_texture_cube_map)  glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
@@ -178,7 +178,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
 
   if (has_ext_texture_filter_anisotropic) glGetIntegerv (GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, (GLint*)&max_anisotropy);
   else                                    max_anisotropy = 1;
-  
+
   if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
   else                      texture_units_count = 1;
 
@@ -208,5 +208,5 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   glUniformMatrix2fv_fn        = glUniformMatrix2fv ? glUniformMatrix2fv : glUniformMatrix2fvARB;
   glUniformMatrix3fv_fn        = glUniformMatrix3fv ? glUniformMatrix3fv : glUniformMatrix3fvARB;
   glUniformMatrix4fv_fn        = glUniformMatrix4fv ? glUniformMatrix4fv : glUniformMatrix4fvARB;
-  glUseProgram_fn              = glUseProgram ? glUseProgram : glUseProgramObjectARB;
+  glUseProgram_fn              = glUseProgram ? glUseProgram : (PFNGLUSEPROGRAMPROC)glUseProgramObjectARB;
 }

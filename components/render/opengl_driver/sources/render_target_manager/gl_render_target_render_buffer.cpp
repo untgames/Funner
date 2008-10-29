@@ -20,16 +20,16 @@ struct RenderBufferTempState
   public:
     RenderBufferTempState (const ContextManager& manager) : context_manager (manager)
     {
-        //сохранение состояния параметров пофрагментных операций          
-      
+        //сохранение состояния параметров пофрагментных операций
+
       for (size_t i=0; i<MODE_NAMES_COUNT; i++)
-        mode_states [i] = glIsEnabled (MODE_NAMES [i]) != 0;                
+        mode_states [i] = glIsEnabled (MODE_NAMES [i]) != 0;
 
       glGetIntegerv (GL_COLOR_WRITEMASK, color_write_mask);
       glGetIntegerv (GL_STENCIL_WRITEMASK, &stencil_write_mask);
       glGetIntegerv (GL_DEPTH_WRITEMASK, &depth_write_mask);
 
-        //отключение пофрагментных операций      
+        //отключение пофрагментных операций
 
       for (size_t i=0; i<MODE_NAMES_COUNT; i++)
         glDisable (MODE_NAMES [i]);
@@ -37,14 +37,14 @@ struct RenderBufferTempState
       glColorMask   (1, 1, 1, 1);
       glDepthMask   (GL_TRUE);
       glStencilMask (~0);
-      
-      context_manager.ClearErrors ();      
+
+      context_manager.ClearErrors ();
     }
-    
+
     ~RenderBufferTempState ()
     {
         //восстановление состояния параметров пофрагментных операций
-        
+
       for (size_t i=0; i<MODE_NAMES_COUNT; i++)
         if (mode_states [i]) glEnable (MODE_NAMES [i]);
         else                 glDisable (MODE_NAMES [i]);
@@ -54,14 +54,14 @@ struct RenderBufferTempState
       glStencilMask (stencil_write_mask);
 
       context_manager.ClearErrors ();
-    }    
+    }
 
   private:
     ContextManager context_manager;
     bool           mode_states [MODE_NAMES_COUNT];
-    int            color_write_mask [4];
-    int            stencil_write_mask;
-    int            depth_write_mask;
+    GLint          color_write_mask [4];
+    GLint          stencil_write_mask;
+    GLint          depth_write_mask;
 };
 
 /*
@@ -72,7 +72,7 @@ struct Depth24Stencil8
 {
   size_t depth_component : 24;
   size_t stencil_index : 8;
-  
+
   void Set (size_t in_depth_component, unsigned char in_stencil_index)
   {
     depth_component = in_depth_component >> 8;
@@ -130,11 +130,11 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
   static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::RenderBuffer";
 
     //проверка корректности дескриптора
-    
+
   switch (desc.format)
   {
     case PixelFormat_RGB8:
-    case PixelFormat_RGBA8:   
+    case PixelFormat_RGBA8:
     case PixelFormat_L8:
     case PixelFormat_A8:
     case PixelFormat_LA8:
@@ -154,10 +154,10 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.format", desc.format);
       break;
-  }    
+  }
 
   static size_t BAD_BIND_FLAGS = ~(BindFlag_RenderTarget | BindFlag_DepthStencil);
-  
+
   if (desc.bind_flags & BAD_BIND_FLAGS)
     throw xtl::make_argument_exception (METHOD_NAME, "Unsupported bindable flags desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
 
@@ -172,8 +172,8 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
       throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", desc.access_flags);
       break;
   }
-  
-  switch (desc.usage_mode)  
+
+  switch (desc.usage_mode)
   {
     case UsageMode_Default:
     case UsageMode_Static:
@@ -184,7 +184,7 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
       throw xtl::make_argument_exception (METHOD_NAME, "desc.usage_mode", desc.usage_mode);
       break;
   }
-  
+
   switch (desc.dimension)
   {
     case TextureDimension_2D:
@@ -198,7 +198,7 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
       throw xtl::make_argument_exception (METHOD_NAME, "desc.dimension", desc.dimension);
       break;
   }
-  
+
   if (desc.generate_mips_enable)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Automatic mip-map generation for render-buffers not supported");
 }
@@ -240,7 +240,7 @@ GLenum get_glformat (PixelFormat format, const char* source, const char* param)
     case PixelFormat_LA8:   return GL_LUMINANCE_ALPHA;
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
-    case PixelFormat_DXT5:    
+    case PixelFormat_DXT5:
     case PixelFormat_D16:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:
@@ -258,10 +258,10 @@ GLenum get_glformat (PixelFormat format, const char* source, const char* param)
 void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::SetData";
-  
+
   if (!(desc.access_flags & AccessFlag_Write))
     throw xtl::format_operation_exception (METHOD_NAME, "Can't set render buffer data (no AccessFlag_Write in desc.access_flags)");
-  
+
   if (layer)
     throw xtl::make_range_exception (METHOD_NAME, "layer", layer, 1);
 
@@ -270,29 +270,29 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
   if (!width || !height)
     return;
-    
+
   if (!buffer)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");    
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
 
     //установка буфера в контекст OpenGL
 
   Bind ();
-  
+
     //сохранение текущего состояния
-  
+
   RenderBufferTempState temp_state (GetContextManager ());
 
     //проверка наличия расширения GL_ARB_window_pos либо версии OpenGL не ниже 1.4
 
   if (!GetCaps ().has_arb_window_pos)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can not set image at position (%u;%u) (GL_ARB_window_pos not supported)", x, y);
-    
+
     //установка позиции растра
 
   if      (glWindowPos2iARB) glWindowPos2iARB (x, y);
   else if (glWindowPos2i)    glWindowPos2i    (x, y);
   else                       return;
-  
+
     //настройка параметров расположения данных в буфере
 
   glPixelStorei (GL_UNPACK_ROW_LENGTH,  0); //длина строки в пикселях
@@ -306,12 +306,12 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
     {
         //преобразование формата пикселей
 
-      GLenum format = get_glformat (source_format, METHOD_NAME, "source_format"); 
+      GLenum format = get_glformat (source_format, METHOD_NAME, "source_format");
 
-        //копирование      
+        //копирование
 
       glDrawPixels (width, height, format, GL_UNSIGNED_BYTE, buffer);
-      
+
       break;
     }
     case RenderTargetType_DepthStencil:
@@ -335,7 +335,7 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
         case PixelFormat_D24X8:
         {
           xtl::uninitialized_storage<size_t> depth_buffer (width * height);
-          
+
           size_t*       dst_pixel = depth_buffer.data ();
           const size_t* src_pixel = static_cast<const size_t*> (buffer);
 
@@ -350,7 +350,7 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
         {
             //копирование может быть произведено двумя способами: при помощи расширения EXT_packed_depth_stencil,
             //либо посредством разделения переданного буфера на 2: буфер глубины и буфер трафарета
-            
+
           if (GetCaps ().has_ext_packed_depth_stencil)
           {
             glDrawPixels (width, height, GL_DEPTH_STENCIL_EXT, GL_UNSIGNED_INT_24_8_EXT, buffer);
@@ -360,12 +360,12 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
               //разделение данных буфера на компоненты глубины и трафарета
 
             xtl::uninitialized_storage<size_t>        depth_buffer (width * height);
-            xtl::uninitialized_storage<unsigned char> stencil_buffer (width * height);    
-            
+            xtl::uninitialized_storage<unsigned char> stencil_buffer (width * height);
+
             const Depth24Stencil8* src_pixel         = static_cast<const Depth24Stencil8*> (buffer);
             size_t*                dst_depth_pixel   = depth_buffer.data ();
             unsigned char*         dst_stencil_pixel = stencil_buffer.data ();
-      
+
             for (size_t count=width*height; count--; src_pixel++, dst_depth_pixel++, dst_stencil_pixel++)
             {
               *dst_depth_pixel   = (size_t)(src_pixel->depth_component) << 8;
@@ -396,12 +396,12 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
         default:
           throw xtl::make_argument_exception (METHOD_NAME, "source_format", source_format);
           return;
-      }      
+      }
 
       break;
     }
     default: break;
-  }    
+  }
 
     //проверка состояния OpenGL
 
@@ -417,20 +417,20 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
   if (layer)
     throw xtl::make_range_exception (METHOD_NAME, "layer", layer, 1);
-    
+
   if (mip_level)
-    throw xtl::make_range_exception (METHOD_NAME, "mip_level", mip_level, 1);        
+    throw xtl::make_range_exception (METHOD_NAME, "mip_level", mip_level, 1);
 
   if (!width || !height)
     return;
 
   if (!buffer)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");    
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
 
     //установка буфера в контекст OpenGL
 
   Bind ();
-  
+
     //настройка параметров расположения данных в буфере
 
   glPixelStorei (GL_PACK_ROW_LENGTH,  0); //размер строки в пикселях
@@ -444,12 +444,12 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
     {
         //преобразование формата пикселей
 
-      GLenum format = get_glformat (target_format, METHOD_NAME, "target_format");  
+      GLenum format = get_glformat (target_format, METHOD_NAME, "target_format");
 
         //копирование
 
       glReadPixels (x, y, width, height, format, GL_UNSIGNED_BYTE, buffer);
-      
+
       break;
     }
     case RenderTargetType_DepthStencil:
@@ -476,7 +476,7 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
         {
             //копирование может быть произведено двумя способами: при помощи расширения EXT_packed_depth_stencil,
             //либо посредством разделения переданного буфера на 2: буфер глубины и буфер трафарета
-            
+
           if (GetCaps ().has_ext_packed_depth_stencil)
           {
             glReadPixels (x, y, width, height, GL_DEPTH_STENCIL_EXT, GL_UNSIGNED_INT_24_8_EXT, buffer);
@@ -521,12 +521,12 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
         default:
           throw xtl::make_argument_exception (METHOD_NAME, "target_format", target_format);
           return;
-      }      
+      }
 
       break;
     }
     default: break;
-  }  
+  }
 
     //проверка состояния OpenGL
 

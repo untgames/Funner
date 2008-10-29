@@ -43,27 +43,27 @@ GlslBindableProgram::GlslBindableProgram
 
   parameters.reserve (parameters_layout->GetParametersCount ());
   groups.reserve     (parameters_layout->GetGroupsCount ());
-  
+
     //получение таблицы расширенных настроек контекста
-  
-  const ContextCaps& caps = GetCaps ();  
+
+  const ContextCaps& caps = GetCaps ();
 
     //сделать копирование окружения программы!!!!!!!!!
     //либо оповещение GlslProgram об изменении параметров
 
     //преобразование параметров
-    
+
   GLhandleARB handle = program.GetHandle ();
 
   for (size_t i=0, count=parameters_layout->GetGroupsCount (); i<count; i++)
   {
     size_t start_parameters_count = parameters.size ();
-    
-    const ProgramParameterGroup& src_group = parameters_layout->GetGroup (i);        
+
+    const ProgramParameterGroup& src_group = parameters_layout->GetGroup (i);
 
     for (size_t j=0; j<src_group.count; j++)
     {
-      const ProgramParameter& src_parameter = src_group.parameters [j];            
+      const ProgramParameter& src_parameter = src_group.parameters [j];
       Parameter               dst_parameter;
 
       dst_parameter.location = caps.glGetUniformLocation_fn (handle, src_parameter.name);
@@ -74,15 +74,15 @@ GlslBindableProgram::GlslBindableProgram
       dst_parameter.type   = src_parameter.type;
       dst_parameter.count  = src_parameter.count;
       dst_parameter.offset = src_parameter.offset;
-      
+
         //добавление нового параметра
 
       parameters.push_back (dst_parameter);
     }
 
       //добавление новой группы
-      
-    Group dst_group;      
+
+    Group dst_group;
 
     dst_group.slot       = src_group.slot;
     dst_group.data_hash  = 0;
@@ -103,7 +103,7 @@ GlslBindableProgram::GlslBindableProgram
 void GlslBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::GlslBindableProgram::Bind";
-  
+
     //проверка корректности аргументов
 
   if (!constant_buffers)
@@ -111,7 +111,7 @@ void GlslBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
     //установка текущего контекста
 
-  MakeContextCurrent ();    
+  MakeContextCurrent ();
 
     //получение данных из кэша контекста
 
@@ -142,7 +142,7 @@ void GlslBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       //обновление хэша параметров группы
 
     group.data_hash = constant_buffers [group.slot]->GetDataHash ();
-    
+
       //установка параметров
 
     char* buffer_base = (char*)constant_buffers [group.slot]->GetDataPointer ();
@@ -154,13 +154,13 @@ void GlslBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
       switch (parameter.type)
       {
-        case ProgramParameterType_Int:      caps.glUniform1iv_fn       (parameter.location, parameter.count, (int*)parameter_data);      break;
+        case ProgramParameterType_Int:      caps.glUniform1iv_fn       (parameter.location, parameter.count, (GLint*)parameter_data);      break;
         case ProgramParameterType_Float:    caps.glUniform1fv_fn       (parameter.location, parameter.count, (float*)parameter_data);    break;
-        case ProgramParameterType_Int2:     caps.glUniform2iv_fn       (parameter.location, parameter.count, (int*)parameter_data);      break;
+        case ProgramParameterType_Int2:     caps.glUniform2iv_fn       (parameter.location, parameter.count, (GLint*)parameter_data);      break;
         case ProgramParameterType_Float2:   caps.glUniform2fv_fn       (parameter.location, parameter.count, (float*)parameter_data);    break;
-        case ProgramParameterType_Int3:     caps.glUniform3iv_fn       (parameter.location, parameter.count, (int*)parameter_data);      break;
+        case ProgramParameterType_Int3:     caps.glUniform3iv_fn       (parameter.location, parameter.count, (GLint*)parameter_data);      break;
         case ProgramParameterType_Float3:   caps.glUniform3fv_fn       (parameter.location, parameter.count, (float*)parameter_data);    break;
-        case ProgramParameterType_Int4:     caps.glUniform4iv_fn       (parameter.location, parameter.count, (int*)parameter_data);      break;
+        case ProgramParameterType_Int4:     caps.glUniform4iv_fn       (parameter.location, parameter.count, (GLint*)parameter_data);      break;
         case ProgramParameterType_Float4:   caps.glUniform4fv_fn       (parameter.location, parameter.count, (float*)parameter_data);    break;
         case ProgramParameterType_Float2x2: caps.glUniformMatrix2fv_fn (parameter.location, parameter.count, 0, (float*)parameter_data); break;
         case ProgramParameterType_Float3x3: caps.glUniformMatrix3fv_fn (parameter.location, parameter.count, 0, (float*)parameter_data); break;

@@ -19,7 +19,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
       //установка текущего контекста
 
     MakeContextCurrent ();
-    
+
       //создание программы
 
     if (glCreateProgram) handle = glCreateProgram ();
@@ -35,7 +35,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
     for (size_t i=0; i<shaders_count; i++)
     {
       ShaderPtr shader = cast_object<GlslShader> (*this, in_shaders [i], METHOD_NAME, "shaders");
-      
+
       if (!shader)
         throw xtl::format_exception<xtl::null_argument_exception> (METHOD_NAME, "shaders[%u]", i);
 
@@ -44,20 +44,20 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
 
       shaders.push_back (shader);
     }
-    
+
       //линковка программы
 
-    int link_status = 0;
+    GLint link_status = 0;
 
     if (glLinkProgram) glLinkProgram    (handle);
     else               glLinkProgramARB (handle);
-    
+
       //протоколирование ошибок
 
     if (glGetProgramiv) glGetProgramiv            (handle, GL_LINK_STATUS, &link_status);
     else                glGetObjectParameterivARB (handle, GL_LINK_STATUS, &link_status);
 
-    stl::string log_buffer;   
+    stl::string log_buffer;
 
     GetProgramLog (log_buffer);
     error_log     (log_buffer.c_str ());
@@ -79,7 +79,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
       //проверка ошибок
 
     if (!link_status)
-      RaiseError (METHOD_NAME);        
+      RaiseError (METHOD_NAME);
 
     CheckErrors (METHOD_NAME);
   }
@@ -120,11 +120,11 @@ void GlslProgram::DeleteProgram ()
 {
   if (!handle)
     return;
-    
+
     //установка текущего контекста
 
   MakeContextCurrent ();
-  
+
     //отсоединение шейдеров от программы
 
   for (ShaderArray::iterator iter=shaders.begin (), end=shaders.end (); iter!=end; ++iter)
@@ -132,7 +132,7 @@ void GlslProgram::DeleteProgram ()
     if (glDetachShader) glDetachShader    (handle, (*iter)->GetHandle ());
     else                glDetachObjectARB (handle, (*iter)->GetHandle ());
   }
-  
+
     //удаление программы
 
   if (glDeleteProgram) glDeleteProgram   (handle);
@@ -152,24 +152,24 @@ void GlslProgram::GetProgramLog (stl::string& log_buffer)
     //очистка буфера
 
   log_buffer.clear ();
-  
+
     //установка текущего контекста
 
   MakeContextCurrent ();
-  
+
     //получение размера строки состояния программы
-  
-  int log_length = 0;  
+
+  GLint log_length = 0;
 
   if (glGetProgramiv) glGetProgramiv            (handle, GL_INFO_LOG_LENGTH, &log_length);
   else                glGetObjectParameterivARB (handle, GL_INFO_LOG_LENGTH, &log_length);
 
   if (!log_length)
     return;
-    
+
     //чтение строки состояния
 
-  int getted_log_size = 0;
+  GLsizei getted_log_size = 0;
 
   log_buffer.resize (log_length - 1);
 
