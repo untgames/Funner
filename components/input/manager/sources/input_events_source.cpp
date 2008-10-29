@@ -39,10 +39,10 @@ struct EventsSource::Impl : public xtl::reference_counter
 ///Обработчик сообщений от устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void DeviceEventHandler (const char* event);
-  
+
   private:
-    typedef signal<void (const char*)> DeviceSignal;
-    typedef com_ptr<IDevice>           DevicePtr;
+    typedef xtl::signal<void (const char*)> DeviceSignal;
+    typedef com_ptr<IDevice>                DevicePtr;
 
     DeviceSignal         signals;           //сигналы устройства
     DevicePtr            connected_device;  //подключённое устройство
@@ -148,7 +148,7 @@ void EventsSource::Impl::DeviceEventHandler (const char* event)
   {
     //подавление всех исключений
   }
-}  
+}
 
 /*
    Конструксторы / деструктор / присваивание
