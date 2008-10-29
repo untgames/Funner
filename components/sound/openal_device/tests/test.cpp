@@ -48,13 +48,13 @@ template <class T, size_t N>
 void print (const math::vec<T, N>& v)
 {
   printf ("[");
-  
+
   for (size_t i=0; i<N; i++)
   {
     printf (" ");
     print  (v [i]);
   }
-  
+
   printf (" ]");
 }
 
@@ -104,21 +104,21 @@ int main ()
 {
   try
   {
-    xtl::com_ptr<IDevice> sound_system (DriverManager::CreateDevice ("OpenAL", "Generic*", "frequency=192000 min_channels_count=32 max_channels_count=192"), false);
+    xtl::com_ptr<IDevice> sound_system (DriverManager::CreateDevice ("OpenAL", "*", "frequency=192000 min_channels_count=32 max_channels_count=192"), false);
 
     Capabilities   info;
     Listener       listener;
 
     sound_system->SetDebugLog (&log_print);
     sound_system->GetCapabilities (info);
-    
+
 //    sound_system->SetIntegerParam ("al_debug_log", 1);
 
     printf ("Using device %s.\n", sound_system->Name ());
     printf ("Total channels available: %u.\n", info.channels_count);
-    printf ("Supported EAX %u.%u.\n", info.eax_major_version, info.eax_minor_version);
-    printf ("Supported EFX %u.%u.\n", info.efx_major_version, info.efx_minor_version);
-    printf ("Maximum auxilary sends %u.\n", info.max_aux_sends);
+//    printf ("Supported EAX %u.%u.\n", info.eax_major_version, info.eax_minor_version);
+//    printf ("Supported EFX %u.%u.\n", info.efx_major_version, info.efx_minor_version);
+//    printf ("Maximum auxilary sends %u.\n", info.max_aux_sends);
 
     printf ("Distance model is '%s'\n", sound_system->GetStringParam ("al_distance_model"));
 
@@ -131,7 +131,7 @@ int main ()
     sound_system->SetListener (listener);
     sound_system->GetListener (listener);
     dump (listener);
-  
+
     sound_system->GetSource (0, source);
     dump (source);
     source.position     = vec3f(0,0,1);
@@ -151,9 +151,9 @@ int main ()
 
 //    source.gain         = 0.3f;
     sound_system->SetSource (1, source);
-    
+
     SoundSample sample1 (file_name), sample2 (file_name2);
-    
+
     sound_system->SetSample (1, sample2);
 
 //    sound_system->SetSample (0, sample1);
@@ -163,20 +163,20 @@ int main ()
 
     Timer timer1 (bind (&TimerHandler, get_pointer (sound_system), _1), SOURCE_UPDATE_TIME),
           timer2 (bind (&Application::Exit, 0), TEST_WORK_TIME);
-          
+
 //    xtl::auto_connection c = Application::RegisterEventHandler (ApplicationEvent_OnIdle, &idle);
-  
+
     Application::Run ();
   }
   catch (std::exception& exception)
-  {                                               
-    printf ("exception: %s\n",exception.what ()); 
-  }                                               
+  {
+    printf ("exception: %s\n",exception.what ());
+  }
   catch (...)
   {
     printf ("unknown exception\n");
   }
-  
+
   printf ("exit\n");
 
   return Application::GetExitCode ();

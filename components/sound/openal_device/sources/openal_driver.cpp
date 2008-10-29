@@ -20,16 +20,19 @@ class Driver : virtual public IDriver, public xtl::reference_counter
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////    
-    Driver () 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Driver ()
     {
       try
       {
         const char* devices_names = 0;
-        
+
+#ifdef ALC_ALL_DEVICES_SPECIFIER
         if (alcIsExtensionPresent (NULL, "ALC_ENUMERATE_ALL_EXT"))
           devices_names = alcGetString (NULL, ALC_ALL_DEVICES_SPECIFIER);
-        else if (alcIsExtensionPresent (NULL, "ALC_ENUMERATION_EXT"))
+        else
+#endif
+        if (alcIsExtensionPresent (NULL, "ALC_ENUMERATION_EXT"))
           devices_names = alcGetString (NULL, ALC_DEVICE_SPECIFIER);
 
         if (devices_names)
@@ -53,7 +56,7 @@ class Driver : virtual public IDriver, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание драйвера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* GetDescription () 
+    const char* GetDescription ()
     {
       return "sound::low_level::openal::Driver";
     }
@@ -61,7 +64,7 @@ class Driver : virtual public IDriver, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перечисление доступных устройств
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t GetDevicesCount () 
+    size_t GetDevicesCount ()
     {
       return devices.size ();
     }
@@ -129,7 +132,7 @@ class Driver : virtual public IDriver, public xtl::reference_counter
 
 class OpenALComponent
 {
-  public:   
+  public:
     OpenALComponent ()
     {
       DriverManager::RegisterDriver (DRIVER_NAME, xtl::com_ptr<Driver> (new Driver, false).get ());

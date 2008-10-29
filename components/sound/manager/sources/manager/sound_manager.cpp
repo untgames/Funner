@@ -1,17 +1,21 @@
-#include <time.h>
-#include <sound/manager.h>
-#include <sound/device.h>
-#include <sound/driver.h>
 #include <stl/hash_map>
 #include <stl/algorithm>
 #include <stl/stack>
 #include <stl/string>
+
 #include <xtl/intrusive_ptr.h>
 #include <xtl/shared_ptr.h>
 #include <xtl/function.h>
 #include <xtl/signal.h>
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+
+#include <common/time.h>
+
+#include <sound/manager.h>
+#include <sound/device.h>
+#include <sound/driver.h>
+
 #include <media/sound.h>
 #include <media/sound_declaration.h>
 
@@ -45,7 +49,7 @@ struct SoundManagerEmitter
 {
   int               channel_number;               //номер канала проигрывания (-1 - отсечён или не проигрывается)
   float             cur_position;                 //текущая позиция проигрывания в секундах
-  clock_t           play_start_time;              //время начала проигрывания
+  size_t            play_start_time;              //время начала проигрывания
   bool              is_playing;                   //статус проигрывания
   SoundDeclaration* sound_declaration;            //описание звука
   SoundSample       sound_sample;                 //звуковой сэмпл (используется для определения длительности звука)
@@ -89,7 +93,7 @@ struct SoundManager::Impl : public xtl::trackable
       device = DevicePtr (DriverManager::CreateDevice (driver_mask, device_mask, init_string), false);
 
       device->GetCapabilities (capabilities);
-      
+
       for (size_t i = 0; i < capabilities.channels_count; i++)
         free_channels.push (i);
     }
@@ -168,7 +172,7 @@ struct SoundManager::Impl : public xtl::trackable
       }
 
       emitter_iter->second->sound_declaration_gain = emitter_iter->second->source.gain = emitter_iter->second->sound_declaration->Param (SoundParam_Gain);
-            
+
       emitter_iter->second->source.minimum_gain       = emitter_iter->second->sound_declaration->Param (SoundParam_MinimumGain);
       emitter_iter->second->source.maximum_gain       = emitter_iter->second->sound_declaration->Param (SoundParam_MaximumGain);
       emitter_iter->second->source.inner_angle        = emitter_iter->second->sound_declaration->Param (SoundParam_InnerAngle);
@@ -193,7 +197,7 @@ struct SoundManager::Impl : public xtl::trackable
     if (!emitter_iter->second->is_playing || emitter_iter->second->channel_number == -1)
     {
       emitter_iter->second->is_playing = true;
-      
+
       if (!free_channels.empty ())
       {
         size_t channel_to_use = free_channels.top ();
@@ -205,7 +209,7 @@ struct SoundManager::Impl : public xtl::trackable
         emitter_iter->second->channel_number = -1;
     }
 
-    emitter_iter->second->play_start_time = clock ();
+    emitter_iter->second->play_start_time = milliseconds ();
 
     emitter_iter->second->cur_position = offset;
 
@@ -228,9 +232,9 @@ struct SoundManager::Impl : public xtl::trackable
 
     if (emitter_iter->second->is_playing)
     {
-      float offset = (clock () - emitter_iter->second->play_start_time) / (float)CLOCKS_PER_SEC + emitter_iter->second->cur_position;
+      float offset = (milliseconds () - emitter_iter->second->play_start_time) / 1000.f + emitter_iter->second->cur_position;
 
-      if (emitter_iter->second->sound_declaration->Looping ()) 
+      if (emitter_iter->second->sound_declaration->Looping ())
         emitter_iter->second->cur_position = fmod (offset, (float)emitter_iter->second->sound_sample.Duration ());
       else
         emitter_iter->second->cur_position = offset < emitter_iter->second->sound_sample.Duration () ? offset : 0.0f;
@@ -273,7 +277,7 @@ struct SoundManager::Impl : public xtl::trackable
 
     if (emitter_iter->second->is_playing)
     {
-      float offset = (clock () - emitter_iter->second->play_start_time) / (float)CLOCKS_PER_SEC + emitter_iter->second->cur_position;
+      float offset = (milliseconds () - emitter_iter->second->play_start_time) / 1000.f + emitter_iter->second->cur_position;
 
       if (emitter_iter->second->sound_declaration->Looping ()) return fmod (offset, (float)emitter_iter->second->sound_sample.Duration ());
       else                                                     return offset < emitter_iter->second->sound_sample.Duration () ? offset : 0.0f;

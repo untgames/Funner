@@ -9,7 +9,7 @@ using namespace common;
 #endif
 
 //период обновлени€ буферов источника в тиках
-const size_t SOURCE_BUFFERS_UPDATE_TICKS = size_t (1.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY * CLOCKS_PER_SEC);
+const size_t SOURCE_BUFFERS_UPDATE_MILLISECONDS = size_t (1000.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY);
 
 /*
      онструктор / деструктор
@@ -23,19 +23,19 @@ OpenALSource::OpenALSource (OpenALDevice& in_device)
     is_playing (false),
     is_active (false),
     play_time_offset (0),
-    last_buffers_fill_time (clock () - SOURCE_BUFFERS_UPDATE_TICKS),
+    last_buffers_fill_time (milliseconds () - SOURCE_BUFFERS_UPDATE_MILLISECONDS),
     prev_active (0),
     next_active (0)
 {
   alGetError   ();
-  alGenSources (1, &al_source);  
-  
+  alGenSources (1, &al_source);
+
   if (alGetError () != AL_NO_ERROR)
     throw xtl::format_exception<OpenALException> ("sound::low_level::OpenALSource::OpenALSource", "No enough sources");
 }
 
 OpenALSource::~OpenALSource ()
-{ 
+{
   Deactivate ();
 
   try
@@ -55,10 +55,10 @@ OpenALSource::~OpenALSource ()
 */
 
 void OpenALSource::Activate ()
-{  
+{
   if (is_active)
     return;
-    
+
   for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
   {
     try
@@ -69,18 +69,18 @@ void OpenALSource::Activate ()
     {
       for (size_t j=0; j<i; j++)
         device.DeallocateSourceBuffer (al_buffers [j]);
-        
+
       throw;
     }
   }
-    
+
   OpenALSource* first = device.GetFirstActiveSource ();
-  
+
   next_active = first;
-  
+
   if (next_active) next_active->prev_active = this;
 
-  device.SetFirstActiveSource (this);    
+  device.SetFirstActiveSource (this);
 
   is_active = true;
 }
@@ -89,10 +89,10 @@ void OpenALSource::Deactivate ()
 {
   if (!is_active)
     return;
-    
+
   for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
     device.DeallocateSourceBuffer (al_buffers [i]);
-    
+
   if (next_active) next_active->prev_active = prev_active;
   if (prev_active) prev_active->next_active = next_active;
   else             device.SetFirstActiveSource (next_active);
@@ -124,9 +124,9 @@ void OpenALSource::UpdateSampleNotify ()
 */
 
 void OpenALSource::SetSource (const Source& in_source)
-{   
+{
   source = in_source;
-  
+
   UpdateSourceNotify ();
 }
 
@@ -135,7 +135,7 @@ void OpenALSource::SetSource (const Source& in_source)
 */
 
 void OpenALSource::SetSample (const media::SoundSample& sample)
-{   
+{
   static const char* METHOD_NAME = "sound::low_level::OpenALSource::SetSample";
 
   if (!sample.SizeInBytes ())
@@ -147,7 +147,7 @@ void OpenALSource::SetSample (const media::SoundSample& sample)
   try
   {
     if (sample.Frequency () > MAX_SOUND_SAMPLE_RATE)
-      throw xtl::format_not_supported_exception (METHOD_NAME, "Sound sample '%s' has unsupported sample rate=%u. Maximum supported sample rate is %u", 
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Sound sample '%s' has unsupported sample rate=%u. Maximum supported sample rate is %u",
                          sample.Name (), sample.Frequency (), MAX_SOUND_SAMPLE_RATE);
 
     if (sample.BitsPerSample () != 16)
@@ -163,16 +163,16 @@ void OpenALSource::SetSample (const media::SoundSample& sample)
         throw xtl::format_not_supported_exception (METHOD_NAME, "Sound sample '%s' has unsupported channels_count=%u", sample.Name (), sample.Channels ());
         break;
     }
-    
+
     sound_sample = sample;
-    
+
     UpdateSampleNotify ();
   }
   catch (std::exception& exception)
-  {                                               
+  {
     device.DebugPrintf ("Exception at load sample '%s': %s", sample.Name (), exception.what ());
     Stop ();
-  }                                               
+  }
   catch (...)
   {
     device.DebugPrintf ("Unknown exception at load sample '%s'", sample.Name ());
@@ -181,17 +181,17 @@ void OpenALSource::SetSample (const media::SoundSample& sample)
 }
 
 const media::SoundSample& OpenALSource::GetSample () const
-{   
+{
   return sound_sample;
 }
 
 /*
-    ѕолучение позиции в тиках
+    ѕолучение позиции в миллисекундах
 */
 
-size_t OpenALSource::TellInTicks () const
+size_t OpenALSource::TellInMilliseconds () const
 {
-  return is_playing ? clock () - play_time_start + play_time_offset : play_time_offset;
+  return is_playing ? milliseconds () - play_time_start + play_time_offset : play_time_offset;
 }
 
 /*
@@ -211,25 +211,25 @@ void OpenALSource::Play (bool looping)
 
   is_looped       = looping;
   is_playing      = true;
-  play_time_start = clock ();
+  play_time_start = milliseconds ();
 
   UpdateSourceNotify ();
   UpdateSampleNotify ();
 }
 
 void OpenALSource::Pause ()
-{   
+{
   if (!is_playing)
     return;
 
   is_playing       = false;
-  play_time_offset = TellInTicks ();
+  play_time_offset = TellInMilliseconds ();
 
   UpdateSampleNotify ();
 }
 
 void OpenALSource::Stop ()
-{   
+{
   is_playing       = false;
   is_looped        = false;
   play_time_offset = 0;
@@ -243,9 +243,9 @@ void OpenALSource::Stop ()
 
 float OpenALSource::Tell () const
 {
-  float offset   = float (TellInTicks ()) / CLOCKS_PER_SEC,
+  float offset   = float (TellInMilliseconds ()) / 1000.f,
         duration = (float)sound_sample.Duration ();
-  
+
   if (is_looped) return fmod (offset, duration);
   else           return offset < duration ? offset : 0.0f;
 }
@@ -256,10 +256,10 @@ void OpenALSource::Seek (float offset, SeekMode seek_mode)
 
   if (offset < 0) offset = 0.0f;
 
-  if (offset > duration) 
+  if (offset > duration)
     switch (seek_mode)
     {
-      case SeekMode_Clamp: 
+      case SeekMode_Clamp:
         offset = duration;
         break;
       case SeekMode_Repeat:
@@ -269,8 +269,8 @@ void OpenALSource::Seek (float offset, SeekMode seek_mode)
         throw xtl::make_argument_exception ("sound::low_level::OpenALDevice::Seek", "seek_mode", seek_mode);
     }
 
-  play_time_start  = clock ();
-  play_time_offset = size_t (offset * CLOCKS_PER_SEC);
+  play_time_start  = milliseconds ();
+  play_time_offset = size_t (offset * 1000.f);
 
   UpdateSampleNotify ();
 }
@@ -283,7 +283,7 @@ bool OpenALSource::IsPlaying () const
   if (is_looped)
     return true;
 
-  float offset   = float (TellInTicks ()) / CLOCKS_PER_SEC,
+  float offset   = float (TellInMilliseconds ()) / 1000.f,
         duration = (float)sound_sample.Duration ();
 
   return offset < duration;
@@ -293,16 +293,16 @@ bool OpenALSource::IsPlaying () const
     „тение данных в OpenAL буфер с учЄтом цикличности проигрывани€
 */
 
-void OpenALSource::FillBuffer (size_t al_buffer)
+void OpenALSource::FillBuffer (ALuint al_buffer)
 {
   size_t max_samples_count       = sound_sample.BytesToSamples (device.GetSampleBufferSize ()),
          available_samples_count = max_samples_count;
   char*  buffer                  = (char*)device.GetSampleBuffer ();
 
   if (is_looped)
-  {   
+  {
     while (available_samples_count)
-    {    
+    {
       if (play_sample_position == sound_sample.SamplesCount ())
         play_sample_position = 0;
 
@@ -310,19 +310,19 @@ void OpenALSource::FillBuffer (size_t al_buffer)
 
       if (!samples_count)
         break;
-      
+
       available_samples_count -= samples_count;
       buffer                  += sound_sample.SamplesToBytes (samples_count);
       play_sample_position    += samples_count;
-    }    
+    }
   }
   else
   {
-    size_t samples_count     = sound_sample.Read (play_sample_position, available_samples_count, buffer);    
+    size_t samples_count     = sound_sample.Read (play_sample_position, available_samples_count, buffer);
     available_samples_count -= samples_count;
     play_sample_position    += samples_count;
-  }      
-  
+  }
+
   size_t readed_samples_count = max_samples_count - available_samples_count;
 
   if (!readed_samples_count)
@@ -330,7 +330,7 @@ void OpenALSource::FillBuffer (size_t al_buffer)
 
   ALenum format = sound_sample.Channels () == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
 
-  OpenALContext& context = device.Context ();  
+  OpenALContext& context = device.Context ();
 
   context.MakeCurrent ();
 
@@ -341,7 +341,7 @@ void OpenALSource::FillBuffer (size_t al_buffer)
 
 void OpenALSource::FillBuffers ()
 {
-  if (size_t (clock () - last_buffers_fill_time) < SOURCE_BUFFERS_UPDATE_TICKS)
+  if (size_t (milliseconds () - last_buffers_fill_time) < SOURCE_BUFFERS_UPDATE_MILLISECONDS)
     return;
 
   ALint          queued_buffers_count = 0, processed_buffers_count = 0;
@@ -353,23 +353,23 @@ void OpenALSource::FillBuffers ()
   context.alGetSourcei (al_source, AL_BUFFERS_PROCESSED, &processed_buffers_count);
 
   if (!queued_buffers_count)
-  {  
-      //первоначальное заполнение буферов      
+  {
+      //первоначальное заполнение буферов
 
     for (size_t i=0; i<SOURCE_BUFFERS_COUNT; i++)
       FillBuffer (al_buffers [i]);
   }
   else if (processed_buffers_count)
   {
-    ALuint buffers [SOURCE_BUFFERS_COUNT];   
+    ALuint buffers [SOURCE_BUFFERS_COUNT];
 
-    context.alSourceUnqueueBuffers (al_source, processed_buffers_count, buffers);    
+    context.alSourceUnqueueBuffers (al_source, processed_buffers_count, buffers);
 
     for (int i=0; i<processed_buffers_count; i++)
       FillBuffer (buffers [i]);
   }
-  
-  last_buffers_fill_time = clock ();    
+
+  last_buffers_fill_time = milliseconds ();
 }
 
 /*
@@ -379,12 +379,12 @@ void OpenALSource::FillBuffers ()
 void OpenALSource::BufferUpdate ()
 {
   if (!is_active && !sample_need_update)
-    return;    
+    return;
 
   try
   {
     OpenALContext& context = device.Context ();
-    
+
       //определение состо€ни€ проигрывани€
 
     int status = AL_STOPPED;
@@ -394,13 +394,13 @@ void OpenALSource::BufferUpdate ()
     context.alGetSourcei (al_source, AL_SOURCE_STATE, &status);
 
       //возобновление прекращенного проигрывани€ / установка флага, сигнализирующего о конце проигрывани€
-      
+
     if (status != AL_PLAYING)
     {
       if (IsPlaying ()) sample_need_update = true;
       else              is_playing         = false;
     }
-    
+
       //добавление / удаление источника в список активных, заказ буферов
 
     if (is_playing != is_active)
@@ -409,12 +409,12 @@ void OpenALSource::BufferUpdate ()
       else            Deactivate ();
     }
 
-      //обновление буферов      
+      //обновление буферов
 
     if (sample_need_update)
-    {     
-      sample_need_update = false;      
-      
+    {
+      sample_need_update = false;
+
         //останавливаем проигрывание
 
       context.alSourceStop (al_source);
@@ -429,7 +429,7 @@ void OpenALSource::BufferUpdate ()
       if (queued_buffers_count)
         context.alSourceUnqueueBuffers (al_source, queued_buffers_count, queued_buffers);
 
-      play_sample_position = sound_sample.SecondsToSamples (Tell ());      
+      play_sample_position = sound_sample.SecondsToSamples (Tell ());
 
       if (is_playing)
       {
@@ -438,7 +438,7 @@ void OpenALSource::BufferUpdate ()
       }
       else alSourceStop (al_source);
     }
-    else FillBuffers ();    
+    else FillBuffers ();
   }
   catch (std::exception& exception)
   {
@@ -457,7 +457,7 @@ void OpenALSource::PropertiesUpdate ()
 
   try
   {
-    OpenALContext& context = device.Context ();        
+    OpenALContext& context = device.Context ();
 
     context.MakeCurrent ();
 

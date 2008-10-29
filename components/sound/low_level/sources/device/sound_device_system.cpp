@@ -20,7 +20,7 @@ using namespace common;
 namespace
 {
 
-const size_t DRIVER_ARRAY_RESERVE = 5; //резервируемый размер массива драйверов 
+const size_t DRIVER_ARRAY_RESERVE = 5; //резервируемый размер массива драйверов
 const char*  DRIVER_COMPONENTS_MASK = "sound.low_level.*"; //маска имён компонентов устройств воспроизведения
 
 }
@@ -43,7 +43,7 @@ class DriverManagerImpl
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация драйверов
-///////////////////////////////////////////////////////////////////////////////////////////////////    
+///////////////////////////////////////////////////////////////////////////////////////////////////
     void RegisterDriver (const char* name, IDriver* driver)
     {
       static const char* METHOD_NAME = "sound::low_level::DriverManager::RegisterDriver";
@@ -54,8 +54,9 @@ class DriverManagerImpl
       if (!driver)
         throw xtl::make_null_argument_exception (METHOD_NAME, "driver");
 
-      if (FindDriver (name))
-        throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Driver with this name has been already registered");
+      for (DriverArray::iterator i = drivers.begin (); i != drivers.end (); ++i)
+        if (i->name == name)
+          throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Driver with this name has been already registered");
 
       drivers.push_back (SoundDriver (driver, name));
     }
@@ -64,7 +65,7 @@ class DriverManagerImpl
     {
       if (!name)
         return;
-        
+
       for (DriverArray::iterator i = drivers.begin (); i != drivers.end (); ++i)
         if (i->name == name)
           drivers.erase (i--);
@@ -82,13 +83,13 @@ class DriverManagerImpl
     {
       if (!name)
         return 0;
-        
+
       LoadDefaultDrivers ();
 
       for (DriverArray::iterator i = drivers.begin (); i != drivers.end (); ++i)
         if (i->name == name)
           return get_pointer (i->driver);
-      
+
       return 0;
     }
 
@@ -131,7 +132,7 @@ class DriverManagerImpl
 
       if (!driver_mask)
         driver_mask = "*";
-        
+
       if (!device_mask)
         device_mask = "*";
 
@@ -149,7 +150,7 @@ class DriverManagerImpl
               return iter->driver->CreateDevice (iter->driver->GetDeviceName (i), init_string);
           }
         }
-        
+
       throw xtl::format_operation_exception ("sound::low_level::DriverManagerImpl::CreateDevice",
         "No configuration with driver_mask='%s' and device_mask='%s'", driver_mask, device_mask);
     }
@@ -173,13 +174,13 @@ class DriverManagerImpl
     typedef xtl::com_ptr<IDriver>  DriverPtr;
     struct SoundDriver
     {
-      SoundDriver (IDriver* in_driver, const char* in_name) : driver (in_driver), name (in_name) {} 
+      SoundDriver (IDriver* in_driver, const char* in_name) : driver (in_driver), name (in_name) {}
 
       DriverPtr   driver;
       stl::string name;
     };
     typedef stl::vector<SoundDriver> DriverArray;
-  
+
   private:
     DriverArray drivers; //карта драйверов
 };

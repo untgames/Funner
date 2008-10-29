@@ -71,14 +71,14 @@ OpenALContext::OpenALContext (const char* device_name, const char* init_string)
 
     if (!init_string)
       throw xtl::make_null_argument_exception ("", "init_string");
-      
+
     ContextInitProperties properties;
 
-    common::parse_init_string (init_string, xtl::bind (&process_init_string, _1, _2, ref (properties)));      
+    common::parse_init_string (init_string, xtl::bind (&process_init_string, _1, _2, ref (properties)));
 
     device = alcOpenDevice (device_name);
 
-    if (!device) 
+    if (!device)
       throw xtl::format_exception<OpenALException> ("", "Can't open device '%s'", device_name);
 
     efx_present = alcIsExtensionPresent ("ALC_EXT_EFX") == ALC_TRUE;
@@ -97,7 +97,7 @@ OpenALContext::OpenALContext (const char* device_name, const char* init_string)
     {
       alcCloseDevice (device);
       throw xtl::format_exception<OpenALException> ("", "Can't create context. %s", get_alc_error_message (alcGetError (device)));
-    }    
+    }
   }
   catch (xtl::exception& exception)
   {
@@ -141,7 +141,7 @@ bool OpenALContext::MakeCurrent ()
     LogPrintf ("Error at alcMakeContextCurrent(%p). %s", context, get_alc_error_message (alcGetError (device)));
     return false;
   }
-  
+
   return true;
 }
 
@@ -194,7 +194,7 @@ void OpenALContext::CheckErrors (const char* function_name)
 void OpenALContext::ContextCheckErrors (const char* function_name)
 {
   ALCenum error = alcGetError (device);
-  
+
   try
   {
     if (error != ALC_NO_ERROR)
@@ -569,7 +569,7 @@ ALCboolean OpenALContext::alcIsExtensionPresent (const ALCchar *extname)
 
 void OpenALContext::alcGetIntegerv (ALCenum param, ALCsizei size, ALCint *data)
 {
-  ::alcGetIntegerv (device, param, size, data);  
+  ::alcGetIntegerv (device, param, size, data);
 
   ContextCheckErrors ("alcGetIntegerv");
 }

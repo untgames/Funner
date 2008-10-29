@@ -30,13 +30,13 @@ template <class T, size_t N>
 void print (const math::vec<T, N>& v)
 {
   printf ("[");
-  
+
   for (size_t i=0; i<N; i++)
   {
     printf (" ");
     print  (v [i]);
   }
-  
+
   printf (" ]");
 }
 
@@ -58,7 +58,7 @@ void print (bool arg)
 {
   if (arg)
     printf ("true\n");
-  else 
+  else
     printf ("false\n");
 }
 
@@ -140,14 +140,14 @@ int main ()
     Application::Run ();
   }
   catch (std::exception& exception)
-  {                                               
-    printf ("exception: %s\n",exception.what ()); 
-  }                                               
+  {
+    printf ("exception: %s\n",exception.what ());
+  }
   catch (...)
   {
     printf ("unknown exception\n");
   }
-  
+
   printf ("exit\n");
 
   return Application::GetExitCode ();

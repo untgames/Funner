@@ -4,15 +4,15 @@
 TARGETS := SOUND.OPENAL_DRIVER.SOURCES SOUND.OPENAL_DRIVER.TESTS
 
 #Öåëü ¹1 - OPENALDEVICE sources
-SOUND.OPENAL_DRIVER.SOURCES.TYPE             := static-lib
-SOUND.OPENAL_DRIVER.SOURCES.NAME             := funner.sound.low_level.openal_driver
-SOUND.OPENAL_DRIVER.SOURCES.INCLUDE_DIRS     := ../../../extern/openalsdk/include
-SOUND.OPENAL_DRIVER.SOURCES.SOURCE_DIRS      := sources
-SOUND.OPENAL_DRIVER.SOURCES.LIB_DIRS         :=  
-SOUND.OPENAL_DRIVER.SOURCES.LIBS             := 
-SOUND.OPENAL_DRIVER.SOURCES.COMPILER_CFLAGS  :=
-SOUND.OPENAL_DRIVER.SOURCES.COMPILER_DEFINES := 
-SOUND.OPENAL_DRIVER.SOURCES.IMPORTS          := ../low_level/compile.static.mak ../../media/sound/compile.static.mak ../../system/compile.static.mak 
+SOUND.OPENAL_DRIVER.SOURCES.TYPE                   := static-lib
+SOUND.OPENAL_DRIVER.SOURCES.NAME                   := funner.sound.low_level.openal_driver
+SOUND.OPENAL_DRIVER.SOURCES.win32.INCLUDE_DIRS     := ../../../extern/openalsdk/include
+SOUND.OPENAL_DRIVER.SOURCES.SOURCE_DIRS            := sources
+SOUND.OPENAL_DRIVER.SOURCES.LIB_DIRS               :=  
+SOUND.OPENAL_DRIVER.SOURCES.LIBS                   := 
+SOUND.OPENAL_DRIVER.SOURCES.macosx.COMPILER_CFLAGS := -I/System/Library/Frameworks/OpenAL.framework/Versions/A/Headers
+SOUND.OPENAL_DRIVER.SOURCES.COMPILER_DEFINES       := 
+SOUND.OPENAL_DRIVER.SOURCES.IMPORTS                := ../low_level/compile.static.mak ../../media/sound/compile.static.mak ../../system/compile.static.mak 
 
 #Öåëü ¹2 - OPENALDEVICE tests
 SOUND.OPENAL_DRIVER.TESTS.TYPE             := test-suite

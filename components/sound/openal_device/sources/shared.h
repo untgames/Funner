@@ -2,10 +2,9 @@
 #define SOUND_SYSTEM_OPENAL_DEVICE_SHARED_HEADER
 
 #include <stdarg.h>
-#include <time.h>
 #include <al.h>
 #include <alc.h>
-#include <efx.h>
+//#include <efx.h>
 
 #include <stl/string>
 #include <stl/vector>
@@ -19,8 +18,9 @@
 #include <xtl/string.h>
 #include <xtl/common_exceptions.h>
 
-#include <common/strlib.h>
 #include <common/component.h>
+#include <common/strlib.h>
+#include <common/time.h>
 
 #include <media/sound.h>
 
@@ -63,7 +63,7 @@ class OpenALContext
 {
   public:
     typedef IDevice::LogHandler LogHandler;
-  
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ class OpenALContext
 ///Обёртки над вызовами OpenAL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void alEnable( ALenum capability );
-    void alDisable( ALenum capability ); 
+    void alDisable( ALenum capability );
     ALboolean alIsEnabled( ALenum capability );
     const ALchar* alGetString( ALenum param );
     void alGetBooleanv( ALenum param, ALboolean* data );
@@ -97,19 +97,19 @@ class OpenALContext
     ALint alGetInteger( ALenum param );
     ALfloat alGetFloat( ALenum param );
     ALdouble alGetDouble( ALenum param );
-    void alGenSources( ALsizei n, ALuint* sources );     
+    void alGenSources( ALsizei n, ALuint* sources );
     void alDeleteSources( ALsizei n, const ALuint* sources );
-    ALboolean alIsSource( ALuint sid );      
+    ALboolean alIsSource( ALuint sid );
     void alGetSourcef( ALuint sid, ALenum param, ALfloat* value );
     void alGetSource3f( ALuint sid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
     void alGetSourcefv( ALuint sid, ALenum param, ALfloat* values );
     void alGetSourcei( ALuint sid,  ALenum param, ALint* value );
     void alGetSource3i( ALuint sid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
     void alGetSourceiv( ALuint sid,  ALenum param, ALint* values );
-    void alSourcef( ALuint sid, ALenum param, ALfloat value ); 
+    void alSourcef( ALuint sid, ALenum param, ALfloat value );
     void alSource3f( ALuint sid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
-    void alSourcefv( ALuint sid, ALenum param, const ALfloat* values ); 
-    void alSourcei( ALuint sid, ALenum param, ALint value ); 
+    void alSourcefv( ALuint sid, ALenum param, const ALfloat* values );
+    void alSourcei( ALuint sid, ALenum param, ALint value );
     void alSource3i( ALuint sid, ALenum param, ALint value1, ALint value2, ALint value3 );
     void alSourceiv( ALuint sid, ALenum param, const ALint* values );
     void alSourcePlayv( ALsizei ns, const ALuint *sids );
@@ -121,10 +121,10 @@ class OpenALContext
     void alSourceRewind( ALuint sid );
     void alSourcePause( ALuint sid );
     void alSourceQueueBuffers( ALuint sid, ALsizei numEntries, const ALuint *bids );
-    void alSourceUnqueueBuffers( ALuint sid, ALsizei numEntries, ALuint *bids );     
+    void alSourceUnqueueBuffers( ALuint sid, ALsizei numEntries, ALuint *bids );
     void alListenerf( ALenum param, ALfloat value );
     void alListener3f( ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
-    void alListenerfv( ALenum param, const ALfloat* values ); 
+    void alListenerfv( ALenum param, const ALfloat* values );
     void alListeneri( ALenum param, ALint value );
     void alListener3i( ALenum param, ALint value1, ALint value2, ALint value3 );
     void alListeneriv( ALenum param, const ALint* values );
@@ -210,7 +210,7 @@ class OpenALDevice : public sound::low_level::IDevice, public xtl::reference_cou
 ///Количество микшируемых каналов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t ChannelsCount () { return channels.size (); }
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущего проигрываемого звука
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -221,7 +221,7 @@ class OpenALDevice : public sound::low_level::IDevice, public xtl::reference_cou
 ///Проверка цикличности проигрывания канала
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool IsLooped (size_t channel);
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка параметров источника
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -237,7 +237,7 @@ class OpenALDevice : public sound::low_level::IDevice, public xtl::reference_cou
     void  Seek  (size_t channel, float time_in_seconds, SeekMode seek_mode);
     float Tell  (size_t channel);
     bool  IsPlaying (size_t channel);
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка уровня громкости для устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -272,7 +272,7 @@ class OpenALDevice : public sound::low_level::IDevice, public xtl::reference_cou
 ///Буфер сэмплирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const void* GetSampleBuffer     () const { return sample_buffer.data (); }
-          void* GetSampleBuffer     ()       { return sample_buffer.data (); }    
+          void* GetSampleBuffer     ()       { return sample_buffer.data (); }
     size_t      GetSampleBufferSize () const { return sample_buffer.size (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -286,7 +286,7 @@ class OpenALDevice : public sound::low_level::IDevice, public xtl::reference_cou
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void AddRef  ();
     void Release ();
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка параметров устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -311,7 +311,7 @@ class OpenALDevice : public sound::low_level::IDevice, public xtl::reference_cou
     void DebugVPrintf (const char* format, va_list);
 
   private:
-    void BufferUpdate ();   
+    void BufferUpdate ();
     void ListenerUpdate ();
     void SourceUpdate ();
     void UpdateListenerNotify ();
@@ -330,7 +330,7 @@ class OpenALDevice : public sound::low_level::IDevice, public xtl::reference_cou
 
   private:
     stl::string    name;                                       //имя устройства
-    OpenALContext  context;                                    //контекст    
+    OpenALContext  context;                                    //контекст
     syslib::Timer  buffer_timer;                               //таймер обновления буфера
     syslib::Timer  listener_timer;                             //таймер обновления слушателя
     syslib::Timer  source_timer;                               //таймер обновления источников
@@ -338,7 +338,7 @@ class OpenALDevice : public sound::low_level::IDevice, public xtl::reference_cou
     Capabilities   info;                                       //информация о устройстве
     Listener       listener;                                   //слушатель
     bool           listener_need_update;                       //слушатель требует обновления
-    SampleBuffer   sample_buffer;                              //буфер сэмплирования        
+    SampleBuffer   sample_buffer;                              //буфер сэмплирования
     float          gain;                                       //коэффициент усиления
     bool           is_muted;                                   //флг блокировки проигрывания
     ChannelsArray  channels;                                   //каналы проигрывания
@@ -372,7 +372,7 @@ class OpenALSource
 ///Проверка цикличности проигрывания канала
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool IsLooped () const { return is_looped; }
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка параметров источника
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -388,7 +388,7 @@ class OpenALSource
     void  Seek      (float time_in_seconds, SeekMode seek_mode);
     float Tell      () const;
     bool  IsPlaying () const;
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление (синхронизация с OpenAL)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -402,18 +402,18 @@ class OpenALSource
     OpenALSource* NextActive () const { return next_active; }
 
   private:
-    void   FillBuffer (size_t al_buffer);
+    void   FillBuffer (ALuint al_buffer);
     void   FillBuffers ();
     void   UpdateSourceNotify ();
     void   UpdateSampleNotify ();
-    size_t TellInTicks () const;
+    size_t TellInMilliseconds () const;
     void   Activate ();
     void   Deactivate ();
-    
+
   private:
     OpenALSource (const OpenALSource&); //no impl
     OpenALSource& operator = (const OpenALSource&); //no impl
-    
+
   private:
     typedef media::SoundSample SoundSample;
 
@@ -426,10 +426,10 @@ class OpenALSource
     bool           is_looped;                         //цикличность проигрывания
     bool           is_playing;                        //проигрывается ли звук
     bool           is_active;                         //является ли источник активным
-    clock_t        play_time_start;                   //время начала проигрывания
-    clock_t        play_time_offset;                  //смещение при проигрывании
-    clock_t        last_buffers_fill_time;            //время последнего обновления буферов
-    size_t         play_sample_position;              //позиция проигрывания    
+    size_t         play_time_start;                   //время начала проигрывания
+    size_t         play_time_offset;                  //смещение при проигрывании
+    size_t         last_buffers_fill_time;            //время последнего обновления буферов
+    size_t         play_sample_position;              //позиция проигрывания
     ALuint         al_source;                         //имя источника в OpenAL
     ALuint         al_buffers [SOURCE_BUFFERS_COUNT]; //OpenAL буферы
     OpenALSource   *prev_active, *next_active;        //список активных источников (проигрываемых)
