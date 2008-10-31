@@ -202,8 +202,8 @@ class PlatformManagerImpl
         {
           if (flags.empty ()) flags += ", ";
           else                flags += " | ";          
-          
-          flags += " | STEREO";          
+
+          flags += "STEREO";
         }
 
         log.Printf ("...choose %s pixel format #%u on adapter '%s' (RGB/A: %u/%u, D/S: %u/%u, Samples: %u%s)",
