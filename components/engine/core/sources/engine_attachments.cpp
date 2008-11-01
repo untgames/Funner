@@ -193,7 +193,7 @@ class AttachmentRegistryImpl
         default:
           throw xtl::make_argument_exception (METHOD_NAME, "mode", mode);
       }
-      
+
         //добавление слушателя
 
       listeners.push_back (ListenerEntry (type, listener));      

@@ -124,6 +124,17 @@ inline void AttachmentRegistry::Register (const char* name, T& object)
 }
 
 template <class T>
+inline void AttachmentRegistry::Unregister (const char* name, T& object)
+{
+  T* attachment = Find<T> (name);
+  
+  if (!attachment || attachment != &object)
+    return;
+
+  Unregister (name);  
+}
+
+template <class T>
 inline void AttachmentRegistry::UnregisterAll ()
 {
   UnregisterAllCore (typeid (T));
@@ -132,7 +143,7 @@ inline void AttachmentRegistry::UnregisterAll ()
 template <class T>
 inline T& AttachmentRegistry::Get (const char* name)
 {
-  return static_cast<detail::IAttachment<T>*> (FindCore (name, typeid (T), false))->GetValue ();
+  return static_cast<detail::IAttachment<T>*> (FindCore (name, typeid (T), true))->GetValue ();
 }
 
 template <class T>

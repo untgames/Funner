@@ -2,24 +2,26 @@
 #include <stl/string>
 #include <stl/vector>
 
-#include <xtl/any.h>
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/function.h>
+#include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 
 #include <common/component.h>
 #include <common/log.h>
+#include <common/parser.h>
 
 #include <input/low_level/driver.h>
 
 #include <input/translation_map.h>
 #include <input/translation_map_registry.h>
 
-#include <client/engine.h>
+#include <engine/attachments.h>
+#include <engine/subsystem_manager.h>
 
-using namespace client;
+using namespace engine;
 using namespace common;
 using namespace input::low_level;
 
@@ -27,50 +29,33 @@ namespace
 {
 
 const char* SUBSYSTEM_NAME = "InputManager";
-const char* LOG_NAME       = "client.InputManagerSubsystem";
+const char* LOG_NAME       = "engine.subsystems.InputManagerSubsystem";
+const char* COMPONENT_NAME = LOG_NAME;
 
 /*
    Подсистема менеджера ввода               
 */
 
-class InputManagerSubsystem : public IEngineSubsystem, public IEngineEventListener, public xtl::reference_counter
+typedef xtl::function<void (const char*)> InputHandler;
+
+class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListener<const InputHandler>, public xtl::reference_counter
 {
   public:
 /// Конструктор/деструктор
-    InputManagerSubsystem (Engine& in_engine, const char* in_translation_map_registry)
-      : engine (&in_engine), translation_map_registry (in_translation_map_registry), log (LOG_NAME)
+    InputManagerSubsystem (const char* registry_name)
+      : translation_map_registry (registry_name),
+        log (LOG_NAME)
     {
-      try
-      {
-        engine->Attach (this);
-      }
-      catch (...)
-      {
-        engine->Detach (this);
-      }
+      AttachmentRegistry::Attach (this, AttachmentRegistryAttachMode_ForceNotify);
     }
 
     ~InputManagerSubsystem ()
     {
-      engine->Detach (this);
-    }
-    
-/// Получение имени
-    const char* Name () { return SUBSYSTEM_NAME; }
-
-/// Подсчёт ссылок
-    void AddRef ()
-    {
-      addref (this);
+      AttachmentRegistry::Detach (this);
     }
 
-    void Release ()
-    {
-      release (this);
-    }
-
-///События добавления / удаления точек привязки событий ввода
-    void OnSetInputHandler (const char* attachment_name, const InputHandler& handler)
+///Обработчик события добавления точек привязки событий ввода
+    void OnRegisterAttachment (const char* attachment_name, const InputHandler& handler)
     {
       if (!attachment_name)
         throw xtl::make_null_argument_exception ("InputManagerSubsystem::OnSetInputHandler", "attachment_name");
@@ -113,15 +98,15 @@ class InputManagerSubsystem : public IEngineSubsystem, public IEngineEventListen
             else
               device_entry->device = device_iter->second;
 
-            device_entry->device_connection = current_device->RegisterEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent, 
-                                               &(device_entry->translation_map->GetTranslationMap ()), _1, handler));
+            device_entry->device_connection = current_device->RegisterEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent,
+              &device_entry->translation_map->GetTranslationMap (), _1, handler));
 
             new_attachment->devices.push_back (device_entry);
           }
           catch (xtl::exception& exception)
           {
             log.Printf ("Can't attach to device '%s' with attachment name '%s': exception '%s'", current_driver->GetDeviceName (j), attachment_name,
-                                                                                                 exception.what ());
+              exception.what ());
           }
           catch (...)
           {
@@ -135,26 +120,37 @@ class InputManagerSubsystem : public IEngineSubsystem, public IEngineEventListen
       attachments[attachment_name] = new_attachment;
     }
 
-    void OnRemoveInputHandler (const char* attachment_name)
+///Обработчик события удаления точек привязки событий ввода
+    void OnRemoveInputHandler (const char* attachment_name, const InputHandler&)
     {
       attachments.erase (attachment_name);
+    }
+
+/// Подсчёт ссылок
+    void AddRef ()
+    {
+      addref (this);
+    }
+
+    void Release ()
+    {
+      release (this);
     }
 
   private:
     InputManagerSubsystem (const InputManagerSubsystem&);             //no impl
     InputManagerSubsystem& operator = (const InputManagerSubsystem&); //no impl
 
-  private:
+  private:    
     class TranslationMapHolder;
     class DeviceHolder;
-    
+  
     typedef xtl::com_ptr<IDevice>                                            DevicePtr;
-    typedef stl::hash_map<stl::hash_key<const char*>, TranslationMapHolder*> TranslationMapsMap;
     typedef stl::hash_map<stl::hash_key<const char*>, DeviceHolder*>         DevicesMap;
+    typedef stl::hash_map<stl::hash_key<const char*>, TranslationMapHolder*> TranslationMapsMap;    
     typedef xtl::intrusive_ptr<DeviceHolder>                                 DeviceHolderPtr;
     typedef xtl::intrusive_ptr<TranslationMapHolder>                         TranslationMapHolderPtr;
 
-  private:
     class TranslationMapHolder : public xtl::reference_counter
     {
       public:
@@ -229,7 +225,6 @@ class InputManagerSubsystem : public IEngineSubsystem, public IEngineEventListen
     typedef stl::hash_map<stl::hash_key<const char*>, AttachmentPtr> AttachmentMap;
 
   private:
-    Engine                        *engine;
     input::TranslationMapRegistry translation_map_registry;
     TranslationMapsMap            translation_maps;
     DevicesMap                    devices;
@@ -238,45 +233,40 @@ class InputManagerSubsystem : public IEngineSubsystem, public IEngineEventListen
 };
 
 /*
-   Создание менеджера
-*/
-
-void input_manager_startup (common::VarRegistry& var_registry, IEngineStartupParams*, Engine& engine)
-{
-  try
-  {
-    if (!var_registry.HasVariable ("TranslationMapRegistry"))
-      throw xtl::format_operation_exception ("", "There is no 'TranslationMapRegistry' variable in the configuration registry branch '%s'", var_registry.BranchName ());
-
-    xtl::com_ptr<IEngineSubsystem> new_subsystem (new InputManagerSubsystem (engine, var_registry.GetValue ("TranslationMapRegistry").cast<stl::string> ().c_str ()), false);
-
-    engine.AddSubsystem (new_subsystem.get ());
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("window_renderer_startup");
-    throw;
-  }
-}
-
-/*
    Компонент менеджера ввода
 */
 
 class InputManagerComponent
 {
   public:
-    //загрузка компонента
     InputManagerComponent () 
     {
-      StartupManager::RegisterStartupHandler ("InputManager", &input_manager_startup, StartupGroup_Level5);
+      StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);
+    }
+    
+  private:
+    static void StartupHandler (ParseNode& node, SubsystemManager& manager)
+    {
+      try
+      {        
+        const char* registry_name = get<const char*> (node, "TranslationMapRegistry");
+
+        xtl::com_ptr<ISubsystem> subsystem (new InputManagerSubsystem (registry_name), false);
+
+        manager.AddSubsystem (subsystem.get ());
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::InputManagerComponent::StartupHandler");
+        throw;
+      }
     }
 };
 
 extern "C"
 {
 
-ComponentRegistrator<InputManagerComponent> InputManager ("client.subsystems.input_manager");
+ComponentRegistrator<InputManagerComponent> InputManager (COMPONENT_NAME);
 
 }
 
