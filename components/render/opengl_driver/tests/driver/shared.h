@@ -6,14 +6,17 @@
 
 #include <exception>
 
-#include <syslib/window.h>
-
-#include <render/low_level/driver.h>
-#include <render/low_level/debug.h>
-
 #include <stl/vector>
 
+#include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
+
+#include <common/log.h>
+
+#include <syslib/window.h>
+
+#include <render/low_level/debug.h>
+#include <render/low_level/driver.h>
 
 using namespace render::low_level;
 

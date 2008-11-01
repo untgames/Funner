@@ -3,17 +3,17 @@
 int main ()
 {
   printf ("Results of output1_test:\n");
-  
+
   try
   {
     xtl::com_ptr<IDriver> driver = DriverManager::FindDriver ("OpenGL");
-    
+
     if (!driver)
     {
-      printf ("OpenGL driver not found");
+      printf ("OpenGL driver not found\n");
       return 0;
-    }    
-    
+    }
+
     printf ("Driver:\n");
     printf ("  description:   '%s'\n", driver->GetDescription ());
     printf ("  adapters count: %u\n", driver->GetAdaptersCount ());
@@ -42,7 +42,22 @@ int main ()
         printf ("      name: '%s'\n", output->GetName ());
 
         for (size_t j=0; j<properties->GetSize (); j++)
-          printf ("      %s: '%s'\n", properties->GetKey (j), properties->GetValue (j));        
+          printf ("      %s: '%s'\n", properties->GetKey (j), properties->GetValue (j));
+
+        printf ("    modes count: %u\n", output->GetModesCount ());
+
+        OutputModeDesc mode_desc;
+
+        for (size_t k = 0; k < output->GetModesCount (); k++)
+        {
+          output->GetModeDesc (k, mode_desc);
+
+          printf ("       mode #%u:\n", k);
+          printf ("         width:        %u\n", mode_desc.width);
+          printf ("         height:       %u\n", mode_desc.height);
+          printf ("         color bits:   %u\n", mode_desc.color_bits);
+          printf ("         refresh rate: %u\n", mode_desc.refresh_rate);
+        }
       }
     }
   }
@@ -50,6 +65,6 @@ int main ()
   {
     printf ("exception: %s\n", exception.what ());
   }
-  
+
   return 0;
 }
