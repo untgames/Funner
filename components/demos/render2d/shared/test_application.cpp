@@ -25,6 +25,7 @@ namespace
 */
 
 const char* CONFIGURATION_BRANCH_NAME = "Configuration.WindowSettings"; //имя ветки реестра с настройками
+const char* CONFIGURATION_FILE_NAME   = "media/config.xml"; //имя файла конфигурации
 const char* MID_LEVEL_RENDERER_NAME   = "MyRenderer"; //имя системы визуализации среднего уровня
 const char* MATERIAL_LIB_FILE_NAME    = "media/materials.xmtl"; //имя файла с материалами
 
@@ -160,8 +161,12 @@ TestApplication::TestApplication ()
     impl->window->RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, &*impl)); 
 
       //инициализация системы рендеринга
+      
+    common::Parser cfg_parser (CONFIGURATION_FILE_NAME);
+    common::ParseNode cfg_root = cfg_parser.Root ().First ("Configuration");
 
-    render::mid_level::WindowDriver::RegisterWindow (MID_LEVEL_RENDERER_NAME, *impl->window, CONFIGURATION_BRANCH_NAME);        
+    render::mid_level::WindowDriver::RegisterRenderer (MID_LEVEL_RENDERER_NAME, cfg_root);
+    render::mid_level::WindowDriver::RegisterWindow (MID_LEVEL_RENDERER_NAME, *impl->window, cfg_root);
 
       //инициализация рендера
 
