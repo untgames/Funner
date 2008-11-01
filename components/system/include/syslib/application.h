@@ -1,6 +1,8 @@
 #ifndef SYSLIB_APPLICATION_HEADER
 #define SYSLIB_APPLICATION_HEADER
 
+#include <cstddef>
+
 #include <xtl/functional_fwd>
 
 namespace syslib
@@ -14,7 +16,7 @@ enum ApplicationEvent
   ApplicationEvent_OnExit,     //получен сигнал завершения приложения
   ApplicationEvent_OnIdle,     //очередь сообщений пуста
   ApplicationEvent_OnDoEvents, //обработка пользовательских очередей сообщений
-  
+
   ApplicationEvent_Num
 };
 
@@ -32,7 +34,7 @@ class Application
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение об отмене обработки системных событий в DoEvents
 ///  (может быть вызван в обработчике события ApplicationEvent_OnDoEvents)
-///////////////////////////////////////////////////////////////////////////////////////////////////    
+///////////////////////////////////////////////////////////////////////////////////////////////////
     static void CancelSystemEventsProcess ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
