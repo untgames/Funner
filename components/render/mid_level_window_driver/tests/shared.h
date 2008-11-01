@@ -5,6 +5,8 @@
 #include <cstring>
 #include <ctime>
 
+#include <stl/vector>
+
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
@@ -15,8 +17,7 @@
 #include <xtl/trackable.h>
 
 #include <common/log.h>
-#include <common/var_registry.h>
-#include <common/var_registry_container.h>
+#include <common/parser.h>
 
 #include <media/image.h>
 
@@ -40,8 +41,6 @@ using namespace math;
 
 const size_t WINDOW_WIDTH              = 1024;                        //ширина окна
 const size_t WINDOW_HEIGHT             = 768;                         //высота окна
-const char*  CONFIGURATION_MOUNT_POINT = "Configuration";
-const char*  CONFIGURATION_BRANCH_NAME = "Configuration.Configuration1";
 const char*  CONFIGURATION_FILE_NAME   = "data/configuration.xml";
 
 const math::vec4f CLEAR_COLOR (0.7f, 0.f, 0.f, 0.f);
@@ -95,15 +94,15 @@ class RendererListener : public IRendererListener
 class RenderWindow : public IRendererListener, public xtl::trackable
 {
   public:
-    RenderWindow (const wchar_t* title) 
+    RenderWindow (const wchar_t* title, common::ParseNode& cfg_root) 
       : window (syslib::WindowStyle_Overlapped, WINDOW_WIDTH, WINDOW_HEIGHT), style (0)
     {
         //инициализация окна
     
       window.SetTitle (title);
       window.Show ();
-
-      WindowDriver::RegisterWindow ("MyRenderer", window, CONFIGURATION_BRANCH_NAME);
+      
+      WindowDriver::RegisterWindow ("MyRenderer", window, cfg_root);
 
       RendererPtr basic_renderer (DriverManager::CreateRenderer (WindowDriver::Name (), "MyRenderer"), false);
 
@@ -289,23 +288,13 @@ class BasicTest
 {
   public:
 ///Конструктор  
-    BasicTest (const wchar_t* title) : log_filter ("*", &LogMessage)
+    BasicTest (const wchar_t* title) : log_filter ("*", &LogMessage), cfg_parser (CONFIGURATION_FILE_NAME)
     {
-        //монтирование реестра
-        
-      string_registry.Mount (CONFIGURATION_MOUNT_POINT);
-
-        //чтение настроек
-        
-      var_registry.Open (CONFIGURATION_MOUNT_POINT);
-
-        //чтение конфигурации
-
-      load_xml_configuration (var_registry, CONFIGURATION_FILE_NAME);
-
+      WindowDriver::RegisterRenderer ("MyRenderer", cfg_parser.Root ().First ("Configuration"));
+    
       AddWindow ();
 
-      render_windows[0]->Renderer ()->AttachListener (&renderer_listener);
+      render_windows [0]->Renderer ()->AttachListener (&renderer_listener);
     }    
     
     virtual ~BasicTest () {}
@@ -316,7 +305,7 @@ class BasicTest
       if (render_windows.empty ())
         return 0;
 
-      return render_windows[0]->Renderer (); 
+      return render_windows [0]->Renderer (); 
     }
 
     renderer2d::IFrame* Frame () 
@@ -324,7 +313,7 @@ class BasicTest
       if (render_windows.empty ())
         return 0;
 
-      return render_windows[0]->Frame (); 
+      return render_windows [0]->Frame (); 
     }
     
 ///Загрузка ресурсов
@@ -353,7 +342,7 @@ class BasicTest
 
     void AddWindow ()
     {
-      render_windows.push_back (new RenderWindow (L"Additional window"));
+      render_windows.push_back (new RenderWindow (L"Additional window", cfg_parser.Root ().First ("Configuration")));
 
       render_windows.back ()->Window ().RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&BasicTest::OnClose, this, _1));
     }
@@ -430,12 +419,11 @@ class BasicTest
     typedef xtl::shared_ptr<RenderWindow> RenderWindowPtr;
 
   private:
-    common::LogFilter                         log_filter;
-    stl::vector<RenderWindow*>                render_windows;
-    common::VarRegistry                       var_registry;
-    common::VarRegistryContainer<stl::string> string_registry;
-    RendererListener                          renderer_listener;
-    xtl::connection                           idle_connection;
+    common::LogFilter          log_filter;
+    common::Parser             cfg_parser;
+    stl::vector<RenderWindow*> render_windows;
+    RendererListener           renderer_listener;
+    xtl::connection            idle_connection;
 };
 
 //получение случайного числа в диапазоне [min_value;max_value]

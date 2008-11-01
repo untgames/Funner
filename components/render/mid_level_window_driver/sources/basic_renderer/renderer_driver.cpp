@@ -6,260 +6,330 @@ using namespace render::low_level;
 using namespace render::mid_level;
 using namespace render::mid_level::window_driver;
 
+namespace
+{
+
 /*
     Константы
 */
 
-namespace
-{
-
 const char* DRIVER_NAME = "WindowDriver"; //имя драйвера
 
-void test_registry_variable (VarRegistry& var_registry, const char* variable_name)
-{
-  if (!var_registry.HasVariable (variable_name))
-    throw xtl::format_operation_exception ("", "There is no '%s' variable in the configuration registry branch '%s'",
-      variable_name, var_registry.BranchName ());
-}
-
-void test_registry_variables (VarRegistry& var_registry)
-{
-  test_registry_variable (var_registry, "DriverMask");
-  test_registry_variable (var_registry, "AdapterMask");
-  test_registry_variable (var_registry, "ColorBits");
-  test_registry_variable (var_registry, "AlphaBits");
-  test_registry_variable (var_registry, "DepthBits");
-  test_registry_variable (var_registry, "StencilBits");
-  test_registry_variable (var_registry, "SamplesCount");
-  test_registry_variable (var_registry, "BuffersCount");
-  test_registry_variable (var_registry, "SwapMethod");
-  test_registry_variable (var_registry, "VSync");
-  test_registry_variable (var_registry, "FullScreen");
-}
-
-stl::string get_string (VarRegistry& registry, const char* name)
-{
-  return registry.GetValue (name).cast<stl::string> ();
-}
-
-SwapMethod get_swap_method (VarRegistry& registry, const char* name)
-{
-  stl::string swap_method (get_string (registry, name));
-
-  if (!xtl::xstricmp ("Discard", swap_method.c_str ()))
-    return SwapMethod_Discard;
-  if (!xtl::xstricmp ("Flip", swap_method.c_str ()))
-    return SwapMethod_Flip;
-  if (!xtl::xstricmp ("Copy", swap_method.c_str ()))
-    return SwapMethod_Copy;
-
-  throw xtl::format_operation_exception ("", "Unknown '%s' value", name);
-}
-
-size_t get_size_t (VarRegistry& registry, const char* name)
-{
-  return atoi (get_string (registry, name).c_str ());
-}
-
-stl::string get (VarRegistry& registry, const char* name)
-{
-  return get_string (registry, name);
-}
-
-stl::string get (VarRegistry& registry, const char* name, const char* default_value)
-{
-  if (registry.HasVariable (name))
-    return get_string (registry, name);
-
-  return stl::string (default_value);
-}
-
-void fill_swap_chain_desc (SwapChainDesc& swap_chain_desc, const void* window_handle, VarRegistry& var_registry)
-{
-  test_registry_variables (var_registry);
-
-  memset (&swap_chain_desc, 0, sizeof (swap_chain_desc));
-
-  swap_chain_desc.frame_buffer.width        = 0;
-  swap_chain_desc.frame_buffer.height       = 0;
-  swap_chain_desc.frame_buffer.color_bits   = get_size_t (var_registry, "ColorBits");
-  swap_chain_desc.frame_buffer.alpha_bits   = get_size_t (var_registry, "AlphaBits");
-  swap_chain_desc.frame_buffer.depth_bits   = get_size_t (var_registry, "DepthBits");
-  swap_chain_desc.frame_buffer.stencil_bits = get_size_t (var_registry, "StencilBits");
-  swap_chain_desc.samples_count             = get_size_t (var_registry, "SamplesCount");
-  swap_chain_desc.buffers_count             = get_size_t (var_registry, "BuffersCount");
-  swap_chain_desc.swap_method               = get_swap_method (var_registry, "SwapMethod");
-  swap_chain_desc.vsync                     = get_size_t (var_registry, "VSync") ? 1 : 0;
-  swap_chain_desc.fullscreen                = get_size_t (var_registry, "FullScreen") ? 1 : 0;
-  swap_chain_desc.window_handle             = window_handle;
-}
-
 /*
-    Вхождение системы рендеринга в список драйвера
+    Вхождение окна в систему рендеринга
 */
 
 typedef xtl::com_ptr<FrameBuffer> FrameBufferPtr;
 
-struct WindowFrameBuffer : public xtl::trackable
+struct WindowEntry: public xtl::trackable, public xtl::reference_counter
 {
-  syslib::Window*           window;
-  FrameBufferPtr            frame_buffer;
-  Driver*                   driver;
-  Driver::RendererEntry*    renderer_entry;
-  stl::string               configuration_branch;
+  Window&        window;          //окно
+  FrameBufferPtr frame_buffer;    //буфера кадров  
+  SwapChainDesc  swap_chain_desc; //дескриптор цепочки обмена
 
-  WindowFrameBuffer (syslib::Window* in_window, FrameBuffer* in_frame_buffer, Driver* in_driver, 
-                     Driver::RendererEntry* in_renderer_entry, const char* in_configuration_branch)
-    : window (in_window), frame_buffer (in_frame_buffer, false), driver (in_driver), 
-      renderer_entry (in_renderer_entry), configuration_branch (in_configuration_branch)
-  {
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnDestroy, xtl::bind (&WindowFrameBuffer::DestroyWindowHandler, this)));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnChangeHandle, xtl::bind (&WindowFrameBuffer::ChangeWindowHandleHandler, this)));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnSize, xtl::bind (&WindowFrameBuffer::ResizeWindowHandler, this)));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnPaint, xtl::bind (&WindowFrameBuffer::UpdateWindowHandler, this)));
+///Конструктор  
+    WindowEntry (syslib::Window& in_window, const ParseNode& cfg_node)
+      : window (in_window)
+    {
+        //чтение параметров инициализации устройства отрисовки
 
-    syslib::Rect client_rect = window->ClientRect ();
+      memset (&swap_chain_desc, 0, sizeof (swap_chain_desc));
 
-    size_t width = client_rect.right - client_rect.left;
-    size_t height = client_rect.bottom - client_rect.top;
+      swap_chain_desc.frame_buffer.color_bits   = get<size_t> (cfg_node, "ColorBits", 0);
+      swap_chain_desc.frame_buffer.alpha_bits   = get<size_t> (cfg_node, "AlphaBits", 0);
+      swap_chain_desc.frame_buffer.depth_bits   = get<size_t> (cfg_node, "DepthBits", 0);
+      swap_chain_desc.frame_buffer.stencil_bits = get<size_t> (cfg_node, "StencilBits", 0);
+      swap_chain_desc.samples_count             = get<size_t> (cfg_node, "SamplesCount", 0);
+      swap_chain_desc.buffers_count             = get<size_t> (cfg_node, "BuffersCount", 1);
+      swap_chain_desc.swap_method               = SwapMethod_Discard;
+      swap_chain_desc.vsync                     = get<bool> (cfg_node, "VSync", false);
+      swap_chain_desc.fullscreen                = get<bool> (cfg_node, "FullScreen", false);
 
-    frame_buffer->SetSize (width, height);
-  }
+      const char* swap_method_name = get<const char*> (cfg_node, "SwapMethod", (const char*)0);
 
-  void DestroyWindowHandler ();
-  void ChangeWindowHandleHandler ();
-  void ResizeWindowHandler ();
-  void UpdateWindowHandler ();
-};
-
-}
-
-struct Driver::RendererEntry
-{
-  typedef xtl::com_ptr<RendererDispatch> RendererDispatchPtr;
-
-  stl::string         renderer_name;
-  RendererDispatchPtr renderer;
-
-  RendererEntry (const char* in_renderer_name, syslib::Window& window, const char* configuration_branch, Driver* in_driver)
-    : renderer_name (in_renderer_name),
-      driver        (in_driver)
-  {
-    frame_buffers.push_back (WindowFrameBufferPtr (new WindowFrameBuffer (&window, CreateFrameBuffer (window.Handle (), configuration_branch), driver, this, configuration_branch)));
-  
-    renderer = RendererDispatchPtr (new RendererDispatch (*device), false);
-
-    renderer->AddFrameBuffer (frame_buffers.back ()->frame_buffer.get ());
-  }
-
-  void RegisterWindow (syslib::Window& window, const char* configuration_branch)
-  {
-    for (WindowFrameBufferArray::iterator iter = frame_buffers.begin (), end = frame_buffers.end (); iter != end; ++iter)
-      if ((*iter)->window == &window)
-        throw xtl::format_operation_exception ("render::mid_level::window_driver::Driver::RendererEntry::RegisterWindow", "Window already registered");
-
-    frame_buffers.push_back (WindowFrameBufferPtr (new WindowFrameBuffer (&window, CreateFrameBuffer (window.Handle (), configuration_branch), driver, this, configuration_branch)));
-
-    renderer->AddFrameBuffer (frame_buffers.back ()->frame_buffer.get ());
-  }
-
-  void UnregisterWindow (syslib::Window& window)
-  {
-    for (WindowFrameBufferArray::iterator iter = frame_buffers.begin (), end = frame_buffers.end (); iter != end; ++iter)
-      if ((*iter)->window == &window)
+      if (swap_method_name)
       {
-        frame_buffers.erase (iter);
-        
-        break;
+        if      (!xtl::xstricmp ("Flip",    swap_method_name)) swap_chain_desc.swap_method = SwapMethod_Flip;
+        else if (!xtl::xstricmp ("Copy",    swap_method_name)) swap_chain_desc.swap_method = SwapMethod_Copy;
+        else if (!xtl::xstricmp ("Discard", swap_method_name)) swap_chain_desc.swap_method = SwapMethod_Discard;
+        else
+        {
+          cfg_node.Log ().Error (cfg_node, "Attribute 'SwapMethod' has wrong value '%s'", swap_method_name);
+        }
       }
-  }
-
-  FrameBuffer* CreateFrameBuffer (const void* window_handle, const char* configuration_branch)
-  {
-    try
-    {
-      if (!window_handle)
-       throw xtl::make_null_argument_exception ("", "window_handle");
-
-      if (!configuration_branch)
-        throw xtl::make_null_argument_exception ("", "configuration_branch");
-
-      SwapChainDesc swap_chain_desc;
-
-      VarRegistry var_registry (configuration_branch);
-
-      fill_swap_chain_desc (swap_chain_desc, window_handle, var_registry);
-
-      SwapChainPtr swap_chain;
-
-      if (device)
-        swap_chain = SwapChainPtr (render::low_level::DriverManager::CreateSwapChain (get (var_registry, "DriverMask").c_str (), 
-                                                                                      get (var_registry, "AdapterMask").c_str (), swap_chain_desc), false);
-      else
-        render::low_level::DriverManager::CreateSwapChainAndDevice (get (var_registry, "DriverMask").c_str (), get (var_registry, "AdapterMask").c_str (), 
-                                                                    swap_chain_desc, get (var_registry, "InitString", "").c_str (), swap_chain, device);
-
-      return new FrameBuffer (*device, *swap_chain);
     }
-    catch (xtl::exception& exception)
-    {
-      exception.touch ("render::mid_level::window_driver::Driver::RendererEntry::CreateFrameBuffer");
-      throw;
-    }
-  }
-
-  private:
-    typedef xtl::com_ptr<render::low_level::IDevice> DevicePtr;  
-    typedef xtl::com_ptr<ISwapChain>                 SwapChainPtr;
-    typedef xtl::shared_ptr<WindowFrameBuffer>       WindowFrameBufferPtr;
-    typedef stl::vector<WindowFrameBufferPtr>        WindowFrameBufferArray;
-
-  private:
-    Driver*                driver;
-    DevicePtr              device;
-    WindowFrameBufferArray frame_buffers;
 };
 
-namespace
-{
-
-void WindowFrameBuffer::DestroyWindowHandler ()
-{
-  driver->UnregisterWindow (renderer_entry->renderer_name.c_str (), *window);
 }
 
-void WindowFrameBuffer::ChangeWindowHandleHandler ()
+/*
+    Вхождение системы рендеринга в драйвер
+*/
+
+class Driver::RendererEntry: public xtl::reference_counter
 {
-  if (!window->Handle ())
-  {
-    renderer_entry->renderer->RemoveFrameBuffer (frame_buffer.get ());
-    frame_buffer = 0;
-    return;
-  }
+  public:
+///Конструктор
+    RendererEntry (const char* in_renderer_name, Driver& in_driver)
+      : driver        (in_driver),
+        renderer_name (in_renderer_name),
+        low_level_driver_mask ("*"),
+        low_level_adapter_mask ("*")
+    {
+    }
 
-  frame_buffer = FrameBufferPtr (renderer_entry->CreateFrameBuffer (window->Handle (), configuration_branch.c_str ()), false);
+///Имя системы рендеринга
+    const char* Name () { return renderer_name.c_str (); }
 
-  renderer_entry->renderer->AddFrameBuffer (frame_buffer.get ());
-}
+///Чтение настроек
+    void ReadConfiguration (const ParseNode& cfg_node)
+    {
+      low_level_driver_mask        = get<const char*> (cfg_node, "DriverMask", "*");
+      low_level_adapter_mask       = get<const char*> (cfg_node, "AdapterMask", "*");
+      low_level_device_init_string = get<const char*> (cfg_node, "InitString", "");
+    }
 
-void WindowFrameBuffer::ResizeWindowHandler ()
-{
-  syslib::Rect client_rect = window->ClientRect ();
+///Регистрация нового окна в системе рендеринга
+    void RegisterWindow (syslib::Window& window, const ParseNode& cfg_node)
+    {
+      try
+      {
+          //проверка корректности аргументов
 
-  size_t width = client_rect.right - client_rect.left;
-  size_t height = client_rect.bottom - client_rect.top;
+        for (WindowEntryArray::iterator iter = windows.begin (), end = windows.end (); iter != end; ++iter)
+        {
+          WindowEntry& window_entry = **iter;
 
-  frame_buffer->SetSize (width, height);
+          if (&window_entry.window == &window)
+            throw xtl::format_operation_exception ("", "Window already registered");
+        }
+        
+          //создание вхождения окна в систему рендеринга
+          
+        WindowEntryPtr window_entry (new WindowEntry (window, cfg_node), false);
+        DevicePtr      window_device = device;
+        
+          //создание буфера кадра
 
-  renderer_entry->renderer->FrameBufferResizeNotify (frame_buffer.get (), width, height);
-}
+        CreateFrameBuffer (*window_entry, window_device);
+        
+          //регистрация обработчиков событий окна
 
-void WindowFrameBuffer::UpdateWindowHandler ()
-{
-  renderer_entry->renderer->FrameBufferUpdateNotify (frame_buffer.get ());
-}
+        window_entry->connect_tracker (window.RegisterEventHandler (WindowEvent_OnDestroy, xtl::bind (&RendererEntry::UnregisterWindow,
+          this, xtl::ref (window))));
 
-}
+        window_entry->connect_tracker (window.RegisterEventHandler (WindowEvent_OnPaint, xtl::bind (&RendererEntry::OnUpdateWindow,
+          this, xtl::ref (*window_entry))));
+
+        window_entry->connect_tracker (window.RegisterEventHandler (WindowEvent_OnSize, xtl::bind (&RendererEntry::OnResizeWindow,
+          this, xtl::ref (*window_entry))));
+          
+        window_entry->connect_tracker (window.RegisterEventHandler (WindowEvent_OnChangeHandle, xtl::bind (&RendererEntry::OnChangeWindowHandle,
+          this, xtl::ref (*window_entry))));
+
+          //регистрация буфера кадра
+
+        windows.push_back (window_entry);
+        
+        try
+        {
+            //регистрация нового буфера кадров
+
+          if (renderer)
+            renderer->AddFrameBuffer (window_entry->frame_buffer.get ());
+
+            //сохранение параметров
+
+          device = window_device;
+        }
+        catch (...)
+        {
+          windows.pop_back ();
+          throw;
+        }
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("render::mid_level::window_driver::Driver::RendererEntry::RegisterWindow");
+        throw;
+      }
+    }
+
+///Отмена регистрации окна в системе рендеринга
+    void UnregisterWindow (syslib::Window& window)
+    {
+        //удаление буфера кадра, соответствующего окну
+      
+      for (WindowEntryArray::iterator iter = windows.begin (), end = windows.end (); iter != end; ++iter)
+      {
+        WindowEntry& window_entry = **iter;
+
+        if (&window_entry.window == &window)
+        {
+          windows.erase (iter);
+          break;
+        }
+      }
+
+        //в случае отсутствия буферов кадра - удаление вхождения системы рендеринга в драйвер
+
+      if (windows.empty ())
+        driver.UnregisterAllWindows (renderer_name.c_str ());
+    }
+
+///Создание системы рендеринга
+    IRenderer* CreateRenderer ()
+    {
+      try
+      {
+          //если система уже создана - возвращаем её
+          
+        if (renderer)
+          return renderer.get ();
+
+          //создание системы рендеринга
+
+        if (!device)
+          throw xtl::format_operation_exception ("", "No windows attached for renderer");            
+
+        xtl::com_ptr<RendererDispatch> new_renderer (new RendererDispatch (*device), false);
+        
+          //добавление буферов кадра
+          
+        for (WindowEntryArray::iterator iter=windows.begin (), end=windows.end (); iter!=end; ++iter)
+          new_renderer->AddFrameBuffer ((*iter)->frame_buffer.get ());
+          
+          //возвращение результата
+
+        renderer = new_renderer.get ();
+
+        new_renderer->AddRef ();
+
+        return renderer.get ();
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("render::mid_level::window_driver::Driver::RendererEntry::CreateRenderer");
+        throw;
+      }
+    }
+
+  private:
+    typedef xtl::com_ptr<render::low_level::IDevice> DevicePtr;
+
+  private:
+///Создание буфера кадра
+    void CreateFrameBuffer (WindowEntry& window_entry, DevicePtr& window_device)
+    {
+      try
+      {
+        if (!window_entry.window.Handle ())
+          throw xtl::format_operation_exception ("", "Null window handle");
+
+        window_entry.swap_chain_desc.window_handle = window_entry.window.Handle ();
+
+          //создание цепочки обмена и буфера кадров
+          
+        typedef xtl::com_ptr<ISwapChain> SwapChainPtr;
+          
+        SwapChainPtr new_swap_chain;
+        
+        if (window_device)
+        {
+          new_swap_chain = SwapChainPtr (render::low_level::DriverManager::CreateSwapChain (low_level_driver_mask.c_str (),
+            low_level_adapter_mask.c_str (), window_entry.swap_chain_desc), false);
+        }
+        else
+        {
+          render::low_level::DriverManager::CreateSwapChainAndDevice (low_level_driver_mask.c_str (), low_level_adapter_mask.c_str (),
+            window_entry.swap_chain_desc, low_level_device_init_string.c_str (), new_swap_chain, window_device);
+        }
+
+        FrameBufferPtr new_frame_buffer (new FrameBuffer (*window_device, *new_swap_chain), false);
+
+          //обновление размеров буфера кадра
+
+        syslib::Rect client_rect = window_entry.window.ClientRect ();
+
+        size_t width  = client_rect.right - client_rect.left,
+               height = client_rect.bottom - client_rect.top;      
+
+        new_frame_buffer->SetSize (width, height);        
+
+          //сохранение состояния
+
+        window_entry.frame_buffer = new_frame_buffer;
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("render::mid_level::window_driver::Driver::RendererEntry::CreateFrameBuffer");
+        throw;
+      }
+    }
+
+///Обработчик события смены оконного дескриптора
+    void OnChangeWindowHandle (WindowEntry& window_entry)
+    {
+      if (!window_entry.window.Handle ())
+      {
+        if (renderer)
+          renderer->RemoveFrameBuffer (window_entry.frame_buffer.get ());
+
+        window_entry.frame_buffer = 0;
+
+        return;
+      }
+      
+        //создание буфера кадра
+
+      CreateFrameBuffer (window_entry, device);
+
+        //регистрация буфера кадра
+
+      if (renderer)
+        renderer->AddFrameBuffer (window_entry.frame_buffer.get ());
+    }
+
+///Обработчик события изменения размеров окна
+    void OnResizeWindow (WindowEntry& window_entry)
+    {
+      if (!renderer || !window_entry.frame_buffer)
+        return;
+      
+      syslib::Rect client_rect = window_entry.window.ClientRect ();
+
+      size_t width  = client_rect.right - client_rect.left,
+             height = client_rect.bottom - client_rect.top;
+
+      window_entry.frame_buffer->SetSize (width, height);
+
+      renderer->FrameBufferResizeNotify (window_entry.frame_buffer.get (), width, height);
+    }
+
+///Обработчик события обновления окна
+    void OnUpdateWindow (WindowEntry& window_entry)
+    {
+      if (!renderer || !window_entry.frame_buffer)
+        return;
+
+      renderer->FrameBufferUpdateNotify (window_entry.frame_buffer.get ());
+    }
+
+  private:
+    typedef xtl::intrusive_ptr<WindowEntry>      WindowEntryPtr;
+    typedef stl::vector<WindowEntryPtr>          WindowEntryArray;
+    typedef xtl::trackable_ptr<RendererDispatch> RendererDispatchPtr;
+
+  private:
+    Driver&             driver;                       //ссылка на драйвер, хранящий систему рендеринга
+    stl::string         renderer_name;                //имя системы рендеринга
+    stl::string         low_level_driver_mask;        //маска имени драйвера
+    stl::string         low_level_adapter_mask;       //маска имени драйвера    
+    stl::string         low_level_device_init_string; //строка инициализации устройства отрисовки
+    WindowEntryArray    windows;                      //окна системы рендеринга
+    DevicePtr           device;                       //устройство отрисовки
+    RendererDispatchPtr renderer;                     //система рендеринга
+};
 
 /*
     Конструктор / деструктор
@@ -267,11 +337,12 @@ void WindowFrameBuffer::UpdateWindowHandler ()
 
 Driver::Driver ()
 {
+  DriverManager::RegisterDriver (DRIVER_NAME, this);
 }
 
 Driver::~Driver ()
 {
-  UnregisterDriver ();
+  DriverManager::UnregisterDriver (DRIVER_NAME);
 }
 
 /*
@@ -294,10 +365,10 @@ size_t Driver::GetRenderersCount ()
 
 const char* Driver::GetRendererName (size_t index)
 {
-  if (index >= GetRenderersCount ())
-    throw xtl::make_range_exception ("render::mid_level::window_driver::Driver::GetRendererName", "index", index, 0u, GetRenderersCount ());
+  if (index >= renderer_entries.size ())
+    throw xtl::make_range_exception ("render::mid_level::window_driver::Driver::GetRendererName", "index", index, renderer_entries.size ());
 
-  return renderer_entries[index]->renderer_name.c_str ();
+  return renderer_entries [index]->Name ();
 }
 
 /*
@@ -309,44 +380,93 @@ IRenderer* Driver::CreateRenderer (const char* name)
   static const char* METHOD_NAME = "render::mid_level::window_driver::Driver::CreateRenderer";
 
   if (!name)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
-    
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");      
+
   for (RendererEntries::iterator iter = renderer_entries.begin (), end = renderer_entries.end (); iter != end; ++iter)
-    if (!xtl::xstrcmp ((*iter)->renderer_name.c_str (), name))
-    {
-      (*iter)->renderer->AddRef ();
+  {
+    RendererEntry& entry = **iter;
 
-      return (*iter)->renderer.get ();
-    }
+    if (!xtl::xstrcmp (entry.Name (), name))
+      return entry.CreateRenderer ();
+  }
 
-  throw xtl::make_argument_exception (METHOD_NAME, "name", name);
+  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Renderer not found");
 }
 
 /*
-   Регистрация систем рендернинга
+    Регистрация систем рендеринга
 */
 
-void Driver::RegisterWindow (const char* renderer_name, syslib::Window& window, const char* configuration_branch)
+void Driver::RegisterRenderer (const char* renderer_name, const common::ParseNode& configuration_node)
 {
   static const char* METHOD_NAME = "render::mid_level::window_driver::Driver::RegisterRenderer";
+  
+    //проверка корректности аргументов
+
+  if (!renderer_name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "renderer_name");  
+    
+  for (RendererEntries::iterator iter = renderer_entries.begin (), end = renderer_entries.end (); iter != end; ++iter)
+  {
+    RendererEntry& entry = **iter;
+
+    if (!xtl::xstrcmp (entry.Name (), renderer_name))
+      throw xtl::make_argument_exception (METHOD_NAME, "renderer_name", renderer_name, "Renderer has already registered");
+  }
+  
+    //добавление системы рендеринга    
+  
+  RendererEntryPtr renderer_entry (new RendererEntry (renderer_name, *this), false);
+
+  renderer_entry->ReadConfiguration (configuration_node);
+
+  renderer_entries.push_back (renderer_entry);
+}
+
+void Driver::RegisterWindow (const char* renderer_name, syslib::Window& window, const common::ParseNode& configuration_node)
+{
+  static const char* METHOD_NAME = "render::mid_level::window_driver::Driver::RegisterRenderer";
+  
+    //проверка корректности аргументов
 
   if (!renderer_name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "renderer_name");
-
-  if (!configuration_branch)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "configuration_branch");
+    
+    //поиск системы рендеринга среди уже созданных
+    
+  RendererEntryPtr renderer_entry = 0;
 
   for (RendererEntries::iterator iter = renderer_entries.begin (), end = renderer_entries.end (); iter != end; ++iter)
-    if (!xtl::xstrcmp ((*iter)->renderer_name.c_str (), renderer_name))
+  {
+    RendererEntry& entry = **iter;
+
+    if (!xtl::xstrcmp (entry.Name (), renderer_name))
     {
-      (*iter)->RegisterWindow (window, configuration_branch);
-      return;
+      renderer_entry = *iter;
+      break;
     }
+  }
+  
+    //если система рендеринга ещё не создана - создаём её
+  
+  if (!renderer_entry)
+  {
+    renderer_entry = RendererEntryPtr (new RendererEntry (renderer_name, *this), false);
 
-  renderer_entries.push_back (RendererEntryPtr (new RendererEntry (renderer_name, window, configuration_branch, this)));
+    renderer_entries.push_back (renderer_entry);
+  }
 
-  if (renderer_entries.size () == 1)
-    DriverManager::RegisterDriver (DRIVER_NAME, this);
+    //регистрация окна в системе рендеринга
+
+  try
+  {
+    renderer_entry->RegisterWindow (window, configuration_node);
+  }
+  catch (...)
+  {
+    renderer_entries.pop_back ();
+    throw;
+  }
 }
 
 void Driver::UnregisterWindow (const char* renderer_name, syslib::Window& window)
@@ -355,17 +475,9 @@ void Driver::UnregisterWindow (const char* renderer_name, syslib::Window& window
     return;
 
   for (RendererEntries::iterator iter = renderer_entries.begin (), end = renderer_entries.end (); iter != end; ++iter)
-    if (!xtl::xstrcmp ((*iter)->renderer_name.c_str (), renderer_name))
+    if (!xtl::xstrcmp ((*iter)->Name (), renderer_name))
     {
       (*iter)->UnregisterWindow (window);
-
-      if (!(*iter)->renderer->GetFrameBuffersCount ())
-      {
-        renderer_entries.erase (iter);
-
-        if (renderer_entries.empty ())
-          UnregisterDriver ();
-      }
 
       return;
     }
@@ -377,13 +489,9 @@ void Driver::UnregisterAllWindows (const char* renderer_name)
     return;
 
   for (RendererEntries::iterator iter = renderer_entries.begin (), end = renderer_entries.end (); iter != end; ++iter)
-    if (!xtl::xstrcmp ((*iter)->renderer_name.c_str (), renderer_name))
+    if (!xtl::xstrcmp ((*iter)->Name (), renderer_name))
     {
       renderer_entries.erase (iter);
-
-      if (renderer_entries.empty ())
-        UnregisterDriver ();
-
       return;
     }
 }
@@ -391,28 +499,13 @@ void Driver::UnregisterAllWindows (const char* renderer_name)
 void Driver::UnregisterAllWindows ()
 {
   renderer_entries.clear ();
-  UnregisterDriver ();
-}
-
-void Driver::UnregisterDriver ()
-{
-  DriverManager::UnregisterDriver (DRIVER_NAME);
-}
-
-namespace
-{
-
-/*
-   Синглтон драйвера низкоуровневой системы рендернинга
-*/
-
-typedef common::Singleton<Driver> WindowDriverSingleton;
-
 }
 
 /*
    Драйвер оконной системы рендеринга
 */
+
+typedef common::Singleton<Driver> WindowDriverSingleton;
 
 /*
    Имя драйвера
@@ -433,12 +526,21 @@ render::mid_level::IDriver* WindowDriver::Driver ()
 }
 
 /*
+    Предварительная регистрация системы рендеринга (для конфигурирования)
+*/
+
+void WindowDriver::RegisterRenderer (const char* renderer_name, const common::ParseNode& configuration_node)
+{
+  WindowDriverSingleton::Instance ().RegisterRenderer (renderer_name, configuration_node);
+}
+
+/*
    Регистрация окон
 */
 
-void WindowDriver::RegisterWindow (const char* renderer_name, syslib::Window& window, const char* configuration_branch)
+void WindowDriver::RegisterWindow (const char* renderer_name, syslib::Window& window, const common::ParseNode& configuration_node)
 {
-  WindowDriverSingleton::Instance ().RegisterWindow (renderer_name, window, configuration_branch);
+  WindowDriverSingleton::Instance ().RegisterWindow (renderer_name, window, configuration_node);
 }
 
 void WindowDriver::UnregisterWindow (const char* renderer_name, syslib::Window& window)

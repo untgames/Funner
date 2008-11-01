@@ -8,12 +8,13 @@
 #include <xtl/bind.h>
 #include <xtl/connection.h>
 #include <xtl/common_exceptions.h>
-#include <xtl/shared_ptr.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/reference_counter.h>
 #include <xtl/string.h>
 #include <xtl/trackable.h>
 
+#include <common/parser.h>
 #include <common/singleton.h>
-#include <common/var_registry.h>
 
 #include <media/image.h>
 
@@ -103,12 +104,17 @@ class Driver: virtual public IDriver
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание системы визуализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IRenderer* CreateRenderer (const char* name);    
+    IRenderer* CreateRenderer (const char* name);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Предварительная регистрация системы рендеринга (для конфигурирования)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RegisterRenderer (const char* renderer_name, const common::ParseNode& configuration_node);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация окон
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterWindow       (const char* renderer_name, syslib::Window& window, const char* configuration_branch);
+    void RegisterWindow       (const char* renderer_name, syslib::Window& window, const common::ParseNode& configuration_node);
     void UnregisterWindow     (const char* renderer_name, syslib::Window& window);
     void UnregisterAllWindows (const char* renderer_name);
     void UnregisterAllWindows ();
@@ -119,15 +125,12 @@ class Driver: virtual public IDriver
     void AddRef  () {}
     void Release () {}
 
-  public:
-    struct RendererEntry;
-
   private:
-    void UnregisterDriver ();
-
+    class RendererEntry;
+    
   private:
-    typedef xtl::shared_ptr<RendererEntry> RendererEntryPtr;
-    typedef stl::vector<RendererEntryPtr>  RendererEntries;
+    typedef xtl::intrusive_ptr<RendererEntry> RendererEntryPtr;
+    typedef stl::vector<RendererEntryPtr>     RendererEntries;
 
   private:
     RendererEntries renderer_entries;
@@ -194,7 +197,7 @@ class ILowLevelRendererDispatch: virtual public ILowLevelRenderer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовая система рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class RendererDispatch: virtual public IRenderer2dDispatch, virtual public ILowLevelRendererDispatch, public Object
+class RendererDispatch: virtual public IRenderer2dDispatch, virtual public ILowLevelRendererDispatch, public Object, public xtl::trackable
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

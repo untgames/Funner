@@ -1,6 +1,8 @@
 #ifndef RENDER_MID_LEVEL_WINDOW_DRIVER_HEADER
 #define RENDER_MID_LEVEL_WINDOW_DRIVER_HEADER
 
+#include <common/parse_tree.h>
+
 #include <syslib/window.h>
 
 namespace render
@@ -29,9 +31,14 @@ class WindowDriver
     static IDriver* Driver ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Предварительная регистрация системы рендеринга (для конфигурирования)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void RegisterRenderer (const char* renderer_name, const common::ParseNode& configuration_node);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация окон
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterWindow       (const char* renderer_name, syslib::Window& window, const char* configuration_branch);
+    static void RegisterWindow       (const char* renderer_name, syslib::Window& window, const common::ParseNode& configuration_node);
     static void UnregisterWindow     (const char* renderer_name, syslib::Window& window);
     static void UnregisterAllWindows (const char* renderer_name);
     static void UnregisterAllWindows ();
