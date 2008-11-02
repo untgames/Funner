@@ -43,8 +43,9 @@ class DriverManagerImpl
       if (!driver)
         throw xtl::make_null_argument_exception (METHOD_NAME, "driver");
 
-      if (FindDriver (name))
-        throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Driver with this name has been already registered");
+      for (DriverArray::iterator i = drivers.begin (); i != drivers.end (); ++i)
+        if (i->name == name)
+          throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Driver with this name has been already registered");
 
       drivers.push_back (RendererDriver (driver, name));
     }
