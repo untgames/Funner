@@ -21,10 +21,10 @@ typedef stl::vector<VertexBufferPtr>           VertexBufferArray;
 
 struct ModelPrimitive
 {
-  PrimitiveType   type;          //тип примитива
-  VertexBufferPtr vertex_buffer; //вершинный буфер
-  size_t          first;         //индекс первой вершины/индекса
-  size_t          count;         //количество примитивов
+  PrimitiveType   type;          //Єшя яЁшьшЄштр
+  VertexBufferPtr vertex_buffer; //тхЁ°шээ√щ сєЇхЁ
+  size_t          first;         //шэфхъё яхЁтющ тхЁ°шэ√/шэфхъёр
+  size_t          count;         //ъюышўхёЄтю яЁшьшЄштют
 };
 
 typedef stl::vector<ModelPrimitive> PrimitiveArray;
@@ -446,7 +446,7 @@ void idle (Test& test)
   test.window.Invalidate ();
 }
 
-//получение ортографической матрицы проекции
+//яюыєўхэшх юЁЄюуЁрЇшўхёъющ ьрЄЁшЎ√ яЁюхъЎшш
 math::mat4f get_ortho_proj (float left, float right, float bottom, float top, float znear, float zfar)
 {
   math::mat4f proj_matrix;
@@ -455,7 +455,7 @@ math::mat4f get_ortho_proj (float left, float right, float bottom, float top, fl
         height = top - bottom,
         depth  = zfar - znear;  
 
-    //выбрана матрица проецирования, используемая gluOrtho2D
+    //т√сЁрэр ьрЄЁшЎр яЁюхЎшЁютрэш , шёяюы№чєхьр  gluOrtho2D
 
   proj_matrix [0] = math::vec4f (2.0f / width, 0, 0, - (right + left) / width);
   proj_matrix [1] = math::vec4f (0, 2.0f / height, 0, - (top + bottom) / height);
