@@ -4,7 +4,6 @@
 #include <render/low_level/driver.h>
 
 #include <shared/library.h>
-//#include <shared/gl_entries.h>
 
 namespace render
 {
