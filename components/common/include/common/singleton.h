@@ -91,6 +91,7 @@ class Singleton
   private:
     static T*                instance;
     static SingletonListNode node;
+    static bool              is_in_init;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,6 +102,9 @@ T* Singleton<T,CreateaionPolicy>::instance = 0;
 
 template <class T,template <class> class CreateaionPolicy>
 SingletonListNode Singleton<T,CreateaionPolicy>::node;
+
+template <class T,template <class> class CreateaionPolicy>
+bool Singleton<T,CreateaionPolicy>::is_in_init = false;
 
 #include <common/detail/singleton.inl>
 

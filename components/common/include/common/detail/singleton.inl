@@ -81,13 +81,28 @@ void Singleton<T,CreationPolicy>::Init ()
 {
   if (instance)
     return;
+    
+  if (is_in_init)
+    throw stl::runtime_error ("Singleton recursive init");
 
-  instance = CreationPolicy<T>::Create ();
+  is_in_init = true;    
   
-  if (!instance)
-    throw stl::runtime_error ("unable to create singleton");
-  
-  node.RegisterSingleton (&Singleton<T,CreationPolicy>::Destroy);
+  try
+  {
+    instance = CreationPolicy<T>::Create ();
+    
+    if (!instance)
+      throw stl::runtime_error ("unable to create singleton");
+
+    node.RegisterSingleton (&Singleton<T,CreationPolicy>::Destroy);
+
+    is_in_init = false;
+  }
+  catch (...)
+  {
+    is_in_init = false;
+    throw;
+  }
 }
 
 template <class T,template <class> class CreationPolicy>
