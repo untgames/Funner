@@ -236,7 +236,6 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             window_impl->Notify (window_handle, WindowEvent_OnHide, context);
             break;
           case kEventWindowResizeCompleted: //окно изменило размеры
-            printf ("Resize\n");
             Platform::InvalidateWindow (window_handle);
             window_impl->Notify (window_handle, WindowEvent_OnSize, context);
             break;
