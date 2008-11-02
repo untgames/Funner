@@ -15,16 +15,24 @@ struct WindowImpl
   void*                          user_data;                               //указатель на пользовательские данные
   Platform::WindowMessageHandler message_handler;                         //функция обработки сообщений окна
   EventHandlerRef                carbon_window_event_handler;             //обработчик сообщений
+  EventHandlerUPP                carbon_window_event_handler_proc;        //обработчик сообщений
   WindowRef                      carbon_window;                           //окно
   UniChar                        char_code_buffer[CHAR_CODE_BUFFER_SIZE]; //буффер для получения имени введенного символа
 
-  WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data) :
-      user_data (in_user_data), message_handler (handler) {}
+  WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
+    : user_data (in_user_data), message_handler (handler), carbon_window_event_handler (0), carbon_window_event_handler_proc (0), carbon_window (0)
+    {}
 
   ~WindowImpl ()
   {
-    RemoveEventHandler (carbon_window_event_handler);
-    DisposeWindow      (carbon_window);
+    if (carbon_window_event_handler)
+      RemoveEventHandler (carbon_window_event_handler);
+
+    if (carbon_window_event_handler_proc)
+      DisposeEventHandlerUPP (carbon_window_event_handler_proc);
+
+    if (carbon_window)
+      DisposeWindow (carbon_window);
   }
 
   void Notify (Platform::window_t window, WindowEvent event, const WindowEventContext& context)
@@ -212,7 +220,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
 
             delete window_impl;
             break;
-          case kEventWindowPaint: //перерисовка окна
+          case kEventWindowDrawContent: //перерисовка окна
             window_impl->Notify (window_handle, WindowEvent_OnPaint, context);
             break;
           case kEventWindowActivated: //окно стало активным
@@ -228,6 +236,8 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             window_impl->Notify (window_handle, WindowEvent_OnHide, context);
             break;
           case kEventWindowResizeCompleted: //окно изменило размеры
+            printf ("Resize\n");
+            Platform::InvalidateWindow (window_handle);
             window_impl->Notify (window_handle, WindowEvent_OnSize, context);
             break;
           case kEventWindowDragCompleted: //окно изменило положение
@@ -454,7 +464,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       break;
     case WindowStyle_PopUp:
       window_class = kSheetWindowClass;
-      window_attributes = kWindowNoAttributes;
+      window_attributes = kWindowStandardHandlerAttribute;
       break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "style", style);
@@ -487,7 +497,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       EventTypeSpec handled_event_types [] = {
         { kEventClassWindow,    kEventWindowClose },
         { kEventClassWindow,    kEventWindowClosed },
-        { kEventClassWindow,    kEventWindowPaint },
+        { kEventClassWindow,    kEventWindowDrawContent },
         { kEventClassWindow,    kEventWindowActivated },
         { kEventClassWindow,    kEventWindowDeactivated },
         { kEventClassWindow,    kEventWindowShown },
@@ -514,6 +524,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
                                  window_impl, &window_event_handler), "::InstallEventHandler", "Can't install event handler");
 
       window_impl->carbon_window_event_handler = window_event_handler;
+      window_impl->carbon_window_event_handler_proc = window_event_handler_proc;
 
       SetMouseCoalescingEnabled (false, 0);
 
@@ -757,13 +768,11 @@ Platform::window_t Platform::GetParentWindow (window_t child)
 
 void Platform::InvalidateWindow (window_t handle)
 {
-  Rect window_rect;
-
   try
   {
-    GetWindowRect (handle, window_rect);
+    ::Rect update_rect;
 
-    ::Rect update_rect = { 0, 0, window_rect.bottom - window_rect.top, window_rect.right - window_rect.left };
+    GetWindowPortBounds ((WindowRef)handle, &update_rect);
 
     check_window_manager_error (InvalWindowRect ((WindowRef)handle, &update_rect), "::InvalidWindowRect", "Can't invalidate window");
   }
