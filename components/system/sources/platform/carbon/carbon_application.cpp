@@ -16,6 +16,8 @@ void Platform::DoNextEvent ()
   EventQueueRef current_event_queue (GetCurrentEventQueue ());
   EventRef      event               (AcquireFirstMatchingEventInQueue (current_event_queue, 0, 0, kEventQueueOptionsNone));
 
+  ReceiveNextEvent (0, 0, 0.000000001, false, &event);
+
   if (!event)
     return;
 
