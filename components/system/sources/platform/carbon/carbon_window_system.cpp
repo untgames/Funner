@@ -235,6 +235,13 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
           case kEventWindowHidden: //окно стало невидимым
             window_impl->Notify (window_handle, WindowEvent_OnHide, context);
             break;
+          case kEventWindowZoomed:
+            window_impl->Notify (window_handle, WindowEvent_OnSize, context);
+            window_impl->Notify (window_handle, WindowEvent_OnMove, context);
+            break;
+          case kEventWindowBoundsChanged:
+            Platform::InvalidateWindow (window_handle);
+            break;
           case kEventWindowResizeCompleted: //окно изменило размеры
             Platform::InvalidateWindow (window_handle);
             window_impl->Notify (window_handle, WindowEvent_OnSize, context);
@@ -459,11 +466,11 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
   {
     case WindowStyle_Overlapped:
       window_class = kDocumentWindowClass;
-      window_attributes = kWindowStandardDocumentAttributes | kWindowStandardHandlerAttribute;
+      window_attributes = kWindowStandardDocumentAttributes | kWindowStandardHandlerAttribute | kWindowLiveResizeAttribute;
       break;
     case WindowStyle_PopUp:
       window_class = kSheetWindowClass;
-      window_attributes = kWindowStandardHandlerAttribute;
+      window_attributes = kWindowStandardHandlerAttribute | kWindowLiveResizeAttribute;
       break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "style", style);
@@ -500,7 +507,9 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
         { kEventClassWindow,    kEventWindowActivated },
         { kEventClassWindow,    kEventWindowDeactivated },
         { kEventClassWindow,    kEventWindowShown },
+        { kEventClassWindow,    kEventWindowZoomed },
         { kEventClassWindow,    kEventWindowHidden },
+        { kEventClassWindow,    kEventWindowBoundsChanged },
         { kEventClassWindow,    kEventWindowResizeCompleted },
         { kEventClassWindow,    kEventWindowDragCompleted },
         { kEventClassWindow,    kEventWindowFocusAcquired },
