@@ -13,10 +13,9 @@ bool Platform::IsMessageQueueEmpty ()
 
 void Platform::DoNextEvent ()
 {
-  EventQueueRef current_event_queue (GetCurrentEventQueue ());
-  EventRef      event               (AcquireFirstMatchingEventInQueue (current_event_queue, 0, 0, kEventQueueOptionsNone));
+  EventRef event;
 
-  ReceiveNextEvent (0, 0, 0.000000001, false, &event);
+  ReceiveNextEvent (0, 0, 0.000000001, true, &event);
 
   if (!event)
     return;
@@ -27,8 +26,6 @@ void Platform::DoNextEvent ()
 
   try
   {
-    check_event_manager_error (RemoveEventFromQueue (current_event_queue, event), "::RemoveEventFromQueue", "Can't remove event from queue");
-
     OSStatus operation_result = SendEventToEventTarget (event, GetEventDispatcherTarget ());
 
     if (operation_result != eventNotHandledErr)

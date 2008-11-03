@@ -248,10 +248,6 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
           case kEventWindowHidden: //окно стало невидимым
             window_impl->Notify (window_handle, WindowEvent_OnHide, context);
             break;
-          case kEventWindowZoomed:
-            window_impl->Notify (window_handle, WindowEvent_OnSize, context);
-            window_impl->Notify (window_handle, WindowEvent_OnMove, context);
-            break;
           case kEventWindowBoundsChanged: //окно изменило размеры или положение
             Platform::InvalidateWindow (window_handle);
             window_impl->Notify (window_handle, WindowEvent_OnSize, context);
@@ -549,7 +545,6 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
         { kEventClassWindow,    kEventWindowActivated },
         { kEventClassWindow,    kEventWindowDeactivated },
         { kEventClassWindow,    kEventWindowShown },
-        { kEventClassWindow,    kEventWindowZoomed },
         { kEventClassWindow,    kEventWindowHidden },
         { kEventClassWindow,    kEventWindowBoundsChanged },
         { kEventClassWindow,    kEventWindowFocusAcquired },

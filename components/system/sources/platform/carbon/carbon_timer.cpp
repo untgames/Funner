@@ -74,8 +74,10 @@ void CarbonTimer::TimerProc (EventLoopTimerRef in_timer, void* user_data)
   {
     carbon_timer->handler (carbon_timer->user_data);
 
-    if (!IsEventInQueue (GetCurrentEventQueue (), carbon_timer->dummy_event))
-      check_event_manager_error (PostEventToQueue (GetCurrentEventQueue (), carbon_timer->dummy_event, kEventPriorityLow),
+    EventQueueRef current_event_queue (GetCurrentEventQueue ());
+
+    if (!IsEventInQueue (current_event_queue, carbon_timer->dummy_event))
+      check_event_manager_error (PostEventToQueue (current_event_queue, carbon_timer->dummy_event, kEventPriorityLow),
                                  "::SendEventToEventTarget", "Can't dispatch dummy event");
   }
   catch (xtl::exception& exception)
