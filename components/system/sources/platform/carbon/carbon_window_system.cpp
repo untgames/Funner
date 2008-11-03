@@ -5,7 +5,10 @@ using namespace syslib;
 namespace
 {
 
-const size_t CHAR_CODE_BUFFER_SIZE = 4;
+const OSType WINDOW_PROPERTY_CREATOR = 'untg';  //тег приложения
+const OSType FULLSCREEN_PROPERTY_TAG = 'fscr';  //тег свойства полноэкранности
+
+const size_t CHAR_CODE_BUFFER_SIZE = 4;  //размер буффера для декодированного имени символа
 
 /*
     Описание реализации окна
@@ -14,13 +17,17 @@ struct WindowImpl
 {
   void*                          user_data;                               //указатель на пользовательские данные
   Platform::WindowMessageHandler message_handler;                         //функция обработки сообщений окна
-  EventHandlerRef                carbon_window_event_handler;             //обработчик сообщений
-  EventHandlerUPP                carbon_window_event_handler_proc;        //обработчик сообщений
+  EventHandlerRef                carbon_window_event_handler;             //обработчик сообщений окна
+  EventHandlerUPP                carbon_window_event_handler_proc;        //обработчик сообщений окна
+  EventHandlerRef                carbon_application_event_handler;        //обработчик сообщений приложения
+  EventHandlerUPP                carbon_application_event_handler_proc;   //обработчик сообщений приложения
   WindowRef                      carbon_window;                           //окно
   UniChar                        char_code_buffer[CHAR_CODE_BUFFER_SIZE]; //буффер для получения имени введенного символа
 
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
-    : user_data (in_user_data), message_handler (handler), carbon_window_event_handler (0), carbon_window_event_handler_proc (0), carbon_window (0)
+    : user_data (in_user_data), message_handler (handler), carbon_window_event_handler (0),
+      carbon_window_event_handler_proc (0), carbon_application_event_handler (0),
+      carbon_application_event_handler_proc (0), carbon_window (0)
     {}
 
   ~WindowImpl ()
@@ -30,6 +37,12 @@ struct WindowImpl
 
     if (carbon_window_event_handler_proc)
       DisposeEventHandlerUPP (carbon_window_event_handler_proc);
+
+    if (carbon_application_event_handler)
+      RemoveEventHandler (carbon_application_event_handler);
+
+    if (carbon_application_event_handler_proc)
+      DisposeEventHandlerUPP (carbon_application_event_handler_proc);
 
     if (carbon_window)
       DisposeWindow (carbon_window);
@@ -448,6 +461,36 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
   return eventNotHandledErr;
 }
 
+/*
+    Обработка событий приложения
+*/
+
+OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref, EventRef event, void* impl)
+{
+  bool        is_fullscreen;
+  WindowImpl* window_impl = (WindowImpl*)impl;
+  WindowRef   wnd         = window_impl->carbon_window;
+
+  try
+  {
+    check_window_manager_error (GetWindowProperty (wnd, WINDOW_PROPERTY_CREATOR, FULLSCREEN_PROPERTY_TAG,
+                                sizeof (is_fullscreen), 0, &is_fullscreen), "::GetWindowProperty", "Can't get window property");
+  }
+  catch (std::exception& exception)
+  {
+    printf ("Exception at processing event in ::application_message_handler : '%s'\n", exception.what ());
+  }
+  catch (...)
+  {
+    printf ("Exception at processing event in ::application_message_handler : unknown exception\n");
+  }
+
+  if (is_fullscreen)
+    return window_message_handler (event_handler_call_ref, event, impl);
+
+  return eventNotHandledErr;
+}
+
 }
 
 
@@ -483,6 +526,8 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
 
     try
     {
+        //Создание окна
+
       WindowRef new_window;
 
       ::Rect window_rect = {0, 0, 400, 600};
@@ -496,11 +541,13 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
 
 //      SetParentWindow ((window_t)new_window, parent);
 
+        //Установка обработчика событий окна
+
       EventHandlerRef window_event_handler;
 
       EventHandlerUPP window_event_handler_proc = NewEventHandlerUPP (&window_message_handler);
 
-      EventTypeSpec handled_event_types [] = {
+      EventTypeSpec window_handled_event_types [] = {
         { kEventClassWindow,    kEventWindowClose },
         { kEventClassWindow,    kEventWindowClosed },
         { kEventClassWindow,    kEventWindowDrawContent },
@@ -528,11 +575,38 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       };
 
       check_event_manager_error (InstallEventHandler (GetWindowEventTarget (new_window), window_event_handler_proc,
-                                 sizeof (handled_event_types) / sizeof (handled_event_types[0]), handled_event_types,
+                                 sizeof (window_handled_event_types) / sizeof (window_handled_event_types[0]), window_handled_event_types,
                                  window_impl, &window_event_handler), "::InstallEventHandler", "Can't install event handler");
 
       window_impl->carbon_window_event_handler = window_event_handler;
       window_impl->carbon_window_event_handler_proc = window_event_handler_proc;
+
+        //Установка обработчика событий приложения (для обработки событий мыши в полноэкранном режиме)
+
+      EventHandlerRef application_event_handler;
+
+      EventHandlerUPP application_event_handler_proc = NewEventHandlerUPP (&application_message_handler);
+
+      EventTypeSpec application_handled_event_types [] = {
+        { kEventClassMouse,     kEventMouseDown },
+        { kEventClassMouse,     kEventMouseUp },
+        { kEventClassMouse,     kEventMouseMoved },
+        { kEventClassMouse,     kEventMouseDragged },
+        { kEventClassMouse,     kEventMouseWheelMoved },
+      };
+
+      check_event_manager_error (InstallEventHandler (GetApplicationEventTarget (), application_event_handler_proc,
+                                 sizeof (application_handled_event_types) / sizeof (application_handled_event_types[0]),
+                                 application_handled_event_types, window_impl, &application_event_handler),
+                                 "::InstallEventHandler", "Can't install event handler");
+
+      window_impl->carbon_application_event_handler = application_event_handler;
+      window_impl->carbon_application_event_handler_proc = application_event_handler_proc;
+
+      bool is_fullscreen = false;
+
+      check_window_manager_error (SetWindowProperty (new_window, WINDOW_PROPERTY_CREATOR, FULLSCREEN_PROPERTY_TAG,
+                                  sizeof (is_fullscreen), &is_fullscreen), "::SetWindowProperty", "Can't set window property");
 
       SetMouseCoalescingEnabled (false, 0);
 
