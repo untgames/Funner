@@ -2,24 +2,33 @@
 <Configuration>
   <WindowManager>
     <Window
-      Style   = "Overlapped"
-      Width   = "300"
-      Height  = "300"
-      Title   = "Window1"
-      Visible = "1"
-      Attachment = "Window1"
+      Id       = "ParentWindow"
+      Style    = "Overlapped"
+      Width    = "800"
+      Height   = "600"
+      Title    = "Parent window"
+      Visible  = "1"
+    />  
+    <Window
+      Id       = "Window1"    
+      Style    = "Overlapped"
+      Width    = "300"
+      Height   = "300"
+      Title    = "Window1 title"
+      Visible  = "1"
+      Parent   = "ParentWindow"
     />
     <Window
-      Style   = "Overlapped"
-      Width   = "300"
-      Height  = "300"
-      Title   = "Window2"
-      Visible = "1"
-      Attachment = "Window2"
-      Parent = "Window1"
+      Id       = "Window2"    
+      Style    = "Overlapped"
+      Width    = "300"
+      Height   = "300"
+      Title    = "Window2 title"
+      Visible  = "1"
+      Parent   = "ParentWindow"
     />
   </WindowManager>
-  <WindowRenderer Name="MyRenderer" AdapterMask="OpenGL32" DriverMask="*">
+  <WindowRenderer Id="MyRenderer" AdapterMask="OpenGL32" DriverMask="*">
     <FrameBuffer
       Window       = "Window1"
       ColorBits    = "24"
@@ -47,16 +56,18 @@
       FullScreen   = "0"
     />
   </WindowRenderer>
-  <WindowInputDriver Window="Window1"/>
-  <WindowInputDriver Window="Window2"/>
   <SceneRender
     DriverMask   = "*"
-    RendererMask = "*"
+    RendererMask = "MyRenderer"
     Log          = "render.scene_render"
     >
-    <Screen Attachment = "Screen1" RenderTarget = "0"/>
-    <Screen Attachment = "Screen2" RenderTarget = "1"/>
+    <RenderTarget Screen = "Screen1"/>
+    <RenderTarget Screen = "Screen2"/>
   </SceneRender>
-  <ScenePlayer Attachment = "ScenePlayer1" DriverMask = "*" DeviceMask = "*" InitString = ""/>
+  <ScenePlayer Listener = "ScenePlayer1" DriverMask = "*" DeviceMask = "*" InitString = ""/>
+  <WindowInputDriver>
+    <Device Id="Device1" Window="Window1"/>
+    <Device Window="Window2"/>
+  </WindowInputDriver>
   <InputManager TranslationMapRegistry = "data/translation_map_registry.xkeyreg"/>
 </Configuration>

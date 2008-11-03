@@ -99,7 +99,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public xtl::re
         
       try
       {
-        attachment_name = get<const char*> (node, "Attachment", "");        
+        attachment_name = get<const char*> (node, "Id", "");
 
         if (!attachment_name.empty ())
           AttachmentRegistry::Register (attachment_name.c_str (), xtl::ref (window));

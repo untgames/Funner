@@ -53,11 +53,12 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
           Log (log_name).Swap (log);
 
         render.SetLogHandler (xtl::bind (&Log::Print, &log, _1));
+        
+        size_t render_target_index = 0;
 
-        for (Parser::NamesakeIterator iter=node.First ("Screen"); iter; ++iter)
+        for (Parser::NamesakeIterator iter=node.First ("RenderTarget"); iter; ++iter, ++render_target_index)
         {
-          const char* attachment          = get<const char*> (*iter, "Attachment");
-          size_t      render_target_index = get<size_t> (*iter, "RenderTarget");
+          const char* attachment = get<const char*> (*iter, "Screen");
 
           if (render_target_index >= render.RenderTargetsCount ())
           {

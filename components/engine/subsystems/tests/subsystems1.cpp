@@ -24,11 +24,6 @@ void log_handler (const char* log_name, const char* message)
   printf ("%s: %s\n", log_name, message);
 }
 
-void render_log_print (const char* message)
-{
-  printf ("%s\n", message);
-}
-
 void input_event_handler (const char* event)
 {
   if (!xtl::xstrcmp ("exit", event))
@@ -68,6 +63,8 @@ int main ()
   {
     printf ("unknown exception\n");
   }
+  
+  printf ("heye!\n");
 
   return syslib::Application::GetExitCode ();
 }

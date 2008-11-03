@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding = "windows-1251"?>
 <TranslationTable>
-  <Translation Event="'Axis0' delta *" Replacement="Mouse {0} {1} {2}"/>
-  <Translation Event="'Axis1' delta *" Replacement="Mouse {0} {1} {2}"/>
-  <Translation Event="'Button1' down" Replacement="exit"/>
+  <Translation Event="'CursorX' delta *" Replacement="Mouse {0} {1} {2}"/>
+  <Translation Event="'CursorY' delta *" Replacement="Mouse {0} {1} {2}"/>
+  <Translation Event="'Mouse1' down" Replacement="exit"/>
 </TranslationTable>

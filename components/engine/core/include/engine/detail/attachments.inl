@@ -124,14 +124,20 @@ inline void AttachmentRegistry::Register (const char* name, T& object)
 }
 
 template <class T>
+inline void AttachmentRegistry::Unregister (const char* name)
+{
+  UnregisterCore (name, typeid (T));
+}
+
+template <class T>
 inline void AttachmentRegistry::Unregister (const char* name, T& object)
 {
-  T* attachment = Find<T> (name);
+  detail::IAttachment<T>* attachment = static_cast<detail::IAttachment<T>*> (FindCore (name, typeid (T), false));
   
-  if (!attachment || attachment != &object)
+  if (!attachment || &attachment->GetValue () != &object)
     return;
 
-  Unregister (name);  
+  UnregisterCore (name, attachment->GetType ());
 }
 
 template <class T>

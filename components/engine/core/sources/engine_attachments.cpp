@@ -2,6 +2,31 @@
 
 using namespace engine;
 
+namespace
+{
+
+/*
+    Ключ к реестре
+*/
+
+struct AttachmentKey
+{
+  size_t                name_hash; //хэш имени
+  const std::type_info* type;      //тип точки привязки
+  
+  AttachmentKey (const char* name, const std::type_info& in_type) :
+    name_hash (common::strhash (name)), type (&in_type) {}
+    
+  bool operator == (const AttachmentKey& key) const { return name_hash == key.name_hash && type == key.type; }
+};
+
+size_t hash (const AttachmentKey& key)
+{
+  return stl::hash (key.name_hash, stl::hash (key.type));
+}
+
+}
+
 namespace engine
 {
 
@@ -9,7 +34,7 @@ namespace engine
     Реализация менеджера точек привязки
 */
 
-class AttachmentRegistryImpl
+class AttachmentRegistryImpl: public xtl::reference_counter
 {
   public:
 ///Деструктор
@@ -35,34 +60,19 @@ class AttachmentRegistryImpl
         throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
         //поиск вхождения в карту точек привязки
-        
-      AttachmentMap::iterator iter = attachments.find (name);
+
+      AttachmentKey           key (name, type);
+      AttachmentMap::iterator iter = attachments.find (key);
       
       if (iter == attachments.end ())
       {
           //добавление новой точки привязки
 
-        attachments.insert_pair (name, AttachmentEntryPtr (new AttachmentEntry (name, type, attachment_holder), false));
+        attachments.insert_pair (key, AttachmentEntryPtr (new AttachmentEntry (name, type, attachment_holder), false));
       }
       else
       {
-        AttachmentEntry& entry = *iter->second;
-
-        if (entry.type == &type) //если регистрация производится без изменения типа точки привязки
-        {
-          entry.attachment = attachment_holder;
-        }
-        else //регистрация производится с изменением типа точки привязки
-        {
-            //отмена регистрации предыдущей точки привязки
-            
-          UnregisterAttachmentNotify (entry.name.c_str (), *entry.type, entry.attachment.get ());
-
-            //изменение параметров точки привязки
-
-          entry.attachment = attachment_holder;
-          entry.type       = &type;
-        }
+        iter->second->attachment = attachment_holder;
       }
 
         //оповещение об установке новой точки привязки
@@ -71,14 +81,15 @@ class AttachmentRegistryImpl
     }
     
 ///Отмена регистрации точки привязки
-    void Unregister (const char* name)
+    void Unregister (const char* name, const std::type_info& type)
     {
       if (!name)
         return;
 
         //поиск точки привязки
 
-      AttachmentMap::iterator iter = attachments.find (name);
+      AttachmentKey           key (name, type);
+      AttachmentMap::iterator iter = attachments.find (key);
 
       if (iter == attachments.end ())
         return;
@@ -101,7 +112,7 @@ class AttachmentRegistryImpl
         if (iter->second->type == &type)
         {
           AttachmentMap::iterator next = iter;
-          
+
           ++next;
 
             //оповещение об удалении точки привязки
@@ -151,23 +162,13 @@ class AttachmentRegistryImpl
       
         //поиск точки привязки по имени
       
-      AttachmentMap::iterator iter = attachments.find (name);
+      AttachmentKey           key (name, type);
+      AttachmentMap::iterator iter = attachments.find (key);
 
       if (iter == attachments.end ())
       {
         if (raise_exception)
           throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Attachment point not found");
-
-        return 0;
-      }
-      
-        //проверка типа точки привязки
-        
-      if (iter->second->type != &type)
-      {
-        if (raise_exception)
-          throw xtl::format_operation_exception (METHOD_NAME, "Attachment '%s' has incompatible type (requested_type='%s', attachment_type='%s')",
-            name, type.name (), iter->second->type->name ());
 
         return 0;
       }
@@ -335,9 +336,9 @@ class AttachmentRegistryImpl
         listener (in_listener), type (&in_type) {}
     };
 
-    typedef xtl::intrusive_ptr<AttachmentEntry>                           AttachmentEntryPtr;
-    typedef stl::hash_map<stl::hash_key<const char*>, AttachmentEntryPtr> AttachmentMap;
-    typedef stl::list<ListenerEntry>                                      ListenerList;
+    typedef xtl::intrusive_ptr<AttachmentEntry>              AttachmentEntryPtr;
+    typedef stl::hash_map<AttachmentKey, AttachmentEntryPtr> AttachmentMap;
+    typedef stl::list<ListenerEntry>                         ListenerList;
 
   private:
     AttachmentMap attachments; //карта точек привязки
@@ -349,7 +350,7 @@ typedef common::Singleton<AttachmentRegistryImpl> AttachmentRegistrySingleton;
 }
 
 /*
-    Обёртки над вызовами методов AttachmentRegistry
+    Врапперы над вызовами к AttachmentRegistry
 */
 
 void AttachmentRegistry::RegisterCore (const char* name, detail::IBasicAttachment* attachment)
@@ -357,9 +358,9 @@ void AttachmentRegistry::RegisterCore (const char* name, detail::IBasicAttachmen
   AttachmentRegistrySingleton::Instance ().Register (name, attachment);
 }
 
-void AttachmentRegistry::Unregister (const char* name)
+void AttachmentRegistry::UnregisterCore (const char* name, const std::type_info& type)
 {
-  AttachmentRegistrySingleton::Instance ().Unregister (name);
+  AttachmentRegistrySingleton::Instance ().Unregister (name, type);
 }
 
 void AttachmentRegistry::UnregisterAllCore (const std::type_info& type)

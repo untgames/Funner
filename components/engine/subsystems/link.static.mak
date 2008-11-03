@@ -1,5 +1,5 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LINK_INCLUDES := SceneRender
-export.IMPORTS       := ../../render/scene_render/link.static.mak link.static.mak
+export.LIBS    := funner.engine.subsystems
+export.IMPORTS := ../core/link.static.mak

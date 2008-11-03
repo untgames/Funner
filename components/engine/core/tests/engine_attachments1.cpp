@@ -51,7 +51,7 @@ class MyListener : public IAttachmentRegistryListener<A1>, public IAttachmentReg
 int main ()
 {
   printf ("Results of engine_attachments1_test:\n");
-  
+
   MyListener listener;  
   
   try
@@ -60,7 +60,7 @@ int main ()
     xtl::shared_ptr<A1> a12 (new A1 (2));
     xtl::com_ptr<A2> a21 (new A2 (3), false);
 
-    printf ("Attach listener\n");    
+    printf ("Attach listener\n");        
     
     AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<A2>*> (&listener));    
     
@@ -77,7 +77,7 @@ int main ()
     
     printf ("Unregister value 'Value2'\n");
 
-    AttachmentRegistry::Unregister ("Value2");
+    AttachmentRegistry::Unregister ("Value2", a12);
     
     printf ("Unregiser all A1 values\n");
 

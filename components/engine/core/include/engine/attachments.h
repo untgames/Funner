@@ -19,7 +19,8 @@ namespace engine
 
 //forward declaration
 class AttachmentRegistryImpl;
-class AttachmentRegistry;
+class IBasicAttachmentRegistryListener;
+template <class T> class IAttachmentRegistryListener;
 
 namespace detail
 {
@@ -40,6 +41,41 @@ enum AttachmentRegistryAttachMode
   AttachmentRegistryAttachMode_Num,
 
   AttachmentRegistryAttachMode_Default = AttachmentRegistryAttachMode_Quiet
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Реестр точек привязки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class AttachmentRegistry
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация точек привязки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class T> static void Register      (const char* name, T& object);
+    template <class T> static void Unregister    (const char* name, T& object); //only if equal
+    template <class T> static void Unregister    (const char* name);
+    template <class T> static void UnregisterAll ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск точки привязки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class T> static T& Get  (const char* name);
+    template <class T> static T* Find (const char* name); //nothrow
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа со слушателями событий
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    template <class T> static void Attach (IAttachmentRegistryListener<T>* listener, AttachmentRegistryAttachMode = AttachmentRegistryAttachMode_Default);
+    template <class T> static void Detach (IAttachmentRegistryListener<T>* listener, AttachmentRegistryAttachMode = AttachmentRegistryAttachMode_Default);
+
+  private:
+    static void                      RegisterCore      (const char* name, detail::IBasicAttachment* attachment);
+    static void                      UnregisterCore    (const char* name, const std::type_info& type);
+    static void                      UnregisterAllCore (const std::type_info& type);
+    static void                      AttachCore        (const std::type_info& type, IBasicAttachmentRegistryListener* listener, AttachmentRegistryAttachMode mode);
+    static void                      DetachCore        (const std::type_info& type, IBasicAttachmentRegistryListener* listener, AttachmentRegistryAttachMode mode);
+    static detail::IBasicAttachment* FindCore          (const char* name, const std::type_info& type, bool raise_exception);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,40 +107,6 @@ template <class T> class IAttachmentRegistryListener: public IBasicAttachmentReg
   private:
     virtual void OnRegisterAttachmentCore   (const char* name, detail::IBasicAttachment* attachment);
     virtual void OnUnregisterAttachmentCore (const char* name, detail::IBasicAttachment* attachment);
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Реестр точек привязки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class AttachmentRegistry
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация точек привязки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T> static void Register      (const char* name, T& object);
-    template <class T> static void Unregister    (const char* name, T& object); //only if equal
-                       static void Unregister    (const char* name);
-    template <class T> static void UnregisterAll ();
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск точки привязки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T> static T& Get  (const char* name);
-    template <class T> static T* Find (const char* name); //nothrow
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа со слушателями событий
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class T> static void Attach (IAttachmentRegistryListener<T>* listener, AttachmentRegistryAttachMode = AttachmentRegistryAttachMode_Default);
-    template <class T> static void Detach (IAttachmentRegistryListener<T>* listener, AttachmentRegistryAttachMode = AttachmentRegistryAttachMode_Default);
-
-  private:
-    static void                      RegisterCore      (const char* name, detail::IBasicAttachment* attachment);
-    static void                      UnregisterAllCore (const std::type_info& type);
-    static void                      AttachCore        (const std::type_info& type, IBasicAttachmentRegistryListener* listener, AttachmentRegistryAttachMode mode);
-    static void                      DetachCore        (const std::type_info& type, IBasicAttachmentRegistryListener* listener, AttachmentRegistryAttachMode mode);
-    static detail::IBasicAttachment* FindCore          (const char* name, const std::type_info& type, bool raise_exception);
 };
 
 #include <engine/detail/attachments.inl>

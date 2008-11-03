@@ -35,7 +35,7 @@ class WindowRendererSubsystem: public ISubsystem, public xtl::reference_counter
 ///Конструктор
     WindowRendererSubsystem (ParseNode& node)
     {
-      renderer_name = get<const char*> (node, "Name");
+      renderer_name = get<const char*> (node, "Id");
 
       render::mid_level::WindowDriver::RegisterRenderer (renderer_name.c_str (), node);      
 

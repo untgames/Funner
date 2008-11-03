@@ -8,12 +8,12 @@ A::A(const A&): id=1
 OnRegisterAttachment(Value1, A1=1)
 OnRegisterAttachment(Value2, A1=2)
 Change value 'Value1'
-OnUnregisterAttachment(Value1, A1=1)
-A::~A():        id=1
 OnRegisterAttachment(Value1, A2=3)
 Unregister value 'Value2'
-OnUnregisterAttachment(Value2, A1=2)
 Unregiser all A1 values
+OnUnregisterAttachment(Value1, A1=1)
+A::~A():        id=1
+OnUnregisterAttachment(Value2, A1=2)
 Unregiser all A2 values
 OnUnregisterAttachment(Value1, A2=3)
 A::~A():        id=3
