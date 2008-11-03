@@ -252,14 +252,9 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             window_impl->Notify (window_handle, WindowEvent_OnSize, context);
             window_impl->Notify (window_handle, WindowEvent_OnMove, context);
             break;
-          case kEventWindowBoundsChanged:
-            Platform::InvalidateWindow (window_handle);
-            break;
-          case kEventWindowResizeCompleted: //окно изменило размеры
+          case kEventWindowBoundsChanged: //окно изменило размеры или положение
             Platform::InvalidateWindow (window_handle);
             window_impl->Notify (window_handle, WindowEvent_OnSize, context);
-            break;
-          case kEventWindowDragCompleted: //окно изменило положение
             window_impl->Notify (window_handle, WindowEvent_OnMove, context);
             break;
           case kEventWindowFocusRestored:
@@ -557,8 +552,6 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
         { kEventClassWindow,    kEventWindowZoomed },
         { kEventClassWindow,    kEventWindowHidden },
         { kEventClassWindow,    kEventWindowBoundsChanged },
-        { kEventClassWindow,    kEventWindowResizeCompleted },
-        { kEventClassWindow,    kEventWindowDragCompleted },
         { kEventClassWindow,    kEventWindowFocusAcquired },
         { kEventClassWindow,    kEventWindowFocusRelinquish },
         { kEventClassWindow,    kEventWindowFocusLost },
