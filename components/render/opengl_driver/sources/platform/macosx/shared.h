@@ -297,8 +297,9 @@ class Context: virtual public IContext, public Object
 };
 
 //Проверка ошибок
+void check_event_manager_error  (OSStatus error_code, const char* source, const char* message);  //проверка ошибок EventManager
 void check_quartz_error         (CGError error_code, const char* source, const char* message);   //проверка ошибок Quartz Framework
-void check_window_manager_error (OSStatus error_code, const char* source);                       //генерация исключений WindowManager Framework
+void check_window_manager_error (OSStatus error_code, const char* source);                       //генерация исключений WindowManager
 void check_agl_error            (const char* source);                                            //проверка ошибок Agl Framework
 void raise_agl_error            (const char* source);                                            //генерация исключений с информацией об ошибке
 

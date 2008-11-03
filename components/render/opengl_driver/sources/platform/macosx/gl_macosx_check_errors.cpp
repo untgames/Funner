@@ -3,6 +3,29 @@
 namespace
 {
 
+const char* get_event_manager_error_name (OSStatus error)
+{
+  switch (error)
+  {
+    case noErr:                           return "noErr";
+    case eventAlreadyPostedErr:           return "eventAlreadyPostedErr";
+    case eventTargetBusyErr:              return "eventTargetBusyErr";
+    case eventClassInvalidErr:            return "eventClassInvalidErr";
+    case eventClassIncorrectErr:          return "eventClassIncorrectErr";
+    case eventHandlerAlreadyInstalledErr: return "eventHandlerAlreadyInstalledErr";
+    case eventInternalErr:                return "eventInternalErr";
+    case eventKindIncorrectErr:           return "eventKindIncorrectErr";
+    case eventParameterNotFoundErr:       return "eventParameterNotFoundErr";
+    case eventNotHandledErr:              return "eventNotHandledErr";
+    case eventLoopTimedOutErr:            return "eventLoopTimedOutErr";
+    case eventLoopQuitErr:                return "eventLoopQuitErr";
+    case eventNotInQueueErr:              return "eventNotInQueueErr";
+    case eventHotKeyExistsErr:            return "eventHotKeyExistsErr";
+    case eventHotKeyInvalidErr:           return "eventHotKeyInvalidErr";
+    default:                              return "Unknown error";
+  }
+}
+
 const char* get_quartz_error_name (CGError error)
 {
   switch (error)
@@ -68,6 +91,14 @@ namespace opengl
 namespace macosx
 {
 
+//проверка ошибок EventManager
+void check_event_manager_error (OSStatus error_code, const char* source, const char* message)
+{
+  if (error_code != noErr)
+    throw xtl::format_operation_exception (source, "%s. Carbon error: %s (code %d)", message,
+                                           get_event_manager_error_name (error_code), error_code);
+}
+
 //проверка ошибок Quartz Framework
 void check_quartz_error (CGError error_code, const char* source, const char* message)
 {
@@ -76,11 +107,11 @@ void check_quartz_error (CGError error_code, const char* source, const char* mes
                                            get_quartz_error_name (error_code), error_code);
 }
 
-//проверка ошибок WindowManager Framework
+//проверка ошибок WindowManager
 void check_window_manager_error (OSStatus error_code, const char* source)
 {
   if (error_code != noErr)
-    throw xtl::format_operation_exception (source, "Internal window manager error %s, code %d",
+    throw xtl::format_operation_exception (source, "Carbon error %s, code %d",
                                            get_window_manager_error_name (error_code), error_code);
 }
 

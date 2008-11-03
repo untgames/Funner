@@ -3,6 +3,16 @@
 using namespace render::low_level;
 using namespace render::low_level::opengl::macosx;
 
+namespace
+{
+
+/*
+    Обработка событий окна
+*/
+
+
+}
+
 /*
     Описание реализации PrimarySwapChain
 */
@@ -11,22 +21,36 @@ typedef xtl::com_ptr<Adapter> AdapterPtr;
 
 struct PrimarySwapChain::Impl
 {
-  Log            log;                  //протокол
-  AdapterPtr     adapter;              //адаптер цепочки обмена
-  SwapChainDesc  desc;                 //дескриптор цепочки обмена
-  AGLPixelFormat pixel_format;         //формат пикселей
-  OutputManager  output_manager;       //менеджер устройств вывода
-  AGLContext     context;              //установленный контекст
-  Output*        containing_output;    //дисплей, на котором производится рендеринг
+  Log             log;                       //протокол
+  AdapterPtr      adapter;                   //адаптер цепочки обмена
+  SwapChainDesc   desc;                      //дескриптор цепочки обмена
+  AGLPixelFormat  pixel_format;              //формат пикселей
+  OutputManager   output_manager;            //менеджер устройств вывода
+  AGLContext      context;                   //установленный контекст
+  Output*         containing_output;         //дисплей, на котором производится рендеринг
+  EventHandlerRef window_event_handler;      //обработчик событий окна
+  EventHandlerUPP window_event_handler_proc; //обработчик событий окна
 
 ///Конструктор
   Impl (const SwapChainDesc& in_desc, Adapter* in_adapter)
-    : adapter (in_adapter), context (0)
+    : adapter (in_adapter), pixel_format (0), context (0), window_event_handler (0), window_event_handler_proc (0)
   {
       //проверка корректности аргументов
 
     if (!in_desc.window_handle)
       throw xtl::make_null_argument_exception ("", "in_desc.window_handle");
+
+      //подписка на событие изменения окна
+
+    window_event_handler_proc = NewEventHandlerUPP (&PrimarySwapChain::Impl::window_message_handler);
+
+    EventTypeSpec handled_event_types [] = {
+      { kEventClassWindow, kEventWindowBoundsChanged },
+    };
+
+    check_event_manager_error (InstallEventHandler (GetWindowEventTarget ((WindowRef)in_desc.window_handle), window_event_handler_proc,
+      sizeof (handled_event_types) / sizeof (handled_event_types[0]), handled_event_types,
+      this, &window_event_handler), "::InstallEventHandler", "Can't install window event handler");
 
       //поиск дисплея, на котором производится рендеринг
 
@@ -145,7 +169,15 @@ struct PrimarySwapChain::Impl
     }
     catch (...)
     {
-      aglDestroyPixelFormat (pixel_format);
+      if (window_event_handler)
+        RemoveEventHandler (window_event_handler);
+
+      if (window_event_handler_proc)
+        DisposeEventHandlerUPP (window_event_handler_proc);
+
+      if (pixel_format)
+        aglDestroyPixelFormat (pixel_format);
+
       throw;
     }
   }
@@ -161,6 +193,9 @@ struct PrimarySwapChain::Impl
 
       containing_output->SetCurrentMode (default_output_mode);
     }*/
+
+    RemoveEventHandler     (window_event_handler);
+    DisposeEventHandlerUPP (window_event_handler_proc);
 
     aglDestroyPixelFormat (pixel_format);
 
@@ -198,6 +233,35 @@ struct PrimarySwapChain::Impl
       exception.touch ("render::low_level::opengl::macosx::PrimarySwapChain::Impl::GetPixelFormatValue(%04x)", attribute);
       throw;
     }
+  }
+
+  static OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, EventRef event, void* swap_chain_impl)
+  {
+    if ((GetEventClass (event) != kEventClassWindow) || (GetEventKind (event) != kEventWindowBoundsChanged))
+      return eventNotHandledErr;
+
+    Impl* this_impl = (Impl*)swap_chain_impl;
+
+    if (this_impl->context)
+      aglUpdateContext (this_impl->context);
+
+    try
+    {
+      OSStatus operation_result = CallNextEventHandler (event_handler_call_ref, event);
+
+      if (operation_result != eventNotHandledErr)
+        check_event_manager_error (operation_result, "::CallNextEventHandler", "Can't call next event handler");
+    }
+    catch (std::exception& exception)
+    {
+      printf ("Exception at processing event in ::window_message_handler : '%s'\n", exception.what ());
+    }
+    catch (...)
+    {
+      printf ("Exception at processing event in ::window_message_handler : unknown exception\n");
+    }
+
+    return noErr;
   }
 };
 
@@ -336,6 +400,8 @@ void PrimarySwapChain::SetContext (AGLContext context)
     {
       if (!aglSetWindowRef (context, (WindowRef)impl->desc.window_handle))
         raise_agl_error ("::aglSetWindowRef");
+
+      aglUpdateContext (context);
     }
   }
   catch (xtl::exception& exception)

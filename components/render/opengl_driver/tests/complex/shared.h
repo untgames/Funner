@@ -3,7 +3,6 @@
 
 #include <cstdio>
 #include <cmath>
-#include <ctime>
 #include <exception>
 
 #include <mathlib.h>
@@ -33,6 +32,7 @@
 #include <common/hash.h>
 #include <common/log.h>
 #include <common/singleton.h>
+#include <common/time.h>
 
 #include <media/image.h>
 #include <media/mesh.h>
@@ -68,14 +68,14 @@ typedef xtl::com_ptr<IPredicate>               PredicatePtr;
 struct TestLogFilter
 {
   common::LogFilter log_filter;
-  
+
   TestLogFilter () : log_filter ("*", &LogPrint) {}
-  
+
   static void LogPrint (const char* log_name, const char* message)
   {
     printf ("%s: %s\n", log_name, message);
     fflush (stdout);
-  }  
+  }
 };
 
 typedef common::Singleton<TestLogFilter> TestLogFilterSingleton;
@@ -95,7 +95,7 @@ struct Test
     redraw (in_redraw)
   {
     TestLogFilterSingleton::Instance (); //инициализация фильтра протокольных сообщений
-  
+
     window.SetTitle (title);
     window.Show ();
 
@@ -111,25 +111,27 @@ struct Test
     desc.samples_count             = 4;
     desc.swap_method               = SwapMethod_Discard;
     desc.vsync                     = false;
-    desc.window_handle             = window.Handle ();    
+    desc.window_handle             = window.Handle ();
 
-    DriverManager::CreateSwapChainAndDevice ("OpenGL", adapter_mask, desc, init_string, swap_chain, device);        
-    
+    DriverManager::CreateSwapChainAndDevice ("OpenGL", adapter_mask, desc, init_string, swap_chain, device);
+
 //    swap_chain->SetFullscreenState (true);
 
     OnResize ();
-    
+
     window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Test::OnRedraw, this));
     window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Test::OnResize, this));
     window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Test::OnClose, this));
+
+    window.Invalidate ();
   }
- 
+
   void OnResize ()
   {
     try
     {
       syslib::Rect rect = window.ClientRect ();
-    
+
       Viewport vp;
 
       vp.x         = rect.left;
@@ -137,7 +139,7 @@ struct Test
       vp.width     = rect.right - rect.left;
       vp.height    = rect.bottom - rect.top;
       vp.min_depth = 0;
-      vp.max_depth = 1;            
+      vp.max_depth = 1;
 
       device->RSSetViewport (vp);
     }
@@ -146,7 +148,7 @@ struct Test
       printf ("resize exception: %s\n", e.what ());
     }
   }
-  
+
   void OnRedraw ()
   {
     try
@@ -156,12 +158,12 @@ struct Test
       clear_color.red   = 0;
       clear_color.green = 0.7f;
       clear_color.blue  = 0.7f;
-      clear_color.alpha = 0;      
+      clear_color.alpha = 0;
 
       device->ClearViews (ClearFlag_All, clear_color, 1.0f, 0);
 
       if (redraw)
-        redraw (*this);      
+        redraw (*this);
 
       device->Flush ();
 
@@ -170,26 +172,26 @@ struct Test
     catch (std::exception& e)
     {
       printf ("redraw exception: %s\n", e.what ());
-    }  
+    }
   }
-  
+
   void OnClose ()
   {
     syslib::Application::Exit (0);
-  }  
+  }
 };
 
 //чтение ихсодного текста шейдера в строку
 stl::string read_shader (const char* file_name)
 {
   common::InputFile file (file_name);
-  
+
   stl::string buffer (file.Size (), ' ');
-  
+
   file.Read (&buffer [0], file.Size ());
-  
+
   return buffer;
-} 
+}
 
 
 #endif
