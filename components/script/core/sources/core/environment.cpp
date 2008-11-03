@@ -276,6 +276,23 @@ const char* Environment::LibraryId (const ConstIterator& i) const
 }
 
 /*
+    Биндинг библиотек
+*/
+
+void Environment::BindLibraries (const char* library_mask)
+{
+  try
+  {
+    LibraryManager::BindLibraries (*this, library_mask);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("script::Environment::BindLibraries");
+    throw;
+  }
+}
+
+/*
     Регистрация обработчиков событий
 */
 
