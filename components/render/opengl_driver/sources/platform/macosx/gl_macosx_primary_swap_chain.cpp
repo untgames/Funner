@@ -6,10 +6,8 @@ using namespace render::low_level::opengl::macosx;
 namespace
 {
 
-/*
-    Обработка событий окна
-*/
-
+const OSType WINDOW_PROPERTY_CREATOR = 'untg';  //тег приложения
+const OSType FULLSCREEN_PROPERTY_TAG = 'fscr';  //тег свойства полноэкранности
 
 }
 
@@ -30,6 +28,8 @@ struct PrimarySwapChain::Impl
   Output*         containing_output;         //дисплей, на котором производится рендеринг
   EventHandlerRef window_event_handler;      //обработчик событий окна
   EventHandlerUPP window_event_handler_proc; //обработчик событий окна
+  size_t          window_width;              //ширина окна
+  size_t          window_height;             //высота окна
 
 ///Конструктор
   Impl (const SwapChainDesc& in_desc, Adapter* in_adapter)
@@ -112,6 +112,11 @@ struct PrimarySwapChain::Impl
       ::Rect window_rect;
 
       check_window_manager_error (GetWindowBounds ((WindowRef)in_desc.window_handle, kWindowStructureRgn, &window_rect), "::GetWindowBounds");
+
+      window_width  = window_rect.right - window_rect.left;
+      window_height = window_rect.bottom - window_rect.top;
+
+      check_window_manager_error (GetWindowBounds ((WindowRef)in_desc.window_handle, kWindowContentRgn, &window_rect), "::GetWindowBounds");
 
       desc.frame_buffer.width        = window_rect.right - window_rect.left;
       desc.frame_buffer.height       = window_rect.bottom - window_rect.top;
@@ -391,9 +396,12 @@ void PrimarySwapChain::SetContext (AGLContext context)
 
       //установка fullscreen
 
+    check_window_manager_error (SetWindowProperty ((WindowRef)impl->desc.window_handle, WINDOW_PROPERTY_CREATOR, FULLSCREEN_PROPERTY_TAG,
+                                sizeof (impl->desc.fullscreen), &impl->desc.fullscreen), "::SetWindowProperty");
+
     if (impl->desc.fullscreen)
     {
-      if (!aglSetFullScreen (context, impl->desc.frame_buffer.width, impl->desc.frame_buffer.height, 0, 0))
+      if (!aglSetFullScreen (context, impl->window_width, impl->window_height, 0, 0))
         raise_agl_error ("::aglSetFullScreen");
     }
     else
