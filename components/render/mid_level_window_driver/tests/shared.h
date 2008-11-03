@@ -3,7 +3,6 @@
 
 #include <cstdio>
 #include <cstring>
-#include <ctime>
 
 #include <stl/vector>
 
@@ -17,6 +16,7 @@
 #include <xtl/trackable.h>
 
 #include <common/log.h>
+#include <common/time.h>
 #include <common/parser.h>
 
 #include <media/image.h>
@@ -66,22 +66,22 @@ typedef xtl::com_ptr<IPrimitive>                      PrimitivePtr;
 class RendererListener : public IRendererListener
 {
   public:
-    void OnFrameBufferCreate (IFrameBuffer* frame_buffer) 
+    void OnFrameBufferCreate (IFrameBuffer* frame_buffer)
     {
       printf ("Created frame buffer %p\n", frame_buffer);
     }
 
-    void OnFrameBufferDestroy (IFrameBuffer* frame_buffer) 
+    void OnFrameBufferDestroy (IFrameBuffer* frame_buffer)
     {
       printf ("Destroyed frame buffer %p\n", frame_buffer);
     }
 
-    void OnFrameBufferUpdate (IFrameBuffer* frame_buffer) 
+    void OnFrameBufferUpdate (IFrameBuffer* frame_buffer)
     {
       printf ("Updated frame buffer %p\n", frame_buffer);
     }
 
-    void OnFrameBufferResize (IFrameBuffer* frame_buffer, size_t width, size_t height) 
+    void OnFrameBufferResize (IFrameBuffer* frame_buffer, size_t width, size_t height)
     {
       printf ("Changed size of frame buffer %p to %ux%u\n", frame_buffer, width, height);
     }
@@ -94,14 +94,14 @@ class RendererListener : public IRendererListener
 class RenderWindow : public IRendererListener, public xtl::trackable
 {
   public:
-    RenderWindow (const wchar_t* title, common::ParseNode& cfg_root) 
+    RenderWindow (const wchar_t* title, common::ParseNode& cfg_root)
       : window (syslib::WindowStyle_Overlapped, WINDOW_WIDTH, WINDOW_HEIGHT), style (0)
     {
         //инициализация окна
-    
+
       window.SetTitle (title);
       window.Show ();
-      
+
       WindowDriver::RegisterWindow ("MyRenderer", window, cfg_root);
 
       RendererPtr basic_renderer (DriverManager::CreateRenderer (WindowDriver::Name (), "MyRenderer"), false);
@@ -112,9 +112,9 @@ class RenderWindow : public IRendererListener, public xtl::trackable
         throw xtl::format_operation_exception ("RenderWindow::RenderWindow", "No renderer2d");
 
       renderer->AttachListener (this);
-      
+
       OnFrameBufferCreate (renderer->GetFrameBuffer (renderer->GetFrameBuffersCount () - 1));
-      
+
         //регистрация обработчиков событий окна
 
       window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&RenderWindow::OnRedraw, this));
@@ -125,7 +125,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
 
         //установка размеров области вывода
 
-      OnResize ();      
+      OnResize ();
     }
 
     ~RenderWindow ()
@@ -133,7 +133,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
       renderer->DetachListener (this);
     }
 
-    void OnFrameBufferCreate (IFrameBuffer* new_frame_buffer) 
+    void OnFrameBufferCreate (IFrameBuffer* new_frame_buffer)
     {
       if (frame_buffer)
         return;
@@ -141,13 +141,13 @@ class RenderWindow : public IRendererListener, public xtl::trackable
       frame_buffer = new_frame_buffer;
 
         //создание очищающего кадра
-        
+
       clear_frame = ClearFramePtr (renderer->CreateClearFrame (), false);
 
       clear_frame->SetRenderTargets (frame_buffer->GetColorBuffer (), frame_buffer->GetDepthStencilBuffer ());
       clear_frame->SetFlags         (render::mid_level::ClearFlag_All);
       clear_frame->SetColor         (CLEAR_COLOR);
-      
+
         //создание базового кадра
 
       frame = FramePtr (renderer->CreateFrame (), false);
@@ -156,19 +156,19 @@ class RenderWindow : public IRendererListener, public xtl::trackable
       frame->SetProjection    (GetOrthoProjectionMatrix (-100, 100, -100, 100, -1000, 1000));
     }
 
-    void OnFrameBufferDestroy (IFrameBuffer* destroyed_frame_buffer) 
+    void OnFrameBufferDestroy (IFrameBuffer* destroyed_frame_buffer)
     {
       if (frame_buffer.get () == destroyed_frame_buffer)
         frame_buffer = 0;
     }
 
-    void OnFrameBufferUpdate (IFrameBuffer* updated_frame_buffer) 
+    void OnFrameBufferUpdate (IFrameBuffer* updated_frame_buffer)
     {
       if (frame_buffer.get () == updated_frame_buffer)
         OnRedraw ();
     }
 
-    void OnFrameBufferResize (IFrameBuffer* resized_frame_buffer, size_t width, size_t height) 
+    void OnFrameBufferResize (IFrameBuffer* resized_frame_buffer, size_t width, size_t height)
     {
       if (frame_buffer.get () == resized_frame_buffer)
         OnResize ();
@@ -179,7 +179,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
       return renderer.get ();
     }
 
-    renderer2d::IFrame* Frame () 
+    renderer2d::IFrame* Frame ()
     {
       return frame.get ();
     }
@@ -205,29 +205,29 @@ class RenderWindow : public IRendererListener, public xtl::trackable
     {
       window.SetStyle ((syslib::WindowStyle)(style++ % 2));
     }
-    
+
 ///Перерисовка
     void Redraw ()
     {
       try
-      {      
-        renderer->AddFrame   (clear_frame.get ());        
+      {
+        renderer->AddFrame   (clear_frame.get ());
         renderer->AddFrame   (frame.get ());
 
-        renderer->DrawFrames ();        
+        renderer->DrawFrames ();
       }
       catch (std::exception& e)
       {
         printf ("redraw exception: %s\n", e.what ());
-      }          
-    }    
-  
+      }
+    }
+
 ///Обработчик события изменения размеров окна
     void OnResize ()
     {
       try
       {
-        syslib::Rect client_rect = window.ClientRect ();      
+        syslib::Rect client_rect = window.ClientRect ();
 
         render::mid_level::Viewport viewport;
 
@@ -251,7 +251,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
     {
       frame_buffer = 0;
     }
-    
+
 ///Получение ортографической матрицы проекции
     static math::mat4f GetOrthoProjectionMatrix (float left, float right, float bottom, float top, float znear, float zfar)
     {
@@ -259,7 +259,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
 
       float width  = right - left,
             height = top - bottom,
-            depth  = zfar - znear;  
+            depth  = zfar - znear;
 
         //выбрана матрица проецирования, используемая gluOrtho2D
 
@@ -267,9 +267,9 @@ class RenderWindow : public IRendererListener, public xtl::trackable
       proj_matrix [1] = math::vec4f (0, 2.0f / height, 0, - (top + bottom) / height);
       proj_matrix [2] = math::vec4f (0, 0, 2.0f / depth, - (znear + zfar) / depth);
       proj_matrix [3] = math::vec4f (0, 0, 0, 1);
-      
+
       return proj_matrix;
-    }    
+    }
 
   private:
     syslib::Window      window;
@@ -287,41 +287,41 @@ class RenderWindow : public IRendererListener, public xtl::trackable
 class BasicTest
 {
   public:
-///Конструктор  
+///Конструктор
     BasicTest (const wchar_t* title) : log_filter ("*", &LogMessage), cfg_parser (CONFIGURATION_FILE_NAME)
     {
       WindowDriver::RegisterRenderer ("MyRenderer", cfg_parser.Root ().First ("Configuration"));
-    
+
       AddWindow ();
 
       render_windows [0]->Renderer ()->AttachListener (&renderer_listener);
-    }    
-    
+    }
+
     virtual ~BasicTest () {}
-    
+
 ///Получение объектов визуализации
-    renderer2d::IRenderer* Renderer () 
-    { 
+    renderer2d::IRenderer* Renderer ()
+    {
       if (render_windows.empty ())
         return 0;
 
-      return render_windows [0]->Renderer (); 
+      return render_windows [0]->Renderer ();
     }
 
-    renderer2d::IFrame* Frame () 
-    { 
+    renderer2d::IFrame* Frame ()
+    {
       if (render_windows.empty ())
         return 0;
 
-      return render_windows [0]->Frame (); 
+      return render_windows [0]->Frame ();
     }
-    
+
 ///Загрузка ресурсов
     TexturePtr LoadTexture (const char* file_name)
     {
       if (!file_name)
         throw xtl::make_null_argument_exception ("BasicTest::LoadTexture", "file_name");
-    
+
       if (render_windows.empty ())
         throw xtl::format_operation_exception ("BasicTest::LoadTexture", "No windows");
 
@@ -329,20 +329,22 @@ class BasicTest
 
       return TexturePtr (render_windows[0]->Renderer ()->CreateTexture (image), false);
     }
-    
+
 ///Выполнение теста
     int Run ()
     {
       idle_connection = syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&BasicTest::OnIdleWrapper, this));
 
-      syslib::Application::Run ();    
-      
+      syslib::Application::Run ();
+
       return syslib::Application::GetExitCode ();
     }
 
     void AddWindow ()
     {
-      render_windows.push_back (new RenderWindow (L"Additional window", cfg_parser.Root ().First ("Configuration")));
+      common::ParseNode cfg_root = cfg_parser.Root ().First ("Configuration");
+
+      render_windows.push_back (new RenderWindow (L"Additional window", cfg_root));
 
       render_windows.back ()->Window ().RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&BasicTest::OnClose, this, _1));
     }
@@ -352,7 +354,7 @@ class BasicTest
       for (size_t i = 0; i < render_windows.size (); i++)
         render_windows[i]->AddPrimitive (primitive);
     }
-    
+
   private:
 ///Обработчик событий главного цикла приложения
     virtual void OnIdle () {}
@@ -373,32 +375,32 @@ class BasicTest
         syslib::Application::Exit (0);
       }
     }
-    
+
 ///Обёртка над обработчиком событий главного цикла приложения
     void OnIdleWrapper ()
     {
       try
-      {        
+      {
         static size_t last_fps = 0, frames_count = 0;
-        
+
           //замер количества кадров в секунду
 
-        if (clock () - last_fps > CLK_TCK)
+        if (common::milliseconds () - last_fps > 1000.f)
         {
-          printf ("FPS: %.2f\n", float (frames_count)/float (clock () - last_fps)*float (CLK_TCK));
+          printf ("FPS: %.2f\n", float (frames_count)/float (common::milliseconds () - last_fps) * 1000.f);
 
-          last_fps     = clock ();
+          last_fps     = common::milliseconds ();
           frames_count = 0;
-        }                  
-        
+        }
+
           //рисование кадров
-          
+
         for (size_t i = 0; i < render_windows.size (); i++)
-          render_windows[i]->OnRedraw ();
+          render_windows[i]->Window ().Invalidate ();
 
           //увеличение числа кадров
-        
-        frames_count++;        
+
+        frames_count++;
 
         OnIdle ();
       }

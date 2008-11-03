@@ -26,7 +26,7 @@ class Test: public BasicTest
         //создание ресурсов
 
       TexturePtr texture = LoadTexture (TEXTURE_NAME);
-      
+
       primitive1 = PrimitivePtr (Renderer ()->CreatePrimitive (), false);
       primitive2 = PrimitivePtr (Renderer ()->CreatePrimitive (), false);
 
@@ -40,16 +40,16 @@ class Test: public BasicTest
       primitive2->SetBlendMode (BlendMode_AlphaClamp);
 
       printf ("Primitive1 sprites count is %u\n", primitive1->GetSpritesCount ());
-      
+
       primitive1->AddSprites (1, &sprite1);
       primitive2->AddSprites (1, &sprite2);
 
       printf ("Primitive1 sprites count is %u\n", primitive1->GetSpritesCount ());
 
-      // building frame        
-      
+      // building frame
+
       printf ("Frame primitives count is %u\n", Frame ()->PrimitivesCount ());
-      
+
       Frame ()->AddPrimitive (primitive1.get ());
       Frame ()->AddPrimitive (primitive2.get ());
 
@@ -61,12 +61,12 @@ class Test: public BasicTest
     void OnIdle ()
     {
       static const float PI = 3.1415926f;
-      
+
       mat4f tm1 = rotatef (sprite_rotation, 0, 0, 1) * translatef (cos (sprite_angle) * 10 + 5, sin (sprite_angle) * 10 + 5, 0.1f) * scalef (40, 40, 1) * rotatef (-sprite_rotation, 0, 0, 1);
       mat4f tm2 = translatef (cos (sprite_angle + PI) * 10 + 5, sin (sprite_angle + PI) * 10 + 5, 0.2f) * rotatef (sprite_rotation, 0, 0, 1) * scalef (40, 40, 1) * rotatef (-sprite_rotation, 0, 0, 1);
 
       primitive1->SetTransform (tm1);
-      primitive2->SetTransform (tm2);  
+      primitive2->SetTransform (tm2);
 
       primitive2->SetAlphaReference (0.5f * (1.0f + cos(sprite_angle)));
 
@@ -82,9 +82,9 @@ class Test: public BasicTest
         screenshot.Save (SCREENSHOT_NAME);
 
         screenshot_made = true;
-      }      
+      }
     }
-    
+
   private:
     float        sprite_angle;
     float        sprite_rotation;
@@ -97,8 +97,8 @@ int main ()
 {
   printf ("Results of low_level_driver1_test:\n");
 
-  try  
-  {            
+  try
+  {
     Test test;
 
     return test.Run ();
