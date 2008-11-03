@@ -1,5 +1,10 @@
 #include "shared.h"
 
+#include <stl/numeric>
+
+#include <mathlib.h>
+#include <math/io.h>
+
 using namespace script;
 using namespace math;
 using namespace stl;
@@ -18,6 +23,8 @@ const char* MATHLIB_VEC3_LIBRARY = "Math.Vector3";
 const char* MATHLIB_VEC4_LIBRARY = "Math.Vector4";
 const char* MATHLIB_MAT4_LIBRARY = "Math.Matrix4";
 const char* MATHLIB_QUAT_LIBRARY = "Math.Quaternion";
+const char* BINDER_NAME          = "Math";
+const char* COMPONENT_NAME       = "script.binds.Math";
 
 /*
     Создание шлюзов унарных и бинарных операций
@@ -533,14 +540,6 @@ void bind_math_common_library (InvokerRegistry& lib)
   lib.Register ("sign", make_invoker (&get_sign));
 }
 
-}
-
-namespace script
-{
-
-namespace binds
-{
-
 /*
     Регистрация математической библиотеки
 */
@@ -594,6 +593,30 @@ void bind_math_library (Environment& environment)
   environment.RegisterType<mat4f> (MATHLIB_MAT4_LIBRARY);
   environment.RegisterType<quatf> (MATHLIB_QUAT_LIBRARY);  
 }
+
+/*
+    Компонент
+*/
+
+class Component
+{
+  public:
+    Component ()
+    {
+      LibraryManager::RegisterLibrary (BINDER_NAME, &Bind);
+    }
+
+  private:
+    static void Bind (Environment& environment)
+    {
+      bind_math_library (environment);
+    }
+};
+
+extern "C"
+{
+
+common::ComponentRegistrator<Component> MathScriptBind (COMPONENT_NAME);
 
 }
 

@@ -1,5 +1,20 @@
 #include "shared.h"
 
+#include <xtl/shared_ptr.h>
+
+#include <mathlib.h>
+#include <math/io.h>
+
+#include <sg/camera.h>
+#include <sg/light.h>
+#include <sg/helper.h>
+#include <sg/listener.h>
+#include <sg/scene.h>
+#include <sg/sound_emitter.h>
+#include <sg/sprite.h>
+#include <sg/text_line.h>
+#include <sg/visual_model.h>
+
 using namespace script;
 using namespace scene_graph;
 using namespace math;
@@ -35,6 +50,8 @@ const char* SCENE_SPRITE_LIBRARY                      = "Scene.Sprite";
 const char* SCENE_SPRITE_LIST_LIBRARY                 = "Scene.SpriteList";
 const char* SCENE_TEXT_LINE_LIBRARY                   = "Scene.TextLine";
 const char* SCENE_VISUAL_MODEL_LIBRARY                = "Scene.VisualModel";
+const char* BINDER_NAME                               = "SceneGraph";
+const char* COMPONENT_NAME                            = "script.binds.SceneGraph";
 
 /*
     Создание сцены
@@ -747,14 +764,6 @@ void bind_visual_model_library (Environment& environment)
   environment.RegisterType<VisualModel> (SCENE_VISUAL_MODEL_LIBRARY);
 }
 
-}
-
-namespace script
-{
-
-namespace binds
-{
-
 /*
     Регистрация библиотеки работы со сценой
 */
@@ -778,6 +787,30 @@ void bind_scene_graph_library (Environment& environment)
   bind_text_line_library          (environment);
   bind_visual_model_library       (environment);
 }
+
+/*
+    Компонент
+*/
+
+class Component
+{
+  public:
+    Component ()
+    {
+      LibraryManager::RegisterLibrary (BINDER_NAME, &Bind);
+    }
+
+  private:
+    static void Bind (Environment& environment)
+    {
+      bind_scene_graph_library (environment);
+    }
+};
+
+extern "C"
+{
+
+common::ComponentRegistrator<Component> SceneGraphScriptBind (COMPONENT_NAME);
 
 }
 

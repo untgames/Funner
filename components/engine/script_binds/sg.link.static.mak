@@ -1,8 +1,5 @@
 ###################################################################################################
-#Определения и константы
+#Настройки, экспортируемые для библиотек использующих Scriptbinds
 ###################################################################################################
-TARGETS := SCRIPT_COMPONENTS
-
-#Цель №1 - пакет
-SCRIPT_COMPONENTS.TYPE       := package
-SCRIPT_COMPONENTS.COMPONENTS := core
+export.LINK_INCLUDES := SceneGraphScriptBind
+export.IMPORTS       := link.static.mak ../../scene_graph/link.static.mak

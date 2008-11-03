@@ -17,13 +17,11 @@
 #include <mathlib.h>
 #include <math/io.h>
 
-#include <script/bind_libraries.h>
 #include <script/environment.h>
 #include <script/bind.h>
 #include <script/shell.h>
 
 using namespace script;
-using namespace script::binds;
 using namespace math;
 
 /*

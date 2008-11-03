@@ -1,12 +1,18 @@
 #include "shared.h"
 
+#include <xtl/reference_counter.h>
+
+#include <common/var_registry.h>
+
 using namespace common;
 using namespace xtl;
+using namespace script;
 
 namespace
 {
 
 const char* COMMON_VAR_REGISTRY_LIBRARY = "VarRegistry";
+const char* BINDER_NAME                 = "VarRegistry";
 
 class DynamicCastRootVarRegistry : public xtl::reference_counter, public xtl::dynamic_cast_root
 {
@@ -61,10 +67,7 @@ class DynamicCastRootVarRegistry : public xtl::reference_counter, public xtl::dy
 
 }
 
-namespace script
-{
-
-namespace binds
+namespace engine
 {
 
 /*
@@ -83,12 +86,12 @@ void bind_common_var_registry (Environment& environment)
 
   lib.Register ("get_BranchName", make_invoker (&DynamicCastRootVarRegistry::BranchName));
 
-  lib.Register ("GetValue",           make_invoker (&DynamicCastRootVarRegistry::GetValue));
-  lib.Register ("SetValue",           make_invoker (&DynamicCastRootVarRegistry::SetValue));
-  lib.Register ("HasVariable",        make_invoker (&DynamicCastRootVarRegistry::HasVariable));
-  lib.Register ("IsOpened",           make_invoker (&DynamicCastRootVarRegistry::IsOpened));
-  lib.Register ("Open",               make_invoker (&DynamicCastRootVarRegistry::Open));
-  lib.Register ("Close",              make_invoker (&DynamicCastRootVarRegistry::Close));
+  lib.Register ("GetValue",    make_invoker (&DynamicCastRootVarRegistry::GetValue));
+  lib.Register ("SetValue",    make_invoker (&DynamicCastRootVarRegistry::SetValue));
+  lib.Register ("HasVariable", make_invoker (&DynamicCastRootVarRegistry::HasVariable));
+  lib.Register ("IsOpened",    make_invoker (&DynamicCastRootVarRegistry::IsOpened));
+  lib.Register ("Open",        make_invoker (&DynamicCastRootVarRegistry::Open));
+  lib.Register ("Close",       make_invoker (&DynamicCastRootVarRegistry::Close));
 
     //регистрация типов данных
 
@@ -96,6 +99,3 @@ void bind_common_var_registry (Environment& environment)
 }
 
 }
-
-}
-

@@ -1,8 +1,6 @@
 ###################################################################################################
-#ќпределени€ и константы
+#Ёкспортируемые настройки
 ###################################################################################################
-TARGETS := SCRIPT_COMPONENTS
+export.LINK_INCLUDES := BoundVolumesScriptBind
+export.IMPORTS       := link.static.mak
 
-#÷ель є1 - пакет
-SCRIPT_COMPONENTS.TYPE       := package
-SCRIPT_COMPONENTS.COMPONENTS := core

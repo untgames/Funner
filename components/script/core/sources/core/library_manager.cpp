@@ -9,7 +9,7 @@ namespace
     Константы
 */
 
-const char* COMPONENTS_MASK = "script.libraries.*"; //маска имён компонентов скриптовых библиотек
+const char* COMPONENTS_MASK = "script.binds.*"; //маска имён компонентов скриптовых библиотек
 
 /*
     Реализация менеджера библиотек

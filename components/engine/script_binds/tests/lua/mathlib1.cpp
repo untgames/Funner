@@ -16,7 +16,7 @@ int main ()
 
     env->Library ("global").Register ("typename", make_invoker (&get_typename));
   
-    bind_math_library (*env);
+    env->BindLibraries ("Math");
     load_script       (*script, SCRIPT_FILE_NAME);
     
     printf ("Test vec3f library:\n");

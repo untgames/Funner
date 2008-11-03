@@ -1,5 +1,9 @@
 #include "shared.h"
 
+#include <math/io.h>
+
+#include <bv/axis_aligned_box.h>
+
 using namespace script;
 using namespace math;
 using namespace xtl;
@@ -14,11 +18,12 @@ namespace
 
 const char* BV_STATIC_AXIS_ALIGNED_BOX_CORNER_LIBRARY = "BV.Corner";
 const char* BV_AXIS_ALIGNED_BOX_LIBRARY               = "BV.AxisAlignedBox";
+const char* COMPONENT_NAME                            = "script.binds.BoundVolumes";
+const char* BINDER_NAME                               = "BoundVolumes";
 
 /*
     Создание ограничивающего параллелепипеда
 */
-
 
 template <class T>
 axis_aligned_box<T> create_axis_aligned_box ()
@@ -95,24 +100,29 @@ void bind_axis_aligned_box_library (Environment& environment)
   environment.RegisterType<axis_aligned_box<T> > (BV_AXIS_ALIGNED_BOX_LIBRARY);
 }
 
-}
-
-namespace script
-{
-
-namespace binds
-{
-
 /*
-    Регистрация библиотеки ограничивающих объёмов
+    Компонент
 */
 
-void bind_bv_library (Environment& environment)
+class Component
 {
-    //регистрация библиотек
-  
-  bind_axis_aligned_box_library<float> (environment);
-}
+  public:
+    Component ()
+    {
+      LibraryManager::RegisterLibrary (BINDER_NAME, &Bind);
+    }
+
+  private:
+    static void Bind (Environment& environment)
+    {
+      bind_axis_aligned_box_library<float> (environment);
+    }
+};
+
+extern "C"
+{
+
+common::ComponentRegistrator<Component> BoundVolumesScriptBind (COMPONENT_NAME);
 
 }
 

@@ -1,10 +1,10 @@
 #include "shared.h"
 
-const char* SCRIPT_FILE_NAME = "data/bv.lua";
+const char* SCRIPT_FILE_NAME = "data/common.lua";
 
 int main ()
 {
-  printf ("Results of bv_test:\n");
+  printf ("Results of common_test:\n");
   
   try
   {
@@ -16,10 +16,9 @@ int main ()
     
     env->Library ("global").Register ("typename", make_invoker (&get_typename));
   
-    bind_math_library (*env);
-    bind_bv_library   (*env);
-    load_script       (*script, SCRIPT_FILE_NAME);
-    
+    env->BindLibraries ("Common");    
+    load_script        (*script, SCRIPT_FILE_NAME);
+
     printf ("Test library:\n");
 
     invoke<void> (*script, "test");

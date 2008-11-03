@@ -1,5 +1,10 @@
 #include "shared.h"
 
+#include <sg/camera.h>
+
+#include <render/screen.h>
+#include <render/viewport.h>
+
 using namespace render;
 using namespace script;
 using namespace xtl;
@@ -14,6 +19,8 @@ namespace
 const char* RENDER_RECT_LIBRARY     = "Render.Rect";
 const char* RENDER_VIEWPORT_LIBRARY = "Render.Viewport";
 const char* RENDER_SCREEN_LIBRARY   = "Render.Screen";
+const char* BINDER_NAME             = "Render";
+const char* COMPONENT_NAME          = "script.binds.Render";
 
 /*
     Утилиты
@@ -158,14 +165,6 @@ void bind_screen_library (Environment& environment)
   environment.RegisterType<Screen> (RENDER_SCREEN_LIBRARY);
 }
 
-}
-
-namespace script
-{
-
-namespace binds
-{
-
 /*
     Регистрация библиотеки рендера
 */
@@ -178,6 +177,30 @@ void bind_render_library (Environment& environment)
   bind_viewport_library (environment);
   bind_screen_library   (environment);
 }
+
+/*
+    Компонент
+*/
+
+class Component
+{
+  public:
+    Component ()
+    {
+      LibraryManager::RegisterLibrary (BINDER_NAME, &Bind);
+    }
+
+  private:
+    static void Bind (Environment& environment)
+    {
+      bind_render_library (environment);
+    }
+};
+
+extern "C"
+{
+
+common::ComponentRegistrator<Component> RenderScriptBind (COMPONENT_NAME);
 
 }
 

@@ -35,7 +35,7 @@ int main ()
 
     xtl::com_ptr<IInterpreter> script (shell.Interpreter ());                
   
-    bind_common_var_registry (*env);
+    env->BindLibraries ("Common");
 
     load_script (*script, SCRIPT_FILE_NAME);
     

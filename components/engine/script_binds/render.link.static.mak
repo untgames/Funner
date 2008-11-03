@@ -1,8 +1,5 @@
 ###################################################################################################
-#ќпределени€ и константы
+#Ёкспортируемые настройки
 ###################################################################################################
-TARGETS := SCRIPT_COMPONENTS
-
-#÷ель є1 - пакет
-SCRIPT_COMPONENTS.TYPE       := package
-SCRIPT_COMPONENTS.COMPONENTS := core
+export.LINK_INCLUDES := RenderScriptBind
+export.IMPORTS       := link.static.mak ../../render/scene_render/link.static.mak

@@ -1,10 +1,10 @@
 #include "shared.h"
 
-const char* SCRIPT_FILE_NAME = "data/sg.lua";
+const char* SCRIPT_FILE_NAME = "data/bv.lua";
 
 int main ()
 {
-  printf ("Results of sg_test:\n");
+  printf ("Results of bv_test:\n");
   
   try
   {
@@ -12,13 +12,14 @@ int main ()
     
     Shell shell ("lua", env);
 
-    xtl::com_ptr<IInterpreter> script (shell.Interpreter ());                
-  
-    bind_bv_library   (*env);
-    bind_math_library (*env);
-    bind_scene_graph_library (*env);
-    load_script       (*script, SCRIPT_FILE_NAME);
+    xtl::com_ptr<IInterpreter> script (shell.Interpreter ());        
     
+    env->Library ("global").Register ("typename", make_invoker (&get_typename));
+    env->BindLibraries ("Math");
+    env->BindLibraries ("BoundVolumes");
+
+    load_script (*script, SCRIPT_FILE_NAME);
+
     printf ("Test library:\n");
 
     invoke<void> (*script, "test");

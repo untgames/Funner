@@ -23,7 +23,7 @@ int main ()
 
   try
   {
-    common::ComponentManager::Register ("script.libraries.library1", new MyComponent);
+    common::ComponentManager::Register ("script.binds.library1", new MyComponent);
     
     Environment env;
 

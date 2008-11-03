@@ -1,5 +1,8 @@
 #include "shared.h"
 
+#include <common/file.h>
+#include <common/strlib.h>
+
 using namespace script;
 using namespace common;
 using namespace xtl;
@@ -12,6 +15,8 @@ namespace
 */
 
 const char* COMMON_FILE_LIBRARY = "File";
+const char* COMPONENT_NAME      = "script.binds.Common";
+const char* BINDER_NAME         = "Common";
 
 /*
     –егистраци€ библиотек
@@ -32,33 +37,17 @@ stl::string load_string_filter_out (const char* file_name, const char* out_filte
   return s;
 }
 
+}
+
+namespace engine
+{
+
 void bind_file_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (COMMON_FILE_LIBRARY);
 
   lib.Register ("LoadString",          make_invoker (implicit_cast<stl::string (*)(const char*)> (&FileSystem::LoadTextFile)));
   lib.Register ("LoadStringFilterOut", make_invoker (&load_string_filter_out));
-}
-
-}
-
-namespace script
-{
-
-namespace binds
-{
-
-/*
-    –егистраци€ библиотеки общего назначени€
-*/
-
-void bind_common_library (Environment& environment)
-{
-    //регистраци€ библиотек
-
-  bind_file_library (environment);
-}
-
 }
 
 }

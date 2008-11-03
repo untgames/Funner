@@ -1,14 +1,29 @@
 #include "shared.h"
 
+#include <stl/vector>
+
+#include <xtl/iterator_range.h>
+#include <xtl/reference_counter.h>
+
+#include <common/log.h>
+#include <common/parser.h>
+#include <common/xml_writer.h>
+
 using namespace common;
+using namespace script;
 using namespace xtl;
 
 namespace
 {
 
-const char* LOG_NAME = "script.binds.common_string_node"; //имя потока протоколирования
+/*
+    Константы
+*/
 
+const char* COMPONENT_NAME             = "script.binds.StringTree";
+const char* LOG_NAME                   = COMPONENT_NAME;
 const char* COMMON_STRING_TREE_LIBRARY = "StringNode";
+const char* BINDER_NAME                = "StringTree";
 
 //получение протокола
 Log& get_log ()
@@ -502,10 +517,7 @@ void set (StringNode* node, const char* name, const char* value)
 
 }
 
-namespace script
-{
-
-namespace binds
+namespace engine
 {
 
 /*
@@ -558,6 +570,3 @@ void bind_common_string_tree (Environment& environment)
 }
 
 }
-
-}
-

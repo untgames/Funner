@@ -1,37 +1,22 @@
 #include "shared.h"
 
-const char* SCRIPT_FILE_NAME = "data/common_string_tree.lua";
-
-void print_indent (size_t indent_size)
-{
-  for (size_t i = 0; i < indent_size; i++)
-    printf (" ");
-}
-
-void log_handler (const char* log_name, const char* event)
-{
-  printf ("Log event from log '%s': '%s'\n", log_name, event);
-}
+const char* SCRIPT_FILE_NAME = "data/render.lua";
 
 int main ()
 {
-  printf ("Results of common_string_tree_test:\n");
+  printf ("Results of render_test:\n");
   
   try
   {
-    common::LogFilter filter ("script.binds.*", &log_handler);
-
     xtl::shared_ptr<Environment> env (new Environment);
     
-    InvokerRegistry& lib = env->CreateLibrary ("Utils");
-
-    lib.Register ("PrintIndent", make_invoker (&print_indent));
-
     Shell shell ("lua", env);
 
     xtl::com_ptr<IInterpreter> script (shell.Interpreter ());                
-  
-    bind_common_string_tree (*env);
+
+    env->BindLibraries ("Math");
+    env->BindLibraries ("SceneGraph");
+    env->BindLibraries ("Render");
 
     load_script (*script, SCRIPT_FILE_NAME);
     
