@@ -39,6 +39,7 @@ template <class Signature> class function
   typedef void (function::*safe_bool)();
   typedef xtl::invoker<Signature, detail::function_invoker_base> invoker_type;
   public:
+    typedef Signature                          signature_type;
     typedef typename invoker_type::arg1_type   arg1_type;
     typedef typename invoker_type::arg2_type   arg2_type;
     typedef typename invoker_type::arg3_type   arg3_type;
