@@ -1,8 +1,5 @@
 ###################################################################################################
-#ќпределени€ и константы
+#Ёкспортируемые настройки
 ###################################################################################################
-TARGETS := SCRIPT_COMPONENTS
-
-#÷ель є1 - пакет
-SCRIPT_COMPONENTS.TYPE       := package
-SCRIPT_COMPONENTS.COMPONENTS := core lua
+export.LINK_INCLUDES := SystemScriptBind
+export.IMPORTS       := link.static.mak ../../system/link.static.mak
