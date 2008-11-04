@@ -20,12 +20,26 @@
 #include <script/environment.h>
 #include <script/library_manager.h>
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //this used in base member initializer list
+#endif
+
 using namespace script;
 
 class MyStack: public IStack
 {
   public:
+    MyStack (IInterpreter* in_interpreter = 0) : interpreter (in_interpreter) {}
+  
     size_t Size () { return array.size (); }
+    
+    IInterpreter& Interpreter ()
+    {
+      if (!interpreter)
+        throw xtl::format_operation_exception ("MyStack::Interpreter", "Null interpreter");
+
+      return *interpreter;
+    }
 
     float       GetFloat   (size_t index) { return xtl::any_multicast<float> (array.at (index)); }
     int         GetInteger (size_t index) { return xtl::any_multicast<int> (array.at (index)); }
@@ -86,12 +100,15 @@ class MyStack: public IStack
   private:
     typedef stl::vector<xtl::any> Array;
     
-    Array array;
+    Array         array;
+    IInterpreter* interpreter;
 };
 
-class MyInterpreter: public IInterpreter
+class MyInterpreter: public IInterpreter, public xtl::trackable
 {
   public:
+    MyInterpreter () : stack (this) {}
+
     const char* Name () { return "MyInterpreter"; }
     IStack&     Stack () { return stack; }
 
@@ -126,6 +143,8 @@ class MyInterpreter: public IInterpreter
 
     void AddRef  () {}
     void Release () {}
+    
+    xtl::trackable& GetTrackable () { return *this; }
     
   private:
     MyStack stack;

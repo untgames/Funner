@@ -631,3 +631,130 @@ inline Ret invoke
 
   return invoke_dispatch<10> (interpreter, fn_name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, xtl::type<Ret> ());
 }
+
+/*
+    Создание шлюза для функции обратного вызова
+*/
+
+namespace detail
+{
+
+template <class Ret> class callback_dispatcher
+{
+  public:
+    callback_dispatcher (IInterpreter* in_interpreter, const char* in_function_name)
+      : interpreter (in_interpreter), function_name (in_function_name) {}
+
+    Ret operator () ()
+    {
+      return invoke<Ret> (GetInterpreter (), function_name.c_str ());
+    }
+    
+    template <class T1>
+    Ret operator () (T1& arg1)
+    {
+      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1);
+    }
+
+    template <class T1, class T2>
+    Ret operator () (T1& arg1, T2& arg2)
+    {
+      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2);
+    }
+    
+    template <class T1, class T2, class T3>
+    Ret operator () (T1& arg1, T2& arg2, T3& arg3)
+    {
+      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3);
+    }
+    
+    template <class T1, class T2, class T3, class T4>
+    Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4)
+    {
+      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4);
+    }
+
+    template <class T1, class T2, class T3, class T4, class T5>
+    Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5)
+    {
+      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4, arg5);
+    }
+    
+    template <class T1, class T2, class T3, class T4, class T5, class T6>
+    Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6)
+    {
+      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4, arg5, arg6);
+    }
+    
+    template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
+    Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7)
+    {
+      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    }
+
+    template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
+    Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8)
+    {
+      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+    }
+
+    template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+    Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9)
+    {
+      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+    }
+
+    template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
+    Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, T10& arg10)
+    {
+      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+    }
+
+  private:
+    IInterpreter& GetInterpreter ()
+    {
+      if (!interpreter)
+        throw xtl::format_operation_exception ("script::callback_dispatcher", "Interpreter has already destroyed");
+
+      return *interpreter;
+    }
+
+  private:
+    typedef xtl::trackable_ptr<IInterpreter> InterpreterPtr;
+
+  private:
+    InterpreterPtr interpreter;
+    stl::string    function_name;
+};
+
+template <class Signature> struct callback_invoker
+{
+  size_t operator () (IStack& stack) const
+  {
+      //проверка наличия достаточного числа аргументов в стеке    
+
+    check_arguments_count<1> (stack.Size ());  
+  
+    IInterpreter* interpreter   = &stack.Interpreter ();
+    const char*   function_name = get_argument<const char*> (stack, 1);    
+
+    if (!function_name)
+      throw xtl::format_operation_exception ("script::callback_invoker::operator ()", "Null callback function name");
+
+    typedef typename xtl::functional_traits<Signature>::result_type result_type;
+
+    xtl::function<Signature> result = callback_dispatcher<result_type> (interpreter, function_name);
+
+    stack.Push (xtl::make_ref_any (result));
+
+    return 1;
+  }
+};
+
+}
+
+template <class Signature>
+inline Invoker make_callback_invoker ()
+{
+  return Invoker (detail::callback_invoker<Signature> ());
+}

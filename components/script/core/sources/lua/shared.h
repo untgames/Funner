@@ -6,15 +6,16 @@
 
 #include <stl/hash_map>
 
-#include <xtl/common_exceptions.h>
 #include <xtl/any.h>
+#include <xtl/bind.h>
+#include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
-#include <xtl/shared_ptr.h>
+#include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/iterator.h>
-#include <xtl/bind.h>
 #include <xtl/reference_counter.h>
-#include <xtl/function.h>
+#include <xtl/shared_ptr.h>
+#include <xtl/trackable.h>
 
 #include <common/component.h>
 #include <common/heap.h>
@@ -72,7 +73,12 @@ class Stack: public IStack
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Stack (lua_State* state, Environment& environment);
+    Stack (lua_State* state, lua::Interpreter& interpreter);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Интерпретатор, которому принадлежит стек
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    IInterpreter& Interpreter ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество аргументов в стеке
@@ -105,8 +111,8 @@ class Stack: public IStack
     void Pop (size_t arguments_count);
 
   private:
-    lua_State*   state;
-    Environment& environment;
+    lua_State*        state;
+    lua::Interpreter& interpreter;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,10 +156,10 @@ class Library: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Интерпретатор Lua
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Interpreter: public IInterpreter, public StateHolder, public xtl::reference_counter
+class Interpreter: public IInterpreter, public StateHolder, public xtl::reference_counter, public xtl::trackable
 {
   public:
-    typedef xtl::shared_ptr<Environment> EnvironmentPointer;
+    typedef xtl::shared_ptr<script::Environment> EnvironmentPointer;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
@@ -165,6 +171,11 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
 ///Имя интерпретатора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* Name ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Окружение
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    script::Environment& Environment ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Стек аргументов
@@ -192,12 +203,22 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
     void AddRef  ();
     void Release ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Объект, оповещающий об удалении IInterpreter
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    xtl::trackable& GetTrackable () { return *this; }
+
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация/удаление библиотек
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RegisterLibrary   (const char* name, InvokerRegistry& registry);
     void UnregisterLibrary (const char* name);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Регистрация библиотеки шлюзов интерпретатора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RegisterShellLibrary ();
 
   private:
     typedef xtl::intrusive_ptr<Library>                           LibraryPtr;
@@ -206,6 +227,7 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
   private:
     EnvironmentPointer    environment;                  //скриптовое окружение
     lua::Stack            stack;                        //стек аргументов
+    InvokerRegistry       shell_library;                //библиотека шлюзов интерпретатора
     LibraryMap            libraries;                    //карта библиотек
     xtl::auto_connection  on_create_library_connection; //соединение на событие создания библиотеки
     xtl::auto_connection  on_remove_library_connection; //соединение на событие удаления библиотеки

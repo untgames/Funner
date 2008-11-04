@@ -8,10 +8,19 @@ using namespace common;
     Конструкторы
 */
 
-Stack::Stack (lua_State* in_state, Environment& in_environment)
+Stack::Stack (lua_State* in_state, lua::Interpreter& in_interpreter)
   : state (in_state),
-    environment (in_environment)
+    interpreter (in_interpreter)
   {}
+  
+/*
+    Интерпретатор, которому принадлежит стек
+*/
+
+IInterpreter& Stack::Interpreter ()
+{
+  return interpreter;
+}
 
 /*
     Количество аргументов в стеке
@@ -218,7 +227,7 @@ void Stack::Push (const xtl::any& value)
   if (!buffer) 
     throw xtl::format_exception<StackException> ("script::lua::Stack::Push(const xtl::any&)", "Fail to allocate %u bytes from stack", BUFFER_SIZE);
     
-  const char* library_id = environment.FindLibraryId (value.castable_type ());
+  const char* library_id = interpreter.Environment ().FindLibraryId (value.castable_type ());
   
   if (!library_id)
     library_id = VARIANT_DEFAULT_TYPE_NAME;    

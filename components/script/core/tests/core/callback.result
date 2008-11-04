@@ -1,0 +1,6 @@
+call f2
+invoke 'my_callback'
+  arg1: '2'
+  arg2: '3.14'
+  arg3: 'Hello world'
+  result: 'result'

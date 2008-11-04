@@ -5,15 +5,19 @@ using namespace script::lua;
 using namespace common;
 using namespace xtl;
 
-/*
-    Имя вариантного типа данных по умолчанию
-*/
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //this used in base member initializer list
+#endif
 
 namespace script
 {
 
 namespace lua
 {
+
+/*
+    Имя вариантного типа данных по умолчанию
+*/
 
 const char* VARIANT_DEFAULT_TYPE_NAME = "__lua_variant_type";
 
@@ -23,6 +27,16 @@ const char* VARIANT_DEFAULT_TYPE_NAME = "__lua_variant_type";
 
 namespace
 {
+
+/*
+    Константы
+*/
+
+const char* SHELL_LIBRARY_NAME = "Shell";
+
+/*
+    Утилиты
+*/
 
 //функция обработки ошибок lua
 int error_handler (lua_State* state)
@@ -38,7 +52,7 @@ int error_handler (lua_State* state)
 
 Interpreter::Interpreter (const EnvironmentPointer& in_environment)
   : environment (in_environment),
-    stack (state, *environment)
+    stack (state, *this)
 {
     //инициализация стандартных библиотек
 
@@ -74,6 +88,8 @@ Interpreter::Interpreter (const EnvironmentPointer& in_environment)
 
   for (Environment::Iterator i=environment->CreateIterator (); i; ++i)
     RegisterLibrary (environment->LibraryId (i), *i);
+    
+  RegisterShellLibrary ();
 
     //очистка стека
 
@@ -91,6 +107,15 @@ Interpreter::~Interpreter ()
 const char* Interpreter::Name ()
 {
   return LUA_RELEASE;
+}
+
+/*
+    Скриптовое окружение
+*/
+
+Environment& Interpreter::Environment ()
+{
+  return *environment;
 }
 
 /*
@@ -230,6 +255,17 @@ void Interpreter::UnregisterLibrary (const char* name)
     return;
     
   libraries.erase (name);
+}
+
+/*
+    Регистрация библиотеки шлюзов интерпретатора
+*/
+
+void Interpreter::RegisterShellLibrary ()
+{
+//  shell_library.Register ("EventHandler", make_invoker ());
+
+//  RegisterLibrary (SHELL_LIBRARY_NAME, shell_library);
 }
 
 namespace

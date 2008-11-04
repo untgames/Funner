@@ -2,10 +2,11 @@
 #define SCRIPTLIB_BIND_HEADER
 
 #include <xtl/any.h>
+#include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/type_list.h>
 #include <xtl/type_traits>
-#include <xtl/message_exception.h>
+#include <xtl/trackable_ptr.h>
 
 #include <script/invoker.h>
 #include <script/interpreter.h>
@@ -39,6 +40,11 @@ Invoker make_invoker (size_t invokers_count, const Invoker* invokers);
 ///Создание функции, возвращающей константу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> Invoker make_const (const T& value);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание шлюза для функции обратного вызова
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Signature> Invoker make_callback_invoker ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вызов шлюза
@@ -80,7 +86,7 @@ Ret invoke (IInterpreter&, const char* function_name, const T1& arg1, const T2& 
 
 template <class Ret, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
 Ret invoke (IInterpreter&, const char* function_name, const T1& arg1, const T2& arg2, const T3& arg3, const T4& arg4,
-            const T5& arg5, const T6& arg6, const T7& arg7, const T8& arg8, const T9& arg9, const T10& arg10);            
+            const T5& arg5, const T6& arg6, const T7& arg7, const T8& arg8, const T9& arg9, const T10& arg10);
 
 #include <script/detail/bind.inl>
 

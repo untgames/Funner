@@ -1,0 +1,5 @@
+Results of lua_callback_test:
+x=3
+result: '3'
+exception: Interpreter has already destroyed
+    at script::callback_dispatcher
