@@ -1,9 +1,9 @@
 function clone_test ()
-  local node1 = StringNode.Create ()
+  local node1 = Common.StringNode.Create ()
 
   node1:AddAttribute ("First attribute value")
 
-  local child = StringNode.Create ()
+  local child = Common.StringNode.Create ()
 
   child.Name = "Child Node"
 
@@ -50,13 +50,13 @@ function print_node (node, indent)
 end
 
 function xml_test ()
-  local node = StringNode.LoadXml ("data/string_tree.xml")
+  local node = Common.StringNode.LoadXml ("data/string_tree.xml")
   print_node (node, 0)
   node:SaveXml ("/io/stdout")
 end
 
 function test ()
-  local node = StringNode.Create ()
+  local node = Common.StringNode.Create ()
 
   print ("Name: '" .. node.Name .. "'")
   print ("Attributes áount: " .. node.AttributesCount)
@@ -78,7 +78,7 @@ function test ()
 
   print ("Second attribute value is " .. node:Attribute (1))
 
-  local child = StringNode.Create ()
+  local child = Common.StringNode.Create ()
 
   child.Name = "Child Node"
 
@@ -104,7 +104,7 @@ function test ()
 
   print ("Attributes áount: " .. node.AttributesCount)
 
-  local child2 = StringNode.Create ()
+  local child2 = Common.StringNode.Create ()
 
   child2.Name = "Child2 Node"
 

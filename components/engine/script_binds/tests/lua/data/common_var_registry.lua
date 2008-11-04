@@ -1,5 +1,5 @@
 function test ()
-  local var_registry = VarRegistry.Create ()
+  local var_registry = Common.VarRegistry.Create ()
 
   print ("Branch name = " .. var_registry.BranchName)
   print ("IsOpened = " .. tostring (var_registry:IsOpened ()))

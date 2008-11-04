@@ -14,9 +14,7 @@ namespace
     Константы (имена библиотек)
 */
 
-const char* COMMON_FILE_LIBRARY = "File";
-const char* COMPONENT_NAME      = "script.binds.Common";
-const char* BINDER_NAME         = "Common";
+const char* COMMON_FILE_LIBRARY = "Common.File";
 
 /*
     Регистрация библиотек
@@ -42,7 +40,7 @@ stl::string load_string_filter_out (const char* file_name, const char* out_filte
 namespace engine
 {
 
-void bind_file_library (Environment& environment)
+void bind_common_file_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (COMMON_FILE_LIBRARY);
 

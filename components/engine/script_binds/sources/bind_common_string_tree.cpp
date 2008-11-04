@@ -20,10 +20,8 @@ namespace
     Константы
 */
 
-const char* COMPONENT_NAME             = "script.binds.StringTree";
-const char* LOG_NAME                   = COMPONENT_NAME;
-const char* COMMON_STRING_TREE_LIBRARY = "StringNode";
-const char* BINDER_NAME                = "StringTree";
+const char* LOG_NAME                   = "script.binds.StringTree";
+const char* COMMON_STRING_TREE_LIBRARY = "Common.StringNode";
 
 //получение протокола
 Log& get_log ()

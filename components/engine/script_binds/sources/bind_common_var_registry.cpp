@@ -11,8 +11,7 @@ using namespace script;
 namespace
 {
 
-const char* COMMON_VAR_REGISTRY_LIBRARY = "VarRegistry";
-const char* BINDER_NAME                 = "VarRegistry";
+const char* COMMON_VAR_REGISTRY_LIBRARY = "Common.VarRegistry";
 
 class DynamicCastRootVarRegistry : public xtl::reference_counter, public xtl::dynamic_cast_root
 {

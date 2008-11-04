@@ -25,4 +25,4 @@ ENGINE.SCRIPT_BINDS.TESTS.COMPILER_CFLAGS  :=
 ENGINE.SCRIPT_BINDS.TESTS.COMPILER_DEFINES :=
 ENGINE.SCRIPT_BINDS.TESTS.IMPORTS	  		   := ../../script/core/compile.static.mak ../../common/compile.static.mak ../../script/lua/link.static.mak \
                                               bv.link.static.mak sg.link.static.mak math.link.static.mak render.link.static.mak \
-                                              common.link.static.mak system.link.static.mak
+                                              common.link.static.mak system.link.static.mak ../../system/compile.static.mak

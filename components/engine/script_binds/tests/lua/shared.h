@@ -21,6 +21,8 @@
 #include <script/bind.h>
 #include <script/shell.h>
 
+#include <syslib/application.h>
+
 using namespace script;
 using namespace math;
 
