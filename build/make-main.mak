@@ -431,6 +431,9 @@ endef
 
 #Обработка сборки цели
 define process_target_common
+    #Добавление toolset-настроек к общему списку настроек
+  $$(foreach profile,$$(PROFILES),$$(eval $1.IMPORTS := $$($1.IMPORTS) $$($1.$$(profile).IMPORTS)))  
+
     #Импорт настроек
   $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
   
