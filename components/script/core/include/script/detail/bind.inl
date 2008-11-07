@@ -193,7 +193,7 @@ inline void check_arguments_count (size_t stack_arguments_count)
 
 struct ignore {};
 
-template <class T> inline void push_argument (IStack& stack, const T& value)
+template <class T> inline void push_argument (IStack& stack, T& value)
 {
   stack.Push (make_invoker_argument (value));
 }
@@ -259,8 +259,10 @@ struct invoker_impl
     check_arguments_count<arguments_count> (stack.Size ());
 
       //вызов шлюза и помещение его результата в стек
+      
+    typename FnTraits::result_type result = xtl::apply<typename FnTraits::result_type, arguments_count> (fn, stack, xtl::make_const_ref (stack_argument_selector<FnTraits> ()));
 
-    push_argument (stack, xtl::apply<typename FnTraits::result_type, arguments_count> (fn, stack, xtl::make_const_ref (stack_argument_selector<FnTraits> ())));
+    push_argument (stack, result);
 
     return 1; //results_count = 1
   }
@@ -385,16 +387,16 @@ template <size_t ArgsCount, class Ret, class T1, class T2, class T3, class T4, c
 Ret invoke_dispatch
  (IInterpreter& interpreter,
   const char*   name,
-  const T1&     arg1,
-  const T2&     arg2,
-  const T3&     arg3,
-  const T4&     arg4,
-  const T5&     arg5,
-  const T6&     arg6,
-  const T7&     arg7,
-  const T8&     arg8,
-  const T9&     arg9,
-  const T10&    arg10,
+  T1&           arg1,
+  T2&           arg2,
+  T3&           arg3,
+  T4&           arg4,
+  T5&           arg5,
+  T6&           arg6,
+  T7&           arg7,
+  T8&           arg8,
+  T9&           arg9,
+  T10&          arg10,
   xtl::type<Ret>)
 {
   try
@@ -476,36 +478,44 @@ template <class Ret>
 inline Ret invoke (IInterpreter& interpreter, const char* fn_name)
 {
   using namespace detail;
+  
+  static ignore dummy;
 
-  return invoke_dispatch<0> (interpreter, fn_name, ignore (), ignore (), ignore (), ignore (), ignore (),
-                             ignore (), ignore (), ignore (), ignore (), ignore (), xtl::type<Ret> ());
+  return invoke_dispatch<0> (interpreter, fn_name, dummy, dummy, dummy, dummy, dummy,
+                             dummy, dummy, dummy, dummy, dummy, xtl::type<Ret> ());
 }
 
 template <class Ret, class T1>
 inline Ret invoke (IInterpreter& interpreter, const char* fn_name, const T1& arg1)
 {
   using namespace detail;
+  
+  static ignore dummy;
 
-  return invoke_dispatch<1> (interpreter, fn_name, arg1, ignore (), ignore (), ignore (), ignore (),
-                             ignore (), ignore (), ignore (), ignore (), ignore (), xtl::type<Ret> ());
+  return invoke_dispatch<1> (interpreter, fn_name, arg1, dummy, dummy, dummy, dummy,
+                             dummy, dummy, dummy, dummy, dummy, xtl::type<Ret> ());
 }
 
 template <class Ret, class T1, class T2>
 inline Ret invoke (IInterpreter& interpreter, const char* fn_name, const T1& arg1, const T2& arg2)
 {
   using namespace detail;
+  
+  static ignore dummy;
 
-  return invoke_dispatch<2> (interpreter, fn_name, arg1, arg2, ignore (), ignore (), ignore (),
-                             ignore (), ignore (), ignore (), ignore (), ignore (), xtl::type<Ret> ());
+  return invoke_dispatch<2> (interpreter, fn_name, arg1, arg2, dummy, dummy, dummy,
+                             dummy, dummy, dummy, dummy, dummy, xtl::type<Ret> ());
 }
 
 template <class Ret, class T1, class T2, class T3>
 inline Ret invoke (IInterpreter& interpreter, const char* fn_name, const T1& arg1, const T2& arg2, const T3& arg3)
 {
   using namespace detail;
+  
+  static ignore dummy;
 
-  return invoke_dispatch<3> (interpreter, fn_name, arg1, arg2, arg3, ignore (), ignore (),
-                             ignore (), ignore (), ignore (), ignore (), ignore (), xtl::type<Ret> ());
+  return invoke_dispatch<3> (interpreter, fn_name, arg1, arg2, arg3, dummy, dummy,
+                             dummy, dummy, dummy, dummy, dummy, xtl::type<Ret> ());
 }
 
 template <class Ret, class T1, class T2, class T3, class T4>
@@ -518,9 +528,11 @@ inline Ret invoke
   const T4&      arg4)
 {
   using namespace detail;
+  
+  static ignore dummy;
 
-  return invoke_dispatch<4> (interpreter, fn_name, arg1, arg2, arg3, arg4, ignore (),
-                             ignore (), ignore (), ignore (), ignore (), ignore (), xtl::type<Ret> ());
+  return invoke_dispatch<4> (interpreter, fn_name, arg1, arg2, arg3, arg4, dummy,
+                             dummy, dummy, dummy, dummy, dummy, xtl::type<Ret> ());
 }
 
 template <class Ret, class T1, class T2, class T3, class T4, class T5>
@@ -534,9 +546,11 @@ inline Ret invoke
   const T5&      arg5)
 {
   using namespace detail;
+  
+  static ignore dummy;
 
   return invoke_dispatch<5> (interpreter, fn_name, arg1, arg2, arg3, arg4, arg5,
-                             ignore (), ignore (), ignore (), ignore (), ignore (), xtl::type<Ret> ());
+                             dummy, dummy, dummy, dummy, dummy, xtl::type<Ret> ());
 }
 
 template <class Ret, class T1, class T2, class T3, class T4, class T5, class T6>
@@ -551,9 +565,11 @@ inline Ret invoke
   const T6&      arg6)
 {
   using namespace detail;
+  
+  static ignore dummy;
 
   return invoke_dispatch<6> (interpreter, fn_name, arg1, arg2, arg3, arg4, arg5, arg6,
-                             ignore (), ignore (), ignore (), ignore (), xtl::type<Ret> ());
+                             dummy, dummy, dummy, dummy, xtl::type<Ret> ());
 }
 
 template <class Ret, class T1, class T2, class T3, class T4, class T5, class T6, class T7>
@@ -569,9 +585,11 @@ inline Ret invoke
   const T7&      arg7)
 {
   using namespace detail;
+  
+  static ignore dummy;
 
   return invoke_dispatch<7> (interpreter, fn_name, arg1, arg2, arg3, arg4, arg5, arg6, arg7,
-                             ignore (), ignore (), ignore (), xtl::type<Ret> ());
+                             dummy, dummy, dummy, xtl::type<Ret> ());
 }
 
 template <class Ret, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
@@ -588,9 +606,11 @@ inline Ret invoke
   const T8&      arg8)
 {
   using namespace detail;
+  
+  static ignore dummy;
 
   return invoke_dispatch<8> (interpreter, fn_name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8,
-                             ignore (), ignore (), xtl::type<Ret> ());
+                             dummy, dummy, xtl::type<Ret> ());
 }
 
 template <class Ret, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
@@ -608,8 +628,10 @@ inline Ret invoke
   const T9&      arg9)
 {
   using namespace detail;
+  
+  static ignore dummy;
 
-  return invoke_dispatch<9> (interpreter, fn_name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, ignore (), xtl::type<Ret> ());
+  return invoke_dispatch<9> (interpreter, fn_name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, dummy, xtl::type<Ret> ());
 }
 
 template <class Ret, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
@@ -628,6 +650,8 @@ inline Ret invoke
   const T10&     arg10)
 {
   using namespace detail;
+  
+  static ignore dummy;
 
   return invoke_dispatch<10> (interpreter, fn_name, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, xtl::type<Ret> ());
 }
@@ -646,77 +670,79 @@ template <class Ret> class callback_dispatcher
       : interpreter (in_interpreter), function_name (in_function_name) {}
 
     Ret operator () ()
-    {
-      return invoke<Ret> (GetInterpreter (), function_name.c_str ());
+    {    
+      return invoke<0> (dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy);
     }
     
     template <class T1>
     Ret operator () (T1& arg1)
     {
-      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1);
+      return invoke<1> (arg1, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy);
     }
 
     template <class T1, class T2>
     Ret operator () (T1& arg1, T2& arg2)
     {
-      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2);
+      return invoke<2> (arg1, arg2, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy);
     }
     
     template <class T1, class T2, class T3>
     Ret operator () (T1& arg1, T2& arg2, T3& arg3)
     {
-      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3);
+      return invoke<3> (arg1, arg2, arg3, dummy, dummy, dummy, dummy, dummy, dummy, dummy);
     }
     
     template <class T1, class T2, class T3, class T4>
     Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4)
     {
-      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4);
+      return invoke<4> (arg1, arg2, arg3, arg4, dummy, dummy, dummy, dummy, dummy, dummy);
     }
 
     template <class T1, class T2, class T3, class T4, class T5>
     Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5)
     {
-      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4, arg5);
+      return invoke<5> (arg1, arg2, arg3, arg4, arg5, dummy, dummy, dummy, dummy, dummy);
     }
     
     template <class T1, class T2, class T3, class T4, class T5, class T6>
     Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6)
     {
-      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4, arg5, arg6);
+      return invoke<6> (arg1, arg2, arg3, arg4, arg5, arg6, dummy, dummy, dummy, dummy);
     }
     
     template <class T1, class T2, class T3, class T4, class T5, class T6, class T7>
     Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7)
     {
-      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+      return invoke<7> (arg1, arg2, arg3, arg4, arg5, arg6, arg7, dummy, dummy, dummy);
     }
 
     template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8>
     Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8)
     {
-      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+      return invoke<8> (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, dummy, dummy);
     }
 
     template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
     Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9)
     {
-      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+      return invoke<9> (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, dummy);
     }
 
     template <class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
     Ret operator () (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, T10& arg10)
     {
-      return invoke<Ret> (GetInterpreter (), function_name.c_str (), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+      return invoke<10> (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
     }
 
   private:
-    IInterpreter& GetInterpreter ()
+    template <size_t ArgsCount, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10>
+    Ret invoke (T1& arg1, T2& arg2, T3& arg3, T4& arg4, T5& arg5, T6& arg6, T7& arg7, T8& arg8, T9& arg9, T10& arg10)
     {
       if (!interpreter)
-        throw xtl::format_operation_exception ("script::callback_dispatcher", "Interpreter has already destroyed");
-
-      return *interpreter;
+        throw xtl::format_operation_exception ("script::callback_dispatcher::invoke", "Interpreter has already destroyed");
+    
+      return detail::invoke_dispatch<ArgsCount> (*interpreter, function_name.c_str (), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8,
+        arg9, arg10, xtl::type<Ret> ());
     }
 
   private:
@@ -725,7 +751,11 @@ template <class Ret> class callback_dispatcher
   private:
     InterpreterPtr interpreter;
     stl::string    function_name;
+    
+    static ignore dummy;
 };
+
+template <class Ret> detail::ignore callback_dispatcher<Ret>::dummy;
 
 template <class Signature> struct callback_invoker
 {

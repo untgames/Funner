@@ -171,6 +171,55 @@ function test_node ()
   print ("IsInUpdateTransaction = " .. tostring (node1.IsInUpdateTransaction))
 end
 
+function node_event_handler (node, event)
+  local name = ""  
+
+  if     event == Scene.NodeEvent.AfterUpdate       then name = "AfterUpdate"
+  elseif event == Scene.NodeEvent.BeforeDestroy     then name = "BeforeDestroy"
+  elseif event == Scene.NodeEvent.AfterDestroy      then name = "AfterDestroy"
+  elseif event == Scene.NodeEvent.AfterBind         then name = "AfterBind"
+  elseif event == Scene.NodeEvent.BeforeUnbind      then name = "BeforeUnbind"  
+  elseif event == Scene.NodeEvent.AfterSceneAttach  then name = "AfterSceneAttach"
+  elseif event == Scene.NodeEvent.BeforeSceneDetach then name = "BeforeSceneDetach"
+  elseif event == Scene.NodeEvent.AfterSceneChange  then name = "AfterSceneChange"
+  end  
+
+  print ("Node '" .. tostring (node.Name) .. "' event '" .. name .. "'")
+end
+
+function test_events ()
+  print ("Node events test")
+  
+  local handler = Scene.Node.EventHandler ("node_event_handler")
+  local node1   = Scene.Node.Create ()
+  local node2   = Scene.Node.Create ()
+  local scene   = Scene.Scene.Create ()
+  
+  node1.Name = "Node1"
+  node2.Name = "Node2"
+
+  node1:RegisterEventHandler (Scene.NodeEvent.AfterUpdate, handler)
+  node1:RegisterEventHandler (Scene.NodeEvent.BeforeDestroy, handler)
+  node1:RegisterEventHandler (Scene.NodeEvent.AfterDestroy, handler)
+  node1:RegisterEventHandler (Scene.NodeEvent.AfterBind, handler)
+  node1:RegisterEventHandler (Scene.NodeEvent.BeforeUnbind, handler)
+  node1:RegisterEventHandler (Scene.NodeEvent.AfterSceneAttach, handler)
+  node1:RegisterEventHandler (Scene.NodeEvent.BeforeSceneDetach, handler)
+  node1:RegisterEventHandler (Scene.NodeEvent.AfterSceneChange, handler)
+  
+  node1:BindToScene (scene)
+  node2:BindToScene (scene)
+  node1:BindToParent (node2)
+  
+  node1.Position = vec3 (1, 2, 3)
+  
+  node1 = nil
+  node2 = nil
+  scene = nil
+  
+  collectgarbage ("collect")
+end
+
 function test_entity ()
   print ("Entity test")
 
@@ -465,6 +514,8 @@ end
 
 function test ()
   test_node ()
+  
+  test_events ()
 
   test_entity ()
   

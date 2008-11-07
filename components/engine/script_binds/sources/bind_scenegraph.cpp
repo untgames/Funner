@@ -32,6 +32,7 @@ const char* SCENE_STATIC_NODE_TRANSFORM_SPACE_LIBRARY = "Scene.NodeTransformSpac
 const char* SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY   = "Scene.NodeTraverseMode";
 const char* SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY     = "Scene.NodeSearchMode";
 const char* SCENE_STATIC_NODE_ORT_LIBRARY             = "Scene.NodeOrt";
+const char* SCENE_STATIC_NODE_EVENT_LIBRARY           = "Scene.NodeEvent";
 const char* SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY  = "Scene.TextLineAlignment";
 const char* SCENE_SCENE_LIBRARY                       = "Scene.Scene";
 const char* SCENE_NODE_LIBRARY                        = "Scene.Node";
@@ -100,6 +101,21 @@ Node::Pointer create_node ()
   return Node::Create ();
 }
 
+}
+
+namespace scene_graph
+{
+
+void push_argument (IStack& stack, Node& node)
+{
+  stack.Push (xtl::any (&node, true));
+}
+
+}
+
+namespace
+{
+
 /*
    Регистрация библиотеки работы с узлами сцены
 */
@@ -111,22 +127,31 @@ void bind_static_node_library (Environment& environment)
   InvokerRegistry& node_traverse_mode_lib   = environment.CreateLibrary (SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY);
   InvokerRegistry& node_search_mode_lib     = environment.CreateLibrary (SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY);
   InvokerRegistry& node_ort_lib             = environment.CreateLibrary (SCENE_STATIC_NODE_ORT_LIBRARY);
+  InvokerRegistry& node_event_lib           = environment.CreateLibrary (SCENE_STATIC_NODE_EVENT_LIBRARY);
 
-  node_bind_mode_lib.Register       ("get_AddRef",         make_const (NodeBindMode_AddRef));
-  node_bind_mode_lib.Register       ("get_Capture",        make_const (NodeBindMode_Capture));
-  node_bind_mode_lib.Register       ("get_Default",        make_const (NodeBindMode_Default));
-  node_transform_space_lib.Register ("get_Local",          make_const (NodeTransformSpace_Local));
-  node_transform_space_lib.Register ("get_Parent",         make_const (NodeTransformSpace_Parent));
-  node_transform_space_lib.Register ("get_World",          make_const (NodeTransformSpace_World));
-  node_traverse_mode_lib.Register   ("get_TopToBottom",    make_const (NodeTraverseMode_TopToBottom));
-  node_traverse_mode_lib.Register   ("get_BottomToTop",    make_const (NodeTraverseMode_BottomToTop));
-  node_traverse_mode_lib.Register   ("get_Default",        make_const (NodeTraverseMode_Default));
-  node_search_mode_lib.Register     ("get_OnNextSublevel", make_const (NodeSearchMode_OnNextSublevel));
-  node_search_mode_lib.Register     ("get_OnAllSublevels", make_const (NodeSearchMode_OnAllSublevels));
-  node_search_mode_lib.Register     ("get_Default",        make_const (NodeSearchMode_Default));
-  node_ort_lib.Register             ("get_X",              make_const (NodeOrt_X));
-  node_ort_lib.Register             ("get_Y",              make_const (NodeOrt_Y));
-  node_ort_lib.Register             ("get_Z",              make_const (NodeOrt_Z));
+  node_bind_mode_lib.Register       ("get_AddRef",            make_const (NodeBindMode_AddRef));
+  node_bind_mode_lib.Register       ("get_Capture",           make_const (NodeBindMode_Capture));
+  node_bind_mode_lib.Register       ("get_Default",           make_const (NodeBindMode_Default));
+  node_transform_space_lib.Register ("get_Local",             make_const (NodeTransformSpace_Local));
+  node_transform_space_lib.Register ("get_Parent",            make_const (NodeTransformSpace_Parent));
+  node_transform_space_lib.Register ("get_World",             make_const (NodeTransformSpace_World));
+  node_traverse_mode_lib.Register   ("get_TopToBottom",       make_const (NodeTraverseMode_TopToBottom));
+  node_traverse_mode_lib.Register   ("get_BottomToTop",       make_const (NodeTraverseMode_BottomToTop));
+  node_traverse_mode_lib.Register   ("get_Default",           make_const (NodeTraverseMode_Default));
+  node_search_mode_lib.Register     ("get_OnNextSublevel",    make_const (NodeSearchMode_OnNextSublevel));
+  node_search_mode_lib.Register     ("get_OnAllSublevels",    make_const (NodeSearchMode_OnAllSublevels));
+  node_search_mode_lib.Register     ("get_Default",           make_const (NodeSearchMode_Default));
+  node_ort_lib.Register             ("get_X",                 make_const (NodeOrt_X));
+  node_ort_lib.Register             ("get_Y",                 make_const (NodeOrt_Y));
+  node_ort_lib.Register             ("get_Z",                 make_const (NodeOrt_Z));
+  node_event_lib.Register           ("get_AfterUpdate",       make_const (NodeEvent_AfterUpdate));
+  node_event_lib.Register           ("get_BeforeDestroy",     make_const (NodeEvent_BeforeDestroy));
+  node_event_lib.Register           ("get_AfterDestroy",      make_const (NodeEvent_AfterDestroy));
+  node_event_lib.Register           ("get_AfterBind",         make_const (NodeEvent_AfterBind));
+  node_event_lib.Register           ("get_BeforeUnbind",      make_const (NodeEvent_BeforeUnbind));
+  node_event_lib.Register           ("get_AfterSceneAttach",  make_const (NodeEvent_AfterSceneAttach));
+  node_event_lib.Register           ("get_BeforeSceneDetach", make_const (NodeEvent_BeforeSceneDetach));
+  node_event_lib.Register           ("get_AfterSceneChange",  make_const (NodeEvent_AfterSceneChange));
 }
   
 InvokerRegistry& bind_node_library (Environment& environment)
@@ -241,7 +266,12 @@ InvokerRegistry& bind_node_library (Environment& environment)
   ));
 
   lib.Register ("BeginUpdate", make_invoker (&Node::BeginUpdate));
-  lib.Register ("EndUpdate",   make_invoker (&Node::EndUpdate));
+  lib.Register ("EndUpdate",   make_invoker (&Node::EndUpdate));  
+
+  lib.Register ("EventHandler",                make_callback_invoker<Node::EventHandler::signature_type> ());
+  lib.Register ("SubTreeEventHandler",         make_callback_invoker<Node::SubTreeEventHandler::signature_type> ());
+  lib.Register ("RegisterEventHandler",        make_invoker (xtl::implicit_cast<xtl::connection (Node::*)(NodeEvent, const Node::EventHandler&) const> (&Node::RegisterEventHandler)));
+  lib.Register ("RegisterSubTreeEventHandler", make_invoker (xtl::implicit_cast<xtl::connection (Node::*)(NodeSubTreeEvent, const Node::SubTreeEventHandler&) const> (&Node::RegisterEventHandler)));
 
     //регистрация типов данных
 

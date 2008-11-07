@@ -31,7 +31,6 @@ MEDIA.FONT.FONT_CONVERTER.NAME             := funner.media.font.font_converter
 MEDIA.FONT.FONT_CONVERTER.INCLUDE_DIRS     := ../../../extern/freetype/include
 MEDIA.FONT.FONT_CONVERTER.SOURCE_DIRS      := sources/font_converter
 MEDIA.FONT.FONT_CONVERTER.LIB_DIRS         :=  
-MEDIA.FONT.FONT_CONVERTER.LIBS             := extern.freetype
 MEDIA.FONT.FONT_CONVERTER.COMPILER_CFLAGS  := 
 MEDIA.FONT.FONT_CONVERTER.COMPILER_DEFINES := 
 MEDIA.FONT.FONT_CONVERTER.IMPORTS          := compile.static.mak ../../media/image/compile.static.mak ../../media/image/link.static.mak
