@@ -173,7 +173,7 @@ end
 
 function node_event_handler (node, event)
   local name = ""  
-
+  
   if     event == Scene.NodeEvent.AfterUpdate       then name = "AfterUpdate"
   elseif event == Scene.NodeEvent.BeforeDestroy     then name = "BeforeDestroy"
   elseif event == Scene.NodeEvent.AfterDestroy      then name = "AfterDestroy"
@@ -187,26 +187,39 @@ function node_event_handler (node, event)
   print ("Node '" .. tostring (node.Name) .. "' event '" .. name .. "'")
 end
 
+function node_subtree_event_handler (node, child, event)
+  local name = ""  
+  
+  if     event == Scene.NodeSubTreeEvent.AfterBind    then name = "AfterBind"
+  elseif event == Scene.NodeSubTreeEvent.BeforeUnbind then name = "BeforeUnbind"
+  end  
+
+  print ("Node '" .. tostring (node.Name) .. "." .. tostring (child.Name) .. "' subtree event '" .. name .. "'")
+end
+
 function test_events ()
   print ("Node events test")
   
-  local handler = Scene.Node.EventHandler ("node_event_handler")
-  local node1   = Scene.Node.Create ()
-  local node2   = Scene.Node.Create ()
-  local scene   = Scene.Scene.Create ()
+  local handler1 = Scene.Node.EventHandler ("node_event_handler")
+  local handler2 = Scene.Node.SubTreeEventHandler ("node_subtree_event_handler")
+  local node1    = Scene.Node.Create ()
+  local node2    = Scene.Node.Create ()
+  local scene    = Scene.Scene.Create ()
   
   node1.Name = "Node1"
   node2.Name = "Node2"
 
-  node1:RegisterEventHandler (Scene.NodeEvent.AfterUpdate, handler)
-  node1:RegisterEventHandler (Scene.NodeEvent.BeforeDestroy, handler)
-  node1:RegisterEventHandler (Scene.NodeEvent.AfterDestroy, handler)
-  node1:RegisterEventHandler (Scene.NodeEvent.AfterBind, handler)
-  node1:RegisterEventHandler (Scene.NodeEvent.BeforeUnbind, handler)
-  node1:RegisterEventHandler (Scene.NodeEvent.AfterSceneAttach, handler)
-  node1:RegisterEventHandler (Scene.NodeEvent.BeforeSceneDetach, handler)
-  node1:RegisterEventHandler (Scene.NodeEvent.AfterSceneChange, handler)
-  
+  node1:RegisterEventHandler (Scene.NodeEvent.AfterUpdate, handler1)
+  node1:RegisterEventHandler (Scene.NodeEvent.BeforeDestroy, handler1)
+  node1:RegisterEventHandler (Scene.NodeEvent.AfterDestroy, handler1)
+  node1:RegisterEventHandler (Scene.NodeEvent.AfterBind, handler1)
+  node1:RegisterEventHandler (Scene.NodeEvent.BeforeUnbind, handler1)
+  node1:RegisterEventHandler (Scene.NodeEvent.AfterSceneAttach, handler1)
+  node1:RegisterEventHandler (Scene.NodeEvent.BeforeSceneDetach, handler1)
+  node1:RegisterEventHandler (Scene.NodeEvent.AfterSceneChange, handler1)
+  node2:RegisterSubTreeEventHandler (Scene.NodeSubTreeEvent.AfterBind, handler2)
+  node2:RegisterSubTreeEventHandler (Scene.NodeSubTreeEvent.BeforeUnbind, handler2)
+
   node1:BindToScene (scene)
   node2:BindToScene (scene)
   node1:BindToParent (node2)

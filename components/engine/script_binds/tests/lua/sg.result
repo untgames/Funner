@@ -60,6 +60,22 @@ Child name - node1
 IsInUpdateTransaction = 0
 IsInUpdateTransaction = 1
 IsInUpdateTransaction = 0
+Node events test
+Node 'Node1' event 'AfterSceneAttach'
+Node 'Node1' event 'AfterSceneChange'
+Node 'Node1' event 'AfterBind'
+Node 'Node1' event 'AfterUpdate'
+Node 'Node1' event 'BeforeUnbind'
+Node 'Node1' event 'AfterBind'
+Node 'Node1' event 'AfterUpdate'
+Node 'Node2.Node1' subtree event 'AfterBind'
+Node 'Node1' event 'AfterUpdate'
+Node 'Node1' event 'BeforeSceneDetach'
+Node 'Node1' event 'AfterSceneChange'
+Node 'Node1' event 'BeforeUnbind'
+Node 'Node2.Node1' subtree event 'BeforeUnbind'
+Node 'Node1' event 'BeforeDestroy'
+Node 'Node1' event 'AfterDestroy'
 Entity test
 IsInfiniteBounds = 1
 WireColor = 0 0 0

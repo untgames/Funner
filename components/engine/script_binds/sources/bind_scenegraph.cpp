@@ -33,6 +33,7 @@ const char* SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY   = "Scene.NodeTraverseMode"
 const char* SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY     = "Scene.NodeSearchMode";
 const char* SCENE_STATIC_NODE_ORT_LIBRARY             = "Scene.NodeOrt";
 const char* SCENE_STATIC_NODE_EVENT_LIBRARY           = "Scene.NodeEvent";
+const char* SCENE_STATIC_NODE_SUBTREE_EVENT_LIBRARY   = "Scene.NodeSubTreeEvent";
 const char* SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY  = "Scene.TextLineAlignment";
 const char* SCENE_SCENE_LIBRARY                       = "Scene.Scene";
 const char* SCENE_NODE_LIBRARY                        = "Scene.Node";
@@ -128,6 +129,7 @@ void bind_static_node_library (Environment& environment)
   InvokerRegistry& node_search_mode_lib     = environment.CreateLibrary (SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY);
   InvokerRegistry& node_ort_lib             = environment.CreateLibrary (SCENE_STATIC_NODE_ORT_LIBRARY);
   InvokerRegistry& node_event_lib           = environment.CreateLibrary (SCENE_STATIC_NODE_EVENT_LIBRARY);
+  InvokerRegistry& node_subtree_event_lib   = environment.CreateLibrary (SCENE_STATIC_NODE_SUBTREE_EVENT_LIBRARY);
 
   node_bind_mode_lib.Register       ("get_AddRef",            make_const (NodeBindMode_AddRef));
   node_bind_mode_lib.Register       ("get_Capture",           make_const (NodeBindMode_Capture));
@@ -152,6 +154,8 @@ void bind_static_node_library (Environment& environment)
   node_event_lib.Register           ("get_AfterSceneAttach",  make_const (NodeEvent_AfterSceneAttach));
   node_event_lib.Register           ("get_BeforeSceneDetach", make_const (NodeEvent_BeforeSceneDetach));
   node_event_lib.Register           ("get_AfterSceneChange",  make_const (NodeEvent_AfterSceneChange));
+  node_subtree_event_lib.Register   ("get_AfterBind",         make_const (NodeSubTreeEvent_AfterBind));
+  node_subtree_event_lib.Register   ("get_BeforeUnbind",      make_const (NodeSubTreeEvent_BeforeUnbind));
 }
   
 InvokerRegistry& bind_node_library (Environment& environment)
