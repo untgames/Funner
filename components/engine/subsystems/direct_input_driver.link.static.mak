@@ -1,5 +1,5 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LINK_INCLUDES := DirectInputDriver
+export.LINK_INCLUDES := DirectInputDriverSubsystem
 export.IMPORTS       := ../../input/direct_input_driver/link.static.mak link.static.mak

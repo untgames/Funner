@@ -14,7 +14,8 @@ ENGINE.SUBSYSTEMS.SOURCES.COMPILER_CFLAGS   :=
 ENGINE.SUBSYSTEMS.SOURCES.COMPILER_DEFINES  :=
 ENGINE.SUBSYSTEMS.SOURCES.IMPORTS           := ../core/compile.static.mak ../../render/scene_render/compile.static.mak \
                                                ../../input/manager/compile.static.mak ../../input/low_level/compile.static.mak \
-                                               ../../sound/scene_player/compile.static.mak ../../system/compile.static.mak
+                                               ../../sound/scene_player/compile.static.mak ../../system/compile.static.mak \
+                                               ../../script/core/compile.static.mak
 ENGINE.SUBSYSTEMS.SOURCES.win32.IMPORTS     := ../../input/window_driver/compile.static.mak ../../render/mid_level_window_driver/compile.static.mak
 ENGINE.SUBSYSTEMS.SOURCES.win32.SOURCE_DIRS := sources/window_manager
 
@@ -29,7 +30,8 @@ ENGINE.SUBSYSTEMS.TESTS.COMPILER_DEFINES :=
 ENGINE.SUBSYSTEMS.TESTS.IMPORTS          := ../core/compile.static.mak ../../common/compile.static.mak ../../system/compile.static.mak \
                                             ../../render/scene_render/compile.static.mak \
                                             scene_render.link.static.mak scene_player.link.static.mak \
-                                             input_manager.link.static.mak \
+                                             input_manager.link.static.mak shell.link.static.mak \
                                             ../../input/manager/xkeymap.link.static.mak ../../input/manager/xkeyreg.link.static.mak \
-                                            ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak
+                                            ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
+                                            ../../script/lua/link.static.mak ../script_binds/math.link.static.mak ../script_binds/sg.link.static.mak
 ENGINE.SUBSYSTEMS.TESTS.win32.IMPORTS := ../../render/opengl_driver/link.static.mak window_input_driver.link.static.mak window_manager.link.static.mak window_renderer.link.static.mak

@@ -1,5 +1,5 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LINK_INCLUDES := WindowRenderer
+export.LINK_INCLUDES := WindowRendererSubsystem
 export.IMPORTS       := ../../render/mid_level_window_driver/link.static.mak link.static.mak

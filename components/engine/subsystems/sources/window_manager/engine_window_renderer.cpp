@@ -94,7 +94,7 @@ class WindowRendererComponent
 extern "C"
 {
 
-ComponentRegistrator<WindowRendererComponent> WindowRenderer (COMPONENT_NAME);
+ComponentRegistrator<WindowRendererComponent> WindowRendererSubsystem (COMPONENT_NAME);
 
 }
 

@@ -1,21 +1,16 @@
 #include <stl/hash_map>
 
 #include <xtl/bind.h>
-#include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/iterator.h>
-#include <xtl/reference_counter.h>
 
-#include <common/component.h>
 #include <common/log.h>
-#include <common/parser.h>
 #include <common/strlib.h>
 
 #include <render/scene_render.h>
 
-#include <engine/attachments.h>
-#include <engine/subsystem_manager.h>
+#include "shared.h"
 
 using namespace engine;
 using namespace common;
@@ -155,7 +150,7 @@ class SceneRenderComponent
 extern "C"
 {
 
-ComponentRegistrator<SceneRenderComponent> SceneRender (COMPONENT_NAME);
+ComponentRegistrator<SceneRenderComponent> SceneRenderSubsystem (COMPONENT_NAME);
 
 }
 

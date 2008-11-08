@@ -3,23 +3,18 @@
 #include <stl/vector>
 
 #include <xtl/bind.h>
-#include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
-#include <xtl/reference_counter.h>
 
-#include <common/component.h>
 #include <common/log.h>
-#include <common/parser.h>
 
 #include <input/low_level/driver.h>
 
 #include <input/translation_map.h>
 #include <input/translation_map_registry.h>
 
-#include <engine/attachments.h>
-#include <engine/subsystem_manager.h>
+#include "shared.h"
 
 using namespace engine;
 using namespace common;
@@ -266,7 +261,7 @@ class InputManagerComponent
 extern "C"
 {
 
-ComponentRegistrator<InputManagerComponent> InputManager (COMPONENT_NAME);
+ComponentRegistrator<InputManagerComponent> InputManagerSubsystem (COMPONENT_NAME);
 
 }
 

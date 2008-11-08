@@ -34,7 +34,7 @@ void input_event_handler (const char* event)
 
 int main ()
 {
-  printf ("Results of subsystems1_test:\n");
+  printf ("Results of window_manager_test:\n");
 
   try  
   {            
@@ -63,8 +63,6 @@ int main ()
   {
     printf ("unknown exception\n");
   }
-  
-  printf ("heye!\n");
 
   return syslib::Application::GetExitCode ();
 }

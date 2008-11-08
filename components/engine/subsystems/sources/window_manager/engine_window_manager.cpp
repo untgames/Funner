@@ -204,7 +204,7 @@ class WindowManagerComponent
 extern "C"
 {
 
-ComponentRegistrator<WindowManagerComponent> WindowManager (COMPONENT_NAME);
+ComponentRegistrator<WindowManagerComponent> WindowManagerSubsystem (COMPONENT_NAME);
 
 }
 

@@ -1,5 +1,5 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LINK_INCLUDES := SceneRenderSubsystem
-export.IMPORTS       := ../../render/scene_render/link.static.mak link.static.mak
+export.LINK_INCLUDES := ShellSubsystem
+export.IMPORTS       := ../../script/core/link.static.mak link.static.mak

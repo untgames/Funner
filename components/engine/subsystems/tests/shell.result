@@ -1,0 +1,54 @@
+Results of shell_test:
+engine.SubsystemManager1: Start subsystems...
+Node test
+Name = 
+Position = 0 0 0
+WorldPosition = 0 0 0
+Orientation = 0 0 0 1
+WorldOrientation = 0 0 0 1
+Scale = 1 1 1
+WorldScale = 1 1 1
+OrientationInherit = 1
+ScaleInherit = 1
+LocalTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+WorldTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+ParentTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+LocalOrtX = 1 0 0
+LocalOrtY = 0 1 0
+LocalOrtZ = 0 0 1
+WorldOrtX = 1 0 0
+WorldOrtY = 0 1 0
+WorldOrtZ = 0 0 1
+ParentOrtX = 1 0 0
+ParentOrtY = 0 1 0
+ParentOrtZ = 0 0 1
+Name = node1
+Position = 10 10 10
+WorldPosition = 10 10 10
+Orientation = 34 10 15 0
+WorldOrientation = 34 10 15 0
+Scale = 100 0 0
+WorldScale = 100 0 0
+OrientationInherit = 0
+ScaleInherit = 0
+LocalTM = 56.1107 0 0 10 45.9149 0 0 10 68.8724 0 0 10 0 0 0 1
+WorldTM = 56.1107 0 0 10 45.9149 0 0 10 68.8724 0 0 10 0 0 0 1
+ParentTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+Position = 1.4 5 6.779
+Reset position = 0 0 0
+Translate position = 4 5 6
+Orientation = 0.0886976 0.27646 0.195826 0.936672
+Orientation = 0.40061 0.107611 0.207484 0.885936
+Reset orientation = 0 0 0 1
+Roatate orientation = 0.018283 0.28532 0.33527 0.897693
+Scale = 15 16.4 17
+Rescale = 150 16.4 17
+ObjectTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+Scale = 1 1 1
+WorldOrtX = 1 0 0
+WorldOrtY = 0 0 -1
+WorldOrtZ = 0 1 0
+engine.SubsystemManager1: Add subsystem 'Subsystem01'
+engine.SubsystemManager1: Subsystems successfully started
+engine.SubsystemManager1: config_shell.xml(1): warning: not yet implement. Encoding='windows-1251'
+engine.SubsystemManager1: Remove susbsystem 'Subsystem01'

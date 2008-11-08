@@ -1,5 +1,5 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LINK_INCLUDES := WindowInputDriver
+export.LINK_INCLUDES := WindowInputDriverSubsystem
 export.IMPORTS       := ../../input/window_driver/link.static.mak link.static.mak

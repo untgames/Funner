@@ -1,5 +1,5 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LINK_INCLUDES := WindowManager
+export.LINK_INCLUDES := WindowManagerSubsystem
 export.IMPORTS       := ../../system/link.static.mak link.static.mak

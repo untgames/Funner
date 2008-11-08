@@ -1,16 +1,10 @@
 #include <stl/string>
 
-#include <xtl/common_exceptions.h>
-#include <xtl/reference_counter.h>
 #include <xtl/string.h>
-
-#include <common/component.h>
-#include <common/parser.h>
 
 #include <sound/scene_player.h>
 
-#include <engine/attachments.h>
-#include <engine/subsystem_manager.h>
+#include "shared.h"
 
 using namespace engine;
 using namespace common;
@@ -107,7 +101,7 @@ class ScenePlayerComponent
 extern "C"
 {
 
-ComponentRegistrator<ScenePlayerComponent> ScenePlayer (COMPONENT_NAME);
+ComponentRegistrator<ScenePlayerComponent> ScenePlayerSubsystem (COMPONENT_NAME);
 
 }
 

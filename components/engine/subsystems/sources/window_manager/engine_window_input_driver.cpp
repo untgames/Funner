@@ -141,7 +141,7 @@ class WindowInputDriverComponent
 extern "C"
 {
 
-ComponentRegistrator<WindowInputDriverComponent> WindowInputDriver (COMPONENT_NAME);
+ComponentRegistrator<WindowInputDriverComponent> WindowInputDriverSubsystem (COMPONENT_NAME);
 
 }
 
