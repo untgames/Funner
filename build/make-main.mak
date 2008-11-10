@@ -198,7 +198,11 @@ endef
 
 #Создание зависимости для копирования внешних файлов (имя внешнего файла, каталоги поиска)
 define create_extern_file_dependency
-  $1: $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $1),$2)) $$(notdir $1))
+  DEPENDENCY_SOURCE := $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $1),$2)) $$(notdir $1))
+  
+$(warning src='$(DEPENDENCY_SOURCE)' target='$1')
+
+  $1: $(DEPENDENCY_SOURCE)
 		@cp -fv $$< $$@
 		@chmod ug+rwx $$@
 endef
