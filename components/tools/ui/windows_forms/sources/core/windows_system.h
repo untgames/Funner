@@ -7,7 +7,7 @@ class WindowSystem: public ICustomWindowSystem, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    WindowSystem  (IApplicationServer*);
+    WindowSystem  (tools::ui::IApplicationServer*);
     ~WindowSystem ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,8 +35,8 @@ class WindowSystem: public ICustomWindowSystem, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение сервера приложения и скриптового окружения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    IApplicationServer&  ApplicationServer () { return *application_server; }
-    script::Environment& ShellEnvironment  () { return *shell_environment; }
+    tools::ui::IApplicationServer&  ApplicationServer () { return *application_server; }
+    script::Environment&            ShellEnvironment  () { return *shell_environment; }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Главная форма
@@ -83,4 +83,5 @@ class WindowSystem: public ICustomWindowSystem, public xtl::reference_counter
     ChildFormRegistry                child_forms;         //реестр дочерних форм
     LogFunction                      log_handler;         //функция протоколирования
     size_t                           next_child_form_uid; //номер следующей дочерней формы
+    PluginManager                    plugin_manager;      //менеджер плагинов
 };

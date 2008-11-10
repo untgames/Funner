@@ -15,11 +15,11 @@ class AutoString
 ///Конструкторы
     AutoString () : str (0) { }
 
-    AutoString (System::String^ from)
+    AutoString (const System::String^ from)
     {
       try
       {
-        str = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi (from);
+        str = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi (const_cast<System::String^> (from));
       }
       catch (...)
       {

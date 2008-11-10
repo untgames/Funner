@@ -98,26 +98,6 @@ class IApplicationServer: virtual public IObject
     virtual void ExecuteCommand (const char* command) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение / установка значения свойства
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SetProperty (const char* name, const stl::string& value) = 0;
-    virtual void GetProperty (const char* name, stl::string& value) = 0;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка наличия свойства / проверка режима "только чтения" свойства
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual bool IsPropertyPresent  (const char* name) = 0;
-    virtual bool IsPropertyReadOnly (const char* name) = 0;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация слушателей событий свойств
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void RegisterPropertyListener       (const char* name_wc_mask, IPropertyListener* listener) = 0;
-    virtual void UnregisterPropertyListener     (const char* name_wc_mask, IPropertyListener* listener) = 0;
-    virtual void UnregisterAllPropertyListeners (const char* name_wc_mask) = 0;
-    virtual void UnregisterAllPropertyListeners () = 0;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание пользовательского дочернего окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual ICustomChildWindow* CreateChildWindow (const char* init_string) = 0;
@@ -129,12 +109,12 @@ class IApplicationServer: virtual public IObject
 class WindowSystemManager
 {
   public:
-    typedef xtl::function<ICustomWindowSystem* (const char* profile, IApplicationServer* application)> WindowSystemCreater;
+    typedef xtl::function<ICustomWindowSystem* (const char* profile, IApplicationServer* application)> WindowSystemCreator;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация пользовательских оконных систем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterWindowSystem       (const char* profile, const WindowSystemCreater& creater);
+    static void RegisterWindowSystem       (const char* profile, const WindowSystemCreator& creator);
     static void UnregisterWindowSystem     (const char* profile);
     static void UnregisterAllWindowSystems ();
 

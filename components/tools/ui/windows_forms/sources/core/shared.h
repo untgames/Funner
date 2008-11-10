@@ -19,6 +19,7 @@
 
 #include <common/component.h>
 #include <common/file.h>
+#include <common/log.h>
 #include <common/parser.h>
 #include <common/strlib.h>
 
@@ -34,6 +35,7 @@
 #using <System.dll>
 #using <System.Windows.Forms.dll>
 #using <System.Drawing.dll>
+#using <System.Xml.dll>
 #using <WeifenLuo.WinFormsUI.Docking.dll>
 
 #include <msclr/gcroot.h>
@@ -52,7 +54,7 @@ namespace ui
 namespace windows_forms
 {
 
-typedef xtl::com_ptr<IApplicationServer> ApplicationServerPtr;
+typedef xtl::com_ptr<tools::ui::IApplicationServer> ApplicationServerPtr;
 
 class WindowSystem;
 
@@ -64,6 +66,7 @@ class WindowSystem;
 #include "main_form.h"
 #include "child_form.h"
 #include "control_registry.h"
+#include "plugin_manager.h"
 #include "windows_system.h"
 #include "configuration_parser.h"
 

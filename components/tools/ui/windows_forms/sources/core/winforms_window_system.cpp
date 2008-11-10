@@ -81,6 +81,10 @@ class ApplicationModelWrapper
 
 }
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
+
 /*
     Конструктор / деструктор
 */
@@ -89,7 +93,8 @@ WindowSystem::WindowSystem (IApplicationServer* server)
   : application_server (server),
     shell_environment (new script::Environment),
     shell (INTERPERTER_NAME, shell_environment),
-    next_child_form_uid (0)
+    next_child_form_uid (0),
+    plugin_manager (*this)
 {
   try
   {
@@ -106,6 +111,8 @@ WindowSystem::WindowSystem (IApplicationServer* server)
       //регистрация шлюзов
       
     RegisterInvokers ();
+    
+    plugin_manager.LoadPlugins ("data/*.dll");
   }
   catch (xtl::exception& exception)
   {
