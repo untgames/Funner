@@ -200,9 +200,7 @@ endef
 define create_extern_file_dependency
   DEPENDENCY_SOURCE := $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $1),$2)) $$(notdir $1))
   
-$(warning src='$(DEPENDENCY_SOURCE)' target='$1')
-
-  $1: $(DEPENDENCY_SOURCE)
+  $1: $$(DEPENDENCY_SOURCE)
 		@cp -fv $$< $$@
 		@chmod ug+rwx $$@
 endef
@@ -214,11 +212,10 @@ define process_target_with_sources
   $1.INCLUDE_DIRS   := $$(call specialize_paths,$$($1.INCLUDE_DIRS))
   $1.SOURCE_DIRS    := $$(call specialize_paths,$$($1.SOURCE_DIRS))
   $1.LIB_DIRS       := $$(call specialize_paths,$$($1.LIB_DIRS)) $(DIST_LIB_DIR)
-  $1.DLL_DIRS       := $$(call specialize_paths,$$($1.DLL_DIRS))
+  $1.DLL_DIRS       := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)
   $1.EXECUTION_DIR  := $$(strip $$($1.EXECUTION_DIR))
   $1.EXECUTION_DIR  := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
   $1.LIBS           := $$($1.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
-  $1.TARGET_DLLS    := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
   $1.LIB_DEPS       := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(wildcard $$($1.LIB_DIRS:%=%/*)))
 
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
@@ -262,6 +259,7 @@ define process_target.dynamic-lib
   $1.DLL_FILE  := $(DIST_BIN_DIR)/$$($1.NAME)$(DLL_SUFFIX)
   $1.LIB_FILE  := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
   TARGET_FILES := $$(TARGET_FILES) $$($1.DLL_FILE) $(DIST_LIB_DIR)/$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
+  $1.TARGET_DLLS := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
 
   build: $$($1.DLL_FILE)  
 
@@ -284,6 +282,7 @@ define process_target.application
 
   $1.EXE_FILE  := $(DIST_BIN_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,$(EXE_SUFFIX))
   TARGET_FILES := $$(TARGET_FILES) $$($1.EXE_FILE)
+  $1.TARGET_DLLS := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
 
   build: $$($1.EXE_FILE)
 
@@ -406,7 +405,7 @@ define process_target.cs-assembly
   
   $1.SOURCE_FILES   := $$($1.SOURCE_FILES:%=$(COMPONENT_DIR)%)
   $1.NAME           := $(COMPONENT_DIR)$$($1.NAME)
-  $1.DLL_DIRS       := $$(call specialize_paths,$$($1.DLL_DIRS))
+  $1.DLL_DIRS       := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)
   $1.EXECUTION_DIR  := $$(strip $$($1.EXECUTION_DIR))
   $1.EXECUTION_DIR  := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
   $1.TARGET_DLLS    := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
@@ -505,8 +504,8 @@ all: build check
 run: build
 build: create-dirs
 rebuild: clean build
-#test: build
-#check: build
+test: build
+check: build
 export-dirs: create-dirs
 #dist: check
 dist : export-dirs

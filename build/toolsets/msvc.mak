@@ -81,7 +81,7 @@ export LIB
 #список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
 ###################################################################################################
 define tools.c++compile
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/cl" -c -Fo"$3\\" $(patsubst %,-I"%",$2) $(COMMON_CFLAGS) $5 $(if $(filter -clr,$5),$(foreach dir,$7,-AI $(dir)),-EHsc)  $(patsubst %,-D%,$4) $1 $(if $6,-FI"$6" -Yc"$6" -Fp"$3\\")
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/cl" -c -Fo"$3\\" $(patsubst %,-I"%",$2) $(COMMON_CFLAGS) $5 $(if $(filter -clr,$5),$(foreach dir,$7 $(DIST_BIN_DIR),-AI $(dir)),-EHsc)  $(patsubst %,-D%,$4) $1 $(if $6,-FI"$6" -Yc"$6" -Fp"$3\\")
 endef
 
 ###################################################################################################
@@ -104,5 +104,5 @@ endef
 #список дефайнов, флаги компиляции)
 ###################################################################################################
 define tools.cscompile
-export PATH="$(FRAMEWORK_DIR);$$PATH" && "$(FRAMEWORK_DIR)/csc" -nologo $5 -out:"$1" $(if $(filter %.dll,$1),-t:library,-t:exe) $(patsubst %,-lib:"%",$3) $(if $(strip $4),-define:"$(strip $4)") $(subst /,\\,$2)
+export PATH="$(FRAMEWORK_DIR);$$PATH" && "$(FRAMEWORK_DIR)/csc" -nologo $5 -out:"$1" $(if $(filter %.dll,$1),-t:library,-t:exe) $(patsubst %,-lib:"%",$3 $(DIST_BIN_DIR)) $(if $(strip $4),-define:"$(strip $4)") $(subst /,\\,$2)
 endef
