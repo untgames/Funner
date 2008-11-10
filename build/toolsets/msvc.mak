@@ -48,6 +48,7 @@ MSVC_PATH        := $(call convert_path,$(MSVC_PATH))
 MSVC_BIN_PATH    := $(MSVC_PATH)/bin
 MSVS_COMMON_PATH := $(call convert_path,$(MSVS_COMMON_PATH))
 COMMON_CFLAGS    += -W3 -Ox -wd4996 $(if $(analyze),-analyze) -nologo -FC
+FRAMEWORK_DIR    := $(SYSTEMROOT)/Microsoft.NET/Framework/v2.0.50727
 
 ###################################################################################################
 #Константы
@@ -96,4 +97,12 @@ endef
 ###################################################################################################
 define tools.lib
 export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/lib" -nologo -out:$1 $2
+endef
+
+###################################################################################################
+#Компиляция исходников C# (имя выходного файла, список исходников, список подключаемых dll каталогов,
+#список дефайнов, флаги компиляции)
+###################################################################################################
+define tools.cscompile
+export PATH="$(FRAMEWORK_DIR);$$PATH" && "$(FRAMEWORK_DIR)/csc" -nologo $5 -out:"$1" $(if $(filter %.dll,$1),-t:library,-t:exe) $(patsubst %,-lib:"%",$3) $(if $(strip $4),-define:"$(strip $4)") $(subst /,\\,$2)
 endef

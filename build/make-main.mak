@@ -10,11 +10,12 @@ TOOLSETS_DIR_SHORT_NAME                 := toolsets      #Базовое имя каталога с
 PCH_SHORT_NAME                          := pch.h         #Базовое имя PCH файла
 EXPORT_VAR_PREFIX                       := export        #Префикс имени переменной экспортирования настроек компонента
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag    #Базовое имя файла-флага пакетной компиляции
-VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package sdk #Допустимые типы целей
+VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package sdk cs-assembly #Допустимые типы целей
 PACKAGE_COMMANDS                        := build clean test check run #Команды, делегируемые компонентам пакета
 COMPILE_TOOL                            := tools.c++compile #Имя макроса утилиты компиляции C++ файлов
 LINK_TOOL                               := tools.link       #Имя макроса утилиты редактора связей
 LIB_TOOL                                := tools.lib        #Имя макроса утилиты архивирования объектных файлов
+CSC_TOOL                                := tools.cscompile  #Имя макроса утилиты компиляции C# файлов
 EXPORT_EXCLUDE_PATTERN                  := .svn            #Шаблон файлов, исключаемых из копирования при выполнении цели export-dirs
 EXPORT_TAR_TMP_FILE_SHORT_NAME          := export-file.tar #Базовое имя файла архива, используемого при выполнении цели export-dirs
 
@@ -380,6 +381,41 @@ ifneq (,$$($1.EXPORT_DIRS))
 		@tar --directory=$(DIST_DIR) --overwrite --overwrite-dir -xf $$($1.EXPORT_TMP_TAR)
 endif
 
+endef
+
+#Обработка каталога с C# исходниками (имя цели, имя каталога)
+define process_cs_source_dir 
+  ifneq (,$$(wildcard $2/sources.mak))
+    SOURCE_FILES :=
+  
+    include $2/sources.mak    
+
+    $1.SOURCE_FILES := $$($1.SOURCE_FILES) $$(wildcard $$(SOURCE_FILES:%=$2/%))
+  else
+    $1.SOURCE_FILES := $$($1.SOURCE_FILES) $$(wildcard $2/*.cs)
+  endif
+endef
+
+#Обработка цели cs-dll (имя цели)
+define process_target.cs-assembly
+  $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_cs_source_dir,$1,$$(dir))))
+  
+  $1.SOURCE_FILES   := $$($1.SOURCE_FILES:%=$(COMPONENT_DIR)%)
+  $1.NAME           := $(COMPONENT_DIR)$$($1.NAME)
+  $1.DLL_DIRS       := $$(call specialize_paths,$$($1.DLL_DIRS))
+  $1.EXECUTION_DIR  := $$(strip $$($1.EXECUTION_DIR))
+  $1.EXECUTION_DIR  := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
+  $1.TARGET_DLLS    := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
+
+  build: $$($1.NAME)  
+
+  $$($1.NAME): $$($1.SOURCE_FILES)
+		@echo Compile $$@...
+		@$$(call $(CSC_TOOL),$$($1.NAME),$$($1.SOURCE_FILES),$$($1.DLL_DIRS),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS))
+
+  build: $$($1.TARGET_DLLS)
+
+  $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
 endef
 
 #Импортирование переменных (префикс источника, префикс приёмника, относительный путь к используемому компоненту)
