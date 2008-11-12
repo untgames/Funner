@@ -401,10 +401,11 @@ endef
 
 #Обработка цели cs-dll (имя цели)
 define process_target.cs-assembly
+  $1.SOURCE_DIRS := $$($1.SOURCE_DIRS:%=$(COMPONENT_DIR)%)
+
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_cs_source_dir,$1,$$(dir))))
   
-  $1.SOURCE_FILES   := $$($1.SOURCE_FILES:%=$(COMPONENT_DIR)%)
-  $1.NAME           := $(COMPONENT_DIR)$$($1.NAME)
+  $1.NAME           := $(DIST_BIN_DIR)/$$($1.NAME)
   $1.DLL_DIRS       := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)
   $1.EXECUTION_DIR  := $$(strip $$($1.EXECUTION_DIR))
   $1.EXECUTION_DIR  := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
@@ -414,7 +415,7 @@ define process_target.cs-assembly
 
   $$($1.NAME): $$($1.SOURCE_FILES)
 		@echo Compile $$@...
-		@$$(call $(CSC_TOOL),$$($1.NAME),$$($1.SOURCE_FILES),$$($1.DLL_DIRS),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS))
+		@$$(call $(CSC_TOOL),$$($1.NAME),$$($1.SOURCE_FILES),$$($1.DLLS),$$($1.DLL_DIRS),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS))
 
   build: $$($1.TARGET_DLLS)
 

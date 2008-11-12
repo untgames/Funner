@@ -100,9 +100,9 @@ export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/lib" -nologo -out:
 endef
 
 ###################################################################################################
-#Компиляция исходников C# (имя выходного файла, список исходников, список подключаемых dll каталогов,
+#Компиляция исходников C# (имя выходного файла, список исходников, список необходимых длл, список подключаемых dll каталогов,
 #список дефайнов, флаги компиляции)
 ###################################################################################################
 define tools.cscompile
-export PATH="$(FRAMEWORK_DIR);$$PATH" && "$(FRAMEWORK_DIR)/csc" -nologo $5 -out:"$1" $(if $(filter %.dll,$1),-t:library,-t:exe) $(patsubst %,-lib:"%",$3 $(DIST_BIN_DIR)) $(if $(strip $4),-define:"$(strip $4)") $(subst /,\\,$2)
+export PATH="$(FRAMEWORK_DIR);$$PATH" && "$(FRAMEWORK_DIR)/csc" -nologo $6 -out:"$1" $(if $(filter %.dll,$1),-t:library,-t:exe) $(patsubst %,-lib:"%",$4 $(DIST_BIN_DIR)) $(patsubst %,-reference:"%.dll",$3) $(if $(strip $5),-define:"$(strip $5)") $(subst /,\\,$2)
 endef
