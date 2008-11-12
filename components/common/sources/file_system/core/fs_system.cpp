@@ -912,9 +912,45 @@ string FileSystem::GetNormalizedFileName (const char* file_name)
   for (string::iterator i=res.begin ();i!=res.end ();++i)
     switch (*i)
     {
-      case '\\': *i = '/'; break;
-      default:   *i = tolower (*i); break;
-    }
+      case '\\':
+        *i = '/';
+        break;
+      case '<': //замена шаблона <VarName> на значение переменной VarName
+      {
+        string::iterator end = strchr (i, '>');
+        
+        if (!end)
+          continue;          
+
+        stl::string var_name (i + 1, end);
+        const char* var_value = getenv (var_name.c_str ());
+        
+        if (!var_value)
+          var_value = "";
+
+        size_t offset = i - res.begin ();
+        
+
+        res.replace (i, end + 1, var_value);
+
+        i   = res.begin () + offset;
+        end = i + strlen (var_value);
+
+        for (;i!=end; i++)
+          switch (*i)
+          {
+            case '\\': *i = '/'; break;
+            default:   *i = tolower (*i); break;
+          }
+
+        --i;
+
+        break;
+      }
+      default:
+        *i = tolower (*i);
+        break;
+    }    
 
   return res;
 }

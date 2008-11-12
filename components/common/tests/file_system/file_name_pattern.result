@@ -1,0 +1,4 @@
+Results of file_name_pattern_test:
+'<TEST>/explorer.exe' -> '<test>/explorer.exe'
+'<TEST/explorer.exe' -> '<test/explorer.exe'
+'<TEST!!!!!!>/explorer.exe' -> '/explorer.exe'
