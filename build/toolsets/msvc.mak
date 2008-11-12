@@ -126,22 +126,25 @@ define process_target_csassembly
   $1.SOURCE_DIRS := $$($1.SOURCE_DIRS:%=$(COMPONENT_DIR)%)
 
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_cs_source_dir,$1,$$(dir))))
-  
+
+  $1.TARGET_DLLS   := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))    
   $1.TARGET        := $(DIST_BIN_DIR)/$$($1.NAME)$2
   $1.DLL_DIRS      := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)
   $1.EXECUTION_DIR := $$(strip $$($1.EXECUTION_DIR))
   $1.EXECUTION_DIR := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
-  DIRS             := $$(DIRS) $$(dir $$($1.TARGET))
+  DIST_DIRS        := $$(DIST_DIRS) $$(dir $$($1.TARGET))  
 
-  $$($1.TARGET): $$($1.SOURCE_FILES)
+  $$($1.TARGET): $$($1.SOURCE_FILES) $$($1.TARGET_DLLS)
 		@echo Compile $$@...
 		@$$(call tools.cscompile,$$@,$$($1.SOURCE_FILES),$$($1.DLLS),$$($1.DLL_DIRS),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS))
 
-  BUILD.$1: $$($1.TARGET)
+  BUILD.$1: $$($1.TARGET_DLLS) $$($1.TARGET)
 
   .PHONY: BUILD.$1
 
   build: BUILD.$1
+  
+  $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
 endef
 
 #Обработка цели cs-dynamic-lib (имя цели)
@@ -157,9 +160,7 @@ define process_target.cs-application
     $1.EXECUTION_DIR := $(DIST_BIN_DIR)
   endif
 
-  $1.TARGET_DLLS := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))      
-
-  RUN.$1: $$($1.TARGET_DLLS) $$($1.TARGET)
+  RUN.$1: $$($1.TARGET)
 
   .PHONY: RUN.$1
 
@@ -169,7 +170,5 @@ define process_target.cs-application
 
   ifneq (,$$(filter $$(files:%=$(DIST_BIN_DIR)/%$(EXE_SUFFIX)),$$($1.TARGET)))
     run: RUN.$1
-  endif
-  
-  $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
+  endif  
 endef

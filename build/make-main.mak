@@ -41,7 +41,8 @@ PCH_SHORT_NAME                          := $(strip $(PCH_SHORT_NAME))
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := $(strip $(BATCH_COMPILE_FLAG_FILE_SHORT_NAME))
 ROOT_TMP_DIR                            := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)
 TMP_DIRS                                := $(ROOT_TMP_DIR)
-DIRS                                     = $(TMP_DIRS) $(DIST_DIR) $(DIST_LIB_DIR) $(DIST_BIN_DIR)
+DIST_DIRS                               := $(DIST_LIB_DIR) $(DIST_BIN_DIR)
+DIRS                                     = $(TMP_DIRS) $(DIST_DIRS)
 COMPILE_TOOL                            := $(strip $(COMPILE_TOOL))
 LINK_TOOL                               := $(strip $(LINK_TOOL))
 LIB_TOOL                                := $(strip $(LIB_TOOL))
@@ -138,10 +139,10 @@ endef
 #Правила пакетной компиляции (имя цели, имя модуля)
 define batch-compile
   $2.FLAG_FILE  := $$($2.TMP_DIR)/$$(BATCH_COMPILE_FLAG_FILE_SHORT_NAME)
-  $1.FLAG_FILES := $$($1.FLAG_FILES) $$($2.FLAG_FILE)
+  $1.FLAG_FILES := $$($1.FLAG_FILES) $$($2.FLAG_FILE)  
 
-  ifeq (,$$(wildcard $$($2.FLAG_FILE).incomplete-build))
-  
+  ifeq (,$$(wildcard $$($2.FLAG_FILE).incomplete-build))  
+
     $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
 			@echo build-start > $$@.incomplete-build
 			@$$(call $(COMPILE_TOOL),$$(sort $$(filter-out force,$$?)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($2.TMP_DIR),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH),$$($1.DLL_DIRS))
@@ -157,7 +158,7 @@ define batch-compile
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
-  endif
+  endif  
 
   ifneq (,$$($2.NEW_SOURCE_FILES))
     $$($2.FLAG_FILE): force
@@ -190,14 +191,18 @@ define process_source_dir
   $$(MODULE_NAME).OBJECT_FILES := $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%$(OBJ_SUFFIX),$$(notdir $$(basename $$($$(MODULE_NAME).SOURCE_FILES))))
   $$(MODULE_NAME).PCH          := $$(if $$(wildcard $2/$(PCH_SHORT_NAME)),$(PCH_SHORT_NAME))
   $1.TMP_DIRS                  := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)
-  $1.OBJECT_FILES              := $$($1.OBJECT_FILES) $$($$(MODULE_NAME).OBJECT_FILES)
+  $1.OBJECT_FILES              := $$($1.OBJECT_FILES) $$($$(MODULE_NAME).OBJECT_FILES)  
 
   $$(foreach macros,batch-compile $3,$$(eval $$(call $$(macros),$1,$$(MODULE_NAME))))
 endef
 
 #Создание зависимости для копирования внешних файлов (имя внешнего файла, каталоги поиска)
 define create_extern_file_dependency
-  DEPENDENCY_SOURCE := $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $1),$2)) $$(notdir $1))
+  DEPENDENCY_SOURCE := $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $1),$2)))
+  
+  ifeq (,$$(strip $$(DEPENDENCY_SOURCE)))
+    DEPENDENCY_SOURCE := $(DIST_BIN_DIR)/$$(notdir $1)
+  endif
 
   ifneq ($$(strip $1),$$(strip $$(DEPENDENCY_SOURCE)))
 
@@ -263,7 +268,7 @@ define process_target.dynamic-lib
   $1.LIB_FILE    := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
   TARGET_FILES   := $$(TARGET_FILES) $$($1.DLL_FILE) $(DIST_LIB_DIR)/$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
   $1.TARGET_DLLS := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
-  DIRS           := $$(DIRS) $$(dir $$($1.DLL_FILE))
+  DIST_DIRS      := $$(DIST_DIRS) $$(dir $$($1.DLL_FILE))
 
   build: $$($1.DLL_FILE)
 
@@ -287,7 +292,7 @@ define process_target.application
   $1.EXE_FILE    := $(DIST_BIN_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,$(EXE_SUFFIX))
   TARGET_FILES   := $$(TARGET_FILES) $$($1.EXE_FILE)
   $1.TARGET_DLLS := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
-  DIRS           := $$(DIRS) $$(dir $$($1.EXE_FILE))
+  DIST_DIRS      := $$(DIST_DIRS) $$(dir $$($1.EXE_FILE))
 
   build: $$($1.EXE_FILE)
 
