@@ -10,12 +10,11 @@ TOOLSETS_DIR_SHORT_NAME                 := toolsets      #Базовое имя каталога с
 PCH_SHORT_NAME                          := pch.h         #Базовое имя PCH файла
 EXPORT_VAR_PREFIX                       := export        #Префикс имени переменной экспортирования настроек компонента
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag    #Базовое имя файла-флага пакетной компиляции
-VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package sdk cs-assembly #Допустимые типы целей
+VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package sdk #Допустимые типы целей
 PACKAGE_COMMANDS                        := build clean test check run #Команды, делегируемые компонентам пакета
 COMPILE_TOOL                            := tools.c++compile #Имя макроса утилиты компиляции C++ файлов
 LINK_TOOL                               := tools.link       #Имя макроса утилиты редактора связей
 LIB_TOOL                                := tools.lib        #Имя макроса утилиты архивирования объектных файлов
-CSC_TOOL                                := tools.cscompile  #Имя макроса утилиты компиляции C# файлов
 EXPORT_EXCLUDE_PATTERN                  := .svn            #Шаблон файлов, исключаемых из копирования при выполнении цели export-dirs
 EXPORT_TAR_TMP_FILE_SHORT_NAME          := export-file.tar #Базовое имя файла архива, используемого при выполнении цели export-dirs
 
@@ -199,10 +198,14 @@ endef
 #Создание зависимости для копирования внешних файлов (имя внешнего файла, каталоги поиска)
 define create_extern_file_dependency
   DEPENDENCY_SOURCE := $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $1),$2)) $$(notdir $1))
-  
-  $1: $$(DEPENDENCY_SOURCE)
-		@cp -fv $$< $$@
-		@chmod ug+rwx $$@
+
+  ifneq ($$(strip $1),$$(strip $$(DEPENDENCY_SOURCE)))
+
+    $1: $$(DEPENDENCY_SOURCE)
+			@cp -fv $$< $$@
+			@chmod ug+rwx $$@
+
+  endif
 endef
 
 #Общее для целей с исходными файлами (имя цели, список макросов применяемых для обработки каталогов с исходными файлами)
@@ -256,12 +259,13 @@ define process_target.dynamic-lib
     $$(error Empty dynamic library name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.DLL_FILE  := $(DIST_BIN_DIR)/$$($1.NAME)$(DLL_SUFFIX)
-  $1.LIB_FILE  := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
-  TARGET_FILES := $$(TARGET_FILES) $$($1.DLL_FILE) $(DIST_LIB_DIR)/$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
+  $1.DLL_FILE    := $(DIST_BIN_DIR)/$$($1.NAME)$(DLL_SUFFIX)
+  $1.LIB_FILE    := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
+  TARGET_FILES   := $$(TARGET_FILES) $$($1.DLL_FILE) $(DIST_LIB_DIR)/$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
   $1.TARGET_DLLS := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
+  DIRS           := $$(DIRS) $$(dir $$($1.DLL_FILE))
 
-  build: $$($1.DLL_FILE)  
+  build: $$($1.DLL_FILE)
 
   $$(eval $$(call process_target_with_sources,$1))
 
@@ -280,9 +284,10 @@ define process_target.application
     $$(error Empty application name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.EXE_FILE  := $(DIST_BIN_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,$(EXE_SUFFIX))
-  TARGET_FILES := $$(TARGET_FILES) $$($1.EXE_FILE)
+  $1.EXE_FILE    := $(DIST_BIN_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,$(EXE_SUFFIX))
+  TARGET_FILES   := $$(TARGET_FILES) $$($1.EXE_FILE)
   $1.TARGET_DLLS := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
+  DIRS           := $$(DIRS) $$(dir $$($1.EXE_FILE))
 
   build: $$($1.EXE_FILE)
 
@@ -386,42 +391,6 @@ endif
 
 endef
 
-#Обработка каталога с C# исходниками (имя цели, имя каталога)
-define process_cs_source_dir 
-  ifneq (,$$(wildcard $2/sources.mak))
-    SOURCE_FILES :=
-  
-    include $2/sources.mak    
-
-    $1.SOURCE_FILES := $$($1.SOURCE_FILES) $$(wildcard $$(SOURCE_FILES:%=$2/%))
-  else
-    $1.SOURCE_FILES := $$($1.SOURCE_FILES) $$(wildcard $2/*.cs)
-  endif
-endef
-
-#Обработка цели cs-dll (имя цели)
-define process_target.cs-assembly
-  $1.SOURCE_DIRS := $$($1.SOURCE_DIRS:%=$(COMPONENT_DIR)%)
-
-  $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_cs_source_dir,$1,$$(dir))))
-  
-  $1.NAME           := $(DIST_BIN_DIR)/$$($1.NAME)
-  $1.DLL_DIRS       := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)
-  $1.EXECUTION_DIR  := $$(strip $$($1.EXECUTION_DIR))
-  $1.EXECUTION_DIR  := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
-  $1.TARGET_DLLS    := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
-
-  build: $$($1.NAME)  
-
-  $$($1.NAME): $$($1.SOURCE_FILES)
-		@echo Compile $$@...
-		@$$(call $(CSC_TOOL),$$($1.NAME),$$($1.SOURCE_FILES),$$($1.DLLS),$$($1.DLL_DIRS),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS))
-
-  build: $$($1.TARGET_DLLS)
-
-  $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
-endef
-
 #Импортирование переменных (префикс источника, префикс приёмника, относительный путь к используемому компоненту)
 define import_variables
 #  $$(warning src='$1' dst='$2' path='$3')  
@@ -478,7 +447,7 @@ define process_target_common
   $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
   
     #Добавление toolset-настроек к общему списку настроек
-  $$(foreach profile,$$(PROFILES),$$(eval $$(call import_toolset_settings,$1,$$(profile))))
+  $$(foreach profile,$$(PROFILES),$$(eval $$(call import_toolset_settings,$1,$$(profile))))  
 
   DUMP.$1:
 		@echo Dump target \'$1\' settings
@@ -505,8 +474,8 @@ all: build check
 run: build
 build: create-dirs
 rebuild: clean build
-test: build
-check: build
+#test: build
+#check: build
 export-dirs: create-dirs
 #dist: check
 dist : export-dirs
