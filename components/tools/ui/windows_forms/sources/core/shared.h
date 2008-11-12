@@ -22,6 +22,7 @@
 #include <common/log.h>
 #include <common/parser.h>
 #include <common/strlib.h>
+#include <common/var_registry_container.h>
 
 #include <syslib/application.h>
 

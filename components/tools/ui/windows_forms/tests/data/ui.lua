@@ -4,4 +4,6 @@ Application.MainForm.Text = "Hello world"
 Application.MainForm.MenuStrip = Application.MenuStrips:Item("MenuStrip1")
 Application.MenuItems:Item ("MenuItem1").OnClick = "Application.MenuItems:Item ('MenuItem1').Image = 'data/app.ico'"
 
-Application.CreateForm ('my_init_string', DockState.Document)
+Application.CreateForm ("Application", 'my_init_string', DockState.Document)
+Application.LoadPlugins ("data/*.dll")
+Application.CreateForm ("MyPlugin", '', DockState.Document)

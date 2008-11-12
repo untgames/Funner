@@ -46,8 +46,8 @@ class WindowSystem: public ICustomWindowSystem, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание дочерней формы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ChildForm::Pointer CreateChildForm (const char* id, const char* init_string, FormDockState dock_state = FormDockState_Default);
-    ChildForm::Pointer CreateChildForm (const char* init_string, FormDockState dock_state = FormDockState_Default);
+    ChildForm::Pointer CreateChildForm (const char* id, const char* plugin_name, const char* init_string, FormDockState dock_state = FormDockState_Default);
+    ChildForm::Pointer CreateChildForm (const char* plugin_name, const char* init_string, FormDockState dock_state = FormDockState_Default);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Реестры контролов

@@ -129,12 +129,33 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
 
 }
 
+struct ChildForm::Impl
+{
+  typedef msclr::gcroot<WeifenLuo::WinFormsUI::Docking::DockContent^> HandlePtr;
+  typedef xtl::com_ptr<ICustomChildWindow>                            ChildWindowPtr;
+  
+  HandlePtr      form;         //дескриптор формы
+  ChildWindowPtr child_window; //дочернее окно, включенное в форму
+
+  ~Impl ()
+  {
+    try
+    {
+      form = 0;
+    }
+    catch (...)
+    {
+      //подавление исключений
+    }
+  }
+};
+
 /*
     Конструктор / деструктор
 */
 
 ChildForm::ChildForm (tools::ui::windows_forms::WindowSystem& window_system, const char* init_string, FormDockState dock_state)
-  : Form (window_system)
+  : Form (window_system), impl (new Impl)
 {
   static const char* METHOD_NAME = "tools::ui::ChildForm::ChildForm";
 
@@ -144,11 +165,11 @@ ChildForm::ChildForm (tools::ui::windows_forms::WindowSystem& window_system, con
 
     IApplicationServer& application_server = window_system.ApplicationServer ();
 
-    child_window = ChildWindowPtr (application_server.CreateChildWindow (init_string), false);
+    impl->child_window = Impl::ChildWindowPtr (application_server.CreateChildWindow (init_string), false);
 
       //создание контейнера
 
-    form = gcnew ChildFormImpl (window_system, *child_window);
+    impl->form = gcnew ChildFormImpl (window_system, *(impl->child_window));
     
       //установка дока
 
@@ -156,7 +177,7 @@ ChildForm::ChildForm (tools::ui::windows_forms::WindowSystem& window_system, con
 
       //отображение
 
-    window_system.MainForm ().Insert (form);
+    window_system.MainForm ().Insert (impl->form);
   }
   catch (xtl::exception& exception)
   {
@@ -171,14 +192,6 @@ ChildForm::ChildForm (tools::ui::windows_forms::WindowSystem& window_system, con
 
 ChildForm::~ChildForm ()
 {
-  try
-  {
-    form = 0;
-  }
-  catch (...)
-  {
-    //подавление исключений
-  }
 }
 
 /*
@@ -188,6 +201,20 @@ ChildForm::~ChildForm ()
 ChildForm::Pointer ChildForm::Create (tools::ui::windows_forms::WindowSystem& window_system, const char* init_string, FormDockState dock_state)
 {
   return Pointer (new ChildForm (window_system, init_string, dock_state), false);
+}
+
+ChildForm::Pointer ChildForm::Create (tools::ui::windows_forms::WindowSystem& window_system, System::Windows::Forms::Form^ child, FormDockState dock_state)
+{
+  ChildForm::Pointer new_form (new ChildForm (window_system, "", dock_state), false);
+
+  child->Hide ();                             //необходимо скрыть форму перед установкой родителя
+
+  child->TopLevel = false;                    //необходимо, чтобы форму можно было установить ребёнком панели
+  child->Parent   = new_form->impl->form;
+  
+  child->Show ();
+
+  return new_form;
 }
 
 /*
@@ -241,7 +268,7 @@ void ChildForm::SetDockState (FormDockState state)
         throw xtl::make_argument_exception ("", "state", state);
     }    
 
-    form->ShowHint = dock_state;
+    impl->form->ShowHint = dock_state;
   }
   catch (xtl::exception& exception)
   {
@@ -260,7 +287,7 @@ FormDockState ChildForm::DockState ()
 
   try
   {
-    switch (form->ShowHint)
+    switch (impl->form->ShowHint)
     {
       case WeifenLuo::WinFormsUI::Docking::DockState::DockBottom:           return FormDockState_Bottom;
       case WeifenLuo::WinFormsUI::Docking::DockState::DockBottomAutoHide:   return FormDockState_BottomAutoHide;
@@ -293,7 +320,7 @@ FormDockState ChildForm::DockState ()
 
 System::Windows::Forms::Form^ ChildForm::FormHandle ()
 {
-  return form;
+  return impl->form;
 }
 
 /*

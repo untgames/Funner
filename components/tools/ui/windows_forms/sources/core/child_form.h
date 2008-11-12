@@ -1,6 +1,3 @@
-//forward declaration
-ref class ChildFormImpl;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Варианты стыковки формы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,6 +37,7 @@ class ChildForm: public Form
 ///Создание формы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static Pointer Create (windows_forms::WindowSystem& window_system, const char* init_string, FormDockState dock_state);
+    static Pointer Create (windows_forms::WindowSystem& window_system, System::Windows::Forms::Form^ child, FormDockState dock_state);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим стыковки формы
@@ -67,10 +65,6 @@ class ChildForm: public Form
     System::Windows::Forms::Form^ FormHandle ();
 
   private:
-    typedef msclr::gcroot<ChildFormImpl^>    HandlePtr;
-    typedef xtl::com_ptr<ICustomChildWindow> ChildWindowPtr;
-
-  private:
-    HandlePtr      form;         //дескриптор формы
-    ChildWindowPtr child_window; //дочернее окно, включенное в форму
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };

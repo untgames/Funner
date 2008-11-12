@@ -24,6 +24,8 @@ const char* MENU_STRIP_COLLECTION_LIBRARY_NAME        = "MenuStripCollection";  
 const char* TOOL_STRIP_BUTTON_COLLECTION_LIBRARY_NAME = "ToolButtonCollection"; //имя библиотеки шлюзов коллекции кнопок
 const char* TOOL_STRIP_COLLECTION_LIBRARY_NAME        = "ToolStripCollection";  //имя библиотеки шлюзов коллекции цепочек меню
 
+const char* APPLICATION_PLUGIN_NAME = "Application"; //имя данного приложения при создании форм
+
 /*
     Враппер над моделью приложения Windows Forms
 */
@@ -111,8 +113,6 @@ WindowSystem::WindowSystem (IApplicationServer* server)
       //регистрация шлюзов
       
     RegisterInvokers ();
-    
-    plugin_manager.LoadPlugins ("data/*.dll");
   }
   catch (xtl::exception& exception)
   {
@@ -178,14 +178,22 @@ void WindowSystem::Execute (const char* command)
     Создание дочерней формы
 */
 
-ChildForm::Pointer WindowSystem::CreateChildForm (const char* id, const char* init_string, FormDockState dock_state)
+ChildForm::Pointer WindowSystem::CreateChildForm (const char* id, const char* plugin_name, const char* init_string, FormDockState dock_state)
 {
   try
   {
     if (!id)
       throw xtl::make_null_argument_exception ("", "id");
 
-    ChildForm::Pointer form = ChildForm::Create (*this, init_string, dock_state);
+    if (!plugin_name)
+      throw xtl::make_null_argument_exception ("", "plugin_name");
+
+    ChildForm::Pointer form;
+
+    if (!xtl::xstrcmp (APPLICATION_PLUGIN_NAME, plugin_name))
+      form = ChildForm::Create (*this, init_string, dock_state);
+    else
+      form = plugin_manager.CreateForm (plugin_name, init_string);
 
     child_forms.Register (id, form);
 
@@ -198,14 +206,14 @@ ChildForm::Pointer WindowSystem::CreateChildForm (const char* id, const char* in
   }
 }
 
-ChildForm::Pointer WindowSystem::CreateChildForm (const char* init_string, FormDockState dock_state)
+ChildForm::Pointer WindowSystem::CreateChildForm (const char* plugin_name, const char* init_string, FormDockState dock_state)
 {
   try
   {
     if (++next_child_form_uid == 0)
       throw xtl::format_operation_exception ("tools::ui::WindowSystem::CreateChildForm", "No free UID's");
 
-    return CreateChildForm (common::format ("Form%u", next_child_form_uid).c_str (), init_string, dock_state);
+    return CreateChildForm (common::format ("Form%u", next_child_form_uid).c_str (), plugin_name, init_string, dock_state);
   }
   catch (...)
   {
@@ -319,11 +327,13 @@ void WindowSystem::RegisterInvokers ()
     lib.Register ("LoadConfiguration", make_invoker<void (const char*)> (xtl::bind (&WindowSystem::LoadConfiguration, this, _1)));
     lib.Register ("Execute", make_invoker<void (const char*)> (xtl::bind (&IApplicationServer::ExecuteCommand, &*application_server, _1)));
     lib.Register ("CreateForm", make_invoker (
+      make_invoker<void (const char*, const char*, const char*, FormDockState)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*, const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2, _3, _4)),
       make_invoker<void (const char*, const char*, FormDockState)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2, _3)),
-      make_invoker<void (const char*, FormDockState)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2)),
-      make_invoker<void (const char*, const char*)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2, FormDockState_Default)),
-      make_invoker<void (const char*)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, FormDockState_Default))
+      make_invoker<void (const char*, const char*, const char*)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*, const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2, _3, FormDockState_Default)),
+      make_invoker<void (const char*, const char*)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2, FormDockState_Default))
     ));
+    lib.Register ("LoadPlugins",   make_invoker<void (const char*)> (xtl::bind (&PluginManager::LoadPlugins,   &plugin_manager, _1)));
+    lib.Register ("UnloadPlugins", make_invoker<void (const char*)> (xtl::bind (&PluginManager::UnloadPlugins, &plugin_manager, _1)));
   }
   catch (xtl::exception& exception)
   {

@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := TOOLS.UI.WINDOWS_FORMS.PLUGIN_API TOOLS.UI.WINDOWS_FORMS.SOURCES TOOLS.UI.WINDOWS_FORMS.TESTS
+TARGETS := TOOLS.UI.WINDOWS_FORMS.PLUGIN_API TOOLS.UI.WINDOWS_FORMS.SOURCES TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN TOOLS.UI.WINDOWS_FORMS.TESTS
 
 #Цель - Windows forms interface dll
 TOOLS.UI.WINDOWS_FORMS.PLUGIN_API.TYPE             := dynamic-lib
@@ -23,9 +23,18 @@ TOOLS.UI.WINDOWS_FORMS.SOURCES.LIBS             :=
 TOOLS.UI.WINDOWS_FORMS.SOURCES.DLL_DIRS         := ../../../../extern/windows_controls/bin
 TOOLS.UI.WINDOWS_FORMS.SOURCES.COMPILER_CFLAGS  := 
 TOOLS.UI.WINDOWS_FORMS.SOURCES.COMPILER_DEFINES := 
-TOOLS.UI.WINDOWS_FORMS.SOURCES.IMPORTS			    := ../core/compile.static.mak ../../../script/core/compile.static.mak\
+TOOLS.UI.WINDOWS_FORMS.SOURCES.IMPORTS			    := ../core/compile.static.mak ../../../script/core/compile.static.mak \
                                                    ../../../common/compile.static.mak ../../../system/compile.static.mak
 TOOLS.UI.WINDOWS_FORMS.SOURCES.msvc.COMPILER_CFLAGS := -clr -wd4793 -wd4503
+
+#Цель - Windows forms window system unmanaged sources
+TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN.TYPE             := cs-assembly
+TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN.NAME             := test_cs_plugin.dll
+TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN.SOURCE_DIRS      := sources/plugins
+TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN.DLL_DIRS         :=
+TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN.DLLS             := funner.tools.ui.windows_forms.PluginApi
+TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN.COMPILER_CFLAGS  := 
+TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN.COMPILER_DEFINES := 
 
 #Цель - Tool UI core tests
 TOOLS.UI.WINDOWS_FORMS.TESTS.TYPE             := test-suite

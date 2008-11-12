@@ -27,24 +27,13 @@ class PluginManager: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание формы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ChildForm::Pointer CreateForm (const char* plugin, const char* form_type);
+    ChildForm::Pointer CreateForm (const char* plugin, const char* init_string);
 
   private:
-    struct Plugin;
-
-    typedef xtl::intrusive_ptr<Plugin>            PluginPtr;
-    typedef stl::list<PluginPtr>                  PluginList;
     typedef msclr::gcroot<ApplicationServerImpl^> ApplicationServerPtr;
-
-  private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Предикат выгрузки плагина
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool UnloadPredicate (PluginPtr plugin, const char* wc_mask);
 
   private:
     WindowSystem*        window_system;      //оконная система
     common::Log          log;                //лог
-    PluginList           plugins;            //загруженные плагины
     ApplicationServerPtr application_server; //интерфейс приложения
 };
