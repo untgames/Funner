@@ -157,7 +157,7 @@ struct ChildForm::Impl
 ChildForm::ChildForm (tools::ui::windows_forms::WindowSystem& window_system, const char* init_string, FormDockState dock_state)
   : Form (window_system), impl (new Impl)
 {
-  static const char* METHOD_NAME = "tools::ui::ChildForm::ChildForm";
+  static const char* METHOD_NAME = "tools::ui::ChildForm::ChildForm (WindowSystem&, const char*, FormDockState)";
 
   try
   {
@@ -190,6 +190,48 @@ ChildForm::ChildForm (tools::ui::windows_forms::WindowSystem& window_system, con
   }
 }
 
+ChildForm::ChildForm (windows_forms::WindowSystem& window_system, System::Windows::Forms::Control^ child, FormDockState dock_state)
+  : Form (window_system), impl (new Impl)
+{
+  static const char* METHOD_NAME = "tools::ui::ChildForm::ChildForm (WindowSystem&, Form^, FormDockState)";
+
+  try
+  {
+      //создание пользовательского дочернего окна
+
+    IApplicationServer& application_server = window_system.ApplicationServer ();
+
+//    child->Hide ();           //необходимо скрыть форму перед установкой родителя
+
+      //создание контейнера
+
+    impl->form = gcnew WeifenLuo::WinFormsUI::Docking::DockContent ();
+    
+    impl->form->Controls->Add (child);
+
+    child->Dock = System::Windows::Forms::DockStyle::Fill;
+    child->Show ();
+
+      //установка дока
+
+    SetDockState (dock_state);
+
+      //отображение
+
+    window_system.MainForm ().Insert (impl->form);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch (METHOD_NAME);
+    throw;
+  }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException (METHOD_NAME, exception);
+  }
+}
+
+
 ChildForm::~ChildForm ()
 {
 }
@@ -203,18 +245,9 @@ ChildForm::Pointer ChildForm::Create (tools::ui::windows_forms::WindowSystem& wi
   return Pointer (new ChildForm (window_system, init_string, dock_state), false);
 }
 
-ChildForm::Pointer ChildForm::Create (tools::ui::windows_forms::WindowSystem& window_system, System::Windows::Forms::Form^ child, FormDockState dock_state)
+ChildForm::Pointer ChildForm::Create (tools::ui::windows_forms::WindowSystem& window_system, System::Windows::Forms::Control^ child, FormDockState dock_state)
 {
-  ChildForm::Pointer new_form (new ChildForm (window_system, "", dock_state), false);
-
-  child->Hide ();                             //необходимо скрыть форму перед установкой родителя
-
-  child->TopLevel = false;                    //необходимо, чтобы форму можно было установить ребёнком панели
-  child->Parent   = new_form->impl->form;
-  
-  child->Show ();
-
-  return new_form;
+  return Pointer (new ChildForm (window_system, child, dock_state), false);
 }
 
 /*

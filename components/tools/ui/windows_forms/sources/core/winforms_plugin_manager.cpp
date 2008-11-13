@@ -23,6 +23,46 @@ struct PluginEntry
   PluginEntry (IPlugin^ in_plugin, const char* in_name) : plugin (in_plugin), name (in_name) {}
 };
 
+class VarRegistryEventHandler
+{
+  public:
+    VarRegistryEventHandler (System::String^ wc_mask, IPropertyListener^ in_property_listener, common::VarRegistry* var_registry)
+      : property_listener (in_property_listener)
+    {
+      AutoString wc_mask_string (wc_mask);
+
+      create_var_connection = var_registry->RegisterEventHandler (wc_mask_string.Data (), common::VarRegistryEvent_OnCreateVar, 
+                                                                  xtl::bind (&VarRegistryEventHandler::OnCreateVar, this, _1));
+      change_var_connection = var_registry->RegisterEventHandler (wc_mask_string.Data (), common::VarRegistryEvent_OnChangeVar, 
+                                                                  xtl::bind (&VarRegistryEventHandler::OnChangeVar, this, _1));
+      delete_var_connection = var_registry->RegisterEventHandler (wc_mask_string.Data (), common::VarRegistryEvent_OnDeleteVar, 
+                                                                  xtl::bind (&VarRegistryEventHandler::OnDeleteVar, this, _1));
+    }
+
+
+  private:
+    void OnCreateVar (const char* var_name)
+    {
+      property_listener->OnAddProperty (gcnew System::String (var_name));
+    }
+
+    void OnChangeVar (const char* var_name)
+    {
+      property_listener->OnChangeProperty (gcnew System::String (var_name));
+    }
+
+    void OnDeleteVar (const char* var_name)
+    {
+      property_listener->OnRemoveProperty (gcnew System::String (var_name));
+    }
+
+  private:
+    msclr::gcroot<IPropertyListener^> property_listener;
+    xtl::auto_connection              create_var_connection;
+    xtl::auto_connection              change_var_connection;
+    xtl::auto_connection              delete_var_connection;
+};
+
 }
 
 /*
@@ -46,11 +86,27 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
     {
       plugins = new PluginMap;
 
-      var_registry_container = new StringRegistryContainer;
+      try
+      {
+        var_registry_container = new StringRegistryContainer;
 
-      var_registry_container->Mount (REGISTRY_BRANCH);
+        try
+        {
+          var_registry_container->Mount (REGISTRY_BRANCH);
 
-      var_registry = new common::VarRegistry (REGISTRY_BRANCH);
+          var_registry = new common::VarRegistry (REGISTRY_BRANCH);
+        }
+        catch (...)
+        {
+          delete var_registry_container;
+          throw;
+        }
+      }
+      catch (...)
+      {
+        delete plugins;
+        throw;
+      }
     }
 
     ~ApplicationServerImpl ()
@@ -137,7 +193,7 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
         }
       }
 
-      PropertyListenerEntry^ new_listener = gcnew PropertyListenerEntry (name_wc_mask, listener);
+      PropertyListenerEntry^ new_listener = gcnew PropertyListenerEntry (name_wc_mask, listener, var_registry);
 
       property_listeners.Add (new_listener);
     }
@@ -184,25 +240,27 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
 
       System::String^ init_string_wrap = gcnew System::String (init_string);
 
-      System::Windows::Forms::Form^ new_form = plugin_iter->second.plugin->CreateForm (init_string_wrap);
+      System::Windows::Forms::Control^ new_form = plugin_iter->second.plugin->CreateControl (init_string_wrap);
 
       return ChildForm::Create (*window_system, new_form, FormDockState_Default);
     }
 
   private:
-    void VarRegistryEventHandler (const char* var_name, common::VarRegistryEvent event)
-    {
-    }
-
-  private:
     ref struct PropertyListenerEntry
     {
-      System::String^    name_wc_mask;
-      IPropertyListener^ listener;
+      System::String^          name_wc_mask;
+      IPropertyListener^       listener;
+      VarRegistryEventHandler* event_handler;
 
-      PropertyListenerEntry (System::String^ in_name_wc_mask, IPropertyListener^ in_listener) 
-        : name_wc_mask (in_name_wc_mask), listener (in_listener)
+      PropertyListenerEntry (System::String^ in_name_wc_mask, IPropertyListener^ in_listener, common::VarRegistry* var_registry)
+        : name_wc_mask (in_name_wc_mask), listener (in_listener), event_handler (new VarRegistryEventHandler (in_name_wc_mask, in_listener, var_registry))
         {}
+
+      ~PropertyListenerEntry ()
+      {
+        delete event_handler;
+      }
+
     };
 
     typedef stl::hash_map<stl::hash_key<const char*>, PluginEntry> PluginMap;

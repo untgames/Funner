@@ -29,7 +29,7 @@ TOOLS.UI.WINDOWS_FORMS.SOURCES.msvc.COMPILER_CFLAGS := -clr -wd4793 -wd4503
 
 #Цель - Windows forms window system unmanaged sources
 TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN.TYPE             := cs-dynamic-lib
-TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN.NAME             := ui-plugins/test_cs_plugin.dll
+TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN.NAME             := ui-plugins/test_cs_plugin
 TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN.SOURCE_DIRS      := sources/plugins
 TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN.DLL_DIRS         :=
 TOOLS.UI.WINDOWS_FORMS.TEST_PLUGIN.DLLS             := funner.tools.ui.windows_forms.PluginApi

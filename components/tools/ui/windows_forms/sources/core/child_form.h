@@ -37,7 +37,7 @@ class ChildForm: public Form
 ///Создание формы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static Pointer Create (windows_forms::WindowSystem& window_system, const char* init_string, FormDockState dock_state);
-    static Pointer Create (windows_forms::WindowSystem& window_system, System::Windows::Forms::Form^ child, FormDockState dock_state);
+    static Pointer Create (windows_forms::WindowSystem& window_system, System::Windows::Forms::Control^ child, FormDockState dock_state);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим стыковки формы
@@ -58,6 +58,7 @@ class ChildForm: public Form
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ChildForm (windows_forms::WindowSystem& window_system, const char* init_string, FormDockState dock_state);
+    ChildForm (windows_forms::WindowSystem& window_system, System::Windows::Forms::Control^ child, FormDockState dock_state);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение ref-указателя формы

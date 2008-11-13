@@ -12,7 +12,7 @@
   </MenuItem>
   <MenuStrip Id="MenuStrip1">
     <MenuItem Text="Файл">
-      <MenuItem Text="Новая форма" OnClick="Application.CreateForm ('my_init_string', DockState.Float)"/>
+      <MenuItem Text="Новая форма" OnClick="Application.CreateForm ('Application', 'my_init_string', DockState.Float)"/>
       <MenuItem Text="Выход" Tip="Выход из приложения" OnClick="Application.Execute ('close')"/>
     </MenuItem>
     <MenuItem Source="MenuItem2"/>
