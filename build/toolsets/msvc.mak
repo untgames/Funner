@@ -166,7 +166,7 @@ define process_target.cs-application
 
   RUN.$1: $$($1.TARGET)
 		@echo Running $$(notdir $$<)...
-		@export PATH="$$(call build_execution_path,$$($1.DLL_DIRS))" && cd $$($1.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args)
+		@$$(call prepare_to_execute,$$($1.EXECUTION_DIR),$$($1.DLL_DIRS)) && && $$(patsubst %,"$(CURDIR)/%",$$<) $(args)
 
   ifneq (,$$(filter $$(files:%=$(DIST_BIN_DIR)/%$(EXE_SUFFIX)),$$($1.TARGET)))
     run: RUN.$1

@@ -68,13 +68,6 @@ $(subst \,/,$1)
 endef
 
 ###################################################################################################
-#Формирование пути для выполнения программы (список путей к dll-файлам)
-###################################################################################################
-define build_execution_path
-$(subst ;,:,$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$(foreach dir,$1,$(dir);)$$PATH))
-endef
-
-###################################################################################################
 #Перебор списка файлов (имя переменной с именем файла, список файлов, действие)
 ###################################################################################################
 define for_each_file
@@ -119,6 +112,31 @@ include $(COMPONENT_CONFIGURATION_FILE)
 ###################################################################################################
 define specialize_paths
 $(foreach dir,$1,$(COMPONENT_DIR)$(dir))
+endef
+
+###################################################################################################
+#Преобразование путей make к системным путям (имя пути)
+###################################################################################################
+ifneq (,$(filter Win%,$(OS)))
+
+define get_system_dir
+cmd //C "cd $1 && cd"
+endef
+
+else
+
+define get_system_dir
+cd "$1" && pwd
+endef
+
+endif
+
+###################################################################################################
+#Подготовка к запуску приложения (каталог запуска приложения, список каталогов с динамическими библиотеками)
+###################################################################################################
+define prepare_to_execute
+export PATH="$(subst ;,:,$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$(foreach dir,$2,$(dir);)$$PATH))" \
+BIN_DIR=`$(call get_system_dir,$(DIST_BIN_DIR))` && cd "$1"
 endef
 
 ###################################################################################################
@@ -308,7 +326,7 @@ define process_target.application
 
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
-		@export PATH="$$(call build_execution_path,$$($1.DLL_DIRS))" && cd $$($1.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args)
+		@$$(call prepare_to_execute,$$($1.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args)
 
   ifneq (,$$(filter $$(files:%=$(DIST_BIN_DIR)/%$(EXE_SUFFIX)),$$($1.EXE_FILE)))
     run: RUN.$1
@@ -335,11 +353,11 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%$(EXE_SUFFIX)
 		@echo Running $$(notdir $$<)...
-		@export PATH="$$(call build_execution_path,$$($1.DLL_DIRS))" && cd $$($2.EXECUTION_DIR) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
+		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@export PATH="$$(call build_execution_path,$$($1.DLL_DIRS))" && cd $$($2.EXECUTION_DIR) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%$(EXE_SUFFIX)),$$^)),$$$$file)
+		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%$(EXE_SUFFIX)),$$^)),$$$$file)
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
