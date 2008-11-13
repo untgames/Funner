@@ -17,6 +17,11 @@ class MyListener: public ICursorListener
     {
       printf ("MyListener::OnChangePosition(%.1f,%.1f)\n", pos.x, pos.y);
     }
+    
+    void OnChangeVisible (bool state)
+    {
+      printf ("MyListener::OnChangeVisible(%s)\n", state ? "true" : "false");
+    }
 };
 
 int main ()
@@ -33,6 +38,9 @@ int main ()
     cursor.SetPosition (2.1f, 3.2f);
     cursor.SetPosition (2.1f, 3.2f);
     cursor.SetPosition (3.2f, 2.1f);
+
+    cursor.Show ();
+    cursor.Hide ();
   }
   catch (std::exception& exception)
   {

@@ -16,6 +16,7 @@ class ICursorListener
 ///Оповещения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void OnChangePosition (const math::vec2f& position) {}
+    virtual void OnChangeVisible  (bool state) {}
     virtual void OnDestroy        () {}
 
   protected:
@@ -45,6 +46,14 @@ class Cursor
     math::vec2f& Position    () const;
     float        GetX        () const;
     float        GetY        () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Управление видимостью курсора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool IsVisible  () const;
+    void SetVisible (bool state);
+    void Show       () { SetVisible (true); }
+    void Hide       () { SetVisible (false); }    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление слушателей событий курсора

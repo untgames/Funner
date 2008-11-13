@@ -12,6 +12,9 @@ struct Cursor::Impl: public xtl::reference_counter
 {
   math::vec2f  position;   //положение курсора
   ListenerList listeners;  //слушатели событий курсора
+  bool         visible;    //видим ли курсор
+  
+  Impl () : visible (true) {}
   
   ~Impl ()
   {
@@ -82,7 +85,7 @@ void Cursor::SetPosition (const math::vec2f& position)
     {
       //подавление всех исключений
     }
-  }  
+  }
 }
 
 math::vec2f& Cursor::Position () const
@@ -98,6 +101,35 @@ float Cursor::GetX () const
 float Cursor::GetY () const
 {
   return impl->position.y;
+}
+
+/*
+    Управление видимостью курсора
+*/
+
+bool Cursor::IsVisible () const
+{
+  return impl->visible;
+}
+
+void Cursor::SetVisible (bool state)
+{
+  if (state == impl->visible)
+    return;
+
+  impl->visible = state;
+  
+  for (ListenerList::iterator iter=impl->listeners.begin (), end=impl->listeners.end (); iter!=end; ++iter)
+  {
+    try    
+    {
+      (*iter)->OnChangeVisible (state);
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
+  }  
 }
 
 /*
