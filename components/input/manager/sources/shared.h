@@ -26,8 +26,10 @@
 
 #include <input/low_level/device.h>
 #include <input/low_level/driver.h>
+
 #include <input/action_map.h>
 #include <input/controls_detector.h>
+#include <input/cursor.h>
 #include <input/events_source.h>
 #include <input/translation_map.h>
 #include <input/translation_map_registry.h>
