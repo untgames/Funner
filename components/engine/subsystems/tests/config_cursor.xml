@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration>
+  <WindowManager>
+    <Window
+      Id       = "MyWindow"
+      Cursor   = "MyCursor"
+      Style    = "Overlapped"
+      Width    = "800"
+      Height   = "600"
+      Title    = "My window"
+      Visible  = "1"
+    />  
+  </WindowManager>
+</Configuration>

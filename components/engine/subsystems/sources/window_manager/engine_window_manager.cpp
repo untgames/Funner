@@ -8,10 +8,13 @@
 #include <xtl/iterator.h>
 #include <xtl/ref.h>
 #include <xtl/reference_counter.h>
+#include <xtl/connection.h>
 
 #include <common/component.h>
 #include <common/log.h>
 #include <common/parser.h>
+
+#include <input/cursor.h>
 
 #include <syslib/window.h>
 
@@ -50,13 +53,15 @@ syslib::WindowStyle get_window_style (ParseNode& node)
     Реализация окна
 */
 
-class Window: public IAttachmentRegistryListener<syslib::Window>, public xtl::reference_counter
+class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttachmentRegistryListener<input::Cursor>,
+              private input::ICursorListener, public xtl::reference_counter
 {
   public:
 ///Конструктор
     Window (ParseNode& node)
       : log (LOG_NAME),
-        window (get_window_style (node), get<size_t> (node, "Width"), get<size_t> (node, "Height"))    
+        window (get_window_style (node), get<size_t> (node, "Width"), get<size_t> (node, "Height")),
+        cursor (0)
     {
         //создание окна
       
@@ -73,7 +78,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public xtl::re
       window.SetPosition (position);
 
       bool is_window_visible = get<bool> (node, "Visible", window.IsVisible ()),
-           is_cursor_visible = get<bool> (node, "Cursor", window.IsCursorVisible ());
+           is_cursor_visible = get<bool> (node, "CursorVisible", window.IsCursorVisible ());
 
       window.SetVisible (is_window_visible);
       window.SetCursorVisible (is_cursor_visible);
@@ -90,32 +95,41 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public xtl::re
         Log (log_name).Swap (log);
 
       window.SetDebugLog (xtl::bind (&Log::Print, &log, _1));
+      
+        //подписка на события окна
+        
+      on_mouse_move_connection = window.RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Window::OnMouseMove, this, _3));
 
         //регистрация слушателя событий появления новых окон
 
-      AttachmentRegistry::Attach (this, AttachmentRegistryAttachMode_ForceNotify);      
+      AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this), AttachmentRegistryAttachMode_ForceNotify);
+      AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this), AttachmentRegistryAttachMode_ForceNotify);      
       
         //регистрация окна
         
       try
       {
-        attachment_name = get<const char*> (node, "Id", "");
+        attachment_name        = get<const char*> (node, "Id", "");
+        cursor_attachment_name = get<const char*> (node, "Cursor", "");
 
         if (!attachment_name.empty ())
           AttachmentRegistry::Register (attachment_name.c_str (), xtl::ref (window));
       }
       catch (...)
       {
-        AttachmentRegistry::Detach (this);
+        AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this));
+        AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));
         throw;
       }
     }
-    
+
 ///Деструктор
     ~Window ()
     {
+      BindCursor (0);
       AttachmentRegistry::Unregister (attachment_name.c_str (), window);
-      AttachmentRegistry::Detach (this);
+      AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this));
+      AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));      
     }    
 
 ///Обработчик события регистрации окна
@@ -135,11 +149,88 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public xtl::re
       window.SetParentHandle (0);
     }
 
+///Обработчик события регистрации курсора
+    void OnRegisterAttachment (const char* attachment_name, input::Cursor& in_cursor)
+    {
+      if (!cursor_attachment_name.empty () && cursor_attachment_name != attachment_name)
+        return;
+      
+      BindCursor (&in_cursor);
+    }
+
+    void OnUnregisterAttachment (const char* attachment_name, input::Cursor&)
+    {
+      if (!cursor_attachment_name.empty () && cursor_attachment_name != attachment_name)
+        return;
+      
+      BindCursor (0);
+    }
+    
+///Обработчики событий курсора
+    void OnChangePosition (const math::vec2f& position)
+    {
+      if (position == cached_cursor_position)
+        return;
+      
+      syslib::Rect client_rect = window.ClientRect ();
+      
+      window.SetCursorPosition (size_t (client_rect.left + position.x * (client_rect.right - client_rect.left)),
+        size_t (client_rect.top + position.y * (client_rect.bottom - client_rect.top)));
+        
+      cached_cursor_position = position;
+    }
+    
+    void OnChangeVisible (bool state)
+    {
+      window.SetCursorVisible (state);
+    }
+
+    void OnDestroy ()
+    {
+      cursor = 0;
+    }
+
   private:
-    Log            log;
-    syslib::Window window;
-    stl::string    attachment_name;
-    stl::string    parent_window_name;    
+    void BindCursor (input::Cursor* new_cursor)
+    {
+      if (cursor)
+      {
+        cursor->Detach (this);
+        cursor = 0;
+      }
+
+      cursor = new_cursor;
+
+      if (cursor)
+      {
+        cursor->Attach (this);        
+        
+        SetCursorPosition (window.CursorPosition (), window.WindowRect ());
+      }
+    }
+    
+    void SetCursorPosition (const syslib::Point& position, const syslib::Rect& window_rect)
+    {
+      cached_cursor_position = math::vec2f (position.x / float (window_rect.right - window_rect.left),
+        position.y / float (window_rect.bottom - window_rect.top));
+
+      cursor->SetPosition (cached_cursor_position);      
+    }
+    
+    void OnMouseMove (const syslib::WindowEventContext& context)
+    {
+      SetCursorPosition (context.cursor_position, context.window_rect);
+    }
+
+  private:
+    Log                  log;
+    syslib::Window       window;
+    input::Cursor*       cursor;
+    stl::string          attachment_name;
+    stl::string          parent_window_name;
+    stl::string          cursor_attachment_name;
+    math::vec2f          cached_cursor_position;
+    xtl::auto_connection on_mouse_move_connection;
 };
 
 /*

@@ -16,7 +16,7 @@
 
 using namespace engine;
 
-const char* CONFIGURATION_FILE_NAME      = "config.xml";
+const char* CONFIGURATION_FILE_NAME      = "config_window_manager.xml";
 const char* TRANSLATION_TABLE1_FILE_NAME = "data/translation_table1.keymap";
 
 void log_handler (const char* log_name, const char* message)

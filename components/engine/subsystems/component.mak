@@ -28,7 +28,7 @@ ENGINE.SUBSYSTEMS.TESTS.LIBS             :=
 ENGINE.SUBSYSTEMS.TESTS.COMPILER_CFLAGS  :=
 ENGINE.SUBSYSTEMS.TESTS.COMPILER_DEFINES :=
 ENGINE.SUBSYSTEMS.TESTS.IMPORTS          := ../core/compile.static.mak ../../common/compile.static.mak ../../system/compile.static.mak \
-                                            ../../render/scene_render/compile.static.mak \
+                                            ../../render/scene_render/compile.static.mak ../../input/manager/compile.static.mak \
                                             scene_render.link.static.mak scene_player.link.static.mak \
                                              input_manager.link.static.mak shell.link.static.mak \
                                             ../../input/manager/xkeymap.link.static.mak ../../input/manager/xkeyreg.link.static.mak \
