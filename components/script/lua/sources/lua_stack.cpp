@@ -53,13 +53,13 @@ void check_item (lua_State* state, size_t index, int expected_type, const char* 
     //проверка корректности индекса элемента
 
   check_item_index (state, index, function_name);
-  
+
     //определение типа элемента, находящегося в стеке
 
   int item_type = lua_type (state, index);
-  
+
     //проверка совместимости типов
-    
+
   switch (item_type)
   {
     case LUA_TNIL:
@@ -68,14 +68,26 @@ void check_item (lua_State* state, size_t index, int expected_type, const char* 
         case LUA_TNUMBER:
         case LUA_TNIL:
         case LUA_TLIGHTUSERDATA:
+        case LUA_TBOOLEAN:
           return;
       }
+      break;
+    case LUA_TNUMBER:
+      switch (expected_type)
+      {
+        case LUA_TNUMBER:
+        case LUA_TNIL:
+        case LUA_TBOOLEAN:
+          return;
+      }
+      
       break;
     case LUA_TBOOLEAN:
       switch (expected_type)
       {
         case LUA_TNUMBER:
         case LUA_TNIL:
+        case LUA_TBOOLEAN:
           return;
       }
       break;
@@ -104,6 +116,13 @@ int Stack::GetInteger (size_t index)
   check_item (state, index, LUA_TNUMBER, "script::lua::Stack::GetInteger");
 
   return lua_tointeger (state, index);
+}
+
+bool Stack::GetBoolean (size_t index)
+{
+  check_item (state, index, LUA_TBOOLEAN, "script::lua::Stack::GetBoolean");
+  
+  return lua_toboolean (state, index) != 0;
 }
 
 void* Stack::GetPointer (size_t index)
@@ -179,8 +198,14 @@ void Stack::Push (float value)
 
 void Stack::Push (int value)
 {
-  check_stack    (state);
+  check_stack     (state);  
   lua_pushinteger (state, value);
+}
+
+void Stack::Push (bool value)
+{
+  check_stack     (state);
+  lua_pushboolean (state, value);
 }
 
 void Stack::Push (const char* string)
@@ -194,8 +219,10 @@ void Stack::Push (const char* string)
 
 void Stack::Push (void* value)
 {
-  check_stack           (state);
-  lua_pushlightuserdata (state, value);
+  check_stack (state);
+  
+  if (value) lua_pushlightuserdata (state, value);
+  else       lua_pushnil           (state);
 }
 
 void Stack::PushSymbol (const char* symbol)

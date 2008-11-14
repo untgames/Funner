@@ -90,6 +90,7 @@ class Stack: public IStack
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     float       GetFloat   (size_t index);
     int         GetInteger (size_t index);
+    bool        GetBoolean (size_t index);
     void*       GetPointer (size_t index);
     const char* GetString  (size_t index);
     const char* GetSymbol  (size_t index);
@@ -100,6 +101,7 @@ class Stack: public IStack
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Push       (float value);
     void Push       (int value);
+    void Push       (bool value);
     void Push       (void* pointer);
     void Push       (const char* string);
     void Push       (const xtl::any& object);

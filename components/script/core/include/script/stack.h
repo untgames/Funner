@@ -36,6 +36,7 @@ class IStack
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual float       GetFloat   (size_t index) = 0;
     virtual int         GetInteger (size_t index) = 0;
+    virtual bool        GetBoolean (size_t index) = 0;
     virtual void*       GetPointer (size_t index) = 0;
     virtual const char* GetString  (size_t index) = 0;
     virtual xtl::any&   GetVariant (size_t index) = 0;
@@ -45,6 +46,7 @@ class IStack
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void Push (float value) = 0;
     virtual void Push (int value) = 0;
+    virtual void Push (bool value) = 0;
     virtual void Push (void* pointer) = 0;
     virtual void Push (const char* string) = 0;
     virtual void Push (const xtl::any& variant) = 0;

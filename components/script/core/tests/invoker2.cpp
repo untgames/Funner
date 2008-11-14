@@ -42,7 +42,7 @@ int main ()
     
     stack.Clear ();
     stack.PushSymbol ("dummy");    
-    stack.Push (xtl::shared_ptr<X> (new Y));
+    stack.Push (xtl::any (xtl::shared_ptr<X> (new Y)));
     
     invoke ("f2", f2, stack);    
 
@@ -50,7 +50,7 @@ int main ()
     
     stack.Clear ();    
     stack.PushSymbol ("dummy");    
-    stack.Push (xtl::shared_ptr<const X> (new Y));
+    stack.Push (xtl::any (xtl::shared_ptr<const X> (new Y)));
 
     invoke ("f2", f2, stack);
     

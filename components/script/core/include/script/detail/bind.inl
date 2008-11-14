@@ -32,7 +32,7 @@ inline typename make_invoker_argument_helper<T>::result_type make_invoker_argume
 }
 
 inline xtl::any    make_invoker_argument (const xtl::any& value)    { return value; }
-inline int         make_invoker_argument (bool value)               { return static_cast<int> (value); }
+inline bool        make_invoker_argument (bool value)               { return value; }
 inline int         make_invoker_argument (char value)               { return value; }
 inline int         make_invoker_argument (signed char value)        { return value; }
 inline int         make_invoker_argument (unsigned char value)      { return value; }
@@ -50,6 +50,12 @@ inline const char* make_invoker_argument (char* string)             { return str
 
 template <class Traits, class Allocator>
 inline const char* make_invoker_argument (const stl::basic_string<char, Traits, Allocator>& s)
+{
+  return s.c_str ();
+}
+
+template <class Traits, class Allocator>
+inline const char* make_invoker_argument (stl::basic_string<char, Traits, Allocator>& s)
 {
   return s.c_str ();
 }
@@ -145,9 +151,9 @@ template <> struct argument_selector<const volatile char*>:     public string_ar
 
 template <> struct argument_selector<bool>
 {
-  typedef int dump_type;
+  typedef bool dump_type;
 
-  static bool get (IStack& stack, size_t index) { return stack.GetInteger (index) != 0; }
+  static bool get (IStack& stack, size_t index) { return stack.GetBoolean (index); }
 };
 
 template <class Traits, class Allocator>
@@ -306,6 +312,11 @@ inline void dump_type (stl::string& buffer)
 template <> inline void dump_type<int> (stl::string& buffer)
 {
   buffer += "int";  
+}
+
+template <> inline void dump_type<bool> (stl::string& buffer)
+{
+  buffer += "bool";
 }
 
 template <> inline void dump_type<float> (stl::string& buffer)
