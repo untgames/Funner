@@ -20,10 +20,13 @@ public class ConsoleControl: Control
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   public ConsoleControl (IApplicationServer in_application_server)
   {
+    HISTORY_CAPACITY = 65;
+
     application_server = in_application_server;
 
-    command_line = new ComboBox ();
-    output       = new TextBox ();
+    command_line    = new TextBox ();
+    output          = new TextBox ();
+    command_history = new System.Collections.ArrayList ();
 
     Name = "Console";
 
@@ -32,11 +35,6 @@ public class ConsoleControl: Control
     command_line.Dock      = DockStyle.Bottom;        
 
     command_line.KeyDown += new KeyEventHandler (this.OnCommandLineKeyDown);
-
-    command_line.Items.Insert (0, "");
-    command_line.Items.Insert (1, "");
-    command_line.Items.Insert (2, "");
-    command_line.Items.Insert (3, "");
 
     output.BackColor = Color.Black;
     output.ForeColor = Color.White;
@@ -62,9 +60,8 @@ public class ConsoleControl: Control
 
         System.String command_line_text = command_line.Text;
 
-        command_line.Items.Remove (command_line.Text);
-
-        command_line.Items.Insert (2, command_line_text);
+        command_history.Remove (command_line_text);
+        command_history.Insert (0, command_line_text);
 
         try
         {
@@ -76,23 +73,34 @@ public class ConsoleControl: Control
 
         command_line.Text = "";
 
+        selected_item = -1;
+
+        if (command_history.Count > HISTORY_CAPACITY)
+          command_history.RemoveAt (command_history.Count - 1);
+
         break;
       }
       case Keys.Up:
-        if (command_line.SelectedIndex < 1)
-        {
-          command_line.SelectedIndex = 3;
-          return;                    
-        }
+        if (selected_item > command_history.Count - 2)
+          selected_item = command_history.Count - 1;
+        else
+          selected_item += 1;
 
-        if (command_line.SelectedIndex < (command_line.Items.Count - 1))
-          command_line.SelectedIndex += 2;
-          
+        command_line.Text = command_history[selected_item].ToString ();
+
         break;
       case Keys.Down:
-        if (command_line.SelectedIndex > 0)
-          command_line.SelectedIndex -= 2;
-  
+        if (selected_item < 1)
+        {
+          selected_item = -1;
+          command_line.Text = "";
+        }
+        else
+        {
+          selected_item -= 1;
+          command_line.Text = command_history[selected_item].ToString ();
+        }
+
         break;
     }
   }
@@ -100,9 +108,12 @@ public class ConsoleControl: Control
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///„лены класса
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  private IApplicationServer application_server;
-  private ComboBox           command_line;
-  private TextBox            output;
+  private IApplicationServer           application_server;
+  private TextBox                      output;
+  private TextBox                      command_line;
+  private int                          selected_item;
+  private System.Collections.ArrayList command_history;
+  private int                          HISTORY_CAPACITY;
 };
 
 }
