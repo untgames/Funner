@@ -8,8 +8,8 @@ Orientation = 0 0 0 1
 WorldOrientation = 0 0 0 1
 Scale = 1 1 1
 WorldScale = 1 1 1
-OrientationInherit = 1
-ScaleInherit = 1
+OrientationInherit = true
+ScaleInherit = true
 LocalTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
 WorldTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
 ParentTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
@@ -29,8 +29,8 @@ Orientation = 34 10 15 0
 WorldOrientation = 34 10 15 0
 Scale = 100 0 0
 WorldScale = 100 0 0
-OrientationInherit = 0
-ScaleInherit = 0
+OrientationInherit = false
+ScaleInherit = false
 LocalTM = 56.1107 0 0 10 45.9149 0 0 10 68.8724 0 0 10 0 0 0 1
 WorldTM = 56.1107 0 0 10 45.9149 0 0 10 68.8724 0 0 10 0 0 0 1
 ParentTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
@@ -57,9 +57,9 @@ Child name - node2
 Unbind all test
 Unbind node2 by name test
 Child name - node1
-IsInUpdateTransaction = 0
-IsInUpdateTransaction = 1
-IsInUpdateTransaction = 0
+IsInUpdateTransaction = false
+IsInUpdateTransaction = true
+IsInUpdateTransaction = false
 Node events test
 Node 'Node1' event 'AfterSceneAttach'
 Node 'Node1' event 'AfterSceneChange'
@@ -77,7 +77,7 @@ Node 'Node2.Node1' subtree event 'BeforeUnbind'
 Node 'Node1' event 'BeforeDestroy'
 Node 'Node1' event 'AfterDestroy'
 Entity test
-IsInfiniteBounds = 1
+IsInfiniteBounds = true
 WireColor = 0 0 0
 WireColor = 1 0 0
 WireColor = 0 0 1

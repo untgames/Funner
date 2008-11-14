@@ -1,13 +1,13 @@
 Results of syslib_test:
 Test library:
 idle1
-idle2: blocked=0
+idle2: blocked=false
 idle1
-idle2: blocked=0
+idle2: blocked=false
 idle1
 connection blocked
-idle2: blocked=1
+idle2: blocked=true
 connection unblocked
 idle1
 exit
-idle2: blocked=0
+idle2: blocked=false

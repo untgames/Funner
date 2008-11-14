@@ -1,0 +1,6 @@
+Results of engine_test:
+Test library:
+Cursor 2 is nil
+Cursor1 is present
+Cursor2 isn't present
+Listener name: 'MyListener'

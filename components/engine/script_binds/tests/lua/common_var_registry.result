@@ -1,11 +1,11 @@
 Results of common_var_registry_test:
 Test library:
 Branch name = 
-IsOpened = 0
-Has a = 0
+IsOpened = false
+Has a = false
 Branch name = branch
-IsOpened = 1
-Has a = 1
+IsOpened = true
+Has a = true
 a = 1
-Has a = 1
-Has a = 0
+Has a = true
+Has a = false

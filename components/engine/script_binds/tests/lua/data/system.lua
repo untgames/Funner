@@ -19,7 +19,7 @@ end
 function idle2 ()
   print ("idle2: blocked=" .. tostring (connection.Blocked))
 
-  if connection.Blocked == 1 then
+  if connection.Blocked then
     print ("connection unblocked")
     connection:Unblock ()
   end

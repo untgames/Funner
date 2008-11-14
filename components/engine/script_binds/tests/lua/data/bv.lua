@@ -43,12 +43,12 @@ function test ()
   print ("box3 volume = " .. BV.AxisAlignedBox.volume (aabox3) .. " = " .. aabox3:volume ())
   print ("box1 volume = " .. aabox1:volume ())
 
-  print ("is box2 intersects box3 ? " .. BV.AxisAlignedBox.intersects (aabox2, aabox3))
-  print ("is box2 contatins box3 ? " .. BV.AxisAlignedBox.contains (aabox2, aabox3))
+  print ("is box2 intersects box3 ? " .. tostring (BV.AxisAlignedBox.intersects (aabox2, aabox3)))
+  print ("is box2 contatins box3 ? " .. tostring (BV.AxisAlignedBox.contains (aabox2, aabox3)))
   aabox2:set_extents (vec3 (-10, -10, -10), vec3 (5, 5, 5))
   aabox3:set_extents (vec3 (-5, -5, -5), vec3 (4, 4, 4))
-  print ("is transformed box2 intersects box3 ? " .. BV.AxisAlignedBox.intersects (aabox2, aabox3))
-  print ("is transformed box2 contatins box3 ? " .. BV.AxisAlignedBox.contains (aabox2, aabox3))
+  print ("is transformed box2 intersects box3 ? " .. tostring (BV.AxisAlignedBox.intersects (aabox2, aabox3)))
+  print ("is transformed box2 contatins box3 ? " .. tostring (BV.AxisAlignedBox.contains (aabox2, aabox3)))
 
   aabox3:set_extents (vec3 (-6, -6, -6), vec3 (14, 14, 14))
 
