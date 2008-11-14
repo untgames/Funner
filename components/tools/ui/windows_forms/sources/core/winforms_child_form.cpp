@@ -16,11 +16,11 @@ namespace ui
 namespace windows_forms
 {
 
-private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockContent
+private ref class CustomWindowForm: public WeifenLuo::WinFormsUI::Docking::DockContent
 {
   public:
 /// онструктор
-    ChildFormImpl (WindowSystem& in_window_system, ICustomChildWindow& in_child_window) :
+    CustomWindowForm (WindowSystem& in_window_system, ICustomChildWindow& in_child_window) :
       window_system (in_window_system), child_window (in_child_window)
     {
         //инициализаци€ свойств формы
@@ -31,9 +31,9 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
 
         //подписка на событи€ формы
 
-      HandleCreated   += gcnew EventHandler (this, &ChildFormImpl::OnCreateHandle);
-      HandleDestroyed += gcnew EventHandler (this, &ChildFormImpl::OnDestroyHandle);
-      Resize          += gcnew EventHandler (this, &ChildFormImpl::OnResize);
+      HandleCreated   += gcnew EventHandler (this, &CustomWindowForm::OnCreateHandle);
+      HandleDestroyed += gcnew EventHandler (this, &CustomWindowForm::OnDestroyHandle);
+      Resize          += gcnew EventHandler (this, &CustomWindowForm::OnResize);
     }    
 
   private:
@@ -48,7 +48,7 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
         }
         catch (System::Exception^ exception)
         {
-          throw DotNetException ("tools::ui::windows_forms::ChildFormImpl::UpdateParent", exception);
+          throw DotNetException ("tools::ui::windows_forms::CustomWindowForm::UpdateParent", exception);
         }
       }
       catch (std::exception& exception)
@@ -57,7 +57,7 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
       }
       catch (...)
       {
-        window_system.LogPrintf ("Unknown exception at tools::ui::windows_forms::ChildFormImpl::UpdateParent");
+        window_system.LogPrintf ("Unknown exception at tools::ui::windows_forms::CustomWindowForm::UpdateParent");
       }      
     }
 
@@ -75,7 +75,7 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
         }
         catch (System::Exception^ exception)
         {
-          throw DotNetException ("tools::ui::windows_forms::ChildFormImpl::UpdateRect", exception);
+          throw DotNetException ("tools::ui::windows_forms::CustomWindowForm::UpdateRect", exception);
         }
       }
       catch (std::exception& exception)
@@ -84,14 +84,14 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
       }
       catch (...)
       {
-        window_system.LogPrintf ("Unknown exception at tools::ui::windows_forms::ChildFormImpl::UpdateRect");
+        window_system.LogPrintf ("Unknown exception at tools::ui::windows_forms::CustomWindowForm::UpdateRect");
       }
     }
 
 ///ќбработка событи€ создани€ дескриптора формы
     void OnCreateHandle (System::Object^, EventArgs^)
     {
-//      printf ("ChildFormImpl::OnCreateHandle (%p)\n", (const void*)Handle);
+//      printf ("CustomWindowForm::OnCreateHandle (%p)\n", (const void*)Handle);
       
         //обновление параметров
 
@@ -106,7 +106,7 @@ private ref class ChildFormImpl: public WeifenLuo::WinFormsUI::Docking::DockCont
 ///ќбработка событи€ уничтожени€ дескриптора формы
     void OnDestroyHandle (System::Object^, EventArgs^)
     {
-//      printf ("ChildFormImpl::OnDestroyHandle (%p)\n", (const void*)Handle);
+//      printf ("CustomWindowForm::OnDestroyHandle (%p)\n", (const void*)Handle);
 
       child_window.Show (false);
       child_window.SetParent (0);
@@ -169,7 +169,7 @@ ChildForm::ChildForm (tools::ui::windows_forms::WindowSystem& window_system, con
 
       //создание контейнера
 
-    impl->form = gcnew ChildFormImpl (window_system, *(impl->child_window));
+    impl->form = gcnew CustomWindowForm (window_system, *(impl->child_window));
     
       //установка дока
 
@@ -201,15 +201,16 @@ ChildForm::ChildForm (windows_forms::WindowSystem& window_system, System::Window
 
     IApplicationServer& application_server = window_system.ApplicationServer ();
 
-//    child->Hide ();           //необходимо скрыть форму перед установкой родител€
-
       //создание контейнера
 
     impl->form = gcnew WeifenLuo::WinFormsUI::Docking::DockContent ();
+
+    impl->form->Text = child->Name;
     
     impl->form->Controls->Add (child);
 
     child->Dock = System::Windows::Forms::DockStyle::Fill;
+
     child->Show ();
 
       //установка дока

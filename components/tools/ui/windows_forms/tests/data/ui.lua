@@ -6,4 +6,4 @@ Application.MenuItems:Item ("MenuItem1").OnClick = "Application.MenuItems:Item (
 
 Application.CreateForm ("Application", 'my_init_string', DockState.Document)
 Application.LoadPlugins ("<BIN_DIR>/ui-plugins/*.dll")
-Application.CreateForm ("MyPlugin", '', DockState.Document)
+Application.CreateForm ("UIConsolePlugin", '', DockState.Document)
