@@ -211,6 +211,9 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
     
     void SetCursorPosition (const syslib::Point& position, const syslib::Rect& window_rect)
     {
+      if (!cursor)
+        return;
+      
       cached_cursor_position = math::vec2f (position.x / float (window_rect.right - window_rect.left),
         position.y / float (window_rect.bottom - window_rect.top));
 

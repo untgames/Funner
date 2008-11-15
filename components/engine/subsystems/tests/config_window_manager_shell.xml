@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration>
+  <WindowManager>
+    <Window
+      Id       = "ParentWindow"
+      Style    = "Overlapped"
+      Width    = "800"
+      Height   = "600"
+      Title    = "Parent window"
+      Visible  = "1"
+    />  
+    <Window
+      Id       = "Window1"    
+      Style    = "Overlapped"
+      Width    = "300"
+      Height   = "300"
+      Title    = "Window1 title"
+      Visible  = "1"
+      Parent   = "ParentWindow"
+    />
+    <Window
+      Id       = "Window2"    
+      Style    = "Overlapped"
+      Width    = "300"
+      Height   = "300"
+      Title    = "Window2 title"
+      Visible  = "1"
+      Parent   = "ParentWindow"
+    />
+  </WindowManager>
+  <WindowRenderer Id="MyRenderer" AdapterMask="OpenGL32" DriverMask="*">
+    <FrameBuffer
+      Window       = "Window1"
+      ColorBits    = "24"
+      AlphaBits    = "0"
+      DepthBits    = "24"
+      StencilBits  = "8"
+      FullScreen   = "0"
+      BuffersCount = "2"
+      SwapMethod   = "Discard"
+      SamplesCount = "1024"
+      VSync        = "0"
+      FullScreen   = "0"
+    />
+    <FrameBuffer
+      Window       = "Window2"
+      ColorBits    = "24"
+      AlphaBits    = "0"
+      DepthBits    = "24"
+      StencilBits  = "8"
+      FullScreen   = "0"
+      BuffersCount = "2"
+      SwapMethod   = "Discard"
+      SamplesCount = "1024"
+      VSync        = "0"
+      FullScreen   = "0"
+    />
+  </WindowRenderer>
+  <SceneRender
+    DriverMask   = "*"
+    RendererMask = "MyRenderer"
+    Log          = "render.scene_render"
+    >
+    <RenderTarget Screen = "Screen1"/>
+    <RenderTarget Screen = "Screen2"/>
+  </SceneRender>
+  <ScenePlayer Listener = "ScenePlayer1" DriverMask = "*" DeviceMask = "*" InitString = ""/> 
+  <WindowInputDriver>
+    <Device Id="Device1" Window="Window1"/>
+    <Device Window="Window2"/>
+  </WindowInputDriver>
+  <InputManager TranslationMapRegistry = "data/translation_map_registry.xkeyreg"/>
+  <Shell Interpreter="lua" Sources="data/window_manager_shell_scripts/*" Libraries="*" Execute="main ()"/>
+</Configuration>

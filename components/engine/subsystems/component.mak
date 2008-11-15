@@ -33,5 +33,7 @@ ENGINE.SUBSYSTEMS.TESTS.IMPORTS          := ../core/compile.static.mak ../../com
                                              input_manager.link.static.mak shell.link.static.mak \
                                             ../../input/manager/xkeymap.link.static.mak ../../input/manager/xkeyreg.link.static.mak \
                                             ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
-                                            ../../script/lua/link.static.mak ../script_binds/math.link.static.mak ../script_binds/sg.link.static.mak
+                                            ../../script/lua/link.static.mak ../script_binds/math.link.static.mak ../script_binds/sg.link.static.mak \
+                                            ../script_binds/render.link.static.mak ../script_binds/engine.link.static.mak ../script_binds/input.link.static.mak \
+                                            ../script_binds/system.link.static.mak
 ENGINE.SUBSYSTEMS.TESTS.win32.IMPORTS := ../../render/opengl_driver/link.static.mak window_input_driver.link.static.mak window_manager.link.static.mak window_renderer.link.static.mak

@@ -33,7 +33,7 @@ void idle (Cursor& cursor)
   if (common::milliseconds () - last < 1000)
     return;
     
-  cursor.SetPosition (0.5f, 0.5f);  
+  cursor.SetPosition (0.5f, 0.5f);
 
   last = common::milliseconds ();    
 }

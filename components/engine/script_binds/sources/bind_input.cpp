@@ -14,6 +14,7 @@ namespace
 
 const char* COMPONENT_NAME = "script.binds.Input";
 const char* BINDER_NAME    = "Input";
+const char* INPUT_LIBRARY  = "Input";
 const char* CURSOR_LIBRARY = "Input.Cursor";
 
 /*
@@ -41,6 +42,13 @@ void bind_cursor_library (Environment& environment)
   environment.RegisterType<Cursor> (CURSOR_LIBRARY);
 }
 
+void bind_input_globals (Environment& environment)
+{
+  InvokerRegistry& lib = environment.Library (INPUT_LIBRARY);
+  
+  lib.Register ("EventHandler", make_callback_invoker<void (const char*)> ());
+}
+
 /*
     Компонент
 */
@@ -57,6 +65,7 @@ class Component
     static void Bind (Environment& environment)
     {
       bind_cursor_library (environment);
+      bind_input_globals  (environment);
     }
 };
 

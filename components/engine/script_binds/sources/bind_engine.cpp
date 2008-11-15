@@ -97,12 +97,12 @@ template <class T> void bind_attachment_methods (Environment& environment, const
 
 void bind_attachment_registry_library (Environment& environment)
 {
-  bind_attachment_methods<render::Screen>        (environment, "Screen");
+  bind_attachment_methods<render::Screen>        (environment, "Screens");
   bind_attachment_methods<scene_graph::Listener> (environment, "Listeners");
 
   typedef xtl::function<void (const char*)> InputHandler;
 
-  bind_attachment_methods<InputHandler>  (environment, "InputHandlers");
+  bind_attachment_methods<InputHandler>  (environment, "InputEventHandlers");
   bind_attachment_methods<input::Cursor> (environment, "Cursors");
 }
 

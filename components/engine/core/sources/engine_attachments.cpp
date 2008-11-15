@@ -133,7 +133,7 @@ class AttachmentRegistryImpl: public xtl::reference_counter
 ///Отмена регистрации всех точек привязки
     void UnregisterAll ()
     {
-      for (AttachmentMap::iterator iter=attachments.begin (); iter!=attachments.end ();)
+      for (AttachmentMap::iterator iter=attachments.begin (); iter!=attachments.end (); ++iter)
       {
           //оповещение об удалении точки привязки
 

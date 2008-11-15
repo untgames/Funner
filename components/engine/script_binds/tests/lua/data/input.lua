@@ -1,3 +1,6 @@
+function input_handler (event)
+end
+
 function test ()
   local cursor = Input.Cursor.Create ()  
   
@@ -11,4 +14,6 @@ function test ()
   cursor:Hide ()
   
   print ("Visible: " .. tostring (cursor.Visible))
+  
+  local handler = Input.EventHandler ("my_input_handler")
 end
