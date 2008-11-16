@@ -36,22 +36,22 @@ int main ()
 {
   printf ("Results of window_manager_test:\n");
 
-  try  
-  {            
+  try
+  {
     common::LogFilter log_filter ("*", &log_handler);
 
     SubsystemManager manager;
 
-    manager.Start (CONFIGURATION_FILE_NAME);    
+    manager.Start (CONFIGURATION_FILE_NAME);
 
     render::Screen screen1, screen2;
-    
+
     screen1.SetBackgroundColor (0.8f, 0.f, 0.f, 0.f);
     screen2.SetBackgroundColor (0.f, 0.8f, 0.f, 0.f);
 
     AttachmentRegistry::Register ("Screen1", screen1);
     AttachmentRegistry::Register ("Screen2", screen2);
-    AttachmentRegistry::Register ("game1", xtl::function<void (const char*)> (&input_event_handler));
+    AttachmentRegistry::Register ("game1", xtl::make_const_ref (xtl::function<void (const char*)> (&input_event_handler)));
 
     syslib::Application::Run ();
   }

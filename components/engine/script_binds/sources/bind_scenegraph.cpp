@@ -274,7 +274,7 @@ InvokerRegistry& bind_node_library (Environment& environment)
 
   lib.Register ("CreateEventHandler",          make_callback_invoker<Node::EventHandler::signature_type> ());
   lib.Register ("CreateSubTreeEventHandler",   make_callback_invoker<Node::SubTreeEventHandler::signature_type> ());
-  lib.Register ("CreateRegisterEventHandler",  make_invoker (xtl::implicit_cast<xtl::connection (Node::*)(NodeEvent, const Node::EventHandler&) const> (&Node::RegisterEventHandler)));
+  lib.Register ("RegisterEventHandler",  make_invoker (xtl::implicit_cast<xtl::connection (Node::*)(NodeEvent, const Node::EventHandler&) const> (&Node::RegisterEventHandler)));
   lib.Register ("RegisterSubTreeEventHandler", make_invoker (xtl::implicit_cast<xtl::connection (Node::*)(NodeSubTreeEvent, const Node::SubTreeEventHandler&) const> (&Node::RegisterEventHandler)));
 
     //регистрация типов данных
