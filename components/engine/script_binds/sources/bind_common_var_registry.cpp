@@ -28,9 +28,9 @@ class DynamicCastRootVarRegistry : public xtl::reference_counter, public xtl::dy
       return registry.BranchName ();
     }
 
-    const char* GetValue (const char* var_name) const
+    stl::string GetValue (const char* var_name) const
     {
-      return to_string (registry.GetValue (var_name)).c_str ();
+      return to_string (registry.GetValue (var_name));
     }
 
     void SetValue (const char* var_name, const char* value)
