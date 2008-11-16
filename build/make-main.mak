@@ -427,6 +427,7 @@ define import_variables
   $2.COMPILER_DEFINES := $$($2.COMPILER_DEFINES) $$($1.COMPILER_DEFINES)
   $2.LINK_INCLUDES    := $$($2.LINK_INCLUDES) $$($1.LINK_INCLUDES)
   $2.LINK_FLAGS       := $$($2.LINK_FLAGS) $$($1.LINK_FLAGS)
+  $2.COMPONENTS       := $$($2.COMPONENTS) $$($1.COMPONENTS)
 endef
 
 #Импортирование настроек
