@@ -1,0 +1,5 @@
+Results of console test:
+Console handler - new message: Console::Print message
+Console::Print message
+Console handler - new message: Console::Printf arg1=42 arg2='arg2'
+Console::Printf arg1=42 arg2='arg2'

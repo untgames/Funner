@@ -21,12 +21,16 @@
   #error Unknown compiler
 #endif
 
+#include <xtl/bind.h>
+#include <xtl/connection.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/string.h>
 
-#include <common/heap.h>
+#include <common/component.h>
+#include <common/console.h>
 #include <common/file.h>
+#include <common/heap.h>
 #include <common/strlib.h>
 #include <common/singleton.h>
 

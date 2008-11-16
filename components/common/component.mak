@@ -71,4 +71,5 @@ COMMON.TESTS.LINK_INCLUDES    :=
 COMMON.TESTS.COMPILER_CFLAGS  :=
 COMMON.TESTS.COMPILER_DEFINES :=
 COMMON.TESTS.IMPORTS          := compile.static.mak link.static.mak zip_file_system.link.static.mak \
-                                 wxf.link.static.mak xml.link.static.mak configurator.link.static.mak
+                                 wxf.link.static.mak xml.link.static.mak configurator.link.static.mak \
+                                 default_console_handler.link.static.mak
