@@ -16,8 +16,8 @@ ENGINE.SUBSYSTEMS.SOURCES.IMPORTS           := ../core/compile.static.mak ../../
                                                ../../input/manager/compile.static.mak ../../input/low_level/compile.static.mak \
                                                ../../sound/scene_player/compile.static.mak ../../system/compile.static.mak \
                                                ../../script/core/compile.static.mak
-ENGINE.SUBSYSTEMS.SOURCES.win32.IMPORTS     := ../../input/window_driver/compile.static.mak ../../render/mid_level_window_driver/compile.static.mak
-ENGINE.SUBSYSTEMS.SOURCES.win32.SOURCE_DIRS := sources/window_manager
+ENGINE.SUBSYSTEMS.SOURCES.has_windows.IMPORTS     := ../../input/window_driver/compile.static.mak ../../render/mid_level_window_driver/compile.static.mak
+ENGINE.SUBSYSTEMS.SOURCES.has_windows.SOURCE_DIRS := sources/window_manager
 
 #Цель - tests
 ENGINE.SUBSYSTEMS.TESTS.TYPE             := test-suite
@@ -36,4 +36,4 @@ ENGINE.SUBSYSTEMS.TESTS.IMPORTS          := ../core/compile.static.mak ../../com
                                             ../../script/lua/link.static.mak ../script_binds/math.link.static.mak ../script_binds/sg.link.static.mak \
                                             ../script_binds/render.link.static.mak ../script_binds/engine.link.static.mak ../script_binds/input.link.static.mak \
                                             ../script_binds/system.link.static.mak
-ENGINE.SUBSYSTEMS.TESTS.win32.IMPORTS := ../../render/opengl_driver/link.static.mak window_input_driver.link.static.mak window_manager.link.static.mak window_renderer.link.static.mak
+ENGINE.SUBSYSTEMS.TESTS.has_windows.IMPORTS := ../../render/opengl_driver/link.static.mak window_input_driver.link.static.mak window_manager.link.static.mak window_renderer.link.static.mak

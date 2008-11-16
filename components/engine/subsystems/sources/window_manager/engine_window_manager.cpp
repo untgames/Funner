@@ -64,7 +64,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         cursor (0)
     {
         //создание окна
-      
+
       const char* title = get<const char*> (node, "Title", (const char*)0);
 
       if (title)
@@ -82,7 +82,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
       window.SetVisible (is_window_visible);
       window.SetCursorVisible (is_cursor_visible);
-      
+
         //сохранение точки привязки родительского окна
 
       parent_window_name = get<const char*> (node, "Parent", "");
@@ -90,30 +90,30 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         //установка протокола
 
       const char* log_name = get<const char*> (node, "Log", "");
-      
+
       if (*log_name)
         Log (log_name).Swap (log);
 
       window.SetDebugLog (xtl::bind (&Log::Print, &log, _1));
-      
+
         //подписка на события окна
-        
+
       on_mouse_move_connection = window.RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Window::OnMouseMove, this, _3));
 
         //регистрация слушателя событий появления новых окон
 
       AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this), AttachmentRegistryAttachMode_ForceNotify);
-      AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this), AttachmentRegistryAttachMode_ForceNotify);      
-      
+      AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this), AttachmentRegistryAttachMode_ForceNotify);
+
         //регистрация окна
-        
+
       try
       {
         attachment_name        = get<const char*> (node, "Id", "");
         cursor_attachment_name = get<const char*> (node, "Cursor", "");
 
         if (!attachment_name.empty ())
-          AttachmentRegistry::Register (attachment_name.c_str (), xtl::ref (window));
+          AttachmentRegistry::Register (attachment_name.c_str (), xtl::make_const_ref (xtl::ref (window)));
       }
       catch (...)
       {
@@ -129,8 +129,8 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       BindCursor (0);
       AttachmentRegistry::Unregister (attachment_name.c_str (), window);
       AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this));
-      AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));      
-    }    
+      AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));
+    }
 
 ///Обработчик события регистрации окна
     void OnRegisterAttachment (const char* attachment_name, syslib::Window& in_window)
@@ -154,7 +154,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
     {
       if (!cursor_attachment_name.empty () && cursor_attachment_name != attachment_name)
         return;
-      
+
       BindCursor (&in_cursor);
     }
 
@@ -162,24 +162,24 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
     {
       if (!cursor_attachment_name.empty () && cursor_attachment_name != attachment_name)
         return;
-      
+
       BindCursor (0);
     }
-    
+
 ///Обработчики событий курсора
     void OnChangePosition (const math::vec2f& position)
     {
       if (position == cached_cursor_position)
         return;
-      
+
       syslib::Rect client_rect = window.ClientRect ();
-      
+
       window.SetCursorPosition (size_t (client_rect.left + position.x * (client_rect.right - client_rect.left)),
         size_t (client_rect.top + position.y * (client_rect.bottom - client_rect.top)));
-        
+
       cached_cursor_position = position;
     }
-    
+
     void OnChangeVisible (bool state)
     {
       window.SetCursorVisible (state);
@@ -203,23 +203,23 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
       if (cursor)
       {
-        cursor->Attach (this);        
-        
+        cursor->Attach (this);
+
         SetCursorPosition (window.CursorPosition (), window.WindowRect ());
       }
     }
-    
+
     void SetCursorPosition (const syslib::Point& position, const syslib::Rect& window_rect)
     {
       if (!cursor)
         return;
-      
+
       cached_cursor_position = math::vec2f (position.x / float (window_rect.right - window_rect.left),
         position.y / float (window_rect.bottom - window_rect.top));
 
-      cursor->SetPosition (cached_cursor_position);      
+      cursor->SetPosition (cached_cursor_position);
     }
-    
+
     void OnMouseMove (const syslib::WindowEventContext& context)
     {
       SetCursorPosition (context.cursor_position, context.window_rect);
@@ -249,7 +249,7 @@ class WindowManagerSubsystem: public ISubsystem, public xtl::reference_counter
       for (Parser::NamesakeIterator iter=node.First ("Window"); iter; ++iter)
       {
         WindowPtr window (new Window (*iter), false);
-        
+
         windows.push_back (window);
       }
     }
@@ -257,7 +257,7 @@ class WindowManagerSubsystem: public ISubsystem, public xtl::reference_counter
 ///Подсчёт ссылок
     void AddRef () { addref (this); }
     void Release () { release (this); }
-    
+
   private:
     typedef xtl::intrusive_ptr<Window> WindowPtr;
     typedef stl::list<WindowPtr>       WindowList;
@@ -273,16 +273,16 @@ class WindowManagerSubsystem: public ISubsystem, public xtl::reference_counter
 class WindowManagerComponent
 {
   public:
-    WindowManagerComponent () 
+    WindowManagerComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);
     }
-    
+
   private:
     static void StartupHandler (ParseNode& node, SubsystemManager& manager)
     {
       try
-      {        
+      {
         xtl::com_ptr<ISubsystem> subsystem (new WindowManagerSubsystem (node), false);
 
         manager.AddSubsystem (subsystem.get ());

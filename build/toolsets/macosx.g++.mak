@@ -7,7 +7,7 @@
 ###################################################################################################
 EXE_SUFFIX   :=
 DLL_SUFFIX   := .dylib
-PROFILES     += macosx unistd carbon
+PROFILES     += macosx unistd carbon has_windows
 
 COMMON_CFLAGS += -I/System/Library/Frameworks/Carbon.framework/Versions/A/Frameworks/HIToolbox.framework/Versions/A/Headers \
                  -I/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/CarbonCore.framework/Versions/A/Headers

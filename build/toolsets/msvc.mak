@@ -58,7 +58,7 @@ LIB_SUFFIX := .lib
 OBJ_SUFFIX := .obj
 EXE_SUFFIX := .exe
 DLL_SUFFIX := .dll
-PROFILES   += msvc win32
+PROFILES   += msvc win32 has_windows
 COMMON_LINK_FLAGS += -stack:128000
 
 ###################################################################################################

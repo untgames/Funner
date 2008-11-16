@@ -9,6 +9,8 @@
 #include <common/parser.h>
 #include <common/strlib.h>
 
+#include <syslib/window.h>
+
 #include <input/low_level/window_driver.h>
 
 #include <engine/attachments.h>
@@ -37,14 +39,14 @@ class WindowDevice: public IAttachmentRegistryListener<syslib::Window>, public x
 ///Конструктор
     WindowDevice (ParseNode& node)
       : attachment_name (get<const char*> (node, "Window")),
-        device_name (get<const char*> (node, "Id", ""))    
+        device_name (get<const char*> (node, "Id", ""))
     {
       if (device_name.empty ())
       {
         static size_t driver_index = 1;
 
         device_name = format ("WindowInputSubsystem%u", driver_index++);
-      }      
+      }
 
       AttachmentRegistry::Attach (this, AttachmentRegistryAttachMode_ForceNotify);
     }
@@ -53,7 +55,7 @@ class WindowDevice: public IAttachmentRegistryListener<syslib::Window>, public x
     ~WindowDevice ()
     {
       AttachmentRegistry::Detach (this, AttachmentRegistryAttachMode_ForceNotify);
-    }    
+    }
 
 ///Обработчик события регистрации окна
     void OnRegisterAttachment (const char* name, syslib::Window& window)
@@ -72,15 +74,15 @@ class WindowDevice: public IAttachmentRegistryListener<syslib::Window>, public x
         return;
 
       input::low_level::WindowDriver::UnregisterDevice (device_name.c_str ());
-    }    
+    }
 
   private:
     stl::string attachment_name;
-    stl::string device_name;  
+    stl::string device_name;
 };
 
 /*
-    Подсистема direct input драйвера               
+    Подсистема direct input драйвера
 */
 
 class WindowInputDriverSubsystem : public ISubsystem, public xtl::reference_counter
@@ -88,7 +90,7 @@ class WindowInputDriverSubsystem : public ISubsystem, public xtl::reference_coun
   public:
 ///Конструктор
     WindowInputDriverSubsystem (ParseNode& node)
-    {              
+    {
       for (Parser::NamesakeIterator iter=node.First ("Device"); iter; ++iter)
         devices.push_back (DevicePtr (new WindowDevice (*iter), false));
     }
@@ -100,11 +102,11 @@ class WindowInputDriverSubsystem : public ISubsystem, public xtl::reference_coun
   private:
     WindowInputDriverSubsystem (const WindowInputDriverSubsystem&);             //no impl
     WindowInputDriverSubsystem& operator = (const WindowInputDriverSubsystem&); //no impl
-    
+
   private:
     typedef xtl::intrusive_ptr<WindowDevice> DevicePtr;
     typedef stl::list<DevicePtr>             DeviceList;
-    
+
   private:
     DeviceList devices;
 };
@@ -116,7 +118,7 @@ class WindowInputDriverSubsystem : public ISubsystem, public xtl::reference_coun
 class WindowInputDriverComponent
 {
   public:
-    WindowInputDriverComponent () 
+    WindowInputDriverComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);
     }
