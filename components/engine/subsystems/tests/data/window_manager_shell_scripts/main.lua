@@ -14,5 +14,5 @@ function main ()
   Engine.Screens.Register ("Screen1", screen1)
   Engine.Screens.Register ("Screen2", screen2)
   
-  Engine.InputEventHandlers.Register ("game1", Input.EventHandler ("input_handler"))
+  Engine.InputEventHandlers.Register ("game1", Input.CreateEventHandler ("input_handler"))
 end
