@@ -44,4 +44,5 @@ TOOLS.UI.WINDOWS_FORMS.TESTS.LIBS             :=
 TOOLS.UI.WINDOWS_FORMS.TESTS.COMPILER_CFLAGS  := 
 TOOLS.UI.WINDOWS_FORMS.TESTS.COMPILER_DEFINES :=
 TOOLS.UI.WINDOWS_FORMS.TESTS.IMPORTS          := ../core/compile.static.mak link.static.mak ../../../system/compile.static.mak \
-                                                 ../../../system/link.static.mak ../../../script/lua/link.static.mak
+                                                 ../../../system/link.static.mak ../../../script/lua/link.static.mak \
+                                                 ../../../engine/script_binds/common.link.static.mak

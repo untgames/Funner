@@ -21,4 +21,6 @@
     <ToolButton Image="data/app.ico" OnClick="Application.Execute ('Button1Click')" Tip="Картинка"/>
     <ToolButton Text="Hello world" OnClick="Application.Execute ('Hello world')"/>
   </ToolStrip>
+  <Plugin Name="Console" BackgroundColor="0;0;0;255" ForegroundColor="255;255;255;255" HistoryCapacity="64" OutputVarName="ConsoleOutput"
+          OutputCutThreshold="64" OutputCutTo="48"/>
 </UIConfig>

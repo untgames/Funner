@@ -10,29 +10,15 @@ namespace
 
 const char* LOG_NAME = "tools.ui.windows_forms.ConfigurationParser";
 
-String^ get_node_path (XmlNode^ node)
-{
-  String^ parent_path;
-
-  if (!node->ParentNode)
-    return "";
-
-  parent_path = get_node_path (node->ParentNode);
-
-  if (parent_path->Length)
-    return String::Concat (String::Concat (parent_path, "::"), node->Name);
-  else
-    return String::Concat (parent_path, node->Name);
-}
-
 }
 
 /*
     Конструктор / деструктор
 */
 
-ConfigurationParser::ConfigurationParser (const char* file_name, WindowSystem& in_window_system)
+ConfigurationParser::ConfigurationParser (const char* file_name, WindowSystem& in_window_system, PluginManager& in_plugin_manager)
   : window_system (in_window_system),
+    plugin_manager (in_plugin_manager),
     next_uid (0),
     log (LOG_NAME)
 {  
@@ -120,6 +106,11 @@ void ConfigurationParser::ParseConfiguration (XmlNode^ document)
 
   for (int i = 0; i < node_list->Count; i++)
     ParseToolStrip (node_list[i]);
+
+  node_list = document->SelectNodes ("Plugin");
+
+  for (int i = 0; i < node_list->Count; i++)
+    plugin_manager.LoadConfiguration (node_list[i]);
 }
 
 /*
@@ -369,4 +360,34 @@ ToolStrip::Pointer ConfigurationParser::ParseToolStrip (XmlNode^ tool_strip_iter
     window_system.ToolStrips ().Register (GenerateUid ().c_str (), tool_strip);
   
   return tool_strip;
+}
+
+namespace tools
+{
+
+namespace ui
+{
+
+namespace windows_forms
+{
+
+String^ get_node_path (XmlNode^ node)
+{
+  String^ parent_path;
+
+  if (!node->ParentNode)
+    return "";
+
+  parent_path = get_node_path (node->ParentNode);
+
+  if (parent_path->Length)
+    return String::Concat (String::Concat (parent_path, "::"), node->Name);
+  else
+    return String::Concat (parent_path, node->Name);
+}
+
+}
+
+}
+
 }

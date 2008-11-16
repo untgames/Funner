@@ -60,7 +60,7 @@ public interface class IApplicationServer
 ///Получение / установка значения свойства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetProperty (const System::String^ name, const System::String^ value);
-    void GetProperty (const System::String^ name, System::String^ value);
+    void GetProperty (const System::String^ name, System::String^% value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка наличия свойства / проверка режима "только чтения" свойства

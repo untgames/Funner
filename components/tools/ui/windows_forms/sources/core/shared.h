@@ -71,6 +71,8 @@ class WindowSystem;
 #include "windows_system.h"
 #include "configuration_parser.h"
 
+String^ get_node_path (System::Xml::XmlNode^ node);
+
 }
 
 }

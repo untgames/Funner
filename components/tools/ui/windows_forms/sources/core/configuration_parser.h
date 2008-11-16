@@ -7,7 +7,7 @@ class ConfigurationParser
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ConfigurationParser  (const char* file_name, WindowSystem& window_system);
+    ConfigurationParser  (const char* file_name, WindowSystem& window_system, PluginManager& plugin_manager);
     ~ConfigurationParser ();
 
   private:
@@ -20,6 +20,7 @@ class ConfigurationParser
 
   private:
     WindowSystem&            window_system;     //оконна€ система
+    PluginManager&           plugin_manager;    //менеджер плагинов
     size_t                   next_uid;          //следующий номер уникального идентификатора
     common::Log              log;               //лог
 };

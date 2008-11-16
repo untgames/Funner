@@ -82,8 +82,9 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
 {
   public:
 /// онструктор/деструктор
-    ApplicationServerImpl ()
+    ApplicationServerImpl (WindowSystem* in_window_system)
     {
+      window_system = in_window_system;
       plugins = new PluginMap;
 
       try
@@ -152,6 +153,9 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
 ///¬ыполнение команды на стороне приложени€
     virtual void ExecuteCommand (System::String^ const command)
     {
+      AutoString command_string (command);
+
+      window_system->Execute (command_string.Data ());
     }
 
 ///ѕолучение / установка значени€ свойства
@@ -162,7 +166,7 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
       var_registry->SetValue (var_name.Data (), xtl::any (stl::string (var_value.Data ()), true));
     }
 
-    virtual void GetProperty (System::String^ const name, System::String^ value)
+    virtual void GetProperty (System::String^ const name, System::String^% value)
     {
       AutoString var_name (name);
 
@@ -245,6 +249,43 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
       return ChildForm::Create (*window_system, new_form, FormDockState_Default);
     }
 
+///«агрузка конфигурации
+    void LoadConfiguration (System::Xml::XmlNode^ plugin_configuration)
+    {
+      static const char* METHOD_NAME = "tools::ui::windows_forms::ApplicationServerImpl::LoadConfiguration";
+
+      try
+      {
+        System::Xml::XmlNode ^plugin_name = plugin_configuration->Attributes["Name"];
+
+        if (!plugin_name)
+        {
+          AutoString node_path (get_node_path (plugin_configuration));
+
+          throw xtl::format_operation_exception ("", "Can't load configuration from node %s, there is no 'Name' attribute in this node", 
+                                                 node_path.Data ());
+        }
+
+        AutoString plugin_name_string (plugin_name->InnerText);
+
+        PluginMap::iterator plugin_iter = plugins->find (plugin_name_string.Data ());
+
+        if (plugin_iter == plugins->end ())
+          return;
+
+        plugin_iter->second.plugin->LoadConfiguration (plugin_configuration);
+      }
+      catch (System::Exception^ exception)
+      {
+        throw DotNetException (METHOD_NAME, exception);
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch (METHOD_NAME);
+        throw;
+      }
+    }
+
   private:
     ref struct PropertyListenerEntry
     {
@@ -267,6 +308,7 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
     typedef common::VarRegistryContainer<stl::string>              StringRegistryContainer;
 
   private:
+    WindowSystem*            window_system;          //оконна€ система
     PluginMap*               plugins;                //добавленные плагины
     StringRegistryContainer* var_registry_container; //контейнер реестра переменных
     common::VarRegistry*     var_registry;           //реестр переменных
@@ -292,7 +334,7 @@ PluginManager::PluginManager (WindowSystem& in_window_system)
 {
   try
   {
-    application_server = gcnew ApplicationServerImpl ();
+    application_server = gcnew ApplicationServerImpl (window_system);
   }
   catch (System::Exception^ exception)
   {
@@ -374,6 +416,7 @@ void PluginManager::UnloadPlugins (const char* wc_mask)
 
 void PluginManager::LoadConfiguration (System::Xml::XmlNode^ configuration)
 {
+  application_server->LoadConfiguration (configuration);
 }
 
 /*

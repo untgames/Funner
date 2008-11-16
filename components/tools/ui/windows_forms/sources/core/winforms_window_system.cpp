@@ -99,7 +99,7 @@ WindowSystem::WindowSystem (IApplicationServer* server)
     plugin_manager (*this)
 {
   try
-  {
+  {      
       //регистрация очереди обработки сообщений Window Forms
       
     ApplicationModelWrapper::RegisterWrapper ();
@@ -111,6 +111,8 @@ WindowSystem::WindowSystem (IApplicationServer* server)
     main_form->Show ();        
     
       //регистрация шлюзов
+
+    shell_environment->BindLibraries ("*");
       
     RegisterInvokers ();
   }
@@ -282,7 +284,7 @@ void WindowSystem::LoadConfiguration (const char* file_name_mask)
     throw xtl::make_null_argument_exception ("tools::ui::WindowSystem::LoadConfiguration", "file_name_mask");
 
   for (FileListIterator i=FileSystem::Search (file_name_mask, FileSearch_Files | FileSearch_Sort); i; ++i)
-    ConfigurationParser (i->name, *this);
+    ConfigurationParser (i->name, *this, plugin_manager);
 }
 
 /*
