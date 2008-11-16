@@ -26,6 +26,6 @@ function idle2 ()
 end
 
 function test ()
-  connection = System.Application.RegisterEventHandler (System.ApplicationEvent.OnIdle, System.Application.EventHandler ("idle1"))
-  System.Application.RegisterEventHandler (System.ApplicationEvent.OnIdle, System.Application.EventHandler ("idle2"))  
+  connection = System.Application.RegisterEventHandler (System.ApplicationEvent.OnIdle, System.Application.CreateEventHandler ("idle1"))
+  System.Application.RegisterEventHandler (System.ApplicationEvent.OnIdle, System.Application.CreateEventHandler ("idle2"))  
 end

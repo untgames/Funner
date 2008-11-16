@@ -15,5 +15,5 @@ function test ()
   
   print ("Visible: " .. tostring (cursor.Visible))
   
-  local handler = Input.EventHandler ("my_input_handler")
+  local handler = Input.CreateEventHandler ("input_handler")
 end

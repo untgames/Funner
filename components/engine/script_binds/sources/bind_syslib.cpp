@@ -32,12 +32,12 @@ void bind_application_events_library (Environment& environment)
 void bind_application_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.Library (APPLICATION_LIBRARY);
-  
+
     //регистрация операций
-    
+
   lib.Register ("Exit",                 make_invoker (&syslib::Application::Exit));
   lib.Register ("Sleep",                make_invoker (&syslib::Application::Sleep));
-  lib.Register ("EventHandler",         make_callback_invoker<syslib::Application::EventHandler::signature_type> ());
+  lib.Register ("CreateEventHandler",   make_callback_invoker<syslib::Application::EventHandler::signature_type> ());
   lib.Register ("RegisterEventHandler", make_invoker (&syslib::Application::RegisterEventHandler));
 }
 
@@ -61,7 +61,7 @@ class Component
 
   private:
     static void Bind (Environment& environment)
-    {      
+    {
       bind_syslib_library (environment);
     }
 };

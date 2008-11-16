@@ -29,7 +29,7 @@ Cursor create_cursor ()
 void bind_cursor_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (CURSOR_LIBRARY);
-  
+
   lib.Register ("Create",       make_invoker (&create_cursor));
   lib.Register ("get_Position", make_invoker (&Cursor::Position));
   lib.Register ("set_Position", make_invoker (xtl::implicit_cast<void (Cursor::*)(const math::vec2f&)> (&Cursor::SetPosition)));
@@ -38,15 +38,15 @@ void bind_cursor_library (Environment& environment)
   lib.Register ("set_Visible",  make_invoker (&Cursor::SetVisible));
   lib.Register ("Show",         make_invoker (&Cursor::Show));
   lib.Register ("Hide",         make_invoker (&Cursor::Hide));
-  
+
   environment.RegisterType<Cursor> (CURSOR_LIBRARY);
 }
 
 void bind_input_globals (Environment& environment)
 {
   InvokerRegistry& lib = environment.Library (INPUT_LIBRARY);
-  
-  lib.Register ("EventHandler", make_callback_invoker<void (const char*)> ());
+
+  lib.Register ("CreateEventHandler", make_callback_invoker<void (const char*)> ());
 }
 
 /*

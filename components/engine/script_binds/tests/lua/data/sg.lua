@@ -200,8 +200,8 @@ end
 function test_events ()
   print ("Node events test")
   
-  local handler1 = Scene.Node.EventHandler ("node_event_handler")
-  local handler2 = Scene.Node.SubTreeEventHandler ("node_subtree_event_handler")
+  local handler1 = Scene.Node.CreateEventHandler ("node_event_handler")
+  local handler2 = Scene.Node.CreateSubTreeEventHandler ("node_subtree_event_handler")
   local node1    = Scene.Node.Create ()
   local node2    = Scene.Node.Create ()
   local scene    = Scene.Scene.Create ()

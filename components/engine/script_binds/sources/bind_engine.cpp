@@ -35,7 +35,9 @@ template <class T> void register_attachment (const char* name, T& value)
 
 template <> void register_attachment<scene_graph::Listener> (const char* name, scene_graph::Listener& listener)
 {
-  AttachmentRegistry::Register (name, scene_graph::Listener::Pointer (&listener));
+  scene_graph::Listener::Pointer listener_pointer (&listener);
+
+  AttachmentRegistry::Register (name, listener_pointer);
 }
 
 template <class T> void unregister_attachment (const char* name)
@@ -51,14 +53,14 @@ template <class T> bool is_attachment_present (const char* name)
 template <class T> struct selector_result_type
 {
   typedef T type;
-  
+
   static T get (T& value) { return value; }
 };
 
 template <> struct selector_result_type<scene_graph::Listener>
 {
   typedef scene_graph::Listener::Pointer type;
-  
+
   static type get (scene_graph::Listener& value) { return &value; }
 };
 
@@ -74,12 +76,12 @@ template <class T> size_t find_attachment (IStack& stack)
 
   if (value)
   {
-    script::detail::push_argument (stack, selector_result_type<T>::get (*value));
+    script::detail::push_argument (stack, xtl::make_const_ref (selector_result_type<T>::get (*value)));
   }
   else
   {
     stack.Push ((void*)0);
-  }  
+  }
 
   return 1;
 }

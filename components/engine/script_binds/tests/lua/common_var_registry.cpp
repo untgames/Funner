@@ -18,7 +18,7 @@ typedef common::VarRegistryContainer<stl::string> StringRegistry;
 int main ()
 {
   printf ("Results of common_var_registry_test:\n");
-  
+
   try
   {
     StringRegistry string_registry;
@@ -26,19 +26,19 @@ int main ()
     string_registry.Mount ("branch");
 
     xtl::shared_ptr<Environment> env (new Environment);
-    
+
     InvokerRegistry& lib = env->CreateLibrary ("Utils");
 
     lib.Register ("PrintIndent", make_invoker (&print_indent));
 
     Shell shell ("lua", env);
 
-    xtl::com_ptr<IInterpreter> script (shell.Interpreter ());                
-  
+    xtl::com_ptr<IInterpreter> script (shell.Interpreter ());
+
     env->BindLibraries ("Common");
 
     load_script (*script, SCRIPT_FILE_NAME);
-    
+
     printf ("Test library:\n");
 
     invoke<void> (*script, "test");
@@ -46,7 +46,7 @@ int main ()
   catch (xtl::bad_any_cast& exception)
   {
     printf ("%s: %s -> %s\n", exception.what (), exception.source_type ().name (), exception.target_type ().name ());
-  }    
+  }
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());
