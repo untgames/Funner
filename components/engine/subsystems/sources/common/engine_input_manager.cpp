@@ -1,13 +1,7 @@
 #include <stl/hash_map>
 #include <stl/string>
-#include <stl/vector>
 
-#include <xtl/bind.h>
 #include <xtl/connection.h>
-#include <xtl/function.h>
-#include <xtl/intrusive_ptr.h>
-
-#include <common/log.h>
 
 #include <input/low_level/driver.h>
 

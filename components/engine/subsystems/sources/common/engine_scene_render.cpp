@@ -1,12 +1,6 @@
 #include <stl/hash_map>
 
-#include <xtl/bind.h>
-#include <xtl/function.h>
-#include <xtl/intrusive_ptr.h>
 #include <xtl/iterator.h>
-
-#include <common/log.h>
-#include <common/strlib.h>
 
 #include <render/scene_render.h>
 

@@ -1,5 +1,5 @@
 Results of shell_test:
-engine.SubsystemManager1: Start subsystems...
+engine.SubsystemManager1: Add subsystem 'Subsystem01'
 Node test
 Name = 
 Position = 0 0 0
@@ -48,7 +48,8 @@ Scale = 1 1 1
 WorldOrtX = 1 0 0
 WorldOrtY = 0 0 -1
 WorldOrtZ = 0 1 0
-engine.SubsystemManager1: Add subsystem 'Subsystem01'
+engine.SubsystemManager1: Add subsystem 'Subsystem02'
 engine.SubsystemManager1: Subsystems successfully started
 engine.SubsystemManager1: config_shell.xml(1): warning: not yet implement. Encoding='windows-1251'
+engine.SubsystemManager1: Remove susbsystem 'Subsystem02'
 engine.SubsystemManager1: Remove susbsystem 'Subsystem01'

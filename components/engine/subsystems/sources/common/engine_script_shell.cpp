@@ -1,10 +1,4 @@
-#include <xtl/bind.h>
-#include <xtl/function.h>
-#include <xtl/intrusive_ptr.h>
 #include <xtl/shared_ptr.h>
-
-#include <common/log.h>
-#include <common/strlib.h>
 
 #include <script/environment.h>
 #include <script/shell.h>
