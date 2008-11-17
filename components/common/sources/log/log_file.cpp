@@ -136,6 +136,8 @@ struct LogFile::Impl
             }
           }
 
+          print_message.append ("\n");
+
           file.Write (print_message.c_str (), print_message.length ());
 
           return;

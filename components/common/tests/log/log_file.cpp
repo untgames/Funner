@@ -10,8 +10,8 @@ int main ()
 
   LogFile log_file;
 
-  size_t default_filter_index = log_file.AddFilter ("*", "[{time}] {log}: {message}<br>\n", 1);
-  log_file.AddFilter ("*error*", "<font color=#ff0000><strong>[{day}-{month}-{year} {hour}:{minutes}:{seconds}] {log}: {message}</strong></font><br>\n", 0);
+  size_t default_filter_index = log_file.AddFilter ("*", "[{time}] {log}: {message}<br>", 1);
+  log_file.AddFilter ("*error*", "<font color=#ff0000><strong>[{day}-{month}-{year} {hour}:{minutes}:{seconds}] {log}: {message}</strong></font><br>", 0);
 
   OutputFile output_file (DST_FILE_NAME);
   File    dummy_file;
