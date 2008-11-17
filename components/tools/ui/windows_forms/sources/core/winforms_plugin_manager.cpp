@@ -39,7 +39,6 @@ class VarRegistryEventHandler
                                                                   xtl::bind (&VarRegistryEventHandler::OnDeleteVar, this, _1));
     }
 
-
   private:
     void OnCreateVar (const char* var_name)
     {
@@ -232,6 +231,35 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
       property_listeners.Clear ();
     }
 
+///–егистраци€ слушателей сообщений вывода
+    virtual void RegisterOutputListener (IOutputListener^ listener)
+    {
+      if (output_listeners.IndexOf (listener) != -1)
+        throw xtl::format_operation_exception ("tools::ui::windows_forms::ApplicationServerImpl::RegisterOutputListener",
+                                               "Can't register listener, this listener already registered");
+
+      output_listeners.Add (listener);
+    }
+
+    virtual void UnregisterOutputListener (IOutputListener^ listener)
+    {
+      output_listeners.Remove (listener);
+    }
+
+    virtual void UnregisterAllOutputListeners ()
+    {
+      output_listeners.Clear ();
+    }
+
+///ќбработка сообщений консоли
+    void ProcessConsoleMessage (const char* message)
+    {
+      System::String ^message_string = gcnew System::String (message);
+
+      for (int i = 0; i < output_listeners.Count; i++)
+        safe_cast<IOutputListener^>(output_listeners[i])->OnMessage (message_string);
+    }
+
 ///—оздание формы
     ChildForm::Pointer CreateForm (WindowSystem* window_system, const char* plugin, const char* init_string)
     {
@@ -312,7 +340,9 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
     PluginMap*               plugins;                //добавленные плагины
     StringRegistryContainer* var_registry_container; //контейнер реестра переменных
     common::VarRegistry*     var_registry;           //реестр переменных
+
     ArrayList                property_listeners;     //слушатели событий свойств
+    ArrayList                output_listeners;       //слушатели сообщений вывода
 };
 
 }
@@ -325,16 +355,35 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
    ћенеджер плагинов
 */
 
+struct PluginManager::Impl
+{   
+  WindowSystem*        window_system;      //оконна€ система
+  common::Log          log;                //лог
+  ApplicationServerPtr application_server; //интерфейс приложени€
+  xtl::auto_connection console_connection; //соединение обработчика консоли 
+
+  Impl (WindowSystem* in_window_system)
+    : window_system (in_window_system), log (LOG_NAME)
+  {
+    console_connection = common::Console::RegisterEventHandler (xtl::bind (&PluginManager::Impl::ConsoleHandler, this, _1));
+  }
+
+  void ConsoleHandler (const char* message)
+  {
+    application_server->ProcessConsoleMessage (message);
+  }
+};
+
 /*
     онструктор/деструктор
 */
 
 PluginManager::PluginManager (WindowSystem& in_window_system)
-  : window_system (&in_window_system), log (LOG_NAME)
+  : impl (new Impl (&in_window_system))
 {
   try
   {
-    application_server = gcnew ApplicationServerImpl (window_system);
+    impl->application_server = gcnew ApplicationServerImpl (&in_window_system);
   }
   catch (System::Exception^ exception)
   {
@@ -387,17 +436,17 @@ void PluginManager::LoadPlugins (const char* wc_mask)
       if (!create_plugin_func->IsStatic || !create_plugin_func->IsPublic)
         throw xtl::format_operation_exception ("", "Method 'InitPlugin (IApplicationServer)' in class 'tools.ui.windows_forms.Plugin' must be static public");
 
-      array<Object^>^ params = {application_server};
+      array<Object^>^ params = {impl->application_server};
 
       create_plugin_func->Invoke (nullptr, params);
     }
     catch (xtl::exception& exception)
     {
-      log.Printf ("Can't load plugin '%s', exception %s", iter->name, exception.what ());
+      impl->log.Printf ("Can't load plugin '%s', exception %s", iter->name, exception.what ());
     }
     catch (System::Exception^ exception)
     {
-      log.Printf ("Can't load plugin '%s', exception %s", iter->name, exception->ToString ());
+      impl->log.Printf ("Can't load plugin '%s', exception %s", iter->name, exception->ToString ());
     }
   }
 }
@@ -407,7 +456,7 @@ void PluginManager::UnloadPlugins (const char* wc_mask)
   if (!wc_mask)
     throw xtl::make_null_argument_exception ("tools::ui::windows_forms::PluginManager::UnloadPlugins", "wc_mask");
 
-  application_server->RemovePlugins (wc_mask);
+  impl->application_server->RemovePlugins (wc_mask);
 }
 
 /*
@@ -416,7 +465,7 @@ void PluginManager::UnloadPlugins (const char* wc_mask)
 
 void PluginManager::LoadConfiguration (System::Xml::XmlNode^ configuration)
 {
-  application_server->LoadConfiguration (configuration);
+  impl->application_server->LoadConfiguration (configuration);
 }
 
 /*
@@ -435,7 +484,7 @@ ChildForm::Pointer PluginManager::CreateForm (const char* plugin, const char* in
 
   try
   {
-    return application_server->CreateForm (window_system, plugin, init_string);
+    return impl->application_server->CreateForm (impl->window_system, plugin, init_string);
   }
   catch (System::Exception^ exception)
   {

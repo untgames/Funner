@@ -24,10 +24,9 @@ public struct ConsoleControlConfiguration
   public int           output_cut_threshold;
   public int           output_cut_to;
   public int           history_capacity;
-  public System.String output_var_name;
 };
 
-public class ConsoleControl: Control, IPropertyListener
+public class ConsoleControl: Control, IOutputListener
 {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
@@ -38,11 +37,6 @@ public class ConsoleControl: Control, IPropertyListener
 
     output_cut_threshold = configuration.output_cut_threshold;
     output_cut_to        = configuration.output_cut_to;
-
-    output_var_name = configuration.output_var_name;
-
-    if (output_var_name.Length > 0)
-      application_server.RegisterPropertyListener (output_var_name, this);
 
     history_capacity   = configuration.history_capacity;
 
@@ -75,12 +69,13 @@ public class ConsoleControl: Control, IPropertyListener
 
     Controls.Add (output);
     Controls.Add (command_line);
+
+    application_server.RegisterOutputListener (this);
   }
 
   ~ConsoleControl ()
   {
-    if (output_var_name.Length > 0)
-      application_server.UnregisterPropertyListener (output_var_name, this);
+    application_server.UnregisterOutputListener (this);
   }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,27 +140,9 @@ public class ConsoleControl: Control, IPropertyListener
     }
   }
 
-  public void OnAddProperty (System.String name)
+  public void OnMessage (System.String message)
   {
-    UpdateOutput ();
-  }
-  
-  public void OnChangeProperty (System.String name)
-  {
-    UpdateOutput ();
-  }
-
-  public void OnRemoveProperty (System.String name)
-  {
-  }
-
-  private void UpdateOutput ()
-  {
-    System.String new_message = null;
-
-    application_server.GetProperty (output_var_name, ref new_message);
-
-    output.Text += System.Environment.NewLine + new_message;
+    output.Text += System.Environment.NewLine + message;
 
     if (output.Text.Length > output_cut_threshold)
     {
@@ -192,7 +169,6 @@ public class ConsoleControl: Control, IPropertyListener
   private int                          output_cut_to;
   private System.Collections.ArrayList command_history;
   private int                          history_capacity;
-  private System.String                output_var_name;
 };
 
 }
@@ -215,7 +191,6 @@ public class UIConsolePlugin: IPlugin
     configuration.output_cut_threshold = 1024*64;
     configuration.output_cut_to        = 1024*63;
     configuration.history_capacity     = DEFAULT_HISTORY_CAPACITY;
-    configuration.output_var_name      = "";
   }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -236,14 +211,8 @@ public class UIConsolePlugin: IPlugin
     XmlNode foreground_color     = xml_configuration.Attributes["ForegroundColor"];
     XmlNode output_cut_threshold = xml_configuration.Attributes["OutputCutThreshold"];
     XmlNode output_cut_to        = xml_configuration.Attributes["OutputCutTo"];
-    XmlNode output_var_name      = xml_configuration.Attributes["OutputVarName"];
 
     ui_console_plugin.ConsoleControlConfiguration new_configuration = new ui_console_plugin.ConsoleControlConfiguration ();
-
-    if (output_var_name == null)
-      throw new System.Exception ("No 'OutputVarName' attribute in 'Console' plugin configuration");
-
-    new_configuration.output_var_name = output_var_name.InnerText;
 
     if (history_capacity == null)
       new_configuration.history_capacity = DEFAULT_HISTORY_CAPACITY;

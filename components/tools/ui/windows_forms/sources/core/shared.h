@@ -18,6 +18,7 @@
 #include <xtl/shared_ptr.h>
 
 #include <common/component.h>
+#include <common/console.h>
 #include <common/file.h>
 #include <common/log.h>
 #include <common/parser.h>

@@ -33,7 +33,6 @@ class PluginManager: public xtl::noncopyable
     typedef msclr::gcroot<ApplicationServerImpl^> ApplicationServerPtr;
 
   private:
-    WindowSystem*        window_system;      //оконная система
-    common::Log          log;                //лог
-    ApplicationServerPtr application_server; //интерфейс приложения
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };
