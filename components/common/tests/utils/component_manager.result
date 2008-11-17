@@ -1,6 +1,7 @@
 Results of component_manager_test:
 Before load
 Components:
+  component 'common.console.DefaultConsoleHandler' not loaded
   component 'common.file_systems.ZipFileSystem' not loaded
   component 'common.parsers.wxf' not loaded
   component 'common.parsers.xml' not loaded
@@ -9,6 +10,7 @@ Components:
 Load MyComponent
 After load
 Components:
+  component 'common.console.DefaultConsoleHandler' loaded
   component 'common.file_systems.ZipFileSystem' loaded
   component 'common.parsers.wxf' loaded
   component 'common.parsers.xml' loaded
@@ -16,6 +18,7 @@ Components:
   component 'common.var_registries.configuration_registry' loaded
 Unload MyComponent
 Components:
+  component 'common.console.DefaultConsoleHandler' not loaded
   component 'common.file_systems.ZipFileSystem' not loaded
   component 'common.parsers.wxf' not loaded
   component 'common.parsers.xml' not loaded
@@ -23,6 +26,7 @@ Components:
   component 'common.var_registries.configuration_registry' not loaded
 After unregister
 Components:
+  component 'common.console.DefaultConsoleHandler' not loaded
   component 'common.file_systems.ZipFileSystem' not loaded
   component 'common.parsers.wxf' not loaded
   component 'common.parsers.xml' not loaded
