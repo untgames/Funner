@@ -11,28 +11,56 @@ namespace
 
 const char* COMPONENT_NAME = "script.binds.LuaOverride";
 const char* BINDER_NAME    = "LuaOverride";
+const char* LOG_NAME       = "script.binds.LuaOverride";
+
+struct ShellLogHandler
+{
+  ShellLogHandler (common::Log& in_log) : log (in_log), was_error (false) {}
+
+  void operator () (const char* message)
+  {
+    was_error = true;
+
+    log.Print (message);
+  }
+
+  common::Log& log;
+  bool         was_error;
+};
 
 void print_override (const char* message)
 {
   common::Console::Printf ("%s\n", message);
 }
 
-size_t dofile_override (IStack& stack)
+struct DoFileOverride
 {
-  size_t initial_stack_size = stack.Size ();
+  DoFileOverride () : log (LOG_NAME) {}
 
-  const char* file_name = stack.GetString (1);
+  size_t operator () (IStack& stack)
+  {
+    size_t initial_stack_size = stack.Size ();
 
-  common::InputFile input_file (file_name);
+    const char* file_name = stack.GetString (1);
 
-  xtl::uninitialized_storage<char> file_content (input_file.Size ());
+    common::InputFile input_file (file_name);
 
-  input_file.Read (file_content.data (), file_content.size ());
+    xtl::uninitialized_storage<char> file_content (input_file.Size ());
 
-  stack.Interpreter ().DoCommands (file_name, file_content.data (), file_content.size (), &common::Console::Print);
+    input_file.Read (file_content.data (), file_content.size ());
 
-  return stack.Size () - initial_stack_size;
-}
+    ShellLogHandler log_handler (log);
+
+    stack.Interpreter ().DoCommands (file_name, file_content.data (), file_content.size (), xtl::ref (log_handler));
+
+    if (log_handler.was_error)
+      throw xtl::format_operation_exception ("script::binds::LuaOverride::do_file", "Lua exception while dofile '%s'", file_name);
+
+    return stack.Size () - initial_stack_size;
+  }
+
+  common::Log log;  
+};
 
 /*
     Компонент
@@ -54,7 +82,7 @@ class Component
         //регистрация операций
 
       lib.Register ("print",  make_invoker (&print_override));
-      lib.Register ("dofile", &dofile_override);
+      lib.Register ("dofile", DoFileOverride ());
     }
 };
 

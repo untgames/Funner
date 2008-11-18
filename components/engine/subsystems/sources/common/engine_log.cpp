@@ -34,7 +34,7 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
                    *file_log_filters_masks = get<const char*> (file_node, "Filters"),
                    *flush                  = get<const char*> (file_node, "Flush");
 
-        if (file_log_filters_masks)
+        if (*file_log_filters_masks)
         {
           StringArray log_filters_masks = split (file_log_filters_masks);
 
@@ -68,7 +68,7 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
       {
         const char* console_log_filters_masks = get<const char*> (console_node, "Filters");
 
-        if (console_log_filters_masks)
+        if (*console_log_filters_masks)
         {
           StringArray log_filters_masks = split (console_log_filters_masks);
 

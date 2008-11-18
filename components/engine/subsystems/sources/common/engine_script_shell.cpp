@@ -24,6 +24,21 @@ const char* LOG_NAME       = COMPONENT_NAME;            //имя потока протоколиро
     Подсистема скриптового интерпретатора
 */
 
+struct ShellLogHandler
+{
+  ShellLogHandler (Log& in_log) : log (in_log), was_error (false) {}
+
+  void operator () (const char* message)
+  {
+    was_error = true;
+
+    log.Print (message);
+  }
+
+  Log& log;
+  bool was_error;
+};
+
 class ShellSubsystem : public ISubsystem, public xtl::reference_counter
 {
   public:
@@ -32,6 +47,8 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
       : log (COMPONENT_NAME),
         environment (new Environment)
     {
+      static const char* METHOD_NAME = "engine::subsystems::ShellSubsystem::ShellSubsystem";
+        
         //чтение конфигурации
       
       const char *interpreter = get<const char*> (node, "Interpreter"),
@@ -59,15 +76,25 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
 
         //загрузка и исполнение исходных файлов
 
-      Shell::LogFunction log_handler = xtl::bind (&Log::Print, &log, _1);
+      ShellLogHandler shell_log_handler (log);
+
+      Shell::LogFunction log_handler (xtl::ref (shell_log_handler));
 
       for (size_t i=0; i<src_list.Size (); i++)
+      {
         shell.ExecuteFileList (src_list [i], log_handler);
-        
+
+        if (shell_log_handler.was_error)
+          throw xtl::format_operation_exception (METHOD_NAME, "Lua exception while executing file list '%s'", src_list[i]);
+      }  
+
         //исполнение команды
         
       if (*command)
         shell.Execute (command, log_handler);
+
+      if (shell_log_handler.was_error)
+        throw xtl::format_operation_exception (METHOD_NAME, "Lua exception while executing command '%s'", command);
     }
 
 /// Подсчёт ссылок

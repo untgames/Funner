@@ -11,6 +11,7 @@
 #include <common/component.h>
 #include <common/console.h>
 #include <common/file.h>
+#include <common/log.h>
 
 #include <script/bind.h>
 #include <script/environment.h>
