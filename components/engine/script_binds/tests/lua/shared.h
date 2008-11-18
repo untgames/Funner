@@ -9,6 +9,7 @@
 #include <xtl/connection.h>
 #include <xtl/shared_ptr.h>
 
+#include <common/console.h>
 #include <common/file.h>
 #include <common/log.h>
 #include <common/strlib.h>

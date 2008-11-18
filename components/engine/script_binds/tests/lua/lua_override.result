@@ -1,0 +1,4 @@
+Results of lua_override_test:
+Print override
+in dofile.lua
+Dofile override = return from dofile.lua
