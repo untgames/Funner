@@ -19,11 +19,9 @@ void print_override (const char* message)
 
 size_t dofile_override (IStack& stack)
 {
-  size_t initial_stack_size = stack.Size () - 1;
+  size_t initial_stack_size = stack.Size ();
 
   const char* file_name = stack.GetString (1);
-
-  stack.Pop (1);
 
   common::InputFile input_file (file_name);
 
