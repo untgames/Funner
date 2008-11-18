@@ -1,0 +1,11 @@
+Results of resource_group_tst:
+add 'data/group/subfolder/test3.txt'
+add 'data/group/test1.txt'
+add 'data/group/test2.txt'
+group1 initial state (3 items):
+  'data/group/subfolder/test3.txt'
+  'data/group/test1.txt'
+  'data/group/test2.txt'
+remove 'data/group/test1.txt'
+remove 'data/group/subfolder/test3.txt'
+remove 'data/group/test2.txt'
