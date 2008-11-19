@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration>
+  <Log>
+    <Console Filters="*"/>
+    <File FileName="log.txt" Filters="*" Flush="1">
+      <OutputFormat 
+        Filter="*" 
+        Replacement="{log}: {message}" 
+        SortOrder="1"
+      />
+    </File>
+  </Log>
+  <WindowManager>
+    <Window
+      Id       = "MainWindow"
+      Style    = "Overlapped"
+      Width    = "1024"
+      Height   = "768"
+      Title    = "Main window"
+      Visible  = "1"
+    />  
+  </WindowManager>
+  <WindowRenderer Id="MyRenderer" AdapterMask="OpenGL32" DriverMask="*">
+    <FrameBuffer
+      Window       = "MainWindow"
+      ColorBits    = "24"
+      AlphaBits    = "0"
+      DepthBits    = "24"
+      StencilBits  = "8"
+      FullScreen   = "0"
+      BuffersCount = "2"
+      SwapMethod   = "Discard"
+      SamplesCount = "1024"
+      VSync        = "1"
+    />
+  </WindowRenderer>
+  <SceneRender
+    DriverMask   = "*"
+    RendererMask = "MyRenderer"
+    Log          = "render.scene_render"
+    >
+    <RenderTarget Screen = "Screen1"/>
+  </SceneRender>
+  <ScenePlayer Attachment = "Listener1" DriverMask = "*" DeviceMask = "*" InitString = ""/> 
+  <WindowInputDriver>
+    <Device Id="Device1" Window="MainWindow"/>
+  </WindowInputDriver>
+  <InputManager TranslationMapRegistry = "data/configurations/input/translation_map_registry.xkeyreg"/>
+  <Shell Interpreter="lua" Sources="data/scripts/main.lua" Libraries="*" Execute=""/>
+</Configuration>

@@ -10,8 +10,9 @@ namespace
     Константы
 */
 
-const char* SUBSYSTEM_NAME = "Log";                   //имя подсистемы
-const char* COMPONENT_NAME = "engine.subsystems.Log"; //имя компонента
+const char* SUBSYSTEM_NAME    = "Log";                   //имя подсистемы
+const char* COMPONENT_NAME    = "engine.subsystems.Log"; //имя компонента
+const char* DEFAULT_FILE_NAME = "/io/stdout/log.txt";    //имя файла вывода по умолчанию
 
 /*
    Подсистема печати лог сообщений в консоль               
@@ -30,9 +31,10 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
 
       if (file_node)
       {
-        const char *file_name              = get<const char*> (file_node, "FileName", ""),
-                   *file_log_filters_masks = get<const char*> (file_node, "Filters", ""),
-                   *flush                  = get<const char*> (file_node, "Flush", "");
+        const char *file_name              = get<const char*> (file_node, "FileName", DEFAULT_FILE_NAME),
+                   *file_log_filters_masks = get<const char*> (file_node, "Filters", "*");
+
+        need_flush = get<bool> (file_node, "Flush", true);
 
         if (*file_log_filters_masks && *file_name)
         {
@@ -56,9 +58,6 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
 
             output_file.AddFilter (filter, replacement, sort_order);
           }
-
-          if (*flush && xtl::xstrcmp ("0", flush))
-            need_flush = true;
         }
       }    
 
@@ -66,7 +65,7 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
 
       if (console_node)
       {
-        const char* console_log_filters_masks = get<const char*> (console_node, "Filters", "");
+        const char* console_log_filters_masks = get<const char*> (console_node, "Filters", "*");
 
         if (*console_log_filters_masks)
         {
