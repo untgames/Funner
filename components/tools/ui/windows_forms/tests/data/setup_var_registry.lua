@@ -1,0 +1,7 @@
+local var_registry = Common.VarRegistry.Create ()
+var_registry:Open ("ApplicationServer.registry1")
+var_registry:SetValue ("Property1", "1")
+var_registry:SetValue ("Property2", "2")
+var_registry:SetValue ("Property3", "3")
+var_registry:SetValue ("Property4", "4")
+--var_registry:SetValue ("Property5", "5")

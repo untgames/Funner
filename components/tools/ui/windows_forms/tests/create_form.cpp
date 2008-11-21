@@ -9,12 +9,12 @@ extern double _HUGE = DBL_MAX;
 
 void print (const char* message)
 {
-  printf ("%s\n", message);
+  common::Console::Printf ("%s\n", message);
 }
 
 void log_handler (const char* log_name, const char* log_message)
 {
-  printf ("%s: %s\n", log_name, log_message);
+  common::Console::Printf ("%s: %s\n", log_name, log_message);
 }
 
 int main ()

@@ -11,6 +11,7 @@
 #include <xtl/reference_counter.h>
 #include <xtl/string.h>
 
+#include <common/console.h>
 #include <common/log.h>
 
 #include <syslib/application.h>

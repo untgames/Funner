@@ -29,4 +29,18 @@
     OutputCutThreshold="256" 
     OutputCutTo="196"
   />
+  <Plugin Name="PropertyGrid">  <!-- init_string - имя_карты префикс_реестра -->
+    <PropertyMaps>
+      <PropertyMap Name="Map1">
+        <Property Name="Property1" VarName="Property1" Category="Category #1"/>
+        <Property Name="Property2" VarName="Property2" tip="Property tip"/>
+        <Property Name="Property3" VarName="Property3"/>
+        <Property Name="Property4" VarName="Property4" Title="Property title!"/>
+      </PropertyMap>
+
+      <PropertyMap Name="Map2" Inherit="Map1">
+        <Property Name="Property5" VarName="Property5" Category="Category #2"/>
+      </PropertyMap>  
+    </PropertyMaps>
+  </Plugin>
 </UIConfig>

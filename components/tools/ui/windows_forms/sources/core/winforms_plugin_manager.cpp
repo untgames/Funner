@@ -261,7 +261,7 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
     }
 
 ///Создание формы
-    ChildForm::Pointer CreateForm (WindowSystem* window_system, const char* plugin, const char* init_string)
+    ChildForm::Pointer CreateForm (WindowSystem* window_system, const char* plugin, const char* init_string, FormDockState dock_state)
     {
       static const char* METHOD_NAME = "tools::ui::windows_forms::ApplicationServerImpl::CreateForm";
 
@@ -274,7 +274,7 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
 
       System::Windows::Forms::Control^ new_form = plugin_iter->second.plugin->CreateControl (init_string_wrap);
 
-      return ChildForm::Create (*window_system, new_form, FormDockState_Default);
+      return ChildForm::Create (*window_system, new_form, dock_state);
     }
 
 ///Загрузка конфигурации
@@ -472,7 +472,7 @@ void PluginManager::LoadConfiguration (System::Xml::XmlNode^ configuration)
    Создание формы
 */
 
-ChildForm::Pointer PluginManager::CreateForm (const char* plugin, const char* init_string)
+ChildForm::Pointer PluginManager::CreateForm (const char* plugin, const char* init_string, FormDockState dock_state)
 {
   static const char* METHOD_NAME = "tools::ui::windows_forms::PluginManager::CreateForm";
 
@@ -484,7 +484,7 @@ ChildForm::Pointer PluginManager::CreateForm (const char* plugin, const char* in
 
   try
   {
-    return impl->application_server->CreateForm (impl->window_system, plugin, init_string);
+    return impl->application_server->CreateForm (impl->window_system, plugin, init_string, dock_state);
   }
   catch (System::Exception^ exception)
   {

@@ -195,7 +195,7 @@ ChildForm::Pointer WindowSystem::CreateChildForm (const char* id, const char* pl
     if (!xtl::xstrcmp (APPLICATION_PLUGIN_NAME, plugin_name))
       form = ChildForm::Create (*this, init_string, dock_state);
     else
-      form = plugin_manager.CreateForm (plugin_name, init_string);
+      form = plugin_manager.CreateForm (plugin_name, init_string, dock_state);
 
     child_forms.Register (id, form);
 

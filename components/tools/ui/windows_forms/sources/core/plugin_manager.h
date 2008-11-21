@@ -27,7 +27,7 @@ class PluginManager: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание формы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ChildForm::Pointer CreateForm (const char* plugin, const char* init_string);
+    ChildForm::Pointer CreateForm (const char* plugin, const char* init_string, FormDockState dock_state);
 
   private:
     typedef msclr::gcroot<ApplicationServerImpl^> ApplicationServerPtr;
