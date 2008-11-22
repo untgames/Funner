@@ -1,7 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := TOOLS.UI.WINDOWS_FORMS.PLUGIN_API TOOLS.UI.WINDOWS_FORMS.SOURCES TOOLS.UI.WINDOWS_FORMS.CONSOLE_PLUGIN \
+TARGETS := TOOLS.UI.WINDOWS_FORMS.PLUGIN_API TOOLS.UI.WINDOWS_FORMS.SOURCES TOOLS.UI.WINDOWS_FORMS.TYPE_CONVERTER_PLUGIN \
+           TOOLS.UI.WINDOWS_FORMS.CONSOLE_PLUGIN \
            TOOLS.UI.WINDOWS_FORMS.PROPERTY_GRID_PLUGIN TOOLS.UI.WINDOWS_FORMS.TESTS
 
 #Цель - Windows forms interface dll
@@ -27,6 +28,15 @@ TOOLS.UI.WINDOWS_FORMS.SOURCES.COMPILER_DEFINES :=
 TOOLS.UI.WINDOWS_FORMS.SOURCES.IMPORTS			    := ../core/compile.static.mak ../../../script/core/compile.static.mak \
                                                    ../../../common/compile.static.mak ../../../system/compile.static.mak
 TOOLS.UI.WINDOWS_FORMS.SOURCES.msvc.COMPILER_CFLAGS := -clr -wd4793 -wd4503
+
+#Цель - C# type converter plugin
+TOOLS.UI.WINDOWS_FORMS.TYPE_CONVERTER_PLUGIN.TYPE             := cs-dynamic-lib
+TOOLS.UI.WINDOWS_FORMS.TYPE_CONVERTER_PLUGIN.NAME             := funner.tools.ui.windows_forms.TypeConverter
+TOOLS.UI.WINDOWS_FORMS.TYPE_CONVERTER_PLUGIN.SOURCE_DIRS      := sources/plugins/type_converter
+TOOLS.UI.WINDOWS_FORMS.TYPE_CONVERTER_PLUGIN.DLL_DIRS         :=
+TOOLS.UI.WINDOWS_FORMS.TYPE_CONVERTER_PLUGIN.DLLS             :=
+TOOLS.UI.WINDOWS_FORMS.TYPE_CONVERTER_PLUGIN.COMPILER_CFLAGS  := 
+TOOLS.UI.WINDOWS_FORMS.TYPE_CONVERTER_PLUGIN.COMPILER_DEFINES := 
 
 #Цель - C# Console plugin
 TOOLS.UI.WINDOWS_FORMS.CONSOLE_PLUGIN.TYPE             := cs-dynamic-lib

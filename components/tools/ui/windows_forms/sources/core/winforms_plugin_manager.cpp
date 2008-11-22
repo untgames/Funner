@@ -410,18 +410,9 @@ void PluginManager::LoadPlugins (const char* wc_mask)
   {
     try
     {
-      common::InputFile plugin_file (iter->name);
+      System::String ^file_path = gcnew System::String (iter->name);
 
-      array<unsigned char>^ raw_assembly = gcnew array<unsigned char> ((int)plugin_file.Size ());
-
-      xtl::uninitialized_storage<unsigned char> plugin_file_content (plugin_file.Size ());
-
-      plugin_file.Read (plugin_file_content.data (), plugin_file_content.size ());
-
-      for (int i = 0; i < (int)plugin_file_content.size (); i++)
-        raw_assembly->SetValue (plugin_file_content.data ()[i], i);
-
-      Assembly^ assembly = Assembly::Load (raw_assembly);
+      Assembly^ assembly = Assembly::LoadFile (file_path);
 
       Type ^plugin_class = assembly->GetType ("tools.ui.windows_forms.Plugin");
 

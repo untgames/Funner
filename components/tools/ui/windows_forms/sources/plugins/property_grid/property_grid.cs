@@ -23,6 +23,11 @@ class Constants
   {
     return "funner.tools.ui.windows_forms.PluginApi.dll";
   }
+  
+  public static System.String TypeConverterDllName ()
+  {
+    return "funner.tools.ui.windows_forms.TypeConverter.dll";
+  }
 };
 
 public class PropertyGridControl: PropertyGrid, IPropertyListener
@@ -67,6 +72,7 @@ public class PropertyGridControl: PropertyGrid, IPropertyListener
 ///События
   public void OnAddProperty (System.String name)
   {
+    Refresh ();
   }
 
   public void OnChangeProperty (System.String name)
@@ -92,6 +98,16 @@ public class UIPropertyGridPlugin: IPlugin
   {
     application_server = in_application_server;
     assembly           = null;
+
+    type_conversion_match = new System.Collections.Hashtable ();
+
+    type_conversion_match.Add ("string",               "ToString");
+    type_conversion_match.Add ("bool",                 "ToBool");
+    type_conversion_match.Add ("int",                  "ToInt");
+    type_conversion_match.Add ("float",                "ToFloat");
+    type_conversion_match.Add ("double",               "ToDouble");
+    type_conversion_match.Add ("System.DateTime",      "ToDateTime");
+    type_conversion_match.Add ("System.Drawing.Color", "ToColor");
   }
 
 ///Создание формы
@@ -135,6 +151,8 @@ public class UIPropertyGridPlugin: IPlugin
     compiler_parameters.CompilerOptions    = "/target:library /optimize /nologo";
 
     compiler_parameters.ReferencedAssemblies.Add ("System.dll");
+    compiler_parameters.ReferencedAssemblies.Add ("System.Drawing.dll");
+    compiler_parameters.ReferencedAssemblies.Add (Application.StartupPath + "\\" + tools.ui.windows_forms.ui_property_grid_plugin.Constants.TypeConverterDllName ());
     compiler_parameters.ReferencedAssemblies.Add (Application.StartupPath + "\\" + tools.ui.windows_forms.ui_property_grid_plugin.Constants.PluginApiDllName ());
 
     Microsoft.CSharp.CSharpCodeProvider     cs_code_provider = new Microsoft.CSharp.CSharpCodeProvider ();    
@@ -148,20 +166,35 @@ public class UIPropertyGridPlugin: IPlugin
     assembly = results.CompiledAssembly;
   }
 
-  private void ParseProperty (XmlNode property, StringWriter writer)
+  public void ParseProperty (XmlNode property, StringWriter writer)
   {
-    XmlNode name_node     = property.Attributes ["Name"];
-    XmlNode var_name_node = property.Attributes ["VarName"];
-    XmlNode category_node = property.Attributes ["Category"];
-    XmlNode tip_node      = property.Attributes ["Tip"];
-    XmlNode title_node    = property.Attributes ["Title"];
-    XmlNode type_node     = property.Attributes ["Type"];
-    
+    XmlNode name_node      = property.Attributes ["Name"];
+    XmlNode var_name_node  = property.Attributes ["VarName"];
+    XmlNode category_node  = property.Attributes ["Category"];
+    XmlNode tip_node       = property.Attributes ["Tip"];
+    XmlNode title_node     = property.Attributes ["Title"];
+    XmlNode type_node      = property.Attributes ["Type"];
+    XmlNode read_only_node = property.Attributes ["ReadOnly"];
+
     if (name_node == null)
       throw new System.Exception ("Invalid 'Property' node, must contain 'Name' attribute");
 
     if (var_name_node == null)
       throw new System.Exception ("Invalid 'Property' node, must contain 'VarName' attribute");
+
+    System.String type = "string";
+
+    if (type_node != null)
+    {
+      if (type_conversion_match.Contains (type_node.InnerText))
+        type = type_node.InnerText;
+      else
+      {
+        string exception_string = "Invalid 'Property' node, unknown attribute 'Type' value: " + type_node.InnerText;
+
+        throw new System.Exception (exception_string);
+      }
+    }
 
     writer.Write ("\tprivate System.String {0}_var_name;\n\n", name_node.InnerText);
 
@@ -169,16 +202,18 @@ public class UIPropertyGridPlugin: IPlugin
     writer.Write ("\t System.ComponentModel.DisplayName (\"{0}\"),\n", (title_node != null) ? title_node.InnerText : name_node.InnerText);
     writer.Write ("\t System.ComponentModel.Category    (\"{0}\")]\n", (category_node != null) ? category_node.InnerText : "Common");
 
-    writer.Write ("\tpublic {0} {1}\n\t{{\n", (type_node != null) ? type_node.InnerText : "string", name_node.InnerText);
+    writer.Write ("\tpublic {0} {1}\n\t{{\n", type, name_node.InnerText);
     
     writer.Write ("\t\tget\n\t\t{\n");
     writer.Write ("\t\t\tif (!application_server.IsPropertyPresent ({0}_var_name))\n", var_name_node.InnerText);
     writer.Write ("\t\t\t\tthrow new System.Exception (\"Variable '\" + {0}_var_name + \"' not found!\");\n", var_name_node.InnerText);
-    writer.Write ("System.String return_value = null;\n");
+    writer.Write ("\t\t\t\tSystem.String return_value = null;\n");
     writer.Write ("\t\t\tapplication_server.GetProperty ({0}_var_name, ref return_value);\n", name_node.InnerText);
-    writer.Write ("\t\t\treturn return_value;\n\t\t}\n");
+    writer.Write ("\t\t\treturn Converter.{0} (return_value);\n\t\t}}\n", type_conversion_match[type]);
 
-    writer.Write ("\t\tset\n\t\t{{\n\t\t\tapplication_server.SetProperty ({0}_var_name, value);\n\t\t}}\n", name_node.InnerText);
+    if ((read_only_node == null) || (read_only_node.InnerText == "0"))
+      writer.Write ("\t\tset\n\t\t{{\n\t\t\tapplication_server.SetProperty ({0}_var_name, Converter.ToString (value));\n\t\t}}\n", name_node.InnerText);
+
     writer.Write ("\t}\n\n");
   }
 
@@ -238,8 +273,9 @@ public class UIPropertyGridPlugin: IPlugin
   }
   
 ///Члены класса
-  private IApplicationServer                                       application_server;
-  private System.Reflection.Assembly                               assembly;
+  private IApplicationServer           application_server;
+  private System.Reflection.Assembly   assembly;
+  private System.Collections.Hashtable type_conversion_match;
 };
 
 public class Plugin
