@@ -30,21 +30,26 @@
     OutputCutTo="196"
   />
   <Plugin Name="PropertyGrid">  <!-- init_string - имя_карты префикс_реестра -->
-    <PropertyMaps>
-      <PropertyMap Name="Map1">
-        <Property Name="IntProperty1" VarName="IntProperty1" Category="Category #1" Title="Property title!" Type="int"/>
-        <Property Name="FloatProperty1" VarName="FloatProperty1" Tip="Property tip" ReadOnly="0" Type="float"/>
-        <Property Name="DoubleProperty1" VarName="DoubleProperty1" Type="double"/>
-        <Property Name="BoolProperty1" VarName="BoolProperty1" Type="bool" ReadOnly="1"/>
-        <Property Name="BoolProperty2" VarName="BoolProperty2" Type="bool"/>
-      </PropertyMap>
+    <ListBox Name="List1">
+      <Item Name="Employee" Value="Employee"/>
+      <Item Name="CEO" Value="Big boss"/>
+      <Item Name="Director" Value="Director"/>
+    </ListBox>
 
-      <PropertyMap Name="Map2" Inherit="Map1">
-        <Property Name="Property5" VarName="Property5" Category="Category #2"/>
-        <Property Name="DateTimeProperty1" VarName="DateTimeProperty1" Type="System.DateTime"/>
-        <Property Name="ColorProperty1" VarName="ColorProperty1" Type="System.Drawing.Color"/>
-        <Property Name="StringProperty1" VarName="StringProperty1"/>
-      </PropertyMap>  
-    </PropertyMaps>
+    <PropertyMap Name="Map1">
+      <Property Name="IntProperty1" VarName="IntProperty1" Category="Category #1" Title="Property title!" Type="int"/>
+      <Property Name="FloatProperty1" VarName="FloatProperty1" Tip="Property tip" ReadOnly="0" Type="float"/>
+      <Property Name="DoubleProperty1" VarName="DoubleProperty1" Type="double"/>
+      <Property Name="BoolProperty1" VarName="BoolProperty1" Type="bool" ReadOnly="1"/>
+      <Property Name="BoolProperty2" VarName="BoolProperty2" Type="bool"/>
+      <Property Name="ListBoxProperty1" VarName="ListBoxProperty1" Type="list" ListBox="List1"/>
+    </PropertyMap>
+
+    <PropertyMap Name="Map2" Inherit="Map1">
+      <Property Name="Property5" VarName="Property5" Category="Category #2"/>
+      <Property Name="DateTimeProperty1" VarName="DateTimeProperty1" Type="System.DateTime"/>
+      <Property Name="ColorProperty1" VarName="ColorProperty1" Type="System.Drawing.Color"/>
+      <Property Name="StringProperty1" VarName="StringProperty1"/>
+    </PropertyMap>  
   </Plugin>
 </UIConfig>
