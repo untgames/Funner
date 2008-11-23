@@ -37,6 +37,7 @@ class Component
       engine::bind_common_var_registry (environment);
       engine::bind_common_signals      (environment);
       engine::bind_common_action_queue (environment);
+      engine::bind_common_timer        (environment);
     }
 };
 
