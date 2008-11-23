@@ -4,6 +4,7 @@
     Константы
 */
 
+const char* RESULTS_DIR     = "screenshots";                 //имя папки результатов
 const char* SCREENSHOT_NAME = "screenshots/screenshot1.tga"; //имя файла, в который будет сохранён образ экрана
 const char* TEXTURE_NAME    = "data/house.tif";              //имя текстуры
 
@@ -99,6 +100,9 @@ int main ()
 
   try
   {
+    if (!common::FileSystem::IsDir (RESULTS_DIR))
+      common::FileSystem::Mkdir (RESULTS_DIR);
+
     Test test;
 
     return test.Run ();
