@@ -11,7 +11,7 @@ namespace
 
 const char* COMPONENT_NAME = "script.binds.LuaOverride";
 const char* BINDER_NAME    = "LuaOverride";
-const char* LOG_NAME       = "script.binds.LuaOverride";
+const char* LOG_NAME       = COMPONENT_NAME;
 
 struct ShellLogHandler
 {
@@ -59,7 +59,7 @@ struct DoFileOverride
     return stack.Size () - initial_stack_size;
   }
 
-  common::Log log;  
+  common::Log log;
 };
 
 /*
