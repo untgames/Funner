@@ -15,7 +15,7 @@ const char* COMPONENT_NAME    = "engine.subsystems.Log"; //имя компонента
 const char* DEFAULT_FILE_NAME = "/io/stdout/log.txt";    //имя файла вывода по умолчанию
 
 /*
-   Подсистема печати лог сообщений в консоль               
+   Подсистема печати лог сообщений в консоль
 */
 
 class LogSubsystem : public ISubsystem, public xtl::reference_counter
@@ -25,8 +25,6 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
     LogSubsystem (common::ParseNode& node)
       : need_flush (false)
     {
-      static const char* METHOD_NAME = "LogSubsystem::LogSubsystem";
-
       ParseNode file_node = node.First ("File");
 
       if (file_node)
@@ -59,7 +57,7 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
             output_file.AddFilter (filter, replacement, sort_order);
           }
         }
-      }    
+      }
 
       ParseNode console_node = node.First ("Console");
 
@@ -88,7 +86,7 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
     {
       Console::Printf ("%s: %s\n", log_name, message);
     }
-    
+
     void FileLogHandler (const char* log_name, const char* message)
     {
       output_file.Print (log_name, message);
@@ -116,7 +114,7 @@ class LogComponent
 {
   public:
     //загрузка компонента
-    LogComponent () 
+    LogComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);
     }
@@ -134,7 +132,7 @@ class LogComponent
       {
         e.touch ("engine::LogComponent::StartupHandler");
         throw;
-      }      
+      }
     }
 };
 
