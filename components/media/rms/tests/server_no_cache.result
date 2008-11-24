@@ -1,0 +1,19 @@
+Results of server_no_cache_test:
+Create groups
+Create binding for group1
+Load resources for group1
+MyServer::LoadResources(3, {resource1, resource2, resource3})
+Create binding for group2
+Prefetch resources for group2
+MyServer::PrefetchResources(2, {resource4, resource5})
+Unload resources for group2
+MyServer::UnloadResources(3, {resource2, resource4, resource5})
+Delete binding for group2
+Delete binding for group1
+MyServer::UnloadResources(2, {resource1, resource3})
+Create binding for group3 = group1 + group2
+Load resources for group3
+MyServer::LoadResources(5, {resource1, resource2, resource3, resource4, resource5})
+Remove server
+MyServer::UnloadResources(5, {resource1, resource2, resource3, resource4, resource5})
+Remove binding for group3

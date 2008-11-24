@@ -1,0 +1,21 @@
+Results of server_cache_test:
+Create groups
+Create binding for group1
+Load resources for group1
+MyServer::LoadResources(4, {resource1, resource2, resource3, resource4})
+Create binding for group2
+Load resources for group2
+MyServer::LoadResources(1, {resource5})
+Delete binding for group2
+Disable cache
+MyServer::UnloadResources(1, {resource5})
+Delete binding for group1
+MyServer::UnloadResources(3, {resource2, resource3, resource4})
+Create binding for group3 = group1 + group2 - 'resource1'
+Enable cache
+Prefetch resources for group3
+MyServer::PrefetchResources(4, {resource3, resource4, resource5, resource6})
+Recreate binding (check cache)
+Remove server
+MyServer::UnloadResources(5, {resource1, resource3, resource4, resource5, resource6})
+Remove binding for group3

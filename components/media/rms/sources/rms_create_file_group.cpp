@@ -17,10 +17,10 @@ static const char* RESOURCE_LIST_FILE_MASK = "*.xreslist"; //шаблон имени файла 
 */
 
 //обработка списка ресурсов
-void process_resource_list (size_t count, const char** list, ResourceGroup& result);
+void process_resource_list (size_t count, const char** list, Group& result);
 
 //обработка файла со списком ресурсов
-void process_resource_list_file (const char* file_name, ResourceGroup& result)
+void process_resource_list_file (const char* file_name, Group& result)
 {
   try
   {
@@ -52,7 +52,7 @@ void process_resource_list_file (const char* file_name, ResourceGroup& result)
 }
 
 //обработка отдельного файла
-void process_file (const char* file_name, ResourceGroup& result)
+void process_file (const char* file_name, Group& result)
 {
   if (!*file_name)
     return;
@@ -68,14 +68,14 @@ void process_file (const char* file_name, ResourceGroup& result)
 }
 
 //обработка wildcard
-void process_wildcard (const char* file_mask, ResourceGroup& result)
+void process_wildcard (const char* file_mask, Group& result)
 {
   for (FileListIterator i=FileSystem::Search (file_mask, FileSearch_Files | FileSearch_Sort); i; ++i)
     process_file (i->name, result);
 }
 
 //обработка списка ресурсов
-void process_resource_list (size_t count, const char** list, ResourceGroup& result)
+void process_resource_list (size_t count, const char** list, Group& result)
 {
   for (size_t i=0; i<count; i++)
   {
@@ -107,11 +107,11 @@ namespace media
 namespace rms
 {
 
-ResourceGroup create_file_group (const char* files)
+Group create_file_group (const char* files)
 {
   try
   {
-    ResourceGroup result;
+    Group result;
 
     add_file_group (files, result);
 
@@ -124,7 +124,7 @@ ResourceGroup create_file_group (const char* files)
   }
 }
 
-void add_file_group (const char* files, ResourceGroup& group)
+void add_file_group (const char* files, Group& group)
 {
   try
   {

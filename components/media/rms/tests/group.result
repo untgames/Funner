@@ -1,4 +1,4 @@
-Results of resource_group_tst:
+Results of group_tst:
 add 'data/group/subfolder/test3.txt'
 add 'data/group/test1.txt'
 add 'data/group/test2.txt'

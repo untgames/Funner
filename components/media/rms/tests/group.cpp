@@ -2,7 +2,7 @@
 
 const char* GROUP_MASK = "data/group/*";
 
-void dump (const char* name, const ResourceGroup& group)
+void dump (const char* name, const Group& group)
 {
   printf ("%s (%u items):\n", name, group.Size ());
   
@@ -22,20 +22,20 @@ void print_on_remove (const char* resource_name)
 
 int main ()
 {
-  printf ("Results of resource_group_tst:\n");
+  printf ("Results of group_tst:\n");
   
   try
   {
-    ResourceGroup group1;
+    Group group1;
     
-    group1.RegisterEventHandler (ResourceGroupEvent_OnAdd, &print_on_add);
-    group1.RegisterEventHandler (ResourceGroupEvent_OnRemove, &print_on_remove);
+    group1.RegisterEventHandler (GroupEvent_OnAdd, &print_on_add);
+    group1.RegisterEventHandler (GroupEvent_OnRemove, &print_on_remove);
     
     add_file_group ("data/group/*", group1);
         
     dump ("group1 initial state", group1);
     
-    ResourceGroup group2;
+    Group group2;
     
     group2.Add ("data/group/test1.txt");
 

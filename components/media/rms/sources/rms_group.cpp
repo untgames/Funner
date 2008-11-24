@@ -10,17 +10,17 @@ using namespace common;
 typedef stl::hash_set<stl::hash_key<const char*> > ResourceSet;
 typedef xtl::signal<void (const char*)>            EventSignal;
 
-struct ResourceGroup::Impl: public xtl::reference_counter
+struct Group::Impl: public xtl::reference_counter
 {
   ResourceSet references;                       //карта ресурсов
   StringArray resources;                        //имена ресурсов
-  EventSignal signals [ResourceGroupEvent_Num]; //сигналы
-  
+  EventSignal signals [GroupEvent_Num]; //сигналы
+
   ~Impl ()
   {
     Clear ();
   }
-  
+
   void Clear ()
   {
       //оповещение об удалении всех ресурсов
@@ -29,7 +29,7 @@ struct ResourceGroup::Impl: public xtl::reference_counter
     {
       try
       {
-        signals [ResourceGroupEvent_OnRemove] (resources [i]);
+        signals [GroupEvent_OnRemove] (resources [i]);
       }
       catch (...)
       {
@@ -48,25 +48,25 @@ struct ResourceGroup::Impl: public xtl::reference_counter
     Конструкторы / деструктор / присваивание
 */
 
-ResourceGroup::ResourceGroup ()
+Group::Group ()
   : impl (new Impl)
 {
 }
 
-ResourceGroup::ResourceGroup (const ResourceGroup& group)
+Group::Group (const Group& group)
   : impl (group.impl)
 {
   addref (impl);
 }
 
-ResourceGroup::~ResourceGroup ()
+Group::~Group ()
 {
   release (impl);
 }
 
-ResourceGroup& ResourceGroup::operator = (const ResourceGroup& group)
+Group& Group::operator = (const Group& group)
 {
-  ResourceGroup (group).Swap (*this);
+  Group (group).Swap (*this);
 
   return *this;  
 }
@@ -76,13 +76,13 @@ ResourceGroup& ResourceGroup::operator = (const ResourceGroup& group)
 */
 
 //пуста ли группа
-bool ResourceGroup::IsEmpty () const
+bool Group::IsEmpty () const
 {
   return impl->resources.IsEmpty ();
 }
 
 //количество элементов в группе
-size_t ResourceGroup::Size () const
+size_t Group::Size () const
 {
   return impl->resources.Size ();
 }
@@ -91,7 +91,7 @@ size_t ResourceGroup::Size () const
     Перебор ресурсов
 */
 
-const char* ResourceGroup::Item (size_t index) const
+const char* Group::Item (size_t index) const
 {
   try
   {
@@ -99,7 +99,7 @@ const char* ResourceGroup::Item (size_t index) const
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("media::rms::ResourceGroup::Item");
+    exception.touch ("media::rms::Group::Item");
     throw;
   }
 }
@@ -108,7 +108,7 @@ const char* ResourceGroup::Item (size_t index) const
     Добавление / удаление ресурсов
 */
 
-void ResourceGroup::Add (const char* name)
+void Group::Add (const char* name)
 {
   try
   {
@@ -136,7 +136,7 @@ void ResourceGroup::Add (const char* name)
 
     try
     {
-      impl->signals [ResourceGroupEvent_OnAdd] (name);
+      impl->signals [GroupEvent_OnAdd] (name);
     }
     catch (...)
     {
@@ -145,12 +145,12 @@ void ResourceGroup::Add (const char* name)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("media::rfx::ResourceGroup::Add(const char*)");
+    exception.touch ("media::rfx::Group::Add(const char*)");
     throw;
   }
 }
 
-void ResourceGroup::Add (const ResourceGroup& group)
+void Group::Add (const Group& group)
 {
   try
   {
@@ -164,12 +164,12 @@ void ResourceGroup::Add (const ResourceGroup& group)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("media::rfx::ResourceGroup::Add(const ResourceGroup&)");
+    exception.touch ("media::rfx::Group::Add(const Group&)");
     throw;
   }
 }
 
-void ResourceGroup::Remove (const char* name)
+void Group::Remove (const char* name)
 {
     //проверка корректности аргументов
 
@@ -194,7 +194,7 @@ void ResourceGroup::Remove (const char* name)
     
   try
   {
-    impl->signals [ResourceGroupEvent_OnRemove] (name);
+    impl->signals [GroupEvent_OnRemove] (name);
   }
   catch (...)
   {
@@ -202,7 +202,7 @@ void ResourceGroup::Remove (const char* name)
   }
 }
 
-void ResourceGroup::Remove (const ResourceGroup& group)
+void Group::Remove (const Group& group)
 {
   try
   {
@@ -219,12 +219,12 @@ void ResourceGroup::Remove (const ResourceGroup& group)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("media::rfx::ResourceGroup::Remove(const ResourceGroup&)");
+    exception.touch ("media::rfx::Group::Remove(const Group&)");
     throw;
   }
 }
 
-void ResourceGroup::Clear ()
+void Group::Clear ()
 {
   impl->Clear ();
 }
@@ -233,10 +233,10 @@ void ResourceGroup::Clear ()
     Подписка на события
 */
 
-xtl::connection ResourceGroup::RegisterEventHandler (ResourceGroupEvent event, const EventHandler& handler)
+xtl::connection Group::RegisterEventHandler (GroupEvent event, const EventHandler& handler) const
 {
-  if (event < 0 || event >= ResourceGroupEvent_Num)
-    throw xtl::make_argument_exception ("media::rms::ResourceGroup::RegisterEventHandler", "event", event);
+  if (event < 0 || event >= GroupEvent_Num)
+    throw xtl::make_argument_exception ("media::rms::Group::RegisterEventHandler", "event", event);
 
   return impl->signals [event].connect (handler);
 }
@@ -245,7 +245,7 @@ xtl::connection ResourceGroup::RegisterEventHandler (ResourceGroupEvent event, c
     Обмен
 */
 
-void ResourceGroup::Swap (ResourceGroup& group)
+void Group::Swap (Group& group)
 {
   stl::swap (impl, group.impl);
 }
@@ -256,7 +256,7 @@ namespace media
 namespace rms
 {
 
-void swap (ResourceGroup& group1, ResourceGroup& group2)
+void swap (Group& group1, Group& group2)
 {
   group1.Swap (group2);
 }
