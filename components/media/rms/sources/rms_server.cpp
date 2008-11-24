@@ -90,7 +90,9 @@ class ServerQuery
       if (names_count == MAX_QUERY_NAMES)
         DoQuery ();
 
-      names [names_count++] = name;
+      names [names_count] = name;
+
+      names_count++;
     }
 
 ///Выполнение запроса
@@ -239,7 +241,7 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
     Описание реализации сервера ресурсов
 */
 
-struct Server::Impl: public IResourceDestroyListener
+struct Server::Impl: public IResourceDestroyListener, public xtl::trackable
 {
   ICustomServer*      server;         //сервер управления ресурсами (ссылка без владения)
   stl::string         name;           //имя сервера
@@ -314,7 +316,7 @@ struct Server::Impl: public IResourceDestroyListener
 ///Сброс неиспользуемых ресурсов
   void FlushUnusedResources ()
   {
-      //работа метода имеет смысл только в случае включенного кэширования не используемых ресурсов
+      //работа метода имеет смысл только в случае включенного кэширования неиспользуемых ресурсов
 
     if (!cache_state)
       return;
@@ -438,11 +440,11 @@ Binding Server::CreateBinding (const Group& group)
     
         //создание группы ресурсов
 
-    for (size_t i=0, count=group.Size (); i<count; i++)
+    for (size_t i=0, group_count=group.Size (); i<group_count; i++)
     {
       const char* resource_name = group.Item (i);
       
-      for (size_t j=0, count=impl->filters.Size (); j<count; j++)
+      for (size_t j=0, filter_count=impl->filters.Size (); j<filter_count; j++)
       {
         const char* filter = impl->filters [j];
         
@@ -557,4 +559,28 @@ bool Server::CacheState () const
 void Server::FlushUnusedResources ()
 {
   impl->FlushUnusedResources ();
+}
+
+/*
+    Получение объекта, оповещающего об удалении сервера
+*/
+
+xtl::trackable& Server::GetTrackable () const
+{
+  return *impl;
+}
+
+namespace media
+{
+
+namespace rms
+{
+
+xtl::trackable& get_trackable (const Server& server)
+{
+  return server.GetTrackable ();
+}
+
+}
+
 }

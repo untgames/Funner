@@ -1,0 +1,11 @@
+Results of server_filters_test:
+Create binding
+Load resources
+MyServer::LoadResources(1, {resource3.bmp})
+Add filters
+Recreate binding
+MyServer::UnloadResources(1, {resource3.bmp})
+Load resources
+MyServer::LoadResources(2, {resource1.xmesh, resource3.bmp})
+Destroy
+MyServer::UnloadResources(2, {resource1.xmesh, resource3.bmp})

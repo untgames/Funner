@@ -1,0 +1,11 @@
+Results of manager_test:
+Attach serversCreate binding
+Load resources
+MyServer1::LoadResources(2, {resource1, resource2})
+MyServer2::LoadResources(2, {resource1, resource2})
+Delete server2
+MyServer2::UnloadResources(2, {resource1, resource2})
+Delete resource manager
+MyServer1::UnloadResources(2, {resource1, resource2})
+Delete binding
+Delete server1

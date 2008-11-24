@@ -1,40 +1,5 @@
 #include "shared.h"
 
-class MyServer: public ICustomServer
-{
-  public:
-    void PrefetchResources (size_t count, const char** resource_names)
-    {
-      Print ("MyServer::PrefetchResources", count, resource_names);
-    }
-    
-    void LoadResources (size_t count, const char** resource_names)
-    {
-      Print ("MyServer::LoadResources", count, resource_names);
-    }
-    
-    void UnloadResources (size_t count, const char** resource_names)
-    {
-      Print ("MyServer::UnloadResources", count, resource_names);
-    }
-    
-  private:
-    void Print (const char* message, size_t count, const char** resource_names)
-    {
-      printf ("%s(%u, {", message, count);
-      
-      for (size_t i=0; i<count; i++)
-      {
-        if (i)
-          printf (", ");
-
-        printf ("%s", resource_names [i]);
-      }
-      
-      printf ("})\n");
-    }        
-};
-
 int main ()
 {
   printf ("Results of server_no_cache_test:\n");
