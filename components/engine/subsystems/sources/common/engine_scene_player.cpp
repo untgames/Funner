@@ -20,7 +20,7 @@ const char* SUBSYSTEM_NAME = "ScenePlayer";                   //имя подсистемы
 const char* COMPONENT_NAME = "engine.subsystems.ScenePlayer"; //имя компонента
 
 /*
-   Подсистема рендера сцены               
+   Подсистема рендера сцены
 */
 
 class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListener<scene_graph::Listener>, public xtl::reference_counter
@@ -28,7 +28,7 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
   public:
 /// Конструктор/деструктор
     ScenePlayerSubsystem (common::ParseNode& node)
-      : attachment (get<const char*> (node, "Attachment")),
+      : attachment (get<const char*> (node, "Listener")),
         sound_manager (get<const char*> (node, "DriverMask", "*"), get<const char*> (node, "DeviceMask", "*"), get<const char*> (node, "InitString", ""))
     {
       scene_player.SetManager (&sound_manager);
@@ -40,7 +40,7 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
     {
       AttachmentRegistry::Detach (this);
     }
-    
+
 ///События установки / удаления слушателя
     void OnRegisterAttachment (const char* attachment_name, scene_graph::Listener& listener)
     {
@@ -76,7 +76,7 @@ class ScenePlayerComponent
 {
   public:
     //загрузка компонента
-    ScenePlayerComponent () 
+    ScenePlayerComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);
     }
@@ -94,7 +94,7 @@ class ScenePlayerComponent
       {
         e.touch ("engine::ScenePlayerComponent::StartupHandler");
         throw;
-      }      
+      }
     }
 };
 
