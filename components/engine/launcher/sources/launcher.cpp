@@ -61,17 +61,17 @@ class Application
       need_print_version = false;
       need_print_help    = false;
     }
-    
+
 ///–азбор параметров командой строки
     void ParseCommandLine (size_t args_count, char* args [])
     {
       for (size_t i=0; i<args_count; i++)
       {
         const char* argument = args [i];
-        
+
         if (!argument)
           continue;
-          
+
         if (!xtl::xstrcmp (argument, KEY_CONFIGURATION))
         {
           configuration_name = argument + xtl::xstrlen (KEY_CONFIGURATION);
@@ -94,27 +94,27 @@ class Application
         }
       }
     }
-    
+
 ///¬ыполнение приложени€
     void Run ()
-    {      
+    {
       manager.Start (configuration_name.c_str ());
 
       if (need_print_version)
         common::Console::Printf ("Application version: %s\n", VERSION);
-      
+
       if (need_print_help)
         for (size_t i = 0, help_strings = sizeof (HELP) / sizeof (HELP[0]); i < help_strings; i++)
           common::Console::Print (HELP[i]);
 
         //запуск основного цикла приложени€
-      
+
       if (has_main_loop)
       {
         syslib::Application::Run ();
       }
     }
-    
+
   private:
     SubsystemManager manager;                    //менеджер подсистем
     bool             has_main_loop;              //есть ли главный цикл приложени€
@@ -129,7 +129,7 @@ class Application
 //точка входа
 int main (int argc, char* argv [])
 {
-  try  
+  try
   {
     Application application;
 

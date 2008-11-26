@@ -20,7 +20,7 @@
       Visible  = "1"
     />  
   </WindowManager>
-  <WindowRenderer Id="MyRenderer" AdapterMask="OpenGL32" DriverMask="*">
+  <WindowRenderer Id="MyRenderer" AdapterMask="*" DriverMask="*">
     <FrameBuffer
       Window       = "MainWindow"
       ColorBits    = "24"
@@ -41,7 +41,7 @@
     >
     <RenderTarget Screen = "Screen1"/>
   </SceneRender>
-  <ScenePlayer Attachment = "Listener1" DriverMask = "*" DeviceMask = "*" InitString = ""/> 
+  <ScenePlayer Listener = "Listener1" DriverMask = "*" DeviceMask = "*" InitString = ""/> 
   <WindowInputDriver>
     <Device Id="Device1" Window="MainWindow"/>
   </WindowInputDriver>

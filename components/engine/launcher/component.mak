@@ -19,7 +19,7 @@ ENGINE.LAUNCHER.SOURCES.IMPORTS          := ../core/compile.static.mak \
                                             ../../common/compile.static.mak ../../common/default_console_handler.link.static.mak \
                                             ../../input/manager/xkeymap.link.static.mak ../../input/manager/xkeyreg.link.static.mak \
                                             ../../input/manager/compile.static.mak \
-                                            ../../render/scene_render/compile.static.mak \
+                                            ../../render/scene_render/compile.static.mak ../../render/scene_render/render2d.link.static.mak \
                                             ../../script/lua/link.static.mak \
                                             ../script_binds/math.link.static.mak   ../script_binds/sg.link.static.mak \
                                             ../script_binds/render.link.static.mak ../script_binds/engine.link.static.mak \
