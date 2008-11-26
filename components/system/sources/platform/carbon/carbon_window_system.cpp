@@ -5,6 +5,8 @@ using namespace syslib;
 namespace
 {
 
+const char* LOG_NAME = "syslib.Platform";
+
 const OSType WINDOW_PROPERTY_CREATOR = 'untg';  //тег приложения
 const OSType FULLSCREEN_PROPERTY_TAG = 'fscr';  //тег свойства полноэкранности
 
@@ -940,12 +942,12 @@ syslib::Point Platform::GetCursorPosition (window_t handle)
 
 void Platform::SetCursorVisible (window_t, bool state)
 {
-  throw xtl::make_not_implemented_exception ("syslib::CarbonPlatform::SetCursorVisible");
+  common::Log (LOG_NAME).Print ("Cursor visibility management not supported on MacOS X");
 }
 
 bool Platform::GetCursorVisible (window_t)
 {
-  xtl::make_not_implemented_exception ("syslib::CarbonPlatform::GetCursorVisible");
+  common::Log (LOG_NAME).Print ("Cursor visibility management not supported on MacOS X");
 
-  return false;
+  return true;
 }
