@@ -13,7 +13,15 @@ using namespace common;
 namespace
 {
 
+/*
+    Константы
+*/
+
 const char* CONSOLE_HANDLERS_MASK = "common.console.*";
+
+/*
+    Реализация консоли
+*/
 
 class ConsoleImpl
 {
@@ -29,22 +37,6 @@ class ConsoleImpl
       try
       {
         signal (message);
-      }
-      catch (...)
-      {
-      }
-    }
-
-    void VPrintf (const char* message, va_list list)
-    {
-      if (!message)
-        throw xtl::make_null_argument_exception ("common::Console::VPrintf", "message");
-
-      LoadConsoleHandlers ();
-
-      try
-      {
-        Print (common::vformat (message, list).c_str ());
       }
       catch (...)
       {
@@ -76,6 +68,8 @@ class ConsoleImpl
 
 typedef Singleton<ConsoleImpl> ConsoleSingleton;
 
+size_t print_lock = false; //консоль заблокирована для печати
+
 }
 
 /*
@@ -84,7 +78,22 @@ typedef Singleton<ConsoleImpl> ConsoleSingleton;
 
 void Console::Print (const char* message)
 {
-  ConsoleSingleton::Instance ().Print (message);
+  if (print_lock)
+    return;
+
+  try
+  {
+    print_lock = true;
+    
+    ConsoleSingleton::Instance ().Print (message);
+    
+    print_lock = false;
+  }
+  catch (...)
+  {
+    print_lock = false;
+    throw;
+  }
 }
 
 void Console::Printf (const char* message, ...)
@@ -97,7 +106,13 @@ void Console::Printf (const char* message, ...)
 
 void Console::VPrintf (const char* message, va_list list)
 {
-  ConsoleSingleton::Instance ().VPrintf (message, list);
+  if (!message)
+    throw xtl::make_null_argument_exception ("common::Console::VPrintf", "message");
+    
+  if (print_lock)
+    return;
+
+  Print (common::vformat (message, list).c_str ());
 }
 
 /*
