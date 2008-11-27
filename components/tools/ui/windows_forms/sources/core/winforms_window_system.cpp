@@ -153,7 +153,7 @@ void WindowSystem::Execute (const char* name, const void* buffer, size_t buffer_
 {
   try
   {        
-    shell.Execute (name, buffer, buffer_size, log_handler);
+    shell.Execute (name, buffer, buffer_size);
   }
   catch (xtl::exception& exception)
   {
@@ -167,7 +167,7 @@ void WindowSystem::Execute (const char* command)
 {
   try
   {
-    shell.Execute (command, log_handler);
+    shell.Execute (command);
   }
   catch (xtl::exception& exception)
   {
