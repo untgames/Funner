@@ -27,15 +27,6 @@
 using namespace script;
 using namespace math;
 
-/*
-    Отладочное протоколирование
-*/
-
-inline void log_print (const char* message)
-{
-  printf ("%s\n", message);
-}
-
 inline void print (float x)
 {
   printf ("%g", x);
@@ -71,7 +62,7 @@ void load_script (IInterpreter& interpreter, const char* file_name)
 
   file.Read (&buffer [0], buffer.size ());        
 
-  interpreter.DoCommands (file_name, buffer.c_str (), buffer.size (), &log_print);    
+  interpreter.DoCommands (file_name, buffer.c_str (), buffer.size ());
 }
 
 #endif

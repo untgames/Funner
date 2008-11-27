@@ -46,7 +46,8 @@ void bind_input_globals (Environment& environment)
 {
   InvokerRegistry& lib = environment.Library (INPUT_LIBRARY);
 
-  lib.Register ("CreateEventHandler", make_callback_invoker<void (const char*)> ());
+  lib.Register ("CreateEventHandler", make_invoker (make_callback_invoker<void (const char*)> (),
+                                                    make_shell_callback_invoker ()));
 }
 
 /*

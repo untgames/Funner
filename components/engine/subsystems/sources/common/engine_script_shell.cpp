@@ -18,34 +18,17 @@ namespace
 
 const char* SUBSYSTEM_NAME = "Shell";                   //имя подсистемы
 const char* COMPONENT_NAME = "engine.subsystems.Shell"; //имя компонента
-const char* LOG_NAME       = COMPONENT_NAME;            //имя потока протоколирования
 
 /*
     Подсистема скриптового интерпретатора
 */
-
-struct ShellLogHandler
-{
-  ShellLogHandler (Log& in_log) : log (in_log), was_error (false) {}
-
-  void operator () (const char* message)
-  {
-    was_error = true;
-
-    log.Print (message);
-  }
-
-  Log& log;
-  bool was_error;
-};
 
 class ShellSubsystem : public ISubsystem, public xtl::reference_counter
 {
   public:
 /// Конструктор/деструктор
     ShellSubsystem (common::ParseNode& node)
-      : log (COMPONENT_NAME),
-        environment (new Environment)
+      : environment (new Environment)
     {
       static const char* METHOD_NAME = "engine::subsystems::ShellSubsystem::ShellSubsystem";
         
@@ -54,17 +37,13 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
       const char *interpreter = get<const char*> (node, "Interpreter"),
                  *libraries   = get<const char*> (node, "Libraries", ""),
                  *sources     = get<const char*> (node, "Sources"),
-                 *command     = get<const char*> (node, "Execute", ""),
-                 *log_name    = get<const char*> (node, "Log", "");
+                 *command     = get<const char*> (node, "Execute", "");
 
       StringArray lib_list = split (libraries),
                   src_list = split (sources);
 
         //установка потока протоколирования
 
-      if (*log_name)
-        Log (log_name).Swap (log);
-        
         //загрузка библиотек
         
       for (size_t i=0; i<lib_list.Size (); i++)
@@ -76,25 +55,13 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
 
         //загрузка и исполнение исходных файлов
 
-      ShellLogHandler shell_log_handler (log);
-
-      Shell::LogFunction log_handler (xtl::ref (shell_log_handler));
-
       for (size_t i=0; i<src_list.Size (); i++)
-      {
-        shell.ExecuteFileList (src_list [i], log_handler);
-
-        if (shell_log_handler.was_error)
-          throw xtl::format_operation_exception (METHOD_NAME, "Lua exception while executing file list '%s'", src_list[i]);
-      }  
+        shell.ExecuteFileList (src_list [i]);
 
         //исполнение команды
         
       if (*command)
-        shell.Execute (command, log_handler);
-
-      if (shell_log_handler.was_error)
-        throw xtl::format_operation_exception (METHOD_NAME, "Lua exception while executing command '%s'", command);
+        shell.Execute (command);
     }
 
 /// Подсчёт ссылок
@@ -105,7 +72,6 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
     typedef Shell::EnvironmentPtr EnvironmentPtr;
 
   private:
-    Log            log;         //протокол подсистемы
     EnvironmentPtr environment; //скриптовое окружение
     Shell          shell;       //скриптовый интерпретатор
 };

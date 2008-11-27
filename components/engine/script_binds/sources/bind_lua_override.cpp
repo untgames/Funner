@@ -11,22 +11,6 @@ namespace
 
 const char* COMPONENT_NAME = "script.binds.LuaOverride";
 const char* BINDER_NAME    = "LuaOverride";
-const char* LOG_NAME       = COMPONENT_NAME;
-
-struct ShellLogHandler
-{
-  ShellLogHandler (common::Log& in_log) : log (in_log), was_error (false) {}
-
-  void operator () (const char* message)
-  {
-    was_error = true;
-
-    log.Print (message);
-  }
-
-  common::Log& log;
-  bool         was_error;
-};
 
 void print_override (const char* message)
 {
@@ -35,8 +19,6 @@ void print_override (const char* message)
 
 struct DoFileOverride
 {
-  DoFileOverride () : log (LOG_NAME) {}
-
   size_t operator () (IStack& stack)
   {
     size_t initial_stack_size = stack.Size ();
@@ -49,17 +31,10 @@ struct DoFileOverride
 
     input_file.Read (file_content.data (), file_content.size ());
 
-    ShellLogHandler log_handler (log);
-
-    stack.Interpreter ().DoCommands (file_name, file_content.data (), file_content.size (), xtl::ref (log_handler));
-
-    if (log_handler.was_error)
-      throw xtl::format_operation_exception ("script::binds::LuaOverride::do_file", "Lua exception while dofile '%s'", file_name);
+    stack.Interpreter ().DoCommands (file_name, file_content.data (), file_content.size ());
 
     return stack.Size () - initial_stack_size;
   }
-
-  common::Log log;
 };
 
 /*
