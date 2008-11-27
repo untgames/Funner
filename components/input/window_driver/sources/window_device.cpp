@@ -353,18 +353,18 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
       signals (message);
       break;
     case WindowEvent_OnKeyDown:
-      if (pressed_keys[window_event_context.key_scan_code])
-        xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' repeat", get_key_scan_name (window_event_context.key_scan_code));
+      if (pressed_keys[window_event_context.key])
+        xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' repeat", get_key_name (window_event_context.key));
       else
       {
-        xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' down", get_key_scan_name (window_event_context.key_scan_code));
-        pressed_keys.set (window_event_context.key_scan_code);
+        xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' down", get_key_name (window_event_context.key));
+        pressed_keys.set (window_event_context.key);
       }
       signals (message);
       break;
     case WindowEvent_OnKeyUp:
-      pressed_keys.reset (window_event_context.key_scan_code);
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' up", get_key_scan_name (window_event_context.key_scan_code));
+      pressed_keys.reset (window_event_context.key);
+      xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' up", get_key_name (window_event_context.key));
       signals (message);
       break;
     case WindowEvent_OnChar:

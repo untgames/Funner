@@ -72,17 +72,17 @@ class Device: virtual public input::low_level::IDevice, public xtl::reference_co
     const char* GetProperties ();
     void        SetProperty   (const char* name, float value);
     float       GetProperty   (const char* name);
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddRef () { addref (this); }  
+    void AddRef () { addref (this); }
     void Release () { release (this); }
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработчик сообщений окна
-///////////////////////////////////////////////////////////////////////////////////////////////////    
+///////////////////////////////////////////////////////////////////////////////////////////////////
     void WindowEventHandler (syslib::Window& window, syslib::WindowEvent event, const syslib::WindowEventContext& window_event_context);
 
   private:
@@ -93,18 +93,18 @@ class Device: virtual public input::low_level::IDevice, public xtl::reference_co
     typedef xtl::signal<void (const char*)> DeviceSignal;
 
   private:
-    stl::string                       name;                         //имя устройства
-    stl::string                       full_name;                    //полное имя устройства
-    stl::string                       properties;                   //настройки
-    DeviceSignal                      signals;                      //обработчики событий
-    size_t                            x_cursor_pos;                 //последние координаты курсора
-    size_t                            y_cursor_pos;                 //последние координаты курсора
-    bool                              autocenter_cursor;            //автоматическое центрирование курсора
-    float                             cursor_sensitivity;           //множитель delt'ы курсора
-    float                             vertical_wheel_sensitivity;   //множитель delt'ы вертикального колеса мыши
-    float                             horisontal_wheel_sensitivity; //множитель delt'ы горизонтального колеса мыши
-    stl::bitset<syslib::ScanCode_Num> pressed_keys;                 //какие кнопки являются нажатыми
-    stl::wstring                      control_name;                 //имя контрола
+    stl::string                  name;                         //имя устройства
+    stl::string                  full_name;                    //полное имя устройства
+    stl::string                  properties;                   //настройки
+    DeviceSignal                 signals;                      //обработчики событий
+    size_t                       x_cursor_pos;                 //последние координаты курсора
+    size_t                       y_cursor_pos;                 //последние координаты курсора
+    bool                         autocenter_cursor;            //автоматическое центрирование курсора
+    float                        cursor_sensitivity;           //множитель delt'ы курсора
+    float                        vertical_wheel_sensitivity;   //множитель delt'ы вертикального колеса мыши
+    float                        horisontal_wheel_sensitivity; //множитель delt'ы горизонтального колеса мыши
+    stl::bitset<syslib::Key_Num> pressed_keys;                 //какие кнопки являются нажатыми
+    stl::wstring                 control_name;                 //имя контрола
 };
 
 }
