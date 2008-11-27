@@ -12,6 +12,10 @@
 using namespace engine;
 using namespace common;
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
+
 namespace
 {
 
@@ -44,6 +48,9 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     {
       try
       {
+        resource_server.SetFilters (get<const char*> (node, "ResourceMask", "*"));
+        resource_server.SetCacheState (get<bool> (node, "CacheState", true));
+
         render.SetMaxDrawDepth (get<size_t> (node, "MaxDrawDepth", render.MaxDrawDepth ()));
 
         const char* log_name = get<const char*> (node, "Log", "");

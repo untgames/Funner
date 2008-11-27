@@ -9,6 +9,10 @@
 using namespace engine;
 using namespace common;
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
+
 namespace
 {
 
