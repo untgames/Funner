@@ -35,13 +35,27 @@
     />
   </WindowRenderer>
   <SceneRender
-    DriverMask   = "*"
-    RendererMask = "MyRenderer"
-    Log          = "render.scene_render"
+    DriverMask      = "*"
+    RendererMask    = "MyRenderer"
+    Log             = "render.scene_render"
+    ResourceManager = "ResourceManager1"
+    ResourceMask    = "*xmtl"
+    CacheState      = "1"
     >
-    <RenderTarget Screen = "Screen1"/>
+    <RenderTarget 
+      Screen     = "Screen1"
+      IdleRender = "1"
+      />
   </SceneRender>
-  <ScenePlayer Listener = "Listener1" DriverMask = "*" DeviceMask = "*" InitString = ""/> 
+  <ScenePlayer 
+    Listener        = "Listener1"
+    DriverMask      = "*"
+    DeviceMask      = "*"
+    InitString      = ""
+    ResourceManager = "ResourceManager1"
+    ResourceMask    = "*snddecl"
+    CacheState      = "1"
+    /> 
   <WindowInputDriver>
     <Device Id="Device1" Window="MainWindow"/>
   </WindowInputDriver>

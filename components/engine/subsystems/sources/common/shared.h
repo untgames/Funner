@@ -20,4 +20,7 @@
 #include <engine/attachments.h>
 #include <engine/subsystem_manager.h>
 
+#include <media/rms/manager.h>
+#include <media/rms/server.h>
+
 #endif

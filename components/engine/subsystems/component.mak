@@ -15,7 +15,7 @@ ENGINE.SUBSYSTEMS.SOURCES.COMPILER_DEFINES  :=
 ENGINE.SUBSYSTEMS.SOURCES.IMPORTS           := ../core/compile.static.mak ../../render/scene_render/compile.static.mak \
                                                ../../input/manager/compile.static.mak ../../input/low_level/compile.static.mak \
                                                ../../sound/scene_player/compile.static.mak ../../system/compile.static.mak \
-                                               ../../script/core/compile.static.mak
+                                               ../../script/core/compile.static.mak ../../media/rms/compile.static.mak
 ENGINE.SUBSYSTEMS.SOURCES.has_windows.IMPORTS     := ../../input/window_driver/compile.static.mak ../../render/mid_level_window_driver/compile.static.mak
 ENGINE.SUBSYSTEMS.SOURCES.has_windows.SOURCE_DIRS := sources/window_manager
 
@@ -35,7 +35,8 @@ ENGINE.SUBSYSTEMS.TESTS.IMPORTS             := ../core/compile.static.mak ../../
                                                ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
                                                ../../script/lua/link.static.mak ../script_binds/math.link.static.mak ../script_binds/sg.link.static.mak \
                                                ../script_binds/render.link.static.mak ../script_binds/engine.link.static.mak \
-                                               ../script_binds/input.link.static.mak ../script_binds/system.link.static.mak
+                                               ../script_binds/input.link.static.mak ../script_binds/system.link.static.mak \
+                                                ../../media/rms/link.static.mak
 ENGINE.SUBSYSTEMS.TESTS.has_windows.IMPORTS := ../../render/opengl_driver/link.static.mak window_input_driver.link.static.mak \
                                                window_manager.link.static.mak window_renderer.link.static.mak
 ENGINE.SUBSYSTEMS.TESTS.win32.IMPORTS       := ../../input/direct_input_driver/link.static.mak

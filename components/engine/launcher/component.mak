@@ -17,14 +17,18 @@ ENGINE.LAUNCHER.SOURCES.msvc.LINK_FLAGS  := -subsystem:windows -entry:mainCRTSta
 ENGINE.LAUNCHER.SOURCES.COMPILER_DEFINES := LAUNCHER_VERSION='$(LAUNCHER_VERSION_STRING)'
 ENGINE.LAUNCHER.SOURCES.IMPORTS          := ../core/compile.static.mak \
                                             ../../common/compile.static.mak ../../common/default_console_handler.link.static.mak \
+                                            ../../media/rms/link.static.mak ../../media/rfx/xmtl.link.static.mak \
+                                            ../../media/sound/snddecl.link.static.mak ../../media/sound/default_decoders.link.static.mak \
+                                            ../../media/font/xfont.link.static.mak \
                                             ../../input/manager/xkeymap.link.static.mak ../../input/manager/xkeyreg.link.static.mak \
-                                            ../../input/manager/compile.static.mak \
+                                            ../../input/manager/compile.static.mak ../../input/window_driver/link.static.mak \
                                             ../../render/scene_render/compile.static.mak ../../render/scene_render/render2d.link.static.mak \
                                             ../../script/lua/link.static.mak \
                                             ../script_binds/math.link.static.mak   ../script_binds/sg.link.static.mak \
                                             ../script_binds/render.link.static.mak ../script_binds/engine.link.static.mak \
                                             ../script_binds/input.link.static.mak  ../script_binds/lua_override.link.static.mak \
                                             ../script_binds/system.link.static.mak ../script_binds/common.link.static.mak \
+                                            ../script_binds/rms.link.static.mak \
                                             ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
                                             ../subsystems/scene_render.link.static.mak ../subsystems/scene_player.link.static.mak \
                                             ../subsystems/input_manager.link.static.mak ../subsystems/shell.link.static.mak \
