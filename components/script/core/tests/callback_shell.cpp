@@ -2,26 +2,25 @@
 
 int main ()
 {
-  printf ("Results of callback_test:\n");
+  printf ("Results of callback_shell_test:\n");
 
   try
   {
-    Invoker f1 = make_callback_invoker<const char* (int, float, const char*)> ();
+    Invoker f1 = make_shell_callback_invoker ();
 
     MyInterpreter interpreter;
 
-    typedef xtl::function<const char* (int, float, const char*)> my_fn;
+    typedef xtl::function<void (const char*)> my_fn;
 
     interpreter.Stack ().PushSymbol ("dummy");
-    interpreter.Stack ().Push ("my_callback");
     
     f1 (interpreter.Stack ());
 
     my_fn f2 = xtl::any_multicast<my_fn> (interpreter.Stack ().GetVariant (interpreter.Stack ().Size () - 1));
-    
+
     printf ("call f2\n");
-    
-    printf ("  result: '%s'\n", f2 (2, 3.14f, "Hello world"));
+
+    f2 ("Hello world");    
   }
   catch (std::exception& exception)
   {

@@ -25,9 +25,8 @@ class Environment;
 class Shell
 {
   public:
-    typedef xtl::shared_ptr<Environment>      EnvironmentPtr;
-    typedef xtl::com_ptr<IInterpreter>        InterpeterPtr;
-    typedef xtl::function<void (const char*)> LogFunction;    
+    typedef xtl::shared_ptr<Environment> EnvironmentPtr;
+    typedef xtl::com_ptr<IInterpreter>   InterpeterPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
@@ -60,22 +59,15 @@ class Shell
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выполнение команд
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Execute (const char*        buffer_name,     //имя буфера команд
-                  const void*        buffer,          //буфер с командами
-                  size_t             buffer_size,     //размер буфера
-                  const LogFunction& log);            //функция протоколирования ошибок интерпретации
-    void Execute (const char*        buffer_name,     //имя буфера команд
-                  const void*        buffer,          //буфер с командами
-                  size_t             buffer_size);    //размер буфера
-    void Execute (const char* command, const LogFunction& log);
+    void Execute (const char* buffer_name,  //имя буфера команд
+                  const void* buffer,       //буфер с командами
+                  size_t      buffer_size); //размер буфера
     void Execute (const char* command);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выполнение команд, расположенных в файле / файлах
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ExecuteFile     (const char* file_name, const LogFunction& log);
     void ExecuteFile     (const char* file_name);
-    void ExecuteFileList (const char* file_mask, const LogFunction& log);
     void ExecuteFileList (const char* file_mask);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,7 +76,7 @@ class Shell
     void Swap (Shell&);
     
   private:
-    void ExecuteImpl (const char* buffer_name, const void* buffer, size_t buffer_size, const LogFunction& log);
+    void ExecuteImpl (const char* buffer_name, const void* buffer, size_t buffer_size);
 
   private:
     InterpeterPtr interpreter;

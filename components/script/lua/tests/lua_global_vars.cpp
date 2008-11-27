@@ -42,11 +42,6 @@ void set_hard_value (const A& a)
   printf ("set hard value: %d\n", a.id);
 }
 
-void log_function (const char* s)
-{
-  printf ("%s\n", s);
-}
-
 int main ()
 {
   try
@@ -73,7 +68,7 @@ int main ()
     var_registry.Register  ("set_HardValue", make_invoker (&set_hard_value));    
     var_registry.Register  ("get_HardValue", make_invoker (&get_hard_value));
 
-    interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f), log_function);
+    interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f));
 
     printf ("invoke\n");
 

@@ -152,50 +152,33 @@ bool Interpreter::HasFunction (const char* name)
 namespace
 {
 
-//функция протоколирования по умолчанию
-void log_function (const char*)
+//получение сообщения об ошибке
+void raise_error (lua_State* state, const char* source)
 {
+  try
+  {
+    const char* reason = lua_tostring (state, -1);
+
+    throw xtl::format_exception<RuntimeException> (source, "%s", reason ? reason : "internal error");
+  }
+  catch (...)
+  {
+    lua_pop (state, 1);
+    throw;
+  }
 }
 
 }
 
-void Interpreter::DoCommands (const char* buffer_name, const void* buffer, size_t buffer_size, const LogFunction& log)
+void Interpreter::DoCommands (const char* buffer_name, const void* buffer, size_t buffer_size)
 {
     //загружаем буфер команд в контекст луа
 
   if (luaL_loadbuffer (state, (const char*)buffer, buffer_size, buffer_name))
-  {
-    try
-    {
-      log (lua_tostring (state, -1));        
-    }
-    catch (...)
-    {
-      //подавляем все исключения
-    }
-
-      //выталкиваем сообщение об ошибке из стека 
-
-    lua_pop (state, 1);
-
-    return;
-  }
+    raise_error (state, "script::Interpreter::DoCommands[compile]");
 
   if (lua_pcall (state, 0, LUA_MULTRET, 0))
-  {
-    try
-    {
-      log (lua_tostring (state, -1));
-    }
-    catch (...)
-    {
-      //подавляем все исключения
-    }
-    
-      //выталкиваем из стека сообщение об ошибке
-      
-    lua_pop (state, 1);
-  }
+    raise_error (state, "script::Interpreter::DoCommands[execute]");
 }
 
 /*
@@ -207,20 +190,7 @@ void Interpreter::Invoke (size_t arguments_count, size_t results_count)
     //возможно проще использовать call???
 
   if (lua_pcall (state, arguments_count, results_count, 0))
-  {
-      //формируем сообщение об ошибке
-    
-    const char* reason    = lua_tostring (state, -1);
-    stl::string error_msg = reason ? reason : "internal error";
-
-      //выталкиваем из стека сообщение об ошибке
-
-    lua_pop (state, 1);
-
-      //возбуждаем исключение
-
-    throw xtl::format_exception<RuntimeException> ("script::lua::Interpreter::Invoke", "%s", error_msg.c_str ());    
-  }
+    raise_error (state, "script::lua::Interpreter::Invoke");
 }
 
 /*

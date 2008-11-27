@@ -1,3 +1,4 @@
+Results of callback_test:
 call f2
 invoke 'my_callback'
   arg1: '2'

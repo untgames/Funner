@@ -1,0 +1,3 @@
+Results of callback_shell_test:
+call f2
+MyInterpreter::DoCommands(Hello world,'Hello world')

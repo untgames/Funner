@@ -205,16 +205,7 @@ bool Shell::HasFunction (const char* name) const
     Выполнение команд
 */
 
-namespace
-{
-
-void dummy_log (const char*)
-{
-}
-
-}
-
-void Shell::ExecuteImpl (const char* buffer_name, const void* buffer, size_t buffer_size, const LogFunction& log)
+void Shell::ExecuteImpl (const char* buffer_name, const void* buffer, size_t buffer_size)
 {
   static const char* METHOD_NAME = "script::Shell::ExecuteImpl";
 
@@ -230,45 +221,35 @@ void Shell::ExecuteImpl (const char* buffer_name, const void* buffer, size_t buf
   if (!buffer)
     throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
     
-  interpreter->DoCommands (buffer_name, buffer, buffer_size, log);
-}
-
-void Shell::Execute (const char* buffer_name, const void* buffer, size_t buffer_size, const LogFunction& log)
-{
-  ExecuteImpl (buffer_name, buffer, buffer_size, log);
+  interpreter->DoCommands (buffer_name, buffer, buffer_size);
 }
 
 void Shell::Execute (const char* buffer_name, const void* buffer, size_t buffer_size)
 {
-  ExecuteImpl (buffer_name, buffer, buffer_size, &dummy_log);
-}
-
-void Shell::Execute (const char* command, const LogFunction& log)
-{
-  if (!command)
-    throw xtl::make_null_argument_exception ("script::Shell::Execute", "command");
-    
-  ExecuteImpl (command, command, strlen (command), log);
+  ExecuteImpl (buffer_name, buffer, buffer_size);
 }
 
 void Shell::Execute (const char* command)
 {
-  Execute (command, &dummy_log);  
+  if (!command)
+    throw xtl::make_null_argument_exception ("script::Shell::Execute", "command");
+    
+  ExecuteImpl (command, command, strlen (command));
 }
 
 /*
     Выполнение команд, расположенных в файле / файлах
 */
 
-void Shell::ExecuteFile (const char* file_name, const LogFunction& log)
+void Shell::ExecuteFile (const char* file_name)
 {
   try
   {
     stl::string buffer;
-  
+
     common::FileSystem::LoadTextFile (file_name, buffer);
-  
-    ExecuteImpl (file_name, buffer.c_str (), buffer.size (), log);
+
+    ExecuteImpl (file_name, buffer.c_str (), buffer.size ());
   }
   catch (xtl::exception& exception)
   {
@@ -277,30 +258,20 @@ void Shell::ExecuteFile (const char* file_name, const LogFunction& log)
   }
 }
 
-void Shell::ExecuteFile (const char* file_name)
-{
-  ExecuteFile (file_name, &dummy_log);
-}
-
-void Shell::ExecuteFileList (const char* file_mask, const LogFunction& log)
+void Shell::ExecuteFileList (const char* file_mask)
 {
   try
   {
     using namespace common;
     
     for (FileListIterator i = FileSystem::Search (file_mask, FileSearch_Files | FileSearch_Sort); i; ++i)
-      ExecuteFile (i->name, log);
+      ExecuteFile (i->name);
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("script::Shell::ExecuteFileList");
     throw;
   }
-}
-
-void Shell::ExecuteFileList (const char* file_mask)
-{
-  ExecuteFileList (file_mask, &dummy_log);
 }
 
 /*

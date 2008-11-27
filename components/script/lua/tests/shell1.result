@@ -4,11 +4,17 @@ Printed by LUA
 Printed by LUA
 Printed by LUA
 shell interpreter name is 'Lua 5.1.3'
-log message: '[string "lua_bad_code"]:2: '=' expected near 'salhdf''
+[string "lua_bad_code"]:2: '=' expected near 'salhdf'
+    at script::Interpreter::DoCommands[compile]
 shell has function 'f' - 'n'
 shell has function 'f' - 'y'
 executing command with this text as arg
-log message: '[string "data/shell_test2.lua"]:2: '=' expected near '<eof>''
-log message: '[string "data/shell_test2.lua"]:2: '=' expected near '<eof>''
+[string "data/shell_test2.lua"]:2: '=' expected near '<eof>'
+    at script::Interpreter::DoCommands[compile]
+    at script::Shell::ExecuteFile
+[string "data/shell_test2.lua"]:2: '=' expected near '<eof>'
+    at script::Interpreter::DoCommands[compile]
+    at script::Shell::ExecuteFile
+    at script::Shell::ExecuteFileList
 this printed from file 'shell_list_test1'
 this printed from file 'shell_list_test2'

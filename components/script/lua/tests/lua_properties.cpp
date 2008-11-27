@@ -35,11 +35,6 @@ int set_id (A& a, int id)
   return a.id = id;
 }
 
-void log_function (const char* s)
-{
-  printf ("%s\n", s);
-}
-
 int main ()
 {
   try
@@ -59,7 +54,7 @@ int main ()
     registry.Register ("get_id", make_invoker (&get_id));
     registry.Register ("set_id", make_invoker (&set_id));
     
-    interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f), log_function);
+    interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f));
 
     printf ("invoke result: %d\n", invoke<int> (*interpreter, "test1", A (4)));
     

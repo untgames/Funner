@@ -9,11 +9,6 @@ void hello_func ()
   printf ("Hello world!\n");
 }
 
-void log_function (const char* msg)
-{
-  printf ("%s\n", msg);
-}
-
 int main ()
 {
   try
@@ -40,7 +35,7 @@ int main ()
 
     printf ("Interpreter has function 'f1': %d\n", interpreter->HasFunction ("f1"));
 
-    interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f), log_function);
+    interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f));
 
     printf ("Interpreter has function 'f': %d\n", interpreter->HasFunction ("f"));
 

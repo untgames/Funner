@@ -12,11 +12,6 @@ const char* lua_f =
 "end\n"
 ;
 
-void log_function (const char* s)
-{
-  printf ("%s\n", s);
-}
-
 int main ()
 {
   try
@@ -38,7 +33,7 @@ int main ()
 
       registry.Register ("EventHandler", make_callback_invoker<const char* (int)> ());
 
-      interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f), log_function);
+      interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f));
 
       typedef xtl::function<const char* (int)> my_fn;
 

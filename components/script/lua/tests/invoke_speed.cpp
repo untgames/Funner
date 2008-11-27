@@ -23,11 +23,6 @@ int my_add (const A& object1, const A& object2)
   return object1.id + object2.id;
 }
 
-void log_function (const char* s)
-{
-  printf ("%s\n", s);
-}
-
 int main ()
 {
   try
@@ -46,7 +41,7 @@ int main ()
     registry.Register ("__add", make_invoker (&my_add));
     env->RegisterType (typeid (A), "my_library");
 
-    interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f), log_function);
+    interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f));
 
     A value (4);
 

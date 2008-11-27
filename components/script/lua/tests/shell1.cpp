@@ -11,11 +11,6 @@ const char* file_list_mask     = "data/shell_list_test*.lua";
 
 using namespace script;
 
-void log_function (const char* s)
-{
-  printf ("log message: '%s'\n", s);
-}
-
 int main ()
 {
   try
@@ -36,16 +31,22 @@ int main ()
 
     shell.SetInterpreter ("lua", env);
 
-    shell.Execute (lua_print_name, lua_print, strlen (lua_print), &log_function);
+    shell.Execute (lua_print_name, lua_print, strlen (lua_print));
 
     shell.SetInterpreter (shell.Interpreter ());
 
-    shell.Interpreter ()->DoCommands (lua_print_name, lua_print, strlen (lua_print), &log_function);
+    shell.Interpreter ()->DoCommands (lua_print_name, lua_print, strlen (lua_print));
 
     printf ("shell interpreter name is '%s'\n", shell.InterpreterName ());
 
-    shell.Execute (lua_bad_code_name, lua_bad_code, strlen (lua_bad_code));
-    shell.Execute (lua_bad_code_name, lua_bad_code, strlen (lua_bad_code), &log_function);
+    try
+    {
+      shell.Execute (lua_bad_code_name, lua_bad_code, strlen (lua_bad_code));
+    }
+    catch (std::exception& exception)
+    {
+      printf ("%s\n", exception.what ());
+    }
 
     printf ("shell has function 'f' - '%c'\n", shell.HasFunction ("f") ? 'y' : 'n');
 
@@ -55,8 +56,23 @@ int main ()
 
     shell.Execute ("f (\"executing command with this text as arg\")");
 
-    shell.ExecuteFile (bad_test_file_name, &log_function);
-    shell.ExecuteFileList (bad_test_file_name, &log_function);
+    try
+    {
+      shell.ExecuteFile (bad_test_file_name);
+    }
+    catch (std::exception& exception)
+    {
+      printf ("%s\n", exception.what ());
+    }
+    
+    try
+    {
+      shell.ExecuteFileList (bad_test_file_name);
+    }
+    catch (std::exception& exception)
+    {
+      printf ("%s\n", exception.what ());
+    }
 
     shell.ExecuteFileList (file_list_mask);
   }

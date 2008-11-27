@@ -25,11 +25,6 @@ Ptr f ()
   return Ptr ();
 }
 
-void log_function (const char* s)
-{
-  printf ("%s\n", s);
-}
-
 int main ()
 {
   try
@@ -46,7 +41,7 @@ int main ()
 
     registry.Register ("f", make_invoker (&f));
 
-    interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f), log_function);
+    interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f));
 
     printf ("invoke\n");
 

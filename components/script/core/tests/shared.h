@@ -114,9 +114,9 @@ class MyInterpreter: public IInterpreter, public xtl::trackable
     const char* Name () { return "MyInterpreter"; }
     IStack&     Stack () { return stack; }
 
-    void DoCommands (const char*, const void*, size_t, const LogFunction&)
+    void DoCommands (const char* name, const void* buffer, size_t buffer_size)
     {
-      throw xtl::make_not_implemented_exception ("MyInterpreter::DoCommands");
+      printf ("MyInterpreter::DoCommands(%s,'%s')\n", name, stl::string ((char*)buffer, buffer_size).c_str ());
     }
 
     bool HasFunction (const char*) { return true; }
