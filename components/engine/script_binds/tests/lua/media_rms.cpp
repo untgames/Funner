@@ -1,10 +1,17 @@
 #include "shared.h"
 
-const char* SCRIPT_FILE_NAME = "data/engine.lua";
+const char* SCRIPT_FILE_NAME = "data/media_rms.lua";
+
+void console_handler (const char* message)
+{
+  printf ("%s", message);
+}
 
 int main ()
 {
-  printf ("Results of engine_test:\n");
+  common::Console::RegisterEventHandler (&console_handler);
+
+  printf ("Results of media_rms_test:\n");
 
   try
   {
@@ -14,15 +21,9 @@ int main ()
 
     xtl::com_ptr<IInterpreter> script (shell.Interpreter ());
 
-    env->BindLibraries ("Engine");
-    env->BindLibraries ("SceneGraph");
-    env->BindLibraries ("Render");
-    env->BindLibraries ("Input");
     env->BindLibraries ("Media");
 
     load_script (*script, SCRIPT_FILE_NAME);
-
-    printf ("Test library:\n");
 
     invoke<void> (*script, "test");
   }

@@ -1,0 +1,18 @@
+Results of media_rms_test:
+Is group empty = true
+Group size = 0
+Is group empty = false
+Group size = 1
+Is group2 empty = false
+Group2 size = 1
+Is group empty = false
+Group size = 2
+Item 1 = data/bv.lua
+Is group empty = false
+Group size = 1
+Is group empty = true
+Group size = 0
+Is group empty = false
+Group size = 1
+Is group empty = true
+Group size = 0

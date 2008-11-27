@@ -27,4 +27,8 @@ function test ()
   local result = Engine.Listeners.Get ("Listener1")
   
   print ("Listener name: '" .. result.Name .. "'")
+  
+  local resource_manager = Media.ResourceManager.Create ()
+  
+  Engine.ResourceManagers.Register ("ResourceManager1", resource_manager)
 end

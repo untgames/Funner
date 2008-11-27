@@ -2,6 +2,8 @@
 
 #include <common/strlib.h>
 
+#include <media/rms/manager.h>
+
 #include <sg/listener.h>
 
 #include <render/scene_render.h>
@@ -99,8 +101,9 @@ template <class T> void bind_attachment_methods (Environment& environment, const
 
 void bind_attachment_registry_library (Environment& environment)
 {
-  bind_attachment_methods<render::Screen>        (environment, "Screens");
-  bind_attachment_methods<scene_graph::Listener> (environment, "Listeners");
+  bind_attachment_methods<render::Screen>              (environment, "Screens");
+  bind_attachment_methods<scene_graph::Listener>       (environment, "Listeners");
+  bind_attachment_methods<media::rms::ResourceManager> (environment, "ResourceManagers");
 
   typedef xtl::function<void (const char*)> InputHandler;
 
