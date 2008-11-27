@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<sound_declaration_library>
-  <declaration id="gorilka" name="gorilka" type="Type1" looping="1">
-    <params gain="0.7" min_gain="0.1" max_gain="0.95" inner_angle="20" outer_angle="60" outer_gain="0.4" reference_distance="25" maximum_distance="90" cull_distance="95"/>
-    <samples>
-      'data/sounds/gorilka.ogg'
-    </samples>
-  </declaration>
-</sound_declaration_library>

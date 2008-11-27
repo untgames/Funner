@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<material_library>
-  <material id="sprite_material">
-    <sprite_profile image="data/textures/bottom.jpg" blend_mode="translucent"/>
-  </material>
-  <material id="gun_material">
-    <sprite_profile image="data/textures/gun.bmp" blend_mode="alpha_clamp"/>
-  </material>
-</material_library>
