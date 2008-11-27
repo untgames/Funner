@@ -174,7 +174,7 @@ bool ParseNode::operator ! () const
   return IsEmpty ();
 }
 
-ParseNode::operator UnspecifiendBoolType () const
+ParseNode::operator UnspecifiedBoolType () const
 {
   return IsEmpty () ? 0 : &ParseNode::IsEmpty;
 }
