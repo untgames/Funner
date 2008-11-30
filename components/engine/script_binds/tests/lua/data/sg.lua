@@ -236,10 +236,10 @@ end
 function test_entity ()
   print ("Entity test")
 
-  local aabox1 = BV.AxisAlignedBox.create ()
+  local aabox1 = AABB ()
   local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
 
-  print ("IsInfiniteBounds = " .. tostring (sound_emitter1:IsInfiniteBounds ()))
+  print ("IsInfiniteBounds = " .. tostring (sound_emitter1.InfiniteBounds))
   print ("WireColor = " .. tostring (sound_emitter1.WireColor))
 
   sound_emitter1.WireColor = vec3 (1, 0, 0)
@@ -250,35 +250,72 @@ function test_entity ()
 
   print ("WireColor = " .. tostring (sound_emitter1.WireColor))
 
-  aabox1 = sound_emitter1:BoundBox ()
+  aabox1 = sound_emitter1.BoundBox
 
-  print ("local bb minimum = " .. tostring (aabox1.minimum))
-  print ("local bb maximum = " .. tostring (aabox1.maximum))
+  print ("local bb minimum = " .. tostring (aabox1.Minimum))
+  print ("local bb maximum = " .. tostring (aabox1.Maximum))
 
-  aabox1 = sound_emitter1:WorldBoundBox ()
+  aabox1 = sound_emitter1.WorldBoundBox
 
-  print ("world bb minimum = " .. tostring (aabox1.minimum))
-  print ("world bb maximum = " .. tostring (aabox1.maximum))
+  print ("world bb minimum = " .. tostring (aabox1.Minimum))
+  print ("world bb maximum = " .. tostring (aabox1.Maximum))
 
-  aabox1 = sound_emitter1:ChildrenBoundBox ()
+  aabox1 = sound_emitter1.ChildrenBoundBox
 
-  print ("children bb minimum = " .. tostring (aabox1.minimum))
-  print ("children bb maximum = " .. tostring (aabox1.maximum))
+  print ("children bb minimum = " .. tostring (aabox1.Minimum))
+  print ("children bb maximum = " .. tostring (aabox1.Maximum))
 
-  aabox1 = sound_emitter1:FullBoundBox ()
+  aabox1 = sound_emitter1.FullBoundBox
 
-  print ("full bb minimum = " .. tostring (aabox1.minimum))
-  print ("full bb maximum = " .. tostring (aabox1.maximum))
+  print ("full bb minimum = " .. tostring (aabox1.Minimum))
+  print ("full bb maximum = " .. tostring (aabox1.Maximum))
 
-  aabox1 = sound_emitter1:WorldChildrenBoundBox ()
+  aabox1 = sound_emitter1.WorldChildrenBoundBox
 
-  print ("world children bb minimum = " .. tostring (aabox1.minimum))
-  print ("world children bb maximum = " .. tostring (aabox1.maximum))
+  print ("world children bb minimum = " .. tostring (aabox1.Minimum))
+  print ("world children bb maximum = " .. tostring (aabox1.Maximum))
 
-  aabox1 = sound_emitter1:WorldFullBoundBox ()
+  aabox1 = sound_emitter1.WorldFullBoundBox
 
-  print ("world full bb minimum = " .. tostring (aabox1.minimum))
-  print ("world full bb maximum = " .. tostring (aabox1.maximum))
+  print ("world full bb minimum = " .. tostring (aabox1.Minimum))
+  print ("world full bb maximum = " .. tostring (aabox1.Maximum))
+end
+
+function print_intersections (entity)
+  local intersections = entity:GetIntersections ()
+  
+  print (entity.Name .. " has " .. tostring (intersections.Size) .. " intersections:")
+  
+  for i=0,intersections.Size-1,1 do
+    print ("  " .. intersections:Item (i).Name)
+  end
+end
+
+function test_intersections ()
+  print ("Intersections test")
+  
+  local scene   = Scene.Scene.Create ()
+  local entity1 = Scene.Helpers.Box.Create ()
+  local entity2 = Scene.Helpers.Box.Create ()
+  local entity3 = Scene.Helpers.Box.Create ()
+
+  entity1.Name = "entity1"
+  entity2.Name = "entity2"
+  entity3.Name = "entity3"
+  
+  local bb = AABB (-1, -1, -1, 1, 1, 1)
+
+  entity1.BoundBox = AABB (-1, -1, -1, 1, 1, 1)
+  entity2.BoundBox = AABB (0.1, 0.1, -1, 1, 1, 1)
+  entity3.BoundBox = AABB (-1, -1, -1, -0, -0.1, 1)  
+
+  entity1:BindToScene (scene)
+  entity2:BindToScene (scene)
+  entity3:BindToScene (scene)
+
+  print_intersections (entity1)
+  print_intersections (entity2)
+  print_intersections (entity3)
 end
 
 function test_perspective_camera ()
@@ -376,7 +413,7 @@ end
 function test_box_helper ()
   print ("BoxHelper test")
 
-  local helper1 = Scene.BoxHelper.Create ()
+  local helper1 = Scene.Helpers.Box.Create ()
 end
 
 function test_listener ()
@@ -531,6 +568,8 @@ function test ()
   test_events ()
 
   test_entity ()
+  
+  test_intersections ()
   
   test_perspective_camera ()
   test_ortho_camera ()

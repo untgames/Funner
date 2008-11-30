@@ -6,9 +6,10 @@
 #include <math/io.h>
 
 #include <sg/camera.h>
-#include <sg/light.h>
 #include <sg/helper.h>
+#include <sg/light.h>
 #include <sg/listener.h>
+#include <sg/node_array.h>
 #include <sg/scene.h>
 #include <sg/sound_emitter.h>
 #include <sg/sprite.h>
@@ -34,9 +35,11 @@ const char* SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY     = "Scene.NodeSearchMode";
 const char* SCENE_STATIC_NODE_ORT_LIBRARY             = "Scene.NodeOrt";
 const char* SCENE_STATIC_NODE_EVENT_LIBRARY           = "Scene.NodeEvent";
 const char* SCENE_STATIC_NODE_SUBTREE_EVENT_LIBRARY   = "Scene.NodeSubTreeEvent";
+const char* SCENE_STATIC_NODE_ARRAY_LINK_MODE_LIBRARY = "Scene.NodeArrayLinkMode";
 const char* SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY  = "Scene.TextLineAlignment";
 const char* SCENE_SCENE_LIBRARY                       = "Scene.Scene";
 const char* SCENE_NODE_LIBRARY                        = "Scene.Node";
+const char* SCENE_NODE_ARRAY_LIBRARY                  = "Scene.NodeArray";
 const char* SCENE_ENTITY_LIBRARY                      = "Scene.Entity";
 const char* SCENE_PERSPECTIVE_CAMERA_LIBRARY          = "Scene.PerspectiveCamera";
 const char* SCENE_ORTHO_CAMERA_LIBRARY                = "Scene.OrthoCamera";
@@ -44,7 +47,7 @@ const char* SCENE_LIGHT_LIBRARY                       = "Scene.Light";
 const char* SCENE_DIRECT_LIGHT_LIBRARY                = "Scene.DirectLight";
 const char* SCENE_SPOT_LIGHT_LIBRARY                  = "Scene.SpotLight";
 const char* SCENE_POINT_LIGHT_LIBRARY                 = "Scene.PointLight";
-const char* SCENE_BOX_HELPER_LIBRARY                  = "Scene.BoxHelper";
+const char* SCENE_BOX_HELPER_LIBRARY                  = "Scene.Helpers.Box";
 const char* SCENE_LISTENER_LIBRARY                    = "Scene.Listener";
 const char* SCENE_SOUND_EMITTER_LIBRARY               = "Scene.SoundEmitter";
 const char* SCENE_SPRITE_MODEL_LIBRARY                = "Scene.SpriteModel";
@@ -158,6 +161,12 @@ void bind_static_node_library (Environment& environment)
   node_subtree_event_lib.Register   ("get_BeforeUnbind",      make_const (NodeSubTreeEvent_BeforeUnbind));
 }
 
+//получение уникального идентификатора узла
+void* get_node_id (Node& node)
+{
+  return &node;
+}
+
 InvokerRegistry& bind_node_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_NODE_LIBRARY);
@@ -172,6 +181,7 @@ InvokerRegistry& bind_node_library (Environment& environment)
 
     //регистрация операций
 
+  lib.Register ("get_Id",                   make_invoker (&get_node_id));
   lib.Register ("set_Name",                 make_invoker (&Node::SetName));
   lib.Register ("set_Position",             make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetPosition)));
   lib.Register ("set_WorldPosition",        make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetWorldPosition)));
@@ -285,6 +295,61 @@ InvokerRegistry& bind_node_library (Environment& environment)
 }
 
 /*
+   Регистрация библиотеки работы с массивами узлов сцены
+*/
+
+void bind_node_array_link_mode_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_STATIC_NODE_ARRAY_LINK_MODE_LIBRARY);
+  
+    //регистрация операций
+    
+  lib.Register ("get_AddRef",  make_const (NodeArrayLinkMode_AddRef));
+  lib.Register ("get_WeakRef", make_const (NodeArrayLinkMode_WeakRef));
+}
+
+NodeArray create_node_array (NodeArrayLinkMode link_mode)
+{
+  return NodeArray (link_mode);
+}
+
+Node::Pointer get_node_array_item (NodeArray& array, size_t index)
+{
+  return &array.Item (index);
+}
+
+void bind_node_array_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_NODE_ARRAY_LIBRARY);
+  
+    //регистрация статических библиотек
+    
+  bind_node_array_link_mode_library (environment);
+  
+    //регистрация функций создания
+    
+  lib.Register ("Create", make_invoker (make_invoker (&create_node_array),
+                                        make_invoker<NodeArray ()> (xtl::bind (&create_node_array, NodeArrayLinkMode_AddRef))));
+
+    //регистрация операций
+    
+  lib.Register ("get_Size",     make_invoker (&NodeArray::Size));
+  lib.Register ("get_Empty",    make_invoker (&NodeArray::IsEmpty));
+  lib.Register ("get_Capacity", make_invoker (&NodeArray::Capacity));
+  lib.Register ("get_LinkMode", make_invoker (&NodeArray::LinkMode));
+  lib.Register ("Item",         make_invoker (&get_node_array_item));
+  lib.Register ("Add",          make_invoker (&NodeArray::Add));
+  lib.Register ("Remove",       make_invoker (make_invoker ((void (NodeArray::*)(size_t))&NodeArray::Remove),
+                                              make_invoker ((void (NodeArray::*)(Node&))&NodeArray::Remove)));
+  lib.Register ("Clear",        make_invoker (&NodeArray::Clear));
+  lib.Register ("Reserve",      make_invoker (&NodeArray::Reserve));
+  
+    //регистрация типов данных
+    
+  environment.RegisterType<NodeArray> (SCENE_NODE_ARRAY_LIBRARY);
+}
+
+/*
    Регистрация библиотеки работы с объектами сцены
 */
 
@@ -303,15 +368,17 @@ InvokerRegistry& bind_entity_library (Environment& environment)
 
   lib.Register ("SetWireColor", make_invoker (implicit_cast<void (Entity::*) (float, float, float)> (&Entity::SetWireColor)));
 
-  lib.Register ("BoundBox", make_invoker (&Entity::BoundBox));
-  lib.Register ("WorldBoundBox", make_invoker (&Entity::WorldBoundBox));
+  lib.Register ("get_BoundBox",      make_invoker (&Entity::BoundBox));
+  lib.Register ("get_WorldBoundBox", make_invoker (&Entity::WorldBoundBox));
 
-  lib.Register ("IsInfiniteBounds", make_invoker (&Entity::IsInfiniteBounds));
+  lib.Register ("get_InfiniteBounds", make_invoker (&Entity::IsInfiniteBounds));
 
-  lib.Register ("ChildrenBoundBox",      make_invoker (&Entity::ChildrenBoundBox));
-  lib.Register ("FullBoundBox",          make_invoker (&Entity::FullBoundBox));
-  lib.Register ("WorldChildrenBoundBox", make_invoker (&Entity::WorldChildrenBoundBox));
-  lib.Register ("WorldFullBoundBox",     make_invoker (&Entity::WorldFullBoundBox));
+  lib.Register ("get_ChildrenBoundBox",      make_invoker (&Entity::ChildrenBoundBox));
+  lib.Register ("get_FullBoundBox",          make_invoker (&Entity::FullBoundBox));
+  lib.Register ("get_WorldChildrenBoundBox", make_invoker (&Entity::WorldChildrenBoundBox));
+  lib.Register ("get_WorldFullBoundBox",     make_invoker (&Entity::WorldFullBoundBox));
+  lib.Register ("GetIntersections",          make_invoker (make_invoker ((void (Entity::*)(NodeArray&) const)&Entity::GetIntersections),
+                                                           make_invoker ((NodeArray (Entity::*)() const)&Entity::GetIntersections)));
 
     //регистрация типов данных
 
@@ -519,6 +586,11 @@ helpers::Box::Pointer create_box_helper ()
    Регистрация библиотеки работы с хелперами
 */
 
+void set_bound_box (helpers::Box& entity, const bound_volumes::aaboxf& box)
+{
+  entity.SetBoundBox (box);
+}
+
 void bind_box_helper_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_BOX_HELPER_LIBRARY);
@@ -530,6 +602,10 @@ void bind_box_helper_library (Environment& environment)
     //регистрация функций создания
 
   lib.Register ("Create", make_invoker (&create_box_helper));
+  
+    //регистрация операций
+
+  lib.Register ("set_BoundBox", make_invoker (&set_bound_box));
 
     //регистрация типов данных
 
@@ -725,7 +801,6 @@ void bind_static_text_line_library (Environment& environment)
   text_line_alignment_lib.Register ("get_Bottom", make_const (TextLineAlignment_Bottom));
 }
 
-
 void bind_text_line_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_TEXT_LINE_LIBRARY);
@@ -806,6 +881,7 @@ void bind_scene_graph_library (Environment& environment)
 {
   bind_scene_library              (environment);
   bind_node_library               (environment);
+  bind_node_array_library         (environment);
   bind_entity_library             (environment);
   bind_perspective_camera_library (environment);
   bind_ortho_camera_library       (environment);

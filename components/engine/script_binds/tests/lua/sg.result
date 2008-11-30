@@ -93,6 +93,14 @@ world children bb minimum = -1e+008 -1e+008 -1e+008
 world children bb maximum = 1e+008 1e+008 1e+008
 world full bb minimum = -1e+008 -1e+008 -1e+008
 world full bb maximum = 1e+008 1e+008 1e+008
+Intersections test
+entity1 has 2 intersections:
+  entity2
+  entity3
+entity2 has 1 intersections:
+  entity1
+entity3 has 1 intersections:
+  entity1
 Perspective camera test
 FovX  = 1
 FovY  = 1
