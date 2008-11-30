@@ -23,4 +23,4 @@ RENDER.MID_LEVEL.TESTS.LIBS             :=
 RENDER.MID_LEVEL.TESTS.DLLS             :=
 RENDER.MID_LEVEL.TESTS.DLL_DIRS         :=
 RENDER.MID_LEVEL.TESTS.COMPILER_CFLAGS  :=
-RENDER.MID_LEVEL.TESTS.IMPORTS          := compile.static.mak link.static.mak ../../media/image/compile.static.mak ../../media/image/link.static.mak
+RENDER.MID_LEVEL.TESTS.IMPORTS          := compile.static.mak link.static.mak
