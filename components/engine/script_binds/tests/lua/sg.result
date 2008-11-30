@@ -76,6 +76,31 @@ Node 'Node1' event 'BeforeUnbind'
 Node 'Node2.Node1' subtree event 'BeforeUnbind'
 Node 'Node1' event 'BeforeDestroy'
 Node 'Node1' event 'AfterDestroy'
+NodeArray addref test
+after insert (array has 3 items):
+  node1
+  node2
+  node3
+after node2 destroy (array has 3 items):
+  node1
+  node2
+  node3
+after remove node by index (array has 2 items):
+  node2
+  node3
+after remove by value (array has 1 items):
+  node2
+NodeArray weak-ref test
+after insert (array has 3 items):
+  node1
+  node2
+  node3
+after node2 destroy (array has 2 items):
+  node1
+  node3
+after remove node by index (array has 1 items):
+  node3
+after remove by value (array has 0 items):
 Entity test
 IsInfiniteBounds = true
 WireColor = 0 0 0

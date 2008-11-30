@@ -81,8 +81,8 @@ class ActionQueue: public xtl::reference_counter, public xtl::dynamic_cast_root
         EventHandlerWrapper (float in_first_fire, float in_period, const EventHandler& in_handler)
           : handler (in_handler)
         {
-          first_fire       = in_first_fire * 1000.f;
-          period           = in_period * 1000.f;
+          first_fire       = size_t (in_first_fire * 1000.f);
+          period           = size_t (in_period * 1000.f);
           accumulated_time = 0;
           previous_time    = common::milliseconds ();
           fired            = false;

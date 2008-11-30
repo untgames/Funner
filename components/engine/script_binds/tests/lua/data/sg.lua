@@ -233,6 +233,49 @@ function test_events ()
   collectgarbage ("collect")
 end
 
+function print_node_array (title, array)
+  print (title .. " (array has " .. tostring (array.Size) .. " items):")
+
+  for i=0,array.Size-1,1 do
+    print ("  " .. array:Item (i).Name)
+  end
+end
+
+function test_node_array (link_mode)
+  if link_mode == Scene.NodeArrayLinkMode.AddRef  then print ("NodeArray addref test") end
+  if link_mode == Scene.NodeArrayLinkMode.WeakRef then print ("NodeArray weak-ref test") end
+
+  local node1 = Scene.Node.Create ()
+  local node2 = Scene.Node.Create ()
+  local node3 = Scene.Node.Create ()
+  
+  node1.Name = "node1"
+  node2.Name = "node2"
+  node3.Name = "node3"
+  
+  local array = Scene.NodeArray.Create (link_mode)
+  local index = array:Add (node1)
+
+  array:Add (node2)
+  array:Add (node3)
+  
+  print_node_array ("after insert", array)
+  
+  node2 = nil
+  
+  collectgarbage ("collect")
+  
+  print_node_array ("after node2 destroy", array)
+   
+  array:Remove (index)
+  
+  print_node_array ("after remove node by index", array)
+
+  array:Remove (node3)
+
+  print_node_array ("after remove by value", array)
+end
+
 function test_entity ()
   print ("Entity test")
 
@@ -566,6 +609,9 @@ function test ()
   test_node ()
   
   test_events ()
+  
+  test_node_array (Scene.NodeArrayLinkMode.AddRef)
+  test_node_array (Scene.NodeArrayLinkMode.WeakRef)
 
   test_entity ()
   
