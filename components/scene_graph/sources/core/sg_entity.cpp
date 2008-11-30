@@ -9,7 +9,17 @@ using namespace math;
 using namespace bound_volumes;
 using namespace xtl;
 
-const float INFINITE_BOUND_VALUE = 1e8f; //значение бесконечности для ограничивающих объёмов
+namespace
+{
+
+/*
+    Константы
+*/
+
+const float  INFINITE_BOUND_VALUE       = 1e8f; //значение бесконечности для ограничивающих объёмов
+const size_t INTERSECTIONS_RESERVE_SIZE = 16;   //резервируемое число пересечений
+
+}
 
 /*
     Описание реализации Entity
@@ -200,6 +210,57 @@ aaboxf Entity::WorldChildrenBoundBox () const
 aaboxf Entity::WorldFullBoundBox () const
 {
   return WorldChildrenBoundBox () += WorldBoundBox ();
+}
+
+/*
+    Получение пересечений
+*/
+
+namespace
+{
+
+//враппер для добавления объекта в массив
+struct ArrayInserter: public ISceneTraverser
+{
+  ArrayInserter (const Entity& in_self, NodeArray& in_array) : self (in_self), array (in_array) {}
+
+  void operator () (Entity& entity)
+  {
+    if (&entity == &self) //защита от самопересечений
+      return;
+
+    array.Add (entity);
+  }
+
+  const Entity& self;
+  NodeArray&    array;
+};
+
+}
+
+void Entity::GetIntersections (NodeArray& intersections) const
+{
+  intersections.Clear ();
+
+  const scene_graph::Scene* scene = Scene ();
+  
+  if (!scene)
+    return;
+
+  ArrayInserter inserter (*this, intersections);
+
+  scene->Traverse (WorldBoundBox (), inserter);
+}
+
+NodeArray Entity::GetIntersections () const
+{
+  NodeArray intersections;
+
+  intersections.Reserve (INTERSECTIONS_RESERVE_SIZE);
+
+  GetIntersections (intersections);
+
+  return intersections;
 }
 
 /*

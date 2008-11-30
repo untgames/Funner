@@ -1,0 +1,4 @@
+Results of intersection_test:
+entity1 has 2 intersections: {entity2, entity3}
+entity2 has 1 intersections: {entity1}
+entity3 has 1 intersections: {entity1}

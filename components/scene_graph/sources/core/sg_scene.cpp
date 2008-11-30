@@ -26,15 +26,6 @@ struct Scene::Impl: public SceneSpace
 
     for (size_t count=ObjectsCount (); count--; object=object->NextObject ())
       fn (object->Entity ());
-  }
-  
-  template <class Fn>
-  void ForEach (Fn& fn) const
-  {
-    const SceneObject* object = FirstObject ();
-
-    for (size_t count=ObjectsCount (); count--; object=object->NextObject ())
-      fn (object->Entity ());
   }  
 };
 
@@ -174,14 +165,14 @@ struct BoundsCheckFunction
     Обход объектов, принадлежащих сцене
 */
 
-void Scene::Traverse (const TraverseFunction& fn)
+void Scene::Traverse (const TraverseFunction& fn) const
 {
   impl->ForEach (fn);
 }
 
-void Scene::Traverse (const ConstTraverseFunction& fn) const
+void Scene::Traverse (ISceneTraverser& traverser) const
 {
-  impl->ForEach (fn);
+  impl->ForEach (traverser);
 }
 
 void Scene::VisitEach (Visitor& visitor) const
@@ -195,16 +186,16 @@ void Scene::VisitEach (Visitor& visitor) const
     Обход объектов, принадлежащих сцене и входящих в ограничивающий объём
 */
 
-void Scene::Traverse (const aaboxf& box, const TraverseFunction& fn)
-{  
+void Scene::Traverse (const aaboxf& box, const TraverseFunction& fn) const
+{
   BoundsCheckFunction<const TraverseFunction> checker (box, fn);
 
   impl->ForEach (checker);
 }
 
-void Scene::Traverse (const aaboxf& box, const ConstTraverseFunction& fn) const
+void Scene::Traverse (const aaboxf& box, ISceneTraverser& traverser) const
 {
-  BoundsCheckFunction<const ConstTraverseFunction> checker (box, fn);
+  BoundsCheckFunction<ISceneTraverser> checker (box, traverser);
 
   impl->ForEach (checker);
 }
