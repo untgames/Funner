@@ -28,7 +28,7 @@ DEMOS.MODELER.VISUALIZER.IMPORTS       := ../../system/compile.static.mak ../../
                                           ../../render/mid_level_window_driver/compile.static.mak ../../render/low_level/compile.static.mak \
                                           ../../scene_graph/compile.static.mak  ../../tools/ui/windows_forms/link.static.mak \
                                           ../../tools/ui/core/compile.static.mak ../../script/lua/link.static.mak \
-                                          ../../client/core/compile.static.mak ../../client/window_manager/compile.static.mak \
-                                          ../../client/subsystems/scene_render.link.static.mak ../../client/subsystems/window_renderer.link.static.mak \
-                                          ../../common/configurator.link.static.mak ../../render/opengl_driver/link.static.mak \
+                                          ../../engine/core/compile.static.mak ../../engine/subsystems/scene_render.link.static.mak \
+                                          ../../engine/subsystems/window_manager.link.static.mak ../../engine/subsystems/window_renderer.link.static.mak \
+                                          ../../render/opengl_driver/link.static.mak \
                                           ../../media/geometry/compile.static.mak ../../media/geometry/xmesh.link.static.mak
