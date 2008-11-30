@@ -1,0 +1,5 @@
+Results of node_array_weak_ref_test:
+after insert: weak-ref-array{Node1, Node2, Node3}
+after node2 destroy: weak-ref-array{Node1, Node3}
+after remove node by index: weak-ref-array{Node3}
+after remove by value: weak-ref-array{}

@@ -1,0 +1,5 @@
+Results of node_array_add_ref_test:
+after insert: intrusive-array{Node1, Node2, Node3}
+after node2 destroy: intrusive-array{Node1, Node2, Node3}
+after remove node by index: intrusive-array{Node2, Node3}
+after remove by value: intrusive-array{Node2}
