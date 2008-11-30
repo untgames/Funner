@@ -24,7 +24,7 @@ ENGINE.LAUNCHER.SOURCES.IMPORTS          := ../core/compile.static.mak \
                                             ../../input/manager/compile.static.mak ../../input/window_driver/link.static.mak \
                                             ../../render/scene_render/compile.static.mak ../../render/scene_render/render2d.link.static.mak \
                                             ../../script/lua/link.static.mak \
-                                            ../script_binds/math.link.static.mak   ../script_binds/sg.link.static.mak \
+                                            ../script_binds/math.link.static.mak   ../script_binds/sg.link.static.mak ../script_binds/bv.link.static.mak \
                                             ../script_binds/render.link.static.mak ../script_binds/engine.link.static.mak \
                                             ../script_binds/input.link.static.mak  ../script_binds/lua_override.link.static.mak \
                                             ../script_binds/system.link.static.mak ../script_binds/common.link.static.mak \
