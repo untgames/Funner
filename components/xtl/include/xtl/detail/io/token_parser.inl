@@ -19,7 +19,7 @@ inline bool read (const char* string, long& value)
     return false;
 
   while (*++string)
-    if (!isdigit (*string))
+    if (!isdigit ((unsigned char)*string))
       return false;
 
   value = tmp;
