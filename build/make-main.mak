@@ -135,7 +135,7 @@ endif
 #ѕодготовка к запуску приложени€ (каталог запуска приложени€, список каталогов с динамическими библиотеками)
 ###################################################################################################
 define prepare_to_execute
-export PATH="$(subst ;,:,$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$(foreach dir,$2,$(dir);)$$PATH))" \
+export PATH="$(subst ;,:,$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$(foreach dir,$(ADDITIONAL_PATHS),$(dir);)$(foreach dir,$2,$(dir);)$$PATH))" \
 BIN_DIR=`$(call get_system_dir,$(DIST_BIN_DIR))` && cd "$1"
 endef
 
@@ -157,7 +157,13 @@ endef
 #ѕравила пакетной компил€ции (им€ цели, им€ модул€)
 define batch-compile
   $2.FLAG_FILE  := $$($2.TMP_DIR)/$$(BATCH_COMPILE_FLAG_FILE_SHORT_NAME)
-  $1.FLAG_FILES := $$($1.FLAG_FILES) $$($2.FLAG_FILE)  
+  $1.FLAG_FILES := $$($1.FLAG_FILES) $$($2.FLAG_FILE)
+  
+  ifneq (,$$(strip $$($2.PCH)))
+  
+  $$($2.FLAG_FILE): $$($2.PCH_OUTPUT)
+  
+  endif  
 
   ifeq (,$$(wildcard $$($2.FLAG_FILE).incomplete-build))  
 
