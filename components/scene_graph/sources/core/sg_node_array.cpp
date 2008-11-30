@@ -238,12 +238,17 @@ NodeArrayLinkMode NodeArray::LinkMode () const
 }
 
 /*
-    Количество элементов в коллекции
+    Количество элементов в коллекции / проверка на пустоту
 */
 
 size_t NodeArray::Size () const
 {
   return impl->Size ();
+}
+
+bool NodeArray::IsEmpty () const
+{
+  return impl->Size () == 0;
 }
 
 /*
