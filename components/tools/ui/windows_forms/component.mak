@@ -60,10 +60,10 @@ TOOLS.UI.WINDOWS_FORMS.PROPERTY_GRID_PLUGIN.COMPILER_DEFINES :=
 TOOLS.UI.WINDOWS_FORMS.TESTS.TYPE             := test-suite
 TOOLS.UI.WINDOWS_FORMS.TESTS.INCLUDE_DIRS     :=
 TOOLS.UI.WINDOWS_FORMS.TESTS.SOURCE_DIRS      := tests
-TOOLS.UI.WINDOWS_FORMS.TESTS.LIBS             :=
+TOOLS.UI.WINDOWS_FORMS.TESTS.LINK_INCLUDES    :=
 TOOLS.UI.WINDOWS_FORMS.TESTS.COMPILER_CFLAGS  := 
 TOOLS.UI.WINDOWS_FORMS.TESTS.COMPILER_DEFINES :=
 TOOLS.UI.WINDOWS_FORMS.TESTS.IMPORTS          := ../core/compile.static.mak link.static.mak ../../../system/compile.static.mak \
                                                  ../../../system/link.static.mak ../../../script/lua/link.static.mak \
                                                  ../../../engine/script_binds/common.link.static.mak ../../../engine/script_binds/lua_override.link.static.mak \
-                                                 ../../../common/default_console_handler.link.static.mak
+                                                 ../../../common/default_console_handler.link.static.mak ../../../script/core/compile.static.mak

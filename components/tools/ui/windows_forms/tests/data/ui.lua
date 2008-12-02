@@ -5,7 +5,7 @@ Application.MainForm.Text = "Hello world"
 Application.MainForm.MenuStrip = Application.MenuStrips:Item("MenuStrip1")
 Application.MenuItems:Item ("MenuItem1").OnClick = "Application.MenuItems:Item ('MenuItem1').Image = 'data/app.ico'"
 
-dofile ("data/setup_var_registry.lua")
+Application.Execute ("dofile ('data/setup_var_registry.lua')")
 
 Application.CreateForm ("PropertyGrid", "Map2 registry1", DockState.Right)
 Application.CreateForm ("Console", "", DockState.Bottom)

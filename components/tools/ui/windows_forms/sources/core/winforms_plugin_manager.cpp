@@ -154,7 +154,7 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
     {
       AutoString command_string (command);
 
-      window_system->Execute (command_string.Data ());
+      window_system->ApplicationExecute (command_string.Data ());
     }
 
 ///ѕолучение / установка значени€ свойства

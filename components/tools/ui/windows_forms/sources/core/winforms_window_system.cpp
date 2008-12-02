@@ -177,6 +177,15 @@ void WindowSystem::Execute (const char* command)
 }
 
 /*
+   ¬ыполнение команды на стороне сервера приложени€
+*/
+
+void WindowSystem::ApplicationExecute (const char* command)
+{
+  application_server->ExecuteCommand (command);
+}
+    
+/*
     —оздание дочерней формы
 */
 

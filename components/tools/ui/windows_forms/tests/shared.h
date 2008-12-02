@@ -9,6 +9,7 @@
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/shared_ptr.h>
 #include <xtl/string.h>
 
 #include <common/console.h>
@@ -17,10 +18,15 @@
 #include <syslib/application.h>
 #include <syslib/window.h>
 
+#include <script/shell.h>
+#include <script/environment.h>
+
 #include <tools/ui/main_window.h>
 #include <tools/ui/custom_window_system.h>
 
 using namespace tools::ui;
+
+const char* INTERPERTER_NAME = "lua"; //имя интерпретатора
 
 //тестовое пользовательское дочернее окно
 class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
@@ -98,7 +104,13 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 {
   public:
     MyApplicationServer ()
+      : shell_environment (new script::Environment),
+        shell (INTERPERTER_NAME, shell_environment)
     {
+        //регистрация шлюзов
+
+      shell_environment->BindLibraries ("*");
+      
       printf ("MyApplicationServer::MyApplicationServer\n");
     }
     
@@ -110,9 +122,20 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     void ExecuteCommand (const char* command)
     {
       if (!xtl::xstrcmp (command, "close"))
+      {
         syslib::Application::Exit (0);
-      
-      printf ("MyApplicationServer::ExecuteCommand(%s)\n", command);
+        return;
+      }
+
+      try
+      {        
+        shell.Execute (command);
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("MyApplicationServer::ExecuteCommand");
+        throw;
+      }
     }
 
     void SetProperty (const char* name, const stl::string& value)
@@ -162,6 +185,13 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
     void AddRef  () { addref (this); }
     void Release () { release (this); }
+
+  private:
+    typedef xtl::shared_ptr<script::Environment> ShellEnvironmentPtr;
+
+  private:
+    ShellEnvironmentPtr shell_environment;   //окружение скриптовой среды
+    script::Shell       shell;               //скриптовый интерпретатор
 };
 
 //класс тестового приложения
