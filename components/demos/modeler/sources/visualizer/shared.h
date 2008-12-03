@@ -1,7 +1,12 @@
+#ifndef MODELER_VISUALIZER_SHARED_HEADER
+#define MODELER_VISUALIZER_SHARED_HEADER
+
 #include <stl/auto_ptr.h>
 
 #include <render/low_level/device.h>
 #include <render/low_level/utils.h>
+
+#include <engine/attachments.h>
 
 class RenderableModel
 {
@@ -19,3 +24,5 @@ class RenderableModel
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
+
+#endif

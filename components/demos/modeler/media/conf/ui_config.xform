@@ -12,14 +12,20 @@
   </MenuItem>
   <MenuStrip Id="MenuStrip1">
     <MenuItem Text="Файл">
-      <MenuItem Text="Новая форма" OnClick="Application.CreateForm ('my_init_string')"/>
-      <MenuItem Text="Новая форма снизу" OnClick="Application.CreateForm ('my_init_string', DockState.BottomAutoHide)"/>
+      <MenuItem Text="Новая форма" OnClick="Application.CreateForm ('Application', 'my_init_string', DockState.Float)"/>
       <MenuItem Text="Выход" Tip="Выход из приложения" OnClick="Application.Execute ('close')"/>
     </MenuItem>
     <MenuItem Source="MenuItem2"/>
   </MenuStrip>
   <ToolStrip Id="ToolStrip1">
-    <ToolButton Image="media/app.ico" OnClick="Application.Execute ('Button1Click')" Tip="Картинка"/>
-    <ToolButton Text="Hello world" OnClick="Application.Execute ('Hello world')"/>
+    <ToolButton Text="CalculateEnvelope" OnClick="Application.Execute ('Modeler.CalculateEnvelope (400)')"/>
   </ToolStrip>
+  <Plugin 
+    Name="Console" 
+    BackgroundColor="255;255;255;255"
+    ForegroundColor="0;0;0;255"
+    HistoryCapacity="64"
+    OutputCutThreshold="8192" 
+    OutputCutTo="7900"
+  />
 </UIConfig>

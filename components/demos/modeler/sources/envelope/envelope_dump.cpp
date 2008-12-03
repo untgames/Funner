@@ -6,6 +6,31 @@
 
 using namespace modeler;
 
+const char* DESC_FILE_SUFFIX = ".desc";
+
+void save_desc_file (const char* result_file_name, size_t file_size)
+{
+  size_t file_name_buffer_size = strlen (result_file_name) + strlen (DESC_FILE_SUFFIX) + 1;
+
+  char* desc_file_name = new char [file_name_buffer_size];
+
+  _snprintf (desc_file_name, file_name_buffer_size, "%s%s", result_file_name, DESC_FILE_SUFFIX);
+
+  FILE* desc_file = fopen (desc_file_name, "w");
+
+  delete [] desc_file_name;
+
+  if (!desc_file)
+  {
+    printf ("Can't open desc file '%s'\n", desc_file_name);
+    return;
+  }
+
+  fwrite (&file_size, sizeof (file_size), 1, desc_file);
+
+  fclose (desc_file);
+}
+
 void dump (const char* result_file_name, const DrawVertexArray& vertices, const DrawPrimitiveArray& primitives)
 {
   FILE* result_file = fopen (result_file_name, "w");
@@ -32,7 +57,7 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
   fprintf (result_file, "\n");
   fprintf (result_file, "      </channel>\n");
   fprintf (result_file, "      <channel semantic=\"normal\" type=\"float3\" offset=\"12\">\n");
-  
+
   for (size_t i=0; i<vertices.size (); i++)
   {
     const Vec3f& n = vertices [i].normal;
@@ -70,6 +95,10 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
   fprintf (result_file, "    </mesh>\n");
   fprintf (result_file, "  </meshes>\n");
   fprintf (result_file, "</mesh_library>\n");
+
+  fflush (result_file);
+
+  save_desc_file (result_file_name, ftell (result_file));
 
   fclose (result_file);
 }

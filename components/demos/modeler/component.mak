@@ -24,11 +24,16 @@ DEMOS.MODELER.VISUALIZER.INCLUDE_DIRS  :=
 DEMOS.MODELER.VISUALIZER.SOURCE_DIRS   := sources/visualizer
 DEMOS.MODELER.VISUALIZER.EXECUTION_DIR := .
 DEMOS.MODELER.VISUALIZER.LINK_INCLUDES := ModelerRender
-DEMOS.MODELER.VISUALIZER.IMPORTS       := ../../system/compile.static.mak ../../system/link.static.mak ../../render/scene_render/compile.static.mak \
-                                          ../../render/mid_level_window_driver/compile.static.mak ../../render/low_level/compile.static.mak \
-                                          ../../scene_graph/compile.static.mak  ../../tools/ui/windows_forms/link.static.mak \
-                                          ../../tools/ui/core/compile.static.mak ../../script/lua/link.static.mak \
-                                          ../../engine/core/compile.static.mak ../../engine/subsystems/scene_render.link.static.mak \
-                                          ../../engine/subsystems/window_manager.link.static.mak ../../engine/subsystems/window_renderer.link.static.mak \
+DEMOS.MODELER.VISUALIZER.IMPORTS       := ../../system/compile.static.mak ../../system/link.static.mak \
                                           ../../render/opengl_driver/link.static.mak \
-                                          ../../media/geometry/compile.static.mak ../../media/geometry/xmesh.link.static.mak
+                                          ../../render/scene_render/compile.static.mak \
+                                          ../../render/mid_level_window_driver/compile.static.mak ../../render/low_level/compile.static.mak \
+                                          ../../scene_graph/compile.static.mak \
+                                          ../../tools/ui/windows_forms/link.static.mak ../../tools/ui/core/compile.static.mak \
+                                          ../../script/lua/link.static.mak ../../script/core/compile.static.mak \
+                                          ../../engine/core/compile.static.mak ../../engine/subsystems/scene_render.link.static.mak \
+                                          ../../engine/subsystems/window_renderer.link.static.mak ../../engine/script_binds/lua_override.link.static.mak \
+                                          ../../media/geometry/compile.static.mak ../../media/geometry/xmesh.link.static.mak \
+                                          ../../media/rms/link.static.mak ../../media/rms/compile.static.mak \
+                                          ../../media/geometry/binmesh.link.static.mak
+

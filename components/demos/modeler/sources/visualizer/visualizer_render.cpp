@@ -24,6 +24,8 @@
 #include <sg/scene.h>
 #include <sg/visual_model.h>
 
+#include <media/rms/manager.h>
+
 #include <render/low_level/device.h>
 
 #include <render/mid_level/low_level_renderer.h>
@@ -85,12 +87,46 @@ BlendStatePtr create_blend_state
   return BlendStatePtr (device.CreateBlendState (blend_desc), false);
 }
 
-class RenderManager
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
+
+class RenderManager : public engine::IAttachmentRegistryListener<media::rms::ResourceManager>, public media::rms::ICustomServer
 {
   public:
+    RenderManager ()
+      : resource_server (*this)
+    {
+      engine::AttachmentRegistry::Attach<media::rms::ResourceManager> (this, engine::AttachmentRegistryAttachMode_ForceNotify);
+    }
+
+    ~RenderManager ()
+    {
+      engine::AttachmentRegistry::Detach<media::rms::ResourceManager> (this);
+    }
+
 ///Получение модели по имени
     RenderableModel& GetRenderableModel (low_level::IDevice* device, const char* model_name)
     {
+      for (ResourceNames::iterator iter = resources_to_load.begin (), end = resources_to_load.end (); iter != end; ++iter)
+      {
+        try
+        {
+          RenderableModelPtr new_model (new RenderableModel (*device, iter->c_str ()));
+
+          renderable_models.erase (iter->c_str ());
+
+          renderable_models.insert_pair (iter->c_str (), new_model);
+        }
+        catch (std::exception& exception)
+        {
+          printf ("exception: %s\n    at RenderManager::GetRenderableModel\n", exception.what ());
+          throw;
+        }
+      }
+
+      resources_to_load.clear ();
+
       RenderableModelMap::iterator iter = renderable_models.find (model_name);
 
       if (iter == renderable_models.end ())
@@ -111,13 +147,71 @@ class RenderManager
       return *renderable_models[model_name];
     }
 
+///События установки / удаления менеджера ресурсов
+    void OnRegisterAttachment (const char* attachment_name, media::rms::ResourceManager& resource_manager)
+    {
+      if (!xtl::xstrcmp (attachment_name, "MeshResourceManager"))
+      {
+        resource_manager.Attach (resource_server);
+
+        DetachServer ();
+
+        attached_resource_manager = &resource_manager;
+      }
+    }
+
+    void OnUnregisterAttachment (const char* attachment_name, media::rms::ResourceManager&)
+    {
+      if (!xtl::xstrcmp (attachment_name, "MeshResourceManager"))
+        DetachServer ();
+    }
+
+///Управление ресурсами
+    void PrefetchResources (size_t count, const char** resource_names)
+    {
+    }
+
+    void LoadResources (size_t count, const char** resource_names)
+    {
+      static const char* METHOD_NAME = "RenderManager::LoadResources";
+
+      if (!resource_names)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
+
+      for (size_t i = 0; i < count; i++)
+      {
+        if (!resource_names[i])
+          throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
+
+        resources_to_load.push_back (resource_names[i]);
+      }
+    }
+
+    void UnloadResources (size_t count, const char** resource_names)
+    {
+    }
+
+  private:
+    void DetachServer ()
+    {
+      if (!attached_resource_manager)
+        return;
+
+      attached_resource_manager->Detach (resource_server);
+      attached_resource_manager = 0;
+    }
+
   private:
     typedef xtl::shared_ptr<RenderableModel> RenderableModelPtr;
 
     typedef stl::hash_map<stl::hash_key<const char*>, RenderableModelPtr> RenderableModelMap;
+    typedef stl::vector<stl::string>                                      ResourceNames;
 
   private:
-    RenderableModelMap  renderable_models;
+    RenderableModelMap           renderable_models;
+    media::rms::Server           resource_server;
+    media::rms::ResourceManager* attached_resource_manager;
+    ResourceNames                resources_to_load;
 };
 
 #pragma pack (1)
