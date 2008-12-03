@@ -4,7 +4,7 @@ using namespace common;
 using namespace stl;
 
 /*
-    Утилиты
+    ╙ЄшышЄ√
 */
 
 inline bool TestFlag (size_t mask,size_t flag)
@@ -13,7 +13,7 @@ inline bool TestFlag (size_t mask,size_t flag)
 }
 
 /*
-    Операции работы с файлом
+    ╬яхЁрЎшш ЁрсюЄ√ ё Їрщыюь
 */
 
 StdioFileSystem::file_t StdioFileSystem::FileOpen (const char* file_name,filemode_t mode,size_t)
@@ -44,7 +44,7 @@ StdioFileSystem::file_t StdioFileSystem::FileOpen (const char* file_name,filemod
       case EACCES: throw xtl::format_exception<FileLoadException>     ("common::StdioFileSystem::FileOpen","Access denied to file '%s' mode=%s",file_name,strfilemode (mode).c_str ()); break;
       case EMFILE: throw xtl::format_exception<FileLoadException>     ("common::StdioFileSystem::FileOpen","Unable to open file '%s'. Too many open files",file_name); break;
       case ENOENT: throw xtl::format_exception<FileNotFoundException> ("common::StdioFileSystem::FileOpen","File '%s' not found",file_name); break;
-      default:     throw xtl::format_exception<FileLoadException>     ("common::StdioFileSystem::FileOpen","Unable to open fie '%s' mode=%s. Reason unknown",file_name,strfilemode (mode).c_str ()); break;
+      default:     throw xtl::format_exception<FileLoadException>     ("common::StdioFileSystem::FileOpen","Unable to open file '%s' mode=%s. Reason unknown",file_name,strfilemode (mode).c_str ()); break;
     }
   }
   
@@ -192,7 +192,7 @@ void StdioFileSystem::FileFlush (file_t file)
 }
 
 /*
-    Управление расположением файла
+    ╙яЁртыхэшх Ёрёяюыюцхэшхь Їрщыр
 */
 
 void StdioFileSystem::Remove (const char* file_name)
@@ -201,9 +201,13 @@ void StdioFileSystem::Remove (const char* file_name)
   {
     switch (errno)
     {
-      case EACCES: throw xtl::format_exception<FileException>         ("common::StdioFileSystem::Remove","Access to file '%s' denied",file_name); break;
-      case ENOENT: throw xtl::format_exception<FileNotFoundException> ("common::StdioFileSystem::Remove","File '%s' not found",file_name); break;
-      default:     throw xtl::format_exception<FileException>         ("common::StdioFileSystem::Remove","Unknown error"); break;
+      case EACCES: 
+        throw xtl::format_exception<FileException> ("common::StdioFileSystem::Remove","Access to file '%s' denied",file_name);
+      case ENOENT: 
+        break;
+      default:
+        throw xtl::format_exception<FileException> ("common::StdioFileSystem::Remove","Can't remove file '%s'. Reason: %s", 
+          file_name, strerror (errno));
     }
   }
 }
@@ -240,7 +244,7 @@ void StdioFileSystem::Mkdir (const char* dir_name)
 }
 
 /*
-    Получение информации о файле
+    ╧юыєўхэшх шэЇюЁьрЎшш ю Їрщых
 */
 
 bool StdioFileSystem::IsFileExist (const char* file_name)
@@ -267,7 +271,7 @@ bool StdioFileSystem::GetFileInfo (const char* file_name,FileInfo& info)
 }
 
 /*
-    Поиск файлов
+    ╧юшёъ Їрщыют
 */
 
 #ifdef _WIN32
