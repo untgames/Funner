@@ -422,21 +422,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
           wait_envelope_timer.Pause ();
           return;
         }
-      }
 
-      size_t file_size = common::FileSystem::GetFileSize (waited_envelope.file_name.c_str ());
-
-      if (!file_size)
-        return;
-
-      if (file_size != waited_envelope.current_file_size)
-      {
-        waited_envelope.current_file_size = file_size;
-        return;
-      }
-
-      if (waited_envelope.waiting_for_xmesh)
-      {
         stl::string application_name  = common::format ("%s\\%smesh-converter.exe", working_directory.c_str (), plugin_path.c_str ()),
                     xmesh_file_name   = waited_envelope.file_name,
                     binmesh_file_name = common::format ("%senvelope.binmesh", project_path.c_str ());
@@ -447,6 +433,17 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
         _spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), xmesh_file_name.c_str (), binmesh_file_name.c_str (), 0);
 
+        return;
+      }
+
+      size_t file_size = common::FileSystem::GetFileSize (waited_envelope.file_name.c_str ());
+
+      if (!file_size)
+        return;
+
+      if (file_size != waited_envelope.current_file_size)
+      {
+        waited_envelope.current_file_size = file_size;
         return;
       }
 
