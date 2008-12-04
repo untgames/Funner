@@ -11,7 +11,6 @@ struct ModelData
 {
   double  A, B, C;     //момент инерции A,B,C
   double  h, g;        //постоянные интегрирования h,g
-  double  nu1,nu2,nu3; //направления силы тяжести  
   double  mx,my,mz;    //координаты центра тяжести
   int     ini;         //???
   double  len, dm;     //длина интервала интегрирования и масштаб
@@ -21,7 +20,7 @@ struct ModelData
     Загрузка модели из файла
 */
 
-void LoadModelData (const char* file_name, ModelData& model_data, double nu1, double nu2, double nu3);
+void LoadModelData (const char* file_name, ModelData& model_data);
 
 /*
     Простые структуры данных
@@ -74,6 +73,6 @@ struct DrawPrimitive
 typedef std::vector<DrawVertex>    DrawVertexArray;
 typedef std::vector<DrawPrimitive> DrawPrimitiveArray;
 
-void BuildTrajectory (const ModelData& model_data, size_t iterations_count, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives);
+void BuildTrajectory (const ModelData& model_data, double nu1, double nu2, double nu3, size_t iterations_count, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives);
 
 #endif

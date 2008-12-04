@@ -14,7 +14,6 @@ struct ModelData
 {
   double  A, B, C;     //момент инерции A,B,C
   double  h, g;        //постоянные интегрирования h,g
-  double  nu1,nu2,nu3; //???
   double  mx,my,mz;    //координаты центра тяжести
   int     ini;         //???
   double  len, dm;     //длина интервала интегрирования и масштаб

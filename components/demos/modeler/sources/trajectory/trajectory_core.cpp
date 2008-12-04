@@ -106,7 +106,11 @@ void free_vector(double *v,int nl,int)
 class TrajectoryBuilder
 {
   public:
-    TrajectoryBuilder (const ModelData& in_model_data, size_t iterations_count) : model_data (in_model_data) 
+    TrajectoryBuilder (const ModelData& in_model_data, double in_nu1, double in_nu2, double in_nu3, size_t iterations_count) 
+      : model_data (in_model_data),
+        nu1 (in_nu1),
+        nu2 (in_nu2),
+        nu3 (in_nu3)
     {
       MaxSize = 900000; //?????
 
@@ -116,18 +120,18 @@ class TrajectoryBuilder
 
       nit = 1;
 
-      if (sqr (model_data.nu1) + sqr (model_data.nu3) > 1)
+      if (sqr (nu1) + sqr (nu3) > 1)
       {
-        model_data.nu3 = sqrt (1.0 - sqr (model_data.nu1));
+        nu3 = sqrt (1.0 - sqr (nu1));
       }
       
-      model_data.nu2 = sqrt (1.0 - sqr (model_data.nu1) - sqr (model_data.nu3));
+      nu2 = sqrt (1.0 - sqr (nu1) - sqr (nu3));
       
       mlen = model_data.len;      
       dm   = model_data.dm;
       
-      qq1 = model_data.nu1;
-      qq3 = model_data.nu3;
+      qq1 = nu1;
+      qq3 = nu3;
 
       alf = 0.2;
 
@@ -141,18 +145,18 @@ class TrajectoryBuilder
 
       for (size_t i = 0; i < 1000; i++, angle += 0.001)
       {
-        model_data.nu1 = sin (angle);
-        model_data.nu3 = sin (angle);
+        nu1 = sin (angle);
+        nu3 = sin (angle);
 
-        if (sqr (model_data.nu1) + sqr (model_data.nu3) > 1)
+        if (sqr (nu1) + sqr (nu3) > 1)
         {
-          model_data.nu3 = sqrtf (1 - sqr (model_data.nu1));
+          nu3 = sqrtf (1 - sqr (nu1));
         }
 
-        model_data.nu2 = sqrtf (1 - sqr (model_data.nu1) - sqr (model_data.nu3));
+        nu2 = sqrtf (1 - sqr (nu1) - sqr (nu3));
 
-        qq1 = model_data.nu1;
-        qq3 = model_data.nu3;
+        qq1 = nu1;
+        qq3 = nu3;
 
         DoIterEx ();
       }*/
@@ -342,8 +346,8 @@ class TrajectoryBuilder
         memcpy (&point3d[elmnts].rgb,   dot_color,  sizeof (dot_color));
 
         point3d[elmnts].side = koef > 1;
-        point3d[elmnts].nu1  = model_data.nu1;
-        point3d[elmnts].nu3  = model_data.nu3;
+        point3d[elmnts].nu1  = nu1;
+        point3d[elmnts].nu3  = nu3;
 
         point3d[elmnts].envelope_side = ii > 0;
         
@@ -366,8 +370,8 @@ class TrajectoryBuilder
         else
           point3d[elmnts].side = koef > 1;
 
-        point3d[elmnts].nu1  = model_data.nu1;
-        point3d[elmnts].nu3  = model_data.nu3;
+        point3d[elmnts].nu1  = nu1;
+        point3d[elmnts].nu3  = nu3;
         
         point3d[elmnts].envelope_side = ii > 0;
         
@@ -594,16 +598,17 @@ class TrajectoryBuilder
   private:
     struct Point3D
     {
-      float   pnts[3];
-      float   pnts2[3];
-      float   nrmls[3];
-      double  rgb[3],nu1,nu3;
-      bool    side;
-      bool    envelope_side;
+      float  pnts[3];
+      float  pnts2[3];
+      float  nrmls[3];
+      double rgb[3],nu1,nu3;
+      bool   side;
+      bool   envelope_side;
     };
 
   private:    
     ModelData            model_data;
+    double               nu1, nu2, nu3;
     double               xx[201], y[7][201], z[3][201];
     size_t               elmnts;
     int                  MaxSize, CurSize;
@@ -620,7 +625,7 @@ class TrajectoryBuilder
     Загрузка модели из файла
 */
 
-void LoadModelData (const char* file_name, ModelData& model_data, double nu1, double nu2, double nu3)
+void LoadModelData (const char* file_name, ModelData& model_data)
 {
   FILE* file = fopen (file_name, "rt");
   
@@ -630,17 +635,13 @@ void LoadModelData (const char* file_name, ModelData& model_data, double nu1, do
     exit (1);
   }
 
-  if (fscanf (file, "A=%lf, B=%lf, C=%lf, h=%lf, g=%lf, nu1=%lf, nu3=%lf, mx=%lf, my=%lf, mz=%lf, ini=%d",
-              &model_data.A, &model_data.B, &model_data.C, &model_data.h,&model_data.g, &model_data.nu1,
-              &model_data.nu3, &model_data.mx, &model_data.my,&model_data.mz, &model_data.ini) != 11)
+  if (fscanf (file, "A=%lf, B=%lf, C=%lf, h=%lf, g=%lf, mx=%lf, my=%lf, mz=%lf, ini=%d",
+              &model_data.A, &model_data.B, &model_data.C, &model_data.h,&model_data.g,
+              &model_data.mx, &model_data.my,&model_data.mz, &model_data.ini) != 9)
   {
     printf ("Error at read model data\n");
     exit (1);
   }
-
-  model_data.nu1 = nu1;
-  model_data.nu2 = nu2;
-  model_data.nu3 = nu3;
 
   model_data.len = 10.1f;
   model_data.dm  = 0.6f;
@@ -650,9 +651,9 @@ void LoadModelData (const char* file_name, ModelData& model_data, double nu1, do
     Построение мега-поверхности
 */
 
-void BuildTrajectory (const ModelData& model_data, size_t iterations_count, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
+void BuildTrajectory (const ModelData& model_data, double nu1, double nu2, double nu3, size_t iterations_count, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
 {
-  TrajectoryBuilder builder (model_data, iterations_count);
+  TrajectoryBuilder builder (model_data, nu1, nu2, nu3, iterations_count);
   
   builder.Convert (out_vertices, out_primitives);
 }

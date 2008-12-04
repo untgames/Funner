@@ -122,12 +122,12 @@ int main (int argc, char* argv[])
     return 2;
   }
 
-  LoadModelData (argv[1], model_data, nu1, nu2, nu3);
+  LoadModelData (argv[1], model_data);
   
   DrawVertexArray    vertices;
   DrawPrimitiveArray primitives;
 
-  BuildTrajectory (model_data, atoi (argv[6]), vertices, primitives);
+  BuildTrajectory (model_data, nu1, nu2, nu3, atoi (argv[6]), vertices, primitives);
   
   dump (argv[5], vertices, primitives);
 

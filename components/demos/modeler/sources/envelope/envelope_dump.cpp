@@ -122,9 +122,6 @@ int main (int argc, char* argv[])
 
   BuildMegaSurface (model_data, iterations_count, iterations_count, vertices, primitives);
 
-//  printf ("Mega surface builded successfull!\n");
-//  printf ("Primitives %u, vertices %u:\n", primitives.size (), vertices.size ());
-  
   dump (argv[2], vertices, primitives);  
 
   return 0;

@@ -626,15 +626,13 @@ void LoadModelData (const char* file_name, ModelData& model_data)
     return;
   }
 
-  if (fscanf (file, "A=%lf, B=%lf, C=%lf, h=%lf, g=%lf, nu1=%lf, nu3=%lf, mx=%lf, my=%lf, mz=%lf, ini=%d",
-              &model_data.A, &model_data.B, &model_data.C, &model_data.h,&model_data.g, &model_data.nu1,
-              &model_data.nu3, &model_data.mx, &model_data.my,&model_data.mz, &model_data.ini) != 11)
+  if (fscanf (file, "A=%lf, B=%lf, C=%lf, h=%lf, g=%lf, mx=%lf, my=%lf, mz=%lf, ini=%d",
+              &model_data.A, &model_data.B, &model_data.C, &model_data.h,&model_data.g,
+              &model_data.mx, &model_data.my, &model_data.mz, &model_data.ini) != 9)
   {
     printf ("Error at read model data\n");
     return;
   }
-
-  model_data.nu2 = sqrt (1 - model_data.nu1 * model_data.nu1 - model_data.nu3 * model_data.nu3);
 }
 
 /*
