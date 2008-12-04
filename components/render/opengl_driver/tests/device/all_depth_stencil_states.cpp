@@ -94,22 +94,22 @@ int main ()
   try
   {
     Test test (L"OpenGL device test window (all_input_states_test)");
-    
+
     output_mode = test.log_mode;
-    
+
     DepthStencilDesc desc;
     desc.stencil_read_mask = 0xFF;
     desc.stencil_write_mask = 0xFF;
-    
+
     for (int dt = 0; dt < 2; dt++)
     {
-      desc.depth_test_enable = (bool) dt;
+      desc.depth_test_enable = dt ? true : false;
       for (int dw = 0; dw < 2; dw++)
       {
-        desc.depth_write_enable = (bool) dw;
+        desc.depth_write_enable = dw ? true : false;
         for (int st = 0; st < 2; st++)
         {
-          desc.stencil_test_enable = (bool) st;
+          desc.stencil_test_enable = st ? true : false;
           for (int dcm = 0; dcm < CompareMode_Num; dcm++)
           {
             desc.depth_compare_mode = (CompareMode) dcm;
