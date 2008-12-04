@@ -21,7 +21,7 @@ struct ModelData
     Загрузка модели из файла
 */
 
-void LoadModelData (const char* file_name, ModelData& model_data);
+void LoadModelData (const char* file_name, ModelData& model_data, double nu1, double nu2, double nu3);
 
 /*
     Простые структуры данных

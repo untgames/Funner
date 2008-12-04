@@ -19,6 +19,7 @@
   </MenuStrip>
   <ToolStrip Id="ToolStrip1">
     <ToolButton Text="CalculateEnvelope" OnClick="Application.Execute ('Modeler.CalculateEnvelope (400)')"/>
+    <ToolButton Text="CalculateTrajectory" OnClick="Application.Execute ('Modeler.CalculateTrajectory (0, 1, 0, 100)')"/>
   </ToolStrip>
   <Plugin 
     Name="Console" 

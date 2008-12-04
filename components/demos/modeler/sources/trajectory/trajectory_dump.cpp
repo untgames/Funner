@@ -4,6 +4,31 @@
 
 #include "core.h"
 
+const char* DESC_FILE_SUFFIX = ".desc";
+
+void save_desc_file (const char* result_file_name, size_t file_size)
+{
+  size_t file_name_buffer_size = strlen (result_file_name) + strlen (DESC_FILE_SUFFIX) + 1;
+
+  char* desc_file_name = new char [file_name_buffer_size];
+
+  _snprintf (desc_file_name, file_name_buffer_size, "%s%s", result_file_name, DESC_FILE_SUFFIX);
+
+  FILE* desc_file = fopen (desc_file_name, "w");
+
+  delete [] desc_file_name;
+
+  if (!desc_file)
+  {
+    printf ("Can't open desc file '%s'\n", desc_file_name);
+    return;
+  }
+
+  fwrite (&file_size, sizeof (file_size), 1, desc_file);
+
+  fclose (desc_file);
+}
+
 void dump (const char* result_file_name, const DrawVertexArray& vertices, const DrawPrimitiveArray& primitives)
 {
   FILE* result_file = fopen (result_file_name, "w");
@@ -69,27 +94,42 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
   fprintf (result_file, "  </meshes>\n");
   fprintf (result_file, "</mesh_library>\n");
 
+  fflush (result_file);
+
+  save_desc_file (result_file_name, ftell (result_file));
+
   fclose (result_file);
 }
 
 int main (int argc, char* argv[])
 {
-  if (argc != 4)
+  if (argc != 7)
   {
-    printf ("Usage: modeler-trajectory model_data_file result_file iterations_count\n");
+    printf ("Usage: modeler-trajectory model_data_file nu1 nu2 nu3 result_file iterations_count\n");
     return 1;
   }
 
   ModelData model_data;
 
-  LoadModelData (argv[1], model_data);
+  double nu1 = atof (argv[2]), nu2 = atof (argv[3]), nu3 = atof (argv[4]);
+
+  double nu_sqr_sum = nu1 * nu1 + nu2 * nu2 + nu3 * nu3;
+
+  if ((nu_sqr_sum < 0.99) || (nu_sqr_sum > 1.01))
+  {
+    save_desc_file (argv[5], 0);
+    printf ("Invalid input nu data, nu1 * nu1 + nu2 * nu2 + nu3 * nu3 must be 1\n");
+    return 2;
+  }
+
+  LoadModelData (argv[1], model_data, nu1, nu2, nu3);
   
   DrawVertexArray    vertices;
   DrawPrimitiveArray primitives;
 
-  BuildTrajectory (model_data, atoi (argv[3]), vertices, primitives);
+  BuildTrajectory (model_data, atoi (argv[6]), vertices, primitives);
   
-  dump (argv[2], vertices, primitives);
+  dump (argv[5], vertices, primitives);
 
   return 0;
 }

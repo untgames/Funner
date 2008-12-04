@@ -620,7 +620,7 @@ class TrajectoryBuilder
     Загрузка модели из файла
 */
 
-void LoadModelData (const char* file_name, ModelData& model_data)
+void LoadModelData (const char* file_name, ModelData& model_data, double nu1, double nu2, double nu3)
 {
   FILE* file = fopen (file_name, "rt");
   
@@ -638,7 +638,9 @@ void LoadModelData (const char* file_name, ModelData& model_data)
     exit (1);
   }
 
-  model_data.nu2 = sqrt (1 - model_data.nu1 * model_data.nu1 - model_data.nu3 * model_data.nu3);
+  model_data.nu1 = nu1;
+  model_data.nu2 = nu2;
+  model_data.nu3 = nu3;
 
   model_data.len = 10.1f;
   model_data.dm  = 0.6f;

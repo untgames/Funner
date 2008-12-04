@@ -4,6 +4,7 @@
 #include <exception>
 #include <process.h>
 
+#include <stl/hash_map>
 #include <stl/list>
 
 #include <xtl/any.h>
@@ -209,7 +210,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
         //регистрация функций
 
       lib.Register ("CalculateEnvelope", script::make_invoker<void (size_t)> (xtl::bind (&MyApplicationServer::CalculateEnvelope, this, _1)));
-      lib.Register ("CalculateTrajectory", script::make_invoker<void ()> (xtl::bind (&MyApplicationServer::CalculateTrajectory, this)));
+      lib.Register ("CalculateTrajectory", script::make_invoker<void (double, double, double, size_t)> (xtl::bind (&MyApplicationServer::CalculateTrajectory, this, _1, _2, _3, _4)));
 
         //чтение конфигурации
 
@@ -324,47 +325,101 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     void Release () { release (this); }
 
   private:
+    void LoadTrajectory (const char* file_name)
+    {
+      media::rms::Group resource_group;
+
+      resource_group.Add (file_name);
+
+      resource_manager.CreateBinding (resource_group).Load ();
+
+      if (!common::FileSystem::IsFileExist (file_name))
+      {
+        common::Console::Printf ("Can't load trajectory '%s', no such file\n", file_name);
+        return;
+      }
+
+      VisualModels::iterator iter = trajectories.find (file_name);
+
+      if (iter != trajectories.end ())
+      {
+        iter->second->Unbind ();
+        trajectories.erase (iter);
+      }
+
+      VisualModel::Pointer new_trajectory = VisualModel::Create ();
+
+      new_trajectory->SetMeshName (file_name);
+      new_trajectory->BindToScene (scene);
+      new_trajectory->SetName     ("Trajectory");
+      new_trajectory->Scale       (-2.f, 2.f, 2.f);
+
+      trajectories[file_name] = new_trajectory;
+    }
+
     void CheckNewTrajectories ()
     {
       for (WaitedMeshes::iterator iter = waited_trajectories.begin (), end= waited_trajectories.end (); iter != end;)
       {
-        stl::string file_path = project_path + iter->file_name;
-
-        if (!common::FileSystem::IsFileExist (file_path.c_str ()))
+        if (iter->waiting_for_xmesh)
         {
-          ++iter;
-          continue;
+          if (!common::FileSystem::IsFileExist (iter->file_name.c_str ()))
+          {
+            ++iter;
+            continue;
+          }
+
+          common::InputFile desc_file (iter->file_name.c_str ());
+
+          size_t desc_file_data;
+
+          desc_file.Read (&desc_file_data, sizeof (desc_file_data));
+
+          iter->file_name.resize (iter->file_name.size () - xtl::xstrlen (DESC_FILE_SUFFIX));
+
+          if (!desc_file_data || !common::FileSystem::IsFileExist (iter->file_name.c_str ()) ||
+              (common::FileSystem::GetFileSize (iter->file_name.c_str ()) != desc_file_data))
+          {
+            common::Console::Print ("There was an error while calculating trajectory\n");
+            
+            WaitedMeshes::iterator next = iter;
+
+            ++next;
+            waited_trajectories.erase (iter);
+            iter = next;
+            
+            return;
+          }
+
+          stl::string application_name  = common::format ("%s\\%smesh-converter.exe", working_directory.c_str (), plugin_path.c_str ()),
+                      xmesh_file_name   = iter->file_name,
+                      binmesh_file_name = common::format ("%.*sbinmesh", iter->file_name.length () - xtl::xstrlen ("xmesh"), iter->file_name.c_str ());
+
+          iter->file_name         = binmesh_file_name;
+          iter->waiting_for_xmesh = false;
+          iter->current_file_size = 0;
+
+          _spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), xmesh_file_name.c_str (), binmesh_file_name.c_str (), 0);
+
+          return;
         }
 
-        size_t file_size = common::FileSystem::GetFileSize (file_path.c_str ());
+        size_t file_size = common::FileSystem::GetFileSize (iter->file_name.c_str ());
 
         if (!file_size)
-        {
-          ++iter;
-          continue;
-        }
+          return;
 
         if (file_size != iter->current_file_size)
         {
           iter->current_file_size = file_size;
-          ++iter;
-          continue;
+          return;
         }
 
         WaitedMeshes::iterator next = iter;
 
         ++next;
-
-        VisualModel::Pointer trajectory = VisualModel::Create ();
-
-        trajectory->SetMeshName (file_path.c_str ());
-        trajectory->SetName     ("Trajectory");
-        trajectory->BindToScene (scene);
-
-        trajectory->Scale (-2.f, 2.f, 2.f);
-
+        LoadTrajectory (iter->file_name.c_str ());
         waited_trajectories.erase (iter);
-
         iter = next;
       }
 
@@ -372,9 +427,31 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
         wait_trajectory_timer.Pause ();
     }
 
-    void CalculateTrajectory ()
+    void CalculateTrajectory (double nu1, double nu2, double nu3, size_t lod)
     {
-      waited_trajectories.push_back (WaitedMesh ("trajectory.xmesh"));
+      stl::string application_name        = common::format ("%s\\%smodeler-trajectory.exe", working_directory.c_str (), plugin_path.c_str ()),
+                  model_name              = common::format ("%smodel.dat", project_path.c_str ()),
+                  trajectory_name         = common::format ("%strajectory_%g_%g_%g.xmesh", project_path.c_str (), nu1, nu2, nu3),
+                  binmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.binmesh", project_path.c_str (), nu1, nu2, nu3),
+                  nu1_string              = common::format ("%g", nu1),
+                  nu2_string              = common::format ("%g", nu2),
+                  nu3_string              = common::format ("%g", nu3),
+                  lod_string              = common::format ("%u", lod);
+
+      WaitedMesh waited_trajectory;
+
+      waited_trajectory.file_name         = trajectory_name + DESC_FILE_SUFFIX;
+      waited_trajectory.current_file_size = 0;
+      waited_trajectory.waiting_for_xmesh = true;
+
+      waited_trajectories.push_back (waited_trajectory);
+
+      common::FileSystem::Remove (trajectory_name.c_str ());
+      common::FileSystem::Remove (binmesh_trajectory_name.c_str ());
+      common::FileSystem::Remove (waited_trajectory.file_name.c_str ());
+      
+      _spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), model_name.c_str (), nu1_string.c_str (),
+               nu2_string.c_str (), nu3_string.c_str (), trajectory_name.c_str (), lod_string.c_str (), 0);
 
       wait_trajectory_timer.Run ();
     }
@@ -487,6 +564,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     };
 
     typedef stl::list<WaitedMesh> WaitedMeshes;
+    typedef stl::hash_map<stl::hash_key<const char*>, VisualModel::Pointer> VisualModels;
 
   private:
     ShellEnvironmentPtr         shell_environment;     //окружение скриптовой среды
@@ -501,6 +579,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     syslib::Timer               wait_envelope_timer;
     stl::string                 working_directory;
     VisualModel::Pointer        envelope;
+    VisualModels                trajectories;
     WaitedMesh                  waited_envelope;
     media::rms::ResourceManager resource_manager;
 };
@@ -538,12 +617,19 @@ void print (const char* message)
   common::Console::Printf ("%s\n", message);
 }
 
+void log_handler (const char* log_name, const char* message)
+{
+  common::Console::Printf ("%s: %s\n", log_name, message);
+}
+
 }
 
 int main ()
 {
   try
   {
+    common::LogFilter log_filter ("*", &log_handler);
+
     Test test;
 
     test.main_window.SetLogHandler (&print);
