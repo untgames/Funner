@@ -106,7 +106,7 @@ void free_vector(double *v,int nl,int)
 class TrajectoryBuilder
 {
   public:
-    TrajectoryBuilder (const ModelData& in_model_data, double in_nu1, double in_nu2, double in_nu3, size_t iterations_count) 
+    TrajectoryBuilder (const ModelData& in_model_data, double in_nu1, double in_nu2, double in_nu3, size_t vertices_count) 
       : model_data (in_model_data),
         nu1 (in_nu1),
         nu2 (in_nu2),
@@ -161,15 +161,15 @@ class TrajectoryBuilder
         DoIterEx ();
       }*/
 
-      size_t print_step = iterations_count / 10000;
+      size_t print_step = vertices_count / 10000;
 
       if (!print_step)
         print_step++;
 
-      for (size_t i = 0; i < iterations_count; i++)
+      for (size_t i = 0; CurSize < vertices_count; i++)
       {
         if (!(i % print_step))
-          printf ("\rProgress: %.2f%%", (float)i / iterations_count * 100.f);
+          printf ("\rProgress: %.2f%%", (float)i / vertices_count * 100.f);
 
         DoIterEx ();
       }
@@ -651,9 +651,9 @@ void LoadModelData (const char* file_name, ModelData& model_data)
     Построение мега-поверхности
 */
 
-void BuildTrajectory (const ModelData& model_data, double nu1, double nu2, double nu3, size_t iterations_count, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
+void BuildTrajectory (const ModelData& model_data, double nu1, double nu2, double nu3, size_t vertices_count, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
 {
-  TrajectoryBuilder builder (model_data, nu1, nu2, nu3, iterations_count);
+  TrajectoryBuilder builder (model_data, nu1, nu2, nu3, vertices_count);
   
   builder.Convert (out_vertices, out_primitives);
 }

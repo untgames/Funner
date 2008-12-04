@@ -105,7 +105,7 @@ int main (int argc, char* argv[])
 {
   if (argc != 7)
   {
-    printf ("Usage: modeler-trajectory model_data_file nu1 nu2 nu3 result_file iterations_count\n");
+    printf ("Usage: modeler-trajectory model_data_file nu1 nu2 nu3 result_file vertices_count\n");
     return 1;
   }
 
