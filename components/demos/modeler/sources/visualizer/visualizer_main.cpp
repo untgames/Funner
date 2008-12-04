@@ -227,6 +227,13 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
       common::ParseIterator iter = parser.Root ().First ("Configuration");
 
+      stl::string precomputed_trajectories_mask = project_path + "trajectory*.binmesh";
+
+      common::FileList precomputed_trajectories = common::FileSystem::Search (precomputed_trajectories_mask.c_str (), common::FileSearch_Files);
+
+      for (size_t i = 0, size = precomputed_trajectories.Size (); i < size; i++)
+        LoadTrajectory (precomputed_trajectories.Item (i).name);
+
       LoadEnvelope ();
 
       plugin_path = common::get<const char*> (*iter, "PluginPath");
