@@ -78,6 +78,9 @@ const char* CONFIGURATION_FILE_NAME             = "media/conf/form_config.xml";
 const char* SCREEN_ATTACHMENT_NAME              = "MainScreen";
 const char* INTERPRETER_NAME                    = "lua";
 const char* DESC_FILE_SUFFIX                    = ".desc";
+const char* ENVELOPE_APPLICATION_NAME           = "modeler-envelope.exe";
+const char* TRAJECTORY_APPLICATION_NAME         = "modeler-trajectory.exe";
+const char* MESH_CONVERTER_APPLICATION_NAME     = "mesh-converter.exe";
 
 //тестовое пользовательское дочернее окно
 class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
@@ -173,13 +176,15 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
 //тестовый сервер приложения
 class MyApplicationServer: public IApplicationServer, public xtl::reference_counter
 {
+  private:
+    typedef xtl::function <void (const char*)> WaitFileHandler;
+
   public:
     MyApplicationServer ()
       : shell_environment (new script::Environment),
         shell (INTERPRETER_NAME, shell_environment),
         project_path ("projects\\project1\\"),
-        wait_trajectory_timer (xtl::bind (&MyApplicationServer::CheckNewTrajectories, this), 1000, syslib::TimerState_Paused),
-        wait_envelope_timer (xtl::bind (&MyApplicationServer::CheckNewEnvelope, this), 1000, syslib::TimerState_Paused),
+        wait_files_timer (xtl::bind (&MyApplicationServer::CheckNewFiles, this), 1000, syslib::TimerState_Paused),
         envelope (VisualModel::Create ())
     {
       static const char* METHOD_NAME = "MyApplicationServer::MyApplicationServer";
@@ -198,7 +203,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
         free (buffer);
       }
-      
+
         //регистрация шлюзов
 
       shell_environment->BindLibraries ("*");
@@ -211,6 +216,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
       lib.Register ("CalculateEnvelope", script::make_invoker<void (size_t)> (xtl::bind (&MyApplicationServer::CalculateEnvelope, this, _1)));
       lib.Register ("CalculateTrajectory", script::make_invoker<void (double, double, double, size_t)> (xtl::bind (&MyApplicationServer::CalculateTrajectory, this, _1, _2, _3, _4)));
+      lib.Register ("CalculateTrajectories", script::make_invoker<void (size_t, size_t)> (xtl::bind (&MyApplicationServer::CalculateTrajectories, this, _1, _2)));
 
         //чтение конфигурации
 
@@ -274,7 +280,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       }
 
       try
-      {        
+      {
         shell.Execute (command);
       }
       catch (std::exception& exception)
@@ -364,103 +370,54 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       trajectories[file_name] = new_trajectory;
     }
 
-    void CheckNewTrajectories ()
+    void OnNewXmeshTrajectory (const char* desc_trajectory_file_name)
     {
-      for (WaitedMeshes::iterator iter = waited_trajectories.begin (), end= waited_trajectories.end (); iter != end;)
+      common::InputFile desc_file (desc_trajectory_file_name);
+
+      size_t desc_file_data;
+
+      desc_file.Read (&desc_file_data, sizeof (desc_file_data));
+
+      stl::string xmesh_trajectory_file_name (desc_trajectory_file_name, xtl::xstrlen (desc_trajectory_file_name) - xtl::xstrlen (DESC_FILE_SUFFIX));
+
+      if (!desc_file_data || !common::FileSystem::IsFileExist (xmesh_trajectory_file_name.c_str ()) ||
+          (common::FileSystem::GetFileSize (xmesh_trajectory_file_name.c_str ()) != desc_file_data))
       {
-        if (iter->waiting_for_xmesh)
-        {
-          if (!common::FileSystem::IsFileExist (iter->file_name.c_str ()))
-          {
-            ++iter;
-            continue;
-          }
-
-          common::InputFile desc_file (iter->file_name.c_str ());
-
-          size_t desc_file_data;
-
-          desc_file.Read (&desc_file_data, sizeof (desc_file_data));
-
-          iter->file_name.resize (iter->file_name.size () - xtl::xstrlen (DESC_FILE_SUFFIX));
-
-          if (!desc_file_data || !common::FileSystem::IsFileExist (iter->file_name.c_str ()) ||
-              (common::FileSystem::GetFileSize (iter->file_name.c_str ()) != desc_file_data))
-          {
-            common::Console::Print ("There was an error while calculating trajectory\n");
-            
-            WaitedMeshes::iterator next = iter;
-
-            ++next;
-            waited_trajectories.erase (iter);
-            iter = next;
-            
-            return;
-          }
-
-          stl::string application_name  = common::format ("%s\\%smesh-converter.exe", working_directory.c_str (), plugin_path.c_str ()),
-                      xmesh_file_name   = iter->file_name,
-                      binmesh_file_name = common::format ("%.*sbinmesh", iter->file_name.length () - xtl::xstrlen ("xmesh"), iter->file_name.c_str ());
-
-          iter->file_name         = binmesh_file_name;
-          iter->waiting_for_xmesh = false;
-          iter->current_file_size = 0;
-
-          _spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), xmesh_file_name.c_str (), binmesh_file_name.c_str (), 0);
-
-          return;
-        }
-
-        size_t file_size = common::FileSystem::GetFileSize (iter->file_name.c_str ());
-
-        if (!file_size)
-          return;
-
-        if (file_size != iter->current_file_size)
-        {
-          iter->current_file_size = file_size;
-          return;
-        }
-
-        WaitedMeshes::iterator next = iter;
-
-        ++next;
-        LoadTrajectory (iter->file_name.c_str ());
-        waited_trajectories.erase (iter);
-        iter = next;
+        common::Console::Print ("There was an error while calculating trajectory\n");
+        return;
       }
 
-      if (waited_trajectories.empty ())
-        wait_trajectory_timer.Pause ();
+      stl::string application_name  = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME),
+                  binmesh_file_name = common::format ("%.*sbinmesh", xmesh_trajectory_file_name.length () - xtl::xstrlen ("xmesh"),
+                                                      xmesh_trajectory_file_name.c_str ());
+
+      if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), xmesh_trajectory_file_name.c_str (), binmesh_file_name.c_str (), 0) == -1)
+        throw xtl::format_operation_exception ("MyApplicationServer::OnNewXmeshEnvelope", "Can't call %s: %s", MESH_CONVERTER_APPLICATION_NAME, get_spawn_error_name ());
+
+      WaitForFile (binmesh_file_name.c_str (), xtl::bind (&MyApplicationServer::LoadTrajectory, this, _1));
     }
 
     void CalculateTrajectory (double nu1, double nu2, double nu3, size_t lod)
     {
-      stl::string application_name        = common::format ("%s\\%smodeler-trajectory.exe", working_directory.c_str (), plugin_path.c_str ()),
+      stl::string application_name        = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), TRAJECTORY_APPLICATION_NAME),
                   model_name              = common::format ("%smodel.dat", project_path.c_str ()),
                   trajectory_name         = common::format ("%strajectory_%g_%g_%g.xmesh", project_path.c_str (), nu1, nu2, nu3),
                   binmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.binmesh", project_path.c_str (), nu1, nu2, nu3),
                   nu1_string              = common::format ("%g", nu1),
                   nu2_string              = common::format ("%g", nu2),
                   nu3_string              = common::format ("%g", nu3),
-                  lod_string              = common::format ("%u", lod);
-
-      WaitedMesh waited_trajectory;
-
-      waited_trajectory.file_name         = trajectory_name + DESC_FILE_SUFFIX;
-      waited_trajectory.current_file_size = 0;
-      waited_trajectory.waiting_for_xmesh = true;
-
-      waited_trajectories.push_back (waited_trajectory);
+                  lod_string              = common::format ("%u", lod),
+                  waited_desc_file_name   = trajectory_name + DESC_FILE_SUFFIX;
 
       common::FileSystem::Remove (trajectory_name.c_str ());
       common::FileSystem::Remove (binmesh_trajectory_name.c_str ());
-      common::FileSystem::Remove (waited_trajectory.file_name.c_str ());
-      
-      _spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), model_name.c_str (), nu1_string.c_str (),
-               nu2_string.c_str (), nu3_string.c_str (), trajectory_name.c_str (), lod_string.c_str (), 0);
+      common::FileSystem::Remove (waited_desc_file_name.c_str ());
 
-      wait_trajectory_timer.Run ();
+      if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), model_name.c_str (), nu1_string.c_str (),
+            nu2_string.c_str (), nu3_string.c_str (), trajectory_name.c_str (), lod_string.c_str (), 0) == -1)
+        throw xtl::format_operation_exception ("MyApplicationServer::CalculateTrajectory", "Can't call %s: %s", TRAJECTORY_APPLICATION_NAME, get_spawn_error_name ());
+
+      WaitForFile (waited_desc_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewXmeshTrajectory, this, _1));
     }
 
     void LoadEnvelope ()
@@ -484,93 +441,104 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       envelope->SetName     ("Envelope");
     }
 
-    void CheckNewEnvelope ()
+    void OnNewXmeshEnvelope (const char* desc_envelope_file_name)
     {
-      if (!common::FileSystem::IsFileExist (waited_envelope.file_name.c_str ()))
-        return;
+      common::InputFile desc_file (desc_envelope_file_name);
 
-      if (waited_envelope.waiting_for_xmesh)
+      size_t desc_file_data;
+
+      desc_file.Read (&desc_file_data, sizeof (desc_file_data));
+
+      stl::string xmesh_envelope_file_name (desc_envelope_file_name, xtl::xstrlen (desc_envelope_file_name) - xtl::xstrlen (DESC_FILE_SUFFIX));
+
+      if (!desc_file_data || !common::FileSystem::IsFileExist (xmesh_envelope_file_name.c_str ()) ||
+          (common::FileSystem::GetFileSize (xmesh_envelope_file_name.c_str ()) != desc_file_data))
       {
-        common::InputFile desc_file (waited_envelope.file_name.c_str ());
-
-        size_t desc_file_data;
-
-        desc_file.Read (&desc_file_data, sizeof (desc_file_data));
-
-        waited_envelope.file_name.resize (waited_envelope.file_name.size () - xtl::xstrlen (DESC_FILE_SUFFIX));
-
-        if (!desc_file_data || !common::FileSystem::IsFileExist (waited_envelope.file_name.c_str ()) ||
-            (common::FileSystem::GetFileSize (waited_envelope.file_name.c_str ()) != desc_file_data))
-        {
-          common::Console::Print ("There was an error while calculating envelope\n");
-          wait_envelope_timer.Pause ();
-          return;
-        }
-
-        stl::string application_name  = common::format ("%s\\%smesh-converter.exe", working_directory.c_str (), plugin_path.c_str ()),
-                    xmesh_file_name   = waited_envelope.file_name,
-                    binmesh_file_name = common::format ("%senvelope.binmesh", project_path.c_str ());
-
-        waited_envelope.file_name         = binmesh_file_name;
-        waited_envelope.waiting_for_xmesh = false;
-        waited_envelope.current_file_size = 0;
-
-        _spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), xmesh_file_name.c_str (), binmesh_file_name.c_str (), 0);
-
+        common::Console::Print ("There was an error while calculating envelope\n");
         return;
       }
 
-      size_t file_size = common::FileSystem::GetFileSize (waited_envelope.file_name.c_str ());
+      stl::string application_name  = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME),
+                  binmesh_file_name = common::format ("%senvelope.binmesh", project_path.c_str ());
 
-      if (!file_size)
-        return;
+      if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), xmesh_envelope_file_name.c_str (), binmesh_file_name.c_str (), 0) == -1)
+        throw xtl::format_operation_exception ("MyApplicationServer::OnNewXmeshEnvelope", "Can't call %s: %s", MESH_CONVERTER_APPLICATION_NAME, get_spawn_error_name ());
 
-      if (file_size != waited_envelope.current_file_size)
-      {
-        waited_envelope.current_file_size = file_size;
-        return;
-      }
-
-      LoadEnvelope ();
-
-      wait_envelope_timer.Pause ();
+      WaitForFile (binmesh_file_name.c_str (), xtl::bind (&MyApplicationServer::LoadEnvelope, this));
     }
-    
+
     void CalculateEnvelope (size_t lod)
-    {
-      stl::string application_name      = common::format ("%s\\%smodeler-envelope.exe", working_directory.c_str (), plugin_path.c_str ()),
+    { //????Продумать двойной вызов
+      stl::string application_name      = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), ENVELOPE_APPLICATION_NAME),
                   model_name            = common::format ("%smodel.dat", project_path.c_str ()),
                   envelope_name         = common::format ("%senvelope.xmesh", project_path.c_str ()),
                   binmesh_envelope_name = common::format ("%senvelope.binmesh", project_path.c_str ()),
-                  lod_string            = common::format ("%u", lod);
-
-      waited_envelope.file_name         = envelope_name + DESC_FILE_SUFFIX;
-      waited_envelope.current_file_size = 0;
-      waited_envelope.waiting_for_xmesh = true;
+                  lod_string            = common::format ("%u", lod),
+                  waited_desc_file_name = envelope_name + DESC_FILE_SUFFIX;
 
       common::FileSystem::Remove (envelope_name.c_str ());
       common::FileSystem::Remove (binmesh_envelope_name.c_str ());
-      common::FileSystem::Remove (waited_envelope.file_name.c_str ());
-      
-      _spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), model_name.c_str (), envelope_name.c_str (), lod_string.c_str (), 0);
+      common::FileSystem::Remove (waited_desc_file_name.c_str ());
 
-      wait_envelope_timer.Run ();
+      if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), model_name.c_str (), envelope_name.c_str (), lod_string.c_str (), 0) == -1)
+        throw xtl::format_operation_exception ("MyApplicationServer::CalculateEnvelope", "Can't call %s: %s", ENVELOPE_APPLICATION_NAME, get_spawn_error_name ());
+
+      WaitForFile (waited_desc_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewXmeshEnvelope, this, _1));
+    }
+
+    void CalculateTrajectories (size_t trajectories_count, size_t lod)
+    {
+      //????do this
+    }
+
+    void CheckNewFiles ()
+    {
+      for (WaitedFiles::iterator iter = waited_files.begin (); iter != waited_files.end (); ++iter)
+      {
+        if (!common::FileSystem::IsFileExist (iter->file_name.c_str ()))
+          continue;
+
+        size_t file_size = common::FileSystem::GetFileSize (iter->file_name.c_str ());
+
+        if (file_size != iter->current_file_size)
+        {
+          iter->current_file_size = file_size;
+          continue;
+        }
+
+        WaitedFiles::iterator next = iter;
+
+        ++next;
+        iter->handler (iter->file_name.c_str ());
+        waited_files.erase (iter);
+        iter = next;
+      }
+
+      if (waited_files.empty ())
+        wait_files_timer.Pause ();
+    }
+
+    void WaitForFile (const char* file_name, const WaitFileHandler& handler)
+    {
+      waited_files.push_back (WaitedFile (file_name, handler));
+      wait_files_timer.Run ();
     }
 
   private:
     typedef xtl::shared_ptr<script::Environment> ShellEnvironmentPtr;
 
-    struct WaitedMesh
+    struct WaitedFile
     {
-      stl::string file_name;
-      size_t      current_file_size;
-      bool        waiting_for_xmesh; //если true - то ожидается появление начальной текстовой модели, если false - то ожидается окончание конвертирование xmesh в binmesh
+      stl::string     file_name;
+      size_t          current_file_size;
+      WaitFileHandler handler;
 
-      WaitedMesh () {}
-      WaitedMesh (const char* in_file_name) : file_name (in_file_name), current_file_size (0), waiting_for_xmesh (true) {}
+      WaitedFile (const char* in_file_name, const WaitFileHandler& in_handler)
+        : file_name (in_file_name), current_file_size (1), handler (in_handler)
+        {}
     };
 
-    typedef stl::list<WaitedMesh> WaitedMeshes;
+    typedef stl::list<WaitedFile> WaitedFiles;
     typedef stl::hash_map<stl::hash_key<const char*>, VisualModel::Pointer> VisualModels;
 
   private:
@@ -581,14 +549,12 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     Screen                      screen;
     stl::string                 plugin_path;
     stl::string                 project_path;
-    WaitedMeshes                waited_trajectories;
-    syslib::Timer               wait_trajectory_timer;
-    syslib::Timer               wait_envelope_timer;
+    syslib::Timer               wait_files_timer;
     stl::string                 working_directory;
     VisualModel::Pointer        envelope;
     VisualModels                trajectories;
-    WaitedMesh                  waited_envelope;
     media::rms::ResourceManager resource_manager;
+    WaitedFiles                 waited_files;
 };
 
 //класс тестового приложения

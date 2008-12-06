@@ -13,16 +13,19 @@ class RenderableModel
   public:
     RenderableModel (render::low_level::IDevice& device, const char* file_name);
     ~RenderableModel ();
-    
+
     void Draw (render::low_level::IDevice& device);
 
   private:
      RenderableModel (const RenderableModel&);
      RenderableModel& operator = (const RenderableModel&);
-    
+
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
+
+//проверка ошибок
+const char* get_spawn_error_name ();
 
 #endif

@@ -16,12 +16,12 @@ void hls2rgb3f (double h, double l, double s, double* rgb, int hls)
   int    c;
   double frac, diff, mini, maxi;
   double *r, *g, *b;
-  
+
   r = rgb;
   g = rgb + 1;
   b = rgb + 2;
   h = fmod (h, 360.0);
-  
+
   if (hls)
   {
     h /= 60.0;
@@ -36,13 +36,13 @@ void hls2rgb3f (double h, double l, double s, double* rgb, int hls)
 
   c    = (int)h;
   frac = h - c;
-  
+
   if (l <= 0.5) maxi = l * (1 + s);
   else          maxi = l + s - l * s;
 
   mini = 2 * l - maxi;
   diff = maxi - mini;
-    
+
   if (s == 0)                                       /* grau */
   {
     *r = *g = *b = (double)l;
@@ -89,12 +89,12 @@ double* vector (int nl, int nh)
 {
   double* v = (double*)malloc ((unsigned)(nh - nl + 1) * sizeof (double));
 
-  if (!v) 
+  if (!v)
   {
     printf ("allocation failure in vector(%d,%d)", nl, nh);
     abort  ();
   }
-  
+
   return v - nl;
 }
 
@@ -106,7 +106,7 @@ void free_vector(double *v,int nl,int)
 class TrajectoryBuilder
 {
   public:
-    TrajectoryBuilder (const ModelData& in_model_data, double in_nu1, double in_nu2, double in_nu3, size_t vertices_count) 
+    TrajectoryBuilder (const ModelData& in_model_data, double in_nu1, double in_nu2, double in_nu3, size_t vertices_count)
       : model_data (in_model_data),
         nu1 (in_nu1),
         nu2 (in_nu2),
@@ -124,12 +124,12 @@ class TrajectoryBuilder
       {
         nu3 = sqrt (1.0 - sqr (nu1));
       }
-      
+
       nu2 = sqrt (1.0 - sqr (nu1) - sqr (nu3));
-      
-      mlen = model_data.len;      
+
+      mlen = model_data.len;
       dm   = model_data.dm;
-      
+
       qq1 = nu1;
       qq3 = nu3;
 
@@ -175,7 +175,7 @@ class TrajectoryBuilder
       }
       printf ("\rProgress: 100.00%%\n");
 //      Section3D (200, 1.02);
-    }  
+    }
 
     void Convert (DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
     {
@@ -183,16 +183,16 @@ class TrajectoryBuilder
 
       size_t first = 0;
 
-      for (int i=0; i < CurSize; i++)
+      for (size_t i=0; i < CurSize; i++)
       {
         DrawVertex   line_start, line_end;
 
 //        if ((sqr (point3d[i].pnts2[0]) + sqr (point3d[i].pnts2[1]) + sqr (point3d[i].pnts2[2])) > 2.f)
 //          continue;
-         
+
         Point3D& point = point3d [i];
         float    normal [3], normal_length = 0.0f;
-        
+
         for (size_t j=0; j<3; j++)
         {
 //          normal [j]     = point.pnts [j] - point.pnts2 [j];
@@ -201,7 +201,7 @@ class TrajectoryBuilder
         }
 
         normal_length = sqrt (normal_length);
-        
+
         for (size_t j=0; j<3; j++)
           normal [j] /= normal_length;
 
@@ -212,7 +212,7 @@ class TrajectoryBuilder
         line_start.color.g    = 0.2f;
         line_start.color.b    = 0.2f;
         line_start.color.a    = 1.f;
-        
+
         float direction = point.envelope_side ? 1.0f : -1.0f;
 
         line_end.position.x = line_start.position.x + direction * normal [0] * 0.1f;
@@ -267,7 +267,7 @@ class TrajectoryBuilder
         ii = -1;
       }
 
-      for (i = 1; i <= nst; i++) 
+      for (i = 1; i <= nst; i++)
       {
         BuildPoint (i, fb, fa, ii, maximum_moment_of_inertia, koef, true);
       }
@@ -278,13 +278,13 @@ class TrajectoryBuilder
       {
         ii = 1;
       }
-    
-      for (i = 1; i <= nst; i++) 
+
+      for (i = 1; i <= nst; i++)
       {
         BuildPoint (i, fb, fa, ii, maximum_moment_of_inertia, koef, false);
       }
     }
-    
+
     void BuildPoint (size_t i, float& fb, float& fa, int& ii, double maximum_moment_of_inertia, double koef, bool sign)
     {
       elmnts %= MaxSize; //??????
@@ -313,7 +313,7 @@ class TrajectoryBuilder
       double condition_value = y[0][i] * (y[4][i] * (y[3][i] * model_data.my - y[4][i] * model_data.mx) - y[5][i] * (y[5][i] * model_data.mx - y[3][i] * model_data.mz)) +
                                y[1][i] * (y[5][i] * (y[4][i] * model_data.mz - y[5][i] * model_data.my) - y[3][i] * (y[3][i] * model_data.my - y[4][i] * model_data.mx)) +
                                y[2][i] * (y[3][i] * (y[5][i] * model_data.mx - y[3][i] * model_data.mz) - y[4][i] * (y[4][i] * model_data.mz - y[5][i] * model_data.my));
-                               
+
       if (sign)
         build_point_condition = condition_value > 0;
       else
@@ -330,13 +330,13 @@ class TrajectoryBuilder
 
         if (MegaFormulaWithMaximumInertia (maximum_moment_of_inertia) != 0)
         {
-          hls2rgb3f (sqrt ((m - sqr (model_data.g)) / MegaFormulaWithMaximumInertia (maximum_moment_of_inertia)) * 360., 0.5, 1.0, dot_color, 1);   
+          hls2rgb3f (sqrt ((m - sqr (model_data.g)) / MegaFormulaWithMaximumInertia (maximum_moment_of_inertia)) * 360., 0.5, 1.0, dot_color, 1);
         }
 
         dd[0] = (float)(y[3][i - 1] * fa - y[3][i] * fb) / (fa - fb);
         dd[1] = (float)(y[4][i - 1] * fa - y[4][i] * fb) / (fa - fb);
         dd[2] = (float)(y[5][i - 1] * fa - y[5][i] * fb) / (fa - fb);
-    
+
         dd2[0] = (float)(dm * (y[0][i - 1] * fa - y[0][i] * fb) / (fa - fb));
         dd2[1] = (float)(dm * (y[1][i - 1] * fa - y[1][i] * fb) / (fa - fb));
         dd2[2] = (float)(dm * (y[2][i - 1] * fa - y[2][i] * fb) / (fa - fb));
@@ -350,14 +350,14 @@ class TrajectoryBuilder
         point3d[elmnts].nu3  = nu3;
 
         point3d[elmnts].envelope_side = ii > 0;
-        
+
         if (MaxSize > CurSize)
         {
           CurSize++;
         }
 
-        elmnts++;    
-        
+        elmnts++;
+
         memcpy (&point3d[elmnts].pnts,  dd,  sizeof (dd));
         memcpy (&point3d[elmnts].pnts2, dd2, sizeof (dd2));
         memcpy (&point3d[elmnts].rgb,   dot_color,  sizeof (dot_color));
@@ -372,18 +372,18 @@ class TrajectoryBuilder
 
         point3d[elmnts].nu1  = nu1;
         point3d[elmnts].nu3  = nu3;
-        
+
         point3d[elmnts].envelope_side = ii > 0;
-        
+
         if (MaxSize > CurSize)
         {
           CurSize++;
         }
-        
-        elmnts++; 
-      }         
+
+        elmnts++;
+      }
     }
-    
+
     void q_starting (double *vst, int nd, int nst, int pr)
     {
       int    i;
@@ -394,20 +394,20 @@ class TrajectoryBuilder
         double u1, u2, u3, v1, v2, v3, vv;
 
         q1 = qq1;
-        q3 = qq3; 
+        q3 = qq3;
         q2 = sqrt (1.0 + 1.0e-20 - sqr (q1) - sqr (q3)); //???
-           
+
         u1 = q2 * model_data.mz - q3 * model_data.my;
         u2 = q3 * model_data.mx - q1 * model_data.mz;
         u3 = q1 * model_data.my - q2 * model_data.mx;
 
         v1 = q2 * u3 - q3 * u2;
         v2 = q3 * u1 - q1 * u3;
-        v3 = q1 * u2 - q2 * u1; 
+        v3 = q1 * u2 - q2 * u1;
 
         vv = sqr (v1) / model_data.A + sqr (v2) / model_data.B + sqr (v3) / model_data.C;
 
-        det = 2.0 * (model_data.h + q1 * model_data.mx + q2 * model_data.my + q3 * model_data.mz) * vv - 
+        det = 2.0 * (model_data.h + q1 * model_data.mx + q2 * model_data.my + q3 * model_data.mz) * vv -
               sqr (model_data.g) * (model_data.A * sqr (u1) + model_data.B * sqr (u2) + model_data.C * sqr (u3)) / model_data.A / model_data.B / model_data.C;
 
                                   //here put +-sqrt
@@ -425,7 +425,7 @@ class TrajectoryBuilder
         for (i = 1; i <= nd; i++)
         {
           vst[i] = y[i - 1][nst];
-        } 
+        }
       }
     }
 
@@ -441,17 +441,17 @@ class TrajectoryBuilder
       dvdx[6] = v[2] * v[4] - v[1] * v[5];
 
       d1 = v[1] * v[4] + v[2] * v[5] + v[3] * v[6];
-      d2 = v[1] * v[1] + v[2] * v[2] + v[3] * v[3] - d1 * d1; 
-      
-      dvdx[7] = dvdx[1] * dvdx[4] + dvdx[2] * dvdx[5] + dvdx[3] * dvdx[6];  
-      dvdx[7] = dvdx[7] / d2; 
+      d2 = v[1] * v[1] + v[2] * v[2] + v[3] * v[3] - d1 * d1;
+
+      dvdx[7] = dvdx[1] * dvdx[4] + dvdx[2] * dvdx[5] + dvdx[3] * dvdx[6];
+      dvdx[7] = dvdx[7] / d2;
     }
 
     void rk4 (double y[], double dydx[], int n, double x, double h, double yout[])
     {
       int    i;
       double xh, hh, h6, *dym, *dyt, *yt;
-      
+
       dym = vector (1,n);
       dyt = vector (1,n);
       yt  = vector (1,n);
@@ -459,8 +459,8 @@ class TrajectoryBuilder
       hh = h * 0.5;
       h6 = h / 6.0;
       xh = x + hh;
-      
-      for (i = 1; i <= n; i++) 
+
+      for (i = 1; i <= n; i++)
         yt[i] = y[i] + hh * dydx[i];
 
       derivs (xh, yt, dyt);
@@ -504,17 +504,17 @@ class TrajectoryBuilder
       }
 
       z[0][0] = v[1] * v[4] + v[2] * v[5] + v[3] * v[6];
-      
+
       d = sqrt (sqr (v[1]) + sqr (v[2]) + sqr (v[3]) - sqr (z[0][0]));
 
       z[1][0] = d * cos (v[7]);
-      z[2][0] = d * sin (v[7]);  
+      z[2][0] = d * sin (v[7]);
 
       xx[0] = x1;
       x     = x1;
       sh    = (x2 - x1) / nstep;
-  
-      for (j = 1; j <= nstep; j++) 
+
+      for (j = 1; j <= nstep; j++)
       {
         derivs (x, v, dv);
         rk4    (v, dv, nd, x, sh, vout);
@@ -532,9 +532,9 @@ class TrajectoryBuilder
         z[0][j] = v[1] * v[4] + v[2] * v[5] + v[3] * v[6];
 
         d = sqrt (sqr (v[1]) + sqr (v[2]) + sqr (v[3]) - sqr (z[0][j]));
-        
+
         z[1][j] = d * cos (v[7]);
-        z[2][j] = d * sin (v[7]);  
+        z[2][j] = d * sin (v[7]);
       }
 
       free_vector (dv,   1, nd);
@@ -545,16 +545,16 @@ class TrajectoryBuilder
     void Array_y_z ()
     {
       double x1 = 0.0, x2, dx = mlen, *vstart;
-      
+
       int nstep = 200, ndim = 10;
 
       vstart = vector (1, ndim);
-      
+
       x2 = x1 + dx;
 
       q_starting (vstart, ndim, nstep, nit - 1);
       rkd        (vstart, ndim, x1, x2, nstep);
-      
+
       x1 += dx;
 
       free_vector (vstart, 1, ndim);
@@ -606,12 +606,12 @@ class TrajectoryBuilder
       bool   envelope_side;
     };
 
-  private:    
+  private:
     ModelData            model_data;
     double               nu1, nu2, nu3;
     double               xx[201], y[7][201], z[3][201];
     size_t               elmnts;
-    int                  MaxSize, CurSize;
+    size_t               MaxSize, CurSize;
     int                  ind;
     int                  nit;
     double               dm;
@@ -628,7 +628,7 @@ class TrajectoryBuilder
 void LoadModelData (const char* file_name, ModelData& model_data)
 {
   FILE* file = fopen (file_name, "rt");
-  
+
   if (!file)
   {
     printf ("File '%s' not found\n", file_name);
@@ -654,6 +654,6 @@ void LoadModelData (const char* file_name, ModelData& model_data)
 void BuildTrajectory (const ModelData& model_data, double nu1, double nu2, double nu3, size_t vertices_count, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
 {
   TrajectoryBuilder builder (model_data, nu1, nu2, nu3, vertices_count);
-  
+
   builder.Convert (out_vertices, out_primitives);
 }
