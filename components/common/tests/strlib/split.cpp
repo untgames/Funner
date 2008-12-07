@@ -29,6 +29,7 @@ int main ()
       {"hello 'my world' world"," "," \t","''"},
       {"hello (my world}111,world"," ,"," \t","(}"},
       {"hello (my world}world"," }"," \t","(}"},
+      {"hello ' world '", " ", " \t", "''\"\""}
   };
 
   static const size_t tests_count = sizeof (test) / sizeof (*test);

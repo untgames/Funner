@@ -37,3 +37,6 @@ split 'hello (my world}world' (delimiters=' }', spaces=' \t', brackets='(}') on 
     'hello'
     'my world'
     'world'
+split 'hello ' world '' (delimiters=' ', spaces=' \t', brackets='''\"\"') on 2 tokens:
+    'hello'
+    ' world '

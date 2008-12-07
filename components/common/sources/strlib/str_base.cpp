@@ -241,6 +241,7 @@ class WordParser
       for (; space_map [*pos]; pos++); //cut leading spaces
       
       const unsigned char *first, *last;
+      bool word_in_brackets = false;
       
       if (open_brackets_map [*pos]) //found open bracket
       {
@@ -252,6 +253,8 @@ class WordParser
 
         if (pos [0] && delimiters_map [pos [1]])
           ++pos;
+          
+        word_in_brackets = true;
       }
       else
       {
@@ -265,7 +268,7 @@ class WordParser
       if (*pos)
         pos++;
 
-      if (last != first)
+      if (last != first && !word_in_brackets)
       {
         for (--last; space_map [*last]; last--); //cut trailing spaces
 
