@@ -230,7 +230,7 @@ struct PrimarySwapChain::Impl: private IWindowListener
   {
     try
     {
-        //оповещение об изменении виедо-режима
+        //оповещение об изменении видео-режима
 
       cdm_signal ();
     }

@@ -42,7 +42,6 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
         context->AttachListener (this);
 
           //выбор активного контекста          
-
         
         context->MakeCurrent (swap_chain);        
         
