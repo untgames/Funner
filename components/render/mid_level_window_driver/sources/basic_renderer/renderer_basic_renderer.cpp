@@ -230,10 +230,12 @@ void RendererDispatch::DrawFrames ()
     return;
     
     //отрисовка кадров
+    
+  size_t draw_frames_count = 0;
 
   for (FrameList::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
   {
-    (*iter)->Draw (device.get ());
+    (*iter)->Draw (device.get (), draw_frames_count);
   }  
 
     //очистка списка кадров

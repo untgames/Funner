@@ -93,7 +93,7 @@ void BasicFrame::BindViewport (render::low_level::IDevice* device)
     Визуализация
 */
 
-void BasicFrame::Draw (render::low_level::IDevice* device)
+void BasicFrame::Draw (render::low_level::IDevice* device, size_t& draw_frames_count)
 {
   using namespace render::low_level;
 
@@ -102,16 +102,24 @@ void BasicFrame::Draw (render::low_level::IDevice* device)
     
     //установка целей отрисовки
     
-  render::low_level::IView *render_target_view = render_target ? render_target->GetView () : 0,
-                           *depth_stencil_view = depth_stencil_target ? depth_stencil_target->GetView () : 0;
+  render::low_level::IView *render_target_view        = render_target ? render_target->GetView () : 0,
+                           *depth_stencil_view        = depth_stencil_target ? depth_stencil_target->GetView () : 0,
+                           *device_render_target_view = device->OSGetRenderTargetView (),
+                           *device_depth_stencil_view = device->OSGetDepthStencilView ();
 
-  if (render_target_view != device->OSGetRenderTargetView () || depth_stencil_view != device->OSGetDepthStencilView ())
+  if (render_target_view != device_render_target_view || depth_stencil_view != device_depth_stencil_view)
   {                           
-    device->Flush ();
+    if (draw_frames_count && (device_render_target_view || device_depth_stencil_view))
+      device->Flush ();
+
     device->OSSetRenderTargets (render_target_view, depth_stencil_view);
-  }
+  }  
 
     //собственно отрисовка
 
   DrawCore (device);
+  
+    //увеличение числа количества нарисованных кадров
+  
+  draw_frames_count++;  
 }
