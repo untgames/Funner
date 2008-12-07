@@ -1,0 +1,6 @@
+Results of scene_traverse2_test:
+Visit two entities:
+  test_entity 'entity1'
+  test_entity 'entity2'
+Visit one entity:
+  test_entity 'entity2'

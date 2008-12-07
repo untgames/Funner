@@ -22,7 +22,7 @@ struct Scene::Impl: public SceneSpace
   template <class Fn>
   void ForEach (Fn& fn)
   {
-    SceneObject* object = FirstObject ();
+    SceneObject* object = FirstObject ();    
 
     for (size_t count=ObjectsCount (); count--; object=object->NextObject ())
       fn (object->Entity ());

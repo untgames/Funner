@@ -452,7 +452,7 @@ struct Node::Impl
       //вызываем обработчики событий
 
     try
-    {
+    {     
       signals [event] (*this_node, event);
     }
     catch (...)
