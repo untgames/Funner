@@ -368,7 +368,7 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
       signals (message);
       break;
     case WindowEvent_OnChar:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s char %C", CHAR_INPUT_CHANNEL, window_event_context.char_code);
+      xsnprintf (message, MESSAGE_BUFFER_SIZE, "Char '%C'", window_event_context.char_code);
       signals (message);
       break;
     default:
