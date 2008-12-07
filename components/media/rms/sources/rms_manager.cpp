@@ -33,13 +33,13 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
 ///ƒобавление св€зывани€ группы ресурсов с сервером
     void AddBinding (const Group& group, Server& server)
     {
-      server_bindins.push_back (ServerBinding (group, server));
+      server_bindings.push_back (ServerBinding (group, server));
     }
-    
+
 ///”даление св€зывани€ с сервером
     void RemoveBinding (Server& server)
     {
-      for (ServerBindingList::iterator iter=server_bindins.begin (), end=server_bindins.end (); iter!=end;)
+      for (ServerBindingList::iterator iter=server_bindings.begin (), end=server_bindings.end (); iter!=end;)
       {
         if (iter->server == &server)
         {
@@ -47,18 +47,18 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
 
           ++next;
 
-          server_bindins.erase (iter);
+          server_bindings.erase (iter);
 
           iter = next;
         }
         else ++iter;
       }
     }
-    
+
 ///ѕредвыборка ресурсов
     void Prefetch ()
     {
-      for (ServerBindingList::iterator iter=server_bindins.begin (), end=server_bindins.end (); iter!=end; ++iter)
+      for (ServerBindingList::iterator iter=server_bindings.begin (), end=server_bindings.end (); iter!=end; ++iter)
       {
         try
         {
@@ -74,7 +74,7 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
 ///«агрузка ресурсов
     void Load ()
     {
-      for (ServerBindingList::iterator iter=server_bindins.begin (), end=server_bindins.end (); iter!=end; ++iter)
+      for (ServerBindingList::iterator iter=server_bindings.begin (), end=server_bindings.end (); iter!=end; ++iter)
       {
         try
         {
@@ -84,13 +84,13 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
         {
           //подавление всех исключений
         }
-      }      
+      }
     }
-    
+
 ///¬ыгрузка ресурсов
     void Unload ()
     {
-      for (ServerBindingList::iterator iter=server_bindins.begin (), end=server_bindins.end (); iter!=end; ++iter)
+      for (ServerBindingList::iterator iter=server_bindings.begin (), end=server_bindings.end (); iter!=end; ++iter)
       {
         try
         {
@@ -100,12 +100,12 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
         {
           //подавление всех исключений
         }
-      }      
-    }    
+      }
+    }
 
 ///ѕолучение объекта, оповещающего об удалении текущего объекта (может быть 0)
     xtl::trackable* GetTrackable () { return this; }
-    
+
   private:
     struct ServerBinding
     {
@@ -114,11 +114,11 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
 
       ServerBinding (const Group& group, Server& in_server) : binding (in_server.CreateBinding (group)), server (&in_server) {}
     };
-    
+
     typedef stl::list<ServerBinding> ServerBindingList;
-    
+
   private:
-    ServerBindingList            server_bindins; //список св€зываний групп ресурсов с сервером
+    ServerBindingList            server_bindings; //список св€зываний групп ресурсов с сервером
     ManagerBindingList&          bindings;       //список св€зываний
     ManagerBindingList::iterator bindings_pos;   //положение в списке св€зываний
 };
@@ -130,7 +130,7 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
 struct ServerAttachment: public xtl::reference_counter
 {
   Server&              server;            //ссылка на сервер
-  xtl::auto_connection on_destroy_server; //соединение с сигналом, оповещающем об удалении сервера  
+  xtl::auto_connection on_destroy_server; //соединение с сигналом, оповещающем об удалении сервера
 
 /// онструктор
   ServerAttachment (Server& in_server, xtl::auto_connection& in_on_destroy_server)
@@ -186,7 +186,7 @@ ResourceManager::~ResourceManager ()
 ResourceManager& ResourceManager::operator = (const ResourceManager& manager)
 {
   ResourceManager (manager).Swap (*this);
-  
+
   return *this;
 }
 
@@ -220,13 +220,13 @@ Binding ResourceManager::CreateBinding (const Group& group)
 void ResourceManager::Attach (Server& server)
 {
     //проверка повторной регистрации
-    
+
   for (ServerList::iterator iter=impl->servers.begin (), end=impl->servers.end (); iter!=end; ++iter)
     if (&(*iter)->server == &server)
       return;
 
     //подписка на событие удалени€ сервера
-    
+
   xtl::auto_connection on_destroy_server = server.GetTrackable ().connect_tracker (xtl::bind (&ResourceManager::Detach, this, xtl::ref (server)));
 
     //добавление сервера
@@ -240,7 +240,7 @@ void ResourceManager::Detach (Server& server)
     if (&(*iter)->server == &server)
     {
         //удаление св€зываний с данным сервером
-        
+
       for (ManagerBindingList::iterator binding=impl->bindings.begin (), binding_end=impl->bindings.end (); binding!=binding_end; ++binding)
       {
         (*binding)->RemoveBinding (server);
