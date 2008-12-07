@@ -3,6 +3,8 @@
 
 #include <stl/auto_ptr.h>
 
+#include <common/console.h>
+
 #include <render/low_level/device.h>
 #include <render/low_level/utils.h>
 

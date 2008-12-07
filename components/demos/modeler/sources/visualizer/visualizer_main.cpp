@@ -17,7 +17,6 @@
 #include <xtl/shared_ptr.h>
 #include <xtl/string.h>
 
-#include <common/console.h>
 #include <common/file.h>
 #include <common/log.h>
 #include <common/parse_iterator.h>
@@ -81,6 +80,23 @@ const char* DESC_FILE_SUFFIX                    = ".desc";
 const char* ENVELOPE_APPLICATION_NAME           = "modeler-envelope.exe";
 const char* TRAJECTORY_APPLICATION_NAME         = "modeler-trajectory.exe";
 const char* MESH_CONVERTER_APPLICATION_NAME     = "mesh-converter.exe";
+const int   TRAJECTORIES_COORDS_HEADER          = 'TRJC';
+const int   TRAJECTORIES_COORDS_VERSION         = 1;
+
+void file_read (const char* source, common::InputFile& file, void* data, size_t size)
+{
+  if (file.Read (data, size) != size)
+    throw xtl::format_operation_exception (source, "Can't read data from file at %u, file size is %u",
+                                           file.Tell (), file.Size ());
+}
+
+void remove_files (const char* mask)
+{
+  common::FileList files_to_delete = common::FileSystem::Search (mask, common::FileSearch_Files);
+
+  for (size_t i = 0, size = files_to_delete.Size (); i < size; i++)
+    common::FileSystem::Remove (files_to_delete.Item (i).name);
+}
 
 //тестовое пользовательское дочернее окно
 class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
@@ -162,12 +178,6 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
     void Release () { release (this); }
 
   private:
-    void OnTime ()
-    {
-      window.Invalidate ();
-    }
-
-  private:
     SubsystemManager     manager;                    //менеджер подсистем
     OrthoCamera::Pointer camera;
     syslib::Window       window;
@@ -184,9 +194,9 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       : shell_environment (new script::Environment),
         shell (INTERPRETER_NAME, shell_environment),
         project_path ("projects\\project1\\"),
-        wait_files_timer (xtl::bind (&MyApplicationServer::CheckNewFiles, this), 1000, syslib::TimerState_Paused),
-        envelope (VisualModel::Create ())
+        wait_files_timer (xtl::bind (&MyApplicationServer::CheckNewFiles, this), 1000, syslib::TimerState_Paused)
     {
+      common::FileSystem::SetDefaultFileBufferSize (0);     //???????? обход бага!!!!!!!!!!!
       static const char* METHOD_NAME = "MyApplicationServer::MyApplicationServer";
 
       AttachmentRegistry::Register ("MeshResourceManager", resource_manager);
@@ -217,6 +227,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       lib.Register ("CalculateEnvelope", script::make_invoker<void (size_t)> (xtl::bind (&MyApplicationServer::CalculateEnvelope, this, _1)));
       lib.Register ("CalculateTrajectory", script::make_invoker<void (double, double, double, size_t)> (xtl::bind (&MyApplicationServer::CalculateTrajectory, this, _1, _2, _3, _4)));
       lib.Register ("CalculateTrajectories", script::make_invoker<void (size_t, size_t)> (xtl::bind (&MyApplicationServer::CalculateTrajectories, this, _1, _2)));
+      lib.Register ("Cleanup", script::make_invoker<void ()> (xtl::bind (&MyApplicationServer::Cleanup, this)));
 
         //чтение конфигурации
 
@@ -237,10 +248,16 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
       common::FileList precomputed_trajectories = common::FileSystem::Search (precomputed_trajectories_mask.c_str (), common::FileSearch_Files);
 
-      for (size_t i = 0, size = precomputed_trajectories.Size (); i < size; i++)
-        LoadTrajectory (precomputed_trajectories.Item (i).name);
+      try
+      {
+        for (size_t i = 0, size = precomputed_trajectories.Size (); i < size; i++)
+          LoadTrajectory (precomputed_trajectories.Item (i).name);
 
-      LoadEnvelope ();
+        LoadEnvelope ();
+      }
+      catch (...)
+      {
+      }
 
       plugin_path = common::get<const char*> (*iter, "PluginPath");
 
@@ -338,40 +355,70 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     void Release () { release (this); }
 
   private:
+    void Cleanup ()
+    {
+      if (envelope.visual_model)
+      {
+        envelope.visual_model->Unbind ();
+        envelope.visual_model = 0;
+
+        envelope.resource_binding.Unload ();
+      }
+
+      for (VisualModels::iterator iter = trajectories.begin (), end = trajectories.end (); iter != end; ++iter)
+      {
+        iter->second.visual_model->Unbind ();
+        iter->second.resource_binding.Unload ();
+      }
+
+      trajectories.clear ();
+
+      stl::string meshes_to_delete_mask = project_path + "*.*mesh";
+      remove_files (meshes_to_delete_mask.c_str ());
+
+      stl::string desc_to_delete_mask = project_path + "*.*desc";
+      remove_files (desc_to_delete_mask.c_str ());
+    }
+
     void LoadTrajectory (const char* file_name)
     {
+      if (!common::FileSystem::IsFileExist (file_name))
+        throw xtl::format_operation_exception ("MyApplicationServer::LoadTrajectory",
+                                               "Can't load trajectory '%s', no such file", file_name);
+
       media::rms::Group resource_group;
 
       resource_group.Add (file_name);
 
-      resource_manager.CreateBinding (resource_group).Load ();
+      VisualModelResource new_trajectory;
 
-      if (!common::FileSystem::IsFileExist (file_name))
-      {
-        common::Console::Printf ("Can't load trajectory '%s', no such file\n", file_name);
-        return;
-      }
+      common::Console::Printf ("Loading trajectory...\n");
+      new_trajectory.resource_binding = resource_manager.CreateBinding (resource_group);
+      new_trajectory.resource_binding.Load ();
+      common::Console::Printf ("Loaded\n");
 
       VisualModels::iterator iter = trajectories.find (file_name);
 
       if (iter != trajectories.end ())
       {
-        iter->second->Unbind ();
+        iter->second.visual_model->Unbind ();
         trajectories.erase (iter);
       }
 
-      VisualModel::Pointer new_trajectory = VisualModel::Create ();
+      new_trajectory.visual_model = VisualModel::Create ();
 
-      new_trajectory->SetMeshName (file_name);
-      new_trajectory->BindToScene (scene);
-      new_trajectory->SetName     ("Trajectory");
-      new_trajectory->Scale       (-2.f, 2.f, 2.f);
+      new_trajectory.visual_model->SetMeshName (file_name);
+      new_trajectory.visual_model->BindToScene (scene);
+      new_trajectory.visual_model->SetName     ("Trajectory");
+      new_trajectory.visual_model->Scale       (-2.f, 2.f, 2.f);
 
       trajectories[file_name] = new_trajectory;
     }
 
     void OnNewXmeshTrajectory (const char* desc_trajectory_file_name)
     {
+      static const char* METHOD_NAME = "MyApplicationServer::OnNewXmeshEnvelope";
+
       common::InputFile desc_file (desc_trajectory_file_name);
 
       size_t desc_file_data;
@@ -382,17 +429,15 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
       if (!desc_file_data || !common::FileSystem::IsFileExist (xmesh_trajectory_file_name.c_str ()) ||
           (common::FileSystem::GetFileSize (xmesh_trajectory_file_name.c_str ()) != desc_file_data))
-      {
-        common::Console::Print ("There was an error while calculating trajectory\n");
-        return;
-      }
+        throw xtl::format_operation_exception (METHOD_NAME, "There was an error while calculating trajectory %s",
+                                               xmesh_trajectory_file_name.c_str ());
 
       stl::string application_name  = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME),
                   binmesh_file_name = common::format ("%.*sbinmesh", xmesh_trajectory_file_name.length () - xtl::xstrlen ("xmesh"),
                                                       xmesh_trajectory_file_name.c_str ());
 
       if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), xmesh_trajectory_file_name.c_str (), binmesh_file_name.c_str (), 0) == -1)
-        throw xtl::format_operation_exception ("MyApplicationServer::OnNewXmeshEnvelope", "Can't call %s: %s", MESH_CONVERTER_APPLICATION_NAME, get_spawn_error_name ());
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't call %s: %s", MESH_CONVERTER_APPLICATION_NAME, get_spawn_error_name ());
 
       WaitForFile (binmesh_file_name.c_str (), xtl::bind (&MyApplicationServer::LoadTrajectory, this, _1));
     }
@@ -428,21 +473,25 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
       resource_group.Add (mesh_name.c_str ());
 
-      resource_manager.CreateBinding (resource_group).Load ();
+      common::Console::Printf ("Loading envelope\n");
+      envelope.resource_binding = resource_manager.CreateBinding (resource_group);
+      envelope.resource_binding.Load ();
+      common::Console::Printf ("Loaded\n");
 
       if (!common::FileSystem::IsFileExist (mesh_name.c_str ()))
-      {
-        common::Console::Printf ("Can't load envelope '%s', no such file\n", mesh_name.c_str ());
-        return;
-      }
+        throw xtl::format_operation_exception ("MyApplicationServer::LoadEnvelope", "Can't load envelope '%s', no such file", mesh_name.c_str ());
 
-      envelope->SetMeshName (mesh_name.c_str ());
-      envelope->BindToScene (scene);
-      envelope->SetName     ("Envelope");
+      envelope.visual_model = VisualModel::Create ();
+
+      envelope.visual_model->SetMeshName (mesh_name.c_str ());
+      envelope.visual_model->BindToScene (scene);
+      envelope.visual_model->SetName     ("Envelope");
     }
 
     void OnNewXmeshEnvelope (const char* desc_envelope_file_name)
     {
+      static const char* METHOD_NAME = "MyApplicationServer::OnNewXmeshEnvelope";
+
       common::InputFile desc_file (desc_envelope_file_name);
 
       size_t desc_file_data;
@@ -453,16 +502,13 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
       if (!desc_file_data || !common::FileSystem::IsFileExist (xmesh_envelope_file_name.c_str ()) ||
           (common::FileSystem::GetFileSize (xmesh_envelope_file_name.c_str ()) != desc_file_data))
-      {
-        common::Console::Print ("There was an error while calculating envelope\n");
-        return;
-      }
+        throw xtl::format_operation_exception (METHOD_NAME, "There was an error while calculating envelope");
 
       stl::string application_name  = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME),
                   binmesh_file_name = common::format ("%senvelope.binmesh", project_path.c_str ());
 
       if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), xmesh_envelope_file_name.c_str (), binmesh_file_name.c_str (), 0) == -1)
-        throw xtl::format_operation_exception ("MyApplicationServer::OnNewXmeshEnvelope", "Can't call %s: %s", MESH_CONVERTER_APPLICATION_NAME, get_spawn_error_name ());
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't call %s: %s", MESH_CONVERTER_APPLICATION_NAME, get_spawn_error_name ());
 
       WaitForFile (binmesh_file_name.c_str (), xtl::bind (&MyApplicationServer::LoadEnvelope, this));
     }
@@ -486,9 +532,76 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       WaitForFile (waited_desc_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewXmeshEnvelope, this, _1));
     }
 
-    void CalculateTrajectories (size_t trajectories_count, size_t lod)
+    void OnNewTrajectoriesCoords (const char* desc_file_name, size_t lod)
     {
-      //????do this
+      static const char* METHOD_NAME = "MyApplicationServer::OnNewTrajectoriesCoords";
+
+      common::InputFile desc_file (desc_file_name);
+
+      size_t desc_file_data;
+
+      desc_file.Read (&desc_file_data, sizeof (desc_file_data));
+
+      stl::string trajectories_coords_file_name (desc_file_name, xtl::xstrlen (desc_file_name) - xtl::xstrlen (DESC_FILE_SUFFIX));
+
+      if (!desc_file_data || !common::FileSystem::IsFileExist (trajectories_coords_file_name.c_str ()) ||
+          (common::FileSystem::GetFileSize (trajectories_coords_file_name.c_str ()) != desc_file_data))
+        throw xtl::format_operation_exception (METHOD_NAME, "There was an error while calculating trajectories coordinates for batch processing");
+
+      common::InputFile trajectories_coords_file (trajectories_coords_file_name.c_str ());
+
+      //проверка заголовка файла
+
+      int header;
+
+      file_read (METHOD_NAME, trajectories_coords_file, &header, sizeof (header));
+
+      if (header != TRAJECTORIES_COORDS_HEADER)
+        throw xtl::format_operation_exception (METHOD_NAME, "File '%s' has invalid header '%c%c%c%c', must be '%c%c%c%c'", trajectories_coords_file_name,
+          ((char*)(&header))[3], ((char*)(&header))[2], ((char*)(&header))[1], ((char*)(&header))[0], ((char*)(&TRAJECTORIES_COORDS_HEADER))[3],
+          ((char*)(&TRAJECTORIES_COORDS_HEADER))[2], ((char*)(&TRAJECTORIES_COORDS_HEADER))[1], ((char*)(&TRAJECTORIES_COORDS_HEADER))[0]);
+
+      int version;
+
+      file_read (METHOD_NAME, trajectories_coords_file, &version, sizeof (version));
+
+      if (version != TRAJECTORIES_COORDS_VERSION)
+        throw xtl::format_operation_exception (METHOD_NAME, "File '%s' has unsupported version %d, supported version - %d", trajectories_coords_file_name,
+                                               version, TRAJECTORIES_COORDS_VERSION);
+
+      size_t coords_count;
+
+      file_read (METHOD_NAME, trajectories_coords_file, &coords_count, sizeof (coords_count));
+
+      for (size_t i = 0; i < coords_count; i++)
+      {
+        float nu1, nu2, nu3;
+
+        file_read (METHOD_NAME, trajectories_coords_file, &nu1, sizeof (nu1));
+        file_read (METHOD_NAME, trajectories_coords_file, &nu2, sizeof (nu2));
+        file_read (METHOD_NAME, trajectories_coords_file, &nu3, sizeof (nu3));
+
+        CalculateTrajectory (nu1, nu2, nu3, lod);
+      }
+    }
+
+    void CalculateTrajectories (size_t trajectories_count, size_t lod)
+    { //????Продумать двойной вызов
+      stl::string application_name          = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), ENVELOPE_APPLICATION_NAME),
+                  model_name                = common::format ("%smodel.dat", project_path.c_str ()),
+                  trajectories_coords_name  = common::format ("%strajecories_coords.bintrjc", project_path.c_str ()),
+                  trajectories_count_string = common::format ("%u", trajectories_count),
+                  waited_desc_file_name     = trajectories_coords_name + DESC_FILE_SUFFIX;
+
+      common::FileSystem::Remove (trajectories_coords_name.c_str ());
+      common::FileSystem::Remove (waited_desc_file_name.c_str ());
+
+      if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), "-save_coords_only", model_name.c_str (),
+             trajectories_coords_name.c_str (), trajectories_count_string.c_str (), 0) == -1)
+        throw xtl::format_operation_exception ("MyApplicationServer::CalculateTrajectories",
+                                               "Can't call %s: %s", ENVELOPE_APPLICATION_NAME, get_spawn_error_name ());
+
+      WaitForFile (waited_desc_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewTrajectoriesCoords, this, _1, lod));
     }
 
     void CheckNewFiles ()
@@ -509,7 +622,20 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
         WaitedFiles::iterator next = iter;
 
         ++next;
-        iter->handler (iter->file_name.c_str ());
+
+        try
+        {
+          iter->handler (iter->file_name.c_str ());
+        }
+        catch (std::exception& exception)
+        {
+          common::Console::Printf ("Exception '%s' while calling handler for file %s\n", exception.what (), iter->file_name.c_str ());
+        }
+        catch (...)
+        {
+          common::Console::Printf ("Unknown exception while calling handler for file %s\n", iter->file_name.c_str ());
+        }
+
         waited_files.erase (iter);
         iter = next;
       }
@@ -538,8 +664,14 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
         {}
     };
 
+    struct VisualModelResource
+    {
+      VisualModel::Pointer visual_model;
+      media::rms::Binding  resource_binding;
+    };
+
     typedef stl::list<WaitedFile> WaitedFiles;
-    typedef stl::hash_map<stl::hash_key<const char*>, VisualModel::Pointer> VisualModels;
+    typedef stl::hash_map<stl::hash_key<const char*>, VisualModelResource> VisualModels;
 
   private:
     ShellEnvironmentPtr         shell_environment;     //окружение скриптовой среды
@@ -551,7 +683,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     stl::string                 project_path;
     syslib::Timer               wait_files_timer;
     stl::string                 working_directory;
-    VisualModel::Pointer        envelope;
+    VisualModelResource         envelope;
     VisualModels                trajectories;
     media::rms::ResourceManager resource_manager;
     WaitedFiles                 waited_files;

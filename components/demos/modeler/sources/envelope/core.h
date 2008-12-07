@@ -2,6 +2,7 @@
 #define MODELER_CORE_HEADER
 
 #include <vector>
+#include <math.h>
 
 namespace modeler
 {

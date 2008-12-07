@@ -50,13 +50,13 @@ typedef xtl::com_ptr<low_level::IBlendState> BlendStatePtr;
 stl::string read_shader (const char* file_name)
 {
   common::InputFile file (file_name);
-  
+
   stl::string buffer (file.Size (), ' ');
-  
+
   file.Read (&buffer [0], file.Size ());
-  
+
   return buffer;
-} 
+}
 
 void print (const char* message)
 {
@@ -95,7 +95,7 @@ class RenderManager : public engine::IAttachmentRegistryListener<media::rms::Res
 {
   public:
     RenderManager ()
-      : resource_server (*this)
+      : attached_resource_manager (0), resource_server (*this)
     {
       engine::AttachmentRegistry::Attach<media::rms::ResourceManager> (this, engine::AttachmentRegistryAttachMode_ForceNotify);
     }
@@ -189,6 +189,18 @@ class RenderManager : public engine::IAttachmentRegistryListener<media::rms::Res
 
     void UnloadResources (size_t count, const char** resource_names)
     {
+      static const char* METHOD_NAME = "RenderManager::UnloadResources";
+
+      if (!resource_names)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
+
+      for (size_t i = 0; i < count; i++)
+      {
+        if (!resource_names[i])
+          throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
+
+        renderable_models.erase (resource_names[i]);
+      }
     }
 
   private:
@@ -218,7 +230,7 @@ class RenderManager : public engine::IAttachmentRegistryListener<media::rms::Res
 
 struct MyShaderParameters
 {
-  math::mat4f object_tm; 
+  math::mat4f object_tm;
   math::mat4f view_tm;
   math::mat4f proj_tm;
   int         light_enable;
@@ -260,21 +272,21 @@ struct RenderViewVisitor: public xtl::visitor<void, VisualModel>
   void visit (VisualModel& model)
   {
     RenderableModel& renderable_model = render_manager->GetRenderableModel (device, model.MeshName ());
-    
+
     if (!xtl::xstrcmp (model.Name (), "Envelope"))
     {
       shader_parameters->light_enable = true;
 
-//      device->OSSetBlendState (envelope_blend_state);            
+//      device->OSSetBlendState (envelope_blend_state);
     }
     else
     {
       shader_parameters->light_enable = false;
-      
-//      device->OSSetBlendState (trajectory_blend_state);      
+
+//      device->OSSetBlendState (trajectory_blend_state);
     }
 
-    shader_parameters->object_tm = math::rotatef (angle, 0, 0, 1) * math::rotatef (angle, 0, 1, 0) * 
+    shader_parameters->object_tm = math::rotatef (angle, 0, 0, 1) * math::rotatef (angle, 0, 1, 0) *
                                    math::rotatef (angle, 1, 0, 0) * model.WorldTM ();
 
     cb->SetData (0, sizeof *shader_parameters, shader_parameters);
@@ -314,43 +326,43 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
         current_angle (0.f),
         shader_source (read_shader (SHADER_FILE_NAME))
     {
-      frame->SetCallback (this);      
+      frame->SetCallback (this);
     }
-    
+
 ///Целевые буферы рендеринга
     void SetRenderTargets (mid_level::IRenderTarget* render_target, mid_level::IRenderTarget* depth_stencil_target)
     {
       frame->SetRenderTargets (render_target, depth_stencil_target);
     }
-    
+
     mid_level::IRenderTarget* GetRenderTarget ()
     {
       throw xtl::make_not_implemented_exception ("ModelerView::GetRenderTarget");
     }
-    
+
     mid_level::IRenderTarget* GetDepthStencilTarget ()
     {
       throw xtl::make_not_implemented_exception ("ModelerView::GetDepthStencilTarget");
     }
-  
+
 ///Установка области вывода
     void SetViewport (const Rect& rect)
     {
       render::mid_level::Viewport viewport;
-      
+
       viewport.x      = rect.left;
       viewport.y      = rect.top;
       viewport.width  = rect.width;
       viewport.height = rect.height;
-      
+
       frame->SetViewport (viewport);
     }
-    
+
     void GetViewport (Rect&)
     {
       throw xtl::make_not_implemented_exception ("ModelerView::GetViewport");
     }
-    
+
 ///Установка камеры
     void SetCamera (scene_graph::Camera* new_camera)
     {
@@ -367,7 +379,7 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
 
     void GetProperty (const char*, size_t, char*)
     {
-      throw xtl::make_not_implemented_exception ("ModelerView::GetProperty");      
+      throw xtl::make_not_implemented_exception ("ModelerView::GetProperty");
     }
 
 ///Рисование
@@ -380,13 +392,13 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
     }
 
     void Draw (render::low_level::IDevice& device)
-    {      
+    {
       if (!trajectory_blend_state)
         trajectory_blend_state = create_blend_state (device, true, low_level::BlendArgument_One, low_level::BlendArgument_One, low_level::BlendArgument_One);
-        
+
       if (!envelope_blend_state)
         envelope_blend_state = create_blend_state (device, false, low_level::BlendArgument_One, low_level::BlendArgument_Zero, low_level::BlendArgument_Zero);
-      
+
       if (!shader)
       {
         low_level::ShaderDesc shader_descs [] = {
@@ -399,7 +411,7 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
           {"myObjectMatrix", low_level::ProgramParameterType_Float4x4, 0, 1, offsetof (MyShaderParameters, object_tm)},
           {"myLightEnable", low_level::ProgramParameterType_Int, 0, 1, offsetof (MyShaderParameters, light_enable)},
         };
-        
+
         low_level::ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
 
         shader = ProgramPtr (device.CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print), false);
@@ -410,9 +422,9 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
       if (!cb)
       {
         low_level::BufferDesc cb_desc;
-        
+
         memset (&cb_desc, 0, sizeof cb_desc);
-        
+
         cb_desc.size         = sizeof MyShaderParameters;
         cb_desc.usage_mode   = low_level::UsageMode_Default;
         cb_desc.bind_flags   = low_level::BindFlag_ConstantBuffer;
@@ -434,7 +446,7 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
       device.RSSetState (rasterizer.get ());
 
       MyShaderParameters my_shader_parameters;
-      
+
       my_shader_parameters.proj_tm      = camera->ProjectionMatrix ();
       my_shader_parameters.view_tm      = invert (camera->WorldTM ());
       my_shader_parameters.light_enable = 1;
@@ -452,13 +464,13 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
       if (clock () - last > CLK_TCK / 50)
       {
         current_angle += 0.1f * float (clock () - last) / CLK_TCK;
-      
+
         last = clock ();
       }
     }
 
 ///Подсчёт ссылок
-    void AddRef ()    
+    void AddRef ()
     {
       addref (this);
     }
@@ -479,7 +491,7 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
     FramePtr                              frame;
     float                                 current_angle;
     BlendStatePtr                         envelope_blend_state;
-    BlendStatePtr                         trajectory_blend_state;    
+    BlendStatePtr                         trajectory_blend_state;
     stl::string                           shader_source;
     ProgramPtr                            shader;
     ProgramParametersLayoutPtr            program_parameters_layout;
@@ -502,7 +514,7 @@ class ModelerRender: public ICustomSceneRender, public xtl::reference_counter
       if (!renderer)
         throw xtl::format_exception<xtl::bad_argument> ("ModelerRender::ModelerRender", "Renderer is not castable to render::mid_level::ILowLevelRenderer");
     }
-  
+
 ///Создание областей вывода
     IRenderView* CreateRenderView (scene_graph::Scene* scene)
     {
@@ -522,19 +534,19 @@ class ModelerRender: public ICustomSceneRender, public xtl::reference_counter
     {
       throw xtl::make_not_implemented_exception ("ModelerView::GetLogHandler");
     }
-    
+
     void SetQueryHandler (const QueryFunction& in_handler)
     {
       query_handler = in_handler;
     }
-    
+
     const QueryFunction& GetQueryHandler () { return query_handler; }
 
 ///Подсчёт ссылок
     void AddRef ()
     {
       addref (this);
-    }    
+    }
 
     void Release ()
     {
@@ -545,7 +557,7 @@ class ModelerRender: public ICustomSceneRender, public xtl::reference_counter
     static ICustomSceneRender* Create (mid_level::IRenderer* renderer, const char* path_name)
     {
       printf ("ModelerRender::Create(%s, %s)\n", renderer ? renderer->GetDescription () : "null", path_name);
-      
+
       return new ModelerRender (renderer);
     }
 
@@ -572,13 +584,14 @@ class ModelerRenderComponent
   private:
     static ICustomSceneRender* CreateRender (mid_level::IRenderer* renderer, const char*)
     {
-      return new ModelerRender (renderer);
+      ICustomSceneRender* render = new ModelerRender (renderer);
+      return render;
     }
 };
 
 }
 
-extern "C" 
+extern "C"
 {
 
 common::ComponentRegistrator<ModelerRenderComponent> ModelerRender (COMPONENT_NAME);

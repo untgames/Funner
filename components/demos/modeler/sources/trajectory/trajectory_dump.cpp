@@ -44,18 +44,18 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
   fprintf (result_file, "  <vertex_streams>\n");
   fprintf (result_file, "    <vertex_stream id=\"vs#1\" vertices_count=\"%u\" vertex_size=\"16\">\n", vertices.size ());
   fprintf (result_file, "      <channel semantic=\"position\" type=\"float3\" offset=\"0\">\n");
-  
+
   for (size_t i=0; i<vertices.size (); i++)
   {
     const Vec3f& p = vertices [i].position;
 
     fprintf (result_file, "%g %g %g ", p.x, p.y, p.z);
   }
-  
+
   fprintf (result_file, "\n");
   fprintf (result_file, "      </channel>\n");
   fprintf (result_file, "      <channel semantic=\"color\" type=\"ubyte4\" offset=\"12\">\n");
-  
+
   for (size_t i=0; i<vertices.size (); i++)
   {
     const Color4f& c = vertices [i].color;
@@ -63,7 +63,7 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
     fprintf (result_file, "%u %u %u %u ", size_t (255.0f * c.r), size_t (255.0f * c.g), size_t (255.0f * c.b), size_t (255.0f * c.a));
   }
 
-  fprintf (result_file, "\n");  
+  fprintf (result_file, "\n");
   fprintf (result_file, "      </channel>\n");
   fprintf (result_file, "    </vertex_stream>\n");
   fprintf (result_file, "  </vertex_streams>\n");
@@ -80,15 +80,15 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
   fprintf (result_file, "        vb#1\n");
   fprintf (result_file, "      </vertex_buffers>\n");
   fprintf (result_file, "      <primitives>\n");
-  
+
   for (size_t i=0; i<primitives.size (); i++)
   {
     const DrawPrimitive& primitive = primitives [i];
-    
+
     fprintf (result_file, "        <primitive type=\"line_list\" material=\"\" vertex_buffer=\"0\" first=\"%u\" count=\"%u\"/>\n",
             primitive.first, primitive.count);
   }
-  
+
   fprintf (result_file, "      </primitives>\n");
   fprintf (result_file, "    </mesh>\n");
   fprintf (result_file, "  </meshes>\n");
@@ -115,20 +115,20 @@ int main (int argc, char* argv[])
 
   double nu_sqr_sum = nu1 * nu1 + nu2 * nu2 + nu3 * nu3;
 
-  if ((nu_sqr_sum < 0.99) || (nu_sqr_sum > 1.01))
+/*  if ((nu_sqr_sum < 0.99) || (nu_sqr_sum > 1.01))
   {
     save_desc_file (argv[5], 0);
     printf ("Invalid input nu data, nu1 * nu1 + nu2 * nu2 + nu3 * nu3 must be 1\n");
     return 2;
-  }
+  }*/
 
   LoadModelData (argv[1], model_data);
-  
+
   DrawVertexArray    vertices;
   DrawPrimitiveArray primitives;
 
   BuildTrajectory (model_data, nu1, nu2, nu3, atoi (argv[6]), vertices, primitives);
-  
+
   dump (argv[5], vertices, primitives);
 
   return 0;

@@ -18,8 +18,10 @@
     <MenuItem Source="MenuItem2"/>
   </MenuStrip>
   <ToolStrip Id="ToolStrip1">
-    <ToolButton Text="CalculateEnvelope" OnClick="Application.Execute ('Modeler.CalculateEnvelope (400)')"/>
-    <ToolButton Text="CalculateTrajectory" OnClick="Application.Execute ('Modeler.CalculateTrajectory (0, 1, 0, 100)')"/>
+    <ToolButton Text="CalculateEnvelope" OnClick="Application.Execute ('Modeler.CalculateEnvelope (1000)')"/>
+    <ToolButton Text="CalculateTrajectory" OnClick="Application.Execute ('Modeler.CalculateTrajectory (0, 1, 0, 600)')"/>
+    <ToolButton Text="Calculate 5 Trajectories" OnClick="Application.Execute ('Modeler.CalculateTrajectories (40, 6000)')"/>
+    <ToolButton Text="Cleanup" OnClick="Application.Execute ('Modeler.Cleanup ()')"/>
   </ToolStrip>
   <Plugin 
     Name="Console" 

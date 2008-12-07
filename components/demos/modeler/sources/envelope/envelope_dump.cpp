@@ -6,7 +6,10 @@
 
 using namespace modeler;
 
-const char* DESC_FILE_SUFFIX = ".desc";
+const char* DESC_FILE_SUFFIX        = ".desc";
+const char* SAVE_COORDS_OPTION_NAME = "-save_coords_only";
+const int   HEADER                  = 'TRJC';
+const int   VERSION                 = 1;
 
 void save_desc_file (const char* result_file_name, size_t file_size)
 {
@@ -38,6 +41,7 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
   if (!result_file)
   {
     printf ("Can't open result file '%s'\n", result_file_name);
+    save_desc_file (result_file_name, 0);
     return;
   }
 
@@ -46,14 +50,14 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
   fprintf (result_file, "  <vertex_streams>\n");
   fprintf (result_file, "    <vertex_stream id=\"vs#1\" vertices_count=\"%u\" vertex_size=\"24\">\n", vertices.size ());
   fprintf (result_file, "      <channel semantic=\"position\" type=\"float3\" offset=\"0\">\n");
-  
+
   for (size_t i=0; i<vertices.size (); i++)
   {
     const Vec3f& p = vertices [i].position;
 
     fprintf (result_file, "%g %g %g ", p.x, p.y, p.z);
   }
-  
+
   fprintf (result_file, "\n");
   fprintf (result_file, "      </channel>\n");
   fprintf (result_file, "      <channel semantic=\"normal\" type=\"float3\" offset=\"12\">\n");
@@ -64,7 +68,7 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
 
     fprintf (result_file, "%g %g %g ", n.x, n.y, n.z);
   }
-  
+
   fprintf (result_file, "\n");
   fprintf (result_file, "      </channel>\n");
   fprintf (result_file, "    </vertex_stream>\n");
@@ -82,15 +86,15 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
   fprintf (result_file, "        vb#1\n");
   fprintf (result_file, "      </vertex_buffers>\n");
   fprintf (result_file, "      <primitives>\n");
-  
+
   for (size_t i=0; i<primitives.size (); i++)
   {
     const DrawPrimitive& primitive = primitives [i];
-    
+
     fprintf (result_file, "        <primitive type=\"triangle_strip\" material=\"\" vertex_buffer=\"0\" first=\"%u\" count=\"%u\"/>\n",
             primitive.first, primitive.count-2);
   }
-  
+
   fprintf (result_file, "      </primitives>\n");
   fprintf (result_file, "    </mesh>\n");
   fprintf (result_file, "  </meshes>\n");
@@ -103,26 +107,72 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
   fclose (result_file);
 }
 
+void save_vertices (const char* result_file_name, const DrawVertexArray& vertices, size_t vertices_to_save)
+{
+  FILE* result_file = fopen (result_file_name, "wb");
+
+  if (!result_file)
+  {
+    printf ("Can't open result file '%s'\n", result_file_name);
+    return;
+  }
+
+  fwrite (&HEADER, sizeof (HEADER), 1, result_file);
+  fwrite (&VERSION, sizeof (VERSION), 1, result_file);
+
+  if (vertices_to_save > vertices.size ())
+    vertices_to_save = vertices.size ();
+
+  fwrite (&vertices_to_save, sizeof (vertices_to_save), 1, result_file);
+
+  float index = 0, index_delta = vertices.size () / (float)vertices_to_save;
+
+  for (size_t i = 0; i < vertices_to_save; i++, index += index_delta)
+    fwrite (&vertices[(size_t)index].position, sizeof (vertices[(size_t)index].position), 1, result_file);
+
+  fflush (result_file);
+
+  save_desc_file (result_file_name, ftell (result_file));
+
+  fclose (result_file);
+}
+
 int main (int argc, char* argv[])
 {
-  if (argc != 4)
+  if (argc < 4 || argc > 5)
   {
-    printf ("Usage: modeler-envelope model_data_file result_file iterations_count\n");
+    printf ("Usage: modeler-envelope [%s] model_data_file result_file iterations_count\n", SAVE_COORDS_OPTION_NAME);
+    printf ("  If save_coord_only option setted, iteration_count is needed coords count\n");
     return 1;
   }
 
+  bool save_coords_only = !strcmp (argv[1], SAVE_COORDS_OPTION_NAME);
+
+  size_t options_count = save_coords_only ? 1 : 0;
+
   ModelData model_data;
 
-  LoadModelData (argv[1], model_data);  
-  
-  DrawVertexArray    vertices;
-  DrawPrimitiveArray primitives; 
+  LoadModelData (argv[1 + options_count], model_data);
 
-  size_t iterations_count = atoi (argv[3]);
+  DrawVertexArray    vertices;
+  DrawPrimitiveArray primitives;
+
+  size_t iterations_count = atoi (argv[3 + options_count]);
+
+  if (iterations_count < 1)
+  {
+    if (!save_coords_only)
+      save_desc_file (argv[2 + options_count], 0);
+
+    return 2;
+  }
 
   BuildMegaSurface (model_data, iterations_count, iterations_count, vertices, primitives);
 
-  dump (argv[2], vertices, primitives);  
+  if (options_count)
+    save_vertices (argv[2 + options_count], vertices, atoi (argv[3 + options_count]));
+  else
+    dump (argv[2 + options_count], vertices, primitives);
 
   return 0;
 }

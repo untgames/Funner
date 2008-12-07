@@ -161,10 +161,13 @@ class TrajectoryBuilder
         DoIterEx ();
       }*/
 
-      size_t print_step = vertices_count / 10000;
+      size_t print_step = vertices_count / 100;
 
       if (!print_step)
         print_step++;
+
+      size_t current_size = -1;
+      size_t constant_size_interval = 0;
 
       for (size_t i = 0; CurSize < vertices_count; i++)
       {
@@ -172,6 +175,21 @@ class TrajectoryBuilder
           printf ("\rProgress: %.2f%%", (float)i / vertices_count * 100.f);
 
         DoIterEx ();
+
+        if (current_size != CurSize)
+        {
+          current_size           = CurSize;
+          constant_size_interval = 0;
+        }
+        else
+        {
+          constant_size_interval++;
+          if (constant_size_interval > 10)
+          {
+            printf ("\nTrajectory not grow, possibly invalid input data\n");
+            return;
+          }
+        }
       }
       printf ("\rProgress: 100.00%%\n");
 //      Section3D (200, 1.02);

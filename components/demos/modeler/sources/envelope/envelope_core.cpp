@@ -1,7 +1,6 @@
 #include "core.h"
 
 #include <stdio.h>
-#include <math.h>
 #include <vector>
 #include <algorithm>
 
@@ -20,7 +19,7 @@ struct Vertex
 {
   Vec3d   position;
   Vec3d   dummy;
-  Vec3d   normal;  
+  Vec3d   normal;
   int     attr;
 };
 
@@ -63,7 +62,7 @@ int sol3 (double a, double b, double c, double d, double result [3])
     radi = sqrt (delta) + fabs (q0 / 2.0);
     u    = pow (radi, 1.0 / 3.0);
     v    = -p0 / 3.0 / u;
-    
+
     if (q0 < 0.0)
     {
       result [0] = (u + v) - r0 / 3.0;
@@ -82,7 +81,7 @@ int sol3 (double a, double b, double c, double d, double result [3])
   else
   {
     rho = sqrt (-p0 * p0 * p0 / 27.0);
-    
+
     if (fabs (rho) == 0.0)
     {
       result [0] = -b / a / 3.0;
@@ -93,9 +92,9 @@ int sol3 (double a, double b, double c, double d, double result [3])
     }
 
     phi    = acos (-q0 / 2.0 / rho);
-    phi3   = phi / 3.0;    
+    phi3   = phi / 3.0;
     factor = 2.0 * pow (rho, 1.0 / 3.0);
-    
+
     result [0] = factor * cos (phi3) - r0 / 3.0;
     result [1] = factor * cos (phi3 + 2.0 * PI / 3.0) - r0 / 3.0;
     result [2] = factor * cos (phi3 + 4.0 * PI / 3.0) - r0 / 3.0;
@@ -124,12 +123,12 @@ void hls2rgb3f (double h, double l, double s, double* rgb, int hls)
   int    c;
   double frac, diff, mini, maxi;
   double *r, *g, *b;
-  
+
   r = rgb;
   g = rgb + 1;
   b = rgb + 2;
   h = fmod (h, 360.0);
-  
+
   if (hls)
   {
     h /= 60.0;
@@ -144,13 +143,13 @@ void hls2rgb3f (double h, double l, double s, double* rgb, int hls)
 
   c    = (int)h;
   frac = h - c;
-  
+
   if (l <= 0.5) maxi = l * (1 + s);
   else          maxi = l + s - l * s;
 
   mini = 2 * l - maxi;
   diff = maxi - mini;
-    
+
   if (s == 0)                                       /* grau */
   {
     *r = *g = *b = (double)l;
@@ -199,31 +198,31 @@ class SurfaceBuilder
     SurfaceBuilder (const ModelData& in_model_data, int uanz, int vanz) : model_data (in_model_data)
     {
       Init (uanz, vanz);
-    }  
-    
+    }
+
     void Convert (DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
     {
       out_vertices.reserve (vertices.size ());
       out_primitives.reserve (100); //???
 
-      int p_in = -10;      
-      
+      int p_in = -10;
+
       size_t first = 0;
 
       for (size_t i=0; i < vertices.size (); i++)
       {
         const Vertex& vertex = vertices [i];
-        
+
         if (p_in != vertex.attr)
         {
           if (p_in != -1)
           {
             size_t count = i - first;
-            
+
             if (count >= 3)
             {
               DrawPrimitive primitive;
-              
+
               primitive.type  = PrimitiveType_TriangleStrip;
               primitive.first = first;
               primitive.count = count;
@@ -240,15 +239,15 @@ class SurfaceBuilder
 
         copy (vertex.position, out_vertex.position);
         copy (vertex.normal, out_vertex.normal);
-        
+
         out_vertices.push_back (out_vertex);
       }
-      
+
       size_t count = vertices.size () - first;
-      
+
       if (count >= 3)
       {
-        DrawPrimitive primitive;      
+        DrawPrimitive primitive;
 
         primitive.type  = PrimitiveType_TriangleStrip;
         primitive.first = first;
@@ -260,35 +259,35 @@ class SurfaceBuilder
 
   private:
     typedef std::vector<Vertex> VertexArray;
-    
+
     struct _OLD_
     {
       double  p,q,r;
 
       _OLD_ () : p (0), q (0), r (0) {}
     };
-    
+
     struct Last
     {
-      double ly, ty; 
+      double ly, ty;
       double lp1, lp2;
-      double tp1, tp2;      
+      double tp1, tp2;
     };
 
-  private:    
-    
+  private:
+
     const ModelData&  model_data;
-    VertexArray       vertices;   
-    Last              last;    
+    VertexArray       vertices;
+    Last              last;
         //сделать локальными!!!!
     double            e1, e3, e, ei [3];
     short             ok;
     double            f0, f1, f2, f3, dm, p1, p2, ymax;
-    
+
     int def_ok (double x, double y, _OLD_& old)
     {
       double qq, p, q, r;
-      
+
       if (y == last.ty)
       {
         p1 = last.tp1;
@@ -302,16 +301,16 @@ class SurfaceBuilder
       else
       {
         p1 = div_2 (e1, e, y);
-        
+
         if (ok == 3)
         {
           p2 = div_2 (e3, -e, y);
         }
-        else 
+        else
         {
           p2 = div_2 (e1, -e, y);
         }
-        
+
         last.ly  = last.ty;
         last.lp1 = last.tp1;
         last.lp2 = last.tp2;
@@ -319,9 +318,9 @@ class SurfaceBuilder
         last.tp1 = p1;
         last.tp2 = p2;
       }
-      
+
       p = p1 * sin2 (x+PI/4.) + p2 * cos2 (x+PI/4.);
-      
+
       def_coef (y, p);
 
       if (sol3 (f3, f2, f1, f0, ei) == 1)
@@ -335,24 +334,24 @@ class SurfaceBuilder
       {
         if      (ei [0] < 0.) qq = std::min (ei [1], ei [2]);
         else if (ei [1] < 0.) qq = std::min (ei [0], ei [2]);
-        else                  qq = std::min (ei [1], ei [0]);    
+        else                  qq = std::min (ei [1], ei [0]);
       }
-      
+
       qq = sqrt (fabs (qq));
       r  = qq * sin (y);
       q  = qq * cos (y);
-      
+
       old.p = p;
       old.q = q;
       old.r = r;
 
       return 1;
-    }    
-    
+    }
+
     void def_coef (double y, double p0)
     {
       double u1, u2, u3, u4;
-      
+
       u1 = model_data.B * cos2 (y) + model_data.C * sin2 (y);
       u2 = model_data.B * model_data.B * cos2 (y) + model_data.C * model_data.C * sin2 (y);
       u3 = 2 * model_data.h - model_data.A * p0 * p0;
@@ -362,28 +361,28 @@ class SurfaceBuilder
       f1 = u2 * (4. * model_data.mx * model_data.mx - u3 * u3) - 2.*model_data.A * p0 * u1 * u4;
       f0 = - u4 * u4;
     }
-    
+
     double div_2 (double smin, double smax, double y)
-    {      
+    {
       int ii;
       double s;
-      
+
       for (ii=0; ii < 1000; ii++)
       {
         s = (smin + smax)/2;
-        
+
         def_coef (y, s);
-        
+
         if (del3 (f3, f2, f1, f0) == 1) smax = s;
         else                            smin = s;
-        
+
         if (fabs (smax - smin) < EPS)
           return smin;
       }
 
       return 0.0;
-    }    
-    
+    }
+
     void env (double y, double x, Vertex& vertex)
     {
       double z, z1, z2, z3;
@@ -393,7 +392,7 @@ class SurfaceBuilder
       y = y * PI * ymax;
 
       _OLD_ old;
-      
+
       if(def_ok(x, y, old))
       {
         vertex.position.x = old.p * dm;
@@ -429,24 +428,24 @@ class SurfaceBuilder
         vertex.normal.y   = 0.1;
         vertex.normal.z   = 0.1;
         vertex.dummy.x    = 1.0;
-        vertex.dummy.y    = 1.0; 
+        vertex.dummy.y    = 1.0;
         vertex.dummy.z    = 1.0;
         vertex.attr       = 0;
       }
     }
-    
+
     void Init (int uanz, int vanz)
     {
       vertices.reserve (uanz * vanz * 4);
-      
+
       memset (ei, 0, sizeof ei);
 
       dm       = 1.2;
-      ymax     = 2;  
+      ymax     = 2;
       last.tp1 = last.tp2 = last.lp1 = last.lp2 = last.ly = last.ty = -1;
-      
+
       ok = sol3 (model_data.A * model_data.A, 0., -2 * model_data.h * model_data.A, 2. * model_data.g * model_data.mx, ei);
-      
+
       if (ok == 1)
       {
         e1 = ei [0];
@@ -466,7 +465,7 @@ class SurfaceBuilder
 
       int  in, i, mn=50;
       double uu,vv;
-      Vertex sixpack, copy_six, copy_copy;      
+      Vertex sixpack, copy_six, copy_copy;
 
       size_t print_step = uanz / 10000;
 
@@ -479,7 +478,7 @@ class SurfaceBuilder
           printf ("\rProgress: %.2f%%", (float)u / uanz * 100.f);
 
         in = 0;
-        
+
         for (int v=0;v<(vanz);v++)
         {
           for (int swap=0; swap<2; swap++)
@@ -493,9 +492,9 @@ class SurfaceBuilder
               case 1:
               {
                 env(uu,vv, sixpack);
-                
+
                 if (sixpack.attr != 0.)
-                {                  
+                {
                    sixpack.attr = in;
 
                    vertices.push_back(sixpack);
@@ -506,29 +505,29 @@ class SurfaceBuilder
 
                   for (i=0; i<mn; i++)
                   {
-                    vv = vv - 1./mn/vanz; 
-                  
+                    vv = vv - 1./mn/vanz;
+
                     env (uu, vv, sixpack);
-                    
+
                     if (sixpack.attr)
-                    { 
+                    {
                       sixpack.attr = in;
-                      
+
                       vertices.push_back (sixpack);
 
                       break;
                     }
                   }
                 }
-                
-                break;            
+
+                break;
               }
               case 10:
               {
                 if (swap==0)
                 {
                   env(uu,vv, copy_copy);
-                  
+
                   if (copy_copy.attr)
                     in=11;
                 }
@@ -537,17 +536,17 @@ class SurfaceBuilder
               case 11:
               {
                 env (uu, vv, copy_six);
-                
+
                 if (copy_six.attr)
                 {
                   in = 0;
                   vv = vv - (mn+1)/mn/vanz;
                   uu = uu-1./uanz;
-                  
+
                   for (i=-1; i<mn; i++)
                   {
                     vv=vv+1./mn/vanz;
-                    
+
                     env (uu,vv, sixpack);
 
                     if(sixpack.attr)
@@ -562,36 +561,36 @@ class SurfaceBuilder
 
                   vv = (v - (mn + 1) / mn)/((double)(vanz));
                   uu = uu + 1. / uanz;
-                  
+
                   for(i=-1; i<mn; i++)
                   {
                     vv = vv + 1. / mn / (vanz-1);
 
                     env (uu,vv, sixpack);
-                    
+
                     if (sixpack.attr)
-                    { 
+                    {
                       sixpack.attr = in;
-                      
+
                       vertices.push_back(sixpack);
 
                       break;
                     }
                   }
-                  
+
                   sixpack = copy_copy;
-                  
+
                   sixpack.attr = in;
-                  
+
                   vertices.push_back (sixpack);
-                  
+
                   sixpack = copy_six;
-                  
+
                   sixpack.attr = in;
-                  
+
                   vertices.push_back(sixpack);
                 }
-                else 
+                else
                 {
                   in = 10;
                 }
@@ -602,12 +601,12 @@ class SurfaceBuilder
           if (in == 1 || in == 2)
           {
             in = 10;
-          }        
+          }
         }
       }
-      
+
       printf ("\rProgress: 100.00%%\n");
-    }    
+    }
 };
 
 }
@@ -619,7 +618,7 @@ class SurfaceBuilder
 void LoadModelData (const char* file_name, ModelData& model_data)
 {
   FILE* file = fopen (file_name, "rt");
-  
+
   if (!file)
   {
     printf ("File '%s' not found\n", file_name);
