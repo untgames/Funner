@@ -148,11 +148,13 @@ void DrawTransactionManager::EndDraw ()
   catch (std::exception& exception)
   {
     impl->draw_contexts.pop_back ();    
+    impl->renderer.CancelFrames ();
     log_printf (impl->log_handler, "%s\n    at render::DrawTransactionManager::EndDraw", exception.what ());
   }
   catch (...)
   {
     impl->draw_contexts.pop_back ();    
+    impl->renderer.CancelFrames ();
     log_printf (impl->log_handler, "Unknown exception\n    at render::DrawTransactionManager::EndDraw");
   }
 }

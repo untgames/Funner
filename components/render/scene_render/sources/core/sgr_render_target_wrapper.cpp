@@ -46,6 +46,15 @@ RenderTarget& RenderTarget::operator = (const RenderTarget& render_target)
 }
 
 /*
+    Проверка связи цели рендеринга с рендером
+*/
+
+bool RenderTarget::IsBindedToRender () const
+{
+  return impl->RenderManager () != 0;
+}
+
+/*
     Экран (политика владения - weak-ref)
 */
 

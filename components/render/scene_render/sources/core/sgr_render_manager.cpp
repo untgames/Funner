@@ -35,13 +35,20 @@ struct RenderPath
 
 struct FrameBuffer: public xtl::reference_counter
 {
-  mid_level::IFrameBuffer* frame_buffer;  //указаель на буфер кадра системы рендеринга  
-  RenderTargetImpl::Pointer    render_target; //указаель на цель рендеринга
+  mid_level::IFrameBuffer*  frame_buffer;  //указаель на буфер кадра системы рендеринга  
+  RenderTargetImpl::Pointer render_target; //указаель на цель рендеринга
 
   FrameBuffer (mid_level::IFrameBuffer* in_frame_buffer, RenderManager& manager)
     : frame_buffer (in_frame_buffer),
       render_target (RenderTargetImpl::Create (manager, frame_buffer->GetColorBuffer (), frame_buffer->GetDepthStencilBuffer ()))
   { }
+  
+  ~FrameBuffer ()
+  {
+      //отмена регистрации в менеджере
+    
+    render_target->SetRenderManager (0);
+  }
 };
 
 }
