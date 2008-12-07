@@ -100,7 +100,7 @@ struct tuple_argument_evalutor
 {
   template <size_t I, class Tuple> static typename tuple_element<I, Tuple>::type eval (Tuple& args)
   {
-    return get<I> (args);
+    return args.template get<I> ();
   }
 };
 
