@@ -39,7 +39,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
   public:
 ///Конструктор
     SceneRenderSubsystem (common::ParseNode& node)
-      : resource_manager_name (get<const char*> (node, "ResourceManager")),
+      : resource_manager_name (get<const char*> (node, "ResourceManager", "")),
         resource_server (*this),
         attached_resource_manager (0),
         render (get<const char*> (node, "DriverMask"), get<const char*> (node, "RendererMask"), get<const char*> (node, "RenderPathMasks", "*")),
@@ -62,7 +62,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
         size_t render_target_index = 0;
 
-        idle_renders.reserve (DEFAULT_IDLE_RENDER_COUNT);
+        idle_render_targets.reserve (DEFAULT_IDLE_RENDER_COUNT);
 
         for (Parser::NamesakeIterator iter=node.First ("RenderTarget"); iter; ++iter, ++render_target_index)
         {
@@ -78,7 +78,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
           screen_map.insert_pair (attachment, render_target_index);
 
           if (get<bool> (node, "IdleRender", true))
-            idle_renders.push_back (render_target_index);
+            idle_render_targets.push_back (render.RenderTarget (render_target_index));
         }
 
         AttachmentRegistry::Attach<render::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
@@ -110,7 +110,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 ///События установки / удаления менеджера ресурсов
     void OnRegisterAttachment (const char* attachment_name, media::rms::ResourceManager& resource_manager)
     {
-      if (resource_manager_name == attachment_name)
+      if (!resource_manager_name.empty () && resource_manager_name == attachment_name)
       {
         resource_manager.Attach (resource_server);
 
@@ -122,7 +122,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
     void OnUnregisterAttachment (const char* attachment_name, media::rms::ResourceManager&)
     {
-      if (resource_manager_name == attachment_name)
+      if (!resource_manager_name.empty () && resource_manager_name == attachment_name)
         DetachServer ();
     }
 
@@ -206,8 +206,26 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
     void OnIdle ()
     {
-      for (size_t i = 0, idle_renders_count = idle_renders.size (); i < idle_renders_count; i++)
-        render.RenderTarget (idle_renders[i]).Update ();
+      for (RenderTargetArray::iterator iter=idle_render_targets.begin (); iter!=idle_render_targets.end ();)
+      {
+        if (!iter->IsBindedToRender ()) //если цель рендеринга удалена - удаляем её из списка отрисовки
+        {
+          idle_render_targets.erase (iter);
+
+          continue;
+        }
+        
+          //обновление цели рендеринга
+
+        iter->Update ();        
+
+        ++iter;
+      }
+      
+        //если все цели рендеринга удалены - перерисовывать нечего
+      
+      if (idle_render_targets.empty ())
+        idle_connection.disconnect ();
     }
 
   private:
@@ -216,17 +234,17 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
   private:
     typedef stl::hash_map<stl::hash_key<const char*>, size_t> ScreenMap;
-    typedef stl::vector<size_t>                               IdleRenderArray;
+    typedef stl::vector<render::RenderTarget>                 RenderTargetArray;
 
   private:
-    stl::string                  resource_manager_name;      //имя аттачмента менеджера ресурсов
+    stl::string                  resource_manager_name;      //имя точки привязки менеджера ресурсов
     media::rms::Server           resource_server;            //сервер ресурсов
     media::rms::ResourceManager* attached_resource_manager;  //присоединненный менеджер ресурсов
     render::SceneRender          render;                     //рендер
     ScreenMap                    screen_map;                 //соответствие экранов и рендер-таргетов
     Log                          log;                        //лог
     xtl::auto_connection         idle_connection;            //соединение обновления рендер-таргетов
-    IdleRenderArray              idle_renders;               //список рендер-таргетов
+    RenderTargetArray            idle_render_targets;        //список автоматически обновляемых целей рендеринга
 };
 
 /*

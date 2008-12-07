@@ -36,7 +36,7 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
 /// Конструктор/деструктор
     ScenePlayerSubsystem (common::ParseNode& node)
       : attachment (get<const char*> (node, "Listener")),
-        resource_manager_name (get<const char*> (node, "ResourceManager")),
+        resource_manager_name (get<const char*> (node, "ResourceManager", "")),
         sound_manager (get<const char*> (node, "DriverMask", "*"), get<const char*> (node, "DeviceMask", "*"), get<const char*> (node, "InitString", "")),
         resource_server (*this),
         attached_resource_manager (0),
@@ -75,7 +75,7 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
 ///События установки / удаления менеджера ресурсов
     void OnRegisterAttachment (const char* attachment_name, media::rms::ResourceManager& resource_manager)
     {
-      if (resource_manager_name == attachment_name)
+      if (!resource_manager_name.empty () && resource_manager_name == attachment_name)
       {
         resource_manager.Attach (resource_server);
 
@@ -87,7 +87,7 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
     void OnUnregisterAttachment (const char* attachment_name, media::rms::ResourceManager&)
     {
-      if (resource_manager_name == attachment_name)
+      if (!resource_manager_name.empty () && resource_manager_name == attachment_name)
         DetachServer ();
     }
 
