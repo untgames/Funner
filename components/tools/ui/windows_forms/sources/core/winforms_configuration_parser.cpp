@@ -136,17 +136,17 @@ MenuStripItem::Pointer ConfigurationParser::ParseMenuStripItem (XmlNode^ menu_it
   }
   
   XmlNode ^id       = menu_iter->Attributes ["Id"],
-          ^text     = menu_iter->Attributes ["Text"],
+          ^name     = menu_iter->Attributes ["Name"],
           ^tip      = menu_iter->Attributes ["Tip"],
           ^image    = menu_iter->Attributes ["Image"],
           ^on_click = menu_iter->Attributes ["OnClick"];
 
-  if (!text)
+  if (!name)
   {
     AutoString node_prefix (get_node_path (menu_iter));
 
     throw xtl::format_operation_exception ("tools::ui::windows_forms::ConfigurationParser::ParseMenuStripItem", 
-                                           "No 'Text' attribute in node %s", node_prefix.Data ());
+                                           "No 'Name' attribute in node %s", node_prefix.Data ());
   }
 
     //создание элемента меню
@@ -155,9 +155,9 @@ MenuStripItem::Pointer ConfigurationParser::ParseMenuStripItem (XmlNode^ menu_it
   
     //установка свойств меню
 
-  AutoString text_string (text->InnerText);
+  AutoString name_string (name->InnerText);
 
-  menu_item->SetText (text_string.Data ());
+  menu_item->SetText (name_string.Data ());
 
   if (tip)
   {
@@ -267,7 +267,7 @@ ToolStripButton::Pointer ConfigurationParser::ParseToolStripButton (XmlNode^ but
   }
   
   XmlNode ^id       = button_iter->Attributes ["Id"],
-          ^text     = button_iter->Attributes ["Text"],
+          ^name     = button_iter->Attributes ["Name"],
           ^tip      = button_iter->Attributes ["Tip"],
           ^image    = button_iter->Attributes ["Image"],
           ^on_click = button_iter->Attributes ["OnClick"];  
@@ -276,19 +276,19 @@ ToolStripButton::Pointer ConfigurationParser::ParseToolStripButton (XmlNode^ but
 
   ToolStripButton::Pointer button (new ToolStripButton (window_system), false);
   
-  if (!text && !image)
+  if (!name && !image)
   {
-    log.Printf ("'Text' and 'Image' tags missing in node %s", node_path.Data ());
+    log.Printf ("'Name' and 'Image' tags missing in node %s", node_path.Data ());
     return 0;
   }
   
     //установка свойств меню
     
-  if (text)
+  if (name)
   {
-    AutoString text_string (text->InnerText);
+    AutoString name_string (name->InnerText);
     
-    button->SetText (text_string.Data ());
+    button->SetText (name_string.Data ());
   }
 
   if (tip)

@@ -23,7 +23,7 @@ class Constants
   {
     return "funner.tools.ui.windows_forms.PluginApi.dll";
   }
-  
+
   public static System.String TypeConverterDllName ()
   {
     return "funner.tools.ui.windows_forms.TypeConverter.dll";
@@ -33,7 +33,7 @@ class Constants
 public class PropertyGridControl: PropertyGrid, IPropertyListener
 {
 ///Конструктор
-  public PropertyGridControl (IApplicationServer in_application_server, System.Reflection.Assembly assembly, 
+  public PropertyGridControl (IApplicationServer in_application_server, System.Reflection.Assembly assembly,
                               System.String property_map, System.String var_registry_branch)
   {
     application_server = in_application_server;
@@ -42,7 +42,7 @@ public class PropertyGridControl: PropertyGrid, IPropertyListener
 
     System.Object [] arguments = {application_server, var_registry_branch};
 
-    System.Object map = assembly.CreateInstance ("tools.ui.windows_forms.ui_property_grid_plugin." + property_map, false, 
+    System.Object map = assembly.CreateInstance ("tools.ui.windows_forms.ui_property_grid_plugin." + property_map, false,
                                                  System.Reflection.BindingFlags.Default, null, arguments, null, null);
 
     if (map == null)
@@ -151,24 +151,23 @@ public class UIPropertyGridPlugin: IPlugin
     compiler_parameters.ReferencedAssemblies.Add (Application.StartupPath + "\\" + tools.ui.windows_forms.ui_property_grid_plugin.Constants.TypeConverterDllName ());
     compiler_parameters.ReferencedAssemblies.Add (Application.StartupPath + "\\" + tools.ui.windows_forms.ui_property_grid_plugin.Constants.PluginApiDllName ());
 
-    Microsoft.CSharp.CSharpCodeProvider     cs_code_provider = new Microsoft.CSharp.CSharpCodeProvider ();    
+    Microsoft.CSharp.CSharpCodeProvider     cs_code_provider = new Microsoft.CSharp.CSharpCodeProvider ();
     System.CodeDom.Compiler.CompilerResults results          = cs_code_provider.CompileAssemblyFromSource (compiler_parameters, generated_code.ToString ());
 
     System.Collections.Specialized.StringCollection sc = results.Output;
-    
+
     for (int i = 0; i < sc.Count; i++)
-      System.Console.WriteLine (sc [i]);  
+      System.Console.WriteLine (sc [i]);
 
     assembly = results.CompiledAssembly;
   }
 
-  public void ParseProperty (XmlNode property, StringWriter writer)
+  public void ParseProperty (XmlNode property, int property_index, System.String map_name, StringWriter writer)
   {
     XmlNode name_node      = property.Attributes ["Name"];
     XmlNode var_name_node  = property.Attributes ["VarName"];
     XmlNode category_node  = property.Attributes ["Category"];
     XmlNode tip_node       = property.Attributes ["Tip"];
-    XmlNode title_node     = property.Attributes ["Title"];
     XmlNode type_node      = property.Attributes ["Type"];
     XmlNode read_only_node = property.Attributes ["ReadOnly"];
     XmlNode list_box_node  = property.Attributes ["ListBox"];
@@ -195,27 +194,27 @@ public class UIPropertyGridPlugin: IPlugin
 
     if (type == "list" && list_box_node == null)
       throw new System.Exception ("Property with type 'list' must contain 'ListBox' attribute");
-    
-    writer.Write ("\tprivate System.String {0}_var_name;\n\n", name_node.InnerText);
+
+    writer.Write ("\tprivate System.String {0}_property_{1}_var_name;\n\n", map_name, property_index);
 
     writer.Write ("\t[System.ComponentModel.Description (\"{0}\"),\n", (tip_node != null) ? tip_node.InnerText : "");
-    
+
     if (type == "list")
       writer.Write ("\tSystem.ComponentModel.TypeConverter (typeof ({0}Converter)),\n", list_box_node.InnerText);
-    
-    writer.Write ("\t System.ComponentModel.DisplayName (\"{0}\"),\n", (title_node != null) ? title_node.InnerText : name_node.InnerText);
+
+    writer.Write ("\t System.ComponentModel.DisplayName (\"{0}\"),\n", name_node.InnerText);
     writer.Write ("\t System.ComponentModel.Category    (\"{0}\")]\n", (category_node != null) ? category_node.InnerText : "Common");
 
     if (type == "list")
-      writer.Write ("\tpublic string {0}\n\t{{\n", name_node.InnerText);
+      writer.Write ("\tpublic string {0}Property{1}\n\t{{\n", map_name, property_index);
     else
-      writer.Write ("\tpublic {0} {1}\n\t{{\n", type, name_node.InnerText);
-    
+      writer.Write ("\tpublic {0} {1}Property{2}\n\t{{\n", type, map_name, property_index);
+
     writer.Write ("\t\tget\n\t\t{\n");
-    writer.Write ("\t\t\tif (!application_server.IsPropertyPresent ({0}_var_name))\n", var_name_node.InnerText);
-    writer.Write ("\t\t\t\tthrow new System.Exception (\"Variable '\" + {0}_var_name + \"' not found!\");\n", var_name_node.InnerText);
+    writer.Write ("\t\t\tif (!application_server.IsPropertyPresent ({0}_property_{1}_var_name))\n", map_name, property_index);
+    writer.Write ("\t\t\t\tthrow new System.Exception (\"Variable '\" + {0}_property_{1}_var_name + \"' not found!\");\n", map_name, property_index);
     writer.Write ("\t\t\t\tSystem.String return_value = null;\n");
-    writer.Write ("\t\t\tapplication_server.GetProperty ({0}_var_name, ref return_value);\n", name_node.InnerText);
+    writer.Write ("\t\t\tapplication_server.GetProperty ({0}_property_{1}_var_name, ref return_value);\n", map_name, property_index);
 
     if (type == "list")
       writer.Write ("\t\t\treturn List{0}Table.GetItemByValue (return_value);\n\t\t}}\n", list_box_node.InnerText);
@@ -225,10 +224,11 @@ public class UIPropertyGridPlugin: IPlugin
     if ((read_only_node == null) || (read_only_node.InnerText == "0"))
     {
       if (type == "list")
-        writer.Write ("\t\tset\n\t\t{{\n\t\t\tapplication_server.SetProperty ({0}_var_name, List{1}Table.GetValueByItem (value));\n\t\t}}\n", 
-                      name_node.InnerText, list_box_node.InnerText);
+        writer.Write ("\t\tset\n\t\t{{\n\t\t\tapplication_server.SetProperty ({0}_property_{1}_var_name, List{2}Table.GetValueByItem (value));\n\t\t}}\n",
+                      map_name, property_index, list_box_node.InnerText);
       else
-        writer.Write ("\t\tset\n\t\t{{\n\t\t\tapplication_server.SetProperty ({0}_var_name, Converter.ToString (value));\n\t\t}}\n", name_node.InnerText);
+        writer.Write ("\t\tset\n\t\t{{\n\t\t\tapplication_server.SetProperty ({0}_property_{1}_var_name, Converter.ToString (value));\n\t\t}}\n", 
+                      map_name, property_index);
     }
 
     writer.Write ("\t}\n\n");
@@ -243,27 +243,27 @@ public class UIPropertyGridPlugin: IPlugin
       throw new System.Exception ("Invalid 'PropertyMap' node, must contain 'Name' attribute");
 
     if (inherit_node != null) writer.Write ("public class {0}: {1}\n{{\n", name_node.InnerText, inherit_node.InnerText);
-    else                      writer.Write ("public class {0}\n{{\n", name_node.InnerText);  
+    else                      writer.Write ("public class {0}\n{{\n", name_node.InnerText);
 
     writer.Write ("\tprivate IApplicationServer application_server;\n\n");
     writer.Write ("\tpublic {0} (IApplicationServer in_application_server, System.String var_name_prefix)\n", name_node.InnerText);
 
     if (inherit_node != null)
-      writer.Write ("\t: base (in_application_server, var_name_prefix)\n");    
-    
+      writer.Write ("\t: base (in_application_server, var_name_prefix)\n");
+
     writer.Write ("\t{\n\t\tapplication_server = in_application_server;\n\t\tInitVars (var_name_prefix);\n\t}\n\n");
 
     XmlNodeList list = property_map.SelectNodes ("Property");
-    
+
     for (int i = 0; i < list.Count; i++)
-      ParseProperty (list [i], writer);
+      ParseProperty (list [i], i, name_node.InnerText, writer);
 
     writer.Write ("\tprivate void InitVars (System.String var_name_prefix)\n\t{\n");
     writer.Write ("\t\tif (var_name_prefix.Length > 0)\n\t\t\tvar_name_prefix += \".\";\n");
 
     for (int i = 0; i < list.Count; i++)
-      writer.Write ("\t\t{0}_var_name = var_name_prefix + \"{0}\";\n", list[i].Attributes["VarName"].InnerText);
-    
+      writer.Write ("\t\t{0}_property_{1}_var_name = var_name_prefix + \"{2}\";\n", name_node.InnerText, i, list[i].Attributes["VarName"].InnerText);
+
     writer.Write ("\t}\n\n");
 
     writer.Write ("};\n\n");
@@ -281,7 +281,7 @@ public class UIPropertyGridPlugin: IPlugin
     writer.Write ("\tpublic override System.ComponentModel.TypeConverter.StandardValuesCollection GetStandardValues (System.ComponentModel.ITypeDescriptorContext dummy)\n\t{\n");
 
     XmlNodeList list = list_box.SelectNodes ("Item");
-    
+
     writer.Write ("\t\tstring [] list_items = new string [{0}];\n", list.Count);
 
     for (int i = 0; i < list.Count; i++)
@@ -300,7 +300,7 @@ public class UIPropertyGridPlugin: IPlugin
     writer.Write ("};\n\n");
 
     writer.Write ("class List{0}Table\n", name_node.InnerText);
-    
+
     writer.Write ("{{\n\tstatic private ListBoxItem [] items = new ListBoxItem [{0}] {{", list.Count);
     for (int i = 0; i < list.Count; i++)
     {
@@ -328,7 +328,7 @@ public class UIPropertyGridPlugin: IPlugin
   private StringWriter GenerateCode (XmlNode property_maps)
   {
     StringWriter string_writer = new StringWriter ();
-    
+
     string_writer.Write ("namespace tools\n{\n\nnamespace ui\n{\n\nnamespace windows_forms\n{\n\nnamespace ui_property_grid_plugin\n{\n\n");
 
     string_writer.Write ("struct ListBoxItem\n{\n\tpublic string item_name;\n\tpublic string item_value;\n\n");
@@ -336,20 +336,20 @@ public class UIPropertyGridPlugin: IPlugin
     string_writer.Write ("};\n\n");
 
     XmlNodeList list = property_maps.SelectNodes ("ListBox");
-    
+
     for (int i = 0; i < list.Count; i++)
       ParseListBox (list [i], string_writer);
 
     list = property_maps.SelectNodes ("PropertyMap");
-    
+
     for (int i = 0; i < list.Count; i++)
       ParsePropertyMap (list [i], string_writer);
-      
+
     string_writer.Write ("}\n\n}\n\n}\n\n}\n\n");
 
     return string_writer;
   }
-  
+
 ///Члены класса
   private IApplicationServer           application_server;
   private System.Reflection.Assembly   assembly;

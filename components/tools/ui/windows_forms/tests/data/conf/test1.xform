@@ -1,25 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="cp-1251"?>
 <UIConfig>
-  <MenuItem Id="MenuItem1" Text="Ещё один пункт" Tip="Странное название"/>
-  <MenuItem Id="MenuItem2" Text="Справка" Tip="Справка о приложении">
-    <MenuItem Text="О программе..." Tip="Описание программы" OnClick="Application.Execute ('ShowAbout')"/>
+  <MenuItem Id="MenuItem1" Name="Ещё один пункт" Tip="Странное название"/>
+  <MenuItem Id="MenuItem2" Name="Справка" Tip="Справка о приложении">
+    <MenuItem Name="О программе..." Tip="Описание программы" OnClick="Application.Execute ('ShowAbout')"/>
     <MenuItem Source="MenuItem1"/>
-    <MenuItem Text="Подменю">
-       <MenuItem Text="Подподменю">
-         <MenuItem Text="Пункт" Image="data/app.ico"/>
+    <MenuItem Name="Подменю">
+       <MenuItem Name="Подподменю">
+         <MenuItem Name="Пункт" Image="data/app.ico"/>
        </MenuItem>
     </MenuItem>
   </MenuItem>
   <MenuStrip Id="MenuStrip1">
-    <MenuItem Text="Файл">
-      <MenuItem Text="Новая форма" OnClick="Application.CreateForm ('Application', 'my_init_string', DockState.Float)"/>
-      <MenuItem Text="Выход" Tip="Выход из приложения" OnClick="Application.Execute ('close')"/>
+    <MenuItem Name="Файл">
+      <MenuItem Name="Новая форма" OnClick="Application.CreateForm ('Application', 'my_init_string', DockState.Float)"/>
+      <MenuItem Name="Выход" Tip="Выход из приложения" OnClick="Application.Execute ('close')"/>
     </MenuItem>
     <MenuItem Source="MenuItem2"/>
   </MenuStrip>
   <ToolStrip Id="ToolStrip1">
     <ToolButton Image="data/app.ico" OnClick="Application.Execute ('Button1Click')" Tip="Картинка"/>
-    <ToolButton Text="Hello world" OnClick="Application.Execute ('Hello world')"/>
+    <ToolButton Name="Hello world" OnClick="Application.Execute ('Hello world')"/>
   </ToolStrip>
   <Plugin 
     Name="Console" 
@@ -37,7 +37,7 @@
     </ListBox>
 
     <PropertyMap Name="Map1">
-      <Property Name="IntProperty1" VarName="IntProperty1" Category="Category #1" Title="Property title!" Type="int"/>
+      <Property Name="IntProperty1" VarName="IntProperty1" Category="Category #1" Type="int"/>
       <Property Name="FloatProperty1" VarName="FloatProperty1" Tip="Property tip" ReadOnly="0" Type="float"/>
       <Property Name="DoubleProperty1" VarName="DoubleProperty1" Type="double"/>
       <Property Name="BoolProperty1" VarName="BoolProperty1" Type="bool" ReadOnly="1"/>
