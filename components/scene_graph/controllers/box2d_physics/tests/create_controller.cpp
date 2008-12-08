@@ -9,6 +9,15 @@ int main ()
     Scene scene;
     
     scene.Root ().AttachController ("Box2D.World");
+    
+    Body::Pointer body = Body::Create ();
+    
+    body->SetName ("body1");
+    body->SetModelName ("shape1");
+    
+    body->BindToScene (scene);    
+    
+    scene.Root ().Update (1.0f);
   }
   catch (std::exception& exception)
   {

@@ -1,7 +1,8 @@
 #include "shared.h"
 
 using namespace scene_graph;
-using namespace scene_graph::box2d;
+using namespace scene_graph::physics;
+using namespace scene_graph::physics::box2d;
 
 namespace
 {

@@ -1,17 +1,22 @@
 #ifndef SCENE_GRAPH_CONTROLLER_BOX2D_PHYSICS_HEADER
 #define SCENE_GRAPH_CONTROLLER_BOX2D_PHYSICS_HEADER
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/connection.h>
 #include <xtl/function.h>
 
 #include <common/component.h>
 
 #include <sg/controller.h>
-#include <sg/node.h>
+#include <sg/physics.h>
 
 #include <Box2D.h>
 
 namespace scene_graph
+{
+
+namespace physics
 {
 
 namespace box2d
@@ -35,9 +40,20 @@ class WorldController: public IController, public xtl::noncopyable
     void Update (float dt);
 
   private:
-    b2World world;     //физический мир
-    Node&   root_node; //корневой узел, сопоставленный физическому миру
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Оповещения о появлении нового узла
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    void OnAttachChild (Node&);
+    void OnDetachChild (Node&);
+
+  private:
+    b2World              world;           //физический мир
+    Node&                root_node;       //корневой узел, сопоставленный физическому миру
+    xtl::auto_connection on_attach_child; //соединение на событие появления потомка
+    xtl::auto_connection on_detach_child; //соединение на событие удаления потомка
 };
+
+}
 
 }
 
