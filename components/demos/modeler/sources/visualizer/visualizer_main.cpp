@@ -81,6 +81,7 @@ const char* ENVELOPE_APPLICATION_NAME           = "modeler-envelope.exe";
 const char* TRAJECTORY_APPLICATION_NAME         = "modeler-trajectory.exe";
 const char* MESH_CONVERTER_APPLICATION_NAME     = "mesh-converter.exe";
 const char* MODEL_REGISTRY_NAME                 = "ApplicationServer.Model";
+const char* MODEL_FILE_NAME                     = "model.xmodel";
 const int   TRAJECTORIES_COORDS_HEADER          = 'TRJC';
 const int   TRAJECTORIES_COORDS_VERSION         = 1;
 
@@ -246,8 +247,6 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
       plugin_path = common::get<const char*> (*iter, "PluginPath");
 
-      OpenProjectPath ("projects\\project1\\");
-
       camera = OrthoCamera::Create ();
 
       camera->SetLeft   (-3);
@@ -336,6 +335,56 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     ICustomChildWindow* CreateChildWindow (const char* init_string)
     {
       return new MyChildWindow ();
+    }
+
+    void OpenProjectPath (const char* path)
+    {
+      static const char* METHOD_NAME = "MyApplicationServer::OpenProjectPath";
+
+      if (!path)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "path");
+
+      stl::string model_name = common::format ("%s%s", path, MODEL_FILE_NAME);
+
+      if (!common::FileSystem::IsFileExist (model_name.c_str ()))
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't open path '%s', no model data file", path);
+
+      LoadModel (model_name.c_str ());
+
+      UnloadModels ();
+
+      project_path = path;
+
+      stl::string precomputed_trajectories_mask = project_path + "trajectory*.binmesh";
+
+      common::FileList precomputed_trajectories = common::FileSystem::Search (precomputed_trajectories_mask.c_str (), common::FileSearch_Files);
+
+      for (size_t i = 0, size = precomputed_trajectories.Size (); i < size; i++)
+        try
+        {
+          LoadTrajectory (precomputed_trajectories.Item (i).name);
+        }
+        catch (std::exception& exception)
+        {
+          common::Console::Printf ("Can't load trajectory from file '%s', exception '%s'\n", precomputed_trajectories.Item (i).name, exception.what ());
+        }
+        catch (...)
+        {
+          common::Console::Printf ("Can't load trajectory from file '%s', unknown exception\n", precomputed_trajectories.Item (i).name);
+        }
+
+      try
+      {
+        LoadEnvelope ();
+      }
+      catch (std::exception& exception)
+      {
+        common::Console::Printf ("Can't load envelope, exception '%s'\n", exception.what ());
+      }
+      catch (...)
+      {
+        common::Console::Printf ("Can't load envelope, unknown exception\n");
+      }
     }
 
     void AddRef  () { addref (this); }
@@ -644,51 +693,75 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       wait_files_timer.Run ();
     }
 
-    void OpenProjectPath (const char* path)
+    void LoadModel (const char* path)
     {
-      static const char* METHOD_NAME = "MyApplicationServer::OpenProjectPath";
+      static const char* METHOD_NAME = "MyApplicationServer::LoadModel";
 
-      if (!path)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "path");
+      common::Parser   parser     (path);
+      common::ParseLog parser_log (parser.Log ());
 
-      stl::string model_name = common::format ("%smodel.dat", path);
+      for (size_t i = 0; i < parser_log.MessagesCount (); i++)
+      {
+        common::ParseLogMessageType message_type = parser_log.MessageType (i);
 
-      if (!common::FileSystem::IsFileExist (model_name.c_str ()))
-        throw xtl::format_operation_exception (METHOD_NAME, "Can't open path '%s', no model data file", path);
+        if (message_type == common::ParseLogMessageType_Error || message_type == common::ParseLogMessageType_FatalError)
+          throw xtl::format_operation_exception (METHOD_NAME, "Model parse error: '%s'", parser_log.Message (i));
+      }
 
-      UnloadModels ();
+      double  A, B, C;     //момент инерции A,B,C
+      double  h, g;        //постоянные интегрирования h,g
+      double  mx,my,mz;    //координаты центра тяжести
+      int     ini;         //???
 
-      project_path = path;
-
-      stl::string precomputed_trajectories_mask = project_path + "trajectory*.binmesh";
-
-      common::FileList precomputed_trajectories = common::FileSystem::Search (precomputed_trajectories_mask.c_str (), common::FileSearch_Files);
-
-      for (size_t i = 0, size = precomputed_trajectories.Size (); i < size; i++)
-        try
-        {
-          LoadTrajectory (precomputed_trajectories.Item (i).name);
-        }
-        catch (std::exception& exception)
-        {
-          common::Console::Printf ("Can't load trajectory from file '%s', exception '%s'\n", precomputed_trajectories.Item (i).name, exception.what ());
-        }
-        catch (...)
-        {
-          common::Console::Printf ("Can't load trajectory from file '%s', unknown exception\n", precomputed_trajectories.Item (i).name);
-        }
+      common::VarRegistry model_registry (MODEL_REGISTRY_NAME);
 
       try
       {
-        LoadEnvelope ();
+        common::ParseIterator root = parser.Root ().First ("Model");
+
+        ini = common::get<int> (*root, "ini");
+        model_registry.SetValue ("ini", xtl::any (stl::string (common::get<const char*> (*root, "ini")), true));
+
+        common::ParseIterator iter = root->First ("MomentOfInertia");
+
+        A = common::get<double> (*iter, "A");
+        model_registry.SetValue ("A", xtl::any (stl::string (common::get<const char*> (*iter, "A")), true));
+        B = common::get<double> (*iter, "B");
+        model_registry.SetValue ("B", xtl::any (stl::string (common::get<const char*> (*iter, "B")), true));
+        C = common::get<double> (*iter, "C");
+        model_registry.SetValue ("C", xtl::any (stl::string (common::get<const char*> (*iter, "C")), true));
+
+        iter = root->First ("IntegrationConstant");
+
+        h = common::get<double> (*iter, "h");
+        model_registry.SetValue ("h", xtl::any (stl::string (common::get<const char*> (*iter, "h")), true));
+        g = common::get<double> (*iter, "g");
+        model_registry.SetValue ("g", xtl::any (stl::string (common::get<const char*> (*iter, "g")), true));
+
+        iter = root->First ("CenterOfMass");
+
+        mx = common::get<double> (*iter, "mx");
+        model_registry.SetValue ("mx", xtl::any (stl::string (common::get<const char*> (*iter, "mx")), true));
+        my = common::get<double> (*iter, "my");
+        model_registry.SetValue ("my", xtl::any (stl::string (common::get<const char*> (*iter, "my")), true));
+        mz = common::get<double> (*iter, "mz");
+        model_registry.SetValue ("mz", xtl::any (stl::string (common::get<const char*> (*iter, "mz")), true));
+
+        stl::string old_format_model_file_name (path, xtl::xstrlen (path) - xtl::xstrlen (MODEL_FILE_NAME));
+
+        old_format_model_file_name += "model.dat";
+
+        common::OutputFile old_format_model_file (old_format_model_file_name.c_str ());
+
+        stl::string old_format_model_data = common::format ("A=%lf, B=%lf, C=%lf, h=%lf, g=%lf, mx=%lf, my=%lf, mz=%lf, ini=%d",
+                                                            A, B, C, h, g, mx, my, mz, ini);
+
+        old_format_model_file.Write (old_format_model_data.c_str (), old_format_model_data.length () + 1);
       }
-      catch (std::exception& exception)
+      catch (xtl::exception& exception)
       {
-        common::Console::Printf ("Can't load envelope, exception '%s'\n", exception.what ());
-      }
-      catch (...)
-      {
-        common::Console::Printf ("Can't load envelope, unknown exception\n");
+        exception.touch (METHOD_NAME);
+        throw;
       }
     }
 
@@ -734,12 +807,11 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 //класс тестового приложения
 struct Test
 {
-  Test () : log ("modeler.test")
+  Test () : log ("modeler.test"), application_server (new MyApplicationServer, false)
   {
       //регистрация сервера приложения
 
-    tools::ui::WindowSystemManager::RegisterApplicationServer ("MyApplicationServer",
-      xtl::com_ptr<MyApplicationServer> (new MyApplicationServer, false).get ());
+    tools::ui::WindowSystemManager::RegisterApplicationServer ("MyApplicationServer", application_server.get ());
 
       //создание главного окна
 
@@ -748,6 +820,10 @@ struct Test
       //подписка на события протоколирования
 
     main_window.SetLogHandler (xtl::bind (&Test::LogPrint, this, _1));
+
+      //Открытие папки
+
+    application_server->OpenProjectPath ("projects\\project1\\");
   }
 
   void LogPrint (const char* message)
@@ -755,8 +831,11 @@ struct Test
     log.Print (message);
   }
 
-  common::Log  log;
-  MainWindow   main_window;
+  typedef xtl::com_ptr<MyApplicationServer> MyApplicationServerPtr;
+
+  common::Log            log;
+  MyApplicationServerPtr application_server;
+  MainWindow             main_window;
 };
 
 void print (const char* message)
