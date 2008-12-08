@@ -18,7 +18,7 @@ DEMOS.WATER_SLIDES.LINK_INCLUDES    :=
 DEMOS.WATER_SLIDES.IMPORTS          := ../../system/compile.static.mak ../../system/link.static.mak \
                                        ../../media/image/compile.static.mak ../../media/image/link.static.mak \
                                        ../../render/low_level/compile.static.mak ../../render/opengl_driver/link.static.mak  \
-                                       ../../scene_graph/link.static.mak ../../scene_graph/compile.static.mak \
+                                       ../../scene_graph/core/link.static.mak ../../scene_graph/core/compile.static.mak \
                                        ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
                                        ../../sound/scene_player/link.static.mak ../../media/sound/snddecl.link.static.mak \
                                        ../../media/sound/default_decoders.link.static.mak ../../sound/scene_player/compile.static.mak

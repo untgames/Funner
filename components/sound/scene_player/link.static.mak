@@ -2,4 +2,4 @@
 #Экспортируемые настройки компонента
 ###################################################################################################
 export.LIBS    := funner.sound.scene_player
-export.IMPORTS := ../manager/link.static.mak ../../system/link.static.mak ../../scene_graph/link.static.mak
+export.IMPORTS := ../manager/link.static.mak ../../system/link.static.mak ../../scene_graph/core/link.static.mak

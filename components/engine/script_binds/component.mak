@@ -12,7 +12,7 @@ ENGINE.SCRIPT_BINDS.SOURCES.LIB_DIRS         :=
 ENGINE.SCRIPT_BINDS.SOURCES.LIBS             := 
 ENGINE.SCRIPT_BINDS.SOURCES.COMPILER_CFLAGS  := 
 ENGINE.SCRIPT_BINDS.SOURCES.COMPILER_DEFINES := 
-ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS			 := ../../script/core/compile.static.mak ../../scene_graph/compile.static.mak ../../common/compile.static.mak \
+ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS			 := ../../script/core/compile.static.mak ../../scene_graph/core/compile.static.mak ../../common/compile.static.mak \
                                                 ../../render/scene_render/compile.static.mak ../../system/compile.static.mak ../../input/manager/compile.static.mak \
                                                 ../core/compile.static.mak ../../media/rms/compile.static.mak
 

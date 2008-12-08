@@ -2,4 +2,4 @@
 #Настройки, экспортируемые для библиотек использующих Scriptbinds
 ###################################################################################################
 export.LINK_INCLUDES := SceneGraphScriptBind
-export.IMPORTS       := link.static.mak ../../scene_graph/link.static.mak
+export.IMPORTS       := link.static.mak ../../scene_graph/core/link.static.mak

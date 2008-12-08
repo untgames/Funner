@@ -12,7 +12,7 @@ RENDER.SCENE_RENDER.CORE.SOURCES.LIB_DIRS         :=
 RENDER.SCENE_RENDER.CORE.SOURCES.LIBS             := 
 RENDER.SCENE_RENDER.CORE.SOURCES.COMPILER_CFLAGS  :=
 RENDER.SCENE_RENDER.CORE.SOURCES.COMPILER_DEFINES :=
-RENDER.SCENE_RENDER.CORE.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak ../../scene_graph/compile.static.mak \
+RENDER.SCENE_RENDER.CORE.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak ../../scene_graph/core/compile.static.mak \
                                              ../mid_level/compile.static.mak ../../media/image/compile.static.mak
                                              
 #Öåëü ¹2 - Scene render2d sources
@@ -24,7 +24,7 @@ RENDER.SCENE_RENDER.RENDER2D.SOURCES.LIB_DIRS         :=
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.LIBS             := 
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.COMPILER_CFLAGS  :=
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.COMPILER_DEFINES :=
-RENDER.SCENE_RENDER.RENDER2D.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak ../../scene_graph/compile.static.mak \
+RENDER.SCENE_RENDER.RENDER2D.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak ../../scene_graph/core/compile.static.mak \
                                                          ../mid_level/compile.static.mak ../../media/rfx/compile.static.mak \
                                                          ../../media/image/compile.static.mak ../../media/font/compile.static.mak
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.msvc.COMPILER_CFLAGS  := -wd4355
@@ -39,7 +39,7 @@ RENDER.SCENE_RENDER.CORE.TESTS.DLLS             :=
 RENDER.SCENE_RENDER.CORE.TESTS.DLL_DIRS         :=
 RENDER.SCENE_RENDER.CORE.TESTS.COMPILER_CFLAGS  :=
 RENDER.SCENE_RENDER.CORE.TESTS.IMPORTS          := compile.static.mak link.static.mak ../debug_renderer_driver/link.static.mak \
-                                                   ../../scene_graph/compile.static.mak ../../common/compile.static.mak \
+                                                   ../../scene_graph/core/compile.static.mak ../../common/compile.static.mak \
                                                    ../mid_level/compile.static.mak
 
 #Öåëü ¹4 - Scene render2d tests
@@ -52,5 +52,5 @@ RENDER.SCENE_RENDER.RENDER2D.TESTS.DLLS             :=
 RENDER.SCENE_RENDER.RENDER2D.TESTS.DLL_DIRS         :=
 RENDER.SCENE_RENDER.RENDER2D.TESTS.COMPILER_CFLAGS  :=
 RENDER.SCENE_RENDER.RENDER2D.TESTS.IMPORTS          := compile.static.mak render2d.link.static.mak ../debug_renderer_driver/link.static.mak \
-                                                       ../../scene_graph/compile.static.mak ../../common/compile.static.mak \
+                                                       ../../scene_graph/core/compile.static.mak ../../common/compile.static.mak \
                                                        ../../media/rfx/xmtl.link.static.mak ../../media/font/xfont.link.static.mak
