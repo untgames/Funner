@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Model ini="-1">
-  <MomentOfInertia A="1.70" B="0.9" C="0.8"/>
+<Model ini="-1" Author="Неизвестный автор" Description="Интересный случай">
+  <MomentOfInertia A="1.7" B="0.9" C="0.8"/>
   <IntegrationConstant h="1.91" g="1.76"/>
   <CenterOfMass mx="1" my="0" mz="0"/>
 </Model>

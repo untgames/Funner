@@ -1,41 +1,23 @@
 #include <cfloat>
-#include <cstdio>
 #include <direct.h>
-#include <exception>
 #include <process.h>
 
-#include <stl/hash_map>
 #include <stl/list>
 
 #include <xtl/any.h>
-#include <xtl/bind.h>
-#include <xtl/common_exceptions.h>
-#include <xtl/function.h>
-#include <xtl/intrusive_ptr.h>
-#include <xtl/iterator.h>
-#include <xtl/reference_counter.h>
-#include <xtl/shared_ptr.h>
-#include <xtl/string.h>
 
-#include <common/file.h>
 #include <common/log.h>
 #include <common/parse_iterator.h>
 #include <common/parser.h>
 #include <common/strlib.h>
 #include <common/var_registry.h>
+#include <common/xml_writer.h>
 
 #include <syslib/application.h>
 #include <syslib/timer.h>
 #include <syslib/window.h>
 
-#include <sg/scene.h>
-#include <sg/visual_model.h>
-#include <sg/camera.h>
-
-#include <media/rms/manager.h>
-
 #include <render/screen.h>
-#include <render/scene_render.h>
 
 #include <script/bind.h>
 #include <script/environment.h>
@@ -71,19 +53,20 @@ namespace
      онстанты
 */
 
-const char* TRAJECTORIES_REGISTRY_NAME          = "Configuration.Trajectories";
-const char* APPLICATION_CONFIGURATION_FILE_NAME = "media/conf/application_config.xml";
-const char* CONFIGURATION_FILE_NAME             = "media/conf/form_config.xml";
-const char* SCREEN_ATTACHMENT_NAME              = "MainScreen";
-const char* INTERPRETER_NAME                    = "lua";
-const char* DESC_FILE_SUFFIX                    = ".desc";
-const char* ENVELOPE_APPLICATION_NAME           = "modeler-envelope.exe";
-const char* TRAJECTORY_APPLICATION_NAME         = "modeler-trajectory.exe";
-const char* MESH_CONVERTER_APPLICATION_NAME     = "mesh-converter.exe";
-const char* MODEL_REGISTRY_NAME                 = "ApplicationServer.Model";
-const char* MODEL_FILE_NAME                     = "model.xmodel";
-const int   TRAJECTORIES_COORDS_HEADER          = 'TRJC';
-const int   TRAJECTORIES_COORDS_VERSION         = 1;
+const char*  TRAJECTORIES_REGISTRY_NAME          = "Configuration.Trajectories";
+const char*  APPLICATION_CONFIGURATION_FILE_NAME = "media/conf/application_config.xml";
+const char*  CONFIGURATION_FILE_NAME             = "media/conf/form_config.xml";
+const char*  SCREEN_ATTACHMENT_NAME              = "MainScreen";
+const char*  INTERPRETER_NAME                    = "lua";
+const char*  DESC_FILE_SUFFIX                    = ".desc";
+const char*  ENVELOPE_APPLICATION_NAME           = "modeler-envelope.exe";
+const char*  TRAJECTORY_APPLICATION_NAME         = "modeler-trajectory.exe";
+const char*  MESH_CONVERTER_APPLICATION_NAME     = "mesh-converter.exe";
+const char*  MODEL_REGISTRY_NAME                 = "ApplicationServer.Model";
+const char*  MODEL_FILE_NAME                     = "model.xmodel";
+const size_t DEFAULT_ENVELOPE_LOD                = 200;
+const int    TRAJECTORIES_COORDS_HEADER          = 'TRJC';
+const int    TRAJECTORIES_COORDS_VERSION         = 1;
 
 void file_read (const char* source, common::InputFile& file, void* data, size_t size)
 {
@@ -229,6 +212,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       lib.Register ("CalculateTrajectory", script::make_invoker<void (double, double, double, size_t)> (xtl::bind (&MyApplicationServer::CalculateTrajectory, this, _1, _2, _3, _4)));
       lib.Register ("CalculateTrajectories", script::make_invoker<void (size_t, size_t)> (xtl::bind (&MyApplicationServer::CalculateTrajectories, this, _1, _2)));
       lib.Register ("Cleanup", script::make_invoker<void ()> (xtl::bind (&MyApplicationServer::Cleanup, this)));
+      lib.Register ("SaveModel", script::make_invoker<void ()> (xtl::bind (&MyApplicationServer::SaveModel, this)));
 
         //чтение конфигурации
 
@@ -377,13 +361,20 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       {
         LoadEnvelope ();
       }
-      catch (std::exception& exception)
-      {
-        common::Console::Printf ("Can't load envelope, exception '%s'\n", exception.what ());
-      }
       catch (...)
       {
-        common::Console::Printf ("Can't load envelope, unknown exception\n");
+        try
+        {
+          CalculateEnvelope (200);
+        }
+        catch (std::exception& exception)
+        {
+          common::Console::Printf ("Can't calculate envelope, exception '%s'\n", exception.what ());
+        }
+        catch (...)
+        {
+          common::Console::Printf ("Can't calculate envelope, unknown exception\n");
+        }
       }
     }
 
@@ -721,6 +712,8 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
         ini = common::get<int> (*root, "ini");
         model_registry.SetValue ("ini", xtl::any (stl::string (common::get<const char*> (*root, "ini")), true));
+        model_registry.SetValue ("Author", xtl::any (stl::string (common::get<const char*> (*root, "Author", "")), true));
+        model_registry.SetValue ("Description", xtl::any (stl::string (common::get<const char*> (*root, "Description", "")), true));
 
         common::ParseIterator iter = root->First ("MomentOfInertia");
 
@@ -763,6 +756,64 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
         exception.touch (METHOD_NAME);
         throw;
       }
+    }
+
+    void SaveModel ()
+    {
+      double  A, B, C;     //момент инерции A,B,C
+      double  h, g;        //посто€нные интегрировани€ h,g
+      double  mx,my,mz;    //координаты центра т€жести
+      int     ini;         //???
+
+      common::VarRegistry model_registry (MODEL_REGISTRY_NAME);
+
+      A   = atof (to_string (model_registry.GetValue ("A")).c_str ());
+      B   = atof (to_string (model_registry.GetValue ("B")).c_str ());
+      C   = atof (to_string (model_registry.GetValue ("C")).c_str ());
+      h   = atof (to_string (model_registry.GetValue ("h")).c_str ());
+      g   = atof (to_string (model_registry.GetValue ("g")).c_str ());
+      mx  = atof (to_string (model_registry.GetValue ("mx")).c_str ());
+      my  = atof (to_string (model_registry.GetValue ("my")).c_str ());
+      mz  = atof (to_string (model_registry.GetValue ("mz")).c_str ());
+      ini = atoi (to_string (model_registry.GetValue ("ini")).c_str ());
+
+      stl::string model_file_name = project_path + MODEL_FILE_NAME;
+
+      {
+        common::XmlWriter writer (model_file_name.c_str ());
+
+        common::XmlWriter::Scope root_scope (writer, "Model");
+
+        writer.WriteAttribute ("ini", ini);
+        writer.WriteAttribute ("Author", to_string (model_registry.GetValue ("Author")).c_str ());
+        writer.WriteAttribute ("Description", to_string (model_registry.GetValue ("Description")).c_str ());
+
+        {
+          common::XmlWriter::Scope scope (writer, "MomentOfInertia");
+
+          writer.WriteAttribute ("A", A);
+          writer.WriteAttribute ("B", B);
+          writer.WriteAttribute ("C", C);
+        }
+
+        {
+          common::XmlWriter::Scope scope (writer, "IntegrationConstant");
+
+          writer.WriteAttribute ("h", h);
+          writer.WriteAttribute ("g", g);
+        }
+
+        {
+          common::XmlWriter::Scope scope (writer, "CenterOfMass");
+
+          writer.WriteAttribute ("mx", mx);
+          writer.WriteAttribute ("my", my);
+          writer.WriteAttribute ("mz", mz);
+        }
+      }
+
+      Cleanup ();
+      OpenProjectPath (project_path.c_str ());
     }
 
   private:

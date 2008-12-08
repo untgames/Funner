@@ -1,36 +1,18 @@
-#include <cstdio>
 #include <ctime>
-#include <exception>
 
-#include <stl/hash_map>
 #include <stl/string>
 
-#include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
-#include <xtl/function.h>
-#include <xtl/iterator.h>
-#include <xtl/intrusive_ptr.h>
-#include <xtl/reference_counter.h>
-#include <xtl/shared_ptr.h>
-#include <xtl/string.h>
 #include <xtl/visitor.h>
 
 #include <mathlib.h>
 
 #include <common/component.h>
-#include <common/file.h>
-
-#include <sg/camera.h>
-#include <sg/scene.h>
-#include <sg/visual_model.h>
-
-#include <media/rms/manager.h>
 
 #include <render/low_level/device.h>
 
 #include <render/mid_level/low_level_renderer.h>
 
-#include <render/scene_render.h>
 #include <render/custom_render.h>
 #include <render/mid_level/renderer.h>
 

@@ -5,6 +5,7 @@
     <ToolButton Name="Рассчитать траекторию" OnClick="Application.Execute ('Modeler.CalculateTrajectory (0, 1, 0, 600)')"/>
     <ToolButton Name="Рассчитать несколько траекторий" OnClick="Application.Execute ('Modeler.CalculateTrajectories (40, 10000)')"/>
     <ToolButton Name="Удалить все рассчёты" OnClick="Application.Execute ('Modeler.Cleanup ()')"/>
+    <ToolButton Name="Сохранить модель" OnClick="Application.Execute ('Modeler.SaveModel ()')"/>
     <ToolButton Name="Выход" OnClick="Application.Execute ('close')"/>
   </ToolStrip>
   <Plugin 
@@ -25,6 +26,8 @@
       <Property Name="x" VarName="mx" Category="Координаты центра масс" Type="double"/>
       <Property Name="y" VarName="my" Category="Координаты центра масс" Type="double"/>
       <Property Name="z" VarName="mz" Category="Координаты центра масс" Type="double"/>
+      <Property Name="Автор" VarName="Author" Category="Разное" Type="string" ReadOnly="1"/>
+      <Property Name="Описание" VarName="Description" Category="Разное" Type="string"/>
     </PropertyMap>
   </Plugin>
 </UIConfig>
