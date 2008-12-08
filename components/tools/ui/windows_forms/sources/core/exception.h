@@ -1,6 +1,6 @@
-//¡ §®¢ë© ª« áá ¨áª«îç¥­¨©, âà ­á«¨à®¢ ­­ëå ¨§ .NET Framework
+//áàçîâûé êëàññ èñêëþ÷åíèé, òðàíñëèðîâàííûõ èç .NET Framework
 struct DotNetException: public xtl::message_exception_base
 {
   DotNetException (const char* source, System::Exception^ exception) :
-    message_exception_base (source, AutoString (exception->Message).Data ()) {}
+    message_exception_base (source, AutoString (exception->ToString()).Data ()) {}
 };
