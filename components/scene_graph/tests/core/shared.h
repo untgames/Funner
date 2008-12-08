@@ -11,6 +11,7 @@
 #include <common/hash.h>
 
 #include <sg/camera.h>
+#include <sg/controller.h>
 #include <sg/light.h>
 #include <sg/listener.h>
 #include <sg/node.h>

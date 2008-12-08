@@ -2,15 +2,25 @@
 #define SCENE_GRAPH_NODE_HEADER
 
 #include <mathlib.h>
+
 #include <xtl/functional_fwd>
 #include <xtl/dynamic_cast_root.h>
 #include <xtl/intrusive_ptr.h>
+
+namespace xtl
+{
+
+//forward declaration
+class any_reference;
+
+}
 
 namespace scene_graph
 {
 
 //forward declarations
 class Scene;
+class Node;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим присоединения
@@ -51,7 +61,8 @@ enum NodeTraverseMode
 {
   NodeTraverseMode_TopToBottom, //обход узлов от родителей к потомкам
   NodeTraverseMode_BottomToTop, //обход узлов от потомков к родителям
-  
+  NodeTraverseMode_OnlyThis,    //вырожденный случай - в обходе участвует только текущий узел
+
   NodeTraverseMode_Default = NodeTraverseMode_TopToBottom
 };
 
@@ -96,9 +107,20 @@ enum NodeOrt
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Интерфейс обхода сцены
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class INodeTraverser
+{
+  public:
+    virtual void operator () (Node& node) = 0;
+    
+  protected:
+    virtual ~INodeTraverser () {}
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Узел сцены
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  //добавить NodeIterator / NodeConstIterator
   //добавить блокировку на удаление объектов при оповещениях (скорее всего в Notify)!!!
 class Node: public xtl::dynamic_cast_root
 {
@@ -184,11 +206,10 @@ class Node: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обход потомков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (Node&)>       TraverseFunction;
-    typedef xtl::function<void (const Node&)> ConstTraverseFunction;
+    typedef xtl::function<void (Node&)> TraverseFunction;
 
-    void Traverse  (const TraverseFunction&, NodeTraverseMode = NodeTraverseMode_Default);
-    void Traverse  (const ConstTraverseFunction&, NodeTraverseMode = NodeTraverseMode_Default) const;
+    void Traverse  (const TraverseFunction&, NodeTraverseMode = NodeTraverseMode_Default) const;
+    void Traverse  (INodeTraverser&, NodeTraverseMode = NodeTraverseMode_Default) const;
     void VisitEach (Visitor&, NodeTraverseMode = NodeTraverseMode_Default) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,7 +306,7 @@ class Node: public xtl::dynamic_cast_root
     math::mat4f ObjectTM (Node&) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подписка на события Node
+///Подписка на события узла и его потомков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (Node& sender, NodeEvent event)> EventHandler;
     typedef xtl::function<void (Node& sender, Node& child, NodeSubTreeEvent event)> SubTreeEventHandler;
@@ -301,6 +322,22 @@ class Node: public xtl::dynamic_cast_root
     void BeginUpdate ();
     void EndUpdate   ();
     bool IsInUpdateTransaction () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Присоединение / отсоединение контроллера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (float dt)> UpdateHandler;
+
+    xtl::connection AttachController     (const UpdateHandler&);
+    xtl::connection AttachController     (const char* controller_name);
+    xtl::connection AttachController     (const char* controller_name, const char* init_string);
+    xtl::connection AttachController     (const char* controller_name, const xtl::any_reference& param);
+    void            DetachAllControllers ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление состояния узла и его потомков
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Update (float dt, NodeTraverseMode mode = NodeTraverseMode_Default);
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -334,7 +371,7 @@ class Node: public xtl::dynamic_cast_root
 
   private:
     static void DestroyNode (Node*);
-    void SetScene (scene_graph::Scene* in_scene);
+           void SetScene    (scene_graph::Scene* in_scene);
 
   private:
     Node (const Node&); //no impl

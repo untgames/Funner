@@ -1,0 +1,17 @@
+Results of node_update_test:
+update parent without controller & child with controller
+my_updater2(0.50)
+update parent with controller & child with controller
+my_updater1(0.50)
+my_updater2(0.50)
+update bottom-to-top
+my_updater2(0.50)
+my_updater1(0.50)
+update only parent
+my_updater1(0.50)
+disconnect parent & update parent
+my_updater2(0.50)
+create parent of parent & update it
+my_updater2(0.50)
+disconnect child & update parent of parent
+yet one update

@@ -170,7 +170,7 @@ void Scene::Traverse (const TraverseFunction& fn) const
   impl->ForEach (fn);
 }
 
-void Scene::Traverse (ISceneTraverser& traverser) const
+void Scene::Traverse (INodeTraverser& traverser) const
 {
   impl->ForEach (traverser);
 }
@@ -193,9 +193,9 @@ void Scene::Traverse (const aaboxf& box, const TraverseFunction& fn) const
   impl->ForEach (checker);
 }
 
-void Scene::Traverse (const aaboxf& box, ISceneTraverser& traverser) const
+void Scene::Traverse (const aaboxf& box, INodeTraverser& traverser) const
 {
-  BoundsCheckFunction<ISceneTraverser> checker (box, traverser);
+  BoundsCheckFunction<INodeTraverser> checker (box, traverser);
 
   impl->ForEach (checker);
 }

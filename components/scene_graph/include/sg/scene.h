@@ -10,15 +10,6 @@ namespace scene_graph
 class SceneObject;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Интерфейс обхода сцены
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class ISceneTraverser
-{
-  public:
-    virtual void operator () (Entity& entity) = 0;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сцена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Scene : public xtl::dynamic_cast_root //Убрать в будущем!!!!
@@ -55,14 +46,14 @@ class Scene : public xtl::dynamic_cast_root //Убрать в будущем!!!!
     typedef xtl::basic_visitor<void>      Visitor;
 
     void Traverse  (const TraverseFunction&) const;
-    void Traverse  (ISceneTraverser&) const;
+    void Traverse  (INodeTraverser&) const;
     void VisitEach (Visitor&) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обход объектов, принадлежащих сцене и входящих в ограничивающий объём
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Traverse  (const bound_volumes::aaboxf&, const TraverseFunction&) const;
-    void Traverse  (const bound_volumes::aaboxf&, ISceneTraverser&) const;
+    void Traverse  (const bound_volumes::aaboxf&, INodeTraverser&) const;
     void VisitEach (const bound_volumes::aaboxf&, Visitor&) const;
 
   private:    

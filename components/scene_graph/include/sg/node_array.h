@@ -3,8 +3,6 @@
 
 #include <cstddef>
 
-///!!возможно класс нужен только для потомков Entity
-
 namespace scene_graph
 {
 

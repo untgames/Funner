@@ -10,6 +10,7 @@ using namespace common;
 
 typedef xtl::signal<void (Node& sender, NodeEvent event)> NodeSignal;
 typedef xtl::signal<void (Node& sender, Node& child, NodeSubTreeEvent event)> SubTreeNodeSignal;
+typedef xtl::signal<void (float dt)> UpdateSignal;
 
 struct Node::Impl
 {
@@ -43,19 +44,26 @@ struct Node::Impl
   bool                need_local_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы локальных преобразований
   size_t              update_lock;                      //счётчик открытых транзакций обновления
   bool                update_notify;                    //флаг, сигнализирующий о необходимости оповещения об обновлениях по завершении транзакции обновления
+  Node*               first_updatable_child;            //первый обновляемый потомок
+  Node*               prev_updatable_child;             //предыдущий обновляемый потомок
+  Node*               next_updatable_child;             //следующий обновляемый потомок
+  UpdateSignal        update_signal;                    //сигнал обновления узла
 
   Impl (Node* node) : this_node (node)
   {
-    ref_count     = 1;
-    scene         = 0;
-    parent        = 0;
-    first_child   = 0;
-    last_child    = 0;
-    prev_child    = 0;
-    next_child    = 0;
-    update_lock   = 0;
-    update_notify = false;
-    name_hash     = strhash (name.c_str ());
+    ref_count             = 1;
+    scene                 = 0;
+    parent                = 0;
+    first_child           = 0;
+    last_child            = 0;
+    prev_child            = 0;
+    next_child            = 0;
+    update_lock           = 0;
+    update_notify         = false;
+    name_hash             = strhash (name.c_str ());
+    first_updatable_child = 0;
+    prev_updatable_child  = 0;
+    next_updatable_child  = 0;
 
       //масштаб по умолчанию
 
@@ -193,7 +201,6 @@ struct Node::Impl
         break;
       default:
         throw xtl::make_argument_exception ("scene_graph::Node::BindToParent", "invariant_space", invariant_space);
-        break;
     }
     
       //проверяем корректность режима присоединения
@@ -205,7 +212,6 @@ struct Node::Impl
         break;
       default:
         throw xtl::make_argument_exception ("scene_graph::Node::BindToParent", "mode", mode);
-        break;
     }
     
       //если родитель не изменяется нет необходимости в присоединии
@@ -237,6 +243,7 @@ struct Node::Impl
     if (parent)
     {
         //оповещаем клиентов об отсоединении узла от родителя
+
       UnbindNotify ();
 
         //отсоединям узел от родителя    
@@ -246,6 +253,10 @@ struct Node::Impl
       
       if (next_child) next_child->impl->prev_child = prev_child;
       else            parent->impl->last_child     = prev_child;    
+      
+        //отсоединяем узел от списка обновлений родителя
+        
+      UnbindFromParentUpdateList ();
       
         //уменьшаем счётчик ссылок
       
@@ -277,6 +288,11 @@ struct Node::Impl
         //установка текущей сцены
         
       SetScene (parent_impl->scene);
+
+        //добавление в список обновлений родителя
+
+      if (HasUpdatables ())
+        BindToParentUpdateList ();
 
         //оповещение о присоединении узла к родителю
 
@@ -500,6 +516,91 @@ struct Node::Impl
       //снимаем флаг обработки события
     
     subtree_signal_process [event] = false;  
+  }
+  
+/*
+    Работа со списком обновляемых узлов
+*/
+
+  void BindToParentUpdateList ()
+  {
+    if (!parent || prev_updatable_child)
+      return;
+
+    if (parent->impl->first_updatable_child) //если список обновляемых узлов не пуст
+    {
+      next_updatable_child = parent->impl->first_updatable_child;
+      prev_updatable_child = next_updatable_child->impl->prev_updatable_child;
+
+      prev_updatable_child->impl->next_updatable_child = this_node;
+      next_updatable_child->impl->prev_updatable_child = this_node;
+    }
+    else
+    {
+        //если список обновляемых узлов пуст
+
+      parent->impl->first_updatable_child = this_node;
+      prev_updatable_child                = this_node;
+      next_updatable_child                = this_node;
+      
+        //рекурсивная регистрация родителя
+
+      parent->impl->BindToParentUpdateList ();
+    }
+  }
+  
+  void UnbindFromParentUpdateList ()
+  {
+    if (!parent || !prev_updatable_child)
+      return;
+      
+    prev_updatable_child->impl->next_updatable_child = next_updatable_child;
+    next_updatable_child->impl->prev_updatable_child = prev_updatable_child;  
+
+    if (this_node == parent->impl->first_updatable_child)
+    {
+      if (this_node != next_updatable_child)
+      {
+        parent->impl->first_updatable_child = next_updatable_child;
+      }
+      else
+      {
+        parent->impl->first_updatable_child = 0;
+        
+          //рекурсивная отмена регистрации родителя
+          
+        if (parent->impl->update_signal.empty ())
+          parent->impl->UnbindFromParentUpdateList ();
+      }
+    }
+    
+    prev_updatable_child = 0;
+    next_updatable_child = 0;
+  }
+  
+  bool HasUpdatables () { return !update_signal.empty () || first_updatable_child; }
+
+/*
+    Обновление состояния узла
+*/
+
+  void UpdateNode (float dt)
+  {
+    if (update_signal.empty ())
+      return;
+    
+    try
+    {
+      this_node->BeginUpdate ();
+      
+      update_signal (dt);
+      
+      this_node->EndUpdate ();
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
   }
 };
 
@@ -763,46 +864,53 @@ void Node::AcceptCore (Visitor& visitor)
     Обход потомков
 */
 
-void Node::Traverse (const TraverseFunction& fn, NodeTraverseMode mode)
+void Node::Traverse (const TraverseFunction& fn, NodeTraverseMode mode) const
 {
   switch (mode)
   {
     case NodeTraverseMode_BottomToTop:
       break;
+    case NodeTraverseMode_OnlyThis:
     case NodeTraverseMode_TopToBottom:
-      fn (*this);
+      fn (const_cast<Node&> (*this));
       break;
     default:
-      throw xtl::make_argument_exception ("scene_graph::Node::Traverse", "mode", mode);
-      break;
-  }  
+      throw xtl::make_argument_exception ("scene_graph::Node::Traverse(const TraverseFunction&)", "mode", mode);
+  }
 
-  for (Node* node=impl->first_child; node; node=node->impl->next_child)
-    node->Traverse (fn, mode);
+  if (mode != NodeTraverseMode_OnlyThis)
+  {
+    for (Node* node=impl->first_child; node; node=node->impl->next_child)
+      node->Traverse (fn, mode);
+  }
     
   if (mode == NodeTraverseMode_BottomToTop)
-    fn (*this);
+    fn (const_cast<Node&> (*this));
 }
 
-void Node::Traverse (const ConstTraverseFunction& fn, NodeTraverseMode mode) const
+void Node::Traverse (INodeTraverser& traverser, NodeTraverseMode mode) const
 {
   switch (mode)
   {
     case NodeTraverseMode_BottomToTop:
       break;
+    case NodeTraverseMode_OnlyThis:
     case NodeTraverseMode_TopToBottom:
-      fn (*this);
+      traverser (const_cast<Node&> (*this));
       break;
     default:
-      throw xtl::make_argument_exception ("scene_graph::Node::Traverse", "mode", mode);
+      throw xtl::make_argument_exception ("scene_graph::Node::Traverse(INodeTraverser&)", "mode", mode);
       break;
   }
 
-  for (const Node* node=impl->first_child; node; node=node->impl->next_child)
-    node->Traverse (fn, mode);
+  if (mode != NodeTraverseMode_OnlyThis)
+  {
+    for (Node* node=impl->first_child; node; node=node->impl->next_child)
+      node->Traverse (traverser, mode);
+  }
 
   if (mode == NodeTraverseMode_BottomToTop)
-    fn (*this);
+    traverser (const_cast<Node&> (*this));
 }
 
 void Node::VisitEach (Visitor& visitor, NodeTraverseMode mode) const
@@ -811,6 +919,7 @@ void Node::VisitEach (Visitor& visitor, NodeTraverseMode mode) const
   {
     case NodeTraverseMode_BottomToTop:
       break;
+    case NodeTraverseMode_OnlyThis:
     case NodeTraverseMode_TopToBottom:
       const_cast<Node&> (*this).AcceptCore (visitor);
       break;
@@ -819,8 +928,11 @@ void Node::VisitEach (Visitor& visitor, NodeTraverseMode mode) const
       break;
   }
 
-  for (const Node* node=impl->first_child; node; node=node->impl->next_child)
-    node->VisitEach (visitor, mode);
+  if (mode != NodeTraverseMode_OnlyThis)
+  {
+    for (Node* node=impl->first_child; node; node=node->impl->next_child)
+      node->VisitEach (visitor, mode);
+  }
 
   if (mode == NodeTraverseMode_BottomToTop)
     const_cast<Node&> (*this).AcceptCore (visitor);
@@ -1438,4 +1550,115 @@ void Node::UpdateNotify () const
 void Node::SetScene (scene_graph::Scene* in_scene)
 {
   impl->SetScene (in_scene);
+}
+
+/*
+    Присоединение / отсоединение контроллера
+*/
+
+xtl::connection Node::AttachController (const char* controller_name)
+{
+  xtl::any_reference ref;
+  
+  return AttachController (controller_name, ref);
+}
+
+xtl::connection Node::AttachController (const char* controller_name, const char* init_string)
+{
+  xtl::any_reference ref (init_string);
+
+  return AttachController (controller_name, ref);
+}
+
+namespace
+{
+
+//адаптер вызова контроллера
+struct ControllerAdapter
+{
+  typedef xtl::shared_ptr<IController> ControllerPtr;
+
+  ControllerAdapter (IController* in_controller) : controller (in_controller) {}
+  
+  void operator () (float dt) { controller->Update (dt); }
+
+  ControllerPtr controller;
+};
+
+}
+
+xtl::connection Node::AttachController (const char* controller_name, const xtl::any_reference& param)
+{
+  try
+  {
+      //проверка корректности аргументов
+
+    if (!controller_name)
+      throw xtl::make_null_argument_exception ("", "controller_name");
+
+      //создание контроллера
+
+    ControllerAdapter adapter = create_controller (*this, controller_name, param);
+
+      //присоединение контроллера к узлу
+
+    return AttachController (adapter);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("scene_graph::Node::AttachController(const char*, const xtl::any_reference&)");
+    throw;
+  }
+}
+
+xtl::connection Node::AttachController (const UpdateHandler& fn)
+{
+  impl->BindToParentUpdateList ();
+
+  return impl->update_signal.connect (fn);
+}
+
+void Node::DetachAllControllers ()
+{
+  impl->update_signal.disconnect_all ();
+
+  if (!impl->HasUpdatables ()) //если нет обновляемых потомков - отсоединение от родительского списка обновлений
+    impl->UnbindFromParentUpdateList ();
+}
+
+/*
+    Обновление состояния узла и его потомков
+*/
+
+void Node::Update (float dt, NodeTraverseMode mode)
+{  
+    //проверка корректности аргументов    
+
+  switch (mode)
+  {
+    case NodeTraverseMode_BottomToTop:
+      break;
+    case NodeTraverseMode_OnlyThis:
+    case NodeTraverseMode_TopToBottom:
+      impl->UpdateNode (dt);
+      break;
+    default:
+      throw xtl::make_argument_exception ("scene_graph::Node::Update", "mode", mode);
+  }
+  
+  if (mode != NodeTraverseMode_OnlyThis && impl->first_updatable_child)
+  {
+    impl->first_updatable_child->Update (dt, mode);
+  
+    for (Node* node=impl->first_updatable_child; node!=impl->first_updatable_child; node=node->impl->next_updatable_child)
+      node->Update (dt, mode);
+  }
+  
+  if (mode == NodeTraverseMode_BottomToTop)
+  {
+    impl->UpdateNode (dt);
+  }
+
+  if (!impl->HasUpdatables ())
+    impl->UnbindFromParentUpdateList ();
 }

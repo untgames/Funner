@@ -220,11 +220,11 @@ namespace
 {
 
 //враппер для добавления объекта в массив
-struct ArrayInserter: public ISceneTraverser
+struct ArrayInserter: public INodeTraverser
 {
   ArrayInserter (const Entity& in_self, NodeArray& in_array) : self (in_self), array (in_array) {}
 
-  void operator () (Entity& entity)
+  void operator () (Node& entity)
   {
     if (&entity == &self) //защита от самопересечений
       return;
