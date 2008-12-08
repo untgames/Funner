@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <xtl/any.h>
+#include <xtl/any_reference.h>
 #include <xtl/ref.h>
 #include <stl/string>
 #include <stl/utility>
