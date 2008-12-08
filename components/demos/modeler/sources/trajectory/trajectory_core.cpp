@@ -1,7 +1,6 @@
 #include "core.h"
 
 #include <stdio.h>
-#include <math.h>
 #include <vector>
 #include <algorithm>
 
@@ -184,7 +183,7 @@ class TrajectoryBuilder
         else
         {
           constant_size_interval++;
-          if (constant_size_interval > 10)
+          if (constant_size_interval > 100)
           {
             printf ("\nTrajectory not grow, possibly invalid input data\n");
             return;

@@ -1,27 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <UIConfig>
-  <MenuItem Id="MenuItem1" Text="Ещё один пункт" Tip="Странное название"/>
-  <MenuItem Id="MenuItem2" Text="Справка" Tip="Справка о приложении">
-    <MenuItem Text="О программе..." Tip="Описание программы" OnClick="Application.Execute ('ShowAbout')"/>
-    <MenuItem Source="MenuItem1"/>
-    <MenuItem Text="Подменю">
-       <MenuItem Text="Подподменю">
-         <MenuItem Text="Пункт" Image="media/app.ico"/>
-       </MenuItem>
-    </MenuItem>
-  </MenuItem>
-  <MenuStrip Id="MenuStrip1">
-    <MenuItem Text="Файл">
-      <MenuItem Text="Новая форма" OnClick="Application.CreateForm ('Application', 'my_init_string', DockState.Float)"/>
-      <MenuItem Text="Выход" Tip="Выход из приложения" OnClick="Application.Execute ('close')"/>
-    </MenuItem>
-    <MenuItem Source="MenuItem2"/>
-  </MenuStrip>
   <ToolStrip Id="ToolStrip1">
-    <ToolButton Text="CalculateEnvelope" OnClick="Application.Execute ('Modeler.CalculateEnvelope (1000)')"/>
-    <ToolButton Text="CalculateTrajectory" OnClick="Application.Execute ('Modeler.CalculateTrajectory (0, 1, 0, 600)')"/>
-    <ToolButton Text="Calculate 5 Trajectories" OnClick="Application.Execute ('Modeler.CalculateTrajectories (40, 6000)')"/>
-    <ToolButton Text="Cleanup" OnClick="Application.Execute ('Modeler.Cleanup ()')"/>
+    <ToolButton Name="Рассчитать огибающую" OnClick="Application.Execute ('Modeler.CalculateEnvelope (200)')"/>
+    <ToolButton Name="Рассчитать траекторию" OnClick="Application.Execute ('Modeler.CalculateTrajectory (0, 1, 0, 600)')"/>
+    <ToolButton Name="Рассчитать несколько траекторий" OnClick="Application.Execute ('Modeler.CalculateTrajectories (40, 10000)')"/>
+    <ToolButton Name="Удалить все рассчёты" OnClick="Application.Execute ('Modeler.Cleanup ()')"/>
+    <ToolButton Name="Выход" OnClick="Application.Execute ('close')"/>
   </ToolStrip>
   <Plugin 
     Name="Console" 
@@ -31,4 +15,16 @@
     OutputCutThreshold="8192" 
     OutputCutTo="7900"
   />
+  <Plugin Name="PropertyGrid">
+    <PropertyMap Name="Model">
+      <Property Name="A" VarName="A" Category="Моменты инерции" Type="double"/>
+      <Property Name="B" VarName="B" Category="Моменты инерции" Type="double"/>
+      <Property Name="C" VarName="C" Category="Моменты инерции" Type="double"/>
+      <Property Name="h" VarName="h" Category="Константы интегрирования" Type="double"/>
+      <Property Name="g" VarName="g" Category="Константы интегрирования" Type="double"/>
+      <Property Name="x" VarName="x" Category="Координаты центра масс" Type="double"/>
+      <Property Name="y" VarName="y" Category="Координаты центра масс" Type="double"/>
+      <Property Name="z" VarName="z" Category="Координаты центра масс" Type="double"/>
+    </PropertyMap>
+  </Plugin>
 </UIConfig>

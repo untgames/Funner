@@ -80,6 +80,7 @@ const char* DESC_FILE_SUFFIX                    = ".desc";
 const char* ENVELOPE_APPLICATION_NAME           = "modeler-envelope.exe";
 const char* TRAJECTORY_APPLICATION_NAME         = "modeler-trajectory.exe";
 const char* MESH_CONVERTER_APPLICATION_NAME     = "mesh-converter.exe";
+const char* MODEL_REGISTRY_NAME                 = "ApplicationServer.Model";
 const int   TRAJECTORIES_COORDS_HEADER          = 'TRJC';
 const int   TRAJECTORIES_COORDS_VERSION         = 1;
 
@@ -193,7 +194,6 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     MyApplicationServer ()
       : shell_environment (new script::Environment),
         shell (INTERPRETER_NAME, shell_environment),
-        project_path ("projects\\project1\\"),
         wait_files_timer (xtl::bind (&MyApplicationServer::CheckNewFiles, this), 1000, syslib::TimerState_Paused)
     {
       common::FileSystem::SetDefaultFileBufferSize (0);     //???????? обход бага!!!!!!!!!!!
@@ -244,22 +244,9 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
       common::ParseIterator iter = parser.Root ().First ("Configuration");
 
-      stl::string precomputed_trajectories_mask = project_path + "trajectory*.binmesh";
-
-      common::FileList precomputed_trajectories = common::FileSystem::Search (precomputed_trajectories_mask.c_str (), common::FileSearch_Files);
-
-      try
-      {
-        for (size_t i = 0, size = precomputed_trajectories.Size (); i < size; i++)
-          LoadTrajectory (precomputed_trajectories.Item (i).name);
-
-        LoadEnvelope ();
-      }
-      catch (...)
-      {
-      }
-
       plugin_path = common::get<const char*> (*iter, "PluginPath");
+
+      OpenProjectPath ("projects\\project1\\");
 
       camera = OrthoCamera::Create ();
 
@@ -355,7 +342,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     void Release () { release (this); }
 
   private:
-    void Cleanup ()
+    void UnloadModels ()
     {
       if (envelope.visual_model)
       {
@@ -372,6 +359,11 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       }
 
       trajectories.clear ();
+    }
+
+    void Cleanup ()
+    {
+      UnloadModels ();
 
       stl::string meshes_to_delete_mask = project_path + "*.*mesh";
       remove_files (meshes_to_delete_mask.c_str ());
@@ -392,10 +384,8 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
       VisualModelResource new_trajectory;
 
-      common::Console::Printf ("Loading trajectory...\n");
       new_trajectory.resource_binding = resource_manager.CreateBinding (resource_group);
       new_trajectory.resource_binding.Load ();
-      common::Console::Printf ("Loaded\n");
 
       VisualModels::iterator iter = trajectories.find (file_name);
 
@@ -473,10 +463,8 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
       resource_group.Add (mesh_name.c_str ());
 
-      common::Console::Printf ("Loading envelope\n");
       envelope.resource_binding = resource_manager.CreateBinding (resource_group);
       envelope.resource_binding.Load ();
-      common::Console::Printf ("Loaded\n");
 
       if (!common::FileSystem::IsFileExist (mesh_name.c_str ()))
         throw xtl::format_operation_exception ("MyApplicationServer::LoadEnvelope", "Can't load envelope '%s', no such file", mesh_name.c_str ());
@@ -581,6 +569,12 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
         file_read (METHOD_NAME, trajectories_coords_file, &nu2, sizeof (nu2));
         file_read (METHOD_NAME, trajectories_coords_file, &nu3, sizeof (nu3));
 
+        double nu_length = sqrt (nu1 * nu1 + nu2 * nu2 + nu3 * nu3);
+
+        nu1 /= (float)-nu_length;  //обход хитрости с развёрнутыми траекториями
+        nu2 /= (float)nu_length;
+        nu3 /= (float)nu_length;
+
         CalculateTrajectory (nu1, nu2, nu3, lod);
       }
     }
@@ -648,6 +642,54 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     {
       waited_files.push_back (WaitedFile (file_name, handler));
       wait_files_timer.Run ();
+    }
+
+    void OpenProjectPath (const char* path)
+    {
+      static const char* METHOD_NAME = "MyApplicationServer::OpenProjectPath";
+
+      if (!path)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "path");
+
+      stl::string model_name = common::format ("%smodel.dat", path);
+
+      if (!common::FileSystem::IsFileExist (model_name.c_str ()))
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't open path '%s', no model data file", path);
+
+      UnloadModels ();
+
+      project_path = path;
+
+      stl::string precomputed_trajectories_mask = project_path + "trajectory*.binmesh";
+
+      common::FileList precomputed_trajectories = common::FileSystem::Search (precomputed_trajectories_mask.c_str (), common::FileSearch_Files);
+
+      for (size_t i = 0, size = precomputed_trajectories.Size (); i < size; i++)
+        try
+        {
+          LoadTrajectory (precomputed_trajectories.Item (i).name);
+        }
+        catch (std::exception& exception)
+        {
+          common::Console::Printf ("Can't load trajectory from file '%s', exception '%s'\n", precomputed_trajectories.Item (i).name, exception.what ());
+        }
+        catch (...)
+        {
+          common::Console::Printf ("Can't load trajectory from file '%s', unknown exception\n", precomputed_trajectories.Item (i).name);
+        }
+
+      try
+      {
+        LoadEnvelope ();
+      }
+      catch (std::exception& exception)
+      {
+        common::Console::Printf ("Can't load envelope, exception '%s'\n", exception.what ());
+      }
+      catch (...)
+      {
+        common::Console::Printf ("Can't load envelope, unknown exception\n");
+      }
     }
 
   private:

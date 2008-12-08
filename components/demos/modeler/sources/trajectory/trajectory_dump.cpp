@@ -113,9 +113,13 @@ int main (int argc, char* argv[])
 
   double nu1 = atof (argv[2]), nu2 = atof (argv[3]), nu3 = atof (argv[4]);
 
-  double nu_sqr_sum = nu1 * nu1 + nu2 * nu2 + nu3 * nu3;
+/*  double nu_length = sqrt (nu1 * nu1 + nu2 * nu2 + nu3 * nu3);
 
-/*  if ((nu_sqr_sum < 0.99) || (nu_sqr_sum > 1.01))
+  nu1 /= nu_length;
+  nu2 /= nu_length;
+  nu3 /= nu_length;
+
+  if ((nu_sqr_sum < 0.99) || (nu_sqr_sum > 1.01))
   {
     save_desc_file (argv[5], 0);
     printf ("Invalid input nu data, nu1 * nu1 + nu2 * nu2 + nu3 * nu3 must be 1\n");
