@@ -382,7 +382,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     void Release () { release (this); }
 
   private:
-    void UnloadModels ()
+    void UnloadEnvelope ()
     {
       if (envelope.visual_model)
       {
@@ -391,6 +391,11 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
         envelope.resource_binding.Unload ();
       }
+    }
+
+    void UnloadModels ()
+    {
+      UnloadEnvelope ();
 
       for (VisualModels::iterator iter = trajectories.begin (), end = trajectories.end (); iter != end; ++iter)
       {
@@ -432,6 +437,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       if (iter != trajectories.end ())
       {
         iter->second.visual_model->Unbind ();
+        iter->second.resource_binding.Unload ();
         trajectories.erase (iter);
       }
 
@@ -497,6 +503,8 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
 
     void LoadEnvelope ()
     {
+      UnloadEnvelope ();
+
       stl::string mesh_name = project_path + "envelope.binmesh";
 
       media::rms::Group resource_group;
