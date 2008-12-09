@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="cp-1251"?>
+<?xml version="1.0" encoding="Cp1251"?>
 <UIConfig>
   <MenuItem Id="MenuItem1" Name="Ещё один пункт" Tip="Странное название"/>
   <MenuItem Id="MenuItem2" Name="Справка" Tip="Справка о приложении">
