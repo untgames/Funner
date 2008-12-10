@@ -8,16 +8,16 @@ typedef stl::vector<math::vec3f> ParticleArray;
 struct ParticleFrame
 {
   ParticleArray particles;
-  
+
   void Load (common::Parser::Iterator iter)
   {
-    particles.reserve (PARTICLES_COUNT);    
-    
+    particles.reserve (PARTICLES_COUNT);
+
     read (*iter, "", stl::back_inserter (particles), iter->AttributesCount ()/3);
-    
+
     for (ParticleArray::iterator pos_iter=particles.begin (); pos_iter!=particles.end (); ++pos_iter)
       stl::swap (pos_iter->y, pos_iter->z);
-  }    
+  }
 };
 
 typedef xtl::shared_ptr<ParticleFrame>  ParticleFramePtr;
@@ -26,21 +26,21 @@ typedef stl::vector<ParticleFramePtr>   ParticleFrameArray;
 struct ParticleSystem
 {
   ParticleFrameArray frames;
-  
+
   void Load (const char* file_name)
   {
     common::Parser parser (file_name, "wxf");
     common::ParseLog log = parser.Log ();
-    
+
     for (common::Parser::NamesakeIterator iter=parser.Root ().First ("positions"); iter; ++iter)
     {
       ParticleFramePtr frame (new ParticleFrame);
-      
+
       frame->Load (iter);
-      
+
       frames.push_back (frame);
     }
-    
+
     for (size_t i=0; i<log.MessagesCount (); i++)
       printf ("%s\n", log.Message (i));
   }
@@ -62,9 +62,9 @@ struct TestScene
   TestScene () : current_particle_frame (0)
   {
     particle_system.Load (PARTICLES_FILE_NAME);
-    
-    sprite_list = SpriteList::Create ();    
-    
+
+    sprite_list = SpriteList::Create ();
+
     sprite_list->SetName     ("SpriteList");
 //    sprite_list->SetMaterial ("font_material");
     sprite_list->SetMaterial ("pistol_material");
@@ -81,14 +81,14 @@ struct TestScene
       sprite.size     = scale;
       sprite.color    = math::vec4f (1, 1, 1, 1);
 
-      sprite.frame    = rand ();  
+      sprite.frame    = rand ();
 
       sprite_list->Insert (sprite);
     }
 
-    camera = OrthoCamera::Create ();    
-    
-    camera->BindToScene (scene, NodeBindMode_Capture);
+    camera = OrthoCamera::Create ();
+
+    camera->BindToScene (scene);
     camera->SetName     ("Camera1");
     camera->SetPosition (0, 0, -50);
     camera->SetLeft     (-100);
@@ -96,7 +96,7 @@ struct TestScene
     camera->SetTop      (100);
     camera->SetBottom   (-100);
     camera->SetZNear    (-100);
-    camera->SetZFar     (100);    
+    camera->SetZFar     (100);
   }
 };
 
@@ -108,12 +108,12 @@ void idle (TestApplication& app, TestScene& scene)
                    last_pos_update = 0;
 
     if (clock () - last_pos_update >= CLK_TCK / 25)
-    {    
+    {
       if (scene.particle_system.frames.empty ())
         return;
 
-      SpriteModel::SpriteDesc* sprite         = scene.sprite_list->Sprites ();
-      ParticleFrame& particle_frame = *scene.particle_system.frames [scene.current_particle_frame];
+      SpriteModel::SpriteDesc* sprite = scene.sprite_list->Sprites ();
+      ParticleFrame& particle_frame   = *scene.particle_system.frames [scene.current_particle_frame];
 
       for (ParticleArray::iterator  pos_iter = particle_frame.particles.begin (); pos_iter!=particle_frame.particles.end (); ++pos_iter, ++sprite)
       {
@@ -121,17 +121,17 @@ void idle (TestApplication& app, TestScene& scene)
       }
 
       scene.sprite_list->Invalidate ();
-      
+
       scene.current_particle_frame++;
-      
+
       if (scene.current_particle_frame >= scene.particle_system.frames.size ())
         scene.current_particle_frame = 0;
 
       last_pos_update = clock ();
     }
-    
+
     if (clock () - last_frame_update >= CLK_TCK / 20)
-    {    
+    {
       SpriteModel::SpriteDesc* sprite         = scene.sprite_list->Sprites ();
       size_t                   sprites_count  = scene.sprite_list->SpritesCount ();
 
@@ -141,7 +141,7 @@ void idle (TestApplication& app, TestScene& scene)
       scene.sprite_list->Invalidate ();
 
       last_frame_update = clock ();
-    }    
+    }
 
     app.PostRedraw ();
   }
@@ -164,24 +164,24 @@ int main (int argc, char* argv [])
   }
 
   printf ("Results of test_particles:\n");
-  
+
   common::LogFilter filter ("*", &log_print);
 
   try
-  {    
+  {
       //инициализация приложения
 
     TestApplication test;
-    
+
       //создание сцены
-      
+
     TestScene scene;
-      
+
       //создание областей вывода
-      
+
     Viewport vp;
     Screen screen;
-    
+
     screen.SetBackgroundColor (1, 0, 0, 0);
 
     vp.SetName       ("Viewport1");
@@ -195,7 +195,7 @@ int main (int argc, char* argv [])
     screen.Attach (vp);
 
     RenderTarget& render_target = test.RenderTarget ();
-    
+
     render_target.SetScreen (&screen);
 
       //установка idle-функции

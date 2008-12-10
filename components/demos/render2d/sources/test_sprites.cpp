@@ -15,18 +15,18 @@ struct Test
   OrthoCamera::Pointer camera;
   Scene                scene;
   Screen               screen;
- 
+
   Test ()
   {
       //создание сцены
-    
-    sprite_list = SpriteList::Create ();    
+
+    sprite_list = SpriteList::Create ();
     sprite      = Sprite::Create ();
-    
+
     sprite_list->SetMaterial ("burst_material");
     sprite_list->Reserve     (SPRITES_COUNT);
     sprite_list->BindToScene (scene);
-    
+
     sprite->SetMaterial ("dynamic_material");
     sprite->SetColor    (1, 1, 1, 0.95f);
     sprite->SetPosition (0, 0, -15);
@@ -37,19 +37,19 @@ struct Test
     {
       SpriteModel::SpriteDesc sprite;
 
-      float scale = frand (1, 4);      
+      float scale = frand (1, 4);
 
       sprite.position = math::vec3f (frand (-10, 10), frand (-10, 10), frand (-10, 10));
       sprite.size     = scale;
       sprite.color    = math::vec4f (frand (), frand (), frand (), frand ());
-      sprite.frame    = rand ();  
+      sprite.frame    = rand ();
 
       sprite_list->Insert (sprite);
     }
 
-    camera = OrthoCamera::Create ();    
-    
-    camera->BindToScene (scene, NodeBindMode_Capture);
+    camera = OrthoCamera::Create ();
+
+    camera->BindToScene (scene);
     camera->SetName     ("Camera1");
     camera->SetPosition (0, 0, -3);
     camera->SetLeft     (-10);
@@ -57,12 +57,12 @@ struct Test
     camera->SetTop      (10);
     camera->SetBottom   (-10);
     camera->SetZNear    (-20);
-    camera->SetZFar     (20);    
-    
+    camera->SetZFar     (20);
+
       //создание областей вывода
-      
+
     Viewport vp;
-    
+
     screen.SetBackgroundColor (1, 0, 0, 0);
     screen.SetBackgroundState (false);
 
@@ -75,31 +75,31 @@ struct Test
     vp.SetArea (5, 5, 90, 90);
 //    vp.SetArea (0, 0, 100, 100);
 
-    screen.Attach (vp);    
+    screen.Attach (vp);
 
       //настройка целевых буферов вывода
 
     RenderTarget& render_target = application.RenderTarget ();
-    
-    render_target.SetScreen (&screen);    
-    
+
+    render_target.SetScreen (&screen);
+
       //настройка запросов рендеринга
-      
+
     application.Render ().SetMaxDrawDepth (3);
-      
+
     application.Render ().RegisterQueryHandler ("test_query", xtl::bind (&Test::SetupDynamicRenderTarget, this, _1, _2));
-    
+
       //установка idle-функции
 
-    application.SetIdleHandler (xtl::bind (&Test::Idle, this));    
+    application.SetIdleHandler (xtl::bind (&Test::Idle, this));
   }
-  
+
     //настройка динамического целевого буфера рендеринга
   void SetupDynamicRenderTarget (RenderTarget& render_target, const char*)
   {
     render_target.SetScreen (&screen);
   }
-  
+
     //обработчик главного цикла приложения
   void Idle ()
   {
@@ -108,7 +108,7 @@ struct Test
       static clock_t last_update = 0;
 
       if (clock () - last_update >= CLK_TCK / 25)
-      {    
+      {
         SpriteModel::SpriteDesc* sprite        = sprite_list->Sprites ();
         size_t                   sprites_count = sprite_list->SpritesCount ();
 
@@ -116,18 +116,18 @@ struct Test
           sprite->frame++;
 
         sprite_list->Invalidate ();
-        
+
         this->sprite->Rotate (1, 0, 0, 1);
 
         last_update = clock ();
-      }    
+      }
 
       application.PostRedraw ();
     }
     catch (std::exception& exception)
     {
       printf ("exception at idle: %s\n", exception.what ());
-    }    
+    }
   }
 };
 
@@ -141,14 +141,14 @@ int main ()
   printf ("Results of test_sprites:\n");
 
   try
-  {    
+  {
       //настройка протоколированиЯ
 
     common::LogFilter filter ("*", &log_print);
-    
+
       //запуск теста
-    
-    Test test;    
+
+    Test test;
 
     return test.application.Run ();
   }
