@@ -21,4 +21,5 @@ SCENE_GRAPH.CONTROLLERS.BOX2D.TESTS.LIB_DIRS         :=
 SCENE_GRAPH.CONTROLLERS.BOX2D.TESTS.LIBS             :=
 SCENE_GRAPH.CONTROLLERS.BOX2D.TESTS.COMPILER_CFLAGS  :=
 SCENE_GRAPH.CONTROLLERS.BOX2D.TESTS.COMPILER_DEFINES := 
-SCENE_GRAPH.CONTROLLERS.BOX2D.TESTS.IMPORTS          := link.static.mak ../../core/compile.static.mak
+SCENE_GRAPH.CONTROLLERS.BOX2D.TESTS.IMPORTS          := link.static.mak ../../core/compile.static.mak \
+                                                        ../../../common/compile.static.mak ../../../common/xml.link.static.mak

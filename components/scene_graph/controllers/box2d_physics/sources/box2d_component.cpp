@@ -31,7 +31,19 @@ class Component
     {
       try
       {
-        return new WorldController (node);
+        ControllerDesc* desc = param.content<ControllerDesc> ();
+        
+          //проверка корректности аргументов
+          
+        if (!desc)
+          throw xtl::make_argument_exception ("", "param", param.type ().name (), "Expected scene_graph::physics::ControllerDesc parameter");
+          
+        if (!desc->configuration_name)
+          throw xtl::make_null_argument_exception ("", "param.configuration_name");
+
+          //создание контроллера физического мира
+
+        return new WorldController (node, desc->world_bound_box, ConfigurationManager::GetConfiguration (desc->configuration_name));
       }
       catch (xtl::exception& exception)
       {
