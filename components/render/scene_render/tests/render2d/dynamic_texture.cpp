@@ -5,7 +5,7 @@ Screen* dynamic_screen_ptr = 0;
 void setup_render_target (RenderTarget& render_target, const char* query_string)
 {
   printf ("Create dynamic render target. Query='%s'\n", query_string);
-  
+
   render_target.SetScreen (dynamic_screen_ptr);
 }
 
@@ -16,9 +16,9 @@ int main ()
   try
   {
       //настройка протоколирования
-      
+
     common::LogFilter log_filter ("render.mid_level.Debug", &print);
-    
+
       //создание сцены
 
     Sprite::Pointer      sprite = Sprite::Create ();
@@ -26,8 +26,8 @@ int main ()
 
     Scene scene;
 
-    sprite->BindToScene (scene, NodeBindMode_Capture);
-    camera->BindToScene (scene, NodeBindMode_Capture);
+    sprite->BindToScene (scene, NodeBindMode_WeakRef);
+    camera->BindToScene (scene, NodeBindMode_WeakRef);
 
     sprite->SetName ("Sprite1");
     camera->SetName ("Camera1");
@@ -35,8 +35,8 @@ int main ()
 
       //создание рендера
 
-    SceneRender render ("Debug", "Renderer2d", "Render2d");            
-    
+    SceneRender render ("Debug", "Renderer2d", "Render2d");
+
     render.SetLogHandler (&log_print);
 
       //настройка запросов рендеринга
@@ -52,31 +52,31 @@ int main ()
     vp1.SetRenderPath ("Render2d");
 
     Screen screen;
-    
-    dynamic_screen_ptr = &screen;        
-    
+
+    dynamic_screen_ptr = &screen;
+
     render.SetMaxDrawDepth (3);
 
     screen.Attach (vp1);
 
     RenderTarget render_target;
-    
+
     render_target = render.RenderTarget (0);
 
     render_target.SetScreen (&screen);
-    
+
       //загрузка ресурсов
-      
+
     render.LoadResource ("data/materials.xmtl");
-    
+
       //отрисовка
-      
+
     render_target.Update ();
   }
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());
-  }  
+  }
 
   return 0;
 }
