@@ -135,7 +135,7 @@ void bind_static_node_library (Environment& environment)
   InvokerRegistry& node_subtree_event_lib   = environment.CreateLibrary (SCENE_STATIC_NODE_SUBTREE_EVENT_LIBRARY);
 
   node_bind_mode_lib.Register       ("get_AddRef",            make_const (NodeBindMode_AddRef));
-  node_bind_mode_lib.Register       ("get_Capture",           make_const (NodeBindMode_Capture));
+  node_bind_mode_lib.Register       ("get_WeakRef",           make_const (NodeBindMode_WeakRef));
   node_bind_mode_lib.Register       ("get_Default",           make_const (NodeBindMode_Default));
   node_transform_space_lib.Register ("get_Local",             make_const (NodeTransformSpace_Local));
   node_transform_space_lib.Register ("get_Parent",            make_const (NodeTransformSpace_Parent));
