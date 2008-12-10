@@ -32,7 +32,7 @@ SoundEmitterPtr play_sound (const char* declaration_name, scene_graph::Scene& sc
 {
   SoundEmitterPtr sound_emitter = scene_graph::SoundEmitter::Create (declaration_name);
 
-  sound_emitter->BindToParent (scene.Root (), NodeBindMode_Capture);
+  sound_emitter->BindToParent (scene.Root (), NodeBindMode_WeakRef);
 
   sound_emitter->Play ();
 
@@ -48,7 +48,7 @@ int main ()
     scene_graph::Scene scene;
     SoundManager       manager ("OpenAL", "*");
     ListenerPtr        listener (scene_graph::Listener::Create ());
-    
+
     listener->BindToParent (scene.Root ());
 
     manager.LoadSoundLibrary (library_file);
@@ -64,14 +64,14 @@ int main ()
     Application::Run ();
   }
   catch (std::exception& exception)
-  {                                               
-    printf ("exception: %s\n",exception.what ()); 
-  }                                               
+  {
+    printf ("exception: %s\n",exception.what ());
+  }
   catch (...)
   {
     printf ("unknown exception\n");
   }
-  
+
   printf ("exit\n");
 
   return Application::GetExitCode ();
