@@ -38,7 +38,9 @@ class TestEntity: public Entity
     using Entity::SetBoundBox;
     using Entity::SetInfiniteBounds;
     
-    static TestEntity* Create () { return new TestEntity; }
+    typedef xtl::com_ptr<TestEntity> Pointer;
+    
+    static Pointer Create () { return Pointer (new TestEntity, false); }
     
   protected:
     void AcceptCore (Visitor& visitor)

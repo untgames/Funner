@@ -22,23 +22,23 @@ int main ()
   
   Scene scene;
   
-  TestEntity* entity1 = TestEntity::Create ();
+  TestEntity::Pointer entity1 = TestEntity::Create ();
   
   entity1->SetName ("entity1");
   entity1->SetBoundBox (aaboxf (-10.0f, 10.0f));
-  entity1->BindToScene (scene, NodeBindMode_Capture);
+  entity1->BindToScene (scene);
   
-  TestEntity* entity2 = TestEntity::Create ();
+  TestEntity::Pointer entity2 = TestEntity::Create ();
   
   entity2->SetName ("entity2");
   entity2->SetInfiniteBounds ();
-  entity2->BindToScene (scene, NodeBindMode_Capture);  
+  entity2->BindToScene (scene);  
   
-  TestEntity* entity3 = TestEntity::Create ();
+  TestEntity::Pointer entity3 = TestEntity::Create ();
   
   entity3->SetName ("entity3");
   entity3->SetBoundBox (aaboxf (-20.0f, -10.0f));
-  entity3->BindToScene (scene, NodeBindMode_Capture);
+  entity3->BindToScene (scene);
   
     //обход объектов попадающих в объём
     

@@ -12,15 +12,15 @@ int main ()
 
   Scene scene;
 
-  TestEntity* entity1 = TestEntity::Create (), *entity2 = TestEntity::Create ();
+  TestEntity::Pointer entity1 = TestEntity::Create (), entity2 = TestEntity::Create ();
 
   entity1->SetName ("entity1");
   entity1->SetBoundBox (aaboxf (-10.0f, 10.0f));
-  entity1->BindToScene (scene, NodeBindMode_Capture);
+  entity1->BindToScene (scene);
 
   entity2->SetName ("entity2");
   entity2->SetBoundBox (aaboxf (-10.0f, 10.0f));
-  entity2->BindToScene (scene, NodeBindMode_Capture);
+  entity2->BindToScene (scene);
 
   MyVisitor visitor;
 

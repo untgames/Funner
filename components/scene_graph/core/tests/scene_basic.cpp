@@ -48,7 +48,7 @@ int main ()
     
     xtl::xsnprintf (name, sizeof (name), "entity%u", i);
     
-    Entity* entity = TestEntity::Create ();
+    TestEntity::Pointer entity = TestEntity::Create ();
     
     entity->SetName (name);
     
@@ -57,7 +57,7 @@ int main ()
     entity->RegisterEventHandler (NodeEvent_AfterSceneAttach, &on_scene_attach);
     entity->RegisterEventHandler (NodeEvent_AfterSceneChange, &on_scene_change);
     
-    entity->BindToScene (scene, NodeBindMode_Capture);
+    entity->BindToScene (scene);
   }
   
   printf ("%u entities in scene\n", scene.EntitiesCount ());

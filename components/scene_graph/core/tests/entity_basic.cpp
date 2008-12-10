@@ -1,12 +1,10 @@
 #include "shared.h"
 
-typedef com_ptr<Entity> EntityPtr;
-
 int main ()
 {
   printf ("Results of entity_basic_test:\n");
   
-  EntityPtr entity (TestEntity::Create (), false);
+  TestEntity::Pointer entity = TestEntity::Create ();
   
   entity->SetName ("entity1");
   entity->SetWireColor (1.0f, 0.5f, 0.7f);

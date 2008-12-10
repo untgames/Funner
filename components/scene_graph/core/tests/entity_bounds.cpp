@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<TestEntity> EntityPtr;
-
 void dump (const aaboxf& box)
 {
   printf ("[");
@@ -26,8 +24,8 @@ int main ()
 {
   printf ("Results of entity_bounds_test:\n");
   
-  EntityPtr entity (TestEntity::Create (), false), child (TestEntity::Create (), false);
-  Node::Pointer parent (Node::Create ());
+  TestEntity::Pointer entity = TestEntity::Create (), child = TestEntity::Create ();
+  Node::Pointer parent = Node::Create ();
   
   entity->SetName ("entity");
   parent->SetName ("parent");

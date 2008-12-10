@@ -1,7 +1,5 @@
 #include "shared.h"
 
-typedef com_ptr<TestEntity> EntityPtr;
-
 void print_intersections (Entity& entity)
 {
   NodeArray intersections = entity.GetIntersections ();
@@ -27,9 +25,9 @@ int main ()
   {
     Scene scene;
     
-    EntityPtr entity1 (TestEntity::Create (), false),
-              entity2 (TestEntity::Create (), false),
-              entity3 (TestEntity::Create (), false);
+    TestEntity::Pointer entity1 = TestEntity::Create (),
+                        entity2 = TestEntity::Create (),
+                        entity3 = TestEntity::Create ();
 
     entity1->SetName ("entity1");
     entity2->SetName ("entity2");

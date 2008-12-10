@@ -25,6 +25,7 @@ struct Node::Impl
   Node*               prev_child;                       //предыдущий потомок
   Node*               next_child;                       //следующий потомок
   bool                bind_lock;                        //флаг блокировки на вызов BindToParent
+  bool                need_release_at_unbind;           //нужно ли уменьшать счётчик ссылок узла при отсоединении от родителя
   NodeSignal          signals [NodeEvent_Num];          //сигналы
   bool                signal_process [NodeEvent_Num];   //флаги обработки сигналов
   SubTreeNodeSignal   subtree_signals [NodeSubTreeEvent_Num]; //сигналы событий, возникающих в узлах-потомках
@@ -92,6 +93,7 @@ struct Node::Impl
       //очистка флага блокировки на вызов BindToParent
       
     bind_lock = false;
+    need_release_at_unbind = false;
   }
 
   //оповещение об изменении узла
@@ -208,7 +210,7 @@ struct Node::Impl
     switch (mode)
     {
       case NodeBindMode_AddRef:
-      case NodeBindMode_Capture:
+      case NodeBindMode_WeakRef:
         break;
       default:
         throw xtl::make_argument_exception ("scene_graph::Node::BindToParent", "mode", mode);
@@ -260,7 +262,11 @@ struct Node::Impl
       
         //уменьшаем счётчик ссылок
       
-      this_node->Release ();
+      if (need_release_at_unbind)
+      {
+        need_release_at_unbind = false;
+        this_node->Release ();
+      }
     }
 
       //связываем узел с новым родителем
@@ -272,7 +278,15 @@ struct Node::Impl
         //увеличиваем число ссылок если этого требует режим присоединения
 
       if (mode == NodeBindMode_AddRef)
+      {
         this_node->AddRef ();
+        
+        need_release_at_unbind = true;
+      }
+      else
+      {
+        need_release_at_unbind = false;
+      }
 
         //регистрируем узел в списке потомков родителя
         
@@ -764,7 +778,7 @@ Node::ConstPointer Node::NextChild () const
 
 void Node::Unbind (NodeTransformSpace invariant_space)
 {
-  impl->BindToParentImpl (0, NodeBindMode_Capture, invariant_space);
+  impl->BindToParentImpl (0, NodeBindMode_WeakRef, invariant_space);
 }
 
 void Node::BindToParent (Node& parent, NodeBindMode mode, NodeTransformSpace invariant_space)
