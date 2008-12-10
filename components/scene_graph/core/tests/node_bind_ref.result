@@ -1,0 +1,15 @@
+Results of node_bind_ref_test:
+test weak-ref bind mode
+node 'node1' binded to parent 'parent1'
+node 'node1' before destroy
+node 'node1' unbinded from parent 'parent1'
+node 'node1' destroyed
+node 'parent1' before destroy
+node 'parent1' destroyed
+test add-ref bind mode
+node 'node1' binded to parent 'parent1'
+node 'parent1' before destroy
+node 'node1' unbinded from parent 'parent1'
+node 'node1' before destroy
+node 'node1' destroyed
+node 'parent1' destroyed
