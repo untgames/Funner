@@ -140,26 +140,6 @@ class TrajectoryBuilder
 
       Array_y_z ();
 
-/*      float angle = 0;
-
-      for (size_t i = 0; i < 1000; i++, angle += 0.001)
-      {
-        nu1 = sin (angle);
-        nu3 = sin (angle);
-
-        if (sqr (nu1) + sqr (nu3) > 1)
-        {
-          nu3 = sqrtf (1 - sqr (nu1));
-        }
-
-        nu2 = sqrtf (1 - sqr (nu1) - sqr (nu3));
-
-        qq1 = nu1;
-        qq3 = nu3;
-
-        DoIterEx ();
-      }*/
-
       size_t print_step = vertices_count / 100;
 
       if (!print_step)
@@ -171,7 +151,7 @@ class TrajectoryBuilder
       for (size_t i = 0; CurSize < vertices_count; i++)
       {
         if (!(i % print_step))
-          printf ("\rProgress: %.2f%%", (float)i / vertices_count * 100.f);
+          printf ("\rProgress: %.2f%%", (float)CurSize / vertices_count * 100.f);
 
         DoIterEx ();
 
@@ -183,7 +163,7 @@ class TrajectoryBuilder
         else
         {
           constant_size_interval++;
-          if (constant_size_interval > 100)
+          if (constant_size_interval > 1000) //???? непонятное место
           {
             printf ("\nTrajectory not grow, possibly invalid input data\n");
             return;
@@ -191,7 +171,6 @@ class TrajectoryBuilder
         }
       }
       printf ("\rProgress: 100.00%%\n");
-//      Section3D (200, 1.02);
     }
 
     void Convert (DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
@@ -401,7 +380,7 @@ class TrajectoryBuilder
       }
     }
 
-    void q_starting (double *vst, int nd, int nst, int pr)
+    void q_starting (double *vst, int nd, int nst, int pr) // меняет vst
     {
       int    i;
       double q1, q2, q3, det;
@@ -446,7 +425,7 @@ class TrajectoryBuilder
       }
     }
 
-    void derivs (double x,double *v,double *dvdx)
+    void derivs (double x,double *v,double *dvdx) //заполняет dvdx
     {
       double d1,d2;
 
@@ -464,7 +443,7 @@ class TrajectoryBuilder
       dvdx[7] = dvdx[7] / d2;
     }
 
-    void rk4 (double y[], double dydx[], int n, double x, double h, double yout[])
+    void rk4 (double y[], double dydx[], int n, double x, double h, double yout[]) //заполняет yout
     {
       int    i;
       double xh, hh, h6, *dym, *dyt, *yt;
@@ -504,7 +483,7 @@ class TrajectoryBuilder
       free_vector (dym, 1, n);
     }
 
-    void rkd (double *vstart, int nd, double x1, double x2, int nstep)
+    void rkd (double *vstart, int nd, double x1, double x2, int nstep) //меняет y, z, xx
     {
       int    i, j;
       double x, sh, d;
@@ -575,23 +554,6 @@ class TrajectoryBuilder
       x1 += dx;
 
       free_vector (vstart, 1, ndim);
-    }
-
-    void DoIter ()
-    {
-      ind += 2;
-
-      if (ind > 201)
-      {
-        ind = 0;
-
-        Array_y_z ();
-
-        if (nit < 1000)
-        {
-          nit++;
-        }
-      }
     }
 
     void DoIterEx ()

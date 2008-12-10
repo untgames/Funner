@@ -128,7 +128,20 @@ void save_vertices (const char* result_file_name, const DrawVertexArray& vertice
   float index = 0, index_delta = vertices.size () / (float)vertices_to_save;
 
   for (size_t i = 0; i < vertices_to_save; i++, index += index_delta)
-    fwrite (&vertices[(size_t)index].position, sizeof (vertices[(size_t)index].position), 1, result_file);
+  {
+    float nu1 = vertices[(size_t)index].position.x,
+          nu2 = vertices[(size_t)index].position.y,
+          nu3 = vertices[(size_t)index].position.z,
+          nu_length = sqrt (nu1 * nu1 + nu2 * nu2 + nu3 * nu3);
+
+    nu1 /= -nu_length;  //обход хитрости с развёрнутыми траекториями
+    nu2 /= nu_length;
+    nu3 /= nu_length;
+
+    fwrite (&nu1, sizeof (nu1), 1, result_file);
+    fwrite (&nu2, sizeof (nu2), 1, result_file);
+    fwrite (&nu3, sizeof (nu3), 1, result_file);
+  }
 
   fflush (result_file);
 

@@ -6,7 +6,9 @@
 
 #include <stl/auto_ptr.h>
 #include <stl/hash_map>
+#include <stl/list>
 
+#include <xtl/any.h>
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
@@ -18,6 +20,10 @@
 
 #include <common/console.h>
 #include <common/file.h>
+
+#include <syslib/application.h>
+#include <syslib/timer.h>
+#include <syslib/window.h>
 
 #include <sg/camera.h>
 #include <sg/scene.h>
@@ -31,6 +37,11 @@
 #include <render/scene_render.h>
 
 #include <engine/attachments.h>
+#include <engine/subsystem_manager.h>
+
+#include <script/shell.h>
+
+#include <tools/ui/custom_window_system.h>
 
 class RenderableModel
 {
@@ -47,6 +58,164 @@ class RenderableModel
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
+};
+
+//тестовое пользовательское дочернее окно
+class MyChildWindow: public tools::ui::ICustomChildWindow, public xtl::reference_counter
+{
+  public:
+///Конструктор
+    MyChildWindow ();
+
+///Изменение положения окна
+    void SetPosition (size_t x, size_t y);
+
+///Изменение размеров окна
+    void SetSize (size_t width, size_t height);
+
+///Установка родительского окна
+    void SetParent (const void* parent_window_handle);
+
+///Управление видимостью окна
+    void Show (bool state);
+
+///Подсчёт ссылок
+    void AddRef  () { addref (this); }
+    void Release () { release (this); }
+
+  private:
+    engine::SubsystemManager          manager; //менеджер подсистем
+    scene_graph::OrthoCamera::Pointer camera;
+    syslib::Window                    window;
+};
+
+//тестовый сервер приложения
+class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::reference_counter
+{
+  private:
+    typedef xtl::function <void (const char*)> WaitFileHandler;
+
+  public:
+    MyApplicationServer ();
+
+    void ExecuteCommand (const char* command);
+
+    void SetProperty (const char* name, const stl::string& value)
+    {
+      throw xtl::make_not_implemented_exception ("MyApplicationServer::SetProperty");
+    }
+
+    void GetProperty (const char* name, stl::string& value)
+    {
+      throw xtl::make_not_implemented_exception ("MyApplicationServer::GetProperty");
+    }
+
+    bool IsPropertyPresent (const char* name)
+    {
+      throw xtl::make_not_implemented_exception ("MyApplicationServer::IsPropertyPresent");
+    }
+
+    bool IsPropertyReadOnly (const char* name)
+    {
+      throw xtl::make_not_implemented_exception ("MyApplicationServer::IsPropertyPresent");
+    }
+
+    void RegisterPropertyListener (const char* name_wc_mask, tools::ui::IPropertyListener* listener)
+    {
+      throw xtl::make_not_implemented_exception ("MyApplicationServer::RegisterPropertyListener");
+    }
+
+    void UnregisterPropertyListener (const char* name_wc_mask, tools::ui::IPropertyListener* listener)
+    {
+      throw xtl::make_not_implemented_exception ("MyApplicationServer::UnregisterPropertyListener");
+    }
+
+    void UnregisterAllPropertyListeners (const char* name_wc_mask)
+    {
+      throw xtl::make_not_implemented_exception ("MyApplicationServer::UnregisterAllPropertyListeners");
+    }
+
+    void UnregisterAllPropertyListeners ()
+    {
+      throw xtl::make_not_implemented_exception ("MyApplicationServer::UnregisterAllPropertyListeners");
+    }
+
+    tools::ui::ICustomChildWindow* CreateChildWindow (const char* init_string)
+    {
+      return new MyChildWindow ();
+    }
+
+    void OpenProjectPath (const char* path);
+
+    void AddRef  () { addref (this); }
+    void Release () { release (this); }
+
+  private:
+    void UnloadEnvelope ();
+    void UnloadModels ();
+    void Cleanup ();
+
+    void LoadTrajectory (const char* file_name);
+
+    void OnNewXmeshTrajectory (const char* desc_trajectory_file_name);
+    void CalculateTrajectory (double nu1, double nu2, double nu3, size_t lod);
+
+    void LoadEnvelope ();
+
+    void OnNewXmeshEnvelope (const char* desc_envelope_file_name);
+    void CalculateEnvelope (size_t lod);
+
+    void OnNewCondorBatchTrajectory (const char* desc_trajectory_file_name);
+    void OnNewTrajectoriesCoords (const char* desc_file_name, size_t lod);
+    void CalculateTrajectories (size_t trajectories_count, size_t lod);
+
+    void CheckNewFiles ();
+    void WaitForFile (const char* file_name, const WaitFileHandler& handler);
+
+    void LoadModel (const char* path);
+    void SaveModel ();
+
+  private:
+    typedef xtl::shared_ptr<script::Environment> ShellEnvironmentPtr;
+
+    struct WaitedFile
+    {
+      stl::string     file_name;
+      size_t          current_file_size;
+      WaitFileHandler handler;
+
+      WaitedFile (const char* in_file_name, const WaitFileHandler& in_handler)
+        : file_name (in_file_name), current_file_size (1), handler (in_handler)
+        {}
+    };
+
+    struct VisualModelResource
+    {
+      scene_graph::VisualModel::Pointer visual_model;
+      media::rms::Binding               resource_binding;
+    };
+
+    typedef stl::list<WaitedFile> WaitedFiles;
+    typedef stl::hash_map<stl::hash_key<const char*>, VisualModelResource> VisualModels;
+    typedef stl::hash_map<stl::hash_key<const char*>, stl::string>         CondorTrajectoriesNames;
+
+  private:
+    ShellEnvironmentPtr               shell_environment;     //окружение скриптовой среды
+    script::Shell                     shell;                 //скриптовый интерпретатор
+    scene_graph::Scene                scene;
+    scene_graph::OrthoCamera::Pointer camera;
+    render::Screen                    screen;
+    stl::string                       plugin_path;
+    stl::string                       project_path;
+    syslib::Timer                     wait_files_timer;
+    stl::string                       working_directory;
+    VisualModelResource               envelope;
+    VisualModels                      trajectories;
+    media::rms::ResourceManager       resource_manager;
+    WaitedFiles                       waited_files;
+    stl::string                       condor_path;
+    bool                              use_condor;
+    CondorTrajectoriesNames           condor_trajectories_names;
 };
 
 //проверка ошибок

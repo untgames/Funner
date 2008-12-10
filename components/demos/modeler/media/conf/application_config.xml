@@ -1,3 +1,3 @@
-<?xml version="1.0" encoding = "windows-1251"?>
-<Configuration PluginPath="..\..\..\dist\msvc\bin\">
+<?xml version="1.0" encoding = "Cp1251"?>
+<Configuration PluginPath="..\..\..\dist\msvc\bin\" CondorPath="c:\condor\bin\" UseCondor="1">
 </Configuration>

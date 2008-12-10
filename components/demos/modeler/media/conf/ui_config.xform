@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="Cp1251"?>
 <UIConfig>
   <ToolStrip Id="ToolStrip1">
     <ToolButton Name="Рассчитать огибающую" OnClick="Application.Execute ('Modeler.CalculateEnvelope (200)')"/>
     <ToolButton Name="Рассчитать траекторию" OnClick="Application.Execute ('Modeler.CalculateTrajectory (0, 1, 0, 600)')"/>
     <ToolButton Name="Рассчитать несколько траекторий" OnClick="Application.Execute ('Modeler.CalculateTrajectories (40, 10000)')"/>
-    <ToolButton Name="Удалить все рассчёты" OnClick="Application.Execute ('Modeler.Cleanup ()')"/>
+    <ToolButton Name="Удалить все рассчёты" OnClick="Application.Execute ('Modeler.Cleanup ()')"></ToolButton>
     <ToolButton Name="Сохранить модель" OnClick="Application.Execute ('Modeler.SaveModel ()')"/>
     <ToolButton Name="Выход" OnClick="Application.Execute ('close')"/>
   </ToolStrip>

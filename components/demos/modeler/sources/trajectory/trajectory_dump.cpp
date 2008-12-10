@@ -4,7 +4,9 @@
 
 #include "core.h"
 
-const char* DESC_FILE_SUFFIX = ".desc";
+const char* DESC_FILE_SUFFIX            = ".desc";
+const int   TRAJECTORIES_COORDS_HEADER  = 'TRJC';
+const int   TRAJECTORIES_COORDS_VERSION = 1;
 
 void save_desc_file (const char* result_file_name, size_t file_size)
 {
@@ -103,37 +105,89 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
 
 int main (int argc, char* argv[])
 {
-  if (argc != 7)
+  if ((argc != 7) && (argc != 8))
   {
-    printf ("Usage: modeler-trajectory model_data_file nu1 nu2 nu3 result_file vertices_count\n");
+    printf ("Usage: modeler-trajectory mode args\n");
+    printf ("  'mode' values:\n");
+    printf ("    'args-input': 'args' = nu1 nu2 nu3 model_data_file result_file vertices_count\n");
+    printf ("    'file-input': 'args' = nu_file nu_index model_data_file result_file vertices_count\n");
     return 1;
   }
 
   ModelData model_data;
+  size_t    optional_parameters_count;
+  float     nu[3];
 
-  double nu1 = atof (argv[2]), nu2 = atof (argv[3]), nu3 = atof (argv[4]);
-
-/*  double nu_length = sqrt (nu1 * nu1 + nu2 * nu2 + nu3 * nu3);
-
-  nu1 /= nu_length;
-  nu2 /= nu_length;
-  nu3 /= nu_length;
-
-  if ((nu_sqr_sum < 0.99) || (nu_sqr_sum > 1.01))
+  if (!strcmp (argv[1], "args-input"))
   {
-    save_desc_file (argv[5], 0);
-    printf ("Invalid input nu data, nu1 * nu1 + nu2 * nu2 + nu3 * nu3 must be 1\n");
-    return 2;
-  }*/
+    nu[0] = (float)atof (argv[3]);
+    nu[1] = (float)atof (argv[4]);
+    nu[2] = (float)atof (argv[5]);
+    optional_parameters_count = 3;
+  }
+  else if (!strcmp (argv[1], "file-input"))
+  {
+    FILE* nu_file = fopen (argv[2], "rb");
 
-  LoadModelData (argv[1], model_data);
+    if (!nu_file)
+    {
+      printf ("Can't open nu file '%s'\n", argv[2]);
+      save_desc_file (argv[5], 0);
+      return 1;
+    }
+
+    int header, version;
+
+    fread (&header, sizeof (header), 1, nu_file);
+    fread (&version, sizeof (version), 1, nu_file);
+
+    if ((header != TRAJECTORIES_COORDS_HEADER) || (version != TRAJECTORIES_COORDS_VERSION))
+    {
+      printf ("nu file '%s' has unknown header or version\n", argv[2]);
+      save_desc_file (argv[5], 0);
+      fclose (nu_file);
+      return 1;
+    }
+
+    size_t read_position = sizeof (int) * 2 + sizeof (size_t) + atoi (argv[3]) * sizeof (float) * 3;
+
+    if (fseek (nu_file, read_position, SEEK_SET))
+    {
+      printf ("Can't seek in nu file '%s' to position %u\n", argv[2], read_position);
+      save_desc_file (argv[5], 0);
+      fclose (nu_file);
+      return 1;
+    }
+
+    for (size_t i = 0; i < 3; i++)
+    {
+      if (!fread (&nu[i], sizeof (nu[i]), 1, nu_file))
+      {
+        printf ("Can't read nu%u from file '%s'\n", i, argv[2]);
+        save_desc_file (argv[5], 0);
+        fclose (nu_file);
+        return 1;
+      }
+    }
+
+    fclose (nu_file);
+
+    optional_parameters_count = 2;
+  }
+  else
+  {
+    printf ("Unknown mode parameter, launch application without args to usage description.\n");
+    return 1;
+  }
+
+  LoadModelData (argv[2 + optional_parameters_count], model_data);
 
   DrawVertexArray    vertices;
   DrawPrimitiveArray primitives;
 
-  BuildTrajectory (model_data, nu1, nu2, nu3, atoi (argv[6]), vertices, primitives);
+  BuildTrajectory (model_data, nu[0], nu[1], nu[2], atoi (argv[4 + optional_parameters_count]), vertices, primitives);
 
-  dump (argv[5], vertices, primitives);
+  dump (argv[3 + optional_parameters_count], vertices, primitives);
 
   return 0;
 }
