@@ -17,7 +17,7 @@ void save_desc_file (const char* result_file_name, size_t file_size)
 
   char* desc_file_name = new char [file_name_buffer_size];
 
-  snprintf (desc_file_name, file_name_buffer_size, "%s%s", result_file_name, DESC_FILE_SUFFIX);
+  sprintf (desc_file_name, "%s%s", result_file_name, DESC_FILE_SUFFIX);
 
   FILE* desc_file = fopen (desc_file_name, "w");
 
