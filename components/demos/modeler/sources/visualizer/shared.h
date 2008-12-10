@@ -175,6 +175,8 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     void LoadModel (const char* path);
     void SaveModel ();
 
+    void CreateCondorBinaries ();
+
   private:
     typedef xtl::shared_ptr<script::Environment> ShellEnvironmentPtr;
 
