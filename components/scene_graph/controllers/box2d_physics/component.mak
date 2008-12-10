@@ -12,6 +12,7 @@ SCENE_GRAPH.CONTROLLERS.BOX2D.SOURCES.LIB_DIRS         :=
 SCENE_GRAPH.CONTROLLERS.BOX2D.SOURCES.LIBS             :=
 SCENE_GRAPH.CONTROLLERS.BOX2D.SOURCES.COMPILER_DEFINES := 
 SCENE_GRAPH.CONTROLLERS.BOX2D.SOURCES.IMPORTS          := ../../../common/compile.static.mak ../../core/compile.static.mak ../../../../extern/box2d/compile.static.mak
+SCENE_GRAPH.CONTROLLERS.BOX2D.SOURCES.g++.COMPILER_CFLAGS := -Wno-unused -Wno-switch
 
 #Öåëü ¹2 - SG tests
 SCENE_GRAPH.CONTROLLERS.BOX2D.TESTS.TYPE             := test-suite
