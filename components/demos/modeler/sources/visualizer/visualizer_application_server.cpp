@@ -169,7 +169,7 @@ MyApplicationServer::MyApplicationServer ()
   camera->SetPosition (0, 0, 4);
   camera->LookTo      (math::vec3f (0.0f), NodeOrt_Z, NodeOrt_Y, NodeTransformSpace_World);
 
-  camera->BindToScene (scene);
+  camera->BindToScene (scene, NodeBindMode_AddRef);
 
   screen.SetBackgroundColor (0.f, 0.05f, 0.2f, 0);
 
@@ -321,7 +321,7 @@ void MyApplicationServer::LoadTrajectory (const char* file_name)
   new_trajectory.visual_model = VisualModel::Create ();
 
   new_trajectory.visual_model->SetMeshName (file_name);
-  new_trajectory.visual_model->BindToScene (scene);
+  new_trajectory.visual_model->BindToScene (scene, NodeBindMode_AddRef);
   new_trajectory.visual_model->SetName     ("Trajectory");
   new_trajectory.visual_model->Scale       (-2.f, 2.f, 2.f);
 
@@ -399,7 +399,7 @@ void MyApplicationServer::LoadEnvelope ()
   envelope.visual_model = VisualModel::Create ();
 
   envelope.visual_model->SetMeshName (mesh_name.c_str ());
-  envelope.visual_model->BindToScene (scene);
+  envelope.visual_model->BindToScene (scene, NodeBindMode_AddRef);
   envelope.visual_model->SetName     ("Envelope");
 }
 

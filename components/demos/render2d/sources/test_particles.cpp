@@ -69,7 +69,7 @@ struct TestScene
 //    sprite_list->SetMaterial ("font_material");
     sprite_list->SetMaterial ("pistol_material");
     sprite_list->Reserve     (PARTICLES_COUNT);
-    sprite_list->BindToScene (scene);
+    sprite_list->BindToScene (scene, NodeBindMode_AddRef);
 
     for (size_t i=0; i<PARTICLES_COUNT; i++)
     {

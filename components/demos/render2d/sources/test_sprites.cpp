@@ -31,7 +31,7 @@ struct Test
     sprite->SetColor    (1, 1, 1, 0.95f);
     sprite->SetPosition (0, 0, -15);
     sprite->SetScale    (15, 15, 1);
-    sprite->BindToScene (scene);
+    sprite->BindToScene (scene, NodeBindMode_AddRef);
 
     for (size_t i=0; i<SPRITES_COUNT; i++)
     {
