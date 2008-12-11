@@ -8,6 +8,6 @@ Application.MenuItems:Item ("MenuItem1").OnClick = "Application.MenuItems:Item (
 Application.Execute ("dofile ('data/setup_var_registry.lua')")
 
 Application.CreateForm ("PropertyGrid", "Map2 registry1", DockState.Right)
-form = Application.CreateForm ("Console", "", DockState.Bottom)
+Application.CreateForm ("Console", "", DockState.Bottom)
 
 Application.MainForm.OnClosed = "Application.Execute ('close')"
