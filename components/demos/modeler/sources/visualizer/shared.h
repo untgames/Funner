@@ -207,8 +207,10 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     scene_graph::Scene                scene;
     scene_graph::OrthoCamera::Pointer camera;
     render::Screen                    screen;
-    stl::string                       plugin_path;
+    stl::string                       win32_plugin_path;
+    stl::string                       osx_plugin_path;
     stl::string                       project_path;
+    stl::string                       condor_trajectory_requirements;
     syslib::Timer                     wait_files_timer;
     stl::string                       working_directory;
     VisualModelResource               envelope;

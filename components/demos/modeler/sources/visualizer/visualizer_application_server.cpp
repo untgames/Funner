@@ -150,9 +150,10 @@ MyApplicationServer::MyApplicationServer ()
 
   common::ParseIterator iter = parser.Root ().First ("Configuration");
 
-  plugin_path = common::get<const char*> (*iter, "PluginPath");
-  condor_path = common::get<const char*> (*iter, "CondorPath", "");
-  use_condor  = common::get<bool>        (*iter, "UseCondor", true);
+  win32_plugin_path = common::get<const char*> (*iter, "Win32PluginPath");
+  osx_plugin_path   = common::get<const char*> (*iter, "MacOSXPluginPath", "");
+  condor_path       = common::get<const char*> (*iter, "CondorPath", "");
+  use_condor        = common::get<bool>        (*iter, "UseCondor", true);
 
   if (use_condor)
     CreateCondorBinaries ();
@@ -347,7 +348,7 @@ void MyApplicationServer::OnNewXmeshTrajectory (const char* desc_trajectory_file
     throw xtl::format_operation_exception (METHOD_NAME, "There was an error while calculating trajectory %s",
                                            xmesh_trajectory_file_name.c_str ());
 
-  stl::string application_name  = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME),
+  stl::string application_name  = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME),
               binmesh_file_name = common::format ("%.*sbinmesh", xmesh_trajectory_file_name.length () - xtl::xstrlen ("xmesh"),
                                                   xmesh_trajectory_file_name.c_str ());
 
@@ -359,7 +360,7 @@ void MyApplicationServer::OnNewXmeshTrajectory (const char* desc_trajectory_file
 
 void MyApplicationServer::CalculateTrajectory (double nu1, double nu2, double nu3, size_t lod)
 {
-  stl::string application_name        = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
+  stl::string application_name        = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
               model_name              = common::format ("%smodel.dat", project_path.c_str ()),
               trajectory_name         = common::format ("%strajectory_%g_%g_%g.xmesh", project_path.c_str (), nu1, nu2, nu3),
               binmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.binmesh", project_path.c_str (), nu1, nu2, nu3),
@@ -419,7 +420,7 @@ void MyApplicationServer::OnNewXmeshEnvelope (const char* desc_envelope_file_nam
       (common::FileSystem::GetFileSize (xmesh_envelope_file_name.c_str ()) != desc_file_data))
     throw xtl::format_operation_exception (METHOD_NAME, "There was an error while calculating envelope");
 
-  stl::string application_name  = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME),
+  stl::string application_name  = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME),
               binmesh_file_name = common::format ("%senvelope.binmesh", project_path.c_str ());
 
   if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), xmesh_envelope_file_name.c_str (), binmesh_file_name.c_str (), 0) == -1)
@@ -430,7 +431,7 @@ void MyApplicationServer::OnNewXmeshEnvelope (const char* desc_envelope_file_nam
 
 void MyApplicationServer::CalculateEnvelope (size_t lod)
 { //????Продумать двойной вызов
-  stl::string application_name      = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), WIN32_ENVELOPE_APPLICATION_NAME),
+  stl::string application_name      = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_ENVELOPE_APPLICATION_NAME),
               model_name            = common::format ("%smodel.dat", project_path.c_str ()),
               envelope_name         = common::format ("%senvelope.xmesh", project_path.c_str ()),
               binmesh_envelope_name = common::format ("%senvelope.binmesh", project_path.c_str ()),
@@ -544,11 +545,11 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
     fprintf (condor_config_file, "Log = %s%s\n", project_path.c_str (), BATCH_TRAJECTORY_LOG_FILE_NAME);
     fprintf (condor_config_file, "Arguments = file-input %s $(Process) %s batch_trajectory.$(Process).xmesh %u\n",
              BATCH_TRAJECTORIES_COORDS_FILE_NAME, OLD_FORMAT_MODEL_FILE_NAME, lod);
-    fprintf (condor_config_file, "output = %sbatch_trajectory.$(Process).xmesh.output\n", project_path.c_str ());
+//    fprintf (condor_config_file, "output = %sbatch_trajectory.$(Process).xmesh.output\n", project_path.c_str ());
     fprintf (condor_config_file, "transfer_input_files = %s%s, %s%s\n", project_path.c_str (),
              BATCH_TRAJECTORIES_COORDS_FILE_NAME, project_path.c_str (), OLD_FORMAT_MODEL_FILE_NAME);
     fprintf (condor_config_file, "Universe = Vanilla\n");
-    fprintf (condor_config_file, "Requirements = (Arch == \"X86_64\" || Arch == \"INTEL\") && (OpSys == \"OSX\" || OpSys == \"WINNT51\" || OpSys == \"WINNT60\")\n");
+    fprintf (condor_config_file, "Requirements = %s\n", condor_trajectory_requirements.c_str ());
     fprintf (condor_config_file, "Rank = kflops\n");
     fprintf (condor_config_file, "should_transfer_files = YES\n");
     fprintf (condor_config_file, "when_to_transfer_output = ON_EXIT\n");
@@ -581,7 +582,7 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
 
 void MyApplicationServer::CalculateTrajectories (size_t trajectories_count, size_t lod)
 { //????Продумать двойной вызов
-  stl::string application_name          = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), WIN32_ENVELOPE_APPLICATION_NAME),
+  stl::string application_name          = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_ENVELOPE_APPLICATION_NAME),
               model_name                = common::format ("%smodel.dat", project_path.c_str ()),
               trajectories_coords_name  = common::format ("%s%s", project_path.c_str (), BATCH_TRAJECTORIES_COORDS_FILE_NAME),
               trajectories_count_string = common::format ("%u", trajectories_count),
@@ -780,32 +781,56 @@ void MyApplicationServer::CreateCondorBinaries ()
 {
   try
   {
-    common::FileSystem::Mkdir (CONDOR_BINARIES_PATH);
+    if (!common::FileSystem::IsDir (CONDOR_BINARIES_PATH))
+      common::FileSystem::Mkdir (CONDOR_BINARIES_PATH);
 
-    stl::string win32_trajectory_application_name = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
-                osx_trajectory_application_name   = common::format ("%s\\%s%s", working_directory.c_str (), plugin_path.c_str (), OSX_TRAJECTORY_APPLICATION_NAME),
-                win_5_1_intel_trajectory          = common::format ("%s\\%s.WINNT51.INTEL.exe", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
-                win_6_0_intel_trajectory          = common::format ("%s\\%s.WINNT60.INTEL.exe", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
-                win_5_1_X86_64_trajectory         = common::format ("%s\\%s.WINNT51.X86_64.exe", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
-                win_6_0_X86_64_trajectory         = common::format ("%s\\%s.WINNT60.X86_64.exe", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
-                osx_intel_trajectory              = common::format ("%s\\%s.OSX.INTEL.exe", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
-                osx_X86_64_trajectory             = common::format ("%s\\%s.OSX.X86_64.exe", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME);
+    stl::string win32_trajectory_application_name = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
+                win_5_0_intel_trajectory          = common::format ("%s\\%s.WINNT50.INTEL", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
+                win_5_1_intel_trajectory          = common::format ("%s\\%s.WINNT51.INTEL", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
+                win_5_2_intel_trajectory          = common::format ("%s\\%s.WINNT52.INTEL", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
+                win_6_0_intel_trajectory          = common::format ("%s\\%s.WINNT60.INTEL", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
+                win_5_0_X86_64_trajectory         = common::format ("%s\\%s.WINNT50.X86_64", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
+                win_5_1_X86_64_trajectory         = common::format ("%s\\%s.WINNT51.X86_64", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
+                win_5_2_X86_64_trajectory         = common::format ("%s\\%s.WINNT52.X86_64", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
+                win_6_0_X86_64_trajectory         = common::format ("%s\\%s.WINNT60.X86_64", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME);
 
+    copy_file (win32_trajectory_application_name.c_str (), win_5_0_intel_trajectory.c_str ());
     copy_file (win32_trajectory_application_name.c_str (), win_5_1_intel_trajectory.c_str ());
+    copy_file (win32_trajectory_application_name.c_str (), win_5_2_intel_trajectory.c_str ());
     copy_file (win32_trajectory_application_name.c_str (), win_6_0_intel_trajectory.c_str ());
+    copy_file (win32_trajectory_application_name.c_str (), win_5_0_X86_64_trajectory.c_str ());
     copy_file (win32_trajectory_application_name.c_str (), win_5_1_X86_64_trajectory.c_str ());
+    copy_file (win32_trajectory_application_name.c_str (), win_5_2_X86_64_trajectory.c_str ());
     copy_file (win32_trajectory_application_name.c_str (), win_6_0_X86_64_trajectory.c_str ());
-    copy_file (osx_trajectory_application_name.c_str (), osx_intel_trajectory.c_str ());
-    copy_file (osx_trajectory_application_name.c_str (), osx_X86_64_trajectory.c_str ());
+
+    condor_trajectory_requirements = "((Arch == \"X86_64\" || Arch == \"INTEL\") && (OpSys == \"WINNT50\" || OpSys == \"WINNT51\" || OpSys == \"WINNT52\" || OpSys == \"WINNT60\"))";
+
+    if (!osx_plugin_path.empty ())
+    {
+      stl::string osx_trajectory_application_name = common::format ("%s\\%s%s", working_directory.c_str (), osx_plugin_path.c_str (), OSX_TRAJECTORY_APPLICATION_NAME),
+                  osx_intel_trajectory            = common::format ("%s\\%s.OSX.INTEL", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME);
+
+      if (common::FileSystem::IsFileExist (osx_trajectory_application_name.c_str ()))
+      {
+        copy_file (osx_trajectory_application_name.c_str (), osx_intel_trajectory.c_str ());
+
+        condor_trajectory_requirements += " || (Arch == \"INTEL\" && OpSys == \"OSX\")";
+      }
+      else
+      {
+        printf ("Condor will not perform calculations on OSX machines, there is no OSX executable '' in specified directory '%s'\n",
+                osx_trajectory_application_name.c_str (), osx_plugin_path.c_str ());
+      }
+    }
   }
   catch (xtl::exception& exception)
   {
     use_condor = 0;
-    common::Console::Printf ("Condor will not be used, exception while creating needed binaries: '%s'\n", exception.what ());
+    printf ("Condor will not be used, exception while creating needed binaries: '%s'\n", exception.what ());
   }
   catch (...)
   {
     use_condor = 0;
-    common::Console::Print ("Condor will not be used, unknown exception while creating needed binaries\n");
+    printf ("Condor will not be used, unknown exception while creating needed binaries\n");
   }
 }

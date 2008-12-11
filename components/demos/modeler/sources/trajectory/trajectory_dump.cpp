@@ -120,9 +120,9 @@ int main (int argc, char* argv[])
 
   if (!strcmp (argv[1], "args-input"))
   {
-    nu[0] = (float)atof (argv[3]);
-    nu[1] = (float)atof (argv[4]);
-    nu[2] = (float)atof (argv[5]);
+    nu[0] = (float)atof (argv[2]);
+    nu[1] = (float)atof (argv[3]);
+    nu[2] = (float)atof (argv[4]);
     optional_parameters_count = 3;
   }
   else if (!strcmp (argv[1], "file-input"))
