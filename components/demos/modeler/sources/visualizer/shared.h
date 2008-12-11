@@ -20,6 +20,9 @@
 
 #include <common/console.h>
 #include <common/file.h>
+#include <common/parse_iterator.h>
+#include <common/parser.h>
+#include <common/var_registry.h>
 
 #include <syslib/application.h>
 #include <syslib/timer.h>

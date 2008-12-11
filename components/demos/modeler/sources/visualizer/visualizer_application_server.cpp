@@ -1,10 +1,7 @@
 #include <direct.h>
 #include <process.h>
 
-#include <common/parse_iterator.h>
-#include <common/parser.h>
 #include <common/strlib.h>
-#include <common/var_registry.h>
 #include <common/xml_writer.h>
 
 #include <script/bind.h>
@@ -25,7 +22,6 @@ namespace
     Константы
 */
 
-const char*  TRAJECTORIES_REGISTRY_NAME          = "Configuration.Trajectories";
 const char*  APPLICATION_CONFIGURATION_FILE_NAME = "media/conf/application_config.xml";
 const char*  SCREEN_ATTACHMENT_NAME              = "MainScreen";
 const char*  INTERPRETER_NAME                    = "lua";
@@ -38,7 +34,7 @@ const char*  OSX_TRAJECTORY_APPLICATION_NAME     = "modeler-trajectory";
 const char*  TRAJECTORY_APPLICATION_BASE_NAME    = "modeler-trajectory";
 const char*  CONDOR_BINARIES_PATH                = "condor_binaries";
 const char*  MESH_CONVERTER_APPLICATION_NAME     = "mesh-converter.exe";
-const char*  MODEL_REGISTRY_NAME                 = "ApplicationServer.Model";
+const char*  MODEL_REGISTRY_NAME                 = "ApplicationServer.Properties.Model";
 const char*  MODEL_FILE_NAME                     = "model.xmodel";
 const char*  OLD_FORMAT_MODEL_FILE_NAME          = "model.dat";
 const char*  CONDOR_CONFIG_FILE_NAME             = "condor.cfg";
@@ -818,7 +814,7 @@ void MyApplicationServer::CreateCondorBinaries ()
       }
       else
       {
-        printf ("Condor will not perform calculations on OSX machines, there is no OSX executable '' in specified directory '%s'\n",
+        printf ("Condor will not perform calculations on OSX machines, there is no OSX executable '%s' in specified directory '%s'\n",
                 osx_trajectory_application_name.c_str (), osx_plugin_path.c_str ());
       }
     }

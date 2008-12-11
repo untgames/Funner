@@ -2,11 +2,10 @@
 <UIConfig>
   <ToolStrip Id="ToolStrip1">
     <ToolButton Name="Рассчитать огибающую" OnClick="Application.Execute ('Modeler.CalculateEnvelope (200)')"/>
-    <ToolButton Name="Рассчитать траекторию" OnClick="Application.Execute ('Modeler.CalculateTrajectory (0, 1, 0, 600)')"/>
-    <ToolButton Name="Рассчитать несколько траекторий" OnClick="Application.Execute ('Modeler.CalculateTrajectories (40, 10000)')"/>
+    <ToolButton Name="Рассчитать траекторию" OnClick="Application.Execute ('Modeler.CalculateTrajectory (0, 1, 0, 1000)')"/>
+    <ToolButton Name="Рассчитать несколько траекторий" OnClick="Application.Execute ('Modeler.CalculateTrajectories (20, 10000)')"/>
     <ToolButton Name="Удалить все рассчёты" OnClick="Application.Execute ('Modeler.Cleanup ()')"></ToolButton>
     <ToolButton Name="Сохранить модель" OnClick="Application.Execute ('Modeler.SaveModel ()')"/>
-    <ToolButton Name="Выход" OnClick="Application.Execute ('close')"/>
   </ToolStrip>
   <Plugin 
     Name="Console" 
@@ -17,17 +16,29 @@
     OutputCutTo="7900"
   />
   <Plugin Name="PropertyGrid">
-    <PropertyMap Name="Model">
-      <Property Name="A" VarName="A" Category="Моменты инерции" Type="double"/>
-      <Property Name="B" VarName="B" Category="Моменты инерции" Type="double"/>
-      <Property Name="C" VarName="C" Category="Моменты инерции" Type="double"/>
-      <Property Name="h" VarName="h" Category="Константы интегрирования" Type="double"/>
-      <Property Name="g" VarName="g" Category="Константы интегрирования" Type="double"/>
-      <Property Name="x" VarName="mx" Category="Координаты центра масс" Type="double"/>
-      <Property Name="y" VarName="my" Category="Координаты центра масс" Type="double"/>
-      <Property Name="z" VarName="mz" Category="Координаты центра масс" Type="double"/>
-      <Property Name="Автор" VarName="Author" Category="Разное" Type="string" ReadOnly="1"/>
-      <Property Name="Описание" VarName="Description" Category="Разное" Type="string"/>
+    <ListBox Name="CullModeList">
+    		<Item Name="None" Value="None" />
+    		<Item Name="Back" Value="Back" />
+    		<Item Name="Front" Value="Front" />
+        </ListBox><PropertyMap Name="Model">
+      <Property Name="A" VarName="Model.A" Category="Моменты инерции" Type="double"/>
+      <Property Name="B" VarName="Model.B" Category="Моменты инерции" Type="double"/>
+      <Property Name="C" VarName="Model.C" Category="Моменты инерции" Type="double"/>
+      <Property Name="h" VarName="Model.h" Category="Константы интегрирования" Type="double"/>
+      <Property Name="g" VarName="Model.g" Category="Константы интегрирования" Type="double"/>
+      <Property Name="x" VarName="Model.mx" Category="Координаты центра масс" Type="double"/>
+      <Property Name="y" VarName="Model.my" Category="Координаты центра масс" Type="double"/>
+      <Property Name="z" VarName="Model.mz" Category="Координаты центра масс" Type="double"/>
+      <Property Name="Автор" VarName="Model.Author" Category="Разное" Type="string" ReadOnly="1"/>
+      <Property Name="Описание" VarName="Model.Description" Category="Разное" Type="string"/></PropertyMap>
+    <PropertyMap Name="Render" Inherit="Model">
+    	
+        <Property Name="Wireframe rendering" VarName="Render.Wireframe"
+    		Category="Рендер" Type="bool">
+    	</Property>
+    	<Property Name="Cull Mode" VarName="Render.CullMode"
+    		Category="Рендер" Type="list" ListBox="CullModeList">
+    	</Property>
     </PropertyMap>
   </Plugin>
 </UIConfig>

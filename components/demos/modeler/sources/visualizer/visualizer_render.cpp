@@ -24,9 +24,35 @@ using namespace scene_graph;
 namespace
 {
 
-const char* SHADER_FILE_NAME  = "media/fpp_shader.wxf";
+/*
+===================================================================================================
+    Константы
+===================================================================================================
+*/
+
+const char* COMPONENT_NAME                 = "render.scene_render.ModelerRender"; //имя компонента
+const char* RENDER_PATH_NAME               = "ModelerRender";                     //имя пути рендеринга
+const char* SHADER_FILE_NAME               = "media/fpp_shader.wxf";
+const char* RENDER_CONFIGURATION_FILE_NAME = "media/conf/render_config.xml";
+const char* RENDER_REGISTRY_NAME           = "ApplicationServer.Properties.Render";
+const char* WIREFRAME_PROPERTY_NAME        = "Wireframe";
+const char* CULL_MODE_PROPERTY_NAME        = "CullMode";
 
 typedef xtl::com_ptr<low_level::IBlendState> BlendStatePtr;
+
+render::low_level::CullMode get_cull_mode (const char* cull_mode)
+{
+  if (!xtl::xstrcmp (cull_mode, "Back"))
+    return render::low_level::CullMode_Back;
+
+  if (!xtl::xstrcmp (cull_mode, "None"))
+    return render::low_level::CullMode_None;
+
+  if (!xtl::xstrcmp (cull_mode, "Front"))
+    return render::low_level::CullMode_Front;
+
+  throw xtl::make_argument_exception ("::get_cull_mode", "cull_mode", cull_mode);
+}
 
 //чтение ихсодного текста шейдера в строку
 stl::string read_shader (const char* file_name)
@@ -277,16 +303,6 @@ struct RenderViewVisitor: public xtl::visitor<void, VisualModel>
   }
 };
 
-
-/*
-===================================================================================================
-    Константы
-===================================================================================================
-*/
-
-const char* COMPONENT_NAME   = "render.scene_render.ModelerRender"; //имя компонента
-const char* RENDER_PATH_NAME = "ModelerRender";                     //имя пути рендеринга
-
 typedef xtl::com_ptr<low_level::IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<low_level::IProgramParametersLayout> ProgramParametersLayoutPtr;
 
@@ -306,9 +322,30 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
         render_manager (in_render_manager),
         frame (in_renderer->CreateFrame (), false),
         current_angle (0.f),
-        shader_source (read_shader (SHADER_FILE_NAME))
+        shader_source (read_shader (SHADER_FILE_NAME)),
+        configuration_registry (RENDER_REGISTRY_NAME)
     {
       frame->SetCallback (this);
+
+        //чтение конфигурации
+
+      common::Parser   parser     (RENDER_CONFIGURATION_FILE_NAME);
+      common::ParseLog parser_log (parser.Log ());
+
+      common::ParseIterator iter = parser.Root ().First ("Configuration");
+
+      wireframe_mode = common::get<bool> (*iter, WIREFRAME_PROPERTY_NAME, false);
+      cull_mode      = get_cull_mode (common::get<const char*> (*iter, CULL_MODE_PROPERTY_NAME, "None"));
+
+      configuration_registry.SetValue (WIREFRAME_PROPERTY_NAME,
+        xtl::any (stl::string (common::get<const char*> (*iter, WIREFRAME_PROPERTY_NAME, "false")), true));
+      configuration_registry.SetValue (CULL_MODE_PROPERTY_NAME,
+        xtl::any (stl::string (common::get<const char*> (*iter, CULL_MODE_PROPERTY_NAME, "None")), true));
+
+      wireframe_property_connection = configuration_registry.RegisterEventHandler (WIREFRAME_PROPERTY_NAME,
+        common::VarRegistryEvent_OnChangeVar, xtl::bind (&ModelerView::OnChangeWireframeMode, this, _1));
+      cull_mode_property_connection = configuration_registry.RegisterEventHandler (CULL_MODE_PROPERTY_NAME,
+        common::VarRegistryEvent_OnChangeVar, xtl::bind (&ModelerView::OnChangeCullMode, this, _1));
     }
 
 ///Целевые буферы рендеринга
@@ -415,19 +452,20 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
         cb = BufferPtr (device.CreateBuffer (cb_desc), false);
       }
 
-      render::low_level::RasterizerDesc rs_desc;
+      if (!rasterizer_state)
+      {
+        render::low_level::RasterizerDesc rs_desc;
 
-      memset (&rs_desc, 0, sizeof (rs_desc));
+        memset (&rs_desc, 0, sizeof (rs_desc));
 
-//      rs_desc.fill_mode  = render::low_level::FillMode_Wireframe;
-//      rs_desc.cull_mode  = render::low_level::CullMode_None;
-      rs_desc.fill_mode  = render::low_level::FillMode_Solid;
-      rs_desc.cull_mode  = render::low_level::CullMode_Front;
-      rs_desc.front_counter_clockwise = true;
+        rs_desc.fill_mode  = wireframe_mode ? render::low_level::FillMode_Wireframe : render::low_level::FillMode_Solid;
+        rs_desc.cull_mode  = cull_mode;
+        rs_desc.front_counter_clockwise = true;
 
-      xtl::com_ptr<render::low_level::IRasterizerState> rasterizer (device.CreateRasterizerState (rs_desc), false);
+        rasterizer_state = RasterizerStatePtr (device.CreateRasterizerState (rs_desc), false);
+      }
 
-      device.RSSetState (rasterizer.get ());
+      device.RSSetState (rasterizer_state.get ());
 
       MyShaderParameters my_shader_parameters;
 
@@ -465,7 +503,42 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
     }
 
   private:
-    typedef xtl::com_ptr<render::mid_level::ILowLevelFrame> FramePtr;
+    void OnChangeWireframeMode (const char* var_name)
+    {
+      stl::string new_wireframe_mode = to_string (configuration_registry.GetValue (var_name));
+
+      if (new_wireframe_mode == "false" || new_wireframe_mode == "0")
+      {
+        if (wireframe_mode)
+        {
+          wireframe_mode   = false;
+          rasterizer_state = 0;
+        }
+      }
+      else
+      {
+        if (!wireframe_mode)
+        {
+          wireframe_mode   = true;
+          rasterizer_state = 0;
+        }
+      }
+    }
+
+    void OnChangeCullMode (const char* var_name)
+    {
+      render::low_level::CullMode new_cull_mode = get_cull_mode (to_string (configuration_registry.GetValue (var_name)).c_str ());
+
+      if (new_cull_mode != cull_mode)
+      {
+        cull_mode = new_cull_mode;
+        rasterizer_state = 0;
+      }
+    }
+
+  private:
+    typedef xtl::com_ptr<render::mid_level::ILowLevelFrame>   FramePtr;
+    typedef xtl::com_ptr<render::low_level::IRasterizerState> RasterizerStatePtr;
 
   private:
     render::mid_level::ILowLevelRenderer* renderer;
@@ -480,6 +553,12 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
     ProgramPtr                            shader;
     ProgramParametersLayoutPtr            program_parameters_layout;
     BufferPtr                             cb;
+    RasterizerStatePtr                    rasterizer_state;
+    common::VarRegistry                   configuration_registry;
+    bool                                  wireframe_mode;
+    xtl::auto_connection                  wireframe_property_connection;
+    render::low_level::CullMode           cull_mode;
+    xtl::auto_connection                  cull_mode_property_connection;
 };
 
 /*
