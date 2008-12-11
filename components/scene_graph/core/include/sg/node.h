@@ -30,7 +30,7 @@ enum NodeBindMode
   NodeBindMode_AddRef,  //при присоединении количество ссылок на родителя увеличивается на 1
   NodeBindMode_WeakRef, //при присоединении количество ссылок на родителя не увеличивается
   
-  NodeBindMode_Default = NodeBindMode_AddRef
+  NodeBindMode_Default = NodeBindMode_WeakRef
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

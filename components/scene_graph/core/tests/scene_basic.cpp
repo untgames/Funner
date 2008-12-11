@@ -57,7 +57,7 @@ int main ()
     entity->RegisterEventHandler (NodeEvent_AfterSceneAttach, &on_scene_attach);
     entity->RegisterEventHandler (NodeEvent_AfterSceneChange, &on_scene_change);
     
-    entity->BindToScene (scene);
+    entity->BindToScene (scene, NodeBindMode_AddRef);
   }
   
   printf ("%u entities in scene\n", scene.EntitiesCount ());
