@@ -135,7 +135,7 @@ define process_target_csassembly
   DIST_DIRS        := $$(DIST_DIRS) $$(dir $$($1.TARGET))  
 
   $$($1.TARGET): $$($1.SOURCE_FILES) $$($1.TARGET_DLLS)
-		@echo Compile $$@...
+		@echo Compile $$(notdir $$@)...
 		@$$(call tools.cscompile,$$@,$$($1.SOURCE_FILES),$$($1.DLLS),$$($1.DLL_DIRS),$$($1.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS))
 
   BUILD.$1: $$($1.TARGET_DLLS) $$($1.TARGET)
