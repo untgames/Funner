@@ -59,6 +59,8 @@ MainForm::MainForm (tools::ui::windows_forms::WindowSystem& window_system)
   try
   {
     form = gcnew MainFormImpl;
+    
+    SetHandle (form);
   }
   catch (System::Exception^ exception)
   {
@@ -71,6 +73,7 @@ MainForm::~MainForm ()
   try
   {
     form = 0;
+    SetHandle (nullptr);
   }
   catch (...)
   {
@@ -101,15 +104,6 @@ void MainForm::Insert (WeifenLuo::WinFormsUI::Docking::DockContent^ sub_form)
   {
     throw DotNetException ("tools::ui::windows_forms::MainForm::Insert", exception);
   }  
-}
-
-/*
-    Получение ref-указателя формы
-*/
-
-System::Windows::Forms::Form^ MainForm::FormHandle ()
-{
-  return form;
 }
 
 /*

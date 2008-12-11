@@ -60,11 +60,6 @@ class ChildForm: public Form
     ChildForm (windows_forms::WindowSystem& window_system, const char* init_string, FormDockState dock_state);
     ChildForm (windows_forms::WindowSystem& window_system, System::Windows::Forms::Control^ child, FormDockState dock_state);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение ref-указателя формы
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    System::Windows::Forms::Form^ FormHandle ();
-
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;

@@ -171,6 +171,8 @@ ChildForm::ChildForm (tools::ui::windows_forms::WindowSystem& window_system, con
 
     impl->form = gcnew CustomWindowForm (window_system, *(impl->child_window));
     
+    SetHandle (impl->form);    
+    
       //установка дока
 
     SetDockState (dock_state);
@@ -204,6 +206,8 @@ ChildForm::ChildForm (windows_forms::WindowSystem& window_system, System::Window
       //создание контейнера
 
     impl->form = gcnew WeifenLuo::WinFormsUI::Docking::DockContent ();
+    
+    SetHandle (impl->form);    
 
     impl->form->Text = child->Name;
     
@@ -235,6 +239,7 @@ ChildForm::ChildForm (windows_forms::WindowSystem& window_system, System::Window
 
 ChildForm::~ChildForm ()
 {
+  SetHandle (nullptr);
 }
 
 /*
@@ -346,15 +351,6 @@ FormDockState ChildForm::DockState ()
   {
     throw DotNetException (METHOD_NAME, exception);
   }  
-}
-
-/*
-    Получение ref-указателя формы
-*/
-
-System::Windows::Forms::Form^ ChildForm::FormHandle ()
-{
-  return impl->form;
 }
 
 /*

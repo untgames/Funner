@@ -338,10 +338,10 @@ void WindowSystem::RegisterInvokers ()
     lib.Register ("LoadConfiguration", make_invoker<void (const char*)> (xtl::bind (&WindowSystem::LoadConfiguration, this, _1)));
     lib.Register ("Execute", make_invoker<void (const char*)> (xtl::bind (&IApplicationServer::ExecuteCommand, &*application_server, _1)));
     lib.Register ("CreateForm", make_invoker (
-      make_invoker<void (const char*, const char*, const char*, FormDockState)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*, const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2, _3, _4)),
-      make_invoker<void (const char*, const char*, FormDockState)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2, _3)),
-      make_invoker<void (const char*, const char*, const char*)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*, const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2, _3, FormDockState_Default)),
-      make_invoker<void (const char*, const char*)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2, FormDockState_Default))
+      make_invoker<ChildForm::Pointer (const char*, const char*, const char*, FormDockState)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*, const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2, _3, _4)),
+      make_invoker<ChildForm::Pointer (const char*, const char*, FormDockState)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2, _3)),
+      make_invoker<ChildForm::Pointer (const char*, const char*, const char*)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*, const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2, _3, FormDockState_Default)),
+      make_invoker<ChildForm::Pointer (const char*, const char*)> (xtl::bind (xtl::implicit_cast<ChildForm::Pointer (WindowSystem::*)(const char*, const char*, FormDockState)> (&WindowSystem::CreateChildForm), this, _1, _2, FormDockState_Default))
     ));
     lib.Register ("LoadPlugins",   make_invoker<void (const char*)> (xtl::bind (&PluginManager::LoadPlugins,   &plugin_manager, _1)));
     lib.Register ("UnloadPlugins", make_invoker<void (const char*)> (xtl::bind (&PluginManager::UnloadPlugins, &plugin_manager, _1)));
