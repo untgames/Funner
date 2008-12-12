@@ -38,6 +38,9 @@ const char*  MODEL_REGISTRY_NAME                 = "ApplicationServer.Properties
 const char*  MODEL_FILE_NAME                     = "model.xmodel";
 const char*  OLD_FORMAT_MODEL_FILE_NAME          = "model.dat";
 const char*  CONDOR_CONFIG_FILE_NAME             = "condor.cfg";
+const char*  BATCH_TRAJECTORY_NU_FILE_FOLDER     = "condor_input_files";
+const char*  BATCH_TRAJECTORY_NU_FILE_BASE_NAME  = "nu";
+const char*  BATCH_TRAJECTORY_NU_FILE_SUFFIX     = ".dat";
 const char*  BATCH_TRAJECTORY_LOG_FILE_NAME      = "batch_trajectory.log";
 const char*  BATCH_TRAJECTORIES_COORDS_FILE_NAME = "trajecories_coords.bintrjc";
 const size_t DEFAULT_ENVELOPE_LOD                = 200;
@@ -530,34 +533,8 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
   {
     common::Console::Printf ("Calculating %u trajectories with Condor...\n", coords_count);
 
-    stl::string condor_config_file_name = common::format ("%s%s", project_path.c_str (), CONDOR_CONFIG_FILE_NAME);
-
-    FILE* condor_config_file = fopen (condor_config_file_name.c_str (), "w");
-
-    if (!condor_config_file)
-      throw xtl::format_operation_exception ("Can't open condor config file '%s'\n", condor_config_file_name.c_str ());
-
-    fprintf (condor_config_file, "Executable = %s\\%s.$$(OpSys).$$(Arch)\n", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME);
-    fprintf (condor_config_file, "Log = %s%s\n", project_path.c_str (), BATCH_TRAJECTORY_LOG_FILE_NAME);
-    fprintf (condor_config_file, "Arguments = file-input %s $(Process) %s batch_trajectory.$(Process).xmesh %u\n",
-             BATCH_TRAJECTORIES_COORDS_FILE_NAME, OLD_FORMAT_MODEL_FILE_NAME, lod);
-//    fprintf (condor_config_file, "output = %sbatch_trajectory.$(Process).xmesh.output\n", project_path.c_str ());
-    fprintf (condor_config_file, "transfer_input_files = %s%s, %s%s\n", project_path.c_str (),
-             BATCH_TRAJECTORIES_COORDS_FILE_NAME, project_path.c_str (), OLD_FORMAT_MODEL_FILE_NAME);
-    fprintf (condor_config_file, "Universe = Vanilla\n");
-    fprintf (condor_config_file, "Requirements = %s\n", condor_trajectory_requirements.c_str ());
-    fprintf (condor_config_file, "Rank = kflops\n");
-    fprintf (condor_config_file, "should_transfer_files = YES\n");
-    fprintf (condor_config_file, "when_to_transfer_output = ON_EXIT\n");
-    fprintf (condor_config_file, "Queue %u\n", coords_count);
-
-    fclose (condor_config_file);
-
-    stl::string application_name = common::format ("%s%s", condor_path.c_str (), CONDOR_SUBMIT_APPLICATION_NAME);
-
-    if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), condor_config_file_name.c_str (), 0) == -1)
-      throw xtl::format_operation_exception ("MyApplicationServer::OnNewTrajectoriesCoords",
-                                             "Can't call %s: %s", CONDOR_SUBMIT_APPLICATION_NAME, get_spawn_error_name ());
+    if (!common::FileSystem::IsDir (BATCH_TRAJECTORY_NU_FILE_FOLDER)) //????Очищать папку по завершении рассчётов
+      common::FileSystem::Mkdir (BATCH_TRAJECTORY_NU_FILE_FOLDER);
 
     for (size_t i = 0; i < coords_count; i++)
     {
@@ -572,7 +549,48 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
       condor_trajectories_names[waited_file_name.c_str ()] = common::format ("%strajectory_%f_%f_%f.xmesh.desc", project_path.c_str (), nu1, nu2, nu3);
 
       WaitForFile (waited_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewCondorBatchTrajectory, this, _1));
+
+      stl::string nu_file_name = common::format ("%s\\%s.%d%s", BATCH_TRAJECTORY_NU_FILE_FOLDER, BATCH_TRAJECTORY_NU_FILE_BASE_NAME, i,
+                                                 BATCH_TRAJECTORY_NU_FILE_SUFFIX);
+
+      //????Добавить обработку ошибок сохранения файла
+
+      FILE* nu_file = fopen (nu_file_name.c_str (), "w");
+
+      fprintf (nu_file, "%f %f %f", nu1, nu2, nu3);
+
+      fclose (nu_file);
     }
+
+    stl::string condor_config_file_name = common::format ("%s%s", project_path.c_str (), CONDOR_CONFIG_FILE_NAME);
+
+    FILE* condor_config_file = fopen (condor_config_file_name.c_str (), "w");
+
+    if (!condor_config_file)
+      throw xtl::format_operation_exception ("Can't open condor config file '%s'\n", condor_config_file_name.c_str ());
+
+    fprintf (condor_config_file, "Executable = %s\\%s.$$(OpSys).$$(Arch)\n", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME);
+    fprintf (condor_config_file, "Log = %s%s\n", project_path.c_str (), BATCH_TRAJECTORY_LOG_FILE_NAME);
+    fprintf (condor_config_file, "Arguments = text-file-input %s.$(Process)%s %s batch_trajectory.$(Process).xmesh %u\n",
+        BATCH_TRAJECTORY_NU_FILE_BASE_NAME, BATCH_TRAJECTORY_NU_FILE_SUFFIX, OLD_FORMAT_MODEL_FILE_NAME, lod);
+//    fprintf (condor_config_file, "output = %sbatch_trajectory.$(Process).xmesh.output\n", project_path.c_str ());
+    fprintf (condor_config_file, "transfer_input_files = %s%s, %s%s, %s\\%s.$(Process)%s\n", project_path.c_str (),
+             BATCH_TRAJECTORIES_COORDS_FILE_NAME, project_path.c_str (), OLD_FORMAT_MODEL_FILE_NAME, BATCH_TRAJECTORY_NU_FILE_FOLDER,
+             BATCH_TRAJECTORY_NU_FILE_BASE_NAME, BATCH_TRAJECTORY_NU_FILE_SUFFIX);
+    fprintf (condor_config_file, "Universe = Vanilla\n");
+    fprintf (condor_config_file, "Requirements = %s && Disk >= %d\n", condor_trajectory_requirements.c_str (), (int)(lod * 2.f * 45.f / 1024.f + 1));
+    fprintf (condor_config_file, "Rank = kflops\n");
+    fprintf (condor_config_file, "should_transfer_files = YES\n");
+    fprintf (condor_config_file, "when_to_transfer_output = ON_EXIT\n");
+    fprintf (condor_config_file, "Queue %u\n", coords_count);
+
+    fclose (condor_config_file);
+
+    stl::string application_name = common::format ("%s%s", condor_path.c_str (), CONDOR_SUBMIT_APPLICATION_NAME);
+
+    if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), condor_config_file_name.c_str (), 0) == -1)
+      throw xtl::format_operation_exception ("MyApplicationServer::OnNewTrajectoriesCoords",
+                                             "Can't call %s: %s", CONDOR_SUBMIT_APPLICATION_NAME, get_spawn_error_name ());
   }
 }
 

@@ -105,12 +105,13 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
 
 int main (int argc, char* argv[])
 {
-  if ((argc != 7) && (argc != 8))
+  if ((argc < 6) || (argc > 8))
   {
     printf ("Usage: modeler-trajectory mode args\n");
     printf ("  'mode' values:\n");
     printf ("    'args-input': 'args' = nu1 nu2 nu3 model_data_file result_file vertices_count\n");
-    printf ("    'file-input': 'args' = nu_file nu_index model_data_file result_file vertices_count\n");
+    printf ("    'bin-file-input': 'args' = nu_file nu_index model_data_file result_file vertices_count\n");
+    printf ("    'text-file-input': 'args' = nu_file model_data_file result_file vertices_count\n");
     return 1;
   }
 
@@ -125,7 +126,7 @@ int main (int argc, char* argv[])
     nu[2] = (float)atof (argv[4]);
     optional_parameters_count = 3;
   }
-  else if (!strcmp (argv[1], "file-input"))
+  else if (!strcmp (argv[1], "bin-file-input"))
   {
     FILE* nu_file = fopen (argv[2], "rb");
 
@@ -173,6 +174,28 @@ int main (int argc, char* argv[])
     fclose (nu_file);
 
     optional_parameters_count = 2;
+  }
+  else if (!strcmp (argv[1], "text-file-input"))
+  {
+    FILE* nu_file = fopen (argv[2], "r");
+
+    if (!nu_file)
+    {
+      printf ("Can't open nu file '%s'\n", argv[2]);
+      save_desc_file (argv[4], 0);
+      return 1;
+    }
+
+    if (fscanf (nu_file, "%f %f %f", &nu[0], &nu[1], &nu[2]) != 3)
+    {
+      printf ("Incorrect nu file '%s' format, must be: float float float.\n", argv[2]);
+      save_desc_file (argv[4], 0);
+      return 1;
+    }
+
+    fclose (nu_file);
+
+    optional_parameters_count = 1;
   }
   else
   {
