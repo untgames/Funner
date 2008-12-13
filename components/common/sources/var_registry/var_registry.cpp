@@ -161,7 +161,14 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
   private:
     void LoadDefaultComponents ()
     {
-      static ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
+      static bool is_loaded = false;
+
+      if (!is_loaded)
+      {
+        is_loaded = true;
+
+        static ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
+      }
     }
 
 ///Поиск точки монтирования по имени
