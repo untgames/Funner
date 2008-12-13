@@ -208,16 +208,21 @@ define process_source_dir
     $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES:%=$2/%))
   else
     $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES_SUFFIXES:%=$2/*.%))
+  endif  
+  
+  $$(MODULE_NAME).SOURCE_DIR := $2
+  $$(MODULE_NAME).TMP_DIR    := $$($1.TMP_DIR)/$$(MODULE_PATH)
+  $1.TMP_DIRS                := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)
+
+  ifneq (,$$($$(MODULE_NAME).SOURCE_FILES))
+    $$(MODULE_NAME).OBJECT_FILES := $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%$(OBJ_SUFFIX),$$(notdir $$(basename $$($$(MODULE_NAME).SOURCE_FILES))))
+    $$(MODULE_NAME).PCH          := $$(if $$(wildcard $2/$(PCH_SHORT_NAME)),$(PCH_SHORT_NAME))
+    $1.OBJECT_FILES              := $$($1.OBJECT_FILES) $$($$(MODULE_NAME).OBJECT_FILES)    
+    
+    $$(eval $$(call batch-compile,$1,$$(MODULE_NAME)))
   endif
 
-  $$(MODULE_NAME).SOURCE_DIR   := $2
-  $$(MODULE_NAME).TMP_DIR      := $$($1.TMP_DIR)/$$(MODULE_PATH)
-  $$(MODULE_NAME).OBJECT_FILES := $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%$(OBJ_SUFFIX),$$(notdir $$(basename $$($$(MODULE_NAME).SOURCE_FILES))))
-  $$(MODULE_NAME).PCH          := $$(if $$(wildcard $2/$(PCH_SHORT_NAME)),$(PCH_SHORT_NAME))
-  $1.TMP_DIRS                  := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)
-  $1.OBJECT_FILES              := $$($1.OBJECT_FILES) $$($$(MODULE_NAME).OBJECT_FILES)  
-
-  $$(foreach macros,batch-compile $3,$$(eval $$(call $$(macros),$1,$$(MODULE_NAME))))
+  $$(foreach macros,$3,$$(eval $$(call $$(macros),$1,$$(MODULE_NAME))))
 endef
 
 #Создание зависимости для копирования внешних файлов (имя внешнего файла, каталоги поиска)
@@ -360,10 +365,15 @@ define process_tests_source_dir
   $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%$(EXE_SUFFIX)
 		@echo Running $$(notdir $$<)...
 		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
+		
+#Правило получения файла-результата тестирования по shell-файлу
+  $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh
+		@echo Running $$(notdir $$<)...
+		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.TMP_DIR)/%$(EXE_SUFFIX)),$$^)),$$$$file)
+		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.SOURCE_DIR)/%.sh),$$(wildcard $$($2.SOURCE_DIR)/*.sh)) $$(filter $$(files:%=$$($2.TMP_DIR)/%$(EXE_SUFFIX)),$$^)),$$$$file)
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
@@ -504,14 +514,17 @@ all: build check
 run: build
 build: create-dirs
 rebuild: clean build
-#test: build
-#check: build
+test: build
+check: build
 export-dirs: create-dirs
 #dist: check
 dist : export-dirs
 force:
 
 .PHONY: build rebuild clean fullyclean run test check help create-dirs force dump export-dirs dist tar-dist
+
+#Специализация списка целей (в зависимости от профиля)
+$(foreach profile,$(PROFILES),$(eval TARGETS := $$(TARGETS) $$(TARGETS.$$(profile))))  
 
 #Обработка целей компонента
 $(foreach target,$(filter $(targets),$(TARGETS)),$(eval $(call test_target_type,$(target))))
