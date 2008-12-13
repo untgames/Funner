@@ -12,7 +12,7 @@ class DefaultConsoleHandlerComponent
   public:
     DefaultConsoleHandlerComponent ()
     {
-      event_connection = common::Console::RegisterEventHandler (xtl::bind (&DefaultConsoleHandlerComponent::EventHandler, this, _1));
+      event_connection = common::Console::RegisterEventHandler (common::ConsoleEvent_OnPrint, xtl::bind (&DefaultConsoleHandlerComponent::EventHandler, this, _1));
     }
 
   private:

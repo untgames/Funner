@@ -1,5 +1,13 @@
 Results of console test:
-Console handler - new message: Console::Print message
 Console::Print message
-Console handler - new message: Console::Printf arg1=42 arg2='arg2'
+new line: 'Console::Print message'
 Console::Printf arg1=42 arg2='arg2'
+new line: 'Console::Printf arg1=42 arg2='arg2''
+Yet one console message
+new line: 'Yet one console message'
+Console has 2 messages:
+  'Console::Printf arg1=42 arg2='arg2''
+  'Yet one console message'
+0123456789
+new line: '0123456789'
+Console has 0 messages:
