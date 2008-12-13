@@ -104,10 +104,10 @@ void idle (TestApplication& app, TestScene& scene)
 {
   try
   {
-    static clock_t last_frame_update = 0,
-                   last_pos_update = 0;
+    static size_t last_frame_update = 0,
+                  last_pos_update = 0;
 
-    if (clock () - last_pos_update >= CLK_TCK / 25)
+    if (common::milliseconds () - last_pos_update >= 40)
     {
       if (scene.particle_system.frames.empty ())
         return;
@@ -127,10 +127,10 @@ void idle (TestApplication& app, TestScene& scene)
       if (scene.current_particle_frame >= scene.particle_system.frames.size ())
         scene.current_particle_frame = 0;
 
-      last_pos_update = clock ();
+      last_pos_update = common::milliseconds ();
     }
 
-    if (clock () - last_frame_update >= CLK_TCK / 20)
+    if (common::milliseconds () - last_frame_update >= 50)
     {
       SpriteModel::SpriteDesc* sprite         = scene.sprite_list->Sprites ();
       size_t                   sprites_count  = scene.sprite_list->SpritesCount ();
@@ -140,7 +140,7 @@ void idle (TestApplication& app, TestScene& scene)
 
       scene.sprite_list->Invalidate ();
 
-      last_frame_update = clock ();
+      last_frame_update = common::milliseconds ();
     }
 
     app.PostRedraw ();
