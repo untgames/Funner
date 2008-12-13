@@ -111,9 +111,7 @@ class TrajectoryBuilder
         nu2 (in_nu2),
         nu3 (in_nu3)
     {
-      MaxSize = 900000; //?????
-
-      CurSize = elmnts = 0;
+      current_size = 0;
 
       mlen = model_data.len;
 
@@ -136,7 +134,7 @@ class TrajectoryBuilder
 
       ind = 200;
 
-      point3d.resize (MaxSize);
+      point3d.resize (vertices_count + 8);
 
       Array_y_z ();
 
@@ -145,19 +143,19 @@ class TrajectoryBuilder
       if (!print_step)
         print_step++;
 
-      size_t current_size = -1;
+      size_t current_points = -1;
       size_t constant_size_interval = 0;
 
-      for (size_t i = 0; CurSize < vertices_count; i++)
+      for (size_t i = 0; current_size < vertices_count; i++)
       {
         if (!(i % print_step))
-          printf ("\rProgress: %.2f%%", (float)CurSize / vertices_count * 100.f);
+          printf ("\rProgress: %.2f%%", (float)current_size / vertices_count * 100.f);
 
         DoIterEx ();
 
-        if (current_size != CurSize)
+        if (current_points != current_size)
         {
-          current_size           = CurSize;
+          current_points         = current_size;
           constant_size_interval = 0;
         }
         else
@@ -175,11 +173,9 @@ class TrajectoryBuilder
 
     void Convert (DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
     {
-      out_vertices.reserve (CurSize * 2);
+      out_vertices.reserve (current_size * 2);
 
-      size_t first = 0;
-
-      for (size_t i=0; i < CurSize; i++)
+      for (size_t i=0; i < current_size; i++)
       {
         DrawVertex   line_start, line_end;
 
@@ -283,7 +279,8 @@ class TrajectoryBuilder
 
     void BuildPoint (size_t i, float& fb, float& fa, int& ii, double maximum_moment_of_inertia, double koef, bool sign)
     {
-      elmnts %= MaxSize; //??????
+      if (current_size >= point3d.size ())
+        return;
 
       fb = fa;
 
@@ -337,46 +334,36 @@ class TrajectoryBuilder
         dd2[1] = (float)(dm * (y[1][i - 1] * fa - y[1][i] * fb) / (fa - fb));
         dd2[2] = (float)(dm * (y[2][i - 1] * fa - y[2][i] * fb) / (fa - fb));
 
-        memcpy (&point3d[elmnts].pnts,  dd,  sizeof (dd));
-        memcpy (&point3d[elmnts].pnts2, dd2, sizeof (dd2));
-        memcpy (&point3d[elmnts].rgb,   dot_color,  sizeof (dot_color));
+        memcpy (&point3d[current_size].pnts,  dd,  sizeof (dd));
+        memcpy (&point3d[current_size].pnts2, dd2, sizeof (dd2));
+        memcpy (&point3d[current_size].rgb,   dot_color,  sizeof (dot_color));
 
-        point3d[elmnts].side = koef > 1;
-        point3d[elmnts].nu1  = nu1;
-        point3d[elmnts].nu3  = nu3;
+        point3d[current_size].side = koef > 1;
+        point3d[current_size].nu1  = nu1;
+        point3d[current_size].nu3  = nu3;
 
-        point3d[elmnts].envelope_side = ii > 0;
+        point3d[current_size].envelope_side = ii > 0;
 
-        if (MaxSize > CurSize)
-        {
-          CurSize++;
-        }
+        current_size++;
 
-        elmnts++;
+        memcpy (&point3d[current_size].pnts,  dd,  sizeof (dd));
+        memcpy (&point3d[current_size].pnts2, dd2, sizeof (dd2));
+        memcpy (&point3d[current_size].rgb,   dot_color,  sizeof (dot_color));
 
-        memcpy (&point3d[elmnts].pnts,  dd,  sizeof (dd));
-        memcpy (&point3d[elmnts].pnts2, dd2, sizeof (dd2));
-        memcpy (&point3d[elmnts].rgb,   dot_color,  sizeof (dot_color));
-
-        point3d[elmnts].pnts[1]  *= -1;
-        point3d[elmnts].pnts2[1] *= -1;
+        point3d[current_size].pnts[1]  *= -1;
+        point3d[current_size].pnts2[1] *= -1;
 
         if (sign)
-          point3d[elmnts].side = koef < 1;
+          point3d[current_size].side = koef < 1;
         else
-          point3d[elmnts].side = koef > 1;
+          point3d[current_size].side = koef > 1;
 
-        point3d[elmnts].nu1  = nu1;
-        point3d[elmnts].nu3  = nu3;
+        point3d[current_size].nu1  = nu1;
+        point3d[current_size].nu3  = nu3;
 
-        point3d[elmnts].envelope_side = ii > 0;
+        point3d[current_size].envelope_side = ii > 0;
 
-        if (MaxSize > CurSize)
-        {
-          CurSize++;
-        }
-
-        elmnts++;
+        current_size++;
       }
     }
 
@@ -589,8 +576,7 @@ class TrajectoryBuilder
     ModelData            model_data;
     double               nu1, nu2, nu3;
     double               xx[201], y[7][201], z[3][201];
-    size_t               elmnts;
-    size_t               MaxSize, CurSize;
+    size_t               current_size;                      //текущее количество рассчитанных точек
     int                  ind;
     int                  nit;
     double               dm;
