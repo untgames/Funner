@@ -26,8 +26,8 @@
     BackgroundColor="0;0;0;255" 
     ForegroundColor="255;255;255;255" 
     HistoryCapacity="64"
-    OutputCutThreshold="256" 
-    OutputCutTo="196"
+    OutputCutThreshold="2048" 
+    OutputCutTo="1024"
   />
   <Plugin Name="PropertyGrid">  <!-- init_string - имя_карты префикс_реестра -->
     <ListBox Name="List1">

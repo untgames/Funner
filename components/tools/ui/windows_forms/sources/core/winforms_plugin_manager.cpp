@@ -239,6 +239,11 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
                                                "Can't register listener, this listener already registered");
 
       output_listeners.Add (listener);
+      
+      for (size_t i=0; i<common::Console::LinesCount (); i++)
+      {
+        listener->OnMessage (gcnew String (common::Console::Message (i)));
+      }
     }
 
     virtual void UnregisterOutputListener (IOutputListener^ listener)
@@ -365,7 +370,7 @@ struct PluginManager::Impl
   Impl (WindowSystem* in_window_system)
     : window_system (in_window_system), log (LOG_NAME)
   {
-    console_connection = common::Console::RegisterEventHandler (xtl::bind (&PluginManager::Impl::ConsoleHandler, this, _1));
+    console_connection = common::Console::RegisterEventHandler (common::ConsoleEvent_OnPrint, xtl::bind (&PluginManager::Impl::ConsoleHandler, this, _1));
   }
 
   void ConsoleHandler (const char* message)
