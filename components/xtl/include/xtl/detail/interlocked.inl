@@ -38,7 +38,7 @@
   {
     for (;;)
     {
-      long tmp = static_cast <const volatile long&> (rc);
+      long tmp = *(const volatile long*)&rc;
       
       if (tmp == 0)
         return tmp;
@@ -52,7 +52,7 @@
   {
     for (;;)
     {
-      long tmp = static_cast <const volatile long&> (rc);
+      long tmp = *(const volatile long*)&rc;
       
       if (tmp == 0)
         return tmp;

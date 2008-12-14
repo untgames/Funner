@@ -44,7 +44,7 @@ class shared_counter
 
     bool add_ref_lock() // true on success
     {
-      return atomic_conditional_increment (use_counter) != 0; ////!?!?!?!?!?!
+      return atomic_conditional_increment (use_counter) != 0;
     }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ class shared_counter
 
     long use_count () const
     {
-      return static_cast<const volatile long&> (use_counter);
+      return *(const volatile long*)&use_counter;
     }
     
   private:
