@@ -105,9 +105,9 @@ struct Test
   {
     try
     {
-      static clock_t last_update = 0;
+      static size_t last_update = 0;
 
-      if (clock () - last_update >= CLK_TCK / 25)
+      if (common::milliseconds () - last_update >= 40)
       {
         SpriteModel::SpriteDesc* sprite        = sprite_list->Sprites ();
         size_t                   sprites_count = sprite_list->SpritesCount ();
@@ -119,7 +119,7 @@ struct Test
 
         this->sprite->Rotate (1, 0, 0, 1);
 
-        last_update = clock ();
+        last_update = common::milliseconds ();
       }
 
       application.PostRedraw ();
