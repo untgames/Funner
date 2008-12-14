@@ -153,6 +153,7 @@ MyApplicationServer::MyApplicationServer ()
   osx_plugin_path   = common::get<const char*> (*iter, "MacOSXPluginPath", "");
   condor_path       = common::get<const char*> (*iter, "CondorPath", "");
   use_condor        = common::get<bool>        (*iter, "UseCondor", true);
+  author            = common::get<const char*> (*iter, "Author", "Неизвестный автор");
 
   if (use_condor)
     CreateCondorBinaries ();
@@ -292,6 +293,9 @@ void MyApplicationServer::Cleanup ()
 
   stl::string desc_to_delete_mask = project_path + "*.*desc";
   remove_files (desc_to_delete_mask.c_str ());
+
+  stl::string bintrjc_to_delete_mask = project_path + "*.*bintrjc";
+  remove_files (bintrjc_to_delete_mask.c_str ());
 }
 
 void MyApplicationServer::LoadTrajectory (const char* file_name)
@@ -536,6 +540,9 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
     if (!common::FileSystem::IsDir (BATCH_TRAJECTORY_NU_FILE_FOLDER)) //????Очищать папку по завершении рассчётов
       common::FileSystem::Mkdir (BATCH_TRAJECTORY_NU_FILE_FOLDER);
 
+    stl::string log_to_delete_mask = project_path + BATCH_TRAJECTORY_LOG_FILE_NAME;
+    remove_files (log_to_delete_mask.c_str ());
+
     for (size_t i = 0; i < coords_count; i++)
     {
       float nu1, nu2, nu3;
@@ -760,7 +767,7 @@ void MyApplicationServer::SaveModel ()
     common::XmlWriter::Scope root_scope (writer, "Model");
 
     writer.WriteAttribute ("ini", ini);
-    writer.WriteAttribute ("Author", to_string (model_registry.GetValue ("Author")).c_str ());
+    writer.WriteAttribute ("Author", author.c_str ());
     writer.WriteAttribute ("Description", to_string (model_registry.GetValue ("Description")).c_str ());
 
     {

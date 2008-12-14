@@ -223,6 +223,7 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     stl::string                       condor_path;
     bool                              use_condor;
     CondorTrajectoriesNames           condor_trajectories_names;
+    stl::string                       author;
 };
 
 //проверка ошибок
