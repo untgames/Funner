@@ -2,7 +2,9 @@
 #define XTL_REFERENCE_COUNTER_HEADER
 
 #include <cstddef>
+
 #include <xtl/checked_delete.h>
+#include <xtl/interlocked.h>
 
 namespace xtl
 {
@@ -11,7 +13,7 @@ namespace reference_counter_namespace //дл€ защиты от ADL
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///—чЄтчик ссылок
+///—чЄтчик ссылок (multithread-safely)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class reference_counter
 {
@@ -35,15 +37,13 @@ class reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool empty () const;
 
-    operator safe_bool () const { return counter != 0 ? &reference_counter::empty : 0; }
+    operator safe_bool () const { return use_count () ? &reference_counter::empty : 0; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”величение / уменьшение количества ссылок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    reference_counter& operator ++ ();
-    reference_counter  operator ++ (int);
-    reference_counter& operator -- ();
-    reference_counter  operator -- (int);
+    void increment ();
+    bool decrement (); //возвращает true, если counter стал равен нулю
 
   private:
     size_t counter;
@@ -66,6 +66,12 @@ template <class T> void intrusive_ptr_add_ref (T*);
 template <class T> void intrusive_ptr_release (T*);
 
 #include <xtl/detail/reference_counter.inl>
+
+#ifdef XTL_HAS_INTERLOCKED
+  #include <xtl/detail/reference_counter_interlocked.inl>
+#else
+  #include <xtl/detail/reference_counter_nothreads.inl>
+#endif
 
 }
 

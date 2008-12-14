@@ -30,45 +30,7 @@ inline size_t reference_counter::use_count () const
 
 inline bool reference_counter::empty () const
 {
-  return counter == 0;
-}
-
-/*
-    Увеличение / уменьшение количества ссылок
-*/
-
-inline reference_counter& reference_counter::operator ++ ()
-{
-  if (counter)
-    counter++;
-
-  return *this;
-}
-
-inline reference_counter reference_counter::operator ++ (int)
-{
-  reference_counter tmp (counter);
-  
-  ++(*this);
- 
-  return tmp;
-}
-
-inline reference_counter& reference_counter::operator -- ()
-{
-  if (counter)
-    counter--;
-
-  return *this;
-}
-
-inline reference_counter reference_counter::operator -- (int)
-{
-  reference_counter tmp (counter);
-
-  --(*this);
- 
-  return tmp;
+  return use_count () == 0;
 }
 
 /*
@@ -77,18 +39,18 @@ inline reference_counter reference_counter::operator -- (int)
 
 inline void addref (reference_counter& rc)
 {  
-  ++rc;
+  rc.increment ();
 }
 
 inline void addref (reference_counter* rc)
-{
+{ 
   addref (*rc);
 }
 
 template <class Fn>
 inline void release (reference_counter& rc, Fn fn)
 {
-  if (rc && !--rc)
+  if (rc.decrement ())
     fn ();
 }
 
@@ -103,7 +65,7 @@ inline void release (const Ptr& ptr)
 {
   reference_counter& rc = *ptr;
 
-  if (rc && !--rc)
+  if (rc.decrement ())
     checked_delete (ptr);
 }
 
@@ -112,7 +74,7 @@ inline void release (const Ptr& ptr, Deleter deleter)
 {
   reference_counter& rc = *ptr;
 
-  if (rc && !--rc)
+  if (rc.decrement ())
     deleter (ptr);
 }
 

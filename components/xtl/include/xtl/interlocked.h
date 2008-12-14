@@ -1,36 +1,28 @@
 #ifndef XTL_INTERLOCKED_API_HEADER
 #define XTL_INTERLOCKED_API_HEADER
 
+#if defined (WIN32) || defined (_WIN32) || defined (__WIN32__) || defined (__GNUC__) && (defined( __i386__) || defined (__x86_64__))
+  #define XTL_HAS_INTERLOCKED
+#endif
+
 /*
-    Функции для поддержки многопоточного shared_ptr
+    Функции для поддержки многопоточного подсчёта ссылок
 */
 
-#ifdef _MSC_VER
+namespace xtl
+{
 
-extern "C" long __cdecl _InterlockedIncrement       (volatile long*);
-extern "C" long __cdecl _InterlockedDecrement       (volatile long*);
-extern "C" long __cdecl _InterlockedCompareExchange (volatile long*, long, long);
+#ifdef XTL_HAS_INTERLOCKED
 
-#pragma intrinsic (_InterlockedIncrement)
-#pragma intrinsic (_InterlockedDecrement)
-#pragma intrinsic (_InterlockedCompareExchange)
+int atomic_increment             (volatile int& rc); //int r = rc; ++rc; return r;
+int atomic_decrement             (volatile int& rc); //int r = rc; --rc; return r;
+int atomic_conditional_increment (volatile int& rc); //int r = rc; if (r) ++rc; return r;
+int atomic_conditional_decrement (volatile int& rc); //int r = rc; if (r) --rc; return r;
 
-#define XTL_INTERLOCKED_INCREMENT        _InterlockedIncrement
-#define XTL_INTERLOCKED_DECREMENT        _InterlockedDecrement
-#define XTL_INTERLOCKED_COMPARE_EXCHANGE _InterlockedCompareExchange
+#include <xtl/detail/interlocked.inl>
 
-#elif defined (WIN32) || defined (_WIN32) || defined (__WIN32__)
-
-extern "C" __declspec (dllimport) long __stdcall InterlockedIncrement       (volatile long*);
-extern "C" __declspec (dllimport) long __stdcall InterlockedDecrement       (volatile long*);
-extern "C" __declspec (dllimport) long __stdcall InterlockedCompareExchange (volatile long*, long, long);
-
-#define XTL_INTERLOCKED_INCREMENT        InterlockedIncrement
-#define XTL_INTERLOCKED_DECREMENT        InterlockedDecrement
-#define XTL_INTERLOCKED_COMPARE_EXCHANGE InterlockedCompareExchange
-
-#else
-  #error "Interlocked intrinsics not available"
 #endif
+
+}
 
 #endif

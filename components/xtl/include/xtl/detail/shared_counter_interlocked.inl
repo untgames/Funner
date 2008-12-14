@@ -30,12 +30,12 @@ class shared_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void add_ref_copy ()
     {
-      XTL_INTERLOCKED_INCREMENT (&use_counter);
+      atomic_increment (use_counter);
     }
     
     void release ()
     {
-      if (XTL_INTERLOCKED_DECREMENT (&use_counter) == 0)
+      if (atomic_decrement (use_counter) == 1)
       {
         dispose      ();
         weak_release ();
@@ -44,16 +44,7 @@ class shared_counter
 
     bool add_ref_lock() // true on success
     {
-      for( ;; )
-      {
-        long tmp = static_cast <const volatile long&> (use_counter);
-        
-        if (tmp == 0)
-          return false;
-
-        if (XTL_INTERLOCKED_COMPARE_EXCHANGE (&use_counter, tmp + 1, tmp) == tmp)
-          return true;
-      }
+      return atomic_conditional_increment (use_counter) != 0; ////!?!?!?!?!?!
     }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,12 +52,12 @@ class shared_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     void weak_add_ref ()
     {
-      XTL_INTERLOCKED_INCREMENT (&weak_counter);
+      atomic_increment (weak_counter);
     }
 
     void weak_release ()
     {
-      if (XTL_INTERLOCKED_DECREMENT (&weak_counter) == 0)
+      if (atomic_decrement (weak_counter) == 1)
         destroy ();
     }
 
@@ -76,8 +67,8 @@ class shared_counter
     }
     
   private:
-    long use_counter;
-    long weak_counter;
+    int use_counter;
+    int weak_counter;
 };
 
 }
