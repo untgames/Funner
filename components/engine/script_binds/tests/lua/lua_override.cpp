@@ -9,18 +9,18 @@ void console_handler (const char* message)
 
 int main ()
 {
-  common::Console::RegisterEventHandler (&console_handler);
+  common::Console::RegisterEventHandler (common::ConsoleEvent_OnPrintLine, &console_handler);
 
   printf ("Results of lua_override_test:\n");
-  
+
   try
   {
     xtl::shared_ptr<Environment> env (new Environment);
-    
+
     Shell shell ("lua", env);
 
-    xtl::com_ptr<IInterpreter> script (shell.Interpreter ());                
-    
+    xtl::com_ptr<IInterpreter> script (shell.Interpreter ());
+
     env->BindLibraries ("LuaOverride");
 
     load_script (*script, SCRIPT_FILE_NAME);
@@ -30,7 +30,7 @@ int main ()
   catch (xtl::bad_any_cast& exception)
   {
     printf ("%s: %s -> %s\n", exception.what (), exception.source_type ().name (), exception.target_type ().name ());
-  }    
+  }
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());

@@ -9,7 +9,7 @@ void console_handler (const char* message)
 
 int main ()
 {
-  common::Console::RegisterEventHandler (&console_handler);
+  common::Console::RegisterEventHandler (common::ConsoleEvent_OnPrintLine, &console_handler);
 
   printf ("Results of media_rms_test:\n");
 
