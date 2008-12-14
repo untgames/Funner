@@ -17,9 +17,9 @@
   />
   <Plugin Name="PropertyGrid">
     <ListBox Name="CullModeList">
-    		<Item Name="None" Value="None" />
-    		<Item Name="Back" Value="Back" />
-    		<Item Name="Front" Value="Front" />
+    		<Item Name="Не отсекать" Value="None" />
+    		<Item Name="Отсекать задние" Value="Back" />
+    		<Item Name="Отсекать передние" Value="Front" />
         </ListBox><PropertyMap Name="Model">
       <Property Name="A" VarName="Model.A" Category="Моменты инерции" Type="double"/>
       <Property Name="B" VarName="Model.B" Category="Моменты инерции" Type="double"/>
@@ -33,10 +33,10 @@
       <Property Name="Описание" VarName="Model.Description" Category="Разное" Type="string"/></PropertyMap>
     <PropertyMap Name="Render" Inherit="Model">
     	
-        <Property Name="Wireframe rendering" VarName="Render.Wireframe"
+        <Property Name="Каркасная растеризация" VarName="Render.Wireframe"
     		Category="Рендер" Type="bool">
     	</Property>
-    	<Property Name="Cull Mode" VarName="Render.CullMode"
+    	<Property Name="Режим отсечения" VarName="Render.CullMode"
     		Category="Рендер" Type="list" ListBox="CullModeList">
     	</Property>
     </PropertyMap>

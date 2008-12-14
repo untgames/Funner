@@ -1,3 +1,3 @@
 <?xml version="1.0" encoding = "Cp1251"?>
-<Configuration Wireframe="1" CullMode="None">
+<Configuration Wireframe="0" CullMode="Front">
 </Configuration>

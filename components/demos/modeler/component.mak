@@ -26,6 +26,7 @@ DEMOS.MODELER.VISUALIZER.SOURCE_DIRS   := sources/visualizer
 DEMOS.MODELER.VISUALIZER.EXECUTION_DIR := .
 DEMOS.MODELER.VISUALIZER.LINK_INCLUDES := ModelerRender
 DEMOS.MODELER.VISUALIZER.IMPORTS       := ../../system/compile.static.mak ../../system/link.static.mak \
+                                          ../../common/default_console_handler.link.static.mak \
                                           ../../render/opengl_driver/link.static.mak \
                                           ../../render/scene_render/compile.static.mak \
                                           ../../render/mid_level_window_driver/compile.static.mak ../../render/low_level/compile.static.mak \

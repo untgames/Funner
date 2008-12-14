@@ -6,7 +6,7 @@
 #include <vector>
 #include <algorithm>
 
-const float POINT_EQUAL_EPSILON = 0.001;
+const float POINT_EQUAL_EPSILON = 0.001f;
 
 template <class T>
 inline T sqr (T value)
@@ -129,7 +129,7 @@ struct HashSet
     if (!hash_table_size)
       hash_table.resize (1);
 
-    hash_multiplier = pow (10, (size_t)log10 (hash_table_size) - 1);
+    hash_multiplier = (size_t)pow (10.f, (int)log10 ((float)hash_table_size) - 1);
 
     if (!hash_multiplier)
       hash_multiplier = 10;
@@ -137,7 +137,7 @@ struct HashSet
 
   void Insert (Point3D* point)
   {
-    size_t point_hash = fabs (point->pnts2[0] * hash_multiplier + point->pnts2[1] * hash_multiplier + point->pnts2[2] * hash_multiplier);
+    size_t point_hash = (size_t)fabs (point->pnts2[0] * hash_multiplier + point->pnts2[1] * hash_multiplier + point->pnts2[2] * hash_multiplier);
 
     point_hash %= hash_table.size ();
 
@@ -306,9 +306,9 @@ class TrajectoryBuilder
     {
       HashSet unique_points (point3d.size () / 10);
 
-      for (Point3DArray::iterator iter = point3d.begin (), end = point3d.end (); iter != end; ++iter)
+      for (size_t i = 0; i < current_size; i++)
       {
-        unique_points.Insert (&(*iter));
+        unique_points.Insert (&point3d[i]);
       }
 
 //      printf ("Unique points count is %u\n", unique_points.Size ());
@@ -356,15 +356,15 @@ class TrajectoryBuilder
           out_vertices.push_back (line_start);
           out_vertices.push_back (line_end);
         }
-
-        DrawPrimitive line;
-
-        line.type  = PrimitiveType_LineList;
-        line.first = 0;
-        line.count = out_vertices.size () / 2;
-
-        out_primitives.push_back (line);
       }
+
+      DrawPrimitive line;
+
+      line.type  = PrimitiveType_LineList;
+      line.first = 0;
+      line.count = out_vertices.size () / 2;
+
+      out_primitives.push_back (line);
     }
 
   private:
