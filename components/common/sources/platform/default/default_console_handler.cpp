@@ -12,17 +12,24 @@ class DefaultConsoleHandlerComponent
   public:
     DefaultConsoleHandlerComponent ()
     {
-      event_connection = common::Console::RegisterEventHandler (common::ConsoleEvent_OnPrint, xtl::bind (&DefaultConsoleHandlerComponent::EventHandler, this, _1));
+      on_print_connection = common::Console::RegisterEventHandler (common::ConsoleEvent_OnPrint, xtl::bind (&DefaultConsoleHandlerComponent::OnPrint, this, _1));
+      on_print_line_connection = common::Console::RegisterEventHandler (common::ConsoleEvent_OnPrintLine, xtl::bind (&DefaultConsoleHandlerComponent::OnPrintLine, this));
     }
 
   private:
-    void EventHandler (const char* event)
+    void OnPrint (const char* event)
     {
       printf ("%s", event);
     }
 
+    void OnPrintLine ()
+    {
+      fflush (stdout);
+    }
+
   private:
-    xtl::auto_connection event_connection; //соединение обработки сообщений консоли
+    xtl::auto_connection on_print_connection;
+    xtl::auto_connection on_print_line_connection;
 };
 
 }
