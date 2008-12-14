@@ -1,7 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := DEMOS.MODELER.ENVELOPE DEMOS.MODELER.TRAJECTORY DEMOS.MODELER.VISUALIZER
+TARGETS       := DEMOS.MODELER.ENVELOPE DEMOS.MODELER.TRAJECTORY 
+TARGETS.win32 := DEMOS.MODELER.VISUALIZER
 
 #Утилита расчёта огибающей
 DEMOS.MODELER.ENVELOPE.TYPE          := application

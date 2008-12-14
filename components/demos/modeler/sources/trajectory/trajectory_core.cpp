@@ -1,8 +1,12 @@
 #include "core.h"
 
 #include <stdio.h>
+
+#include <list>
 #include <vector>
 #include <algorithm>
+
+const float POINT_EQUAL_EPSILON = 0.001;
 
 template <class T>
 inline T sqr (T value)
@@ -102,6 +106,80 @@ void free_vector(double *v,int nl,int)
   free ((char*)(v + nl));
 }
 
+bool float_equal (float value1, float value2, float eps)
+{
+  return (fabs (value1 - value2) < eps);
+}
+
+struct Point3D
+{
+  float  pnts[3];
+  float  pnts2[3];
+  float  nrmls[3];
+  double rgb[3],nu1,nu3;
+  bool   side;
+  bool   envelope_side;
+};
+
+struct HashSet
+{
+  HashSet (size_t hash_table_size)
+    : hash_table (hash_table_size), size (0)
+  {
+    if (!hash_table_size)
+      hash_table.resize (1);
+
+    hash_multiplier = pow (10, (size_t)log10 (hash_table_size) - 1);
+
+    if (!hash_multiplier)
+      hash_multiplier = 10;
+  }
+
+  void Insert (Point3D* point)
+  {
+    size_t point_hash = fabs (point->pnts2[0] * hash_multiplier + point->pnts2[1] * hash_multiplier + point->pnts2[2] * hash_multiplier);
+
+    point_hash %= hash_table.size ();
+
+    bool point_exist = false;
+
+    for (PointList::iterator iter = hash_table[point_hash].begin (), end = hash_table[point_hash].end (); iter != end; ++iter)
+    {
+      if (Point3dEqualPredicate (point, *iter))
+      {
+        point_exist = true;
+        break;
+      }
+    }
+
+    if (point_exist)
+      return;
+
+    hash_table[point_hash].push_front (point);
+    size++;
+  }
+
+  size_t Size ()
+  {
+    return size;
+  }
+
+  bool Point3dEqualPredicate (Point3D* point1, Point3D* point2)
+  {
+    return float_equal (point1->pnts2[0], point2->pnts2[0], POINT_EQUAL_EPSILON) &&
+           float_equal (point1->pnts2[1], point2->pnts2[1], POINT_EQUAL_EPSILON) &&
+           float_equal (point1->pnts2[2], point2->pnts2[2], POINT_EQUAL_EPSILON) &&
+           (point1->envelope_side == point2->envelope_side);
+  }
+
+  typedef std::list<Point3D*>    PointList;
+  typedef std::vector<PointList> PointListArray;
+
+  PointListArray hash_table;
+  size_t         size;
+  size_t         hash_multiplier;
+};
+
 class TrajectoryBuilder
 {
   public:
@@ -179,15 +257,11 @@ class TrajectoryBuilder
       {
         DrawVertex   line_start, line_end;
 
-//        if ((sqr (point3d[i].pnts2[0]) + sqr (point3d[i].pnts2[1]) + sqr (point3d[i].pnts2[2])) > 2.f)
-//          continue;
-
         Point3D& point = point3d [i];
         float    normal [3], normal_length = 0.0f;
 
         for (size_t j=0; j<3; j++)
         {
-//          normal [j]     = point.pnts [j] - point.pnts2 [j];
           normal [j]     = point.pnts2 [j];
           normal_length += sqr (normal [j]);
         }
@@ -227,6 +301,74 @@ class TrajectoryBuilder
 
       out_primitives.push_back (line);
     }
+
+    void ConvertUnique (DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
+    {
+      HashSet unique_points (point3d.size () / 10);
+
+      for (Point3DArray::iterator iter = point3d.begin (), end = point3d.end (); iter != end; ++iter)
+      {
+        unique_points.Insert (&(*iter));
+      }
+
+//      printf ("Unique points count is %u\n", unique_points.Size ());
+
+      out_vertices.reserve (unique_points.Size () * 2);
+
+      for (HashSet::PointListArray::iterator iter = unique_points.hash_table.begin (), end = unique_points.hash_table.end (); iter != end; ++iter)
+      {
+        for (HashSet::PointList::iterator list_iter = iter->begin (), list_end = iter->end (); list_iter != list_end; ++list_iter)
+        {
+          DrawVertex line_start, line_end;
+
+          Point3D& point = **list_iter;
+          float    normal [3], normal_length = 0.0f;
+
+          for (size_t j=0; j<3; j++)
+          {
+            normal [j]     = point.pnts2 [j];
+            normal_length += sqr (normal [j]);
+          }
+
+          normal_length = sqrt (normal_length);
+
+          for (size_t j=0; j<3; j++)
+            normal [j] /= normal_length;
+
+          line_start.position.x = point.pnts2 [0];
+          line_start.position.y = point.pnts2 [1];
+          line_start.position.z = point.pnts2 [2];
+          line_start.color.r    = 0.2f;
+          line_start.color.g    = 0.2f;
+          line_start.color.b    = 0.2f;
+          line_start.color.a    = 1.f;
+
+          float direction = point.envelope_side ? 1.0f : -1.0f;
+
+          line_end.position.x = line_start.position.x + direction * normal [0] * 0.1f;
+          line_end.position.y = line_start.position.y + direction * normal [1] * 0.1f;
+          line_end.position.z = line_start.position.z + direction * normal [2] * 0.1f;
+          line_end.color.r    = (float)point.rgb[0];
+          line_end.color.g    = (float)point.rgb[1];
+          line_end.color.b    = (float)point.rgb[2];
+          line_end.color.a    = 1.f;
+
+          out_vertices.push_back (line_start);
+          out_vertices.push_back (line_end);
+        }
+
+        DrawPrimitive line;
+
+        line.type  = PrimitiveType_LineList;
+        line.first = 0;
+        line.count = out_vertices.size () / 2;
+
+        out_primitives.push_back (line);
+      }
+    }
+
+  private:
+    typedef std::vector<Point3D> Point3DArray;
 
   private:
     double CalculateFaI (int i)
@@ -562,17 +704,6 @@ class TrajectoryBuilder
     }
 
   private:
-    struct Point3D
-    {
-      float  pnts[3];
-      float  pnts2[3];
-      float  nrmls[3];
-      double rgb[3],nu1,nu3;
-      bool   side;
-      bool   envelope_side;
-    };
-
-  private:
     ModelData            model_data;
     double               nu1, nu2, nu3;
     double               xx[201], y[7][201], z[3][201];
@@ -583,7 +714,7 @@ class TrajectoryBuilder
     double               mlen;
     double               qq1, qq3;
     double               alf;
-    std::vector<Point3D> point3d;
+    Point3DArray         point3d;
 };
 
 /*
@@ -620,5 +751,7 @@ void BuildTrajectory (const ModelData& model_data, double nu1, double nu2, doubl
 {
   TrajectoryBuilder builder (model_data, nu1, nu2, nu3, vertices_count);
 
-  builder.Convert (out_vertices, out_primitives);
+  builder.ConvertUnique (out_vertices, out_primitives);
+
+//  builder.Convert (out_vertices, out_primitives);
 }
