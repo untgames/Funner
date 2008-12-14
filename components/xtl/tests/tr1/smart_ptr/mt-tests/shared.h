@@ -7,6 +7,8 @@
 
 #include <xtl/shared_ptr.h>
 #include <xtl/bind.h>
+#include <xtl/reference_counter.h>
+#include <xtl/intrusive_ptr.h>
 
 #include <stl/vector>
 #include <stl/memory>
@@ -145,3 +147,7 @@ class A
 };
 
 int A::count = 0;
+
+class B: public A, public xtl::reference_counter
+{
+};
