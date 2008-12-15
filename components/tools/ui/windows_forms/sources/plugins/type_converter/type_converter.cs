@@ -1,10 +1,4 @@
-namespace tools
-{
-
-namespace ui
-{
-
-namespace windows_forms
+namespace tools.ui.windows_forms
 {
 
 public static class Converter
@@ -103,9 +97,5 @@ public static class Converter
   private static System.Char []                        color_separators = {';', ' '};
   private static System.Globalization.NumberFormatInfo number_format_provider;
 };
-
-}
-
-}
 
 }

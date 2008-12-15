@@ -26,7 +26,7 @@ class Constants
 
   public static System.String TypeConverterDllName ()
   {
-    return "funner.tools.ui.windows_forms.TypeConverter.dll";
+    return "funner.tools.ui.windows_forms.Helpers.dll";
 //    return "funner.tools.ui.windows_forms.Helpers.dll";
   }
 };
