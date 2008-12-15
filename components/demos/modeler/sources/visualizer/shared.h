@@ -100,6 +100,7 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
 
   public:
     MyApplicationServer ();
+    ~MyApplicationServer ();
 
     void ExecuteCommand (const char* command);
 
@@ -180,6 +181,8 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
 
     void CreateCondorBinaries ();
 
+    void Benchmark ();
+
   private:
     typedef xtl::shared_ptr<script::Environment> ShellEnvironmentPtr;
 
@@ -217,6 +220,7 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     syslib::Timer                     wait_files_timer;
     stl::string                       working_directory;
     VisualModelResource               envelope;
+    bool                              calculating_envelope;
     VisualModels                      trajectories;
     media::rms::ResourceManager       resource_manager;
     WaitedFiles                       waited_files;
@@ -224,6 +228,7 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     bool                              use_condor;
     CondorTrajectoriesNames           condor_trajectories_names;
     stl::string                       author;
+    size_t                            trajectory_vertex_per_second;   //производительность данного компьютера при рассчёте траекторий
 };
 
 //проверка ошибок

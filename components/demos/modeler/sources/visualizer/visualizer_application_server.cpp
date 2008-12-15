@@ -2,6 +2,7 @@
 #include <process.h>
 
 #include <common/strlib.h>
+#include <common/time.h>
 #include <common/xml_writer.h>
 
 #include <script/bind.h>
@@ -23,30 +24,52 @@ namespace
 */
 
 const char*  APPLICATION_CONFIGURATION_FILE_NAME = "media/conf/application_config.xml";
-const char*  SCREEN_ATTACHMENT_NAME              = "MainScreen";
-const char*  INTERPRETER_NAME                    = "lua";
-const char*  DESC_FILE_SUFFIX                    = ".desc";
+const char*  BATCH_TRAJECTORIES_COORDS_FILE_NAME = "trajecories_coords.bintrjc";
+const char*  BATCH_TRAJECTORY_FILE_NAME          = "batch_trajectory.bat";
+const char*  BATCH_TRAJECTORY_LOG_FILE_NAME      = "batch_trajectory.log";
+const char*  BATCH_TRAJECTORY_NU_FILE_FOLDER     = "tmp\\condor_input_files";
+const char*  BATCH_TRAJECTORY_NU_FILE_BASE_NAME  = "nu";
+const char*  BATCH_TRAJECTORY_NU_FILE_SUFFIX     = ".dat";
+const char*  BENCHMARK_MODEL                     = "media/benchmark_model.dat";
+const char*  BENCHMARK_TRAJECTORY_BINMESH        = "benchmark_trajectory.binmesh";
+const char*  BENCHMARK_TRAJECTORY_XMESH          = "benchmark_trajectory.xmesh";
+const size_t BENCHMARK_VERTICES_COUNT            = 10000;
+const char*  CONDOR_BINARIES_PATH                = "tmp\\condor_binaries";
+const char*  CONDOR_CONFIG_FILE_NAME             = "condor.cfg";
 const char*  CONDOR_SUBMIT_APPLICATION_NAME      = "condor_submit.exe";
-const char*  WIN32_ENVELOPE_APPLICATION_NAME     = "modeler-envelope.exe";
-const char*  OSX_ENVELOPE_APPLICATION_NAME       = "modeler-envelope";
-const char*  WIN32_TRAJECTORY_APPLICATION_NAME   = "modeler-trajectory.exe";
-const char*  OSX_TRAJECTORY_APPLICATION_NAME     = "modeler-trajectory";
-const char*  TRAJECTORY_APPLICATION_BASE_NAME    = "modeler-trajectory";
-const char*  CONDOR_BINARIES_PATH                = "condor_binaries";
+const size_t COPY_FILE_BUFFER                    = 1024 * 1024;
+const size_t DEFAULT_ENVELOPE_LOD                = 200;
+const char*  DESC_FILE_SUFFIX                    = ".desc";
+const char*  INTERPRETER_NAME                    = "lua";
+const size_t LINE_DATA_SIZE                      = 90;
 const char*  MESH_CONVERTER_APPLICATION_NAME     = "mesh-converter.exe";
 const char*  MODEL_REGISTRY_NAME                 = "ApplicationServer.Properties.Model";
 const char*  MODEL_FILE_NAME                     = "model.xmodel";
 const char*  OLD_FORMAT_MODEL_FILE_NAME          = "model.dat";
-const char*  CONDOR_CONFIG_FILE_NAME             = "condor.cfg";
-const char*  BATCH_TRAJECTORY_NU_FILE_FOLDER     = "condor_input_files";
-const char*  BATCH_TRAJECTORY_NU_FILE_BASE_NAME  = "nu";
-const char*  BATCH_TRAJECTORY_NU_FILE_SUFFIX     = ".dat";
-const char*  BATCH_TRAJECTORY_LOG_FILE_NAME      = "batch_trajectory.log";
-const char*  BATCH_TRAJECTORIES_COORDS_FILE_NAME = "trajecories_coords.bintrjc";
-const size_t DEFAULT_ENVELOPE_LOD                = 200;
-const size_t COPY_FILE_BUFFER                    = 1024 * 1024;
+const char*  OSX_ENVELOPE_APPLICATION_NAME       = "modeler-envelope";
+const char*  OSX_TRAJECTORY_APPLICATION_NAME     = "modeler-trajectory";
+const char*  SCREEN_ATTACHMENT_NAME              = "MainScreen";
+const char*  TEMP_DIRECTORY_NAME                 = "tmp";
 const int    TRAJECTORIES_COORDS_HEADER          = 'TRJC';
 const int    TRAJECTORIES_COORDS_VERSION         = 1;
+const char*  TRAJECTORY_APPLICATION_BASE_NAME    = "modeler-trajectory";
+const size_t VERTEX_DATA_SIZE                    = 132;
+const char*  WIN32_ENVELOPE_APPLICATION_NAME     = "modeler-envelope.exe";
+const char*  WIN32_TRAJECTORY_APPLICATION_NAME   = "modeler-trajectory.exe";
+
+struct OsMemoryUsage
+{
+  stl::string os_name;
+  size_t      memory_usage;
+};
+
+const OsMemoryUsage OS_MEMORY_USAGE [] = {
+                                          { "OSX", 512 },
+                                          { "WINNT50", 128 },
+                                          { "WINNT51", 128 },
+                                          { "WINNT52", 256 },
+                                          { "WINNT60", 512 }
+};
 
 void file_read (const char* source, common::InputFile& file, void* data, size_t size)
 {
@@ -97,11 +120,15 @@ void copy_file (const char* source_file_name, const char* result_file_name)
 MyApplicationServer::MyApplicationServer ()
   : shell_environment (new script::Environment),
     shell (INTERPRETER_NAME, shell_environment),
-    wait_files_timer (xtl::bind (&MyApplicationServer::CheckNewFiles, this), 1000, syslib::TimerState_Paused)
+    wait_files_timer (xtl::bind (&MyApplicationServer::CheckNewFiles, this), 1000, syslib::TimerState_Paused),
+    calculating_envelope (false)
 {
   common::FileSystem::SetDefaultFileBufferSize (0);     //???????? обход бага!!!!!!!!!!!
 
   static const char* METHOD_NAME = "MyApplicationServer::MyApplicationServer";
+
+  if (!common::FileSystem::IsDir (TEMP_DIRECTORY_NAME))
+    common::FileSystem::Mkdir (TEMP_DIRECTORY_NAME);
 
   engine::AttachmentRegistry::Register ("MeshResourceManager", resource_manager);
 
@@ -158,6 +185,8 @@ MyApplicationServer::MyApplicationServer ()
   if (use_condor)
     CreateCondorBinaries ();
 
+  Benchmark ();
+
   camera = OrthoCamera::Create ();
 
   camera->SetLeft   (-3);
@@ -183,6 +212,11 @@ MyApplicationServer::MyApplicationServer ()
   screen.Attach (viewport);
 
   engine::AttachmentRegistry::Register<render::Screen> (SCREEN_ATTACHMENT_NAME, screen);
+}
+
+MyApplicationServer::~MyApplicationServer ()
+{
+  //???? Удалять временную папку
 }
 
 void MyApplicationServer::ExecuteCommand (const char* command)
@@ -364,7 +398,7 @@ void MyApplicationServer::OnNewXmeshTrajectory (const char* desc_trajectory_file
 void MyApplicationServer::CalculateTrajectory (double nu1, double nu2, double nu3, size_t lod)
 {
   stl::string application_name        = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
-              model_name              = common::format ("%smodel.dat", project_path.c_str ()),
+              model_name              = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME),
               trajectory_name         = common::format ("%strajectory_%g_%g_%g.xmesh", project_path.c_str (), nu1, nu2, nu3),
               binmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.binmesh", project_path.c_str (), nu1, nu2, nu3),
               nu1_string              = common::format ("%g", nu1),
@@ -386,6 +420,8 @@ void MyApplicationServer::CalculateTrajectory (double nu1, double nu2, double nu
 
 void MyApplicationServer::LoadEnvelope ()
 {
+  calculating_envelope = false;
+
   UnloadEnvelope ();
 
   stl::string mesh_name = project_path + "envelope.binmesh";
@@ -433,9 +469,14 @@ void MyApplicationServer::OnNewXmeshEnvelope (const char* desc_envelope_file_nam
 }
 
 void MyApplicationServer::CalculateEnvelope (size_t lod)
-{ //????Продумать двойной вызов
+{
+  static const char* METHOD_NAME = "MyApplicationServer::CalculateEnvelope";
+
+  if (calculating_envelope)
+    throw xtl::format_operation_exception (METHOD_NAME, "Envelope calculating already running, please wait results of current calculation before posting new.");
+
   stl::string application_name      = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_ENVELOPE_APPLICATION_NAME),
-              model_name            = common::format ("%smodel.dat", project_path.c_str ()),
+              model_name            = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME),
               envelope_name         = common::format ("%senvelope.xmesh", project_path.c_str ()),
               binmesh_envelope_name = common::format ("%senvelope.binmesh", project_path.c_str ()),
               lod_string            = common::format ("%u", lod),
@@ -446,7 +487,9 @@ void MyApplicationServer::CalculateEnvelope (size_t lod)
   common::FileSystem::Remove (waited_desc_file_name.c_str ());
 
   if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), model_name.c_str (), envelope_name.c_str (), lod_string.c_str (), 0) == -1)
-    throw xtl::format_operation_exception ("MyApplicationServer::CalculateEnvelope", "Can't call %s: %s", WIN32_ENVELOPE_APPLICATION_NAME, get_spawn_error_name ());
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't call %s: %s", WIN32_ENVELOPE_APPLICATION_NAME, get_spawn_error_name ());
+
+  calculating_envelope = true;
 
   WaitForFile (waited_desc_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewXmeshEnvelope, this, _1));
 }
@@ -515,9 +558,19 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
 
   file_read (METHOD_NAME, trajectories_coords_file, &coords_count, sizeof (coords_count));
 
-  if (condor_path.empty () || !use_condor)
+  if (condor_path.empty () || !use_condor || ((coords_count * lod / (float)trajectory_vertex_per_second / 60.f) < 2))
   {
-    common::Console::Printf ("Calculating %u trajectories...\n", coords_count);
+    common::Console::Printf ("Calculating %u trajectories with %u points each...\n", coords_count, lod);
+
+    stl::string batch_file_name = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, BATCH_TRAJECTORY_FILE_NAME);
+
+    FILE* batch_file = fopen (batch_file_name.c_str (), "w");
+
+    if (!batch_file)
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't open batch file '%s'\n", batch_file_name.c_str ());
+
+    stl::string application_name        = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
+                model_name              = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME);
 
     for (size_t i = 0; i < coords_count; i++)
     {
@@ -527,17 +580,33 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
       file_read (METHOD_NAME, trajectories_coords_file, &nu2, sizeof (nu2));
       file_read (METHOD_NAME, trajectories_coords_file, &nu3, sizeof (nu3));
 
-      CalculateTrajectory (nu1, nu2, nu3, lod);
+      stl::string trajectory_name         = common::format ("%strajectory_%g_%g_%g.xmesh", project_path.c_str (), nu1, nu2, nu3),
+                  binmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.binmesh", project_path.c_str (), nu1, nu2, nu3),
+                  waited_desc_file_name   = trajectory_name + DESC_FILE_SUFFIX;
+
+      fprintf (batch_file, "%s args-input %f %f %f %s %s %u\n", application_name.c_str (), nu1, nu2, nu3, model_name.c_str (),
+               trajectory_name.c_str (), lod);
+
+      common::FileSystem::Remove (trajectory_name.c_str ());
+      common::FileSystem::Remove (binmesh_trajectory_name.c_str ());
+      common::FileSystem::Remove (waited_desc_file_name.c_str ());
+
+      WaitForFile (waited_desc_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewXmeshTrajectory, this, _1));
     }
+
+    fclose (batch_file);
+
+    if (_spawnl (_P_NOWAIT, batch_file_name.c_str (), batch_file_name.c_str (), 0) == -1)
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't call %s: %s", batch_file_name.c_str (), get_spawn_error_name ());
 
     return;
   }
 
   if (!condor_path.empty () && use_condor)
   {
-    common::Console::Printf ("Calculating %u trajectories with Condor...\n", coords_count);
+    common::Console::Printf ("Calculating %u trajectories with %u points each with Condor...\n", coords_count, lod);
 
-    if (!common::FileSystem::IsDir (BATCH_TRAJECTORY_NU_FILE_FOLDER)) //????Очищать папку по завершении рассчётов
+    if (!common::FileSystem::IsDir (BATCH_TRAJECTORY_NU_FILE_FOLDER))
       common::FileSystem::Mkdir (BATCH_TRAJECTORY_NU_FILE_FOLDER);
 
     stl::string log_to_delete_mask = project_path + BATCH_TRAJECTORY_LOG_FILE_NAME;
@@ -569,23 +638,41 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
       fclose (nu_file);
     }
 
-    stl::string condor_config_file_name = common::format ("%s%s", project_path.c_str (), CONDOR_CONFIG_FILE_NAME);
+    stl::string condor_config_file_name = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, CONDOR_CONFIG_FILE_NAME);
 
     FILE* condor_config_file = fopen (condor_config_file_name.c_str (), "w");
 
     if (!condor_config_file)
-      throw xtl::format_operation_exception ("Can't open condor config file '%s'\n", condor_config_file_name.c_str ());
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't open condor config file '%s'\n", condor_config_file_name.c_str ());
 
     fprintf (condor_config_file, "Executable = %s\\%s.$$(OpSys).$$(Arch)\n", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME);
     fprintf (condor_config_file, "Log = %s%s\n", project_path.c_str (), BATCH_TRAJECTORY_LOG_FILE_NAME);
     fprintf (condor_config_file, "Arguments = text-file-input %s.$(Process)%s %s batch_trajectory.$(Process).xmesh %u\n",
         BATCH_TRAJECTORY_NU_FILE_BASE_NAME, BATCH_TRAJECTORY_NU_FILE_SUFFIX, OLD_FORMAT_MODEL_FILE_NAME, lod);
 //    fprintf (condor_config_file, "output = %sbatch_trajectory.$(Process).xmesh.output\n", project_path.c_str ());
-    fprintf (condor_config_file, "transfer_input_files = %s%s, %s%s, %s\\%s.$(Process)%s\n", project_path.c_str (),
-             BATCH_TRAJECTORIES_COORDS_FILE_NAME, project_path.c_str (), OLD_FORMAT_MODEL_FILE_NAME, BATCH_TRAJECTORY_NU_FILE_FOLDER,
+    fprintf (condor_config_file, "transfer_input_files = %s%s, %s\\%s, %s\\%s.$(Process)%s\n", project_path.c_str (),
+             BATCH_TRAJECTORIES_COORDS_FILE_NAME, TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME, BATCH_TRAJECTORY_NU_FILE_FOLDER,
              BATCH_TRAJECTORY_NU_FILE_BASE_NAME, BATCH_TRAJECTORY_NU_FILE_SUFFIX);
     fprintf (condor_config_file, "Universe = Vanilla\n");
-    fprintf (condor_config_file, "Requirements = %s && Disk >= %d\n", condor_trajectory_requirements.c_str (), (int)(lod * 2.f * 45.f / 1024.f + 1));
+
+    size_t disk_usage = (size_t)(lod * LINE_DATA_SIZE / 1024.f + 1);
+    size_t memory_usage = (size_t)(VERTEX_DATA_SIZE * lod / (1024.f * 1024.f));
+
+    fprintf (condor_config_file, "Requirements = (%s) && (Disk >= %d) && (", condor_trajectory_requirements.c_str (),
+             disk_usage, memory_usage);
+
+    for (size_t i = 0, count = sizeof (OS_MEMORY_USAGE) / sizeof (OS_MEMORY_USAGE [0]); i < count; i++)
+    {
+      if (i)
+        fprintf (condor_config_file, " || ");
+
+      fprintf (condor_config_file, "((Memory >= (%u * Cpus + %u / Cpus)) && OpSys == \"%s\")", memory_usage, OS_MEMORY_USAGE [i].memory_usage,
+          OS_MEMORY_USAGE [i].os_name.c_str ());
+    }
+
+    fprintf (condor_config_file, ")\n");
+
+    fprintf (condor_config_file, "ImageSize = %u\n", memory_usage);
     fprintf (condor_config_file, "Rank = kflops\n");
     fprintf (condor_config_file, "should_transfer_files = YES\n");
     fprintf (condor_config_file, "when_to_transfer_output = ON_EXIT\n");
@@ -596,15 +683,14 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
     stl::string application_name = common::format ("%s%s", condor_path.c_str (), CONDOR_SUBMIT_APPLICATION_NAME);
 
     if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), condor_config_file_name.c_str (), 0) == -1)
-      throw xtl::format_operation_exception ("MyApplicationServer::OnNewTrajectoriesCoords",
-                                             "Can't call %s: %s", CONDOR_SUBMIT_APPLICATION_NAME, get_spawn_error_name ());
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't call %s: %s", CONDOR_SUBMIT_APPLICATION_NAME, get_spawn_error_name ());
   }
 }
 
 void MyApplicationServer::CalculateTrajectories (size_t trajectories_count, size_t lod)
 { //????Продумать двойной вызов
   stl::string application_name          = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_ENVELOPE_APPLICATION_NAME),
-              model_name                = common::format ("%smodel.dat", project_path.c_str ()),
+              model_name                = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME),
               trajectories_coords_name  = common::format ("%s%s", project_path.c_str (), BATCH_TRAJECTORIES_COORDS_FILE_NAME),
               trajectories_count_string = common::format ("%u", trajectories_count),
               waited_desc_file_name     = trajectories_coords_name + DESC_FILE_SUFFIX;
@@ -722,9 +808,7 @@ void MyApplicationServer::LoadModel (const char* path)
     mz = common::get<double> (*iter, "mz");
     model_registry.SetValue ("mz", xtl::any (stl::string (common::get<const char*> (*iter, "mz")), true));
 
-    stl::string old_format_model_file_name (path, xtl::xstrlen (path) - xtl::xstrlen (MODEL_FILE_NAME));
-
-    old_format_model_file_name += "model.dat";
+    stl::string old_format_model_file_name = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME);
 
     common::OutputFile old_format_model_file (old_format_model_file_name.c_str ());
 
@@ -854,4 +938,34 @@ void MyApplicationServer::CreateCondorBinaries ()
     use_condor = 0;
     printf ("Condor will not be used, unknown exception while creating needed binaries\n");
   }
+}
+
+
+void MyApplicationServer::Benchmark ()
+{
+  static const char* METHOD_NAME = "MyApplicationServer::Benchmark";
+
+  size_t benchmark_start = common::milliseconds ();
+
+  stl::string application_name = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
+              lod_string       = common::format ("%u", BENCHMARK_VERTICES_COUNT);
+
+  if (_spawnl (_P_WAIT, application_name.c_str (), application_name.c_str (), "args-input", "0",
+        "0", "0", BENCHMARK_MODEL, BENCHMARK_TRAJECTORY_XMESH, lod_string.c_str (), 0) != 0)
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't perform benchmark, trajectory was not calculated");
+
+  application_name = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME);
+
+  if (_spawnl (_P_WAIT, application_name.c_str (), application_name.c_str (), BENCHMARK_TRAJECTORY_XMESH, BENCHMARK_TRAJECTORY_BINMESH, 0) != 0)
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't perform benchmark, trajectory was not calculated");
+
+  trajectory_vertex_per_second = (size_t)((float)BENCHMARK_VERTICES_COUNT / ((common::milliseconds () - benchmark_start) / 1000.f));
+
+  stl::string xmesh_desc_file_name = common::format ("%s%s", BENCHMARK_TRAJECTORY_XMESH, DESC_FILE_SUFFIX);
+
+  common::FileSystem::Remove (BENCHMARK_TRAJECTORY_XMESH);
+  common::FileSystem::Remove (BENCHMARK_TRAJECTORY_BINMESH);
+  common::FileSystem::Remove (xmesh_desc_file_name.c_str ());
+
+  common::Console::Printf ("This computer performance is %u vps\n", trajectory_vertex_per_second);
 }
