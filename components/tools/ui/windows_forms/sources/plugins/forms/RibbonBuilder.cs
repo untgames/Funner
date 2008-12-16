@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace tools.ui.windows_forms
 {
-  public class RibbonBuilder: IPlugin
+  public class RibbonBuilderPlugin: IPlugin
   {
     protected static int ControlIndex = 0;
     protected static string[] RibbonModules = new string[] {
@@ -17,9 +17,18 @@ namespace tools.ui.windows_forms
       Application.StartupPath + "\\System.Windows.Forms.Ribbon.dll",
     };
     protected Dictionary<string, Assembly> assemblies = new Dictionary<string, Assembly>();
+    protected IApplicationServer server = null;
+    public RibbonBuilderPlugin(IApplicationServer server)
+    {
+      if (server == null)
+        throw new ArgumentNullException("IApplicationServer reference must not be NULL");
+      this.server = server;
+    }
     public Control CreateControl(string initstring)
     {
-      throw new NotImplementedException("CreateControl method not implemented yet");
+      if (!assemblies.ContainsKey(initstring.Trim()))
+        throw new KeyNotFoundException("Invalid initialization string, must specify existing ribbon control configuration name");
+      return (Control)CodeBuilder.Instantiate(assemblies[initstring.Trim()], "tools.ui.windows_forms.CustomRibbon", this.server);
     }
     public void LoadConfiguration(XmlNode root)
     {
@@ -42,19 +51,20 @@ namespace tools.ui.windows_forms
     private void ParseRibbon(XmlNode ribbon, StringWriter writer)
     {
       string classname = ribbon.Attributes["Name"].InnerText;
-      StringWriter tailwriter = new StringWriter();
-      Dictionary<string, int> propclasses = new Dictionary<string, int>();
 
       writer.Write("using System;\n");
       writer.Write("using System.Drawing;\n");
       writer.Write("using System.Windows.Forms;\n");
       writer.Write("using System.Collections.Generic;\n\n");
       writer.Write("namespace tools.ui.windows_forms {{\n");
+      writer.Write("{0}", CodeSnippets.Properties.Template("RibbonTextBox", "TextBoxText", "string", "ToString"));
       foreach (XmlNode dropdown in ribbon.SelectNodes("Menu"))
-        ParseDropDownMenu(dropdown, writer, tailwriter, propclasses);
-      writer.Write("  public class {0}Ribbon: Ribbon {{\n", classname);
+        ParseDropDownMenu(dropdown, writer);
+      foreach (XmlNode list in ribbon.SelectNodes("List"))
+        ParseList(list, writer);
+      writer.Write("  public class CustomRibbon: Ribbon {{\n");
       writer.Write("    protected IApplicationServer server;\n");
-      writer.Write("    public {0}Ribbon(IApplicationServer server): base()\n", classname);
+      writer.Write("    public CustomRibbon(IApplicationServer server): base()\n");
       writer.Write("    {{\n");
       writer.Write("      this.server = server;\n");
       writer.Write("      this.SuspendLayout();\n");
@@ -64,15 +74,55 @@ namespace tools.ui.windows_forms
       writer.Write("      this.Minimized = false;\n");
       writer.Write("      \n");
       foreach (XmlNode tab in ribbon.SelectNodes("Tab"))
-        writer.Write("      this.Tabs.Add({0});\n", ParseRibbonTab(tab, writer, tailwriter, propclasses));
+        writer.Write("      this.Tabs.Add({0});\n", ParseRibbonTab(tab, writer));
       writer.Write("      \n");
       writer.Write("      this.RestoreLayout();\n");
       writer.Write("    }}\n");
       writer.Write("  }}\n");
-      writer.Write("{0}", tailwriter.ToString());
       writer.Write("}}\n");
     }
-    private void ParseDropDownMenu(XmlNode menu, StringWriter writer, StringWriter tailwriter, Dictionary<string, int> propclasses)
+    private void ParseList(XmlNode list, StringWriter writer)
+    {
+      if (list.Attributes["Name"] == null)
+        throw new Exception("'Name' attribute for ribbon list not specified");
+      string varname = list.Attributes["Name"].InnerText.Trim();
+      writer.Write("  public class RibbonList_{0}: RibbonComboBox\n", varname);
+      writer.Write("  {{\n");
+      writer.Write("    public RibbonList_{0}(): base()\n", varname);
+      writer.Write("    {{\n");
+      foreach (XmlNode item in list.ChildNodes)
+      {
+        try
+        {
+          switch (item.Name)
+          {
+            case "Item":
+              writer.Write("      this.DropDownItems.Add({0});\n", ParseListItem(item, writer));
+              break;
+            case "Separator":
+              writer.Write("      this.DropDownItems.Add({0});\n", ParseSeparator(item, writer));
+              break;
+            default:
+              throw new Exception("Unknown node tag '" + item.Name + "' when parsing ribbon combobox list");
+          }
+        }
+        catch (Exception e)
+        {
+          Console.WriteLine("{0}", e.ToString());
+        }
+      }      
+      writer.Write("    }}\n");
+      writer.Write("  }}\n");
+    }
+    private string ParseListItem(XmlNode item, StringWriter writer)
+    {
+      ++ControlIndex;
+      string varname = "ribbonlistitem" + ControlIndex.ToString();
+      writer.Write("      RibbonButton {0} = new RibbonButton();\n", varname);
+      CodeSnippets.Attributes.Text(item, writer, varname);
+      return varname;
+    }
+    private void ParseDropDownMenu(XmlNode menu, StringWriter writer)
     {
       if (menu.Attributes["Name"] == null)
         throw new Exception("'Name' attribute for ribbon drop-down menu not specified");
@@ -110,10 +160,10 @@ namespace tools.ui.windows_forms
           switch (item.Name)
           {
             case "Item":
-              writer.Write("      this.DropDownItems.Add({0});\n", ParseDropDownItem(item, writer, tailwriter, propclasses));
+              writer.Write("      this.DropDownItems.Add({0});\n", ParseDropDownItem(item, writer));
               break;
             case "Separator":
-              writer.Write("      this.DropDownItems.Add({0});\n", ParseSeparator(item, writer, tailwriter, propclasses));
+              writer.Write("      this.DropDownItems.Add({0});\n", ParseSeparator(item, writer));
               break;
             default:
               throw new Exception("Unknown node tag '" + item.Name + "' when parsing ribbon dropdown menu");
@@ -129,7 +179,7 @@ namespace tools.ui.windows_forms
       writer.Write("    }}\n");
       writer.Write("  }}\n");
     }
-    private string ParseDropDownItem(XmlNode item, StringWriter writer, StringWriter tailwriter, Dictionary<string, int> propclasses)
+    private string ParseDropDownItem(XmlNode item, StringWriter writer)
     {
       ++ControlIndex;
       string varname = "ribbondropdownitem" + ControlIndex.ToString();
@@ -147,10 +197,10 @@ namespace tools.ui.windows_forms
           switch (sub.Name)
           {
             case "Item":
-              writer.Write("      {0}.DropDownItems.Add({1});\n", varname, ParseDropDownItem(sub, writer, tailwriter, propclasses));
+              writer.Write("      {0}.DropDownItems.Add({1});\n", varname, ParseDropDownItem(sub, writer));
               break;
             case "Separator":
-              writer.Write("      {0}.DropDownItems.Add({1});\n", varname, ParseSeparator(sub, writer, tailwriter, propclasses));
+              writer.Write("      {0}.DropDownItems.Add({1});\n", varname, ParseSeparator(sub, writer));
               break;
             default:
               throw new Exception("Unknown node tag '" + sub.Name + "' when parsing ribbon dropdown menu subitem");
@@ -170,7 +220,7 @@ namespace tools.ui.windows_forms
       writer.Write("      }}\n");
       return varname;
     }
-    private string ParseRibbonTab(XmlNode tab, StringWriter writer, StringWriter tailwriter, Dictionary<string, int> propclasses)
+    private string ParseRibbonTab(XmlNode tab, StringWriter writer)
     {
       ++ControlIndex;
       string tabvarname = "ribbontab" + ControlIndex.ToString();
@@ -179,11 +229,11 @@ namespace tools.ui.windows_forms
       writer.Write("      {0}.Text = \"{1}\";\n", tabvarname, tabtext);
       writer.Write("      \n");
       foreach (XmlNode panel in tab.SelectNodes("Panel"))
-        writer.Write("      {0}.Panels.Add({1});\n", tabvarname,  ParseRibbonPanel(panel, writer, tailwriter, propclasses));
+        writer.Write("      {0}.Panels.Add({1});\n", tabvarname,  ParseRibbonPanel(panel, writer));
       writer.Write("      \n");
       return tabvarname;
     }
-    private string ParseRibbonPanel(XmlNode panel, StringWriter writer, StringWriter tailwriter, Dictionary<string, int> propclasses)
+    private string ParseRibbonPanel(XmlNode panel, StringWriter writer)
     {
       ++ControlIndex;
       string panelvarname = "ribbonpanel" + ControlIndex.ToString();
@@ -195,13 +245,13 @@ namespace tools.ui.windows_forms
       writer.Write("      \n");
       // process childs
       foreach (XmlNode group in panel.SelectNodes("Group"))
-        writer.Write("      {0}.Items.Add({1});\n", panelvarname, ParseRibbonItemGroup(group, writer, tailwriter, propclasses));
+        writer.Write("      {0}.Items.Add({1});\n", panelvarname, ParseRibbonItemGroup(group, writer));
       foreach (XmlNode item in panel.ChildNodes)
-        writer.Write("      {0}.Items.Add({1});\n", panelvarname, ParseRibbonItem(item, writer, tailwriter, propclasses));
+        writer.Write("      {0}.Items.Add({1});\n", panelvarname, ParseRibbonItem(item, writer));
       writer.Write("      \n");
       return panelvarname;
     }
-    private string ParseRibbonItemGroup(XmlNode group, StringWriter writer, StringWriter tailwriter, Dictionary<string, int> propclasses)
+    private string ParseRibbonItemGroup(XmlNode group, StringWriter writer)
     {
       ++ControlIndex;
       string groupvarname = "ribbonitemgroup" + ControlIndex.ToString();
@@ -210,7 +260,7 @@ namespace tools.ui.windows_forms
       foreach (XmlNode item in group.ChildNodes)
         try
         {
-          writer.Write("      {0}.Items.Add({1});\n", groupvarname, ParseRibbonItem(item, writer, tailwriter, propclasses));
+          writer.Write("      {0}.Items.Add({1});\n", groupvarname, ParseRibbonItem(item, writer));
         }
         catch (Exception e)
         {
@@ -219,22 +269,24 @@ namespace tools.ui.windows_forms
       writer.Write("      \n");
       return groupvarname;
     }
-    private string ParseRibbonItem(XmlNode item, StringWriter writer, StringWriter tailwriter, Dictionary<string, int> propclasses)
+    private string ParseRibbonItem(XmlNode item, StringWriter writer)
     {
       switch (item.Name)
       {
         case "Separator":
-          return ParseSeparator(item, writer, tailwriter, propclasses);
+          return ParseSeparator(item, writer);
         case "Button":
-          return ParseButton(item, writer, tailwriter, propclasses);
+          return ParseButton(item, writer);
         case "Menu":
-          return ParseMenu(item, writer, tailwriter, propclasses);
+          return ParseMenu(item, writer);
         case "Editor":
-          return ParseEditBox(item, writer, tailwriter, propclasses);
+          return ParseEditBox(item, writer);
+        case "List":
+          return ParseComboBox(item, writer);
       }
       return "null";
     }
-    private string ParseEditBox(XmlNode item, StringWriter writer, StringWriter tailwriter, Dictionary<string, int> propclasses)
+    private string ParseEditBox(XmlNode item, StringWriter writer)
     {
       ++ControlIndex;
       string varname = "ribboneditbox" + ControlIndex.ToString();
@@ -244,18 +296,32 @@ namespace tools.ui.windows_forms
       writer.Write("      RibbonTextBox {0} = new RibbonTextBox();\n", varname);
       CodeSnippets.Attributes.Text(item, writer, varname);
       CodeSnippets.Attributes.Image(item, writer, varname);
+      CodeSnippets.Attributes.TextBoxWidth(item, writer, varname);
       // register link between textbox contents and scripting variable
-      if (!propclasses.ContainsKey("TextBoxText"))
-      {
-        propclasses.Add("TextBoxText", 0);
-        tailwriter.Write("{0}", CodeBuilder.PropertyListenerTemplate("TextBoxText", "string", "RibbonTextBox", "ToString"));
-      }
-      ++ControlIndex;
-      writer.Write("      {0}.TextBoxTextChanged += new EventHandler(new TextBoxTextPropertyListener({0}, this.server, \"{1}\").OnUpdateProperty);\n",
-        varname, binding);
+      writer.Write("      {0}.TextBoxTextChanged += new EventHandler(new {0}({1}, this.server, \"{2}\").OnUpdateProperty);\n",
+        CodeSnippets.Properties.TemplateName("RibbonTextBox", "TextBoxText"), varname, binding);
       return varname;
     }
-    private string ParseButton(XmlNode item, StringWriter writer, StringWriter tailwriter, Dictionary<string, int> propclasses)
+    private string ParseComboBox(XmlNode item, StringWriter writer)
+    {
+      ++ControlIndex;
+      string varname = "ribboncombobox" + ControlIndex.ToString();
+      if (item.Attributes["Source"] == null)
+        throw new Exception("'Source' attribute must be specified and contain name of existing list");
+      string classname = item.Attributes["Source"].InnerText.Trim();
+      if (item.Attributes["Variable"] == null)
+        throw new Exception("'Variable' attribute must be specified and contain name of core variable");
+      string binding = item.Attributes["Variable"].InnerText;
+      writer.Write("      RibbonComboBox {0} = new RibbonList_{1}();\n", varname, classname);
+      CodeSnippets.Attributes.Text(item, writer, varname);
+      CodeSnippets.Attributes.Image(item, writer, varname);
+      CodeSnippets.Attributes.TextBoxWidth(item, writer, varname);
+      // register link between textbox contents and scripting variable
+      writer.Write("      {0}.TextBoxTextChanged += new EventHandler(new {0}({1}, this.server, \"{2}\").OnUpdateProperty);\n",
+        CodeSnippets.Properties.TemplateName("RibbonTextBox", "TextBoxText"), varname, binding);
+      return varname;
+    }
+    private string ParseButton(XmlNode item, StringWriter writer)
     {
       ++ControlIndex;
       string buttonvarname = "ribbonbutton" + ControlIndex.ToString();
@@ -268,7 +334,7 @@ namespace tools.ui.windows_forms
       CodeSnippets.Events.Click(item, writer, buttonvarname);
       return buttonvarname;
     }
-    private string ParseMenu(XmlNode item, StringWriter writer, StringWriter tailwriter, Dictionary<string, int> propclasses)
+    private string ParseMenu(XmlNode item, StringWriter writer)
     {
       ++ControlIndex;
       string varname = "ribbonmenu" + ControlIndex.ToString();
@@ -283,7 +349,7 @@ namespace tools.ui.windows_forms
         writer.Write("      {0}.Style = RibbonButtonStyle.SplitDropDown;\n", varname);
       return varname;
     }
-    private string ParseSeparator(XmlNode item, StringWriter writer, StringWriter tailwriter, Dictionary<string, int> propclasses)
+    private string ParseSeparator(XmlNode item, StringWriter writer)
     {
       ++ControlIndex;
       string varname = "ribbonseparator" + ControlIndex.ToString();
