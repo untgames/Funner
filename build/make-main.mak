@@ -468,7 +468,8 @@ define import_settings
   $$(foreach profile,$(PROFILES),$$(eval $$(call import_variables,$(EXPORT_VAR_PREFIX).$$(profile),$2,$$(DEPENDENCY_COMPONENT_DIR))))
 
 #Импортирование вложенных зависимостей
-  DEPENDENCY_IMPORTS  := $$($$(EXPORT_VAR_PREFIX).IMPORTS:%=$(dir $1)%)
+  DEPENDENCY_IMPORTS := $$($$(EXPORT_VAR_PREFIX).IMPORTS) $$(foreach profile,$(PROFILES),$$($$(EXPORT_VAR_PREFIX).$$(profile).IMPORTS))  
+  DEPENDENCY_IMPORTS := $$(DEPENDENCY_IMPORTS:%=$(dir $1)%)
 
   $$(foreach imp,$$(DEPENDENCY_IMPORTS),$$(eval $$(call import_settings,$$(imp),$2)))
 endef
