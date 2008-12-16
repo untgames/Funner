@@ -48,6 +48,7 @@ const char*  MODEL_FILE_NAME                     = "model.xmodel";
 const char*  OLD_FORMAT_MODEL_FILE_NAME          = "model.dat";
 const char*  OSX_ENVELOPE_APPLICATION_NAME       = "modeler-envelope";
 const char*  OSX_TRAJECTORY_APPLICATION_NAME     = "modeler-trajectory";
+//const char*  PLATFORM_DESCRIPTION_FILE_NAME      = "platform_description.txt";
 const char*  SCREEN_ATTACHMENT_NAME              = "MainScreen";
 const char*  TEMP_DIRECTORY_NAME                 = "tmp";
 const int    TRAJECTORIES_COORDS_HEADER          = 'TRJC';
@@ -121,7 +122,8 @@ MyApplicationServer::MyApplicationServer ()
   : shell_environment (new script::Environment),
     shell (INTERPRETER_NAME, shell_environment),
     wait_files_timer (xtl::bind (&MyApplicationServer::CheckNewFiles, this), 1000, syslib::TimerState_Paused),
-    calculating_envelope (false)
+    calculating_envelope (false),
+    calculating_trajectories_coord (false)
 {
   common::FileSystem::SetDefaultFileBufferSize (0);     //???????? обход бага!!!!!!!!!!!
 
@@ -212,11 +214,6 @@ MyApplicationServer::MyApplicationServer ()
   screen.Attach (viewport);
 
   engine::AttachmentRegistry::Register<render::Screen> (SCREEN_ATTACHMENT_NAME, screen);
-}
-
-MyApplicationServer::~MyApplicationServer ()
-{
-  //???? Удалять временную папку
 }
 
 void MyApplicationServer::ExecuteCommand (const char* command)
@@ -338,6 +335,25 @@ void MyApplicationServer::LoadTrajectory (const char* file_name)
     throw xtl::format_operation_exception ("MyApplicationServer::LoadTrajectory",
                                            "Can't load trajectory '%s', no such file", file_name);
 
+  CalculatingTrajectoriesNameMap::iterator name_map_iter = calculating_trajectories_name_map.find (file_name);
+
+  if (name_map_iter != calculating_trajectories_name_map.end ())
+  {
+    CalculatingTrajectoriesNuMap::iterator nu_map_iter = calculating_trajectories_nu_map.find (name_map_iter->second);
+
+    if (nu_map_iter == calculating_trajectories_nu_map.end ())
+      common::Console::Printf ("Warning: loading trajecotry which present in names map, but not present in nu map\n");
+    else
+    {
+      common::Console::Printf ("Trajectory with nu1 = %f, nu2 = %f, nu3 = %f calculated.\n", name_map_iter->second.x,
+                               name_map_iter->second.y, name_map_iter->second.z);
+      calculating_trajectories_name_map.erase (name_map_iter);
+      calculating_trajectories_nu_map.erase (nu_map_iter);
+    }
+  }
+
+  common::Console::Printf ("Loading trajectory '%s'\n", file_name);
+
   media::rms::Group resource_group;
 
   resource_group.Add (file_name);
@@ -397,6 +413,13 @@ void MyApplicationServer::OnNewXmeshTrajectory (const char* desc_trajectory_file
 
 void MyApplicationServer::CalculateTrajectory (double nu1, double nu2, double nu3, size_t lod)
 {
+  static const char* METHOD_NAME = "MyApplicationServer::CalculateTrajectory";
+
+  math::vec3f nu_vector ((float)nu1, (float)nu2, (float)nu3);
+
+  if (calculating_trajectories_nu_map.find (nu_vector) != calculating_trajectories_nu_map.end ())
+    throw xtl::format_operation_exception (METHOD_NAME, "Calculation of trajectory %g %g %g is already running.", nu1, nu2, nu3);
+
   stl::string application_name        = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
               model_name              = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME),
               trajectory_name         = common::format ("%strajectory_%g_%g_%g.xmesh", project_path.c_str (), nu1, nu2, nu3),
@@ -413,7 +436,12 @@ void MyApplicationServer::CalculateTrajectory (double nu1, double nu2, double nu
 
   if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), "args-input", nu1_string.c_str (),
         nu2_string.c_str (), nu3_string.c_str (), model_name.c_str (), trajectory_name.c_str (), lod_string.c_str (), 0) == -1)
-    throw xtl::format_operation_exception ("MyApplicationServer::CalculateTrajectory", "Can't call %s: %s", WIN32_TRAJECTORY_APPLICATION_NAME, get_spawn_error_name ());
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't call %s: %s", WIN32_TRAJECTORY_APPLICATION_NAME, get_spawn_error_name ());
+
+  common::Console::Printf ("Calculating trajectory with nu1 = %g, nu2 = %g, nu3 = %g and lod = %u\n", nu1, nu2, nu3, lod);
+
+  calculating_trajectories_nu_map.insert_pair   (nu_vector, binmesh_trajectory_name.c_str ());
+  calculating_trajectories_name_map.insert_pair (binmesh_trajectory_name.c_str (), nu_vector);
 
   WaitForFile (waited_desc_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewXmeshTrajectory, this, _1));
 }
@@ -421,6 +449,9 @@ void MyApplicationServer::CalculateTrajectory (double nu1, double nu2, double nu
 void MyApplicationServer::LoadEnvelope ()
 {
   calculating_envelope = false;
+
+  common::Console::Printf ("Envelope calculation complete.\n");
+  common::Console::Printf ("Loading envelope...\n");
 
   UnloadEnvelope ();
 
@@ -439,8 +470,10 @@ void MyApplicationServer::LoadEnvelope ()
   envelope.visual_model = VisualModel::Create ();
 
   envelope.visual_model->SetMeshName (mesh_name.c_str ());
-  envelope.visual_model->BindToScene (scene, NodeBindMode_AddRef);
   envelope.visual_model->SetName     ("Envelope");
+  envelope.visual_model->BindToScene (scene, NodeBindMode_AddRef);
+
+  common::Console::Printf ("Envelope loaded.\n");
 }
 
 void MyApplicationServer::OnNewXmeshEnvelope (const char* desc_envelope_file_name)
@@ -491,6 +524,8 @@ void MyApplicationServer::CalculateEnvelope (size_t lod)
 
   calculating_envelope = true;
 
+  common::Console::Printf ("Calculating envelope with level of detail %u\n", lod);
+
   WaitForFile (waited_desc_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewXmeshEnvelope, this, _1));
 }
 
@@ -519,6 +554,9 @@ void MyApplicationServer::OnNewCondorBatchTrajectory (const char* desc_trajector
 
 void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, size_t lod)
 {
+  common::Console::Printf ("Calculation of start points for batch trajectory calculation complete.\n");
+  calculating_trajectories_coord = false;
+
   static const char* METHOD_NAME = "MyApplicationServer::OnNewTrajectoriesCoords";
 
   common::InputFile desc_file (desc_file_name);
@@ -580,6 +618,16 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
       file_read (METHOD_NAME, trajectories_coords_file, &nu2, sizeof (nu2));
       file_read (METHOD_NAME, trajectories_coords_file, &nu3, sizeof (nu3));
 
+      math::vec3f nu_vector (nu1, nu2, nu3);
+
+      if (calculating_trajectories_nu_map.find (nu_vector) != calculating_trajectories_nu_map.end ())
+      {
+        coords_count--;
+        i--;
+        common::Console::Printf ("Calculation of trajectory %g %g %g is already running.\n", nu1, nu2, nu3);
+        continue;
+      }
+
       stl::string trajectory_name         = common::format ("%strajectory_%g_%g_%g.xmesh", project_path.c_str (), nu1, nu2, nu3),
                   binmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.binmesh", project_path.c_str (), nu1, nu2, nu3),
                   waited_desc_file_name   = trajectory_name + DESC_FILE_SUFFIX;
@@ -590,6 +638,9 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
       common::FileSystem::Remove (trajectory_name.c_str ());
       common::FileSystem::Remove (binmesh_trajectory_name.c_str ());
       common::FileSystem::Remove (waited_desc_file_name.c_str ());
+
+      calculating_trajectories_nu_map.insert_pair   (nu_vector, binmesh_trajectory_name.c_str ());
+      calculating_trajectories_name_map.insert_pair (binmesh_trajectory_name.c_str (), nu_vector);
 
       WaitForFile (waited_desc_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewXmeshTrajectory, this, _1));
     }
@@ -620,22 +671,43 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
       file_read (METHOD_NAME, trajectories_coords_file, &nu2, sizeof (nu2));
       file_read (METHOD_NAME, trajectories_coords_file, &nu3, sizeof (nu3));
 
-      stl::string waited_file_name  = common::format ("batch_trajectory.%u.xmesh.desc", i);
+      math::vec3f nu_vector (nu1, nu2, nu3);
 
-      condor_trajectories_names[waited_file_name.c_str ()] = common::format ("%strajectory_%f_%f_%f.xmesh.desc", project_path.c_str (), nu1, nu2, nu3);
-
-      WaitForFile (waited_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewCondorBatchTrajectory, this, _1));
+      if (calculating_trajectories_nu_map.find (nu_vector) != calculating_trajectories_nu_map.end ())
+      {
+        coords_count--;
+        i--;
+        common::Console::Printf ("Calculation of trajectory %g %g %g is already running.\n", nu1, nu2, nu3);
+        continue;
+      }
 
       stl::string nu_file_name = common::format ("%s\\%s.%d%s", BATCH_TRAJECTORY_NU_FILE_FOLDER, BATCH_TRAJECTORY_NU_FILE_BASE_NAME, i,
                                                  BATCH_TRAJECTORY_NU_FILE_SUFFIX);
 
-      //????Добавить обработку ошибок сохранения файла
-
       FILE* nu_file = fopen (nu_file_name.c_str (), "w");
+
+      if (!nu_file)
+      {
+        coords_count--;
+        i--;
+        common::Console::Printf ("Can't create file '%s' needed for condor calculations\n");
+        continue;
+      }
 
       fprintf (nu_file, "%f %f %f", nu1, nu2, nu3);
 
       fclose (nu_file);
+
+      stl::string waited_file_name  = common::format ("batch_trajectory.%u.xmesh.desc", i);
+
+      condor_trajectories_names[waited_file_name.c_str ()] = common::format ("%strajectory_%f_%f_%f.xmesh.desc", project_path.c_str (), nu1, nu2, nu3);
+
+      stl::string binmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.binmesh", project_path.c_str (), nu1, nu2, nu3);
+
+      calculating_trajectories_nu_map.insert_pair   (nu_vector, binmesh_trajectory_name.c_str ());
+      calculating_trajectories_name_map.insert_pair (binmesh_trajectory_name.c_str (), nu_vector);
+
+      WaitForFile (waited_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewCondorBatchTrajectory, this, _1));
     }
 
     stl::string condor_config_file_name = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, CONDOR_CONFIG_FILE_NAME);
@@ -688,7 +760,12 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
 }
 
 void MyApplicationServer::CalculateTrajectories (size_t trajectories_count, size_t lod)
-{ //????Продумать двойной вызов
+{
+  static const char* METHOD_NAME = "MyApplicationServer::CalculateTrajectories";
+
+  if (calculating_trajectories_coord)
+    throw xtl::format_operation_exception (METHOD_NAME, "Preaparing for batch trajecoty calculating is already running for previous command, try again a little bit later.\n");
+
   stl::string application_name          = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_ENVELOPE_APPLICATION_NAME),
               model_name                = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME),
               trajectories_coords_name  = common::format ("%s%s", project_path.c_str (), BATCH_TRAJECTORIES_COORDS_FILE_NAME),
@@ -700,8 +777,10 @@ void MyApplicationServer::CalculateTrajectories (size_t trajectories_count, size
 
   if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), "-save_coords_only", model_name.c_str (),
          trajectories_coords_name.c_str (), trajectories_count_string.c_str (), 0) == -1)
-    throw xtl::format_operation_exception ("MyApplicationServer::CalculateTrajectories",
-                                           "Can't call %s: %s", WIN32_ENVELOPE_APPLICATION_NAME, get_spawn_error_name ());
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't call %s: %s", WIN32_ENVELOPE_APPLICATION_NAME, get_spawn_error_name ());
+
+  common::Console::Printf ("Calculating start points for batch trajectory calculation.\n");
+  calculating_trajectories_coord = true;
 
   WaitForFile (waited_desc_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewTrajectoriesCoords, this, _1, lod));
 }
@@ -751,6 +830,25 @@ void MyApplicationServer::WaitForFile (const char* file_name, const WaitFileHand
   waited_files.push_back (WaitedFile (file_name, handler));
   wait_files_timer.Run ();
 }
+
+/*void MyApplicationServer::StopFileWaiting (const char* file_name)
+{
+  for (WaitedFiles::iterator iter = waited_files.begin (), end = waited_files.end (); iter != end;)
+  {
+    if (iter->file_name == file_name)
+    {
+      WaitedFiles::iterator next = iter;
+
+      ++next;
+
+      waited_files.erase (iter);
+
+      iter = next;
+    }
+    else
+      ++iter;
+  }
+}*/
 
 void MyApplicationServer::LoadModel (const char* path)
 {
@@ -969,3 +1067,27 @@ void MyApplicationServer::Benchmark ()
 
   common::Console::Printf ("This computer performance is %u vps\n", trajectory_vertex_per_second);
 }
+
+/*void MyApplicationServer::SavePlatformDescription ()
+{
+  static const char* METHOD_NAME = "MyApplicationServer::SavePlatformDescription";
+
+  stl::string platform_description_file_name = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, PLATFORM_DESCRIPTION_FILE_NAME);
+
+  FILE* platform_description_file = fopen (platform_description_file_name.c_str (), "w");
+
+  if (!platform_description_file)
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't open platform description file '%s'\n", platform_description_file_name.c_str ());
+
+  int dummy = 1;
+
+  if (reinterpret_cast<char*> (&dummy)[0])
+    fprintf (platform_description_file, "Little endian 1\n");
+  else
+    fprintf (platform_description_file, "Little endian 0\n");
+
+  fprintf (platform_description_file, "size_t size %u\n", sizeof (size_t));
+  fprintf (platform_description_file, "float size %u\n",  sizeof (float));
+
+  fclose (platform_description_file);
+}*/

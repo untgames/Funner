@@ -15,3 +15,13 @@ const char* get_spawn_error_name ()
     default:      return "Unknown error";
   }
 }
+
+namespace math
+{
+
+size_t hash (const math::vec3f& vector)
+{
+  return common::crc32 (&vector, sizeof (vector));
+}
+
+}

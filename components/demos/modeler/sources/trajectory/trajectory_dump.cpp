@@ -4,9 +4,14 @@
 
 #include "core.h"
 
-const char* DESC_FILE_SUFFIX            = ".desc";
-const int   TRAJECTORIES_COORDS_HEADER  = 'TRJC';
-const int   TRAJECTORIES_COORDS_VERSION = 1;
+const char* DESC_FILE_SUFFIX               = ".desc";
+/*const char* PLATFORM_DESCRIPTION_FILE_NAME = "platform_description.txt";
+const char* XMESH_FILE_SUFFIX              = ".xmesh";
+const char* BINMESH_FILE_SUFFIX            = ".binmesh";*/
+const int   TRAJECTORIES_COORDS_HEADER     = 'TRJC';
+const int   TRAJECTORIES_COORDS_VERSION    = 1;
+/*const int   BINMESH_HEADER                 = 'BMSH';
+const int   BINMESH_VERSION                = 1;*/
 
 void save_desc_file (const char* result_file_name, size_t file_size)
 {
@@ -31,7 +36,7 @@ void save_desc_file (const char* result_file_name, size_t file_size)
   fclose (desc_file);
 }
 
-void dump (const char* result_file_name, const DrawVertexArray& vertices, const DrawPrimitiveArray& primitives)
+void dump_xmesh (const char* result_file_name, const DrawVertexArray& vertices, const DrawPrimitiveArray& primitives)
 {
   FILE* result_file = fopen (result_file_name, "w");
 
@@ -103,6 +108,67 @@ void dump (const char* result_file_name, const DrawVertexArray& vertices, const 
   fclose (result_file);
 }
 
+/*void dump_binmesh (const char* result_file_name, const DrawVertexArray& vertices, const DrawPrimitiveArray& primitives)
+{
+  size_t result_file_name_length  = strlen (result_file_name),
+         xmesh_file_suffix_length = strlen (XMESH_FILE_SUFFIX);
+
+  std::string binmesh_file_name;
+
+  if (result_file_mesh_length > xmesh_file_suffix_length)
+  {
+    if (!strcmp (result_file_name + result_file_mesh_length - xmesh_file_suffix_length, XMESH_FILE_SUFFIX))
+    {
+      binmesh_file_name = std::string (result_file_name, result_file_name_length - xmesh_file_suffix_length);
+      binmesh_file_name += BINMESH_FILE_SUFFIX;
+    }
+  }
+
+  FILE* result_file = fopen (binmesh_file_name.c_str (), "wb");
+
+  if (!result_file)
+  {
+    printf ("Can't open result file '%s'\n", binmesh_file_name.c_str ());
+    return;
+  }
+
+  file_write (result_file, &HEADER,  sizeof (HEADER));
+  file_write (result_file, &VERSION, sizeof (VERSION));
+
+  size_t vertex_streams_count = 1;
+  file_write (result_file, &vertex_streams_count, sizeof (vertex_streams_count));
+
+  size_t vertices_count = vertices.size (),
+         vertex_size    = 16;
+
+  file_write (result_file, &vertices_count, sizeof (vertices_count));
+  file_write (result_file, &vertex_size, sizeof (vertex_size));
+
+  size_t channels_count = 2;
+  file_write (result_file, &channels_count, sizeof (channels_count));
+
+
+
+
+
+  size_t vertex_buffers_count = 1;
+  file_write (result_file, &vertex_buffers_count, sizeof (vertex_buffers_count));
+
+  size_t weights_count = 0;
+  file_write (result_file, &weights_count, sizeof (weights_count));
+
+  size_t vertex_streams_count = 0;
+  file_write (result_file, &vertex_streams_count, sizeof (vertex_streams_count));
+
+  size_t vertex_stream_index = 0;
+  file_write (result_file, &vertex_stream_index, sizeof (vertex_stream_index));
+
+  size_t weights_streams_count = 0;
+  file_write (result_file, &weights_streams_count, sizeof (weights_streams_count));
+
+  fclose (result_file);
+}*/
+
 int main (int argc, char* argv[])
 {
   if ((argc < 6) || (argc > 8))
@@ -118,6 +184,7 @@ int main (int argc, char* argv[])
   ModelData model_data;
   size_t    optional_parameters_count;
   float     nu[3];
+//  bool      convert_to_binmesh = false;
 
   if (!strcmp (argv[1], "args-input"))
   {
@@ -196,6 +263,27 @@ int main (int argc, char* argv[])
     fclose (nu_file);
 
     optional_parameters_count = 1;
+
+  /*  FILE* platform_description_file = fopen (PLATFORM_DESCRIPTION_FILE_NAME, "r");
+
+    if (platform_description_file)
+    {
+      size_t little_endian, size_t_size, float_size;
+
+      fscanf (platform_description_file, "Little endian %u\n", &little_endian);
+      fscanf (platform_description_file, "size_t size %u\n",   &size_t_size);
+      fscanf (platform_description_file, "float size %u\n",    &float_size);
+
+      fclose (platform_description_file);
+
+      int  dummy = 1;
+
+      bool this_pc_little_endian = reinterpret_cast<char*> (&dummy)[0] != 0;
+
+      if ((sizeof (size_t) == size_t_size) && (sizeof (float) == float_size) &&
+          ((!little_endian && !this_pc_little_endian) || (little_endian && this_pc_little_endian)))
+        convert_to_binmesh = true;
+    }*/
   }
   else
   {
@@ -210,7 +298,11 @@ int main (int argc, char* argv[])
 
   BuildTrajectory (model_data, nu[0], nu[1], nu[2], atoi (argv[4 + optional_parameters_count]), vertices, primitives);
 
-  dump (argv[3 + optional_parameters_count], vertices, primitives);
+/*  if (convert_to_binmesh)
+    dump_binmesh (argv[3 + optional_parameters_count], vertices, primitives);
+  else*/
+
+  dump_xmesh (argv[3 + optional_parameters_count], vertices, primitives);
 
   return 0;
 }

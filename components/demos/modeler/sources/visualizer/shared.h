@@ -100,7 +100,6 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
 
   public:
     MyApplicationServer ();
-    ~MyApplicationServer ();
 
     void ExecuteCommand (const char* command);
 
@@ -173,8 +172,9 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     void OnNewTrajectoriesCoords (const char* desc_file_name, size_t lod);
     void CalculateTrajectories (size_t trajectories_count, size_t lod);
 
-    void CheckNewFiles ();
-    void WaitForFile (const char* file_name, const WaitFileHandler& handler);
+    void CheckNewFiles   ();
+    void WaitForFile     (const char* file_name, const WaitFileHandler& handler);
+//    void StopFileWaiting (const char* file_name);
 
     void LoadModel (const char* path);
     void SaveModel ();
@@ -182,6 +182,8 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     void CreateCondorBinaries ();
 
     void Benchmark ();
+
+//    void SavePlatformDescription ();
 
   private:
     typedef xtl::shared_ptr<script::Environment> ShellEnvironmentPtr;
@@ -206,32 +208,44 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     typedef stl::list<WaitedFile> WaitedFiles;
     typedef stl::hash_map<stl::hash_key<const char*>, VisualModelResource> VisualModels;
     typedef stl::hash_map<stl::hash_key<const char*>, stl::string>         CondorTrajectoriesNames;
+    typedef stl::hash_map<math::vec3f, stl::string>                        CalculatingTrajectoriesNuMap;
+    typedef stl::hash_map<stl::hash_key<const char*>, math::vec3f>         CalculatingTrajectoriesNameMap;
 
   private:
-    ShellEnvironmentPtr               shell_environment;     //окружение скриптовой среды
-    script::Shell                     shell;                 //скриптовый интерпретатор
+    ShellEnvironmentPtr               shell_environment;                    //окружение скриптовой среды
+    script::Shell                     shell;                                //скриптовый интерпретатор
     scene_graph::Scene                scene;
     scene_graph::OrthoCamera::Pointer camera;
     render::Screen                    screen;
     stl::string                       win32_plugin_path;
     stl::string                       osx_plugin_path;
-    stl::string                       project_path;
-    stl::string                       condor_trajectory_requirements;
-    syslib::Timer                     wait_files_timer;
-    stl::string                       working_directory;
+    stl::string                       project_path;                         //путь к текущей используемой папке
+    stl::string                       condor_trajectory_requirements;       //condor требования для запуска рассчёта траекторий
+    syslib::Timer                     wait_files_timer;                     //таймер проверки наличия новых файлов
+    stl::string                       working_directory;                    //папка, содержащая приложение
     VisualModelResource               envelope;
-    bool                              calculating_envelope;
+    bool                              calculating_envelope;                 //идёт ли сейчас рассчёт огибающей
     VisualModels                      trajectories;
     media::rms::ResourceManager       resource_manager;
-    WaitedFiles                       waited_files;
-    stl::string                       condor_path;
-    bool                              use_condor;
-    CondorTrajectoriesNames           condor_trajectories_names;
-    stl::string                       author;
-    size_t                            trajectory_vertex_per_second;   //производительность данного компьютера при рассчёте траекторий
+    WaitedFiles                       waited_files;                         //ожидаемые файлы
+    stl::string                       condor_path;                          //путь к bin папке condor'а
+    bool                              use_condor;                           //использовать ли condor
+    CondorTrajectoriesNames           condor_trajectories_names;            //имена, в которые будут переименованы рассчитанные condor'ом траектории
+    stl::string                       author;                               //имя пользователя программы
+    size_t                            trajectory_vertex_per_second;         //производительность данного компьютера при рассчёте траекторий
+    CalculatingTrajectoriesNuMap      calculating_trajectories_nu_map;      //рассчитываемые в данный момент траектории
+    CalculatingTrajectoriesNameMap    calculating_trajectories_name_map;    //рассчитываемые в данный момент траектории
+    bool                              calculating_trajectories_coord;       //идёт ли сейчас рассчёт начальных точек для пакетного рассчёта траекторий
 };
 
 //проверка ошибок
 const char* get_spawn_error_name ();
+
+namespace math
+{
+
+size_t hash (const math::vec3f& vector);
+
+}
 
 #endif
