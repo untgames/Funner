@@ -9,5 +9,6 @@ Application.Execute ("dofile ('data/setup_var_registry.lua')")
 
 Application.CreateForm ("PropertyGrid", "Map2 registry1", DockState.Right)
 Application.CreateForm ("Console", "", DockState.Bottom)
+Application.CreateForm ("Ribbon", "CustomRibbon", DockState.Top)
 
 Application.MainForm.OnClosed = "Application.Execute ('close')"

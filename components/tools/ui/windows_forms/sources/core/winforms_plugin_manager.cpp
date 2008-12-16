@@ -415,6 +415,7 @@ void PluginManager::LoadPlugins (const char* wc_mask)
   {
     try
     {
+      printf("%s\n", iter->name);
       System::String ^file_path = gcnew System::String (iter->name);
 
       Assembly^ assembly = Assembly::LoadFile (file_path);
