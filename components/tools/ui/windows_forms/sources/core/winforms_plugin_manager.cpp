@@ -31,11 +31,11 @@ class VarRegistryEventHandler
     {
       AutoString wc_mask_string (wc_mask);
 
-      create_var_connection = var_registry->RegisterEventHandler (wc_mask_string.Data (), common::VarRegistryEvent_OnCreateVar, 
+      create_var_connection = var_registry->RegisterEventHandler (wc_mask_string.Data (), common::VarRegistryEvent_OnCreateVar,
                                                                   xtl::bind (&VarRegistryEventHandler::OnCreateVar, this, _1));
-      change_var_connection = var_registry->RegisterEventHandler (wc_mask_string.Data (), common::VarRegistryEvent_OnChangeVar, 
+      change_var_connection = var_registry->RegisterEventHandler (wc_mask_string.Data (), common::VarRegistryEvent_OnChangeVar,
                                                                   xtl::bind (&VarRegistryEventHandler::OnChangeVar, this, _1));
-      delete_var_connection = var_registry->RegisterEventHandler (wc_mask_string.Data (), common::VarRegistryEvent_OnDeleteVar, 
+      delete_var_connection = var_registry->RegisterEventHandler (wc_mask_string.Data (), common::VarRegistryEvent_OnDeleteVar,
                                                                   xtl::bind (&VarRegistryEventHandler::OnDeleteVar, this, _1));
     }
 
@@ -124,7 +124,7 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
       PluginMap::iterator iter = plugins->find (plugin_name_string.Data ());
 
       if (iter != plugins->end ())
-        throw xtl::format_operation_exception ("tools::ui::windows_forms::ApplicationServerImpl::AddPlugin", 
+        throw xtl::format_operation_exception ("tools::ui::windows_forms::ApplicationServerImpl::AddPlugin",
                                                "Can't add plugin with name %s, plugin with this name already added", plugin_name_string.Data ());
 
       plugins->insert_pair (plugin_name_string.Data (), PluginEntry (plugin, plugin_name_string.Data ()));
@@ -239,7 +239,7 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
                                                "Can't register listener, this listener already registered");
 
       output_listeners.Add (listener);
-      
+
       for (size_t i=0; i<common::Console::LinesCount (); i++)
       {
         listener->OnMessage (gcnew String (common::Console::Message (i)));
@@ -295,7 +295,7 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
         {
           AutoString node_path (get_node_path (plugin_configuration));
 
-          throw xtl::format_operation_exception ("", "Can't load configuration from node %s, there is no 'Name' attribute in this node", 
+          throw xtl::format_operation_exception ("", "Can't load configuration from node %s, there is no 'Name' attribute in this node",
                                                  node_path.Data ());
         }
 
@@ -354,18 +354,18 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
 
 }
 
-} 
+}
 
 /*
    Менеджер плагинов
 */
 
 struct PluginManager::Impl
-{   
+{
   WindowSystem*        window_system;      //оконная система
   common::Log          log;                //лог
   ApplicationServerPtr application_server; //интерфейс приложения
-  xtl::auto_connection console_connection; //соединение обработчика консоли 
+  xtl::auto_connection console_connection; //соединение обработчика консоли
 
   Impl (WindowSystem* in_window_system)
     : window_system (in_window_system), log (LOG_NAME)
@@ -415,8 +415,7 @@ void PluginManager::LoadPlugins (const char* wc_mask)
   {
     try
     {
-      printf("%s\n", iter->name);
-      System::String ^file_path = gcnew System::String (iter->name);
+      System::String ^file_path = System::IO::Path::GetFullPath (gcnew System::String (iter->name));
 
       Assembly^ assembly = Assembly::LoadFile (file_path);
 
