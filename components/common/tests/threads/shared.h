@@ -1,5 +1,6 @@
 #include <cstdio>
 
+#include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 
 #include <common/log.h>

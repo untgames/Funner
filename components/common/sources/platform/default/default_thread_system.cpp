@@ -6,7 +6,7 @@ using namespace common;
     Создание / удаление нити
 */
 
-DefaultThreadSystem::thread_t DefaultThreadSystem::CreateThread (IThreadCallback*, ThreadState)
+DefaultThreadSystem::thread_t DefaultThreadSystem::CreateThread (IThreadCallback*)
 {
   throw xtl::format_not_supported_exception ("common::DefaultThreadSystem::CreateThread", "Threads are not supported");
 }
@@ -20,14 +20,9 @@ void DefaultThreadSystem::DeleteThread (thread_t)
     Управление состоянием работы нити
 */
 
-void DefaultThreadSystem::SetThreadState (thread_t, ThreadState)
+void DefaultThreadSystem::CancelThread (thread_t)
 {
-  throw xtl::format_not_supported_exception ("common::DefaultThreadSystem::SetThreadState", "Threads are not supported");
-}
-
-ThreadState DefaultThreadSystem::GetThreadState (thread_t)
-{
-  throw xtl::format_not_supported_exception ("common::DefaultThreadSystem::GetThreadState", "Threads are not supported");
+  throw xtl::format_not_supported_exception ("common::DefaultThreadSystem::CancelThread", "Threads are not supported");
 }
 
 /*

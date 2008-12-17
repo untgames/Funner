@@ -9,6 +9,12 @@ using namespace common;
 namespace
 {
 
+//генерация исключения с кодом ошибки
+void raise (const char* source, int status)
+{
+  throw xtl::format_operation_exception (source, "Operation failed. Reason: %s (function exit with code %d)", common::strerror (status), status);
+}
+
 #ifdef _WIN32
 
 //функция инициализации библиотеки
@@ -25,7 +31,7 @@ inline void thread_init ()
 }
 
 //функция деинициализации библиотеки
-inline void thread_done ()
+inline void thread_done (void*)
 {
   pthread_win32_thread_detach_np ();
 }
@@ -46,7 +52,7 @@ inline void thread_init ()
 {
 }
 
-inline void thread_done ()
+inline void thread_done (void*)
 {
 }
 
@@ -68,11 +74,23 @@ void* thread_run (void* data)
 
   xtl::com_ptr<IThreadCallback> callback (reinterpret_cast<IThreadCallback*> (data));
 
-  thread_init ();
+  thread_init ();  
 
-  callback->Run ();
+  pthread_cleanup_push (&thread_done, 0);
 
-  thread_done ();
+  pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, 0);   //???переделать!!!
+
+  try
+  {
+    callback->Run ();
+  }
+  catch (...)
+  {
+    thread_done (0);
+    throw;
+  }
+
+  pthread_cleanup_pop (1);
 
   return 0;
 }
@@ -91,7 +109,7 @@ PThreadsSystem::PThreadsSystem ()
 
 PThreadsSystem::~PThreadsSystem ()
 {
-  thread_done ();
+  thread_done (0);
   process_done ();
 }
 
@@ -99,7 +117,7 @@ PThreadsSystem::~PThreadsSystem ()
     Создание / удаление нити
 */
 
-PThreadsSystem::thread_t PThreadsSystem::CreateThread (IThreadCallback* in_callback, ThreadState initial_state)
+PThreadsSystem::thread_t PThreadsSystem::CreateThread (IThreadCallback* in_callback)
 {
   try
   {
@@ -121,7 +139,9 @@ PThreadsSystem::thread_t PThreadsSystem::CreateThread (IThreadCallback* in_callb
     int status = pthread_create (handle.get (), 0, &thread_run, callback.get ());
 
     if (status)
-      throw xtl::format_operation_exception ("", "Can't create thread. Reason: ::pthread_create return %d", status);
+      raise ("::pthread_create", status);
+      
+
 
     return handle.release ();
   }
@@ -135,31 +155,38 @@ PThreadsSystem::thread_t PThreadsSystem::CreateThread (IThreadCallback* in_callb
 void PThreadsSystem::DeleteThread (thread_t thread)
 {
   if (!thread)
-    return;
+    return;    
 
-  thread_init ();
-
-  pthread_t* handle = (pthread_t*)thread;
-
-
+  pthread_t* handle = (pthread_t*)thread;    
 
   delete handle;
 }
 
 /*
-    Управление состоянием работы нити
+    Отмена нити
 */
 
-void PThreadsSystem::SetThreadState (thread_t thread, ThreadState state)
+void PThreadsSystem::CancelThread (thread_t thread)
 {
-  thread_init ();
-}
+  try
+  {
+    if (!thread)
+      throw xtl::make_null_argument_exception ("", "thread");
+      
+    thread_init ();
+    
+    pthread_t* handle = (pthread_t*)thread;
+    
+    int status = pthread_cancel (*handle);    
 
-ThreadState PThreadsSystem::GetThreadState (thread_t thread)
-{
-  thread_init ();
-
-  return ThreadState_Exited;
+    if (status)
+      raise ("::pthread_cancel", status);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::PThreadsSystem::CancelThread");
+    throw;
+  }    
 }
 
 /*
@@ -168,18 +195,24 @@ ThreadState PThreadsSystem::GetThreadState (thread_t thread)
 
 void PThreadsSystem::JoinThread (thread_t thread)
 {
-  static const char* METHOD_NAME = "common::PThreadsSystem::JoinThread";
+  try
+  {
+    if (!thread)
+      throw xtl::make_null_argument_exception ("", "thread");
+      
+    thread_init ();
+    
+    pthread_t* handle    = (pthread_t*)thread;
+    void*      exit_code = 0;
 
-  if (!thread)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "thread");
+    int status = pthread_join (*handle, &exit_code);
 
-  thread_init ();
-
-  pthread_t* handle    = (pthread_t*)thread;
-  void*      exit_code = 0;
-
-  int status = pthread_join (*handle, &exit_code);
-
-  if (status)
-    throw xtl::format_operation_exception (METHOD_NAME, "Can't join threads. Reason: ::pthread_join return %d", status);
+    if (status)
+      raise ("::pthread_join", status);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::PThreadsSystem::JoinThread");
+    throw;
+  }
 }

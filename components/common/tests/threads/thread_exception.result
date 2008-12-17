@@ -1,0 +1,3 @@
+Results of thread_exception_test:
+common.threads.Thread1: Operation failed
+    at ::run

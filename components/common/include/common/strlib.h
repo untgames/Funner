@@ -78,6 +78,12 @@ bool wcimatch (const char* string,const char* wildcard);
 
 bool is_wildcard (const char* string);
 
+/*
+    Получение строки с информацией об ошибке (портируемый аналог strerror)
+*/
+
+const char* strerror (int code);
+
 #include <common/detail/strlib.inl>
 
 }

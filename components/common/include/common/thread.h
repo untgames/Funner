@@ -7,18 +7,9 @@ namespace common
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Состояние нити
+///Константы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ThreadState
-{
-  ThreadState_Suspended, //нить приостановлена
-  ThreadState_Worked,    //нить работает
-  ThreadState_Exited,    //нить завершила работу  
-  
-  ThreadState_Num,
-  
-  ThreadState_DefaultInitialState = ThreadState_Suspended,
-};
+const int THREAD_CANCELED_EXIT_CODE = -1; //од завершения сброшенной нити
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Нить
@@ -32,8 +23,8 @@ class Thread
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Thread  ();
-    Thread  (const Function& thread_function, ThreadState initial_state = ThreadState_DefaultInitialState);
-    Thread  (const char* name, const Function& thread_function, ThreadState initial_state = ThreadState_DefaultInitialState);
+    Thread  (const Function& thread_function);
+    Thread  (const char* name, const Function& thread_function);
     Thread  (const Thread&);
     ~Thread ();
 
@@ -45,13 +36,9 @@ class Thread
     const char* Name () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление состоянием выполнения
+///Отмена нити
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ThreadState State () const;
-    void        SetState (ThreadState state);
-    void        Suspend () { SetState (ThreadState_Suspended); } //приостановка выполнения нити
-    void        Resume  () { SetState (ThreadState_Worked); }    //продолжение выполнения нити
-    void        Kill    () { SetState (ThreadState_Exited); }    //принудительное завершение работы нити
+    void Cancel ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ожидание завершения нити
@@ -62,6 +49,11 @@ class Thread
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Swap (Thread&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение текущей нити
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static Thread GetCurrent ();
 
   private:
     struct Impl;

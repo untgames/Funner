@@ -2,14 +2,12 @@
 
 int run ()
 {
-  printf ("in another thread\n");
-  
-  return 12;
+  throw xtl::format_operation_exception ("::run", "Operation failed");
 }
 
 int main ()
 {
-  printf ("Results of create_thread_test:\n");
+  printf ("Results of thread_exception_test:\n");
 
   try    
   {
@@ -17,8 +15,7 @@ int main ()
     
     Thread thread (&run);
 
-    printf ("thread exit with code %d\n", thread.Join ());
-//    printf ("join again, code %d\n", thread.Join ());    
+    thread.Join ();
   }
   catch (std::exception& exception)
   {

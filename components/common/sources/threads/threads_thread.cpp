@@ -27,26 +27,11 @@ struct Thread::Impl: public IThreadCallback, public xtl::reference_counter
 ///Конструкторы
   Impl () : handle (0), exit_code (0) {}  
   
-  Impl (const char* in_name, const Function& in_thread_function, ThreadState initial_state)
+  Impl (const char* in_name, const Function& in_thread_function)
     : thread_function (in_thread_function),
       name (in_name)
   {
-      //проверка корректности аргументов
-
-    switch (initial_state)
-    {
-      case ThreadState_Suspended:
-      case ThreadState_Worked:     
-        break;
-      case ThreadState_Exited:
-        throw xtl::make_argument_exception ("", "initial_state", "ThreadState_Exited", "Can't create thread");
-      default:
-        throw xtl::make_argument_exception ("", "initial_state", initial_state);
-    }    
-
-      //создание нити
-
-    handle = Platform::GetThreadSystem ()->CreateThread (this, initial_state);
+    handle = Platform::GetThreadSystem ()->CreateThread (this);
   }
   
 ///Деструктор
@@ -101,7 +86,7 @@ Thread::Thread ()
 {
 }
 
-Thread::Thread (const Function& thread_function, ThreadState initial_state)
+Thread::Thread (const Function& thread_function)
 {
   try
   {
@@ -109,7 +94,7 @@ Thread::Thread (const Function& thread_function, ThreadState initial_state)
 
     ++thread_auto_counter;
 
-    impl = new Impl (format ("Thread%u", thread_auto_counter).c_str (), thread_function, initial_state);
+    impl = new Impl (format ("Thread%u", thread_auto_counter).c_str (), thread_function);
   }
   catch (xtl::exception& exception)
   {
@@ -118,14 +103,14 @@ Thread::Thread (const Function& thread_function, ThreadState initial_state)
   }
 }
 
-Thread::Thread (const char* name, const Function& thread_function, ThreadState initial_state)
+Thread::Thread (const char* name, const Function& thread_function)
 {
   try
   {
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
     
-    impl = new Impl (name, thread_function, initial_state);
+    impl = new Impl (name, thread_function);
   }
   catch (xtl::exception& exception)
   {
@@ -162,54 +147,17 @@ const char* Thread::Name () const
 }
 
 /*
-    Управление состоянием выполнения
+    Отмена нити
 */
 
-ThreadState Thread::State () const
+void Thread::Cancel ()
 {
   if (!impl->handle)
-    return ThreadState_Exited;
-    
-  try
-  {    
-    return Platform::GetThreadSystem ()->GetThreadState (impl->handle);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("common::Thread::State");
-    throw;
-  }
-}
+    return;
 
-void Thread::SetState (ThreadState state)
-{
-  try
-  {
-    switch (state)
-    {
-      case ThreadState_Suspended:
-      case ThreadState_Worked:     
-      case ThreadState_Exited:
-        break;
-      default:
-        throw xtl::make_argument_exception ("", "state", state);
-    }
-
-    if (!impl->handle)
-    {
-      if (state == ThreadState_Exited)
-        return;
-
-      throw xtl::format_operation_exception ("", "Can't set state on dummy thread");
-    }    
-
-    Platform::GetThreadSystem ()->SetThreadState (impl->handle, state);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("common::Thread::SetState");
-    throw;
-  }
+  Platform::GetThreadSystem ()->CancelThread (impl->handle);
+  
+  impl->exit_code = THREAD_CANCELED_EXIT_CODE;
 }
 
 /*
