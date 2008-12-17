@@ -16,3 +16,8 @@ ICustomFileSystem* DefaultPlatform::GetIOSystem ()
 {
   return Singleton<StdioIOSystem>::InstancePtr ();
 }
+
+ICustomThreadSystem* DefaultPlatform::GetThreadSystem ()
+{
+  return Singleton<DefaultThreadSystem>::InstancePtr ();
+}

@@ -2,3 +2,4 @@
 #Экспортируемые настройки компонента
 ###################################################################################################
 export.LIBS  := funner.common funner.extern.pcre
+export.win32.IMPORTS := ../../extern/pthreads_win32/link.static.mak

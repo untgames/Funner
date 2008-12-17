@@ -9,13 +9,15 @@ COMMON.SOURCES.NAME             := funner.common
 COMMON.SOURCES.INCLUDE_DIRS     := include ../xtl/include ../../extern/pcre/include sources
 COMMON.SOURCES.SOURCE_DIRS      := sources/file_system/core sources/streams sources/hash sources/memory \
                                    sources/parselib/tree sources/parselib/manager sources/strlib sources/utils sources/log \
-                                   sources/var_registry sources/platform/default
-COMMON.SOURCES.LIB_DIRS         :=  
-COMMON.SOURCES.LIBS             := 
-COMMON.SOURCES.COMPILER_CFLAGS  :=
-COMMON.SOURCES.COMPILER_DEFINES := PCRE_STATIC
+                                   sources/var_registry sources/threads sources/platform/default
+COMMON.SOURCES.LIB_DIRS           :=  
+COMMON.SOURCES.LIBS               := 
+COMMON.SOURCES.COMPILER_CFLAGS    :=
+COMMON.SOURCES.COMPILER_DEFINES   := PCRE_STATIC
 COMMON.SOURCES.unistd.SOURCE_DIRS := sources/platform/unistd
 COMMON.SOURCES.macosx.SOURCE_DIRS := sources/platform/macosx
+COMMON.SOURCES.win32.IMPORTS      := ../../extern/pthreads_win32/compile.static.mak
+COMMON.SOURCES.win32.SOURCE_DIRS  := sources/platform/win32 sources/platform/pthreads
 
 #Цель - WxfParser
 COMMON.WXF_PARSER.TYPE             := static-lib
@@ -63,7 +65,7 @@ COMMON.CONFIGURATOR.IMPORTS          := compile.static.mak
 COMMON.TESTS.TYPE             := test-suite
 COMMON.TESTS.INCLUDE_DIRS     :=
 COMMON.TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils \
-                                 tests/memory tests/log tests/parselib
+                                 tests/memory tests/log tests/parselib tests/threads
 COMMON.TESTS.EXECUTION_DIR    :=
 COMMON.TESTS.LIB_DIRS         :=  
 COMMON.TESTS.LIBS             :=
