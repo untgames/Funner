@@ -76,7 +76,8 @@ class ConsoleImpl
           current_line.clear ();          
 
           prev_pos = pos + 1;
-        } while (pos = strchr (prev_pos, '\n'));
+          pos      = strchr (prev_pos, '\n');
+        } while (pos);
 
           //изменение текущего сообщения
 
