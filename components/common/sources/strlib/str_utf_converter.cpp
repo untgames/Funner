@@ -5,6 +5,7 @@
 
 #include <xtl/common_exceptions.h>
 #include <xtl/string.h>
+#include <xtl/utility>
 
 #include <common/utf_converter.h>
 
@@ -239,30 +240,32 @@ bool decoder<Encoding_UTF8> (const void*& src_char, size_t& src_size, void*& dst
 template<>
 bool decoder<Encoding_UTF16LE> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
 {
-  const wchar_t* src_ptr = (const wchar_t*) src_char;
+  xtl::compile_time_assert<sizeof (unsigned short) == 2> ();
+
+  const unsigned short* src_ptr = (const unsigned short*) src_char;
   size_t* dst_ptr = (size_t*) dst_char;
 
-  if (src_size < sizeof(wchar_t))
+  if (src_size < 2)
     return false;
 
   if ( (*src_ptr < 0xD800) || (*src_ptr > 0xDFFF) )
   {
     *dst_ptr = *src_ptr;
     src_ptr++;
-    src_size -= sizeof(wchar_t);
+    src_size -= 2;
   }
   else
   {
-    if (src_size < sizeof(wchar_t)*2)
+    if (src_size < 4)
       return false;
 
     if ( (*src_ptr > 0xDBFF ) || (*(src_ptr+1) < 0xDC00) || (*(src_ptr+1) > 0xDFFF) )
-      *dst_ptr = 0x3F;
+      *dst_ptr = '?';
     else
-      *dst_ptr = (*src_ptr & 0x03FF) + ( (*(src_ptr+1) & 0x03FF) << 10) + 0x10000;
+      *dst_ptr = ((*src_ptr & 0x3FF) << 10) + (*(src_ptr+1) & 0x3FF) + 0x10000;
 
     src_ptr += 2;
-    src_size += sizeof(wchar_t)*2;
+    src_size -= 4;
   }
 
   src_char = src_ptr;
@@ -272,35 +275,37 @@ bool decoder<Encoding_UTF16LE> (const void*& src_char, size_t& src_size, void*& 
 template<>
 bool decoder<Encoding_UTF16BE> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
 {
-  const wchar_t* src_ptr = (const wchar_t*) src_char;
-  size_t* dst_ptr = (size_t*) dst_char;
-  wchar_t tmp0, tmp1;
+  xtl::compile_time_assert<sizeof (unsigned short) == 2> ();
 
-  if (src_size < sizeof(wchar_t))
+  const unsigned short* src_ptr = (const unsigned short*) src_char;
+  size_t* dst_ptr = (size_t*) dst_char;
+  unsigned short tmp0, tmp1;
+
+  if (src_size < 2)
     return false;
 
-  tmp0 = ((*src_ptr >> 8) & 0xFF) + ((*src_ptr & 0xFF) << 8);
+  tmp0 = (*src_ptr >> 8) | (*src_ptr << 8);
 
-  if ( (tmp0 < 0xD800) || (tmp0 > 0xDFFF) )
+  if ((tmp0 < 0xD800) || (tmp0 > 0xDFFF))
   {
     *dst_ptr = tmp0;
     src_ptr++;
-    src_size -= sizeof(wchar_t);
+    src_size -= 2;
   }
   else
   {
-    if (src_size < sizeof(wchar_t)*2)
+    if (src_size < 4)
       return false;
 
-    tmp1 = ((*(src_ptr+1) >> 8) & 0xFF) + ((*(src_ptr+1) & 0xFF) << 8);
+    tmp1 = (*(src_ptr+1) >> 8) | (*(src_ptr+1) << 8);
 
-    if ( (tmp0 > 0xDBFF ) || (tmp1 < 0xDC00) || (tmp1 > 0xDFFF) )
-      *dst_ptr = 0x3F;
+    if ((tmp0 > 0xDBFF ) || (tmp1 < 0xDC00) || (tmp1 > 0xDFFF))
+      *dst_ptr = '?';
     else
-      *dst_ptr = ( tmp0 & 0x03FF) + ( ( tmp1 & 0x03FF) << 10) + 0x10000;
+      *dst_ptr = ((tmp0 & 0x3FF) << 10) + (tmp1 & 0x3FF) + 0x10000;
 
     src_ptr += 2;
-    src_size -= sizeof(wchar_t)*2;
+    src_size -= 4;
   }
 
   src_char = src_ptr;
@@ -425,31 +430,36 @@ bool encoder<Encoding_UTF8> (const void*& src_char, size_t& src_size, void*& dst
 template<>
 bool encoder<Encoding_UTF16LE> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
 {
+  xtl::compile_time_assert<sizeof (unsigned short) == 2> ();
+
   const size_t* src_ptr = (const size_t*) src_char;
-  wchar_t* dst_ptr = (wchar_t*) dst_char;
+  unsigned short* dst_ptr = (unsigned short*) dst_char;
   size_t tmp;
 
   if (*src_ptr > 0x10000)
   {
-    if (dst_size < sizeof(wchar_t)*2)
+    if (dst_size < 4)
+      return false;
+
+    if (*src_ptr > 0x10FFFF)
       return false;
 
     tmp = *src_ptr - 0x10000;
-    *dst_ptr = (wchar_t) ( ( (tmp >> 10) & 0x03FF ) + 0xD800);
-    *(dst_ptr+1) = (wchar_t) ( ( tmp & 0x03FF ) + 0xDC00);
+    *dst_ptr = (unsigned short) ((tmp >> 10) | 0xD800);
+    *(dst_ptr+1) = (unsigned short) ((tmp & 0x3FF) | 0xDC00);
 
     dst_ptr +=2;
-    dst_size -= sizeof(wchar_t)*2;
+    dst_size -= 4;
   }
   else
   {
-    if (dst_size < sizeof(wchar_t))
+    if (dst_size < 2)
       return false;
 
-    *dst_ptr = (wchar_t)*src_ptr;
+    *dst_ptr = (unsigned short)*src_ptr;
 
     dst_ptr++;
-    dst_size -= sizeof(wchar_t);
+    dst_size -= 2;
   }
 
   dst_char = dst_ptr;
@@ -459,32 +469,39 @@ bool encoder<Encoding_UTF16LE> (const void*& src_char, size_t& src_size, void*& 
 template<>
 bool encoder<Encoding_UTF16BE> (const void*& src_char, size_t& src_size, void*& dst_char, size_t& dst_size)
 {
+  xtl::compile_time_assert<sizeof (unsigned short) == 2> ();
+
   const size_t* src_ptr = (const size_t*) src_char;
-  wchar_t* dst_ptr = (wchar_t*) dst_char;
-  wchar_t tmp0, tmp1;
+  unsigned short* dst_ptr = (unsigned short*) dst_char;
+  unsigned short tmp0, tmp1;
 
   if (*src_ptr > 0x10000)
   {
-    if (dst_size < sizeof(wchar_t)*2)
+    if (dst_size < 4)
       return false;
 
-    tmp0 = (wchar_t) ( (((*src_ptr - 0x10000) >> 10) & 0x3FF) + 0xD800 );
-    tmp1 = (wchar_t) ( ((*src_ptr - 0x10000) & 0x3FF) + 0xDC00 );
-    *dst_ptr = (wchar_t) ( ((tmp0 & 0xFF) << 8) + ((tmp0 >> 8) & 0xFF));
-    *(dst_ptr+1) = (wchar_t) ( ((tmp1 & 0xFF) << 8) + ((tmp1 >> 8) & 0xFF));
+    if (*src_ptr > 0x10FFFF)
+      return false;
+
+    size_t tmp = *src_ptr - 0x10000;
+
+    tmp0 = (unsigned short) ((tmp >> 10) | 0xD800);
+    tmp1 = (unsigned short) ((tmp & 0x3FF) | 0xDC00);
+    *dst_ptr = (unsigned short) ((tmp0 << 8) | (tmp0 >> 8));
+    *(dst_ptr+1) = (unsigned short) ((tmp1 << 8) | (tmp1 >> 8));
 
     dst_ptr +=2;
-    dst_size -= sizeof(wchar_t)*2;
+    dst_size -= 4;
   }
   else
   {
-    if (dst_size < sizeof(wchar_t))
+    if (dst_size < 2)
       return false;
 
-    *dst_ptr = (wchar_t) ( ((*src_ptr & 0xFF) << 8) + ((*src_ptr >> 8) & 0xFF));
+    *dst_ptr = (unsigned short) (((*src_ptr & 0xFF) << 8) + ((*src_ptr >> 8) & 0xFF));
 
     dst_ptr++;
-    dst_size -= sizeof(wchar_t);
+    dst_size -= 2;
   }
 
   dst_char = dst_ptr;
