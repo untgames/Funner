@@ -8,26 +8,11 @@ namespace detail
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовый класс для функций обратного вызова
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct function_invoker_base
+struct function_invoker_base: public xtl::reference_counter
 {
   public:
-            function_invoker_base () : ref_count (1) {}
     virtual ~function_invoker_base () {}
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подсчёт ссылок
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void release ()
-    {
-      if (!--ref_count)
-        delete this;
-    }
 
-    void addref ()
-    {
-      ref_count++;
-    }
-    
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение типа хранимого функционального объекта и указателя на него
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,9 +23,6 @@ struct function_invoker_base
 ///Дамп
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void dump (stl::string&) = 0;
-
-  private:
-    size_t ref_count;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -251,7 +233,7 @@ template <class Signature>
 inline function<Signature>::function (const function& f)
   : invoker (f.invoker)
 {
-  invoker->addref ();  
+  addref (invoker);
 }
 
 template <class Signature> template <class Fn>
@@ -267,7 +249,7 @@ inline function<Signature>::function (const function<Signature1>& f)
 template <class Signature>
 inline function<Signature>::~function ()
 {
-  invoker->release ();
+  release (invoker);
 }
 
 /*
@@ -345,7 +327,7 @@ inline typename function<Signature>::invoker_type* function<Signature>::create_i
 {
   invoker_type* invoker = empty_invoker_impl::instance_ptr ();
 
-  invoker->addref ();
+  addref (invoker);
 
   return invoker;
 }
