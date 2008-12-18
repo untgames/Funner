@@ -30,10 +30,8 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
     ShellSubsystem (common::ParseNode& node)
       : environment (new Environment)
     {
-      static const char* METHOD_NAME = "engine::subsystems::ShellSubsystem::ShellSubsystem";
-        
         //чтение конфигурации
-      
+
       const char *interpreter = get<const char*> (node, "Interpreter"),
                  *libraries   = get<const char*> (node, "Libraries", ""),
                  *sources     = get<const char*> (node, "Sources"),
@@ -45,12 +43,12 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
         //установка потока протоколирования
 
         //загрузка библиотек
-        
+
       for (size_t i=0; i<lib_list.Size (); i++)
         environment->BindLibraries (lib_list [i]);
-        
+
         //создание интерпретатора
-        
+
       Shell (interpreter, environment).Swap (shell);
 
         //загрузка и исполнение исходных файлов
@@ -59,7 +57,7 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
         shell.ExecuteFileList (src_list [i]);
 
         //исполнение команды
-        
+
       if (*command)
         shell.Execute (command);
     }
@@ -67,7 +65,7 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
 /// Подсчёт ссылок
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
-    
+
   private:
     typedef Shell::EnvironmentPtr EnvironmentPtr;
 
@@ -83,7 +81,7 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
 class Component
 {
   public:
-    Component () 
+    Component ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);
     }
@@ -101,7 +99,7 @@ class Component
       {
         e.touch ("engine::ShellComponent::StartupHandler");
         throw;
-      }      
+      }
     }
 };
 
