@@ -120,7 +120,7 @@ endef
 ifneq (,$(filter Win%,$(OS)))
 
 define get_system_dir
-cmd //C "cd $1 && cd"
+cmd "/C" "cd $1 && cd"
 endef
 
 else
