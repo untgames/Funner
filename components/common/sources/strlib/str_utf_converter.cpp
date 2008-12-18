@@ -8,6 +8,138 @@
 
 #include <common/utf_converter.h>
 
+namespace
+{
+
+const size_t DECOMPRESSED_WCHAR_SIZE = 4;
+
+template<size_t wchar_size>
+size_t wchar_decompress_impl (const char* src, size_t src_count, char*& dst, size_t dst_count);
+
+template <>
+size_t wchar_decompress_impl<2> (const char* src, size_t src_count, char*& dst, size_t dst_count)
+{
+  for (size_t i = 0; (i < src_count) && dst_count; src += 2, dst += DECOMPRESSED_WCHAR_SIZE, i++, dst_count--)
+    xtl::xsnprintf (dst, DECOMPRESSED_WCHAR_SIZE + 1, "%02X%02X", src [0], src [1]);
+
+  return src_count;
+}
+
+template<>
+size_t wchar_decompress_impl<4> (const char* src, size_t src_count, char*& dst, size_t dst_count)
+{
+  size_t i = 0;
+
+  for (; src_count && dst_count; src += 4, dst += DECOMPRESSED_WCHAR_SIZE, src_count--, dst_count--, i++)
+  {
+    wchar_t* wchar_src = (wchar_t*)src;
+
+    if ((*wchar_src > 0xD7FF) && (*wchar_src < 0xE000))                                    //некорректный символ
+      xtl::xsnprintf (dst, DECOMPRESSED_WCHAR_SIZE + 1, "%02X00", '?');
+    else if (*wchar_src < 0x10000)                                                         //16-битный символ
+      xtl::xsnprintf (dst, DECOMPRESSED_WCHAR_SIZE + 1, "%02X%02X", src[0], src[1]);
+    else if (*wchar_src < 0x110000)                                                        //32-битный символ
+    {
+      if (dst_count == 1)   //не хватает места дл€ записи двойного символа
+        return i;
+
+      size_t subtract         = *wchar_src - 0x10000,
+             first_surrogate  = (subtract >> 10) | 0xD800,
+             second_surrogate = (subtract & 0x3FF) | 0xDC00;
+
+      xtl::xsnprintf (dst, (DECOMPRESSED_WCHAR_SIZE * 2) + 1, "%04X%04X", first_surrogate, second_surrogate);
+
+      dst += DECOMPRESSED_WCHAR_SIZE;
+      dst_count--;
+
+      if (src_count > 1)
+        src_count--;
+    }
+    else                                                                                   // некорректный символ
+    {
+      xtl::xsnprintf (dst, DECOMPRESSED_WCHAR_SIZE + 1, "%02X00", '?');
+    }
+  }
+
+  return i;
+}
+
+template<size_t wchar_size>
+size_t wchar_compress_impl (const char* src, size_t count, wchar_t*& dst, size_t dst_count);
+
+template<>
+size_t wchar_compress_impl<2> (const char* src, size_t count, wchar_t*& dst, size_t dst_count)
+{
+  char* dummy_ptr;
+
+  char decompressed_buffer [5] = {0, 0, 0, 0, 0};
+
+  for (size_t i = 0; (i < count) && dst_count; src += DECOMPRESSED_WCHAR_SIZE, dst++, i++, dst_count--)
+  {
+    decompressed_buffer [0] = src [2];
+    decompressed_buffer [1] = src [3];
+    decompressed_buffer [2] = src [0];
+    decompressed_buffer [3] = src [1];
+
+    *dst = (wchar_t)strtoul (decompressed_buffer, &dummy_ptr, 16);
+  }
+
+  return count * DECOMPRESSED_WCHAR_SIZE;
+}
+
+template<>
+size_t wchar_compress_impl<4> (const char* src, size_t count, wchar_t*& dst, size_t dst_count)
+{
+  char* dummy_ptr;
+
+  char decompressed_buffer [5] = {0, 0, 0, 0, 0};
+
+  size_t i = 0;
+
+  for (; count && dst_count; src += DECOMPRESSED_WCHAR_SIZE, dst++, count--, i++, dst_count--)
+  {
+    decompressed_buffer [0] = src [2];
+    decompressed_buffer [1] = src [3];
+    decompressed_buffer [2] = src [0];
+    decompressed_buffer [3] = src [1];
+
+    wchar_t utf_code = (wchar_t)strtoul (decompressed_buffer, &dummy_ptr, 16);
+
+    if ((utf_code < 0xD800) || (utf_code > 0xDFFF)) //16-битный символ
+      *dst = utf_code;
+    else if (utf_code < 0xDC00)                     //32-битный символ
+    {
+      if (count == 1)                               //нет необходимого последующего символа
+      {
+        *dst = '?';
+        continue;
+      }
+
+      count--;
+
+      decompressed_buffer [0] = src [6];
+      decompressed_buffer [1] = src [7];
+      decompressed_buffer [2] = src [4];
+      decompressed_buffer [3] = src [5];
+
+      wchar_t second_surrogate_code = (wchar_t)strtoul (decompressed_buffer, &dummy_ptr, 16);
+
+      if ((second_surrogate_code < 0xDC00) || (second_surrogate_code > 0xDFFF)) //некорректный символ
+        *dst = '?';
+
+      *dst = (((0x3FF & utf_code) << 10) | (0x3FF & second_surrogate_code)) + 0x10;
+    }
+    else                                            //некорректный символ
+    {
+      *dst = '?';
+    }
+  }
+
+  return i * DECOMPRESSED_WCHAR_SIZE;
+}
+
+}
+
 namespace common
 {
 
@@ -519,10 +651,10 @@ void convert_encoding(Encoding       source_encoding,
 stl::wstring towstring (const char* string, int length)
 {
   if (!string)
-    throw xtl::make_null_argument_exception ("common::towstring", "string");    
+    throw xtl::make_null_argument_exception ("common::towstring", "string");
 
   if (length == -1)
-    length = strlen (string);        
+    length = strlen (string);
 
   stl::wstring result;
 
@@ -531,10 +663,10 @@ stl::wstring towstring (const char* string, int length)
   int result_size = mbstowcs (&result [0], string, length);
 
   if (result_size < 0)
-    return L"(common::towstring error)";   
+    return L"(common::towstring error)";
 
   result.fast_resize (result_size);
-  
+
   return result;
 }
 
@@ -562,12 +694,12 @@ stl::string tostring (const wchar_t* string, int length)
   if (length == -1)
     length = wcslen (string);
 
-  stl::string result;  
-  
+  stl::string result;
+
   result.fast_resize (length * 4);
 
   int result_size = wcstombs (&result [0], string, length);
-  
+
   if (result_size < 0)
     return "(common::tostring error)";
 
@@ -593,15 +725,17 @@ stl::string tostring (const stl::wstring& string)
 }
 
 /*
-   —жатие UTF16 строк
+   —жатие wchar_t строк
 */
 
-size_t utf16_decompress (const wchar_t* source, size_t source_length, char* destination, size_t max_destination_length)
+size_t wchar_decompress (const wchar_t* source, size_t source_length, char* destination, size_t max_destination_length)
 {
+  static const char* METHOD_NAME = "common::wchar_decompress (const wchar_t*, size_t, char*, size_t)";
+
   if (!source)
   {
     if (source_length)
-      throw xtl::make_null_argument_exception ("common::utf16_decompress", "source");
+      throw xtl::make_null_argument_exception (METHOD_NAME, "source");
 
     return 0;
   }
@@ -609,45 +743,38 @@ size_t utf16_decompress (const wchar_t* source, size_t source_length, char* dest
   if (!destination)
   {
     if (max_destination_length)
-      throw xtl::make_null_argument_exception ("common::utf16_decompress", "destination");
+      throw xtl::make_null_argument_exception (METHOD_NAME, "destination");
 
-    return 0; 
+    return 0;
   }
 
-  size_t count = source_length * 6 + 1;
-  
-  if (count > max_destination_length)
-    count = max_destination_length;
-
-  if (!count)
+  if (!max_destination_length)
     return 0;
 
-  char* dst = destination;
+  size_t processed_characters = wchar_decompress_impl<sizeof (wchar_t)> ((char*)source, source_length, destination,
+                                                                         (max_destination_length - 1) / DECOMPRESSED_WCHAR_SIZE);
 
-  count = (count - 1) / 6;
+  *destination = 0;
 
-  for (const char* src = reinterpret_cast<const char*> (source); count; src += 2, dst += 6, count--)
-    xtl::xsnprintf (dst, 7, "%%%02X%%%02X", src[0], src[1]);
-
-  *dst = 0;
-
-  return (dst - destination) / 6;
+  return processed_characters;
 }
 
-size_t utf16_decompress (const wchar_t* source, char* destination, size_t max_destination_length)
+size_t wchar_decompress (const wchar_t* source, char* destination, size_t max_destination_length)
 {
   if (!source)
-    throw xtl::make_null_argument_exception ("common::utf16_decompress (const wchar_t*, char*, size_t)", "source");
+    throw xtl::make_null_argument_exception ("common::wchar_decompress (const wchar_t*, char*, size_t)", "source");
 
-  return utf16_decompress (source, xtl::xstrlen (source), destination, max_destination_length);
+  return wchar_decompress (source, xtl::xstrlen (source), destination, max_destination_length);
 }
 
-size_t utf16_compress (const char* source, size_t source_length, wchar_t* destination, size_t max_destination_length)
+size_t wchar_compress (const char* source, size_t source_length, wchar_t* destination, size_t max_destination_length)
 {
+  static const char* METHOD_NAME = "common::wchar_compress (const char*, size_t, wchar_t*, size_t)";
+
   if (!source)
   {
     if (source_length)
-      throw xtl::make_null_argument_exception ("common::utf16_compress", "source");
+      throw xtl::make_null_argument_exception (METHOD_NAME, "source");
 
     return 0;
   }
@@ -655,99 +782,78 @@ size_t utf16_compress (const char* source, size_t source_length, wchar_t* destin
   if (!destination)
   {
     if (max_destination_length)
-      throw xtl::make_null_argument_exception ("common::utf16_compress", "destination");
+      throw xtl::make_null_argument_exception (METHOD_NAME, "destination");
 
-    return 0; 
+    return 0;
   }
 
-  size_t count = source_length / 6 + 1;
-  
-  if (count > max_destination_length)
-    count = max_destination_length;
-
-  if (!count)
+  if (!max_destination_length)
     return 0;
 
-  count--;
+  size_t processed_characters = wchar_compress_impl<sizeof (wchar_t)> (source, source_length / DECOMPRESSED_WCHAR_SIZE,
+                                                                       destination, max_destination_length - 1);
 
-  wchar_t* dst = destination;
+  *destination = 0;
 
-  char* dummy_ptr;
-
-  char decompressed_buffer[5] = {0, 0, 0, 0, 0};
-
-  for (; count; source += 6, dst++, count--)
-  {
-    if ((source[0] != '%') || (source[3] != '%'))
-      break;
-
-    decompressed_buffer[0] = source[4];
-    decompressed_buffer[1] = source[5];
-    decompressed_buffer[2] = source[1];
-    decompressed_buffer[3] = source[2];
-
-    *dst = (wchar_t)strtoul (decompressed_buffer, &dummy_ptr, 16);
-  }
-
-  *dst = 0;
-
-  return (dst - destination) * 6;
+  return processed_characters;
 }
 
-size_t utf16_compress (const char* source, wchar_t* destination, size_t max_destination_length)
+size_t wchar_compress (const char* source, wchar_t* destination, size_t max_destination_length)
 {
   if (!source)
-    throw xtl::make_null_argument_exception ("common::utf16_compress (const char*, wchar_t*, size_t)", "source");
+    throw xtl::make_null_argument_exception ("common::wchar_compress (const char*, wchar_t*, size_t)", "source");
 
-  return utf16_compress (source, xtl::xstrlen (source), destination, max_destination_length);
+  return wchar_compress (source, xtl::xstrlen (source), destination, max_destination_length);
 }
 
-stl::string utf16_decompress (const wchar_t* source, size_t source_length)
+stl::string wchar_decompress (const wchar_t* source, size_t source_length)
 {
   stl::string result;
 
-  result.fast_resize (source_length * 6);
+  result.fast_resize (source_length * DECOMPRESSED_WCHAR_SIZE * 2);
 
-  result.resize (utf16_decompress (source, source_length, &result[0], result.length () + 1) * 6);
+  wchar_decompress (source, source_length, &result[0], result.length () + 1);
+
+  result.resize (result.length ());
 
   return result;
 }
 
-stl::string utf16_decompress (const wchar_t* source)
+stl::string wchar_decompress (const wchar_t* source)
 {
   if (!source)
-    throw xtl::make_null_argument_exception ("common::utf16_decompress (const wchar_t*)", "source");
+    throw xtl::make_null_argument_exception ("common::wchar_decompress (const wchar_t*)", "source");
 
-  return utf16_decompress (source, xtl::xstrlen (source));
+  return wchar_decompress (source, xtl::xstrlen (source));
 }
 
-stl::string utf16_decompress (const stl::wstring& source)
+stl::string wchar_decompress (const stl::wstring& source)
 {
-  return utf16_decompress (source.c_str (), source.length ());
+  return wchar_decompress (source.c_str (), source.length ());
 }
 
-stl::wstring utf16_compress (const char* source, size_t source_length)
+stl::wstring wchar_compress (const char* source, size_t source_length)
 {
   stl::wstring result;
 
-  result.fast_resize (source_length / 6);
+  result.fast_resize (source_length / DECOMPRESSED_WCHAR_SIZE);
 
-  result.resize (utf16_compress (source, source_length, &result[0], result.length () + 1) / 6);
+  result.resize (wchar_compress (source, source_length, &result[0], result.length () + 1) / DECOMPRESSED_WCHAR_SIZE);
 
   return result;
 }
 
-stl::wstring utf16_compress (const char* source)
+stl::wstring wchar_compress (const char* source)
 {
   if (!source)
-    throw xtl::make_null_argument_exception ("common::utf16_compress (const char*)", "source");
+    throw xtl::make_null_argument_exception ("common::wchar_compress (const char*)", "source");
 
-  return utf16_compress (source, xtl::xstrlen (source));
+  return wchar_compress (source, xtl::xstrlen (source));
 }
 
-stl::wstring utf16_compress (const stl::string& source)
+stl::wstring wchar_compress (const stl::string& source)
 {
-  return utf16_compress (source.c_str (), source.length ());
+  return wchar_compress (source.c_str (), source.length ());
 }
 
 } //namespace common

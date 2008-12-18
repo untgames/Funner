@@ -19,7 +19,7 @@ const size_t DECOMPRESS_BUFFER_SIZE = 64;
 
 int main ()
 {
-  printf ("Results of utf16_compress2:\n");
+  printf ("Results of wchar_compress2:\n");
 
   char decompress_buffer[DECOMPRESS_BUFFER_SIZE];
   const wchar_t* source = L"Test";
@@ -48,12 +48,12 @@ int main ()
 
   for (size_t i = 0; i < tests_count; i++)
   {
-    printf ("utf16_decompress (%S, %lu, %s, %lu) = ", test[i].source ? test[i].source : L"0",
+    printf ("wchar_decompress (%S, %lu, %s, %lu) = ", test[i].source ? test[i].source : L"0",
              test[i].source_length, test[i].destination ? "buffer" : "0", test[i].max_destination_size);
 
     try
     {
-      printf ("%lu\n", utf16_decompress (test[i].source, test[i].source_length, test[i].destination, test[i].max_destination_size));
+      printf ("%lu\n", wchar_decompress (test[i].source, test[i].source_length, test[i].destination, test[i].max_destination_size));
     }
     catch (xtl::exception& exception)
     {

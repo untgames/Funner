@@ -40,18 +40,18 @@ stl::wstring towstring (const char* string);
 stl::wstring towstring (const stl::string&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///—жатие UTF16 строк
+///—жатие wchar_t строк
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-size_t       utf16_decompress (const wchar_t* source, size_t source_length, char* destination, size_t max_destination_length);
-size_t       utf16_decompress (const wchar_t* source, char* destination, size_t max_destination_length);
-size_t       utf16_compress   (const char* source, size_t source_length, wchar_t* destination, size_t max_destination_length);
-size_t       utf16_compress   (const char* source, wchar_t* destination, size_t max_destination_length);
-stl::string  utf16_decompress (const wchar_t* source, size_t source_length);
-stl::string  utf16_decompress (const wchar_t* source);
-stl::string  utf16_decompress (const stl::wstring& source);
-stl::wstring utf16_compress   (const char* source, size_t source_length);
-stl::wstring utf16_compress   (const char* source);
-stl::wstring utf16_compress   (const stl::string& source);
+size_t       wchar_decompress (const wchar_t* source, size_t source_length, char* destination, size_t max_destination_length);
+size_t       wchar_decompress (const wchar_t* source, char* destination, size_t max_destination_length);
+size_t       wchar_compress   (const char* source, size_t source_length, wchar_t* destination, size_t max_destination_length);
+size_t       wchar_compress   (const char* source, wchar_t* destination, size_t max_destination_length);
+stl::string  wchar_decompress (const wchar_t* source, size_t source_length);
+stl::string  wchar_decompress (const wchar_t* source);
+stl::string  wchar_decompress (const stl::wstring& source);
+stl::wstring wchar_compress   (const char* source, size_t source_length);
+stl::wstring wchar_compress   (const char* source);
+stl::wstring wchar_compress   (const stl::string& source);
 
 };
 
