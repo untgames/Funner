@@ -33,7 +33,7 @@ struct Thread::Impl: public IThreadCallback, public xtl::reference_counter
   {
     handle = Platform::GetThreadSystem ()->CreateThread (this);
   }
-  
+
 ///Деструктор
   ~Impl ()
   {
@@ -83,6 +83,11 @@ struct Thread::Impl: public IThreadCallback, public xtl::reference_counter
 
 Thread::Thread ()
   : impl (new Impl)
+{
+}
+
+Thread::Thread (Impl* in_impl)
+  : impl (in_impl)
 {
 }
 
@@ -152,12 +157,20 @@ const char* Thread::Name () const
 
 void Thread::Cancel ()
 {
-  if (!impl->handle)
-    return;
+  try
+  {  
+    if (!impl->handle)
+      return;
 
-  Platform::GetThreadSystem ()->CancelThread (impl->handle);
-  
-  impl->exit_code = THREAD_CANCELED_EXIT_CODE;
+    Platform::GetThreadSystem ()->CancelThread (impl->handle);
+    
+    impl->exit_code = THREAD_CANCELED_EXIT_CODE;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::Thread::Cancel");
+    throw;
+  }
 }
 
 /*
@@ -172,6 +185,27 @@ int Thread::Join ()
   Platform::GetThreadSystem ()->JoinThread (impl->handle);
 
   return impl->exit_code;
+}
+
+/*
+    Получение текущей нити
+*/
+
+Thread Thread::GetCurrent ()
+{
+  try
+  {
+    Thread thread (new Impl);
+
+    thread.impl->handle = Platform::GetThreadSystem ()->GetCurrentThread ();
+
+    return thread;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::Thread::GetCurrent");
+    throw;
+  }
 }
 
 /*

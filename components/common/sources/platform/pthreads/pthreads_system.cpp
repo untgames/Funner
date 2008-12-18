@@ -76,9 +76,8 @@ void* thread_run (void* data)
 
   thread_init ();  
 
-  pthread_cleanup_push (&thread_done, 0);
-
-  pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, 0);   //???переделать!!!
+  pthread_cleanup_push  (&thread_done, 0);
+  pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
 
   try
   {
@@ -213,6 +212,78 @@ void PThreadsSystem::JoinThread (thread_t thread)
   catch (xtl::exception& exception)
   {
     exception.touch ("common::PThreadsSystem::JoinThread");
+    throw;
+  }
+}
+
+/*
+    Получение текущей нити
+*/
+
+ICustomThreadSystem::thread_t PThreadsSystem::GetCurrentThread ()
+{
+  try
+  {
+    thread_init ();
+
+    return new pthread_t (pthread_self ());
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::PThreadsSystem::GetCurrentThread");
+    throw;
+  }
+}
+
+/*
+    Работа с критическими секциями кода
+*/
+
+namespace
+{
+
+XTL_THREAD_VARIABLE size_t critical_section_entries = 0;
+
+}
+
+void PThreadsSystem::EnterCriticalSection ()
+{
+  try
+  {
+    thread_init ();    
+    
+    if (!critical_section_entries++)
+    {
+      int status = pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, 0);
+
+      if (status)
+        raise ("::pthread_setcancelstate(PTHREAD_CANCEL_DISABLE,0)", status);
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::PThreadsSystem::EnterCtriticalSection");
+    throw;
+  }
+}
+
+void PThreadsSystem::ExitCriticalSection ()
+{
+  try
+  {
+    thread_init ();    
+    
+    if (!--critical_section_entries)
+    {
+      int status = pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, 0);
+
+      if (status)
+        raise ("::pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,0)", status);
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::PThreadsSystem::ExitCtriticalSection");
     throw;
   }
 }

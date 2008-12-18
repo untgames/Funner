@@ -4,6 +4,7 @@
 
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/thread_variable.h>
 
 #include <common/strlib.h>
 

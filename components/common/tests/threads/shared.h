@@ -4,6 +4,7 @@
 #include <xtl/function.h>
 
 #include <common/log.h>
+#include <common/time.h>
 #include <common/thread.h>
 
 using namespace common;
