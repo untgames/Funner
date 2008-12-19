@@ -15,19 +15,21 @@ namespace
 const size_t DECOMPRESSED_WCHAR_SIZE = 4;
 
 template<size_t wchar_size>
-size_t wchar_decompress_impl (const char* src, size_t src_count, char*& dst, size_t dst_count);
+size_t wchar_decompress_impl (const unsigned char* src, size_t src_count, char*& dst, size_t dst_count);
 
 template <>
-size_t wchar_decompress_impl<2> (const char* src, size_t src_count, char*& dst, size_t dst_count)
+size_t wchar_decompress_impl<2> (const unsigned char* src, size_t src_count, char*& dst, size_t dst_count)
 {
-  for (size_t i = 0; (i < src_count) && dst_count; src += 2, dst += DECOMPRESSED_WCHAR_SIZE, i++, dst_count--)
+  size_t i = 0;
+
+  for (; (i < src_count) && dst_count; src += 2, dst += DECOMPRESSED_WCHAR_SIZE, i++, dst_count--)
     xtl::xsnprintf (dst, DECOMPRESSED_WCHAR_SIZE + 1, "%02X%02X", src [0], src [1]);
 
-  return src_count;
+  return i;
 }
 
 template<>
-size_t wchar_decompress_impl<4> (const char* src, size_t src_count, char*& dst, size_t dst_count)
+size_t wchar_decompress_impl<4> (const unsigned char* src, size_t src_count, char*& dst, size_t dst_count)
 {
   size_t i = 0;
 
@@ -48,7 +50,8 @@ size_t wchar_decompress_impl<4> (const char* src, size_t src_count, char*& dst, 
              first_surrogate  = (subtract >> 10) | 0xD800,
              second_surrogate = (subtract & 0x3FF) | 0xDC00;
 
-      xtl::xsnprintf (dst, (DECOMPRESSED_WCHAR_SIZE * 2) + 1, "%04X%04X", first_surrogate, second_surrogate);
+      xtl::xsnprintf (dst, (DECOMPRESSED_WCHAR_SIZE * 2) + 1, "%02X%02X%02X%02X", first_surrogate & 0xFF, first_surrogate >> 8,
+                      second_surrogate & 0xFF, second_surrogate >> 8);
 
       dst += DECOMPRESSED_WCHAR_SIZE;
       dst_count--;
@@ -75,7 +78,9 @@ size_t wchar_compress_impl<2> (const char* src, size_t count, wchar_t*& dst, siz
 
   char decompressed_buffer [5] = {0, 0, 0, 0, 0};
 
-  for (size_t i = 0; (i < count) && dst_count; src += DECOMPRESSED_WCHAR_SIZE, dst++, i++, dst_count--)
+  size_t i = 0;
+
+  for (; (i < count) && dst_count; src += DECOMPRESSED_WCHAR_SIZE, dst++, i++, dst_count--)
   {
     decompressed_buffer [0] = src [2];
     decompressed_buffer [1] = src [3];
@@ -85,7 +90,7 @@ size_t wchar_compress_impl<2> (const char* src, size_t count, wchar_t*& dst, siz
     *dst = (wchar_t)strtoul (decompressed_buffer, &dummy_ptr, 16);
   }
 
-  return count * DECOMPRESSED_WCHAR_SIZE;
+  return i * DECOMPRESSED_WCHAR_SIZE;
 }
 
 template<>
@@ -768,7 +773,7 @@ size_t wchar_decompress (const wchar_t* source, size_t source_length, char* dest
   if (!max_destination_length)
     return 0;
 
-  size_t processed_characters = wchar_decompress_impl<sizeof (wchar_t)> ((char*)source, source_length, destination,
+  size_t processed_characters = wchar_decompress_impl<sizeof (wchar_t)> ((unsigned char*)source, source_length, destination,
                                                                          (max_destination_length - 1) / DECOMPRESSED_WCHAR_SIZE);
 
   *destination = 0;

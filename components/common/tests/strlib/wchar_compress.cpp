@@ -29,7 +29,7 @@ int main()
     }
     else if (sizeof (wchar_t) == 4)
     {
-      sources [0] [0] = 0x1D11E;
+      sources [0] [0] = (wchar_t)0x1D11E;
       sources [0] [1] = 0;
     }
     else
@@ -42,10 +42,10 @@ int main()
 
       printf ("Processing string '%S':\n", sources[i].c_str ());
 
-      printf ("  wchar_decompress (const wchar_t*, size_t, char*, size_t) result is %lu; ", wchar_decompress (sources[i].c_str (), sources[i].length (), decompress_buffer, DECOMPRESS_BUFFER_SIZE));
+      printf ("  wchar_decompress (const wchar_t*, size_t, char*, size_t) next char %04X; ", sources [i] [wchar_decompress (sources[i].c_str (), sources[i].length (), decompress_buffer, DECOMPRESS_BUFFER_SIZE)]);
       printf ("decompressed string: '%s'\n", decompress_buffer);
 
-      printf ("  wchar_decompress (const wchar_t*, char*, size_t) result is %lu; ", wchar_decompress (sources[i].c_str (), decompress_buffer, DECOMPRESS_BUFFER_SIZE));
+      printf ("  wchar_decompress (const wchar_t*, char*, size_t) next char %04X; ", sources [i] [wchar_decompress (sources[i].c_str (), decompress_buffer, DECOMPRESS_BUFFER_SIZE)]);
       printf ("decompressed string: '%s'\n", decompress_buffer);
 
       printf ("  wchar_decompress (const wchar_t*, size_t) result is '%s'\n", wchar_decompress (sources[i].c_str (), sources[i].length ()).c_str ());
