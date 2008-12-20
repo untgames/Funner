@@ -53,12 +53,16 @@ namespace tools.ui.windows_forms
     {
       string classname = ribbon.Attributes["Name"].InnerText;
 
-      writer.Write("using System;\n");
-      writer.Write("using System.Drawing;\n");
-      writer.Write("using System.Windows.Forms;\n");
-      writer.Write("using System.Collections.Generic;\n\n");
-      writer.Write("namespace tools.ui.windows_forms {\n");
-      writer.Write("{0}", CodeSnippets.Properties.Template("RibbonTextBox", "TextBoxText", "string", "ToString"));
+      writer.Write(
+        "using System;\n" +
+        "using System.Drawing;\n" +
+        "using System.Windows.Forms;\n" +
+        "using System.Collections.Generic;\n\n" +
+        "namespace tools.ui.windows_forms {\n"
+      );
+      writer.Write(
+        "{0}", CodeSnippets.Properties.Template("RibbonTextBox", "TextBoxText", "string", "ToString")
+      );
       foreach (XmlNode dropdown in ribbon.SelectNodes("Menu"))
         ParseDropDownMenu(dropdown, writer);
       foreach (XmlNode list in ribbon.SelectNodes("List"))
@@ -70,10 +74,12 @@ namespace tools.ui.windows_forms
       writer.Write("    {\n");
       writer.Write("      this.server = server;\n");
       writer.Write("      this.SuspendLayout();\n");
+      writer.Write("      this.DoubleBuffered = true;\n");
       writer.Write("      this.TabSpacing = 6;\n");
       writer.Write("      this.TabIndex = 0;\n");
       writer.Write("      this.Name = \"{0}\";\n", classname);
       writer.Write("      this.Minimized = false;\n");
+      writer.Write("      this.Dock = DockStyle.Top;\n");
       writer.Write("      \n");
       foreach (XmlNode tab in ribbon.SelectNodes("Tab"))
         writer.Write("      this.Tabs.Add({0});\n", ParseRibbonTab(tab, writer));
@@ -145,7 +151,7 @@ namespace tools.ui.windows_forms
         writer.Write("    {\n");
         writer.Write("      this.server = server;\n");
       }
-      CodeSnippets.Attributes.Icon(menu, writer, "this");
+      CodeSnippets.Attributes.SmallImage(menu, writer, "this");
       CodeSnippets.Attributes.Image(menu, writer, "this");
       CodeSnippets.Attributes.Text(menu, writer, "this");
       CodeSnippets.Attributes.SizeMode(menu, writer, "this");
@@ -187,37 +193,10 @@ namespace tools.ui.windows_forms
         writer.Write("      RibbonButton {0} = new RibbonMenu_{1}(this.server);\n", varname, item.Attributes["Source"].InnerText.Trim());
       else
         writer.Write("      RibbonButton {0} = new RibbonButton();\n", varname);
-      CodeSnippets.Attributes.Icon(item, writer, varname);
-      CodeSnippets.Attributes.Image(item, writer, varname);
+      CodeSnippets.Attributes.SmallImage(item, writer, varname);
       CodeSnippets.Attributes.Text(item, writer, varname);
-      foreach (XmlNode sub in item.ChildNodes)
-      {
-        try
-        {
-          switch (sub.Name)
-          {
-            case "Item":
-              writer.Write("      {0}.DropDownItems.Add({1});\n", varname, ParseDropDownItem(sub, writer));
-              break;
-            case "Separator":
-              writer.Write("      {0}.DropDownItems.Add({1});\n", varname, ParseSeparator(sub, writer));
-              break;
-            default:
-              throw new Exception("Unknown node tag '" + sub.Name + "' when parsing ribbon dropdown menu subitem");
-          }
-        }
-        catch (Exception e)
-        {
-          Console.WriteLine("{0}", e.ToString());
-        }
-      }
-      writer.Write("      if ({0}.DropDownItems.Count > 0)\n", varname);
-      writer.Write("        {0}.Style = RibbonButtonStyle.DropDown;\n", varname);
-      writer.Write("      else\n");
-      writer.Write("      {\n");
-      writer.Write("        {0}.Style = RibbonButtonStyle.Normal;\n", varname);
+      writer.Write("      {0}.Style = RibbonButtonStyle.Normal;\n", varname);
       CodeSnippets.Events.Click(item, writer, varname);
-      writer.Write("      }\n");
       return varname;
     }
     private string ParseRibbonTab(XmlNode tab, StringWriter writer)
@@ -241,7 +220,7 @@ namespace tools.ui.windows_forms
       writer.Write("      RibbonPanel {0} = new RibbonPanel();\n", panelvarname);
       if (!CodeSnippets.Attributes.Text(panel, writer, panelvarname))
         writer.Write("      {0}.Text = \"Panel {1}\";\n", panelvarname, ControlIndex.ToString());
-      CodeSnippets.Attributes.Flow(panel, writer, panelvarname);
+      CodeSnippets.Attributes.FlowsTo(panel, writer, panelvarname);
       writer.Write("      \n");
       // process childs
       foreach (XmlNode item in panel.ChildNodes)
@@ -337,7 +316,7 @@ namespace tools.ui.windows_forms
       writer.Write("      {0}.Style = RibbonButtonStyle.Normal;\n", buttonvarname);
       CodeSnippets.Attributes.Text(item, writer, buttonvarname);
       CodeSnippets.Attributes.Image(item, writer, buttonvarname);
-      CodeSnippets.Attributes.Icon(item, writer, buttonvarname);
+      CodeSnippets.Attributes.SmallImage(item, writer, buttonvarname);
       CodeSnippets.Attributes.SizeMode(item, writer, buttonvarname);
       CodeSnippets.Events.Click(item, writer, buttonvarname);
       return buttonvarname;
@@ -351,7 +330,7 @@ namespace tools.ui.windows_forms
       writer.Write("      RibbonButton {0} = new RibbonMenu_{1}(this.server);\n", varname, item.Attributes["Source"].InnerText.Trim());
       CodeSnippets.Attributes.Text(item, writer, varname);
       CodeSnippets.Attributes.Image(item, writer, varname);
-      CodeSnippets.Attributes.Icon(item, writer, varname);
+      CodeSnippets.Attributes.SmallImage(item, writer, varname);
       CodeSnippets.Attributes.SizeMode(item, writer, varname);
       if (CodeSnippets.Events.Click(item, writer, varname))
         writer.Write("      {0}.Style = RibbonButtonStyle.SplitDropDown;\n", varname);
