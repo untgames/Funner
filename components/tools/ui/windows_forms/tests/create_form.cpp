@@ -21,7 +21,7 @@ int main ()
 {
   common::LogFilter log_filter ("*", &log_handler);
 
-  printf ("Results of create_form_test:\n");  
+  printf ("Results of create_form_test:\n");    
   
   try
   {    

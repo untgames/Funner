@@ -275,7 +275,7 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
       if (plugin_iter == plugins->end ())
         throw xtl::format_operation_exception (METHOD_NAME, "Can't create form with plugin %s, plugin not registered", plugin);
 
-      System::String^ init_string_wrap = gcnew System::String (init_string);
+      System::String^ init_string_wrap = gcnew System::String (init_string);      
 
       System::Windows::Forms::Control^ new_form = plugin_iter->second.plugin->CreateControl (init_string_wrap);
 
@@ -308,15 +308,15 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
 
         plugin_iter->second.plugin->LoadConfiguration (plugin_configuration);
       }
-      catch (System::Exception^ exception)
-      {
-        throw DotNetException (METHOD_NAME, exception);
-      }
       catch (xtl::exception& exception)
       {
         exception.touch (METHOD_NAME);
         throw;
       }
+      catch (System::Exception^ exception)
+      {
+        throw DotNetException (METHOD_NAME, exception);
+      }      
     }
 
   private:
@@ -407,7 +407,7 @@ PluginManager::~PluginManager ()
 void PluginManager::LoadPlugins (const char* wc_mask)
 {
   if (!wc_mask)
-    throw xtl::make_null_argument_exception ("tools::ui::windows_forms::PluginManager::LoadPlugins", "wc_mask");
+    throw xtl::make_null_argument_exception ("tools::ui::windows_forms::PluginManager::LoadPlugins", "wc_mask");    
 
   common::FileList plugins_files = common::FileSystem::Search (wc_mask, common::FileSearch_Files);
 
@@ -482,13 +482,13 @@ ChildForm::Pointer PluginManager::CreateForm (const char* plugin, const char* in
   {
     return impl->application_server->CreateForm (impl->window_system, plugin, init_string, dock_state);
   }
-  catch (System::Exception^ exception)
-  {
-    throw DotNetException (METHOD_NAME, exception);
-  }
   catch (xtl::exception& exception)
   {
     exception.touch (METHOD_NAME);
     throw;
   }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException (METHOD_NAME, exception);
+  }  
 }

@@ -1,4 +1,4 @@
-Application.LoadPlugins ("<BIN_DIR>/ui-plugins/*.dll")
+Application.LoadPlugins ("<BIN_DIR>ui-plugins/*.dll")
 Application.LoadConfiguration ("data/conf/*.xform")
 Application.MainForm:Add (Application.ToolStrips:Item ("ToolStrip1"))
 Application.MainForm.Text = "Hello world"

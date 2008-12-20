@@ -191,6 +191,8 @@ void WindowSystem::ApplicationExecute (const char* command)
 
 ChildForm::Pointer WindowSystem::CreateChildForm (const char* id, const char* plugin_name, const char* init_string, FormDockState dock_state)
 {
+  static const char* METHOD_NAME = "tools::ui::windows_forms::WindowSystem::CreateChildForm";
+
   try
   {
     if (!id)
@@ -212,9 +214,13 @@ ChildForm::Pointer WindowSystem::CreateChildForm (const char* id, const char* pl
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("tools::ui::windows_forms::WindowSystem::CreateChildForm");
+    exception.touch (METHOD_NAME);
     throw;
   }
+  catch (System::Exception^ exception)
+  {
+    throw DotNetException (METHOD_NAME, exception);    
+  }    
 }
 
 ChildForm::Pointer WindowSystem::CreateChildForm (const char* plugin_name, const char* init_string, FormDockState dock_state)
