@@ -40,7 +40,7 @@ int main()
       memset (decompress_buffer, 0, sizeof (decompress_buffer));
       memset (compress_buffer, 0, sizeof (compress_buffer));
 
-      printf ("Processing string '%S':\n", sources[i].c_str ());
+      printf ("Processing string '%u':\n", i);
 
       printf ("  wchar_decompress (const wchar_t*, size_t, char*, size_t) next char %04X; ", sources [i] [wchar_decompress (sources[i].c_str (), sources[i].length (), decompress_buffer, DECOMPRESS_BUFFER_SIZE)]);
       printf ("decompressed string: '%s'\n", decompress_buffer);
@@ -52,9 +52,9 @@ int main()
       printf ("  wchar_decompress (const wchar_t*) result is '%s'\n", wchar_decompress (sources[i].c_str ()).c_str ());
       printf ("  wchar_decompress (const stl::wstring&) result is '%s'\n", wchar_decompress (sources[i]).c_str ());
 
-      printf ("  wchar_compress (const char*, size_t, wchar_t*, size_t) result is %lu; ", wchar_compress (decompress_buffer, xtl::xstrlen (decompress_buffer),
+      printf ("  wchar_compress (const char*, size_t, wchar_t*, size_t) result is %lu\n", wchar_compress (decompress_buffer, xtl::xstrlen (decompress_buffer),
                                                                                          compress_buffer, COMPRESS_BUFFER_SIZE));
-      printf ("compressed string: %04X%04X%04X%04X or '%S'\n", compress_buffer[0], compress_buffer[1], compress_buffer[2], compress_buffer[3], compress_buffer);
+ //     printf ("compressed string: %08X%08X%04X%04X or '%S'\n", compress_buffer[0], compress_buffer[1], compress_buffer[2], compress_buffer[3], compress_buffer);
     }
   }
   catch (std::exception& exception)

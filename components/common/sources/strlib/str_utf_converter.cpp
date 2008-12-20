@@ -121,6 +121,7 @@ size_t wchar_compress_impl<4> (const char* src, size_t count, wchar_t*& dst, siz
         continue;
       }
 
+      i++;
       count--;
 
       decompressed_buffer [0] = src [6];
@@ -133,7 +134,7 @@ size_t wchar_compress_impl<4> (const char* src, size_t count, wchar_t*& dst, siz
       if ((second_surrogate_code < 0xDC00) || (second_surrogate_code > 0xDFFF)) //некорректный символ
         *dst = '?';
 
-      *dst = (((0x3FF & utf_code) << 10) | (0x3FF & second_surrogate_code)) + 0x10;
+      *dst = (((0x3FF & utf_code) << 10) | (0x3FF & second_surrogate_code)) + 0x10000;
     }
     else                                            //некорректный символ
     {
