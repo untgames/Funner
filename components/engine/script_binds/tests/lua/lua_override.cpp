@@ -4,7 +4,7 @@ const char* SCRIPT_FILE_NAME = "data/lua_override.lua";
 
 void console_handler (const char* message)
 {
-  printf ("%s", message);
+  printf ("%s\n", message);
 }
 
 int main ()
