@@ -127,7 +127,8 @@ MyApplicationServer::MyApplicationServer ()
     shell (INTERPRETER_NAME, shell_environment),
     wait_files_timer (xtl::bind (&MyApplicationServer::CheckNewFiles, this), 1000, syslib::TimerState_Paused),
     calculating_envelope (false),
-    calculating_trajectories_coord (false)
+    calculating_trajectories_coord (false),
+    visualize_new_calculations (false)
 {
   common::FileSystem::SetDefaultFileBufferSize (0);     //???????? обход бага!!!!!!!!!!!
 
@@ -167,6 +168,7 @@ MyApplicationServer::MyApplicationServer ()
   lib.Register ("Cleanup", script::make_invoker<void ()> (xtl::bind (&MyApplicationServer::Cleanup, this)));
   lib.Register ("SaveModel", script::make_invoker<void ()> (xtl::bind (&MyApplicationServer::SaveModel, this)));
   lib.Register ("LoadTrajectoryIfExist", script::make_invoker <bool (float, float, float, float)> (xtl::bind (&MyApplicationServer::LoadTrajectoryIfExist, this, _1, _2, _3, _4)));
+  lib.Register ("LoadAllCalculatedTrajectories", script::make_invoker<void ()> (xtl::bind (&MyApplicationServer::LoadAllCalculatedTrajectories, this)));
 
     //чтение конфигурации
 
@@ -257,24 +259,6 @@ void MyApplicationServer::OpenProjectPath (const char* path)
 
   project_path = path;
 
-/*  stl::string precomputed_trajectories_mask = project_path + "trajectory*.binmesh";
-
-  common::FileList precomputed_trajectories = common::FileSystem::Search (precomputed_trajectories_mask.c_str (), common::FileSearch_Files);
-
-  for (size_t i = 0, size = precomputed_trajectories.Size (); i < size; i++)
-    try
-    {
-      LoadTrajectory (precomputed_trajectories.Item (i).name);
-    }
-    catch (std::exception& exception)
-    {
-      common::Console::Printf ("Can't load trajectory from file '%s', exception '%s'\n", precomputed_trajectories.Item (i).name, exception.what ());
-    }
-    catch (...)
-    {
-      common::Console::Printf ("Can't load trajectory from file '%s', unknown exception\n", precomputed_trajectories.Item (i).name);
-    }*/
-
   try
   {
     LoadEnvelope ();
@@ -294,6 +278,27 @@ void MyApplicationServer::OpenProjectPath (const char* path)
       common::Console::Printf ("Can't calculate envelope, unknown exception\n");
     }
   }
+}
+
+void MyApplicationServer::LoadAllCalculatedTrajectories ()
+{
+  stl::string precomputed_trajectories_mask = project_path + "trajectory*.binmesh";
+
+  common::FileList precomputed_trajectories = common::FileSystem::Search (precomputed_trajectories_mask.c_str (), common::FileSearch_Files);
+
+  for (size_t i = 0, size = precomputed_trajectories.Size (); i < size; i++)
+    try
+    {
+      LoadTrajectory (precomputed_trajectories.Item (i).name);
+    }
+    catch (std::exception& exception)
+    {
+      common::Console::Printf ("Can't load trajectory from file '%s', exception '%s'\n", precomputed_trajectories.Item (i).name, exception.what ());
+    }
+    catch (...)
+    {
+      common::Console::Printf ("Can't load trajectory from file '%s', unknown exception\n", precomputed_trajectories.Item (i).name);
+    }
 }
 
 void MyApplicationServer::UnloadEnvelope ()
@@ -456,7 +461,8 @@ void MyApplicationServer::OnNewXmeshTrajectory (const char* desc_trajectory_file
   if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), xmesh_trajectory_file_name.c_str (), binmesh_file_name.c_str (), 0) == -1)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't call %s: %s", MESH_CONVERTER_APPLICATION_NAME, get_spawn_error_name ());
 
-  WaitForFile (binmesh_file_name.c_str (), xtl::bind (&MyApplicationServer::LoadTrajectory, this, _1));
+  if (visualize_new_calculations)
+    WaitForFile (binmesh_file_name.c_str (), xtl::bind (&MyApplicationServer::LoadTrajectory, this, _1));
 }
 
 void MyApplicationServer::CalculateTrajectory (double nu1, double nu2, double nu3, size_t lod)
@@ -878,25 +884,6 @@ void MyApplicationServer::WaitForFile (const char* file_name, const WaitFileHand
   waited_files.push_back (WaitedFile (file_name, handler));
   wait_files_timer.Run ();
 }
-
-/*void MyApplicationServer::StopFileWaiting (const char* file_name)
-{
-  for (WaitedFiles::iterator iter = waited_files.begin (), end = waited_files.end (); iter != end;)
-  {
-    if (iter->file_name == file_name)
-    {
-      WaitedFiles::iterator next = iter;
-
-      ++next;
-
-      waited_files.erase (iter);
-
-      iter = next;
-    }
-    else
-      ++iter;
-  }
-}*/
 
 void MyApplicationServer::LoadModel (const char* path)
 {

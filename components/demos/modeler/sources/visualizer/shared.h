@@ -155,6 +155,8 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     void Release () { release (this); }
 
   private:
+    void LoadAllCalculatedTrajectories ();
+
     void UnloadEnvelope ();
     void UnloadModels ();
     void Cleanup ();
@@ -236,6 +238,7 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     CalculatingTrajectoriesNuMap      calculating_trajectories_nu_map;      //рассчитываемые в данный момент траектории
     CalculatingTrajectoriesNameMap    calculating_trajectories_name_map;    //рассчитываемые в данный момент траектории
     bool                              calculating_trajectories_coord;       //идёт ли сейчас рассчёт начальных точек для пакетного рассчёта траекторий
+    bool                              visualize_new_calculations;           //загружать ли траектории сразу после рассчёта
 };
 
 //проверка ошибок
