@@ -136,7 +136,7 @@ endif
 ###################################################################################################
 define prepare_to_execute
 export PATH="$(subst ;,:,$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$(foreach dir,$(ADDITIONAL_PATHS),$(dir);)$(foreach dir,$2,$(dir);)$$PATH))" \
-BIN_DIR=`$(call get_system_dir,$(DIST_BIN_DIR))`/ && echo BIN_DIR=$$BIN_DIR && cd "$1"
+BIN_DIR=`$(call get_system_dir,$(DIST_BIN_DIR))`/ && cd "$1"
 endef
 
 ###################################################################################################
