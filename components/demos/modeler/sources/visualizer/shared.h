@@ -13,6 +13,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/implicit_cast.h>
 #include <xtl/iterator.h>
 #include <xtl/reference_counter.h>
 #include <xtl/shared_ptr.h>
@@ -159,6 +160,7 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     void Cleanup ();
 
     void LoadTrajectory (const char* file_name);
+    bool LoadTrajectoryIfExist (float nu1, float nu2, float nu3, float epsilon);
 
     void OnNewXmeshTrajectory (const char* desc_trajectory_file_name);
     void CalculateTrajectory (double nu1, double nu2, double nu3, size_t lod);
@@ -182,8 +184,6 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     void CreateCondorBinaries ();
 
     void Benchmark ();
-
-//    void SavePlatformDescription ();
 
   private:
     typedef xtl::shared_ptr<script::Environment> ShellEnvironmentPtr;

@@ -311,8 +311,6 @@ class TrajectoryBuilder
         unique_points.Insert (&point3d[i]);
       }
 
-//      printf ("Unique points count is %u\n", unique_points.Size ());
-
       out_vertices.reserve (unique_points.Size () * 2);
 
       for (HashSet::PointListArray::iterator iter = unique_points.hash_table.begin (), end = unique_points.hash_table.end (); iter != end; ++iter)
@@ -751,7 +749,7 @@ void BuildTrajectory (const ModelData& model_data, double nu1, double nu2, doubl
 {
   TrajectoryBuilder builder (model_data, nu1, nu2, nu3, vertices_count);
 
-  builder.ConvertUnique (out_vertices, out_primitives);
+//  builder.ConvertUnique (out_vertices, out_primitives);
 
-//  builder.Convert (out_vertices, out_primitives);
+  builder.Convert (out_vertices, out_primitives);
 }

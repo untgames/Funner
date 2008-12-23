@@ -48,7 +48,6 @@ const char*  MODEL_FILE_NAME                     = "model.xmodel";
 const char*  OLD_FORMAT_MODEL_FILE_NAME          = "model.dat";
 const char*  OSX_ENVELOPE_APPLICATION_NAME       = "modeler-envelope";
 const char*  OSX_TRAJECTORY_APPLICATION_NAME     = "modeler-trajectory";
-//const char*  PLATFORM_DESCRIPTION_FILE_NAME      = "platform_description.txt";
 const char*  SCREEN_ATTACHMENT_NAME              = "MainScreen";
 const char*  TEMP_DIRECTORY_NAME                 = "tmp";
 const int    TRAJECTORIES_COORDS_HEADER          = 'TRJC';
@@ -114,6 +113,11 @@ void copy_file (const char* source_file_name, const char* result_file_name)
   }
 }
 
+double sqr (double value)
+{
+  return value * value;
+}
+
 }
 
 //тестовый сервер приложения
@@ -162,6 +166,7 @@ MyApplicationServer::MyApplicationServer ()
   lib.Register ("CalculateTrajectories", script::make_invoker<void (size_t, size_t)> (xtl::bind (&MyApplicationServer::CalculateTrajectories, this, _1, _2)));
   lib.Register ("Cleanup", script::make_invoker<void ()> (xtl::bind (&MyApplicationServer::Cleanup, this)));
   lib.Register ("SaveModel", script::make_invoker<void ()> (xtl::bind (&MyApplicationServer::SaveModel, this)));
+  lib.Register ("LoadTrajectoryIfExist", script::make_invoker <bool (float, float, float, float)> (xtl::bind (&MyApplicationServer::LoadTrajectoryIfExist, this, _1, _2, _3, _4)));
 
     //чтение конфигурации
 
@@ -252,7 +257,7 @@ void MyApplicationServer::OpenProjectPath (const char* path)
 
   project_path = path;
 
-  stl::string precomputed_trajectories_mask = project_path + "trajectory*.binmesh";
+/*  stl::string precomputed_trajectories_mask = project_path + "trajectory*.binmesh";
 
   common::FileList precomputed_trajectories = common::FileSystem::Search (precomputed_trajectories_mask.c_str (), common::FileSearch_Files);
 
@@ -268,7 +273,7 @@ void MyApplicationServer::OpenProjectPath (const char* path)
     catch (...)
     {
       common::Console::Printf ("Can't load trajectory from file '%s', unknown exception\n", precomputed_trajectories.Item (i).name);
-    }
+    }*/
 
   try
   {
@@ -382,6 +387,49 @@ void MyApplicationServer::LoadTrajectory (const char* file_name)
   trajectories[file_name] = new_trajectory;
 
   common::Console::Printf ("%u trajectories loaded.\n", trajectories.size ());
+}
+
+bool MyApplicationServer::LoadTrajectoryIfExist (float nu1, float nu2, float nu3, float epsilon)
+{
+  if (epsilon < 0)
+    throw xtl::make_argument_exception ("MyApplicationServer::LoadTrajectory (float, float, float, float)", "epsilon", epsilon,
+                                        "Epsilon must not be less then 0");
+
+  stl::string computed_trajectories_mask = project_path + "trajectory*.binmesh";
+
+  common::FileList computed_trajectories = common::FileSystem::Search (computed_trajectories_mask.c_str (), common::FileSearch_Files);
+
+  size_t trajectory_index = 0;
+  double distance_to_needed_point = epsilon * 2;
+
+  for (size_t i = 0, size = computed_trajectories.Size (); i < size; i++)
+  {
+    const char* trajectory_name = computed_trajectories.Item (i).name + project_path.length () + xtl::xstrlen ("trajectory_");
+
+    float current_nu1 = 0.f, current_nu2 = 0.f, current_nu3 = 0.f;
+
+    if (sscanf (trajectory_name, "%g_%g_%g", &current_nu1, &current_nu2, &current_nu3) != 3)
+    {
+      common::Console::Printf ("Trajectory with incorrect file name ('%s') detected.\n", computed_trajectories.Item (i).name);
+      continue;
+    }
+
+    double distance = sqrt (sqr (nu1 - current_nu1) + sqr (nu2 - current_nu2) + sqr (nu3 - current_nu3));
+
+    if (distance < distance_to_needed_point)
+    {
+      trajectory_index = i;
+      distance_to_needed_point = distance;
+    }
+  }
+
+  if (distance_to_needed_point <= epsilon)
+  {
+    LoadTrajectory (computed_trajectories.Item (trajectory_index).name);
+    return true;
+  }
+
+  return false;
 }
 
 void MyApplicationServer::OnNewXmeshTrajectory (const char* desc_trajectory_file_name)
@@ -1067,27 +1115,3 @@ void MyApplicationServer::Benchmark ()
 
   common::Console::Printf ("This computer performance is %u vps\n", trajectory_vertex_per_second);
 }
-
-/*void MyApplicationServer::SavePlatformDescription ()
-{
-  static const char* METHOD_NAME = "MyApplicationServer::SavePlatformDescription";
-
-  stl::string platform_description_file_name = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, PLATFORM_DESCRIPTION_FILE_NAME);
-
-  FILE* platform_description_file = fopen (platform_description_file_name.c_str (), "w");
-
-  if (!platform_description_file)
-    throw xtl::format_operation_exception (METHOD_NAME, "Can't open platform description file '%s'\n", platform_description_file_name.c_str ());
-
-  int dummy = 1;
-
-  if (reinterpret_cast<char*> (&dummy)[0])
-    fprintf (platform_description_file, "Little endian 1\n");
-  else
-    fprintf (platform_description_file, "Little endian 0\n");
-
-  fprintf (platform_description_file, "size_t size %u\n", sizeof (size_t));
-  fprintf (platform_description_file, "float size %u\n",  sizeof (float));
-
-  fclose (platform_description_file);
-}*/
