@@ -56,6 +56,10 @@ int main ()
     text_line->SetAlignment (TextLineAlignment_Right, TextLineAlignment_Top);
 
     render_target.Update ();
+
+    text_line->SetAlignment (TextLineAlignment_BaseLine, TextLineAlignment_BaseLine);
+
+    render_target.Update ();
   }
   catch (std::exception& exception)
   {

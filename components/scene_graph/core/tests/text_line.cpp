@@ -4,9 +4,10 @@ const char* get_name (TextLineAlignment alignment)
 {
   switch (alignment)
   {
-    case TextLineAlignment_Center: return "TextLineAlignment_Center";
-    case TextLineAlignment_Left:   return "TextLineAlignment_Left/TextLineAlignment_Top";
-    case TextLineAlignment_Right:  return "TextLineAlignment_Right/TextLineAlignment_Bottom";
+    case TextLineAlignment_Center:   return "TextLineAlignment_Center";
+    case TextLineAlignment_Left:     return "TextLineAlignment_Left/TextLineAlignment_Top";
+    case TextLineAlignment_Right:    return "TextLineAlignment_Right/TextLineAlignment_Bottom";
+    case TextLineAlignment_BaseLine: return "TextLineAlignment_BaseLine";
     default: return "Invalid";
   }
 }
@@ -41,6 +42,11 @@ int main ()
 
   text_line->SetHorizontalAlignment (TextLineAlignment_Right);
   text_line->SetVerticalAlignment   (TextLineAlignment_Center);
+
+  printf ("TextLine horizontal alignment = '%s', vertical_alignment = '%s'\n", get_name (text_line->HorizontalAlignment ()), get_name (text_line->VerticalAlignment ()));
+
+  text_line->SetHorizontalAlignment (TextLineAlignment_BaseLine);
+  text_line->SetVerticalAlignment   (TextLineAlignment_BaseLine);
 
   printf ("TextLine horizontal alignment = '%s', vertical_alignment = '%s'\n", get_name (text_line->HorizontalAlignment ()), get_name (text_line->VerticalAlignment ()));
 

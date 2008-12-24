@@ -301,9 +301,9 @@ InvokerRegistry& bind_node_library (Environment& environment)
 void bind_node_array_link_mode_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_STATIC_NODE_ARRAY_LINK_MODE_LIBRARY);
-  
+
     //регистрация операций
-    
+
   lib.Register ("get_AddRef",  make_const (NodeArrayLinkMode_AddRef));
   lib.Register ("get_WeakRef", make_const (NodeArrayLinkMode_WeakRef));
 }
@@ -321,18 +321,18 @@ Node::Pointer get_node_array_item (NodeArray& array, size_t index)
 void bind_node_array_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_NODE_ARRAY_LIBRARY);
-  
+
     //регистрация статических библиотек
-    
+
   bind_node_array_link_mode_library (environment);
-  
+
     //регистрация функций создания
-    
+
   lib.Register ("Create", make_invoker (make_invoker (&create_node_array),
                                         make_invoker<NodeArray ()> (xtl::bind (&create_node_array, NodeArrayLinkMode_AddRef))));
 
     //регистрация операций
-    
+
   lib.Register ("get_Size",     make_invoker (&NodeArray::Size));
   lib.Register ("get_Empty",    make_invoker (&NodeArray::IsEmpty));
   lib.Register ("get_Capacity", make_invoker (&NodeArray::Capacity));
@@ -343,9 +343,9 @@ void bind_node_array_library (Environment& environment)
                                               make_invoker ((void (NodeArray::*)(Node&))&NodeArray::Remove)));
   lib.Register ("Clear",        make_invoker (&NodeArray::Clear));
   lib.Register ("Reserve",      make_invoker (&NodeArray::Reserve));
-  
+
     //регистрация типов данных
-    
+
   environment.RegisterType<NodeArray> (SCENE_NODE_ARRAY_LIBRARY);
 }
 
@@ -602,7 +602,7 @@ void bind_box_helper_library (Environment& environment)
     //регистрация функций создания
 
   lib.Register ("Create", make_invoker (&create_box_helper));
-  
+
     //регистрация операций
 
   lib.Register ("set_BoundBox", make_invoker (&set_bound_box));
@@ -794,11 +794,12 @@ void bind_static_text_line_library (Environment& environment)
 {
   InvokerRegistry& text_line_alignment_lib = environment.CreateLibrary (SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY);
 
-  text_line_alignment_lib.Register ("get_Center", make_const (TextLineAlignment_Center));
-  text_line_alignment_lib.Register ("get_Left",   make_const (TextLineAlignment_Left));
-  text_line_alignment_lib.Register ("get_Right",  make_const (TextLineAlignment_Right));
-  text_line_alignment_lib.Register ("get_Top",    make_const (TextLineAlignment_Top));
-  text_line_alignment_lib.Register ("get_Bottom", make_const (TextLineAlignment_Bottom));
+  text_line_alignment_lib.Register ("get_Center",   make_const (TextLineAlignment_Center));
+  text_line_alignment_lib.Register ("get_Left",     make_const (TextLineAlignment_Left));
+  text_line_alignment_lib.Register ("get_Right",    make_const (TextLineAlignment_Right));
+  text_line_alignment_lib.Register ("get_Top",      make_const (TextLineAlignment_Top));
+  text_line_alignment_lib.Register ("get_Bottom",   make_const (TextLineAlignment_Bottom));
+  text_line_alignment_lib.Register ("get_BaseLine", make_const (TextLineAlignment_BaseLine));
 }
 
 void bind_text_line_library (Environment& environment)

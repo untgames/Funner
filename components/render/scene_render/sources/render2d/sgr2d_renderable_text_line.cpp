@@ -37,11 +37,11 @@ struct RenderableTextLine::Impl
   math::vec4f                    current_color;                //текущий цвет
   RenderableFont*                current_renderable_font;      //текущий шрифт
   size_t                         current_text_hash;            //текущий хэш текста
-  TextDimensions                 current_text_dimensions;      //текущие границы текста 
+  TextDimensions                 current_text_dimensions;      //текущие границы текста
   scene_graph::TextLineAlignment current_horizontal_alignment; //текущее горизонтальное выравнивание
   scene_graph::TextLineAlignment current_vertical_alignment;   //текущее вертикальное выравнивание
-  math::vec3f                    current_offset;               //текущее смещение текста, определяемое выраваниванием  
-  size_t                         current_world_tm_hash;        //хэш текущей матрицы преобразований  
+  math::vec3f                    current_offset;               //текущее смещение текста, определяемое выраваниванием
+  size_t                         current_world_tm_hash;        //хэш текущей матрицы преобразований
   bool                           need_full_update;             //необходимо полностью обновить все параметры
   bool                           wrong_state;                  //надпись находится в некорректном состоянии
 
@@ -55,7 +55,7 @@ struct RenderableTextLine::Impl
   {
     primitive->SetBlendMode (render::mid_level::renderer2d::BlendMode_Translucent);
   }
-  
+
 ///Обновление параметров строки текста
   void Update ()
   {
@@ -65,13 +65,13 @@ struct RenderableTextLine::Impl
         need_full_update = true;
 
       wrong_state = true;
-      
+
         //получение шрифта
-        
+
       RenderableFont* renderable_font = render.GetFont (text_line->Font ());
-      
+
         //инициализация флагов обновления
-        
+
       bool need_update_sprites = false;
 
         //определение необходимости обновления текста
@@ -93,9 +93,9 @@ struct RenderableTextLine::Impl
         //определение необходимости обновления цвета текста
 
       bool need_update_color = current_color != text_line->Color ();
-      
+
         //определение необходимости обновления всех полей
-        
+
       if (need_full_update)
       {
         need_update_text    = true;
@@ -126,12 +126,12 @@ struct RenderableTextLine::Impl
 
           //резервирование места для буфера спрайтов
 
-        sprites_buffer.resize (text_length, false);      
+        sprites_buffer.resize (text_length, false);
 
           //формирование массива спрайтов
 
         const wchar_t*                 pos              = text_unicode;
-        size_t                         prev_glyph_index = 0;      
+        size_t                         prev_glyph_index = 0;
         mid_level::renderer2d::Sprite* dst_sprite       = sprites_buffer.data ();
 
         for (size_t i=0; i<text_length; i++, pos++)
@@ -147,14 +147,14 @@ struct RenderableTextLine::Impl
 
             current_symbol_code = '?';
           }
-          
+
             //получение глифа
 
           size_t                  glyph_index = current_symbol_code - first_glyph_code;
           const media::GlyphInfo& glyph       = glyphs [glyph_index];
-          
+
             //перенос пера
-            
+
           if (dst_sprite != sprites_buffer.data ()) //производится только если есть предыдущий символ
           {
             if (font.HasKerning (prev_glyph_index, glyph_index))
@@ -179,8 +179,8 @@ struct RenderableTextLine::Impl
           dst_sprite->color      = color;
           dst_sprite->size       = src_sprite.size;
           dst_sprite->tex_offset = src_sprite.tex_offset;
-          dst_sprite->tex_size   = src_sprite.tex_size;        
-          
+          dst_sprite->tex_size   = src_sprite.tex_size;
+
             //перенос пера
 
           current_pen_x += glyph.advance_x / max_glyph_side;
@@ -189,7 +189,7 @@ struct RenderableTextLine::Impl
             //корректировка границ текста
 
           TextDimensions glyph_dimensions;
-          
+
           glyph_dimensions.min.x = dst_sprite->position.x - dst_sprite->size.x * 0.5f;
           glyph_dimensions.min.y = dst_sprite->position.y - dst_sprite->size.y * 0.5f;
           glyph_dimensions.max.x = glyph_dimensions.min.x + dst_sprite->size.x;
@@ -199,25 +199,25 @@ struct RenderableTextLine::Impl
           if (glyph_dimensions.min.y < text_dimensions.min.y) text_dimensions.min.y = glyph_dimensions.min.y;
           if (glyph_dimensions.max.x > text_dimensions.max.x) text_dimensions.max.x = glyph_dimensions.max.x;
           if (glyph_dimensions.max.y > text_dimensions.max.y) text_dimensions.max.y = glyph_dimensions.max.y;
-          
+
             //переход к следующему спрайту
 
           dst_sprite++;
           prev_glyph_index = glyph_index;
         }
-        
+
           //корректировка количества спрайтов
 
         sprites_buffer.resize (dst_sprite - sprites_buffer.data ());
 
           //обновление текстуры
 
-        primitive->SetTexture (renderable_font->GetTexture ());      
+        primitive->SetTexture (renderable_font->GetTexture ());
 
           //обновление параметров
 
-        current_text_dimensions = text_dimensions;      
-        current_renderable_font = renderable_font;      
+        current_text_dimensions = text_dimensions;
+        current_renderable_font = renderable_font;
         current_text_hash       = text_line->TextUnicodeHash ();
 
           //обновление флагов
@@ -226,13 +226,13 @@ struct RenderableTextLine::Impl
         need_update_sprites = true;
         need_update_color   = false;
       }
-      
+
         //обновление положения текста
-        
+
       if (need_update_offset)
       {
           //расчёт вектора смещения надписи
-        
+
         scene_graph::TextLineAlignment halign = text_line->HorizontalAlignment (),
                                        valign = text_line->VerticalAlignment ();
         math::vec2f                    size   = current_text_dimensions.max - current_text_dimensions.min,
@@ -247,10 +247,13 @@ struct RenderableTextLine::Impl
           case TextLineAlignment_Right:
             offset.x -= size.x;
             break;
+          case TextLineAlignment_BaseLine:
+            offset.x = 0.f;
+            break;
           case TextLineAlignment_Left:
             break;
         }
-        
+
         switch (valign)
         {
           default:
@@ -259,6 +262,9 @@ struct RenderableTextLine::Impl
             break;
           case TextLineAlignment_Top:
             offset.y -= size.y;
+            break;
+          case TextLineAlignment_BaseLine:
+            offset.y = 0.f;
             break;
           case TextLineAlignment_Bottom:
             break;
@@ -291,9 +297,9 @@ struct RenderableTextLine::Impl
       if (need_update_color)
       {
           //получение цвета
-         
+
         math::vec4f color = text_line->Color ();
-        
+
           //обновление цвета в спрайтах
 
         mid_level::renderer2d::Sprite* sprite = sprites_buffer.data ();
@@ -304,14 +310,14 @@ struct RenderableTextLine::Impl
           //обновление параметров
 
         current_color = text_line->Color ();
-        
+
           //обновление флагов
-          
+
         need_update_sprites = true;
       }
-      
+
         //обновление спрайтов
-        
+
       if (need_update_sprites)
       {
         primitive->RemoveAllSprites ();
@@ -327,7 +333,7 @@ struct RenderableTextLine::Impl
       render.LogPrintf ("%s\n    at render::render2d::RenderableTextLine::Update(text_line='%s')", exception.what (), text_line->Name ());
     }
     catch (...)
-    {    
+    {
       render.LogPrintf ("Unknown exception\n    at render::render2d::RenderableTextLine::Update(text_line='%s')", text_line->Name ());
     }
   }

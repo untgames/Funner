@@ -12,3 +12,4 @@ TextLine horizontal alignment = 'TextLineAlignment_Center', vertical_alignment =
 TextLine text = 'Unicode text'
 TextLine unicode text = 'Unicode text'
 TextLine horizontal alignment = 'TextLineAlignment_Right/TextLineAlignment_Bottom', vertical_alignment = 'TextLineAlignment_Center'
+TextLine horizontal alignment = 'TextLineAlignment_BaseLine', vertical_alignment = 'TextLineAlignment_BaseLine'

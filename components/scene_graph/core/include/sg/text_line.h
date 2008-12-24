@@ -12,11 +12,12 @@ namespace scene_graph
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum TextLineAlignment
 {
-  TextLineAlignment_Center = 0, //по центру
-  TextLineAlignment_Left = 1,   //по левому краю
-  TextLineAlignment_Right = 2,  //по правому краю
-  TextLineAlignment_Top = 1,    //по верхнему краю
-  TextLineAlignment_Bottom = 2, //по нижнему краю
+  TextLineAlignment_Center = 0,   //по центру
+  TextLineAlignment_Left = 1,     //по левому краю
+  TextLineAlignment_Right = 2,    //по правому краю
+  TextLineAlignment_Top = 1,      //по верхнему краю
+  TextLineAlignment_Bottom = 2,   //по нижнему краю
+  TextLineAlignment_BaseLine = 3, //по базовой линии
 
   TextLineAlignment_Num
 };
@@ -71,7 +72,7 @@ class TextLine: public Entity
     void              SetVerticalAlignment   (TextLineAlignment alignment);
     TextLineAlignment VerticalAlignment      () const;
     TextLineAlignment HorizontalAlignment    () const;
-  
+
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор

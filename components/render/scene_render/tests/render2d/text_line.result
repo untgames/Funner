@@ -51,6 +51,28 @@ Draw primitive (id=8)
     sprite #3: position=[1.65 0.30 0.00] size=[0.27 0.59] color=[0.10 0.20 0.30 0.40] tex_offset=[0.60 0.09] tex_size=[0.01 0.04]
 End draw frame (id=7)
 End draw frames (id=2, frame_id=1)
+Begin draw frames (id=2, frame_id=2)
+Begin draw frame (id=6)
+Set render targets: render-target=4, depth-stencil-target=5
+Clear render target [0.00 0.00 0.00 0.00]
+Clear depth-stencil target [1.000 0]
+End draw frame (id=6)
+Begin draw frame (id=7)
+Set render targets: render-target=4, depth-stencil-target=5
+Set viewport (left=0, top=0, width=800, height=600)
+Projection matrix=[[2.00 0.00 0.00] [-1.00 0.00 2.00] [0.00 -1.00 0.00] [0.00 2.00 -1.00]]
+View point=[0.00 0.00 0.00]
+Draw primitive (id=8)
+  texture_id=9
+  blend=translucent
+  transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
+  sprites (count=4):
+    sprite #0: position=[0.30 0.32 0.00] size=[0.53 0.67] color=[0.10 0.20 0.30 0.40] tex_offset=[0.02 0.09] tex_size=[0.02 0.04]
+    sprite #1: position=[0.80 0.22 0.00] size=[0.36 0.47] color=[0.10 0.20 0.30 0.40] tex_offset=[0.36 0.10] tex_size=[0.01 0.03]
+    sprite #2: position=[1.26 0.21 0.00] size=[0.45 0.45] color=[0.10 0.20 0.30 0.40] tex_offset=[0.68 0.10] tex_size=[0.01 0.03]
+    sprite #3: position=[1.65 0.30 0.00] size=[0.27 0.59] color=[0.10 0.20 0.30 0.40] tex_offset=[0.60 0.09] tex_size=[0.01 0.04]
+End draw frame (id=7)
+End draw frames (id=2, frame_id=2)
 Destroy frame2d (id=7)
 Destroy primitive (id=8)
 Destroy texture2d (id=9)

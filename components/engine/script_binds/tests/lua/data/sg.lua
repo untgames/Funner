@@ -558,9 +558,10 @@ function test_visual_model ()
 end
 
 function get_name (alignment)
-  if (alignment == Scene.TextLineAlignment.Center) then return "Center" end
-  if (alignment == Scene.TextLineAlignment.Left)   then return "Left/Top" end
-  if (alignment == Scene.TextLineAlignment.Right) then return "Right/Bottom" end
+  if (alignment == Scene.TextLineAlignment.Center)   then return "Center"       end
+  if (alignment == Scene.TextLineAlignment.Left)     then return "Left/Top"     end
+  if (alignment == Scene.TextLineAlignment.Right)    then return "Right/Bottom" end
+  if (alignment == Scene.TextLineAlignment.BaseLine) then return "BaseLine"     end
   return "Invalid"
 end
 
@@ -601,6 +602,10 @@ function test_text_line ()
   print ("Color = " .. tostring (text_line1.Color))
 
   text_line1:SetAlignment (Scene.TextLineAlignment.Right, Scene.TextLineAlignment.Center)
+
+  print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+
+  text_line1:SetAlignment (Scene.TextLineAlignment.BaseLine, Scene.TextLineAlignment.BaseLine)
 
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
 end
