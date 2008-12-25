@@ -174,20 +174,6 @@ template <class Signature> class function<Signature>::empty_invoker_impl: public
 ///Дамп
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void dump (stl::string&) { throw detail::function_adl_defaults::bad_function_dump (); }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение экземпляра обработчика пустого делегата
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    static empty_invoker_impl* instance_ptr ()
-    {
-      static char buffer [sizeof (empty_invoker_impl)];
-      static empty_invoker_impl* invoker = new (buffer) empty_invoker_impl;
-
-      return invoker;
-    }
-
-  private:
-    empty_invoker_impl () {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -325,7 +311,7 @@ inline typename function<Signature>::invoker_type* function<Signature>::create_i
 template <class Signature>
 inline typename function<Signature>::invoker_type* function<Signature>::create_invoker (null_ptr_type)
 {
-  invoker_type* invoker = empty_invoker_impl::instance_ptr ();
+  invoker_type* invoker = &singleton_default<empty_invoker_impl>::instance ();
 
   addref (invoker);
 
@@ -339,7 +325,7 @@ inline typename function<Signature>::invoker_type* function<Signature>::create_i
 template <class Signature>
 inline bool function<Signature>::empty () const
 {
-  return invoker == empty_invoker_impl::instance_ptr ();
+  return invoker == &singleton_default<empty_invoker_impl>::instance ();
 }
 
 /*

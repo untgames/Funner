@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <new>
 
+#include <xtl/singleton_default.h>
+
 namespace xtl
 {
 

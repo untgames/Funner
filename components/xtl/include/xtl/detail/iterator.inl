@@ -179,15 +179,7 @@ template <class T> struct empty_iterator_impl: public iterator_interface<T>
   bool equal (const iterator_interface<T>& iter)
   {
     return this == &iter;
-  }
-  
-  static empty_iterator_impl* instace_ptr ()
-  {
-    static char buffer [sizeof (empty_iterator_impl)];
-    static empty_iterator_impl* iter = new (buffer) empty_iterator_impl;
-
-    return iter;
-  }
+  }  
 };
 
 /*
@@ -213,7 +205,7 @@ struct default_iterator_selector
 
 template <class T>
 inline iterator<T>::iterator ()
-  : impl (detail::empty_iterator_impl<value_type>::instace_ptr ())
+  : impl (&singleton_default<detail::empty_iterator_impl<value_type> >::instance ())
   {}
 
 template <class T>

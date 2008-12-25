@@ -52,16 +52,7 @@ class connection_impl
 class empty_connection_impl: public connection_impl
 {
   public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение единственного экземпляра пустого соединения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    static connection_impl* instance_ptr () {
-      static char buffer [sizeof (empty_connection_impl)];
-      static connection_impl* empty = new (buffer) empty_connection_impl;
-
-      return empty;
-    }
-
+    empty_connection_impl () {}
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка состояния соединения / разрыв соединения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +74,7 @@ class empty_connection_impl: public connection_impl
 */
 
 inline connection::connection ()
-  : impl (detail::empty_connection_impl::instance_ptr ())
+  : impl (&singleton_default<detail::empty_connection_impl>::instance ())
 {
   impl->addref ();
 }

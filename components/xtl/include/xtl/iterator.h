@@ -3,6 +3,7 @@
 
 #include <typeinfo>
 #include <stl/iterator_traits.h>
+#include <xtl/singleton_default.h>
 
 namespace stl
 {

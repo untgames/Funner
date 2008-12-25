@@ -1,0 +1,7 @@
+A<1>::A()
+A<3>::A()
+A<2>::A()
+Results of singleton_default_test:
+A<2>::~A()
+A<3>::~A()
+A<1>::~A()

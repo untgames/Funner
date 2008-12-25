@@ -11,6 +11,7 @@
 #include <xtl/function_equal.h>
 #include <xtl/invoker.h>
 #include <xtl/reference_counter.h>
+#include <xtl/singleton_default.h>
 #include <xtl/utility>
 
 namespace xtl
