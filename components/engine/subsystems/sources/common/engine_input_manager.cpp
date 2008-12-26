@@ -22,7 +22,7 @@ const char* LOG_NAME       = "engine.subsystems.InputManagerSubsystem";
 const char* COMPONENT_NAME = LOG_NAME;
 
 /*
-   Подсистема менеджера ввода               
+   Подсистема менеджера ввода
 */
 
 typedef xtl::function<void (const char*)> InputHandler;
@@ -71,7 +71,7 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
             if (!translation_map_name)
               continue;
 
-            Attachment::DeviceEntryPtr device_entry (new Attachment::DeviceEntry, false); 
+            Attachment::DeviceEntryPtr device_entry (new Attachment::DeviceEntry, false);
 
             TranslationMapsMap::iterator translation_map_iter = translation_maps.find (translation_map_name);
 
@@ -110,9 +110,11 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
     }
 
 ///Обработчик события удаления точек привязки событий ввода
-    void OnRemoveInputHandler (const char* attachment_name, const InputHandler&)
+    void OnUnregisterAttachment (const char* attachment_name, const InputHandler&)
     {
+      printf ("InputManagerSubsystem::OnRemoveInputHandler\n");
       attachments.erase (attachment_name);
+      printf ("InputManagerSubsystem::OnRemoveInputHandler attachment erased\n");
     }
 
 /// Подсчёт ссылок
@@ -130,13 +132,13 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
     InputManagerSubsystem (const InputManagerSubsystem&);             //no impl
     InputManagerSubsystem& operator = (const InputManagerSubsystem&); //no impl
 
-  private:    
+  private:
     class TranslationMapHolder;
     class DeviceHolder;
-  
+
     typedef xtl::com_ptr<IDevice>                                            DevicePtr;
     typedef stl::hash_map<stl::hash_key<const char*>, DeviceHolder*>         DevicesMap;
-    typedef stl::hash_map<stl::hash_key<const char*>, TranslationMapHolder*> TranslationMapsMap;    
+    typedef stl::hash_map<stl::hash_key<const char*>, TranslationMapHolder*> TranslationMapsMap;
     typedef xtl::intrusive_ptr<DeviceHolder>                                 DeviceHolderPtr;
     typedef xtl::intrusive_ptr<TranslationMapHolder>                         TranslationMapHolderPtr;
 
@@ -148,7 +150,7 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
         {
           this_iter = translation_maps.insert_pair (translation_map_name, this).first;
         }
-        
+
         ~TranslationMapHolder ()
         {
           container->erase (this_iter);
@@ -173,7 +175,7 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
         {
           this_iter = device_map.insert_pair (device->GetFullName (), this).first;
         }
-        
+
         ~DeviceHolder ()
         {
           container->erase (this_iter);
@@ -228,16 +230,16 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
 class InputManagerComponent
 {
   public:
-    InputManagerComponent () 
+    InputManagerComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);
     }
-    
+
   private:
     static void StartupHandler (ParseNode& node, SubsystemManager& manager)
     {
       try
-      {        
+      {
         const char* registry_name = get<const char*> (node, "TranslationMapRegistry");
 
         xtl::com_ptr<ISubsystem> subsystem (new InputManagerSubsystem (registry_name), false);
