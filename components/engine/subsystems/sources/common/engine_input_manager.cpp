@@ -112,9 +112,7 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
 ///Обработчик события удаления точек привязки событий ввода
     void OnUnregisterAttachment (const char* attachment_name, const InputHandler&)
     {
-      printf ("InputManagerSubsystem::OnRemoveInputHandler\n");
       attachments.erase (attachment_name);
-      printf ("InputManagerSubsystem::OnRemoveInputHandler attachment erased\n");
     }
 
 /// Подсчёт ссылок
