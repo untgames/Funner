@@ -18,3 +18,7 @@ void Platform::DoNextEvent ()
 void Platform::WaitMessage ()
 {
 }
+
+void Platform::UpdateMessageQueue ()
+{
+}

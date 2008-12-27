@@ -2,6 +2,13 @@
 
 using namespace syslib;
 
+namespace
+{
+
+const double RECEIVE_EVENT_TIMEOUT = 0.000000001;
+
+}
+
 /*
     Работа с очередью сообщений
 */
@@ -15,7 +22,7 @@ void Platform::DoNextEvent ()
 {
   EventRef event;
 
-  ReceiveNextEvent (0, 0, 0.000000001, true, &event);
+  ReceiveNextEvent (0, 0, RECEIVE_EVENT_TIMEOUT, true, &event);
 
   if (!event)
     return;
@@ -47,4 +54,11 @@ void Platform::WaitMessage ()
 
   check_event_manager_error (ReceiveNextEvent (0, 0, kEventDurationForever, false, &next_event),
                              "syslib::CarbonPlatform::WaitMessage", "Can't wait for next message, error at '::ReceiveNextEvent'");
+}
+
+void Platform::UpdateMessageQueue ()
+{
+  EventRef next_event;
+
+  ReceiveNextEvent (0, 0, RECEIVE_EVENT_TIMEOUT, false, &next_event);
 }

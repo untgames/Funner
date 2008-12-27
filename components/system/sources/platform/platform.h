@@ -105,6 +105,7 @@ class Platform
     static bool IsMessageQueueEmpty ();
     static void DoNextEvent         ();
     static void WaitMessage         (); //приостановка выполнения приложения до появления следующего сообщения
+    static void UpdateMessageQueue  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка динамических библиотек

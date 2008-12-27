@@ -178,6 +178,8 @@ void ApplicationImpl::Run ()
 
   while (!is_exit_detected)
   {
+    Platform::UpdateMessageQueue ();
+
     DoEvents ();
 
      //если нет обработчиков OnIdle - приостанавливаем приложение
