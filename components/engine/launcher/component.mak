@@ -1,7 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := ENGINE.LAUNCHER.SOURCES ENGINE.CLAUNCHER.SOURCES
+TARGETS := ENGINE.LAUNCHER.SOURCES 
+TARGETS.win32 := ENGINE.CLAUNCHER.SOURCES
 
 LAUNCHER_VERSION_STRING := "Launcher version 1.0"
 

@@ -87,8 +87,9 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
             else
               device_entry->device = device_iter->second;
 
-            device_entry->device_connection = current_device->RegisterEventHandler (xtl::bind (&input::TranslationMap::ProcessEvent,
-              &device_entry->translation_map->GetTranslationMap (), _1, handler));
+            device_entry->handler = handler;
+
+            device_entry->device_connection = device_entry->device->GetDevice ()->RegisterEventHandler (xtl::bind (&Attachment::DeviceEntry::Process, device_entry.get (), _1));
 
             new_attachment->devices.push_back (device_entry);
           }
@@ -103,8 +104,6 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
           }
         }
       }
-
-      new_attachment->handler = handler;
 
       attachments[attachment_name] = new_attachment;
     }
@@ -197,7 +196,15 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
         {
           DeviceHolderPtr         device;
           TranslationMapHolderPtr translation_map;
+          InputHandler            handler;
           xtl::auto_connection    device_connection;
+
+          void Process (const char* event)
+          {
+            DeviceEntryPtr this_holder (this);
+
+            translation_map->GetTranslationMap ().ProcessEvent (event, handler);
+          }
         };
 
         typedef xtl::intrusive_ptr<DeviceEntry> DeviceEntryPtr;
@@ -207,7 +214,6 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
 
       public:
         DeviceArray  devices;
-        InputHandler handler;
     };
 
     typedef xtl::intrusive_ptr<Attachment>                           AttachmentPtr;
