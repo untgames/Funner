@@ -8,9 +8,9 @@ int main ()
   {
     LogFilter filter ("common.threads.*", &print_log);
     
-    Thread thread = Thread::GetCurrent ();
-
-      //???
+    Thread& thread = Thread::GetCurrent ();
+    
+//    printf ("current thread name is '%s'\n", thread.Name ());
   }
   catch (std::exception& exception)
   {

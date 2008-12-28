@@ -19,5 +19,5 @@ ICustomFileSystem* DefaultPlatform::GetIOSystem ()
 
 ICustomThreadSystem* DefaultPlatform::GetThreadSystem ()
 {
-  return Singleton<DefaultThreadSystem>::InstancePtr ();
+  throw xtl::format_not_supported_exception ("common::DefaultPlatform::GetThreadSystem", "Threads are not supported");
 }

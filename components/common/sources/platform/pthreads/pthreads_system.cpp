@@ -94,6 +94,12 @@ void* thread_run (void* data)
   return 0;
 }
 
+//получение дескриптора нити
+pthread_t get_handle (ICustomThreadSystem::thread_t thread)
+{
+  return thread ? *(pthread_t*)thread : pthread_self ();
+}
+
 }
 
 /*
@@ -140,9 +146,7 @@ PThreadsSystem::thread_t PThreadsSystem::CreateThread (IThreadCallback* in_callb
     if (status)
       raise ("::pthread_create", status);
       
-
-
-    return handle.release ();
+    return (thread_t)handle.release ();
   }
   catch (xtl::exception& exception)
   {
@@ -169,14 +173,9 @@ void PThreadsSystem::CancelThread (thread_t thread)
 {
   try
   {
-    if (!thread)
-      throw xtl::make_null_argument_exception ("", "thread");
-      
-    thread_init ();
-    
-    pthread_t* handle = (pthread_t*)thread;
-    
-    int status = pthread_cancel (*handle);    
+    thread_init ();    
+
+    int status = pthread_cancel (get_handle (thread));
 
     if (status)
       raise ("::pthread_cancel", status);
@@ -196,15 +195,11 @@ void PThreadsSystem::JoinThread (thread_t thread)
 {
   try
   {
-    if (!thread)
-      throw xtl::make_null_argument_exception ("", "thread");
-      
     thread_init ();
     
-    pthread_t* handle    = (pthread_t*)thread;
-    void*      exit_code = 0;
+    void* exit_code = 0;
 
-    int status = pthread_join (*handle, &exit_code);
+    int status = pthread_join (get_handle (thread), &exit_code);
 
     if (status)
       raise ("::pthread_join", status);
@@ -217,73 +212,140 @@ void PThreadsSystem::JoinThread (thread_t thread)
 }
 
 /*
-    Получение текущей нити
-*/
-
-ICustomThreadSystem::thread_t PThreadsSystem::GetCurrentThread ()
-{
-  try
-  {
-    thread_init ();
-
-    return new pthread_t (pthread_self ());
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("common::PThreadsSystem::GetCurrentThread");
-    throw;
-  }
-}
-
-/*
-    Работа с критическими секциями кода
+    Работа с локальными данными нити
 */
 
 namespace
 {
 
-XTL_THREAD_VARIABLE size_t critical_section_entries = 0;
+//хранилище переменных нити
+struct TlsValueImpl
+{
+  void*                   data;
+  IThreadCleanupCallback* cleanup;
+
+  TlsValueImpl (IThreadCleanupCallback* in_cleanup) : data (0), cleanup (in_cleanup) {}  
+  
+  static void Cleanup (void* data)
+  {
+    TlsValueImpl* value = (TlsValueImpl*)data;
+    
+    if (!value || !value->cleanup)
+      return;
+
+    value->cleanup->Cleanup (value->data);
+  }
+};
+
+//ключ переменных нити
+struct TlsKeyImpl
+{
+  pthread_key_t           key;
+  IThreadCleanupCallback* cleanup;
+  
+  TlsKeyImpl (IThreadCleanupCallback* in_cleanup) : cleanup (in_cleanup)
+  {
+    int status = pthread_key_create (&key, &TlsValueImpl::Cleanup);
+    
+    if (status)
+      raise ("::pthread_create", status);
+  }
+  
+  ~TlsKeyImpl ()
+  {
+    pthread_key_delete (key);
+  }
+  
+  TlsValueImpl& GetValue ()
+  {
+    TlsValueImpl* value = (TlsValueImpl*)pthread_getspecific (key);
+
+    if (value)
+      return *value;
+
+    stl::auto_ptr<TlsValueImpl> new_value (new TlsValueImpl (cleanup));
+
+    int status = pthread_setspecific (key, new_value.get ());
+
+    if (status)
+      raise ("::pthread_setspecific", status);
+
+    return *new_value.release ();
+  }
+};
 
 }
 
-void PThreadsSystem::EnterCriticalSection ()
+PThreadsSystem::tls_t PThreadsSystem::CreateTls (IThreadCleanupCallback* cleanup)
 {
   try
   {
-    thread_init ();    
-    
-    if (!critical_section_entries++)
-    {
-      int status = pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, 0);
+    thread_init ();
 
-      if (status)
-        raise ("::pthread_setcancelstate(PTHREAD_CANCEL_DISABLE,0)", status);
-    }
+    return (tls_t)new TlsKeyImpl (cleanup);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::PThreadsSystem::EnterCtriticalSection");
+    exception.touch ("common::PThreadsSystem::CreateTls");
     throw;
   }
 }
 
-void PThreadsSystem::ExitCriticalSection ()
+void PThreadsSystem::DeleteTls (tls_t tls)
 {
   try
   {
-    thread_init ();    
-    
-    if (!--critical_section_entries)
-    {
-      int status = pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, 0);
+    if (!tls)
+      return;
+      
+    thread_init ();
 
-      if (status)
-        raise ("::pthread_setcancelstate(PTHREAD_CANCEL_ENABLE,0)", status);
-    }
+    TlsKeyImpl* handle = (TlsKeyImpl*)tls;
+      
+    delete handle;
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
+}
+
+void PThreadsSystem::SetTls (tls_t tls, void* data)
+{
+  try
+  {
+    if (!tls)
+      throw xtl::make_null_argument_exception ("", "tls");
+    
+    thread_init ();
+    
+    TlsKeyImpl* key = (TlsKeyImpl*)tls;
+
+    key->GetValue ().data = data;
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::PThreadsSystem::ExitCtriticalSection");
+    exception.touch ("common::PThreadsSystem::SetTls");
+    throw;
+  }
+}
+
+void* PThreadsSystem::GetTls (tls_t tls)
+{
+  try
+  {
+    if (!tls)
+      throw xtl::make_null_argument_exception ("", "tls");
+    
+    thread_init ();
+    
+    TlsKeyImpl* key = (TlsKeyImpl*)tls;
+
+    return key->GetValue ().data;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::PThreadsSystem::GetTls");
     throw;
   }
 }

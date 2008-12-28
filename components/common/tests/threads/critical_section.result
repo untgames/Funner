@@ -1,9 +1,0 @@
-Results of critical_section_test:
-join thread2: 0
-thread1 started
-enter critical section
-enter critical section (again)
-thread2 started
-exit critical section
-exit critical section (again)
-join thread1: -1

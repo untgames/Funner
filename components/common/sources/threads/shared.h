@@ -5,6 +5,7 @@
 #include <xtl/reference_counter.h>
 
 #include <common/log.h>
+#include <common/singleton.h>
 #include <common/strlib.h>
 #include <common/thread.h>
 

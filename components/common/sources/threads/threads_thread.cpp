@@ -25,8 +25,8 @@ struct Thread::Impl: public IThreadCallback, public xtl::reference_counter
   int                           exit_code;       //код выхода нити
 
 ///Конструкторы
-  Impl () : handle (0), exit_code (0) {}  
-  
+  Impl () : handle (0), exit_code (0) {}
+
   Impl (const char* in_name, const Function& in_thread_function)
     : thread_function (in_thread_function),
       name (in_name)
@@ -86,11 +86,6 @@ Thread::Thread ()
 {
 }
 
-Thread::Thread (Impl* in_impl)
-  : impl (in_impl)
-{
-}
-
 Thread::Thread (const Function& thread_function)
 {
   try
@@ -124,32 +119,19 @@ Thread::Thread (const char* name, const Function& thread_function)
   }
 }
 
-Thread::Thread (const Thread& thread)
-  : impl (thread.impl)
-{
-  addref (impl);
-}
-
 Thread::~Thread ()
 {
   release (impl);
-}
-
-Thread& Thread::operator = (const Thread& thread)
-{
-  Thread (thread).Swap (*this);
-
-  return *this;
 }
 
 /*
     Имя нити
 */
 
-const char* Thread::Name () const
+/*const char* Thread::Name () const
 {
-  return impl->name.c_str ();
-}
+  return impl->handle ? impl->name.c_str () : Platform::GetThreadSystem ()->GetCurrentThreadName ();
+}*/
 
 /*
     Отмена нити
@@ -159,9 +141,6 @@ void Thread::Cancel ()
 {
   try
   {  
-    if (!impl->handle)
-      return;
-
     Platform::GetThreadSystem ()->CancelThread (impl->handle);
     
     impl->exit_code = THREAD_CANCELED_EXIT_CODE;
@@ -179,9 +158,6 @@ void Thread::Cancel ()
 
 int Thread::Join ()
 {
-  if (!impl->handle)
-    return 0;    
-
   Platform::GetThreadSystem ()->JoinThread (impl->handle);
 
   return impl->exit_code;
@@ -191,38 +167,27 @@ int Thread::Join ()
     Получение текущей нити
 */
 
-Thread Thread::GetCurrent ()
+namespace common
+{
+
+struct CurrentThreadHolder
+{
+  Thread thread;
+};
+
+typedef Singleton<CurrentThreadHolder> CurrentThreadSingleton;
+
+}
+
+Thread& Thread::GetCurrent ()
 {
   try
   {
-    Thread thread (new Impl);
-
-    thread.impl->handle = Platform::GetThreadSystem ()->GetCurrentThread ();
-
-    return thread;
+    return CurrentThreadSingleton::Instance ().thread;
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("common::Thread::GetCurrent");
     throw;
   }
-}
-
-/*
-    Обмен
-*/
-
-void Thread::Swap (Thread& thread)
-{
-  stl::swap (impl, thread.impl);
-}
-
-namespace common
-{
-
-void swap (Thread& thread1, Thread& thread2)
-{
-  thread1.Swap (thread2);
-}
-
 }
