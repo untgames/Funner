@@ -23,6 +23,7 @@
 #include <common/file.h>
 #include <common/parse_iterator.h>
 #include <common/parser.h>
+#include <common/strlib.h>
 #include <common/var_registry.h>
 
 #include <syslib/application.h>
@@ -150,6 +151,8 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     }
 
     void OpenProjectPath (const char* path);
+
+    size_t CalculatingTrajectoriesCount ();
 
     void AddRef  () { addref (this); }
     void Release () { release (this); }

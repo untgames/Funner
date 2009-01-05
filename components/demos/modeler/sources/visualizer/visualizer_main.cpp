@@ -6,6 +6,10 @@
 
 #include "shared.h"
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
+
 extern "C"
 {
 
@@ -19,7 +23,10 @@ namespace
 //класс тестового приложения
 struct Test
 {
-  Test () : log ("modeler.test"), application_server (new MyApplicationServer, false)
+  Test () :
+    log ("modeler.test"),
+    application_server (new MyApplicationServer, false),
+    window_title_update_timer (xtl::bind (&Test::UpdateWindowTitle, this), 1000, syslib::TimerState_Paused)
   {
       //регистрация сервера приложения
 
@@ -28,6 +35,7 @@ struct Test
       //создание главного окна
 
     tools::ui::MainWindow ("MyApplicationServer", "WindowsForms").Swap (main_window);
+    window_title_update_timer.Run ();
 
       //подписка на события протоколирования
 
@@ -43,11 +51,24 @@ struct Test
     log.Print (message);
   }
 
+  void UpdateWindowTitle ()
+  {
+    if (application_server->CalculatingTrajectoriesCount ())
+    {
+      stl::string window_title = common::format ("Application.MainForm.Text = \"Modeler: calculating %u trajectories\"", application_server->CalculatingTrajectoriesCount ());
+
+      main_window.ExecuteCommand (window_title.c_str ());
+    }
+    else
+      main_window.ExecuteCommand ("Application.MainForm.Text = \"Modeler\"");
+  }
+
   typedef xtl::com_ptr<MyApplicationServer> MyApplicationServerPtr;
 
   common::Log            log;
   MyApplicationServerPtr application_server;
   tools::ui::MainWindow  main_window;
+  syslib::Timer          window_title_update_timer;            //таймер обновления заголовка окна
 };
 
 void print (const char* message)

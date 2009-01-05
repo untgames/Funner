@@ -1,7 +1,6 @@
 #include <direct.h>
 #include <process.h>
 
-#include <common/strlib.h>
 #include <common/time.h>
 #include <common/xml_writer.h>
 
@@ -345,23 +344,6 @@ void MyApplicationServer::LoadTrajectory (const char* file_name)
     throw xtl::format_operation_exception ("MyApplicationServer::LoadTrajectory",
                                            "Can't load trajectory '%s', no such file", file_name);
 
-  CalculatingTrajectoriesNameMap::iterator name_map_iter = calculating_trajectories_name_map.find (file_name);
-
-  if (name_map_iter != calculating_trajectories_name_map.end ())
-  {
-    CalculatingTrajectoriesNuMap::iterator nu_map_iter = calculating_trajectories_nu_map.find (name_map_iter->second);
-
-    if (nu_map_iter == calculating_trajectories_nu_map.end ())
-      common::Console::Printf ("Warning: loading trajecotry which present in names map, but not present in nu map\n");
-    else
-    {
-      common::Console::Printf ("Trajectory with nu1 = %f, nu2 = %f, nu3 = %f calculated.\n", name_map_iter->second.x,
-                               name_map_iter->second.y, name_map_iter->second.z);
-      calculating_trajectories_name_map.erase (name_map_iter);
-      calculating_trajectories_nu_map.erase (nu_map_iter);
-    }
-  }
-
   common::Console::Printf ("Loading trajectory '%s'\n", file_name);
 
   media::rms::Group resource_group;
@@ -461,6 +443,23 @@ void MyApplicationServer::OnNewXmeshTrajectory (const char* desc_trajectory_file
   if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), xmesh_trajectory_file_name.c_str (), binmesh_file_name.c_str (), 0) == -1)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't call %s: %s", MESH_CONVERTER_APPLICATION_NAME, get_spawn_error_name ());
 
+  CalculatingTrajectoriesNameMap::iterator name_map_iter = calculating_trajectories_name_map.find (xmesh_trajectory_file_name.c_str ());
+
+  if (name_map_iter != calculating_trajectories_name_map.end ())
+  {
+    CalculatingTrajectoriesNuMap::iterator nu_map_iter = calculating_trajectories_nu_map.find (name_map_iter->second);
+
+    if (nu_map_iter == calculating_trajectories_nu_map.end ())
+      common::Console::Printf ("Warning: loading trajecotry which present in names map, but not present in nu map\n");
+    else
+    {
+      common::Console::Printf ("Trajectory with nu1 = %f, nu2 = %f, nu3 = %f calculated.\n", name_map_iter->second.x,
+                               name_map_iter->second.y, name_map_iter->second.z);
+      calculating_trajectories_name_map.erase (name_map_iter);
+      calculating_trajectories_nu_map.erase (nu_map_iter);
+    }
+  }
+
   if (visualize_new_calculations)
     WaitForFile (binmesh_file_name.c_str (), xtl::bind (&MyApplicationServer::LoadTrajectory, this, _1));
 }
@@ -495,7 +494,7 @@ void MyApplicationServer::CalculateTrajectory (double nu1, double nu2, double nu
   common::Console::Printf ("Calculating trajectory with nu1 = %g, nu2 = %g, nu3 = %g and lod = %u\n", nu1, nu2, nu3, lod);
 
   calculating_trajectories_nu_map.insert_pair   (nu_vector, binmesh_trajectory_name.c_str ());
-  calculating_trajectories_name_map.insert_pair (binmesh_trajectory_name.c_str (), nu_vector);
+  calculating_trajectories_name_map.insert_pair (trajectory_name.c_str (), nu_vector);
 
   WaitForFile (waited_desc_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewXmeshTrajectory, this, _1));
 }
@@ -694,7 +693,7 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
       common::FileSystem::Remove (waited_desc_file_name.c_str ());
 
       calculating_trajectories_nu_map.insert_pair   (nu_vector, binmesh_trajectory_name.c_str ());
-      calculating_trajectories_name_map.insert_pair (binmesh_trajectory_name.c_str (), nu_vector);
+      calculating_trajectories_name_map.insert_pair (trajectory_name.c_str (), nu_vector);
 
       WaitForFile (waited_desc_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewXmeshTrajectory, this, _1));
     }
@@ -756,10 +755,11 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
 
       condor_trajectories_names[waited_file_name.c_str ()] = common::format ("%strajectory_%f_%f_%f.xmesh.desc", project_path.c_str (), nu1, nu2, nu3);
 
-      stl::string binmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.binmesh", project_path.c_str (), nu1, nu2, nu3);
+      stl::string xmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.xmesh", project_path.c_str (), nu1, nu2, nu3),
+                  binmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.binmesh", project_path.c_str (), nu1, nu2, nu3);
 
       calculating_trajectories_nu_map.insert_pair   (nu_vector, binmesh_trajectory_name.c_str ());
-      calculating_trajectories_name_map.insert_pair (binmesh_trajectory_name.c_str (), nu_vector);
+      calculating_trajectories_name_map.insert_pair (xmesh_trajectory_name.c_str (), nu_vector);
 
       WaitForFile (waited_file_name.c_str (), xtl::bind (&MyApplicationServer::OnNewCondorBatchTrajectory, this, _1));
     }
@@ -1101,4 +1101,9 @@ void MyApplicationServer::Benchmark ()
   common::FileSystem::Remove (xmesh_desc_file_name.c_str ());
 
   common::Console::Printf ("This computer performance is %u vps\n", trajectory_vertex_per_second);
+}
+
+size_t MyApplicationServer::CalculatingTrajectoriesCount ()
+{
+  return calculating_trajectories_nu_map.size ();
 }
