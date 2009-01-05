@@ -41,6 +41,8 @@ const size_t DEFAULT_ENVELOPE_LOD                = 200;
 const char*  DESC_FILE_SUFFIX                    = ".desc";
 const char*  INTERPRETER_NAME                    = "lua";
 const size_t LINE_DATA_SIZE                      = 90;
+const char*  LINUX_ENVELOPE_APPLICATION_NAME     = "modeler-envelope";
+const char*  LINUX_TRAJECTORY_APPLICATION_NAME   = "modeler-trajectory";
 const char*  MESH_CONVERTER_APPLICATION_NAME     = "mesh-converter.exe";
 const char*  MODEL_REGISTRY_NAME                 = "ApplicationServer.Properties.Model";
 const char*  MODEL_FILE_NAME                     = "model.xmodel";
@@ -65,9 +67,10 @@ struct OsMemoryUsage
 const OsMemoryUsage OS_MEMORY_USAGE [] = {
                                           { "OSX", 512 },
                                           { "WINNT50", 128 },
-                                          { "WINNT51", 128 },
+                                          { "WINNT51", 256 },
                                           { "WINNT52", 256 },
-                                          { "WINNT60", 512 }
+                                          { "WINNT60", 512 },
+                                          { "LINUX", 256 }
 };
 
 void file_read (const char* source, common::InputFile& file, void* data, size_t size)
@@ -186,6 +189,7 @@ MyApplicationServer::MyApplicationServer ()
 
   win32_plugin_path = common::get<const char*> (*iter, "Win32PluginPath");
   osx_plugin_path   = common::get<const char*> (*iter, "MacOSXPluginPath", "");
+  linux_plugin_path = common::get<const char*> (*iter, "LinuxPluginPath", "");
   condor_path       = common::get<const char*> (*iter, "CondorPath", "");
   use_condor        = common::get<bool>        (*iter, "UseCondor", true);
   author            = common::get<const char*> (*iter, "Author", "Неизвестный автор");
@@ -649,7 +653,7 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
 
   file_read (METHOD_NAME, trajectories_coords_file, &coords_count, sizeof (coords_count));
 
-  if (condor_path.empty () || !use_condor || ((coords_count * lod / (float)trajectory_vertex_per_second / 60.f) < 2))
+  if (condor_path.empty () || !use_condor || ((coords_count * lod / (float)trajectory_vertex_per_second) < 300) || ((lod / (float)trajectory_vertex_per_second) < 30))
   {
     common::Console::Printf ("Calculating %u trajectories with %u points each...\n", coords_count, lod);
 
@@ -755,7 +759,7 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
 
       condor_trajectories_names[waited_file_name.c_str ()] = common::format ("%strajectory_%f_%f_%f.xmesh.desc", project_path.c_str (), nu1, nu2, nu3);
 
-      stl::string xmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.xmesh", project_path.c_str (), nu1, nu2, nu3),
+      stl::string xmesh_trajectory_name = common::format ("%strajectory_%f_%f_%f.xmesh", project_path.c_str (), nu1, nu2, nu3),
                   binmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.binmesh", project_path.c_str (), nu1, nu2, nu3);
 
       calculating_trajectories_nu_map.insert_pair   (nu_vector, binmesh_trajectory_name.c_str ());
@@ -1058,6 +1062,24 @@ void MyApplicationServer::CreateCondorBinaries ()
       {
         printf ("Condor will not perform calculations on OSX machines, there is no OSX executable '%s' in specified directory '%s'\n",
                 osx_trajectory_application_name.c_str (), osx_plugin_path.c_str ());
+      }
+    }
+
+    if (!linux_plugin_path.empty ())
+    {
+      stl::string linux_trajectory_application_name = common::format ("%s\\%s%s", working_directory.c_str (), linux_plugin_path.c_str (), LINUX_TRAJECTORY_APPLICATION_NAME),
+                  linux_intel_trajectory            = common::format ("%s\\%s.LINUX.INTEL", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME);
+
+      if (common::FileSystem::IsFileExist (linux_trajectory_application_name.c_str ()))
+      {
+        copy_file (linux_trajectory_application_name.c_str (), linux_intel_trajectory.c_str ());
+
+        condor_trajectory_requirements += " || (Arch == \"INTEL\" && OpSys == \"LINUX\")";
+      }
+      else
+      {
+        printf ("Condor will not perform calculations on Linux machines, there is no Linux executable '%s' in specified directory '%s'\n",
+                linux_trajectory_application_name.c_str (), linux_plugin_path.c_str ());
       }
     }
   }

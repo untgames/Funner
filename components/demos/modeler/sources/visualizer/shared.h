@@ -224,6 +224,7 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     render::Screen                    screen;
     stl::string                       win32_plugin_path;
     stl::string                       osx_plugin_path;
+    stl::string                       linux_plugin_path;
     stl::string                       project_path;                         //путь к текущей используемой папке
     stl::string                       condor_trajectory_requirements;       //condor требования для запуска рассчёта траекторий
     syslib::Timer                     wait_files_timer;                     //таймер проверки наличия новых файлов
