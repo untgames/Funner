@@ -1,5 +1,6 @@
 #include <direct.h>
 #include <process.h>
+#include <windows.h>
 
 #include <common/time.h>
 #include <common/xml_writer.h>
@@ -667,6 +668,10 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
     stl::string application_name        = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
                 model_name              = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME);
 
+    SYSTEM_INFO system_info;
+
+    GetSystemInfo (&system_info);
+
     for (size_t i = 0; i < coords_count; i++)
     {
       float nu1, nu2, nu3;
@@ -689,8 +694,12 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
                   binmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.binmesh", project_path.c_str (), nu1, nu2, nu3),
                   waited_desc_file_name   = trajectory_name + DESC_FILE_SUFFIX;
 
-      fprintf (batch_file, "%s args-input %f %f %f %s %s %u\n", application_name.c_str (), nu1, nu2, nu3, model_name.c_str (),
-               trajectory_name.c_str (), lod);
+      if (i % system_info.dwNumberOfProcessors)
+        fprintf (batch_file, "start /abovenormal /wait /b %s args-input %f %f %f %s %s %u\n", application_name.c_str (), nu1, nu2, nu3, model_name.c_str (),
+                 trajectory_name.c_str (), lod);
+      else
+        fprintf (batch_file, "start /abovenormal /b %s args-input %f %f %f %s %s %u\n", application_name.c_str (), nu1, nu2, nu3, model_name.c_str (),
+                 trajectory_name.c_str (), lod);
 
       common::FileSystem::Remove (trajectory_name.c_str ());
       common::FileSystem::Remove (binmesh_trajectory_name.c_str ());
