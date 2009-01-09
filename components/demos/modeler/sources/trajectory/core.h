@@ -1,7 +1,9 @@
 #ifndef MODELER_CORE_HEADER
 #define MODELER_CORE_HEADER
 
-#include <math.h>
+#include <cstdio>
+#include <cstring>
+#include <cmath>
 
 #include <vector>
 

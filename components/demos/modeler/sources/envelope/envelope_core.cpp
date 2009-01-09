@@ -1,8 +1,6 @@
-#include "core.h"
-
-#include <stdio.h>
-#include <vector>
 #include <algorithm>
+
+#include "core.h"
 
 namespace modeler
 {

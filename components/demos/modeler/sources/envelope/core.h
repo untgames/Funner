@@ -1,8 +1,11 @@
 #ifndef MODELER_CORE_HEADER
 #define MODELER_CORE_HEADER
 
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+
 #include <vector>
-#include <math.h>
 
 namespace modeler
 {

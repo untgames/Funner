@@ -1,10 +1,7 @@
-#include "core.h"
-
-#include <stdio.h>
-
 #include <list>
-#include <vector>
 #include <algorithm>
+
+#include "core.h"
 
 const float POINT_EQUAL_EPSILON = 0.001f;
 
