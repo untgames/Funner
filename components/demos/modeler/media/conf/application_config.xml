@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding = "Cp1251"?>
-<Configuration CondorPath="c:\condor\bin\" UseCondor="1" Win32PluginPath="..\..\..\dist\msvc\bin\" MacOSXPluginPath="..\..\..\dist\macosx.g++\bin\" Author="Мухин Евгений">
+<Configuration 
+  CondorPath       = "c:\condor\bin\" 
+  UseCondor        = "1" 
+  Win32PluginPath  = "..\..\..\dist\msvc\bin\"
+  MacOSXPluginPath = "..\..\..\dist\macosx.g++\bin\"
+  LinuxPluginPath  = "..\..\..\dist\macosx.g++\bin\"
+  Author           = "Мухин Евгений">
 </Configuration>

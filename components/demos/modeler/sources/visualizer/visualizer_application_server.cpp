@@ -198,7 +198,8 @@ MyApplicationServer::MyApplicationServer ()
   if (use_condor)
     CreateCondorBinaries ();
 
-  Benchmark ();
+  if (use_condor)  //раздельно, так как в CreateCondorBinaries use_condor может быть присвоено false
+    Benchmark ();
 
   camera = OrthoCamera::Create ();
 

@@ -53,14 +53,17 @@ struct Test
 
   void UpdateWindowTitle ()
   {
-    if (application_server->CalculatingTrajectoriesCount ())
+    size_t calculating_trajectories_count = application_server->CalculatingTrajectoriesCount ();
+
+    if (calculating_trajectories_count)
     {
-      stl::string window_title = common::format ("Application.MainForm.Text = \"Modeler: calculating %u trajectories\"", application_server->CalculatingTrajectoriesCount ());
+      stl::string window_title = common::format ("if (MainFormTitle == nil) then Application.MainForm.Text = \"Modeler. Calculating %u trajectories\" else Application.MainForm.Text = MainFormTitle .. \" Calculating %u trajectories\" end",
+                                                 calculating_trajectories_count, calculating_trajectories_count);
 
       main_window.ExecuteCommand (window_title.c_str ());
     }
     else
-      main_window.ExecuteCommand ("Application.MainForm.Text = \"Modeler\"");
+      main_window.ExecuteCommand ("if (MainFormTitle == nil) then Application.MainForm.Text = \"Modeler\" else Application.MainForm.Text = MainFormTitle end");
   }
 
   typedef xtl::com_ptr<MyApplicationServer> MyApplicationServerPtr;
