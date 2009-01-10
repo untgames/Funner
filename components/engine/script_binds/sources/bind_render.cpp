@@ -107,7 +107,7 @@ void bind_viewport_library (Environment& environment)
   lib.Register ("get_BackgroundState", make_invoker (&Viewport::BackgroundState));
   lib.Register ("get_Id",              make_invoker (&Viewport::Id));
   lib.Register ("get_Area",            make_invoker (&Viewport::Area));
-  lib.Register ("set_Area",            make_invoker (implicit_cast<const Rect& (Viewport::*)() const> (&Viewport::Area)));
+  lib.Register ("set_Area",            make_invoker (implicit_cast<void (Viewport::*) (const Rect&)> (&Viewport::SetArea)));
 
   lib.Register ("SetArea",             make_invoker (implicit_cast<void (Viewport::*) (int, int, size_t, size_t)> (&Viewport::SetArea)));
   lib.Register ("SetOrigin",           make_invoker (&Viewport::SetOrigin));
