@@ -81,8 +81,8 @@ namespace tools.ui.windows_forms
       CompilerResults results = cs_code_provider.CompileAssemblyFromSource(
         compiler_parameters, sources);
       // print building output to console
-//      foreach (string outstring in results.Output)
-//        System.Console.WriteLine(outstring);
+      foreach (string outstring in results.Output)
+        System.Console.WriteLine(outstring);
       return results.CompiledAssembly;
     }
     /// <summary>

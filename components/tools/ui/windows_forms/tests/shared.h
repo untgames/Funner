@@ -14,6 +14,7 @@
 
 #include <common/console.h>
 #include <common/log.h>
+#include <common/var_registry_container.h>
 
 #include <syslib/application.h>
 #include <syslib/window.h>
@@ -62,7 +63,7 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
         throw;
       }
     }
-    
+
 ///Установка родительского окна
     void SetParent (const void* parent_window_handle)
     {
@@ -75,8 +76,8 @@ class MyChildWindow: public ICustomChildWindow, public xtl::reference_counter
         exception.touch ("MyChildWindow::SetParent");
         throw;
       }
-    }    
-    
+    }
+
 ///Управление видимостью окна
     void Show (bool state)
     {
@@ -110,10 +111,10 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
         //регистрация шлюзов
 
       shell_environment->BindLibraries ("*");
-      
+
       printf ("MyApplicationServer::MyApplicationServer\n");
     }
-    
+
     ~MyApplicationServer ()
     {
       printf ("MyApplicationServer::~MyApplicationServer\n");
@@ -128,7 +129,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
       }
 
       try
-      {        
+      {
         shell.Execute (command);
       }
       catch (xtl::exception& exception)
@@ -141,13 +142,13 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     void SetProperty (const char* name, const stl::string& value)
     {
       throw xtl::make_not_implemented_exception ("MyApplicationServer::SetProperty");
-    } 
-    
+    }
+
     void GetProperty (const char* name, stl::string& value)
     {
       throw xtl::make_not_implemented_exception ("MyApplicationServer::GetProperty");
     }
-    
+
     bool IsPropertyPresent (const char* name)
     {
       throw xtl::make_not_implemented_exception ("MyApplicationServer::IsPropertyPresent");
@@ -156,7 +157,7 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     bool IsPropertyReadOnly (const char* name)
     {
       throw xtl::make_not_implemented_exception ("MyApplicationServer::IsPropertyPresent");
-    }    
+    }
 
     void RegisterPropertyListener (const char* name_wc_mask, IPropertyListener* listener)
     {
@@ -167,17 +168,17 @@ class MyApplicationServer: public IApplicationServer, public xtl::reference_coun
     {
       throw xtl::make_not_implemented_exception ("MyApplicationServer::UnregisterPropertyListener");
     }
-    
+
     void UnregisterAllPropertyListeners (const char* name_wc_mask)
     {
       throw xtl::make_not_implemented_exception ("MyApplicationServer::UnregisterAllPropertyListeners");
     }
-    
+
     void UnregisterAllPropertyListeners ()
     {
-      throw xtl::make_not_implemented_exception ("MyApplicationServer::UnregisterAllPropertyListeners");    
+      throw xtl::make_not_implemented_exception ("MyApplicationServer::UnregisterAllPropertyListeners");
     }
-    
+
     ICustomChildWindow* CreateChildWindow (const char* init_string)
     {
       return new MyChildWindow;
@@ -203,9 +204,9 @@ struct Test
 
     tools::ui::WindowSystemManager::RegisterApplicationServer ("MyApplicationServer",
       xtl::com_ptr<MyApplicationServer> (new MyApplicationServer, false).get ());
-      
+
       //создание главного окна
-      
+
     MainWindow ("MyApplicationServer", "WindowsForms").Swap (main_window);
   }
 

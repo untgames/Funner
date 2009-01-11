@@ -1,5 +1,7 @@
 #include "shared.h"
 
+const char* APPLICATION_SERVER_REGISTRY_BRANCH = "ApplicationServer";
+
 extern "C"
 {
 
@@ -21,17 +23,21 @@ int main ()
 {
   common::LogFilter log_filter ("*", &log_handler);
 
-  printf ("Results of create_form_test:\n");    
-  
+  printf ("Results of create_form_test:\n");
+
   try
-  {    
+  {
+    common::VarRegistryContainer<stl::string> application_server_registry_container;
+
+    application_server_registry_container.Mount (APPLICATION_SERVER_REGISTRY_BRANCH);
+
     Test test;
-    
+
     test.main_window.SetLogHandler (&print);
-    test.main_window.ExecuteFile ("data/ui.lua");        
+    test.main_window.ExecuteFile ("data/ui.lua");
 
     syslib::Application::Run ();
-    
+
     return syslib::Application::GetExitCode ();
   }
   catch (std::exception& exception)

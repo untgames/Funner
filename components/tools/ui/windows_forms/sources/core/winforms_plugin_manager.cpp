@@ -88,19 +88,7 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
 
       try
       {
-        var_registry_container = new StringRegistryContainer;
-
-        try
-        {
-          var_registry_container->Mount (REGISTRY_BRANCH);
-
-          var_registry = new common::VarRegistry (REGISTRY_BRANCH);
-        }
-        catch (...)
-        {
-          delete var_registry_container;
-          throw;
-        }
+        var_registry = new common::VarRegistry (REGISTRY_BRANCH);
       }
       catch (...)
       {
@@ -112,7 +100,6 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
     ~ApplicationServerImpl ()
     {
       delete var_registry;
-      delete var_registry_container;
       delete plugins;
     }
 
@@ -275,7 +262,7 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
       if (plugin_iter == plugins->end ())
         throw xtl::format_operation_exception (METHOD_NAME, "Can't create form with plugin %s, plugin not registered", plugin);
 
-      System::String^ init_string_wrap = gcnew System::String (init_string);      
+      System::String^ init_string_wrap = gcnew System::String (init_string);
 
       System::Windows::Forms::Control^ new_form = plugin_iter->second.plugin->CreateControl (init_string_wrap);
 
@@ -316,7 +303,7 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
       catch (System::Exception^ exception)
       {
         throw DotNetException (METHOD_NAME, exception);
-      }      
+      }
     }
 
   private:
@@ -338,14 +325,11 @@ public ref class ApplicationServerImpl: public tools::ui::windows_forms::IApplic
     };
 
     typedef stl::hash_map<stl::hash_key<const char*>, PluginEntry> PluginMap;
-    typedef common::VarRegistryContainer<stl::string>              StringRegistryContainer;
 
   private:
     WindowSystem*            window_system;          //оконная система
     PluginMap*               plugins;                //добавленные плагины
-    StringRegistryContainer* var_registry_container; //контейнер реестра переменных
     common::VarRegistry*     var_registry;           //реестр переменных
-
     ArrayList                property_listeners;     //слушатели событий свойств
     ArrayList                output_listeners;       //слушатели сообщений вывода
 };
@@ -407,7 +391,7 @@ PluginManager::~PluginManager ()
 void PluginManager::LoadPlugins (const char* wc_mask)
 {
   if (!wc_mask)
-    throw xtl::make_null_argument_exception ("tools::ui::windows_forms::PluginManager::LoadPlugins", "wc_mask");    
+    throw xtl::make_null_argument_exception ("tools::ui::windows_forms::PluginManager::LoadPlugins", "wc_mask");
 
   common::FileList plugins_files = common::FileSystem::Search (wc_mask, common::FileSearch_Files);
 
@@ -490,5 +474,5 @@ ChildForm::Pointer PluginManager::CreateForm (const char* plugin, const char* in
   catch (System::Exception^ exception)
   {
     throw DotNetException (METHOD_NAME, exception);
-  }  
+  }
 }

@@ -157,8 +157,8 @@ public class UIPropertyGridPlugin: IPlugin
 
     System.Collections.Specialized.StringCollection sc = results.Output;
 
-//    for (int i = 0; i < sc.Count; i++)
-//      System.Console.WriteLine (sc [i]);
+    for (int i = 0; i < sc.Count; i++)
+      System.Console.WriteLine (sc [i]);
 
     assembly = results.CompiledAssembly;
   }

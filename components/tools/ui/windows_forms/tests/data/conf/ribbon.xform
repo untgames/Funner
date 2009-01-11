@@ -21,7 +21,7 @@
       <Tab Text="Ribbon tab">
         <Panel Text="Button panel" Flow="Vertical">
           <Group>
-            <Button Text="Small button" Size="Medium"></Button>
+            <Button Text="Small button" Size="Medium" OnClick ="print ('Button click')"></Button>
             <Menu Source="FirstMenu"></Menu>
           </Group>
           <Separator></Separator>
