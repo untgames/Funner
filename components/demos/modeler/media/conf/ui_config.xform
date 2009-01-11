@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="Cp1251"?>
 <UIConfig>
-  <ToolStrip Id="ToolStrip1">
-    <ToolButton Name="Рассчитать огибающую" OnClick="Application.Execute ('Modeler.CalculateEnvelope (200)')"/>
-    <ToolButton Name="Рассчитать траекторию" OnClick="Application.Execute ('Modeler.CalculateTrajectory (0, 1, 0, 100000)')"/>
-    <ToolButton Name="Рассчитать несколько траекторий" OnClick="Application.Execute ('Modeler.CalculateTrajectories (5, 10000)')"/>
-    <ToolButton Name="Загрузить все рассчитанные траектории" OnClick="Application.Execute ('Modeler.LoadAllCalculatedTrajectories ()')"/>    
-    <ToolButton Name="Удалить все рассчёты" OnClick="Application.Execute ('Modeler.Cleanup ()')"/>
-    <ToolButton Name="Сохранить модель" OnClick="Application.Execute ('Modeler.SaveModel ()')"/>
-  </ToolStrip>
   <Plugin 
     Name="Console" 
     BackgroundColor="255;255;255;255"

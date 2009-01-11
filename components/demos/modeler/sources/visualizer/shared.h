@@ -217,14 +217,32 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     typedef stl::hash_map<stl::hash_key<const char*>, math::vec3f>         CalculatingTrajectoriesNameMap;
 
   private:
+      //Настройки приложения
+    struct Configuration
+    {
+      stl::string                       win32_plugin_path;
+      stl::string                       osx_plugin_path;
+      stl::string                       linux_plugin_path;
+      stl::string                       condor_path;                          //путь к bin папке condor'а
+      bool                              use_condor;                           //использовать ли condor
+      stl::string                       author;                               //имя пользователя программы
+      bool                              visualize_new_calculations;           //загружать ли траектории сразу после рассчёта
+      common::VarRegistry               configuration_registry;               //реестр настроек
+
+      Configuration ();
+
+      void Load (const char* configuration_file_name);
+
+      void OnChangeVisualizeNewCalculationsMode ();
+    };
+
+  private:
     ShellEnvironmentPtr               shell_environment;                    //окружение скриптовой среды
     script::Shell                     shell;                                //скриптовый интерпретатор
     scene_graph::Scene                scene;
     scene_graph::OrthoCamera::Pointer camera;
     render::Screen                    screen;
-    stl::string                       win32_plugin_path;
-    stl::string                       osx_plugin_path;
-    stl::string                       linux_plugin_path;
+    Configuration                     configuration;                        //настройки
     stl::string                       project_path;                         //путь к текущей используемой папке
     stl::string                       condor_trajectory_requirements;       //condor требования для запуска рассчёта траекторий
     syslib::Timer                     wait_files_timer;                     //таймер проверки наличия новых файлов
@@ -234,15 +252,11 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     VisualModels                      trajectories;
     media::rms::ResourceManager       resource_manager;
     WaitedFiles                       waited_files;                         //ожидаемые файлы
-    stl::string                       condor_path;                          //путь к bin папке condor'а
-    bool                              use_condor;                           //использовать ли condor
     CondorTrajectoriesNames           condor_trajectories_names;            //имена, в которые будут переименованы рассчитанные condor'ом траектории
-    stl::string                       author;                               //имя пользователя программы
     size_t                            trajectory_vertex_per_second;         //производительность данного компьютера при рассчёте траекторий
     CalculatingTrajectoriesNuMap      calculating_trajectories_nu_map;      //рассчитываемые в данный момент траектории
     CalculatingTrajectoriesNameMap    calculating_trajectories_name_map;    //рассчитываемые в данный момент траектории
     bool                              calculating_trajectories_coord;       //идёт ли сейчас рассчёт начальных точек для пакетного рассчёта траекторий
-    bool                              visualize_new_calculations;           //загружать ли траектории сразу после рассчёта
 };
 
 //проверка ошибок

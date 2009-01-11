@@ -1,6 +1,7 @@
 #include <cfloat>
 
 #include <common/log.h>
+#include <common/var_registry_container.h>
 
 #include <tools/ui/main_window.h>
 
@@ -19,6 +20,8 @@ extern double _HUGE = DBL_MAX;
 
 namespace
 {
+
+const char* APPLICATION_SERVER_REGISTRY_BRANCH = "ApplicationServer";
 
 //класс тестового приложения
 struct Test
@@ -91,6 +94,10 @@ int main ()
   try
   {
     common::LogFilter log_filter ("*", &log_handler);
+
+    common::VarRegistryContainer<stl::string> application_server_registry_container;
+
+    application_server_registry_container.Mount (APPLICATION_SERVER_REGISTRY_BRANCH);
 
     Test test;
 

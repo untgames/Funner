@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="Cp1251"?>
+<UIConfig>
+  <Plugin Name="Ribbon">
+    <Ribbon Name="MainRibbon">
+      <List Name="VisualizeNewCalculations">
+        <Item Text="Визуализировать новые расчёты"/>
+        <Item Text="Не визуализировать новые расчёты"/>
+      </List>
+      <Tab Text="Main Tab">
+        <Panel Text="Раcчёты." Flow="Vertical">
+          <Group>
+            <Button Text="Рассчитать огибающую" Size="Large" OnClick="Modeler.CalculateEnvelope (200)"/>
+            <Button Text="Рассчитать траекторию" Size="Large" OnClick="Modeler.CalculateTrajectory (0, 1, 0, 100000)"/>
+            <Button Text="Рассчитать несколько траекторий" Size="Large" OnClick="Modeler.CalculateTrajectories (5, 10000)"/>
+            <List Width="220" Text="Новые рассчёты" Variable="Configuration.VisualizeNewCalculations" Source="VisualizeNewCalculations"/>
+          </Group>
+        </Panel>
+        <Panel Text="Работа с результатами рассчётов." Flow="Vertical">
+          <Group>
+            <Button Text="Загрузить все расчёты" Size="Large" OnClick="Modeler.LoadAllCalculatedTrajectories ()"/>
+            <Separator/>
+            <Button Text="Удалить все расчёты" Size="Large" OnClick="Modeler.Cleanup ()"/>
+          </Group>
+        </Panel>
+        <Panel Text="Работа с моделью." Flow="Vertical">
+          <Group>
+            <Button Text="Сохранить модель" Size="Large" OnClick="Modeler.SaveModel ()"/>
+          </Group>
+        </Panel>
+      </Tab>
+    </Ribbon>
+  </Plugin>
+</UIConfig>

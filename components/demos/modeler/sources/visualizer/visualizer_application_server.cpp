@@ -131,8 +131,7 @@ MyApplicationServer::MyApplicationServer ()
     shell (INTERPRETER_NAME, shell_environment),
     wait_files_timer (xtl::bind (&MyApplicationServer::CheckNewFiles, this), 1000, syslib::TimerState_Paused),
     calculating_envelope (false),
-    calculating_trajectories_coord (false),
-    visualize_new_calculations (false)
+    calculating_trajectories_coord (false)
 {
   common::FileSystem::SetDefaultFileBufferSize (0);     //???????? обход бага!!!!!!!!!!!
 
@@ -176,30 +175,12 @@ MyApplicationServer::MyApplicationServer ()
 
     //чтение конфигурации
 
-  common::Parser   parser     (APPLICATION_CONFIGURATION_FILE_NAME);
-  common::ParseLog parser_log (parser.Log ());
+  configuration.Load (APPLICATION_CONFIGURATION_FILE_NAME);
 
-  for (size_t i = 0; i < parser_log.MessagesCount (); i++)
-  {
-    common::ParseLogMessageType message_type = parser_log.MessageType (i);
-
-    if (message_type == common::ParseLogMessageType_Error || message_type == common::ParseLogMessageType_FatalError)
-      throw xtl::format_operation_exception (METHOD_NAME, "Configuration parse error: '%s'", parser_log.Message (i));
-  }
-
-  common::ParseIterator iter = parser.Root ().First ("Configuration");
-
-  win32_plugin_path = common::get<const char*> (*iter, "Win32PluginPath");
-  osx_plugin_path   = common::get<const char*> (*iter, "MacOSXPluginPath", "");
-  linux_plugin_path = common::get<const char*> (*iter, "LinuxPluginPath", "");
-  condor_path       = common::get<const char*> (*iter, "CondorPath", "");
-  use_condor        = common::get<bool>        (*iter, "UseCondor", true);
-  author            = common::get<const char*> (*iter, "Author", "Неизвестный автор");
-
-  if (use_condor)
+  if (configuration.use_condor)
     CreateCondorBinaries ();
 
-  if (use_condor)  //раздельно, так как в CreateCondorBinaries use_condor может быть присвоено false
+  if (configuration.use_condor)  //раздельно, так как в CreateCondorBinaries use_condor может быть присвоено false
     Benchmark ();
 
   camera = OrthoCamera::Create ();
@@ -443,7 +424,7 @@ void MyApplicationServer::OnNewXmeshTrajectory (const char* desc_trajectory_file
     throw xtl::format_operation_exception (METHOD_NAME, "There was an error while calculating trajectory %s",
                                            xmesh_trajectory_file_name.c_str ());
 
-  stl::string application_name  = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME),
+  stl::string application_name  = common::format ("%s\\%s%s", working_directory.c_str (), configuration.win32_plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME),
               binmesh_file_name = common::format ("%.*sbinmesh", xmesh_trajectory_file_name.length () - xtl::xstrlen ("xmesh"),
                                                   xmesh_trajectory_file_name.c_str ());
 
@@ -467,7 +448,7 @@ void MyApplicationServer::OnNewXmeshTrajectory (const char* desc_trajectory_file
     }
   }
 
-  if (visualize_new_calculations)
+  if (configuration.visualize_new_calculations)
     WaitForFile (binmesh_file_name.c_str (), xtl::bind (&MyApplicationServer::LoadTrajectory, this, _1));
 }
 
@@ -480,7 +461,7 @@ void MyApplicationServer::CalculateTrajectory (double nu1, double nu2, double nu
   if (calculating_trajectories_nu_map.find (nu_vector) != calculating_trajectories_nu_map.end ())
     throw xtl::format_operation_exception (METHOD_NAME, "Calculation of trajectory %g %g %g is already running.", nu1, nu2, nu3);
 
-  stl::string application_name        = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
+  stl::string application_name        = common::format ("%s\\%s%s", working_directory.c_str (), configuration.win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
               model_name              = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME),
               trajectory_name         = common::format ("%strajectory_%g_%g_%g.xmesh", project_path.c_str (), nu1, nu2, nu3),
               binmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.binmesh", project_path.c_str (), nu1, nu2, nu3),
@@ -554,7 +535,7 @@ void MyApplicationServer::OnNewXmeshEnvelope (const char* desc_envelope_file_nam
       (common::FileSystem::GetFileSize (xmesh_envelope_file_name.c_str ()) != desc_file_data))
     throw xtl::format_operation_exception (METHOD_NAME, "There was an error while calculating envelope");
 
-  stl::string application_name  = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME),
+  stl::string application_name  = common::format ("%s\\%s%s", working_directory.c_str (), configuration.win32_plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME),
               binmesh_file_name = common::format ("%senvelope.binmesh", project_path.c_str ());
 
   if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), xmesh_envelope_file_name.c_str (), binmesh_file_name.c_str (), 0) == -1)
@@ -570,7 +551,7 @@ void MyApplicationServer::CalculateEnvelope (size_t lod)
   if (calculating_envelope)
     throw xtl::format_operation_exception (METHOD_NAME, "Envelope calculating already running, please wait results of current calculation before posting new.");
 
-  stl::string application_name      = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_ENVELOPE_APPLICATION_NAME),
+  stl::string application_name      = common::format ("%s\\%s%s", working_directory.c_str (), configuration.win32_plugin_path.c_str (), WIN32_ENVELOPE_APPLICATION_NAME),
               model_name            = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME),
               envelope_name         = common::format ("%senvelope.xmesh", project_path.c_str ()),
               binmesh_envelope_name = common::format ("%senvelope.binmesh", project_path.c_str ()),
@@ -658,7 +639,8 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
 
   file_read (METHOD_NAME, trajectories_coords_file, &coords_count, sizeof (coords_count));
 
-  if (condor_path.empty () || !use_condor || ((coords_count * lod / (float)trajectory_vertex_per_second) < 300) || ((lod / (float)trajectory_vertex_per_second) < 30))
+  if (configuration.condor_path.empty () || !configuration.use_condor ||
+      ((coords_count * lod / (float)trajectory_vertex_per_second) < 300) || ((lod / (float)trajectory_vertex_per_second) < 30))
   {
     common::Console::Printf ("Calculating %u trajectories with %u points each...\n", coords_count, lod);
 
@@ -669,7 +651,8 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
     if (!batch_file)
       throw xtl::format_operation_exception (METHOD_NAME, "Can't open batch file '%s'\n", batch_file_name.c_str ());
 
-    stl::string application_name        = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
+    stl::string application_name        = common::format ("%s\\%s%s", working_directory.c_str (), configuration.win32_plugin_path.c_str (),
+                                                          WIN32_TRAJECTORY_APPLICATION_NAME),
                 model_name              = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME);
 
     SYSTEM_INFO system_info;
@@ -723,7 +706,7 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
     return;
   }
 
-  if (!condor_path.empty () && use_condor)
+  if (!configuration.condor_path.empty () && configuration.use_condor)
   {
     common::Console::Printf ("Calculating %u trajectories with %u points each with Condor...\n", coords_count, lod);
 
@@ -823,7 +806,7 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
 
     fclose (condor_config_file);
 
-    stl::string application_name = common::format ("%s%s", condor_path.c_str (), CONDOR_SUBMIT_APPLICATION_NAME);
+    stl::string application_name = common::format ("%s%s", configuration.condor_path.c_str (), CONDOR_SUBMIT_APPLICATION_NAME);
 
     if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), condor_config_file_name.c_str (), 0) == -1)
       throw xtl::format_operation_exception (METHOD_NAME, "Can't call %s: %s", CONDOR_SUBMIT_APPLICATION_NAME, get_spawn_error_name ());
@@ -837,7 +820,7 @@ void MyApplicationServer::CalculateTrajectories (size_t trajectories_count, size
   if (calculating_trajectories_coord)
     throw xtl::format_operation_exception (METHOD_NAME, "Preaparing for batch trajecoty calculating is already running for previous command, try again a little bit later.\n");
 
-  stl::string application_name          = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_ENVELOPE_APPLICATION_NAME),
+  stl::string application_name          = common::format ("%s\\%s%s", working_directory.c_str (), configuration.win32_plugin_path.c_str (), WIN32_ENVELOPE_APPLICATION_NAME),
               model_name                = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME),
               trajectories_coords_name  = common::format ("%s%s", project_path.c_str (), BATCH_TRAJECTORIES_COORDS_FILE_NAME),
               trajectories_count_string = common::format ("%u", trajectories_count),
@@ -1001,7 +984,7 @@ void MyApplicationServer::SaveModel ()
     common::XmlWriter::Scope root_scope (writer, "Model");
 
     writer.WriteAttribute ("ini", ini);
-    writer.WriteAttribute ("Author", author.c_str ());
+    writer.WriteAttribute ("Author", configuration.author.c_str ());
     writer.WriteAttribute ("Description", to_string (model_registry.GetValue ("Description")).c_str ());
 
     {
@@ -1039,7 +1022,7 @@ void MyApplicationServer::CreateCondorBinaries ()
     if (!common::FileSystem::IsDir (CONDOR_BINARIES_PATH))
       common::FileSystem::Mkdir (CONDOR_BINARIES_PATH);
 
-    stl::string win32_trajectory_application_name = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
+    stl::string win32_trajectory_application_name = common::format ("%s\\%s%s", working_directory.c_str (), configuration.win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
                 win_5_0_intel_trajectory          = common::format ("%s\\%s.WINNT50.INTEL", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
                 win_5_1_intel_trajectory          = common::format ("%s\\%s.WINNT51.INTEL", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
                 win_5_2_intel_trajectory          = common::format ("%s\\%s.WINNT52.INTEL", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME),
@@ -1060,9 +1043,9 @@ void MyApplicationServer::CreateCondorBinaries ()
 
     condor_trajectory_requirements = "((Arch == \"X86_64\" || Arch == \"INTEL\") && (OpSys == \"WINNT50\" || OpSys == \"WINNT51\" || OpSys == \"WINNT52\" || OpSys == \"WINNT60\"))";
 
-    if (!osx_plugin_path.empty ())
+    if (!configuration.osx_plugin_path.empty ())
     {
-      stl::string osx_trajectory_application_name = common::format ("%s\\%s%s", working_directory.c_str (), osx_plugin_path.c_str (), OSX_TRAJECTORY_APPLICATION_NAME),
+      stl::string osx_trajectory_application_name = common::format ("%s\\%s%s", working_directory.c_str (), configuration.osx_plugin_path.c_str (), OSX_TRAJECTORY_APPLICATION_NAME),
                   osx_intel_trajectory            = common::format ("%s\\%s.OSX.INTEL", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME);
 
       if (common::FileSystem::IsFileExist (osx_trajectory_application_name.c_str ()))
@@ -1074,13 +1057,13 @@ void MyApplicationServer::CreateCondorBinaries ()
       else
       {
         printf ("Condor will not perform calculations on OSX machines, there is no OSX executable '%s' in specified directory '%s'\n",
-                osx_trajectory_application_name.c_str (), osx_plugin_path.c_str ());
+                osx_trajectory_application_name.c_str (), configuration.osx_plugin_path.c_str ());
       }
     }
 
-    if (!linux_plugin_path.empty ())
+    if (!configuration.linux_plugin_path.empty ())
     {
-      stl::string linux_trajectory_application_name = common::format ("%s\\%s%s", working_directory.c_str (), linux_plugin_path.c_str (), LINUX_TRAJECTORY_APPLICATION_NAME),
+      stl::string linux_trajectory_application_name = common::format ("%s\\%s%s", working_directory.c_str (), configuration.linux_plugin_path.c_str (), LINUX_TRAJECTORY_APPLICATION_NAME),
                   linux_intel_trajectory            = common::format ("%s\\%s.LINUX.INTEL", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME);
 
       if (common::FileSystem::IsFileExist (linux_trajectory_application_name.c_str ()))
@@ -1092,18 +1075,18 @@ void MyApplicationServer::CreateCondorBinaries ()
       else
       {
         printf ("Condor will not perform calculations on Linux machines, there is no Linux executable '%s' in specified directory '%s'\n",
-                linux_trajectory_application_name.c_str (), linux_plugin_path.c_str ());
+                linux_trajectory_application_name.c_str (), configuration.linux_plugin_path.c_str ());
       }
     }
   }
   catch (xtl::exception& exception)
   {
-    use_condor = 0;
+    configuration.use_condor = 0;
     printf ("Condor will not be used, exception while creating needed binaries: '%s'\n", exception.what ());
   }
   catch (...)
   {
-    use_condor = 0;
+    configuration.use_condor = 0;
     printf ("Condor will not be used, unknown exception while creating needed binaries\n");
   }
 }
@@ -1115,7 +1098,7 @@ void MyApplicationServer::Benchmark ()
 
   size_t benchmark_start = common::milliseconds ();
 
-  stl::string application_name      = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
+  stl::string application_name      = common::format ("%s\\%s%s", working_directory.c_str (), configuration.win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
               lod_string            = common::format ("%u", BENCHMARK_VERTICES_COUNT),
               cutoff_epsilon_string = common::format ("%f", POINT_EQUAL_EPSILON);
 
@@ -1123,7 +1106,7 @@ void MyApplicationServer::Benchmark ()
         "0", "0", BENCHMARK_MODEL, BENCHMARK_TRAJECTORY_XMESH, lod_string.c_str (), cutoff_epsilon_string.c_str (), 0) != 0)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't perform benchmark, trajectory was not calculated");
 
-  application_name = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME);
+  application_name = common::format ("%s\\%s%s", working_directory.c_str (), configuration.win32_plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME);
 
   if (_spawnl (_P_WAIT, application_name.c_str (), application_name.c_str (), BENCHMARK_TRAJECTORY_XMESH, BENCHMARK_TRAJECTORY_BINMESH, 0) != 0)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't perform benchmark, trajectory was not calculated");

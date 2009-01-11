@@ -34,7 +34,8 @@ DEMOS.MODELER.VISUALIZER.IMPORTS       := ../../system/compile.static.mak ../../
                                           ../../tools/ui/windows_forms/link.static.mak ../../tools/ui/core/compile.static.mak \
                                           ../../script/lua/link.static.mak ../../script/core/compile.static.mak \
                                           ../../engine/core/compile.static.mak ../../engine/subsystems/scene_render.link.static.mak \
-                                          ../../engine/subsystems/window_renderer.link.static.mak ../../engine/script_binds/lua_override.link.static.mak \
+                                          ../../engine/subsystems/window_renderer.link.static.mak \
+                                          ../../engine/script_binds/common.link.static.mak ../../engine/script_binds/lua_override.link.static.mak \
                                           ../../media/geometry/compile.static.mak ../../media/geometry/xmesh.link.static.mak \
                                           ../../media/rms/link.static.mak ../../media/rms/compile.static.mak \
                                           ../../media/geometry/binmesh.link.static.mak
