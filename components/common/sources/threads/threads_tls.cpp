@@ -26,6 +26,9 @@ struct ThreadLocalStorage::Impl: public IThreadCleanupCallback
 ///Оповещение о необходимости очистки данных
   void Cleanup (void* data)
   {
+    if (!cleanup)
+      return;
+    
     try
     {
       cleanup (data);
@@ -41,6 +44,19 @@ struct ThreadLocalStorage::Impl: public IThreadCleanupCallback
     Конструктор / деструктор
 */
 
+ThreadLocalStorage::ThreadLocalStorage ()  
+{
+  try
+  {
+    impl = new Impl (CleanupHandler ());
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::ThreadLocalStorage::ThreadLocalStorage()");
+    throw;
+  }
+}
+
 ThreadLocalStorage::ThreadLocalStorage (const CleanupHandler& cleanup)
 {
   try
@@ -49,7 +65,7 @@ ThreadLocalStorage::ThreadLocalStorage (const CleanupHandler& cleanup)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::ThreadLocalStorage::ThreadLocalStorage");
+    exception.touch ("common::ThreadLocalStorage::ThreadLocalStorage(const CleanupHandler&)");
     throw;
   }
 }
@@ -62,7 +78,7 @@ ThreadLocalStorage::ThreadLocalStorage (void (*cleanup)(void*))
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::ThreadLocalStorage::ThreadLocalStorage");
+    exception.touch ("common::ThreadLocalStorage::ThreadLocalStorage(void (*)(void*))");
     throw;
   }
 }

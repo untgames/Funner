@@ -1,0 +1,7 @@
+Results of lockable_test:
+lock
+unlock
+recursive lock
+exception: Recursive lock not supported
+    at common::SingleThreadedLockable::Lock
+    at common::Lockable::Lock

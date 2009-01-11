@@ -1,12 +1,13 @@
 #include "shared.h"
 
 Thread* volatile thread [2] = {0, 0};
+bool    volatile cancel_flag = false;
 
 int thread2_run ()
 {
   printf ("thread2 started\n");
   
-  while (!thread [1]);
+  while (!cancel_flag);
 
   thread [0]->Cancel ();
   
@@ -17,10 +18,7 @@ int thread1_run ()
 {
   printf ("thread1 started\n");
   
-  Thread thread2 (&thread2_run);
-    printf ("!!!\n");  
-  
-  thread [1] = &thread2;
+  cancel_flag = true;
 
   for (;;);
   
@@ -35,11 +33,10 @@ int main ()
   {
     LogFilter filter ("common.threads.*", &print_log);
     
-    Thread thread1 (&thread1_run);
+    Thread thread1 (&thread1_run), thread2 (&thread2_run);    
     
     thread [0] = &thread1;
-    
-    while (!thread [1]);
+    thread [1] = &thread2;
     
     printf ("join thread2: %d\n", thread [1]->Join ());
     printf ("join thread1: %d\n", thread [0]->Join ());

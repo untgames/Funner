@@ -1,7 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.CONFIGURATOR COMMON.TESTS
+TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.CONFIGURATOR \
+           COMMON.SINGLE_THREADED_LOCKABLE COMMON.TESTS
 
 #Цель - CommonLib sources
 COMMON.SOURCES.TYPE             := static-lib
@@ -61,13 +62,23 @@ COMMON.CONFIGURATOR.COMPILER_CFLAGS  :=
 COMMON.CONFIGURATOR.COMPILER_DEFINES :=
 COMMON.CONFIGURATOR.IMPORTS          := compile.static.mak
 
+#Цель - CommonLib single threaded lockable
+COMMON.SINGLE_THREADED_LOCKABLE.TYPE             := static-lib
+COMMON.SINGLE_THREADED_LOCKABLE.NAME             := funner.common.single_threaded_lockable
+COMMON.SINGLE_THREADED_LOCKABLE.INCLUDE_DIRS     := include ../xtl/include
+COMMON.SINGLE_THREADED_LOCKABLE.SOURCE_DIRS      := sources/utils/single_threaded_lockable
+COMMON.SINGLE_THREADED_LOCKABLE.LIB_DIRS         :=  
+COMMON.SINGLE_THREADED_LOCKABLE.LIBS             := 
+COMMON.SINGLE_THREADED_LOCKABLE.COMPILER_CFLAGS  :=
+COMMON.SINGLE_THREADED_LOCKABLE.COMPILER_DEFINES :=
+
 #Цель - CommonLib tests
 COMMON.TESTS.TYPE             := test-suite
 COMMON.TESTS.INCLUDE_DIRS     :=
 COMMON.TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils \
                                  tests/memory tests/log tests/parselib tests/threads
 COMMON.TESTS.EXECUTION_DIR    :=
-COMMON.TESTS.LIB_DIRS         :=  
+COMMON.TESTS.LIB_DIRS         :=
 COMMON.TESTS.LIBS             :=
 COMMON.TESTS.LINK_INCLUDES    :=
 COMMON.TESTS.COMPILER_CFLAGS  :=

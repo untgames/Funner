@@ -1,5 +1,5 @@
 Results of cancel_thread_test:
-join thread2: 0
 thread1 started
 thread2 started
+join thread2: 0
 join thread1: -1
