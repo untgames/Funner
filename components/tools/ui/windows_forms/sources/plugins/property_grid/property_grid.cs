@@ -157,8 +157,8 @@ public class UIPropertyGridPlugin: IPlugin
 
     System.Collections.Specialized.StringCollection sc = results.Output;
 
-    for (int i = 0; i < sc.Count; i++)
-      System.Console.WriteLine (sc [i]);
+//    for (int i = 0; i < sc.Count; i++)
+//      System.Console.WriteLine (sc [i]);
 
     assembly = results.CompiledAssembly;
   }
@@ -228,7 +228,7 @@ public class UIPropertyGridPlugin: IPlugin
         writer.Write ("\t\tset\n\t\t{{\n\t\t\tapplication_server.SetProperty ({0}_property_{1}_var_name, List{2}Table.GetValueByItem (value));\n\t\t}}\n",
                       map_name, property_index, list_box_node.InnerText);
       else
-        writer.Write ("\t\tset\n\t\t{{\n\t\t\tapplication_server.SetProperty ({0}_property_{1}_var_name, Converter.ToString (value));\n\t\t}}\n", 
+        writer.Write ("\t\tset\n\t\t{{\n\t\t\tapplication_server.SetProperty ({0}_property_{1}_var_name, Converter.ToString (value));\n\t\t}}\n",
                       map_name, property_index);
     }
 

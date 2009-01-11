@@ -72,17 +72,17 @@ namespace tools.ui.windows_forms
       foreach (string modname in modules)
         compiler_parameters.ReferencedAssemblies.Add(modname);
       // dump source to screen
-      Console.WriteLine("// --- Assembly start ---");
-      foreach (string str in sources)
-        Console.WriteLine("{0}", str);
-      Console.WriteLine("// --- Assembly end ---");
+//      Console.WriteLine("// --- Assembly start ---");
+//      foreach (string str in sources)
+//        Console.WriteLine("{0}", str);
+//      Console.WriteLine("// --- Assembly end ---");
       // compile all this stuff
       Microsoft.CSharp.CSharpCodeProvider cs_code_provider = new Microsoft.CSharp.CSharpCodeProvider();
       CompilerResults results = cs_code_provider.CompileAssemblyFromSource(
         compiler_parameters, sources);
       // print building output to console
-      foreach (string outstring in results.Output)
-        System.Console.WriteLine(outstring);
+//      foreach (string outstring in results.Output)
+//        System.Console.WriteLine(outstring);
       return results.CompiledAssembly;
     }
     /// <summary>
