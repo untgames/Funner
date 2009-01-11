@@ -1,6 +1,8 @@
 #include "shared.h"
 
-using namespace common;
+//!!!!!добавить очистки ресурсов процесса pthread_win32_process_detach_np ()
+
+using namespace syslib;
 
 /*
     Утилиты
@@ -20,6 +22,15 @@ void raise (const char* source, int status)
 //функция инициализации библиотеки
 inline void thread_init ()
 {
+  static bool is_process_initialized = false;
+  
+  if (!is_process_initialized)
+  {
+    pthread_win32_process_attach_np ();
+    
+    is_process_initialized = true;
+  }
+
   static __declspec(thread) bool is_thread_initialized = false;
 
   if (is_thread_initialized)
@@ -36,16 +47,6 @@ inline void thread_done (void*)
   pthread_win32_thread_detach_np ();
 }
 
-inline void process_init ()
-{
-  pthread_win32_process_attach_np ();
-}
-
-inline void process_done ()
-{
-  pthread_win32_process_detach_np ();
-}
-
 #else
 
 inline void thread_init ()
@@ -53,14 +54,6 @@ inline void thread_init ()
 }
 
 inline void thread_done (void*)
-{
-}
-
-inline void process_init ()
-{
-}
-
-inline void process_done ()
 {
 }
 
@@ -95,7 +88,7 @@ void* thread_run (void* data)
 }
 
 //получение дескриптора нити
-pthread_t get_handle (ICustomThreadSystem::thread_t thread)
+pthread_t get_handle (Platform::thread_t thread)
 {
   return thread ? *(pthread_t*)thread : pthread_self ();
 }
@@ -103,26 +96,10 @@ pthread_t get_handle (ICustomThreadSystem::thread_t thread)
 }
 
 /*
-    Конструктор / деструктор
-*/
-
-PThreadsSystem::PThreadsSystem ()
-{
-  process_init ();
-  thread_init ();
-}
-
-PThreadsSystem::~PThreadsSystem ()
-{
-  thread_done (0);
-  process_done ();
-}
-
-/*
     Создание / удаление нити
 */
 
-PThreadsSystem::thread_t PThreadsSystem::CreateThread (IThreadCallback* in_callback)
+Platform::thread_t Platform::CreateThread (IThreadCallback* in_callback)
 {
   try
   {
@@ -150,12 +127,12 @@ PThreadsSystem::thread_t PThreadsSystem::CreateThread (IThreadCallback* in_callb
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::PThreadsSystem::CreateThread");
+    exception.touch ("syslib::Platform::CreateThread");
     throw;
   }
 }
 
-void PThreadsSystem::DeleteThread (thread_t thread)
+void Platform::DeleteThread (thread_t thread)
 {
   if (!thread)
     return;    
@@ -169,7 +146,7 @@ void PThreadsSystem::DeleteThread (thread_t thread)
     Отмена нити
 */
 
-void PThreadsSystem::CancelThread (thread_t thread)
+void Platform::CancelThread (thread_t thread)
 {
   try
   {
@@ -182,7 +159,7 @@ void PThreadsSystem::CancelThread (thread_t thread)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::PThreadsSystem::CancelThread");
+    exception.touch ("syslib::Platform::CancelThread");
     throw;
   }    
 }
@@ -191,7 +168,7 @@ void PThreadsSystem::CancelThread (thread_t thread)
     Ожидание завершения нити
 */
 
-void PThreadsSystem::JoinThread (thread_t thread)
+void Platform::JoinThread (thread_t thread)
 {
   try
   {
@@ -206,7 +183,7 @@ void PThreadsSystem::JoinThread (thread_t thread)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::PThreadsSystem::JoinThread");
+    exception.touch ("syslib::Platform::JoinThread");
     throw;
   }
 }
@@ -276,7 +253,7 @@ struct TlsKeyImpl
 
 }
 
-PThreadsSystem::tls_t PThreadsSystem::CreateTls (IThreadCleanupCallback* cleanup)
+Platform::tls_t Platform::CreateTls (IThreadCleanupCallback* cleanup)
 {
   try
   {
@@ -286,12 +263,12 @@ PThreadsSystem::tls_t PThreadsSystem::CreateTls (IThreadCleanupCallback* cleanup
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::PThreadsSystem::CreateTls");
+    exception.touch ("syslib::Platform::CreateTls");
     throw;
   }
 }
 
-void PThreadsSystem::DeleteTls (tls_t tls)
+void Platform::DeleteTls (tls_t tls)
 {
   try
   {
@@ -310,7 +287,7 @@ void PThreadsSystem::DeleteTls (tls_t tls)
   }
 }
 
-void PThreadsSystem::SetTls (tls_t tls, void* data)
+void Platform::SetTls (tls_t tls, void* data)
 {
   try
   {
@@ -325,12 +302,12 @@ void PThreadsSystem::SetTls (tls_t tls, void* data)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::PThreadsSystem::SetTls");
+    exception.touch ("syslib::Platform::SetTls");
     throw;
   }
 }
 
-void* PThreadsSystem::GetTls (tls_t tls)
+void* Platform::GetTls (tls_t tls)
 {
   try
   {
@@ -345,7 +322,7 @@ void* PThreadsSystem::GetTls (tls_t tls)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::PThreadsSystem::GetTls");
+    exception.touch ("syslib::Platform::GetTls");
     throw;
   }
 }

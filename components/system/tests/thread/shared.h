@@ -1,5 +1,5 @@
-#ifndef COMMONLIB_THREAD_TESTS_SHARED_HEADER
-#define COMMONLIB_THREAD_TESTS_SHARED_HEADER
+#ifndef SYSLIB_THREAD_TESTS_SHARED_HEADER
+#define SYSLIB_THREAD_TESTS_SHARED_HEADER
 
 #include <cstdio>
 
@@ -9,8 +9,10 @@
 
 #include <common/log.h>
 #include <common/time.h>
-#include <common/thread.h>
 
+#include <syslib/thread.h>
+
+using namespace syslib;
 using namespace common;
 
 void print_log (const char* log, const char* message)

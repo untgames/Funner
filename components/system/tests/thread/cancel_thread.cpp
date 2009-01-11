@@ -4,10 +4,10 @@ Thread* volatile thread [2] = {0, 0};
 bool    volatile cancel_flag = false;
 
 int thread2_run ()
-{
-  printf ("thread2 started\n");
-  
+{ 
   while (!cancel_flag);
+  
+  printf ("thread2 started\n");
 
   thread [0]->Cancel ();
   

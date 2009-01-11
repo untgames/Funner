@@ -7,4 +7,6 @@
 
 #include <common/strlib.h>
 
-#include "public.h"
+#include <syslib/thread.h>
+
+#include <platform/platform.h>

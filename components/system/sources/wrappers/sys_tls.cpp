@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace common;
+using namespace syslib;
 
 /*
     Описание релизации локального хранилища данных
@@ -8,19 +8,19 @@ using namespace common;
 
 struct ThreadLocalStorage::Impl: public IThreadCleanupCallback
 {
-  ICustomThreadSystem::tls_t key;     //ключ локальных данных нити
-  CleanupHandler             cleanup; //очищающий функционал
+  Platform::tls_t key;     //ключ локальных данных нити
+  CleanupHandler  cleanup; //очищающий функционал
   
 ///Конструктор
   Impl (const CleanupHandler& in_cleanup) : cleanup (in_cleanup)
   {
-    key = Platform::GetThreadSystem ()->CreateTls (this);
+    key = Platform::CreateTls (this);
   }
   
 ///Деструктор
   ~Impl ()
   {
-    Platform::GetThreadSystem ()->DeleteTls (key);
+    Platform::DeleteTls (key);
   }
 
 ///Оповещение о необходимости очистки данных
@@ -52,7 +52,7 @@ ThreadLocalStorage::ThreadLocalStorage ()
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::ThreadLocalStorage::ThreadLocalStorage()");
+    exception.touch ("syslib::ThreadLocalStorage::ThreadLocalStorage()");
     throw;
   }
 }
@@ -65,7 +65,7 @@ ThreadLocalStorage::ThreadLocalStorage (const CleanupHandler& cleanup)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::ThreadLocalStorage::ThreadLocalStorage(const CleanupHandler&)");
+    exception.touch ("syslib::ThreadLocalStorage::ThreadLocalStorage(const CleanupHandler&)");
     throw;
   }
 }
@@ -78,7 +78,7 @@ ThreadLocalStorage::ThreadLocalStorage (void (*cleanup)(void*))
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::ThreadLocalStorage::ThreadLocalStorage(void (*)(void*))");
+    exception.touch ("syslib::ThreadLocalStorage::ThreadLocalStorage(void (*)(void*))");
     throw;
   }
 }
@@ -95,11 +95,11 @@ void ThreadLocalStorage::SetValue (void* data)
 {
   try
   {
-    Platform::GetThreadSystem ()->SetTls (impl->key, data);
+    Platform::SetTls (impl->key, data);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::ThreadLocalStorage::SetValue");
+    exception.touch ("syslib::ThreadLocalStorage::SetValue");
     throw;
   }
 }
@@ -108,11 +108,11 @@ void* ThreadLocalStorage::GetValue () const
 {
   try
   {
-    return Platform::GetThreadSystem ()->GetTls (impl->key);
+    return Platform::GetTls (impl->key);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::ThreadLocalStorage::GetValue");
+    exception.touch ("syslib::ThreadLocalStorage::GetValue");
     throw;
   }
 }

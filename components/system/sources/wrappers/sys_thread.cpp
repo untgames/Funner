@@ -1,5 +1,6 @@
 #include "shared.h"
 
+using namespace syslib;
 using namespace common;
 
 namespace
@@ -9,7 +10,7 @@ namespace
     Константы
 */
 
-const char* LOG_NAME_PREFIX = "common.threads"; //имя потока протоколирования
+const char* LOG_NAME_PREFIX = "system.threads"; //имя потока протоколирования
 
 }
 
@@ -19,10 +20,10 @@ const char* LOG_NAME_PREFIX = "common.threads"; //имя потока протоколирования
 
 struct Thread::Impl: public IThreadCallback, public xtl::reference_counter
 {
-  Function                      thread_function; //функция нити
-  ICustomThreadSystem::thread_t handle;          //идентификатор нити
-  stl::string                   name;            //имя нити
-  int                           exit_code;       //код выхода нити
+  Function           thread_function; //функция нити
+  Platform::thread_t handle;          //идентификатор нити
+  stl::string        name;            //имя нити
+  int                exit_code;       //код выхода нити
 
 ///Конструкторы
   Impl () : handle (0), exit_code (0) {}
@@ -31,7 +32,7 @@ struct Thread::Impl: public IThreadCallback, public xtl::reference_counter
     : thread_function (in_thread_function),
       name (in_name)
   {
-    handle = Platform::GetThreadSystem ()->CreateThread (this);
+    handle = Platform::CreateThread (this);
   }
 
 ///Деструктор
@@ -39,7 +40,7 @@ struct Thread::Impl: public IThreadCallback, public xtl::reference_counter
   {
     try
     {
-      Platform::GetThreadSystem ()->DeleteThread (handle);
+      Platform::DeleteThread (handle);
     }
     catch (...)
     {
@@ -98,7 +99,7 @@ Thread::Thread (const Function& thread_function)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::Thread::Thread(const Function&, ThreadState)");
+    exception.touch ("syslib::Thread::Thread(const Function&, ThreadState)");
     throw;
   }
 }
@@ -114,7 +115,7 @@ Thread::Thread (const char* name, const Function& thread_function)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::Thread::Thread(const char*, const Function&, ThreadState)");
+    exception.touch ("syslib::Thread::Thread(const char*, const Function&, ThreadState)");
     throw;
   }
 }
@@ -130,7 +131,7 @@ Thread::~Thread ()
 
 /*const char* Thread::Name () const
 {
-  return impl->handle ? impl->name.c_str () : Platform::GetThreadSystem ()->GetCurrentThreadName ();
+  return impl->handle ? impl->name.c_str () : Platform::GetCurrentThreadName ();
 }*/
 
 /*
@@ -141,13 +142,13 @@ void Thread::Cancel ()
 {
   try
   {  
-    Platform::GetThreadSystem ()->CancelThread (impl->handle);
+    Platform::CancelThread (impl->handle);
     
     impl->exit_code = THREAD_CANCELED_EXIT_CODE;
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::Thread::Cancel");
+    exception.touch ("syslib::Thread::Cancel");
     throw;
   }
 }
@@ -158,7 +159,7 @@ void Thread::Cancel ()
 
 int Thread::Join ()
 {
-  Platform::GetThreadSystem ()->JoinThread (impl->handle);
+  Platform::JoinThread (impl->handle);
 
   return impl->exit_code;
 }
@@ -167,7 +168,7 @@ int Thread::Join ()
     Получение текущей нити
 */
 
-namespace common
+namespace syslib
 {
 
 struct CurrentThreadHolder
@@ -187,7 +188,7 @@ Thread& Thread::GetCurrent ()
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::Thread::GetCurrent");
+    exception.touch ("syslib::Thread::GetCurrent");
     throw;
   }
 }

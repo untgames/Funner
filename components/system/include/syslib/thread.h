@@ -1,10 +1,10 @@
-#ifndef COMMONLIB_THREAD_HEADER
-#define COMMONLIB_THREAD_HEADER
+#ifndef SYSLIB_THREAD_HEADER
+#define SYSLIB_THREAD_HEADER
 
 #include <stl/auto_ptr.h>
 #include <xtl/functional_fwd>
 
-namespace common
+namespace syslib
 {
 
 //implementation forwards
@@ -249,7 +249,7 @@ template <class T> class ThreadLockScope
     T* object;
 };
 
-#include <common/detail/thread.inl>
+#include <syslib/detail/thread.inl>
 
 }
 
