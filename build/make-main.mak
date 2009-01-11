@@ -244,6 +244,9 @@ endef
 
 #Общее для целей с исходными файлами (имя цели, список макросов применяемых для обработки каталогов с исходными файлами)
 define process_target_with_sources
+#Исключение библиотек по умолчанию
+  $$(foreach lib,$$($1.EXCLUDE_DEFAULT_LIBS),$$(eval $1.LIBS := $$(filter-out $$(lib),$$($1.LIBS))))
+
   $1.TMP_DIR        := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
   $1.TMP_DIRS       := $$($1.TMP_DIR)
   $1.INCLUDE_DIRS   := $$(call specialize_paths,$$($1.INCLUDE_DIRS))
@@ -253,7 +256,7 @@ define process_target_with_sources
   $1.EXECUTION_DIR  := $$(strip $$($1.EXECUTION_DIR))
   $1.EXECUTION_DIR  := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
   $1.LIBS           := $$($1.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
-  $1.LIB_DEPS       := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(wildcard $$($1.LIB_DIRS:%=%/*)))
+  $1.LIB_DEPS       := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(wildcard $$($1.LIB_DIRS:%=%/*)))  
 
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
 
@@ -434,16 +437,17 @@ endef
 define import_variables
 #  $$(warning src='$1' dst='$2' path='$3')  
 
-  $2.INCLUDE_DIRS     := $$($2.INCLUDE_DIRS) $$($1.INCLUDE_DIRS:%=$3%)
-  $2.LIB_DIRS         := $$($2.LIB_DIRS) $$($1.LIB_DIRS:%=$3%)
-  $2.DLL_DIRS         := $$($2.DLL_DIRS) $$($1.DLL_DIRS:%=$3%)
-  $2.DLLS             := $$($2.DLLS) $$($1.DLLS)
-  $2.LIBS             := $$($2.LIBS) $$($1.LIBS)
-  $2.COMPILER_CFLAGS  := $$($2.COMPILER_CFLAGS) $$($1.COMPILER_CFLAGS)
-  $2.COMPILER_DEFINES := $$($2.COMPILER_DEFINES) $$($1.COMPILER_DEFINES)
-  $2.LINK_INCLUDES    := $$($2.LINK_INCLUDES) $$($1.LINK_INCLUDES)
-  $2.LINK_FLAGS       := $$($2.LINK_FLAGS) $$($1.LINK_FLAGS)
-  $2.COMPONENTS       := $$($2.COMPONENTS) $$($1.COMPONENTS)
+  $2.INCLUDE_DIRS         := $$($2.INCLUDE_DIRS) $$($1.INCLUDE_DIRS:%=$3%)
+  $2.LIB_DIRS             := $$($2.LIB_DIRS) $$($1.LIB_DIRS:%=$3%)
+  $2.DLL_DIRS             := $$($2.DLL_DIRS) $$($1.DLL_DIRS:%=$3%)
+  $2.DLLS                 := $$($2.DLLS) $$($1.DLLS)
+  $2.LIBS                 := $$($2.LIBS) $$($1.LIBS)
+  $2.EXCLUDE_DEFAULT_LIBS := $$($2.EXCLUDE_DEFAULT_LIBS) $$($1.EXCLUDE_DEFAULT_LIBS)
+  $2.COMPILER_CFLAGS      := $$($2.COMPILER_CFLAGS) $$($1.COMPILER_CFLAGS)
+  $2.COMPILER_DEFINES     := $$($2.COMPILER_DEFINES) $$($1.COMPILER_DEFINES)
+  $2.LINK_INCLUDES        := $$($2.LINK_INCLUDES) $$($1.LINK_INCLUDES)
+  $2.LINK_FLAGS           := $$($2.LINK_FLAGS) $$($1.LINK_FLAGS)
+  $2.COMPONENTS           := $$($2.COMPONENTS) $$($1.COMPONENTS)
 endef
 
 #Импортирование настроек
