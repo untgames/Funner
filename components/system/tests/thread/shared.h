@@ -10,6 +10,7 @@
 #include <common/log.h>
 #include <common/time.h>
 
+#include <syslib/mutex.h>
 #include <syslib/thread.h>
 
 using namespace syslib;

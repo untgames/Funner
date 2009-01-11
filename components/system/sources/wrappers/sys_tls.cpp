@@ -20,7 +20,14 @@ struct ThreadLocalStorage::Impl: public IThreadCleanupCallback
 ///Деструктор
   ~Impl ()
   {
-    Platform::DeleteTls (key);
+    try
+    {
+      Platform::DestroyTls (key);
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
   }
 
 ///Оповещение о необходимости очистки данных

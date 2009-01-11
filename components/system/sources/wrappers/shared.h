@@ -16,6 +16,7 @@
 #include <syslib/application.h>
 #include <syslib/dll.h>
 #include <syslib/keydefs.h>
+#include <syslib/mutex.h>
 #include <syslib/timer.h>
 #include <syslib/thread.h>
 #include <syslib/window.h>

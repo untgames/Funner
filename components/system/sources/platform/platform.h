@@ -61,10 +61,12 @@ class Platform
     struct window_handle;
     struct thread_handle;
     struct tls_handle;  
+    struct mutex_handle;
 
     typedef window_handle* window_t;
     typedef thread_handle* thread_t;
     typedef tls_handle*    tls_t;
+    typedef mutex_handle*  mutex_t;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание/закрытие/уничтожение окна
@@ -162,7 +164,7 @@ class Platform
 ///Создание / удаление нити
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static thread_t CreateThread (IThreadCallback*);
-    static void     DeleteThread (thread_t); 
+    static void     DestroyThread (thread_t); 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отмена нити
@@ -183,9 +185,19 @@ class Platform
 ///Работа с локальными данными нити
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static tls_t CreateTls (IThreadCleanupCallback* cleanup);
-    static void  DeleteTls (tls_t tls);
+    static void  DestroyTls (tls_t tls);
     static void  SetTls    (tls_t tls, void* data);
     static void* GetTls    (tls_t tls);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с исключающими семафорами
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static mutex_t CreateMutex  ();
+    static void    DestroyMutex  (mutex_t);
+    static void    LockMutex    (mutex_t);
+    static void    LockMutex    (mutex_t, size_t wait_in_milliseconds);
+    static bool    TryLockMutex (mutex_t);
+    static void    UnlockMutex  (mutex_t);
 };
 
 }

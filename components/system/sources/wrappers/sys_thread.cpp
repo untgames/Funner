@@ -40,7 +40,7 @@ struct Thread::Impl: public IThreadCallback, public xtl::reference_counter
   {
     try
     {
-      Platform::DeleteThread (handle);
+      Platform::DestroyThread (handle);
     }
     catch (...)
     {
