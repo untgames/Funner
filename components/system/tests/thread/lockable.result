@@ -1,9 +1,8 @@
-Results of mutex_test:
+Results of lockable_test:
 create mutex
 lock mutex
 create thread
 another thread: lock mutex
-another thread: try lock mutex: 0
 unlock mutex
 another thread: mutex locked
 exit

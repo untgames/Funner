@@ -8,6 +8,7 @@
 #include <xtl/common_exceptions.h>
 
 #include <common/log.h>
+#include <common/lockable.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 #include <common/time.h>

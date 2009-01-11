@@ -1,13 +1,11 @@
 #include "shared.h"
 
-Mutex* mutex = 0;
-bool   flag  = false;
+Lockable* mutex = 0;
+bool      flag  = false;
 
 int run ()
 {
   printf ("another thread: lock mutex\n");
-  
-  printf ("another thread: try lock mutex: %d\n", mutex->TryLock ());
   
   flag = true;
 
@@ -20,7 +18,7 @@ int run ()
 
 int main ()
 {
-  printf ("Results of mutex_test:\n");
+  printf ("Results of lockable_test:\n");
 
   try    
   {
@@ -28,7 +26,7 @@ int main ()
     
     printf ("create mutex\n");
     
-    Mutex mutex_holder;
+    Lockable mutex_holder;
     
     mutex = &mutex_holder;
     
@@ -44,7 +42,7 @@ int main ()
 
     printf ("unlock mutex\n");
 
-    mutex->Unlock ();
+    mutex->Unlock ();    
 
     thread.Join ();
 

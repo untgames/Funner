@@ -7,6 +7,7 @@
 #include <xtl/function.h>
 #include <xtl/shared_ptr.h>
 
+#include <common/lockable.h>
 #include <common/log.h>
 #include <common/time.h>
 
