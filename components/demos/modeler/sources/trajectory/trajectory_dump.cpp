@@ -105,13 +105,13 @@ void dump_xmesh (const char* result_file_name, const DrawVertexArray& vertices, 
 
 int main (int argc, char* argv[])
 {
-  if ((argc < 6) || (argc > 8))
+  if ((argc < 7) || (argc > 9))
   {
     printf ("Usage: modeler-trajectory mode args\n");
     printf ("  'mode' values:\n");
-    printf ("    'args-input': 'args' = nu1 nu2 nu3 model_data_file result_file vertices_count\n");
-    printf ("    'bin-file-input': 'args' = nu_file nu_index model_data_file result_file vertices_count\n");
-    printf ("    'text-file-input': 'args' = nu_file model_data_file result_file vertices_count\n");
+    printf ("    'args-input': 'args' = nu1 nu2 nu3 model_data_file result_file vertices_count cutoff_epsilon\n");
+    printf ("    'bin-file-input': 'args' = nu_file nu_index model_data_file result_file vertices_count cutoff_epsilon\n");
+    printf ("    'text-file-input': 'args' = nu_file model_data_file result_file vertices_count cutoff_epsilon\n");
     return 1;
   }
 
@@ -209,7 +209,7 @@ int main (int argc, char* argv[])
   DrawVertexArray    vertices;
   DrawPrimitiveArray primitives;
 
-  BuildTrajectory (model_data, nu[0], nu[1], nu[2], atoi (argv[4 + optional_parameters_count]), vertices, primitives);
+  BuildTrajectory (model_data, nu[0], nu[1], nu[2], atoi (argv[4 + optional_parameters_count]), (float)atof (argv[5 + optional_parameters_count]), vertices, primitives);
 
   dump_xmesh (argv[3 + optional_parameters_count], vertices, primitives);
 

@@ -50,6 +50,7 @@ const char*  MODEL_FILE_NAME                     = "model.xmodel";
 const char*  OLD_FORMAT_MODEL_FILE_NAME          = "model.dat";
 const char*  OSX_ENVELOPE_APPLICATION_NAME       = "modeler-envelope";
 const char*  OSX_TRAJECTORY_APPLICATION_NAME     = "modeler-trajectory";
+const float  POINT_EQUAL_EPSILON                 = 0.001f;
 const char*  SCREEN_ATTACHMENT_NAME              = "MainScreen";
 const char*  TEMP_DIRECTORY_NAME                 = "tmp";
 const int    TRAJECTORIES_COORDS_HEADER          = 'TRJC';
@@ -487,6 +488,7 @@ void MyApplicationServer::CalculateTrajectory (double nu1, double nu2, double nu
               nu2_string              = common::format ("%g", nu2),
               nu3_string              = common::format ("%g", nu3),
               lod_string              = common::format ("%u", lod),
+              cutoff_epsilon_string   = common::format ("%f", POINT_EQUAL_EPSILON),
               waited_desc_file_name   = trajectory_name + DESC_FILE_SUFFIX;
 
   common::FileSystem::Remove (trajectory_name.c_str ());
@@ -494,7 +496,8 @@ void MyApplicationServer::CalculateTrajectory (double nu1, double nu2, double nu
   common::FileSystem::Remove (waited_desc_file_name.c_str ());
 
   if (_spawnl (_P_NOWAIT, application_name.c_str (), application_name.c_str (), "args-input", nu1_string.c_str (),
-        nu2_string.c_str (), nu3_string.c_str (), model_name.c_str (), trajectory_name.c_str (), lod_string.c_str (), 0) == -1)
+        nu2_string.c_str (), nu3_string.c_str (), model_name.c_str (), trajectory_name.c_str (), lod_string.c_str (),
+        cutoff_epsilon_string.c_str (), 0) == -1)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't call %s: %s", WIN32_TRAJECTORY_APPLICATION_NAME, get_spawn_error_name ());
 
   common::Console::Printf ("Calculating trajectory with nu1 = %g, nu2 = %g, nu3 = %g and lod = %u\n", nu1, nu2, nu3, lod);
@@ -696,11 +699,11 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
                   waited_desc_file_name   = trajectory_name + DESC_FILE_SUFFIX;
 
       if (i % system_info.dwNumberOfProcessors)
-        fprintf (batch_file, "start /abovenormal /wait /b %s args-input %f %f %f %s %s %u\n", application_name.c_str (), nu1, nu2, nu3, model_name.c_str (),
-                 trajectory_name.c_str (), lod);
+        fprintf (batch_file, "start /abovenormal /wait /b %s args-input %f %f %f %s %s %u %f\n", application_name.c_str (), nu1, nu2, nu3, model_name.c_str (),
+                 trajectory_name.c_str (), lod, POINT_EQUAL_EPSILON);
       else
-        fprintf (batch_file, "start /abovenormal /b %s args-input %f %f %f %s %s %u\n", application_name.c_str (), nu1, nu2, nu3, model_name.c_str (),
-                 trajectory_name.c_str (), lod);
+        fprintf (batch_file, "start /abovenormal /b %s args-input %f %f %f %s %s %u %f\n", application_name.c_str (), nu1, nu2, nu3, model_name.c_str (),
+                 trajectory_name.c_str (), lod, POINT_EQUAL_EPSILON);
 
       common::FileSystem::Remove (trajectory_name.c_str ());
       common::FileSystem::Remove (binmesh_trajectory_name.c_str ());
@@ -787,8 +790,8 @@ void MyApplicationServer::OnNewTrajectoriesCoords (const char* desc_file_name, s
 
     fprintf (condor_config_file, "Executable = %s\\%s.$$(OpSys).$$(Arch)\n", CONDOR_BINARIES_PATH, TRAJECTORY_APPLICATION_BASE_NAME);
     fprintf (condor_config_file, "Log = %s%s\n", project_path.c_str (), BATCH_TRAJECTORY_LOG_FILE_NAME);
-    fprintf (condor_config_file, "Arguments = text-file-input %s.$(Process)%s %s batch_trajectory.$(Process).xmesh %u\n",
-        BATCH_TRAJECTORY_NU_FILE_BASE_NAME, BATCH_TRAJECTORY_NU_FILE_SUFFIX, OLD_FORMAT_MODEL_FILE_NAME, lod);
+    fprintf (condor_config_file, "Arguments = text-file-input %s.$(Process)%s %s batch_trajectory.$(Process).xmesh %u %f\n",
+        BATCH_TRAJECTORY_NU_FILE_BASE_NAME, BATCH_TRAJECTORY_NU_FILE_SUFFIX, OLD_FORMAT_MODEL_FILE_NAME, lod, POINT_EQUAL_EPSILON);
 //    fprintf (condor_config_file, "output = %sbatch_trajectory.$(Process).xmesh.output\n", project_path.c_str ());
     fprintf (condor_config_file, "transfer_input_files = %s%s, %s\\%s, %s\\%s.$(Process)%s\n", project_path.c_str (),
              BATCH_TRAJECTORIES_COORDS_FILE_NAME, TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME, BATCH_TRAJECTORY_NU_FILE_FOLDER,
@@ -1112,11 +1115,12 @@ void MyApplicationServer::Benchmark ()
 
   size_t benchmark_start = common::milliseconds ();
 
-  stl::string application_name = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
-              lod_string       = common::format ("%u", BENCHMARK_VERTICES_COUNT);
+  stl::string application_name      = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), WIN32_TRAJECTORY_APPLICATION_NAME),
+              lod_string            = common::format ("%u", BENCHMARK_VERTICES_COUNT),
+              cutoff_epsilon_string = common::format ("%f", POINT_EQUAL_EPSILON);
 
   if (_spawnl (_P_WAIT, application_name.c_str (), application_name.c_str (), "args-input", "0",
-        "0", "0", BENCHMARK_MODEL, BENCHMARK_TRAJECTORY_XMESH, lod_string.c_str (), 0) != 0)
+        "0", "0", BENCHMARK_MODEL, BENCHMARK_TRAJECTORY_XMESH, lod_string.c_str (), cutoff_epsilon_string.c_str (), 0) != 0)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't perform benchmark, trajectory was not calculated");
 
   application_name = common::format ("%s\\%s%s", working_directory.c_str (), win32_plugin_path.c_str (), MESH_CONVERTER_APPLICATION_NAME);

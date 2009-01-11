@@ -3,8 +3,6 @@
 
 #include "core.h"
 
-const float POINT_EQUAL_EPSILON = 0.001f;
-
 template <class T>
 inline T sqr (T value)
 {
@@ -120,8 +118,8 @@ struct Point3D
 
 struct HashSet
 {
-  HashSet (size_t hash_table_size)
-    : hash_table (hash_table_size), size (0)
+  HashSet (size_t hash_table_size, float in_cutoff_epsilon)
+    : hash_table (hash_table_size), size (0), cutoff_epsilon (in_cutoff_epsilon)
   {
     if (!hash_table_size)
       hash_table.resize (1);
@@ -163,9 +161,9 @@ struct HashSet
 
   bool Point3dEqualPredicate (Point3D* point1, Point3D* point2)
   {
-    return float_equal (point1->pnts2[0], point2->pnts2[0], POINT_EQUAL_EPSILON) &&
-           float_equal (point1->pnts2[1], point2->pnts2[1], POINT_EQUAL_EPSILON) &&
-           float_equal (point1->pnts2[2], point2->pnts2[2], POINT_EQUAL_EPSILON) &&
+    return float_equal (point1->pnts2[0], point2->pnts2[0], cutoff_epsilon) &&
+           float_equal (point1->pnts2[1], point2->pnts2[1], cutoff_epsilon) &&
+           float_equal (point1->pnts2[2], point2->pnts2[2], cutoff_epsilon) &&
            (point1->envelope_side == point2->envelope_side);
   }
 
@@ -175,6 +173,7 @@ struct HashSet
   PointListArray hash_table;
   size_t         size;
   size_t         hash_multiplier;
+  float          cutoff_epsilon;
 };
 
 class TrajectoryBuilder
@@ -246,62 +245,9 @@ class TrajectoryBuilder
       printf ("\rProgress: 100.00%%\n");
     }
 
-    void Convert (DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
+    void Convert (float cutoff_epsilon, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
     {
-      out_vertices.reserve (current_size * 2);
-
-      for (size_t i=0; i < current_size; i++)
-      {
-        DrawVertex   line_start, line_end;
-
-        Point3D& point = point3d [i];
-        float    normal [3], normal_length = 0.0f;
-
-        for (size_t j=0; j<3; j++)
-        {
-          normal [j]     = point.pnts2 [j];
-          normal_length += sqr (normal [j]);
-        }
-
-        normal_length = sqrt (normal_length);
-
-        for (size_t j=0; j<3; j++)
-          normal [j] /= normal_length;
-
-        line_start.position.x = point.pnts2 [0];
-        line_start.position.y = point.pnts2 [1];
-        line_start.position.z = point.pnts2 [2];
-        line_start.color.r    = 0.2f;
-        line_start.color.g    = 0.2f;
-        line_start.color.b    = 0.2f;
-        line_start.color.a    = 1.f;
-
-        float direction = point.envelope_side ? 1.0f : -1.0f;
-
-        line_end.position.x = line_start.position.x + direction * normal [0] * 0.1f;
-        line_end.position.y = line_start.position.y + direction * normal [1] * 0.1f;
-        line_end.position.z = line_start.position.z + direction * normal [2] * 0.1f;
-        line_end.color.r    = (float)point3d[i].rgb[0];
-        line_end.color.g    = (float)point3d[i].rgb[1];
-        line_end.color.b    = (float)point3d[i].rgb[2];
-        line_end.color.a    = 1.f;
-
-        out_vertices.push_back (line_start);
-        out_vertices.push_back (line_end);
-      }
-
-      DrawPrimitive line;
-
-      line.type  = PrimitiveType_LineList;
-      line.first = 0;
-      line.count = out_vertices.size () / 2;
-
-      out_primitives.push_back (line);
-    }
-
-    void ConvertUnique (DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
-    {
-      HashSet unique_points (point3d.size () / 10);
+      HashSet unique_points (point3d.size () / 10, cutoff_epsilon);
 
       for (size_t i = 0; i < current_size; i++)
       {
@@ -742,11 +688,9 @@ void LoadModelData (const char* file_name, ModelData& model_data)
     Построение мега-поверхности
 */
 
-void BuildTrajectory (const ModelData& model_data, double nu1, double nu2, double nu3, size_t vertices_count, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
+void BuildTrajectory (const ModelData& model_data, double nu1, double nu2, double nu3, size_t vertices_count, float cutoff_epsilon, DrawVertexArray& out_vertices, DrawPrimitiveArray& out_primitives)
 {
   TrajectoryBuilder builder (model_data, nu1, nu2, nu3, vertices_count);
 
-//  builder.ConvertUnique (out_vertices, out_primitives);
-
-  builder.Convert (out_vertices, out_primitives);
+  builder.Convert (cutoff_epsilon, out_vertices, out_primitives);
 }
