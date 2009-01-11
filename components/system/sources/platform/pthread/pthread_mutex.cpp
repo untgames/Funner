@@ -13,9 +13,9 @@ Platform::mutex_t Platform::CreateMutex ()
   try
   {
     thread_init ();
-    
-    stl::auto_ptr<mutex_handle> handle = new mutex_handle;
-    
+
+    stl::auto_ptr<mutex_handle> handle (new mutex_handle);
+
     int status = pthread_mutex_init (&handle->mutex, 0);
 
     if (status)
@@ -51,7 +51,7 @@ void Platform::DestroyMutex (mutex_t handle)
   {
     exception.touch ("syslib::PThreadsPlatform::DestroyMutex");
     throw;
-  }  
+  }
 }
 
 //захват исключающего семафора
@@ -93,7 +93,7 @@ bool Platform::TryLockMutex (mutex_t handle)
     thread_init ();
 
     int status = pthread_mutex_trylock (&handle->mutex);
-    
+
     switch (status)
     {
       case 0:     return true;
@@ -123,7 +123,7 @@ void Platform::UnlockMutex (mutex_t handle)
     int status = pthread_mutex_unlock (&handle->mutex);
 
     if (status)
-      pthread_raise_error ("::pthread_mutex_unlock", status);    
+      pthread_raise_error ("::pthread_mutex_unlock", status);
   }
   catch (xtl::exception& exception)
   {
