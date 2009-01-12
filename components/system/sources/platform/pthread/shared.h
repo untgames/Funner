@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <pthread.h>
+#include <semaphore.h>
 
 #include <stl/auto_ptr.h>
 

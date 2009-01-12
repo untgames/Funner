@@ -62,11 +62,13 @@ class Platform
     struct thread_handle;
     struct tls_handle;  
     struct mutex_handle;
+    struct semaphore_handle;
 
-    typedef window_handle* window_t;
-    typedef thread_handle* thread_t;
-    typedef tls_handle*    tls_t;
-    typedef mutex_handle*  mutex_t;
+    typedef window_handle*    window_t;
+    typedef thread_handle*    thread_t;
+    typedef tls_handle*       tls_t;
+    typedef mutex_handle*     mutex_t;
+    typedef semaphore_handle* semaphore_t;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание/закрытие/уничтожение окна
@@ -163,7 +165,7 @@ class Platform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание / удаление нити
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static thread_t CreateThread (IThreadCallback*);
+    static thread_t CreateThread  (IThreadCallback*);
     static void     DestroyThread (thread_t); 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -184,20 +186,32 @@ class Platform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с локальными данными нити
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static tls_t CreateTls (IThreadCleanupCallback* cleanup);
+    static tls_t CreateTls  (IThreadCleanupCallback* cleanup);
     static void  DestroyTls (tls_t tls);
-    static void  SetTls    (tls_t tls, void* data);
-    static void* GetTls    (tls_t tls);
+    static void  SetTls     (tls_t tls, void* data);
+    static void* GetTls     (tls_t tls);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с исключающими семафорами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static mutex_t CreateMutex  ();
-    static void    DestroyMutex  (mutex_t);
+    static void    DestroyMutex (mutex_t);
     static void    LockMutex    (mutex_t);
     static void    LockMutex    (mutex_t, size_t wait_in_milliseconds);
     static bool    TryLockMutex (mutex_t);
     static void    UnlockMutex  (mutex_t);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с семафорами
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static semaphore_t CreateSemaphore   (size_t initial_count);
+    static void        DestroySemaphore  (semaphore_t);
+    static void        WaitSemaphore     (semaphore_t);
+    static void        WaitSemaphore     (semaphore_t, size_t wait_in_milliseconds);
+    static bool        TryWaitSemaphore  (semaphore_t);    
+    static void        PostSemaphore     (semaphore_t);
+    static size_t      GetSemaphoreValue (semaphore_t);
+    
 };
 
 }

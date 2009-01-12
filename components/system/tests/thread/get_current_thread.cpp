@@ -6,7 +6,7 @@ int main ()
 
   try
   {
-    LogFilter filter ("common.threads.*", &print_log);
+    LogFilter filter ("system.threads.*", &print_log);
 
     Thread& thread = Thread::GetCurrent ();
 

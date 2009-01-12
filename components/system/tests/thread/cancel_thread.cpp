@@ -31,7 +31,7 @@ int main ()
 
   try    
   {
-    LogFilter filter ("common.threads.*", &print_log);
+    LogFilter filter ("system.threads.*", &print_log);
     
     Thread thread1 (&thread1_run), thread2 (&thread2_run);    
     

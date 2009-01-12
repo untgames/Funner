@@ -1,0 +1,6 @@
+Results of semaphore_test:
+create semaphore
+in thread
+thread: wait job
+add job
+job done
