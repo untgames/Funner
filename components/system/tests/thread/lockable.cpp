@@ -1,18 +1,18 @@
 #include "shared.h"
 
-Lockable* mutex = 0;
-bool      flag  = false;
+Lockable*     mutex = 0;
+volatile bool flag  = false;
 
 int run ()
 {
   printf ("another thread: lock mutex\n");
-  
+
   flag = true;
 
   mutex->Lock ();
-    
+
   printf ("another thread: mutex locked\n");
-  
+
   return 0;
 }
 
@@ -20,18 +20,18 @@ int main ()
 {
   printf ("Results of lockable_test:\n");
 
-  try    
+  try
   {
     LogFilter filter ("system.threads.*", &print_log);
-    
+
     printf ("create mutex\n");
-    
+
     Lockable mutex_holder;
-    
+
     mutex = &mutex_holder;
-    
+
     printf ("lock mutex\n");
-    
+
     mutex->Lock ();
 
     printf ("create thread\n");
@@ -42,7 +42,7 @@ int main ()
 
     printf ("unlock mutex\n");
 
-    mutex->Unlock ();    
+    mutex->Unlock ();
 
     thread.Join ();
 
