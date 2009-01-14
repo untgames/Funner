@@ -2,12 +2,11 @@ function NuBatchCalculation (nu1_start, nu1_end, nu1_step, nu2_start, nu2_end, n
   Modeler.CleanBatchCalculationList ()
   
   for nu1 = nu1_start, nu1_end, nu1_step do
-	  for nu2 = nu2_start, nu2_end, nu2_step do
-		  for nu3 = nu3_start, nu3_end, nu3_step do
-		    print ("Adding calculation " .. nu1 .. " " .. nu2 .. " " .. nu3)
+    for nu2 = nu2_start, nu2_end, nu2_step do
+      for nu3 = nu3_start, nu3_end, nu3_step do
         Modeler.AddBatchCalculation (nu1, nu2, nu3)
-		  end
-	  end
+      end
+    end
   end
   
   Modeler.RunBatchCalculation (lod, point_equal_epsilon)
