@@ -12,6 +12,7 @@
             <Button Text="Рассчитать огибающую" Size="Large" OnClick="Modeler.CalculateEnvelope (200)" Image="media/images/envelope.png"/>
             <Button Text="Рассчитать траекторию" Size="Large" OnClick="Modeler.CalculateTrajectory (-0.8, 0, 0, 100000)"/>
             <Button Text="Рассчитать несколько траекторий" Size="Large" OnClick="Modeler.CalculateTrajectories (5, 10000)"/>
+            <Button Text="Nu-batch" Size="Large" OnClick="NuBatchCalculation (0, 1, 0.1, 0, 0, 0.1, 0, 0, 0.1, 10000, 0)"/>
             <List Width="220" Text="Новые рассчёты" Variable="Configuration.VisualizeNewCalculations" Source="VisualizeNewCalculations"/>
           </Group>
         </Panel>

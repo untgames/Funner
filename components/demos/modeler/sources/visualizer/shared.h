@@ -155,6 +155,10 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
 
     size_t CalculatingTrajectoriesCount ();
 
+    void CleanBatchCalculationList ();
+    void AddBatchCalculation       (float nu1, float nu2, float nu3);
+    void RunBatchCalculation       (size_t lod, float point_equal_epsilon);
+
     void AddRef  () { addref (this); }
     void Release () { release (this); }
 
@@ -216,6 +220,7 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     typedef stl::hash_map<stl::hash_key<const char*>, stl::string>         CondorTrajectoriesNames;
     typedef stl::hash_map<math::vec3f, stl::string>                        CalculatingTrajectoriesNuMap;
     typedef stl::hash_map<stl::hash_key<const char*>, math::vec3f>         CalculatingTrajectoriesNameMap;
+    typedef stl::vector<math::vec3f>                                       BatchCalculations;
 
   private:
       //Настройки приложения
@@ -259,6 +264,7 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
     CalculatingTrajectoriesNuMap      calculating_trajectories_nu_map;      //рассчитываемые в данный момент траектории
     CalculatingTrajectoriesNameMap    calculating_trajectories_name_map;    //рассчитываемые в данный момент траектории
     bool                              calculating_trajectories_coord;       //идёт ли сейчас рассчёт начальных точек для пакетного рассчёта траекторий
+    BatchCalculations                 batch_calculations;                   //задания для пакетного расчёта
 };
 
 //проверка ошибок
