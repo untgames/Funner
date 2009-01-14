@@ -27,6 +27,9 @@
       <Property Name="Описание" VarName="Model.Description" Category="Разное" Type="string"/>
     </PropertyMap>
     <PropertyMap Name="Render" Inherit="Model">  	
+        <Property Name="Автовращение" VarName="Render.AutoRotation"
+            Category="Рендер" Type="bool">
+        </Property>
         <Property Name="Каркасная растеризация" VarName="Render.Wireframe"
     		Category="Рендер" Type="bool">
     	</Property>

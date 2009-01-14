@@ -2,7 +2,6 @@
 
 #include <stl/string>
 
-#include <xtl/connection.h>
 #include <xtl/visitor.h>
 
 #include <mathlib.h>
@@ -30,13 +29,14 @@ namespace
 ===================================================================================================
 */
 
-const char* COMPONENT_NAME                 = "render.scene_render.ModelerRender"; //имя компонента
-const char* RENDER_PATH_NAME               = "ModelerRender";                     //имя пути рендеринга
-const char* SHADER_FILE_NAME               = "media/fpp_shader.wxf";
-const char* RENDER_CONFIGURATION_FILE_NAME = "media/conf/render_config.xml";
-const char* RENDER_REGISTRY_NAME           = "ApplicationServer.Properties.Render";
-const char* WIREFRAME_PROPERTY_NAME        = "Wireframe";
-const char* CULL_MODE_PROPERTY_NAME        = "CullMode";
+const char* COMPONENT_NAME                  = "render.scene_render.ModelerRender"; //имя компонента
+const char* RENDER_PATH_NAME                = "ModelerRender";                     //имя пути рендеринга
+const char* SHADER_FILE_NAME                = "media/fpp_shader.wxf";
+const char* RENDER_CONFIGURATION_FILE_NAME  = "media/conf/render_config.xml";
+const char* RENDER_REGISTRY_NAME            = "ApplicationServer.Properties.Render";
+const char* WIREFRAME_PROPERTY_NAME         = "Wireframe";
+const char* CULL_MODE_PROPERTY_NAME         = "CullMode";
+const char* AUTOROTATION_MODE_PROPERTY_NAME = "AutoRotation";
 
 typedef xtl::com_ptr<low_level::IBlendState> BlendStatePtr;
 
@@ -334,18 +334,23 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
 
       common::ParseIterator iter = parser.Root ().First ("Configuration");
 
-      wireframe_mode = common::get<bool> (*iter, WIREFRAME_PROPERTY_NAME, false);
-      cull_mode      = get_cull_mode (common::get<const char*> (*iter, CULL_MODE_PROPERTY_NAME, "None"));
+      autorotation_mode = common::get<bool> (*iter, AUTOROTATION_MODE_PROPERTY_NAME, true);
+      cull_mode         = get_cull_mode (common::get<const char*> (*iter, CULL_MODE_PROPERTY_NAME, "None"));
+      wireframe_mode    = common::get<bool> (*iter, WIREFRAME_PROPERTY_NAME, false);
 
-      configuration_registry.SetValue (WIREFRAME_PROPERTY_NAME,
-        xtl::any (stl::string (common::get<const char*> (*iter, WIREFRAME_PROPERTY_NAME, "false")), true));
+      configuration_registry.SetValue (AUTOROTATION_MODE_PROPERTY_NAME,
+        xtl::any (stl::string (common::get<const char*> (*iter, AUTOROTATION_MODE_PROPERTY_NAME, "true")), true));
       configuration_registry.SetValue (CULL_MODE_PROPERTY_NAME,
         xtl::any (stl::string (common::get<const char*> (*iter, CULL_MODE_PROPERTY_NAME, "None")), true));
+      configuration_registry.SetValue (WIREFRAME_PROPERTY_NAME,
+        xtl::any (stl::string (common::get<const char*> (*iter, WIREFRAME_PROPERTY_NAME, "false")), true));
 
-      wireframe_property_connection = configuration_registry.RegisterEventHandler (WIREFRAME_PROPERTY_NAME,
-        common::VarRegistryEvent_OnChangeVar, xtl::bind (&ModelerView::OnChangeWireframeMode, this, _1));
+      autorotation_mode_property_connection = configuration_registry.RegisterEventHandler (AUTOROTATION_MODE_PROPERTY_NAME,
+        common::VarRegistryEvent_OnChangeVar, xtl::bind (&ModelerView::OnChangeAutorotationMode, this, _1));
       cull_mode_property_connection = configuration_registry.RegisterEventHandler (CULL_MODE_PROPERTY_NAME,
         common::VarRegistryEvent_OnChangeVar, xtl::bind (&ModelerView::OnChangeCullMode, this, _1));
+      wireframe_mode_property_connection = configuration_registry.RegisterEventHandler (WIREFRAME_PROPERTY_NAME,
+        common::VarRegistryEvent_OnChangeVar, xtl::bind (&ModelerView::OnChangeWireframeMode, this, _1));
     }
 
 ///Целевые буферы рендеринга
@@ -485,7 +490,8 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
 
       if (clock () - last > CLK_TCK / 50)
       {
-        current_angle += 0.1f * float (clock () - last) / CLK_TCK;
+        if (autorotation_mode)
+          current_angle += 0.1f * float (clock () - last) / CLK_TCK;
 
         last = clock ();
       }
@@ -503,6 +509,24 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
     }
 
   private:
+    void OnChangeAutorotationMode (const char* var_name)
+    {
+      stl::string new_autorotation_mode = to_string (configuration_registry.GetValue (var_name));
+
+      autorotation_mode = new_autorotation_mode == "true" || new_autorotation_mode == "1";
+    }
+
+    void OnChangeCullMode (const char* var_name)
+    {
+      render::low_level::CullMode new_cull_mode = get_cull_mode (to_string (configuration_registry.GetValue (var_name)).c_str ());
+
+      if (new_cull_mode != cull_mode)
+      {
+        cull_mode = new_cull_mode;
+        rasterizer_state = 0;
+      }
+    }
+
     void OnChangeWireframeMode (const char* var_name)
     {
       stl::string new_wireframe_mode = to_string (configuration_registry.GetValue (var_name));
@@ -525,17 +549,6 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
       }
     }
 
-    void OnChangeCullMode (const char* var_name)
-    {
-      render::low_level::CullMode new_cull_mode = get_cull_mode (to_string (configuration_registry.GetValue (var_name)).c_str ());
-
-      if (new_cull_mode != cull_mode)
-      {
-        cull_mode = new_cull_mode;
-        rasterizer_state = 0;
-      }
-    }
-
   private:
     typedef xtl::com_ptr<render::mid_level::ILowLevelFrame>   FramePtr;
     typedef xtl::com_ptr<render::low_level::IRasterizerState> RasterizerStatePtr;
@@ -555,10 +568,12 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
     BufferPtr                             cb;
     RasterizerStatePtr                    rasterizer_state;
     common::VarRegistry                   configuration_registry;
-    bool                                  wireframe_mode;
-    xtl::auto_connection                  wireframe_property_connection;
+    bool                                  autorotation_mode;
+    xtl::auto_connection                  autorotation_mode_property_connection;
     render::low_level::CullMode           cull_mode;
     xtl::auto_connection                  cull_mode_property_connection;
+    bool                                  wireframe_mode;
+    xtl::auto_connection                  wireframe_mode_property_connection;
 };
 
 /*

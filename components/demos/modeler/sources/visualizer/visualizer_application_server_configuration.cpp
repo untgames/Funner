@@ -17,8 +17,8 @@ const char* VISUALIZE_NEW_CALCULATIONS_OFF      = "Не визуализировать новые расч
 MyApplicationServer::Configuration::Configuration ()
   : configuration_registry (CONFIGURATION_REGISTRY_NAME)
 {
-  configuration_registry.RegisterEventHandler (VISUALIZE_NEW_CALCULATIONS_VAR_NAME, common::VarRegistryEvent_OnChangeVar,
-    xtl::bind (&MyApplicationServer::Configuration::OnChangeVisualizeNewCalculationsMode, this));
+  visualize_new_calculations_connection = configuration_registry.RegisterEventHandler (VISUALIZE_NEW_CALCULATIONS_VAR_NAME,
+    common::VarRegistryEvent_OnChangeVar, xtl::bind (&MyApplicationServer::Configuration::OnChangeVisualizeNewCalculationsMode, this));
 }
 
 void MyApplicationServer::Configuration::Load (const char* configuration_file_name)

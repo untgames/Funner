@@ -11,6 +11,7 @@
 #include <xtl/any.h>
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/connection.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/implicit_cast.h>
@@ -223,11 +224,12 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
       stl::string                       win32_plugin_path;
       stl::string                       osx_plugin_path;
       stl::string                       linux_plugin_path;
-      stl::string                       condor_path;                          //путь к bin папке condor'а
-      bool                              use_condor;                           //использовать ли condor
-      stl::string                       author;                               //имя пользователя программы
-      bool                              visualize_new_calculations;           //загружать ли траектории сразу после рассчёта
-      common::VarRegistry               configuration_registry;               //реестр настроек
+      stl::string                       condor_path;                           //путь к bin папке condor'а
+      bool                              use_condor;                            //использовать ли condor
+      stl::string                       author;                                //имя пользователя программы
+      bool                              visualize_new_calculations;            //загружать ли траектории сразу после рассчёта
+      common::VarRegistry               configuration_registry;                //реестр настроек
+      xtl::connection                   visualize_new_calculations_connection;
 
       Configuration ();
 

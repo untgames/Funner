@@ -1,3 +1,6 @@
 <?xml version="1.0" encoding = "Cp1251"?>
-<Configuration Wireframe="0" CullMode="Front">
+<Configuration 
+  AutoRotation = "0"
+  CullMode     = "Front"
+  Wireframe    = "0">
 </Configuration>

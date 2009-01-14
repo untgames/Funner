@@ -286,9 +286,9 @@ class TrajectoryBuilder
 
           float direction = point.envelope_side ? 1.0f : -1.0f;
 
-          line_end.position.x = line_start.position.x + direction * normal [0] * 0.1f;
-          line_end.position.y = line_start.position.y + direction * normal [1] * 0.1f;
-          line_end.position.z = line_start.position.z + direction * normal [2] * 0.1f;
+          line_end.position.x = line_start.position.x + direction * normal [0] * 0.04f;
+          line_end.position.y = line_start.position.y + direction * normal [1] * 0.04f;
+          line_end.position.z = line_start.position.z + direction * normal [2] * 0.04f;
           line_end.color.r    = (float)point.rgb[0];
           line_end.color.g    = (float)point.rgb[1];
           line_end.color.b    = (float)point.rgb[2];
