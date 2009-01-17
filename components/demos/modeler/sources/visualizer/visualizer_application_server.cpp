@@ -1,6 +1,5 @@
 #include <direct.h>
 #include <process.h>
-#include <windows.h>
 
 #include <common/time.h>
 #include <common/xml_writer.h>
@@ -1013,11 +1012,7 @@ void MyApplicationServer::RunBatchCalculation (size_t lod, float point_equal_eps
                                                           WIN32_TRAJECTORY_APPLICATION_NAME),
                 model_name              = common::format ("%s\\%s", TEMP_DIRECTORY_NAME, OLD_FORMAT_MODEL_FILE_NAME);
 
-    SYSTEM_INFO system_info;
-
-    GetSystemInfo (&system_info);
-
-    size_t i = 0;
+    size_t i = 1;
 
     for (BatchCalculations::iterator iter = batch_calculations.begin (), end = batch_calculations.end (); iter != end; i++, ++iter)
     {
@@ -1032,12 +1027,12 @@ void MyApplicationServer::RunBatchCalculation (size_t lod, float point_equal_eps
                   binmesh_trajectory_name = common::format ("%strajectory_%g_%g_%g.binmesh", project_path.c_str (), iter->x, iter->y, iter->z),
                   waited_desc_file_name   = trajectory_name + DESC_FILE_SUFFIX;
 
-      if (i % system_info.dwNumberOfProcessors)
-        fprintf (batch_file, "start /abovenormal /wait /b %s args-input %f %f %f %s %s %u %f\n", application_name.c_str (), iter->x,
-                 iter->y, iter->z, model_name.c_str (), trajectory_name.c_str (), lod, point_equal_epsilon);
-      else
+      if (i % configuration.processors_count_for_calculation)
         fprintf (batch_file, "start /abovenormal /b %s args-input %f %f %f %s %s %u %f\n", application_name.c_str (), iter->x,
             iter->y, iter->z, model_name.c_str (), trajectory_name.c_str (), lod, point_equal_epsilon);
+      else
+        fprintf (batch_file, "%s args-input %f %f %f %s %s %u %f\n", application_name.c_str (), iter->x,
+                 iter->y, iter->z, model_name.c_str (), trajectory_name.c_str (), lod, point_equal_epsilon);
 
       common::FileSystem::Remove (trajectory_name.c_str ());
       common::FileSystem::Remove (binmesh_trajectory_name.c_str ());

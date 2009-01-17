@@ -1,3 +1,5 @@
+#include <windows.h>
+
 #include <xtl/connection.h>
 
 #include "shared.h"
@@ -40,13 +42,23 @@ void MyApplicationServer::Configuration::Load (const char* configuration_file_na
 
   common::ParseIterator iter = parser.Root ().First ("Configuration");
 
-  win32_plugin_path          = common::get<const char*> (*iter, "Win32PluginPath");
-  osx_plugin_path            = common::get<const char*> (*iter, "MacOSXPluginPath", "");
-  linux_plugin_path          = common::get<const char*> (*iter, "LinuxPluginPath", "");
-  condor_path                = common::get<const char*> (*iter, "CondorPath", "");
-  use_condor                 = common::get<bool>        (*iter, "UseCondor", true);
-  author                     = common::get<const char*> (*iter, "Author", "Неизвестный автор");
-  visualize_new_calculations = common::get<bool>        (*iter, "VisualizeNewCalculations", true);
+  win32_plugin_path                = common::get<const char*> (*iter, "Win32PluginPath");
+  osx_plugin_path                  = common::get<const char*> (*iter, "MacOSXPluginPath", "");
+  linux_plugin_path                = common::get<const char*> (*iter, "LinuxPluginPath", "");
+  condor_path                      = common::get<const char*> (*iter, "CondorPath", "");
+  use_condor                       = common::get<bool>        (*iter, "UseCondor", true);
+  author                           = common::get<const char*> (*iter, "Author", "Неизвестный автор");
+  visualize_new_calculations       = common::get<bool>        (*iter, "VisualizeNewCalculations", true);
+  processors_count_for_calculation = common::get<size_t>      (*iter, "ProcessorsCountForCalculation", 0);
+
+  SYSTEM_INFO system_info;
+
+  GetSystemInfo (&system_info);
+
+  if (processors_count_for_calculation)
+    processors_count_for_calculation = stl::min (processors_count_for_calculation, (size_t)system_info.dwNumberOfProcessors);
+  else
+    processors_count_for_calculation = system_info.dwNumberOfProcessors;
 
   configuration_registry.SetValue (VISUALIZE_NEW_CALCULATIONS_VAR_NAME, visualize_new_calculations ? VISUALIZE_NEW_CALCULATIONS_ON : VISUALIZE_NEW_CALCULATIONS_OFF);
 }

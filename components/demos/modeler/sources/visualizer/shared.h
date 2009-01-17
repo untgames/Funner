@@ -233,6 +233,7 @@ class MyApplicationServer: public tools::ui::IApplicationServer, public xtl::ref
       bool                              use_condor;                            //использовать ли condor
       stl::string                       author;                                //имя пользователя программы
       bool                              visualize_new_calculations;            //загружать ли траектории сразу после рассчёта
+      size_t                            processors_count_for_calculation;      //используемое количество процессоров для расчётов на локальном компьютере
       common::VarRegistry               configuration_registry;                //реестр настроек
       xtl::connection                   visualize_new_calculations_connection;
 
