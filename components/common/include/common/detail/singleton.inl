@@ -56,9 +56,9 @@ inline T* SingletonStatic<T>::Create ()
     int         Test::*member_ptr;
     int         (Test::*member_function_ptr)(int);
   };
-  
+
   static MaxAlign static_buffer;
-  
+
   return new (&static_buffer) T;
 }
 
@@ -81,20 +81,20 @@ void Singleton<T,CreationPolicy>::Init ()
 {
   if (instance)
     return;
-    
+
   if (is_in_init)
     throw stl::runtime_error ("Singleton recursive init");
 
-  is_in_init = true;    
-  
+  is_in_init = true;
+
   try
   {
     instance = CreationPolicy<T>::Create ();
-    
+
     if (!instance)
       throw stl::runtime_error ("unable to create singleton");
 
-    node.RegisterSingleton (&Singleton<T,CreationPolicy>::Destroy);
+    node.RegisterSingleton (typeid (Singleton<T, CreationPolicy>), &Singleton<T,CreationPolicy>::Destroy);
 
     is_in_init = false;
   }
@@ -110,7 +110,7 @@ void Singleton<T,CreationPolicy>::Destroy ()
 {
   if (!instance)
     return;
-  
+
   try
   {
     node.UnregisterSingleton ();

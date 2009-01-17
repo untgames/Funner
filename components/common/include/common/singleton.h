@@ -2,6 +2,7 @@
 #define COMMONLIB_SINGLEON_HEADER
 
 #include <new>
+#include <typeinfo>
 #include <stl/stdexcept>
 #include <stdlib.h>
 
@@ -45,7 +46,7 @@ class SingletonListNode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация активных синглтонов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterSingleton   (void (*destroy_function)());
+    void RegisterSingleton   (const std::type_info&, void (*destroy_function)());
     void UnregisterSingleton ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,10 +54,11 @@ class SingletonListNode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void DestroyAll ();
 
-  private:  
+  private:
     SingletonListNode*        prev;
     SingletonListNode*        next;
     void                      (*destroy_function)();
+    const std::type_info*     type;
     static SingletonListNode* first;
     static bool               atexit_registered;
 };

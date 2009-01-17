@@ -5,7 +5,7 @@ using namespace common;
 SingletonListNode* SingletonListNode::first             = NULL;
 bool               SingletonListNode::atexit_registered = false;
 
-void SingletonListNode::RegisterSingleton (void (*destroy)())
+void SingletonListNode::RegisterSingleton (const std::type_info& in_type, void (*destroy)())
 {
   if (!atexit_registered)
   {
@@ -21,16 +21,17 @@ void SingletonListNode::RegisterSingleton (void (*destroy)())
     next->prev = this;
 
   destroy_function = destroy;
+  type             = &in_type;
 }
 
 void SingletonListNode::UnregisterSingleton ()
 {
   if (prev) prev->next = next;
   if (next) next->prev = prev;
-  
+
   if (this == first)
     first = next;
-    
+
   prev = next = NULL;
 }
 
@@ -43,6 +44,6 @@ void SingletonListNode::DestroyAll ()
     first->UnregisterSingleton ();
 
     destroy_function ();
-  }  
+  }
 }
 
