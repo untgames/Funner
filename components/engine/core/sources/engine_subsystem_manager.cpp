@@ -29,13 +29,13 @@ struct SubsystemManager::Impl
     {
       subsystems.reserve (DEFAULT_SUBSYSTEMS_RESERVE_SIZE);
     }
-    
+
 ///Деструктор
     ~Impl ()
     {
       RemoveAllSubsystems ();
     }
-    
+
 ///Протокол
    common::Log& Log () { return log; }
 
@@ -71,7 +71,7 @@ struct SubsystemManager::Impl
     void AddSubsystem (const char* name, ISubsystem* subsystem)
     {
       static const char* METHOD_NAME = "engine::SubsystemManager::AddSubsystem";
-      
+
         //проверка корректности аргументов
 
       if (!name)
@@ -79,24 +79,24 @@ struct SubsystemManager::Impl
 
       if (!subsystem)
         throw xtl::make_null_argument_exception (METHOD_NAME, "subsystem");
-        
+
       for (Subsystems::iterator iter=subsystems.begin (), end=subsystems.end (); iter!=end; ++iter)
       {
         if ((*iter)->name == name)
-          throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Subsystem has already registered");                  
+          throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Subsystem has already registered");
       }
 
       subsystems.push_back (SubsystemControlPtr (new SubsystemControl (name, subsystem), false));
 
       log.Printf ("Add subsystem '%s'", name);
     }
-    
+
     void AddSubsystem (ISubsystem* subsystem)
     {
       try
       {
         ++auto_name_index;
-        
+
         AddSubsystem (common::format ("Subsystem%02u", auto_name_index).c_str (), subsystem);
       }
       catch (...)
@@ -111,25 +111,25 @@ struct SubsystemManager::Impl
     {
       if (!subsystem)
         return;
-        
+
       for (Subsystems::iterator iter=subsystems.begin (); iter!=subsystems.end ();)
       {
         if ((*iter)->subsystem == subsystem)
         {
           log.Printf ("Remove susbsystem '%s'", (*iter)->name.c_str ());
-          
+
           subsystems.erase (iter);
         }
         else ++iter;
-      }        
+      }
     }
-    
+
 ///Удаление подсистем по маске имени
     void RemoveSubsystems (const char* wc_mask)
-    {            
+    {
       if (!wc_mask)
         return;
-        
+
       for (Subsystems::reverse_iterator iter=subsystems.rbegin (); iter!=subsystems.rend ();)
       {
         if (common::wcmatch ((*iter)->name.c_str (), wc_mask))
@@ -141,14 +141,16 @@ struct SubsystemManager::Impl
         else ++iter;
       }
     }
-    
+
 ///Удаление всех подсистем
     void RemoveAllSubsystems ()
     {
-      for (Subsystems::reverse_iterator iter=subsystems.rbegin (); iter!=subsystems.rend (); ++iter)
-        log.Printf ("Remove susbsystem '%s'", (*iter)->name.c_str ());
+      while (!subsystems.empty ())
+      {
+        log.Printf ("Remove susbsystem '%s'", subsystems.back ()->name.c_str ());
 
-      subsystems.clear ();
+        subsystems.erase (subsystems.end () - 1);
+      }
     }
 
   private:
@@ -158,7 +160,7 @@ struct SubsystemManager::Impl
     {
       stl::string  name;
       SubsystemPtr subsystem;
-      
+
       SubsystemControl (const char* in_name, ISubsystem* in_subsystem) :
         name (in_name), subsystem (in_subsystem) {}
 
@@ -213,7 +215,7 @@ void SubsystemManager::Start (const common::ParseNode& node)
   try
   {
     common::ParseNode copy = node;
-    
+
     StartupManagerSingleton::Instance ().Start (copy, *this);
   }
   catch (xtl::exception& exception)
@@ -230,7 +232,7 @@ void SubsystemManager::Start (const char* file_name)
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");
 
-    common::Parser    parser (file_name);            
+    common::Parser    parser (file_name);
     common::ParseNode root = parser.Root ().First ("Configuration");
 
     StartupManagerSingleton::Instance ().Start (root, *this);
