@@ -5,29 +5,48 @@
 namespace detail
 {
 
-template <class T> struct singleton_default_object_creator
+template <class T, bool need_destroy> struct singleton_default_object_creator
 {
-  singleton_default_object_creator () { singleton_default<T>::instance (); }
+  singleton_default_object_creator () { singleton_default<T, need_destroy>::instance (); }
   
   void do_nothing () const {}  
   
   static singleton_default_object_creator creator;
 };
 
-template <class T> singleton_default_object_creator<T> singleton_default_object_creator<T>::creator;
-
-}
+template <class T, bool need_destroy> singleton_default_object_creator<T, need_destroy> singleton_default_object_creator<T, need_destroy>::creator;
 
 /*
     Получение экземпляра объекта
 */
 
-template <class T>
-T& singleton_default<T>::instance ()
+template <class T, bool need_destroy> struct singleton_default_instance
 {
-  static T object;
+  static T& get ()
+  {
+    static T instance;
 
-  detail::singleton_default_object_creator<T>::creator.do_nothing ();
+    return instance;
+  }  
+};
 
-  return object;
+template <class T> struct singleton_default_instance<T, false>
+{
+  static T& get ()
+  {
+    static char buffer [sizeof T];
+    static T*   instance = new (buffer) T;
+
+    return *instance;
+  }  
+};
+
+}
+
+template <class T, bool need_destroy>
+T& singleton_default<T, need_destroy>::instance ()
+{
+  detail::singleton_default_object_creator<T, need_destroy>::creator.do_nothing ();
+
+  return detail::singleton_default_instance<T, need_destroy>::get ();
 }

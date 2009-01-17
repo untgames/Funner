@@ -1,6 +1,8 @@
 #ifndef XTL_SINGLETON_DEFAULT_HEADER
 #define XTL_SINGLETON_DEFAULT_HEADER
 
+#include <new>
+
 namespace xtl
 {
 
@@ -8,7 +10,7 @@ namespace xtl
 ///Класс, используемый для гарантированной инициализации объекта до main() в случае
 ///наличия вызова singleton::instance()
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> class singleton_default
+template <class T, bool need_destroy=true> class singleton_default
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -19,6 +19,7 @@ int main ()
   singleton_default<A<1> >::instance ();
   singleton_default<A<3> >::instance ();
   singleton_default<A<2> >::instance ();
+  singleton_default<A<4>, false >::instance ();  
 
   return 0;
 }

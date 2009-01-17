@@ -74,7 +74,7 @@ class empty_connection_impl: public connection_impl
 */
 
 inline connection::connection ()
-  : impl (&singleton_default<detail::empty_connection_impl>::instance ())
+  : impl (&singleton_default<detail::empty_connection_impl, false>::instance ())
 {
   impl->addref ();
 }

@@ -205,7 +205,7 @@ struct default_iterator_selector
 
 template <class T>
 inline iterator<T>::iterator ()
-  : impl (&singleton_default<detail::empty_iterator_impl<value_type> >::instance ())
+  : impl (&singleton_default<detail::empty_iterator_impl<value_type>, false>::instance ())
   {}
 
 template <class T>

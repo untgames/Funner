@@ -311,7 +311,7 @@ inline typename function<Signature>::invoker_type* function<Signature>::create_i
 template <class Signature>
 inline typename function<Signature>::invoker_type* function<Signature>::create_invoker (null_ptr_type)
 {
-  invoker_type* invoker = &singleton_default<empty_invoker_impl>::instance ();
+  invoker_type* invoker = &singleton_default<empty_invoker_impl, false>::instance ();
 
   addref (invoker);
 
@@ -325,7 +325,7 @@ inline typename function<Signature>::invoker_type* function<Signature>::create_i
 template <class Signature>
 inline bool function<Signature>::empty () const
 {
-  return invoker == &singleton_default<empty_invoker_impl>::instance ();
+  return invoker == &singleton_default<empty_invoker_impl, false>::instance ();
 }
 
 /*
