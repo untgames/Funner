@@ -116,7 +116,7 @@ struct SubsystemManager::Impl
       {
         if ((*iter)->subsystem == subsystem)
         {
-          log.Printf ("Remove susbsystem '%s'", (*iter)->name.c_str ());
+          log.Printf ("Remove subsystem '%s'", (*iter)->name.c_str ());
 
           subsystems.erase (iter);
         }
@@ -134,7 +134,7 @@ struct SubsystemManager::Impl
       {
         if (common::wcmatch ((*iter)->name.c_str (), wc_mask))
         {
-          log.Printf ("Remove susbsystem '%s'", (*iter)->name.c_str ());
+          log.Printf ("Remove subsystem '%s'", (*iter)->name.c_str ());
 
           subsystems.erase (iter.base () - 1);
         }
@@ -147,7 +147,7 @@ struct SubsystemManager::Impl
     {
       while (!subsystems.empty ())
       {
-        log.Printf ("Remove susbsystem '%s'", subsystems.back ()->name.c_str ());
+        log.Printf ("Remove subsystem '%s'", subsystems.back ()->name.c_str ());
 
         subsystems.erase (subsystems.end () - 1);
       }

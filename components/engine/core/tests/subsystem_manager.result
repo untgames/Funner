@@ -16,8 +16,8 @@ Subsystems count is 4
   #3: 'Subsystem01'
   #4: 'Subsystem11'
 Remove subsystems by mask
-engine.SubsystemManager1: Remove susbsystem 'Subsystem22'
+engine.SubsystemManager1: Remove subsystem 'Subsystem22'
 Remove all subsystems
-engine.SubsystemManager1: Remove susbsystem 'Subsystem11'
-engine.SubsystemManager1: Remove susbsystem 'Subsystem01'
-engine.SubsystemManager1: Remove susbsystem 'Subsystem12'
+engine.SubsystemManager1: Remove subsystem 'Subsystem11'
+engine.SubsystemManager1: Remove subsystem 'Subsystem01'
+engine.SubsystemManager1: Remove subsystem 'Subsystem12'
