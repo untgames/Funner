@@ -15,18 +15,19 @@ namespace
 struct Action
 {
   size_t                     action_id;
-  size_t                     next_time;
-  size_t                     period;
-  size_t                     count;      //количество в очереди
+  size_t                     next_time;     //время с создания до следующего срабатывания
+  size_t                     creation_time; //время создания
+  size_t                     period;        //периодичность срабатывания
+  size_t                     count;         //количество в очереди
   bool                       is_deleted;
   ActionQueue::ActionHandler handler;
 
   Action ()
-    : period (0), is_deleted (false) 
+    : period (0), is_deleted (false)
     {}
 
-  Action (size_t in_action_id, size_t in_next_time, size_t in_period, const ActionQueue::ActionHandler& in_handler) 
-    : action_id (in_action_id), next_time (in_next_time), period (in_period), count (0), is_deleted (false), handler (in_handler) 
+  Action (size_t in_action_id, size_t in_next_time, size_t in_creation_time, size_t in_period, const ActionQueue::ActionHandler& in_handler)
+    : action_id (in_action_id), next_time (in_next_time), creation_time (in_creation_time), period (in_period), count (0), is_deleted (false), handler (in_handler)
     {}
 };
 
@@ -43,32 +44,15 @@ void dummy_handler (const char*)
 struct ActionQueue::Impl
 {
   public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Impl () 
+    Impl ()
       : cur_time (0), action_queue (&cur_time)
       {}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление/удаление действий
-///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetAction (size_t action_id, time_t first_time, time_t period, const ActionHandler& handler)
     {
-      ActionMapIterator iter = action_map.find (action_id);
-
-      if (iter == action_map.end ())
-        iter = action_map.insert_pair (action_id, Action (action_id, first_time, period, handler)).first;
-      else
-      {
-        iter->second.next_time = first_time;
-        iter->second.period    = period;
-        iter->second.handler   = handler;
-      }
-
-      action_queue.push (ActionQueueElement (iter, first_time));
-      iter->second.count++;
-      iter->second.is_deleted = false;
+      SetAction (action_id, cur_time, first_time, period, handler);
     }
 
     void RemoveAction (size_t action_id)
@@ -88,9 +72,7 @@ struct ActionQueue::Impl
         action_queue.pop ();
     }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение состояний
-///////////////////////////////////////////////////////////////////////////////////////////////////
     bool IsEmpty () const
     {
       return action_map.empty ();
@@ -106,23 +88,12 @@ struct ActionQueue::Impl
       return true;
     }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Инициация действий (no throw)
-///////////////////////////////////////////////////////////////////////////////////////////////////
     void DoActions (time_t time, const LogHandler& handler)
     {
-      time_t previous_time = cur_time, time_diff = time - cur_time;
-
-      while (!action_queue.empty () && (((action_queue.top ().next_time - previous_time) <= time_diff) || action_queue.top ().iterator->second.is_deleted))
+      while (!action_queue.empty () && ((action_queue.top ().iterator->second.next_time <= (time - action_queue.top ().iterator->second.creation_time)) || action_queue.top ().iterator->second.is_deleted))
       {
         ActionMapIterator iter = action_queue.top ().iterator;
-
-        if (action_queue.top ().next_time != iter->second.next_time)
-        {
-          Pop ();
-        
-          continue;
-        }
 
         if (iter->second.is_deleted)
         {
@@ -131,7 +102,7 @@ struct ActionQueue::Impl
           continue;
         }
 
-        if ((iter->second.next_time - previous_time) <= time_diff)
+        if (iter->second.next_time  <= (time - iter->second.creation_time))
         {
           try
           {
@@ -147,7 +118,7 @@ struct ActionQueue::Impl
           }
 
           if (iter->second.period)
-            SetAction (iter->second.action_id, iter->second.next_time + iter->second.period, iter->second.period, iter->second.handler);
+            SetAction (iter->second.action_id, iter->second.creation_time + iter->second.next_time, iter->second.period, iter->second.period, iter->second.handler);
           else
             iter->second.is_deleted = true;
 
@@ -159,23 +130,39 @@ struct ActionQueue::Impl
     }
 
   private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление действий
+        void SetAction (size_t action_id, size_t creation_time, time_t first_time, time_t period, const ActionHandler& handler)
+        {
+          ActionMapIterator iter = action_map.find (action_id);
+
+          if (iter == action_map.end ())
+            iter = action_map.insert_pair (action_id, Action (action_id, first_time, creation_time, period, handler)).first;
+          else
+          {
+            iter->second.next_time     = first_time;
+            iter->second.creation_time = creation_time;
+            iter->second.period        = period;
+            iter->second.handler       = handler;
+          }
+
+          action_queue.push (ActionQueueElement (iter));
+          iter->second.count++;
+          iter->second.is_deleted = false;
+        }
+
 ///Удаление элемента из начала очереди
-///////////////////////////////////////////////////////////////////////////////////////////////////
     void Pop ()
     {
       ActionMapIterator iter = action_queue.top ().iterator;
-      
-      action_queue.pop ();          
+
+      action_queue.pop ();
       iter->second.count--;
 
       if (!iter->second.count)
         action_map.erase (iter);
     }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Логгирование
-///////////////////////////////////////////////////////////////////////////////////////////////////
     void LogMessage (const char* message, const LogHandler& handler)
     {
       try
@@ -194,22 +181,24 @@ struct ActionQueue::Impl
     struct ActionQueueElement
     {
       ActionMapIterator iterator;
-      time_t            next_time;
 
-      ActionQueueElement (ActionMapIterator& in_iterator, time_t in_next_time)
-        : iterator (in_iterator), next_time (in_next_time)
+      ActionQueueElement (ActionMapIterator& in_iterator)
+        : iterator (in_iterator)
         {}
     };
 
     struct ActionMapComparator
     {
-      ActionMapComparator (time_t *in_cur_time) 
+      ActionMapComparator (time_t *in_cur_time)
         : cur_time (in_cur_time)
         {}
 
       bool operator () (const ActionQueueElement& left, const ActionQueueElement& right)
       {
-        return ((left.next_time - *cur_time) > (right.next_time - *cur_time));
+        size_t left_time_to_action  = left.iterator->second.creation_time - *cur_time + left.iterator->second.next_time,
+               right_time_to_action = right.iterator->second.creation_time - *cur_time + right.iterator->second.next_time;
+
+        return left_time_to_action > right_time_to_action;
       }
 
       time_t* cur_time;
