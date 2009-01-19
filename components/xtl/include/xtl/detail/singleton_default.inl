@@ -8,9 +8,9 @@ namespace detail
 template <class T, bool need_destroy> struct singleton_default_object_creator
 {
   singleton_default_object_creator () { singleton_default<T, need_destroy>::instance (); }
-  
-  void do_nothing () const {}  
-  
+
+  void do_nothing () const {}
+
   static singleton_default_object_creator creator;
 };
 
@@ -27,18 +27,18 @@ template <class T, bool need_destroy> struct singleton_default_instance
     static T instance;
 
     return instance;
-  }  
+  }
 };
 
 template <class T> struct singleton_default_instance<T, false>
 {
   static T& get ()
   {
-    static char buffer [sizeof T];
+    static char buffer [sizeof (T)];
     static T*   instance = new (buffer) T;
 
     return *instance;
-  }  
+  }
 };
 
 }
