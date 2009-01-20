@@ -78,7 +78,7 @@ endef
 #Подключение файла конфигурации утилит сборки
 ###################################################################################################
 ifeq (,$(filter $(CURRENT_TOOLSET),$(TOOLSETS)))
-	$(error Unknown toolset '$(CURRENT_TOOLSET)'. Use one of available toolsets '$(TOOLSETS)')
+  $(error Unknown toolset '$(CURRENT_TOOLSET)'. Use one of available toolsets '$(TOOLSETS)')
 endif
 
 include $(TOOLSET_FILE)
