@@ -394,12 +394,15 @@ void PluginManager::LoadPlugins (const char* wc_mask)
     throw xtl::make_null_argument_exception ("tools::ui::windows_forms::PluginManager::LoadPlugins", "wc_mask");
 
   common::FileList plugins_files = common::FileSystem::Search (wc_mask, common::FileSearch_Files);
+  impl->log.Printf("Search mask is %s", wc_mask);
+  impl->log.Printf("Search path is %s", common::FileSystem::GetNormalizedFileName(wc_mask).c_str());
 
   for (common::FileListIterator iter = plugins_files.GetIterator (); iter; ++iter)
   {
     try
     {
       System::String ^file_path = System::IO::Path::GetFullPath (gcnew System::String (iter->name));
+      impl->log.Printf("Loading %s\n", iter->name);
 
       Assembly^ assembly = Assembly::LoadFile (file_path);
 

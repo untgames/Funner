@@ -25,45 +25,90 @@ namespace tools.ui.windows_forms
     {
       public static bool Text(XmlNode node, StringWriter writer, string varname)
       {
+        return Text(node, writer, varname, null);
+      }
+      public static bool Text(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;
         if (node.Attributes["Text"] != null)
+          value = node.Attributes["Text"].InnerText;
+        else if (defaultvalue != null)
+          value = defaultvalue;
+        if (value != null)
         {
-          writer.Write("      {0}.Text = \"{1}\";\n", varname, node.Attributes["Text"].InnerText);
+          writer.Write("      {0}.Text = \"{1}\";\n", varname, value);
           return true;
         }
         return false;
       }
       public static bool SmallImage(XmlNode node, StringWriter writer, string varname)
       {
+        return SmallImage(node, writer, varname, null);
+      }
+      public static bool SmallImage(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;
         if (node.Attributes["Icon"] != null)
+          value = node.Attributes["Icon"].InnerText;
+        else if (defaultvalue != null)
+          value = defaultvalue;
+        if (value != null)                          
         {
-          writer.Write("      {0}.SmallImage = Image.FromFile(\"{1}\");\n", varname, node.Attributes["Icon"].InnerText.Trim());
+          writer.Write("      {0}.SmallImage = Image.FromFile(\"{1}\");\n", varname, value.Trim());
           return true;
         }
         return false;
       }
       public static bool Image(XmlNode node, StringWriter writer, string varname)
       {
-        if (node.Attributes["Image"] != null)
+        return Image(node, writer, varname, null);
+      }
+      public static bool Image(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["Image"] != null)        
+          value = node.Attributes["Image"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
-          writer.Write("      {0}.Image = Image.FromFile(\"{1}\");\n", varname, node.Attributes["Image"].InnerText.Trim());
+          writer.Write("      {0}.Image = Image.FromFile(\"{1}\");\n", varname, value.Trim());
           return true;
         }
         return false;
       }
       public static bool BackgroundImage(XmlNode node, StringWriter writer, string varname)
       {
-        if (node.Attributes["BackImage"] != null)
+        return BackgroundImage(node, writer, varname, null);
+      }
+      public static bool BackgroundImage(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["BackImage"] != null)        
+          value = node.Attributes["BackImage"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
-          writer.Write("      {0}.BackgroundImage = Image.FromFile(\"{1}\");\n", varname, node.Attributes["BackImage"].InnerText.Trim());
+          writer.Write("      {0}.BackgroundImage = Image.FromFile(\"{1}\");\n", varname, value.Trim());
           return true;
         }
         return false;
       }
       public static bool SizeMode(XmlNode node, StringWriter writer, string varname)
       {
-        if (node.Attributes["Size"] != null)
+        return SizeMode(node, writer, varname, null);
+      }
+      public static bool SizeMode(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["Size"] != null)        
+          value = node.Attributes["Size"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
-          switch (node.Attributes["Size"].InnerText.Trim())
+          switch (value.Trim())
           {
             case "Icon":
               writer.Write("      {0}.MinSizeMode = {0}.MaxSizeMode = RibbonElementSizeMode.Compact;\n", varname);
@@ -77,14 +122,23 @@ namespace tools.ui.windows_forms
           }
           return true;
         }
-        writer.Write("      {0}.MinSizeMode = {0}.MaxSizeMode = RibbonElementSizeMode.Medium;\n", varname);
+        writer.Write("      {0}.MinSizeMode = {0}.MaxSizeMode = RibbonElementSizeMode.Compact;\n", varname);
         return false;
       }
       public static bool FlowsTo(XmlNode node, StringWriter writer, string varname)
       {
+        return FlowsTo(node, writer, varname, null);
+      }
+      public static bool FlowsTo(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
         if (node.Attributes["Flow"] != null)
+          value = node.Attributes["Flow"].InnerText;
+        else if (defaultvalue != null)
+          value = defaultvalue;
+        if (value != null)
         {
-          switch (node.Attributes["Flow"].InnerText.Trim())
+          switch (value.Trim())
           {
             case "Horizontal":
               writer.Write("      {0}.FlowsTo = RibbonPanelFlowDirection.Right;\n", varname);
@@ -97,15 +151,56 @@ namespace tools.ui.windows_forms
         }
         return false;
       }
+      public static bool FlowDirection(XmlNode node, StringWriter writer, string varname)
+      {
+        return FlowDirection(node, writer, varname, null);
+      }
+      public static bool FlowDirection(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["Flow"] != null)        
+          value = node.Attributes["Flow"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
+        {
+          switch (value.Trim())
+          {
+            case "LeftToRight":
+              writer.Write("      {0}.FlowDirection = FlowDirection.LeftToRight;\n", varname);
+              break;
+            case "RightToLeft":
+              writer.Write("      {0}.FlowDirection = FlowDirection.RightToLeft;\n", varname);
+              break;
+            case "TopDown":
+              writer.Write("      {0}.FlowDirection = FlowDirection.TopDown;\n", varname);
+              break;
+            case "BottomUp":
+              writer.Write("      {0}.FlowDirection = FlowDirection.BottomUp;\n", varname);
+              break;
+          }
+          return true;
+        }
+        return false;
+      }
       public static bool TextBoxWidth(XmlNode node, StringWriter writer, string varname)
+      {
+        return TextBoxWidth(node, writer, varname, null);
+      }
+      public static bool TextBoxWidth(XmlNode node, StringWriter writer, string varname, string defaultvalue)
       {
         try
         {
-          if (node.Attributes["Width"] != null)
+          string value = null;                        
+          if (node.Attributes["Width"] != null)        
+            value = node.Attributes["Width"].InnerText;
+          else if (defaultvalue != null)              
+            value = defaultvalue;                     
+          if (value != null)                          
           {
-            if (Converter.ToInt(node.Attributes["Width"].InnerText) <= 0)
+            if (Converter.ToInt(value) <= 0)
               throw new Exception("Invalid 'Width' attribute value");
-            writer.Write("      {0}.TextBoxWidth = {1};\n", varname, node.Attributes["Width"].InnerText);
+            writer.Write("      {0}.TextBoxWidth = {1};\n", varname, value);
             return true;
           }
         }
@@ -118,21 +213,38 @@ namespace tools.ui.windows_forms
       }
       public static bool Name(XmlNode node, StringWriter writer, string varname)
       {
-        if (node.Attributes["Name"] != null)
+        return Name(node, writer, varname, null);
+      }
+      public static bool Name(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["Name"] != null)        
+          value = node.Attributes["Name"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
-          writer.Write("      {0}.Name = \"{1}\";\n", varname, node.Attributes["Name"].InnerText.Trim());
+          writer.Write("      {0}.Name = \"{1}\";\n", varname, value);
           return true;
         }
-        writer.Write("      {0}.Name = \"{0}\";\n", varname);
         return false;
       }
       public static bool ForeColor(XmlNode node, StringWriter writer, string varname)
       {
-        if (node.Attributes["ForeColor"] != null)
+        return ForeColor(node, writer, varname, null);
+      }
+      public static bool ForeColor(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["ForeColor"] != null)        
+          value = node.Attributes["ForeColor"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
           try
           {
-            writer.Write("      {0}.ForeColor = Color.FromArgb({1:D});\n", varname, Converter.ToColor(node.Attributes["ForeColor"].InnerText).ToArgb());
+            writer.Write("      {0}.ForeColor = Color.FromArgb({1:D});\n", varname, Converter.ToColor(value).ToArgb());
             return true;
           }
           catch (Exception e)
@@ -144,11 +256,20 @@ namespace tools.ui.windows_forms
       }
       public static bool BackColor(XmlNode node, StringWriter writer, string varname)
       {
-        if (node.Attributes["BackColor"] != null)
+        return BackColor(node, writer, varname, null);
+      }
+      public static bool BackColor(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["BackColor"] != null)        
+          value = node.Attributes["BackColor"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
           try
           {
-            writer.Write("      {0}.BackColor = Color.FromArgb({1:D});\n", varname, Converter.ToColor(node.Attributes["BackColor"].InnerText).ToArgb());
+            writer.Write("      {0}.BackColor = Color.FromArgb({1:D});\n", varname, Converter.ToColor(value).ToArgb());
             return true;
           }
           catch (Exception e)
@@ -160,21 +281,37 @@ namespace tools.ui.windows_forms
       }
       public static bool AnchorDock(XmlNode node, StringWriter writer, string varname)
       {
+        return AnchorDock(node, writer, varname, null);
+      }
+      public static bool AnchorDock(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
         try
         {
+          string value = null;
           if (node.Attributes["Anchor"] != null && node.Attributes["Dock"] == null)
+            value = "Anchor|" + node.Attributes["Anchor"].InnerText.Trim();
+          else if (node.Attributes["Anchor"] == null && node.Attributes["Dock"] != null)
+            value = "Dock|" + node.Attributes["Dock"].InnerText.Trim();
+          else if (defaultvalue != null)
+            value = defaultvalue;
+          if (value != null)
           {
-            string[] items = Converter.ToAnchorStyles(node.Attributes["Anchor"].InnerText).ToString().Split(" ,".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            string buffer = "";
-            foreach (string item in items)
-              buffer += (string.IsNullOrEmpty(buffer) ? "AnchorStyles." : " | AnchorStyles.") + item;
-            writer.Write("      {0}.Anchor = {1};\n", varname, buffer);
-            return true;
-          }
-          if (node.Attributes["Anchor"] == null && node.Attributes["Dock"] != null)
-          {
-            writer.Write("      {0}.Dock = DockStyle.{1});\n", varname, Converter.ToDockStyle(node.Attributes["Dock"].InnerText).ToString());
-            return true;
+            string[] tokens = value.Split("|".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length != 2)
+              throw new Exception("Invalid Anchor or Dock default value specified");
+            switch (tokens[0].Trim())
+            {
+              case "Anchor":
+                string[] items = Converter.ToAnchorStyles(tokens[1]).ToString().Split(" ,".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                string buffer = "";
+                foreach (string item in items)
+                  buffer += (string.IsNullOrEmpty(buffer) ? "AnchorStyles." : " | AnchorStyles.") + item;
+                writer.Write("      {0}.Anchor = {1};\n", varname, buffer);
+                  return true;
+              case "Dock":
+                writer.Write("      {0}.Dock = DockStyle.{1};\n", varname, Converter.ToDockStyle(tokens[1]).ToString());
+                return true;
+            }
           }
         }
         catch (Exception e)
@@ -185,11 +322,20 @@ namespace tools.ui.windows_forms
       }
       public static bool Size(XmlNode node, StringWriter writer, string varname)
       {
-        if (node.Attributes["Size"] != null)
+        return Size(node, writer, varname, null);
+      }
+      public static bool Size(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["Size"] != null)        
+          value = node.Attributes["Size"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
           try
           {
-            System.Drawing.Size sz = Converter.ToSize(node.Attributes["Size"].InnerText);
+            System.Drawing.Size sz = Converter.ToSize(value);
             writer.Write("      {0}.Size = new Size({1:D}, {2:D});\n", varname, sz.Width, sz.Height);
             return true;
           }
@@ -202,11 +348,20 @@ namespace tools.ui.windows_forms
       }
       public static bool Location(XmlNode node, StringWriter writer, string varname)
       {
-        if (node.Attributes["Location"] != null)
+        return Location(node, writer, varname, null);
+      }
+      public static bool Location(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["Location"] != null)        
+          value = node.Attributes["Location"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
           try
           {
-            System.Drawing.Point pt = Converter.ToPoint(node.Attributes["Location"].InnerText);
+            System.Drawing.Point pt = Converter.ToPoint(value);
             writer.Write("      {0}.Location = new Point({1:D}, {2:D});\n", varname, pt.X, pt.Y);
             return true;
           }
@@ -219,11 +374,20 @@ namespace tools.ui.windows_forms
       }
       public static bool Padding(XmlNode node, StringWriter writer, string varname)
       {
-        if (node.Attributes["Padding"] != null)
+        return Padding(node, writer, varname, null);
+      }
+      public static bool Padding(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["Padding"] != null)        
+          value = node.Attributes["Padding"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
           try
           {
-            Padding pd = Converter.ToPadding(node.Attributes["Padding"].InnerText);
+            Padding pd = Converter.ToPadding(value);
             writer.Write("      {0}.Padding = new Padding({1:D}, {2:D}, {3:D}, {4:D});\n", varname, pd.Left, pd.Top, pd.Right, pd.Bottom);
             return true;
           }
@@ -236,11 +400,20 @@ namespace tools.ui.windows_forms
       }
       public static bool Margin(XmlNode node, StringWriter writer, string varname)
       {
-        if (node.Attributes["Margin"] != null)
+        return Margin(node, writer, varname, null);
+      }
+      public static bool Margin(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["Margin"] != null)        
+          value = node.Attributes["Margin"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
           try
           {
-            Padding pd = Converter.ToPadding(node.Attributes["Margin"].InnerText);
+            Padding pd = Converter.ToPadding(value);
             writer.Write("      {0}.Margin = new Padding({1:D}, {2:D}, {3:D}, {4:D});\n", varname, pd.Left, pd.Top, pd.Right, pd.Bottom);
             return true;
           }
@@ -253,30 +426,67 @@ namespace tools.ui.windows_forms
       }
       public static bool Visible(XmlNode node, StringWriter writer, string varname)
       {
-        return FlagAttributeTemplate(node, writer, varname, "Visible", "Visible");
+        return Visible(node, writer, varname, null);
+      }
+      public static bool Visible(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        return FlagAttributeTemplate(node, writer, varname, defaultvalue, "Visible", "Visible");
       }
       public static bool Enabled(XmlNode node, StringWriter writer, string varname)
       {
-        return FlagAttributeTemplate(node, writer, varname, "Enabled", "Enabled");
+        return Enabled(node, writer, varname, null);
+      }
+      public static bool Enabled(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        return FlagAttributeTemplate(node, writer, varname, defaultvalue, "Enabled", "Enabled");
       }
       public static bool TabStop(XmlNode node, StringWriter writer, string varname)
       {
-        return FlagAttributeTemplate(node, writer, varname, "TabStop", "TabStop");
+        return TabStop(node, writer, varname, null);
+      }
+      public static bool TabStop(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        return FlagAttributeTemplate(node, writer, varname, defaultvalue, "TabStop", "TabStop");
       }
       public static bool IsSplitterFixed(XmlNode node, StringWriter writer, string varname)
       {
-        return FlagAttributeTemplate(node, writer, varname, "Fixed", "IsSplitterFixed");
+        return IsSplitterFixed(node, writer, varname, null);
+      }
+      public static bool IsSplitterFixed(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        return FlagAttributeTemplate(node, writer, varname, defaultvalue, "Fixed", "IsSplitterFixed");
+      }
+      public static bool WrapContents(XmlNode node, StringWriter writer, string varname)
+      {
+        return WrapContents(node, writer, varname, null);
+      }
+      public static bool WrapContents(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        return FlagAttributeTemplate(node, writer, varname, defaultvalue, "Wrap", "WrapContents");
       }
       public static bool EnableDoubleBuffered(XmlNode node, StringWriter writer, string varname)
+      {
+        return EnableDoubleBuffered(node, writer, varname, null);
+      }
+      public static bool EnableDoubleBuffered(XmlNode node, StringWriter writer, string varname, string defaultvalue)
       {
         writer.Write("      {0}.DoubleBuffered = true;\n", varname);
         return true;
       }
       public static bool FixedPanel(XmlNode node, StringWriter writer, string varname)
       {
-        if (node.Attributes["FixedPanel"] != null)
+        return FixedPanel(node, writer, varname, null);
+      }
+      public static bool FixedPanel(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["FixedPanel"] != null)        
+          value = node.Attributes["FixedPanel"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
-          switch (node.Attributes["FixedPanel"].InnerText.Trim())
+          switch (value.Trim())
           {
             case "First":
               writer.Write("      {0}.FixedPanel = FixedPanel.Panel1;\n", varname);
@@ -294,11 +504,20 @@ namespace tools.ui.windows_forms
       }
       public static bool PanelMinSizes(XmlNode node, StringWriter writer, string varname)
       {
-        if (node.Attributes["PanelMinSizes"] != null)
+        return PanelMinSizes(node, writer, varname, null);
+      }
+      public static bool PanelMinSizes(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["PanelMinSizes"] != null)        
+          value = node.Attributes["PanelMinSizes"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
           try
           {
-            System.Drawing.Size sz = Converter.ToSize(node.Attributes["PanelMinSizes"].InnerText);
+            System.Drawing.Size sz = Converter.ToSize(value);
             writer.Write(
               "      {0}.Panel1MinSize = {1:D};\n" +
               "      {0}.Panel2MinSize = {2:D};\n",
@@ -315,9 +534,18 @@ namespace tools.ui.windows_forms
       }
       public static bool Orientation(XmlNode node, StringWriter writer, string varname)
       {
-        if (node.Attributes["Orientation"] != null)
+        return Orientation(node, writer, varname, null);
+      }
+      public static bool Orientation(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;                        
+        if (node.Attributes["Orientation"] != null)        
+          value = node.Attributes["Orientation"].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
-          switch (node.Attributes["Orientation"].InnerText.Trim())
+          switch (value.Trim())
           {
             case "Horizontal":
               writer.Write("      {0}.Orientation = Orientation.Horizontal;\n", varname);
@@ -330,18 +558,23 @@ namespace tools.ui.windows_forms
         }
         return false;
       }
-      private static bool FlagAttributeTemplate(XmlNode node, StringWriter writer, string varname, string attribname, string propname)
+      private static bool FlagAttributeTemplate(XmlNode node, StringWriter writer, string varname, string defaultvalue, string attribname, string propname)
       {
-        if (node.Attributes[attribname] != null)
+        string value = null;                        
+        if (node.Attributes[attribname] != null)        
+          value = node.Attributes[attribname].InnerText;
+        else if (defaultvalue != null)              
+          value = defaultvalue;                     
+        if (value != null)                          
         {
           try
           {
-            writer.Write("      {0}.{1} = {2};\n", varname, propname, Converter.ToBool(node.Attributes[attribname].InnerText) ? "true" : "false");
+            writer.Write("      {0}.{1} = {2};\n", varname, propname, Converter.ToBool(value) ? "true" : "false");
             return true;
           }
           catch (Exception e)
           {
-            Console.WriteLine("{0}", e.ToString());
+            Console.WriteLine(e.ToString());
           }
         }
         return false;
@@ -409,54 +642,49 @@ namespace tools.ui.windows_forms
           "    }\n" +
           "    public void OnChangeProperty(string name)\n" +
           "    {\n" +
-          "      bool prelocked = true; // checks if this method call actually locked listener\n" +
+          "      if (this.locked)" +
+          "        return;" +
+          "      this.locked = true;" +
           "      try\n" +
           "      {\n" +
-          "        if (!this.locked)\n" +
-          "        {\n" +
-          "          prelocked = false;\n" +
-          "          this.locked = true;\n" +
-          "          string buffer = \"\";\n" +
-          "          server.GetProperty(this.variable, ref buffer);\n"
+          "        string buffer = \"\";\n" +
+          "        server.GetProperty(this.variable, ref buffer);\n"
         );
         tmpl.Write(
-          "          container.{0} = Converter.{1}(buffer);\n", property, converter
+          "        container.{0} = Converter.{1}(buffer);\n", property, converter
         );
         tmpl.Write(
-          "        }\n" +
           "      }\n" +
           "      catch (Exception e)\n" +
           "      {\n" +
           "        System.Console.WriteLine(e.ToString());\n" +
           "      }\n" +
-          "      if (!prelocked)\n" +
-          "        this.locked = false;\n" +
+          "      this.locked = false;\n" +
           "    }\n" +
           "    public void OnUpdateProperty(object sender, EventArgs args)\n" +
           "    {\n" +
-          "      bool prelocked = true; // checks if this method call actually locked listener\n" +
+          "      if (this.locked)" +
+          "        return;" +
+          "      this.locked = true;" +
           "      try\n" +
-          "      {\n" +
-          "        if (!this.locked)\n" +
-          "        {\n" +
-          "          prelocked = false;\n" +
-          "          this.locked = true;\n"
+          "      {\n"
         );
         tmpl.Write(
-          "          server.SetProperty(this.variable, Converter.ToString(container.{0}));\n", property
+          "        server.SetProperty(this.variable, Converter.ToString(container.{0}));\n", property
         );
         tmpl.Write(
-          "        }\n" +
           "      }\n" +
           "      catch (Exception e)\n" +
           "      {\n" +
           "        System.Console.WriteLine(e.ToString());\n" +
           "      }\n" +
-          "      if (!prelocked)\n" +
-          "        this.locked = false;\n" +
+          "      this.locked = false;\n" +
           "    }\n" +
           "    public void OnRemoveProperty(string name)\n" +
           "    {\n" +
+          "      if (this.locked)" +
+          "        return;" +
+          "      this.locked = true;" +
           "      try\n" +
           "      {\n"
         );
@@ -469,6 +697,7 @@ namespace tools.ui.windows_forms
           "      {\n" +
           "        System.Console.WriteLine(e.ToString());\n" +
           "      }\n" +
+          "      this.locked = false;\n" +
           "    }\n" +
           "  }\n"
         );

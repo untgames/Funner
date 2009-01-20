@@ -51,8 +51,6 @@ namespace tools.ui.windows_forms
     }
     private void ParseRibbon(XmlNode ribbon, StringWriter writer)
     {
-      string classname = ribbon.Attributes["Name"].InnerText;
-
       writer.Write(
         "using System;\n" +
         "using System.Drawing;\n" +
@@ -67,37 +65,47 @@ namespace tools.ui.windows_forms
         ParseDropDownMenu(dropdown, writer);
       foreach (XmlNode list in ribbon.SelectNodes("List"))
         ParseList(list, writer);
-      writer.Write("  public class CustomRibbon: Ribbon\n");
-      writer.Write("  {\n");
-      writer.Write("    protected IApplicationServer server;\n");
-      writer.Write("    public CustomRibbon(IApplicationServer server): base()\n");
-      writer.Write("    {\n");
-      writer.Write("      this.server = server;\n");
-      writer.Write("      this.SuspendLayout();\n");
-      writer.Write("      this.DoubleBuffered = true;\n");
-      writer.Write("      this.TabSpacing = 6;\n");
-      writer.Write("      this.TabIndex = 0;\n");
-      writer.Write("      this.Name = \"{0}\";\n", classname);
-      writer.Write("      this.Minimized = false;\n");
-      writer.Write("      this.Dock = DockStyle.Top;\n");
-      writer.Write("      \n");
+      writer.Write(
+        "  public class CustomRibbon: Ribbon\n" +
+        "  {\n" +
+        "    protected IApplicationServer server;\n" +
+        "    public CustomRibbon(IApplicationServer server): base()\n" +
+        "    {\n" +
+        "      this.server = server;\n" +
+        "      this.TabSpacing = 6;\n"
+      );
+      CodeSnippets.Layout.Suspend(writer, "this");
+      CodeSnippets.Attributes.EnableDoubleBuffered(ribbon, writer, "this");
+      CodeSnippets.Attributes.Name(ribbon, writer, "this");
+      CodeSnippets.Attributes.AnchorDock(ribbon, writer, "this", "Dock|Top");
       foreach (XmlNode tab in ribbon.SelectNodes("Tab"))
-        writer.Write("      this.Tabs.Add({0});\n", ParseRibbonTab(tab, writer));
-      writer.Write("      \n");
-      writer.Write("      this.ResumeLayout();\n");
-      writer.Write("    }\n");
-      writer.Write("  }\n");
-      writer.Write("}\n");
+        writer.Write(
+        "      this.Tabs.Add({0});\n", ParseRibbonTab(tab, writer)
+      );
+      CodeSnippets.Layout.Resume(writer, "this");
+      writer.Write(
+        "    }\n" +
+        "  }\n" +
+        "}\n"
+      );
     }
     private void ParseList(XmlNode list, StringWriter writer)
     {
       if (list.Attributes["Name"] == null)
         throw new Exception("'Name' attribute for ribbon list not specified");
       string varname = list.Attributes["Name"].InnerText.Trim();
-      writer.Write("  public class RibbonList_{0}: RibbonComboBox\n", varname);
-      writer.Write("  {\n");
-      writer.Write("    public RibbonList_{0}(): base()\n", varname);
-      writer.Write("    {\n");
+      writer.Write(
+        "  public class RibbonList_{0}: RibbonComboBox\n", varname
+      );
+      writer.Write(
+        "  {\n"
+      );
+      writer.Write(
+        "    public RibbonList_{0}(): base()\n", varname
+      );
+      writer.Write(
+        "    {\n"
+      );
       foreach (XmlNode item in list.ChildNodes)
       {
         try

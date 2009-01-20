@@ -82,10 +82,7 @@ namespace tools.ui.windows_forms
     private void ParseContainerAttributes(XmlNode node, StringWriter writer, string varname)
     {
       CodeSnippets.Attributes.EnableDoubleBuffered(node, writer, varname);
-      if (!CodeSnippets.Attributes.Name(node, writer, varname))
-        writer.Write(
-        "      {0}.Name = \"{0}\";\n", varname
-        );
+      CodeSnippets.Attributes.Name(node, writer, varname, varname);
       CodeSnippets.Attributes.Text(node, writer, varname);
       CodeSnippets.Attributes.BackgroundImage(node, writer, varname);
       CodeSnippets.Attributes.Size(node, writer, varname);
@@ -105,13 +102,19 @@ namespace tools.ui.windows_forms
       switch (node.Name)
       {
         // container controls
-        case "Panel": return ParsePanel(node, writer);
-        case "Grid":  return ParseTablePanel(node, writer);
-        case "Tabs":  return ParseTabPanel(node, writer);
-        case "Group": return ParseGroupBox(node, writer);
-        case "Split": return ParseSplitter(node, writer);
-        case "Flow":  return ParseFlowPanel(node, writer);
+        case "Panel":   return ParsePanel(node, writer);
+        case "Grid":    return ParseTablePanel(node, writer);
+        case "Tabs":    return ParseTabPanel(node, writer);
+        case "Group":   return ParseGroupBox(node, writer);
+        case "Split":   return ParseSplitter(node, writer);
+        case "Flow":    return ParseFlowPanel(node, writer);
         // other controls
+        case "Label":   return ParseLabel(node, writer);
+        case "Input":   return ParseInput(node, writer);
+        case "Button":  return ParseButton(node, writer);
+        case "Flag":    return ParseCheckBox(node, writer);
+        case "Switch":  return ParseRadioGroup(node, writer);
+        case "List":    return ParseList(node, writer);
       }
       return "null";
     }
@@ -119,6 +122,9 @@ namespace tools.ui.windows_forms
     {
       string name = "panel" + ControlIndex.ToString("D");
       CodeSnippets.Layout.Suspend(writer, name);
+      writer.Write(
+        "      Panel {0} = new Panel();\n", name
+        );
       ParseContainerAttributes(node, writer, name);
       foreach (XmlNode child in node.ChildNodes)
         try
@@ -137,10 +143,21 @@ namespace tools.ui.windows_forms
     private string ParseTablePanel(XmlNode node, StringWriter writer)
     {
       throw new NotImplementedException();
+      string name = "tablepanel" + ControlIndex.ToString("D");
+      writer.Write(
+        "      TableLayoutPanel {0} = new TableLayoutPanel();\n", name
+        );
+      CodeSnippets.Layout.Suspend(writer, name);
+      ParseContainerAttributes(node, writer, name);
+      CodeSnippets.Layout.Resume(writer, name);
+      return name;
     }
     private string ParseTabPanel(XmlNode node, StringWriter writer)
     {
       string name = "tabpanel" + ControlIndex.ToString("D");
+      writer.Write(
+        "      TabControl {0} = new TabControl();\n", name
+        );
       CodeSnippets.Layout.Suspend(writer, name);
       ParseContainerAttributes(node, writer, name);
       foreach (XmlNode child in node.SelectNodes("Tab"))
@@ -163,6 +180,9 @@ namespace tools.ui.windows_forms
     private string ParseTabPage(XmlNode node, StringWriter writer)
     {
       string name = "tabpage" + ControlIndex.ToString("D");
+      writer.Write(
+        "      TabPage {0} = new TabPage();\n", name
+        );
       CodeSnippets.Layout.Suspend(writer, name);
       if (!CodeSnippets.Attributes.Name(node, writer, name))
         writer.Write(
@@ -191,7 +211,10 @@ namespace tools.ui.windows_forms
     }
     private string ParseGroupBox(XmlNode node, StringWriter writer)
     {
-      string name = "grouppanel" + ControlIndex.ToString("D");
+      string name = "groupbox" + ControlIndex.ToString("D");
+      writer.Write(
+        "      GroupBox {0} = new GroupBox();\n", name
+        );
       CodeSnippets.Layout.Suspend(writer, name);
       ParseContainerAttributes(node, writer, name);
       foreach (XmlNode child in node.ChildNodes)
@@ -214,6 +237,9 @@ namespace tools.ui.windows_forms
       XmlNodeList panels = node.SelectNodes("Panel");
       if (panels == null || panels.Count != 2)
         throw new Exception("Invalid Splitter Panel layout, must contain exactly two 'Panel' nodes");
+      writer.Write(
+        "      SplitContainer {0} = new SplitContainer();\n", name
+        );
       CodeSnippets.Layout.Suspend(writer, name);
       CodeSnippets.Layout.Suspend(writer, name + ".Panel1");
       CodeSnippets.Layout.Suspend(writer, name + ".Panel2");
@@ -249,9 +275,12 @@ namespace tools.ui.windows_forms
     private string ParseFlowPanel(XmlNode node, StringWriter writer)
     {
       string name = "flowpanel" + ControlIndex.ToString("D");
+      writer.Write(
+        "      FlowLayoutPanel {0} = new FlowLayoutPanel();\n", name
+        );
       CodeSnippets.Layout.Suspend(writer, name);
       ParseContainerAttributes(node, writer, name);
-      //FlowDirection
+      CodeSnippets.Attributes.FlowDirection(node, writer, name);
       //WrapContents
       foreach (XmlNode child in node.ChildNodes)
         try
@@ -266,6 +295,76 @@ namespace tools.ui.windows_forms
         }
       CodeSnippets.Layout.Resume(writer, name);
       return name;
+    }
+    // label item
+    private string ParseLabel(XmlNode node, StringWriter writer)
+    {
+      string name = "label" + ControlIndex.ToString("D");
+      writer.Write(
+        "      Label {0} = new Label();\n", name
+        );
+      CodeSnippets.Layout.Suspend(writer, name);
+      ParseContainerAttributes(node, writer, name);
+      CodeSnippets.Layout.Resume(writer, name);
+      return name;
+    }
+    // button item
+    private string ParseButton(XmlNode node, StringWriter writer)
+    {
+      string name = "button" + ControlIndex.ToString("D");
+      writer.Write(
+        "      Button {0} = new Button();\n", name
+        );
+      CodeSnippets.Layout.Suspend(writer, name);
+      ParseContainerAttributes(node, writer, name);
+      CodeSnippets.Events.Click(node, writer, name);
+      CodeSnippets.Layout.Resume(writer, name);
+      return name;
+    }
+    // input item
+    private string ParseInput(XmlNode node, StringWriter writer)
+    {
+      throw new NotImplementedException();
+      // place for datetime, text, spin, masked text
+    }
+    private string ParseDateTimeField(XmlNode node, StringWriter writer)
+    {
+      throw new NotImplementedException();
+    }
+    private string ParseNumericSpin(XmlNode node, StringWriter writer)
+    {
+      throw new NotImplementedException();
+    }
+    private string ParseTextBox(XmlNode node, StringWriter writer)
+    {
+      throw new NotImplementedException();
+    } 
+    private string ParseMaskedTextBox(XmlNode node, StringWriter writer)
+    {
+      throw new NotImplementedException();
+    } 
+    // flag item
+    private string ParseCheckBox(XmlNode node, StringWriter writer)
+    {
+      throw new NotImplementedException();
+    }
+    // list item
+    private string ParseList(XmlNode node, StringWriter writer)
+    {
+      throw new NotImplementedException();
+    }
+    private string ParseListBox(XmlNode node, StringWriter writer)
+    {
+      throw new NotImplementedException();
+    }
+    private string ParseComboBox(XmlNode node, StringWriter writer)
+    {
+      throw new NotImplementedException();
+    }
+    // switch item
+    private string ParseRadioGroup(XmlNode node, StringWriter writer)
+    {
+      throw new NotImplementedException();
     }
   }
 }

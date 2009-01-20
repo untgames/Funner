@@ -71,11 +71,6 @@ namespace tools.ui.windows_forms
       compiler_parameters.ReferencedAssemblies.Add("System.Drawing.dll");
       foreach (string modname in modules)
         compiler_parameters.ReferencedAssemblies.Add(modname);
-      // dump source to screen
-//      Console.WriteLine("// --- Assembly start ---");
-//      foreach (string str in sources)
-//        Console.WriteLine("{0}", str);
-//      Console.WriteLine("// --- Assembly end ---");
       // compile all this stuff
       Microsoft.CSharp.CSharpCodeProvider cs_code_provider = new Microsoft.CSharp.CSharpCodeProvider();
       CompilerResults results = cs_code_provider.CompileAssemblyFromSource(
@@ -83,6 +78,14 @@ namespace tools.ui.windows_forms
       // print building output to console
       foreach (string outstring in results.Output)
         System.Console.WriteLine(outstring);
+      if (results.CompiledAssembly == null)
+      {
+        // dump source to screen
+        Console.WriteLine("// --- Assembly start ---");
+        foreach (string str in sources)
+          Console.WriteLine(str);
+        Console.WriteLine("// --- Assembly end ---");
+      }
       return results.CompiledAssembly;
     }
     /// <summary>
