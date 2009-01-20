@@ -10,6 +10,44 @@ namespace tools.ui.windows_forms
 {
   namespace CodeSnippets
   {
+    public static class Common
+    {
+      public delegate string Parser<T>(T node, StringWriter writer);
+      public static void Instantiate(StringWriter writer, string name, string type)
+      {
+        writer.Write("      {1} {0} = new {1}();\n", name, type);
+      }
+      public static void AddControls(XmlNodeList nodes, StringWriter writer, string container, Parser<XmlNode> parser)
+      {
+        foreach (XmlNode node in nodes)
+        {
+          try
+          {
+            writer.Write(
+          "      {0}.Controls.Add({1});\n", container, parser(node, writer)
+            );
+          }
+          catch (Exception e)
+          {
+            Console.WriteLine(e.ToString());
+          }
+        }
+      }
+      public static bool Bind(XmlNode node, StringWriter writer, string name, string attrib, string eventname, string type, string property)
+      {
+        if (node.Attributes[attrib] != null)
+          writer.Write(
+            "      {0}.{2} += new EventHandler(new {3}({0}, this.server, \"{1}\").OnUpdateProperty);\n",
+            name,
+            node.Attributes[attrib].InnerText,
+            eventname,
+            Properties.TemplateName(type, property)
+          );
+        else
+          return false;
+        return true;
+      }
+    }
     public static class Layout
     {
       public static void Suspend(StringWriter writer, string varname)

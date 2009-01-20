@@ -59,21 +59,15 @@ namespace tools.ui.windows_forms
       );
       CodeSnippets.Layout.Suspend(writer, "this");
       ParseContainerAttributes(node, writer, "this");
-      foreach (XmlNode child in node.ChildNodes)
-        try
-        {
-          writer.Write(
-        "      this.Controls.Add({0});\n", ParseControl(child, writer)
-          );
-        }
-        catch (Exception e)
-        {
-          Console.WriteLine(e.ToString());
-        }
+      CodeSnippets.Common.AddControls(node.ChildNodes, writer, "this", ParseControl);
       CodeSnippets.Layout.Resume(writer, "this");
       writer.Write(
         "    } // end-of-ctor CustomPanel(IApplicationServer)\n" +
         "  } // end-of-class CustomPanel\n"
+      );
+      writer.Write(
+        "{0}\n",
+        CodeSnippets.Properties.Template("CheckBox", "Checked", "bool", "ToBool")
       );
       writer.Write(
         "} // end-of-namespace tools.ui.windows_forms\n"
@@ -121,22 +115,10 @@ namespace tools.ui.windows_forms
     private string ParsePanel(XmlNode node, StringWriter writer)
     {
       string name = "panel" + ControlIndex.ToString("D");
+      CodeSnippets.Common.Instantiate(writer, name, "Panel");
       CodeSnippets.Layout.Suspend(writer, name);
-      writer.Write(
-        "      Panel {0} = new Panel();\n", name
-        );
       ParseContainerAttributes(node, writer, name);
-      foreach (XmlNode child in node.ChildNodes)
-        try
-        {
-          writer.Write(
-        "      {0}.Controls.Add({1});\n", name, ParseControl(child, writer)
-          );
-        }
-        catch (Exception e)
-        {
-          Console.WriteLine(e.ToString());
-        }
+      CodeSnippets.Common.AddControls(node.ChildNodes, writer, name, ParseControl);
       CodeSnippets.Layout.Resume(writer, name);
       return name;
     }
@@ -144,9 +126,7 @@ namespace tools.ui.windows_forms
     {
       throw new NotImplementedException();
       string name = "tablepanel" + ControlIndex.ToString("D");
-      writer.Write(
-        "      TableLayoutPanel {0} = new TableLayoutPanel();\n", name
-        );
+      CodeSnippets.Common.Instantiate(writer, name, "TableLayoutPanel");
       CodeSnippets.Layout.Suspend(writer, name);
       ParseContainerAttributes(node, writer, name);
       CodeSnippets.Layout.Resume(writer, name);
@@ -155,79 +135,35 @@ namespace tools.ui.windows_forms
     private string ParseTabPanel(XmlNode node, StringWriter writer)
     {
       string name = "tabpanel" + ControlIndex.ToString("D");
-      writer.Write(
-        "      TabControl {0} = new TabControl();\n", name
-        );
+      CodeSnippets.Common.Instantiate(writer, name, "TabControl");
       CodeSnippets.Layout.Suspend(writer, name);
       ParseContainerAttributes(node, writer, name);
-      foreach (XmlNode child in node.SelectNodes("Tab"))
-      {
-        ++ControlIndex;
-        try
-        {
-          writer.Write(
-        "      {0}.Controls.Add({1});\n", name, ParseTabPage(child, writer)
-          );
-        }
-        catch (Exception e)
-        {
-          Console.WriteLine(e.ToString());
-        }
-      }
+      CodeSnippets.Common.AddControls(node.SelectNodes("Tab"), writer, name, ParseTabPage);
       CodeSnippets.Layout.Resume(writer, name);
       return name;
     }
     private string ParseTabPage(XmlNode node, StringWriter writer)
     {
+      ++ControlIndex;
       string name = "tabpage" + ControlIndex.ToString("D");
-      writer.Write(
-        "      TabPage {0} = new TabPage();\n", name
-        );
+      CodeSnippets.Common.Instantiate(writer, name, "TabPage");
       CodeSnippets.Layout.Suspend(writer, name);
-      if (!CodeSnippets.Attributes.Name(node, writer, name))
-        writer.Write(
-        "      {0}.Name = \"{0}\";\n", name
-        );
-      if (!CodeSnippets.Attributes.Text(node, writer, name))
-        writer.Write(
-        "      {0}.Text = \"{0}\";\n", name
-        );
+      CodeSnippets.Attributes.Name(node, writer, name, name);
+      CodeSnippets.Attributes.Text(node, writer, name, name);
       writer.Write(
         "      {0}.UseVisualStyleBackColor = true;\n", name
       );
-      foreach (XmlNode child in node.ChildNodes)
-        try
-        {
-          writer.Write(
-        "      {0}.Controls.Add({1});\n", name, ParseControl(child, writer)
-          );
-        }
-        catch (Exception e)
-        {
-          Console.WriteLine(e.ToString());
-        }
+      CodeSnippets.Common.AddControls(node.ChildNodes, writer, name, ParseControl);
       CodeSnippets.Layout.Resume(writer, name);
       return name;
     }
     private string ParseGroupBox(XmlNode node, StringWriter writer)
     {
       string name = "groupbox" + ControlIndex.ToString("D");
-      writer.Write(
-        "      GroupBox {0} = new GroupBox();\n", name
-        );
+      CodeSnippets.Common.Instantiate(writer, name, "GroupBox");
       CodeSnippets.Layout.Suspend(writer, name);
       ParseContainerAttributes(node, writer, name);
-      foreach (XmlNode child in node.ChildNodes)
-        try
-        {
-          writer.Write(
-        "      {0}.Controls.Add({1});\n", name, ParseControl(child, writer)
-          );
-        }
-        catch (Exception e)
-        {
-          Console.WriteLine(e.ToString());
-        }
+      CodeSnippets.Common.AddControls(node.ChildNodes, writer, name, ParseControl);
       CodeSnippets.Layout.Resume(writer, name);
       return name;
     }
@@ -237,36 +173,14 @@ namespace tools.ui.windows_forms
       XmlNodeList panels = node.SelectNodes("Panel");
       if (panels == null || panels.Count != 2)
         throw new Exception("Invalid Splitter Panel layout, must contain exactly two 'Panel' nodes");
-      writer.Write(
-        "      SplitContainer {0} = new SplitContainer();\n", name
-        );
+      CodeSnippets.Common.Instantiate(writer, name, "SplitContainer");
       CodeSnippets.Layout.Suspend(writer, name);
       CodeSnippets.Layout.Suspend(writer, name + ".Panel1");
       CodeSnippets.Layout.Suspend(writer, name + ".Panel2");
       ParseContainerAttributes(node, writer, name);
       CodeSnippets.Attributes.Orientation(node, writer, name);
-      foreach (XmlNode child in panels[0].ChildNodes)
-        try
-        {
-          writer.Write(
-        "      {0}.Panel1.Controls.Add({1});\n", name, ParseControl(child, writer)
-          );
-        }
-        catch (Exception e)
-        {
-          Console.WriteLine(e.ToString());
-        }
-      foreach (XmlNode child in panels[1].ChildNodes)
-        try
-        {
-          writer.Write(
-        "      {0}.Panel2.Controls.Add({1});\n", name, ParseControl(child, writer)
-          );
-        }
-        catch (Exception e)
-        {
-          Console.WriteLine(e.ToString());
-        }
+      CodeSnippets.Common.AddControls(panels[0].ChildNodes, writer, name + ".Panel1", ParseControl);
+      CodeSnippets.Common.AddControls(panels[1].ChildNodes, writer, name + ".Panel2", ParseControl);
       CodeSnippets.Layout.Resume(writer, name + ".Panel1");
       CodeSnippets.Layout.Resume(writer, name + ".Panel2");
       CodeSnippets.Layout.Resume(writer, name);
@@ -275,24 +189,11 @@ namespace tools.ui.windows_forms
     private string ParseFlowPanel(XmlNode node, StringWriter writer)
     {
       string name = "flowpanel" + ControlIndex.ToString("D");
-      writer.Write(
-        "      FlowLayoutPanel {0} = new FlowLayoutPanel();\n", name
-        );
+      CodeSnippets.Common.Instantiate(writer, name, "FlowLayoutPanel");
       CodeSnippets.Layout.Suspend(writer, name);
       ParseContainerAttributes(node, writer, name);
       CodeSnippets.Attributes.FlowDirection(node, writer, name);
-      //WrapContents
-      foreach (XmlNode child in node.ChildNodes)
-        try
-        {
-          writer.Write(
-        "      {0}.Controls.Add({1});\n", name, ParseControl(child, writer)
-          );
-        }
-        catch (Exception e)
-        {
-          Console.WriteLine(e.ToString());
-        }
+      CodeSnippets.Common.AddControls(node.ChildNodes, writer, name, ParseControl);
       CodeSnippets.Layout.Resume(writer, name);
       return name;
     }
@@ -300,9 +201,7 @@ namespace tools.ui.windows_forms
     private string ParseLabel(XmlNode node, StringWriter writer)
     {
       string name = "label" + ControlIndex.ToString("D");
-      writer.Write(
-        "      Label {0} = new Label();\n", name
-        );
+      CodeSnippets.Common.Instantiate(writer, name, "Label");
       CodeSnippets.Layout.Suspend(writer, name);
       ParseContainerAttributes(node, writer, name);
       CodeSnippets.Layout.Resume(writer, name);
@@ -312,9 +211,7 @@ namespace tools.ui.windows_forms
     private string ParseButton(XmlNode node, StringWriter writer)
     {
       string name = "button" + ControlIndex.ToString("D");
-      writer.Write(
-        "      Button {0} = new Button();\n", name
-        );
+      CodeSnippets.Common.Instantiate(writer, name, "Button");
       CodeSnippets.Layout.Suspend(writer, name);
       ParseContainerAttributes(node, writer, name);
       CodeSnippets.Events.Click(node, writer, name);
@@ -346,7 +243,13 @@ namespace tools.ui.windows_forms
     // flag item
     private string ParseCheckBox(XmlNode node, StringWriter writer)
     {
-      throw new NotImplementedException();
+      string name = "checkbox" + ControlIndex.ToString("D");
+      CodeSnippets.Common.Instantiate(writer, name, "CheckBox");
+      CodeSnippets.Layout.Suspend(writer, name);
+      ParseContainerAttributes(node, writer, name);
+      CodeSnippets.Common.Bind(node, writer, name, "Variable", "CheckedChanged", "CheckBox", "Checked");
+      CodeSnippets.Layout.Resume(writer, name);
+      return name;
     }
     // list item
     private string ParseList(XmlNode node, StringWriter writer)
