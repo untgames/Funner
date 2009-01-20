@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="Cp1251"?>
+<UIConfig>
+  <MenuStrip Id="FileMenu">
+    <MenuItem Name="Файл">
+      <MenuItem Name="Сохранить модель" OnClick="Application.Execute ('Modeler.SaveModel ()')"/>
+      <MenuItem Name="Выход" Tip="Выход из программы" OnClick="Application.Execute ('close')"/>
+    </MenuItem>
+    <MenuItem Name="Новые расчёты">
+      <MenuItem Name="Расчитать огибающую" OnClick="Application.Execute ('Modeler.CalculateEnvelope (200)')"/>
+      <MenuItem Name="Расчитать траекторию" OnClick="Application.Execute ('Modeler.CalculateTrajectory (-0.8, 0, 0, 100000)')"/>
+      <MenuItem Name="Расчитать несколько траекторий" OnClick="Application.Execute ('Modeler.CalculateTrajectories (5, 10000)')"/>
+      <MenuItem Name="Пакетный расчёт траекторий" OnClick="Application.Execute ('NuBatchCalculation (0, 1, 0.1, 0, 0, 0.1, 0, 0, 0.1, 10000, 0)')"/>
+    </MenuItem>
+    <MenuItem Name="БД расчётов">
+      <MenuItem Name="Загрузить все расчёты" OnClick="Application.Execute ('Modeler.LoadAllCalculatedTrajectories ()')"/>
+      <MenuItem Name="Удалить все расчёты" OnClick="Application.Execute ('Modeler.Cleanup ()')"/>
+    </MenuItem>
+<!--    <MenuItem Name="Визуализация">
+      <MenuItem Id="VisualizeNewCalculations" Name="Визуализировать новые расчёты" Tip="Необходимо ли визуализировать результаты новых расчётов" OnClick="toogle_visualize_new_calculations()"/>
+    </MenuItem> -->
+  </MenuStrip>
+</UIConfig>
