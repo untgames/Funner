@@ -4,8 +4,9 @@
 #include <cstdio>
 
 #include <stl/auto_ptr.h>
-#include <stl/vector>
 #include <stl/iterator>
+#include <stl/queue>
+#include <stl/vector>
 
 #include <xtl/connection.h>
 #include <xtl/function.h>
