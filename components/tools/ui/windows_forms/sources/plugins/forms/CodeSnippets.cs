@@ -35,14 +35,33 @@ namespace tools.ui.windows_forms
       }
       public static bool Bind(XmlNode node, StringWriter writer, string name, string attrib, string eventname, string type, string property)
       {
+        return Bind(node, writer, name, attrib, eventname, type, property, null);
+      }
+      public static bool Bind(XmlNode node, StringWriter writer, string name, string attrib, string eventname, string type, string property, string defaultvalue)
+      {
+        string value = null;
         if (node.Attributes[attrib] != null)
-          writer.Write(
-            "      {0}.{2} += new EventHandler(new {3}({0}, this.server, \"{1}\").OnUpdateProperty);\n",
-            name,
-            node.Attributes[attrib].InnerText,
-            eventname,
-            Properties.TemplateName(type, property)
-          );
+          value = node.Attributes[attrib].InnerText;
+        else if (defaultvalue != null)
+          value = defaultvalue;
+        if (value != null)
+        {
+          if (!string.IsNullOrEmpty(eventname))
+            writer.Write(
+              "      {0}.{2} += new EventHandler(new {3}({0}, this.server, \"{1}\").OnUpdateProperty);\n",
+              name,
+              value,
+              eventname,
+              Properties.TemplateName(type, property)
+            );
+          else
+            writer.Write(
+              "      new {2}({0}, this.server, \"{1}\");\n",
+              name,
+              value,
+              Properties.TemplateName(type, property)
+            );
+        }
         else
           return false;
         return true;
@@ -61,6 +80,78 @@ namespace tools.ui.windows_forms
     }
     public static class Attributes
     {
+      public static bool MinimumMaximum(XmlNode node, StringWriter writer, string varname)
+      {
+        return MinimumMaximum(node, writer, varname, null);
+      }
+      public static bool MinimumMaximum(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        try
+        {
+          string value = null;
+          if (node.Attributes["Bounds"] != null)
+            value = node.Attributes["Bounds"].InnerText;
+          else if (defaultvalue != null)
+            value = defaultvalue;
+          if (value != null)
+          {
+            string[] parts = value.Split(" ,;".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length != 2)
+              throw new ArgumentException("Invalid 'Bounds' format");
+            writer.Write("      {0}.Minimum = {1};\n      {0}.Maximum = {2};\n",
+              varname, Converter.ToDecimal(parts[0]).ToString(), Converter.ToDecimal(parts[0]).ToString());
+            return true;
+          }
+        }
+        catch (Exception e)
+        {
+          Console.WriteLine(e.ToString());
+        }
+        return false;
+      }
+      public static bool Increment(XmlNode node, StringWriter writer, string varname)
+      {
+        return Increment(node, writer, varname, null);
+      }
+      public static bool Increment(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        try
+        {
+          string value = null;
+          if (node.Attributes["Step"] != null)
+            value = node.Attributes["Step"].InnerText;
+          else if (defaultvalue != null)
+            value = defaultvalue;
+          if (value != null)
+          {
+            writer.Write("      {0}.Increment = {1};\n", varname, Converter.ToDecimal(value).ToString());
+            return true;
+          }
+        }
+        catch (Exception e)
+        {
+          Console.WriteLine(e.ToString());
+        }
+        return false;
+      }
+      public static bool Mask(XmlNode node, StringWriter writer, string varname)
+      {
+        return Mask(node, writer, varname, null);
+      }
+      public static bool Mask(XmlNode node, StringWriter writer, string varname, string defaultvalue)
+      {
+        string value = null;
+        if (node.Attributes["Mask"] != null)
+          value = node.Attributes["Mask"].InnerText;
+        else if (defaultvalue != null)
+          value = defaultvalue;
+        if (value != null)
+        {
+          writer.Write("      {0}.Mask = \"{1}\";\n", varname, value);
+          return true;
+        }
+        return false;
+      }
       public static bool Text(XmlNode node, StringWriter writer, string varname)
       {
         return Text(node, writer, varname, null);
@@ -720,7 +811,7 @@ namespace tools.ui.windows_forms
           "    }\n" +
           "    public void OnRemoveProperty(string name)\n" +
           "    {\n" +
-          "      if (this.locked)" +
+          /*"      if (this.locked)" +*/
           "        return;" +
           "      this.locked = true;" +
           "      try\n" +

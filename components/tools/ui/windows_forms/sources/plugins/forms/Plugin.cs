@@ -5,6 +5,7 @@ namespace tools.ui.windows_forms
     public static void InitPlugin (IApplicationServer application_server)
     {
       application_server.AddPlugin ("Ribbon", new RibbonBuilderPlugin(application_server));
+      application_server.AddPlugin ("Form", new FormBuilderPlugin(application_server));
     }
   }
 }

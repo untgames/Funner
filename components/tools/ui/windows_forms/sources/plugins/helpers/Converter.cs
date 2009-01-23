@@ -63,6 +63,10 @@ namespace tools.ui.windows_forms
     {
       return value.ToString ();
     }
+    public static string ToString (decimal value)
+    {
+      return value.ToString ();
+    }
     public static string ToString (System.Drawing.Color value)
     {
       return
@@ -113,6 +117,10 @@ namespace tools.ui.windows_forms
     public static double ToDouble (string value)
     {
       return Convert.ToDouble (value, float_format_provider);
+    }
+    public static decimal ToDecimal (string value)
+    {
+      return Convert.ToDecimal (value, float_format_provider);
     }
     public static System.DateTime ToDateTime (string value)
     {
