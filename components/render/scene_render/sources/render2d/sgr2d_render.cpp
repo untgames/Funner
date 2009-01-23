@@ -79,9 +79,9 @@ const Render::LogFunction& Render::GetLogHandler ()
 void Render::LogPrintf (const char* format, ...)
 {
   va_list args;
-  
+
   va_start (args, format);
-  
+
   try
   {
     log_handler (common::vformat (format, args).c_str ());
@@ -113,7 +113,7 @@ void Render::LoadResource (const char* tag, const char* file_name)
 {
   try
   {
-    const char* MATERIAL_LIBRARY_TAG = "material_library";      
+    const char* MATERIAL_LIBRARY_TAG = "material_library";
 
     if (!strcmp (tag, "auto"))
     {
@@ -124,7 +124,7 @@ void Render::LoadResource (const char* tag, const char* file_name)
     }
 
       //диспетчеризация тэгов
-      
+
     if (!strcmp (tag, MATERIAL_LIBRARY_TAG))
     {
       LoadMaterialLibrary (file_name);
@@ -142,7 +142,7 @@ void Render::LoadMaterialLibrary (const char* file_name)
   try
   {
     media::rfx::MaterialLibrary library (file_name, log_handler);
-    
+
     for (media::rfx::MaterialLibrary::Iterator iter=library.CreateIterator (); iter; ++iter)
     {
       media::rfx::Material::Pointer material        = *iter;
@@ -211,7 +211,7 @@ Renderable* Render::GetRenderable (scene_graph::SpriteModel* entity)
     //попытка найти объект в кэше
 
   RenderableMap::iterator iter = renderables_cache.find (entity);
-  
+
   if (iter != renderables_cache.end ())
     return iter->second.renderable.get ();
 
@@ -229,7 +229,7 @@ Renderable* Render::GetRenderable (scene_graph::TextLine* entity)
     //попытка найти объект в кэше
 
   RenderableMap::iterator iter = renderables_cache.find (entity);
-  
+
   if (iter != renderables_cache.end ())
     return iter->second.renderable.get ();
 
@@ -243,9 +243,10 @@ Renderable* Render::GetRenderable (scene_graph::TextLine* entity)
 }
 
 void Render::InsertRenderable (scene_graph::Entity* entity, const RenderablePtr& renderable)
-{  
-  renderables_cache.insert_pair (entity, RenderableHolder (renderable,
-    entity->RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&Render::RemoveRenderable, this, entity))));
+{
+  xtl::auto_connection after_destroy_connection = entity->RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&Render::RemoveRenderable, this, entity));
+
+  renderables_cache.insert_pair (entity, RenderableHolder (renderable)).first->second.on_destroy.swap (after_destroy_connection);
 }
 
 void Render::RemoveRenderable (scene_graph::Entity* entity)
@@ -258,13 +259,13 @@ ITexture* Render::GetTexture (const char* file_name, bool need_alpha, RenderQuer
     //попытка найти текстуру в кеше
 
   TextureMap::iterator iter = textures.find (file_name);
-  
+
   if (iter != textures.end ())
   {
     TextureHolder& holder = iter->second;
-    
+
     out_query = holder.query;
-    
+
       //если альфа-канал не требуется - возвращаем базовую текстуру
 
     if (!need_alpha)
@@ -276,9 +277,9 @@ ITexture* Render::GetTexture (const char* file_name, bool need_alpha, RenderQuer
       return holder.alpha_texture.get ();
 
       //если альфа-текстура отсутствует - создаём её и возвращаем
-      
+
     bool has_alpha = false;
-    
+
     RenderQueryPtr tmp_query;
 
     holder.alpha_texture = CreateTexture (file_name, true, has_alpha, tmp_query);
@@ -287,13 +288,13 @@ ITexture* Render::GetTexture (const char* file_name, bool need_alpha, RenderQuer
   }
 
   try
-  {        
+  {
       //создание новой текстуры
-      
+
     bool has_alpha = false;
-      
+
     TexturePtr texture = CreateTexture (file_name, need_alpha, has_alpha, out_query);
-    
+
       //добавление текстуры в кэш
 
     textures.insert_pair (file_name, TextureHolder (texture, has_alpha ? texture : TexturePtr (), out_query));
@@ -317,22 +318,22 @@ TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& 
   {
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");
-      
-      //проверка маски динамической текстуры      
-      
+
+      //проверка маски динамической текстуры
+
     if (!xtl::xstrncmp (file_name, DYNAMIC_STRING_MARKER, strlen (DYNAMIC_STRING_MARKER)))
     {
       has_alpha = true;
 
       return CreateDynamicTexture (file_name, out_query);
     }
-    
+
       //отсутствие динамической текстуры - отсутствие запроса дочернего рендеринга
-    
+
     out_query = 0;
-    
+
       //загрузка картинки
-      
+
     bool need_alpha_generation = false;
 
     media::Image image (file_name);
@@ -348,7 +349,7 @@ TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& 
         has_alpha = true;
         break;
       case media::PixelFormat_RGBA8:
-      case media::PixelFormat_A8:      
+      case media::PixelFormat_A8:
       case media::PixelFormat_L8:
       case media::PixelFormat_LA8:
         has_alpha = true;
@@ -363,15 +364,15 @@ TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& 
       default:
         throw xtl::format_operation_exception ("", "Unknown texture format=%d", image.Format ());
     }
-    
+
     /*
       Если нужна генерация альфа-канала - генерируем канал таким образом, что все пикселы с цветом нижнего левого
       имеют alpha = 0, а остальные - alpha = 255
     */
 
     if (need_alpha_generation)
-    {           
-      #pragma pack(1)      
+    {
+      #pragma pack(1)
 
       struct RGBA
       {
@@ -380,7 +381,7 @@ TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& 
 
       RGBA* pixel       = reinterpret_cast<RGBA*> (image.Bitmap ());
       RGBA  alpha_color = *pixel;
-      
+
       for (size_t count=image.Width () * image.Height (); count--; pixel++)
       {
         if (pixel->red == alpha_color.red && pixel->green == alpha_color.green && pixel->blue == alpha_color.blue)
@@ -388,13 +389,13 @@ TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& 
         else
           pixel->alpha = 255;
       }
-      
+
       has_alpha = true;
     }
-    
+
 
       //создание текстуры
-      
+
     return TexturePtr (renderer->CreateTexture (image), false);
   }
   catch (xtl::exception& exception)
@@ -412,27 +413,27 @@ TexturePtr Render::CreateDynamicTexture (const char* name, RenderQueryPtr& out_q
 
   if (tokens.Size () != 4)
     throw xtl::make_argument_exception ("render::render2d::Render::CreateDynamicTexture", "name", name,
-      "Wrong format. Expected: dynamic(<width>,<height>,'<query_string>')");      
+      "Wrong format. Expected: dynamic(<width>,<height>,'<query_string>')");
 
   size_t texture_width  = xtl::io::get<size_t> (tokens [1]),
          texture_height = xtl::io::get<size_t> (tokens [2]);
 
   const char* query_string = tokens [3];
-  
+
     //создание динамической текстуры и вспомогательного буфера глубины
 
-  TexturePtr       texture (renderer->CreateTexture (texture_width, texture_height, render::mid_level::PixelFormat_RGBA8), false);    
+  TexturePtr       texture (renderer->CreateTexture (texture_width, texture_height, render::mid_level::PixelFormat_RGBA8), false);
   RenderTargetPtr  depth_stencil_buffer (renderer->CreateDepthStencilBuffer (texture_width, texture_height), false);
-                  
+
     //создание запроса
 
   out_query = RenderQueryPtr (query_handler (texture.get (), depth_stencil_buffer.get (), query_string), false);
-  
+
   return texture;
 }
 
 /*
-    Добавление кадра на отрисовку    
+    Добавление кадра на отрисовку
 */
 
 void Render::AddFrame (IFrame* frame)

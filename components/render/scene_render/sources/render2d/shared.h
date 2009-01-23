@@ -77,15 +77,15 @@ class Renderable: public xtl::reference_counter
 ///Оповещение об изменениях в объекте
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void Update () {}
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void DrawCore (IFrame& frame) = 0;
-    
+
   private:
     void UpdateNotify ();
-  
+
   private:
     xtl::auto_connection on_update_connection;  //соединение на сигнал оповещения об обновлении объекта
     bool                 need_update;           //флаг необходимости обновления внутренних структур данных объекта
@@ -201,7 +201,7 @@ class RenderView: public IRenderView, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     RenderView  (scene_graph::Scene*, Render*);
     ~RenderView ();
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Целевые буферы рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -240,7 +240,7 @@ class RenderView: public IRenderView, public xtl::reference_counter
 
   private:
     typedef xtl::intrusive_ptr<Render> RenderPtr;
-    
+
   private:
     RenderPtr            render; //рендер
     FramePtr             frame;  //кадр
@@ -277,7 +277,7 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
     const LogFunction& GetLogHandler ();
 
     void LogPrintf (const char* format, ...);
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание дочерних запросов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -303,7 +303,7 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
     ITexture*       GetTexture    (const char* file_name, bool need_alpha, RenderQueryPtr& out_query);
     SpriteMaterial* GetMaterial   (const char* name);
     RenderableFont* GetFont       (const char* name);
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление кадра на отрисовку
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -336,16 +336,16 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
       RenderablePtr        renderable;
       xtl::auto_connection on_destroy;
 
-      RenderableHolder (const RenderablePtr& in_renderable, const xtl::connection& in_on_destroy) :
-        renderable (in_renderable), on_destroy (in_on_destroy) {}
+      RenderableHolder (const RenderablePtr& in_renderable)
+        : renderable (in_renderable) {}
     };
-    
+
     struct TextureHolder
     {
       TexturePtr     base_texture;  //базовая текстура
       TexturePtr     alpha_texture; //альфа-текстура
       RenderQueryPtr query;         //запрос дочернего рендеринга
-      
+
       TextureHolder (const TexturePtr& in_base_texture, const TexturePtr& in_alpha_texture, const RenderQueryPtr& in_query) :
         base_texture (in_base_texture), alpha_texture (in_alpha_texture), query (in_query) {}
     };
