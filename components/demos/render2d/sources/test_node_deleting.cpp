@@ -75,8 +75,6 @@ struct Test
 
     sprites_queue.push (sprite);
 
-    printf ("Created sprite %p\n", sprite.get ());
-
     current_angle += angle_delta;
   }
 
@@ -89,8 +87,6 @@ struct Test
 
       if (common::milliseconds () - last_update >= 200)
       {
-        printf ("Removing sprite %p\n", sprites_queue.front ().get ());
-
         sprites_queue.pop ();
         CreateSprite ();
 
