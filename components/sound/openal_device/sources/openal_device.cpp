@@ -642,7 +642,7 @@ void OpenALDevice::DeallocateSourceBuffer (ALuint buffer)
 
     context.MakeCurrent ();
 
-    context.alDeleteBuffers (flush_size, al_buffers_pool);
+    context.alDeleteBuffers (flush_size, al_buffers_pool + DEVICE_BUFFERS_POOL_SIZE - flush_size);
 
     al_buffers_pool_size -= flush_size;
   }
