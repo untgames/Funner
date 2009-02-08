@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.FONT.SOURCES MEDIA.FONT.XFONT MEDIA.FONT.FONT_CONVERTER MEDIA.FONT.TESTS MEDIA.FONT.UTILS
+TARGETS := MEDIA.FONT.SOURCES MEDIA.FONT.XFONT MEDIA.FONT.FONT_CONVERTER MEDIA.FONT.TESTS MEDIA.FONT.IMAGE2XFONT MEDIA.FONT.TTF2XFONT
 
 #Цель - MediaLib sources
 MEDIA.FONT.SOURCES.TYPE             := static-lib
@@ -46,13 +46,25 @@ MEDIA.FONT.TESTS.COMPILER_DEFINES :=
 MEDIA.FONT.TESTS.IMPORTS          := compile.static.mak link.static.mak xfont.link.static.mak font_converter.link.static.mak \
                                      ../../media/image/compile.static.mak ../../media/image/link.static.mak ../../media/image/left_bottom_packer.link.static.mak
 
-#Цель - MediaLib utils
-MEDIA.FONT.UTILS.TYPE             := application
-MEDIA.FONT.UTILS.NAME             := image2xfont
-MEDIA.FONT.UTILS.INCLUDE_DIRS     :=
-MEDIA.FONT.UTILS.SOURCE_DIRS      := utils
-MEDIA.FONT.UTILS.LIB_DIRS         :=  
-MEDIA.FONT.UTILS.LIBS             :=
-MEDIA.FONT.UTILS.COMPILER_CFLAGS  :=
-MEDIA.FONT.UTILS.COMPILER_DEFINES :=
-MEDIA.FONT.UTILS.IMPORTS          := compile.static.mak link.static.mak xfont.link.static.mak ../image/compile.static.mak ../image/link.static.mak
+#Цель - Imave to xfont converter
+MEDIA.FONT.IMAGE2XFONT.TYPE             := application
+MEDIA.FONT.IMAGE2XFONT.NAME             := image2xfont
+MEDIA.FONT.IMAGE2XFONT.INCLUDE_DIRS     :=
+MEDIA.FONT.IMAGE2XFONT.SOURCE_DIRS      := utils/image2xfont
+MEDIA.FONT.IMAGE2XFONT.LIB_DIRS         :=  
+MEDIA.FONT.IMAGE2XFONT.LIBS             :=
+MEDIA.FONT.IMAGE2XFONT.COMPILER_CFLAGS  :=
+MEDIA.FONT.IMAGE2XFONT.COMPILER_DEFINES :=
+MEDIA.FONT.IMAGE2XFONT.IMPORTS          := compile.static.mak link.static.mak xfont.link.static.mak ../image/compile.static.mak ../image/link.static.mak
+
+#Цель - Imave to xfont converter
+MEDIA.FONT.TTF2XFONT.TYPE             := application
+MEDIA.FONT.TTF2XFONT.NAME             := ttf2xfont
+MEDIA.FONT.TTF2XFONT.INCLUDE_DIRS     :=
+MEDIA.FONT.TTF2XFONT.SOURCE_DIRS      := utils/ttf2xfont
+MEDIA.FONT.TTF2XFONT.LIB_DIRS         :=  
+MEDIA.FONT.TTF2XFONT.LIBS             :=
+MEDIA.FONT.TTF2XFONT.COMPILER_CFLAGS  :=
+MEDIA.FONT.TTF2XFONT.COMPILER_DEFINES :=
+MEDIA.FONT.TTF2XFONT.IMPORTS          := compile.static.mak link.static.mak xfont.link.static.mak ../image/compile.static.mak \
+                                         ../image/link.static.mak font_converter.link.static.mak ../../media/image/left_bottom_packer.link.static.mak
