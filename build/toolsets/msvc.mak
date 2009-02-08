@@ -48,7 +48,7 @@ MSVC_PATH          := $(call convert_path,$(MSVC_PATH))
 MSVC_BIN_PATH      := $(MSVC_PATH)/bin
 MSVS_COMMON_PATH   := $(call convert_path,$(MSVS_COMMON_PATH))
 COMMON_CFLAGS      += -W3 -Ox -wd4996 $(if $(analyze),-analyze) -nologo -FC
-FRAMEWORK_DIR      := $(SYSTEMROOT)/Microsoft.NET/Framework/v2.0.50727
+FRAMEWORK_DIR      := ${SYSTEMROOT}/Microsoft.NET/Framework/v2.0.50727
 VALID_TARGET_TYPES += cs-dynamic-lib cs-application
 
 ###################################################################################################
@@ -67,12 +67,12 @@ COMMON_LINK_FLAGS += -stack:128000
 INCLUDE := $(MSVC_PATH)/include;$(INCLUDE)
 LIB     := $(MSVC_PATH)/lib;$(LIB)
 
-ifneq (,$(PLATFORM_SDK_PATH))
+ifeq (,$(PLATFORM_SDK_PATH))
+  $(error 'Microsoft SDKs not detected (empty PLATFORM_SDK_PATH)')  
+endif
 
 INCLUDE := $(PLATFORM_SDK_PATH)/include;$(INCLUDE)
 LIB     := $(PLATFORM_SDK_PATH)/lib;$(LIB)
-
-endif
 
 export INCLUDE
 export LIB
