@@ -6,6 +6,8 @@ using namespace media;
 namespace media
 {
 
+typedef xtl::com_ptr<ISoundInputStream> SoundInputStreamPtr;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание реализации звукового сэмпла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,9 +17,9 @@ struct SoundSample::Impl
     Impl () {}
     Impl (const stl::string& in_name, const SoundSampleInfo& in_info) : str_name (in_name), info (in_info) {}
 
-    stl::string                     str_name;     //SoundSample name
-    SoundSampleInfo                 info;         //Информация о файле
-    xtl::com_ptr<ISoundInputStream> input_stream; //Кодек
+    stl::string         str_name;     //SoundSample name
+    SoundSampleInfo     info;         //Информация о файле
+    SoundInputStreamPtr input_stream; //Кодек
 };
 
 }
@@ -29,7 +31,7 @@ SoundSample::SoundSample ()
 
 SoundSample::SoundSample (const SoundSample& source)
   : impl (new Impl (source.impl->str_name, source.impl->info))
-{                  
+{
   impl->input_stream = source.impl->input_stream;
 }
 
@@ -43,8 +45,8 @@ SoundSample::SoundSample (const char* file_name)
   {
     static ComponentLoader loader ("media.sound.loaders.*");
 
-    impl->input_stream    = SoundSampleManager::GetLoader (file_name, SerializerFindMode_ByName) (file_name, impl->info);
-    impl->str_name = file_name;
+    impl->input_stream = SoundInputStreamPtr (SoundSampleManager::GetLoader (file_name, SerializerFindMode_ByName) (file_name, impl->info), false);
+    impl->str_name     = file_name;
   }
   catch (xtl::exception& exception)
   {
@@ -59,7 +61,7 @@ SoundSample::SoundSample (ISoundInputStream* istream)
   if (!istream)
     throw xtl::make_null_argument_exception ("media::SoundSample::SoundSample", "istream");
 
-  impl->input_stream = istream;
+  impl->input_stream = SoundInputStreamPtr (istream);
 }
 
 SoundSample::~SoundSample ()
@@ -73,11 +75,11 @@ SoundSample& SoundSample::operator = (const SoundSample& source)
 
   SoundSample(source).Swap (*this);
 
-  return *this; 
+  return *this;
 }
 
 void SoundSample::Load (const char* file_name)
-{  
+{
   SoundSample (file_name).Swap (*this);
 }
 
@@ -158,7 +160,7 @@ void SoundSample::Save (const char* file_name) const
 {
   if (!file_name)
     throw xtl::make_null_argument_exception ("media::SoundSample::Save", "file_name");
-    
+
   try
   {
     static ComponentLoader loader ("media.sound.savers.*");
