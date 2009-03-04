@@ -18,7 +18,7 @@ namespace common
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Лексема грамматического разбора Xml-файлов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum XmlLexem 
+enum XmlLexem
 {
   XmlLexem_Undefined,               //не определена
   XmlLexem_Equal,                   //равенство
@@ -42,7 +42,7 @@ enum XmlLexem
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Состояние лексического анализатора Xml-файлов
-///////////////////////////////////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////////////////////////////////
 enum XmlLexerStatus
 {
   XmlLexerStatus_NoError,         //нет ошибки
@@ -94,7 +94,7 @@ class XmlLexer
     void ReadShiftedString (char border);
     void ReadCData ();
     void ReadIdentifier (bool identifier);
-    void SetError (XmlLexerStatus error, char* position);
+    void SetError (XmlLexerStatus error, const char* position);
 
   private:
     XmlLexem       current_lexem;
@@ -102,9 +102,9 @@ class XmlLexer
     char           erased_char;
     char*          erased_char_position;
     char*          position;
-    char*          current_token;
+    const char*    current_token;
     char*          line_start;
-    char*          cursor;
+    const char*    cursor;
     size_t         line_number;
 };
 

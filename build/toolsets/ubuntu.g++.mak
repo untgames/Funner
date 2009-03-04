@@ -7,7 +7,7 @@
 ###################################################################################################
 EXE_SUFFIX :=
 
-PROFILES += ubuntu
+PROFILES += ubuntu unistd
 
 include $(TOOLSETS_DIR)/g++.mak
 

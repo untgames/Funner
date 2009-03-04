@@ -21,7 +21,7 @@ char IDENTIFIER_CHAR_MAP [256]; //карта разрешенных символов разбора идентификат
 XmlLexer::XmlLexer ()
 {
   static bool is_identifier_char_map_initialized = false;
-  
+
   if (!is_identifier_char_map_initialized)
   {
     memset (IDENTIFIER_CHAR_MAP, 0, sizeof IDENTIFIER_CHAR_MAP);
@@ -39,7 +39,7 @@ XmlLexer::XmlLexer ()
 
     is_identifier_char_map_initialized = true;
   }
-  
+
   static char default_buffer [] = "";
 
   Reset (default_buffer);
@@ -66,7 +66,7 @@ void XmlLexer::Reset (char* buffer)
     Установка ошибки разбора
 */
 
-void XmlLexer::SetError (XmlLexerStatus error, char* error_position = 0)
+void XmlLexer::SetError (XmlLexerStatus error, const char* error_position = 0)
 {
   current_status = error;
   current_lexem  = XmlLexem_Undefined;
@@ -154,8 +154,8 @@ void XmlLexer::ReadShiftedString (char border)
         };
 
         static Marker       markers []    = {{"lt", '<'}, {"gt", '>'}, {"amp", '&'}, {"aposition", '\''}, {"quot", '"'}};
-        static const size_t markers_count = sizeof markers / sizeof *markers;        
-        
+        static const size_t markers_count = sizeof markers / sizeof *markers;
+
         const Marker* m = markers;
 
         for (size_t i=0; i<markers_count; i++, m++)
@@ -169,7 +169,7 @@ void XmlLexer::ReadShiftedString (char border)
           {
             position        = s2;
             *write_position = m->replacement;
-            
+
             break;
           }
         }
@@ -327,9 +327,9 @@ XmlLexem XmlLexer::NextLexem ()
             break;
           case '!':
             position++;
-            
+
             current_lexem = XmlLexem_Keyword;
-            
+
             if (!strncmp (position, CDATA_TAG, CDATA_TAG_SIZE))
             {
               position += CDATA_TAG_SIZE;
@@ -412,7 +412,7 @@ XmlLexem XmlLexer::NextLexem ()
         break;
       default:
         erased_char_position = position;
-        erased_char          = *position;      
+        erased_char          = *position;
 
         SetError (XmlLexerStatus_WrongChar, position++);
         break;

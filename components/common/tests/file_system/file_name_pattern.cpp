@@ -3,8 +3,8 @@
 int main ()
 {
   printf ("Results of file_name_pattern_test:\n");
-  
-  putenv ("TEST=<TEST>");
+
+  setenv ("TEST", "<TEST>", 1);
 
   const char* names [] = {"<TEST>/explorer.exe", "<TEST/explorer.exe", "<TEST!!!!!!>/explorer.exe"};
   size_t      names_count = sizeof (names) / sizeof (*names);
