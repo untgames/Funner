@@ -3,7 +3,7 @@
 using namespace common;
 using namespace media;
 
-namespace 
+namespace
 {
 
 /*
@@ -19,14 +19,14 @@ const char* LOG_NAME = "media.image.devil"; //им€ потока протоколировани€
 struct LogHolder
 {
   LogHolder () : log (LOG_NAME) {}
-  
+
   Log log;
 };
 
 Log& get_log ()
 {
   typedef common::Singleton<LogHolder> LogHolderSingleton;
-  
+
   return LogHolderSingleton::Instance ().log;
 }
 
@@ -37,14 +37,14 @@ void log_exception (const char* source, std::exception& exception)
 
 void log_exception (const char* source)
 {
-  get_log ().Printf ("Unknown exception at %s", source); 
+  get_log ().Printf ("Unknown exception at %s", source);
 }
 
 /*
     ‘ункции работы с пам€тью и файлами, замен€ющии стандартные DevIL функции
 */
 
-void* ILAPIENTRY devil_allocate (ILuint size)
+void* ILAPIENTRY devil_allocate (ILsizei size)
 {
   try
   {
@@ -58,7 +58,7 @@ void* ILAPIENTRY devil_allocate (ILuint size)
   {
     log_exception ("media::devil_allocate");
   }
-  
+
   return 0;
 }
 
@@ -75,7 +75,7 @@ void ILAPIENTRY devil_deallocate (const void* ptr)
   catch (...)
   {
     log_exception ("media::devil_deallocate");
-  }  
+  }
 }
 
 ILHANDLE ILAPIENTRY devil_file_open_read_only (const ILstring file_name)
@@ -92,7 +92,7 @@ ILHANDLE ILAPIENTRY devil_file_open_read_only (const ILstring file_name)
   {
     log_exception ("media::devil_file_open_read_only");
   }
-  
+
   return 0;
 }
 
@@ -110,7 +110,7 @@ ILHANDLE ILAPIENTRY devil_file_open_write_only (const ILstring file_name)
   {
     log_exception ("media::devil_file_open_write_only");
   }
-  
+
   return 0;
 }
 
@@ -144,7 +144,7 @@ ILboolean ILAPIENTRY devil_file_eof (ILHANDLE file_ptr)
   {
     log_exception ("media::devil_file_eof");
   }
-  
+
   return 0;
 }
 
@@ -164,7 +164,7 @@ ILint ILAPIENTRY devil_file_getc (ILHANDLE file_ptr)
   {
     log_exception ("media::devil_getc");
   }
-  
+
   return 0;
 }
 
@@ -174,7 +174,7 @@ ILint ILAPIENTRY devil_file_read (void* data, ILuint size, ILuint count, ILHANDL
   {
     if (size == 0 || count == 0)
       return 0;
-    
+
     return ((StdFile*)file_ptr)->Read (data, size * count) / size;
   }
   catch (std::exception& exception)
@@ -185,7 +185,7 @@ ILint ILAPIENTRY devil_file_read (void* data, ILuint size, ILuint count, ILHANDL
   {
     log_exception ("media::devil_file_read");
   }
-  
+
   return 0;
 }
 
@@ -196,7 +196,7 @@ ILint ILAPIENTRY devil_file_seek (ILHANDLE file_ptr, ILint offset, ILint origin)
     static FileSeekMode seek_mode [] = {FileSeekMode_Set, FileSeekMode_Current, FileSeekMode_End};
 
     filepos_t seek_pos;
-    
+
     switch (seek_mode [origin])
     {
       default:
@@ -284,13 +284,13 @@ class DevILComponent
 {
   public:
     //загрузка компонента
-    DevILComponent () 
+    DevILComponent ()
     {
       ilInit       ();
       iluInit      ();
       ilEnable     (IL_FILE_OVERWRITE);
       ilEnable     (IL_ORIGIN_SET);
-      ilOriginFunc (IL_ORIGIN_LOWER_LEFT);      
+      ilOriginFunc (IL_ORIGIN_LOWER_LEFT);
 
       ilSetMemory (&devil_allocate, &devil_deallocate);
 
@@ -300,14 +300,14 @@ class DevILComponent
       ilSetRead  (&devil_file_open_read_only, &devil_file_close, &devil_file_eof, &devil_file_getc,
                   &devil_file_read, &devil_file_seek, &devil_file_tell);
       ilSetWrite (&devil_file_open_write_only, &devil_file_close, &devil_file_putc, &devil_file_seek,
-                  &devil_file_tell, &devil_file_write);      
+                  &devil_file_tell, &devil_file_write);
 
       ImageManager::RegisterLoader ("jpg",     &Image::DefaultLoader);
-      ImageManager::RegisterLoader ("png",     &Image::DefaultLoader);      
+      ImageManager::RegisterLoader ("png",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("bmp",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("tga",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("tif",     &Image::DefaultLoader);
-      ImageManager::RegisterLoader ("dds",     &Image::DefaultLoader);    
+      ImageManager::RegisterLoader ("dds",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("psd",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("cubemap", &Image::CubemapLoader);
       ImageManager::RegisterLoader ("skybox",  &Image::SkyBoxLoader);
