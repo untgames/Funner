@@ -1,5 +1,5 @@
 Results of lua_interpreter_info_test:
-Interpreter name - Lua 5.1.3
+Interpreter name - Lua 5.1.4
 Interpreter has function 'f1': 1
 Unregister 'f1'
 Interpreter has function 'f1': 0

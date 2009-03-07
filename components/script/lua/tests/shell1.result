@@ -3,7 +3,7 @@ shell interpreter name is '(no interpreter binded)'
 Printed by LUA
 Printed by LUA
 Printed by LUA
-shell interpreter name is 'Lua 5.1.3'
+shell interpreter name is 'Lua 5.1.4'
 [string "lua_bad_code"]:2: '=' expected near 'salhdf'
     at script::Interpreter::DoCommands[compile]
 shell has function 'f' - 'n'
