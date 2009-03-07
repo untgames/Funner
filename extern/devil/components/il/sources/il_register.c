@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 10/20/2001 <--Y2K Compliant! =]
+// Copyright (C) 2000-2008 by Denton Woods
+// Last modified: 11/07/2008
 //
 // Filename: src-IL/src/il_register.c
 //
@@ -23,18 +23,14 @@ iFormatL *LoadProcs = NULL;
 iFormatS *SaveProcs = NULL;
 
 
-ILboolean ILAPIENTRY ilRegisterLoad(const ILstring Ext, IL_LOADPROC Load) {
+ILboolean ILAPIENTRY ilRegisterLoad(ILconst_string Ext, IL_LOADPROC Load) {
 	iFormatL *TempNode, *NewNode;
 
 	TempNode = LoadProcs;
 	if (TempNode != NULL) {
 		while (TempNode->Next != NULL) {
 			TempNode = TempNode->Next;
-#ifndef _UNICODE
-			if (!stricmp(TempNode->Ext, Ext)) {  // already registered
-#else
-			if (!wcsicmp(TempNode->Ext, Ext)) {
-#endif//_UNICODE
+			if (!iStrCmp(TempNode->Ext, Ext)) {  // already registered
 				return IL_TRUE;
 			}
 		}
@@ -52,11 +48,7 @@ ILboolean ILAPIENTRY ilRegisterLoad(const ILstring Ext, IL_LOADPROC Load) {
 		TempNode->Next = NewNode;
 	}
 
-#ifndef _UNICODE
 	NewNode->Ext = ilStrDup(Ext);
-#else
-	NewNode->Ext = _wcsdup(Ext);
-#endif//_UNICODE
 	NewNode->Load = Load;
 	NewNode->Next = NULL;
 
@@ -64,7 +56,7 @@ ILboolean ILAPIENTRY ilRegisterLoad(const ILstring Ext, IL_LOADPROC Load) {
 }
 
 
-ILboolean ILAPIENTRY ilRegisterSave(const ILstring Ext, IL_SAVEPROC Save)
+ILboolean ILAPIENTRY ilRegisterSave(ILconst_string Ext, IL_SAVEPROC Save)
 {
 	iFormatS *TempNode, *NewNode;
 
@@ -72,11 +64,7 @@ ILboolean ILAPIENTRY ilRegisterSave(const ILstring Ext, IL_SAVEPROC Save)
 	if (TempNode != NULL) {
 		while (TempNode->Next != NULL) {
 			TempNode = TempNode->Next;
-#ifndef _UNICODE
-			if (!stricmp(TempNode->Ext, Ext)) {  // already registered
-#else
-			if (!_wcsicmp(TempNode->Ext, Ext)) {
-#endif//_UNICODE
+			if (!iStrCmp(TempNode->Ext, Ext)) {  // already registered
 				return IL_TRUE;
 			}
 		}
@@ -94,11 +82,7 @@ ILboolean ILAPIENTRY ilRegisterSave(const ILstring Ext, IL_SAVEPROC Save)
 		TempNode->Next = NewNode;
 	}
 
-#ifndef _UNICODE
 	NewNode->Ext = ilStrDup(Ext);
-#else
-	NewNode->Ext = _wcsdup(Ext);
-#endif//_UNICODE
 	NewNode->Save = Save;
 	NewNode->Next = NULL;
 
@@ -107,16 +91,12 @@ ILboolean ILAPIENTRY ilRegisterSave(const ILstring Ext, IL_SAVEPROC Save)
 
 
 //! Unregisters a load extension - doesn't have to be called.
-ILboolean ILAPIENTRY ilRemoveLoad(const ILstring Ext)
+ILboolean ILAPIENTRY ilRemoveLoad(ILconst_string Ext)
 {
 	iFormatL *TempNode = LoadProcs, *PrevNode = NULL;
 
 	while (TempNode != NULL) {
-#ifndef _UNICODE
-		if (!stricmp(Ext, TempNode->Ext)) {
-#else
-		if (_wcsicmp(Ext, TempNode->Ext)) {
-#endif//_UNICODE
+		if (!iStrCmp(Ext, TempNode->Ext)) {
 			if (PrevNode == NULL) {  // first node in the list
 				LoadProcs = TempNode->Next;
 				ifree((void*)TempNode->Ext);
@@ -140,16 +120,12 @@ ILboolean ILAPIENTRY ilRemoveLoad(const ILstring Ext)
 
 
 //! Unregisters a save extension - doesn't have to be called.
-ILboolean ILAPIENTRY ilRemoveSave(const ILstring Ext)
+ILboolean ILAPIENTRY ilRemoveSave(ILconst_string Ext)
 {
 	iFormatS *TempNode = SaveProcs, *PrevNode = NULL;
 
 	while (TempNode != NULL) {
-#ifndef _UNICODE
-		if (!stricmp(Ext, TempNode->Ext)) {
-#else
-		if (_wcsicmp(Ext, TempNode->Ext)) {
-#endif//_UNICODE
+		if (!iStrCmp(Ext, TempNode->Ext)) {
 			if (PrevNode == NULL) {  // first node in the list
 				SaveProcs = TempNode->Next;
 				ifree((void*)TempNode->Ext);
@@ -173,7 +149,7 @@ ILboolean ILAPIENTRY ilRemoveSave(const ILstring Ext)
 
 
 // Automatically removes all registered formats.
-ILvoid ilRemoveRegistered()
+void ilRemoveRegistered()
 {
 	iFormatL *TempNodeL = LoadProcs;
 	iFormatS *TempNodeS = SaveProcs;
@@ -196,7 +172,7 @@ ILvoid ilRemoveRegistered()
 }
 
 
-ILboolean iRegisterLoad(const ILstring FileName)
+ILboolean iRegisterLoad(ILconst_string FileName)
 {
 	iFormatL	*TempNode = LoadProcs;
 	ILstring	Ext = iGetExtension(FileName);
@@ -206,11 +182,7 @@ ILboolean iRegisterLoad(const ILstring FileName)
 		return IL_FALSE;
 
 	while (TempNode != NULL) {
-#ifndef _UNICODE
-		if (!stricmp(Ext, TempNode->Ext)) {
-#else
-		if (_wcsicmp(Ext, TempNode->Ext)) {
-#endif//_UNICODE
+		if (!iStrCmp(Ext, TempNode->Ext)) {
 			Error = TempNode->Load(FileName);
 			if (Error == IL_NO_ERROR || Error == 0) {  // 0 and IL_NO_ERROR are both valid.
 				return IL_TRUE;
@@ -227,7 +199,7 @@ ILboolean iRegisterLoad(const ILstring FileName)
 }
 
 
-ILboolean iRegisterSave(const ILstring FileName)
+ILboolean iRegisterSave(ILconst_string FileName)
 {
 	iFormatS	*TempNode = SaveProcs;
 	ILstring	Ext = iGetExtension(FileName);
@@ -237,11 +209,7 @@ ILboolean iRegisterSave(const ILstring FileName)
 		return IL_FALSE;
 
 	while (TempNode != NULL) {
-#ifndef _UNICODE
-		if (!stricmp(Ext, TempNode->Ext)) {
-#else
-		if (_wcsicmp(Ext, TempNode->Ext)) {
-#endif//_UNICODE
+		if (!iStrCmp(Ext, TempNode->Ext)) {
 			Error = TempNode->Save(FileName);
 			if (Error == IL_NO_ERROR || Error == 0) {  // 0 and IL_NO_ERROR are both valid.
 				return IL_TRUE;
@@ -262,7 +230,7 @@ ILboolean iRegisterSave(const ILstring FileName)
 // "Reporting" functions
 //
 
-ILvoid ILAPIENTRY ilRegisterOrigin(ILenum Origin)
+void ILAPIENTRY ilRegisterOrigin(ILenum Origin)
 {
 	switch (Origin)
 	{
@@ -277,7 +245,7 @@ ILvoid ILAPIENTRY ilRegisterOrigin(ILenum Origin)
 }
 
 
-ILvoid ILAPIENTRY ilRegisterFormat(ILenum Format)
+void ILAPIENTRY ilRegisterFormat(ILenum Format)
 {
 	switch (Format)
 	{
@@ -294,6 +262,43 @@ ILvoid ILAPIENTRY ilRegisterFormat(ILenum Format)
 			ilSetError(IL_INVALID_ENUM);
 	}
 	return;
+}
+
+
+ILboolean ILAPIENTRY ilRegisterNumFaces(ILuint Num)
+{
+	ILimage *Next, *Prev;
+
+	ilBindImage(ilGetCurName());  // Make sure the current image is actually bound.
+	ilCloseImage(iCurImage->Faces);  // Close any current mipmaps.
+
+	iCurImage->Faces = NULL;
+	if (Num == 0)  // Just gets rid of all the mipmaps.
+		return IL_TRUE;
+
+	iCurImage->Faces = ilNewImage(1, 1, 1, 1, 1);
+	if (iCurImage->Faces == NULL)
+		return IL_FALSE;
+	Next = iCurImage->Faces;
+	Num--;
+
+	while (Num) {
+		Next->Faces = ilNewImage(1, 1, 1, 1, 1);
+		if (Next->Faces == NULL) {
+			// Clean up before we error out.
+			Prev = iCurImage->Faces;
+			while (Prev) {
+				Next = Prev->Faces;
+				ilCloseImage(Prev);
+				Prev = Next;
+			}
+			return IL_FALSE;
+		}
+		Next = Next->Faces;
+		Num--;
+	}
+
+	return IL_TRUE;
 }
 
 
@@ -371,7 +376,7 @@ ILboolean ILAPIENTRY ilRegisterNumImages(ILuint Num)
 }
 
 
-ILvoid ILAPIENTRY ilRegisterType(ILenum Type)
+void ILAPIENTRY ilRegisterType(ILenum Type)
 {
 	switch (Type)
 	{
@@ -393,7 +398,7 @@ ILvoid ILAPIENTRY ilRegisterType(ILenum Type)
 }
 
 
-ILvoid ILAPIENTRY ilRegisterPal(ILvoid *Pal, ILuint Size, ILenum Type)
+void ILAPIENTRY ilRegisterPal(void *Pal, ILuint Size, ILenum Type)
 {
 	if (!iCurImage->Pal.Palette || !iCurImage->Pal.PalSize || iCurImage->Pal.PalType != IL_PAL_NONE) {
 		ifree(iCurImage->Pal.Palette);

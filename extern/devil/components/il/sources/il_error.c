@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/25/2001 <--Y2K Compliant! =]
+// Copyright (C) 2000-2008 by Denton Woods
+// Last modified: 06/02/2007
 //
 // Filename: src-IL/src/il_error.c
 //
@@ -23,7 +23,7 @@ ILint	ilErrorPlace = (-1);
 
 // Sets the current error
 //	If you go past the stack size for this, it cycles the errors, almost like a LRU algo.
-ILAPI ILvoid ILAPIENTRY ilSetError(ILenum Error)
+ILAPI void ILAPIENTRY ilSetError(ILenum Error)
 {
 	ILuint i;
 
@@ -41,7 +41,7 @@ ILAPI ILvoid ILAPIENTRY ilSetError(ILenum Error)
 
 
 //! Gets the last error on the error stack
-ILenum ILAPIENTRY ilGetError(ILvoid)
+ILenum ILAPIENTRY ilGetError(void)
 {
 	ILenum ilReturn;
 

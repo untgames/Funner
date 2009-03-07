@@ -37,7 +37,7 @@ ILpal			Pal;
 
 
 //! Checks if the file specified in FileName is a valid Psp file.
-ILboolean ilIsValidPsp(const ILstring FileName)
+ILboolean ilIsValidPsp(ILconst_string FileName)
 {
 	ILHANDLE	PspFile;
 	ILboolean	bPsp = IL_FALSE;
@@ -76,7 +76,7 @@ ILboolean ilIsValidPspF(ILHANDLE File)
 
 
 //! Checks if Lump is a valid Psp lump.
-ILboolean ilIsValidPspL(const ILvoid *Lump, ILuint Size)
+ILboolean ilIsValidPspL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iIsValidPsp();
@@ -122,7 +122,7 @@ ILboolean iCheckPsp()
 
 
 //! Reads a PSP file
-ILboolean ilLoadPsp(const ILstring FileName)
+ILboolean ilLoadPsp(ILconst_string FileName)
 {
 	ILHANDLE	PSPFile;
 	ILboolean	bPsp = IL_FALSE;
@@ -156,7 +156,7 @@ ILboolean ilLoadPspF(ILHANDLE File)
 
 
 //! Reads from a memory "lump" that contains a PSP
-ILboolean ilLoadPspL(const ILvoid *Lump, ILuint Size)
+ILboolean ilLoadPspL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadPspInternal();
@@ -311,6 +311,7 @@ ILboolean ReadLayerBlock(ILuint BlockLen)
 	ILuint				ChunkSize, Padding, i, j;
 	ILushort			NumChars;
 
+	BlockLen;
 
 	// Layer sub-block header
 	if (iread(&Block, 1, sizeof(Block)) != sizeof(Block))
@@ -650,14 +651,23 @@ ILboolean AssembleImage()
 				iCurImage->Data[j+3] = Alpha[i];
 			}
 		}
+
 		else if (NumChannels == 4) {
+
 			ilTexImage(AttChunk.Width, AttChunk.Height, 1, 4, IL_RGBA, IL_UNSIGNED_BYTE, NULL);
+
 			for (i = 0, j = 0; i < Size; i++, j += 4) {
+
 				iCurImage->Data[j  ] = Channels[0][i];
+
 				iCurImage->Data[j+1] = Channels[1][i];
+
 				iCurImage->Data[j+2] = Channels[2][i];
+
 				iCurImage->Data[j+3] = Channels[3][i];
+
 			}
+
 		}
 		else if (NumChannels == 3) {
 			ilTexImage(AttChunk.Width, AttChunk.Height, 1, 3, IL_RGB, IL_UNSIGNED_BYTE, NULL);

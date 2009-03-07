@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 03/02/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2008 by Denton Woods
+// Last modified: 10/10/2006
 //
 // Filename: src-IL/src/il_cut.c
 //
@@ -35,7 +35,7 @@ typedef struct CUT_HEAD
 ILboolean iLoadCutInternal();
 
 //! Reads a .cut file
-ILboolean ilLoadCut(const ILstring FileName)
+ILboolean ilLoadCut(ILconst_string FileName)
 {
 	ILHANDLE	CutFile;
 	ILboolean	bCut = IL_FALSE;
@@ -69,7 +69,7 @@ ILboolean ilLoadCutF(ILHANDLE File)
 
 
 //! Reads from a memory "lump" that contains a .cut
-ILboolean ilLoadCutL(const ILvoid *Lump, ILuint Size)
+ILboolean ilLoadCutL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadCutInternal();
@@ -133,13 +133,11 @@ ILboolean iLoadCutInternal()
 	iCurImage->Pal.PalSize = SharedPal.PalSize;
 	iCurImage->Pal.PalType = SharedPal.PalType;*/
 
-	ilFixImage();
-
-	return IL_TRUE;
+	return ilFixImage();
 }
 
 /* ?????????
-ILvoid ilPopToast() {
+void ilPopToast() {
 	ILstring flipCode = IL_TEXT("#flipCode and www.flipCode.com rule you all.");
 	flipCode[0] = flipCode[0];
 }

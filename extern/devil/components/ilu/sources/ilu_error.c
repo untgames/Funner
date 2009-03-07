@@ -12,52 +12,86 @@
 
 
 #include "ilu_internal.h"
+#include "ilu_error/ilu_err-arabic.h"
+#include "ilu_error/ilu_err-dutch.h"
+#include "ilu_error/ilu_err-english.h"
+#include "ilu_error/ilu_err-japanese.h"
+#include "ilu_error/ilu_err-spanish.h"
+#include "ilu_error/ilu_err-german.h"
 
-const ILstring iluErrorStrings[IL_FILE_READ_ERROR - IL_INVALID_ENUM + 1] = {
-  IL_TEXT("invalid enumerant"),
-    IL_TEXT("out of memory"),
-  IL_TEXT("format not supported yet"),
-  IL_TEXT("internal error"),
-  IL_TEXT("invalid value"),
-    IL_TEXT("illegal operation"),
-  IL_TEXT("illegal file value"),
-  IL_TEXT("invalid file header"),
-  IL_TEXT("invalid parameter"),
-  IL_TEXT("could not open file"),
-  IL_TEXT("invalid extension"),
-  IL_TEXT("file already exists"),
-  IL_TEXT("out format equivalent"),
-  IL_TEXT("stack overflow"),
-    IL_TEXT("stack underflow"),
-  IL_TEXT("invalid conversion"),
-  IL_TEXT("bad dimensions"),
-  IL_TEXT("file read error")
+
+ILconst_string *iluErrors;
+ILconst_string *iluLibErrors;
+ILconst_string *iluMiscErrors;
+#define ILU_NUM_LANGUAGES 6
+
+ILconst_string *iluErrorStrings[ILU_NUM_LANGUAGES] = {
+	iluErrorStringsEnglish,
+	iluErrorStringsArabic,
+	iluErrorStringsDutch,
+	iluErrorStringsJapanese,
+	iluErrorStringsSpanish,
+	iluErrorStringsGerman
 };
 
-const ILstring iluLibErrorStrings[IL_LIB_MNG_ERROR - IL_LIB_GIF_ERROR + 1] = {
-  IL_TEXT("gif library error"),
-  IL_TEXT("jpeg library error"),
-  IL_TEXT("png library error"),
-  IL_TEXT("tiff library error"),
-  IL_TEXT("mng library error")
+ILconst_string *iluLibErrorStrings[ILU_NUM_LANGUAGES] = {
+	iluLibErrorStringsEnglish,
+	iluLibErrorStringsArabic,
+	iluLibErrorStringsDutch,
+	iluLibErrorStringsJapanese,
+	iluLibErrorStringsSpanish,
+	iluLibErrorStringsGerman
+};
+
+ILconst_string *iluMiscErrorStrings[ILU_NUM_LANGUAGES] = {
+	iluMiscErrorStringsEnglish,
+	iluMiscErrorStringsArabic,
+	iluMiscErrorStringsDutch,
+	iluMiscErrorStringsJapanese,
+	iluMiscErrorStringsSpanish,
+	iluMiscErrorStringsGerman
 };
 
 
-ILstring ILAPIENTRY iluErrorString(ILenum Error)
+ILconst_string ILAPIENTRY iluErrorString(ILenum Error)
 {
-  if (Error == IL_NO_ERROR) {
-    return (const ILstring)"no error";
-  }
-  if (Error == IL_UNKNOWN_ERROR) {
-    return (const ILstring)"unknown error";
-  }
-  if (Error >= IL_INVALID_ENUM && Error <= IL_FILE_READ_ERROR) {
-    return iluErrorStrings[Error - IL_INVALID_ENUM];
-  }
-  if (Error >= IL_LIB_GIF_ERROR && Error <= IL_LIB_MNG_ERROR) {
-    return iluLibErrorStrings[Error - IL_LIB_GIF_ERROR];
-  }
+	// Now we are dealing with Unicode strings.
+	if (Error == IL_NO_ERROR) {
+		return iluMiscErrors[0];
+	}
+	if (Error == IL_UNKNOWN_ERROR) {
+		return iluMiscErrors[1];
+	}
+	if (Error >= IL_INVALID_ENUM && Error <= IL_FILE_READ_ERROR) {
+		return (ILstring)iluErrors[Error - IL_INVALID_ENUM];
+	}
+	if (Error >= IL_LIB_GIF_ERROR && Error <= IL_LIB_EXR_ERROR) {
+		return (ILstring)iluLibErrors[Error - IL_LIB_GIF_ERROR];
+	}
 
-  // Siigron: changed this from NULL to "no error"
-  return TEXT("no error");
+	return iluMiscErrors[0];
+}
+
+
+ILboolean ILAPIENTRY iluSetLanguage(ILenum Language)
+{
+	switch (Language)
+	{
+		case ILU_ENGLISH:
+		case ILU_ARABIC:
+		case ILU_DUTCH:
+		case ILU_JAPANESE:
+		case ILU_SPANISH:
+		case ILU_GERMAN:
+			iluErrors = iluErrorStrings[Language - ILU_ENGLISH];
+			iluLibErrors = iluLibErrorStrings[Language - ILU_ENGLISH];
+			iluMiscErrors = iluMiscErrorStrings[Language - ILU_ENGLISH];
+			break;
+
+		default:
+			ilSetError(IL_INVALID_ENUM);
+			return IL_FALSE;
+	}
+
+	return IL_TRUE;
 }

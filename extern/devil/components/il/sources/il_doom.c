@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/25/2001 <--Y2K Compliant! =]
+// Copyright (C) 2000-2008 by Denton Woods
+// Last modified: 06/07/2007
 //
 // Filename: src-IL/src/il_doom.c
 //
@@ -18,8 +18,8 @@
 #include "il_doompal.h"
 
 
-ILboolean iLoadDoomInternal(ILvoid);
-ILboolean iLoadDoomFlatInternal(ILvoid);
+ILboolean iLoadDoomInternal(void);
+ILboolean iLoadDoomFlatInternal(void);
 
 
 //
@@ -27,7 +27,7 @@ ILboolean iLoadDoomFlatInternal(ILvoid);
 //
 
 //! Reads a Doom file
-ILboolean ilLoadDoom(const ILstring FileName)
+ILboolean ilLoadDoom(ILconst_string FileName)
 {
 	ILHANDLE	DoomFile;
 	ILboolean	bDoom = IL_FALSE;
@@ -67,7 +67,7 @@ ILboolean ilLoadDoomF(ILHANDLE File)
 
 
 //! Reads from a memory "lump" that contains a Doom texture
-ILboolean ilLoadDoomL(const ILvoid *Lump, ILuint Size)
+ILboolean ilLoadDoomL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadDoomInternal();
@@ -171,7 +171,7 @@ ILboolean iLoadDoomInternal()
 //
 
 //! Reads a Doom flat file
-ILboolean ilLoadDoomFlat(const ILstring FileName)
+ILboolean ilLoadDoomFlat(ILconst_string FileName)
 {
 	ILHANDLE	FlatFile;
 	ILboolean	bFlat = IL_FALSE;
@@ -211,7 +211,7 @@ ILboolean ilLoadDoomFlatF(ILHANDLE File)
 
 
 //! Reads from a memory "lump" that contains a Doom flat
-ILboolean ilLoadDoomFlatL(const ILvoid *Lump, ILuint Size)
+ILboolean ilLoadDoomFlatL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadDoomFlatInternal();

@@ -50,14 +50,14 @@ typedef struct iSgiHeader
 
 
 // Internal functions
-ILboolean	iIsValidSgi(ILvoid);
+ILboolean	iIsValidSgi(void);
 ILboolean	iCheckSgi(iSgiHeader *Header);
-ILboolean	iLoadSgiInternal(ILvoid);
-ILboolean	iSaveSgiInternal(ILvoid);
-ILvoid		iExpandScanLine(ILubyte *Dest, ILubyte *Src, ILuint Bpc);
+ILboolean	iLoadSgiInternal(void);
+ILboolean	iSaveSgiInternal(void);
+void		iExpandScanLine(ILubyte *Dest, ILubyte *Src, ILuint Bpc);
 ILint		iGetScanLine(ILubyte *ScanLine, iSgiHeader *Head, ILuint Length);
 ILint		iGetScanLineFast(ILubyte *ScanLine, iSgiHeader *Head, ILuint Length, ILubyte*);
-ILvoid		sgiSwitchData(ILubyte *Data, ILuint SizeOfData);
+void		sgiSwitchData(ILubyte *Data, ILuint SizeOfData);
 ILboolean	iNewSgi(iSgiHeader *Head);
 ILboolean	iReadNonRleSgi(iSgiHeader *Head);
 ILboolean	iReadRleSgi(iSgiHeader *Head);

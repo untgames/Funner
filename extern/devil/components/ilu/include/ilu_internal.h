@@ -11,6 +11,14 @@
 		#pragma intrinsic(memset)
 		//pragma comment(linker, "/NODEFAULTLIB:libc")
 		#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+
+		#ifdef _DEBUG 
+			#define _CRTDBG_MAP_ALLOC
+			#include <stdlib.h>
+			#ifndef _WIN32_WCE
+				#include <crtdbg.h>
+			#endif
+		#endif
 	#endif // _MSC_VER > 1000
 #endif
 
@@ -27,8 +35,10 @@
 #define _IL_BUILD_LIBRARY
 #define _ILU_BUILD_LIBRARY
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#ifdef HAVE_CONFIG_H //if we use autotools, we have HAVE_CONFIG_H defined and we have to look for it like that
+#include <config.h>
+#else // if we don't use autotools, we have to point to (possibly different) config.h than in the opposite case
+#include <IL/config.h>
 #endif
 
 #include <IL/ilu.h>
@@ -41,10 +51,10 @@
 	#define IL_TEXT(s) ((char*)TEXT(s))
 #elif _WIN32
 	#include <windows.h>
-	#define IL_TEXT(s) (s)
+	#define IL_TEXT(s) TEXT(s)
 #else
-	#define IL_TEXT(s) (s)
-	#define TEXT(s) (s)
+	#define IL_TEXT(s) s
+	#define TEXT(s) s
 #endif
 
 extern ILimage *iluCurImage;
@@ -84,7 +94,7 @@ INLINE ILint ilRound(ILfloat Num) {
 
 
 ILuint	iluScaleAdvanced(ILuint Width, ILuint Height, ILenum Filter);
-ILubyte	*iScanFill(ILvoid);
+ILubyte	*iScanFill(void);
 
 
 #endif//INTERNAL_H

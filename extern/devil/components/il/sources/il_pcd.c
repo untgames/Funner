@@ -18,10 +18,10 @@
 #include "il_manip.h"
 
 
-ILboolean iLoadPcdInternal(ILvoid);
+ILboolean iLoadPcdInternal(void);
 
 //! Reads a .pcd file
-ILboolean ilLoadPcd(const ILstring FileName)
+ILboolean ilLoadPcd(ILconst_string FileName)
 {
 	ILHANDLE	PcdFile;
 	ILboolean	bPcd = IL_FALSE;
@@ -55,14 +55,14 @@ ILboolean ilLoadPcdF(ILHANDLE File)
 
 
 //! Reads from a memory "lump" that contains a .pcd file
-ILboolean ilLoadPcdL(const ILvoid *Lump, ILuint Size)
+ILboolean ilLoadPcdL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadPcdInternal();
 }
 
 
-ILvoid YCbCr2RGB(ILubyte Y, ILubyte Cb, ILubyte Cr, ILubyte *r, ILubyte *g, ILubyte *b)
+void YCbCr2RGB(ILubyte Y, ILubyte Cb, ILubyte Cr, ILubyte *r, ILubyte *g, ILubyte *b)
 {
 	static const ILdouble c11 = 0.0054980*256;
 	static const ILdouble c12 = 0.0000000*256;
@@ -145,6 +145,9 @@ ILboolean iLoadPcdInternal()
 			ilSetError(IL_INVALID_PARAM);
 			return IL_FALSE;
 	}
+
+	if (itell() == IL_EOF)  // Supposed to have data here.
+		return IL_FALSE;
 
 	Y1 = (ILubyte*)ialloc(Width);
 	Y2 = (ILubyte*)ialloc(Width);

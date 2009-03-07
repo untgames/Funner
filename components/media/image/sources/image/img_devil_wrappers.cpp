@@ -44,7 +44,7 @@ void log_exception (const char* source)
     ‘ункции работы с пам€тью и файлами, замен€ющии стандартные DevIL функции
 */
 
-ILvoid* ILAPIENTRY devil_allocate (ILuint size)
+void* ILAPIENTRY devil_allocate (ILuint size)
 {
   try
   {
@@ -62,11 +62,11 @@ ILvoid* ILAPIENTRY devil_allocate (ILuint size)
   return 0;
 }
 
-ILvoid ILAPIENTRY devil_deallocate (ILvoid* ptr)
+void ILAPIENTRY devil_deallocate (const void* ptr)
 {
   try
   {
-    MemoryManager::Deallocate (ptr);
+    MemoryManager::Deallocate (const_cast <void*> (ptr));
   }
   catch (std::exception& exception)
   {
@@ -114,7 +114,7 @@ ILHANDLE ILAPIENTRY devil_file_open_write_only (const ILstring file_name)
   return 0;
 }
 
-ILvoid ILAPIENTRY devil_file_close (ILHANDLE file_ptr)
+void ILAPIENTRY devil_file_close (ILHANDLE file_ptr)
 {
   try
   {

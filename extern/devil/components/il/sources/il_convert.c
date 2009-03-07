@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 06/13/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 02/01/2009
 //
 // Filename: src-IL/src/il_convert.c
 //
@@ -24,6 +24,7 @@ ILimage *iConvertPalette(ILimage *Image, ILenum DestFormat)
 	ILfloat		Resultf;
 	ILubyte		*Temp = NULL;
 	ILboolean	Converted;
+	ILboolean	HasAlpha;
 
 	NewImage = (ILimage*)icalloc(1, sizeof(ILimage));  // Much better to have it all set to 0.
 	if (NewImage == NULL) {
@@ -32,7 +33,7 @@ ILimage *iConvertPalette(ILimage *Image, ILenum DestFormat)
 
 	ilCopyImageAttr(NewImage, Image);
 
-	if (!iCurImage->Pal.Palette || !iCurImage->Pal.PalSize || iCurImage->Pal.PalType == IL_PAL_NONE || iCurImage->Bpp != 1) {
+	if (!Image->Pal.Palette || !Image->Pal.PalSize || Image->Pal.PalType == IL_PAL_NONE || Image->Bpp != 1) {
 		ilCloseImage(NewImage);
 		ilSetError(IL_ILLEGAL_OPERATION);
 		return NULL;
@@ -115,6 +116,62 @@ ILimage *iConvertPalette(ILimage *Image, ILenum DestFormat)
 		else {
 			for (i = 0; i < Image->SizeOfData; i++) {
 				NewImage->Data[i] = Temp[Image->Data[i]];
+			}
+		}
+
+		ifree(Temp);
+
+		return NewImage;
+	}
+	else if (DestFormat == IL_ALPHA) {
+		if (NewImage->Pal.Palette)
+			ifree(NewImage->Pal.Palette);
+
+		switch (iCurImage->Pal.PalType)
+		{
+			// Opaque, so all the values are 0xFF.
+			case IL_PAL_RGB24:
+			case IL_PAL_RGB32:
+			case IL_PAL_BGR24:
+			case IL_PAL_BGR32:
+				HasAlpha = IL_FALSE;
+				break;
+
+			case IL_PAL_BGRA32:
+			case IL_PAL_RGBA32:
+				HasAlpha = IL_TRUE;
+				Temp = (ILubyte*)ialloc(1 * Image->Pal.PalSize / ilGetBppPal(Image->Pal.PalType));
+				if (Temp == NULL)
+					goto alloc_error;
+
+				Size = ilGetBppPal(Image->Pal.PalType);
+				for (i = 0, k = 0; i < Image->Pal.PalSize; i += Size, k += 1) {
+					Temp[k] = Image->Pal.Palette[i + 3];
+				}
+
+				break;
+		}
+
+		NewImage->Pal.Palette = NULL;
+		NewImage->Pal.PalSize = 0;
+		NewImage->Pal.PalType = IL_PAL_NONE;
+		NewImage->Format = DestFormat;
+		NewImage->Bpp = LumBpp;
+		NewImage->Bps = NewImage->Width * 1;  // Alpha is only one byte.
+		NewImage->SizeOfData = NewImage->SizeOfPlane = NewImage->Bps * NewImage->Height;
+		NewImage->Data = (ILubyte*)ialloc(NewImage->SizeOfData);
+		if (NewImage->Data == NULL)
+			goto alloc_error;
+
+		if (HasAlpha) {
+			for (i = 0; i < Image->SizeOfData; i++) {
+				NewImage->Data[i*2] = Temp[Image->Data[i] * 2];
+				NewImage->Data[i*2+1] = Temp[Image->Data[i] * 2 + 1];
+			}
+		}
+		else {  // No alpha, opaque.
+			for (i = 0; i < Image->SizeOfData; i++) {
+				NewImage->Data[i] = 0xFF;
 			}
 		}
 
@@ -213,7 +270,7 @@ alloc_error:
 // In il_quantizer.c
 ILimage *iQuantizeImage(ILimage *Image, ILuint NumCols);
 // In il_neuquant.c
-ILimage *iNeuQuant(ILimage *Image);
+ILimage *iNeuQuant(ILimage *Image, ILuint NumCols);
 
 // Converts an image from one format to another
 ILAPI ILimage* ILAPIENTRY iConvertImage(ILimage *Image, ILenum DestFormat, ILenum DestType)
@@ -238,13 +295,13 @@ ILAPI ILimage* ILAPIENTRY iConvertImage(ILimage *Image, ILenum DestFormat, ILenu
 		NewImage = iConvertPalette(Image, DestFormat);
 
 		//added test 2003-09-01
-		if(NewImage == NULL)
+		if (NewImage == NULL)
 			return NULL;
 
 		if (DestType == NewImage->Type)
 			return NewImage;
 
-		NewData = ilConvertBuffer(NewImage->SizeOfData, NewImage->Format, DestFormat, NewImage->Type, DestType, NewImage->Data);
+		NewData = (ILubyte*)ilConvertBuffer(NewImage->SizeOfData, NewImage->Format, DestFormat, NewImage->Type, DestType, NULL, NewImage->Data);
 		if (NewData == NULL) {
 			ifree(NewImage);  // ilCloseImage not needed.
 			return NULL;
@@ -263,9 +320,9 @@ ILAPI ILimage* ILAPIENTRY iConvertImage(ILimage *Image, ILenum DestFormat, ILenu
 	}
 	else if (DestFormat == IL_COLOUR_INDEX && Image->Format != IL_LUMINANCE) {
 		if (iGetInt(IL_QUANTIZATION_MODE) == IL_NEU_QUANT)
-			return iNeuQuant(Image);
+			return iNeuQuant(Image, iGetInt(IL_MAX_QUANT_INDICES));
 		else // Assume IL_WU_QUANT otherwise.
-			return iQuantizeImage(Image, iGetInt(IL_MAX_QUANT_INDEXS));
+			return iQuantizeImage(Image, iGetInt(IL_MAX_QUANT_INDICES));
 	}
 	else {
 		NewImage = (ILimage*)icalloc(1, sizeof(ILimage));  // Much better to have it all set to 0.
@@ -305,7 +362,7 @@ ILAPI ILimage* ILAPIENTRY iConvertImage(ILimage *Image, ILenum DestFormat, ILenu
 			memcpy(NewImage->Data, Image->Data, Image->SizeOfData);
 		}
 		else {
-			NewImage->Data = ilConvertBuffer(Image->SizeOfData, Image->Format, DestFormat, Image->Type, DestType, Image->Data);
+			NewImage->Data = (ILubyte*)ilConvertBuffer(Image->SizeOfData, Image->Format, DestFormat, Image->Type, DestType, NULL, Image->Data);
 			if (NewImage->Data == NULL) {
 				ifree(NewImage);  // ilCloseImage not needed.
 				return NULL;
@@ -318,9 +375,15 @@ ILAPI ILimage* ILAPIENTRY iConvertImage(ILimage *Image, ILenum DestFormat, ILenu
 
 
 //! Converts the current image to the DestFormat format.
+/*! \param DestFormat An enum of the desired output format.  Any format values are accepted.
+    \param DestType An enum of the desired output type.  Any type values are accepted.
+	\exception IL_ILLEGAL_OPERATION No currently bound image
+	\exception IL_INVALID_CONVERSION DestFormat or DestType was an invalid identifier.
+	\exception IL_OUT_OF_MEMORY Could not allocate enough memory.
+	\return Boolean value of failure or success*/
 ILboolean ILAPIENTRY ilConvertImage(ILenum DestFormat, ILenum DestType)
 {
-	ILimage *Image;
+	ILimage *Image, *pCurImage;
 
 	if (iCurImage == NULL) {
 		ilSetError(IL_ILLEGAL_OPERATION);
@@ -340,31 +403,38 @@ ILboolean ILAPIENTRY ilConvertImage(ILenum DestFormat, ILenum DestType)
 	if (ilIsEnabled(IL_USE_KEY_COLOUR)) {
 		ilAddAlphaKey(iCurImage);
 	}
-	Image = iConvertImage(iCurImage, DestFormat, DestType);
-	if (Image == NULL)
-		return IL_FALSE;
 
-	//ilCopyImageAttr(iCurImage, Image);  // Destroys subimages.
+	pCurImage = iCurImage;
+	while (pCurImage != NULL)
+	{
+		Image = iConvertImage(pCurImage, DestFormat, DestType);
+		if (Image == NULL)
+			return IL_FALSE;
 
-	// We don't copy the colour profile here, since it stays the same.
-	//	Same with the DXTC data.
-	iCurImage->Format = DestFormat;
-	iCurImage->Type = DestType;
-	iCurImage->Bpc = ilGetBpcType(DestType);
-	iCurImage->Bpp = ilGetBppFormat(DestFormat);
-	iCurImage->Bps = iCurImage->Width * iCurImage->Bpc * iCurImage->Bpp;
-	iCurImage->SizeOfPlane = iCurImage->Bps * iCurImage->Height;
-	iCurImage->SizeOfData = iCurImage->Depth * iCurImage->SizeOfPlane;
-	if (iCurImage->Pal.Palette && iCurImage->Pal.PalSize && iCurImage->Pal.PalType != IL_PAL_NONE)
-		ifree(iCurImage->Pal.Palette);
-	iCurImage->Pal.Palette = Image->Pal.Palette;
-	iCurImage->Pal.PalSize = Image->Pal.PalSize;
-	iCurImage->Pal.PalType = Image->Pal.PalType;
-	Image->Pal.Palette = NULL;
-	ifree(iCurImage->Data);
-	iCurImage->Data = Image->Data;
-	Image->Data = NULL;
-	ilCloseImage(Image);
+		//ilCopyImageAttr(pCurImage, Image);  // Destroys subimages.
+
+		// We don't copy the colour profile here, since it stays the same.
+		//	Same with the DXTC data.
+		pCurImage->Format = DestFormat;
+		pCurImage->Type = DestType;
+		pCurImage->Bpc = ilGetBpcType(DestType);
+		pCurImage->Bpp = ilGetBppFormat(DestFormat);
+		pCurImage->Bps = pCurImage->Width * pCurImage->Bpc * pCurImage->Bpp;
+		pCurImage->SizeOfPlane = pCurImage->Bps * pCurImage->Height;
+		pCurImage->SizeOfData = pCurImage->Depth * pCurImage->SizeOfPlane;
+		if (pCurImage->Pal.Palette && pCurImage->Pal.PalSize && pCurImage->Pal.PalType != IL_PAL_NONE)
+			ifree(pCurImage->Pal.Palette);
+		pCurImage->Pal.Palette = Image->Pal.Palette;
+		pCurImage->Pal.PalSize = Image->Pal.PalSize;
+		pCurImage->Pal.PalType = Image->Pal.PalType;
+		Image->Pal.Palette = NULL;
+		ifree(pCurImage->Data);
+		pCurImage->Data = Image->Data;
+		Image->Data = NULL;
+		ilCloseImage(Image);
+
+		pCurImage = pCurImage->Next;
+	}
 
 	return IL_TRUE;
 }
@@ -374,7 +444,7 @@ ILboolean ILAPIENTRY ilConvertImage(ILenum DestFormat, ILenum DestType)
 //	Must be either an 8, 24 or 32-bit (coloured) image (or palette).
 ILboolean ilSwapColours()
 {
-	ILuint		i = 0, Size = iCurImage->Bps * iCurImage->Height;
+	ILuint		i = 0, Size = iCurImage->Bpp * iCurImage->Width * iCurImage->Height;
 	ILbyte		PalBpp = ilGetBppPal(iCurImage->Pal.PalType);
 	ILushort	*ShortPtr;
 	ILuint		*IntPtr, Temp;
@@ -407,9 +477,10 @@ ILboolean ilSwapColours()
 		case IL_BGRA:
 			iCurImage->Format = IL_RGBA;
 			break;
+		case IL_ALPHA:
 		case IL_LUMINANCE:
 		case IL_LUMINANCE_ALPHA:
-			return IL_TRUE;  // No need to do anything to luminance images.
+			return IL_TRUE;  // No need to do anything to luminance or alpha images.
 		case IL_COLOUR_INDEX:
 			switch (iCurImage->Pal.PalType)
 			{
@@ -593,7 +664,7 @@ ILboolean ilAddAlpha()
 
 //ILfloat KeyRed = 0, KeyGreen = 0, KeyBlue = 0, KeyAlpha = 0;
 
-ILvoid ILAPIENTRY ilKeyColour(ILclampf Red, ILclampf Green, ILclampf Blue, ILclampf Alpha)
+void ILAPIENTRY ilKeyColour(ILclampf Red, ILclampf Green, ILclampf Blue, ILclampf Alpha)
 {
 	ILfloat KeyRed = 0, KeyGreen = 0, KeyBlue = 0, KeyAlpha = 0;
         KeyRed		= Red;
@@ -1003,36 +1074,49 @@ be loaded anyway. Thanks to Chris Lux for pointing this out.
 
 ILboolean ilFixImage()
 {
+	ILuint NumFaces,  f;
 	ILuint NumImages, i;
 	ILuint NumMipmaps,j;
 	ILuint NumLayers, k;
 
-	NumImages  = ilGetInteger(IL_NUM_IMAGES);
+	NumImages = ilGetInteger(IL_NUM_IMAGES);
 	for (i = 0; i <= NumImages; i++) {
 		ilBindImage(ilGetCurName());  // Set to parent image first.
 		if (!ilActiveImage(i))
 			return IL_FALSE;
 
-		NumLayers = ilGetInteger(IL_NUM_LAYERS);
-		for (k = 0; k <= NumLayers; k++) {
+		NumFaces = ilGetInteger(IL_NUM_FACES);
+		for (f = 0; f <= NumFaces; f++) {
 			ilBindImage(ilGetCurName());  // Set to parent image first.
 			if (!ilActiveImage(i))
 				return IL_FALSE;
-			if (!ilActiveLayer(k))
+			if (!ilActiveFace(f))
 				return IL_FALSE;
 
-			NumMipmaps = ilGetInteger(IL_NUM_MIPMAPS);
-
-			for (j = 0; j <= NumMipmaps; j++) {
-				ilBindImage(ilGetCurName());	// Set to parent image first.
+			NumLayers = ilGetInteger(IL_NUM_LAYERS);
+			for (k = 0; k <= NumLayers; k++) {
+				ilBindImage(ilGetCurName());  // Set to parent image first.
 				if (!ilActiveImage(i))
+					return IL_FALSE;
+				if (!ilActiveFace(f))
 					return IL_FALSE;
 				if (!ilActiveLayer(k))
 					return IL_FALSE;
-				if (!ilActiveMipmap(j))
-					return IL_FALSE;
-				if (!ilFixCur())
-					return IL_FALSE;
+
+				NumMipmaps = ilGetInteger(IL_NUM_MIPMAPS);
+				for (j = 0; j <= NumMipmaps; j++) {
+					ilBindImage(ilGetCurName());	// Set to parent image first.
+					if (!ilActiveImage(i))
+						return IL_FALSE;
+					if (!ilActiveFace(f))
+						return IL_FALSE;
+					if (!ilActiveLayer(k))
+						return IL_FALSE;
+					if (!ilActiveMipmap(j))
+						return IL_FALSE;
+					if (!ilFixCur())
+						return IL_FALSE;
+				}
 			}
 		}
 	}

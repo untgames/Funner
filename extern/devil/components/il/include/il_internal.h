@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 02/19/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 01/24/2009
 //
 // Filename: src-IL/include/il_internal.h
 //
@@ -13,19 +13,27 @@
 #define INTERNAL_H
 #define _IL_BUILD_LIBRARY
 
+
+// Local headers
+/*#if (defined(_WIN32) || defined(_WIN64)) && !defined(HAVE_CONFIG_H)
+	#define HAVE_CONFIG_H
+#endif*/
+#ifdef HAVE_CONFIG_H //if we use autotools, we have HAVE_CONFIG_H defined and we have to look for it like that
+#include <config.h>
+#else // if we don't use autotools, we have to point to (possibly different) config.h than in the opposite case
+#include <IL/config.h>
+#endif
+
 // Standard headers
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
 
-// Local headers
-#if defined(_WIN32) && !defined(HAVE_CONFIG_H)
-#define HAVE_CONFIG_H
+#ifdef __cplusplus
+extern "C" {
 #endif
-#ifdef HAVE_CONFIG_H
-	#include <IL/config.h>
-#endif
+
 #include <IL/il.h>
 #include <IL/devil_internal_exports.h>
 #include "il_files.h"
@@ -41,18 +49,17 @@
 			#pragma intrinsic(strcmp)
 			#pragma intrinsic(strlen)
 			#pragma intrinsic(strcpy)
-			/*
-			#if _MSC_VER >= 1300  // Erroneous size_t conversion warnings
-				pragma warning(disable : 4267)
+			
+			#if _MSC_VER >= 1300
+				#pragma warning(disable : 4996)  // MSVC++ 8/9 deprecation warnings
 			#endif
-			pragma comment(linker, "/NODEFAULTLIB:libc")
-			pragma comment(linker, "/NODEFAULTLIB:libcd")
-			pragma comment(linker, "/NODEFAULTLIB:libcmt.lib")
-			#ifdef _DEBUG
-				pragma comment(linker, "/NODEFAULTLIB:libcmtd")
-				pragma comment(linker, "/NODEFAULTLIB:msvcrt.lib")
-			#endif // _DEBUG
-			*/
+			//pragma comment(linker, "/NODEFAULTLIB:libc")
+			//pragma comment(linker, "/NODEFAULTLIB:libcd")
+			//pragma comment(linker, "/NODEFAULTLIB:libcmt.lib")
+			//#ifdef _DEBUG
+			//	pragma comment(linker, "/NODEFAULTLIB:libcmtd")
+			//	pragma comment(linker, "/NODEFAULTLIB:msvcrt.lib")
+			//#endif // _DEBUG
 		#endif // _MSC_VER > 1000
 	#endif
 	#define WIN32_LEAN_AND_MEAN  // Exclude rarely-used stuff from Windows headers
@@ -70,14 +77,33 @@
 	#define IL_TEXT(s) (s)
 	#define TEXT(s) (s)
 #endif*/
+
 #ifdef _UNICODE
 	#define IL_TEXT(s) L##s
+	#ifndef _WIN32  // At least in Linux, fopen works fine, and wcsicmp is not defined.
+		#define wcsicmp wcsncasecmp
+		#define _wcsicmp wcsncasecmp
+		#define _wfopen fopen
+	#endif
+	#define iStrCpy wcscpy
 #else
 	#define IL_TEXT(s) (s)
+	#define iStrCpy strcpy
 #endif
+
 #ifdef IL_INLINE_ASM
-	#ifdef _MSC_VER  // MSVC++ only
+	#if (defined (_MSC_VER) && defined(_WIN32))  // MSVC++ only
 		#define USE_WIN32_ASM
+	#endif
+
+	#ifdef _WIN64
+		#undef USE_WIN32_ASM
+	//@TODO: Windows 64 compiler cannot use inline ASM, so we need to
+	//  generate some MASM code at some point.
+	#endif
+
+	#ifdef _WIN32_WCE  // Cannot use our inline ASM in Windows Mobile.
+		#undef USE_WIN32_ASM
 	#endif
 #endif
 extern ILimage *iCurImage;
@@ -118,7 +144,11 @@ extern ILimage *iCurImage;
 	int stricmp(const char *src1, const char *src2);
 	int strnicmp(const char *src1, const char *src2, size_t max);
 #endif//_WIN32
-int iStrCmp(const ILstring src1, const ILstring src2);
+#ifdef _WIN32_WCE
+	char *strdup(const char *src);
+#endif
+int iStrCmp(ILconst_string src1, ILconst_string src2);
+
 //
 // Some math functions
 //
@@ -130,18 +160,20 @@ int iSqrt(int x);
 //
 // Useful miscellaneous functions
 //
-ILboolean	iCheckExtension(const ILstring Arg, const ILstring Ext);
+ILboolean	iCheckExtension(ILconst_string Arg, ILconst_string Ext);
 ILbyte*		iFgets(char *buffer, ILuint maxlen);
-ILboolean	iFileExists(const ILstring FileName);
-ILstring	iGetExtension(const ILstring FileName);
-char*		ilStrDup(const char *Str);
-ILuint		ilStrLen(const char *Str);
+ILboolean	iFileExists(ILconst_string FileName);
+ILstring	iGetExtension(ILconst_string FileName);
+ILstring	ilStrDup(ILconst_string Str);
+ILuint		ilStrLen(ILconst_string Str);
+ILuint		ilCharStrLen(const char *Str);
 // Miscellaneous functions
-ILvoid					ilDefaultStates(ILvoid);
+void					ilDefaultStates(void);
 ILenum					iGetHint(ILenum Target);
 ILint					iGetInt(ILenum Mode);
-ILvoid					ilRemoveRegistered(ILvoid);
-ILAPI ILvoid ILAPIENTRY	ilSetCurImage(ILimage *Image);
+void					ilRemoveRegistered(void);
+ILAPI void ILAPIENTRY	ilSetCurImage(ILimage *Image);
+ILuint					ilDetermineSize(ILenum Type);
 //
 // Rle compression
 //
@@ -151,230 +183,283 @@ ILAPI ILvoid ILAPIENTRY	ilSetCurImage(ILimage *Image);
 #define     IL_BMPCOMP 0x04
 ILboolean	ilRleCompressLine(ILubyte *ScanLine, ILuint Width, ILubyte Bpp, ILubyte *Dest, ILuint *DestWidth, ILenum CompressMode);
 ILuint		ilRleCompress(ILubyte *Data, ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp, ILubyte *Dest, ILenum CompressMode, ILuint *ScanTable);
-ILvoid		iSetImage0(ILvoid);
+void		iSetImage0(void);
+// DXTC compression
+ILuint		ilNVidiaCompressDXTFile(ILubyte *Data, ILuint Width, ILuint Height, ILuint Depth, ILenum DxtType);
+ILAPI ILubyte*	ILAPIENTRY ilNVidiaCompressDXT(ILubyte *Data, ILuint Width, ILuint Height, ILuint Depth, ILenum DxtFormat, ILuint *DxtSize);
+ILAPI ILubyte* ILAPIENTRY ilSquishCompressDXT(ILubyte *Data, ILuint Width, ILuint Height, ILuint Depth, ILenum DxtFormat, ILuint *DxtSize);
+
 // Conversion functions
-ILboolean	ilAddAlpha(ILvoid);
+ILboolean	ilAddAlpha(void);
 ILboolean	ilAddAlphaKey(ILimage *Image);
 ILboolean	iFastConvert(ILenum DestFormat);
-ILboolean	ilFixImage(ILvoid);
-ILboolean	ilRemoveAlpha(ILvoid);
-ILboolean	ilSwapColours(ILvoid);
+ILboolean	ilFixCur(void);
+ILboolean	ilFixImage(void);
+ILboolean	ilRemoveAlpha(void);
+ILboolean	ilSwapColours(void);
 // Miscellaneous functions
-char *iGetString(ILenum StringName);  // Internal version of ilGetString
-// Library usage
-#if _MSC_VER && !_WIN32_WCE
-	#ifndef IL_NO_JPG
-		#ifdef IL_USE_IJL
-			//pragma comment(lib, "ijl15.lib")
-		#else
-			#ifndef IL_DEBUG
-				//pragma comment(lib, "libjpeg.lib")
-			#else
-				//ragma comment(lib, "debug/libjpeg.lib")
-			#endif
-		#endif
-	#endif
-	#ifndef IL_NO_MNG
-		#ifndef IL_DEBUG
-			//pragma comment(lib, "libmng.lib")
-			//pragma comment(lib, "libjpeg.lib")  // For JNG support.
-		#else
-			//pragma comment(lib, "debug/libmng.lib")
-			//pragma comment(lib, "debug/libjpeg.lib")  // For JNG support.
-		#endif
-	#endif
-	#ifndef IL_NO_PNG
-		#ifndef IL_DEBUG
-			//pragma comment(lib, "libpng.lib")
-		#else
-			//pragma comment(lib, "debug/libpng.lib")
-		#endif
-	#endif
-	#ifndef IL_NO_TIF
-		#ifndef IL_DEBUG
-			//pragma comment(lib, "libtiff.lib")
-		#else
-			//pragma comment(lib, "debug/libtiff.lib")
-		#endif
-	#endif
-	#if !defined(IL_NO_MNG) || !defined(IL_NO_PNG)
-		#ifndef IL_DEBUG
-			//pragma comment(lib, "zlib.lib")
-		#else
-			//pragma comment(lib, "debug/zlib.lib")
-		#endif
-	#endif
-#endif
+char*		iGetString(ILenum StringName);  // Internal version of ilGetString
+
 //
 // Image loading/saving functions
 //
-ILboolean ilIsValidBmp(const ILstring FileName);
+ILboolean ilIsValidBmp(ILconst_string CONST_RESTRICT FileName);
 ILboolean ilIsValidBmpF(ILHANDLE File);
-ILboolean ilIsValidBmpL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadBmp(const ILstring FileName);
+ILboolean ilIsValidBmpL(const void *Lump, const ILuint Size);
+ILboolean ilLoadBmp(ILconst_string FileName);
 ILboolean ilLoadBmpF(ILHANDLE File);
-ILboolean ilLoadBmpL(const ILvoid *Lump, ILuint Size);
-ILboolean ilSaveBmp(const ILstring FileName);
-ILboolean ilSaveBmpF(ILHANDLE File);
-ILboolean ilSaveBmpL(ILvoid *Lump, ILuint Size);
-ILboolean ilSaveCHeader(const ILstring FileName, const char *InternalName);
-ILboolean ilLoadCut(const ILstring FileName);
+ILboolean ilLoadBmpL(const void *Lump, const ILuint Size);
+ILboolean ilSaveBmp(ILconst_string FileName);
+ILuint    ilSaveBmpF(ILHANDLE File);
+ILuint    ilSaveBmpL(void *Lump, ILuint Size);
+ILboolean ilSaveCHeader(ILconst_string FileName, char *InternalName);
+ILboolean ilLoadCut(ILconst_string FileName);
 ILboolean ilLoadCutF(ILHANDLE File);
-ILboolean ilLoadCutL(const ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidDcx(const ILstring FileName);
+ILboolean ilLoadCutL(const void *Lump, ILuint Size);
+ILboolean ilIsValidDcx(ILconst_string FileName);
 ILboolean ilIsValidDcxF(ILHANDLE File);
-ILboolean ilIsValidDcxL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadDcx(const ILstring FileName);
+ILboolean ilIsValidDcxL(const void *Lump, ILuint Size);
+ILboolean ilLoadDcx(ILconst_string FileName);
 ILboolean ilLoadDcxF(ILHANDLE File);
-ILboolean ilLoadDcxL(const ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidDds(const ILstring FileName);
+ILboolean ilLoadDcxL(const void *Lump, ILuint Size);
+ILboolean ilIsValidDds(ILconst_string FileName);
 ILboolean ilIsValidDdsF(ILHANDLE File);
-ILboolean ilIsValidDdsL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadDds(const ILstring FileName);
+ILboolean ilIsValidDdsL(const void *Lump, ILuint Size);
+ILboolean ilLoadDds(ILconst_string FileName);
 ILboolean ilLoadDdsF(ILHANDLE File);
-ILboolean ilLoadDdsL(const ILvoid *Lump, ILuint Size);
-ILboolean ilSaveDds(const ILstring FileName);
-ILboolean ilSaveDdsF(ILHANDLE File);
-ILboolean ilSaveDdsL(ILvoid *Lump, ILuint Size);
-ILboolean ilLoadDoom(const ILstring FileName);
+ILboolean ilLoadDdsL(const void *Lump, ILuint Size);
+ILboolean ilSaveDds(ILconst_string FileName);
+ILuint    ilSaveDdsF(ILHANDLE File);
+ILuint    ilSaveDdsL(void *Lump, ILuint Size);
+ILboolean ilLoadDoom(ILconst_string FileName);
 ILboolean ilLoadDoomF(ILHANDLE File);
-ILboolean ilLoadDoomL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadDoomFlat(const ILstring FileName);
+ILboolean ilLoadDoomL(const void *Lump, ILuint Size);
+ILboolean ilLoadDoomFlat(ILconst_string FileName);
 ILboolean ilLoadDoomFlatF(ILHANDLE File);
-ILboolean ilLoadDoomFlatL(const ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidGif(const ILstring FileName);
+ILboolean ilLoadDoomFlatL(const void *Lump, ILuint Size);
+ILboolean ilIsValidExr(ILconst_string FileName);
+ILboolean ilIsValidExrF(ILHANDLE File);
+ILboolean ilIsValidExrL(const void *Lump, ILuint Size);
+ILboolean ilLoadExr(ILconst_string FileName);
+ILboolean ilLoadExrF(ILHANDLE File);
+ILboolean ilLoadExrL(const void *Lump, ILuint Size);
+ILboolean ilSaveExr(ILconst_string FileName);
+ILuint    ilSaveExrF(ILHANDLE File);
+ILuint    ilSaveExrL(void *Lump, ILuint Size);
+ILboolean ilLoadFits(ILconst_string FileName);
+ILboolean ilLoadFitsF(ILHANDLE File);
+ILboolean ilLoadFitsL(const void *Lump, ILuint Size);
+ILboolean ilIsValidGif(ILconst_string FileName);
 ILboolean ilIsValidGifF(ILHANDLE File);
-ILboolean ilIsValidGifL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadGif(const ILstring FileName);
+ILboolean ilIsValidGifL(const void *Lump, ILuint Size);
+ILboolean ilLoadGif(ILconst_string FileName);
 ILboolean ilLoadGifF(ILHANDLE File);
-ILboolean ilLoadGifL(const ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidHdr(const ILstring FileName);
+ILboolean ilLoadGifL(const void *Lump, ILuint Size);
+ILboolean ilIsValidHdr(ILconst_string FileName);
 ILboolean ilIsValidHdrF(ILHANDLE File);
-ILboolean ilIsValidHdrL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadHdr(const ILstring FileName);
+ILboolean ilIsValidHdrL(const void *Lump, ILuint Size);
+ILboolean ilLoadHdr(ILconst_string FileName);
 ILboolean ilLoadHdrF(ILHANDLE File);
-ILboolean ilLoadHdrL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadIcon(const ILstring FileName);
+ILboolean ilLoadHdrL(const void *Lump, ILuint Size);
+ILboolean ilSaveHdr(ILconst_string FileName);
+ILuint    ilSaveHdrF(ILHANDLE File);
+ILuint    ilSaveHdrL(void *Lump, ILuint Size);
+ILboolean ilLoadIcon(ILconst_string FileName);
 ILboolean ilLoadIconF(ILHANDLE File);
-ILboolean ilLoadIconL(const ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidJpg(const ILstring FileName);
-ILboolean ilIsValidJpgF(ILHANDLE File);
-ILboolean ilIsValidJpgL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadJpeg(const ILstring FileName);
+ILboolean ilLoadIconL(const void *Lump, ILuint Size);
+ILboolean ilIsValidIcns(ILconst_string FileName);
+ILboolean ilIsValidIcnsF(ILHANDLE File);
+ILboolean ilIsValidIcnsL(const void *Lump, ILuint Size);
+ILboolean ilLoadIcns(ILconst_string FileName);
+ILboolean ilLoadIcnsF(ILHANDLE File);
+ILboolean ilLoadIcnsL(const void *Lump, ILuint Size);
+ILboolean ilLoadIff(ILconst_string FileName);
+ILboolean ilLoadIffF(ILHANDLE File);
+ILboolean ilLoadIffL(const void *Lump, ILuint Size);
+ILboolean ilIsValidJp2(ILconst_string FileName);
+ILboolean ilIsValidJp2F(ILHANDLE File);
+ILboolean ilIsValidJp2L(const void *Lump, ILuint Size);
+ILboolean ilLoadJp2(ILconst_string FileName);
+ILboolean ilLoadJp2F(ILHANDLE File);
+ILboolean ilLoadJp2L(const void *Lump, ILuint Size);
+ILboolean ilLoadJp2LInternal(const void *Lump, ILuint Size, ILimage *Image);
+ILboolean ilSaveJp2(ILconst_string FileName);
+ILuint    ilSaveJp2F(ILHANDLE File);
+ILuint    ilSaveJp2L(void *Lump, ILuint Size);
+ILboolean ilIsValidJpeg(ILconst_string FileName);
+ILboolean ilIsValidJpegF(ILHANDLE File);
+ILboolean ilIsValidJpegL(const void *Lump, ILuint Size);
+ILboolean ilLoadJpeg(ILconst_string FileName);
 ILboolean ilLoadJpegF(ILHANDLE File);
-ILboolean ilLoadJpegL(const ILvoid *Lump, ILuint Size);
-ILboolean ilSaveJpeg(const ILstring FileName);
-ILboolean ilSaveJpegF(ILHANDLE File);
-ILboolean ilSaveJpegL(ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidLif(const ILstring FileName);
+ILboolean ilLoadJpegL(const void *Lump, ILuint Size);
+ILboolean ilSaveJpeg(ILconst_string FileName);
+ILuint    ilSaveJpegF(ILHANDLE File);
+ILuint    ilSaveJpegL(void *Lump, ILuint Size);
+ILboolean ilIsValidLif(ILconst_string FileName);
 ILboolean ilIsValidLifF(ILHANDLE File);
-ILboolean ilIsValidLifL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadLif(const ILstring FileName);
+ILboolean ilIsValidLifL(const void *Lump, ILuint Size);
+ILboolean ilLoadLif(ILconst_string FileName);
 ILboolean ilLoadLifF(ILHANDLE File);
-ILboolean ilLoadLifL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadMdl(const ILstring FileName);
+ILboolean ilLoadLifL(const void *Lump, ILuint Size);
+ILboolean ilIsValidMdl(ILconst_string FileName);
+ILboolean ilIsValidMdlF(ILHANDLE File);
+ILboolean ilIsValidMdlL(const void *Lump, ILuint Size);
+ILboolean ilLoadMdl(ILconst_string FileName);
 ILboolean ilLoadMdlF(ILHANDLE File);
-ILboolean ilLoadMdlL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadMng(const ILstring FileName);
+ILboolean ilLoadMdlL(const void *Lump, ILuint Size);
+ILboolean ilLoadMng(ILconst_string FileName);
 ILboolean ilLoadMngF(ILHANDLE File);
-ILboolean ilLoadMngL(const ILvoid *Lump, ILuint Size);
-ILboolean ilSaveMng(const ILstring FileName);
-ILboolean ilSaveMngF(ILHANDLE File);
-ILboolean ilSaveMngL(ILvoid *Lump, ILuint Size);
-ILboolean ilLoadPcd(const ILstring FileName);
+ILboolean ilLoadMngL(const void *Lump, ILuint Size);
+ILboolean ilSaveMng(ILconst_string FileName);
+ILuint    ilSaveMngF(ILHANDLE File);
+ILuint    ilSaveMngL(void *Lump, ILuint Size);
+ILboolean ilLoadPcd(ILconst_string FileName);
 ILboolean ilLoadPcdF(ILHANDLE File);
-ILboolean ilLoadPcdL(const ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidPcx(const ILstring FileName);
+ILboolean ilLoadPcdL(const void *Lump, ILuint Size);
+ILboolean ilIsValidPcx(ILconst_string FileName);
 ILboolean ilIsValidPcxF(ILHANDLE File);
-ILboolean ilIsValidPcxL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadPcx(const ILstring FileName);
+ILboolean ilIsValidPcxL(const void *Lump, ILuint Size);
+ILboolean ilLoadPcx(ILconst_string FileName);
 ILboolean ilLoadPcxF(ILHANDLE File);
-ILboolean ilLoadPcxL(const ILvoid *Lump, ILuint Size);
-ILboolean ilSavePcx(const ILstring FileName);
-ILboolean ilSavePcxF(ILHANDLE File);
-ILboolean ilSavePcxL(ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidPic(const ILstring FileName);
+ILboolean ilLoadPcxL(const void *Lump, ILuint Size);
+ILboolean ilSavePcx(ILconst_string FileName);
+ILuint    ilSavePcxF(ILHANDLE File);
+ILuint    ilSavePcxL(void *Lump, ILuint Size);
+ILboolean ilIsValidPic(ILconst_string FileName);
 ILboolean ilIsValidPicF(ILHANDLE File);
-ILboolean ilIsValidPicL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadPic(const ILstring FileName);
+ILboolean ilIsValidPicL(const void *Lump, ILuint Size);
+ILboolean ilLoadPic(ILconst_string FileName);
 ILboolean ilLoadPicF(ILHANDLE File);
-ILboolean ilLoadPicL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadPix(const ILstring FileName);
+ILboolean ilLoadPicL(const void *Lump, ILuint Size);
+ILboolean ilLoadPix(ILconst_string FileName);
 ILboolean ilLoadPixF(ILHANDLE File);
-ILboolean ilLoadPixL(const ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidPng(const ILstring FileName);
+ILboolean ilLoadPixL(const void *Lump, ILuint Size);
+ILboolean ilIsValidPng(ILconst_string FileName);
 ILboolean ilIsValidPngF(ILHANDLE File);
-ILboolean ilIsValidPngL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadPng(const ILstring FileName);
+ILboolean ilIsValidPngL(const void *Lump, ILuint Size);
+ILboolean ilLoadPng(ILconst_string FileName);
 ILboolean ilLoadPngF(ILHANDLE File);
-ILboolean ilLoadPngL(const ILvoid *Lump, ILuint Size);
-ILboolean ilSavePng(const ILstring FileName);
-ILboolean ilSavePngF(ILHANDLE File);
-ILboolean ilSavePngL(ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidPnm(const ILstring FileName);
+ILboolean ilLoadPngL(const void *Lump, ILuint Size);
+ILboolean ilSavePng(ILconst_string FileName);
+ILuint    ilSavePngF(ILHANDLE File);
+ILuint    ilSavePngL(void *Lump, ILuint Size);
+ILboolean ilIsValidPnm(ILconst_string FileName);
 ILboolean ilIsValidPnmF(ILHANDLE File);
-ILboolean ilIsValidPnmL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadPnm(const ILstring FileName);
+ILboolean ilIsValidPnmL(const void *Lump, ILuint Size);
+ILboolean ilLoadPnm(ILconst_string FileName);
 ILboolean ilLoadPnmF(ILHANDLE File);
-ILboolean ilLoadPnmL(const ILvoid *Lump, ILuint Size);
-ILboolean ilSavePnm(const ILstring FileName);
-ILboolean ilSavePnmF(ILHANDLE File);
-ILboolean ilSavePnmL(ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidPsd(const ILstring FileName);
+ILboolean ilLoadPnmL(const void *Lump, ILuint Size);
+ILboolean ilSavePnm(ILconst_string FileName);
+ILuint    ilSavePnmF(ILHANDLE File);
+ILuint    ilSavePnmL(void *Lump, ILuint Size);
+ILboolean ilIsValidPsd(ILconst_string FileName);
 ILboolean ilIsValidPsdF(ILHANDLE File);
-ILboolean ilIsValidPsdL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadPsd(const ILstring FileName);
+ILboolean ilIsValidPsdL(const void *Lump, ILuint Size);
+ILboolean ilLoadPsd(ILconst_string FileName);
 ILboolean ilLoadPsdF(ILHANDLE File);
-ILboolean ilLoadPsdL(const ILvoid *Lump, ILuint Size);
-ILboolean ilSavePsd(const ILstring FileName);
-ILboolean ilSavePsdF(ILHANDLE File);
-ILboolean ilSavePsdL(ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidPsp(const ILstring FileName);
+ILboolean ilLoadPsdL(const void *Lump, ILuint Size);
+ILboolean ilSavePsd(ILconst_string FileName);
+ILuint    ilSavePsdF(ILHANDLE File);
+ILuint    ilSavePsdL(void *Lump, ILuint Size);
+ILboolean ilIsValidPsp(ILconst_string FileName);
 ILboolean ilIsValidPspF(ILHANDLE File);
-ILboolean ilIsValidPspL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadPsp(const ILstring FileName);
+ILboolean ilIsValidPspL(const void *Lump, ILuint Size);
+ILboolean ilLoadPsp(ILconst_string FileName);
 ILboolean ilLoadPspF(ILHANDLE File);
-ILboolean ilLoadPspL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadPxr(const ILstring FileName);
+ILboolean ilLoadPspL(const void *Lump, ILuint Size);
+ILboolean ilLoadPxr(ILconst_string FileName);
 ILboolean ilLoadPxrF(ILHANDLE File);
-ILboolean ilLoadPxrL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadRaw(const ILstring FileName);
+ILboolean ilLoadPxrL(const void *Lump, ILuint Size);
+ILboolean ilLoadRaw(ILconst_string FileName);
 ILboolean ilLoadRawF(ILHANDLE File);
-ILboolean ilLoadRawL(const ILvoid *Lump, ILuint Size);
-ILboolean ilSaveRaw(const ILstring FileName);
-ILboolean ilSaveRawF(ILHANDLE File);
-ILboolean ilSaveRawL(ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidSgi(const ILstring FileName);
+ILboolean ilLoadRawL(const void *Lump, ILuint Size);
+ILboolean ilSaveRaw(ILconst_string FileName);
+ILuint    ilSaveRawF(ILHANDLE File);
+ILuint    ilSaveRawL(void *Lump, ILuint Size);
+ILboolean ilIsValidSgi(ILconst_string FileName);
 ILboolean ilIsValidSgiF(ILHANDLE File);
-ILboolean ilIsValidSgiL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadSgi(const ILstring FileName);
+ILboolean ilIsValidSgiL(const void *Lump, ILuint Size);
+ILboolean ilLoadSgi(ILconst_string FileName);
 ILboolean ilLoadSgiF(ILHANDLE File);
-ILboolean ilLoadSgiL(const ILvoid *Lump, ILuint Size);
-ILboolean ilSaveSgi(const ILstring FileName);
-ILboolean ilSaveSgiF(ILHANDLE File);
-ILboolean ilSaveSgiL(ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidTga(const ILstring FileName);
+ILboolean ilLoadSgiL(const void *Lump, ILuint Size);
+ILboolean ilSaveSgi(ILconst_string FileName);
+ILuint    ilSaveSgiF(ILHANDLE File);
+ILuint    ilSaveSgiL(void *Lump, ILuint Size);
+ILboolean ilIsValidSun(ILconst_string FileName);
+ILboolean ilIsValidSunF(ILHANDLE File);
+ILboolean ilIsValidSunL(const void *Lump, ILuint Size);
+ILboolean ilLoadSun(ILconst_string FileName);
+ILboolean ilLoadSunF(ILHANDLE File);
+ILboolean ilLoadSunL(const void *Lump, ILuint Size);
+ILboolean ilIsValidTga(ILconst_string FileName);
 ILboolean ilIsValidTgaF(ILHANDLE File);
-ILboolean ilIsValidTgaL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadTarga(const ILstring FileName);
+ILboolean ilIsValidTgaL(const void *Lump, ILuint Size);
+ILboolean ilLoadTarga(ILconst_string FileName);
 ILboolean ilLoadTargaF(ILHANDLE File);
-ILboolean ilLoadTargaL(const ILvoid *Lump, ILuint Size);
-ILboolean ilSaveTarga(const ILstring FileName);
-ILboolean ilSaveTargaF(ILHANDLE File);
-ILboolean ilSaveTargaL(ILvoid *Lump, ILuint Size);
-ILboolean ilIsValidTiff(const ILstring FileName);
+ILboolean ilLoadTargaL(const void *Lump, ILuint Size);
+ILboolean ilSaveTarga(ILconst_string FileName);
+ILuint    ilSaveTargaF(ILHANDLE File);
+ILuint    ilSaveTargaL(void *Lump, ILuint Size);
+ILboolean ilIsValidTiff(ILconst_string FileName);
 ILboolean ilIsValidTiffF(ILHANDLE File);
-ILboolean ilIsValidTiffL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadTiff(const ILstring FileName);
+ILboolean ilIsValidTiffL(const void *Lump, ILuint Size);
+ILboolean ilLoadTiff(ILconst_string FileName);
 ILboolean ilLoadTiffF(ILHANDLE File);
-ILboolean ilLoadTiffL(const ILvoid *Lump, ILuint Size);
-ILboolean ilSaveTiff(const ILstring FileName);
-ILboolean ilSaveTiffF(ILHANDLE File);
-ILboolean ilSaveTiffL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadWal(const ILstring FileName);
+ILboolean ilLoadTiffL(const void *Lump, ILuint Size);
+ILboolean ilSaveTiff(ILconst_string FileName);
+ILuint    ilSaveTiffF(ILHANDLE File);
+ILuint    ilSaveTiffL(void *Lump, ILuint Size);
+ILboolean ilIsValidTpl(ILconst_string FileName);
+ILboolean ilIsValidTplF(ILHANDLE File);
+ILboolean ilIsValidTplL(const void *Lump, ILuint Size);
+ILboolean ilLoadTpl(ILconst_string FileName);
+ILboolean ilLoadTplF(ILHANDLE File);
+ILboolean ilLoadTplL(const void *Lump, ILuint Size);
+ILboolean ilIsValidVtf(ILconst_string FileName);
+ILboolean ilIsValidVtfF(ILHANDLE File);
+ILboolean ilIsValidVtfL(const void *Lump, ILuint Size);
+ILboolean ilLoadVtf(ILconst_string FileName);
+ILboolean ilLoadVtfF(ILHANDLE File);
+ILboolean ilLoadVtfL(const void *Lump, ILuint Size);
+ILboolean ilLoadWal(ILconst_string FileName);
 ILboolean ilLoadWalF(ILHANDLE File);
-ILboolean ilLoadWalL(const ILvoid *Lump, ILuint Size);
-ILboolean ilLoadXpm(const ILstring FileName);
+ILboolean ilLoadWalL(const void *Lump, ILuint Size);
+ILboolean ilLoadWbmp(ILconst_string FileName);
+ILboolean ilLoadWbmpF(ILHANDLE File);
+ILboolean ilLoadWbmpL(const void *Lump, ILuint Size);
+ILboolean ilSaveWbmp(ILconst_string FileName);
+ILuint    ilSaveWbmpF(ILHANDLE File);
+ILuint    ilSaveWbmpL(void *Lump, ILuint Size);
+ILboolean ilIsValidWdp(ILconst_string FileName);
+ILboolean ilIsValidWdpF(ILHANDLE File);
+ILboolean ilIsValidWdpL(const void *Lump, ILuint Size);
+ILboolean ilLoadWdp(ILconst_string FileName);
+ILboolean ilLoadWdpF(ILHANDLE File);
+ILboolean ilLoadWdpL(const void *Lump, ILuint Size);
+ILboolean ilIsValidXpm(ILconst_string FileName);
+ILboolean ilIsValidXpmF(ILHANDLE File);
+ILboolean ilIsValidXpmL(const void *Lump, ILuint Size);
+ILboolean ilLoadXpm(ILconst_string FileName);
 ILboolean ilLoadXpmF(ILHANDLE File);
-ILboolean ilLoadXpmL(const ILvoid *Lump, ILuint Size);
+ILboolean ilLoadXpmL(const void *Lump, ILuint Size);
+
+
+// OpenEXR is written in C++, so we have to wrap this to avoid linker errors.
+/*#ifndef IL_NO_EXR
+	#ifdef __cplusplus
+	extern "C" {
+	#endif
+		ILboolean ilLoadExr(ILconst_string FileName);
+	#ifdef __cplusplus
+	}
+	#endif
+#endif*/
+
+//ILboolean ilLoadExr(ILconst_string FileName);
+
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif//INTERNAL_H

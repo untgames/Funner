@@ -14,7 +14,7 @@
 #include "ilu_internal.h"
 
 
-ILvoid ILAPIENTRY iluDeleteImage(ILuint Id)
+void ILAPIENTRY iluDeleteImage(ILuint Id)
 {
 	ilDeleteImages(1, &Id);
 	return;
@@ -31,7 +31,7 @@ ILuint ILAPIENTRY iluGenImage()
 
 
 //! Retrieves information about the current bound image.
-ILvoid ILAPIENTRY iluGetImageInfo(ILinfo *Info)
+void ILAPIENTRY iluGetImageInfo(ILinfo *Info)
 {
 	iluCurImage = ilGetCurImage();
 	if (iluCurImage == NULL || Info == NULL) {
@@ -52,9 +52,12 @@ ILvoid ILAPIENTRY iluGetImageInfo(ILinfo *Info)
 	Info->Palette		= iluCurImage->Pal.Palette;
 	Info->PalType		= iluCurImage->Pal.PalType;
 	Info->PalSize		= iluCurImage->Pal.PalSize;
-	iGetIntegervImage(iluCurImage, IL_NUM_IMAGES, (ILint*)&Info->NumNext);
-	iGetIntegervImage(iluCurImage, IL_NUM_MIPMAPS, (ILint*)Info->NumMips);
-	iGetIntegervImage(iluCurImage, IL_NUM_LAYERS, (ILint*)Info->NumLayers);
+	iGetIntegervImage(iluCurImage, IL_NUM_IMAGES,             
+	                        (ILint*)&Info->NumNext);
+	iGetIntegervImage(iluCurImage, IL_NUM_MIPMAPS, 
+	                        (ILint*)&Info->NumMips);
+	iGetIntegervImage(iluCurImage, IL_NUM_LAYERS, 
+	                        (ILint*)&Info->NumLayers);
 	
 	return;
 }

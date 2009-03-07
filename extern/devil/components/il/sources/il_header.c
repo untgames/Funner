@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 02/19/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2008 by Denton Woods
+// Last modified: 10/10/2006
 //
 // Filename: src-IL/src/il_header.c
 //
@@ -18,12 +18,12 @@
 #define MAX_LINE_WIDTH 14
 
 //! Generates a C-style header file for the current image.
-ILboolean ilSaveCHeader(const ILstring FileName, const char *InternalName)
+ILboolean ilSaveCHeader(ILconst_string FileName, char *InternalName)
 {
-	FILE	*HeadFile;
-	ILuint	i = 0, j;
-	ILimage	*TempImage;
-	const char *Name;
+	FILE		*HeadFile;
+	ILuint		i = 0, j;
+	ILimage		*TempImage;
+	const char	*Name;
 
 	if (iCurImage == NULL) {
 		ilSetError(IL_ILLEGAL_OPERATION);
@@ -35,11 +35,7 @@ ILboolean ilSaveCHeader(const ILstring FileName, const char *InternalName)
 		Name = InternalName;
 
 	if (FileName == NULL || Name == NULL ||
-#ifndef _UNICODE
-		strlen(FileName) < 1 ||	strlen(Name) < 1) {
-#else
-		wcslen(FileName) < 1 || wcslen(FileName) < 1) {
-#endif//_UNICODE
+		ilStrLen(FileName) < 1 || ilCharStrLen(Name) < 1) {
 		ilSetError(IL_INVALID_VALUE);
 		return IL_FALSE;
 	}
@@ -64,13 +60,17 @@ ILboolean ilSaveCHeader(const ILstring FileName, const char *InternalName)
 		TempImage = iCurImage;
 	}
 
-#ifndef _WIN32_WCE
+#ifndef _UNICODE
 	HeadFile = fopen(FileName, "wb");
 #else
-	HeadFile = _wfopen(FileName, L"wb");
-#endif//_WIN32_WCE
+	#ifdef _WIN32
+		HeadFile = _wfopen(FileName, L"rb");
+	#else
+		HeadFile = fopen((char*)FileName, "rb");
+	#endif
 
-	
+#endif//_UNICODE
+
 	if (HeadFile == NULL) {
 		ilSetError(IL_COULD_NOT_OPEN_FILE);
         return IL_FALSE;

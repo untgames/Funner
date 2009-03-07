@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 01/29/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 01/29/2009
 //
 // Filename: src-IL/include/il_endian.h
 //
@@ -15,13 +15,15 @@
 
 #include "il_internal.h"
 
-#ifdef WORDS_BIGENDIAN //this is defined by ./configure
+#ifdef WORDS_BIGENDIAN  // This is defined by ./configure.
 	#ifndef __BIG_ENDIAN__
-	#define __BIG_ENDIAN__
+	#define __BIG_ENDIAN__ 1
 	#endif
 #endif
 
-#ifdef __BIG_ENDIAN__
+#if (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __BIG_ENDIAN__) \
+  || (defined(__BIG_ENDIAN__) && !defined(__LITTLE_ENDIAN__))
+ 	#undef __LITTLE_ENDIAN__
 	#define Short(s) iSwapShort(s)
 	#define UShort(s) iSwapUShort(s)
 	#define Int(i) iSwapInt(i)
@@ -36,6 +38,7 @@
 	#define BigFloat(f)  
 	#define BigDouble(d)  
 #else
+	#undef __BIG_ENDIAN__
 	#undef __LITTLE_ENDIAN__  // Not sure if it's defined by any compiler...
 	#define __LITTLE_ENDIAN__
 	#define Short(s)  
@@ -53,12 +56,12 @@
 	#define BigDouble(d) iSwapDouble(d)
 #endif
 
-ILvoid   iSwapUShort(ILushort *s);
-ILvoid   iSwapShort(ILshort *s);
-ILvoid   iSwapUInt(ILuint *i);
-ILvoid   iSwapInt(ILint *i);
-ILvoid   iSwapFloat(ILfloat *f);
-ILvoid   iSwapDouble(ILdouble *d);
+void   iSwapUShort(ILushort *s);
+void   iSwapShort(ILshort *s);
+void   iSwapUInt(ILuint *i);
+void   iSwapInt(ILint *i);
+void   iSwapFloat(ILfloat *f);
+void   iSwapDouble(ILdouble *d);
 ILushort GetLittleUShort();
 ILshort  GetLittleShort();
 ILuint   GetLittleUInt();
@@ -91,7 +94,7 @@ ILubyte SaveBigDouble(ILdouble d);
 #endif
 
 #ifndef NOINLINE
-INLINE ILvoid iSwapUShort(ILushort *s)  {
+INLINE void iSwapUShort(ILushort *s)  {
 	#ifdef USE_WIN32_ASM
 		__asm {
 			mov ebx, s
@@ -102,19 +105,19 @@ INLINE ILvoid iSwapUShort(ILushort *s)  {
 	#else
 	#ifdef GCC_X86_ASM
 		asm("ror $8,%0"
-			: 
-			: "r"  (*s) );
+			: "=r" (*s)
+			: "0" (*s));
 	#else
 		*s = ((*s)>>8) | ((*s)<<8);
 	#endif //GCC_X86_ASM
 	#endif //USE_WIN32_ASM
 }
 
-INLINE ILvoid iSwapShort(ILshort *s) {
+INLINE void iSwapShort(ILshort *s) {
 	iSwapUShort((ILushort*)s);
 }
 
-INLINE ILvoid iSwapUInt(ILuint *i) {
+INLINE void iSwapUInt(ILuint *i) {
 	#ifdef USE_WIN32_ASM
 		__asm {
 			mov ebx, i
@@ -124,23 +127,23 @@ INLINE ILvoid iSwapUInt(ILuint *i) {
 		}
 	#else
 	#ifdef GCC_X86_ASM
-			asm("bswap  %0;"
-				: "=r" (*i) );
+			asm("bswap %0;"
+				: "+r" (*i));
 	#else
 		*i = ((*i)>>24) | (((*i)>>8) & 0xff00) | (((*i)<<8) & 0xff0000) | ((*i)<<24);
 	#endif //GCC_X86_ASM
 	#endif //USE_WIN32_ASM
 }
 
-INLINE ILvoid iSwapInt(ILint *i) {
+INLINE void iSwapInt(ILint *i) {
 	iSwapUInt((ILuint*)i);
 }
 
-INLINE ILvoid iSwapFloat(ILfloat *f) {
+INLINE void iSwapFloat(ILfloat *f) {
 	iSwapUInt((ILuint*)f);
 }
 
-INLINE ILvoid iSwapDouble(ILdouble *d) {
+INLINE void iSwapDouble(ILdouble *d) {
 	#ifdef GCC_X86_ASM
 	int *t = (int*)d;
 	asm("bswap %2    \n"
@@ -367,8 +370,8 @@ INLINE ILubyte SaveBigDouble(ILdouble d) {
 #endif
 	return iwrite(&d, sizeof(ILdouble), 1);
 }
-#endif
+#endif//NOINLINE
 
-ILvoid		EndianSwapData(void *_Image);
+void		EndianSwapData(void *_Image);
 
 #endif//ENDIAN_H

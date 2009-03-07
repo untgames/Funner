@@ -20,7 +20,7 @@ ILboolean iLoadDataInternal(ILuint Width, ILuint Height, ILuint Depth, ILubyte B
 
 
 //! Reads a raw data file
-ILboolean ILAPIENTRY ilLoadData(const ILstring FileName, ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp)
+ILboolean ILAPIENTRY ilLoadData(ILconst_string FileName, ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp)
 {
 	ILHANDLE	RawFile;
 	ILboolean	bRaw = IL_FALSE;
@@ -60,7 +60,7 @@ ILboolean ILAPIENTRY ilLoadDataF(ILHANDLE File, ILuint Width, ILuint Height, ILu
 
 
 //! Reads from a raw data memory "lump"
-ILboolean ILAPIENTRY ilLoadDataL(ILvoid *Lump, ILuint Size, ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp)
+ILboolean ILAPIENTRY ilLoadDataL(void *Lump, ILuint Size, ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadDataInternal(Width, Height, Depth, Bpp);
@@ -98,7 +98,7 @@ ILboolean iLoadDataInternal(ILuint Width, ILuint Height, ILuint Depth, ILubyte B
 
 
 //! Save the current image to FileName as raw data
-ILboolean ILAPIENTRY ilSaveData(const ILstring FileName)
+ILboolean ILAPIENTRY ilSaveData(ILconst_string FileName)
 {
 	ILHANDLE DataFile;
 

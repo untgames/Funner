@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/25/2001 <--Y2K Compliant! =]
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 01/30/2009
 //
 // Filename: src-IL/src/il_wal.c
 //
@@ -29,11 +29,11 @@ typedef struct WALHEAD
 	ILuint	Value;			// ??
 } WALHEAD;
 
-ILboolean iLoadWalInternal(ILvoid);
+ILboolean iLoadWalInternal(void);
 
 
 //! Reads a .wal file
-ILboolean ilLoadWal(const ILstring FileName)
+ILboolean ilLoadWal(ILconst_string FileName)
 {
 	ILHANDLE	WalFile;
 	ILboolean	bWal = IL_FALSE;
@@ -67,7 +67,7 @@ ILboolean ilLoadWalF(ILHANDLE File)
 
 
 //! Reads from a memory "lump" that contains a .wal file
-ILboolean ilLoadWalL(const ILvoid *Lump, ILuint Size)
+ILboolean ilLoadWalL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadWalInternal();
@@ -86,12 +86,15 @@ ILboolean iLoadWalInternal()
 	}
 	CurImage = iCurImage;
 
-	//read header
+
+	// Read header
 	iread(&Header.FileName, 1, 32);
 	Header.Width = GetLittleUInt();
 	Header.Height = GetLittleUInt();
+
 	for (i = 0; i < 4; i++)
 		Header.Offsets[i] = GetLittleUInt();
+
 	iread(Header.AnimName, 1, 32);
 	Header.Flags = GetLittleUInt();
 	Header.Contents = GetLittleUInt();
@@ -127,8 +130,8 @@ ILboolean iLoadWalInternal()
 	iCurImage = CurImage;
 	ilCloseImage(iCurImage->Mipmaps);
 	iCurImage->Mipmaps = Mipmaps[0];
-	Mipmaps[0]->Next = Mipmaps[1];
-	Mipmaps[1]->Next = Mipmaps[2];
+	Mipmaps[0]->Mipmaps = Mipmaps[1];
+	Mipmaps[1]->Mipmaps = Mipmaps[2];
 
 	iCurImage->Origin = IL_ORIGIN_UPPER_LEFT;
 

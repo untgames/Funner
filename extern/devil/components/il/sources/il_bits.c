@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/25/2001 <--Y2K Compliant! =]
+// Copyright (C) 2000-2008 by Denton Woods
+// Last modified: 08/14/2004
 //
 // Filename: src-IL/src/il_bits.c
 //
@@ -60,7 +60,9 @@ ILint bclose(BITFILE *BitFile)
 	if (BitFile == NULL || BitFile->File == NULL)
 		return IL_EOF;
 
-	icloser(BitFile->File);
+	// Removed 01-26-2008.  The file will get closed later by
+	//  the calling function.
+	//icloser(BitFile->File);
 	ifree(BitFile);
 
 	return 0;
@@ -85,13 +87,13 @@ ILint bseek(BITFILE *BitFile, ILuint Offset, ILuint Mode)
 	switch (Mode)
 	{
 		case IL_SEEK_SET:
-			if (iseek(Offset >> 3, Mode)) {
+			if (!iseek(Offset >> 3, Mode)) {
 				BitFile->BitPos = Offset;
 				BitFile->ByteBitOff = BitFile->BitPos % 8;
 			}
 			break;
 		case IL_SEEK_CUR:
-			if (iseek(Offset >> 3, Mode)) {
+			if (!iseek(Offset >> 3, Mode)) {
 				BitFile->BitPos += Offset;
 				BitFile->ByteBitOff = BitFile->BitPos % 8;
 			}
@@ -102,7 +104,7 @@ ILint bseek(BITFILE *BitFile, ILuint Offset, ILuint Mode)
 			Len = itell();
 			iseek(0, IL_SEEK_SET);
 
-			if (iseek(Offset >> 3, Mode)) {
+			if (!iseek(Offset >> 3, Mode)) {
 				BitFile->BitPos = (Len << 3) + Offset;
 				BitFile->ByteBitOff = BitFile->BitPos % 8;
 			}
@@ -118,11 +120,12 @@ ILint bseek(BITFILE *BitFile, ILuint Offset, ILuint Mode)
 
 
 // hehe, "bread".  It reads data into Buffer from the BITFILE, just like fread for FILE.
-ILint bread(ILvoid *Buffer, ILuint Size, ILuint Number, BITFILE *BitFile)
+ILint bread(void *Buffer, ILuint Size, ILuint Number, BITFILE *BitFile)
 {
-	//Note that this function is somewhat useless: In binary image
-	//formats, there are some pad bits after each scanline. This
-	//function does not take that into account, so...
+	// Note that this function is somewhat useless: In binary image
+	// formats, there are some pad bits after each scanline. This
+	// function does not take that into account, so you must use bseek to
+	// skip the calculated value of bits.
 
 	ILuint	BuffPos = 0, Count = Size * Number;
 
@@ -143,8 +146,38 @@ ILint bread(ILvoid *Buffer, ILuint Size, ILuint Number, BITFILE *BitFile)
 }
 
 
+// Reads bits and puts the first bit in the file as the highest in the return value.
+ILuint breadVal(ILuint NumBits, BITFILE *BitFile)
+{
+	ILuint	BuffPos = 0;
+	ILuint	Buffer = 0;
+
+	// Only returning up to 32 bits at one time
+	if (NumBits > 32) {
+		ilSetError(IL_INTERNAL_ERROR);
+		return 0;
+	}
+
+	while (BuffPos < NumBits) {
+		Buffer <<= 1;
+		if (BitFile->ByteBitOff < 0 || BitFile->ByteBitOff > 7) {
+			BitFile->ByteBitOff = 7;
+			if (iread(&BitFile->Buff, 1, 1) != 1)  // Reached eof or error...
+				return BuffPos;
+		}
+
+		Buffer = Buffer + (ILubyte)!!(BitFile->Buff & (1 << BitFile->ByteBitOff));
+
+		BuffPos++;
+		BitFile->ByteBitOff--;
+	}
+
+	return BuffPos;
+}
+
+
 // Not implemented yet.
-/*ILint bwrite(ILvoid *Buffer, ILuint Size, ILuint Number, BITFILE *BitFile)
+/*ILint bwrite(void *Buffer, ILuint Size, ILuint Number, BITFILE *BitFile)
 {
 
 

@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Utility Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/25/2001 <--Y2K Compliant! =]
+// Copyright (C) 2000-2008 by Denton Woods
+// Last modified: 12/27/2008
 //
 // Filename: src-ILU/src/ilu_scale.c
 //
@@ -49,8 +49,12 @@ ILboolean ILAPIENTRY iluScale(ILuint Width, ILuint Height, ILuint Depth)
 	if (iluCurImage->Width == Width && iluCurImage->Height == Height && iluCurImage->Depth == Depth)
 		return IL_TRUE;
 
+	// A parameter of 0 is not valid.  Let's just assume that the user wanted a value of 1 instead.
+	if (Width == 0)  Width = 1;
+	if (Height == 0) Height = 1;
+	if (Depth == 0)  Depth = 1;
 
-	if( (iluCurImage->Width<Width) || (iluCurImage->Height<Height) ) // only do special scale if there is some zoom?
+	if ((iluCurImage->Width<Width) || (iluCurImage->Height<Height)) // only do special scale if there is some zoom?
 	{
 		switch (iluFilter)
 		{
@@ -75,13 +79,12 @@ ILboolean ILAPIENTRY iluScale(ILuint Width, ILuint Height, ILuint Depth)
 						return IL_FALSE;
 				}
 
-				if(iluCurImage->Width>Width) // shrink width first
+				if (iluCurImage->Width > Width) // shrink width first
 				{
 					Origin = iluCurImage->Origin;
 					Temp = iluScale_(iluCurImage, Width, iluCurImage->Height, iluCurImage->Depth);
-					if (Temp != NULL)
-					{
-						if( !ilTexImage(Temp->Width, Temp->Height, Temp->Depth, Temp->Bpp, Temp->Format, Temp->Type, Temp->Data ) ) {
+					if (Temp != NULL) {
+						if (!ilTexImage(Temp->Width, Temp->Height, Temp->Depth, Temp->Bpp, Temp->Format, Temp->Type, Temp->Data)) {
 							ilCloseImage(Temp);
 							return IL_FALSE;
 						}
@@ -89,14 +92,12 @@ ILboolean ILAPIENTRY iluScale(ILuint Width, ILuint Height, ILuint Depth)
 						ilCloseImage(Temp);
 					}
 				}
-				else
-				if(iluCurImage->Height>Height) // shrink height first
+				else if (iluCurImage->Height > Height) // shrink height first
 				{
 					Origin = iluCurImage->Origin;
 					Temp = iluScale_(iluCurImage, iluCurImage->Width, Height, iluCurImage->Depth);
-					if (Temp != NULL)
-					{
-						if( !ilTexImage(Temp->Width, Temp->Height, Temp->Depth, Temp->Bpp, Temp->Format, Temp->Type, Temp->Data) ) {
+					if (Temp != NULL) {
+						if (!ilTexImage(Temp->Width, Temp->Height, Temp->Depth, Temp->Bpp, Temp->Format, Temp->Type, Temp->Data)) {
 							ilCloseImage(Temp);
 							return IL_FALSE;
 						}
@@ -105,7 +106,7 @@ ILboolean ILAPIENTRY iluScale(ILuint Width, ILuint Height, ILuint Depth)
 					}
 				}
 
-				return iluScaleAdvanced(Width, Height, iluFilter);
+				return (ILboolean)iluScaleAdvanced(Width, Height, iluFilter);
 		}
 	}
 
@@ -115,7 +116,7 @@ ILboolean ILAPIENTRY iluScale(ILuint Width, ILuint Height, ILuint Depth)
 	PalType = iluCurImage->Pal.PalType;
 	Temp = iluScale_(iluCurImage, Width, Height, Depth);
 	if (Temp != NULL) {
-		if( !ilTexImage(Temp->Width, Temp->Height, Temp->Depth, Temp->Bpp, Temp->Format, Temp->Type, Temp->Data) ) {
+		if (!ilTexImage(Temp->Width, Temp->Height, Temp->Depth, Temp->Bpp, Temp->Format, Temp->Type, Temp->Data)) {
 			ilCloseImage(Temp);
 			return IL_FALSE;
 		}

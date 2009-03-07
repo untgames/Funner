@@ -34,11 +34,11 @@ typedef struct PIXHEAD
 #pragma pack(pop, pxr_struct)
 #endif
 
-ILboolean iLoadPxrInternal(ILvoid);
+ILboolean iLoadPxrInternal(void);
 
 
 //! Reads a Pxr file
-ILboolean ilLoadPxr(const ILstring FileName)
+ILboolean ilLoadPxr(ILconst_string FileName)
 {
 	ILHANDLE	PxrFile;
 	ILboolean	bPxr = IL_FALSE;
@@ -72,7 +72,7 @@ ILboolean ilLoadPxrF(ILHANDLE File)
 
 
 //! Reads from a memory "lump" that contains a Pxr
-ILboolean ilLoadPxrL(const ILvoid *Lump, ILuint Size)
+ILboolean ilLoadPxrL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadPxrInternal();
@@ -91,7 +91,7 @@ ILboolean iLoadPxrInternal()
 	Height = GetLittleUShort();
 	Width = GetLittleUShort();
 	iseek(424, IL_SEEK_SET);
-	Bpp = igetc();
+	Bpp = (ILubyte)igetc();
 
 	switch (Bpp)
 	{

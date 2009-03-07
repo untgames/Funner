@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/24/2001 <--Y2K Compliant! =]
+// Copyright (C) 2000-2008 by Denton Woods
+// Last modified: 11/07/2008
 //
 // Filename: src-IL/src/il_states.h
 //
@@ -46,6 +46,8 @@ typedef struct IL_STATES
 	ILboolean	ilDefaultOnFail;
 	// Key colour states
 	ILboolean	ilUseKeyColour;
+	// Alpha blend states
+	ILboolean	ilBlitBlend;
 	// Compression states
 	ILenum		ilCompression;
 	// Interlace states
@@ -56,6 +58,8 @@ typedef struct IL_STATES
 	ILuint		ilQuantMaxIndexs;
 	// DXTC states
 	ILboolean	ilKeepDxtcData;
+	ILboolean	ilUseNVidiaDXT;
+	ILboolean	ilUseSquishDXT;
 
 
 	//
@@ -69,6 +73,7 @@ typedef struct IL_STATES
 	ILboolean	ilBmpRle;
 	ILboolean	ilSgiRle;
 	ILenum		ilJpgFormat;
+	ILboolean	ilJpgProgressive;
 	ILenum		ilDxtcFormat;
 	ILenum		ilPcdPicNum;
 
@@ -79,17 +84,17 @@ typedef struct IL_STATES
 	// Format-specific strings
 	//
 
-	char		*ilTgaId;
-	char		*ilTgaAuthName;
-	char		*ilTgaAuthComment;
-	char		*ilPngAuthName;
-	char		*ilPngTitle;
-	char		*ilPngDescription;
-	char		*ilTifDescription;
-	char		*ilTifHostComputer;
-	char		*ilTifDocumentName;
-	char		*ilTifAuthName;
-	char		*ilCHeader;
+	char*		ilTgaId;
+	char*		ilTgaAuthName;
+	char*		ilTgaAuthComment;
+	char*		ilPngAuthName;
+	char*		ilPngTitle;
+	char*		ilPngDescription;
+	char*		ilTifDescription;
+	char*		ilTifHostComputer;
+	char*		ilTifDocumentName;
+	char*		ilTifAuthName;
+	char*		ilCHeader;
 
 
 
@@ -141,6 +146,12 @@ IL_HINTS ilHints;
 	#define IL_DDS_EXT ""
 #endif
 
+#ifndef IL_NO_EXR
+	#define IL_EXR_EXT "exr "
+#else
+	#define IL_EXR_EXT ""
+#endif
+
 #ifndef IL_NO_GIF
 	#define IL_GIF_EXT "gif "
 #else
@@ -153,10 +164,28 @@ IL_HINTS ilHints;
 	#define IL_HDR_EXT ""
 #endif
 
+#ifndef IL_NO_ICNS
+	#define IL_ICNS_EXT "icns "
+#else
+	#define IL_ICNS_EXT ""
+#endif
+
 #ifndef IL_NO_ICO
 	#define IL_ICO_EXT "ico cur "
 #else
 	#define IL_ICO_EXT ""
+#endif
+
+#ifndef IL_NO_IFF
+	#define IL_IFF_EXT "iff "
+#else
+	#define IL_IFF_EXT ""
+#endif
+
+#ifndef IL_NO_JP2
+	#define IL_JP2_EXT "jp2 "
+#else
+	#define IL_JP2_EXT ""
 #endif
 
 #ifndef IL_NO_JPG
@@ -181,6 +210,12 @@ IL_HINTS ilHints;
 	#define IL_MNG_EXT "mng jng "
 #else
 	#define IL_MNG_EXT ""
+#endif
+
+#ifndef IL_NO_PCD
+	#define IL_PCD_EXT "pcd "
+#else
+	#define IL_PCD_EXT ""
 #endif
 
 #ifndef IL_NO_PCX
@@ -231,10 +266,22 @@ IL_HINTS ilHints;
 	#define IL_PXR_EXT ""
 #endif
 
+#ifndef IL_NO_RAW
+	#define IL_RAW_EXT "raw "
+#else
+	#define IL_RAW_EXT ""
+#endif
+
 #ifndef IL_NO_SGI
 	#define IL_SGI_EXT "sgi bw rgb rgba "
 #else
 	#define IL_SGI_EXT ""
+#endif
+
+#ifndef IL_NO_SUN
+	#define IL_SUN_EXT "sun "
+#else
+	#define IL_SUN_EXT ""
 #endif
 
 #ifndef IL_NO_TGA
@@ -249,10 +296,22 @@ IL_HINTS ilHints;
 	#define IL_TIF_EXT ""
 #endif
 
+#ifndef IL_NO_VTF
+	#define IL_VTF_EXT "vtf "
+#else
+	#define IL_VTF_EXT ""
+#endif
+
 #ifndef IL_NO_WAL
 	#define IL_WAL_EXT "wal "
 #else
 	#define IL_WAL_EXT ""
+#endif
+
+#ifndef IL_NO_WBMP
+	#define IL_WBMP_EXT "wbmp "
+#else
+	#define IL_WBMP_EXT ""
 #endif
 
 #ifndef IL_NO_XPM

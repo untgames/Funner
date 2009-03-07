@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 02/01/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2008 by Denton Woods
+// Last modified: 12/14/2008
 //
 // Filename: src-IL/src/il_png.c
 //
@@ -22,41 +22,43 @@
 #include "il_manip.h"
 #include <stdlib.h>
 #if PNG_LIBPNG_VER < 10200
-	#warning DevIL was designed with libpng 1.2.0 or higher in mind.  Consider upgrading at www.libpng.org
+	#warning DevIL was designed with libpng 1.2.0 or higher in mind.  Consider upgrading at www.libpng.org.
 #endif
 
-
-#ifdef _WIN32
-	#if (defined(IL_USE_PRAGMA_LIBS))
-		#if defined(_MSC_VER) || defined(__BORLANDC__)
-			#pragma comment(lib, "DevIL_libpng.lib")
-			#pragma comment(lib, "DevIL_zlib.lib")
+#if (defined(_WIN32) || defined(_WIN64)) && defined(IL_USE_PRAGMA_LIBS)
+	#if defined(_MSC_VER) || defined(__BORLANDC__)
+		#ifndef _DEBUG
+			#pragma comment(lib, "libpng.lib")
+			#pragma comment(lib, "zlib.lib")
+		#else
+			#pragma comment(lib, "libpng-d.lib")
+			#pragma comment(lib, "zlib-d.lib")
 		#endif
 	#endif
 #endif
 
 
-ILboolean	iIsValidPng(ILvoid);
-ILboolean	iLoadPngInternal(ILvoid);
-ILboolean	iSavePngInternal(ILvoid);
+ILboolean	iIsValidPng(void);
+ILboolean	iLoadPngInternal(void);
+ILboolean	iSavePngInternal(void);
 
-ILint		readpng_init(ILvoid);
+ILint		readpng_init(void);
 ILboolean	readpng_get_image(ILdouble display_exponent);
-ILvoid		readpng_cleanup(ILvoid);
+void		readpng_cleanup(void);
 
 png_structp png_ptr = NULL;
-png_infop info_ptr = NULL;
-ILint color_type;
+png_infop   info_ptr = NULL;
+ILint		png_color_type;
 
 #define GAMMA_CORRECTION 1.0  // Doesn't seem to be doing anything...
 
 
-ILboolean ilIsValidPng(const ILstring FileName)
+ILboolean ilIsValidPng(ILconst_string FileName)
 {
 	ILHANDLE	PngFile;
 	ILboolean	bPng = IL_FALSE;
 
-	if (!iCheckExtension(FileName, "png")) {
+	if (!iCheckExtension(FileName, IL_TEXT("png"))) {
 		ilSetError(IL_INVALID_EXTENSION);
 		return bPng;
 	}
@@ -88,7 +90,7 @@ ILboolean ilIsValidPngF(ILHANDLE File)
 }
 
 
-ILboolean ilIsValidPngL(const ILvoid *Lump, ILuint Size)
+ILboolean ilIsValidPngL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iIsValidPng();
@@ -108,7 +110,7 @@ ILboolean iIsValidPng()
 
 
 // Reads a file
-ILboolean ilLoadPng(const ILstring FileName)
+ILboolean ilLoadPng(ILconst_string FileName)
 {
 	ILHANDLE	PngFile;
 	ILboolean	bPng = IL_FALSE;
@@ -142,7 +144,7 @@ ILboolean ilLoadPngF(ILHANDLE File)
 
 
 // Reads from a memory "lump"
-ILboolean ilLoadPngL(const ILvoid *Lump, ILuint Size)
+ILboolean ilLoadPngL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadPngInternal();
@@ -176,10 +178,10 @@ ILboolean iLoadPngInternal()
 }
 
 
-static ILvoid png_read(png_structp png_ptr, png_bytep data, png_size_t length)
+static void png_read(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-	(ILvoid)png_ptr;
-	iread(data, 1, length);
+	(void)png_ptr;
+	iread(data, 1, (ILuint)length);
 	return;
 }
 
@@ -203,6 +205,7 @@ static void png_warn_func(png_structp png_ptr, png_const_charp message)
 {
 	return;
 }
+
 
 ILint readpng_init()
 {
@@ -240,7 +243,7 @@ ILint readpng_init()
 
 
 	/* alternatively, could make separate calls to png_get_image_width(),
-	 * etc., but want bit_depth and color_type for later [don't care about
+	 * etc., but want bit_depth and png_color_type for later [don't care about
 	 * compression_type and filter_type => NULLs] */
 
 	/* OK, that's all we need for now; return happy */
@@ -257,9 +260,9 @@ ILboolean readpng_get_image(ILdouble display_exponent)
 	png_uint_32 width, height; // Changed the type to fix AMD64 bit problems, thanks to Eric Werness
 	ILdouble	screen_gamma = 1.0;
 	ILuint		i, channels;
-	ILenum format;
+	ILenum		format;
 	png_colorp	palette;
-	ILint num_palette, j, bit_depth;
+	ILint		num_palette, j, bit_depth;
 #if _WIN32 || DJGPP
 	ILdouble image_gamma;
 #endif
@@ -273,10 +276,10 @@ ILboolean readpng_get_image(ILdouble display_exponent)
 	}
 
 	png_get_IHDR(png_ptr, info_ptr, (png_uint_32*)&width, (png_uint_32*)&height,
-	             &bit_depth, &color_type, NULL, NULL, NULL);
+	             &bit_depth, &png_color_type, NULL, NULL, NULL);
 
 	// Expand low-bit-depth grayscale images to 8 bits
-	if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) {
+	if (png_color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) {
 		png_set_gray_1_2_4_to_8(png_ptr);
 	}
 
@@ -288,7 +291,7 @@ ILboolean readpng_get_image(ILdouble display_exponent)
 
 	//refresh information (added 20040224)
 	png_get_IHDR(png_ptr, info_ptr, (png_uint_32*)&width, (png_uint_32*)&height,
-	             &bit_depth, &color_type, NULL, NULL, NULL);
+	             &bit_depth, &png_color_type, NULL, NULL, NULL);
 
 	if (bit_depth < 8) {	// Expanded earlier for grayscale, now take care of palette and rgb
 		bit_depth = 8;
@@ -314,12 +317,12 @@ ILboolean readpng_get_image(ILdouble display_exponent)
 
 	png_read_update_info(png_ptr, info_ptr);
 	channels = (ILint)png_get_channels(png_ptr, info_ptr);
-	//added 20040224: update color_type so that it has the correct value
+	//added 20040224: update png_color_type so that it has the correct value
 	//in iLoadPngInternal (globals rule...)
-	color_type = png_get_color_type(png_ptr, info_ptr);
+	png_color_type = png_get_color_type(png_ptr, info_ptr);
 
 	//determine internal format
-	switch(color_type)
+	switch(png_color_type)
 	{
 		case PNG_COLOR_TYPE_PALETTE:
 			format = IL_COLOUR_INDEX;
@@ -410,7 +413,7 @@ ILboolean readpng_get_image(ILdouble display_exponent)
 }
 
 
-ILvoid readpng_cleanup()
+void readpng_cleanup()
 {
 	if (png_ptr && info_ptr) {
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
@@ -424,7 +427,7 @@ ILvoid readpng_cleanup()
 ILboolean ilSavePng(const ILstring FileName)
 {
 	ILHANDLE	PngFile;
-	ILboolean	bPng = IL_FALSE;
+	ILuint		PngSize;
 
 	if (ilGetBoolean(IL_FILE_MODE) == IL_FALSE) {
 		if (iFileExists(FileName)) {
@@ -436,40 +439,49 @@ ILboolean ilSavePng(const ILstring FileName)
 	PngFile = iopenw(FileName);
 	if (PngFile == NULL) {
 		ilSetError(IL_COULD_NOT_OPEN_FILE);
-		return bPng;
+		return IL_FALSE;
 	}
 
-	bPng = ilSavePngF(PngFile);
+	PngSize = ilSavePngF(PngFile);
 	iclosew(PngFile);
 
-	return bPng;
+	if (PngSize == 0)
+		return IL_FALSE;
+	return IL_TRUE;
 }
 
 
 //! Writes a Png to an already-opened file
-ILboolean ilSavePngF(ILHANDLE File)
+ILuint ilSavePngF(ILHANDLE File)
 {
+	ILuint Pos;
 	iSetOutputFile(File);
-	return iSavePngInternal();
+	Pos = itellw();
+	if (iSavePngInternal() == IL_FALSE)
+		return 0;  // Error occurred
+	return itellw() - Pos;  // Return the number of bytes written.
 }
 
 
 //! Writes a Png to a memory "lump"
-ILboolean ilSavePngL(ILvoid *Lump, ILuint Size)
+ILuint ilSavePngL(void *Lump, ILuint Size)
 {
+	ILuint Pos = itellw();
 	iSetOutputLump(Lump, Size);
-	return iSavePngInternal();
+	if (iSavePngInternal() == IL_FALSE)
+		return 0;  // Error occurred
+	return itellw() - Pos;  // Return the number of bytes written.
 }
 
 
-ILvoid png_write(png_structp png_ptr, png_bytep data, png_size_t length)
+void png_write(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-	(ILvoid)png_ptr;
-	iwrite(data, 1, length);
+	(void)png_ptr;
+	iwrite(data, 1, (ILuint)length);
 	return;
 }
 
-ILvoid flush_data(png_structp png_ptr)
+void flush_data(png_structp png_ptr)
 {
 	return;
 }
@@ -480,7 +492,7 @@ ILboolean iSavePngInternal()
 {
 	png_structp png_ptr;
 	png_infop	info_ptr;
-	png_text	text[3];
+	png_text	text[4];
 	ILenum		PngType;
 	ILuint		BitDepth, i, j;
 	ILubyte 	**RowPtr = NULL;
@@ -579,7 +591,7 @@ ILboolean iSavePngInternal()
 
 	// Set the image information here.	Width and height are up to 2^31,
 	//	bit_depth is one of 1, 2, 4, 8, or 16, but valid values also depend on
-	//	the color_type selected. color_type is one of PNG_COLOR_TYPE_GRAY,
+	//	the png_color_type selected. png_color_type is one of PNG_COLOR_TYPE_GRAY,
 	//	PNG_COLOR_TYPE_GRAY_ALPHA, PNG_COLOR_TYPE_PALETTE, PNG_COLOR_TYPE_RGB,
 	//	or PNG_COLOR_TYPE_RGB_ALPHA.  interlace is either PNG_INTERLACE_NONE or
 	//	PNG_INTERLACE_ADAM7, and the compression_type and filter_type MUST
@@ -627,16 +639,19 @@ ILboolean iSavePngInternal()
 	//png_set_gAMA(png_ptr, info_ptr, gamma);
 
 	// Optionally write comments into the image.
-	imemclear(text, sizeof(png_text) * 3);
+	imemclear(text, sizeof(png_text) * 4);
 	text[0].key = "Generated by";
 	text[0].text = "Generated by the Developer's Image Library (DevIL)";
 	text[0].compression = PNG_TEXT_COMPRESSION_NONE;
-	text[1].key = "Author's name";
-	text[1].text = iGetString(IL_PNG_AUTHNAME_STRING);
+	text[1].key = "Author";
+	text[1].text = (char*)iGetString(IL_PNG_AUTHNAME_STRING);  // Will not actually be modified!
 	text[1].compression = PNG_TEXT_COMPRESSION_NONE;
-	text[2].key = "Author's comments";
-	text[2].text = iGetString(IL_PNG_AUTHNAME_STRING);
+	text[2].key = "Description";
+	text[2].text = iGetString(IL_PNG_DESCRIPTION_STRING);
 	text[2].compression = PNG_TEXT_COMPRESSION_NONE;
+	text[3].key = "Title";
+	text[3].text = iGetString(IL_PNG_TITLE_STRING);
+	text[3].compression = PNG_TEXT_COMPRESSION_NONE;
 	png_set_text(png_ptr, info_ptr, text, 3);
 
 	// Write the file header information.  REQUIRED.
@@ -647,6 +662,8 @@ ILboolean iSavePngInternal()
 		ifree(text[1].text);
 	if (text[2].text)
 		ifree(text[2].text);
+	if (text[3].text)
+		ifree(text[3].text);
 
 	/* Shift the pixels up to a legal bit depth and fill in
 	* as appropriate to correctly scale the image.

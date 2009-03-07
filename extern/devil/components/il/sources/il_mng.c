@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/25/2001 <--Y2K Compliant! =]
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 01/09/2009
 //
 // Filename: src-IL/src/il_mng.c
 //
@@ -20,18 +20,34 @@
 //#define MNG_USE_SO
 #endif
 
-#ifdef _WIN32
-	#if (defined(IL_USE_PRAGMA_LIBS))
-		#if defined(_MSC_VER) || defined(__BORLANDC__)
-			#pragma comment(lib, "DevIL_libmng.lib")
-			#pragma comment(lib, "DevIL_lcms.lib")
-			#pragma comment(lib, "DevIL_libjpeg.lib")
-			#pragma comment(lib, "DevIL_zlib.lib")
+#if defined(_WIN32) && defined(IL_USE_PRAGMA_LIBS)
+	#if defined(_MSC_VER) || defined(__BORLANDC__)
+		#ifndef _DEBUG
+			#pragma comment(lib, "libmng.lib")
+			#pragma comment(lib, "lcms.lib")
+			#pragma comment(lib, "libjpeg.lib")
+			#pragma comment(lib, "zlib.lib")
+		#else
+			#pragma comment(lib, "libmng-d.lib")
+			#pragma comment(lib, "lcms-d.lib")
+			#pragma comment(lib, "libjpeg-d.lib")
+			#pragma comment(lib, "zlib-d.lib")
 		#endif
 	#endif
 #endif
 
+
+#if defined(_MSC_VER)
+	#pragma warning(push)
+	#pragma warning(disable : 4142)  // Redefinition in jmorecfg.h
+#endif
+
 #include <libmng.h>
+
+#if defined(_MSC_VER)
+	#pragma warning(pop)
+#endif
+
 
 //---------------------------------------------------------------------------------------------
 // memory allocation; data must be zeroed
@@ -84,7 +100,7 @@ mng_bool MNG_DECL mymngclosestream(mng_handle mng)
 mng_bool MNG_DECL mymngreadstream(mng_handle mng, mng_ptr buffer, mng_size_t size, mng_uint32 *bytesread)
 {
 	// read the requested amount of data from the file
-	*bytesread = iread(buffer, 1, size);
+	*bytesread = iread(buffer, 1, (ILuint)size);
 
 	return MNG_TRUE;
 }
@@ -95,7 +111,7 @@ mng_bool MNG_DECL mymngreadstream(mng_handle mng, mng_ptr buffer, mng_size_t siz
 //---------------------------------------------------------------------------------------------
 mng_bool MNG_DECL mymngwritedata(mng_handle mng, mng_ptr buffer, mng_size_t size, mng_uint32 *byteswritten)
 {
-	*byteswritten = iwrite(buffer, 1, size);
+	*byteswritten = iwrite(buffer, 1, (ILuint)size);
 
 	if (*byteswritten < size) {
 		ilSetError(IL_FILE_WRITE_ERROR);
@@ -185,10 +201,10 @@ mng_bool MNG_DECL mymngerror(
 }
 
 
-ILboolean iLoadMngInternal(ILvoid);
+ILboolean iLoadMngInternal(void);
 
 // Reads a file
-ILboolean ilLoadMng(const ILstring FileName)
+ILboolean ilLoadMng(ILconst_string FileName)
 {
 	ILHANDLE	MngFile;
 	ILboolean	bMng = IL_FALSE;
@@ -222,7 +238,7 @@ ILboolean ilLoadMngF(ILHANDLE File)
 
 
 // Reads from a memory "lump"
-ILboolean ilLoadMngL(const ILvoid *Lump, ILuint Size)
+ILboolean ilLoadMngL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadMngInternal();
@@ -267,13 +283,13 @@ ILboolean iLoadMngInternal()
 }
 
 
-ILboolean iSaveMngInternal(ILvoid);
+ILboolean iSaveMngInternal(void);
 
 //! Writes a Mng file
 ILboolean ilSaveMng(const ILstring FileName)
 {
 	ILHANDLE	MngFile;
-	ILboolean	bMng = IL_FALSE;
+	ILuint		MngSize;
 
 	if (ilGetBoolean(IL_FILE_MODE) == IL_FALSE) {
 		if (iFileExists(FileName)) {
@@ -285,65 +301,78 @@ ILboolean ilSaveMng(const ILstring FileName)
 	MngFile = iopenw(FileName);
 	if (MngFile == NULL) {
 		ilSetError(IL_COULD_NOT_OPEN_FILE);
-		return bMng;
+		return IL_FALSE;
 	}
 
-	bMng = ilSaveMngF(MngFile);
+	MngSize = ilSaveMngF(MngFile);
 	iclosew(MngFile);
 
-	return bMng;
+	if (MngSize == 0)
+		return IL_FALSE;
+	return IL_TRUE;
 }
 
 
 //! Writes a Mng to an already-opened file
-ILboolean ilSaveMngF(ILHANDLE File)
+ILuint ilSaveMngF(ILHANDLE File)
 {
+	ILuint Pos = itellw();
 	iSetOutputFile(File);
-	return iSaveMngInternal();
+	if (iSaveMngInternal() == IL_FALSE)
+		return 0;  // Error occurred
+	return itellw() - Pos;  // Return the number of bytes written.
 }
 
 
 //! Writes a Mng to a memory "lump"
-ILboolean ilSaveMngL(ILvoid *Lump, ILuint Size)
+ILuint ilSaveMngL(void *Lump, ILuint Size)
 {
+	ILuint Pos = itellw();
 	iSetOutputLump(Lump, Size);
-	return iSaveMngInternal();
+	if (iSaveMngInternal() == IL_FALSE)
+		return 0;  // Error occurred
+	return itellw() - Pos;  // Return the number of bytes written.
 }
 
 
 // Internal function used to save the Mng.
 ILboolean iSaveMngInternal()
 {
-	/*mng_handle mng;
+	//mng_handle mng;
 
-	if (iCurImage == NULL) {
-		ilSetError(IL_ILLEGAL_OPERATION);
-		return IL_FALSE;
-	}
+	ilSetError(IL_INVALID_EXTENSION);
+	return IL_FALSE;
 
-	mng = mng_initialize(MNG_NULL, mymngalloc, mymngfree, MNG_NULL);
-	if (mng == MNG_NULL) {
-		ilSetError(IL_LIB_MNG_ERROR);
-		return IL_FALSE;
-	}
+	//if (iCurImage == NULL) {
+	//	ilSetError(IL_ILLEGAL_OPERATION);
+	//	return IL_FALSE;
+	//}
 
+	//mng = mng_initialize(MNG_NULL, mymngalloc, mymngfree, MNG_NULL);
+	//if (mng == MNG_NULL) {
+	//	ilSetError(IL_LIB_MNG_ERROR);
+	//	return IL_FALSE;
+	//}
 
-	mng_setcb_openstream(mng, mymngopenstreamwrite);
-	mng_setcb_closestream(mng, mymngclosestream);
-	mng_setcb_writedata(mng, mymngwritedata);
+	//mng_setcb_openstream(mng, mymngopenstreamwrite);
+	//mng_setcb_closestream(mng, mymngclosestream);
+	//mng_setcb_writedata(mng, mymngwritedata);
 
-	// Write File:
-   	mng_create(mng);
+	//// Write File:
+ //  	mng_create(mng);
 
-	// Just a single Frame (save a normal PNG):
-	//WritePNG( mng, 0, 1 );
+	//// Check return value.
+	//mng_putchunk_mhdr(mng, iCurImage->Width, iCurImage->Height, 1000, 3, 1, 3, 0x0047);
+	//mng_putchunk_basi(mng, iCurImage->Width, iCurImage->Height, 8, MNG_COLORTYPE_RGB, 0, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF, 1);
+	//mng_putchunk_iend(mng);
+	//mng_putimgdata_ihdr(mng, iCurImage->Width, iCurImage->Height, MNG_COLORTYPE_RGB, 8, 0, 0, 0, 0, mymnggetcanvasline);
 
-	// Now write file:
-	mng_write(mng);
+	//// Now write file:
+	//mng_write(mng);
 
-	mng_cleanup(&mng);*/
+	//mng_cleanup(&mng);
 
-	return IL_TRUE;
+	//return IL_TRUE;
 }
 
 #endif//IL_NO_MNG

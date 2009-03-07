@@ -1,12 +1,12 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/22/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 01/04/2009
 //
 // Filename: src-IL/src/il_targa.c
 //
-// Description: Reads from and writes to a targa (.tga) file.
+// Description: Reads from and writes to a Targa (.tga) file.
 //
 //-----------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@
 
 
 //! Checks if the file specified in FileName is a valid Targa file.
-ILboolean ilIsValidTga(const ILstring FileName)
+ILboolean ilIsValidTga(ILconst_string FileName)
 {
 	ILHANDLE	TargaFile;
 	ILboolean	bTarga = IL_FALSE;
@@ -67,7 +67,7 @@ ILboolean ilIsValidTgaF(ILHANDLE File)
 
 
 //! Checks if Lump is a valid Targa lump.
-ILboolean ilIsValidTgaL(const ILvoid *Lump, ILuint Size)
+ILboolean ilIsValidTgaL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iIsValidTarga();
@@ -77,19 +77,19 @@ ILboolean ilIsValidTgaL(const ILvoid *Lump, ILuint Size)
 // Internal function used to get the Targa header from the current file.
 ILboolean iGetTgaHead(TARGAHEAD *Header)
 {
-	Header->IDLen = igetc();
-	Header->ColMapPresent = igetc();
-	Header->ImageType = igetc();
+	Header->IDLen = (ILubyte)igetc();
+	Header->ColMapPresent = (ILubyte)igetc();
+	Header->ImageType = (ILubyte)igetc();
 	Header->FirstEntry = GetLittleShort();
 	Header->ColMapLen = GetLittleShort();
-	Header->ColMapEntSize = igetc();
+	Header->ColMapEntSize = (ILubyte)igetc();
 
 	Header->OriginX = GetLittleShort();
 	Header->OriginY = GetLittleShort();
 	Header->Width = GetLittleUShort();
 	Header->Height = GetLittleUShort();
-	Header->Bpp = igetc();
-	Header->ImageDesc = igetc();
+	Header->Bpp = (ILubyte)igetc();
+	Header->ImageDesc = (ILubyte)igetc();
 	
 	return IL_TRUE;
 }
@@ -120,7 +120,7 @@ ILboolean iCheckTarga(TARGAHEAD *Header)
 		return IL_FALSE;
 	
 	// check type (added 20040218)
-	if(Header->ImageType != TGA_NO_DATA
+	if (Header->ImageType   != TGA_NO_DATA
 	   && Header->ImageType != TGA_COLMAP_UNCOMP
 	   && Header->ImageType != TGA_UNMAP_UNCOMP
 	   && Header->ImageType != TGA_BW_UNCOMP
@@ -138,7 +138,7 @@ ILboolean iCheckTarga(TARGAHEAD *Header)
 
 
 //! Reads a Targa file
-ILboolean ilLoadTarga(const ILstring FileName)
+ILboolean ilLoadTarga(ILconst_string FileName)
 {
 	ILHANDLE	TargaFile;
 	ILboolean	bTarga = IL_FALSE;
@@ -148,16 +148,17 @@ ILboolean ilLoadTarga(const ILstring FileName)
 		ilSetError(IL_COULD_NOT_OPEN_FILE);
 		return bTarga;
 	}
-	
+
 	bTarga = ilLoadTargaF(TargaFile);
 	icloser(TargaFile);
-	
+
 	return bTarga;
 }
 
 
 //! Reads an already-opened Targa file
-ILboolean ilLoadTargaF(ILHANDLE File) {
+ILboolean ilLoadTargaF(ILHANDLE File)
+{
 	ILuint		FirstPos;
 	ILboolean	bRet;
 	
@@ -171,7 +172,7 @@ ILboolean ilLoadTargaF(ILHANDLE File) {
 
 
 //! Reads from a memory "lump" that contains a Targa
-ILboolean ilLoadTargaL(const ILvoid *Lump, ILuint Size)
+ILboolean ilLoadTargaL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadTargaInternal();
@@ -293,13 +294,15 @@ ILboolean iReadColMapTga(TARGAHEAD *Header)
 	
 	// Do we need to do something with FirstEntry?	Like maybe:
 	//	iread(Image->Pal + Targa->FirstEntry, 1, Image->Pal.PalSize);  ??
-	if (Header->ColMapEntSize != 16) {
+	if (Header->ColMapEntSize != 16)
+	{
 		if (iread(iCurImage->Pal.Palette, 1, iCurImage->Pal.PalSize) != iCurImage->Pal.PalSize)
 			return IL_FALSE;
 	}
 	else {
 		// 16 bit palette, so we have to break it up.
-		for (i = 0; i < iCurImage->Pal.PalSize; i += 4) {
+		for (i = 0; i < iCurImage->Pal.PalSize; i += 4)
+		{
 			Pixel = GetBigUShort();
 			if (ieof())
 				return IL_FALSE;
@@ -310,13 +313,17 @@ ILboolean iReadColMapTga(TARGAHEAD *Header)
 		}
 	}
 	
-	if (Header->ImageType == TGA_COLMAP_COMP) {
-		if (!iUncompressTgaData(iCurImage)) {
+	if (Header->ImageType == TGA_COLMAP_COMP)
+	{
+		if (!iUncompressTgaData(iCurImage))
+		{
 			return IL_FALSE;
 		}
 	}
-	else {
-		if (iread(iCurImage->Data, 1, iCurImage->SizeOfData) != iCurImage->SizeOfData) {
+	else
+	{
+		if (iread(iCurImage->Data, 1, iCurImage->SizeOfData) != iCurImage->SizeOfData)
+		{
 			return IL_FALSE;
 		}
 	}
@@ -435,7 +442,7 @@ ILboolean iReadBwTga(TARGAHEAD *Header)
 
 ILboolean iUncompressTgaData(ILimage *Image)
 {
-	ILuint	BytesRead = 0, Size, RunLen, i;
+	ILuint	BytesRead = 0, Size, RunLen, i, ToRead;
 	ILubyte Header, Color[4];
 	ILint	c;
 	
@@ -445,7 +452,7 @@ ILboolean iUncompressTgaData(ILimage *Image)
 		iPreCache(iCurImage->SizeOfData / 2);
 	
 	while (BytesRead < Size) {
-		Header = igetc();
+		Header = (ILubyte)igetc();
 		if (Header & BIT_7) {
 			ClearBits(Header, BIT_7);
 			if (iread(Color, 1, Image->Bpp) != Image->Bpp) {
@@ -454,7 +461,8 @@ ILboolean iUncompressTgaData(ILimage *Image)
 			}
 			RunLen = (Header+1) * Image->Bpp;
 			for (i = 0; i < RunLen; i += Image->Bpp) {
-				for (c = 0; c < Image->Bpp; c++) {
+				// Read the color in, but we check to make sure that we do not go past the end of the image.
+				for (c = 0; c < Image->Bpp && BytesRead+i+c < Size; c++) {
 					Image->Data[BytesRead+i+c] = Color[c];
 				}
 			}
@@ -462,11 +470,19 @@ ILboolean iUncompressTgaData(ILimage *Image)
 		}
 		else {
 			RunLen = (Header+1) * Image->Bpp;
-			if (iread(Image->Data + BytesRead, 1, RunLen) != RunLen) {
-				iUnCache();
+			// We have to check that we do not go past the end of the image data.
+			if (BytesRead + RunLen > Size)
+				ToRead = Size - BytesRead;
+			else
+				ToRead = RunLen;
+			if (iread(Image->Data + BytesRead, 1, ToRead) != ToRead) {
+				iUnCache();  //@TODO: Error needed here?
 				return IL_FALSE;
 			}
 			BytesRead += RunLen;
+
+			if (BytesRead + RunLen > Size)
+				iseek(RunLen - ToRead, IL_SEEK_CUR);
 		}
 	}
 	
@@ -528,50 +544,59 @@ ILboolean i16BitTarga(ILimage *Image)
 ILboolean ilSaveTarga(const ILstring FileName)
 {
 	ILHANDLE	TargaFile;
-	ILboolean	bTarga = IL_FALSE;
-	
+	ILuint		TargaSize;
+
 	if (ilGetBoolean(IL_FILE_MODE) == IL_FALSE) {
 		if (iFileExists(FileName)) {
 			ilSetError(IL_FILE_ALREADY_EXISTS);
 			return IL_FALSE;
 		}
 	}
-	
+
 	TargaFile = iopenw(FileName);
 	if (TargaFile == NULL) {
 		ilSetError(IL_COULD_NOT_OPEN_FILE);
-		return bTarga;
+		return IL_FALSE;
 	}
-	
-	bTarga = ilSaveTargaF(TargaFile);
+
+	TargaSize = ilSaveTargaF(TargaFile);
 	iclosew(TargaFile);
-	
-	return bTarga;
+
+	if (TargaSize == 0)
+		return IL_FALSE;
+	return IL_TRUE;
 }
 
 
 //! Writes a Targa to an already-opened file
-ILboolean ilSaveTargaF(ILHANDLE File)
+ILuint ilSaveTargaF(ILHANDLE File)
 {
+	ILuint Pos;
 	iSetOutputFile(File);
-	return iSaveTargaInternal();
+	Pos = itellw();
+	if (iSaveTargaInternal() == IL_FALSE)
+		return 0;  // Error occurred
+	return itellw() - Pos;  // Return the number of bytes written.
 }
 
 
 //! Writes a Targa to a memory "lump"
-ILboolean ilSaveTargaL(ILvoid *Lump, ILuint Size)
+ILuint ilSaveTargaL(void *Lump, ILuint Size)
 {
+	ILuint Pos = itellw();
 	iSetOutputLump(Lump, Size);
-	return iSaveTargaInternal();
+	if (iSaveTargaInternal() == IL_FALSE)
+		return 0;  // Error occurred
+	return itellw() - Pos;  // Return the number of bytes written.
 }
 
 
 // Internal function used to save the Targa.
 ILboolean iSaveTargaInternal()
 {
-	char		*ID = iGetString(IL_TGA_ID_STRING);
-	char		*AuthName = iGetString(IL_TGA_AUTHNAME_STRING);
-	char		*AuthComment = iGetString(IL_TGA_AUTHCOMMENT_STRING);
+	const char	*ID = iGetString(IL_TGA_ID_STRING);
+	const char	*AuthName = iGetString(IL_TGA_AUTHNAME_STRING);
+	const char	*AuthComment = iGetString(IL_TGA_AUTHCOMMENT_STRING);
 	ILubyte 	IDLen = 0, UsePal, Type, PalEntSize;
 	ILshort 	ColMapStart = 0, PalSize;
 	ILubyte		Temp;
@@ -586,7 +611,7 @@ ILboolean iSaveTargaInternal()
 	char		*idString = "Developer's Image Library (DevIL)";
 	ILuint		Day, Month, Year, Hour, Minute, Second;
 	char		*TempData;
-	
+
 	if (iCurImage == NULL) {
 		ilSetError(IL_ILLEGAL_OPERATION);
 		return IL_FALSE;
@@ -598,7 +623,7 @@ ILboolean iSaveTargaInternal()
 		Compress = IL_FALSE;
 	
 	if (ID)
-		IDLen = (ILubyte)strlen(ID);
+		IDLen = (ILubyte)ilCharStrLen(ID);
 	
 	if (iCurImage->Pal.Palette && iCurImage->Pal.PalSize && iCurImage->Pal.PalType != IL_PAL_NONE)
 		UsePal = IL_TRUE;
@@ -607,7 +632,7 @@ ILboolean iSaveTargaInternal()
 	
 	iwrite(&IDLen, sizeof(ILubyte), 1);
 	iwrite(&UsePal, sizeof(ILubyte), 1);
-	
+
 	Format = iCurImage->Format;
 	switch (Format) {
 		case IL_COLOUR_INDEX:
@@ -656,7 +681,7 @@ ILboolean iSaveTargaInternal()
 			PalEntSize = 0;
 			break;
 		case IL_PAL_BGR24:
-			PalSize = iCurImage->Pal.PalSize / 3;
+			PalSize = (ILshort)(iCurImage->Pal.PalSize / 3);
 			PalEntSize = 24;
 			TempPal = &iCurImage->Pal;
 			break;
@@ -669,7 +694,7 @@ ILboolean iSaveTargaInternal()
 			TempPal = iConvertPal(&iCurImage->Pal, IL_PAL_BGR24);
 			if (TempPal == NULL)
 				return IL_FALSE;
-				PalSize = TempPal->PalSize / 3;
+				PalSize = (ILshort)(TempPal->PalSize / 3);
 			PalEntSize = 24;
 			break;
 		default:
@@ -677,9 +702,9 @@ ILboolean iSaveTargaInternal()
 			ifree(ID);
 			ifree(AuthName);
 			ifree(AuthComment);
-			return IL_FALSE;
 			PalSize = 0;
 			PalEntSize = 0;
+			return IL_FALSE;
 	}
 	SaveLittleShort(PalSize);
 	iwrite(&PalEntSize, sizeof(ILubyte), 1);
@@ -744,10 +769,10 @@ ILboolean iSaveTargaInternal()
 	// Write the extension area.
 	ExtOffset = itellw();
 	SaveLittleUShort(495);	// Number of bytes in the extension area (TGA 2.0 spec)
-	iwrite(AuthName, 1, ilStrLen(AuthName));
-	ipad(41 - ilStrLen(AuthName));
-	iwrite(AuthComment, 1, ilStrLen(AuthComment));
-	ipad(324 - ilStrLen(AuthComment));
+	iwrite(AuthName, 1, ilCharStrLen(AuthName));
+	ipad(41 - ilCharStrLen(AuthName));
+	iwrite(AuthComment, 1, ilCharStrLen(AuthComment));
+	ipad(324 - ilCharStrLen(AuthComment));
 	ifree(AuthName);
 	ifree(AuthComment);
 	
@@ -770,8 +795,8 @@ ILboolean iSaveTargaInternal()
 		SaveLittleUShort(0);
 	}
 	
-	iwrite(idString, 1, strlen(idString));	// Software ID
-	for (i = 0; i < 41 - strlen(idString); i++) {
+	iwrite(idString, 1, ilCharStrLen(idString));	// Software ID
+	for (i = 0; i < 41 - ilCharStrLen(idString); i++) {
 		iputc(0);
 	}
 	SaveLittleUShort(IL_VERSION);  // Software version
@@ -788,7 +813,7 @@ ILboolean iSaveTargaInternal()
 	// Write the footer.
 	SaveLittleUInt(ExtOffset);	// No extension area
 	SaveLittleUInt(0);	// No developer directory
-	iwrite(Footer, 1, strlen(Footer));
+	iwrite(Footer, 1, ilCharStrLen(Footer));
 	
 	if (TempImage->Origin != IL_ORIGIN_LOWER_LEFT) {
 		ifree(TempData);
@@ -804,13 +829,59 @@ ILboolean iSaveTargaInternal()
 	
 	if (TempImage != iCurImage)
 		ilCloseImage(TempImage);
-	
+
 	return IL_TRUE;
 }
 
 
+// Only to be called by ilDetermineSize.  Returns the buffer size needed to save the
+//  current image as a Targa file.
+ILuint iTargaSize(void)
+{
+	ILuint	Size, Bpp;
+	ILubyte	IDLen = 0;
+	const char	*ID = iGetString(IL_TGA_ID_STRING);
+	const char	*AuthName = iGetString(IL_TGA_AUTHNAME_STRING);
+	const char	*AuthComment = iGetString(IL_TGA_AUTHCOMMENT_STRING);
+
+	//@TODO: Support color indexed images.
+	if (iGetInt(IL_TGA_RLE) == IL_TRUE || iCurImage->Format == IL_COLOUR_INDEX) {
+		// Use the slower method, since we are using compression.  We do a "fake" write.
+		ilSaveTargaL(NULL, 0);
+	}
+
+	if (ID)
+		IDLen = (ILubyte)ilCharStrLen(ID);
+
+	Size = 18 + IDLen;  // Header + ID
+
+	// Bpp may not be iCurImage->Bpp.
+	switch (iCurImage->Format)
+	{
+		case IL_BGR:
+		case IL_RGB:
+			Bpp = 3;
+			break;
+		case IL_BGRA:
+		case IL_RGBA:
+			Bpp = 4;
+			break;
+		case IL_LUMINANCE:
+			Bpp = 1;
+			break;
+		default:  //@TODO: Do not know what to do with the others yet.
+			return 0;
+	}
+
+	Size += iCurImage->Width * iCurImage->Height * Bpp;
+	Size += 532;  // Size of the extension area
+
+	return Size;
+}
+
+
 /*// Makes a neat string to go into the id field of the .tga
-ILvoid iMakeString(char *Str)
+void iMakeString(char *Str)
 {
 	char		*PSG = "Generated by Developer's Image Library: ";
 	char		TimeStr[255];
@@ -824,8 +895,8 @@ ILvoid iMakeString(char *Str)
 #endif
 	CurTime = localtime(&Time);
 	
-	strftime(TimeStr, 255 - strlen(PSG), "%#c (%z)", CurTime);
-	//strftime(TimeStr, 255 - strlen(PSG), "%C (%Z)", CurTime);
+	strftime(TimeStr, 255 - ilCharStrLen(PSG), "%#c (%z)", CurTime);
+	//strftime(TimeStr, 255 - ilCharStrLen(PSG), "%C (%Z)", CurTime);
 	sprintf(Str, "%s%s", PSG, TimeStr);
 	
 	return;
@@ -833,7 +904,7 @@ ILvoid iMakeString(char *Str)
 
 
 //changed name to iGetDateTime on 20031221 to fix bug 830196
-ILvoid iGetDateTime(ILuint *Month, ILuint *Day, ILuint *Yr, ILuint *Hr, ILuint *Min, ILuint *Sec)
+void iGetDateTime(ILuint *Month, ILuint *Day, ILuint *Yr, ILuint *Hr, ILuint *Min, ILuint *Sec)
 {
 #ifdef DJGPP	
 	struct date day;
@@ -851,7 +922,7 @@ ILvoid iGetDateTime(ILuint *Month, ILuint *Day, ILuint *Yr, ILuint *Hr, ILuint *
 	*Sec = curtime.ti_sec;
 	
 	return;
-#endif
+#else
 	
 #ifdef _WIN32
 	SYSTEMTIME Time;
@@ -867,7 +938,7 @@ ILvoid iGetDateTime(ILuint *Month, ILuint *Day, ILuint *Yr, ILuint *Hr, ILuint *
 	*Sec = Time.wSecond;
 	
 	return;
-#endif
+#else
 	
 	*Month = 0;
 	*Day = 0;
@@ -878,6 +949,8 @@ ILvoid iGetDateTime(ILuint *Month, ILuint *Day, ILuint *Yr, ILuint *Hr, ILuint *
 	*Sec = 0;
 	
 	return;
+#endif
+#endif
 }
 
 

@@ -16,12 +16,6 @@
 
 #include "il_internal.h"
 
-
-#define MAX_BUFFER 180  // According to the ppm specs, it's 70, but PSP
-						//  likes to output longer lines...
-ILbyte LineBuffer[MAX_BUFFER];
-ILbyte SmallBuff[MAX_BUFFER];
-
 #define IL_PBM_ASCII	0x0001
 #define IL_PGM_ASCII	0x0002
 #define IL_PPM_ASCII	0x0003
@@ -38,15 +32,15 @@ typedef struct PPMINFO
 	ILubyte	Bpp;
 } PPMINFO;
 
-ILboolean	iIsValidPnm(ILvoid);
+ILboolean	iIsValidPnm(void);
 ILboolean	iCheckPnm(char Header[2]);
-ILboolean	iLoadPnmInternal(ILvoid);
-ILboolean	iSavePnmInternal(ILvoid);
+ILboolean	iLoadPnmInternal(void);
+ILboolean	iSavePnmInternal(void);
 ILimage		*ilReadAsciiPpm(PPMINFO *Info);
 ILimage		*ilReadBinaryPpm(PPMINFO *Info);
 ILimage		*ilReadBitPbm(PPMINFO *Info);
-ILboolean	iGetWord(ILvoid);
-ILvoid		PbmMaximize(ILimage *Image);
+ILboolean	iGetWord(ILboolean);
+void		PbmMaximize(ILimage *Image);
 
 
 #endif//PPMPGM_H

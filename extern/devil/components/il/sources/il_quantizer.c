@@ -21,7 +21,7 @@
 //
 // ImageLib Sources
 // by Denton Woods
-// Last modified: 02/02/2002 <--Y2K Compliant! =]
+// Last modified: 01/04/2009
 //
 // Filename: src-IL/src/il_quantizer.c
 //
@@ -92,17 +92,20 @@ ILboolean Hist3d(ILubyte *Ir, ILubyte *Ig, ILubyte *Ib, ILint *vwt, ILint *vmr, 
 	ILint	inr, ing, inb, table[2560];
 	ILuint	i;
 		
-	for (i = 0; i < 256; i++) {
+	for (i = 0; i < 256; i++)
+	{
 		table[i] = i * i;
 	}
 	Qadd = (ILushort*)ialloc(sizeof(ILushort) * size);
-	if (Qadd == NULL) {
+	if (Qadd == NULL)
+	{
 		return IL_FALSE;
 	}
 	
         imemclear(Qadd, sizeof(ILushort) * size);
         
-        for (i = 0; i < size; i++) {
+	for (i = 0; i < size; i++)
+	{
 	    r = Ir[i]; g = Ig[i]; b = Ib[i];
 	    inr = (r>>3) + 1; 
 	    ing = (g>>3) + 1; 
@@ -132,7 +135,7 @@ ILboolean Hist3d(ILubyte *Ir, ILubyte *Ig, ILubyte *Ib, ILint *vwt, ILint *vmr, 
 
 
 // Compute cumulative moments
-ILvoid M3d(ILint *vwt, ILint *vmr, ILint *vmg, ILint *vmb, ILfloat *m2)
+void M3d(ILint *vwt, ILint *vmr, ILint *vmg, ILint *vmb, ILfloat *m2)
 {
 	ILushort	ind1, ind2;
 	ILubyte		i, r, g, b;
@@ -415,7 +418,7 @@ ILimage *iQuantizeImage(ILimage *Image, ILuint NumCols)
 	ILimage	*TempImage = NULL, *NewImage = NULL;
 	ILubyte	*Ir = NULL, *Ig = NULL, *Ib = NULL;
 
-	ILint num_alloced_colors; // number of colors we allocated space for in palette, as NumCols but eill not be less than 256
+	ILint num_alloced_colors; // number of colors we allocated space for in palette, as NumCols but will not be less than 256
 
 	num_alloced_colors=NumCols;
 	if(num_alloced_colors<256) { num_alloced_colors=256; }
@@ -448,9 +451,9 @@ ILimage *iQuantizeImage(ILimage *Image, ILuint NumCols)
 		return NULL;
 	}
 
-	Ir = ialloc(Width * Height * Depth);
-	Ig = ialloc(Width * Height * Depth);
-	Ib = ialloc(Width * Height * Depth);
+	Ir = (ILubyte*)ialloc(Width * Height * Depth);
+	Ig = (ILubyte*)ialloc(Width * Height * Depth);
+	Ib = (ILubyte*)ialloc(Width * Height * Depth);
 	if (!Ir || !Ig || !Ib) {
 		ifree(Ir);
 		ifree(Ig);

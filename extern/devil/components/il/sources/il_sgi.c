@@ -10,7 +10,7 @@ static char *FName = NULL;
 /*----------------------------------------------------------------------------*/
 
 /*! Checks if the file specified in FileName is a valid .sgi file. */
-ILboolean ilIsValidSgi(const ILstring FileName)
+ILboolean ilIsValidSgi(ILconst_string FileName)
 {
 	ILHANDLE	SgiFile;
 	ILboolean	bSgi = IL_FALSE;
@@ -20,7 +20,7 @@ ILboolean ilIsValidSgi(const ILstring FileName)
 		return bSgi;
 	}
 
-	FName = (char*) FileName;
+	FName = (char*)FileName;
 
 	SgiFile = iopenr(FileName);
 	if (SgiFile == NULL) {
@@ -53,7 +53,7 @@ ILboolean ilIsValidSgiF(ILHANDLE File)
 /*----------------------------------------------------------------------------*/
 
 //! Checks if Lump is a valid .sgi lump.
-ILboolean ilIsValidSgiL(const ILvoid *Lump, ILuint Size)
+ILboolean ilIsValidSgiL(const void *Lump, ILuint Size)
 {
 	FName = NULL;
 	iSetInputLump(Lump, Size);
@@ -66,8 +66,8 @@ ILboolean ilIsValidSgiL(const ILvoid *Lump, ILuint Size)
 ILboolean iGetSgiHead(iSgiHeader *Header)
 {
 	Header->MagicNum = GetBigUShort();
-	Header->Storage = igetc();
-	Header->Bpc = igetc();
+	Header->Storage = (ILbyte)igetc();
+	Header->Bpc = (ILbyte)igetc();
 	Header->Dim = GetBigUShort();
 	Header->XSize = GetBigUShort();
 	Header->YSize = GetBigUShort();
@@ -116,7 +116,7 @@ ILboolean iCheckSgi(iSgiHeader *Header)
 /*----------------------------------------------------------------------------*/
 
 /*! Reads a SGI file */
-ILboolean ilLoadSgi(const ILstring FileName)
+ILboolean ilLoadSgi(ILconst_string FileName)
 {
 	ILHANDLE	SgiFile;
 	ILboolean	bSgi = IL_FALSE;
@@ -152,7 +152,7 @@ ILboolean ilLoadSgiF(ILHANDLE File)
 /*----------------------------------------------------------------------------*/
 
 /*! Reads from a memory "lump" that contains a SGI image */
-ILboolean ilLoadSgiL(const ILvoid *Lump, ILuint Size)
+ILboolean ilLoadSgiL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadSgiInternal();
@@ -177,6 +177,13 @@ ILboolean iLoadSgiInternal()
 		ilSetError(IL_INVALID_FILE_HEADER);
 		return IL_FALSE;
 	}
+
+	// Bugfix for #1060946.
+	//  The ZSize should never really be 2 by the specifications.  Some
+	//  application is outputting these, and it looks like the ZSize
+	//  should really be 1.
+	if (Header.ZSize == 2)
+		Header.ZSize = 1;
 	
 	if (Header.Storage == SGI_RLE) {  // RLE
 		bSgi = iReadRleSgi(&Header);
@@ -224,7 +231,7 @@ ILboolean iReadRleSgi(iSgiHeader *Head)
 #endif //__LITTLE_ENDIAN__
 
 	// We have to create a temporary buffer for the image, because SGI
-	//	images are plane-separated. */
+	//	images are plane-separated.
 	TempData = (ILubyte**)ialloc(Head->ZSize * sizeof(ILubyte*));
 	if (TempData == NULL)
 		goto cleanup_error;
@@ -391,7 +398,7 @@ ILboolean iReadNonRleSgi(iSgiHeader *Head)
 
 /*----------------------------------------------------------------------------*/
 
-ILvoid sgiSwitchData(ILubyte *Data, ILuint SizeOfData)
+void sgiSwitchData(ILubyte *Data, ILuint SizeOfData)
 {	
 	ILubyte	Temp;
 	ILuint	i;
@@ -435,9 +442,9 @@ ILboolean iNewSgi(iSgiHeader *Head)
 		case 1:
 			iCurImage->Format = IL_LUMINANCE;
 			break;
-		case 2: 
+		/*case 2:
 			iCurImage->Format = IL_LUMINANCE_ALPHA; 
-			break;
+			break;*/
 		case 3:
 			iCurImage->Format = IL_RGB;
 			break;
@@ -479,7 +486,7 @@ ILboolean iNewSgi(iSgiHeader *Head)
 ILboolean ilSaveSgi(const ILstring FileName)
 {
 	ILHANDLE	SgiFile;
-	ILboolean	bSgi = IL_FALSE;
+	ILuint		SgiSize;
 
 	if (ilGetBoolean(IL_FILE_MODE) == IL_FALSE) {
 		if (iFileExists(FileName)) {
@@ -491,31 +498,38 @@ ILboolean ilSaveSgi(const ILstring FileName)
 	SgiFile = iopenw(FileName);
 	if (SgiFile == NULL) {
 		ilSetError(IL_COULD_NOT_OPEN_FILE);
-		return bSgi;
+		return IL_FALSE;
 	}
 
-	bSgi = ilSaveSgiF(SgiFile);
+	SgiSize = ilSaveSgiF(SgiFile);
 	iclosew(SgiFile);
 
-	return bSgi;
+	if (SgiSize == 0)
+		return IL_FALSE;
+	return IL_TRUE;
 }
 
-/*----------------------------------------------------------------------------*/
 
-//! Writes a SGI to an already-opened file
-ILboolean ilSaveSgiF(ILHANDLE File)
+//! Writes a Sgi to an already-opened file
+ILuint ilSaveSgiF(ILHANDLE File)
 {
+	ILuint Pos;
 	iSetOutputFile(File);
-	return iSaveSgiInternal();
+	Pos = itellw();
+	if (iSaveSgiInternal() == IL_FALSE)
+		return 0;  // Error occurred
+	return itellw() - Pos;  // Return the number of bytes written.
 }
 
-/*----------------------------------------------------------------------------*/
 
-//! Writes a SGI to a memory "lump"
-ILboolean ilSaveSgiL(ILvoid *Lump, ILuint Size)
+//! Writes a Sgi to a memory "lump"
+ILuint ilSaveSgiL(void *Lump, ILuint Size)
 {
+	ILuint Pos = itellw();
 	iSetOutputLump(Lump, Size);
-	return iSaveSgiInternal();
+	if (iSaveSgiInternal() == IL_FALSE)
+		return 0;  // Error occurred
+	return itellw() - Pos;  // Return the number of bytes written.
 }
 
 
@@ -612,7 +626,7 @@ ILboolean iSaveSgiInternal()
 	SaveBigInt(0);  // Dummy value
 
 	if (FName) {
-		c = strlen(FName);
+		c = ilCharStrLen(FName);
 		c = c < 79 ? 79 : c;
 		iwrite(FName, 1, c);
 		c = 80 - c;

@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/25/2001 <--Y2K Compliant! =]
+// Copyright (C) 2000-2008 by Denton Woods
+// Last modified: 11/08/2008
 //
 // Filename: src-IL/src/il_internal.c
 //
@@ -41,13 +41,21 @@ ILimage *iCurImage = NULL;
 	}
 #endif /* _WIN32 */
 
-#if _UNICODE //_WIN32_WCE
-	int iStrCmp(const ILstring src1, const ILstring src2)
+#ifdef _WIN32_WCE
+	char *strdup(const char *src)
+	{
+		return _strdup(src);
+	}
+#endif//_WIN32_WCE
+
+
+#ifdef _UNICODE
+	int iStrCmp(ILconst_string src1, ILconst_string src2)
 	{
 		return wcsicmp(src1, src2);
 	}
 #else
-	int iStrCmp(const ILstring src1, const ILstring src2)
+	int iStrCmp(ILconst_string src1, ILconst_string src2)
 	{
 		return stricmp(src1, src2);
 	}
@@ -55,20 +63,35 @@ ILimage *iCurImage = NULL;
 
 
 //! Glut's portability.txt says to use this...
-char *ilStrDup(const char *Str)
+ILstring ilStrDup(ILconst_string Str)
 {
-	char *copy;
+	ILstring copy;
 
-	copy = (char*)ialloc(strlen(Str) + 1);
+	copy = (ILstring)ialloc((ilStrLen(Str) + 1) * sizeof(ILchar));
 	if (copy == NULL)
 		return NULL;
-	strcpy(copy, Str);
+	iStrCpy(copy, Str);
 	return copy;
 }
 
 
 // Because MSVC++'s version is too stupid to check for NULL...
-ILuint ilStrLen(const char *Str)
+ILuint ilStrLen(ILconst_string Str)
+{
+	ILconst_string eos = Str;
+
+	if (Str == NULL)
+		return 0;
+
+	while (*eos++);
+
+	return((int)(eos - Str - 1));
+}
+
+
+// Because MSVC++'s version is too stupid to check for NULL...
+//  Passing NULL to strlen will definitely cause a crash.
+ILuint ilCharStrLen(const char *Str)
 {
 	const char *eos = Str;
 
@@ -82,20 +105,19 @@ ILuint ilStrLen(const char *Str)
 
 
 // Simple function to test if a filename has a given extension, disregarding case
-ILboolean iCheckExtension(const ILstring Arg, const ILstring Ext)
+ILboolean iCheckExtension(ILconst_string Arg, ILconst_string Ext)
 {
 	ILboolean PeriodFound = IL_FALSE;
-	ILint i;
-#ifndef _UNICODE
-	char *Argu = (char*)Arg;  // pointer to arg so we don't destroy arg
+	ILint i, Len;
+	ILstring Argu = (ILstring)Arg;
 
-	if (Arg == NULL || Ext == NULL || !strlen(Arg) || !strlen(Ext))  // if not a good filename/extension, exit early
+	if (Arg == NULL || Ext == NULL || !ilStrLen(Arg) || !ilStrLen(Ext))  // if not a good filename/extension, exit early
 		return IL_FALSE;
 
-	Argu += strlen(Arg);  // start at the end
+	Len = ilStrLen(Arg);
+	Argu += Len;  // start at the end
 
-
-	for (i = strlen(Arg); i >= 0; i--) {
+	for (i = Len; i >= 0; i--) {
 		if (*Argu == '.') {  // try to find a period 
 			PeriodFound = IL_TRUE;
 			break;
@@ -106,47 +128,18 @@ ILboolean iCheckExtension(const ILstring Arg, const ILstring Ext)
 	if (!PeriodFound)  // if no period, no extension
 		return IL_FALSE;
 
-	if (!stricmp(Argu+1, Ext))  // extension and ext match?
+	if (!iStrCmp(Argu+1, Ext))  // extension and ext match?
 		return IL_TRUE;
-
-#else
-	wchar_t *Argu = Arg;
-
-	if (Arg == NULL || Ext == NULL || !wcslen(Arg) || !wcslen(Ext))  // if not a good filename/extension, exit early
-		return IL_FALSE;
-
-	Argu += wcslen(Arg);  // start at the end
-
-
-	for (i = wcslen(Arg); i >= 0; i--) {
-		if (*Argu == '.') {  // try to find a period 
-			PeriodFound = IL_TRUE;
-			break;
-		}
-		Argu--;
-	}
-
-	if (!PeriodFound)  // if no period, no extension
-		return IL_FALSE;
-
-	if (!wcsicmp(Argu+1, Ext))  // extension and ext match?
-		return IL_TRUE;
-
-#endif//_WIN32_WCE
 
 	return IL_FALSE;  // if all else fails, return IL_FALSE
 }
 
 
-ILstring iGetExtension(const ILstring FileName) {
+ILstring iGetExtension(ILconst_string FileName)
+{
 	ILboolean PeriodFound = IL_FALSE;
-#ifndef _UNICODE
-	char *Ext = (char*)FileName;
-	ILint i, Len = strlen(FileName);
-#else
-	wchar_t *Ext = FileName;
-	ILint i, Len = wcslen(FileName);
-#endif//_UNICODE
+	ILstring Ext = (ILstring)FileName;
+	ILint i, Len = ilStrLen(FileName);
 
 	if (FileName == NULL || !Len)  // if not a good filename/extension, exit early
 		return NULL;
@@ -169,11 +162,11 @@ ILstring iGetExtension(const ILstring FileName) {
 
 
 // Checks if the file exists
-ILboolean iFileExists(const ILstring FileName)
+ILboolean iFileExists(ILconst_string FileName)
 {
-#ifndef _UNICODE
+#if (!defined(_UNICODE) || !defined(_WIN32))
 	FILE *CheckFile = fopen(FileName, "rb");
-#else
+#else // Windows uses _wfopen instead.
 	FILE *CheckFile = _wfopen(FileName, L"rb");
 #endif//_UNICODE
 
@@ -200,8 +193,9 @@ ILbyte *iFgets(char *buffer, ILuint maxlen)
 	if (temp == IL_EOF && counter == 0)  // Only return NULL if no data was "got".
 		return NULL;
 
-	return buffer;
+	return (ILbyte*)buffer;
 }
+
 
 // A fast integer squareroot, completely accurate for x < 289.
 // Taken from http://atoms.org.uk/sqrt/
@@ -274,3 +268,4 @@ int iSqrt(int x) {
 	//hm, x was negative....
 	return -1;
 }
+

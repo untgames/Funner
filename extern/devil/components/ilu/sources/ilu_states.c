@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Utility Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/18/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2008 by Denton Woods
+// Last modified: 12/17/2008
 //
 // Filename: src-ILU/src/ilu_states.c
 //
@@ -15,8 +15,8 @@
 #include "ilu_states.h"
 
 
-const ILstring _iluVendor	= IL_TEXT("Abysmal Software");
-const ILstring _iluVersion	= IL_TEXT("Developer's Image Library Utilities (ILU) 1.6.7 " __DATE__);
+ILconst_string _iluVendor	= IL_TEXT("Abysmal Software");
+ILconst_string _iluVersion	= IL_TEXT("Developer's Image Library Utilities (ILU) 1.7.7 ");// IL_TEXT(__DATE__));
 
 
 ILstring ILAPIENTRY iluGetString(ILenum StringName)
@@ -24,10 +24,10 @@ ILstring ILAPIENTRY iluGetString(ILenum StringName)
 	switch (StringName)
 	{
 		case ILU_VENDOR:
-			return (const ILstring)_iluVendor;
+			return (ILstring)_iluVendor;
 		//changed 2003-09-04
 		case ILU_VERSION_NUM:
-			return (const ILstring)_iluVersion;
+			return (ILstring)_iluVersion;
 		default:
 			ilSetError(ILU_INVALID_PARAM);
 			break;
@@ -36,7 +36,7 @@ ILstring ILAPIENTRY iluGetString(ILenum StringName)
 }
 
 
-ILvoid ILAPIENTRY iluGetIntegerv(ILenum Mode, ILint *Param)
+void ILAPIENTRY iluGetIntegerv(ILenum Mode, ILint *Param)
 {
 	switch (Mode)
 	{
@@ -67,7 +67,7 @@ ILint ILAPIENTRY iluGetInteger(ILenum Mode)
 ILenum iluFilter = ILU_NEAREST;
 ILenum iluPlacement = ILU_CENTER;
 
-ILvoid ILAPIENTRY iluImageParameter(ILenum PName, ILenum Param)
+void ILAPIENTRY iluImageParameter(ILenum PName, ILenum Param)
 {
 	switch (PName)
 	{

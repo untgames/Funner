@@ -1,16 +1,16 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/21/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 01/22/2009
 //
 // Filename: src-IL/src/il_pic.c
 //
 // Description: Softimage Pic (.pic) functions
+//	Lots of this code is taken from Paul Bourke's Softimage Pic code at
+//	http://local.wasp.uwa.edu.au/~pbourke/dataformats/softimagepic/
 //
 //-----------------------------------------------------------------------------
-
-// @TODO:  Test these extensively...haven't even been tested yet!!!
 
 #include "il_internal.h"
 #ifndef IL_NO_PIC
@@ -20,7 +20,7 @@
 
 
 //! Checks if the file specified in FileName is a valid .pic file.
-ILboolean ilIsValidPic(const ILstring FileName)
+ILboolean ilIsValidPic(ILconst_string FileName)
 {
 	ILHANDLE	PicFile;
 	ILboolean	bPic = IL_FALSE;
@@ -59,7 +59,7 @@ ILboolean ilIsValidPicF(ILHANDLE File)
 
 
 //! Checks if Lump is a valid .pic lump.
-ILboolean ilIsValidPicL(const ILvoid *Lump, ILuint Size)
+ILboolean ilIsValidPicL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iIsValidPic();
@@ -69,15 +69,15 @@ ILboolean ilIsValidPicL(const ILvoid *Lump, ILuint Size)
 // Internal function used to get the .pic header from the current file.
 ILboolean iGetPicHead(PIC_HEAD *Header)
 {
-	Header->Magic = GetLittleInt();
-	Header->Version = GetLittleFloat();
+	Header->Magic = GetBigInt();
+	Header->Version = GetBigFloat();
 	iread(Header->Comment, 1, 80);
 	iread(Header->Id, 1, 4);
-	Header->Width = GetLittleShort();
-	Header->Height = GetLittleShort();
-	Header->Ratio = GetLittleFloat();
-	Header->Fields = GetLittleShort();
-	Header->Padding = GetLittleShort();
+	Header->Width = GetBigShort();
+	Header->Height = GetBigShort();
+	Header->Ratio = GetBigFloat();
+	Header->Fields = GetBigShort();
+	Header->Padding = GetBigShort();
 
 	return IL_TRUE;
 }
@@ -101,7 +101,7 @@ ILboolean iCheckPic(PIC_HEAD *Header)
 {
 	if (Header->Magic != 0x5380F634)
 		return IL_FALSE;
-	if (strncmp(Header->Id, "PICT", 4))
+	if (strncmp((const char*)Header->Id, "PICT", 4))
 		return IL_FALSE;
 	if (Header->Width == 0)
 		return IL_FALSE;
@@ -113,7 +113,7 @@ ILboolean iCheckPic(PIC_HEAD *Header)
 
 
 //! Reads a .pic file
-ILboolean ilLoadPic(const ILstring FileName)
+ILboolean ilLoadPic(ILconst_string FileName)
 {
 	ILHANDLE	PicFile;
 	ILboolean	bPic = IL_FALSE;
@@ -147,7 +147,7 @@ ILboolean ilLoadPicF(ILHANDLE File)
 
 
 //! Reads from a memory "lump" that contains a .pic
-ILboolean ilLoadPicL(const ILvoid *Lump, ILuint Size)
+ILboolean ilLoadPicL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadPicInternal();
@@ -175,11 +175,6 @@ ILboolean iLoadPicInternal()
 		return IL_FALSE;
 	}
 
-	if (!ilTexImage(Header.Width, Header.Height, 1, 1, 0, IL_UNSIGNED_BYTE, NULL)) {
-		return IL_FALSE;
-	}
-	iCurImage->Origin = IL_ORIGIN_LOWER_LEFT;
-
 	// Read channels
 	do {
 		if (Channel == NULL) {
@@ -193,12 +188,12 @@ ILboolean iLoadPicInternal()
 				// Clean up the list before erroring out.
 				while (Channel) {
 					Prev = Channel;
-					Channel = Channel->Next;
+					Channel = (CHANNEL*)Channel->Next;
 					ifree(Prev);
 				}
 				return IL_FALSE;
 			}
-			Channels = Channels->Next;
+			Channels = (CHANNEL*)Channels->Next;
 		}
 		Channels->Next = NULL;
 
@@ -217,14 +212,27 @@ ILboolean iLoadPicInternal()
 		
 	} while (Chained);
 
+	if (Alpha) {  // Has an alpha channel
+		if (!ilTexImage(Header.Width, Header.Height, 1, 4, IL_RGBA, IL_UNSIGNED_BYTE, NULL)) {
+			Read = IL_FALSE;
+			goto finish;  // Have to destroy Channels first.
+		}
+	}
+	else {  // No alpha channel
+		if (!ilTexImage(Header.Width, Header.Height, 1, 3, IL_RGBA, IL_UNSIGNED_BYTE, NULL)) {
+			Read = IL_FALSE;
+			goto finish;  // Have to destroy Channels first.
+		}
+	}
+	iCurImage->Origin = IL_ORIGIN_LOWER_LEFT;
+
 	Read = readScanlines((ILuint*)iCurImage->Data, Header.Width, Header.Height, Channel, Alpha);
 
 finish:
-
 	// Destroy channels
 	while (Channel) {
 		Prev = Channel;
-		Channel = Channel->Next;
+		Channel = (CHANNEL*)Channel->Next;
 		ifree(Prev);
 	}
 
@@ -242,12 +250,12 @@ ILboolean readScanlines(ILuint *image, ILint width, ILint height, CHANNEL *chann
 	ILint	i;
 	ILuint	*scan;
 
-	(ILvoid)alpha;
+	(void)alpha;
 	
 	for (i = height - 1; i >= 0; i--) {
 		scan = image + i * width;
 
-		if (!readScanline((ILubyte *)scan, width, channel, 4)) {
+		if (!readScanline((ILubyte *)scan, width, channel, alpha ? 4 : 3)) {
 			ilSetError(IL_ILLEGAL_FILE_VALUE);
 			return IL_FALSE;
 		}
@@ -255,6 +263,7 @@ ILboolean readScanlines(ILuint *image, ILint width, ILint height, CHANNEL *chann
 
 	return IL_TRUE;
 }
+
 
 ILuint readScanline(ILubyte *scan, ILint width, CHANNEL *channel, ILint bytes)
 {
@@ -264,7 +273,6 @@ ILuint readScanline(ILubyte *scan, ILint width, CHANNEL *channel, ILint bytes)
 
 	while (channel) {
 		noCol = 0;
-//#ifndef sgi
 		if(channel->Chan & PIC_RED_CHANNEL) {
 			off[noCol] = 0;
 			noCol++;
@@ -280,27 +288,13 @@ ILuint readScanline(ILubyte *scan, ILint width, CHANNEL *channel, ILint bytes)
 		if(channel->Chan & PIC_ALPHA_CHANNEL) {
 			off[noCol] = 3;
 			noCol++;
+			//@TODO: Find out if this is possible.
+			if (bytes == 3)  // Alpha channel in a 24-bit image.  Do not know what to do with this.
+				return 0;
 		}
-/*#else
-		if(channel->channels & PIC_RED_CHANNEL) {
-			off[noCol] = 3;
-			noCol++;
-		}
-		if(channel->channels & PIC_GREEN_CHANNEL) {
-			off[noCol] = 2;
-			noCol++;
-		}
-		if(channel->channels & PIC_BLUE_CHANNEL) {
-			off[noCol] = 1;
-			noCol++;
-		}
-		if(channel->channels & PIC_ALPHA_CHANNEL) {
-			off[noCol] = 0;
-			noCol++;
-		}
-#endif*/
 
-		switch(channel->Type & 0x0F) {
+		switch(channel->Type & 0x0F)
+		{
 			case PIC_UNCOMPRESSED:
 				status = channelReadRaw(scan, width, noCol, off, bytes);
 				break;
@@ -314,10 +308,11 @@ ILuint readScanline(ILubyte *scan, ILint width, CHANNEL *channel, ILint bytes)
 		if (!status)
 			break;
 
-		channel = channel->Next;
+		channel = (CHANNEL*)channel->Next;
 	}
 	return status;
 }
+
 
 ILboolean channelReadRaw(ILubyte *scan, ILint width, ILint noCol, ILint *off, ILint bytes)
 {
@@ -333,6 +328,7 @@ ILboolean channelReadRaw(ILubyte *scan, ILint width, ILint noCol, ILint *off, IL
 	}
 	return IL_TRUE;
 }
+
 
 ILboolean channelReadPure(ILubyte *scan, ILint width, ILint noCol, ILint *off, ILint bytes)
 {
@@ -363,6 +359,7 @@ ILboolean channelReadPure(ILubyte *scan, ILint width, ILint noCol, ILint *off, I
 	return IL_TRUE;
 }
 
+
 ILboolean channelReadMixed(ILubyte *scan, ILint width, ILint noCol, ILint *off, ILint bytes)
 {
 	ILint	count;
@@ -379,9 +376,11 @@ ILboolean channelReadMixed(ILubyte *scan, ILint width, ILint noCol, ILint *off, 
 
 		if (count >= 128) {  // Repeated sequence
 			if (count == 128) {  // Long run
-				count = GetLittleUShort();
-				if (ieof())
+				count = GetBigUShort();
+				if (ieof()) {
+					ilSetError(IL_FILE_READ_ERROR);
 					return IL_FALSE;
+				}
 			}
 			else
 				count -= 127;
@@ -389,12 +388,15 @@ ILboolean channelReadMixed(ILubyte *scan, ILint width, ILint noCol, ILint *off, 
 			// We've run past...
 			if ((i + count) > width) {
 				//fprintf(stderr, "ERROR: FF_PIC_load(): Overrun scanline (Repeat) [%d + %d > %d] (NC=%d)\n", i, count, width, noCol);
+				ilSetError(IL_ILLEGAL_FILE_VALUE);
 				return IL_FALSE;
 			}
 
 			for (j = 0; j < noCol; j++)
-				if (iread(&col[j], 1, 1) != 1)
+				if (iread(&col[j], 1, 1) != 1) {
+					ilSetError(IL_FILE_READ_ERROR);
 					return IL_FALSE;
+				}
 
 			for (k = 0; k < count; k++, scan += bytes) {
 				for (j = 0; j < noCol; j++)
@@ -404,13 +406,16 @@ ILboolean channelReadMixed(ILubyte *scan, ILint width, ILint noCol, ILint *off, 
 			count++;
 			if ((i + count) > width) {
 				//fprintf(stderr, "ERROR: FF_PIC_load(): Overrun scanline (Raw) [%d + %d > %d] (NC=%d)\n", i, count, width, noCol);
+				ilSetError(IL_ILLEGAL_FILE_VALUE);
 				return IL_FALSE;
 			}
 			
 			for (k = count; k > 0; k--, scan += bytes) {
 				for (j = 0; j < noCol; j++)
-					if (iread(&scan[off[j]], 1, 1) != 1)
+					if (iread(&scan[off[j]], 1, 1) != 1) {
+						ilSetError(IL_FILE_READ_ERROR);
 						return IL_FALSE;
+					}
 			}
 		}
 	}
@@ -419,6 +424,5 @@ ILboolean channelReadMixed(ILubyte *scan, ILint width, ILint noCol, ILint *off, 
 }
 
 
-
-
 #endif//IL_NO_PIC
+

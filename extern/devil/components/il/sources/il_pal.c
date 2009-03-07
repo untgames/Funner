@@ -19,7 +19,7 @@
 
 
 //! Loads a palette from FileName into the current image's palette.
-ILboolean ILAPIENTRY ilLoadPal(const ILstring FileName)
+ILboolean ILAPIENTRY ilLoadPal(ILconst_string FileName)
 {
 	FILE		*f;
 	ILboolean	IsPsp;
@@ -40,11 +40,11 @@ ILboolean ILAPIENTRY ilLoadPal(const ILstring FileName)
 		return ilLoadPltPal(FileName);
 	}
 
-#ifndef _WIN32_WCE
+#ifndef _UNICODE
 	f = fopen(FileName, "rt");
 #else
 	f = _wfopen(FileName, L"rt");
-#endif//_WIN32_WCE
+#endif//_UNICODE
 	if (f == NULL) {
 		ilSetError(IL_COULD_NOT_OPEN_FILE);
 		return IL_FALSE;
@@ -65,7 +65,7 @@ ILboolean ILAPIENTRY ilLoadPal(const ILstring FileName)
 
 
 //! Loads a Paint Shop Pro formatted palette (.pal) file.
-ILboolean ilLoadJascPal(const ILstring FileName)
+ILboolean ilLoadJascPal(ILconst_string FileName)
 {
 	FILE *PalFile;
 	ILuint NumColours, i, c;
@@ -83,11 +83,11 @@ ILboolean ilLoadJascPal(const ILstring FileName)
 		return IL_FALSE;
 	}
 
-#ifndef _WIN32_WCE
+#ifndef _UNICODE
 	PalFile = fopen(FileName, "rt");
 #else
 	PalFile = _wfopen(FileName, L"rt");
-#endif//_WIN32_WCE
+#endif//_UNICODE
 	if (PalFile == NULL) {
 		ilSetError(IL_COULD_NOT_OPEN_FILE);
 		return IL_FALSE;
@@ -99,16 +99,16 @@ ILboolean ilLoadJascPal(const ILstring FileName)
 	}
 
 	iFgetw(Buff, BUFFLEN, PalFile);
-	if (stricmp((ILbyte*)Buff, "JASC-PAL")) {
+	if (stricmp((const char*)Buff, "JASC-PAL")) {
 		Error = IL_TRUE;
 	}
 	iFgetw(Buff, BUFFLEN, PalFile);
-	if (stricmp((ILbyte*)Buff, "0100")) {
+	if (stricmp((const char*)Buff, "0100")) {
 		Error = IL_TRUE;
 	}
 
 	iFgetw(Buff, BUFFLEN, PalFile);
-	NumColours = atoi((ILbyte*)Buff);
+	NumColours = atoi((const char*)Buff);
 	if (NumColours == 0 || Error) {
 		ilSetError(IL_INVALID_FILE_HEADER);
 		fclose(PalFile);
@@ -126,7 +126,7 @@ ILboolean ilLoadJascPal(const ILstring FileName)
 	for (i = 0; i < NumColours; i++) {
 		for (c = 0; c < PALBPP; c++) {
 			iFgetw(Buff, BUFFLEN, PalFile);
-			Pal->Palette[i * PALBPP + c] = atoi((ILbyte*)Buff);
+			Pal->Palette[i * PALBPP + c] = atoi((const char*)Buff);
 		}
 	}
 
@@ -140,7 +140,7 @@ ILboolean ilLoadJascPal(const ILstring FileName)
 //	MaxLen must be greater than 1, because the trailing NULL is always stored.
 char *iFgetw(ILubyte *Buff, ILint MaxLen, FILE *File)
 {
-	ILbyte Temp;
+	ILint Temp;
 	ILint i;
 
 	if (Buff == NULL || File == NULL || MaxLen < 2) {
@@ -174,11 +174,11 @@ char *iFgetw(ILubyte *Buff, ILint MaxLen, FILE *File)
 	}
 
 	Buff[i] = '\0';
-	return (ILbyte*)Buff;
+	return (char *)Buff;
 }
 
 
-ILboolean ILAPIENTRY ilSavePal(const ILstring FileName)
+ILboolean ILAPIENTRY ilSavePal(ILconst_string FileName)
 {
 	ILstring Ext = iGetExtension(FileName);
 
@@ -211,7 +211,7 @@ ILboolean ILAPIENTRY ilSavePal(const ILstring FileName)
 
 
 //! Saves a Paint Shop Pro formatted palette (.pal) file.
-ILboolean ilSaveJascPal(const ILstring FileName)
+ILboolean ilSaveJascPal(ILconst_string FileName)
 {
 	FILE	*PalFile;
 	ILuint	i, PalBpp, NumCols = ilGetInteger(IL_PALETTE_NUM_COLS);
@@ -258,11 +258,11 @@ ILboolean ilSaveJascPal(const ILstring FileName)
 		return IL_FALSE;
 	}
 
-#ifndef _WIN32_WCE
+#ifndef _UNICODE
 	PalFile = fopen(FileName, "wt");
 #else
 	PalFile = _wfopen(FileName, L"wt");
-#endif//_WIN32_WCE
+#endif//_UNICODE
 	if (!PalFile) {
 		ilSetError(IL_COULD_NOT_OPEN_FILE);
 		return IL_FALSE;
@@ -292,7 +292,7 @@ ILboolean ilSaveJascPal(const ILstring FileName)
 
 
 //! Loads a Halo formatted palette (.pal) file.
-ILboolean ilLoadHaloPal(const ILstring FileName)
+ILboolean ilLoadHaloPal(ILconst_string FileName)
 {
 	ILHANDLE	HaloFile;
 	HALOHEAD	HaloHead;
@@ -365,7 +365,7 @@ ILboolean ilLoadHaloPal(const ILstring FileName)
 //	@TODO: Test the thing!
 
 //! Loads a .col palette file
-ILboolean ilLoadColPal(const ILstring FileName)
+ILboolean ilLoadColPal(ILconst_string FileName)
 {
 	ILuint		RealFileSize, FileSize;
 	ILushort	Version;
@@ -393,11 +393,11 @@ ILboolean ilLoadColPal(const ILstring FileName)
 	}
 
 	iseek(0, IL_SEEK_END);
-	RealFileSize = ftell(ColFile);
+	RealFileSize = ftell((FILE*)ColFile);
 	iseek(0, IL_SEEK_SET);
 
 	if (RealFileSize > 768) {  // has a header
-		fread(&FileSize, 4, 1, ColFile);
+		fread(&FileSize, 4, 1, (FILE*)ColFile);
 		if ((FileSize - 8) % 3 != 0) {  // check to make sure an even multiple of 3!
 			icloser(ColFile);
 			ilSetError(IL_ILLEGAL_FILE_VALUE);
@@ -446,7 +446,7 @@ ILboolean ilLoadColPal(const ILstring FileName)
 
 
 //! Loads an .act palette file.
-ILboolean ilLoadActPal(const ILstring FileName)
+ILboolean ilLoadActPal(ILconst_string FileName)
 {
 	ILHANDLE	ActFile;
 
@@ -491,7 +491,7 @@ ILboolean ilLoadActPal(const ILstring FileName)
 
 
 //! Loads an .plt palette file.
-ILboolean ilLoadPltPal(const ILstring FileName)
+ILboolean ilLoadPltPal(ILconst_string FileName)
 {
 	ILHANDLE	PltFile;
 
@@ -859,7 +859,7 @@ ILboolean ILAPIENTRY ilConvertPal(ILenum DestFormat)
 
 
 // Sets the current palette.
-ILAPI ILvoid ILAPIENTRY ilSetPal(ILpal *Pal)
+ILAPI void ILAPIENTRY ilSetPal(ILpal *Pal)
 {
 	if (iCurImage->Pal.Palette && iCurImage->Pal.PalSize && iCurImage->Pal.PalType != IL_PAL_NONE) {
 		ifree(iCurImage->Pal.Palette);
@@ -897,7 +897,7 @@ int sort_func(void *e1, void *e2)
 }
 
 
-ILboolean ILAPIENTRY ilApplyPal(const ILstring FileName)
+ILboolean ILAPIENTRY ilApplyPal(ILconst_string FileName)
 {
 	ILimage		Image, *CurImage = iCurImage;
 	ILubyte		*NewData;
@@ -1072,7 +1072,8 @@ ILboolean ILAPIENTRY ilApplyPal(const ILstring FileName)
 			break;
 
 		default:  // Should be no other!
-			break;
+			ilSetError(IL_INTERNAL_ERROR);
+			return IL_FALSE;
 	}
 
 	iCurImage = CurImage;

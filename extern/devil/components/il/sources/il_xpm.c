@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 05/27/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 01/04/2009
 //
 // Filename: src-IL/src/il_xpm.c
 //
@@ -15,16 +15,80 @@
 #ifndef IL_NO_XPM
 #include <ctype.h>
 
+
 //If this is defined, only xpm files with 1 char/pixel
 //can be loaded. They load somewhat faster then, though
 //(not much).
 //#define XPM_DONT_USE_HASHTABLE
 
-ILboolean iLoadXpmInternal(ILvoid);
+ILboolean iIsValidXpm(void);
+ILboolean iLoadXpmInternal(void);
+ILint XpmGetsInternal(ILubyte *Buffer, ILint MaxLen);
+
+//! Checks if the file specified in FileName is a valid XPM file.
+ILboolean ilIsValidXpm(ILconst_string FileName)
+{
+	ILHANDLE	XpmFile;
+	ILboolean	bXpm = IL_FALSE;
+	
+	if (!iCheckExtension(FileName, IL_TEXT("xpm"))) {
+		ilSetError(IL_INVALID_EXTENSION);
+		return bXpm;
+	}
+	
+	XpmFile = iopenr(FileName);
+	if (XpmFile == NULL) {
+		ilSetError(IL_COULD_NOT_OPEN_FILE);
+		return bXpm;
+	}
+	
+	bXpm = ilIsValidXpmF(XpmFile);
+	icloser(XpmFile);
+	
+	return bXpm;
+}
+
+
+//! Checks if the ILHANDLE contains a valid XPM file at the current position.
+ILboolean ilIsValidXpmF(ILHANDLE File)
+{
+	ILuint		FirstPos;
+	ILboolean	bRet;
+	
+	iSetInputFile(File);
+	FirstPos = itell();
+	bRet = iIsValidXpm();
+	iseek(FirstPos, IL_SEEK_SET);
+	
+	return bRet;
+}
+
+
+//! Checks if Lump is a valid XPM lump.
+ILboolean ilIsValidXpmL(const void *Lump, ILuint Size)
+{
+	iSetInputLump(Lump, Size);
+	return iIsValidXpm();
+}
+
+
+// Internal function to get the header and check it.
+ILboolean iIsValidXpm(void)
+{
+	ILubyte	Buffer[10];
+	ILuint	Pos = itell();
+
+	XpmGetsInternal(Buffer, 10);
+	iseek(Pos, IL_SEEK_SET);  // Restore position
+
+	if (strncmp("/* XPM */", (char*)Buffer, strlen("/* XPM */")))
+		return IL_FALSE;
+	return IL_TRUE;
+}
 
 
 // Reads an .xpm file
-ILboolean ilLoadXpm(const ILstring FileName)
+ILboolean ilLoadXpm(ILconst_string FileName)
 {
 	ILHANDLE	XpmFile;
 	ILboolean	bXpm = IL_FALSE;
@@ -36,9 +100,7 @@ ILboolean ilLoadXpm(const ILstring FileName)
 	}
 
 	iSetInputFile(XpmFile);
-
 	bXpm = ilLoadXpmF(XpmFile);
-
 	icloser(XpmFile);
 
 	return bXpm;
@@ -61,12 +123,15 @@ ILboolean ilLoadXpmF(ILHANDLE File)
 
 
 //! Reads from a memory "lump" that contains an .xpm
-ILboolean ilLoadXpmL( const ILvoid *Lump, ILuint Size) {
+ILboolean ilLoadXpmL(const void *Lump, ILuint Size)
+ {
 	iSetInputLump(Lump, Size);
 	return iLoadXpmInternal();
 }
 
+
 typedef ILubyte XpmPixel[4];
+
 #define XPM_MAX_CHAR_PER_PIXEL 2
 
 
@@ -175,6 +240,7 @@ ILint XpmGetsInternal(ILubyte *Buffer, ILint MaxLen)
 			return 0;
 		if (Current == '\n') //unix line ending
 			break;
+
 		if (Current == '\r') { //dos/mac line ending
 			Current = igetc();
 			if (Current == '\n') //dos line ending
@@ -183,11 +249,10 @@ ILint XpmGetsInternal(ILubyte *Buffer, ILint MaxLen)
 			if (Current == IL_EOF)
 				break;
 
-			Buffer[i++] = Current;
+			Buffer[i++] = (ILubyte)Current;
 			continue;
 		}
-
-		Buffer[i++] = Current;
+		Buffer[i++] = (ILubyte)Current;
 	}
 
 	Buffer[i++] = 0;
@@ -206,13 +271,13 @@ ILint XpmGets(ILubyte *Buffer, ILint MaxLen)
 		if (Size == IL_EOF)
 			return IL_EOF;
 
-		//stip leading whitespace (sometimes there's whitespace
+		//skip leading whitespace (sometimes there's whitespace
 		//before a comment or before the pixel data)
+
 		for(i = 0; i < Size && isspace(Buffer[i]); ++i) ;
 		Size = Size - i;
 		for(j = 0; j < Size; ++j)
 			Buffer[j] = Buffer[j + i];
-
 
 		if (Size == 0)
 			continue;
@@ -333,7 +398,7 @@ ILboolean XpmPredefCol(char *Buff, XpmPixel *Colour)
 	}
 
 	//check for grayXXX codes (added 20040218)
-	len = strlen(Buff);
+	len = ilCharStrLen(Buff);
 	if (len >= 4) {
 		if (Buff[0] == 'g' || Buff[0] == 'G'
 			|| Buff[1] == 'r' || Buff[1] == 'R'
@@ -348,9 +413,9 @@ ILboolean XpmPredefCol(char *Buff, XpmPixel *Colour)
 				}
 				val = (255*val)/100;
 			}
-			(*Colour)[0] = val;
-			(*Colour)[1] = val;
-			(*Colour)[2] = val;
+			(*Colour)[0] = (ILubyte)val;
+			(*Colour)[1] = (ILubyte)val;
+			(*Colour)[2] = (ILubyte)val;
 			return IL_TRUE;
 		}
 	}
@@ -375,6 +440,7 @@ ILboolean XpmGetColour(ILubyte *Buffer, ILint Size, int Len, XpmPixel* Colours)
 	ILint		i = 0, j, strLen = 0;
 	ILubyte		ColBuff[3];
 	char		Buff[1024];
+
 	XpmPixel	Colour;
 	ILubyte		Name[XPM_MAX_CHAR_PER_PIXEL];
 
@@ -461,15 +527,16 @@ ILboolean XpmGetColour(ILubyte *Buffer, ILint Size, int Len, XpmPixel* Colours)
 			return IL_FALSE;
 
 		if (!XpmPredefCol(Buff, &Colour))
+
 			return IL_FALSE;
 	}
+
 
 #ifndef XPM_DONT_USE_HASHTABLE
 	XpmInsertEntry(Table, Name, Len, Colour);
 #else
 	memcpy(Colours[Name[0]], Colour, sizeof(Colour));
 #endif
-
 	return IL_TRUE;
 }
 
@@ -479,7 +546,9 @@ ILboolean iLoadXpmInternal()
 #define BUFFER_SIZE 2000
 	ILubyte			Buffer[BUFFER_SIZE], *Data;
 	ILint			Size, Pos, Width, Height, NumColours, i, x, y;
+
 	ILint			CharsPerPixel;
+
 #ifndef XPM_DONT_USE_HASHTABLE
 	XPMHASHENTRY	**HashTable;
 #else
@@ -501,6 +570,7 @@ ILboolean iLoadXpmInternal()
 	Width = XpmGetInt(Buffer, Size, &Pos);
 	Height = XpmGetInt(Buffer, Size, &Pos);
 	NumColours = XpmGetInt(Buffer, Size, &Pos);
+
 	CharsPerPixel = XpmGetInt(Buffer, Size, &Pos);
 
 #ifdef XPM_DONT_USE_HASHTABLE
@@ -549,6 +619,7 @@ ILboolean iLoadXpmInternal()
 	}
 
 	Data = iCurImage->Data;
+
 	for (y = 0; y < Height; y++) {
 		Size = XpmGets(Buffer, BUFFER_SIZE);
 		for (x = 0; x < Width; x++) {
@@ -562,19 +633,21 @@ ILboolean iLoadXpmInternal()
 			Data[Offset + 3] = Colours[Buffer[x + 1]][3];
 #endif
 		}
+
 		Data += iCurImage->Bps;
 	}
 
 	//added 20040218
 	iCurImage->Origin = IL_ORIGIN_UPPER_LEFT;
 
+
 #ifndef XPM_DONT_USE_HASHTABLE
 	XpmDestroyHashTable(HashTable);
 #else
 	ifree(Colours);
 #endif
-
 	return IL_TRUE;
+
 #undef BUFFER_SIZE
 }
 

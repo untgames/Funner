@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 02/19/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2009 by Denton Woods
+// Last modified: 02/01/2009
 //
 // Filename: src-IL/src/il_devil.c
 //
@@ -16,7 +16,8 @@
 #include <limits.h>
 #include "il_manip.h"
 
-ILAPI ILboolean ILAPIENTRY ilInitImage(ILimage *Image, ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp, ILenum Format, ILenum Type, ILvoid *Data)
+
+ILAPI ILboolean ILAPIENTRY ilInitImage(ILimage *Image, ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp, ILenum Format, ILenum Type, void *Data)
 {
 	ILubyte BpcType = ilGetBpcType(Type);
 	if (BpcType == 0) {
@@ -24,13 +25,15 @@ ILAPI ILboolean ILAPIENTRY ilInitImage(ILimage *Image, ILuint Width, ILuint Heig
 		return IL_FALSE;
 	}
 
-	memset (Image, 0, sizeof(ILimage));
+	memset(Image, 0, sizeof(ILimage));
 
 	////
-
-	Image->Width	   = Width	== 0 ? 1 : Width;
-	Image->Height	   = Height == 0 ? 1 : Height;
-	Image->Depth	   = Depth	== 0 ? 1 : Depth;
+	if (Width  == 0) Width = 1;
+	if (Height == 0) Height = 1;
+	if (Depth  == 0) Depth = 1;
+	Image->Width	   = Width;
+	Image->Height	   = Height;
+	Image->Depth	   = Depth;
 	Image->Bpp		   = Bpp;
 	Image->Bpc		   = BpcType;
 	Image->Bps		   = Width * Bpp * Image->Bpc;
@@ -71,7 +74,7 @@ ILAPI ILimage* ILAPIENTRY ilNewImage(ILuint Width, ILuint Height, ILuint Depth, 
 		return NULL;
 	}
 
-	if (!ilInitImage (Image, Width, Height, Depth, Bpp, ilGetFormatBpp(Bpp), ilGetTypeBpc(Bpc), NULL)) {
+	if (!ilInitImage(Image, Width, Height, Depth, Bpp, ilGetFormatBpp(Bpp), ilGetTypeBpc(Bpc), NULL)) {
 		if (Image->Data != NULL) {
 			ifree(Image->Data);
 		}
@@ -82,7 +85,9 @@ ILAPI ILimage* ILAPIENTRY ilNewImage(ILuint Width, ILuint Height, ILuint Depth, 
 	return Image;
 }
 
-ILAPI ILimage* ILAPIENTRY ilNewImageFull(ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp, ILenum Format, ILenum Type, ILvoid *Data)
+
+// Same as above but allows specification of Format and Type
+ILAPI ILimage* ILAPIENTRY ilNewImageFull(ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp, ILenum Format, ILenum Type, void *Data)
 {
 	ILimage *Image;
 
@@ -95,7 +100,7 @@ ILAPI ILimage* ILAPIENTRY ilNewImageFull(ILuint Width, ILuint Height, ILuint Dep
 		return NULL;
 	}
 
-	if (!ilInitImage (Image, Width, Height, Depth, Bpp, Format, Type, Data)) {
+	if (!ilInitImage(Image, Width, Height, Depth, Bpp, Format, Type, Data)) {
 		if (Image->Data != NULL) {
 			ifree(Image->Data);
 		}
@@ -108,14 +113,25 @@ ILAPI ILimage* ILAPIENTRY ilNewImageFull(ILuint Width, ILuint Height, ILuint Dep
 
 
 //! Changes the current bound image to use these new dimensions (current data is destroyed).
-ILboolean ILAPIENTRY ilTexImage(ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp, ILenum Format, ILenum Type, ILvoid *Data)
+/*! \param Width Specifies the new image width.  This cannot be 0.
+	\param Height Specifies the new image height.  This cannot be 0.
+	\param Depth Specifies the new image depth.  This cannot be 0.
+	\param Bpp Number of channels (ex. 3 for RGB)
+	\param Format Enum of the desired format.  Any format values are accepted.
+	\param Type Enum of the desired type.  Any type values are accepted.
+	\param Data Specifies data that should be copied to the new image. If this parameter is NULL, no data is copied, and the new image data consists of undefined values.
+	\exception IL_ILLEGAL_OPERATION No currently bound image.
+	\exception IL_INVALID_PARAM One of the parameters is incorrect, such as one of the dimensions being 0.
+	\exception IL_OUT_OF_MEMORY Could not allocate enough memory.
+	\return Boolean value of failure or success*/
+ILboolean ILAPIENTRY ilTexImage(ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp, ILenum Format, ILenum Type, void *Data)
 {
 	return ilTexImage_(iCurImage, Width, Height, Depth, Bpp, Format, Type, Data);
 }
 
 
 // Internal version of ilTexImage.
-ILAPI ILboolean ILAPIENTRY ilTexImage_(ILimage *Image, ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp, ILenum Format, ILenum Type, ILvoid *Data)
+ILAPI ILboolean ILAPIENTRY ilTexImage_(ILimage *Image, ILuint Width, ILuint Height, ILuint Depth, ILubyte Bpp, ILenum Format, ILenum Type, void *Data)
 {
 	if (Image == NULL) {
 		ilSetError(IL_ILLEGAL_OPERATION);
@@ -131,6 +147,7 @@ ILAPI ILboolean ILAPIENTRY ilTexImage_(ILimage *Image, ILuint Width, ILuint Heig
 
 	ilCloseImage(Image->Mipmaps);
 	ilCloseImage(Image->Next);
+	ilCloseImage(Image->Faces);
 	ilCloseImage(Image->Layers);
 
 	if (Image->AnimList) ifree(Image->AnimList);
@@ -140,7 +157,7 @@ ILAPI ILboolean ILAPIENTRY ilTexImage_(ILimage *Image, ILuint Width, ILuint Heig
 
 	////
 
-	// Also check against format?
+	//@TODO: Also check against format?
 	/*if (Width == 0 || Height == 0 || Depth == 0 || Bpp == 0) {
 		ilSetError(IL_INVALID_PARAM);
 	return IL_FALSE;
@@ -151,7 +168,12 @@ ILAPI ILboolean ILAPIENTRY ilTexImage_(ILimage *Image, ILuint Width, ILuint Heig
 
 
 //! Uploads Data of the same size to replace the current image's data.
-ILboolean ILAPIENTRY ilSetData(ILvoid *Data)
+/*! \param Data New image data to update the currently bound image
+	\exception IL_ILLEGAL_OPERATION No currently bound image
+	\exception IL_INVALID_PARAM Data was NULL.
+	\return Boolean value of failure or success
+*/
+ILboolean ILAPIENTRY ilSetData(void *Data)
 {
 	if (iCurImage == NULL) {
 		ilSetError(IL_ILLEGAL_OPERATION);
@@ -163,7 +185,7 @@ ILboolean ILAPIENTRY ilSetData(ILvoid *Data)
 
 
 // Internal version of ilTexSubImage.
-ILAPI ILboolean ILAPIENTRY ilTexSubImage_(ILimage *Image, ILvoid *Data)
+ILAPI ILboolean ILAPIENTRY ilTexSubImage_(ILimage *Image, void *Data)
 {
 	if (Image == NULL || Data == NULL) {
 		ilSetError(IL_INVALID_PARAM);
@@ -179,7 +201,14 @@ ILAPI ILboolean ILAPIENTRY ilTexSubImage_(ILimage *Image, ILvoid *Data)
 }
 
 
-ILubyte* ILAPIENTRY ilGetData()
+//! Returns a pointer to the current image's data.
+/*! The pointer to the image data returned by this function is only valid until any
+    operations are done on the image.  After any operations, this function should be
+	called again.  The pointer can be cast to other types for images that have more
+	than one byte per channel for easier access to data.
+	\exception IL_ILLEGAL_OPERATION No currently bound image
+	\return ILubyte pointer to image data.*/
+ILubyte* ILAPIENTRY ilGetData(void)
 {
 	if (iCurImage == NULL) {
 		ilSetError(IL_ILLEGAL_OPERATION);
@@ -190,7 +219,13 @@ ILubyte* ILAPIENTRY ilGetData()
 }
 
 
-ILubyte* ILAPIENTRY ilGetPalette()
+//! Returns a pointer to the current image's palette data.
+/*! The pointer to the image palette data returned by this function is only valid until
+	any operations are done on the image.  After any operations, this function should be
+	called again.
+	\exception IL_ILLEGAL_OPERATION No currently bound image
+	\return ILubyte pointer to image palette data.*/
+ILubyte* ILAPIENTRY ilGetPalette(void)
 {
 	if (iCurImage == NULL) {
 		ilSetError(IL_ILLEGAL_OPERATION);
@@ -213,7 +248,7 @@ static ILfloat ClearBlue  = 0.90588f;
 static ILfloat ClearAlpha = 0.0f;
 static ILfloat ClearLum   = 1.0f;
 
-ILvoid ILAPIENTRY ilClearColour(ILclampf Red, ILclampf Green, ILclampf Blue, ILclampf Alpha)
+void ILAPIENTRY ilClearColour(ILclampf Red, ILclampf Green, ILclampf Blue, ILclampf Alpha)
 {
 	// Clamp to 0.0f - 1.0f.
 	ClearRed	= Red < 0.0f ? 0.0f : (Red > 1.0f ? 1.0f : Red);
@@ -233,7 +268,7 @@ ILvoid ILAPIENTRY ilClearColour(ILclampf Red, ILclampf Green, ILclampf Blue, ILc
 }
 
 
-ILAPI ILvoid ILAPIENTRY ilGetClear(ILvoid *Colours, ILenum Format, ILenum Type)
+ILAPI void ILAPIENTRY ilGetClear(void *Colours, ILenum Format, ILenum Type)
 {
 	ILubyte 	*BytePtr;
 	ILushort	*ShortPtr;
@@ -547,7 +582,7 @@ ILAPI ILboolean ILAPIENTRY ilClearImage_(ILimage *Image)
 				ShortPtr = (ILushort*)Colours;
 				for (c = 0; c < NumBytes; c += Image->Bpc) {
 					for (i = c; i < Image->SizeOfData; i += NumBytes) {
-						*((ILushort*)(Image->Data + i)) = ShortPtr[c];
+						*((ILushort*)(Image->Data + i)) = ShortPtr[c / Image->Bpc];
 					}
 				}
 					break;
@@ -557,7 +592,7 @@ ILAPI ILboolean ILAPIENTRY ilClearImage_(ILimage *Image)
 				IntPtr = (ILuint*)Colours;
 				for (c = 0; c < NumBytes; c += Image->Bpc) {
 					for (i = c; i < Image->SizeOfData; i += NumBytes) {
-						*((ILuint*)(Image->Data + i)) = IntPtr[c];
+						*((ILuint*)(Image->Data + i)) = IntPtr[c / Image->Bpc];
 					}
 				}
 					break;
@@ -566,7 +601,7 @@ ILAPI ILboolean ILAPIENTRY ilClearImage_(ILimage *Image)
 				FloatPtr = (ILfloat*)Colours;
 				for (c = 0; c < NumBytes; c += Image->Bpc) {
 					for (i = c; i < Image->SizeOfData; i += NumBytes) {
-						*((ILfloat*)(Image->Data + i)) = FloatPtr[c];
+						*((ILfloat*)(Image->Data + i)) = FloatPtr[c / Image->Bpc];
 					}
 				}
 					break;
@@ -575,7 +610,7 @@ ILAPI ILboolean ILAPIENTRY ilClearImage_(ILimage *Image)
 				DblPtr = (ILdouble*)Colours;
 				for (c = 0; c < NumBytes; c += Image->Bpc) {
 					for (i = c; i < Image->SizeOfData; i += NumBytes) {
-						*((ILdouble*)(Image->Data + i)) = DblPtr[c];
+						*((ILdouble*)(Image->Data + i)) = DblPtr[c / Image->Bpc];
 					}
 				}
 					break;
@@ -607,204 +642,150 @@ ILAPI ILboolean ILAPIENTRY ilClearImage_(ILimage *Image)
 //! Overlays the image found in Src on top of the current bound image at the coords specified.
 ILboolean ILAPIENTRY ilOverlayImage(ILuint Source, ILint XCoord, ILint YCoord, ILint ZCoord)
 {
-	ILuint		x, y, z, SrcIndex, DestIndex, ConvBps, ConvSizePlane;
-	ILint		c;
-	ILimage 	*Dest;//, *Src;
-	ILubyte 	*Converted;
-	ILuint		DestName = ilGetCurName();
-	ILfloat 	FrontPer, BackPer;
-	ILenum		DestOrigin, SrcOrigin;
-	ILuint		StartX, StartY, StartZ, AlphaOff;
-	ILubyte 	*SrcTemp = NULL;
-	ILboolean	DestFlipped = IL_FALSE;
-		
-		
-	if (DestName == 0 || iCurImage == NULL) {
-			ilSetError(IL_ILLEGAL_OPERATION);
-			return IL_FALSE;
-	}
-		
-	if (iCurImage->Origin == IL_ORIGIN_LOWER_LEFT) {  // Dest
-			DestFlipped = IL_TRUE;
-			ilFlipImage();
-	}
+	ILuint	Width, Height, Depth;
+	ILuint	Dest;
 	
-	Dest = iCurImage;
-	DestOrigin = iCurImage->Origin;
+	Dest = ilGetCurName();
 	ilBindImage(Source);
-	SrcOrigin = iCurImage->Origin;
-		
-	if (iCurImage->Origin == IL_ORIGIN_LOWER_LEFT) {
-			SrcTemp = iGetFlipped(iCurImage);
-			if (SrcTemp == NULL) {
-				ilBindImage(DestName);
-				if (DestFlipped)
-					ilFlipImage();
-				return IL_FALSE;
-			}
-	}
-	else {
-			SrcTemp = iCurImage->Data;
-	}
-		
-	if (Dest == NULL || iCurImage == NULL) {
-			ilSetError(IL_INVALID_PARAM);
-			return IL_FALSE;
-	}
-		
-	Converted = ilConvertBuffer(iCurImage->SizeOfData, iCurImage->Format, Dest->Format, iCurImage->Type, Dest->Type, SrcTemp);
-	if (Converted == NULL)
-			return IL_FALSE;
-		
-	ConvBps = Dest->Bpp * iCurImage->Width;
-	ConvSizePlane = ConvBps * iCurImage->Height;
-		
-	StartX = XCoord >= 0 ? 0 : -XCoord;
-	StartY = YCoord >= 0 ? 0 : -YCoord;
-	StartZ = ZCoord >= 0 ? 0 : -ZCoord;
-		
-	if (iCurImage->Format == IL_RGBA || iCurImage->Format == IL_BGRA || iCurImage->Format == IL_LUMINANCE_ALPHA) {
-			if (iCurImage->Format == IL_LUMINANCE_ALPHA)
-				AlphaOff = 1;
-			else
-				AlphaOff = 3;
-			
-			for (z = StartZ; z < iCurImage->Depth && (ILint)z + ZCoord < (ILint)Dest->Depth; z++) {
-				for (y = StartY; y < iCurImage->Height && (ILint)y + YCoord < (ILint)Dest->Height; y++) {
-					for (x = StartX; x < iCurImage->Width && (ILint)x + XCoord < (ILint)Dest->Width; x++) {
-						SrcIndex = z * ConvSizePlane + y * ConvBps + x * Dest->Bpp;
-						DestIndex = (z + ZCoord) * Dest->SizeOfPlane + (y + YCoord) * Dest->Bps + (x + XCoord) * Dest->Bpp;
-						FrontPer = iCurImage->Data[z * iCurImage->SizeOfPlane + y * iCurImage->Bps + x * iCurImage->Bpp + AlphaOff] / 255.0f;
-						BackPer = 1.0f - FrontPer;
-						for (c = 0; c < iCurImage->Bpp - 1; c++) {
-							Dest->Data[DestIndex + c] = (ILubyte)(Converted[SrcIndex + c] * FrontPer
-																  + Dest->Data[DestIndex + c] * BackPer);
-						}
-						// Keep the original alpha.
-						//Dest->Data[DestIndex + c + 1] = Dest->Data[DestIndex + c + 1];
-					}
-				}
-			}
-	}
-	else {
-			for (z = StartZ; z < iCurImage->Depth && z + ZCoord < Dest->Depth; z++) {
-				for (y = StartY; y < iCurImage->Height && y + YCoord < Dest->Height; y++) {
-					for (x = StartX; x < iCurImage->Width && x + XCoord < Dest->Width; x++) {
-						for (c = 0; c < iCurImage->Bpp; c++) {
-							Dest->Data[(z + ZCoord) * Dest->SizeOfPlane + (y + YCoord) * Dest->Bps + (x + XCoord) * Dest->Bpp + c] =
-							Converted[z * ConvSizePlane + y * ConvBps + x * Dest->Bpp + c];
-						}
-					}
-				}
-			}
-	}
-		
-	if (SrcTemp != iCurImage->Data)
-			ifree(SrcTemp);
-		
-	ilBindImage(DestName);
-	if (DestFlipped)
-			ilFlipImage();
-		
-	ifree(Converted);
-		
-	return IL_TRUE;
+	Width = iCurImage->Width;  Height = iCurImage->Height;  Depth = iCurImage->Depth;
+	ilBindImage(Dest);
+
+	return ilBlit(Source, XCoord, YCoord, ZCoord, 0, 0, 0, Width, Height, Depth);
 }
 
-
-ILboolean ILAPIENTRY ilBlit(ILuint Source, ILint DestX, ILint DestY, ILint DestZ, ILuint SrcX, ILuint SrcY, ILuint SrcZ, ILuint Width, ILuint Height, ILuint Depth)
+//@NEXT DestX,DestY,DestZ must be set to ILuint
+ILboolean ILAPIENTRY ilBlit(ILuint Source, ILint DestX,  ILint DestY,   ILint DestZ, 
+                                           ILuint SrcX,  ILuint SrcY,   ILuint SrcZ,
+                                           ILuint Width, ILuint Height, ILuint Depth)
 {
-	register ILuint 	x, y, z, SrcIndex, DestIndex, ConvBps, ConvSizePlane;
-	ILimage 	*Dest;
+	ILuint 		x, y, z, ConvBps, ConvSizePlane;
+	ILimage 	*Dest,*Src;
 	ILubyte 	*Converted;
 	ILuint		DestName = ilGetCurName();
-	ILint		c;
-	ILfloat 	FrontPer, BackPer;
-	ILenum		DestOrigin, SrcOrigin;
-	ILuint		StartX, StartY, StartZ, AlphaOff;
+	ILuint		c;
+	ILuint		StartX, StartY, StartZ;
 	ILboolean	DestFlipped = IL_FALSE;
 	ILubyte 	*SrcTemp;
-	
-	
+	ILfloat		Back;
+
+	// Check if the desiination image really exists
 	if (DestName == 0 || iCurImage == NULL) {
 		ilSetError(IL_ILLEGAL_OPERATION);
 		return IL_FALSE;
 	}
+	Dest = iCurImage;
 	
-	if (iCurImage->Origin == IL_ORIGIN_LOWER_LEFT) {  // Dest
+	// set the destination image to upper left origin
+	if (Dest->Origin == IL_ORIGIN_LOWER_LEFT) {  // Dest
 		DestFlipped = IL_TRUE;
 		ilFlipImage();
 	}
-	
-	Dest = iCurImage;
-	DestOrigin = iCurImage->Origin;
+	//DestOrigin = Dest->Origin;
 	ilBindImage(Source);
-	SrcOrigin = iCurImage->Origin;
 	
-	if (iCurImage->Origin == IL_ORIGIN_LOWER_LEFT) {
+	// Check if the source image really exists
+	if (iCurImage == NULL) {
+		ilSetError(IL_INVALID_PARAM);
+		return IL_FALSE;
+	}
+	
+	Src = iCurImage;
+	
+	//@TODO test if coordinates are inside the images (hard limit for source)
+	
+	// set the source image to upper left origin
+	if (Src->Origin == IL_ORIGIN_LOWER_LEFT)
+	{
 		SrcTemp = iGetFlipped(iCurImage);
-		if (SrcTemp == NULL) {
+		if (SrcTemp == NULL)
+		{
 			ilBindImage(DestName);
 			if (DestFlipped)
 				ilFlipImage();
 			return IL_FALSE;
 		}
 	}
-	else {
+	else
+	{
 		SrcTemp = iCurImage->Data;
 	}
 	
-	if (Dest == NULL || iCurImage == NULL) {
-		ilSetError(IL_INVALID_PARAM);
-		return IL_FALSE;
-	}
-	
-	Converted = ilConvertBuffer(iCurImage->SizeOfData, iCurImage->Format, Dest->Format, iCurImage->Type, Dest->Type, SrcTemp);
+	// convert source image to match the destination image type and format
+	Converted = (ILubyte*)ilConvertBuffer(Src->SizeOfData, Src->Format, Dest->Format, Src->Type, Dest->Type, NULL, SrcTemp);
 	if (Converted == NULL)
 		return IL_FALSE;
 	
-	ConvBps = Dest->Bpp * iCurImage->Width;
-	ConvSizePlane = ConvBps * iCurImage->Height;
+	ConvBps 	  = Dest->Bpp * Src->Width;
+	ConvSizePlane = ConvBps   * Src->Height;
 	
+	//@NEXT in next version this would have to be removed since Dest* will be unsigned
 	StartX = DestX >= 0 ? 0 : -DestX;
 	StartY = DestY >= 0 ? 0 : -DestY;
 	StartZ = DestZ >= 0 ? 0 : -DestZ;
 	
-	Width = Width + SrcX < Dest->Width ? Width + SrcX : Dest->Width;
-	Height = Height + SrcY < Dest->Height ? Height + SrcY : Dest->Height;
-	Depth = Depth + SrcZ < Dest->Depth ? Depth + SrcZ : Dest->Depth;
+	// Limit the copy of data inside of the destination image
+	if (Width  + DestX > Dest->Width)  Width  = Dest->Width  - DestX;
+	if (Height + DestY > Dest->Height) Height = Dest->Height - DestY;
+	if (Depth  + DestZ > Dest->Depth)  Depth  = Dest->Depth  - DestZ;
 	
-	if (iCurImage->Format == IL_RGBA || iCurImage->Format == IL_BGRA || iCurImage->Format == IL_LUMINANCE_ALPHA) {
-		if (iCurImage->Format == IL_LUMINANCE_ALPHA)
-			AlphaOff = 1;
-		else
-			AlphaOff = 3;
-		
-		for (z = StartZ; z < Depth && z + DestZ < Dest->Depth; z++) {
-			for (y = StartY; y < Height && y + DestY < Dest->Height; y++) {
-				for (x = StartX; x < Width && x + DestX < Dest->Width; x++) {
-					SrcIndex = (z + SrcZ) * ConvSizePlane + (y + SrcY) * ConvBps + (x + SrcX) * Dest->Bpp;
-					DestIndex = (z + DestZ) * Dest->SizeOfPlane + (y + DestY) * Dest->Bps + (x + DestX) * Dest->Bpp;
-					// Use the original alpha
-					FrontPer = iCurImage->Data[(z + SrcZ) * iCurImage->SizeOfPlane + (y + SrcY) * iCurImage->Bps + (x + SrcX) * iCurImage->Bpp + 3] / 255.0f;
-					BackPer = 1.0f - FrontPer;
-					for (c = 0; c < Dest->Bpp - 1; c++) {
-						Dest->Data[DestIndex + c] = (ILubyte)(Converted[SrcIndex + c] * FrontPer
-																  + Dest->Data[DestIndex + c] * BackPer);
+	//@TODO: non funziona con rgba
+	if (Src->Format == IL_RGBA || Src->Format == IL_BGRA || Src->Format == IL_LUMINANCE_ALPHA) {
+		const ILuint bpp_without_alpha = Dest->Bpp - 1;
+		for (z = 0; z < Depth; z++) {
+			for (y = 0; y < Height; y++) {
+				for (x = 0; x < Width; x++) {
+					const ILuint  SrcIndex  = (z+SrcZ)*ConvSizePlane + (y+SrcY)*ConvBps + (x+SrcX)*Dest->Bpp;
+					const ILuint  DestIndex = (z+DestZ)*Dest->SizeOfPlane + (y+DestY)*Dest->Bps + (x+DestX)*Dest->Bpp;
+					const ILuint  AlphaIdx = SrcIndex + bpp_without_alpha;
+					ILfloat Front = 0;
+					
+					switch (Dest->Type)
+					{
+						case IL_BYTE:
+						case IL_UNSIGNED_BYTE:
+							Front = Converted[AlphaIdx]/((float)IL_MAX_UNSIGNED_BYTE);
+							break;
+						case IL_SHORT:
+						case IL_UNSIGNED_SHORT:
+							Front = ((ILshort*)Converted)[AlphaIdx]/((float)IL_MAX_UNSIGNED_SHORT);
+							break;
+						case IL_INT:
+						case IL_UNSIGNED_INT:
+							Front = ((ILint*)Converted)[AlphaIdx]/((float)IL_MAX_UNSIGNED_INT);
+							break;
+						case IL_FLOAT:
+							Front = ((ILfloat*)Converted)[AlphaIdx];
+							break;
+						case IL_DOUBLE:
+							Front = (ILfloat)(((ILdouble*)Converted)[AlphaIdx]);
+							break;
 					}
-					// Keep the original alpha.
-					//Dest->Data[DestIndex + c + 1] = Dest->Data[DestIndex + c + 1];
+					Back = 1.0f - Front;
+					// In case of Alpha channel, the data is blended. Keeps the original alpha.
+					if (ilIsEnabled(IL_BLIT_BLEND)) {
+						for (c = 0; c < bpp_without_alpha; c++)
+						{
+							Dest->Data[DestIndex + c] = 
+								(ILubyte)(Converted[SrcIndex + c] * Front
+											+ Dest->Data[DestIndex + c] * Back);
+						}
+					}
+					else {
+						for (c = 0; c < Dest->Bpp; c++)
+						{
+							Dest->Data[DestIndex + c] = (ILubyte)(Converted[SrcIndex + c]);
+						}
+					}
 				}
 			}
 		}
-	}
-	else {
-		for (z = StartZ; z < Depth && z + DestZ < Dest->Depth; z++) {
-			for (y = StartY; y < Height && y + DestY < Dest->Height; y++) {
-				for (x = StartX; x < Width && x + DestX < Dest->Width; x++) {
-					for (c = 0; c < Dest->Bpp; c++) {
-						Dest->Data[(z + DestZ) * Dest->SizeOfPlane + (y + DestY) * Dest->Bps + (x + DestX) * Dest->Bpp + c] =
-						Converted[(z + SrcZ) * ConvSizePlane + (y + SrcY) * ConvBps + (x + SrcX) * Dest->Bpp + c];
+	} else {
+		for( z = 0; z < Depth; z++ ) {
+			for( y = 0; y < Height; y++ ) {
+				for( x = 0; x < Width; x++ ) {
+					for( c = 0; c < Dest->Bpp; c++ ) {
+						Dest->Data[(z+DestZ)*Dest->SizeOfPlane + (y+DestY)*Dest->Bps + (x+DestX)*Dest->Bpp + c] =
+						 Converted[(z+SrcZ)*ConvSizePlane + (y+SrcY)*ConvBps + (x+SrcX)*Dest->Bpp + c];
 					}
 				}
 			}
@@ -856,8 +837,18 @@ ILboolean iCopySubImage(ILimage *Dest, ILimage *Src)
 	return IL_TRUE;
 }
 
+
 ILboolean iCopySubImages(ILimage *Dest, ILimage *Src)
 {
+	if (Src->Faces) {
+		Dest->Faces = (ILimage*)icalloc(1, sizeof(ILimage));
+		if (!Dest->Faces) {
+			return IL_FALSE;
+		}
+		if (!iCopySubImage(Dest->Faces, Src->Faces))
+			return IL_FALSE;
+	}
+	
 	if (Src->Layers) {
 		Dest->Layers = (ILimage*)icalloc(1, sizeof(ILimage));
 		if (!Dest->Layers) {
@@ -866,7 +857,7 @@ ILboolean iCopySubImages(ILimage *Dest, ILimage *Src)
 		if (!iCopySubImage(Dest->Layers, Src->Layers))
 			return IL_FALSE;
 	}
-	
+
 	if (Src->Mipmaps) {
 		Dest->Mipmaps = (ILimage*)icalloc(1, sizeof(ILimage));
 		if (!Dest->Mipmaps) {
@@ -875,7 +866,7 @@ ILboolean iCopySubImages(ILimage *Dest, ILimage *Src)
 		if (!iCopySubImage(Dest->Mipmaps, Src->Mipmaps))
 			return IL_FALSE;
 	}
-	
+
 	if (Src->Next) {
 		Dest->Next = (ILimage*)icalloc(1, sizeof(ILimage));
 		if (!Dest->Next) {
@@ -884,7 +875,7 @@ ILboolean iCopySubImages(ILimage *Dest, ILimage *Src)
 		if (!iCopySubImage(Dest->Next, Src->Next))
 			return IL_FALSE;
 	}
-	
+
 	return IL_TRUE;
 }
 
@@ -900,6 +891,10 @@ ILAPI ILboolean ILAPIENTRY ilCopyImageAttr(ILimage *Dest, ILimage *Src)
 	if (Dest->Pal.Palette && Dest->Pal.PalSize && Dest->Pal.PalType != IL_PAL_NONE) {
 		ifree(Dest->Pal.Palette);
 		Dest->Pal.Palette = NULL;
+	}
+	if (Dest->Faces) {
+		ilCloseImage(Dest->Faces);
+		Dest->Faces = NULL;
 	}
 	if (Dest->Layers) {
 		ilCloseImage(Dest->Layers);

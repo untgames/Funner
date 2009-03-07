@@ -18,20 +18,25 @@
 #undef  PACKAGE_NAME
 #endif
 
-#ifndef _WIN32
+#if (!defined(_WIN32) && !defined(_WIN64))
 	#define NON_WINDOWS 1
-	#ifndef LCMS_NODIRINCLUDE
+	#ifdef LCMS_NODIRINCLUDE
 		#include <lcms.h>
 	#else
 		#include <lcms/lcms.h>
 	#endif
 	
 #else
-//	#ifndef IL_DEBUG
-//		pragma comment(lib, "lcms108.lib")
-//	#else
-//		pragma comment(lib, "debug/lcms108.lib")
-//	#endif
+	#if defined(IL_USE_PRAGMA_LIBS)
+		#if defined(_MSC_VER) || defined(__BORLANDC__)
+			#ifndef _DEBUG
+				#pragma comment(lib, "lcms.lib")
+			#else
+				#pragma comment(lib, "lcms-d.lib")
+			#endif
+		#endif
+	#endif
+
 	#include <lcms.h>
 #endif//_WIN32
 
@@ -53,6 +58,9 @@ ILboolean ILAPIENTRY ilApplyProfile(ILstring InProfile, ILstring OutProfile)
 	cmsHTRANSFORM	hTransform;
 	ILubyte			*Temp;
 	ILint			Format=0;
+#ifdef _UNICODE
+	char AnsiName[512];
+#endif//_UNICODE
 
 	if (iCurImage == NULL) {
 		ilSetError(IL_ILLEGAL_OPERATION);
@@ -129,10 +137,19 @@ ILboolean ILAPIENTRY ilApplyProfile(ILstring InProfile, ILstring OutProfile)
 		hInProfile = iCurImage->Profile;
 	}
 	else {
-		hInProfile = cmsOpenProfileFromFile(InProfile, "r");
+#ifndef _UNICODE
+ 		hInProfile = cmsOpenProfileFromFile(InProfile, "r");
+#else
+		wcstombs(AnsiName, InProfile, 512);
+		hInProfile = cmsOpenProfileFromFile(AnsiName, "r");
+#endif//_UNICODE
 	}
-
-	hOutProfile = cmsOpenProfileFromFile(OutProfile, "r");
+#ifndef _UNICODE
+ 	hOutProfile = cmsOpenProfileFromFile(OutProfile, "r");
+#else
+	wcstombs(AnsiName, OutProfile, 512);
+	hOutProfile = cmsOpenProfileFromFile(AnsiName, "r");
+#endif//_UNICODE
 
 	hTransform = cmsCreateTransform(hInProfile, Format, hOutProfile, Format, INTENT_PERCEPTUAL, 0);
 

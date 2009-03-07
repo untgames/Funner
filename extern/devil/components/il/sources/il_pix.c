@@ -33,11 +33,12 @@ typedef struct PIXHEAD
 #endif
 
 ILboolean iCheckPix(PIXHEAD *Header);
-ILboolean iLoadPixInternal(ILvoid);
+ILboolean iLoadPixInternal(void);
 
 
 // Internal function used to get the Pix header from the current file.
-ILboolean iGetPixHead(PIXHEAD *Header) {
+ILboolean iGetPixHead(PIXHEAD *Header)
+{
 	Header->Width = GetBigUShort();
 	Header->Height = GetBigUShort();
 	Header->OffX = GetBigUShort();
@@ -76,7 +77,7 @@ ILboolean iCheckPix(PIXHEAD *Header)
 
 
 //! Reads a Pix file
-ILboolean ilLoadPix(const ILstring FileName)
+ILboolean ilLoadPix(ILconst_string FileName)
 {
 	ILHANDLE	PixFile;
 	ILboolean	bPix = IL_FALSE;
@@ -110,7 +111,7 @@ ILboolean ilLoadPixF(ILHANDLE File)
 
 
 //! Reads from a memory "lump" that contains a Pix
-ILboolean ilLoadPixL(const ILvoid *Lump, ILuint Size)
+ILboolean ilLoadPixL(const void *Lump, ILuint Size)
 {
 	iSetInputLump(Lump, Size);
 	return iLoadPixInternal();

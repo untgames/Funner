@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------------
 //
 // ImageLib Sources
-// Copyright (C) 2000-2002 by Denton Woods
-// Last modified: 02/21/2002 <--Y2K Compliant! =]
+// Copyright (C) 2000-2008 by Denton Woods
+// Last modified: 12/27/2008
 //
 // Filename: src-IL/include/il_dds.h
 //
@@ -110,8 +110,10 @@ typedef struct DXTAlphaBlock3BitLinear
 #define DDS_CAPS				0x00000001L
 #define DDS_HEIGHT				0x00000002L
 #define DDS_WIDTH				0x00000004L
+
 #define DDS_RGB					0x00000040L
 #define DDS_PIXELFORMAT			0x00001000L
+
 #define DDS_LUMINANCE			0x00020000L
 
 #define DDS_ALPHAPIXELS			0x00000001L
@@ -166,28 +168,31 @@ enum PixFormat
 #define CUBEMAP_SIDES 6
 
 // Internal functions
-ILboolean	iLoadDdsInternal(ILvoid);
-ILboolean	iIsValidDds(ILvoid);
+ILboolean	iLoadDdsInternal(void);
+ILboolean	iIsValidDds(void);
 ILboolean	iCheckDds(DDSHEAD *Head);
-ILvoid		AdjustVolumeTexture(DDSHEAD *Head);
-ILboolean	ReadData(ILvoid);
-ILboolean	AllocImage(ILvoid);
-ILboolean	Decompress(ILvoid);
-ILboolean	ReadMipmaps(ILvoid);
-ILuint		DecodePixelFormat(ILvoid);
-ILboolean	DecompressARGB(ILvoid);
-ILboolean	DecompressDXT1(ILvoid);
-ILboolean	DecompressDXT2(ILvoid);
-ILboolean	DecompressDXT3(ILvoid);
-ILboolean	DecompressDXT4(ILvoid);
-ILboolean	DecompressDXT5(ILvoid);
-ILboolean	Decompress3Dc(ILvoid);
-ILboolean	DecompressAti1n(ILvoid);
-ILboolean	DecompressRXGB(ILvoid);
-ILboolean	DecompressFloat(ILvoid);
-ILvoid		CorrectPreMult(ILvoid);
-ILvoid		GetBitsFromMask(ILuint Mask, ILuint *ShiftLeft, ILuint *ShiftRight);
-ILboolean	iSaveDdsInternal(ILvoid);
+void		AdjustVolumeTexture(DDSHEAD *Head);
+ILboolean	ReadData();
+ILboolean	AllocImage();
+ILboolean	Decompress();
+ILboolean	ReadMipmaps();
+ILuint		DecodePixelFormat();
+void		DxtcReadColor(ILushort Data, Color8888* Out);
+void		DxtcReadColors(const ILubyte* Data, Color8888* Out);
+ILboolean	DecompressARGB();
+ILboolean	DecompressDXT1(ILimage *lImage, ILubyte *lCompData);
+ILboolean	DecompressDXT2(ILimage *lImage, ILubyte *lCompData);
+ILboolean	DecompressDXT3(ILimage *lImage, ILubyte *lCompData);
+ILboolean	DecompressDXT4(ILimage *lImage, ILubyte *lCompData);
+ILboolean	DecompressDXT5(ILimage *lImage, ILubyte *lCompData);
+ILboolean	Decompress3Dc();
+ILboolean	DecompressAti1n();
+ILboolean	DecompressRXGB();
+ILboolean	iConvFloat16ToFloat32(ILuint* dest, ILushort* src, ILuint size);
+ILboolean	DecompressFloat(ILuint lCompFormat);
+void		CorrectPreMult();
+void		GetBitsFromMask(ILuint Mask, ILuint *ShiftLeft, ILuint *ShiftRight);
+ILboolean	iSaveDdsInternal(void);
 ILboolean	WriteHeader(ILimage *Image, ILenum DXTCFormat, ILuint CubeFlags);
 ILushort	*CompressTo565(ILimage *Image);
 ILubyte		*CompressTo88(ILimage *Image);
@@ -195,18 +200,19 @@ ILuint		Compress(ILimage *Image, ILenum DXTCFormat);
 ILboolean	GetBlock(ILushort *Block, ILushort *Data, ILimage *Image, ILuint XPos, ILuint YPos);
 ILboolean	GetAlphaBlock(ILubyte *Block, ILubyte *Data, ILimage *Image, ILuint XPos, ILuint YPos);
 ILboolean	Get3DcBlock(ILubyte *Block, ILubyte *Data, ILimage *Image, ILuint XPos, ILuint YPos, int channel);
-ILvoid		ShortToColor565(ILushort Pixel, Color565 *Colour);
-ILvoid		ShortToColor888(ILushort Pixel, Color888 *Colour);
+void		ShortToColor565(ILushort Pixel, Color565 *Colour);
+void		ShortToColor888(ILushort Pixel, Color888 *Colour);
 ILushort	Color565ToShort(Color565 *Colour);
 ILushort	Color888ToShort(Color888 *Colour);
 ILuint		GenBitMask(ILushort ex0, ILushort ex1, ILuint NumCols, ILushort *In, ILubyte *Alpha, Color888 *OutCol);
-ILvoid		GenAlphaBitMask(ILubyte a0, ILubyte a1, ILubyte *In, ILubyte *Mask, ILubyte *Out);
+void		GenAlphaBitMask(ILubyte a0, ILubyte a1, ILubyte *In, ILubyte *Mask, ILubyte *Out);
 ILuint		RMSAlpha(ILubyte *Orig, ILubyte *Test);
 ILuint		Distance(Color888 *c1, Color888 *c2);
-ILvoid		ChooseEndpoints(ILushort *Block, ILushort *ex0, ILushort *ex1);
-ILvoid		ChooseAlphaEndpoints(ILubyte *Block, ILubyte *a0, ILubyte *a1);
-ILvoid		CorrectEndDXT1(ILushort *ex0, ILushort *ex1, ILboolean HasAlpha);
-ILvoid		PreMult(ILushort *Data, ILubyte *Alpha);
+void		ChooseEndpoints(ILushort *Block, ILushort *ex0, ILushort *ex1);
+void		ChooseAlphaEndpoints(ILubyte *Block, ILubyte *a0, ILubyte *a1);
+void		CorrectEndDXT1(ILushort *ex0, ILushort *ex1, ILboolean HasAlpha);
+void		PreMult(ILushort *Data, ILubyte *Alpha);
+
 
 extern ILuint CubemapDirections[CUBEMAP_SIDES];
 

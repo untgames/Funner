@@ -392,7 +392,7 @@ void DevILImageImpl::PutImage (size_t x, size_t y, size_t z, size_t width, size_
 
   DevILPixelFormat devil_format = get_devil_format (format);
 
-  ilSetPixels (x, y, z, width, height, depth, devil_format.format, devil_format.type, const_cast<ILvoid*> (data));
+  ilSetPixels (x, y, z, width, height, depth, devil_format.format, devil_format.type, const_cast<void*> (data));
   check_devil_errors ("media::DevILImageImpl::PutImage", "ilSetPixels");
 }
 
