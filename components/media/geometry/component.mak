@@ -27,15 +27,11 @@ MEDIA.GEOMETRY.XMESH.COMPILER_DEFINES :=
 MEDIA.GEOMETRY.XMESH.IMPORTS          := compile.static.mak
 
 #Цель - binmesh serializer sources
-MEDIA.GEOMETRY.BINMESH.TYPE             := static-lib
-MEDIA.GEOMETRY.BINMESH.NAME             := funner.media.geometry.binmesh
-MEDIA.GEOMETRY.BINMESH.INCLUDE_DIRS     :=
-MEDIA.GEOMETRY.BINMESH.SOURCE_DIRS      := sources/binmesh
-MEDIA.GEOMETRY.BINMESH.LIB_DIRS         :=
-MEDIA.GEOMETRY.BINMESH.LIBS             :=
-MEDIA.GEOMETRY.BINMESH.COMPILER_CFLAGS  :=
-MEDIA.GEOMETRY.BINMESH.COMPILER_DEFINES :=
-MEDIA.GEOMETRY.BINMESH.IMPORTS          := compile.static.mak
+MEDIA.GEOMETRY.BINMESH.TYPE                   := static-lib
+MEDIA.GEOMETRY.BINMESH.NAME                   := funner.media.geometry.binmesh
+MEDIA.GEOMETRY.BINMESH.SOURCE_DIRS            := sources/binmesh
+MEDIA.GEOMETRY.BINMESH.ubuntu.COMPILER_CFLAGS := -Wno-multichar
+MEDIA.GEOMETRY.BINMESH.IMPORTS                := compile.static.mak
 
 #Цель - tests
 MEDIA.GEOMETRY.TESTS.TYPE             := test-suite

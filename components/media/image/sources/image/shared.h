@@ -3,8 +3,8 @@
 
 #include <stdarg.h>
 
-#include <il/il.h>
-#include <il/ilu.h>
+#include <IL/il.h>
+#include <IL/ilu.h>
 
 #include <stl/string>
 #include <stl/vector>
@@ -61,7 +61,7 @@ class ImageImpl
     virtual size_t Width  () = 0;
     virtual size_t Height () = 0;
     virtual size_t Depth  () = 0;
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Изменение размера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ class ImageImpl
   protected:
     ImageImpl  ();
     ImageImpl  (const ImageImpl&);
-    
+
   private:
     ImageImpl& operator = (const ImageImpl&); //no impl
 

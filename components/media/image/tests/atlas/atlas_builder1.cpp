@@ -39,9 +39,9 @@ int main ()
   try
   {
     printf ("Results of atlas_builder1 test:\n");
-    
+
     if (!FileSystem::IsDir (RESULTS_DIR))
-      FileSystem::Mkdir (RESULTS_DIR);    
+      FileSystem::Mkdir (RESULTS_DIR);
 
     AtlasBuilder atlas_builder;
 
@@ -55,7 +55,7 @@ int main ()
 
     Image image (SOURCE_IMAGE_WIDTH, SOURCE_IMAGE_HEIGHT, 1, PixelFormat_RGB8);
 
-    ImagePixel *image_pixel = (ImagePixel*)image.Bitmap (), image_color = {255, 0, 0};
+    ImagePixel *image_pixel = (ImagePixel*)image.Bitmap (), image_color = {{255, 0, 0}};
 
     for (size_t i = 0; i < SOURCE_IMAGE_WIDTH * SOURCE_IMAGE_HEIGHT; i++, image_pixel++)
       *image_pixel = image_color;
@@ -90,8 +90,8 @@ int main ()
 //    dump_hash (RESULT_EMPTY_IMAGE_NAME);
   }
   catch (std::exception& exception)
-  {                                               
-    printf ("exception: %s\n",exception.what ()); 
+  {
+    printf ("exception: %s\n",exception.what ());
   }
 
   return 0;

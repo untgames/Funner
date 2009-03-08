@@ -14,9 +14,9 @@ namespace
 void xfont_load (const char* file_name, Font& font)
 {
   Parser           p (file_name);
-  ParseLog         log = p.Log (); 
+  ParseLog         log = p.Log ();
   Parser::Iterator iter = p.Root ().First("Font");
-  size_t           first_char_code, glyph_count = 0;
+  size_t           first_char_code = 0, glyph_count = 0;
   GlyphInfo*       glyph_info;
   Font             new_font;
 
@@ -51,21 +51,21 @@ void xfont_load (const char* file_name, Font& font)
 
   if (!iter)
     throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'Font' root tag");
-    
+
   if (!glyph_count)
     throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no glyphs");
 
   if (!iter->First ("FontFile"))
     throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'FontFile' property");
-    
+
   if (!iter->First ("FirstCharCode"))
     throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'FirstCharCode' property");
-    
+
   if (!iter->First ("Glyphs"))
     throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'Glyphs' tag");
-    
+
   stl::string string_buffer;
-  
+
   read (*iter, "Name", string_buffer);
 
   new_font.Rename (string_buffer.c_str ());
@@ -75,7 +75,7 @@ void xfont_load (const char* file_name, Font& font)
   new_font.SetImageName (string_buffer.c_str ());
 
   read (*iter, "FirstCharCode", first_char_code);
-  
+
   new_font.SetFirstGlyphCode (first_char_code);
 
   new_font.ResizeGlyphsTable (glyph_count);
@@ -86,17 +86,17 @@ void xfont_load (const char* file_name, Font& font)
   for (Parser::NamesakeIterator i = iter->First ("Glyphs.Glyph"); i; ++i, glyph_count++)
   {
     GlyphInfo& glyph = glyph_info [glyph_count];
-    
+
     memset (&glyph, 0, sizeof glyph);
-    
+
     try_read (*i, "XPos",     glyph.x_pos);
     try_read (*i, "YPos",     glyph.y_pos);
     try_read (*i, "Width",    glyph.width);
     try_read (*i, "Height",   glyph.height);
-    
+
     glyph.bearing_x = (int)glyph.height;
-    glyph.advance_x = (int)glyph.width;    
-    
+    glyph.advance_x = (int)glyph.width;
+
     try_read (*i, "BearingX", glyph.bearing_x);
     try_read (*i, "BearingY", glyph.bearing_y);
     try_read (*i, "AdvanceX", glyph.advance_x);
@@ -107,7 +107,7 @@ void xfont_load (const char* file_name, Font& font)
   {
     KerningInfo kerning_info;
     size_t      left = 0, right = 0;
-    
+
     memset (&kerning_info, 0, sizeof kerning_info);
 
     try_read (*i, "LeftGlyph",  left);
@@ -129,7 +129,7 @@ class XFontLoaderComponent
 {
   public:
     //загрузка компонента
-    XFontLoaderComponent () 
+    XFontLoaderComponent ()
     {
       FontManager::RegisterLoader ("xfont", &xfont_load);
     }
