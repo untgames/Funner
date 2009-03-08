@@ -31,14 +31,14 @@ EXTERN.PNGLIB.INCLUDE_DIRS     := components/png/include ../zlib/include
 EXTERN.PNGLIB.SOURCE_DIRS      := components/png/sources
 
 #Цель - DevILDLL sources
-EXTERN.DEVIL.TYPE                    := static-lib
-EXTERN.DEVIL.NAME                    := funner.extern.devil
-EXTERN.DEVIL.INCLUDE_DIRS            := include components/il/include/IL components/jpeg/include components/tiff/include components/png/include components/il/include ../zlib/include
-EXTERN.DEVIL.SOURCE_DIRS             := components/il/sources
-EXTERN.DEVIL.COMPILER_DEFINES        := IL_STATIC_LIB HAVE_CONFIG_H
-EXTERN.DEVIL.ubuntu.COMPILER_DEFINES := MM_MALLOC
-EXTERN.DEVIL.msvc.COMPILER_CFLAGS    := -wd4101
-EXTERN.DEVIL.g++.COMPILER_CFLAGS     := --no-warn
+EXTERN.DEVIL.TYPE                   := static-lib
+EXTERN.DEVIL.NAME                   := funner.extern.devil
+EXTERN.DEVIL.INCLUDE_DIRS           := include components/il/include/IL components/jpeg/include components/tiff/include components/png/include components/il/include ../zlib/include
+EXTERN.DEVIL.SOURCE_DIRS            := components/il/sources
+EXTERN.DEVIL.COMPILER_DEFINES       := IL_STATIC_LIB HAVE_CONFIG_H
+EXTERN.DEVIL.linux.COMPILER_DEFINES := MM_MALLOC
+EXTERN.DEVIL.msvc.COMPILER_CFLAGS   := -wd4101
+EXTERN.DEVIL.g++.COMPILER_CFLAGS    := --no-warn
 
 #Цель - ILUDLL sources
 EXTERN.ILU.TYPE                 := static-lib
