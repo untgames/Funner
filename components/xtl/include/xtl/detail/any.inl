@@ -1,9 +1,9 @@
 /*
 ===================================================================================================
     ќписание реализации any
-===================================================================================================    
+===================================================================================================
 */
- 
+
 namespace detail
 {
 
@@ -17,7 +17,7 @@ struct bad_any_cast_internal: public std::bad_cast
 
   const char* what () const throw () { return "xtl::detail::bad_any_cast_internal"; }
 
-  bad_any_cast::cast_error error_id;    
+  bad_any_cast::cast_error error_id;
 };
 
 namespace adl_defaults
@@ -40,7 +40,7 @@ inline void to_string (stl::string&, default_cast_type)
 //по умолчанию типы не приводимы из строки
 inline void to_value (const stl::string& buffer, default_cast_type)
 {
-  throw bad_any_cast_internal (bad_any_cast::bad_to_value_cast);  
+  throw bad_any_cast_internal (bad_any_cast::bad_to_value_cast);
 }
 
 //по умолчанию, тип не €вл€етс€ потомком dynamic_cast_root
@@ -113,19 +113,19 @@ inline typename any_stored_type<T>::type& get_unqualified_value (T& value)
 template <class T>
 inline typename any_stored_type<T>::type& get_unqualified_value (const T& value)
 {
-  return const_cast<typename any_stored_type<T>::type&> (value);  
+  return const_cast<typename any_stored_type<T>::type&> (value);
 }
 
 template <class T>
 inline typename any_stored_type<T>::type& get_unqualified_value (volatile T& value)
 {
-  return const_cast<typename any_stored_type<T>::type&> (value);  
+  return const_cast<typename any_stored_type<T>::type&> (value);
 }
 
 template <class T>
 inline typename any_stored_type<T>::type& get_unqualified_value (const volatile T& value)
 {
-  return const_cast<typename any_stored_type<T>::type&> (value);    
+  return const_cast<typename any_stored_type<T>::type&> (value);
 }
 
 template <class T>
@@ -165,7 +165,7 @@ inline const std::type_info& get_typeid (T& value)
 template <class T>
 inline const std::type_info& get_typeid (T* value)
 {
-  return &value ? typeid (value) : typeid (T*);
+  return value ? typeid (value) : typeid (T*);
 }
 
 /*
@@ -185,7 +185,7 @@ inline bool is_null (const T* value)
 }
 
 /*
-    »нтерфейс хранилища вариантных данных 
+    »нтерфейс хранилища вариантных данных
 */
 
 struct any_holder
@@ -232,17 +232,17 @@ template <class T> struct any_content: public any_holder
   dynamic_cast_root* get_dynamic_cast_root ()
   {
     using adl_defaults::get_root;
-  
+
     return get_unqualified_value (get_root (get_castable_value (value)));
   }
-  
+
   void dump (stl::string& buffer)
   {
     using adl_defaults::to_string;
 
     to_string (buffer, get_castable_value (value));
   }
-  
+
   void set_content (const stl::string& buffer)
   {
     using adl_defaults::to_value;
@@ -275,7 +275,7 @@ template <class T> class referenced_any_impl: public any_content<T>
     referenced_any_impl (const T& in_value) : any_content<T> (in_value), ref_count (1) {}
 
     any_holder* clone () { return ref_count++, this; }
-  
+
     void release ()
     {
       if (!--ref_count)
@@ -291,7 +291,7 @@ template <class T> class referenced_any_impl: public any_content<T>
 /*
 ===================================================================================================
     any
-===================================================================================================    
+===================================================================================================
 */
 
 /*
@@ -384,10 +384,10 @@ inline const T* any::content () const
 {
   if (!content_ptr)
     return 0;
-     
+
   if (&typeid (T) != &content_ptr->type ())
     return 0; //преобразование невозможно, из-за неэквивалентности базовых типов
-    
+
   return &static_cast<detail::any_content<T>*> (const_cast<detail::any_holder*> (content_ptr))->value;
 }
 
@@ -405,10 +405,10 @@ struct dynamic_caster_helper
   static DstT* cast (dynamic_cast_root* source)
   {
     DstT* result = dynamic_cast<DstT*> (source);
-    
+
     if (!result)
       throw bad_any_cast_internal (bad_any_cast::bad_dynamic_cast);
-      
+
     return result;
   }
 };
@@ -481,60 +481,60 @@ inline const T any::cast () const
 {
   if (!content_ptr)
     throw bad_any_cast (bad_any_cast::bad_direct_cast, type (), typeid (T));
-    
+
   try
-  {    
+  {
     typedef typename type_traits::remove_reference<T>::type  nonref;
     typedef typename detail::any_stored_type<nonref>::type   stored_type;
 
       //проверка возможности const_cast приведени€
 
     static const size_t target_qualifier_mask = detail::any_qualifier_mask<nonref>::value;
-    
+
     bool is_lost_qualifiers = (content_ptr->qualifier_mask () & ~target_qualifier_mask) != 0;
 
        //попытка пр€мого преобразовани€
 
     const std::type_info* content_type = &content_ptr->stored_type ();
-      
+
     if (&typeid (stored_type) == content_type)
     {
       if (is_lost_qualifiers)
       {
           //преобразование невозможно, из-за понижени€ уровн€ cv-квалификаторов
 
-        throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));      
+        throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));
       }
-    
+
       return detail::try_direct_cast<stored_type> (content_ptr);
     }
-      
+
       //попытка приведени€ из reference_wrapper
-      
+
     if (&typeid (reference_wrapper<stored_type>) == content_type)
     {
       if (is_lost_qualifiers)
       {
           //преобразование невозможно, из-за понижени€ уровн€ cv-квалификаторов
 
-        throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));      
+        throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));
       }
-    
+
       return detail::try_direct_cast<reference_wrapper<stored_type> > (content_ptr);
     }
-      
-      //попытка приведени€ через dynamic_cast_root    
-      
+
+      //попытка приведени€ через dynamic_cast_root
+
     if (dynamic_cast_root* dc_root = content_ptr->get_dynamic_cast_root ())
     {
       if (is_lost_qualifiers)
       {
           //преобразование невозможно, из-за понижени€ уровн€ cv-квалификаторов
 
-        throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));      
+        throw bad_any_cast (bad_any_cast::bad_const_cast, type (), typeid (T));
       }
-    
-      return detail::dynamic_caster<nonref>::cast (dc_root);      
+
+      return detail::dynamic_caster<nonref>::cast (dc_root);
     }
 
       //попытка лексикографического приведени€
@@ -542,7 +542,7 @@ inline const T any::cast () const
     stl::string buffer;
 
     content_ptr->dump (buffer);
-    
+
     return detail::try_lexical_cast (buffer, xtl::type<typename detail::any_stored_type<T>::type> ());
   }
   catch (detail::bad_any_cast_internal& exception)
@@ -586,7 +586,7 @@ inline void any::set_content (const stl::string& buffer)
 
     throw bad_any_cast (bad_any_cast::bad_const_cast, typeid (const stl::string), type ());
   }
-    
+
   try
   {
     content_ptr->set_content (buffer);
@@ -616,7 +616,7 @@ inline any& any::swap (any& in_any)
   detail::any_holder* tmp = content_ptr;
   content_ptr             = in_any.content_ptr;
   in_any.content_ptr      = tmp;
-  
+
   return *this;
 }
 
@@ -628,7 +628,7 @@ inline void swap (any& a1, any& a2)
 /*
 ===================================================================================================
     ”тилиты
-===================================================================================================    
+===================================================================================================
 */
 
 /*
