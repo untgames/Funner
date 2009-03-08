@@ -20,7 +20,7 @@ const char* RESULT_FONT_FILE_NAME  = "data/a_damn_mess.xfont";
 const char* RESULT_IMAGE_FILE_NAME = "data/a_damn_mess.tga";
 
 const size_t FIRST_GLYPH_CODE = 32;
-const size_t LAST_GLYPH_CODE  = 255;
+const size_t LAST_GLYPH_CODE  = 127;
 const size_t FONT_SIZE        = LAST_GLYPH_CODE - FIRST_GLYPH_CODE + 1;
 
 void dump_hash (const char* file_name)
@@ -61,13 +61,11 @@ int main ()
     Image    image (1, 1, 1, PixelFormat_RGBA8);
     FontDesc font_desc;
 
-    setlocale (LC_ALL, "Russian");
-
     stl::string ascii_string (FONT_SIZE, 0);
 
     for (size_t i = FIRST_GLYPH_CODE; i <= LAST_GLYPH_CODE; i++)
       ascii_string[i - FIRST_GLYPH_CODE] = i;
-    
+
     stl::wstring utf16_string = towstring (ascii_string);
 
     font_desc.file_name = FONT_FILE_NAME;
@@ -79,7 +77,7 @@ int main ()
     convert (font_desc, font, image);
 
     image.Rename (RESULT_IMAGE_FILE_NAME);
-    
+
     font.Rename       (RESULT_FONT_FILE_NAME);
     font.SetImageName (RESULT_IMAGE_FILE_NAME);
 
@@ -92,9 +90,9 @@ int main ()
     dump_hash (image);
   }
   catch (std::exception& exception)
-  {                                               
+  {
     printf ("exception: %s\n",exception.what ());
-  }                                               
+  }
   catch (...)
   {
     printf ("unknown exception\n");
