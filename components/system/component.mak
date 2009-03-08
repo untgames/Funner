@@ -8,11 +8,6 @@ SYSTEMLIB.SOURCES.TYPE                   := static-lib
 SYSTEMLIB.SOURCES.NAME                   := funner.system
 SYSTEMLIB.SOURCES.INCLUDE_DIRS           := sources
 SYSTEMLIB.SOURCES.SOURCE_DIRS            := sources/wrappers
-SYSTEMLIB.SOURCES.LIB_DIRS               :=
-SYSTEMLIB.SOURCES.EXECTUTION_DIR         :=
-SYSTEMLIB.SOURCES.LIBS                   :=
-SYSTEMLIB.SOURCES.COMPILER_CFLAGS        :=
-SYSTEMLIB.SOURCES.COMPILER_DEFINES       :=
 SYSTEMLIB.SOURCES.IMPORTS                := compile.static.mak
 SYSTEMLIB.SOURCES.win32.IMPORTS          := ../../extern/pthreads_win32/compile.static.mak
 SYSTEMLIB.SOURCES.win32.SOURCE_DIRS      := sources/platform/win32 sources/platform/pthread
@@ -20,6 +15,7 @@ SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS     := sources/platform/pthread sources/pla
 SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS   := -wd4355
 SYSTEMLIB.SOURCES.no_windows.SOURCE_DIRS := sources/platform/no_windows
 SYSTEMLIB.SOURCES.carbon.SOURCE_DIRS     := sources/platform/carbon
+SYSTEMLIB.SOURCES.x11.SOURCE_DIRS        := sources/platform/x11
 
 #Öåëü ¹2 - System library tests
 SYSTEMLIB.TESTS.TYPE             := test-suite

@@ -6,6 +6,9 @@
 #elif defined (__APPLE__)
   const char* LIBRARY_NAME = "libc.dylib";
   const char* SYMBOL_NAME  = "printf";
+#elif defined (__linux__)
+  const char* LIBRARY_NAME = "libdl.so";
+  const char* SYMBOL_NAME  = "dlopen";
 #else
   #error Unknown platform
 #endif

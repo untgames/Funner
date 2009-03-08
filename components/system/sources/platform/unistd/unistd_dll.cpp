@@ -1,4 +1,11 @@
-#include "shared.h"
+#include <dlfcn.h>
+
+#include <xtl/common_exceptions.h>
+
+#include <common/strlib.h>
+#include <common/utf_converter.h>
+
+#include <platform/platform.h>
 
 using namespace syslib;
 
@@ -38,7 +45,7 @@ Platform::dll_t Platform::LoadLibrary (const wchar_t* name)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::LoadLibrary");
+    exception.touch ("syslib::UnistdPlatform::LoadLibrary");
     throw;
   }
 
@@ -57,14 +64,14 @@ void Platform::UnloadLibrary (dll_t library)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::UnloadLibrary");
+    exception.touch ("syslib::UnistdPlatform::UnloadLibrary");
     throw;
   }
 }
 
 void* Platform::GetSymbol (dll_t library, const char* symbol_name)
 {
-  static const char* METHOD_NAME = "syslib::CarbonPlatform::GetSymbol";
+  static const char* METHOD_NAME = "syslib::UnistdPlatform::GetSymbol";
 
   if (!library)
     throw xtl::make_null_argument_exception (METHOD_NAME, "library");

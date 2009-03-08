@@ -6,8 +6,9 @@
 #Константы
 ###################################################################################################
 EXE_SUFFIX :=
+DLL_SUFFIX := .so
 
-PROFILES += linux unistd no_windows
+PROFILES += linux unistd x11 haswchar
 
 include $(TOOLSETS_DIR)/g++.mak
 
