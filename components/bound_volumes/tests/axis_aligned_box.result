@@ -45,7 +45,6 @@ intersects:
   box2 with box: 0, intersection: min=[0 0 0] max=[0 0 0]
 contains point: 1
 contains box1: 0
-contains intersection (box, box1): 1
 box == box: 1
 box != box: 0
 box == box1: 0
