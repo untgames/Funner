@@ -37,7 +37,7 @@ class SerializerHolder: public ISerializerHolder
 template <class Signature>
 void SerializerManager::Register (const char* extension, const xtl::function<Signature>& fn)
 {
-  detail::ISerializerHolder* holder = new detail::SerializerHolder<Signature> (fn);
+  detail::ISerializerHolder* volatile holder = new detail::SerializerHolder<Signature> (fn);
 
   try
   {

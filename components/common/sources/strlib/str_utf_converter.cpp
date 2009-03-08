@@ -14,28 +14,27 @@ namespace
 
 const size_t DECOMPRESSED_WCHAR_SIZE = 4;
 
-template<size_t wchar_size>
-size_t wchar_decompress_impl (const unsigned char* src, size_t src_count, char*& dst, size_t dst_count);
+template <class T=wchar_t, size_t wchar_size = sizeof (T)> struct selector {};
 
-template <>
-size_t wchar_decompress_impl<2> (const unsigned char* src, size_t src_count, char*& dst, size_t dst_count)
+template <class T>
+size_t wchar_decompress_impl (const unsigned char* src, size_t src_count, char*& dst, size_t dst_count, selector<T, 2>)
 {
   size_t i = 0;
 
-  for (; (i < src_count) && dst_count; src += 2, dst += DECOMPRESSED_WCHAR_SIZE, i++, dst_count--)
+  for (; (i < src_count) && dst_count; src += sizeof (T), dst += DECOMPRESSED_WCHAR_SIZE, i++, dst_count--)
     xtl::xsnprintf (dst, DECOMPRESSED_WCHAR_SIZE + 1, "%02X%02X", src [0], src [1]);
 
   return i;
 }
 
-template<>
-size_t wchar_decompress_impl<4> (const unsigned char* src, size_t src_count, char*& dst, size_t dst_count)
+template <class T>
+size_t wchar_decompress_impl (const unsigned char* src, size_t src_count, char*& dst, size_t dst_count, selector<T, 4>)
 {
-  size_t i = 0;
+  size_t i = 0;    
 
   for (; src_count && dst_count; src += 4, dst += DECOMPRESSED_WCHAR_SIZE, src_count--, dst_count--, i++)
   {
-    wchar_t* wchar_src = (wchar_t*)src;
+    T* wchar_src = (T*)src;
 
     if ((*wchar_src > 0xD7FF) && (*wchar_src < 0xE000))                                    //некорректный символ
       xtl::xsnprintf (dst, DECOMPRESSED_WCHAR_SIZE + 1, "%02X00", '?');
@@ -68,11 +67,8 @@ size_t wchar_decompress_impl<4> (const unsigned char* src, size_t src_count, cha
   return i;
 }
 
-template<size_t wchar_size>
-size_t wchar_compress_impl (const char* src, size_t count, wchar_t*& dst, size_t dst_count);
-
-template<>
-size_t wchar_compress_impl<2> (const char* src, size_t count, wchar_t*& dst, size_t dst_count)
+template <class T>
+size_t wchar_compress_impl (const char* src, size_t count, wchar_t*& dst, size_t dst_count, selector<T, 2>)
 {
   char* dummy_ptr;
 
@@ -93,8 +89,8 @@ size_t wchar_compress_impl<2> (const char* src, size_t count, wchar_t*& dst, siz
   return i * DECOMPRESSED_WCHAR_SIZE;
 }
 
-template<>
-size_t wchar_compress_impl<4> (const char* src, size_t count, wchar_t*& dst, size_t dst_count)
+template <class T>
+size_t wchar_compress_impl (const char* src, size_t count, wchar_t*& dst, size_t dst_count, selector<T, 4>)
 {
   char* dummy_ptr;
 
@@ -109,7 +105,7 @@ size_t wchar_compress_impl<4> (const char* src, size_t count, wchar_t*& dst, siz
     decompressed_buffer [2] = src [0];
     decompressed_buffer [3] = src [1];
 
-    wchar_t utf_code = (wchar_t)strtoul (decompressed_buffer, &dummy_ptr, 16);
+    T utf_code = (T)strtoul (decompressed_buffer, &dummy_ptr, 16);
 
     if ((utf_code < 0xD800) || (utf_code > 0xDFFF)) //16-битный символ
       *dst = utf_code;
@@ -129,7 +125,7 @@ size_t wchar_compress_impl<4> (const char* src, size_t count, wchar_t*& dst, siz
       decompressed_buffer [2] = src [4];
       decompressed_buffer [3] = src [5];
 
-      wchar_t second_surrogate_code = (wchar_t)strtoul (decompressed_buffer, &dummy_ptr, 16);
+      T second_surrogate_code = (T)strtoul (decompressed_buffer, &dummy_ptr, 16);
 
       if ((second_surrogate_code < 0xDC00) || (second_surrogate_code > 0xDFFF)) //некорректный символ
         *dst = '?';
@@ -774,8 +770,8 @@ size_t wchar_decompress (const wchar_t* source, size_t source_length, char* dest
   if (!max_destination_length)
     return 0;
 
-  size_t processed_characters = wchar_decompress_impl<sizeof (wchar_t)> ((unsigned char*)source, source_length, destination,
-                                                                         (max_destination_length - 1) / DECOMPRESSED_WCHAR_SIZE);
+  size_t processed_characters = wchar_decompress_impl ((unsigned char*)source, source_length, destination,
+    (max_destination_length - 1) / DECOMPRESSED_WCHAR_SIZE, selector<> ());
 
   *destination = 0;
 
@@ -813,8 +809,8 @@ size_t wchar_compress (const char* source, size_t source_length, wchar_t* destin
   if (!max_destination_length)
     return 0;
 
-  size_t processed_characters = wchar_compress_impl<sizeof (wchar_t)> (source, source_length / DECOMPRESSED_WCHAR_SIZE,
-                                                                       destination, max_destination_length - 1);
+  size_t processed_characters = wchar_compress_impl (source, source_length / DECOMPRESSED_WCHAR_SIZE,
+    destination, max_destination_length - 1, selector<> ());
 
   *destination = 0;
 

@@ -57,7 +57,7 @@ class ConsoleImpl
         
         //разбивка на строки и оповещение о появлении строк
 
-      const char* pos = strchr (message, '\n');
+      const char* volatile pos = strchr (message, '\n');
 
       if (!pos)
       {

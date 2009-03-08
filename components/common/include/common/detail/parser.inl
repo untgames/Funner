@@ -126,23 +126,36 @@ inline void read (const ParseNode& node, const char* name, OutIter first, size_t
     raise_parser_exception (child, "Error at read node item #%u (requested_items_count=%u)", read_count, count);
 }
 
+namespace detail
+{
+
+//обёртка для хранения возвращаемого значения (для обхода предупреждения g++ 'value may be used uninitialized')
+template <class T> struct ResultValueHolder
+{
+  T value;
+  
+  ResultValueHolder () : value () {}
+};
+
+}
+
 template <class T>
 inline T get (const ParseNode& node, const char* name)
 {
-  T value;
+  detail::ResultValueHolder<T> result;
 
-  read (node, name, value);
+  read (node, name, result.value);
 
-  return value;
+  return result.value;
 }
 
 template <class T>
 inline T get (const ParseNode& node, const char* name, const T& default_value)
 {
-  T value;
+  detail::ResultValueHolder<T> result;
 
-  if (try_read (node, name, value))
-    return value;
+  if (try_read (node, name, result.value))
+    return result.value;
 
 //  node.Log ().Warning (node, "Could not read attribute '%s'. Using default value", name);
 
