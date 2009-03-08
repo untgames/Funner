@@ -1,20 +1,20 @@
 #include "shared.h"
 
-char* f (float x, const char* y)
+const char* f (float x, const char* y)
 {
   printf ("f(%g,%s)\n", x, y);
 
   return "f (float, const char*)";
 }
 
-char* f (float x, int y)
+const char* f (float x, int y)
 {
   printf ("f(%g,%d)\n", x, y);
 
   return "f (float, int)";
 }
 
-char* f (float x, const char* y, int z)
+const char* f (float x, const char* y, int z)
 {
   printf ("f(%g,%s,%d)\n", x, y, z);
 
@@ -24,12 +24,12 @@ char* f (float x, const char* y, int z)
 int main ()
 {
   printf ("Results of invoker_overload_test:\n");
-  
+
   try
   {
-    Invoker f1 = make_invoker (make_invoker (xtl::implicit_cast<char* (*)(float, const char*, int)> (&f)),
-                               make_invoker (xtl::implicit_cast<char* (*)(float, const char*)> (&f)),
-                               make_invoker (xtl::implicit_cast<char* (*)(float, int)> (&f)));
+    Invoker f1 = make_invoker (make_invoker (xtl::implicit_cast<const char* (*)(float, const char*, int)> (&f)),
+                               make_invoker (xtl::implicit_cast<const char* (*)(float, const char*)> (&f)),
+                               make_invoker (xtl::implicit_cast<const char* (*)(float, int)> (&f)));
 
     MyStack stack;
 
@@ -39,13 +39,13 @@ int main ()
 
     f1 (stack);
     stack.Dump ();
-    
+
     stack.Clear ();
     stack.PushSymbol ("dummy");
     stack.Push (3.0f);
-    stack.Push ("Hello world");    
+    stack.Push ("Hello world");
     stack.Push (2);
-    
+
     f1 (stack);
     stack.Dump ();
 
@@ -56,7 +56,7 @@ int main ()
 
     f1 (stack);
     stack.Dump ();
-    
+
     stack.Clear ();
     stack.PushSymbol ("dummy");
     stack.Push ("Hello world");

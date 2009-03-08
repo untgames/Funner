@@ -29,12 +29,6 @@ namespace
 {
 
 /*
-    Константы
-*/
-
-const char* SHELL_LIBRARY_NAME = "Shell";
-
-/*
     Утилиты
 */
 
@@ -64,7 +58,7 @@ Interpreter::Interpreter (const EnvironmentPointer& in_environment)
     //регистрация функции обработки ошибок
 
   lua_atpanic (state, &error_handler);
-  
+
     //регистрация обработчиков пользовательского типа данных
 
   static const luaL_reg user_data_meta_table [] = {
@@ -72,7 +66,7 @@ Interpreter::Interpreter (const EnvironmentPointer& in_environment)
     {"__tostring", &variant_tostring},
     {0,0}
   };
-  
+
   luaL_newmetatable (state, VARIANT_DEFAULT_TYPE_NAME);
   luaI_openlib      (state, 0, user_data_meta_table, 0);
 
@@ -88,7 +82,7 @@ Interpreter::Interpreter (const EnvironmentPointer& in_environment)
 
   for (Environment::Iterator i=environment->CreateIterator (); i; ++i)
     RegisterLibrary (environment->LibraryId (i), *i);
-    
+
   RegisterShellLibrary ();
 
     //очистка стека
@@ -135,7 +129,7 @@ bool Interpreter::HasFunction (const char* name)
 {
   if (!name)
     return false;
-      
+
   lua_getglobal (state, name);
 
   bool is_function = lua_isfunction (state, -1) != 0;
@@ -206,7 +200,7 @@ void Interpreter::Release ()
 {
   release (this);
 }
-   
+
 /*
     Регистрация / удаление библиотек
 */
@@ -223,7 +217,7 @@ void Interpreter::UnregisterLibrary (const char* name)
 {
   if (!name)
     return;
-    
+
   libraries.erase (name);
 }
 
@@ -261,7 +255,7 @@ class LuaInterpreterComponent
 {
   public:
     //загрузка компонента
-    LuaInterpreterComponent () 
+    LuaInterpreterComponent ()
     {
       InterpreterManager::RegisterInterpreter ("lua", &create_lua_interpreter);
     }

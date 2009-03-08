@@ -1,6 +1,6 @@
 #include "shared.h"
 
-char* f (float x, const char* y, int z, size_t w)
+const char* f (float x, const char* y, int z, size_t w)
 {
   printf ("f(%g,%s,%d,%u)\n", x, y, z, w);
 
@@ -10,7 +10,7 @@ char* f (float x, const char* y, int z, size_t w)
 int main ()
 {
   printf ("Results of invoker1_test:\n");
-  
+
   try
   {
     Invoker f1 = make_invoker (&f);
