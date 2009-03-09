@@ -12,7 +12,6 @@ const size_t CONNECTIONS_COUNT   = 21;
 const size_t MESSAGE_BUFFER_SIZE = 32;
 const char*  CURSOR_AXIS_NAME    = "Cursor";
 const char*  WHEEL_AXIS_NAME     = "Wheel";
-const char*  CHAR_INPUT_CHANNEL  = "Window";
 
 const char* AUTOCENTER_CURSOR            = "Cursor.auto_center";
 const char* CURSOR_SENSITIVITY           = "Cursor.sensitivity";
