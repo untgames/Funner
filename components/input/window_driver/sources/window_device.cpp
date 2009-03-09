@@ -63,6 +63,7 @@ Device::Device (Window* window, const char* in_name)
     connect_tracker (window->RegisterEventHandler (WindowEvent_OnKeyDown,                 handler));
     connect_tracker (window->RegisterEventHandler (WindowEvent_OnKeyUp,                   handler));
     connect_tracker (window->RegisterEventHandler (WindowEvent_OnChar,                    handler));
+    connect_tracker (window->RegisterEventHandler (WindowEvent_OnClose,                   handler));
 
     for (size_t i = 0; i < PROPERTIES_COUNT; i++)
     {
@@ -283,74 +284,54 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
 
       break;
     case WindowEvent_OnLeftButtonDoubleClick:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse0 dblclk");
-      signals (message);
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse0 down");
-      signals (message);
+      signals ("Mouse0 dblclk");
+      signals ("Mouse0 down");
       break;
     case WindowEvent_OnLeftButtonDown:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse0 down");
-      signals (message);
+      signals ("Mouse0 down");
       break;
     case WindowEvent_OnLeftButtonUp:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse0 up");
-      signals (message);
+      signals ("Mouse0 up");
       break;
     case WindowEvent_OnRightButtonDoubleClick:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse1 dblclk");
-      signals (message);
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse1 down");
-      signals (message);
+      signals ("Mouse1 dblclk");
+      signals ("Mouse1 down");
       break;
     case WindowEvent_OnRightButtonDown:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse1 down");
-      signals (message);
+      signals ("Mouse1 down");
       break;
     case WindowEvent_OnRightButtonUp:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse1 up");
-      signals (message);
+      signals ("Mouse1 up");
       break;
     case WindowEvent_OnMiddleButtonDoubleClick:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse2 dblclk");
-      signals (message);
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse2 down");
-      signals (message);
+      signals ("Mouse2 dblclk");
+      signals ("Mouse2 down");
       break;
     case WindowEvent_OnMiddleButtonDown:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse2 down");
-      signals (message);
+      signals ("Mouse2 down");
       break;
     case WindowEvent_OnMiddleButtonUp:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "Mouse2 up");
-      signals (message);
+      signals ("Mouse2 up");
       break;
     case WindowEvent_OnXButton1DoubleClick:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX1 dblclk");
-      signals (message);
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX1 down");
-      signals (message);
+      signals ("MouseX1 dblclk");
+      signals ("MouseX1 down");
       break;
     case WindowEvent_OnXButton1Down:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX1 down");
-      signals (message);
+      signals ("MouseX1 down");
       break;
     case WindowEvent_OnXButton1Up:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX1 up");
-      signals (message);
+      signals ("MouseX1 up");
       break;
     case WindowEvent_OnXButton2DoubleClick:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX2 dblclk");
-      signals (message);
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX2 down");
-      signals (message);
+      signals ("MouseX2 dblclk");
+      signals ("MouseX2 down");
       break;
     case WindowEvent_OnXButton2Down:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX2 down");
-      signals (message);
+      signals ("MouseX2 down");
       break;
     case WindowEvent_OnXButton2Up:
-      xsnprintf (message, MESSAGE_BUFFER_SIZE, "MouseX2 up");
-      signals (message);
+      signals ("MouseX2 up");
       break;
     case WindowEvent_OnKeyDown:
       if (pressed_keys[window_event_context.key])
@@ -372,6 +353,9 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
       signals (message);
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "CharCode %u", window_event_context.char_code);
       signals (message);
+      break;
+    case WindowEvent_OnClose:
+      signals ("Window closed");
       break;
     default:
       break;

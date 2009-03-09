@@ -38,7 +38,7 @@ void print_didft_type (DWORD type)
   if (type & DIDFT_PSHBUTTON)       printf ("'Push button' ");
   if (type & DIDFT_TGLBUTTON)       printf ("'Toggle button' ");
   if (type & DIDFT_BUTTON)          printf ("Button ");
-  
+
   if (type & DIDFT_POV)             printf ("POV ");
 
   if (type & DIDFT_COLLECTION)      printf ("Collection ");
@@ -76,7 +76,7 @@ ObjectType get_object_type (DWORD type)
 
   if (type & DIDFT_PSHBUTTON)       return ObjectType_Button;
   if (type & DIDFT_TGLBUTTON)       return ObjectType_Button;
-  
+
   return ObjectType_Unknown;
 }
 
@@ -105,7 +105,7 @@ BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance
     printf ("  name is '%s'\n", object_instance->tszName);
     printf ("  type is '%s'\n", object_type_name (object_instance->guidType));
     printf ("  offset is %d\n", object_instance->dwOfs);
-    
+
     printf ("  dwType is: ");
     print_didft_type (object_instance->dwType & 0xff0000ff);
     printf ("\n");
@@ -113,7 +113,7 @@ BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance
     printf ("  flags is: ");
     print_flags (object_instance->dwFlags);
     printf ("\n");
-    
+
     printf ("  dwFFMaxForce is %d\n", object_instance->dwFFMaxForce);
     printf ("  dwFFForceResolution is %d\n", object_instance->dwFFForceResolution);*/
 
@@ -125,10 +125,10 @@ BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance
   catch (...)
   {
     //добавить протоколирование!!
-    ///подавление всех исключений    
+    ///подавление всех исключений
   }
 
-  return DIENUM_CONTINUE;    
+  return DIENUM_CONTINUE;
 }
 
 }
@@ -141,7 +141,7 @@ OtherDevice::OtherDevice
  (Window*                window,
   const char*            in_name,
   IDirectInputDevice8*   in_direct_input_device_interface,
-  REFGUID                rguid, 
+  REFGUID                rguid,
   const DebugLogHandler& in_debug_log_handler,
   const char*            device_type,
   const char*            init_string)
@@ -157,7 +157,7 @@ OtherDevice::OtherDevice
     current_pov (0),
     current_unknown (0)
 {
-  static const char* METHOD_NAME = "input::low_level::direct_input_driver::OtherDevice::OtherDevice";  
+  static const char* METHOD_NAME = "input::low_level::direct_input_driver::OtherDevice::OtherDevice";
 
   if (!init_string)
     init_string = "";
@@ -180,7 +180,7 @@ OtherDevice::OtherDevice
   if (device_data_size % 4)
     device_data_size += 4 - device_data_size % 4;
 
-  xtl::uninitialized_storage<DIOBJECTDATAFORMAT> objects_data_format (objects.size ());  
+  xtl::uninitialized_storage<DIOBJECTDATAFORMAT> objects_data_format (objects.size ());
 
   size_t i = 0;
   for (ObjectsMap::iterator iter = objects.begin (), end = objects.end (); iter != end; ++iter, i++)
@@ -189,9 +189,9 @@ OtherDevice::OtherDevice
     objects_data_format.data ()[i].dwOfs   = iter->second.offset;
     objects_data_format.data ()[i].dwType  = DIDFT_AXIS | DIDFT_BUTTON | DIDFT_POV | DIDFT_PSHBUTTON | DIDFT_TGLBUTTON | DIDFT_ABSAXIS | DIDFT_RELAXIS | DIDFT_ANYINSTANCE;
     objects_data_format.data ()[i].dwFlags = 0;
-  } 
+  }
 
-  DIDATAFORMAT data_format = { sizeof(DIDATAFORMAT), sizeof(DIOBJECTDATAFORMAT), DIDF_ABSAXIS, device_data_size, objects.size (), objects_data_format.data () }; 
+  DIDATAFORMAT data_format = { sizeof(DIDATAFORMAT), sizeof(DIOBJECTDATAFORMAT), DIDF_ABSAXIS, device_data_size, objects.size (), objects_data_format.data () };
 
   operation_result = device_interface->SetDataFormat (&data_format);
 
@@ -234,10 +234,10 @@ OtherDevice::OtherDevice
     {
       DIPROPRANGE range_property;
 
-      range_property.diph.dwSize       = sizeof(DIPROPRANGE); 
-      range_property.diph.dwHeaderSize = sizeof(DIPROPHEADER); 
+      range_property.diph.dwSize       = sizeof(DIPROPRANGE);
+      range_property.diph.dwHeaderSize = sizeof(DIPROPHEADER);
       range_property.diph.dwObj        = iter->second.offset;
-      range_property.diph.dwHow        = DIPH_BYOFFSET; 
+      range_property.diph.dwHow        = DIPH_BYOFFSET;
 
       operation_result = device_interface->GetProperty (DIPROP_RANGE, &range_property.diph);
 
@@ -254,7 +254,7 @@ OtherDevice::OtherDevice
 
       iter->second.min_value = range_property.lMin;
       iter->second.max_value = range_property.lMax;
-        
+
       AddProperty (".dead_zone", iter, ObjectPropertyType_DeadZone, 0.f);
       AddProperty (".saturation", iter, ObjectPropertyType_Saturation, 1.f);
     }
@@ -355,7 +355,7 @@ void OtherDevice::SetProperty (const char* name, float value)
 
       break;
     }
-    case ObjectPropertyType_Saturation: 
+    case ObjectPropertyType_Saturation:
     {
       if (value > 1.f) value = 1.f;
       if (value < 0.f) value = 0.f;
@@ -406,11 +406,11 @@ void OtherDevice::RegisterObject (const char* name, size_t offset, ObjectType ty
   unicode_name.fast_resize (length);
 
   int result_size = mbstowcs (&unicode_name [0], name, length);
-  
+
   if (result_size < 0) unicode_name.fast_resize (result_size);
   else                 unicode_name.clear ();
 
-  RegisterObject (unicode_name.c_str (), offset, type);  
+  RegisterObject (unicode_name.c_str (), offset, type);
 }
 
 void OtherDevice::RegisterObject (const wchar_t* unicode_name, size_t offset, ObjectType type)
@@ -428,7 +428,7 @@ void OtherDevice::RegisterObject (const wchar_t* unicode_name, size_t offset, Ob
 
   ObjectsMap::iterator iter = objects.insert_pair (offset, ObjectData (object_name.c_str (), unicode_name, offset, type)).first;
 
-  objects_names.insert_pair (object_name.c_str (), iter);  
+  objects_names.insert_pair (object_name.c_str (), iter);
 }
 
 /*
@@ -452,8 +452,8 @@ void OtherDevice::PollDevice ()
       log_message = common::format ("Device %s reacquired", name.c_str ());
 
       debug_log_handler (log_message.c_str ());
-      ProcessEvent ("device reacquired");
-      
+      ProcessEvent ("Device reacquired");
+
       device_lost       = false;
       device_reacquired = true;
     }
@@ -464,8 +464,8 @@ void OtherDevice::PollDevice ()
         log_message = common::format ("Device %s lost", name.c_str ());
 
         debug_log_handler (log_message.c_str ());
-        ProcessEvent ("device lost");
-        
+        ProcessEvent ("Device lost");
+
         device_lost = true;
       }
 
@@ -503,15 +503,15 @@ void OtherDevice::PollDevice ()
         log_message = common::format ("Bad device %s (loosing at get state)", name.c_str ());
 
         debug_log_handler (log_message.c_str ());
-        ProcessEvent ("device bad");
-        
+        ProcessEvent ("Device bad");
+
         poll_timer.Pause ();
 
         return;
       }
 
       bool reacquire_result = ReAcquireDevice ();
-    
+
       if (reacquire_result)
       {
         if (events_buffer_size)
@@ -529,7 +529,7 @@ void OtherDevice::PollDevice ()
           operation_result = device_interface->GetDeviceState (current_device_data.size (), current_device_data.data ());
 
         if (operation_result != DI_OK)
-        { 
+        {
           log_message = common::format ("Can't get device %s state, error '%s'", name.c_str (), get_direct_input_error_name (operation_result));
 
           debug_log_handler (log_message.c_str ());
@@ -545,7 +545,7 @@ void OtherDevice::PollDevice ()
         device_lost = true;
 
         return;
-      }      
+      }
     }
     else
     {
@@ -573,17 +573,17 @@ void OtherDevice::PollDevice ()
         case ObjectType_AbsoluteAxis:
           xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' axis %.4f", iter->second.name.c_str (), (((float)(events_buffer.data ()[i].dwData - iter->second.min_value)) / (float)(iter->second.max_value - iter->second.min_value)) * 2.f - 1.f);
           ProcessEvent (event_string_buffer.data ());
-          
+
           break;
         case ObjectType_RelativeAxis:
           xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' delta %f", iter->second.name.c_str (), ((float)(LONG)(events_buffer.data ()[i].dwData - iter->second.last_value)) * iter->second.properties[ObjectPropertyType_Sensitivity]->second.value);
           ProcessEvent (event_string_buffer.data ());
-          
+
           break;
         case ObjectType_Button:
           xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' %s", iter->second.name.c_str (), (events_buffer.data ()[i].dwData & 0x80) ? "down" : "up");
           ProcessEvent (event_string_buffer.data ());
-          
+
           break;
         case ObjectType_POV:
           if (!is_pov_pressed (events_buffer.data ()[i].dwData))
@@ -595,7 +595,7 @@ void OtherDevice::PollDevice ()
           {
             xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' pov %d", iter->second.name.c_str (), events_buffer.data ()[i].dwData);
             ProcessEvent (event_string_buffer.data ());
-            
+
             if (!is_pov_pressed (iter->second.last_value))
             {
               xsnprintf (event_string_buffer.data (), event_string_buffer.size (), "'%s' down", iter->second.name.c_str ());

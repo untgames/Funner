@@ -1,7 +1,8 @@
 #include <stdio.h>
 
-#include <xtl/signal.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/string.h>
+#include <xtl/signal.h>
 
 #include <input/low_level/device.h>
 #include <input/low_level/driver.h>
@@ -13,14 +14,12 @@
 using namespace syslib;
 using namespace input::low_level;
 
-void on_window_close (Window&, WindowEvent, const WindowEventContext&)
-{
-  Application::Exit (0);
-}
-
 void input_event_handler (const char* event)
 {
   printf ("New event: '%s'\n", event);
+
+  if (!xtl::xstrcmp ("Window closed", event))
+    Application::Exit (0);
 }
 
 int main ()
@@ -52,8 +51,6 @@ int main ()
     printf ("Property 'Cursor.sensitivity' = %f\n", device->GetProperty ("Cursor.sensitivity"));
 
     window.Show ();
-
-    window.RegisterEventHandler (WindowEvent_OnClose, &on_window_close);
 
     Application::Run ();
 
