@@ -76,7 +76,8 @@ bool CustomFileImpl::Eof ()
 
 void CustomFileImpl::Flush ()
 {
-  file_system->FileFlush (file_handle);
+  if (Mode () & (FileMode_Write | FileMode_Resize | FileMode_Create))
+    file_system->FileFlush (file_handle);
 }
 
 size_t CustomFileImpl::GetBufferSize ()
