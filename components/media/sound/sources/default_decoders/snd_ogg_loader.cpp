@@ -21,7 +21,7 @@ class OggInputStream : public media::ISoundInputStream, public xtl::reference_co
 
     size_t Read (size_t first_sample, size_t samples_count, void* data);
 
-    void AddRef () { addref (this); }  
+    void AddRef () { addref (this); }
     void Release () { release (this); }
 
     common::InputFile file;
@@ -35,14 +35,14 @@ class OggInputStream : public media::ISoundInputStream, public xtl::reference_co
 struct LogHolder
 {
   LogHolder () : log (LOG_NAME) {}
-  
+
   Log log;
 };
 
 Log& get_log ()
 {
   typedef common::Singleton<LogHolder> LogHolderSingleton;
-  
+
   return LogHolderSingleton::Instance ().log;
 }
 
@@ -93,8 +93,8 @@ int OggSeekFunc (void* file_ptr, ogg_int64_t offset, int origin)
        case FileSeekMode_Set:     seek_pos = (filepos_t)offset; break;
        case FileSeekMode_Current: seek_pos = ((StdFile*)file_ptr)->Tell () + (filepos_t)offset; break;
        case FileSeekMode_End:     seek_pos = ((StdFile*)file_ptr)->Size () + (filepos_t)offset; break;
-     } 
-     return seek_pos != ((StdFile*)file_ptr)->Seek ((filepos_t)offset, seek_mode[origin]);  
+     }
+     return seek_pos != ((StdFile*)file_ptr)->Seek ((filepos_t)offset, seek_mode[origin]);
   }
   catch (std::exception& exception)
   {
@@ -105,12 +105,6 @@ int OggSeekFunc (void* file_ptr, ogg_int64_t offset, int origin)
     log_exception ("::OggSeekFunc");
   }
   return 1;
-}
-
-int OggCloseFunc (void* file_ptr)
-{
-  ((File*)file_ptr)->Close ();
-  return 0;
 }
 
 long OggTellFunc (void *file_ptr)
@@ -141,12 +135,12 @@ void SwapSamples (short &s1, short &s2)
 OggInputStream::OggInputStream (const char* file_name, SoundSampleInfo& sound_sample_info)
   : file (file_name, FileMode_ReadOnly)
 {
-  ov_callbacks callbacks = {OggReadFunc, OggSeekFunc, OggCloseFunc, OggTellFunc};
+  ov_callbacks callbacks = {OggReadFunc, OggSeekFunc, 0, OggTellFunc};
   int          ret_code;
 
   ret_code = ov_open_callbacks (&file, &vf, NULL, 0, callbacks);
 
-  if (ret_code < 0) 
+  if (ret_code < 0)
     throw xtl::format_operation_exception ("OggCodec::OggCodec", "Can't open ogg file, seems to be not ogg bitstream (return code %d)", ret_code);
 
   vorbis_info *vi = ov_info (&vf, -1);
@@ -162,7 +156,7 @@ size_t OggInputStream::Read (size_t first_sample, size_t samples_count, void* da
 
   vorbis_info* vi = ov_info (&vf, -1);
   size_t       decoded_bytes = 0, readed_bytes;
-  int          current_section;       
+  int          current_section;
   size_t       buffer_size = samples_count * 2 * vi->channels;
 
   ov_pcm_seek (&vf, first_sample);
@@ -176,12 +170,12 @@ size_t OggInputStream::Read (size_t first_sample, size_t samples_count, void* da
       if (decoded_bytes >= buffer_size)
         break;
     }
-    else 
+    else
       break;
   }
 
   if (vi->channels == 6)
-  {   
+  {
     short* pSamples = (short*)data;
     for (size_t ulSamples = 0; ulSamples < (buffer_size>>1); ulSamples+=6)
     {
@@ -211,7 +205,7 @@ class OggLoaderComponent
 {
   public:
     //загрузка компонента
-    OggLoaderComponent () 
+    OggLoaderComponent ()
     {
       SoundSampleManager::RegisterLoader ("ogg", &default_ogg_loader);
     }
