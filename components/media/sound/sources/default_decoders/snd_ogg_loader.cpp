@@ -133,7 +133,7 @@ void SwapSamples (short &s1, short &s2)
 }
 
 OggInputStream::OggInputStream (const char* file_name, SoundSampleInfo& sound_sample_info)
-  : file (file_name, FileMode_ReadOnly)
+  : file (file_name)
 {
   ov_callbacks callbacks = {OggReadFunc, OggSeekFunc, 0, OggTellFunc};
   int          ret_code;
