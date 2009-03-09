@@ -319,7 +319,7 @@ class OpenALDevice : public sound::low_level::IDevice, public xtl::reference_cou
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление каналов и буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void OpenALDevice::ClearALData ();
+    void ClearALData ();
 
     OpenALDevice (const OpenALDevice&);
     OpenALDevice& operator = (const OpenALDevice&);
