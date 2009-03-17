@@ -7,8 +7,9 @@ namespace
 
 const char* LOG_NAME = "syslib.Platform";
 
-const OSType WINDOW_PROPERTY_CREATOR = 'untg';  //тег приложения
-const OSType FULLSCREEN_PROPERTY_TAG = 'fscr';  //тег свойства полноэкранности
+const OSType WINDOW_PROPERTY_CREATOR     = 'untg';  //тег приложения
+const OSType FULLSCREEN_PROPERTY_TAG     = 'fscr';  //тег свойства полноэкранности
+const OSType CURSOR_VISIBLE_PROPERTY_TAG = 'hcrs';  //тег видимости курсора (если истина - курсор виден)
 
 const size_t CHAR_CODE_BUFFER_SIZE = 4;  //размер буффера для декодированного имени символа
 
@@ -66,6 +67,7 @@ struct WindowImpl
 /*
     Получение области окна
 */
+
 void get_rect (WindowRef wnd, WindowRegionCode region, syslib::Rect& rect, const char* source)
 {
   ::Rect window_rect;
@@ -254,13 +256,15 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             Platform::InvalidateWindow (window_handle);
             window_impl->Notify (window_handle, WindowEvent_OnSize, context);
             window_impl->Notify (window_handle, WindowEvent_OnMove, context);
+
+            Platform::SetCursorVisible (window_handle, Platform::GetCursorVisible (window_handle));  //Обновление области скрытия курсора
             break;
           case kEventWindowFocusRestored:
-          case kEventWindowFocusAcquired: //окно изменило размеры
+          case kEventWindowFocusAcquired: //окно получило фокус
             window_impl->Notify (window_handle, WindowEvent_OnSetFocus, context);
             break;
           case kEventWindowFocusRelinquish:
-          case kEventWindowFocusLost:       //окно изменило положение
+          case kEventWindowFocusLost:       //окно потеряло фокус
             window_impl->Notify (window_handle, WindowEvent_OnLostFocus, context);
             break;
           default:
@@ -597,6 +601,11 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
 
       check_window_manager_error (SetWindowProperty (new_window, WINDOW_PROPERTY_CREATOR, FULLSCREEN_PROPERTY_TAG,
                                   sizeof (is_fullscreen), &is_fullscreen), "::SetWindowProperty", "Can't set window property");
+
+      bool is_cursor_visible = true;
+
+      check_window_manager_error (SetWindowProperty (new_window, WINDOW_PROPERTY_CREATOR, CURSOR_VISIBLE_PROPERTY_TAG,
+                                  sizeof (is_cursor_visible), &is_cursor_visible), "::SetWindowProperty", "Can't set window property");
 
       SetMouseCoalescingEnabled (false, 0);
 
@@ -940,14 +949,30 @@ syslib::Point Platform::GetCursorPosition (window_t handle)
     Видимость курсора
 */
 
-void Platform::SetCursorVisible (window_t, bool state)
+void Platform::SetCursorVisible (window_t handle, bool state)
 {
-  common::Log (LOG_NAME).Print ("Cursor visibility management not supported on MacOS X");
+  if (state)
+    ShowCursor ();
+  else
+  {
+    ::Rect content_rect;
+
+    check_window_manager_error (GetWindowBounds ((WindowRef)handle, kWindowContentRgn, &content_rect), "syslib::CarbonPlatform::SetCursorVisible",
+                                "Can't get window content rect, ::GetWindowBounds error");
+
+    ShieldCursor (&content_rect, ::Point ());
+  }
+
+  check_window_manager_error (SetWindowProperty ((WindowRef)handle, WINDOW_PROPERTY_CREATOR, CURSOR_VISIBLE_PROPERTY_TAG,
+                              sizeof (state), &state), "::SetWindowProperty", "Can't set window property");
 }
 
-bool Platform::GetCursorVisible (window_t)
+bool Platform::GetCursorVisible (window_t handle)
 {
-  common::Log (LOG_NAME).Print ("Cursor visibility management not supported on MacOS X");
+  bool return_value;
 
-  return true;
+  check_window_manager_error (GetWindowProperty ((WindowRef)handle, WINDOW_PROPERTY_CREATOR, CURSOR_VISIBLE_PROPERTY_TAG,
+                              sizeof (return_value), 0, &return_value), "::GetWindowProperty", "Can't get window property");
+
+  return return_value;
 }
