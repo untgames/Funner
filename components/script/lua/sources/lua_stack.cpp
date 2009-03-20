@@ -4,6 +4,17 @@ using namespace script;
 using namespace script::lua;
 using namespace common;
 
+namespace
+{
+
+/*
+     онстанты
+*/
+
+const char INLINE_FUNCTION_MARKER = '@'; //маркер встраиваемых команд
+
+}
+
 /*
      онструкторы
 */
@@ -35,75 +46,6 @@ size_t Stack::Size ()
     ѕолучение аргументов из стека
 */
 
-namespace
-{
-
-//проверка наличи€ элемента в стеке
-void check_item_index (lua_State* state, size_t index, const char* function_name)
-{
-  size_t stack_size = lua_gettop (state) + 1; 
-
-  if (index >= stack_size)
-    throw xtl::format_exception<script::ArgumentException> (function_name, "Attempt to get item #%u from stack with %u items", index, stack_size);
-}
-
-//проверка корректности типа элемента, извлекаемого из стека
-void check_item (lua_State* state, size_t index, int expected_type, const char* function_name)
-{
-    //проверка корректности индекса элемента
-
-  check_item_index (state, index, function_name);
-
-    //определение типа элемента, наход€щегос€ в стеке
-
-  int item_type = lua_type (state, index);
-
-    //проверка совместимости типов
-
-  switch (item_type)
-  {
-    case LUA_TNIL:
-      switch (expected_type)
-      {
-        case LUA_TNUMBER:
-        case LUA_TNIL:
-        case LUA_TLIGHTUSERDATA:
-        case LUA_TBOOLEAN:
-          return;
-      }
-      break;
-    case LUA_TNUMBER:
-      switch (expected_type)
-      {
-        case LUA_TNUMBER:
-        case LUA_TNIL:
-        case LUA_TBOOLEAN:
-          return;
-      }
-      
-      break;
-    case LUA_TBOOLEAN:
-      switch (expected_type)
-      {
-        case LUA_TNUMBER:
-        case LUA_TNIL:
-        case LUA_TBOOLEAN:
-          return;
-      }
-      break;
-    default:
-      break;
-  }
-  
-  if (item_type != expected_type)
-  {
-    throw xtl::format_exception<script::ArgumentException> (function_name, "Bad item #%u type (%s expected, got %s)", index, lua_typename (state, expected_type),
-                             lua_typename (state, item_type));
-  }  
-}
-
-}
-
 float Stack::GetFloat (size_t index)
 {
   check_item (state, index, LUA_TNUMBER, "script::lua::Stack::GetFloat");
@@ -133,15 +75,74 @@ void* Stack::GetPointer (size_t index)
 
 const char* Stack::GetString (size_t index)
 {
-  check_item (state, index, LUA_TSTRING, "script::lua::Stack::GetString");
-  return lua_tostring (state, index);
+  check_item (state, index, LUA_TSTRING, "script::lua::Stack::GetString");  
+  return lua_tostring (state, index);  
 }
 
-const char* Stack::GetSymbol (size_t index)
+ISymbol* Stack::GetSymbol (size_t index)
 {
-  throw xtl::format_not_supported_exception ("script::lua::Stack::GetSymbol");
+  try
+  {
+      //проверка индекса
 
-  return "";
+    check_item (state, index, LUA_TFUNCTION, "");
+    
+    int item_type = lua_type (state, index);
+    
+    switch (item_type)
+    {
+      case LUA_TFUNCTION:
+      {
+          //получение символа      
+
+        return interpreter.SymbolRegistry ().GetSymbol (-(int)index);
+      }
+      case LUA_TSTRING:
+      {
+        check_stack (state, 1);
+        
+        const char* symbol_string = lua_tostring (state, index);
+        
+        if (!symbol_string)
+          throw xtl::format_exception<RuntimeException> ("", "Null symbol string");
+
+        if (*symbol_string == INLINE_FUNCTION_MARKER)
+        {
+          ++symbol_string; //удаление маркера
+          
+          if (luaL_loadbuffer (state, symbol_string, strlen (symbol_string), symbol_string))
+            raise_error (state, "");
+        }
+        else
+        {
+          lua_getglobal (state, symbol_string);
+        }
+
+        ISymbol* symbol = 0;
+
+        try
+        {
+          symbol = interpreter.SymbolRegistry ().GetSymbol (-1);
+        }
+        catch (...)
+        {
+          lua_pop (state, 1);
+          throw;          
+        }        
+
+        lua_pop (state, 1);
+
+        return symbol;
+      }
+      default:
+        throw xtl::format_exception<StackException> ("", "Wrong item type");
+    }    
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("script::lua::Stack::GetSymbol");
+    throw;
+  }
 }
 
 xtl::any& Stack::GetVariant (size_t index)
@@ -176,19 +177,6 @@ xtl::any& Stack::GetVariant (size_t index)
 /*
     ѕомещение аргументов в стек
 */
-
-namespace
-{
-
-//проверка возможности поместить в стек count аргументов 
-void check_stack (lua_State* state, size_t count = 1)
-{
-  if (!lua_checkstack (state, count))
-    throw xtl::format_exception<StackException> ("script::lua::Stack::Push", "Not enough stack space."
-    "Attempt to push %u items in stack with %u items (stack_size=%u)", count, lua_gettop (state), LUAI_MAXCSTACK);
-}
-
-}
 
 void Stack::Push (float value)
 {
@@ -228,10 +216,19 @@ void Stack::Push (void* value)
 void Stack::PushSymbol (const char* symbol)
 {
   if (!symbol)
-    throw xtl::make_null_argument_exception ("script::lua::Stack::PushSymbol", "symbol");
+    throw xtl::make_null_argument_exception ("script::lua::Stack::PushSymbol(const char*)", "symbol");
 
   check_stack   (state);    
   lua_getglobal (state, symbol);
+}
+
+void Stack::PushSymbol (ISymbol* symbol)
+{
+  if (!symbol)
+    throw xtl::make_null_argument_exception ("script::lua::Stack::PushSymbol(ISymbol*)", "symbol");
+
+  check_stack   (state);
+  lua_getglobal (state, symbol->Name ());
 }
 
 void Stack::Push (const xtl::any& value)

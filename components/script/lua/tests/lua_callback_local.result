@@ -1,0 +1,5 @@
+Results of lua_callback_local_test:
+x=1 y=2
+result: '1 2'
+result: '8'
+result: 'bad result'

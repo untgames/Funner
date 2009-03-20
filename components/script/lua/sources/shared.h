@@ -93,7 +93,7 @@ class Stack: public IStack
     bool        GetBoolean (size_t index);
     void*       GetPointer (size_t index);
     const char* GetString  (size_t index);
-    const char* GetSymbol  (size_t index);
+    ISymbol*    GetSymbol  (size_t index);
     xtl::any&   GetVariant (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,15 +106,55 @@ class Stack: public IStack
     void Push       (const char* string);
     void Push       (const xtl::any& object);
     void PushSymbol (const char* string);
+    void PushSymbol (ISymbol*);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление аргументов из стека
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Pop (size_t arguments_count);
+    void Pop (size_t arguments_count);    
 
   private:
     lua_State*        state;
     lua::Interpreter& interpreter;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Реестр символов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class SymbolRegistry
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    SymbolRegistry  (lua_State* state);
+    ~SymbolRegistry ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение состояния
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    lua_State* State () const { return state; }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение символа
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ISymbol* GetSymbol (int index);
+
+  private:
+    SymbolRegistry (const SymbolRegistry&); //no impl
+    SymbolRegistry& operator = (const SymbolRegistry&); //no impl
+
+    void RemoveSymbol (void* symbol_handle);    
+
+  private:
+    class Symbol;
+    typedef stl::hash_map<void*, Symbol*> SymbolMap;
+
+    friend class Symbol;
+
+  private:
+    lua_State* state;
+    SymbolMap  symbols;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,14 +215,11 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
     const char* Name ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Окружение
+///Окружение / реестр символов / стек
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     script::Environment& Environment ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Стек аргументов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    IStack& Stack ();
+    lua::SymbolRegistry& SymbolRegistry ();
+    IStack&              Stack ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка наличия функции
@@ -217,19 +254,14 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
     void RegisterLibrary   (const char* name, InvokerRegistry& registry);
     void UnregisterLibrary (const char* name);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация библиотеки шлюзов интерпретатора
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterShellLibrary ();
-
   private:
     typedef xtl::intrusive_ptr<Library>                           LibraryPtr;
     typedef stl::hash_map<stl::hash_key<const char*>, LibraryPtr> LibraryMap;
 
   private:
     EnvironmentPointer    environment;                  //скриптовое окружение
+    lua::SymbolRegistry   symbol_registry;              //реестр символов
     lua::Stack            stack;                        //стек аргументов
-    InvokerRegistry       shell_library;                //библиотека шлюзов интерпретатора
     LibraryMap            libraries;                    //карта библиотек
     xtl::auto_connection  on_create_library_connection; //соединение на событие создания библиотеки
     xtl::auto_connection  on_remove_library_connection; //соединение на событие удаления библиотеки
@@ -242,6 +274,9 @@ int  variant_destroy  (lua_State*); //удаление объекта вариантного типа данных
 int  variant_tostring (lua_State*); //печать в строку состояния объекта пользовательского типа данных
 int  safe_call        (lua_State*, int (*f)(lua_State*)); //безопасный вызов шлюза
 void dump_stack       (lua_State*, stl::string& buffer); //печать состояния стека
+void check_stack      (lua_State* state, size_t count = 1); //проверка возможности поместить в стек count аргументов
+void check_item       (lua_State* state, size_t index, int expected_type, const char* function_name); //проверка корректности типа элемента, извлекаемого из стека
+void raise_error      (lua_State* state, const char* source); //получение сообщения об ошибке
 
 }
 

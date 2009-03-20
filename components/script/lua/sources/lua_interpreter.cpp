@@ -46,6 +46,7 @@ int error_handler (lua_State* state)
 
 Interpreter::Interpreter (const EnvironmentPointer& in_environment)
   : environment (in_environment),
+    symbol_registry (State ()),
     stack (state, *this)
 {
     //инициализация стандартных библиотек
@@ -83,8 +84,6 @@ Interpreter::Interpreter (const EnvironmentPointer& in_environment)
   for (Environment::Iterator i=environment->CreateIterator (); i; ++i)
     RegisterLibrary (environment->LibraryId (i), *i);
 
-  RegisterShellLibrary ();
-
     //очистка стека
 
   lua_settop (state, 0);
@@ -104,7 +103,7 @@ const char* Interpreter::Name ()
 }
 
 /*
-    Скриптовое окружение
+    Скриптовое окружение / реестр символов / стек аргументов
 */
 
 Environment& Interpreter::Environment ()
@@ -112,9 +111,10 @@ Environment& Interpreter::Environment ()
   return *environment;
 }
 
-/*
-    Стек аргументов
-*/
+lua::SymbolRegistry& Interpreter::SymbolRegistry ()
+{
+  return symbol_registry;
+}
 
 IStack& Interpreter::Stack ()
 {
@@ -142,27 +142,6 @@ bool Interpreter::HasFunction (const char* name)
 /*
     Выполнение буфера интерпретации луа
 */
-
-namespace
-{
-
-//получение сообщения об ошибке
-void raise_error (lua_State* state, const char* source)
-{
-  try
-  {
-    const char* reason = lua_tostring (state, -1);
-
-    throw xtl::format_exception<RuntimeException> (source, "%s", reason ? reason : "internal error");
-  }
-  catch (...)
-  {
-    lua_pop (state, 1);
-    throw;
-  }
-}
-
-}
 
 void Interpreter::DoCommands (const char* buffer_name, const void* buffer, size_t buffer_size)
 {
@@ -219,17 +198,6 @@ void Interpreter::UnregisterLibrary (const char* name)
     return;
 
   libraries.erase (name);
-}
-
-/*
-    Регистрация библиотеки шлюзов интерпретатора
-*/
-
-void Interpreter::RegisterShellLibrary ()
-{
-//  shell_library.Register ("EventHandler", make_invoker ());
-
-//  RegisterLibrary (SHELL_LIBRARY_NAME, shell_library);
 }
 
 namespace

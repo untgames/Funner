@@ -201,6 +201,114 @@ void dump_stack (lua_State* state, stl::string& buffer)
   }
 }
 
+//проверка возможности поместить в стек count аргументов 
+void check_stack (lua_State* state, size_t count)
+{
+  if (!lua_checkstack (state, count))
+    throw xtl::format_exception<StackException> ("script::lua::check_stack", "Not enough stack space."
+    "Attempt to push %u items in stack with %u items (stack_size=%u)", count, lua_gettop (state), LUAI_MAXCSTACK);
+}
+
+namespace
+{
+
+//проверка наличия элемента в стеке
+void check_item_index (lua_State* state, size_t index, const char* function_name)
+{
+  size_t stack_size = lua_gettop (state) + 1; 
+
+  if (index >= stack_size)
+    throw xtl::format_exception<script::ArgumentException> (function_name, "Attempt to get item #%u from stack with %u items", index, stack_size);
+}
+
+}
+
+//проверка корректности типа элемента, извлекаемого из стека
+void check_item (lua_State* state, size_t index, int expected_type, const char* function_name)
+{
+    //проверка корректности индекса элемента
+
+  check_item_index (state, index, function_name);
+
+    //определение типа элемента, находящегося в стеке
+
+  int item_type = lua_type (state, index);
+
+    //проверка совместимости типов
+
+  switch (item_type)
+  {
+    case LUA_TNIL:
+      switch (expected_type)
+      {
+        case LUA_TNUMBER:
+        case LUA_TNIL:
+        case LUA_TLIGHTUSERDATA:
+        case LUA_TBOOLEAN:
+          return;
+      }
+      break;
+    case LUA_TNUMBER:
+      switch (expected_type)
+      {
+        case LUA_TNUMBER:
+        case LUA_TNIL:
+        case LUA_TBOOLEAN:
+          return;
+      }
+      
+      break;
+    case LUA_TBOOLEAN:
+      switch (expected_type)
+      {
+        case LUA_TNUMBER:
+        case LUA_TNIL:
+        case LUA_TBOOLEAN:
+          return;
+      }
+      break;
+    case LUA_TSTRING:
+      switch (expected_type)
+      {
+        case LUA_TSTRING:
+        case LUA_TFUNCTION:
+          return;
+      }
+      break;
+    case LUA_TFUNCTION:
+      switch (expected_type)
+      {
+        case LUA_TFUNCTION:
+          return;
+      }
+      break;
+    default:
+      break;
+  }
+  
+  if (item_type != expected_type)
+  {
+    throw xtl::format_exception<script::ArgumentException> (function_name, "Bad item #%u type (%s expected, got %s)", index, lua_typename (state, expected_type),
+                             lua_typename (state, item_type));
+  }  
+}
+
+//получение сообщения об ошибке
+void raise_error (lua_State* state, const char* source)
+{
+  try
+  {
+    const char* reason = lua_tostring (state, -1);
+
+    throw xtl::format_exception<RuntimeException> (source, "%s", reason ? reason : "internal error");
+  }
+  catch (...)
+  {
+    lua_pop (state, 1);
+    throw;
+  }
+}
+
 }
 
 }

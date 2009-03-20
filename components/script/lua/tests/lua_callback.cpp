@@ -8,7 +8,7 @@ const char* lua_f =
 "  return tostring (x)\n"
 "end\n"
 "function test ()\n"
-"  return EventHandler (\"callback\")\n"
+"  return EventHandler ('callback')\n"
 "end\n"
 ;
 
