@@ -679,8 +679,19 @@ namespace detail
 template <class Ret> class callback_dispatcher
 {
   public:
-    callback_dispatcher (IInterpreter* in_interpreter, const char* in_function_name)
-      : interpreter (in_interpreter), function_name (in_function_name) {}
+    callback_dispatcher (IInterpreter* in_interpreter, ISymbol* in_symbol)
+      : interpreter (in_interpreter), symbol (in_symbol) {}
+      
+    callback_dispatcher (const callback_dispatcher& dispatcher)
+      : interpreter (dispatcher.interpreter), symbol (dispatcher.symbol)
+    {
+      symbol->AddRef ();
+    }
+      
+    ~callback_dispatcher ()
+    {
+      symbol->Release ();
+    }
 
     Ret operator () ()
     {    
@@ -753,17 +764,19 @@ template <class Ret> class callback_dispatcher
     {
       if (!interpreter)
         throw xtl::format_operation_exception ("script::callback_dispatcher::invoke", "Interpreter has already destroyed");
-    
-      return detail::invoke_dispatch<ArgsCount> (*interpreter, function_name.c_str (), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8,
+
+      return detail::invoke_dispatch<ArgsCount> (*interpreter, symbol->Name (), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8,
         arg9, arg10, xtl::type<Ret> ());
     }
+    
+    callback_dispatcher& operator = (const callback_dispatcher&); //no impl
 
   private:
     typedef xtl::trackable_ptr<IInterpreter> InterpreterPtr;
 
   private:
     InterpreterPtr interpreter;
-    stl::string    function_name;
+    ISymbol*       symbol;
     
     static ignore dummy;
 };
@@ -779,14 +792,14 @@ template <class Signature> struct callback_invoker
     check_arguments_count<1> (stack.Size ());  
   
     IInterpreter* interpreter   = &stack.Interpreter ();
-    const char*   function_name = get_argument<const char*> (stack, 1);    
+    ISymbol*      symbol        = stack.GetSymbol (1);
 
-    if (!function_name)
-      throw xtl::format_operation_exception ("script::callback_invoker::operator ()", "Null callback function name");
+    if (!symbol)
+      throw xtl::format_operation_exception ("script::callback_invoker::operator ()", "Null callback function");
 
     typedef typename xtl::functional_traits<Signature>::result_type result_type;
 
-    xtl::function<Signature> result = callback_dispatcher<result_type> (interpreter, function_name);
+    xtl::function<Signature> result = callback_dispatcher<result_type> (interpreter, symbol);
 
     stack.Push (xtl::make_ref_any (result));
 

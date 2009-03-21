@@ -46,7 +46,7 @@ class MyStack: public IStack
     bool        GetBoolean (size_t index) { return xtl::any_multicast<bool> (array.at (index)); }
     void*       GetPointer (size_t index) { return xtl::any_multicast<void*> (array.at (index)); }
     const char* GetString  (size_t index) { return xtl::any_multicast<const char*> (array.at (index)); }
-    const char* GetSymbol  (size_t index) { return MyStack::GetString (index); }
+    ISymbol*    GetSymbol  (size_t index) { throw xtl::format_not_supported_exception ("MyStack::GetSymbol", "Symbols not supported"); }
     xtl::any&   GetVariant (size_t index) { return array.at (index); }
 
     void Push (float value)        { array.push_back (xtl::make_ref_any (value)); }
@@ -57,6 +57,7 @@ class MyStack: public IStack
     void Push (const xtl::any& a)  { array.push_back (a); }
 
     void PushSymbol (const char* string) { MyStack::Push (string); }
+    void PushSymbol (ISymbol*)           { throw xtl::format_not_supported_exception ("MyStack::PushSymbol", "Symbols not supported"); }
 
     void Pop (size_t arguments_count)
     {
@@ -126,7 +127,7 @@ class MyInterpreter: public IInterpreter, public xtl::trackable
       if (arguments_count >= stack.Size ())
         throw xtl::format_exception<StackException> ("MyInterpreter::Invoke", "Stack underflow");
         
-      const char* function_name = stack.GetSymbol (stack.Size () - arguments_count - 1);
+      const char* function_name = stack.GetString (stack.Size () - arguments_count - 1);
       
       printf ("invoke '%s'\n", function_name);
       
