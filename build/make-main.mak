@@ -373,16 +373,16 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TARGET_DIR)/%$(EXE_SUFFIX)
 		@echo Running $$(notdir $$<)...
-		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args) > $$(patsubst %,"$(CURDIR)/%",$$@)		
+		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args) > $$(patsubst %,"$(CURDIR)/%",$$@)
 		
 #Правило получения файла-результата тестирования по shell-файлу
   $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh
 		@echo Running $$(notdir $$<)...
-		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args) > $$(patsubst %,"$(CURDIR)/%",$$@)
+		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && chmod u+x $$(patsubst %,"$(CURDIR)/%",$$<) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args) > $$(patsubst %,"$(CURDIR)/%",$$@)
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.SOURCE_DIR)/%.sh),$$(wildcard $$($2.SOURCE_DIR)/*.sh)) $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$^)),$$$$file $(args))
+		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.SOURCE_DIR)/%.sh),$$(wildcard $$($2.SOURCE_DIR)/*.sh)) $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$^)),chmod u+x $$$$file && $$$$file $(args))
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
