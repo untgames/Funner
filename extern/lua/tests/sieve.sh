@@ -1,4 +1,4 @@
-#!env lua
+#!/usr/bin/env lua
 -- the sieve of of Eratosthenes programmed with coroutines
 -- typical usage: lua -e N=1000 sieve.lua | column
 

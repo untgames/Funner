@@ -1,4 +1,4 @@
-#!env lua
+#!/usr/bin/env lua
 -- hex dump
 -- usage: lua xd.lua < file
 
