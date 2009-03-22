@@ -678,21 +678,13 @@ namespace detail
 
 template <class Ret> class callback_dispatcher
 {
+  typedef xtl::com_ptr<ISymbol> SymbolPtr;
   public:
-    callback_dispatcher (IInterpreter* in_interpreter, ISymbol* in_symbol)
+    callback_dispatcher (IInterpreter* in_interpreter, const SymbolPtr& in_symbol)
       : interpreter (in_interpreter), symbol (in_symbol) {}
       
-    callback_dispatcher (const callback_dispatcher& dispatcher)
-      : interpreter (dispatcher.interpreter), symbol (dispatcher.symbol)
-    {
-      symbol->AddRef ();
-    }
-      
-    ~callback_dispatcher ()
-    {
-      symbol->Release ();
-    }
-
+    const char* symbol_name () const { return symbol->Name (); }
+            
     Ret operator () ()
     {    
       return invoke<0> (dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy);
@@ -768,15 +760,13 @@ template <class Ret> class callback_dispatcher
       return detail::invoke_dispatch<ArgsCount> (*interpreter, symbol->Name (), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8,
         arg9, arg10, xtl::type<Ret> ());
     }
-    
-    callback_dispatcher& operator = (const callback_dispatcher&); //no impl
 
   private:
     typedef xtl::trackable_ptr<IInterpreter> InterpreterPtr;
 
   private:
     InterpreterPtr interpreter;
-    ISymbol*       symbol;
+    SymbolPtr      symbol;
     
     static ignore dummy;
 };
@@ -791,17 +781,18 @@ template <class Signature> struct callback_invoker
 
     check_arguments_count<1> (stack.Size ());  
   
-    IInterpreter* interpreter   = &stack.Interpreter ();
-    ISymbol*      symbol        = stack.GetSymbol (1);
+    IInterpreter* interpreter = &stack.Interpreter ();
 
+    xtl::com_ptr<ISymbol> symbol (stack.GetSymbol (1), false);
+    
     if (!symbol)
       throw xtl::format_operation_exception ("script::callback_invoker::operator ()", "Null callback function");
 
     typedef typename xtl::functional_traits<Signature>::result_type result_type;
 
-    xtl::function<Signature> result = callback_dispatcher<result_type> (interpreter, symbol);
+    xtl::function<Signature> result = callback_dispatcher<result_type> (interpreter, symbol);    
 
-    stack.Push (xtl::make_ref_any (result));
+    stack.Push (xtl::make_ref_any (result));    
 
     return 1;
   }
