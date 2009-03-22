@@ -5,7 +5,7 @@ delta=1e-6	-- tolerance
 
 function bisect(f,a,b,fa,fb)
  local c=(a+b)/2
- io.write(string.format("%d c=%.5f a=%.5f b=%.5f\n",n,c,a,b))
+ io.write(string.format("%d c=%.5g a=%.5g b=%.5g\n",n,c,a,b))
  if c==a or c==b or math.abs(a-b)<delta then return c,b-a end
  n=n+1
  local fc=f(c)
