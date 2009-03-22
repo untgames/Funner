@@ -49,7 +49,7 @@ class SymbolRegistry::Symbol: public ISymbol, public xtl::reference_counter
     ~Symbol ()
     {            
       if (!registry)
-        return;              
+        return;                      
         
       try
       {
@@ -134,7 +134,7 @@ ISymbol* SymbolRegistry::GetSymbol (int index)
     
       //регистрация нового символа
 
-    xtl::com_ptr<Symbol> symbol (new Symbol (this, symbol_handle, index), false);
+    xtl::com_ptr<Symbol> symbol (new Symbol (this, symbol_handle, index), false);    
 
     symbols.insert_pair (symbol_handle, symbol.get ());
 

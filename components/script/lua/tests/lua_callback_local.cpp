@@ -36,11 +36,31 @@ int main ()
 
     typedef xtl::function<const char* (int)> my_fn;
     
+    stl::string internal_name;
+       
     for (int i=1; i<=3; i++)
     {
-      my_fn fn = invoke<my_fn> (*interpreter, "test", i);
+      {
+        my_fn fn = invoke<my_fn> (*interpreter, "test", i);
+        
+        typedef detail::callback_dispatcher<const char*> internal_dispatcher_type;
+        
+        internal_dispatcher_type* dispatcher = fn.target<internal_dispatcher_type> ();
+        
+        if (dispatcher) internal_name = dispatcher->symbol_name ();
+        else
+        {
+          printf ("wrong dispatcher type\n");
+          internal_name = "";
+        }
 
-      printf ("result: '%s'\n", fn (i*2));
+        printf ("result: '%s'\n", fn (i*2));
+      }
+
+      invoke<void> (*interpreter, "collectgarbage", "collect");
+
+      if (!interpreter->HasFunction (internal_name.c_str ())) printf ("symbol destroyed successfull\n");
+      else                                                    printf ("symbol '%s' has not destroyed\n", internal_name.c_str ());
     }
   }
   catch (std::exception& exception)
