@@ -1,5 +1,8 @@
 Results of lua_callback_local_test:
 x=1 y=2
 result: '1 2'
+symbol destroyed successfull
 result: '8'
+symbol destroyed successfull
 result: 'bad result'
+symbol destroyed successfull

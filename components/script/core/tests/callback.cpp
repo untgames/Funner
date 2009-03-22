@@ -13,9 +13,9 @@ int main ()
     typedef xtl::function<const char* (int, float, const char*)> my_fn;
 
     interpreter.Stack ().PushSymbol ("dummy");
-    interpreter.Stack ().Push ("my_callback");
+    interpreter.Stack ().Push ("my_callback");    
     
-    f1 (interpreter.Stack ());
+    f1 (interpreter.Stack ());    
 
     my_fn f2 = xtl::any_multicast<my_fn> (interpreter.Stack ().GetVariant (interpreter.Stack ().Size () - 1));
     

@@ -26,6 +26,26 @@
 
 using namespace script;
 
+class MySymbol: public ISymbol
+{
+  public:
+    MySymbol (const char* in_name) : name (in_name), ref_count (1) {}
+
+    const char* Name () { return name.c_str (); }
+    
+    void AddRef () { ref_count++; }
+
+    void Release ()
+    {
+      if (!--ref_count)
+        delete this;
+    }
+
+  private:
+    stl::string name;
+    size_t      ref_count;
+};
+
 class MyStack: public IStack
 {
   public:
@@ -46,7 +66,7 @@ class MyStack: public IStack
     bool        GetBoolean (size_t index) { return xtl::any_multicast<bool> (array.at (index)); }
     void*       GetPointer (size_t index) { return xtl::any_multicast<void*> (array.at (index)); }
     const char* GetString  (size_t index) { return xtl::any_multicast<const char*> (array.at (index)); }
-    ISymbol*    GetSymbol  (size_t index) { throw xtl::format_not_supported_exception ("MyStack::GetSymbol", "Symbols not supported"); }
+    ISymbol*    GetSymbol  (size_t index) { return new MySymbol (GetString (index)); }
     xtl::any&   GetVariant (size_t index) { return array.at (index); }
 
     void Push (float value)        { array.push_back (xtl::make_ref_any (value)); }
@@ -57,7 +77,7 @@ class MyStack: public IStack
     void Push (const xtl::any& a)  { array.push_back (a); }
 
     void PushSymbol (const char* string) { MyStack::Push (string); }
-    void PushSymbol (ISymbol*)           { throw xtl::format_not_supported_exception ("MyStack::PushSymbol", "Symbols not supported"); }
+    void PushSymbol (ISymbol* symbol)    { MyStack::Push (symbol->Name ()); }
 
     void Pop (size_t arguments_count)
     {
