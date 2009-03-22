@@ -1,7 +1,7 @@
 ###################################################################################################
 #Список целей
 ###################################################################################################
-TARGETS := EXTERN.LUALIB EXTERN.LUA_UTILS
+TARGETS := EXTERN.LUALIB EXTERN.LUA_UTILS EXTERN.LUA_TESTS
 
 #Цель №1 - LUALIB
 EXTERN.LUALIB.TYPE                 := static-lib        #Тип цели
@@ -23,3 +23,9 @@ EXTERN.LUA_UTILS.LIBS                 := funner.extern.lua       #Список использ
 EXTERN.LUA_UTILS.COMPILER_DEFINES     := __STRICT_ANSI__  #Определения сборки
 EXTERN.LUA_UTILS.msvc.COMPILER_CFLAGS := -TP              #Флаги сборки (зависят от конфигурации)
 EXTERN.LUA_UTILS.g++.COMPILER_CFLAGS  := -x c++
+EXTERN.LUA_UTILS.TARGET_DIR            = $(DIST_BIN_DIR)
+
+#Цель №3 - LUA_TESTS
+EXTERN.LUA_TESTS.TYPE         := test-suite
+EXTERN.LUA_TESTS.SOURCE_DIRS  := tests
+EXTERN.LUA_TESTS.DLL_DIRS      = $(DIST_BIN_DIR)
