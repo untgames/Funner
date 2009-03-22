@@ -316,8 +316,6 @@ class DevILComponent
       ImageManager::RegisterSaver  ("png",     &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("bmp",     &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("tga",     &Image::DefaultSaver);
-      ImageManager::RegisterSaver  ("tif",     &Image::DefaultSaver);
-      ImageManager::RegisterSaver  ("psd",     &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("cubemap", &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("skybox",  &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("dds",     &Image::DefaultSaver);
