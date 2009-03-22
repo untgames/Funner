@@ -376,6 +376,8 @@ define process_tests_source_dir
 		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args) > $$(patsubst %,"$(CURDIR)/%",$$@)
 		
 #Правило получения файла-результата тестирования по shell-файлу
+  $$($2.SOURCE_DIR)/%.sh: $$($2.TEST_EXE_FILES)
+
   $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh
 		@echo Running $$(notdir $$<)...
 		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && chmod u+x $$(patsubst %,"$(CURDIR)/%",$$<) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args) > $$(patsubst %,"$(CURDIR)/%",$$@)
