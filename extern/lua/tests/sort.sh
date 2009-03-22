@@ -1,4 +1,4 @@
-#!lua
+#!env lua
 -- two implementations of a sort function
 -- this is an example only. Lua has now a built-in function "sort"
 

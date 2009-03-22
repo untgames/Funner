@@ -1,4 +1,4 @@
-#!lua
+#!env lua
 -- example of for with generator functions
 
 function generatefib (n)

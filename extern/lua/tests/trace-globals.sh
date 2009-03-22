@@ -1,4 +1,4 @@
-#!lua
+#!env lua
 -- trace assigments to global variables
 
 do

@@ -1,4 +1,4 @@
-#!lua
+#!env lua
 -- make table, grouping all data for the same item
 -- input is 2 columns (item, data)
 

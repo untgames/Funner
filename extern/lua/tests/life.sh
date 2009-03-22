@@ -1,4 +1,4 @@
-#!lua
+#!env lua
 -- life.lua
 -- original by Dave Bollinger <DBollinger@compuserve.com> posted to lua-l
 -- modified to use ANSI terminal escape sequences

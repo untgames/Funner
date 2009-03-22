@@ -1,4 +1,4 @@
-#!lua
+#!env lua
 -- echo command line arguments
 
 for i=0,table.getn(arg) do
