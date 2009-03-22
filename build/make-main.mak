@@ -349,34 +349,40 @@ endef
 
 #Обработка каталога с исходными файлами тестов (имя цели, имя модуля)
 define process_tests_source_dir
-  $2.TEST_EXE_FILES    := $$(filter $$(files:%=$$($2.TMP_DIR)/%$(EXE_SUFFIX)),$$($2.OBJECT_FILES:%$(OBJ_SUFFIX)=%$(EXE_SUFFIX)))
+  ifeq (,$$($1.TARGET_DIR))
+    $2.TARGET_DIR := $$($2.TMP_DIR)
+  else
+    $2.TARGET_DIR := $$($1.TARGET_DIR)
+  endif
+
+  $2.TEST_EXE_FILES    := $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$(patsubst $$($2.TMP_DIR)/%$(OBJ_SUFFIX),$$($2.TARGET_DIR)/%$(EXE_SUFFIX),$$($2.OBJECT_FILES)))
   $2.TEST_RESULT_FILES := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
   $2.EXECUTION_DIR     := $$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR))
-  $1.TARGET_DLLS       := $$($1.TARGET_DLLS) $$($1.DLLS:%=$$($2.TMP_DIR)/%$(DLL_SUFFIX))
+  $1.TARGET_DLLS       := $$($1.TARGET_DLLS) $$($1.DLLS:%=$$($2.TARGET_DIR)/%$(DLL_SUFFIX))
 
   build: $$($2.TEST_EXE_FILES)
   test: TEST_MODULE.$2
   check: CHECK_MODULE.$2
-  .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2
+  .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2    
   
 #Правило сборки теста
-  $$($2.TMP_DIR)/%$(EXE_SUFFIX): $$($2.TMP_DIR)/%$(OBJ_SUFFIX) $$($1.LIB_DEPS)
+  $$($2.TARGET_DIR)/%$(EXE_SUFFIX): $$($2.TMP_DIR)/%$(OBJ_SUFFIX) $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
 		@$$(call $(LINK_TOOL),$$@,$$(filter %$(OBJ_SUFFIX),$$<) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
 #Правило получения файла-результата тестирования
-  $$($2.TMP_DIR)/%.result: $$($2.TMP_DIR)/%$(EXE_SUFFIX)
+  $$($2.TMP_DIR)/%.result: $$($2.TARGET_DIR)/%$(EXE_SUFFIX)
 		@echo Running $$(notdir $$<)...
-		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
+		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args) > $$(patsubst %,"$(CURDIR)/%",$$@)		
 		
 #Правило получения файла-результата тестирования по shell-файлу
   $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh
 		@echo Running $$(notdir $$<)...
-		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) > $$(patsubst %,"$(CURDIR)/%",$$@)
+		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args) > $$(patsubst %,"$(CURDIR)/%",$$@)
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.SOURCE_DIR)/%.sh),$$(wildcard $$($2.SOURCE_DIR)/*.sh)) $$(filter $$(files:%=$$($2.TMP_DIR)/%$(EXE_SUFFIX)),$$^)),$$$$file)
+		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.SOURCE_DIR)/%.sh),$$(wildcard $$($2.SOURCE_DIR)/*.sh)) $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$^)),$$$$file $(args))
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
