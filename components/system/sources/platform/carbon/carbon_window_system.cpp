@@ -960,7 +960,7 @@ void Platform::SetCursorVisible (window_t handle, bool state)
     check_window_manager_error (GetWindowBounds ((WindowRef)handle, kWindowContentRgn, &content_rect), "syslib::CarbonPlatform::SetCursorVisible",
                                 "Can't get window content rect, ::GetWindowBounds error");
 
-    ShieldCursor (&content_rect, ::Point ());
+    ShieldCursor (&content_rect, ::Point ()); //неправильно работает для верхней и левой границ
   }
 
   check_window_manager_error (SetWindowProperty ((WindowRef)handle, WINDOW_PROPERTY_CREATOR, CURSOR_VISIBLE_PROPERTY_TAG,
