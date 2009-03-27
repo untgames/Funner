@@ -85,7 +85,7 @@ struct ScenePlayer::Impl
   syslib::Timer          action_queue_timer;         //таймер вызова обработки очереди
 
   Impl ()
-    : listener (0), 
+    : listener (0),
       sound_manager (0),
       action_queue_timer (xtl::bind (&ScenePlayer::Impl::DoActions, this), ACTION_QUEUE_PROCESS_MILLISECONDS)
     {}
@@ -104,7 +104,7 @@ struct ScenePlayer::Impl
 
       update_connection.disconnect ();
       listener_unbind_connection.disconnect ();
-      
+
       if (sound_manager)
         sound_manager->SetMute (true);
 
@@ -144,7 +144,7 @@ struct ScenePlayer::Impl
 
   scene_graph::Listener* Listener () const
   {
-    return listener; 
+    return listener;
   }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +161,7 @@ struct ScenePlayer::Impl
         sound_manager->StopSound (i->second->emitter);
 
       manager_destroy_connection.disconnect ();
-      
+
       sound_manager = 0;
 
       return;
@@ -216,7 +216,7 @@ struct ScenePlayer::Impl
         return;
 
       sound::Listener snd_listener;
-        
+
       mat4f listener_world_tm = listener->WorldTM ();
 
       snd_listener.position  = listener_world_tm * vec3f (0.f);                              //!!!!!!!!добавить скорость
@@ -224,6 +224,7 @@ struct ScenePlayer::Impl
       snd_listener.up        = listener_world_tm * vec4f (0.f,1.f,0.f, 0.f);
 
       sound_manager->SetListener (snd_listener);
+      sound_manager->SetVolume   (listener->Gain ());
     }
 
     void EmitterUpdate (Node& sender, NodeEvent event)
@@ -247,7 +248,7 @@ struct ScenePlayer::Impl
 
       if (emitter)
       {
-        ScenePlayerEmitterPtr scene_player_emitter (new ScenePlayerEmitter (emitter->SoundDeclarationName (), 
+        ScenePlayerEmitterPtr scene_player_emitter (new ScenePlayerEmitter (emitter->SoundDeclarationName (),
                                                                   emitter->RegisterEventHandler (SoundEmitterEvent_Play, bind (&ScenePlayer::Impl::PlayEmitter, this, _1, _2)),
                                                                   emitter->RegisterEventHandler (SoundEmitterEvent_Stop, bind (&ScenePlayer::Impl::StopEmitter, this, _1)),
                                                                   node.RegisterEventHandler     (NodeEvent_AfterUpdate,  bind (&ScenePlayer::Impl::EmitterUpdate, this, _1, _2))));
@@ -301,8 +302,8 @@ struct ScenePlayer::Impl
       sound_manager->PlaySound (emitter_iter->second->emitter);
 
       emitter.AddRef ();
-      
-      action_queue.SetAction ((size_t)&emitter, size_t(sound_manager->Duration (emitter_iter->second->emitter) * 1000.f + ACTION_QUEUE_PROCESS_MILLISECONDS * 2), 
+
+      action_queue.SetAction ((size_t)&emitter, size_t(sound_manager->Duration (emitter_iter->second->emitter) * 1000.f + ACTION_QUEUE_PROCESS_MILLISECONDS * 2),
                               bind (&ScenePlayer::Impl::ProcessPlayingComplete, this, xtl::ref (emitter)));
     }
 

@@ -51,6 +51,8 @@ void Listener::SetGain (float gain)
     throw xtl::make_range_exception ("Listener::SetGain", "gain", gain, 0.f, 1e9f);
 
   impl->gain = gain;
+
+  UpdateNotify ();
 }
 
 /*
