@@ -26,11 +26,12 @@ struct WindowImpl
   EventHandlerUPP                carbon_application_event_handler_proc;   //обработчик сообщений приложения
   WindowRef                      carbon_window;                           //окно
   UniChar                        char_code_buffer[CHAR_CODE_BUFFER_SIZE]; //буффер для получения имени введенного символа
+  bool                           is_cursor_in_window;                     //находится ли курсор в окне
 
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data), message_handler (handler), carbon_window_event_handler (0),
       carbon_window_event_handler_proc (0), carbon_application_event_handler (0),
-      carbon_application_event_handler_proc (0), carbon_window (0)
+      carbon_application_event_handler_proc (0), carbon_window (0), is_cursor_in_window (false)
     {}
 
   ~WindowImpl ()
@@ -82,6 +83,26 @@ void get_rect (WindowRef wnd, WindowRegionCode region, syslib::Rect& rect, const
 }
 
 /*
+   Возвращает истину, если курсор находится в клиентской области окна.
+*/
+
+bool is_cursor_in_client_region (WindowRef wnd)
+{
+  syslib::Rect client_rect;
+  ::Point      mouse_coord;
+
+  GetGlobalMouse (&mouse_coord);
+
+  get_rect (wnd, kWindowContentRgn, client_rect, "::window_message_handler");
+
+  if ((mouse_coord.h >= (int)client_rect.left) && (mouse_coord.v >= (int)client_rect.top) &&
+      (mouse_coord.h <= (int)client_rect.right) && (mouse_coord.v <= (int)client_rect.bottom))
+    return true;
+
+  return false;
+}
+
+/*
     Маски кнопок мыши
 */
 
@@ -101,9 +122,6 @@ void GetEventContext (WindowRef wnd, WindowEventContext& context)
   memset (&context, 0, sizeof (context));
 
   context.handle = wnd;
-
-  Platform::GetWindowRect ((Platform::window_t)wnd, context.window_rect);
-  Platform::GetClientRect ((Platform::window_t)wnd, context.client_rect);
 
   context.cursor_position = Platform::GetCursorPosition ((Platform::window_t)wnd);
 
@@ -248,17 +266,17 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             window_impl->Notify (window_handle, WindowEvent_OnDeactivate, context);
             break;
           case kEventWindowShown: //окно стало видимым
+            window_impl->is_cursor_in_window = is_cursor_in_client_region (wnd);
             window_impl->Notify (window_handle, WindowEvent_OnShow, context);
             break;
           case kEventWindowHidden: //окно стало невидимым
+            window_impl->is_cursor_in_window = false;
             window_impl->Notify (window_handle, WindowEvent_OnHide, context);
             break;
           case kEventWindowBoundsChanged: //окно изменило размеры или положение
             Platform::InvalidateWindow (window_handle);
             window_impl->Notify (window_handle, WindowEvent_OnSize, context);
             window_impl->Notify (window_handle, WindowEvent_OnMove, context);
-
-            Platform::SetCursorVisible (window_handle, Platform::GetCursorVisible (window_handle));  //Обновление области скрытия курсора
             break;
           case kEventWindowFocusRestored:
           case kEventWindowFocusAcquired: //окно получило фокус
@@ -302,24 +320,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
       }
       case kEventClassMouse:
       {
-        ::Point mouse_coord;
-
-        check_event_manager_error (GetEventParameter(event, kEventParamMouseLocation, typeQDPoint, 0, sizeof(::Point), 0, &mouse_coord),
-                                   "::GetEventParameter", "Can't get mouse location");
-
-        syslib::Rect client_rect;
-        bool         mouse_in_client_rect = true;
-
-        get_rect (wnd, kWindowContentRgn, client_rect, "::window_message_handler");
-
-        if (mouse_coord.h < (int)client_rect.left)
-          mouse_in_client_rect = false;
-        if (mouse_coord.v < (int)client_rect.top)
-          mouse_in_client_rect = false;
-        if (mouse_coord.h > (int)client_rect.right)
-          mouse_in_client_rect = false;
-        if (mouse_coord.v > (int)client_rect.bottom)
-          mouse_in_client_rect = false;
+        bool mouse_in_client_rect = is_cursor_in_client_region (wnd);
 
         context.cursor_position = Platform::GetCursorPosition (window_handle);
 
@@ -393,6 +394,14 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
           case kEventMouseMoved: //перемещение мыши
             if (!mouse_in_client_rect)
               break;
+
+            if (!Platform::GetCursorVisible (window_handle) && !window_impl->is_cursor_in_window) //если курсор невидим - прячем его при входе в окно
+            {
+              printf ("Hiding cursor...\n");
+              HideCursor ();
+            }
+
+            window_impl->is_cursor_in_window = true;
 
             window_impl->Notify (window_handle, WindowEvent_OnMouseMove, context);
 
@@ -483,6 +492,40 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
     printf ("Exception at processing event in ::application_message_handler : unknown exception\n");
   }
 
+  if (window_impl->is_cursor_in_window && GetEventClass (event) == kEventClassMouse)  //обработка выхода мышки за пределы окна
+  {
+    switch (GetEventKind (event))
+    {
+      case kEventMouseMoved:
+      case kEventMouseDragged:
+      {
+        //получение контекста события
+
+        WindowEventContext context;
+
+        GetEventContext (wnd, context);
+
+        if (!is_cursor_in_client_region (wnd))
+        {
+          Platform::window_t window_handle = (Platform::window_t)wnd;
+
+          window_impl->is_cursor_in_window = false;
+          window_impl->Notify (window_handle, WindowEvent_OnMouseLeave, context);
+
+          if (!Platform::GetCursorVisible (window_handle)) //если курсор невидим - показываем его при выходе из окна
+          {
+            printf ("Showing cursor...\n");
+            ShowCursor ();
+          }
+        }
+
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
   if (is_fullscreen)
     return window_message_handler (event_handler_call_ref, event, impl);
 
@@ -534,6 +577,11 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
                                   "Can't create window");
 
       window_impl->carbon_window = new_window;
+
+      bool initial_cursor_visibility = true;
+
+      check_window_manager_error (SetWindowProperty (new_window, WINDOW_PROPERTY_CREATOR, CURSOR_VISIBLE_PROPERTY_TAG,
+                                  sizeof (initial_cursor_visibility), &initial_cursor_visibility), "::SetWindowProperty", "Can't set window property");
 
       RepositionWindow (new_window, 0, kWindowCenterOnMainScreen);
 
@@ -952,16 +1000,18 @@ syslib::Point Platform::GetCursorPosition (window_t handle)
 
 void Platform::SetCursorVisible (window_t handle, bool state)
 {
-  if (state)
-    ShowCursor ();
-  else
+  if (is_cursor_in_client_region ((WindowRef)handle))
   {
-    ::Rect content_rect;
-
-    check_window_manager_error (GetWindowBounds ((WindowRef)handle, kWindowContentRgn, &content_rect), "syslib::CarbonPlatform::SetCursorVisible",
-                                "Can't get window content rect, ::GetWindowBounds error");
-
-    ShieldCursor (&content_rect, ::Point ()); //неправильно работает для верхней и левой границ
+    if (state)
+    {
+      printf ("Showing cursor\n");
+      ShowCursor ();
+    }
+    else
+    {
+      printf ("Hiding cursor\n");
+      HideCursor ();
+    }
   }
 
   check_window_manager_error (SetWindowProperty ((WindowRef)handle, WINDOW_PROPERTY_CREATOR, CURSOR_VISIBLE_PROPERTY_TAG,
