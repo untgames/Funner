@@ -98,7 +98,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
         //подписка на события окна
 
-      on_mouse_move_connection = window.RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Window::OnMouseMove, this, _3));
+      on_mouse_move_connection = window.RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Window::OnMouseMove, this, _1, _3));
 
         //регистрация слушателя событий появления новых окон
 
@@ -205,7 +205,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       {
         cursor->Attach (this);
 
-        SetCursorPosition (window.CursorPosition (), window.WindowRect ());
+        SetCursorPosition (window.CursorPosition (), window.ClientRect ());
       }
     }
 
@@ -220,9 +220,9 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       cursor->SetPosition (cached_cursor_position);
     }
 
-    void OnMouseMove (const syslib::WindowEventContext& context)
+    void OnMouseMove (syslib::Window& window, const syslib::WindowEventContext& context)
     {
-      SetCursorPosition (context.cursor_position, context.client_rect);
+      SetCursorPosition (context.cursor_position, window.ClientRect ());
     }
 
   private:
