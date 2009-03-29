@@ -15,6 +15,7 @@ struct Sprite::Impl
   {
     sprite_desc.frame = 0;
     sprite_desc.size  = vec2f (1.0f);
+    sprite_desc.color = vec4f (1.0f, 1.0f, 1.0f, 1.0f);
   }
 };
 

@@ -5,11 +5,11 @@ update sprite 'Sprite1' descs (count=1):
     position: [0.00 0.00 0.00]
     size:     [1.00 1.00]
     frame:    12
-    color:    [0.00 0.00 0.00 0.00]
+    color:    [1.00 1.00 1.00 1.00]
 update node 'Sprite1'
 update sprite 'Sprite1' descs (count=1):
     position: [0.00 0.00 0.00]
     size:     [1.00 1.00]
     frame:    12
-    color:    [0.00 0.00 0.00 0.50]
+    color:    [1.00 1.00 1.00 0.50]
 update node 'Sprite1'
