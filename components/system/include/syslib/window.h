@@ -40,6 +40,7 @@ enum WindowEvent
   WindowEvent_OnSize,                    //изменились размеры окна
   WindowEvent_OnMove,                    //изменилось положение окна
   WindowEvent_OnMouseMove,               //курсор мыши переместился над областью окна
+  WindowEvent_OnMouseLeave,              //курсор мыши покинул область окна
   WindowEvent_OnMouseVerticalWheel,      //изменилось положение вертикального колеса мыши
   WindowEvent_OnMouseHorisontalWheel,    //изменилось положение горизонтального колеса мыши
   WindowEvent_OnLeftButtonDown,          //нажата левая кнопка мыши
@@ -92,8 +93,6 @@ struct Rect
 struct WindowEventContext
 {
   const void*   handle;                          //дескриптор окна
-  Rect          window_rect;                     //область окна
-  Rect          client_rect;                     //клиентская область окна
   Point         cursor_position;                 //координаты курсора
   float         mouse_vertical_wheel_delta;      //изменение положения вертикального колеса мыши (в строках)
   float         mouse_horisontal_wheel_delta;    //изменение положения горизонтального колеса мыши (в строках)

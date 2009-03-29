@@ -14,13 +14,34 @@ const char* WINDOW_CLASS_NAME = "Default window class";
 
 struct WindowImpl
 {
-  void*                          user_data;         //указатель на пользовательские данные
-  Platform::WindowMessageHandler message_handler;   //функция обработки сообщений окна
-  bool                           is_cursor_visible; //видим ли курсор
-  HCURSOR                        cursor;            //изображение курсора
+  void*                          user_data;           //указатель на пользовательские данные
+  Platform::WindowMessageHandler message_handler;     //функция обработки сообщений окна
+  bool                           is_cursor_visible;   //видим ли курсор
+  bool                           is_cursor_in_window; //находится ли курсор в окне
+  HCURSOR                        cursor;              //изображение курсора  
 
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data) :
-      user_data (in_user_data), message_handler (handler), is_cursor_visible (true), cursor (0) {}
+      user_data (in_user_data), message_handler (handler), is_cursor_visible (true), cursor (0),
+      is_cursor_in_window (false) {}
+      
+  void TrackCursor (HWND wnd)
+  {
+    if (is_cursor_in_window)
+      return;
+    
+    TRACKMOUSEEVENT track_mouse_event;
+    
+    memset (&track_mouse_event, 0, sizeof (track_mouse_event));
+    
+    track_mouse_event.cbSize     = sizeof (TRACKMOUSEEVENT);
+    track_mouse_event.dwFlags    = TME_LEAVE;
+    track_mouse_event.hwndTrack  = wnd;
+    
+    if (!TrackMouseEvent (&track_mouse_event))
+      raise_error ("::TrackMouseEvent");
+
+    is_cursor_in_window = true;
+  }
 
   void Notify (Platform::window_t window, WindowEvent event, const WindowEventContext& context)
   {
@@ -41,26 +62,14 @@ struct WindowImpl
 
 void GetEventContext (HWND wnd, WindowEventContext& context)
 {
-  RECT window_rect, client_rect;
+  RECT client_rect;
 
   memset (&context, 0, sizeof (context));
 
   context.handle = wnd;
 
-  GetWindowRect (wnd, &window_rect);
-
   GetClientRect (wnd, &client_rect);
-
-  context.window_rect.left   = window_rect.left;
-  context.window_rect.right  = window_rect.right;
-  context.window_rect.top    = window_rect.top;
-  context.window_rect.bottom = window_rect.bottom;
-  
-  context.client_rect.left   = client_rect.left;
-  context.client_rect.right  = client_rect.right;
-  context.client_rect.top    = client_rect.top;
-  context.client_rect.bottom = client_rect.bottom;  
-
+ 
   POINT cursor_position;
 
   GetCursorPos (&cursor_position);
@@ -274,7 +283,12 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       context.cursor_position.x = LOWORD (lparam);
       context.cursor_position.y = HIWORD (lparam);
 
+      impl->TrackCursor (wnd);
       impl->Notify (window_handle, WindowEvent_OnMouseMove, context);
+      return 0;
+    case WM_MOUSELEAVE:
+      impl->is_cursor_in_window = false;
+      impl->Notify (window_handle, WindowEvent_OnMouseLeave, context);
       return 0;
     case WM_MOUSEWHEEL: //изменилось положение вертикального колеса мыши
       context.mouse_vertical_wheel_delta = float (GET_WHEEL_DELTA_WPARAM (wparam)) / float (WHEEL_DELTA);

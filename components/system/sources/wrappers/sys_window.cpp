@@ -241,6 +241,7 @@ struct Window::Impl
           case WindowEvent_OnSize:                    //изменились размеры окна
           case WindowEvent_OnMove:                    //изменилось положение окна
           case WindowEvent_OnMouseMove:               //курсор мыши переместился над областью окна
+          case WindowEvent_OnMouseLeave:              //курсор мыши вышел за пределы области окна
           case WindowEvent_OnMouseVerticalWheel:      //изменилось положение вертикального колеса мыши
           case WindowEvent_OnMouseHorisontalWheel:    //изменилось положение горизонтального колеса мыши
           case WindowEvent_OnLeftButtonDown:          //нажата левая кнопка мыши
