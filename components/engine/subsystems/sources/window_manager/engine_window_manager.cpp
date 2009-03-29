@@ -209,20 +209,20 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       }
     }
 
-    void SetCursorPosition (const syslib::Point& position, const syslib::Rect& window_rect)
+    void SetCursorPosition (const syslib::Point& position, const syslib::Rect& client_rect)
     {
       if (!cursor)
         return;
 
-      cached_cursor_position = math::vec2f (position.x / float (window_rect.right - window_rect.left),
-        position.y / float (window_rect.bottom - window_rect.top));
+      cached_cursor_position = math::vec2f (position.x / float (client_rect.right - client_rect.left),
+        position.y / float (client_rect.bottom - client_rect.top));
 
       cursor->SetPosition (cached_cursor_position);
     }
 
     void OnMouseMove (const syslib::WindowEventContext& context)
     {
-      SetCursorPosition (context.cursor_position, context.window_rect);
+      SetCursorPosition (context.cursor_position, context.client_rect);
     }
 
   private:
