@@ -93,6 +93,7 @@ struct WindowEventContext
 {
   const void*   handle;                          //дескриптор окна
   Rect          window_rect;                     //область окна
+  Rect          client_rect;                     //клиентская область окна
   Point         cursor_position;                 //координаты курсора
   float         mouse_vertical_wheel_delta;      //изменение положения вертикального колеса мыши (в строках)
   float         mouse_horisontal_wheel_delta;    //изменение положения горизонтального колеса мыши (в строках)

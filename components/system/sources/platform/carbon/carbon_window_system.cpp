@@ -103,6 +103,7 @@ void GetEventContext (WindowRef wnd, WindowEventContext& context)
   context.handle = wnd;
 
   Platform::GetWindowRect ((Platform::window_t)wnd, context.window_rect);
+  Platform::GetClientRect ((Platform::window_t)wnd, context.client_rect);
 
   context.cursor_position = Platform::GetCursorPosition ((Platform::window_t)wnd);
 

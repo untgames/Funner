@@ -55,6 +55,11 @@ void GetEventContext (HWND wnd, WindowEventContext& context)
   context.window_rect.right  = window_rect.right;
   context.window_rect.top    = window_rect.top;
   context.window_rect.bottom = window_rect.bottom;
+  
+  context.client_rect.left   = client_rect.left;
+  context.client_rect.right  = client_rect.right;
+  context.client_rect.top    = client_rect.top;
+  context.client_rect.bottom = client_rect.bottom;  
 
   POINT cursor_position;
 
