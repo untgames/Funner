@@ -34,35 +34,50 @@ const size_t PROPERTIES_COUNT = sizeof (PROPERTIES) / sizeof (*PROPERTIES);
 */
 
 Device::Device (Window* window, const char* in_name)
-  : name (in_name), full_name ("window"), x_cursor_pos (window->CursorPosition ().x), y_cursor_pos (window->CursorPosition ().y),
-    autocenter_cursor (0), cursor_sensitivity (1.f), vertical_wheel_sensitivity (1.f), horisontal_wheel_sensitivity (1.f)
+  : name (in_name)
+  , full_name ("window")
+  , x_cursor_pos (window->CursorPosition ().x)
+  , y_cursor_pos (window->CursorPosition ().y)
+  , mouse_in_window (false)
+  , autocenter_cursor (false)
+  , cursor_sensitivity (1.f)
+  , vertical_wheel_sensitivity (1.f)
+  , horisontal_wheel_sensitivity (1.f)
 {
   try
   {
     Window::EventHandler handler (xtl::bind (&Device::WindowEventHandler, this, _1, _2, _3));
+    
+    static WindowEvent events [] = {      
+      WindowEvent_OnMouseMove,
+      WindowEvent_OnMouseLeave,
+      WindowEvent_OnMouseVerticalWheel,
+      WindowEvent_OnMouseHorisontalWheel,
+      WindowEvent_OnLeftButtonDown,
+      WindowEvent_OnLeftButtonUp,
+      WindowEvent_OnLeftButtonDoubleClick,  
+      WindowEvent_OnRightButtonDown,        
+      WindowEvent_OnRightButtonUp,          
+      WindowEvent_OnRightButtonDoubleClick, 
+      WindowEvent_OnMiddleButtonDown,       
+      WindowEvent_OnMiddleButtonUp,         
+      WindowEvent_OnMiddleButtonDoubleClick,
+      WindowEvent_OnXButton1Down,           
+      WindowEvent_OnXButton1Up,             
+      WindowEvent_OnXButton1DoubleClick,    
+      WindowEvent_OnXButton2Down,           
+      WindowEvent_OnXButton2Up,             
+      WindowEvent_OnXButton2DoubleClick,    
+      WindowEvent_OnKeyDown,                
+      WindowEvent_OnKeyUp,                              
+      WindowEvent_OnChar,                         
+      WindowEvent_OnClose
+    };
+    
+    static size_t events_num = sizeof (events) / sizeof (*events);
 
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnMouseMove,               handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnMouseVerticalWheel,      handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnMouseHorisontalWheel,    handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnLeftButtonDown,          handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnLeftButtonUp,            handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnLeftButtonDoubleClick,   handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnRightButtonDown,         handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnRightButtonUp,           handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnRightButtonDoubleClick,  handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnMiddleButtonDown,        handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnMiddleButtonUp,          handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnMiddleButtonDoubleClick, handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnXButton1Down,            handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnXButton1Up,              handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnXButton1DoubleClick,     handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnXButton2Down,            handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnXButton2Up,              handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnXButton2DoubleClick,     handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnKeyDown,                 handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnKeyUp,                   handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnChar,                    handler));
-    connect_tracker (window->RegisterEventHandler (WindowEvent_OnClose,                   handler));
+    for (size_t i=0; i<events_num; i++)    
+      connect_tracker (window->RegisterEventHandler (events [i], handler));
 
     for (size_t i = 0; i < PROPERTIES_COUNT; i++)
     {
@@ -184,6 +199,14 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
     {
       if (x_cursor_pos == window_event_context.cursor_position.x && y_cursor_pos == window_event_context.cursor_position.y)
         break;
+        
+      if (!mouse_in_window)
+      {
+        xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s enter", CURSOR_AXIS_NAME);
+        signals (message);
+        
+        mouse_in_window = true;
+      }
 
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s at %u %u", CURSOR_AXIS_NAME, window_event_context.cursor_position.x, window_event_context.cursor_position.y);
       signals (message);
@@ -240,6 +263,16 @@ void Device::WindowEventHandler (Window& window, WindowEvent event, const Window
 
       break;
     }
+    case WindowEvent_OnMouseLeave:
+      if (mouse_in_window)
+      {
+        xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s leave", CURSOR_AXIS_NAME);
+        signals (message);        
+        
+        mouse_in_window = false;
+      }
+      
+      break;
     case WindowEvent_OnMouseVerticalWheel:
       xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY delta %f", WHEEL_AXIS_NAME, window_event_context.mouse_vertical_wheel_delta * vertical_wheel_sensitivity);
       signals (message);

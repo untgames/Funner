@@ -99,12 +99,13 @@ class Device: virtual public input::low_level::IDevice, public xtl::reference_co
     DeviceSignal                 signals;                      //обработчики событий
     size_t                       x_cursor_pos;                 //последние координаты курсора
     size_t                       y_cursor_pos;                 //последние координаты курсора
+    bool                         mouse_in_window;              //курсор мыши в пределах клиентской области окна
     bool                         autocenter_cursor;            //автоматическое центрирование курсора
     float                        cursor_sensitivity;           //множитель delt'ы курсора
     float                        vertical_wheel_sensitivity;   //множитель delt'ы вертикального колеса мыши
     float                        horisontal_wheel_sensitivity; //множитель delt'ы горизонтального колеса мыши
     stl::bitset<syslib::Key_Num> pressed_keys;                 //какие кнопки являются нажатыми
-    stl::wstring                 control_name;                 //имя контрола
+    stl::wstring                 control_name;                 //имя контрола    
 };
 
 }
