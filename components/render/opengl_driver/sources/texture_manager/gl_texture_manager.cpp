@@ -29,17 +29,17 @@ class TextureManagerState: public IStageState
   public:
       //конструкторы
     TextureManagerState (TextureManagerState* in_main_state) : owner (0), main_state (in_main_state) {}
-    TextureManagerState (ContextObject* in_owner) : owner (in_owner), main_state (0) {}    
-    
+    TextureManagerState (ContextObject* in_owner) : owner (in_owner), main_state (0) {}
+
       //получение слотов сэмплирования
     SamplerSlot* GetSlots () { return &samplers [0]; }
-    
+
       //получение слота сэмплирования
     SamplerSlot& GetSlot (size_t slot)
     {
       if (slot >= DEVICE_SAMPLER_SLOTS_COUNT)
         throw xtl::make_range_exception ("render::low_level::opengl::TextureManagerState::GetSlot", "slot", slot, DEVICE_SAMPLER_SLOTS_COUNT);
-        
+
       return samplers [slot];
     }
 
@@ -47,12 +47,12 @@ class TextureManagerState: public IStageState
     void SetTexture (size_t slot, BindableTexture* in_texture)
     {
       TexturePtr& texture = GetSlot (slot).texture;
-      
+
       if (texture == in_texture)
         return;
-        
+
       texture = in_texture;
-      
+
       UpdateNotify ();
     }
 
@@ -61,20 +61,20 @@ class TextureManagerState: public IStageState
     {
       return GetSlot (slot).texture.get ();
     }
-    
+
       //установка состояния сэмплирования
     void SetSampler (size_t slot, SamplerState* in_state)
     {
       SamplerStatePtr& state = GetSlot (slot).sampler_state;
-      
+
       if (state == in_state)
         return;
-        
+
       state = in_state;
-      
+
       UpdateNotify ();
     }
-    
+
       //получение состояния сэмплирования
     SamplerState* GetSampler (size_t slot)
     {
@@ -100,7 +100,7 @@ class TextureManagerState: public IStageState
     void Copy (const TextureManagerState& source, const StateBlockMask& mask)
     {
       bool need_rebind = false;
-      
+
       for (size_t i=0; i<DEVICE_SAMPLER_SLOTS_COUNT; i++)
       {
         if (mask.ss_textures [i])
@@ -115,20 +115,20 @@ class TextureManagerState: public IStageState
           need_rebind                = true;
         }
       }
-      
+
       if (need_rebind)
         UpdateNotify ();
     }
-    
+
       //оповещение об изменении
     void UpdateNotify ()
     {
       if (!owner)
         return;
-        
+
       owner->GetContextManager ().StageRebindNotify (Stage_TextureManager);
     }
-  
+
   private:
     typedef xtl::trackable_ptr<TextureManagerState>             TextureManagerStatePtr;
     typedef xtl::array<SamplerSlot, DEVICE_SAMPLER_SLOTS_COUNT> SamplerSlotArray;
@@ -154,12 +154,12 @@ bool is_power_of_two (size_t size)
 struct TextureManager::Impl: public ContextObject
 {
   public:
-      //конструктор    
+      //конструктор
     Impl (const ContextManager& context_manager, TextureManager& in_texture_manager) :
       ContextObject (context_manager),
       texture_manager (in_texture_manager),
       state (this) {}
-    
+
       //получение основного состояния
     TextureManagerState& GetState () { return state; }
 
@@ -178,7 +178,7 @@ struct TextureManager::Impl: public ContextObject
 
         //выбор текущего контекста
 
-      MakeContextCurrent ();  
+      MakeContextCurrent ();
 
         //установка текстур и сэмплеров
 
@@ -191,12 +191,12 @@ struct TextureManager::Impl: public ContextObject
       {
         BindableTexture* texture        = samplers [i].texture.get ();
         SamplerState*    sampler_state  = samplers [i].sampler_state.get ();
-        bool             is_active_slot = texture && sampler_state;          
+        bool             is_active_slot = texture && sampler_state;
 
         if (is_active_slot)
         {
           texture->GetDesc (texture_desc);
-          
+
           enabled_textures |= 1 << i;
         }
 
@@ -214,18 +214,18 @@ struct TextureManager::Impl: public ContextObject
 
           current_active_slot = i;
         }
-        
+
           //биндинг текстуры
-          
+
         if (need_bind)
           texture->Bind ();
-          
+
           //установка сэмплера
-          
+
         if (need_change_sampler)
         {
             //проверка случая установки для одной и той же текстуры различных сэмплеров
-            
+
           for (size_t j=0; j<i; j++)
             if (samplers [j].texture == texture && samplers [j].sampler_state && samplers [j].sampler_state != sampler_state)
             {
@@ -246,7 +246,7 @@ struct TextureManager::Impl: public ContextObject
           if (texture_target)             glEnable  (texture_target);
 
           current_texture_target [i] = texture_target;
-        }    
+        }
       }
 
         //проверка ошибок
@@ -271,17 +271,17 @@ struct TextureManager::Impl: public ContextObject
           throw xtl::make_argument_exception ("", "desc.dimension", desc.dimension);
       }
     }
-    
+
       //cоздание сэмплера
     ISamplerState* TextureManager::Impl::CreateSamplerState (const SamplerDesc& desc)
     {
       return new SamplerState (GetContextManager (), desc);
     }
-    
+
     /*
-        Установка текущей текстуры и сэмплера    
+        Установка текущей текстуры и сэмплера
     */
-    
+
     void SetTexture (size_t sampler_slot, ITexture* texture)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::SetTexture";
@@ -318,28 +318,29 @@ struct TextureManager::Impl: public ContextObject
 
       return sampler_slot;
     }
-    
+
       //создание одномерной текстуры
     ITexture* CreateTexture1D (const TextureDesc& in_desc)
     {
-      static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture1D";
-      
         //игнорирование неиспользуемых параметров
-      
+
       TextureDesc desc = in_desc;
-      
+
       desc.height = desc.layers = 1;
-      
+
         //проверка возможности создания текстуры
 
       const ContextCaps& caps = GetCaps ();
 
       if (desc.width > caps.max_texture_size)
-        throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 1D texture with width %u (maximum texture size is %u)", desc.width, caps.max_texture_size);
+      {
+        LogPrintf ("Can't create 1D texture with width %u (maximum texture size is %u). Creating scaled texture.", desc.width, caps.max_texture_size);
+        return new ScaledTexture (GetContextManager (), texture_manager, desc, caps.max_texture_size, 1);
+      }
 
         //диспетчеризация создания текстуры в зависимости от поддерживаемых расширений
 
-      bool is_pot = is_power_of_two (desc.width);    
+      bool is_pot = is_power_of_two (desc.width);
 
       if (is_pot || caps.has_arb_texture_non_power_of_two)
       {
@@ -354,35 +355,58 @@ struct TextureManager::Impl: public ContextObject
       if (caps.has_arb_texture_rectangle)
       {
         if (desc.width > caps.max_rectangle_texture_size)
-          throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 1D texture with width %u (maximum texture size is %u)", desc.width, caps.max_rectangle_texture_size);
+        {
+          LogPrintf ("Can't create 1D rectangular texture with width %u (maximum rectangular texture size is %u). Creating scaled texture.",
+                     desc.width, caps.max_rectangle_texture_size);
+          return new ScaledTexture (GetContextManager (), texture_manager, desc, caps.max_rectangle_texture_size, 1);
+        }
 
         return new TextureNpot (GetContextManager (), desc);
       }
 
       return new ScaledTexture (GetContextManager (), texture_manager, desc);
     }
-    
+
+    ITexture* CreateScaledTexture2D (const TextureDesc& desc, size_t max_texture_size)
+    {
+      const ContextCaps& caps = GetCaps ();
+
+      if ((desc.width < max_texture_size || desc.height < max_texture_size) &&
+          ((is_power_of_two (desc.width) && is_power_of_two (desc.height)) || caps.has_arb_texture_non_power_of_two ||
+          (caps.has_arb_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)))  //можно масштабировать только по одной оси
+      {
+        if (desc.width > max_texture_size)
+          return new ScaledTexture (GetContextManager (), texture_manager, desc, max_texture_size, desc.height);
+        else
+          return new ScaledTexture (GetContextManager (), texture_manager, desc, desc.width, max_texture_size);
+      }
+      else
+        return new ScaledTexture (GetContextManager (), texture_manager, desc);
+    }
+
       //создание двумерной текстуры
     ITexture* CreateTexture2D (const TextureDesc& in_desc)
     {
-      static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture2D";
-      
         //игнорирование неиспользуемых параметров
-      
+
       TextureDesc desc = in_desc;
-      
-      desc.layers = 1;  
-      
+
+      desc.layers = 1;
+
         //проверка возможности создания текстуры
 
       const ContextCaps& caps = GetCaps ();
 
+      bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height);
+
       if (desc.width > caps.max_texture_size || desc.height > caps.max_texture_size)
-        throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 2D texture %ux%u (maximum texture size is %u)", desc.width, desc.height, caps.max_texture_size);
+      {
+        LogPrintf ("Can't create 2D texture with width %u and height %u (maximum texture size is %u). Creating scaled texture.",
+                   desc.width, desc.height, caps.max_texture_size);
+        return CreateScaledTexture2D (desc, caps.max_texture_size);
+      }
 
         //диспетчеризация создания текстуры в зависимости от поддерживаемых расширений
-
-      bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height);
 
       if (is_pot || caps.has_arb_texture_non_power_of_two)
       {
@@ -397,7 +421,11 @@ struct TextureManager::Impl: public ContextObject
       if (caps.has_arb_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)
       {
         if (desc.width > caps.max_rectangle_texture_size || desc.height > caps.max_rectangle_texture_size)
-          throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 2D texture %ux%u (maximum texture size is %u)", desc.width, desc.height, caps.max_rectangle_texture_size);
+        {
+          LogPrintf ("Can't create rectangular 2D texture with width %u and height %u (maximum rectangular texture size is %u). Creating scaled texture.",
+                      desc.width, desc.height, caps.max_rectangle_texture_size);
+          return CreateScaledTexture2D (desc, caps.max_rectangle_texture_size);
+        }
 
         return new TextureNpot (GetContextManager (), desc);
       }
@@ -416,7 +444,7 @@ struct TextureManager::Impl: public ContextObject
 
       if (!caps.has_ext_texture3d)
         throw xtl::format_not_supported_exception (METHOD_NAME, "3D textures not supported (GL_ext_texture_3d not supported)");
-        
+
       if (desc.width > caps.max_3d_texture_size || desc.height > caps.max_3d_texture_size || desc.layers > caps.max_3d_texture_size)
       {
         throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 3D texture %ux%ux%u (max_edge_size=%u)", desc.width, desc.height,
@@ -430,7 +458,7 @@ struct TextureManager::Impl: public ContextObject
         throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 3D texture %ux%ux%u@%s (GL_ARB_texture_non_power_of_two & GL_VERSION_2_0 not supported)",
                            desc.width, desc.height, desc.layers, get_name (desc.format));
       }
-      
+
         //создание текстуры
 
       return new Texture3D (GetContextManager (), desc);
@@ -448,21 +476,31 @@ struct TextureManager::Impl: public ContextObject
       if (!caps.has_arb_texture_cube_map)
         throw xtl::format_not_supported_exception (METHOD_NAME, "Cubemap textuers not supported. No 'ARB_texture_cubemap' extension");
 
+      bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height);
+
       if (desc.width > caps.max_cube_map_texture_size || desc.height > caps.max_cube_map_texture_size)
       {
-        throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create cubemap texture %ux%u (max_edge_size=%u)", desc.width, desc.height,
-                           caps.max_cube_map_texture_size);
-      }
-      
-        //диспетчеризация создания текстуры в зависимости от поддерживаемых расширений
+        LogPrintf ("Can't create cubemap texture with width %u and height %u (maximum texture size is %u). Creating scaled texture.",
+                   desc.width, desc.height, caps.max_cube_map_texture_size);
 
-      bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height);
+        if ((desc.width <= caps.max_texture_size || desc.height <= caps.max_texture_size) && (is_pot || caps.has_arb_texture_non_power_of_two))  //можно масштабировать только по одной оси
+        {
+          if (desc.width > caps.max_texture_size)
+            return new ScaledTexture (GetContextManager (), texture_manager, desc, caps.max_cube_map_texture_size, desc.height);
+          else
+            return new ScaledTexture (GetContextManager (), texture_manager, desc, desc.width, caps.max_cube_map_texture_size);
+        }
+        else
+          return new ScaledTexture (GetContextManager (), texture_manager, desc);
+      }
+
+        //диспетчеризация создания текстуры в зависимости от поддерживаемых расширений
 
       if (is_pot || caps.has_arb_texture_non_power_of_two)
         return new TextureCubemap (GetContextManager (), desc);
 
-      return new ScaledTexture (GetContextManager (), texture_manager, desc);  
-    }    
+      return new ScaledTexture (GetContextManager (), texture_manager, desc);
+    }
 
   public:
     TextureManager&     texture_manager; //менеджер текстур
@@ -506,7 +544,7 @@ void TextureManager::Bind ()
     throw;
   }
 }
-    
+
 /*
    Создание текстуры и сэмплера
 */
@@ -590,5 +628,5 @@ ISamplerState* TextureManager::GetSampler (size_t sampler_slot) const
   {
     exception.touch ("render::low_level::opengl::TextureManager::GetSampler");
     throw;
-  }  
+  }
 }

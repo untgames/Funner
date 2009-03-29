@@ -18,8 +18,22 @@ ScaledTexture::ScaledTexture
       original_width (original_desc.width),
       original_height (original_desc.height)
 {
-  if (!scaled_width)  scaled_width  = get_next_higher_power_of_two (original_desc.width);
-  if (!scaled_height) scaled_height = get_next_higher_power_of_two (original_desc.height);
+  const ContextCaps& caps = GetCaps ();
+
+  if (!scaled_width)
+  {
+    if (original_desc.width > caps.max_texture_size)
+      scaled_width = caps.max_texture_size;
+    else
+      scaled_width = get_next_higher_power_of_two (original_desc.width);
+  }
+  if (!scaled_height)
+  {
+    if (original_desc.height > caps.max_texture_size)
+      scaled_height = caps.max_texture_size;
+    else
+      scaled_height = get_next_higher_power_of_two (original_desc.height);
+  }
 
   TextureDesc temp_desc = original_desc;
 
@@ -32,7 +46,7 @@ ScaledTexture::ScaledTexture
     throw xtl::format_operation_exception ("render::low_level::opengl::ScaledTexture::ScaledTexture", "TextureManager::CreateTexture returned texture with incompatible type");
 
   horisontal_scale = (float)scaled_width  / (float)original_desc.width;
-  vertical_scale   = (float)scaled_height / (float)original_desc.height;  
+  vertical_scale   = (float)scaled_height / (float)original_desc.height;
 
   LogPrintf ("Scaled texture %ux%ux%u has created for original texture %ux%ux%u@%s", scaled_width, scaled_height, temp_desc.layers,
              original_desc.width, original_desc.height, original_desc.layers, get_name (original_desc.format));
@@ -103,7 +117,7 @@ void ScaledTexture::SetData (size_t layer, size_t mip_level, size_t x, size_t y,
          scaled_height = (size_t)ceil ((float)height * vertical_scale);
 
   x = (size_t)ceil ((float)x * horisontal_scale);
-  y = (size_t)ceil ((float)y * vertical_scale);    
+  y = (size_t)ceil ((float)y * vertical_scale);
 
   xtl::uninitialized_storage <char> scaled_buffer;
 
@@ -116,9 +130,9 @@ void ScaledTexture::SetData (size_t layer, size_t mip_level, size_t x, size_t y,
       scaled_buffer.resize (get_uncompressed_image_size (scaled_width, scaled_height, source_format));
 
       unpack_dxt  (source_format, width, height, buffer, unpacked_buffer.data ());
-      
+
       PixelFormat uncompressed_format = get_uncompressed_format (source_format);
-      
+
       scale_image (uncompressed_format, width, height, scaled_width, scaled_height, unpacked_buffer.data (), scaled_buffer.data ());
 
       shadow_texture->SetData (layer, mip_level, x, y, scaled_width, scaled_height, uncompressed_format, scaled_buffer.data ());
@@ -127,10 +141,10 @@ void ScaledTexture::SetData (size_t layer, size_t mip_level, size_t x, size_t y,
     {
       scaled_buffer.resize (get_image_size (scaled_width, scaled_height, source_format));
 
-      scale_image (source_format, width, height, scaled_width, scaled_height, buffer, scaled_buffer.data ());      
+      scale_image (source_format, width, height, scaled_width, scaled_height, buffer, scaled_buffer.data ());
 
       shadow_texture->SetData (layer, mip_level, x, y, scaled_width, scaled_height, source_format, scaled_buffer.data ());
-    }  
+    }
   }
   catch (xtl::exception& exception)
   {
