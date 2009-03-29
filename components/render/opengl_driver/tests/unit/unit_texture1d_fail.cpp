@@ -5,7 +5,7 @@ using namespace common;
 int main ()
 {
   printf ("Results of unit_texture1d_fail_test:\n");
-  
+
   try
   {
     Test test;
@@ -21,14 +21,14 @@ int main ()
     desc.format               = PixelFormat_RGB8;
     desc.bind_flags           = BindFlag_Texture;
     desc.generate_mips_enable = true;
-    desc.access_flags         = AccessFlag_ReadWrite;    
+    desc.access_flags         = AccessFlag_ReadWrite;
 
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
   }
   catch (std::exception& exception)
   {
-    printf ("exception: %s\n", exception.what ());
+    printf ("exception.\n");
   }
-  
+
   return 0;
 }
