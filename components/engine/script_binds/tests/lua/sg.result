@@ -177,7 +177,7 @@ VisualModel test
 Mesh name = 
 Mesh name = mesh.xmesh
 Sprite test
-Color = 0 0 0 0
+Color = 1 1 1 1
 Material name = 
 Alpha value = 0.80000001192093
 Alpha reference = 0.40000000596046
