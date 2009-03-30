@@ -48,7 +48,7 @@ ScaledTexture::ScaledTexture
   horisontal_scale = (float)scaled_width  / (float)original_desc.width;
   vertical_scale   = (float)scaled_height / (float)original_desc.height;
 
-  LogPrintf ("Scaled texture %ux%ux%u has created for original texture %ux%ux%u@%s", scaled_width, scaled_height, temp_desc.layers,
+  LogPrintf ("Warning: scaled texture %ux%ux%u has created for original texture %ux%ux%u@%s", scaled_width, scaled_height, temp_desc.layers,
              original_desc.width, original_desc.height, original_desc.layers, get_name (original_desc.format));
 }
 
