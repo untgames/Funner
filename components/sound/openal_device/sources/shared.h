@@ -9,7 +9,6 @@
 #include <stl/string>
 #include <stl/vector>
 
-#include <xtl/function.h>
 #include <xtl/bind.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/uninitialized_storage.h>
@@ -19,6 +18,7 @@
 #include <xtl/common_exceptions.h>
 
 #include <common/component.h>
+#include <common/log.h>
 #include <common/strlib.h>
 #include <common/time.h>
 
@@ -62,8 +62,6 @@ struct OpenALException: virtual public xtl::exception {};
 class OpenALContext
 {
   public:
-    typedef IDevice::LogHandler LogHandler;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,96 +75,85 @@ class OpenALContext
     bool MakeCurrent ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление отладочным протоколированием
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void              SetDebugLog (const LogHandler&);
-    const LogHandler& GetDebugLog () const { return log_handler; }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обёртки над вызовами OpenAL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void alEnable( ALenum capability );
-    void alDisable( ALenum capability );
-    ALboolean alIsEnabled( ALenum capability );
-    const ALchar* alGetString( ALenum param );
-    void alGetBooleanv( ALenum param, ALboolean* data );
-    void alGetIntegerv( ALenum param, ALint* data );
-    void alGetFloatv( ALenum param, ALfloat* data );
-    void alGetDoublev( ALenum param, ALdouble* data );
-    ALboolean alGetBoolean( ALenum param );
-    ALint alGetInteger( ALenum param );
-    ALfloat alGetFloat( ALenum param );
-    ALdouble alGetDouble( ALenum param );
-    void alGenSources( ALsizei n, ALuint* sources );
-    void alDeleteSources( ALsizei n, const ALuint* sources );
-    ALboolean alIsSource( ALuint sid );
-    void alGetSourcef( ALuint sid, ALenum param, ALfloat* value );
-    void alGetSource3f( ALuint sid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
-    void alGetSourcefv( ALuint sid, ALenum param, ALfloat* values );
-    void alGetSourcei( ALuint sid,  ALenum param, ALint* value );
-    void alGetSource3i( ALuint sid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
-    void alGetSourceiv( ALuint sid,  ALenum param, ALint* values );
-    void alSourcef( ALuint sid, ALenum param, ALfloat value );
-    void alSource3f( ALuint sid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
-    void alSourcefv( ALuint sid, ALenum param, const ALfloat* values );
-    void alSourcei( ALuint sid, ALenum param, ALint value );
-    void alSource3i( ALuint sid, ALenum param, ALint value1, ALint value2, ALint value3 );
-    void alSourceiv( ALuint sid, ALenum param, const ALint* values );
-    void alSourcePlayv( ALsizei ns, const ALuint *sids );
-    void alSourceStopv( ALsizei ns, const ALuint *sids );
-    void alSourceRewindv( ALsizei ns, const ALuint *sids );
-    void alSourcePausev( ALsizei ns, const ALuint *sids );
-    void alSourcePlay( ALuint sid );
-    void alSourceStop( ALuint sid );
-    void alSourceRewind( ALuint sid );
-    void alSourcePause( ALuint sid );
-    void alSourceQueueBuffers( ALuint sid, ALsizei numEntries, const ALuint *bids );
-    void alSourceUnqueueBuffers( ALuint sid, ALsizei numEntries, ALuint *bids );
-    void alListenerf( ALenum param, ALfloat value );
-    void alListener3f( ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
-    void alListenerfv( ALenum param, const ALfloat* values );
-    void alListeneri( ALenum param, ALint value );
-    void alListener3i( ALenum param, ALint value1, ALint value2, ALint value3 );
-    void alListeneriv( ALenum param, const ALint* values );
-    void alGetListenerf( ALenum param, ALfloat* value );
-    void alGetListener3f( ALenum param, ALfloat *value1, ALfloat *value2, ALfloat *value3 );
-    void alGetListenerfv( ALenum param, ALfloat* values );
-    void alGetListeneri( ALenum param, ALint* value );
-    void alGetListener3i( ALenum param, ALint *value1, ALint *value2, ALint *value3 );
-    void alGetListeneriv( ALenum param, ALint* values );
-    void alGenBuffers( ALsizei n, ALuint* buffers );
-    void alDeleteBuffers( ALsizei n, const ALuint* buffers );
-    ALboolean alIsBuffer( ALuint bid );
-    void alBufferData( ALuint bid, ALenum format, const ALvoid* data, ALsizei size, ALsizei freq );
-    void alBufferf( ALuint bid, ALenum param, ALfloat value );
-    void alBuffer3f( ALuint bid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3 );
-    void alBufferfv( ALuint bid, ALenum param, const ALfloat* values );
-    void alBufferi( ALuint bid, ALenum param, ALint value );
-    void alBuffer3i( ALuint bid, ALenum param, ALint value1, ALint value2, ALint value3 );
-    void alBufferiv( ALuint bid, ALenum param, const ALint* values );
-    void alGetBufferf( ALuint bid, ALenum param, ALfloat* value );
-    void alGetBuffer3f( ALuint bid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
-    void alGetBufferfv( ALuint bid, ALenum param, ALfloat* values );
-    void alGetBufferi( ALuint bid, ALenum param, ALint* value );
-    void alGetBuffer3i( ALuint bid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
-    void alGetBufferiv( ALuint bid, ALenum param, ALint* values );
-    void alDopplerFactor( ALfloat value );
-    void alDopplerVelocity( ALfloat value );
-    void alSpeedOfSound( ALfloat value );
-    void alDistanceModel( ALenum distanceModel );
+    void alEnable (ALenum capability);
+    void alDisable (ALenum capability);
+    ALboolean alIsEnabled (ALenum capability);
+    const ALchar* alGetString (ALenum param);
+    void alGetBooleanv (ALenum param, ALboolean* data);
+    void alGetIntegerv (ALenum param, ALint* data);
+    void alGetFloatv (ALenum param, ALfloat* data);
+    void alGetDoublev (ALenum param, ALdouble* data);
+    ALboolean alGetBoolean (ALenum param);
+    ALint alGetInteger (ALenum param);
+    ALfloat alGetFloat (ALenum param);
+    ALdouble alGetDouble (ALenum param);
+    void alGenSources (ALsizei n, ALuint* sources);
+    void alDeleteSources (ALsizei n, const ALuint* sources);
+    ALboolean alIsSource (ALuint sid);
+    void alGetSourcef (ALuint sid, ALenum param, ALfloat* value);
+    void alGetSource3f (ALuint sid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
+    void alGetSourcefv (ALuint sid, ALenum param, ALfloat* values);
+    void alGetSourcei (ALuint sid, ALenum param, ALint* value);
+    void alGetSource3i (ALuint sid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
+    void alGetSourceiv (ALuint sid, ALenum param, ALint* values);
+    void alSourcef (ALuint sid, ALenum param, ALfloat value);
+    void alSource3f (ALuint sid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3);
+    void alSourcefv (ALuint sid, ALenum param, const ALfloat* values);
+    void alSourcei (ALuint sid, ALenum param, ALint value);
+    void alSource3i (ALuint sid, ALenum param, ALint value1, ALint value2, ALint value3);
+    void alSourceiv (ALuint sid, ALenum param, const ALint* values);
+    void alSourcePlayv (ALsizei ns, const ALuint *sids);
+    void alSourceStopv (ALsizei ns, const ALuint *sids);
+    void alSourceRewindv (ALsizei ns, const ALuint *sids);
+    void alSourcePausev (ALsizei ns, const ALuint *sids);
+    void alSourcePlay (ALuint sid);
+    void alSourceStop (ALuint sid);
+    void alSourceRewind (ALuint sid);
+    void alSourcePause (ALuint sid);
+    void alSourceQueueBuffers (ALuint sid, ALsizei numEntries, const ALuint *bids);
+    void alSourceUnqueueBuffers (ALuint sid, ALsizei numEntries, ALuint *bids);
+    void alListenerf (ALenum param, ALfloat value);
+    void alListener3f (ALenum param, ALfloat value1, ALfloat value2, ALfloat value3);
+    void alListenerfv (ALenum param, const ALfloat* values);
+    void alListeneri (ALenum param, ALint value);
+    void alListener3i (ALenum param, ALint value1, ALint value2, ALint value3);
+    void alListeneriv (ALenum param, const ALint* values);
+    void alGetListenerf (ALenum param, ALfloat* value);
+    void alGetListener3f (ALenum param, ALfloat *value1, ALfloat *value2, ALfloat *value3);
+    void alGetListenerfv (ALenum param, ALfloat* values);
+    void alGetListeneri (ALenum param, ALint* value);
+    void alGetListener3i (ALenum param, ALint *value1, ALint *value2, ALint *value3);
+    void alGetListeneriv (ALenum param, ALint* values);
+    void alGenBuffers (ALsizei n, ALuint* buffers);
+    void alDeleteBuffers (ALsizei n, const ALuint* buffers);
+    ALboolean alIsBuffer (ALuint bid);
+    void alBufferData (ALuint bid, ALenum format, const ALvoid* data, ALsizei size, ALsizei freq);
+    void alBufferf (ALuint bid, ALenum param, ALfloat value);
+    void alBuffer3f (ALuint bid, ALenum param, ALfloat value1, ALfloat value2, ALfloat value3);
+    void alBufferfv (ALuint bid, ALenum param, const ALfloat* values);
+    void alBufferi (ALuint bid, ALenum param, ALint value);
+    void alBuffer3i (ALuint bid, ALenum param, ALint value1, ALint value2, ALint value3);
+    void alBufferiv (ALuint bid, ALenum param, const ALint* values);
+    void alGetBufferf (ALuint bid, ALenum param, ALfloat* value);
+    void alGetBuffer3f (ALuint bid, ALenum param, ALfloat* value1, ALfloat* value2, ALfloat* value3);
+    void alGetBufferfv (ALuint bid, ALenum param, ALfloat* values);
+    void alGetBufferi (ALuint bid, ALenum param, ALint* value);
+    void alGetBuffer3i (ALuint bid, ALenum param, ALint* value1, ALint* value2, ALint* value3);
+    void alGetBufferiv (ALuint bid, ALenum param, ALint* values);
+    void alDopplerFactor (ALfloat value);
+    void alDopplerVelocity (ALfloat value);
+    void alSpeedOfSound (ALfloat value);
+    void alDistanceModel (ALenum distanceModel);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обёртки над вызовами OpenALContext
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ALCboolean alcIsExtensionPresent( const ALCchar *extname );
-    void       alcGetIntegerv( ALCenum param, ALCsizei size, ALCint *data );
+    ALCboolean alcIsExtensionPresent (const ALCchar *extname);
+    void       alcGetIntegerv        (ALCenum param, ALCsizei size, ALCint *data);
 
   private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Функция протоколирования
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LogPrintf (const char* message, ...);
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка ошибок после вызова функции
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,8 +167,8 @@ class OpenALContext
   private:
     ALCdevice*  device;          //устройство OpenAL
     ALCcontext* context;         //контекст OpenAL
-    LogHandler  log_handler;     //функтор протоколирования
     bool        efx_present;     //наличие EFX
+    common::Log log;             //протокол
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -298,18 +285,6 @@ class OpenALDevice : public sound::low_level::IDevice, public xtl::reference_cou
     void        SetStringParam  (const char* name, const char* value);
     const char* GetStringParam  (const char* name);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка функции отладочного протоколирования
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void              SetDebugLog (const LogHandler&);
-    const LogHandler& GetDebugLog ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Печать отладочных сообщений
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void DebugPrintf  (const char* format, ...);
-    void DebugVPrintf (const char* format, va_list);
-
   private:
     void BufferUpdate ();
     void ListenerUpdate ();
@@ -334,7 +309,6 @@ class OpenALDevice : public sound::low_level::IDevice, public xtl::reference_cou
     syslib::Timer  buffer_timer;                               //таймер обновления буфера
     syslib::Timer  listener_timer;                             //таймер обновления слушателя
     syslib::Timer  source_timer;                               //таймер обновления источников
-    LogHandler     log_handler;                                //функция лога
     Capabilities   info;                                       //информация о устройстве
     Listener       listener;                                   //слушатель
     bool           listener_need_update;                       //слушатель требует обновления
@@ -433,6 +407,7 @@ class OpenALSource
     ALuint         al_source;                         //имя источника в OpenAL
     ALuint         al_buffers [SOURCE_BUFFERS_COUNT]; //OpenAL буферы
     OpenALSource   *prev_active, *next_active;        //список активных источников (проигрываемых)
+    common::Log    log;                               //протокол
 };
 
 const char* get_al_constant_name (ALenum value);

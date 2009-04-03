@@ -31,10 +31,6 @@ const char*  DEVICE_STRING_PARAMS_NAMES = "AL_DISTANCE_MODEL";
 namespace
 {
 
-void DefaultLogHandler (const char* log_message)
-{
-}
-
 struct OpenALDeviceProperties
 {
   size_t min_channels_count;
@@ -283,42 +279,6 @@ void OpenALDevice::SetListener (const Listener& in_listener)
 void OpenALDevice::GetListener (Listener& target_listener)
 {
   target_listener = listener;
-}
-
-/*
-    Отладочное протоколирование
-*/
-
-void OpenALDevice::SetDebugLog (const LogHandler& in_log_handler)
-{
-  log_handler = in_log_handler ? in_log_handler : &DefaultLogHandler;
-
-  context.SetDebugLog (log_handler);
-}
-
-const OpenALDevice::LogHandler& OpenALDevice::GetDebugLog ()
-{
-  return log_handler;
-}
-
-void OpenALDevice::DebugPrintf (const char* format, ...)
-{
-  va_list list;
-
-  va_start (list, format);
-  DebugVPrintf (format, list);
-}
-
-void OpenALDevice::DebugVPrintf (const char* format, va_list list)
-{
-  try
-  {
-    log_handler (vformat (format, list).c_str ());
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
 }
 
 /*

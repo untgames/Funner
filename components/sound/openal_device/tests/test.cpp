@@ -7,6 +7,8 @@
 #include <xtl/connection.h>
 #include <xtl/common_exceptions.h>
 
+#include <common/log.h>
+
 #include <syslib/application.h>
 #include <syslib/timer.h>
 
@@ -26,15 +28,17 @@ const char* file_name = "data/sound1.ogg";
 //const char* file_name2 = "data/sound1.wav";
 const char* file_name2 = "data/sound2.ogg";
 
+const char* LOG_FILTER_MASK = "sound::low_level::openal";
+
 const size_t SOURCE_UPDATE_TIME = 100;   //период обновления параметров источника звука (в милисекундах)
 const size_t TEST_WORK_TIME     = 8000;  //время работы теста (в милисекундах)
 
 float        source_angle = 0;
 Source       source;
 
-void log_print (const char* message)
+void log_print (const char* log_name, const char* message)
 {
-  printf ("DeviceLog: %s\n", message);
+  printf ("Log '%s': '%s'\n", log_name, message);
 }
 
 //печать числа с плавающей точкой
@@ -104,12 +108,13 @@ int main ()
 {
   try
   {
+    common::LogFilter log_filter (LOG_FILTER_MASK, &log_print);
+
     xtl::com_ptr<IDevice> sound_system (DriverManager::CreateDevice ("OpenAL", "*", "frequency=192000 min_channels_count=32 max_channels_count=192"), false);
 
     Capabilities   info;
     Listener       listener;
 
-    sound_system->SetDebugLog (&log_print);
     sound_system->GetCapabilities (info);
 
 //    sound_system->SetIntegerParam ("al_debug_log", 1);

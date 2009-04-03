@@ -4,7 +4,6 @@
 #include <exception>
 
 #include <mathlib.h>
-#include <xtl/functional_fwd>
 
 #include <sound/listener.h>
 
@@ -101,11 +100,11 @@ struct IDevice
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление проигрыванием
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void  Play  (size_t channel, bool looping = false) = 0;
-    virtual void  Pause (size_t channel) = 0;
-    virtual void  Stop  (size_t channel) = 0;
-    virtual void  Seek  (size_t channel, float time_in_seconds, SeekMode seek_mode) = 0;
-    virtual float Tell  (size_t channel) = 0;
+    virtual void  Play      (size_t channel, bool looping = false) = 0;
+    virtual void  Pause     (size_t channel) = 0;
+    virtual void  Stop      (size_t channel) = 0;
+    virtual void  Seek      (size_t channel, float time_in_seconds, SeekMode seek_mode) = 0;
+    virtual float Tell      (size_t channel) = 0;
     virtual bool  IsPlaying (size_t channel) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,14 +135,6 @@ struct IDevice
     virtual int         GetIntegerParam (const char* name) = 0;
     virtual void        SetStringParam  (const char* name, const char* value) = 0;
     virtual const char* GetStringParam  (const char* name) = 0;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///”становка функции отладочного протоколировани€
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (const char* message)> LogHandler;
-
-    virtual void              SetDebugLog (const LogHandler&) = 0;
-    virtual const LogHandler& GetDebugLog () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление подсчЄтом ссылок

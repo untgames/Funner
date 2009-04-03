@@ -28,12 +28,12 @@ class Driver : virtual public IDriver, public xtl::reference_counter
         const char* devices_names = 0;
 
 #ifdef ALC_ALL_DEVICES_SPECIFIER
-        if (alcIsExtensionPresent (NULL, "ALC_ENUMERATE_ALL_EXT"))
-          devices_names = alcGetString (NULL, ALC_ALL_DEVICES_SPECIFIER);
+        if (alcIsExtensionPresent (0, "ALC_ENUMERATE_ALL_EXT"))
+          devices_names = alcGetString (0, ALC_ALL_DEVICES_SPECIFIER);
         else
 #endif
-        if (alcIsExtensionPresent (NULL, "ALC_ENUMERATION_EXT"))
-          devices_names = alcGetString (NULL, ALC_DEVICE_SPECIFIER);
+        if (alcIsExtensionPresent (0, "ALC_ENUMERATION_EXT"))
+          devices_names = alcGetString (0, ALC_DEVICE_SPECIFIER);
 
         if (devices_names)
         {
@@ -98,21 +98,6 @@ class Driver : virtual public IDriver, public xtl::reference_counter
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Отладочное протоколирование
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef sound::low_level::IDevice::LogHandler LogHandler;
-
-    void SetDebugLog (const LogHandler& in_log_fn)
-    {
-      log_fn = in_log_fn;
-    }
-
-    const LogHandler& GetDebugLog ()
-    {
-      return log_fn;
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void AddRef  () { addref (this); }
@@ -123,7 +108,6 @@ class Driver : virtual public IDriver, public xtl::reference_counter
 
   private:
     DeviceArray devices;
-    LogHandler  log_fn;
 };
 
 /*

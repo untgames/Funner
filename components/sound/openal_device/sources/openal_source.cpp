@@ -8,8 +8,13 @@ using namespace common;
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
 #endif
 
-//период обновления буферов источника в тиках
-const size_t SOURCE_BUFFERS_UPDATE_MILLISECONDS = size_t (1000.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY);
+namespace
+{
+
+const char*  LOG_NAME                           = "sound::low_level::openal";                               //имя потока протоколирования
+const size_t SOURCE_BUFFERS_UPDATE_MILLISECONDS = size_t (1000.f / (float)SOURCE_BUFFERS_UPDATE_FREQUENCY); //период обновления буферов источника в тиках
+
+}
 
 /*
     Конструктор / деструктор
@@ -25,7 +30,8 @@ OpenALSource::OpenALSource (OpenALDevice& in_device)
     play_time_offset (0),
     last_buffers_fill_time (milliseconds () - SOURCE_BUFFERS_UPDATE_MILLISECONDS),
     prev_active (0),
-    next_active (0)
+    next_active (0),
+    log (LOG_NAME)
 {
   alGetError   ();
   alGenSources (1, &al_source);
@@ -170,13 +176,13 @@ void OpenALSource::SetSample (const media::SoundSample& sample)
   }
   catch (std::exception& exception)
   {
-    device.DebugPrintf ("Exception at load sample '%s': %s", sample.Name (), exception.what ());
     Stop ();
+    throw;
   }
   catch (...)
   {
-    device.DebugPrintf ("Unknown exception at load sample '%s'", sample.Name ());
     Stop ();
+    throw;
   }
 }
 
@@ -202,7 +208,7 @@ void OpenALSource::Play (bool looping)
 {
   if (!sound_sample.SizeInBytes ())
   {
-    device.DebugPrintf ("Can't play, empty sound sample");
+    log.Printf ("Warning: can't play, empty sound sample '%s'", sound_sample.Name ());
     return;
   }
 
@@ -442,7 +448,7 @@ void OpenALSource::BufferUpdate ()
   }
   catch (std::exception& exception)
   {
-    device.DebugPrintf ("Exception at update source: %s", exception.what ());
+    log.Printf ("Exception at update source: %s", exception.what ());
   }
   catch (...)
   {
@@ -477,7 +483,7 @@ void OpenALSource::PropertiesUpdate ()
   }
   catch (std::exception& exception)
   {
-    device.DebugPrintf ("Exception at update source properties: %s", exception.what ());
+    log.Printf ("Exception at update source properties: %s", exception.what ());
   }
   catch (...)
   {

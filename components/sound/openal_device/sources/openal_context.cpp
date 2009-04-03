@@ -9,6 +9,8 @@ using namespace xtl;
 namespace
 {
 
+const char* LOG_NAME = "sound::low_level::openal";                    //им€ потока протоколировани€
+
 //получение текстового описани€ ошибки контекста OpenAL
 const char* get_alc_error_message (ALCenum error)
 {
@@ -60,6 +62,7 @@ void process_init_string (const char* property, const char* value, ContextInitPr
 */
 
 OpenALContext::OpenALContext (const char* device_name, const char* init_string)
+  : log (LOG_NAME)
 {
   try
   {
@@ -116,10 +119,10 @@ OpenALContext::~OpenALContext ()
   ALCenum error = alcGetError (device);
 
   if (error != AL_NO_ERROR)
-    LogPrintf ("Error at alcDestroyContext(%p). %s", context, get_alc_error_message (error));
+    log.Printf ("Error at alcDestroyContext(%p). %s", context, get_alc_error_message (error));
 
   if (!alcCloseDevice (device))
-    LogPrintf ("Error at alcCloseDevice(%p). %s", device, get_alc_error_message (alcGetError (device)));
+    log.Printf ("Error at alcCloseDevice(%p). %s", device, get_alc_error_message (alcGetError (device)));
 }
 
 /*
@@ -138,39 +141,11 @@ bool OpenALContext::MakeCurrent ()
 
   if (!alcMakeContextCurrent (context))
   {
-    LogPrintf ("Error at alcMakeContextCurrent(%p). %s", context, get_alc_error_message (alcGetError (device)));
+    log.Printf ("Error at alcMakeContextCurrent(%p). %s", context, get_alc_error_message (alcGetError (device)));
     return false;
   }
 
   return true;
-}
-
-/*
-    ѕротоколирование ошибок
-*/
-
-void OpenALContext::SetDebugLog (const LogHandler& in_log_handler)
-{
-  log_handler = in_log_handler;
-}
-
-void OpenALContext::LogPrintf (const char* message, ...)
-{
-  if (!log_handler)
-    return;
-
-  try
-  {
-    va_list list;
-
-    va_start (list, message);
-
-    log_handler (vformat (message, list).c_str ());
-  }
-  catch (...)
-  {
-    //подавл€ем все исключени€
-  }
 }
 
 /*
@@ -184,7 +159,7 @@ void OpenALContext::CheckErrors (const char* function_name)
   try
   {
     if (error != AL_NO_ERROR)
-      LogPrintf ("Error at call %s. %s", function_name, get_al_error_message (error));
+      log.Printf ("Error at call %s. %s", function_name, get_al_error_message (error));
   }
   catch (...)
   {
@@ -198,7 +173,7 @@ void OpenALContext::ContextCheckErrors (const char* function_name)
   try
   {
     if (error != ALC_NO_ERROR)
-      LogPrintf ("Error at call %s. %s", function_name, get_al_error_message (error));
+      log.Printf ("Error at call %s. %s", function_name, get_al_error_message (error));
   }
   catch (...)
   {
