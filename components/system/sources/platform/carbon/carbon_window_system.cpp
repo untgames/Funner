@@ -396,10 +396,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
               break;
 
             if (!Platform::GetCursorVisible (window_handle) && !window_impl->is_cursor_in_window) //если курсор невидим - прячем его при входе в окно
-            {
-              printf ("Hiding cursor...\n");
               HideCursor ();
-            }
 
             window_impl->is_cursor_in_window = true;
 
@@ -513,10 +510,7 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
           window_impl->Notify (window_handle, WindowEvent_OnMouseLeave, context);
 
           if (!Platform::GetCursorVisible (window_handle)) //если курсор невидим - показываем его при выходе из окна
-          {
-            printf ("Showing cursor...\n");
             ShowCursor ();
-          }
         }
 
         break;
@@ -1003,15 +997,9 @@ void Platform::SetCursorVisible (window_t handle, bool state)
   if (is_cursor_in_client_region ((WindowRef)handle))
   {
     if (state)
-    {
-      printf ("Showing cursor\n");
       ShowCursor ();
-    }
     else
-    {
-      printf ("Hiding cursor\n");
       HideCursor ();
-    }
   }
 
   check_window_manager_error (SetWindowProperty ((WindowRef)handle, WINDOW_PROPERTY_CREATOR, CURSOR_VISIBLE_PROPERTY_TAG,
