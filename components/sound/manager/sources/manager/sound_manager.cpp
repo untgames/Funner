@@ -10,6 +10,7 @@
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 
+#include <common/log.h>
 #include <common/time.h>
 
 #include <sound/manager.h>
@@ -32,6 +33,8 @@ using namespace media;
 
 namespace
 {
+
+const char* LOG_NAME = "sound::SoundManager";  //имя потока протоколирования
 
 SeekMode get_seek_mode (bool looping)
 {
@@ -83,10 +86,11 @@ struct SoundManager::Impl : public xtl::trackable
   ChannelsSet                 free_channels;            //номера свободных каналов
   Capabilities                capabilities;             //возможности устройства
   SoundDeclarationLibrary     sound_decl_library;       //библиотека описаний звуков
+  common::Log                 log;                      //протокол
   xtl::trackable              trackable;
 
   Impl (const char* driver_mask, const char* device_mask, const char* init_string)
-    : volume (1.f)
+    : volume (1.f), log (LOG_NAME)
   {
     try
     {
@@ -215,11 +219,26 @@ struct SoundManager::Impl : public xtl::trackable
 
     if (emitter_iter->second->channel_number != -1)
     {
-      device->Stop (emitter_iter->second->channel_number);
-      device->SetSample (emitter_iter->second->channel_number, emitter_iter->second->sound_sample);
-      device->SetSource (emitter_iter->second->channel_number, emitter_iter->second->source);
-      device->Seek (emitter_iter->second->channel_number, emitter_iter->second->cur_position, get_seek_mode (emitter_iter->second->sound_declaration->Looping ()));
-      device->Play (emitter_iter->second->channel_number, emitter_iter->second->sound_declaration->Looping ());
+      try
+      {
+        device->Stop (emitter_iter->second->channel_number);
+        device->SetSample (emitter_iter->second->channel_number, emitter_iter->second->sound_sample);
+        device->SetSource (emitter_iter->second->channel_number, emitter_iter->second->source);
+        device->Seek (emitter_iter->second->channel_number, emitter_iter->second->cur_position, get_seek_mode (emitter_iter->second->sound_declaration->Looping ()));
+        device->Play (emitter_iter->second->channel_number, emitter_iter->second->sound_declaration->Looping ());
+      }
+      catch (xtl::exception& e)
+      {
+        log.Printf ("Can't play sound '%s'. Exception: '%s'", emitter_iter->second->sound_sample.Name (), e.what ());
+        emitter_iter->second->channel_number = -1;
+        throw;
+      }
+      catch (...)
+      {
+        log.Printf ("Can't play sound '%s'. Unknown exception", emitter_iter->second->sound_sample.Name ());
+        emitter_iter->second->channel_number = -1;
+        throw;
+      }
     }
   }
 
