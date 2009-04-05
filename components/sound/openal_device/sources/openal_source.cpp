@@ -174,7 +174,7 @@ void OpenALSource::SetSample (const media::SoundSample& sample)
 
     UpdateSampleNotify ();
   }
-  catch (std::exception& exception)
+  catch (std::exception&)
   {
     Stop ();
     throw;
