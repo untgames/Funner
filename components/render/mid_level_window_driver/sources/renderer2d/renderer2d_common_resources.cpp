@@ -256,7 +256,7 @@ CommonResources::CommonResources (IDevice* device)
   blend_states [BlendMode_None]        = create_blend_state (*device);
   blend_states [BlendMode_Translucent] = create_blend_state (*device, BlendArgument_SourceAlpha, BlendArgument_InverseSourceAlpha);
   blend_states [BlendMode_Mask]        = create_blend_state (*device, true, BlendArgument_Zero, BlendArgument_SourceColor, BlendArgument_SourceAlpha);
-  blend_states [BlendMode_Additive]    = create_blend_state (*device, BlendArgument_One, BlendArgument_One);
+  blend_states [BlendMode_Additive]    = create_blend_state (*device, BlendArgument_SourceAlpha, BlendArgument_One);
   blend_states [BlendMode_AlphaClamp]  = blend_states [BlendMode_None];
 
   depth_stencil_states [0] = create_depth_stencil_state (*device, false);
