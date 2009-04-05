@@ -29,6 +29,8 @@
 #include <xtl/common_exceptions.h>
 
 #include <common/file.h>
+#include <common/log.h>
+#include <common/strlib.h>
 
 #include <media/image.h>
 

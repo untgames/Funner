@@ -2,12 +2,20 @@
 
 using namespace common;
 
+void print (const char* log, const char* message)
+{
+  if (common::wcimatch (message, "*Warning:*scaled*"))
+    printf ("texture size warning detected\n", log);
+}
+
 int main ()
 {
   printf ("Results of unit_texture1d_fail_test:\n");
 
   try
   {
+    LogFilter filter ("render.*", &print);
+    
     Test test;
 
     TextureDesc desc;
@@ -27,7 +35,7 @@ int main ()
   }
   catch (std::exception& exception)
   {
-    printf ("exception.\n");
+    printf ("exception: %s\n", exception.what ());
   }
 
   return 0;
