@@ -195,7 +195,22 @@ struct SoundManager::Impl : public xtl::trackable
     if (!emitter_iter->second->sample_chosen || emitter_iter->second->sample_index != emitter.SampleIndex ())
     {
       emitter_iter->second->sample_index = emitter.SampleIndex ();
-      emitter_iter->second->sound_sample.Load (emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_index % emitter_iter->second->sound_declaration->SamplesCount ()));
+
+      try
+      {
+        emitter_iter->second->sound_sample.Load (emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_index % emitter_iter->second->sound_declaration->SamplesCount ()));
+      }
+      catch (xtl::exception& e)
+      {
+        log.Printf ("Can't load sound sample '%s'. Exception: '%s'", emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_index % emitter_iter->second->sound_declaration->SamplesCount ()), e.what ());
+        throw;
+      }
+      catch (...)
+      {
+        log.Printf ("Can't load sound sample '%s'. Unknown exception", emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_index % emitter_iter->second->sound_declaration->SamplesCount ()));
+        throw;
+      }
+
       emitter_iter->second->sample_chosen = true;
     }
 
