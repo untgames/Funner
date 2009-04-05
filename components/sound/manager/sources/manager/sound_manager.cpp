@@ -75,6 +75,8 @@ typedef stl::hash_map<Emitter*, SoundManagerEmitterPtr> EmitterSet;
 typedef xtl::com_ptr<low_level::IDevice>                DevicePtr;
 typedef xtl::com_ptr<low_level::IDriver>                DriverPtr;
 typedef stl::stack<size_t>                              ChannelsSet;
+typedef xtl::shared_ptr<SoundDeclarationLibrary>        SoundDeclarationLibraryPtr;
+typedef stl::vector<SoundDeclarationLibraryPtr>         SoundDeclarationLibraries;
 
 struct SoundManager::Impl : public xtl::trackable
 {
@@ -85,7 +87,7 @@ struct SoundManager::Impl : public xtl::trackable
   EmitterSet                  emitters;                 //излучатели звука
   ChannelsSet                 free_channels;            //номера свободных каналов
   Capabilities                capabilities;             //возможности устройства
-  SoundDeclarationLibrary     sound_decl_library;       //библиотека описаний звуков
+  SoundDeclarationLibraries   sound_decl_libraries;     //библиотеки описаний звуков
   common::Log                 log;                      //протокол
   xtl::trackable              trackable;
 
@@ -153,89 +155,83 @@ struct SoundManager::Impl : public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   void PlaySound (Emitter& emitter, float offset)
   {
-    emitter.Activate ();
-
-    EmitterSet::iterator emitter_iter = emitters.find (&emitter);
-
-    if (emitter_iter == emitters.end ())
+    try
     {
-      SoundManagerEmitterPtr manager_emitter (new SoundManagerEmitter (emitter.RegisterEventHandler (EmitterEvent_OnUpdateVolume, xtl::bind (&SoundManager::Impl::UpdateEmitterVolume, this, _1, _2)),
-                                                                       emitter.RegisterEventHandler (EmitterEvent_OnUpdateProperties, xtl::bind (&SoundManager::Impl::UpdateEmitterProperties, this, _1, _2))));
+      emitter.Activate ();
 
-      emitter_iter = emitters.insert_pair (&emitter, manager_emitter).first;
-    }
+      EmitterSet::iterator emitter_iter = emitters.find (&emitter);
 
-    if (strcmp (emitter_iter->second->source_name.c_str (), emitter.Source ()))
-    {
-      emitter_iter->second->sound_declaration = sound_decl_library.Find (emitter.Source ());
+      if (emitter_iter == emitters.end ())
+      {
+        SoundManagerEmitterPtr manager_emitter (new SoundManagerEmitter (emitter.RegisterEventHandler (EmitterEvent_OnUpdateVolume, xtl::bind (&SoundManager::Impl::UpdateEmitterVolume, this, _1, _2)),
+            emitter.RegisterEventHandler (EmitterEvent_OnUpdateProperties, xtl::bind (&SoundManager::Impl::UpdateEmitterProperties, this, _1, _2))));
+
+        emitter_iter = emitters.insert_pair (&emitter, manager_emitter).first;
+      }
+
+      if (strcmp (emitter_iter->second->source_name.c_str (), emitter.Source ()))
+      {
+        for (SoundDeclarationLibraries::iterator iter = sound_decl_libraries.begin (), end = sound_decl_libraries.end (); iter != end; ++iter)
+        {
+          emitter_iter->second->sound_declaration = (*iter)->Find (emitter.Source ());
+
+          if (emitter_iter->second->sound_declaration)
+            break;
+        }
+
+        if (!emitter_iter->second->sound_declaration)
+        {
+          log.Printf ("Can't find sound declaration for id '%s'.", emitter.Source ());
+          StopSound (emitter);
+          return;
+        }
+
+        emitter_iter->second->sound_declaration_gain = emitter_iter->second->sound_declaration->Param (SoundParam_Gain);
+
+        emitter_iter->second->source.gain               = emitter.Volume();
+        emitter_iter->second->source.minimum_gain       = emitter_iter->second->sound_declaration->Param (SoundParam_MinimumGain);
+        emitter_iter->second->source.maximum_gain       = emitter_iter->second->sound_declaration->Param (SoundParam_MaximumGain);
+        emitter_iter->second->source.inner_angle        = emitter_iter->second->sound_declaration->Param (SoundParam_InnerAngle);
+        emitter_iter->second->source.outer_angle        = emitter_iter->second->sound_declaration->Param (SoundParam_OuterAngle);
+        emitter_iter->second->source.outer_gain         = emitter_iter->second->sound_declaration->Param (SoundParam_OuterGain);
+        emitter_iter->second->source.reference_distance = emitter_iter->second->sound_declaration->Param (SoundParam_ReferenceDistance);
+        emitter_iter->second->source.maximum_distance   = emitter_iter->second->sound_declaration->Param (SoundParam_MaximumDistance);
+
+        emitter_iter->second->source_name = emitter.Source ();
+      }
 
       if (!emitter_iter->second->sound_declaration)
-      {
-        StopSound (emitter);
         return;
-      }
 
-      emitter_iter->second->sound_declaration_gain = emitter_iter->second->sound_declaration->Param (SoundParam_Gain);
-
-      emitter_iter->second->source.gain               = emitter.Volume();
-      emitter_iter->second->source.minimum_gain       = emitter_iter->second->sound_declaration->Param (SoundParam_MinimumGain);
-      emitter_iter->second->source.maximum_gain       = emitter_iter->second->sound_declaration->Param (SoundParam_MaximumGain);
-      emitter_iter->second->source.inner_angle        = emitter_iter->second->sound_declaration->Param (SoundParam_InnerAngle);
-      emitter_iter->second->source.outer_angle        = emitter_iter->second->sound_declaration->Param (SoundParam_OuterAngle);
-      emitter_iter->second->source.outer_gain         = emitter_iter->second->sound_declaration->Param (SoundParam_OuterGain);
-      emitter_iter->second->source.reference_distance = emitter_iter->second->sound_declaration->Param (SoundParam_ReferenceDistance);
-      emitter_iter->second->source.maximum_distance   = emitter_iter->second->sound_declaration->Param (SoundParam_MaximumDistance);
-
-      emitter_iter->second->source_name = emitter.Source ();
-    }
-
-    if (!emitter_iter->second->sound_declaration)
-      return;
-
-    if (!emitter_iter->second->sample_chosen || emitter_iter->second->sample_index != emitter.SampleIndex ())
-    {
-      emitter_iter->second->sample_index = emitter.SampleIndex ();
-
-      try
+      if (!emitter_iter->second->sample_chosen || emitter_iter->second->sample_index != emitter.SampleIndex ())
       {
+        emitter_iter->second->sample_index = emitter.SampleIndex ();
+
         emitter_iter->second->sound_sample.Load (emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_index % emitter_iter->second->sound_declaration->SamplesCount ()));
+
+        emitter_iter->second->sample_chosen = true;
       }
-      catch (xtl::exception& e)
+
+      if (!emitter_iter->second->is_playing || emitter_iter->second->channel_number == -1)
       {
-        log.Printf ("Can't load sound sample '%s'. Exception: '%s'", emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_index % emitter_iter->second->sound_declaration->SamplesCount ()), e.what ());
-        throw;
+        emitter_iter->second->is_playing = true;
+
+        if (!free_channels.empty ())
+        {
+          size_t channel_to_use = free_channels.top ();
+          free_channels.pop ();
+
+          emitter_iter->second->channel_number = channel_to_use;
+        }
+        else
+          emitter_iter->second->channel_number = -1;
       }
-      catch (...)
-      {
-        log.Printf ("Can't load sound sample '%s'. Unknown exception", emitter_iter->second->sound_declaration->Sample (emitter_iter->second->sample_index % emitter_iter->second->sound_declaration->SamplesCount ()));
-        throw;
-      }
 
-      emitter_iter->second->sample_chosen = true;
-    }
+      emitter_iter->second->play_start_time = milliseconds ();
 
-    if (!emitter_iter->second->is_playing || emitter_iter->second->channel_number == -1)
-    {
-      emitter_iter->second->is_playing = true;
+      emitter_iter->second->cur_position = offset;
 
-      if (!free_channels.empty ())
-      {
-        size_t channel_to_use = free_channels.top ();
-        free_channels.pop ();
-
-        emitter_iter->second->channel_number = channel_to_use;
-      }
-      else
-        emitter_iter->second->channel_number = -1;
-    }
-
-    emitter_iter->second->play_start_time = milliseconds ();
-
-    emitter_iter->second->cur_position = offset;
-
-    if (emitter_iter->second->channel_number != -1)
-    {
-      try
+      if (emitter_iter->second->channel_number != -1)
       {
         device->Stop (emitter_iter->second->channel_number);
         device->SetSample (emitter_iter->second->channel_number, emitter_iter->second->sound_sample);
@@ -243,18 +239,18 @@ struct SoundManager::Impl : public xtl::trackable
         device->Seek (emitter_iter->second->channel_number, emitter_iter->second->cur_position, get_seek_mode (emitter_iter->second->sound_declaration->Looping ()));
         device->Play (emitter_iter->second->channel_number, emitter_iter->second->sound_declaration->Looping ());
       }
-      catch (xtl::exception& e)
-      {
-        log.Printf ("Can't play sound '%s'. Exception: '%s'", emitter_iter->second->sound_sample.Name (), e.what ());
-        emitter_iter->second->channel_number = -1;
-        throw;
-      }
-      catch (...)
-      {
-        log.Printf ("Can't play sound '%s'. Unknown exception", emitter_iter->second->sound_sample.Name ());
-        emitter_iter->second->channel_number = -1;
-        throw;
-      }
+    }
+    catch (xtl::exception& e)
+    {
+      log.Printf ("Can't play sound. Exception: '%s'", e.what ());
+      StopSound (emitter);
+      throw;
+    }
+    catch (...)
+    {
+      log.Printf ("Can't play sound. Unknown exception");
+      StopSound (emitter);
+      throw;
     }
   }
 
@@ -283,10 +279,15 @@ struct SoundManager::Impl : public xtl::trackable
     EmitterSet::iterator emitter_iter = emitters.find (&emitter);
 
     if (emitter_iter == emitters.end ())
+    {
+      emitter.Deactivate ();
       return;
+    }
 
     if (emitter_iter->second->is_playing)
       StopPlaying (emitter_iter);
+
+    emitter.Deactivate ();
 
     emitters.erase (emitter_iter);
   }
@@ -400,7 +401,6 @@ void SoundManager::PlaySound (Emitter& emitter, float offset)
 void SoundManager::StopSound (Emitter& emitter)
 {
   impl->StopSound (emitter);
-  emitter.Deactivate ();
 }
 
 float SoundManager::Tell (Emitter& emitter) const
@@ -498,5 +498,5 @@ const sound::Listener& SoundManager::Listener () const
 
 void SoundManager::LoadSoundLibrary (const char* file_name)
 {
-  impl->sound_decl_library.Load (file_name);
+  impl->sound_decl_libraries.push_back (SoundDeclarationLibraryPtr (new SoundDeclarationLibrary (file_name)));
 }
