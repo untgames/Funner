@@ -103,7 +103,7 @@ void OpenALSource::Deactivate ()
   if (prev_active) prev_active->next_active = next_active;
   else             device.SetFirstActiveSource (next_active);
 
-  prev_active = next_active = 0;
+  prev_active = 0;
   is_active   = false;
 }
 
