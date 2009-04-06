@@ -1,21 +1,22 @@
-#include <stl/hash_map>
 #include <stl/algorithm>
+#include <stl/hash_map>
 #include <stl/stack>
 #include <stl/string>
 
-#include <xtl/intrusive_ptr.h>
-#include <xtl/shared_ptr.h>
-#include <xtl/function.h>
-#include <xtl/signal.h>
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/function.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/iterator.h>
+#include <xtl/shared_ptr.h>
+#include <xtl/signal.h>
 
 #include <common/log.h>
 #include <common/time.h>
 
-#include <sound/manager.h>
 #include <sound/device.h>
 #include <sound/driver.h>
+#include <sound/manager.h>
 
 #include <media/sound.h>
 #include <media/sound_declaration.h>
@@ -75,21 +76,19 @@ typedef stl::hash_map<Emitter*, SoundManagerEmitterPtr> EmitterSet;
 typedef xtl::com_ptr<low_level::IDevice>                DevicePtr;
 typedef xtl::com_ptr<low_level::IDriver>                DriverPtr;
 typedef stl::stack<size_t>                              ChannelsSet;
-typedef xtl::shared_ptr<SoundDeclarationLibrary>        SoundDeclarationLibraryPtr;
-typedef stl::vector<SoundDeclarationLibraryPtr>         SoundDeclarationLibraries;
 
 struct SoundManager::Impl : public xtl::trackable
 {
-  DevicePtr                   device;                   //устройство воспроизведения
-  float                       volume;                   //добавочная громкость
-  bool                        is_muted;                 //флаг блокировки проигрывания звука
-  sound::Listener             listener;                 //параметры слушателя
-  EmitterSet                  emitters;                 //излучатели звука
-  ChannelsSet                 free_channels;            //номера свободных каналов
-  Capabilities                capabilities;             //возможности устройства
-  SoundDeclarationLibraries   sound_decl_libraries;     //библиотеки описаний звуков
-  common::Log                 log;                      //протокол
-  xtl::trackable              trackable;
+  DevicePtr               device;                    //устройство воспроизведения
+  float                   volume;                    //добавочная громкость
+  bool                    is_muted;                  //флаг блокировки проигрывания звука
+  sound::Listener         listener;                  //параметры слушателя
+  EmitterSet              emitters;                  //излучатели звука
+  ChannelsSet             free_channels;             //номера свободных каналов
+  Capabilities            capabilities;              //возможности устройства
+  SoundDeclarationLibrary sound_declaration_library; //библиотека описаний звуков
+  common::Log             log;                       //протокол
+  xtl::trackable          trackable;
 
   Impl (const char* driver_mask, const char* device_mask, const char* init_string)
     : volume (1.f), log (LOG_NAME)
@@ -171,13 +170,7 @@ struct SoundManager::Impl : public xtl::trackable
 
       if (strcmp (emitter_iter->second->source_name.c_str (), emitter.Source ()))
       {
-        for (SoundDeclarationLibraries::iterator iter = sound_decl_libraries.begin (), end = sound_decl_libraries.end (); iter != end; ++iter)
-        {
-          emitter_iter->second->sound_declaration = (*iter)->Find (emitter.Source ());
-
-          if (emitter_iter->second->sound_declaration)
-            break;
-        }
+        emitter_iter->second->sound_declaration = sound_declaration_library.Find (emitter.Source ());
 
         if (!emitter_iter->second->sound_declaration)
         {
@@ -498,5 +491,18 @@ const sound::Listener& SoundManager::Listener () const
 
 void SoundManager::LoadSoundLibrary (const char* file_name)
 {
-  impl->sound_decl_libraries.push_back (SoundDeclarationLibraryPtr (new SoundDeclarationLibrary (file_name)));
+  SoundDeclarationLibrary new_library (file_name);
+
+  for (SoundDeclarationLibrary::Iterator iter = new_library.CreateIterator (); iter; ++iter)
+  {
+    const char* item_id = new_library.ItemId (iter);
+
+    if (impl->sound_declaration_library.Find (item_id))
+    {
+      impl->log.Printf ("Warning: ignoring already loaded sound declaration with id '%s' - redefinition in library '%s'", item_id, file_name);
+      continue;
+    }
+
+    impl->sound_declaration_library.Attach (item_id, *iter);
+  }
 }
