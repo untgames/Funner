@@ -292,7 +292,7 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Pointer FindNode (const char* name_to_find, bool create_if_not_exist)
+    Pointer FindNode (const char* name_to_find, const char* value, bool create_if_not_exist)
     {
       if (!name_to_find)
         throw xtl::make_null_argument_exception ("script::binds::StringNode::FindNode", "name");
@@ -305,13 +305,27 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
 
         for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
           if (!xstrncmp (name_to_find, (*iter)->Name (), base_name_len))
-            return (*iter)->FindNode (subname + 1, create_if_not_exist);
+            return (*iter)->FindNode (subname + 1, value, create_if_not_exist);
       }
       else
       {
         for (ChildArray::iterator iter = childs.begin (), end = childs.end (); iter != end; ++iter)
+        {
           if (!xstrcmp (name_to_find, (*iter)->Name ()))
-            return *iter;
+          {
+            if (value)
+            {
+              const char* attr = (*iter)->Attribute (0);
+              
+              if (attr && !xstrcmp (value, attr))
+                return *iter;
+            }
+            else
+            {
+              return *iter;
+            }
+          }
+        }
       }
 
       if (create_if_not_exist)
@@ -471,7 +485,12 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 StringNode::Pointer find (StringNode* node, const char* name)
 {
-  return node->FindNode (name, false);
+  return node->FindNode (name, 0, false);
+}
+
+StringNode::Pointer find (StringNode* node, const char* name, const char* value)
+{
+  return node->FindNode (name, value, false);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -479,7 +498,7 @@ StringNode::Pointer find (StringNode* node, const char* name)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const char* get (StringNode* node, const char* name)
 {
-  StringNode::Pointer find_node = node->FindNode (name, false);
+  StringNode::Pointer find_node = node->FindNode (name, 0, false);
 
   if (!find_node)
     throw xtl::format_operation_exception ("script::binds::get (StringNode, const char*)", "There is no node '%s'", name);
@@ -492,7 +511,7 @@ const char* get (StringNode* node, const char* name)
 
 const char* get (StringNode* node, const char* name, const char* default_value)
 {
-  StringNode::Pointer find_node = node->FindNode (name, false);
+  StringNode::Pointer find_node = node->FindNode (name, 0, false);
 
   if (!find_node)
     return default_value;
@@ -505,7 +524,7 @@ const char* get (StringNode* node, const char* name, const char* default_value)
 
 void set (StringNode* node, const char* name, const char* value)
 {
-  StringNode::Pointer find_node = node->FindNode (name, true);
+  StringNode::Pointer find_node = node->FindNode (name, 0, true);
 
   if (find_node->AttributesCount ())
     find_node->SetAttribute (0, value);
@@ -557,9 +576,12 @@ void bind_common_string_tree (Environment& environment)
   lib.Register ("RemoveAllChildren",   make_invoker (&StringNode::RemoveAllChildren));
   lib.Register ("LoadXml",             make_invoker (&StringNode::LoadXml));
   lib.Register ("SaveXml",             make_invoker (&StringNode::SaveXml));
-  lib.Register ("Find",                make_invoker (&find));
-  lib.Register ("Get",                 make_invoker (make_invoker(implicit_cast<const char* (*) (StringNode*, const char*, const char*)> (&get)),
-                                                     make_invoker(implicit_cast<const char* (*) (StringNode*, const char*)> (&get))));
+  lib.Register ("Find",                make_invoker (
+                                                     make_invoker ((StringNode::Pointer (*)(StringNode*, const char*, const char*))&find),
+                                                     make_invoker ((StringNode::Pointer (*)(StringNode*, const char*))&find)
+                                                    ));
+  lib.Register ("Get",                 make_invoker (make_invoker (implicit_cast<const char* (*) (StringNode*, const char*, const char*)> (&get)),
+                                                     make_invoker (implicit_cast<const char* (*) (StringNode*, const char*)> (&get))));
   lib.Register ("Set",                 make_invoker (&set));
 
     //регистрация типов данных

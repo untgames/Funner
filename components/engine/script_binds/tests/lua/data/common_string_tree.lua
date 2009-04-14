@@ -25,6 +25,33 @@ function clone_test ()
   print ("Node 2 children count: " .. tostring (node2.ChildrenCount))
 end
 
+function search_test ()
+  local root   = Common.StringNode.Create ()
+  local parent = Common.StringNode.Create ()
+  local child1 = Common.StringNode.Create ()
+  local child2 = Common.StringNode.Create ()
+   
+  root.Name   = "Root"
+  parent.Name = "Parent"
+  child1.Name = "Child"
+  child2.Name = "Child"
+  
+  child1:AddAttribute ("attr1")
+  child2:AddAttribute ("attr2")  
+  
+  root:AddChild (parent)
+  parent:AddChild (0, child1)
+  parent:AddChild (0, child2)  
+  
+  local node = root:Find ("Parent.Child", "attr1")
+  
+  if node then print ("Node found: " .. node:Attribute (0)) end
+  
+  node = root:Find ("Parent.Child", "attr2")
+
+  if node then print ("Node found: " .. node:Attribute (0)) end
+end
+
 function print_node (node, indent)
   Utils.PrintIndent (indent)
   print ("Node '" .. node.Name .. "'")
@@ -146,8 +173,10 @@ function test ()
   node:RemoveAllChildren ()
 
   print ("Children count: " .. node.ChildrenCount)
-
+  
+  search_test ()  
+  
   clone_test ()
 
-  xml_test ()
+  xml_test ()  
 end

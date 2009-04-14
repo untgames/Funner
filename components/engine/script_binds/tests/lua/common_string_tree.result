@@ -29,6 +29,8 @@ Node.Child2 Node = default value
 Child2 attribute0 = new child2 attribute0
 Children count: 1
 Children count: 0
+Node found: attr1
+Node found: attr2
 Node 1 attributes áount: 1
 Node 2 attributes áount: 1
 Node 1 children count: 1
