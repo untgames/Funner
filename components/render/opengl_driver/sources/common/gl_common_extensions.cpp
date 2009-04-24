@@ -313,6 +313,7 @@ const char* extensions [] = {
 
   "GLBUG_texture3D_get_tex_image",
   "GLBUG_texture_no_subimage",
+  "GLBUG_texture_no_mipmap",
   "GLBUG_swap_buffers_twice_call",
 };
 

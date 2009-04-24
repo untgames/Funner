@@ -128,7 +128,8 @@ size_t SamplerState::GetDescHash ()
 
 void SamplerState::SetDesc (const SamplerDesc& in_desc)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::SamplerState::SetDesc";
+  static const char* METHOD_NAME           = "render::low_level::opengl::SamplerState::SetDesc";
+  static Extension   BUG_texture_no_mipmap = "GLBUG_texture_no_mipmap";
   
     //проверка поддержки необхоимых расширений
 
@@ -183,17 +184,35 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   
   GLenum gl_min_filter, gl_mag_filter, gl_wrap [Texcoord_Num], gl_comparision_function;
   
-  switch (in_desc.min_filter)
+  if (IsSupported (BUG_texture_no_mipmap))
   {
-    case TexMinFilter_Point:           gl_min_filter = GL_NEAREST; break;
-    case TexMinFilter_Linear:          gl_min_filter = GL_LINEAR; break;
-    case TexMinFilter_PointMipPoint:   gl_min_filter = GL_NEAREST_MIPMAP_NEAREST; break;
-    case TexMinFilter_LinearMipPoint:  gl_min_filter = GL_LINEAR_MIPMAP_NEAREST; break;
-    case TexMinFilter_PointMipLinear:  gl_min_filter = GL_NEAREST_MIPMAP_LINEAR; break;
-    case TexMinFilter_Default:
-    case TexMinFilter_LinearMipLinear: gl_min_filter = GL_LINEAR_MIPMAP_LINEAR; break;
-    default:
-      throw xtl::make_argument_exception (METHOD_NAME, "desc.min_filter", in_desc.min_filter);
+    switch (in_desc.min_filter)
+    {
+      case TexMinFilter_Point:
+      case TexMinFilter_PointMipPoint:
+      case TexMinFilter_PointMipLinear:  gl_min_filter = GL_NEAREST; break;      
+      case TexMinFilter_Default:
+      case TexMinFilter_Linear:
+      case TexMinFilter_LinearMipPoint:
+      case TexMinFilter_LinearMipLinear: gl_min_filter = GL_LINEAR; break;
+      default:
+        throw xtl::make_argument_exception (METHOD_NAME, "desc.min_filter", in_desc.min_filter);
+    }    
+  }
+  else
+  {
+    switch (in_desc.min_filter)
+    {
+      case TexMinFilter_Point:           gl_min_filter = GL_NEAREST; break;
+      case TexMinFilter_Linear:          gl_min_filter = GL_LINEAR; break;
+      case TexMinFilter_PointMipPoint:   gl_min_filter = GL_NEAREST_MIPMAP_NEAREST; break;
+      case TexMinFilter_LinearMipPoint:  gl_min_filter = GL_LINEAR_MIPMAP_NEAREST; break;
+      case TexMinFilter_PointMipLinear:  gl_min_filter = GL_NEAREST_MIPMAP_LINEAR; break;
+      case TexMinFilter_Default:
+      case TexMinFilter_LinearMipLinear: gl_min_filter = GL_LINEAR_MIPMAP_LINEAR; break;
+      default:
+        throw xtl::make_argument_exception (METHOD_NAME, "desc.min_filter", in_desc.min_filter);
+    }    
   }
   
   switch (in_desc.mag_filter)
