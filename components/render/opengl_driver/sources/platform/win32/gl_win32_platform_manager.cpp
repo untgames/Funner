@@ -37,7 +37,7 @@ class PlatformManagerImpl
 
           //загрузка MSOGL
 
-        LoadDefaultAdapter ("MSOGL", "ogldrv", "bugs='GLBUG_swap_buffers_twice_call GLBUG_texture_no_subimage'");
+        LoadDefaultAdapter ("MSOGL", "ogldrv", "bugs='GLBUG_swap_buffers_twice_call GLBUG_texture_no_subimage GLBUG_texture_no_mipmap'");
 
           //загрузка Direct3D эмулятора AcXtrnal
 
