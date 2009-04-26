@@ -22,13 +22,44 @@ class Timer
     {
       Reset ();
     }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Пауза / возобновление
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Pause ()
+    {
+      if (paused)
+        return;
+      
+      offset += common::milliseconds () - start_time;
+      paused  = true;
+    }
+    
+    void Resume ()
+    {
+      if (!paused)
+        return;
+
+      paused     = false;
+      start_time = common::milliseconds ();
+    }
+    
+    bool IsPaused () const { return paused; }
+    
+    void SetPaused (bool state)
+    {
+      if (state) Pause ();
+      else       Resume ();
+    }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сброс времени
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void  Reset ()
+    void Reset ()
     {
       start_time = common::milliseconds ();
+      paused     = false;
+      offset     = 0;
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,11 +67,13 @@ class Timer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     float SecondsEllapsed ()
     {
-      return (common::milliseconds () - start_time) / 1000.f;
+      return paused ? offset / 1000.0f : (common::milliseconds () - start_time + offset) / 1000.f;
     }
 
   private:
+    bool   paused;
     size_t start_time;
+    size_t offset;
 };
 
 }
@@ -64,6 +97,10 @@ void bind_common_timer (script::Environment& environment)
     //регистрация операций
 
   lib.Register ("Reset",               make_invoker (&Timer::Reset));
+  lib.Register ("Pause",               make_invoker (&Timer::Pause));
+  lib.Register ("Resume",              make_invoker (&Timer::Resume));  
+  lib.Register ("get_Paused",          make_invoker (&Timer::IsPaused));
+  lib.Register ("set_Paused",          make_invoker (&Timer::SetPaused));
   lib.Register ("get_SecondsEllapsed", make_invoker (&Timer::SecondsEllapsed));
 
     //регистрация типов данных

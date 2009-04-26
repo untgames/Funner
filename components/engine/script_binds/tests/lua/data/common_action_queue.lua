@@ -1,12 +1,23 @@
-three_time_no_delay_handler_counter = 0
+five_time_no_delay_handler_counter = 0
 
-function three_time_no_delay_handler (dt)
-  print ("three_time_no_delay_handler called with dt=" .. dt .. " timer=" .. timer.SecondsEllapsed)
+function five_time_no_delay_handler (dt)
+  print ("five_time_no_delay_handler called with dt=" .. tostring (dt) .. " timer=" .. tostring (timer.SecondsEllapsed) 
+    .. " paused=" .. tostring (timer.Paused))
 
-  three_time_no_delay_handler_counter = three_time_no_delay_handler_counter + 1
-	
-  if (three_time_no_delay_handler_counter == 3) then  
-    three_time_no_delay_handler_connection:Disconnect ()
+  five_time_no_delay_handler_counter = five_time_no_delay_handler_counter + 1
+  
+  if (five_time_no_delay_handler_counter == 2) then
+    timer.Paused = true
+    print ("timer paused with time=" .. tostring (timer.SecondsEllapsed))
+  end
+  
+  if (five_time_no_delay_handler_counter == 4) then    
+    timer.Paused = false
+    print ("timer resumed with time=" .. tostring (timer.SecondsEllapsed))    
+  end
+  
+  if (five_time_no_delay_handler_counter == 5) then  
+    five_time_no_delay_handler_connection:Disconnect ()
     timer:Reset ()
   end  
 end
@@ -29,8 +40,8 @@ function test ()
 
   local action_queue = Common.ActionQueue.Create ()
   
-  three_time_no_delay_handler_connection = action_queue:RegisterEventHandler (0, 0.2, Common.ActionQueue.CreateEventHandler ("three_time_no_delay_handler"))
+  five_time_no_delay_handler_connection = action_queue:RegisterEventHandler (0, 0.2, Common.ActionQueue.CreateEventHandler (five_time_no_delay_handler))
   action_queue:RegisterEventHandler (0.5, 0.2, Common.ActionQueue.CreateEventHandler ("delayed_handler"))
 --  action_queue:RegisterEventHandler (Common.ActionQueue.CreateEventHandler ("instant_handler"))  
-  action_queue:RegisterEventHandler (1, 1, Common.ActionQueue.CreateEventHandler ("exit_handler"))  
+  action_queue:RegisterEventHandler (3, 1, Common.ActionQueue.CreateEventHandler ("exit_handler"))  
 end
