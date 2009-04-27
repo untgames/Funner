@@ -12,9 +12,31 @@ namespace
 const char* COMPONENT_NAME = "script.binds.LuaOverride";
 const char* BINDER_NAME    = "LuaOverride";
 
+/*
+    Функции
+*/
+
 void print_override (const char* message)
 {
   common::Console::Printf ("%s\n", message);
+}
+
+void error_override (const char* message)
+{
+  throw xtl::format_operation_exception ("", message ? "error: %s" : "error", message);
+}
+
+void assert_override (bool assertion, const char* message)
+{
+  if (assertion)
+    return;
+    
+  error_override (message ? message : "assertion failed");
+}
+
+void assert_override (bool assertion)
+{
+  assert_override (assertion, 0);
 }
 
 struct DoFileOverride
@@ -57,6 +79,10 @@ class Component
         //регистрация операций
 
       lib.Register ("print",  make_invoker (&print_override));
+      lib.Register ("error",  make_invoker (&error_override));
+      lib.Register ("assert", make_invoker (
+                                make_invoker ((void (*)(bool, const char*))&assert_override),
+                                make_invoker ((void (*)(bool))&assert_override)));
       lib.Register ("dofile", DoFileOverride ());
     }
 };
