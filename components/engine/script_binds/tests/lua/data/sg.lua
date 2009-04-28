@@ -21,10 +21,10 @@ function test_scene ()
 end
 
 function print_childs (parent_node)
-  local child_node = parent_node:FirstChild ()
+  local child_node = parent_node.FirstChild
   while (child_node) do
     print ("Child name - " .. child_node.Name) 
-    child_node = child_node:NextChild ()
+    child_node = child_node.NextChild
   end
 end
 
@@ -39,7 +39,7 @@ function test_node_bind ()
   node2.Name = "node2"
   node3.Name = "node3"
 
-  local node4 = node2:Parent ()
+  local node4 = node2.Parent
   
   node1:BindToParent (node3, Scene.NodeBindMode.AddRef, Scene.NodeTransformSpace.Parent)
   node2:BindToParent (node3)

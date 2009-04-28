@@ -216,12 +216,11 @@ InvokerRegistry& bind_node_library (Environment& environment)
   lib.Register ("get_WorldTM",               make_invoker (&Node::WorldTM));
   lib.Register ("get_ParentTM",              make_invoker (&Node::ParentTM));
   lib.Register ("get_IsInUpdateTransaction", make_invoker (&Node::IsInUpdateTransaction));
-
-  lib.Register ("Parent",     make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::Parent)));
-  lib.Register ("FirstChild", make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::FirstChild)));
-  lib.Register ("LastChild",  make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::LastChild)));
-  lib.Register ("PrevChild",  make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::PrevChild)));
-  lib.Register ("NextChild",  make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::NextChild)));
+  lib.Register ("get_Parent",                make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::Parent)));
+  lib.Register ("get_FirstChild",            make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::FirstChild)));
+  lib.Register ("get_LastChild",             make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::LastChild)));
+  lib.Register ("get_PrevChild",             make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::PrevChild)));
+  lib.Register ("get_NextChild",             make_invoker (implicit_cast<Node::Pointer (Node::*) ()> (&Node::NextChild)));
 
   lib.Register ("BindToParent", make_invoker (make_invoker (&Node::BindToParent),
     make_invoker<void (Node&, Node&, NodeBindMode)> (xtl::bind (&Node::BindToParent, _1, _2, _3, NodeTransformSpace_Local)),
