@@ -1,5 +1,4 @@
 local five_time_no_delay_handler_counter = 0
-local action_queue_paused                = false
 
 function five_time_no_delay_handler (dt)
   print ("five_time_no_delay_handler called with dt=" .. string.format ("%1.1f", dt) .. " timer=" .. string.format ("%1.1f", timer.SecondsEllapsed) 
@@ -32,21 +31,26 @@ function instant_handler (dt)
 end  
 
 function exit_handler (dt)
-  print ("exit_handler called with dt=" .. dt .. " timer=" .. string.format ("%1.1f", timer.SecondsEllapsed))
+  print ("exit_handler called with dt=" .. string.format ("%1.0f", dt) .. " timer=" .. string.format ("%1.1f", timer.SecondsEllapsed))
   System.Application.Exit (0)
 end
 
+function registered_in_pause_handler (dt)
+  print ("registered_in_pause_handler called with dt=" .. string.format ("%1.1f", dt) .. " timer =" .. string.format ("%1.1f", timer.SecondsEllapsed))
+end
+
 function action_queue_pause_handler (dt)
-  if action_queue_paused then
-    print ("action_queue_pause_handler resumed action_queue with dt=" .. string.format ("%1.2f", dt) .. " timer=" .. string.format ("%1.2f", timer.SecondsEllapsed))
+  if action_queue.Paused then
+    print ("action_queue_pause_handler resumed action_queue with dt=" .. string.format ("%1.1f", dt) .. " timer=" .. string.format ("%1.1f", timer.SecondsEllapsed))
   
     action_queue:Resume ()
     action_queue_pause_handler_connection:Disconnect ()
   else  
-    print ("action_queue_pause_handler paused action_queue with dt=" .. string.format ("%1.2f", dt) .. " timer=" .. string.format ("%1.2f", timer.SecondsEllapsed))
+    print ("action_queue_pause_handler paused action_queue with dt=" .. string.format ("%1.1f", dt) .. " timer=" .. string.format ("%1.1f", timer.SecondsEllapsed))
   
     action_queue:Pause ()
     action_queue_paused = true
+    action_queue:RegisterEventHandler (0, 0.3, Common.ActionQueue.CreateEventHandler ("registered_in_pause_handler"))  
   end  
 end
 
@@ -60,7 +64,9 @@ function test ()
 --  action_queue:RegisterEventHandler (Common.ActionQueue.CreateEventHandler ("instant_handler"))  
   action_queue:RegisterEventHandler (3, 1, Common.ActionQueue.CreateEventHandler ("exit_handler"))  
   
+  print ("action_queue paused = " .. tostring (action_queue.Paused))
+  
   local action_queue2 = Common.ActionQueue.Create ()
   
-  action_queue_pause_handler_connection = action_queue2:RegisterEventHandler (2.55, 1, Common.ActionQueue.CreateEventHandler ("action_queue_pause_handler"))  
+  action_queue_pause_handler_connection = action_queue2:RegisterEventHandler (2.6, 1, Common.ActionQueue.CreateEventHandler ("action_queue_pause_handler"))  
 end

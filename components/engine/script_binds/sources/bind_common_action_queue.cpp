@@ -26,6 +26,13 @@ class ActionQueue: public xtl::reference_counter, public xtl::dynamic_cast_root
     typedef xtl::function<void (float)>     EventHandler;  //dt
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+/// онструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ActionQueue ()
+      : paused (false)
+      {}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—оздание новой очереди
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static Pointer Create ()
@@ -38,14 +45,16 @@ class ActionQueue: public xtl::reference_counter, public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::connection RegisterEventHandler (float first_fire, float period, const EventHandler& handler)
     {
-      RegisterIdleHandler ();
+      if (!paused)
+        RegisterIdleHandler ();
 
       return signal.connect (EventHandlerWrapper (first_fire, period, handler));
     }
 
     xtl::connection RegisterEventHandler (const EventHandler& handler)
     {
-      RegisterIdleHandler ();
+      if (!paused)
+        RegisterIdleHandler ();
 
       return signal.connect (EventHandlerWrapper (0, 0, handler));
     }
@@ -56,16 +65,27 @@ class ActionQueue: public xtl::reference_counter, public xtl::dynamic_cast_root
     void Pause ()
     {
       idle_connection.disconnect ();
+      paused = true;
     }
 
     void Resume ()
     {
-      if (idle_connection.connected ())
+      if (!paused)
         return;
 
       signal (true);  //обновление времени обработчиков
 
       RegisterIdleHandler ();
+
+      paused = false;
+    }
+
+    bool IsPaused () const { return paused; }
+
+    void SetPaused (bool state)
+    {
+      if (state) Pause ();
+      else       Resume ();
     }
 
   private:
@@ -176,6 +196,7 @@ class ActionQueue: public xtl::reference_counter, public xtl::dynamic_cast_root
   private:
     ActionQueueSignal    signal;          //сигнал обработки таймеров
     xtl::auto_connection idle_connection; //соединение idle
+    bool                 paused;          //находитс€ ли в режиме паузы
 };
 
 }
@@ -198,6 +219,8 @@ void bind_common_action_queue (script::Environment& environment)
                                                       make_invoker (xtl::implicit_cast<xtl::connection (ActionQueue::*) (const ActionQueue::EventHandler&)> (&ActionQueue::RegisterEventHandler))));
   lib.Register ("Pause",                make_invoker (&ActionQueue::Pause));
   lib.Register ("Resume",               make_invoker (&ActionQueue::Resume));
+  lib.Register ("get_Paused",           make_invoker (&ActionQueue::IsPaused));
+  lib.Register ("set_Paused",           make_invoker (&ActionQueue::SetPaused));
 
     //регистраци€ типов данных
 
