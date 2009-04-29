@@ -1,0 +1,25 @@
+Results of common_action_queue test:
+Test library:
+five_time_no_delay_handler called with dt=0.0 timer=0.0 paused=false
+five_time_no_delay_handler called with dt=0.2 timer=0.2 paused=false
+timer paused with time=0.2
+five_time_no_delay_handler called with dt=0.2 timer=0.2 paused=true
+delayed_handler called with dt=0.5 timer =0.2
+five_time_no_delay_handler called with dt=0.2 timer=0.2 paused=true
+timer resumed with time=0.2
+delayed_handler called with dt=0.2 timer =0.3
+five_time_no_delay_handler called with dt=0.2 timer=0.4 paused=false
+delayed_handler called with dt=0.2 timer =0.1
+delayed_handler called with dt=0.2 timer =0.3
+delayed_handler called with dt=0.2 timer =0.5
+delayed_handler called with dt=0.2 timer =0.7
+delayed_handler called with dt=0.2 timer =0.9
+delayed_handler called with dt=0.2 timer =1.1
+delayed_handler called with dt=0.2 timer =1.3
+delayed_handler called with dt=0.2 timer =1.5
+delayed_handler called with dt=0.2 timer =1.7
+action_queue_pause_handler paused action_queue with dt=2.55 timer=1.75
+action_queue_pause_handler resumed action_queue with dt=1.00 timer=2.75
+delayed_handler called with dt=0.2 timer =2.9
+delayed_handler called with dt=0.2 timer =3.1
+exit_handler called with dt=3 timer=3.2

@@ -43,13 +43,29 @@ class ActionQueue: public xtl::reference_counter, public xtl::dynamic_cast_root
       return signal.connect (EventHandlerWrapper (first_fire, period, handler));
     }
 
-//    xtl::connection RegisterEventHandler (float delay, const EventHandler& handler);
-
     xtl::connection RegisterEventHandler (const EventHandler& handler)
     {
       RegisterIdleHandler ();
 
       return signal.connect (EventHandlerWrapper (0, 0, handler));
+    }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Пауза / возобновление
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Pause ()
+    {
+      idle_connection.disconnect ();
+    }
+
+    void Resume ()
+    {
+      if (idle_connection.connected ())
+        return;
+
+      signal (true);  //обновление времени обработчиков
+
+      RegisterIdleHandler ();
     }
 
   private:
@@ -69,7 +85,7 @@ class ActionQueue: public xtl::reference_counter, public xtl::dynamic_cast_root
         return;
       }
 
-      signal ();
+      signal (false);
     }
 
   private:
@@ -88,11 +104,12 @@ class ActionQueue: public xtl::reference_counter, public xtl::dynamic_cast_root
           fired            = false;
         }
 
-        void operator () ()
+        void operator () (bool update_after_pause)
         {
           size_t current_time = common::milliseconds ();
 
-          accumulated_time += current_time - previous_time;
+          if (!update_after_pause)
+            accumulated_time += current_time - previous_time;
 
           previous_time = current_time;
 
@@ -154,7 +171,7 @@ class ActionQueue: public xtl::reference_counter, public xtl::dynamic_cast_root
     };
 
   private:
-    typedef xtl::signal<void ()> ActionQueueSignal;
+    typedef xtl::signal<void (bool)> ActionQueueSignal;
 
   private:
     ActionQueueSignal    signal;          //сигнал обработки таймеров
@@ -179,6 +196,8 @@ void bind_common_action_queue (script::Environment& environment)
   lib.Register ("CreateEventHandler",   make_callback_invoker<ActionQueue::EventHandler::signature_type> ());
   lib.Register ("RegisterEventHandler", make_invoker (make_invoker (xtl::implicit_cast<xtl::connection (ActionQueue::*) (float, float, const ActionQueue::EventHandler&)> (&ActionQueue::RegisterEventHandler)),
                                                       make_invoker (xtl::implicit_cast<xtl::connection (ActionQueue::*) (const ActionQueue::EventHandler&)> (&ActionQueue::RegisterEventHandler))));
+  lib.Register ("Pause",                make_invoker (&ActionQueue::Pause));
+  lib.Register ("Resume",               make_invoker (&ActionQueue::Resume));
 
     //регистрация типов данных
 
