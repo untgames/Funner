@@ -1,16 +1,35 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include <xtl/string.h>
+
 #include <media/image.h>
 
 using namespace media;
 
+const char* BLEND_3_FRAMES = "-3_frames_blending";
+
+//??????? ƒоработать проверку входных данных; квадратные выходные картинки; квадратные входные картинки
+
 int main (int argc, char *argv[])
 {
-  if (argc != 6)
+  if ((argc != 6) && (argc != 7))
   {
-    printf ("Usage: animation_enhancer source_animation target_animation animation_width animation_height new_frames_between_two_frames\n");
+    printf ("Usage: animation_enhancer source_animation target_animation animation_width animation_height new_frames_between_two_frames [%s]\n", BLEND_3_FRAMES);
     return 1;
+  }
+
+  bool use_3_frames_blending = false;
+
+  if (argc == 7)
+  {
+    if (!xtl::xstrcmp (argv [6], BLEND_3_FRAMES))
+      use_3_frames_blending = true;
+    else
+    {
+      printf ("Invalid 6 parameter\nUsage: animation_enhancer source_animation target_animation animation_width animation_height new_frames_between_two_frames [%s]\n", BLEND_3_FRAMES);
+      return 1;
+    }
   }
 
   int animation_width               = atoi (argv [3]),
@@ -45,35 +64,82 @@ int main (int argc, char *argv[])
 
     size_t image_bpp = get_bytes_per_pixel (source_animation.Format ());
 
-    for (size_t i = 0, base_frame = 0; i < target_frames_count; i++)
+    if (!use_3_frames_blending)
     {
-      size_t next_frame = base_frame + 1;
-
-      if (next_frame == source_animation.Width () / animation_width)
-        next_frame = 0;
-
-      size_t frame1_x = base_frame * animation_width,
-             frame1_y = 0,
-             frame2_x = next_frame * animation_width,
-             frame2_y = 0,
-             target_x = i * animation_width,
-             target_y = 0;
-
-      float frame1_weight = 1.f - (i % (new_frames_between_two_frames + 1)) / (float)(new_frames_between_two_frames + 1),
-            frame2_weight = 1.f - frame1_weight;
-
-      for (int j = 0; j < animation_height; j++)
+      for (size_t i = 0, base_frame = 0; i < target_frames_count; i++)
       {
-        unsigned char *frame1_data = (unsigned char*)source_animation.Bitmap () + source_animation.Width () * (frame1_y + j) * image_bpp + frame1_x * image_bpp,
-                      *frame2_data = (unsigned char*)source_animation.Bitmap () + source_animation.Width () * (frame2_y + j) * image_bpp + frame2_x * image_bpp,
-                      *target_data = (unsigned char*)target_animation.Bitmap () + target_animation.Width () * (target_y + j) * image_bpp + target_x * image_bpp;
+        size_t next_frame = base_frame + 1;
 
-        for (size_t k = 0; k < animation_width * image_bpp; k++, frame1_data++, frame2_data++, target_data++)
-          *target_data = (unsigned char)(*frame1_data * frame1_weight + *frame2_data * frame2_weight);
+        if (next_frame == source_animation.Width () / animation_width)
+          next_frame = 0;
+
+        size_t frame1_x = base_frame * animation_width,
+               frame1_y = 0,
+               frame2_x = next_frame * animation_width,
+               frame2_y = 0,
+               target_x = i * animation_width,
+               target_y = 0;
+
+        float frame1_weight = 1.f - (i % (new_frames_between_two_frames + 1)) / (float)(new_frames_between_two_frames + 1),
+              frame2_weight = 1.f - frame1_weight;
+
+        for (int j = 0; j < animation_height; j++)
+        {
+          unsigned char *frame1_data = (unsigned char*)source_animation.Bitmap () + source_animation.Width () * (frame1_y + j) * image_bpp + frame1_x * image_bpp,
+                        *frame2_data = (unsigned char*)source_animation.Bitmap () + source_animation.Width () * (frame2_y + j) * image_bpp + frame2_x * image_bpp,
+                        *target_data = (unsigned char*)target_animation.Bitmap () + target_animation.Width () * (target_y + j) * image_bpp + target_x * image_bpp;
+
+          for (size_t k = 0; k < animation_width * image_bpp; k++, frame1_data++, frame2_data++, target_data++)
+            *target_data = (unsigned char)(*frame1_data * frame1_weight + *frame2_data * frame2_weight);
+        }
+
+        if (!((i + 1) % (new_frames_between_two_frames + 1)))
+          base_frame++;
       }
+    }
+    else
+    {
+      for (size_t i = 0, base_frame = source_animation.Width () / animation_width - 1; i < target_frames_count; i++)
+      {
+        size_t second_frame = base_frame + 1,
+               third_frame  = base_frame + 2;
 
-      if (!((i + 1) % (new_frames_between_two_frames + 1)))
-        base_frame++;
+        if (second_frame == source_animation.Width () / animation_width)
+        {
+          second_frame = 0;
+          third_frame  = 1;
+        }
+
+        if (third_frame == source_animation.Width () / animation_width)
+          third_frame = 0;
+
+        size_t frame1_x = base_frame * animation_width,
+               frame1_y = 0,
+               frame2_x = second_frame * animation_width,
+               frame2_y = 0,
+               frame3_x = third_frame * animation_width,
+               frame3_y = 0,
+               target_x = i * animation_width,
+               target_y = 0;
+
+        float frame2_weight = (1.f - (i % (new_frames_between_two_frames + 1)) / (float)(new_frames_between_two_frames + 1)) * 0.2f + 0.4f,
+              frame1_weight = (1.f - (i % (new_frames_between_two_frames + 1)) / (float)(new_frames_between_two_frames + 1)) * 0.4f,
+              frame3_weight = 1.f - frame1_weight - frame2_weight;
+
+        for (int j = 0; j < animation_height; j++)
+        {
+          unsigned char *frame1_data = (unsigned char*)source_animation.Bitmap () + source_animation.Width () * (frame1_y + j) * image_bpp + frame1_x * image_bpp,
+                        *frame2_data = (unsigned char*)source_animation.Bitmap () + source_animation.Width () * (frame2_y + j) * image_bpp + frame2_x * image_bpp,
+                        *frame3_data = (unsigned char*)source_animation.Bitmap () + source_animation.Width () * (frame3_y + j) * image_bpp + frame3_x * image_bpp,
+                        *target_data = (unsigned char*)target_animation.Bitmap () + target_animation.Width () * (target_y + j) * image_bpp + target_x * image_bpp;
+
+          for (size_t k = 0; k < animation_width * image_bpp; k++, frame1_data++, frame2_data++, frame3_data++, target_data++)
+            *target_data = (unsigned char)(*frame1_data * frame1_weight + *frame2_data * frame2_weight + *frame3_data * frame3_weight);
+        }
+
+        if (!((i + 1) % (new_frames_between_two_frames + 1)))
+          base_frame++;
+      }
     }
 
     target_animation.Save (argv [2]);
