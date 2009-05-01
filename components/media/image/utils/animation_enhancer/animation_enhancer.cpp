@@ -1,5 +1,8 @@
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
+
+#include <stl/algorithm>
 
 #include <xtl/string.h>
 
@@ -9,7 +12,29 @@ using namespace media;
 
 const char* BLEND_3_FRAMES = "-3_frames_blending";
 
-//??????? Доработать проверку входных данных; квадратные выходные картинки; квадратные входные картинки
+//??????? Доработать проверку входных данных; квадратные входные картинки
+
+size_t optimal_rows_count (size_t frame_width, size_t frame_height, size_t frames_count)
+{
+  size_t optimal_rows_count = 1,
+         max_side = stl::max (frame_width * frames_count, frame_height);
+
+  for (size_t rows_count = 2; rows_count <= frames_count; rows_count++)
+  {
+    if ((rows_count * (size_t)ceil (frames_count / (float)rows_count)) != frames_count)
+      continue;
+
+    size_t current_max_side = stl::max (frame_height * rows_count, (size_t)(frame_width * ceil (frames_count / (float)rows_count)));
+
+    if (current_max_side < max_side)
+    {
+      max_side           = current_max_side;
+      optimal_rows_count = rows_count;
+    }
+  }
+
+  return optimal_rows_count;
+}
 
 int main (int argc, char *argv[])
 {
@@ -58,9 +83,11 @@ int main (int argc, char *argv[])
       return 1;
     }
 
-    size_t target_frames_count = source_animation.Width () / animation_width * (new_frames_between_two_frames + 1);
+    size_t target_frames_count  = source_animation.Width () / animation_width * (new_frames_between_two_frames + 1),
+           target_rows_count    = optimal_rows_count (animation_width, animation_height, target_frames_count),
+           target_columns_count = (size_t)ceil (target_frames_count / (float)target_rows_count);
 
-    Image target_animation (animation_width * target_frames_count, animation_height, 1, source_animation.Format ());
+    Image target_animation (animation_width * target_columns_count, animation_height * target_rows_count, 1, source_animation.Format ());
 
     size_t image_bpp = get_bytes_per_pixel (source_animation.Format ());
 
@@ -77,8 +104,8 @@ int main (int argc, char *argv[])
                frame1_y = 0,
                frame2_x = next_frame * animation_width,
                frame2_y = 0,
-               target_x = i * animation_width,
-               target_y = 0;
+               target_x = (i % target_columns_count) * animation_width,
+               target_y = (i / target_columns_count) * animation_height;
 
         float frame1_weight = 1.f - (i % (new_frames_between_two_frames + 1)) / (float)(new_frames_between_two_frames + 1),
               frame2_weight = 1.f - frame1_weight;
@@ -119,8 +146,8 @@ int main (int argc, char *argv[])
                frame2_y = 0,
                frame3_x = third_frame * animation_width,
                frame3_y = 0,
-               target_x = i * animation_width,
-               target_y = 0;
+               target_x = (i % target_columns_count) * animation_width,
+               target_y = (i / target_columns_count) * animation_height;
 
         float frame2_weight = (1.f - (i % (new_frames_between_two_frames + 1)) / (float)(new_frames_between_two_frames + 1)) * 0.2f + 0.4f,
               frame1_weight = (1.f - (i % (new_frames_between_two_frames + 1)) / (float)(new_frames_between_two_frames + 1)) * 0.4f,
