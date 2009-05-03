@@ -286,21 +286,21 @@ class DevILComponent
     //загрузка компонента
     DevILComponent ()
     {
-      ilInit       ();
-      iluInit      ();
-      ilEnable     (IL_FILE_OVERWRITE);
-      ilEnable     (IL_ORIGIN_SET);
-      ilOriginFunc (IL_ORIGIN_LOWER_LEFT);
+      ilSetMemory (&devil_allocate, &devil_deallocate); //Необходимо вызывать до вызова ilInit ();
 
-      ilSetMemory (&devil_allocate, &devil_deallocate);
-
-        //!!!!Временный хак!!!! (https://unt.game-host.org/trac/funner/ticket/31)
+      //!!!!Временный хак!!!! (https://unt.game-host.org/trac/funner/ticket/31)
       FileSystem::SetDefaultFileBufferSize (0);
 
       ilSetRead  (&devil_file_open_read_only, &devil_file_close, &devil_file_eof, &devil_file_getc,
                   &devil_file_read, &devil_file_seek, &devil_file_tell);
       ilSetWrite (&devil_file_open_write_only, &devil_file_close, &devil_file_putc, &devil_file_seek,
                   &devil_file_tell, &devil_file_write);
+
+      ilInit       ();
+      iluInit      ();
+      ilEnable     (IL_FILE_OVERWRITE);
+      ilEnable     (IL_ORIGIN_SET);
+      ilOriginFunc (IL_ORIGIN_LOWER_LEFT);
 
       ImageManager::RegisterLoader ("jpg",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("png",     &Image::DefaultLoader);
