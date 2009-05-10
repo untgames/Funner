@@ -34,7 +34,6 @@ struct Window::Impl
             break;
           default:
             throw xtl::make_argument_exception ("syslib::Window::Impl::Init", "style", in_style);
-            return;
         }
 
         if (handle)

@@ -491,7 +491,6 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       break;
     default:
       throw xtl::make_argument_exception ("syslib::Win32Platform::CreateWindow", "style", style);
-      return 0;
   }
 
   try
