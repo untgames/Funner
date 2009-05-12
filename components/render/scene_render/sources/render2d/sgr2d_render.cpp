@@ -149,7 +149,15 @@ void Render::LoadMaterialLibrary (const char* file_name)
       media::rfx::SpriteMaterial*   sprite_material = dynamic_cast<media::rfx::SpriteMaterial*> (&*material);
 
       if (sprite_material)
+      {
         InsertMaterial (library.ItemId (iter), sprite_material);
+
+        //предзагрузка текстуры
+
+        RenderQueryPtr query;
+
+        GetTexture (sprite_material->Image (), sprite_material->BlendMode () == media::rfx::SpriteBlendMode_AlphaClamp ? true : false, query); //???? не загружается альфа текстур текста
+      }
     }
   }
   catch (xtl::exception& exception)
