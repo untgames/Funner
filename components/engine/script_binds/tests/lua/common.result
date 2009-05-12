@@ -2,3 +2,5 @@ Results of common_test:
 Test library:
 File data: 'Hello world!'
 Filtered file data: 'Hello world!Hello world!Hello world!'
+File 'data/text_file.txt' exist
+File 'data/not_existing_file.txt' not exist
