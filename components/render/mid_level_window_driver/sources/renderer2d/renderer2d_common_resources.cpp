@@ -15,7 +15,7 @@ const char* LOG_NAME = "render.mid_level.window_driver.renderer2d.Renderer"; //и
 
 /*const char* PIXEL_SHADER =
 "uniform sampler2D texture; varying vec4 color; void main (void) {gl_FragColor = vec4 (vec3 (texture2D (texture, vec2 (gl_TexCoord[0]))), color.w);}";
-const char* VERTEX_SHADER = 
+const char* VERTEX_SHADER =
 "uniform mat4 currentViewMatrix; uniform mat4 currentProjMatrix; varying vec4 color; void main (void) {gl_Position = currentViewMatrix * currentProjMatrix * gl_Vertex; gl_TexCoord[0] = gl_MultiTexCoord0; color = gl_Color;}";
 
     ShaderDesc shader_descs [] = {
@@ -112,7 +112,7 @@ DepthStencilStatePtr create_depth_stencil_state (IDevice& device, bool depth_wri
 void shader_error_log (const char* message)
 {
   static common::Log log (LOG_NAME);
-  
+
   log.Print (message);
 }
 
@@ -136,9 +136,9 @@ ProgramPtr create_program (IDevice& device, const char* shader_name, const char*
 ProgramParametersLayoutPtr create_program_parameters (IDevice& device)
 {
   ProgramParameter program_parameters [3];
-  
+
   memset (program_parameters, 0, sizeof (program_parameters));
-   
+
   program_parameters [0].name   = "currentViewMatrix";
   program_parameters [0].type   = ProgramParameterType_Float4x4;
   program_parameters [0].slot   = 0;
@@ -150,7 +150,7 @@ ProgramParametersLayoutPtr create_program_parameters (IDevice& device)
   program_parameters [1].slot   = 0;
   program_parameters [1].count  = 1;
   program_parameters [1].offset = offsetof (CommonProgramParameters, projection_matrix);
-  
+
   program_parameters [2].name   = "currentAlphaReference";
   program_parameters [2].type   = ProgramParameterType_Float;
   program_parameters [2].slot   = 1;
@@ -164,7 +164,7 @@ ProgramParametersLayoutPtr create_program_parameters (IDevice& device)
   program_parameters_layout_desc.parameters_count = sizeof (program_parameters) / sizeof (*program_parameters);
   program_parameters_layout_desc.parameters       = program_parameters;
 
-  return ProgramParametersLayoutPtr (device.CreateProgramParametersLayout (program_parameters_layout_desc), false);  
+  return ProgramParametersLayoutPtr (device.CreateProgramParametersLayout (program_parameters_layout_desc), false);
 }
 
 //создание сэмплера
@@ -177,8 +177,8 @@ SamplerStatePtr create_sampler (IDevice& device)
   sampler_desc.min_filter           = TexMinFilter_LinearMipLinear;
   sampler_desc.mag_filter           = TexMagFilter_Linear;
   sampler_desc.max_anisotropy       = 1;
-  sampler_desc.wrap_u               = TexcoordWrap_Repeat;
-  sampler_desc.wrap_v               = TexcoordWrap_Repeat;
+  sampler_desc.wrap_u               = TexcoordWrap_Clamp;
+  sampler_desc.wrap_v               = TexcoordWrap_Clamp;
   sampler_desc.comparision_function = CompareMode_AlwaysPass;
   sampler_desc.min_lod              = 0;
   sampler_desc.max_lod              = FLT_MAX;
@@ -191,7 +191,7 @@ InputLayoutPtr create_input_layout (IDevice& device)
 {
   VertexAttribute attributes [3];
 
-  memset (attributes, 0, sizeof (attributes));      
+  memset (attributes, 0, sizeof (attributes));
 
   attributes [0].semantic = VertexAttributeSemantic_Position;
   attributes [0].format   = InputDataFormat_Vector3;
@@ -236,7 +236,7 @@ CommonResources::CommonResources (IDevice* device)
     //создание состояний входного уровня
 
   input_layout = create_input_layout (*device);
- 
+
     //создание состояний уровня шейдинга
 
   default_program = create_program (*device, "render.mid_level.window_driver.renderer2d.Renderer.default_program",
@@ -247,10 +247,10 @@ CommonResources::CommonResources (IDevice* device)
 
   program_parameters_layout = create_program_parameters (*device);
 
-  sampler = create_sampler (*device);  
+  sampler = create_sampler (*device);
 
     //создание состояний выходного уровня
-    
+
 //При переносе выше CreateProgram бленд стейты не работают!!!!!!!    ?????
 
   blend_states [BlendMode_None]        = create_blend_state (*device);
@@ -260,11 +260,11 @@ CommonResources::CommonResources (IDevice* device)
   blend_states [BlendMode_AlphaClamp]  = blend_states [BlendMode_None];
 
   depth_stencil_states [0] = create_depth_stencil_state (*device, false);
-  depth_stencil_states [1] = create_depth_stencil_state (*device, true);    
+  depth_stencil_states [1] = create_depth_stencil_state (*device, true);
 }
 
-render::low_level::IDepthStencilState* CommonResources::GetDepthStencilState (bool depth_write_enabled) 
-{ 
-  if (depth_write_enabled) return depth_stencil_states[1].get (); 
-  else                     return depth_stencil_states[0].get (); 
+render::low_level::IDepthStencilState* CommonResources::GetDepthStencilState (bool depth_write_enabled)
+{
+  if (depth_write_enabled) return depth_stencil_states[1].get ();
+  else                     return depth_stencil_states[0].get ();
 }
