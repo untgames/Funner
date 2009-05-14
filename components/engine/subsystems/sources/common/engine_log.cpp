@@ -49,12 +49,16 @@ class LogSubsystem : public ISubsystem, public xtl::reference_counter
 
           for (ParseNamesakeIterator iter = file_node.First ("OutputFormat"); iter; ++iter)
           {
-            const char *filter      = get<const char*> (*iter, "Filter"),
-                       *replacement = get<const char*> (*iter, "Replacement");
+            const char *replacement = get<const char*> (*iter, "Replacement");
 
             size_t sort_order = get<size_t> (*iter, "SortOrder", ~0);
 
-            output_file.AddFilter (filter, replacement, sort_order);
+            for (ParseNamesakeIterator filter_iter = iter->First ("Filter"); filter_iter; ++filter_iter)
+            {
+              const char *wildcard = get<const char*> (*filter_iter, "Wildcard");
+
+              output_file.AddFilter (wildcard, replacement, sort_order);
+            }
           }
         }
       }
@@ -130,6 +134,7 @@ class LogComponent
       }
       catch (xtl::exception& e)
       {
+        printf ("Exception at engine::LogComponent::StartupHandler: '%s'\n", e.what ());
         e.touch ("engine::LogComponent::StartupHandler");
         throw;
       }
