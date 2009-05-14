@@ -5,123 +5,125 @@ Create depth-stencil-buffer 800x600 (id=5)
 Create frame-buffer (id=3)
 Create 2D renderer (id=2)
 data/materials.xmtl(1): warning: not yet implement. Encoding='utf-8'
-Create frame2d (id=7)
-Create primitive (id=8)
-Create texture 256x512 format=PixelFormat_RGBA8 (id=9)
-Create depth-stencil-buffer 256x512 (id=10)
+Create texture 171x128 format=PixelFormat_RGB8 (id=6)
+Create texture 256x512 format=PixelFormat_RGBA8 (id=7)
+Create depth-stencil-buffer 256x512 (id=8)
 Create dynamic render target. Query='test_query'
-Create frame2d (id=12)
+Create frame2d (id=10)
+Create primitive (id=11)
+Create frame2d (id=13)
 Begin draw frames (id=2, frame_id=0)
-Begin draw frame (id=11)
-Set render targets: render-target=9, depth-stencil-target=10
+Begin draw frame (id=12)
+Set render targets: render-target=7, depth-stencil-target=8
 Clear render target [0.00 0.00 0.00 0.00]
 Clear depth-stencil target [1.000 0]
-End draw frame (id=11)
-Begin draw frame (id=12)
-Set render targets: render-target=9, depth-stencil-target=10
+End draw frame (id=12)
+Begin draw frame (id=13)
+Set render targets: render-target=7, depth-stencil-target=8
 Set viewport (left=0, top=0, width=256, height=512)
 Projection matrix=[[2.00 0.00 0.00] [-1.00 0.00 2.00] [0.00 -1.00 0.00] [0.00 2.00 -1.00]]
 View point=[0.00 0.00 0.00]
-Draw primitive (id=8)
-  texture_id=9
+Draw primitive (id=11)
+  texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
     sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
-Draw primitive (id=8)
-  texture_id=9
+Draw primitive (id=11)
+  texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
     sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
-Draw primitive (id=8)
-  texture_id=9
+Draw primitive (id=11)
+  texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
     sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
-End draw frame (id=12)
-Begin draw frame (id=11)
-Set render targets: render-target=9, depth-stencil-target=10
+End draw frame (id=13)
+Begin draw frame (id=12)
+Set render targets: render-target=7, depth-stencil-target=8
 Clear render target [0.00 0.00 0.00 0.00]
 Clear depth-stencil target [1.000 0]
-End draw frame (id=11)
-Begin draw frame (id=12)
-Set render targets: render-target=9, depth-stencil-target=10
+End draw frame (id=12)
+Begin draw frame (id=13)
+Set render targets: render-target=7, depth-stencil-target=8
 Set viewport (left=0, top=0, width=256, height=512)
 Projection matrix=[[2.00 0.00 0.00] [-1.00 0.00 2.00] [0.00 -1.00 0.00] [0.00 2.00 -1.00]]
 View point=[0.00 0.00 0.00]
-Draw primitive (id=8)
-  texture_id=9
+Draw primitive (id=11)
+  texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
     sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
-Draw primitive (id=8)
-  texture_id=9
+Draw primitive (id=11)
+  texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
     sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
-Draw primitive (id=8)
-  texture_id=9
+Draw primitive (id=11)
+  texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
     sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
-End draw frame (id=12)
-Begin draw frame (id=11)
-Set render targets: render-target=9, depth-stencil-target=10
+End draw frame (id=13)
+Begin draw frame (id=12)
+Set render targets: render-target=7, depth-stencil-target=8
 Clear render target [0.00 0.00 0.00 0.00]
 Clear depth-stencil target [1.000 0]
-End draw frame (id=11)
-Begin draw frame (id=12)
-Set render targets: render-target=9, depth-stencil-target=10
+End draw frame (id=12)
+Begin draw frame (id=13)
+Set render targets: render-target=7, depth-stencil-target=8
 Set viewport (left=0, top=0, width=256, height=512)
 Projection matrix=[[2.00 0.00 0.00] [-1.00 0.00 2.00] [0.00 -1.00 0.00] [0.00 2.00 -1.00]]
 View point=[0.00 0.00 0.00]
-Draw primitive (id=8)
-  texture_id=9
+Draw primitive (id=11)
+  texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
     sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
-Draw primitive (id=8)
-  texture_id=9
+Draw primitive (id=11)
+  texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
     sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
-Draw primitive (id=8)
-  texture_id=9
+Draw primitive (id=11)
+  texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
     sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
-End draw frame (id=12)
-Begin draw frame (id=6)
+End draw frame (id=13)
+Begin draw frame (id=9)
 Set render targets: render-target=4, depth-stencil-target=5
 Clear render target [0.00 0.00 0.00 0.00]
 Clear depth-stencil target [1.000 0]
-End draw frame (id=6)
-Begin draw frame (id=7)
+End draw frame (id=9)
+Begin draw frame (id=10)
 Set render targets: render-target=4, depth-stencil-target=5
 Set viewport (left=0, top=0, width=800, height=600)
 Projection matrix=[[2.00 0.00 0.00] [-1.00 0.00 2.00] [0.00 -1.00 0.00] [0.00 2.00 -1.00]]
 View point=[0.00 0.00 0.00]
-Draw primitive (id=8)
-  texture_id=9
+Draw primitive (id=11)
+  texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
     sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
-End draw frame (id=7)
+End draw frame (id=10)
 End draw frames (id=2, frame_id=0)
-Destroy frame2d (id=7)
-Destroy frame2d (id=12)
-Destroy depth-stencil-buffer (id=10)
-Destroy primitive (id=8)
-Destroy texture2d (id=9)
+Destroy frame2d (id=10)
+Destroy frame2d (id=13)
+Destroy texture2d (id=6)
+Destroy depth-stencil-buffer (id=8)
+Destroy primitive (id=11)
+Destroy texture2d (id=7)
 Destroy 2D renderer (id=2)
 Destroy frame-buffer (id=3)
 Destroy depth-stencil-buffer (id=5)

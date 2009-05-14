@@ -71,7 +71,7 @@ int main ()
 
       //отрисовка
 
-    render_target.Update ();
+    render_target.Update ();    
   }
   catch (std::exception& exception)
   {
