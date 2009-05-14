@@ -85,7 +85,7 @@ struct LogFile::Impl
               time (&current_time);
 
               tm *converted_time = localtime (&current_time);
-              
+
               xtl::to_string (temp_string, converted_time->tm_mon + 1);
               print_message.append (temp_string);
             }
@@ -94,7 +94,7 @@ struct LogFile::Impl
               time (&current_time);
 
               tm *converted_time = localtime (&current_time);
-                            
+
               xtl::to_string (temp_string, converted_time->tm_year - 100);
               print_message.append (temp_string);
             }
@@ -102,8 +102,8 @@ struct LogFile::Impl
             {
               time (&current_time);
 
-              tm *converted_time = localtime (&current_time);                           
-              
+              tm *converted_time = localtime (&current_time);
+
               xtl::to_string (temp_string, converted_time->tm_hour);
               print_message.append (temp_string);
             }
@@ -111,20 +111,20 @@ struct LogFile::Impl
             {
               time (&current_time);
 
-              tm *converted_time = localtime (&current_time);                           
-                            
+              tm *converted_time = localtime (&current_time);
+
               xtl::to_string (temp_string, converted_time->tm_min);
               print_message.append (temp_string);
-            }  
+            }
             else if (!xtl::xstrcmp ("seconds", iter->replacement_components[i].replacement_tag.c_str ()))
             {
               time (&current_time);
 
-              tm *converted_time = localtime (&current_time);                           
-                            
+              tm *converted_time = localtime (&current_time);
+
               xtl::to_string (temp_string, converted_time->tm_sec);
               print_message.append (temp_string);
-            }  
+            }
             else
             {
               if (iter->replacement_components[i].replacement_tag.empty ())
@@ -170,9 +170,13 @@ struct LogFile::Impl
       filter_index = filter_pool.back ();
       filter_pool.pop_back ();
 
-      LogFiltersSet::iterator insert_result = log_filters.insert (LogFilter (filter_index, sort_order, replace_mask)).first;
+      stl::pair <LogFiltersSet::iterator, bool> insert_result = log_filters.insert (LogFilter (filter_index, sort_order, replace_mask));
 
-      current_replacement_array = (ReplacementComponentsArray*)&(insert_result->replacement_components);
+      if (!insert_result.second)
+        throw xtl::format_operation_exception ("common::LogFile::AddFilter", "Can't add filter with mask '%s', replacement '%s' and sort order %u",
+                                               replace_mask, replacement, sort_order);
+
+      current_replacement_array = (ReplacementComponentsArray*)&(insert_result.first->replacement_components);
 
       parse_format_string (replacement, xtl::bind (&LogFile::Impl::ProcessReplacementTag, this, _1, _2));
 
@@ -184,7 +188,7 @@ struct LogFile::Impl
       LogFiltersSet::iterator filter = FindFilter (filter_index);
 
       if (filter == log_filters.end ())
-        throw xtl::make_argument_exception ("LogFilter::SetFilter", "filter_index", filter_index);
+        throw xtl::make_argument_exception ("common::LogFile::SetFilter", "filter_index", filter_index);
 
       log_filters.erase (filter);
 
@@ -246,11 +250,14 @@ struct LogFile::Impl
 
       bool operator < (const LogFilter& right) const
       {
+        if (sort_order == right.sort_order)
+          return index < right.index;
+
         return sort_order < right.sort_order;
       }
 
-      LogFilter (size_t in_index, size_t in_sort_order, const char* in_replace_mask) 
-        : index (in_index), sort_order (in_sort_order), replace_mask (in_replace_mask) 
+      LogFilter (size_t in_index, size_t in_sort_order, const char* in_replace_mask)
+        : index (in_index), sort_order (in_sort_order), replace_mask (in_replace_mask)
         {}
     };
 
