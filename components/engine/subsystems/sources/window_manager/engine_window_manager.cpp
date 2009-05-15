@@ -121,6 +121,8 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));
         throw;
       }
+      
+      window.RegisterEventHandler (syslib::WindowEvent_OnKeyDown, xtl::bind (&Window::OnTest, this));
     }
 
 ///Деструктор
@@ -131,11 +133,18 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this));
       AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));
     }
+    
+    void OnTest ()
+    {
+      printf ("TEST!\n");
+      window.SetStyle ((syslib::WindowStyle)!window.Style ());
+      printf ("TEST out!\n");      
+    }
 
 ///Обработчик события регистрации окна
     void OnRegisterAttachment (const char* attachment_name, syslib::Window& in_window)
     {
-      if (!parent_window_name.empty () && attachment_name != parent_window_name)
+      if (parent_window_name.empty () || attachment_name != parent_window_name)
         return;
 
       window.SetParentHandle (in_window.Handle ());
@@ -143,7 +152,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
     void OnUnregisterAttachment (const char* attachment_name, syslib::Window&)
     {
-      if (!parent_window_name.empty () && attachment_name != parent_window_name)
+      if (parent_window_name.empty () || attachment_name != parent_window_name)
         return;
 
       window.SetParentHandle (0);
@@ -152,7 +161,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 ///Обработчик события регистрации курсора
     void OnRegisterAttachment (const char* attachment_name, input::Cursor& in_cursor)
     {
-      if (!cursor_attachment_name.empty () && cursor_attachment_name != attachment_name)
+      if (cursor_attachment_name.empty () || cursor_attachment_name != attachment_name)
         return;
 
       BindCursor (&in_cursor);
@@ -160,7 +169,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
     void OnUnregisterAttachment (const char* attachment_name, input::Cursor&)
     {
-      if (!cursor_attachment_name.empty () && cursor_attachment_name != attachment_name)
+      if (cursor_attachment_name.empty () || cursor_attachment_name != attachment_name)
         return;
 
       BindCursor (0);

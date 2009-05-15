@@ -30,13 +30,13 @@ ENGINE.SUBSYSTEMS.TESTS.COMPILER_DEFINES    :=
 ENGINE.SUBSYSTEMS.TESTS.IMPORTS             := ../core/compile.static.mak ../../common/compile.static.mak ../../system/compile.static.mak \
                                                ../../render/scene_render/compile.static.mak ../../input/manager/compile.static.mak \
                                                scene_render.link.static.mak scene_player.link.static.mak \
-                                                input_manager.link.static.mak shell.link.static.mak log.link.static.mak \
+                                                input_manager.link.static.mak shell.link.static.mak log.link.static.mak file_system.link.static.mak \
                                                ../../input/manager/xkeymap.link.static.mak ../../input/manager/xkeyreg.link.static.mak \
                                                ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
                                                ../../script/lua/link.static.mak ../script_binds/math.link.static.mak ../script_binds/sg.link.static.mak \
                                                ../script_binds/render.link.static.mak ../script_binds/engine.link.static.mak \
                                                ../script_binds/input.link.static.mak ../script_binds/system.link.static.mak \
-                                                ../../media/rms/link.static.mak
+                                                ../../media/rms/link.static.mak 
 ENGINE.SUBSYSTEMS.TESTS.has_windows.IMPORTS := ../../render/opengl_driver/link.static.mak window_input_driver.link.static.mak \
                                                window_manager.link.static.mak window_renderer.link.static.mak
 ENGINE.SUBSYSTEMS.TESTS.win32.IMPORTS       := ../../input/direct_input_driver/link.static.mak

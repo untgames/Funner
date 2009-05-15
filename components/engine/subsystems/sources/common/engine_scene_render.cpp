@@ -44,7 +44,8 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
         attached_resource_manager (0),
         render (get<const char*> (node, "DriverMask"), get<const char*> (node, "RendererMask"), get<const char*> (node, "RenderPathMasks", "*")),
         log (LOG_NAME),
-        idle_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&SceneRenderSubsystem::OnIdle, this)))
+        idle_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&SceneRenderSubsystem::OnIdle, this))),
+        screen (0)
     {
       try
       {
@@ -135,6 +136,8 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
         return;
 
       render.RenderTarget (iter->second).SetScreen (&screen);
+      
+      this->screen = &screen;
     }
 
     void OnUnregisterAttachment (const char* attachment_name, render::Screen&)
@@ -145,6 +148,8 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
         return;
 
       render.RenderTarget (iter->second).SetScreen (0);
+
+      this->screen = 0;            
     }
 
 ///Управление ресурсами
@@ -206,7 +211,18 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
     void OnIdle ()
     {
-      for (RenderTargetArray::iterator iter=idle_render_targets.begin (); iter!=idle_render_targets.end ();)
+      for (size_t i=0; i<render.RenderTargetsCount (); i++)
+      {
+        if (!render.RenderTarget (i).Screen ())
+        {
+          printf ("set screen=%p\n", screen);
+          render.RenderTarget (i).SetScreen (screen);
+        }
+        
+        render.RenderTarget (i).Update ();      
+      }
+      
+/*      for (RenderTargetArray::iterator iter=idle_render_targets.begin (); iter!=idle_render_targets.end ();)
       {
         if (!iter->IsBindedToRender ()) //если цель рендеринга удалена - удаляем её из списка отрисовки
         {
@@ -225,7 +241,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
         //если все цели рендеринга удалены - перерисовывать нечего
       
       if (idle_render_targets.empty ())
-        idle_connection.disconnect ();
+        idle_connection.disconnect ();*/
     }
 
   private:
@@ -245,6 +261,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     Log                          log;                        //лог
     xtl::auto_connection         idle_connection;            //соединение обновления рендер-таргетов
     RenderTargetArray            idle_render_targets;        //список автоматически обновляемых целей рендеринга
+    render::Screen* screen;
 };
 
 /*
