@@ -52,7 +52,7 @@ template <class Signature> class slot_impl: public connection_impl
         wait_next_slot = new_next_slot;
         return;
       }
-
+    
         //захватываем слот
 
       addref ();
@@ -91,7 +91,7 @@ template <class Signature> class slot_impl: public connection_impl
     void disconnect ()
     {
       if (prev_slot == this)
-        return;
+        return;                
         
       connect (this);        
     }
@@ -113,8 +113,11 @@ template <class Signature> class slot_impl: public connection_impl
     {
       if (!--lock_count && wait_next_slot)
       {
-        connect (wait_next_slot);
+        slot_impl* new_next_slot = wait_next_slot;
+        
         wait_next_slot = 0;
+
+        connect (new_next_slot);
       }
     }
     
