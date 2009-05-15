@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.IMAGE.SOURCES MEDIA.XATLAS.SOURCES MEDIA.LEFT_BOTTOM_PACKER.SOURCES MEDIA.IMAGE.TESTS MEDIA.IMAGE.ANIMATION_ENHANCER
+TARGETS := MEDIA.IMAGE.SOURCES MEDIA.XATLAS.SOURCES MEDIA.LEFT_BOTTOM_PACKER.SOURCES MEDIA.IMAGE.TESTS MEDIA.IMAGE.ANIMATION_ENHANCER MEDIA.IMAGE.SPRITE_COMPOSER
 
 #Цель - Image sources
 MEDIA.IMAGE.SOURCES.TYPE             := static-lib
@@ -49,10 +49,11 @@ MEDIA.IMAGE.TESTS.IMPORTS          := compile.static.mak link.static.mak xatlas.
 #Цель - Animation enhancer sources
 MEDIA.IMAGE.ANIMATION_ENHANCER.TYPE             := application
 MEDIA.IMAGE.ANIMATION_ENHANCER.NAME             := animation_enhancer
-MEDIA.IMAGE.ANIMATION_ENHANCER.INCLUDE_DIRS     :=
 MEDIA.IMAGE.ANIMATION_ENHANCER.SOURCE_DIRS      := utils/animation_enhancer
-MEDIA.IMAGE.ANIMATION_ENHANCER.LIB_DIRS         :=  
-MEDIA.IMAGE.ANIMATION_ENHANCER.LIBS             :=
-MEDIA.IMAGE.ANIMATION_ENHANCER.COMPILER_CFLAGS  :=
-MEDIA.IMAGE.ANIMATION_ENHANCER.COMPILER_DEFINES :=
 MEDIA.IMAGE.ANIMATION_ENHANCER.IMPORTS          := compile.static.mak link.static.mak
+
+#Цель - Sprite composer sources
+MEDIA.IMAGE.SPRITE_COMPOSER.TYPE             := application
+MEDIA.IMAGE.SPRITE_COMPOSER.NAME             := sprite_composer
+MEDIA.IMAGE.SPRITE_COMPOSER.SOURCE_DIRS      := utils/sprite_composer
+MEDIA.IMAGE.SPRITE_COMPOSER.IMPORTS          := compile.static.mak link.static.mak
