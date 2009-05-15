@@ -17,7 +17,7 @@ void self_disconnect (int index)
 
 int main ()
 {
-  printf ("Results of slot_self_deletion:\n");
+  printf ("Results of slot_self_deletion1:\n");
 
   for (int i=0; i<NUM; i++)
     self_destroy_connections [i] = self_destroy_signals [i].connect (&self_disconnect);    
