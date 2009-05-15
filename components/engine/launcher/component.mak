@@ -33,7 +33,7 @@ ENGINE.LAUNCHER.SOURCES.IMPORTS          := ../core/compile.static.mak \
                                             ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
                                             ../subsystems/scene_render.link.static.mak ../subsystems/scene_player.link.static.mak \
                                             ../subsystems/input_manager.link.static.mak ../subsystems/shell.link.static.mak \
-                                            ../subsystems/log.link.static.mak \
+                                            ../subsystems/log.link.static.mak ../subsystems/file_system.link.static.mak \
                                             ../../system/compile.static.mak
 ENGINE.LAUNCHER.SOURCES.has_windows.IMPORTS := ../../render/opengl_driver/link.static.mak ../subsystems/window_input_driver.link.static.mak \
                                                ../subsystems/window_manager.link.static.mak ../subsystems/window_renderer.link.static.mak
