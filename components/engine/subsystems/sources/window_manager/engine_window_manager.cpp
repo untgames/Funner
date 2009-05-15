@@ -121,8 +121,6 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));
         throw;
       }
-      
-      window.RegisterEventHandler (syslib::WindowEvent_OnKeyDown, xtl::bind (&Window::OnTest, this));
     }
 
 ///Деструктор
@@ -134,13 +132,6 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));
     }
     
-    void OnTest ()
-    {
-      printf ("TEST!\n");
-      window.SetStyle ((syslib::WindowStyle)!window.Style ());
-      printf ("TEST out!\n");      
-    }
-
 ///Обработчик события регистрации окна
     void OnRegisterAttachment (const char* attachment_name, syslib::Window& in_window)
     {
