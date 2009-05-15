@@ -4,10 +4,11 @@
     <Console Filters="engine.*"/>
     <File FileName="/io/stdout" Filters="engine.*" Flush="1">
       <OutputFormat 
-        Filter="*" 
         Replacement="{log}: {message}" 
         SortOrder="1"
-      />
+      >
+        Filter="*" 
+      </OutputFormat>
     </File>
   </Log>
   <Shell Interpreter="lua" Sources="data/shell_scripts/*" Libraries="Math SceneGraph" Execute="main ()"/>
