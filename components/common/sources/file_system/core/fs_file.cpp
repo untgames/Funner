@@ -13,7 +13,7 @@ using namespace stl;
 
 File::File ()
   : impl (ClosedFileImpl::Instance ())
-{  
+{
   FileSystemSingleton::Instance ().RegisterFile (*this);
 }
 
@@ -31,14 +31,20 @@ File::File (const File& file)
 
 File::~File ()
 {
-  if (FileSystemSingleton::IsInitialized ()) //если менеджера файловой системы уже уничтожен регистрация не нужна
-    FileSystemSingleton::Instance ().UnregisterFile (*this);
+  try
+  {
+    if (FileSystemSingleton::IsInitialized ()) //если менеджера файловой системы уже уничтожен регистрация не нужна
+      FileSystemSingleton::Instance ().UnregisterFile (*this);
+  }
+  catch (...)
+  {
+  }
 }
 
 File& File::operator = (const File& file)
 {
   impl = file.impl;
-  
+
   return *this;
 }
 
@@ -111,10 +117,10 @@ size_t File::Read (void* buf,size_t size)
 
   if (!buf)
   {
-    if (size) throw xtl::make_null_argument_exception ("File::Read","buffer");    
+    if (size) throw xtl::make_null_argument_exception ("File::Read","buffer");
     else      return 0;
   }
-    
+
   return impl->Read (buf,size);
 }
 
@@ -148,7 +154,7 @@ filepos_t File::Seek (filepos_t pos,FileSeekMode seek_mode)
 {
   if (!(impl->Mode () & FileMode_Seek))
     throw xtl::format_not_supported_exception ("File::Seek","This file can't be seek");
-    
+
   size_t position = 0;
 
   switch (seek_mode)
@@ -210,7 +216,7 @@ void File::Close ()
   if (impl->IsClosedFileType ())
     return;
 
-  impl->Flush ();    
+  impl->Flush ();
 
   impl = ClosedFileImpl::Instance ();
 }
@@ -246,7 +252,7 @@ size_t FileImpl::Write (const void*,size_t)
 {
   return 0;
 }
-    
+
 filepos_t FileImpl::Tell ()
 {
   return 0;
@@ -276,7 +282,7 @@ bool FileImpl::Eof ()
 {
   return (filepos_t)Size () == Tell ();
 }
-    
+
 void FileImpl::Flush ()
 {
 }
