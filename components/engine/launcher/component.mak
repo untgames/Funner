@@ -18,6 +18,7 @@ ENGINE.LAUNCHER.SOURCES.msvc.LINK_FLAGS  := -subsystem:windows -entry:mainCRTSta
 ENGINE.LAUNCHER.SOURCES.COMPILER_DEFINES := LAUNCHER_VERSION='$(LAUNCHER_VERSION_STRING)'
 ENGINE.LAUNCHER.SOURCES.IMPORTS          := ../core/compile.static.mak \
                                             ../../common/compile.static.mak ../../common/default_console_handler.link.static.mak \
+                                            ../../common/zip_file_system.link.static.mak \
                                             ../../media/rms/link.static.mak ../../media/rfx/xmtl.link.static.mak \
                                             ../../media/sound/snddecl.link.static.mak ../../media/sound/default_decoders.link.static.mak \
                                             ../../media/font/xfont.link.static.mak \

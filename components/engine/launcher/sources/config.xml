@@ -4,10 +4,12 @@
     <Console Filters="*"/>
     <File FileName="log.txt" Filters="*" Flush="1">
       <OutputFormat 
-        Filter="*" 
         Replacement="{log}: {message}" 
         SortOrder="1"
       />
+      >
+        <Filter Wildcard="*"/>
+      </OutputFormat>
     </File>
   </Log>
   <WindowManager>
