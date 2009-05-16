@@ -46,7 +46,6 @@ bool is_file_exist (const char* file_name,StdioFile& file)
 
 }
 
-
 StdioIOSystem::file_t StdioIOSystem::FileOpen (const char* file_name,filemode_t mode,size_t)
 {
   StdioFile* stdio_file = stdio_files;
@@ -64,6 +63,10 @@ StdioIOSystem::file_t StdioIOSystem::FileOpen (const char* file_name,filemode_t 
     }
 
   throw xtl::format_exception<FileNotFoundException> ("common::StdioIOSystem::FileOpen","File '%s' not found",file_name);
+}
+
+void StdioIOSystem::FileClose (file_t)
+{
 }
 
 bool StdioIOSystem::IsFileExist (const char* file_name)
