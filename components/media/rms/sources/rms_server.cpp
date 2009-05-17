@@ -323,7 +323,7 @@ struct Server::Impl: public IResourceDestroyListener, public xtl::trackable
 
     ServerQuery query (*server, &ICustomServer::UnloadResources);
 
-    for (ResourceMap::iterator iter=resources.begin (), end=resources.end (); iter!=end;)
+    for (ResourceMap::iterator iter = resources.begin (), end = resources.end (); iter != end; ++iter)
     {
       Resource& resource = *iter->second;
 
@@ -342,12 +342,7 @@ struct Server::Impl: public IResourceDestroyListener, public xtl::trackable
 
           resource.SetState (ResourceState_Unloaded);
         }
-
-        ++iter;
-
-        release (&resource);
       }
-      else ++iter;
     }
 
     try
@@ -357,6 +352,14 @@ struct Server::Impl: public IResourceDestroyListener, public xtl::trackable
     catch (...)
     {
       //подавление всех исключений
+    }
+
+    for (ResourceMap::iterator iter = resources.begin (), end = resources.end (); iter != end; ++iter)
+    {
+      Resource& resource = *iter->second;
+
+      if (resource.use_count () == 1) //если ресурс находится только в кеше
+        release (&resource);
     }
   }
 };
