@@ -20,7 +20,7 @@ enum EmitterEvent
   EmitterEvent_OnDeactivate,       //излучателя деактивирован
   EmitterEvent_OnUpdateVolume,     //изменена громкость звука
   EmitterEvent_OnUpdateProperties, //изменены параметры излучателя звука
-  
+
   EmitterEvent_Num
 };
 
@@ -122,6 +122,7 @@ class SoundManager
     void  StopSound        (Emitter& emitter);
     float Tell             (Emitter&) const;
     float Duration         (Emitter&) const;
+    bool  IsLooping        (Emitter&) const;
     bool  IsPlaying        (Emitter&) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

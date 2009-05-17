@@ -303,8 +303,9 @@ struct ScenePlayer::Impl
 
       emitter.AddRef ();
 
-      action_queue.SetAction ((size_t)&emitter, size_t(sound_manager->Duration (emitter_iter->second->emitter) * 1000.f + ACTION_QUEUE_PROCESS_MILLISECONDS * 2),
-                              bind (&ScenePlayer::Impl::ProcessPlayingComplete, this, xtl::ref (emitter)));
+      if (!sound_manager->IsLooping (emitter_iter->second->emitter))
+        action_queue.SetAction ((size_t)&emitter, size_t(sound_manager->Duration (emitter_iter->second->emitter) * 1000.f + ACTION_QUEUE_PROCESS_MILLISECONDS * 2),
+                                bind (&ScenePlayer::Impl::StopEmitter, this, xtl::ref (emitter)));
     }
 
     void StopEmitter (SoundEmitter& emitter)
@@ -319,13 +320,9 @@ struct ScenePlayer::Impl
 
       sound_manager->StopSound (emitter_iter->second->emitter);
 
-      emitter_iter->second->is_playing = false;
-    }
-
-    void ProcessPlayingComplete (SoundEmitter& emitter)
-    {
-      StopEmitter (emitter);
       emitter.Release ();
+
+      emitter_iter->second->is_playing = false;
     }
 };
 

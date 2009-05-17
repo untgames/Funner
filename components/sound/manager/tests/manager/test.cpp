@@ -133,6 +133,7 @@ int main ()
 
     printf ("Current offset in seconds = %f\n", manager.Tell (emitter));
     printf ("Duration in seconds = %f\n", manager.Duration (emitter));
+    printf ("Looping = %c\n", manager.IsLooping (emitter) ? 'y' : 'n');
     printf ("Is Playing = %c\n", manager.IsPlaying (emitter) ? 'y' : 'n');
 
     Timer timer2 (bind (&TimerHandler, ref (emitter)), ACTION_TIME);

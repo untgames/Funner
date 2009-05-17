@@ -325,12 +325,25 @@ struct SoundManager::Impl : public xtl::trackable
     return (float)emitter_iter->second->sound_sample.Duration ();
   }
 
+  bool IsLooping (Emitter& emitter) const
+  {
+    EmitterSet::const_iterator emitter_iter = emitters.find (&emitter);
+
+    if (emitter_iter == emitters.end ())
+      return false;
+
+    if (emitter_iter->second->sound_declaration)
+      return emitter_iter->second->sound_declaration->Looping ();
+
+    return false;
+  }
+
   bool IsPlaying (Emitter& emitter) const
   {
     EmitterSet::const_iterator emitter_iter = emitters.find (&emitter);
 
     if (emitter_iter == emitters.end ())
-      return 0.f;
+      return false;
 
     return emitter_iter->second->is_playing;
   }
@@ -404,6 +417,11 @@ float SoundManager::Tell (Emitter& emitter) const
 float SoundManager::Duration (Emitter& emitter) const
 {
   return impl->Duration (emitter);
+}
+
+bool SoundManager::IsLooping (Emitter& emitter) const
+{
+  return impl->IsLooping (emitter);
 }
 
 bool SoundManager::IsPlaying (Emitter& emitter) const
