@@ -77,7 +77,7 @@ int main (int argc, char *argv[])
       return 1;
     }
 
-    if (source_animation.Height () != animation_height)
+    if (source_animation.Height () != (size_t)animation_height)
     {
       printf ("Invalid animation_height, source animation height is %u\n", source_animation.Height ());
       return 1;
