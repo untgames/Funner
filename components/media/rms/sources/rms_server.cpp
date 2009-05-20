@@ -354,12 +354,22 @@ struct Server::Impl: public IResourceDestroyListener, public xtl::trackable
       //подавление всех исключений
     }
 
-    for (ResourceMap::iterator iter = resources.begin (), end = resources.end (); iter != end; ++iter)
+    for (ResourceMap::iterator iter = resources.begin (), end = resources.end (); iter != end;)
     {
       Resource& resource = *iter->second;
 
       if (resource.use_count () == 1) //если ресурс находится только в кеше
+      {
+        ResourceMap::iterator next = iter;
+
+        ++next;
+
         release (&resource);
+
+        iter = next;
+      }
+      else
+        ++iter;
     }
   }
 };
