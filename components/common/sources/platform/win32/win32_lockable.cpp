@@ -10,14 +10,10 @@ void Win32Platform::InitLockable (lockable_t& lockable)
 {
   try
   {
-    FAST_MUTEX* mutex = (FAST_MUTEX*)malloc (FAST_MUTEX);
+    lockable.data = CreateMutex (0, FALSE, 0);
 
-    if (!mutex)
-      throw xtl::format_operation_exception ("", "No memory");
-
-    ExInitializeFastMutex (mutex);
-      
-    lockable.data = mutex;
+    if (!lockable.data)
+      raise_error ("::CreateMutex");
   }
   catch (xtl::exception& exception)
   {
