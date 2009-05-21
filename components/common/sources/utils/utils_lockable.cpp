@@ -1,9 +1,8 @@
-#include <stl/auto_ptr.h>
-
 #include <xtl/common_exceptions.h>
-#include <xtl/reference_counter.h>
 
 #include <common/lockable.h>
+
+#include <platform/platform.h>
 
 using namespace common;
 
@@ -11,25 +10,33 @@ using namespace common;
     Описание реализации блокируемого объекта
 */
 
-typedef stl::auto_ptr<ILockable> LockablePtr;
-
 struct Lockable::Impl
 {
-  LockablePtr lockable; //реализациия блокируемого объекта
+  Platform::lockable_t lockable; //реализациия блокируемого объекта
 
 ///Конструктор
   Impl ()
   {
-    lockable = create_lockable ();
-
-    if (!lockable)
-      throw xtl::format_operation_exception ("", "Lockable not created");
+    Platform::InitLockable (lockable);
+  }
+  
+///Деструктор
+  ~Impl ()
+  {
+    try
+    {
+      Platform::DestroyLockable (lockable);
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
   }
 
 ///Блокировка
   void Lock ()
   {
-    lockable->Lock ();
+    Platform::Lock (lockable);
   }
   
 ///Отмена блокировки
@@ -37,7 +44,7 @@ struct Lockable::Impl
   {
     try
     {
-      lockable->Unlock ();
+      Platform::Unlock (lockable);
     }
     catch (...)
     {

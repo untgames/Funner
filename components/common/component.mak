@@ -1,8 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.CONFIGURATOR \
-           COMMON.SINGLE_THREADED_LOCKABLE COMMON.TESTS
+TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.CONFIGURATOR COMMON.TESTS
 
 #Цель - CommonLib sources
 COMMON.SOURCES.TYPE             := static-lib
@@ -17,6 +16,7 @@ COMMON.SOURCES.COMPILER_CFLAGS    :=
 COMMON.SOURCES.COMPILER_DEFINES   := PCRE_STATIC
 COMMON.SOURCES.unistd.SOURCE_DIRS := sources/platform/unistd
 COMMON.SOURCES.macosx.SOURCE_DIRS := sources/platform/macosx
+COMMON.SOURCES.win32.SOURCE_DIRS  := sources/platform/win32
 
 #Цель - WxfParser
 COMMON.WXF_PARSER.TYPE             := static-lib
@@ -59,16 +59,6 @@ COMMON.CONFIGURATOR.LIBS             :=
 COMMON.CONFIGURATOR.COMPILER_CFLAGS  :=
 COMMON.CONFIGURATOR.COMPILER_DEFINES :=
 COMMON.CONFIGURATOR.IMPORTS          := compile.static.mak
-
-#Цель - CommonLib single threaded lockable
-COMMON.SINGLE_THREADED_LOCKABLE.TYPE             := static-lib
-COMMON.SINGLE_THREADED_LOCKABLE.NAME             := funner.common.single_threaded_lockable
-COMMON.SINGLE_THREADED_LOCKABLE.INCLUDE_DIRS     := include ../xtl/include
-COMMON.SINGLE_THREADED_LOCKABLE.SOURCE_DIRS      := sources/utils/single_threaded_lockable
-COMMON.SINGLE_THREADED_LOCKABLE.LIB_DIRS         :=  
-COMMON.SINGLE_THREADED_LOCKABLE.LIBS             := 
-COMMON.SINGLE_THREADED_LOCKABLE.COMPILER_CFLAGS  :=
-COMMON.SINGLE_THREADED_LOCKABLE.COMPILER_DEFINES :=
 
 #Цель - CommonLib tests
 COMMON.TESTS.TYPE             := test-suite
