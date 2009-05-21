@@ -1,3 +1,9 @@
+#include <pthread.h>
+
+#include <xtl/common_exceptions.h>
+
+#include <common/strlib.h>
+
 #include <platform/platform.h>
 
 using namespace common;
@@ -8,7 +14,7 @@ namespace
 //мьютекс
 struct Mutex
 {
-  mutex_handle handle;  
+  pthread_mutex_t handle;
 };
 
 //генерация исключения с кодом ошибки
@@ -31,7 +37,7 @@ void UnistdPlatform::InitLockable (lockable_t& lockable)
 
     if (!mutex)
       throw xtl::format_operation_exception ("", "No memory");
-      
+
     pthread_mutexattr_t attributes;
 
     pthread_mutexattr_init (&attributes);
@@ -44,16 +50,16 @@ void UnistdPlatform::InitLockable (lockable_t& lockable)
       pthread_raise_error ("::pthread_mutexattr_init", status);
     }
 
-    status = pthread_mutex_init (&mutex->handle, 0);    
-    
+    status = pthread_mutex_init (&mutex->handle, 0);
+
     pthread_mutexattr_destroy (&attributes);
 
     if (status)
     {
       free (mutex);
       pthread_raise_error ("::pthread_mutex_init", status);
-    }    
-    
+    }
+
     lockable.data = mutex;
   }
   catch (xtl::exception& exception)
@@ -69,7 +75,7 @@ void UnistdPlatform::DestroyLockable (lockable_t& lockable)
   {
     if (!lockable.data)
       throw xtl::make_null_argument_exception ("", "lockable");
-      
+
     Mutex* mutex = (Mutex*)lockable.data;
 
     int status = pthread_mutex_destroy (&mutex->handle);
@@ -78,7 +84,7 @@ void UnistdPlatform::DestroyLockable (lockable_t& lockable)
       pthread_raise_error ("::pthread_mutex_destroy", status);
 
     free (lockable.data);
-    
+
     lockable.data = 0;
   }
   catch (xtl::exception& exception)
@@ -94,13 +100,13 @@ void UnistdPlatform::Lock (lockable_t& lockable)
   {
     if (!lockable.data)
       throw xtl::make_null_argument_exception ("", "lockable");
-      
+
     Mutex* mutex = (Mutex*)lockable.data;
 
     int status = pthread_mutex_lock (&mutex->handle);
 
     if (status)
-      pthread_raise_error ("::pthread_mutex_lock", status);          
+      pthread_raise_error ("::pthread_mutex_lock", status);
   }
   catch (xtl::exception& exception)
   {
@@ -115,7 +121,7 @@ void UnistdPlatform::Unlock (lockable_t& lockable)
   {
     if (!lockable.data)
       throw xtl::make_null_argument_exception ("", "lockable");
-      
+
     Mutex* mutex = (Mutex*)lockable.data;
 
     int status = pthread_mutex_unlock (&mutex->handle);
