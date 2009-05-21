@@ -8,11 +8,12 @@ using namespace common;
     Описание реализации Material
 */
 
-struct Material::Impl: public xtl::reference_counter
+struct Material::Impl
 {
-  stl::string name;       //имя материала
-  size_t      name_hash;  //хэш имени
-  int         sort_group; //группа сортировки
+  xtl::reference_counter ref_count;  //счётчик ссылок
+  stl::string            name;       //имя материала
+  size_t                 name_hash;  //хэш имени
+  int                    sort_group; //группа сортировки
 
   Impl () : name_hash (strhash ("")), sort_group (0) {}
 };
@@ -104,10 +105,11 @@ int Material::SortGroup () const
 
 void Material::AddRef () const
 {
-  addref (*impl);
+  impl->ref_count.increment ();
 }
 
 void Material::Release () const
 {
-  release (impl.get ());
+  if (impl->ref_count.decrement ())
+    delete this;
 }
