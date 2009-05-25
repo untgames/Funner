@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<material_library>
+  <material id="Minigame_Balls_Background">
+    <sprite_profile image="data\textures\minigames\balls\background.jpg" blend_mode="none"/>
+  </material>
+  <material id="Minigame_Balls_UserFields">
+    <sprite_profile image="data\textures\minigames\balls\user_fields.png" blend_mode="translucent"/>
+  </material>
+  <material id="Minigame_Balls_Exit">
+    <sprite_profile image="data\textures\minigames\balls\exit.png" blend_mode="translucent"/>
+  </material>
+  <material id="Minigame_Balls_ExitGlow">
+    <sprite_profile image="data\textures\minigames\balls\exit_glow.png" blend_mode="translucent"/>
+  </material>
+  <material id="Minigame_Balls_Selection">
+    <sprite_profile image="data\textures\minigames\balls\selection.png" blend_mode="translucent"/>
+  </material>
+  <material id="Minigame_Balls_AnimalBall">
+    <sprite_profile image="data\textures\minigames\balls\balls\animal.png" blend_mode="translucent"/>
+  </material>
+  <material id="Minigame_Balls_FireBall">
+    <sprite_profile image="data\textures\minigames\balls\balls\fire.png" blend_mode="translucent"/>
+  </material>
+  <material id="Minigame_Balls_MoonBall">
+    <sprite_profile image="data\textures\minigames\balls\balls\moon.png" blend_mode="translucent"/>
+  </material>
+  <material id="Minigame_Balls_NatureBall">
+    <sprite_profile image="data\textures\minigames\balls\balls\nature.png" blend_mode="translucent"/>
+  </material>
+  <material id="Minigame_Balls_StarBall">
+    <sprite_profile image="data\textures\minigames\balls\balls\star.png" blend_mode="translucent"/>
+  </material>
+  <!-- кусочки дерева для игрового поля =====================================================================================-->
+  
+  <material id="Minigame_Balls_LeftFieldLeft">
+    <sprite_profile image="data\textures\minigames\balls\left_field_left.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Minigame_Balls_LeftFieldRight">
+    <sprite_profile image="data\textures\minigames\balls\left_field_right.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Minigame_Balls_RightFieldLeft">
+    <sprite_profile image="data\textures\minigames\balls\right_field_left.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Minigame_Balls_RightFieldRight">
+    <sprite_profile image="data\textures\minigames\balls\right_field_right.png" blend_mode="translucent"/>
+  </material>
+  
+</material_library>

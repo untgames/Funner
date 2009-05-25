@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<material_library>
+
+  <!-- Cursor =================================================================================== -->
+  
+	<material id="Cursor_Main">
+    <sprite_profile image="data/textures/Cursor/Cursor_main.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Cursor_Pressed">
+    <sprite_profile image="data/textures/Cursor/Cursor_pressed.png" blend_mode="translucent"/>
+  </material>
+  
+  <!-- Main menu =================================================================================== -->
+  
+  <material id="Window_MainMenu_TitleRus">
+    <sprite_profile image="data/textures/Windows/MainMenu_TitleRus.png" blend_mode="translucent"/>
+  </material> 
+
+  <material id="Window_MainMenu_TitleEng">
+    <sprite_profile image="data/textures/Windows/MainMenu_TitleEng.png" blend_mode="translucent"/>
+  </material> 
+
+
+  <material id="Window_MainMenu">
+    <sprite_profile image="data/textures/Windows/MainMenu.png" blend_mode="translucent"/>
+  </material> 
+
+  <material id="Window_MainMenu_Button">
+    <sprite_profile image="data/textures/Windows/MainMenu_Button.png" blend_mode="translucent"/>
+  </material> 
+  
+  <material id="Window_MainMenu_Exit">
+    <sprite_profile image="data/textures/Windows/MainMenu_Exit.png" blend_mode="translucent"/>
+  </material> 
+  
+  <material id="Window_MainMenu_candles_fire">
+    <sprite_profile image="data/textures/Windows/MainMenu_candles_fire.png" blend_mode="translucent" tiling="1" tile_width="118" tile_height="48"/>
+  </material>
+  
+  <material id="Window_MainMenu_Blood">
+    <sprite_profile image="data/textures/Windows/MainMenu_Blood.png" blend_mode="translucent" tiling="1" tile_width="98" tile_height="100"/>
+  </material>
+  
+  <material id="Window_MainMenu_Ball">
+    <sprite_profile image="data/textures/Windows/MainMenu_Ball.png" blend_mode="translucent" tiling="1" tile_width="84" tile_height="96"/>
+  </material>
+  
+    <!-- Options ====================================================================================== -->
+  
+  <material id="Window_Options">
+    <sprite_profile image="data/textures/Windows/Options.png" blend_mode="translucent"/>
+  </material> 
+  
+  <material id="Window_Options_Slider">
+    <sprite_profile image="data/textures/Windows/Options_Slider.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Window_Options_SliderHead">
+    <sprite_profile image="data/textures/Windows/Options_SliderHead.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Window_Options_FullscreenFlag">
+    <sprite_profile image="data/textures/Windows/Options_FullscreenFlag.png" blend_mode="translucent"/>
+  </material>
+
+  <material id="Window_Options_FullscreenFlagBack">
+    <sprite_profile image="data/textures/Windows/Options_FullscreenFlagBack.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Window_Options_Button">
+    <sprite_profile image="data/textures/Windows/Options_Button.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Window_Options_ButtonLight">
+    <sprite_profile image="data/textures/Windows/Options_ButtonLight.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Window_Options_CandleFire">
+    <sprite_profile image="data/textures/Windows/Options_CandleFire.png" blend_mode="translucent" tiling="1" tile_width="43" tile_height="44"/>
+  </material>
+  
+  <!-- UNUSED delete from here!!! -->
+  <!-- ITEMS -->
+
+  <material id="Item_chain_link_1">
+    <sprite_profile image="data/textures/Items/chain_link_1.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Item_chain_link_2">
+    <sprite_profile image="data/textures/Items/chain_link_2.png" blend_mode="translucent"/>
+  </material>  
+
+  <material id="Item_chain_link_3">
+    <sprite_profile image="data/textures/Items/chain_link_3.png" blend_mode="translucent"/>
+  </material>
+
+  <material id="Item_chain">
+    <sprite_profile image="data/textures/Items/chain.png" blend_mode="translucent"/>
+  </material>  
+  
+  <material id="Item_handle">
+    <sprite_profile image="data/textures/Items/handle.png" blend_mode="translucent"/>
+  </material>
+  
+  
+  
+  <material id="Item_wheel_rim">
+    <sprite_profile image="data/textures/Items/wheel_rim.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Item_needle_1">
+    <sprite_profile image="data/textures/Items/needle_1.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Item_needle_2">
+    <sprite_profile image="data/textures/Items/needle_2.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Item_needle_3">
+    <sprite_profile image="data/textures/Items/needle_3.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Item_wheel_0">
+    <sprite_profile image="data/textures/Items/wheel_0.png" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Item_wheel">
+    <sprite_profile image="data/textures/Items/wheel.png" blend_mode="translucent"/>
+  </material>
+  
+  <!-- Locations -->
+  
+  <material id="Location_DvorDom">
+    <sprite_profile image="data/textures/Locations/DvorDom.jpg" blend_mode="translucent"/>
+  </material>
+
+  <material id="Location_DvorMelnica">
+    <sprite_profile image="data/textures/Locations/DvorMelnica.jpg" blend_mode="translucent"/>
+  </material>
+  
+  <material id="Location_Kamin">
+    <sprite_profile image="data/textures/Locations/Kamin.jpg" blend_mode="translucent"/>
+  </material>
+
+</material_library>
