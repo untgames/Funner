@@ -1,3 +1,4 @@
+//данный тест проверяет наличие ошибки в функции hashtable::erase
 #include <stl/hash_map>
 
 int main ()
