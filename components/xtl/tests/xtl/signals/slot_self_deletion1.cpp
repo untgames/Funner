@@ -19,14 +19,14 @@ int main ()
 {
   printf ("Results of slot_self_deletion1:\n");
 
-  for (int i=0; i<NUM; i++)
-    self_destroy_connections [i] = self_destroy_signals [i].connect (&self_disconnect);    
+  for (size_t i=0; i<NUM; i++)
+    self_destroy_connections [i] = self_destroy_signals [i].connect (&self_disconnect);
 
-  for (int i=0; i<NUM; i++)
+  for (size_t i=0; i<NUM; i++)
   {
     self_destroy_signals [i](i);
   }
-  
+
   printf ("executed successfull\n");
 
   return 0;
