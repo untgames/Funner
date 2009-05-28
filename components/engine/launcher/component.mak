@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := ENGINE.LAUNCHER.SOURCES 
+TARGETS := ENGINE.LAUNCHER.SOURCES ENGINE.LAUNCHER.SDK
 TARGETS.win32 := ENGINE.CLAUNCHER.SOURCES
 
 LAUNCHER_VERSION_STRING := "Launcher version 1.0"
@@ -52,3 +52,9 @@ ENGINE.CLAUNCHER.SOURCES.COMPILER_DEFINES  :=
 ENGINE.CLAUNCHER.SOURCES.IMPORTS           := $(ENGINE.LAUNCHER.SOURCES.IMPORTS)
 ENGINE.CLAUNCHER.SOURCES.has_windows.IMPORTS := $(ENGINE.LAUNCHER.SOURCES.has_windows.IMPORTS)
 ENGINE.CLAUNCHER.SOURCES.win32.IMPORTS       := $(ENGINE.LAUNCHER.SOURCES.win32.IMPORTS)
+
+#Цель - SDK
+ENGINE.LAUNCHER.SDK.TYPE             := installation
+ENGINE.LAUNCHER.SDK.INSTALLATION_DIR := sdk/bin
+ENGINE.LAUNCHER.SDK.SOURCE_FILES     :=
+ENGINE.LAUNCHER.SDK.TARGETS          := ENGINE.LAUNCHER.SOURCES
