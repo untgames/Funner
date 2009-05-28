@@ -1,8 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-#TARGETS := XTL.STL.TESTS XTL.TR1.TESTS XTL.XTL.TESTS XTL.XTL.EXPORT XTL.MATH.TESTS
-TARGETS := XTL.STL.TESTS XTL.TR1.TESTS XTL.XTL.TESTS XTL.XTL.EXPORT
+TARGETS := XTL.STL.TESTS XTL.TR1.TESTS XTL.XTL.TESTS XTL.SDK
 
 #Цель №1 - STL tests
 XTL.STL.TESTS.TYPE             := test-suite
@@ -49,7 +48,7 @@ XTL.MATH.TESTS.LIBS             :=
 XTL.MATH.TESTS.COMPILER_CFLAGS  :=
 XTL.MATH.TESTS.COMPILER_DEFINES := __MYSTL_STANDALONE__
 
-#Цель №5 - XTL export
-XTL.XTL.EXPORT.TYPE         := test-suite
-XTL.XTL.EXPORT.EXPORT_DIRS  := include
-
+#XTL SDK
+XTL.SDK.TYPE              := installation
+XTL.SDK.INSTALLATION_DIR  := sdk
+XTL.SDK.SOURCE_FILES      := include
