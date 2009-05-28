@@ -10,8 +10,8 @@ TOOLSETS_DIR_SHORT_NAME                 := toolsets      #Базовое имя каталога с
 PCH_SHORT_NAME                          := pch.h         #Базовое имя PCH файла
 EXPORT_VAR_PREFIX                       := export        #Префикс имени переменной экспортирования настроек компонента
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag    #Базовое имя файла-флага пакетной компиляции
-VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package sdk #Допустимые типы целей
-PACKAGE_COMMANDS                        := build clean test check run #Команды, делегируемые компонентам пакета
+VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package installation #Допустимые типы целей
+PACKAGE_COMMANDS                        := build clean test check run install #Команды, делегируемые компонентам пакета
 COMPILE_TOOL                            := tools.c++compile #Имя макроса утилиты компиляции C++ файлов
 LINK_TOOL                               := tools.link       #Имя макроса утилиты редактора связей
 LIB_TOOL                                := tools.lib        #Имя макроса утилиты архивирования объектных файлов
@@ -418,25 +418,50 @@ define process_target.package
   endif  
 endef
 
-#Обработка цели sdk (имя цели)
-define process_target.sdk
+#Обработка копирования вложенных директорий (имя исходной директории, имя результирующей директории)
+define process_subdir_installation
+  DIST_DIRS := $(DIST_DIRS) $2
 
-ifneq (,$$($1.EXPORT_DIRS))
-  $1.TMP_DIR        := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
-  $1.EXPORT_DIRS    := $$(sort $$(call specialize_paths,$$($1.EXPORT_DIRS)))
-  $1.EXPORT_TMP_TAR := $$($1.TMP_DIR)/$(EXPORT_TAR_TMP_FILE_SHORT_NAME)
+  $$(eval $$(call process_file_installation,$1/,*,$2))		
+endef
 
-  TMP_DIRS := $$($1.TMP_DIR) $$(TMP_DIRS)
-  TMP_CLEAN_DIRS := $(TMP_CLEAN_DIRS) $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+#Обработка копирования файла(ов) (имя исходной директории, имя/маска файлов, имя результирующей директории)
+define process_file_installation
+  ifneq (,$$(filter %*,$2)$$(filter *%,$2))	
+    #Обработка файловых масок
 
-    #Экспорт каталогов
-  export-dirs: EXPORT_DIRS_TARGET.$1  
-  .PHONY: EXPORT_DIRS_TARGET.$1
-  
-  EXPORT_DIRS_TARGET.$1:
-		@echo Export dirs "$(DIST_DIR) <- $$($1.EXPORT_DIRS)"
-		@tar --exclude=$(EXPORT_EXCLUDE_PATTERN) -cf $$($1.EXPORT_TMP_TAR) $$($1.EXPORT_DIRS)
-		@tar --directory=$(DIST_DIR) --overwrite --overwrite-dir -xf $$($1.EXPORT_TMP_TAR)
+    SOURCE_INSTALLATION_DIRS       := $$(patsubst %/,%,$$(filter %/,$$(wildcard $1$2/)))
+    SOURCE_INSTALLATION_FILES      := $$(filter-out $$(INSTALLATION_DIRS),$$(wildcard $1$2))
+    DESTINATION_INSTALLATION_FILES := $$(SOURCE_INSTALLATION_FILES:$1%=$3/%)
+  else
+    ifneq (,$$(wildcard $1$2/*))
+      #Обработка директорий
+      SOURCE_INSTALLATION_DIRS := $1$2
+    else
+      #Обработка файлов
+
+      DESTINATION_INSTALLATION_FILES := $3/$2
+    endif
+  endif
+
+  install: $$(DESTINATION_INSTALLATION_FILES)
+
+  $3/%: $1%
+		@cp "$$<" "$$@" --verbose
+
+  #Обработка вложений
+  $$(foreach dir,$$(SOURCE_INSTALLATION_DIRS),$$(eval $$(call process_subdir_installation,$$(dir),$3/$$(dir:$1%=%))))
+endef
+
+#Обработка цели dist (имя цели)
+define process_target.installation-dir  
+
+ifneq (,$$(filter install,$$(MAKECMDGOALS)))
+  $1.INSTALLATION_DIR := $(DIST_DIR)/$$($1.INSTALLATION_DIR)
+  $1.SOURCE_FILES     := $$(sort $$(call specialize_paths,$$($1.SOURCE_FILES)))
+  DIST_DIRS           := $(DIST_DIRS) $$($1.INSTALLATION_DIR)  
+
+  $$(foreach file,$$($1.SOURCE_FILES),$$(eval $$(call process_file_installation,$$(dir $$(file)),$$(notdir $$(file)),$$($1.INSTALLATION_DIR))))  		
 endif
 
 endef
@@ -527,6 +552,7 @@ all: build check
 run: build
 build: create-dirs
 rebuild: clean build
+install: build
 test: build
 check: build
 export-dirs: create-dirs
