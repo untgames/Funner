@@ -1,9 +1,12 @@
 #include <zzip/zzip.h>
+#include <zzip/plugin.h>
 
-#include <common/file.h>
 #include <common/component.h>
-#include <common/strlib.h>
+#include <common/file.h>
 #include <common/hash.h>
+#include <common/log.h>
+#include <common/singleton.h>
+#include <common/strlib.h>
 
 #include <stl/hash_map>
 #include <stl/vector>
@@ -19,6 +22,172 @@ using namespace stl;
 namespace
 {
 
+/*
+    Константы
+*/
+
+const char* LOG_NAME = "common.file_systems.zip_file_system"; //имя потока протоколирования
+
+/*
+    Протоколирование исключения
+*/
+
+struct LogHolder
+{
+  LogHolder () : log (LOG_NAME) {}
+
+  Log log;
+};
+
+Log& get_log ()
+{
+  typedef common::Singleton<LogHolder> LogHolderSingleton;
+
+  return LogHolderSingleton::Instance ().log;
+}
+
+void log_exception (const char* source, std::exception& exception)
+{
+  get_log ().Printf ("Exception at %s: %s", source, exception.what ());
+}
+
+void log_exception (const char* source)
+{
+  get_log ().Printf ("Unknown exception at %s", source);
+}
+
+int zip_open_func (zzip_char_t* name, int flags, ...)
+{
+  try
+  {
+    if (flags != O_RDONLY)
+      throw xtl::make_argument_exception ("", "flags", flags);
+
+    return (int)new StdFile (name, FileMode_ReadOnly);
+  }
+  catch (std::exception& exception)
+  {
+    log_exception ("::zip_open_func", exception);
+  }
+  catch (...)
+  {
+    log_exception ("::zip_open_func");
+  }
+
+  return 0;
+}
+
+int zip_close_func (int fd)
+{
+  try
+  {
+    delete (StdFile*)fd;
+  }
+  catch (std::exception& exception)
+  {
+    log_exception ("::zip_close_func", exception);
+    return EOF;
+  }
+  catch (...)
+  {
+    log_exception ("::zip_close_func");
+    return EOF;
+  }
+
+  return 0;
+}
+
+zzip_ssize_t zip_read_func (int fd, void* buf, zzip_size_t len)
+{
+  zzip_ssize_t ret_value = 0;
+
+  if (!len)
+    return 0;
+
+  try
+  {
+    ret_value = ((StdFile*)fd)->Read (buf, len);
+  }
+  catch (std::exception& exception)
+  {
+    log_exception ("::zip_read_func", exception);
+  }
+  catch (...)
+  {
+    log_exception ("::zip_read_func");
+  }
+
+  return ret_value;
+}
+
+zzip_off_t zip_seek_func (int fd, zzip_off_t offset, int whence)
+{
+  FileSeekMode seek_mode[3] = {FileSeekMode_Set, FileSeekMode_Current, FileSeekMode_End};
+
+  try
+  {
+     filepos_t seek_pos;
+
+     switch (seek_mode[whence])
+     {
+       default:
+       case FileSeekMode_Set:     seek_pos = offset; break;
+       case FileSeekMode_Current: seek_pos = ((StdFile*)fd)->Tell () + offset; break;
+       case FileSeekMode_End:     seek_pos = ((StdFile*)fd)->Size () + offset; break;
+     }
+
+     return seek_pos != ((StdFile*)fd)->Seek (offset, seek_mode[whence]);
+  }
+  catch (std::exception& exception)
+  {
+    log_exception ("::zip_seek_func", exception);
+  }
+  catch (...)
+  {
+    log_exception ("::zip_seek_func");
+  }
+  return 1;
+}
+
+zzip_off_t zip_size_func (int fd)
+{
+  try
+  {
+    return ((StdFile*)fd)->Size ();
+  }
+  catch (std::exception& exception)
+  {
+    log_exception ("::zip_size_func", exception);
+  }
+  catch (...)
+  {
+    log_exception ("::zip_size_func");
+  }
+
+  return -1;
+}
+
+zzip_ssize_t zip_write_func (int fd, _zzip_const void* buf, zzip_size_t len)
+{
+  try
+  {
+    if (!len)
+      return 0;
+
+    return ((StdFile*)fd)->Write (buf, len);
+  }
+  catch (std::exception& exception)
+  {
+    log_exception ("::zip_write_func", exception);
+  }
+  catch (...)
+  {
+    log_exception ("::zip_write_func");
+  }
+
+  return 0;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Файловая система zip-файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,7 +196,7 @@ class ZipFileSystem: public ICustomFileSystem
   public:
             ZipFileSystem  (const char* path);
     virtual ~ZipFileSystem ();
-  
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с файлом
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,8 +208,8 @@ class ZipFileSystem: public ICustomFileSystem
     filepos_t  FileSeek   (file_t,filepos_t pos);
     filepos_t  FileTell   (file_t);
     filesize_t FileSize   (file_t);
-    void       FileResize (file_t,filesize_t new_size); 
-    bool       FileEof    (file_t); 
+    void       FileResize (file_t,filesize_t new_size);
+    bool       FileEof    (file_t);
     void       FileFlush  (file_t);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,11 +235,11 @@ class ZipFileSystem: public ICustomFileSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void AddRef  ();
     void Release ();
-    
+
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка ошибки
-///////////////////////////////////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////////////////////////////////
     void CheckError ();
     void CheckError (zzip_error_t);
 
@@ -79,19 +248,20 @@ class ZipFileSystem: public ICustomFileSystem
     {
       ZZIP_FILE* handle;
       size_t     size;
-    };  
-  
+    };
+
     typedef vector<FileListItem>    EntryList;
-    typedef hash_map<size_t,size_t> EntryMap;   
+    typedef hash_map<size_t,size_t> EntryMap;
     typedef list<ZipFile*>          OpenFileList;
-    
-    size_t       ref_count;
-    ZZIP_DIR*    zip_dir;
-    OpenFileList open_files;
-    EntryList    entries;
-    EntryMap     entry_map;
-    string       file_names;
-    string       zip_file_name;
+
+    zzip_plugin_io_handlers io_handlers;
+    size_t                  ref_count;
+    ZZIP_DIR*               zip_dir;
+    OpenFileList            open_files;
+    EntryList               entries;
+    EntryMap                entry_map;
+    string                  file_names;
+    string                  zip_file_name;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,14 +272,14 @@ class ZipFileSystem: public ICustomFileSystem
     Получение сообщения об ошибке
 */
 
-const char* GetZZipErrorMessage (zzip_error_t error) 
+const char* GetZZipErrorMessage (zzip_error_t error)
 {
   switch (error)
   {
     case ZZIP_NO_ERROR:     return "No error";
     case ZZIP_OUTOFMEM:     return "Out of memory";
     case ZZIP_DIR_OPEN:     return "Failed to open zip-file";
-    case ZZIP_DIR_STAT: 
+    case ZZIP_DIR_STAT:
     case ZZIP_DIR_SEEK:
     case ZZIP_DIR_READ:     return "Unable to read zip file";
     case ZZIP_UNSUPP_COMPR: return "Unsupported compression format";
@@ -125,30 +295,39 @@ const char* GetZZipErrorMessage (zzip_error_t error)
 ZipFileSystem::ZipFileSystem (const char* path)
   : ref_count (1), zip_file_name (path)
 {
+  zzip_init_io (&io_handlers, 0);
+
+  io_handlers.fd.open     = zip_open_func;
+  io_handlers.fd.close    = zip_close_func;
+  io_handlers.fd.read     = zip_read_func;
+  io_handlers.fd.seeks    = zip_seek_func;
+  io_handlers.fd.filesize = zip_size_func;
+  io_handlers.fd.write    = zip_write_func;
+
   zzip_error_t error = ZZIP_NO_ERROR;
 
-  zip_dir = zzip_dir_open (path,&error);
-  
+  zip_dir = zzip_dir_open_ext_io (path, &error, 0, &io_handlers);
+
   try
   {
     CheckError (error);
-    
+
     ZZIP_DIRENT entry;
     string      file_name;
-    
+
     while (zzip_dir_read (zip_dir,&entry))
     {
       FileListItem item;
-      
-      item.name = (const char*)file_names.size ();    
+
+      item.name = (const char*)file_names.size ();
       file_name = FileSystem::GetNormalizedFileName (entry.d_name);
 
       if (!file_name.empty () && file_name.end ()[-1] == '/')
         file_name.erase (file_name.end ()-1);
 
-      file_names.append    (file_name);            
+      file_names.append    (file_name);
       file_names.push_back (0);
-      
+
       item.info.is_dir      = strchr (file_name.c_str (),'/') != NULL;
       item.info.size        = entry.st_size;
       item.info.time_create = 0;
@@ -157,11 +336,11 @@ ZipFileSystem::ZipFileSystem (const char* path)
 
       entry_map [strihash (file_name.c_str ())] = entries.size ();
 
-      entries.push_back (item);      
+      entries.push_back (item);
     }
-    
+
     const char* string_base = file_names.c_str ();
-    
+
     for (EntryList::iterator i=entries.begin ();i!=entries.end ();++i)
       i->name = string_base + (size_t)i->name;
   }
@@ -182,10 +361,10 @@ ZipFileSystem::~ZipFileSystem ()
   for (OpenFileList::iterator i=open_files.begin ();i!=open_files.end ();++i)
   {
     zzip_file_close ((*i)->handle);
-    delete *i;    
+    delete *i;
   }
 
-  zzip_dir_close (zip_dir);  
+  zzip_dir_close (zip_dir);
 }
 
 /*
@@ -199,24 +378,24 @@ ZipFileSystem::file_t ZipFileSystem::FileOpen (const char* file_name,filemode_t 
           file_name,zip_file_name.c_str (),strfilemode (mode_flags).c_str ());
 
   EntryMap::iterator iter = entry_map.find (strihash (file_name));
-  
+
   if (iter == entry_map.end ())
     throw xtl::format_exception<FileNotFoundException> ("ZipFileSystem::FileOpen","File '%s' not found in zip-file '%s'",file_name,zip_file_name.c_str ());
 
   ZipFile* file = new ZipFile;
-  
+
   file->handle = zzip_file_open (zip_dir,file_name,ZZIP_ONLYZIP|ZZIP_CASELESS);
   file->size   = entries [iter->second].info.size;
-  
+
   if (!file->handle)
   {
     delete file;
 
     CheckError ();
-    
-    return 0;    
+
+    return 0;
   }
-  
+
   try
   {
     open_files.push_back (file);
@@ -234,11 +413,11 @@ ZipFileSystem::file_t ZipFileSystem::FileOpen (const char* file_name,filemode_t 
 void ZipFileSystem::FileClose (file_t _file)
 {
   ZipFile* file = (ZipFile*)_file;
-  
+
   open_files.remove (file);
 
   zzip_file_close (file->handle);
-  
+
   delete file;
 }
 
@@ -247,9 +426,9 @@ size_t ZipFileSystem::FileRead (file_t _file,void* buf,size_t size)
   ZipFile* file = (ZipFile*)_file;
 
   size_t read_size = zzip_file_read (file->handle,(char*)buf,size);
-  
+
   CheckError ();
-  
+
   return read_size;
 }
 
@@ -261,7 +440,7 @@ size_t ZipFileSystem::FileWrite (file_t,const void* buf,size_t size)
 void ZipFileSystem::FileRewind (file_t _file)
 {
   ZipFile* file = (ZipFile*)_file;
-  
+
   zzip_rewind (file->handle);
 
   CheckError ();
@@ -270,11 +449,11 @@ void ZipFileSystem::FileRewind (file_t _file)
 filepos_t ZipFileSystem::FileSeek (file_t _file,filepos_t pos)
 {
   ZipFile* file = (ZipFile*)_file;
-  
+
   filepos_t new_pos = zzip_seek (file->handle,pos,SEEK_SET);
 
   CheckError ();
-  
+
   return new_pos;
 }
 
@@ -298,7 +477,7 @@ void ZipFileSystem::FileResize (file_t,filesize_t)
 bool ZipFileSystem::FileEof (file_t _file)
 {
   ZipFile* file = (ZipFile*)_file;
-  
+
   return (filesize_t)zzip_tell (file->handle) >= file->size;
 }
 
@@ -335,19 +514,19 @@ void ZipFileSystem::Mkdir (const char* dir_name)
 bool ZipFileSystem::IsFileExist (const char* file_name)
 {
   EntryMap::iterator i = entry_map.find (strihash (file_name));
-  
+
   return i != entry_map.end ();
 }
 
 bool ZipFileSystem::GetFileInfo (const char* file_name,FileInfo& info)
 {
   EntryMap::iterator i = entry_map.find (strihash (file_name));
-  
+
   if (i == entry_map.end ())
     return false;
-    
+
   info = entries [i->second].info;
-    
+
   return true;
 }
 
@@ -375,7 +554,7 @@ void ZipFileSystem::CheckError (zzip_error_t error)
 {
   if (error == ZZIP_NO_ERROR)
     return;
-    
+
   throw xtl::format_exception<FileException> ("", "ZZip internal error (zip-file '%s'): %s",
                         zip_file_name.c_str (),GetZZipErrorMessage (error));
 }
@@ -406,7 +585,7 @@ class ZipFileSystemComponent
     {
       FileSystem::RegisterPackFile ("zip", &Create);
       FileSystem::RegisterPackFile ("jar", &Create);
-      FileSystem::RegisterPackFile ("pk3", &Create);            
+      FileSystem::RegisterPackFile ("pk3", &Create);
     }
 
   private:
