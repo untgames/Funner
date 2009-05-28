@@ -278,9 +278,10 @@ define process_target.static-lib
     $$(error Empty static name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.LIB_FILE  := $(DIST_LIB_DIR)/$(LIB_PREFIX)$$($1.NAME)$(LIB_SUFFIX)
-  TARGET_FILES := $$(TARGET_FILES) $$($1.LIB_FILE)
-  
+  $1.LIB_FILE                      := $(DIST_LIB_DIR)/$(LIB_PREFIX)$$($1.NAME)$(LIB_SUFFIX)
+  TARGET_FILES                     := $$(TARGET_FILES) $$($1.LIB_FILE)
+  $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
+
   build: $$($1.LIB_FILE)
 
   $$(eval $$(call process_target_with_sources,$1))  
@@ -298,11 +299,13 @@ define process_target.dynamic-lib
     $$(error Empty dynamic library name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.DLL_FILE    := $(DIST_BIN_DIR)/$$($1.NAME)$(DLL_SUFFIX)
-  $1.LIB_FILE    := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
-  TARGET_FILES   := $$(TARGET_FILES) $$($1.DLL_FILE) $(DIST_LIB_DIR)/$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
-  $1.TARGET_DLLS := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
-  DIST_DIRS      := $$(DIST_DIRS) $$(dir $$($1.DLL_FILE))
+  $1.DLL_FILE                      := $(DIST_BIN_DIR)/$$($1.NAME)$(DLL_SUFFIX)
+  $1.LIB_FILE                      := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
+  TARGET_FILES                     := $$(TARGET_FILES) $$($1.DLL_FILE) $(DIST_LIB_DIR)/$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
+  $1.TARGET_DLLS                   := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
+  DIST_DIRS                        := $$(DIST_DIRS) $$(dir $$($1.DLL_FILE))
+  $1.SOURCE_INSTALLATION_DLL_FILES := $$($1.TARGET_DLLS) $$($1.DLL_FILE)
+  $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)  
 
   build: $$($1.DLL_FILE)
 
@@ -323,10 +326,12 @@ define process_target.application
     $$(error Empty application name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.EXE_FILE    := $(DIST_BIN_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,$(EXE_SUFFIX))
-  TARGET_FILES   := $$(TARGET_FILES) $$($1.EXE_FILE)
-  $1.TARGET_DLLS := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
-  DIST_DIRS      := $$(DIST_DIRS) $$(dir $$($1.EXE_FILE))
+  $1.EXE_FILE                      := $(DIST_BIN_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,$(EXE_SUFFIX))
+  TARGET_FILES                     := $$(TARGET_FILES) $$($1.EXE_FILE)
+  $1.TARGET_DLLS                   := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
+  DIST_DIRS                        := $$(DIST_DIRS) $$(dir $$($1.EXE_FILE))
+  $1.SOURCE_INSTALLATION_DLL_FILES := $$($1.TARGET_DLLS)
+  $1.SOURCE_INSTALLATION_EXE_FILES := $$($1.EXE_FILE)
 
   build: $$($1.EXE_FILE)
 
@@ -455,8 +460,24 @@ define process_file_installation
   $$(foreach dir,$$(SOURCE_INSTALLATION_DIRS),$$(eval $$(call process_subdir_installation,$$(dir),$3/$$(dir:$1%=%))))
 endef
 
-#ќбработка цели dist (им€ цели)
-define process_target.installation-dir  
+#ќбработка зависимостей инсталл€ции после сборки (им€ цели, им€ цели зависимости, результирующа€ директори€)
+define process_target_installation_dependency
+  $1.SOURCE_INSTALLATION_FILES      := $$($2.SOURCE_INSTALLATION_DLL_FILES) $$($2.SOURCE_INSTALLATION_LIB_FILES) $$($2.SOURCE_INSTALLATION_EXE_FILES)
+  $1.DESTINATION_INSTALLATION_FILES := $$(foreach file,$$($1.SOURCE_INSTALLATION_FILES),$3/$$(notdir $$(file)))
+
+  install: $$($1.DESTINATION_INSTALLATION_FILES)
+
+  $3/%: $(DIST_LIB_DIR)/%
+		@cp "$$<" "$$@" --verbose
+
+  $3/%: $(DIST_BIN_DIR)/%
+		@cp "$$<" "$$@" --verbose
+
+  $$(foreach file,$$($1.SOURCE_INSTALLATION_DLL_FILES:%=$3/%),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
+endef
+
+#ќбработка цели installation (им€ цели)
+define process_target.installation
 
 ifneq (,$$(filter install,$$(MAKECMDGOALS)))
   $1.INSTALLATION_DIR := $(DIST_DIR)/$$($1.INSTALLATION_DIR)
@@ -464,6 +485,8 @@ ifneq (,$$(filter install,$$(MAKECMDGOALS)))
   DIST_DIRS           := $(DIST_DIRS) $$($1.INSTALLATION_DIR)  
 
   $$(foreach file,$$($1.SOURCE_FILES),$$(eval $$(call process_file_installation,$$(dir $$(file)),$$(notdir $$(file)),$$($1.INSTALLATION_DIR))))  		
+
+  $$(foreach target,$$($1.TARGETS),$$(eval $$(call process_target_installation_dependency,$1,$$(target),$$($1.INSTALLATION_DIR))))
 endif
 
 endef
