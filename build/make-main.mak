@@ -15,8 +15,6 @@ PACKAGE_COMMANDS                        := build clean test check run install #К
 COMPILE_TOOL                            := tools.c++compile #Имя макроса утилиты компиляции C++ файлов
 LINK_TOOL                               := tools.link       #Имя макроса утилиты редактора связей
 LIB_TOOL                                := tools.lib        #Имя макроса утилиты архивирования объектных файлов
-EXPORT_EXCLUDE_PATTERN                  := .svn            #Шаблон файлов, исключаемых из копирования при выполнении цели export-dirs
-EXPORT_TAR_TMP_FILE_SHORT_NAME          := export-file.tar #Базовое имя файла архива, используемого при выполнении цели export-dirs
 
 ###################################################################################################
 #Производные пути и переменные
@@ -555,12 +553,9 @@ rebuild: clean build
 install: build
 test: build
 check: build
-export-dirs: create-dirs
-#dist: check
-dist : export-dirs
 force:
 
-.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump export-dirs dist tar-dist
+.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump
 
 #Специализация списка целей (в зависимости от профиля)
 $(foreach profile,$(PROFILES),$(eval TARGETS := $$(TARGETS) $$(TARGETS.$$(profile))))  
