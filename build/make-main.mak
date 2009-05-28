@@ -46,6 +46,7 @@ LINK_TOOL                               := $(strip $(LINK_TOOL))
 LIB_TOOL                                := $(strip $(LIB_TOOL))
 EMPTY                                   :=
 SPACE                                   := $(EMPTY) $(EMPTY)
+EXTERNAL_FILES                          :=
 
 ###################################################################################################
 #Если не указан фильтры - обрабатываем все доступные
@@ -225,18 +226,21 @@ endef
 
 #Создание зависимости для копирования внешних файлов (имя внешнего файла, каталоги поиска)
 define create_extern_file_dependency
-  DEPENDENCY_SOURCE := $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $1),$2)))
+  ifeq (,$$(filter $1,$$(EXTERNAL_FILES)))
+    DEPENDENCY_SOURCE := $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $1),$2)))
   
-  ifeq (,$$(strip $$(DEPENDENCY_SOURCE)))
-    DEPENDENCY_SOURCE := $(DIST_BIN_DIR)/$$(notdir $1)
-  endif
+    ifeq (,$$(strip $$(DEPENDENCY_SOURCE)))
+      DEPENDENCY_SOURCE := $(DIST_BIN_DIR)/$$(notdir $1)
+    endif
 
-  ifneq ($$(strip $1),$$(strip $$(DEPENDENCY_SOURCE)))
+    ifneq ($$(strip $1),$$(strip $$(DEPENDENCY_SOURCE)))
 
-    $1: $$(DEPENDENCY_SOURCE)
-			@cp -fv $$< $$@
-			@chmod ug+rwx $$@
-
+      $1: $$(DEPENDENCY_SOURCE)
+				@cp -fv $$< $$@
+				@chmod ug+rwx $$@
+    endif
+    
+    EXTERNAL_FILES := $$(EXTERNAL_FILES) $1
   endif
 endef
 
