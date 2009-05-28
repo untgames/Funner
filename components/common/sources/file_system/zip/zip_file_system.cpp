@@ -328,7 +328,7 @@ ZipFileSystem::ZipFileSystem (const char* path)
       file_names.append    (file_name);
       file_names.push_back (0);
 
-      item.info.is_dir      = strchr (file_name.c_str (),'/') != NULL;
+      item.info.is_dir      = entry.st_size == 0;
       item.info.size        = entry.st_size;
       item.info.time_create = 0;
       item.info.time_access = 0;
