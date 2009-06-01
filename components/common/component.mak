@@ -1,13 +1,13 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.CONFIGURATOR COMMON.TESTS
+TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.CONFIGURATOR COMMON.AES COMMON.TESTS
 
 #Цель - CommonLib sources
 COMMON.SOURCES.TYPE             := static-lib
 COMMON.SOURCES.NAME             := funner.common
 COMMON.SOURCES.INCLUDE_DIRS     := include ../xtl/include ../../extern/pcre/include sources
-COMMON.SOURCES.SOURCE_DIRS      := sources/file_system/core sources/streams sources/hash sources/memory \
+COMMON.SOURCES.SOURCE_DIRS      := sources/file_system/core sources/streams sources/hash sources/crypto/core sources/memory \
                                    sources/parselib/tree sources/parselib/manager sources/strlib sources/utils sources/log \
                                    sources/var_registry sources/platform/default
 COMMON.SOURCES.LIB_DIRS           :=  
@@ -60,11 +60,22 @@ COMMON.CONFIGURATOR.COMPILER_CFLAGS  :=
 COMMON.CONFIGURATOR.COMPILER_DEFINES :=
 COMMON.CONFIGURATOR.IMPORTS          := compile.static.mak
 
+#Цель - CommonLib zip file system sources
+COMMON.AES.TYPE             := static-lib
+COMMON.AES.NAME             := funner.common.aes
+COMMON.AES.INCLUDE_DIRS     := 
+COMMON.AES.SOURCE_DIRS      := sources/crypto/aes
+COMMON.AES.LIB_DIRS         :=
+COMMON.AES.LIBS             :=
+COMMON.AES.COMPILER_CFLAGS  :=
+COMMON.AES.COMPILER_DEFINES :=
+COMMON.AES.IMPORTS          := compile.static.mak
+
 #Цель - CommonLib tests
 COMMON.TESTS.TYPE             := test-suite
 COMMON.TESTS.INCLUDE_DIRS     :=
 COMMON.TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils \
-                                 tests/memory tests/log tests/parselib
+                                 tests/memory tests/log tests/parselib tests/crypto
 COMMON.TESTS.EXECUTION_DIR    :=
 COMMON.TESTS.LIB_DIRS         :=
 COMMON.TESTS.LIBS             :=
@@ -73,4 +84,4 @@ COMMON.TESTS.COMPILER_CFLAGS  :=
 COMMON.TESTS.COMPILER_DEFINES :=
 COMMON.TESTS.IMPORTS          := compile.static.mak link.static.mak zip_file_system.link.static.mak \
                                  wxf.link.static.mak xml.link.static.mak configurator.link.static.mak \
-                                 default_console_handler.link.static.mak
+                                 default_console_handler.link.static.mak aes.link.static.mak

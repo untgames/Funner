@@ -1,0 +1,6 @@
+Results of aes_context_test:
+source:             'Hello world from the AES encrypt'
+encrypt update:      32
+dst_encrypt_buffer:  ffffffb2ffffffc7fffffff9ffffffe56d3fffffffdafffffffaffffffcf32ffffffd1fffffff9274cffffffea5affffffac58ffffffc5ffffffe02b611bfffffff0334c62491a21ffffffbe05
+decrypt update:      32
+dst_decrypt_buffer: 'Hello world from the AES encrypt'

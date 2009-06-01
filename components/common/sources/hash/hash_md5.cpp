@@ -4,6 +4,9 @@
 
 using namespace common;
 
+namespace
+{
+
 /* POINTER defines a generic pointer type */
 typedef unsigned char *POINTER;
 
@@ -40,7 +43,7 @@ struct MD5_CTX
 #define S43 15
 #define S44 21
 
-static void MD5Transform (UINT4 [4], unsigned char [64]);
+static void Md5Transform (UINT4 [4], unsigned char [64]);
 static void Encode       (unsigned char *, UINT4 *, unsigned int);
 static void Decode       (UINT4 *, unsigned char *, unsigned int);
 
@@ -85,7 +88,8 @@ Rotation is separate from addition to prevent recomputation.
 
 /* MD5 initialization. Begins an MD5 operation, writing a new context.
  */
-static void MD5Init (MD5_CTX *context)
+
+void Md5Init (MD5_CTX *context)
 {
   context->count[0] = context->count[1] = 0;
   /* Load magic initialization constants. */
@@ -99,7 +103,8 @@ static void MD5Init (MD5_CTX *context)
   operation, processing another message block, and updating the
   context.
  */
-static void MD5Update (MD5_CTX *context, unsigned char *input, unsigned int inputLen)
+
+void Md5Update (MD5_CTX *context, unsigned char *input, unsigned int inputLen)
 {
   unsigned int i, index, partLen;
 
@@ -117,10 +122,10 @@ static void MD5Update (MD5_CTX *context, unsigned char *input, unsigned int inpu
   if (inputLen >= partLen)
   {
     memcpy (&context->buffer[index], input, partLen);
-    MD5Transform (context->state, context->buffer);
+    Md5Transform (context->state, context->buffer);
 
     for (i = partLen; i + 63 < inputLen; i += 64)
-      MD5Transform (context->state, &input[i]);
+      Md5Transform (context->state, &input[i]);
 
     index = 0;
   }
@@ -134,7 +139,8 @@ static void MD5Update (MD5_CTX *context, unsigned char *input, unsigned int inpu
 /* MD5 finalization. Ends an MD5 message-digest operation, writing the
   the message digest and zeroizing the context.
  */
-static void MD5Final (unsigned char result_hash_value[16], MD5_CTX *context)
+
+void Md5Final (unsigned char result_hash_value[16], MD5_CTX *context)
 {
   unsigned char bits[8];
   unsigned int index, padLen;
@@ -145,17 +151,17 @@ static void MD5Final (unsigned char result_hash_value[16], MD5_CTX *context)
   /* Pad out to 56 mod 64.*/
   index = (unsigned int)((context->count[0] >> 3) & 0x3f);
   padLen = (index < 56) ? (56 - index) : (120 - index);
-  MD5Update (context, PADDING, padLen);
+  Md5Update (context, PADDING, padLen);
 
   /* Append length (before padding) */
-  MD5Update (context, bits, 8);
+  Md5Update (context, bits, 8);
 
   /* Store state in digest */
   Encode (result_hash_value, context->state, 16);
 }
 
 /* MD5 basic transformation. Transforms state based on block. */
-static void MD5Transform (UINT4 state[4], unsigned char block[64])
+void Md5Transform (UINT4 state[4], unsigned char block[64])
 {
   UINT4 a = state[0], b = state[1], c = state[2], d = state[3], x[16];
 
@@ -242,7 +248,8 @@ static void MD5Transform (UINT4 state[4], unsigned char block[64])
 /* Encodes input (UINT4) into output (unsigned char). Assumes len is
   a multiple of 4.
  */
-static void Encode (unsigned char *output, UINT4 *input, unsigned int len)
+
+void Encode (unsigned char *output, UINT4 *input, unsigned int len)
 {
   unsigned int i, j;
 
@@ -258,7 +265,8 @@ static void Encode (unsigned char *output, UINT4 *input, unsigned int len)
 /* Decodes input (unsigned char) into output (UINT4). Assumes len is
   a multiple of 4.
  */
-static void Decode (UINT4 *output, unsigned char *input, unsigned int len)
+
+void Decode (UINT4 *output, unsigned char *input, unsigned int len)
 {
   unsigned int i, j;
 
@@ -266,44 +274,52 @@ static void Decode (UINT4 *output, unsigned char *input, unsigned int len)
     output[i] = ((UINT4)input[j]) | (((UINT4)input[j+1]) << 8) | (((UINT4)input[j+2]) << 16) | (((UINT4)input[j+3]) << 24);
 }
 
+}
+
+namespace common
+{
+
 /* hash_value - 16 байт */
-void common::md5 (unsigned char result_hash_value [16], const void* buf, size_t len)
+
+void md5 (unsigned char result_hash_value [16], const void* buf, size_t len)
 {
   MD5_CTX context;
 
-  MD5Init   (&context);
-  MD5Update (&context,(unsigned char*)buf,len);
-  MD5Final  (result_hash_value, &context);
+  Md5Init   (&context);
+  Md5Update (&context,(unsigned char*)buf,len);
+  Md5Final  (result_hash_value, &context);
+}
+
 }
 
 /*
     MD5Context wraper
 */
 
-struct MD5Context::Impl
+struct Md5Context::Impl
 {
   MD5_CTX context;
 };
 
-MD5Context::MD5Context ()
+Md5Context::Md5Context ()
 {
   impl = new Impl;
 
-  MD5Init (&impl->context);
+  Md5Init (&impl->context);
 }
 
-MD5Context::~MD5Context ()
+Md5Context::~Md5Context ()
 {
   delete impl;
 }
           
-void MD5Context::Update (const void* buf,size_t len)
+void Md5Context::Update (const void* buf,size_t len)
 {
-  MD5Update (&impl->context,(unsigned char*)buf,len);  
+  Md5Update (&impl->context,(unsigned char*)buf,len);  
 }
 
-void MD5Context::Finish (unsigned char result_hash_value [16])
+void Md5Context::Finish (unsigned char result_hash_value [16])
 {
-  MD5Final (result_hash_value,&impl->context);
-  MD5Init  (&impl->context);
+  Md5Final (result_hash_value,&impl->context);
+  Md5Init  (&impl->context);
 }

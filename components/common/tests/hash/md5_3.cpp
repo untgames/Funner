@@ -17,7 +17,7 @@ int main ()
   try
   {
     InputFile     file (sample_file_name);    
-    MD5Context    context;
+    Md5Context    context;
     unsigned char buffer [READ_BUFFER_SIZE], digest [16];    
     
     for (size_t len;(len=file.Read (buffer,READ_BUFFER_SIZE));)

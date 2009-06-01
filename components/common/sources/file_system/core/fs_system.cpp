@@ -834,7 +834,7 @@ const char* FileSystem::GetCurrentDir ()
 static void InternalGetFileHash (File& file,FileHash& hash)
 {
   char       buf [FILE_HASH_BUF_SIZE];
-  MD5Context md5;
+  Md5Context md5;
   size_t     crc32_hash = 0xFFFFFFFF;
 
   while (!file.Eof ())
