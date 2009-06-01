@@ -24,21 +24,15 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
 /// Конструктор/деструктор
     FileSystem (common::ParseNode& node)
     {
-      for (common::Parser::NamesakeIterator iter=node.First ("Paths"); iter; ++iter)
+      const char* paths_string = get<const char*> (node, "Paths", "");
+      
+      StringArray path_list = split (paths_string);
+      
+      for (size_t i=0; i<path_list.Size (); i++)
       {
-        common::ParseNode paths_node = iter->First ("#text");
-        
-        if (!paths_node)
-          continue;
-        
-        common::Parser::AttributeIterator attr_iter = make_attribute_iterator (paths_node);
-        
-        for (size_t i=0, count=paths_node.AttributesCount (); i<count; i++)
-        {
-          const char* path = paths_node.Attribute (i);          
-          
-          paths.Add (path);
-        }
+        const char* path = path_list [i];
+                
+        paths.Add (path);
       }
       
       Log log (LOG_NAME);
