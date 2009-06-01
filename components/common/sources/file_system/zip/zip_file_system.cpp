@@ -48,33 +48,47 @@ Log& get_log ()
 
 void log_exception (const char* source, std::exception& exception)
 {
-  get_log ().Printf ("Exception at %s: %s", source, exception.what ());
+  try
+  {
+    get_log ().Printf ("Exception at %s: %s", source, exception.what ());
+  }
+  catch (...)
+  {
+  }
 }
 
 void log_exception (const char* source)
 {
-  get_log ().Printf ("Unknown exception at %s", source);
+  try
+  {
+    get_log ().Printf ("Unknown exception at %s", source);
+  }
+  catch (...)
+  {
+  }
 }
 
 int zip_open_func (zzip_char_t* name, int flags, ...)
 {
   try
   {
-    if (flags != O_RDONLY)
+    static size_t INVALID_MODE = O_WRONLY | O_RDWR | O_APPEND;   
+
+    if (flags & INVALID_MODE)
       throw xtl::make_argument_exception ("", "flags", flags);
 
     return (int)new StdFile (name, FileMode_ReadOnly);
   }
   catch (std::exception& exception)
   {
-    log_exception ("::zip_open_func", exception);
+    log_exception ("common::zip_open_func", exception);
   }
   catch (...)
   {
-    log_exception ("::zip_open_func");
+    log_exception ("common::zip_open_func");
   }
 
-  return 0;
+  return -1;
 }
 
 int zip_close_func (int fd)
@@ -82,71 +96,69 @@ int zip_close_func (int fd)
   try
   {
     delete (StdFile*)fd;
+
+    return 0;    
   }
   catch (std::exception& exception)
   {
-    log_exception ("::zip_close_func", exception);
-    return EOF;
+    log_exception ("common::zip_close_func", exception);
   }
   catch (...)
   {
-    log_exception ("::zip_close_func");
-    return EOF;
+    log_exception ("common::zip_close_func");
   }
-
-  return 0;
+  
+  return -1;  
 }
 
 zzip_ssize_t zip_read_func (int fd, void* buf, zzip_size_t len)
 {
-  zzip_ssize_t ret_value = 0;
-
   if (!len)
     return 0;
 
   try
   {
-    ret_value = ((StdFile*)fd)->Read (buf, len);
+    return ((StdFile*)fd)->Read (buf, len);
   }
   catch (std::exception& exception)
   {
-    log_exception ("::zip_read_func", exception);
+    log_exception ("common::zip_read_func", exception);
   }
   catch (...)
   {
-    log_exception ("::zip_read_func");
+    log_exception ("common::zip_read_func");
   }
 
-  return ret_value;
+  return 0;
 }
 
 zzip_off_t zip_seek_func (int fd, zzip_off_t offset, int whence)
 {
-  FileSeekMode seek_mode[3] = {FileSeekMode_Set, FileSeekMode_Current, FileSeekMode_End};
-
   try
   {
-     filepos_t seek_pos;
+    FileSeekMode seek_mode;
+    
+    switch (whence)
+    {
+      case SEEK_SET: seek_mode = FileSeekMode_Set;     break;
+      case SEEK_CUR: seek_mode = FileSeekMode_Current; break;
+      case SEEK_END: seek_mode = FileSeekMode_End;     break;
+      default:
+        throw xtl::make_argument_exception ("common::zip_seek_func", "whence", whence);
+    }     
 
-     switch (seek_mode[whence])
-     {
-       default:
-       case FileSeekMode_Set:     seek_pos = offset; break;
-       case FileSeekMode_Current: seek_pos = ((StdFile*)fd)->Tell () + offset; break;
-       case FileSeekMode_End:     seek_pos = ((StdFile*)fd)->Size () + offset; break;
-     }
-
-     return seek_pos != ((StdFile*)fd)->Seek (offset, seek_mode[whence]);
+    return ((StdFile*)fd)->Seek (offset, seek_mode);
   }
   catch (std::exception& exception)
   {
-    log_exception ("::zip_seek_func", exception);
+    log_exception ("common::zip_seek_func", exception);
   }
   catch (...)
   {
-    log_exception ("::zip_seek_func");
+    log_exception ("common::zip_seek_func");
   }
-  return 1;
+
+  return -1;
 }
 
 zzip_off_t zip_size_func (int fd)
@@ -157,11 +169,11 @@ zzip_off_t zip_size_func (int fd)
   }
   catch (std::exception& exception)
   {
-    log_exception ("::zip_size_func", exception);
+    log_exception ("common::zip_size_func", exception);
   }
   catch (...)
   {
-    log_exception ("::zip_size_func");
+    log_exception ("common::zip_size_func");
   }
 
   return -1;
