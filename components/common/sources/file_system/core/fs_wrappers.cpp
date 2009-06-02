@@ -51,9 +51,9 @@ CustomFile::CustomFile (ICustomFileSystemPtr file_system,ICustomFileSystem::file
  { }
 
 CryptoFile::CryptoFile (const File& source_file, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)
-  : File (FileImplPtr (new CryptoFileImpl (source_file, read_crypto_method, write_crypto_method, key, key_bits), false))
+  : File (FileImplPtr (new CryptoFileImpl (source_file, FileSystemSingleton::Instance ().GetDefaultFileBufferSize (), read_crypto_method, write_crypto_method, key, key_bits), false))
  { }
 
 CryptoFile::CryptoFile (const File& source_file, const char* read_crypto_method, const void* key, size_t key_bits)
-  : File (FileImplPtr (new CryptoFileImpl (source_file, read_crypto_method, key, key_bits), false))
+  : File (FileImplPtr (new CryptoFileImpl (source_file, FileSystemSingleton::Instance ().GetDefaultFileBufferSize (), read_crypto_method, key, key_bits), false))
  { }

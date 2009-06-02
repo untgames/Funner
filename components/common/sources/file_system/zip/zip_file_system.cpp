@@ -392,7 +392,7 @@ ZipFileSystem::file_t ZipFileSystem::FileOpen (const char* file_name,filemode_t 
   EntryMap::iterator iter = entry_map.find (strihash (file_name));
 
   if (iter == entry_map.end ())
-    throw xtl::format_exception<FileNotFoundException> ("ZipFileSystem::FileOpen","File '%s' not found in zip-file '%s'",file_name,zip_file_name.c_str ());
+    throw xtl::format_operation_exception ("ZipFileSystem::FileOpen","File '%s' not found in zip-file '%s'",file_name,zip_file_name.c_str ());
 
   ZipFile* file = new ZipFile;
 
@@ -567,8 +567,8 @@ void ZipFileSystem::CheckError (zzip_error_t error)
   if (error == ZZIP_NO_ERROR)
     return;
 
-  throw xtl::format_exception<FileException> ("", "ZZip internal error (zip-file '%s'): %s",
-                        zip_file_name.c_str (),GetZZipErrorMessage (error));
+  throw xtl::format_operation_exception ("", "ZZip internal error (zip-file '%s'): %s",
+    zip_file_name.c_str (),GetZZipErrorMessage (error));
 }
 
 /*

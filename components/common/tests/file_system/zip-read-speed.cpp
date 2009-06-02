@@ -45,9 +45,9 @@ int main ()
     printf ("Time:        %.2f seconds\n",float (end-start)/float (CLOCKS_PER_SEC));
     printf ("Speed:       %.2f M/sec\n",float (file.Size ())/float (end-start)*float (CLOCKS_PER_SEC)/1.0e6f*float (TESTS_COUNT));
   }
-  catch (FileException& exception)
+  catch (std::exception& exception)
   {
-    printf ("FileException: %s\n",exception.what ());
+    printf ("exception: %s\n",exception.what ());
   }
 
   return 0;

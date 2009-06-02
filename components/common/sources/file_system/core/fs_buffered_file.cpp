@@ -3,19 +3,120 @@
 using namespace common;
 using namespace stl;
 
-typedef xtl::message_exception<BufferedFileException> BufferedFileExceptionImpl;
+typedef xtl::uninitialized_storage<char> Buffer;
 
-BufferedFileImpl::BufferedFileImpl (FileImplPtr _base_file,size_t buf_size)
-  : FileImpl (_base_file->Mode ()), base_file (_base_file)
+/*
+    Описание реализации буферизированного файла
+*/
+
+struct BufferedFileImpl::Impl
 {
-  buffer       = (char*)::operator new (buf_size);
-  buffer_size  = buf_size;
-  dirty_start  = 0;
-  dirty_finish = 0;
-  cache_start  = 0;
-  cache_finish = 0;
-  file_pos     = base_file->Tell ();
-  file_size    = base_file->Size ();
+  FileImplPtr base_file;            //базовый файл
+  Buffer      buffer;               //файловый буфер
+  filesize_t  file_size;            //размер файла
+  filepos_t   file_pos;             //файловая позиция
+  filepos_t   data_start_pos;       //позиция начала данных
+  filepos_t   data_dirty_start_pos; //файловая позиция начала блока данных, требующего выгрузки на диск
+  filepos_t   data_dirty_end_pos;   //файловая позиция конца блока данных, требующего выгрузки на диск
+  
+///Конструктор
+  Impl (FileImplPtr in_base_file, size_t buffer_size)
+    : base_file (in_base_file)  
+    , file_size (base_file->Size ())
+    , file_pos (0)
+    , data_start_pos (0)
+    , data_dirty_start_pos (0)
+    , data_dirty_end_pos (0)
+  {
+    buffer.reserve (buffer_size);    
+  }
+  
+///Сброс буфера
+  void FlushBuffer ()
+  {
+    try
+    {
+      if (data_dirty_start_pos == data_dirty_end_pos)
+        return;
+        
+      if (base_file->Seek (data_dirty_start_pos) != data_dirty_start_pos)
+        throw xtl::format_operation_exception ("", "Can't seek file");      
+        
+      char*  data = buffer.data () + data_dirty_start_pos - data_start_pos;
+      size_t size = data_dirty_end_pos - data_dirty_end_pos;
+
+      size_t write_size = base_file->Write (data, size);
+
+      if (write_size != size)
+        throw xtl::format_operation_exception ("", "Can't write file");
+
+      data_dirty_start_pos = 0;
+      data_dirty_end_pos   = 0;
+    }
+    catch (xtl::exception& exception)
+    {
+      exception.touch ("common::BufferedFileImpl::Impl");
+      throw;
+    }
+  }  
+
+///Подготовка данных
+  void PrepareData (filepos_t pos)
+  {
+    if (pos >= data_start_pos && size_t (pos - data_start_pos) < buffer.size ())
+      return;    
+
+    try
+    {
+        //сброс буфера данных
+
+      FlushBuffer ();
+
+      try
+      {
+        data_start_pos = pos;
+        
+          //изменение размеров буферов
+
+        size_t available_size = base_file->Size () - data_start_pos;     
+
+        buffer.resize (available_size < buffer.capacity () ? available_size : buffer.capacity (), false);
+
+          //чтение данных
+
+        if (base_file->Seek (data_start_pos) != data_start_pos)
+          throw xtl::format_operation_exception ("", "Can't seek file");
+
+        size_t result = base_file->Read (buffer.data (), buffer.size ());
+
+        if (result != buffer.size ())
+          throw xtl::format_operation_exception ("", "Can't read data from file");
+      }
+      catch (...)
+      {
+        data_start_pos = 0;
+
+        buffer.resize (0);
+        
+        throw;
+      }
+    }
+    catch (xtl::exception& exception)
+    {
+      exception.touch ("common::BufferedFileImpl::PrepareData");
+      throw;
+    }
+  }
+};
+
+/*
+    Конструктор / деструктор
+*/
+
+BufferedFileImpl::BufferedFileImpl (FileImplPtr in_base_file, size_t buffer_size)
+  : FileImpl (in_base_file->Mode ())
+  , impl (new Impl (in_base_file, buffer_size))
+{
 }
 
 BufferedFileImpl::~BufferedFileImpl ()
@@ -26,257 +127,245 @@ BufferedFileImpl::~BufferedFileImpl ()
   }
   catch (...)
   {
+    //подавление всех исключений
   }
-
-  ::operator delete (buffer);
 }
 
-void BufferedFileImpl::ResetBuffer (filepos_t new_cache_start)
+/*
+    Размер буфера
+*/
+
+size_t BufferedFileImpl::GetBufferSize ()
 {
-  FlushBuffer ();
-
-  if (Mode () & FileMode_Read)
-  {
-    if (base_file->Tell () != new_cache_start && base_file->Seek (new_cache_start) != new_cache_start)    
-    {
-      throw BufferedFileExceptionImpl ("BufferedFileImpl::ResetBuffer", "Can not seek base file");
-    }
-
-    cache_finish = new_cache_start + base_file->Read (buffer,buffer_size);
-  }
-  else cache_finish = new_cache_start + buffer_size;
-
-  cache_start = new_cache_start;  
+  return impl->buffer.capacity ();
 }
 
-size_t BufferedFileImpl::ReadBuffer (filepos_t position,void* buf,size_t size)
-{  
-  if (position < cache_start || position >= cache_finish)
-    return 0;
-
-  if ((filesize_t)size > (filesize_t)(cache_finish - position))
-    size = cache_finish - position;
-
-  memcpy (buf,buffer+position-cache_start,size);
-
-  return size;
-}
-
-size_t BufferedFileImpl::WriteBuffer (filepos_t position,const void* buf,size_t size)
-{  
-  if (position < cache_start || position > cache_finish)
-    return 0;
-
-  size_t block_start = position - cache_start;
-         
-  if (size > buffer_size - block_start)           size          = buffer_size - block_start;
-  if ((filesize_t)(cache_finish-position) < size) cache_finish += size;
-
-  size_t block_finish = block_start + size;
-
-  memcpy (buffer+block_start,buf,size);
-
-  if (block_start  < dirty_start)  dirty_start  = block_start;
-  if (block_finish > dirty_finish) dirty_finish = block_finish;
-
-  return size;
-}
-
-size_t BufferedFileImpl::Read (void* buf,size_t size)
-{
-  char*  read_buffer = (char*)buf;
-  size_t read_size   = 0,
-         tail_size   = 0; //размер прочитанного хвоста блока
-
-  if ((filesize_t)(file_size - file_pos) < (filesize_t)size)
-    size = file_size - file_pos;
-
-  if (!size)
-    return 0;
-    
-  filepos_t block_finish_file_pos = file_pos + size;
-
-  if (file_pos >= cache_start)
-  {
-    if (file_pos < cache_finish) //если голова блока находится в кэше
-    {     
-      read_size    = ReadBuffer (file_pos,read_buffer,size);
-      read_buffer += read_size;
-      size        -= read_size;
-      file_pos    += read_size;
-    }
-  }
-  else if (block_finish_file_pos >= cache_start && block_finish_file_pos <= cache_finish) //если хвост блока находится в кэше
-  {
-    size_t offset = cache_start - file_pos;
-    read_size     = ReadBuffer (cache_start,read_buffer+offset,size-offset);
-    size         -= read_size;
-    tail_size     = read_size;
-  }
-
-  if (!size)
-    return read_size;
-    
-  filepos_t new_cache_start = (file_pos / buffer_size) * buffer_size; //выравниваем по границе страницы
-  size_t    block_start     = file_pos - new_cache_start;
-
-  if (block_start + size > buffer_size) //чтение в обход кэша
-  {
-    if (base_file->Tell () != file_pos && base_file->Seek (file_pos) != file_pos)
-      throw BufferedFileExceptionImpl ("BufferedFileImpl::Read", "Can not seek base file");
-
-    size      = base_file->Read (read_buffer,size);
-    file_pos += size + tail_size;
-
-    return read_size + size;
-  }
-
-  ResetBuffer (new_cache_start);
-
-  size       = ReadBuffer (file_pos,read_buffer,size);
-  file_pos  += size + tail_size;
-  read_size += size;
-
-  return read_size;
-}
-
-size_t BufferedFileImpl::Write (const void* buf,size_t size)
-{
-  const char* write_buffer = (char*)buf;
-  size_t      write_size   = 0;
-  size_t      tail_size    = 0; //размер записанного хвоста блока
-  
-  if ((filesize_t)(file_size - file_pos) < (filesize_t)size)
-  {
-    if (Mode () & FileMode_Resize) Resize (file_pos + size);
-    else                           size = file_size - file_pos;
-  }
-
-  if (!size)
-    return 0;
-
-  filepos_t block_finish_file_pos = file_pos + size;
-
-  if (file_pos >= cache_start)
-  {
-    if (file_pos <= cache_finish) //если голова блока находится в кэше
-    {
-      write_size    = WriteBuffer (file_pos,write_buffer,size);
-      write_buffer += write_size;
-      size         -= write_size;
-      file_pos     += write_size;
-    }
-  }
-  else if (block_finish_file_pos > cache_start)
-  {      
-    if (block_finish_file_pos <= cache_finish) //если хвост блока находится в кэше
-    {
-      size_t offset = cache_start - file_pos;
-      write_size    = WriteBuffer (cache_start,write_buffer+offset,size-offset);
-      size         -= write_size;
-      tail_size     = write_size;
-    }      
-    else //если блок накрывает кэш
-    {
-      if (base_file->Tell () != file_pos && base_file->Seek (file_pos) != file_pos)
-        throw BufferedFileExceptionImpl ("BufferedFileImpl::Write", "Can not seek base file");
-
-      write_size  = base_file->Write (write_buffer,size);
-      file_pos   += write_size;
-
-      if (file_pos > cache_start)
-      {
-        size_t block_size = min ((filesize_t)(file_pos-cache_start),(filesize_t)buffer_size);
-
-        if (dirty_start  < block_size) dirty_start  = block_size;
-        if (dirty_finish < block_size) dirty_finish = block_size;
-
-        if (Mode () & FileMode_Read)
-          memcpy (buffer,write_buffer+write_size-block_size,block_size);
-      }
-
-      return write_size;
-    }
-  }
-  
-  if (!size)
-    return write_size;
-
-  filepos_t new_cache_start = (file_pos / buffer_size) * buffer_size; //выравниваем по границе страницы
-  size_t    block_start     = file_pos - new_cache_start;
-
-  if (block_start + size > buffer_size) //запись в обход кэша
-  {
-    if (base_file->Tell () != file_pos && base_file->Seek (file_pos) != file_pos)
-      throw  BufferedFileExceptionImpl ("BufferedFileImpl::Write", "Can not seek base file");
-
-    size      = base_file->Write (write_buffer,size);
-    file_pos += size + tail_size;
-
-    return write_size + size;
-  }
-
-  ResetBuffer (new_cache_start);
-
-  size        = WriteBuffer (file_pos,write_buffer,size);
-  file_pos   += size + tail_size;
-  write_size += size;
-
-  return write_size;
-}
+/*
+    Управление файловым указателем
+*/
 
 filepos_t BufferedFileImpl::Tell ()
 {
-  return (filepos_t)file_pos;
+  return (filepos_t)impl->file_pos;
 }
 
 filepos_t BufferedFileImpl::Seek (filepos_t new_pos)
 {
-  return (filepos_t)(file_pos = ((filesize_t)new_pos <= file_size ? new_pos : file_size));
+  if ((filesize_t)new_pos > impl->file_size)
+    new_pos = impl->file_size;
+    
+  impl->file_pos = new_pos;
+
+  return impl->file_pos;
 }
 
 void BufferedFileImpl::Rewind ()
 {
-  file_pos = 0;
+  impl->file_pos = 0;
 }
+
+/*
+    Размер файла
+*/
+
 
 filesize_t BufferedFileImpl::Size ()
 {
-  return file_size;
+  return impl->file_size;
 }
 
 void BufferedFileImpl::Resize (filesize_t new_size)
 {
-  file_size = new_size;
+  try
+  {
+    impl->FlushBuffer ();
+    
+    impl->base_file->Resize (new_size);
+    
+    impl->file_size = new_size;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::BufferedFileImpl::Resize");
+    throw;
+  }
 }
 
 bool BufferedFileImpl::Eof ()
 {
-  return (filesize_t)file_pos == file_size;
+  return (filesize_t)impl->file_pos == impl->file_size;
 }
 
-void BufferedFileImpl::FlushBuffer ()
+/*
+    Чтение / запись
+*/
+
+size_t BufferedFileImpl::Read (void* buf, size_t size)
 {
-  if (base_file->Size () != file_size)
-    base_file->Resize (file_size);
+  try
+  {
+      //усечение файла при чтении
 
-  if (dirty_start == dirty_finish)
-    return;
+    if (impl->file_size - impl->file_pos < size)
+      size = impl->file_size - impl->file_pos;
+      
+    if (size > impl->buffer.size ())
+    {      
+        //чтение в обход кэша
+        
+      impl->FlushBuffer ();        
 
-  filepos_t position = cache_start + dirty_start;
-  size_t    size     = dirty_finish - dirty_start;
+      if (impl->base_file->Seek (impl->file_pos) != impl->file_pos)
+        throw xtl::format_operation_exception ("", "Can't seek file");
 
-  if (base_file->Tell () != position && base_file->Seek (position) != position)
-    throw BufferedFileExceptionImpl ("BufferedFileImpl::FlushBuffer", "Can not seek base file");
+      size_t read_size = impl->base_file->Read (buf, size);
 
-  if (base_file->Write (buffer+dirty_start,size) != size)
-    throw BufferedFileExceptionImpl ("BufferedFileImpl::FlushBuffer", "Can not flush file buffer");
+      if (read_size != size)
+        throw xtl::format_operation_exception ("", "Can't read file");
 
-  dirty_start = dirty_finish = 0;
+      impl->file_pos += read_size;
+
+      return read_size;
+    }    
+
+      //последовательное чтение блоков данных
+
+    filepos_t pos = impl->file_pos;
+    char*     dst = (char*)buf;      
+
+    while (size)
+    {
+        //подготовка буфера данных
+
+      impl->PrepareData (pos);
+
+        //копирование данных
+
+      size_t      offset         = pos - impl->data_start_pos;
+      size_t      available_size = impl->buffer.size () - offset;
+      size_t      read_size      = size < available_size ? size : available_size;
+      const char* src            = impl->buffer.data () + offset;
+
+        //проверка возможности чтения
+
+      if (!available_size)
+        break; //end of file
+
+      memcpy (dst, src, read_size);
+
+        //переход к следующему блоку
+
+      size -= read_size;
+      dst  += read_size;
+      pos  += read_size;
+    }
+
+      //обновление файлового указателя
+
+    size_t result = pos - impl->file_pos;
+
+    impl->file_pos = pos;
+
+    return result;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::CryptoFileImpl::Read");
+    throw;
+  }
+}
+
+size_t BufferedFileImpl::Write (const void* buf,size_t size)
+{
+  try
+  {
+    if ((filesize_t)(impl->file_size - impl->file_pos) < (filesize_t)size)
+    {
+      if (Mode () & FileMode_Resize) Resize (impl->file_pos + size);
+      else                           size = impl->file_size - impl->file_pos;
+    }
+
+    if (!size)
+      return 0;      
+
+    if (size > impl->buffer.size ())
+    {
+        //запись в обход кэша
+
+      impl->FlushBuffer ();
+
+      if (impl->base_file->Seek (impl->file_pos) != impl->file_pos)
+        throw xtl::format_operation_exception ("", "Can't seek file");
+
+      size_t write_size = impl->base_file->Write (buf, size);
+      
+      if (write_size != size)
+        throw xtl::format_operation_exception ("", "Can't write file");        
+        
+      impl->file_pos += write_size;
+        
+      return write_size;
+    }    
+
+      //последовательная запись блоков данных
+
+    filepos_t   pos = impl->file_pos;
+    const char* src = (const char*)buf;
+
+    while (size)
+    {
+        //подготовка буфера данных
+
+      impl->PrepareData (pos);
+
+        //копирование данных
+
+      size_t offset         = pos - impl->data_start_pos;
+      size_t available_size = impl->buffer.size () - offset;
+      size_t write_size     = size < available_size ? size : available_size;
+      char*  dst            = impl->buffer.data () + offset;
+      
+      if (!available_size)
+        break;
+
+      memcpy (dst, src, write_size);
+      
+      if (pos < impl->data_dirty_start_pos)                               impl->data_dirty_start_pos = pos;
+      if ((filepos_t)(pos + write_size) > impl->data_dirty_end_pos - pos) impl->data_dirty_end_pos   = pos + write_size;
+
+        //переход к следующему блоку
+
+      src  += write_size;
+      pos  += write_size;
+      size -= write_size;        
+    }
+
+      //обновление файлового указателя
+
+    size_t result = pos - impl->file_pos;
+
+    impl->file_pos = pos;
+
+    return result;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::BufferedFileImpl::Write");
+    throw;
+  }  
 }
 
 void BufferedFileImpl::Flush ()
 {
-  FlushBuffer ();
-  base_file->Flush  ();
+  try
+  {
+    impl->FlushBuffer ();
+
+    impl->base_file->Flush  ();
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::BufferedFileImpl::Flush");
+    throw;
+  }
 }

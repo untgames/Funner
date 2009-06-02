@@ -154,10 +154,10 @@ void FileSystemImpl::SetDefaultPath (const char* path)
   FileInfo info;
 
   if (!GetFileInfo (new_path.c_str (),info))
-    throw xtl::format_exception<FileNotFoundException> ("common::FileSystem::SetCurrentDir","Dir '%s' does not exist",new_path.c_str ());
+    throw xtl::format_operation_exception ("common::FileSystem::SetCurrentDir","Dir '%s' does not exist",new_path.c_str ());
 
   if (!info.is_dir)
-    throw xtl::format_exception<FileNotDirException> ("common::FileSystem::SetCurrentDir","Can not set current dir '%s' because it is not dir",new_path.c_str ());
+    throw xtl::format_operation_exception ("common::FileSystem::SetCurrentDir","Can not set current dir '%s' because it is not dir",new_path.c_str ());
     
   swap (default_path,new_path);
 }
@@ -235,10 +235,6 @@ void FileSystemImpl::AddPackFile (const char* _path,size_t search_path_hash,cons
         pack_files.push_front (PackFile (strihash (path.c_str ()),search_path_hash,pack_file_system));
 
         return;
-      }
-      catch (FileException& exception)
-      {
-        log_handler (format ("File exception at open pack-file '%s': %s",_path,exception.what ()).c_str ());
       }
       catch (std::exception& exception)
       {
@@ -362,7 +358,7 @@ void FileSystemImpl::Mount (const char* _path_prefix,ICustomFileSystemPtr file_s
 
   for (MountList::iterator i=mounts.begin ();i!=mounts.end ();++i)
     if (!strncmp (i->prefix.c_str (),prefix.c_str (),i->prefix.size ()))
-      throw xtl::format_exception<FileMountException> ("common::FileSystem::Mount","Can not mount file system '%s' "
+      throw xtl::format_operation_exception ("common::FileSystem::Mount","Can not mount file system '%s' "
                                  "because it intersects with already mounted file system '%s'",
                                  prefix.c_str (),i->prefix.c_str ());
 
@@ -502,7 +498,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
     //возвращаем ссылку на файловую систему включающую путь по умолчанию      
 
   if (!default_file_system)
-    throw format_exception<FileNotFoundException> ("","File '%s' does not belong to any file system",src_file_name);
+    throw format_operation_exception ("","File '%s' does not belong to any file system",src_file_name);
 
   swap (result_file_name,default_mount_name);
 
@@ -546,17 +542,10 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
       throw;
     }
   }
-  catch (FileException&)
+  catch (xtl::exception& exception)
   {
+    exception.touch ("common::FileSystemImpl::OpenFile('%s')", src_file_name);
     throw;
-  }
-  catch (std::exception& exception)
-  {
-    throw format_exception<FileLoadException> ("FileSystemImpl::OpenFile","Unknown exception at open file '%s': %s",src_file_name,exception.what ());
-  }
-  catch (...)
-  {
-    throw format_exception<FileLoadException> ("FileSystemImpl::OpenFile","Unknown exception at open file '%s'",src_file_name);
   }
   
   return NULL;
@@ -891,7 +880,7 @@ void FileSystem::GetFileHash (const char* file_name,FileHash& hash)
 
     InternalGetFileHash (file,hash);
   }
-  catch (FileException& exception)
+  catch (xtl::exception& exception)
   {
     exception.touch ("common::FileSystem::GetFileHash");
     throw;

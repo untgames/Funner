@@ -197,24 +197,11 @@ class BufferedFileImpl: public FileImpl
     void        Resize (filesize_t new_size);
     bool        Eof    ();
     void        Flush  ();
-    size_t      GetBufferSize () { return buffer_size; }
+    size_t      GetBufferSize ();
 
   private:
-    size_t ReadBuffer  (filepos_t position,void* buf,size_t size);
-    size_t WriteBuffer (filepos_t position,const void* buf,size_t size);
-    void   ResetBuffer (filepos_t new_cache_start);
-    void   FlushBuffer ();
-
-  private:
-    FileImplPtr base_file;   //базовый файл
-    filepos_t   file_pos;     //файловая позиция
-    filesize_t  file_size;    //размер файла
-    char*       buffer;       //буфер файла
-    size_t      buffer_size;  //размер буфера файла
-    filepos_t   cache_start;  //файловая позиция начала буферизированного участка
-    filepos_t   cache_finish; //файловая позиция конца буферизированного участка
-    size_t      dirty_start;  //файловая позиция начала обновлённого участка
-    size_t      dirty_finish; //файловая позиция конца обновлённого участка
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,8 +210,8 @@ class BufferedFileImpl: public FileImpl
 class CryptoFileImpl: public FileImpl
 {
   public:
-    CryptoFileImpl  (const File& file,const char* read_crypto_method,const char* write_crypto_method,const void* key,size_t key_bits);
-    CryptoFileImpl  (const File& file,const char* read_crypto_method,const void* key,size_t key_bits);
+    CryptoFileImpl  (const File& file,size_t buffer_size,const char* read_crypto_method,const char* write_crypto_method,const void* key,size_t key_bits);
+    CryptoFileImpl  (const File& file,size_t buffer_size,const char* read_crypto_method,const void* key,size_t key_bits);
     ~CryptoFileImpl ();
 
     size_t      Read   (void* buf,size_t size);

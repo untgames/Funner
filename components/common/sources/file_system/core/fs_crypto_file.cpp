@@ -31,7 +31,7 @@ struct CryptoFileImpl::Impl
   bool          data_need_write;      //флаг необходимости записи данных в исходный файл
 
 ///Конструктор
-  Impl (const File& in_source_file, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)
+  Impl (const File& in_source_file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)
     : source_file (in_source_file)
     , read_crypto_context (read_crypto_method, key, key_bits)
     , write_crypto_context (write_crypto_method, key, key_bits)
@@ -46,15 +46,29 @@ struct CryptoFileImpl::Impl
       
     if (block_size != write_crypto_context.BlockSize ())
       throw xtl::format_not_supported_exception ("", "Read crypto context '%s' block size %u defferes from write crypto context '%s' block size %u",
-        read_crypto_method, read_crypto_context.BlockSize (), write_crypto_method, write_crypto_context.BlockSize ());
-      
-    size_t buffer_size = DEFAULT_BUFFER_SIZE;
-    
+        read_crypto_method, read_crypto_context.BlockSize (), write_crypto_method, write_crypto_context.BlockSize ());      
+
+    if (buffer_size < DEFAULT_BUFFER_SIZE)
+      buffer_size = DEFAULT_BUFFER_SIZE;
+
     if (buffer_size > block_size) buffer_size = buffer_size / block_size * block_size;
     else                          buffer_size = block_size;
 
     data_buffer.reserve (buffer_size);
     read_write_buffer.reserve (buffer_size);
+  }
+  
+///Деструктор
+  ~Impl ()
+  {
+    try
+    {
+      FlushBuffer ();
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
   }
   
 ///Корректировка размеров файла
@@ -171,12 +185,12 @@ struct CryptoFileImpl::Impl
     Конструктор / деструктор
 */
 
-CryptoFileImpl::CryptoFileImpl (const File& file, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)  
+CryptoFileImpl::CryptoFileImpl (const File& file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)  
   : FileImpl (file.Mode ())
 {
   try
   {
-    impl = new Impl (file, read_crypto_method, write_crypto_method, key, key_bits);
+    impl = new Impl (file, buffer_size, read_crypto_method, write_crypto_method, key, key_bits);
   }
   catch (xtl::exception& exception)
   {
@@ -185,12 +199,12 @@ CryptoFileImpl::CryptoFileImpl (const File& file, const char* read_crypto_method
   }
 }
 
-CryptoFileImpl::CryptoFileImpl (const File& file, const char* read_crypto_method, const void* key, size_t key_bits)
+CryptoFileImpl::CryptoFileImpl (const File& file, size_t buffer_size, const char* read_crypto_method, const void* key, size_t key_bits)
   : FileImpl (file.Mode () & ~(FileMode_Resize | FileMode_Write))
 {
   try
   {
-    impl = new Impl (file, read_crypto_method, read_crypto_method, key, key_bits);
+    impl = new Impl (file, buffer_size, read_crypto_method, read_crypto_method, key, key_bits);
   }
   catch (xtl::exception& exception)
   {
@@ -217,7 +231,7 @@ filepos_t CryptoFileImpl::Seek (filepos_t new_pos)
   try
   {
     if ((filesize_t)new_pos > Size ())
-      Resize (new_pos);
+      new_pos = Size ();
 
     return impl->file_pos = new_pos;
   }
@@ -330,6 +344,8 @@ size_t CryptoFileImpl::Write (const void* buf, size_t size)
 {
   try
   {
+      //перенести resize в начало!!!
+    
     filepos_t   pos = impl->file_pos;
     const char* src = (const char*)buf;
     

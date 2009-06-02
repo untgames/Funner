@@ -69,17 +69,15 @@ void MountPointFileSystem::Remove (const char* file_name)
 
 void MountPointFileSystem::Rename (const char* file_name,const char* new_name)
 {
-  ICustomFileSystemPtr file_system = owner->file_system;
-  
-  FileSystemSingleton::Instance ().Unmount (file_name);
+  ICustomFileSystemPtr file_system = owner->file_system;  
   
   try
   {
     FileSystemSingleton::Instance ().Mount (new_name,file_system);
+    FileSystemSingleton::Instance ().Unmount (file_name);    
   }
-  catch (FileMountException& exception)
+  catch (xtl::exception& exception)
   {
-    FileSystemSingleton::Instance ().Mount (file_name,file_system);
     exception.touch ("MountPointFileSystem::Rename");
     throw;
   }

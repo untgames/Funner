@@ -1,4 +1,4 @@
-Results of buffered_file_test:
+Results of buffered_file1_test:
 Is file buffered: true
 File content (forward read):
 0123456789

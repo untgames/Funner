@@ -25,19 +25,6 @@ typedef xtl::intrusive_ptr<FileListImpl> FileListImplPtr;
 typedef xtl::com_ptr<ICustomFileSystem>  ICustomFileSystemPtr;
 
 /*
-    Файловые исключения
-*/
-
-struct FileException:         virtual public xtl::exception {}; //тэг базового класса файловых исключений
-struct FileNotFoundException:         public FileException {};  //файл не найден
-struct FileNotDirException:           public FileException {};  //файл не является каталогом
-struct FileLoadException:             public FileException {};  //ошибка загрузки файла
-struct FileClosedException:           public FileException {};  //попытка обращения к закрытому файлу
-struct FileNoSpaceException:          public FileException {};  //недостаточно места на носителе для завершения операции
-struct FileMountException:            public FileException {};  //ошибка монтирования файловой системы
-struct BufferedFileException:         public FileException {};  //исключения связанные с буферизацией файла
-
-/*
     Основные структуры
 */
 

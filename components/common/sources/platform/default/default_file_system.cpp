@@ -41,10 +41,10 @@ StdioFileSystem::file_t StdioFileSystem::FileOpen (const char* file_name,filemod
   {
     switch (errno)
     {
-      case EACCES: throw xtl::format_exception<FileLoadException>     ("common::StdioFileSystem::FileOpen","Access denied to file '%s' mode=%s",file_name,strfilemode (mode).c_str ()); break;
-      case EMFILE: throw xtl::format_exception<FileLoadException>     ("common::StdioFileSystem::FileOpen","Unable to open file '%s'. Too many open files",file_name); break;
-      case ENOENT: throw xtl::format_exception<FileNotFoundException> ("common::StdioFileSystem::FileOpen","File '%s' not found",file_name); break;
-      default:     throw xtl::format_exception<FileLoadException>     ("common::StdioFileSystem::FileOpen","Unable to open file '%s' mode=%s. Reason unknown",file_name,strfilemode (mode).c_str ()); break;
+      case EACCES: throw xtl::format_operation_exception ("common::StdioFileSystem::FileOpen","Access denied to file '%s' mode=%s",file_name,strfilemode (mode).c_str ()); break;
+      case EMFILE: throw xtl::format_operation_exception ("common::StdioFileSystem::FileOpen","Unable to open file '%s'. Too many open files",file_name); break;
+      case ENOENT: throw xtl::format_operation_exception ("common::StdioFileSystem::FileOpen","File '%s' not found",file_name); break;
+      default:     throw xtl::format_operation_exception ("common::StdioFileSystem::FileOpen","Unable to open file '%s' mode=%s. Reason unknown",file_name,strfilemode (mode).c_str ()); break;
     }
   }
   
@@ -68,9 +68,9 @@ size_t StdioFileSystem::FileRead (file_t file,void* buf,size_t size)
   {
     switch (errno)
     {
-      case EBADF:  throw xtl::make_argument_exception ("common::StdioFileSystem::FileRead","file"); break;
-      case EINVAL: throw xtl::make_null_argument_exception    ("common::StdioFileSystem::FileRead","buffer"); break;
-      default:     throw xtl::format_exception<FileException> ("common::StdioFileSystem::FileRead","Unknown error"); break;
+      case EBADF:  throw xtl::make_argument_exception      ("common::StdioFileSystem::FileRead","file"); break;
+      case EINVAL: throw xtl::make_null_argument_exception ("common::StdioFileSystem::FileRead","buffer"); break;
+      default:     throw xtl::format_operation_exception   ("common::StdioFileSystem::FileRead","Unknown error"); break;
     }
   }
   
@@ -86,9 +86,9 @@ size_t StdioFileSystem::FileWrite (file_t file,const void* buf,size_t size)
     switch (errno)
     {
       case EBADF:  throw xtl::make_argument_exception ("common::StdioFileSystem::FileWrite","file"); break;
-      case EINVAL: throw xtl::make_null_argument_exception    ("common::StdioFileSystem::FileWrite","buffer"); break;
-      case ENOSPC: throw xtl::format_exception<FileNoSpaceException> ("common::StdioFileSystem::FileWrite","No enough space for write %u bytes to file",size); break;
-      default:     throw xtl::format_exception<FileException> ("common::StdioFileSystem::FileWrite","Unknown error"); break;
+      case EINVAL: throw xtl::make_null_argument_exception ("common::StdioFileSystem::FileWrite","buffer"); break;
+      case ENOSPC: throw xtl::format_operation_exception ("common::StdioFileSystem::FileWrite","No enough space for write %u bytes to file",size); break;
+      default:     throw xtl::format_operation_exception ("common::StdioFileSystem::FileWrite","Unknown error"); break;
     }
   }
   
@@ -104,7 +104,7 @@ void StdioFileSystem::FileRewind (file_t file)
     switch (errno)
     {
       case EBADF:  throw xtl::make_argument_exception ("common::StdioFileSystem::FileRewind","file"); break;
-      default:     throw xtl::format_exception<FileException> ("common::StdioFileSystem::FileRewind","Unknown error"); break;
+      default:     throw xtl::format_operation_exception ("common::StdioFileSystem::FileRewind","Unknown error"); break;
     }
   }
 }
@@ -116,7 +116,7 @@ filepos_t StdioFileSystem::FileSeek (file_t file,filepos_t pos)
     switch (errno)
     {
       case EBADF:  throw xtl::make_argument_exception ("common::StdioFileSystem::FileSeek","file"); break;
-      default:     throw xtl::format_exception<FileException> ("common::StdioFileSystem::FileSeek","Unknown error"); break;
+      default:     throw xtl::format_operation_exception ("common::StdioFileSystem::FileSeek","Unknown error"); break;
     }    
   }
 
@@ -132,7 +132,7 @@ filepos_t StdioFileSystem::FileTell (file_t file)
     switch (errno)
     {
       case EBADF: throw xtl::make_argument_exception ("common::StdioFileSystem::FileTell","file"); break;
-      default:    throw xtl::format_exception<FileException> ("common::StdioFileSystem::FileTell","Unknown error"); break;
+      default:    throw xtl::format_operation_exception ("common::StdioFileSystem::FileTell","Unknown error"); break;
     }    
   }
 
@@ -148,7 +148,7 @@ filesize_t StdioFileSystem::FileSize (file_t file)
     switch (errno)
     {
       case EBADF: throw xtl::make_argument_exception ("common::StdioFileSystem::FileSize","file"); break;
-      default:    throw xtl::format_exception<FileException> ("common::StdioFileSystem::FileSize","Unknown error"); break;
+      default:    throw xtl::format_operation_exception ("common::StdioFileSystem::FileSize","Unknown error"); break;
     }
   }
 
@@ -164,8 +164,8 @@ void StdioFileSystem::FileResize (file_t file,filesize_t new_size)
     {
       case EBADF:  throw xtl::make_argument_exception ("common::StdioFileSystem::FileResize","file"); break;
       case EINVAL: throw xtl::make_null_argument_exception    ("common::StdioFileSystem::FileResize","buffer"); break;
-      case ENOSPC: throw xtl::format_exception<FileNoSpaceException> ("common::StdioFileSystem::FileResize","No enough space for resize file up to %u bytes",new_size); break;
-      default:     throw xtl::format_exception<FileException> ("common::StdioFileSystem::FileResize","Unknown error"); break;
+      case ENOSPC: throw xtl::format_operation_exception ("common::StdioFileSystem::FileResize","No enough space for resize file up to %u bytes",new_size); break;
+      default:     throw xtl::format_operation_exception ("common::StdioFileSystem::FileResize","Unknown error"); break;
     }
   }    
 #else
@@ -185,8 +185,8 @@ void StdioFileSystem::FileFlush (file_t file)
     switch (errno)
     {
       case EBADF:  throw xtl::make_argument_exception ("common::StdioFileSystem::FileFlush","file",(int)file,"Invalid file descriptor"); break;
-      case ENOSPC: throw xtl::format_exception<FileNoSpaceException> ("common::StdioFileSystem::FileFlush","Unable to flush file buffers due to write failure"); break;
-      default:     throw xtl::format_exception<FileException> ("common::StdioFileSystem::FileFlush","Unknown error"); break;
+      case ENOSPC: throw xtl::format_operation_exception ("common::StdioFileSystem::FileFlush","Unable to flush file buffers due to write failure"); break;
+      default:     throw xtl::format_operation_exception ("common::StdioFileSystem::FileFlush","Unknown error"); break;
     }
   }
 }
@@ -202,11 +202,11 @@ void StdioFileSystem::Remove (const char* file_name)
     switch (errno)
     {
       case EACCES: 
-        throw xtl::format_exception<FileException> ("common::StdioFileSystem::Remove","Access to file '%s' denied",file_name);
+        throw xtl::format_operation_exception ("common::StdioFileSystem::Remove","Access to file '%s' denied",file_name);
       case ENOENT: 
         break;
       default:
-        throw xtl::format_exception<FileException> ("common::StdioFileSystem::Remove","Can't remove file '%s'. Reason: %s", 
+        throw xtl::format_operation_exception ("common::StdioFileSystem::Remove","Can't remove file '%s'. Reason: %s", 
           file_name, strerror (errno));
     }
   }
@@ -218,10 +218,10 @@ void StdioFileSystem::Rename (const char* file_name,const char* new_name)
   {
     switch (errno)
     {
-      case EACCES: throw xtl::format_exception<FileException>         ("common::StdioFileSystem::Rename","Access to file '%s' denied",file_name); break;
-      case ENOENT: throw xtl::format_exception<FileNotFoundException> ("common::StdioFileSystem::Rename","File '%s' not found",file_name); break;
-      case EINVAL: throw xtl::format_exception<FileException>         ("common::StdioFileSystem::Rename","Invalid name <old_name>='%s' <new_name>='%s'",file_name,new_name); break;
-      default:     throw xtl::format_exception<FileException>         ("common::StdioFileSystem::Rename","Unknown error"); break;
+      case EACCES: throw xtl::format_operation_exception ("common::StdioFileSystem::Rename","Access to file '%s' denied",file_name); break;
+      case ENOENT: throw xtl::format_operation_exception ("common::StdioFileSystem::Rename","File '%s' not found",file_name); break;
+      case EINVAL: throw xtl::format_operation_exception ("common::StdioFileSystem::Rename","Invalid name <old_name>='%s' <new_name>='%s'",file_name,new_name); break;
+      default:     throw xtl::format_operation_exception ("common::StdioFileSystem::Rename","Unknown error"); break;
     }
   }
 }
@@ -233,9 +233,9 @@ void StdioFileSystem::Mkdir (const char* dir_name)
   {
     switch (errno)
     {
-      case EEXIST: throw xtl::format_exception<FileException> ("common::StdioFileSystem::Mkdir","Path '%s' already exist",dir_name); break;
-      case ENOENT: throw xtl::format_exception<FileNotFoundException> ("common::StdioFileSystem::Mkdir","Path '%s' not found",dir_name); break;
-      default:     throw xtl::format_exception<FileException> ("common::StdioFileSystem::Mkdir","Unknown error"); break;
+      case EEXIST: throw xtl::format_operation_exception ("common::StdioFileSystem::Mkdir","Path '%s' already exist",dir_name); break;
+      case ENOENT: throw xtl::format_operation_exception ("common::StdioFileSystem::Mkdir","Path '%s' not found",dir_name); break;
+      default:     throw xtl::format_operation_exception ("common::StdioFileSystem::Mkdir","Unknown error"); break;
     }
   }
 #else

@@ -266,7 +266,7 @@ filepos_t FileImpl::Seek (filepos_t)
 void FileImpl::Rewind ()
 {
   if (Seek (0))
-    throw xtl::message_exception<FileException> ("FileImpl::Rewind", "Internal seek error");
+    throw xtl::format_operation_exception ("FileImpl::Rewind", "Internal seek error");
 }
 
 filesize_t FileImpl::Size ()

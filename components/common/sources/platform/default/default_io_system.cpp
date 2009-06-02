@@ -55,14 +55,14 @@ StdioIOSystem::file_t StdioIOSystem::FileOpen (const char* file_name,filemode_t 
     {
       if (stdio_file->mode & ~mode)
       {
-        throw xtl::format_exception<FileLoadException> ("common::StdioIOSystem::FileOpen","Wrong <file_mode>='%s' at open '%s' stream",
-                                  strfilemode (mode).c_str (),file_name);
+        throw xtl::format_operation_exception ("common::StdioIOSystem::FileOpen","Wrong <file_mode>='%s' at open '%s' stream",
+          strfilemode (mode).c_str (),file_name);
       }
 
       return (file_t)stdio_file->stream;
     }
 
-  throw xtl::format_exception<FileNotFoundException> ("common::StdioIOSystem::FileOpen","File '%s' not found",file_name);
+  throw xtl::format_operation_exception ("common::StdioIOSystem::FileOpen","File '%s' not found",file_name);
 }
 
 void StdioIOSystem::FileClose (file_t)

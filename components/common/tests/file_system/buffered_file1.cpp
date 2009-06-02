@@ -14,7 +14,7 @@ static char buffer [1024*16];
 
 int main ()
 {
-  printf ("Results of buffered_file_test:\n");
+  printf ("Results of buffered_file1_test:\n");
   
   try
   {

@@ -32,7 +32,7 @@ int main ()
 
     printf ("\n");
   }
-  catch (FileException& exception)
+  catch (std::exception& exception)
   {
     printf ("FileException: %s\n",exception.what ());
   }
