@@ -202,7 +202,7 @@ ILint ILAPIENTRY devil_file_seek (ILHANDLE file_ptr, ILint offset, ILint origin)
       default:
       case FileSeekMode_Set:     seek_pos = offset; break;
       case FileSeekMode_Current: seek_pos = ((StdFile*)file_ptr)->Tell () + offset; break;
-      case FileSeekMode_End:     seek_pos = ((StdFile*)file_ptr)->Size () + offset; break;
+      case FileSeekMode_End:     seek_pos = ((StdFile*)file_ptr)->Size () - offset; break;
     }
 
     return seek_pos != ((StdFile*)file_ptr)->Seek (seek_pos); //return 1 if error
@@ -288,10 +288,7 @@ class DevILComponent
     {
       ilSetMemory (&devil_allocate, &devil_deallocate); //Необходимо вызывать до вызова ilInit ();
 
-      ilInit       ();
-
-      //!!!!Временный хак!!!! (https://unt.game-host.org/trac/funner/ticket/31)
-      FileSystem::SetDefaultFileBufferSize (0);
+      ilInit ();
 
       ilSetRead  (&devil_file_open_read_only, &devil_file_close, &devil_file_eof, &devil_file_getc,  //Необходимо вызывать после вызова ilInit ();
                   &devil_file_read, &devil_file_seek, &devil_file_tell);
