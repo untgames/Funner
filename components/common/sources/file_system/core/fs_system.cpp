@@ -421,6 +421,71 @@ bool FileSystemImpl::IsPathMount (const char* path) const
 }
 
 /*
+    Настройка шифрования
+*/
+
+void FileSystemImpl::SetCryptoParameters (const char* path, const FileCryptoParameters& parameters)
+{
+  try
+  {
+    if (!path)
+      throw xtl::make_null_argument_exception ("", "path");
+
+    CryptoMap::iterator iter = crypto_parameters.find (path);
+    
+    if (iter != crypto_parameters.end ())
+    {
+      iter->second = parameters;      
+    }
+    else
+    {
+      crypto_parameters.insert_pair (path, parameters);
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::FileSystemImpl::SetCryptoParameters");
+    throw;
+  }
+}
+
+bool FileSystemImpl::HasCryptoParameters (const char* path) const
+{
+  if (!path)
+    return false;
+    
+  return crypto_parameters.find (path) != crypto_parameters.end ();
+}
+
+FileCryptoParameters FileSystemImpl::GetCryptoParameters (const char* path) const
+{
+  static const char* METHOD_NAME = "common::FileSystemImpl::GetCryptoParameters";
+  
+  if (!path)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "path");
+    
+  CryptoMap::const_iterator iter = crypto_parameters.find (path);
+  
+  if (iter == crypto_parameters.end ())
+    throw xtl::make_argument_exception (METHOD_NAME, "path", path, "No crypto parameters assigned");
+
+  return iter->second;
+}
+
+void FileSystemImpl::RemoveCryptoParameters (const char* path)
+{
+  if (!path)
+    return;
+    
+  crypto_parameters.erase (path);
+}
+
+void FileSystemImpl::RemoveAllCryptoParameters ()
+{
+  crypto_parameters.clear ();
+}
+
+/*
     Определение принадлежности файла к файловой системе
 */
 
@@ -526,6 +591,13 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
     {
       FileImplPtr base_file (new CustomFileImpl (file_system,file,mode_flags,true),false);
       
+      if (HasCryptoParameters (src_file_name))
+      {
+        FileCryptoParameters params = GetCryptoParameters (src_file_name);
+        
+        base_file = FileImplPtr (new CryptoFileImpl (base_file, buffer_size, params.ReadMethod (), params.WriteMethod (), params.Key (), params.KeyBits ()), false);
+      }
+
       size_t self_buffer_size = base_file->GetBufferSize ();
       
       if (!buffer_size || self_buffer_size >= buffer_size)
@@ -972,4 +1044,43 @@ string FileSystem::LoadTextFile (const char* file_name)
   LoadTextFile (file_name, buffer);
   
   return buffer;
+}
+
+/*
+    Настройка шифрования
+*/
+
+void FileSystem::SetCryptoParameters
+ (const char* path,
+  const char* read_crypto_method,
+  const char* write_crypto_method,
+  const void* key,
+  size_t      key_bits)
+{
+  SetCryptoParameters (path, FileCryptoParameters (read_crypto_method, write_crypto_method, key, key_bits));
+}
+
+void FileSystem::SetCryptoParameters (const char* path, const FileCryptoParameters& parameters)
+{
+  FileSystemSingleton::Instance ().SetCryptoParameters (path, parameters);
+}
+
+bool FileSystem::HasCryptoParameters (const char* path)
+{
+  return FileSystemSingleton::Instance ().HasCryptoParameters (path);
+}
+
+FileCryptoParameters FileSystem::GetCryptoParameters (const char* path)
+{
+  return FileSystemSingleton::Instance ().GetCryptoParameters (path);
+}
+
+void FileSystem::RemoveCryptoParameters (const char* path)
+{
+  FileSystemSingleton::Instance ().RemoveCryptoParameters (path);
+}
+
+void FileSystem::RemoveAllCryptoParameters ()
+{
+  FileSystemSingleton::Instance ().RemoveAllCryptoParameters ();
 }

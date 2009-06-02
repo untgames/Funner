@@ -236,6 +236,15 @@ bool File::operator != (const File& file) const
 }
 
 /*
+    Получение дескриптора файла (для внутреннего использования)
+*/
+
+FileImplPtr File::GetImpl () const
+{
+  return impl;
+}
+
+/*
     FileImpl
 */
 

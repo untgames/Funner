@@ -21,7 +21,7 @@ typedef xtl::uninitialized_storage<char> Buffer;
 
 struct CryptoFileImpl::Impl
 {
-  File          source_file;          //исходный файл
+  FileImplPtr   source_file;          //исходный файл
   CryptoContext read_crypto_context;  //контекст шифрования
   CryptoContext write_crypto_context; //контекст шифрования  
   Buffer        read_write_buffer;    //вспомогательный буфер для чтения / записи данных из исходного файла
@@ -31,7 +31,7 @@ struct CryptoFileImpl::Impl
   bool          data_need_write;      //флаг необходимости записи данных в исходный файл
 
 ///Конструктор
-  Impl (const File& in_source_file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)
+  Impl (const FileImplPtr& in_source_file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)
     : source_file (in_source_file)
     , read_crypto_context (read_crypto_method, key, key_bits)
     , write_crypto_context (write_crypto_method, key, key_bits)
@@ -97,7 +97,7 @@ struct CryptoFileImpl::Impl
       if (!data_need_write)
         return;
 
-      if (source_file.Seek (data_start_pos) != data_start_pos)
+      if (source_file->Seek (data_start_pos) != data_start_pos)
         throw xtl::format_operation_exception ("", "Can't seek file");
 
       read_write_buffer.resize (data_buffer.size (), false);
@@ -107,7 +107,7 @@ struct CryptoFileImpl::Impl
       if (result != read_write_buffer.size ())
         throw xtl::format_operation_exception ("", "Can't encrypt/decrypt data from file");
 
-      result = source_file.Write (read_write_buffer.data (), read_write_buffer.size ());
+      result = source_file->Write (read_write_buffer.data (), read_write_buffer.size ());
 
       if (result != read_write_buffer.size ())
         throw xtl::format_operation_exception ("", "Can't write data to file");
@@ -143,18 +143,27 @@ struct CryptoFileImpl::Impl
 
           //изменение размеров буферов
 
-        size_t available_size = AdjustBlockSizeLow (source_file.Size ()) - data_start_pos;        
+        size_t file_size = AdjustBlockSizeLow (source_file->Size ());
+        
+        if (!file_size)
+        {
+          data_buffer.resize (0);
+
+          return;
+        }
+
+        size_t available_size = file_size >= (filesize_t)data_start_pos ? file_size - data_start_pos : 0;
 
         data_buffer.resize (available_size < data_buffer.capacity () ? available_size : data_buffer.capacity (), false);
         
         read_write_buffer.resize (data_buffer.size (), false);
           
-          //чтение и шифрование данных
+          //чтение и шифрование данных          
           
-        if (source_file.Seek (data_start_pos) != data_start_pos)
+        if (source_file->Seek (data_start_pos) != data_start_pos)
           throw xtl::format_operation_exception ("", "Can't seek file");
 
-        size_t result = source_file.Read (read_write_buffer.data (), read_write_buffer.size ());
+        size_t result = source_file->Read (read_write_buffer.data (), read_write_buffer.size ());
 
         if (result != read_write_buffer.size ())
           throw xtl::format_operation_exception ("", "Can't read data from file");
@@ -166,8 +175,6 @@ struct CryptoFileImpl::Impl
       }
       catch (...)
       {
-        data_start_pos = 0;
-
         data_buffer.resize (0);
         
         throw;
@@ -185,8 +192,8 @@ struct CryptoFileImpl::Impl
     Конструктор / деструктор
 */
 
-CryptoFileImpl::CryptoFileImpl (const File& file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)  
-  : FileImpl (file.Mode ())
+CryptoFileImpl::CryptoFileImpl (const FileImplPtr& file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)  
+  : FileImpl (file->Mode ())
 {
   try
   {
@@ -199,8 +206,8 @@ CryptoFileImpl::CryptoFileImpl (const File& file, size_t buffer_size, const char
   }
 }
 
-CryptoFileImpl::CryptoFileImpl (const File& file, size_t buffer_size, const char* read_crypto_method, const void* key, size_t key_bits)
-  : FileImpl (file.Mode () & ~(FileMode_Resize | FileMode_Write))
+CryptoFileImpl::CryptoFileImpl (const FileImplPtr& file, size_t buffer_size, const char* read_crypto_method, const void* key, size_t key_bits)
+  : FileImpl (file->Mode () & ~(FileMode_Resize | FileMode_Write))
 {
   try
   {
@@ -253,7 +260,7 @@ void CryptoFileImpl::Rewind ()
 
 filesize_t CryptoFileImpl::Size ()
 {
-  return impl->AdjustBlockSizeLow (impl->source_file.Size ());
+  return impl->AdjustBlockSizeLow (impl->source_file->Size ());
 }
 
 void CryptoFileImpl::Resize (filesize_t new_size)
@@ -262,7 +269,7 @@ void CryptoFileImpl::Resize (filesize_t new_size)
   {
     impl->FlushBuffer ();
     
-    impl->source_file.Resize (impl->AdjustBlockSizeHigh (new_size));
+    impl->source_file->Resize (impl->AdjustBlockSizeHigh (new_size));
   }
   catch (xtl::exception& exception)
   {
@@ -293,6 +300,14 @@ size_t CryptoFileImpl::Read (void* buf, size_t size)
 {
   try
   {
+      //усечение файла при чтении
+
+    if (Size () - impl->file_pos < size)
+      size = Size () - impl->file_pos;
+      
+    if (!size)
+      return 0;
+    
     filepos_t pos = impl->file_pos;
     char*     dst = (char*)buf;
     
@@ -307,7 +322,7 @@ size_t CryptoFileImpl::Read (void* buf, size_t size)
         //копирование данных
 
       size_t      offset         = pos - impl->data_start_pos;
-      size_t      available_size = impl->data_buffer.size () - offset;
+      size_t      available_size = impl->data_buffer.size () ? impl->data_buffer.size () - offset : 0;
       size_t      read_size      = size < available_size ? size : available_size;
       const char* src            = impl->data_buffer.data () + offset;
       
@@ -344,8 +359,6 @@ size_t CryptoFileImpl::Write (const void* buf, size_t size)
 {
   try
   {
-      //перенести resize в начало!!!
-    
     filepos_t   pos = impl->file_pos;
     const char* src = (const char*)buf;
     
@@ -360,7 +373,7 @@ size_t CryptoFileImpl::Write (const void* buf, size_t size)
         //копирование данных
         
       size_t offset         = pos - impl->data_start_pos;
-      size_t available_size = impl->data_buffer.size () - offset;
+      size_t available_size = impl->data_buffer.size () ? impl->data_buffer.size () - offset : 0;      
       size_t write_size     = size < available_size ? size : available_size;
       char*  dst            = impl->data_buffer.data () + offset;
       
@@ -412,7 +425,7 @@ void CryptoFileImpl::Flush ()
 
       //сброс файловых буферов исходного файла
 
-    impl->source_file.Flush ();
+    impl->source_file->Flush ();
   }
   catch (xtl::exception& exception)
   {

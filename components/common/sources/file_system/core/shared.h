@@ -6,6 +6,7 @@
 #include <stl/algorithm>
 #include <stl/auto_ptr.h>
 #include <stl/hash_set>
+#include <stl/hash_map>
 #include <stl/list>
 #include <stl/vector>
 
@@ -210,8 +211,8 @@ class BufferedFileImpl: public FileImpl
 class CryptoFileImpl: public FileImpl
 {
   public:
-    CryptoFileImpl  (const File& file,size_t buffer_size,const char* read_crypto_method,const char* write_crypto_method,const void* key,size_t key_bits);
-    CryptoFileImpl  (const File& file,size_t buffer_size,const char* read_crypto_method,const void* key,size_t key_bits);
+    CryptoFileImpl  (const FileImplPtr& file,size_t buffer_size,const char* read_crypto_method,const char* write_crypto_method,const void* key,size_t key_bits);
+    CryptoFileImpl  (const FileImplPtr& file,size_t buffer_size,const char* read_crypto_method,const void* key,size_t key_bits);
     ~CryptoFileImpl ();
 
     size_t      Read   (void* buf,size_t size);
@@ -403,6 +404,15 @@ class FileSystemImpl
     bool IsPathMount (const char* path) const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Настройка шифрования
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                 SetCryptoParameters       (const char* path, const FileCryptoParameters& parameters);
+    bool                 HasCryptoParameters       (const char* path) const;
+    FileCryptoParameters GetCryptoParameters       (const char* path) const;
+    void                 RemoveCryptoParameters    (const char* path);
+    void                 RemoveAllCryptoParameters ();    
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Открытие файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     FileImplPtr OpenFile (const char* src_file_name,filemode_t mode_flags);
@@ -462,11 +472,12 @@ class FileSystemImpl
     void MountSearch (FileListBuilder& builder,const char* wc_mask,const char* prefix,size_t flags);
    
   private:
-    typedef stl::hash_set<File*>       OpenFileSet;
-    typedef stl::list<SearchPath>      SearchPathList;
-    typedef stl::list<PackFile>        PackFileList;
-    typedef stl::list<PackFileType>    PackFileTypeList;
-    typedef stl::list<MountFileSystem> MountList;  
+    typedef stl::hash_set<File*>                                            OpenFileSet;
+    typedef stl::list<SearchPath>                                           SearchPathList;
+    typedef stl::list<PackFile>                                             PackFileList;
+    typedef stl::list<PackFileType>                                         PackFileTypeList;
+    typedef stl::list<MountFileSystem>                                      MountList;
+    typedef stl::hash_map<stl::hash_key<const char*>, FileCryptoParameters> CryptoMap;
 
   private:    
     OpenFileSet       open_files;               //список открытых файлов
@@ -475,6 +486,7 @@ class FileSystemImpl
     MountList         mounts;                   //список смонтированных файловых систем
     SearchPathList    search_paths;             //список путей поиска
     FileImplPtr       closed_file;              //закрытый файл
+    CryptoMap         crypto_parameters;        //параметры шифрования файлов
     stl::string       default_path;             //путь по умолчанию (аналог текущего каталога)
     stl::string       compress_path;            //буфер для формирования сокращённого пути
     size_t            default_file_buffer_size; //размер буфера файла по умолчанию

@@ -224,7 +224,12 @@ class File
 ///Сравнение двух файлов на эквивалентность
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool operator == (const File&) const;
-    bool operator != (const File&) const;
+    bool operator != (const File&) const;    
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение дескриптора файла (для внутреннего использования)
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    FileImplPtr GetImpl () const;
 
   protected:
     File (FileImplPtr);
@@ -427,6 +432,39 @@ class FileList
 };
 
 /*
+    Классы обеспечивающие настройку шифрования файлов
+*/
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Параметры шифрования
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class FileCryptoParameters
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы / деструктор / присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FileCryptoParameters  (const char* read_method,const char* write_method,const void* key,size_t key_bits);
+    FileCryptoParameters  (const FileCryptoParameters&);
+    ~FileCryptoParameters ();
+
+    FileCryptoParameters& operator = (const FileCryptoParameters&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Параметры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* ReadMethod  () const; //метод шифрования при чтении из файла
+    const char* WriteMethod () const; //метод шифрования при записи в файл
+    const void* Key         () const; //указатель на буфер, содержащий ключ шифрования
+    size_t      KeyBits     () const; //количество битов в ключе
+
+  private:
+    struct Impl;
+    Impl* impl;
+};
+
+
+/*
     Классы обеспечивающие управление файловой системой
 */
 
@@ -467,6 +505,20 @@ class FileSystem
     static void Unmount     (ICustomFileSystemPtr file_system);
     static void UnmountAll  ();
     static bool IsPathMount (const char* path); //проверка: смонтирован ли путь
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Настройка шифрования
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void SetCryptoParameters (const char* path,
+                                     const char* read_crypto_method,
+                                     const char* write_crypto_method,
+                                     const void* key,
+                                     size_t      key_bits);
+    static void                 SetCryptoParameters       (const char* path, const FileCryptoParameters& parameters);
+    static bool                 HasCryptoParameters       (const char* path);
+    static FileCryptoParameters GetCryptoParameters       (const char* path);
+    static void                 RemoveCryptoParameters    (const char* path);
+    static void                 RemoveAllCryptoParameters ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление / переименование файла, создание каталога
