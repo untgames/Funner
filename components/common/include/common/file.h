@@ -308,6 +308,23 @@ class CustomFile: public File
                 bool                      auto_close = false);
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Файл с шифрованием
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class CryptoFile: public File
+{
+  public:
+    CryptoFile (const File& source_file,
+                const char* read_crypto_method,
+                const void* key,
+                size_t      key_bits);
+    CryptoFile (const File& source_file,
+                const char* read_crypto_method,
+                const char* write_crypto_method,
+                const void* key,
+                size_t      key_bits);
+};
+
 /*
     Классы обслуживающие поиск файлов
 */

@@ -3,22 +3,25 @@
 
 #include <cstring>
 
-#include <stl/hash_set>
-#include <stl/vector>
-#include <stl/list>
 #include <stl/algorithm>
+#include <stl/auto_ptr.h>
+#include <stl/hash_set>
+#include <stl/list>
+#include <stl/vector>
 
-#include <xtl/function.h>
 #include <xtl/bind.h>
+#include <xtl/common_exceptions.h>
+#include <xtl/function.h>
 #include <xtl/reference_counter.h>
 #include <xtl/string.h>
-#include <xtl/common_exceptions.h>
+#include <xtl/uninitialized_storage.h>
 
+#include <common/component.h>
+#include <common/crypto.h>
 #include <common/file.h>
+#include <common/hash.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
-#include <common/hash.h>
-#include <common/component.h>
 
 #include <platform/platform.h>
 
@@ -212,6 +215,36 @@ class BufferedFileImpl: public FileImpl
     filepos_t   cache_finish; //файловая позиция конца буферизированного участка
     size_t      dirty_start;  //файловая позиция начала обновлённого участка
     size_t      dirty_finish; //файловая позиция конца обновлённого участка
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Файл с шифрованием
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class CryptoFileImpl: public FileImpl
+{
+  public:
+    CryptoFileImpl  (const File& file,const char* read_crypto_method,const char* write_crypto_method,const void* key,size_t key_bits);
+    CryptoFileImpl  (const File& file,const char* read_crypto_method,const void* key,size_t key_bits);
+    ~CryptoFileImpl ();
+
+    size_t      Read   (void* buf,size_t size);
+    size_t      Write  (const void* buf,size_t size);
+    filepos_t   Tell   ();
+    filepos_t   Seek   (filepos_t new_pos);
+    void        Rewind ();
+    filesize_t  Size   ();
+    void        Resize (filesize_t new_size);
+    bool        Eof    ();
+    void        Flush  ();
+    size_t      GetBufferSize ();
+
+  private:
+    CryptoFileImpl (const CryptoFileImpl&); //no impl
+    CryptoFileImpl& operator = (const CryptoFileImpl&); //no impl
+
+  private:
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

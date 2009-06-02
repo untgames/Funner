@@ -56,7 +56,7 @@ CryptoContext::~CryptoContext ()
     Размер блока шифрования
 */
 
-size_t CryptoContext::GetBlockSize () const
+size_t CryptoContext::BlockSize () const
 {
   return impl->context->GetBlockSize ();
 }

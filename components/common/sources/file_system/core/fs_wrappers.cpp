@@ -39,13 +39,21 @@ AppendFile::AppendFile (const char* file_name,size_t buffer_size)
 }
 
 MemFile::MemFile (void* buf,size_t size,filemode_t mode)
-  : File (new MemFileImpl (buf,size,mode))
+  : File (FileImplPtr (new MemFileImpl (buf,size,mode), false))
   { }
   
 CustomFile::CustomFile (ICustomFileSystemPtr file_system,const char* name,filemode_t mode)
- : File (new CustomFileImpl (file_system,name,mode))
+ : File (FileImplPtr (new CustomFileImpl (file_system,name,mode), false))
  { }
 
 CustomFile::CustomFile (ICustomFileSystemPtr file_system,ICustomFileSystem::file_t handle,filemode_t mode,bool auto_close)
- : File (new CustomFileImpl (file_system,handle,mode,auto_close))
+ : File (FileImplPtr (new CustomFileImpl (file_system,handle,mode,auto_close), false))
+ { }
+
+CryptoFile::CryptoFile (const File& source_file, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)
+  : File (FileImplPtr (new CryptoFileImpl (source_file, read_crypto_method, write_crypto_method, key, key_bits), false))
+ { }
+
+CryptoFile::CryptoFile (const File& source_file, const char* read_crypto_method, const void* key, size_t key_bits)
+  : File (FileImplPtr (new CryptoFileImpl (source_file, read_crypto_method, key, key_bits), false))
  { }
