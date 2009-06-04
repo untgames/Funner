@@ -23,7 +23,7 @@ struct CryptoFileImpl::Impl
 {
   FileImplPtr   source_file;          //исходный файл
   CryptoContext read_crypto_context;  //контекст шифрования
-  CryptoContext write_crypto_context; //контекст шифрования  
+  CryptoContext write_crypto_context; //контекст шифрования
   Buffer        read_write_buffer;    //вспомогательный буфер для чтения / записи данных из исходного файла
   Buffer        data_buffer;          //кэш с данными после шифрования
   filepos_t     file_pos;             //файловая позиция
@@ -43,10 +43,10 @@ struct CryptoFileImpl::Impl
 
     if (!block_size)
       throw xtl::format_not_supported_exception ("", "Sequential crypting contexts not supported (method='%s')", read_crypto_method);
-      
+
     if (block_size != write_crypto_context.BlockSize ())
       throw xtl::format_not_supported_exception ("", "Read crypto context '%s' block size %u defferes from write crypto context '%s' block size %u",
-        read_crypto_method, read_crypto_context.BlockSize (), write_crypto_method, write_crypto_context.BlockSize ());      
+        read_crypto_method, read_crypto_context.BlockSize (), write_crypto_method, write_crypto_context.BlockSize ());
 
     if (buffer_size < DEFAULT_BUFFER_SIZE)
       buffer_size = DEFAULT_BUFFER_SIZE;
@@ -57,7 +57,7 @@ struct CryptoFileImpl::Impl
     data_buffer.reserve (buffer_size);
     read_write_buffer.reserve (buffer_size);
   }
-  
+
 ///Деструктор
   ~Impl ()
   {
@@ -70,25 +70,25 @@ struct CryptoFileImpl::Impl
       //подавление всех исключений
     }
   }
-  
+
 ///Корректировка размеров файла
   size_t AdjustBlockSizeHigh (size_t size)
   {
     size_t block_size = write_crypto_context.BlockSize ();
-    
+
     if (!(size % block_size))
       return size;
-      
+
     return size + block_size - size % block_size;
   }
-  
+
   size_t AdjustBlockSizeLow (size_t size)
   {
     size_t block_size = read_crypto_context.BlockSize ();
 
     return size / block_size * block_size;
-  }  
-  
+  }
+
 ///Сброс буфера данных
   void FlushBuffer ()
   {
@@ -103,7 +103,7 @@ struct CryptoFileImpl::Impl
       read_write_buffer.resize (data_buffer.size (), false);
 
       size_t result = write_crypto_context.Update (data_buffer.size (), data_buffer.data (), read_write_buffer.data ());
-      
+
       if (result != read_write_buffer.size ())
         throw xtl::format_operation_exception ("", "Can't encrypt/decrypt data from file");
 
@@ -120,7 +120,7 @@ struct CryptoFileImpl::Impl
       throw;
     }
   }
-  
+
 ///Подготовка буфера данных
   void PrepareData (filepos_t pos)
   {
@@ -134,7 +134,7 @@ struct CryptoFileImpl::Impl
       FlushBuffer ();
 
       try
-      {              
+      {
           //расчёт файловой позиции начала буфера файла
 
         size_t block_size = read_crypto_context.BlockSize ();
@@ -144,7 +144,7 @@ struct CryptoFileImpl::Impl
           //изменение размеров буферов
 
         size_t file_size = AdjustBlockSizeLow (source_file->Size ());
-        
+
         if (!file_size)
         {
           data_buffer.resize (0);
@@ -155,11 +155,11 @@ struct CryptoFileImpl::Impl
         size_t available_size = file_size >= (filesize_t)data_start_pos ? file_size - data_start_pos : 0;
 
         data_buffer.resize (available_size < data_buffer.capacity () ? available_size : data_buffer.capacity (), false);
-        
+
         read_write_buffer.resize (data_buffer.size (), false);
-          
-          //чтение и шифрование данных          
-          
+
+          //чтение и шифрование данных
+
         if (source_file->Seek (data_start_pos) != data_start_pos)
           throw xtl::format_operation_exception ("", "Can't seek file");
 
@@ -168,7 +168,7 @@ struct CryptoFileImpl::Impl
         if (result != read_write_buffer.size ())
           throw xtl::format_operation_exception ("", "Can't read data from file");
 
-        result = read_crypto_context.Update (result, read_write_buffer.data (), data_buffer.data ());        
+        result = read_crypto_context.Update (result, read_write_buffer.data (), data_buffer.data ());
 
         if (result != read_write_buffer.size ())
           throw xtl::format_operation_exception ("", "Can't encrypt/decrypt data from file");
@@ -176,7 +176,7 @@ struct CryptoFileImpl::Impl
       catch (...)
       {
         data_buffer.resize (0);
-        
+
         throw;
       }
     }
@@ -192,7 +192,7 @@ struct CryptoFileImpl::Impl
     Конструктор / деструктор
 */
 
-CryptoFileImpl::CryptoFileImpl (const FileImplPtr& file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)  
+CryptoFileImpl::CryptoFileImpl (const FileImplPtr& file, size_t buffer_size, const char* read_crypto_method, const char* write_crypto_method, const void* key, size_t key_bits)
   : FileImpl (file->Mode ())
 {
   try
@@ -268,7 +268,7 @@ void CryptoFileImpl::Resize (filesize_t new_size)
   try
   {
     impl->FlushBuffer ();
-    
+
     impl->source_file->Resize (impl->AdjustBlockSizeHigh (new_size));
   }
   catch (xtl::exception& exception)
@@ -280,7 +280,7 @@ void CryptoFileImpl::Resize (filesize_t new_size)
 
 bool CryptoFileImpl::Eof ()
 {
-  return impl->file_pos == Size ();
+  return impl->file_pos == (filepos_t)Size ();
 }
 
 /*
@@ -304,35 +304,35 @@ size_t CryptoFileImpl::Read (void* buf, size_t size)
 
     if (Size () - impl->file_pos < size)
       size = Size () - impl->file_pos;
-      
+
     if (!size)
       return 0;
-    
+
     filepos_t pos = impl->file_pos;
     char*     dst = (char*)buf;
-    
+
       //последовательное чтение блоков данных
 
     while (size)
     {
         //подготовка буфера данных
-      
-      impl->PrepareData (pos);      
-      
+
+      impl->PrepareData (pos);
+
         //копирование данных
 
       size_t      offset         = pos - impl->data_start_pos;
       size_t      available_size = impl->data_buffer.size () ? impl->data_buffer.size () - offset : 0;
       size_t      read_size      = size < available_size ? size : available_size;
       const char* src            = impl->data_buffer.data () + offset;
-      
+
         //проверка возможности чтения
-        
+
       if (!available_size)
         break; //end of file
 
       memcpy (dst, src, read_size);
-      
+
         //переход к следующему блоку
 
       size -= read_size;
@@ -361,9 +361,9 @@ size_t CryptoFileImpl::Write (const void* buf, size_t size)
   {
     filepos_t   pos = impl->file_pos;
     const char* src = (const char*)buf;
-    
+
       //последовательная запись блоков данных
-    
+
     while (size)
     {
         //подготовка буфера данных
@@ -371,12 +371,12 @@ size_t CryptoFileImpl::Write (const void* buf, size_t size)
       impl->PrepareData (pos);
 
         //копирование данных
-        
+
       size_t offset         = pos - impl->data_start_pos;
-      size_t available_size = impl->data_buffer.size () ? impl->data_buffer.size () - offset : 0;      
+      size_t available_size = impl->data_buffer.size () ? impl->data_buffer.size () - offset : 0;
       size_t write_size     = size < available_size ? size : available_size;
       char*  dst            = impl->data_buffer.data () + offset;
-      
+
       if (!available_size)
       {
         if (!(Mode () & FileMode_Resize))
