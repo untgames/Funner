@@ -131,6 +131,8 @@ int main (int argc, char* argv [])
 {
   try
   {
+    
+    
     Application application;
 
     application.ParseCommandLine ((size_t)argc, argv);
