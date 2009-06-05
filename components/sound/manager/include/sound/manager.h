@@ -154,9 +154,10 @@ class SoundManager
     const sound::Listener& Listener    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Загрузка библиотеки звуков
+///Загрузка/выгрузка библиотек звуков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void LoadSoundLibrary (const char* file_name);
+    void UnloadSoundLibrary (const char* file_name);
 
   private:
     SoundManager (const SoundManager&); //no impl

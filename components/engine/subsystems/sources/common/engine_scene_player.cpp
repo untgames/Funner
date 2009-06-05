@@ -37,10 +37,10 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
     ScenePlayerSubsystem (common::ParseNode& node)
       : attachment (get<const char*> (node, "Listener")),
         resource_manager_name (get<const char*> (node, "ResourceManager", "")),
+        log (LOG_NAME),
         sound_manager (get<const char*> (node, "DriverMask", "*"), get<const char*> (node, "DeviceMask", "*"), get<const char*> (node, "InitString", "")),
         resource_server (*this),
-        attached_resource_manager (0),
-        log (LOG_NAME)
+        attached_resource_manager (0)
     {
       scene_player.SetManager (&sound_manager);
 
@@ -68,8 +68,8 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
     ~ScenePlayerSubsystem ()
     {
-      AttachmentRegistry::Detach<media::rms::ResourceManager> (this);
-      AttachmentRegistry::Detach<scene_graph::Listener>       (this);
+      AttachmentRegistry::Detach<media::rms::ResourceManager> (this, AttachmentRegistryAttachMode_ForceNotify);
+      AttachmentRegistry::Detach<scene_graph::Listener>       (this, AttachmentRegistryAttachMode_ForceNotify);
     }
 
 ///События установки / удаления менеджера ресурсов
@@ -144,7 +144,34 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
     void UnloadResources (size_t count, const char** resource_names)
     {
-      //?????: do this !!!!!!!!!
+      static const char* METHOD_NAME = "engine::subsystems::ScenePlayerSubsystem::UnloadResources";
+
+      if (!resource_names)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
+
+      for (size_t i = 0; i < count; i++)
+      {
+        if (!resource_names[i])
+          throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
+
+        try
+        {
+          sound_manager.UnloadSoundLibrary (resource_names [i]);
+        }
+        catch (xtl::exception& exception)
+        {
+          log.Printf ("Can't unload resource '%s', exception '%s'", resource_names[i], exception.what ());
+
+          exception.touch (METHOD_NAME);
+
+          throw;
+        }
+        catch (...)
+        {
+          log.Printf ("Can't unload resource '%s', unknown exception", resource_names[i]);
+          throw;
+        }
+      }
     }
 
 /// Подсчёт ссылок
@@ -168,11 +195,11 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
   private:
     stl::string                  attachment;
     stl::string                  resource_manager_name;
+    common::Log                  log;
     sound::SoundManager          sound_manager;
     sound::ScenePlayer           scene_player;
     media::rms::Server           resource_server;
     media::rms::ResourceManager* attached_resource_manager;
-    common::Log                  log;
 };
 
 /*
