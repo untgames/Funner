@@ -103,7 +103,7 @@ const char* FileSystemImpl::CompressPath (const char* path)
              *src    = marker - 1;
   
   compress_path.fast_resize (path_size);
-  
+
   char* dst = compress_path.end ();
   
   for (;src!=path-1;--src)
@@ -1083,4 +1083,28 @@ void FileSystem::RemoveCryptoParameters (const char* path)
 void FileSystem::RemoveAllCryptoParameters ()
 {
   FileSystemSingleton::Instance ().RemoveAllCryptoParameters ();
+}
+
+/*
+    Получение ключа шифрования по файлу
+*/
+
+void FileSystem::GetFileCryptoKey (const char* file_name, filecryptokey_t key)
+{
+  try
+  {
+    if (!file_name)
+      throw xtl::make_null_argument_exception ("", "file_name");
+
+    FileHash file_hash;
+
+    GetFileHash (file_name, file_hash);
+
+    memcpy (key, file_hash.md5, sizeof (key) < sizeof (file_hash.md5) ? sizeof (key) : sizeof (file_hash.md5));
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("common::FileSystem::GetFileCryptoKey");
+    throw;
+  }
 }

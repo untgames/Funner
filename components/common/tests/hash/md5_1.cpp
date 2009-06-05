@@ -14,7 +14,7 @@ int main ()
   char          source [] = "";
   unsigned char digest [16];
 
-  md5 (digest,source,strlen (source));
+  md5 (source,strlen (source),digest);
 
   printf ("hash = ");
 

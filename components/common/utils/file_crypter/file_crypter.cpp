@@ -17,57 +17,32 @@ int main (int argc, char* argv [])
 {
   try
   {
-    if (argc < 4)
+    if (argc < 5)
     {
-      printf ("file-crypter encrypt <src_file_name> <dst_file_name>\n");
-      printf ("file-crypter decrypt <src_file_name> <dst_file_name> <key>\n");
+      printf ("file-crypter encrypt <src_file_name> <dst_file_name> <key-file>\n");
+      printf ("file-crypter decrypt <src_file_name> <dst_file_name> <key-file>\n");
       return 1;
     }
         
     const char* method        = argv [1];
     const char* src_file_name = argv [2];
     const char* dst_file_name = argv [3];
+    const char* key_file_name = argv [4];
     
     const char* read_method  = "";
     const char* write_method = "";    
 
-    xtl::uninitialized_storage<char> key;
+    filecryptokey_t key;
+      
+    FileSystem::GetFileCryptoKey (key_file_name, key);
 
     if (!xtl::xstricmp (method, "encrypt"))
     {      
-      FileHash src_file_hash;
-
-      FileSystem::GetFileHash (src_file_name, src_file_hash);
-      
-      printf ("key: '");
-
-      for (int i=0; i<16; i++)
-        printf ("%02x", src_file_hash.md5 [i]);
-
-      printf ("'\n");    
-      
-      key.resize (sizeof (src_file_hash.md5));
-      
-      memcpy (key.data (), src_file_hash.md5, key.size ());
-      
       read_method  = DECRYPT_METHOD;
       write_method = ENCRYPT_METHOD;
     }
     else if (!xtl::xstricmp (method, "decrypt"))
     {
-      if (argc < 5)
-      {
-        printf ("file-crypter decrypt <src_file_name> <dst_file_name> <key>\n");
-        return 1;
-      }
-      
-      const char* key_string = argv [4];
-      size_t      key_length = strlen (key_string);
-
-      key.resize (key_length / 2);
-
-      compress_buffer (key_length, key_string, key.data ());            
-
       write_method = DECRYPT_METHOD;
       read_method  = ENCRYPT_METHOD;
     }
@@ -77,13 +52,14 @@ int main (int argc, char* argv [])
       return 1;
     }
 
-      //запись данных      
+      //шифрование
 
     InputFile  in_file (src_file_name);          
     StdFile    out_bin_file (dst_file_name, FileMode_ReadWrite);
-    CryptoFile out_file (out_bin_file, read_method, write_method, key.data (), key.size () * CHAR_BIT);
-   
-      //чтение данных
+    CryptoFile out_file (out_bin_file, read_method, write_method, key, sizeof (key) * CHAR_BIT);
+    
+    size_t file_size      = in_file.Size (),
+           processed_size = 0;
 
     while (!in_file.Eof ())
     {
@@ -110,6 +86,10 @@ int main (int argc, char* argv [])
 
         return 1;        
       }
+      
+      processed_size += size;
+      
+      printf ("\rProgress %.1f%%", 100.0f * float (processed_size)/float (file_size));
     }
   }
   catch (std::exception& exception)

@@ -73,6 +73,7 @@ enum FileSeekMode
 typedef size_t filesize_t, filemode_t;
 typedef time_t filetime_t;
 typedef int    filepos_t;
+typedef char   filecryptokey_t [16];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о файле
@@ -520,6 +521,11 @@ class FileSystem
     static FileCryptoParameters GetCryptoParameters       (const char* path);
     static void                 RemoveCryptoParameters    (const char* path);
     static void                 RemoveAllCryptoParameters ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение ключа шифрования по файлу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void GetFileCryptoKey (const char* file_name, filecryptokey_t key);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление / переименование файла, создание каталога

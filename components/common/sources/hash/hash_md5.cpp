@@ -281,7 +281,7 @@ namespace common
 
 /* hash_value - 16 байт */
 
-void md5 (unsigned char result_hash_value [16], const void* buf, size_t len)
+void md5 (const void* buf, size_t len, unsigned char result_hash_value [16])
 {
   MD5_CTX context;
 

@@ -1,4 +1,2 @@
-crypto_zip.cpp
-Linking crypto_zip.exe...
 Results of crypto_zip_test:
 File content: 'Hello world from crypted zip file!'
