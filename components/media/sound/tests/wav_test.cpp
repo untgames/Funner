@@ -34,8 +34,8 @@ int main ()
     for (; i < sample1.SamplesCount();)
       i += sample1.Read (i, one_read, data_buffers[1] + i * sample1.SamplesToBytes (1));
 
-    md5 (hash[0], data_buffers[0], buffer_size);
-    md5 (hash[1], data_buffers[1], buffer_size);
+    md5 (data_buffers[0], buffer_size, hash[0]);
+    md5 (data_buffers[1], buffer_size, hash[1]);
 
     printf ("Results of wav_test:\n");
 
@@ -46,14 +46,14 @@ int main ()
         printf ("%02x", hash[j][i]);
       printf ("%02x}\n", hash [j][15]);
     }
-  
+
     delete [] data_buffers [0];
     delete [] data_buffers [1];
   }
   catch (std::exception& exception)
-  {                                               
-    printf ("exception: %s\n",exception.what ()); 
-  }                                               
+  {
+    printf ("exception: %s\n",exception.what ());
+  }
   catch (...)
   {
     printf ("unknown exception\n");

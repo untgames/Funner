@@ -43,7 +43,7 @@ void dump_hash (media::Image& image)
 
   unsigned char hash[16];
 
-  md5 (hash, image.Bitmap (), image.Width () * image.Height () * get_bytes_per_pixel (image.Format ()));
+  md5 (image.Bitmap (), image.Width () * image.Height () * get_bytes_per_pixel (image.Format ()), hash);
 
   for (size_t i=0;i<15;i++)
     printf ("%02x,", hash [i]);

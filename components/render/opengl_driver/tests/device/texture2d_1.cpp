@@ -8,7 +8,7 @@ const size_t IMAGE_DATA_SIZE = TEX_SIZE * TEX_SIZE * 4;
 int main ()
 {
   printf ("Results of texture2d_1_test:\n");
-  
+
   try
   {
     Test test (L"OpenGL device test window (texture2d_1_test)");
@@ -18,10 +18,10 @@ int main ()
 
     TextureDesc desc;
     memset (&desc, 0, sizeof (desc));
-  
+
     char* image_data = new char [IMAGE_DATA_SIZE];
     unsigned char hash[2][16];
-    
+
     desc.dimension            = TextureDimension_2D;
     desc.width                = TEX_SIZE;
     desc.height               = TEX_SIZE;
@@ -29,19 +29,19 @@ int main ()
     desc.format               = PixelFormat_RGB8;
     desc.bind_flags           = BindFlag_Texture;
     desc.generate_mips_enable = false;
-    desc.access_flags         = AccessFlag_ReadWrite;    
-    
+    desc.access_flags         = AccessFlag_ReadWrite;
+
     xtl::com_ptr<ITexture> texture (test.device->CreateTexture (desc), false);
-    
+
     memset (image_data, 17, IMAGE_DATA_SIZE);
-    
+
     texture->SetData (0, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_RGB8, image_data);
-    
-    md5 (hash[0], image_data, IMAGE_DATA_SIZE);
-    
+
+    md5 (image_data, IMAGE_DATA_SIZE, hash[0]);
+
     texture->GetData (0, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_RGB8, image_data);
-    
-    md5 (hash[1], image_data, IMAGE_DATA_SIZE);
+
+    md5 (image_data, IMAGE_DATA_SIZE, hash[1]);
 
     if (memcmp (hash[0], hash[1], 16))
       printf ("RGB non power of two 2d texture data operations works incorrect!\n");
@@ -54,12 +54,12 @@ int main ()
     desc.height               = TEX_SIZE;
 
     xtl::com_ptr<ITexture> texture2 (test.device->CreateTexture (desc), false);
-    
+
     memset (image_data, 0x01010101, IMAGE_DATA_SIZE);
     texture2->SetData (0, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_RGBA8, image_data);
-    md5 (hash[0], image_data, IMAGE_DATA_SIZE);
+    md5 (image_data, IMAGE_DATA_SIZE, hash[0]);
     texture2->GetData (0, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_RGBA8, image_data);
-    md5 (hash[1], image_data, IMAGE_DATA_SIZE);
+    md5 (image_data, IMAGE_DATA_SIZE, hash[1]);
 
     if (memcmp (hash[0], hash[1], 16))
       printf ("RGB8 to DXT 2d texture data operations works incorrect!\n");
@@ -67,9 +67,9 @@ int main ()
       printf ("RGB8 to DXT 2d texture data operations works correct!\n");
 
     texture2->SetData (0, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_DXT3, image_data);
-    md5 (hash[0], image_data, IMAGE_DATA_SIZE);
+    md5 (image_data, IMAGE_DATA_SIZE, hash[0]);
     texture2->GetData (0, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_DXT3, image_data);
-    md5 (hash[1], image_data, IMAGE_DATA_SIZE);
+    md5 (image_data, IMAGE_DATA_SIZE, hash[1]);
 
 /*    texture2->SetData (0, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_RGBA8, image_data);
     md5 (hash[0], image_data, IMAGE_DATA_SIZE);
@@ -90,7 +90,7 @@ int main ()
       printf ("DXT to DXT 2d texture data operations works incorrect!\n");
     else
       printf ("DXT to DXT 2d texture data operations works correct!\n");
-  
+
     desc.format  = PixelFormat_D16;
     desc.width   = TEX_SIZE;
     desc.height  = TEX_SIZE;
@@ -98,10 +98,10 @@ int main ()
     xtl::com_ptr<ITexture> texture3 (test.device->CreateTexture (desc), false);
 
     texture3->SetData (0, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_D16, image_data);
-    md5 (hash[0], image_data, IMAGE_DATA_SIZE);
-    
+    md5 (image_data, IMAGE_DATA_SIZE, hash[0]);
+
     texture3->GetData (0, 0, 0, 0, TEX_SIZE, TEX_SIZE, PixelFormat_D16, image_data);
-    md5 (hash[1], image_data, IMAGE_DATA_SIZE);
+    md5 (image_data, IMAGE_DATA_SIZE, hash[1]);
 
     if (memcmp (hash[0], hash[1], 16))
       printf ("Depth 2d texture data operations works incorrect!\n");
@@ -114,6 +114,6 @@ int main ()
   {
     printf ("exception: %s\n", exception.what ());
   }
-  
+
   return 0;
 }
