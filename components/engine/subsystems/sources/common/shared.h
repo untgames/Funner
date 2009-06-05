@@ -1,6 +1,8 @@
 #ifndef ENGINE_SUBSYSTEMS_COMMON_SHARED_HEADER
 #define ENGINE_SUBSYSTEMS_COMMON_SHARED_HEADER
 
+#include <climits>
+
 #include <stl/vector>
 
 #include <xtl/bind.h>

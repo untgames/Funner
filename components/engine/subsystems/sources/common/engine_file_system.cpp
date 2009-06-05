@@ -24,6 +24,31 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
 /// Конструктор/деструктор
     FileSystem (common::ParseNode& node)
     {
+        //чтение параметров шифрования
+        
+      ParseNode crypto_node = node.First ("Crypto");
+      
+      if (crypto_node)
+      {
+        for (Parser::NamesakeIterator iter=crypto_node.First ("File"); iter; ++iter)
+        {
+          const char* file_name    = get<const char*> (*iter, "Name");
+          const char* read_method  = get<const char*> (*iter, "ReadMethod");
+          const char* write_method = get<const char*> (*iter, "WriteMethod", read_method);
+          const char* key_file     = get<const char*> (*iter, "KeyFile");
+
+          filecryptokey_t key;
+
+          common::FileSystem::GetFileCryptoKey (key_file, key);
+
+          common::FileCryptoParameters crypto_parameters (read_method, write_method, key, sizeof (key) * CHAR_BIT);
+
+          common::FileSystem::SetCryptoParameters (file_name, crypto_parameters);
+        }
+      }
+        
+        //добавление путей поиска
+      
       const char* paths_string = get<const char*> (node, "Paths", "");
       
       StringArray path_list = split (paths_string);
