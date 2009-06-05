@@ -40,7 +40,7 @@ ScaledTexture::ScaledTexture
   temp_desc.width  = scaled_width;
   temp_desc.height = scaled_height;
 
-  shadow_texture   = dynamic_cast<BindableTexture*> (texture_manager.CreateTexture (temp_desc));
+  shadow_texture = TexturePtr (dynamic_cast<BindableTexture*> (texture_manager.CreateTexture (temp_desc)), false);
 
   if (!shadow_texture.get ())
     throw xtl::format_operation_exception ("render::low_level::opengl::ScaledTexture::ScaledTexture", "TextureManager::CreateTexture returned texture with incompatible type");

@@ -605,6 +605,11 @@ class ModelerRender: public ICustomSceneRender, public xtl::reference_counter
       printf ("LoadResource(%s, %s)\n", tag, file_name);
     }
 
+    void UnloadResource (const char* tag, const char* file_name)
+    {
+      printf ("LoadResource(%s, %s)\n", tag, file_name);
+    }
+
 ///Установка функции отладочного протоколирования
     void SetLogHandler (const ICustomSceneRender::LogFunction&) {}
 

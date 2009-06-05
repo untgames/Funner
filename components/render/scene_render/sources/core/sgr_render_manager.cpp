@@ -23,7 +23,7 @@ const size_t RENDER_TARGET_ARRAY_RESERVE_SIZE = 32;  //резервируемое число целей
 
 struct RenderPath
 {
-  CustomSceneRenderPtr render;  
+  CustomSceneRenderPtr render;
   stl::string          name;
 
   RenderPath (const CustomSceneRenderPtr& in_render, const char* in_name) : render (in_render), name (in_name) {}
@@ -35,18 +35,18 @@ struct RenderPath
 
 struct FrameBuffer: public xtl::reference_counter
 {
-  mid_level::IFrameBuffer*  frame_buffer;  //указаель на буфер кадра системы рендеринга  
+  mid_level::IFrameBuffer*  frame_buffer;  //указаель на буфер кадра системы рендеринга
   RenderTargetImpl::Pointer render_target; //указаель на цель рендеринга
 
   FrameBuffer (mid_level::IFrameBuffer* in_frame_buffer, RenderManager& manager)
     : frame_buffer (in_frame_buffer),
       render_target (RenderTargetImpl::Create (manager, frame_buffer->GetColorBuffer (), frame_buffer->GetDepthStencilBuffer ()))
   { }
-  
+
   ~FrameBuffer ()
   {
       //отмена регистрации в менеджере
-    
+
     render_target->SetRenderManager (0);
   }
 };
@@ -75,28 +75,28 @@ class RenderManager::Impl: private mid_level::IRendererListener
       {
         if (!driver_name_mask)
           throw xtl::make_null_argument_exception ("", "driver_name_mask");
-          
+
         if (!renderer_name_mask)
           throw xtl::make_null_argument_exception ("", "renderer_name_mask");
-          
+
         if (!render_path_masks)
-          throw xtl::make_null_argument_exception ("", "render_path_masks");      
-          
-          //создание системы ренедринга      
+          throw xtl::make_null_argument_exception ("", "render_path_masks");
+
+          //создание системы ренедринга
 
         renderer = RendererPtr (mid_level::DriverManager::CreateRenderer (driver_name_mask, renderer_name_mask), false);
 
           //построение множества имён путей рендеринга
-          
+
         typedef stl::hash_set<stl::string> StringSet;
-          
+
         StringSet                    path_names;
         common::StringArray          path_masks        = common::split (render_path_masks);
         SceneRenderManager::Iterator render_path_begin = SceneRenderManager::CreateIterator ();
 
         for (size_t i=0, count=path_masks.Size (); i<count; i++)
         {
-          const char* render_path_mask = path_masks [i]; 
+          const char* render_path_mask = path_masks [i];
 
           if (!strchr (render_path_mask, '*') && !strchr (render_path_mask, '?'))
           {
@@ -115,22 +115,22 @@ class RenderManager::Impl: private mid_level::IRendererListener
           //создание путей рендеринга
 
         render_paths_string.reserve (RENDER_PATHS_STRING_RESERVE);
-        
+
         for (StringSet::iterator iter=path_names.begin (), end=path_names.end (); iter!=end; ++iter)
         {
           const char* path_name = iter->c_str ();
 
             //создание пути рендеринга
-            
+
           CustomSceneRenderPtr render_path = create_render_path (renderer.get (), path_name);
-          
+
             //установка функций обратного вызова
 
           render_path->SetLogHandler   (log_handler);
           render_path->SetQueryHandler (query_handler);
 
             //регистрация пути рендеринга
-            
+
           render_paths.insert_pair (path_name, RenderPath (render_path, path_name));
 
             //модификация строки имён путей рендеринга
@@ -144,33 +144,33 @@ class RenderManager::Impl: private mid_level::IRendererListener
           //создание менеджера транзакций отрисовки
 
         draw_transaction_manager = new render::DrawTransactionManager (*renderer, log_handler);
-        
+
           //резервирование места для массива целей рендеринга
 
         render_targets.reserve (RENDER_TARGET_ARRAY_RESERVE_SIZE);
 
           //резервирование места для массива буферов кадра
-          
+
         frame_buffers.reserve (FRAME_BUFFER_ARRAY_RESERVE_SIZE);
-        
+
           //регистрация слушателя системы рендеринга
-         
+
         renderer->AttachListener (this);
       }
       catch (xtl::exception& exception)
       {
         exception.touch ("render::RenderManager::Impl::Impl");
         throw;
-      }      
+      }
     }
 
 ///Деструктор
     ~Impl ()
     {
         //отмена регистрации слушателя системы рендеринга
-        
+
       renderer->DetachListener (this);
-      
+
         //сброс менеджера рендеринга в целях рендеринга
 
       for (RenderTargetList::iterator iter=render_targets.begin (), end=render_targets.end (); iter!=end; ++iter)
@@ -179,7 +179,7 @@ class RenderManager::Impl: private mid_level::IRendererListener
 
 ///Получение системы рендеринга
     mid_level::IRenderer& Renderer () { return *renderer; }
-    
+
 ///Список доступных путей рендеринга
     const char* RenderPaths () { return render_paths_string.c_str (); }
 
@@ -195,7 +195,7 @@ class RenderManager::Impl: private mid_level::IRendererListener
       RenderPathMap::const_iterator iter = render_paths.find (path_name);
 
       return iter != render_paths.end ();
-    }    
+    }
 
 ///Получение пути рендеринга
     ICustomSceneRender& GetRenderPath (const char* path_name)
@@ -212,19 +212,19 @@ class RenderManager::Impl: private mid_level::IRendererListener
 
       return *iter->second.render;
     }
-    
+
 ///Количество целей рендеринга
     size_t RenderTargetsCount () { return render_targets.size (); }
-    
+
 ///Получение цели рендеринга
     RenderTargetImpl& RenderTarget (size_t index)
     {
       if (index >= render_targets.size ())
         throw xtl::make_range_exception ("render::RenderManager::Impl::RenderTarget", "index", index, render_targets.size ());
-        
+
       return *render_targets [index];
     }
-    
+
 ///Регистрация цели рендеринга
     void RegisterRenderTarget (RenderTargetImpl* render_target)
     {
@@ -239,17 +239,17 @@ class RenderManager::Impl: private mid_level::IRendererListener
     {
       render_targets.erase (stl::remove (render_targets.begin (), render_targets.end (), render_target), render_targets.end ());
     }
-    
+
 ///Регистрация буфера кадра
     void RegisterFrameBuffer (mid_level::IFrameBuffer* in_frame_buffer)
     {
         //создание буфера кадра
-        
+
       FrameBufferPtr frame_buffer (new FrameBuffer (in_frame_buffer, owner), false);
 
         //добавление буфера кадра
 
-      frame_buffers.push_back (frame_buffer);      
+      frame_buffers.push_back (frame_buffer);
     }
 
 ///Загрузка ресурса
@@ -278,18 +278,50 @@ class RenderManager::Impl: private mid_level::IRendererListener
         }
         catch (...)
         {
-          log_printf (log_handler, "Unknown exception\n    at SceneRender::LoadResource (file_name='%s', tag='%s', render_path='%s', renderer='%s')"
+          log_printf (log_handler, "Unknown exception\n    at load resource (file_name='%s', tag='%s', render_path='%s', renderer='%s')"
             "\n    at %s", file_name, tag, render_path.name.c_str (), renderer->GetDescription (), METHOD_NAME);
         }
       }
     }
-    
+
+///Выгрузка ресурса
+    void UnloadResource (const char* tag, const char* file_name)
+    {
+      static const char* METHOD_NAME = "render::RenderManager::Impl::UnloadResource";
+
+      if (!tag)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "tag");
+
+      if (!file_name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
+
+      for (RenderPathMap::iterator iter=render_paths.begin (), end=render_paths.end (); iter!=end; ++iter)
+      {
+        RenderPath& render_path = iter->second;
+
+        try
+        {
+          render_path.render->UnloadResource (tag, file_name);
+        }
+        catch (std::exception& exception)
+        {
+          log_printf (log_handler, "%s\n    at unload resource (file_name='%s', tag='%s', render_path='%s', renderer='%s')"
+            "\n    at %s", exception.what (), file_name, tag, render_path.name.c_str (), renderer->GetDescription (), METHOD_NAME);
+        }
+        catch (...)
+        {
+          log_printf (log_handler, "Unknown exception\n    at unload resource (file_name='%s', tag='%s', render_path='%s', renderer='%s')"
+            "\n    at %s", file_name, tag, render_path.name.c_str (), renderer->GetDescription (), METHOD_NAME);
+        }
+      }
+    }
+
 ///Протоколирование
     void LogVPrintf (const char* format, va_list list)
     {
       if (!format)
         return;
-        
+
       try
       {
         log_handler (common::vformat (format, list).c_str ());
@@ -318,7 +350,7 @@ class RenderManager::Impl: private mid_level::IRendererListener
 
       throw xtl::format_operation_exception ("render::RenderManager::Impl::GetFrameBuffer", "Invalid frame buffer");
     }
-  
+
 ///Создан буфер кадра
     void OnFrameBufferCreate (mid_level::IFrameBuffer* frame_buffer)
     {
@@ -389,7 +421,7 @@ class RenderManager::Impl: private mid_level::IRendererListener
     stl::string                render_paths_string;      //строка с именами доступных путей рендеринга
     FrameBufferArray           frame_buffers;            //буферы кадра
     RenderTargetList           render_targets;           //цели рендеринга
-    SceneRender::LogFunction   log_handler;              //функция протоколирования    
+    SceneRender::LogFunction   log_handler;              //функция протоколирования
     DrawTransactionManagerPtr  draw_transaction_manager; //менеджер отрисовки
 };
 
@@ -411,11 +443,11 @@ RenderManager::RenderManager
     impl = new Impl (*this, driver_name_mask, renderer_name_mask, render_path_masks, log_handler, query_handler);
 
       //регистрация буферов кадра
-      
-    mid_level::IRenderer& renderer = impl->Renderer ();    
+
+    mid_level::IRenderer& renderer = impl->Renderer ();
 
     for (size_t i=0, count=renderer.GetFrameBuffersCount (); i<count; i++)
-      impl->RegisterFrameBuffer (renderer.GetFrameBuffer (i));      
+      impl->RegisterFrameBuffer (renderer.GetFrameBuffer (i));
   }
   catch (xtl::exception& exception)
   {
@@ -470,12 +502,17 @@ DrawTransactionManager& RenderManager::DrawTransactionManager ()
 }
 
 /*
-    Загрузка ресурса
+    Работа с ресурсами
 */
 
 void RenderManager::LoadResource (const char* tag, const char* file_name)
 {
   impl->LoadResource (tag, file_name);
+}
+
+void RenderManager::UnloadResource (const char* tag, const char* file_name)
+{
+  impl->UnloadResource (tag, file_name);
 }
 
 /*
@@ -485,8 +522,8 @@ void RenderManager::LoadResource (const char* tag, const char* file_name)
 void RenderManager::LogPrintf (const char* format, ...)
 {
   va_list list;
-  
-  va_start (list, format);  
+
+  va_start (list, format);
 
   impl->LogVPrintf (format, list);
 }

@@ -105,7 +105,7 @@ class SceneRender
     const char* RendererDescription () const; //описание системы рендеринга
     const char* RenderPaths         () const; //список доступных путей рендеринга
     bool        HasRenderPath       (const char* name) const; //проверка доступности указанного пути рендеринга
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор целей рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,8 +138,10 @@ class SceneRender
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с ресурсами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void LoadResource (const char* tag, const char* file_name);
-    void LoadResource (const char* file_name) { LoadResource ("auto", file_name); }
+    void LoadResource   (const char* tag, const char* file_name);
+    void LoadResource   (const char* file_name) { LoadResource ("auto", file_name); }
+    void UnloadResource (const char* tag, const char* file_name);
+    void UnloadResource (const char* file_name) { UnloadResource ("auto", file_name); }
 
   private:
     SceneRender (const SceneRender&); //no impl

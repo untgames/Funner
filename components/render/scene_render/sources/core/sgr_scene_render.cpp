@@ -20,12 +20,12 @@ const size_t DEFAULT_MAX_DRAW_DEPTH = 16; //максимальный уровень вложенности рен
 typedef stl::auto_ptr<RenderManager> RenderManagerPtr;
 
 struct SceneRender::Impl
-{  
+{
   RenderManagerPtr         render_manager; //менеджер рендеринга
   QueryManager             query_manager;  //менеджер запросов рендеринга
   SceneRender::LogFunction log_handler;    //функци€ отладочного протоколировани€
   size_t                   max_draw_depth; //максимальный уровень вложенности рендеринга
-  
+
 /// онструктор
   Impl () : max_draw_depth (DEFAULT_MAX_DRAW_DEPTH) {}
 
@@ -56,16 +56,16 @@ struct SceneRender::Impl
       //подавление всех исключений
     }
   }
-  
+
   void LogPrintf (const char* format, ...)
   {
     if (!log_handler)
       return;
-    
+
     va_list args;
-    
+
     va_start (args, format);
-    
+
     try
     {
       log_handler (common::vformat (format, args).c_str ());
@@ -120,7 +120,7 @@ void SceneRender::SetRenderer
 
     new_manager->DrawTransactionManager ().SetMaxDrawDepth (impl->max_draw_depth);
 
-    impl->render_manager = new_manager;    
+    impl->render_manager = new_manager;
   }
   catch (xtl::exception& exception)
   {
@@ -161,6 +161,14 @@ void SceneRender::LoadResource (const char* tag, const char* file_name)
   impl->render_manager->LoadResource (tag, file_name);
 }
 
+void SceneRender::UnloadResource (const char* tag, const char* file_name)
+{
+  if (!impl->render_manager)
+    throw xtl::format_operation_exception ("render::SceneRender::UnloadResource", "Null render manager");
+
+  impl->render_manager->UnloadResource (tag, file_name);
+}
+
 /*
     ѕеребор доступных целей рендеринга
 */
@@ -173,7 +181,7 @@ size_t SceneRender::RenderTargetsCount () const
 RenderTarget SceneRender::RenderTarget (size_t index) const
 {
   if (!impl->render_manager)
-    throw xtl::make_range_exception ("render::SceneRender::RenderTarget", "index", index, 0u);    
+    throw xtl::make_range_exception ("render::SceneRender::RenderTarget", "index", index, 0u);
 
   return ConstructableRenderTarget (impl->render_manager->RenderTarget (index));
 }

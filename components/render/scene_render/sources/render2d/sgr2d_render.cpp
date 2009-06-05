@@ -137,6 +137,34 @@ void Render::LoadResource (const char* tag, const char* file_name)
   }
 }
 
+void Render::UnloadResource (const char* tag, const char* file_name)
+{
+  try
+  {
+    const char* MATERIAL_LIBRARY_TAG = "material_library";
+
+    if (!strcmp (tag, "auto"))
+    {
+        //автоматическое определение тэга
+
+      if (common::suffix (file_name) == ".xmtl")
+        tag = MATERIAL_LIBRARY_TAG;
+    }
+
+      //диспетчеризация тэгов
+
+    if (!strcmp (tag, MATERIAL_LIBRARY_TAG))
+    {
+      UnloadMaterialLibrary (file_name);
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::render2d::Render::UnloadResource");
+    throw;
+  }
+}
+
 void Render::LoadMaterialLibrary (const char* file_name)
 {
   try
@@ -167,9 +195,40 @@ void Render::LoadMaterialLibrary (const char* file_name)
   }
 }
 
+void Render::UnloadMaterialLibrary (const char* file_name)
+{
+  try
+  {
+    media::rfx::MaterialLibrary library (file_name, log_handler);
+
+    for (media::rfx::MaterialLibrary::Iterator iter=library.CreateIterator (); iter; ++iter)
+    {
+      media::rfx::Material::Pointer material        = *iter;
+      media::rfx::SpriteMaterial*   sprite_material = dynamic_cast<media::rfx::SpriteMaterial*> (&*material);
+
+      if (sprite_material)
+      {
+        RemoveMaterial (library.ItemId (iter));
+
+        textures.erase (sprite_material->Image ());
+      }
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::render2d::Render::UnloadMaterialLibrary(file_name='%s')", file_name);
+    throw;
+  }
+}
+
 void Render::InsertMaterial (const char* id, const media::rfx::SpriteMaterial::Pointer& material)
 {
   materials [id] = material;
+}
+
+void Render::RemoveMaterial (const char* id)
+{
+  materials.erase (id);
 }
 
 SpriteMaterial* Render::GetMaterial (const char* name)

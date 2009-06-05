@@ -40,10 +40,10 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 /// онструктор
     SceneRenderSubsystem (common::ParseNode& node)
       : resource_manager_name (get<const char*> (node, "ResourceManager", "")),
+        log (LOG_NAME),
+        render (get<const char*> (node, "DriverMask"), get<const char*> (node, "RendererMask"), get<const char*> (node, "RenderPathMasks", "*")),
         resource_server (*this),
         attached_resource_manager (0),
-        render (get<const char*> (node, "DriverMask"), get<const char*> (node, "RendererMask"), get<const char*> (node, "RenderPathMasks", "*")),
-        log (LOG_NAME),
         idle_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&SceneRenderSubsystem::OnIdle, this))),
         screen (0)
     {
@@ -104,8 +104,8 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 ///ƒеструктор
     ~SceneRenderSubsystem ()
     {
-      AttachmentRegistry::Detach<media::rms::ResourceManager> (this);
-      AttachmentRegistry::Detach<render::Screen>              (this);
+      AttachmentRegistry::Detach<media::rms::ResourceManager> (this, AttachmentRegistryAttachMode_ForceNotify);
+      AttachmentRegistry::Detach<render::Screen>              (this, AttachmentRegistryAttachMode_ForceNotify);
     }
 
 ///—обыти€ установки / удалени€ менеджера ресурсов
@@ -136,7 +136,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
         return;
 
       render.RenderTarget (iter->second).SetScreen (&screen);
-      
+
       this->screen = &screen;
     }
 
@@ -149,7 +149,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
       render.RenderTarget (iter->second).SetScreen (0);
 
-      this->screen = 0;            
+      this->screen = 0;
     }
 
 ///”правление ресурсами
@@ -192,7 +192,34 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
     void UnloadResources (size_t count, const char** resource_names)
     {
-      //?????: do this !!!!!!!!!
+      static const char* METHOD_NAME = "engine::subsystems::SceneRenderSubsystem::UnloadResources";
+
+      if (!resource_names)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
+
+      for (size_t i = 0; i < count; i++)
+      {
+        if (!resource_names[i])
+          throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
+
+        try
+        {
+          render.UnloadResource (resource_names [i]);
+        }
+        catch (xtl::exception& exception)
+        {
+          log.Printf ("Can't unload resource '%s', exception '%s'", resource_names[i], exception.what ());
+
+          exception.touch (METHOD_NAME);
+
+          throw;
+        }
+        catch (...)
+        {
+          log.Printf ("Can't unload resource '%s', unknown exception", resource_names[i]);
+          throw;
+        }
+      }
     }
 
 /// ѕодсчЄт ссылок
@@ -211,18 +238,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
     void OnIdle ()
     {
-      for (size_t i=0; i<render.RenderTargetsCount (); i++)
-      {
-        if (!render.RenderTarget (i).Screen ())
-        {
-          printf ("set screen=%p\n", screen);
-          render.RenderTarget (i).SetScreen (screen);
-        }
-        
-        render.RenderTarget (i).Update ();      
-      }
-      
-/*      for (RenderTargetArray::iterator iter=idle_render_targets.begin (); iter!=idle_render_targets.end ();)
+      for (RenderTargetArray::iterator iter=idle_render_targets.begin (); iter!=idle_render_targets.end ();)
       {
         if (!iter->IsBindedToRender ()) //если цель рендеринга удалена - удал€ем еЄ из списка отрисовки
         {
@@ -230,18 +246,18 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
           continue;
         }
-        
+
           //обновление цели рендеринга
 
-        iter->Update ();        
+        iter->Update ();
 
         ++iter;
       }
-      
+
         //если все цели рендеринга удалены - перерисовывать нечего
-      
+
       if (idle_render_targets.empty ())
-        idle_connection.disconnect ();*/
+        idle_connection.disconnect ();
     }
 
   private:
@@ -254,14 +270,14 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
   private:
     stl::string                  resource_manager_name;      //им€ точки прив€зки менеджера ресурсов
+    Log                          log;                        //лог
+    render::SceneRender          render;                     //рендер
     media::rms::Server           resource_server;            //сервер ресурсов
     media::rms::ResourceManager* attached_resource_manager;  //присоединненный менеджер ресурсов
-    render::SceneRender          render;                     //рендер
     ScreenMap                    screen_map;                 //соответствие экранов и рендер-таргетов
-    Log                          log;                        //лог
     xtl::auto_connection         idle_connection;            //соединение обновлени€ рендер-таргетов
     RenderTargetArray            idle_render_targets;        //список автоматически обновл€емых целей рендеринга
-    render::Screen* screen;
+    render::Screen*              screen;
 };
 
 /*
