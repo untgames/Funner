@@ -50,7 +50,7 @@ void UnistdPlatform::InitLockable (lockable_t& lockable)
       pthread_raise_error ("::pthread_mutexattr_init", status);
     }
 
-    status = pthread_mutex_init (&mutex->handle, 0);
+    status = pthread_mutex_init (&mutex->handle, &attributes);
 
     pthread_mutexattr_destroy (&attributes);
 
