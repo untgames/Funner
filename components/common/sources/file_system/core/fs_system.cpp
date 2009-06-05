@@ -22,15 +22,15 @@ const char* FILE_SYSTEM_ADDONS_MASK = "common.file_systems.*"; //маска имЄн комп
 inline PackFileType::PackFileType (const char* _extension,size_t _hash,const FileSystem::PackFileCreater& _creater)
   : creater (_creater), extension_hash (_hash), extension (_extension)
   { }
-  
+
 inline SearchPath::SearchPath (const char* _path,size_t _hash)
   : hash (_hash), path (_path)
   { }
-  
-inline PackFile::PackFile (size_t _file_name_hash,size_t _search_path_hash,ICustomFileSystemPtr _file_system) 
+
+inline PackFile::PackFile (size_t _file_name_hash,size_t _search_path_hash,ICustomFileSystemPtr _file_system)
   : file_name_hash (_file_name_hash), search_path_hash (_search_path_hash), file_system (_file_system)
   { }
-    
+
 inline MountFileSystem::MountFileSystem (const char* _prefix,size_t _hash,ICustomFileSystemPtr _file_system)
   : hash (_hash), prefix (_prefix), file_system (_file_system), mount_point_file_system (*this)
 {
@@ -55,11 +55,11 @@ FileSystemImpl::FileSystemImpl ()
   default_file_buffer_size = DEFAULT_FILE_BUF_SIZE;
 
   ClosedFileImpl::Instance ();
-  
+
   Mount ("/std",Platform::GetFileSystem ());
-  Mount ("/io",Platform::GetIOSystem ());  
-  
-  default_path = "/std";  
+  Mount ("/io",Platform::GetIOSystem ());
+
+  default_path = "/std";
 }
 
 FileSystemImpl::~FileSystemImpl ()
@@ -101,25 +101,25 @@ const char* FileSystemImpl::CompressPath (const char* path)
 
   const char *marker = path + path_size,
              *src    = marker - 1;
-  
+
   compress_path.fast_resize (path_size);
 
   char* dst = compress_path.end ();
-  
+
   for (;src!=path-1;--src)
     if (*src == '/')
-    {      
+    {
       size_t size = marker - src;
-      
+
       marker = src;
-      
+
       switch (size)
       {
         case 2:
           if (!strncmp (src+1,".",1))
             continue;
-          break;            
-        case 3:            
+          break;
+        case 3:
           if (!strncmp (src+1,"..",2))
           {
             del_count++;
@@ -130,7 +130,7 @@ const char* FileSystemImpl::CompressPath (const char* path)
           break;
       }
 
-      if (!del_count) 
+      if (!del_count)
       {
         dst -= size;
         memcpy (dst,src,size);
@@ -143,7 +143,7 @@ const char* FileSystemImpl::CompressPath (const char* path)
 
 void FileSystemImpl::SetDefaultPath (const char* path)
 {
-  string new_path = path ? FileSystem::GetNormalizedFileName (path) : "/";  
+  string new_path = path ? FileSystem::GetNormalizedFileName (path) : "/";
 
   if (new_path [0] != '/')
     new_path = CompressPath (format ("%s/%s",default_path.c_str (),new_path.c_str ()).c_str ());
@@ -158,7 +158,7 @@ void FileSystemImpl::SetDefaultPath (const char* path)
 
   if (!info.is_dir)
     throw xtl::format_operation_exception ("common::FileSystem::SetCurrentDir","Can not set current dir '%s' because it is not dir",new_path.c_str ());
-    
+
   swap (default_path,new_path);
 }
 
@@ -175,13 +175,13 @@ void FileSystemImpl::RegisterPackFile (const char* extension,const PackFileCreat
     throw xtl::make_null_argument_exception ("common::FileSystem::RegisterPackFile","creater");
 
   size_t hash = strihash (extension);
-  
+
   for (PackFileTypeList::iterator i=pack_types.begin ();i!=pack_types.end ();++i)
     if (i->extension_hash == hash)
     {
       i->creater = creater;
       return;
-    }    
+    }
 
   pack_types.push_front (PackFileType (extension,hash,creater));
 }
@@ -192,7 +192,7 @@ void FileSystemImpl::UnregisterPackFile (const char* extension)
     throw xtl::make_null_argument_exception ("common::FileSystem::UnregisterPackFile","extension");
 
   size_t hash = strihash (extension);
-    
+
   for (PackFileTypeList::iterator i=pack_types.begin ();i!=pack_types.end ();++i)
     if (i->extension_hash == hash)
     {
@@ -210,14 +210,14 @@ void FileSystemImpl::AddPackFile (const char* _path,size_t search_path_hash,cons
   static ComponentLoader custom_file_systems_loader (FILE_SYSTEM_ADDONS_MASK);
 
   string path = FileSystem::GetNormalizedFileName (_path), type = suffix (path);
-         
+
   if (type.empty ())
     return;
 
   type.erase (type.begin ());
 
   volatile size_t path_hash = strhash (path.c_str ()), type_hash = strhash (type.c_str ());
-    
+
   for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();++i)
     if (i->file_name_hash == path_hash)
     {
@@ -229,7 +229,7 @@ void FileSystemImpl::AddPackFile (const char* _path,size_t search_path_hash,cons
     if (i->extension_hash == type_hash)
     {
       try
-      {        
+      {
         ICustomFileSystemPtr pack_file_system (i->creater (path.c_str ()),false);
 
         pack_files.push_front (PackFile (strihash (path.c_str ()),search_path_hash,pack_file_system));
@@ -270,7 +270,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
     log_handler (format ("Search path '%s' doesn't exist",path.c_str ()).c_str ());
     return;
   }
-  
+
   size_t path_hash = strhash (path.c_str ());
 
   if (file_info.is_dir)
@@ -303,19 +303,19 @@ void FileSystemImpl::RemoveSearchPath (const char* _path)
     throw xtl::make_null_argument_exception ("common::FileSystem::RemoveSearchPath","path");
 
   string path = FileSystem::GetNormalizedFileName (_path);
-  
+
   if (path [0] != '/')
     path = format ("%s/%s",default_path.c_str (),path.c_str ());
 
   size_t hash = strhash (path.c_str ());
-    
+
   for (SearchPathList::iterator i=search_paths.begin ();i!=search_paths.end ();++i)
     if (i->hash == hash)
     {
       search_paths.erase (i);
       break;
     }
-    
+
   for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();)
     if (i->search_path_hash == hash || i->file_name_hash == hash)
     {
@@ -344,7 +344,7 @@ void FileSystemImpl::Mount (const char* _path_prefix,ICustomFileSystemPtr file_s
 {
   if (!_path_prefix)
     throw xtl::make_null_argument_exception ("common::FileSystem::Mount","path_prefix");
-    
+
   if (!file_system)
     throw xtl::make_null_argument_exception ("common::FileSystem::Mount","file_system");
 
@@ -369,7 +369,7 @@ void FileSystemImpl::Unmount (const char* _path_prefix)
 {
   if (!_path_prefix)
     return;
-        
+
   string prefix = FileSystem::GetNormalizedFileName (_path_prefix);
   size_t hash   = strhash (prefix.c_str ());
 
@@ -385,7 +385,7 @@ void FileSystemImpl::Unmount (ICustomFileSystemPtr file_system)
 {
   if (!file_system)
     return;
-    
+
   for (MountList::iterator i=mounts.begin ();i!=mounts.end ();)
     if (i->file_system == file_system)
     {
@@ -409,7 +409,7 @@ bool FileSystemImpl::IsPathMount (const char* path) const
 {
   if (!path)
     return false;
-        
+
   string prefix = FileSystem::GetNormalizedFileName (path);
   size_t hash   = strhash (prefix.c_str ());
 
@@ -432,10 +432,10 @@ void FileSystemImpl::SetCryptoParameters (const char* path, const FileCryptoPara
       throw xtl::make_null_argument_exception ("", "path");
 
     CryptoMap::iterator iter = crypto_parameters.find (path);
-    
+
     if (iter != crypto_parameters.end ())
     {
-      iter->second = parameters;      
+      iter->second = parameters;
     }
     else
     {
@@ -453,19 +453,19 @@ bool FileSystemImpl::HasCryptoParameters (const char* path) const
 {
   if (!path)
     return false;
-    
+
   return crypto_parameters.find (path) != crypto_parameters.end ();
 }
 
 FileCryptoParameters FileSystemImpl::GetCryptoParameters (const char* path) const
 {
   static const char* METHOD_NAME = "common::FileSystemImpl::GetCryptoParameters";
-  
+
   if (!path)
     throw xtl::make_null_argument_exception (METHOD_NAME, "path");
-    
+
   CryptoMap::const_iterator iter = crypto_parameters.find (path);
-  
+
   if (iter == crypto_parameters.end ())
     throw xtl::make_argument_exception (METHOD_NAME, "path", path, "No crypto parameters assigned");
 
@@ -476,7 +476,7 @@ void FileSystemImpl::RemoveCryptoParameters (const char* path)
 {
   if (!path)
     return;
-    
+
   crypto_parameters.erase (path);
 }
 
@@ -517,14 +517,14 @@ ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,
 ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,string& result_file_name)
 {
   string file_name = FileSystem::GetNormalizedFileName (src_file_name);
-  
+
     //пытаемс€ найти файл не использу€ путей поиска
-  
+
   if (file_name [0] == '/')
     return FindMountFileSystem (file_name.c_str (),result_file_name);
- 
+
     //пытаемс€ найти файл по дефолтному пути поиска
- 
+
   string             full_name         = format ("%s/%s",default_path.c_str (),file_name.c_str ()), mount_name;
   ICustomFileSystemPtr owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name);
 
@@ -559,8 +559,8 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
       swap (result_file_name,file_name);
       return i->file_system;
     }
-    
-    //возвращаем ссылку на файловую систему включающую путь по умолчанию      
+
+    //возвращаем ссылку на файловую систему включающую путь по умолчанию
 
   if (!default_file_system)
     throw format_operation_exception ("","File '%s' does not belong to any file system",src_file_name);
@@ -584,22 +584,22 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
   ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
 
   try
-  {    
+  {
     volatile ICustomFileSystem::file_t file = file_system->FileOpen (file_name.c_str (),mode_flags,buffer_size);
-    
+
     try
     {
       FileImplPtr base_file (new CustomFileImpl (file_system,file,mode_flags,true),false);
-      
+
       if (HasCryptoParameters (src_file_name))
       {
         FileCryptoParameters params = GetCryptoParameters (src_file_name);
-        
+
         base_file = FileImplPtr (new CryptoFileImpl (base_file, buffer_size, params.ReadMethod (), params.WriteMethod (), params.Key (), params.KeyBits ()), false);
       }
 
       size_t self_buffer_size = base_file->GetBufferSize ();
-      
+
       if (!buffer_size || self_buffer_size >= buffer_size)
         return base_file;
 
@@ -619,7 +619,7 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
     exception.touch ("common::FileSystemImpl::OpenFile('%s')", src_file_name);
     throw;
   }
-  
+
   return NULL;
 }
 
@@ -646,13 +646,13 @@ void FileSystemImpl::Remove (const char* src_file_name)
 {
   if (!src_file_name)
     throw xtl::make_null_argument_exception ("common::FileSystem::Remove","file_name");
-    
+
   string file_name;
-  
+
   try
   {
     ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
-    
+
     file_system->Remove (file_name.c_str ());
   }
   catch (xtl::exception& exception)
@@ -666,16 +666,16 @@ void FileSystemImpl::Rename (const char* src_file_name,const char* new_name)
 {
   if (!src_file_name)
     throw xtl::make_null_argument_exception ("common::FileSystem::Rename","file_name");
-  
+
   if (!new_name)
     throw xtl::make_null_argument_exception ("common::FileSystem::Rename","new_name");
 
   string file_name;
-  
+
   try
   {
     ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
-    
+
     file_system->Rename (file_name.c_str (),new_name);
   }
   catch (xtl::exception& exception)
@@ -695,7 +695,7 @@ void FileSystemImpl::Mkdir (const char* src_dir_name)
   try
   {
     ICustomFileSystemPtr file_system = FindFileSystem (src_dir_name,dir_name);
-    
+
     file_system->Mkdir (dir_name.c_str ());
   }
   catch (xtl::exception& exception)
@@ -714,12 +714,12 @@ bool FileSystemImpl::IsFileExist (const char* src_file_name)
   try
   {
     string file_name;
-    
+
     if (!src_file_name)
       return false;
-      
+
     ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
-    
+
     if (!file_system)
       return false;
 
@@ -735,12 +735,12 @@ bool FileSystemImpl::GetFileInfo (const char* src_file_name,FileInfo& info)
 {
   if (!src_file_name)
     return false;
-    
+
   try
   {
     string file_name;
 
-    ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);    
+    ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
 
     return file_system->GetFileInfo (file_name.c_str (),info);
   }
@@ -765,7 +765,7 @@ void FileSystem::AddSearchPath (const char* path,const LogHandler& log_handler)
 
 static void DummyLogHandler (const char*)
 {
-}  
+}
 
 void FileSystem::AddSearchPath (const char* path)
 {
@@ -901,14 +901,14 @@ static void InternalGetFileHash (File& file,FileHash& hash)
   while (!file.Eof ())
   {
     size_t size = file.Read (buf,sizeof (buf));
-    
+
     md5.Update (buf,size);
-    
+
     crc32_hash = crc32 (buf,size,crc32_hash);
   }
-  
+
   md5.Finish (hash.md5);
-  
+
   hash.crc32 = crc32_hash;
 }
 
@@ -916,7 +916,7 @@ void FileSystem::GetFileHash (File& file,FileHash& hash)
 {
   if (!file.CanRead ())
     throw xtl::format_not_supported_exception ("common::FileSystem::GetFileHash","Unable to compute FileHash. Reason: file can't be read");
-    
+
   filepos_t current_position = file.Tell ();
 
   if (current_position)
@@ -924,7 +924,7 @@ void FileSystem::GetFileHash (File& file,FileHash& hash)
     if (!file.CanSeek ())
       throw xtl::format_not_supported_exception ("common::FileSystem::GetFileHash","Can't compute FileHash. Reason: file can't be seek");
 
-    file.Seek (0);  
+    file.Seek (0);
 
     InternalGetFileHash (file,hash);
 
@@ -979,18 +979,18 @@ string FileSystem::GetNormalizedFileName (const char* file_name)
       case '<': //замена шаблона <VarName> на значение переменной VarName
       {
         string::iterator end = strchr (i, '>');
-        
+
         if (!end)
-          continue;          
+          continue;
 
         stl::string var_name (i + 1, end);
         const char* var_value = getenv (var_name.c_str ());
-        
+
         if (!var_value)
           var_value = "";
 
         size_t offset = i - res.begin ();
-        
+
 
         res.replace (i, end + 1, var_value);
 
@@ -1011,7 +1011,7 @@ string FileSystem::GetNormalizedFileName (const char* file_name)
       default:
         *i = tolower (*i);
         break;
-    }    
+    }
 
   return res;
 }
@@ -1040,9 +1040,9 @@ void FileSystem::LoadTextFile (const char* file_name, string& buffer)
 string FileSystem::LoadTextFile (const char* file_name)
 {
   string buffer;
-  
+
   LoadTextFile (file_name, buffer);
-  
+
   return buffer;
 }
 
@@ -1100,7 +1100,7 @@ void FileSystem::GetFileCryptoKey (const char* file_name, filecryptokey_t key)
 
     GetFileHash (file_name, file_hash);
 
-    memcpy (key, file_hash.md5, sizeof (key) < sizeof (file_hash.md5) ? sizeof (key) : sizeof (file_hash.md5));
+    memcpy (key, file_hash.md5, sizeof (filecryptokey_t) < sizeof (file_hash.md5) ? sizeof (filecryptokey_t) : sizeof (file_hash.md5));
   }
   catch (xtl::exception& exception)
   {
