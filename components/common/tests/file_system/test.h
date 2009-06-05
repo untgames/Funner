@@ -10,6 +10,7 @@
 
 #include <common/file.h>
 #include <common/streams.h>
+#include <common/strlib.h>
 
 using namespace common;
 

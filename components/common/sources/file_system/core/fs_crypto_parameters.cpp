@@ -50,6 +50,31 @@ FileCryptoParameters::FileCryptoParameters (const char* read_method, const char*
   impl = new Impl (read_method, write_method, key, key_bits);
 }
 
+FileCryptoParameters::FileCryptoParameters (const char* read_method,const char* write_method,const char* key_string)
+{
+  static const char* METHOD_NAME = "common::FileFileCryptoParameters";
+  
+  if (!read_method)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "read_method");
+    
+  if (!write_method)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "write_method");
+
+  if (!key_string)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "key_string");
+    
+  size_t key_length = strlen (key_string);
+  
+  if (key_length % 2)
+    throw xtl::make_argument_exception (METHOD_NAME, "key_string", key_string, "Key string must have even value length");
+
+  xtl::uninitialized_storage<char> key (key_length / 2);
+
+  compress_buffer (key_length, key_string, key.data ());
+
+  impl = new Impl (read_method, write_method, key.data (), key.size () * CHAR_BIT);
+}
+
 FileCryptoParameters::FileCryptoParameters (const FileCryptoParameters& params)
   : impl (params.impl)
 {

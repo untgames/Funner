@@ -1,7 +1,7 @@
 #ifndef COMMONLIB_HASH_HEADER
 #define COMMONLIB_HASH_HEADER
 
-#include <stddef.h>
+#include <cstddef>
 
 namespace common
 {

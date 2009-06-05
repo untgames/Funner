@@ -1,0 +1,4 @@
+Results of str_buffer_compression_test:
+source:           'abcd'
+after decompress: '61626364'
+after compress:   'abcd'

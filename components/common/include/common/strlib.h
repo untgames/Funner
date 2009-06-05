@@ -84,6 +84,13 @@ bool is_wildcard (const char* string);
 
 const char* strerror (int code);
 
+/*
+    Компрессия / декомпрессия последовательности байт в символы
+*/
+
+void decompress_buffer (size_t src_buffer_size, const void* src_buffer, char* dst_buffer); //dst_buffer_size = buffer_size * 2 + 1
+void compress_buffer   (size_t src_buffer_size, const char* src_buffer, void* dst_buffer); //dst_buffer_size = src_buffer_size / 2
+
 #include <common/detail/strlib.inl>
 
 }

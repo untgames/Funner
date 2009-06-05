@@ -1,7 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.CONFIGURATOR COMMON.AES COMMON.TESTS
+TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.CONFIGURATOR COMMON.AES COMMON.TESTS \
+  COMMON.UTILS.FILE_CRYPTER
 
 #Цель - CommonLib sources
 COMMON.SOURCES.TYPE             := static-lib
@@ -85,3 +86,16 @@ COMMON.TESTS.COMPILER_DEFINES :=
 COMMON.TESTS.IMPORTS          := compile.static.mak link.static.mak zip_file_system.link.static.mak \
                                  wxf.link.static.mak xml.link.static.mak configurator.link.static.mak \
                                  default_console_handler.link.static.mak aes.link.static.mak
+
+#Цель - CommonLib crypter
+COMMON.UTILS.FILE_CRYPTER.TYPE             := application
+COMMON.UTILS.FILE_CRYPTER.NAME             := file-crypter
+COMMON.UTILS.FILE_CRYPTER.INCLUDE_DIRS     :=
+COMMON.UTILS.FILE_CRYPTER.SOURCE_DIRS      := utils/file_crypter
+COMMON.UTILS.FILE_CRYPTER.EXECUTION_DIR    :=
+COMMON.UTILS.FILE_CRYPTER.LIB_DIRS         :=
+COMMON.UTILS.FILE_CRYPTER.LIBS             :=
+COMMON.UTILS.FILE_CRYPTER.LINK_INCLUDES    :=
+COMMON.UTILS.FILE_CRYPTER.COMPILER_CFLAGS  :=
+COMMON.UTILS.FILE_CRYPTER.COMPILER_DEFINES :=
+COMMON.UTILS.FILE_CRYPTER.IMPORTS          := compile.static.mak link.static.mak aes.link.static.mak

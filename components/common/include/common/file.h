@@ -445,6 +445,7 @@ class FileCryptoParameters
 /// онструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     FileCryptoParameters  (const char* read_method,const char* write_method,const void* key,size_t key_bits);
+    FileCryptoParameters  (const char* read_method,const char* write_method,const char* key_string);
     FileCryptoParameters  (const FileCryptoParameters&);
     ~FileCryptoParameters ();
 
