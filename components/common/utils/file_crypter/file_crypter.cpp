@@ -10,8 +10,9 @@
 
 using namespace common;
 
-const char* ENCRYPT_METHOD = "aes.encrypt";
-const char* DECRYPT_METHOD = "aes.decrypt";
+const char*  ENCRYPT_METHOD = "aes.encrypt";
+const char*  DECRYPT_METHOD = "aes.decrypt";
+const size_t BUFFER_SIZE    = 128*1024;
 
 int main (int argc, char* argv [])
 {
@@ -60,12 +61,12 @@ int main (int argc, char* argv [])
     
     size_t file_size      = in_file.Size (),
            processed_size = 0;
+           
+    xtl::uninitialized_storage<char> buffer (BUFFER_SIZE);
 
     while (!in_file.Eof ())
     {
-      char buffer [128];
-      
-      size_t size = in_file.Read (buffer, sizeof (buffer));      
+      size_t size = in_file.Read (buffer.data (), buffer.size ());
       
       if (!size)
       {
@@ -76,7 +77,7 @@ int main (int argc, char* argv [])
         return 1;
       }      
       
-      size_t result = out_file.Write (buffer, size);      
+      size_t result = out_file.Write (buffer.data (), size);      
       
       if (result != size)
       {
