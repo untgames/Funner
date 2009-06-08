@@ -72,7 +72,7 @@ int zip_open_func (zzip_char_t* name, int flags, ...)
 {
   try
   {
-    static size_t INVALID_MODE = O_WRONLY | O_RDWR | O_APPEND;   
+    static size_t INVALID_MODE = O_WRONLY | O_RDWR | O_APPEND;
 
     if (flags & INVALID_MODE)
       throw xtl::make_argument_exception ("", "flags", flags);
@@ -97,7 +97,7 @@ int zip_close_func (int fd)
   {
     delete (StdFile*)fd;
 
-    return 0;    
+    return 0;
   }
   catch (std::exception& exception)
   {
@@ -107,8 +107,8 @@ int zip_close_func (int fd)
   {
     log_exception ("common::zip_close_func");
   }
-  
-  return -1;  
+
+  return -1;
 }
 
 zzip_ssize_t zip_read_func (int fd, void* buf, zzip_size_t len)
@@ -137,7 +137,7 @@ zzip_off_t zip_seek_func (int fd, zzip_off_t offset, int whence)
   try
   {
     FileSeekMode seek_mode;
-    
+
     switch (whence)
     {
       case SEEK_SET: seek_mode = FileSeekMode_Set;     break;
@@ -145,7 +145,7 @@ zzip_off_t zip_seek_func (int fd, zzip_off_t offset, int whence)
       case SEEK_END: seek_mode = FileSeekMode_End;     break;
       default:
         throw xtl::make_argument_exception ("common::zip_seek_func", "whence", whence);
-    }     
+    }
 
     return ((StdFile*)fd)->Seek (offset, seek_mode);
   }
@@ -460,6 +460,8 @@ void ZipFileSystem::FileRewind (file_t _file)
 
 filepos_t ZipFileSystem::FileSeek (file_t _file,filepos_t pos)
 {
+  FileRead (_file, 0, 0); //????? Обход бага с вылетом zzip при вызове seek после закрытия какого-либо файла.
+
   ZipFile* file = (ZipFile*)_file;
 
   filepos_t new_pos = zzip_seek (file->handle,pos,SEEK_SET);
