@@ -1,6 +1,7 @@
 #ifndef COMMONLIB_FILE_SYSTEM_TEST_HEADER
 #define COMMONLIB_FILE_SYSTEM_TEST_HEADER
 
+#include <climits>
 #include <cstdio>
 #include <cstring>
 
