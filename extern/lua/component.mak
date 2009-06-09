@@ -1,31 +1,30 @@
 ###################################################################################################
-#Список целей
+#╤яшёюъ Ўхыхщ
 ###################################################################################################
 TARGETS := EXTERN.LUALIB EXTERN.LUA_UTILS EXTERN.LUA_TESTS
 
-#Цель №1 - LUALIB
-EXTERN.LUALIB.TYPE                 := static-lib        #Тип цели
-EXTERN.LUALIB.NAME                 := funner.extern.lua        #Имя выходного файла
-EXTERN.LUALIB.INCLUDE_DIRS         := include				   #Относительные пути к каталогам c заголовочными файлами
-EXTERN.LUALIB.SOURCE_DIRS          := sources           #Относительные пути к каталогам c исходными файлами
-EXTERN.LUALIB.LIB_DIRS             :=                   #Относительные пути к каталогам с библиотеками
-EXTERN.LUALIB.LIBS                 :=                   #Список используемых при линковке библиотек
-EXTERN.LUALIB.COMPILER_DEFINES     := __STRICT_ANSI__   #Определения сборки
-EXTERN.LUALIB.msvc.COMPILER_CFLAGS := -TP               #Флаги сборки (зависят от конфигурации)
+#╓хы№ ╣1 - LUALIB
+EXTERN.LUALIB.TYPE                 := static-lib        #╥шя Ўхыш
+EXTERN.LUALIB.NAME                 := funner.extern.lua        #╚ь  т√їюфэюую Їрщыр
+EXTERN.LUALIB.INCLUDE_DIRS         := include				   #╬ЄэюёшЄхы№э√х яєЄш ъ ърЄрыюурь c чруюыютюўэ√ьш Їрщырьш
+EXTERN.LUALIB.SOURCE_DIRS          := sources           #╬ЄэюёшЄхы№э√х яєЄш ъ ърЄрыюурь c шёїюфэ√ьш Їрщырьш
+EXTERN.LUALIB.LIB_DIRS             :=                   #╬ЄэюёшЄхы№э√х яєЄш ъ ърЄрыюурь ё сшсышюЄхърьш
+EXTERN.LUALIB.LIBS                 :=                   #╤яшёюъ шёяюы№чєхь√ї яЁш ышэъютъх сшсышюЄхъ
+EXTERN.LUALIB.COMPILER_DEFINES     := __STRICT_ANSI__   #╬яЁхфхыхэш  ёсюЁъш
+EXTERN.LUALIB.msvc.COMPILER_CFLAGS := -TP               #╘ыруш ёсюЁъш (чртшё Є юЄ ъюэЇшуєЁрЎшш)
 EXTERN.LUALIB.g++.COMPILER_CFLAGS  := -x c++
 
-#Цель №2 - LUA_UTILS
-EXTERN.LUA_UTILS.TYPE                 := test-suite     	 #Тип цели
-EXTERN.LUA_UTILS.INCLUDE_DIRS         := include	sources  #Относительные пути к каталогам c заголовочными файлами
-EXTERN.LUA_UTILS.SOURCE_DIRS          := utils          	 #Относительные пути к каталогам c исходными файлами
-EXTERN.LUA_UTILS.LIB_DIRS             :=                  #Относительные пути к каталогам с библиотеками
-EXTERN.LUA_UTILS.LIBS                 := funner.extern.lua       #Список используемых при линковке библиотек
-EXTERN.LUA_UTILS.COMPILER_DEFINES     := __STRICT_ANSI__  #Определения сборки
-EXTERN.LUA_UTILS.msvc.COMPILER_CFLAGS := -TP              #Флаги сборки (зависят от конфигурации)
+#╓хы№ ╣2 - LUA_UTILS
+EXTERN.LUA_UTILS.TYPE                 := test-suite     	 #╥шя Ўхыш
+EXTERN.LUA_UTILS.INCLUDE_DIRS         := include	sources  #╬ЄэюёшЄхы№э√х яєЄш ъ ърЄрыюурь c чруюыютюўэ√ьш Їрщырьш
+EXTERN.LUA_UTILS.SOURCE_DIRS          := utils          	 #╬ЄэюёшЄхы№э√х яєЄш ъ ърЄрыюурь c шёїюфэ√ьш Їрщырьш
+EXTERN.LUA_UTILS.LIB_DIRS             :=                  #╬ЄэюёшЄхы№э√х яєЄш ъ ърЄрыюурь ё сшсышюЄхърьш
+EXTERN.LUA_UTILS.LIBS                 := funner.extern.lua       #╤яшёюъ шёяюы№чєхь√ї яЁш ышэъютъх сшсышюЄхъ
+EXTERN.LUA_UTILS.COMPILER_DEFINES     := __STRICT_ANSI__  #╬яЁхфхыхэш  ёсюЁъш
+EXTERN.LUA_UTILS.msvc.COMPILER_CFLAGS := -TP              #╘ыруш ёсюЁъш (чртшё Є юЄ ъюэЇшуєЁрЎшш)
 EXTERN.LUA_UTILS.g++.COMPILER_CFLAGS  := -x c++
 EXTERN.LUA_UTILS.TARGET_DIR            = $(DIST_BIN_DIR)
 
-#Цель №3 - LUA_TESTS
+#╓хы№ ╣3 - LUA_TESTS
 EXTERN.LUA_TESTS.TYPE         := test-suite
 EXTERN.LUA_TESTS.SOURCE_DIRS  := tests
-EXTERN.LUA_TESTS.DLL_DIRS      = $(DIST_BIN_DIR)
