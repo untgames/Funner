@@ -62,8 +62,13 @@ class SubsystemManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запуск подсистем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Start (const common::ParseNode& configuration_root);
-    void Start (const char* configuration_file_name);
+    void Start   (const common::ParseNode& configuration_root);
+    void Start   (const char* configuration_file_name);
+    void Start   (const char* subsystem_name_mask, const common::ParseNode& configuration_root);
+    void Start   (const char* subsystem_name_mask, const char* configuration_file_name);
+    void Stop    (const char* subsystem_name_mask);
+    void Restart (const char* subsystem_name_mask, const common::ParseNode& configuration_root);
+    void Restart (const char* subsystem_name_mask, const char* configuration_file_name);    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор подсистем
