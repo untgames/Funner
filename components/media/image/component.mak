@@ -1,7 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.IMAGE.SOURCES MEDIA.XATLAS.SOURCES MEDIA.LEFT_BOTTOM_PACKER.SOURCES MEDIA.IMAGE.TESTS MEDIA.IMAGE.ANIMATION_ENHANCER MEDIA.IMAGE.SPRITE_COMPOSER
+TARGETS := MEDIA.IMAGE.SOURCES MEDIA.XATLAS.SOURCES MEDIA.LEFT_BOTTOM_PACKER.SOURCES MEDIA.IMAGE.TESTS \
+           MEDIA.IMAGE.ANIMATION_ENHANCER MEDIA.IMAGE.SPRITE_COMPOSER MEDIA.IMAGE.PSD_EXPORTER
 
 #Цель - Image sources
 MEDIA.IMAGE.SOURCES.TYPE             := static-lib
@@ -57,3 +58,11 @@ MEDIA.IMAGE.SPRITE_COMPOSER.TYPE             := application
 MEDIA.IMAGE.SPRITE_COMPOSER.NAME             := sprite_composer
 MEDIA.IMAGE.SPRITE_COMPOSER.SOURCE_DIRS      := utils/sprite_composer
 MEDIA.IMAGE.SPRITE_COMPOSER.IMPORTS          := compile.static.mak link.static.mak
+
+#Цель - PSD exporter
+MEDIA.IMAGE.PSD_EXPORTER.TYPE             := application
+MEDIA.IMAGE.PSD_EXPORTER.NAME             := psd-exporter
+MEDIA.IMAGE.PSD_EXPORTER.INCLUDE_DIRS     :=
+MEDIA.IMAGE.PSD_EXPORTER.SOURCE_DIRS      := utils/psd_exporter
+MEDIA.IMAGE.PSD_EXPORTER.IMPORTS          := compile.static.mak link.static.mak ../../../extern/libpsd/compile.static.mak ../../../extern/libpsd/link.static.mak
+MEDIA.IMAGE.PSD_EXPORTER.EXECUTION_DIR    := utils/psd_exporter
