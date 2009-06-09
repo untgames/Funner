@@ -24,8 +24,6 @@
 
 #include <syslib/application.h>
 
-#include <engine/subsystem_manager.h>
-
 using namespace script;
 using namespace math;
 

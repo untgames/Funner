@@ -1,7 +1,7 @@
 local CONFIG_FILE_NAME = "data/config.xml"
 
 function test ()
-  local subsystem_manager = Engine.GetSubsystemManager ()
+  local subsystem_manager = Engine.SubsystemManager
   
   print ("Removing subsystems of group 1")
   subsystem_manager:Remove ("Group1*")

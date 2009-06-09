@@ -52,7 +52,7 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
 
       InvokerRegistry& engine_lib = environment->Library ("Engine");
 
-      engine_lib.Register ("GetSubsystemManager", make_const (xtl::ref (manager)));
+      engine_lib.Register ("get_SubsystemManager", make_const (xtl::ref (manager)));
 
         //создание интерпретатора
 

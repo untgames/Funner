@@ -1,4 +1,11 @@
-#include "shared.h"
+#include <cstdio>
+
+#include <xtl/any_cast_exception.h>
+#include <xtl/function.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/reference_counter.h>
+
+#include <engine/subsystem_manager.h>
 
 const char* CONFIGURATION_FILE_NAME = "data/config.xml";
 const char* SUBSYSTEM1_NAME         = "Group1_Subsystem1";
