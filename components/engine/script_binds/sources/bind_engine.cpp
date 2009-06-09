@@ -11,6 +11,7 @@
 #include <input/cursor.h>
 
 #include <engine/attachments.h>
+#include <engine/subsystem_manager.h>
 
 using namespace engine;
 using namespace script;
@@ -25,6 +26,7 @@ namespace
 const char* COMPONENT_NAME             = "script.binds.Engine";
 const char* BINDER_NAME                = "Engine";
 const char* ATTACHMENT_REGISTRY_PREFIX = "Engine";
+const char* SUBSYSTEM_MANAGER_LIBRARY  = "Engine.SubsystemManager";
 
 /*
     Регистрация библиотек
@@ -90,7 +92,7 @@ template <class T> size_t find_attachment (IStack& stack)
 
 template <class T> void bind_attachment_methods (Environment& environment, const char* suffix)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (common::format ("%s.%s", ATTACHMENT_REGISTRY_PREFIX, suffix).c_str ());
+  InvokerRegistry& lib = environment.Library (common::format ("%s.%s", ATTACHMENT_REGISTRY_PREFIX, suffix).c_str ());
 
   lib.Register ("Register",   make_invoker (&register_attachment<T>));
   lib.Register ("Unregister", make_invoker (&unregister_attachment<T>));
@@ -111,6 +113,17 @@ void bind_attachment_registry_library (Environment& environment)
   bind_attachment_methods<input::Cursor> (environment, "Cursors");
 }
 
+void bind_subsystem_manager_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.Library (SUBSYSTEM_MANAGER_LIBRARY);
+
+  lib.Register ("Start",   make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Start)));
+  lib.Register ("Restart", make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Restart)));
+  lib.Register ("Remove",  make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*)>              (&SubsystemManager::Remove)));
+
+  environment.RegisterType<SubsystemManager> (SUBSYSTEM_MANAGER_LIBRARY);
+}
+
 /*
     Компонент
 */
@@ -127,6 +140,7 @@ class Component
     static void Bind (Environment& environment)
     {
       bind_attachment_registry_library (environment);
+      bind_subsystem_manager_library   (environment);
     }
 };
 

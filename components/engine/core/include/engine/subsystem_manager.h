@@ -11,7 +11,7 @@ namespace engine
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подсистема движка               
+///Подсистема движка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class ISubsystem
 {
@@ -62,13 +62,14 @@ class SubsystemManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запуск подсистем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Start   (const common::ParseNode& configuration_root);
-    void Start   (const char* configuration_file_name);
-    void Start   (const char* subsystem_name_mask, const common::ParseNode& configuration_root);
-    void Start   (const char* subsystem_name_mask, const char* configuration_file_name);
-    void Stop    (const char* subsystem_name_mask);
-    void Restart (const char* subsystem_name_mask, const common::ParseNode& configuration_root);
-    void Restart (const char* subsystem_name_mask, const char* configuration_file_name);    
+    void Start (const common::ParseNode& configuration_root, const char* subsystem_name_mask = "*");
+    void Start (const char* configuration_file_name, const char* subsystem_name_mask = "*");
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перезапуск подсистем
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Restart (const common::ParseNode& configuration_root, const char* subsystem_name_mask);
+    void Restart (const char* configuration_file_name, const char* subsystem_name_mask);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор подсистем
@@ -79,11 +80,11 @@ class SubsystemManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление / удаление подсистем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddSubsystem        (const char* name, ISubsystem* subsystem);
-    void AddSubsystem        (ISubsystem* subsystem);
-    void RemoveSubsystem     (ISubsystem* subsystem);
-    void RemoveSubsystems    (const char* wc_mask);
-    void RemoveAllSubsystems ();
+    void Add       (const char* name, ISubsystem* subsystem);
+    void Add       (ISubsystem* subsystem);
+    void Remove    (ISubsystem* subsystem);
+    void Remove    (const char* wc_mask);
+    void RemoveAll ();
 
   private:
     SubsystemManager (const SubsystemManager&);

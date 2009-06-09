@@ -299,7 +299,7 @@ class SceneRenderComponent
       {
         xtl::com_ptr<SceneRenderSubsystem> subsystem (new SceneRenderSubsystem (node), false);
 
-        manager.AddSubsystem (subsystem.get ());
+        manager.Add (SUBSYSTEM_NAME, subsystem.get ());
       }
       catch (xtl::exception& e)
       {

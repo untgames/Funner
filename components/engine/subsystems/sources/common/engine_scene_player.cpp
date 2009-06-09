@@ -222,7 +222,7 @@ class ScenePlayerComponent
       {
         xtl::com_ptr<ScenePlayerSubsystem> subsystem (new ScenePlayerSubsystem (node), false);
 
-        manager.AddSubsystem (subsystem.get ());
+        manager.Add (SUBSYSTEM_NAME, subsystem.get ());
       }
       catch (xtl::exception& e)
       {

@@ -248,7 +248,7 @@ class InputManagerComponent
 
         xtl::com_ptr<ISubsystem> subsystem (new InputManagerSubsystem (registry_name), false);
 
-        manager.AddSubsystem (subsystem.get ());
+        manager.Add (SUBSYSTEM_NAME, subsystem.get ());
       }
       catch (xtl::exception& e)
       {

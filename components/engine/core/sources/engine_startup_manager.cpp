@@ -24,7 +24,7 @@ struct StartupManagerImpl::Impl
 ///Регистрация обработчика запуска подсистемы
     void RegisterStartupHandler (const char* configuration_node_name, const StartupHandler& startup_handler)
     {
-      static const char* METHOD_NAME = "client::StartupManager::RegisterStartupHandler";              
+      static const char* METHOD_NAME = "client::StartupManager::RegisterStartupHandler";
 
       if (!configuration_node_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "configuration_node_name");
@@ -53,28 +53,31 @@ struct StartupManagerImpl::Impl
     }
 
 ///Запуск подсистем
-    void Start (common::ParseNode& node, SubsystemManager& manager)
+    void Start (common::ParseNode& node, const char* wc_mask, SubsystemManager& manager)
     {
       static common::ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
 
       common::Log log (common::format ("%s.%s", LOG_PREFIX, manager.Name ()).c_str ());
 
-      log.Printf ("Start subsystems...");      
-      
+      log.Printf ("Start subsystems...");
+
       for (common::ParseNode iter=node.First (); iter; iter=iter.Next ())
       {
         const char* node_name = iter.Name ();
-        
+
+        if (!common::wcmatch (node_name, wc_mask))
+          continue;
+
           //поиск обработчика запуска
-          
-        StartupHandlers::iterator startup_iter = startup_handlers.find (node_name);        
-        
+
+        StartupHandlers::iterator startup_iter = startup_handlers.find (node_name);
+
         if (startup_iter == startup_handlers.end ())
         {
           log.Printf ("Unknown configuration node '%s'", node_name);
           continue;
         }
-        
+
           //старт подсистем
 
         StartupHandlerEntry& entry = *startup_iter->second;
@@ -149,9 +152,9 @@ void StartupManagerImpl::UnregisterAllStartupHandlers ()
     Запуск обработчиков
 */
 
-void StartupManagerImpl::Start (common::ParseNode& node, SubsystemManager& manager)
+void StartupManagerImpl::Start (common::ParseNode& node, const char* wc_mask, SubsystemManager& manager)
 {
-  impl->Start (node, manager);
+  impl->Start (node, wc_mask, manager);
 }
 
 /*

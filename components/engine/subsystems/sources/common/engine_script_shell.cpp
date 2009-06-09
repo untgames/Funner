@@ -1,5 +1,6 @@
 #include <xtl/shared_ptr.h>
 
+#include <script/bind.h>
 #include <script/environment.h>
 #include <script/shell.h>
 
@@ -27,7 +28,7 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
 {
   public:
 /// Конструктор/деструктор
-    ShellSubsystem (common::ParseNode& node)
+    ShellSubsystem (common::ParseNode& node, SubsystemManager& manager)
       : environment (new Environment)
     {
         //чтение конфигурации
@@ -46,6 +47,12 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
 
       for (size_t i=0; i<lib_list.Size (); i++)
         environment->BindLibraries (lib_list [i]);
+
+        //регистрация менеджера подсистем
+
+      InvokerRegistry& engine_lib = environment->Library ("Engine");
+
+      engine_lib.Register ("GetSubsystemManager", make_const (xtl::ref (manager)));
 
         //создание интерпретатора
 
@@ -91,9 +98,9 @@ class Component
     {
       try
       {
-        xtl::com_ptr<ShellSubsystem> subsystem (new ShellSubsystem (node), false);
+        xtl::com_ptr<ShellSubsystem> subsystem (new ShellSubsystem (node, manager), false);
 
-        manager.AddSubsystem (subsystem.get ());
+        manager.Add (SUBSYSTEM_NAME, subsystem.get ());
       }
       catch (xtl::exception& e)
       {

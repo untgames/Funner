@@ -131,7 +131,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this));
       AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));
     }
-    
+
 ///Обработчик события регистрации окна
     void OnRegisterAttachment (const char* attachment_name, syslib::Window& in_window)
     {
@@ -285,7 +285,7 @@ class WindowManagerComponent
       {
         xtl::com_ptr<ISubsystem> subsystem (new WindowManagerSubsystem (node), false);
 
-        manager.AddSubsystem (subsystem.get ());
+        manager.Add (SUBSYSTEM_NAME, subsystem.get ());
       }
       catch (xtl::exception& e)
       {

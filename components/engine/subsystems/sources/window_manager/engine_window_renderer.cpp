@@ -37,7 +37,7 @@ class WindowRendererSubsystem: public ISubsystem, public xtl::reference_counter
     {
       renderer_name = get<const char*> (node, "Id");
 
-      render::mid_level::WindowDriver::RegisterRenderer (renderer_name.c_str (), node);      
+      render::mid_level::WindowDriver::RegisterRenderer (renderer_name.c_str (), node);
 
       for (Parser::NamesakeIterator iter=node.First ("FrameBuffer"); iter; ++iter)
       {
@@ -53,11 +53,11 @@ class WindowRendererSubsystem: public ISubsystem, public xtl::reference_counter
     {
       render::mid_level::WindowDriver::UnregisterAllWindows (renderer_name.c_str ());
     }
-    
+
 ///Подсчёт ссылок
     void AddRef () { addref (this); }
     void Release () { release (this); }
-    
+
   private:
     stl::string renderer_name; //имя системы рендеринга
 };
@@ -69,25 +69,25 @@ class WindowRendererSubsystem: public ISubsystem, public xtl::reference_counter
 class WindowRendererComponent
 {
   public:
-    WindowRendererComponent () 
+    WindowRendererComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);
     }
-    
+
   private:
     static void StartupHandler (ParseNode& node, SubsystemManager& manager)
     {
       try
-      {        
+      {
         xtl::com_ptr<ISubsystem> subsystem (new WindowRendererSubsystem (node), false);
 
-        manager.AddSubsystem (subsystem.get ());
+        manager.Add (SUBSYSTEM_NAME, subsystem.get ());
       }
       catch (xtl::exception& e)
       {
         e.touch ("engine::WindowRendererComponent::StartupHandler");
         throw;
-      }      
+      }
     }
 };
 

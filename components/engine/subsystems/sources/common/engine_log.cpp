@@ -130,7 +130,7 @@ class LogComponent
       {
         xtl::com_ptr<LogSubsystem> subsystem (new LogSubsystem (node), false);
 
-        manager.AddSubsystem (subsystem.get ());
+        manager.Add (SUBSYSTEM_NAME, subsystem.get ());
       }
       catch (xtl::exception& e)
       {

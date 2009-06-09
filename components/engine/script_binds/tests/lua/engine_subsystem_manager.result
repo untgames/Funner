@@ -1,0 +1,27 @@
+Results of engine_subsystem_manager_test:
+Subsystem1::Subsystem1
+Subsystem2::Subsystem2
+Subsystem3::Subsystem3
+Removing subsystems of group 1
+Subsystem3::~Subsystem3
+Subsystem1::~Subsystem1
+Subsystems removed
+Restarting subsystems of group2
+Subsystem2::~Subsystem2
+Subsystem2::Subsystem2
+Subsystems restarted
+Starting subsystems of group1
+Subsystem1::Subsystem1
+Subsystem3::Subsystem3
+Subsystems restarted
+Restarting subsystems of group1 and group2
+Subsystem3::~Subsystem3
+Subsystem1::~Subsystem1
+Subsystem2::~Subsystem2
+Subsystem1::Subsystem1
+Subsystem2::Subsystem2
+Subsystem3::Subsystem3
+Subsystems restarted
+Subsystem3::~Subsystem3
+Subsystem2::~Subsystem2
+Subsystem1::~Subsystem1

@@ -40,8 +40,8 @@ class EngineSubsystem : public ISubsystem, public xtl::reference_counter
 
       printf ("Starting subsystem '%s', value='%u'\n", Name (), value);
 
-      if (value == 3) manager.AddSubsystem (this);
-      else            manager.AddSubsystem (Name (), this);
+      if (value == 3) manager.Add (this);
+      else            manager.Add (Name (), this);
     }
 
   private:
@@ -56,7 +56,7 @@ void log_handler (const char* log_name, const char* message)
 void dump (const SubsystemManager& manager)
 {
   printf ("Subsystems count is %u\n", manager.SubsystemsCount ());
-  
+
   for (size_t i=0; i<manager.SubsystemsCount (); i++)
     printf ("  #%u: '%s'\n", i+1, manager.Subsystem (i).Name ());
 }
@@ -84,14 +84,14 @@ int main ()
     manager.Start (CONFIGURATION_FILE_NAME);
 
     dump (manager);
-    
-    printf ("Remove subsystems by mask\n");
-    
-    manager.RemoveSubsystems ("Subsystem2*");
-    
-    printf ("Remove all subsystems\n");    
 
-    manager.RemoveAllSubsystems ();
+    printf ("Remove subsystems by mask\n");
+
+    manager.Remove ("Subsystem2*");
+
+    printf ("Remove all subsystems\n");
+
+    manager.RemoveAll ();
   }
   catch (xtl::exception& e)
   {

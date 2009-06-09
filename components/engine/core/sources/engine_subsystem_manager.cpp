@@ -33,7 +33,7 @@ struct SubsystemManager::Impl
 ///Деструктор
     ~Impl ()
     {
-      RemoveAllSubsystems ();
+      RemoveAll ();
     }
 
 ///Протокол
@@ -68,7 +68,7 @@ struct SubsystemManager::Impl
     }
 
 ///Добавление подсистемы
-    void AddSubsystem (const char* name, ISubsystem* subsystem)
+    void Add (const char* name, ISubsystem* subsystem)
     {
       static const char* METHOD_NAME = "engine::SubsystemManager::AddSubsystem";
 
@@ -91,13 +91,13 @@ struct SubsystemManager::Impl
       log.Printf ("Add subsystem '%s'", name);
     }
 
-    void AddSubsystem (ISubsystem* subsystem)
+    void Add (ISubsystem* subsystem)
     {
       try
       {
         ++auto_name_index;
 
-        AddSubsystem (common::format ("Subsystem%02u", auto_name_index).c_str (), subsystem);
+        Add (common::format ("Subsystem%02u", auto_name_index).c_str (), subsystem);
       }
       catch (...)
       {
@@ -107,7 +107,7 @@ struct SubsystemManager::Impl
     }
 
 ///Удаление подсистемы
-    void RemoveSubsystem (ISubsystem* subsystem)
+    void Remove (ISubsystem* subsystem)
     {
       if (!subsystem)
         return;
@@ -125,7 +125,7 @@ struct SubsystemManager::Impl
     }
 
 ///Удаление подсистем по маске имени
-    void RemoveSubsystems (const char* wc_mask)
+    void Remove (const char* wc_mask)
     {
       if (!wc_mask)
         return;
@@ -136,14 +136,20 @@ struct SubsystemManager::Impl
         {
           log.Printf ("Remove subsystem '%s'", (*iter)->name.c_str ());
 
+          Subsystems::reverse_iterator next = iter;
+
+          ++next;
+
           subsystems.erase (iter.base () - 1);
+
+          iter = next;
         }
         else ++iter;
       }
     }
 
 ///Удаление всех подсистем
-    void RemoveAllSubsystems ()
+    void RemoveAll ()
     {
       while (!subsystems.empty ())
       {
@@ -210,40 +216,58 @@ const char* SubsystemManager::Name () const
     Запуск систем
 */
 
-void SubsystemManager::Start (const common::ParseNode& node)
+void SubsystemManager::Start (const common::ParseNode& configuration_root, const char* subsystem_name_mask)
 {
   try
   {
-    common::ParseNode copy = node;
+    if (!subsystem_name_mask)
+      throw xtl::make_null_argument_exception ("", "subsystem_name_mask");
 
-    StartupManagerSingleton::Instance ().Start (copy, *this);
+    common::ParseNode copy = configuration_root;
+
+    StartupManagerSingleton::Instance ().Start (copy, subsystem_name_mask, *this);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("engine::SubsystemManager::Start(const ParseNode&)");
+    exception.touch ("engine::SubsystemManager::Start(const ParseNode&, const char*)");
     throw;
   }
 }
 
-void SubsystemManager::Start (const char* file_name)
+void SubsystemManager::Start (const char* configuration_file_name, const char* subsystem_name_mask)
 {
   try
   {
-    if (!file_name)
-      throw xtl::make_null_argument_exception ("", "file_name");
+    if (!configuration_file_name)
+      throw xtl::make_null_argument_exception ("", "configuration_file_name");
 
-    common::Parser    parser (file_name);
-    common::ParseNode root = parser.Root ().First ("Configuration");
+    common::Parser parser (configuration_file_name);
 
-    StartupManagerSingleton::Instance ().Start (root, *this);
+    Start (parser.Root ().First ("Configuration"), subsystem_name_mask);
 
     parser.Log ().Print (xtl::bind (&common::Log::Print, &impl->Log (), _1));
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("engine::SubsystemManager::Start(const char*)");
+    exception.touch ("engine::SubsystemManager::Start(const char*, const char*)");
     throw;
   }
+}
+
+/*
+   Перезапуск подсистем
+*/
+
+void SubsystemManager::Restart (const common::ParseNode& configuration_root, const char* subsystem_name_mask)
+{
+  Remove (subsystem_name_mask);
+  Start  (configuration_root, subsystem_name_mask);
+}
+
+void SubsystemManager::Restart (const char* configuration_file_name, const char* subsystem_name_mask)
+{
+  Remove (subsystem_name_mask);
+  Start  (configuration_file_name, subsystem_name_mask);
 }
 
 /*
@@ -264,27 +288,27 @@ ISubsystemControl& SubsystemManager::Subsystem (size_t index) const
     Добавление / удаление подсистем
 */
 
-void SubsystemManager::AddSubsystem (const char* name, ISubsystem* subsystem)
+void SubsystemManager::Add (const char* name, ISubsystem* subsystem)
 {
-  impl->AddSubsystem (name, subsystem);
+  impl->Add (name, subsystem);
 }
 
-void SubsystemManager::AddSubsystem (ISubsystem* subsystem)
+void SubsystemManager::Add (ISubsystem* subsystem)
 {
-  impl->AddSubsystem (subsystem);
+  impl->Add (subsystem);
 }
 
-void SubsystemManager::RemoveSubsystem (ISubsystem* subsystem)
+void SubsystemManager::Remove (ISubsystem* subsystem)
 {
-  impl->RemoveSubsystem (subsystem);
+  impl->Remove (subsystem);
 }
 
-void SubsystemManager::RemoveSubsystems (const char* wc_mask)
+void SubsystemManager::Remove (const char* wc_mask)
 {
-  impl->RemoveSubsystems (wc_mask);
+  impl->Remove (wc_mask);
 }
 
-void SubsystemManager::RemoveAllSubsystems ()
+void SubsystemManager::RemoveAll ()
 {
-  impl->RemoveAllSubsystems ();
+  impl->RemoveAll ();
 }

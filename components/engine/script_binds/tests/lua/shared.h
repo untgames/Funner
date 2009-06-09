@@ -24,6 +24,8 @@
 
 #include <syslib/application.h>
 
+#include <engine/subsystem_manager.h>
+
 using namespace script;
 using namespace math;
 
@@ -51,7 +53,7 @@ inline const char* get_typename (const xtl::any& variant)
 }
 
 /*
-    Выполнение скрипта    
+    Выполнение скрипта
 */
 
 void load_script (IInterpreter& interpreter, const char* file_name)
@@ -60,7 +62,7 @@ void load_script (IInterpreter& interpreter, const char* file_name)
 
   stl::string buffer (file.Size (), ' ');
 
-  file.Read (&buffer [0], buffer.size ());        
+  file.Read (&buffer [0], buffer.size ());
 
   interpreter.DoCommands (file_name, buffer.c_str (), buffer.size ());
 }

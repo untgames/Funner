@@ -130,7 +130,7 @@ class WindowInputDriverComponent
       {
         xtl::com_ptr<ISubsystem> subsystem (new WindowInputDriverSubsystem (node), false);
 
-        manager.AddSubsystem (subsystem.get ());
+        manager.Add (SUBSYSTEM_NAME, subsystem.get ());
       }
       catch (xtl::exception& e)
       {

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration>
+  <Group1_Subsystem1/>
+  <Group2_Subsystem1/>
+  <Group1_Subsystem2/>
+  <Shell Interpreter="lua" Sources="data/engine_subsystem_manager.lua" Libraries="Engine" Execute="test()"/>
+</Configuration>

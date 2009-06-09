@@ -25,9 +25,9 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
     FileSystem (common::ParseNode& node)
     {
         //чтение параметров шифрования
-        
+
       ParseNode crypto_node = node.First ("Crypto");
-      
+
       if (crypto_node)
       {
         for (Parser::NamesakeIterator iter=crypto_node.First ("File"); iter; ++iter)
@@ -46,31 +46,31 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
           common::FileSystem::SetCryptoParameters (file_name, crypto_parameters);
         }
       }
-        
+
         //добавление путей поиска
-      
+
       const char* paths_string = get<const char*> (node, "Paths", "");
-      
+
       StringArray path_list = split (paths_string);
-      
+
       for (size_t i=0; i<path_list.Size (); i++)
       {
         const char* path = path_list [i];
-                
+
         paths.Add (path);
       }
-      
+
       Log log (LOG_NAME);
       common::FileSystem::LogHandler log_handler (xtl::bind (&common::Log::Print, &log, _1));
-        
+
       for (size_t i=0; i<paths.Size (); i++)
       {
         const char* path = paths [i];
 
-        common::FileSystem::AddSearchPath (path, log_handler);        
+        common::FileSystem::AddSearchPath (path, log_handler);
       }
     }
-    
+
     ~FileSystem ()
     {
       for (size_t i=0; i<paths.Size (); i++)
@@ -84,7 +84,7 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
   private:
     FileSystem (const FileSystem&);             //no impl
     FileSystem& operator = (const FileSystem&); //no impl
-    
+
   private:
     common::StringArray paths;
 };
@@ -109,7 +109,7 @@ class FileSystemComponent
       {
         xtl::com_ptr<FileSystem> subsystem (new FileSystem (node), false);
 
-        manager.AddSubsystem (subsystem.get ());
+        manager.Add (SUBSYSTEM_NAME, subsystem.get ());
       }
       catch (xtl::exception& e)
       {
