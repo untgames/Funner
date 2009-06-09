@@ -64,10 +64,10 @@ MEDIA.IMAGE.SPRITE_COMPOSER.IMPORTS          := compile.static.mak link.static.m
 MEDIA.IMAGE.PSD_EXPORTER.SOURCES.TYPE             := application
 MEDIA.IMAGE.PSD_EXPORTER.SOURCES.NAME             := psd-exporter
 MEDIA.IMAGE.PSD_EXPORTER.SOURCES.INCLUDE_DIRS     :=
-MEDIA.IMAGE.PSD_EXPORTER.SOURCES.SOURCE_DIRS      := utils/psd_exporter/sources
+MEDIA.IMAGE.PSD_EXPORTER.SOURCES.SOURCE_DIRS      := utils/psd_exporter
 MEDIA.IMAGE.PSD_EXPORTER.SOURCES.IMPORTS          := compile.static.mak link.static.mak ../../../extern/libpsd/compile.static.mak ../../../extern/libpsd/link.static.mak
 
 #Цель - PSD exporter tests
 MEDIA.IMAGE.PSD_EXPORTER.TESTS.TYPE          := test-suite
-MEDIA.IMAGE.PSD_EXPORTER.TESTS.SOURCE_DIRS   := utils/psd_exporter/tests
-MEDIA.IMAGE.PSD_EXPORTER.TESTS.EXECUTION_DIR := utils/psd_exporter/tests
+MEDIA.IMAGE.PSD_EXPORTER.TESTS.SOURCE_DIRS   := tests/psd_exporter
+MEDIA.IMAGE.PSD_EXPORTER.TESTS.EXECUTION_DIR := tests/psd_exporter
