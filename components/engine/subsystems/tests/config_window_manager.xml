@@ -57,9 +57,9 @@
     />
   </WindowRenderer>
   <SceneRender
-    DriverMask   = "*"
-    RendererMask = "MyRenderer"
-    Log          = "render.scene_render"
+    DriverMask     = "*"
+    RendererMask   = "MyRenderer"
+    Log            = "render.scene_render"
     >
     <RenderTarget Screen = "Screen1"/>
     <RenderTarget Screen = "Screen2"/>

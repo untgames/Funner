@@ -33,25 +33,17 @@ const size_t DEFAULT_IDLE_RENDER_COUNT = 8;                                     
 */
 
 class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListener<render::Screen>,
-                             public IAttachmentRegistryListener<media::rms::ResourceManager>,
-                             public media::rms::ICustomServer, public xtl::reference_counter
+  public media::rms::ICustomServer, public xtl::reference_counter
 {
   public:
 ///Конструктор
     SceneRenderSubsystem (common::ParseNode& node)
-      : resource_manager_name (get<const char*> (node, "ResourceManager", "")),
-        log (LOG_NAME),
+      : log (LOG_NAME),
         render (get<const char*> (node, "DriverMask"), get<const char*> (node, "RendererMask"), get<const char*> (node, "RenderPathMasks", "*")),
-        resource_server (*this),
-        attached_resource_manager (0),
-        idle_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&SceneRenderSubsystem::OnIdle, this))),
-        screen (0)
+        idle_connection (syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&SceneRenderSubsystem::OnIdle, this)))
     {
       try
       {
-        resource_server.SetFilters (get<const char*> (node, "ResourceMask", "*"));
-        resource_server.SetCacheState (get<bool> (node, "CacheState", true));
-
         render.SetMaxDrawDepth (get<size_t> (node, "MaxDrawDepth", render.MaxDrawDepth ()));
 
         const char* log_name = get<const char*> (node, "Log", "");
@@ -83,14 +75,14 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
         }
 
         AttachmentRegistry::Attach<render::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
-
+        
         try
         {
-          AttachmentRegistry::Attach<media::rms::ResourceManager> (this, AttachmentRegistryAttachMode_ForceNotify);
+          resource_server = new media::rms::ServerGroupAttachment (get<const char*> (node, "ResourceServer", SUBSYSTEM_NAME), *this);
         }
         catch (...)
         {
-          AttachmentRegistry::Detach<render::Screen> (this);
+          AttachmentRegistry::Detach<render::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
           throw;
         }
       }
@@ -104,27 +96,7 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 ///Деструктор
     ~SceneRenderSubsystem ()
     {
-      AttachmentRegistry::Detach<media::rms::ResourceManager> (this, AttachmentRegistryAttachMode_ForceNotify);
-      AttachmentRegistry::Detach<render::Screen>              (this, AttachmentRegistryAttachMode_ForceNotify);
-    }
-
-///События установки / удаления менеджера ресурсов
-    void OnRegisterAttachment (const char* attachment_name, media::rms::ResourceManager& resource_manager)
-    {
-      if (!resource_manager_name.empty () && resource_manager_name == attachment_name)
-      {
-        resource_manager.Attach (resource_server);
-
-        DetachServer ();
-
-        attached_resource_manager = &resource_manager;
-      }
-    }
-
-    void OnUnregisterAttachment (const char* attachment_name, media::rms::ResourceManager&)
-    {
-      if (!resource_manager_name.empty () && resource_manager_name == attachment_name)
-        DetachServer ();
+      AttachmentRegistry::Detach<render::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
     }
 
 /// События установки/удаления экрана
@@ -136,8 +108,6 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
         return;
 
       render.RenderTarget (iter->second).SetScreen (&screen);
-
-      this->screen = &screen;
     }
 
     void OnUnregisterAttachment (const char* attachment_name, render::Screen&)
@@ -148,77 +118,53 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
         return;
 
       render.RenderTarget (iter->second).SetScreen (0);
-
-      this->screen = 0;
     }
 
 ///Управление ресурсами
-    void PrefetchResources (size_t count, const char** resource_names)
+    void PrefetchResource (const char* resource_name)
     {
       //??????: do this !!!!!!!!!
     }
 
-    void LoadResources (size_t count, const char** resource_names)
+    void LoadResource (const char* resource_name)
     {
-      static const char* METHOD_NAME = "engine::subsystems::SceneRenderSubsystem::LoadResources";
+      static const char* METHOD_NAME = "engine::subsystems::SceneRenderSubsystem::LoadResource";
 
-      if (!resource_names)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
+      if (!resource_name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_name");
 
-      for (size_t i = 0; i < count; i++)
+      try
       {
-        if (!resource_names[i])
-          throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
+        render.LoadResource (resource_name);
+      }
+      catch (xtl::exception& exception)
+      {
+        log.Printf ("Can't load resource '%s', exception: %s", resource_name, exception.what ());
 
-        try
-        {
-          render.LoadResource (resource_names [i]);
-        }
-        catch (xtl::exception& exception)
-        {
-          log.Printf ("Can't load resource '%s', exception '%s'", resource_names[i], exception.what ());
+        exception.touch (METHOD_NAME);
 
-          exception.touch (METHOD_NAME);
-
-          throw;
-        }
-        catch (...)
-        {
-          log.Printf ("Can't load resource '%s', unknown exception", resource_names[i]);
-          throw;
-        }
+        throw;
       }
     }
 
-    void UnloadResources (size_t count, const char** resource_names)
+    void UnloadResource (const char* resource_name)
     {
-      static const char* METHOD_NAME = "engine::subsystems::SceneRenderSubsystem::UnloadResources";
+      static const char* METHOD_NAME = "engine::subsystems::SceneRenderSubsystem::UnloadResource";
 
-      if (!resource_names)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
+      if (!resource_name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_name");
 
-      for (size_t i = 0; i < count; i++)
+      try
       {
-        if (!resource_names[i])
-          throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
+        render.UnloadResource (resource_name);
+      }
+      catch (xtl::exception& exception)
+      {
+        log.Printf ("Can't unload resource '%s', exception: %s", resource_name, exception.what ());
 
-        try
-        {
-          render.UnloadResource (resource_names [i]);
-        }
-        catch (xtl::exception& exception)
-        {
-          log.Printf ("Can't unload resource '%s', exception '%s'", resource_names[i], exception.what ());
+        exception.touch (METHOD_NAME);
 
-          exception.touch (METHOD_NAME);
-
-          throw;
-        }
-        catch (...)
-        {
-          log.Printf ("Can't unload resource '%s', unknown exception", resource_names[i]);
-          throw;
-        }
+        throw;
       }
     }
 
@@ -227,15 +173,6 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     void Release () { release (this); }
 
   private:
-    void DetachServer ()
-    {
-      if (!attached_resource_manager)
-        return;
-
-      attached_resource_manager->Detach (resource_server);
-      attached_resource_manager = 0;
-    }
-
     void OnIdle ()
     {
       for (RenderTargetArray::iterator iter=idle_render_targets.begin (); iter!=idle_render_targets.end ();)
@@ -269,15 +206,12 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     typedef stl::vector<render::RenderTarget>                 RenderTargetArray;
 
   private:
-    stl::string                  resource_manager_name;      //имя точки привязки менеджера ресурсов
-    Log                          log;                        //лог
-    render::SceneRender          render;                     //рендер
-    media::rms::Server           resource_server;            //сервер ресурсов
-    media::rms::ResourceManager* attached_resource_manager;  //присоединненный менеджер ресурсов
-    ScreenMap                    screen_map;                 //соответствие экранов и рендер-таргетов
-    xtl::auto_connection         idle_connection;            //соединение обновления рендер-таргетов
-    RenderTargetArray            idle_render_targets;        //список автоматически обновляемых целей рендеринга
-    render::Screen*              screen;
+    Log                                              log;                 //лог
+    render::SceneRender                              render;              //рендер
+    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;     //сервер ресурсов рендеринга
+    ScreenMap                                        screen_map;          //соответствие экранов и рендер-таргетов
+    xtl::auto_connection                             idle_connection;     //соединение обновления рендер-таргетов
+    RenderTargetArray                                idle_render_targets; //список автоматически обновляемых целей рендеринга
 };
 
 /*
