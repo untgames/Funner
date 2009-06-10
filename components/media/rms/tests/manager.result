@@ -1,5 +1,6 @@
 Results of manager_test:
-Attach serversCreate binding
+Attach servers
+Create binding
 Load resources
 MyServer1::LoadResources(2, {resource1, resource2})
 MyServer2::LoadResources(2, {resource1, resource2})

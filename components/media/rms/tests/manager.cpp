@@ -6,38 +6,40 @@ int main ()
 
   try
   {
-    MyServer custom_server1 (1), custom_server2 (2);
-    Server   server1 (custom_server1);
+    MyServer    custom_server1 (1), custom_server2 (2);
+    ServerGroup server_group1 ("group1");
+    
+    server_group1.Attach (custom_server1); 
 
     {
       Binding binding;
 
       {
-        ResourceManager manager;
+        ServerGroup server_group2 ("group2");
         
         Group group;
         
         group.Add ("resource1");
         group.Add ("resource2");
         
-        printf ("Attach servers");
+        printf ("Attach servers\n");
         
-        manager.Attach (server1);      
+        server_group2.Attach (custom_server1);
         
         {
-          Server server2 (custom_server2);
-
-          manager.Attach (server2);
+          server_group2.Attach (custom_server2);
 
           printf ("Create binding\n");
 
-          binding = manager.CreateBinding (group);
+          binding = server_group2.CreateBinding (group);
           
           printf ("Load resources\n");
           
           binding.Load ();
 
           printf ("Delete server2\n");
+          
+          server_group2.Detach (custom_server2);
         }      
         
         printf ("Delete resource manager\n");

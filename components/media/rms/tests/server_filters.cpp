@@ -6,8 +6,10 @@ int main ()
   
   try
   {
-    MyServer custom_server;
-    Server   server (custom_server);      
+    MyServer    custom_server;
+    ServerGroup server_group ("group1");      
+    
+    server_group.Attach (custom_server);
            
     Group group;
 
@@ -16,11 +18,11 @@ int main ()
     group.Add ("resource3.bmp");
     group.Add ("resource4");
     
-    server.SetFilters ("*.bmp");
+    server_group.SetFilters ("*.bmp");
 
     printf ("Create binding\n");
       
-    Binding binding = server.CreateBinding (group);
+    Binding binding = server_group.CreateBinding (group);
         
     printf ("Load resources\n");
 
@@ -28,12 +30,12 @@ int main ()
     
     printf ("Add filters\n");
     
-    server.AddFilters ("*.xmesh");    
+    server_group.AddFilters ("*.xmesh");    
     
     printf ("Recreate binding\n");
     
     binding = Binding ();
-    binding = server.CreateBinding (group);
+    binding = server_group.CreateBinding (group);
 
     printf ("Load resources\n");
 

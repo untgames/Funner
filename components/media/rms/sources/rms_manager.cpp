@@ -31,17 +31,17 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
     }
 
 ///Добавление связывания группы ресурсов с сервером
-    void AddBinding (const Group& group, Server& server)
+    void AddBinding (const Group& group, IServerGroupInstance* server_group)
     {
-      server_bindings.push_back (ServerBinding (group, server));
+      server_bindings.push_back (ServerBinding (group, server_group));
     }
 
 ///Удаление связывания с сервером
-    void RemoveBinding (Server& server)
+    void RemoveBinding (IServerGroupInstance* server_group)
     {
       for (ServerBindingList::iterator iter=server_bindings.begin (), end=server_bindings.end (); iter!=end;)
       {
-        if (iter->server == &server)
+        if (iter->server_group == server_group)
         {
           ServerBindingList::iterator next = iter;
 
@@ -76,14 +76,9 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
     {
       for (ServerBindingList::iterator iter=server_bindings.begin (), end=server_bindings.end (); iter!=end; ++iter)
       {
-        try
-        {
-          iter->binding.Load ();
-        }
-        catch (...)
-        {
-          //подавление всех исключений
-        }
+          //исключения загрузки не подавляются
+
+        iter->binding.Load ();
       }
     }
 
@@ -109,10 +104,14 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
   private:
     struct ServerBinding
     {
-      Binding binding;
-      Server* server;
+      Binding               binding;
+      IServerGroupInstance* server_group;
 
-      ServerBinding (const Group& group, Server& in_server) : binding (in_server.CreateBinding (group)), server (&in_server) {}
+      ServerBinding (const Group& resource_group, IServerGroupInstance* in_server_group)
+        : binding (in_server_group->Instance ().CreateBinding (resource_group))
+        , server_group (in_server_group)
+      {
+      }
     };
 
     typedef stl::list<ServerBinding> ServerBindingList;
@@ -123,37 +122,18 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
     ManagerBindingList::iterator bindings_pos;   //положение в списке связываний
 };
 
-/*
-    Сервер, присоединенный к менеджеру ресурсов
-*/
-
-struct ServerAttachment: public xtl::reference_counter
-{
-  Server&              server;            //ссылка на сервер
-  xtl::auto_connection on_destroy_server; //соединение с сигналом, оповещающем об удалении сервера
-
-///Конструктор
-  ServerAttachment (Server& in_server, xtl::auto_connection& in_on_destroy_server)
-    : server (in_server)
-  {
-    on_destroy_server.swap (in_on_destroy_server);
-  }
-};
-
-typedef xtl::intrusive_ptr<ServerAttachment> ServerAttachmentPtr;
-
 }
 
 /*
     Описание реализации менеджера ресурсов
 */
 
-typedef stl::list<ServerAttachmentPtr> ServerList;
+typedef stl::vector<IServerGroupInstance*> ServerGroupList;
 
-struct ResourceManager::Impl: public xtl::reference_counter
+struct ResourceManagerImpl::Impl
 {
   ManagerBindingList bindings; //список связываний
-  ServerList         servers;  //список серверов
+  ServerGroupList    groups;   //список групп
 
 ///Деструктор
   ~Impl ()
@@ -167,42 +147,28 @@ struct ResourceManager::Impl: public xtl::reference_counter
     Конструкторы / деструктор / присваивание
 */
 
-ResourceManager::ResourceManager ()
+ResourceManagerImpl::ResourceManagerImpl ()
   : impl (new Impl)
 {
 }
 
-ResourceManager::ResourceManager (const ResourceManager& manager)
-  : impl (manager.impl)
+ResourceManagerImpl::~ResourceManagerImpl ()
 {
-  addref (impl);
-}
-
-ResourceManager::~ResourceManager ()
-{
-  release (impl);
-}
-
-ResourceManager& ResourceManager::operator = (const ResourceManager& manager)
-{
-  ResourceManager (manager).Swap (*this);
-
-  return *this;
 }
 
 /*
     Связывание с серверами ресурсов
 */
 
-Binding ResourceManager::CreateBinding (const Group& group)
+Binding ResourceManagerImpl::CreateBinding (const Group& group)
 {
   try
   {
     ManagerBinding* manager_binding = new ManagerBinding (impl->bindings);
     Binding         binding (manager_binding);
 
-    for (ServerList::iterator iter=impl->servers.begin (), end=impl->servers.end (); iter!=end; ++iter)
-      manager_binding->AddBinding (group, (*iter)->server);
+    for (ServerGroupList::iterator iter=impl->groups.begin (), end=impl->groups.end (); iter!=end; ++iter)
+      manager_binding->AddBinding (group, *iter);
 
     return binding;
   }
@@ -214,76 +180,95 @@ Binding ResourceManager::CreateBinding (const Group& group)
 }
 
 /*
-    Управление серверами ресурсов
+    Регистрация группы ресурсов
 */
 
-void ResourceManager::Attach (Server& server)
+void ResourceManagerImpl::RegisterServerGroup (const char* name, IServerGroupInstance* group)
 {
-    //проверка повторной регистрации
-
-  for (ServerList::iterator iter=impl->servers.begin (), end=impl->servers.end (); iter!=end; ++iter)
-    if (&(*iter)->server == &server)
-      return;
-
-    //подписка на событие удаления сервера
-
-  xtl::auto_connection on_destroy_server = server.GetTrackable ().connect_tracker (xtl::bind (&ResourceManager::Detach, this, xtl::ref (server)));
-
-    //добавление сервера
-
-  impl->servers.push_back (ServerAttachmentPtr (new ServerAttachment (server, on_destroy_server), false));
+  impl->groups.push_back (group);
 }
 
-void ResourceManager::Detach (Server& server)
+void ResourceManagerImpl::UnregisterServerGroup (IServerGroupInstance* group)
 {
-  for (ServerList::iterator iter=impl->servers.begin (), end=impl->servers.end (); iter!=end; ++iter)
-    if (&(*iter)->server == &server)
+  for (ServerGroupList::iterator iter=impl->groups.begin (), end=impl->groups.end (); iter!=end; ++iter)
+    if (*iter == group)
     {
-        //удаление связываний с данным сервером
+        //удаление связываний с данной группой серверов
 
       for (ManagerBindingList::iterator binding=impl->bindings.begin (), binding_end=impl->bindings.end (); binding!=binding_end; ++binding)
-      {
-        (*binding)->RemoveBinding (server);
-      }
+        (*binding)->RemoveBinding (group);
 
-        //удаление сервера из списка серверов
+        //удаление группы серверов из списка
 
-      impl->servers.erase (iter);
+      impl->groups.erase (iter);
 
       return;
     }
 }
 
 /*
-    Сброс неиспользуемых ресурсов
+    Поиск группы серверов
 */
 
-void ResourceManager::FlushUnusedResources ()
+IServerGroupInstance* ResourceManagerImpl::FindServerGroup (const char* name) const
 {
-  for (ServerList::iterator iter=impl->servers.begin (), end=impl->servers.end (); iter!=end; ++iter)
-    (*iter)->server.FlushUnusedResources ();
+  if (!name)
+    return 0;
+
+  for (ServerGroupList::iterator iter=impl->groups.begin (), end=impl->groups.end (); iter!=end; ++iter)
+    if (!strcmp ((*iter)->Name (), name))
+      return *iter;
+
+  return 0;
 }
 
 /*
-    Обмен
+    Перебор групп
 */
 
-void ResourceManager::Swap (ResourceManager& manager)
+size_t ResourceManagerImpl::ServerGroupsCount () const
 {
-  stl::swap (impl, manager.impl);
+  return impl->groups.size ();
 }
 
-namespace media
+IServerGroupInstance* ResourceManagerImpl::ServerGroup (size_t index) const
 {
-
-namespace rms
-{
-
-void swap (ResourceManager& manager1, ResourceManager& manager2)
-{
-  manager1.Swap (manager2);
+  if (index >= impl->groups.size ())
+    throw xtl::make_range_exception ("media::rms::ResourceManagerImpl::ServerGroup", "index", index, impl->groups.size ());
+    
+  return impl->groups [index];
 }
 
+/*
+    Сброс неиспользуемых ресурсов
+*/
+
+void ResourceManagerImpl::FlushUnusedResources ()
+{
+  for (ServerGroupList::iterator iter=impl->groups.begin (), end=impl->groups.end (); iter!=end; ++iter)
+    (*iter)->Instance ().FlushUnusedResources ();
 }
 
+/*
+    Делегирование вызовов ResourceManager
+*/
+
+Binding ResourceManager::CreateBinding (const Group& group)
+{
+  return ResourceManagerSingleton::Instance ().CreateBinding (group);
+}
+
+size_t ResourceManager::ServerGroupsCount ()
+{
+  return ResourceManagerSingleton::Instance ().ServerGroupsCount ();
+}
+
+media::rms::ServerGroup ResourceManager::ServerGroup (size_t index)
+{
+  return ResourceManagerSingleton::Instance ().ServerGroup (index)->Instance ();
+}
+
+void ResourceManager::FlushUnusedResources ()
+{
+  ResourceManagerSingleton::Instance ().FlushUnusedResources ();
 }

@@ -3,17 +3,19 @@
 int main ()
 {
   printf ("Results of server_cache_test:\n");
-  
+
   try
   {
     Binding  binding_that_destroyes_after_server;    
     
     {
       MyServer custom_server;
-      Server   server (custom_server);
-      
-      server.EnableCache ();
-      
+      ServerGroup server_group ("group1");
+
+      server_group.Attach (custom_server);
+
+      server_group.EnableCache ();
+
       printf ("Create groups\n");
       
       Group group1, group2, group3;
@@ -34,7 +36,7 @@ int main ()
       {
         printf ("Create binding for group1\n");
       
-        Binding binding1 = server.CreateBinding (group1);
+        Binding binding1 = server_group.CreateBinding (group1);
         
         printf ("Load resources for group1\n");
 
@@ -43,7 +45,7 @@ int main ()
         {      
           printf ("Create binding for group2\n");
 
-          Binding binding2 = server.CreateBinding (group2);
+          Binding binding2 = server_group.CreateBinding (group2);
           
           printf ("Load resources for group2\n");
           
@@ -54,18 +56,18 @@ int main ()
         
         printf ("Disable cache\n");
       
-        server.DisableCache ();        
+        server_group.DisableCache ();        
         
         printf ("Delete binding for group1\n");
       }      
       
       printf ("Create binding for group3 = group1 + group2 - 'resource1'\n");
       
-      binding_that_destroyes_after_server = server.CreateBinding (group3);
+      binding_that_destroyes_after_server = server_group.CreateBinding (group3);
       
       printf ("Enable cache\n");
       
-      server.EnableCache ();
+      server_group.EnableCache ();
       
       printf ("Prefetch resources for group3\n");      
 
@@ -74,7 +76,7 @@ int main ()
       printf ("Recreate binding (check cache)\n");
       
       binding_that_destroyes_after_server = Binding ();
-      binding_that_destroyes_after_server = server.CreateBinding (group3);      
+      binding_that_destroyes_after_server = server_group.CreateBinding (group3);      
       
       printf ("Remove server\n");
     }
