@@ -21,7 +21,7 @@ int main ()
 
     xtl::com_ptr<IInterpreter> script (shell.Interpreter ());
 
-    env->BindLibraries ("Media");
+    env->BindLibraries ("ResourceManager");
 
     load_script (*script, SCRIPT_FILE_NAME);
 

@@ -14,11 +14,11 @@ namespace
     Константы (имена библиотек)
 */
 
-const char* RMS_RESOURCE_MANAGER_LIBRARY = "Media.ResourceManager";
-const char* RMS_BINDING_LIBRARY          = "Media.ResourceBinding";
-const char* RMS_GROUP_LIBRARY            = "Media.ResourceGroup";
-const char* BINDER_NAME                  = "Media";
-const char* COMPONENT_NAME               = "script.binds.Media";
+const char* RMS_RESOURCE_MANAGER_LIBRARY = "Engine.ResourceManager";
+const char* RMS_BINDING_LIBRARY          = "Engine.ResourceManager.Binding";
+const char* RMS_GROUP_LIBRARY            = "Engine.ResourceManager.Group";
+const char* BINDER_NAME                  = "ResourceManager";
+const char* COMPONENT_NAME               = "script.binds.ResourceManager";
 
 ///Создание ресурсного менеджера
 ResourceManager create_resource_manager ()
@@ -27,19 +27,15 @@ ResourceManager create_resource_manager ()
 }
 
 //создание биндинга
-Binding create_file_group_binding (ResourceManager& resource_manager, const char* resources)
+Binding create_file_group_binding (const char* resources)
 {
-  return resource_manager.CreateBinding (create_file_group (resources));
+  return ResourceManager::CreateBinding (create_file_group (resources));
 }
 
 ///Регистрация библиотеки работы с ресурсными менеджерами
 void bind_resource_manager_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (RMS_RESOURCE_MANAGER_LIBRARY);
-
-    //регистрация функций создания
-
-  lib.Register ("Create", make_invoker (&create_resource_manager));
 
     //регистрация операций
 
@@ -137,8 +133,6 @@ extern "C"
 {
 
 common::ComponentRegistrator<Component> RmsScriptBind (COMPONENT_NAME);
-
-//?????? tests
 
 }
 

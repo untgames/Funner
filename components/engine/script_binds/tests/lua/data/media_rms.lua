@@ -1,13 +1,11 @@
-function test ()
-  local resource_manager = Media.ResourceManager.Create ()
-  
-  local binding1 = resource_manager:CreateFileGroupBinding ("*")
+function test () 
+  local binding1 = Engine.ResourceManager.CreateFileGroupBinding ("*")
   
   binding1:Prefetch ()
   binding1:Load ()
   binding1:Unload ()
   
-  local group1 = Media.ResourceGroup.Create ()
+  local group1 = Engine.ResourceManager.Group.Create ()
   
   print ("Is group empty = " .. tostring (group1.Empty))
   print ("Group size = " .. tostring (group1.Size))
@@ -17,7 +15,7 @@ function test ()
   print ("Is group empty = " .. tostring (group1.Empty))
   print ("Group size = " .. tostring (group1.Size))
 
-  local group2 = Media.ResourceGroup.Create ("data/bv.*")
+  local group2 = Engine.ResourceManager.Group.Create ("data/bv.*")
 
   print ("Is group2 empty = " .. tostring (group2.Empty))
   print ("Group2 size = " .. tostring (group2.Size))
@@ -48,7 +46,7 @@ function test ()
   print ("Is group empty = " .. tostring (group1.Empty))
   print ("Group size = " .. tostring (group1.Size))
 
-  local binding2 = resource_manager:CreateBinding (group1)
+  local binding2 = Engine.ResourceManager.CreateBinding (group1)
   
-  resource_manager:FlushUnusedResources ()
+  Engine.ResourceManager.FlushUnusedResources ()
 end

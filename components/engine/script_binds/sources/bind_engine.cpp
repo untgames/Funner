@@ -103,9 +103,8 @@ template <class T> void bind_attachment_methods (Environment& environment, const
 
 void bind_attachment_registry_library (Environment& environment)
 {
-  bind_attachment_methods<render::Screen>              (environment, "Screens");
-  bind_attachment_methods<scene_graph::Listener>       (environment, "Listeners");
-  bind_attachment_methods<media::rms::ResourceManager> (environment, "ResourceManagers");
+  bind_attachment_methods<render::Screen>        (environment, "Screens");
+  bind_attachment_methods<scene_graph::Listener> (environment, "Listeners");
 
   typedef xtl::function<void (const char*)> InputHandler;
 
