@@ -27,9 +27,9 @@ class ResourceManager : public ISubsystem, public xtl::reference_counter
     {
       for (Parser::NamesakeIterator iter=node.First ("Server"); iter; ++iter)
       {
-        const char* server_name = get<const char*> (node, "Name");
-        const char* filters     = get<const char*> (node, "Filters", "*");
-        bool        cache_state = get<bool> (node, "Cache", false);
+        const char* server_name = get<const char*> (*iter, "Name");
+        const char* filters     = get<const char*> (*iter, "Filters", "*");
+        bool        cache_state = get<bool> (*iter, "Cache", false);
 
         ServerGroup server_group (server_name);
 
