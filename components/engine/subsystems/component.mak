@@ -31,7 +31,7 @@ ENGINE.SUBSYSTEMS.TESTS.IMPORTS             := ../core/compile.static.mak ../../
                                                ../../render/scene_render/compile.static.mak ../../input/manager/compile.static.mak \
                                                scene_render.link.static.mak scene_player.link.static.mak \
                                                 input_manager.link.static.mak shell.link.static.mak log.link.static.mak file_system.link.static.mak \
-                                                resource_manager.link.static.mak \
+                                                resource_system.link.static.mak \
                                                ../../input/manager/xkeymap.link.static.mak ../../input/manager/xkeyreg.link.static.mak \
                                                ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
                                                ../../script/lua/link.static.mak ../script_binds/math.link.static.mak ../script_binds/sg.link.static.mak \

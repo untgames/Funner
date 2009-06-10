@@ -11,19 +11,19 @@ namespace
     Константы
 */
 
-const char* SUBSYSTEM_NAME = "ResourceManager";                   //имя подсистемы
-const char* COMPONENT_NAME = "engine.subsystems.ResourceManager"; //имя компонента
+const char* SUBSYSTEM_NAME = "ResourceSystem";                   //имя подсистемы
+const char* COMPONENT_NAME = "engine.subsystems.ResourceSystem"; //имя компонента
 const char* LOG_NAME       = COMPONENT_NAME;
 
 /*
    Подсистема управления ресурсами
 */
 
-class ResourceManager : public ISubsystem, public xtl::reference_counter
+class ResourceSystem : public ISubsystem, public xtl::reference_counter
 {
   public:
 /// Конструктор/деструктор
-    ResourceManager (common::ParseNode& node)
+    ResourceSystem (common::ParseNode& node)
     {
       for (Parser::NamesakeIterator iter=node.First ("Server"); iter; ++iter)
       {
@@ -40,7 +40,7 @@ class ResourceManager : public ISubsystem, public xtl::reference_counter
       }
     }
 
-    ~ResourceManager ()
+    ~ResourceSystem ()
     {
     }
 
@@ -59,11 +59,11 @@ class ResourceManager : public ISubsystem, public xtl::reference_counter
    Компонент
 */
 
-class ResourceManagerComponent
+class ResourceSystemComponent
 {
   public:
     //загрузка компонента
-    ResourceManagerComponent ()
+    ResourceSystemComponent ()
     {
       StartupManager::RegisterStartupHandler (SUBSYSTEM_NAME, &StartupHandler);
     }
@@ -73,13 +73,13 @@ class ResourceManagerComponent
     {
       try
       {
-        xtl::com_ptr<ResourceManager> subsystem (new ResourceManager (node), false);
+        xtl::com_ptr<ResourceSystem> subsystem (new ResourceSystem (node), false);
 
         manager.Add (SUBSYSTEM_NAME, subsystem.get ());
       }
       catch (xtl::exception& e)
       {
-        e.touch ("engine::ResourceManagerComponent::StartupHandler");
+        e.touch ("engine::ResourceSystemComponent::StartupHandler");
         throw;
       }
     }
@@ -88,7 +88,7 @@ class ResourceManagerComponent
 extern "C"
 {
 
-ComponentRegistrator<ResourceManagerComponent> ResourceManagerSubsystem (COMPONENT_NAME);
+ComponentRegistrator<ResourceSystemComponent> ResourceSystem (COMPONENT_NAME);
 
 }
 

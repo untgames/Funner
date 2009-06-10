@@ -1,5 +1,5 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LINK_INCLUDES := ResourceManagerSubsystem
+export.LINK_INCLUDES := ResourceSystem
 export.IMPORTS       := ../../media/rms/link.static.mak link.static.mak
