@@ -9,7 +9,6 @@ namespace
     Константы
 */
 
-const size_t MAX_QUERY_NAMES             = 64;    //максимальное количество ресурсов, передаваемых в запросе к ICustomServer
 const size_t RESOURCE_ARRAY_RESERVE_SIZE = 128;   //резервируемое число ресурсов в группе ресурсов
 const size_t SERVER_ARRAY_RESERVE_SIZE   = 8;     //резервируемое число серверов в группе серверов
 const bool   DEFAULT_CACHE_STATE         = false; //состояние кэша ресурсов по умолчанию
@@ -28,19 +27,68 @@ class IResourceDestroyListener
 };
 
 /*
-    Интерфейс списка серверов
+    Работа со списокм серверов ресурсов
 */
 
-class IServerList
+template <class Fn> void do_query (ICustomServer** servers, size_t count, const char* resource_name, const Fn& fn, bool ignore_exceptions, bool reverse_order = false)
 {
-  public:
-    typedef void (ICustomServer::*CallbackHandler)(size_t count, const char** resource_names);  
-
-    virtual void DoQuery (const CallbackHandler& handler, size_t names_count, const char** resource_names, bool ignore_exceptions) = 0;
-
-  protected:
-    virtual ~IServerList () {}
-};
+  if (ignore_exceptions)
+  {
+    if (reverse_order)
+    {
+      for (size_t i=0; i<count; i++)
+      {
+        try
+        {
+          (servers [count-i-1]->*fn)(resource_name);
+        }
+        catch (...)
+        {
+          //игнорирование исключений
+        }
+      }      
+    }
+    else
+    {
+      for (size_t i=0; i<count; i++)
+      {
+        try
+        {
+          (servers [i]->*fn)(resource_name);
+        }
+        catch (...)
+        {
+          //игнорирование исключений
+        }
+      }
+    }
+  }
+  else
+  {
+    try
+    {
+      if (reverse_order)
+      {
+        for (size_t i=0; i<count; i++)
+        {
+          (servers [i]->*fn)(resource_name);
+        }
+      }
+      else
+      {
+        for (size_t i=0; i<count; i++)
+        {
+          (servers [count-i-1]->*fn)(resource_name);
+        }        
+      }
+    }
+    catch (xtl::exception& exception)
+    {
+      exception.touch ("media::rms::do_query");
+      throw;
+    }
+  }
+}
 
 /*
     Описание ресурса
@@ -89,66 +137,19 @@ typedef stl::vector<ResourcePtr>                             ResourceArray;
 typedef stl::hash_map<stl::hash_key<const char*>, Resource*> ResourceMap; //weak-ref
 
 /*
-    Запрос к серверу ресурсов
-*/
-
-class ServerQuery
-{
-  public:
-    typedef void (ICustomServer::*CallbackHandler)(size_t count, const char** resource_names);
-
-///Конструктор
-    ServerQuery (IServerList& in_servers, CallbackHandler in_callback, bool in_ignore_exceptions)
-      : servers (in_servers)
-      , callback (in_callback)
-      , names_count (0) 
-      , ignore_exceptions (in_ignore_exceptions)
-    {
-    }
-
-///Добавление имени ресурса к запросу
-    void Add (const char* name)
-    {
-      if (names_count == MAX_QUERY_NAMES)
-        DoQuery ();
-
-      names [names_count] = name;
-
-      names_count++;
-    }
-
-///Выполнение запроса
-    void DoQuery ()
-    {
-      if (!names_count)
-        return;
-
-      servers.DoQuery (callback, names_count, names, ignore_exceptions);
-
-      names_count = 0;
-    }
-
-  private:
-    IServerList&    servers;                 //список серверов ресурсов
-    CallbackHandler callback;                //обработчик обратного вызова
-    size_t          names_count;             //количество имён ресурсов в запросе
-    const char*     names [MAX_QUERY_NAMES]; //имена ресурсов в запросе
-    bool            ignore_exceptions;       //игнорирование исключений
-};
-
-/*
     Связывание с группой ресурсов
 */
 
 class GroupBinding;
 
-typedef stl::list<GroupBinding*> GroupBindingList;
+typedef stl::list<GroupBinding*>    GroupBindingList;
+typedef stl::vector<ICustomServer*> ServerList;
 
 class GroupBinding: public ICustomBinding, public xtl::trackable
 {
   public:
 ///Конструктор
-    GroupBinding (IServerList& in_servers, ResourceArray& in_resources, GroupBindingList& in_group_bindings)
+    GroupBinding (ServerList& in_servers, ResourceArray& in_resources, GroupBindingList& in_group_bindings)
       : servers (in_servers),
         group_bindings (in_group_bindings)
     {
@@ -168,9 +169,7 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
       {
           //оповещение о групповой выгрузке ресурсов со ссылкой только на данную группу
 
-        ServerQuery query (servers, &ICustomServer::UnloadResources, true);
-
-        SetResourcesState (ResourceState_Unloaded, query, DestructorPredicate ());
+        SetResourcesState (ResourceState_Unloaded, &ICustomServer::UnloadResource, DestructorPredicate (), true, true);
       }
       catch (...)
       {
@@ -185,25 +184,19 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
 ///Предвыборка группы ресурсов
     void Prefetch ()
     {
-      ServerQuery query (servers, &ICustomServer::PrefetchResources, true);
-
-      SetResourcesState (ResourceState_Prefetched, query, StatePredicate<stl::less<ResourceState> > ());
+      SetResourcesState (ResourceState_Prefetched, &ICustomServer::PrefetchResource, StatePredicate<stl::less<ResourceState> > (), true);
     }
 
 ///Загрузка группы ресурсов
     void Load ()
     {
-      ServerQuery query (servers, &ICustomServer::LoadResources, false);
-
-      SetResourcesState (ResourceState_Loaded, query, StatePredicate<stl::less<ResourceState> > ());
+      SetResourcesState (ResourceState_Loaded, &ICustomServer::LoadResource, StatePredicate<stl::less<ResourceState> > (), false);
     }
 
 ///Выгрузка группы ресурсов
     void Unload ()
     {
-      ServerQuery query (servers, &ICustomServer::UnloadResources, true);
-
-      SetResourcesState (ResourceState_Unloaded, query, StatePredicate<stl::greater<ResourceState> > ());
+      SetResourcesState (ResourceState_Unloaded, &ICustomServer::UnloadResource, StatePredicate<stl::greater<ResourceState> > (), true, true);
     }
 
 ///Получение объекта, оповещающего о досрочном удалении GroupBinding
@@ -211,30 +204,31 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
 
 ///Получение массива ресурсов
     ResourceArray& Resources () { return resources; }
-
+        
   private:
-    template <class Pred> void SetResourcesState (ResourceState state, ServerQuery& query, Pred pred)
+    template <class Fn, class Pred, class Iter> void SetResourcesState (ResourceState state, Fn fn, Pred pred, bool ignore_exceptions, bool reverse_order, Iter first, Iter last)
     {
-        //оповещение сервера ресурсов
-
-      for (ResourceArray::iterator iter=resources.begin (), end=resources.end (); iter!=end; ++iter)
+      for (; first!=last; ++first)        
       {
-        Resource& resource = **iter;
+        Resource& resource = **first;
 
         if (pred (resource, state))
-          query.Add (resource.Name ());
-      }
-
-      query.DoQuery ();
-
-        //установка состояний ресурсов
-
-      for (ResourceArray::iterator iter=resources.begin (), end=resources.end (); iter!=end; ++iter)
-      {
-        Resource& resource = **iter;
-
-        if (pred (resource, state))
+        {
+          do_query (&servers [0], servers.size (), resource.Name (), fn, ignore_exceptions, reverse_order);
           resource.SetState (state);
+        }
+      }
+    }
+  
+    template <class Fn, class Pred> void SetResourcesState (ResourceState state, Fn fn, Pred pred, bool ignore_exceptions, bool reverse_order = false)
+    {
+      if (reverse_order)
+      {
+        SetResourcesState (state, fn, pred, ignore_exceptions, reverse_order, resources.rbegin (), resources.rend ());
+      }
+      else
+      {
+        SetResourcesState (state, fn, pred, ignore_exceptions, reverse_order, resources.begin (), resources.end ());
       }
     }
 
@@ -252,7 +246,7 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
     };
 
   private:
-    IServerList&               servers;            //список серверов ресурсов
+    ServerList&                servers;            //список серверов ресурсов
     ResourceArray              resources;          //ресурсы
     GroupBindingList&          group_bindings;     //список групп связывания
     GroupBindingList::iterator group_bindings_pos; //положение в списке групп связывания
@@ -264,9 +258,7 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
     Описание реализации сервера ресурсов
 */
 
-typedef stl::vector<ICustomServer*> ServerList;
-
-struct ServerGroup::Impl: public IResourceDestroyListener, public IServerList, public IServerGroupInstance, public xtl::reference_counter
+struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupInstance, public xtl::reference_counter
 {
   ServerList          servers;        //сервер управления ресурсами (ссылка без владения)
   stl::string         name;           //имя сервера
@@ -288,40 +280,6 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerList, p
     ResourceManagerSingleton::Instance ().RegisterServerGroup (name.c_str (), this);
   }
   
-///Запрос к серверам ресурсов
-  void DoQuery (const CallbackHandler& handler, size_t names_count, const char** resource_names, bool ignore_exceptions)
-  {
-    if (ignore_exceptions)
-    {
-      for (ServerList::iterator iter=servers.begin (), end=servers.end (); iter!=end; ++iter)
-      {
-        try
-        {
-          ((**iter).*handler)(names_count, resource_names);
-        }
-        catch (...)
-        {
-          //игнорирование исключений
-        }
-      }
-    }
-    else
-    {
-      try
-      {
-        for (ServerList::iterator iter=servers.begin (), end=servers.end (); iter!=end; ++iter)
-        {
-          ((**iter).*handler)(names_count, resource_names);
-        }
-      }
-      catch (xtl::exception& exception)
-      {
-        exception.touch ("media::rms::ServerGroup::Impl::DoQuery");
-        throw;
-      }
-    }
-  }
-
 ///Деструктор
   ~Impl ()
   {
@@ -339,7 +297,7 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerList, p
 
     while (!group_bindings.empty ())
     {
-      GroupBinding* binding = group_bindings.front ();
+      GroupBinding* binding = group_bindings.back ();
 
       binding->Unload ();
 
@@ -375,7 +333,7 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerList, p
       {
         const char* resource_name = iter->second->Name ();
 
-        DoQuery (&ICustomServer::UnloadResources, 1, &resource_name, true);
+        do_query (&servers [0], servers.size (), resource_name, &ICustomServer::UnloadResource, true, true);
       }
       catch (...)
       {
@@ -394,55 +352,28 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerList, p
     if (!cache_state)
       return;
 
-    ServerQuery query (*this, &ICustomServer::UnloadResources, true);
-
-    for (ResourceMap::iterator iter = resources.begin (), end = resources.end (); iter != end; ++iter)
+    for (ResourceMap::reverse_iterator iter = resources.rbegin (); iter != resources.rend ();)
     {
-      Resource& resource = *iter->second;
+      Resource& resource = *iter->second;      
 
       if (resource.use_count () == 1) //если ресурс находится только в кеше
       {
+        ResourceMap::reverse_iterator next = iter;        
+
+        ++++next;
+        
         if (resource.State () > ResourceState_Unloaded)
         {
-          try
-          {
-            query.Add (resource.Name ());
-          }
-          catch (...)
-          {
-            //подавление всех исключений
-          }
+          do_query (&servers [0], servers.size (), resource.Name (), &ICustomServer::UnloadResource, true, true);
 
           resource.SetState (ResourceState_Unloaded);
         }
-      }
-    }
-
-    try
-    {
-      query.DoQuery ();
-    }
-    catch (...)
-    {
-      //подавление всех исключений
-    }
-
-    for (ResourceMap::iterator iter = resources.begin (), end = resources.end (); iter != end;)
-    {
-      Resource& resource = *iter->second;
-
-      if (resource.use_count () == 1) //если ресурс находится только в кеше
-      {
-        ResourceMap::iterator next = iter;
-
-        ++next;
 
         release (&resource);
-
-        iter = next;
+        
+        iter = --next;
       }
-      else
-        ++iter;
+      else ++iter;
     }
   }
   
@@ -554,33 +485,6 @@ void ServerGroup::SetName (const char* name)
     Добавление / удаление серверов ресурсов
 */
 
-namespace
-{
-
-struct AttachServerList: public IServerList
-{
-  public:
-    AttachServerList (ICustomServer& in_server) : server (in_server) {}
-
-    void DoQuery (const CallbackHandler& handler, size_t resource_count, const char** resource_names, bool ignore_exceptions)
-    {
-      try
-      {      
-        (server.*handler)(resource_count, resource_names);
-      }
-      catch (...)
-      {
-        if (!ignore_exceptions)
-          throw;
-      }
-    }      
-
-  private:
-    ICustomServer& server;
-};
-
-}
-
 void ServerGroup::Attach (ICustomServer& server)
 {
   try
@@ -590,21 +494,18 @@ void ServerGroup::Attach (ICustomServer& server)
     for (ServerList::iterator iter=impl->servers.begin (), end=impl->servers.end (); iter!=end; ++iter)
       if (*iter == &server)
         return;
-        
+
       //восстановление состояния ресурсов
       
-    AttachServerList single_server_list (server);
-    ServerQuery      query (single_server_list, &ICustomServer::LoadResources, false);
-      
+    ICustomServer* server_ptr = &server;      
+
     for (ResourceMap::iterator iter=impl->resources.begin (), end=impl->resources.end (); iter!=end; ++iter)
     {
       Resource& resource = *iter->second;
 
-      if (resource.State () > ResourceState_Unloaded)
-        query.Add (resource.Name ());
+      if (resource.State () == ResourceState_Loaded)
+        do_query (&server_ptr, 1, resource.Name (), &ICustomServer::LoadResource, false);
     }
-
-    query.DoQuery ();
 
       //добавление сервера
 
@@ -624,18 +525,15 @@ void ServerGroup::Detach (ICustomServer& server)
     {
         //выгрузка ресурсов с сервера
         
-      AttachServerList single_server_list (server);
-      ServerQuery      query (single_server_list, &ICustomServer::UnloadResources, true);
-      
-      for (ResourceMap::iterator res_iter=impl->resources.begin (), res_end=impl->resources.end (); res_iter!=res_end; ++res_iter)
+      ICustomServer* server_ptr = &server;        
+             
+      for (ResourceMap::reverse_iterator res_iter=impl->resources.rbegin (), res_end=impl->resources.rend (); res_iter!=res_end; ++res_iter)
       {
         Resource& resource = *res_iter->second;
 
         if (resource.State () > ResourceState_Unloaded)
-          query.Add (resource.Name ());
+          do_query (&server_ptr, 1, resource.Name (), &ICustomServer::UnloadResource, true);
       }
-
-      query.DoQuery ();
 
         //удаление сервера из списка серверов
       
@@ -736,7 +634,7 @@ Binding ServerGroup::CreateBinding (const Group& group)
 
       //создание группы связывания
 
-    GroupBinding* group_binding = new GroupBinding (*impl, group_resources, impl->group_bindings);
+    GroupBinding* group_binding = new GroupBinding (impl->servers, group_resources, impl->group_bindings);
 
     Binding binding (group_binding);
 
@@ -779,9 +677,9 @@ void ServerGroup::SetCacheState (bool state)
   {
       //отключение кэша - сбрасываем кэш ресурсов, уменьшаем число ссылок всех оставшихся ресурсов
 
-    FlushUnusedResources ();
+    FlushUnusedResources ();    
 
-    for (ResourceMap::iterator iter=impl->resources.begin (), end=impl->resources.end (); iter!=end;)
+    for (ResourceMap::reverse_iterator iter=impl->resources.rbegin (), end=impl->resources.rend (); iter!=end;)
     {
       Resource* resource = iter->second;
 

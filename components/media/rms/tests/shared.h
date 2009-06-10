@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <exception>
 
+#include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/function.h>
 
@@ -13,36 +14,35 @@ class MyServer: public ICustomServer
   public:
     MyServer (int in_id = -1) : id (in_id) {}
 
-    void PrefetchResources (size_t count, const char** resource_names)
+    void PrefetchResource (const char* resource_name)
     {
-      Print ("PrefetchResources", count, resource_names);
+      if (!strcmp (resource_name, "bad_resource"))
+        throw xtl::format_operation_exception ("MyServer::PrefetchResource", "Attempt to load bad resource");    
+    
+      Print ("PrefetchResource", resource_name);
     }
     
-    void LoadResources (size_t count, const char** resource_names)
+    void LoadResource (const char* resource_name)
     {
-      Print ("LoadResources", count, resource_names);
+      if (!strcmp (resource_name, "bad_resource"))
+        throw xtl::format_operation_exception ("MyServer::LoadResource", "Attempt to load bad resource");
+    
+      Print ("LoadResource", resource_name);
     }
     
-    void UnloadResources (size_t count, const char** resource_names)
+    void UnloadResource (const char* resource_name)
     {
-      Print ("UnloadResources", count, resource_names);
+      if (!strcmp (resource_name, "bad_resource"))
+        throw xtl::format_operation_exception ("MyServer::UnloadResource", "Attempt to load bad resource");    
+    
+      Print ("UnloadResource", resource_name);
     }
     
   private:
-    void Print (const char* message, size_t count, const char** resource_names)
+    void Print (const char* message, const char* resource_name)
     {
-      if (id >= 0) printf ("MyServer%u::%s(%u, {", id, message, count);
-      else         printf ("MyServer::%s(%u, {", message, count);
-
-      for (size_t i=0; i<count; i++)
-      {
-        if (i)
-          printf (", ");
-
-        printf ("%s", resource_names [i]);
-      }
-      
-      printf ("})\n");
+      if (id >= 0) printf ("MyServer%u::%s(%s)\n", id, message, resource_name);
+      else         printf ("MyServer::%s(%s)\n", message, resource_name);
     }        
     
   private:

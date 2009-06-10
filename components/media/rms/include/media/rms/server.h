@@ -19,9 +19,9 @@ class ICustomServer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление ресурсами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void PrefetchResources (size_t count, const char** resource_names) = 0;
-    virtual void LoadResources     (size_t count, const char** resource_names) = 0;
-    virtual void UnloadResources   (size_t count, const char** resource_names) = 0;
+    virtual void PrefetchResource (const char* resource_name) = 0;
+    virtual void LoadResource     (const char* resource_name) = 0;
+    virtual void UnloadResource   (const char* resource_name) = 0;
 
   protected:
     virtual ~ICustomServer () {}

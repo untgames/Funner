@@ -1,0 +1,14 @@
+Results of load_exceptions_test:
+Create binding
+Prefetch resources
+MyServer1::PrefetchResource(resource1)
+MyServer1::PrefetchResource(resource2)
+Unload resources
+MyServer1::UnloadResource(resource2)
+MyServer1::UnloadResource(resource1)
+Load resources
+MyServer1::LoadResource(resource1)
+MyServer1::UnloadResource(resource1)
+exception: Attempt to load bad resource
+    at MyServer::LoadResource
+    at media::rms::do_query

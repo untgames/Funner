@@ -2,20 +2,34 @@ Results of server_cache_test:
 Create groups
 Create binding for group1
 Load resources for group1
-MyServer::LoadResources(4, {resource1, resource2, resource3, resource4})
+MyServer::LoadResource(resource1)
+MyServer::LoadResource(resource2)
+MyServer::LoadResource(resource3)
+MyServer::LoadResource(resource4)
 Create binding for group2
 Load resources for group2
-MyServer::LoadResources(1, {resource5})
+MyServer::LoadResource(resource5)
 Delete binding for group2
 Disable cache
-MyServer::UnloadResources(1, {resource5})
+MyServer::UnloadResource(resource5)
 Delete binding for group1
-MyServer::UnloadResources(4, {resource1, resource2, resource3, resource4})
+MyServer::UnloadResource(resource4)
+MyServer::UnloadResource(resource3)
+MyServer::UnloadResource(resource2)
+MyServer::UnloadResource(resource1)
 Create binding for group3 = group1 + group2 - 'resource1'
 Enable cache
 Prefetch resources for group3
-MyServer::PrefetchResources(5, {resource1, resource3, resource4, resource5, resource6})
+MyServer::PrefetchResource(resource1)
+MyServer::PrefetchResource(resource3)
+MyServer::PrefetchResource(resource4)
+MyServer::PrefetchResource(resource5)
+MyServer::PrefetchResource(resource6)
 Recreate binding (check cache)
 Remove server
-MyServer::UnloadResources(5, {resource1, resource3, resource4, resource5, resource6})
+MyServer::UnloadResource(resource6)
+MyServer::UnloadResource(resource5)
+MyServer::UnloadResource(resource4)
+MyServer::UnloadResource(resource3)
+MyServer::UnloadResource(resource1)
 Remove binding for group3
