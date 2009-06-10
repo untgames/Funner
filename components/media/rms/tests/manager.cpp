@@ -27,7 +27,7 @@ int main ()
         server_group2.Attach (custom_server1);
         
         {
-          server_group2.Attach (custom_server2);
+          ServerGroupAttachment attachment ("group2", custom_server2);          
 
           printf ("Create binding\n");
 
@@ -38,8 +38,6 @@ int main ()
           binding.Load ();
 
           printf ("Delete server2\n");
-          
-          server_group2.Detach (custom_server2);
         }      
         
         printf ("Delete resource manager\n");
