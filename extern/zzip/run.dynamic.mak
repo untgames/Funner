@@ -1,6 +1,4 @@
 ###################################################################################################
 #Экспортируемые настройки компонента
 ###################################################################################################
-export.LIBS             := funner.media.image
-export.LINK_INCLUDES    := DevIL
-export.IMPORTS          := ../../common/link.static.mak ../../../extern/devil/link.dynamic.mak
+export.DLLS := funner.extern.zzip

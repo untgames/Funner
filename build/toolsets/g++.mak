@@ -9,6 +9,7 @@ LIB_SUFFIX           ?= .a
 OBJ_SUFFIX           ?= .o
 EXE_SUFFIX           ?= .exe
 DLL_SUFFIX           ?= .dll
+DLL_LIB_SUFFIX       ?= .a
 LIB_PREFIX           ?= lib
 COMPILER_GCC         ?= gcc
 LINKER_GCC           ?= g++

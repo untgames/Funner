@@ -215,7 +215,11 @@
 #define LCMS_NODIRINCLUDE
 
 /* Building on Mac OS X */
+#ifdef __APPLE__
+#define MAX_OS_X
+#else
 #undef MAX_OS_X
+#endif
 
 /* define if you have memalign memory allocation */
 #undef MEMALIGN

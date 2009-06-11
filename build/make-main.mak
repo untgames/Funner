@@ -15,6 +15,7 @@ PACKAGE_COMMANDS                        := build clean test check run install #К
 COMPILE_TOOL                            := tools.c++compile #Имя макроса утилиты компиляции C++ файлов
 LINK_TOOL                               := tools.link       #Имя макроса утилиты редактора связей
 LIB_TOOL                                := tools.lib        #Имя макроса утилиты архивирования объектных файлов
+DLL_PATH                                := PATH             #Имя переменной среды для указания путей к длл-файлам
 
 ###################################################################################################
 #Производные пути и переменные
@@ -47,6 +48,7 @@ LIB_TOOL                                := $(strip $(LIB_TOOL))
 EMPTY                                   :=
 SPACE                                   := $(EMPTY) $(EMPTY)
 EXTERNAL_FILES                          :=
+DLL_PATH                                := $(strip $(DLL_PATH))
 
 ###################################################################################################
 #Если не указан фильтры - обрабатываем все доступные
@@ -63,7 +65,7 @@ default: build
 #Преобразование Windows-путей
 ###################################################################################################
 define convert_path
-$(subst \,/,$1)
+$(subst ; ,;,$(subst \,/,$1))
 endef
 
 ###################################################################################################
@@ -110,7 +112,7 @@ include $(COMPONENT_CONFIGURATION_FILE)
 #Специализация пути
 ###################################################################################################
 define specialize_paths
-$(foreach dir,$1,$(COMPONENT_DIR)$(dir))
+$(foreach dir,$(strip $1),$(COMPONENT_DIR)$(dir))
 endef
 
 ###################################################################################################
@@ -134,7 +136,8 @@ endif
 #Подготовка к запуску приложения (каталог запуска приложения, список каталогов с динамическими библиотеками)
 ###################################################################################################
 define prepare_to_execute
-export PATH="$(subst ;,:,$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$(foreach dir,$(ADDITIONAL_PATHS),$(dir);)$(foreach dir,$2,$(dir);)$$PATH))" \
+export PATH="$(subst ;,:,$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$(foreach dir,$(ADDITIONAL_PATHS),$(dir);)$$PATH))" \
+$(DLL_PATH)="$(subst ;,:,$(call convert_path,$(foreach dir,$2,$(CURDIR)/$(dir);)$$$(DLL_PATH)))" \
 BIN_DIR=`$(call get_system_dir,$(DIST_BIN_DIR))`/ && cd "$1"
 endef
 
@@ -300,22 +303,23 @@ define process_target.dynamic-lib
   endif
 
   $1.DLL_FILE                      := $(DIST_BIN_DIR)/$$($1.NAME)$(DLL_SUFFIX)
-  $1.LIB_FILE                      := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
-  TARGET_FILES                     := $$(TARGET_FILES) $$($1.DLL_FILE) $(DIST_LIB_DIR)/$$(notdir $$(basename $$($1.DLL_FILE)))$(LIB_SUFFIX)
+  $1.LIB_FILE                      := $(DIST_LIB_DIR)/$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(DLL_LIB_SUFFIX)
+  $1.LIB_TMP_FILE                  := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(DLL_LIB_SUFFIX)
+  TARGET_FILES                     := $$(TARGET_FILES) $$($1.DLL_FILE) $$($1.LIB_FILE)
   $1.TARGET_DLLS                   := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
   DIST_DIRS                        := $$(DIST_DIRS) $$(dir $$($1.DLL_FILE))
   $1.SOURCE_INSTALLATION_DLL_FILES := $$($1.TARGET_DLLS) $$($1.DLL_FILE)
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)  
 
-  build: $$($1.DLL_FILE)
+  build: $$($1.DLL_FILE) $$($1.LIB_FILE)
 
   $$(eval $$(call process_target_with_sources,$1))
 
-  $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
-		@echo Create dynamic library $$(notdir $$@)...
-		@$$(call $(LINK_TOOL),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
-		@$(RM) $$(basename $$@).exp
-		@if [ -x $$($1.LIB_FILE) ]; then mv -f $$($1.LIB_FILE) $(DIST_LIB_DIR); fi
+  $$($1.DLL_FILE) $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
+		@echo Create dynamic library $$(notdir $$($1.DLL_FILE))...
+		@$$(call $(LINK_TOOL),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+		@$(RM) $$(basename $$($1.DLL_FILE)).exp
+		@if [ -e $$($1.LIB_TMP_FILE) ]; then mv -f $$($1.LIB_TMP_FILE) $(DIST_LIB_DIR); fi
 endef
 
 #Обработка цели application (имя цели)
@@ -347,7 +351,7 @@ define process_target.application
 
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
-		@$$(call prepare_to_execute,$$($1.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args)
+		@$$(call prepare_to_execute,$$($1.EXECUTION_DIR),$$(dir $$($1.EXE_FILE)) $$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args)
 
   ifneq (,$$(filter $$(files:%=$(DIST_BIN_DIR)/%$(EXE_SUFFIX)),$$($1.EXE_FILE)))
     run: RUN.$1
@@ -380,18 +384,18 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TARGET_DIR)/%$(EXE_SUFFIX)
 		@echo Running $$(notdir $$<)...
-		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args) > $$(patsubst %,"$(CURDIR)/%",$$@)
+		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args) > $$(patsubst %,"$(CURDIR)/%",$$@)
 		
 #Правило получения файла-результата тестирования по shell-файлу
   $$($2.SOURCE_DIR)/%.sh: $$($2.TEST_EXE_FILES)
 
   $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh
 		@echo Running $$(notdir $$<)...
-		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && chmod u+x $$(patsubst %,"$(CURDIR)/%",$$<) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args) > $$(patsubst %,"$(CURDIR)/%",$$@)
+		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) && chmod u+x $$(patsubst %,"$(CURDIR)/%",$$<) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args) > $$(patsubst %,"$(CURDIR)/%",$$@)
 
 #Правило запуска тестов
   TEST_MODULE.$2: $$($2.TEST_EXE_FILES)
-		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($1.DLL_DIRS)) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.SOURCE_DIR)/%.sh),$$(wildcard $$($2.SOURCE_DIR)/*.sh)) $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$^)),chmod u+x $$$$file && $$$$file $(args))
+		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) && $$(call for_each_file,file,$$(patsubst %,"$(CURDIR)/%",$$(filter $$(files:%=$$($2.SOURCE_DIR)/%.sh),$$(wildcard $$($2.SOURCE_DIR)/*.sh)) $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$^)),chmod u+x $$$$file && $$$$file $(args))
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
