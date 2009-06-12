@@ -103,15 +103,8 @@ class RenderManager : public engine::IAttachmentRegistryListener<media::rms::Res
 {
   public:
     RenderManager ()
-      : attached_resource_manager (0), resource_server (*this)
-    {
-      engine::AttachmentRegistry::Attach<media::rms::ResourceManager> (this, engine::AttachmentRegistryAttachMode_ForceNotify);
-    }
-
-    ~RenderManager ()
-    {
-      engine::AttachmentRegistry::Detach<media::rms::ResourceManager> (this);
-    }
+      : resource_server (new media::rms::ServerGroupAttachment ("MeshResourceManager", *this))
+      {}
 
 ///Получение модели по имени
     RenderableModel& GetRenderableModel (low_level::IDevice* device, const char* model_name)
@@ -155,70 +148,25 @@ class RenderManager : public engine::IAttachmentRegistryListener<media::rms::Res
       return *renderable_models[model_name];
     }
 
-///События установки / удаления менеджера ресурсов
-    void OnRegisterAttachment (const char* attachment_name, media::rms::ResourceManager& resource_manager)
-    {
-      if (!xtl::xstrcmp (attachment_name, "MeshResourceManager"))
-      {
-        resource_manager.Attach (resource_server);
-
-        DetachServer ();
-
-        attached_resource_manager = &resource_manager;
-      }
-    }
-
-    void OnUnregisterAttachment (const char* attachment_name, media::rms::ResourceManager&)
-    {
-      if (!xtl::xstrcmp (attachment_name, "MeshResourceManager"))
-        DetachServer ();
-    }
-
 ///Управление ресурсами
-    void PrefetchResources (size_t count, const char** resource_names)
+    void PrefetchResource (const char* resource_name)
     {
     }
 
-    void LoadResources (size_t count, const char** resource_names)
+    void LoadResource (const char* resource_name)
     {
-      static const char* METHOD_NAME = "RenderManager::LoadResources";
+      if (!resource_name)
+        throw xtl::make_null_argument_exception ("RenderManager::LoadResources", "resource_name");
 
-      if (!resource_names)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
-
-      for (size_t i = 0; i < count; i++)
-      {
-        if (!resource_names[i])
-          throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
-
-        resources_to_load.push_back (resource_names[i]);
-      }
+      resources_to_load.push_back (resource_name);
     }
 
-    void UnloadResources (size_t count, const char** resource_names)
+    void UnloadResource (const char* resource_name)
     {
-      static const char* METHOD_NAME = "RenderManager::UnloadResources";
+      if (!resource_name)
+        throw xtl::make_null_argument_exception ("RenderManager::UnloadResources", "resource_names");
 
-      if (!resource_names)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
-
-      for (size_t i = 0; i < count; i++)
-      {
-        if (!resource_names[i])
-          throw xtl::make_null_argument_exception (METHOD_NAME, "resource_names");
-
-        renderable_models.erase (resource_names[i]);
-      }
-    }
-
-  private:
-    void DetachServer ()
-    {
-      if (!attached_resource_manager)
-        return;
-
-      attached_resource_manager->Detach (resource_server);
-      attached_resource_manager = 0;
+      renderable_models.erase (resource_name);
     }
 
   private:
@@ -228,10 +176,9 @@ class RenderManager : public engine::IAttachmentRegistryListener<media::rms::Res
     typedef stl::vector<stl::string>                                      ResourceNames;
 
   private:
-    RenderableModelMap           renderable_models;
-    media::rms::Server           resource_server;
-    media::rms::ResourceManager* attached_resource_manager;
-    ResourceNames                resources_to_load;
+    RenderableModelMap                               renderable_models;
+    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;
+    ResourceNames                                    resources_to_load;
 };
 
 #pragma pack (1)
