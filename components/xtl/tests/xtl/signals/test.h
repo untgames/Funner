@@ -1,4 +1,7 @@
-#include <stdio.h>
+#include <cstdio>
+
+#include <stl/auto_ptr.h>
+
 #include <xtl/signal.h>
 #include <xtl/functional>
 #include <xtl/trackable_ptr.h>

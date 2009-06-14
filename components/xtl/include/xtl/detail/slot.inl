@@ -31,7 +31,7 @@ template <class Signature> class slot_impl: public connection_impl
     ~slot_impl ()
     {
       next_slot->prev_slot = prev_slot;
-      prev_slot->next_slot = next_slot;
+      prev_slot->next_slot = next_slot;      
     }
 
       //функци€-обработчик сигнала
@@ -94,6 +94,12 @@ template <class Signature> class slot_impl: public connection_impl
         return;                
         
       connect (this);        
+    }
+    
+      //принудительный разрыв соединени€ (может быть использован только дл€ пол€ first сигнала)
+    void force_signal_first_slot_disconnect ()
+    {
+      prev_slot = next_slot = this;
     }
 
       //проверка соединени€

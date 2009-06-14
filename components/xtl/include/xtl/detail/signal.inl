@@ -154,6 +154,7 @@ inline signal<Signature, Accumulator>::~signal ()
 {
   first.unlock ();
   disconnect_all ();
+  first.force_signal_first_slot_disconnect ();
 }
 
 /*
