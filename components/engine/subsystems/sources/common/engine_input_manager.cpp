@@ -71,7 +71,7 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
             if (!translation_map_name)
               continue;
 
-            Attachment::DeviceEntryPtr device_entry (new Attachment::DeviceEntry, false);
+            Attachment::DeviceEntryPtr device_entry (new Attachment::DeviceEntry (this), false);
 
             TranslationMapsMap::iterator translation_map_iter = translation_maps.find (translation_map_name);
 
@@ -198,10 +198,16 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
           TranslationMapHolderPtr translation_map;
           InputHandler            handler;
           xtl::auto_connection    device_connection;
+          ISubsystem              *subsystem;
+
+          DeviceEntry (ISubsystem *in_subsystem)
+            : subsystem (in_subsystem)
+            {}
 
           void Process (const char* event)
           {
-            DeviceEntryPtr this_holder (this);
+            xtl::com_ptr<ISubsystem> subsystem_holder (subsystem);
+            DeviceEntryPtr           this_holder (this);
 
             translation_map->GetTranslationMap ().ProcessEvent (event, handler);
           }
