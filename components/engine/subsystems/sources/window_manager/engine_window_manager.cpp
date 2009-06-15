@@ -100,11 +100,6 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
       on_mouse_move_connection = window.RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Window::OnMouseMove, this, _1, _3));
 
-        //регистрация слушателя событий появления новых окон
-
-      AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this), AttachmentRegistryAttachMode_ForceNotify);
-      AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this), AttachmentRegistryAttachMode_ForceNotify);
-
         //регистрация окна
 
       try
@@ -114,6 +109,11 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
         if (!attachment_name.empty ())
           AttachmentRegistry::Register (attachment_name.c_str (), xtl::make_const_ref (xtl::ref (window)));
+
+          //регистрация слушателя событий появления новых окон
+
+        AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this), AttachmentRegistryAttachMode_ForceNotify);
+        AttachmentRegistry::Attach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this), AttachmentRegistryAttachMode_ForceNotify);
       }
       catch (...)
       {
@@ -206,6 +206,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         cursor->Attach (this);
 
         SetCursorPosition (window.CursorPosition (), window.ClientRect ());
+        OnChangeVisible (cursor->IsVisible ());
       }
     }
 
