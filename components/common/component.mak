@@ -50,7 +50,7 @@ COMMON.AES.IMPORTS          := compile.static.mak
 #Цель - CommonLib tests
 COMMON.TESTS.TYPE             := test-suite
 COMMON.TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils \
-                                 tests/memory tests/log tests/parselib tests/crypto
+                                 tests/memory tests/log tests/parselib tests/crypto tests/var_registry
 COMMON.TESTS.IMPORTS          := compile.static.mak link.static.mak zip_file_system.link.static.mak \
                                  wxf.link.static.mak xml.link.static.mak configurator.link.static.mak \
                                  default_console_handler.link.static.mak aes.link.static.mak \

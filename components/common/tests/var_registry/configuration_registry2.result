@@ -2,11 +2,17 @@ Results of configuration_registry2_test:
 Log 'common.ComponentManager' message: 'Load components 'common.file_systems.*''
 Log 'common.ComponentManager' message: '...load component 'common.file_systems.ZipFileSystem''
 Log 'common.ComponentManager' message: '...components loaded successull'
+Log 'common.ComponentManager' message: 'Load components 'common.parsers.*''
+Log 'common.ComponentManager' message: '...load component 'common.parsers.wxf''
+Log 'common.ComponentManager' message: '...load component 'common.parsers.xml''
+Log 'common.ComponentManager' message: '...components loaded successull'
 Log 'common.ComponentManager' message: 'Load components 'common.var_registries.*''
 Log 'common.ComponentManager' message: '...load component 'common.var_registries.configuration_registry''
-Log 'common.Configurator' message: 'config.xml(0): error: File 'config.xml' not found
+Log 'common.Configurator' message: 'File 'config.xml' not found
     at common::StdioFileSystem::FileOpen
-    at common::load_xml_configuration
+    at common::FileSystemImpl::OpenFile('config.xml')
+    at common::FileSystem::LoadTextFile
+    at common::Parser::Parser(const char*, const char*)
     at common::ConfigurationRegistry::LoadConfiguration'
 Log 'common.ComponentManager' message: '...components loaded successull'
 Variable 'Window2.Style' value is 'Overlapped'

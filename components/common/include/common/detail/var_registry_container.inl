@@ -193,6 +193,8 @@ VarRegistryContainer<T>::VarRegistryContainer (const VarRegistryContainer<T>& so
 template <class T>
 VarRegistryContainer<T>::~VarRegistryContainer ()
 {
+  UnmountAll ();
+
   release (impl);
 }
 

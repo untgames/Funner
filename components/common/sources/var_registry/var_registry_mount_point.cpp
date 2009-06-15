@@ -12,6 +12,11 @@ MountPoint::MountPoint (const char* in_name, ICustomVarRegistry* in_registry)
   registry->SetEventHandler (xtl::bind (&MountPoint::Notify, this, _1, _2));
 }
 
+MountPoint::~MountPoint ()
+{
+  registry->SetEventHandler (ICustomVarRegistry::EventHandler ());
+}
+
 /*
     Подписка на события реестра / оповещение о возникновении события
 */
