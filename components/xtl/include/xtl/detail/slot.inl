@@ -95,12 +95,6 @@ template <class Signature> class slot_impl: public connection_impl
         
       connect (this);        
     }
-    
-      //принудительный разрыв соединения (может быть использован только для поля first сигнала)
-    void force_signal_first_slot_disconnect ()
-    {
-      prev_slot = next_slot = this;
-    }
 
       //проверка соединения
     bool connected () { return prev_slot != this; }
@@ -110,21 +104,23 @@ template <class Signature> class slot_impl: public connection_impl
 
       //блокировка слота от пересоединений
     void lock ()
-    {
+    {    
       lock_count++;
+      
+      addref ();
     } 
     
       //снятие блокировки слота от пересоединений
     void unlock ()
-    {
+    {        
       if (!--lock_count && wait_next_slot)
       {
-        slot_impl* new_next_slot = wait_next_slot;
-        
-        wait_next_slot = 0;
+        connect (wait_next_slot);
 
-        connect (new_next_slot);
+        wait_next_slot = 0;        
       }
+
+      release ();
     }
     
       //блокировка соединения

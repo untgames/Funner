@@ -16,7 +16,7 @@ template <class Slot, class Args> class signal_invoke_iterator
     {
       while (slot->slot_type::blocked () && slot != end) slot = slot->next ();
 
-      slot->lock ();
+      slot->lock ();      
     }
     
     signal_invoke_iterator (const signal_invoke_iterator& i) : slot (i.slot), args (i.args)
@@ -35,11 +35,11 @@ template <class Slot, class Args> class signal_invoke_iterator
         return *this;
 
       slot_type* old_slot = slot;
-      
+
       slot = i.slot;
       end  = i.end;
       args = i.args;
-      
+
       slot->lock ();
       old_slot->unlock ();
 
@@ -49,12 +49,12 @@ template <class Slot, class Args> class signal_invoke_iterator
     signal_invoke_iterator& operator ++ ()
     {
       slot_type* old_slot = slot;
-    
-      do slot = slot->next (); while (slot->slot_type::blocked () && slot != end);
       
+      do slot = slot->next (); while (slot->slot_type::blocked () && slot != end);
+
       slot->lock ();
       old_slot->unlock ();
-    
+
       return *this;
     }        
     
@@ -145,16 +145,17 @@ template <> struct default_signal_accumulator<void>
 
 template <class Signature, class Accumulator>
 inline signal<Signature, Accumulator>::signal ()
+  : first (0)
 {
-  first.lock ();
 }
 
 template <class Signature, class Accumulator>
 inline signal<Signature, Accumulator>::~signal ()
 {
-  first.unlock ();
   disconnect_all ();
-  first.force_signal_first_slot_disconnect ();
+  
+  if (first)
+    first->release ();
 }
 
 /*
@@ -164,7 +165,10 @@ inline signal<Signature, Accumulator>::~signal ()
 template <class Signature, class Accumulator>
 inline connection signal<Signature, Accumulator>::connect (slot_type& s)
 {
-  s.impl->connect (&first);
+  if (!first)
+    first = new slot_impl;
+
+  s.impl->connect (first);
 
   return s.connection ();
 }
@@ -172,13 +176,19 @@ inline connection signal<Signature, Accumulator>::connect (slot_type& s)
 template <class Signature, class Accumulator>
 inline connection signal<Signature, Accumulator>::connect (const function_type& fn)
 {
-  return detail::slot_connection (new detail::slot_impl<Signature> (fn, &first));
+  if (!first)
+    first = new slot_impl;
+
+  return detail::slot_connection (new detail::slot_impl<Signature> (fn, first));
 }
 
 template <class Signature, class Accumulator> template <class Fn>
 inline void signal<Signature, Accumulator>::disconnect (Fn fn)
 {
-  for (slot_impl* i=first.next (); i!=&first;)
+  if (!first)
+    return;
+
+  for (slot_impl* i=first->next (); i!=first;)
     if (i->function () == fn)
     {
       slot_impl* tmp = i;
@@ -195,9 +205,12 @@ inline void signal<Signature, Accumulator>::disconnect (Fn fn)
 template <class Signature, class Accumulator>
 void signal<Signature, Accumulator>::disconnect_all ()
 {
+  if (!first)
+    return;
+
     //данная функция предполагает возможность очистки списка обработчиков во время распространения сигнала
 
-  for (slot_impl* i=first.previos (); i!=&first;)
+  for (slot_impl* i=first->previos (); i!=first;)
   {
     slot_impl* tmp = i;
     
@@ -216,7 +229,7 @@ void signal<Signature, Accumulator>::disconnect_all ()
 template <class Signature, class Accumulator>
 inline bool signal<Signature, Accumulator>::empty () const
 {
-  return !first.connected ();
+  return !first || !first->connected ();
 }
 
 /*
@@ -226,9 +239,12 @@ inline bool signal<Signature, Accumulator>::empty () const
 template <class Signature, class Accumulator>
 inline size_t signal<Signature, Accumulator>::num_slots () const
 {
+  if (!first)
+    return 0;
+
   size_t count = 0;
 
-  for (slot_impl* i=first.next (); i!=&first; i=i->next ())
+  for (slot_impl* i=first->next (); i!=first; i=i->next ())
     count++;
     
   return count;
@@ -243,7 +259,16 @@ inline typename signal<Signature, Accumulator>::result_type signal<Signature, Ac
 {
   typedef detail::signal_invoke_iterator<slot_impl, const Tuple> iterator;
 
-  return Accumulator () (iterator (args, first.next (), &first), iterator (args, &first, &first));
+  if (!first)
+  {
+    static slot_impl empty_slot;
+    
+    iterator iter (args, &empty_slot, &empty_slot);    
+
+    return Accumulator () (iter, iter);
+  }  
+
+  return Accumulator () (iterator (args, first->next (), first), iterator (args, first, first));
 }
 
 template <class Signature, class Accumulator>

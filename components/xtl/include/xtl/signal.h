@@ -185,17 +185,14 @@ class signal
   private:
     typedef detail::slot_impl<Signature> slot_impl;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Распространение сигнала
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    template <class Tuple> result_type invoke (const Tuple&) const;
+    template <class Tuple> result_type invoke (const Tuple&) const;    
 
   private:
     signal (const signal&); //no impl
     signal& operator = (const signal&); //no impl
 
   private:
-    mutable slot_impl first;
+    slot_impl* first;
 };
 
 #include <xtl/detail/slot.inl>
