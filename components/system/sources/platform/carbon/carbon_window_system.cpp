@@ -65,6 +65,24 @@ struct WindowImpl
   }
 };
 
+bool check_fullscreen (WindowRef window)
+{
+  bool is_fullscreen;
+
+  try
+  {
+    check_window_manager_error (GetWindowProperty (window, WINDOW_PROPERTY_CREATOR, FULLSCREEN_PROPERTY_TAG,
+                                sizeof (is_fullscreen), 0, &is_fullscreen), "::GetWindowProperty", "Can't get window property");
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::check_fullscreen");
+    throw;
+  }
+
+  return is_fullscreen;
+}
+
 /*
     ѕолучение области окна
 */
@@ -76,10 +94,20 @@ void get_rect (WindowRef wnd, WindowRegionCode region, syslib::Rect& rect, const
   check_window_manager_error (GetWindowBounds (wnd, region, &window_rect), source,
                               "Can't get window rect, ::GetWindowBounds error");
 
-  rect.top    = window_rect.top;
-  rect.left   = window_rect.left;
-  rect.bottom = window_rect.bottom;
-  rect.right  = window_rect.right;
+  if (check_fullscreen (wnd))  //в полноэкранном режиме окно имеет смещенные координаты, хот€ и отображаетс€ правильно
+  {
+    rect.top    = 0;
+    rect.left   = 0;
+    rect.bottom = window_rect.bottom - window_rect.top;
+    rect.right  = window_rect.right - window_rect.left;
+  }
+  else
+  {
+    rect.top    = window_rect.top;
+    rect.left   = window_rect.left;
+    rect.bottom = window_rect.bottom;
+    rect.right  = window_rect.right;
+  }
 }
 
 /*
@@ -471,14 +499,13 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
 
 OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref, EventRef event, void* impl)
 {
-  bool        is_fullscreen;
-  WindowImpl* window_impl = (WindowImpl*)impl;
-  WindowRef   wnd         = window_impl->carbon_window;
+  bool        is_fullscreen = false;
+  WindowImpl* window_impl   = (WindowImpl*)impl;
+  WindowRef   wnd           = window_impl->carbon_window;
 
   try
   {
-    check_window_manager_error (GetWindowProperty (wnd, WINDOW_PROPERTY_CREATOR, FULLSCREEN_PROPERTY_TAG,
-                                sizeof (is_fullscreen), 0, &is_fullscreen), "::GetWindowProperty", "Can't get window property");
+    is_fullscreen = check_fullscreen (wnd);
   }
   catch (std::exception& exception)
   {
