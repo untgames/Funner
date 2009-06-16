@@ -16,6 +16,7 @@ const size_t CHAR_CODE_BUFFER_SIZE = 4;  //размер буффера для декодированного им
 /*
     Описание реализации окна
 */
+
 struct WindowImpl
 {
   void*                          user_data;                               //указатель на пользовательские данные
@@ -332,7 +333,26 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
         switch (event_kind)
         {
           case kEventRawKeyDown: //нажатие клавиши клавиатуры
-            window_impl->Notify (window_handle, WindowEvent_OnKeyDown, context);
+            UInt32 key_modifiers = GetCurrentEventKeyModifiers ();
+
+            if (key_modifiers & cmdKey)
+            {
+              switch (context.key)
+              {
+                case Key_W:
+                  Platform::CloseWindow (window_handle);
+                  break;
+                case Key_M:
+                  if (IsWindowCollapsable (wnd))
+                    check_window_manager_error (CollapseWindow (wnd, true), "::CollapseWindow", "Can't collapse window");
+
+                  break;
+                default:
+                  window_impl->Notify (window_handle, WindowEvent_OnKeyDown, context);
+                  break;
+              }
+            }
+
             break;
           case kEventRawKeyRepeat: //удержание клавиши клавиатуры
             window_impl->Notify (window_handle, WindowEvent_OnKeyDown, context);
