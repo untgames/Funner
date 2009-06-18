@@ -106,20 +106,20 @@ typedef common::Singleton<LibraryManagerImpl> LibraryManagerSingleton;
 
 void LibraryManager::RegisterLibrary (const char* name, const BindHandler& binder)
 {
-  LibraryManagerSingleton::Instance ().RegisterLibrary (name, binder);
+  LibraryManagerSingleton::Instance ()->RegisterLibrary (name, binder);
 }
 
 void LibraryManager::UnregisterLibrary (const char* name)
 {
-  LibraryManagerSingleton::Instance ().UnregisterLibrary (name);
+  LibraryManagerSingleton::Instance ()->UnregisterLibrary (name);
 }
 
 void LibraryManager::UnregisterAllLibraries ()
 {
-  LibraryManagerSingleton::Instance ().UnregisterAllLibraries ();
+  LibraryManagerSingleton::Instance ()->UnregisterAllLibraries ();
 }
 
 void LibraryManager::BindLibraries (Environment& environment, const char* library_mask)
 {
-  LibraryManagerSingleton::Instance ().BindLibraries (environment, library_mask);
+  LibraryManagerSingleton::Instance ()->BindLibraries (environment, library_mask);
 }

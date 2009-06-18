@@ -97,17 +97,17 @@ typedef common::Singleton<InterpreterManagerImpl> InterpreterManagerSingleton;
 
 void InterpreterManager::RegisterInterpreter (const char* name, const InterpreterCreater& creater)
 {
-  InterpreterManagerSingleton::Instance ().Register (name, creater);
+  InterpreterManagerSingleton::Instance ()->Register (name, creater);
 }
 
 void InterpreterManager::UnregisterInterpreter (const char* name)
 {
-  InterpreterManagerSingleton::Instance ().Unregister (name);
+  InterpreterManagerSingleton::Instance ()->Unregister (name);
 }
 
 void InterpreterManager::UnregisterAllInterpreters ()
 {
-  InterpreterManagerSingleton::Instance ().UnregisterAll ();
+  InterpreterManagerSingleton::Instance ()->UnregisterAll ();
 }
 
 /*
@@ -131,7 +131,7 @@ Shell::Shell (const char* interpreter_name, const EnvironmentPtr& environment)
   {
     static common::ComponentLoader default_interpreters_loader (INTERPRETERS_COMPONENTS_MASK);
     
-    interpreter = InterpeterPtr (InterpreterManagerSingleton::Instance ().CreateInterpreter (interpreter_name, environment), false);
+    interpreter = InterpeterPtr (InterpreterManagerSingleton::Instance ()->CreateInterpreter (interpreter_name, environment), false);
   }
   catch (xtl::exception& exception)
   {
