@@ -16,18 +16,6 @@
 namespace syslib
 {
 
-#ifdef _WIN32
-
-void thread_init ();      //функция инициализации библиотеки
-void thread_done (void*); //функция деинициализации библиотеки
-
-#else
-
-inline void thread_init () {}
-inline void thread_done (void*) {}
-
-#endif
-
 //генерация исключения с кодом ошибки
 void pthread_raise_error (const char* source, int status);
 

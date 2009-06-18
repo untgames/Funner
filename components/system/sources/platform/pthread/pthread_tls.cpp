@@ -73,8 +73,6 @@ Platform::tls_t Platform::CreateTls (IThreadCleanupCallback* cleanup)
 {
   try
   {
-    thread_init ();
-
     return (tls_t)new TlsKeyImpl (cleanup);
   }
   catch (xtl::exception& exception)
@@ -91,8 +89,6 @@ void Platform::DestroyTls (tls_t tls)
     if (!tls)
       return;
       
-    thread_init ();
-
     TlsKeyImpl* handle = (TlsKeyImpl*)tls;
       
     delete handle;
@@ -111,8 +107,6 @@ void Platform::SetTls (tls_t tls, void* data)
     if (!tls)
       throw xtl::make_null_argument_exception ("", "tls");
     
-    thread_init ();
-    
     TlsKeyImpl* key = (TlsKeyImpl*)tls;
 
     key->GetValue ().data = data;
@@ -130,8 +124,6 @@ void* Platform::GetTls (tls_t tls)
   {
     if (!tls)
       throw xtl::make_null_argument_exception ("", "tls");
-    
-    thread_init ();
     
     TlsKeyImpl* key = (TlsKeyImpl*)tls;
 

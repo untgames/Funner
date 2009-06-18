@@ -12,8 +12,6 @@ Platform::mutex_t Platform::CreateMutex ()
 {
   try
   {
-    thread_init ();
-
     stl::auto_ptr<mutex_handle> handle (new mutex_handle);
 
     int status = pthread_mutex_init (&handle->mutex, 0);
@@ -38,8 +36,6 @@ void Platform::DestroyMutex (mutex_t handle)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "mutex");
 
-    thread_init ();
-
     int status = pthread_mutex_destroy (&handle->mutex);
 
     if (status)
@@ -61,8 +57,6 @@ void Platform::LockMutex (mutex_t handle)
   {
     if (!handle)
       throw xtl::make_null_argument_exception ("", "mutex");
-
-    thread_init ();
 
     int status = pthread_mutex_lock (&handle->mutex);
 
@@ -90,8 +84,6 @@ bool Platform::TryLockMutex (mutex_t handle)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "mutex");
 
-    thread_init ();
-
     int status = pthread_mutex_trylock (&handle->mutex);
 
     switch (status)
@@ -117,8 +109,6 @@ void Platform::UnlockMutex (mutex_t handle)
   {
     if (!handle)
       throw xtl::make_null_argument_exception ("", "mutex");
-
-    thread_init ();
 
     int status = pthread_mutex_unlock (&handle->mutex);
 

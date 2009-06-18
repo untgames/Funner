@@ -12,8 +12,6 @@ Platform::semaphore_t Platform::CreateSemaphore (size_t initial_value)
 {
   try
   {
-    thread_init ();
-
     stl::auto_ptr<semaphore_handle> handle (new semaphore_handle);
 
     int status = sem_init (&handle->semaphore, 0, initial_value);
@@ -35,8 +33,6 @@ void Platform::DestroySemaphore (semaphore_t handle)
 {
   try
   {
-    thread_init ();
-
     int status = sem_destroy (&handle->semaphore);
 
     if (status)
@@ -56,8 +52,6 @@ void Platform::WaitSemaphore (semaphore_t handle)
 {
   try
   {
-    thread_init ();
-
     int status = sem_wait (&handle->semaphore);
 
     if (status)
@@ -81,8 +75,6 @@ bool Platform::TryWaitSemaphore (semaphore_t handle)
 {
   try
   {
-    thread_init ();
-
     int status = sem_trywait (&handle->semaphore);
 
     switch (status)
@@ -106,8 +98,6 @@ void Platform::PostSemaphore (semaphore_t handle)
 {
   try
   {
-    thread_init ();
-
     int status = sem_post (&handle->semaphore);
 
     if (status)

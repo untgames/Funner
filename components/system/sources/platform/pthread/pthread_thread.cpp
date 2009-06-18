@@ -13,9 +13,6 @@ void* thread_run (void* data)
 
   xtl::com_ptr<IThreadCallback> callback (reinterpret_cast<IThreadCallback*> (data));
 
-  thread_init ();
-
-  pthread_cleanup_push  (&thread_done, 0);
   pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
 
   try
@@ -24,11 +21,7 @@ void* thread_run (void* data)
   }
   catch (...)
   {
-    thread_done (0);
-    throw;
   }
-
-  pthread_cleanup_pop (1);
 
   return 0;
 }
@@ -55,10 +48,6 @@ Platform::thread_t Platform::CreateThread (IThreadCallback* in_callback)
       throw xtl::make_null_argument_exception ("", "callback");
 
     xtl::com_ptr<IThreadCallback> callback (in_callback);
-
-      //инициализации библиотеки
-
-    thread_init ();
 
       //создание нити
 
@@ -96,8 +85,6 @@ void Platform::CancelThread (thread_t thread)
 {
   try
   {
-    thread_init ();    
-
     int status = pthread_cancel (get_handle (thread));
 
     if (status)
@@ -118,8 +105,6 @@ void Platform::JoinThread (thread_t thread)
 {
   try
   {
-    thread_init ();
-    
     void* exit_code = 0;
 
     int status = pthread_join (get_handle (thread), &exit_code);
