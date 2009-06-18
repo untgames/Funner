@@ -9,7 +9,6 @@ SYSTEMLIB.SOURCES.NAME                   := funner.system
 SYSTEMLIB.SOURCES.INCLUDE_DIRS           := sources
 SYSTEMLIB.SOURCES.SOURCE_DIRS            := sources/wrappers
 SYSTEMLIB.SOURCES.IMPORTS                := compile.static.mak
-SYSTEMLIB.SOURCES.win32.IMPORTS          := ../../extern/pthreads_win32/compile.static.mak
 SYSTEMLIB.SOURCES.win32.SOURCE_DIRS      := sources/platform/win32
 SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS     := sources/platform/pthread sources/platform/unistd
 SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS   := -wd4355
