@@ -163,15 +163,15 @@ void StartupManagerImpl::Start (common::ParseNode& node, const char* wc_mask, Su
 
 void StartupManager::RegisterStartupHandler (const char* node_name, const StartupHandler& startup_handler)
 {
-  StartupManagerSingleton::Instance ().RegisterStartupHandler (node_name, startup_handler);
+  StartupManagerSingleton::Instance ()->RegisterStartupHandler (node_name, startup_handler);
 }
 
 void StartupManager::UnregisterStartupHandler (const char* node_name)
 {
-  StartupManagerSingleton::Instance ().UnregisterStartupHandler (node_name);
+  StartupManagerSingleton::Instance ()->UnregisterStartupHandler (node_name);
 }
 
 void StartupManager::UnregisterAllStartupHandlers ()
 {
-  StartupManagerSingleton::Instance ().UnregisterAllStartupHandlers ();
+  StartupManagerSingleton::Instance ()->UnregisterAllStartupHandlers ();
 }

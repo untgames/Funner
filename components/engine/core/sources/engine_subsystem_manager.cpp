@@ -225,7 +225,7 @@ void SubsystemManager::Start (const common::ParseNode& configuration_root, const
 
     common::ParseNode copy = configuration_root;
 
-    StartupManagerSingleton::Instance ().Start (copy, subsystem_name_mask, *this);
+    StartupManagerSingleton::Instance ()->Start (copy, subsystem_name_mask, *this);
   }
   catch (xtl::exception& exception)
   {

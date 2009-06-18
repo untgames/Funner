@@ -355,22 +355,22 @@ typedef common::Singleton<AttachmentRegistryImpl> AttachmentRegistrySingleton;
 
 void AttachmentRegistry::RegisterCore (const char* name, detail::IBasicAttachment* attachment)
 {
-  AttachmentRegistrySingleton::Instance ().Register (name, attachment);
+  AttachmentRegistrySingleton::Instance ()->Register (name, attachment);
 }
 
 void AttachmentRegistry::UnregisterCore (const char* name, const std::type_info& type)
 {
-  AttachmentRegistrySingleton::Instance ().Unregister (name, type);
+  AttachmentRegistrySingleton::Instance ()->Unregister (name, type);
 }
 
 void AttachmentRegistry::UnregisterAllCore (const std::type_info& type)
 {
-  AttachmentRegistrySingleton::Instance ().UnregisterAll (type);
+  AttachmentRegistrySingleton::Instance ()->UnregisterAll (type);
 }
 
 detail::IBasicAttachment* AttachmentRegistry::FindCore (const char* name, const std::type_info& type, bool raise_exception)
 {
-  return AttachmentRegistrySingleton::Instance ().Find (name, type, raise_exception);
+  return AttachmentRegistrySingleton::Instance ()->Find (name, type, raise_exception);
 }
 
 void AttachmentRegistry::AttachCore
@@ -378,7 +378,7 @@ void AttachmentRegistry::AttachCore
   IBasicAttachmentRegistryListener* listener,
   AttachmentRegistryAttachMode      mode)
 {
-  AttachmentRegistrySingleton::Instance ().Attach (type, listener, mode);
+  AttachmentRegistrySingleton::Instance ()->Attach (type, listener, mode);
 }
 
 void AttachmentRegistry::DetachCore
@@ -386,5 +386,5 @@ void AttachmentRegistry::DetachCore
   IBasicAttachmentRegistryListener* listener,
   AttachmentRegistryAttachMode      mode)
 {
-  AttachmentRegistrySingleton::Instance ().Detach (type, listener, mode);
+  AttachmentRegistrySingleton::Instance ()->Detach (type, listener, mode);
 }
