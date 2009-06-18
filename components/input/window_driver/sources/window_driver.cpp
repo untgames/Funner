@@ -202,7 +202,7 @@ namespace low_level
 
 const char* WindowDriver::Name ()
 {
-  return WindowDriverSingleton::Instance ().GetDescription ();
+  return WindowDriverSingleton::Instance ()->GetDescription ();
 }
 
 /*
@@ -211,7 +211,7 @@ const char* WindowDriver::Name ()
 
 IDriver* WindowDriver::Driver ()
 {
-  return WindowDriverSingleton::InstancePtr ();
+  return &*WindowDriverSingleton::Instance ();
 }
 
 /*
@@ -223,7 +223,7 @@ void WindowDriver::RegisterDevice (const char* device_name, syslib::Window& wind
   if (!device_name)
     throw xtl::make_null_argument_exception ("input::low_level::WindowDriver::RegisterDevice", "device_name");
 
-  WindowDriverSingleton::Instance ().RegisterDevice (device_name, window);
+  WindowDriverSingleton::Instance ()->RegisterDevice (device_name, window);
 }
 
 void WindowDriver::RegisterDevice (syslib::Window& window)
@@ -236,17 +236,17 @@ void WindowDriver::UnregisterDevice (const char* device_name)
   if (!device_name)
     throw xtl::make_null_argument_exception ("input::low_level::WindowDriver::UnregisterDevice", "device_name");
 
-  WindowDriverSingleton::Instance ().UnregisterDevice (device_name);
+  WindowDriverSingleton::Instance ()->UnregisterDevice (device_name);
 }
 
 void WindowDriver::UnregisterAllDevices (syslib::Window& window)
 {
-  WindowDriverSingleton::Instance ().UnregisterAllDevices (window);
+  WindowDriverSingleton::Instance ()->UnregisterAllDevices (window);
 }
 
 void WindowDriver::UnregisterAllDevices ()
 {
-  WindowDriverSingleton::Instance ().UnregisterAllDevices ();
+  WindowDriverSingleton::Instance ()->UnregisterAllDevices ();
 }
 
 }
