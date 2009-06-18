@@ -319,65 +319,65 @@ typedef Singleton<sound::low_level::SoundSystemImpl> SoundSystemSingleton;
 
 void SoundSystem::RegisterDriver (const char* driver_name, const CreateDeviceHandler& creater)
 {
-  SoundSystemSingleton::Instance ().RegisterDriver (driver_name, creater);
+  SoundSystemSingleton::Instance ()->RegisterDriver (driver_name, creater);
 }
 
 void SoundSystem::UnregisterDriver (const char* driver_name)
 {
-  SoundSystemSingleton::Instance ().UnregisterDriver (driver_name);
+  SoundSystemSingleton::Instance ()->UnregisterDriver (driver_name);
 }
 
 void SoundSystem::UnregisterAllDrivers ()
 {
-  SoundSystemSingleton::Instance ().UnregisterAllDrivers ();
+  SoundSystemSingleton::Instance ()->UnregisterAllDrivers ();
 }
 
 const char* SoundSystem::RegisterConfiguration (const char* driver_name, const char* device_name)
 {
-  return SoundSystemSingleton::Instance ().RegisterConfiguration (driver_name, device_name);
+  return SoundSystemSingleton::Instance ()->RegisterConfiguration (driver_name, device_name);
 }
 
 void SoundSystem::UnregisterConfiguration (const char* configuration_name)
 {
-  SoundSystemSingleton::Instance ().UnregisterConfiguration (configuration_name);
+  SoundSystemSingleton::Instance ()->UnregisterConfiguration (configuration_name);
 }
 
 void SoundSystem::UnregisterConfiguration (const char* driver_name, const char* device_name)
 {
-  SoundSystemSingleton::Instance ().UnregisterConfiguration (driver_name, device_name);
+  SoundSystemSingleton::Instance ()->UnregisterConfiguration (driver_name, device_name);
 }
 
 void SoundSystem::UnregisterAllConfigurations (const char* driver_mask, const char* device_mask)
 {
-  SoundSystemSingleton::Instance ().UnregisterAllConfigurations (driver_mask, device_mask);
+  SoundSystemSingleton::Instance ()->UnregisterAllConfigurations (driver_mask, device_mask);
 }
 
 void SoundSystem::UnregisterAllConfigurations ()
 {
-  SoundSystemSingleton::Instance ().UnregisterAllConfigurations ();
+  SoundSystemSingleton::Instance ()->UnregisterAllConfigurations ();
 }
 
 size_t SoundSystem::GetConfigurationsCount ()
 {
-  return SoundSystemSingleton::Instance ().GetConfigurationsCount ();
+  return SoundSystemSingleton::Instance ()->GetConfigurationsCount ();
 }
 
 const char* SoundSystem::GetConfiguration (size_t index)
 {
-  return SoundSystemSingleton::Instance ().GetConfiguration (index);
+  return SoundSystemSingleton::Instance ()->GetConfiguration (index);
 }
 
 const char* SoundSystem::FindConfiguration (const char* driver_mask, const char* device_mask)
 {
-  return SoundSystemSingleton::Instance ().FindConfiguration (driver_mask, device_mask);
+  return SoundSystemSingleton::Instance ()->FindConfiguration (driver_mask, device_mask);
 }
 
 ISoundDevice* SoundSystem::CreateDevice (const char* driver_name, const char* device_name, const void* window_handle, const char* init_string)
 {
-  return SoundSystemSingleton::Instance ().CreateDevice (driver_name, device_name, window_handle, init_string);
+  return SoundSystemSingleton::Instance ()->CreateDevice (driver_name, device_name, window_handle, init_string);
 }
 
 ISoundDevice* SoundSystem::CreateDevice (const char* configuration_name, const void* window_handle, const char* init_string)
 {
-  return SoundSystemSingleton::Instance ().CreateDevice (configuration_name, window_handle, init_string);
+  return SoundSystemSingleton::Instance ()->CreateDevice (configuration_name, window_handle, init_string);
 }

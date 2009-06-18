@@ -202,40 +202,40 @@ typedef Singleton<DriverManagerImpl> DriverManagerSingleton;
 
 void DriverManager::RegisterDriver (const char* name, IDriver* driver)
 {
-  DriverManagerSingleton::Instance ().RegisterDriver (name, driver);
+  DriverManagerSingleton::Instance ()->RegisterDriver (name, driver);
 }
 
 void DriverManager::UnregisterDriver (const char* name)
 {
-  DriverManagerSingleton::Instance ().UnregisterDriver (name);
+  DriverManagerSingleton::Instance ()->UnregisterDriver (name);
 }
 
 void DriverManager::UnregisterAllDrivers ()
 {
-  DriverManagerSingleton::Instance ().UnregisterAllDrivers ();
+  DriverManagerSingleton::Instance ()->UnregisterAllDrivers ();
 }
 
 IDriver* DriverManager::FindDriver (const char* name)
 {
-  return DriverManagerSingleton::Instance ().FindDriver (name);
+  return DriverManagerSingleton::Instance ()->FindDriver (name);
 }
 
 size_t DriverManager::DriversCount ()
 {
-  return DriverManagerSingleton::Instance ().DriversCount ();
+  return DriverManagerSingleton::Instance ()->DriversCount ();
 }
 
 IDriver* DriverManager::Driver (size_t index)
 {
-  return DriverManagerSingleton::Instance ().Driver (index);
+  return DriverManagerSingleton::Instance ()->Driver (index);
 }
 
 const char* DriverManager::DriverName (size_t index)
 {
-  return DriverManagerSingleton::Instance ().DriverName (index);
+  return DriverManagerSingleton::Instance ()->DriverName (index);
 }
 
 IDevice* DriverManager::CreateDevice (const char* driver_mask, const char* device_mask, const char* init_string)
 {
-  return DriverManagerSingleton::Instance ().CreateDevice (driver_mask, device_mask, init_string);
+  return DriverManagerSingleton::Instance ()->CreateDevice (driver_mask, device_mask, init_string);
 }
