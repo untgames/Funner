@@ -147,30 +147,30 @@ CustomWindowSystemPtr WindowSystemManagerImpl::CreateWindowSystem (const char* a
 
 void WindowSystemManager::RegisterWindowSystem (const char* profile, const WindowSystemCreator& creator)
 {
-  WindowSystemManagerSingleton::Instance ().RegisterWindowSystem (profile, creator);
+  WindowSystemManagerSingleton::Instance ()->RegisterWindowSystem (profile, creator);
 }
 
 void WindowSystemManager::UnregisterWindowSystem (const char* profile)
 {
-  WindowSystemManagerSingleton::Instance ().UnregisterWindowSystem (profile);
+  WindowSystemManagerSingleton::Instance ()->UnregisterWindowSystem (profile);
 }
 
 void WindowSystemManager::UnregisterAllWindowSystems ()
 {
-  WindowSystemManagerSingleton::Instance ().UnregisterAllWindowSystems ();
+  WindowSystemManagerSingleton::Instance ()->UnregisterAllWindowSystems ();
 }
 
 void WindowSystemManager::RegisterApplicationServer (const char* application_server_name, IApplicationServer* server)
 {
-  WindowSystemManagerSingleton::Instance ().RegisterApplicationServer (application_server_name, server);
+  WindowSystemManagerSingleton::Instance ()->RegisterApplicationServer (application_server_name, server);
 }
 
 void WindowSystemManager::UnregisterApplicationServer (const char* application_server_name)
 {
-  WindowSystemManagerSingleton::Instance ().UnregisterApplicationServer (application_server_name);
+  WindowSystemManagerSingleton::Instance ()->UnregisterApplicationServer (application_server_name);
 }
 
 void WindowSystemManager::UnregisterAllApplicationServers ()
 {
-  WindowSystemManagerSingleton::Instance ().UnregisterAllApplicationServers ();
+  WindowSystemManagerSingleton::Instance ()->UnregisterAllApplicationServers ();
 }

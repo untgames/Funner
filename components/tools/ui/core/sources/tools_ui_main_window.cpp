@@ -27,7 +27,7 @@ MainWindow::MainWindow (const char* application_server, const char* window_syste
 {
   try
   {
-    impl->window_system      = WindowSystemManagerSingleton::Instance ().CreateWindowSystem (application_server, window_system_profile);
+    impl->window_system      = WindowSystemManagerSingleton::Instance ()->CreateWindowSystem (application_server, window_system_profile);
     impl->profile            = window_system_profile;
     impl->application_server = application_server;
   }
