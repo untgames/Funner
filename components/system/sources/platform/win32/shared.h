@@ -1,6 +1,7 @@
 #include <process.h>
 
 #include <stl/hash_map>
+#include <stl/hash_set>
 
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
@@ -21,5 +22,8 @@ namespace syslib
 //проверка ошибок использования WinAPI и генерация исключения в случае их наличия
 void check_errors (const char* source);
 void raise_error  (const char* source);
+
+//очистка tls нити
+void cleanup_tls ();
 
 }

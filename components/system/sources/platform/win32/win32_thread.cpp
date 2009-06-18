@@ -17,8 +17,24 @@ unsigned CALLBACK thread_run (void* data)
     return 0;
 
   xtl::com_ptr<IThreadCallback> callback (reinterpret_cast<IThreadCallback*> (data));
+  
+  try
+  {
+    callback->Run ();
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 
-  callback->Run ();
+  try
+  {
+    cleanup_tls ();
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 
   return 0;
 }
