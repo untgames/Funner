@@ -93,17 +93,6 @@ void CarbonTimer::TimerProc (EventLoopTimerRef in_timer, void* user_data)
 }
 
 /*
-    Приостановка выполнения приложения на miliseconds милисекунд
-*/
-
-void Platform::Sleep (size_t miliseconds)
-{
-  unsigned long final_ticks;
-
-  Delay ((float)miliseconds * 0.06, &final_ticks);
-}
-
-/*
     Создание / уничтожение таймера
 */
 
