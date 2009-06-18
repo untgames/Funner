@@ -33,7 +33,7 @@ IPropertyList* Object::GetProperties ()
 {
   typedef common::Singleton<DefaultPropertyList> DefaultPropertyListSingleton;
   
-  return DefaultPropertyListSingleton::InstancePtr ();
+  return &*DefaultPropertyListSingleton::Instance ();
 }
 
 /*

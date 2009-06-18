@@ -235,27 +235,27 @@ typedef Singleton<DriverManagerImpl> DriverManagerSingleton;
 
 void DriverManager::RegisterDriver (const char* name, IDriver* driver)
 {
-  DriverManagerSingleton::Instance ().RegisterDriver (name, driver);
+  DriverManagerSingleton::Instance ()->RegisterDriver (name, driver);
 }
 
 void DriverManager::UnregisterDriver (const char* name)
 {
-  DriverManagerSingleton::Instance ().UnregisterDriver (name);
+  DriverManagerSingleton::Instance ()->UnregisterDriver (name);
 }
 
 void DriverManager::UnregisterAllDrivers ()
 {
-  DriverManagerSingleton::Instance ().UnregisterAllDrivers ();
+  DriverManagerSingleton::Instance ()->UnregisterAllDrivers ();
 }
 
 IDriver* DriverManager::FindDriver (const char* name)
 {
-  return DriverManagerSingleton::Instance ().FindDriver (name);
+  return DriverManagerSingleton::Instance ()->FindDriver (name);
 }
 
 IAdapter* DriverManager::CreateAdapter (const char* driver_name, const char* adapter_name, const char* path, const char* init_string)
 {
-  return DriverManagerSingleton::Instance ().CreateAdapter (driver_name, adapter_name, path, init_string);
+  return DriverManagerSingleton::Instance ()->CreateAdapter (driver_name, adapter_name, path, init_string);
 }
 
 ISwapChain* DriverManager::CreateSwapChain
@@ -263,7 +263,7 @@ ISwapChain* DriverManager::CreateSwapChain
   const char*          adapter_mask,
   const SwapChainDesc& swap_chain_desc)
 {
-  return DriverManagerSingleton::Instance ().CreateSwapChain (driver_mask, adapter_mask, swap_chain_desc);
+  return DriverManagerSingleton::Instance ()->CreateSwapChain (driver_mask, adapter_mask, swap_chain_desc);
 }
 
 void DriverManager::CreateSwapChainAndDevice
@@ -274,7 +274,7 @@ void DriverManager::CreateSwapChainAndDevice
   xtl::com_ptr<ISwapChain>& out_swap_chain,
   xtl::com_ptr<IDevice>&    out_device)
 {
-  DriverManagerSingleton::Instance ().CreateSwapChainAndDevice (driver_mask, adapter_mask, swap_chain_desc, init_string, out_swap_chain, out_device);
+  DriverManagerSingleton::Instance ()->CreateSwapChainAndDevice (driver_mask, adapter_mask, swap_chain_desc, init_string, out_swap_chain, out_device);
 }
 
 void DriverManager::CreateSwapChainAndDevice

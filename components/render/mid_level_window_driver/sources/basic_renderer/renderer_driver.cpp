@@ -522,7 +522,7 @@ const char* WindowDriver::Name ()
 
 render::mid_level::IDriver* WindowDriver::Driver ()
 {
-  return WindowDriverSingleton::InstancePtr ();
+  return &*WindowDriverSingleton::Instance ();
 }
 
 /*
@@ -531,7 +531,7 @@ render::mid_level::IDriver* WindowDriver::Driver ()
 
 void WindowDriver::RegisterRenderer (const char* renderer_name, const common::ParseNode& configuration_node)
 {
-  WindowDriverSingleton::Instance ().RegisterRenderer (renderer_name, configuration_node);
+  WindowDriverSingleton::Instance ()->RegisterRenderer (renderer_name, configuration_node);
 }
 
 /*
@@ -540,20 +540,20 @@ void WindowDriver::RegisterRenderer (const char* renderer_name, const common::Pa
 
 void WindowDriver::RegisterWindow (const char* renderer_name, syslib::Window& window, const common::ParseNode& configuration_node)
 {
-  WindowDriverSingleton::Instance ().RegisterWindow (renderer_name, window, configuration_node);
+  WindowDriverSingleton::Instance ()->RegisterWindow (renderer_name, window, configuration_node);
 }
 
 void WindowDriver::UnregisterWindow (const char* renderer_name, syslib::Window& window)
 {
-  WindowDriverSingleton::Instance ().UnregisterWindow (renderer_name, window);
+  WindowDriverSingleton::Instance ()->UnregisterWindow (renderer_name, window);
 }
 
 void WindowDriver::UnregisterAllWindows (const char* renderer_name)
 {
-  WindowDriverSingleton::Instance ().UnregisterAllWindows (renderer_name);
+  WindowDriverSingleton::Instance ()->UnregisterAllWindows (renderer_name);
 }
 
 void WindowDriver::UnregisterAllWindows ()
 {
-  WindowDriverSingleton::Instance ().UnregisterAllWindows ();
+  WindowDriverSingleton::Instance ()->UnregisterAllWindows ();
 }

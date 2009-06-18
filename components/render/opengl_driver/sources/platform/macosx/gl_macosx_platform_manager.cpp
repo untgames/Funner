@@ -112,25 +112,25 @@ typedef common::Singleton<PlatformManagerImpl> PlatformManagerSingleton;
 
 IAdapter* PlatformManager::CreateAdapter (const char* name, const char* path, const char* init_string)
 {
-  return PlatformManagerSingleton::Instance ().CreateAdapter (name, path, init_string);
+  return PlatformManagerSingleton::Instance ()->CreateAdapter (name, path, init_string);
 }
 
 void PlatformManager::EnumDefaultAdapters (const xtl::function<void (IAdapter*)>& handler)
 {
-  PlatformManagerSingleton::Instance ().EnumDefaultAdapters (handler);
+  PlatformManagerSingleton::Instance ()->EnumDefaultAdapters (handler);
 }
 
 ISwapChain* PlatformManager::CreateSwapChain (size_t adapters_count, IAdapter** adapters, const SwapChainDesc& desc)
 {
-  return PlatformManagerSingleton::Instance ().CreateSwapChain (adapters_count, adapters, desc);
+  return PlatformManagerSingleton::Instance ()->CreateSwapChain (adapters_count, adapters, desc);
 }
 
 ISwapChain* PlatformManager::CreatePBuffer (ISwapChain* source_chain, const SwapChainDesc* pbuffer_desc)
 {
-  return PlatformManagerSingleton::Instance ().CreatePBuffer (source_chain, pbuffer_desc);
+  return PlatformManagerSingleton::Instance ()->CreatePBuffer (source_chain, pbuffer_desc);
 }
 
 render::low_level::opengl::IContext* PlatformManager::CreateContext (ISwapChain* swap_chain)
 {
-  return PlatformManagerSingleton::Instance ().CreateContext (swap_chain);
+  return PlatformManagerSingleton::Instance ()->CreateContext (swap_chain);
 }

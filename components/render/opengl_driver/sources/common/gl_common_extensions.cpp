@@ -375,7 +375,7 @@ size_t get_extension_id (const char* full_name, size_t length)
 
   typedef Singleton<ExtensionMap> ExtensionMapSingleton;
 
-  return ExtensionMapSingleton::Instance ().FindExtensionId (full_name, length);
+  return ExtensionMapSingleton::Instance ()->FindExtensionId (full_name, length);
 }
 
 size_t get_extension_id (const char* full_name)

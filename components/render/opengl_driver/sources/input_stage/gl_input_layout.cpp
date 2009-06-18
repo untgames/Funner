@@ -112,13 +112,13 @@ class VertexAttributeSemanticTraits
       //проверка совместимости семантики и типа данных элементов
     static bool IsCompatible (VertexAttributeSemantic semantic, InputDataType type)
     {
-      return ThisSingleton::Instance ().type_compatibility [semantic][type];
+      return ThisSingleton::Instance ()->type_compatibility [semantic][type];
     }
 
       //проверка совместимости семантики и формата элементов
     static bool IsCompatible (VertexAttributeSemantic semantic, InputDataFormat format)
     {
-      return ThisSingleton::Instance ().format_compatibility [semantic][format];
+      return ThisSingleton::Instance ()->format_compatibility [semantic][format];
     }
 
   private:

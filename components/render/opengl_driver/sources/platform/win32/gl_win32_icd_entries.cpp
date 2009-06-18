@@ -406,7 +406,7 @@ namespace windows
 
 int get_icd_table_index (const char* name)
 {
-  return IcdEntryMapSingleton::Instance ().FindIndex (name);
+  return IcdEntryMapSingleton::Instance ()->FindIndex (name);
 }
 
 }

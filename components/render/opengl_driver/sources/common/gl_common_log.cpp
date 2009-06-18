@@ -64,7 +64,7 @@ Log::Log ()
 {
   typedef common::Singleton<ImplHolder> ImplSingleton;
 
-  impl = ImplSingleton::Instance ().impl.get ();
+  impl = ImplSingleton::Instance ()->impl.get ();
 
   addref (impl);
 }

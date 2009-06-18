@@ -32,7 +32,7 @@ class StandartExtensionSet
 
     static const StandartExtensionSet& Instance ()
     {
-      return common::Singleton<StandartExtensionSet>::Instance ();
+      return *common::Singleton<StandartExtensionSet>::Instance ();
     }
 
     StandartExtensionSet ()

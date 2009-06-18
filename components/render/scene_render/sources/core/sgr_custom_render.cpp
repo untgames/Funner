@@ -155,7 +155,7 @@ void SceneRenderManager::RegisterRender (const char* path_name, const RenderCrea
 {
   try
   {
-    SceneRenderManagerSingleton::Instance ().RegisterRender (path_name, creater);
+    SceneRenderManagerSingleton::Instance ()->RegisterRender (path_name, creater);
   }
   catch (xtl::exception& exception)
   {
@@ -166,12 +166,12 @@ void SceneRenderManager::RegisterRender (const char* path_name, const RenderCrea
 
 void SceneRenderManager::UnregisterRender (const char* path_name)
 {
-  SceneRenderManagerSingleton::Instance ().UnregisterRender (path_name);
+  SceneRenderManagerSingleton::Instance ()->UnregisterRender (path_name);
 }
 
 void SceneRenderManager::UnregisterAllRenders ()
 {
-  SceneRenderManagerSingleton::Instance ().UnregisterAllRenders ();
+  SceneRenderManagerSingleton::Instance ()->UnregisterAllRenders ();
 }
 
 /*
@@ -182,7 +182,7 @@ SceneRenderManager::Iterator SceneRenderManager::CreateIterator ()
 {
   try
   {
-    return SceneRenderManagerSingleton::Instance ().CreateIterator ();
+    return SceneRenderManagerSingleton::Instance ()->CreateIterator ();
   }
   catch (xtl::exception& exception)
   {
@@ -200,7 +200,7 @@ namespace render
 
 CustomSceneRenderPtr create_render_path (mid_level::IRenderer* renderer, const char* path_name)
 {
-  return SceneRenderManagerSingleton::Instance ().CreateRender (renderer, path_name);
+  return SceneRenderManagerSingleton::Instance ()->CreateRender (renderer, path_name);
 }
 
 }
