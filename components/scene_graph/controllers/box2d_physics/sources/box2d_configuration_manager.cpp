@@ -59,5 +59,5 @@ typedef common::Singleton<ConfigurationManagerImpl> ConfigurationManagerSingleto
 
 Configuration::Pointer ConfigurationManager::GetConfiguration (const char* file_name)
 {
-  return ConfigurationManagerSingleton::Instance ().GetConfiguration (file_name);
+  return ConfigurationManagerSingleton::Instance ()->GetConfiguration (file_name);
 }

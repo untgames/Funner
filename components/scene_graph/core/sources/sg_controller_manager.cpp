@@ -114,22 +114,22 @@ typedef common::Singleton<ControllerManagerImpl> ControllerManagerSingleton;
 
 void ControllerManager::Register (const char* name, const ControllerCreator& creator)
 {
-  ControllerManagerSingleton::Instance ().Register (name, creator);
+  ControllerManagerSingleton::Instance ()->Register (name, creator);
 }
 
 void ControllerManager::Unregister (const char* name)
 {
-  ControllerManagerSingleton::Instance ().Unregister (name);
+  ControllerManagerSingleton::Instance ()->Unregister (name);
 }
 
 void ControllerManager::UnregisterAll ()
 {
-  ControllerManagerSingleton::Instance ().UnregisterAll ();
+  ControllerManagerSingleton::Instance ()->UnregisterAll ();
 }
 
 bool ControllerManager::IsPresent (const char* name)
 {
-  return ControllerManagerSingleton::Instance ().IsPresent (name);
+  return ControllerManagerSingleton::Instance ()->IsPresent (name);
 }
 
 namespace scene_graph
@@ -137,7 +137,7 @@ namespace scene_graph
 
 IController* create_controller (Node& node, const char* name, const xtl::any_reference& param)
 {
-  return ControllerManagerSingleton::Instance ().CreateController (node, name, param);
+  return ControllerManagerSingleton::Instance ()->CreateController (node, name, param);
 }
 
 }
