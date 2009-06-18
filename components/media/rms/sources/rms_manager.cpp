@@ -255,20 +255,20 @@ void ResourceManagerImpl::FlushUnusedResources ()
 
 Binding ResourceManager::CreateBinding (const Group& group)
 {
-  return ResourceManagerSingleton::Instance ().CreateBinding (group);
+  return ResourceManagerSingleton::Instance ()->CreateBinding (group);
 }
 
 size_t ResourceManager::ServerGroupsCount ()
 {
-  return ResourceManagerSingleton::Instance ().ServerGroupsCount ();
+  return ResourceManagerSingleton::Instance ()->ServerGroupsCount ();
 }
 
 media::rms::ServerGroup ResourceManager::ServerGroup (size_t index)
 {
-  return ResourceManagerSingleton::Instance ().ServerGroup (index)->Instance ();
+  return ResourceManagerSingleton::Instance ()->ServerGroup (index)->Instance ();
 }
 
 void ResourceManager::FlushUnusedResources ()
 {
-  ResourceManagerSingleton::Instance ().FlushUnusedResources ();
+  ResourceManagerSingleton::Instance ()->FlushUnusedResources ();
 }

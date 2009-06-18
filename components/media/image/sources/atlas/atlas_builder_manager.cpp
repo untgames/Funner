@@ -80,7 +80,7 @@ typedef common::Singleton<AtlasBuilderManagerImpl> AtlasBuilderManagerSingleton;
 
 const AtlasBuilderManager::PackHandler& AtlasBuilderManager::GetPacker (const char* name)
 {
-  return AtlasBuilderManagerSingleton::Instance ().GetPacker (name);
+  return AtlasBuilderManagerSingleton::Instance ()->GetPacker (name);
 }
 
 /*
@@ -89,15 +89,15 @@ const AtlasBuilderManager::PackHandler& AtlasBuilderManager::GetPacker (const ch
 
 void AtlasBuilderManager::RegisterPacker (const char* name, const PackHandler& handler)
 {
-  AtlasBuilderManagerSingleton::Instance ().RegisterPacker (name, handler);
+  AtlasBuilderManagerSingleton::Instance ()->RegisterPacker (name, handler);
 }
 
 void AtlasBuilderManager::UnregisterPacker (const char* name)
 {
-  AtlasBuilderManagerSingleton::Instance ().UnregisterPacker (name);
+  AtlasBuilderManagerSingleton::Instance ()->UnregisterPacker (name);
 }
 
 void AtlasBuilderManager::UnregisterAllPackers ()
 {
-  AtlasBuilderManagerSingleton::Instance ().UnregisterAllPackers ();
+  AtlasBuilderManagerSingleton::Instance ()->UnregisterAllPackers ();
 }

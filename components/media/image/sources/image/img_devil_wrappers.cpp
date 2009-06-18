@@ -27,7 +27,7 @@ Log& get_log ()
 {
   typedef common::Singleton<LogHolder> LogHolderSingleton;
 
-  return LogHolderSingleton::Instance ().log;
+  return LogHolderSingleton::Instance ()->log;
 }
 
 void log_exception (const char* source, std::exception& exception)

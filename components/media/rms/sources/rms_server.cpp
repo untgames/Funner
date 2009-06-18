@@ -277,7 +277,7 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
       
     UpdateFilters ("*");
 
-    ResourceManagerSingleton::Instance ().RegisterServerGroup (name.c_str (), this);
+    ResourceManagerSingleton::Instance ()->RegisterServerGroup (name.c_str (), this);
   }
   
 ///Деструктор
@@ -287,7 +287,7 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
 
     try
     {
-      ResourceManagerSingleton::Instance ().UnregisterServerGroup (this);
+      ResourceManagerSingleton::Instance ()->UnregisterServerGroup (this);
     }
     catch (...)
     {
@@ -418,7 +418,7 @@ ServerGroup::ServerGroup (const char* name)
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
       
-    IServerGroupInstance* instance = ResourceManagerSingleton::Instance ().FindServerGroup (name);    
+    IServerGroupInstance* instance = ResourceManagerSingleton::Instance ()->FindServerGroup (name);    
     
     if (instance)
     {

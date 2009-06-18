@@ -18,5 +18,5 @@ template <class Vertex> struct VertexFormatHolder
 template <class Vertex>
 inline const VertexFormat& get_vertex_format ()
 {
-  return common::Singleton<detail::VertexFormatHolder<Vertex> >::Instance ().format;
+  return common::Singleton<detail::VertexFormatHolder<Vertex> >::Instance ()->format;
 }
