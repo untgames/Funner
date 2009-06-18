@@ -9,10 +9,10 @@ using namespace syslib;
 struct Semaphore::Impl
 {
   Platform::semaphore_t handle; //дескриптор семафора
-  
+
 ///Конструктор
   Impl (size_t initial_value) : handle (Platform::CreateSemaphore (initial_value)) {}
-  
+
 ///Деструктор
   ~Impl ()
   {
@@ -49,23 +49,6 @@ Semaphore::~Semaphore ()
 }
 
 /*
-    Значение семафора
-*/
-
-size_t Semaphore::Value () const
-{
-  try
-  {
-    return Platform::GetSemaphoreValue (impl->handle);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("syslib::Semaphore::Value");
-    throw;
-  }
-}
-
-/*
     Ожидание новой задачи / посылка новой задачи
 */
 
@@ -73,7 +56,7 @@ void Semaphore::Wait ()
 {
   try
   {
-    Platform::WaitSemaphore (impl->handle);    
+    Platform::WaitSemaphore (impl->handle);
   }
   catch (xtl::exception& exception)
   {

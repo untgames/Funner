@@ -1,6 +1,9 @@
+#include <process.h>
+
 #include <stl/hash_map>
 
 #include <xtl/common_exceptions.h>
+#include <xtl/intrusive_ptr.h>
 
 #include <common/singleton.h>
 #include <common/strlib.h>

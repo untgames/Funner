@@ -49,7 +49,7 @@ class IThreadCleanupCallback
     virtual void Cleanup (void* data) = 0;
 
   protected:
-    virtual ~IThreadCleanupCallback () {}  
+    virtual ~IThreadCleanupCallback () {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ class Platform
   public:
     struct window_handle;
     struct thread_handle;
-    struct tls_handle;  
+    struct tls_handle;
     struct mutex_handle;
     struct semaphore_handle;
 
@@ -161,16 +161,16 @@ class Platform
     static dll_t LoadLibrary   (const wchar_t* name);
     static void  UnloadLibrary (dll_t);
     static void* GetSymbol     (dll_t, const char* symbol_name);
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание / удаление нити
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static thread_t CreateThread  (IThreadCallback*);
-    static void     DestroyThread (thread_t); 
+    static void     DestroyThread (thread_t);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отмена нити
-///////////////////////////////////////////////////////////////////////////////////////////////////    
+///////////////////////////////////////////////////////////////////////////////////////////////////
     static void CancelThread (thread_t);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -200,7 +200,7 @@ class Platform
     static void    LockMutex    (mutex_t, size_t wait_in_milliseconds);
     static bool    TryLockMutex (mutex_t);
     static void    UnlockMutex  (mutex_t);
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с семафорами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,10 +208,8 @@ class Platform
     static void        DestroySemaphore  (semaphore_t);
     static void        WaitSemaphore     (semaphore_t);
     static void        WaitSemaphore     (semaphore_t, size_t wait_in_milliseconds);
-    static bool        TryWaitSemaphore  (semaphore_t);    
+    static bool        TryWaitSemaphore  (semaphore_t);
     static void        PostSemaphore     (semaphore_t);
-    static size_t      GetSemaphoreValue (semaphore_t);
-    
 };
 
 }

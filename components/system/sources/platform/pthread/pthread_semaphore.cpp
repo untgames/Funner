@@ -21,7 +21,7 @@ Platform::semaphore_t Platform::CreateSemaphore (size_t initial_value)
     if (status)
       pthread_raise_error ("::sem_init", status);
 
-    return handle.release ();    
+    return handle.release ();
   }
   catch (xtl::exception& exception)
   {
@@ -33,15 +33,15 @@ Platform::semaphore_t Platform::CreateSemaphore (size_t initial_value)
 //уничтожение семафора
 void Platform::DestroySemaphore (semaphore_t handle)
 {
-  try  
+  try
   {
     thread_init ();
-    
+
     int status = sem_destroy (&handle->semaphore);
 
     if (status)
       pthread_raise_error ("::sem_destroy", status);
-      
+
     delete handle;
   }
   catch (xtl::exception& exception)
@@ -57,9 +57,9 @@ void Platform::WaitSemaphore (semaphore_t handle)
   try
   {
     thread_init ();
-    
+
     int status = sem_wait (&handle->semaphore);
-    
+
     if (status)
       pthread_raise_error ("::sem_wait", status);
   }
@@ -82,9 +82,9 @@ bool Platform::TryWaitSemaphore (semaphore_t handle)
   try
   {
     thread_init ();
-    
+
     int status = sem_trywait (&handle->semaphore);
-    
+
     switch (status)
     {
       case 0:  return true;
@@ -109,35 +109,13 @@ void Platform::PostSemaphore (semaphore_t handle)
     thread_init ();
 
     int status = sem_post (&handle->semaphore);
-    
+
     if (status)
       pthread_raise_error ("::sem_post", status);
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("syslib::PThreadPlatform::PostSemaphore");
-    throw;
-  }
-}
-
-//получение значения семафора
-size_t Platform::GetSemaphoreValue (semaphore_t handle)
-{
-  try
-  {
-    thread_init ();
-
-    int value  = 0,
-        status = sem_getvalue (&handle->semaphore, &value);
-    
-    if (status)
-      pthread_raise_error ("::sem_getvalue", status);
-
-    return static_cast<size_t> (value);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("syslib::PThreadPlatform::GetSemaphoreValue");
     throw;
   }
 }
