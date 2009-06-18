@@ -60,7 +60,7 @@ void UnistdPlatform::InitLockable (lockable_t& lockable)
       pthread_raise_error ("::pthread_mutex_init", status);
     }
 
-    lockable.data = mutex;
+    lockable = mutex;
   }
   catch (xtl::exception& exception)
   {
@@ -73,19 +73,19 @@ void UnistdPlatform::DestroyLockable (lockable_t& lockable)
 {
   try
   {
-    if (!lockable.data)
+    if (!lockable)
       throw xtl::make_null_argument_exception ("", "lockable");
 
-    Mutex* mutex = (Mutex*)lockable.data;
+    Mutex* mutex = (Mutex*)lockable;
 
     int status = pthread_mutex_destroy (&mutex->handle);
 
     if (status)
       pthread_raise_error ("::pthread_mutex_destroy", status);
 
-    free (lockable.data);
+    free (lockable);
 
-    lockable.data = 0;
+    lockable = 0;
   }
   catch (xtl::exception& exception)
   {
@@ -98,10 +98,10 @@ void UnistdPlatform::Lock (lockable_t& lockable)
 {
   try
   {
-    if (!lockable.data)
+    if (!lockable)
       throw xtl::make_null_argument_exception ("", "lockable");
 
-    Mutex* mutex = (Mutex*)lockable.data;
+    Mutex* mutex = (Mutex*)lockable;
 
     int status = pthread_mutex_lock (&mutex->handle);
 
@@ -119,10 +119,10 @@ void UnistdPlatform::Unlock (lockable_t& lockable)
 {
   try
   {
-    if (!lockable.data)
+    if (!lockable)
       throw xtl::make_null_argument_exception ("", "lockable");
 
-    Mutex* mutex = (Mutex*)lockable.data;
+    Mutex* mutex = (Mutex*)lockable;
 
     int status = pthread_mutex_unlock (&mutex->handle);
 

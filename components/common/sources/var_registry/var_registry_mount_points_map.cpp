@@ -390,5 +390,5 @@ MountPointsMap::Pointer MountPointsMap::GetGlobalMap ()
 {
   typedef Singleton<MountPointsMapWrapper> MountPointsMapSingleton;
 
-  return MountPointsMapSingleton::Instance ().instance;
+  return MountPointsMapSingleton::Instance ()->instance;
 }

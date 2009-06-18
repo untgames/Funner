@@ -22,14 +22,14 @@ struct Test3
 struct Test2
 {
   Test2 () {
-    Singleton<Test1>::Instance ().Touch ();
+    Singleton<Test1>::Instance ()->Touch ();
     printf ("Test2::Test2\n");
   }
 
   ~Test2 () 
   { 
     printf ("Test2::~Test2\n");
-    Singleton<Test3>::Instance ().Touch ();
+    Singleton<Test3>::Instance ()->Touch ();
   }
 
   void Print ()
@@ -42,12 +42,9 @@ int main ()
 {
   printf ("Results of singleton_test:\n");
   
-  Singleton<Test3>::Init ();
-  Singleton<Test3>::Destroy ();
-  
   printf ("Test3 is initialized: %s\n",Singleton<Test3>::IsInitialized ()?"true":"false");
   
-  Singleton<Test2>::Instance ().Print ();
+  Singleton<Test2>::Instance ()->Print ();
   
   printf ("Exit from main\n");
 

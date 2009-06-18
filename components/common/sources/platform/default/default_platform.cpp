@@ -2,13 +2,15 @@
 
 using namespace common;
 
+///переделать!!!!, singleton, return
+
 /*
     Получение системного распределителя памяти
 */
 
 ICustomAllocator* DefaultPlatform::GetSystemAllocator ()
 {
-  return Singleton<MallocAllocator>::InstancePtr ();
+  return &*Singleton<MallocAllocator>::Instance ();
 }
 
 /*
@@ -17,12 +19,12 @@ ICustomAllocator* DefaultPlatform::GetSystemAllocator ()
 
 ICustomFileSystem* DefaultPlatform::GetFileSystem ()
 {
-  return Singleton<StdioFileSystem>::InstancePtr ();
+  return &*Singleton<StdioFileSystem>::Instance ();
 }
 
 ICustomFileSystem* DefaultPlatform::GetIOSystem ()
 {
-  return Singleton<StdioIOSystem>::InstancePtr ();
+  return &*Singleton<StdioIOSystem>::Instance ();
 }
 
 /*
@@ -31,27 +33,27 @@ ICustomFileSystem* DefaultPlatform::GetIOSystem ()
 
 void DefaultPlatform::InitLockable (lockable_t& lockable)
 {
-  lockable.data = 0;  
+  lockable = 0;
 }
 
 void DefaultPlatform::DestroyLockable (lockable_t& lockable)
 {
-  lockable.data = 0;
+  lockable = 0;
 }
 
 void DefaultPlatform::Lock (lockable_t& lockable)
 {
   static const char* METHOD_NAME = "common::DefaultPlatform::Lock";
 
-  if (lockable.data)
+  if (lockable)
     throw xtl::format_operation_exception (METHOD_NAME, "Recursive lock not supported");
 
-  lockable.data = (void*)~0;
+  lockable = (void*)~0;
 }
 
 void DefaultPlatform::Unlock (lockable_t& lockable)
 {
-  lockable.data = 0;
+  lockable = 0;
 }
     
 /*

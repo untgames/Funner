@@ -61,7 +61,7 @@ FileListImpl* FileListImpl::Create ()
 
 FileListImpl* FileListImpl::GetEmptyList ()
 {
-  return Singleton<FileListImpl,SingletonCreateUsingNew>::InstancePtr ();
+  return &*Singleton<FileListImpl,SingletonCreateUsingNew>::Instance (); //???
 }
 
 /*

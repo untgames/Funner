@@ -150,7 +150,7 @@ class VarRegistry::Impl : public trackable, public reference_counter, private Mo
 ///Создание ветвей реестра
     static Impl* GetNullBranch ()
     {
-      return common::Singleton<ImplWrapper>::Instance ().instance.get ();
+      return common::Singleton<ImplWrapper>::Instance ()->instance.get (); //??????
     }
 
     static Impl* CreateBranch  (const char* branch_name)

@@ -127,8 +127,10 @@ struct NullTreeHolder
 ParseNode::ParseNode ()
 {
   typedef common::Singleton<NullTreeHolder> NullTreeHolderSingleton;
+  
+  NullTreeHolderSingleton::Instance instance;
 
-  tree   = NullTreeHolderSingleton::Instance ().tree.get ();
+  tree   = instance->tree.get ();
   offset = 0;
 
   addref (tree);

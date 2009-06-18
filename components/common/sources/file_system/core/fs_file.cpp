@@ -14,19 +14,19 @@ using namespace stl;
 File::File ()
   : impl (ClosedFileImpl::Instance ())
 {
-  FileSystemSingleton::Instance ().RegisterFile (*this);
+  FileSystemSingleton::Instance ()->RegisterFile (*this);
 }
 
 File::File (FileImplPtr _impl)
   : impl (_impl)
 {
-  FileSystemSingleton::Instance ().RegisterFile (*this);
+  FileSystemSingleton::Instance ()->RegisterFile (*this);
 }
 
 File::File (const File& file)
   : impl (file.impl)
 {
-  FileSystemSingleton::Instance ().RegisterFile (*this);
+  FileSystemSingleton::Instance ()->RegisterFile (*this);
 }
 
 File::~File ()
@@ -34,7 +34,7 @@ File::~File ()
   try
   {
     if (FileSystemSingleton::IsInitialized ()) //если менеджера файловой системы уже уничтожен регистрация не нужна
-      FileSystemSingleton::Instance ().UnregisterFile (*this);
+      FileSystemSingleton::Instance ()->UnregisterFile (*this);
   }
   catch (...)
   {

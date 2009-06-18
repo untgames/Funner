@@ -301,17 +301,17 @@ typedef Singleton<ComponentManagerImpl, SingletonStatic> ComponentManagerSinglet
 
 void ComponentManager::Register (const char* name, IComponent* component)
 {
-  ComponentManagerSingleton::Instance ().Register (name, component);
+  ComponentManagerSingleton::Instance ()->Register (name, component);
 }
 
 void ComponentManager::Unregister (IComponent* component)
 {
-  ComponentManagerSingleton::Instance ().Unregister (component);
+  ComponentManagerSingleton::Instance ()->Unregister (component);
 }
 
 void ComponentManager::Unregister (const char* wc_component_mask)
 {
-  ComponentManagerSingleton::Instance ().Unregister (wc_component_mask);
+  ComponentManagerSingleton::Instance ()->Unregister (wc_component_mask);
 }
 
 /*
@@ -320,17 +320,17 @@ void ComponentManager::Unregister (const char* wc_component_mask)
 
 void ComponentManager::Load (const char* wc_component_mask)
 {
-  ComponentManagerSingleton::Instance ().Load (wc_component_mask, LogHandler ());
+  ComponentManagerSingleton::Instance ()->Load (wc_component_mask, LogHandler ());
 }
 
 void ComponentManager::Load (const char* wc_component_mask, const LogHandler& log_handler)
 {
-  ComponentManagerSingleton::Instance ().Load (wc_component_mask, log_handler);
+  ComponentManagerSingleton::Instance ()->Load (wc_component_mask, log_handler);
 }
 
 void ComponentManager::Unload (const char* wc_component_mask)
 {
-  ComponentManagerSingleton::Instance ().Unload (wc_component_mask);
+  ComponentManagerSingleton::Instance ()->Unload (wc_component_mask);
 }
 
 /*
@@ -339,5 +339,5 @@ void ComponentManager::Unload (const char* wc_component_mask)
 
 ComponentManager::Iterator ComponentManager::CreateIterator ()
 {
-  return ComponentManagerSingleton::Instance ().CreateIterator ();
+  return ComponentManagerSingleton::Instance ()->CreateIterator ();
 }

@@ -251,22 +251,22 @@ bool StringConverterSystem::RegisterConverter
   const char*        destination_encoding,
   const ConverterFn& converter)
 {
-  return StringConverterSystemImplSingleton::Instance ().RegisterConverter (source_encoding, destination_encoding, converter);
+  return StringConverterSystemImplSingleton::Instance ()->RegisterConverter (source_encoding, destination_encoding, converter);
 }
 
 void StringConverterSystem::UnregisterConverter (const char* source_encoding, const char* destination_encoding)
 {
-  StringConverterSystemImplSingleton::Instance().UnregisterConverter(source_encoding, destination_encoding);
+  StringConverterSystemImplSingleton::Instance()->UnregisterConverter(source_encoding, destination_encoding);
 }
 
 void StringConverterSystem::UnregisterAllConverters ()
 {
-  StringConverterSystemImplSingleton::Instance ().UnregisterAllConverters ();
+  StringConverterSystemImplSingleton::Instance ()->UnregisterAllConverters ();
 }
 
 bool StringConverterSystem::IsConverterRegistered (const char* source_encoding, const char* destination_encoding)
 {
-  return StringConverterSystemImplSingleton::Instance ().IsConverterRegistered (source_encoding, destination_encoding);
+  return StringConverterSystemImplSingleton::Instance ()->IsConverterRegistered (source_encoding, destination_encoding);
 }
 
 /*
@@ -277,7 +277,7 @@ bool StringConverterSystem::IsConverterRegistered (const char* source_encoding, 
 
 StringConverter::StringConverter (const char* source_encoding, const char* destination_encoding)
 {
-  converter = StringConverterSystemImplSingleton::Instance ().CreateConverter (source_encoding, destination_encoding); 
+  converter = StringConverterSystemImplSingleton::Instance ()->CreateConverter (source_encoding, destination_encoding); 
 }
 
 StringConverter::StringConverter (const StringConverter& conv)

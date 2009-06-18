@@ -20,7 +20,7 @@ class ICustomFileSystem;
 class DefaultPlatform
 {
   public:
-    struct lockable_t { void* data; };
+    typedef void* lockable_t;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕолучение системного распределител€ пам€ти

@@ -98,5 +98,5 @@ class UnistdFileSystem: public StdioFileSystem
 
 ICustomFileSystem* UnistdPlatform::GetFileSystem ()
 {
-  return Singleton<UnistdFileSystem>::InstancePtr ();
+  return &*Singleton<UnistdFileSystem>::Instance ();
 }

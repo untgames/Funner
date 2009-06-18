@@ -59,15 +59,15 @@ CryptoSystemImpl::CrypterCreator CryptoSystemImpl::GetCrypter (const char* metho
 
 void CryptoSystem::RegisterCrypter (const char* method, const CrypterCreator& creator)
 {
-  CryptoSystemSingleton::Instance ().RegisterCrypter (method, creator);
+  CryptoSystemSingleton::Instance ()->RegisterCrypter (method, creator);
 }
 
 void CryptoSystem::UnregisterCrypter (const char* method)
 {
-  CryptoSystemSingleton::Instance ().UnregisterCrypter (method);
+  CryptoSystemSingleton::Instance ()->UnregisterCrypter (method);
 }
 
 void CryptoSystem::UnregisterAllCrypters ()
 {
-  CryptoSystemSingleton::Instance ().UnregisterAllCrypters ();
+  CryptoSystemSingleton::Instance ()->UnregisterAllCrypters ();
 }

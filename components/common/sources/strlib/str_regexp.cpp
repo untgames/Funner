@@ -122,7 +122,9 @@ int parse_internal (const char* str,const char* pattern,const char* flags,int* o
 
 StringArray parse (const char* str,const char* pattern,const char* flags)
 {
-  OffsetBuffer& offset_buffer = OffsetBufferSingleton::Instance ().buffer;
+  OffsetBufferSingleton::Instance instance;
+
+  OffsetBuffer& offset_buffer = instance->buffer;
 
   int* offset = offset_buffer.data ();  
 
@@ -143,7 +145,9 @@ StringArray parse (const char* str,const char* pattern,const char* flags)
 
 string replace (const char* str,const char* pattern,const char* replacement,const char* flags)
 {
-  OffsetBuffer& offset_buffer = OffsetBufferSingleton::Instance ().buffer;
+  OffsetBufferSingleton::Instance instance;
+  
+  OffsetBuffer& offset_buffer = instance->buffer;
   
   int* offset = offset_buffer.data ();
 

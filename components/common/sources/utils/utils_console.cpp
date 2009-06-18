@@ -3,6 +3,7 @@
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
+#include <xtl/interlocked.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 #include <xtl/signal.h>
@@ -188,7 +189,7 @@ class ConsoleImpl
 
 typedef Singleton<ConsoleImpl> ConsoleSingleton;
 
-size_t print_lock = false; //консоль заблокирована для печати
+volatile int print_lock = 0; //консоль заблокирована для печати
 
 }
 
@@ -198,22 +199,20 @@ size_t print_lock = false; //консоль заблокирована для печати
 
 void Console::Print (const char* message)
 {
-  if (print_lock)
-    return;
-
-  try
+  if (!xtl::atomic_increment (print_lock))
   {
-    print_lock = true;
-    
-    ConsoleSingleton::Instance ().Print (message);
-    
-    print_lock = false;
+    try
+    {
+      ConsoleSingleton::Instance ()->Print (message);
+    }
+    catch (...)
+    {
+      xtl::atomic_decrement (print_lock);
+      throw;
+    }
   }
-  catch (...)
-  {
-    print_lock = false;
-    throw;
-  }
+  
+  xtl::atomic_decrement (print_lock);
 }
 
 void Console::Printf (const char* message, ...)
@@ -241,7 +240,7 @@ void Console::VPrintf (const char* message, va_list list)
 
 xtl::connection Console::RegisterEventHandler (ConsoleEvent event, const Console::EventHandler& handler)
 {
-  return ConsoleSingleton::Instance ().RegisterEventHandler (event, handler);
+  return ConsoleSingleton::Instance ()->RegisterEventHandler (event, handler);
 }
 
 /*
@@ -250,12 +249,12 @@ xtl::connection Console::RegisterEventHandler (ConsoleEvent event, const Console
 
 void Console::SetMaxLinesCount (size_t lines_count)
 {
-  ConsoleSingleton::Instance ().SetMaxLinesCount (lines_count);
+  ConsoleSingleton::Instance ()->SetMaxLinesCount (lines_count);
 }
 
 size_t Console::MaxLinesCount ()
 {
-  return ConsoleSingleton::Instance ().MaxLinesCount ();
+  return ConsoleSingleton::Instance ()->MaxLinesCount ();
 }
 
 /*
@@ -264,10 +263,10 @@ size_t Console::MaxLinesCount ()
 
 size_t Console::LinesCount ()
 {
-  return ConsoleSingleton::Instance ().LinesCount ();
+  return ConsoleSingleton::Instance ()->LinesCount ();
 }
 
 const char* Console::Message (size_t index)
 {
-  return ConsoleSingleton::Instance ().Message (index);
+  return ConsoleSingleton::Instance ()->Message (index);
 }

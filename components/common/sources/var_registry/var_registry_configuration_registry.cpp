@@ -62,7 +62,7 @@ const char* ConfigurationRegistry::BranchName ()
 
 void ConfigurationRegistry::LoadConfiguration (const char* file_name_mask)
 {
-  ConfigurationRegistrySingleton::Instance ().LoadConfiguration (file_name_mask);
+  ConfigurationRegistrySingleton::Instance ()->LoadConfiguration (file_name_mask);
 }
 
 /*
@@ -71,5 +71,5 @@ void ConfigurationRegistry::LoadConfiguration (const char* file_name_mask)
 
 void ConfigurationRegistry::UnloadAll ()
 {
-  ConfigurationRegistrySingleton::Instance ().UnloadAll ();
+  ConfigurationRegistrySingleton::Instance ()->UnloadAll ();
 }

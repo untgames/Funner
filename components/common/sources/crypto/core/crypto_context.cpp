@@ -36,7 +36,7 @@ CryptoContext::CryptoContext (const char* method, const void* key, size_t key_bi
       
     static ComponentLoader loader (CRYPTO_COMPONENTS_MASK);
 
-    impl->context = CryptoSystemSingleton::Instance ().GetCrypter (method)(method, key, key_bits);
+    impl->context = CryptoSystemSingleton::Instance ()->GetCrypter (method)(method, key, key_bits);
     
     if (!impl->context)
       throw xtl::format_operation_exception ("", "Can't create crypto context for method '%s'", method);

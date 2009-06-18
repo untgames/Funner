@@ -24,23 +24,7 @@ typedef Singleton<MemoryManagerImpl> MemoryManagerSingleton;
 
 Heap& MemoryManager::GetHeap ()
 {
-  return MemoryManagerSingleton::Instance ().heap;
-}
-
-void MemoryManager::Init ()
-{
-  MemoryManagerSingleton::Init ();
-}
-
-void MemoryManager::Shutdown ()
-{
-  MemoryManagerSingleton::Destroy ();
-}
-
-void MemoryManager::Restart ()
-{
-  MemoryManagerSingleton::Destroy ();
-  MemoryManagerSingleton::Init ();
+  return MemoryManagerSingleton::Instance ()->heap;
 }
 
 bool MemoryManager::IsInitialized ()
@@ -54,7 +38,7 @@ bool MemoryManager::IsInitialized ()
 
 void* MemoryManager::Allocate (size_t size)
 {
-  void* p = MemoryManagerSingleton::Instance ().heap.Allocate (size);
+  void* p = MemoryManagerSingleton::Instance ()->heap.Allocate (size);
   
   if (!p)
     throw std::bad_alloc ();
@@ -65,5 +49,5 @@ void* MemoryManager::Allocate (size_t size)
 void MemoryManager::Deallocate (void* p)
 {  
   if (p && MemoryManagerSingleton::IsInitialized ())
-    MemoryManagerSingleton::Instance ().heap.Deallocate (p);
+    MemoryManagerSingleton::Instance ()->heap.Deallocate (p);
 }

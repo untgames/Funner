@@ -760,7 +760,7 @@ bool FileSystemImpl::GetFileInfo (const char* src_file_name,FileInfo& info)
 
 void FileSystem::AddSearchPath (const char* path,const LogHandler& log_handler)
 {
-  FileSystemSingleton::Instance ().AddSearchPath (path,log_handler);
+  FileSystemSingleton::Instance ()->AddSearchPath (path,log_handler);
 }
 
 static void DummyLogHandler (const char*)
@@ -769,123 +769,123 @@ static void DummyLogHandler (const char*)
 
 void FileSystem::AddSearchPath (const char* path)
 {
-  FileSystemSingleton::Instance ().AddSearchPath (path,DummyLogHandler);
+  FileSystemSingleton::Instance ()->AddSearchPath (path,DummyLogHandler);
 }
 
 void FileSystem::RemoveSearchPath (const char* path)
 {
-  FileSystemSingleton::Instance ().RemoveSearchPath (path);
+  FileSystemSingleton::Instance ()->RemoveSearchPath (path);
 }
 
 void FileSystem::RemoveAllSearchPaths ()
 {
-  FileSystemSingleton::Instance ().RemoveAllSearchPaths ();
+  FileSystemSingleton::Instance ()->RemoveAllSearchPaths ();
 }
 
 void FileSystem::RegisterPackFile (const char* extension,const PackFileCreater& creater)
 {
-  FileSystemSingleton::Instance ().RegisterPackFile (extension,creater);
+  FileSystemSingleton::Instance ()->RegisterPackFile (extension,creater);
 }
 
 void FileSystem::UnregisterPackFile (const char* extension)
 {
-  FileSystemSingleton::Instance ().UnregisterPackFile (extension);
+  FileSystemSingleton::Instance ()->UnregisterPackFile (extension);
 }
 
 void FileSystem::Mount (const char* path_prefix,ICustomFileSystemPtr file_system)
 {
-  FileSystemSingleton::Instance ().Mount (path_prefix,file_system);
+  FileSystemSingleton::Instance ()->Mount (path_prefix,file_system);
 }
 
 void FileSystem::Unmount (const char* path_prefix)
 {
-  FileSystemSingleton::Instance ().Unmount (path_prefix);
+  FileSystemSingleton::Instance ()->Unmount (path_prefix);
 }
 
 void FileSystem::Unmount (ICustomFileSystemPtr file_system)
 {
-  FileSystemSingleton::Instance ().Unmount (file_system);
+  FileSystemSingleton::Instance ()->Unmount (file_system);
 }
 
 void FileSystem::UnmountAll ()
 {
-  FileSystemSingleton::Instance ().UnmountAll ();
+  FileSystemSingleton::Instance ()->UnmountAll ();
 }
 
 bool FileSystem::IsPathMount (const char* path_prefix)
 {
-  return FileSystemSingleton::Instance ().IsPathMount (path_prefix);
+  return FileSystemSingleton::Instance ()->IsPathMount (path_prefix);
 }
 
 void FileSystem::Remove (const char* file_name)
 {
-  FileSystemSingleton::Instance ().Remove (file_name);
+  FileSystemSingleton::Instance ()->Remove (file_name);
 }
 
 void FileSystem::Rename (const char* file_name,const char* new_name)
 {
-  FileSystemSingleton::Instance ().Rename (file_name,new_name);
+  FileSystemSingleton::Instance ()->Rename (file_name,new_name);
 }
 
 void FileSystem::Mkdir (const char* dir_name)
 {
-  FileSystemSingleton::Instance ().Mkdir (dir_name);
+  FileSystemSingleton::Instance ()->Mkdir (dir_name);
 }
 
 bool FileSystem::GetFileInfo (const char* file_name,FileInfo& info)
 {
-  return FileSystemSingleton::Instance ().GetFileInfo (file_name,info);
+  return FileSystemSingleton::Instance ()->GetFileInfo (file_name,info);
 }
 
 bool FileSystem::IsFileExist (const char* file_name)
 {
-  return FileSystemSingleton::Instance ().IsFileExist (file_name);
+  return FileSystemSingleton::Instance ()->IsFileExist (file_name);
 }
 
 bool FileSystem::IsDir (const char* file_name)
 {
   FileInfo info;
 
-  return FileSystemSingleton::Instance ().GetFileInfo (file_name,info) ? info.is_dir : false;
+  return FileSystemSingleton::Instance ()->GetFileInfo (file_name,info) ? info.is_dir : false;
 }
 
 filetime_t FileSystem::GetFileTime (const char* file_name)
 {
   FileInfo info;
 
-  return FileSystemSingleton::Instance ().GetFileInfo (file_name,info) ? info.time_modify : 0;
+  return FileSystemSingleton::Instance ()->GetFileInfo (file_name,info) ? info.time_modify : 0;
 }
 
 filesize_t FileSystem::GetFileSize (const char* file_name)
 {
   FileInfo info;
 
-  return FileSystemSingleton::Instance ().GetFileInfo (file_name,info) ? info.size : 0;
+  return FileSystemSingleton::Instance ()->GetFileInfo (file_name,info) ? info.size : 0;
 }
 
 FileList FileSystem::Search (const char* wc_mask,size_t flags)
 {
-  return FileSystemSingleton::Instance ().Search (wc_mask,flags);
+  return FileSystemSingleton::Instance ()->Search (wc_mask,flags);
 }
 
 void FileSystem::SetDefaultFileBufferSize (size_t buffer_size)
 {
-  FileSystemSingleton::Instance ().SetDefaultFileBufferSize (buffer_size);
+  FileSystemSingleton::Instance ()->SetDefaultFileBufferSize (buffer_size);
 }
 
 size_t FileSystem::GetDefaultFileBufferSize ()
 {
-  return FileSystemSingleton::Instance ().GetDefaultFileBufferSize ();
+  return FileSystemSingleton::Instance ()->GetDefaultFileBufferSize ();
 }
 
 void FileSystem::SetCurrentDir (const char* path)
 {
-  FileSystemSingleton::Instance ().SetDefaultPath (path);
+  FileSystemSingleton::Instance ()->SetDefaultPath (path);
 }
 
 const char* FileSystem::GetCurrentDir ()
 {
-  return FileSystemSingleton::Instance ().GetDefaultPath ();
+  return FileSystemSingleton::Instance ()->GetDefaultPath ();
 }
 
 /*
@@ -1062,27 +1062,27 @@ void FileSystem::SetCryptoParameters
 
 void FileSystem::SetCryptoParameters (const char* path, const FileCryptoParameters& parameters)
 {
-  FileSystemSingleton::Instance ().SetCryptoParameters (path, parameters);
+  FileSystemSingleton::Instance ()->SetCryptoParameters (path, parameters);
 }
 
 bool FileSystem::HasCryptoParameters (const char* path)
 {
-  return FileSystemSingleton::Instance ().HasCryptoParameters (path);
+  return FileSystemSingleton::Instance ()->HasCryptoParameters (path);
 }
 
 FileCryptoParameters FileSystem::GetCryptoParameters (const char* path)
 {
-  return FileSystemSingleton::Instance ().GetCryptoParameters (path);
+  return FileSystemSingleton::Instance ()->GetCryptoParameters (path);
 }
 
 void FileSystem::RemoveCryptoParameters (const char* path)
 {
-  FileSystemSingleton::Instance ().RemoveCryptoParameters (path);
+  FileSystemSingleton::Instance ()->RemoveCryptoParameters (path);
 }
 
 void FileSystem::RemoveAllCryptoParameters ()
 {
-  FileSystemSingleton::Instance ().RemoveAllCryptoParameters ();
+  FileSystemSingleton::Instance ()->RemoveAllCryptoParameters ();
 }
 
 /*

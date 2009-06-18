@@ -165,27 +165,27 @@ typedef Singleton<SerializerManagerImpl> SerializerManagerSingleton;
 
 void SerializerManager::Register (const char* extension, const std::type_info& signature, detail::ISerializerHolder* holder)
 {
-  SerializerManagerSingleton::Instance ().Register (extension, signature, holder);
+  SerializerManagerSingleton::Instance ()->Register (extension, signature, holder);
 }
 
 void SerializerManager::Unregister (const char* extension, const std::type_info& signature)
 {
-  SerializerManagerSingleton::Instance ().Unregister (extension, signature);
+  SerializerManagerSingleton::Instance ()->Unregister (extension, signature);
 }
 
 void SerializerManager::UnregisterAll (const std::type_info& signature)
 {
-  SerializerManagerSingleton::Instance ().UnregisterAll (signature);
+  SerializerManagerSingleton::Instance ()->UnregisterAll (signature);
 }
 
 void SerializerManager::UnregisterAll (const char* extension)
 {
-  SerializerManagerSingleton::Instance ().UnregisterAll (extension);
+  SerializerManagerSingleton::Instance ()->UnregisterAll (extension);
 }
 
 void SerializerManager::UnregisterAll ()
 {
-  SerializerManagerSingleton::Instance ().UnregisterAll ();
+  SerializerManagerSingleton::Instance ()->UnregisterAll ();
 }
 
 /*
@@ -194,5 +194,5 @@ void SerializerManager::UnregisterAll ()
  
 detail::ISerializerHolder* SerializerManager::Find (const char* extension, const std::type_info& signature, SerializerFindMode mode, bool raise_exception)
 {
-  return SerializerManagerSingleton::Instance ().Find (extension, signature, mode, raise_exception);
+  return SerializerManagerSingleton::Instance ()->Find (extension, signature, mode, raise_exception);
 }

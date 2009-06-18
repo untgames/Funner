@@ -65,5 +65,5 @@ void ClosedFileImpl::Flush ()
 
 FileImpl* ClosedFileImpl::Instance ()
 {
-  return Singleton<ClosedFileImpl>::InstancePtr ();
+  return &*Singleton<ClosedFileImpl>::Instance (); //???
 }

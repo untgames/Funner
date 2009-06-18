@@ -64,7 +64,7 @@ void MountPointFileSystem::FileFlush (file_t)
 
 void MountPointFileSystem::Remove (const char* file_name)
 {
-  FileSystemSingleton::Instance ().Unmount (file_name);
+  FileSystemSingleton::Instance ()->Unmount (file_name);
 }
 
 void MountPointFileSystem::Rename (const char* file_name,const char* new_name)
@@ -73,8 +73,10 @@ void MountPointFileSystem::Rename (const char* file_name,const char* new_name)
   
   try
   {
-    FileSystemSingleton::Instance ().Mount (new_name,file_system);
-    FileSystemSingleton::Instance ().Unmount (file_name);    
+    FileSystemSingleton::Instance instance;
+    
+    instance->Mount (new_name,file_system);
+    instance->Unmount (file_name);    
   }
   catch (xtl::exception& exception)
   {

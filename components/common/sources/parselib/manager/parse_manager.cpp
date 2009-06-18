@@ -180,22 +180,22 @@ typedef Singleton<ParserManagerImpl> ParserManagerSingleton;
 
 void ParserManager::RegisterParser (const char* type, const ParseHandler& parser)
 {
-  ParserManagerSingleton::Instance ().RegisterParser (type, parser, CheckHandler ());
+  ParserManagerSingleton::Instance ()->RegisterParser (type, parser, CheckHandler ());
 }
 
 void ParserManager::RegisterParser (const char* type, const ParseHandler& parser, const CheckHandler& checker)
 {
-  ParserManagerSingleton::Instance ().RegisterParser (type, parser, checker);
+  ParserManagerSingleton::Instance ()->RegisterParser (type, parser, checker);
 }
 
 void ParserManager::UnregisterParser (const char* type)
 {
-  ParserManagerSingleton::Instance ().UnregisterParser (type);
+  ParserManagerSingleton::Instance ()->UnregisterParser (type);
 }
 
 void ParserManager::UnregisterAllParsers ()
 {
-  ParserManagerSingleton::Instance ().UnregisterAllParsers ();
+  ParserManagerSingleton::Instance ()->UnregisterAllParsers ();
 }
 
 namespace common
@@ -207,7 +207,7 @@ namespace common
 
 void parse (ParseTreeBuilder& builder, ParseLog& log, const char* type, const char* name, size_t buffer_size, char* buffer)
 {
-  ParserManagerSingleton::Instance ().Parse (builder, log, type, name, buffer_size, buffer);
+  ParserManagerSingleton::Instance ()->Parse (builder, log, type, name, buffer_size, buffer);
 }
 
 ParseNode parse (ParseLog& log, const char* type, const char* name, size_t buffer_size, char* buffer)

@@ -10,9 +10,9 @@ void Win32Platform::InitLockable (lockable_t& lockable)
 {
   try
   {
-    lockable.data = CreateMutex (0, FALSE, 0);
+    lockable = CreateMutex (0, FALSE, 0);
 
-    if (!lockable.data)
+    if (!lockable)
       raise_error ("::CreateMutex");
   }
   catch (xtl::exception& exception)
@@ -26,10 +26,10 @@ void Win32Platform::DestroyLockable (lockable_t& lockable)
 {
   try
   {
-    if (!lockable.data)
+    if (!lockable)
       throw xtl::make_null_argument_exception ("", "lockable");
       
-    if (!CloseHandle ((HANDLE)lockable.data))
+    if (!CloseHandle ((HANDLE)lockable))
       raise_error ("::CloseHandle");
   }
   catch (xtl::exception& exception)
@@ -43,10 +43,10 @@ void Win32Platform::Lock (lockable_t& lockable)
 {
   try
   {
-    if (!lockable.data)
+    if (!lockable)
       throw xtl::make_null_argument_exception ("", "lockable");
 
-    switch (WaitForSingleObject ((HANDLE)lockable.data, 0xFFFFFFFF))
+    switch (WaitForSingleObject ((HANDLE)lockable, 0xFFFFFFFF))
     {
       case WAIT_OBJECT_0:
         break;
@@ -66,10 +66,10 @@ void Win32Platform::Unlock (lockable_t& lockable)
 {
   try
   {
-    if (!lockable.data)
+    if (!lockable)
       throw xtl::make_null_argument_exception ("", "lockable");
 
-    if (!ReleaseMutex ((HANDLE)lockable.data))
+    if (!ReleaseMutex ((HANDLE)lockable))
       raise_error ("::ReleaseMutex");
   }
   catch (xtl::exception& exception)

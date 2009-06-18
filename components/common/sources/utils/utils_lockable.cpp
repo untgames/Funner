@@ -7,53 +7,6 @@
 using namespace common;
 
 /*
-    Описание реализации блокируемого объекта
-*/
-
-struct Lockable::Impl
-{
-  Platform::lockable_t lockable; //реализациия блокируемого объекта
-
-///Конструктор
-  Impl ()
-  {
-    Platform::InitLockable (lockable);
-  }
-  
-///Деструктор
-  ~Impl ()
-  {
-    try
-    {
-      Platform::DestroyLockable (lockable);
-    }
-    catch (...)
-    {
-      //подавление всех исключений
-    }
-  }
-
-///Блокировка
-  void Lock ()
-  {
-    Platform::Lock (lockable);
-  }
-  
-///Отмена блокировки
-  void Unlock ()
-  {
-    try
-    {
-      Platform::Unlock (lockable);
-    }
-    catch (...)
-    {
-      //подавление всех исключений
-    }
-  }
-};
-
-/*
     Конструктор / деструктор
 */
 
@@ -61,7 +14,7 @@ Lockable::Lockable ()
 {
   try
   {
-    impl = new Impl;
+    Platform::InitLockable (handle);
   }
   catch (xtl::exception& exception)
   {
@@ -72,7 +25,14 @@ Lockable::Lockable ()
 
 Lockable::~Lockable ()
 {
-  delete impl;
+  try
+  {
+    Platform::DestroyLockable (handle);
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 }
 
 /*
@@ -83,7 +43,7 @@ void Lockable::Lock ()
 {
   try
   {
-    impl->Lock ();
+    Platform::Lock (handle);
   }
   catch (xtl::exception& exception)
   {
@@ -94,5 +54,12 @@ void Lockable::Lock ()
 
 void Lockable::Unlock ()
 {
-  impl->Unlock ();
+  try
+  {
+    Platform::Unlock (handle);
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 }
