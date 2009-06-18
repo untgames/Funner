@@ -2,8 +2,6 @@
 
 using namespace common;
 
-///переделать!!!!, singleton, return
-
 /*
     Получение системного распределителя памяти
 */

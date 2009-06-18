@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <common/singleton.h>
 
 using namespace common;
@@ -9,10 +10,7 @@ SingletonLog::LogHandler SingletonLog::log_handler            = 0;
 namespace
 {
 
-struct SingletonServiceLockable: public xtl::singleton_default<SingletonServiceLockable>
-{
-  Lockable lockable;
-};
+Lockable singleton_service_lockable;
 
 }
 
@@ -22,7 +20,7 @@ struct SingletonServiceLockable: public xtl::singleton_default<SingletonServiceL
 
 void SingletonListNode::RegisterSingleton (const std::type_info& in_type, void (*destroy)())
 {
-  Lock lock (SingletonServiceLockable::instance ().lockable);
+  Lock lock (singleton_service_lockable);
 
   if (!atexit_registered)
   {
@@ -43,7 +41,7 @@ void SingletonListNode::RegisterSingleton (const std::type_info& in_type, void (
 
 void SingletonListNode::UnregisterSingleton ()
 {
-  Lock lock (SingletonServiceLockable::instance ().lockable);
+  Lock lock (singleton_service_lockable);
 
   if (prev) prev->next = next;
   if (next) next->prev = prev;
@@ -56,14 +54,14 @@ void SingletonListNode::UnregisterSingleton ()
 
 void SingletonListNode::DestroyAll ()
 {
-  Lock lock (SingletonServiceLockable::instance ().lockable);
+  Lock lock (singleton_service_lockable);
 
   while (first)
   {
     void (*destroy_function)() = first->destroy_function;
 
     first->UnregisterSingleton ();
-
+    
     destroy_function ();
   }
 }
@@ -74,7 +72,7 @@ void SingletonListNode::DestroyAll ()
 
 void SingletonLog::LogEvent (Event event, const std::type_info& type)
 {
-  Lock lock (SingletonServiceLockable::instance ().lockable);
+  Lock lock (singleton_service_lockable);
   
   if (!log_handler)
     return;
@@ -84,14 +82,30 @@ void SingletonLog::LogEvent (Event event, const std::type_info& type)
     
 void SingletonLog::SetLogHandler (LogHandler handler)
 {
-  Lock lock (SingletonServiceLockable::instance ().lockable);
+  Lock lock (singleton_service_lockable);
   
   log_handler = handler;
 }
 
 SingletonLog::LogHandler SingletonLog::GetLogHandler ()
 {
-  Lock lock (SingletonServiceLockable::instance ().lockable);
+  Lock lock (singleton_service_lockable);
   
   return log_handler;
+}
+
+void SingletonLog::DebugLogHandler (Event event, const std::type_info& type)
+{
+  const char* event_message = "";
+
+  switch (event)
+  {
+    case SingletonLog::Event_BeforeCreate:  event_message = "before create";  break;
+    case SingletonLog::Event_AfterCreate:   event_message = "after create";   break;
+    case SingletonLog::Event_BeforeDestroy: event_message = "before destroy"; break;
+    case SingletonLog::Event_AfterDestroy:  event_message = "after destroy";  break;
+    default: break; //for gcc
+  }
+
+  printf ("%s '%s'\n", event_message, type.name ());
 }

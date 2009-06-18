@@ -25,9 +25,14 @@ Lockable::Lockable ()
 
 Lockable::~Lockable ()
 {
+  if (!handle)
+    return;
+
   try
   {
     Platform::DestroyLockable (handle);
+
+    handle = 0;
   }
   catch (...)
   {
@@ -41,6 +46,9 @@ Lockable::~Lockable ()
 
 void Lockable::Lock ()
 {
+  if (!handle)
+    return;
+
   try
   {
     Platform::Lock (handle);
@@ -54,6 +62,9 @@ void Lockable::Lock ()
 
 void Lockable::Unlock ()
 {
+  if (!handle)
+    return;
+
   try
   {
     Platform::Unlock (handle);

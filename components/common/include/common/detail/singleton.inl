@@ -1,32 +1,18 @@
-namespace detail
-{
-
 /*
     Экземпляр синглтона
 */
 
 template <class T,template <class> class CreationPolicy>
-struct SingletonImpl: public xtl::singleton_default<SingletonImpl<T, CreationPolicy> >
-{
-  T*                object;
-  Lockable          lockable;
-  SingletonListNode node;
-  bool              is_in_init;
+T* Singleton<T,CreationPolicy>::instance = 0;
 
-  SingletonImpl ()
-    : object (0)
-    , is_in_init (false)
-  {
-    SingletonLog::LogEvent (SingletonLog::Event_AfterServiceInit, typeid (Singleton<T, CreationPolicy>));  
-  }
-  
-  ~SingletonImpl ()
-  {
-    SingletonLog::LogEvent (SingletonLog::Event_BeforeServiceDone, typeid (Singleton<T, CreationPolicy>));
-  }
-};
+template <class T,template <class> class CreationPolicy>
+bool Singleton<T,CreationPolicy>::is_in_init = false;
 
-}
+template <class T,template <class> class CreationPolicy>
+Lockable Singleton<T,CreationPolicy>::lockable;
+
+template <class T,template <class> class CreationPolicy>
+SingletonListNode Singleton<T,CreationPolicy>::node;
 
 /*
     Распределение памяти для синглтона при помощи new/delete
@@ -109,74 +95,68 @@ inline void SingletonStatic<T>::Destroy (T* object)
 template <class T,template <class> class CreationPolicy>
 void Singleton<T,CreationPolicy>::Init ()
 {
-  detail::SingletonImpl<T,CreationPolicy>& impl = detail::SingletonImpl<T,CreationPolicy>::instance ();
+  SingletonLog::LogEvent (SingletonLog::Event_BeforeCreate, typeid (Singleton<T, CreationPolicy>));  
   
-  Lock lock (impl.lockable);
+  Lock lock (lockable);
 
-  if (impl.object)
+  if (instance)
     return;
 
-  if (impl.is_in_init)
+  if (is_in_init)
     throw stl::runtime_error ("singleton recursive init");
 
-  impl.is_in_init = true;
+  is_in_init = true;
 
   try
   {
-    SingletonLog::LogEvent (SingletonLog::Event_BeforeCreate, typeid (Singleton<T, CreationPolicy>));
-  
-    impl.object = CreationPolicy<T>::Create ();
+    instance = CreationPolicy<T>::Create ();
 
-    if (!impl.object)
+    if (!instance)
       throw stl::runtime_error ("unable to create singleton");
 
-    impl.node.RegisterSingleton (typeid (Singleton<T, CreationPolicy>), &Singleton<T,CreationPolicy>::Destroy);
+    node.RegisterSingleton (typeid (Singleton<T, CreationPolicy>), &Singleton<T,CreationPolicy>::Destroy);
 
-    SingletonLog::LogEvent (SingletonLog::Event_AfterCreate, typeid (Singleton<T, CreationPolicy>));    
-
-    impl.is_in_init = false;
+    is_in_init = false;
   }
   catch (...)
   {
-    impl.is_in_init = false;
+    is_in_init = false;
     throw;
   }
+  
+  SingletonLog::LogEvent (SingletonLog::Event_AfterCreate, typeid (Singleton<T, CreationPolicy>));      
 }
 
 template <class T,template <class> class CreationPolicy>
 void Singleton<T,CreationPolicy>::Destroy ()
 {
-  detail::SingletonImpl<T,CreationPolicy>& impl = detail::SingletonImpl<T,CreationPolicy>::instance ();
-  
-  Lock lock (impl.lockable);
+  SingletonLog::LogEvent (SingletonLog::Event_BeforeDestroy, typeid (Singleton<T, CreationPolicy>));  
 
-  if (!impl.object)
+  Lock lock (lockable);
+
+  if (!instance)
     return;
 
   try
   {
-    SingletonLog::LogEvent (SingletonLog::Event_BeforeDestroy, typeid (Singleton<T, CreationPolicy>));
-
-    impl.node.UnregisterSingleton ();
-    CreationPolicy<T>::Destroy (impl.object);
-
-    SingletonLog::LogEvent (SingletonLog::Event_AfterDestroy, typeid (Singleton<T, CreationPolicy>));
+    node.UnregisterSingleton ();
+    CreationPolicy<T>::Destroy (instance);
   }
   catch (...)
   {
   }
 
-  impl.object = 0;
+  instance = 0;
+
+  SingletonLog::LogEvent (SingletonLog::Event_AfterDestroy, typeid (Singleton<T, CreationPolicy>));
 }
 
 template <class T,template <class> class CreationPolicy>
 inline bool Singleton<T,CreationPolicy>::IsInitialized ()
 {
-  detail::SingletonImpl<T,CreationPolicy>& impl = detail::SingletonImpl<T,CreationPolicy>::instance ();
+  Lock lock (lockable);
 
-  Lock lock (impl.lockable);
-
-  return impl.object != 0;
+  return instance != 0;
 }
 
 /*
@@ -186,11 +166,9 @@ inline bool Singleton<T,CreationPolicy>::IsInitialized ()
 template <class T,template <class> class CreationPolicy>
 Singleton<T,CreationPolicy>::Instance::Instance ()
 {
-  detail::SingletonImpl<T,CreationPolicy>& impl = detail::SingletonImpl<T,CreationPolicy>::instance ();
-  
-  impl.lockable.Lock ();
+  lockable.Lock ();
 
-  if (!impl.object)
+  if (!instance)
   {
     try
     {
@@ -198,7 +176,7 @@ Singleton<T,CreationPolicy>::Instance::Instance ()
     }
     catch (...)
     {
-      impl.lockable.Unlock ();
+      lockable.Unlock ();
       throw;
     }
   }
@@ -207,23 +185,23 @@ Singleton<T,CreationPolicy>::Instance::Instance ()
 template <class T,template <class> class CreationPolicy>
 inline Singleton<T,CreationPolicy>::Instance::Instance (const Instance&)
 {
-  detail::SingletonImpl<T,CreationPolicy>::instance ().lockable.Lock ();
+  Singleton<T,CreationPolicy>::lockable.Lock ();
 }
 
 template <class T,template <class> class CreationPolicy>
 inline Singleton<T,CreationPolicy>::Instance::~Instance ()
 {
-  detail::SingletonImpl<T,CreationPolicy>::instance ().lockable.Unlock ();
+  Singleton<T,CreationPolicy>::lockable.Unlock ();
 }
 
 template <class T,template <class> class CreationPolicy>
 inline T* Singleton<T,CreationPolicy>::Instance::operator -> () const
 {
-  return detail::SingletonImpl<T,CreationPolicy>::instance ().object;
+  return Singleton<T,CreationPolicy>::instance;
 }
 
 template <class T,template <class> class CreationPolicy>
 inline T& Singleton<T,CreationPolicy>::Instance::operator * () const
 {
-  return *detail::SingletonImpl<T,CreationPolicy>::instance ().object;
+  return *Singleton<T,CreationPolicy>::instance;
 }

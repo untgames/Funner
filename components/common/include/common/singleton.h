@@ -7,8 +7,6 @@
 
 #include <stl/stdexcept>
 
-#include <xtl/singleton_default.h>
-
 #include <common/lockable.h>
 
 namespace common
@@ -49,18 +47,16 @@ class SingletonLog
   public:
     enum Event
     {
-      Event_BeforeCreate,       //перед созданием экземпляра
-      Event_AfterCreate,        //после создания экземпляра
-      Event_BeforeDestroy,      //перед удалением экземпляра
-      Event_AfterDestroy,       //после удаления экземпляра
-      Event_AfterServiceInit,   //после инициализации служебного кода
-      Event_BeforeServiceDone,  //перед вызовом завершающего служебного кода
+      Event_BeforeCreate,  //перед созданием экземпляра
+      Event_AfterCreate,   //после создания экземпляра
+      Event_BeforeDestroy, //перед удалением экземпляра
+      Event_AfterDestroy,  //после удаления экземпляра
     };
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение о событиях синглтонов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void LogEvent (Event event, const std::type_info& type);
+    static void LogEvent (Event event, const std::type_info& type);    
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка функции протоколирования
@@ -69,6 +65,11 @@ class SingletonLog
 
     static void       SetLogHandler (LogHandler handler);
     static LogHandler GetLogHandler ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Отладочная функция протоколирования
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void DebugLogHandler (Event event, const std::type_info& type);
     
   private:
     static LogHandler log_handler;
@@ -136,6 +137,12 @@ class Singleton
 
   private:
     Singleton ();
+
+  private:
+    static T*                instance;
+    static Lockable          lockable;
+    static SingletonListNode node;
+    static bool              is_in_init;
 };
 
 #include <common/detail/singleton.inl>
