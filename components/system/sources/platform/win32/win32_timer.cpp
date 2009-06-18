@@ -53,7 +53,7 @@ Win32Timer::Win32Timer (size_t period_in_milliseconds, const TimerHandler& in_ha
 
     try
     {
-      TimerMapSingleton::Instance () [timer] = this;
+      (*TimerMapSingleton::Instance ())[timer] = this;
     }
     catch (...)
     {
@@ -73,7 +73,7 @@ Win32Timer::~Win32Timer ()
 {
   try
   {
-    TimerMapSingleton::Instance ().erase (timer);
+    TimerMapSingleton::Instance ()->erase (timer);
   }
   catch (...)
   {
@@ -88,7 +88,9 @@ VOID CALLBACK Win32Timer::TimerProc (HWND, UINT, UINT_PTR timer, DWORD)
 {
   try
   {
-    TimerMap&          timer_map = TimerMapSingleton::Instance ();
+    TimerMapSingleton::Instance instance;
+    
+    TimerMap&          timer_map = *instance;
     TimerMap::iterator iter      = timer_map.find (timer);
     
     if (iter == timer_map.end ())

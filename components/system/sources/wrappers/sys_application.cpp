@@ -228,42 +228,42 @@ void ApplicationImpl::Notify (ApplicationEvent event)
 
 void Application::DoEvents ()
 {
-  ApplicationSingleton::Instance ().DoEvents ();
+  ApplicationSingleton::Instance ()->DoEvents ();
 }
 
 void Application::CancelSystemEventsProcess ()
 {
-  ApplicationSingleton::Instance ().CancelSystemEventsProcess ();
+  ApplicationSingleton::Instance ()->CancelSystemEventsProcess ();
 }
 
 void Application::Run ()
 {
-  ApplicationSingleton::Instance ().Run ();
+  ApplicationSingleton::Instance ()->Run ();
 }
 
 bool Application::IsMessageLoop ()
 {
-  return ApplicationSingleton::Instance ().IsMessageLoop ();
+  return ApplicationSingleton::Instance ()->IsMessageLoop ();
 }
 
 void Application::Exit (int code)
 {
-  ApplicationSingleton::Instance ().Exit (code);
+  ApplicationSingleton::Instance ()->Exit (code);
 }
 
 int Application::GetExitCode ()
 {
-  return ApplicationSingleton::Instance ().GetExitCode ();
+  return ApplicationSingleton::Instance ()->GetExitCode ();
 }
 
 connection Application::RegisterEventHandler (ApplicationEvent event, const EventHandler& handler)
 {
-  return ApplicationSingleton::Instance ().RegisterEventHandler (event, handler);
+  return ApplicationSingleton::Instance ()->RegisterEventHandler (event, handler);
 }
 
 connection Application::RegisterSuspendHandler (const SuspendHandler& handler)
 {
-  return ApplicationSingleton::Instance ().RegisterSuspendHandler (handler);
+  return ApplicationSingleton::Instance ()->RegisterSuspendHandler (handler);
 }
 
 void Application::Sleep (size_t milliseconds)

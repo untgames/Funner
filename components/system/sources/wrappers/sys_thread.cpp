@@ -184,7 +184,7 @@ Thread& Thread::GetCurrent ()
 {
   try
   {
-    return CurrentThreadSingleton::Instance ().thread;
+    return CurrentThreadSingleton::Instance ()->thread;
   }
   catch (xtl::exception& exception)
   {
