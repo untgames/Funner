@@ -352,6 +352,8 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
                   break;
               }
             }
+            else
+              window_impl->Notify (window_handle, WindowEvent_OnKeyDown, context);
 
             break;
           case kEventRawKeyRepeat: //удержание клавиши клавиатуры
