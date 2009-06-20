@@ -47,7 +47,7 @@ endif
 MSVC_PATH          := $(call convert_path,$(MSVC_PATH))
 MSVC_BIN_PATH      := $(MSVC_PATH)/bin
 MSVS_COMMON_PATH   := $(call convert_path,$(MSVS_COMMON_PATH))
-COMMON_CFLAGS      += -W3 -Ox -wd4996 $(if $(analyze),-analyze) -nologo -FC
+COMMON_CFLAGS      += -W3 -Ox -wd4996 $(if $(analyze),-analyze) -nologo -FC -MT
 FRAMEWORK_DIR      := ${SYSTEMROOT}/Microsoft.NET/Framework/v2.0.50727
 VALID_TARGET_TYPES += cs-dynamic-lib cs-application
 
