@@ -460,10 +460,6 @@ void ZipFileSystem::FileRewind (file_t _file)
 
 filepos_t ZipFileSystem::FileSeek (file_t _file,filepos_t pos)
 {
-  char dummy_buffer;
-
-  FileRead (_file, &dummy_buffer, 1); //????? Обход бага с вылетом zzip при вызове seek после закрытия какого-либо файла.
-
   ZipFile* file = (ZipFile*)_file;
 
   filepos_t new_pos = zzip_seek (file->handle,pos,SEEK_SET);
