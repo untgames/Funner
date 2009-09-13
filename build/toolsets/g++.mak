@@ -16,7 +16,7 @@ LINKER_GCC           ?= g++
 LIB_GCC              ?= ar
 PROFILES             += g++ haswchar
 DEFAULT_LIBS         +=
-COMMON_CFLAGS        += -Wno-format
+COMMON_CFLAGS        += -Wno-format -O3
 DISABLE_CPP_WARNINGS += -Wno-invalid-offsetof
 
 ###################################################################################################
