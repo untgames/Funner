@@ -11,6 +11,8 @@ using namespace common;
 namespace
 {
 
+#ifndef OPENGL_ES_SUPPORT
+
 //определение типа буфера рендеринга
 GLenum get_render_buffer_format (PixelFormat format, const char* source, const char* param)
 {
@@ -28,13 +30,38 @@ GLenum get_render_buffer_format (PixelFormat format, const char* source, const c
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
-      throw xtl::format_not_supported_exception (source, "Unsupported %p=%s", param, get_name (format));
-      return 0;
+      throw xtl::format_not_supported_exception (source, "Unsupported %s=%s", param, get_name (format));
     default:
       throw xtl::make_argument_exception (source, param, format);
-      return 0;
   }
 }
+
+#else
+
+//определение типа буфера рендеринга
+GLenum get_render_buffer_format (PixelFormat format, const char* source, const char* param)
+{
+  switch (format)
+  {
+    case PixelFormat_RGB8:    return GL_RGB;
+    case PixelFormat_RGBA8:   return GL_RGBA;
+    case PixelFormat_L8:      return GL_LUMINANCE;
+    case PixelFormat_A8:      return GL_ALPHA;
+    case PixelFormat_LA8:     return GL_LUMINANCE_ALPHA;
+    case PixelFormat_D16:     return GL_DEPTH_COMPONENT16_OES;
+    case PixelFormat_D24X8:   return GL_DEPTH_COMPONENT24_OES;
+    case PixelFormat_D24S8:   return GL_DEPTH24_STENCIL8_OES;
+    case PixelFormat_S8:      return GL_STENCIL_INDEX8_OES;
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+      throw xtl::format_not_supported_exception (source, "Unsupported %s=%s", param, get_name (format));
+    default:
+      throw xtl::make_argument_exception (source, param, format);
+  }
+}
+
+#endif
 
 }
 
@@ -56,7 +83,9 @@ FboRenderBuffer::FboRenderBuffer (const FrameBufferManagerPtr& manager, const Te
   
     //проверка наличия необходимого расширения
     
-  if (!GetCaps ().has_ext_framebuffer_object)
+  const ContextCaps& caps = GetCaps ();
+    
+  if (!caps.has_ext_framebuffer_object)
     throw xtl::format_not_supported_exception (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
   
     //преобразование формата буфера рендеринга
@@ -73,13 +102,13 @@ FboRenderBuffer::FboRenderBuffer (const FrameBufferManagerPtr& manager, const Te
   {  
       //создание буфера рендеринга
     
-    glGenRenderbuffersEXT (1, &render_buffer_id);
+    caps.glGenRenderbuffers_fn (1, &render_buffer_id);
 
     if (!render_buffer_id)
       RaiseError (METHOD_NAME);
 
-    glBindRenderbufferEXT    (GL_RENDERBUFFER_EXT, render_buffer_id);
-    glRenderbufferStorageEXT (GL_RENDERBUFFER_EXT, internal_format, desc.width, desc.height);
+    caps.glBindRenderbuffer_fn    (GL_RENDERBUFFER, render_buffer_id);
+    caps.glRenderbufferStorage_fn (GL_RENDERBUFFER, internal_format, desc.width, desc.height);
 
       //проверка ошибок
 
@@ -87,7 +116,7 @@ FboRenderBuffer::FboRenderBuffer (const FrameBufferManagerPtr& manager, const Te
   }
   catch (...)
   {
-    if (render_buffer_id) glDeleteRenderbuffersEXT (1, &render_buffer_id);
+    if (render_buffer_id) GetCaps ().glDeleteRenderbuffers_fn (1, &render_buffer_id);
   }
 }
 
@@ -96,11 +125,13 @@ FboRenderBuffer::~FboRenderBuffer ()
   try
   {
     MakeContextCurrent ();
+    
+    const ContextCaps& caps = GetCaps ();
 
-    glDeleteRenderbuffersEXT (1, &render_buffer_id);
+    caps.glDeleteRenderbuffers_fn (1, &render_buffer_id);
 
     if (frame_buffer_id)
-      glDeleteFramebuffersEXT (1, &frame_buffer_id);
+      caps.glDeleteFramebuffers_fn (1, &frame_buffer_id);
 
     CheckErrors ("");
   }
@@ -136,10 +167,12 @@ size_t FboRenderBuffer::GetFrameBufferId ()
     //выбор текущего контекста
     
   MakeContextCurrent ();
+  
+  const ContextCaps& caps = GetCaps ();
 
     //создание буфера кадра
     
-  glGenFramebuffersEXT (1, &frame_buffer_id);
+  caps.glGenFramebuffers_fn (1, &frame_buffer_id);
   
   if (!frame_buffer_id)
     RaiseError (METHOD_NAME);
@@ -148,25 +181,27 @@ size_t FboRenderBuffer::GetFrameBufferId ()
   {
       //установка текущего буфера кадра
 
-    glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, frame_buffer_id);
+    caps.glBindFramebuffer_fn (GL_FRAMEBUFFER, frame_buffer_id);
 
       //связывание буфера кадра с буфером рендеринга    
 
     switch (GetTargetType ())
     {
       case RenderTargetType_Color:
-        glFramebufferRenderbufferEXT (GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, render_buffer_id);
+        caps.glFramebufferRenderbuffer_fn (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buffer_id);
         break;
       case RenderTargetType_DepthStencil:
-        glFramebufferRenderbufferEXT (GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, render_buffer_id);
+        caps.glFramebufferRenderbuffer_fn (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, render_buffer_id);
 
         if (GetDesc ().format == PixelFormat_D24X8)
-          glFramebufferRenderbufferEXT (GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, render_buffer_id);
+          caps.glFramebufferRenderbuffer_fn (GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, render_buffer_id);
 
         break;
       default:
         break;
     }
+    
+#ifndef OPENGL_ES_SUPPORT
 
       //настройка буферов рисования и чтения      
     
@@ -182,12 +217,14 @@ size_t FboRenderBuffer::GetFrameBufferId ()
         break;
       default:
         break;
-    }    
+    }
+    
+#endif
     
       //проверка состояния буфера кадра
     
-    GLenum status = (GLenum)glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);    
-    
+    GLenum status = (GLenum)caps.glCheckFramebufferStatus_fn (GL_FRAMEBUFFER);
+
     check_frame_buffer_status (METHOD_NAME, status);
 
       //проверка ошибок
@@ -198,7 +235,7 @@ size_t FboRenderBuffer::GetFrameBufferId ()
   }
   catch (...)
   {
-    glDeleteFramebuffersEXT (1, &frame_buffer_id);
+    GetCaps ().glDeleteFramebuffers_fn (1, &frame_buffer_id);
     
     frame_buffer_id = 0;
     

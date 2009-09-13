@@ -1,8 +1,7 @@
 #ifndef RENDER_GL_DRIVER_CONTEXT_CAPS_HEADER
 #define RENDER_GL_DRIVER_CONTEXT_CAPS_HEADER
 
-#include <shared/gl/gl_types.h>
-#include <shared/gl/glext.h>
+#include <shared/gl.h>
 #include <shared/extensions.h>
 
 namespace render
@@ -67,14 +66,34 @@ struct ContextCaps
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Функции
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-  PFNGLACTIVETEXTUREPROC           glActiveTexture_fn;
-  PFNGLBINDBUFFERPROC              glBindBuffer_fn;
-  PFNGLBUFFERDATAPROC              glBufferData_fn;
-  PFNGLBUFFERSUBDATAPROC           glBufferSubData_fn;
-  PFNGLCLIENTACTIVETEXTUREPROC     glClientActiveTexture_fn;
-  PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC glCompressedTexSubImage2D_fn;
-  PFNGLDELETEBUFFERSPROC           glDeleteBuffers_fn;
-  PFNGLGENBUFFERSPROC              glGenBuffers_fn;
+  PFNGLACTIVETEXTUREPROC                       glActiveTexture_fn;
+  PFNGLBINDBUFFERPROC                          glBindBuffer_fn;
+  PFNGLBLENDEQUATIONPROC                       glBlendEquation_fn;
+  PFNGLBLENDEQUATIONSEPARATEPROC               glBlendEquationSeparate_fn;
+  PFNGLBLENDFUNCSEPARATEPROC                   glBlendFuncSeparate_fn;
+  PFNGLBUFFERDATAPROC                          glBufferData_fn;
+  PFNGLBUFFERSUBDATAPROC                       glBufferSubData_fn;
+  PFNGLCLIENTACTIVETEXTUREPROC                 glClientActiveTexture_fn;
+  PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC             glCompressedTexSubImage2D_fn;
+  PFNGLDELETEBUFFERSPROC                       glDeleteBuffers_fn;
+  PFNGLGENBUFFERSPROC                          glGenBuffers_fn;
+
+  PFNGLISRENDERBUFFERPROC                      glIsRenderbuffer_fn;
+  PFNGLBINDRENDERBUFFERPROC                    glBindRenderbuffer_fn;
+  PFNGLDELETERENDERBUFFERSPROC                 glDeleteRenderbuffers_fn;
+  PFNGLGENRENDERBUFFERSPROC                    glGenRenderbuffers_fn;
+  PFNGLRENDERBUFFERSTORAGEPROC                 glRenderbufferStorage_fn;
+  PFNGLGETRENDERBUFFERPARAMETERIVPROC          glGetRenderbufferParameteriv_fn;
+  PFNGLISFRAMEBUFFERPROC                       glIsFramebuffer_fn;
+  PFNGLBINDFRAMEBUFFERPROC                     glBindFramebuffer_fn;
+  PFNGLDELETEFRAMEBUFFERSPROC                  glDeleteFramebuffers_fn;
+  PFNGLGENFRAMEBUFFERSPROC                     glGenFramebuffers_fn;
+  PFNGLCHECKFRAMEBUFFERSTATUSPROC              glCheckFramebufferStatus_fn;
+  PFNGLFRAMEBUFFERRENDERBUFFERPROC             glFramebufferRenderbuffer_fn;
+  PFNGLFRAMEBUFFERTEXTURE2DPROC                glFramebufferTexture2D_fn;
+  PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC glGetFramebufferAttachmentParameteriv_fn;
+
+#ifndef OPENGL_ES_SUPPORT
   PFNGLGETBUFFERSUBDATAPROC        glGetBufferSubData_fn;
   PFNGLGETCOMPRESSEDTEXIMAGEPROC   glGetCompressedTexImage_fn;
   PFNGLGETUNIFORMLOCATIONPROC      glGetUniformLocation_fn;
@@ -94,6 +113,10 @@ struct ContextCaps
   PFNGLUNIFORMMATRIX3FVPROC        glUniformMatrix3fv_fn;
   PFNGLUNIFORMMATRIX4FVPROC        glUniformMatrix4fv_fn;
   PFNGLUSEPROGRAMPROC              glUseProgram_fn;
+
+  PFNGLFRAMEBUFFERTEXTURE1DPROC    glFramebufferTexture1D_fn;
+  PFNGLFRAMEBUFFERTEXTURE3DPROC    glFramebufferTexture3D_fn;
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор

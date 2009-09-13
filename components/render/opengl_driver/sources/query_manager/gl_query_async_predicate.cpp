@@ -1,3 +1,5 @@
+#ifndef OPENGL_ES_SUPPORT
+
 #include "shared.h"
 
 using namespace render::low_level;
@@ -167,3 +169,5 @@ bool AsyncPredicate::IsResultAvailable ()
 
   return available != 0;
 }
+
+#endif

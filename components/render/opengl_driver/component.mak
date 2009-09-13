@@ -3,6 +3,8 @@
 ###################################################################################################
 TARGETS := RENDER.OPENGL_DRIVER.UTILS RENDER.OPENGL_DRIVER.SOURCES RENDER.OPENGL_DRIVER.TESTS
 
+#PROFILES += gles egl
+
 #OpenGL render system utilities
 RENDER.OPENGL_DRIVER.UTILS.TYPE             := test-suite
 RENDER.OPENGL_DRIVER.UTILS.INCLUDE_DIRS     :=
@@ -20,18 +22,36 @@ RENDER.OPENGL_DRIVER.SOURCES.INCLUDE_DIRS           := sources
 RENDER.OPENGL_DRIVER.SOURCES.macosx.COMPILER_CFLAGS := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/ApplicationServices.framework/Frameworks/CoreGraphics.framework/Headers/ \
                                                        -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/IOKit.framework/Headers/graphics/ \
                                                        -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/AGL.framework/Headers/
-RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            := sources/common sources/driver sources/input_stage \
-                                                       sources/render_target_manager sources/render_target_manager/swap_chain_manager \
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            := sources/common \
+                                                       sources/driver \
+                                                       sources/render_target_manager \
                                                        sources/render_target_manager/fbo_manager \
-                                                       sources/texture_manager sources/texture_manager/nv_dxt sources/shader_stage \
-                                                       sources/shader_stage/fpp sources/shader_stage/glsl sources/query_manager sources/output_stage
+                                                       sources/input_stage \
+                                                       sources/texture_manager \
+                                                       sources/texture_manager/nv_dxt \
+                                                       sources/shader_stage \
+                                                       sources/shader_stage/fpp \
+                                                       sources/output_stage \
+                                                       sources/query_manager
 RENDER.OPENGL_DRIVER.SOURCES.LIB_DIRS               :=  
 RENDER.OPENGL_DRIVER.SOURCES.LIBS                   := 
 RENDER.OPENGL_DRIVER.SOURCES.COMPILER_DEFINES       :=
 RENDER.OPENGL_DRIVER.SOURCES.IMPORTS                := ../low_level/compile.static.mak ../../common/compile.static.mak ../../system/compile.static.mak
 RENDER.OPENGL_DRIVER.SOURCES.msvc.COMPILER_CFLAGS   := -wd4355
-RENDER.OPENGL_DRIVER.SOURCES.win32.SOURCE_DIRS      := sources/platform/win32
-RENDER.OPENGL_DRIVER.SOURCES.macosx.SOURCE_DIRS     := sources/platform/macosx
+
+ifeq (,$(filter gles,$(PROFILES)))
+
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS        += sources/render_target_manager/swap_chain_manager \
+                                                   sources/shader_stage/glsl
+RENDER.OPENGL_DRIVER.SOURCES.win32.SOURCE_DIRS  := sources/platform/win32
+RENDER.OPENGL_DRIVER.SOURCES.macosx.SOURCE_DIRS := sources/platform/macosx
+
+else
+
+RENDER.OPENGL_DRIVER.SOURCES.COMPILER_DEFINES := OPENGL_ES_SUPPORT
+RENDER.OPENGL_DRIVER.SOURCES.egl.SOURCE_DIRS  := sources/platform/egl
+
+endif
 
 #OpenGL render system tests
 RENDER.OPENGL_DRIVER.TESTS.TYPE             := test-suite

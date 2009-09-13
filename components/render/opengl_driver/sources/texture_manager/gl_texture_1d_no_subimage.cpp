@@ -1,3 +1,5 @@
+#ifndef OPENGL_ES_SUPPORT
+
 #include "shared.h"
 
 using namespace common;
@@ -72,3 +74,5 @@ void Texture1DNoSubimage::SetCompressedData (size_t, size_t, size_t, size_t, siz
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::Texture1DNoSubimage::SetCompressedData", "Compression for 1D textures not supported");
 }
+
+#endif

@@ -18,16 +18,18 @@ FboFrameBuffer::FboFrameBuffer (const FrameBufferManagerPtr& manager, View* colo
   
     //выбор текущего контекста
 
-  MakeContextCurrent ();
+  MakeContextCurrent ();    
 
     //проверка поддержки необходимого расширения
     
-  if (!GetCaps ().has_ext_framebuffer_object)
+  const ContextCaps& caps = GetCaps ();
+    
+  if (!caps.has_ext_framebuffer_object)
     throw xtl::format_not_supported_exception (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
 
     //создание буфера кадра
 
-  glGenFramebuffersEXT (1, &id);
+  caps.glGenFramebuffers_fn (1, &id);
 
   if (!id)
     RaiseError (METHOD_NAME);
@@ -38,18 +40,22 @@ FboFrameBuffer::FboFrameBuffer (const FrameBufferManagerPtr& manager, View* colo
     
     frame_buffer_manager->SetFrameBuffer (id, GetId ());
     
+#ifndef OPENGL_ES_SUPPORT
+    
       //установка активного буфера вывода и чтения
 
     if (color_view)
     {
-      glDrawBuffer (GL_COLOR_ATTACHMENT0_EXT);
-      glReadBuffer (GL_COLOR_ATTACHMENT0_EXT);
+      glDrawBuffer (GL_COLOR_ATTACHMENT0);
+      glReadBuffer (GL_COLOR_ATTACHMENT0);
     }
     else
     {
       glDrawBuffer (GL_NONE);
       glReadBuffer (GL_NONE);
     }    
+
+#endif
     
       //инициализация целевых отображений
     
@@ -63,7 +69,7 @@ FboFrameBuffer::FboFrameBuffer (const FrameBufferManagerPtr& manager, View* colo
   }
   catch (...)
   {
-    glDeleteFramebuffersEXT (1, &id);
+    GetCaps ().glDeleteFramebuffers_fn (1, &id);
     throw;
   }    
 }
@@ -74,7 +80,7 @@ FboFrameBuffer::~FboFrameBuffer ()
   {
     MakeContextCurrent ();
 
-    glDeleteFramebuffersEXT (1, &id);
+    GetCaps ().glDeleteFramebuffers_fn (1, &id);
   }
   catch (xtl::exception& exception)
   {
@@ -152,27 +158,50 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, View* view)
   throw xtl::format_operation_exception (METHOD_NAME, "%s has unknown texture type %s", target_name, view->GetTextureTypeName ());
 }
 
+#ifndef OPENGL_ES_SUPPORT
+
 void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, size_t texture_id, const ViewDesc& view_desc)
 {
+  const ContextCaps& caps = GetCaps ();
+
   switch (textarget)
   {
     case GL_TEXTURE_1D:
-      glFramebufferTexture1DEXT (GL_FRAMEBUFFER_EXT, attachment, textarget, texture_id, view_desc.mip_level);
+      caps.glFramebufferTexture1D_fn (GL_FRAMEBUFFER, attachment, textarget, texture_id, view_desc.mip_level);
       break;
     case GL_TEXTURE_CUBE_MAP:
       textarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + view_desc.layer;
     case GL_TEXTURE_2D:
     case GL_TEXTURE_RECTANGLE_ARB:
-      glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, attachment, textarget, texture_id, view_desc.mip_level);
+      caps.glFramebufferTexture2D_fn (GL_FRAMEBUFFER, attachment, textarget, texture_id, view_desc.mip_level);
       break;
     case GL_TEXTURE_3D_EXT:
-      glFramebufferTexture3DEXT (GL_FRAMEBUFFER_EXT, attachment, textarget, texture_id, view_desc.mip_level, view_desc.layer);
+      caps.glFramebufferTexture3D_fn (GL_FRAMEBUFFER, attachment, textarget, texture_id, view_desc.mip_level, view_desc.layer);
       break;
     default:
       throw xtl::format_operation_exception ("render::low_level::opengl::FboFrameBuffer::SetAttachment", "Unknown textarget=0x%04x", textarget);
-      break;
   }
 }
+
+#else
+
+void FboFrameBuffer::SetAttachment (GLenum attachment, GLenum textarget, size_t texture_id, const ViewDesc& view_desc)
+{
+  const ContextCaps& caps = GetCaps ();
+
+  switch (textarget)
+  {
+    case GL_TEXTURE_CUBE_MAP:
+      textarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X + view_desc.layer;
+    case GL_TEXTURE_2D:
+      caps.glFramebufferTexture2D_fn (GL_FRAMEBUFFER, attachment, textarget, texture_id, view_desc.mip_level);
+      break;
+    default:
+      throw xtl::format_operation_exception ("render::low_level::opengl::FboFrameBuffer::SetAttachment", "Unknown textarget=0x%04x", textarget);
+  }
+}
+
+#endif
 
 void FboFrameBuffer::SetAttachment (RenderTargetType target_type, IRenderTargetTexture* texture, const ViewDesc& view_desc, const TextureDesc& texture_desc)
 {
@@ -188,15 +217,15 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, IRenderTargetT
   switch (target_type)
   {
     case RenderTargetType_Color:
-      SetAttachment (GL_COLOR_ATTACHMENT0_EXT, render_target_desc.target, render_target_desc.id, view_desc);
+      SetAttachment (GL_COLOR_ATTACHMENT0, render_target_desc.target, render_target_desc.id, view_desc);
       break;
     case RenderTargetType_DepthStencil:
-      SetAttachment (GL_DEPTH_ATTACHMENT_EXT, render_target_desc.target, render_target_desc.id, view_desc);
+      SetAttachment (GL_DEPTH_ATTACHMENT, render_target_desc.target, render_target_desc.id, view_desc);
 
       switch (texture_desc.format)
       {
         case PixelFormat_D24S8:
-          SetAttachment (GL_STENCIL_ATTACHMENT_EXT, render_target_desc.target, render_target_desc.id, view_desc);
+          SetAttachment (GL_STENCIL_ATTACHMENT, render_target_desc.target, render_target_desc.id, view_desc);
           break;
         default:
           break;
@@ -214,12 +243,14 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, IRenderTargetT
 
 void FboFrameBuffer::SetAttachment (RenderTargetType target_type, FboRenderBuffer* render_buffer)
 {
+  const ContextCaps& caps = GetCaps ();
+
   size_t render_buffer_id = render_buffer->GetRenderBufferId ();
 
   switch (target_type)
   {
     case RenderTargetType_Color:
-      glFramebufferRenderbufferEXT (GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, render_buffer_id);
+      caps.glFramebufferRenderbuffer_fn (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, render_buffer_id);
       break;
     case RenderTargetType_DepthStencil:
     {
@@ -227,12 +258,12 @@ void FboFrameBuffer::SetAttachment (RenderTargetType target_type, FboRenderBuffe
       
       render_buffer->GetDesc (desc);
       
-      glFramebufferRenderbufferEXT (GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, render_buffer_id);
+      caps.glFramebufferRenderbuffer_fn (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, render_buffer_id);
 
       switch (desc.format)
       {
         case PixelFormat_D24S8:
-          glFramebufferRenderbufferEXT (GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, render_buffer_id);
+          caps.glFramebufferRenderbuffer_fn (GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, render_buffer_id);
           break;
         default:
           break;
@@ -259,7 +290,7 @@ void FboFrameBuffer::FinishInitialization ()
 
     //проверка состояния буфера кадра
   
-  GLenum status = (GLenum)glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
+  GLenum status = (GLenum)GetCaps ().glCheckFramebufferStatus_fn (GL_FRAMEBUFFER);
 
   check_frame_buffer_status (METHOD_NAME, status);
 

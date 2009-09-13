@@ -1,3 +1,5 @@
+#ifndef OPENGL_ES_SUPPORT
+
 #include "shared.h"
 
 using namespace render::low_level;
@@ -92,3 +94,5 @@ void Texture2DNoSubimage::SetCompressedData
   throw xtl::format_not_supported_exception ("render::low_level::opengl::Texture2DNoSubimage::SetCompressedData",
     "Compression not supported in texture emulation mode");
 }
+
+#endif

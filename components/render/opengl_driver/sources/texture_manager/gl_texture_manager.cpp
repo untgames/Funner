@@ -319,6 +319,118 @@ struct TextureManager::Impl: public ContextObject
       return sampler_slot;
     }
 
+    ITexture* CreateScaledTexture2D (const TextureDesc& desc, size_t max_texture_size)
+    {
+      const ContextCaps& caps = GetCaps ();
+
+      if ((desc.width < max_texture_size || desc.height < max_texture_size) &&
+          ((is_power_of_two (desc.width) && is_power_of_two (desc.height)) || caps.has_arb_texture_non_power_of_two ||
+          (caps.has_arb_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)))  //можно масштабировать только по одной оси
+      {
+        if (desc.width > max_texture_size)
+          return new ScaledTexture (GetContextManager (), texture_manager, desc, max_texture_size, desc.height);
+        else
+          return new ScaledTexture (GetContextManager (), texture_manager, desc, desc.width, max_texture_size);
+      }
+      else
+        return new ScaledTexture (GetContextManager (), texture_manager, desc);
+    }
+
+      //создание двумерной текстуры
+    ITexture* CreateTexture2D (const TextureDesc& in_desc)
+    {
+        //игнорирование неиспользуемых параметров
+
+      TextureDesc desc = in_desc;
+
+      desc.layers = 1;
+
+        //проверка возможности создани€ текстуры
+
+      const ContextCaps& caps = GetCaps ();
+
+      bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height);
+
+      if (desc.width > caps.max_texture_size || desc.height > caps.max_texture_size)
+      {
+        LogPrintf ("Can't create 2D texture with width %u and height %u (maximum texture size is %u). Creating scaled texture.",
+                   desc.width, desc.height, caps.max_texture_size);
+        return CreateScaledTexture2D (desc, caps.max_texture_size);
+      }
+
+        //диспетчеризаци€ создани€ текстуры в зависимости от поддерживаемых расширений
+
+      if (is_pot || caps.has_arb_texture_non_power_of_two)
+      {
+#ifndef OPENGL_ES_SUPPORT        
+        static Extension BUG_texture_no_subimage = "GLBUG_texture_no_subimage";
+
+        if (IsSupported (BUG_texture_no_subimage))
+          return new Texture2DNoSubimage (GetContextManager (), desc); //создание текстуры в режиме эмул€ции          
+#endif
+
+        return new Texture2D (GetContextManager (), desc);
+      }      
+      
+#ifndef OPENGL_ES_SUPPORT      
+
+      if (caps.has_arb_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)
+      {
+        if (desc.width > caps.max_rectangle_texture_size || desc.height > caps.max_rectangle_texture_size)
+        {
+          LogPrintf ("Can't create rectangular 2D texture with width %u and height %u (maximum rectangular texture size is %u). Creating scaled texture.",
+                      desc.width, desc.height, caps.max_rectangle_texture_size);
+          return CreateScaledTexture2D (desc, caps.max_rectangle_texture_size);
+        }
+
+        return new TextureNpot (GetContextManager (), desc);
+      }
+      
+#endif
+
+      return new ScaledTexture (GetContextManager (), texture_manager, desc);
+    }
+    
+      //создание кубической текстуры
+    ITexture* CreateTextureCubemap (const TextureDesc& desc)
+    {
+      static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTextureCubemap";
+
+        //проверка возможности создани€ текстуры
+
+      const ContextCaps& caps = GetCaps ();
+
+      if (!caps.has_arb_texture_cube_map)
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Cubemap textuers not supported. No 'ARB_texture_cubemap' extension");
+
+      bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height);
+
+      if (desc.width > caps.max_cube_map_texture_size || desc.height > caps.max_cube_map_texture_size)
+      {
+        LogPrintf ("Can't create cubemap texture with width %u and height %u (maximum texture size is %u). Creating scaled texture.",
+                   desc.width, desc.height, caps.max_cube_map_texture_size);
+
+        if ((desc.width <= caps.max_texture_size || desc.height <= caps.max_texture_size) && (is_pot || caps.has_arb_texture_non_power_of_two))  //можно масштабировать только по одной оси
+        {
+          if (desc.width > caps.max_texture_size)
+            return new ScaledTexture (GetContextManager (), texture_manager, desc, caps.max_cube_map_texture_size, desc.height);
+          else
+            return new ScaledTexture (GetContextManager (), texture_manager, desc, desc.width, caps.max_cube_map_texture_size);
+        }
+        else
+          return new ScaledTexture (GetContextManager (), texture_manager, desc);
+      }
+
+        //диспетчеризаци€ создани€ текстуры в зависимости от поддерживаемых расширений
+
+      if (is_pot || caps.has_arb_texture_non_power_of_two)
+        return new TextureCubemap (GetContextManager (), desc);
+
+      return new ScaledTexture (GetContextManager (), texture_manager, desc);
+    }              
+    
+#ifndef OPENGL_ES_SUPPORT
+
       //создание одномерной текстуры
     ITexture* CreateTexture1D (const TextureDesc& in_desc)
     {
@@ -367,72 +479,6 @@ struct TextureManager::Impl: public ContextObject
       return new ScaledTexture (GetContextManager (), texture_manager, desc);
     }
 
-    ITexture* CreateScaledTexture2D (const TextureDesc& desc, size_t max_texture_size)
-    {
-      const ContextCaps& caps = GetCaps ();
-
-      if ((desc.width < max_texture_size || desc.height < max_texture_size) &&
-          ((is_power_of_two (desc.width) && is_power_of_two (desc.height)) || caps.has_arb_texture_non_power_of_two ||
-          (caps.has_arb_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)))  //можно масштабировать только по одной оси
-      {
-        if (desc.width > max_texture_size)
-          return new ScaledTexture (GetContextManager (), texture_manager, desc, max_texture_size, desc.height);
-        else
-          return new ScaledTexture (GetContextManager (), texture_manager, desc, desc.width, max_texture_size);
-      }
-      else
-        return new ScaledTexture (GetContextManager (), texture_manager, desc);
-    }
-
-      //создание двумерной текстуры
-    ITexture* CreateTexture2D (const TextureDesc& in_desc)
-    {
-        //игнорирование неиспользуемых параметров
-
-      TextureDesc desc = in_desc;
-
-      desc.layers = 1;
-
-        //проверка возможности создани€ текстуры
-
-      const ContextCaps& caps = GetCaps ();
-
-      bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height);
-
-      if (desc.width > caps.max_texture_size || desc.height > caps.max_texture_size)
-      {
-        LogPrintf ("Can't create 2D texture with width %u and height %u (maximum texture size is %u). Creating scaled texture.",
-                   desc.width, desc.height, caps.max_texture_size);
-        return CreateScaledTexture2D (desc, caps.max_texture_size);
-      }
-
-        //диспетчеризаци€ создани€ текстуры в зависимости от поддерживаемых расширений
-
-      if (is_pot || caps.has_arb_texture_non_power_of_two)
-      {
-        static Extension BUG_texture_no_subimage = "GLBUG_texture_no_subimage";
-
-        if (IsSupported (BUG_texture_no_subimage))
-          return new Texture2DNoSubimage (GetContextManager (), desc); //создание текстуры в режиме эмул€ции
-
-        return new Texture2D (GetContextManager (), desc);
-      }
-
-      if (caps.has_arb_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)
-      {
-        if (desc.width > caps.max_rectangle_texture_size || desc.height > caps.max_rectangle_texture_size)
-        {
-          LogPrintf ("Can't create rectangular 2D texture with width %u and height %u (maximum rectangular texture size is %u). Creating scaled texture.",
-                      desc.width, desc.height, caps.max_rectangle_texture_size);
-          return CreateScaledTexture2D (desc, caps.max_rectangle_texture_size);
-        }
-
-        return new TextureNpot (GetContextManager (), desc);
-      }
-
-      return new ScaledTexture (GetContextManager (), texture_manager, desc);
-    }
-
       //создание трЄхмерной текстуры
     ITexture* CreateTexture3D (const TextureDesc& desc)
     {
@@ -462,45 +508,22 @@ struct TextureManager::Impl: public ContextObject
         //создание текстуры
 
       return new Texture3D (GetContextManager (), desc);
-    }
-
-      //создание кубической текстуры
-    ITexture* CreateTextureCubemap (const TextureDesc& desc)
+    }    
+    
+#else
+    ITexture* CreateTexture3D (const TextureDesc& desc)
     {
-      static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTextureCubemap";
+      throw xtl::format_not_supported_exception ("render::low_level::opengl::TextureManager::Impl::CreateTexture3D",
+        "Volume textures not supported");
+    }    
+    
+    ITexture* CreateTexture1D (const TextureDesc& desc)
+    {
+      throw xtl::format_not_supported_exception ("render::low_level::opengl::TextureManager::Impl::CreateTexture1D",
+        "1D textures not supported");
+    }    
 
-        //проверка возможности создани€ текстуры
-
-      const ContextCaps& caps = GetCaps ();
-
-      if (!caps.has_arb_texture_cube_map)
-        throw xtl::format_not_supported_exception (METHOD_NAME, "Cubemap textuers not supported. No 'ARB_texture_cubemap' extension");
-
-      bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height);
-
-      if (desc.width > caps.max_cube_map_texture_size || desc.height > caps.max_cube_map_texture_size)
-      {
-        LogPrintf ("Can't create cubemap texture with width %u and height %u (maximum texture size is %u). Creating scaled texture.",
-                   desc.width, desc.height, caps.max_cube_map_texture_size);
-
-        if ((desc.width <= caps.max_texture_size || desc.height <= caps.max_texture_size) && (is_pot || caps.has_arb_texture_non_power_of_two))  //можно масштабировать только по одной оси
-        {
-          if (desc.width > caps.max_texture_size)
-            return new ScaledTexture (GetContextManager (), texture_manager, desc, caps.max_cube_map_texture_size, desc.height);
-          else
-            return new ScaledTexture (GetContextManager (), texture_manager, desc, desc.width, caps.max_cube_map_texture_size);
-        }
-        else
-          return new ScaledTexture (GetContextManager (), texture_manager, desc);
-      }
-
-        //диспетчеризаци€ создани€ текстуры в зависимости от поддерживаемых расширений
-
-      if (is_pot || caps.has_arb_texture_non_power_of_two)
-        return new TextureCubemap (GetContextManager (), desc);
-
-      return new ScaledTexture (GetContextManager (), texture_manager, desc);
-    }
+#endif
 
   public:
     TextureManager&     texture_manager; //менеджер текстур

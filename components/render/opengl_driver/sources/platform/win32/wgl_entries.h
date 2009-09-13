@@ -1,8 +1,7 @@
 #ifndef RENDER_GL_DRIVER_WGL_ENTRIES_HEADER
 #define RENDER_GL_DRIVER_WGL_ENTRIES_HEADER
 
-#include <shared/gl/wglext.h>
-#include <shared/library.h>
+#include <shared/profile/gl/wglext.h>
 
 namespace render
 {
@@ -12,6 +11,9 @@ namespace low_level
 
 namespace opengl
 {
+
+//forward declaration
+class ILibrary;
 
 namespace windows
 {

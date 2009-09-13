@@ -192,8 +192,12 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
       need_update_render_targets (false)
     {
         //регистрация менеджеров буферов кадра
+        
+#ifndef OPENGL_ES_SUPPORT
 
       register_swap_chain_manager (render_target_registry, GetContextManager (), swap_chain);
+      
+#endif
 
       if (GetCaps ().has_ext_framebuffer_object)
         register_fbo_manager (render_target_registry, GetContextManager (), swap_chain);
@@ -320,8 +324,13 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
         {
           const Viewport& viewport = GetViewport ();
 
-          glViewport   (viewport.x, viewport.y, viewport.width, viewport.height);
-          glDepthRange (viewport.min_depth, viewport.max_depth);
+          glViewport (viewport.x, viewport.y, viewport.width, viewport.height);
+
+#ifndef OPENGL_ES_SUPPORT
+          glDepthRange  (viewport.min_depth, viewport.max_depth);
+#else
+          glDepthRangef (viewport.min_depth, viewport.max_depth);
+#endif
           
           SetContextCacheValue (CacheEntry_ViewportHash, GetViewportHash ());
         }
@@ -403,8 +412,12 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
           
           if (GetContextCacheValue (CacheEntry_ClearDepthHash) != clear_depth_hash)
           {
+#ifndef OPENGL_ES_SUPPORT
             glClearDepth (depth);
-            
+#else
+            glClearDepthf (depth);
+#endif
+
             SetContextCacheValue (CacheEntry_ClearDepthHash, clear_depth_hash);
           }
           

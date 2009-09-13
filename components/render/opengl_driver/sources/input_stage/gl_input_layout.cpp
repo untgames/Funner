@@ -184,19 +184,19 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
       new_index_data_type = GL_UNSIGNED_SHORT;
       new_index_size      = sizeof (unsigned short);
       break;
+#ifndef OPENGL_ES_SUPPORT
     case InputDataType_UInt:
       new_index_data_type = GL_UNSIGNED_INT;
       new_index_size      = sizeof (unsigned int);
       break;
+#endif
     case InputDataType_Byte:
     case InputDataType_Short:
     case InputDataType_Int:
     case InputDataType_Float:
       throw xtl::format_not_supported_exception (METHOD_NAME, "desc.index_type", get_name (desc.index_type));
-      break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.index_type", desc.index_type);
-      break;
   }
 
       //создание нового массива вершинных атрибутов и массива групп вершинных атрибутов
@@ -388,6 +388,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
           gl_va.type = GL_UNSIGNED_SHORT;
           type_size  = sizeof (unsigned short);
           break;
+#ifndef OPENGL_ES_SUPPORT          
         case InputDataType_Int:
           gl_va.type = GL_INT;
           type_size  = sizeof (int);
@@ -396,13 +397,13 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
           gl_va.type = GL_UNSIGNED_INT;
           type_size  = sizeof (unsigned int);
           break;
+#endif
         case InputDataType_Float:
           gl_va.type = GL_FLOAT;
           type_size  = sizeof (float);
           break;
         default:
           throw xtl::format_operation_exception (METHOD_NAME, "Internal error at vertex attribute type convertation");
-          break;
       }
       
       gl_va.offset = va.offset;

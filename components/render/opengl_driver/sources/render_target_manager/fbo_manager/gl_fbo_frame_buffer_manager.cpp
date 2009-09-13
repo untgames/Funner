@@ -85,13 +85,15 @@ void FboFrameBufferManager::SetFrameBuffer (size_t fbo_id, size_t cache_id)
   MakeContextCurrent ();
 
     //проверка наличия необходимого расширения
+    
+  const ContextCaps& caps = GetCaps ();
 
-  if (!GetCaps ().has_ext_framebuffer_object)
+  if (!caps.has_ext_framebuffer_object)
     throw xtl::format_not_supported_exception (METHOD_NAME, "GL_EXT_framebuffer_object not supported");
 
     //установка буфера в контекст OpenGL
 
-  glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, fbo_id);
+  caps.glBindFramebuffer_fn (GL_FRAMEBUFFER, fbo_id);
 
     //проверка ошибок
 

@@ -78,6 +78,8 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Multisampling not supported (GL_ARB_multisample extension not supported)");
     
     //проверка корректности аргументов и преобразование дескриптора
+    
+#ifndef OPENGL_ES_SUPPORT
 
   GLenum gl_fill_mode;
 
@@ -87,8 +89,24 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     case FillMode_Solid:     gl_fill_mode = GL_FILL; break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.fill_mode", in_desc.fill_mode);
-      break;
   }
+  
+#else
+
+  switch (in_desc.fill_mode)
+  {
+    case FillMode_Solid:
+      break;
+    case FillMode_Wireframe:
+      throw xtl::format_not_supported_exception (METHOD_NAME, "desc.fill_mode=%s not supported", get_name (in_desc.fill_mode));
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "desc.fill_mode", in_desc.fill_mode);
+  }
+  
+  if (in_desc.depth_bias)
+    throw xtl::format_not_supported_exception (METHOD_NAME, "in_desc.depth_bias=%d not supported", in_desc.depth_bias);
+  
+#endif
 
   switch (in_desc.cull_mode)
   {
@@ -98,7 +116,6 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
       break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.cull_mode", in_desc.cull_mode);
-      break;
   }
 
     //выбор текущего контекста
@@ -108,8 +125,12 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     //запись команд в контекст OpenGL
     
   CommandListBuilder cmd_list;
+  
+#ifndef OPENGL_ES_SUPPORT
 
   cmd_list.Add (glPolygonMode, GL_FRONT_AND_BACK, gl_fill_mode);
+  
+#endif
 
   switch (in_desc.cull_mode)
   {
@@ -130,6 +151,8 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
 
   cmd_list.Add (glFrontFace, in_desc.front_counter_clockwise ? GL_CW : GL_CCW);
 
+#ifndef OPENGL_ES_SUPPORT
+
   if (in_desc.depth_bias)
   {
     cmd_list.Add (glEnable, GL_POLYGON_OFFSET_FILL);
@@ -142,7 +165,9 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
     cmd_list.Add (glDisable, GL_POLYGON_OFFSET_FILL);
     cmd_list.Add (glDisable, GL_POLYGON_OFFSET_LINE);
     cmd_list.Add (glDisable, GL_POLYGON_OFFSET_POINT);
-  }
+  }  
+
+#endif
 
   if (in_desc.scissor_enable) cmd_list.Add (glEnable, GL_SCISSOR_TEST);
   else                        cmd_list.Add (glDisable, GL_SCISSOR_TEST);
@@ -150,18 +175,30 @@ void RasterizerState::SetDesc (const RasterizerDesc& in_desc)
   if (in_desc.antialiased_line_enable && !in_desc.multisample_enable)
   {
     cmd_list.Add (glEnable, GL_POINT_SMOOTH);
-    cmd_list.Add (glEnable, GL_POLYGON_SMOOTH);
     cmd_list.Add (glEnable, GL_LINE_SMOOTH);
+    
+#ifndef OPENGL_ES_SUPPORT
+    cmd_list.Add (glEnable, GL_POLYGON_SMOOTH);    
+#endif
   }
   else
   {
     cmd_list.Add (glDisable, GL_POINT_SMOOTH);
     cmd_list.Add (glDisable, GL_LINE_SMOOTH);
+
+#ifndef OPENGL_ES_SUPPORT    
     cmd_list.Add (glDisable, GL_POLYGON_SMOOTH);
+#endif
   }
 
   if (caps.has_arb_multisample && in_desc.multisample_enable)
+  {
+#ifndef OPENGL_ES_SUPPORT
     cmd_list.Add (glEnable, GL_MULTISAMPLE_ARB);
+#else
+    cmd_list.Add (glEnable, GL_MULTISAMPLE);
+#endif
+  }
     
     //создание исполнителя команд
 

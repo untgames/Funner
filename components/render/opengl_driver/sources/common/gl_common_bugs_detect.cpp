@@ -16,6 +16,8 @@ namespace
     Определение багов и несоответствий спецификации
 */
 
+#ifndef OPENGL_ES_SUPPORT
+
 //определение бага функции glGetTexImage при работе с 3D-текстурой
 bool detect_texture3d_bug ()
 {
@@ -61,6 +63,8 @@ bool detect_texture3d_bug ()
 
   return glGetError () != GL_NO_ERROR || dst_buffer [TEX_SIZE * TEX_SIZE * TEX_SIZE * RGB_TEXEL_SIZE] != DST_BUFFER_MARKER;
 }
+
+#endif
 
 }
 

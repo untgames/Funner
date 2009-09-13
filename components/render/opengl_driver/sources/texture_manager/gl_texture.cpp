@@ -102,7 +102,7 @@ Texture::Texture
   {
     Bind ();
 
-    glTexParameteri (target, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
+    glTexParameteri (target, GL_GENERATE_MIPMAP, GL_TRUE);
   }
 
     //проверка ошибок
@@ -308,12 +308,16 @@ void Texture::BuildMipmaps
     height           = get_next_mip_size (height);
     unclamped_width  = get_next_mip_size (unclamped_width);
     x               /= 2;
-    y               /= 2;
+    y               /= 2;    
+    
+#ifndef OPENGL_ES_SUPPORT
 
     if (target != GL_TEXTURE_CUBE_MAP)
       z /= 2;
 
     glPixelStorei (GL_UNPACK_ROW_LENGTH, unclamped_width); //длина строки в пикселях (для данного mip-уровня)
+
+#endif
 
     SetUncompressedData (z, mip_level, x, y, width, height, gl_format, gl_type, dst);
 
@@ -400,6 +404,8 @@ void Texture::SetData
     //установка текстуры в контекст OpenGL
 
   Bind ();  
+  
+#ifndef OPENGL_ES_SUPPORT
 
     //настройка параметров расположения данных в буфере
 
@@ -407,6 +413,13 @@ void Texture::SetData
   glPixelStorei (GL_UNPACK_ALIGNMENT,   1);               //выравнивание начала строк
   glPixelStorei (GL_UNPACK_SKIP_ROWS,   0);               //количество пропускаемых строк
   glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);               //количество пропускаемых пикселей
+  
+#else
+
+  if (unclamped_width != width)
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Texture image clipping doesn't supported");
+
+#endif
 
     //проверка совместимости форматов
 
@@ -466,6 +479,7 @@ void Texture::SetData
 
     switch (source_format)
     {
+#ifndef OPENGL_ES_SUPPORT
       case PixelFormat_D16:
       {
         tmp_buffer.resize (unclamped_width * unclamped_height);
@@ -478,9 +492,13 @@ void Texture::SetData
 
         buffer  = tmp_buffer.data ();
         gl_type = GL_UNSIGNED_INT;
-
+        
+        break;        
+      }        
+#else
+      case PixelFormat_D16: //need test!
         break;
-      }
+#endif
       case PixelFormat_D24X8:
       {
         tmp_buffer.resize (unclamped_width * unclamped_height);        
@@ -521,6 +539,8 @@ size_t align_size (size_t size, size_t align)
 }
 
 }
+
+#ifndef OPENGL_ES_SUPPORT
 
 void Texture::GetData
  (size_t      layer,
@@ -595,14 +615,14 @@ void Texture::GetData
 
   Bind ();
   
+  const ContextCaps& caps = GetCaps ();  
+  
     //настройка параметров расположения данных в буфере
-    
+
   glPixelStorei (GL_PACK_ROW_LENGTH,  0); //размер строки в пикселях
   glPixelStorei (GL_PACK_ALIGNMENT,   1); //выравнивание начала строк
   glPixelStorei (GL_PACK_SKIP_ROWS,   0); //количество пропускаемых строк
-  glPixelStorei (GL_PACK_SKIP_PIXELS, 0); //количество пропускаемых пикселей
-
-  const ContextCaps& caps = GetCaps ();
+  glPixelStorei (GL_PACK_SKIP_PIXELS, 0); //количество пропускаемых пикселей  
 
   if (caps.has_ext_texture3d)
   {
@@ -760,3 +780,20 @@ void Texture::GetData
 
   CheckErrors (METHOD_NAME);
 }
+
+#else
+
+void Texture::GetData
+ (size_t      layer,
+  size_t      mip_level,
+  size_t      x,
+  size_t      y,
+  size_t      width,
+  size_t      height,
+  PixelFormat target_format,
+  void*       buffer)
+{
+  throw xtl::format_not_supported_exception ("render::low_level::opengl::Texture::GetData", "Get texture image data not supported");
+}
+
+#endif

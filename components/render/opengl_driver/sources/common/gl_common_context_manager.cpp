@@ -50,9 +50,13 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
         gl_entries.Init (context->GetLibrary ());
         
           //отключение буферов отрисовки          
+          
+#ifndef OPENGL_ES_SUPPORT
 
-        glDrawBuffer (GL_NONE);
-        glReadBuffer (GL_NONE);        
+        glDrawBuffer (0);
+        glReadBuffer (0);
+
+#endif
 
           //определение поддержки расширений        
 
@@ -385,11 +389,11 @@ struct ContextManager::Impl: public xtl::reference_counter
           throw xtl::format_exception<OpenGLException> (source, "OpenGL error: stack underflow");
         case GL_OUT_OF_MEMORY:
           throw xtl::format_exception<OpenGLException> (source, "OpenGL error: out of memory");
-        case GL_INVALID_FRAMEBUFFER_OPERATION_EXT:
+        case GL_INVALID_FRAMEBUFFER_OPERATION:
           throw xtl::format_exception<OpenGLException> (source, "OpenGL error: invalid framebuffer operation");
         default:
           throw xtl::format_exception<OpenGLException> (source, "OpenGL error: code=0x%04x", error);
-      }      
+      }
     }
 
 ///Очистка текущей ошибки OpenGL

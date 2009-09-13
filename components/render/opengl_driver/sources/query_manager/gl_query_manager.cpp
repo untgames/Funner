@@ -101,6 +101,8 @@ struct QueryManager::Impl: public ContextObject, public QueryManagerState
         //установка текущего контекста
 
       MakeContextCurrent ();
+      
+#ifndef OPENGL_ES_SUPPORT
 
         //получение количества битов в результате запроса
 
@@ -118,6 +120,9 @@ struct QueryManager::Impl: public ContextObject, public QueryManagerState
         //создание предиката
 
       return new AsyncPredicate (GetContextManager ());
+#else
+      return new NullPredicate;
+#endif
     }
 };
 

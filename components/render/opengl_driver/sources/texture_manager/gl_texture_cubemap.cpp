@@ -9,7 +9,7 @@ using namespace render::low_level::opengl;
 */
 
 TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDesc& tex_desc)
-  : Texture (manager, tex_desc, GL_TEXTURE_CUBE_MAP_ARB, get_mips_count (tex_desc.width, tex_desc.height))
+  : Texture (manager, tex_desc, GL_TEXTURE_CUBE_MAP, get_mips_count (tex_desc.width, tex_desc.height))
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureCubemap::TextureCubemap";
   
@@ -34,6 +34,8 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
                               get_uncompressed_gl_internal_format (tex_desc.format),
          gl_format          = get_uncompressed_gl_format (tex_desc.format),
          gl_type            = get_uncompressed_gl_type (tex_desc.format);
+         
+#ifndef OPENGL_ES_SUPPORT
 
     //проверка возможности создания текстуры
 
@@ -48,7 +50,9 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create cubemap texture %ux%u@%s. Reason: proxy texure fail",
                        tex_desc.width, tex_desc.height, get_name (tex_desc.format));
   }
-  
+    
+#endif
+
     //создание mip-уровней
     
   for (size_t i=0; i<GetMipsCount (); i++)
@@ -59,10 +63,14 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
     for (size_t j=0; j<6; j++)
     {
-      glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, gl_internal_format, level_desc.width, level_desc.height,
+      glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, gl_internal_format, level_desc.width, level_desc.height,
                     0, gl_format, gl_type, 0);
+                    
+#ifndef OPENGL_ES_SUPPORT
 
-      glGetTexLevelParameteriv (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + j, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
+      glGetTexLevelParameteriv (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
+      
+#endif
     }
   }
   
@@ -93,7 +101,7 @@ void TextureCubemap::GetLayerDesc (size_t layer, LayerDesc& desc)
   if (layer > 6)
     throw xtl::make_range_exception ("render::low_level::opengl::TextureCubemap::GetLayerDesc", "layer", layer, 6);
 
-  desc.target    = GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer;
+  desc.target    = GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer;
   desc.new_index = 0;
 }
 
@@ -112,7 +120,7 @@ void TextureCubemap::SetUncompressedData
   GLenum      type,
   const void* buffer)
 {
-  glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, format, type, buffer);  
+  glTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer, mip_level, x, y, width, height, format, type, buffer);  
 }
 
 void TextureCubemap::SetCompressedData
@@ -126,5 +134,5 @@ void TextureCubemap::SetCompressedData
   size_t      buffer_size,
   const void* buffer)
 {
-  GetCaps ().glCompressedTexSubImage2D_fn (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + layer, mip_level, x, y, width, height, format, buffer_size, buffer);
+  GetCaps ().glCompressedTexSubImage2D_fn (GL_TEXTURE_CUBE_MAP_POSITIVE_X + layer, mip_level, x, y, width, height, format, buffer_size, buffer);
 }

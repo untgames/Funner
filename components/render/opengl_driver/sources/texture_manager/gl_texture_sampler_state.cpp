@@ -78,6 +78,8 @@ void SamplerState::Bind (GLenum tex_target, bool is_depth)
 
   glTexParameteri (tex_target, GL_TEXTURE_WRAP_S, impl->gl_wrap [Texcoord_U]);
   glTexParameteri (tex_target, GL_TEXTURE_WRAP_T, impl->gl_wrap [Texcoord_V]);
+  
+#ifndef OPENGL_ES_SUPPORT
 
   switch (tex_target)
   {
@@ -86,22 +88,24 @@ void SamplerState::Bind (GLenum tex_target, bool is_depth)
       glTexParameteri (tex_target, GL_TEXTURE_WRAP_R, impl->gl_wrap [Texcoord_W]);
       break;
     default:
-      break;        
-  }
+      break;
+  }  
 
   if (caps.has_sgis_texture_lod)
   {
     glTexParameterf (tex_target, GL_TEXTURE_MIN_LOD, impl->desc.min_lod);
     glTexParameterf (tex_target, GL_TEXTURE_MAX_LOD, impl->desc.max_lod);
-  }
+  }  
 
   if (is_depth && (caps.has_ext_shadow_funcs || caps.has_arb_shadow))
   {
     glTexParameteri (tex_target, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
     glTexParameteri (tex_target, GL_TEXTURE_COMPARE_FUNC, impl->gl_comparision_function);
   }
+  
+  glTexParameterfv (tex_target, GL_TEXTURE_BORDER_COLOR, (const float*)impl->desc.border_color);  
 
-  glTexParameterfv (tex_target, GL_TEXTURE_BORDER_COLOR, (const float*)impl->desc.border_color);
+#endif
 
     //проверка ошибок
 
@@ -230,11 +234,12 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
 
   for (size_t i=0; i<Texcoord_Num; i++)
   {
+#ifndef OPENGL_ES_SUPPORT
     switch (wrap [i])
     {
       case TexcoordWrap_Mirror:
         if (caps.has_arb_texture_mirrored_repeat)
-          gl_wrap [i] = GL_MIRRORED_REPEAT; 
+          gl_wrap [i] = GL_MIRRORED_REPEAT;
         else
           throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set %s=%s (GL_ARB_texture_mirrored_repeat not supported)", wrap_name [i], get_name (wrap [i]));
 
@@ -255,7 +260,23 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
       default:
         throw xtl::make_argument_exception (METHOD_NAME, wrap_name [i], wrap [i]);
     }
-  }
+#else
+    switch (wrap [i])
+    {
+      case TexcoordWrap_Clamp:
+        gl_wrap [i] = GL_CLAMP_TO_EDGE;
+        break;
+      case TexcoordWrap_Repeat:
+        gl_wrap [i] = GL_REPEAT;
+        break;
+      case TexcoordWrap_Mirror:
+      case TexcoordWrap_ClampToBorder:
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set %s=%s. Not supported", wrap_name [i], get_name (wrap [i]));        
+      default:
+        throw xtl::make_argument_exception (METHOD_NAME, wrap_name [i], wrap [i]);
+    }
+#endif
+  }  
 
   switch (in_desc.comparision_function)
   {
@@ -275,6 +296,15 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
 
   if (max_anisotropy > caps.max_anisotropy)
     max_anisotropy = caps.max_anisotropy;
+    
+#ifdef OPENGL_ES_SUPPORT
+
+  for (size_t i=0; i<4; i++)
+    if (in_desc.border_color [i] != 0.0f)
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Texture border color not supported. Must be zero (color=[%.3f %.3f %.3f %.3f])",
+        in_desc.border_color [0], in_desc.border_color [1], in_desc.border_color [2], in_desc.border_color [3]);
+
+#endif
 
     //сохранение параметров
 

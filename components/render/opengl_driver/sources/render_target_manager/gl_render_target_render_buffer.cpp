@@ -11,8 +11,21 @@ namespace
     Временное хранилище изменяемых параметров OpenGL
 */
 
-const GLenum MODE_NAMES [] = {GL_BLEND, GL_DEPTH_TEST, GL_STENCIL_TEST, GL_SCISSOR_TEST, GL_FOG, GL_TEXTURE_1D, GL_TEXTURE_2D,
-                              GL_TEXTURE_3D, GL_TEXTURE_CUBE_MAP, GL_TEXTURE_RECTANGLE_ARB};
+const GLenum MODE_NAMES [] = {
+  GL_BLEND,
+  GL_DEPTH_TEST,
+  GL_STENCIL_TEST,
+  GL_SCISSOR_TEST,
+  GL_FOG,
+  GL_TEXTURE_2D,
+#ifndef OPENGL_ES_SUPPORT
+  GL_TEXTURE_1D,
+  GL_TEXTURE_3D,
+  GL_TEXTURE_CUBE_MAP,
+  GL_TEXTURE_RECTANGLE_ARB
+#endif
+};
+                              
 const size_t MODE_NAMES_COUNT = sizeof (MODE_NAMES) / sizeof (*MODE_NAMES);
 
 struct RenderBufferTempState
@@ -255,6 +268,8 @@ GLenum get_glformat (PixelFormat format, const char* source, const char* param)
 
 }
 
+#ifndef OPENGL_ES_SUPPORT
+
 void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::RenderBuffer::SetData";
@@ -272,7 +287,7 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
     return;
 
   if (!buffer)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "buffer");      
 
     //установка буфера в контекст OpenGL
 
@@ -287,7 +302,7 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
   if (!GetCaps ().has_arb_window_pos)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can not set image at position (%u;%u) (GL_ARB_window_pos not supported)", x, y);
 
-    //установка позиции растра
+    //установка позиции растра    
 
   if      (glWindowPos2iARB) glWindowPos2iARB (x, y);
   else if (glWindowPos2i)    glWindowPos2i    (x, y);
@@ -392,10 +407,8 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
         case PixelFormat_DXT3:
         case PixelFormat_DXT5:
           throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported source_format=%s", get_name (source_format));
-          return;
         default:
           throw xtl::make_argument_exception (METHOD_NAME, "source_format", source_format);
-          return;
       }
 
       break;
@@ -405,8 +418,17 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
     //проверка состояния OpenGL
 
-  CheckErrors (METHOD_NAME);
+  CheckErrors (METHOD_NAME);  
 }
+
+#else //OPENGL_ES_SUPPORT
+
+void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer)
+{
+  throw xtl::format_not_supported_exception ("render::low_level::opengl::RenderBuffer::SetData", "RenderBuffer::SetData not supported");  
+}
+
+#endif
 
 void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer)
 {
@@ -430,6 +452,8 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
     //установка буфера в контекст OpenGL
 
   Bind ();
+  
+#ifndef OPENGL_ES_SUPPORT
 
     //настройка параметров расположения данных в буфере
 
@@ -437,6 +461,8 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
   glPixelStorei (GL_PACK_ALIGNMENT,   1); //выравнивание начала строк
   glPixelStorei (GL_PACK_SKIP_ROWS,   0); //количество пропускаемых строк
   glPixelStorei (GL_PACK_SKIP_PIXELS, 0); //количество пропускаемых пикселей
+  
+#endif
 
   switch (target_type)
   {
@@ -452,14 +478,13 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
 
       break;
     }
+#ifndef OPENGL_ES_SUPPORT
     case RenderTargetType_DepthStencil:
     {
       switch (target_format)
       {
         case PixelFormat_D16:
-      printf ("2\n");
           glReadPixels (x, y, width, height, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, buffer);
-      printf ("3\n");
           break;
         case PixelFormat_D24X8:
         {
@@ -517,15 +542,18 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
         case PixelFormat_DXT3:
         case PixelFormat_DXT5:
           throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported target_format=%s", get_name (target_format));
-          return;
         default:
           throw xtl::make_argument_exception (METHOD_NAME, "target_format", target_format);
-          return;
       }
 
       break;
     }
-    default: break;
+#else
+    case RenderTargetType_DepthStencil:
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Could not get data from depth-stencil surface (not supported)");
+#endif
+    default:
+      break;
   }
 
     //проверка состояния OpenGL

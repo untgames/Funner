@@ -16,7 +16,7 @@ const size_t COMMAND_ARRAY_RESERVE_SIZE = 16; //резервируемое число команд в буф
     Класс, вызывающий дисплейный список
 */
 
-struct DisplayListCaller: public xtl::reference_counter, public ICommandListExecuter
+/*struct DisplayListCaller: public xtl::reference_counter, public ICommandListExecuter
 {
   int display_list; //номер дисплейного списка
 
@@ -38,7 +38,7 @@ struct DisplayListCaller: public xtl::reference_counter, public ICommandListExec
 ///Подсчёт ссылок
   void AddRef () { addref (this); }
   void Release () { release (this); }
-};
+};*/
 
 }
 

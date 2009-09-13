@@ -21,7 +21,7 @@
 
 #include <render/low_level/utils.h>
 
-#include <shared/gl_entries.h>
+#include <shared/gl.h>
 #include <shared/log.h>
 #include <shared/object.h>
 #include <shared/property_list.h>

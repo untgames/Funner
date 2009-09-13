@@ -12,9 +12,8 @@
 #  endif
 #endif
 
-#include <shared/gl/gl_types.h>
-#include <shared/gl/glext.h>
-#include <shared/library.h>
+#include <shared/profile/gl/gl_types.h>
+#include <shared/profile/gl/glext.h>
 
 namespace render
 {
@@ -24,6 +23,9 @@ namespace low_level
 
 namespace opengl
 {
+
+//forward declaration
+class ILibrary;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Точки входа OpenGL
@@ -732,11 +734,6 @@ const GlEntries* get_gl_entries ();
     Переопределения расширений OpenGL
 */
 <<<GLDEFINES>>>
-
-#ifdef APIENTRY_DEFINED
-  #undef APIENTRY_DEFINED
-  #undef APIENTRY
-#endif
 
 }
 

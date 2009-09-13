@@ -3,7 +3,7 @@
 
 #include <render/low_level/driver.h>
 
-#include <shared/gl_entries.h>
+#include <shared/gl.h>
 #include <shared/extensions.h>
 #include <shared/context_caps.h>
 

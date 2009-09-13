@@ -172,18 +172,23 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
 
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
 
-  if (has_arb_texture_rectangle) glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, (GLint*)&max_rectangle_texture_size);
-  if (has_arb_texture_cube_map)  glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
-  if (has_ext_texture3d)         glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
-
   if (has_ext_texture_filter_anisotropic) glGetIntegerv (GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, (GLint*)&max_anisotropy);
   else                                    max_anisotropy = 1;
 
   if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
-  else                      texture_units_count = 1;
+  else                      texture_units_count = 1;  
+
+#ifndef OPENGL_ES_SUPPORT
+
+  if (has_arb_texture_rectangle) glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, (GLint*)&max_rectangle_texture_size);
+  if (has_arb_texture_cube_map)  glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
+  if (has_ext_texture3d)         glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
 
   glActiveTexture_fn           = glActiveTexture ? glActiveTexture : glActiveTextureARB;
   glBindBuffer_fn              = glBindBuffer ? glBindBuffer : glBindBufferARB;
+  glBlendEquation_fn           = glBlendEquation ? glBlendEquation : glBlendEquationEXT;
+  glBlendEquationSeparate_fn   = glBlendEquationSeparate ? glBlendEquationSeparate : glBlendEquationSeparateEXT;
+  glBlendFuncSeparate_fn       = glBlendFuncSeparate ? glBlendFuncSeparate : glBlendFuncSeparateEXT;
   glBufferData_fn              = glBufferData ? glBufferData : glBufferDataARB;
   glBufferSubData_fn           = glBufferSubData ? glBufferSubData : glBufferSubDataARB;
   glClientActiveTexture_fn     = glClientActiveTexture ? glClientActiveTexture : glClientActiveTextureARB;
@@ -193,6 +198,25 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   glGetBufferSubData_fn        = glGetBufferSubData ? glGetBufferSubData : glGetBufferSubDataARB;
   glGetCompressedTexImage_fn   = glGetCompressedTexImage ? glGetCompressedTexImage : glGetCompressedTexImageARB;
   glGetUniformLocation_fn      = glGetUniformLocation ? glGetUniformLocation : (PFNGLGETUNIFORMLOCATIONPROC)glGetUniformLocationARB;
+
+  glBindFramebuffer_fn                     = glBindFramebufferEXT;
+  glIsRenderbuffer_fn                      = glIsRenderbufferEXT;
+  glBindRenderbuffer_fn                    = glBindRenderbufferEXT;
+  glDeleteRenderbuffers_fn                 = glDeleteRenderbuffersEXT;
+  glGenRenderbuffers_fn                    = glGenRenderbuffersEXT;
+  glRenderbufferStorage_fn                 = glRenderbufferStorageEXT;
+  glGetRenderbufferParameteriv_fn          = glGetRenderbufferParameterivEXT;
+  glIsFramebuffer_fn                       = glIsFramebufferEXT;
+  glBindFramebuffer_fn                     = glBindFramebufferEXT;
+  glDeleteFramebuffers_fn                  = glDeleteFramebuffersEXT;
+  glGenFramebuffers_fn                     = glGenFramebuffersEXT;
+  glCheckFramebufferStatus_fn              = glCheckFramebufferStatusEXT;
+  glFramebufferRenderbuffer_fn             = glFramebufferRenderbufferEXT;
+  glFramebufferTexture1D_fn                = glFramebufferTexture1DEXT;
+  glFramebufferTexture2D_fn                = glFramebufferTexture2DEXT;
+  glFramebufferTexture3D_fn                = glFramebufferTexture3DEXT;
+  glGetFramebufferAttachmentParameteriv_fn = glGetFramebufferAttachmentParameterivEXT; 
+  
   glLoadTransposeMatrixd_fn    = glLoadTransposeMatrixd ? glLoadTransposeMatrixd : (PFNGLLOADTRANSPOSEMATRIXDPROC)glLoadTransposeMatrixdARB;
   glLoadTransposeMatrixf_fn    = glLoadTransposeMatrixf ? glLoadTransposeMatrixf : (PFNGLLOADTRANSPOSEMATRIXFPROC)glLoadTransposeMatrixfARB;
   glMultTransposeMatrixd_fn    = glMultTransposeMatrixd ? glMultTransposeMatrixd : (PFNGLMULTTRANSPOSEMATRIXDPROC)glMultTransposeMatrixdARB;
@@ -209,4 +233,36 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   glUniformMatrix3fv_fn        = glUniformMatrix3fv ? glUniformMatrix3fv : glUniformMatrix3fvARB;
   glUniformMatrix4fv_fn        = glUniformMatrix4fv ? glUniformMatrix4fv : glUniformMatrix4fvARB;
   glUseProgram_fn              = glUseProgram ? glUseProgram : (PFNGLUSEPROGRAMPROC)glUseProgramObjectARB;
+  
+#else
+
+  glActiveTexture_fn           = glActiveTexture;
+  glBindBuffer_fn              = glBindBuffer;
+  glBlendEquation_fn           = glBlendEquationOES;
+  glBlendEquationSeparate_fn   = glBlendEquationSeparateOES;
+  glBlendFuncSeparate_fn       = glBlendFuncSeparateOES;
+  glBufferData_fn              = glBufferData;
+  glBufferSubData_fn           = glBufferSubData;
+  glClientActiveTexture_fn     = glClientActiveTexture;
+  glCompressedTexSubImage2D_fn = glCompressedTexSubImage2D;
+  glDeleteBuffers_fn           = glDeleteBuffers;
+  glGenBuffers_fn              = glGenBuffers;
+  
+  glBindFramebuffer_fn                     = glBindFramebufferOES;
+  glIsRenderbuffer_fn                      = glIsRenderbufferOES;
+  glBindRenderbuffer_fn                    = glBindRenderbufferOES;
+  glDeleteRenderbuffers_fn                 = glDeleteRenderbuffersOES;
+  glGenRenderbuffers_fn                    = glGenRenderbuffersOES;
+  glRenderbufferStorage_fn                 = glRenderbufferStorageOES;
+  glGetRenderbufferParameteriv_fn          = glGetRenderbufferParameterivOES;
+  glIsFramebuffer_fn                       = glIsFramebufferOES;
+  glBindFramebuffer_fn                     = glBindFramebufferOES;
+  glDeleteFramebuffers_fn                  = glDeleteFramebuffersOES;
+  glGenFramebuffers_fn                     = glGenFramebuffersOES;
+  glCheckFramebufferStatus_fn              = glCheckFramebufferStatusOES;
+  glFramebufferRenderbuffer_fn             = glFramebufferRenderbufferOES;
+  glFramebufferTexture2D_fn                = glFramebufferTexture2DOES;
+  glGetFramebufferAttachmentParameteriv_fn = glGetFramebufferAttachmentParameterivOES;  
+
+#endif  
 }

@@ -29,6 +29,8 @@ BlendState::~BlendState ()
 namespace
 {
 
+#ifndef OPENGL_ES_SUPPORT
+
 void check_blend_operation (BlendOperation operation, const ContextCaps& caps, const char* method, const char* param)
 {
   switch (operation)
@@ -66,6 +68,44 @@ GLenum get_blend_equation (BlendOperation operation, const char* method, const c
   }
 }
 
+#else
+
+void check_blend_operation (BlendOperation operation, const ContextCaps& caps, const char* method, const char* param)
+{
+  switch (operation)
+  {
+    case BlendOperation_Add:
+      break;
+    case BlendOperation_Subtraction:
+    case BlendOperation_ReverseSubtraction:
+      if (!caps.has_ext_blend_subtract)
+        throw xtl::format_not_supported_exception (method, "Unsupported blend operation %s=%s (GL_EXT_blend_subtract not supported)", param, get_name (operation));
+
+      break;
+    case BlendOperation_Min:
+    case BlendOperation_Max:
+      throw xtl::format_not_supported_exception (method, "Unsupported blend operation %s=%s (GL_EXT_blend_minmax not supported)", param, get_name (operation));
+    default:
+      break;
+  }
+}
+
+GLenum get_blend_equation (BlendOperation operation, const char* method, const char* param)
+{
+  switch (operation)
+  {
+    case BlendOperation_Add:                return GL_FUNC_ADD_OES;
+    case BlendOperation_Subtraction:        return GL_FUNC_SUBTRACT_OES;
+    case BlendOperation_ReverseSubtraction: return GL_FUNC_REVERSE_SUBTRACT_OES;
+    case BlendOperation_Min:
+    case BlendOperation_Max:                return 0;
+    default:
+      throw xtl::make_argument_exception (method, param, operation);
+  }
+}
+
+#endif
+
 GLenum get_alpha_equivalent (GLenum color_arg)
 {
   switch (color_arg)
@@ -99,7 +139,7 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   const ContextCaps& caps = GetCaps ();
 
     //преобразование данных дескриптора
-    
+
   GLenum color_blend_equation = get_blend_equation (in_desc.blend_color_operation, METHOD_NAME, "desc.blend_color_operation"),
          alpha_blend_equation = get_blend_equation (in_desc.blend_alpha_operation, METHOD_NAME, "desc.blend_alpha_operation");
 
@@ -119,10 +159,8 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     case BlendArgument_SourceColor:
     case BlendArgument_InverseSourceColor:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.blend_color_source_argument", get_name (in_desc.blend_color_source_argument));
-      break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.blend_color_source_argument", in_desc.blend_color_source_argument);
-      break;
   }
 
   switch (in_desc.blend_color_destination_argument)
@@ -138,10 +176,8 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     case BlendArgument_DestinationColor:
     case BlendArgument_InverseDestinationColor:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.blend_color_destination_argument", get_name (in_desc.blend_color_destination_argument));
-      break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.blend_color_destination_argument", in_desc.blend_color_destination_argument);
-      break;    
   }
 
   switch (in_desc.blend_alpha_source_argument)
@@ -157,10 +193,8 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     case BlendArgument_DestinationColor:
     case BlendArgument_InverseDestinationColor:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.blend_alpha_source_argument", get_name (in_desc.blend_alpha_source_argument));
-      break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.blend_alpha_source_argument", in_desc.blend_alpha_source_argument);
-      break;
   }  
   
   switch (in_desc.blend_alpha_destination_argument)
@@ -176,10 +210,8 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
     case BlendArgument_DestinationColor:
     case BlendArgument_InverseDestinationColor:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.blend_alpha_destination_argument", get_name (in_desc.blend_alpha_destination_argument));
-      break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.blend_alpha_destination_argument", in_desc.blend_alpha_destination_argument);
-      break;    
   }
   
   if (!caps.has_arb_multisample && in_desc.sample_alpha_to_coverage) 
@@ -205,9 +237,9 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
         throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported configuration: desc.blend_color_destination_argument=%s mismatch desc.blend_alpha_destination_argument=%s (GL_EXT_blend_func_separate not supported)"
         " (GL_EXT_blend_func_separate not supported)", get_name (in_desc.blend_color_destination_argument), get_name (in_desc.blend_alpha_destination_argument));
     }
-
+    
     check_blend_operation (in_desc.blend_color_operation, caps, METHOD_NAME, "desc.blend_color_operation");
-    check_blend_operation (in_desc.blend_alpha_operation, caps, METHOD_NAME, "desc.blend_alpha_operation");
+    check_blend_operation (in_desc.blend_alpha_operation, caps, METHOD_NAME, "desc.blend_alpha_operation");    
   }
 
     //запись команд в контексте OpenGL
@@ -223,14 +255,11 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   {
     cmd_list.Add (glEnable, GL_BLEND);
 
-    if      (glBlendEquationSeparate)    cmd_list.Add (glBlendEquationSeparate, color_blend_equation, alpha_blend_equation);
-    else if (glBlendEquationSeparateEXT) cmd_list.Add (glBlendEquationSeparateEXT, color_blend_equation, alpha_blend_equation);
-    else if (glBlendEquation)            cmd_list.Add (glBlendEquation, color_blend_equation);
-    else if (glBlendEquationEXT)         cmd_list.Add (glBlendEquationEXT, color_blend_equation);
+    if      (caps.glBlendEquationSeparate_fn) cmd_list.Add (caps.glBlendEquationSeparate_fn, color_blend_equation, alpha_blend_equation);
+    else if (caps.glBlendEquation_fn)         cmd_list.Add (caps.glBlendEquation_fn, color_blend_equation);
 
-    if      (glBlendFuncSeparate)    cmd_list.Add (glBlendFuncSeparate, src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
-    else if (glBlendFuncSeparateEXT) cmd_list.Add (glBlendFuncSeparateEXT, src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
-    else                             cmd_list.Add (glBlendFunc, src_color_arg, dst_color_arg);      
+    if   (caps.glBlendFuncSeparate_fn) cmd_list.Add (caps.glBlendFuncSeparate_fn, src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
+    else                               cmd_list.Add (glBlendFunc, src_color_arg, dst_color_arg);
   }
   else
   {

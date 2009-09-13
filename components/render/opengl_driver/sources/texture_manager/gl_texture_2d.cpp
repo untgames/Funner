@@ -23,6 +23,8 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
                               get_uncompressed_gl_internal_format (tex_desc.format),
          gl_format          = get_uncompressed_gl_format (tex_desc.format),
          gl_type            = get_uncompressed_gl_type (tex_desc.format);
+         
+#ifndef OPENGL_ES_SUPPORT
 
     //проверка возможности создания текстуры
 
@@ -35,6 +37,8 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
   if (!proxy_width)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 2D texture %ux%u@%s. Reason: proxy texure fail", tex_desc.width,
     tex_desc.height, get_name (tex_desc.format));
+    
+#endif
 
       //создание mip-уровней      
       
@@ -45,8 +49,12 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
     GetMipLevelDesc (i, level_desc);
 
     glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format, level_desc.width, level_desc.height, 0, gl_format, gl_type, 0);
+    
+#ifndef OPENGL_ES_SUPPORT
 
     glGetTexLevelParameteriv (GL_TEXTURE_2D, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
+
+#endif
   }    
 
    //установка реального внутреннего формата хранения пикселей (связано с установкой сжатого формата)
@@ -96,10 +104,5 @@ void Texture2D::SetCompressedData
   size_t      buffer_size,
   const void* buffer)
 {
-  PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC glCompressedTexSubImage2D_fn = 0;
-
-  if (glCompressedTexSubImage2D) glCompressedTexSubImage2D_fn = glCompressedTexSubImage2D;
-  else                           glCompressedTexSubImage2D_fn = glCompressedTexSubImage2DARB;
-
-  glCompressedTexSubImage2D_fn (GL_TEXTURE_2D, mip_level, x, y, width, height, format, buffer_size, buffer);
+  GetCaps ().glCompressedTexSubImage2D_fn (GL_TEXTURE_2D, mip_level, x, y, width, height, format, buffer_size, buffer);
 }

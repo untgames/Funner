@@ -153,6 +153,8 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
   {
     cmd_list.Add (glEnable, GL_STENCIL_TEST);
     
+#ifndef OPENGL_ES_SUPPORT
+
     if (need_two_side_stencil)
     {
       if (caps.has_ati_separate_stencil)
@@ -188,6 +190,11 @@ void DepthStencilState::SetDesc (const DepthStencilDesc& in_desc)
 
       cmd_list.Add (glStencilOp, gl_stencil_operation [0][0], gl_stencil_operation [0][1], gl_stencil_operation [0][2]);
     }
+#else
+
+    cmd_list.Add (glStencilOp, gl_stencil_operation [0][0], gl_stencil_operation [0][1], gl_stencil_operation [0][2]);
+
+#endif    
   }
   else
   {
@@ -251,13 +258,14 @@ void DepthStencilState::Bind (size_t reference)
 
   if (desc.stencil_test_enable)
   {
+#ifndef OPENGL_ES_SUPPORT
     if (need_two_side_stencil)
     {
         //получение информации о доступных расширениях
         
       const ContextCaps& caps = GetCaps ();
 
-        //настройка функции трафарета
+        //настройка функции трафарета        
 
       if (caps.has_ati_separate_stencil)
       {
@@ -281,6 +289,7 @@ void DepthStencilState::Bind (size_t reference)
       }
     }
     else
+#endif    
     {
       glStencilFunc (gl_stencil_func [0], reference, desc.stencil_read_mask);
     }

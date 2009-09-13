@@ -1,3 +1,5 @@
+#ifndef OPENGL_ES_SUPPORT
+
 #include "shared.h"
 
 using namespace common;
@@ -76,3 +78,5 @@ void TextureNpot::SetCompressedData (size_t, size_t, size_t, size_t, size_t, siz
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::TextureNpot::SetCompressedData", "Compression for Npot textures not supported");
 }
+
+#endif

@@ -171,9 +171,13 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
       try
       {
           //добавление менеджеров шейдеров
-        
+          
+#ifndef OPENGL_ES_SUPPORT
+
         if (GetCaps ().has_arb_shading_language_100)
           RegisterManager (ShaderManagerPtr (create_glsl_shader_manager (context_manager), false));
+
+#endif
 
         RegisterManager (ShaderManagerPtr (create_fpp_shader_manager (context_manager), false));
         

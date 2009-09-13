@@ -27,11 +27,14 @@ VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, c
         gl_usage_mode = GL_DYNAMIC_DRAW;
         break;
       case UsageMode_Stream:
+#ifndef OPENGL_ES_SUPPORT      
         gl_usage_mode = GL_STREAM_DRAW;
-        break;  
+        break;                
+#else
+        throw xtl::format_not_supported_exception ("", "Usage mode UsageMode_Stream doesn't supported");
+#endif
       default:
         throw xtl::make_argument_exception ("", "desc.usage_mode", in_desc.usage_mode);
-        break;
     }
 
       //выбор текущего контекста
@@ -40,12 +43,14 @@ VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, c
     
       //получение информации о достпных расширениях
       
-    PFNGLGENBUFFERSPROC glGenBuffers_fn = glGenBuffers ? glGenBuffers : glGenBuffersARB;
-    PFNGLBINDBUFFERPROC glBindBuffer_fn = glBindBuffer ? glBindBuffer : glBindBufferARB;
-    PFNGLBUFFERDATAPROC glBufferData_fn = glBufferData ? glBufferData : glBufferDataARB;
+    const ContextCaps& caps = GetCaps ();
+      
+    PFNGLGENBUFFERSPROC glGenBuffers_fn = caps.glGenBuffers_fn;
+    PFNGLBINDBUFFERPROC glBindBuffer_fn = caps.glBindBuffer_fn;
+    PFNGLBUFFERDATAPROC glBufferData_fn = caps.glBufferData_fn;
 
       //создание буфера
-      
+
     glGenBuffers_fn (1, &buffer_id);
 
     if (!buffer_id)
@@ -68,11 +73,10 @@ VboBuffer::~VboBuffer ()
   try
   {
     MakeContextCurrent ();
-    
-    PFNGLDELETEBUFFERSPROC glDeleteBuffers_fn = glDeleteBuffers ? glDeleteBuffers : glDeleteBuffersARB;
-    
-    glDeleteBuffers_fn (1, &buffer_id);
-    CheckErrors        ("");
+
+    GetCaps ().glDeleteBuffers_fn (1, &buffer_id);
+
+    CheckErrors ("");
   }
   catch (xtl::exception& exception)
   {
@@ -96,24 +100,26 @@ VboBuffer::~VboBuffer ()
 
 void VboBuffer::SetDataCore (size_t offset, size_t size, const void* data)
 {
-  Bind ();
+  Bind ();  
   
-  PFNGLBUFFERSUBDATAPROC glBufferSubData_fn = glBufferSubData ? glBufferSubData : glBufferSubDataARB;
-  
-  glBufferSubData_fn (target, offset, size, data);
+  GetCaps ().glBufferSubData_fn (target, offset, size, data);
 
   CheckErrors ("render::low_level::opengl::VboBuffer::SetDataCore");
 }
 
 void VboBuffer::GetDataCore (size_t offset, size_t size, void* data)
 {
-  Bind ();
-  
-  PFNGLGETBUFFERSUBDATAPROC glGetBufferSubData_fn = glGetBufferSubData ? glGetBufferSubData : glGetBufferSubDataARB;  
+#ifndef OPENGL_ES_SUPPORT
 
-  glGetBufferSubData_fn (target, offset, size, data);
+  Bind ();  
+
+  GetCaps ().glGetBufferSubData_fn (target, offset, size, data);
 
   CheckErrors ("render::low_level::opengl::VboBuffer::GetDataCore");
+
+#else
+  throw xtl::format_not_supported_exception ("render::low_level::opengl::VboBuffer::GetDataCore", "glGetBufferSubData not supported");
+#endif
 }
 
 /*

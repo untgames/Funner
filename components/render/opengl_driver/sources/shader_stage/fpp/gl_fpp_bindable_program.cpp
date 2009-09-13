@@ -191,14 +191,17 @@ namespace
 {
 
 //эмул€ци€ загрузки транспонированной матрицы в контекст OpenGL
-void load_transpose_matrix (Matrix4f matrix, PFNGLLOADTRANSPOSEMATRIXFPROC fn)
+void load_transpose_matrix (Matrix4f matrix, const ContextCaps& caps)
 {
-  if (fn)
+#ifndef OPENGL_ES_SUPPORT
+  if (caps.glLoadTransposeMatrixf_fn)
   {
-    fn (&matrix [0][0]);
+    caps.glLoadTransposeMatrixf_fn (&matrix [0][0]);
     
     return;
   }
+
+#endif
   
   Matrix4f transposed_matrix;
 
@@ -231,6 +234,8 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
                current_texmaps_hash       = GetContextCacheValue (CacheEntry_FppTexmapsStateHash),
                current_modes_hash         = GetContextCacheValue (CacheEntry_FppModesStateHash);
 
+#ifndef OPENGL_ES_SUPPORT               
+               
     //отключение glsl-шейдеров  
 
   if (current_program != GetId ())
@@ -240,6 +245,8 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
     SetContextCacheValue (CacheEntry_UsedProgram, 0);
   }
+  
+#endif
 
     //извлечение параметров из кэша расположени€ параметров
     
@@ -364,14 +371,17 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
         //включение освещени€
       
       glEnable      (GL_LIGHTING);
-      glLightModeli (GL_LIGHT_MODEL_TWO_SIDE,     GL_TRUE);
-      glLightModeli (GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+      glLightModelf (GL_LIGHT_MODEL_TWO_SIDE,     1.0f);
+
+#ifndef OPENGL_ES_SUPPORT
+      glLightModelf (GL_LIGHT_MODEL_LOCAL_VIEWER, 1.0f);
+#endif
       
         //установка преобразовани€ наблюдател€
 
       glMatrixMode (GL_MODELVIEW);
 
-      load_transpose_matrix (fpp_state.viewer.view_matrix, caps.glLoadTransposeMatrixf_fn);
+      load_transpose_matrix (fpp_state.viewer.view_matrix, caps);
 
       need_update_modelview_matrix = true;
       
@@ -429,6 +439,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     }
     else
     {
+#ifndef OPENGL_ES_SUPPORT
       GLenum mode;
       
       switch (fpp_state.material.color_material)
@@ -441,8 +452,10 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
         case ColorMaterial_AmbientAndDiffuse: mode = GL_AMBIENT_AND_DIFFUSE; break;
       }
       
-      glEnable        (GL_COLOR_MATERIAL);
       glColorMaterial (GL_FRONT_AND_BACK, mode);
+#endif
+
+      glEnable (GL_COLOR_MATERIAL);
     }
 
       //включение параметров альфа-теста
@@ -537,7 +550,9 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
         //установка параметров генерации текстурных координат
 
-      load_transpose_matrix (texmap.transform, caps.glLoadTransposeMatrixf_fn);
+      load_transpose_matrix (texmap.transform, caps);
+      
+#ifndef OPENGL_ES_SUPPORT
       
       TexcoordSource source [] = {texmap.source_u, texmap.source_v, texmap.source_w};
       
@@ -568,8 +583,9 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
           default:
             break;
         }
-      }
-    }
+      }      
+#endif
+    }    
     
     SetContextCacheValue (CacheEntry_FppTexmapsStateHash, texmaps_hash);
   }
@@ -581,7 +597,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
   if (need_update_viewer)
   {    
     glMatrixMode          (GL_PROJECTION);
-    load_transpose_matrix (fpp_state.viewer.projection_matrix, caps.glLoadTransposeMatrixf_fn);
+    load_transpose_matrix (fpp_state.viewer.projection_matrix, caps);
 
     SetContextCacheValue (CacheEntry_FppViewerStateHash, viewer_hash);
 
@@ -607,7 +623,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
   if (need_update_modelview_matrix)
   {
     glMatrixMode          (GL_MODELVIEW);
-    load_transpose_matrix (view_object_matrix, caps.glLoadTransposeMatrixf_fn);
+    load_transpose_matrix (view_object_matrix, caps);
   }  
   
     //проверка ошибок

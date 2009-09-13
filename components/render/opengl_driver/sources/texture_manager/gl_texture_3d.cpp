@@ -1,3 +1,5 @@
+#ifndef OPENGL_ES_SUPPORT
+
 #include "shared.h"
 
 using namespace common;
@@ -192,3 +194,5 @@ void Texture3D::SetCompressedData (size_t, size_t, size_t, size_t, size_t, size_
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::Texture3D::SetCompressedData", "Compression for 3D textures not supported");
 }
+
+#endif
