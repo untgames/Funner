@@ -3,6 +3,8 @@
 ###################################################################################################
 TARGETS := DEMOS.RENDER2D.SHARED DEMOS.RENDER2D.TESTS
 
+#PROFILES += egl gles
+
 #Цель №1 - Общий код 2D рендера
 DEMOS.RENDER2D.SHARED.TYPE             := static-lib
 DEMOS.RENDER2D.SHARED.NAME             := funner.demos.render2d.shared
@@ -23,4 +25,5 @@ DEMOS.RENDER2D.TESTS.IMPORTS          := ../../system/link.static.mak ../../scen
                                          ../../render/scene_render/compile.static.mak ../../render/scene_render/render2d.link.static.mak \
                                          ../../render/mid_level_window_driver/link.static.mak ../../render/opengl_driver/link.static.mak \
                                          ../../media/rfx/xmtl.link.static.mak ../../render/debug_renderer_driver/link.static.mak \
-                                         ../../common/compile.static.mak ../../common/configurator.link.static.mak ../../common/wxf.link.static.mak
+                                         ../../common/compile.static.mak ../../common/configurator.link.static.mak ../../common/wxf.link.static.mak \
+                                         ../../render/opengl_driver/run.static.mak
