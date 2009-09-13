@@ -148,6 +148,8 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
 -(void) fillTouchDescriptionsBuffer:(NSSet*)touches
 {
+  CGSize window_size = self.frame.size;
+
   if ([touches count] > touch_descriptions->size ())
     touch_descriptions->resize ([touches count], false);
 
@@ -160,10 +162,10 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
             previous_location = [iter previousLocationInView:self];
 
     touch_description->touch      = (touch_t)iter;
-    touch_description->current_x  = current_location.x;
-    touch_description->current_y  = current_location.y;
-    touch_description->previous_x = previous_location.x;
-    touch_description->previous_y = previous_location.y;
+    touch_description->current_x  = current_location.x / window_size.width;
+    touch_description->current_y  = current_location.y / window_size.height;
+    touch_description->previous_x = previous_location.x / window_size.width;
+    touch_description->previous_y = previous_location.y / window_size.height;
     touch_description->tap_count  = iter.tapCount;
   }
 }
