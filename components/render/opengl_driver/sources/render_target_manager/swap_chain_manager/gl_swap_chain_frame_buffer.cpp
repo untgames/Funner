@@ -367,6 +367,7 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
       
     GLenum tex_target = texture_desc.target;
 
+#ifndef OPENGL_ES_SUPPORT    
     switch (tex_target)
     {
       case GL_TEXTURE_1D:
@@ -383,8 +384,21 @@ void SwapChainFrameBuffer::UpdateRenderTargets ()
         break;
       default:
         throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported texture target 0x%04x", tex_target);
-        break;
     }
+    
+#else
+
+    switch (tex_target)
+    {
+      case GL_TEXTURE_CUBE_MAP:
+        tex_target = GL_TEXTURE_CUBE_MAP_POSITIVE_X + view_desc.layer;
+      case GL_TEXTURE_2D:
+        glCopyTexSubImage2D (tex_target, view_desc.mip_level, x, y, x, y, width, height);
+        break;
+      default:
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported texture target 0x%04x", tex_target);
+    }
+#endif    
   }
   
     //проверка ошибок

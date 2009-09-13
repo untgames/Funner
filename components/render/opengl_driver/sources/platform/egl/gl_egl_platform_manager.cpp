@@ -50,7 +50,7 @@ class PlatformManagerImpl
         if (!adapter)
           throw xtl::format_not_supported_exception ("", "Only default adapter supported");
 
-        log.Printf ("Create primary swap chain...");        
+        log.Printf ("Create primary swap chain...");
 
           //создание цепочки обмена
 
@@ -72,7 +72,15 @@ class PlatformManagerImpl
 ///Создание контекста
     render::low_level::opengl::IContext* CreateContext (ISwapChain* swap_chain)
     {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::egl::PlatformManagerImpl::CreateContext");
+      try
+      {
+        return new Context (swap_chain);
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("render::low_level::opengl::egl::PlatformManagerImpl::CreateContext");
+        throw;
+      }
     }
 
   private:

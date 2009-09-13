@@ -106,14 +106,22 @@ struct Model
 
           memset (&desc, 0, sizeof desc);
 
-          desc.size         = ib.Size () * sizeof (size_t);
+          desc.size         = ib.Size () * sizeof (unsigned short);
           desc.usage_mode   = UsageMode_Default;
           desc.bind_flags   = BindFlag_IndexBuffer;
           desc.access_flags = AccessFlag_ReadWrite;
+          
+          stl::vector<unsigned short> index_data (ib.Size ());
+          
+          const size_t*   src_index = ib.Data ();
+          unsigned short* dst_index = &index_data [0];
+          
+          for (size_t i=0; i<ib.Size (); i++, src_index++, dst_index++)
+            *dst_index = static_cast<unsigned short> (*src_index);
 
           BufferPtr (device->CreateBuffer (desc), false).swap (ib_buffer);
 
-          ib_buffer->SetData (0, desc.size, ib.Data ());
+          ib_buffer->SetData (0, desc.size, &index_data [0]);
         }
 
         index_buffers [ib.Id ()] = ib_buffer;
@@ -311,7 +319,7 @@ struct Model
 
         layout_desc.vertex_attributes_count = vertex_attributes.size ();
         layout_desc.vertex_attributes       = &vertex_attributes [0];
-        layout_desc.index_type              = InputDataType_UInt;
+        layout_desc.index_type              = InputDataType_UShort;
         layout_desc.index_buffer_offset     = 0;
 
         model_vb->input_layout = InputLayoutPtr (device->CreateInputLayout (layout_desc), false);

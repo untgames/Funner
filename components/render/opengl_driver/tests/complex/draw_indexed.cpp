@@ -57,7 +57,7 @@ int main ()
 
     printf ("Create index buffer\n");
 
-    static size_t indices [] = {0, 1, 2};
+    static unsigned short indices [] = {0, 1, 2};
 
     BufferDesc ib_desc;
 
@@ -86,7 +86,7 @@ int main ()
 
     layout_desc.vertex_attributes_count = sizeof attributes / sizeof *attributes;
     layout_desc.vertex_attributes       = attributes;
-    layout_desc.index_type              = InputDataType_UInt;
+    layout_desc.index_type              = InputDataType_UShort;
     layout_desc.index_buffer_offset     = 0;
 
     InputLayoutPtr layout (test.device->CreateInputLayout (layout_desc), false);

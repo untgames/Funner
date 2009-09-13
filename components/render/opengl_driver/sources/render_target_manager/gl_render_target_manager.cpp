@@ -192,12 +192,8 @@ struct RenderTargetManager::Impl: public ContextObject, public RenderTargetManag
       need_update_render_targets (false)
     {
         //регистрация менеджеров буферов кадра
-        
-#ifndef OPENGL_ES_SUPPORT
 
       register_swap_chain_manager (render_target_registry, GetContextManager (), swap_chain);
-      
-#endif
 
       if (GetCaps ().has_ext_framebuffer_object)
         register_fbo_manager (render_target_registry, GetContextManager (), swap_chain);

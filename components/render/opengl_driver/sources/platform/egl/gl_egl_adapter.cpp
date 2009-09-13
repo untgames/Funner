@@ -19,18 +19,19 @@ const size_t OUTPUT_ARRAY_RESERVE = 8; //резервируемое количество устройств выво
     ќписание реализации адаптера
 */
 
-typedef stl::vector<IOutput*> OutputArray;
+typedef stl::vector<Output*> OutputArray;
 
 struct Adapter::Impl
 {
   Log         log;     //протокол работы OpenGL
   OutputArray outputs; //зарегистрированные устройства вывода
+  Library     library; //библиотека точек входа OpenGL
   
 /// онструктор
   Impl ()
   {
     outputs.reserve (OUTPUT_ARRAY_RESERVE);
-  }
+  }  
 };
 
 /*
@@ -94,21 +95,15 @@ IOutput* Adapter::GetOutput (size_t index)
     –егистраци€ устройств вывода
 */
 
-void Adapter::RegisterOutput (IOutput* output)
+void Adapter::RegisterOutput (Output* output)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::egl::Adapter::RegisterOutput";
-
   if (!output)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "output");
-
-  for (OutputArray::iterator iter=impl->outputs.begin (), end=impl->outputs.end (); iter!=end; ++iter)
-    if (*iter == output)
-      throw xtl::format_operation_exception (METHOD_NAME, "Output has already registered");
+    return;
 
   impl->outputs.push_back (output);
 }
 
-void Adapter::UnregisterOutput (IOutput* output)
+void Adapter::UnregisterOutput (Output* output)
 {
   if (!output)
     return;
@@ -117,7 +112,44 @@ void Adapter::UnregisterOutput (IOutput* output)
     if (*iter == output)
     {
       impl->outputs.erase (iter);
-      
+
       return;
     }
+}
+
+/*
+    «апрос устройства вывода
+*/
+
+Output::Pointer Adapter::GetOutput (const void* window_handle)
+{
+  try
+  {
+    if (!window_handle)
+      throw xtl::make_null_argument_exception ("", "window_handle");
+      
+      //поиск устройства вывода среди уже созданных
+      
+    for (OutputArray::iterator iter=impl->outputs.begin (), end=impl->outputs.end (); iter!=end; ++iter)
+      if ((*iter)->GetWindowHandle () == window_handle)
+        return *iter;
+
+      //создание нового устройства вывода
+
+    return Output::Pointer (new Output (this, window_handle), false);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::egl::Adapter::GetOutput");
+    throw;
+  }  
+}
+
+/*
+    Ѕиблиотека
+*/
+
+ILibrary& Adapter::GetLibrary ()
+{
+  return impl->library;
 }

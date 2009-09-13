@@ -11,7 +11,6 @@ namespace
     Константы
 */
 
-const size_t OUTPUT_MAX_NAME_SIZE  = 128; //максимальный размер имени устройства вывода
 const size_t CONFIG_MAX_ATTRIBUTES = 128; //максимальное количество атрибутов в конфигурации
 
 }
@@ -21,61 +20,29 @@ const size_t CONFIG_MAX_ATTRIBUTES = 128; //максимальное количество атрибутов в 
 */
 
 typedef xtl::com_ptr<Adapter> AdapterPtr;
+typedef Output::Pointer       OutputPtr;
 
 struct PrimarySwapChain::Impl
 {
-  AdapterPtr        adapter;                     //адаптер, которому принадлежит устройство
-  Log               log;                         //протокол
-  NativeWindowType  native_window;               //окно
-  NativeDisplayType native_display;              //целевое платформо-зависимое устройство вывода
-  EGLDisplay        egl_display;                 //целевое устройство вывода
-  EGLConfig         egl_config;                  //целевая конфигурация
-  EGLSurface        egl_surface;                 //целевая поверхность отрисовки
-  char              name [OUTPUT_MAX_NAME_SIZE]; //имя цепочки обмена
-  SwapChainDesc     desc;                        //дескриптор цепочки обмена
-  PropertyList      properties;                  //свойства цепочки обмена
+  AdapterPtr    adapter;     //адаптер, которому принадлежит устройство
+  OutputPtr     output;      //целевое устройство вывода
+  Log           log;         //протокол
+  EGLDisplay    egl_display; //целевое устройство вывода
+  EGLConfig     egl_config;  //целевая конфигурация
+  EGLSurface    egl_surface; //целевая поверхность отрисовки
+  SwapChainDesc desc;        //дескриптор цепочки обмена
+  PropertyList  properties;  //свойства цепочки обмена
 
 ///Конструктор
   Impl (Adapter* in_adapter, const SwapChainDesc& in_desc)
     : adapter (in_adapter)
-    , native_window (0)
-    , native_display (0)
-    , egl_display (0)
+    , output (adapter->GetOutput (in_desc.window_handle))
+    , egl_display (output->GetEglDisplay ())
     , egl_config (0)
     , egl_surface (0)    
   {
-    *name = 0;    
-    
-    bool egl_initialized = false;
-
     try
     {
-        //платформо-зависимая инициализация
-      
-      PlatformInitialize (in_desc);
-      
-        //создание дисплея
-        
-      log.Printf ("...create display");
-        
-      egl_display = eglGetDisplay (native_display);
-      
-      if (!egl_display)
-        log.Printf ("...using default display");
-        
-        //инициализация EGL
-        
-      log.Printf ("...initialize EGL");            
-      
-      EGLint major_version = 0, minor_version = 0;
-      
-      if (!eglInitialize (egl_display, &major_version, &minor_version))
-        raise_error ("::eglInitialize");
-        
-      egl_initialized = true;
-
-      log.Printf ("...EGL intialized successfull (version %d.%d)", major_version, minor_version);      
-      
         //выбор конфигурации
 
       EGLint config_attributes [CONFIG_MAX_ATTRIBUTES], *attr = config_attributes;
@@ -86,14 +53,11 @@ struct PrimarySwapChain::Impl
       *attr++ = in_desc.frame_buffer.alpha_bits;      
       *attr++ = EGL_DEPTH_SIZE;
       *attr++ = in_desc.frame_buffer.depth_bits;
-      *attr++ = EGL_STENCIL_SIZE;
-      *attr++ = in_desc.frame_buffer.stencil_bits;
+//      *attr++ = EGL_STENCIL_SIZE; //for tests only!!!!!!!
+//      *attr++ = in_desc.frame_buffer.stencil_bits;
       *attr++ = EGL_SAMPLES;
       *attr++ = in_desc.samples_count;
       
-      if (in_desc.buffers_count > 1 || !in_desc.buffers_count)
-        throw xtl::format_not_supported_exception ("", "desc.buffers_count=%u not supported", in_desc.buffers_count);
-
       switch (in_desc.swap_method)
       {
         case SwapMethod_Discard:
@@ -126,7 +90,7 @@ struct PrimarySwapChain::Impl
         
         //создание поверхности отрисовки
 
-      egl_surface = eglCreateWindowSurface (egl_display, egl_config, native_window, 0);
+      egl_surface = eglCreateWindowSurface (egl_display, egl_config, (NativeWindowType)output->GetWindowHandle (), 0);
       
       if (!egl_surface)
         raise_error ("::eglCreateWindowSurface");
@@ -142,8 +106,8 @@ struct PrimarySwapChain::Impl
       desc.frame_buffer.depth_bits   = GetConfigAttribute (EGL_DEPTH_SIZE);
       desc.frame_buffer.stencil_bits = GetConfigAttribute (EGL_STENCIL_SIZE);
       desc.samples_count             = GetConfigAttribute (EGL_SAMPLES);
+      desc.buffers_count             = 1;
       desc.fullscreen                = false;
-      desc.vsync                     = false;
       
         //установка свойств цепочки обмена
         
@@ -157,11 +121,6 @@ struct PrimarySwapChain::Impl
       if (egl_surface)
         eglDestroySurface (egl_display, egl_surface);
 
-      if (egl_initialized)
-        eglTerminate (egl_display);
-
-      PlatformDone ();
-      
       throw;
     }
   }
@@ -169,16 +128,7 @@ struct PrimarySwapChain::Impl
 ///Деструктор
   ~Impl ()
   {
-    try
-    {
-      eglDestroySurface (egl_display, egl_surface);
-      eglTerminate (egl_display);
-
-      PlatformDone ();
-    }
-    catch (...)
-    {
-    }
+    eglDestroySurface (egl_display, egl_surface);
   }
   
 ///Получение атрибута
@@ -213,52 +163,6 @@ struct PrimarySwapChain::Impl
       
     return value;
   }
-
-#ifdef _WIN32
-
-///Платформо-зависимая инициализация
-  void PlatformInitialize (const SwapChainDesc& in_desc)
-  {
-    try
-    {
-      native_window = (HWND)in_desc.window_handle;
-      
-      if (!native_window)
-        throw xtl::make_null_argument_exception ("", "desc.window_handle");
-
-      log.Printf ("...get device context");
-
-      native_display = ::GetDC (native_window);      
-
-      if (!native_display)
-        throw xtl::format_operation_exception ("::GetDC", "Operation failed"); //сделать через raise_error!!!
-
-      log.Printf ("...get window name");
-
-      if (!GetWindowTextA (native_window, name, sizeof (name)))
-        throw xtl::format_operation_exception ("::GetWindowTextA", "Operation failed"); //сделать через raise_error!!!
-    }
-    catch (xtl::exception& exception)
-    {
-      exception.touch ("render::low_level::opengl::egl::Adapter::Impl::PlatformInitializeWin32");
-      throw;
-    }
-  }
-  
-///Платформо-зависимое освобождение ресурсов
-  void PlatformDone ()
-  {    
-    if (native_display && native_window)
-    {
-      log.Printf ("...release device context");
-      
-      ::ReleaseDC (native_window, native_display);
-    }
-  }
-
-#else
-  #error Unknown platform!
-#endif
 };
 
 /*
@@ -272,10 +176,8 @@ PrimarySwapChain::PrimarySwapChain (Adapter* adapter, const SwapChainDesc& desc)
     if (!adapter)
       throw xtl::make_null_argument_exception ("", "adapter");
     
-    impl = new Impl (adapter, desc);
-        
-    adapter->RegisterOutput (this);
-    
+    impl = new Impl (adapter, desc);        
+
     impl->log.Printf ("...swap chain successfully created");
   }
   catch (xtl::exception& exception)
@@ -287,58 +189,6 @@ PrimarySwapChain::PrimarySwapChain (Adapter* adapter, const SwapChainDesc& desc)
 
 PrimarySwapChain::~PrimarySwapChain ()
 {
-  impl->adapter->UnregisterOutput (this);
-}
-
-/*
-    Получение имени
-*/
-
-const char* PrimarySwapChain::GetName ()
-{
-  return impl->name;
-}
-
-/*
-    Получение списка видео-режимов
-*/
-
-size_t PrimarySwapChain::GetModesCount ()
-{
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::egl::PrimarySwapChain::GetModesCount");
-}
-
-void PrimarySwapChain::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
-{
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::egl::PrimarySwapChain::GetModeDesc");
-}
-
-/*
-    Установка текущего видео-режима
-*/
-
-void PrimarySwapChain::SetCurrentMode (const OutputModeDesc&)
-{
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::egl::PrimarySwapChain::SetCurrentMode");
-}
-
-void PrimarySwapChain::GetCurrentMode (OutputModeDesc&)
-{
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::egl::PrimarySwapChain::GetCurrentMode");
-}
-
-/*
-    Управление гамма-коррекцией
-*/
-
-void PrimarySwapChain::SetGammaRamp (const Color3f table [256])
-{
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::egl::PrimarySwapChain::SetGammaRamp");
-}
-
-void PrimarySwapChain::GetGammaRamp (Color3f table [256])
-{
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::egl::PrimarySwapChain::GetGammaRamp");
 }
 
 /*
@@ -365,7 +215,7 @@ void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
 
 IOutput* PrimarySwapChain::GetContainingOutput ()
 {
-  return this;
+  return impl->output.get ();
 }
 
 /*
@@ -388,7 +238,16 @@ bool PrimarySwapChain::GetFullscreenState ()
 
 void PrimarySwapChain::Present ()
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::egl::PrimarySwapChain::Present");
+  try
+  {
+    if (!eglSwapBuffers (impl->egl_display, impl->egl_surface))
+      raise_error ("::eglSwapBuffers");
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::egl::PrimarySwapChain::Present");
+    throw;
+  }
 }
 
 /*
@@ -398,4 +257,23 @@ void PrimarySwapChain::Present ()
 IPropertyList* PrimarySwapChain::GetProperties ()
 {
   return &impl->properties;
+}
+
+/*
+    Получение EGL параметров цепочки обмена
+*/
+
+EGLDisplay PrimarySwapChain::GetEglDisplay ()
+{
+  return impl->output->GetEglDisplay ();
+}
+
+EGLConfig PrimarySwapChain::GetEglConfig ()
+{
+  return impl->egl_config;
+}
+
+EGLSurface PrimarySwapChain::GetEglSurface ()
+{
+  return impl->egl_surface;
 }

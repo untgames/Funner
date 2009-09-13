@@ -3,7 +3,7 @@
 ###################################################################################################
 TARGETS := RENDER.OPENGL_DRIVER.UTILS RENDER.OPENGL_DRIVER.SOURCES RENDER.OPENGL_DRIVER.TESTS
 
-PROFILES += egl gles
+#PROFILES += egl gles
 
 #OpenGL render system utilities
 RENDER.OPENGL_DRIVER.UTILS.TYPE             := test-suite
@@ -32,7 +32,8 @@ RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            := sources/common \
                                                        sources/shader_stage \
                                                        sources/shader_stage/fpp \
                                                        sources/output_stage \
-                                                       sources/query_manager
+                                                       sources/query_manager \
+                                                       sources/render_target_manager/swap_chain_manager
 RENDER.OPENGL_DRIVER.SOURCES.LIB_DIRS               :=  
 RENDER.OPENGL_DRIVER.SOURCES.LIBS                   := 
 RENDER.OPENGL_DRIVER.SOURCES.COMPILER_DEFINES       :=
@@ -45,7 +46,7 @@ RENDER.OPENGL_DRIVER.SOURCES.egl.IMPORTS           := ../../../extern/gles_win32
 
 ifeq (,$(filter gles,$(PROFILES)))
 
-RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS        += sources/render_target_manager/swap_chain_manager \
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS        +=  \
                                                    sources/shader_stage/glsl
 RENDER.OPENGL_DRIVER.SOURCES.win32.SOURCE_DIRS  := sources/platform/win32
 RENDER.OPENGL_DRIVER.SOURCES.macosx.SOURCE_DIRS := sources/platform/macosx

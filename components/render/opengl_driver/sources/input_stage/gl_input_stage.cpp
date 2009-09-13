@@ -156,7 +156,11 @@ struct InputStage::Impl: public ContextObject
       
       memset (&default_layout_desc, 0 , sizeof default_layout_desc);
 
+#ifndef OPENGL_ES_SUPPORT
       default_layout_desc.index_type = InputDataType_UInt;
+#else
+      default_layout_desc.index_type = InputDataType_UShort;
+#endif
 
       default_layout = InputLayoutPtr (new InputLayout (GetContextManager (), default_layout_desc, texture_units_count), false);
       

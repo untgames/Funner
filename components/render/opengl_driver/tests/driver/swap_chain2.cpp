@@ -37,6 +37,11 @@ void dump (ISwapChain& swap_chain)
   
   printf ("    VSync:         %s\n", desc.vsync ? "enable" : "disable");
   printf ("    FullScreen:    %s\n", desc.fullscreen ? "enable" : "disable");
+  
+  IPropertyList* properties = swap_chain.GetProperties ();        
+
+  for (size_t j=0; j<properties->GetSize (); j++)
+    printf ("      %s: '%s'\n", properties->GetKey (j), properties->GetValue (j));  
 }
 
 int main ()
@@ -109,14 +114,10 @@ int main ()
 
       for (size_t j=0; j<adapter->GetOutputsCount (); j++)
       {
-        IOutput*       output     = adapter->GetOutput (j);
-        IPropertyList* properties = output->GetProperties ();
+        IOutput* output = adapter->GetOutput (j);
 
         printf ("    output #%u:\n", j);
-        printf ("      name: '%s'\n", output->GetName ());
-
-        for (size_t j=0; j<properties->GetSize (); j++)
-          printf ("      %s: '%s'\n", properties->GetKey (j), properties->GetValue (j));
+        printf ("      name: '%s'\n", output->GetName ());        
       }
     }    
   }

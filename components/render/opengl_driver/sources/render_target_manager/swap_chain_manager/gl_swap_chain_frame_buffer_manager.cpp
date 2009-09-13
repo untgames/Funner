@@ -292,18 +292,20 @@ void SwapChainFrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum
 
   MakeContextCurrent ();
 
-    //установка буфера кадра по умолчанию
+    //установка буфера кадра по умолчанию    
 
   if (GetCaps ().has_ext_framebuffer_object && current_fbo)
-    glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+    GetCaps ().glBindFramebuffer_fn (GL_FRAMEBUFFER, 0);
 
     //установка текущего буфера чтения и отрисовки
-
+    
+#ifndef OPENGL_ES_SUPPORT
   if (current_buffer_type != buffer_type)
   {
     glDrawBuffer (buffer_type);
     glReadBuffer (buffer_type);
   }
+#endif
 
     //проверка ошибок
 
