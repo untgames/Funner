@@ -29,12 +29,12 @@ typedef xtl::com_ptr<ICustomWindowSystem> CustomWindowSystemPtr;
 class WindowSystemManagerImpl
 {
   public:
-    typedef WindowSystemManager::WindowSystemCreater WindowSystemCreater;
+    typedef WindowSystemManager::WindowSystemCreator WindowSystemCreator;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация оконных систем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterWindowSystem       (const char* profile, const WindowSystemCreater& creater);
+    void RegisterWindowSystem       (const char* profile, const WindowSystemCreator& creator);
     void UnregisterWindowSystem     (const char* profile);
     void UnregisterAllWindowSystems ();
 
@@ -53,7 +53,7 @@ class WindowSystemManagerImpl
   private:
     typedef xtl::com_ptr<IApplicationServer>                                ApplicationServerPtr;
     typedef stl::hash_map<stl::hash_key<const char*>, ApplicationServerPtr> ApplicationServerMap;
-    typedef stl::hash_map<stl::hash_key<const char*>, WindowSystemCreater>  WindowSystemMap;
+    typedef stl::hash_map<stl::hash_key<const char*>, WindowSystemCreator>  WindowSystemMap;
 
   private:
     ApplicationServerPtr GetApplicationServer (const char* server_name);

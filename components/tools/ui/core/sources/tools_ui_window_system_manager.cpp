@@ -19,7 +19,7 @@ const char* APPLICATION_SERVER_COMPONENTS_MASK = "tools.ui.applications.*";  //м
 */
 
 //регистрация оконной системы  
-void WindowSystemManagerImpl::RegisterWindowSystem (const char* profile, const WindowSystemCreater& creater)
+void WindowSystemManagerImpl::RegisterWindowSystem (const char* profile, const WindowSystemCreator& creator)
 {
   static const char* METHOD_NAME = "tools::ui::WindowSystemManagerImpl::RegisterWindowSystem";
   
@@ -31,7 +31,7 @@ void WindowSystemManagerImpl::RegisterWindowSystem (const char* profile, const W
   if (iter != windows_systems.end ())
     throw xtl::make_argument_exception (METHOD_NAME, "profile", profile, "Profile already registered");
     
-  windows_systems.insert_pair (profile, creater);      
+  windows_systems.insert_pair (profile, creator);      
 }
 
 //отмена регистрации оконной системы с указанным именем
@@ -145,9 +145,9 @@ CustomWindowSystemPtr WindowSystemManagerImpl::CreateWindowSystem (const char* a
     WindowSystemManager
 */
 
-void WindowSystemManager::RegisterWindowSystem (const char* profile, const WindowSystemCreater& creater)
+void WindowSystemManager::RegisterWindowSystem (const char* profile, const WindowSystemCreator& creator)
 {
-  WindowSystemManagerSingleton::Instance ().RegisterWindowSystem (profile, creater);
+  WindowSystemManagerSingleton::Instance ().RegisterWindowSystem (profile, creator);
 }
 
 void WindowSystemManager::UnregisterWindowSystem (const char* profile)
