@@ -54,6 +54,10 @@
 #  include "config-macosx.h"
 #endif
 
+#ifdef __linux__
+#include "config-linux.h"
+#endif
+
 #ifdef __AMIGA__
 #include "amigaos.h"
 #endif

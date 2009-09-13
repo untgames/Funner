@@ -16,6 +16,10 @@ include $(TOOLSETS_DIR)/g++.mak
 #Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
 #список подключаемых символов линковки, флаги линковки)
 ###################################################################################################
+define tools.link.dll
+-shared -Wl,-undefined -Wl,error
+endef
+
 define tools.link
-$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(patsubst %,-L"%",$3) $5 $(patsubst lib%.a,-l %,$(filter lib%.a,$2) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $(patsubst %,-u %,$4))
+$(call tools.g++.link,$1,$2,$3,$4,$5,$6,$7,$8,$9) $(if $(filter %$(DLL_SUFFIX),$1), && cp $1 $(DIST_LIB_DIR) && mv $(DIST_LIB_DIR)/$(notdir $1) $(DIST_LIB_DIR)/$(LIB_PREFIX)$(notdir $1))
 endef
