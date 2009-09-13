@@ -17,6 +17,7 @@ using namespace common;
 SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manager, RenderTargetType target_type, ISwapChain* in_swap_chain)
   : RenderBuffer (manager->GetContextManager (), target_type)
   , frame_buffer_manager (manager)
+  , swap_chain (in_swap_chain)
   , frame_buffer_id (0)
   , frame_buffer_cache_id (GetId ())
 {
@@ -31,7 +32,7 @@ SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manag
       frame_buffer_id = swap_chain_frame_buffer->GetFrameBufferId ();
 
     if (Object* object = dynamic_cast<Object*> (in_swap_chain))
-      frame_buffer_cache_id = object->GetId ();    
+      frame_buffer_cache_id = object->GetId ();
   }
   catch (xtl::exception& exception)
   {
@@ -43,6 +44,7 @@ SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manag
 SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manager, ISwapChain* in_swap_chain, const TextureDesc& desc)
   : RenderBuffer (manager->GetContextManager (), desc)
   , frame_buffer_manager (manager)
+  , swap_chain (in_swap_chain)
   , frame_buffer_id (0)
   , frame_buffer_cache_id (GetId ())  
 {

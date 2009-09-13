@@ -267,13 +267,13 @@ IFrameBuffer* SwapChainFrameBufferManager::CreateFrameBuffer (View* color_view, 
 
 void SwapChainFrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type, size_t frame_buffer_id, size_t cache_id)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::SwapChainFrameBufferManager::SetFrameBuffer";
-  
+  static const char* METHOD_NAME = "render::low_level::opengl::SwapChainFrameBufferManager::SetFrameBuffer";  
+
   if (!swap_chain)
   {
     buffer_type = GL_NONE;
     swap_chain  = default_swap_chain.get ();
-  }
+  }  
 
     //установка активной цепочки обмена
 
@@ -321,7 +321,7 @@ void SwapChainFrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum
   CheckErrors (METHOD_NAME);
 
     //установка значений кэш-переменных  
-    
+
   SetContextCacheValue (CacheEntry_BufferAttachment, buffer_type);
   SetContextCacheValue (CacheEntry_FrameBufferId,    cache_id);
 }
