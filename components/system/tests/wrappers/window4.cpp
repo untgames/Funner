@@ -1,5 +1,10 @@
 #include "shared.h"
 
+void destroy (Window&, WindowEvent, const WindowEventContext&)
+{
+  Application::Exit (0);
+}
+
 const char* get_name (syslib::WindowStyle style)
 {
   switch (style)
@@ -39,6 +44,12 @@ int main ()
     printf ("setted\n");
 
     print_window_info (window);
+    
+    auto_connection connection = window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
+    
+    window.Close ();    
+    
+    Application::Run ();
 
     return Application::GetExitCode ();
   }

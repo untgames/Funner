@@ -60,3 +60,15 @@ void Platform::WaitMessage ()
 void Platform::UpdateMessageQueue ()
 {
 }
+
+/*
+    Запуск приложения
+*/
+
+void Platform::RunLoop (IRunLoopContext* context)
+{
+  if (!context)
+    throw xtl::make_null_argument_exception ("syslib::Win32Platform::RunLoop", "context");
+
+  context->DoCustomRunLoop ();
+}

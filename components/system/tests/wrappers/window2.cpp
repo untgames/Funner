@@ -17,8 +17,6 @@ int main ()
 
     window.SetPosition (0, 0);
 
-    auto_connection connection4 = window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
-
     printf ("title: '%s'\n", window.Title ());
     printf ("is_active: %d\n", window.IsActive ());
     printf ("position: x=%lu y=%lu\n", window.Position ().x, window.Position ().y);
@@ -36,9 +34,9 @@ int main ()
     printf ("after deactivate\n");
     printf ("is_active: %d\n", window.IsActive ());
 
-    window.Close ();
+    auto_connection connection = window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
 
-    Timer timer (xtl::bind (&Window::Close, &window), 1000);
+    window.Close ();
 
     Application::Run ();
 

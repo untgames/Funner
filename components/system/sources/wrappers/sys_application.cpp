@@ -39,13 +39,30 @@ struct or_signal_accumulator
   }
 };
 
+/*
+    јккумул€тор сигнала do-events
+*/
+
+struct do_events_accumulator
+{
+  typedef void result_type;
+  
+  template <class InIter> void operator () (InIter first, InIter last) const
+  {
+    if (first == last)
+      return;
+
+    *--last;
+  }
+};
+
 }
 
 /*
     ќписание реализации приложени€
 */
 
-class ApplicationImpl
+class ApplicationImpl: private IRunLoopContext
 {
   public:
     ApplicationImpl ();
@@ -54,7 +71,6 @@ class ApplicationImpl
 ///ќбработка сообщений в очереди сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void DoEvents ();
-    void CancelSystemEventsProcess () { cancel_system_events_process = true; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///«апуск обработки очереди сообщений
@@ -75,25 +91,34 @@ class ApplicationImpl
     connection RegisterSuspendHandler (const Application::SuspendHandler& handler);
 
   private:
+    typedef xtl::signal<void ()>                        ApplicationSignal;
+    typedef xtl::signal<bool (), or_signal_accumulator> SuspendSignal;
+    typedef xtl::signal<void (), do_events_accumulator> DoEventsSignal;  
+  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќповещение о возникновении событи€
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Notify (ApplicationEvent);
+    void Notify (ApplicationSignal&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///«асыпание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Suspend ();
 
-  private:
-    typedef xtl::signal<void ()>                        ApplicationSignal;
-    typedef xtl::signal<bool (), or_signal_accumulator> SuspendSignal;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ќболочки над стандартными вызовами обработки главного цикла приложени€
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void DoCustomRunLoop (); //может быть не вызван, если платформа сама монопольно управл€ет главным циклом (например, iPhone)
+    void OnExit          (int code);
+    void OnIdle          ();
 
-    ApplicationSignal  signals [ApplicationEvent_Num]; //сигналы приложени€
+  private:
+    ApplicationSignal  idle_signal;                    //сигнал обработки событи€ ApplicationEvent_OnIdle
+    ApplicationSignal  exit_signal;                    //сигнал обработки событи€ ApplicationEvent_OnIdle    
+    DoEventsSignal     do_events_signal;               //сигнал обработки событи€ ApplicationEvent_DoEvents
     SuspendSignal      suspend_handler;                //сигнал проверки наличи€ необработанных сообщений
     int                exit_code;                      //код завершени€ приложени€
     bool               is_exit_detected;               //получен сигнал завершени€ приложени€
-    bool               cancel_system_events_process;   //отмена обработки системных событий
     size_t             message_loop_count;             //количество вхождений в обработчик очереди сообщений
 };
 
@@ -105,10 +130,9 @@ typedef Singleton<ApplicationImpl> ApplicationSingleton;
 
 ApplicationImpl::ApplicationImpl ()
 {
-  exit_code                    = 0;
-  message_loop_count           = false;
-  is_exit_detected             = false;
-  cancel_system_events_process = false;
+  exit_code          = 0;
+  message_loop_count = false;
+  is_exit_detected   = false;
 }
 
 /*
@@ -123,7 +147,7 @@ void ApplicationImpl::Exit (int code)
   is_exit_detected = true;
   exit_code        = code;
 
-  Notify (ApplicationEvent_OnExit);
+  Notify (exit_signal);
 }
 
 /*
@@ -154,25 +178,30 @@ void ApplicationImpl::DoEvents ()
 {
   MessageLoopScope scope (message_loop_count);
 
-  cancel_system_events_process = false;
-
-  try
+  if (do_events_signal.empty ())
   {
-    signals [ApplicationEvent_OnDoEvents] ();
+    if (!is_exit_detected)
+    {
+      while (!Platform::IsMessageQueueEmpty () && !is_exit_detected)
+        Platform::DoNextEvent ();
+    }    
   }
-  catch (...)
+  else
   {
-    //подавление всех исключений
-  }
-
-  if (!cancel_system_events_process && !is_exit_detected)
-  {
-    while (!Platform::IsMessageQueueEmpty () && !is_exit_detected)
-      Platform::DoNextEvent ();
+    do_events_signal (); //исключени€ не блокируютс€
   }
 }
 
 void ApplicationImpl::Run ()
+{
+  Platform::RunLoop (this);
+}
+
+/*
+    ќболочки над стандартными вызовами обработки главного цикла приложени€
+*/
+
+void ApplicationImpl::DoCustomRunLoop ()
 {
   MessageLoopScope scope (message_loop_count);
 
@@ -184,16 +213,26 @@ void ApplicationImpl::Run ()
 
      //если нет обработчиков OnIdle - приостанавливаем приложение
 
-    if (signals [ApplicationEvent_OnIdle].empty ())
+    if (idle_signal.empty ())
     {
       if (!is_exit_detected && Platform::IsMessageQueueEmpty ())
         Suspend ();
     }
     else
     {
-      Notify (ApplicationEvent_OnIdle);
+      Notify (idle_signal);
     }
   }
+}
+
+void ApplicationImpl::OnExit (int code)
+{
+  Exit (code);
+}
+
+void ApplicationImpl::OnIdle ()
+{
+  Notify (idle_signal);
 }
 
 /*
@@ -202,10 +241,14 @@ void ApplicationImpl::Run ()
 
 connection ApplicationImpl::RegisterEventHandler (ApplicationEvent event, const Application::EventHandler& handler)
 {
-  if (event < 0 || event >= ApplicationEvent_Num)
-    throw xtl::make_argument_exception ("syslib::Application::RegisterEventHandler", "event", event);
-
-  return signals [event].connect (handler);
+  switch (event)
+  {
+    case ApplicationEvent_OnExit:     return exit_signal.connect (handler);
+    case ApplicationEvent_OnIdle:     return idle_signal.connect (handler);
+    case ApplicationEvent_OnDoEvents: return do_events_signal.connect (handler);
+    default:
+      throw xtl::make_argument_exception ("syslib::Application::RegisterEventHandler", "event", event);
+  }
 }
 
 connection ApplicationImpl::RegisterSuspendHandler (const Application::SuspendHandler& handler)
@@ -217,9 +260,16 @@ connection ApplicationImpl::RegisterSuspendHandler (const Application::SuspendHa
     ќповещение о событи€х приложени€
 */
 
-void ApplicationImpl::Notify (ApplicationEvent event)
+void ApplicationImpl::Notify (ApplicationSignal& signal)
 {
-  signals [event] ();
+  try
+  {
+    signal ();
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
 }
 
 /*
@@ -229,11 +279,6 @@ void ApplicationImpl::Notify (ApplicationEvent event)
 void Application::DoEvents ()
 {
   ApplicationSingleton::Instance ()->DoEvents ();
-}
-
-void Application::CancelSystemEventsProcess ()
-{
-  ApplicationSingleton::Instance ()->CancelSystemEventsProcess ();
 }
 
 void Application::Run ()
