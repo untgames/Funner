@@ -158,15 +158,12 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
   for (UITouch *iter = [enumerator nextObject]; iter; iter = [enumerator nextObject], touch_description++)
   {
-    CGPoint current_location  = [iter locationInView:self],
-            previous_location = [iter previousLocationInView:self];
+    CGPoint current_location  = [iter locationInView:self];
 
-    touch_description->touch      = (touch_t)iter;
-    touch_description->current_x  = current_location.x / window_size.width;
-    touch_description->current_y  = current_location.y / window_size.height;
-    touch_description->previous_x = previous_location.x / window_size.width;
-    touch_description->previous_y = previous_location.y / window_size.height;
-    touch_description->tap_count  = iter.tapCount;
+    touch_description->touch     = (touch_t)iter;
+    touch_description->x         = current_location.x / window_size.width;
+    touch_description->y         = current_location.y / window_size.height;
+    touch_description->tap_count = iter.tapCount;
   }
 }
 
@@ -199,6 +196,8 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
   [self touchesEnded:touches withEvent:event];
 }
 
+#ifdef __IPHONE_3_0
+
 -(void) motionBegan:(UIEventSubtype)motion withEvent:(UIEvent*)event
 {
   if (motion != UIEventSubtypeMotionShake)
@@ -221,6 +220,8 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 {
   [self motionEnded:motion withEvent:event];
 }
+
+#endif
 
 /*
    Добавление/удаление подписчиков
