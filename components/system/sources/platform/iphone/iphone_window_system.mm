@@ -480,12 +480,13 @@ syslib::Point Platform::GetCursorPosition (window_t)
 
 void Platform::SetCursorVisible (window_t, bool state)
 {
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetCursorPosition", "No cursor for iPhone platform");
+  if (state)
+    throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetCursorPosition", "No cursor for iPhone platform");
 }
 
 bool Platform::GetCursorVisible (window_t)
 {
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::GetCursorPosition", "No cursor for iPhone platform");
+  return false;
 }
 
 namespace syslib
