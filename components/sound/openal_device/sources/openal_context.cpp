@@ -139,7 +139,11 @@ bool OpenALContext::MakeCurrent ()
   if (IsCurrent ())
     return true;
 
-  if (!alcMakeContextCurrent (context))
+  ALCboolean status = alcMakeContextCurrent (context);
+
+  ContextCheckErrors ("alcMakeContextCurrent");
+
+  if (!status)
   {
     log.Printf ("Error at alcMakeContextCurrent(%p). %s", context, get_alc_error_message (alcGetError (device)));
     return false;

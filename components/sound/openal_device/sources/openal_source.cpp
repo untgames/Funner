@@ -412,7 +412,22 @@ void OpenALSource::BufferUpdate ()
     if (is_playing != is_active)
     {
       if (is_playing) Activate   ();
-      else            Deactivate ();
+      else                                      //проигрывание завершено
+      {
+        context.alSourceStop (al_source);
+
+        ALint  queued_buffers_count = 0;
+        ALuint queued_buffers [SOURCE_BUFFERS_COUNT];
+
+        context.alGetSourcei (al_source, AL_BUFFERS_QUEUED, &queued_buffers_count);
+
+        if (queued_buffers_count)
+          context.alSourceUnqueueBuffers (al_source, queued_buffers_count, queued_buffers);
+
+        Deactivate ();
+
+        return;
+      }
     }
 
       //обновление буферов
@@ -440,9 +455,8 @@ void OpenALSource::BufferUpdate ()
       if (is_playing)
       {
         FillBuffers  ();
-        alSourcePlay (al_source);
+        context.alSourcePlay (al_source);
       }
-      else alSourceStop (al_source);
     }
     else FillBuffers ();
   }
