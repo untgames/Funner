@@ -2,6 +2,14 @@
 #Сборка под MacOS X g++
 ###################################################################################################
 
+ifndef MACOSX_SDK_PATH
+  $(error "Environment variable 'MACOSX_SDK_PATH' not found (use macosx-version.g++ toolset)")
+endif
+
+ifndef MACOSX_VERSION
+  $(error "Environment variable 'MACOSX_VERSION' not found (use macosx-version.g++ toolset)")
+endif
+
 ###################################################################################################
 #Константы
 ###################################################################################################
@@ -12,10 +20,8 @@ DLL_LIB_SUFFIX := .dylib
 PROFILES += macosx macosx_desktop unistd carbon has_windows haswchar
 DLL_PATH := DYLD_LIBRARY_PATH
 
-MACOSX_SDK_PATH := /Developer/SDKs/MacOSX10.4u.sdk
-
-COMMON_CFLAGS     += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=10.4
-COMMON_LINK_FLAGS += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=10.4
+COMMON_CFLAGS     += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION)
+COMMON_LINK_FLAGS += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION)
 
 include $(TOOLSETS_DIR)/g++.mak
 
