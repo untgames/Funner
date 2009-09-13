@@ -10,9 +10,12 @@
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/connection.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/ref.h>
 #include <xtl/reference_counter.h>
+#include <xtl/signal.h>
 
 #include <common/component.h>
 #include <common/log.h>
@@ -21,6 +24,7 @@
 #include <common/strlib.h>
 
 #include <engine/attachments.h>
+#include <engine/config.h>
 #include <engine/subsystem_manager.h>
 
 namespace engine

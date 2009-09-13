@@ -1,0 +1,24 @@
+Results of config_test:
+Enumerating variables
+Variables enumerated
+Var2 value is 'Var2_Value'
+Evaluating string 'Var1={Var1}, Var3={Var3} end{}': 'Var1=Var1_Value, Var3=Var3_Value end'
+Evaluating string '{Var1}-Var1, unknown var = {unknown var}, Var3={Var3}': 'Var1_Value-Var1, unknown var = {unknown var}, Var3=Var3_Value'
+Evaluating string 'ComplexVar = {ComplexVar}': 'ComplexVar = ComplexVar_Value&Var1_Value'
+Enumerating all variables
+enumerate_handler called for var 'Var1' with value 'Var1_Value'
+enumerate_handler called for var 'Var2' with value 'Var2_Value'
+enumerate_handler called for var 'Var3' with value 'Var3_Value'
+enumerate_handler called for var 'MegaVar1' with value 'MegaVar1_Value'
+enumerate_handler called for var 'ComplexVar' with value 'ComplexVar_Value&{Var1}'
+Enumerating *Mega* variables
+enumerate_handler called for var 'MegaVar1' with value 'MegaVar1_Value'
+Done
+Enumerating all variables
+enumerate_handler called for var 'MegaVar1' with value 'MegaVar1_Value'
+enumerate_handler called for var 'ComplexVar' with value 'ComplexVar_Value&{Var1}'
+Done
+save_handler called
+exception: Can't eval string '{RecursiveVar3}', exception: 'Can't resolve recursive var 'RecursiveVar3'
+    at engine::Config::Impl::ResolveVar'
+    at engine::Config::Eval
