@@ -26,6 +26,7 @@ class OggInputStream : public media::ISoundInputStream, public xtl::reference_co
 
     common::InputFile file;
     OggVorbis_File    vf;
+    size_t            channels_count;
 };
 
 /*
@@ -56,7 +57,7 @@ void log_exception (const char* source)
   get_log ().Printf ("Unknown exception at %s", source);
 }
 
-size_t OggReadFunc (void* data, size_t size, size_t count, void* file_ptr)
+size_t ogg_read_func (void* data, size_t size, size_t count, void* file_ptr)
 {
   size_t ret_value = 0;
 
@@ -69,17 +70,17 @@ size_t OggReadFunc (void* data, size_t size, size_t count, void* file_ptr)
   }
   catch (std::exception& exception)
   {
-    log_exception ("::OggReadFunc", exception);
+    log_exception ("::ogg_read_func", exception);
   }
   catch (...)
   {
-    log_exception ("::OggReadFunc");
+    log_exception ("::ogg_read_func");
   }
 
   return ret_value / size;
 }
 
-int OggSeekFunc (void* file_ptr, ogg_int64_t offset, int origin)
+int ogg_seek_func (void* file_ptr, ogg_int64_t offset, int origin)
 {
   FileSeekMode seek_mode[3] = {FileSeekMode_Set, FileSeekMode_Current, FileSeekMode_End};
 
@@ -98,16 +99,16 @@ int OggSeekFunc (void* file_ptr, ogg_int64_t offset, int origin)
   }
   catch (std::exception& exception)
   {
-    log_exception ("::OggSeekFunc", exception);
+    log_exception ("::ogg_seek_func", exception);
   }
   catch (...)
   {
-    log_exception ("::OggSeekFunc");
+    log_exception ("::ogg_seek_func");
   }
   return 1;
 }
 
-long OggTellFunc (void *file_ptr)
+long ogg_tell_func (void *file_ptr)
 {
   try
   {
@@ -115,51 +116,83 @@ long OggTellFunc (void *file_ptr)
   }
   catch (std::exception& exception)
   {
-    log_exception ("::OggTellFunc", exception);
+    log_exception ("::ogg_tell_func", exception);
   }
   catch (...)
   {
-    log_exception ("::OggTellFunc");
+    log_exception ("::ogg_tell_func");
   }
 
   return 0;
 }
 
-void SwapSamples (short &s1, short &s2)
+void swap_samples (short &sample1, short &sample2)
 {
-  short sTemp = s1;
-  s1 = s2;
-  s2 = sTemp;
+  short temp = sample1;
+
+  sample1 = sample2;
+  sample2 = temp;
+}
+
+const char* get_vorbis_file_error_name (int error_code)
+{
+  switch (error_code)
+  {
+    case OV_EREAD:      return "Read error while fetching compressed data for decode";
+    case OV_EFAULT:     return "Internal inconsistency in decode state";
+    case OV_EIMPL:      return "Feature not implemented";
+    case OV_EINVAL:     return "Either an invalid argument, or incompletely initialized argument";
+    case OV_ENOTVORBIS: return "The given file/data was not recognized as Ogg Vorbis data";
+    case OV_EBADHEADER: return "The file/data is apparently an Ogg Vorbis stream, but contains a corrupted or undecipherable header";
+    case OV_EVERSION:   return "The bitstream format revision of the given stream is not supported";
+    case OV_EBADLINK:   return "The given link exists in the Vorbis data stream, but is not decipherable due to garbacge or corruption";
+    case OV_ENOSEEK:    return "The given stream is not seekable";
+    default:            return "Unknown error";
+  }
+}
+
+void check_vorbis_file_error (int error_code, const char* source, const char* message)
+{
+  if (error_code)
+    throw xtl::format_operation_exception (source, "%s. Vorbis file error: %s (code %d)", message,
+                                           get_vorbis_file_error_name (error_code), error_code);
 }
 
 OggInputStream::OggInputStream (const char* file_name, SoundSampleInfo& sound_sample_info)
   : file (file_name)
 {
-  ov_callbacks callbacks = {OggReadFunc, OggSeekFunc, 0, OggTellFunc};
-  int          ret_code;
+  static const char* METHOD_NAME = "media::sound::OggInputStream::OggInputStream";
 
-  ret_code = ov_open_callbacks (&file, &vf, NULL, 0, callbacks);
+  ov_callbacks callbacks = {ogg_read_func, ogg_seek_func, 0, ogg_tell_func};
 
-  if (ret_code < 0)
-    throw xtl::format_operation_exception ("OggCodec::OggCodec", "Can't open ogg file, seems to be not ogg bitstream (return code %d)", ret_code);
+  check_vorbis_file_error (ov_open_callbacks (&file, &vf, NULL, 0, callbacks), METHOD_NAME, "Can't open vorbis file, error at ::ov_open_callbacks");
 
   vorbis_info *vi = ov_info (&vf, -1);
+
+  if (!vi)
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't get vorbis file info, error at ::ov_info");
+
   sound_sample_info.frequency       = vi->rate;
-  sound_sample_info.channels        = vi->channels;
-  sound_sample_info.samples_count   = (size_t) ov_pcm_total (&vf, -1);
+  sound_sample_info.channels        = channels_count = vi->channels;
   sound_sample_info.bits_per_sample = 16;
+
+  ogg_int64_t samples_count = ov_pcm_total (&vf, -1);
+
+  if (samples_count == OV_EINVAL)
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't get samples count, the requested bitstream did not exist or the bitstream is unseekable");
+
+  sound_sample_info.samples_count = samples_count;
 }
 
 size_t OggInputStream::Read (size_t first_sample, size_t samples_count, void* data)
 {
-  size_t ret_value;
+  static const char* METHOD_NAME = "media::sound::OggInputStream::Read";
 
-  vorbis_info* vi = ov_info (&vf, -1);
-  size_t       decoded_bytes = 0, readed_bytes;
-  int          current_section;
-  size_t       buffer_size = samples_count * 2 * vi->channels;
+  size_t ret_value, readed_bytes, decoded_bytes = 0, buffer_size = samples_count * 2 * channels_count;
+  int    current_section;
 
-  ov_pcm_seek (&vf, first_sample);
+  if (first_sample != ov_pcm_tell (&vf))
+    check_vorbis_file_error (ov_pcm_seek (&vf, first_sample), METHOD_NAME, "Can't seek in vorbis file, error at ::ov_pcm_seek");
 
   while (1)
   {
@@ -171,23 +204,27 @@ size_t OggInputStream::Read (size_t first_sample, size_t samples_count, void* da
         break;
     }
     else
-      break;
-  }
-
-  if (vi->channels == 6)
-  {
-    short* pSamples = (short*)data;
-    for (size_t ulSamples = 0; ulSamples < (buffer_size>>1); ulSamples+=6)
     {
-      // WAVEFORMATEXTENSIBLE Order : FL, FR, FC, LFE, RL, RR
-      // OggVorbis Order            : FL, FC, FR,  RL, RR, LFE
-      SwapSamples(pSamples[ulSamples+1], pSamples[ulSamples+2]);
-      SwapSamples(pSamples[ulSamples+3], pSamples[ulSamples+5]);
-      SwapSamples(pSamples[ulSamples+4], pSamples[ulSamples+5]);
+      check_vorbis_file_error (readed_bytes, METHOD_NAME, "Can't read data from vorbis file, error at ::ov_read");
+      break;
     }
   }
 
-  ret_value = decoded_bytes / (2 * vi->channels);
+  if (channels_count == 6)
+  {
+    short* samples = (short*)data;
+
+    for (size_t current_sample = 0; current_sample < (buffer_size >> 1); current_sample += 6)
+    {
+      // WAVEFORMATEXTENSIBLE Order : FL, FR, FC, LFE, RL, RR
+      // OggVorbis Order            : FL, FC, FR,  RL, RR, LFE
+      swap_samples (samples [current_sample + 1], samples [current_sample + 2]);
+      swap_samples (samples [current_sample + 3], samples [current_sample + 5]);
+      swap_samples (samples [current_sample + 4], samples [current_sample + 5]);
+    }
+  }
+
+  ret_value = decoded_bytes / (2 * channels_count);
 
   return ret_value;
 }
