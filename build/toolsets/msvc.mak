@@ -47,7 +47,7 @@ endif
 MSVC_PATH          := $(call convert_path,$(MSVC_PATH))
 MSVC_BIN_PATH      := $(MSVC_PATH)/bin
 MSVS_COMMON_PATH   := $(call convert_path,$(MSVS_COMMON_PATH))
-COMMON_CFLAGS      += -W3 -Ox -wd4996 $(if $(analyze),-analyze) -nologo -FC -MT
+COMMON_CFLAGS      += -W3 -Ox -wd4996 $(if $(analyze),-analyze) -nologo -FC
 FRAMEWORK_DIR      := ${SYSTEMROOT}/Microsoft.NET/Framework/v2.0.50727
 VALID_TARGET_TYPES += cs-dynamic-lib cs-application
 
@@ -83,7 +83,7 @@ export LIB
 #список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
 ###################################################################################################
 define tools.c++compile
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/cl" -c -Fo"$4\\" $(patsubst %,-I"%",$2) $(patsubst %,-FI"%",$3) $(COMMON_CFLAGS) $6 $(if $(filter -clr,$6),$(foreach dir,$8 $(DIST_BIN_DIR),-AI $(dir)),-EHsc)  $(patsubst %,-D%,$5) $1 $(if $7,-FI"$7" -Yc"$7" -Fp"$4\\")
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/cl" -c -Fo"$4\\" $(patsubst %,-I"%",$2) $(patsubst %,-FI"%",$3) $(COMMON_CFLAGS) $6 $(if $(filter -clr,$6),$(foreach dir,$8 $(DIST_BIN_DIR),-AI $(dir)) -MD,-EHsc -MT)  $(patsubst %,-D%,$5) $1 $(if $7,-FI"$7" -Yc"$7" -Fp"$4\\")
 endef
 
 ###################################################################################################
