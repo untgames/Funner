@@ -51,10 +51,6 @@ class ApplicationModelWrapper
         //обработка событий Windows Forms
       
       System::Windows::Forms::Application::DoEvents ();
-
-        //обработка системных событий уже выполнена в System::Windows::Forms::Application::DoEvents      
-
-      syslib::Application::CancelSystemEventsProcess ();
     }
 
     static void RegisterWrapper (bool state)

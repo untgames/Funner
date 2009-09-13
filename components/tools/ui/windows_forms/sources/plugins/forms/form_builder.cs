@@ -407,13 +407,13 @@ namespace tools.ui.windows_forms
     private string ParseComboBox(XmlNode node, StringWriter writer)
     {
       throw new NotImplementedException();
-      string name = "combobox" + ControlIndex.ToString("D");
+/*      string name = "combobox" + ControlIndex.ToString("D");
       CodeSnippets.Common.Instantiate(writer, name, "ComboBox");
       CodeSnippets.Layout.Suspend(writer, name);
       ParseAttributes(node, writer, name);
       CodeSnippets.Common.Bind(node, writer, name, "Variable", "CheckedChanged", "CheckBox", "Checked");
       CodeSnippets.Layout.Resume(writer, name);
-      return name;
+      return name;*/
     }
     // radiobutton item
     private string ParseRadioButton(XmlNode node, StringWriter writer)
