@@ -10,16 +10,25 @@ namespace
 
 const size_t MESSAGE_BUFFER_SIZE = 64;
 const double DEFAULT_ACCELEROMETER_UPDATE_INTERVAL = 1.f / 30.f;
+const float  MAXIMUM_ACCELEROMETER_UPDATE_INTERVAL = 1000.f;
+const float  EPSILON                               = 0.01f;
 
-const char* TOUCH_NAME             = "Touch";
+const char* TOUCH_NAME = "Touch";
 
 const char* ACCELEROMETER_UPDATE_INTERVAL = "AccelerometerUpdateInterval";
+const char* MULTITOUCH_ENABLED            = "MultitouchEnabled";
 
 const char* PROPERTIES [] = {
-  ACCELEROMETER_UPDATE_INTERVAL
+  ACCELEROMETER_UPDATE_INTERVAL,
+  MULTITOUCH_ENABLED
 };
 
 const size_t PROPERTIES_COUNT = sizeof (PROPERTIES) / sizeof (*PROPERTIES);
+
+bool float_compare (float value1, float value2)
+{
+  return (value1 > (value2 - EPSILON)) && (value1 < (value2 + EPSILON));
+}
 
 }
 
@@ -203,24 +212,42 @@ const char* Device::GetProperties ()
 
 void Device::SetProperty (const char* name, float value)
 {
+  static const char* METHOD_NAME = "input::low_level::window::Device::SetProperty";
+
   if (!xtl::xstrcmp (ACCELEROMETER_UPDATE_INTERVAL, name))
   {
-    impl->accelerometer_update_interval = value;
+    detach_application_listener (impl);
 
-    set_accelerometer_update_interval (impl->accelerometer_update_interval);
+    if (value < MAXIMUM_ACCELEROMETER_UPDATE_INTERVAL)
+    {
+      attach_application_listener (impl);
 
-    return;
+      impl->accelerometer_update_interval = value;
+
+      set_accelerometer_update_interval (impl->accelerometer_update_interval);
+    }
   }
-
-  throw xtl::make_argument_exception ("input::low_level::window::Device::SetProperty", "name", name);
+  else if (!xtl::xstrcmp (MULTITOUCH_ENABLED, name))
+  {
+    if (float_compare (value, 0.f))
+      set_multitouch_enabled (*impl->window, false);
+    else if (float_compare (value, 1.f))
+      set_multitouch_enabled (*impl->window, true);
+    else
+      throw xtl::format_operation_exception (METHOD_NAME, "Set only 0 or 1 for property '%s'", MULTITOUCH_ENABLED);
+  }
+  else
+    throw xtl::make_argument_exception (METHOD_NAME, "name", name);
 }
 
 float Device::GetProperty (const char* name)
 {
   if (!xtl::xstrcmp (ACCELEROMETER_UPDATE_INTERVAL, name))
     return impl->accelerometer_update_interval;
-
-  throw xtl::make_argument_exception ("input::low_level::window::Device::GetProperty", "name", name);
+  else if (!xtl::xstrcmp (MULTITOUCH_ENABLED, name))
+    return get_multitouch_enabled (*impl->window) ? 1.f : 0.f;
+  else
+    throw xtl::make_argument_exception ("input::low_level::window::Device::GetProperty", "name", name);
 }
 
 /*
