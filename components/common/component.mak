@@ -5,16 +5,17 @@ TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SY
   COMMON.UTILS.FILE_CRYPTER
 
 #Цель - CommonLib sources
-COMMON.SOURCES.TYPE             := static-lib
-COMMON.SOURCES.NAME             := funner.common
-COMMON.SOURCES.INCLUDE_DIRS     := include ../xtl/include ../../extern/pcre/include sources
-COMMON.SOURCES.SOURCE_DIRS      := sources/file_system/core sources/streams sources/hash sources/crypto/core sources/memory \
-                                   sources/parselib/tree sources/parselib/manager sources/strlib sources/utils sources/log \
-                                   sources/var_registry sources/platform/default
-COMMON.SOURCES.COMPILER_DEFINES   := PCRE_STATIC
-COMMON.SOURCES.unistd.SOURCE_DIRS := sources/platform/unistd
-COMMON.SOURCES.macosx.SOURCE_DIRS := sources/platform/macosx
-COMMON.SOURCES.win32.SOURCE_DIRS  := sources/platform/win32
+COMMON.SOURCES.TYPE                              := static-lib
+COMMON.SOURCES.NAME                              := funner.common
+COMMON.SOURCES.INCLUDE_DIRS                      := include ../xtl/include ../../extern/pcre/include sources
+COMMON.SOURCES.SOURCE_DIRS                       := sources/file_system/core sources/streams sources/hash sources/crypto/core sources/memory \
+                                                    sources/parselib/tree sources/parselib/manager sources/strlib sources/utils sources/log \
+                                                    sources/var_registry sources/platform/default
+COMMON.SOURCES.COMPILER_DEFINES                  := PCRE_STATIC
+COMMON.SOURCES.iphone_simulator.COMPILER_DEFINES := __IPHONE__
+COMMON.SOURCES.unistd.SOURCE_DIRS                := sources/platform/unistd
+COMMON.SOURCES.macosx.SOURCE_DIRS                := sources/platform/macosx
+COMMON.SOURCES.win32.SOURCE_DIRS                 := sources/platform/win32
 
 #Цель - WxfParser
 COMMON.WXF_PARSER.TYPE             := static-lib

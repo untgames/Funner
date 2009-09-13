@@ -12,4 +12,3 @@ EXTERN.ZZIP.IMPORTS                    := compile.dynamic.mak ../zlib/compile.st
 EXTERN.ZZIP.msvc.COMPILER_CFLAGS       :=  -wd4244                        #Флаги сборки (зависят от конфигурации)
 EXTERN.ZZIP.msvc.COMPILER_DEFINES      := _CRT_SECURE_NO_DEPRECATE        #Определения сборки
 EXTERN.ZZIP.g++.COMPILER_CFLAGS        := --no-warn                       #Флаги сборки (зависят от конфигурации)
-EXTERN.ZZIP.mingw.g++.COMPILER_DEFINES := ZZIP_2_H
