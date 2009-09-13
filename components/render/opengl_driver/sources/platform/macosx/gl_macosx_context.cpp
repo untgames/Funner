@@ -163,13 +163,15 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
       impl->swap_chain = swap_chain;
     }
 
+    if (Impl::current_context)
+      Impl::current_context->LostCurrentNotify ();
+
+    Impl::current_context = 0;
+
       //установка текущего контекста
 
     if (!aglSetCurrentContext (impl->context))
       raise_agl_error ("::aglSetCurrentContext");
-
-    if (Impl::current_context)
-      Impl::current_context->LostCurrentNotify ();
 
     Impl::current_context = impl.get ();
 
