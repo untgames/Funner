@@ -71,7 +71,7 @@ template <class Slot, class Args> class signal_invoke_iterator
     {
       slot_type* old_slot = slot;    
 
-      do slot = slot->prev (); while (slot->slot_type::blocked () && slot != end);
+      do slot = slot->previos (); while (slot->slot_type::blocked () && slot != end);
 
       slot->lock ();
       old_slot->unlock ();
