@@ -4,26 +4,27 @@
 TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS
 
 #Öåëü ¹1 - System library sources
-SYSTEMLIB.SOURCES.TYPE                    := static-lib
-SYSTEMLIB.SOURCES.NAME                    := funner.system
-SYSTEMLIB.SOURCES.INCLUDE_DIRS            := sources
-SYSTEMLIB.SOURCES.SOURCE_DIRS             := sources/wrappers
-SYSTEMLIB.SOURCES.IMPORTS                 := compile.static.mak
-SYSTEMLIB.SOURCES.win32.SOURCE_DIRS       := sources/platform/win32
-SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS      := sources/platform/pthread sources/platform/unistd
-SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS    := -wd4355
-SYSTEMLIB.SOURCES.no_windows.SOURCE_DIRS  := sources/platform/no_windows
-SYSTEMLIB.SOURCES.carbon.SOURCE_DIRS      := sources/platform/carbon
-SYSTEMLIB.SOURCES.carbon.COMPILER_DEFINES := NO_PTHREAD_SEMAPHORES
-SYSTEMLIB.SOURCES.x11.SOURCE_DIRS         := sources/platform/x11
+SYSTEMLIB.SOURCES.TYPE                              := static-lib
+SYSTEMLIB.SOURCES.NAME                              := funner.system
+SYSTEMLIB.SOURCES.INCLUDE_DIRS                      := sources
+SYSTEMLIB.SOURCES.SOURCE_DIRS                       := sources/wrappers
+SYSTEMLIB.SOURCES.IMPORTS                           := compile.static.mak
+SYSTEMLIB.SOURCES.win32.SOURCE_DIRS                 := sources/platform/win32
+SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS                := sources/platform/pthread sources/platform/unistd
+SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS              := -wd4355
+SYSTEMLIB.SOURCES.no_windows.SOURCE_DIRS            := sources/platform/no_windows
+SYSTEMLIB.SOURCES.carbon.SOURCE_DIRS                := sources/platform/carbon
+SYSTEMLIB.SOURCES.carbon.COMPILER_DEFINES           := NO_PTHREAD_SEMAPHORES
+SYSTEMLIB.SOURCES.carbon.COMPILER_CFLAGS            := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/Carbon.framework/Frameworks/HIToolbox.framework/Headers/ \
+                                                       -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/
+SYSTEMLIB.SOURCES.iphone.SOURCE_DIRS                := sources/platform/iphone
+SYSTEMLIB.SOURCES.iphone.COMPILER_DEFINES           := NO_PTHREAD_SEMAPHORES
+SYSTEMLIB.SOURCES.iphone.COMPILER_CFLAGS            := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers/ \
+                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/Foundation.framework/Headers/ \
+                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/UIKit.framework/Headers/
+SYSTEMLIB.SOURCES.x11.SOURCE_DIRS                   := sources/platform/x11
 
 #Öåëü ¹2 - System library tests
 SYSTEMLIB.TESTS.TYPE             := test-suite
-SYSTEMLIB.TESTS.INCLUDE_DIRS     :=
 SYSTEMLIB.TESTS.SOURCE_DIRS      := tests/wrappers tests/thread
-SYSTEMLIB.TESTS.LIB_DIRS         :=
-SYSTEMLIB.TESTS.EXECTUTION_DIR   :=
-SYSTEMLIB.TESTS.LIBS             :=
-SYSTEMLIB.TESTS.COMPILER_CFLAGS  :=
-SYSTEMLIB.TESTS.COMPILER_DEFINES :=
 SYSTEMLIB.TESTS.IMPORTS          := compile.static.mak link.static.mak

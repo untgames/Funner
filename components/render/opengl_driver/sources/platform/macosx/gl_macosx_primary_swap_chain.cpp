@@ -1,3 +1,11 @@
+#if ! defined (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) || (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 1040)
+  #error "__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ not defined or less then 1040"
+#endif
+
+#if (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 1050)
+  #define MACOSX_10_5_SUPPORTED
+#endif
+
 #include "shared.h"
 
 using namespace render::low_level;
@@ -81,8 +89,10 @@ struct PrimarySwapChain::Impl
     if (in_desc.fullscreen && containing_output)
     {
       *attr++ = AGL_FULLSCREEN;
+#ifdef AGL_DISPLAY_MASK  //MacOSX 10.5 и старше
       *attr++ = AGL_DISPLAY_MASK;
       *attr++ = CGDisplayIDToOpenGLDisplayMask (containing_output->GetDisplayID ());
+#endif
     }
 
     if (in_desc.samples_count)
@@ -406,8 +416,13 @@ void PrimarySwapChain::SetContext (AGLContext context)
     }
     else
     {
+#ifdef MACOSX_10_5_SUPPORTED
       if (!aglSetWindowRef (context, (WindowRef)impl->desc.window_handle))
         raise_agl_error ("::aglSetWindowRef");
+#else
+      if (!aglSetDrawable (context, GetWindowPort ((WindowRef)impl->desc.window_handle)))
+        raise_agl_error ("::aglSetDrawable");
+#endif
 
       aglUpdateContext (context);
     }

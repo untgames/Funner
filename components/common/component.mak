@@ -12,7 +12,7 @@ COMMON.SOURCES.SOURCE_DIRS                       := sources/file_system/core sou
                                                     sources/parselib/tree sources/parselib/manager sources/strlib sources/utils sources/log \
                                                     sources/var_registry sources/platform/default
 COMMON.SOURCES.COMPILER_DEFINES                  := PCRE_STATIC
-COMMON.SOURCES.iphone_simulator.COMPILER_DEFINES := __IPHONE__
+COMMON.SOURCES.iphone.COMPILER_DEFINES           := __IPHONE__
 COMMON.SOURCES.unistd.SOURCE_DIRS                := sources/platform/unistd
 COMMON.SOURCES.carbon.SOURCE_DIRS                := sources/platform/carbon
 COMMON.SOURCES.carbon.COMPILER_CFLAGS            := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers

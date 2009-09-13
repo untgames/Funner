@@ -1,3 +1,11 @@
+#if ! defined (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) || (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 1040)
+  #error "__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ not defined or less then 1040"
+#endif
+
+#if (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 1050)
+  #define MACOSX_10_5_SUPPORTED
+#endif
+
 #include "shared.h"
 
 using namespace syslib;
@@ -307,12 +315,16 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             window_impl->Notify (window_handle, WindowEvent_OnSize, context);
             window_impl->Notify (window_handle, WindowEvent_OnMove, context);
             break;
+#ifdef MACOSX_10_5_SUPPORTED
           case kEventWindowFocusRestored:
+#endif
           case kEventWindowFocusAcquired: //окно получило фокус
             window_impl->Notify (window_handle, WindowEvent_OnSetFocus, context);
             break;
           case kEventWindowFocusRelinquish:
+#ifdef MACOSX_10_5_SUPPORTED
           case kEventWindowFocusLost:       //окно потеряло фокус
+#endif
             window_impl->Notify (window_handle, WindowEvent_OnLostFocus, context);
             break;
           default:
@@ -446,7 +458,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
               break;
 
             if (!Platform::GetCursorVisible (window_handle) && !window_impl->is_cursor_in_window) //если курсор невидим - прячем его при входе в окно
-              HideCursor ();
+              check_quartz_error (CGDisplayHideCursor (kCGDirectMainDisplay), "::CGDisplayHideCursor", "Can't hide cursor");
 
             window_impl->is_cursor_in_window = true;
 
@@ -559,7 +571,7 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
           window_impl->Notify (window_handle, WindowEvent_OnMouseLeave, context);
 
           if (!Platform::GetCursorVisible (window_handle)) //если курсор невидим - показываем его при выходе из окна
-            ShowCursor ();
+            CGDisplayShowCursor (kCGDirectMainDisplay);
         }
 
         break;
@@ -647,8 +659,10 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
         { kEventClassWindow,    kEventWindowBoundsChanged },
         { kEventClassWindow,    kEventWindowFocusAcquired },
         { kEventClassWindow,    kEventWindowFocusRelinquish },
+#ifdef MACOSX_10_5_SUPPORTED
         { kEventClassWindow,    kEventWindowFocusLost },
         { kEventClassWindow,    kEventWindowFocusRestored },
+#endif
         { kEventClassKeyboard,  kEventRawKeyDown },
         { kEventClassKeyboard,  kEventRawKeyRepeat },
         { kEventClassKeyboard,  kEventRawKeyUp },
@@ -1043,16 +1057,24 @@ syslib::Point Platform::GetCursorPosition (window_t handle)
 
 void Platform::SetCursorVisible (window_t handle, bool state)
 {
-  if (is_cursor_in_client_region ((WindowRef)handle))
+  try
   {
-    if (state)
-      ShowCursor ();
-    else
-      HideCursor ();
-  }
+    if (is_cursor_in_client_region ((WindowRef)handle))
+    {
+      if (state)
+        check_quartz_error (CGDisplayShowCursor (kCGDirectMainDisplay), "::CGDisplayShowCursor", "Can't show cursor");
+      else
+        check_quartz_error (CGDisplayHideCursor (kCGDirectMainDisplay), "::CGDisplayHideCursor", "Can't hide cursor");
+    }
 
-  check_window_manager_error (SetWindowProperty ((WindowRef)handle, WINDOW_PROPERTY_CREATOR, CURSOR_VISIBLE_PROPERTY_TAG,
-                              sizeof (state), &state), "::SetWindowProperty", "Can't set window property");
+    check_window_manager_error (SetWindowProperty ((WindowRef)handle, WINDOW_PROPERTY_CREATOR, CURSOR_VISIBLE_PROPERTY_TAG,
+        sizeof (state), &state), "::SetWindowProperty", "Can't set window property");
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::CarbonPlatform::SetCursorVisible");
+    throw;
+  }
 }
 
 bool Platform::GetCursorVisible (window_t handle)

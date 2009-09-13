@@ -104,7 +104,7 @@ Platform::timer_t Platform::CreateTimer (size_t period_in_milliseconds, TimerHan
 void Platform::KillTimer (timer_t handle)
 {
   if (!handle)
-    throw xtl::make_null_argument_exception ("syslib::Platform::KillTimer", "handle");
+    throw xtl::make_null_argument_exception ("syslib::CarbonPlatform::KillTimer", "handle");
 
   CarbonTimer* timer = (CarbonTimer*)handle;
 
