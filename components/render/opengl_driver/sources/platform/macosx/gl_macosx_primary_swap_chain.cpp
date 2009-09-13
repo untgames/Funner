@@ -27,21 +27,23 @@ typedef xtl::com_ptr<Adapter> AdapterPtr;
 
 struct PrimarySwapChain::Impl
 {
-  Log             log;                       //протокол
-  AdapterPtr      adapter;                   //адаптер цепочки обмена
-  SwapChainDesc   desc;                      //дескриптор цепочки обмена
-  AGLPixelFormat  pixel_format;              //формат пикселей
-  OutputManager   output_manager;            //менеджер устройств вывода
-  AGLContext      context;                   //установленный контекст
-  Output*         containing_output;         //дисплей, на котором производится рендеринг
-  EventHandlerRef window_event_handler;      //обработчик событий окна
-  EventHandlerUPP window_event_handler_proc; //обработчик событий окна
-  size_t          window_width;              //ширина окна
-  size_t          window_height;             //высота окна
+  Log                       log;                       //протокол
+  AdapterPtr                adapter;                   //адаптер цепочки обмена
+  SwapChainDesc             desc;                      //дескриптор цепочки обмена
+  AGLPixelFormat            pixel_format;              //формат пикселей
+  OutputManager             output_manager;            //менеджер устройств вывода
+  AGLContext                context;                   //установленный контекст
+  Output*                   containing_output;         //дисплей, на котором производится рендеринг
+  EventHandlerRef           window_event_handler;      //обработчик событий окна
+  EventHandlerUPP           window_event_handler_proc; //обработчик событий окна
+  size_t                    window_width;              //ширина окна
+  size_t                    window_height;             //высота окна
+  xtl::trackable::slot_type on_destroy_context;        //обработчик удаления контекста
 
 ///Конструктор
   Impl (const SwapChainDesc& in_desc, Adapter* in_adapter)
-    : adapter (in_adapter), pixel_format (0), context (0), window_event_handler (0), window_event_handler_proc (0)
+    : adapter (in_adapter), pixel_format (0), context (0), window_event_handler (0), window_event_handler_proc (0),
+      on_destroy_context (xtl::bind (&Impl::OnDestroyContext, this))
   {
       //проверка корректности аргументов
 
@@ -217,6 +219,12 @@ struct PrimarySwapChain::Impl
     log.Printf ("...release resources");
   }
 
+  ///Обработчик удаления контекста
+  void OnDestroyContext ()
+  {
+    context = 0;
+  }
+
   ///Обмен текущего заднего буфера и переднего буфера
   void Present ()
   {
@@ -385,15 +393,16 @@ bool PrimarySwapChain::GetFullscreenState ()
    Получение/установка контекста
 */
 
-void PrimarySwapChain::SetContext (AGLContext context)
+void PrimarySwapChain::SetContext (Context* context)
 {
-  if (impl->context == context)
+  AGLContext new_context = context->GetAGLContext ();
+
+  if (impl->context == new_context)
     return;
 
-  impl->context = context;
+  impl->context = new_context;
 
-  if (!context)
-    return;
+  context->RegisterDestroyHandler (impl->on_destroy_context);
 
   try
   {
@@ -401,7 +410,7 @@ void PrimarySwapChain::SetContext (AGLContext context)
 
     GLint swap_interval = impl->desc.vsync ? 1 : 0;
 
-    if (!aglSetInteger (context, AGL_SWAP_INTERVAL, &swap_interval))
+    if (!aglSetInteger (new_context, AGL_SWAP_INTERVAL, &swap_interval))
       raise_agl_error ("::aglSetInteger");
 
       //установка fullscreen
@@ -411,20 +420,20 @@ void PrimarySwapChain::SetContext (AGLContext context)
 
     if (impl->desc.fullscreen)
     {
-      if (!aglSetFullScreen (context, impl->window_width, impl->window_height, 0, 0))
+      if (!aglSetFullScreen (new_context, impl->window_width, impl->window_height, 0, 0))
         raise_agl_error ("::aglSetFullScreen");
     }
     else
     {
 #ifdef MACOSX_10_5_SUPPORTED
-      if (!aglSetWindowRef (context, (WindowRef)impl->desc.window_handle))
+      if (!aglSetWindowRef (new_context, (WindowRef)impl->desc.window_handle))
         raise_agl_error ("::aglSetWindowRef");
 #else
-      if (!aglSetDrawable (context, GetWindowPort ((WindowRef)impl->desc.window_handle)))
+      if (!aglSetDrawable (new_context, GetWindowPort ((WindowRef)impl->desc.window_handle)))
         raise_agl_error ("::aglSetDrawable");
 #endif
 
-      aglUpdateContext (context);
+      aglUpdateContext (new_context);
     }
   }
   catch (xtl::exception& exception)
@@ -432,11 +441,6 @@ void PrimarySwapChain::SetContext (AGLContext context)
     exception.touch ("render::low_level::opengl::macosx::PrimarySwapChain::SetContext");
     throw;
   }
-}
-
-AGLContext PrimarySwapChain::GetContext ()
-{
-  return impl->context;
 }
 
 AGLPixelFormat PrimarySwapChain::GetPixelFormat ()

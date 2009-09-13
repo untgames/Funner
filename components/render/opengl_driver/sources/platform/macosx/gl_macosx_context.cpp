@@ -154,7 +154,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 
       ISwapChainImpl* casted_swap_chain = cast_object<ISwapChainImpl> (swap_chain, "", "swap_chain");
 
-      casted_swap_chain->SetContext (impl->context);
+      casted_swap_chain->SetContext (this);
 
         //подписка на событие удаления цепочки обмена
 
@@ -228,3 +228,13 @@ void Context::DetachListener (IContextListener* listener)
 {
   impl->listeners.erase (stl::remove (impl->listeners.begin (), impl->listeners.end (), listener), impl->listeners.end ());
 }
+
+/*
+   Получение AGL контекста
+*/
+
+AGLContext Context::GetAGLContext ()
+{
+  return impl->context;
+}
+
