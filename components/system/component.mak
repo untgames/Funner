@@ -4,17 +4,18 @@
 TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS
 
 #Öåëü ¹1 - System library sources
-SYSTEMLIB.SOURCES.TYPE                   := static-lib
-SYSTEMLIB.SOURCES.NAME                   := funner.system
-SYSTEMLIB.SOURCES.INCLUDE_DIRS           := sources
-SYSTEMLIB.SOURCES.SOURCE_DIRS            := sources/wrappers
-SYSTEMLIB.SOURCES.IMPORTS                := compile.static.mak
-SYSTEMLIB.SOURCES.win32.SOURCE_DIRS      := sources/platform/win32
-SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS     := sources/platform/pthread sources/platform/unistd
-SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS   := -wd4355
-SYSTEMLIB.SOURCES.no_windows.SOURCE_DIRS := sources/platform/no_windows
-SYSTEMLIB.SOURCES.carbon.SOURCE_DIRS     := sources/platform/carbon
-SYSTEMLIB.SOURCES.x11.SOURCE_DIRS        := sources/platform/x11
+SYSTEMLIB.SOURCES.TYPE                    := static-lib
+SYSTEMLIB.SOURCES.NAME                    := funner.system
+SYSTEMLIB.SOURCES.INCLUDE_DIRS            := sources
+SYSTEMLIB.SOURCES.SOURCE_DIRS             := sources/wrappers
+SYSTEMLIB.SOURCES.IMPORTS                 := compile.static.mak
+SYSTEMLIB.SOURCES.win32.SOURCE_DIRS       := sources/platform/win32
+SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS      := sources/platform/pthread sources/platform/unistd
+SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS    := -wd4355
+SYSTEMLIB.SOURCES.no_windows.SOURCE_DIRS  := sources/platform/no_windows
+SYSTEMLIB.SOURCES.carbon.SOURCE_DIRS      := sources/platform/carbon
+SYSTEMLIB.SOURCES.carbon.COMPILER_DEFINES := NO_PTHREAD_SEMAPHORES
+SYSTEMLIB.SOURCES.x11.SOURCE_DIRS         := sources/platform/x11
 
 #Öåëü ¹2 - System library tests
 SYSTEMLIB.TESTS.TYPE             := test-suite

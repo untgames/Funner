@@ -1,3 +1,5 @@
+#ifndef NO_PTHREAD_SEMAPHORES
+
 #include "shared.h"
 
 using namespace syslib;
@@ -109,3 +111,5 @@ void Platform::PostSemaphore (semaphore_t handle)
     throw;
   }
 }
+
+#endif
