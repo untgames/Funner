@@ -110,7 +110,21 @@ struct PrimarySwapChain::Impl
 
     log.Printf ("...call aglChoosePixelFormat");
 
+#ifdef AGL_DISPLAY_MASK  //MacOSX 10.5 и старше
     pixel_format = aglChoosePixelFormat (0, 0, attributes);
+#else
+    if (in_desc.fullscreen && containing_output)
+    {
+      GDHandle display_device;
+
+      if (noErr != DMGetGDeviceByDisplayID ((DisplayIDType)containing_output->GetDisplayID (), &display_device, false))
+        throw xtl::format_operation_exception ("::DMGetGDeviceByDisplayID", "Can't get display device");
+
+      pixel_format = aglChoosePixelFormat (&display_device, 1, attributes);
+    }
+    else
+      pixel_format = aglChoosePixelFormat (0, 0, attributes);
+#endif
 
     if (!pixel_format)
       raise_agl_error ("::aglChoosePixelFormat");
