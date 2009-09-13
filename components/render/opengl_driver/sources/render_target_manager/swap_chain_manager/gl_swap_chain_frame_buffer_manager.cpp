@@ -299,7 +299,7 @@ void SwapChainFrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum
     {
       GetCaps ().glBindFramebuffer_fn (GL_FRAMEBUFFER, frame_buffer_id);
     }
-    else
+    else if (frame_buffer_id)
     {
       throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set frame_buffer_id=%u. Frame buffers not supported",
         frame_buffer_id);

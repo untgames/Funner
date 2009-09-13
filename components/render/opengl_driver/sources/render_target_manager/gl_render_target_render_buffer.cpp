@@ -120,7 +120,6 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, RenderTargetT
       break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "target_type", target_type);
-      break;
   }
 
   memset (&desc, 0, sizeof desc);
@@ -163,10 +162,8 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported desc.format=%s", get_name (desc.format));
-      break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.format", desc.format);
-      break;
   }
 
   static size_t BAD_BIND_FLAGS = ~(BindFlag_RenderTarget | BindFlag_DepthStencil);
@@ -183,7 +180,6 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
       break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", desc.access_flags);
-      break;
   }
 
   switch (desc.usage_mode)
@@ -206,10 +202,8 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
     case TextureDimension_3D:
     case TextureDimension_Cubemap:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported render-buffer dimension desc.dimension=%s", get_name (desc.dimension));
-      break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.dimension", desc.dimension);
-      break;
   }
 
   if (desc.generate_mips_enable)
