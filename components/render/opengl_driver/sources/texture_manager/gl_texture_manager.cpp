@@ -273,7 +273,7 @@ struct TextureManager::Impl: public ContextObject
     }
 
       //cоздание сэмплера
-    ISamplerState* TextureManager::Impl::CreateSamplerState (const SamplerDesc& desc)
+    ISamplerState* CreateSamplerState (const SamplerDesc& desc)
     {
       return new SamplerState (GetContextManager (), desc);
     }
