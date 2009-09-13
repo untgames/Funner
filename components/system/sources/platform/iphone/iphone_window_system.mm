@@ -179,6 +179,11 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
     (*iter)->OnTouchesMoved ([touches count], touch_descriptions->data ());
 }
 
+-(void) touchesCancelled:(NSSet*)touches withEvent:(UIEvent*)event
+{
+  [self touchesEnded:touches withEvent:event];
+}
+
 -(void) motionBegan:(UIEventSubtype)motion withEvent:(UIEvent*)event
 {
   if (motion != UIEventSubtypeMotionShake)
@@ -195,6 +200,11 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
   for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
     (*iter)->OnShakeMotionEnded ();
+}
+
+-(void) motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent*)event
+{
+  [self motionEnded:motion withEvent:event];
 }
 
 /*

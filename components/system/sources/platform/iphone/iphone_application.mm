@@ -12,8 +12,16 @@ using namespace syslib::iphone;
 namespace
 {
 
+const size_t IDLE_TIMER_PERIOD = 10;
+
 IRunLoopContext* run_loop_context     = 0;
 bool             application_launched = false;
+
+void idle_handler (Timer& timer)
+{
+  if (run_loop_context)
+    run_loop_context->OnIdle ();
+}
 
 }
 
@@ -33,6 +41,7 @@ typedef stl::vector<IApplicationListener*> ListenerArray;
 {
   @private
     ListenerArray *listeners;  //слушатели событий
+    Timer         *idle_timer; //таймер вызова OnIdle
 }
 
 -(id) init;
@@ -51,12 +60,19 @@ typedef stl::vector<IApplicationListener*> ListenerArray;
 
   if (self)
   {
+    listeners  = 0;
+    idle_timer = 0;
+
     try
     {
-      listeners = new ListenerArray ();
+      listeners  = new ListenerArray ();
+      idle_timer = new Timer (&idle_handler, IDLE_TIMER_PERIOD, TimerState_Paused);
     }
     catch (...)
     {
+      delete idle_timer;
+      delete listeners;
+
       [self release];
       return nil;
     }
@@ -67,6 +83,10 @@ typedef stl::vector<IApplicationListener*> ListenerArray;
 
 -(void) dealloc
 {
+  run_loop_context     = 0;
+  application_launched = false;
+
+  delete idle_timer;
   delete listeners;
 
   [super dealloc];
@@ -79,6 +99,15 @@ typedef stl::vector<IApplicationListener*> ListenerArray;
   [UIAccelerometer sharedAccelerometer].delegate = self;
 
   run_loop_context->OnEnterRunLoop ();
+
+  idle_timer->Run ();
+}
+
+-(void) applicationWillTerminate:(UIApplication*)application
+{
+  idle_timer->Pause ();
+
+  run_loop_context->OnExit (0);
 }
 
 -(void) applicationDidReceiveMemoryWarning:(UIApplication*)application

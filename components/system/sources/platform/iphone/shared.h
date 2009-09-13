@@ -9,8 +9,11 @@
 #include <stl/vector>
 
 #include <xtl/common_exceptions.h>
+#include <xtl/function.h>
 
 #include <common/log.h>
+
+#include <syslib/timer.h>
 
 #include <syslib/platform/iphone.h>
 
