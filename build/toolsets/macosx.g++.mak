@@ -20,8 +20,12 @@ DLL_LIB_SUFFIX := .dylib
 PROFILES += macosx unistd carbon has_windows haswchar
 DLL_PATH := DYLD_LIBRARY_PATH
 
+MACOSX_DEPLOYMENT_TARGET := $(MACOSX_VERSION)
+
+export MACOSX_DEPLOYMENT_TARGET
+
 COMMON_CFLAGS     += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION)
-COMMON_LINK_FLAGS += -syslibroot$(MACOSX_SDK_PATH) -macosx_version_min=$(MACOSX_VERSION)
+COMMON_LINK_FLAGS += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION)
 
 include $(TOOLSETS_DIR)/g++.mak
 
