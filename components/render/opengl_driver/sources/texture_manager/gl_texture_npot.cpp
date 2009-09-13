@@ -15,6 +15,9 @@ TextureNpot::TextureNpot  (const ContextManager& manager, const TextureDesc& tex
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureNpot::TextureNpot";
 
+  if (data)
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Texture initial data not supported");    
+
   if (tex_desc.generate_mips_enable)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Mip maps for non power of two textures not supported");
 

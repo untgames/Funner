@@ -8,10 +8,13 @@ using namespace render::low_level::opengl;
    Конструктор / деструктор
 */
 
-Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
+Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
   : Texture (manager, tex_desc, GL_TEXTURE_2D, get_mips_count (tex_desc.width, tex_desc.height))
 {
   const char* METHOD_NAME = "render::low_level::opengl::Texture2D::Texture2D";  
+  
+  if (data)
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Texture initial data not supported");  
   
     //установка текстуры в контекст OpenGL
 

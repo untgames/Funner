@@ -12,7 +12,10 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
   : Texture (manager, tex_desc, GL_TEXTURE_CUBE_MAP, get_mips_count (tex_desc.width, tex_desc.height))
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureCubemap::TextureCubemap";
-  
+
+  if (data)
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Texture initial data not supported");
+
     //установка текстуры в контекст OpenGL
 
   Bind ();

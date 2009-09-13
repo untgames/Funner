@@ -14,7 +14,10 @@ Texture2DNoSubimage::Texture2DNoSubimage  (const ContextManager& manager, const 
     get_mips_count (tex_desc.width, tex_desc.height))
 {
   const char* METHOD_NAME = "render::low_level::opengl::Texture2DNoSubimage::Texture2DNoSubimage";
-  
+
+  if (data)
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Texture initial data not supported");
+
     //установка текстуры в контекст OpenGL
 
   Bind ();

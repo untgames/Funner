@@ -19,6 +19,11 @@ ScaledTexture::ScaledTexture
       original_width (original_desc.width),
       original_height (original_desc.height)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::ScaledTexture::ScaledTexture";
+
+  if (data)
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Texture initial data not supported");
+
   const ContextCaps& caps = GetCaps ();
 
   if (!scaled_width)
@@ -46,7 +51,7 @@ ScaledTexture::ScaledTexture
   shadow_texture = TexturePtr (dynamic_cast<BindableTexture*> (texture_manager.CreateTexture (temp_desc, 0)), false);
 
   if (!shadow_texture.get ())
-    throw xtl::format_operation_exception ("render::low_level::opengl::ScaledTexture::ScaledTexture", "TextureManager::CreateTexture returned texture with incompatible type");
+    throw xtl::format_operation_exception (METHOD_NAME, "TextureManager::CreateTexture returned texture with incompatible type");
 
   horisontal_scale = (float)scaled_width  / (float)original_desc.width;
   vertical_scale   = (float)scaled_height / (float)original_desc.height;

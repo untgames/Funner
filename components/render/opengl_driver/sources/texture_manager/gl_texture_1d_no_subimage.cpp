@@ -10,10 +10,13 @@ using namespace render::low_level::opengl;
     Конструктор / деструктор
 */
 
-Texture1DNoSubimage::Texture1DNoSubimage  (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
+Texture1DNoSubimage::Texture1DNoSubimage (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
   : Texture (manager, tex_desc, GL_TEXTURE_1D, get_mips_count (tex_desc.width))
 {
   const char* METHOD_NAME = "render::low_level::opengl::Texture1DNoSubimage::Texture1DNoSubimage";
+  
+  if (data)
+    throw xtl::format_not_supported_exception (METHOD_NAME, "Texture initial data not supported");  
   
     //установка текстуры в контекст OpenGL
 
