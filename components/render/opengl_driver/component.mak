@@ -21,8 +21,6 @@ RENDER.OPENGL_DRIVER.SOURCES.iphone.COMPILER_CFLAGS := -I$(IPHONE_SDK_PATH)/Syst
                                                        -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreGraphics.framework/Headers/ \
                                                        -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/UIKit.framework/Headers/ \
                                                        -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/QuartzCore.framework/Headers/
-RENDER.OPENGL_DRIVER.SOURCES.iphone-device.COMPILER_CFLAGS    := -DOPENGL_DYLIB_PATH=\"/System/Library/Frameworks/OpenGLES.framework/OpenGLES\"
-RENDER.OPENGL_DRIVER.SOURCES.iphone-simulator.COMPILER_CFLAGS := -DOPENGL_DYLIB_PATH=\"/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator3.0.sdk/System/Library/Frameworks/OpenGLES.framework/OpenGLES\"
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            := sources/common \
                                                        sources/driver \
                                                        sources/render_target_manager \
