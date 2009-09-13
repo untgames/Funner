@@ -17,7 +17,7 @@ EXE_SUFFIX     :=
 DLL_SUFFIX     := .dylib
 DLL_LIB_SUFFIX := .dylib
 
-PROFILES += macosx macosx_desktop unistd carbon has_windows haswchar
+PROFILES += macosx unistd carbon has_windows haswchar
 DLL_PATH := DYLD_LIBRARY_PATH
 
 COMMON_CFLAGS     += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION)

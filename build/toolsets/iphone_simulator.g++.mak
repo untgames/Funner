@@ -9,7 +9,7 @@ EXE_SUFFIX     :=
 DLL_SUFFIX     := .dylib
 DLL_LIB_SUFFIX := .dylib
 
-PROFILES += iphone_simulator macosx unistd has_windows haswchar
+PROFILES += iphone_simulator unistd has_windows haswchar
 DLL_PATH := DYLD_LIBRARY_PATH
 
 COMPILER_GCC := /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2
