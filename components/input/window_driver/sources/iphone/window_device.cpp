@@ -12,8 +12,6 @@ const size_t MESSAGE_BUFFER_SIZE = 64;
 const double DEFAULT_ACCELEROMETER_UPDATE_INTERVAL = 1.f / 30.f;
 
 const char* TOUCH_NAME             = "Touch";
-const char* MULTITOUCH_BEGAN_EVENT = "MultiTouch began";
-const char* MULTITOUCH_ENDED_EVENT = "MultiTouch ended";
 
 const char* ACCELEROMETER_UPDATE_INTERVAL = "AccelerometerUpdateInterval";
 
@@ -86,51 +84,39 @@ struct Device::Impl : public IWindowListener, public IApplicationListener
   ///События касания
   void OnTouchesBegan (size_t touches_count, const TouchDescription* touches)
   {
-    signals (MULTITOUCH_BEGAN_EVENT);
-
     for (size_t i = 0; i < touches_count; i++, touches++)
     {
       xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s began %p %f %f", TOUCH_NAME, touches->touch,
-                 touches->current_x, touches->current_y);
+                 touches->x, touches->y);
       signals (message);
 
       if (!(touches->tap_count % 2))
       {
         xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s doubletap %p %f %f", TOUCH_NAME, touches->touch,
-                   touches->current_x, touches->current_y);
+                   touches->x, touches->y);
         signals (message);
       }
     }
-
-    signals (MULTITOUCH_ENDED_EVENT);
   }
 
   void OnTouchesMoved (size_t touches_count, const TouchDescription* touches)
   {
-    signals (MULTITOUCH_BEGAN_EVENT);
-
     for (size_t i = 0; i < touches_count; i++, touches++)
     {
-      xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s moved %p %f %f %f %f", TOUCH_NAME, touches->touch,
-                 touches->current_x, touches->current_y, touches->previous_x, touches->previous_y);
+      xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s moved %p %f %f", TOUCH_NAME, touches->touch,
+                      touches->x, touches->y);
       signals (message);
     }
-
-    signals (MULTITOUCH_ENDED_EVENT);
   }
 
   void OnTouchesEnded (size_t touches_count, const TouchDescription* touches)
   {
-    signals (MULTITOUCH_BEGAN_EVENT);
-
     for (size_t i = 0; i < touches_count; i++, touches++)
     {
-      xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s ended %p %f %f %f %f", TOUCH_NAME, touches->touch,
-                 touches->current_x, touches->current_y, touches->previous_x, touches->previous_y);
+      xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s ended %p %f %f", TOUCH_NAME, touches->touch,
+                      touches->x, touches->y);
       signals (message);
     }
-
-    signals (MULTITOUCH_ENDED_EVENT);
   }
 
   ///События движения
