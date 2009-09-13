@@ -64,6 +64,7 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
     WindowImpl            *window_impl;        //окно
     ListenerArray         *listeners;          //подписчика на события
     TouchDescriptionArray *touch_descriptions; //массив для хранения описаний текущего события
+    WindowEventContext    event_context;      //контекст, передаваемый обработчикам событий
 }
 
 @property (nonatomic, readwrite) WindowImpl* window_impl;
@@ -75,6 +76,16 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 -(id) initWithFrame:(CGRect)rect;
 -(void) drawRect:(CGRect)rect;
 -(void) displayLayer:(CALayer*)layer;
+
+/*
+  Получение контекста события
+*/
+
+-(WindowEventContext&) getEventContext;
+
+/*
+  Добавление/удаление подписчиков
+*/
 
 -(void) attachListener:(IWindowListener*)listener;
 -(void) detachListener:(IWindowListener*)listener;
@@ -104,9 +115,10 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
   if (self)
   {
-    window_impl        = 0;
-    listeners          = 0;
-    touch_descriptions = 0;
+    window_impl          = 0;
+    listeners            = 0;
+    touch_descriptions   = 0;
+    event_context.handle = self;
 
     [self layer].delegate = self;
 
@@ -131,9 +143,7 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
 -(void) onPaint
 {
-  WindowEventContext dummy_context;
-
-  window_impl->Notify (WindowEvent_OnPaint, dummy_context);
+  window_impl->Notify (WindowEvent_OnPaint, [self getEventContext]);
 }
 
 -(void) drawRect:(CGRect)rect
@@ -223,6 +233,11 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
 #endif
 
+-(WindowEventContext&) getEventContext
+{
+  return event_context;
+}
+
 /*
    Добавление/удаление подписчиков
 */
@@ -272,18 +287,14 @@ void Platform::CloseWindow (window_t handle)
 {
   WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
 
-  WindowEventContext dummy_context;
-
-  window->Notify (WindowEvent_OnClose, dummy_context);
+  window->Notify (WindowEvent_OnClose, [(UIWindowWrapper*)handle getEventContext]);
 }
 
 void Platform::DestroyWindow (window_t handle)
 {
   WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
 
-  WindowEventContext dummy_context;
-
-  window->Notify (WindowEvent_OnDestroy, dummy_context);
+  window->Notify (WindowEvent_OnDestroy, [(UIWindowWrapper*)handle getEventContext]);
 
   delete window;
 }
@@ -324,7 +335,7 @@ void Platform::SetWindowRect (window_t handle, const Rect& rect)
 
   WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
 
-  WindowEventContext dummy_context;
+  WindowEventContext& dummy_context = [(UIWindowWrapper*)handle getEventContext];
 
   window->Notify (WindowEvent_OnMove, dummy_context);
   window->Notify (WindowEvent_OnSize, dummy_context);
@@ -358,7 +369,7 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 
   WindowImpl* window = wnd.window_impl;
 
-  WindowEventContext dummy_context;
+  WindowEventContext& dummy_context = [(UIWindowWrapper*)handle getEventContext];
 
   try
   {

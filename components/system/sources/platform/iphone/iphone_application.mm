@@ -12,7 +12,7 @@ using namespace syslib::iphone;
 namespace
 {
 
-const size_t IDLE_TIMER_PERIOD = 10;
+const size_t IDLE_TIMER_PERIOD = 1000 / 70; //ограничение в 70 fps
 
 IRunLoopContext* run_loop_context     = 0;
 bool             application_launched = false;
