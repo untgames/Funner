@@ -7,7 +7,7 @@ using namespace render::low_level::opengl::macosx;
 namespace
 {
 
-const char* OPENGL_DYLIB_NAME = "/Volumes/Mac/System/Library/Frameworks/OpenGL.framework/OpenGL";
+const char* OPENGL_DYLIB_NAME = "/System/Library/Frameworks/OpenGL.framework/OpenGL";
 
 }
 

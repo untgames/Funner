@@ -61,6 +61,7 @@ struct WindowImpl
 @property (nonatomic, readwrite) bool        destroyed;
 
 -(id) initWithFrame:(CGRect)rect;
+-(void) drawRect:(CGRect)rect;
 
 @end
 
@@ -80,6 +81,13 @@ struct WindowImpl
   }
 
   return self;
+}
+
+-(void) drawRect:(CGRect)rect
+{
+  WindowEventContext dummy_context;
+
+  window_impl->Notify (WindowEvent_OnPaint, dummy_context);
 }
 
 -(void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
