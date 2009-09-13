@@ -1,4 +1,5 @@
-#include <shared/gl.h>
+#include <ES1/gl.h>
+#include <ES1/glext.h>
 
 #include "shared.h"
 
@@ -16,15 +17,18 @@ struct PrimarySwapChain::Impl
   Log             log;                       //протокол
   AdapterPtr      adapter;                   //адаптер цепочки обмена
   SwapChainDesc   desc;                      //дескриптор цепочки обмена
-  EAGLContext*    context;                   //установленный контекст
+  Context*        context;                   //установленный контекст
+  EAGLContext*    eagl_context;              //установленный контекст
+  ISwapChain*     swap_chain;                //цепочка обмена
   GLuint          frame_buffer;              //буфер кадра
+  GLuint          render_buffer;             //буфер рендеринга
   GLuint          depth_buffer;              //буфер глубины
   GLuint          stencil_buffer;            //буфер шаблона
-  GLuint          render_buffer;             //буфер рендеринга
 
 ///Конструктор
-  Impl (const SwapChainDesc& in_desc, Adapter* in_adapter)
-    : adapter (in_adapter), context (0)
+  Impl (const SwapChainDesc& in_desc, Adapter* in_adapter, ISwapChain *in_swap_chain)
+    : adapter (in_adapter), context (0), eagl_context (0), swap_chain (in_swap_chain), frame_buffer (0),
+      render_buffer (0), depth_buffer (0), stencil_buffer (0)
   {
       //проверка корректности аргументов
 
@@ -58,75 +62,55 @@ struct PrimarySwapChain::Impl
 ///Деструктор
   ~Impl ()
   {
-    SetContext (0);
-
     log.Printf ("...release resources");
   }
 
   ///Установка нового контекста
-  void SetContext (EAGLContext* new_context)
+  void InitializeForContext (EAGLContext* new_eagl_context, Context* new_context)
   {
     static const char* METHOD_NAME = "render::low_level::opengl::iphone::PrimarySwapChain::Impl::SetContext";
 
-    if (context == new_context)
-      return;
+    if (context)
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't set two contexts for one swap chain");
 
     //??????Необходимо учитывать разные имена функций при наличии/отсутсвии расширения
 
-    //удаление ресурсов текущего контекста
-    if (context)
-    {
-      SetContextCurrent ();
+    context      = new_context;
+    eagl_context = new_eagl_context;
 
-      glDeleteFramebuffersOES (1, &frame_buffer);
-      glDeleteRenderbuffersOES (1, &render_buffer);
+    log.Printf ("...making context current");
 
-      if (desc.frame_buffer.depth_bits)
-        glDeleteRenderbuffersOES (1, &depth_buffer);
-
-      if (desc.frame_buffer.stencil_bits)
-        glDeleteRenderbuffersOES (1, &stencil_buffer);
-
-      try
-      {
-        CheckErrors (METHOD_NAME);
-      }
-      catch (...)
-      {
-        //подавление ошибок
-      }
-    }
-
-    context = new_context;
-
-    if (!context)
-      return;
-
-    SetContextCurrent ();
-    printf ("Generating buffers\n");
-    fflush (stdout);
+    context->MakeCurrent (swap_chain);
 
     try
     {
+      log.Printf ("...creating framebuffer");
+
       glGenFramebuffersOES (1, &frame_buffer);
-      printf ("Framebuffer generated\n");
-      fflush (stdout);
       glBindFramebufferOES (GL_FRAMEBUFFER_OES, frame_buffer);
+
+      log.Printf ("...creating renderbuffer");
 
       glGenRenderbuffersOES (1, &render_buffer);
       glBindRenderbufferOES (GL_RENDERBUFFER_OES, render_buffer);
 
       CheckErrors (METHOD_NAME);
 
+      log.Printf ("...binding to drawable");
+
       CAEAGLLayer* eagl_layer = (CAEAGLLayer*)[(UIView*)(desc.window_handle) layer];
 
       eagl_layer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO],
                                        kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
 
-      if (![context renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:eagl_layer])
+      if (![eagl_context renderbufferStorage:GL_RENDERBUFFER_OES fromDrawable:eagl_layer])
         throw xtl::format_operation_exception ("render::low_level::opengl::iphone::PrimarySwapChain::Impl::SetContext", "Can't set context");
 
+      log.Printf ("...attaching renderbuffer");
+
       glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, render_buffer);
+
+      log.Printf ("...creating additional renderbuffers");
 
       if (desc.frame_buffer.depth_bits)
       {
@@ -146,44 +130,89 @@ struct PrimarySwapChain::Impl
 
       GLenum status = glCheckFramebufferStatusOES (GL_FRAMEBUFFER_OES);
 
+      CheckErrors (METHOD_NAME);
+
       if (status != GL_FRAMEBUFFER_COMPLETE_OES)
-        throw xtl::format_operation_exception ("render::low_level::opengl::iphone::PrimarySwapChain::Impl::SetContext", "Failed to make complete framebuffer object");
+        throw xtl::format_operation_exception (METHOD_NAME, "Failed to make complete framebuffer object");
+
+      log.Printf ("...swap chain initialized");
     }
     catch (...)
     {
-      SetContext (0);
+      DoneForContext ();
       throw;
     }
+  }
+
+  ///Освобождение ресурсов старого контекста
+  void DoneForContext ()
+  {
+    if (!context)
+      return;
+
+    context->MakeCurrent (swap_chain);
+
+    context      = 0;
+    eagl_context = 0;
+
+    glDeleteFramebuffersOES  (1, &frame_buffer);
+    glDeleteRenderbuffersOES (1, &render_buffer);
+
+    if (desc.frame_buffer.depth_bits)
+      glDeleteRenderbuffersOES (1, &depth_buffer);
+
+    if (desc.frame_buffer.stencil_bits)
+      glDeleteRenderbuffersOES (1, &stencil_buffer);
+
+    frame_buffer   = 0;
+    render_buffer  = 0;
+    depth_buffer   = 0;
+    stencil_buffer = 0;
+
+    CheckErrors ("render::low_level::opengl::iphone::PrimarySwapChain::Impl::DoneForContext");
   }
 
   ///Обмен текущего заднего буфера и переднего буфера
   void Present ()
   {
+    static const char* METHOD_NAME = "render::low_level::opengl::iphone::PrimarySwapChain::Impl::Present";
+
     if (!context)
       return;
 
-    EAGLContext *current_context = [EAGLContext currentContext];
+    context->MakeCurrent (swap_chain);
 
-    if (current_context != context)
-      [EAGLContext setCurrentContext:context];
+    GLuint current_render_buffer;
 
-    glBindRenderbufferOES (GL_RENDERBUFFER_OES, render_buffer);
+    glGetIntegerv (GL_RENDERBUFFER_BINDING_OES, (GLint*)&current_render_buffer);
 
-    if (![context presentRenderbuffer:GL_RENDERBUFFER_OES])
-      throw xtl::format_operation_exception ("render::low_level::opengl::iphone::PrimarySwapChain::Impl::Present", "Failed to swap renderbuffer");
+    CheckErrors (METHOD_NAME);
+
+    if (current_render_buffer != render_buffer)
+    {
+      glBindRenderbufferOES (GL_RENDERBUFFER_OES, render_buffer);
+      CheckErrors (METHOD_NAME);
+    }
+
+    try
+    {
+      if (![eagl_context presentRenderbuffer:GL_RENDERBUFFER_OES])
+        throw xtl::format_operation_exception (METHOD_NAME, "Failed to swap renderbuffer");
+    }
+    catch (...)
+    {
+      if (current_render_buffer != render_buffer)
+      {
+        glBindRenderbufferOES (GL_RENDERBUFFER_OES, current_render_buffer);
+        CheckErrors (METHOD_NAME);
+      }
+
+      throw;
+    }
   }
 
   private:
-    ///Установка текущего контекста
-    void SetContextCurrent ()
-    {
-      EAGLContext *current_context = [EAGLContext currentContext];
-
-      if (current_context != context)
-        [EAGLContext setCurrentContext:context];
-    }
-
-    ///Проверка ошибок OpenGL
+     ///Проверка ошибок OpenGL
     void CheckErrors (const char* source)
     {
       GLenum error = glGetError ();
@@ -222,7 +251,7 @@ PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& desc, Adapter* adapter)
 
   try
   {
-    impl = new Impl (desc, adapter);
+    impl = new Impl (desc, adapter, this);
   }
   catch (xtl::exception& exception)
   {
@@ -240,6 +269,8 @@ PrimarySwapChain::~PrimarySwapChain ()
     Log log;
 
     log.Printf ("Destroy primary swap chain (id=%u)...", GetId ());
+
+    DoneForContext ();
 
     impl = 0;
 
@@ -313,15 +344,27 @@ bool PrimarySwapChain::GetFullscreenState ()
 }
 
 /*
-   Получение/установка контекста
+   Инициализация связи с контекстом/закрытие связи
 */
 
-void PrimarySwapChain::SetContext (EAGLContext* context)
+void PrimarySwapChain::InitializeForContext (EAGLContext* eagl_context, Context* context)
 {
-  impl->SetContext (context);
+  impl->InitializeForContext (eagl_context, context);
 }
 
-EAGLContext* PrimarySwapChain::GetContext ()
+void PrimarySwapChain::DoneForContext ()
 {
-  return impl->context;
+  impl->DoneForContext ();
+}
+
+/*
+   Получение идентификатора буфера
+*/
+
+size_t PrimarySwapChain::GetFrameBufferId ()
+{
+  if (!impl->frame_buffer)
+    throw xtl::format_operation_exception ("render::low_level::opengl::iphone::PrimarySwapChain::GetFrameBufferId", "Can't get frame buffer before initializing swap chain");
+
+  return impl->frame_buffer;
 }

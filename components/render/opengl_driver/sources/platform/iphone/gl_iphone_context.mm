@@ -75,6 +75,8 @@ Context::Context (ISwapChain* in_swap_chain, Library* library)
     if (!in_swap_chain)
       throw xtl::make_null_argument_exception ("", "swap_chain");
 
+    impl->swap_chain = in_swap_chain;
+
     if (!library)
       throw xtl::make_null_argument_exception ("", "library");
 
@@ -86,6 +88,14 @@ Context::Context (ISwapChain* in_swap_chain, Library* library)
 
     if (!impl->context)
       throw xtl::format_operation_exception ("", "Can't create EAGL context");
+
+    ISwapChainImpl* swap_chain = cast_object<ISwapChainImpl> (impl->swap_chain, "", "swap_chain");
+
+    swap_chain->InitializeForContext (impl->context, this);
+
+      //подписка на событие удаления цепочки обмена
+
+    impl->swap_chain->RegisterDestroyHandler (impl->on_destroy_swap_chain);
 
     impl->log.Printf ("...context created successfull (handle=%08X)", impl->context);
   }
@@ -102,6 +112,24 @@ Context::~Context ()
   {
     impl->log.Printf ("Destroy context (id=%u)...", GetId ());
 
+    if (impl->swap_chain)
+    {
+      try
+      {
+        ISwapChainImpl* swap_chain = cast_object<ISwapChainImpl> (impl->swap_chain, "", "swap_chain");
+
+        swap_chain->DoneForContext ();
+      }
+      catch (xtl::exception& e)
+      {
+        impl->log.Printf ("Exception while closing context for swap chain: '%s'", e.what ());
+      }
+      catch (...)
+      {
+        impl->log.Printf ("Unknown exception while closing context for swap chain");
+      }
+    }
+
       //отмена текущего контекста
 
     if (Impl::current_context == impl.get ())
@@ -113,17 +141,6 @@ Context::~Context ()
       //удаление контекста
 
     impl->log.Printf ("...delete context (handle=%08X)", impl->context);
-
-    try
-    {
-      ISwapChainImpl* casted_swap_chain = cast_object<ISwapChainImpl> (impl->swap_chain, "", "swap_chain");
-
-      if (casted_swap_chain)
-        casted_swap_chain->SetContext (0);
-    }
-    catch (...)
-    {
-    }
 
     [impl->context release];
 
@@ -147,29 +164,17 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
       throw xtl::make_null_argument_exception ("", "swap_chain");
 
     if (swap_chain != impl->swap_chain)
-    {
-        //изменение текущей цепочки обмена
-
-      ISwapChainImpl* casted_swap_chain = cast_object<ISwapChainImpl> (swap_chain, "", "swap_chain");
-
-      casted_swap_chain->SetContext (impl->context);
-
-        //подписка на событие удаления цепочки обмена
-
-      casted_swap_chain->RegisterDestroyHandler (impl->on_destroy_swap_chain);
-
-      impl->swap_chain = swap_chain;
-    }
+      throw xtl::format_operation_exception ("", "Can't set another swap chain for context");
 
       //установка текущего контекста
 
-    EAGLContext *current_context = [EAGLContext currentContext];
-
-    if (current_context != impl->context)
-      [EAGLContext setCurrentContext:impl->context];
-
     if (Impl::current_context)
       Impl::current_context->LostCurrentNotify ();
+
+    Impl::current_context = 0;
+
+    if (![EAGLContext setCurrentContext:impl->context])
+      throw xtl::format_operation_exception ("EAGLContext::setCurrentContext", "Can't set current context");
 
     Impl::current_context = impl.get ();
 
