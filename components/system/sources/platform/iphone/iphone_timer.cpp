@@ -49,7 +49,7 @@ IPhoneTimer::IPhoneTimer (size_t period_in_milliseconds, const TimerHandler& in_
 
   double period_in_seconds = period_in_milliseconds / 1000.f;
 
-  timer = CFRunLoopTimerCreate (0, CFAbsoluteTimeGetCurrent () + period_in_seconds, period_in_seconds, 0, 0, &IPhoneTimer::TimerProc, &timer_context);
+  timer = CFRunLoopTimerCreate (0, CFAbsoluteTimeGetCurrent () + period_in_seconds, period_in_seconds, 0, 0, &IPhoneTimer::TimerProc, &timer_context);  //???????Нужно учитывать, что время может измениться (летнее/зимнее)
 
   CFRunLoopAddTimer (CFRunLoopGetMain (), timer, kCFRunLoopCommonModes);
 }

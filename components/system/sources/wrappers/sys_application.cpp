@@ -46,7 +46,7 @@ struct or_signal_accumulator
 struct do_events_accumulator
 {
   typedef void result_type;
-  
+
   template <class InIter> void operator () (InIter first, InIter last) const
   {
     if (first == last)
@@ -93,8 +93,8 @@ class ApplicationImpl: private IRunLoopContext
   private:
     typedef xtl::signal<void ()>                        ApplicationSignal;
     typedef xtl::signal<bool (), or_signal_accumulator> SuspendSignal;
-    typedef xtl::signal<void (), do_events_accumulator> DoEventsSignal;  
-  
+    typedef xtl::signal<void (), do_events_accumulator> DoEventsSignal;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение о возникновении события
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,10 +111,12 @@ class ApplicationImpl: private IRunLoopContext
     void DoCustomRunLoop (); //может быть не вызван, если платформа сама монопольно управляет главным циклом (например, iPhone)
     void OnExit          (int code);
     void OnIdle          ();
+    void OnEnterRunLoop  ();
 
   private:
     ApplicationSignal  idle_signal;                    //сигнал обработки события ApplicationEvent_OnIdle
-    ApplicationSignal  exit_signal;                    //сигнал обработки события ApplicationEvent_OnIdle    
+    ApplicationSignal  exit_signal;                    //сигнал обработки события ApplicationEvent_OnExit
+    ApplicationSignal  enter_run_loop_signal;          //сигнал обработки события ApplicationEvent_OnStartup
     DoEventsSignal     do_events_signal;               //сигнал обработки события ApplicationEvent_DoEvents
     SuspendSignal      suspend_handler;                //сигнал проверки наличия необработанных сообщений
     int                exit_code;                      //код завершения приложения
@@ -184,7 +186,7 @@ void ApplicationImpl::DoEvents ()
     {
       while (!Platform::IsMessageQueueEmpty () && !is_exit_detected)
         Platform::DoNextEvent ();
-    }    
+    }
   }
   else
   {
@@ -235,6 +237,11 @@ void ApplicationImpl::OnIdle ()
   Notify (idle_signal);
 }
 
+void ApplicationImpl::OnEnterRunLoop ()
+{
+  Notify (enter_run_loop_signal);
+}
+
 /*
     Подписка на события приложения
 */
@@ -243,9 +250,10 @@ connection ApplicationImpl::RegisterEventHandler (ApplicationEvent event, const 
 {
   switch (event)
   {
-    case ApplicationEvent_OnExit:     return exit_signal.connect (handler);
-    case ApplicationEvent_OnIdle:     return idle_signal.connect (handler);
-    case ApplicationEvent_OnDoEvents: return do_events_signal.connect (handler);
+    case ApplicationEvent_OnExit:         return exit_signal.connect (handler);
+    case ApplicationEvent_OnIdle:         return idle_signal.connect (handler);
+    case ApplicationEvent_OnEnterRunLoop: return enter_run_loop_signal.connect (handler);
+    case ApplicationEvent_OnDoEvents:     return do_events_signal.connect (handler);
     default:
       throw xtl::make_argument_exception ("syslib::Application::RegisterEventHandler", "event", event);
   }

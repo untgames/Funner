@@ -13,9 +13,10 @@ namespace syslib
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum ApplicationEvent
 {
-  ApplicationEvent_OnExit,     //получен сигнал завершения приложения
-  ApplicationEvent_OnIdle,     //очередь сообщений пуста
-  ApplicationEvent_OnDoEvents, //обработка пользовательских очередей сообщений
+  ApplicationEvent_OnExit,          //получен сигнал завершения приложения
+  ApplicationEvent_OnIdle,          //очередь сообщений пуста
+  ApplicationEvent_OnEnterRunLoop,  //инициализация приложения завершена
+  ApplicationEvent_OnDoEvents,      //обработка пользовательских очередей сообщений
 
   ApplicationEvent_Num
 };

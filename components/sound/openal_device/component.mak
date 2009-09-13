@@ -8,7 +8,8 @@ SOUND.OPENAL_DRIVER.SOURCES.TYPE                   := static-lib
 SOUND.OPENAL_DRIVER.SOURCES.NAME                   := funner.sound.low_level.openal_driver
 SOUND.OPENAL_DRIVER.SOURCES.win32.INCLUDE_DIRS     := ../../../extern/openalsdk/include
 SOUND.OPENAL_DRIVER.SOURCES.SOURCE_DIRS            := sources
-SOUND.OPENAL_DRIVER.SOURCES.macosx.COMPILER_CFLAGS := -I/System/Library/Frameworks/OpenAL.framework/Versions/A/Headers
+SOUND.OPENAL_DRIVER.SOURCES.macosx.COMPILER_CFLAGS := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/OpenAL.framework/Headers
+SOUND.OPENAL_DRIVER.SOURCES.iphone.COMPILER_CFLAGS := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/OpenAL.framework/Headers
 SOUND.OPENAL_DRIVER.SOURCES.linux.COMPILER_CFLAGS  := -I/usr/include/AL
 SOUND.OPENAL_DRIVER.SOURCES.IMPORTS                := ../low_level/compile.static.mak ../../media/sound/compile.static.mak ../../system/compile.static.mak 
 

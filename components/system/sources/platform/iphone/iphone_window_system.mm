@@ -1,52 +1,137 @@
 #include "shared.h"
 
-#include <UIScreen.h>
-#include <UIWindow.h>
+#import <syslib/platform/iphone.h>
+
+#import <UIScreen.h>
+#import <UIWindow.h>
+
+#import <UIApplication.h>
 
 using namespace syslib;
 
-@interface UIWindowWrapper : UIWindow
-{
-}
-
--(void)Close
+namespace
 {
 
-}
-
--(void)Destroy
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Описание реализации окна
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct WindowImpl
 {
+  void*                          user_data;       //указатель на пользовательские данные
+  Platform::WindowMessageHandler message_handler; //функция обработки сообщений окна
+  Platform::window_t             cocoa_window;    //окно
+
+  //Конструктор/деструктор
+  WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data, void* new_window)
+    : user_data (in_user_data), message_handler (handler), cocoa_window ((Platform::window_t)new_window)
+    {}
+
+  ~WindowImpl ()
+  {
+    [(UIWindow*)cocoa_window release];
+  }
+
+  //Посылка сообщений
+  void Notify (WindowEvent event, const WindowEventContext& context)
+  {
+    try
+    {
+      message_handler (cocoa_window, event, context, user_data);
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
+  }
+};
 
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Распределитель событий окна
+///////////////////////////////////////////////////////////////////////////////////////////////////
+@interface UIWindowWrapper : UIWindow <WindowEventProvider>
+{
+  @private
+    WindowImpl* window_impl;
+    bool        destroyed;
+}
+
+@property (nonatomic, readwrite) WindowImpl* window_impl;
+@property (nonatomic, readwrite) bool        destroyed;
+
+-(id) initWithFrame:(CGRect)rect;
 
 @end
 
 @implementation UIWindowWrapper
+
+@synthesize window_impl;
+@synthesize destroyed;
+
+-(id) initWithFrame:(CGRect)rect
+{
+  self = [super initWithFrame:rect];
+
+  if (self)
+  {
+    window_impl = 0;
+    destroyed   = false;
+  }
+
+  return self;
+}
+
+-(void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+
+}
+
+-(void) touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+{
+
+}
+
+-(void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+
+}
+
+-(void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+
+}
+
+-(void) motionBegan:(UIEventSubtype)motion withEvent:(UIEvent *)event
+{
+
+}
+
+-(void) motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent *)event
+{
+
+}
+
+-(void) motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
+{
+
+}
+
+/*
+   Добавление/удаление подписчиков (подписчик не захватывается)
+*/
+
+-(void) addEventHandler:(id <WindowEventHandler>)handler
+{
+
+}
+
+-(void) removeEventHandler:(id <WindowEventHandler>)handler
+{
+
+}
+
 @end
-
-//Конструктор/деструктор
-WindowImpl::WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data, void* new_window)
-  : user_data (in_user_data), message_handler (handler), cocoa_window ((Platform::window_t)new_window)
-  {}
-
-WindowImpl::~WindowImpl ()
-{
-  [(UIWindow*)cocoa_window dealloc];
-  IPhoneApplication::SetWindow (0);
-}
-
-//Посылка сообщений
-void WindowImpl::Notify (WindowEvent event, const WindowEventContext& context)
-{
-  try
-  {
-    message_handler (cocoa_window, event, context, user_data);
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
-}
 
 /*
     Создание/закрытие/уничтожение окна
@@ -56,11 +141,11 @@ Platform::window_t Platform::CreateWindow (WindowStyle window_style, WindowMessa
 {
   static const char* METHOD_NAME = "syslib::iPhonePlatform::CreateWindow";
 
+  if (!is_in_run_loop ())
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't create window before entering run loop");
+
   if (parent)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Parent windows not supported for iPhonePlatform");
-
-  if (IPhoneApplication::GetWindow ())
-    throw xtl::format_operation_exception (METHOD_NAME, "One window already created, can't create second window.");
 
     //Создание окна
   UIWindowWrapper* new_window = [[UIWindowWrapper alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -68,21 +153,35 @@ Platform::window_t Platform::CreateWindow (WindowStyle window_style, WindowMessa
   if (!new_window)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't create window.");
 
-  new_window.multipleTouchEnabled = YES;
+  new_window.clearsContextBeforeDrawing = NO;
 
-  new WindowImpl (handler, user_data, new_window);
+  WindowImpl* window_impl = new WindowImpl (handler, user_data, new_window);
+
+  new_window.window_impl = window_impl;
 
   return (window_t)new_window;
 }
 
-void Platform::CloseWindow (window_t)
+void Platform::CloseWindow (window_t handle)
 {
-  throw xtl::make_not_implemented_exception ("syslib::iPhonePlatform::CloseWindow");
+  WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
+
+  WindowEventContext dummy_context;
+
+  window->Notify (WindowEvent_OnClose, dummy_context);
 }
 
-void Platform::DestroyWindow (window_t)
+void Platform::DestroyWindow (window_t handle)
 {
-  throw xtl::make_not_implemented_exception ("syslib::iPhonePlatform::DestroyWindow");
+  ((UIWindowWrapper*)handle).destroyed = true;
+
+  WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
+
+  WindowEventContext dummy_context;
+
+  window->Notify (WindowEvent_OnDestroy, dummy_context);
+
+  delete window;
 }
 
 /*
@@ -103,19 +202,33 @@ void Platform::GetWindowTitle (window_t, size_t, wchar_t*)
     Область окна / клиентская область
 */
 
-void Platform::SetWindowRect (window_t, const Rect&)
+void Platform::SetWindowRect (window_t handle, const Rect& rect)
 {
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetWindowRect", "Window rect changing not supported for iPhone platform");
+  CGRect frame;
+
+  frame.size.width  = rect.right - rect.left;
+  frame.size.height = rect.bottom - rect.top;
+  frame.origin.x    = rect.left;
+  frame.origin.y    = rect.top;
+
+  ((UIView*)handle).frame = frame;
+
+  WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
+
+  WindowEventContext dummy_context;
+
+  window->Notify (WindowEvent_OnMove, dummy_context);
+  window->Notify (WindowEvent_OnSize, dummy_context);
 }
 
 void Platform::GetWindowRect (window_t handle, Rect& rect)
 {
-  CGRect bounds = ((UIView*)handle).bounds;
+  CGRect frame = ((UIView*)handle).frame;
 
-  rect.bottom = bounds.size.height;
-  rect.right  = bounds.size.width;
-  rect.top    = 0;
-  rect.left   = 0;
+  rect.bottom = frame.origin.y + frame.size.height;
+  rect.right  = frame.origin.x + frame.size.width;
+  rect.top    = frame.origin.y;
+  rect.left   = frame.origin.x;
 }
 
 void Platform::GetClientRect (window_t handle, Rect& target_rect)
@@ -127,17 +240,98 @@ void Platform::GetClientRect (window_t handle, Rect& target_rect)
     Установка флагов окна
 */
 
-void Platform::SetWindowFlag (window_t, WindowFlag, bool)
+void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 {
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetWindowRect", "Window changing not supported for iPhone platform");
+  if (state == GetWindowFlag (handle, flag))
+    return;
+
+  UIWindowWrapper* wnd = (UIWindowWrapper*)handle;
+
+  WindowImpl* window = wnd.window_impl;
+
+  WindowEventContext dummy_context;
+
+  try
+  {
+    switch (flag)
+    {
+      case WindowFlag_Visible: //видимость окна
+        if (state)
+        {
+          wnd.hidden = NO;
+
+          window->Notify (WindowEvent_OnShow, dummy_context);
+        }
+        else
+        {
+          wnd.hidden = YES;
+
+          window->Notify (WindowEvent_OnHide, dummy_context);
+        }
+
+        break;
+      case WindowFlag_Active: //активность окна
+        if (state)
+        {
+          [wnd makeKeyWindow];
+
+          window->Notify (WindowEvent_OnActivate, dummy_context);
+        }
+        else
+          throw xtl::format_operation_exception ("", "Can't make window inactive");
+
+        break;
+      case WindowFlag_Focus: //фокус ввода
+        if (state)
+        {
+          wnd.userInteractionEnabled = YES;
+
+          window->Notify (WindowEvent_OnSetFocus, dummy_context);
+        }
+        else
+        {
+          wnd.userInteractionEnabled = NO;
+
+          window->Notify (WindowEvent_OnLostFocus, dummy_context);
+        }
+
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "flag", flag);
+        break;
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::iPhonePlatform::SetWindowFlag");
+    throw;
+  }
 }
 
-bool Platform::GetWindowFlag (window_t handle, WindowFlag)
+bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
 {
-  if ((UIWindow*)handle != [UIApplication sharedApplication].keyWindow)
-    return false;
+  UIWindow* wnd = (UIWindow*)handle;
 
-  return true;
+  try
+  {
+    switch (flag)
+    {
+      case WindowFlag_Visible:
+        return wnd.hidden == NO;
+      case WindowFlag_Active:
+        return wnd == [UIApplication sharedApplication].keyWindow;
+      case WindowFlag_Focus:
+        return wnd.userInteractionEnabled == YES;
+      default:
+        throw xtl::make_argument_exception ("", "flag", flag);
+        break;
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::iPhonePlatform::GetWindowFlag");
+    throw;
+  }
 }
 
 /*

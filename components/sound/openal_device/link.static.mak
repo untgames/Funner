@@ -7,4 +7,5 @@ export.win32.LIBS        := openal32
 export.linux.LIBS        := openal
 export.LINK_INCLUDES     := OpenAL
 export.macosx.LINK_FLAGS := -framework OpenAL
+export.iphone.LINK_FLAGS := -framework OpenAL
 export.IMPORTS           := ../low_level/link.static.mak ../../media/sound/link.static.mak ../../system/link.static.mak

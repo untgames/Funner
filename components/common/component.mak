@@ -15,6 +15,8 @@ COMMON.SOURCES.COMPILER_DEFINES                  := PCRE_STATIC
 COMMON.SOURCES.iphone.COMPILER_DEFINES           := __IPHONE__
 COMMON.SOURCES.unistd.SOURCE_DIRS                := sources/platform/unistd
 COMMON.SOURCES.carbon.SOURCE_DIRS                := sources/platform/carbon
+COMMON.SOURCES.iphone.SOURCE_DIRS                := sources/platform/iphone
+COMMON.SOURCES.iphone.COMPILER_CFLAGS            := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers
 COMMON.SOURCES.carbon.COMPILER_CFLAGS            := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers
 COMMON.SOURCES.win32.SOURCE_DIRS                 := sources/platform/win32
 

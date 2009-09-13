@@ -61,6 +61,7 @@ class IRunLoopContext
     virtual void DoCustomRunLoop () {} //может быть не вызван, если платформа сама монопольно управляет главным циклом (например, iPhone)
     virtual void OnExit          (int code) {}
     virtual void OnIdle          () {}
+    virtual void OnEnterRunLoop  () {}
 
   protected:
     virtual ~IRunLoopContext () {}
