@@ -28,7 +28,7 @@ void GlEntries::Init (ILibrary& library)
 {
     //обнуление адресов точек входа
 
-  memset (this, 0, sizeof GlEntries);
+  memset (this, 0, sizeof (GlEntries));
   
     //получение адресов точек входа OpenGL ES 1.1
 
