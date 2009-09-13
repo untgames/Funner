@@ -52,7 +52,6 @@ const char* SCENE_LISTENER_LIBRARY                    = "Scene.Listener";
 const char* SCENE_SOUND_EMITTER_LIBRARY               = "Scene.SoundEmitter";
 const char* SCENE_SPRITE_MODEL_LIBRARY                = "Scene.SpriteModel";
 const char* SCENE_SPRITE_LIBRARY                      = "Scene.Sprite";
-const char* SCENE_SPRITE_LIST_LIBRARY                 = "Scene.SpriteList";
 const char* SCENE_TEXT_LINE_LIBRARY                   = "Scene.TextLine";
 const char* SCENE_VISUAL_MODEL_LIBRARY                = "Scene.VisualModel";
 const char* BINDER_NAME                               = "SceneGraph";
