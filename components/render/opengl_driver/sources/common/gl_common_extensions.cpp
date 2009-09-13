@@ -318,6 +318,7 @@ const char* extensions [] = {
   "GLBUG_swap_buffers_twice_call",
   
 #else
+  "GL_VERSION_1_1",
 
   "GL_OES_blend_equation_separate",
   "GL_OES_blend_func_separate",

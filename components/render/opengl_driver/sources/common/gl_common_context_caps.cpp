@@ -5,6 +5,8 @@ using namespace render::low_level::opengl;
 namespace
 {
 
+#ifndef OPENGL_ES_SUPPORT
+
 /*
     Версии OpenGL
 */
@@ -70,6 +72,8 @@ class StandartExtensionSet
       versions [GlVersion_2_1].SetGroup ("GL_ARB_pixel_buffer_object GL_EXT_texture_sRGB", true);
     }
 };
+
+#endif
 
 }
 
@@ -225,6 +229,8 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   glUseProgram_fn              = glUseProgram ? glUseProgram : (PFNGLUSEPROGRAMPROC)glUseProgramObjectARB;
   
 #else
+
+  ExtensionSet ext = available_extension_set;
 
   static Extension OES_blend_equation_separate    = "GL_OES_blend_equation_separate",
                    OES_blend_func_separate        = "GL_OES_blend_func_separate",

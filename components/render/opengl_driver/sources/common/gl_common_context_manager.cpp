@@ -90,7 +90,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
 
         extensions.SetGroup (extensions_string.c_str (), true);
 
-          //определение поддержки расширений и версий           
+          //определение поддержки расширений и версий
 
         Version version = version_string.c_str ();
 
@@ -101,17 +101,20 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
           
           VersionEntry (const char* version_id, const char* extension_id) : version (version_id), extension (extension_id) {}
         };        
-        
+
         static VersionEntry version_entries [] = {
           VersionEntry ("1.1", "GL_VERSION_1_1"),
+
+#ifndef OPENGL_ES_SUPPORT
           VersionEntry ("1.2", "GL_VERSION_1_2"),
           VersionEntry ("1.3", "GL_VERSION_1_3"),
           VersionEntry ("1.4", "GL_VERSION_1_4"),
           VersionEntry ("1.5", "GL_VERSION_1_5"),
           VersionEntry ("2.0", "GL_VERSION_2_0"),
-          VersionEntry ("2.1", "GL_VERSION_2_1")
-        };        
-        
+          VersionEntry ("2.1", "GL_VERSION_2_1"),
+#endif
+        };
+
         static const size_t version_entries_count = sizeof (version_entries) / sizeof (*version_entries);
 
         for (size_t i=0; i<version_entries_count; i++)
