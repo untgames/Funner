@@ -3,6 +3,8 @@
 ###################################################################################################
 TARGETS := RENDER.MID_LEVEL_WINDOW_DRIVER.SOURCES RENDER.MID_LEVEL_WINDOW_DRIVER.TESTS
 
+#PROFILES += egl gles
+
 #Öåëü ¹1 - Low level render system sources
 RENDER.MID_LEVEL_WINDOW_DRIVER.SOURCES.TYPE             := static-lib
 RENDER.MID_LEVEL_WINDOW_DRIVER.SOURCES.NAME             := funner.render.mid_level.window_driver
@@ -23,4 +25,4 @@ RENDER.MID_LEVEL_WINDOW_DRIVER.TESTS.COMPILER_CFLAGS  :=
 RENDER.MID_LEVEL_WINDOW_DRIVER.TESTS.COMPILER_DEFINES := 
 RENDER.MID_LEVEL_WINDOW_DRIVER.TESTS.IMPORTS          := link.static.mak compile.static.mak ../low_level/compile.static.mak ../../system/compile.static.mak ../../system/link.static.mak  \
                                                          ../opengl_driver/link.static.mak ../../media/image/compile.static.mak \
-                                                         ../../common/xml.link.static.mak
+                                                         ../../common/xml.link.static.mak ../opengl_driver/run.static.mak
