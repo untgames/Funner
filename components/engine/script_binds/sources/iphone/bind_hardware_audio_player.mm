@@ -10,17 +10,7 @@
 
 #import <AVAudioPlayer.h>
 
-#include <xtl/bind.h>
-#include <xtl/common_exceptions.h>
-#include <xtl/function.h>
-
-#include <common/component.h>
-#include <common/log.h>
-#include <common/singleton.h>
-
-#include <script/bind.h>
-#include <script/environment.h>
-#include <script/library_manager.h>
+#include "shared.h"
 
 using namespace script;
 
@@ -57,7 +47,7 @@ const char* BINDER_NAME                   = "HardwareAudioPlayer";
 const double EPSILON = 0.01;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Очередь действий
+///Аппаратный проигрыватель звука
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class HardwareAudioPlayer
 {
@@ -92,7 +82,7 @@ class HardwareAudioPlayer
 
       NSString *ns_file_name = [[NSString alloc] initWithCString:file_name encoding:NSASCIIStringEncoding];
 
-      NSURL *file_url = [[NSURL alloc] initWithString: ns_file_name];
+      NSURL *file_url = [[NSURL alloc] initFileURLWithPath: ns_file_name];
 
       [ns_file_name release];
 
@@ -202,7 +192,7 @@ class HardwareAudioPlayer
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Синглтон файловой системы
+///Синглтон аппаратного проигрывателя звука
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef common::Singleton<HardwareAudioPlayer> HardwareAudioPlayerSingleton;
 
