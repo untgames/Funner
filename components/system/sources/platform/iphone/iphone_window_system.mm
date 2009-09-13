@@ -378,6 +378,7 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
       case WindowFlag_Visible: //видимость окна
         if (state)
         {
+          [wnd makeKeyAndVisible];
           wnd.hidden = NO;
 
           window->Notify (WindowEvent_OnShow, dummy_context);
@@ -393,7 +394,7 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
       case WindowFlag_Active: //активность окна
         if (state)
         {
-          [wnd makeKeyWindow];
+          [wnd makeKeyAndVisible];
 
           window->Notify (WindowEvent_OnActivate, dummy_context);
         }
