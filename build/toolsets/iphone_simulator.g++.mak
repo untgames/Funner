@@ -12,11 +12,11 @@ DLL_LIB_SUFFIX := .dylib
 PROFILES += iphone_simulator unistd has_windows haswchar
 DLL_PATH := DYLD_LIBRARY_PATH
 
-COMPILER_GCC := /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.0
-LINKER_GCC   := /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/g++-4.0
+COMPILER_GCC := /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2
+LINKER_GCC   := /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/g++-4.2
 
-COMMON_CFLAGS     += -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator2.2.sdk
-COMMON_LINK_FLAGS += -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator2.2.sdk
+COMMON_CFLAGS     += -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator3.0.sdk
+COMMON_LINK_FLAGS += -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator3.0.sdk
 
 include $(TOOLSETS_DIR)/g++.mak
 
