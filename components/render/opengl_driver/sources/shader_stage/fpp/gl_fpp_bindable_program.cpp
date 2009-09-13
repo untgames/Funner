@@ -243,7 +243,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     if (caps.has_arb_shading_language_100)
       caps.glUseProgram_fn (0);
 
-    SetContextCacheValue (CacheEntry_UsedProgram, 0);
+    SetContextCacheValue (CacheEntry_UsedProgram, GetId ());
   }
   
 #endif
