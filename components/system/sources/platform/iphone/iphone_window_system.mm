@@ -74,6 +74,7 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
 -(id) initWithFrame:(CGRect)rect;
 -(void) drawRect:(CGRect)rect;
+-(void) displayLayer:(CALayer*)layer;
 
 -(void) attachListener:(IWindowListener*)listener;
 -(void) detachListener:(IWindowListener*)listener;
@@ -107,6 +108,8 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
     listeners          = 0;
     touch_descriptions = 0;
 
+    [self layer].delegate = self;
+
     try
     {
       listeners          = new ListenerArray ();
@@ -126,11 +129,21 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
   return self;
 }
 
--(void) drawRect:(CGRect)rect
+-(void) onPaint
 {
   WindowEventContext dummy_context;
 
   window_impl->Notify (WindowEvent_OnPaint, dummy_context);
+}
+
+-(void) drawRect:(CGRect)rect
+{
+  [self onPaint];
+}
+
+-(void) displayLayer:(CALayer*)layer
+{
+  [self onPaint];
 }
 
 -(void) fillTouchDescriptionsBuffer:(NSSet*)touches
