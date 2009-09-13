@@ -8,6 +8,7 @@ using namespace render::low_level::opengl::macosx;
     Описание реализации контекста OpenGL
 */
 
+typedef xtl::com_ptr<Library>          LibraryPtr;
 typedef stl::vector<IContextListener*> ListenerArray;
 
 struct Context::Impl
@@ -18,7 +19,7 @@ struct Context::Impl
   ISwapChain*                 swap_chain;            //текущая цепочка обмена
   xtl::trackable::slot_type   on_destroy_swap_chain; //обработчик удаления цепочки обмена
   ListenerArray               listeners;             //слушатели событий контекста
-  Library*                    opengl_library;        //библиотека фунций OpenGL
+  LibraryPtr                  opengl_library;        //библиотека фунций OpenGL
   static Impl*                current_context;       //текущий контекст
 
   Impl (Library* in_library)

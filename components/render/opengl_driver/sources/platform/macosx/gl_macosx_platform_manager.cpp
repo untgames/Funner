@@ -24,6 +24,7 @@ class PlatformManagerImpl
 
 ///Конструктор
     PlatformManagerImpl ()
+      : opengl_library (new Library, false)
     {
       default_adapters.push_back (AdapterPtr (new Adapter, false));
     }
@@ -83,7 +84,7 @@ class PlatformManagerImpl
     {
       try
       {
-        return new Context (swap_chain, &opengl_library);
+        return new Context (swap_chain, opengl_library.get ());
       }
       catch (xtl::exception& exception)
       {
@@ -93,13 +94,14 @@ class PlatformManagerImpl
     }
 
   private:
+    typedef xtl::com_ptr<Library> LibraryPtr;
     typedef xtl::com_ptr<Adapter> AdapterPtr;
     typedef stl::list<AdapterPtr> AdapterList;
 
   private:
     Log         log;              //протокол
     AdapterList default_adapters; //адаптеры
-    Library     opengl_library;   //библиотека функций OpenGL
+    LibraryPtr  opengl_library;   //библиотека функций OpenGL
 };
 
 typedef common::Singleton<PlatformManagerImpl> PlatformManagerSingleton;
