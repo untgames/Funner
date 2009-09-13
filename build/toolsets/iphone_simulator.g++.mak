@@ -1,5 +1,5 @@
 ###################################################################################################
-#Сборка под MacOS X g++
+#Сборка под iPhone Simulator 3.0 g++
 ###################################################################################################
 
 ###################################################################################################
@@ -9,16 +9,20 @@ EXE_SUFFIX     :=
 DLL_SUFFIX     := .dylib
 DLL_LIB_SUFFIX := .dylib
 
-PROFILES += iphone_simulator unistd has_windows haswchar
+PROFILES += iphone_simulator macosx unistd has_windows haswchar
 DLL_PATH := DYLD_LIBRARY_PATH
 
 COMPILER_GCC := /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2
 LINKER_GCC   := /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/g++-4.2
 
-COMMON_CFLAGS     += -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator3.0.sdk
-COMMON_LINK_FLAGS += -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator3.0.sdk
+IPHONE_SDK_PATH := /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator3.0.sdk
+
+COMMON_CFLAGS     += -isysroot $(IPHONE_SDK_PATH)
+COMMON_LINK_FLAGS += -isysroot $(IPHONE_SDK_PATH)
 
 include $(TOOLSETS_DIR)/g++.mak
+
+SOURCE_FILES_SUFFIXES += mm         #Расширения исходных файлов
 
 ###################################################################################################
 #Линковка shared-library (имя выходного файла)

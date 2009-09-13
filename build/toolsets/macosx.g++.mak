@@ -9,13 +9,13 @@ EXE_SUFFIX     :=
 DLL_SUFFIX     := .dylib
 DLL_LIB_SUFFIX := .dylib
 
-PROFILES   += macosx unistd carbon has_windows haswchar
-DLL_PATH   := DYLD_LIBRARY_PATH
+PROFILES += macosx macosx_desktop unistd carbon has_windows haswchar
+DLL_PATH := DYLD_LIBRARY_PATH
 
-COMMON_CFLAGS += -I/System/Library/Frameworks/Carbon.framework/Versions/A/Frameworks/HIToolbox.framework/Versions/A/Headers \
-                 -I/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/CarbonCore.framework/Versions/A/Headers
+MACOSX_SDK_PATH := /Developer/SDKs/MacOSX10.4u.sdk
 
-COMMON_LINK_FLAGS += -framework Carbon
+COMMON_CFLAGS     += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=10.4
+COMMON_LINK_FLAGS += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=10.4
 
 include $(TOOLSETS_DIR)/g++.mak
 
