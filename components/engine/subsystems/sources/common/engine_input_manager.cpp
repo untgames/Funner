@@ -21,6 +21,8 @@ const char* SUBSYSTEM_NAME = "InputManager";
 const char* LOG_NAME       = "engine.subsystems.InputManagerSubsystem";
 const char* COMPONENT_NAME = LOG_NAME;
 
+const size_t DEFAULT_DEVICE_PROPERTIES_COUNT = 4;
+
 /*
    Подсистема менеджера ввода
 */
@@ -31,10 +33,27 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
 {
   public:
 /// Конструктор/деструктор
-    InputManagerSubsystem (const char* registry_name)
-      : translation_map_registry (registry_name),
+    InputManagerSubsystem (ParseNode& node)
+      : translation_map_registry (get<const char*> (node, "TranslationMapRegistry")),
         log (LOG_NAME)
     {
+      for (Parser::NamesakeIterator device_iter = node.First ("DevicesProperties.Device"); device_iter; ++device_iter)
+      {
+        const char* device_name = get<const char*> (*device_iter, "Name");
+
+        DevicePropertiesArray& device_properties = devices_properties [device_name];
+
+        device_properties.reserve (DEFAULT_DEVICE_PROPERTIES_COUNT);
+
+        for (Parser::NamesakeIterator property_iter = device_iter->First ("Property"); property_iter; ++property_iter)
+        {
+          const char* property_name  = get<const char*> (*property_iter, "Name");
+          float       property_value = get<float> (*property_iter, "Value");
+
+          device_properties.push_back (DeviceProperty (property_name, property_value));
+        }
+      }
+
       AttachmentRegistry::Attach (this, AttachmentRegistryAttachMode_ForceNotify);
     }
 
@@ -83,7 +102,18 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
             DevicesMap::iterator device_iter = devices.find (current_device->GetFullName ());
 
             if (device_iter == devices.end ())
+            {
               device_entry->device = DeviceHolderPtr (new DeviceHolder (current_device.get (), devices), false);
+
+              DevicesProperties::iterator devices_properties_iter = devices_properties.find (current_device->GetFullName ());
+
+              if (devices_properties_iter != devices_properties.end ())
+              {
+                for (DevicePropertiesArray::iterator property_iter = devices_properties_iter->second.begin (),
+                                                     properties_end = devices_properties_iter->second.end (); property_iter != properties_end; ++property_iter)
+                  current_device->SetProperty (property_iter->name.c_str (), property_iter->value);
+              }
+            }
             else
               device_entry->device = device_iter->second;
 
@@ -225,11 +255,23 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
     typedef xtl::intrusive_ptr<Attachment>                           AttachmentPtr;
     typedef stl::hash_map<stl::hash_key<const char*>, AttachmentPtr> AttachmentMap;
 
+    struct DeviceProperty
+    {
+      stl::string name;
+      float       value;
+
+      DeviceProperty (const char* in_name, float in_value) : name (in_name), value (in_value) {}
+    };
+
+    typedef stl::vector<DeviceProperty>                                      DevicePropertiesArray;
+    typedef stl::hash_map<stl::hash_key<const char*>, DevicePropertiesArray> DevicesProperties;
+
   private:
     input::TranslationMapRegistry translation_map_registry;
     TranslationMapsMap            translation_maps;
     DevicesMap                    devices;
     AttachmentMap                 attachments;
+    DevicesProperties             devices_properties;
     common::Log                   log;
 };
 
@@ -250,9 +292,7 @@ class InputManagerComponent
     {
       try
       {
-        const char* registry_name = get<const char*> (node, "TranslationMapRegistry");
-
-        xtl::com_ptr<ISubsystem> subsystem (new InputManagerSubsystem (registry_name), false);
+        xtl::com_ptr<ISubsystem> subsystem (new InputManagerSubsystem (node), false);
 
         manager.Add (SUBSYSTEM_NAME, subsystem.get ());
       }
