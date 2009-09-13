@@ -4,13 +4,6 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::iphone;
 
-namespace
-{
-
-const char* OPENGL_DYLIB_NAME = "/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator3.0.sdk/System/Library/Frameworks/OpenGLES.framework/OpenGLES"; //?????
-
-}
-
 /*
     Описание реализации библиотеки функций OpenGL
 */
@@ -20,7 +13,7 @@ struct Library::Impl
   syslib::DynamicLibrary opengl_dylib; //библиотека OpenGL
 
   Impl ()
-    : opengl_dylib (OPENGL_DYLIB_NAME)
+    : opengl_dylib (OPENGL_DYLIB_PATH)
     {}
 };
 
