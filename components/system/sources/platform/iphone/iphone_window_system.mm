@@ -278,12 +278,17 @@ void Platform::DestroyWindow (window_t handle)
 
 void Platform::SetWindowTitle (window_t, const wchar_t*)
 {
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetWindowTitle", "No window title for iPhone platform");
 }
 
-void Platform::GetWindowTitle (window_t, size_t, wchar_t*)
+void Platform::GetWindowTitle (window_t, size_t size, wchar_t* buffer)
 {
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::GetWindowTitle", "No window title for iPhone platform");
+  if (!size)
+    return;
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::GetWindowTitle", "buffer");
+
+  *buffer = L'\0';
 }
 
 /*
