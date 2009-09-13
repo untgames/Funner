@@ -14,25 +14,73 @@ using namespace common;
      онструктор
 */
 
-SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manager, RenderTargetType target_type)
-  : RenderBuffer (manager->GetContextManager (), target_type),
-    frame_buffer_manager (manager)
+SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manager, RenderTargetType target_type, ISwapChain* in_swap_chain)
+  : RenderBuffer (manager->GetContextManager (), target_type)
+  , frame_buffer_manager (manager)
+  , frame_buffer_id (0)
+  , frame_buffer_cache_id (GetId ())
 {
+  try
+  {
+      //проверка корректности переданных параметров
+
+    if (!in_swap_chain)
+      throw xtl::make_null_argument_exception ("", "swap_chain");
+
+    if (ISwapChainFrameBuffer* swap_chain_frame_buffer = dynamic_cast<ISwapChainFrameBuffer*> (in_swap_chain))
+      frame_buffer_id = swap_chain_frame_buffer->GetFrameBufferId ();
+
+    if (Object* object = dynamic_cast<Object*> (in_swap_chain))
+      frame_buffer_cache_id = object->GetId ();    
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::SwapChainRenderBuffer::SwapChainRenderBuffer(const FrameBufferManagerPtr&,RenderTargetType,ISwapChain*)");
+    throw;
+  }
 }
 
-SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manager, const TextureDesc& desc)
-  : RenderBuffer (manager->GetContextManager (), desc),
-    frame_buffer_manager (manager)
+SwapChainRenderBuffer::SwapChainRenderBuffer (const FrameBufferManagerPtr& manager, ISwapChain* in_swap_chain, const TextureDesc& desc)
+  : RenderBuffer (manager->GetContextManager (), desc)
+  , frame_buffer_manager (manager)
+  , frame_buffer_id (0)
+  , frame_buffer_cache_id (GetId ())  
 {
+  try
+  {
+      //проверка корректности переданных параметров
+
+    if (!in_swap_chain)
+      throw xtl::make_null_argument_exception ("", "swap_chain");
+
+    if (ISwapChainFrameBuffer* swap_chain_frame_buffer = dynamic_cast<ISwapChainFrameBuffer*> (in_swap_chain))
+      frame_buffer_id = swap_chain_frame_buffer->GetFrameBufferId ();
+    
+    if (Object* object = dynamic_cast<Object*> (in_swap_chain))
+      frame_buffer_cache_id = object->GetId ();
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::SwapChainRenderBuffer::SwapChainRenderBuffer(const FrameBufferManagerPtr&,ISwapChain*,const TextureDesc&)");
+    throw;
+  }
 }
 
 /*
     ”становка активного буфера кадра
 */
 
-void SwapChainRenderBuffer::SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type)
+void SwapChainRenderBuffer::SetFrameBuffer (GLenum buffer_type)
 {
-  frame_buffer_manager->SetFrameBuffer (swap_chain, buffer_type);
+  try
+  {
+    frame_buffer_manager->SetFrameBuffer (swap_chain.get (), buffer_type, frame_buffer_id, frame_buffer_cache_id);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::SwapChainRenderBuffer::SetFrameBuffer");
+    throw;
+  }
 }
 
 /*
@@ -47,19 +95,15 @@ void SwapChainRenderBuffer::SetFrameBuffer (ISwapChain* swap_chain, GLenum buffe
 
 SwapChainColorBuffer::SwapChainColorBuffer
  (const FrameBufferManagerPtr& manager,
-  ISwapChain*                  in_swap_chain,
+  ISwapChain*                  swap_chain,
   size_t                       in_buffer_index)
-  : SwapChainRenderBuffer (manager, RenderTargetType_Color),
-    swap_chain (in_swap_chain),
+  : SwapChainRenderBuffer (manager, RenderTargetType_Color, swap_chain),
     buffer_index (in_buffer_index),
     is_shadow (false)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainColorBuffer::SwapChainColorBuffer";
   
     //проверка корректности переданных параметров
-  
-  if (!swap_chain)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");
 
   SwapChainDesc swap_chain_desc;
 
@@ -81,25 +125,19 @@ SwapChainColorBuffer::SwapChainColorBuffer
   SetSize (swap_chain_desc.frame_buffer.width, swap_chain_desc.frame_buffer.height);
 }
 
-SwapChainColorBuffer::SwapChainColorBuffer (const FrameBufferManagerPtr& manager, ISwapChain* in_swap_chain, const TextureDesc& desc)
-  : SwapChainRenderBuffer (manager, desc),
-    swap_chain (in_swap_chain),
+SwapChainColorBuffer::SwapChainColorBuffer (const FrameBufferManagerPtr& manager, ISwapChain* swap_chain, const TextureDesc& desc)
+  : SwapChainRenderBuffer (manager, swap_chain, desc),
     buffer_index (0),
     buffer_type (GL_FRONT),
     is_shadow (true)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainColorBuffer::SwapChainColorBuffer";
 
-    //проверка корректности переданных параметров
-
-  if (!swap_chain)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "swap_chain");
-    
     //установка индекса буфера
     
   SwapChainDesc swap_chain_desc;
 
-  memset (&swap_chain_desc, 0, sizeof swap_chain_desc);
+  memset (&swap_chain_desc, 0, sizeof (swap_chain_desc));
 
   swap_chain->GetDesc (swap_chain_desc);
 
@@ -118,12 +156,11 @@ void SwapChainColorBuffer::Bind ()
 {
   try    
   {
-    SetFrameBuffer (swap_chain.get (), buffer_type);
+    SetFrameBuffer (buffer_type);
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("render::low_level::opengl::SwapChainColorBuffer::Bind");
-
     throw;
   }
 }
@@ -138,17 +175,11 @@ void SwapChainColorBuffer::Bind ()
      онструктор / деструктор
 */
 
-SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManagerPtr& manager, ISwapChain* in_swap_chain)
-  : SwapChainRenderBuffer (manager, RenderTargetType_DepthStencil),
-    swap_chain (in_swap_chain)
+SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManagerPtr& manager, ISwapChain* swap_chain)
+  : SwapChainRenderBuffer (manager, RenderTargetType_DepthStencil, swap_chain)
 {
   try
   {
-      //проверка корректности переданных параметров
-    
-    if (!swap_chain)
-      throw xtl::make_null_argument_exception ("", "swap_chain");
-      
       //установка размеров буфера
 
     SwapChainDesc swap_chain_desc;    
@@ -164,16 +195,12 @@ SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManag
   }
 }
 
-SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManagerPtr& manager, ISwapChain* in_swap_chain, const TextureDesc& desc)
-  : SwapChainRenderBuffer (manager, desc),
-    swap_chain (in_swap_chain)
+SwapChainDepthStencilBuffer::SwapChainDepthStencilBuffer (const FrameBufferManagerPtr& manager, ISwapChain* swap_chain, const TextureDesc& desc)
+  : SwapChainRenderBuffer (manager, swap_chain, desc)
 {
   try
   {
       //проверка переданных параметров
-
-    if (!swap_chain)
-      throw xtl::make_null_argument_exception ("", "swap_chain");
 
     SwapChainDesc swap_chain_desc;
 
@@ -206,12 +233,11 @@ void SwapChainDepthStencilBuffer::Bind ()
 {
   try
   {
-    SetFrameBuffer (swap_chain.get (), GL_NONE);
+    SetFrameBuffer (GL_NONE);
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("render::low_level::opengl::SwapChainDepthStencilBuffer::Bind");
-    
     throw;
   }  
 }

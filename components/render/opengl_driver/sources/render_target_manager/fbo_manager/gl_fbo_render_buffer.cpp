@@ -169,6 +169,8 @@ size_t FboRenderBuffer::GetFrameBufferId ()
   MakeContextCurrent ();
   
   const ContextCaps& caps = GetCaps ();
+  
+  size_t current_id = GetContextCacheValue (CacheEntry_FrameBufferId);
 
     //создание буфера кадра
     
@@ -179,6 +181,8 @@ size_t FboRenderBuffer::GetFrameBufferId ()
     
   try
   {
+    SetContextCacheValue (CacheEntry_FrameBufferId, 0); //for exceptions
+    
       //установка текущего буфера кадра
 
     caps.glBindFramebuffer_fn (GL_FRAMEBUFFER, frame_buffer_id);
@@ -229,8 +233,12 @@ size_t FboRenderBuffer::GetFrameBufferId ()
 
       //проверка ошибок
 
-    CheckErrors (METHOD_NAME);
-    
+    CheckErrors (METHOD_NAME);    
+
+      //обновление текущего буфера
+
+    SetContextCacheValue (CacheEntry_FrameBufferId, GetId ());
+
     return frame_buffer_id;
   }
   catch (...)

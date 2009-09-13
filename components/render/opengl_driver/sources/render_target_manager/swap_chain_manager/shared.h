@@ -3,6 +3,8 @@
 
 #include "../shared.h"
 
+#include <shared/platform.h>
+
 namespace render
 {
 
@@ -55,7 +57,7 @@ class SwapChainFrameBufferManager: public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка активного буфера кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type);
+    void SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type, size_t frame_buffer_id, size_t cache_id);
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,20 +84,34 @@ typedef xtl::com_ptr<SwapChainFrameBufferManager> FrameBufferManagerPtr;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class SwapChainRenderBuffer: public RenderBuffer
 {
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Цепочка обмена / идентификатор буфера кадра
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ISwapChain* GetSwapChain          () const { return swap_chain.get (); }
+    size_t      GetFrameBufferId      () const { return frame_buffer_id; }
+    size_t      GetFrameBufferCacheId () const { return frame_buffer_cache_id; }
+
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    SwapChainRenderBuffer (const FrameBufferManagerPtr&, RenderTargetType target_type);
-    SwapChainRenderBuffer (const FrameBufferManagerPtr&, const TextureDesc& desc);
+    SwapChainRenderBuffer (const FrameBufferManagerPtr&, RenderTargetType target_type, ISwapChain* swap_chain);
+    SwapChainRenderBuffer (const FrameBufferManagerPtr&, ISwapChain* swap_chain, const TextureDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка активного буфера кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type);
-    
+    void SetFrameBuffer (GLenum buffer_type);
+
   private:
-    FrameBufferManagerPtr frame_buffer_manager;
+    typedef xtl::com_ptr<ISwapChain> SwapChainPtr;    
+
+  private:
+    FrameBufferManagerPtr frame_buffer_manager;  //менеджер буферов кадра
+    SwapChainPtr          swap_chain;            //цепочка обмена    
+    size_t                frame_buffer_id;       //буфер кадра
+    size_t                frame_buffer_cache_id; //идентификатор цепочки обмена
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,15 +127,10 @@ class SwapChainColorBuffer: public SwapChainRenderBuffer
     SwapChainColorBuffer (const FrameBufferManagerPtr&, ISwapChain* swap_chain, const TextureDesc& desc);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Цепочка обмена и номер буфера
+///Номер буфера / тип буфера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ISwapChain* GetSwapChain   () const { return swap_chain.get (); }
-    size_t      GetBufferIndex () const { return buffer_index; }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Тип буфера
-///////////////////////////////////////////////////////////////////////////////////////////////////    
-    GLenum GetBufferType () const { return buffer_type; }
+    size_t GetBufferIndex () const { return buffer_index; }
+    GLenum GetBufferType  () const { return buffer_type; }    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Является ли буфер теневым
@@ -130,13 +141,9 @@ class SwapChainColorBuffer: public SwapChainRenderBuffer
     void Bind ();
 
   private:
-    typedef xtl::com_ptr<ISwapChain> SwapChainPtr;
-
-  private:
-    SwapChainPtr swap_chain;   //цепочка обмена
-    size_t       buffer_index; //индекс буфера обмена в цепочке обмена
-    GLenum       buffer_type;  //тип буфера
-    bool         is_shadow;    //является ли буфер теневым
+    size_t buffer_index; //индекс буфера обмена в цепочке обмена
+    GLenum buffer_type;  //тип буфера
+    bool   is_shadow;    //является ли буфер теневым
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,19 +159,8 @@ class SwapChainDepthStencilBuffer: public SwapChainRenderBuffer
     SwapChainDepthStencilBuffer  (const FrameBufferManagerPtr&, ISwapChain* swap_chain, const TextureDesc&);
     ~SwapChainDepthStencilBuffer ();
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Цепочка обмена
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    ISwapChain* GetSwapChain () const { return swap_chain.get (); }
-
   private:
     void Bind ();
-
-  private:
-    typedef xtl::com_ptr<ISwapChain> SwapChainPtr;
-
-  private:
-    SwapChainPtr swap_chain; //цепочка обмена
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

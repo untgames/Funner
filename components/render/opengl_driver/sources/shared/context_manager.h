@@ -48,8 +48,8 @@ enum CacheEntry
   CacheEntry_EnabledTextures,   //маска: установлена ли текстура в определенном слоте
   CacheEntry_ColorWriteMask,    //маска записи в буфер цвета
   CacheEntry_DepthWriteEnable,  //включена ли запись в буфер глубины
-  CacheEntry_StencilWriteMask,  //маска записи в буфер трафарета  
-  CacheEntry_ScissorEnable,     //включен ли тест отсечения    
+  CacheEntry_StencilWriteMask,  //маска записи в буфер трафарета
+  CacheEntry_ScissorEnable,     //включен ли тест отсечения
 
   CacheEntry_SharedLast = CacheEntry_SharedFirst + CONTEXT_CACHE_STAGE_ENTRIES_NUM,
 

@@ -154,7 +154,6 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
       case PixelFormat_DXT3:
       case PixelFormat_DXT5:
         throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported depth-stencil render-target texture format=%s", get_name (render_target.texture_desc.format));
-        break;
       case PixelFormat_D16:
       case PixelFormat_D24X8:
       case PixelFormat_D24S8:
@@ -162,7 +161,6 @@ void SwapChainFrameBuffer::SetDepthStencilView (View* view)
         break;
       default:
         throw xtl::make_argument_exception (METHOD_NAME, "texture_desc.format", render_target.texture_desc.format);
-        break;
     }    
     
     has_texture_targets = true;    
@@ -258,7 +256,8 @@ void SwapChainFrameBuffer::Bind ()
   try
   {
     frame_buffer_manager->SetFrameBuffer (color_buffer->GetSwapChain (),
-      is_color_buffer_active ? color_buffer->GetBufferType () : GL_NONE);
+      is_color_buffer_active ? color_buffer->GetBufferType () : GL_NONE, color_buffer->GetFrameBufferId (),
+      color_buffer->GetFrameBufferCacheId ());
   }
   catch (xtl::exception& exception)
   {

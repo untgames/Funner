@@ -4,13 +4,12 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 
 /*
-    Конструктор / деструктор
+    ╩юэёЄЁєъЄюЁ / фхёЄЁєъЄюЁ
 */
 
 SwapChainFrameBufferManager::SwapChainFrameBufferManager (const ContextManager& context_manager, ISwapChain* in_default_swap_chain)
-  : ContextObject (context_manager),
-    default_swap_chain (in_default_swap_chain)
-
+  : ContextObject (context_manager)
+  , default_swap_chain (in_default_swap_chain)
 {
 }
 
@@ -19,7 +18,7 @@ SwapChainFrameBufferManager::~SwapChainFrameBufferManager ()
 }
 
 /*
-    Работа с теневыми буферами
+    ╨рсюЄр ё Єхэхт√ьш сєЇхЁрьш
 */
 
 ColorBufferPtr SwapChainFrameBufferManager::CreateShadowColorBuffer (SwapChainDepthStencilBuffer* depth_stencil_buffer)
@@ -36,12 +35,12 @@ DepthStencilBufferPtr SwapChainFrameBufferManager::CreateShadowDepthStencilBuffe
 
 ColorBufferPtr SwapChainFrameBufferManager::GetShadowBuffer (SwapChainDepthStencilBuffer* depth_stencil_buffer)
 {
-    //попытка вернуть существующий теневой буфер цвета
+    //яюя√Єър тхЁэєЄ№ ёє∙хёЄтє■∙шщ Єхэхтющ сєЇхЁ ЎтхЄр
     
   if (shadow_color_buffer)
     return shadow_color_buffer.get ();
 
-    //создание нового буфера цвета
+    //ёючфрэшх эютюую сєЇхЁр ЎтхЄр
 
   ColorBufferPtr color_buffer = CreateShadowColorBuffer (depth_stencil_buffer);
 
@@ -52,12 +51,12 @@ ColorBufferPtr SwapChainFrameBufferManager::GetShadowBuffer (SwapChainDepthStenc
 
 DepthStencilBufferPtr SwapChainFrameBufferManager::GetShadowBuffer (SwapChainColorBuffer* color_buffer)
 {
-    //попытка вернуть существующий теневой буфер попиксельного отсечения
+    //яюя√Єър тхЁэєЄ№ ёє∙хёЄтє■∙шщ Єхэхтющ сєЇхЁ яюяшъёхы№эюую юЄёхўхэш 
     
   if (shadow_depth_stencil_buffer)
     return shadow_depth_stencil_buffer.get ();
 
-    //создание нового буфера попиксельного отсечения
+    //ёючфрэшх эютюую сєЇхЁр яюяшъёхы№эюую юЄёхўхэш 
 
   DepthStencilBufferPtr depth_stencil_buffer = CreateShadowDepthStencilBuffer (color_buffer);
   
@@ -68,7 +67,7 @@ DepthStencilBufferPtr SwapChainFrameBufferManager::GetShadowBuffer (SwapChainCol
 
 void SwapChainFrameBufferManager::GetShadowBuffers (ColorBufferPtr& color_buffer, DepthStencilBufferPtr& depth_stencil_buffer)
 {
-    //попытка вернуть существующие буферы
+    //яюя√Єър тхЁэєЄ№ ёє∙хёЄтє■∙шх сєЇхЁ√
     
   if (shadow_depth_stencil_buffer && shadow_color_buffer)
   {
@@ -78,7 +77,7 @@ void SwapChainFrameBufferManager::GetShadowBuffers (ColorBufferPtr& color_buffer
     return;
   }
       
-    //создание буфера цвета
+    //ёючфрэшх сєЇхЁр ЎтхЄр
 
   if (!shadow_color_buffer && shadow_depth_stencil_buffer)
   {
@@ -91,7 +90,7 @@ void SwapChainFrameBufferManager::GetShadowBuffers (ColorBufferPtr& color_buffer
     return;
   }
 
-    //создание буфера попиксельного отсечения
+    //ёючфрэшх сєЇхЁр яюяшъёхы№эюую юЄёхўхэш 
 
   if (shadow_color_buffer && !shadow_depth_stencil_buffer)
   {
@@ -104,28 +103,28 @@ void SwapChainFrameBufferManager::GetShadowBuffers (ColorBufferPtr& color_buffer
     return;
   }
 
-    //если оба буфера отсутствуют - создание PBuffer-а
+    //хёыш юср сєЇхЁр юЄёєЄёЄтє■Є - ёючфрэшх PBuffer-р
 
   SwapChainPtr swap_chain (GetContextManager ().CreateCompatibleSwapChain (default_swap_chain.get ()), false);
 
-    //создание теневого буфера цвета
+    //ёючфрэшх Єхэхтюую сєЇхЁр ЎтхЄр
 
   ColorBufferPtr new_color_buffer (new SwapChainColorBuffer (this, swap_chain.get (), 1), false);  
 
   shadow_color_buffer = new_color_buffer.get ();    
 
-    //создание теневого буфера попиксельного отсечения
+    //ёючфрэшх Єхэхтюую сєЇхЁр яюяшъёхы№эюую юЄёхўхэш 
 
   DepthStencilBufferPtr new_depth_stencil_buffer = GetShadowBuffer (new_color_buffer.get ());
 
-    //возврат значений
+    //тючтЁрЄ чэрўхэшщ
 
   color_buffer         = new_color_buffer;
   depth_stencil_buffer = new_depth_stencil_buffer;
 }
 
 /*
-    Создание буферов рендеринга
+    ╤ючфрэшх сєЇхЁют ЁхэфхЁшэур
 */
 
 ITexture* SwapChainFrameBufferManager::CreateRenderBuffer (const TextureDesc& desc)
@@ -214,13 +213,13 @@ ITexture* SwapChainFrameBufferManager::CreateDepthStencilBuffer (ISwapChain* swa
 }
 
 /*
-    Создание буферов кадра
+    ╤ючфрэшх сєЇхЁют ърфЁр
 */
 
-//проверка возможности создания буфера кадра
+//яЁютхЁър тючьюцэюёЄш ёючфрэш  сєЇхЁр ърфЁр
 bool SwapChainFrameBufferManager::IsSupported (View* color_view, View* depth_stencil_view)
 {
-    //проверка совместимости цветового отображения
+    //яЁютхЁър ёютьхёЄшьюёЄш ЎтхЄютюую юЄюсЁрцхэш 
 
   if (color_view)
   {
@@ -230,7 +229,7 @@ bool SwapChainFrameBufferManager::IsSupported (View* color_view, View* depth_ste
       return false;
   }
 
-    //проверка совместимости отображения буфера попиксельного отсечения
+    //яЁютхЁър ёютьхёЄшьюёЄш юЄюсЁрцхэш  сєЇхЁр яюяшъёхы№эюую юЄёхўхэш 
     
   if (depth_stencil_view)
   {
@@ -244,7 +243,7 @@ bool SwapChainFrameBufferManager::IsSupported (View* color_view, View* depth_ste
   return true;  
 }
 
-//создание буфера кадра
+//ёючфрэшх сєЇхЁр ърфЁр
 IFrameBuffer* SwapChainFrameBufferManager::CreateFrameBuffer (View* color_view, View* depth_stencil_view)
 {
   try
@@ -263,10 +262,10 @@ IFrameBuffer* SwapChainFrameBufferManager::CreateFrameBuffer (View* color_view, 
 }
 
 /*
-    Установка активного буфера кадра
+    ╙ёЄрэютър ръЄштэюую сєЇхЁр ърфЁр
 */
 
-void SwapChainFrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type)
+void SwapChainFrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum buffer_type, size_t frame_buffer_id, size_t cache_id)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::SwapChainFrameBufferManager::SetFrameBuffer";
   
@@ -276,28 +275,38 @@ void SwapChainFrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum
     swap_chain  = default_swap_chain.get ();
   }
 
-    //установка активной цепочки обмена
+    //єёЄрэютър ръЄштэющ Ўхяюўъш юсьхэр
 
   GetContextManager ().SetSwapChain (swap_chain);
 
-    //проверка необходимости переустановки буфера
+    //яЁютхЁър эхюсїюфшьюёЄш яхЁхєёЄрэютъш сєЇхЁр
 
   const size_t current_buffer_type = GetContextCacheValue (CacheEntry_BufferAttachment),
                current_fbo         = GetContextCacheValue (CacheEntry_FrameBufferId);
 
-  if (current_buffer_type == buffer_type && !current_fbo)
+  if (current_buffer_type == buffer_type && current_fbo == cache_id)
     return;
 
-    //установка текущего контекста OpenGL
+    //єёЄрэютър Єхъє∙хую ъюэЄхъёЄр OpenGL
 
   MakeContextCurrent ();
 
-    //установка буфера кадра по умолчанию    
+    //єёЄрэютър сєЇхЁр ърфЁр яю єьюыўрэш■    
 
-  if (GetCaps ().has_ext_framebuffer_object && current_fbo)
-    GetCaps ().glBindFramebuffer_fn (GL_FRAMEBUFFER, 0);
+  if (current_fbo != cache_id)
+  {
+    if (GetCaps ().has_ext_framebuffer_object)
+    {
+      GetCaps ().glBindFramebuffer_fn (GL_FRAMEBUFFER, frame_buffer_id);
+    }
+    else
+    {
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Can't set frame_buffer_id=%u. Frame buffers not supported",
+        frame_buffer_id);
+    }
+  }
 
-    //установка текущего буфера чтения и отрисовки
+    //єёЄрэютър Єхъє∙хую сєЇхЁр ўЄхэш  ш юЄЁшёютъш
     
 #ifndef OPENGL_ES_SUPPORT
   if (current_buffer_type != buffer_type)
@@ -307,18 +316,18 @@ void SwapChainFrameBufferManager::SetFrameBuffer (ISwapChain* swap_chain, GLenum
   }
 #endif
 
-    //проверка ошибок
+    //яЁютхЁър ю°шсюъ
 
   CheckErrors (METHOD_NAME);
 
-    //установка значений кэш-переменных  
+    //єёЄрэютър чэрўхэшщ ъ¤°-яхЁхьхээ√ї  
     
   SetContextCacheValue (CacheEntry_BufferAttachment, buffer_type);
-  SetContextCacheValue (CacheEntry_FrameBufferId,    0);
+  SetContextCacheValue (CacheEntry_FrameBufferId,    cache_id);
 }
 
 /*
-    Регистрация обработчиков создания буферов рендеринга и буферов кадра
+    ╨хушёЄЁрЎш  юсЁрсюЄўшъют ёючфрэш  сєЇхЁют ЁхэфхЁшэур ш сєЇхЁют ърфЁр
 */
 
 namespace render
@@ -334,13 +343,13 @@ void register_swap_chain_manager (RenderTargetRegistry& registry, const ContextM
 {
   FrameBufferManagerPtr manager (new SwapChainFrameBufferManager (context_manager, default_swap_chain), false);
 
-    //регистрация обработчиков создания буферов рендеринга
+    //ЁхушёЄЁрЎш  юсЁрсюЄўшъют ёючфрэш  сєЇхЁют ЁхэфхЁшэур
 
   registry.RegisterCreater (ColorBufferCreater (xtl::bind (&SwapChainFrameBufferManager::CreateColorBuffer, manager, _1, _2)));
   registry.RegisterCreater (DepthStencilBufferCreater (xtl::bind (&SwapChainFrameBufferManager::CreateDepthStencilBuffer, manager, _1)));
   registry.RegisterCreater (RenderBufferCreater (xtl::bind (&SwapChainFrameBufferManager::CreateRenderBuffer, manager, _1)));
 
-    //регистрация обработчиков создания буферов кадра
+    //ЁхушёЄЁрЎш  юсЁрсюЄўшъют ёючфрэш  сєЇхЁют ърфЁр
 
   registry.RegisterCreater (&SwapChainFrameBufferManager::IsSupported, xtl::bind (&SwapChainFrameBufferManager::CreateFrameBuffer, manager, _1, _2));
 }
