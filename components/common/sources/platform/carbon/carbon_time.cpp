@@ -4,7 +4,7 @@
 
 using namespace common;
 
-size_t MacOsXPlatform::GetMilliseconds ()
+size_t CarbonPlatform::GetMilliseconds ()
 {
   UnsignedWide microseconds;
 

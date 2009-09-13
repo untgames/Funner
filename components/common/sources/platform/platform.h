@@ -83,9 +83,9 @@ class UnistdPlatform: public DefaultPlatform
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Darwin
+///Carbon
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class MacOsXPlatform : public UnistdPlatform
+class CarbonPlatform : public UnistdPlatform
 {
   public:
     static size_t GetMilliseconds ();
@@ -97,7 +97,7 @@ class MacOsXPlatform : public UnistdPlatform
 #ifdef _WIN32
   typedef Win32Platform Platform;
 #elif defined (__APPLE__) && !defined (__IPHONE__)
-  typedef MacOsXPlatform Platform;
+  typedef CarbonPlatform Platform;
 #elif defined __GNUC__
   typedef UnistdPlatform Platform;
 #else

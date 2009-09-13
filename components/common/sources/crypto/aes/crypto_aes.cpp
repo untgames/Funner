@@ -6,7 +6,7 @@
 #include <common/crypto.h>
 #include <common/component.h>
 
-typedef size_t        uint32_t;
+typedef size_t        aes_uint32_t;
 typedef unsigned char byte;
 
 #include "aes_le.h"
@@ -28,8 +28,8 @@ const size_t CRYPTO_BLOCK_SIZE = 16; //размер блока шифрования в байтах
 
 struct AesParam
 {
-  uint32_t key_expansion [64];
-  uint32_t number_of_rounds;
+  aes_uint32_t key_expansion [64];
+  aes_uint32_t number_of_rounds;
 };
 
 enum AesOperation
@@ -42,7 +42,7 @@ enum AesOperation
 void aes_init (AesParam* ap, const byte* key, size_t key_bits, AesOperation operation)
 {
   static const char* METHOD_NAME = "common::aes_init";
-  
+
     //проверка корректности аргументов
 
   if (!key)
@@ -50,12 +50,12 @@ void aes_init (AesParam* ap, const byte* key, size_t key_bits, AesOperation oper
 
   if ((key_bits & 63) || key_bits < 128 || key_bits > 256)
     throw xtl::make_argument_exception (METHOD_NAME, "key_bits", key_bits, "Must be in range [128;256]");
-    
+
     //подготовка контекста
 
   if (((key_bits & 63) == 0) && (key_bits >= 128) && (key_bits <= 256))
   {
-    uint32_t* rk, t, i, j;
+    aes_uint32_t* rk, t, i, j;
 
     ap->number_of_rounds = 6 + (key_bits >> 5);
 
@@ -184,11 +184,11 @@ void aes_init (AesParam* ap, const byte* key, size_t key_bits, AesOperation oper
 }
 
 //шифрование
-void aes_encrypt (AesParam* ap, uint32_t* dst, const uint32_t* src)
+void aes_encrypt (AesParam* ap, aes_uint32_t* dst, const aes_uint32_t* src)
 {
-  uint32_t s0, s1, s2, s3;
-  uint32_t t0, t1, t2, t3;
-  uint32_t* rk = ap->key_expansion;
+  aes_uint32_t s0, s1, s2, s3;
+  aes_uint32_t t0, t1, t2, t3;
+  aes_uint32_t* rk = ap->key_expansion;
 
   s0 = src [0] ^ rk [0];
   s1 = src [1] ^ rk [1];
@@ -228,11 +228,11 @@ void aes_encrypt (AesParam* ap, uint32_t* dst, const uint32_t* src)
 }
 
 //дешифровка
-void aes_decrypt (AesParam* ap, uint32_t* dst, const uint32_t* src)
+void aes_decrypt (AesParam* ap, aes_uint32_t* dst, const aes_uint32_t* src)
 {
-  uint32_t s0, s1, s2, s3;
-  uint32_t t0, t1, t2, t3;
-  uint32_t* rk = ap->key_expansion;
+  aes_uint32_t s0, s1, s2, s3;
+  aes_uint32_t t0, t1, t2, t3;
+  aes_uint32_t* rk = ap->key_expansion;
 
   s0 = src [0] ^ rk [0];
   s1 = src [1] ^ rk [1];
@@ -279,7 +279,7 @@ template <AesOperation operation> class AesContext: public ICryptoContext
 {
   public:
     AesContext (const void* key, size_t key_bits)
-    {  
+    {
       aes_init (&ap, (const byte*)key, key_bits, operation);
     }
 
@@ -288,16 +288,16 @@ template <AesOperation operation> class AesContext: public ICryptoContext
 
 ///Обновление контекста
     size_t Update (size_t data_size, const void* src_data, void* dst_data)
-    {      
+    {
       const char* src    = (const char*)src_data;
       char*       dst    = (char*)dst_data;
       size_t      length = 0;
-      
+
       while (data_size >= CRYPTO_BLOCK_SIZE)
       {
-        if (operation == AesOperation_Encrypt) aes_encrypt (&ap, (uint32_t*)dst, (const uint32_t*)src);
-        else                                   aes_decrypt (&ap, (uint32_t*)dst, (const uint32_t*)src);
-        
+        if (operation == AesOperation_Encrypt) aes_encrypt (&ap, (aes_uint32_t*)dst, (const aes_uint32_t*)src);
+        else                                   aes_decrypt (&ap, (aes_uint32_t*)dst, (const aes_uint32_t*)src);
+
         src       += CRYPTO_BLOCK_SIZE;
         dst       += CRYPTO_BLOCK_SIZE;
         data_size -= CRYPTO_BLOCK_SIZE;
@@ -323,7 +323,7 @@ class AesComponent
       CryptoSystem::RegisterCrypter ("aes.encrypt", &CreateEncryptContext);
       CryptoSystem::RegisterCrypter ("aes.decrypt", &CreateDecryptContext);
     }
-    
+
   private:
     static ICryptoContext* CreateEncryptContext (const char*, const void* key, size_t key_bits)
     {

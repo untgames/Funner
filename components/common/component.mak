@@ -14,7 +14,8 @@ COMMON.SOURCES.SOURCE_DIRS                       := sources/file_system/core sou
 COMMON.SOURCES.COMPILER_DEFINES                  := PCRE_STATIC
 COMMON.SOURCES.iphone_simulator.COMPILER_DEFINES := __IPHONE__
 COMMON.SOURCES.unistd.SOURCE_DIRS                := sources/platform/unistd
-COMMON.SOURCES.macosx.SOURCE_DIRS                := sources/platform/macosx
+COMMON.SOURCES.carbon.SOURCE_DIRS                := sources/platform/carbon
+COMMON.SOURCES.carbon.COMPILER_CFLAGS            := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers
 COMMON.SOURCES.win32.SOURCE_DIRS                 := sources/platform/win32
 
 #Цель - WxfParser
