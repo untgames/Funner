@@ -185,6 +185,7 @@ struct InputStage::Impl: public ContextObject
     {
       try
       {
+#ifndef OPENGL_ES_SUPPORT
         if (GetCaps ().has_arb_vertex_buffer_object)
         {
           return new VboBuffer (GetContextManager (), buffer_target, desc);
@@ -193,6 +194,9 @@ struct InputStage::Impl: public ContextObject
         {
           return new SystemMemoryInputBuffer (GetContextManager (), buffer_target, desc);
         }
+#else
+        return new VboBuffer (GetContextManager (), buffer_target, desc);
+#endif
       }
       catch (xtl::exception& exception)
       {

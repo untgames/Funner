@@ -84,7 +84,9 @@ ContextCaps::ContextCaps ()
 
 void ContextCaps::Init (const ExtensionSet& available_extension_set, const ExtensionSet& enabled_extension_set)
 {
-    //маркеры исползуемых расширений
+#ifndef OPENGL_ES_SUPPORT  
+
+    //маркеры используемых расширений
 
   static Extension ARB_depth_texture              = "GL_ARB_depth_texture",
                    ARB_fragment_shader            = "GL_ARB_fragment_shader",
@@ -119,7 +121,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                    EXT_texture3D                  = "GL_EXT_texture3D",
                    NV_texture_rectangle           = "GL_NV_texture_rectangle",
                    SGIS_generate_mipmap           = "GL_SGIS_generate_mipmap",
-                   SGIS_texture_lod               = "GL_SGIS_texture_lod";
+                   SGIS_texture_lod               = "GL_SGIS_texture_lod";                   
 
   static Extension versions [GlVersion_Num] = {"GL_VERSION_1_2", "GL_VERSION_1_3", "GL_VERSION_1_4", "GL_VERSION_1_5",
                                                "GL_VERSION_2_0", "GL_VERSION_2_1"};
@@ -134,9 +136,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   {
     if (ext.Get (versions [version_id]))
       (ext |= std_extension_set.versions [version_id]) &= enabled_extension_set;
-  }
-
-     //инициализация таблицы возможностей контекста
+  }                   
 
   has_arb_depth_texture              = ext.Get (ARB_depth_texture);
   has_arb_fragment_shader            = ext.Get (ARB_fragment_shader);
@@ -169,16 +169,6 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ext_texture3d                  = ext.Get (EXT_texture3D);
   has_sgis_generate_mipmap           = ext.Get (SGIS_generate_mipmap);
   has_sgis_texture_lod               = ext.Get (SGIS_texture_lod);
-
-  glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
-
-  if (has_ext_texture_filter_anisotropic) glGetIntegerv (GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, (GLint*)&max_anisotropy);
-  else                                    max_anisotropy = 1;
-
-  if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
-  else                      texture_units_count = 1;  
-
-#ifndef OPENGL_ES_SUPPORT
 
   if (has_arb_texture_rectangle) glGetIntegerv (GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB, (GLint*)&max_rectangle_texture_size);
   if (has_arb_texture_cube_map)  glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
@@ -236,6 +226,24 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   
 #else
 
+  static Extension OES_blend_equation_separate    = "GL_OES_blend_equation_separate",
+                   OES_blend_func_separate        = "GL_OES_blend_func_separate",
+                   OES_blend_subtract             = "GL_OES_blend_subtract",
+                   OES_framebuffer_object         = "GL_OES_framebuffer_object",
+                   OES_texture_cube_map           = "GL_OES_texture_cube_map",
+                   EXT_texture_filter_anisotropic = "GL_EXT_texture_filter_anisotropic";
+
+  has_arb_multisample                = true;
+  has_arb_multitexture               = true;
+  has_arb_texture_cube_map           = ext.Get (OES_texture_cube_map);
+  has_arb_vertex_buffer_object       = true;
+  has_ext_blend_equation_separate    = ext.Get (OES_blend_equation_separate);
+  has_ext_blend_func_separate        = ext.Get (OES_blend_func_separate);
+  has_ext_blend_subtract             = ext.Get (OES_blend_subtract);
+  has_ext_framebuffer_object         = ext.Get (OES_framebuffer_object);
+  has_ext_texture_filter_anisotropic = ext.Get (EXT_texture_filter_anisotropic);
+  has_sgis_generate_mipmap           = true;
+
   glActiveTexture_fn           = glActiveTexture;
   glBindBuffer_fn              = glBindBuffer;
   glBlendEquation_fn           = glBlendEquationOES;
@@ -262,7 +270,15 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   glCheckFramebufferStatus_fn              = glCheckFramebufferStatusOES;
   glFramebufferRenderbuffer_fn             = glFramebufferRenderbufferOES;
   glFramebufferTexture2D_fn                = glFramebufferTexture2DOES;
-  glGetFramebufferAttachmentParameteriv_fn = glGetFramebufferAttachmentParameterivOES;  
+  glGetFramebufferAttachmentParameteriv_fn = glGetFramebufferAttachmentParameterivOES;
 
-#endif  
+#endif
+
+  glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
+
+  if (has_ext_texture_filter_anisotropic) glGetIntegerv (GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, (GLint*)&max_anisotropy);
+  else                                    max_anisotropy = 1;
+
+  if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
+  else                      texture_units_count = 1;
 }

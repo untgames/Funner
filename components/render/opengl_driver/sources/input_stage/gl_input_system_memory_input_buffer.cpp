@@ -1,3 +1,5 @@
+#ifndef OPENGL_ES_SUPPORT
+
 #include "shared.h"
 
 using namespace render::low_level;
@@ -50,3 +52,5 @@ void SystemMemoryInputBuffer::SetDataCore (size_t offset, size_t size, const voi
 
   StageRebindNotify (Stage_Input);
 }
+
+#endif
