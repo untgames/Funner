@@ -6,10 +6,6 @@ ifndef IPHONE_SDK_PATH
   $(error "Environment variable 'IPHONE_SDK_PATH' not found (use iphone-version.g++ toolset)")
 endif
 
-ifndef IPHONEOS_VERSION
-  $(error "Environment variable 'IPHONEOS_VERSION' not found (use iphone-version.g++ toolset)")
-endif
-
 ###################################################################################################
 #Константы
 ###################################################################################################
@@ -20,7 +16,7 @@ DLL_LIB_SUFFIX := .dylib
 PROFILES += iphone unistd has_windows haswchar gles
 DLL_PATH := DYLD_LIBRARY_PATH
 
-COMMON_CFLAGS     += -isysroot $(IPHONE_SDK_PATH) -D__IPHONE_OS_VERSION_MIN_REQUIRED=$(IPHONEOS_VERSION)
+COMMON_CFLAGS     += -isysroot $(IPHONE_SDK_PATH)
 COMMON_LINK_FLAGS += -isysroot $(IPHONE_SDK_PATH) -mmacosx-version-min=10.5
 
 include $(TOOLSETS_DIR)/g++.mak
