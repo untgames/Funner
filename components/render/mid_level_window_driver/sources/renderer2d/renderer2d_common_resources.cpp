@@ -220,7 +220,7 @@ InputLayoutPtr create_input_layout (IDevice& device)
 
   layout_desc.vertex_attributes_count = sizeof attributes / sizeof *attributes;
   layout_desc.vertex_attributes       = attributes;
-  layout_desc.index_type              = InputDataType_UInt;
+  layout_desc.index_type              = InputDataType_UShort;
   layout_desc.index_buffer_offset     = 0;
 
   return InputLayoutPtr (device.CreateInputLayout (layout_desc), false);

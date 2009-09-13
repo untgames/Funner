@@ -36,9 +36,9 @@ FrameBuffer::FrameBuffer (IDevice& device, ISwapChain& in_swap_chain)
 
     memset (&view_desc, 0, sizeof view_desc);
     
-      //создание буфера цвета
+      //создание буфера цвета      
 
-    texture      = TexturePtr (device.CreateRenderTargetTexture (swap_chain.get (), swap_chain_desc.buffers_count ? 1 : 0), false);
+    texture      = TexturePtr (device.CreateRenderTargetTexture (swap_chain.get (), swap_chain_desc.buffers_count > 1 ? 1 : 0), false);
     view         = ViewPtr (device.CreateView (texture.get (), view_desc), false);
     color_buffer = RenderTargetPtr (new RenderTarget (view.get (), RenderTargetType_Color), false);
     

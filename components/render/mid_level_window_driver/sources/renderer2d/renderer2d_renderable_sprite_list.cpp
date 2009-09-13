@@ -13,7 +13,8 @@ namespace
     Константы
 */
 
-const size_t DEFAULT_SPRITES_RESERVE_SIZE = 512; //резервируемое число спрайтов в буферах
+const size_t DEFAULT_SPRITES_RESERVE_SIZE = 512;           //резервируемое число спрайтов в буферах
+const size_t MAX_VERTICES_COUNT           = USHRT_MAX + 1; //максимальное количество вершин
 
 /*
     Временный буфер хранения вершинных данных
@@ -153,7 +154,7 @@ void RenderableSpriteList::ResizeBuffers (IDevice& device, size_t new_sprites_co
   buffer_desc.usage_mode   = UsageMode_Stream;
   buffer_desc.bind_flags   = BindFlag_IndexBuffer;
   buffer_desc.access_flags = AccessFlag_Write;
-  buffer_desc.size         = sizeof (size_t) * new_sprites_count * SPRITE_INDICES_COUNT;  
+  buffer_desc.size         = sizeof (unsigned short) * new_sprites_count * SPRITE_INDICES_COUNT;  
 
   BufferPtr new_index_buffer = BufferPtr (device.CreateBuffer (buffer_desc), false);
 
@@ -181,6 +182,15 @@ void RenderableSpriteList::UpdateVertexBuffer (IDevice& device)
     //формирование буфера вершин    
 
   TempBuffer& cache = TempBufferHolder::GetCache ();
+  
+  size_t total_vertices_count = data_buffer.size () * SPRITE_VERTICES_COUNT;
+  
+  if (total_vertices_count >= MAX_VERTICES_COUNT)
+  { 
+    throw xtl::format_not_supported_exception ("render::mid_level::window_driver::renderer2d::RenderableSpriteList::UpdateVertexBuffer",
+      "Too many vertices for rendering (vertices_count=%u, max_vertices_count=%u)",
+      total_vertices_count, MAX_VERTICES_COUNT);
+  }
 
   cache.resize (data_buffer.size () * SPRITE_VERTICES_COUNT * sizeof (RenderableVertex), false);
 
@@ -188,9 +198,9 @@ void RenderableSpriteList::UpdateVertexBuffer (IDevice& device)
   const RenderableSprite** src_sprite = data_buffer.data ();
 
   for (size_t count=data_buffer.size (); count--; src_sprite++, dst_vertex += SPRITE_VERTICES_COUNT)
-    memcpy (dst_vertex, (*src_sprite)->vertices, sizeof (RenderableVertex) * SPRITE_VERTICES_COUNT);
+    memcpy (dst_vertex, (*src_sprite)->vertices, sizeof (RenderableVertex) * SPRITE_VERTICES_COUNT);    
 
-    //обновление вершинного буфера    
+    //обновление вершинного буфера
 
   vertex_buffer->SetData (0, cache.size (), cache.data ());
   
@@ -198,7 +208,7 @@ void RenderableSpriteList::UpdateVertexBuffer (IDevice& device)
     
   cache.resize (data_buffer.size () * SPRITE_INDICES_COUNT * sizeof (size_t), false);
 
-  size_t *dst_index = reinterpret_cast<size_t*> (cache.data ()), src_index = 0;
+  unsigned short *dst_index = reinterpret_cast<unsigned short*> (cache.data ()), src_index = 0;
 
   static const size_t index_offsets [] = {0, 1, 2, 3, 0, 2};
 
@@ -207,10 +217,10 @@ void RenderableSpriteList::UpdateVertexBuffer (IDevice& device)
     const size_t* offset = index_offsets;
     
     for (size_t count=SPRITE_INDICES_COUNT; count--; dst_index++, offset++)
-      *dst_index = *offset + src_index;
+      *dst_index = static_cast<unsigned short> (*offset + src_index);
   }
 
     //обновление индексного буфера
 
-  index_buffer->SetData (0, cache.size (), cache.data ());    
+  index_buffer->SetData (0, cache.size (), cache.data ());
 }
