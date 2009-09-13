@@ -545,6 +545,20 @@ void detach_window_listener (const Window& window, IWindowListener* listener)
   [(UIWindowWrapper*)(window.Handle ()) detachListener:listener];
 }
 
+/*
+   Установка multitouch режима для окна
+*/
+
+void set_multitouch_enabled (const Window& window, bool enabled)
+{
+  ((UIWindowWrapper*)window.Handle ()).multipleTouchEnabled = enabled;
+}
+
+bool get_multitouch_enabled (const Window& window)
+{
+  return ((UIWindowWrapper*)window.Handle ()).multipleTouchEnabled;
+}
+
 }
 
 }
