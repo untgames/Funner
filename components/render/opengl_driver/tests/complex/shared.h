@@ -114,7 +114,7 @@ struct Test
     desc.window_handle             = window.Handle ();
 
     DriverManager::CreateSwapChainAndDevice ("OpenGL", adapter_mask, desc, init_string, swap_chain, device);
-
+    
 //    swap_chain->SetFullscreenState (true);
 
     OnResize ();
@@ -167,7 +167,7 @@ struct Test
 
       device->Flush ();
 
-      swap_chain->Present ();
+      swap_chain->Present ();      
     }
     catch (std::exception& e)
     {

@@ -157,8 +157,8 @@ int main ()
 
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
 
-    ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));
-    ProgramParametersLayoutPtr program_parameters_layout (test.device->CreateProgramParametersLayout (program_parameters_layout_desc));
+    ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print), false);
+    ProgramParametersLayoutPtr program_parameters_layout (test.device->CreateProgramParametersLayout (program_parameters_layout_desc), false);
 
     BufferDesc cb_desc;
 
@@ -189,7 +189,7 @@ int main ()
     test.device->SSSetProgram (shader.get ());
     test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());
     test.device->SSSetConstantBuffer (0, cb.get ());
-    test.device->SSSetConstantBuffer (1, cb2.get ());
+    test.device->SSSetConstantBuffer (1, cb2.get ());    
 
     printf ("Load textures\n");
 
