@@ -111,16 +111,13 @@ struct MaterialManager::Impl
 ///Выгрузка библиотеки
   void UnloadMaterialLibrary (const media::rfx::MaterialLibrary* source_library, const char* name)
   {
-    if (!name)
-      name = "";
-      
     log.Printf ("Unloading material library '%s'", name && *name ? name : source_library ? source_library->Name () : "");  
     
     for (MaterialLibraryList::iterator iter=loaded_libraries.begin (), end=loaded_libraries.end (); iter!=end; ++iter)
     {
       MaterialLibraryEntry& entry = **iter;
       
-      if (entry.source_library == source_library || entry.resource_name == name)
+      if (source_library && entry.source_library == source_library || name && entry.resource_name == name)
       {
         loaded_libraries.erase (iter);
         return;

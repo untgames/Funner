@@ -110,14 +110,11 @@ struct PrimitiveManager::Impl
 ///Выгрузка библиотеки
   void UnloadMeshLibrary (const media::geometry::MeshLibrary* source_library, const char* name)
   {
-    if (!name)
-      name = "";
-    
     for (MeshLibraryList::iterator iter=loaded_libraries.begin (), end=loaded_libraries.end (); iter!=end; ++iter)
     {
       MeshLibraryEntry& entry = **iter;
       
-      if (entry.source_library == source_library || entry.resource_name == name)
+      if (source_library && entry.source_library == source_library || name && entry.resource_name == name)
       {
         loaded_libraries.erase (iter);
         return;
