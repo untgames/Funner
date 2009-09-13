@@ -30,7 +30,7 @@ int main ()
     }
 
     IOutput *output = driver->GetAdapter (0)->GetOutput (0);
-    Color3f table [256] = {0}, table2[256] = {0};
+    Color3f table [256], table2[256];
 
     output->GetGammaRamp (table);
     printf ("Current gamma ramp:\n");
