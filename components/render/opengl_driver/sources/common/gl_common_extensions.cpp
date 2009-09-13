@@ -10,7 +10,6 @@ namespace
 {
 
 const char* extensions [] = {
-#ifndef OPENGL_ES_SUPPORT
   "GL_VERSION_1_1",
   "GL_VERSION_1_2",
   "GL_VERSION_1_3",
@@ -18,6 +17,7 @@ const char* extensions [] = {
   "GL_VERSION_1_5",
   "GL_VERSION_2_0",
   "GL_VERSION_2_1",
+  
   "GL_3DFX_multisample",
   "GL_3DFX_tbuffer",
   "GL_3DFX_texture_compression_FXT1",
@@ -317,9 +317,7 @@ const char* extensions [] = {
   "GLBUG_texture_no_mipmap",
   "GLBUG_swap_buffers_twice_call",
   
-#else
-  "GL_VERSION_1_1",
-
+#ifdef OPENGL_ES_SUPPORT
   "GL_OES_blend_equation_separate",
   "GL_OES_blend_func_separate",
   "GL_OES_blend_subtract",

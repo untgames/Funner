@@ -24,7 +24,6 @@ Buffer::Buffer (const ContextManager& context_manager, const BufferDesc& in_desc
       break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.usage_mode", desc.usage_mode);
-      break;
   }
 
     //проверка корректности флагов доступа
@@ -38,7 +37,6 @@ Buffer::Buffer (const ContextManager& context_manager, const BufferDesc& in_desc
       break;
     default:
       throw xtl::make_argument_exception ("", "desc.access_flags", desc.access_flags);
-      break;
   }
 }
 

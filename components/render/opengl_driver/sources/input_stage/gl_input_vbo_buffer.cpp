@@ -31,7 +31,8 @@ VboBuffer::VboBuffer (const ContextManager& context_manager, GLenum in_target, c
         gl_usage_mode = GL_STREAM_DRAW;
         break;                
 #else
-        throw xtl::format_not_supported_exception ("", "Usage mode UsageMode_Stream doesn't supported");
+        gl_usage_mode = GL_DYNAMIC_DRAW;
+        break;
 #endif
       default:
         throw xtl::make_argument_exception ("", "desc.usage_mode", in_desc.usage_mode);
