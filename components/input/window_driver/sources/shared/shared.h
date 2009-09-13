@@ -37,7 +37,7 @@ namespace low_level
 namespace window
 {
 
-class Device: virtual public input::low_level::IDevice, public xtl::reference_counter, private xtl::trackable
+class Device: virtual public input::low_level::IDevice, public xtl::reference_counter
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,12 +49,12 @@ class Device: virtual public input::low_level::IDevice, public xtl::reference_co
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение имени устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* GetName () { return name.c_str (); }
+    const char* GetName ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Полное имя устройства (тип.имя.идентификатор)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* GetFullName () { return full_name.c_str (); }
+    const char* GetFullName ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение имени контрола
@@ -80,32 +80,12 @@ class Device: virtual public input::low_level::IDevice, public xtl::reference_co
     void Release () { release (this); }
 
   private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обработчик сообщений окна
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void WindowEventHandler (syslib::Window& window, syslib::WindowEvent event, const syslib::WindowEventContext& window_event_context);
-
-  private:
     Device (const Device& source);             //no impl
     Device& operator = (const Device& source); //no impl
 
   private:
-    typedef xtl::signal<void (const char*)> DeviceSignal;
-
-  private:
-    stl::string                  name;                         //имя устройства
-    stl::string                  full_name;                    //полное имя устройства
-    stl::string                  properties;                   //настройки
-    DeviceSignal                 signals;                      //обработчики событий
-    size_t                       x_cursor_pos;                 //последние координаты курсора
-    size_t                       y_cursor_pos;                 //последние координаты курсора
-    bool                         mouse_in_window;              //курсор мыши в пределах клиентской области окна
-    bool                         autocenter_cursor;            //автоматическое центрирование курсора
-    float                        cursor_sensitivity;           //множитель delt'ы курсора
-    float                        vertical_wheel_sensitivity;   //множитель delt'ы вертикального колеса мыши
-    float                        horisontal_wheel_sensitivity; //множитель delt'ы горизонтального колеса мыши
-    stl::bitset<syslib::Key_Num> pressed_keys;                 //какие кнопки являются нажатыми
-    stl::wstring                 control_name;                 //имя контрола    
+    struct Impl;
+    Impl *impl;
 };
 
 }

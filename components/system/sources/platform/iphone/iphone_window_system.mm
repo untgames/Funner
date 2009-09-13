@@ -2,15 +2,20 @@
 
 #import <syslib/platform/iphone.h>
 
+#import <UIApplication.h>
 #import <UIScreen.h>
+#import <UITouch.h>
 #import <UIWindow.h>
 
-#import <UIApplication.h>
+#import <CAEAGLLayer.h>
 
 using namespace syslib;
+using namespace syslib::iphone;
 
 namespace
 {
+
+const size_t DEFAULT_TOUCH_BUFFER_SIZE = 4;  //размер буфера для хранения информации о касаниях
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание реализации окна
@@ -47,28 +52,50 @@ struct WindowImpl
 
 }
 
+typedef stl::vector <IWindowListener*>                ListenerArray;
+typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Распределитель событий окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-@interface UIWindowWrapper : UIWindow <WindowEventProvider>
+@interface UIWindowWrapper : UIWindow
 {
   @private
-    WindowImpl* window_impl;
-    bool        destroyed;
+    WindowImpl            *window_impl;        //окно
+    ListenerArray         *listeners;          //подписчика на события
+    TouchDescriptionArray *touch_descriptions; //массив для хранения описаний текущего события
 }
 
 @property (nonatomic, readwrite) WindowImpl* window_impl;
-@property (nonatomic, readwrite) bool        destroyed;
+
+-(void) dealloc;
+
++(Class) layerClass;
 
 -(id) initWithFrame:(CGRect)rect;
 -(void) drawRect:(CGRect)rect;
+
+-(void) attachListener:(IWindowListener*)listener;
+-(void) detachListener:(IWindowListener*)listener;
 
 @end
 
 @implementation UIWindowWrapper
 
 @synthesize window_impl;
-@synthesize destroyed;
+
+-(void) dealloc
+{
+  delete touch_descriptions;
+  delete listeners;
+
+  [super dealloc];
+}
+
++(Class) layerClass
+{
+  return [CAEAGLLayer class];
+}
 
 -(id) initWithFrame:(CGRect)rect
 {
@@ -76,8 +103,24 @@ struct WindowImpl
 
   if (self)
   {
-    window_impl = 0;
-    destroyed   = false;
+    window_impl        = 0;
+    listeners          = 0;
+    touch_descriptions = 0;
+
+    try
+    {
+      listeners          = new ListenerArray ();
+      touch_descriptions = new TouchDescriptionArray (DEFAULT_TOUCH_BUFFER_SIZE);
+    }
+    catch (...)
+    {
+      delete listeners;
+      delete touch_descriptions;
+
+      [self release];
+
+      return nil;
+    }
   }
 
   return self;
@@ -90,53 +133,82 @@ struct WindowImpl
   window_impl->Notify (WindowEvent_OnPaint, dummy_context);
 }
 
--(void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+-(void) fillTouchDescriptionsBuffer:(NSSet*)touches
 {
+  if ([touches count] > touch_descriptions->size ())
+    touch_descriptions->resize ([touches count], false);
 
+  NSEnumerator     *enumerator        = [touches objectEnumerator];
+  TouchDescription *touch_description = touch_descriptions->data ();
+
+  for (UITouch *iter = [enumerator nextObject]; iter; iter = [enumerator nextObject], touch_description++)
+  {
+    CGPoint current_location  = [iter locationInView:self],
+            previous_location = [iter previousLocationInView:self];
+
+    touch_description->touch      = (touch_t)iter;
+    touch_description->current_x  = current_location.x;
+    touch_description->current_y  = current_location.y;
+    touch_description->previous_x = previous_location.x;
+    touch_description->previous_y = previous_location.y;
+    touch_description->tap_count  = iter.tapCount;
+  }
 }
 
--(void) touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+-(void) touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
 {
+  [self fillTouchDescriptionsBuffer:touches];
 
+  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+    (*iter)->OnTouchesBegan ([touches count], touch_descriptions->data ());
 }
 
--(void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+-(void) touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
 {
+  [self fillTouchDescriptionsBuffer:touches];
 
+  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+    (*iter)->OnTouchesEnded ([touches count], touch_descriptions->data ());
 }
 
--(void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+-(void) touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
 {
+  [self fillTouchDescriptionsBuffer:touches];
 
+  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+    (*iter)->OnTouchesMoved ([touches count], touch_descriptions->data ());
 }
 
--(void) motionBegan:(UIEventSubtype)motion withEvent:(UIEvent *)event
+-(void) motionBegan:(UIEventSubtype)motion withEvent:(UIEvent*)event
 {
+  if (motion != UIEventSubtypeMotionShake)
+    return;
 
+  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+    (*iter)->OnShakeMotionBegan ();
 }
 
--(void) motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent *)event
+-(void) motionEnded:(UIEventSubtype)motion withEvent:(UIEvent*)event
 {
+  if (motion != UIEventSubtypeMotionShake)
+    return;
 
-}
-
--(void) motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
-{
-
+  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+    (*iter)->OnShakeMotionEnded ();
 }
 
 /*
-   Добавление/удаление подписчиков (подписчик не захватывается)
+   Добавление/удаление подписчиков
 */
 
--(void) addEventHandler:(id <WindowEventHandler>)handler
+-(void) attachListener:(IWindowListener*)listener
 {
-
+  listeners->push_back (listener);
 }
 
--(void) removeEventHandler:(id <WindowEventHandler>)handler
+-(void) detachListener:(IWindowListener*)listener
 {
-
+  listeners->erase (stl::remove (listeners->begin (), listeners->end (), listener), listeners->end ());
 }
 
 @end
@@ -181,8 +253,6 @@ void Platform::CloseWindow (window_t handle)
 
 void Platform::DestroyWindow (window_t handle)
 {
-  ((UIWindowWrapper*)handle).destroyed = true;
-
   WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
 
   WindowEventContext dummy_context;
@@ -401,4 +471,37 @@ void Platform::SetCursorVisible (window_t, bool state)
 bool Platform::GetCursorVisible (window_t)
 {
   throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::GetCursorPosition", "No cursor for iPhone platform");
+}
+
+namespace syslib
+{
+
+namespace iphone
+{
+
+/*
+   Добавление/удаление подписчиков
+*/
+
+void attach_window_listener (const Window& window, IWindowListener* listener)
+{
+  if  (!listener)
+    return;
+
+  if (!is_in_run_loop ())
+    throw xtl::format_operation_exception ("syslib::iphone::attach_window_listener", "Can't attach window listener before entering run loop");
+
+  [(UIWindowWrapper*)(window.Handle ()) attachListener:listener];
+}
+
+void detach_window_listener (const Window& window, IWindowListener* listener)
+{
+  if (!is_in_run_loop ())
+    return;
+
+  [(UIWindowWrapper*)(window.Handle ()) detachListener:listener];
+}
+
+}
+
 }

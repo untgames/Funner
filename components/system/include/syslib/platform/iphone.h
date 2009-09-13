@@ -1,43 +1,91 @@
 #ifndef SYSLIB_PLATFORM_IPHONE_HEADER
 #define SYSLIB_PLATFORM_IPHONE_HEADER
 
-#import <UIEvent.h>
+#include <syslib/window.h>
 
-@class NSSet;
+namespace syslib
+{
+
+namespace iphone
+{
+
+struct touch_handle;
+
+typedef touch_handle* touch_t;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Протокол подписчика на события окна
+///Описание одного касания
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-@protocol WindowEventHandler
+struct TouchDescription
+{
+  touch_t touch;       //идентификатор касания
+  float   current_x;   //текущее положение пальца относительно окна
+  float   current_y;   //текущее положение пальца относительно окна
+  float   previous_x;  //предыдущее положение пальца относительно окна
+  float   previous_y;  //предыдущее положение пальца относительно окна
+  size_t  tap_count;   //количество касаний
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///События касания экрана
+///Интерфейс слушателя событий окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
--(void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event;
--(void) touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event;
--(void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event;
--(void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event;
+class IWindowListener
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///События касания
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void OnTouchesBegan (size_t touches_count, const TouchDescription* touches) {} //один или несколько пальцев дотронулись до окна
+    virtual void OnTouchesMoved (size_t touches_count, const TouchDescription* touches) {} //один или несколько пальцев двигаются в окне
+    virtual void OnTouchesEnded (size_t touches_count, const TouchDescription* touches) {} //один или несколько пальцев поднялись с окна
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///События движения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
--(void) motionBegan:(UIEventSubtype)motion withEvent:(UIEvent *)event;
--(void) motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent *)event;
--(void) motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event;
+    virtual void OnShakeMotionBegan () {} //пользователь начал жест "тряски" телефона
+    virtual void OnShakeMotionEnded () {} //пользователь закончил жест "тряски" телефона
 
-@end
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Протокол окна, на события которого можно подписаться
-///////////////////////////////////////////////////////////////////////////////////////////////////
-@protocol WindowEventProvider
+  protected:
+    virtual ~IWindowListener () {}
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление/удаление подписчиков (подписчик не захватывается)
+///Добавление/удаление подписчиков на события окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
--(void) addEventHandler:(id <WindowEventHandler>)handler;
--(void) removeEventHandler:(id <WindowEventHandler>)handler;
+void attach_window_listener (const Window& window, IWindowListener* listener);
+void detach_window_listener (const Window& window, IWindowListener* listener);
 
-@end
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Интерфейс слушателя событий приложения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class IApplicationListener
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///События
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void OnAcceleration  (double x, double y, double z) {}  //произошло движение телефона
+    virtual void OnMemoryWarning () {}                              //нехватка памяти
+    virtual void OnActive        () {}                              //приложение стало активным
+    virtual void OnInactive      () {}                              //приложение стало неактивным
+
+  protected:
+    virtual ~IApplicationListener () {}
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление/удаление подписчиков на события приложения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void attach_application_listener (IApplicationListener* listener);
+void detach_application_listener (IApplicationListener* listener);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка параметров устройства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void set_accelerometer_update_interval (double seconds); //установка периода опроса акселерометра телефона (не гарантируется, что будет установлен именно запрошенный интервал)
+
+}
+
+}
 
 #endif

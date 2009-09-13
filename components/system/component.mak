@@ -21,7 +21,8 @@ SYSTEMLIB.SOURCES.iphone.SOURCE_DIRS                := sources/platform/iphone
 SYSTEMLIB.SOURCES.iphone.COMPILER_DEFINES           := NO_PTHREAD_SEMAPHORES
 SYSTEMLIB.SOURCES.iphone.COMPILER_CFLAGS            := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers/ \
                                                        -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/Foundation.framework/Headers/ \
-                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/UIKit.framework/Headers/
+                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/UIKit.framework/Headers/ \
+                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/QuartzCore.framework/Headers/
 SYSTEMLIB.SOURCES.x11.SOURCE_DIRS                   := sources/platform/x11
 
 #Öåëü ¹2 - System library tests
