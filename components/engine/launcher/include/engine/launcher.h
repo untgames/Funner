@@ -1,0 +1,27 @@
+#ifndef FUNNER_ENGINE_LAUNCHER_HEADER
+#define FUNNER_ENGINE_LAUNCHER_HEADER
+
+#ifndef FUNNER_C_API
+  #ifdef FUNNER_BUILD
+    #define FUNNER_C_API __declspec(dllexport)
+  #else
+    #define FUNNER_C_API __declspec(dllimport)
+  #endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Интерфейс доступа к движку
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct FunnerApi
+{
+  bool (*ParseCommandLine)(unsigned int arguments_count, const char** arguments);
+  void (*Run)();
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание / удаление приложения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef FUNNER_C_API FunnerApi* (*FunnerInitProc)();
+typedef FUNNER_C_API void       (*FunnerShutdownProc)(FunnerApi*);
+
+#endif
