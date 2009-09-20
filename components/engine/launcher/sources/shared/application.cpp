@@ -175,14 +175,6 @@ class Application
       {
         printf ("unknown exception at engine::Application::StartupTimerHandler\n");
       }
-      
-      try
-      {
-        syslib::Application::Exit (0);      
-      }
-      catch (...)
-      {
-      }
     }
 
   private:

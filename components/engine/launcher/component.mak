@@ -38,33 +38,30 @@ ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := ../../render/opengl_driver/link.sta
 ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := ../../input/direct_input_driver/link.static.mak
 
 #Цель - win32 application
-ENGINE.LAUNCHER.SOURCES.TYPE                    := application
-ENGINE.LAUNCHER.SOURCES.NAME                    := launcher
-ENGINE.LAUNCHER.SOURCES.INCLUDE_DIRS            := include
-ENGINE.LAUNCHER.SOURCES.EXECUTION_DIR           := sources
-ENGINE.LAUNCHER.SOURCES.macosx.COMPILER_C_FLAGS := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers/
-ENGINE.LAUNCHER.SOURCES.iphone.COMPILER_CFLAGS  := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers/
-ENGINE.LAUNCHER.SOURCES.iphone.LINK_FLAGS       := -framework CoreFoundation
-ENGINE.LAUNCHER.SOURCES.msvc.LINK_FLAGS         := -subsystem:windows -entry:mainCRTStartup
-ENGINE.LAUNCHER.SOURCES.win32.SOURCE_DIRS       := sources/platform/win32
-ENGINE.LAUNCHER.SOURCES.macosx.SOURCE_DIRS      := sources/platform/macosx
-ENGINE.LAUNCHER.SOURCES.iphone.SOURCE_DIRS      := sources/platform/iphone
+ENGINE.LAUNCHER.SOURCES.TYPE                   := application
+ENGINE.LAUNCHER.SOURCES.NAME                   := launcher
+ENGINE.LAUNCHER.SOURCES.INCLUDE_DIRS           := include
+ENGINE.LAUNCHER.SOURCES.EXECUTION_DIR          := sources
+ENGINE.LAUNCHER.SOURCES.macosx.COMPILER_CFLAGS := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers/
+ENGINE.LAUNCHER.SOURCES.iphone.COMPILER_CFLAGS := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers/
+ENGINE.LAUNCHER.SOURCES.macosx.LINK_FLAGS      := -framework CoreFoundation
+ENGINE.LAUNCHER.SOURCES.iphone.LINK_FLAGS      := -framework CoreFoundation
+ENGINE.LAUNCHER.SOURCES.msvc.LINK_FLAGS        := -subsystem:windows -entry:mainCRTStartup
+ENGINE.LAUNCHER.SOURCES.win32.SOURCE_DIRS      := sources/platform/win32
+ENGINE.LAUNCHER.SOURCES.macosx.SOURCE_DIRS     := sources/platform/macosx
+ENGINE.LAUNCHER.SOURCES.iphone.SOURCE_DIRS     := sources/platform/iphone
 
 #Цель - console application
-ENGINE.CLAUNCHER.SOURCES.TYPE              := application
-ENGINE.CLAUNCHER.SOURCES.NAME              := clauncher
-ENGINE.CLAUNCHER.SOURCES.INCLUDE_DIRS      := include
-ENGINE.CLAUNCHER.SOURCES.EXECUTION_DIR     := sources
-ENGINE.CLAUNCHER.SOURCES.LIBS              := 
-ENGINE.CLAUNCHER.SOURCES.COMPILER_CFLAGS   :=
-ENGINE.CLAUNCHER.SOURCES.COMPILER_DEFINES  :=
-ENGINE.CLAUNCHER.SOURCES.IMPORTS           := $(ENGINE.LAUNCHER.SOURCES.IMPORTS)
+ENGINE.CLAUNCHER.SOURCES.TYPE                := application
+ENGINE.CLAUNCHER.SOURCES.NAME                := clauncher
+ENGINE.CLAUNCHER.SOURCES.INCLUDE_DIRS        := include
+ENGINE.CLAUNCHER.SOURCES.EXECUTION_DIR       := sources
+ENGINE.CLAUNCHER.SOURCES.IMPORTS             := $(ENGINE.LAUNCHER.SOURCES.IMPORTS)
 ENGINE.CLAUNCHER.SOURCES.has_windows.IMPORTS := $(ENGINE.LAUNCHER.SOURCES.has_windows.IMPORTS)
 ENGINE.CLAUNCHER.SOURCES.win32.IMPORTS       := $(ENGINE.LAUNCHER.SOURCES.win32.IMPORTS)
-ENGINE.CLAUNCHER.SOURCES.win32.SOURCE_DIRS := sources/platform/win32
+ENGINE.CLAUNCHER.SOURCES.win32.SOURCE_DIRS   := sources/platform/win32
 
 #Цель - SDK
 ENGINE.LAUNCHER.SDK.TYPE             := installation
 ENGINE.LAUNCHER.SDK.INSTALLATION_DIR := sdk/bin
-ENGINE.LAUNCHER.SDK.SOURCE_FILES     :=
 ENGINE.LAUNCHER.SDK.TARGETS          := ENGINE.LAUNCHER.SOURCES
