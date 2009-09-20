@@ -6,5 +6,5 @@
   MacOSXPluginPath              = "..\..\..\dist\macosx.g++\bin\"
   LinuxPluginPath               = "..\..\..\dist\macosx.g++\bin\"
   ProcessorsCountForCalculation = "0"
-  Author                        = "Мухин Евгений">
+  Author                        = "Холодов Леонид">
 </Configuration>
