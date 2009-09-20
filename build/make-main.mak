@@ -18,6 +18,14 @@ LIB_TOOL                                := tools.lib        #Имя макроса утилиты
 DLL_PATH                                := PATH             #Имя переменной среды для указания путей к длл-файлам
 
 ###################################################################################################
+#Подключение настроек пользователя
+###################################################################################################
+BUILD_DIR  := $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+USER       ?= $(USERNAME)
+
+-include $(ROOT)/$(USER).settings.mak
+
+###################################################################################################
 #Производные пути и переменные
 ###################################################################################################
 COMPONENT_CONFIGURATION_FILE_SHORT_NAME := $(strip $(COMPONENT_CONFIGURATION_FILE_SHORT_NAME))
@@ -29,7 +37,6 @@ EXPORT_VAR_PREFIX                       := $(strip $(EXPORT_VAR_PREFIX))
 EXPORT_TAR_TMP_FILE_SHORT_NAME          := $(strip $(EXPORT_TAR_TMP_FILE_SHORT_NAME))
 EXPORT_EXCLUDE_PATTERN                  := $(strip $(EXPORT_EXCLUDE_PATTERN))
 CURRENT_TOOLSET                         := $(TOOLSET)
-BUILD_DIR                               := $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
 TOOLSETS_DIR                            := $(BUILD_DIR)$(strip $(TOOLSETS_DIR_SHORT_NAME))
 TOOLSETS                                := $(patsubst $(TOOLSETS_DIR)/%.mak,%,$(wildcard $(TOOLSETS_DIR)/*.mak))
 TOOLSET_FILE                            := $(TOOLSETS_DIR)/$(CURRENT_TOOLSET).mak
@@ -460,7 +467,7 @@ define process_file_installation
   install: $$(DESTINATION_INSTALLATION_FILES)
 
   $3/%: $1%
-		@cp "$$<" "$$@" --verbose
+		@cp -v "$$<" "$$@"
 
   #Обработка вложений
   $$(foreach dir,$$(SOURCE_INSTALLATION_DIRS),$$(eval $$(call process_subdir_installation,$$(dir),$3/$$(dir:$1%=%))))
