@@ -38,15 +38,17 @@ ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := ../../render/opengl_driver/link.sta
 ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := ../../input/direct_input_driver/link.static.mak
 
 #Цель - win32 application
-ENGINE.LAUNCHER.SOURCES.TYPE              := application
-ENGINE.LAUNCHER.SOURCES.NAME              := launcher
-ENGINE.LAUNCHER.SOURCES.INCLUDE_DIRS      := include
-ENGINE.LAUNCHER.SOURCES.SOURCE_DIRS       :=
-ENGINE.LAUNCHER.SOURCES.EXECUTION_DIR     := sources
-ENGINE.LAUNCHER.SOURCES.LIBS              := 
-ENGINE.LAUNCHER.SOURCES.COMPILER_CFLAGS   :=
-ENGINE.LAUNCHER.SOURCES.msvc.LINK_FLAGS   := -subsystem:windows -entry:mainCRTStartup
-ENGINE.LAUNCHER.SOURCES.win32.SOURCE_DIRS := sources/platform/win32
+ENGINE.LAUNCHER.SOURCES.TYPE                    := application
+ENGINE.LAUNCHER.SOURCES.NAME                    := launcher
+ENGINE.LAUNCHER.SOURCES.INCLUDE_DIRS            := include
+ENGINE.LAUNCHER.SOURCES.EXECUTION_DIR           := sources
+ENGINE.LAUNCHER.SOURCES.macosx.COMPILER_C_FLAGS := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers/
+ENGINE.LAUNCHER.SOURCES.iphone.COMPILER_CFLAGS  := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers/
+ENGINE.LAUNCHER.SOURCES.iphone.LINK_FLAGS       := -framework CoreFoundation
+ENGINE.LAUNCHER.SOURCES.msvc.LINK_FLAGS         := -subsystem:windows -entry:mainCRTStartup
+ENGINE.LAUNCHER.SOURCES.win32.SOURCE_DIRS       := sources/platform/win32
+ENGINE.LAUNCHER.SOURCES.macosx.SOURCE_DIRS      := sources/platform/macosx
+ENGINE.LAUNCHER.SOURCES.iphone.SOURCE_DIRS      := sources/platform/iphone
 
 #Цель - console application
 ENGINE.CLAUNCHER.SOURCES.TYPE              := application

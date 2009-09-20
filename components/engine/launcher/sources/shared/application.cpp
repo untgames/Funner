@@ -21,7 +21,13 @@
 
 using namespace engine;
 
-#define FUNNER_C_API __declspec(dllexport)
+#ifdef _WIN32
+  #define FUNNER_C_API __declspec(dllexport)
+#elif __GNUC__
+  #define FUNNER_C_API
+#else
+  #error "Unknown platform"
+#endif
 
 namespace
 {
@@ -110,11 +116,11 @@ class Application
 ///Выполнение приложения
     void Run ()
     {
-        //регистрация обработчика старта приложения      
+        //регистрация обработчика старта приложения
       
       syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnEnterRunLoop, xtl::bind (&Application::StartupHandler, this));
 
-        //запуск основного цикла        
+        //запуск основного цикла
 
       syslib::Application::Run ();      
     }
@@ -199,11 +205,11 @@ struct FunnerApiImpl: public FunnerApi
 {
   FunnerApiImpl ()
   {
-    ParseCommandLine = ParseCommandLineEntry;
-    Run              = RunEntry; 
+    ParseCommandLine = &ParseCommandLineEntry;
+    Run              = &RunEntry;
   }
   
-  static bool ParseCommandLineEntry (size_t argc, const char** argv)
+  static bool ParseCommandLineEntry (unsigned int argc, const char** argv)
   {
     try
     {
