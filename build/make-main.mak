@@ -301,7 +301,7 @@ define process_target.dynamic-lib
   ifeq (,$$($1.NAME))
     $$(error Empty dynamic library name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
-
+  
   $1.DLL_FILE                      := $(DIST_BIN_DIR)/$$($1.NAME)$(DLL_SUFFIX)
   $1.LIB_FILE                      := $(DIST_LIB_DIR)/$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(DLL_LIB_SUFFIX)
   $1.LIB_TMP_FILE                  := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(DLL_LIB_SUFFIX)
@@ -314,8 +314,10 @@ define process_target.dynamic-lib
   build: $$($1.DLL_FILE) $$($1.LIB_FILE)
 
   $$(eval $$(call process_target_with_sources,$1))
+  
+  $$($1.LIB_FILE): $$($1.DLL_FILE)
 
-  $$($1.DLL_FILE) $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
+  $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
 		@echo Create dynamic library $$(notdir $$($1.DLL_FILE))...
 		@$$(call $(LINK_TOOL),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 		@$(RM) $$(basename $$($1.DLL_FILE)).exp
