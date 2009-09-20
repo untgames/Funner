@@ -21,6 +21,8 @@
 
 using namespace engine;
 
+#define FUNNER_C_API __declspec(dllexport)
+
 namespace
 {
 
