@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include <dlfcn.h>
+#include <unistd.h>
 
 #include <CFBundle.h>
 
