@@ -33,7 +33,7 @@ include $(TOOLSETS_DIR)/g++.mak
 #Линковка shared-library (имя выходного файла)
 ###################################################################################################
 define tools.link.dll
--dynamiclib -Wl,-undefined -Wl,error -install_name @executable_path/$(notdir $(basename $1))$(DLL_SUFFIX)
+-dynamiclib -Wl,-undefined -Wl,error -install_name @loader_path/$(notdir $(basename $1))$(DLL_SUFFIX)
 endef
 
 define tools.link
