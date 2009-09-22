@@ -6,9 +6,9 @@ TARGETS := RENDER.OPENGL_DRIVER.UTILS RENDER.OPENGL_DRIVER.SOURCES RENDER.OPENGL
 #PROFILES += egl gles
 
 #OpenGL render system utilities
-RENDER.OPENGL_DRIVER.UTILS.TYPE             := test-suite
-RENDER.OPENGL_DRIVER.UTILS.SOURCE_DIRS      := utils
-RENDER.OPENGL_DRIVER.UTILS.IMPORTS          :=  ../../common/compile.static.mak ../../common/link.static.mak
+RENDER.OPENGL_DRIVER.UTILS.TYPE        := test-suite
+RENDER.OPENGL_DRIVER.UTILS.SOURCE_DIRS := utils
+RENDER.OPENGL_DRIVER.UTILS.IMPORTS     := compile.common link.common
 
 #OpenGL render system sources
 RENDER.OPENGL_DRIVER.SOURCES.TYPE                   := static-lib
@@ -33,12 +33,12 @@ RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            := sources/common \
                                                        sources/output_stage \
                                                        sources/query_manager \
                                                        sources/render_target_manager/swap_chain_manager
-RENDER.OPENGL_DRIVER.SOURCES.IMPORTS                := ../low_level/compile.static.mak ../../common/compile.static.mak ../../system/compile.static.mak
+RENDER.OPENGL_DRIVER.SOURCES.IMPORTS                := compile.render.low_level compile.common compile.system
 RENDER.OPENGL_DRIVER.SOURCES.msvc.COMPILER_CFLAGS   := -wd4355
-RENDER.OPENGL_DRIVER.SOURCES.gles.COMPILER_DEFINES := OPENGL_ES_SUPPORT
-RENDER.OPENGL_DRIVER.SOURCES.iphone.SOURCE_DIRS    := sources/platform/iphone
-RENDER.OPENGL_DRIVER.SOURCES.egl.SOURCE_DIRS       := sources/platform/egl
-RENDER.OPENGL_DRIVER.SOURCES.egl.IMPORTS           := ../../../extern/gles_win32/compile.mak
+RENDER.OPENGL_DRIVER.SOURCES.gles.COMPILER_DEFINES  := OPENGL_ES_SUPPORT
+RENDER.OPENGL_DRIVER.SOURCES.iphone.SOURCE_DIRS     := sources/platform/iphone
+RENDER.OPENGL_DRIVER.SOURCES.egl.SOURCE_DIRS        := sources/platform/egl
+RENDER.OPENGL_DRIVER.SOURCES.egl.IMPORTS            := compile.extern.gles_win32
 
 ifeq (,$(filter gles,$(PROFILES)))
 
@@ -52,8 +52,6 @@ endif
 #OpenGL render system tests
 RENDER.OPENGL_DRIVER.TESTS.TYPE             := test-suite
 RENDER.OPENGL_DRIVER.TESTS.SOURCE_DIRS      := tests/driver tests/device tests/complex tests/unit
-RENDER.OPENGL_DRIVER.TESTS.IMPORTS          := link.static.mak run.static.mak ../low_level/compile.static.mak \
-                                               ../../system/compile.static.mak ../../system/link.static.mak ../../common/link.static.mak \
-                                               ../../media/image/compile.static.mak ../../media/geometry/compile.static.mak \
-                                               ../../media/geometry/compile.static.mak  ../../media/image/link.static.mak \
-                                               ../../media/geometry/xmesh.link.static.mak
+RENDER.OPENGL_DRIVER.TESTS.IMPORTS          := link.render.low_level.opengl_driver run.render.low_level.opengl_driver compile.render.low_level \
+                                               compile.system link.system link.common compile.media.image compile.media.geometry \
+                                               link.media.image link.media.geometry.xmesh
