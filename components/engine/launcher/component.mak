@@ -24,13 +24,13 @@ ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core \
                                              link.engine.script_binds.input link.engine.script_binds.lua_override \
                                              link.engine.script_binds.system link.engine.script_binds.common \
                                              link.engine.script_binds.rms \
-                                             link.sound.openal_device run.sound.openal_device \
+                                             link.sound.low_level.openal_device run.sound.openal_device \
                                              link.engine.subsystems.scene_render link.engine.subsystems.scene_player \
                                              link.engine.subsystems.input_manager link.engine.subsystems.shell \
                                              link.engine.subsystems.log link.engine.subsystems.file_system \
                                              link.engine.subsystems.resource_system \
                                              compile.system
-ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := link.render.opengl_driver link.engine.subsystems.window_input_driver \
+ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := link.render.low_level.opengl_driver link.engine.subsystems.window_input_driver \
                                              link.engine.subsystems.window_manager link.engine.subsystems.window_renderer
 ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := link.input.direct_input_driver
 
