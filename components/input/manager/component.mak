@@ -4,26 +4,13 @@
 TARGETS := INPUT.MANAGER.SOURCES INPUT.MANAGER.TESTS
 
 #Öåëü ¹1 - INPUT manager sources
-INPUT.MANAGER.SOURCES.TYPE             := static-lib
-INPUT.MANAGER.SOURCES.NAME             := funner.input.manager
-INPUT.MANAGER.SOURCES.INCLUDE_DIRS     := 
-INPUT.MANAGER.SOURCES.SOURCE_DIRS      := sources
-INPUT.MANAGER.SOURCES.LIB_DIRS         :=  
-INPUT.MANAGER.SOURCES.LIBS             := 
-INPUT.MANAGER.SOURCES.COMPILER_CFLAGS  :=
-INPUT.MANAGER.SOURCES.COMPILER_DEFINES := 
-INPUT.MANAGER.SOURCES.IMPORTS          := compile.static.mak ../low_level/compile.static.mak ../../common/compile.static.mak
+INPUT.MANAGER.SOURCES.TYPE        := static-lib
+INPUT.MANAGER.SOURCES.NAME        := funner.input.manager
+INPUT.MANAGER.SOURCES.SOURCE_DIRS := sources
+INPUT.MANAGER.SOURCES.IMPORTS     := compile.input.manager compile.input.low_level compile.common
 
 #Öåëü ¹2 - INPUT manager tests
-INPUT.MANAGER.TESTS.TYPE             := test-suite
-INPUT.MANAGER.TESTS.INCLUDE_DIRS     :=
-INPUT.MANAGER.TESTS.SOURCE_DIRS      := tests
-INPUT.MANAGER.TESTS.LIB_DIRS         :=
-INPUT.MANAGER.TESTS.LIBS             :=
-INPUT.MANAGER.TESTS.DLLS             :=
-INPUT.MANAGER.TESTS.DLL_DIRS         :=
-INPUT.MANAGER.TESTS.COMPILER_CFLAGS  :=
-INPUT.MANAGER.TESTS.COMPILER_DEFINES :=
-INPUT.MANAGER.TESTS.IMPORTS          := compile.static.mak link.static.mak xkeymap.link.static.mak xkeydet.link.static.mak \
-                                        xkeyreg.link.static.mak ../low_level/compile.static.mak ../../common/compile.static.mak \
-                                        ../../common/link.static.mak
+INPUT.MANAGER.TESTS.TYPE        := test-suite
+INPUT.MANAGER.TESTS.SOURCE_DIRS := tests
+INPUT.MANAGER.TESTS.IMPORTS     := compile.input.manager link.input.manager link.input.manager.xkeymap link.input.manager.xkeydet \
+                                   link.input.manager.xkeyreg compile.input.low_level compile.common link.common
