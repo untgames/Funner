@@ -13,6 +13,6 @@ EXTERN.CURL.TESTS.TYPE                 := test-suite
 EXTERN.CURL.TESTS.SOURCE_DIRS          := tests
 EXTERN.CURL.TESTS.INCLUDE_DIRS         := sources
 EXTERN.CURL.TESTS.INCLUDE_FILES        := first.c testutil.c
-EXTERN.CURL.TESTS.IMPORTS              := compile.static.mak link.static.mak
+EXTERN.CURL.TESTS.IMPORTS              := compile.extern.curl link.extern.curl
 EXTERN.CURL.TESTS.msvc.COMPILER_CFLAGS := -wd4700
 EXTERN.CURL.TESTS.g++.COMPILER_CFLAGS  := --no-warn

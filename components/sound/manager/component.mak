@@ -12,7 +12,7 @@ SOUND.MANAGER.SOURCES.LIB_DIRS         :=
 SOUND.MANAGER.SOURCES.LIBS             := 
 SOUND.MANAGER.SOURCES.COMPILER_CFLAGS  :=
 SOUND.MANAGER.SOURCES.COMPILER_DEFINES := 
-SOUND.MANAGER.SOURCES.IMPORTS          := compile.static.mak ../../media/sound/compile.static.mak
+SOUND.MANAGER.SOURCES.IMPORTS          := compile.sound.manager compile.media.sound compile.common
 
 #Öåëü ¹2 - Sound system tests
 SOUND.MANAGER.TESTS.TYPE             := test-suite
@@ -23,5 +23,5 @@ SOUND.MANAGER.TESTS.DLLS             :=
 SOUND.MANAGER.TESTS.DLL_DIRS         :=
 SOUND.MANAGER.TESTS.COMPILER_CFLAGS  :=
 SOUND.MANAGER.TESTS.COMPILER_DEFINES :=
-SOUND.MANAGER.TESTS.IMPORTS          := compile.static.mak link.static.mak ../openal_device/link.static.mak ../../system/compile.static.mak ../../media/sound/snddecl.link.static.mak \
-																       ../../media/sound/default_decoders.link.static.mak ../openal_device/run.static.mak
+SOUND.MANAGER.TESTS.IMPORTS          := compile.sound.manager link.sound.manager link.sound.openal_driver compile.system link.media.sound.snddecl \
+																       link.media.sound.default_decoders run.sound.openal_driver

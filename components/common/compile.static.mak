@@ -3,3 +3,4 @@
 ###################################################################################################
 export.INCLUDE_DIRS     := include ../xtl/include
 export.COMPILER_DEFINES :=
+export.IMPORT_CHM       := funner.xtl

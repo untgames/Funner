@@ -2,7 +2,7 @@
 #Определения и константы
 ###################################################################################################
 TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.CONFIGURATOR COMMON.AES COMMON.TESTS \
-  COMMON.UTILS.FILE_CRYPTER
+  COMMON.UTILS.FILE_CRYPTER COMMON.INFO
 
 #Цель - CommonLib sources
 COMMON.SOURCES.TYPE                              := static-lib
@@ -11,6 +11,7 @@ COMMON.SOURCES.INCLUDE_DIRS                      := include ../xtl/include ../..
 COMMON.SOURCES.SOURCE_DIRS                       := sources/file_system/core sources/streams sources/hash sources/crypto/core sources/memory \
                                                     sources/parselib/tree sources/parselib/manager sources/strlib sources/utils sources/log \
                                                     sources/var_registry sources/platform/default
+COMMON.SOURCES.DOCUMENTATION_DIRS                := include
 COMMON.SOURCES.COMPILER_DEFINES                  := PCRE_STATIC
 COMMON.SOURCES.iphone.COMPILER_DEFINES           := __IPHONE__
 COMMON.SOURCES.unistd.SOURCE_DIRS                := sources/platform/unistd
@@ -37,31 +38,34 @@ COMMON.ZIP_FILE_SYSTEM.TYPE         := static-lib
 COMMON.ZIP_FILE_SYSTEM.NAME         := funner.common.zip_file_system
 COMMON.ZIP_FILE_SYSTEM.INCLUDE_DIRS := include ../xtl/include
 COMMON.ZIP_FILE_SYSTEM.SOURCE_DIRS  := sources/file_system/zip
-COMMON.ZIP_FILE_SYSTEM.IMPORTS      := ../../extern/zzip/compile.dynamic.mak
+COMMON.ZIP_FILE_SYSTEM.IMPORTS      := compile.extern.zzip
 
 #Цель - CommonLib zip file system sources
 COMMON.CONFIGURATOR.TYPE             := static-lib
 COMMON.CONFIGURATOR.NAME             := funner.common.configurator
 COMMON.CONFIGURATOR.SOURCE_DIRS      := sources/var_registry/configurator
-COMMON.CONFIGURATOR.IMPORTS          := compile.static.mak
+COMMON.CONFIGURATOR.IMPORTS          := compile.common
 
 #Цель - CommonLib zip file system sources
 COMMON.AES.TYPE             := static-lib
 COMMON.AES.NAME             := funner.common.aes
 COMMON.AES.SOURCE_DIRS      := sources/crypto/aes
-COMMON.AES.IMPORTS          := compile.static.mak
+COMMON.AES.IMPORTS          := compile.common
 
 #Цель - CommonLib tests
 COMMON.TESTS.TYPE             := test-suite
 COMMON.TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils \
                                  tests/memory tests/log tests/parselib tests/crypto tests/var_registry
-COMMON.TESTS.IMPORTS          := compile.static.mak link.static.mak zip_file_system.link.static.mak \
-                                 wxf.link.static.mak xml.link.static.mak configurator.link.static.mak \
-                                 default_console_handler.link.static.mak aes.link.static.mak \
-                                 ../../extern/zzip/run.dynamic.mak
+COMMON.TESTS.IMPORTS          := compile.common link.common run.extern.zzip
 
 #Цель - CommonLib crypter
 COMMON.UTILS.FILE_CRYPTER.TYPE             := application
 COMMON.UTILS.FILE_CRYPTER.NAME             := file-crypter
 COMMON.UTILS.FILE_CRYPTER.SOURCE_DIRS      := utils/file_crypter
-COMMON.UTILS.FILE_CRYPTER.IMPORTS          := compile.static.mak link.static.mak aes.link.static.mak
+COMMON.UTILS.FILE_CRYPTER.IMPORTS          := compile.common link.common link.common.aes
+
+#Цель - сборка документации
+COMMON.INFO.TYPE        := doxygen-info
+COMMON.INFO.CHM_NAME    := funner.common
+COMMON.INFO.SOURCE_DIRS := include
+COMMON.INFO.IMPORTS     := compile.common

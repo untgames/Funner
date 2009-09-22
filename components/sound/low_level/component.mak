@@ -12,7 +12,7 @@ SOUND.LOW_LEVEL.SOURCES.LIB_DIRS         :=
 SOUND.LOW_LEVEL.SOURCES.LIBS             := 
 SOUND.LOW_LEVEL.SOURCES.COMPILER_CFLAGS  :=
 SOUND.LOW_LEVEL.SOURCES.COMPILER_DEFINES := 
-SOUND.LOW_LEVEL.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak
+SOUND.LOW_LEVEL.SOURCES.IMPORTS          := compile.sound.low_level compile.common
 
 #Öåëü ¹2 - Sound system tests
 SOUND.LOW_LEVEL.TESTS.TYPE             := test-suite
@@ -24,4 +24,4 @@ SOUND.LOW_LEVEL.TESTS.DLLS             :=
 SOUND.LOW_LEVEL.TESTS.DLL_DIRS         :=
 SOUND.LOW_LEVEL.TESTS.COMPILER_CFLAGS  :=
 SOUND.LOW_LEVEL.TESTS.COMPILER_DEFINES :=
-SOUND.LOW_LEVEL.TESTS.IMPORTS          := compile.static.mak link.static.mak ../../common/compile.static.mak
+SOUND.LOW_LEVEL.TESTS.IMPORTS          := compile.sound.low_level link.sound.low_level compile.common

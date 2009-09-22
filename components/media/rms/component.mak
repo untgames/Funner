@@ -12,7 +12,7 @@ MEDIA.RMS.SOURCES.LIB_DIRS         :=
 MEDIA.RMS.SOURCES.LIBS             :=
 MEDIA.RMS.SOURCES.COMPILER_CFLAGS  :=
 MEDIA.RMS.SOURCES.COMPILER_DEFINES :=
-MEDIA.RMS.SOURCES.IMPORTS          := compile.static.mak ../../common/compile.static.mak
+MEDIA.RMS.SOURCES.IMPORTS          := compile.media.rms compile.common
 
 #Öåëü ¹3 - tests
 MEDIA.RMS.TESTS.TYPE             := test-suite
@@ -22,5 +22,4 @@ MEDIA.RMS.TESTS.LIB_DIRS         :=
 MEDIA.RMS.TESTS.LIBS             :=
 MEDIA.RMS.TESTS.COMPILER_CFLAGS  :=
 MEDIA.RMS.TESTS.COMPILER_DEFINES :=
-MEDIA.RMS.TESTS.IMPORTS          := compile.static.mak link.static.mak
-
+MEDIA.RMS.TESTS.IMPORTS          := compile.media.rms link.media.rms

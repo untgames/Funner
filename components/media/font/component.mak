@@ -12,7 +12,7 @@ MEDIA.FONT.SOURCES.LIB_DIRS         :=
 MEDIA.FONT.SOURCES.LIBS             := 
 MEDIA.FONT.SOURCES.COMPILER_CFLAGS  := 
 MEDIA.FONT.SOURCES.COMPILER_DEFINES := 
-MEDIA.FONT.SOURCES.IMPORTS          := compile.static.mak
+MEDIA.FONT.SOURCES.IMPORTS          := compile.media.font
 
 #Цель - xfont
 MEDIA.FONT.XFONT.TYPE             := static-lib
@@ -23,7 +23,7 @@ MEDIA.FONT.XFONT.LIB_DIRS         :=
 MEDIA.FONT.XFONT.LIBS             := 
 MEDIA.FONT.XFONT.COMPILER_CFLAGS  := 
 MEDIA.FONT.XFONT.COMPILER_DEFINES := 
-MEDIA.FONT.XFONT.IMPORTS          := compile.static.mak
+MEDIA.FONT.XFONT.IMPORTS          := compile.media.font
 
 #Цель - xfont
 MEDIA.FONT.FONT_CONVERTER.TYPE             := static-lib
@@ -33,7 +33,7 @@ MEDIA.FONT.FONT_CONVERTER.SOURCE_DIRS      := sources/font_converter
 MEDIA.FONT.FONT_CONVERTER.LIB_DIRS         :=  
 MEDIA.FONT.FONT_CONVERTER.COMPILER_CFLAGS  := 
 MEDIA.FONT.FONT_CONVERTER.COMPILER_DEFINES := 
-MEDIA.FONT.FONT_CONVERTER.IMPORTS          := compile.static.mak ../../media/image/compile.static.mak ../../media/image/link.static.mak
+MEDIA.FONT.FONT_CONVERTER.IMPORTS          := compile.media.font compile.media.image link.media.image
 
 #Цель - MediaLib tests
 MEDIA.FONT.TESTS.TYPE             := test-suite
@@ -43,8 +43,8 @@ MEDIA.FONT.TESTS.LIB_DIRS         :=
 MEDIA.FONT.TESTS.LIBS             :=
 MEDIA.FONT.TESTS.COMPILER_CFLAGS  :=
 MEDIA.FONT.TESTS.COMPILER_DEFINES :=
-MEDIA.FONT.TESTS.IMPORTS          := compile.static.mak link.static.mak xfont.link.static.mak font_converter.link.static.mak \
-                                     ../../media/image/compile.static.mak ../../media/image/link.static.mak ../../media/image/left_bottom_packer.link.static.mak
+MEDIA.FONT.TESTS.IMPORTS          := compile.media.font link.media.font link.media.font.xfont link.media.font.font_converter \
+                                     compile.media.image link.media.image link.media.image.left_bottom_packer
 
 #Цель - Imave to xfont converter
 MEDIA.FONT.IMAGE2XFONT.TYPE             := application
@@ -55,7 +55,7 @@ MEDIA.FONT.IMAGE2XFONT.LIB_DIRS         :=
 MEDIA.FONT.IMAGE2XFONT.LIBS             :=
 MEDIA.FONT.IMAGE2XFONT.COMPILER_CFLAGS  :=
 MEDIA.FONT.IMAGE2XFONT.COMPILER_DEFINES :=
-MEDIA.FONT.IMAGE2XFONT.IMPORTS          := compile.static.mak link.static.mak xfont.link.static.mak ../image/compile.static.mak ../image/link.static.mak
+MEDIA.FONT.IMAGE2XFONT.IMPORTS          := compile.media.font link.media.font link.media.font.xfont compile.media.image link.media.image
 
 #Цель - Imave to xfont converter
 MEDIA.FONT.TTF2XFONT.TYPE             := application
@@ -66,5 +66,5 @@ MEDIA.FONT.TTF2XFONT.LIB_DIRS         :=
 MEDIA.FONT.TTF2XFONT.LIBS             :=
 MEDIA.FONT.TTF2XFONT.COMPILER_CFLAGS  :=
 MEDIA.FONT.TTF2XFONT.COMPILER_DEFINES :=
-MEDIA.FONT.TTF2XFONT.IMPORTS          := compile.static.mak link.static.mak xfont.link.static.mak ../image/compile.static.mak \
-                                         ../image/link.static.mak font_converter.link.static.mak ../../media/image/left_bottom_packer.link.static.mak
+MEDIA.FONT.TTF2XFONT.IMPORTS          := compile.media.font link.media.font link.media.font.xfont compile.media.image \
+                                         link.media.image link.media.font.font_converter link.media.image.left_bottom_packer

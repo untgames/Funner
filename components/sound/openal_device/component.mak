@@ -11,7 +11,7 @@ SOUND.OPENAL_DRIVER.SOURCES.SOURCE_DIRS            := sources
 SOUND.OPENAL_DRIVER.SOURCES.macosx.COMPILER_CFLAGS := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/OpenAL.framework/Headers
 SOUND.OPENAL_DRIVER.SOURCES.iphone.COMPILER_CFLAGS := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/OpenAL.framework/Headers
 SOUND.OPENAL_DRIVER.SOURCES.linux.COMPILER_CFLAGS  := -I/usr/include/AL
-SOUND.OPENAL_DRIVER.SOURCES.IMPORTS                := ../low_level/compile.static.mak ../../media/sound/compile.static.mak ../../system/compile.static.mak 
+SOUND.OPENAL_DRIVER.SOURCES.IMPORTS                := compile.sound.low_level compile.media.sound compile.system
 
 #Öåëü ¹2 - OPENALDEVICE tests
 SOUND.OPENAL_DRIVER.TESTS.TYPE             := test-suite
@@ -23,4 +23,4 @@ SOUND.OPENAL_DRIVER.TESTS.DLLS             :=
 SOUND.OPENAL_DRIVER.TESTS.DLL_DIRS         :=
 SOUND.OPENAL_DRIVER.TESTS.COMPILER_CFLAGS  :=
 SOUND.OPENAL_DRIVER.TESTS.COMPILER_DEFINES :=
-SOUND.OPENAL_DRIVER.TESTS.IMPORTS          := link.static.mak run.static.mak ../../common/compile.static.mak ../../system/compile.static.mak ../low_level/compile.static.mak ../../media/sound/default_decoders.link.static.mak
+SOUND.OPENAL_DRIVER.TESTS.IMPORTS          := link.sound.openal_driver run.sound.openal_driver compile.common compile.system compile.sound.low_level link.media.sound.default_decoders

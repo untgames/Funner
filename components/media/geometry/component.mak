@@ -13,7 +13,7 @@ MEDIA.GEOMETRY.SOURCES.LIB_DIRS         :=
 MEDIA.GEOMETRY.SOURCES.LIBS             :=
 MEDIA.GEOMETRY.SOURCES.COMPILER_CFLAGS  :=
 MEDIA.GEOMETRY.SOURCES.COMPILER_DEFINES :=
-MEDIA.GEOMETRY.SOURCES.IMPORTS          := compile.static.mak ../shared/compile.static.mak
+MEDIA.GEOMETRY.SOURCES.IMPORTS          := compile.media.geometry compile.media.shared
 
 #Цель - xmesh serializer sources
 MEDIA.GEOMETRY.XMESH.TYPE             := static-lib
@@ -24,14 +24,14 @@ MEDIA.GEOMETRY.XMESH.LIB_DIRS         :=
 MEDIA.GEOMETRY.XMESH.LIBS             :=
 MEDIA.GEOMETRY.XMESH.COMPILER_CFLAGS  :=
 MEDIA.GEOMETRY.XMESH.COMPILER_DEFINES :=
-MEDIA.GEOMETRY.XMESH.IMPORTS          := compile.static.mak
+MEDIA.GEOMETRY.XMESH.IMPORTS          := compile.media.geometry
 
 #Цель - binmesh serializer sources
 MEDIA.GEOMETRY.BINMESH.TYPE                   := static-lib
 MEDIA.GEOMETRY.BINMESH.NAME                   := funner.media.geometry.binmesh
 MEDIA.GEOMETRY.BINMESH.SOURCE_DIRS            := sources/binmesh
 MEDIA.GEOMETRY.BINMESH.ubuntu.COMPILER_CFLAGS := -Wno-multichar
-MEDIA.GEOMETRY.BINMESH.IMPORTS                := compile.static.mak
+MEDIA.GEOMETRY.BINMESH.IMPORTS                := compile.media.geometry
 
 #Цель - tests
 MEDIA.GEOMETRY.TESTS.TYPE             := test-suite
@@ -41,7 +41,7 @@ MEDIA.GEOMETRY.TESTS.LIB_DIRS         :=
 MEDIA.GEOMETRY.TESTS.LIBS             :=
 MEDIA.GEOMETRY.TESTS.COMPILER_CFLAGS  :=
 MEDIA.GEOMETRY.TESTS.COMPILER_DEFINES :=
-MEDIA.GEOMETRY.TESTS.IMPORTS          := compile.static.mak link.static.mak
+MEDIA.GEOMETRY.TESTS.IMPORTS          := compile.media.geometry link.media.geometry
 
 #Цель - xmesh serializer tests
 MEDIA.GEOMETRY.XMESH.TESTS.TYPE             := test-suite
@@ -51,7 +51,7 @@ MEDIA.GEOMETRY.XMESH.TESTS.LIB_DIRS         :=
 MEDIA.GEOMETRY.XMESH.TESTS.LIBS             :=
 MEDIA.GEOMETRY.XMESH.TESTS.COMPILER_CFLAGS  :=
 MEDIA.GEOMETRY.XMESH.TESTS.COMPILER_DEFINES :=
-MEDIA.GEOMETRY.XMESH.TESTS.IMPORTS          := compile.static.mak xmesh.link.static.mak
+MEDIA.GEOMETRY.XMESH.TESTS.IMPORTS          := compile.media.geometry link.media.geometry.xmesh
 
 #Цель - binmesh serializer tests
 MEDIA.GEOMETRY.BINMESH.TESTS.TYPE             := test-suite
@@ -61,7 +61,7 @@ MEDIA.GEOMETRY.BINMESH.TESTS.LIB_DIRS         :=
 MEDIA.GEOMETRY.BINMESH.TESTS.LIBS             :=
 MEDIA.GEOMETRY.BINMESH.TESTS.COMPILER_CFLAGS  :=
 MEDIA.GEOMETRY.BINMESH.TESTS.COMPILER_DEFINES :=
-MEDIA.GEOMETRY.BINMESH.TESTS.IMPORTS          := compile.static.mak binmesh.link.static.mak
+MEDIA.GEOMETRY.BINMESH.TESTS.IMPORTS          := compile.media.geometry link.media.geometry.binmesh
 
 #Цель - utils
 MEDIA.GEOMETRY.UTILS.TYPE             := application
@@ -71,4 +71,4 @@ MEDIA.GEOMETRY.UTILS.LIB_DIRS         :=
 MEDIA.GEOMETRY.UTILS.LIBS             :=
 MEDIA.GEOMETRY.UTILS.COMPILER_CFLAGS  :=
 MEDIA.GEOMETRY.UTILS.COMPILER_DEFINES :=
-MEDIA.GEOMETRY.UTILS.IMPORTS          := compile.static.mak xmesh.link.static.mak binmesh.link.static.mak
+MEDIA.GEOMETRY.UTILS.IMPORTS          := compile.media.geometry link.media.geometry.xmesh link.media.geometry.binmesh

@@ -12,7 +12,7 @@ MEDIA.RFX.SOURCES.LIB_DIRS         :=
 MEDIA.RFX.SOURCES.LIBS             := 
 MEDIA.RFX.SOURCES.COMPILER_CFLAGS  :=
 MEDIA.RFX.SOURCES.COMPILER_DEFINES :=
-MEDIA.RFX.SOURCES.IMPORTS          := compile.static.mak ../shared/compile.static.mak
+MEDIA.RFX.SOURCES.IMPORTS          := compile.media.rfx compile.media.shared
 
 #Öåëü ¹2 - XMTL serializer sources
 MEDIA.RFX.XMTL.SOURCES.TYPE             := static-lib
@@ -23,7 +23,7 @@ MEDIA.RFX.XMTL.SOURCES.LIB_DIRS         :=
 MEDIA.RFX.XMTL.SOURCES.LIBS             := 
 MEDIA.RFX.XMTL.SOURCES.COMPILER_CFLAGS  :=
 MEDIA.RFX.XMTL.SOURCES.COMPILER_DEFINES :=
-MEDIA.RFX.XMTL.SOURCES.IMPORTS          := compile.static.mak
+MEDIA.RFX.XMTL.SOURCES.IMPORTS          := compile.media.rfx
 
 #Öåëü ¹3 - tests
 MEDIA.RFX.TESTS.TYPE             := test-suite
@@ -33,7 +33,7 @@ MEDIA.RFX.TESTS.LIB_DIRS         :=
 MEDIA.RFX.TESTS.LIBS             :=
 MEDIA.RFX.TESTS.COMPILER_CFLAGS  :=
 MEDIA.RFX.TESTS.COMPILER_DEFINES :=
-MEDIA.RFX.TESTS.IMPORTS          := link.static.mak compile.static.mak
+MEDIA.RFX.TESTS.IMPORTS          := link.media.rfx compile.media.rfx
 
 #Öåëü ¹4 - XMTL tests
 MEDIA.RFX.XMTL.TESTS.TYPE             := test-suite
@@ -43,4 +43,4 @@ MEDIA.RFX.XMTL.TESTS.LIB_DIRS         :=
 MEDIA.RFX.XMTL.TESTS.LIBS             :=
 MEDIA.RFX.XMTL.TESTS.COMPILER_CFLAGS  :=
 MEDIA.RFX.XMTL.TESTS.COMPILER_DEFINES :=
-MEDIA.RFX.XMTL.TESTS.IMPORTS          := xmtl.link.static.mak compile.static.mak
+MEDIA.RFX.XMTL.TESTS.IMPORTS          := link.media.rfx.xmtl compile.media.rfx

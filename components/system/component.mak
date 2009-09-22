@@ -8,7 +8,7 @@ SYSTEMLIB.SOURCES.TYPE                              := static-lib
 SYSTEMLIB.SOURCES.NAME                              := funner.system
 SYSTEMLIB.SOURCES.INCLUDE_DIRS                      := sources
 SYSTEMLIB.SOURCES.SOURCE_DIRS                       := sources/wrappers
-SYSTEMLIB.SOURCES.IMPORTS                           := compile.static.mak
+SYSTEMLIB.SOURCES.IMPORTS                           := compile.system
 SYSTEMLIB.SOURCES.win32.SOURCE_DIRS                 := sources/platform/win32
 SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS                := sources/platform/pthread sources/platform/unistd
 SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS              := -wd4355
@@ -28,4 +28,4 @@ SYSTEMLIB.SOURCES.x11.SOURCE_DIRS                   := sources/platform/x11
 #Öåëü ¹2 - System library tests
 SYSTEMLIB.TESTS.TYPE             := test-suite
 SYSTEMLIB.TESTS.SOURCE_DIRS      := tests/wrappers tests/thread
-SYSTEMLIB.TESTS.IMPORTS          := compile.static.mak link.static.mak
+SYSTEMLIB.TESTS.IMPORTS          := compile.system link.system

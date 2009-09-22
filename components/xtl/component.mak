@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := XTL.STL.TESTS XTL.TR1.TESTS XTL.XTL.TESTS
+TARGETS := XTL.STL.TESTS XTL.TR1.TESTS XTL.XTL.TESTS XTL.INFO
 
 #Цель №1 - STL tests
 XTL.STL.TESTS.TYPE             := test-suite
@@ -12,6 +12,7 @@ XTL.STL.TESTS.EXECTUTION_DIR   :=
 XTL.STL.TESTS.LIBS             :=
 XTL.STL.TESTS.COMPILER_CFLAGS  :=
 XTL.STL.TESTS.COMPILER_DEFINES := __MYSTL_STANDALONE__
+XTL.STL.TESTS.DOCUMENTATION_DIRS := include
 
 #Цель №2 - TR1 tests
 XTL.TR1.TESTS.TYPE                := test-suite
@@ -52,3 +53,8 @@ XTL.MATH.TESTS.COMPILER_DEFINES := __MYSTL_STANDALONE__
 XTL.SDK.TYPE              := installation
 XTL.SDK.INSTALLATION_DIR  := sdk
 XTL.SDK.SOURCE_FILES      := include
+
+#XTL documenation
+XTL.INFO.TYPE        := doxygen-info
+XTL.INFO.CHM_NAME    := funner.xtl
+XTL.INFO.SOURCE_DIRS := include
