@@ -10,16 +10,18 @@ ENGINE.SCRIPT_BINDS.SOURCES.INCLUDE_DIRS           := include
 ENGINE.SCRIPT_BINDS.SOURCES.SOURCE_DIRS            := sources
 ENGINE.SCRIPT_BINDS.SOURCES.iphone.SOURCE_DIRS     := sources/iphone
 ENGINE.SCRIPT_BINDS.SOURCES.iphone.COMPILER_CFLAGS := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/AVFoundation.framework/Headers/ \
-                                                      -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/Foundation.framework/Headers/
-ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS                := ../../script/core/compile.static.mak ../../scene_graph/core/compile.static.mak ../../common/compile.static.mak \
-                                                      ../../render/scene_render/compile.static.mak ../../system/compile.static.mak ../../input/manager/compile.static.mak \
-                                                      ../core/compile.static.mak ../../media/rms/compile.static.mak
+                                                      -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/Foundation.framework/Headers/ \
+                                                      -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/UIKit.framework/Headers/
+ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS                := compile.script.core compile.scene_graph.core compile.common \
+                                                      compile.render.scene_render compile.system compile.input.manager \
+                                                      compile.engine.core compile.media.rms
 
 #Öåëü ¹2 - SCRIPT_BINDS tests
-ENGINE.SCRIPT_BINDS.TESTS.TYPE             := test-suite
-ENGINE.SCRIPT_BINDS.TESTS.SOURCE_DIRS      := tests/lua
-ENGINE.SCRIPT_BINDS.TESTS.IMPORTS	  		   := ../../script/core/compile.static.mak ../../common/compile.static.mak ../../script/lua/link.static.mak \
-                                              bv.link.static.mak sg.link.static.mak math.link.static.mak render.link.static.mak \
-                                              common.link.static.mak system.link.static.mak engine.link.static.mak input.link.static.mak \
-                                              lua_override.link.static.mak rms.link.static.mak \
-                                              ../../system/compile.static.mak ../../media/rms/link.static.mak
+ENGINE.SCRIPT_BINDS.TESTS.TYPE        := test-suite
+ENGINE.SCRIPT_BINDS.TESTS.SOURCE_DIRS := tests/lua
+ENGINE.SCRIPT_BINDS.TESTS.IMPORTS	  	:= compile.script.core compile.common compile.system link.script.lua \
+                                         link.engine.script_binds.bv link.engine.script_binds.sg link.engine.script_binds.math \
+                                         link.engine.script_binds.render link.engine.script_binds.common link.engine.script_binds.system \
+                                         link.engine.script_binds.engine link.engine.script_binds.input \
+                                         link.engine.script_binds.lua_override link.engine.script_binds.rms
+                                              

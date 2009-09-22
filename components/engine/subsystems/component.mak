@@ -4,39 +4,26 @@
 TARGETS := ENGINE.SUBSYSTEMS.SOURCES ENGINE.SUBSYSTEMS.TESTS
 
 #Цель - sources
-ENGINE.SUBSYSTEMS.SOURCES.TYPE              := static-lib
-ENGINE.SUBSYSTEMS.SOURCES.NAME              := funner.engine.subsystems
-ENGINE.SUBSYSTEMS.SOURCES.INCLUDE_DIRS      :=
-ENGINE.SUBSYSTEMS.SOURCES.SOURCE_DIRS       := sources/common
-ENGINE.SUBSYSTEMS.SOURCES.LIB_DIRS          :=
-ENGINE.SUBSYSTEMS.SOURCES.LIBS              := 
-ENGINE.SUBSYSTEMS.SOURCES.COMPILER_CFLAGS   := 
-ENGINE.SUBSYSTEMS.SOURCES.COMPILER_DEFINES  :=
-ENGINE.SUBSYSTEMS.SOURCES.IMPORTS           := ../core/compile.static.mak ../../render/scene_render/compile.static.mak \
-                                               ../../input/manager/compile.static.mak ../../input/low_level/compile.static.mak \
-                                               ../../sound/scene_player/compile.static.mak ../../system/compile.static.mak \
-                                               ../../script/core/compile.static.mak ../../media/rms/compile.static.mak
-ENGINE.SUBSYSTEMS.SOURCES.has_windows.IMPORTS     := ../../input/window_driver/compile.static.mak ../../render/mid_level_window_driver/compile.static.mak
+ENGINE.SUBSYSTEMS.SOURCES.TYPE                    := static-lib
+ENGINE.SUBSYSTEMS.SOURCES.NAME                    := funner.engine.subsystems
+ENGINE.SUBSYSTEMS.SOURCES.SOURCE_DIRS             := sources/common
+ENGINE.SUBSYSTEMS.SOURCES.IMPORTS                 := compile.engine.core compile.render.scene_render \
+                                                     compile.input.manager compile.input.low_level \
+                                                     compile.sound.scene_player compile.system compile.script.core compile.media.rms
+ENGINE.SUBSYSTEMS.SOURCES.has_windows.IMPORTS     := compile.input.window_driver compile.render.mid_level.window_driver
 ENGINE.SUBSYSTEMS.SOURCES.has_windows.SOURCE_DIRS := sources/window_manager
 
 #Цель - tests
 ENGINE.SUBSYSTEMS.TESTS.TYPE                := test-suite
-ENGINE.SUBSYSTEMS.TESTS.INCLUDE_DIRS        :=
 ENGINE.SUBSYSTEMS.TESTS.SOURCE_DIRS         := tests
-ENGINE.SUBSYSTEMS.TESTS.LIB_DIRS            :=
-ENGINE.SUBSYSTEMS.TESTS.LIBS                :=
-ENGINE.SUBSYSTEMS.TESTS.COMPILER_CFLAGS     :=
-ENGINE.SUBSYSTEMS.TESTS.COMPILER_DEFINES    :=
-ENGINE.SUBSYSTEMS.TESTS.IMPORTS             := ../core/compile.static.mak ../../common/compile.static.mak ../../system/compile.static.mak \
-                                               ../../render/scene_render/compile.static.mak ../../input/manager/compile.static.mak \
-                                               scene_render.link.static.mak scene_player.link.static.mak \
-                                                input_manager.link.static.mak shell.link.static.mak log.link.static.mak file_system.link.static.mak \
-                                                resource_system.link.static.mak \
-                                               ../../input/manager/xkeymap.link.static.mak ../../input/manager/xkeyreg.link.static.mak \
-                                               ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
-                                               ../../script/lua/link.static.mak ../script_binds/math.link.static.mak ../script_binds/sg.link.static.mak \
-                                               ../script_binds/render.link.static.mak ../script_binds/engine.link.static.mak \
-                                               ../script_binds/input.link.static.mak ../script_binds/system.link.static.mak
-ENGINE.SUBSYSTEMS.TESTS.has_windows.IMPORTS := ../../render/opengl_driver/link.static.mak window_input_driver.link.static.mak \
-                                               window_manager.link.static.mak window_renderer.link.static.mak
-ENGINE.SUBSYSTEMS.TESTS.win32.IMPORTS       := ../../input/direct_input_driver/link.static.mak
+ENGINE.SUBSYSTEMS.TESTS.IMPORTS             := compile.engine.core compile.common compile.system compile.render.scene_render compile.input.manager \
+                                               link.engine.subsystems.scene_render link.engine.subsystems.scene_player \
+                                               link.engine.subsystems.input_manager link.engine.subsystems.shell link.engine.subsystems.log \
+                                               link.engine.subsystems.file_system link.engine.subsystems.resource_system \
+                                               link.input.manager.xkeymap link.input.manager.xkeyreg link.sound.openal_device run.sound.openal_device \
+                                               link.script.lua link.engine.script_binds.math link.engine.script_binds.sg \
+                                               link.engine.script_binds.render link.engine.script_binds.engine \
+                                               link.engine.script_binds.input link.engine.script_binds.system
+ENGINE.SUBSYSTEMS.TESTS.has_windows.IMPORTS := link.render.opengl_driver link.engine.subsystems.window_input_driver \
+                                               link.engine.subsystems.window_manager link.engine.subsystems.window_renderer
+ENGINE.SUBSYSTEMS.TESTS.win32.IMPORTS       := link.input.direct_input_driver

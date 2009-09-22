@@ -7,35 +7,32 @@ TARGETS.win32 := ENGINE.CLAUNCHER.SOURCES
 LAUNCHER_VERSION_STRING := "Launcher version 1.0"
 
 #Цель - сборка движка
-ENGINE.FUNNER_LIBRARY.TYPE             := dynamic-lib
-ENGINE.FUNNER_LIBRARY.NAME             := funner
-ENGINE.FUNNER_LIBRARY.SOURCE_DIRS      := sources/shared
-ENGINE.FUNNER_LIBRARY.COMPILER_DEFINES := LAUNCHER_VERSION='$(LAUNCHER_VERSION_STRING)' FUNNER_BUILD=1
-ENGINE.FUNNER_LIBRARY.INCLUDE_DIRS     := include
-ENGINE.FUNNER_LIBRARY.IMPORTS          := ../core/compile.static.mak \
-                                            ../../common/compile.static.mak ../../common/default_console_handler.link.static.mak \
-                                            ../../common/zip_file_system.link.static.mak ../../common/aes.link.static.mak \
-                                            ../../media/rms/link.static.mak ../../media/rfx/xmtl.link.static.mak \
-                                            ../../media/sound/snddecl.link.static.mak ../../media/sound/default_decoders.link.static.mak \
-                                            ../../media/font/xfont.link.static.mak \
-                                            ../../input/manager/xkeymap.link.static.mak ../../input/manager/xkeyreg.link.static.mak \
-                                            ../../input/manager/compile.static.mak ../../input/window_driver/link.static.mak \
-                                            ../../render/scene_render/compile.static.mak ../../render/scene_render/render2d.link.static.mak \
-                                            ../../script/lua/link.static.mak \
-                                            ../script_binds/math.link.static.mak   ../script_binds/sg.link.static.mak ../script_binds/bv.link.static.mak \
-                                            ../script_binds/render.link.static.mak ../script_binds/engine.link.static.mak \
-                                            ../script_binds/input.link.static.mak  ../script_binds/lua_override.link.static.mak \
-                                            ../script_binds/system.link.static.mak ../script_binds/common.link.static.mak \
-                                            ../script_binds/rms.link.static.mak \
-                                            ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
-                                            ../subsystems/scene_render.link.static.mak ../subsystems/scene_player.link.static.mak \
-                                            ../subsystems/input_manager.link.static.mak ../subsystems/shell.link.static.mak \
-                                            ../subsystems/log.link.static.mak ../subsystems/file_system.link.static.mak \
-                                            ../subsystems/resource_system.link.static.mak \
-                                            ../../system/compile.static.mak
-ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := ../../render/opengl_driver/link.static.mak ../subsystems/window_input_driver.link.static.mak \
-                                             ../subsystems/window_manager.link.static.mak ../subsystems/window_renderer.link.static.mak
-ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := ../../input/direct_input_driver/link.static.mak
+ENGINE.FUNNER_LIBRARY.TYPE                := dynamic-lib
+ENGINE.FUNNER_LIBRARY.NAME                := funner
+ENGINE.FUNNER_LIBRARY.SOURCE_DIRS         := sources/shared
+ENGINE.FUNNER_LIBRARY.COMPILER_DEFINES    := LAUNCHER_VERSION='$(LAUNCHER_VERSION_STRING)' FUNNER_BUILD=1
+ENGINE.FUNNER_LIBRARY.INCLUDE_DIRS        := include
+ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core \
+                                             compile.common link.common.default_console_handler link.common.zip_file_system link.common.aes \
+                                             link.media.rms link.media.rfx.xmtl link.media.sound.snddecl link.media.sound.default_decoders \
+                                             link.media.font.xfont \
+                                             link.input.manager.xkeymap link.input.manager.xkeyreg compile.input.manager link.input.window_driver \
+                                             compile.render.scene_render link.render.scene_render.render2d \
+                                             link.script.lua \
+                                             link.engine.script_binds.math link.engine.script_binds.sg link.engine.script_binds.bv \
+                                             link.engine.script_binds.render link.engine.script_binds.engine \
+                                             link.engine.script_binds.input link.engine.script_binds.lua_override \
+                                             link.engine.script_binds.system link.engine.script_binds.common \
+                                             link.engine.script_binds.rms \
+                                             link.sound.openal_device run.sound.openal_device \
+                                             link.engine.subsystems.scene_render link.engine.subsystems.scene_player \
+                                             link.engine.subsystems.input_manager link.engine.subsystems.shell \
+                                             link.engine.subsystems.log link.engine.subsystems.file_system \
+                                             link.engine.subsystems.resource_system \
+                                             compile.system
+ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := link.render.opengl_driver link.engine.subsystems.window_input_driver \
+                                             link.engine.subsystems.window_manager link.engine.subsystems.window_renderer
+ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := link.input.direct_input_driver
 
 #Цель - win32 application
 ENGINE.LAUNCHER.SOURCES.TYPE                   := application
