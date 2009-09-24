@@ -205,7 +205,8 @@ void RenderableSpriteModel::Update ()
                  tile_row    = frame / impl->tile_columns % impl->tile_rows,
                  tile_column = frame % impl->tile_columns;
 
-          dst_sprite.tex_offset = math::vec2f (tile_column * impl->tile_tex_width, tile_row * impl->tile_tex_height);
+//          dst_sprite.tex_offset = math::vec2f (tile_column * impl->tile_tex_width, tile_row * impl->tile_tex_height);
+          dst_sprite.tex_offset = math::vec2f (tile_column * impl->tile_tex_width, 1.0f - tile_row * impl->tile_tex_height - impl->tile_tex_height);
           dst_sprite.tex_size   = math::vec2f (impl->tile_tex_width, impl->tile_tex_height);
         }
         else
