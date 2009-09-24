@@ -182,9 +182,20 @@ void Render::LoadMaterialLibrary (const char* file_name)
 
         //предзагрузка текстуры
 
-        RenderQueryPtr query;
+        try
+        {
+          RenderQueryPtr query;
 
-        GetTexture (sprite_material->Image (), sprite_material->BlendMode () == media::rfx::SpriteBlendMode_AlphaClamp ? true : false, query); //???? не загружается альфа текстур текста
+          GetTexture (sprite_material->Image (), sprite_material->BlendMode () == media::rfx::SpriteBlendMode_AlphaClamp ? true : false, query); //???? не загружается альфа текстур текста
+        }
+        catch (std::exception& exception)
+        {
+          LogPrintf ("%s\n    at Render::LoadMaterialLibrary('%s')", exception.what (), file_name);
+        }
+        catch (...)
+        {
+          LogPrintf ("unknown exception\n    at Render::LoadMaterialLibrary('%s')", file_name);
+        }
       }
     }
   }
