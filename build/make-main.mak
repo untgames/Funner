@@ -72,13 +72,6 @@ DOXYGEN_DEFAULT_TOPIC                   := $(DOXYGEN_TEMPLATE_DIR)/$(DOXYGEN_DEF
 DOXYGEN_TOOL                            := $(DOXYGEN_DIR)/doxygen
 
 ###################################################################################################
-#Проверка наличия переменной с путём к утилите документирования кода
-###################################################################################################
-ifeq (,$(DOXYGEN_DIR))
-  $(warning Documentation tool may be not found (DOXYGEN_DIR not defined))
-endif
-
-###################################################################################################
 #Если не указан фильтры - обрабатываем все доступные
 ###################################################################################################
 files ?= %
@@ -583,9 +576,15 @@ define process_target.doxygen-info
 
 ifneq (,$$($1.SOURCE_DIRS))  
 
+  #Проверка наличия переменной с путём к утилите документирования кода
+
+  ifeq (,$(DOXYGEN_DIR))
+    $(error Documentation tool not found (DOXYGEN_DIR not defined))
+  endif
+
   $$($1.DOXYGEN_SELF_CHM_FILE): $(TAGS_DIR) $$(DIST_INFO_DIR) $$($1.TMP_DIR) $$($1.DOXYGEN_CFG_FILE)
 		@echo Generate $$(notdir $$@)...
-		@"$$(DOXYGEN_DIR/)doxygen" $$($1.DOXYGEN_CFG_FILE)
+		@"$$(DOXYGEN_DIR)/doxygen" $$($1.DOXYGEN_CFG_FILE)
 		@$(MV) $$($1.TMP_DIR)/index.chm "$$@"
 
   $$($1.DOXYGEN_CFG_FILE): $$($1.TMP_DIR) force  
