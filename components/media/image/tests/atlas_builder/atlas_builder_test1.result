@@ -1,0 +1,4 @@
+Results of atlas_builder_test1:
+atlas-builder [<OPTIONS>] <SOURCE> ...
+  use: atlas-builder --help
+error: no input files

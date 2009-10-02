@@ -3,7 +3,7 @@
 ###################################################################################################
 TARGETS := MEDIA.IMAGE.SOURCES MEDIA.XATLAS.SOURCES MEDIA.LEFT_BOTTOM_PACKER.SOURCES MEDIA.IMAGE.TESTS \
            MEDIA.IMAGE.ANIMATION_ENHANCER MEDIA.IMAGE.SPRITE_COMPOSER MEDIA.IMAGE.PSD_EXPORTER.SOURCES \
-           MEDIA.IMAGE.PSD_EXPORTER.TESTS
+           MEDIA.IMAGE.PSD_EXPORTER.TESTS MEDIA.XATLAS_BUILDER.SOURCES MEDIA.XATLAS_BUILDER.TESTS
 
 #Цель - Image sources
 MEDIA.IMAGE.SOURCES.TYPE        := static-lib
@@ -52,3 +52,13 @@ MEDIA.IMAGE.PSD_EXPORTER.SOURCES.IMPORTS     := compile.media.image link.media.i
 MEDIA.IMAGE.PSD_EXPORTER.TESTS.TYPE          := test-suite
 MEDIA.IMAGE.PSD_EXPORTER.TESTS.SOURCE_DIRS   := tests/psd_exporter
 MEDIA.IMAGE.PSD_EXPORTER.TESTS.EXECUTION_DIR := tests/psd_exporter
+
+#Цель - XAtlas builder
+MEDIA.XATLAS_BUILDER.SOURCES.TYPE          := application
+MEDIA.XATLAS_BUILDER.SOURCES.NAME          := atlas-builder
+MEDIA.XATLAS_BUILDER.SOURCES.SOURCE_DIRS   := utils/atlas_builder
+MEDIA.XATLAS_BUILDER.SOURCES.IMPORTS       := compile.common compile.media.image link.media.image link.media.image.xatlas link.media.image.left_bottom_packer
+
+#Цель - XAtlas builder tests
+MEDIA.XATLAS_BUILDER.TESTS.TYPE        := test-suite
+MEDIA.XATLAS_BUILDER.TESTS.SOURCE_DIRS := tests/atlas_builder

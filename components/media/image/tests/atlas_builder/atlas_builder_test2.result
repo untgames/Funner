@@ -1,0 +1,9 @@
+Results of atlas_builder_test2:
+atlas-builder [<OPTIONS>] <SOURCE> ...
+  OPTIONS:
+    --help, -?                 print help message
+    --silent, -s               quiet mode
+    --atlas=<file>, -o <file>  set output atlas file
+    --layout=<file>, -l <file> set output layout file
+    --pot                      resize atlas texture to nearest greater power of two sizes
+successfull!
