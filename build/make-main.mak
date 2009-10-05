@@ -692,7 +692,9 @@ ifeq (,$$(filter $1,$$(PROCESSED_IMPORTS)))
 
 #Проверка наличия компонента
 ifeq (,$$(paths.$1))
-  $$(error Component '$1' not exported (unresolved import))
+  ifeq (,$$(strip $$(foreach profile,$$(PROFILES),$$(paths.$1.$$(profile)))))
+    $$(error Component '$1' not exported (unresolved import))
+  endif
 endif
 
 #Изменение настроек
