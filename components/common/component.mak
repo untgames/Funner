@@ -56,7 +56,8 @@ COMMON.AES.IMPORTS          := compile.common
 COMMON.TESTS.TYPE             := test-suite
 COMMON.TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils \
                                  tests/memory tests/log tests/parselib tests/crypto tests/var_registry
-COMMON.TESTS.IMPORTS          := compile.common link.common run.extern.zzip
+COMMON.TESTS.IMPORTS          := compile.common link.common link.common.aes link.common.xml link.common.wxf \
+                                 link.common.configurator link.common.zip_file_system link.common.default_console_handler
 
 #Цель - CommonLib crypter
 COMMON.UTILS.FILE_CRYPTER.TYPE             := application
