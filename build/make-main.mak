@@ -691,7 +691,7 @@ ifeq (,$$(filter $1,$$(PROCESSED_IMPORTS)))
   PROCESSED_IMPORTS := $$(PROCESSED_IMPORTS) $1
 
 #Проверка наличия компонента
-ifeq (,$1)
+ifeq (,$$(paths.$1))
   $$(error Component '$1' not exported (unresolved import))
 endif
 
