@@ -580,7 +580,7 @@ ifneq (,$$($1.SOURCE_DIRS))
 
   ifneq (,$$(filter info,$$(MAKECMDGOALS)))
     ifeq (,$(DOXYGEN_DIR))
-      $(error Documentation tool not found (DOXYGEN_DIR not defined))
+      $$(error Documentation tool not found (DOXYGEN_DIR not defined))
     endif
   endif
 
