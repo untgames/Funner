@@ -12,7 +12,7 @@ INPUT.DIRECT_INPUT_DRIVER.SOURCES.LIB_DIRS             :=
 INPUT.DIRECT_INPUT_DRIVER.SOURCES.LIBS                 := 
 INPUT.DIRECT_INPUT_DRIVER.SOURCES.COMPILER_CFLAGS      :=
 INPUT.DIRECT_INPUT_DRIVER.SOURCES.COMPILER_DEFINES     := DIRECT_INPUT_KEYBOARD_DISABLED
-INPUT.DIRECT_INPUT_DRIVER.SOURCES.IMPORTS              := ../manager/compile.static.mak ../../system/compile.static.mak ../../common/compile.static.mak ../low_level/compile.static.mak
+INPUT.DIRECT_INPUT_DRIVER.SOURCES.IMPORTS              := compile.input.manager compile.system compile.input.low_level
 INPUT.DIRECT_INPUT_DRIVER.SOURCES.msvc.COMPILER_CFLAGS := -wd4503
 
 #Öåëü ¹2 - Window driver tests
@@ -25,4 +25,4 @@ INPUT.DIRECT_INPUT_DRIVER.TESTS.DLLS             :=
 INPUT.DIRECT_INPUT_DRIVER.TESTS.DLL_DIRS         :=
 INPUT.DIRECT_INPUT_DRIVER.TESTS.COMPILER_CFLAGS  :=
 INPUT.DIRECT_INPUT_DRIVER.TESTS.COMPILER_DEFINES :=
-INPUT.DIRECT_INPUT_DRIVER.TESTS.IMPORTS          := link.static.mak ../../common/compile.static.mak ../low_level/compile.static.mak ../../system/compile.static.mak
+INPUT.DIRECT_INPUT_DRIVER.TESTS.IMPORTS          := link.input.direct_input_driver compile.input.low_level compile.system
