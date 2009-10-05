@@ -22,23 +22,23 @@
   
   namespace math
   {
-    #include <math/impl/vec4f_sse.inl>
-    #include <math/impl/matrix4f_sse.inl>
-    #include <math/impl/quatf_sse.inl>    
+    #include <math/detail/vec4f_sse.inl>
+    #include <math/detail/matrix4f_sse.inl>
+    #include <math/detail/quatf_sse.inl>    
   }
 #endif
 
 namespace math
 {
 
-#include <math/impl/vec_base.inl>
-#include <math/impl/vector.inl>
-#include <math/impl/matrix_base.inl>
-#include <math/impl/matrix.inl>
-#include <math/impl/quat_base.inl>
-#include <math/impl/quat.inl>
-#include <math/impl/utils.inl>
-#include <math/impl/affine.inl>
+#include <math/detail/vec_base.inl>
+#include <math/detail/vector.inl>
+#include <math/detail/matrix_base.inl>
+#include <math/detail/matrix.inl>
+#include <math/detail/quat_base.inl>
+#include <math/detail/quat.inl>
+#include <math/detail/utils.inl>
+#include <math/detail/affine.inl>
 
 typedef vec<float,2>              vec2f;
 typedef vec<double,2>             vec2d;

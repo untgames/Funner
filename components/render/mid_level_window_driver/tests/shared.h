@@ -79,7 +79,7 @@ class RendererListener : public IRendererListener
 
     void OnFrameBufferUpdate (IFrameBuffer* frame_buffer)
     {
-      printf ("Updated frame buffer %p\n", frame_buffer);
+      //printf ("Updated frame buffer %p\n", frame_buffer);
     }
 
     void OnFrameBufferResize (IFrameBuffer* frame_buffer, size_t width, size_t height)

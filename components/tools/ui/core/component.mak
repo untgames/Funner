@@ -12,7 +12,7 @@ TOOLS.UI.CORE.SOURCES.LIB_DIRS         :=
 TOOLS.UI.CORE.SOURCES.LIBS             :=
 TOOLS.UI.CORE.SOURCES.COMPILER_CFLAGS  := 
 TOOLS.UI.CORE.SOURCES.COMPILER_DEFINES := 
-TOOLS.UI.CORE.SOURCES.IMPORTS				   := compile.static.mak ../../../common/compile.static.mak
+TOOLS.UI.CORE.SOURCES.IMPORTS				   := compile.tools.ui.core compile.common
 
 #Öåëü ¹2 - Tool UI core tests
 TOOLS.UI.CORE.TESTS.TYPE             := test-suite
@@ -22,4 +22,5 @@ TOOLS.UI.CORE.TESTS.LIB_DIRS         :=
 TOOLS.UI.CORE.TESTS.LIBS             :=
 TOOLS.UI.CORE.TESTS.COMPILER_CFLAGS  := 
 TOOLS.UI.CORE.TESTS.COMPILER_DEFINES :=
-TOOLS.UI.CORE.TESTS.IMPORTS				   := compile.static.mak link.static.mak ../../../common/compile.static.mak
+TOOLS.UI.CORE.TESTS.IMPORTS				   := compile.tools.ui.core link.tools.ui.core compile.common
+

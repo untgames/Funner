@@ -8,4 +8,5 @@ export.link.render.low_level.opengl_driver.IMPORTS           := link.render.low_
 export.link.render.low_level.opengl_driver.egl.IMPORTS       := link.extern.gles_win32
 
 # Run exports
+export.run.render.low_level.opengl_driver.IMPORTS     :=
 export.run.render.low_level.opengl_driver.egl.IMPORTS := run.extern.gles_win32

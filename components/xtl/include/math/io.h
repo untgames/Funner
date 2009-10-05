@@ -56,7 +56,7 @@ void to_string (String& buffer, const matrix<T, size>& value);
 template <class String, class T>
 void to_string (String& buffer, const quat<T>& value);
 
-#include <math/impl/io.inl>
+#include <math/detail/io.inl>
 
 }
 

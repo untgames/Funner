@@ -32,6 +32,6 @@ export.link.common.xml.LINK_INCLUDES := XmlParser
 export.link.common.xml.IMPORTS       := link.common
 
 # ZIP file system link exports
-export.link.zip_file_system.LIBS          := funner.common.zip_file_system funner.extern.zzip funner.extern.zlib
-export.link.zip_file_system.LINK_INCLUDES := ZipFileSystem
-export.link.zip_file_system.IMPORTS       := link.common
+export.link.common.zip_file_system.LIBS          := funner.common.zip_file_system funner.extern.zzip funner.extern.zlib
+export.link.common.zip_file_system.LINK_INCLUDES := ZipFileSystem
+export.link.common.zip_file_system.IMPORTS       := link.common

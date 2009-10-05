@@ -27,8 +27,7 @@ TOOLS.UI.WINDOWS_FORMS.SOURCES.LIBS             :=
 TOOLS.UI.WINDOWS_FORMS.SOURCES.DLL_DIRS         := ../../../../extern/windows_controls/bin
 TOOLS.UI.WINDOWS_FORMS.SOURCES.COMPILER_CFLAGS  := 
 TOOLS.UI.WINDOWS_FORMS.SOURCES.COMPILER_DEFINES := 
-TOOLS.UI.WINDOWS_FORMS.SOURCES.IMPORTS			    := ../core/compile.static.mak ../../../script/core/compile.static.mak \
-                                                   ../../../common/compile.static.mak ../../../system/compile.static.mak
+TOOLS.UI.WINDOWS_FORMS.SOURCES.IMPORTS			    := compile.tools.ui.core compile.script.core compile.system
 TOOLS.UI.WINDOWS_FORMS.SOURCES.msvc.COMPILER_CFLAGS := -clr -wd4793 -wd4503
 
 #Цель - C# type converter plugin
@@ -75,7 +74,7 @@ TOOLS.UI.WINDOWS_FORMS.TESTS.SOURCE_DIRS      := tests
 TOOLS.UI.WINDOWS_FORMS.TESTS.LINK_INCLUDES    :=
 TOOLS.UI.WINDOWS_FORMS.TESTS.COMPILER_CFLAGS  := 
 TOOLS.UI.WINDOWS_FORMS.TESTS.COMPILER_DEFINES :=
-TOOLS.UI.WINDOWS_FORMS.TESTS.IMPORTS          := ../core/compile.static.mak link.static.mak ../../../system/compile.static.mak \
-                                                 ../../../system/link.static.mak ../../../script/lua/link.static.mak \
-                                                 ../../../engine/script_binds/common.link.static.mak ../../../engine/script_binds/lua_override.link.static.mak \
-                                                 ../../../common/default_console_handler.link.static.mak ../../../script/core/compile.static.mak
+TOOLS.UI.WINDOWS_FORMS.TESTS.IMPORTS          := compile.tools.ui.core link.tools.ui.windows_forms compile.system link.system \
+                                                 link.script.lua link.engine.script_binds.common link.engine.script_binds.lua_override \
+                                                 link.common.default_console_handler compile.script.core
+                                                 

@@ -20,10 +20,10 @@ ENGINE.SUBSYSTEMS.TESTS.IMPORTS             := compile.engine.core compile.commo
                                                link.engine.subsystems.scene_render link.engine.subsystems.scene_player \
                                                link.engine.subsystems.input_manager link.engine.subsystems.shell link.engine.subsystems.log \
                                                link.engine.subsystems.file_system link.engine.subsystems.resource_system \
-                                               link.input.manager.xkeymap link.input.manager.xkeyreg link.sound.openal_device run.sound.openal_device \
+                                               link.input.manager.xkeymap link.input.manager.xkeyreg link.sound.low_level.openal_driver run.sound.low_level.openal_driver \
                                                link.script.lua link.engine.script_binds.math link.engine.script_binds.sg \
                                                link.engine.script_binds.render link.engine.script_binds.engine \
                                                link.engine.script_binds.input link.engine.script_binds.system
-ENGINE.SUBSYSTEMS.TESTS.has_windows.IMPORTS := link.render.opengl_driver link.engine.subsystems.window_input_driver \
+ENGINE.SUBSYSTEMS.TESTS.has_windows.IMPORTS := link.render.low_level.opengl_driver link.engine.subsystems.window_input_driver \
                                                link.engine.subsystems.window_manager link.engine.subsystems.window_renderer
 ENGINE.SUBSYSTEMS.TESTS.win32.IMPORTS       := link.input.direct_input_driver

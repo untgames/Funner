@@ -15,11 +15,9 @@ DEMOS.WATER_SLIDES.DLL_DIRS         :=
 DEMOS.WATER_SLIDES.COMPILER_DEFINES :=
 DEMOS.WATER_SLIDES.EXECUTION_DIR    := .
 DEMOS.WATER_SLIDES.LINK_INCLUDES    :=
-DEMOS.WATER_SLIDES.IMPORTS          := ../../system/compile.static.mak ../../system/link.static.mak \
-                                       ../../media/image/compile.static.mak ../../media/image/link.static.mak \
-                                       ../../render/low_level/compile.static.mak ../../render/opengl_driver/link.static.mak  \
-                                       ../../scene_graph/core/link.static.mak ../../scene_graph/core/compile.static.mak \
-                                       ../../sound/openal_device/link.static.mak ../../sound/openal_device/run.static.mak \
-                                       ../../sound/scene_player/link.static.mak ../../media/sound/snddecl.link.static.mak \
-                                       ../../media/sound/default_decoders.link.static.mak ../../sound/scene_player/compile.static.mak
+DEMOS.WATER_SLIDES.IMPORTS          := compile.system link.system compile.media.image link.media.image compile.render.low_level \
+                                       link.render.low_level.opengl_driver compile.scene_graph.core link.scene_graph.core \
+                                       link.sound.low_level.openal_driver run.sound.low_level.openal_driver \
+                                       compile.sound.scene_player link.sound.scene_player link.media.sound.snddecl \
+                                       link.media.sound.default_decoders compile.sound.scene_player
 DEMOS.WATER_SLIDES.msvc.COMPILER_CFLAGS  := -wd4355
