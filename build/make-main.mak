@@ -775,7 +775,7 @@ $(DIRS):
 
 #Очистка
 clean:
-	@cd $(ROOT_TMP_DIR) && $(RM) -r $(TMP_CLEAN_DIRS:$(ROOT_TMP_DIR)/%=%)
+	@$(if $(wildcard $(ROOT_TMP_DIR)),cd $(ROOT_TMP_DIR) && $(RM) -r $(TMP_CLEAN_DIRS:$(ROOT_TMP_DIR)/%=%))
 
 fullyclean: clean
 	@$(RM) -r $(DIRS)
