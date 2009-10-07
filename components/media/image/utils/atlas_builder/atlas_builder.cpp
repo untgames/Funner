@@ -64,9 +64,12 @@ struct Params
   StringArray   sources;          //имя исходных изображений
   stl::string   atlas_file_name;  //имя результирующего изображения
   stl::string   layout_file_name; //имя файла разметки
-  bool          print_help;       //нужно ли печатать сообщение помощи
+  bool          silent;           //минимальное число сообщений  
+  bool          print_help;       //нужно ли печатать сообщение помощи  
+  bool          need_layout;      //нужно генерировать файл разметки
   bool          need_pot_rescale; //нужно ли масштабировать изображение к размерам кратным степени двойки
-  bool          silent;           //минимальное число сообщений
+  bool          invert_x;         //инвертирование координаты X тайлов
+  bool          invert_y;         //инвертирование координаты Y тайлов
 };
 
 //получение подсказки по программе
@@ -108,6 +111,12 @@ void command_line_result_layout (const char* file_name, Params& params)
   params.layout_file_name = file_name;
 }
 
+//установка флага генерации файла разметки
+void command_line_no_layout (const char* file_name, Params& params)
+{
+  params.need_layout = false;
+}
+
 //установка параметра масштабирования к степени двойки
 void command_line_pot (const char*, Params& params)
 {
@@ -120,15 +129,30 @@ void command_line_silent (const char*, Params& params)
   params.silent = true;
 }
 
+//установка параметра инвертирования тайлов по оси X
+void command_line_invert_x (const char*, Params& params)
+{
+  params.invert_x = true;
+}
+
+//установка параметра инвертирования тайлов по оси Y
+void command_line_invert_y (const char*, Params& params)
+{
+  params.invert_y = true;
+}
+
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
     {command_line_help,          "help",    '?',      0, "print help message"},
     {command_line_silent,        "silent",  's',      0, "quiet mode"},    
-    {command_line_result_atlas,  "atlas",   'o', "file", "set output atlas file"},
+    {command_line_result_atlas,  "atlas",   'o', "file", "set output atlas file"},    
     {command_line_result_layout, "layout",  'l', "file", "set output layout file"},
+    {command_line_no_layout,     "no-layout", 0,      0, "don't generatoe layout file"},    
     {command_line_pot,           "pot",       0,      0, "resize atlas texture to nearest greater power of two sizes"},
+    {command_line_invert_x,      "invert-x",  0,      0, "invert X coordinate in layout of tiles"},
+    {command_line_invert_y,      "invert-y",  0,      0, "invert Y coordinate in layout of tiles"},
   };
   
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -367,7 +391,13 @@ void build (Params& params)
 
     if (params.need_pot_rescale)
       pack_flags |= media::AtlasPackFlag_PowerOfTwoEdges;
-      
+
+    if (params.invert_x)
+      pack_flags |= media::AtlasPackFlag_InvertTilesX;
+
+    if (params.invert_y)
+      pack_flags |= media::AtlasPackFlag_InvertTilesY;
+
     try
     {
       builder.Build (atlas, atlas_image, pack_flags);
@@ -386,12 +416,17 @@ void build (Params& params)
       //сохранение атласа
       
     if (!params.silent)
-      printf ("Save atlas '%s' and layout '%s'", params.atlas_file_name.c_str (), params.layout_file_name.c_str ());
+    {
+      if (params.need_layout) printf ("Save atlas '%s' and layout '%s'", params.atlas_file_name.c_str (), params.layout_file_name.c_str ());
+      else                    printf ("Save atlas '%s'", params.atlas_file_name.c_str ());
+    }
 
     try
     {
       atlas_image.Save (params.atlas_file_name.c_str ());
-      atlas.Save (params.layout_file_name.c_str ());
+      
+      if (params.need_layout)
+        atlas.Save (params.layout_file_name.c_str ());
     }
     catch (...)
     {
@@ -421,8 +456,11 @@ int main (int argc, const char* argv [])
   params.atlas_file_name  = DEFAULT_ATLAS_FILE_NAME;
   params.print_help       = false;
   params.silent           = false;
+  params.need_layout      = true;
   params.need_pot_rescale = false;
-  
+  params.invert_x         = false;
+  params.invert_y         = false;
+
     //разбор командной строки
 
   command_line_parse (argc, argv, params);

@@ -129,6 +129,8 @@ struct AtlasBuilder::Impl
 
       try
       {
+          //упаковка
+        
         xtl::uninitialized_storage<math::vec2ui> sizes (images.size ());
         xtl::uninitialized_storage<math::vec2ui> origins (images.size ());
 
@@ -141,41 +143,52 @@ struct AtlasBuilder::Impl
         }
 
         pack_handler (sizes.size (), sizes.data (), origins.data (), pack_flags);
-
+        
+          //заполнение атласа
+          
         Atlas  result_atlas;
         size_t result_image_width = 0;
-        size_t result_image_height = 0;
+        size_t result_image_height = 0;                                  
 
-        result_atlas.SetImage (atlas_image_name.c_str ());
-
+        result_atlas.SetImage (atlas_image_name.c_str ());          
+        
         for (size_t i = 0; i < origins.size (); i++)
         {
-          Tile new_tile;
-
-          new_tile.name   = images[i]->Name ();
-          new_tile.origin = origins.data ()[i];
-          new_tile.size   = sizes.data ()[i];
-
-          result_atlas.Insert (new_tile);
-
-          if (result_image_width < (origins.data ()[i].x + sizes.data ()[i].x))
-            result_image_width = origins.data ()[i].x + sizes.data ()[i].x;
-          if (result_image_height < (origins.data ()[i].y + sizes.data ()[i].y))
-            result_image_height = origins.data ()[i].y + sizes.data ()[i].y;
+          if (result_image_width < (origins.data ()[i].x + sizes.data ()[i].x))  result_image_width = origins.data ()[i].x + sizes.data ()[i].x;
+          if (result_image_height < (origins.data ()[i].y + sizes.data ()[i].y)) result_image_height = origins.data ()[i].y + sizes.data ()[i].y;          
         }
-
+        
         if (pack_flags & AtlasPackFlag_PowerOfTwoEdges)
         {
           result_image_width  = get_next_higher_power_of_two (result_image_width);
           result_image_height = get_next_higher_power_of_two (result_image_height);
+        }        
+
+        for (size_t i = 0; i < origins.size (); i++)
+        {
+          Tile new_tile;
+          
+          math::vec2ui& origin = origins.data ()[i];
+          math::vec2ui& size   = sizes.data ()[i];
+
+          if (pack_flags & AtlasPackFlag_InvertTilesX) origin.x = result_image_width  - origin.x - size.x;
+          if (pack_flags & AtlasPackFlag_InvertTilesY) origin.y = result_image_height - origin.y - size.y;
+
+          new_tile.name   = images[i]->Name ();
+          new_tile.origin = origin;
+          new_tile.size   = sizes.data ()[i];
+          
+          result_atlas.Insert (new_tile);
         }
+        
+          //создание изображения атласа
 
         Image result_image (result_image_width, result_image_height, 1, (*images.begin ())->Format ());
 
         memset (result_image.Bitmap (), 0, result_image_width * result_image_height * get_bytes_per_pixel (result_image.Format ()));
 
         for (size_t i = 0; i < origins.size (); i++)
-          result_image.PutImage (origins.data ()[i].x, origins.data ()[i].y, 0, sizes.data ()[i].x, sizes.data ()[i].y, 1, images[i]->Format (), images[i]->Bitmap ());
+          result_image.PutImage (origins.data ()[i].x, origins.data ()[i].y, 0, sizes.data ()[i].x, sizes.data ()[i].y, 1, images [i]->Format (), images [i]->Bitmap ());
 
         result_atlas.Swap (out_atlas);
         result_image.Swap (out_atlas_image);

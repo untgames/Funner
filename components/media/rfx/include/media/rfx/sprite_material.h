@@ -68,7 +68,7 @@ class SpriteMaterial: public Material
     void   SetTileSize (size_t width, size_t height);
     size_t TileWidth   () const;
     size_t TileHeight  () const;
-    
+
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
