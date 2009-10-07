@@ -71,10 +71,8 @@ Texture::Texture
       break;
     case PixelFormat_S8:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Stencil textures not supported");
-      return;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.format", desc.format);
-      return;
   }
   
     //проверка корректности флагов доступа
@@ -88,7 +86,6 @@ Texture::Texture
       break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.access_flags", desc.access_flags);
-      break;
   }
 
     //выделение нового OpenGL-идентификатора текстуры

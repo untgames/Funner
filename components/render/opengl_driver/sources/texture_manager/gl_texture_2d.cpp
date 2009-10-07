@@ -36,7 +36,23 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
 
   if (!proxy_width)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 2D texture %ux%u@%s. Reason: proxy texure fail", tex_desc.width,
-    tex_desc.height, get_name (tex_desc.format));
+      tex_desc.height, get_name (tex_desc.format));
+            
+#else
+
+      //установка внутреннего формата сжатия
+
+  switch (gl_internal_format)
+  {
+    case GL_RGBA:
+      gl_internal_format = GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+      break;
+    case GL_RGB:
+      gl_internal_format = GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+      break;
+    default:
+      break;
+  }
     
 #endif
 
