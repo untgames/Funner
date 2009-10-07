@@ -24,7 +24,7 @@ MACOSX_DEPLOYMENT_TARGET := $(MACOSX_VERSION)
 
 export MACOSX_DEPLOYMENT_TARGET
 
-COMMON_CFLAGS     += -O3 -msse3 -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION)
+COMMON_CFLAGS     += -msse3 -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION)
 COMMON_LINK_FLAGS += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION)
 
 include $(TOOLSETS_DIR)/g++.mak
