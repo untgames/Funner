@@ -70,6 +70,7 @@ struct Params
   bool          need_pot_rescale; //нужно ли масштабировать изображение к размерам кратным степени двойки
   bool          invert_x;         //инвертирование координаты X тайлов
   bool          invert_y;         //инвертирование координаты Y тайлов
+  bool          swap_axises;      //обмен осей местами
 };
 
 //получение подсказки по программе
@@ -141,18 +142,25 @@ void command_line_invert_y (const char*, Params& params)
   params.invert_y = true;
 }
 
+//установка параметра обмена осей местами
+void command_line_swap_axises (const char*, Params& params)
+{
+  params.swap_axises = true;
+}
+
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
-    {command_line_help,          "help",    '?',      0, "print help message"},
-    {command_line_silent,        "silent",  's',      0, "quiet mode"},    
-    {command_line_result_atlas,  "atlas",   'o', "file", "set output atlas file"},    
-    {command_line_result_layout, "layout",  'l', "file", "set output layout file"},
-    {command_line_no_layout,     "no-layout", 0,      0, "don't generatoe layout file"},    
-    {command_line_pot,           "pot",       0,      0, "resize atlas texture to nearest greater power of two sizes"},
-    {command_line_invert_x,      "invert-x",  0,      0, "invert X coordinate in layout of tiles"},
-    {command_line_invert_y,      "invert-y",  0,      0, "invert Y coordinate in layout of tiles"},
+    {command_line_help,          "help",       '?',      0, "print help message"},
+    {command_line_silent,        "silent",     's',      0, "quiet mode"},    
+    {command_line_result_atlas,  "atlas",      'o', "file", "set output atlas file"},    
+    {command_line_result_layout, "layout",     'l', "file", "set output layout file"},
+    {command_line_no_layout,     "no-layout",   0,       0, "don't generatoe layout file"},    
+    {command_line_pot,           "pot",         0,       0, "resize atlas texture to nearest greater power of two sizes"},
+    {command_line_invert_x,      "invert-x",    0,       0, "invert X coordinate in layout of tiles"},
+    {command_line_invert_y,      "invert-y",    0,       0, "invert Y coordinate in layout of tiles"},
+    {command_line_swap_axises,   "swap-axises", 0,       0, "swap axises at layout tiles"},
   };
   
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -389,14 +397,10 @@ void build (Params& params)
 
     size_t pack_flags = 0;
 
-    if (params.need_pot_rescale)
-      pack_flags |= media::AtlasPackFlag_PowerOfTwoEdges;
-
-    if (params.invert_x)
-      pack_flags |= media::AtlasPackFlag_InvertTilesX;
-
-    if (params.invert_y)
-      pack_flags |= media::AtlasPackFlag_InvertTilesY;
+    if (params.need_pot_rescale) pack_flags |= media::AtlasPackFlag_PowerOfTwoEdges;
+    if (params.invert_x)         pack_flags |= media::AtlasPackFlag_InvertTilesX;
+    if (params.invert_y)         pack_flags |= media::AtlasPackFlag_InvertTilesY;
+    if (params.swap_axises)      pack_flags |= media::AtlasPackFlag_SwapAxises;
 
     try
     {
@@ -460,6 +464,7 @@ int main (int argc, const char* argv [])
   params.need_pot_rescale = false;
   params.invert_x         = false;
   params.invert_y         = false;
+  params.swap_axises      = false;
 
     //разбор командной строки
 

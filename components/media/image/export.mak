@@ -16,3 +16,8 @@ export.link.media.image.xatlas.IMPORTS       := link.media.image link.common.xml
 export.link.media.image.left_bottom_packer.LIBS          := funner.media.image.left_bottom_packer
 export.link.media.image.left_bottom_packer.LINK_INCLUDES := LeftBottomPacker
 export.link.media.image.left_bottom_packer.IMPORTS       := link.media.image
+
+# PVRTC loader exports
+export.link.media.image.pvr.LIBS          := funner.media.image.pvr_loader
+export.link.media.image.pvr.LINK_INCLUDES := PvrLoader
+export.link.media.image.pvr.IMPORTS       := link.media.image

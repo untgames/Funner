@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.IMAGE.SOURCES MEDIA.XATLAS.SOURCES MEDIA.LEFT_BOTTOM_PACKER.SOURCES MEDIA.IMAGE.TESTS \
+TARGETS := MEDIA.IMAGE.SOURCES MEDIA.XATLAS.SOURCES MEDIA.LEFT_BOTTOM_PACKER.SOURCES MEDIA.PVR_LOADER.SOURCES MEDIA.IMAGE.TESTS \
            MEDIA.IMAGE.ANIMATION_ENHANCER MEDIA.IMAGE.SPRITE_COMPOSER MEDIA.IMAGE.PSD_EXPORTER.SOURCES \
            MEDIA.IMAGE.PSD_EXPORTER.TESTS MEDIA.XATLAS_BUILDER.SOURCES MEDIA.XATLAS_BUILDER.TESTS
 
@@ -24,11 +24,17 @@ MEDIA.LEFT_BOTTOM_PACKER.SOURCES.INCLUDE_DIRS := ../../bound_volumes/include
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.SOURCE_DIRS  := sources/packers/left_bottom
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.IMPORTS      := compile.media.image
 
+#Цель - PVR loader
+MEDIA.PVR_LOADER.SOURCES.TYPE         := static-lib
+MEDIA.PVR_LOADER.SOURCES.NAME         := funner.media.image.pvr_loader
+MEDIA.PVR_LOADER.SOURCES.SOURCE_DIRS  := sources/compressed_image_loaders/pvr
+MEDIA.PVR_LOADER.SOURCES.IMPORTS      := compile.media.image
+
 #Цель - Image tests
 MEDIA.IMAGE.TESTS.TYPE         := test-suite
 MEDIA.IMAGE.TESTS.INCLUDE_DIRS := ../../bound_volumes/include
 MEDIA.IMAGE.TESTS.SOURCE_DIRS  := tests/image tests/atlas
-MEDIA.IMAGE.TESTS.IMPORTS      := compile.media.image link.media.image link.media.image.xatlas link.media.image.left_bottom_packer run.extern.devil
+MEDIA.IMAGE.TESTS.IMPORTS      := compile.media.image link.media.image link.media.image.xatlas link.media.image.left_bottom_packer run.extern.devil link.media.image.pvr
 
 #Цель - Animation enhancer sources
 MEDIA.IMAGE.ANIMATION_ENHANCER.TYPE        := application

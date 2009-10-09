@@ -154,6 +154,11 @@ struct AtlasBuilder::Impl
         
         for (size_t i = 0; i < origins.size (); i++)
         {
+          math::vec2ui& origin = origins.data ()[i];          
+          
+          if (pack_flags & AtlasPackFlag_SwapAxises)
+            stl::swap (origin.x, origin.y);
+          
           if (result_image_width < (origins.data ()[i].x + sizes.data ()[i].x))  result_image_width = origins.data ()[i].x + sizes.data ()[i].x;
           if (result_image_height < (origins.data ()[i].y + sizes.data ()[i].y)) result_image_height = origins.data ()[i].y + sizes.data ()[i].y;          
         }
@@ -162,25 +167,25 @@ struct AtlasBuilder::Impl
         {
           result_image_width  = get_next_higher_power_of_two (result_image_width);
           result_image_height = get_next_higher_power_of_two (result_image_height);
-        }        
-
+        }
+        
         for (size_t i = 0; i < origins.size (); i++)
         {
           Tile new_tile;
           
           math::vec2ui& origin = origins.data ()[i];
-          math::vec2ui& size   = sizes.data ()[i];
+          math::vec2ui& size   = sizes.data ()[i];          
 
           if (pack_flags & AtlasPackFlag_InvertTilesX) origin.x = result_image_width  - origin.x - size.x;
-          if (pack_flags & AtlasPackFlag_InvertTilesY) origin.y = result_image_height - origin.y - size.y;
+          if (pack_flags & AtlasPackFlag_InvertTilesY) origin.y = result_image_height - origin.y - size.y;          
 
-          new_tile.name   = images[i]->Name ();
+          new_tile.name   = images [i]->Name ();
           new_tile.origin = origin;
-          new_tile.size   = sizes.data ()[i];
-          
+          new_tile.size   = size;
+
           result_atlas.Insert (new_tile);
         }
-        
+
           //создание изображения атласа
 
         Image result_image (result_image_width, result_image_height, 1, (*images.begin ())->Format ());
