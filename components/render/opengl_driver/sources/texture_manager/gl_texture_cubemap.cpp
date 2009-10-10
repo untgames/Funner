@@ -13,9 +13,6 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureCubemap::TextureCubemap";
 
-  if (data)
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Texture initial data not supported");
-
     //установка текстуры в контекст OpenGL
 
   Bind ();
@@ -58,6 +55,8 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
     //создание mip-уровней
     
+  TextureDataSelector data_selector (tex_desc, data);
+
   for (size_t i=0; i<GetMipsCount (); i++)
   {
     MipLevelDesc level_desc;
@@ -67,13 +66,15 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     for (size_t j=0; j<6; j++)
     {
       glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, gl_internal_format, level_desc.width, level_desc.height,
-                    0, gl_format, gl_type, 0);
+                    0, gl_format, gl_type, data_selector.GetData ());
                     
 #ifndef OPENGL_ES_SUPPORT
 
       glGetTexLevelParameteriv (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
       
 #endif
+
+      data_selector.Next (level_desc.width, level_desc.height, 1);
     }
   }
   

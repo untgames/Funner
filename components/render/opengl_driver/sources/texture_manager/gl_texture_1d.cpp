@@ -14,10 +14,7 @@ Texture1D::Texture1D (const ContextManager& manager, const TextureDesc& tex_desc
   : Texture (manager, tex_desc, GL_TEXTURE_1D, get_mips_count (tex_desc.width))
 {
   const char* METHOD_NAME = "render::low_level::opengl::Texture1D::Texture1D";
-  
-  if (data)
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Texture initial data not supported");
-  
+
     //установка текстуры в контекст OpenGL
 
   Bind ();
@@ -44,8 +41,16 @@ Texture1D::Texture1D (const ContextManager& manager, const TextureDesc& tex_desc
 
     //создание текстуры
 
+  TextureDataSelector data_selector (tex_desc, data);
+
   for (size_t i=0; i<GetMipsCount (); i++)
-    glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format, tex_desc.width >> i, 0, gl_format, gl_type, 0);
+  {
+    size_t level_width = tex_desc.width >> i;
+
+    glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format, level_width, 0, gl_format, gl_type, data_selector.GetData ());
+
+    data_selector.Next (level_width, 1, 1);
+  }
 
     //проверка ошибок
 

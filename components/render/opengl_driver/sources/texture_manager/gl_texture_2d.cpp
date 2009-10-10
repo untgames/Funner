@@ -13,9 +13,6 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
 {
   const char* METHOD_NAME = "render::low_level::opengl::Texture2D::Texture2D";  
   
-  if (data)
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Texture initial data not supported");  
-  
     //установка текстуры в контекст OpenGL
 
   Bind ();
@@ -43,7 +40,9 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
             
 #endif
 
-      //создание mip-уровней      
+      //создание mip-уровней
+
+  TextureDataSelector data_selector (tex_desc, data);
 
   for (size_t i=0; i<GetMipsCount (); i++)
   {
@@ -51,14 +50,16 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
 
     GetMipLevelDesc (i, level_desc);
 
-    glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format, level_desc.width, level_desc.height, 0, gl_format, gl_type, 0);
-    
+    glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format, level_desc.width, level_desc.height, 0, gl_format, gl_type, data_selector.GetData ());
+
+    data_selector.Next (level_desc.width, level_desc.height, 1);
+
 #ifndef OPENGL_ES_SUPPORT
 
     glGetTexLevelParameteriv (GL_TEXTURE_2D, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
 
 #endif
-  }    
+  }
 
    //установка реального внутреннего формата хранения пикселей (связано с установкой сжатого формата)
 

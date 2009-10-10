@@ -10,13 +10,10 @@ using namespace render::low_level::opengl;
    Конструктор / деструктор
 */
 
-TextureNpot::TextureNpot  (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
+TextureNpot::TextureNpot (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
   : Texture (manager, tex_desc, GL_TEXTURE_RECTANGLE_ARB, 1)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureNpot::TextureNpot";
-
-  if (data)
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Texture initial data not supported");    
 
   if (tex_desc.generate_mips_enable)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Mip maps for non power of two textures not supported");
@@ -48,7 +45,7 @@ TextureNpot::TextureNpot  (const ContextManager& manager, const TextureDesc& tex
     //создание текстуры
 
   glTexImage2D (GL_TEXTURE_RECTANGLE_ARB, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, 
-                gl_format, gl_type, 0);
+                gl_format, gl_type, data ? data->data : 0);
 
     //проверка ошибок
 

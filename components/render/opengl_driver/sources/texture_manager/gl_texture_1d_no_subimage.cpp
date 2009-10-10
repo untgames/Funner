@@ -14,10 +14,7 @@ Texture1DNoSubimage::Texture1DNoSubimage (const ContextManager& manager, const T
   : Texture (manager, tex_desc, GL_TEXTURE_1D, get_mips_count (tex_desc.width))
 {
   const char* METHOD_NAME = "render::low_level::opengl::Texture1DNoSubimage::Texture1DNoSubimage";
-  
-  if (data)
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Texture initial data not supported");  
-  
+
     //установка текстуры в контекст OpenGL
 
   Bind ();
@@ -44,10 +41,32 @@ Texture1DNoSubimage::Texture1DNoSubimage (const ContextManager& manager, const T
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.format", GetFormat ());
   }  
+    
+    //преобразование формата пикселей
 
-    //преобразование формата
+  if (is_compressed (tex_desc.format))
+    throw xtl::format_not_supported_exception (METHOD_NAME, "1D texture can't be compressed");
 
   gl_internal_format = get_gl_internal_format (GetFormat ());
+
+    //создание mip-уровней
+  
+  if (data)
+  {
+    TextureDataSelector data_selector (tex_desc, data);
+
+    GLenum gl_format = get_gl_format (tex_desc.format),
+           gl_type   = get_gl_type (tex_desc.format);
+
+    for (size_t i=0; i<GetMipsCount (); i++)
+    {
+      size_t level_width = tex_desc.width >> i;
+
+      glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format, level_width, 0, gl_format, gl_type, data_selector.GetData ());
+
+      data_selector.Next (level_width, 1, 1);
+    }
+  }
 
     //проверка ошибок
 

@@ -69,7 +69,7 @@ class TextureDataSelector
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TextureDataSelector (const TextureData* data);
+    TextureDataSelector (const TextureDesc& desc, const TextureData* data);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Выборка данных
@@ -79,11 +79,14 @@ class TextureDataSelector
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Переход к следующему блоку
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Next (size_t size);
+    void Next (size_t width, size_t height, size_t depth);
 
   private:
+    PixelFormat        format;
+    bool               is_internal_format;
     const TextureData* data;
     size_t             index;
+    size_t             images_count;
     size_t             offset;
 };
 
@@ -449,6 +452,7 @@ class SamplerState : virtual public ISamplerState, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Утилиты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+size_t      get_image_size                      (PixelFormat format, size_t width, size_t height, size_t depth); //получение размера битового образа
 size_t      get_next_higher_power_of_two        (size_t size);        //получение ближайшей сверху степени двойки
 GLint       get_gl_internal_format              (PixelFormat format); //внутренний формат OpenGL
 GLenum      get_gl_format                       (PixelFormat format); //формат OpenGL

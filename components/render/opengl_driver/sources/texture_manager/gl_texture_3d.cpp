@@ -15,9 +15,6 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
 {
   static const char* METHOD_NAME = "render::low_level::opengl::Texture3D::Texture3D";
   
-  if (data)
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Texture initial data not supported");      
-
     //выбор текущего контекста и биндинг текстуры
 
   MakeContextCurrent ();
@@ -38,16 +35,13 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
       throw xtl::format_not_supported_exception (METHOD_NAME, "3D compressed textures not supported (desc.format=%s)", get_name (GetFormat ()));
-      return;
     case PixelFormat_D16:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:
     case PixelFormat_S8:    
       throw xtl::format_not_supported_exception (METHOD_NAME, "3D depth-stencil textures not supported (desc.format=%s)", get_name (GetFormat ()));
-      return;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.format", GetFormat ());
-      return;
   }
   
     //преобразование формата текстуры
@@ -71,9 +65,11 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
 
   if (!width)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 3d texture %ux%ux%u@%s (proxy texture fail)", 
-                       tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format));
+      tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format));
 
     //создание mip-уровней
+
+  TextureDataSelector data_selector (tex_desc, data);
 
   size_t depth = tex_desc.layers;
 
@@ -81,18 +77,14 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
   {
     MipLevelDesc level_desc;
 
-    GetMipLevelDesc (mip_level, level_desc);        
+    GetMipLevelDesc (mip_level, level_desc);    
 
-    if (glTexImage3D)
-    {
-      glTexImage3D (GL_TEXTURE_3D_EXT, mip_level, gl_internal_format, level_desc.width, level_desc.height, depth, 0, gl_format, gl_type, 0);
-    }
-    else
-    {
-      glTexImage3DEXT (GL_TEXTURE_3D_EXT, mip_level, gl_internal_format, level_desc.width, level_desc.height, depth, 0, gl_format, gl_type, 0);
-    }
+    if (glTexImage3D) glTexImage3D    (GL_TEXTURE_3D_EXT, mip_level, gl_internal_format, level_desc.width, level_desc.height, depth, 0, gl_format, gl_type, data_selector.GetData ());
+    else              glTexImage3DEXT (GL_TEXTURE_3D_EXT, mip_level, gl_internal_format, level_desc.width, level_desc.height, depth, 0, gl_format, gl_type, data_selector.GetData ());
 
     if (depth > 1) depth /= 2;
+    
+    data_selector.Next (level_desc.width, level_desc.height, depth);
   }
 
     //проверка ошибок
