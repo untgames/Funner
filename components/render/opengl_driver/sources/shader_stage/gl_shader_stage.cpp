@@ -314,6 +314,12 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
       }
     }
     
+///Получение строки поддерживаемых профилей шейдера
+    const char* GetShaderProfilesString () const
+    {
+      return supported_profiles.c_str ();
+    }
+    
   private:
     typedef xtl::com_ptr<IShaderManager>                                ShaderManagerPtr;
     typedef xtl::com_ptr<IShader>                                       ShaderPtr;
@@ -335,6 +341,8 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
         throw xtl::make_null_argument_exception (METHOD_NAME, "manager");
 
         //регистрация профилей
+        
+      size_t start_profiles_string_size = supported_profiles.size ();
 
       for (size_t i=0; i<manager->GetProfilesCount (); i++)
       {
@@ -351,11 +359,18 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
             throw xtl::format_operation_exception (METHOD_NAME, "Profile '%s' already registered", profile);
 
           profiles [profile] = manager.get ();
+
+          if (!supported_profiles.empty ())
+            supported_profiles += ' ';
+
+          supported_profiles += profile;
         }
         catch (...)
         {
           while (i--)
             profiles.erase (manager->GetProfile (i));
+
+          supported_profiles.resize (start_profiles_string_size);
 
           throw;
         }
@@ -491,10 +506,11 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
     }
 
   private:
-    ShaderMap          shaders;           //скомпилированные шейдеры
-    BindableProgramMap bindable_programs; //карта программ шейдинга с возможностью установки в контекст OpenGL
-    ProfileMap         profiles;          //соответствие профиль -> менеджер шейдеров
-    ProgramPtr         default_program;   //программа "по умолчанию"
+    ShaderMap          shaders;            //скомпилированные шейдеры
+    BindableProgramMap bindable_programs;  //карта программ шейдинга с возможностью установки в контекст OpenGL
+    ProfileMap         profiles;           //соответствие профиль -> менеджер шейдеров
+    ProgramPtr         default_program;    //программа "по умолчанию"
+    stl::string        supported_profiles; //поддерживаемые профили шейдеров
 };
 
 /*
@@ -635,5 +651,5 @@ IBuffer* ShaderStage::GetConstantBuffer (size_t buffer_slot) const
 
 const char* ShaderStage::GetShaderProfilesString () const
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::ShaderStage::GetShaderProfilesString");
+  return impl->GetShaderProfilesString ();
 }

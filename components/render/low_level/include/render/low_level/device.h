@@ -56,7 +56,7 @@ struct DeviceCaps
   size_t max_texture_2d_size;            //максимальный размер ребра двумерной текстуры
   size_t max_texture_3d_size;            //максимальный размер ребра трёхмерной текстуры
   size_t max_texture_cubemap_size;       //максимальный размер ребра кубической текстуры
-  size_t max_anisotropy;                 //максимальный уровень анизотропии
+  size_t max_texture_anisotropy;         //максимальный уровень анизотропии
   size_t samplers_count;                 //количество текстурных сэмплеров
   bool   has_advanced_blend;             //поддерживаются сложные режимы смешивания цветов
   bool   has_depth_texture;              //поддерживаются текстуры с информацией о глубине
@@ -68,6 +68,7 @@ struct DeviceCaps
   bool   has_texture_lod_bias;           //поддерживаются уровни детализации текстур
   bool   has_texture_mirrored_repeat;    //поддерживается отражение текстурных координат
   bool   has_texture_non_power_of_two;   //поддерживаются текстуры с размерами не кратными степени двойки
+  bool   has_texture1d;                  //поддерживаются одномерные текстуры
   bool   has_texture3d;                  //поддерживаются трёхмерные текстуры
   bool   has_two_side_stencil;           //поддерживается двусторонний буфер трафарета
 };

@@ -297,5 +297,28 @@ void ContextCaps::GetDeviceCaps (render::low_level::DeviceCaps& caps) const
 {
   memset (&caps, 0, sizeof (DeviceCaps));
   
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::ContextCaps::GetDeviceCaps");    
+#ifndef OPENGL_ES_SUPPORT
+  caps.has_texture1d = true;
+#else
+  caps.has_texture1d = false;
+#endif  
+  
+  caps.max_texture_2d_size            = max_rectangle_texture_size > max_texture_size ? max_rectangle_texture_size : max_texture_size;
+  caps.max_texture_1d_size            = caps.has_texture1d ? caps.max_texture_2d_size : 0;
+  caps.max_texture_3d_size            = max_3d_texture_size;
+  caps.max_texture_cubemap_size       = max_cube_map_texture_size;
+  caps.max_texture_anisotropy         = max_anisotropy;
+  caps.samplers_count                 = texture_units_count;
+  caps.has_advanced_blend             = has_ext_blend_equation_separate && has_ext_blend_func_separate && has_ext_blend_minmax && has_ext_blend_subtract;
+  caps.has_depth_texture              = has_arb_depth_texture;
+  caps.has_multisample                = has_arb_multisample;
+  caps.has_occlusion_queries          = has_arb_occlusion_query;
+  caps.has_shadow_maps                = has_arb_shadow && has_arb_depth_texture && has_ext_shadow_funcs;
+  caps.has_texture_anisotropic_filter = has_ext_texture_filter_anisotropic;
+  caps.has_texture_cube_map           = has_arb_texture_cube_map;
+  caps.has_texture_lod_bias           = has_ext_texture_lod_bias || has_sgis_texture_lod;
+  caps.has_texture_mirrored_repeat    = has_arb_texture_mirrored_repeat;
+  caps.has_texture_non_power_of_two   = has_arb_texture_non_power_of_two || has_arb_texture_rectangle;
+  caps.has_texture3d                  = has_ext_texture3d;
+  caps.has_two_side_stencil           = has_ati_separate_stencil || has_ext_stencil_two_side;
 }
