@@ -628,3 +628,12 @@ IBuffer* ShaderStage::GetConstantBuffer (size_t buffer_slot) const
 
   return impl->GetConstantBuffer (buffer_slot);
 }
+
+/*
+    Получение строки поддерживаемых контекстом профилей шейдеров
+*/
+
+const char* ShaderStage::GetShaderProfilesString () const
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::ShaderStage::GetShaderProfilesString");
+}

@@ -79,7 +79,7 @@ class TextureManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание текстуры и сэмплера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ITexture*      CreateTexture      (const TextureDesc&);
+    ITexture*      CreateTexture      (const TextureDesc&, const TextureData*);
     ISamplerState* CreateSamplerState (const SamplerDesc&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,6 +89,12 @@ class TextureManager
     void           SetSampler (size_t sampler_slot, ISamplerState* state);
     ITexture*      GetTexture (size_t sampler_slot) const;
     ISamplerState* GetSampler (size_t sampler_slot) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение строки внутренних форматов сжатия, поддерживаемых в контексте / получение формата сжатия по имени
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+    const char* GetTextureCompressionFormatsString () const;
+    int         GetTextureCompressionFormat        (const char*) const;
 
   private:
     TextureManager (const TextureManager&);             //no impl

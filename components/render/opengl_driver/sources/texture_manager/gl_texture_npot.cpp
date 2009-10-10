@@ -10,7 +10,7 @@ using namespace render::low_level::opengl;
    Конструктор / деструктор
 */
 
-TextureNpot::TextureNpot  (const ContextManager& manager, const TextureDesc& tex_desc)
+TextureNpot::TextureNpot  (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
   : Texture (manager, tex_desc, GL_TEXTURE_RECTANGLE_ARB, 1)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureNpot::TextureNpot";

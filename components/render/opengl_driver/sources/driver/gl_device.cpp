@@ -46,6 +46,63 @@ const char* Device::GetName ()
 }
 
 /*
+    ѕолучение возможностей устройства
+*/
+
+void Device::GetCaps (DeviceCaps& caps)
+{
+  try
+  {
+    context_manager.GetCaps ().GetDeviceCaps (caps);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::Device::GetCaps");
+    throw;
+  }
+}
+
+const char* Device::GetCapString (DeviceCapString cap_string)
+{
+  try
+  {
+    switch (cap_string)
+    {
+      case DeviceCapString_TextureCompressionFormats:
+        return texture_manager.GetTextureCompressionFormatsString ();
+      case DeviceCapString_ShaderProfiles:
+        return shader_stage.GetShaderProfilesString ();
+      default:
+        throw xtl::make_argument_exception ("", "cap_string", cap_string);
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::Device::GetCapString");
+    throw;
+  }
+}
+
+/*
+    ѕолучение номера внутреннего формата сжати€ текстур по имени (-1 в случае отсутстви€ формата)
+*/
+
+int Device::GetTextureCompressionFormat (const char* name)
+{
+  if (!name)
+    return -1;
+
+  try
+  {
+    return texture_manager.GetTextureCompressionFormat (name);
+  }
+  catch (...)
+  {
+    return -1;
+  }
+}
+
+/*
     —оздание ресурсов
 */
 
@@ -106,7 +163,6 @@ IBuffer* Device::CreateBuffer (const BufferDesc& desc)
       case BindFlag_ConstantBuffer: return input_stage.CreateConstantBuffer (desc);
       default:
         throw xtl::format_not_supported_exception ("", "Incompatible desc.bind_flags=%s", get_name ((BindFlag)desc.bind_flags));
-        return 0;
     }
   }
   catch (xtl::exception& e)
@@ -225,6 +281,16 @@ ISamplerState* Device::CreateSamplerState (const SamplerDesc& desc)
 
 ITexture* Device::CreateTexture (const TextureDesc& desc)
 {
+  return CreateTexture (desc, 0);
+}
+
+ITexture* Device::CreateTexture (const TextureDesc& desc, const TextureData& data)
+{
+  return CreateTexture (desc, &data);
+}
+
+ITexture* Device::CreateTexture (const TextureDesc& desc, const TextureData* data)
+{
   static const char* METHOD_NAME = "render::low_level::opengl::Device::CreateTexture";
 
   if (!(desc.bind_flags & (BindFlag_Texture | BindFlag_RenderTarget | BindFlag_DepthStencil)))
@@ -234,12 +300,12 @@ ITexture* Device::CreateTexture (const TextureDesc& desc)
 
     return 0;
   }
-  
+
   try
   {
     if (desc.bind_flags & BindFlag_Texture)
     {    
-      return texture_manager.CreateTexture (desc);
+      return texture_manager.CreateTexture (desc, data);
     }
     else if (desc.bind_flags & (BindFlag_RenderTarget | BindFlag_DepthStencil))
     {
@@ -250,7 +316,7 @@ ITexture* Device::CreateTexture (const TextureDesc& desc)
   catch (xtl::exception& exception)
   {
     exception.touch (METHOD_NAME);
-    
+
     throw;
   }
 }
@@ -576,7 +642,6 @@ GLenum get_mode (PrimitiveType type, const char* source)
     case PrimitiveType_TriangleFan:   return GL_TRIANGLE_FAN;
     default:
       throw xtl::make_argument_exception (source, "primitive_type", type);
-      return 0;
   }
 }
 

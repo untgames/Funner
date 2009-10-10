@@ -259,16 +259,15 @@ struct TextureManager::Impl: public ContextObject
     }
 
       //создание текстуры
-    ITexture* CreateTexture (const TextureDesc& desc)
+    ITexture* CreateTexture (const TextureDesc& desc, const TextureData* data)
     {
       switch (desc.dimension)
       {
-        case TextureDimension_1D:      return CreateTexture1D (desc);
-        case TextureDimension_2D:      return CreateTexture2D (desc);
-        case TextureDimension_3D:      return CreateTexture3D (desc);
-        case TextureDimension_Cubemap: return CreateTextureCubemap (desc);
-        default:
-          throw xtl::make_argument_exception ("", "desc.dimension", desc.dimension);
+        case TextureDimension_1D:      return CreateTexture1D (desc, data);
+        case TextureDimension_2D:      return CreateTexture2D (desc, data);
+        case TextureDimension_3D:      return CreateTexture3D (desc, data);
+        case TextureDimension_Cubemap: return CreateTextureCubemap (desc, data);
+        default:                       throw xtl::make_argument_exception ("", "desc.dimension", desc.dimension);
       }
     }
 
@@ -319,7 +318,7 @@ struct TextureManager::Impl: public ContextObject
       return sampler_slot;
     }
 
-    ITexture* CreateScaledTexture2D (const TextureDesc& desc, size_t max_texture_size)
+    ITexture* CreateScaledTexture2D (const TextureDesc& desc, const TextureData* data, size_t max_texture_size)
     {
       const ContextCaps& caps = GetCaps ();
 
@@ -328,16 +327,16 @@ struct TextureManager::Impl: public ContextObject
           (caps.has_arb_texture_rectangle && !is_compressed (desc.format) && !desc.generate_mips_enable)))  //можно масштабировать только по одной оси
       {
         if (desc.width > max_texture_size)
-          return new ScaledTexture (GetContextManager (), texture_manager, desc, max_texture_size, desc.height);
+          return new ScaledTexture (GetContextManager (), texture_manager, desc, data, max_texture_size, desc.height);
         else
-          return new ScaledTexture (GetContextManager (), texture_manager, desc, desc.width, max_texture_size);
+          return new ScaledTexture (GetContextManager (), texture_manager, desc, data, desc.width, max_texture_size);
       }
       else
-        return new ScaledTexture (GetContextManager (), texture_manager, desc);
+        return new ScaledTexture (GetContextManager (), texture_manager, desc, data);
     }
 
       //создание двумерной текстуры
-    ITexture* CreateTexture2D (const TextureDesc& in_desc)
+    ITexture* CreateTexture2D (const TextureDesc& in_desc, const TextureData* data)
     {
         //игнорирование неиспользуемых параметров
 
@@ -354,8 +353,9 @@ struct TextureManager::Impl: public ContextObject
       if (desc.width > caps.max_texture_size || desc.height > caps.max_texture_size)
       {
         LogPrintf ("Can't create 2D texture with width %u and height %u (maximum texture size is %u). Creating scaled texture.",
-                   desc.width, desc.height, caps.max_texture_size);
-        return CreateScaledTexture2D (desc, caps.max_texture_size);
+          desc.width, desc.height, caps.max_texture_size);
+
+        return CreateScaledTexture2D (desc, data, caps.max_texture_size);
       }
 
         //диспетчеризаци€ создани€ текстуры в зависимости от поддерживаемых расширений
@@ -366,10 +366,10 @@ struct TextureManager::Impl: public ContextObject
         static Extension BUG_texture_no_subimage = "GLBUG_texture_no_subimage";
 
         if (IsSupported (BUG_texture_no_subimage))
-          return new Texture2DNoSubimage (GetContextManager (), desc); //создание текстуры в режиме эмул€ции          
+          return new Texture2DNoSubimage (GetContextManager (), desc, data); //создание текстуры в режиме эмул€ции          
 #endif
 
-        return new Texture2D (GetContextManager (), desc);
+        return new Texture2D (GetContextManager (), desc, data);
       }      
       
 #ifndef OPENGL_ES_SUPPORT      
@@ -379,20 +379,21 @@ struct TextureManager::Impl: public ContextObject
         if (desc.width > caps.max_rectangle_texture_size || desc.height > caps.max_rectangle_texture_size)
         {
           LogPrintf ("Can't create rectangular 2D texture with width %u and height %u (maximum rectangular texture size is %u). Creating scaled texture.",
-                      desc.width, desc.height, caps.max_rectangle_texture_size);
-          return CreateScaledTexture2D (desc, caps.max_rectangle_texture_size);
+            desc.width, desc.height, caps.max_rectangle_texture_size);
+
+          return CreateScaledTexture2D (desc, data, caps.max_rectangle_texture_size);
         }
 
-        return new TextureNpot (GetContextManager (), desc);
+        return new TextureNpot (GetContextManager (), desc, data);
       }
       
 #endif
 
-      return new ScaledTexture (GetContextManager (), texture_manager, desc);
+      return new ScaledTexture (GetContextManager (), texture_manager, desc, data);
     }
     
       //создание кубической текстуры
-    ITexture* CreateTextureCubemap (const TextureDesc& desc)
+    ITexture* CreateTextureCubemap (const TextureDesc& desc, const TextureData* data)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTextureCubemap";
 
@@ -408,31 +409,31 @@ struct TextureManager::Impl: public ContextObject
       if (desc.width > caps.max_cube_map_texture_size || desc.height > caps.max_cube_map_texture_size)
       {
         LogPrintf ("Can't create cubemap texture with width %u and height %u (maximum texture size is %u). Creating scaled texture.",
-                   desc.width, desc.height, caps.max_cube_map_texture_size);
+          desc.width, desc.height, caps.max_cube_map_texture_size);
 
         if ((desc.width <= caps.max_texture_size || desc.height <= caps.max_texture_size) && (is_pot || caps.has_arb_texture_non_power_of_two))  //можно масштабировать только по одной оси
         {
           if (desc.width > caps.max_texture_size)
-            return new ScaledTexture (GetContextManager (), texture_manager, desc, caps.max_cube_map_texture_size, desc.height);
+            return new ScaledTexture (GetContextManager (), texture_manager, desc, data, caps.max_cube_map_texture_size, desc.height);
           else
-            return new ScaledTexture (GetContextManager (), texture_manager, desc, desc.width, caps.max_cube_map_texture_size);
+            return new ScaledTexture (GetContextManager (), texture_manager, desc, data, desc.width, caps.max_cube_map_texture_size);
         }
         else
-          return new ScaledTexture (GetContextManager (), texture_manager, desc);
+          return new ScaledTexture (GetContextManager (), texture_manager, desc, data);
       }
 
         //диспетчеризаци€ создани€ текстуры в зависимости от поддерживаемых расширений
 
       if (is_pot || caps.has_arb_texture_non_power_of_two)
-        return new TextureCubemap (GetContextManager (), desc);
+        return new TextureCubemap (GetContextManager (), desc, data);
 
-      return new ScaledTexture (GetContextManager (), texture_manager, desc);
+      return new ScaledTexture (GetContextManager (), texture_manager, desc, data);
     }              
     
 #ifndef OPENGL_ES_SUPPORT
 
       //создание одномерной текстуры
-    ITexture* CreateTexture1D (const TextureDesc& in_desc)
+    ITexture* CreateTexture1D (const TextureDesc& in_desc, const TextureData* data)
     {
         //игнорирование неиспользуемых параметров
 
@@ -447,7 +448,8 @@ struct TextureManager::Impl: public ContextObject
       if (desc.width > caps.max_texture_size)
       {
         LogPrintf ("Can't create 1D texture with width %u (maximum texture size is %u). Creating scaled texture.", desc.width, caps.max_texture_size);
-        return new ScaledTexture (GetContextManager (), texture_manager, desc, caps.max_texture_size, 1);
+
+        return new ScaledTexture (GetContextManager (), texture_manager, desc, data, caps.max_texture_size, 1);
       }
 
         //диспетчеризаци€ создани€ текстуры в зависимости от поддерживаемых расширений
@@ -459,9 +461,9 @@ struct TextureManager::Impl: public ContextObject
         static Extension BUG_texture_no_subimage = "GLBUG_texture_no_subimage";
 
         if (IsSupported (BUG_texture_no_subimage))
-          return new Texture1DNoSubimage (GetContextManager (), desc); //создание текстуры в режиме эмул€ции
+          return new Texture1DNoSubimage (GetContextManager (), desc, data); //создание текстуры в режиме эмул€ции
 
-        return new Texture1D (GetContextManager (), desc);
+        return new Texture1D (GetContextManager (), desc, data);
       }
 
       if (caps.has_arb_texture_rectangle)
@@ -469,18 +471,19 @@ struct TextureManager::Impl: public ContextObject
         if (desc.width > caps.max_rectangle_texture_size)
         {
           LogPrintf ("Can't create 1D rectangular texture with width %u (maximum rectangular texture size is %u). Creating scaled texture.",
-                     desc.width, caps.max_rectangle_texture_size);
-          return new ScaledTexture (GetContextManager (), texture_manager, desc, caps.max_rectangle_texture_size, 1);
+            desc.width, caps.max_rectangle_texture_size);
+
+          return new ScaledTexture (GetContextManager (), texture_manager, desc, data, caps.max_rectangle_texture_size, 1);
         }
 
-        return new TextureNpot (GetContextManager (), desc);
+        return new TextureNpot (GetContextManager (), desc, data);
       }
 
-      return new ScaledTexture (GetContextManager (), texture_manager, desc);
+      return new ScaledTexture (GetContextManager (), texture_manager, desc, data);
     }
 
       //создание трЄхмерной текстуры
-    ITexture* CreateTexture3D (const TextureDesc& desc)
+    ITexture* CreateTexture3D (const TextureDesc& desc, const TextureData* data)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::CreateTexture3D";
 
@@ -494,7 +497,7 @@ struct TextureManager::Impl: public ContextObject
       if (desc.width > caps.max_3d_texture_size || desc.height > caps.max_3d_texture_size || desc.layers > caps.max_3d_texture_size)
       {
         throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 3D texture %ux%ux%u (max_edge_size=%u)", desc.width, desc.height,
-                           desc.layers, caps.max_3d_texture_size);
+          desc.layers, caps.max_3d_texture_size);
       }
 
       bool is_pot = is_power_of_two (desc.width) && is_power_of_two (desc.height) && is_power_of_two (desc.layers);
@@ -502,25 +505,24 @@ struct TextureManager::Impl: public ContextObject
       if (!is_pot && !caps.has_arb_texture_non_power_of_two)
       {
         throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 3D texture %ux%ux%u@%s (GL_ARB_texture_non_power_of_two & GL_VERSION_2_0 not supported)",
-                           desc.width, desc.height, desc.layers, get_name (desc.format));
+          desc.width, desc.height, desc.layers, get_name (desc.format));
       }
 
         //создание текстуры
 
-      return new Texture3D (GetContextManager (), desc);
+      return new Texture3D (GetContextManager (), desc, data);
     }    
     
 #else
-    ITexture* CreateTexture3D (const TextureDesc& desc)
+
+    ITexture* CreateTexture3D (const TextureDesc& desc, const TextureData* data)
     {
-      throw xtl::format_not_supported_exception ("render::low_level::opengl::TextureManager::Impl::CreateTexture3D",
-        "Volume textures not supported");
-    }    
-    
-    ITexture* CreateTexture1D (const TextureDesc& desc)
+      throw xtl::format_not_supported_exception ("render::low_level::opengl::TextureManager::Impl::CreateTexture3D", "Volume textures not supported");
+    }
+
+    ITexture* CreateTexture1D (const TextureDesc& desc, const TextureData* data)
     {
-      throw xtl::format_not_supported_exception ("render::low_level::opengl::TextureManager::Impl::CreateTexture1D",
-        "1D textures not supported");
+      throw xtl::format_not_supported_exception ("render::low_level::opengl::TextureManager::Impl::CreateTexture1D", "1D textures not supported");
     }    
 
 #endif
@@ -572,11 +574,11 @@ void TextureManager::Bind ()
    —оздание текстуры и сэмплера
 */
 
-ITexture* TextureManager::CreateTexture (const TextureDesc& tex_desc)
+ITexture* TextureManager::CreateTexture (const TextureDesc& tex_desc, const TextureData* data)
 {
   try
   {
-    return impl->CreateTexture (tex_desc);
+    return impl->CreateTexture (tex_desc, data);
   }
   catch (xtl::exception& exception)
   {
@@ -652,4 +654,18 @@ ISamplerState* TextureManager::GetSampler (size_t sampler_slot) const
     exception.touch ("render::low_level::opengl::TextureManager::GetSampler");
     throw;
   }
+}
+
+/*
+    ѕолучение строки внутренних форматов сжати€, поддерживаемых в контексте / получение формата сжати€ текстур по имени (-1 в случае отсутстви€)
+*/
+
+const char* TextureManager::GetTextureCompressionFormatsString () const
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::TextureManager::GetTextureCompressionFormatsString");
+}
+
+int TextureManager::GetTextureCompressionFormat (const char*) const
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::TextureManager::GetTextureCompressionFormat");
 }

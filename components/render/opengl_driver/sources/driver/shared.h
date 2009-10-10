@@ -113,6 +113,17 @@ class Device: virtual public IDevice, public Object
 ///Имя устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* GetName ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение возможностей устройства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        GetCaps      (DeviceCaps&);
+    const char* GetCapString (DeviceCapString);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение номера внутреннего формата сжатия текстур по имени (-1 в случае отсутствия формата)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    int GetTextureCompressionFormat (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
@@ -126,6 +137,7 @@ class Device: virtual public IDevice, public Object
     IBuffer*                  CreateBuffer                  (const BufferDesc&);
     IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log);
     ITexture*                 CreateTexture                 (const TextureDesc&);
+    ITexture*                 CreateTexture                 (const TextureDesc&, const TextureData&);
     ITexture*                 CreateRenderTargetTexture     (ISwapChain* swap_chain, size_t buffer_index);
     ITexture*                 CreateDepthStencilTexture     (ISwapChain* swap_chain);
     IView*                    CreateView                    (ITexture* texture, const ViewDesc&);
@@ -211,6 +223,8 @@ class Device: virtual public IDevice, public Object
     IPropertyList* GetProperties ();
 
   private:
+    ITexture* CreateTexture (const TextureDesc&, const TextureData*);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка состояния устройства в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////

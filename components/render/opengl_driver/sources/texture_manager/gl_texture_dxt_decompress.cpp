@@ -21,7 +21,16 @@ struct rgb8_t
    Работа с DXT форматом при остутствии аппаратной поддержки
 */
 
-void render::low_level::opengl::unpack_dxt (PixelFormat format, size_t width, size_t height, const void* dxt_data, void* unpacked_data)
+namespace render
+{
+
+namespace low_level
+{
+
+namespace opengl
+{
+
+void unpack_dxt (PixelFormat format, size_t width, size_t height, const void* dxt_data, void* unpacked_data)
 {
   switch (format)
   {
@@ -90,4 +99,10 @@ void render::low_level::opengl::unpack_dxt (PixelFormat format, size_t width, si
     }
     default: throw xtl::make_argument_exception ("render::low_level::opengl::unpack_dxt", "format"); return;
   }
+}
+
+}
+
+}
+
 }

@@ -8,7 +8,7 @@ using namespace render::low_level::opengl;
     онструктор / деструктор
 */
 
-Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_desc)
+Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
   : Texture (manager, tex_desc, GL_TEXTURE_2D, get_mips_count (tex_desc.width, tex_desc.height))
 {
   const char* METHOD_NAME = "render::low_level::opengl::Texture2D::Texture2D";  
@@ -38,26 +38,10 @@ Texture2D::Texture2D  (const ContextManager& manager, const TextureDesc& tex_des
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 2D texture %ux%u@%s. Reason: proxy texure fail", tex_desc.width,
       tex_desc.height, get_name (tex_desc.format));
             
-#else
-
-      //установка внутреннего формата сжати€
-
-  switch (gl_internal_format)
-  {
-    case GL_RGBA:
-      gl_internal_format = GL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
-      break;
-    case GL_RGB:
-      gl_internal_format = GL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
-      break;
-    default:
-      break;
-  }
-    
 #endif
 
       //создание mip-уровней      
-      
+
   for (size_t i=0; i<GetMipsCount (); i++)
   {
     MipLevelDesc level_desc;

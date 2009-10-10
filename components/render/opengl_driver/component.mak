@@ -42,8 +42,7 @@ RENDER.OPENGL_DRIVER.SOURCES.egl.IMPORTS            := compile.extern.gles_win32
 
 ifeq (,$(filter gles,$(PROFILES)))
 
-RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS        +=  \
-                                                   sources/shader_stage/glsl
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS        += sources/shader_stage/glsl
 RENDER.OPENGL_DRIVER.SOURCES.win32.SOURCE_DIRS  := sources/platform/win32
 RENDER.OPENGL_DRIVER.SOURCES.macosx.SOURCE_DIRS := sources/platform/macosx
 

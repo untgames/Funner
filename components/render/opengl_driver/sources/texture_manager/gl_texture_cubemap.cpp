@@ -8,7 +8,7 @@ using namespace render::low_level::opengl;
    Конструктор / деструктор
 */
 
-TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDesc& tex_desc)
+TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
   : Texture (manager, tex_desc, GL_TEXTURE_CUBE_MAP, get_mips_count (tex_desc.width, tex_desc.height))
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureCubemap::TextureCubemap";

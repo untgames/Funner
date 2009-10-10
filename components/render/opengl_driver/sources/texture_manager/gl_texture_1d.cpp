@@ -10,7 +10,7 @@ using namespace render::low_level::opengl;
    Конструктор / деструктор
 */
 
-Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_desc)
+Texture1D::Texture1D  (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
   : Texture (manager, tex_desc, GL_TEXTURE_1D, get_mips_count (tex_desc.width))
 {
   const char* METHOD_NAME = "render::low_level::opengl::Texture1D::Texture1D";

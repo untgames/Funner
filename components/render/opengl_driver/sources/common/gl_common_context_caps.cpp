@@ -288,3 +288,14 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
   else                      texture_units_count = 1;
 }
+
+/*
+    Преобразование в формат возможностей устройства
+*/
+
+void ContextCaps::GetDeviceCaps (render::low_level::DeviceCaps& caps) const
+{
+  memset (&caps, 0, sizeof (DeviceCaps));
+  
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::ContextCaps::GetDeviceCaps");    
+}

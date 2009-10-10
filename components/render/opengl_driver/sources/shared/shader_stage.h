@@ -60,6 +60,11 @@ class ShaderStage
     IProgram*                 GetProgram                () const;
     IBuffer*                  GetConstantBuffer         (size_t buffer_slot) const;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение строки поддерживаемых контекстом профилей шейдеров
+///////////////////////////////////////////////////////////////////////////////////////////////////        
+    const char* GetShaderProfilesString () const;
+
   private:
     ShaderStage (const ShaderStage&);             //no impl
     ShaderStage& operator = (const ShaderStage&); //no impl

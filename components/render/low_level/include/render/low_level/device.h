@@ -48,6 +48,42 @@ enum PrimitiveType
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Таблица возможностей устройства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct DeviceCaps
+{
+  size_t max_texture_1d_size;            //максимальная длина одномерной текстуры
+  size_t max_texture_2d_size;            //максимальный размер ребра двумерной текстуры
+  size_t max_texture_3d_size;            //максимальный размер ребра трёхмерной текстуры
+  size_t max_texture_cubemap_size;       //максимальный размер ребра кубической текстуры
+  size_t max_anisotropy;                 //максимальный уровень анизотропии
+  size_t samplers_count;                 //количество текстурных сэмплеров
+  bool   has_advanced_blend;             //поддерживаются сложные режимы смешивания цветов
+  bool   has_depth_texture;              //поддерживаются текстуры с информацией о глубине
+  bool   has_multisample;                //поддерживается мультисэмплинг
+  bool   has_occlusion_queries;          //поддерживаются запросы видимости геометрии
+  bool   has_shadow_maps;                //поддерживаются карты теней
+  bool   has_texture_anisotropic_filter; //поддерживается анизотропная фильтрация
+  bool   has_texture_cube_map;           //поддерживаются кубические текстуры
+  bool   has_texture_lod_bias;           //поддерживаются уровни детализации текстур
+  bool   has_texture_mirrored_repeat;    //поддерживается отражение текстурных координат
+  bool   has_texture_non_power_of_two;   //поддерживаются текстуры с размерами не кратными степени двойки
+  bool   has_texture3d;                  //поддерживаются трёхмерные текстуры
+  bool   has_two_side_stencil;           //поддерживается двусторонний буфер трафарета
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Идентификаторы строк возможностей устройства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum DeviceCapString
+{
+  DeviceCapString_TextureCompressionFormats, //строка со списком внутренних форматов сжатия текстур
+  DeviceCapString_ShaderProfiles,            //строка со списком профилей шейдеров
+  
+  DeviceCapString_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Устройство отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class IDevice: virtual public IObject
@@ -57,6 +93,17 @@ class IDevice: virtual public IObject
 ///Имя устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const char* GetName () = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение возможностей устройства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void        GetCaps      (DeviceCaps&) = 0;
+    virtual const char* GetCapString (DeviceCapString) = 0;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение номера внутреннего формата сжатия текстур по имени (-1 в случае отсутствия формата)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual int GetTextureCompressionFormat (const char* name) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание ресурсов
@@ -70,6 +117,7 @@ class IDevice: virtual public IObject
     virtual IBuffer*                  CreateBuffer                  (const BufferDesc&) = 0;
     virtual IProgram*                 CreateProgram                 (size_t shaders_count, const ShaderDesc* shader_descs, const LogFunction& error_log) = 0;
     virtual ITexture*                 CreateTexture                 (const TextureDesc&) = 0;
+    virtual ITexture*                 CreateTexture                 (const TextureDesc&, const TextureData&) = 0;
     virtual ITexture*                 CreateRenderTargetTexture     (ISwapChain* swap_chain, size_t buffer_index) = 0;
     virtual ITexture*                 CreateDepthStencilTexture     (ISwapChain* swap_chain) = 0;
     virtual IView*                    CreateView                    (ITexture* texture, const ViewDesc& desc) = 0;

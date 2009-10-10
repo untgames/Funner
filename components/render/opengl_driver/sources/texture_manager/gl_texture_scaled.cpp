@@ -12,6 +12,7 @@ ScaledTexture::ScaledTexture
  (const ContextManager& context_manager,
   TextureManager&       texture_manager,
   const TextureDesc&    original_desc,
+  const TextureData*    data,
   size_t                scaled_width,
   size_t                scaled_height)
     : BindableTexture (context_manager),
@@ -40,7 +41,9 @@ ScaledTexture::ScaledTexture
   temp_desc.width  = scaled_width;
   temp_desc.height = scaled_height;
 
-  shadow_texture = TexturePtr (dynamic_cast<BindableTexture*> (texture_manager.CreateTexture (temp_desc)), false);
+   //TODO: rescale data!!!
+
+  shadow_texture = TexturePtr (dynamic_cast<BindableTexture*> (texture_manager.CreateTexture (temp_desc, 0)), false);
 
   if (!shadow_texture.get ())
     throw xtl::format_operation_exception ("render::low_level::opengl::ScaledTexture::ScaledTexture", "TextureManager::CreateTexture returned texture with incompatible type");
@@ -49,7 +52,7 @@ ScaledTexture::ScaledTexture
   vertical_scale   = (float)scaled_height / (float)original_desc.height;
 
   LogPrintf ("Warning: scaled texture %ux%ux%u has created for original texture %ux%ux%u@%s", scaled_width, scaled_height, temp_desc.layers,
-             original_desc.width, original_desc.height, original_desc.layers, get_name (original_desc.format));
+    original_desc.width, original_desc.height, original_desc.layers, get_name (original_desc.format));
 }
 
 /*

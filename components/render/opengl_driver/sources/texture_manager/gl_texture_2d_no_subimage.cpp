@@ -9,7 +9,7 @@ using namespace render::low_level::opengl;
    Конструктор / деструктор
 */
 
-Texture2DNoSubimage::Texture2DNoSubimage  (const ContextManager& manager, const TextureDesc& tex_desc)
+Texture2DNoSubimage::Texture2DNoSubimage  (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
   : Texture (manager, tex_desc, GL_TEXTURE_2D,
     get_mips_count (tex_desc.width, tex_desc.height))
 {
