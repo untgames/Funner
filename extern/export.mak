@@ -1,1 +1,2 @@
-COMPONENT_DIRS := zlib zzip jpeg tiff libpng devil box2d libpsd curl
+COMPONENT_DIRS := zlib zzip jpeg tiff libpng devil box2d libpsd curl gles_win32
+
