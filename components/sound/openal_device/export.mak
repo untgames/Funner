@@ -9,5 +9,7 @@ export.link.sound.low_level.openal_driver.iphone.LINK_FLAGS := -framework OpenAL
 export.link.sound.low_level.openal_driver.IMPORTS           := link.sound.low_level link.media.sound link.system
 
 # Run exports
+export.run.sound.low_level.openal_driver.DLLS :=
+
 export.run.sound.low_level.openal_driver.win32.DLLS     := OpenAL32 wrap_oal
 export.run.sound.low_level.openal_driver.win32.DLL_DIRS := ../../../extern/openalsdk/bin
