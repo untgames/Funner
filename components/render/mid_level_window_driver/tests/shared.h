@@ -15,6 +15,7 @@
 #include <xtl/shared_ptr.h>
 #include <xtl/trackable.h>
 
+#include <common/component.h>
 #include <common/file.h>
 #include <common/log.h>
 #include <common/time.h>
@@ -326,6 +327,8 @@ class BasicTest
 
       if (render_windows.empty ())
         throw xtl::format_operation_exception ("BasicTest::LoadTexture", "No windows");
+        
+      static common::ComponentLoader loader ("media.compressed_image.*");
         
       if (media::CompressedImageManager::FindLoader (file_name, common::SerializerFindMode_ByName) != 0)
       {
