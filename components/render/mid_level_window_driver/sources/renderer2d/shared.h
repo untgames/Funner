@@ -8,6 +8,7 @@
 
 #include <common/log.h>
 
+#include <media/compressed_image.h>
 #include <media/image.h>
 
 #include <render/low_level/utils.h>
@@ -128,6 +129,7 @@ class ImageTexture: virtual public mid_level::renderer2d::ITexture, public Objec
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ImageTexture (render::low_level::IDevice& device, const media::Image& image);
+    ImageTexture (render::low_level::IDevice& device, const media::CompressedImage& image);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размеры текстуры

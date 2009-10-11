@@ -51,6 +51,20 @@ render::mid_level::renderer2d::ITexture* Renderer2D::CreateTexture (const media:
   }
 }
 
+render::mid_level::renderer2d::ITexture* Renderer2D::CreateTexture (const media::CompressedImage& image)
+{
+  try
+  {
+    return new ImageTexture (*impl->device, image);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::mid_level::window_driver::renderer2d::Renderer2D::CreateTexture(const media::CompressedImage&)");
+    throw;
+  }
+}
+
+
 render::mid_level::renderer2d::ITexture* Renderer2D::CreateTexture (size_t width, size_t height, render::mid_level::PixelFormat pixel_format)
 {
   try

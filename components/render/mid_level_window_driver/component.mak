@@ -3,7 +3,7 @@
 ###################################################################################################
 TARGETS := RENDER.MID_LEVEL_WINDOW_DRIVER.SOURCES RENDER.MID_LEVEL_WINDOW_DRIVER.TESTS
 
-#PROFILES += egl gles
+PROFILES += egl gles
 
 #Öåëü ¹1 - Low level render system sources
 RENDER.MID_LEVEL_WINDOW_DRIVER.SOURCES.TYPE             := static-lib
@@ -19,4 +19,5 @@ RENDER.MID_LEVEL_WINDOW_DRIVER.TESTS.SOURCE_DIRS      := tests
 RENDER.MID_LEVEL_WINDOW_DRIVER.TESTS.IMPORTS          := link.render.mid_level.window_driver compile.render.mid_level.window_driver \
                                                          compile.render.low_level compile.system link.system  \
                                                          link.render.low_level.opengl_driver compile.media.image \
-                                                         link.common.xml run.render.low_level.opengl_driver
+                                                         link.common.xml run.render.low_level.opengl_driver \
+                                                         link.media.image.pvr

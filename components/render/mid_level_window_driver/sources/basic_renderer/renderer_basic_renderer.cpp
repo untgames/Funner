@@ -296,6 +296,11 @@ render::mid_level::renderer2d::ITexture* RendererDispatch::CreateTexture (const 
   return renderer2d->CreateTexture (image);
 }
 
+render::mid_level::renderer2d::ITexture* RendererDispatch::CreateTexture (const media::CompressedImage& image)
+{
+  return renderer2d->CreateTexture (image);
+}
+
 render::mid_level::renderer2d::ITexture* RendererDispatch::CreateTexture (size_t width, size_t height, render::mid_level::PixelFormat pixel_format)
 {
   return renderer2d->CreateTexture (width, height, pixel_format);

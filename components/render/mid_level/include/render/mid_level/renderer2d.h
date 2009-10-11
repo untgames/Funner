@@ -8,6 +8,7 @@ namespace media
 {
 
 //forward declarations
+class CompressedImage;
 class Image;
 
 }
@@ -125,6 +126,7 @@ class IRenderer: virtual public mid_level::IRenderer
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual ITexture*   CreateTexture   (const media::Image& image) = 0;
+    virtual ITexture*   CreateTexture   (const media::CompressedImage& image) = 0;
     virtual ITexture*   CreateTexture   (size_t width, size_t height, PixelFormat pixel_format) = 0;
     virtual IPrimitive* CreatePrimitive () = 0;
     virtual IFrame*     CreateFrame     () = 0;

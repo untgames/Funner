@@ -20,6 +20,7 @@
 #include <common/time.h>
 #include <common/parser.h>
 
+#include <media/compressed_image.h>
 #include <media/image.h>
 
 #include <syslib/application.h>
@@ -325,10 +326,19 @@ class BasicTest
 
       if (render_windows.empty ())
         throw xtl::format_operation_exception ("BasicTest::LoadTexture", "No windows");
+        
+      if (media::CompressedImageManager::FindLoader (file_name, common::SerializerFindMode_ByName) != 0)
+      {
+        media::CompressedImage image (file_name);
 
-      media::Image image (file_name, media::PixelFormat_RGBA8);
+        return TexturePtr (render_windows[0]->Renderer ()->CreateTexture (image), false);        
+      }
+      else
+      {
+        media::Image image (file_name, media::PixelFormat_RGBA8);
 
-      return TexturePtr (render_windows[0]->Renderer ()->CreateTexture (image), false);
+        return TexturePtr (render_windows[0]->Renderer ()->CreateTexture (image), false);      
+      }      
     }
 
 ///Выполнение теста
