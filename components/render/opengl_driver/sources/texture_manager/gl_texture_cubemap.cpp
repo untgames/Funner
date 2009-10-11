@@ -58,7 +58,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
     //проверка возможности создания текстуры
 
-  glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP, 1, gl_internal_format, tex_desc.width, tex_desc.height, 0, gl_format, gl_type, 0);
+  glTexImage2D (GL_PROXY_TEXTURE_CUBE_MAP, 1, gl_internal_format, tex_desc.width, tex_desc.height, 0, gl_uncompressed_format, gl_uncompressed_type, 0);
   
   GLint proxy_width = 0;
 

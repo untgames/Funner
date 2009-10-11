@@ -32,16 +32,17 @@ AsyncPredicate::~AsyncPredicate ()
   {
       //установка текущего контекста
 
-    MakeContextCurrent ();
+    if (TryMakeContextCurrent ())
+    {
+        //удаление запроса
 
-      //удаление запроса
+      if (glDeleteQueries) glDeleteQueries    (1, &query);
+      else                 glDeleteQueriesARB (1, &query);
 
-    if (glDeleteQueries) glDeleteQueries    (1, &query);
-    else                 glDeleteQueriesARB (1, &query);
+        //проверка ошибок
 
-      //проверка ошибок
-
-    CheckErrors ("");
+      CheckErrors ("");
+    }
   }
   catch (xtl::exception& exception)
   {

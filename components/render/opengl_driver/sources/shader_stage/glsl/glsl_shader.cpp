@@ -100,7 +100,8 @@ GlslShader::~GlslShader ()
 {
   try
   {
-    DeleteShader ();
+    if (TryMakeContextCurrent ())
+      DeleteShader ();
   }
   catch (xtl::exception& exception)
   {

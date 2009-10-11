@@ -3,7 +3,7 @@
 ###################################################################################################
 TARGETS := RENDER.OPENGL_DRIVER.UTILS RENDER.OPENGL_DRIVER.SOURCES RENDER.OPENGL_DRIVER.TESTS
 
-PROFILES += egl gles
+#PROFILES += egl gles
 
 #OpenGL render system utilities
 RENDER.OPENGL_DRIVER.UTILS.TYPE        := test-suite

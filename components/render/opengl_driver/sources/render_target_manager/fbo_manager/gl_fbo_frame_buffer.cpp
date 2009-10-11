@@ -78,9 +78,10 @@ FboFrameBuffer::~FboFrameBuffer ()
 {
   try
   {
-    MakeContextCurrent ();
-
-    GetCaps ().glDeleteFramebuffers_fn (1, &id);
+    if (TryMakeContextCurrent ())
+    {
+      GetCaps ().glDeleteFramebuffers_fn (1, &id);
+    }
   }
   catch (xtl::exception& exception)
   {

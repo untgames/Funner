@@ -80,6 +80,8 @@ GLenum get_gl_format (PixelFormat format)
 //преобразование формата хранения пикселей к типу элементов в буферах OpenGL
 GLenum get_gl_type (PixelFormat format)
 {
+  static const char* METHOD_NAME = "render::low_level::opengl::get_gl_type";
+
   switch (format)
   {
     case PixelFormat_L8:    
@@ -98,9 +100,9 @@ GLenum get_gl_type (PixelFormat format)
     case PixelFormat_RGB_PVRTC4:
     case PixelFormat_RGBA_PVRTC2:
     case PixelFormat_RGBA_PVRTC4:
-      throw xtl::format_not_supported_exception (METHOD_NAME, "PVRTC textures not supported");    
+      throw xtl::format_not_supported_exception (METHOD_NAME, "PVRTC textures not supported");
     default:
-      throw xtl::make_argument_exception ("render::low_level::opengl::get_gl_type", "format", format);
+      throw xtl::make_argument_exception (METHOD_NAME, "format", format);
   }
 }
 

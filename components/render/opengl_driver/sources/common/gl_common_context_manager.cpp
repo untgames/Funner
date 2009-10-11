@@ -314,7 +314,7 @@ struct ContextManager::Impl: public xtl::reference_counter
 
         throw;
       }
-    }    
+    }
 
 ///Получение текущего контекста и цепочек обмена
     ISwapChain*  GetSwapChain () { return current_swap_chain; }
@@ -517,6 +517,20 @@ ISwapChain* ContextManager::GetSwapChain () const
 void ContextManager::MakeContextCurrent () const
 {
   impl->MakeContextCurrent (true);
+}
+
+bool ContextManager::TryMakeContextCurrent () const
+{
+  try
+  {
+    MakeContextCurrent ();
+    
+    return true;
+  }
+  catch (...)
+  {
+    return false;
+  }
 }
 
 /*

@@ -123,9 +123,11 @@ Texture::~Texture ()
 {
   try
   {
-    MakeContextCurrent ();
-    glDeleteTextures   (1, &texture_id);
-    CheckErrors        ("");
+    if (TryMakeContextCurrent ())
+    {
+      glDeleteTextures   (1, &texture_id);
+      CheckErrors        ("");
+    }
   }
   catch (xtl::exception& exception)
   {

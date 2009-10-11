@@ -132,16 +132,17 @@ FboRenderBuffer::~FboRenderBuffer ()
 {
   try
   {
-    MakeContextCurrent ();
-    
-    const ContextCaps& caps = GetCaps ();
+    if (TryMakeContextCurrent ())
+    {    
+      const ContextCaps& caps = GetCaps ();
 
-    caps.glDeleteRenderbuffers_fn (1, &render_buffer_id);
+      caps.glDeleteRenderbuffers_fn (1, &render_buffer_id);
 
-    if (frame_buffer_id)
-      caps.glDeleteFramebuffers_fn (1, &frame_buffer_id);
+      if (frame_buffer_id)
+        caps.glDeleteFramebuffers_fn (1, &frame_buffer_id);
 
-    CheckErrors ("");
+      CheckErrors ("");
+    }
   }
   catch (xtl::exception& exception)
   {

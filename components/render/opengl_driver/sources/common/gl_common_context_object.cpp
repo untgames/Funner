@@ -34,6 +34,11 @@ void ContextObject::MakeContextCurrent () const
   context_manager.MakeContextCurrent ();
 }
 
+bool ContextObject::TryMakeContextCurrent () const
+{
+  return context_manager.TryMakeContextCurrent ();
+}
+
 /*
     Работа с таблицами локальных данных текущего контекста
 */

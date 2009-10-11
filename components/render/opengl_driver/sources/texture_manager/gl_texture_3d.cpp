@@ -85,7 +85,7 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     
     TextureLevelData level_data;
     
-    data_selector.GetLevelData (level_data);
+    data_selector.GetLevelData (level_desc.width, level_desc.height, depth, level_data);
 
     if (glTexImage3D) glTexImage3D    (GL_TEXTURE_3D_EXT, mip_level, gl_internal_format, level_desc.width, level_desc.height, depth, 0, gl_format, gl_type, level_data.data);
     else              glTexImage3DEXT (GL_TEXTURE_3D_EXT, mip_level, gl_internal_format, level_desc.width, level_desc.height, depth, 0, gl_format, gl_type, level_data.data);

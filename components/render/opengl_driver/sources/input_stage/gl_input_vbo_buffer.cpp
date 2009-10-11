@@ -73,11 +73,12 @@ VboBuffer::~VboBuffer ()
 {
   try
   {
-    MakeContextCurrent ();
+    if (TryMakeContextCurrent ())
+    {
+      GetCaps ().glDeleteBuffers_fn (1, &buffer_id);
 
-    GetCaps ().glDeleteBuffers_fn (1, &buffer_id);
-
-    CheckErrors ("");
+      CheckErrors ("");
+    }
   }
   catch (xtl::exception& exception)
   {

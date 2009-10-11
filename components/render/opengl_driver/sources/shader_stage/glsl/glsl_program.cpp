@@ -94,7 +94,8 @@ GlslProgram::~GlslProgram ()
 {
   try
   {
-    DeleteProgram ();
+    if (TryMakeContextCurrent ())
+      DeleteProgram ();
   }
   catch (xtl::exception& exception)
   {
