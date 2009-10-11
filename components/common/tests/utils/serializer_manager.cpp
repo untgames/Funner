@@ -37,7 +37,7 @@ int main ()
     
     AManager::GetSaver ("my.ext", SerializerFindMode_ByName)("test", a);
     
-    AManager::GetLoader ("ext")("test", a);
+    AManager::GetLoader ("ext")("test", a);    
   }
   catch (std::exception& exception)
   {
@@ -50,7 +50,7 @@ int main ()
     
     SerializerManager::UnregisterAll ("ext");
    
-    printf ("is-saver-null: %s\n", AManager::FindSaver ("ext") ? "false" : "true");
+    printf ("is-saver-null: %s\n", AManager::FindSaver ("ext") ? "false" : "true");    
   }
   catch (std::exception& exception)
   {

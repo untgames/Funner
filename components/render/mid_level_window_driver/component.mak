@@ -3,7 +3,7 @@
 ###################################################################################################
 TARGETS := RENDER.MID_LEVEL_WINDOW_DRIVER.SOURCES RENDER.MID_LEVEL_WINDOW_DRIVER.TESTS
 
-PROFILES += egl gles
+#PROFILES += egl gles
 
 #Цель №1 - Low level render system sources
 RENDER.MID_LEVEL_WINDOW_DRIVER.SOURCES.TYPE             := static-lib

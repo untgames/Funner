@@ -110,7 +110,7 @@ class SerializerManagerImpl
             throw xtl::make_argument_exception (METHOD_NAME, "mode", mode);
 
           return 0;
-      }
+      }      
 
       if (!name)
       {
@@ -119,9 +119,9 @@ class SerializerManagerImpl
 
         return 0;
       }
-      
-      SerializerMap::iterator iter = serializers.find (SerializerKey (name, signature));
-      
+
+      SerializerMap::iterator iter = serializers.find (SerializerKey (name, signature));      
+
       if (iter == serializers.end ())
       {
         if (raise_exception)
