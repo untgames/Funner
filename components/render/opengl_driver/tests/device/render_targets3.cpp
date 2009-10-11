@@ -43,6 +43,10 @@ RenderTargetType get_target_type (IView* view)
       case PixelFormat_DXT1:
       case PixelFormat_DXT3:
       case PixelFormat_DXT5:
+      case PixelFormat_RGB_PVRTC2:
+      case PixelFormat_RGB_PVRTC4:
+      case PixelFormat_RGBA_PVRTC2:
+      case PixelFormat_RGBA_PVRTC4:      
         return RenderTargetType_Color;
       case PixelFormat_D16:
       case PixelFormat_D24X8:

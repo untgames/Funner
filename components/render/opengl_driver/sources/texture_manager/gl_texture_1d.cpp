@@ -46,10 +46,14 @@ Texture1D::Texture1D (const ContextManager& manager, const TextureDesc& tex_desc
   for (size_t i=0; i<GetMipsCount (); i++)
   {
     size_t level_width = tex_desc.width >> i;
+    
+    TextureLevelData level_data;
+    
+    data_selector.GetLevelData (level_width, 1, 1, level_data);
 
-    glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format, level_width, 0, gl_format, gl_type, data_selector.GetData ());
+    glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format, level_width, 0, gl_format, gl_type, level_data.data);
 
-    data_selector.Next (level_width, 1, 1);
+    data_selector.Next ();
   }
 
     //проверка ошибок

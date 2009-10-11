@@ -32,6 +32,10 @@ Texture1DNoSubimage::Texture1DNoSubimage (const ContextManager& manager, const T
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
+    case PixelFormat_RGB_PVRTC2:
+    case PixelFormat_RGB_PVRTC4:
+    case PixelFormat_RGBA_PVRTC2:
+    case PixelFormat_RGBA_PVRTC4:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Compressed 1D textures not supported (desc.format=%s)", get_name (GetFormat ()));
     case PixelFormat_D16:
     case PixelFormat_D24X8:
@@ -62,9 +66,13 @@ Texture1DNoSubimage::Texture1DNoSubimage (const ContextManager& manager, const T
     {
       size_t level_width = tex_desc.width >> i;
 
-      glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format, level_width, 0, gl_format, gl_type, data_selector.GetData ());
+      TextureLevelData level_data;
 
-      data_selector.Next (level_width, 1, 1);
+      data_selector.GetLevelData (level_width, 1, 1, level_data);
+
+      glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format, level_width, 0, gl_format, gl_type, level_data.data);
+
+      data_selector.Next ();
     }
   }
 

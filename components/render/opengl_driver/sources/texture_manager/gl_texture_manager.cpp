@@ -305,20 +305,6 @@ struct TextureManager::Impl: public ContextObject
       return state.GetSampler (sampler_slot);
     }
     
-    /*
-        Получение информации о внутренних форматах сжатия текстур
-    */
-    
-    const char* GetTextureCompressionFormatsString () const
-    {
-      return "";
-    }
-
-    int GetTextureCompressionFormat (const char* format_name) const
-    {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::TextureManager::Impl::GetTextureCompressionFormat");
-    }
-
   private:
       //проверка номера слота сэмплирования
     size_t CheckSamplerSlot (size_t sampler_slot)
@@ -666,28 +652,6 @@ ISamplerState* TextureManager::GetSampler (size_t sampler_slot) const
   catch (xtl::exception& exception)
   {
     exception.touch ("render::low_level::opengl::TextureManager::GetSampler");
-    throw;
-  }
-}
-
-/*
-    Получение строки внутренних форматов сжатия, поддерживаемых в контексте / получение формата сжатия текстур по имени (-1 в случае отсутствия)
-*/
-
-const char* TextureManager::GetTextureCompressionFormatsString () const
-{
-  return impl->GetTextureCompressionFormatsString ();
-}
-
-int TextureManager::GetTextureCompressionFormat (const char* format_name) const
-{
-  try
-  {
-    return impl->GetTextureCompressionFormat (format_name);
-  }
-  catch (xtl::exception& exception)  
-  {
-    exception.touch ("render::low_level::opengl::TextureManager::GetTextureCompressionFormat");
     throw;
   }
 }

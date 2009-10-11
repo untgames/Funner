@@ -32,6 +32,10 @@ Texture2DNoSubimage::Texture2DNoSubimage  (const ContextManager& manager, const 
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
+    case PixelFormat_RGB_PVRTC2:
+    case PixelFormat_RGB_PVRTC4:
+    case PixelFormat_RGBA_PVRTC2:
+    case PixelFormat_RGBA_PVRTC4:
       throw xtl::format_not_supported_exception (METHOD_NAME, "Compressed 2D textures not supported (desc.format=%s)", get_name (GetFormat ()));
     case PixelFormat_D16:
     case PixelFormat_D24X8:
@@ -52,18 +56,50 @@ Texture2DNoSubimage::Texture2DNoSubimage  (const ContextManager& manager, const 
 
     TextureDataSelector data_selector (tex_desc, data);
     
-    GLenum gl_format = get_gl_format (tex_desc.format),
-           gl_type   = get_gl_type (tex_desc.format);    
+    bool   is_compressed_data     = is_compressed (tex_desc.format);    
+    GLenum gl_format              = get_gl_format (tex_desc.format),
+           gl_uncompressed_format = get_uncompressed_gl_format (tex_desc.format),
+           gl_uncompressed_type   = get_uncompressed_gl_type (tex_desc.format);
+
+    switch (tex_desc.format)
+    {
+      case PixelFormat_DXT1:
+      case PixelFormat_DXT3:
+      case PixelFormat_DXT5:
+        if (!GetCaps ().has_ext_texture_compression_s3tc)
+          gl_internal_format = get_uncompressed_gl_internal_format (tex_desc.format);
+        break;
+      case PixelFormat_RGB_PVRTC2:
+      case PixelFormat_RGB_PVRTC4:
+      case PixelFormat_RGBA_PVRTC2:
+      case PixelFormat_RGBA_PVRTC4:
+        if (!GetCaps ().has_img_texture_compression_pvrtc)
+          throw xtl::format_not_supported_exception (METHOD_NAME, "PVRTC texture compresson not supported");
+
+      default:
+        break;    
+    }    
+    
+    PFNGLCOMPRESSEDTEXIMAGE2DPROC glCompressedTexImage2D_fn = GetCaps ().glCompressedTexImage2D_fn;
 
     for (size_t i=0; i<GetMipsCount (); i++)
     {
       MipLevelDesc level_desc;
 
       GetMipLevelDesc (i, level_desc);
+      
+      TextureLevelData level_data;    
 
-      glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format, level_desc.width, level_desc.height, 0, gl_format, gl_type, data_selector.GetData ());
+      if (data_selector.GetLevelData (level_desc.width, level_desc.height, 1, level_data) && is_compressed_data)
+      {
+        glCompressedTexImage2D_fn (GL_TEXTURE_2D, i, gl_internal_format, level_desc.width, level_desc.height, gl_format, level_data.size, level_data.data);
+      }
+      else
+      {
+        glTexImage2D (GL_TEXTURE_2D, i, gl_internal_format, level_desc.width, level_desc.height, 0, gl_uncompressed_format, gl_uncompressed_type, level_data.data);
+      }
 
-      data_selector.Next (level_desc.width, level_desc.height, 1);
+      data_selector.Next ();
 
 #ifndef OPENGL_ES_SUPPORT
 

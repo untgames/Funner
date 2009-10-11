@@ -3,7 +3,7 @@
 ###################################################################################################
 TARGETS := RENDER.OPENGL_DRIVER.UTILS RENDER.OPENGL_DRIVER.SOURCES RENDER.OPENGL_DRIVER.TESTS
 
-#PROFILES += egl gles
+PROFILES += egl gles
 
 #OpenGL render system utilities
 RENDER.OPENGL_DRIVER.UTILS.TYPE        := test-suite
@@ -53,4 +53,4 @@ RENDER.OPENGL_DRIVER.TESTS.TYPE             := test-suite
 RENDER.OPENGL_DRIVER.TESTS.SOURCE_DIRS      := tests/driver tests/device tests/complex tests/unit
 RENDER.OPENGL_DRIVER.TESTS.IMPORTS          := link.render.low_level.opengl_driver run.render.low_level.opengl_driver compile.render.low_level \
                                                compile.system link.system link.common compile.media.image compile.media.geometry \
-                                               link.media.image link.media.geometry.xmesh
+                                               link.media.image link.media.geometry.xmesh link.media.image.pvr

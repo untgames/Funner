@@ -210,10 +210,14 @@ IFrameBuffer* RenderTargetRegistry::CreateFrameBuffer (View* render_target_view,
         case PixelFormat_L8:
         case PixelFormat_A8:
         case PixelFormat_LA8:
+          break;
         case PixelFormat_DXT1:
         case PixelFormat_DXT3:
         case PixelFormat_DXT5:
-          break;
+        case PixelFormat_RGB_PVRTC2:
+        case PixelFormat_RGB_PVRTC4:
+        case PixelFormat_RGBA_PVRTC2:
+        case PixelFormat_RGBA_PVRTC4:
         case PixelFormat_D16:
         case PixelFormat_D24X8:
         case PixelFormat_D24S8:
@@ -247,6 +251,10 @@ IFrameBuffer* RenderTargetRegistry::CreateFrameBuffer (View* render_target_view,
         case PixelFormat_DXT1:
         case PixelFormat_DXT3:
         case PixelFormat_DXT5:
+        case PixelFormat_RGB_PVRTC2:
+        case PixelFormat_RGB_PVRTC4:
+        case PixelFormat_RGBA_PVRTC2:
+        case PixelFormat_RGBA_PVRTC4:
           throw xtl::format_not_supported_exception ("", "Unsupported depth-stencil view texture format=%s", get_name (desc.format));
         case PixelFormat_D16:
         case PixelFormat_D24X8:

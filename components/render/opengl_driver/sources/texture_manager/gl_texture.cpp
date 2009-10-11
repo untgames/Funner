@@ -46,7 +46,7 @@ Texture::Texture
         
       if (desc.generate_mips_enable)
         throw xtl::format_operation_exception (METHOD_NAME, "Auto-generate mipmaps incompatible with compressed textures (desc.format=%s)",
-                               get_name (desc.format));
+          get_name (desc.format));
 
         //проверка корректности начальных размеров
 
@@ -57,6 +57,18 @@ Texture::Texture
       }
 
       mips_count -= 2;
+
+      break;
+    case PixelFormat_RGB_PVRTC2:
+    case PixelFormat_RGB_PVRTC4:
+    case PixelFormat_RGBA_PVRTC2:
+    case PixelFormat_RGBA_PVRTC4:
+      if (!GetCaps ().has_img_texture_compression_pvrtc)
+        throw xtl::format_not_supported_exception (METHOD_NAME, "PVRTC texture compression doesn't supported");
+        
+      if (desc.generate_mips_enable)
+        throw xtl::format_operation_exception (METHOD_NAME, "Auto-generate mipmaps incompatible with compressed textures (desc.format=%s)",
+          get_name (desc.format));
 
       break;
     case PixelFormat_D24S8:
@@ -442,28 +454,51 @@ void Texture::SetData
   if (is_compressed (source_format))
   {
       //проверка корректности размеров
-
-    if ((x % DXT_EDGE_SIZE) || (y % DXT_EDGE_SIZE))          throw xtl::format_not_supported_exception (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
-    if ((width % DXT_EDGE_SIZE) || (height % DXT_EDGE_SIZE)) throw xtl::format_not_supported_exception (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);    
-
-      //копирование сжатого образа
-
-    if (GetCaps ().has_ext_texture_compression_s3tc && source_format == desc.format)
+      
+    switch (source_format)
     {
-      size_t buffer_size = get_image_size (width, height, source_format);
+      case PixelFormat_DXT1:
+      case PixelFormat_DXT3:
+      case PixelFormat_DXT5:
+      {
+        if ((x % DXT_EDGE_SIZE) || (y % DXT_EDGE_SIZE))          throw xtl::format_not_supported_exception (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
+        if ((width % DXT_EDGE_SIZE) || (height % DXT_EDGE_SIZE)) throw xtl::format_not_supported_exception (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);    
 
-      SetCompressedData (layer, mip_level, x, y, width, height, gl_format, buffer_size, buffer);
-    }
-    else
-    {
-      xtl::uninitialized_storage<char> unpacked_buffer (get_uncompressed_image_size (unclamped_width, unclamped_height, source_format));
+          //копирование сжатого образа
 
-      unpack_dxt (source_format, unclamped_width, unclamped_height, buffer, unpacked_buffer.data ());
+        if (GetCaps ().has_ext_texture_compression_s3tc && source_format == desc.format)
+        {
+          size_t buffer_size = get_image_size (width, height, source_format);
 
-      gl_format = get_uncompressed_gl_format (source_format);
-      gl_type   = get_uncompressed_gl_type (source_format);
+          SetCompressedData (layer, mip_level, x, y, width, height, gl_format, buffer_size, buffer);
+        }
+        else
+        {
+          xtl::uninitialized_storage<char> unpacked_buffer (get_uncompressed_image_size (unclamped_width, unclamped_height, source_format));
 
-      SetUncompressedData (layer, mip_level, x, y, width, height, gl_format, gl_type, unpacked_buffer.data ());
+          unpack_dxt (source_format, unclamped_width, unclamped_height, buffer, unpacked_buffer.data ());
+
+          gl_format = get_uncompressed_gl_format (source_format);
+          gl_type   = get_uncompressed_gl_type (source_format);
+
+          SetUncompressedData (layer, mip_level, x, y, width, height, gl_format, gl_type, unpacked_buffer.data ());
+        }
+        
+        break;
+      }
+      case PixelFormat_RGB_PVRTC2:
+      case PixelFormat_RGB_PVRTC4:
+      case PixelFormat_RGBA_PVRTC2:
+      case PixelFormat_RGBA_PVRTC4:
+      {
+        size_t buffer_size = get_image_size (width, height, source_format);
+
+        SetCompressedData (layer, mip_level, x, y, width, height, gl_format, buffer_size, buffer);
+
+        break;
+      }
+      default:
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Set data to with compression format %s not supported", get_name (source_format));
     }
   }
   else
@@ -632,60 +667,77 @@ void Texture::GetData
   bool is_full_image = width == level_desc.width && height == level_desc.height && desc.layers == 1 && !x && !y;
 
   if (is_compressed (target_format))
-  {
+  {    
       //проверка возможности копирования
-      
-    if (!caps.has_ext_texture_compression_s3tc)
-      throw xtl::format_not_supported_exception (METHOD_NAME, "Texture packing not supported (GL_EXT_texture_compression_s3tc not supported)");
       
     if (target_format != desc.format)
       throw xtl::format_not_supported_exception (METHOD_NAME, "Can't get compressed texture data, target format %s mismatch with texture format %s", 
-                         get_name (target_format), get_name (desc.format));
+      get_name (target_format), get_name (desc.format));            
 
     if (is_full_image)
     {      
       caps.glGetCompressedTexImage_fn (layer_desc.target, mip_level, buffer);
     }
     else
-    {
-        //проверка корректности смещения и размеров запрашиваемого образа
+    {            
+        //проверка корректности
+        
+      switch (target_format)
+      {
+        case PixelFormat_RGB_PVRTC2:
+        case PixelFormat_RGB_PVRTC4:
+        case PixelFormat_RGBA_PVRTC2:
+        case PixelFormat_RGBA_PVRTC4:
+          throw xtl::format_not_supported_exception (METHOD_NAME, "Get texture sub-image data not supported for format=%s", get_name (target_format));
+        case PixelFormat_DXT1:
+        case PixelFormat_DXT3:
+        case PixelFormat_DXT5:
+        {
+          if (!caps.has_ext_texture_compression_s3tc)
+            throw xtl::format_not_supported_exception (METHOD_NAME, "Texture packing not supported (GL_EXT_texture_compression_s3tc not supported)");              
 
-      if (x % DXT_EDGE_SIZE || y % DXT_EDGE_SIZE)
-        throw xtl::format_not_supported_exception (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
+          if (x % DXT_EDGE_SIZE || y % DXT_EDGE_SIZE)
+            throw xtl::format_not_supported_exception (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
 
-      if (width % DXT_EDGE_SIZE || height % DXT_EDGE_SIZE)
-        throw xtl::format_not_supported_exception (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);
+          if (width % DXT_EDGE_SIZE || height % DXT_EDGE_SIZE)
+            throw xtl::format_not_supported_exception (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);
 
-        //переход к размерности блока в DXT
+            //переход к размерности блока в DXT
 
-      x                /= DXT_EDGE_SIZE;
-      y                /= DXT_EDGE_SIZE;
-      width            /= DXT_EDGE_SIZE;
-      height           /= DXT_EDGE_SIZE;
-      unclamped_width  /= DXT_EDGE_SIZE;
-      unclamped_height /= DXT_EDGE_SIZE;
+          x                /= DXT_EDGE_SIZE;
+          y                /= DXT_EDGE_SIZE;
+          width            /= DXT_EDGE_SIZE;
+          height           /= DXT_EDGE_SIZE;
+          unclamped_width  /= DXT_EDGE_SIZE;
+          unclamped_height /= DXT_EDGE_SIZE;
 
-        //копирование полного образа во временный буфер
+            //копирование полного образа во временный буфер
 
-      size_t layer_size = get_image_size (level_desc.width, level_desc.height, target_format),
-             quad_size  = get_image_size (DXT_EDGE_SIZE, DXT_EDGE_SIZE, target_format);
+          size_t layer_size = get_image_size (level_desc.width, level_desc.height, target_format),
+                 quad_size  = get_image_size (DXT_EDGE_SIZE, DXT_EDGE_SIZE, target_format);
 
-      xtl::uninitialized_storage<char> temp_buffer (layer_size * desc.layers);
+          xtl::uninitialized_storage<char> temp_buffer (layer_size * desc.layers);
 
-      caps.glGetCompressedTexImage_fn (layer_desc.target, mip_level, temp_buffer.data ());
+          caps.glGetCompressedTexImage_fn (layer_desc.target, mip_level, temp_buffer.data ());
 
-        //копирование части образа в пользовательский буфер        
+            //копирование части образа в пользовательский буфер        
 
-      size_t src_line_size    = level_desc.width / DXT_EDGE_SIZE * quad_size,
-             src_start_offset = layer_desc.new_index * layer_size + y * src_line_size + x * quad_size,
-             block_size       = width * quad_size,
-             dst_line_size    = unclamped_width * quad_size;
+          size_t src_line_size    = level_desc.width / DXT_EDGE_SIZE * quad_size,
+                 src_start_offset = layer_desc.new_index * layer_size + y * src_line_size + x * quad_size,
+                 block_size       = width * quad_size,
+                 dst_line_size    = unclamped_width * quad_size;
 
-      const char* src = temp_buffer.data () + src_start_offset;
-      char*       dst = reinterpret_cast<char*> (buffer);
+          const char* src = temp_buffer.data () + src_start_offset;
+          char*       dst = reinterpret_cast<char*> (buffer);
 
-      for (size_t i=0; i<height; i++, src += src_line_size, dst += dst_line_size)
-        memcpy (dst, src, block_size);
+          for (size_t i=0; i<height; i++, src += src_line_size, dst += dst_line_size)
+            memcpy (dst, src, block_size);
+            
+          break;
+        }
+        default:
+          throw xtl::format_not_supported_exception (METHOD_NAME, "Get data with compression format %s not supported", get_name (target_format));
+      }
     }
   }
   else

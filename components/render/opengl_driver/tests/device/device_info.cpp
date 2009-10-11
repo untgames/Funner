@@ -22,7 +22,6 @@ int main ()
       
     printf ("Device capabilities:\n");      
     printf ("  shader_profiles: '%s'\n", test.device->GetCapString (DeviceCapString_ShaderProfiles));
-    printf ("  texture_compression_formats: '%s'\n", test.device->GetCapString (DeviceCapString_TextureCompressionFormats));
     
     DeviceCaps caps;
     

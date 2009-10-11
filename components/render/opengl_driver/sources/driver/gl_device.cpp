@@ -68,8 +68,6 @@ const char* Device::GetCapString (DeviceCapString cap_string)
   {
     switch (cap_string)
     {
-      case DeviceCapString_TextureCompressionFormats:
-        return texture_manager.GetTextureCompressionFormatsString ();
       case DeviceCapString_ShaderProfiles:
         return shader_stage.GetShaderProfilesString ();
       default:
@@ -80,25 +78,6 @@ const char* Device::GetCapString (DeviceCapString cap_string)
   {
     exception.touch ("render::low_level::opengl::Device::GetCapString");
     throw;
-  }
-}
-
-/*
-    ѕолучение номера внутреннего формата сжати€ текстур по имени (-1 в случае отсутстви€ формата)
-*/
-
-int Device::GetTextureCompressionFormat (const char* name)
-{
-  if (!name)
-    return -1;
-
-  try
-  {
-    return texture_manager.GetTextureCompressionFormat (name);
-  }
-  catch (...)
-  {
-    return -1;
   }
 }
 

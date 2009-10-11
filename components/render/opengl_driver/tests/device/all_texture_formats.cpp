@@ -336,6 +336,17 @@ int main ()
 
       for (size_t j = 0; j < PixelFormat_Num; j++)
       {
+        switch (j)
+        {
+          case PixelFormat_RGB_PVRTC2:
+          case PixelFormat_RGB_PVRTC4:
+          case PixelFormat_RGBA_PVRTC2:
+          case PixelFormat_RGBA_PVRTC4:
+            continue;
+          default:
+            break;
+        }
+        
         desc.format = (PixelFormat)j;
 
         try

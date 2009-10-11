@@ -35,6 +35,7 @@ typedef void (GL_APIENTRY* PFNGLCLIENTACTIVETEXTUREPROC)(GLenum texture);
 typedef void (GL_APIENTRY* PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid *data);
 typedef void (GL_APIENTRY* PFNGLDELETEBUFFERSPROC)(GLsizei n, const GLuint *buffers);
 typedef void (GL_APIENTRY* PFNGLGENBUFFERSPROC)(GLsizei n, GLuint *buffers);
+typedef void (GL_APIENTRY* PFNGLCOMPRESSEDTEXIMAGE2DPROC) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid *data);
 
 #define GL_NONE                                         GL_NONE_OES
 #define GL_FRAMEBUFFER                                  GL_FRAMEBUFFER_OES

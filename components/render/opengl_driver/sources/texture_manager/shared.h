@@ -61,30 +61,39 @@ struct BindableTextureDesc
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Данные мип-уровня
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct TextureLevelData
+{
+  size_t      size; //размер буфера
+  const void* data; //буфер с данными  
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обёртка для выборки текстурных данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class TextureDataSelector
 {
-  public:
+  public: 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     TextureDataSelector (const TextureDesc& desc, const TextureData* data);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Выборка данных
+///Получение данных уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const void* GetData () const;
+    bool GetLevelData (size_t width, size_t height, size_t depth, TextureLevelData&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Переход к следующему блоку
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Next (size_t width, size_t height, size_t depth);
-
+    void Next ();
+    
   private:
     PixelFormat        format;
-    bool               is_internal_format;
     const TextureData* data;
+    size_t             data_size;
     size_t             index;
     size_t             images_count;
     size_t             offset;
@@ -404,9 +413,12 @@ class ScaledTexture: public BindableTexture
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat source_format, const void* buffer);
     void GetData (size_t layer, size_t mip_level, size_t x, size_t y, size_t width, size_t height, PixelFormat target_format, void* buffer);
-
+    
   private:
-    typedef xtl::com_ptr<BindableTexture> TexturePtr;
+    typedef xtl::com_ptr<BindableTexture>    TexturePtr;    
+    typedef xtl::uninitialized_storage<char> Buffer;
+
+    void ScaleImage (size_t width, size_t height, PixelFormat source_format, const void* src_buffer, Buffer& scaled_buffer, PixelFormat& scaled_format);
 
   private:
     TexturePtr    shadow_texture;   //теневая текстура, со сторонами кратными степени двойки

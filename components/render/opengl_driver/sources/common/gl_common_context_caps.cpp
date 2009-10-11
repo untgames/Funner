@@ -171,6 +171,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ext_texture_filter_anisotropic = ext.Get (EXT_texture_filter_anisotropic);
   has_ext_texture_lod_bias           = ext.Get (EXT_texture_lod_bias);
   has_ext_texture3d                  = ext.Get (EXT_texture3D);
+  has_img_texture_compression_pvrtc  = false;
   has_sgis_generate_mipmap           = ext.Get (SGIS_generate_mipmap);
   has_sgis_texture_lod               = ext.Get (SGIS_texture_lod);
 
@@ -186,6 +187,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   glBufferData_fn              = glBufferData ? glBufferData : glBufferDataARB;
   glBufferSubData_fn           = glBufferSubData ? glBufferSubData : glBufferSubDataARB;
   glClientActiveTexture_fn     = glClientActiveTexture ? glClientActiveTexture : glClientActiveTextureARB;
+  glCompressedTexImage2D_fn    = glCompressedTexImage2D ? glCompressedTexImage2D : glCompressedTexImage2DARB;
   glCompressedTexSubImage2D_fn = glCompressedTexSubImage2D ? glCompressedTexSubImage2D : glCompressedTexSubImage2DARB;
   glDeleteBuffers_fn           = glDeleteBuffers ? glDeleteBuffers : glDeleteBuffersARB;
   glGenBuffers_fn              = glGenBuffers ? glGenBuffers : glGenBuffersARB;
@@ -237,7 +239,8 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                    OES_blend_subtract             = "GL_OES_blend_subtract",
                    OES_framebuffer_object         = "GL_OES_framebuffer_object",
                    OES_texture_cube_map           = "GL_OES_texture_cube_map",
-                   EXT_texture_filter_anisotropic = "GL_EXT_texture_filter_anisotropic";
+                   EXT_texture_filter_anisotropic = "GL_EXT_texture_filter_anisotropic",
+                   IMG_texture_compression_pvrtc  = "GL_IMG_texture_compression_pvrtc";
 
   has_arb_multisample                = true;
   has_arb_multitexture               = true;
@@ -248,6 +251,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ext_blend_subtract             = ext.Get (OES_blend_subtract);
   has_ext_framebuffer_object         = ext.Get (OES_framebuffer_object);
   has_ext_texture_filter_anisotropic = ext.Get (EXT_texture_filter_anisotropic);
+  has_img_texture_compression_pvrtc  = ext.Get (IMG_texture_compression_pvrtc);
   has_sgis_generate_mipmap           = true;
 
   glActiveTexture_fn           = glActiveTexture;
@@ -258,6 +262,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   glBufferData_fn              = glBufferData;
   glBufferSubData_fn           = glBufferSubData;
   glClientActiveTexture_fn     = glClientActiveTexture;
+  glCompressedTexImage2D_fn    = glCompressedTexImage2D;
   glCompressedTexSubImage2D_fn = glCompressedTexSubImage2D;
   glDeleteBuffers_fn           = glDeleteBuffers;
   glGenBuffers_fn              = glGenBuffers;

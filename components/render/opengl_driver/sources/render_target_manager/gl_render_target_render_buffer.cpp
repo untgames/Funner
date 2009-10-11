@@ -161,6 +161,10 @@ RenderBuffer::RenderBuffer (const ContextManager& context_manager, const Texture
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
+    case PixelFormat_RGB_PVRTC2:
+    case PixelFormat_RGB_PVRTC4:
+    case PixelFormat_RGBA_PVRTC2:
+    case PixelFormat_RGBA_PVRTC4:    
       throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported desc.format=%s", get_name (desc.format));
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.format", desc.format);
@@ -248,15 +252,17 @@ GLenum get_glformat (PixelFormat format, const char* source, const char* param)
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
+    case PixelFormat_RGB_PVRTC2:
+    case PixelFormat_RGB_PVRTC4:
+    case PixelFormat_RGBA_PVRTC2:
+    case PixelFormat_RGBA_PVRTC4:    
     case PixelFormat_D16:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:
     case PixelFormat_S8:
       throw xtl::format_not_supported_exception (source, "Unsupported %s=%s", param, get_name (format));
-      return 0;
     default:
       throw xtl::make_argument_exception (source, param, format);
-      return 0;
   }
 }
 
@@ -400,6 +406,10 @@ void RenderBuffer::SetData (size_t layer, size_t mip_level, size_t x, size_t y, 
         case PixelFormat_DXT1:
         case PixelFormat_DXT3:
         case PixelFormat_DXT5:
+        case PixelFormat_RGB_PVRTC2:
+        case PixelFormat_RGB_PVRTC4:
+        case PixelFormat_RGBA_PVRTC2:
+        case PixelFormat_RGBA_PVRTC4:        
           throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported source_format=%s", get_name (source_format));
         default:
           throw xtl::make_argument_exception (METHOD_NAME, "source_format", source_format);
@@ -535,6 +545,10 @@ void RenderBuffer::GetData (size_t layer, size_t mip_level, size_t x, size_t y, 
         case PixelFormat_DXT1:
         case PixelFormat_DXT3:
         case PixelFormat_DXT5:
+        case PixelFormat_RGB_PVRTC2:
+        case PixelFormat_RGB_PVRTC4:
+        case PixelFormat_RGBA_PVRTC2:
+        case PixelFormat_RGBA_PVRTC4:        
           throw xtl::format_not_supported_exception (METHOD_NAME, "Unsupported target_format=%s", get_name (target_format));
         default:
           throw xtl::make_argument_exception (METHOD_NAME, "target_format", target_format);

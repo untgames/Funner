@@ -129,18 +129,22 @@ const char* get_name (PixelFormat param)
 {
   switch (param)
   {
-    case PixelFormat_RGB8:  return "PixelFormat_RGB8";
-    case PixelFormat_RGBA8: return "PixelFormat_RGBA8";
-    case PixelFormat_L8:    return "PixelFormat_L8";
-    case PixelFormat_A8:    return "PixelFormat_A8";
-    case PixelFormat_LA8:   return "PixelFormat_LA8";
-    case PixelFormat_DXT1:  return "PixelFormat_DXT1";
-    case PixelFormat_DXT3:  return "PixelFormat_DXT3";
-    case PixelFormat_DXT5:  return "PixelFormat_DXT5";
-    case PixelFormat_D16:   return "PixelFormat_D16";
-    case PixelFormat_D24X8: return "PixelFormat_D24X8";
-    case PixelFormat_D24S8: return "PixelFormat_D24S8";
-    case PixelFormat_S8:    return "PixelFormat_S8";
+    case PixelFormat_RGB8:        return "PixelFormat_RGB8";
+    case PixelFormat_RGBA8:       return "PixelFormat_RGBA8";
+    case PixelFormat_L8:          return "PixelFormat_L8";
+    case PixelFormat_A8:          return "PixelFormat_A8";
+    case PixelFormat_LA8:         return "PixelFormat_LA8";
+    case PixelFormat_DXT1:        return "PixelFormat_DXT1";
+    case PixelFormat_DXT3:        return "PixelFormat_DXT3";
+    case PixelFormat_DXT5:        return "PixelFormat_DXT5";
+    case PixelFormat_RGB_PVRTC2:  return "PixelFormat_RGB_PVRTC2";
+    case PixelFormat_RGB_PVRTC4:  return "PixelFormat_RGB_PVRTC4";
+    case PixelFormat_RGBA_PVRTC2: return "PixelFormat_RGBA_PVRTC2";
+    case PixelFormat_RGBA_PVRTC4: return "PixelFormat_RGBA_PVRTC4";
+    case PixelFormat_D16:         return "PixelFormat_D16";
+    case PixelFormat_D24X8:       return "PixelFormat_D24X8";
+    case PixelFormat_D24S8:       return "PixelFormat_D24S8";
+    case PixelFormat_S8:          return "PixelFormat_S8";
     default:
       throw xtl::make_argument_exception ("render::low_level::get_name(PixelFormat)", "param", param);
   }
@@ -424,11 +428,13 @@ size_t get_texel_size (PixelFormat format)
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
+    case PixelFormat_RGB_PVRTC2:
+    case PixelFormat_RGB_PVRTC4:
+    case PixelFormat_RGBA_PVRTC2:
+    case PixelFormat_RGBA_PVRTC4:
       throw xtl::make_argument_exception ("render::low_level::get_texel_size", "format", get_name (format), "No texel size semantic in compressed pixel format");
-      return 0;
     default:
       throw xtl::make_argument_exception ("render::low_level::get_texel_size", "format");
-      return 0;
   }
 }
 
@@ -447,15 +453,24 @@ size_t get_image_size (size_t width, size_t height, size_t depth, PixelFormat fo
     case PixelFormat_RGB8:
     case PixelFormat_RGBA8:
     case PixelFormat_D24X8:
-    case PixelFormat_D24S8: return width * height * depth * get_texel_size (format);
-    case PixelFormat_DXT1:  return width * height * depth * 8 / DXT_BLOCK_SIZE;
-    case PixelFormat_DXT3:  return width * height * depth * 16 / DXT_BLOCK_SIZE;
-    case PixelFormat_DXT5:  return width * height * depth * 16 / DXT_BLOCK_SIZE;
-      throw xtl::make_argument_exception ("render::low_level::get_texel_size", "format", get_name (format), "No texel size semantic in compressed pixel format");
-      return 0;
+    case PixelFormat_D24S8:        return width * height * depth * get_texel_size (format);
+    case PixelFormat_DXT1:         return width * height * depth * 8 / DXT_BLOCK_SIZE;
+    case PixelFormat_DXT3:         return width * height * depth * 16 / DXT_BLOCK_SIZE;
+    case PixelFormat_DXT5:         return width * height * depth * 16 / DXT_BLOCK_SIZE;     
+    case PixelFormat_RGB_PVRTC2:
+    case PixelFormat_RGBA_PVRTC2:
+      if (width < 16) width  = 16;
+      if (height < 8) height = 8;
+      
+      return (width * height * depth * 2 + 7) / 8;
+    case PixelFormat_RGB_PVRTC4:
+    case PixelFormat_RGBA_PVRTC4:
+      if (width < 8)  width  = 8;
+      if (height < 8) height = 8;
+      
+      return (width * height * depth * 4 + 7) / 8;
     default:
       throw xtl::make_argument_exception ("render::low_level::get_texel_size", "format");
-      return 0;    
   }
 }
 
@@ -476,7 +491,12 @@ bool is_compressed (PixelFormat format)
   {
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
-    case PixelFormat_DXT5:  return true;
+    case PixelFormat_DXT5:
+    case PixelFormat_RGB_PVRTC2:
+    case PixelFormat_RGB_PVRTC4:
+    case PixelFormat_RGBA_PVRTC2:
+    case PixelFormat_RGBA_PVRTC4:
+      return true;
     case PixelFormat_L8:    
     case PixelFormat_A8:    
     case PixelFormat_S8:
@@ -485,10 +505,10 @@ bool is_compressed (PixelFormat format)
     case PixelFormat_RGBA8: 
     case PixelFormat_D16:
     case PixelFormat_D24X8:
-    case PixelFormat_D24S8: return false;  
+    case PixelFormat_D24S8:
+      return false;  
     default:
       throw xtl::make_argument_exception ("render::low_level::is_compressed", "format", format);
-      return false;
   }
 }
 
@@ -510,6 +530,10 @@ bool is_depth_stencil (PixelFormat format)
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
+    case PixelFormat_RGB_PVRTC2:
+    case PixelFormat_RGB_PVRTC4:
+    case PixelFormat_RGBA_PVRTC2:
+    case PixelFormat_RGBA_PVRTC4:    
     case PixelFormat_L8:    
     case PixelFormat_A8:
     case PixelFormat_LA8:   
@@ -517,7 +541,6 @@ bool is_depth_stencil (PixelFormat format)
     case PixelFormat_RGBA8: return false;
     default:
       throw xtl::make_argument_exception ("render::low_level::is_depth_stencil", "format", format);
-      return false;
   }
 }
 
@@ -540,13 +563,16 @@ PixelFormat get_uncompressed_format (PixelFormat format)
     case PixelFormat_D16:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:
-    case PixelFormat_S8:    return format;
-    case PixelFormat_DXT1:  return PixelFormat_RGB8;
+    case PixelFormat_S8:          return format;
+    case PixelFormat_RGB_PVRTC2:
+    case PixelFormat_RGB_PVRTC4:    
+    case PixelFormat_DXT1:        return PixelFormat_RGB8;
     case PixelFormat_DXT3:
-    case PixelFormat_DXT5:  return PixelFormat_RGBA8;
+    case PixelFormat_DXT5:
+    case PixelFormat_RGBA_PVRTC2:
+    case PixelFormat_RGBA_PVRTC4: return PixelFormat_RGBA8;
     default:
       throw xtl::make_argument_exception ("render::low_level::get_unpacked_format", "format", format);
-      return (PixelFormat)0;
   }
 }
 

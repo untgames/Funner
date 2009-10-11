@@ -44,8 +44,7 @@ TextureNpot::TextureNpot (const ContextManager& manager, const TextureDesc& tex_
 
     //создание текстуры
 
-  glTexImage2D (GL_TEXTURE_RECTANGLE_ARB, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, 
-                gl_format, gl_type, data ? data->data : 0);
+  glTexImage2D (GL_TEXTURE_RECTANGLE_ARB, 0, gl_internal_format, tex_desc.width, tex_desc.height, 0, gl_format, gl_type, data ? data->data : 0);
 
     //проверка ошибок
 

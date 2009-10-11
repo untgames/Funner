@@ -7,6 +7,10 @@ Results of utils1_test:
 104@PixelFormat_DXT1: size=32 uncompressed_size=192
 104@PixelFormat_DXT3: size=64 uncompressed_size=256
 104@PixelFormat_DXT5: size=64 uncompressed_size=256
+104@PixelFormat_RGB_PVRTC2: size=96 uncompressed_size=192
+104@PixelFormat_RGB_PVRTC4: size=192 uncompressed_size=192
+104@PixelFormat_RGBA_PVRTC2: size=128 uncompressed_size=256
+104@PixelFormat_RGBA_PVRTC4: size=256 uncompressed_size=256
 104@PixelFormat_D16: size=128 uncompressed_size=128
 104@PixelFormat_D24X8: size=256 uncompressed_size=256
 104@PixelFormat_D24S8: size=256 uncompressed_size=256

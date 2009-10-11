@@ -12,14 +12,14 @@ int main ()
   {
     CompressedImage image (IMAGE_NAME);
     
-    printf ("width:      %u\n", image.Width ());
-    printf ("height:     %u\n", image.Height ());
-    printf ("depth:      %u\n", image.Depth ());
-    printf ("mips_count: %u\n", image.MipsCount ());
-    printf ("format:     '%s'\n", image.Format ());
+    printf ("width:        %u\n", image.Width ());
+    printf ("height:       %u\n", image.Height ());
+    printf ("layers_count: %u\n", image.LayersCount ());
+    printf ("mips_count:   %u\n", image.MipsCount ());
+    printf ("format:       '%s'\n", image.Format ());
     printf ("layers:\n");
     
-    for (size_t i=0; i<image.Depth (); i++)
+    for (size_t i=0; i<image.LayersCount (); i++)
     {
       printf ("  layer%u:\n", i);
 

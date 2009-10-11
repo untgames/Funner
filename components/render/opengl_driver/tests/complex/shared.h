@@ -34,6 +34,7 @@
 #include <common/singleton.h>
 #include <common/time.h>
 
+#include <media/compressed_image.h>
 #include <media/image.h>
 #include <media/mesh.h>
 

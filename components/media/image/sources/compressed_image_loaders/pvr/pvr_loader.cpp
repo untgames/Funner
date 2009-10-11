@@ -96,7 +96,12 @@ class PvrCompressedImage: public ICustomCompressedImage
           
         size_t data_length = header.dataLength;
 
-        data.resize (data_length, false);        
+        data.resize (data_length, false);
+        
+        size_t read_size = file.Read (data.data (), data.size ());
+        
+        if (read_size != data.size ())
+          throw xtl::format_operation_exception ("", "Invalid PVR file '%s'. Error at read %u bytes from file (read_size=%u)", file_name, data.size (), read_size);
         
           // Calculate the data size for each texture level and respect the minimum number of blocks
           
@@ -130,7 +135,7 @@ class PvrCompressedImage: public ICustomCompressedImage
 
           size_t data_size = width_blocks * height_blocks * ((block_size  * bpp) / 8);
 
-          MipLevel mip_level;
+          CompressedImageBlockDesc mip_level;
 
           mip_level.offset = data_offset;
           mip_level.size   = data_size;
@@ -164,7 +169,7 @@ class PvrCompressedImage: public ICustomCompressedImage
     }
 
 ///Количество слоёв
-    size_t Depth ()
+    size_t LayersCount ()
     {
       return 1; //формат поддерживает только однослойные изображения
     }
@@ -186,32 +191,16 @@ class PvrCompressedImage: public ICustomCompressedImage
       }
     }
 
-///Возвращение размера слоя
-    size_t BitmapSize (size_t layer, size_t mip_level)
+///Возвращение буфера данных
+    const void* Data ()
     {
-      static const char* METHOD_NAME = "media::DefaultCompressedImage::BitmapSize";
-      
-      if (layer)
-        throw xtl::make_range_exception (METHOD_NAME, "layer", layer, 1u);
-        
-      if (mip_level >= mip_levels.size ())
-        throw xtl::make_range_exception (METHOD_NAME, "mip_level", mip_level, mip_levels.size ());
-
-      return mip_levels [mip_level].size;
+      return data.data ();
     }
 
-///Возвращение битовой карты слоя
-    const void* Bitmap (size_t layer, size_t mip_level)
+///Возвращение блоков
+    const CompressedImageBlockDesc* Blocks ()
     {
-      static const char* METHOD_NAME = "media::DefaultCompressedImage::Bitmap";
-      
-      if (layer)
-        throw xtl::make_range_exception (METHOD_NAME, "layer", layer, 1u);
-        
-      if (mip_level >= mip_levels.size ())
-        throw xtl::make_range_exception (METHOD_NAME, "mip_level", mip_level, mip_levels.size ());
-
-      return data.data () + mip_levels [mip_level].offset;
+      return &mip_levels [0];
     }
     
   private:
@@ -226,16 +215,8 @@ class PvrCompressedImage: public ICustomCompressedImage
     }
     
   private:
-    typedef xtl::uninitialized_storage<char> Buffer;
-    
-///Описание мип-уровня
-    struct MipLevel
-    {
-      size_t offset; //смещение от начала сжатого изображения
-      size_t size;   //размер уровня в байтах
-    };
-    
-    typedef stl::vector<MipLevel> MipLevelArrray;
+    typedef xtl::uninitialized_storage<char>      Buffer;        
+    typedef stl::vector<CompressedImageBlockDesc> MipLevelArrray;
 
   private:
     size_t         format;     //формат изображения

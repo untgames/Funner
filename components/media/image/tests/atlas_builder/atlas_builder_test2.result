@@ -5,5 +5,9 @@ atlas-builder [<OPTIONS>] <SOURCE> ...
     --silent, -s               quiet mode
     --atlas=<file>, -o <file>  set output atlas file
     --layout=<file>, -l <file> set output layout file
+    --no-layout                don't generatoe layout file
     --pot                      resize atlas texture to nearest greater power of two sizes
+    --invert-x                 invert X coordinate in layout of tiles
+    --invert-y                 invert Y coordinate in layout of tiles
+    --swap-axises              swap axises at layout tiles
 successfull!

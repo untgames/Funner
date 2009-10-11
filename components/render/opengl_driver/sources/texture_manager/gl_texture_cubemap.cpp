@@ -30,11 +30,30 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
      //преобразование формата пикселей
 
-  GLenum gl_internal_format = GetCaps ().has_ext_texture_compression_s3tc ? get_gl_internal_format (tex_desc.format) :
-                              get_uncompressed_gl_internal_format (tex_desc.format),
-         gl_format          = get_uncompressed_gl_format (tex_desc.format),
-         gl_type            = get_uncompressed_gl_type (tex_desc.format);
+  GLenum gl_format              = get_gl_format (tex_desc.format),
+         gl_uncompressed_format = get_uncompressed_gl_format (tex_desc.format),
+         gl_uncompressed_type   = get_uncompressed_gl_type (tex_desc.format),
+         gl_internal_format;
          
+  switch (tex_desc.format)
+  {
+    case PixelFormat_DXT1:
+    case PixelFormat_DXT3:
+    case PixelFormat_DXT5:
+      gl_internal_format = GetCaps ().has_ext_texture_compression_s3tc ? get_gl_internal_format (tex_desc.format) : get_uncompressed_gl_internal_format (tex_desc.format);
+      break;
+    case PixelFormat_RGB_PVRTC2:
+    case PixelFormat_RGB_PVRTC4:
+    case PixelFormat_RGBA_PVRTC2:
+    case PixelFormat_RGBA_PVRTC4:
+      if (!GetCaps ().has_img_texture_compression_pvrtc)
+        throw xtl::format_not_supported_exception (METHOD_NAME, "PVRTC texture compresson not supported");
+
+    default:
+      gl_internal_format = get_gl_internal_format (tex_desc.format);    
+      break;    
+  }
+
 #ifndef OPENGL_ES_SUPPORT
 
     //проверка возможности создания текстуры
@@ -56,6 +75,9 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     //создание mip-уровней
     
   TextureDataSelector data_selector (tex_desc, data);
+  bool                is_compressed_data = is_compressed (tex_desc.format);
+
+  PFNGLCOMPRESSEDTEXIMAGE2DPROC glCompressedTexImage2D_fn = GetCaps ().glCompressedTexImage2D_fn;
 
   for (size_t i=0; i<GetMipsCount (); i++)
   {
@@ -65,16 +87,24 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
     for (size_t j=0; j<6; j++)
     {
-      glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, gl_internal_format, level_desc.width, level_desc.height,
-                    0, gl_format, gl_type, data_selector.GetData ());
-                    
+      TextureLevelData level_data;
+
+      if (data_selector.GetLevelData (level_desc.width, level_desc.height, 1, level_data) && is_compressed_data)
+      {
+        glCompressedTexImage2D_fn (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, gl_internal_format, level_desc.width, level_desc.height, gl_format, level_data.size, level_data.data);
+      }
+      else
+      {
+        glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, gl_internal_format, level_desc.width, level_desc.height, 0, gl_uncompressed_format, gl_uncompressed_type, level_data.data);
+      }
+
 #ifndef OPENGL_ES_SUPPORT
 
       glGetTexLevelParameteriv (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
       
 #endif
 
-      data_selector.Next (level_desc.width, level_desc.height, 1);
+      data_selector.Next ();
     }
   }
   

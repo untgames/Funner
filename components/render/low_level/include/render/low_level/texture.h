@@ -15,22 +15,24 @@ namespace low_level
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum PixelFormat
 {
-  PixelFormat_RGB8,     //red:8, green:8, blue:8
-  PixelFormat_RGBA8,    //red:8, green:8, blue:8, alpha:8
-  PixelFormat_L8,       //luminance:8
-  PixelFormat_A8,       //alpha:8
-  PixelFormat_LA8,      //luminance:8, alpha:8
-  PixelFormat_DXT1,     //red, green, blue, alpha - compressed
-  PixelFormat_DXT3,     //red, green, blue, alpha - compressed  
-  PixelFormat_DXT5,     //red, green, blue, alpha - compressed
-  PixelFormat_D16,      //depth:16
-  PixelFormat_D24X8,    //depth:24, x:8
-  PixelFormat_D24S8,    //depth:24, stencil:8
-  PixelFormat_S8,       //stencil:8
+  PixelFormat_RGB8,        //red:8, green:8, blue:8
+  PixelFormat_RGBA8,       //red:8, green:8, blue:8, alpha:8
+  PixelFormat_L8,          //luminance:8
+  PixelFormat_A8,          //alpha:8
+  PixelFormat_LA8,         //luminance:8, alpha:8
+  PixelFormat_DXT1,        //red, green, blue, alpha - compressed
+  PixelFormat_DXT3,        //red, green, blue, alpha - compressed  
+  PixelFormat_DXT5,        //red, green, blue, alpha - compressed
+  PixelFormat_RGB_PVRTC2,  //red, green, blue - compressed
+  PixelFormat_RGB_PVRTC4,  //red, green, blue - compressed
+  PixelFormat_RGBA_PVRTC2, //red, green, blue, alpha - compressed
+  PixelFormat_RGBA_PVRTC4, //red, green, blue, alpha - compressed
+  PixelFormat_D16,         //depth:16
+  PixelFormat_D24X8,       //depth:24, x:8
+  PixelFormat_D24S8,       //depth:24, stencil:8
+  PixelFormat_S8,          //stencil:8
 
   PixelFormat_Num,
-
-  PixelFormat_FirstInternal = PixelFormat_Num, //первый номер внутреннего сжатого формата
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

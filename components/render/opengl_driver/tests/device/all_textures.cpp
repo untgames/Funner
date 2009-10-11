@@ -269,6 +269,17 @@ int main ()
     for (size_t i = 0; i < TextureDimension_Num; i++)
       for (size_t j = 0; j < PixelFormat_Num; j++)
       {
+        switch (j)
+        {
+          case PixelFormat_RGB_PVRTC2:
+          case PixelFormat_RGB_PVRTC4:
+          case PixelFormat_RGBA_PVRTC2:
+          case PixelFormat_RGBA_PVRTC4:
+            continue;
+          default:
+            break;
+        }        
+
         desc.dimension            = (TextureDimension)i;
         desc.width                = sizes [0][i].width;
         desc.height               = sizes [0][i].height;

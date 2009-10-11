@@ -19,20 +19,16 @@ const char* COMPRESSED_IMAGE_COMPONENT_MASK = "media.compressed_image.*"; //маск
 class DefaultCompressedImage: public ICustomCompressedImage
 {
   public:
-    size_t      Width     () { return 0; }
-    size_t      Height    () { return 0; }
-    size_t      Depth     () { return 0; }
-    size_t      MipsCount () { return 0; }
-    const char* Format    () { return ""; }
+    size_t      Width       () { return 0; }
+    size_t      Height      () { return 0; }
+    size_t      LayersCount () { return 0; }
+    size_t      MipsCount   () { return 0; }
+    const char* Format      () { return ""; }
+    const void* Data        () { return 0;  }
 
-    size_t BitmapSize (size_t layer, size_t mip_level)
+    const CompressedImageBlockDesc* Blocks ()
     {
-      throw xtl::make_range_exception ("media::DefaultCompressedImage::BitmapSize", "layer", layer, 0u);
-    }
-
-    const void* Bitmap (size_t layer, size_t mip_level)
-    {
-      throw xtl::make_range_exception ("media::DefaultCompressedImage::Bitmap", "layer", layer, 0u);
+      return 0;
     }
 };
 
@@ -141,18 +137,18 @@ size_t CompressedImage::Height () const
 }
 
 /*
-    Количество слоёв / mip-уровней
+    Количество слоёв / mip-уровней / блоков
 */
 
-size_t CompressedImage::Depth () const
+size_t CompressedImage::LayersCount () const
 {
   try
   {
-    return impl->image->Depth ();
+    return impl->image->LayersCount ();
   }
   catch (xtl::exception& e)
   {
-    e.touch ("media::CompressedImage::Depth");
+    e.touch ("media::CompressedImage::LayersCount");
     throw;
   }
 }
@@ -166,6 +162,19 @@ size_t CompressedImage::MipsCount () const
   catch (xtl::exception& e)
   {
     e.touch ("media::CompressedImage::MipsCount");
+    throw;
+  }
+}
+
+size_t CompressedImage::BlocksCount () const
+{
+  try
+  {
+    return impl->image->LayersCount () * impl->image->MipsCount ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::CompressedImage::BlocksCount");
     throw;
   }
 }
@@ -188,6 +197,36 @@ const char* CompressedImage::Format () const
 }
 
 /*
+    Получение данных
+*/
+
+const void* CompressedImage::Data () const
+{
+  try
+  {
+    return impl->image->Data ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::CompressedImage::Data");
+    throw;
+  }  
+}
+
+const CompressedImageBlockDesc* CompressedImage::Blocks () const
+{
+  try
+  {
+    return impl->image->Blocks ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::CompressedImage::Blocks");
+    throw;
+  }  
+}
+
+/*
     Размер образа / получение битовой карты
 */
 
@@ -195,7 +234,19 @@ size_t CompressedImage::BitmapSize (size_t layer, size_t mip_level) const
 {
   try
   {
-    return impl->image->BitmapSize (layer, mip_level);
+    size_t layers_count = LayersCount (),
+           mips_count   = MipsCount ();
+    
+    if (layer >= layers_count)
+      throw xtl::make_range_exception ("", "layer", layer, layers_count);
+
+    if (mip_level >= mips_count)
+      throw xtl::make_range_exception ("", "mip_level", mip_level, mips_count);
+
+    const CompressedImageBlockDesc* blocks = Blocks ();
+    size_t                          index  = layers_count * mip_level + layer;
+    
+    return blocks [index].size;
   }
   catch (xtl::exception& e)
   {
@@ -208,7 +259,19 @@ const void* CompressedImage::Bitmap (size_t layer, size_t mip_level) const
 {
   try
   {
-    return impl->image->Bitmap (layer, mip_level);
+    size_t layers_count = LayersCount (),
+           mips_count   = MipsCount ();
+
+    if (layer >= layers_count)
+      throw xtl::make_range_exception ("", "layer", layer, layers_count);
+
+    if (mip_level >= mips_count)
+      throw xtl::make_range_exception ("", "mip_level", mip_level, mips_count);
+
+    const CompressedImageBlockDesc* blocks = Blocks ();
+    size_t                          index  = layers_count * mip_level + layer;
+
+    return (char*)impl->image->Data () + blocks [index].offset;
   }
   catch (xtl::exception& e)
   {

@@ -178,6 +178,10 @@ ITexture* SwapChainFrameBufferManager::CreateRenderBuffer (const TextureDesc& de
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
+    case PixelFormat_RGB_PVRTC2:
+    case PixelFormat_RGB_PVRTC4:
+    case PixelFormat_RGBA_PVRTC2:
+    case PixelFormat_RGBA_PVRTC4:    
       throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create render-target texture with format=%s", get_name (desc.format));
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.format", desc.format);

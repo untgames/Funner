@@ -34,6 +34,10 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
     case PixelFormat_DXT5:
+    case PixelFormat_RGB_PVRTC2:
+    case PixelFormat_RGB_PVRTC4:
+    case PixelFormat_RGBA_PVRTC2:
+    case PixelFormat_RGBA_PVRTC4:    
       throw xtl::format_not_supported_exception (METHOD_NAME, "3D compressed textures not supported (desc.format=%s)", get_name (GetFormat ()));
     case PixelFormat_D16:
     case PixelFormat_D24X8:
@@ -78,13 +82,17 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     MipLevelDesc level_desc;
 
     GetMipLevelDesc (mip_level, level_desc);    
+    
+    TextureLevelData level_data;
+    
+    data_selector.GetLevelData (level_data);
 
-    if (glTexImage3D) glTexImage3D    (GL_TEXTURE_3D_EXT, mip_level, gl_internal_format, level_desc.width, level_desc.height, depth, 0, gl_format, gl_type, data_selector.GetData ());
-    else              glTexImage3DEXT (GL_TEXTURE_3D_EXT, mip_level, gl_internal_format, level_desc.width, level_desc.height, depth, 0, gl_format, gl_type, data_selector.GetData ());
+    if (glTexImage3D) glTexImage3D    (GL_TEXTURE_3D_EXT, mip_level, gl_internal_format, level_desc.width, level_desc.height, depth, 0, gl_format, gl_type, level_data.data);
+    else              glTexImage3DEXT (GL_TEXTURE_3D_EXT, mip_level, gl_internal_format, level_desc.width, level_desc.height, depth, 0, gl_format, gl_type, level_data.data);
 
     if (depth > 1) depth /= 2;
-    
-    data_selector.Next (level_desc.width, level_desc.height, depth);
+
+    data_selector.Next ();
   }
 
     //проверка ошибок
