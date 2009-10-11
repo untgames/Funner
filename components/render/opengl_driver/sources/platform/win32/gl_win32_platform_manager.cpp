@@ -25,28 +25,53 @@ class PlatformManagerImpl
 ///Конструктор
     PlatformManagerImpl ()
     {
-        //получение пути к директории Windows
+      try
+      {
+          //получение пути к директории Windows
+          
+        stl::string win_dir;      
+
+        win_dir.fast_resize (GetWindowsDirectory (&win_dir [0], 0));            
+
+        if (GetWindowsDirectory (&win_dir [0], win_dir.size ()))
+        {      
+          win_dir.pop_back ();
+          
+            //получение версии Windows
+            
+          OSVERSIONINFO version;
+          
+          memset (&version, 0, sizeof (OSVERSIONINFO));
+
+          version.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
+
+          if (!GetVersionEx (&version))
+            raise_error ("::GetVersionInfo");
+
+            //загрузка MSOGL
+
+          LoadDefaultAdapter ("MSOGL", "ogldrv", "bugs='GLBUG_swap_buffers_twice_call GLBUG_texture_no_subimage GLBUG_texture_no_mipmap'");
+          
+          static const size_t WINDOWS7_VERSION_MAJOR = 6;
+          static const size_t WINDOWS7_VERSION_MINOR = 1;
+
+          if (version.dwMajorVersion > WINDOWS7_VERSION_MAJOR || version.dwMajorVersion == WINDOWS7_VERSION_MAJOR && version.dwMinorVersion > WINDOWS7_VERSION_MINOR)          
+          {
+              //загрузка Direct3D эмулятора AcXtrnal
+
+            LoadDefaultAdapter ("Direct3D wrapper", (win_dir + "\\AppPatch\\AcXtrnal").c_str (), "bugs='GLBUG_texture_no_subimage'");
+          }
+        }      
         
-      stl::string win_dir;      
+          //загрузка адаптера "по умолчанию"
 
-      win_dir.fast_resize (GetWindowsDirectory (&win_dir [0], 0));      
-
-      if (GetWindowsDirectory (&win_dir [0], win_dir.size ()))
-      {      
-        win_dir.pop_back ();
-
-          //загрузка MSOGL
-
-        LoadDefaultAdapter ("MSOGL", "ogldrv", "bugs='GLBUG_swap_buffers_twice_call GLBUG_texture_no_subimage GLBUG_texture_no_mipmap'");
-
-          //загрузка Direct3D эмулятора AcXtrnal
-
-        LoadDefaultAdapter ("Direct3D wrapper", (win_dir + "\\AppPatch\\AcXtrnal").c_str (), "bugs='GLBUG_texture_no_subimage'");
-      }      
-      
-        //загрузка адаптера "по умолчанию"
-
-      LoadDefaultAdapter ("OpenGL32", "opengl32");
+        LoadDefaultAdapter ("OpenGL32", "opengl32");
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("render::low_level::opengl::windows::PlatformManagerImpl::PlatformManagerImpl");
+        throw;
+      }
     }
 
 ///Создание адаптера

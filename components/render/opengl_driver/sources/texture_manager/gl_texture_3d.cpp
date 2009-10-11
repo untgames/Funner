@@ -38,7 +38,7 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     case PixelFormat_D16:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:
-    case PixelFormat_S8:    
+    case PixelFormat_S8:
       throw xtl::format_not_supported_exception (METHOD_NAME, "3D depth-stencil textures not supported (desc.format=%s)", get_name (GetFormat ()));
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.format", GetFormat ());
