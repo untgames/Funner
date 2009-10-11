@@ -409,72 +409,85 @@ TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& 
       //отсутствие динамической текстуры - отсутствие запроса дочернего рендеринга
 
     out_query = 0;
-
-      //загрузка картинки
-
-    bool need_alpha_generation = false;
-
-    media::Image image (file_name);
-
-    switch (image.Format ())
+    
+    static common::ComponentLoader loader ("media.compressed_image.*");
+    
+    if (media::CompressedImageManager::FindLoader (file_name, common::SerializerFindMode_ByName))
     {
-      case media::PixelFormat_BGR8:
-        image.Convert (need_alpha ? media::PixelFormat_RGBA8 : media::PixelFormat_RGB8);
-        need_alpha_generation = need_alpha;
-        break;
-      case media::PixelFormat_BGRA8:
-        image.Convert (media::PixelFormat_RGBA8);
-        has_alpha = true;
-        break;
-      case media::PixelFormat_RGBA8:
-      case media::PixelFormat_A8:
-      case media::PixelFormat_L8:
-      case media::PixelFormat_LA8:
-        has_alpha = true;
-        break;
-      case media::PixelFormat_RGB8:
-        if (need_alpha)
-          image.Convert (media::PixelFormat_RGBA8);
+        //загрузка сжатой картинки
 
-        need_alpha_generation = need_alpha;
+      media::CompressedImage image (file_name);
 
-        break;
-      default:
-        throw xtl::format_operation_exception ("", "Unknown texture format=%d", image.Format ());
+      return TexturePtr (renderer->CreateTexture (image), false);
     }
-
-    /*
-      ≈сли нужна генераци€ альфа-канала - генерируем канал таким образом, что все пикселы с цветом нижнего левого
-      имеют alpha = 0, а остальные - alpha = 255
-    */
-
-    if (need_alpha_generation)
+    else
     {
-      #pragma pack(1)
+        //загрузка не сжатой картинки
 
-      struct RGBA
+      bool need_alpha_generation = false;
+
+      media::Image image (file_name);
+
+      switch (image.Format ())
       {
-        unsigned char red, green, blue, alpha;
-      };
+        case media::PixelFormat_BGR8:
+          image.Convert (need_alpha ? media::PixelFormat_RGBA8 : media::PixelFormat_RGB8);
+          need_alpha_generation = need_alpha;
+          break;
+        case media::PixelFormat_BGRA8:
+          image.Convert (media::PixelFormat_RGBA8);
+          has_alpha = true;
+          break;
+        case media::PixelFormat_RGBA8:
+        case media::PixelFormat_A8:
+        case media::PixelFormat_L8:
+        case media::PixelFormat_LA8:
+          has_alpha = true;
+          break;
+        case media::PixelFormat_RGB8:
+          if (need_alpha)
+            image.Convert (media::PixelFormat_RGBA8);
 
-      RGBA* pixel       = reinterpret_cast<RGBA*> (image.Bitmap ());
-      RGBA  alpha_color = *pixel;
+          need_alpha_generation = need_alpha;
 
-      for (size_t count=image.Width () * image.Height (); count--; pixel++)
-      {
-        if (pixel->red == alpha_color.red && pixel->green == alpha_color.green && pixel->blue == alpha_color.blue)
-          pixel->alpha = 0;
-        else
-          pixel->alpha = 255;
+          break;
+        default:
+          throw xtl::format_operation_exception ("", "Unknown texture format=%d", image.Format ());
       }
 
-      has_alpha = true;
+      /*
+        ≈сли нужна генераци€ альфа-канала - генерируем канал таким образом, что все пикселы с цветом нижнего левого
+        имеют alpha = 0, а остальные - alpha = 255
+      */
+
+      if (need_alpha_generation)
+      {
+        #pragma pack(1)
+
+        struct RGBA
+        {
+          unsigned char red, green, blue, alpha;
+        };
+
+        RGBA* pixel       = reinterpret_cast<RGBA*> (image.Bitmap ());
+        RGBA  alpha_color = *pixel;
+
+        for (size_t count=image.Width () * image.Height (); count--; pixel++)
+        {
+          if (pixel->red == alpha_color.red && pixel->green == alpha_color.green && pixel->blue == alpha_color.blue)
+            pixel->alpha = 0;
+          else
+            pixel->alpha = 255;
+        }
+
+        has_alpha = true;
+      }
+
+
+        //создание текстуры
+
+      return TexturePtr (renderer->CreateTexture (image), false);
     }
-
-
-      //создание текстуры
-
-    return TexturePtr (renderer->CreateTexture (image), false);
   }
   catch (xtl::exception& exception)
   {

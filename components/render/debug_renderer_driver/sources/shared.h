@@ -15,6 +15,7 @@
 #include <common/log.h>
 #include <common/component.h>
 
+#include <media/compressed_image.h>
 #include <media/image.h>
 
 #include <render/mid_level/driver.h>
@@ -356,6 +357,7 @@ class Texture: virtual public mid_level::renderer2d::ITexture, public RenderTarg
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Texture  (size_t width, size_t height, PixelFormat format);
+    Texture  (size_t width, size_t height, const char* format);
     ~Texture ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,6 +366,7 @@ class Texture: virtual public mid_level::renderer2d::ITexture, public RenderTarg
     void CaptureImage (media::Image&);    
 
   private:
+    bool        is_compressed;
     PixelFormat format;
 };
 
@@ -490,6 +493,7 @@ class Renderer: virtual public mid_level::renderer2d::IRenderer, public BasicRen
 ///Создание ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     mid_level::renderer2d::ITexture*   CreateTexture   (const media::Image& image);
+    mid_level::renderer2d::ITexture*   CreateTexture   (const media::CompressedImage& image);
     mid_level::renderer2d::ITexture*   CreateTexture   (size_t width, size_t height, PixelFormat pixel_format);
     mid_level::renderer2d::IPrimitive* CreatePrimitive ();
     mid_level::renderer2d::IFrame*     CreateFrame     ();

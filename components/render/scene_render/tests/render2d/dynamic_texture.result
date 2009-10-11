@@ -28,19 +28,19 @@ Draw primitive (id=11)
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
-    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
+    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.96] tex_size=[0.04 0.04]
 Draw primitive (id=11)
   texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
-    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
+    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.96] tex_size=[0.04 0.04]
 Draw primitive (id=11)
   texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
-    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
+    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.96] tex_size=[0.04 0.04]
 End draw frame (id=13)
 Begin draw frame (id=12)
 Set render targets: render-target=7, depth-stencil-target=8
@@ -57,19 +57,19 @@ Draw primitive (id=11)
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
-    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
+    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.96] tex_size=[0.04 0.04]
 Draw primitive (id=11)
   texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
-    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
+    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.96] tex_size=[0.04 0.04]
 Draw primitive (id=11)
   texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
-    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
+    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.96] tex_size=[0.04 0.04]
 End draw frame (id=13)
 Begin draw frame (id=12)
 Set render targets: render-target=7, depth-stencil-target=8
@@ -86,19 +86,19 @@ Draw primitive (id=11)
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
-    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
+    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.96] tex_size=[0.04 0.04]
 Draw primitive (id=11)
   texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
-    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
+    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.96] tex_size=[0.04 0.04]
 Draw primitive (id=11)
   texture_id=7
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
-    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
+    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.96] tex_size=[0.04 0.04]
 End draw frame (id=13)
 Begin draw frame (id=9)
 Set render targets: render-target=4, depth-stencil-target=5
@@ -115,7 +115,7 @@ Draw primitive (id=11)
   blend=translucent
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
-    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.00] tex_size=[0.04 0.04]
+    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.96] tex_size=[0.04 0.04]
 End draw frame (id=10)
 End draw frames (id=2, frame_id=0)
 Destroy frame2d (id=10)

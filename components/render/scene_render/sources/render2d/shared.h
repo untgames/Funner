@@ -17,6 +17,7 @@
 #include <common/component.h>
 #include <common/strlib.h>
 
+#include <media/compressed_image.h>
 #include <media/image.h>
 #include <media/font.h>
 #include <media/rfx/material_library.h>

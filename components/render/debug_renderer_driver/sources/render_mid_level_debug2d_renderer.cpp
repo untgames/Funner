@@ -44,6 +44,11 @@ ITexture* Renderer::CreateTexture (const media::Image& image)
   return CreateTexture (image.Width (), image.Height (), get_format (image.Format ()));
 }
 
+ITexture* Renderer::CreateTexture (const media::CompressedImage& image)
+{
+  return new Texture (image.Width (), image.Height (), image.Format ());
+}
+
 ITexture* Renderer::CreateTexture (size_t width, size_t height, PixelFormat pixel_format)
 {
   return new Texture (width, height, pixel_format);
