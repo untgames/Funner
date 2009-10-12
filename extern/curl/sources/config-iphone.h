@@ -1,5 +1,5 @@
-/* src/config.h.  Generated from config.h.in by configure.  */
-/* lib/config.h.in.  Generated from configure.ac by autoheader.  */
+/* src/curl_config.h.  Generated from curl_config.h.in by configure.  */
+/* lib/curl_config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* when building libcurl itself */
 /* #undef BUILDING_LIBCURL */
@@ -29,7 +29,7 @@
 /* #undef CURL_DISABLE_HTTP */
 
 /* to disable LDAP */
-#define CURL_DISABLE_LDAP 1
+/* #undef CURL_DISABLE_LDAP */
 
 /* to disable LDAPS */
 #define CURL_DISABLE_LDAPS 1
@@ -115,11 +115,17 @@
 /* Define to 1 if you have the clock_gettime function and monotonic timer. */
 /* #undef HAVE_CLOCK_GETTIME_MONOTONIC */
 
-/* Define to 1 if you have the `closesocket' function. */
+/* Define to 1 if you have the closesocket function. */
 /* #undef HAVE_CLOSESOCKET */
 
+/* Define to 1 if you have the CloseSocket camel case function. */
+/* #undef HAVE_CLOSESOCKET_CAMEL */
+
+/* Define to 1 if you have the connect function. */
+#define HAVE_CONNECT 1
+
 /* Define to 1 if you have the `CRYPTO_cleanup_all_ex_data' function. */
-#define HAVE_CRYPTO_CLEANUP_ALL_EX_DATA 1
+/* #undef HAVE_CRYPTO_CLEANUP_ALL_EX_DATA */
 
 /* Define to 1 if you have the <crypto.h> header file. */
 /* #undef HAVE_CRYPTO_H */
@@ -131,7 +137,7 @@
 #define HAVE_DLFCN_H 1
 
 /* Define to 1 if you have the `ENGINE_load_builtin_engines' function. */
-#define HAVE_ENGINE_LOAD_BUILTIN_ENGINES 1
+/* #undef HAVE_ENGINE_LOAD_BUILTIN_ENGINES */
 
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
@@ -330,7 +336,7 @@
 /* #undef HAVE_LDAPSSL_H */
 
 /* Define to 1 if you have the ldap.h header file. */
-/*#define HAVE_LDAP_H 1*/
+#define HAVE_LDAP_H 1
 
 /* Use LDAPS implementation */
 /* #undef HAVE_LDAP_SSL */
@@ -339,7 +345,7 @@
 /* #undef HAVE_LDAP_SSL_H */
 
 /* Define to 1 if you have the `ldap_url_parse' function. */
-/*#define HAVE_LDAP_URL_PARSE 1*/
+#define HAVE_LDAP_URL_PARSE 1
 
 /* Define to 1 if you have the <libgen.h> header file. */
 #define HAVE_LIBGEN_H 1
@@ -353,9 +359,6 @@
 /* Define to 1 if you have the `resolve' library (-lresolve). */
 /* #undef HAVE_LIBRESOLVE */
 
-/* Define to 1 if you have the `socket' library (-lsocket). */
-/* #undef HAVE_LIBSOCKET */
-
 /* Define to 1 if you have the `ssh2' library (-lssh2). */
 /* #undef HAVE_LIBSSH2 */
 
@@ -366,7 +369,7 @@
 /* #undef HAVE_LIBSSH2_VERSION */
 
 /* Define to 1 if you have the `ssl' library (-lssl). */
-#define HAVE_LIBSSL 1
+/* #undef HAVE_LIBSSL */
 
 /* if zlib is available */
 #define HAVE_LIBZ 1
@@ -415,28 +418,28 @@
 /* #undef HAVE_OLD_GSSMIT */
 
 /* Define to 1 if you have the <openssl/crypto.h> header file. */
-/*#define HAVE_OPENSSL_CRYPTO_H 1*/
+/* #undef HAVE_OPENSSL_CRYPTO_H */
 
 /* Define to 1 if you have the <openssl/engine.h> header file. */
-/*#define HAVE_OPENSSL_ENGINE_H 1*/
+/* #undef HAVE_OPENSSL_ENGINE_H */
 
 /* Define to 1 if you have the <openssl/err.h> header file. */
-/*#define HAVE_OPENSSL_ERR_H 1*/
+/* #undef HAVE_OPENSSL_ERR_H */
 
 /* Define to 1 if you have the <openssl/pem.h> header file. */
-/*#define HAVE_OPENSSL_PEM_H 1*/
+/* #undef HAVE_OPENSSL_PEM_H */
 
 /* Define to 1 if you have the <openssl/pkcs12.h> header file. */
-/*#define HAVE_OPENSSL_PKCS12_H 1*/
+/* #undef HAVE_OPENSSL_PKCS12_H */
 
 /* Define to 1 if you have the <openssl/rsa.h> header file. */
-/*#define HAVE_OPENSSL_RSA_H 1*/
+/* #undef HAVE_OPENSSL_RSA_H */
 
 /* Define to 1 if you have the <openssl/ssl.h> header file. */
-/*#define HAVE_OPENSSL_SSL_H 1*/
+/* #undef HAVE_OPENSSL_SSL_H */
 
 /* Define to 1 if you have the <openssl/x509.h> header file. */
-/*#define HAVE_OPENSSL_X509_H 1*/
+/* #undef HAVE_OPENSSL_X509_H */
 
 /* Define to 1 if you have the <pem.h> header file. */
 /* #undef HAVE_PEM_H */
@@ -466,13 +469,13 @@
 #define HAVE_PWD_H 1
 
 /* Define to 1 if you have the `RAND_egd' function. */
-#define HAVE_RAND_EGD 1
+/* #undef HAVE_RAND_EGD */
 
 /* Define to 1 if you have the `RAND_screen' function. */
 /* #undef HAVE_RAND_SCREEN */
 
 /* Define to 1 if you have the `RAND_status' function. */
-#define HAVE_RAND_STATUS 1
+/* #undef HAVE_RAND_STATUS */
 
 /* Define to 1 if you have the recv function. */
 #define HAVE_RECV 1
@@ -534,14 +537,17 @@
 /* Define to 1 if struct sockaddr_in6 has the sin6_scope_id member */
 #define HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 1
 
-/* Define to 1 if you have the `socket' function. */
+/* Define to 1 if you have the socket function. */
 #define HAVE_SOCKET 1
+
+/* Define to 1 if you have the <socket.h> header file. */
+/* #undef HAVE_SOCKET_H */
 
 /* Define this if you have the SPNEGO library fbopenssl */
 /* #undef HAVE_SPNEGO */
 
 /* Define to 1 if you have the `SSL_get_shutdown' function. */
-#define HAVE_SSL_GET_SHUTDOWN 1
+/* #undef HAVE_SSL_GET_SHUTDOWN */
 
 /* Define to 1 if you have the <ssl.h> header file. */
 /* #undef HAVE_SSL_H */
@@ -743,28 +749,28 @@
 /* #undef NEED_REENTRANT */
 
 /* cpu-machine-OS */
-#define OS "i386-apple-darwin9.5.0"
+#define OS "i386-apple-darwin9.7.0"
 
 /* Name of package */
 #define PACKAGE "curl"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "a suitable curl mailing list => http://curl.haxx.se/mail/"
+/* #undef PACKAGE_BUGREPORT */
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "curl"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "curl -"
+/* #undef PACKAGE_STRING */
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "curl"
+/* #undef PACKAGE_TARNAME */
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "-"
+/* #undef PACKAGE_VERSION */
 
 /* a suitable file to read random data from */
-#define RANDOM_FILE "/dev/urandom"
+/* #undef RANDOM_FILE */
 
 /* Define to the type of arg 1 for recvfrom. */
 #define RECVFROM_TYPE_ARG1 int
@@ -815,7 +821,7 @@
 #define RETSIGTYPE void
 
 /* Define to the type qualifier of arg 5 for select. */
-#define SELECT_QUAL_ARG5
+#define SELECT_QUAL_ARG5 
 
 /* Define to the type of arg 1 for select. */
 #define SELECT_TYPE_ARG1 int
@@ -893,10 +899,10 @@
 /* #undef USE_NSS */
 
 /* if OpenSSL is in use */
-/*#define USE_OPENSSL 1*/
+/* #undef USE_OPENSSL */
 
 /* if SSL is enabled */
-/*#define USE_SSLEAY 1*/
+/* #undef USE_SSLEAY */
 
 /* Define to 1 if you are building a Windows target without large file
    support. */
@@ -909,7 +915,7 @@
 /* #undef USE_YASSLEMUL */
 
 /* Version number of package */
-#define VERSION "7.19.5"
+#define VERSION "7.19.6"
 
 /* Define to avoid automatic inclusion of winsock.h */
 /* #undef WIN32_LEAN_AND_MEAN */

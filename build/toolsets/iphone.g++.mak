@@ -16,7 +16,7 @@ DLL_LIB_SUFFIX := .dylib
 PROFILES += iphone unistd has_windows haswchar gles
 DLL_PATH := DYLD_LIBRARY_PATH
 
-COMMON_CFLAGS     += -Os -isysroot $(IPHONE_SDK_PATH)
+COMMON_CFLAGS     += -Os -isysroot $(IPHONE_SDK_PATH) -DIPHONE
 COMMON_LINK_FLAGS += -isysroot $(IPHONE_SDK_PATH) -mmacosx-version-min=10.5
 
 include $(TOOLSETS_DIR)/g++.mak

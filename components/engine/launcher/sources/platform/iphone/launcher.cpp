@@ -72,10 +72,10 @@ int main (int argc, const char* argv [])
     printf ("Can't load engine library\n");
     return 1;
   }
-  
+
   FunnerInitProc     FunnerInit     = (FunnerInitProc)dlsym (library, "FunnerInit");
   FunnerShutdownProc FunnerShutdown = (FunnerShutdownProc)dlsym (library, "FunnerShutdown");
-  
+
   if (!FunnerInit || !FunnerShutdown)
   {
     printf ("Bad library (entries not found)\n");
@@ -89,15 +89,15 @@ int main (int argc, const char* argv [])
     printf ("Funner startup failed!");
     return 1;
   }
-  
+
   if (!funner->ParseCommandLine (argc, argv))
   {
     return 1;
   }
-  
+
   funner->Run ();
-  
+
   FunnerShutdown (funner);
-  
+
   dlclose (library);
 }

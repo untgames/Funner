@@ -3,6 +3,8 @@
 
 #if defined (WIN32) || defined (_WIN32) || defined (__WIN32__) || defined (__GNUC__) && (defined( __i386__) || defined (__x86_64__))
   #define XTL_HAS_INTERLOCKED
+#elif defined (IPHONE)
+  #define XTL_HAS_INTERLOCKED
 #endif
 
 /*

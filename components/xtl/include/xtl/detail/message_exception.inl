@@ -51,15 +51,6 @@ inline const char* message_exception_base::what () const throw ()
     Добавление информации о контексте выброса
 */
 
-inline void message_exception_base::touch (const char* format, ...) throw ()
-{
-  va_list args;
-  
-  va_start (args, format);
-  
-  message_exception_base::vtouch (format, args);
-}
-
 inline void message_exception_base::vtouch (const char* format, va_list args) throw ()
 {
   if (!format || !*format)

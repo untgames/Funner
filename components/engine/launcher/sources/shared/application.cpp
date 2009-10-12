@@ -117,14 +117,14 @@ class Application
     void Run ()
     {
         //регистрация обработчика старта приложения
-      
+
       syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnEnterRunLoop, xtl::bind (&Application::StartupHandler, this));
 
         //запуск основного цикла
 
-      syslib::Application::Run ();      
+      syslib::Application::Run ();
     }
-    
+
   private:
 ///Обработчик старта приложения
     void StartupHandler ()
@@ -141,7 +141,7 @@ class Application
       {
         printf ("unknown exception at engine::Application::StartupHandler\n");
       }
-      
+
     }
 
 ///Обработчик событий таймера запуска приложения
@@ -150,9 +150,9 @@ class Application
       try
       {
         startup_timer.reset ();
-        
+
           //запуск подсистем
-          
+
         manager.Start (configuration_name.c_str ());
 
         if (need_print_version)
@@ -200,13 +200,13 @@ struct FunnerApiImpl: public FunnerApi
     ParseCommandLine = &ParseCommandLineEntry;
     Run              = &RunEntry;
   }
-  
+
   static bool ParseCommandLineEntry (unsigned int argc, const char** argv)
   {
     try
     {
       ApplicationSingleton::Instance ()->ParseCommandLine (argc, argv);
-      
+
       return true;
     }
     catch (std::exception& exception)
@@ -220,7 +220,7 @@ struct FunnerApiImpl: public FunnerApi
 
     return false;
   }
-  
+
   static void RunEntry ()
   {
     try
@@ -234,7 +234,7 @@ struct FunnerApiImpl: public FunnerApi
     catch (...)
     {
       printf ("unknown exception at FunnerApplicationEntries::RunEntry\n");
-    }    
+    }
   }
 };
 
@@ -256,13 +256,13 @@ FUNNER_C_API FunnerApi* FunnerInit ()
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());
-  }  
+  }
   catch (...)
   {
     printf ("unknown exception at FunnerInit\n");
   }
-  
-  return 0;  
+
+  return 0;
 }
 
 FUNNER_C_API void FunnerShutdown (FunnerApi* api)

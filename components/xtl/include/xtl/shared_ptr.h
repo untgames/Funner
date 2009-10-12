@@ -257,10 +257,11 @@ template <class T>                T*       get_pointer (const shared_ptr<T>&);
 
 #ifdef XTL_HAS_INTERLOCKED
   #include <xtl/detail/shared_counter_interlocked.inl>  
-#elif defined (ARM9)
-  #include <xtl/detail/shared_counter_nothreads.inl>
 #else
-  #error Unknown platform
+//#elif defined (ARM9)
+  #include <xtl/detail/shared_counter_nothreads.inl>
+//#else
+//  #error Unknown platform
 #endif
 
 #include <xtl/detail/shared_counter.inl>

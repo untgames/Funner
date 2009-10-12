@@ -199,6 +199,7 @@ volatile int print_lock = 0; //консоль заблокирована для печати
 
 void Console::Print (const char* message)
 {
+#ifdef XTL_HAS_INTERLOCKED
   if (!xtl::atomic_increment (print_lock))
   {
     try
@@ -213,6 +214,24 @@ void Console::Print (const char* message)
   }
   
   xtl::atomic_decrement (print_lock);
+#else
+
+  if (!print_lock++)
+  {
+    try
+    {
+      ConsoleSingleton::Instance ()->Print (message);
+    }
+    catch (...)
+    {
+      --print_lock;
+      throw;
+    }
+  }
+  
+  --print_lock;
+
+#endif
 }
 
 void Console::Printf (const char* message, ...)

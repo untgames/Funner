@@ -20,9 +20,11 @@ class exception: public std::exception
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление информации о контексте возникновения исключения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void vtouch (const char* format, va_list args) throw () {} //no default implementation
-    virtual void touch  (const char* format, ...) throw () {} //no default implementation
+    virtual void vtouch (const char* format, va_list args) throw () {} //no default implementation    
+            void touch  (const char* format, ...) throw ();
 };
+
+#include <xtl/detail/exception.inl>
 
 }
 

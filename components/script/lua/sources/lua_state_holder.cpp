@@ -20,13 +20,13 @@ void* reallocate (void* user_data, void* ptr, size_t old_size, size_t new_size)
     if (!new_size)
     {
       heap.Deallocate (ptr);
-      return 0;    
+      return 0;
     }
 
     void* new_buffer = heap.Allocate (new_size);
 
     if (!new_buffer)
-      return 0;    
+      return 0;
 
     if (ptr)
     {
@@ -52,7 +52,8 @@ void* reallocate (void* user_data, void* ptr, size_t old_size, size_t new_size)
 
 StateHolder::StateHolder ()
 {
-  state = lua_newstate (&reallocate, &MemoryManager::GetHeap ());
+  //state = lua_newstate (&reallocate, &MemoryManager::GetHeap ());
+  state = lua_open ();
 
   if (!state)
     throw xtl::format_exception<InterpreterException> ("script::lua::StateHolder::StateHolder", "Can't create lua state");

@@ -147,5 +147,43 @@
 
       return rv;
   }
+  
+#elif defined (IPHONE)
+
+inline int atomic_increment (volatile int& rc)
+{
+  int r = rc;
+
+  ++rc;
+
+  return r;
+}
+
+inline int atomic_decrement (volatile int& rc)
+{
+  int r = rc;
+  
+  --rc;
+  
+  return r;
+}
+
+inline int atomic_conditional_increment (volatile int& rc)
+{
+  int r = rc;
+  
+  if (r) ++rc;
+  
+  return r;  
+}
+
+inline int atomic_conditional_decrement (volatile int& rc)
+{
+  int r = rc;
+  
+  if (r) --rc;
+  
+  return r;
+}
 
 #endif
