@@ -92,15 +92,20 @@ typedef stl::vector<IApplicationListener*> ListenerArray;
   [super dealloc];
 }
 
+-(void) applicationWillFinishLaunching:(UIApplication*)application
+{
+//  run_loop_context->OnEnterRunLoop ();  
+}
+
 -(void) applicationDidFinishLaunching:(UIApplication*)application
 {
   application_launched = true;
-
+  
   [UIAccelerometer sharedAccelerometer].delegate = self;
+  
+  run_loop_context->OnEnterRunLoop ();  
 
-  run_loop_context->OnEnterRunLoop ();
-
-  idle_timer->Run ();
+  idle_timer->Run ();  
 }
 
 -(void) applicationWillTerminate:(UIApplication*)application

@@ -129,7 +129,7 @@ class Application
 ///Обработчик старта приложения
     void StartupHandler ()
     {
-      try
+/*      try
       {
         startup_timer = new syslib::Timer (xtl::bind (&Application::StartupTimerHandler, this), STARTUP_MAIN_LOOP_DELAY);
       }
@@ -140,8 +140,35 @@ class Application
       catch (...)
       {
         printf ("unknown exception at engine::Application::StartupHandler\n");
-      }
+      }*/
+      try
+      {
+        startup_timer.reset ();
 
+          //запуск подсистем
+
+        manager.Start (configuration_name.c_str ());
+
+        if (need_print_version)
+          common::Console::Printf ("Application version: %s\n", VERSION);
+
+        if (need_print_help)
+          for (size_t i = 0, help_strings = sizeof (HELP) / sizeof (HELP[0]); i < help_strings; i++)
+            common::Console::Print (HELP [i]);
+
+          //если основного цикла нет - выход из приложения
+
+        if (!has_main_loop)
+          syslib::Application::Exit (0);
+      }
+      catch (std::exception& exception)
+      {
+        printf ("exception: %s\n", exception.what ());
+      }
+      catch (...)
+      {
+        printf ("unknown exception at engine::Application::StartupTimerHandler\n");
+      }      
     }
 
 ///Обработчик событий таймера запуска приложения
