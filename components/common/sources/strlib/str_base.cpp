@@ -18,7 +18,7 @@ inline string basename (const char* src,size_t len,string::allocator_type alloca
   for (const char* s=src+len;len--;)
     if (*--s == '.')
       return string (src,s-src,allocator);
-  
+
   return string (src,allocator);
 }
 
@@ -27,7 +27,7 @@ inline string suffix (const char* src,size_t len,string::allocator_type allocato
   for (const char* s=src+len;s!=src;)
     if (*--s == '.')
       return string (s,len-(s-src),allocator);
-  
+
   return string ("",allocator);
 }
 
@@ -36,7 +36,7 @@ inline string dir (const char* src,size_t len,string::allocator_type allocator)
   for (const char* s=src+len;len--;)
     if (*--s == '/')
       return string (src,s-src+1,allocator);
-  
+
   return string ("./",allocator);
 }
 
@@ -45,7 +45,7 @@ inline string notdir (const char* src,size_t len,string::allocator_type allocato
   for (const char* s=src+len;s!=src;)
     if (*--s == '/')
       return string (s+1,len-(s-src)-1,allocator);
-  
+
   return string (src,allocator);
 }
 
@@ -98,7 +98,7 @@ inline string compress (const char* src,size_t len,string::allocator_type alloca
 {
   string res (allocator);
   string::iterator dst;
-  
+
   res.fast_resize (len);
 
   for (dst=res.begin ();len--;src++,dst++)
@@ -122,33 +122,33 @@ inline string compress (const char* src,size_t len,string::allocator_type alloca
           case 'n': *dst = '\n'; break;
           case 'r': *dst = '\r'; break;
           case 't': *dst = '\t'; break;
-          default: 
+          default:
             *dst = *src;
             break;
         }
         break;
-      default: 
+      default:
         *dst = *src;
         break;
     }
   }
-    
-  res.fast_resize (dst-res.begin ()); 
-  
+
+  res.fast_resize (dst-res.begin ());
+
   return res;
 }
 
 inline string decompress (const char* src,size_t len,const char* exceptions,string::allocator_type allocator)
 {
-  string res (allocator);   
-  string::iterator dst;  
-  
+  string res (allocator);
+  string::iterator dst;
+
   res.fast_resize (len*4); //len * 4 - maximum new string size
-  
+
   unsigned char excmap [256];
-  
-  memset (excmap,0,sizeof (excmap));  
-  
+
+  memset (excmap,0,sizeof (excmap));
+
   if (exceptions)
     for (const unsigned char* i=(const unsigned char*)exceptions;*i;excmap [*i++]=1);
 
@@ -159,7 +159,7 @@ inline string decompress (const char* src,size_t len,const char* exceptions,stri
       *dst = *src;
       continue;
     }
-    
+
     switch (*src)
     {
       case '\b': *dst++ = '\\'; *dst = 'b';  break;
@@ -180,9 +180,9 @@ inline string decompress (const char* src,size_t len,const char* exceptions,stri
         else *dst = *src;
     }
   }
-  
+
   res.fast_resize (dst-res.begin ());
-  
+
   return res;
 }
 
@@ -215,34 +215,39 @@ namespace
 
 class WordParser
 {
-  public: 
+  public:
     WordParser (const char* string, const char* delimiters, const char* spaces, const char* brackets) : pos ((unsigned char*)string)
     {
-      for (; *delimiters; delimiters++) delimiters_map.set ((unsigned char)*delimiters);
-      for (; *spaces; spaces++)         space_map.set ((unsigned char)*spaces);
+      memset (delimiters_map, 0, sizeof (delimiters_map));
+      memset (space_map, 0, sizeof (space_map));
+      memset (open_brackets_map, 0, sizeof (open_brackets_map));
+      memset (close_brackets_map, 0, sizeof (close_brackets_map));
+
+      for (; *delimiters; delimiters++) delimiters_map [(unsigned char)*delimiters] = true;
+      for (; *spaces; spaces++)         space_map [(unsigned char)*spaces] = true;
 
       for (; brackets [0] && brackets [1]; brackets += 2)
       {
-        open_brackets_map.set ((unsigned char)brackets [0]);
-        close_brackets_map.set ((unsigned char)brackets [1]);
+        open_brackets_map [(unsigned char)brackets [0]] = true;
+        close_brackets_map [(unsigned char)brackets [1]] = true;
       }
 
-      delimiters_map.set ('\0');
-      close_brackets_map.set ('\0');
+      delimiters_map ['\0'] = true;
+      close_brackets_map ['\0'] = true;
     }
-    
+
     typedef stl::pair<const char*, const char*> Word;
-    
+
     Word NextWord ()
     {
       if (!*pos)
         return Word ((const char*)pos, (const char*)pos);
 
       for (; space_map [*pos]; pos++); //cut leading spaces
-      
+
       const unsigned char *first, *last;
       bool word_in_brackets = false;
-      
+
       if (open_brackets_map [*pos]) //found open bracket
       {
         first = ++pos;
@@ -253,17 +258,17 @@ class WordParser
 
         if (pos [0] && delimiters_map [pos [1]])
           ++pos;
-          
+
         word_in_brackets = true;
       }
       else
       {
         first = pos;
-        
+
         for (; !delimiters_map [*pos]; pos++);
-        
+
         last = pos;
-      }      
+      }
 
       if (*pos)
         pos++;
@@ -281,8 +286,11 @@ class WordParser
     bool EndOfString () const { return *pos == '\0'; }
 
   private:
-    bitset<256>    delimiters_map, space_map, open_brackets_map, close_brackets_map;
-    unsigned char* pos;  
+    typedef bool BoolMap [256];
+
+  private:
+    BoolMap        delimiters_map, space_map, open_brackets_map, close_brackets_map;
+    unsigned char* pos;
 };
 
 inline string word (const char* str, size_t word_index, const char* delimiters, const char* spaces, const char* brackets, string::allocator_type allocator)
@@ -291,7 +299,7 @@ inline string word (const char* str, size_t word_index, const char* delimiters, 
     return "";
 
   WordParser parser (str, delimiters, spaces, brackets);
-  
+
   WordParser::Word word;
 
   for (size_t i=0; i<=word_index; i++)
@@ -306,7 +314,7 @@ inline void split (const char* str, const char* delimiters, const char* spaces, 
     return;
 
   res.Reserve (8);
-  
+
   WordParser parser (str, delimiters, spaces, brackets);
 
   do
