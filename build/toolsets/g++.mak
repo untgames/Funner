@@ -16,7 +16,7 @@ LINKER_GCC           ?= g++
 LIB_GCC              ?= ar
 PROFILES             += g++ haswchar
 DEFAULT_LIBS         +=
-COMMON_CFLAGS        += -Os -Wno-format
+COMMON_CFLAGS        += -Os -Wall -Wno-format
 DISABLE_CPP_WARNINGS += -Wno-invalid-offsetof
 
 ###################################################################################################
@@ -24,7 +24,7 @@ DISABLE_CPP_WARNINGS += -Wno-invalid-offsetof
 #список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
 ###################################################################################################
 define tools.g++.c++compile
-$(call for_each_file,src,$1,echo $$src && $(COMPILER_GCC) -c -Wall -O7 $(COMMON_CFLAGS) $(if $(filter %.c,$1),,$(DISABLE_CPP_WARNINGS)) -o "$4/$$(basename $$src $${src##*.})o" $(patsubst %,-I "%",$2) $(patsubst %,-include "%",$3) $6 $(patsubst %,-D %,$5) $$src)
+$(call for_each_file,src,$1,echo $$src && $(COMPILER_GCC) -c $(COMMON_CFLAGS) $(if $(filter %.c,$1),,$(DISABLE_CPP_WARNINGS)) -o "$4/$$(basename $$src $${src##*.})o" $(patsubst %,-I "%",$2) $(patsubst %,-include "%",$3) $6 $(patsubst %,-D %,$5) $$src)
 endef
 
 ###################################################################################################
