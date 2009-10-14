@@ -232,8 +232,8 @@ class WordParser
         close_brackets_map [(unsigned char)brackets [1]] = true;
       }
 
-      delimiters_map ['\0'] = true;
-      close_brackets_map ['\0'] = true;
+      delimiters_map [(unsigned char)'\0'] = true;
+      close_brackets_map [(unsigned char)'\0'] = true;
     }
 
     typedef stl::pair<const char*, const char*> Word;

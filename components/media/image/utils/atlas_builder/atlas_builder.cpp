@@ -51,7 +51,7 @@ struct Option
   const char*   name;          //имя команды
   char          short_name;    //короткое имя
   const char*   argument_name; //имя аргумента
-  const char*   tip;           //подсказка    
+  const char*   tip;           //подсказка
 };
 
 typedef stl::vector<const char*> StringArray;
@@ -59,13 +59,13 @@ typedef stl::vector<const char*> StringArray;
 //параметры запуска
 struct Params
 {
-  const Option* options;          //массив опций  
+  const Option* options;          //массив опций
   size_t        options_count;    //количество опций
   StringArray   sources;          //имя исходных изображений
   stl::string   atlas_file_name;  //имя результирующего изображения
   stl::string   layout_file_name; //имя файла разметки
-  bool          silent;           //минимальное число сообщений  
-  bool          print_help;       //нужно ли печатать сообщение помощи  
+  bool          silent;           //минимальное число сообщений
+  bool          print_help;       //нужно ли печатать сообщение помощи
   bool          need_layout;      //нужно генерировать файл разметки
   bool          need_pot_rescale; //нужно ли масштабировать изображение к размерам кратным степени двойки
   bool          invert_x;         //инвертирование координаты X тайлов
@@ -197,7 +197,6 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {
       arg += LONG_OPTION_NAME_PREFIX_LENGTH;
       
-      const char* option_argument = 0;      
       const char* end_option_name = strchr (arg, '=');        
       
       if (end_option_name)
@@ -281,7 +280,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
       }            
     }
             
-      //получение аргумента                      
+      //получение аргумента
       
     for (;*arg; arg++)
     {
@@ -359,7 +358,7 @@ void build (Params& params)
 {
   try
   {
-      //конфигурирование построителя атласа      
+      //конфигурирование построителя атласа
       
     media::AtlasBuilder builder;
     media::Image        atlas_image;

@@ -133,8 +133,6 @@ SwapChainColorBuffer::SwapChainColorBuffer (const FrameBufferManagerPtr& manager
     buffer_type (GL_FRONT),
     is_shadow (true)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::SwapChainColorBuffer::SwapChainColorBuffer";
-
     //установка индекса буфера
     
   SwapChainDesc swap_chain_desc;

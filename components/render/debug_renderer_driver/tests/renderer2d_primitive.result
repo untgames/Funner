@@ -6,10 +6,10 @@ Create frame-buffer (id=3)
 Create 2D renderer (id=2)
 Create primitive (id=6)
 Primitive (size=4):
-sprite #0: position=[0 0 0] size=[1 0] color=[0 1 0 0] tex_offset=[0 0] tex_size=[1 1]
-sprite #1: position=[1 1 1] size=[1 1] color=[0 1 0 1] tex_offset=[0 0] tex_size=[1 1]
-sprite #2: position=[2 2 2] size=[1 4] color=[0 1 0 2] tex_offset=[0 0] tex_size=[1 1]
-sprite #3: position=[3 3 3] size=[1 9] color=[0 1 0 3] tex_offset=[0 0] tex_size=[1 1]
+sprite #0: position=[0 0 0] size=[1 0] color=[0 1 0 0] tex_offset=[0 0] tex_size=[0.5 0.5]
+sprite #1: position=[1 1 1] size=[1 1] color=[0 1 0 1] tex_offset=[0 0] tex_size=[0.5 0.5]
+sprite #2: position=[2 2 2] size=[1 4] color=[0 1 0 2] tex_offset=[0 0] tex_size=[0.5 0.5]
+sprite #3: position=[3 3 3] size=[1 9] color=[0 1 0 3] tex_offset=[0 0] tex_size=[0.5 0.5]
 Destroy primitive (id=6)
 Destroy 2D renderer (id=2)
 Destroy frame-buffer (id=3)

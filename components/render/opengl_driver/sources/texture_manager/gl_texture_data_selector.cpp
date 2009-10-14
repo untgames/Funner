@@ -5,11 +5,11 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 TextureDataSelector::TextureDataSelector (const TextureDesc& in_desc, const TextureData* in_data)
-  : images_count (0)
-  , format (in_desc.format)
+  : format (in_desc.format)
   , data (in_data)
   , data_size (0)
   , index (0)
+  , images_count (0)
   , offset (0)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::TextureDataSelector::TextureDataSelector";    

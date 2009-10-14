@@ -119,8 +119,6 @@ void ScaledTexture::Bind ()
 
 void ScaledTexture::ScaleImage (size_t width, size_t height, PixelFormat source_format, const void* buffer, Buffer& scaled_buffer, PixelFormat& scaled_format)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::ScaledTexture::ScaleImage";
-
   size_t scaled_width  = (size_t)ceil ((float)width * horisontal_scale),
          scaled_height = (size_t)ceil ((float)height * vertical_scale);
 

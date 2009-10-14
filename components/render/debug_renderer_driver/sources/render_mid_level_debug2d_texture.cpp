@@ -11,8 +11,8 @@ using namespace render::mid_level::debug::renderer2d;
 
 Texture::Texture (size_t width, size_t height, PixelFormat in_format)
   : RenderTarget (width, height, RenderTargetType_Color)
-  , format (in_format)
   , is_compressed (false)
+  , format (in_format)
 {
   switch (format)
   {
@@ -31,8 +31,8 @@ Texture::Texture (size_t width, size_t height, PixelFormat in_format)
 
 Texture::Texture (size_t width, size_t height, const char* in_format)
   : RenderTarget (width, height, RenderTargetType_Color)
-  , format (PixelFormat_RGBA8)
   , is_compressed (true)
+  , format (PixelFormat_RGBA8)
 {
   if (!in_format)
     throw xtl::make_null_argument_exception ("render::mid_level::debug::renderer2d::Texture::Texture", "format");

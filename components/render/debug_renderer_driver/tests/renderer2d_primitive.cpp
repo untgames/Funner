@@ -53,7 +53,7 @@ int main ()
       
       primitive->GetSprite (i, s);
            
-      printf ("sprite #%u: position=[%.0f %.0f %.0f] size=[%.0f %.0f] color=[%.0f %.0f %.0f %.0f] tex_offset=[%.0f %.0f] tex_size=[%.0f %.0f]\n",            
+      printf ("sprite #%u: position=[%.0f %.0f %.0f] size=[%.0f %.0f] color=[%.0f %.0f %.0f %.0f] tex_offset=[%.0f %.0f] tex_size=[%.1f %.1f]\n",
         i, s.position.x, s.position.y, s.position.z, s.size.x, s.size.y, s.color.x, s.color.y, s.color.z, s.color.w, 
         s.tex_offset.x, s.tex_offset.y, s.tex_size.x, s.tex_size.y);
     }    
