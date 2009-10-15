@@ -275,6 +275,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle window_style, WindowMessa
     throw xtl::format_operation_exception (METHOD_NAME, "Can't create window.");
 
   new_window.clearsContextBeforeDrawing = NO;
+  new_window.multipleTouchEnabled       = YES;
 
   WindowImpl* window_impl = new WindowImpl (handler, user_data, new_window);
 
