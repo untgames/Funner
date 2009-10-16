@@ -61,6 +61,7 @@ class MediaPlayer
     MediaPlayer  ();
     MediaPlayer  (const char* target_name);
     MediaPlayer  (const char* target_name, const char* stream_name);
+    MediaPlayer  (const char* target_name, const PlayList& list);
     MediaPlayer  (const MediaPlayer&);
     ~MediaPlayer ();
 
@@ -69,9 +70,8 @@ class MediaPlayer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Текущая цель проигрывания
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        BindToTarget     (const char* target_name);
-    void        UnbindFromTarget ();
-    const char* Target           () const; //имя цели проигрывания
+    void        SetTarget (const char* target_name);    
+    const char* Target    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Открытие / закрытие потока
@@ -88,7 +88,7 @@ class MediaPlayer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим повторения источников
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                  SetRepeatMode (StreamRepeatMode mode);
+    void                  SetRepeatMode (MediaPlayerRepeatMode mode);
     MediaPlayerRepeatMode RepeatMode    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

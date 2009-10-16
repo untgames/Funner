@@ -10,6 +10,19 @@ namespace player
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///События потока
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum StreamEvent
+{
+  StreamEvent_OnPlay,         //поток начал проигрываться
+  StreamEvent_OnPause,        //проигрывание потока приостановлено
+  StreamEvent_OnManualStop,   //проигрывание потока остановлено вручную
+  StreamEvent_OnAutoStop,     //проигрывание потока остановлено автоматически по окончании его проигрывания
+  
+  StreamEvent_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Интерфейс реализации проигрывателей медиа-потока
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class IStreamPlayer
@@ -33,13 +46,13 @@ class IStreamPlayer
 class StreamPlayerManager
 {
   public:
-    typedef xtl::function<void (StreamPlayerState)> StateChangeCallback;  
-    typedef xtl::function<IStreamPlayer* (const char* target_name, const char* source_name, const StateChangeCallback& callback)> PlayerCreater;
+    typedef xtl::function<void (IStreamPlayer*, StreamEvent)> StreamEventHandler;
+    typedef xtl::function<IStreamPlayer* (const char* target_name, const char* source_name, const StreamEventHandler& handler)> PlayerCreator;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация проигрывателей медиа-потоков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterPlayer       (const char* target, const PlayerCreater& creater);
+    static void RegisterPlayer       (const char* target, const PlayerCreator& creator);
     static void UnregisterPlayer     (const char* target);
     static void UnregisterAllPlayers ();
 };
