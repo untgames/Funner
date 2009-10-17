@@ -33,7 +33,7 @@ ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core \
 ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := link.render.low_level.opengl_driver link.engine.subsystems.window_input_driver \
                                              link.engine.subsystems.window_manager link.engine.subsystems.window_renderer
 ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := link.input.direct_input_driver
-ENGINE.FUNNER_LIBRARY.iphone.IMPORTS      := link.media.image.pvr
+ENGINE.FUNNER_LIBRARY.iphone.IMPORTS      := link.media.image.pvr link.input.iphone_driver 
 
 #Цель - win32 application
 ENGINE.LAUNCHER.SOURCES.TYPE                   := application
