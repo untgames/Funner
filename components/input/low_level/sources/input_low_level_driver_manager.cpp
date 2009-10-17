@@ -13,7 +13,7 @@
 using namespace input::low_level;
 using namespace common;
 
-const size_t DRIVER_ARRAY_RESERVE = 4; //резервируемый размер массива драйверов 
+const size_t DRIVER_ARRAY_RESERVE = 4; //резервируемый размер массива драйверов
 
 namespace input
 {
@@ -28,7 +28,10 @@ namespace low_level
 class DriverManagerImpl
 {
   public:
-    DriverManagerImpl () {drivers.reserve (DRIVER_ARRAY_RESERVE);}
+    DriverManagerImpl ()
+    {
+      drivers.reserve (DRIVER_ARRAY_RESERVE);
+    }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация драйверов
@@ -85,15 +88,17 @@ class DriverManagerImpl
 
 void DriverManagerImpl::RegisterDriver (const char* name, IDriver* driver)
 {
+  static const char* METHOD_NAME = "input::low_level::DriverManager::RegisterDriver";
+
   if (!name)
-    throw xtl::make_null_argument_exception ("input::low_level::DriverManager::RegisterDriver", "name");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
   if (!driver)
-    throw xtl::make_null_argument_exception ("input::low_level::DriverManager::RegisterDriver", "driver");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "driver");
 
-  if (FindDriver (name))
-    throw xtl::make_argument_exception ("input::low_level::DriverManager::RegisterDriver", "name", name,
-                          "Driver with this name has been already registered");
+  for (DriverArray::iterator i = drivers.begin (); i != drivers.end (); ++i)
+    if (i->name == name)
+      throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Driver with this name has been already registered");
 
   drivers.push_back (InputDriver (driver, name));
 }
