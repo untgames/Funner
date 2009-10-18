@@ -222,6 +222,10 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
 
   ~Impl ()
   {
+    text_field.delegate = nil;
+
+    [text_field_listener release];
+
     try
     {
       HideKeyboard ();
@@ -232,7 +236,6 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
     }
 
     [text_field release];
-    [text_field_listener release];
   }
 
   void ShowKeyboard ()

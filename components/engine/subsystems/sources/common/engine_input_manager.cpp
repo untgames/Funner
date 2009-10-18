@@ -78,13 +78,8 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
         {
           try
           {
-            DevicePtr current_device (current_driver->CreateDevice (current_driver->GetDeviceName (j)), false);
-
-            stl::string profile (attachment_name);
-
-            profile += '.';
-            profile += current_device->GetFullName ();
-
+            const char* device_full_name     = current_driver->GetDeviceFullName (j);
+            stl::string profile              = common::format("%s.%s", attachment_name, device_full_name);
             const char* translation_map_name = translation_map_registry.FindNearest (profile.c_str ());
 
             if (!translation_map_name)
@@ -99,13 +94,15 @@ class InputManagerSubsystem: public ISubsystem, public IAttachmentRegistryListen
             else
               device_entry->translation_map = translation_map_iter->second;
 
-            DevicesMap::iterator device_iter = devices.find (current_device->GetFullName ());
+            DevicesMap::iterator device_iter = devices.find (device_full_name);
 
             if (device_iter == devices.end ())
             {
+              DevicePtr current_device (current_driver->CreateDevice (current_driver->GetDeviceName (j)), false);
+
               device_entry->device = DeviceHolderPtr (new DeviceHolder (current_device.get (), devices), false);
 
-              DevicesProperties::iterator devices_properties_iter = devices_properties.find (current_device->GetFullName ());
+              DevicesProperties::iterator devices_properties_iter = devices_properties.find (device_full_name);
 
               if (devices_properties_iter != devices_properties.end ())
               {

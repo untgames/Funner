@@ -44,6 +44,6 @@ export.link.engine.script_binds.system.LINK_INCLUDES := SystemScriptBind
 export.link.engine.script_binds.system.IMPORTS       := link.engine.script_binds link.system
 
 # Link iphone exports
-export.link.engine.script_binds.iphone.iphone.LINK_INCLUDES := HardwareAudioPlayerScriptBind VirtualKeyboardScriptBind
-export.link.engine.script_binds.iphone.iphone.LINK_FLAGS    := -framework AVFoundation -framework UIKit
+export.link.engine.script_binds.iphone.iphone.LINK_INCLUDES := HardwareAudioPlayerScriptBind
+export.link.engine.script_binds.iphone.iphone.LINK_FLAGS    := -framework AVFoundation
 export.link.engine.script_binds.iphone.IMPORTS              := link.engine.script_binds
