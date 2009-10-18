@@ -23,7 +23,8 @@ using namespace input;
 using namespace input::low_level;
 using namespace common;
 
-const char* TEST_DEVICE_NAME = "TestInput";
+const char* TEST_DEVICE_NAME      = "TestInput";
+const char* TEST_DEVICE_FULL_NAME = "type.TestInput.1c4a1-9f2-21-aa0c";
 const char* EVENTS [] = {
   "MouseX axis 0.7",
   "", 
@@ -45,7 +46,7 @@ class TestInput: virtual public IDevice, public xtl::reference_counter
     const char* GetName () { return TEST_DEVICE_NAME; }
 
 ///Полное имя устройства (тип.имя.идентификатор)
-    const char* GetFullName () { return "type.TestInput.1c4a1-9f2-21-aa0c"; };
+    const char* GetFullName () { return TEST_DEVICE_FULL_NAME; };
 
 ///Получение имени контрола
     const wchar_t* GetControlName (const char* control_id)
@@ -108,9 +109,15 @@ class TestDriver: virtual public IDriver, public xtl::reference_counter
     {
       return 1;
     }
+
     const char* GetDeviceName (size_t index)
     {
       return TEST_DEVICE_NAME;
+    }
+
+    const char* GetDeviceFullName (size_t index)
+    {
+      return TEST_DEVICE_FULL_NAME;
     }
 
 ///Создаение устройства ввода

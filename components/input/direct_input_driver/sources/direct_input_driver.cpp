@@ -149,6 +149,14 @@ class Driver: virtual public IDriver, public xtl::reference_counter
       return device_entries[index]->device_name.c_str ();
     }
 
+    const char* GetDeviceFullName (size_t index)
+    {
+      if (index >= GetDevicesCount ())
+        throw xtl::make_range_exception ("input::low_level::direct_input_driver::Driver::GetDeviceFullName", "index", index, 0u, GetDevicesCount ());
+
+      return device_entries[index]->device_full_name.c_str ();
+    }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создаение устройства ввода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,7 +171,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
         init_string = "";
 
       for (DeviceEntries::iterator iter = device_entries.begin (), end = device_entries.end (); iter != end; ++iter)
-        if (!strcmp ((*iter)->device_name.c_str (), name))
+        if (!xtl::xstrcmp ((*iter)->device_name.c_str (), name))
         {
           HRESULT create_result;
 
@@ -174,7 +182,7 @@ class Driver: virtual public IDriver, public xtl::reference_counter
           if (create_result != DI_OK)
             throw xtl::format_operation_exception (METHOD_NAME, "Can't create direct input device, error '%s'", get_direct_input_error_name (create_result));
 
-          return new OtherDevice (&dummy_window, name, device_interface, (*iter)->device_guid, log_fn, get_device_type_name ((*iter)->device_type), init_string);
+          return new OtherDevice (&dummy_window, name, (*iter)->device_full_name.c_str (), device_interface, log_fn, get_device_type_name ((*iter)->device_type), init_string);
         }
 
       throw xtl::make_argument_exception (METHOD_NAME, "name", name);
@@ -202,9 +210,18 @@ class Driver: virtual public IDriver, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация устройства ввода по имени устройства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterDevice (const char* device_name, REFGUID device_guid)
+    void RegisterDevice (const char* device_name, REFGUID guid)
     {
-      direct_input_device_entries.push_back (DirectInputDeviceEntry (device_name, device_guid, current_device_type));
+      try
+      {
+        stl::string full_name = common::format ("%s.%s.%x-%x-%x-%x", get_device_type_name (current_device_type), device_name, ((size_t*)&guid)[0], ((size_t*)&guid)[1], ((size_t*)&guid)[2], ((size_t*)&guid)[3]);
+
+        device_entries.push_back (DeviceEntryPtr (new DeviceEntry (device_name, full_name.c_str (), guid, current_device_type), false));
+      }
+      catch (...)
+      {
+        //подавление исключений
+      }
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,11 +240,6 @@ class Driver: virtual public IDriver, public xtl::reference_counter
 
       current_device_type = DirectInputDeviceType_Other;
       direct_input_interface->EnumDevices (DI8DEVCLASS_DEVICE, &enum_devices_callback, this, DIEDFL_ATTACHEDONLY);
-
-      for (DirectInputDeviceEntries::iterator iter = direct_input_device_entries.begin (), end = direct_input_device_entries.end (); iter != end; ++iter)
-        device_entries.push_back (DeviceEntryPtr (new DeviceEntry (iter->device_name.c_str (), iter->device_guid, iter->device_type)));
-
-      direct_input_device_entries.clear ();
     }
 
   private:
@@ -241,39 +253,27 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     }
 
   private:
-    struct DirectInputDeviceEntry
-    {
-      stl::string           device_name;
-      GUID                  device_guid;
-      DirectInputDeviceType device_type;
-
-      DirectInputDeviceEntry (const char* in_device_name, const GUID& in_device_guid, DirectInputDeviceType in_device_type)
-        : device_name (in_device_name), device_guid (in_device_guid), device_type (in_device_type)
-        {}
-    };
-
     struct DeviceEntry : public xtl::reference_counter
     {
       stl::string           device_name;
+      stl::string           device_full_name;
       GUID                  device_guid;
       DirectInputDeviceType device_type;
 
-      DeviceEntry (const char* in_device_name, const GUID& in_device_guid, DirectInputDeviceType in_device_type)
-        : device_name (in_device_name), device_guid (in_device_guid), device_type (in_device_type)
+      DeviceEntry (const char* in_device_name, const char* in_device_full_name, const GUID& in_device_guid, DirectInputDeviceType in_device_type)
+        : device_name (in_device_name), device_full_name (in_device_full_name), device_guid (in_device_guid), device_type (in_device_type)
         {}
     };
 
     typedef xtl::intrusive_ptr<DeviceEntry>     DeviceEntryPtr;
     typedef stl::vector<DeviceEntryPtr>         DeviceEntries;
-    typedef stl::vector<DirectInputDeviceEntry> DirectInputDeviceEntries;
 
   private:
-    DirectInputDeviceEntries direct_input_device_entries;
-    DeviceEntries            device_entries;
-    LogHandler               log_fn;
-    IDirectInput8            *direct_input_interface;  
-    DirectInputDeviceType    current_device_type;
-    syslib::Window           dummy_window;
+    DeviceEntries         device_entries;
+    LogHandler            log_fn;
+    IDirectInput8         *direct_input_interface;
+    DirectInputDeviceType current_device_type;
+    syslib::Window        dummy_window;
 };
 
 }

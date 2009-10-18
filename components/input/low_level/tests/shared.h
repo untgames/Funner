@@ -115,9 +115,16 @@ class TestDriver: virtual public IDriver, public xtl::reference_counter
       throw xtl::make_not_implemented_exception ("TestDriver::GetDevicesCount");
       return 0;
     }
+
     const char* GetDeviceName (size_t index)
     {
       throw xtl::make_not_implemented_exception ("TestDriver::GetDeviceName");
+      return 0;
+    }
+
+    const char* GetDeviceFullName (size_t index)
+    {
+      throw xtl::make_not_implemented_exception ("TestDriver::GetDeviceFullName");
       return 0;
     }
 

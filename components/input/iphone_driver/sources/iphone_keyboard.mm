@@ -13,8 +13,6 @@ namespace
 const size_t MESSAGE_BUFFER_SIZE = 16;
 const float  EPSILON             = 0.01f;
 
-const char* DEVICE_NAME          = "iphone_keyboard";
-const char* DEVICE_FULL_NAME     = "keyboard.iphone_keyboard";
 const char* ORIENTATION_PROPERTY = "Orientation";
 
 const char* PROPERTIES [] = {
@@ -178,8 +176,8 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
   TextFieldListener *text_field_listener;  //слушатель сообщений текстового пол€
 
   /// онструктор / деструктор
-  Impl ()
-    : text_field (0), text_field_listener (0)
+  Impl (const char* in_name, const char* in_full_name)
+    : name (in_name), full_name (in_full_name), text_field (0), text_field_listener (0)
   {
     try
     {
@@ -267,8 +265,8 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
     онструктор/деструктор
 */
 
-IPhoneKeyboard::IPhoneKeyboard ()
-  : impl (new Impl)
+IPhoneKeyboard::IPhoneKeyboard (const char* name, const char* full_name)
+  : impl (new Impl (name, full_name))
   {}
 
 IPhoneKeyboard::~IPhoneKeyboard ()
@@ -282,7 +280,7 @@ IPhoneKeyboard::~IPhoneKeyboard ()
 
 const char* IPhoneKeyboard::GetName ()
 {
-  return DEVICE_NAME;
+  return impl->name.c_str ();
 }
 
 /*
@@ -291,7 +289,7 @@ const char* IPhoneKeyboard::GetName ()
 
 const char* IPhoneKeyboard::GetFullName ()
 {
-  return DEVICE_FULL_NAME;
+  return impl->full_name.c_str ();
 }
 
 /*

@@ -56,7 +56,7 @@ class OtherDevice: virtual public input::low_level::IDevice, public xtl::referen
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    OtherDevice (syslib::Window* window, const char* name, IDirectInputDevice8* direct_input_device_interface, REFGUID rguid, 
+    OtherDevice (syslib::Window* window, const char* name, const char* full_name, IDirectInputDevice8* direct_input_device_interface,
                  const DebugLogHandler& debug_log_handler, const char* device_type, const char* init_string = "");
     ~OtherDevice ();
 

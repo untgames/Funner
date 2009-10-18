@@ -47,9 +47,9 @@ struct Device::Impl : public IWindowListener, public IApplicationListener
   char                         message [MESSAGE_BUFFER_SIZE]; //сообщение
 
   ///Конструктор / деструктор
-  Impl (syslib::Window* in_window, const char* in_name)
+  Impl (syslib::Window* in_window, const char* in_name, const char* in_full_name)
     : name (in_name)
-    , full_name ("window")
+    , full_name (in_full_name)
     , accelerometer_update_interval (DEFAULT_ACCELEROMETER_UPDATE_INTERVAL)
     , window (in_window)
   {
@@ -70,12 +70,6 @@ struct Device::Impl : public IWindowListener, public IApplicationListener
     {
       exception.touch ("input::low_level::window::Device::Device");
       throw;
-    }
-
-    if (!name.empty ())
-    {
-      full_name += '.';
-      full_name += name;
     }
 
     attach_window_listener      (*window, this);
@@ -171,8 +165,8 @@ struct Device::Impl : public IWindowListener, public IApplicationListener
    Конструктор/деструктор
 */
 
-Device::Device (syslib::Window* window, const char* name)
-  : impl (new Impl (window, name))
+Device::Device (syslib::Window* window, const char* name, const char* full_name)
+  : impl (new Impl (window, name, full_name))
 {
 }
 

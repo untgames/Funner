@@ -8,9 +8,15 @@ namespace
 const char* COMPONENT_NAME = "input.low_level.iphone"; //имя компонента
 const char* DRIVER_NAME    = "IPhone";                 //имя драйвера
 
-const char* KEYBOARD_DEVICE_NAME = "Keyboard";
+struct DeviceDesc
+{
+  const char* name;
+  const char* full_name;
+};
 
-const char* SUPPORTED_DEVICES [] = { KEYBOARD_DEVICE_NAME };
+const DeviceDesc KEYBOARD_DEVICE_DESC = { "iphone_keyboard", "keyboard.iphone_keyboard" };
+
+const DeviceDesc SUPPORTED_DEVICES [] = { KEYBOARD_DEVICE_DESC };
 
 }
 
@@ -59,7 +65,15 @@ class Driver: virtual public IDriver, public xtl::reference_counter
       if (index >= GetDevicesCount ())
         throw xtl::make_range_exception ("input::low_level::iphone_driver::Driver::GetDeviceName", "index", index, 0u, GetDevicesCount ());
 
-      return SUPPORTED_DEVICES [index];
+      return SUPPORTED_DEVICES [index].name;
+    }
+
+    const char* GetDeviceFullName (size_t index)
+    {
+      if (index >= GetDevicesCount ())
+        throw xtl::make_range_exception ("input::low_level::iphone_driver::Driver::GetDeviceFullName", "index", index, 0u, GetDevicesCount ());
+
+      return SUPPORTED_DEVICES [index].full_name;
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,10 +93,10 @@ class Driver: virtual public IDriver, public xtl::reference_counter
       {
         const char* device_name = GetDeviceName (i);
 
-        if (!strcmp (device_name, name))
+        if (!xtl::xstrcmp (device_name, name))
         {
-          if (!strcmp (device_name, KEYBOARD_DEVICE_NAME))
-            return new IPhoneKeyboard ();
+          if (!xtl::xstrcmp (device_name, KEYBOARD_DEVICE_DESC.name))
+            return new IPhoneKeyboard (KEYBOARD_DEVICE_DESC.name, KEYBOARD_DEVICE_DESC.full_name);
         }
       }
 

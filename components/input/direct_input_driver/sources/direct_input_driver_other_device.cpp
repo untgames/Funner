@@ -140,12 +140,13 @@ BOOL FAR PASCAL enum_object_callback (LPCDIDEVICEOBJECTINSTANCEA object_instance
 OtherDevice::OtherDevice
  (Window*                window,
   const char*            in_name,
+  const char*            in_full_name,
   IDirectInputDevice8*   in_direct_input_device_interface,
-  REFGUID                rguid,
   const DebugLogHandler& in_debug_log_handler,
   const char*            device_type,
   const char*            init_string)
   : name (in_name),
+    full_name (in_full_name),
     device_interface (in_direct_input_device_interface, false),
     poll_timer (xtl::bind (&OtherDevice::PollDevice, this), 10),
     device_lost (false),
@@ -261,8 +262,6 @@ OtherDevice::OtherDevice
     if (iter->second.type == ObjectType_RelativeAxis)
       AddProperty (".sensitivity", iter, ObjectPropertyType_Sensitivity, 1.f);
   }
-
-  full_name = common::format ("%s.%s.%x-%x-%x-%x", device_type, in_name, ((size_t*)&rguid)[0], ((size_t*)&rguid)[1], ((size_t*)&rguid)[2], ((size_t*)&rguid)[3]);
 
   xtl::uninitialized_storage<char> initial_device_data (device_data_size);
 

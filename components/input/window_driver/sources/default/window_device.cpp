@@ -47,9 +47,9 @@ struct Device::Impl : private xtl::trackable
   stl::wstring                 control_name;                 //имя контрола
 
   ///Конструктор
-  Impl (Window* window, const char* in_name)
+  Impl (Window* window, const char* in_name, const char* in_full_name)
     : name (in_name)
-    , full_name ("window")
+    , full_name (in_full_name)
     , x_cursor_pos (window->CursorPosition ().x)
     , y_cursor_pos (window->CursorPosition ().y)
     , mouse_in_window (false)
@@ -106,12 +106,6 @@ struct Device::Impl : private xtl::trackable
     {
       exception.touch ("input::low_level::window::Device::Device");
       throw;
-    }
-
-    if (!name.empty ())
-    {
-      full_name += '.';
-      full_name += name;
     }
   }
 
@@ -327,8 +321,8 @@ struct Device::Impl : private xtl::trackable
    Конструктор/деструктор
 */
 
-Device::Device (Window* window, const char* name)
-  : impl (new Impl (window, name))
+Device::Device (Window* window, const char* name, const char* full_name)
+  : impl (new Impl (window, name, full_name))
 {
 }
 

@@ -4,15 +4,6 @@ using namespace common;
 using namespace stl;
 using namespace syslib;
 
-namespace
-{
-
-void default_log_handler (const char*)
-{
-}
-
-}
-
 namespace input
 {
 
@@ -28,7 +19,7 @@ namespace window
 class Driver: virtual public IDriver, public xtl::reference_counter
 {
   public:
-    Driver () : log_fn (&default_log_handler) {}
+    Driver () {}
 
     ~Driver ()
     {
@@ -57,14 +48,22 @@ class Driver: virtual public IDriver, public xtl::reference_counter
       return device_entries[index]->device_name.c_str ();
     }
 
+    const char* GetDeviceFullName (size_t index)
+    {
+      if (index >= GetDevicesCount ())
+        throw xtl::make_range_exception ("input::low_level::window::Driver::GetDeviceFullName", "index", index, 0u, GetDevicesCount ());
+
+      return device_entries[index]->device_full_name.c_str ();
+    }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создаение устройства ввода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     IDevice* CreateDevice (const char* name, const char*)
     {
       for (DeviceEntries::iterator iter = device_entries.begin (), end = device_entries.end (); iter != end; ++iter)
-        if (!strcmp ((*iter)->device_name.c_str (), name))
-          return new Device ((*iter)->window, name);
+        if (!xtl::xstrcmp ((*iter)->device_name.c_str (), name))
+          return new Device ((*iter)->window, name, (*iter)->device_full_name.c_str ());
 
       throw xtl::make_argument_exception ("input::low_level::window::Driver::CreateDevice", "name", name);
     }
@@ -99,7 +98,15 @@ class Driver: virtual public IDriver, public xtl::reference_counter
 
       xtl::auto_connection c = window.RegisterEventHandler (WindowEvent_OnDestroy, xtl::bind (&Driver::DestroyWindowHandler, this, _1, _2, _3));
 
-      device_entries.push_back (DeviceEntryPtr (new DeviceEntry (device_name, &window, c), false));
+      string device_full_name = "window";
+
+      if (xtl::xstrlen (device_name))
+      {
+        device_full_name += '.';
+        device_full_name += device_name;
+      }
+
+      device_entries.push_back (DeviceEntryPtr (new DeviceEntry (device_name, device_full_name.c_str (), &window, c), false));
 
       if (device_entries.size () == 1)
         DriverManager::RegisterDriver (GetDescription (), this);
@@ -154,11 +161,12 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     struct DeviceEntry: public xtl::reference_counter
     {
       string               device_name;
+      string               device_full_name;
       Window*              window;
       xtl::auto_connection on_window_destroy_connection;
 
-      DeviceEntry (const char* in_device_name, Window* in_window, xtl::connection& in_connection)
-        : device_name (in_device_name), window (in_window)
+      DeviceEntry (const char* in_device_name, const char* in_device_full_name, Window* in_window, xtl::connection& in_connection)
+        : device_name (in_device_name), device_full_name (in_device_full_name), window (in_window)
       {
         on_window_destroy_connection.swap (in_connection);
       }
