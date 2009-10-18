@@ -202,8 +202,6 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
       if (!text_field)
         throw xtl::format_operation_exception ("", "Can't create needed text field");
 
-      text_field.keyboardType = UIKeyboardTypeASCIICapable;
-
       [[UIApplication sharedApplication].keyWindow addSubview:text_field];
 
       text_field_listener = [[TextFieldListener alloc] initWithTextField:text_field listener:this];
