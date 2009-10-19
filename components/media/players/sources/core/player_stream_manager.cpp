@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace media::player;
+using namespace media::players;
 
 namespace
 {
@@ -17,7 +17,7 @@ class StreamPlayerManagerImpl
 ///Регистрация проигрывателя медиа-потоков
     void RegisterPlayer (const char* target, const PlayerCreator& creator)
     {
-      static const char* METHOD_NAME = "media::player::StreamPlayerManagerImpl::RegisterPlayer";
+      static const char* METHOD_NAME = "media::players::StreamPlayerManagerImpl::RegisterPlayer";
       
       if (!target)
         throw xtl::make_null_argument_exception (METHOD_NAME, "target");
@@ -46,7 +46,7 @@ class StreamPlayerManagerImpl
     }
     
 ///Создание проигрывателя медиа-потока
-    IStreamPlayer* CreatePlayer (const char* target, const char* stream_name, const StreamManager::StreamEventHandler& handler)
+    IStreamPlayer* CreatePlayer (const char* target, const char* stream_name, const StreamPlayerManager::StreamEventHandler& handler)
     {
       try
       {
@@ -65,7 +65,7 @@ class StreamPlayerManagerImpl
       }
       catch (xtl::exception& e)
       {
-        e.touch ("media::player::StreamPlayerManagerImpl::CreatePlayer");
+        e.touch ("media::players::StreamPlayerManagerImpl::CreatePlayer");
         throw;
       }
     }
@@ -106,8 +106,7 @@ namespace media
 namespace player
 {
 
-
-IStreamPlayer* create_player (const char* target, const char* stream_name, const StreamManager::StreamEventHandler& handler)
+IStreamPlayer* create_stream_player (const char* target, const char* stream_name, const StreamPlayerManager::StreamEventHandler& handler)
 {
   return StreamPlayerSingleton::Instance ()->CreatePlayer (target, stream_name, handler);
 }

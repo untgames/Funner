@@ -1,12 +1,14 @@
 #ifndef MEDIALIB_PLAYER_MEDIA_PLAYER_HEADER
 #define MEDIALIB_PLAYER_MEDIA_PLAYER_HEADER
 
+#include <stl/auto_ptr.h>
+
 #include <xtl/functional_fwd>
 
 namespace media
 {
 
-namespace player
+namespace players
 {
 
 //forward declarations
@@ -29,10 +31,9 @@ enum MediaPlayerState
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum MediaPlayerRepeatMode
 {
-  MediaPlayerRepeatMode_Off,     //повторение проигрывани€ потоков выключено
-  MediaPlayerRepeatMode_Current, //повтор€етс€ текущий выбранный поток
-  MediaPlayerRepeatMode_Last,    //повтор€етс€ последний выбранный поток в списке проигрывани€
-  MediaPlayerRepeatMode_All,     //повтор€етс€ весь список проигрывани€
+  MediaPlayerRepeatMode_Off,  //повторение проигрывани€ потоков выключено
+  MediaPlayerRepeatMode_Last, //повтор€етс€ последний выбранный поток в списке проигрывани€
+  MediaPlayerRepeatMode_All,  //повтор€етс€ весь список проигрывани€
 
   MediaPlayerRepeatMode_Num
 };
@@ -42,9 +43,12 @@ enum MediaPlayerRepeatMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum MediaPlayerEvent
 {
-  MediaPlayerEvent_OnChangeTrack,    //переключен трек
-  MediaPlayerEvent_OnChangePlayback, //изменены настройки проигрывани€ (play / pause / stop / position)
-  MediaPlayerEvent_OnChangeVolume,   //изменены настройки громкости
+  MediaPlayerEvent_OnChangeTarget,     //изменена цель проигрывани€
+  MediaPlayerEvent_OnChangePlayList,   //изменЄн список проигрывани€
+  MediaPlayerEvent_OnChangeTrack,      //переключен трек
+  MediaPlayerEvent_OnChangePlayback,   //изменены настройки проигрывани€ (play / pause / stop / position)
+  MediaPlayerEvent_OnChangeVolume,     //изменены настройки громкости
+  MediaPlayerEvent_OnChangeRepeatMode, //изменЄн режим повторени€ песен
   
   MediaPlayerEvent_Num
 };
@@ -62,10 +66,7 @@ class MediaPlayer
     MediaPlayer  (const char* target_name);
     MediaPlayer  (const char* target_name, const char* stream_name);
     MediaPlayer  (const char* target_name, const PlayList& list);
-    MediaPlayer  (const MediaPlayer&);
     ~MediaPlayer ();
-
-    MediaPlayer& operator = (const MediaPlayer&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///“екуща€ цель проигрывани€
@@ -98,7 +99,7 @@ class MediaPlayer
     size_t      Track    () const;             //текущий трек
     const char* Source   (size_t track) const; //им€ трека    
     const char* Source   () const;             //им€ прогрываемого трека
-    float       Duration (size_t tack);        //длительность трека
+    float       Duration (size_t tack) const;  //длительность трека
     float       Duration () const;             //длительность проигрываемого трека
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -137,24 +138,18 @@ class MediaPlayer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќповещени€ о событи€х плеера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (MediaPlayer&)> EventHandler;
+    typedef xtl::function<void (MediaPlayer&, MediaPlayerEvent)> EventHandler;
 
-    xtl::connection RegisterEventHandler (MediaPlayerEvent event, const EventHandler& handler);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///ќбмен
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Swap (MediaPlayer&);
+    xtl::connection RegisterEventHandler (MediaPlayerEvent event, const EventHandler& handler) const;
+    
+  private:
+    MediaPlayer  (const MediaPlayer&); //no impl
+    MediaPlayer& operator = (const MediaPlayer&); //no impl
 
   private:
     struct Impl;
-    Impl* impl;    
+    stl::auto_ptr<Impl> impl;    
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///ќбмен
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void swap (MediaPlayer&, MediaPlayer&);
 
 }
 
