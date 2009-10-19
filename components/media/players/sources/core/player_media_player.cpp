@@ -24,8 +24,9 @@ typedef xtl::signal<void (MediaPlayer&, MediaPlayerEvent)> MediaPlayerSignal;
 struct MediaPlayer::Impl
 {
   MediaPlayer&                            owner;                          //владелец
+  stl::string                             name;                           //им€ проигрывател€
   stl::string                             target_name;                    //им€ цели проигрывани€
-  PlayList                                list;                           //список воспроизведени€
+  media::players::PlayList                list;                           //список воспроизведени€
   StreamArray                             streams;                        //проигрыватели потоков
   StreamPlayerManager::StreamEventHandler callback_handler;               //обработчик изменени€ состо€ни€ проигрываемых потоков
   size_t                                  current_track;                  //текущий трек
@@ -43,18 +44,19 @@ struct MediaPlayer::Impl
     , current_track_state (MediaPlayerState_Stopped)
     , is_muted (false)
     , volume (1.0f)
+    , repeat_mode (MediaPlayerRepeatMode_Off)
   {
   }  
   
 ///—оздание проигрывателей потоков
-  void UpdatePlayList (const PlayList& in_play_list)
+  void UpdatePlayList (const media::players::PlayList& in_play_list)
   {
     try
     {
       static common::ComponentLoader loader (COMPONENT_MASK);
       
-      StreamArray new_streams;
-      PlayList    new_play_list = in_play_list.Id () == list.Id () ? list : in_play_list.Clone ();      
+      StreamArray              new_streams;
+      media::players::PlayList new_play_list = in_play_list.Id () == list.Id () ? list : in_play_list.Clone ();      
 
       new_streams.reserve (new_play_list.Size ());
 
@@ -71,9 +73,12 @@ struct MediaPlayer::Impl
       
       streams.swap (new_streams);
       
-      list = new_play_list;
+      bool is_closed = list.IsEmpty ();
       
-      Notify (MediaPlayerEvent_OnChangePlayList);
+      list = new_play_list;
+            
+      if (!is_closed || !list.IsEmpty ())
+        Notify (MediaPlayerEvent_OnChangePlayList);
     }
     catch (xtl::exception& e)
     {
@@ -86,7 +91,7 @@ struct MediaPlayer::Impl
   {
     try
     {
-      PlayList new_play_list;
+      media::players::PlayList new_play_list;
       
       new_play_list.AddSource (stream_name);
       
@@ -121,7 +126,7 @@ struct MediaPlayer::Impl
       if (current_track >= streams.size ())
         return;
         
-      if (stream_player != CurrentStream ().get ())
+      if (stream_player != CurrentStream ().get () || !stream_player)
         return;
         
       switch (event)
@@ -139,6 +144,8 @@ struct MediaPlayer::Impl
         {
           current_track_state = MediaPlayerState_Stopped;
           
+          stream_player->SetPosition (0.0f);
+          
           size_t track = current_track + 1;
           
           if (track >= streams.size ())
@@ -148,7 +155,7 @@ struct MediaPlayer::Impl
             switch (repeat_mode)
             {
               case MediaPlayerRepeatMode_Off:
-                Notify (MediaPlayerEvent_OnChangeTrack);
+                Notify (MediaPlayerEvent_OnChangePlayback);
                 return;
               case MediaPlayerRepeatMode_Last:
                 break;
@@ -186,7 +193,7 @@ struct MediaPlayer::Impl
   {
     try
     {
-      if (event < 0 || event >= MediaPlayerEvent_Num)
+      if (event < 0 || event >= MediaPlayerEvent_Num || signals [event].empty ())
         return;
 
       signals [event](owner, event);
@@ -246,7 +253,7 @@ MediaPlayer::MediaPlayer (const char* target_name, const char* stream_name)
   }
 }
 
-MediaPlayer::MediaPlayer (const char* target_name, const PlayList& list) 
+MediaPlayer::MediaPlayer (const char* target_name, const media::players::PlayList& list) 
   : impl (new Impl (*this))
 {
   try
@@ -270,6 +277,24 @@ MediaPlayer::~MediaPlayer ()
   Close ();
 }
 
+/*
+    »м€
+*/
+
+void MediaPlayer::SetName (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("media::players::MediaPlayer::SetName", "name");
+    
+  impl->name = name;
+  
+  impl->Notify (MediaPlayerEvent_OnChangeName);
+}
+
+const char* MediaPlayer::Name () const
+{
+  return impl->name.c_str ();
+}
 
 /*
     “екуща€ цель проигрывани€
@@ -335,7 +360,7 @@ void MediaPlayer::Open (const char* stream_name)
   }
 }
 
-void MediaPlayer::Open (const PlayList& list)
+void MediaPlayer::Open (const media::players::PlayList& list)
 {
   try
   {
@@ -354,10 +379,13 @@ void MediaPlayer::Close ()
 {
   try
   {
+    bool is_closed = impl->streams.empty ();
+  
     switch (impl->current_track_state)
     {
       case MediaPlayerState_Playing:
       case MediaPlayerState_Paused:
+      
         try
         {
           Stop ();
@@ -365,6 +393,7 @@ void MediaPlayer::Close ()
         catch (...)
         {
         }
+        
         break;
       case MediaPlayerState_Stopped:
       default:
@@ -377,12 +406,25 @@ void MediaPlayer::Close ()
     impl->streams.clear ();
     impl->list.Clear ();
     
-    impl->Notify (MediaPlayerEvent_OnChangePlayList);
+    if (!is_closed)
+    {      
+      impl->Notify (MediaPlayerEvent_OnChangePlayList);
+      impl->Notify (MediaPlayerEvent_OnChangeTrack);
+    }
   }
   catch (...)
   {
     //подавление всех исключений
   }
+}
+
+/*
+        —писок проигрывани€
+*/
+
+const media::players::PlayList MediaPlayer::PlayList () const
+{
+  return impl->list;
 }
 
 /*
@@ -403,7 +445,7 @@ void MediaPlayer::SetRepeatMode (MediaPlayerRepeatMode mode)
   static const char* METHOD_NAME = "media::players::MediaPlayer::SetRepeatMode";
   
   if (mode < 0 || mode >= MediaPlayerRepeatMode_Num)
-    throw xtl::make_argument_exception (METHOD_NAME, "mode", mode);
+    throw xtl::make_argument_exception (METHOD_NAME, "mode", mode);      
 
   impl->repeat_mode = mode;
 
@@ -428,11 +470,13 @@ void MediaPlayer::SetTrack (size_t track)
       throw xtl::make_range_exception ("", "track", track, impl->streams.size ());
       
     MediaPlayerState state = State ();
-      
+
     Stop ();
-    
+
     impl->current_track = track;
-    
+
+    impl->Notify (MediaPlayerEvent_OnChangeTrack);
+
     switch (state)
     {
       case MediaPlayerState_Playing:
@@ -569,9 +613,10 @@ void MediaPlayer::Play ()
         break;
       case MediaPlayerState_Stopped:
       {
-        StreamPtr stream = impl->CurrentStream ();
+        StreamPtr stream = impl->CurrentStream ();                
 
         stream->SetVolume (impl->volume);
+        stream->SetLooping (impl->current_track == impl->streams.size () - 1 && impl->repeat_mode == MediaPlayerRepeatMode_Last);
         
         stream->Play ();
 
@@ -724,7 +769,7 @@ void MediaPlayer::SetVolume (float volume)
 
 float MediaPlayer::Volume () const
 {
-  return impl->volume;
+  return impl->is_muted ? 0.0f : impl->volume;
 }
 
 //включен или отключен ли звук
@@ -737,8 +782,8 @@ void MediaPlayer::SetMute (bool state)
       
     if (impl->IsCurrentStreamValid ())
     {
-      if (state) impl->CurrentStream ()->SetVolume (impl->volume);
-      else       impl->CurrentStream ()->SetVolume (0.0f);
+      if (state) impl->CurrentStream ()->SetVolume (0.0f);
+      else       impl->CurrentStream ()->SetVolume (impl->volume);
     }
 
     impl->is_muted = state;

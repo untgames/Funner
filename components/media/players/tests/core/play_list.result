@@ -1,0 +1,11 @@
+Results of play_list_test:
+list1_default={}
+list1 empty: true
+list1_after_add={'source1', 'source2', 'source3'}
+list1 empty: false
+list1_after_remove={'source1', 'source3'}
+list2_copy={'source1', 'source3'}
+list2_after_list1_remove={'source3'}
+list3_after_list1_remove={'source1', 'source3'}
+list1_with_duplicates={'source3', 'source4', 'source4', 'source5', 'source4'}
+list1_after_remove_duplicates={'source3', 'source5'}

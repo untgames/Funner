@@ -49,7 +49,7 @@ class PlayList
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление и удаление источников
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t AddSource    (const char* source_name);
+    size_t AddSource    (const char* source_name);    
     void   RemoveSource (size_t source_index);
     void   RemoveSource (const char* source_name); //all sources
     void   Clear        ();

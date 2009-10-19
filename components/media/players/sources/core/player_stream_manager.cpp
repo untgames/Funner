@@ -24,7 +24,7 @@ class StreamPlayerManagerImpl
         
       CreatorMap::iterator iter = creators.find (target);
       
-      if (iter == creators.end ())
+      if (iter != creators.end ())
         throw xtl::make_argument_exception (METHOD_NAME, "target", target, "Target with this name has already registered");
         
       creators.insert_pair (target, creator);
@@ -103,7 +103,7 @@ void StreamPlayerManager::UnregisterAllPlayers ()
 namespace media
 {
 
-namespace player
+namespace players
 {
 
 IStreamPlayer* create_stream_player (const char* target, const char* stream_name, const StreamPlayerManager::StreamEventHandler& handler)
