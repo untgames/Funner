@@ -221,6 +221,8 @@ int main ()
     
     player.Open (list);
     
+    printf ("Tracks count: %u\n", player.TracksCount ());
+    
     printf ("Playing...\n");
     
     simulate (player);
@@ -232,6 +234,8 @@ int main ()
     simulate (player, 4.0f);
     
     printf ("Playing with all looping...\n");
+    
+    player.PrevTrack ();
     
     player.SetRepeatMode (MediaPlayerRepeatMode_All);
     
@@ -248,6 +252,8 @@ int main ()
     printf ("volume=%.2f mute=%s\n", player.Volume (), player.IsMuted () ? "true" : "false");
     
     printf ("Dynamic change volume\n");
+    
+    player.NextTrack ();
     
     player.Play ();
     

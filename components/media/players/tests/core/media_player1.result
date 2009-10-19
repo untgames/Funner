@@ -3,6 +3,7 @@ media player 'player' change name
 media player 'player' change target to 'test'
 Open play list:
 media player 'player' change play list={'source1', 'source2'}
+Tracks count: 2
 Playing...
 TestStreamPlayer::SetVolume(source1, 1.00)
 TestStreamPlayer::SetLooping(source1, false)
@@ -67,24 +68,8 @@ media player 'player' change playback: state=playing, track=1, source=source2, d
 TestStreamPlayer::Stop(source2)
 media player 'player' change playback: state=stopped, track=1, source=source2, duration=2.00, position=0.00
 Playing with all looping...
+media player 'player' change track to 0
 media player 'player' change repeat mode to 'all'
-TestStreamPlayer::SetVolume(source2, 1.00)
-TestStreamPlayer::SetLooping(source2, false)
-TestStreamPlayer::Play(source2)
-media player 'player' change playback: state=playing, track=1, source=source2, duration=2.00, position=0.00
-  track #1 stream 'source2': 0.00 of 2.00
-  track #1 stream 'source2': 0.20 of 2.00
-  track #1 stream 'source2': 0.40 of 2.00
-  track #1 stream 'source2': 0.60 of 2.00
-  track #1 stream 'source2': 0.80 of 2.00
-  track #1 stream 'source2': 1.00 of 2.00
-  track #1 stream 'source2': 1.20 of 2.00
-  track #1 stream 'source2': 1.40 of 2.00
-  track #1 stream 'source2': 1.60 of 2.00
-  track #1 stream 'source2': 1.80 of 2.00
-TestStreamPlayer::Stop(source2)
-TestStreamPlayer::SetPosition(source2, 0.00)
-media player 'player' change track to 0
 TestStreamPlayer::SetVolume(source1, 1.00)
 TestStreamPlayer::SetLooping(source1, false)
 TestStreamPlayer::Play(source1)
@@ -141,20 +126,38 @@ TestStreamPlayer::SetLooping(source2, false)
 TestStreamPlayer::Play(source2)
 media player 'player' change playback: state=playing, track=1, source=source2, duration=2.00, position=0.00
   track #1 stream 'source2': 0.00 of 2.00
+  track #1 stream 'source2': 0.20 of 2.00
+  track #1 stream 'source2': 0.40 of 2.00
+  track #1 stream 'source2': 0.60 of 2.00
+  track #1 stream 'source2': 0.80 of 2.00
+  track #1 stream 'source2': 1.00 of 2.00
+  track #1 stream 'source2': 1.20 of 2.00
+  track #1 stream 'source2': 1.40 of 2.00
+  track #1 stream 'source2': 1.60 of 2.00
+  track #1 stream 'source2': 1.80 of 2.00
 TestStreamPlayer::Stop(source2)
-media player 'player' change playback: state=stopped, track=1, source=source2, duration=2.00, position=0.20
+TestStreamPlayer::SetPosition(source2, 0.00)
+media player 'player' change track to 0
+TestStreamPlayer::SetVolume(source1, 1.00)
+TestStreamPlayer::SetLooping(source1, false)
+TestStreamPlayer::Play(source1)
+media player 'player' change playback: state=playing, track=0, source=source1, duration=2.00, position=0.00
+  track #0 stream 'source1': 0.00 of 2.00
+TestStreamPlayer::Stop(source1)
+media player 'player' change playback: state=stopped, track=0, source=source1, duration=2.00, position=0.20
 Change mute
-TestStreamPlayer::SetVolume(source2, 0.00)
+TestStreamPlayer::SetVolume(source1, 0.00)
 media player 'player' change volume: mute=true, volume=0.00
 volume=0.00 mute=true
-TestStreamPlayer::SetVolume(source2, 1.00)
+TestStreamPlayer::SetVolume(source1, 1.00)
 media player 'player' change volume: mute=false, volume=1.00
 volume=1.00 mute=false
 Dynamic change volume
+media player 'player' change track to 1
 TestStreamPlayer::SetVolume(source2, 1.00)
 TestStreamPlayer::SetLooping(source2, false)
 TestStreamPlayer::Play(source2)
-media player 'player' change playback: state=playing, track=1, source=source2, duration=2.00, position=0.20
+media player 'player' change playback: state=playing, track=1, source=source2, duration=2.00, position=0.00
 TestStreamPlayer::SetVolume(source2, 0.00)
 media player 'player' change volume: mute=false, volume=0.00
 TestStreamPlayer::SetVolume(source2, 0.20)
@@ -167,6 +170,6 @@ TestStreamPlayer::SetVolume(source2, 0.80)
 media player 'player' change volume: mute=false, volume=0.80
 before exit
 TestStreamPlayer::Stop(source2)
-media player 'player' change playback: state=stopped, track=1, source=source2, duration=2.00, position=0.20
+media player 'player' change playback: state=stopped, track=1, source=source2, duration=2.00, position=0.00
 media player 'player' change play list={}
 media player 'player' change track to 0
