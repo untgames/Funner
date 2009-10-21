@@ -10,6 +10,8 @@ using namespace input::low_level::iphone_driver;
 namespace
 {
 
+NSString* EMPTY_STRING_REPLACE = @" ";
+
 const size_t MESSAGE_BUFFER_SIZE = 16;
 const float  EPSILON             = 0.01f;
 
@@ -107,7 +109,9 @@ class KeyboardListener
 
   text_field     = in_text_field;
   listener       = in_listener;
-  self.last_text = text_field.text;
+
+  text_field.text = EMPTY_STRING_REPLACE;             //инициализация текста в поле для ввода, для обработки нажатия backspace
+  self.last_text  = text_field.text;
 
   NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 
@@ -140,12 +144,24 @@ class KeyboardListener
 
 - (void)keyboardTextChanged
 {
+  size_t new_text_length  = [text_field.text length],
+         last_text_length = [last_text length];
+
+  if (new_text_length == last_text_length)
+    return;
+
   if (listener)
   {
-    size_t new_text_length = [text_field.text length];
-
-    if ([self.last_text length] > new_text_length)   //Backspace
+    if (last_text_length > new_text_length)   //Backspace
+    {
       listener->OnChar (8);
+
+      if (![text_field.text length])
+      {
+        self.last_text  = EMPTY_STRING_REPLACE;
+        text_field.text = EMPTY_STRING_REPLACE;  //поддерживаем текстовую строку всегда наполненной, чтобы всегда можно было обработать нажатие backspace
+      }
+    }
     else                                             //New char
       listener->OnChar ([text_field.text characterAtIndex:(new_text_length - 1)]);
   }
