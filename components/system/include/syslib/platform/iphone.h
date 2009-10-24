@@ -68,10 +68,9 @@ class IApplicationListener
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///События
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void OnAcceleration  (double x, double y, double z) {}  //произошло движение телефона
-    virtual void OnMemoryWarning () {}                              //нехватка памяти
-    virtual void OnActive        () {}                              //приложение стало активным
-    virtual void OnInactive      () {}                              //приложение стало неактивным
+    virtual void OnMemoryWarning () {}   //нехватка памяти
+    virtual void OnActive        () {}   //приложение стало активным
+    virtual void OnInactive      () {}   //приложение стало неактивным
 
   protected:
     virtual ~IApplicationListener () {}
@@ -82,11 +81,6 @@ class IApplicationListener
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void attach_application_listener (IApplicationListener* listener);
 void detach_application_listener (IApplicationListener* listener);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка параметров устройства
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void set_accelerometer_update_interval (double seconds); //установка периода опроса акселерометра телефона (не гарантируется, что будет установлен именно запрошенный интервал)
 
 }
 

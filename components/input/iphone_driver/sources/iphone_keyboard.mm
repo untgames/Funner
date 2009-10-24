@@ -66,6 +66,9 @@ class KeyboardListener
 
     //вызывается при обновлении текста
     virtual void KeyboardWasShown (float center_x, float center_y, float width, float height) = 0;
+
+  protected:
+    virtual ~KeyboardListener () {}
 };
 
 }
@@ -231,6 +234,7 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
       [text_field release];
       [text_field_listener release];
       e.touch ("input::low_level::iphone_driver::IPhoneKeyboard::IPhoneKeyboard");
+      throw;
     }
   }
 

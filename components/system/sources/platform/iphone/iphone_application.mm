@@ -3,7 +3,6 @@
 #import <NSObject.h>
 #import <NSAutoreleasePool.h>
 
-#import <UIAccelerometer.h>
 #import <UIApplication.h>
 
 using namespace syslib;
@@ -37,7 +36,7 @@ bool is_in_run_loop () //запущен ли главный цикл
 
 typedef stl::vector<IApplicationListener*> ListenerArray;
 
-@interface ApplicationDelegate : NSObject <UIAccelerometerDelegate>
+@interface ApplicationDelegate : NSObject
 {
   @private
     ListenerArray *listeners;  //слушатели событий
@@ -101,8 +100,6 @@ typedef stl::vector<IApplicationListener*> ListenerArray;
 {
   application_launched = true;
   
-  [UIAccelerometer sharedAccelerometer].delegate = self;
-  
   run_loop_context->OnEnterRunLoop ();  
 
   idle_timer->Run ();  
@@ -131,12 +128,6 @@ typedef stl::vector<IApplicationListener*> ListenerArray;
 {
   for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
     (*iter)->OnActive ();
-}
-
--(void) accelerometer:(UIAccelerometer*)accelerometer didAccelerate:(UIAcceleration*)acceleration
-{
-  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
-    (*iter)->OnAcceleration (acceleration.x, acceleration.y, acceleration.z);
 }
 
 /*
@@ -226,23 +217,6 @@ void detach_application_listener (IApplicationListener* listener)
     return;
 
   [(ApplicationDelegate*)([UIApplication sharedApplication].delegate) detachListener:listener];
-}
-
-/*
-   Установка параметров устройства
-*/
-
-void set_accelerometer_update_interval (double seconds)
-{
-  static const char* METHOD_NAME = "syslib::iphone::set_accelerometer_update_interval";
-
-  if (!is_in_run_loop ())
-    throw xtl::format_operation_exception (METHOD_NAME, "Can't set accelerometer update interval before entering run loop");
-
-  if (seconds < 0)
-    throw xtl::make_argument_exception (METHOD_NAME, "seconds", seconds, "Interval must be larger than 0");
-
-  [UIAccelerometer sharedAccelerometer].updateInterval = seconds;
 }
 
 }
