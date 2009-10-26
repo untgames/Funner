@@ -3,6 +3,7 @@ psd-exporter [<OPTIONS>] <SOURCE> ...
   OPTIONS:
     --help, -?                 print help message
     --silent, -s               quiet mode
+    --layout-layers-dir=<dir>  set output layers dir that used in layout file
     --layout=<file>, -o <file> set output layout file
     --layers-dir=<dir>, -O <dir> set output layers dir
     --layers-format=<string>   set output layers format string
