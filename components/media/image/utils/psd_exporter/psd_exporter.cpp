@@ -59,16 +59,18 @@ struct Option
 //параметры запуска
 struct Params
 {
-  const Option* options;          //массив опций
-  size_t        options_count;    //количество опций
-  stl::string   source_file_name; //имя исходного файла
-  stl::string   layout_file_name; //имя файла разметки
-  stl::string   layers_dir_name;  //имя каталога с сохранёнными слоями
-  stl::string   layers_format;    //строка форматирования имён слоёв
-  bool          silent;           //минимальное число сообщений
-  bool          print_help;       //нужно ли печатать сообщение помощи
-  bool          need_layout;      //нужно генерировать файл разметки
-  bool          need_layers;      //нужно сохранять слои
+  const Option* options;                 //массив опций
+  size_t        options_count;           //количество опций
+  stl::string   source_file_name;        //имя исходного файла
+  stl::string   layout_file_name;        //имя файла разметки  
+  stl::string   layers_dir_name;         //имя каталога с сохранёнными слоями
+  stl::string   layout_layers_dir_name;  //имя каталога с сохранёнными слоями, используемое в файле разметки
+  stl::string   layers_format;           //строка форматирования имён слоёв
+  bool          silent;                  //минимальное число сообщений
+  bool          print_help;              //нужно ли печатать сообщение помощи
+  bool          need_layout;             //нужно генерировать файл разметки
+  bool          need_layers;             //нужно сохранять слои
+  bool          need_pot_extent;         //нужно ли расширять изображения до ближайшей степени двойки
 };
 
 //форматы пикселя
@@ -127,6 +129,12 @@ void command_line_result_layers_dir (const char* dir_name, Params& params)
   params.layers_dir_name = dir_name;
 }
 
+//установка имени результирующей директории с содержимым слоёв, используемой в файле разметки
+void command_line_result_layout_layers_dir (const char* dir_name, Params& params)
+{
+  params.layout_layers_dir_name = dir_name;
+}
+
 //установка формата имени результирующих файлов слоёв
 void command_line_result_layers_format (const char* format, Params& params)
 {
@@ -151,17 +159,25 @@ void command_line_silent (const char*, Params& params)
   params.silent = true;
 }
 
+//установка параметра генерации слоёв размерами кратными степени двойки
+void command_line_pot (const char*, Params& params)
+{
+  params.need_pot_extent = true;
+}
+
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
-    {command_line_help,                 "help",         '?',        0, "print help message"},
-    {command_line_silent,               "silent",       's',        0, "quiet mode"},    
-    {command_line_result_layout,        "layout",       'o',   "file", "set output layout file"},
-    {command_line_result_layers_dir,    "layers-dir",   'O',    "dir", "set output layers dir"},    
-    {command_line_result_layers_format, "layers-format", 0,  "string", "set output layers format string"},
-    {command_line_no_layout,            "no-layout",     0,         0, "don't generate layout file"},
-    {command_line_no_layers,            "no-layers",     0,         0, "don't generate layers"},    
+    {command_line_help,                     "help",             '?',        0, "print help message"},
+    {command_line_silent,                   "silent",           's',        0, "quiet mode"},    
+    {command_line_result_layout_layers_dir, "layout-layers-dir", 0,     "dir", "set output layers dir that used in layout file"},    
+    {command_line_result_layout,            "layout",           'o',   "file", "set output layout file"},    
+    {command_line_result_layers_dir,        "layers-dir",       'O',    "dir", "set output layers dir"},    
+    {command_line_result_layers_format,     "layers-format",     0,  "string", "set output layers format string"},
+    {command_line_no_layout,                "no-layout",         0,         0, "don't generate layout file"},
+    {command_line_no_layers,                "no-layers",         0,         0, "don't generate layers"},
+    {command_line_pot,                      "pot",               0,         0, "extent layers image size to nearest greater power of two"},
   };
   
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -357,6 +373,11 @@ void validate (Params& params)
   {
     params.layers_dir_name = common::notdir (common::basename (params.source_file_name));
   }
+  
+  if (params.layout_layers_dir_name.empty ())
+  {
+    params.layout_layers_dir_name = params.layers_dir_name;
+  }
 }
 
 //проверка статуса PSD
@@ -395,21 +416,36 @@ void check_status (psd_status status, const char* source)
   }
 } */
 
-void convert_image_data (size_t width, size_t height, const psd_argb_color* src_image, void* dst_image)
+//преобразование растровой карты
+void convert_image_data (size_t src_width, size_t src_height, const psd_argb_color* src_image, size_t dst_width, size_t dst_height, void* dst_image)
 {
-  for (size_t i=0; i<height; i++)
+  for (size_t i=0; i<src_height; i++)
   {
-    const bgra_t* src = (const bgra_t*)src_image + i * width;
-    rgba_t*       dst = (rgba_t*)dst_image + width * (height - 1) - i * width;
+    const bgra_t* src = (const bgra_t*)src_image + i * src_width;
+    rgba_t*       dst = (rgba_t*)dst_image + dst_width * (dst_height - 1) - i * dst_width;
 
-    for (size_t j=0; j<width; j++, src++, dst++)
+    for (size_t j=0; j<src_width; j++, src++, dst++)
     {
       dst->red   = src->red;
       dst->green = src->green;
       dst->blue  = src->blue;
       dst->alpha = src->alpha;
-    }    
+    }
   }
+}
+
+//получение ближайшей сверху степени двойки
+size_t get_next_higher_power_of_two (size_t k) 
+{
+  if (!k)
+    return 1;
+
+  k--;
+
+  for (size_t i=1; i < sizeof (size_t) * 8; i *= 2)
+          k |= k >> i;
+
+  return k + 1;
 }
 
 //экспорт
@@ -417,14 +453,14 @@ void export_data (Params& params)
 {
   psd_context* context = 0;
   
-  check_status (psd_image_load (&context, (psd_char*)params.source_file_name.c_str ()), "::psd_image_load");
-  
-  stl::string format = common::format ("%s/%s", params.layers_dir_name.c_str (), params.layers_format.c_str ());
+  check_status (psd_image_load (&context, (psd_char*)params.source_file_name.c_str ()), "::psd_image_load");   
   
     //сохранение разметки     
     
   if (params.need_layout)
   {
+    stl::string format = common::format ("%s/%s", params.layout_layers_dir_name.c_str (), params.layers_format.c_str ());      
+  
     if (!params.silent)
       printf ("Save layout '%s'...\n", params.layout_file_name.c_str ());
   
@@ -477,6 +513,8 @@ void export_data (Params& params)
   
   if (params.need_layers)
   {
+    stl::string format = common::format ("%s/%s", params.layers_dir_name.c_str (), params.layers_format.c_str ());    
+  
     if (!params.silent)
       printf ("Save layers to dir '%s'...\n", params.layers_dir_name.c_str ());
   
@@ -505,10 +543,22 @@ void export_data (Params& params)
       
       if (!params.silent)
         printf ("  save '%s'...\n", dst_image_name.c_str ());
+        
+      size_t image_width  = layer.width,
+             image_height = layer.height;
+             
+      if (params.need_pot_extent)
+      {
+        image_width  = get_next_higher_power_of_two (image_width);
+        image_height = get_next_higher_power_of_two (image_height);               
+      }
 
-      media::Image image (layer.width, layer.height, 1, media::PixelFormat_RGBA8, 0);
+      media::Image image (image_width, image_height, 1, media::PixelFormat_RGBA8, 0);
 
-      convert_image_data (layer.width, layer.height, layer.image_data, image.Bitmap ());
+      if (params.need_pot_extent)
+        memset (image.Bitmap (), 0, get_bytes_per_pixel (image.Format ()) * image.Width () * image.Height ());
+
+      convert_image_data (layer.width, layer.height, layer.image_data, image_width, image_height, image.Bitmap ());
 
       image.Save (dst_image_name.c_str ());
       
@@ -528,13 +578,14 @@ int main (int argc, const char* argv [])
 
     Params params;
       
-    params.options       = 0;
-    params.options_count = 0;
-    params.layers_format = "image%03u.png";
-    params.print_help    = false;
-    params.silent        = false;
-    params.need_layout   = true;
-    params.need_layers   = true;    
+    params.options         = 0;
+    params.options_count   = 0;
+    params.layers_format   = "image%03u.png";
+    params.print_help      = false;
+    params.silent          = false;
+    params.need_layout     = true;
+    params.need_layers     = true;    
+    params.need_pot_extent = false;
 
       //разбор командной строки
 

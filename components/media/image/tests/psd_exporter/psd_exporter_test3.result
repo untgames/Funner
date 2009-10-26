@@ -9,3 +9,4 @@ psd-exporter [<OPTIONS>] <SOURCE> ...
     --layers-format=<string>   set output layers format string
     --no-layout                don't generate layout file
     --no-layers                don't generate layers
+    --pot                      extent layers image size to nearest greater power of two
