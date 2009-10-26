@@ -1,0 +1,8 @@
+Results of psd_exporter_test5:
+<?xml version="1.0" encoding="utf-8"?>
+<LayerMap TotalWidth="100" TotalHeight="100">
+  <Layer Name="Layer 1" Left="8" Top="6" Width="25" Height="19"/>
+  <Layer Name="Layer 2" Left="0" Top="0" Width="100" Height="100"/>
+  <Layer Name="Layer 3" Left="22" Top="71" Width="21" Height="21"/>
+  <Layer Name="Layer 4" Left="59" Top="41" Width="19" Height="17"/>
+</LayerMap>

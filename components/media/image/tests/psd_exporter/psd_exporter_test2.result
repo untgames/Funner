@@ -1,0 +1,4 @@
+Results of psd_exporter_test2:
+psd-exporter [<OPTIONS>] <SOURCE>
+  use: psd-exporter --help
+error: no input file

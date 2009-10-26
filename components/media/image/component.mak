@@ -55,9 +55,10 @@ MEDIA.IMAGE.PSD_EXPORTER.SOURCES.SOURCE_DIRS := utils/psd_exporter
 MEDIA.IMAGE.PSD_EXPORTER.SOURCES.IMPORTS     := compile.media.image link.media.image compile.extern.libpsd link.extern.libpsd
 
 #Цель - PSD exporter tests
-MEDIA.IMAGE.PSD_EXPORTER.TESTS.TYPE          := test-suite
-MEDIA.IMAGE.PSD_EXPORTER.TESTS.SOURCE_DIRS   := tests/psd_exporter
-MEDIA.IMAGE.PSD_EXPORTER.TESTS.EXECUTION_DIR := tests/psd_exporter
+MEDIA.IMAGE.PSD_EXPORTER.TESTS.TYPE              := test-suite
+MEDIA.IMAGE.PSD_EXPORTER.TESTS.SOURCE_DIRS       := tests/psd_exporter
+MEDIA.IMAGE.PSD_EXPORTER.TESTS.EXECUTION_DIR     := tests/psd_exporter
+MEDIA.IMAGE.PSD_EXPORTER.TESTS.USED_APPLICATIONS := psd-exporter
 
 #Цель - XAtlas builder
 MEDIA.XATLAS_BUILDER.SOURCES.TYPE          := application
@@ -66,5 +67,6 @@ MEDIA.XATLAS_BUILDER.SOURCES.SOURCE_DIRS   := utils/atlas_builder
 MEDIA.XATLAS_BUILDER.SOURCES.IMPORTS       := compile.common compile.media.image link.media.image link.media.image.xatlas link.media.image.left_bottom_packer
 
 #Цель - XAtlas builder tests
-MEDIA.XATLAS_BUILDER.TESTS.TYPE        := test-suite
-MEDIA.XATLAS_BUILDER.TESTS.SOURCE_DIRS := tests/atlas_builder
+MEDIA.XATLAS_BUILDER.TESTS.TYPE              := test-suite
+MEDIA.XATLAS_BUILDER.TESTS.SOURCE_DIRS       := tests/atlas_builder
+MEDIA.XATLAS_BUILDER.TESTS.USED_APPLICATIONS := atlas-builder

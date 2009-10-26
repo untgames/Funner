@@ -156,7 +156,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_silent,        "silent",     's',      0, "quiet mode"},    
     {command_line_result_atlas,  "atlas",      'o', "file", "set output atlas file"},    
     {command_line_result_layout, "layout",     'l', "file", "set output layout file"},
-    {command_line_no_layout,     "no-layout",   0,       0, "don't generatoe layout file"},    
+    {command_line_no_layout,     "no-layout",   0,       0, "don't generate layout file"},    
     {command_line_pot,           "pot",         0,       0, "resize atlas texture to nearest greater power of two sizes"},
     {command_line_invert_x,      "invert-x",    0,       0, "invert X coordinate in layout of tiles"},
     {command_line_invert_y,      "invert-y",    0,       0, "invert Y coordinate in layout of tiles"},
@@ -169,7 +169,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
   params.options_count = options_count;
 
     //разбор командной строки
-
+     
   for (int i=1; i<argc; i++)
   {
     const char* arg = argv [i];    

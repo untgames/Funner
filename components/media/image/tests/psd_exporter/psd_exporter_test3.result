@@ -1,0 +1,10 @@
+Results of psd_exporter_test3:
+psd-exporter [<OPTIONS>] <SOURCE> ...
+  OPTIONS:
+    --help, -?                 print help message
+    --silent, -s               quiet mode
+    --layout=<file>, -o <file> set output layout file
+    --layers-dir=<dir>, -O <dir> set output layers dir
+    --layers-format=<string>   set output layers format string
+    --no-layout                don't generate layout file
+    --no-layers                don't generate layers
