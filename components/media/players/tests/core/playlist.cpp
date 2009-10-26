@@ -6,7 +6,7 @@ int main ()
   
   try
   {
-    PlayList list1;
+    Playlist list1;
 	
 	dump ("list1_default", list1);
     
@@ -23,7 +23,7 @@ int main ()
     
     dump ("list1_after_remove", list1);
     
-    PlayList list2 = list1, list3 = list1.Clone ();
+    Playlist list2 = list1, list3 = list1.Clone ();
     
     dump ("list2_copy", list2);
     

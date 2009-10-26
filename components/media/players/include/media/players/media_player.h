@@ -12,7 +12,7 @@ namespace players
 {
 
 //forward declarations
-class PlayList;
+class Playlist;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Состояние проигрывателя медиа-потока
@@ -45,7 +45,7 @@ enum MediaPlayerEvent
 {
   MediaPlayerEvent_OnChangeName,       //изменено имя
   MediaPlayerEvent_OnChangeTarget,     //изменена цель проигрывания
-  MediaPlayerEvent_OnChangePlayList,   //изменён список проигрывания
+  MediaPlayerEvent_OnChangePlaylist,   //изменён список проигрывания
   MediaPlayerEvent_OnChangeTrack,      //переключен трек
   MediaPlayerEvent_OnChangePlayback,   //изменены настройки проигрывания (play / pause / stop / position)
   MediaPlayerEvent_OnChangeVolume,     //изменены настройки громкости
@@ -66,7 +66,7 @@ class MediaPlayer
     MediaPlayer  ();
     MediaPlayer  (const char* target_name);
     MediaPlayer  (const char* target_name, const char* stream_name);
-    MediaPlayer  (const char* target_name, const players::PlayList& list);
+    MediaPlayer  (const char* target_name, const players::Playlist& list);
     ~MediaPlayer ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,13 +85,13 @@ class MediaPlayer
 ///Открытие / закрытие потока
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Open  (const char* stream_name);
-    void Open  (const players::PlayList&);
+    void Open  (const players::Playlist&);
     void Close ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Список проигрывания
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const players::PlayList PlayList () const;
+    const players::Playlist Playlist () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество треков

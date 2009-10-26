@@ -11,7 +11,7 @@
 
 using namespace media::players;
 	
-void dump (const char* name, const PlayList& list)
+void dump (const char* name, const Playlist& list)
 {
   printf ("%s={", name, list.Size ());
   

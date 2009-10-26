@@ -26,7 +26,7 @@ struct MediaPlayer::Impl
   MediaPlayer&                            owner;                          //владелец
   stl::string                             name;                           //имя проигрывателя
   stl::string                             target_name;                    //имя цели проигрывания
-  media::players::PlayList                list;                           //список воспроизведения
+  media::players::Playlist                list;                           //список воспроизведения
   StreamArray                             streams;                        //проигрыватели потоков
   StreamPlayerManager::StreamEventHandler callback_handler;               //обработчик изменения состояния проигрываемых потоков
   size_t                                  current_track;                  //текущий трек
@@ -49,14 +49,14 @@ struct MediaPlayer::Impl
   }  
   
 ///Создание проигрывателей потоков
-  void UpdatePlayList (const media::players::PlayList& in_play_list)
+  void UpdatePlaylist (const media::players::Playlist& in_play_list)
   {
     try
     {
       static common::ComponentLoader loader (COMPONENT_MASK);
       
       StreamArray              new_streams;
-      media::players::PlayList new_play_list = in_play_list.Id () == list.Id () ? list : in_play_list.Clone ();      
+      media::players::Playlist new_play_list = in_play_list.Id () == list.Id () ? list : in_play_list.Clone ();
 
       new_streams.reserve (new_play_list.Size ());
 
@@ -78,28 +78,28 @@ struct MediaPlayer::Impl
       list = new_play_list;
             
       if (!is_closed || !list.IsEmpty ())
-        Notify (MediaPlayerEvent_OnChangePlayList);
+        Notify (MediaPlayerEvent_OnChangePlaylist);
     }
     catch (xtl::exception& e)
     {
-      e.touch ("media::players::MediaPlayer::Impl::UpdatePlayList(const PlayList&)");
+      e.touch ("media::players::MediaPlayer::Impl::UpdatePlaylist(const Playlist&)");
       throw;
     }    
   }
   
-  void UpdatePlayList (const char* stream_name)
+  void UpdatePlaylist (const char* stream_name)
   {
     try
     {
-      media::players::PlayList new_play_list;
+      media::players::Playlist new_play_list;
       
       new_play_list.AddSource (stream_name);
       
-      UpdatePlayList (new_play_list);
+      UpdatePlaylist (new_play_list);
     }
     catch (xtl::exception& e)
     {
-      e.touch ("media::players::MediaPlayer::Impl::UpdatePlayList(const char*)");
+      e.touch ("media::players::MediaPlayer::Impl::UpdatePlaylist(const char*)");
       throw;
     }
   }
@@ -244,7 +244,7 @@ MediaPlayer::MediaPlayer (const char* target_name, const char* stream_name)
 
     impl->target_name = target_name;
     
-    impl->UpdatePlayList (stream_name);
+    impl->UpdatePlaylist (stream_name);
   }
   catch (xtl::exception& e)
   {
@@ -253,7 +253,7 @@ MediaPlayer::MediaPlayer (const char* target_name, const char* stream_name)
   }
 }
 
-MediaPlayer::MediaPlayer (const char* target_name, const media::players::PlayList& list) 
+MediaPlayer::MediaPlayer (const char* target_name, const media::players::Playlist& list)
   : impl (new Impl (*this))
 {
   try
@@ -263,11 +263,11 @@ MediaPlayer::MediaPlayer (const char* target_name, const media::players::PlayLis
 
     impl->target_name = target_name;
 
-    impl->UpdatePlayList (list);
+    impl->UpdatePlaylist (list);
   }
   catch (xtl::exception& e)
   {
-    e.touch ("media::players::MediaPlayer::MediaPlayer(const char*, const PlayList&)");
+    e.touch ("media::players::MediaPlayer::MediaPlayer(const char*, const Playlist&)");
     throw;
   }
 }
@@ -323,7 +323,7 @@ void MediaPlayer::SetTarget (const char* target_name)
 
       //обновление потоков
       
-    impl->UpdatePlayList (impl->list);
+    impl->UpdatePlaylist (impl->list);
   }
   catch (xtl::exception& e)
   {
@@ -351,7 +351,7 @@ void MediaPlayer::Open (const char* stream_name)
     
     Close ();
     
-    impl->UpdatePlayList (stream_name);    
+    impl->UpdatePlaylist (stream_name);
   }
   catch (xtl::exception& e)
   {
@@ -360,17 +360,17 @@ void MediaPlayer::Open (const char* stream_name)
   }
 }
 
-void MediaPlayer::Open (const media::players::PlayList& list)
+void MediaPlayer::Open (const media::players::Playlist& list)
 {
   try
   {
     Close ();
     
-    impl->UpdatePlayList (list);
+    impl->UpdatePlaylist (list);
   }
   catch (xtl::exception& e)
   {
-    e.touch ("media::players::MediaPlayer::Open(const PlayList&)");
+    e.touch ("media::players::MediaPlayer::Open(const Playlist&)");
     throw;
   }
 }
@@ -408,7 +408,7 @@ void MediaPlayer::Close ()
     
     if (!is_closed)
     {      
-      impl->Notify (MediaPlayerEvent_OnChangePlayList);
+      impl->Notify (MediaPlayerEvent_OnChangePlaylist);
       impl->Notify (MediaPlayerEvent_OnChangeTrack);
     }
   }
@@ -422,7 +422,7 @@ void MediaPlayer::Close ()
         Список проигрывания
 */
 
-const media::players::PlayList MediaPlayer::PlayList () const
+const media::players::Playlist MediaPlayer::Playlist () const
 {
   return impl->list;
 }

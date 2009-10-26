@@ -128,9 +128,9 @@ void media_player_event_handler (MediaPlayer& player, MediaPlayerEvent event)
     case MediaPlayerEvent_OnChangeTarget:
       printf ("media player '%s' change target to '%s'\n", player.Name (), player.Target ());
       break;
-    case MediaPlayerEvent_OnChangePlayList:
+    case MediaPlayerEvent_OnChangePlaylist:
       printf ("media player '%s' change play list", player.Name ());
-      dump ("", player.PlayList ());
+      dump ("", player.Playlist ());
       break;
     case MediaPlayerEvent_OnChangeTrack:
       printf ("media player '%s' change track to %u\n", player.Name (), player.Track ());
@@ -214,7 +214,7 @@ int main ()
     
     printf ("Open play list:\n");    
     
-    PlayList list;
+    Playlist list;
     
     list.AddSource ("source1");
     list.AddSource ("source2");       

@@ -6,7 +6,7 @@ using namespace media::players;
     Описание реализации списка проигрывания
 */
 
-struct PlayList::Impl: public xtl::reference_counter
+struct Playlist::Impl: public xtl::reference_counter
 {
   common::StringArray sources; //массив имён источников
 };
@@ -15,25 +15,25 @@ struct PlayList::Impl: public xtl::reference_counter
     Конструкторы / деструктор / присваивание
 */
 
-PlayList::PlayList ()
+Playlist::Playlist ()
   : impl (new Impl)
 {
 }
 
-PlayList::PlayList (const PlayList& list)
+Playlist::Playlist (const Playlist& list)
   : impl (list.impl)
 {
   addref (impl);
 }
 
-PlayList::~PlayList ()
+Playlist::~Playlist ()
 {
   release (impl);
 }
 
-PlayList& PlayList::operator = (const PlayList& list)
+Playlist& Playlist::operator = (const Playlist& list)
 {
-  PlayList (list).Swap (*this);
+  Playlist (list).Swap (*this);
 
   return *this;
 }
@@ -42,7 +42,7 @@ PlayList& PlayList::operator = (const PlayList& list)
     Идентификатор списка
 */
 
-size_t PlayList::Id () const
+size_t Playlist::Id () const
 {
   return reinterpret_cast<size_t> (xtl::get_pointer (impl));
 }
@@ -51,11 +51,11 @@ size_t PlayList::Id () const
     Копирование
 */
 
-PlayList PlayList::Clone () const
+Playlist Playlist::Clone () const
 {
   try
   {
-    PlayList list;
+    Playlist list;
 
     list.impl->sources = impl->sources.Clone ();
 
@@ -63,7 +63,7 @@ PlayList PlayList::Clone () const
   }
   catch (xtl::exception& e)
   {
-    e.touch ("media::players::PlayList::Clone");
+    e.touch ("media::players::Playlist::Clone");
     throw;
   }
 }
@@ -72,12 +72,12 @@ PlayList PlayList::Clone () const
     Количество источников / проверка на пустоту
 */
 
-size_t PlayList::Size () const
+size_t Playlist::Size () const
 {
   return impl->sources.Size ();
 }
 
-bool PlayList::IsEmpty () const
+bool Playlist::IsEmpty () const
 {
   return impl->sources.IsEmpty ();
 }
@@ -86,12 +86,12 @@ bool PlayList::IsEmpty () const
     Получение источников
 */
 
-const char** PlayList::Items () const
+const char** Playlist::Items () const
 {
   return impl->sources.Data ();
 }
 
-const char* PlayList::Item (size_t index) const
+const char* Playlist::Item (size_t index) const
 {
   try
   {
@@ -99,7 +99,7 @@ const char* PlayList::Item (size_t index) const
   }
   catch (xtl::exception& e)
   {
-    e.touch ("media::players::PlayList::Item");
+    e.touch ("media::players::Playlist::Item");
     throw;
   }
 }
@@ -108,7 +108,7 @@ const char* PlayList::Item (size_t index) const
     Добавление и удаление источников
 */
 
-size_t PlayList::AddSource (const char* source_name)
+size_t Playlist::AddSource (const char* source_name)
 {
   try
   {
@@ -119,17 +119,17 @@ size_t PlayList::AddSource (const char* source_name)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("media::players::PlayList::AddSource");
+    e.touch ("media::players::Playlist::AddSource");
     throw;
   }
 }
 
-void PlayList::RemoveSource (size_t source_index)
+void Playlist::RemoveSource (size_t source_index)
 {
   impl->sources.Remove (source_index);
 }
 
-void PlayList::RemoveSource (const char* source_name)
+void Playlist::RemoveSource (const char* source_name)
 {
   if (!source_name)
     return;
@@ -139,7 +139,7 @@ void PlayList::RemoveSource (const char* source_name)
     else                                          i++;
 }
 
-void PlayList::Clear ()
+void Playlist::Clear ()
 {
   impl->sources.Clear ();
 }
@@ -148,12 +148,12 @@ void PlayList::Clear ()
     Резервирование памяти
 */
 
-void PlayList::Reserve (size_t count)
+void Playlist::Reserve (size_t count)
 {
   impl->sources.Reserve (count);
 }
 
-size_t PlayList::Capacity () const
+size_t Playlist::Capacity () const
 {
   return impl->sources.Capacity ();
 }
@@ -162,7 +162,7 @@ size_t PlayList::Capacity () const
     Обмен
 */
 
-void PlayList::Swap (PlayList& list)
+void Playlist::Swap (Playlist& list)
 {
   stl::swap (impl, list.impl);  
 }
@@ -173,7 +173,7 @@ namespace media
 namespace player
 {
 
-void swap (PlayList& list1, PlayList& list2)
+void swap (Playlist& list1, Playlist& list2)
 {
   list1.Swap (list2);
 }
