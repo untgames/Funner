@@ -66,7 +66,7 @@ class MediaPlayer
     MediaPlayer  ();
     MediaPlayer  (const char* target_name);
     MediaPlayer  (const char* target_name, const char* stream_name);
-    MediaPlayer  (const char* target_name, const PlayList& list);
+    MediaPlayer  (const char* target_name, const players::PlayList& list);
     ~MediaPlayer ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,14 +85,14 @@ class MediaPlayer
 ///Открытие / закрытие потока
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Open  (const char* stream_name);
-    void Open  (const PlayList&);
+    void Open  (const players::PlayList&);
     void Close ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Список проигрывания
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const media::players::PlayList PlayList () const;
-    
+    const players::PlayList PlayList () const;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество треков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ class MediaPlayer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void        SetTrack (size_t track);       //установка текущего трека
     size_t      Track    () const;             //текущий трек
-    const char* Source   (size_t track) const; //имя трека    
+    const char* Source   (size_t track) const; //имя трека
     const char* Source   () const;             //имя прогрываемого трека
     float       Duration (size_t tack) const;  //длительность трека
     float       Duration () const;             //длительность проигрываемого трека
@@ -123,7 +123,7 @@ class MediaPlayer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление проигрыванием
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    MediaPlayerState State () const; //состояние проигрывания    
+    MediaPlayerState State () const; //состояние проигрывания
     void             Play  ();       //начать / продолжить проигрывание
     void             Pause ();       //приостановить проигрывание
     void             Stop  ();       //остановить проигрывание

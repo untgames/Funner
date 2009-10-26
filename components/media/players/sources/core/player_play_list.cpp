@@ -44,7 +44,7 @@ PlayList& PlayList::operator = (const PlayList& list)
 
 size_t PlayList::Id () const
 {
-  return reinterpret_cast<size_t> (get_pointer (impl));
+  return reinterpret_cast<size_t> (xtl::get_pointer (impl));
 }
 
 /*
