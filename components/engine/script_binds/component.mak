@@ -4,17 +4,13 @@
 TARGETS := ENGINE.SCRIPT_BINDS.SOURCES ENGINE.SCRIPT_BINDS.TESTS
 
 #Öåëü ¹1 - SCRIPT_BINDS sources
-ENGINE.SCRIPT_BINDS.SOURCES.TYPE                   := static-lib
-ENGINE.SCRIPT_BINDS.SOURCES.NAME                   := funner.engine.script_binds
-ENGINE.SCRIPT_BINDS.SOURCES.INCLUDE_DIRS           := include
-ENGINE.SCRIPT_BINDS.SOURCES.SOURCE_DIRS            := sources
-ENGINE.SCRIPT_BINDS.SOURCES.iphone.SOURCE_DIRS     := sources/iphone
-ENGINE.SCRIPT_BINDS.SOURCES.iphone.COMPILER_CFLAGS := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/AVFoundation.framework/Headers/ \
-                                                      -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/Foundation.framework/Headers/ \
-                                                      -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/UIKit.framework/Headers/
-ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS                := compile.script.core compile.scene_graph.core compile.common \
-                                                      compile.render.scene_render compile.system compile.input.manager \
-                                                      compile.engine.core compile.media.rms
+ENGINE.SCRIPT_BINDS.SOURCES.TYPE         := static-lib
+ENGINE.SCRIPT_BINDS.SOURCES.NAME         := funner.engine.script_binds
+ENGINE.SCRIPT_BINDS.SOURCES.INCLUDE_DIRS := include
+ENGINE.SCRIPT_BINDS.SOURCES.SOURCE_DIRS  := sources
+ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS      := compile.script.core compile.scene_graph.core compile.common \
+                                            compile.render.scene_render compile.system compile.input.manager \
+                                            compile.engine.core compile.media.rms
 
 #Öåëü ¹2 - SCRIPT_BINDS tests
 ENGINE.SCRIPT_BINDS.TESTS.TYPE        := test-suite

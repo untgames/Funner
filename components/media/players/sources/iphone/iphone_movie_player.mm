@@ -1,6 +1,6 @@
 #include "shared.h"
 
-using namespace media::players::iphone;
+using namespace media::players;
 
 /*
     Проигрыватель видео на iPhone
@@ -17,17 +17,18 @@ class MoviePlayer: public IStreamPlayer
     {
     }
 
-///Длительность потока    
+///Длительность потока
     float Duration ()
     {
+      throw xtl::make_not_implemented_exception("media::players::iphone::MoviePlayer::Duration");
     }
 
-///Начать проигрывание    
+///Начать проигрывание
     void  Play ()
     {
     }
     
-///Приостановить проигрывание    
+///Приостановить проигрывание
     void Pause ()
     {
     }
@@ -37,17 +38,18 @@ class MoviePlayer: public IStreamPlayer
     {
     }
     
-///Установить позицию проигрывания    
+///Установить позицию проигрывания
     void  SetPosition (float position)
     {
     }
 
-///Получить позицию проигрывания    
+///Получить позицию проигрывания
     float Position ()
     {
+      throw xtl::make_not_implemented_exception("media::players::iphone::MoviePlayer::Position");
     }
 
-///Установка режима циклического проигрывания    
+///Установка режима циклического проигрывания
     void SetLooping  (bool state)
     {
     }
@@ -56,7 +58,27 @@ class MoviePlayer: public IStreamPlayer
     void SetVolume (float volume)
     {
     }
-    
-  private:
-    
 };
+
+namespace media
+{
+
+namespace players
+{
+
+namespace iphone
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание проигрывателя
+///////////////////////////////////////////////////////////////////////////////////////////////////
+IStreamPlayer* create_movie_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler& handler)
+{
+  throw xtl::make_not_implemented_exception("media::players::iphone::create_movie_player");
+}
+
+}
+
+}
+
+}
