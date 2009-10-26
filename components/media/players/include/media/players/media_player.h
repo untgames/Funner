@@ -1,8 +1,6 @@
 #ifndef MEDIALIB_PLAYER_MEDIA_PLAYER_HEADER
 #define MEDIALIB_PLAYER_MEDIA_PLAYER_HEADER
 
-#include <stl/auto_ptr.h>
-
 #include <xtl/functional_fwd>
 
 namespace media
@@ -64,11 +62,14 @@ class MediaPlayer
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     MediaPlayer  ();
+    MediaPlayer  (const MediaPlayer&);
     MediaPlayer  (const char* target_name);
     MediaPlayer  (const char* target_name, const char* stream_name);
     MediaPlayer  (const char* target_name, const players::Playlist& list);
     ~MediaPlayer ();
     
+    MediaPlayer& operator = (const MediaPlayer&);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,14 +155,20 @@ class MediaPlayer
 
     xtl::connection RegisterEventHandler (MediaPlayerEvent event, const EventHandler& handler) const;
     
-  private:
-    MediaPlayer  (const MediaPlayer&); //no impl
-    MediaPlayer& operator = (const MediaPlayer&); //no impl
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Swap (MediaPlayer&);
 
   private:
     struct Impl;
-    stl::auto_ptr<Impl> impl;    
+    Impl* impl;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void swap (MediaPlayer&, MediaPlayer&);
 
 }
 

@@ -21,7 +21,7 @@ typedef xtl::shared_ptr<IStreamPlayer>                     StreamPtr;
 typedef stl::vector<StreamPtr>                             StreamArray;
 typedef xtl::signal<void (MediaPlayer&, MediaPlayerEvent)> MediaPlayerSignal;
 
-struct MediaPlayer::Impl
+struct MediaPlayer::Impl : public xtl::reference_counter
 {
   MediaPlayer&                            owner;                          //владелец
   stl::string                             name;                           //имя проигрывателя
@@ -48,6 +48,83 @@ struct MediaPlayer::Impl
   {
   }  
   
+  ~Impl ()
+  {
+    Close ();
+  }
+
+///закрытие потока
+  void Close ()
+  {
+    try
+    {
+      bool is_closed = streams.empty ();
+
+      switch (current_track_state)
+      {
+        case MediaPlayerState_Playing:
+        case MediaPlayerState_Paused:
+
+          try
+          {
+            Stop ();
+          }
+          catch (...)
+          {
+          }
+
+          break;
+        case MediaPlayerState_Stopped:
+        default:
+          break;
+      }
+
+      current_track_state = MediaPlayerState_Stopped;
+      current_track       = 0;
+
+      streams.clear ();
+      list.Clear ();
+
+      if (!is_closed)
+      {
+        Notify (MediaPlayerEvent_OnChangePlaylist);
+        Notify (MediaPlayerEvent_OnChangeTrack);
+      }
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
+  }
+
+///остановить проигрывание
+  void Stop ()
+  {
+    try
+    {
+      if (!IsCurrentStreamValid ())
+        return;
+
+      switch (current_track_state)
+      {
+        case MediaPlayerState_Playing:
+        case MediaPlayerState_Paused:
+          CurrentStream ()->Stop ();
+          Notify (MediaPlayerEvent_OnChangePlayback);
+          break;
+        case MediaPlayerState_Stopped:
+          break;
+        default:
+          break;
+      }
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("media::players::MediaPlayer::Stop");
+      throw;
+    }
+  }
+
 ///Создание проигрывателей потоков
   void UpdatePlaylist (const media::players::Playlist& in_play_list)
   {
@@ -214,6 +291,12 @@ MediaPlayer::MediaPlayer ()
 {  
 }
 
+MediaPlayer::MediaPlayer (const MediaPlayer& source)
+  : impl (source.impl)
+{
+  addref (impl);
+}
+
 MediaPlayer::MediaPlayer (const char* target_name)
   : impl (new Impl (*this))
 {
@@ -272,9 +355,16 @@ MediaPlayer::MediaPlayer (const char* target_name, const media::players::Playlis
   }
 }
 
+MediaPlayer& MediaPlayer::operator = (const MediaPlayer& source)
+{
+  MediaPlayer (source).Swap (*this);
+
+  return *this;
+}
+
 MediaPlayer::~MediaPlayer ()
 {
-  Close ();
+  release (impl);
 }
 
 /*
@@ -377,45 +467,7 @@ void MediaPlayer::Open (const media::players::Playlist& list)
 
 void MediaPlayer::Close ()
 {
-  try
-  {
-    bool is_closed = impl->streams.empty ();
-  
-    switch (impl->current_track_state)
-    {
-      case MediaPlayerState_Playing:
-      case MediaPlayerState_Paused:
-      
-        try
-        {
-          Stop ();
-        }
-        catch (...)
-        {
-        }
-        
-        break;
-      case MediaPlayerState_Stopped:
-      default:
-        break;
-    }
-    
-    impl->current_track_state = MediaPlayerState_Stopped;
-    impl->current_track       = 0;
-    
-    impl->streams.clear ();
-    impl->list.Clear ();
-    
-    if (!is_closed)
-    {      
-      impl->Notify (MediaPlayerEvent_OnChangePlaylist);
-      impl->Notify (MediaPlayerEvent_OnChangeTrack);
-    }
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
+  impl->Close ();
 }
 
 /*
@@ -668,29 +720,7 @@ void MediaPlayer::Pause ()
 //остановить проигрывание
 void MediaPlayer::Stop ()
 {
-  try
-  {
-    if (!impl->IsCurrentStreamValid ())
-      return;
-    
-    switch (impl->current_track_state)
-    {
-      case MediaPlayerState_Playing:
-      case MediaPlayerState_Paused:
-        impl->CurrentStream ()->Stop ();
-        impl->Notify (MediaPlayerEvent_OnChangePlayback);
-        break;
-      case MediaPlayerState_Stopped:
-        break;
-      default:
-        break;
-    }
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("media::players::MediaPlayer::Stop");
-    throw;
-  }
+  impl->Stop ();
 }
 
 /*
@@ -814,4 +844,28 @@ xtl::connection MediaPlayer::RegisterEventHandler (MediaPlayerEvent event, const
     throw xtl::make_argument_exception (METHOD_NAME, "event", event);
     
   return impl->signals [event].connect (handler);
+}
+
+/*
+    Обмен
+*/
+
+void MediaPlayer::Swap (MediaPlayer& player)
+{
+  stl::swap (impl, player.impl);
+}
+
+namespace media
+{
+
+namespace player
+{
+
+void swap (MediaPlayer& player1, MediaPlayer& player2)
+{
+  player1.Swap (player2);
+}
+
+}
+
 }
