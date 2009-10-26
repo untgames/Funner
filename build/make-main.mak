@@ -427,10 +427,11 @@ define process_tests_source_dir
     $2.TARGET_DIR := $$($1.TARGET_DIR)
   endif
 
-  $2.TEST_EXE_FILES    := $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$(patsubst $$($2.TMP_DIR)/%$(OBJ_SUFFIX),$$($2.TARGET_DIR)/%$(EXE_SUFFIX),$$($2.OBJECT_FILES)))
-  $2.TEST_RESULT_FILES := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
-  $2.EXECUTION_DIR     := $$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR))
-  $1.TARGET_DLLS       := $$($1.TARGET_DLLS) $$($1.DLLS:%=$$($2.TARGET_DIR)/%$(DLL_SUFFIX))
+  $2.TEST_EXE_FILES     := $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$(patsubst $$($2.TMP_DIR)/%$(OBJ_SUFFIX),$$($2.TARGET_DIR)/%$(EXE_SUFFIX),$$($2.OBJECT_FILES)))
+  $2.TEST_RESULT_FILES  := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
+  $2.EXECUTION_DIR      := $$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR))
+  $1.TARGET_DLLS        := $$($1.TARGET_DLLS) $$($1.DLLS:%=$$($2.TARGET_DIR)/%$(DLL_SUFFIX))
+  $1.USED_APPLICATIONS  := $$($1.USED_APPLICATIONS:%=$$(DIST_BIN_DIR)/%$(EXE_SUFFIX))
 
   build: $$($2.TEST_EXE_FILES)
   test: TEST_MODULE.$2
@@ -450,7 +451,7 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования по shell-файлу
   $$($2.SOURCE_DIR)/%.sh: $$($2.TEST_EXE_FILES)
 
-  $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh
+  $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh $$($1.USED_APPLICATIONS)
 		@echo Running $$(notdir $$<)...
 		@$$(call prepare_to_execute,$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) && chmod u+x $$(patsubst %,"$(CURDIR)/%",$$<) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args) > $$(patsubst %,"$(CURDIR)/%",$$@)
 
