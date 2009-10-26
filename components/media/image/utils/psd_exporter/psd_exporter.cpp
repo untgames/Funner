@@ -439,6 +439,9 @@ size_t get_next_higher_power_of_two (size_t k)
 {
   if (!k)
     return 1;
+    
+  if (!(k & (k-1)))
+    return k;
 
   k--;
 
