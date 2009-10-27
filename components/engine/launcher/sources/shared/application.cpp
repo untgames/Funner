@@ -79,7 +79,7 @@ class Application
       need_print_version = false;
       need_print_help    = false;
     }
-
+        
 ///Разбор параметров командой строки
     void ParseCommandLine (size_t args_count, const char* args [])
     {
