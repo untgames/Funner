@@ -43,10 +43,10 @@ int main (int argc, const char* argv [])
   {
     return 1;
   }
-  
+
   funner->Run ();
-  
+
   FunnerShutdown (funner);
-  
-  FreeLibrary (library);
+
+  //FreeLibrary (library); //библиотека не выгружается, из-за необходимости срабатываний atexit, вызванных в funner.dll
 }
