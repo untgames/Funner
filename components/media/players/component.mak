@@ -14,7 +14,8 @@ MEDIA.PLAYERS.IPHONE.NAME            := funner.media.players.iphone
 MEDIA.PLAYERS.IPHONE.SOURCE_DIRS     := sources/iphone
 MEDIA.PLAYERS.IPHONE.IMPORTS         := compile.media.players compile.common
 MEDIA.PLAYERS.IPHONE.COMPILER_CFLAGS := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/AVFoundation.framework/Headers/ \
-                                        -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/Foundation.framework/Headers/
+                                        -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/Foundation.framework/Headers/ \
+                                        -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/MediaPlayer.framework/Headers/
 
 #MediaPlayer tests
 MEDIA.PLAYERS.TESTS.TYPE        := test-suite

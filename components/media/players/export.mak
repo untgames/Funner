@@ -8,5 +8,5 @@ export.link.media.players.core.IMPORTS := link.common
 # Link exports iphone
 export.link.media.players.iphone.LIBS          := funner.media.players.iphone
 export.link.media.players.iphone.IMPORTS       := link.media.players.core
-export.link.media.players.iphone.LINK_FLAGS    := -framework Foundation -framework AVFoundation
+export.link.media.players.iphone.LINK_FLAGS    := -framework Foundation -framework AVFoundation -framework MediaPlayer
 export.link.media.players.iphone.LINK_INCLUDES := IPhonePlayers

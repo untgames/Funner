@@ -19,7 +19,7 @@ class MusicPlayer;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Делегат проигрывателя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-@interface PlayerDelegate : NSObject <AVAudioPlayerDelegate>
+@interface AudioPlayerDelegate : NSObject <AVAudioPlayerDelegate>
 {
   @private
     MusicPlayer *player;  //проигрыватель
@@ -72,7 +72,7 @@ class MusicPlayer: public IStreamPlayer
         throw xtl::format_operation_exception (METHOD_NAME, "Can't preload sound for file '%s'", in_stream_name);
       }
 
-      player_delegate = [[PlayerDelegate alloc] initWithPlayer: this];
+      player_delegate = [[AudioPlayerDelegate alloc] initWithPlayer: this];
 
       player.delegate = player_delegate;
     }
@@ -183,16 +183,16 @@ class MusicPlayer: public IStreamPlayer
     typedef StreamPlayerManager::StreamEventHandler StreamEventHandler;
 
   private:
-    StreamEventHandler handler;           //обработчик событий
-    stl::string        stream_name;       //имя проигрываемого потока
-    AVAudioPlayer      *player;           //проигрыватель звука
-    PlayerDelegate     *player_delegate;  //делегат проигрывателя
-    bool               is_paused;         //находится ли в режиме паузы (необходимо для отработки прерывания проигрывания внешними событиями)
+    StreamEventHandler  handler;           //обработчик событий
+    stl::string         stream_name;       //имя проигрываемого потока
+    AVAudioPlayer       *player;           //проигрыватель звука
+    AudioPlayerDelegate *player_delegate;  //делегат проигрывателя
+    bool                is_paused;         //находится ли в режиме паузы (необходимо для отработки прерывания проигрывания внешними событиями)
 };
 
 }
 
-@implementation PlayerDelegate
+@implementation AudioPlayerDelegate
 
 -(id) init
 {
@@ -210,7 +210,7 @@ class MusicPlayer: public IStreamPlayer
     try
     {
       if (!in_player)
-        throw xtl::make_null_argument_exception ("media::players::iphone::PlayerDelegate::InitWithPlayer", "in_player");
+        throw xtl::make_null_argument_exception ("media::players::iphone::AudioPlayerDelegate::InitWithPlayer", "in_player");
 
       player = in_player;
 
