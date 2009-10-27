@@ -1,5 +1,6 @@
 #include "shared.h"
 
+#import <NSDate.h>
 #import <NSError.h>
 #import <NSString.h>
 #import <NSURL.h>
