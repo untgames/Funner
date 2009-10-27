@@ -79,8 +79,6 @@ class MusicPlayer: public IStreamPlayer
 ///Деструктор
     ~MusicPlayer ()
     {
-      Stop ();
-
       [player release];
       [player_delegate release];
     }
@@ -128,7 +126,7 @@ class MusicPlayer: public IStreamPlayer
 ///Остановить проигрывание
     void Stop ()
     {
-      PauseWithoutNotify ();
+      [player stop];
       SetPosition (0.f);
 
       OnEvent (StreamEvent_OnManualStop);
@@ -287,12 +285,12 @@ namespace iphone
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание проигрывателя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-IStreamPlayer* create_music_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler& handler)
+IStreamPlayer* create_music_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler* handler)
 {
   if (!stream_name)
     throw xtl::make_null_argument_exception ("media::players::iphone::create_music_player", "stream_name");
 
-  return new MusicPlayer (stream_name, handler);
+  return new MusicPlayer (stream_name, *handler);
 }
 
 }

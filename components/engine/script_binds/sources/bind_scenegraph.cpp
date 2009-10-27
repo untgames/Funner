@@ -1,7 +1,5 @@
 #include "shared.h"
 
-#include <xtl/shared_ptr.h>
-
 #include <mathlib.h>
 #include <math/io.h>
 

@@ -29,7 +29,11 @@ export.link.engine.script_binds.math.IMPORTS       := link.engine.script_binds
 
 # Link render exports
 export.link.engine.script_binds.render.LINK_INCLUDES := RenderScriptBind
-export.link.engine.script_binds.render.IMPORTS       := link.engine.script_binds  link.render.scene_render
+export.link.engine.script_binds.render.IMPORTS       := link.engine.script_binds link.render.scene_render
+
+# Link media players exports
+export.link.engine.script_binds.media.players.LINK_INCLUDES := MediaPlayersScriptBind
+export.link.engine.script_binds.media.players.IMPORTS       := link.engine.script_binds link.media.players.core
 
 # Link rms exports
 export.link.engine.script_binds.rms.LINK_INCLUDES := RmsScriptBind

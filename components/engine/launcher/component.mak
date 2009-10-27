@@ -23,7 +23,7 @@ ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core \
                                              link.engine.script_binds.render link.engine.script_binds.engine \
                                              link.engine.script_binds.input link.engine.script_binds.lua_override \
                                              link.engine.script_binds.system link.engine.script_binds.common \
-                                             link.engine.script_binds.rms \
+                                             link.engine.script_binds.rms link.engine.script_binds.media.players \
                                              link.sound.low_level.openal_driver run.sound.low_level.openal_driver \
                                              link.engine.subsystems.scene_render link.engine.subsystems.scene_player \
                                              link.engine.subsystems.input_manager link.engine.subsystems.shell \
@@ -33,7 +33,7 @@ ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core \
 ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := link.render.low_level.opengl_driver link.engine.subsystems.window_input_driver \
                                              link.engine.subsystems.window_manager link.engine.subsystems.window_renderer
 ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := link.input.direct_input_driver
-ENGINE.FUNNER_LIBRARY.iphone.IMPORTS      := link.media.image.pvr link.input.iphone_driver 
+ENGINE.FUNNER_LIBRARY.iphone.IMPORTS      := link.media.image.pvr link.input.iphone_driver link.media.players.iphone
 
 #Цель - win32 application
 ENGINE.LAUNCHER.SOURCES.TYPE                   := application

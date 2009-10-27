@@ -72,7 +72,7 @@ namespace iphone
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание проигрывателя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-IStreamPlayer* create_movie_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler& handler)
+IStreamPlayer* create_movie_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler* handler)
 {
   throw xtl::make_not_implemented_exception("media::players::iphone::create_movie_player");
 }

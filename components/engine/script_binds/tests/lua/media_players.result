@@ -1,0 +1,28 @@
+Results of media_players_test:
+Playlist test
+list1_default = {}
+list1 empty: true
+list1_after_add = {source1,  source2,  source3}
+list1 empty: false
+list1_after_remove = {source1,  source3}
+list2_copy = {source1,  source3}
+list2_after_list1_remove = {source3}
+list3_after_list1_remove = {source1,  source3}
+list1_with_duplicates = {source3,  source4,  source4,  source5,  source4}
+list1_after_remove_duplicates = {source3,  source5}
+MediaPlayer test
+New event: Media.MediaPlayerEvent.OnChangeName
+Tracks count: 0
+New event: Media.MediaPlayerEvent.OnChangeRepeatMode
+New event: Media.MediaPlayerEvent.OnChangeRepeatMode
+Change mute
+New event: Media.MediaPlayerEvent.OnChangeVolume
+volume=0 mute=true
+New event: Media.MediaPlayerEvent.OnChangeVolume
+volume=1 mute=false
+Dynamic change volume
+New event: Media.MediaPlayerEvent.OnChangeVolume
+New event: Media.MediaPlayerEvent.OnChangeVolume
+New event: Media.MediaPlayerEvent.OnChangeVolume
+New event: Media.MediaPlayerEvent.OnChangeVolume
+New event: Media.MediaPlayerEvent.OnChangeVolume

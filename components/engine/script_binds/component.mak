@@ -10,7 +10,7 @@ ENGINE.SCRIPT_BINDS.SOURCES.INCLUDE_DIRS := include
 ENGINE.SCRIPT_BINDS.SOURCES.SOURCE_DIRS  := sources
 ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS      := compile.script.core compile.scene_graph.core compile.common \
                                             compile.render.scene_render compile.system compile.input.manager \
-                                            compile.engine.core compile.media.rms
+                                            compile.engine.core compile.media.rms compile.media.players
 
 #Öåëü ¹2 - SCRIPT_BINDS tests
 ENGINE.SCRIPT_BINDS.TESTS.TYPE        := test-suite
@@ -19,5 +19,6 @@ ENGINE.SCRIPT_BINDS.TESTS.IMPORTS	  	:= compile.script.core compile.common compi
                                          link.engine.script_binds.bv link.engine.script_binds.sg link.engine.script_binds.math \
                                          link.engine.script_binds.render link.engine.script_binds.common link.engine.script_binds.system \
                                          link.engine.script_binds.engine link.engine.script_binds.input \
-                                         link.engine.script_binds.lua_override link.engine.script_binds.rms
+                                         link.engine.script_binds.lua_override link.engine.script_binds.rms \
+                                         link.engine.script_binds.media.players
                                               

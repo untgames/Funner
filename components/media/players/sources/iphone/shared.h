@@ -20,8 +20,8 @@ namespace iphone
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание проигрывателей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-IStreamPlayer* create_movie_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler& handler);
-IStreamPlayer* create_music_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler& handler);
+IStreamPlayer* create_movie_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler* handler); //Для второго параметра используются указатели, поскольку компилятор не поддерживает передачу параметра по ссылке для mm кода
+IStreamPlayer* create_music_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler* handler);
 
 }
 

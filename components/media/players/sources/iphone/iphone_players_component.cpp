@@ -31,9 +31,9 @@ class PlayersComponent
         throw xtl::make_null_argument_exception (METHOD_NAME, "target_name");
 
       if (!xtl::xstrcmp (target_name, MUSIC_TARGET_NAME))
-        return create_music_player (source_name, handler);
+        return create_music_player (source_name, &handler);
       else if (!xtl::xstrcmp (target_name, VIDEO_TARGET_NAME))
-        return create_movie_player (source_name, handler);
+        return create_movie_player (source_name, &handler);
 
       throw xtl::make_argument_exception (METHOD_NAME, "target_name", target_name);
     }
@@ -44,6 +44,6 @@ class PlayersComponent
 extern "C"
 {
 
-common::ComponentRegistrator<PlayersComponent> IPhonePlayers ("media.players.iphone");
+common::ComponentRegistrator<PlayersComponent> IPhonePlayers ("media.players.stream.iphone");
 
 }
