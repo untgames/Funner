@@ -27,7 +27,7 @@ int main ()
     
     dump ("list2_copy", list2);
     
-    list1.RemoveSource (0ul);
+    list1.RemoveSource (size_t (0));
     
     dump ("list2_after_list1_remove", list2);
     dump ("list3_after_list1_remove", list3);
