@@ -351,6 +351,9 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             {
               switch (context.key)
               {
+                case Key_Q:
+                  syslib::Application::Exit (0);
+                  break;
                 case Key_W:
                   Platform::CloseWindow (window_handle);
                   break;
