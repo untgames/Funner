@@ -11,6 +11,25 @@ namespace
 
 const char* COMPONENT_MASK = "media.players.stream.*"; //маска компонентов проигрывания медиа-потоков
 
+///Класс устанавливающий значение переменной в true в конструкторе и в false в деструкторе
+class PlayStateLockScope
+{
+  public:
+    PlayStateLockScope (bool& in_lock_variable)
+      : lock_variable (in_lock_variable)
+    {
+      lock_variable = true;
+    }
+
+    ~PlayStateLockScope ()
+    {
+      lock_variable = false;
+    }
+
+  private:
+    bool& lock_variable;
+};
+
 }
 
 /*
@@ -32,6 +51,7 @@ struct MediaPlayer::Impl
   size_t                                  current_track;                  //текущий трек
   MediaPlayerState                        current_track_state;            //состояние текущего трека
   bool                                    is_muted;                       //выключен ли звук
+  bool                                    play_state_lock;                //предотвращение двойного вызова функции изменения состояния проигрывателя (play / pause / stop)
   float                                   volume;                         //текущая громкость
   MediaPlayerRepeatMode                   repeat_mode;                    //режим повтора проигрывания треков
   MediaPlayerSignal                       signals [MediaPlayerEvent_Num]; //обработчики событий проигрывателя
@@ -43,6 +63,7 @@ struct MediaPlayer::Impl
     , current_track (0)
     , current_track_state (MediaPlayerState_Stopped)
     , is_muted (false)
+    , play_state_lock (false)
     , volume (1.0f)
     , repeat_mode (MediaPlayerRepeatMode_Off)
   {
@@ -601,6 +622,11 @@ MediaPlayerState MediaPlayer::State () const
 //начать / продолжить проигрывание
 void MediaPlayer::Play ()
 {
+  if (impl->play_state_lock)
+    return;
+
+  PlayStateLockScope lock_scope (impl->play_state_lock);
+
   try
   {
     if (!impl->IsCurrentStreamValid ())
@@ -642,6 +668,11 @@ void MediaPlayer::Play ()
 //приостановить проигрывание
 void MediaPlayer::Pause ()
 {
+  if (impl->play_state_lock)
+    return;
+
+  PlayStateLockScope lock_scope (impl->play_state_lock);
+
   try
   {
     if (!impl->IsCurrentStreamValid ())
@@ -672,6 +703,11 @@ void MediaPlayer::Pause ()
 //остановить проигрывание
 void MediaPlayer::Stop ()
 {
+  if (impl->play_state_lock)
+    return;
+
+  PlayStateLockScope lock_scope (impl->play_state_lock);
+
   try
   {
     if (!impl->IsCurrentStreamValid ())
