@@ -39,7 +39,45 @@ media player 'player' change playback: state=playing, track=1, source=source2, d
 TestStreamPlayer::Stop(source2)
 TestStreamPlayer::SetPosition(source2, 0.00)
 media player 'player' change playback: state=stopped, track=1, source=source2, duration=2.00, position=0.00
+media player 'player' change track to 0
+Playing second time...
+TestStreamPlayer::SetVolume(source1, 1.00)
+TestStreamPlayer::SetLooping(source1, false)
+TestStreamPlayer::Play(source1)
+media player 'player' change playback: state=playing, track=0, source=source1, duration=2.00, position=0.00
+  track #0 stream 'source1': 0.00 of 2.00
+  track #0 stream 'source1': 0.20 of 2.00
+  track #0 stream 'source1': 0.40 of 2.00
+  track #0 stream 'source1': 0.60 of 2.00
+  track #0 stream 'source1': 0.80 of 2.00
+  track #0 stream 'source1': 1.00 of 2.00
+  track #0 stream 'source1': 1.20 of 2.00
+  track #0 stream 'source1': 1.40 of 2.00
+  track #0 stream 'source1': 1.60 of 2.00
+  track #0 stream 'source1': 1.80 of 2.00
+TestStreamPlayer::Stop(source1)
+TestStreamPlayer::SetPosition(source1, 0.00)
+media player 'player' change track to 1
+TestStreamPlayer::SetVolume(source2, 1.00)
+TestStreamPlayer::SetLooping(source2, false)
+TestStreamPlayer::Play(source2)
+media player 'player' change playback: state=playing, track=1, source=source2, duration=2.00, position=0.00
+  track #1 stream 'source2': 0.00 of 2.00
+  track #1 stream 'source2': 0.20 of 2.00
+  track #1 stream 'source2': 0.40 of 2.00
+  track #1 stream 'source2': 0.60 of 2.00
+  track #1 stream 'source2': 0.80 of 2.00
+  track #1 stream 'source2': 1.00 of 2.00
+  track #1 stream 'source2': 1.20 of 2.00
+  track #1 stream 'source2': 1.40 of 2.00
+  track #1 stream 'source2': 1.60 of 2.00
+  track #1 stream 'source2': 1.80 of 2.00
+TestStreamPlayer::Stop(source2)
+TestStreamPlayer::SetPosition(source2, 0.00)
+media player 'player' change playback: state=stopped, track=1, source=source2, duration=2.00, position=0.00
+media player 'player' change track to 0
 Playing with last looping...
+media player 'player' change track to 1
 media player 'player' change repeat mode to 'last'
 TestStreamPlayer::SetVolume(source2, 1.00)
 TestStreamPlayer::SetLooping(source2, true)

@@ -156,6 +156,8 @@ struct MediaPlayer::Impl
             {
               case MediaPlayerRepeatMode_Off:
                 Notify (MediaPlayerEvent_OnChangePlayback);
+                current_track = 0;
+                Notify (MediaPlayerEvent_OnChangeTrack);
                 return;
               case MediaPlayerRepeatMode_Last:
                 break;

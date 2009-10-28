@@ -227,8 +227,14 @@ int main ()
     
     simulate (player);
     
+    printf ("Playing second time...\n");
+
+    simulate (player);
+
     printf ("Playing with last looping...\n");
     
+    player.NextTrack ();
+
     player.SetRepeatMode (MediaPlayerRepeatMode_Last);
     
     simulate (player, 4.0f);
