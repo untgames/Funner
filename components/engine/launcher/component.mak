@@ -4,6 +4,8 @@
 TARGETS       := ENGINE.FUNNER_LIBRARY ENGINE.LAUNCHER.SOURCES ENGINE.LAUNCHER.SDK
 TARGETS.win32 := ENGINE.CLAUNCHER.SOURCES
 
+#PROFILES += gles_win32 egl
+
 LAUNCHER_VERSION_STRING := "Launcher version 1.0"
 
 #Цель - сборка движка
@@ -29,7 +31,7 @@ ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core \
                                              link.engine.subsystems.input_manager link.engine.subsystems.shell \
                                              link.engine.subsystems.log link.engine.subsystems.file_system \
                                              link.engine.subsystems.resource_system \
-                                             compile.system
+                                             compile.system link.media.image.pvr
 ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := link.render.low_level.opengl_driver link.engine.subsystems.window_input_driver \
                                              link.engine.subsystems.window_manager link.engine.subsystems.window_renderer
 ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := link.input.direct_input_driver

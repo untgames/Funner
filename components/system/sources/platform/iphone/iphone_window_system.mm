@@ -420,7 +420,6 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
         break;
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
-        break;
     }
   }
   catch (xtl::exception& exception)
@@ -446,7 +445,6 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
         return wnd.userInteractionEnabled == YES;
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
-        break;
     }
   }
   catch (xtl::exception& exception)

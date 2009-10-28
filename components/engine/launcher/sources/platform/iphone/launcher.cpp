@@ -73,16 +73,15 @@ int main (int argc, const char* argv [])
     return 1;
   }
 
-  FunnerInitProc     FunnerInit     = (FunnerInitProc)dlsym (library, "FunnerInit");
-  FunnerShutdownProc FunnerShutdown = (FunnerShutdownProc)dlsym (library, "FunnerShutdown");
+  FunnerInitProc FunnerInit = (FunnerInitProc)dlsym (library, "FunnerInit");
 
-  if (!FunnerInit || !FunnerShutdown)
+  if (!FunnerInit)
   {
     printf ("Bad library (entries not found)\n");
     return 1;
   }
 
-  FunnerApi* funner = FunnerInit ();
+  IFunnerApi* funner = FunnerInit ();
 
   if (!funner)
   {
@@ -97,7 +96,7 @@ int main (int argc, const char* argv [])
 
   funner->Run ();
 
-  FunnerShutdown (funner);
+  delete funner;
 
   dlclose (library);
 }

@@ -22,16 +22,15 @@ int main (int argc, const char* argv [])
     return 1;
   }
   
-  FunnerInitProc     FunnerInit     = (FunnerInitProc)GetProcAddress (library, "FunnerInit");
-  FunnerShutdownProc FunnerShutdown = (FunnerShutdownProc)GetProcAddress (library, "FunnerShutdown");
+  FunnerInitProc FunnerInit = (FunnerInitProc)GetProcAddress (library, "FunnerInit");  
   
-  if (!FunnerInit || !FunnerShutdown)
+  if (!FunnerInit)
   {
     printf ("Bad library (entries not found)\n");
     return 1;
   }
 
-  FunnerApi* funner = FunnerInit ();
+  IFunnerApi* funner = FunnerInit ();
 
   if (!funner)
   {
@@ -46,7 +45,7 @@ int main (int argc, const char* argv [])
 
   funner->Run ();
 
-  FunnerShutdown (funner);
+  delete funner;
 
   //FreeLibrary (library); //библиотека не выгружается, из-за необходимости срабатываний atexit, вызванных в funner.dll
 }
