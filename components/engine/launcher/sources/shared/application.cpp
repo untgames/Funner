@@ -79,7 +79,7 @@ class Application: public IFunnerApi
     }
         
 ///–азбор параметров командой строки
-    bool ParseCommandLine (size_t args_count, const char* args [])
+    bool ParseCommandLine (unsigned int args_count, const char** args)
     {
       try
       {
@@ -187,7 +187,7 @@ class Application: public IFunnerApi
     bool             has_explicit_configuration; //конфигураци€ приложени€ указана €вно
     stl::string      configuration_name;         //им€ конфигурации
     bool             need_print_version;         //нужно распечатать строку версии
-    bool             need_print_help;            //нужно распечатать помощь по запуску приложени€    
+    bool             need_print_help;            //нужно распечатать помощь по запуску приложени€
 };
 
 }
