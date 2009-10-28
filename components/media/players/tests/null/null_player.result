@@ -1,0 +1,8 @@
+Results of null_player_test:
+media player 'null player' change name
+Playing...
+media player 'null player' change playback: state=stopped, track=0, source=stream1, duration=1.00, position=0.00
+media player 'null player' change track to 0
+media player 'null player' change playback: state=stopped, track=0, source=stream1, duration=1.00, position=0.00
+media player 'null player' change play list
+media player 'null player' change track to 0
