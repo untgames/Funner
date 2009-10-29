@@ -60,6 +60,11 @@ void Platform::SetWindowRect (window_t, const Rect&)
   raise ("syslib::DefaultPlatform::SetWindowRect");
 }
 
+void Platform::SetClientRect (window_t, const Rect&)
+{
+  raise ("syslib::DefaultPlatform::SetClientRect");
+}
+
 void Platform::GetWindowRect (window_t, Rect&)
 {
   raise ("syslib::DefaultPlatform::GetWindowRect");

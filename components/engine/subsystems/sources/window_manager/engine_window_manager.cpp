@@ -60,10 +60,19 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 ///Конструктор
     Window (ParseNode& node)
       : log (LOG_NAME),
-        window (get_window_style (node), get<size_t> (node, "Width"), get<size_t> (node, "Height")),
+        window (get_window_style (node)),
         cursor (0)
     {
         //создание окна
+
+      size_t width       = get<size_t> (node, "Width"),
+             height      = get<size_t> (node, "Height");
+      bool   client_size = get<bool> (node, "ClientSize", true);
+
+      if (client_size)
+        window.SetClientSize (width, height);
+      else
+        window.SetSize (width, height);
 
       const char* title = get<const char*> (node, "Title", (const char*)0);
 

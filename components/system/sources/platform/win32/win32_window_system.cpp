@@ -18,7 +18,7 @@ struct WindowImpl
   Platform::WindowMessageHandler message_handler;     //функция обработки сообщений окна
   bool                           is_cursor_visible;   //видим ли курсор
   bool                           is_cursor_in_window; //находится ли курсор в окне
-  HCURSOR                        cursor;              //изображение курсора  
+  HCURSOR                        cursor;              //изображение курсора
 
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data) :
       user_data (in_user_data), message_handler (handler), is_cursor_visible (true), cursor (0),
@@ -649,6 +649,35 @@ void Platform::SetWindowRect (window_t handle, const Rect& rect)
   catch (xtl::exception& exception)
   {
     exception.touch ("syslib::Win32Platform::SetWindowRect");
+    throw;
+  }
+}
+
+void Platform::SetClientRect (window_t handle, const Rect& rect)
+{
+  try
+  {
+    HWND wnd = (HWND)handle;
+
+    RECT window_rect;
+
+    if (!::GetClientRect (wnd, &window_rect))
+      raise_error ("::GetClientRect");
+
+    AdjustWindowRectEx (&window_rect, GetWindowStyle(wnd), GetMenu(wnd), GetWindowExStyle(wnd));
+
+    Rect new_window_rect;
+
+    new_window_rect.left   = window_rect.left;
+    new_window_rect.right  = window_rect.right;
+    new_window_rect.top    = window_rect.top;
+    new_window_rect.bottom = window_rect.bottom;
+
+    SetWindowRect (handle, new_window_rect);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Win32Platform::SetClientRect");
     throw;
   }
 }

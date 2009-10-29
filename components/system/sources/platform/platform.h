@@ -104,6 +104,7 @@ class Platform
 ///Область окна / клиентская область
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void SetWindowRect (window_t, const Rect&);
+    static void SetClientRect (window_t, const Rect&);
     static void GetWindowRect (window_t, Rect&);
     static void GetClientRect (window_t, Rect&);
 

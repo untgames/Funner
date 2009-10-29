@@ -110,7 +110,7 @@ struct Window::Impl
 ///Установка низкоуровневого дескриптора родительского окна
     void SetParentHandle (Platform::window_t new_parent_handle)
     {
-//      bool need_window_recreate = !new_parent_handle && parent_handle || new_parent_handle && !parent_handle; //нужно пересоздавать окно      
+//      bool need_window_recreate = !new_parent_handle && parent_handle || new_parent_handle && !parent_handle; //нужно пересоздавать окно
       bool need_window_recreate = false;
 
       if (need_window_recreate)
@@ -230,7 +230,7 @@ struct Window::Impl
           case WindowEvent_OnDestroy: //окно уничтожено
             impl->SetHandle (0);
             break;
-          case WindowEvent_OnActivate:                //окно стало активным   
+          case WindowEvent_OnActivate:                //окно стало активным
           case WindowEvent_OnDeactivate:              //окно перестало быть активным
           case WindowEvent_OnShow:                    //окно стало видимым
           case WindowEvent_OnHide:                    //окно стало не видимым
@@ -247,16 +247,16 @@ struct Window::Impl
           case WindowEvent_OnLeftButtonUp:            //отпущена левая кнопка мыши
           case WindowEvent_OnLeftButtonDoubleClick:   //двойной щелчок левой кнопкой мыши
           case WindowEvent_OnRightButtonDown:         //нажата правая кнопка мыши
-          case WindowEvent_OnRightButtonUp:           //отпущена правая кнопка мыши  
+          case WindowEvent_OnRightButtonUp:           //отпущена правая кнопка мыши
           case WindowEvent_OnRightButtonDoubleClick:  //двойной щелчок правой кнопкой мыши
           case WindowEvent_OnMiddleButtonDown:        //нажата средняя кнопка мыши
-          case WindowEvent_OnMiddleButtonUp:          //отпущена средняя кнопка мыши      
+          case WindowEvent_OnMiddleButtonUp:          //отпущена средняя кнопка мыши
           case WindowEvent_OnMiddleButtonDoubleClick: //двойной щелчок средней кнопкой мыши
           case WindowEvent_OnXButton1Down:            //нажата первая Х кнопка мыши
-          case WindowEvent_OnXButton1Up:              //отпущена первая Х кнопка мыши      
+          case WindowEvent_OnXButton1Up:              //отпущена первая Х кнопка мыши
           case WindowEvent_OnXButton1DoubleClick:     //двойной щелчок первой Х кнопкой мыши
           case WindowEvent_OnXButton2Down:            //нажата вторая Х кнопка мыши
-          case WindowEvent_OnXButton2Up:              //отпущена вторая Х кнопка мыши      
+          case WindowEvent_OnXButton2Up:              //отпущена вторая Х кнопка мыши
           case WindowEvent_OnXButton2DoubleClick:     //двойной щелчок второй Х кнопкой мыши
           case WindowEvent_OnKeyDown:                 //нажата клавиша клавиатуры
           case WindowEvent_OnKeyUp:                   //отпущена клавиша клавиатуры
@@ -605,6 +605,40 @@ size_t Window::Height () const
   }
 }
 
+size_t Window::ClientWidth () const
+{
+  try
+  {
+    Rect rect;
+
+    Platform::GetClientRect (impl->CheckedHandle (), rect);
+
+    return rect.right - rect.left;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::ClientWidth");
+    throw;
+  }
+}
+
+size_t Window::ClientHeight () const
+{
+  try
+  {
+    Rect rect;
+
+    Platform::GetClientRect (impl->CheckedHandle (), rect);
+
+    return rect.bottom - rect.top;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::ClientHeight");
+    throw;
+  }
+}
+
 void Window::SetWidth (size_t width)
 {
   SetSize (width, Height ());
@@ -627,6 +661,36 @@ void Window::SetSize (size_t width, size_t height)
     rect.bottom = rect.top + height;
 
     Platform::SetWindowRect (impl->CheckedHandle (), rect);    
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::SetSize");
+    throw;
+  }
+}
+
+void Window::SetClientWidth (size_t width)
+{
+  SetClientSize (width, ClientHeight ());
+}
+
+void Window::SetClientHeight (size_t height)
+{
+  SetClientSize (ClientWidth (), height);
+}
+
+void Window::SetClientSize (size_t width, size_t height)
+{
+  try
+  {
+    Rect rect;
+
+    Platform::GetClientRect (impl->CheckedHandle (), rect);
+
+    rect.right  = rect.left + width;
+    rect.bottom = rect.top + height;
+
+    Platform::SetClientRect (impl->CheckedHandle (), rect);
   }
   catch (xtl::exception& exception)
   {

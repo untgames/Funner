@@ -93,7 +93,7 @@ bool check_fullscreen (WindowRef window)
 }
 
 /*
-    Получение области окна
+    Получение / установка области окна
 */
 
 void get_rect (WindowRef wnd, WindowRegionCode region, syslib::Rect& rect, const char* source)
@@ -117,6 +117,14 @@ void get_rect (WindowRef wnd, WindowRegionCode region, syslib::Rect& rect, const
     rect.bottom = window_rect.bottom;
     rect.right  = window_rect.right;
   }
+}
+
+void set_rect (WindowRef wnd, WindowRegionCode region, const syslib::Rect& rect, const char* source)
+{
+  ::Rect new_rect = { rect.top, rect.left, rect.bottom, rect.right};
+
+  check_window_manager_error (SetWindowBounds (wnd, region, &new_rect), source,
+                              "Can't set window rect, error at ::SetWindowBounds");
 }
 
 /*
@@ -858,10 +866,12 @@ void Platform::GetWindowTitle (window_t handle, size_t buffer_size_in_chars, wch
 
 void Platform::SetWindowRect (window_t handle, const Rect& rect)
 {
-  ::Rect new_rect = { rect.top, rect.left, rect.bottom, rect.right};
+  set_rect ((WindowRef)handle, kWindowStructureRgn, rect, "syslib::CarbonPlatform::SetWindowRect");
+}
 
-  check_window_manager_error (SetWindowBounds ((WindowRef)handle, kWindowStructureRgn, &new_rect), "syslib::CarbonPlatform::SetWindowRect",
-                              "Can't set window rect, error at ::SetWindowBounds");
+void Platform::SetClientRect (window_t handle, const Rect& rect)
+{
+  set_rect ((WindowRef)handle, kWindowContentRgn, rect, "syslib::CarbonPlatform::SetWindowRect");
 }
 
 void Platform::GetWindowRect (window_t handle, Rect& rect)

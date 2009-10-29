@@ -47,11 +47,11 @@ enum WindowEvent
   WindowEvent_OnLeftButtonUp,            //отпущена левая кнопка мыши
   WindowEvent_OnLeftButtonDoubleClick,   //двойной щелчок левой клавишей мыши
   WindowEvent_OnRightButtonDown,         //нажата правая кнопка мыши
-  WindowEvent_OnRightButtonUp,           //отпущена правая кнопка мыши  
+  WindowEvent_OnRightButtonUp,           //отпущена правая кнопка мыши
   WindowEvent_OnRightButtonDoubleClick,  //двойной щелчок правой клавишей мыши
-  WindowEvent_OnMiddleButtonDown,        //нажата средняя кнопка мыши  
+  WindowEvent_OnMiddleButtonDown,        //нажата средняя кнопка мыши
   WindowEvent_OnMiddleButtonUp,          //отпущена средняя кнопка мыши
-  WindowEvent_OnMiddleButtonDoubleClick, //двойной щелчок правой клавишей мыши  
+  WindowEvent_OnMiddleButtonDoubleClick, //двойной щелчок правой клавишей мыши
   WindowEvent_OnXButton1Down,            //нажата первая Х кнопка мыши
   WindowEvent_OnXButton1Up,              //отпущена первая Х кнопка мыши
   WindowEvent_OnXButton1DoubleClick,     //двойной щелчок первой Х клавишей мыши
@@ -158,11 +158,16 @@ class Window
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размеры окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Width     () const;
-    size_t Height    () const;
-    void   SetWidth  (size_t width);
-    void   SetHeight (size_t height);
-    void   SetSize   (size_t width, size_t height);
+    size_t Width           () const;
+    size_t Height          () const;
+    size_t ClientWidth     () const;
+    size_t ClientHeight    () const;
+    void   SetWidth        (size_t width);
+    void   SetHeight       (size_t height);
+    void   SetSize         (size_t width, size_t height);
+    void   SetClientWidth  (size_t width);
+    void   SetClientHeight (size_t height);
+    void   SetClientSize   (size_t width, size_t height);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Область окна / клиентская область

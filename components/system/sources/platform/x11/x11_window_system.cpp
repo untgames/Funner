@@ -39,6 +39,10 @@ void Platform::SetWindowRect (window_t handle, const Rect& rect)
 {
 }
 
+void Platform::SetClientRect (window_t handle, const Rect& rect)
+{
+}
+
 void Platform::GetWindowRect (window_t handle, Rect& rect)
 {
 }

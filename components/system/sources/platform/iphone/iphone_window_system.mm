@@ -342,6 +342,11 @@ void Platform::SetWindowRect (window_t handle, const Rect& rect)
   window->Notify (WindowEvent_OnSize, dummy_context);
 }
 
+void Platform::SetClientRect (window_t handle, const Rect& rect)
+{
+  SetWindowRect (handle, rect);
+}
+
 void Platform::GetWindowRect (window_t handle, Rect& rect)
 {
   CGRect frame = ((UIView*)handle).frame;
