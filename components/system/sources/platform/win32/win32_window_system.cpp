@@ -664,7 +664,7 @@ void Platform::SetClientRect (window_t handle, const Rect& rect)
     if (!::GetClientRect (wnd, &window_rect))
       raise_error ("::GetClientRect");
 
-    AdjustWindowRectEx (&window_rect, GetWindowStyle(wnd), GetMenu(wnd), GetWindowExStyle(wnd));
+    AdjustWindowRectEx (&window_rect, GetWindowLong (wnd, GWL_STYLE), 0, GetWindowLong (wnd, GWL_EXSTYLE));
 
     Rect new_window_rect;
 
