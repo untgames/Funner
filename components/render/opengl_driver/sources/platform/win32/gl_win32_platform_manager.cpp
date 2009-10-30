@@ -55,7 +55,7 @@ class PlatformManagerImpl
           static const size_t WINDOWS7_VERSION_MAJOR = 6;
           static const size_t WINDOWS7_VERSION_MINOR = 1;
 
-          if (version.dwMajorVersion > WINDOWS7_VERSION_MAJOR || version.dwMajorVersion == WINDOWS7_VERSION_MAJOR && version.dwMinorVersion > WINDOWS7_VERSION_MINOR)          
+          if (version.dwMajorVersion < WINDOWS7_VERSION_MAJOR || version.dwMajorVersion == WINDOWS7_VERSION_MAJOR && version.dwMinorVersion < WINDOWS7_VERSION_MINOR)          
           {
               //загрузка Direct3D эмулятора AcXtrnal
 
