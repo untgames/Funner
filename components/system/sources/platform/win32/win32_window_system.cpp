@@ -661,8 +661,10 @@ void Platform::SetClientRect (window_t handle, const Rect& rect)
 
     RECT window_rect;
 
-    if (!::GetClientRect (wnd, &window_rect))
-      raise_error ("::GetClientRect");
+    window_rect.left   = rect.left;
+    window_rect.right  = rect.right;
+    window_rect.top    = rect.top;
+    window_rect.bottom = rect.bottom;
 
     AdjustWindowRectEx (&window_rect, GetWindowLong (wnd, GWL_STYLE), 0, GetWindowLong (wnd, GWL_EXSTYLE));
 

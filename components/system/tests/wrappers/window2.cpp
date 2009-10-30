@@ -27,6 +27,12 @@ int main ()
 
     printf ("after show\n");
 
+    window.SetClientSize (300, 400);
+
+    Rect client_rect = window.ClientRect ();
+
+    printf ("Client width=%u, height=%u\n", client_rect.right - client_rect.left, client_rect.bottom - client_rect.top);
+
     printf ("is_active: %d\n", window.IsActive ());
 
     window.Deactivate ();
