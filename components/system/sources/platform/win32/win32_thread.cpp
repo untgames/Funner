@@ -3,8 +3,9 @@
 using namespace syslib;
 
 struct Platform::thread_handle
-{
+{  
   uintptr_t thread;
+  size_t    id;
 };
 
 namespace
@@ -60,7 +61,7 @@ Platform::thread_t Platform::CreateThread (IThreadCallback* in_callback)
 
     stl::auto_ptr<thread_handle> handle (new thread_handle);
 
-    handle->thread = _beginthreadex (0, 0, &thread_run, callback.get (), 0, 0);
+    handle->thread = _beginthreadex (0, 0, &thread_run, callback.get (), 0, &handle->id);
 
     if (!handle->thread)
       throw xtl::format_operation_exception ("::_beginthreadex", "%s", common::strerror (errno));
@@ -111,10 +112,10 @@ void Platform::JoinThread (thread_t thread)
 
 size_t Platform::GetThreadId (thread_t thread)
 {
-  return (size_t)thread->thread;
+  return (size_t)thread->id;
 }
 
 size_t Platform::GetCurrentThreadId ()
 {
-  return (size_t)GetCurrentThread ();
+  return (size_t)::GetCurrentThreadId ();
 }
