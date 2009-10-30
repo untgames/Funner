@@ -1,6 +1,7 @@
 #include <cstring>
 #include <ctime>
 
+#include <stl/hash_map>
 #include <stl/string>
 
 #include <xtl/signal.h>

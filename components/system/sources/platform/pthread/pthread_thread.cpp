@@ -13,8 +13,6 @@ void* thread_run (void* data)
 
   xtl::com_ptr<IThreadCallback> callback (reinterpret_cast<IThreadCallback*> (data));
 
-  pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, 0);
-
   try
   {
     callback->Run ();
@@ -24,12 +22,6 @@ void* thread_run (void* data)
   }
 
   return 0;
-}
-
-//получение дескриптора нити
-pthread_t get_handle (Platform::thread_t thread)
-{
-  return thread ? *(pthread_t*)thread : pthread_self ();
 }
 
 }
@@ -78,26 +70,6 @@ void Platform::DestroyThread (thread_t thread)
 }
 
 /*
-    Отмена нити
-*/
-
-void Platform::CancelThread (thread_t thread)
-{
-  try
-  {
-    int status = pthread_cancel (get_handle (thread));
-
-    if (status)
-      pthread_raise_error ("::pthread_cancel", status);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("syslib::PThreadPlatform::CancelThread");
-    throw;
-  }    
-}
-
-/*
     Ожидание завершения нити
 */
 
@@ -105,9 +77,12 @@ void Platform::JoinThread (thread_t thread)
 {
   try
   {
+    if (!thread)
+      throw xtl::make_null_argument_exception ("", "thread");
+
     void* exit_code = 0;
 
-    int status = pthread_join (get_handle (thread), &exit_code);
+    int status = pthread_join (*(pthread_t*)thread, &exit_code);
 
     if (status)
       pthread_raise_error ("::pthread_join", status);
@@ -117,4 +92,18 @@ void Platform::JoinThread (thread_t thread)
     exception.touch ("syslib::PThreadPlatform::JoinThread");
     throw;
   }
+}
+
+/*
+   Получение идентификатора нити
+*/
+
+size_t Platform::GetThreadId (thread_t thread)
+{
+  return (size_t)*(pthread_t*)thread;
+}
+
+size_t Platform::GetCurrentThreadId ()
+{
+  return (size_t)pthread_self ();
 }

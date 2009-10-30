@@ -39,12 +39,6 @@ unsigned CALLBACK thread_run (void* data)
   return 0;
 }
 
-//получение дескриптора нити
-uintptr_t get_handle (Platform::thread_t thread)
-{
-  return thread ? thread->thread : (uintptr_t)GetCurrentThread ();
-}
-
 }
 
 /*
@@ -91,24 +85,6 @@ void Platform::DestroyThread (thread_t thread)
 }
 
 /*
-    Отмена нити
-*/
-
-void Platform::CancelThread (thread_t thread)
-{
-  try
-  {
-    if (!TerminateThread ((HANDLE)get_handle (thread), 0))
-      raise_error ("::TerminateThread");
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("syslib::Win32Platform::CancelThread");
-    throw;
-  }
-}
-
-/*
     Ожидание завершения нити
 */
 
@@ -116,7 +92,10 @@ void Platform::JoinThread (thread_t thread)
 {
   try
   {
-    if (WaitForSingleObject ((HANDLE)get_handle (thread), INFINITE) == WAIT_FAILED)
+    if (!thread || !thread->thread)
+      throw xtl::make_null_argument_exception ("", "thread");
+
+    if (WaitForSingleObject ((HANDLE)thread->thread, INFINITE) == WAIT_FAILED)
       raise_error ("::WaitForSingleObject");
   }
   catch (xtl::exception& exception)
@@ -124,4 +103,18 @@ void Platform::JoinThread (thread_t thread)
     exception.touch ("syslib::Win32Platform::JoinThread");
     throw;
   }
+}
+
+/*
+   Получение идентификатора нити
+*/
+
+size_t Platform::GetThreadId (thread_t thread)
+{
+  return (size_t)thread->thread;
+}
+
+size_t Platform::GetCurrentThreadId ()
+{
+  return (size_t)GetCurrentThread ();
 }

@@ -28,15 +28,6 @@ void Platform::DeleteThread (thread_t)
 }
 
 /*
-    Отмена нити
-*/
-
-void Platform::CancelThread (thread_t)
-{
-  raise ("syslib::DefaultPlatform::CancelThread");
-}
-
-/*
     Ожидание завершения нити
 */
 

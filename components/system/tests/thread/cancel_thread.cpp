@@ -20,7 +20,8 @@ int thread1_run ()
 
   cancel_flag = true;
 
-  Application::Sleep (5000);
+  for (;;)
+    Thread::TestCancel();
 
   printf ("thread1 finished\n");
 
