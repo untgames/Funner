@@ -142,7 +142,7 @@ struct AtlasBuilder::Impl
           current_size->y = images[i]->Height ();
         }
 
-        pack_handler (sizes.size (), sizes.data (), origins.data (), pack_flags);
+        pack_handler (sizes.size (), sizes.data (), origins.data (), pack_flags & ~AtlasPackFlag_InvertTilesX & ~AtlasPackFlag_InvertTilesY);
         
           //заполнение атласа
           
@@ -156,11 +156,8 @@ struct AtlasBuilder::Impl
         {
           math::vec2ui& origin = origins.data ()[i];          
           
-          if (pack_flags & AtlasPackFlag_SwapAxises)
-            stl::swap (origin.x, origin.y);
-          
-          if (result_image_width < (origins.data ()[i].x + sizes.data ()[i].x))  result_image_width = origins.data ()[i].x + sizes.data ()[i].x;
-          if (result_image_height < (origins.data ()[i].y + sizes.data ()[i].y)) result_image_height = origins.data ()[i].y + sizes.data ()[i].y;          
+          if (result_image_width < (origin.x + sizes.data ()[i].x))  result_image_width = origin.x + sizes.data ()[i].x;
+          if (result_image_height < (origin.y + sizes.data ()[i].y)) result_image_height = origin.y + sizes.data ()[i].y;
         }
         
         if (pack_flags & AtlasPackFlag_PowerOfTwoEdges)

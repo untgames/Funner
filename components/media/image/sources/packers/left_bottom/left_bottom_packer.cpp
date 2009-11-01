@@ -94,7 +94,7 @@ class TileImageBuilder
 
         do
         {
-          pack_result = PackImages (result_image_horisontal_side, result_image_vertical_side, out_origins, indices);
+          pack_result = PackImages (pack_flags & AtlasPackFlag_SwapAxises, result_image_horisontal_side, result_image_vertical_side, out_origins, indices);
 
           if (pack_result) break;
 
@@ -111,31 +111,46 @@ class TileImageBuilder
       size_t y_pos;
       size_t width;
       size_t height;
+      bool   swap_axises;
 
-      FreeSpace (size_t in_x_pos, size_t in_y_pos, size_t in_width, size_t in_height)
-        : x_pos (in_x_pos), y_pos (in_y_pos), width (in_width), height (in_height)
+      FreeSpace (size_t in_x_pos, size_t in_y_pos, size_t in_width, size_t in_height, bool in_swap_axises)
+        : x_pos (in_x_pos), y_pos (in_y_pos), width (in_width), height (in_height), swap_axises (in_swap_axises)
         {}
 
       bool operator < (const FreeSpace& right) const
       {
-        if      (x_pos < right.x_pos)   return true;
-        else if (x_pos > right.x_pos)   return false;
-        else if (y_pos < right.y_pos)   return true;
-        else if (y_pos > right.y_pos)   return false;
-        else if (width < right.width)   return true;
-        else if (width > right.width)   return false;
-        else if (height < right.height) return true;
-        else return false;
+        if (swap_axises)
+        {
+          if      (y_pos < right.y_pos)   return true;
+          else if (y_pos > right.y_pos)   return false;
+          else if (x_pos < right.x_pos)   return true;
+          else if (x_pos > right.x_pos)   return false;
+          else if (height < right.height) return true;
+          else if (height > right.height) return false;
+          else if (width < right.width)   return true;
+          else return false;
+        }
+        else
+        {
+          if      (x_pos < right.x_pos)   return true;
+          else if (x_pos > right.x_pos)   return false;
+          else if (y_pos < right.y_pos)   return true;
+          else if (y_pos > right.y_pos)   return false;
+          else if (width < right.width)   return true;
+          else if (width > right.width)   return false;
+          else if (height < right.height) return true;
+          else return false;
+        }
       }
     };
 
-    bool PackImages (size_t result_image_horizontal_side, size_t result_image_vertical_side, math::vec2ui* out_origins, const IndexArray& indices)
+    bool PackImages (bool swap_axises, size_t result_image_horizontal_side, size_t result_image_vertical_side, math::vec2ui* out_origins, const IndexArray& indices)
     {
       typedef set<FreeSpace, less<FreeSpace> > FreeSpacesSet;
 
       FreeSpacesSet free_spaces;
 
-      free_spaces.insert (FreeSpace (0, 0, result_image_horizontal_side, result_image_vertical_side));
+      free_spaces.insert (FreeSpace (0, 0, result_image_horizontal_side, result_image_vertical_side, swap_axises));
 
       for (size_t i = 0; i < indices.size (); i++)
       {
@@ -165,25 +180,25 @@ class TileImageBuilder
             {
               if (out_origin.x > erase_iter->x_pos) //есть новое свободное место левее картинки
               {
-                FreeSpace left_free_space (erase_iter->x_pos, erase_iter->y_pos, out_origin.x - erase_iter->x_pos, erase_iter->height);
+                FreeSpace left_free_space (erase_iter->x_pos, erase_iter->y_pos, out_origin.x - erase_iter->x_pos, erase_iter->height, swap_axises);
 
                 free_spaces.insert (left_free_space);
               }
               if ((out_origin.x + image_size.x) < (erase_iter->x_pos + erase_iter->width)) //есть новое свободное место правее картинки
               {
-                FreeSpace right_free_space (out_origin.x + image_size.x, erase_iter->y_pos, erase_iter->x_pos + erase_iter->width - (out_origin.x + image_size.x), erase_iter->height);
+                FreeSpace right_free_space (out_origin.x + image_size.x, erase_iter->y_pos, erase_iter->x_pos + erase_iter->width - (out_origin.x + image_size.x), erase_iter->height, swap_axises);
 
                 free_spaces.insert (right_free_space);
               }
               if (out_origin.y > erase_iter->y_pos) //есть новое свободное место ниже картинки
               {
-                FreeSpace bottom_free_space (erase_iter->x_pos, erase_iter->y_pos, erase_iter->width, out_origin.y - erase_iter->y_pos);
+                FreeSpace bottom_free_space (erase_iter->x_pos, erase_iter->y_pos, erase_iter->width, out_origin.y - erase_iter->y_pos, swap_axises);
 
                 free_spaces.insert (bottom_free_space);
               }
               if ((out_origin.y + image_size.y) < (erase_iter->y_pos + erase_iter->height)) //есть новое свободное место выше картинки
               {
-                FreeSpace top_free_space (erase_iter->x_pos, out_origin.y + image_size.y, erase_iter->width, erase_iter->y_pos + erase_iter->height - (out_origin.y + image_size.y));
+                FreeSpace top_free_space (erase_iter->x_pos, out_origin.y + image_size.y, erase_iter->width, erase_iter->y_pos + erase_iter->height - (out_origin.y + image_size.y), swap_axises);
 
                 free_spaces.insert (top_free_space);
               }

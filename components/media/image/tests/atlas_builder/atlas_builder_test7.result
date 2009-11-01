@@ -1,0 +1,34 @@
+Results of atlas_builder_test5:
+Load image 'data/1.bmp'
+Load image 'data/2.tga'
+Build atlas 231x128
+Save atlas 'results/invert-x.png' and layout 'results/invert-x.xatlas'
+Build successfull!
+Load image 'data/1.bmp'
+Load image 'data/2.tga'
+Build atlas 231x128
+Save atlas 'results/invert-y.png' and layout 'results/invert-y.xatlas'
+Build successfull!
+Load image 'data/1.bmp'
+Load image 'data/2.tga'
+Build atlas 231x128
+Save atlas 'results/invert-xy.png' and layout 'results/invert-xy.xatlas'
+Build successfull!
+results/invert-x.xatlas
+<?xml version="1.0" encoding="utf-8"?>
+<Atlas Image="results/invert-x.png">
+  <Tile Id="data/1.bmp" XPosition="171" YPosition="0" Width="60" Height="60"/>
+  <Tile Id="data/2.tga" XPosition="0" YPosition="0" Width="171" Height="128"/>
+</Atlas>
+results/invert-y.xatlas
+<?xml version="1.0" encoding="utf-8"?>
+<Atlas Image="results/invert-y.png">
+  <Tile Id="data/1.bmp" XPosition="0" YPosition="68" Width="60" Height="60"/>
+  <Tile Id="data/2.tga" XPosition="60" YPosition="0" Width="171" Height="128"/>
+</Atlas>
+results/invert-xy.xatlas
+<?xml version="1.0" encoding="utf-8"?>
+<Atlas Image="results/invert-xy.png">
+  <Tile Id="data/1.bmp" XPosition="171" YPosition="68" Width="60" Height="60"/>
+  <Tile Id="data/2.tga" XPosition="0" YPosition="0" Width="171" Height="128"/>
+</Atlas>
