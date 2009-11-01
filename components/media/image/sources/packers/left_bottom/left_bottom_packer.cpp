@@ -129,85 +129,63 @@ class TileImageBuilder
       }
     };
 
-    bool PackImages (size_t result_image_horisontal_side, size_t result_image_vertical_side, math::vec2ui* out_origins, const IndexArray& indices)
+    bool PackImages (size_t result_image_horizontal_side, size_t result_image_vertical_side, math::vec2ui* out_origins, const IndexArray& indices)
     {
       typedef set<FreeSpace, less<FreeSpace> > FreeSpacesSet;
 
       FreeSpacesSet free_spaces;
 
-      free_spaces.insert (FreeSpace (0, 0, result_image_horisontal_side, result_image_vertical_side));
+      free_spaces.insert (FreeSpace (0, 0, result_image_horizontal_side, result_image_vertical_side));
 
       for (size_t i = 0; i < indices.size (); i++)
       {
+        math::vec2ui &image_size = images [indices [i]],
+                     &out_origin = out_origins [indices [i]];
+
         FreeSpacesSet::iterator iter = free_spaces.begin (), end = free_spaces.end ();
 
         for (; iter != end; ++iter)
         {
-          if ((iter->width < images[indices[i]].x) || (iter->height < images[indices[i]].y))
+          if ((iter->width < image_size.x) || (iter->height < image_size.y))
             continue;
 
-          out_origins[i].x = iter->x_pos;
-          out_origins[i].y = iter->y_pos;
+          out_origin.x = iter->x_pos;
+          out_origin.y = iter->y_pos;
 
-          bound_volumes::axis_aligned_box<unsigned int> image_bb (vec3ui (out_origins[i].x, out_origins[i].y, 0),
-                                                            vec3ui (out_origins[i].x + images[indices[i]].x - 1, out_origins[i].y + images[indices[i]].y - 1, 1));
+          //нашли подходящее место для картинки, для всех свободных мест с которыми пересеклась картинка проводим рассчёт новых свободных мест
+          bound_volumes::axis_aligned_box<unsigned int> image_bb (vec3ui (out_origin.x, out_origin.y, 0),
+                                                                  vec3ui (out_origin.x + image_size.x - 1, out_origin.y + image_size.y - 1, 1));
 
           for (FreeSpacesSet::iterator erase_iter = free_spaces.begin (), erase_end = free_spaces.end (); erase_iter != erase_end;)
           {
             bound_volumes::axis_aligned_box<unsigned int> free_space_bb (vec3ui (erase_iter->x_pos, erase_iter->y_pos, 0),
-                                                                   vec3ui (erase_iter->x_pos + erase_iter->width - 1, erase_iter->y_pos + erase_iter->height - 1, 1));
+                                                                         vec3ui (erase_iter->x_pos + erase_iter->width - 1, erase_iter->y_pos + erase_iter->height - 1, 1));
 
-            if (my_intersects (free_space_bb, image_bb))
+            if (my_intersects (free_space_bb, image_bb)) //картинка пересеклась с этим свободным местом, удаляем его и добавляем образовавшиеся новые свободные места
             {
-              if (erase_iter->x_pos >= out_origins[i].x)
+              if (out_origin.x > erase_iter->x_pos) //есть новое свободное место левее картинки
               {
-                if (out_origins[i].y <= erase_iter->y_pos)
-                {
-                  if (images[indices[i]].y < erase_iter->height)
-                  {
-                    FreeSpace top_free_space (erase_iter->x_pos, out_origins[i].y + images[indices[i]].y, erase_iter->width, erase_iter->height - (out_origins[i].y + images[indices[i]].y - erase_iter->y_pos));
+                FreeSpace left_free_space (erase_iter->x_pos, erase_iter->y_pos, out_origin.x - erase_iter->x_pos, erase_iter->height);
 
-                    free_spaces.insert (top_free_space);
-                  }
-                }
-                else if (erase_iter->x_pos < (out_origins[i].x + images[indices[i]].x))
-                {
-                  FreeSpace lower_free_space (erase_iter->x_pos, erase_iter->y_pos, erase_iter->width, out_origins[i].y - erase_iter->y_pos);
-
-                  free_spaces.insert (lower_free_space);
-                }
-
-                if ((erase_iter->x_pos + erase_iter->width) > (out_origins[i].x + images[indices[i]].x))
-                {
-                  FreeSpace right_free_space (out_origins[i].x + images[indices[i]].x, erase_iter->y_pos, erase_iter->width - (out_origins[i].x + images[indices[i]].x - erase_iter->x_pos), erase_iter->height);
-
-                  free_spaces.insert (right_free_space);
-                }
+                free_spaces.insert (left_free_space);
               }
-              if (erase_iter->y_pos >= out_origins[i].y)
+              if ((out_origin.x + image_size.x) < (erase_iter->x_pos + erase_iter->width)) //есть новое свободное место правее картинки
               {
-                if (out_origins[i].x <= erase_iter->x_pos)
-                {
-                  if (images[indices[i]].x < erase_iter->width)
-                  {
-                    FreeSpace right_free_space (out_origins[i].x + images[indices[i]].x, erase_iter->y_pos, erase_iter->width - (out_origins[i].x + images[indices[i]].x - erase_iter->x_pos), erase_iter->height);
+                FreeSpace right_free_space (out_origin.x + image_size.x, erase_iter->y_pos, erase_iter->x_pos + erase_iter->width - (out_origin.x + image_size.x), erase_iter->height);
 
-                    free_spaces.insert (right_free_space);
-                  }
-                }
-                else if (erase_iter->y_pos < (out_origins[i].y + images[indices[i]].y))
-                {
-                  FreeSpace narrow_free_space (erase_iter->x_pos, erase_iter->y_pos, out_origins[i].x - erase_iter->x_pos, erase_iter->height);
+                free_spaces.insert (right_free_space);
+              }
+              if (out_origin.y > erase_iter->y_pos) //есть новое свободное место ниже картинки
+              {
+                FreeSpace bottom_free_space (erase_iter->x_pos, erase_iter->y_pos, erase_iter->width, out_origin.y - erase_iter->y_pos);
 
-                  free_spaces.insert (narrow_free_space);
-                }
+                free_spaces.insert (bottom_free_space);
+              }
+              if ((out_origin.y + image_size.y) < (erase_iter->y_pos + erase_iter->height)) //есть новое свободное место выше картинки
+              {
+                FreeSpace top_free_space (erase_iter->x_pos, out_origin.y + image_size.y, erase_iter->width, erase_iter->y_pos + erase_iter->height - (out_origin.y + image_size.y));
 
-                if ((erase_iter->y_pos + erase_iter->height) > (out_origins[i].y + images[indices[i]].y))
-                {
-                  FreeSpace top_free_space (erase_iter->x_pos, out_origins[i].y + images[indices[i]].y, erase_iter->width, erase_iter->height - (out_origins[i].y + images[indices[i]].y - erase_iter->y_pos));
-
-                  free_spaces.insert (top_free_space);
-                }
+                free_spaces.insert (top_free_space);
               }
 
               FreeSpacesSet::iterator next = erase_iter;
