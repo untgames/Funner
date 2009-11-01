@@ -68,7 +68,7 @@ struct AtlasBuilder::Impl
         {
           try
           {
-            images.push_back (ImagePtr (new Image (image)));
+            images.push_back (GetImageDesc (ImagePtr (new Image (image))));
           }
           catch (xtl::exception& exception)
           {
@@ -86,7 +86,7 @@ struct AtlasBuilder::Impl
 
             new_image->Swap (image);
 
-            images.push_back (new_image);
+            images.push_back (GetImageDesc (new_image));
           }
           catch (xtl::exception& exception)
           {
@@ -105,7 +105,7 @@ struct AtlasBuilder::Impl
     {
       try
       {
-        images.push_back (ImagePtr (new Image (image_name)));
+        images.push_back (GetImageDesc (ImagePtr (new Image (image_name))));
       }
       catch (xtl::exception& exception)
       {
@@ -130,16 +130,24 @@ struct AtlasBuilder::Impl
       try
       {
           //упаковка
+        size_t unique_images_count = images_hash_map.size ();
         
-        xtl::uninitialized_storage<math::vec2ui> sizes (images.size ());
-        xtl::uninitialized_storage<math::vec2ui> origins (images.size ());
+        xtl::uninitialized_storage<math::vec2ui> sizes (unique_images_count);
+        xtl::uninitialized_storage<math::vec2ui> origins (unique_images_count);
 
         math::vec2ui *current_size = sizes.data ();
 
-        for (size_t i = 0; i < images.size (); i++, current_size++)
+        for (size_t i = 0; i < images.size (); i++)
         {
-          current_size->x = images[i]->Width ();
-          current_size->y = images[i]->Height ();
+          ImageDescPtr current_image_desc = images [i];
+
+          if (current_image_desc->duplicate_of_index != i)
+            continue;
+
+          current_size->x = current_image_desc->image->Width ();
+          current_size->y = current_image_desc->image->Height ();
+
+          current_size++;
         }
 
         pack_handler (sizes.size (), sizes.data (), origins.data (), pack_flags & ~AtlasPackFlag_InvertTilesX & ~AtlasPackFlag_InvertTilesY);
@@ -166,17 +174,18 @@ struct AtlasBuilder::Impl
           result_image_height = get_next_higher_power_of_two (result_image_height);
         }
         
-        for (size_t i = 0; i < origins.size (); i++)
+        for (size_t i = 0; i < images.size (); i++)
         {
-          Tile new_tile;
+          ImageDescPtr current_image_desc = images [i];
+          Tile         new_tile;
           
-          math::vec2ui& origin = origins.data ()[i];
-          math::vec2ui& size   = sizes.data ()[i];          
+          math::vec2ui& origin = origins.data ()[current_image_desc->unique_index];
+          math::vec2ui& size   = sizes.data ()[current_image_desc->unique_index];
 
           if (pack_flags & AtlasPackFlag_InvertTilesX) origin.x = result_image_width  - origin.x - size.x;
           if (pack_flags & AtlasPackFlag_InvertTilesY) origin.y = result_image_height - origin.y - size.y;          
 
-          new_tile.name   = images [i]->Name ();
+          new_tile.name   = current_image_desc->image->Name ();
           new_tile.origin = origin;
           new_tile.size   = size;
 
@@ -185,12 +194,23 @@ struct AtlasBuilder::Impl
 
           //создание изображения атласа
 
-        Image result_image (result_image_width, result_image_height, 1, (*images.begin ())->Format ());
+        Image result_image (result_image_width, result_image_height, 1, (*images.begin ())->image->Format ());
 
         memset (result_image.Bitmap (), 0, result_image_width * result_image_height * get_bytes_per_pixel (result_image.Format ()));
 
-        for (size_t i = 0; i < origins.size (); i++)
-          result_image.PutImage (origins.data ()[i].x, origins.data ()[i].y, 0, sizes.data ()[i].x, sizes.data ()[i].y, 1, images [i]->Format (), images [i]->Bitmap ());
+        for (size_t i = 0; i < images.size (); i++)
+        {
+          ImageDescPtr current_image_desc = images [i];
+
+          if (current_image_desc->duplicate_of_index != i)
+            continue;
+
+          size_t unique_index = current_image_desc->unique_index;
+
+          result_image.PutImage (origins.data ()[unique_index].x, origins.data ()[unique_index].y, 0,
+                                 sizes.data ()[unique_index].x, sizes.data ()[unique_index].y, 1,
+                                 current_image_desc->image->Format (), current_image_desc->image->Bitmap ());
+        }
 
         result_atlas.Swap (out_atlas);
         result_image.Swap (out_atlas_image);
@@ -204,12 +224,49 @@ struct AtlasBuilder::Impl
 
   private:
     typedef xtl::shared_ptr<Image> ImagePtr;
-    typedef stl::vector<ImagePtr>  ImagesArray;
+
+    struct ImageDesc
+    {
+      ImagePtr image;
+      size_t   duplicate_of_index;   //индекс картинки в массиве images, дубликатом которой является эта картинка
+      size_t   unique_index;         //размер карты уникальных картинок в момент добавления этой картинки
+    };
+
+    typedef xtl::shared_ptr<ImageDesc>    ImageDescPtr;
+    typedef stl::vector<ImageDescPtr>     ImagesDescsArray;
+    typedef stl::hash_map<size_t, size_t> BitmapHashMap;
 
   private:
-    PackHandler pack_handler;
-    stl::string atlas_image_name;
-    ImagesArray images;
+    ImageDescPtr GetImageDesc (ImagePtr image)
+    {
+      ImageDescPtr image_desc (new ImageDesc);
+
+      image_desc->image = image;
+
+      size_t bitmap_hash = common::crc32 (image->Bitmap (), image->Width () * image->Height () * get_bytes_per_pixel (image->Format ()));
+
+      BitmapHashMap::iterator iter = images_hash_map.find (bitmap_hash);
+
+      if (iter == images_hash_map.end ())
+      {
+        image_desc->duplicate_of_index = images.size ();
+        image_desc->unique_index       = images_hash_map.size ();
+        images_hash_map.insert_pair (bitmap_hash, image_desc->duplicate_of_index);
+      }
+      else
+      {
+        image_desc->duplicate_of_index = iter->second;
+        image_desc->unique_index       = images [image_desc->duplicate_of_index]->unique_index;
+      }
+
+      return image_desc;
+    }
+
+  private:
+    PackHandler      pack_handler;
+    stl::string      atlas_image_name;
+    ImagesDescsArray images;
+    BitmapHashMap    images_hash_map;
 };
 
 /*
