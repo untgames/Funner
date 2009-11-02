@@ -100,6 +100,9 @@ class MoviePlayer: public IStreamPlayer
 ///Установить позицию проигрывания
     void SetPosition (float position)
     {
+      if (position == 0.f)
+        return;
+
       throw xtl::format_not_supported_exception("media::players::iphone::MoviePlayer::SetPosition");
     }
 
