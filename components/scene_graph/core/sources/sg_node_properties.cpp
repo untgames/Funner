@@ -29,6 +29,11 @@ struct NodeProperty
   {
   }
   
+  virtual ~NodeProperty () {}
+  
+///Копирование
+  virtual NodeProperty* Clone () = 0;
+  
 ///Хэш данных
   virtual size_t GetHash (size_t current_hash) = 0;
   
@@ -52,7 +57,7 @@ template <> struct NodePropertyTypeMap<NodePropertyType_Matrix>  { typedef math:
 template <class T>
 size_t get_value_hash (const T& value, size_t current_hash)
 {
-  return common::crc32 (&value, current_hash);
+  return common::crc32 (&value, sizeof (T), current_hash);
 }
 
 size_t get_value_hash (const stl::string& value, size_t current_hash)
@@ -73,6 +78,18 @@ template <NodePropertyType node_type> struct NodePropertyImpl: public NodeProper
   {    
   }
   
+  NodePropertyImpl (const NodePropertyImpl& property)
+    : NodeProperty (property)
+    , value (property.value)
+  {
+  }
+  
+///Копирование
+  NodeProperty* Clone ()
+  {    
+    return new NodePropertyImpl (*this);    
+  }
+  
 ///Хэш данных
   size_t GetHash (size_t current_hash)
   {
@@ -81,8 +98,8 @@ template <NodePropertyType node_type> struct NodePropertyImpl: public NodeProper
   
 ///Установка значения в список свойств узла
   void CopyValueTo (NodeProperties& map, size_t property_index)
-  {
-    map.SetProperty (property_index, value);
+  {  
+    map.SetProperty (property_index, value);    
   }
 };
 
@@ -92,11 +109,11 @@ typedef stl::vector<NodeProperty*> PropertyArray;
 template <NodePropertyType type>
 void read_value_to_property (const char* string, NodeProperty& property)
 {
-  typedef typename NodePropertyTypeMap<type>::type result_type;
+  typedef typename NodePropertyTypeMap<type>::type result_type;   
 
-  if (!xtl::io::read_and_cast<result_type> (string, static_cast<NodePropertyImpl<type>&> (property).value))
+  if (!xtl::io::read_and_cast<result_type> (string, static_cast<NodePropertyImpl<type>&> (property).value))    
     throw xtl::format_operation_exception ("scene_graph::read_value_to_property", "Could not convert property '%s' from %s='%s' to %s",
-      property.name.c_str (), get_name (NodePropertyType_String), string, get_name (type));
+      property.name.c_str (), get_name (NodePropertyType_String), string, get_name (type));  
 }
 
 template <> void read_value_to_property<NodePropertyType_String> (const char* string, NodeProperty& property)
@@ -122,19 +139,73 @@ void read_value_from_property (const NodePropertyImpl<NodePropertyType_String>& 
 namespace math
 {
 
-template <class T>
-inline bool read (const char* string, T& result)
+inline bool read (const char* string, math::vec4f& result)
+{
+  common::StringArray tokens = common::split (string);
+  
+  switch (tokens.Size ())
+  {    
+    case 1:
+    {
+      float value = 0.0f;
+
+      if (!xtl::io::read (tokens [0], value))
+        return false;
+
+      result = math::vec4f (value);
+
+      return true;
+    }
+    case 2:
+    case 3:
+    case 4:
+    {
+      math::vec4f v (0.0f);
+      
+      for (size_t i=0, count=tokens.Size (); i<count; i++)
+        if (!xtl::io::read (tokens [i], v [i]))
+          return false;
+      
+      result = v;
+
+      return true;
+    }
+    default:
+      return false;
+  }
+}
+
+inline bool read (const char* string, math::mat4f& result)
 {
   typedef xtl::io::token_iterator<const char*> token_iterator;
 
   common::StringArray tokens = common::split (string);
-  token_iterator      iter   = xtl::io::make_token_iterator (tokens.Data (), tokens.Data () + tokens.Size ());  
   
-  return read (iter, result);
+  switch (tokens.Size ())
+  {    
+    case 1:
+    {
+      float value = 0.0f;
+
+      if (!xtl::io::read (tokens [0], value))
+        return false;
+
+      result = math::mat4f (value);
+
+      return true;
+    }
+    case 16:
+    {
+      token_iterator iter = xtl::io::make_token_iterator (tokens.Data (), tokens.Data () + tokens.Size ());
+  
+      return read (iter, result);
+    }
+    default:
+      return false;
+  }  
 }
 
 }
-
 
 /*
     Описание реализации свойств узла
@@ -149,7 +220,7 @@ struct NodeProperties::Impl
   size_t                 structure_hash;   //хэш структуры
   PropertyArray          properties;       //свойства
 
-///Конструктор
+///Конструкторы
   Impl ()  
     : need_hash_update (true)
     , hash (0)
@@ -157,6 +228,37 @@ struct NodeProperties::Impl
     , structure_hash (0)
   {
     properties.reserve (PROPERTY_ARRAY_RESERVE_SIZE);
+  }
+  
+  Impl (const Impl& impl)
+    : need_hash_update (impl.need_hash_update)
+    , hash (impl.hash)
+    , data_hash (impl.data_hash)
+    , structure_hash (impl.structure_hash)
+  {
+    properties.reserve (impl.properties.size ());
+    
+    try
+    {
+      for (PropertyArray::const_iterator iter=impl.properties.begin (), end=impl.properties.end (); iter!=end; ++iter)
+      {
+        NodeProperty&               src_property = **iter;
+        stl::auto_ptr<NodeProperty> new_property (src_property.Clone ());
+        
+        properties.push_back (new_property.get ());
+        
+        new_property.release ();
+      }      
+    }
+    catch (...)
+    {
+      for (PropertyArray::iterator iter=properties.begin (), end=properties.end (); iter!=end; ++iter)
+        delete *iter;
+
+      properties.clear ();
+
+      throw;
+    }
   }
   
 ///Получение индекса свойства
@@ -178,15 +280,15 @@ struct NodeProperties::Impl
   }
   
 ///Создание нового свойства
-  stl::auto_ptr<NodeProperty> CreateProperty (const char* name, NodePropertyType type)
+  static stl::auto_ptr<NodeProperty> CreateProperty (const char* name, NodePropertyType type)
   {
     switch (type)
     {
-      case NodePropertyType_String:  return new NodePropertyImpl<NodePropertyType_String> (name);
-      case NodePropertyType_Integer: return new NodePropertyImpl<NodePropertyType_Integer> (name);
-      case NodePropertyType_Float:   return new NodePropertyImpl<NodePropertyType_Float> (name);
-      case NodePropertyType_Vector:  return new NodePropertyImpl<NodePropertyType_Vector> (name);
-      case NodePropertyType_Matrix:  return new NodePropertyImpl<NodePropertyType_Matrix> (name);
+      case NodePropertyType_String:  return stl::auto_ptr<NodeProperty> (new NodePropertyImpl<NodePropertyType_String> (name));
+      case NodePropertyType_Integer: return stl::auto_ptr<NodeProperty> (new NodePropertyImpl<NodePropertyType_Integer> (name));
+      case NodePropertyType_Float:   return stl::auto_ptr<NodeProperty> (new NodePropertyImpl<NodePropertyType_Float> (name));
+      case NodePropertyType_Vector:  return stl::auto_ptr<NodeProperty> (new NodePropertyImpl<NodePropertyType_Vector> (name));
+      case NodePropertyType_Matrix:  return stl::auto_ptr<NodeProperty> (new NodePropertyImpl<NodePropertyType_Matrix> (name));
       default:
         throw xtl::make_argument_exception ("scene_graph::NodeProperties::Impl::CreateProperty", "type", type);
     }
@@ -212,13 +314,15 @@ struct NodeProperties::Impl
         return index;
         
       //создание нового свойства
-      
+
     stl::auto_ptr<NodeProperty> new_property = CreateProperty (name, type);
 
     properties.push_back (new_property.get ());
     
     new_property_inserted = true;
-    need_hash_update      = true;    
+    need_hash_update      = true;
+    
+    new_property.release ();
 
     return properties.size () - 1;
   }
@@ -226,20 +330,20 @@ struct NodeProperties::Impl
 ///Обновление хэша
   void UpdateHashes ()
   {
-    size_t data_hash      = 0xFFFFFFFF,
-           structure_hash = 0xFFFFFFFF;
-    
+    data_hash      = 0xFFFFFFFF;
+    structure_hash = 0xFFFFFFFF;
+
     for (PropertyArray::iterator iter=properties.begin (), end=properties.end (); iter!=end; ++iter)
     {
       NodeProperty& property = **iter;
-      
-      data_hash      = property.GetHash (data_hash);
+
+      data_hash      = property.GetHash (data_hash);      
       structure_hash = common::crc32 (&property.name_hash, sizeof (property.name_hash), structure_hash);
       structure_hash = common::crc32 (&property.type, sizeof (property.type), structure_hash);
     }
     
     hash             = common::crc32 (&data_hash, sizeof (data_hash), structure_hash);
-    need_hash_update = false;       
+    need_hash_update = false;
   }
   
 ///Установка свойства
@@ -274,11 +378,16 @@ struct NodeProperties::Impl
 };
 
 /*
-    Конструктор / деструктор
+    Конструкторы / деструктор
 */
 
 NodeProperties::NodeProperties ()
   : impl (new Impl)
+{
+}
+
+NodeProperties::NodeProperties (const NodeProperties& properties)
+  : impl (new Impl (*properties.impl))
 {
 }
 
@@ -296,6 +405,23 @@ NodeProperties::~NodeProperties ()
 NodeProperties::Pointer NodeProperties::Create ()
 {
   return Pointer (new NodeProperties, false);
+}
+
+/*
+    Копирование
+*/
+
+NodeProperties::Pointer NodeProperties::Clone () const
+{
+  try
+  {
+    return Pointer (new NodeProperties (*this), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::NodeProperties::Clone");
+    throw;
+  }
 }
 
 /*
@@ -355,7 +481,7 @@ const char* NodeProperties::PropertyName (size_t index) const
 
 void NodeProperties::SetPropertyName (size_t index, const char* name)
 {
-  static const char* METHOD_NAME = "scene_graph::NodeProperties::SetPropertyName";
+  static const char* METHOD_NAME = "scene_graph::NodeProperties::SetPropertyName(size_t,const char*)";
   
     //проверка корректности аргументов
     
@@ -384,6 +510,19 @@ void NodeProperties::SetPropertyName (size_t index, const char* name)
   property.name_hash = name_hash;
   
   impl->need_hash_update = true;
+}
+
+void NodeProperties::SetPropertyName (const char* old_name, const char* new_name)
+{
+  try
+  {
+    SetPropertyName (impl->GetIndex (old_name), new_name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("scene_graph::NodeProperties::SetPropertyName(const char*,const char*)");
+    throw;
+  }
 }
 
 /*
@@ -443,29 +582,29 @@ void NodeProperties::SetPropertyType (size_t index, NodePropertyType type)
         throw xtl::make_argument_exception ("", "type", type);
     }
     
-      //создание нового свойства
+      //создание нового свойства      
     
-    stl::auto_ptr<NodeProperty> new_property = impl->CreateProperty (src_property.name.c_str (), src_property.type);
+    stl::auto_ptr<NodeProperty> new_property = Impl::CreateProperty (src_property.name.c_str (), type);
     
-      //обновление значения
+      //обновление значения    
 
     impl->properties [index] = new_property.get ();
 
     try
     {
-      src_property.CopyValueTo (*this, index);
+      src_property.CopyValueTo (*this, index);      
 
       delete &src_property;
 
       new_property.release ();
-      
-      impl->need_hash_update = true;
+
+      impl->need_hash_update = true;      
     }
     catch (...)
     {
       impl->properties [index] = &src_property;
       throw;
-    }
+    }    
   }
   catch (xtl::exception& e)
   {
@@ -503,7 +642,7 @@ int NodeProperties::IndexOf (const char* name) const
     if ((*iter)->name_hash == hash)
       return index;
       
-  return index;
+  return -1;
 }
 
 bool NodeProperties::IsPresent (const char* name) const
@@ -676,8 +815,8 @@ void NodeProperties::SetProperty (size_t property_index, const char* value)
       case NodePropertyType_Float:
         read_value_to_property<NodePropertyType_Float> (value, property);
         break;
-      case NodePropertyType_Vector:
-        read_value_to_property<NodePropertyType_Vector> (value, property);
+      case NodePropertyType_Vector:      
+        read_value_to_property<NodePropertyType_Vector> (value, property);        
         break;
       case NodePropertyType_Matrix:
         read_value_to_property<NodePropertyType_Matrix> (value, property);
@@ -704,6 +843,7 @@ void NodeProperties::SetProperty (size_t property_index, const stl::string& valu
   catch (xtl::exception& e)
   {
     e.touch ("scene_graph::NodeProperties::SetProperty(size_t,const stl::string&)");
+    throw;
   }
 }
 
@@ -805,7 +945,7 @@ void NodeProperties::SetProperty (size_t property_index, const math::vec4f& valu
       case NodePropertyType_Integer:
       case NodePropertyType_Float:
       case NodePropertyType_Matrix:
-        throw xtl::format_operation_exception ("", "Could not convert property '%s' from %s to %s", property.name.c_str (), get_name (property.type), get_name (NodePropertyType_Vector));
+        throw xtl::format_operation_exception ("", "Could not convert property '%s' from %s to %s", property.name.c_str (), get_name (NodePropertyType_Vector), get_name (property.type));
       default:
         throw xtl::format_operation_exception ("", "Internal error: wrong property '%s' type %d", property.name.c_str (), property.type);        
     }
@@ -836,10 +976,10 @@ void NodeProperties::SetProperty (size_t property_index, const math::mat4f& valu
       case NodePropertyType_Matrix:
         static_cast<NodePropertyImpl<NodePropertyType_Matrix>&> (property).value = value;
         break;
-      case NodePropertyType_Integer:
-      case NodePropertyType_Float:
+      case NodePropertyType_Integer:        
+      case NodePropertyType_Float:        
       case NodePropertyType_Vector:
-        throw xtl::format_operation_exception ("", "Could not convert property '%s' from %s to %s", property.name.c_str (), get_name (property.type), get_name (NodePropertyType_Matrix));
+        throw xtl::format_operation_exception ("", "Could not convert property '%s' from %s to %s", property.name.c_str (), get_name (NodePropertyType_Matrix), get_name (property.type));
       default:
         throw xtl::format_operation_exception ("", "Internal error: wrong property '%s' type %d", property.name.c_str (), property.type);        
     }
@@ -994,7 +1134,7 @@ const math::mat4f& NodeProperties::GetMatrix (const char* name) const
 void NodeProperties::GetProperty (size_t property_index, stl::string& result) const
 {
   try
-  {
+  {    
     if (property_index >= impl->properties.size ())
       throw xtl::make_range_exception ("", "property_index", property_index, impl->properties.size ());
       
@@ -1008,8 +1148,8 @@ void NodeProperties::GetProperty (size_t property_index, stl::string& result) co
       case NodePropertyType_Integer:
         xtl::to_string (result, static_cast<NodePropertyImpl<NodePropertyType_Integer>&> (property).value);
         break;
-      case NodePropertyType_Float:
-        xtl::to_string (result, static_cast<NodePropertyImpl<NodePropertyType_Float>&> (property).value);
+      case NodePropertyType_Float:      
+        xtl::to_string (result, static_cast<NodePropertyImpl<NodePropertyType_Float>&> (property).value);        
         break;
       case NodePropertyType_Vector:    
         to_string (result, static_cast<NodePropertyImpl<NodePropertyType_Vector>&> (property).value);
@@ -1282,6 +1422,7 @@ const char* get_name (NodePropertyType type)
   {
     case NodePropertyType_String:  return "string";
     case NodePropertyType_Integer: return "integer";
+    case NodePropertyType_Float:   return "float";
     case NodePropertyType_Vector:  return "vector";
     case NodePropertyType_Matrix:  return "matrix";
     default:

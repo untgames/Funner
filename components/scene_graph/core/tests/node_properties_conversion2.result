@@ -1,0 +1,158 @@
+Results of node_properties_conversion1_test:
+SetProperty ('String', ""): 
+SetProperty ('String', "hello world"): hello world
+SetProperty ('String', "3.14"): 3.14
+SetProperty ('String', "1 2.5 3 4"): 1 2.5 3 4
+SetProperty ('String', "1 2.5 4"): 1 2.5 4
+SetProperty ('String', "1 2 3 4 5"): 1 2 3 4 5
+SetProperty ('String', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+SetProperty ('String', 13): 13
+SetProperty ('String', 1.5f): 1.5
+SetProperty ('String', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): 1 2 3 4
+SetProperty ('String', math::mat4f (3.0f)): 3 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3
+SetProperty ('Integer', ""): exception: Could not convert property 'Integer' from string='' to integer
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Integer', "hello world"): exception: Could not convert property 'Integer' from string='hello world' to integer
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Integer', "3.14"): 3
+SetProperty ('Integer', "1 2.5 3 4"): exception: Could not convert property 'Integer' from string='1 2.5 3 4' to integer
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Integer', "1 2.5 4"): exception: Could not convert property 'Integer' from string='1 2.5 4' to integer
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Integer', "1 2 3 4 5"): exception: Could not convert property 'Integer' from string='1 2 3 4 5' to integer
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Integer', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'Integer' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to integer
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Integer', 13): 13
+SetProperty ('Integer', 1.5f): 1
+SetProperty ('Integer', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): exception: Could not convert property 'Integer' from vector to integer
+    at scene_graph::NodeProperties::SetProperty(size_t,const math::vec4f&)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const math::vec4f&)
+SetProperty ('Integer', math::mat4f (3.0f)): exception: Could not convert property 'Integer' from matrix to integer
+    at scene_graph::NodeProperties::SetProperty(size_t,const math::mat4f&)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const math::mat4f&)
+SetProperty ('Float', ""): exception: Could not convert property 'Float' from string='' to float
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Float', "hello world"): exception: Could not convert property 'Float' from string='hello world' to float
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Float', "3.14"): 3.14
+SetProperty ('Float', "1 2.5 3 4"): exception: Could not convert property 'Float' from string='1 2.5 3 4' to float
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Float', "1 2.5 4"): exception: Could not convert property 'Float' from string='1 2.5 4' to float
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Float', "1 2 3 4 5"): exception: Could not convert property 'Float' from string='1 2 3 4 5' to float
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Float', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'Float' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to float
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Float', 13): 13
+SetProperty ('Float', 1.5f): 1.5
+SetProperty ('Float', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): exception: Could not convert property 'Float' from vector to float
+    at scene_graph::NodeProperties::SetProperty(size_t,const math::vec4f&)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const math::vec4f&)
+SetProperty ('Float', math::mat4f (3.0f)): exception: Could not convert property 'Float' from matrix to float
+    at scene_graph::NodeProperties::SetProperty(size_t,const math::mat4f&)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const math::mat4f&)
+SetProperty ('Vector', ""): exception: Could not convert property 'Vector' from string='' to vector
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Vector', "hello world"): exception: Could not convert property 'Vector' from string='hello world' to vector
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Vector', "3.14"): 3.14 3.14 3.14 3.14
+SetProperty ('Vector', "1 2.5 3 4"): 1 2.5 3 4
+SetProperty ('Vector', "1 2.5 4"): 1 2.5 4 0
+SetProperty ('Vector', "1 2 3 4 5"): exception: Could not convert property 'Vector' from string='1 2 3 4 5' to vector
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Vector', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'Vector' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to vector
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Vector', 13): 13 13 13 13
+SetProperty ('Vector', 1.5f): 1.5 1.5 1.5 1.5
+SetProperty ('Vector', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): 1 2 3 4
+SetProperty ('Vector', math::mat4f (3.0f)): exception: Could not convert property 'Vector' from matrix to vector
+    at scene_graph::NodeProperties::SetProperty(size_t,const math::mat4f&)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const math::mat4f&)
+SetProperty ('Matrix', ""): exception: Could not convert property 'Matrix' from string='' to matrix
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Matrix', "hello world"): exception: Could not convert property 'Matrix' from string='hello world' to matrix
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Matrix', "3.14"): 3.14 0 0 0 0 3.14 0 0 0 0 3.14 0 0 0 0 3.14
+SetProperty ('Matrix', "1 2.5 3 4"): exception: Could not convert property 'Matrix' from string='1 2.5 3 4' to matrix
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Matrix', "1 2.5 4"): exception: Could not convert property 'Matrix' from string='1 2.5 4' to matrix
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Matrix', "1 2 3 4 5"): exception: Could not convert property 'Matrix' from string='1 2 3 4 5' to matrix
+    at scene_graph::read_value_to_property
+    at scene_graph::NodeProperties::SetProperty(size_t,const char*)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const char*)
+SetProperty ('Matrix', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+SetProperty ('Matrix', 13): 13 0 0 0 0 13 0 0 0 0 13 0 0 0 0 13
+SetProperty ('Matrix', 1.5f): 1.5 0 0 0 0 1.5 0 0 0 0 1.5 0 0 0 0 1.5
+SetProperty ('Matrix', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): exception: Could not convert property 'Matrix' from vector to matrix
+    at scene_graph::NodeProperties::SetProperty(size_t,const math::vec4f&)
+    at scene_graph::NodeProperties::Impl::SetProperty
+    at scene_graph::NodeProperties::SetProperty(const char*,const math::vec4f&)
+SetProperty ('Matrix', math::mat4f (3.0f)): 3 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3
