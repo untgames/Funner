@@ -34,6 +34,11 @@ export.link.engine.subsystems.scene_render.IMPORTS       := link.engine.subsyste
 export.link.engine.subsystems.shell.LINK_INCLUDES := ShellSubsystem
 export.link.engine.subsystems.shell.IMPORTS       := link.engine.subsystems link.script.core
 
+# Link iPhone audio session exports
+export.link.engine.subsystems.iphone_audio_session.LINK_INCLUDES := IPhoneAudioSessionSubsystem
+export.link.engine.subsystems.iphone_audio_session.IMPORTS       := link.engine.subsystems link.script.core
+export.link.engine.subsystems.iphone_audio_session.LINK_FLAGS    := -framework AudioToolbox -framework MediaPlayer
+
 # Link window input driver exports
 export.link.engine.subsystems.window_input_driver.LINK_INCLUDES := WindowInputDriverSubsystem
 export.link.engine.subsystems.window_input_driver.IMPORTS       := link.engine.subsystems link.input.window_driver
