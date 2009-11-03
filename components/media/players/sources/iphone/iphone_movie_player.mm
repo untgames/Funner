@@ -158,27 +158,27 @@ class MoviePlayer: public IStreamPlayer
 {
   self = [super init];
 
-  if (self)
+  if (!self)
+    return nil;
+
+  try
   {
-    try
-    {
-      if (!in_player)
-        throw xtl::make_null_argument_exception ("media::players::iphone::VideoPlayerListener::InitWithPlayer", "in_player");
+    if (!in_player)
+      throw xtl::make_null_argument_exception ("media::players::iphone::VideoPlayerListener::InitWithPlayer", "in_player");
 
-      player = in_player;
-    }
-    catch (xtl::exception& e)
-    {
-      printf ("%s\n", e.what ());
+    player = in_player;
+  }
+  catch (xtl::exception& e)
+  {
+    printf ("%s\n", e.what ());
 
-      [self release];
-      return nil;
-    }
-    catch (...)
-    {
-      [self release];
-      return nil;
-    }
+    [self release];
+    return nil;
+  }
+  catch (...)
+  {
+    [self release];
+    return nil;
   }
 
   NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];

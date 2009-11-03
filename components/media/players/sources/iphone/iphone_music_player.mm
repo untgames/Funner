@@ -203,33 +203,33 @@ class MusicPlayer: public IStreamPlayer
 {
   self = [super init];
 
-  if (self)
+  if (!self)
+    return nil;
+
+  log = 0;
+
+  try
   {
-    log = 0;
+    if (!in_player)
+      throw xtl::make_null_argument_exception ("media::players::iphone::AudioPlayerDelegate::InitWithPlayer", "in_player");
 
-    try
-    {
-      if (!in_player)
-        throw xtl::make_null_argument_exception ("media::players::iphone::AudioPlayerDelegate::InitWithPlayer", "in_player");
+    player = in_player;
 
-      player = in_player;
+    log = new common::Log (LOG_NAME);
+  }
+  catch (xtl::exception& e)
+  {
+    printf ("%s\n", e.what ());
 
-      log = new common::Log (LOG_NAME);
-    }
-    catch (xtl::exception& e)
-    {
-      printf ("%s\n", e.what ());
-
-      delete log;
-      [self release];
-      return nil;
-    }
-    catch (...)
-    {
-      delete log;
-      [self release];
-      return nil;
-    }
+    delete log;
+    [self release];
+    return nil;
+  }
+  catch (...)
+  {
+    delete log;
+    [self release];
+    return nil;
   }
 
   return self;
