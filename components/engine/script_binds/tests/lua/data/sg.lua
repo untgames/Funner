@@ -233,6 +233,39 @@ function test_events ()
   collectgarbage ("collect")
 end
 
+function test_node_properties ()
+  local node       = Scene.Node.Create ()
+  local properties = Scene.NodeProperties.Create ()
+  
+  node.Properties = properties
+
+  node.Properties:SetString ("String", "hello")  
+  node.Properties:SetInteger ("Integer", 1)
+  node.Properties:SetFloat ("Float", 3.14)
+  node.Properties:SetVector ("Vector", vec4 (1, 2, 3, 4))
+  node.Properties:SetMatrix ("Matrix", mat4 (3))
+  
+  local string_result = node.Properties:GetString ("String")
+  local int_result    = node.Properties:GetInteger ("Integer")
+  local float_result  = node.Properties:GetFloat ("Float")
+  local vec_result    = node.Properties:GetVector ("Vector")
+  local matrix_result = node.Properties:GetMatrix ("Matrix")
+
+  print (string.format ("result: string='%s' int=%d float=%.3f vec=[%.3f %.3f %.3f %.3f] det(matrix)=%.3f",
+    string_result, int_result, float_result, vec_result.x, vec_result.y, vec_result.z, vec_result.w, matrix_result:det ()))
+
+  node.Properties:Remove ("Float")
+
+  print ("is_present(Float)=" .. tostring (node.Properties:IsPresent ("Float")))
+  print ("is_present(String)=" .. tostring (node.Properties:IsPresent ("String")))
+  
+  print (string.format ("node has %u properties", node.Properties.Size))
+  
+  for i=0,node.Properties.Size-1 do
+    print (string.format ("  #%d: name='%s' type=%d", i, node.Properties:GetPropertyName (i), node.Properties:GetPropertyType (i)))
+  end
+end
+
 function print_node_array (title, array)
   print (title .. " (array has " .. tostring (array.Size) .. " items):")
 
@@ -611,9 +644,11 @@ function test_text_line ()
 end
 
 function test ()
-  test_node ()
+  test_node ()    
   
   test_events ()
+  
+  test_node_properties ()
   
   test_node_array (Scene.NodeArrayLinkMode.AddRef)
   test_node_array (Scene.NodeArrayLinkMode.WeakRef)

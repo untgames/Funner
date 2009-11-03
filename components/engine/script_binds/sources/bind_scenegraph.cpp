@@ -35,8 +35,10 @@ const char* SCENE_STATIC_NODE_EVENT_LIBRARY           = "Scene.NodeEvent";
 const char* SCENE_STATIC_NODE_SUBTREE_EVENT_LIBRARY   = "Scene.NodeSubTreeEvent";
 const char* SCENE_STATIC_NODE_ARRAY_LINK_MODE_LIBRARY = "Scene.NodeArrayLinkMode";
 const char* SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY  = "Scene.TextLineAlignment";
+const char* SCENE_STATIC_NODE_PROPERTY_TYPE_LIBRARY   = "Scene.NodePropertyType";
 const char* SCENE_SCENE_LIBRARY                       = "Scene.Scene";
 const char* SCENE_NODE_LIBRARY                        = "Scene.Node";
+const char* SCENE_NODE_PROPERTIES_LIBRARY             = "Scene.NodeProperties";
 const char* SCENE_NODE_ARRAY_LIBRARY                  = "Scene.NodeArray";
 const char* SCENE_ENTITY_LIBRARY                      = "Scene.Entity";
 const char* SCENE_PERSPECTIVE_CAMERA_LIBRARY          = "Scene.PerspectiveCamera";
@@ -130,6 +132,7 @@ void bind_static_node_library (Environment& environment)
   InvokerRegistry& node_ort_lib             = environment.CreateLibrary (SCENE_STATIC_NODE_ORT_LIBRARY);
   InvokerRegistry& node_event_lib           = environment.CreateLibrary (SCENE_STATIC_NODE_EVENT_LIBRARY);
   InvokerRegistry& node_subtree_event_lib   = environment.CreateLibrary (SCENE_STATIC_NODE_SUBTREE_EVENT_LIBRARY);
+  InvokerRegistry& node_property_type_lib   = environment.CreateLibrary (SCENE_STATIC_NODE_PROPERTY_TYPE_LIBRARY);
 
   node_bind_mode_lib.Register       ("get_AddRef",            make_const (NodeBindMode_AddRef));
   node_bind_mode_lib.Register       ("get_WeakRef",           make_const (NodeBindMode_WeakRef));
@@ -156,6 +159,11 @@ void bind_static_node_library (Environment& environment)
   node_event_lib.Register           ("get_AfterSceneChange",  make_const (NodeEvent_AfterSceneChange));
   node_subtree_event_lib.Register   ("get_AfterBind",         make_const (NodeSubTreeEvent_AfterBind));
   node_subtree_event_lib.Register   ("get_BeforeUnbind",      make_const (NodeSubTreeEvent_BeforeUnbind));
+  node_property_type_lib.Register   ("get_String",            make_const (NodePropertyType_String));
+  node_property_type_lib.Register   ("get_Integer",           make_const (NodePropertyType_Integer));
+  node_property_type_lib.Register   ("get_Float",             make_const (NodePropertyType_Float));
+  node_property_type_lib.Register   ("get_Vector",            make_const (NodePropertyType_Vector));
+  node_property_type_lib.Register   ("get_Matrix",            make_const (NodePropertyType_Matrix));
 }
 
 //получение уникального идентификатора узла
@@ -180,6 +188,8 @@ InvokerRegistry& bind_node_library (Environment& environment)
 
   lib.Register ("get_Id",                   make_invoker (&get_node_id));
   lib.Register ("set_Name",                 make_invoker (&Node::SetName));
+  lib.Register ("set_Properties",           make_invoker (&Node::SetProperties));
+  lib.Register ("get_Properties",           make_invoker (implicit_cast<NodeProperties::Pointer (Node::*) ()> (&Node::Properties)));
   lib.Register ("set_Position",             make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetPosition)));
   lib.Register ("set_WorldPosition",        make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetWorldPosition)));
   lib.Register ("SetPosition",              make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetPosition)));
@@ -288,6 +298,64 @@ InvokerRegistry& bind_node_library (Environment& environment)
   environment.RegisterType<Node> (SCENE_NODE_LIBRARY);
 
   return lib;
+}
+
+/*
+   –егистраци€ библиотеки работы со свойствами узла
+*/
+
+template <class Ret> struct result_value
+{
+  Ret value;
+  
+  result_value () {}
+};
+
+template <class Ret> Ret get_node_property (NodeProperties& properties, const char* name)
+{
+  result_value<Ret> result;
+  
+  properties.GetProperty (name, result.value);
+  
+  return result.value;
+}
+
+void bind_node_properties_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_NODE_PROPERTIES_LIBRARY);
+
+    //регистраци€ функций создани€
+
+  lib.Register ("Create", make_invoker (&NodeProperties::Create));
+  
+    //регистраци€ методов
+    
+  lib.Register ("get_Size",        make_invoker (&NodeProperties::Size));
+  lib.Register ("SetPropertyName", make_invoker (implicit_cast<void (NodeProperties::*)(const char*, const char*)> (&NodeProperties::SetPropertyName)));
+  lib.Register ("GetPropertyName", make_invoker (&NodeProperties::PropertyName));
+  lib.Register ("Remove",          make_invoker (implicit_cast<void (NodeProperties::*)(const char*)> (&NodeProperties::Remove)));
+  lib.Register ("Clear",           make_invoker (&NodeProperties::Clear));  
+  lib.Register ("Clone",           make_invoker (&NodeProperties::Clone));
+  lib.Register ("GetPropertyType", make_invoker (
+    make_invoker (implicit_cast<NodePropertyType (NodeProperties::*)(const char*) const> (&NodeProperties::PropertyType)),
+    make_invoker (implicit_cast<NodePropertyType (NodeProperties::*)(size_t) const> (&NodeProperties::PropertyType))
+  ));  
+  lib.Register ("SetPropertyType", make_invoker (implicit_cast<void (NodeProperties::*)(const char*, NodePropertyType)> (&NodeProperties::SetPropertyType)));  
+  lib.Register ("IsPresent",       make_invoker (&NodeProperties::IsPresent));
+  lib.Register ("GetString",       make_invoker (&get_node_property<stl::string>));
+  lib.Register ("GetInteger",      make_invoker (&get_node_property<int>));
+  lib.Register ("GetFloat",        make_invoker (&get_node_property<float>));
+  lib.Register ("GetVector",       make_invoker (&get_node_property<math::vec4f>));
+  lib.Register ("GetMatrix",       make_invoker (&get_node_property<math::mat4f>));  
+  lib.Register ("SetString",       make_invoker (implicit_cast<void (NodeProperties::*)(const char*, const char*)> (&NodeProperties::SetProperty)));
+  lib.Register ("SetInteger",      make_invoker (implicit_cast<void (NodeProperties::*)(const char*, int)> (&NodeProperties::SetProperty)));
+  lib.Register ("SetFloat",        make_invoker (implicit_cast<void (NodeProperties::*)(const char*, float)> (&NodeProperties::SetProperty)));
+  lib.Register ("SetVector",       make_invoker (implicit_cast<void (NodeProperties::*)(const char*, const math::vec4f&)> (&NodeProperties::SetProperty)));
+  lib.Register ("SetMatrix",       make_invoker (implicit_cast<void (NodeProperties::*)(const char*, const math::mat4f&)> (&NodeProperties::SetProperty)));
+
+    //регистраци€ типов данных
+
+  environment.RegisterType<NodeProperties> (SCENE_NODE_PROPERTIES_LIBRARY);
 }
 
 /*
@@ -878,6 +946,7 @@ void bind_scene_graph_library (Environment& environment)
 {
   bind_scene_library              (environment);
   bind_node_library               (environment);
+  bind_node_properties_library    (environment);
   bind_node_array_library         (environment);
   bind_entity_library             (environment);
   bind_perspective_camera_library (environment);

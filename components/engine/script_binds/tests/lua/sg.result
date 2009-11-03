@@ -76,6 +76,14 @@ Node 'Node1' event 'BeforeUnbind'
 Node 'Node2.Node1' subtree event 'BeforeUnbind'
 Node 'Node1' event 'BeforeDestroy'
 Node 'Node1' event 'AfterDestroy'
+result: string='hello' int=1 float=3.140 vec=[1.000 2.000 3.000 4.000] det(matrix)=81.000
+is_present(Float)=false
+is_present(String)=true
+node has 4 properties
+  #0: name='String' type=0
+  #1: name='Integer' type=1
+  #2: name='Vector' type=3
+  #3: name='Matrix' type=4
 NodeArray addref test
 after insert (array has 3 items):
   node1
