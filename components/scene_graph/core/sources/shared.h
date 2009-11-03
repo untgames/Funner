@@ -13,11 +13,15 @@
 #include <xtl/reference_counter.h>
 #include <xtl/shared_ptr.h>
 #include <xtl/signal.h>
+#include <xtl/token_parser.h>
 #include <xtl/uninitialized_storage.h>
 #include <xtl/visitor.h>
 
+#include <math/io.h>
+
 #include <common/component.h>
 #include <common/singleton.h>
+#include <common/strlib.h>
 #include <common/utf_converter.h>
 
 #include <bv/axis_aligned_box.h>

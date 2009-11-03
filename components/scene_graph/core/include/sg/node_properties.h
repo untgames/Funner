@@ -16,6 +16,7 @@ enum NodePropertyType
 {
   NodePropertyType_String,
   NodePropertyType_Integer,
+  NodePropertyType_Float,
   NodePropertyType_Vector,  
   NodePropertyType_Matrix, 
 
@@ -49,19 +50,27 @@ class NodeProperties: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Хэш параметров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Hash () const;
+    size_t Hash          () const; //композиция DataHash и StructureHash
+    size_t DataHash      () const; //хэш данных
+    size_t StructureHash () const; //хэш структуры параметров
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Имя свойства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* PropertyName    (size_t index) const;
+    void        SetPropertyName (size_t index, const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип свойства
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    NodePropertyType Type (size_t index) const;
-    NodePropertyType Type (const char* name) const;
+    NodePropertyType PropertyType (size_t index) const;
+    NodePropertyType PropertyType (const char* name) const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Смена типа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetType (size_t index, NodePropertyType type);
-    void SetType (const char* name, NodePropertyType type);
+    void SetPropertyType (size_t index, NodePropertyType type);
+    void SetPropertyType (const char* name, NodePropertyType type);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск индекса свойства
@@ -73,8 +82,9 @@ class NodeProperties: public xtl::dynamic_cast_root
 ///Установка свойства по имени
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetProperty (const char* name, const char* value);
-    void SetProperty (const char* name, float value);    
+    void SetProperty (const char* name, const stl::string& value);
     void SetProperty (const char* name, int value);
+    void SetProperty (const char* name, float value);    
     void SetProperty (const char* name, const math::vec4f& value);   
     void SetProperty (const char* name, const math::mat4f& value);
 
@@ -82,19 +92,20 @@ class NodeProperties: public xtl::dynamic_cast_root
 ///Установка свойства по индексу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetProperty (size_t property_index, const char* value);
-    void SetProperty (size_t property_index, float value);    
+    void SetProperty (size_t property_index, const stl::string& value);
     void SetProperty (size_t property_index, int value);
+    void SetProperty (size_t property_index, float value);
     void SetProperty (size_t property_index, const math::vec4f& value);    
     void SetProperty (size_t property_index, const math::mat4f& value);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение свойства по имени
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void GetProperty (const char* name, stl::string& result);
-    void GetProperty (const char* name, int& result);
-    void GetProperty (const char* name, float& result);
-    void GetProperty (const char* name, math::vec4f& result);
-    void GetProperty (const char* name, math::mat4f& result);
+    void GetProperty (const char* name, stl::string& result) const;
+    void GetProperty (const char* name, int& result) const;
+    void GetProperty (const char* name, float& result) const;
+    void GetProperty (const char* name, math::vec4f& result) const;
+    void GetProperty (const char* name, math::mat4f& result) const;
 
     const char*        GetString  (const char* name) const;
     int                GetInteger (const char* name) const;
@@ -105,11 +116,11 @@ class NodeProperties: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение свойства по индексу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void GetProperty (size_t property_index, stl::string& result);
-    void GetProperty (size_t property_index, int& result);
-    void GetProperty (size_t property_index, float& result);
-    void GetProperty (size_t property_index, math::vec4f& result);
-    void GetProperty (size_t property_index, math::mat4f& result);
+    void GetProperty (size_t property_index, stl::string& result) const;
+    void GetProperty (size_t property_index, int& result) const;
+    void GetProperty (size_t property_index, float& result) const;
+    void GetProperty (size_t property_index, math::vec4f& result) const;
+    void GetProperty (size_t property_index, math::mat4f& result) const;
 
     const char*        GetString  (size_t property_index) const;
     int                GetInteger (size_t property_index) const;
@@ -127,14 +138,15 @@ class NodeProperties: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddRef  ();
-    void Release ();
+    void   AddRef   () const;
+    void   Release  () const;
+    size_t UseCount () const;
   
   private:
     NodeProperties  ();    
     ~NodeProperties ();
 
-    NodeProperties& NodeProperties (const NodeProperties&); //no impl
+    NodeProperties (const NodeProperties&); //no impl
     NodeProperties& operator = (const NodeProperties&); //no impl
 
   private:

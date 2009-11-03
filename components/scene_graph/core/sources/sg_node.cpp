@@ -14,41 +14,42 @@ typedef xtl::signal<void (float dt)> UpdateSignal;
 
 struct Node::Impl
 {
-  scene_graph::Scene* scene;                            //сцена, которой принадлежит объект
-  stl::string         name;                             //имя узла
-  size_t              name_hash;                        //хэш имени
-  size_t              ref_count;                        //количество ссылок на узел
-  Node*               this_node;                        //текущий узел
-  Node*               parent;                           //родительский узел
-  Node*               first_child;                      //первый потомок
-  Node*               last_child;                       //последний потомок
-  Node*               prev_child;                       //предыдущий потомок
-  Node*               next_child;                       //следующий потомок
-  bool                bind_lock;                        //флаг блокировки на вызов BindToParent
-  bool                need_release_at_unbind;           //нужно ли уменьшать счётчик ссылок узла при отсоединении от родителя
-  NodeSignal          signals [NodeEvent_Num];          //сигналы
-  bool                signal_process [NodeEvent_Num];   //флаги обработки сигналов
-  SubTreeNodeSignal   subtree_signals [NodeSubTreeEvent_Num]; //сигналы событий, возникающих в узлах-потомках
-  bool                subtree_signal_process [NodeSubTreeEvent_Num]; //флаги обработки сигналов, возникающих в узлах потомках
-  vec3f               local_position;                   //локальное положение
-  quatf               local_orientation;                //локальная ориентация
-  vec3f               local_scale;                      //локальный масштаб
-  mat4f               local_tm;                         //матрица локальных преобразований
-  vec3f               world_position;                   //мировое положение
-  quatf               world_orientation;                //мировая ориентация
-  vec3f               world_scale;                      //мировой масштаб
-  mat4f               world_tm;                         //матрица мировых преобразований
-  bool                orientation_inherit;              //флаг наследования родительской ориентации
-  bool                scale_inherit;                    //флаг наследования родительского масштаба
-  bool                need_world_transform_update;      //флаг, сигнализирующий о необходимости пересчёта мировых преобразований
-  bool                need_world_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы мировых преобразований
-  bool                need_local_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы локальных преобразований
-  size_t              update_lock;                      //счётчик открытых транзакций обновления
-  bool                update_notify;                    //флаг, сигнализирующий о необходимости оповещения об обновлениях по завершении транзакции обновления
-  Node*               first_updatable_child;            //первый обновляемый потомок
-  Node*               prev_updatable_child;             //предыдущий обновляемый потомок
-  Node*               next_updatable_child;             //следующий обновляемый потомок
-  UpdateSignal        update_signal;                    //сигнал обновления узла
+  scene_graph::Scene*     scene;                            //сцена, которой принадлежит объект
+  stl::string             name;                             //имя узла
+  size_t                  name_hash;                        //хэш имени
+  size_t                  ref_count;                        //количество ссылок на узел
+  Node*                   this_node;                        //текущий узел
+  Node*                   parent;                           //родительский узел
+  Node*                   first_child;                      //первый потомок
+  Node*                   last_child;                       //последний потомок
+  Node*                   prev_child;                       //предыдущий потомок
+  Node*                   next_child;                       //следующий потомок
+  bool                    bind_lock;                        //флаг блокировки на вызов BindToParent
+  bool                    need_release_at_unbind;           //нужно ли уменьшать счётчик ссылок узла при отсоединении от родителя
+  NodeSignal              signals [NodeEvent_Num];          //сигналы
+  bool                    signal_process [NodeEvent_Num];   //флаги обработки сигналов
+  SubTreeNodeSignal       subtree_signals [NodeSubTreeEvent_Num]; //сигналы событий, возникающих в узлах-потомках
+  bool                    subtree_signal_process [NodeSubTreeEvent_Num]; //флаги обработки сигналов, возникающих в узлах потомках
+  vec3f                   local_position;                   //локальное положение
+  quatf                   local_orientation;                //локальная ориентация
+  vec3f                   local_scale;                      //локальный масштаб
+  mat4f                   local_tm;                         //матрица локальных преобразований
+  vec3f                   world_position;                   //мировое положение
+  quatf                   world_orientation;                //мировая ориентация
+  vec3f                   world_scale;                      //мировой масштаб
+  mat4f                   world_tm;                         //матрица мировых преобразований
+  bool                    orientation_inherit;              //флаг наследования родительской ориентации
+  bool                    scale_inherit;                    //флаг наследования родительского масштаба
+  bool                    need_world_transform_update;      //флаг, сигнализирующий о необходимости пересчёта мировых преобразований
+  bool                    need_world_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы мировых преобразований
+  bool                    need_local_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы локальных преобразований
+  size_t                  update_lock;                      //счётчик открытых транзакций обновления
+  bool                    update_notify;                    //флаг, сигнализирующий о необходимости оповещения об обновлениях по завершении транзакции обновления
+  Node*                   first_updatable_child;            //первый обновляемый потомок
+  Node*                   prev_updatable_child;             //предыдущий обновляемый потомок
+  Node*                   next_updatable_child;             //следующий обновляемый потомок
+  UpdateSignal            update_signal;                    //сигнал обновления узла
+  NodeProperties::Pointer properties;                       //свойства узла
 
   Impl (Node* node) : this_node (node)
   {
@@ -682,6 +683,27 @@ void Node::SetName (const char* name)
 
   impl->name      = name;
   impl->name_hash = strhash (name);
+  
+  UpdateNotify ();
+}
+
+/*
+    Свойства узла (могут быть NULL)
+*/
+
+NodeProperties::Pointer Node::Properties ()
+{
+  return impl->properties;
+}
+
+NodeProperties::ConstPointer Node::Properties () const
+{
+  return impl->properties;
+}
+
+void Node::SetProperties (const NodeProperties::Pointer& properties)
+{
+  impl->properties = properties;
   
   UpdateNotify ();
 }
