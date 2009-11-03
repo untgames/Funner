@@ -177,8 +177,10 @@ SamplerStatePtr create_sampler (IDevice& device)
   sampler_desc.min_filter           = TexMinFilter_LinearMipLinear;
   sampler_desc.mag_filter           = TexMagFilter_Linear;
   sampler_desc.max_anisotropy       = 1;
-  sampler_desc.wrap_u               = TexcoordWrap_Clamp;
-  sampler_desc.wrap_v               = TexcoordWrap_Clamp;
+//  sampler_desc.wrap_u               = TexcoordWrap_Clamp;
+//  sampler_desc.wrap_v               = TexcoordWrap_Clamp;
+  sampler_desc.wrap_u               = TexcoordWrap_Repeat;
+  sampler_desc.wrap_v               = TexcoordWrap_Repeat;
   sampler_desc.comparision_function = CompareMode_AlwaysPass;
   sampler_desc.min_lod              = 0;
   sampler_desc.max_lod              = FLT_MAX;

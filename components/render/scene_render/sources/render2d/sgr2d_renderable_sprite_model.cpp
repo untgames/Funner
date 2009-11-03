@@ -19,6 +19,10 @@ struct RenderableSpriteModel::Impl: public xtl::trackable
   size_t                    current_world_tm_hash;           //хэш текущей матрицы трансформации
   size_t                    current_material_name_hash;      //хэш текущего имени материала
   float                     current_alpha_reference;         //текущее значение параметра альфа-отсечения
+  math::vec2f               current_texture_scroll;          //текущее смещение текстуры
+  size_t                    texture_scroll_property_index;   //текущее значение индекса свойства смещения текстурных координат
+  size_t                    properties_structure_hash;       //текущий хэш структуры свойств узла
+  size_t                    properties_hash;                 //текущий хэш свойств узла
 
 ///Конструктор
   Impl (scene_graph::SpriteModel* in_model, Render& in_render) :
@@ -27,7 +31,11 @@ struct RenderableSpriteModel::Impl: public xtl::trackable
     primitive (render.Renderer ()->CreatePrimitive (), false),
     need_update_sprites (true),
     current_world_tm_hash (0),
-    current_material_name_hash (0)  
+    current_material_name_hash (0),
+    current_texture_scroll (0.0f),
+    texture_scroll_property_index (0),
+    properties_structure_hash (0),
+    properties_hash (0)
   {
     connect_tracker (model->RegisterEventHandler (SpriteModelEvent_AfterSpriteDescsUpdate, xtl::bind (&Impl::UpdateSpritesNotify, this)));
 
@@ -178,6 +186,50 @@ void RenderableSpriteModel::Update ()
 
       impl->current_world_tm_hash = world_tm_hash;
     }    
+    
+      //обновление скроллинга текстуры
+      
+    if (!model->Properties () && impl->properties_hash)
+    {
+      impl->properties_hash               = 0;
+      impl->properties_structure_hash     = 0;
+      impl->texture_scroll_property_index = 0;
+      impl->current_texture_scroll        = math::vec2f (0.0f);
+      impl->need_update_sprites           = true;
+    }
+      
+    if (model->Properties () && impl->properties_hash != model->Properties ()->Hash ())
+    {
+      const NodeProperties& properties = *model->Properties ();
+      
+      if (impl->properties_structure_hash != properties.StructureHash ())
+      {
+        impl->texture_scroll_property_index = properties.IndexOf ("render.texture_scroll");
+        impl->properties_structure_hash     = properties.StructureHash ();        
+      }
+      
+      if (impl->texture_scroll_property_index != size_t (-1))
+      {
+        math::vec4f scroll;
+
+        try
+        {
+          properties.GetProperty (impl->texture_scroll_property_index, scroll);
+
+          impl->current_texture_scroll = scroll;
+        }
+        catch (...)
+        {
+          impl->current_texture_scroll = math::vec2f (0.0f);
+        }
+      }
+      else
+      {
+        impl->current_texture_scroll = math::vec2f (0.0f);
+      }
+      
+      impl->properties_hash = properties.Hash ();
+    }
 
       //обновление массива спрайтов
     
@@ -205,13 +257,12 @@ void RenderableSpriteModel::Update ()
                  tile_row    = frame / impl->tile_columns % impl->tile_rows,
                  tile_column = frame % impl->tile_columns;
 
-//          dst_sprite.tex_offset = math::vec2f (tile_column * impl->tile_tex_width, tile_row * impl->tile_tex_height);
-          dst_sprite.tex_offset = math::vec2f (tile_column * impl->tile_tex_width, 1.0f - tile_row * impl->tile_tex_height - impl->tile_tex_height);
+          dst_sprite.tex_offset = math::vec2f (tile_column * impl->tile_tex_width, 1.0f - tile_row * impl->tile_tex_height - impl->tile_tex_height) + impl->current_texture_scroll;
           dst_sprite.tex_size   = math::vec2f (impl->tile_tex_width, impl->tile_tex_height);
         }
         else
         {
-          dst_sprite.tex_offset = math::vec2f (0.0f);
+          dst_sprite.tex_offset = impl->current_texture_scroll;
           dst_sprite.tex_size   = math::vec2f (1.0f);
         }
 
