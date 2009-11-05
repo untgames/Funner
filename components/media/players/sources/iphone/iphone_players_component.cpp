@@ -8,9 +8,9 @@ namespace
 
 const char* MUSIC_TARGET_NAME                  = "music";
 const char* VIDEO_DEFAULT_CONTROLS_TARGET_NAME = "video";
-const char* VIDEO_NO_CONTROLS_TARGET_NAME      = "video_no_controls";
-const char* VIDEO_VOLUME_CONTROLS_TARGET_NAME  = "video_volume_controls";
-const char* VIDEO_ALL_CONTROLS_TARGET_NAME     = "video_all_controls";
+const char* VIDEO_NO_CONTROLS_TARGET_NAME      = "video.no_controls";
+const char* VIDEO_VOLUME_CONTROLS_TARGET_NAME  = "video.volume_controls";
+const char* VIDEO_ALL_CONTROLS_TARGET_NAME     = "video.all_controls";
 
 /*
    Компонент проигрывания медиа
