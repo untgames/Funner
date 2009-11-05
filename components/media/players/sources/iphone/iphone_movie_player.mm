@@ -3,6 +3,7 @@
 #import <MPMoviePlayerController.h>
 
 using namespace media::players;
+using namespace media::players::iphone;
 
 namespace
 {
@@ -36,7 +37,7 @@ class MoviePlayer: public IStreamPlayer
 {
   public:
 ///Конструктор
-    MoviePlayer (const char* in_stream_name, const StreamPlayerManager::StreamEventHandler& in_handler)
+    MoviePlayer (const char* in_stream_name, const StreamPlayerManager::StreamEventHandler& in_handler, VideoPlayerControlsType controls_type)
       : handler (in_handler), player (0)
     {
       static const char* METHOD_NAME = "media::players::iphone::MoviePlayer::MoviePlayer";
@@ -57,7 +58,15 @@ class MoviePlayer: public IStreamPlayer
       if (!player)
         throw xtl::format_operation_exception (METHOD_NAME, "Can't open file '%s' for playing", in_stream_name);
 
-      player.movieControlMode = MPMovieControlModeVolumeOnly;
+      switch (controls_type)
+      {
+        case VideoPlayerControlsType_NoControls:     player.movieControlMode = MPMovieControlModeHidden;     break;
+        case VideoPlayerControlsType_VolumeControls: player.movieControlMode = MPMovieControlModeVolumeOnly; break;
+        case VideoPlayerControlsType_AllControls:    player.movieControlMode = MPMovieControlModeDefault;    break;
+        default:
+          [player release];
+          throw xtl::make_argument_exception (METHOD_NAME, "controls_type", controls_type, "Unknown controls type");
+      }
 
       player_listener = [[VideoPlayerListener alloc] initWithPlayer:(this)];
     }
@@ -217,12 +226,12 @@ namespace iphone
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание проигрывателя
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-IStreamPlayer* create_movie_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler* handler)
+IStreamPlayer* create_movie_player (const char* stream_name, const StreamPlayerManager::StreamEventHandler* handler, VideoPlayerControlsType controls_type)
 {
   if (!stream_name)
     throw xtl::make_null_argument_exception ("media::players::iphone::create_movie_player", "stream_name");
 
-  return new MoviePlayer (stream_name, *handler);
+  return new MoviePlayer (stream_name, *handler, controls_type);
 }
 
 }
