@@ -29,9 +29,11 @@ struct ContextCaps
   bool has_arb_multisample;                //GL_ARB_multisample
   bool has_arb_multitexture;               //GL_ARB_multitexture
   bool has_arb_occlusion_query;            //GL_ARB_occlusion_query
+  bool has_arb_shader_objects;             //GL_ARB_shader_objects
   bool has_arb_shading_language_100;       //GL_ARB_shading_language_100
   bool has_arb_shadow;                     //GL_ARB_shadow
   bool has_arb_texture_border_clamp;       //GL_ARB_texture_border_clamp
+  bool has_arb_texture_compression;        //GL_ARB_texture_compression
   bool has_arb_texture_cube_map;           //GL_ARB_texture_cube_map
   bool has_arb_texture_mirrored_repeat;    //GL_ARB_texture_mirrored_repeat
   bool has_arb_texture_non_power_of_two;   //GL_ARB_texture_non_power_of_two

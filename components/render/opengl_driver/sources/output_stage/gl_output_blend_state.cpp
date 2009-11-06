@@ -36,12 +36,12 @@ void check_blend_operation (BlendOperation operation, const ContextCaps& caps, c
   switch (operation)
   {
     case BlendOperation_Add:
-      break;
+      return; //not break!
     case BlendOperation_Subtraction:
     case BlendOperation_ReverseSubtraction:
       if (!caps.has_ext_blend_subtract)
         throw xtl::format_not_supported_exception (method, "Unsupported blend operation %s=%s (GL_EXT_blend_subtract not supported)", param, get_name (operation));
-
+        
       break;
     case BlendOperation_Min:
     case BlendOperation_Max:
@@ -255,11 +255,11 @@ void BlendState::SetDesc (const BlendDesc& in_desc)
   {
     cmd_list.Add (glEnable, GL_BLEND);
 
-    if      (caps.glBlendEquationSeparate_fn) cmd_list.Add (caps.glBlendEquationSeparate_fn, color_blend_equation, alpha_blend_equation);
-    else if (caps.glBlendEquation_fn)         cmd_list.Add (caps.glBlendEquation_fn, color_blend_equation);
+    if      (caps.has_ext_blend_equation_separate)                     cmd_list.Add (caps.glBlendEquationSeparate_fn, color_blend_equation, alpha_blend_equation);
+    else if (caps.has_ext_blend_subtract || caps.has_ext_blend_minmax) cmd_list.Add (caps.glBlendEquation_fn, color_blend_equation);
 
-    if   (caps.glBlendFuncSeparate_fn) cmd_list.Add (caps.glBlendFuncSeparate_fn, src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
-    else                               cmd_list.Add (glBlendFunc, src_color_arg, dst_color_arg);
+    if   (caps.has_ext_blend_func_separate) cmd_list.Add (caps.glBlendFuncSeparate_fn, src_color_arg, dst_color_arg, src_alpha_arg, dst_alpha_arg);
+    else                                    cmd_list.Add (glBlendFunc, src_color_arg, dst_color_arg);
   }
   else
   {

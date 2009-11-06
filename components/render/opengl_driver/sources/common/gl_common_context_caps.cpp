@@ -97,6 +97,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                    ARB_multisample                = "GL_ARB_multisample",
                    ARB_multitexture               = "GL_ARB_multitexture",
                    ARB_occlusion_query            = "GL_ARB_occlusion_query",
+                   ARB_shader_objects             = "GL_ARB_shader_objects",
                    ARB_shading_language_100       = "GL_ARB_shading_language_100",
                    ARB_shadow                     = "GL_ARB_shadow",
                    ARB_texture_border_clamp       = "GL_ARB_texture_border_clamp",
@@ -141,15 +142,17 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     if (ext.Get (versions [version_id]))
       (ext |= std_extension_set.versions [version_id]) &= enabled_extension_set;
   }                   
-
+  
   has_arb_depth_texture              = ext.Get (ARB_depth_texture);
   has_arb_fragment_shader            = ext.Get (ARB_fragment_shader);
   has_arb_multisample                = ext.Get (ARB_multisample);
-  has_arb_multitexture               = ext.Get (ARB_multitexture);
+  has_arb_multitexture               = ext.Get (ARB_multitexture);  
   has_arb_occlusion_query            = ext.Get (ARB_occlusion_query);
-  has_arb_shading_language_100       = ext.Get (ARB_shading_language_100);
+  has_arb_shader_objects             = ext.Get (ARB_shader_objects);
+  has_arb_shading_language_100       = has_arb_shader_objects && ext.Get (ARB_shading_language_100);
   has_arb_shadow                     = ext.Get (ARB_shadow);
   has_arb_texture_border_clamp       = ext.Get (ARB_texture_border_clamp);
+  has_arb_texture_compression        = ext.Get (ARB_texture_compression);
   has_arb_texture_cube_map           = ext.Get (ARB_texture_cube_map) || ext.Get (EXT_texture_cube_map);
   has_arb_texture_mirrored_repeat    = ext.Get (ARB_texture_mirrored_repeat);
   has_arb_texture_non_power_of_two   = ext.Get (ARB_texture_non_power_of_two);
@@ -166,8 +169,8 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ext_framebuffer_object         = ext.Get (EXT_framebuffer_object);
   has_ext_packed_depth_stencil       = ext.Get (EXT_packed_depth_stencil);
   has_ext_shadow_funcs               = ext.Get (EXT_shadow_funcs);
-  has_ext_stencil_two_side           = ext.Get (EXT_stencil_two_side);
-  has_ext_texture_compression_s3tc   = ext.Get (ARB_texture_compression) && ext.Get (EXT_texture_compression_s3tc);
+  has_ext_stencil_two_side           = ext.Get (EXT_stencil_two_side);  
+  has_ext_texture_compression_s3tc   = has_arb_texture_compression && ext.Get (EXT_texture_compression_s3tc);
   has_ext_texture_filter_anisotropic = ext.Get (EXT_texture_filter_anisotropic);
   has_ext_texture_lod_bias           = ext.Get (EXT_texture_lod_bias);
   has_ext_texture3d                  = ext.Get (EXT_texture3D);
@@ -179,56 +182,66 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   if (has_arb_texture_cube_map)  glGetIntegerv (GL_MAX_CUBE_MAP_TEXTURE_SIZE_ARB, (GLint*)&max_cube_map_texture_size);
   if (has_ext_texture3d)         glGetIntegerv (GL_MAX_3D_TEXTURE_SIZE_EXT, (GLint*)&max_3d_texture_size);
 
-  glActiveTexture_fn           = glActiveTexture ? glActiveTexture : glActiveTextureARB;
-  glBindBuffer_fn              = glBindBuffer ? glBindBuffer : glBindBufferARB;
-  glBlendEquation_fn           = glBlendEquation ? glBlendEquation : glBlendEquationEXT;
-  glBlendEquationSeparate_fn   = glBlendEquationSeparate ? glBlendEquationSeparate : glBlendEquationSeparateEXT;
-  glBlendFuncSeparate_fn       = glBlendFuncSeparate ? glBlendFuncSeparate : glBlendFuncSeparateEXT;
-  glBufferData_fn              = glBufferData ? glBufferData : glBufferDataARB;
-  glBufferSubData_fn           = glBufferSubData ? glBufferSubData : glBufferSubDataARB;
-  glClientActiveTexture_fn     = glClientActiveTexture ? glClientActiveTexture : glClientActiveTextureARB;
-  glCompressedTexImage2D_fn    = glCompressedTexImage2D ? glCompressedTexImage2D : glCompressedTexImage2DARB;
-  glCompressedTexSubImage2D_fn = glCompressedTexSubImage2D ? glCompressedTexSubImage2D : glCompressedTexSubImage2DARB;
-  glDeleteBuffers_fn           = glDeleteBuffers ? glDeleteBuffers : glDeleteBuffersARB;
-  glGenBuffers_fn              = glGenBuffers ? glGenBuffers : glGenBuffersARB;
-  glGetBufferSubData_fn        = glGetBufferSubData ? glGetBufferSubData : glGetBufferSubDataARB;
-  glGetCompressedTexImage_fn   = glGetCompressedTexImage ? glGetCompressedTexImage : glGetCompressedTexImageARB;
-  glGetUniformLocation_fn      = glGetUniformLocation ? glGetUniformLocation : (PFNGLGETUNIFORMLOCATIONPROC)glGetUniformLocationARB;
+  glActiveTexture_fn           = has_arb_multitexture ? (glActiveTexture ? glActiveTexture : glActiveTextureARB) : 0;
+  glBindBuffer_fn              = has_arb_vertex_buffer_object ? (glBindBuffer ? glBindBuffer : glBindBufferARB) : 0;
+  glBlendEquation_fn           = has_ext_blend_minmax || has_ext_blend_subtract ? (glBlendEquation ? glBlendEquation : glBlendEquationEXT) : 0;
+  glBlendEquationSeparate_fn   = has_ext_blend_equation_separate ? (glBlendEquationSeparate ? glBlendEquationSeparate : glBlendEquationSeparateEXT) : 0;
+  glBlendFuncSeparate_fn       = has_ext_blend_func_separate ? (glBlendFuncSeparate ? glBlendFuncSeparate : glBlendFuncSeparateEXT) : 0;
+  glBufferData_fn              = has_arb_vertex_buffer_object ? (glBufferData ? glBufferData : glBufferDataARB) : 0;
+  glBufferSubData_fn           = has_arb_vertex_buffer_object ? (glBufferSubData ? glBufferSubData : glBufferSubDataARB) : 0;
+  glClientActiveTexture_fn     = has_arb_multitexture ? (glClientActiveTexture ? glClientActiveTexture : glClientActiveTextureARB) : 0;
+  glCompressedTexImage2D_fn    = has_arb_texture_compression ? (glCompressedTexImage2D ? glCompressedTexImage2D : glCompressedTexImage2DARB) : 0;
+  glCompressedTexSubImage2D_fn = has_arb_texture_compression ? (glCompressedTexSubImage2D ? glCompressedTexSubImage2D : glCompressedTexSubImage2DARB) : 0;
+  glDeleteBuffers_fn           = has_arb_vertex_buffer_object ? (glDeleteBuffers ? glDeleteBuffers : glDeleteBuffersARB) : 0;
+  glGenBuffers_fn              = has_arb_vertex_buffer_object ? (glGenBuffers ? glGenBuffers : glGenBuffersARB) : 0;
+  glGetBufferSubData_fn        = has_arb_vertex_buffer_object ? (glGetBufferSubData ? glGetBufferSubData : glGetBufferSubDataARB) : 0;
+  glGetCompressedTexImage_fn   = has_arb_texture_compression ? (glGetCompressedTexImage ? glGetCompressedTexImage : glGetCompressedTexImageARB) : 0;
+  glGetUniformLocation_fn      = has_arb_shader_objects ? (glGetUniformLocation ? glGetUniformLocation : (PFNGLGETUNIFORMLOCATIONPROC)glGetUniformLocationARB) : 0;
 
-  glBindFramebuffer_fn                     = glBindFramebufferEXT;
-  glIsRenderbuffer_fn                      = glIsRenderbufferEXT;
-  glBindRenderbuffer_fn                    = glBindRenderbufferEXT;
-  glDeleteRenderbuffers_fn                 = glDeleteRenderbuffersEXT;
-  glGenRenderbuffers_fn                    = glGenRenderbuffersEXT;
-  glRenderbufferStorage_fn                 = glRenderbufferStorageEXT;
-  glGetRenderbufferParameteriv_fn          = glGetRenderbufferParameterivEXT;
-  glIsFramebuffer_fn                       = glIsFramebufferEXT;
-  glBindFramebuffer_fn                     = glBindFramebufferEXT;
-  glDeleteFramebuffers_fn                  = glDeleteFramebuffersEXT;
-  glGenFramebuffers_fn                     = glGenFramebuffersEXT;
-  glCheckFramebufferStatus_fn              = glCheckFramebufferStatusEXT;
-  glFramebufferRenderbuffer_fn             = glFramebufferRenderbufferEXT;
-  glFramebufferTexture1D_fn                = glFramebufferTexture1DEXT;
-  glFramebufferTexture2D_fn                = glFramebufferTexture2DEXT;
-  glFramebufferTexture3D_fn                = glFramebufferTexture3DEXT;
-  glGetFramebufferAttachmentParameteriv_fn = glGetFramebufferAttachmentParameterivEXT; 
+  if (has_ext_framebuffer_object)
+  {
+    glBindFramebuffer_fn                     = glBindFramebufferEXT;
+    glIsRenderbuffer_fn                      = glIsRenderbufferEXT;
+    glBindRenderbuffer_fn                    = glBindRenderbufferEXT;
+    glDeleteRenderbuffers_fn                 = glDeleteRenderbuffersEXT;
+    glGenRenderbuffers_fn                    = glGenRenderbuffersEXT;
+    glRenderbufferStorage_fn                 = glRenderbufferStorageEXT;
+    glGetRenderbufferParameteriv_fn          = glGetRenderbufferParameterivEXT;
+    glIsFramebuffer_fn                       = glIsFramebufferEXT;
+    glBindFramebuffer_fn                     = glBindFramebufferEXT;
+    glDeleteFramebuffers_fn                  = glDeleteFramebuffersEXT;
+    glGenFramebuffers_fn                     = glGenFramebuffersEXT;
+    glCheckFramebufferStatus_fn              = glCheckFramebufferStatusEXT;
+    glFramebufferRenderbuffer_fn             = glFramebufferRenderbufferEXT;
+    glFramebufferTexture1D_fn                = glFramebufferTexture1DEXT;
+    glFramebufferTexture2D_fn                = glFramebufferTexture2DEXT;
+    glFramebufferTexture3D_fn                = glFramebufferTexture3DEXT;
+    glGetFramebufferAttachmentParameteriv_fn = glGetFramebufferAttachmentParameterivEXT;
+  }
   
-  glLoadTransposeMatrixd_fn    = glLoadTransposeMatrixd ? glLoadTransposeMatrixd : (PFNGLLOADTRANSPOSEMATRIXDPROC)glLoadTransposeMatrixdARB;
-  glLoadTransposeMatrixf_fn    = glLoadTransposeMatrixf ? glLoadTransposeMatrixf : (PFNGLLOADTRANSPOSEMATRIXFPROC)glLoadTransposeMatrixfARB;
-  glMultTransposeMatrixd_fn    = glMultTransposeMatrixd ? glMultTransposeMatrixd : (PFNGLMULTTRANSPOSEMATRIXDPROC)glMultTransposeMatrixdARB;
-  glMultTransposeMatrixf_fn    = glMultTransposeMatrixf ? glMultTransposeMatrixf : (PFNGLMULTTRANSPOSEMATRIXFPROC)glMultTransposeMatrixfARB;
-  glUniform1fv_fn              = glUniform1fv ? glUniform1fv : glUniform1fvARB;
-  glUniform1iv_fn              = glUniform1iv ? glUniform1iv : glUniform1ivARB;
-  glUniform2fv_fn              = glUniform2fv ? glUniform2fv : glUniform2fvARB;
-  glUniform2iv_fn              = glUniform2iv ? glUniform2iv : glUniform2ivARB;
-  glUniform3fv_fn              = glUniform3fv ? glUniform3fv : glUniform3fvARB;
-  glUniform3iv_fn              = glUniform3iv ? glUniform3iv : glUniform3ivARB;
-  glUniform4fv_fn              = glUniform4fv ? glUniform4fv : glUniform4fvARB;
-  glUniform4iv_fn              = glUniform4iv ? glUniform4iv : glUniform4ivARB;
-  glUniformMatrix2fv_fn        = glUniformMatrix2fv ? glUniformMatrix2fv : glUniformMatrix2fvARB;
-  glUniformMatrix3fv_fn        = glUniformMatrix3fv ? glUniformMatrix3fv : glUniformMatrix3fvARB;
-  glUniformMatrix4fv_fn        = glUniformMatrix4fv ? glUniformMatrix4fv : glUniformMatrix4fvARB;
-  glUseProgram_fn              = glUseProgram ? glUseProgram : (PFNGLUSEPROGRAMPROC)glUseProgramObjectARB;
+  if (has_arb_transpose_matrix)
+  {
+    glLoadTransposeMatrixd_fn = glLoadTransposeMatrixd ? glLoadTransposeMatrixd : (PFNGLLOADTRANSPOSEMATRIXDPROC)glLoadTransposeMatrixdARB;
+    glLoadTransposeMatrixf_fn = glLoadTransposeMatrixf ? glLoadTransposeMatrixf : (PFNGLLOADTRANSPOSEMATRIXFPROC)glLoadTransposeMatrixfARB;
+    glMultTransposeMatrixd_fn = glMultTransposeMatrixd ? glMultTransposeMatrixd : (PFNGLMULTTRANSPOSEMATRIXDPROC)glMultTransposeMatrixdARB;
+    glMultTransposeMatrixf_fn = glMultTransposeMatrixf ? glMultTransposeMatrixf : (PFNGLMULTTRANSPOSEMATRIXFPROC)glMultTransposeMatrixfARB;
+  }
+
+  if (has_arb_shader_objects)
+  {
+    glUniform1fv_fn              = glUniform1fv ? glUniform1fv : glUniform1fvARB;
+    glUniform1iv_fn              = glUniform1iv ? glUniform1iv : glUniform1ivARB;
+    glUniform2fv_fn              = glUniform2fv ? glUniform2fv : glUniform2fvARB;
+    glUniform2iv_fn              = glUniform2iv ? glUniform2iv : glUniform2ivARB;
+    glUniform3fv_fn              = glUniform3fv ? glUniform3fv : glUniform3fvARB;
+    glUniform3iv_fn              = glUniform3iv ? glUniform3iv : glUniform3ivARB;
+    glUniform4fv_fn              = glUniform4fv ? glUniform4fv : glUniform4fvARB;
+    glUniform4iv_fn              = glUniform4iv ? glUniform4iv : glUniform4ivARB;
+    glUniformMatrix2fv_fn        = glUniformMatrix2fv ? glUniformMatrix2fv : glUniformMatrix2fvARB;
+    glUniformMatrix3fv_fn        = glUniformMatrix3fv ? glUniformMatrix3fv : glUniformMatrix3fvARB;
+    glUniformMatrix4fv_fn        = glUniformMatrix4fv ? glUniformMatrix4fv : glUniformMatrix4fvARB;
+    glUseProgram_fn              = glUseProgram ? glUseProgram : (PFNGLUSEPROGRAMPROC)glUseProgramObjectARB;
+  }
   
 #else
 
@@ -256,9 +269,9 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
 
   glActiveTexture_fn           = glActiveTexture;
   glBindBuffer_fn              = glBindBuffer;
-  glBlendEquation_fn           = glBlendEquationOES;
-  glBlendEquationSeparate_fn   = glBlendEquationSeparateOES;
-  glBlendFuncSeparate_fn       = glBlendFuncSeparateOES;
+  glBlendEquation_fn           = has_ext_blend_subtract ? glBlendEquationOES : 0;
+  glBlendEquationSeparate_fn   = has_ext_blend_equation_separate ? glBlendEquationSeparateOES : 0;
+  glBlendFuncSeparate_fn       = has_ext_blend_func_separate ? glBlendFuncSeparateOES : 0;
   glBufferData_fn              = glBufferData;
   glBufferSubData_fn           = glBufferSubData;
   glClientActiveTexture_fn     = glClientActiveTexture;
@@ -267,21 +280,24 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   glDeleteBuffers_fn           = glDeleteBuffers;
   glGenBuffers_fn              = glGenBuffers;
   
-  glBindFramebuffer_fn                     = glBindFramebufferOES;
-  glIsRenderbuffer_fn                      = glIsRenderbufferOES;
-  glBindRenderbuffer_fn                    = glBindRenderbufferOES;
-  glDeleteRenderbuffers_fn                 = glDeleteRenderbuffersOES;
-  glGenRenderbuffers_fn                    = glGenRenderbuffersOES;
-  glRenderbufferStorage_fn                 = glRenderbufferStorageOES;
-  glGetRenderbufferParameteriv_fn          = glGetRenderbufferParameterivOES;
-  glIsFramebuffer_fn                       = glIsFramebufferOES;
-  glBindFramebuffer_fn                     = glBindFramebufferOES;
-  glDeleteFramebuffers_fn                  = glDeleteFramebuffersOES;
-  glGenFramebuffers_fn                     = glGenFramebuffersOES;
-  glCheckFramebufferStatus_fn              = glCheckFramebufferStatusOES;
-  glFramebufferRenderbuffer_fn             = glFramebufferRenderbufferOES;
-  glFramebufferTexture2D_fn                = glFramebufferTexture2DOES;
-  glGetFramebufferAttachmentParameteriv_fn = glGetFramebufferAttachmentParameterivOES;
+  if (has_ext_framebuffer_object)
+  {
+    glBindFramebuffer_fn                     = glBindFramebufferOES;
+    glIsRenderbuffer_fn                      = glIsRenderbufferOES;
+    glBindRenderbuffer_fn                    = glBindRenderbufferOES;
+    glDeleteRenderbuffers_fn                 = glDeleteRenderbuffersOES;
+    glGenRenderbuffers_fn                    = glGenRenderbuffersOES;
+    glRenderbufferStorage_fn                 = glRenderbufferStorageOES;
+    glGetRenderbufferParameteriv_fn          = glGetRenderbufferParameterivOES;
+    glIsFramebuffer_fn                       = glIsFramebufferOES;
+    glBindFramebuffer_fn                     = glBindFramebufferOES;
+    glDeleteFramebuffers_fn                  = glDeleteFramebuffersOES;
+    glGenFramebuffers_fn                     = glGenFramebuffersOES;
+    glCheckFramebufferStatus_fn              = glCheckFramebufferStatusOES;
+    glFramebufferRenderbuffer_fn             = glFramebufferRenderbufferOES;
+    glFramebufferTexture2D_fn                = glFramebufferTexture2DOES;
+    glGetFramebufferAttachmentParameteriv_fn = glGetFramebufferAttachmentParameterivOES;
+  }
 
 #endif
 
