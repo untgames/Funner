@@ -7,6 +7,7 @@
 #include <stl/vector>
 
 #include <xtl/any_reference.h>
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
@@ -33,6 +34,7 @@
 #include <sg/listener.h>
 #include <sg/node_array.h>
 #include <sg/node_properties.h>
+#include <sg/particle_emitter.h>
 #include <sg/physics.h>
 #include <sg/scene.h>
 #include <sg/sound_emitter.h>
@@ -46,7 +48,7 @@ namespace scene_graph
 {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///СЃІ§†≠®• ™Ѓ≠ваЃЂЂ•а†
+///—оздание контроллера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 IController* create_controller (Node& node, const char* name, const xtl::any_reference& param);
 

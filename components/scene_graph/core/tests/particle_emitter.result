@@ -1,0 +1,4 @@
+Results of particle_emitter_test:
+Declaration = 'particle_system1'
+Particles parent exist = true
+Particles parent exist = false
