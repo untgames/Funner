@@ -5,6 +5,7 @@
 #include <libpsd.h>
 
 #include <stl/string>
+#include <stl/vector>
 
 #include <common/file.h>
 #include <common/strlib.h>
@@ -66,11 +67,13 @@ struct Params
   stl::string   layers_dir_name;         //имя каталога с сохранёнными слоями
   stl::string   layout_layers_dir_name;  //имя каталога с сохранёнными слоями, используемое в файле разметки
   stl::string   layers_format;           //строка форматирования имён слоёв
+  size_t        crop_alpha;              //коэффициент обрезания по прозрачности
   bool          silent;                  //минимальное число сообщений
   bool          print_help;              //нужно ли печатать сообщение помощи
   bool          need_layout;             //нужно генерировать файл разметки
   bool          need_layers;             //нужно сохранять слои
   bool          need_pot_extent;         //нужно ли расширять изображения до ближайшей степени двойки
+  bool          need_crop_alpha;         //нужно ли обрезать картинку по нулевой прозрачности
 };
 
 //форматы пикселя
@@ -88,6 +91,12 @@ struct rgba_t
   unsigned char green;
   unsigned char blue;
   unsigned char alpha;  
+};
+
+//прямоугольная область
+struct Rect
+{
+  size_t x, y, width, height;
 };
 
 //получение подсказки по программе
@@ -165,6 +174,15 @@ void command_line_pot (const char*, Params& params)
   params.need_pot_extent = true;
 }
 
+//установка параметра обрезания по прозрачности
+void command_line_crop_alpha (const char* value_string, Params& params)
+{
+  size_t value = (size_t)atoi (value_string);  
+
+  params.crop_alpha      = value < 0 ? 0 : value > 256 ? 256 : value;
+  params.need_crop_alpha = true;
+}
+
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
@@ -178,6 +196,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_no_layout,                "no-layout",         0,         0, "don't generate layout file"},
     {command_line_no_layers,                "no-layers",         0,         0, "don't generate layers"},
     {command_line_pot,                      "pot",               0,         0, "extent layers image size to nearest greater power of two"},
+    {command_line_crop_alpha,               "crop-alpha",        0,   "value", "crop layers by alpha that less than value"},
   };
   
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -417,14 +436,14 @@ void check_status (psd_status status, const char* source)
 } */
 
 //преобразование растровой карты
-void convert_image_data (size_t src_width, size_t src_height, const psd_argb_color* src_image, size_t dst_width, size_t dst_height, void* dst_image)
-{
-  for (size_t i=0; i<src_height; i++)
+void convert_image_data (size_t src_width, size_t src_height, const psd_argb_color* src_image, const Rect& src_crop, size_t dst_width, size_t dst_height, void* dst_image)
+{    
+  for (size_t i=0; i<src_crop.height; i++)
   {
-    const bgra_t* src = (const bgra_t*)src_image + i * src_width;
+    const bgra_t* src = (const bgra_t*)src_image + (src_crop.y + i) * src_width + src_crop.x;
     rgba_t*       dst = (rgba_t*)dst_image + dst_width * (dst_height - 1) - i * dst_width;
 
-    for (size_t j=0; j<src_width; j++, src++, dst++)
+    for (size_t j=0; j<src_crop.width; j++, src++, dst++)
     {
       dst->red   = src->red;
       dst->green = src->green;
@@ -432,6 +451,57 @@ void convert_image_data (size_t src_width, size_t src_height, const psd_argb_col
       dst->alpha = src->alpha;
     }
   }
+}
+
+//обрезание
+void crop_by_alpha (size_t width, size_t height, const psd_argb_color* image, size_t crop_alpha, Rect& cropped_rect)
+{
+  size_t  min_x, min_y, max_x, max_y;
+  bool first_point_found = false;
+
+  for (size_t y=0; y<height; y++)
+  {
+    const bgra_t* data = (const bgra_t*)image + y * width;
+
+    for (size_t x=0; x<width; x++, data++)
+    {
+      if (data->alpha < crop_alpha)
+        continue;
+        
+      if (!first_point_found)
+      {
+        min_x             = max_x = x;
+        min_y             = max_y = y;
+        first_point_found = true;
+
+        continue;        
+      }
+
+      if (x < min_x) min_x = x;
+      if (y < min_y) min_y = y;
+      if (x > max_x) max_x = x;
+      if (y > max_y) max_y = y;
+    }
+  }
+  
+  if (!cropped_rect.width || !cropped_rect.height)
+  {
+    cropped_rect.x      = min_x;
+    cropped_rect.y      = min_y;
+    cropped_rect.width  = max_x - min_x + 1;
+    cropped_rect.height = max_y - min_y + 1;
+  }
+  else
+  {
+    if (min_x < cropped_rect.x) cropped_rect.x = min_x;
+    if (min_y < cropped_rect.y) cropped_rect.y = min_y;
+
+    if (max_x > cropped_rect.x + cropped_rect.width)
+      cropped_rect.width = max_x - cropped_rect.x + 1;
+      
+    if (max_y > cropped_rect.y + cropped_rect.height)
+      cropped_rect.height = max_y - cropped_rect.y + 1;
+  }  
 }
 
 //получение ближайшей сверху степени двойки
@@ -458,6 +528,60 @@ void export_data (Params& params)
   
   check_status (psd_image_load (&context, (psd_char*)params.source_file_name.c_str ()), "::psd_image_load");   
   
+    //обрезание по альфа     
+  
+  typedef stl::vector<Rect> RectArray;
+  
+  RectArray cropped_layers;
+    
+  if (!params.silent && params.need_crop_alpha)
+    printf ("Crop layers by alpha...\n");
+
+  cropped_layers.reserve (context->layer_count);
+
+  size_t image_index = 1;       
+
+  for (int i=0; i<context->layer_count; i++)
+  {
+    psd_layer_record& layer = context->layer_records [i];
+    stl::string       name ((char*)layer.layer_name);      
+
+    if (!strncmp (name.c_str (), "</", 2))
+      continue;
+    
+    switch (layer.layer_type)
+    {
+      case psd_layer_type_normal:
+        break;
+      default:
+        continue;
+    }
+    
+    Rect rect = {0, 0, 0, 0};           
+  
+    if (params.need_crop_alpha)  
+    {
+      crop_by_alpha (layer.width, layer.height, layer.image_data, params.crop_alpha, rect);
+      
+      if (!rect.width)  rect.width  = 1;
+      if (!rect.height) rect.height = 1;
+      
+      if ((rect.width != layer.width || rect.height != layer.height) && !params.silent)
+        printf ("  crop layer '%s' (%u, %u)-(%u, %u)\n", name.c_str (), rect.x, rect.y, rect.x + rect.width, rect.y + rect.height);
+    }
+    else
+    {
+      rect.x      = 0;
+      rect.y      = 0;
+      rect.width  = layer.width;
+      rect.height = layer.height;
+    }
+          
+    cropped_layers.push_back (rect);
+
+    image_index++;
+  }
+  
     //сохранение разметки     
     
   if (params.need_layout)
@@ -479,11 +603,11 @@ void export_data (Params& params)
     for (int i=0; i<context->layer_count; i++)
     {
       psd_layer_record& layer = context->layer_records [i];
-      stl::string       name ((char*)layer.layer_name);      
+      stl::string       name ((char*)layer.layer_name);
 
       if (!strncmp (name.c_str (), "</", 2))
         continue;
-      
+
       switch (layer.layer_type)
       {
         case psd_layer_type_normal:
@@ -495,7 +619,7 @@ void export_data (Params& params)
       common::XmlWriter::Scope layer_scope (xml_writer, "Layer");
 
       xml_writer.WriteAttribute ("Name", name.c_str ());
-      
+
       if (params.need_layers)
       {      
         stl::string dst_image_name = common::format (format.c_str (), image_index);      
@@ -503,10 +627,12 @@ void export_data (Params& params)
         xml_writer.WriteAttribute ("Image",  dst_image_name.c_str ());
       }
       
-      xml_writer.WriteAttribute ("Left",   layer.left);
-      xml_writer.WriteAttribute ("Top",    layer.top);
-      xml_writer.WriteAttribute ("Width",  layer.width);
-      xml_writer.WriteAttribute ("Height", layer.height);      
+      const Rect& cropped_rect = cropped_layers [image_index - 1];
+      
+      xml_writer.WriteAttribute ("Left",   layer.left + cropped_rect.x);
+      xml_writer.WriteAttribute ("Top",    layer.top + cropped_rect.y);
+      xml_writer.WriteAttribute ("Width",  cropped_rect.width);
+      xml_writer.WriteAttribute ("Height", cropped_rect.height);
       
       image_index++;      
     }
@@ -547,8 +673,10 @@ void export_data (Params& params)
       if (!params.silent)
         printf ("  save '%s'...\n", dst_image_name.c_str ());
         
-      size_t image_width  = layer.width,
-             image_height = layer.height;
+      const Rect& cropped_rect = cropped_layers [image_index - 1];
+        
+      size_t image_width  = cropped_rect.width,
+             image_height = cropped_rect.height;
              
       if (params.need_pot_extent)
       {
@@ -559,9 +687,9 @@ void export_data (Params& params)
       media::Image image (image_width, image_height, 1, media::PixelFormat_RGBA8, 0);
 
       if (params.need_pot_extent)
-        memset (image.Bitmap (), 0, get_bytes_per_pixel (image.Format ()) * image.Width () * image.Height ());
+        memset (image.Bitmap (), 0, get_bytes_per_pixel (image.Format ()) * image.Width () * image.Height ());                 
 
-      convert_image_data (layer.width, layer.height, layer.image_data, image_width, image_height, image.Bitmap ());
+      convert_image_data (layer.width, layer.height, layer.image_data, cropped_rect, image_width, image_height, image.Bitmap ());
 
       image.Save (dst_image_name.c_str ());
       
@@ -584,11 +712,13 @@ int main (int argc, const char* argv [])
     params.options         = 0;
     params.options_count   = 0;
     params.layers_format   = "image%03u.png";
+    params.crop_alpha      = 0;
     params.print_help      = false;
     params.silent          = false;
     params.need_layout     = true;
     params.need_layers     = true;    
     params.need_pot_extent = false;
+    params.need_crop_alpha = false;
 
       //разбор командной строки
 

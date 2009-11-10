@@ -94,7 +94,7 @@ class TileImageBuilder
 
         do
         {
-          pack_result = PackImages (pack_flags & AtlasPackFlag_SwapAxises, result_image_horisontal_side, result_image_vertical_side, out_origins, indices);
+          pack_result = PackImages ((pack_flags & AtlasPackFlag_SwapAxises) != 0, result_image_horisontal_side, result_image_vertical_side, out_origins, indices);
 
           if (pack_result) break;
 

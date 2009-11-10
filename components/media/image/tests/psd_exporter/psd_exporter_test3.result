@@ -10,3 +10,4 @@ psd-exporter [<OPTIONS>] <SOURCE> ...
     --no-layout                don't generate layout file
     --no-layers                don't generate layers
     --pot                      extent layers image size to nearest greater power of two
+    --crop-alpha=<value>       crop layers by alpha that less than value
