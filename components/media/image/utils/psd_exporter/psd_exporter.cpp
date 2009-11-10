@@ -97,7 +97,8 @@ struct rgba_t
 //прямоугольная область
 struct Rect
 {
-  size_t x, y, width, height;
+  int    x, y;
+  size_t width, height;
 };
 
 //получение подсказки по программе
@@ -464,14 +465,14 @@ void convert_image_data (size_t src_width, size_t src_height, const psd_argb_col
 //обрезание
 void crop_by_alpha (size_t width, size_t height, const psd_argb_color* image, size_t crop_alpha, Rect& cropped_rect)
 {
-  size_t  min_x, min_y, max_x, max_y;
+  int  min_x, min_y, max_x, max_y;
   bool first_point_found = false;
 
-  for (size_t y=0; y<height; y++)
+  for (int y=0; y<(int)height; y++)
   {
     const bgra_t* data = (const bgra_t*)image + y * width;
 
-    for (size_t x=0; x<width; x++, data++)
+    for (int x=0; x<(int)width; x++, data++)
     {
       if (data->alpha < crop_alpha)
         continue;
@@ -514,10 +515,10 @@ void crop_by_alpha (size_t width, size_t height, const psd_argb_color* image, si
     if (min_x < cropped_rect.x) cropped_rect.x = min_x;
     if (min_y < cropped_rect.y) cropped_rect.y = min_y;
 
-    if (max_x > cropped_rect.x + cropped_rect.width)
+    if (max_x > (int)(cropped_rect.x + cropped_rect.width))
       cropped_rect.width = max_x - cropped_rect.x + 1;
       
-    if (max_y > cropped_rect.y + cropped_rect.height)
+    if (max_y > (int)(cropped_rect.y + cropped_rect.height))
       cropped_rect.height = max_y - cropped_rect.y + 1;
   }  
 }
