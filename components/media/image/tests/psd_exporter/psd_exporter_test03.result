@@ -1,4 +1,4 @@
-Results of psd_exporter_test3:
+Results of psd_exporter_test03:
 psd-exporter [<OPTIONS>] <SOURCE> ...
   OPTIONS:
     --help, -?                 print help message
@@ -11,3 +11,4 @@ psd-exporter [<OPTIONS>] <SOURCE> ...
     --no-layers                don't generate layers
     --pot                      extent layers image size to nearest greater power of two
     --crop-alpha=<value>       crop layers by alpha that less than value
+    --crop-exclude=<wildcards> exclude selected layers from crop

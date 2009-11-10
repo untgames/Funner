@@ -66,8 +66,9 @@ struct Params
   stl::string   layout_file_name;        //имя файла разметки  
   stl::string   layers_dir_name;         //имя каталога с сохранёнными слоями
   stl::string   layout_layers_dir_name;  //имя каталога с сохранёнными слоями, используемое в файле разметки
-  stl::string   layers_format;           //строка форматирования имён слоёв
-  size_t        crop_alpha;              //коэффициент обрезания по прозрачности
+  stl::string   layers_format;           //строка форматирования имён слоёв  
+  stl::string   crop_exclude;            //необрезаемые слои
+  size_t        crop_alpha;              //коэффициент обрезания по прозрачности  
   bool          silent;                  //минимальное число сообщений
   bool          print_help;              //нужно ли печатать сообщение помощи
   bool          need_layout;             //нужно генерировать файл разметки
@@ -183,20 +184,27 @@ void command_line_crop_alpha (const char* value_string, Params& params)
   params.need_crop_alpha = true;
 }
 
+//установка необрезаемых слоёв
+void command_line_crop_exclude (const char* string, Params& params)
+{
+  params.crop_exclude = string;
+}
+
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
-    {command_line_help,                     "help",             '?',        0, "print help message"},
-    {command_line_silent,                   "silent",           's',        0, "quiet mode"},    
-    {command_line_result_layout_layers_dir, "layout-layers-dir", 0,     "dir", "set output layers dir that used in layout file"},    
-    {command_line_result_layout,            "layout",           'o',   "file", "set output layout file"},    
-    {command_line_result_layers_dir,        "layers-dir",       'O',    "dir", "set output layers dir"},    
-    {command_line_result_layers_format,     "layers-format",     0,  "string", "set output layers format string"},
-    {command_line_no_layout,                "no-layout",         0,         0, "don't generate layout file"},
-    {command_line_no_layers,                "no-layers",         0,         0, "don't generate layers"},
-    {command_line_pot,                      "pot",               0,         0, "extent layers image size to nearest greater power of two"},
-    {command_line_crop_alpha,               "crop-alpha",        0,   "value", "crop layers by alpha that less than value"},
+    {command_line_help,                     "help",             '?',          0, "print help message"},
+    {command_line_silent,                   "silent",           's',          0, "quiet mode"},    
+    {command_line_result_layout_layers_dir, "layout-layers-dir", 0,       "dir", "set output layers dir that used in layout file"},    
+    {command_line_result_layout,            "layout",           'o',     "file", "set output layout file"},    
+    {command_line_result_layers_dir,        "layers-dir",       'O',      "dir", "set output layers dir"},    
+    {command_line_result_layers_format,     "layers-format",     0,    "string", "set output layers format string"},
+    {command_line_no_layout,                "no-layout",         0,           0, "don't generate layout file"},
+    {command_line_no_layers,                "no-layers",         0,           0, "don't generate layers"},
+    {command_line_pot,                      "pot",               0,           0, "extent layers image size to nearest greater power of two"},
+    {command_line_crop_alpha,               "crop-alpha",        0,     "value", "crop layers by alpha that less than value"},
+    {command_line_crop_exclude,             "crop-exclude",      0, "wildcards", "exclude selected layers from crop"},
   };
   
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -536,14 +544,15 @@ void export_data (Params& params)
 {
   psd_context* context = 0;
   
-  check_status (psd_image_load (&context, (psd_char*)params.source_file_name.c_str ()), "::psd_image_load");   
+  check_status (psd_image_load (&context, (psd_char*)params.source_file_name.c_str ()), "::psd_image_load");       
   
     //обрезание по альфа     
   
   typedef stl::vector<Rect> RectArray;
   
-  RectArray cropped_layers;
-    
+  RectArray           cropped_layers;
+  common::StringArray crop_exclude_list = common::split (params.crop_exclude.c_str ());
+
   if (!params.silent && params.need_crop_alpha)
     printf ("Crop layers by alpha...\n");
 
@@ -568,8 +577,24 @@ void export_data (Params& params)
     }
     
     Rect rect = {0, 0, 0, 0};           
+    
+    bool need_crop_alpha = params.need_crop_alpha;
+    
+    if (need_crop_alpha)
+    {
+      for (size_t i=0, count=crop_exclude_list.Size (); i<count; i++)
+      {
+        const char* mask = crop_exclude_list [i];
+        
+        if (common::wcmatch (name.c_str (), mask))
+        {
+          need_crop_alpha = false;
+          break;
+        }
+      }
+    }
   
-    if (params.need_crop_alpha)  
+    if (need_crop_alpha)  
     {
       crop_by_alpha (layer.width, layer.height, layer.image_data, params.crop_alpha, rect);      
 
