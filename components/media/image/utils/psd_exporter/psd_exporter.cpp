@@ -484,12 +484,22 @@ void crop_by_alpha (size_t width, size_t height, const psd_argb_color* image, si
     }
   }
   
+  if (!first_point_found)
+  {
+    cropped_rect.x      = 0;
+    cropped_rect.y      = 0;
+    cropped_rect.width  = 0;
+    cropped_rect.height = 0;
+    
+    return;
+  }  
+  
   if (!cropped_rect.width || !cropped_rect.height)
   {
     cropped_rect.x      = min_x;
     cropped_rect.y      = min_y;
     cropped_rect.width  = max_x - min_x + 1;
-    cropped_rect.height = max_y - min_y + 1;
+    cropped_rect.height = max_y - min_y + 1;      
   }
   else
   {
@@ -561,13 +571,10 @@ void export_data (Params& params)
   
     if (params.need_crop_alpha)  
     {
-      crop_by_alpha (layer.width, layer.height, layer.image_data, params.crop_alpha, rect);
-      
-      if (!rect.width)  rect.width  = 1;
-      if (!rect.height) rect.height = 1;
-      
+      crop_by_alpha (layer.width, layer.height, layer.image_data, params.crop_alpha, rect);      
+
       if ((rect.width != layer.width || rect.height != layer.height) && !params.silent)
-        printf ("  crop layer '%s' (%u, %u)-(%u, %u)\n", name.c_str (), rect.x, rect.y, rect.x + rect.width, rect.y + rect.height);
+        printf ("  crop layer '%s' %ux%u: (%u, %u)-(%u, %u)\n", name.c_str (), layer.width, layer.height, rect.x, rect.y, rect.x + rect.width, rect.y + rect.height);
     }
     else
     {
@@ -672,12 +679,12 @@ void export_data (Params& params)
       
       if (!params.silent)
         printf ("  save '%s'...\n", dst_image_name.c_str ());
-        
+
       const Rect& cropped_rect = cropped_layers [image_index - 1];
-        
+
       size_t image_width  = cropped_rect.width,
              image_height = cropped_rect.height;
-             
+
       if (params.need_pot_extent)
       {
         image_width  = get_next_higher_power_of_two (image_width);
