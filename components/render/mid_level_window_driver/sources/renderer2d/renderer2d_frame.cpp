@@ -16,6 +16,21 @@ namespace
 const size_t PRIMITIVE_ARRAY_RESERVE_SIZE = 2048; //резервируемое количество примитивов
 
 /*
+    Контекст рендеринга
+*/
+
+struct RenderContext
+{
+  render::low_level::IDevice*     device;                  //устройство
+  render::low_level::ITexture*    current_texture;         //текущая текстура
+  render::low_level::IBlendState* current_blend_state;     //текущее состояние уровня смешивания цветов
+  render::low_level::Rect*        current_scissor;         //текущая область отсечения  
+  CommonResources*                resources;               //ресурсы
+  render::low_level::IBuffer*     common_constant_buffer;  //буфер констант
+  render::low_level::IBuffer*     dynamic_constant_buffer; //буфер констант
+};
+
+/*
     Создание константных буферов
 */
 
@@ -201,111 +216,148 @@ namespace
 {
 
 //рисование спрайтов без блендинга
-void draw_solid_sprites
- (IDevice&                 device,
-  const RenderableSprite** base_sprite,
-  const RenderableSprite** first_sprite,
-  const RenderableSprite** last_sprite)
+void draw_solid_sprites (RenderContext& context, const RenderableSprite** sprites, size_t first_sprite, size_t sprites_count)
 {
-  for (const RenderableSprite** sprite=first_sprite; sprite != last_sprite;)
+  for (const RenderableSprite **sprite=sprites+first_sprite, **last_sprite=sprite+sprites_count; sprite != last_sprite;)
   {
     render::low_level::ITexture* texture = (*sprite)->primitive->texture;
+    render::low_level::Rect*     scissor = (*sprite)->primitive->scissor;
 
-    size_t base_sprite_index = sprite++ - base_sprite;
+    size_t base_sprite_index = sprite++ - sprites;
 
-    for (; sprite != last_sprite && (*sprite)->primitive->texture == texture; sprite++);
+    for (; sprite != last_sprite && (*sprite)->primitive->texture == texture && (*sprite)->primitive->scissor == scissor; sprite++);
 
-    size_t sprites_count = sprite - base_sprite - base_sprite_index;
+    size_t draw_sprites_count = sprite - sprites - base_sprite_index;
 
-    device.SSSetTexture (0, texture);
-    device.DrawIndexed  (render::low_level::PrimitiveType_TriangleList, base_sprite_index * SPRITE_INDICES_COUNT,
-                         sprites_count * SPRITE_INDICES_COUNT, 0);
+    if (context.current_scissor != scissor)
+    {      
+      if (scissor)
+      {
+        context.device->RSSetScissor (*scissor);
+        context.device->RSSetState   (context.resources->GetRasterizerState (true));
+      }
+      else
+      {
+        context.device->RSSetState (context.resources->GetRasterizerState (false));
+      }
+
+      context.current_scissor = scissor;
+    }
+
+    if (context.current_texture != texture)
+    {
+      context.device->SSSetTexture (0, texture);
+
+      context.current_texture = texture;
+    }
+
+    context.device->DrawIndexed (render::low_level::PrimitiveType_TriangleList, base_sprite_index * SPRITE_INDICES_COUNT, draw_sprites_count * SPRITE_INDICES_COUNT, 0);
   }
 }
 
 //рисование спрайтов с альфа-отсечением
-void draw_alpha_clamped_sprites
- (IDevice&                 device,
-  const RenderableSprite** base_sprite,
-  const RenderableSprite** first_sprite,
-  const RenderableSprite** last_sprite,
-  IBuffer&                 constant_buffer)
+void draw_alpha_clamped_sprites (RenderContext& context, const RenderableSprite** sprites, size_t first_sprite, size_t sprites_count)
 {
-  render::low_level::ITexture* current_texture         = device.SSGetTexture (0);
-  DynamicProgramParameters     dynamic_program_parameters; //динамические параметры программы рендеринга
+  DynamicProgramParameters dynamic_program_parameters; //динамические параметры программы рендеринга
 
   dynamic_program_parameters.alpha_reference = 0.0f;
 
-  for (const RenderableSprite** sprite=first_sprite; sprite != last_sprite;)
+  for (const RenderableSprite **sprite=sprites+first_sprite, **last_sprite=sprite+sprites_count; sprite != last_sprite;)
   {
     render::low_level::ITexture* texture         = (*sprite)->primitive->texture;
+    render::low_level::Rect*     scissor         = (*sprite)->primitive->scissor;
     float                        alpha_reference = (*sprite)->primitive->alpha_reference;
 
-    size_t base_sprite_index = sprite++ - base_sprite;
+    size_t base_sprite_index = sprite++ - sprites;
 
-    for (; sprite != last_sprite && (*sprite)->primitive->texture == texture && (*sprite)->primitive->alpha_reference == alpha_reference; sprite++);
+    for (; sprite != last_sprite && (*sprite)->primitive->texture == texture && (*sprite)->primitive->alpha_reference == alpha_reference &&
+      scissor == (*sprite)->primitive->scissor; sprite++);
 
-    size_t sprites_count = sprite - base_sprite - base_sprite_index;
+    size_t draw_sprites_count = sprite - sprites - base_sprite_index;
 
     if (dynamic_program_parameters.alpha_reference != alpha_reference)
     {
       dynamic_program_parameters.alpha_reference = alpha_reference;
 
-      constant_buffer.SetData (0, sizeof (dynamic_program_parameters), &dynamic_program_parameters);
+      context.dynamic_constant_buffer->SetData (0, sizeof (dynamic_program_parameters), &dynamic_program_parameters);
     }
-
-    if (current_texture != texture)
+    
+    if (context.current_scissor != scissor)
     {
-      device.SSSetTexture (0, texture);
+      if (scissor)
+      {
+        context.device->RSSetScissor (*scissor);
+        context.device->RSSetState   (context.resources->GetRasterizerState (true));
+      }
+      else
+      {
+        context.device->RSSetState (context.resources->GetRasterizerState (false));
+      }
 
-      current_texture = texture;
+      context.current_scissor = scissor;
     }
 
-    device.DrawIndexed (render::low_level::PrimitiveType_TriangleList, base_sprite_index * SPRITE_INDICES_COUNT,
-      sprites_count * SPRITE_INDICES_COUNT, 0);
+    if (context.current_texture != texture)
+    {
+      context.device->SSSetTexture (0, texture);
+
+      context.current_texture = texture;
+    }
+
+    context.device->DrawIndexed (render::low_level::PrimitiveType_TriangleList, base_sprite_index * SPRITE_INDICES_COUNT,
+      draw_sprites_count * SPRITE_INDICES_COUNT, 0);
   }
 }
 
 //рисование спрайтов с прозрачностью
-void draw_blend_sprites
- (IDevice&                 device,
-  const RenderableSprite** base_sprite,
-  const RenderableSprite** first_sprite,
-  const RenderableSprite** last_sprite,
-  CommonResources&         resources)
-{
-  render::low_level::ITexture*     current_texture     = device.SSGetTexture (0);
-  render::low_level::IBlendState*  current_blend_state = device.OSGetBlendState ();
-
-  for (const RenderableSprite** sprite=first_sprite; sprite != last_sprite;)
+void draw_blend_sprites (RenderContext& context, const RenderableSprite** sprites, size_t first_sprite, size_t sprites_count)
+{  
+  for (const RenderableSprite **sprite=sprites+first_sprite, **last_sprite=sprite+sprites_count; sprite != last_sprite;)
   {
     render::low_level::ITexture*             texture    = (*sprite)->primitive->texture;
     render::mid_level::renderer2d::BlendMode blend_mode = (*sprite)->primitive->blend_mode;
+    render::low_level::Rect*                 scissor    = (*sprite)->primitive->scissor;
 
-    size_t base_sprite_index = sprite++ - base_sprite;
+    size_t base_sprite_index = sprite++ - sprites;
 
-    for (; sprite != last_sprite && (*sprite)->primitive->texture == texture && (*sprite)->primitive->blend_mode == blend_mode; sprite++);
+    for (; sprite != last_sprite && (*sprite)->primitive->texture == texture && (*sprite)->primitive->blend_mode == blend_mode &&
+      (*sprite)->primitive->scissor == scissor; sprite++);
 
-    size_t sprites_count = sprite - base_sprite - base_sprite_index;
+    size_t draw_sprites_count = sprite - sprites - base_sprite_index;
 
-    if (current_texture != texture)
+    if (context.current_scissor != scissor)
     {
-      device.SSSetTexture (0, texture);
+      if (scissor)
+      {
+        context.device->RSSetScissor (*scissor);
+        context.device->RSSetState   (context.resources->GetRasterizerState (true));
+      }
+      else
+      {
+        context.device->RSSetState (context.resources->GetRasterizerState (false));
+      }
 
-      current_texture = texture;
+      context.current_scissor = scissor;
     }
 
-    render::low_level::IBlendState* blend_state = resources.GetBlendState (blend_mode);
-
-    if (current_blend_state != blend_state)
+    if (context.current_texture != texture)
     {
-      device.OSSetBlendState (blend_state);
+      context.device->SSSetTexture (0, texture);
 
-      current_blend_state = blend_state;
+      context.current_texture = texture;
+    }          
+
+    render::low_level::IBlendState* blend_state = context.resources->GetBlendState (blend_mode);
+
+    if (context.current_blend_state != blend_state)
+    {
+      context.device->OSSetBlendState (blend_state);
+
+      context.current_blend_state = blend_state;
     }
 
-    device.DrawIndexed (render::low_level::PrimitiveType_TriangleList, base_sprite_index * SPRITE_INDICES_COUNT,
-      sprites_count * SPRITE_INDICES_COUNT, 0);
+    context.device->DrawIndexed (render::low_level::PrimitiveType_TriangleList, base_sprite_index * SPRITE_INDICES_COUNT,
+      draw_sprites_count * SPRITE_INDICES_COUNT, 0);
   }
 }
 
@@ -315,7 +367,7 @@ void Frame::DrawCore (IDevice* device)
 {
     //установка области вывода
 
-  BasicFrame::BindViewport (device);
+  BasicFrame::BindViewport (device);     
 
     //обновление парметров шейдинга
 
@@ -332,6 +384,7 @@ void Frame::DrawCore (IDevice* device)
   device->SSSetConstantBuffer          (1, dynamic_constant_buffer.get ());
   device->SSSetProgramParametersLayout (common_resources->GetProgramParametersLayout ());
   device->SSSetSampler                 (0, common_resources->GetSamplerState ());
+  device->RSSetState                   (common_resources->GetRasterizerState (0));
 
     //отрисовка спрайтов без блендинга
 
@@ -339,12 +392,26 @@ void Frame::DrawCore (IDevice* device)
   device->ISSetIndexBuffer       (not_blended_sprites.GetIndexBuffer ());
   device->OSSetDepthStencilState (common_resources->GetDepthStencilState (true));
   device->OSSetBlendState        (common_resources->GetBlendState (BlendMode_None));
-
+  
+    //заполнение контекста отрисовки
+  
+  RenderContext context;
+  
+  memset (&context, 0, sizeof (context));
+  
+  context.device                  = device;
+  context.current_texture         = device->SSGetTexture (0);
+  context.current_scissor         = 0;
+  context.current_blend_state     = device->OSGetBlendState ();
+  context.resources               = &*common_resources;  
+  context.common_constant_buffer  = &*common_constant_buffer;
+  context.dynamic_constant_buffer = &*dynamic_constant_buffer;
+  
+    //поиск первого спрайта без альфа-отсечения
+    
   const RenderableSprite **first_sprite = not_blended_sprites.GetSprites (),
                          **last_sprite  = first_sprite + not_blended_sprites.Size (),
                          **first_solid_sprite;
-
-    //поиск первого спрайта без альфа-отсечения
 
   for (first_solid_sprite=first_sprite; first_solid_sprite != last_sprite && (*first_solid_sprite)->primitive->blend_mode == BlendMode_AlphaClamp; ++first_solid_sprite);
 
@@ -354,14 +421,14 @@ void Frame::DrawCore (IDevice* device)
   {
     device->SSSetProgram (common_resources->GetAlphaClampProgram ());
 
-    draw_alpha_clamped_sprites (*device, first_sprite, first_sprite, first_solid_sprite, *dynamic_constant_buffer);
+    draw_alpha_clamped_sprites (context, first_sprite, 0, first_solid_sprite - first_sprite);
   }
 
     //отрисовка спрайтов без альфа-отсечения
 
   device->SSSetProgram (common_resources->GetDefaultProgram ());
 
-  draw_solid_sprites (*device, first_sprite, first_solid_sprite, last_sprite);
+  draw_solid_sprites (context, first_sprite, first_solid_sprite - first_sprite, last_sprite - first_solid_sprite);
 
     //отрисовка спрайтов с блендингом
 
@@ -372,5 +439,5 @@ void Frame::DrawCore (IDevice* device)
   first_sprite = blended_sprites.GetSprites ();
   last_sprite  = first_sprite + blended_sprites.Size ();
 
-  draw_blend_sprites (*device, first_sprite, first_sprite, last_sprite, *common_resources);
+  draw_blend_sprites (context, first_sprite, 0, last_sprite - first_sprite);
 }

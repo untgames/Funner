@@ -39,6 +39,11 @@ class Test: public BasicTest
 
         primitive->AddSprites (1, &sprite);
       }
+      
+      Viewport scissor = {100, 100, 600, 600};
+      
+      primitive->SetScissor (scissor);
+      primitive->SetScissorState (true);
 
       // building frame
 

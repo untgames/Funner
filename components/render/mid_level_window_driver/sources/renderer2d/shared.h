@@ -43,6 +43,7 @@ typedef xtl::com_ptr<render::low_level::IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<render::low_level::IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<render::low_level::ISamplerState>            SamplerStatePtr;
 typedef xtl::com_ptr<render::low_level::IInputLayout>             InputLayoutPtr;
+typedef xtl::com_ptr<render::low_level::IRasterizerState>         RasterizerStatePtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры шейдера
@@ -75,6 +76,7 @@ struct RenderablePrimitive
 {
   float                            alpha_reference; //параметр для альфа-теста
   render::low_level::ITexture*     texture;         //текстура
+  render::low_level::Rect*         scissor;         //область отсечения
   mid_level::renderer2d::BlendMode blend_mode;      //режим смешивания цветов
 };
 
@@ -108,6 +110,7 @@ class CommonResources : public Object
     render::low_level::IProgramParametersLayout* GetProgramParametersLayout () { return program_parameters_layout.get (); }
     render::low_level::ISamplerState*            GetSamplerState      () { return sampler.get (); }
     render::low_level::IInputLayout*             GetInputLayout       () { return input_layout.get (); }
+    render::low_level::IRasterizerState*         GetRasterizerState   (bool scissor_enabled);
 
   private:
     BlendStatePtr              blend_states [render::mid_level::renderer2d::BlendMode_Num];
@@ -117,6 +120,7 @@ class CommonResources : public Object
     ProgramParametersLayoutPtr program_parameters_layout;
     SamplerStatePtr            sampler;
     InputLayoutPtr             input_layout;
+    RasterizerStatePtr         rasterizer_states [2];
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -281,6 +285,14 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
     float GetAlphaReference ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Область отсечения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetScissor      (const Viewport&);
+    void SetScissorState (bool state);
+    void GetScissor      (Viewport&);
+    bool GetScissorState ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Спрайты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t GetSpritesCount  ();
@@ -307,13 +319,15 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
     typedef xtl::com_ptr<mid_level::renderer2d::ITexture> TexturePtr;
 
   private:
-    math::mat4f           transform;                      //матрица преобразований примитива
-    TexturePtr            texture;                        //текстура
-    SpriteArray           sprites;                        //массив спрайтов
-    RenderablePrimitive   renderable_primitive;           //параметры, необходимые для визуализации примитива
-    RenderableSpriteArray renderable_sprites;             //массив визуализируемых спрайтов
-    bool                  need_update_transform;          //необходимо обновить положение вершин
-    bool                  need_update_renderable_sprites; //необходимо обновить параметры визуализации спрайтов
+    math::mat4f             transform;                      //матрица преобразований примитива
+    TexturePtr              texture;                        //текстура
+    SpriteArray             sprites;                        //массив спрайтов
+    RenderablePrimitive     renderable_primitive;           //параметры, необходимые для визуализации примитива
+    RenderableSpriteArray   renderable_sprites;             //массив визуализируемых спрайтов
+    render::low_level::Rect scissor_rect;                   //область отсечения
+    bool                    scissor_state;                  //состояние отсечения
+    bool                    need_update_transform;          //необходимо обновить положение вершин
+    bool                    need_update_renderable_sprites; //необходимо обновить параметры визуализации спрайтов
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

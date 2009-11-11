@@ -10,12 +10,19 @@ using namespace render::mid_level::window_driver::renderer2d;
 */
 
 Primitive::Primitive ()
-  : need_update_transform (true),
-    need_update_renderable_sprites (true)
+  : need_update_transform (true)
+  , need_update_renderable_sprites (true)
+  , scissor_state (false)
 {
+  scissor_rect.x      = 0;
+  scissor_rect.y      = 0;
+  scissor_rect.width  = 0;
+  scissor_rect.height = 0;
+
   renderable_primitive.blend_mode      = BlendMode_None;
   renderable_primitive.texture         = 0;
   renderable_primitive.alpha_reference = 0.0f;
+  renderable_primitive.scissor         = 0;
 }
 
 /*
@@ -106,6 +113,40 @@ void Primitive::SetAlphaReference (float ref)
 float Primitive::GetAlphaReference ()
 {
   return renderable_primitive.alpha_reference;
+}
+
+/*
+    Область отсечения
+*/
+
+void Primitive::SetScissor (const Viewport& viewport)
+{
+  scissor_rect.x      = viewport.x;
+  scissor_rect.y      = viewport.y;
+  scissor_rect.width  = viewport.width;
+  scissor_rect.height = viewport.height;
+}
+
+void Primitive::SetScissorState (bool state)
+{
+  if (scissor_state == state)
+    return;
+
+  scissor_state                = state;    
+  renderable_primitive.scissor = state ? &scissor_rect : 0;
+}
+
+void Primitive::GetScissor (Viewport& out_viewport)
+{
+  out_viewport.x      = scissor_rect.x;
+  out_viewport.y      = scissor_rect.y;
+  out_viewport.width  = scissor_rect.width;
+  out_viewport.height = scissor_rect.height; 
+}
+
+bool Primitive::GetScissorState ()
+{
+  return scissor_state;
 }
 
 /*

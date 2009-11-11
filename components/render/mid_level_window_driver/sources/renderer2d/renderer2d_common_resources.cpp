@@ -228,6 +228,26 @@ InputLayoutPtr create_input_layout (IDevice& device)
   return InputLayoutPtr (device.CreateInputLayout (layout_desc), false);
 }
 
+//создание состояния уровня растеризации
+RasterizerStatePtr create_rasterizer_state (IDevice& device, bool scissor_enabled)
+{
+  RasterizerDesc rasterizer_desc;
+  
+  memset (&rasterizer_desc, 0, sizeof (rasterizer_desc));
+  
+  rasterizer_desc.fill_mode               = FillMode_Solid;
+  rasterizer_desc.cull_mode               = CullMode_None;
+  rasterizer_desc.front_counter_clockwise = true;
+  rasterizer_desc.depth_bias              = 0;
+  rasterizer_desc.scissor_enable          = scissor_enabled;
+  rasterizer_desc.multisample_enable      = false;
+  rasterizer_desc.antialiased_line_enable = false;
+  
+  return RasterizerStatePtr (device.CreateRasterizerState (rasterizer_desc), false);
+  
+  
+}
+
 }
 
 CommonResources::CommonResources (IDevice* device)
@@ -263,10 +283,19 @@ CommonResources::CommonResources (IDevice* device)
 
   depth_stencil_states [0] = create_depth_stencil_state (*device, false);
   depth_stencil_states [1] = create_depth_stencil_state (*device, true);
+  
+  rasterizer_states [0] = create_rasterizer_state (*device, false);
+  rasterizer_states [1] = create_rasterizer_state (*device, true);
 }
 
 render::low_level::IDepthStencilState* CommonResources::GetDepthStencilState (bool depth_write_enabled)
 {
-  if (depth_write_enabled) return depth_stencil_states[1].get ();
-  else                     return depth_stencil_states[0].get ();
+  if (depth_write_enabled) return depth_stencil_states [1].get ();
+  else                     return depth_stencil_states [0].get ();
+}
+
+render::low_level::IRasterizerState* CommonResources::GetRasterizerState (bool scissor_enabled)
+{
+  if (scissor_enabled) return rasterizer_states [1].get ();
+  else                 return rasterizer_states [0].get ();
 }
