@@ -9,6 +9,15 @@ namespace
 const char* WINDOW_CLASS_NAME = "Default window class";
 
 /*
+    Получение экземпляра приложения
+*/
+
+HINSTANCE GetApplicationInstance ()
+{
+  return GetModuleHandle (0);
+}
+
+/*
     Описание реализации окна
 */
 
@@ -20,10 +29,15 @@ struct WindowImpl
   bool                           is_cursor_in_window; //находится ли курсор в окне
   HCURSOR                        cursor;              //изображение курсора
 
-  WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data) :
-      user_data (in_user_data), message_handler (handler), is_cursor_visible (true), cursor (0),
-      is_cursor_in_window (false) {}
-      
+  WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
+    : user_data (in_user_data)
+    , message_handler (handler)
+    , is_cursor_visible (true)
+    , cursor (LoadCursor (GetApplicationInstance (), IDC_ARROW))
+    , is_cursor_in_window (false)
+  {
+  }
+
   void TrackCursor (HWND wnd)
   {
     if (is_cursor_in_window)
@@ -430,15 +444,6 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     //обработка сообщений по умолчанию
 
   return DefWindowProc (wnd, message, wparam, lparam);
-}
-
-/*
-    Получение экземпляра приложения
-*/
-
-HINSTANCE GetApplicationInstance ()
-{
-  return GetModuleHandle (0);
 }
 
 /*

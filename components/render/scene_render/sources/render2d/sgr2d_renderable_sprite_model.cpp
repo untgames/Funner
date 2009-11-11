@@ -9,20 +9,24 @@ using namespace scene_graph;
 
 struct RenderableSpriteModel::Impl: public xtl::trackable
 {
-  Render&                   render;                          //ссылка на рендер
-  scene_graph::SpriteModel* model;                           //исходная модель
-  PrimitivePtr              primitive;                       //визуализируемый примитив
-  RenderQueryPtr            query;                           //запрос дочернего рендеринга
-  bool                      need_update_sprites;             //флаг необходимости обновления массива спрайтов
-  size_t                    tile_columns, tile_rows;         //количество столбцов / строк тайлов
-  float                     tile_tex_width, tile_tex_height; //размеры тайла в текстурных координатах
-  size_t                    current_world_tm_hash;           //хэш текущей матрицы трансформации
-  size_t                    current_material_name_hash;      //хэш текущего имени материала
-  float                     current_alpha_reference;         //текущее значение параметра альфа-отсечения
-  math::vec2f               current_texture_scroll;          //текущее смещение текстуры
-  size_t                    texture_scroll_property_index;   //текущее значение индекса свойства смещения текстурных координат
-  size_t                    properties_structure_hash;       //текущий хэш структуры свойств узла
-  size_t                    properties_hash;                 //текущий хэш свойств узла
+  Render&                     render;                          //ссылка на рендер
+  scene_graph::SpriteModel*   model;                           //исходная модель
+  PrimitivePtr                primitive;                       //визуализируемый примитив
+  RenderQueryPtr              query;                           //запрос дочернего рендеринга
+  bool                        need_update_sprites;             //флаг необходимости обновления массива спрайтов
+  size_t                      tile_columns, tile_rows;         //количество столбцов / строк тайлов
+  float                       tile_tex_width, tile_tex_height; //размеры тайла в текстурных координатах
+  size_t                      current_world_tm_hash;           //хэш текущей матрицы трансформации
+  size_t                      current_material_name_hash;      //хэш текущего имени материала
+  float                       current_alpha_reference;         //текущее значение параметра альфа-отсечения
+  math::vec2f                 current_texture_scroll;          //текущее смещение текстуры
+  bool                        current_scissor_state;           //состояние области отсечения
+  render::mid_level::Viewport current_scissor_rect;            //разрмеры области отсечения  
+  size_t                      texture_scroll_property_index;   //текущее значение индекса свойства смещения текстурных координат
+  size_t                      scissor_rect_property_index;     //текущее значение индекса свойства области отсечения
+  size_t                      scissor_state_property_index;    //текущее значение индекса свойства состояния области отсечения
+  size_t                      properties_structure_hash;       //текущий хэш структуры свойств узла
+  size_t                      properties_hash;                 //текущий хэш свойств узла
 
 ///Конструктор
   Impl (scene_graph::SpriteModel* in_model, Render& in_render) :
@@ -33,10 +37,15 @@ struct RenderableSpriteModel::Impl: public xtl::trackable
     current_world_tm_hash (0),
     current_material_name_hash (0),
     current_texture_scroll (0.0f),
+    current_scissor_state (false),
     texture_scroll_property_index (0),
+    scissor_rect_property_index (0),
+    scissor_state_property_index (0),
     properties_structure_hash (0),
     properties_hash (0)
   {
+    memset (&current_scissor_rect, 0, sizeof (current_scissor_rect));
+    
     connect_tracker (model->RegisterEventHandler (SpriteModelEvent_AfterSpriteDescsUpdate, xtl::bind (&Impl::UpdateSpritesNotify, this)));
 
     current_alpha_reference = primitive->GetAlphaReference ();
@@ -75,6 +84,124 @@ void RenderableSpriteModel::Update ()
 
   try
   {
+      //обновление параметров рендеринга
+      
+    bool need_update_scissor = false;
+    bool scissor_state       = impl->current_scissor_state;
+    render::mid_level::Viewport scissor_rect = {0, 0, 0, 0};
+      
+    if (!model->Properties () && impl->properties_hash)
+    {
+      impl->properties_hash               = 0;
+      impl->properties_structure_hash     = 0;
+      impl->texture_scroll_property_index = 0;
+      impl->scissor_rect_property_index   = 0;
+      impl->scissor_state_property_index  = 0;
+      impl->current_texture_scroll        = math::vec2f (0.0f);
+      impl->need_update_sprites           = true;
+      need_update_scissor                 = true;
+      scissor_state                       = false;
+    }
+      
+    if (model->Properties () && impl->properties_hash != model->Properties ()->Hash ())
+    {     
+      const NodeProperties& properties = *model->Properties ();
+      
+      if (impl->properties_structure_hash != properties.StructureHash ())
+      {
+        impl->texture_scroll_property_index = properties.IndexOf ("render.texture_scroll");
+        impl->scissor_rect_property_index   = properties.IndexOf ("render.scissor_rect");
+        impl->scissor_state_property_index  = properties.IndexOf ("render.scissor_state");
+        impl->properties_structure_hash     = properties.StructureHash ();
+      }
+
+      if (impl->texture_scroll_property_index != size_t (-1))
+      {
+        math::vec4f scroll;
+
+        try
+        {
+          properties.GetProperty (impl->texture_scroll_property_index, scroll);
+
+          impl->current_texture_scroll = scroll;
+        }
+        catch (...)
+        {
+          impl->current_texture_scroll = math::vec2f (0.0f);
+        }
+        
+        impl->need_update_sprites = true;        
+      }
+      else
+      {
+        if (impl->current_texture_scroll != math::vec2f (0.0f))
+          impl->need_update_sprites = true;
+        
+        impl->current_texture_scroll = math::vec2f (0.0f);
+      }
+      
+      if (impl->scissor_state_property_index != size_t (-1))
+      {
+        if (impl->scissor_rect_property_index != size_t (-1))
+        {
+          try
+          {
+            scissor_state = properties.GetInteger (impl->scissor_state_property_index) != 0;
+          }
+          catch (...)
+          {
+            scissor_state = false;
+          }
+        }
+        else
+        {
+          scissor_state = false;
+        }
+        
+        need_update_scissor = true;
+      }
+      else
+      {
+        if (scissor_state)
+          need_update_scissor = true;
+          
+        scissor_state = false;
+      }
+
+      if (impl->scissor_rect_property_index != size_t (-1))
+      {
+        math::vec4f rect;
+        
+        try
+        {
+          properties.GetProperty (impl->scissor_rect_property_index, rect);
+          
+          scissor_rect.x      = (int)rect [0];
+          scissor_rect.y      = (int)rect [1];
+          scissor_rect.width  = (size_t)rect [2];
+          scissor_rect.height = (size_t)rect [3];
+
+          if (impl->scissor_state_property_index == size_t (-1))
+            scissor_state = true;
+        }
+        catch (...)
+        {
+          scissor_state = false;
+        }
+        
+        need_update_scissor = true;
+      }
+      else
+      {
+        if (scissor_state)
+          need_update_scissor = true;
+        
+        scissor_state = false;
+      }
+      
+      impl->properties_hash = properties.Hash ();
+    }    
+    
       //обновление материала
 
     size_t material_name_hash = common::strhash (model->Material ());
@@ -172,6 +299,23 @@ void RenderableSpriteModel::Update ()
       impl->current_alpha_reference = model->AlphaReference ();
     }
     
+    if (need_update_scissor)
+    {
+      if (impl->current_scissor_state != scissor_state)
+      {
+        impl->primitive->SetScissorState (scissor_state);
+      }
+      
+      if (impl->current_scissor_rect.x != scissor_rect.x || impl->current_scissor_rect.y != scissor_rect.y ||
+        impl->current_scissor_rect.width != scissor_rect.width || impl->current_scissor_rect.height != scissor_rect.height)
+      {
+        impl->primitive->SetScissor (scissor_rect);
+      }
+      
+      impl->current_scissor_state = scissor_state;
+      impl->current_scissor_rect  = scissor_rect;
+    }
+    
       //обновление матрицы трансформаций
 
     math::mat4f world_tm;
@@ -185,54 +329,10 @@ void RenderableSpriteModel::Update ()
       impl->primitive->SetTransform (world_tm);
 
       impl->current_world_tm_hash = world_tm_hash;
-    }    
-    
-      //обновление скроллинга текстуры
-      
-    if (!model->Properties () && impl->properties_hash)
-    {
-      impl->properties_hash               = 0;
-      impl->properties_structure_hash     = 0;
-      impl->texture_scroll_property_index = 0;
-      impl->current_texture_scroll        = math::vec2f (0.0f);
-      impl->need_update_sprites           = true;
-    }
-      
-    if (model->Properties () && impl->properties_hash != model->Properties ()->Hash ())
-    {
-      const NodeProperties& properties = *model->Properties ();
-      
-      if (impl->properties_structure_hash != properties.StructureHash ())
-      {
-        impl->texture_scroll_property_index = properties.IndexOf ("render.texture_scroll");
-        impl->properties_structure_hash     = properties.StructureHash ();        
-      }
-      
-      if (impl->texture_scroll_property_index != size_t (-1))
-      {
-        math::vec4f scroll;
-
-        try
-        {
-          properties.GetProperty (impl->texture_scroll_property_index, scroll);
-
-          impl->current_texture_scroll = scroll;
-        }
-        catch (...)
-        {
-          impl->current_texture_scroll = math::vec2f (0.0f);
-        }
-      }
-      else
-      {
-        impl->current_texture_scroll = math::vec2f (0.0f);
-      }
-      
-      impl->properties_hash = properties.Hash ();
-    }
+    }        
 
       //обновление массива спрайтов
-    
+
     if (impl->need_update_sprites)
     {
       impl->primitive->RemoveAllSprites ();
