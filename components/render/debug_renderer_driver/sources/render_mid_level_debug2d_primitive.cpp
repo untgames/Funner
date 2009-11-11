@@ -10,10 +10,16 @@ using namespace render::mid_level::debug::renderer2d;
 */
 
 Primitive::Primitive ()
-  : blend_mode (BlendMode_None),
-    alpha_reference (0.0f)
+  : blend_mode (BlendMode_None)
+  , alpha_reference (0.0f)
+  , scissor_state (false)
 {
   log.Printf ("Create primitive (id=%u)", Id ());
+  
+  scissor_rect.x      = 0;
+  scissor_rect.y      = 0;
+  scissor_rect.width  = 0;
+  scissor_rect.height = 0;  
 }
 
 Primitive::~Primitive ()
@@ -107,6 +113,38 @@ float Primitive::GetAlphaReference ()
   return alpha_reference;
 }
 
+/*
+    Область отсечения
+*/
+
+void Primitive::SetScissor (const Viewport& viewport)
+{
+  scissor_rect.x      = viewport.x;
+  scissor_rect.y      = viewport.y;
+  scissor_rect.width  = viewport.width;
+  scissor_rect.height = viewport.height;
+}
+
+void Primitive::SetScissorState (bool state)
+{
+  if (scissor_state == state)
+    return;
+
+  scissor_state = state;    
+}
+
+void Primitive::GetScissor (Viewport& out_viewport)
+{
+  out_viewport.x      = scissor_rect.x;
+  out_viewport.y      = scissor_rect.y;
+  out_viewport.width  = scissor_rect.width;
+  out_viewport.height = scissor_rect.height; 
+}
+
+bool Primitive::GetScissorState ()
+{
+  return scissor_state;
+}
 
 /*
     Спрайты

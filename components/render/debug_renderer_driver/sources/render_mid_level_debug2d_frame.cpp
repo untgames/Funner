@@ -147,10 +147,21 @@ void Frame::DrawCore ()
         break;
       default:
         break;
-    }    
+    }
     
+    log.Printf ("  scissor_state=%s", primitive.GetScissorState () ? "true" : "false");
+    
+    if (primitive.GetScissorState ())
+    {
+      Viewport viewport;
+
+      primitive.GetScissor (viewport);
+
+      log.Printf ("  scissor=(%d, %d)-(%d, %d)", viewport.x, viewport.y, viewport.x+viewport.width, viewport.y+viewport.height);
+    }
+
     math::mat4f object_tm;
-    
+
     primitive.GetTransform (object_tm);
 
     log.Printf ("  transform=[[%.2f %.2f %.2f] [%.2f %.2f %.2f] [%.2f %.2f %.2f] [%.2f %.2f %.2f]]",
@@ -166,9 +177,9 @@ void Frame::DrawCore ()
     for (size_t i=0; i<sprites_count; i++)
     {
       Sprite s;
-      
+
       primitive.GetSprite (i, s);
-           
+
       log.Printf ("    sprite #%u: position=[%.2f %.2f %.2f] size=[%.2f %.2f] color=[%.2f %.2f %.2f %.2f] tex_offset=[%.2f %.2f] tex_size=[%.2f %.2f]",
         i, s.position.x, s.position.y, s.position.z, s.size.x, s.size.y, s.color.x, s.color.y, s.color.z, s.color.w, 
         s.tex_offset.x, s.tex_offset.y, s.tex_size.x, s.tex_size.y);
