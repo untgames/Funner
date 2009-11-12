@@ -196,13 +196,15 @@ class Application: public IFunnerApi
     Обёртки над обращениями к приложению
 */
 
+extern "C" int MAKE_TARGET_LINK_INCLUDES_COMMA;    
+
 extern "C"
 {
 
 FUNNER_C_API IFunnerApi* FunnerInit ()
 {
   try
-  {
+  {    
     return new Application;
   }
   catch (std::exception& exception)
