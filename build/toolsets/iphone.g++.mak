@@ -53,7 +53,7 @@ define process_target.lipo
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
   $1.LIBS                          := $$(foreach lib,$$($1.LIBS),$$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(strip $$(lib))),$($1.LIB_DIRS)))))    
   
-  $$(warning libs=$$($1.LIBS))
+  $$(warning dirs=$$($1.LIB_DIRS))
   
   build: $$($1.LIB_FILE)
 
