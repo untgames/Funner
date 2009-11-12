@@ -52,6 +52,8 @@ define process_target.lipo
   DIST_DIRS                        := $$(DIST_DIRS) $$(DIST_LIB_DIR)
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
   
+  $$(warning source=$$($1.SOURCE_DIRS))
+  
   $$(eval $$(call process_target_with_sources,$1))
   
   $1.LIBS := $$(foreach lib,$$($1.LIBS),$$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(strip $$(lib))),$($1.LIB_DIRS)))))      
