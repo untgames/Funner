@@ -43,9 +43,9 @@ VALID_TARGET_TYPES += fat-static-lib
 define find_library
   LIPO_LIBRARY_SOURCE := $$(strip $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(strip $1)),$2))))
   
-  ifeq (,$$(LIPO_LIBRARY_SOURCE))
-    $$(error Library '$1' not found)
-  endif
+#  ifeq (,$$(LIPO_LIBRARY_SOURCE))
+#    $$(error Library '$1' not found)
+#  endif
   
   $3 := $$($3) $$(LIPO_LIBRARY_SOURCE)
 endef
