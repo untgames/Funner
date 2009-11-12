@@ -4,7 +4,11 @@
 TARGETS := EXTERN.ZZIP
 
 #Цель №1 - ZZIP
-EXTERN.ZZIP.TYPE                       := dynamic-lib                     #Тип цели
+ifneq (,$(filter iphone,$(PROFILES)))
+EXTERN.ZZIP.TYPE                       := static-lib
+else
+EXTERN.ZZIP.TYPE                       := dynamic-lib
+endif
 EXTERN.ZZIP.NAME                       := funner.extern.zzip              #Имя выходного файла
 EXTERN.ZZIP.INCLUDE_DIRS               := include                         #Относительные пути к каталогам c заголовочными файлами
 EXTERN.ZZIP.SOURCE_DIRS                := sources                         #Относительные пути к каталогам c исходными файлами
