@@ -80,7 +80,7 @@ define process_target.fat-static-lib
 		@$(RM) -Rf $$($1.OBJECT_FILES_DIR)/*
 #		@cd $$($1.OBJECT_FILES_DIR) && for lib in $$($1.LIBS:$(ROOT)/%=../../../../%); do $$(AR) x $$$$lib; done
 		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
-		@libtool -c -o $$@ $$($1.LIBS) $($1.OBJECT_FILES)
+		@libtool -c -o $$@ $$($1.LIBS)
 #		@libtool -c -o $$@ `ls $$($1.OBJECT_FILES_DIR)/*`
 #		@$(AR) rcus $$@ $$($1.OBJECT_FILES_DIR)/*
 endef
