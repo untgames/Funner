@@ -56,13 +56,13 @@ define process_target.lipo
   
   $$(eval $$(call process_target_with_sources,$1))
   
+  $$(warning libs=$$($1.LIBS))  
+  
   $1.LIBS := $$(foreach lib,$$($1.LIBS),$$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(strip $$(lib))),$($1.LIB_DIRS)))))      
-  
-  $$(warning libs=$$($1.LIBS))
-  
-  build: $$($1.LIB_FILE)
 
-  $$(eval $$(call process_target_with_sources,$1))  
+  $$(warning libs=$$($1.LIBS))
+
+  build: $$($1.LIB_FILE)
 
   $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
 		@echo Create lipo library $$(notdir $$($1.LIB_FILE))..

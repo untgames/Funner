@@ -307,16 +307,13 @@ endef
 
 #Общее для целей с исходными файлами (имя цели, список макросов применяемых для обработки каталогов с исходными файлами)
 define process_target_with_sources
-$$(warning in $1)
 #Исключение библиотек по умолчанию
   $$(foreach lib,$$($1.EXCLUDE_DEFAULT_LIBS),$$(eval $1.LIBS := $$(filter-out $$(lib),$$($1.LIBS))))  
 
   $1.TMP_DIR            := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
   $1.TMP_DIRS           := $$($1.TMP_DIR)
   $1.INCLUDE_DIRS       := $$(call specialize_paths,$$($1.INCLUDE_DIRS))
-  $$(warning before=$$($1.SOURCE_DIRS))
   $1.SOURCE_DIRS        := $$(call specialize_paths,$$($1.SOURCE_DIRS))
-  $$(warning after=$$($1.SOURCE_DIRS))  
   $1.DOCUMENTATION_DIRS := $$(call specialize_paths,$$($1.DOCUMENTATION_DIRS))
   $1.LIB_DIRS           := $$(call specialize_paths,$$($1.LIB_DIRS)) $(DIST_LIB_DIR)
   $1.DLL_DIRS           := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)
@@ -333,7 +330,6 @@ $$(warning in $1)
   build: $$($1.TARGET_DLLS)  
 
   $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))  
-$$(warning out $1)  
 endef
 
 #Обработка цели static-lib (имя цели)
