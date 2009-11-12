@@ -51,7 +51,7 @@ define process_target.lipo
   TARGET_FILES                     := $$(TARGET_FILES) $$($1.LIB_FILE)
   DIST_DIRS                        := $$(DIST_DIRS) $$(DIST_LIB_DIR)
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
-  $1.LIBS                          := $$(foreach lib,$$($1.LIBS),$$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(lib)),$($1.LIB_DIRS))))
+  $1.LIBS                          := $$(foreach lib,$$($1.LIBS),$$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(lib)),$($1.LIB_DIRS)))))
   
   $$(warning libs=$$($1.LIBS))
 
