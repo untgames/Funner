@@ -78,6 +78,6 @@ define process_target.fat-static-lib
   $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
 		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
 		@$(RM) -Rf $$($1.TMP_DIR)/*
-		@for lib in $$($1.LIBS) do; echo $$lib; done
+		@for lib in $$($1.LIBS); do echo $$$$lib; done
 endef
 
