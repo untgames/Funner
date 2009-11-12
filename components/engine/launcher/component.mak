@@ -1,25 +1,19 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS       := ENGINE.FUNNER_LIBRARY ENGINE.LAUNCHER.SOURCES ENGINE.LAUNCHER.SDK
+TARGETS       := ENGINE.FUNNER_SHARED_LIBRARY ENGINE.FUNNER_LIBRARY ENGINE.LAUNCHER.SOURCES ENGINE.LAUNCHER.SDK
 TARGETS.win32 := ENGINE.CLAUNCHER.SOURCES
 
 #PROFILES += gles_win32 egl
 
 LAUNCHER_VERSION_STRING := "Launcher version 1.0"
 
-#Цель - сборка движка
-ifneq (,$(filter iphone,$(PROFILES)))
-ENGINE.FUNNER_LIBRARY.TYPE                := fat-static-lib
-else
-ENGINE.FUNNER_LIBRARY.TYPE                := dynamic-lib
-endif
-ENGINE.FUNNER_LIBRARY.NAME                := funner
-ENGINE.FUNNER_LIBRARY.SOURCE_DIRS         := sources/shared
-ENGINE.FUNNER_LIBRARY.INCLUDE_DIRS        := include
-ENGINE.FUNNER_LIBRARY.LINK_INCLUDES       :=
-ENGINE.FUNNER_LIBRARY.COMPILER_DEFINES    := LAUNCHER_VERSION='$(LAUNCHER_VERSION_STRING)' FUNNER_BUILD=1
-ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core compile.common compile.system \
+ENGINE.FUNNER_SHARED_LIBRARY.TYPE              := static-lib
+ENGINE.FUNNER_SHARED_LIBRARY.NAME              := funner.engine.shared
+ENGINE.FUNNER_SHARED_LIBRARY.SOURCE_DIRS       := sources/shared
+ENGINE.FUNNER_SHARED_LIBRARY.INCLUDE_DIRS      := include
+ENGINE.FUNNER_SHARED_LIBRARY.COMPILER_DEFINES  := LAUNCHER_VERSION='$(LAUNCHER_VERSION_STRING)' FUNNER_BUILD=1
+ENGINE.FUNNER_SHARED_LIBRARY.IMPORTS           := compile.engine.core compile.common compile.system \
                                              link.common.default_console_handler link.common.zip_file_system link.common.aes \
                                              link.media.rms link.media.rfx.xmtl link.media.sound.snddecl link.media.sound.default_decoders \
                                              link.media.font.xfont link.media.players.null \
@@ -36,11 +30,27 @@ ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core compile.common 
                                              link.engine.subsystems.log link.engine.subsystems.file_system \
                                              link.engine.subsystems.resource_system \
                                              link.media.image.pvr
-ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := link.render.low_level.opengl_driver link.engine.subsystems.window_input_driver \
+ENGINE.FUNNER_SHARED_LIBRARY.has_windows.IMPORTS := link.render.low_level.opengl_driver link.engine.subsystems.window_input_driver \
                                              link.engine.subsystems.window_manager link.engine.subsystems.window_renderer
-ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := link.input.direct_input_driver
-ENGINE.FUNNER_LIBRARY.iphone.IMPORTS      := link.media.image.pvr link.input.iphone_driver link.media.players.iphone \
+ENGINE.FUNNER_SHARED_LIBRARY.win32.IMPORTS       := link.input.direct_input_driver
+ENGINE.FUNNER_SHARED_LIBRARY.iphone.IMPORTS      := link.media.image.pvr link.input.iphone_driver link.media.players.iphone \
                                              link.engine.subsystems.iphone_audio_session
+
+#Цель - сборка движка
+ifneq (,$(filter iphone,$(PROFILES)))
+ENGINE.FUNNER_LIBRARY.TYPE                := fat-static-lib
+else
+ENGINE.FUNNER_LIBRARY.TYPE                := dynamic-lib
+endif
+ENGINE.FUNNER_LIBRARY.NAME                := funner
+ENGINE.FUNNER_LIBRARY.LIBS                := funner.engine.shared
+ENGINE.FUNNER_LIBRARY.LINK_INCLUDES       :=
+ENGINE.FUNNER_LIBRARY.win32.LINK_FLAGS    := -noentry
+ENGINE.FUNNER_LIBRARY.IMPORTS             := $(ENGINE_FUNNER_SHARED_LIBRARY.has_windows.IMPORTS)
+ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := $(ENGINE_FUNNER_SHARED_LIBRARY.has_windows.IMPORTS)
+ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := $(ENGINE_FUNNER_SHARED_LIBRARY.win32.IMPORTS)
+ENGINE.FUNNER_LIBRARY.iphone.IMPORTS      := $(ENGINE_FUNNER_SHARED_LIBRARY.iphone.IMPORTS)
+
 
 #Цель - application
 ENGINE.LAUNCHER.SOURCES.TYPE                   := application

@@ -19,14 +19,6 @@
 
 using namespace engine;
 
-#ifdef _WIN32
-  #define FUNNER_C_API __declspec(dllexport)
-#elif __GNUC__
-  #define FUNNER_C_API
-#else
-  #error "Unknown platform"
-#endif
-
 namespace
 {
 
@@ -198,9 +190,6 @@ class Application: public IFunnerApi
 
 extern "C" int MAKE_TARGET_LINK_INCLUDES_COMMA;    
 
-extern "C"
-{
-
 FUNNER_C_API IFunnerApi* FunnerInit ()
 {
   try
@@ -217,6 +206,4 @@ FUNNER_C_API IFunnerApi* FunnerInit ()
   }
 
   return 0;
-}
-
 }

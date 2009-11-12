@@ -1,6 +1,14 @@
 #ifndef FUNNER_ENGINE_LAUNCHER_HEADER
 #define FUNNER_ENGINE_LAUNCHER_HEADER
 
+#ifdef _WIN32
+  #define FUNNER_C_API extern "C" __declspec(dllexport)
+#elif __GNUC__
+  #define FUNNER_C_API
+#else
+  #error "Unknown platform"
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Интерфейс доступа к движку
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,7 +26,6 @@ class IFunnerApi
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef IFunnerApi* (*FunnerInitProc)();
 
-//for static libraries
-extern "C" IFunnerApi* FunnerInit ();
+FUNNER_C_API IFunnerApi* FunnerInit ();
 
 #endif
