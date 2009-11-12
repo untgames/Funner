@@ -41,6 +41,8 @@ VALID_TARGET_TYPES += lipo
 
 #Обработка цели объединенния библиотек(имя цели)
 define process_target.lipo
+  $$(eval $$(call process_target_with_sources,$1))
+
   $1.NAME := $$(strip $$($1.NAME))
   
   ifeq (,$$($1.NAME))
