@@ -18,4 +18,7 @@ class IFunnerApi
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef IFunnerApi* (*FunnerInitProc)();
 
+//for static libraries
+extern "C" IFunnerApi* FunnerInit ();
+
 #endif
