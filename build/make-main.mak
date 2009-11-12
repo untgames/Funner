@@ -313,7 +313,9 @@ define process_target_with_sources
   $1.TMP_DIR            := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
   $1.TMP_DIRS           := $$($1.TMP_DIR)
   $1.INCLUDE_DIRS       := $$(call specialize_paths,$$($1.INCLUDE_DIRS))
+  $$(warning before=$$($1.SOURCE_DIRS))
   $1.SOURCE_DIRS        := $$(call specialize_paths,$$($1.SOURCE_DIRS))
+  $$(warning after=$$($1.SOURCE_DIRS))  
   $1.DOCUMENTATION_DIRS := $$(call specialize_paths,$$($1.DOCUMENTATION_DIRS))
   $1.LIB_DIRS           := $$(call specialize_paths,$$($1.LIB_DIRS)) $(DIST_LIB_DIR)
   $1.DLL_DIRS           := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)
