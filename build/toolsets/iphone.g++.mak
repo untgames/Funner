@@ -41,6 +41,23 @@ VALID_TARGET_TYPES += lipo
 
 #Обработка цели объединенния библиотек(имя цели)
 define process_target.lipo
-#  $1
+  $1.NAME := $$(strip $$($1.NAME))
+  
+  ifeq (,$$($1.NAME))
+    $$(error Empty lipo library name at build target '$1' component-dir='$(COMPONENT_DIR)')
+  endif
+  
+  $1.LIB_FILE                      := $(DIST_LIB_DIR)/$$($1.NAME)$(LIB_SUFFIX)
+  TARGET_FILES                     := $$(TARGET_FILES) $$($1.LIB_FILE)
+  DIST_DIRS                        := $$(DIST_DIRS) $$(DIST_LIB_DIR)
+  $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)  
+
+  build: $$($1.LIB_FILE)
+
+  $$(eval $$(call process_target_with_sources,$1))  
+
+  $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
+		@echo Create lipo library $$(notdir $$($1.LIB_FILE))...
+#		@$$(call $(LINK_TOOL),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 endef
 
