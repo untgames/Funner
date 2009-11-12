@@ -9,19 +9,23 @@ TARGETS.win32 := ENGINE.CLAUNCHER.SOURCES
 LAUNCHER_VERSION_STRING := "Launcher version 1.0"
 
 #Цель - сборка движка
+ifneq (,$(filter iphone,$(PROFILES)))
+ENGINE.FUNNER_LIBRARY.TYPE                := lipo
+else
 ENGINE.FUNNER_LIBRARY.TYPE                := dynamic-lib
+endif
 ENGINE.FUNNER_LIBRARY.NAME                := funner
 ENGINE.FUNNER_LIBRARY.SOURCE_DIRS         := sources/shared
-ENGINE.FUNNER_LIBRARY.COMPILER_DEFINES    := LAUNCHER_VERSION='$(LAUNCHER_VERSION_STRING)' FUNNER_BUILD=1
 ENGINE.FUNNER_LIBRARY.INCLUDE_DIRS        := include
 ENGINE.FUNNER_LIBRARY.LINK_INCLUDES       :=
-ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core \
-                                             compile.common link.common.default_console_handler link.common.zip_file_system link.common.aes \
+ENGINE.FUNNER_LIBRARY.COMPILER_DEFINES    := LAUNCHER_VERSION='$(LAUNCHER_VERSION_STRING)' FUNNER_BUILD=1
+ENGINE.FUNNER_LIBRARY.LIBS                := funner.engine.shared
+ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core compile.common compile.system \
+                                             link.common.default_console_handler link.common.zip_file_system link.common.aes \
                                              link.media.rms link.media.rfx.xmtl link.media.sound.snddecl link.media.sound.default_decoders \
                                              link.media.font.xfont link.media.players.null \
-                                             link.input.manager.xkeymap link.input.manager.xkeyreg compile.input.manager link.input.window_driver \
-                                             compile.render.scene_render link.render.scene_render.render2d \
-                                             link.script.lua \
+                                             link.input.manager.xkeymap link.input.manager.xkeyreg link.input.window_driver \
+                                             link.render.scene_render.render2d link.script.lua \
                                              link.engine.script_binds.math link.engine.script_binds.sg link.engine.script_binds.bv \
                                              link.engine.script_binds.render link.engine.script_binds.engine \
                                              link.engine.script_binds.input link.engine.script_binds.lua_override \
@@ -32,14 +36,14 @@ ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core \
                                              link.engine.subsystems.input_manager link.engine.subsystems.shell \
                                              link.engine.subsystems.log link.engine.subsystems.file_system \
                                              link.engine.subsystems.resource_system \
-                                             compile.system link.media.image.pvr
+                                             link.media.image.pvr
 ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := link.render.low_level.opengl_driver link.engine.subsystems.window_input_driver \
                                              link.engine.subsystems.window_manager link.engine.subsystems.window_renderer
 ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := link.input.direct_input_driver
 ENGINE.FUNNER_LIBRARY.iphone.IMPORTS      := link.media.image.pvr link.input.iphone_driver link.media.players.iphone \
                                              link.engine.subsystems.iphone_audio_session
 
-#Цель - win32 application
+#Цель - application
 ENGINE.LAUNCHER.SOURCES.TYPE                   := application
 ENGINE.LAUNCHER.SOURCES.NAME                   := launcher
 ENGINE.LAUNCHER.SOURCES.INCLUDE_DIRS           := include
