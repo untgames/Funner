@@ -19,7 +19,6 @@ ENGINE.FUNNER_LIBRARY.SOURCE_DIRS         := sources/shared
 ENGINE.FUNNER_LIBRARY.INCLUDE_DIRS        := include
 ENGINE.FUNNER_LIBRARY.LINK_INCLUDES       :=
 ENGINE.FUNNER_LIBRARY.COMPILER_DEFINES    := LAUNCHER_VERSION='$(LAUNCHER_VERSION_STRING)' FUNNER_BUILD=1
-ENGINE.FUNNER_LIBRARY.LIBS                := funner.engine.shared
 ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core compile.common compile.system \
                                              link.common.default_console_handler link.common.zip_file_system link.common.aes \
                                              link.media.rms link.media.rfx.xmtl link.media.sound.snddecl link.media.sound.default_decoders \
