@@ -63,7 +63,7 @@ define process_target.fat-static-lib
   DIST_DIRS                        := $$(DIST_DIRS) $$(DIST_LIB_DIR)
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
   TMP_DIRS                         := $$(TMP_DIRS) $$($1.OBJECT_FILES_DIR)
-  $1.LIBS                          := $$($1.LIBS:%=$(LIB_PREFIX)%.$(LIB_SUFFIX))
+  $1.LIBS                          := $$($1.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
 
   $$(foreach lib,$$($1.LIBS),$$(eval $$(call find_library,$$(lib),$$($1.LIB_DIRS),$1.LIBS_FULL_PATH)))
   
