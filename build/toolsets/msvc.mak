@@ -83,7 +83,7 @@ export LIB
 #список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
 ###################################################################################################
 define tools.c++compile
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/cl" -c -Fo"$4\\" $(patsubst %,-I"%",$2) $(patsubst %,-FI"%",$3) $(COMMON_CFLAGS) $6 $(if $(filter -clr,$6),$(foreach dir,$8 $(DIST_BIN_DIR),-AI $(dir)) -MD,-EHsc -MT)  $(patsubst %,-D%,$5) $1 $(if $7,-FI"$7" -Yc"$7" -Fp"$4\\")
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/cl" -c -Fo"$4\\" $(patsubst %,-I"%",$2) $(patsubst %,-FI"%",$3) $(COMMON_CFLAGS) $6 $(if $(filter -clr,$6),$(foreach dir,$8 $(DIST_BIN_DIR),-AI $(dir)) -MD,-EHsc -MT) $(foreach def,$5,-D$(subst %,$(SPACE),$(def))) $1 $(if $7,-FI"$7" -Yc"$7" -Fp"$4\\")
 endef
 
 ###################################################################################################

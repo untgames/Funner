@@ -21,6 +21,7 @@ COMPILE_TOOL                            := tools.c++compile     #Имя макроса ути
 LINK_TOOL                               := tools.link           #Имя макроса утилиты редактора связей
 LIB_TOOL                                := tools.lib            #Имя макроса утилиты архивирования объектных файлов
 DLL_PATH                                := PATH                 #Имя переменной среды для указания путей к длл-файлам
+AUTO_COMPILER_DEFINES                   := NAME TYPE INCLUDE_DIRS SOURCE_FILES LINK_INCLUDES_COMMA COMPILER_CFLAGS EXECUTION_DIR
 
 ###################################################################################################
 #Подключение настроек пользователя
@@ -62,8 +63,9 @@ DIRS                                     = $(TMP_DIRS) $(DIST_DIRS)
 COMPILE_TOOL                            := $(strip $(COMPILE_TOOL))
 LINK_TOOL                               := $(strip $(LINK_TOOL))
 LIB_TOOL                                := $(strip $(LIB_TOOL))
-EMPTY                                   :=
+EMPTY                                   := 
 SPACE                                   := $(EMPTY) $(EMPTY)
+COMMA                                   := ,
 EXTERNAL_FILES                          :=
 DLL_PATH                                := $(strip $(DLL_PATH))
 DOXYGEN_TEMPLATE_DIR                    := $(BUILD_DIR)$(DOXYGEN_TEMPLATE_DIR_SHORT_NAME)
@@ -216,8 +218,9 @@ endef
 
 #Правила пакетной компиляции (имя цели, имя модуля)
 define batch-compile
-  $2.FLAG_FILE  := $$($2.TMP_DIR)/$$(BATCH_COMPILE_FLAG_FILE_SHORT_NAME)
-  $1.FLAG_FILES := $$($1.FLAG_FILES) $$($2.FLAG_FILE)
+  $2.FLAG_FILE        := $$($2.TMP_DIR)/$$(BATCH_COMPILE_FLAG_FILE_SHORT_NAME)
+  $1.FLAG_FILES       := $$($1.FLAG_FILES) $$($2.FLAG_FILE)
+  $1.COMPILER_DEFINES := $$(strip $$($1.COMPILER_DEFINES)) $$(foreach var,$$(AUTO_COMPILER_DEFINES),MAKE_TARGET_$$(var)='$$(subst $$(SPACE),%,$$(strip $$($1.$$(var))))')
   
   ifneq (,$$(strip $$($2.PCH)))
   
@@ -270,6 +273,7 @@ define process_source_dir
     $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES_SUFFIXES:%=$2/*.%))
   endif  
   
+  $1.SOURCE_FILES            := $$($1.SOURCE_FILES) $$($$(MODULE_NAME).SOURCE_FILES)
   $$(MODULE_NAME).SOURCE_DIR := $2
   $$(MODULE_NAME).TMP_DIR    := $$($1.TMP_DIR)/$$(MODULE_PATH)
   $1.TMP_DIRS                := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)
@@ -310,17 +314,18 @@ define process_target_with_sources
 #Исключение библиотек по умолчанию
   $$(foreach lib,$$($1.EXCLUDE_DEFAULT_LIBS),$$(eval $1.LIBS := $$(filter-out $$(lib),$$($1.LIBS))))  
 
-  $1.TMP_DIR            := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
-  $1.TMP_DIRS           := $$($1.TMP_DIR)
-  $1.INCLUDE_DIRS       := $$(call specialize_paths,$$($1.INCLUDE_DIRS))
-  $1.SOURCE_DIRS        := $$(call specialize_paths,$$($1.SOURCE_DIRS))
-  $1.DOCUMENTATION_DIRS := $$(call specialize_paths,$$($1.DOCUMENTATION_DIRS))
-  $1.LIB_DIRS           := $$(call specialize_paths,$$($1.LIB_DIRS)) $(DIST_LIB_DIR)
-  $1.DLL_DIRS           := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)
-  $1.EXECUTION_DIR      := $$(strip $$($1.EXECUTION_DIR))
-  $1.EXECUTION_DIR      := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
-  $1.LIBS               := $$($1.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
-  $1.LIB_DEPS           := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(wildcard $$($1.LIB_DIRS:%=%/*)))  
+  $1.TMP_DIR             := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+  $1.TMP_DIRS            := $$($1.TMP_DIR)
+  $1.INCLUDE_DIRS        := $$(call specialize_paths,$$($1.INCLUDE_DIRS))
+  $1.SOURCE_DIRS         := $$(call specialize_paths,$$($1.SOURCE_DIRS))
+  $1.DOCUMENTATION_DIRS  := $$(call specialize_paths,$$($1.DOCUMENTATION_DIRS))
+  $1.LIB_DIRS            := $$(call specialize_paths,$$($1.LIB_DIRS)) $(DIST_LIB_DIR)
+  $1.DLL_DIRS            := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)
+  $1.EXECUTION_DIR       := $$(strip $$($1.EXECUTION_DIR))
+  $1.EXECUTION_DIR       := $$(if $$($1.EXECUTION_DIR),$(COMPONENT_DIR)$$($1.EXECUTION_DIR))
+  $1.LIBS                := $$($1.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
+  $1.LIB_DEPS            := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(wildcard $$($1.LIB_DIRS:%=%/*)))  
+  $1.LINK_INCLUDES_COMMA := $$(subst $$(SPACE),$$(COMMA),$$(strip $$($1.LINK_INCLUDES)))
 
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
 

@@ -39,6 +39,17 @@ endef
 ###################################################################################################
 VALID_TARGET_TYPES += lipo
 
+#Поиск библиотеки (имя библиотеки, пути поиска, переменная результата)
+define find_library
+  LIPO_LIBRARY_SOURCE := $$(strip $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(strip $1)),$2))))
+  
+  ifeq (,$$(LIPO_LIBRARY_SOURCE))
+    $$(error Library '$1' not found)
+  endif
+  
+  $3 := $$($3) $$(LIPO_LIBRARY_SOURCE)
+endef
+
 #Обработка цели объединенния библиотек(имя цели)
 define process_target.lipo
   $1.NAME := $$(strip $$($1.NAME))
@@ -52,13 +63,11 @@ define process_target.lipo
   DIST_DIRS                        := $$(DIST_DIRS) $$(DIST_LIB_DIR)
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
   
-  $$(warning component-dir=$(COMPONENT_DIR))
-  
   $$(eval $$(call process_target_with_sources,$1))
   
-  $$(warning libs=$$($1.LIBS))  
-  
-  $1.LIBS := $$(foreach lib,$$($1.LIBS),$$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(strip $$(lib))),$($1.LIB_DIRS)))))      
+  $$(foreach lib,$$($1.LIBS),$$(eval $$(call find_library,$$(lib),$$($1.LIB_DIRS),$1.LIBS_FULL_PATH)))
+
+  $1.LIBS := $$($1.LIBS_FULL_PATH)
 
   $$(warning libs=$$($1.LIBS))
 
