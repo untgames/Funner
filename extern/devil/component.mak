@@ -4,7 +4,12 @@
 TARGETS := EXTERN.DEVIL EXTERN.ILU
 
 #Цель - DevILDLL sources
+ifneq (,$(filter iphone,$(PROFILES)))
 EXTERN.DEVIL.TYPE                       := dynamic-lib
+else
+EXTERN.DEVIL.TYPE                       := static-lib
+endif
+
 EXTERN.DEVIL.NAME                       := funner.extern.devil
 EXTERN.DEVIL.INCLUDE_DIRS               := include components/il/include/IL ../jpeg/include ../tiff/include ../libpng/include components/il/include ../zlib/include
 EXTERN.DEVIL.IMPORTS                    := link.extern.libpng link.extern.jpeg link.extern.tiff link.extern.zlib
@@ -16,7 +21,11 @@ EXTERN.DEVIL.g++.COMPILER_CFLAGS        := --no-warn
 EXTERN.DEVIL.mingw.g++.COMPILER_DEFINES := XMD_H
 
 #Цель - ILUDLL sources
+ifneq (,$(filter iphone,$(PROFILES)))
 EXTERN.ILU.TYPE                := dynamic-lib
+else
+EXTERN.ILU.TYPE                := static-lib
+endif
 EXTERN.ILU.NAME                := funner.extern.ilu
 EXTERN.ILU.INCLUDE_DIRS        := include components/il/include/IL ../jpeg/include ../tiff/include components/il/include components/ilu/include ../zlib/include
 EXTERN.ILU.SOURCE_DIRS         := components/ilu/sources
