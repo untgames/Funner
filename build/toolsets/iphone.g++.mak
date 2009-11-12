@@ -45,18 +45,16 @@ define process_target.lipo
   
   ifeq (,$$($1.NAME))
     $$(error Empty lipo library name at build target '$1' component-dir='$(COMPONENT_DIR)')
-  endif
-  
-  $$(warning libs=$$($1.LIBS))  
+  endif  
   
   $1.LIB_FILE                      := $(DIST_LIB_DIR)/$$($1.NAME)$(LIB_SUFFIX)
   TARGET_FILES                     := $$(TARGET_FILES) $$($1.LIB_FILE)
   DIST_DIRS                        := $$(DIST_DIRS) $$(DIST_LIB_DIR)
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
-  $1.LIBS                          := $$(foreach lib,$$($1.LIBS),$$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(lib)),$($1.LIB_DIRS)))))    
+  $1.LIBS                          := $$(foreach lib,$$($1.LIBS),$$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(strip $$(lib))),$($1.LIB_DIRS)))))    
   
-
-
+  $$(warning libs=$$($1.LIBS))
+  
   build: $$($1.LIB_FILE)
 
   $$(eval $$(call process_target_with_sources,$1))  
