@@ -56,7 +56,7 @@ define process_target.lipo
   
   $1.LIBS := $$(foreach lib,$$($1.LIBS),$$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(strip $$(lib))),$($1.LIB_DIRS)))))      
   
-  $$(warning dirs=$$($1.LIB_DIRS))
+  $$(warning libs=$$($1.LIBS))
   
   build: $$($1.LIB_FILE)
 
