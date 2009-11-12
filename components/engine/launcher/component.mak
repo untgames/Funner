@@ -10,7 +10,7 @@ LAUNCHER_VERSION_STRING := "Launcher version 1.0"
 
 #Цель - сборка движка
 ifneq (,$(filter iphone,$(PROFILES)))
-ENGINE.FUNNER_LIBRARY.TYPE                := lipo
+ENGINE.FUNNER_LIBRARY.TYPE                := fat-static-lib
 else
 ENGINE.FUNNER_LIBRARY.TYPE                := dynamic-lib
 endif
