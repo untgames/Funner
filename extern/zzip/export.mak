@@ -13,4 +13,8 @@ endif
 export.link.extern.zzip.LIBS := funner.extern.zzip
 
 # Run exports
+ifeq (,$(filter iphone,$(PROFILES)))
 export.run.extern.zzip.DLLS := funner.extern.zzip
+else
+export.run.extern.zzip.DLLS :=
+endif

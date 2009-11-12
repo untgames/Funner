@@ -9,5 +9,7 @@ export.link.extern.devil.IMPORTS := link.extern.jpeg link.extern.tiff link.exter
 # Run exports
 ifeq (,$(filter iphone,$(PROFILES)))
 export.run.extern.devil.DLLS := funner.extern.devil funner.extern.ilu
+else
+export.run.extern.devil.DLLS :=
 endif
 
