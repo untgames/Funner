@@ -76,8 +76,10 @@ define process_target.fat-static-lib
   build: $$($1.OBJECT_FILES_DIR) $$($1.LIB_FILE)
 
   $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
-		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
+		@echo Extract files for fat static library $$(notdir $$($1.LIB_FILE))..
 		@$(RM) -Rf $$($1.OBJECT_FILES_DIR)/*
-		cd $$($1.OBJECT_FILES_DIR) && for lib in $$($1.LIBS:$(ROOT)/%=../../../../%); do $$(AR) x $$$$lib; done
+		@cd $$($1.OBJECT_FILES_DIR) && for lib in $$($1.LIBS:$(ROOT)/%=../../../../%); do $$(AR) x $$$$lib; done
+		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
+		@$(AR) rcus $$@ $$($1.OBJECT_FILES_DIR)/*
 endef
 
