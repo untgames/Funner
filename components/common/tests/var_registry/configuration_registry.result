@@ -5,7 +5,7 @@ Log 'common.ComponentManager' message: '...load components 'common.file_systems.
 Log 'common.ComponentManager' message: '...load component 'common.file_systems.ZipFileSystem''
 Log 'common.Configurator' message: 'File 'config.xml' not found
     at common::StdioFileSystem::FileOpen
-    at common::FileSystemImpl::OpenFile('config.xml')
+    at common::FileSystemImpl::OpenFile()
     at common::FileSystem::LoadTextFile
     at common::Parser::Parser(const char*, const char*)
     at common::ConfigurationRegistry::LoadConfiguration'

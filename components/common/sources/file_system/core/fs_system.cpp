@@ -616,7 +616,7 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("common::FileSystemImpl::OpenFile('%s')", src_file_name);
+    exception.touch ("common::FileSystemImpl::OpenFile()");
     throw;
   }
 
@@ -1001,7 +1001,7 @@ string FileSystem::GetNormalizedFileName (const char* file_name)
           switch (*i)
           {
             case '\\': *i = '/'; break;
-            default:   *i = tolower (*i); break;
+            default:   /**i = tolower (*i); */  break; //Закомментировано для работы на iPhone с файлами, содержащими большие буквы
           }
 
         --i;
@@ -1009,7 +1009,7 @@ string FileSystem::GetNormalizedFileName (const char* file_name)
         break;
       }
       default:
-        *i = tolower (*i);
+//        *i = tolower (*i);        //Закомментировано для работы на iPhone с файлами, содержащими большие буквы
         break;
     }
 

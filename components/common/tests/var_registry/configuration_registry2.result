@@ -10,7 +10,7 @@ Log 'common.ComponentManager' message: 'Load components 'common.var_registries.*
 Log 'common.ComponentManager' message: '...load component 'common.var_registries.configuration_registry''
 Log 'common.Configurator' message: 'File 'config.xml' not found
     at common::StdioFileSystem::FileOpen
-    at common::FileSystemImpl::OpenFile('config.xml')
+    at common::FileSystemImpl::OpenFile()
     at common::FileSystem::LoadTextFile
     at common::Parser::Parser(const char*, const char*)
     at common::ConfigurationRegistry::LoadConfiguration'
