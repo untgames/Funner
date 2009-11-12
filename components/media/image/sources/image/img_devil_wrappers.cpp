@@ -286,7 +286,7 @@ class DevILComponent
     //загрузка компонента
     DevILComponent ()
     {
-      ilSetMemory (&devil_allocate, &devil_deallocate); //Необходимо вызывать до вызова ilInit ();
+//      ilSetMemory (&devil_allocate, &devil_deallocate); //Необходимо вызывать до вызова ilInit ();
 
       ilInit ();
 
