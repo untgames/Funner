@@ -66,10 +66,10 @@ define process_target.fat-static-lib
   $1.LIBS                          := $$($1.LIBS:%=$(LIB_PREFIX)%.$(LIB_SUFFIX))
 
   $$(foreach lib,$$($1.LIBS),$$(eval $$(call find_library,$$(lib),$$($1.LIB_DIRS),$1.LIBS_FULL_PATH)))
-
-  $1.LIBS := $$($1.LIBS_FULL_PATH)
   
-  $$(warning libs=$$($1.LIBS))
+  $$(warning libs=$$($1.LIBS))  
+
+  $1.LIBS := $$($1.LIBS_FULL_PATH)  
 
   build: $$($1.LIB_FILE)
 
