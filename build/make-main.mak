@@ -308,7 +308,7 @@ endef
 #Общее для целей с исходными файлами (имя цели, список макросов применяемых для обработки каталогов с исходными файлами)
 define process_target_with_sources
 #Исключение библиотек по умолчанию
-  $$(foreach lib,$$($1.EXCLUDE_DEFAULT_LIBS),$$(eval $1.LIBS := $$(filter-out $$(lib),$$($1.LIBS))))
+  $$(foreach lib,$$($1.EXCLUDE_DEFAULT_LIBS),$$(eval $1.LIBS := $$(filter-out $$(lib),$$($1.LIBS))))  
 
   $1.TMP_DIR            := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
   $1.TMP_DIRS           := $$($1.TMP_DIR)
@@ -682,7 +682,7 @@ define import_variables
   $2.COMPILER_DEFINES     := $$($2.COMPILER_DEFINES) $$($1.COMPILER_DEFINES)
   $2.LINK_INCLUDES        := $$(strip $$($2.LINK_INCLUDES)) $$(strip $$($1.LINK_INCLUDES))
   $2.LINK_FLAGS           := $$($2.LINK_FLAGS) $$($1.LINK_FLAGS)
-  $2.COMPONENTS           := $$($2.COMPONENTS) $$($1.COMPONENTS)
+  $2.COMPONENTS           := $$($2.COMPONENTS) $$($1.COMPONENTS)  
 endef
 
 #Импортирование настроек (имя зависимости, имя цели)
@@ -698,12 +698,12 @@ ifeq (,$$(paths.$1))
   endif
 endif
 
-#Изменение настроек
+#Изменение настроек  
   $$(eval $$(call import_variables,$(EXPORT_VAR_PREFIX).$1,$2,$$(patsubst $(COMPONENT_DIR)%,%,$$(paths.$1))))
-  $$(foreach profile,$(PROFILES),$$(eval $$(call import_variables,$(EXPORT_VAR_PREFIX).$1.$$(profile),$2,$$(paths.$1))))
+  $$(foreach profile,$(PROFILES),$$(eval $$(call import_variables,$(EXPORT_VAR_PREFIX).$1.$$(profile),$2,$$(patsubst $(COMPONENT_DIR)%,%,$$(paths.$1)))))
 
 #Импортирование вложенных зависимостей
-  DEPENDENCY_IMPORTS := $$($(EXPORT_VAR_PREFIX).$1.IMPORTS) $$(foreach profile,$(PROFILES),$$($(EXPORT_VAR_PREFIX).$1.$$(profile).IMPORTS))  
+  DEPENDENCY_IMPORTS := $$($(EXPORT_VAR_PREFIX).$1.IMPORTS) $$(foreach profile,$(PROFILES),$$($(EXPORT_VAR_PREFIX).$1.$$(profile).IMPORTS))
 
   $$(foreach imp,$$(DEPENDENCY_IMPORTS),$$(eval $$(call import_settings,$$(imp),$2)))
 
