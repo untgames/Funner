@@ -21,7 +21,7 @@ COMPILE_TOOL                            := tools.c++compile     #Имя макроса ути
 LINK_TOOL                               := tools.link           #Имя макроса утилиты редактора связей
 LIB_TOOL                                := tools.lib            #Имя макроса утилиты архивирования объектных файлов
 DLL_PATH                                := PATH                 #Имя переменной среды для указания путей к длл-файлам
-AUTO_COMPILER_DEFINES                   := NAME TYPE INCLUDE_DIRS SOURCE_FILES LINK_INCLUDES_COMMA COMPILER_CFLAGS EXECUTION_DIR
+AUTO_COMPILER_DEFINES                   := NAME TYPE LINK_INCLUDES_COMMA COMPILER_CFLAGS EXECUTION_DIR
 
 ###################################################################################################
 #Подключение настроек пользователя
