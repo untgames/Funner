@@ -188,7 +188,9 @@ class Application: public IFunnerApi
     Обёртки над обращениями к приложению
 */
 
-extern "C" int MAKE_TARGET_LINK_INCLUDES_COMMA;    
+extern "C" int MAKE_TARGET_LINK_INCLUDES_COMMA; 
+
+static int touch [] = {MAKE_TARGET_LINK_INCLUDES_COMMA};
 
 FUNNER_C_API IFunnerApi* FunnerInit ()
 {
