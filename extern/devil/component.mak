@@ -4,7 +4,7 @@
 TARGETS := EXTERN.DEVIL EXTERN.ILU
 
 #Цель - DevILDLL sources
-ifneq (,$(filter iphone,$(PROFILES)))
+ifeq (,$(filter iphone,$(PROFILES)))
 EXTERN.DEVIL.TYPE                       := dynamic-lib
 else
 EXTERN.DEVIL.TYPE                       := static-lib
@@ -21,7 +21,7 @@ EXTERN.DEVIL.g++.COMPILER_CFLAGS        := --no-warn
 EXTERN.DEVIL.mingw.g++.COMPILER_DEFINES := XMD_H
 
 #Цель - ILUDLL sources
-ifneq (,$(filter iphone,$(PROFILES)))
+ifeq (,$(filter iphone,$(PROFILES)))
 EXTERN.ILU.TYPE                := dynamic-lib
 else
 EXTERN.ILU.TYPE                := static-lib
