@@ -52,7 +52,7 @@ define process_target.lipo
   DIST_DIRS                        := $$(DIST_DIRS) $$(DIST_LIB_DIR)
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
   
-  $$(warning source=$$($1.SOURCE_DIRS))
+  $$(warning component-dir=$(COMPONENT_DIR))
   
   $$(eval $$(call process_target_with_sources,$1))
   
