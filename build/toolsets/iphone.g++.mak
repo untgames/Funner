@@ -37,7 +37,7 @@ endef
 ###################################################################################################
 #Сборка единой статической библиотеки
 ###################################################################################################
-VALID_TARGET_TYPES += lipo
+VALID_TARGET_TYPES += fat-static-lib
 
 #Поиск библиотеки (имя библиотеки, пути поиска, переменная результата)
 define find_library
@@ -51,17 +51,19 @@ define find_library
 endef
 
 #Обработка цели объединенния библиотек(имя цели)
-define process_target.lipo
+define process_target.fat-static-lib
   $1.NAME := $$(strip $$($1.NAME))
   
   ifeq (,$$($1.NAME))
-    $$(error Empty lipo library name at build target '$1' component-dir='$(COMPONENT_DIR)')
+    $$(error Empty fat static library name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif  
   
   $1.LIB_FILE                      := $(DIST_LIB_DIR)/$$($1.NAME)$(LIB_SUFFIX)
   TARGET_FILES                     := $$(TARGET_FILES) $$($1.LIB_FILE)
   DIST_DIRS                        := $$(DIST_DIRS) $$(DIST_LIB_DIR)
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
+
+  $$(warning tmp=$$($1.TMP_DIR))
   
   $$(eval $$(call process_target_with_sources,$1))
   
@@ -69,12 +71,10 @@ define process_target.lipo
 
   $1.LIBS := $$($1.LIBS_FULL_PATH)
 
-  $$(warning libs=$$($1.LIBS))
-
   build: $$($1.LIB_FILE)
 
   $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
-		@echo Create lipo library $$(notdir $$($1.LIB_FILE))..
-		lipo $$($1.LIBS) $$($1.OBJECT_FILES) -output "$$@" -create
+		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
+#		@$(RM) -Rf 
 endef
 
