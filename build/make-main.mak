@@ -307,6 +307,7 @@ endef
 
 #Общее для целей с исходными файлами (имя цели, список макросов применяемых для обработки каталогов с исходными файлами)
 define process_target_with_sources
+$$(warning in)
 #Исключение библиотек по умолчанию
   $$(foreach lib,$$($1.EXCLUDE_DEFAULT_LIBS),$$(eval $1.LIBS := $$(filter-out $$(lib),$$($1.LIBS))))  
 
@@ -332,6 +333,7 @@ define process_target_with_sources
   build: $$($1.TARGET_DLLS)  
 
   $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))  
+$$(warning out)  
 endef
 
 #Обработка цели static-lib (имя цели)
