@@ -62,7 +62,7 @@ define process_target.fat-static-lib
   TARGET_FILES                     := $$(TARGET_FILES) $$($1.LIB_FILE)
   DIST_DIRS                        := $$(DIST_DIRS) $$(DIST_LIB_DIR)
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
-  $1.TMP_DIR                       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+  $1.TMP_DIR                       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1/.object_files
   TMP_DIRS                         := $$(TMP_DIRS) $$($1.TMP_DIR)
 
   $$(warning tmp=$$($1.TMP_DIR))
@@ -77,6 +77,7 @@ define process_target.fat-static-lib
 
   $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
 		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
-#		@$(RM) -Rf 
+		@$(RM) -Rf $$($1.TMP_DIR)/*
+		@for lib in $$($1.LIBS) do; echo $$$$li; done
 endef
 
