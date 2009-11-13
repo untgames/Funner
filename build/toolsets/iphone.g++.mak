@@ -67,7 +67,7 @@ define process_target.fat-static-lib
   $1.LIBS                          := $$($1.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
   $1.LIBS                          := $$(foreach lib,$$($1.LIBS),$$(call find_library,$$(lib),$$($1.LIB_DIRS)))
   
-  $$(warning dist=$$(DIST_LIB_DIR))
+  $$(warning dirs='$$($1.LIB_DIRS)')
 
   $$($1.LIB_FILE): $$($1.LIBS)
 		@echo Libs='$$($1.LIBS)'
