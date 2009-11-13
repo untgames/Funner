@@ -1,7 +1,7 @@
 Results of cubemap loader test:
-File 'results/pic1_px.jpg' hash: {69,37,0e,28,91,d0,b2,6b,80,8a,0c,0b,49,27,1d,fa}
-File 'results/pic1_nx.jpg' hash: {69,37,0e,28,91,d0,b2,6b,80,8a,0c,0b,49,27,1d,fa}
-File 'results/pic1_py.jpg' hash: {69,37,0e,28,91,d0,b2,6b,80,8a,0c,0b,49,27,1d,fa}
-File 'results/pic1_ny.jpg' hash: {69,37,0e,28,91,d0,b2,6b,80,8a,0c,0b,49,27,1d,fa}
-File 'results/pic1_pz.jpg' hash: {69,37,0e,28,91,d0,b2,6b,80,8a,0c,0b,49,27,1d,fa}
-File 'results/pic1_nz.jpg' hash: {69,37,0e,28,91,d0,b2,6b,80,8a,0c,0b,49,27,1d,fa}
+File 'results/pic1_px.jpg' hash: {ad,16,e5,35,6b,92,9e,a9,92,55,5c,78,ca,18,2d,11}
+File 'results/pic1_nx.jpg' hash: {ad,16,e5,35,6b,92,9e,a9,92,55,5c,78,ca,18,2d,11}
+File 'results/pic1_py.jpg' hash: {ad,16,e5,35,6b,92,9e,a9,92,55,5c,78,ca,18,2d,11}
+File 'results/pic1_ny.jpg' hash: {ad,16,e5,35,6b,92,9e,a9,92,55,5c,78,ca,18,2d,11}
+File 'results/pic1_pz.jpg' hash: {ad,16,e5,35,6b,92,9e,a9,92,55,5c,78,ca,18,2d,11}
+File 'results/pic1_nz.jpg' hash: {ad,16,e5,35,6b,92,9e,a9,92,55,5c,78,ca,18,2d,11}
