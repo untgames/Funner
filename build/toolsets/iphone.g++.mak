@@ -46,7 +46,7 @@ endef
 
 #Поиск библиотеки (имя библиотеки, пути поиска)
 define find_library
-$(if $(call get_full_library_path,$1,$2),$(call get_full_library_path,$1,$2),$(error Library '$1' not found))
+$(if $(call get_full_library_path,$1,$2),$(call get_full_library_path,$1,$2),$1)
 endef
 
 #Обработка цели объединенния библиотек(имя цели)
@@ -65,13 +65,10 @@ define process_target.fat-static-lib
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
   TMP_DIRS                         := $$(TMP_DIRS) $$($1.OBJECT_FILES_DIR)
   $1.LIBS                          := $$($1.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
+  $1.LIBS                          := $$(foreach lib,$$($1.LIBS),$$(call find_library,$$(lib),$$($1.LIB_DIRS)))
 
-  build: $$($1.LIB_FILE)  
-  
-  $$($1.LIB_FILE): LIBS = $$(foreach lib,$$($1.LIBS),$$(call find_library,$$(lib),$$($1.LIB_DIRS)))
-
-  $$($1.LIB_FILE): $$(LIBS)
-		@echo Libs='$$(LIBS)'
+  $$($1.LIB_FILE): $$($1.LIBS)
+		@echo Libs='$$($1.LIBS)'
 #		@echo Extract files for fat static library $$(notdir $$($1.LIB_FILE))..
 #		@$(RM) -Rf $$($1.OBJECT_FILES_DIR)/*
 #		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
