@@ -41,12 +41,12 @@ VALID_TARGET_TYPES += fat-static-lib
 
 #Получение пути к библиотеке
 define get_full_library_path
-$$(strip $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(strip $1)),$2))))
+$(strip $(firstword $(wildcard $(patsubst %,%/$(notdir $(strip $1)),$2))))
 endef
 
 #Поиск библиотеки (имя библиотеки, пути поиска)
 define find_library
-$$(if $$(call get_full_library_path,$1,$2),$$(call get_full_library_path,$1,$2),$$(error Library '$1' not found))
+$(if $(call get_full_library_path,$1,$2),$(call get_full_library_path,$1,$2),$(error Library '$1' not found))
 endef
 
 #Обработка цели объединенния библиотек(имя цели)
