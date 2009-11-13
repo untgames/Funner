@@ -68,7 +68,7 @@ define process_target.fat-static-lib
 
   build: $$($1.LIB_FILE)
 
-  $$($1.LIB_FILE): LIBS = $$(foreach lib,$$($1.LIBS),$$(call find_library,$$(lib),$$($1.LIB_DIRS)))
+  $$($1.LIB_FILE): LIBS := $$(foreach lib,$$($1.LIBS),$$(call find_library,$$(lib),$$($1.LIB_DIRS)))
 
   $$($1.LIB_FILE): $$(LIBS)
 		@echo Libs='$$(LIBS)'
