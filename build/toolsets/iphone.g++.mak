@@ -66,13 +66,11 @@ define process_target.fat-static-lib
   TMP_DIRS                         := $$(TMP_DIRS) $$($1.OBJECT_FILES_DIR)
   $1.LIBS                          := $$($1.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
 
-  build: $$($1.LIB_FILE)
+  build: $$($1.LIB_FILE)  
   
-  .PHONY: PREPARE_VARIABLES.$1
-  
-  PREPARE_VARIABLES.$1: LIBS = $$(foreach lib,$$($1.LIBS),$$(call find_library,$$(lib),$$($1.LIB_DIRS)))
+  $$($1.LIB_FILE): LIBS = $$(foreach lib,$$($1.LIBS),$$(call find_library,$$(lib),$$($1.LIB_DIRS)))
 
-  $$($1.LIB_FILE): PREPARE_VARIABLES.$1 $$(LIBS)
+  $$($1.LIB_FILE): $$(LIBS)
 		@echo Libs='$$(LIBS)'
 #		@echo Extract files for fat static library $$(notdir $$($1.LIB_FILE))..
 #		@$(RM) -Rf $$($1.OBJECT_FILES_DIR)/*
