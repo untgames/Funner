@@ -73,7 +73,7 @@ define process_target.fat-static-lib
   $$($1.LIB_FILE): LIBS = $$(foreach lib,$$($1.LIBS),$$(call find_library,$$(lib),$$($1.LIB_DIRS)))
 
 #  $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.LIBS)
-  $$($1.LIB_FILE): $$($1.FLAG_FILES) $$(LIBS)
+  $$($1.LIB_FILE): $$($1.FLAG_FILES) $$(LIBS) force
 		@echo Libs=$$(LIBS)
 		@echo Extract files for fat static library $$(notdir $$($1.LIB_FILE))..
 		@$(RM) -Rf $$($1.OBJECT_FILES_DIR)/*
