@@ -1,8 +1,9 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS       := ENGINE.FUNNER_SHARED_LIBRARY ENGINE.FUNNER_LIBRARY ENGINE.LAUNCHER.SOURCES ENGINE.LAUNCHER.SDK
-TARGETS.win32 := ENGINE.CLAUNCHER.SOURCES
+TARGETS        := ENGINE.FUNNER_SHARED_LIBRARY ENGINE.FUNNER_LIBRARY ENGINE.LAUNCHER.SOURCES ENGINE.LAUNCHER.SDK
+TARGETS.win32  := ENGINE.CLAUNCHER.SOURCES
+TARGETS.iphone := ENGINE.FUNNER_LIBRARY_LIPO
 
 #PROFILES += gles_win32 egl
 
@@ -51,6 +52,11 @@ ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := $(ENGINE.FUNNER_SHARED_LIBRARY.has_
 ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := $(ENGINE.FUNNER_SHARED_LIBRARY.win32.IMPORTS)
 ENGINE.FUNNER_LIBRARY.iphone.IMPORTS      := $(ENGINE.FUNNER_SHARED_LIBRARY.iphone.IMPORTS)
 
+#Цель - объединение библиотек для iPhone
+ENGINE.FUNNER_LIBRARY_LIPO.NAME     := funner-lipo
+ENGINE.FUNNER_LIBRARY_LIPO.TYPE     := lipo-lib
+ENGINE.FUNNER_LIBRARY_LIPO.LIBS     := funner
+ENGINE.FUNNER_LIBRARY_LIPO.PROFILES := iphone-device.g++ iphone-simulator.g++
 
 #Цель - application
 ENGINE.LAUNCHER.SOURCES.TYPE                   := application
