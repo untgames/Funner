@@ -76,6 +76,8 @@ endef
 #Обработка цели объединения библиотек, собранных для разных архитектур (имя цели)
 define process_target.lipo-lib
   $1.NAME := $$(strip $$($1.NAME))
+  
+  $$(warning !!! $1)
 
   ifeq (,$$($1.NAME))
     $$(error Empty lipo library name at build target '$1' component-dir='$(COMPONENT_DIR)')
