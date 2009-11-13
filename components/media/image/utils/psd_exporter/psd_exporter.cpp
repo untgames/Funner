@@ -63,12 +63,12 @@ struct Params
   const Option* options;                 //массив опций
   size_t        options_count;           //количество опций
   stl::string   source_file_name;        //имя исходного файла
-  stl::string   layout_file_name;        //имя файла разметки  
+  stl::string   layout_file_name;        //имя файла разметки
   stl::string   layers_dir_name;         //имя каталога с сохранёнными слоями
   stl::string   layout_layers_dir_name;  //имя каталога с сохранёнными слоями, используемое в файле разметки
-  stl::string   layers_format;           //строка форматирования имён слоёв  
+  stl::string   layers_format;           //строка форматирования имён слоёв
   stl::string   crop_exclude;            //необрезаемые слои
-  size_t        crop_alpha;              //коэффициент обрезания по прозрачности  
+  size_t        crop_alpha;              //коэффициент обрезания по прозрачности
   bool          silent;                  //минимальное число сообщений
   bool          print_help;              //нужно ли печатать сообщение помощи
   bool          need_layout;             //нужно генерировать файл разметки
@@ -465,7 +465,7 @@ void convert_image_data (size_t src_width, size_t src_height, const psd_argb_col
 //обрезание
 void crop_by_alpha (size_t width, size_t height, const psd_argb_color* image, size_t crop_alpha, Rect& cropped_rect)
 {
-  int  min_x, min_y, max_x, max_y;
+  int  min_x = 0, min_y = 0, max_x = 0, max_y = 0;
   bool first_point_found = false;
 
   for (int y=0; y<(int)height; y++)
@@ -547,7 +547,7 @@ void export_data (Params& params)
   
   check_status (psd_image_load (&context, (psd_char*)params.source_file_name.c_str ()), "::psd_image_load");       
   
-    //обрезание по альфа     
+    //обрезание по альфа
   
   typedef stl::vector<Rect> RectArray;
   
@@ -599,7 +599,7 @@ void export_data (Params& params)
     {
       crop_by_alpha (layer.width, layer.height, layer.image_data, params.crop_alpha, rect);      
 
-      if ((rect.width != layer.width || rect.height != layer.height) && !params.silent)
+      if ((rect.width != (size_t)layer.width || rect.height != (size_t)layer.height) && !params.silent)
         printf ("  crop layer '%s' %ux%u: (%u, %u)-(%u, %u)\n", name.c_str (), layer.width, layer.height, rect.x, rect.y, rect.x + rect.width, rect.y + rect.height);
     }
     else
@@ -615,7 +615,7 @@ void export_data (Params& params)
     image_index++;
   }
   
-    //сохранение разметки     
+    //сохранение разметки
     
   if (params.need_layout)
   {
