@@ -71,7 +71,7 @@ define process_target.fat-static-lib
 
   build: $$($1.LIB_FILE)
 
-  $$($1.LIB_FILE): $$(foreach lib,$$($1.LIBS),$$(eval $$(call find_library,$$(lib),$$($1.LIB_DIRS),LIBS)))
+  $$($1.LIB_FILE): $(foreach lib,$$($1.LIBS),$$(eval $$(call find_library,$$(lib),$$($1.LIB_DIRS),LIBS)))
 
 #  $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.LIBS)
   $$($1.LIB_FILE): $$($1.FLAG_FILES) $$(LIBS)
