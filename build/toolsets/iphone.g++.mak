@@ -39,15 +39,14 @@ endef
 ###################################################################################################
 VALID_TARGET_TYPES += fat-static-lib
 
-#Поиск библиотеки (имя библиотеки, пути поиска, переменная результата)
+#Получение пути к библиотеке
+define get_full_library_path
+$$(strip $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(strip $1)),$2))))
+end
+
+#Поиск библиотеки (имя библиотеки, пути поиска)
 define find_library
-  LIPO_LIBRARY_SOURCE := $$(strip $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(strip $1)),$2))))
-  
-  ifeq (,$$(LIPO_LIBRARY_SOURCE))
-    $$(error Library '$1' not found)
-  endif
-  
-  $3 := $$($3) $$(LIPO_LIBRARY_SOURCE)
+$$(if $$(call get_full_library_path,$1,$2),$$(call get_full_library_path,$1,$2),$$(error Library '$1' not found))
 endef
 
 #Обработка цели объединенния библиотек(имя цели)
@@ -71,7 +70,7 @@ define process_target.fat-static-lib
 
   build: $$($1.LIB_FILE)
 
-  $$($1.LIB_FILE): $(foreach lib,$$($1.LIBS),$$(eval $$(call find_library,$$(lib),$$($1.LIB_DIRS),LIBS)))
+  $$($1.LIB_FILE): LIBS = $$(foreach lib,$$($1.LIBS),$$(call find_library,$$(lib),$$($1.LIB_DIRS)))
 
 #  $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.LIBS)
   $$($1.LIB_FILE): $$($1.FLAG_FILES) $$(LIBS)
