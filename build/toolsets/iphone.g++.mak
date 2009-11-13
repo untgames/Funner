@@ -46,7 +46,7 @@ endef
 
 #Поиск библиотеки (имя библиотеки, пути поиска)
 define find_library
-$(if $(call get_full_library_path,$1,$2),$(call get_full_library_path,$1,$2),$(error Library '$1' not found))
+$(if $(call get_full_library_path,$1,$2),$(call get_full_library_path,$1,$2),$(error Library '$1' not found in '$2'))
 endef
 
 #Обработка цели объединенния библиотек(имя цели)
