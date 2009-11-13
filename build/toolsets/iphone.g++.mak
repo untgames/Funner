@@ -85,7 +85,7 @@ define process_target.lipo-lib
   TARGET_FILES                     := $$(TARGET_FILES) $$($1.LIB_FILE)
   DIST_DIRS                        := $$(DIST_DIRS) $$(DIST_LIB_DIR)
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
-  $1.LIBS                          := $$(foreach lib,$$($1.LIBS),$$(foreach profile,$$($1.PROFILES),$(DIST_LIB_DIR)/../$$(profile)/$(LIB_PREFIX)$$(lib)$(LIB_SUFFIX)))
+  $1.LIBS                          := $$(foreach lib,$$($1.LIBS),$$(foreach profile,$$($1.PROFILES),$(DIST_LIB_DIR)/../../$$(profile)/lib/$(LIB_PREFIX)$$(lib)$(LIB_SUFFIX)))
 
   lipo: $$($1.LIB_FILE)
 
