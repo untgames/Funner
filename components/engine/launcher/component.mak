@@ -43,7 +43,7 @@ else
 ENGINE.FUNNER_LIBRARY.TYPE                := dynamic-lib
 endif
 ENGINE.FUNNER_LIBRARY.NAME                := funner
-ENGINE.FUNNER_LIBRARY.LIBS                := funner.engine.shared ffzd
+ENGINE.FUNNER_LIBRARY.LIBS                := funner.engine.shared
 ENGINE.FUNNER_LIBRARY.LINK_INCLUDES       :=
 ENGINE.FUNNER_LIBRARY.win32.LINK_FLAGS    := -noentry
 ENGINE.FUNNER_LIBRARY.IMPORTS             := $(ENGINE.FUNNER_SHARED_LIBRARY.IMPORTS)
