@@ -43,9 +43,9 @@ VALID_TARGET_TYPES += fat-static-lib
 define find_library
   LIPO_LIBRARY_SOURCE := $$(strip $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(strip $1)),$2))))
   
-#  ifeq (,$$(LIPO_LIBRARY_SOURCE))
-#    $$(error Library '$1' not found)
-#  endif
+  ifeq (,$$(LIPO_LIBRARY_SOURCE))
+    $$(error Library '$1' not found)
+  endif
   
   $3 := $$($3) $$(LIPO_LIBRARY_SOURCE)
 endef
@@ -65,15 +65,17 @@ define process_target.fat-static-lib
   TMP_DIRS                         := $$(TMP_DIRS) $$($1.OBJECT_FILES_DIR)
   $1.LIBS                          := $$($1.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
 
-  $$(foreach lib,$$($1.LIBS),$$(eval $$(call find_library,$$(lib),$$($1.LIB_DIRS),$1.LIBS_FULL_PATH)))
-  
-  $$(warning libs=$$($1.LIBS))  
+#  $$(foreach lib,$$($1.LIBS),$$(eval $$(call find_library,$$(lib),$$($1.LIB_DIRS),$1.LIBS_FULL_PATH)))    
 
-  $1.LIBS := $$($1.LIBS_FULL_PATH)  
+#  $1.LIBS := $$($1.LIBS_FULL_PATH)  
 
   build: $$($1.LIB_FILE)
+  
+  $$($1.LIB_FILE): $$(foreach lib,$$($1.LIBS),$$(eval $$(call find_library,$$(lib),$$($1.LIB_DIRS),LIBS)))  
 
-  $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.LIBS)
+#  $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.LIBS)
+  $$($1.LIB_FILE): $$($1.FLAG_FILES) $$(LIBS)
+		@echo Libs=$$(LIBS)
 		@echo Extract files for fat static library $$(notdir $$($1.LIB_FILE))..
 		@$(RM) -Rf $$($1.OBJECT_FILES_DIR)/*
 		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
