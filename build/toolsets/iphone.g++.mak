@@ -91,7 +91,7 @@ define process_target.lipo-lib
 
   $$($1.LIB_FILE): $$($1.LIBS)
 		@echo Create lipo library $$(notdir $$@)..	
-
+		@lipo $$($1.LIBS) -create -output $$@
 endef
 
 .PHONY: lipo
