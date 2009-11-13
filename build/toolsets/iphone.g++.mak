@@ -37,7 +37,7 @@ endef
 ###################################################################################################
 #Сборка единой статической библиотеки
 ###################################################################################################
-VALID_TARGET_TYPES += fat-static-lib
+VALID_TARGET_TYPES += fat-static-lib lipo-lib
 
 #Получение пути к библиотеке
 define get_full_library_path
@@ -49,7 +49,7 @@ define find_library
 $(if $(call get_full_library_path,$1,$2),$(call get_full_library_path,$1,$2),$1)
 endef
 
-#Обработка цели объединенния библиотек(имя цели)
+#Обработка цели объединения библиотек(имя цели)
 define process_target.fat-static-lib
   $1.NAME := $$(strip $$($1.NAME))
   
@@ -63,7 +63,6 @@ define process_target.fat-static-lib
   TARGET_FILES                     := $$(TARGET_FILES) $$($1.LIB_FILE)
   DIST_DIRS                        := $$(DIST_DIRS) $$(DIST_LIB_DIR)
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
-  TMP_DIRS                         := $$(TMP_DIRS) $$($1.OBJECT_FILES_DIR)
   $1.LIBS                          := $$($1.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
   $1.LIBS                          := $$(foreach lib,$$($1.LIBS),$$(call find_library,$$(lib),$$($1.LIB_DIRS)))
   
@@ -74,3 +73,25 @@ define process_target.fat-static-lib
 		libtool -c -o $$@ $$($1.LIBS)
 endef
 
+#Обработка цели объединения библиотек, собранных для разных архитектур (имя цели)
+define process_target.lipo-lib
+  $1.NAME := $$(strip $$($1.NAME))
+
+  ifeq (,$$($1.NAME))
+    $$(error Empty lipo library name at build target '$1' component-dir='$(COMPONENT_DIR)')
+  endif
+
+  $1.LIB_FILE                      := $(DIST_LIB_DIR)/../$(LIB_PREFIX)$$($1.NAME)$(LIB_SUFFIX)
+  TARGET_FILES                     := $$(TARGET_FILES) $$($1.LIB_FILE)
+  DIST_DIRS                        := $$(DIST_DIRS) $$(DIST_LIB_DIR)
+  $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
+  $1.LIBS                          := $$($1.LIBS:%=$$(foreach profile,$$($1.PROFILES),$($(DIST_LIB_DIR)/../$$(profile)/$(LIB_PREFIX)%$(LIB_SUFFIX)))
+
+  lipo: $$($1.LIB_FILE)
+
+  $$($1.LIB_FILE): $$($1.LIBS)
+		@echo Create lipo library $$(notdir $$@)..	
+
+endef
+
+.PHONY: lipo
