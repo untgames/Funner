@@ -58,6 +58,8 @@ define process_target.fat-static-lib
   endif  
   
   $1.LIB_FILE                      := $(DIST_LIB_DIR)/$(LIB_PREFIX)$$($1.NAME)$(LIB_SUFFIX)
+  $1.LIB_DIRS                      := $$(strip $$($1.LIB_DIRS))
+  $1.LIB_DIRS                      := $$(call specialize_paths,$$($1.LIB_DIRS)) $(DIST_LIB_DIR)
   TARGET_FILES                     := $$(TARGET_FILES) $$($1.LIB_FILE)
   DIST_DIRS                        := $$(DIST_DIRS) $$(DIST_LIB_DIR)
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)
