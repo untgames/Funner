@@ -42,7 +42,7 @@ VALID_TARGET_TYPES += fat-static-lib
 #ѕолучение пути к библиотеке
 define get_full_library_path
 $$(strip $$(firstword $$(wildcard $$(patsubst %,%/$$(notdir $$(strip $1)),$2))))
-end
+endef
 
 #ѕоиск библиотеки (им€ библиотеки, пути поиска)
 define find_library
