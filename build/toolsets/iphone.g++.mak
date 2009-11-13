@@ -70,10 +70,7 @@ define process_target.fat-static-lib
   build: $$($1.LIB_FILE)
 
   $$($1.LIB_FILE): $$($1.LIBS)
-		@echo Libs='$$($1.LIBS)'
-#		@echo Extract files for fat static library $$(notdir $$($1.LIB_FILE))..
-#		@$(RM) -Rf $$($1.OBJECT_FILES_DIR)/*
-#		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
-#		@libtool -c -o $$@ $$($1.LIBS)
+		@echo Create fat static library $$(notdir $$($1.LIB_FILE))..
+		@libtool -c -o $$@ $$($1.LIBS)
 endef
 
