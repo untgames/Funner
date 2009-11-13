@@ -3,7 +3,7 @@ export.compile.system.INCLUDE_DIRS := include
 export.compile.system.IMPORTS      := compile.common
 
 # Link exports
-export.link.system.LIBS              := funner.common funner.system
+export.link.system.LIBS              := funner.system
 export.link.system.IMPORTS           := link.common
 export.link.system.win32.LIBS        := user32
 export.link.system.macosx.LINK_FLAGS := -framework CoreFoundation
