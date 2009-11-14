@@ -38,6 +38,7 @@ endef
 #Сборка единой статической библиотеки
 ###################################################################################################
 VALID_TARGET_TYPES += fat-static-lib lipo-lib
+PACKAGE_COMMANDS   += lipo
 
 #Получение пути к библиотеке
 define get_full_library_path
