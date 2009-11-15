@@ -60,7 +60,7 @@ EXE_SUFFIX     := .exe
 DLL_SUFFIX     := .dll
 DLL_LIB_SUFFIX := .lib
 PROFILES   += msvc win32 has_windows
-COMMON_LINK_FLAGS += -stack:128000
+COMMON_LINK_FLAGS += -stack:128000 /MACHINE:X86
 
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
