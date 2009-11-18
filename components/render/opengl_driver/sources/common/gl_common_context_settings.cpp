@@ -8,11 +8,12 @@ using namespace render::low_level::opengl;
 
 struct ContextSettings::Impl
 {
-  ExtensionSet required_extensions; //расширения, затребованные в строке иициализации
-  ExtensionSet enabled_extensions;  //расширения, разрешенные к использованию в строке инициализации
-  Version      min_version;         //минимальная требуемая версии OpenGL
-  Version      max_version;         //максимальная необходимая версия OpenGL
-  bool         need_check_errors;   //нужно ли проверять ошибки
+  ExtensionSet required_extensions;                       //расширения, затребованные в строке иициализации
+  ExtensionSet enabled_extensions;                        //расширения, разрешенные к использованию в строке инициализации
+  Version      min_version;                               //минимальная требуемая версии OpenGL
+  Version      max_version;                               //максимальная необходимая версия OpenGL
+  bool         need_check_errors;                         //нужно ли проверять ошибки
+  size_t       int_settings [ContextSettingsInteger_Num]; //целочисленные настройки контекста
   
 ///Конструктор
   Impl (const char* init_string)
@@ -25,8 +26,10 @@ struct ContextSettings::Impl
       //инициализация параметров
       
     enabled_extensions.Set (true);
-    
+
     need_check_errors = true;
+
+    memset (int_settings, 0, sizeof (int_settings));
 
       //разбор строки инициализации
     
@@ -94,6 +97,24 @@ struct ContextSettings::Impl
       max_version = Version (value);
       return;
     }
+    
+    if (!xtl::xstricmp (name, "max_texture_size"))
+    {
+      int_settings [ContextSettingsInteger_MaxTextureSize] = atoi (value);
+      return;
+    }
+    
+    if (!xtl::xstricmp (name, "max_anisotropy"))
+    {
+      int_settings [ContextSettingsInteger_MaxAnisotropy] = atoi (value);
+      return;
+    }
+    
+    if (!xtl::xstricmp (name, "texture_units_count"))
+    {
+      int_settings [ContextSettingsInteger_TextureUnitsCount] = atoi (value);
+      return;
+    }    
 
     if (!xtl::xstricmp (name, "check_gl_errors"))
     {
@@ -155,4 +176,16 @@ const Version& ContextSettings::MinVersion () const
 const Version& ContextSettings::MaxVersion () const
 {
   return impl->max_version;
+}
+
+/*
+    Получение целочисленных настроек контекста
+*/
+
+size_t ContextSettings::GetInteger (ContextSettingsInteger tag) const
+{
+  if (tag < 0 || tag >= ContextSettingsInteger_Num)
+    throw xtl::make_argument_exception ("render::low_level::opengl::ContextSettings::GetInteger", "tag", tag);
+
+  return impl->int_settings [tag];
 }

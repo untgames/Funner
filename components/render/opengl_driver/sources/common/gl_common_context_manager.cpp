@@ -162,7 +162,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
 
           //инициализация таблицы возможностей контекста
 
-        context_caps.Init (extensions, context_settings.EnabledExtensions ());
+        context_caps.Init (extensions, context_settings.EnabledExtensions (), context_settings);
       }
       catch (xtl::exception& exception)
       {

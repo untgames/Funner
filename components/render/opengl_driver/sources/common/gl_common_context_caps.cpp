@@ -86,7 +86,7 @@ ContextCaps::ContextCaps ()
   memset (this, 0, sizeof *this);
 }
 
-void ContextCaps::Init (const ExtensionSet& available_extension_set, const ExtensionSet& enabled_extension_set)
+void ContextCaps::Init (const ExtensionSet& available_extension_set, const ExtensionSet& enabled_extension_set, const ContextSettings& settings)
 {
 #ifndef OPENGL_ES_SUPPORT  
 
@@ -308,6 +308,21 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
 
   if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
   else                      texture_units_count = 1;
+  
+  size_t settings_max_texture_size    = settings.GetInteger (ContextSettingsInteger_MaxTextureSize),
+         settings_max_anisotropy      = settings.GetInteger (ContextSettingsInteger_MaxAnisotropy),
+         settings_texture_units_count = settings.GetInteger (ContextSettingsInteger_TextureUnitsCount);         
+
+  if (settings_max_texture_size)
+  {
+    if (max_3d_texture_size > settings_max_texture_size)        max_3d_texture_size        = settings_max_texture_size;
+    if (max_cube_map_texture_size > settings_max_texture_size)  max_cube_map_texture_size  = settings_max_texture_size;
+    if (max_rectangle_texture_size > settings_max_texture_size) max_rectangle_texture_size = settings_max_texture_size;    
+    if (max_texture_size > settings_max_texture_size)           max_texture_size           = settings_max_texture_size;
+  }
+
+  if (settings_max_anisotropy && max_anisotropy > settings_max_anisotropy)                max_anisotropy      = settings_max_anisotropy;
+  if (settings_texture_units_count && texture_units_count > settings_texture_units_count) texture_units_count = settings_texture_units_count;
 }
 
 /*
