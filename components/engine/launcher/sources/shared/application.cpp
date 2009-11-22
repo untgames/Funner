@@ -82,7 +82,7 @@ class Application: public IFunnerApi
           if (!argument)
             continue;
 
-          if (!xtl::xstrcmp (argument, KEY_CONFIGURATION))
+          if (!xtl::xstrncmp (argument, KEY_CONFIGURATION, xtl::xstrlen (KEY_CONFIGURATION)))
           {
             configuration_name = argument + xtl::xstrlen (KEY_CONFIGURATION);
           }
