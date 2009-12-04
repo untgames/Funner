@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "builders.framework", "sources\builders.framework\builders.framework.csproj", "{D09923B4-EF41-46E9-8511-5DB5B4B114B8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A863EB07-DDE3-4497-81EB-AAA64B1B0F39} = {A863EB07-DDE3-4497-81EB-AAA64B1B0F39}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "builders.character_builder", "sources\builders.character_builder\builders.character_builder.csproj", "{A863EB07-DDE3-4497-81EB-AAA64B1B0F39}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D09923B4-EF41-46E9-8511-5DB5B4B114B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D09923B4-EF41-46E9-8511-5DB5B4B114B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D09923B4-EF41-46E9-8511-5DB5B4B114B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D09923B4-EF41-46E9-8511-5DB5B4B114B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A863EB07-DDE3-4497-81EB-AAA64B1B0F39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A863EB07-DDE3-4497-81EB-AAA64B1B0F39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A863EB07-DDE3-4497-81EB-AAA64B1B0F39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A863EB07-DDE3-4497-81EB-AAA64B1B0F39}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
