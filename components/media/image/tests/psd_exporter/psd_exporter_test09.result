@@ -6,5 +6,5 @@ Save layers to dir 'crop'...
   save 'crop/image001.png'...
 <?xml version="1.0" encoding="utf-8"?>
 <LayerMap TotalWidth="128" TotalHeight="128">
-  <Layer Name="Layer 1" Image="crop/image001.png" Left="28" Top="25" Width="77" Height="77"/>
+  <Layer Name="Layer 1" Image="crop/image001.png" Left="28" Top="25" Width="77" Height="77" Opacity="255" Visible="1"/>
 </LayerMap>

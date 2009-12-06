@@ -662,10 +662,12 @@ void export_data (Params& params)
       
       const Rect& cropped_rect = cropped_layers [image_index - 1];
       
-      xml_writer.WriteAttribute ("Left",   layer.left + cropped_rect.x);
-      xml_writer.WriteAttribute ("Top",    layer.top + cropped_rect.y);
-      xml_writer.WriteAttribute ("Width",  cropped_rect.width);
-      xml_writer.WriteAttribute ("Height", cropped_rect.height);
+      xml_writer.WriteAttribute ("Left",    layer.left + cropped_rect.x);
+      xml_writer.WriteAttribute ("Top",     layer.top + cropped_rect.y);
+      xml_writer.WriteAttribute ("Width",   cropped_rect.width);
+      xml_writer.WriteAttribute ("Height",  cropped_rect.height);
+      xml_writer.WriteAttribute ("Opacity", layer.opacity);
+      xml_writer.WriteAttribute ("Visible", layer.visible != 0);
       
       image_index++;      
     }
