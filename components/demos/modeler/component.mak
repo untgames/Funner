@@ -4,6 +4,8 @@
 TARGETS       := DEMOS.MODELER.ENVELOPE DEMOS.MODELER.TRAJECTORY 
 TARGETS.win32 := DEMOS.MODELER.VISUALIZER
 
+#PROFILES += egl gles_win32
+
 #Утилита расчёта огибающей
 DEMOS.MODELER.ENVELOPE.TYPE          := application
 DEMOS.MODELER.ENVELOPE.NAME          := modeler-envelope

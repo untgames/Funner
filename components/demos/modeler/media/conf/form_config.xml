@@ -10,7 +10,7 @@
       />
     </File>
   </Log>
-  <WindowRenderer Id="MyRenderer" AdapterMask="*Open*" DriverMask="*">
+  <WindowRenderer Id="MyRenderer" AdapterMask="*" DriverMask="*">
     <FrameBuffer
       Window       = "MainWindow"
       ColorBits    = "24"
