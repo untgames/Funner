@@ -1,1 +1,2 @@
-COMPONENT_DIRS := vecmath
+COMPONENT_DIRS := vecmath bound_volumes
+
