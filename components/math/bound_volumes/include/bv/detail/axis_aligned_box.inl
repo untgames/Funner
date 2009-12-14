@@ -321,7 +321,7 @@ inline bool intersects (const axis_aligned_box<T>& box, const sphere<T>& sphere)
 */
 
 template <class T>
-inline bool contains (const axis_aligned_box<T>& box, const math::vec<T, 3>& p)
+inline bool contains (const axis_aligned_box<T>& box, const math::vector<T, 3>& p)
 {
   if (box.empty ())
     return false;

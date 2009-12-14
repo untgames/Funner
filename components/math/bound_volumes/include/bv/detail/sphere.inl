@@ -238,7 +238,7 @@ inline bool intersects (const sphere<T>& s, const axis_aligned_box<T>& box)
 */
 
 template <class T>
-inline bool contains (const sphere<T>& s, const math::vec<T, 3>& point)
+inline bool contains (const sphere<T>& s, const math::vector<T, 3>& point)
 {
   return qlen (point - s.center ()) < detail::sqr (s.radius ());
 }

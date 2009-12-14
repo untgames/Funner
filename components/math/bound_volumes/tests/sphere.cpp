@@ -55,21 +55,21 @@ int main()
 
   printf ("rotate\n");
 
-  s1 = s1 * fromAxisAnglef (deg2rad (90.0f), 0, 1, 0);
+  s1 = s1 * to_quat (degree (90.0f), vec3f (0, 1, 0));
 
   dump (s1);
   printf ("\n");
 
   printf ("add sphere\n");
 
-  s1 = s2 + s1 * fromAxisAnglef (deg2rad (90.0f), 0, 1, 0);
+  s1 = s2 + s1 * to_quat (degree (90.0f), vec3f (0, 1, 0));
 
   dump (s1);
   printf ("\n");
 
   printf ("scale\n");
 
-  aaboxf box = scalef (2, 2, 2) * s1;
+  aaboxf box = scale (vec3f (2)) * s1;
 
   dump (box);
   printf ("\n");
@@ -96,7 +96,7 @@ int main()
 
 //  printf ("small sphere changes\n");
 
-  spheref s3 = s1 * fromAxisAnglef (deg2rad (1.0f), 0, 1, 0);
+  spheref s3 = s1 * to_quat (degree (1.0f), vec3f (0, 1, 0));
 
 //  dump (s3);
 //  printf ("\n");

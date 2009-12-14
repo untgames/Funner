@@ -1,7 +1,10 @@
 #ifndef BOUND_VOLUMES_AABB_HEADER
 #define BOUND_VOLUMES_AABB_HEADER
 
-#include <mathlib.h>
+#include <cmath>
+
+#include <math/matrix.h>
+#include <math/quat.h>
 
 namespace bound_volumes
 {
@@ -30,8 +33,8 @@ enum box_corner
 template <class T> class axis_aligned_box
 {
   public:
-    typedef T               element_type;
-    typedef math::vec<T, 3> vec_type;
+    typedef T                  element_type;
+    typedef math::vector<T, 3> vec_type;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
@@ -142,7 +145,7 @@ template <class T> bool intersects (const axis_aligned_box<T>&, const sphere<T>&
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка: содержит ли ограничивающий параллелипиппед различные примитивы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> bool contains (const axis_aligned_box<T>&, const math::vec<T, 3>& point);
+template <class T> bool contains (const axis_aligned_box<T>&, const math::vector<T, 3>& point);
 template <class T> bool contains (const axis_aligned_box<T>&, const axis_aligned_box<T>& box);
 template <class T> bool contains (const axis_aligned_box<T>&, const sphere<T>& s);
 

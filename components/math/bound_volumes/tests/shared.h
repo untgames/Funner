@@ -5,9 +5,12 @@
 #define min
 #define max
 
+#include <cstdio>
+
+#include <math/utility.h>
+
 #include <bv/axis_aligned_box.h>
 #include <bv/sphere.h>
-#include <stdio.h>
 
 using namespace bound_volumes;
 using namespace math;

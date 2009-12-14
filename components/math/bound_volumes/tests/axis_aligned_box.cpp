@@ -99,12 +99,12 @@ int main ()
   printf ("\n");
 
   printf ("multiply on quaternion\n");
-  box *= fromAxisAnglef (deg2rad (90.0f), 1, 0, 0);
+  box *= to_quat (degree (90.0f), vec3f (1, 0, 0));
   dump (box);
   printf ("\n");
 
   printf ("muliply on matrix\n");
-  box *= translatef (10, 20, 30);
+  box *= translate (vec3f (10, 20, 30));
   dump (box);
   printf ("\n");
 

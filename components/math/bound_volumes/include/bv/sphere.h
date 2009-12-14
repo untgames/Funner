@@ -1,7 +1,10 @@
 #ifndef BOUND_VOLUMES_SPHERE_HEADER
 #define BOUND_VOLUMES_SPHERE_HEADER
 
-#include <mathlib.h>
+#include <cmath>
+
+#include <math/matrix.h>
+#include <math/quat.h>
 
 namespace bound_volumes
 {
@@ -15,8 +18,8 @@ template <class T> class axis_aligned_box;
 template <class T> class sphere
 {
   public:
-    typedef T               element_type;
-    typedef math::vec<T, 3> vec_type;
+    typedef T                  element_type;
+    typedef math::vector<T, 3> vec_type;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
@@ -104,7 +107,7 @@ template <class T> bool intersects (const sphere<T>&, const axis_aligned_box<T>&
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка: содержит ли ограничивающая сфера различные примитивы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> bool contains (const sphere<T>&, const math::vec<T, 3>&);
+template <class T> bool contains (const sphere<T>&, const math::vector<T, 3>&);
 template <class T> bool contains (const sphere<T>&, const sphere<T>&);
 template <class T> bool contains (const sphere<T>&, const axis_aligned_box<T>&);
 
