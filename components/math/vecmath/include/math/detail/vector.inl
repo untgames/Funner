@@ -104,7 +104,7 @@ struct vec_copy {
   {
     const unsigned int s1 = Size1 < Size2 ? Size1 : Size2;
     
-    int i;
+    unsigned int i;
   
     for (i=0; i<s1; i++) res [i] = src [i];
     for (; i<Size1; i++) res [i] = 0;
@@ -253,6 +253,28 @@ struct vec_cross_product {
 #endif
 };
 
+/*
+    Приведение к строке
+*/
+
+template <size_t size, class String, class T>
+void to_string_helper (String& buffer, const T* values)
+{
+  buffer.clear ();
+  
+  String item_buffer;
+
+  for (size_t i=0; i<size; i++)
+  {
+    to_string (item_buffer, values [i]);
+
+    buffer += item_buffer;
+
+    if (i != size-1)
+      buffer += ' ';
+  }
+}
+
 }
 
 /*
@@ -360,13 +382,13 @@ vector<T, Size>& vector<T, Size>::operator = (const T& a)
 template <class T, unsigned int Size>
 typename vector<T, Size>::value_type& vector<T, Size>::operator [] (unsigned int index)
 {
-  return (&x) [index];
+  return static_cast<value_type*> (&this->x) [index];
 }
 
 template <class T, unsigned int Size>
 const typename vector<T, Size>::value_type& vector<T, Size>::operator [] (unsigned int index) const
 {
-  return (&x) [index];
+  return static_cast<const value_type*> (&this->x) [index];
 }
 
 /*
@@ -588,4 +610,14 @@ template <class T>
 vector<T, 4> cross (const vector<T, 4>& a, const vector<T, 4>& b)
 {
   return vector<T, 4> (a, b, detail::vec_cross_product (), return_value_tag ());
+}
+
+/*
+    Приведение к строке
+*/
+
+template <class String, class T, unsigned int Size>
+void to_string (String& buffer, const vector<T, Size>& value)
+{
+  detail::to_string_helper<Size> (buffer, &value [0]);
 }

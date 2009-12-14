@@ -11,8 +11,20 @@
 
 using namespace math;
 
-void dump (float x) { printf ("%.3f", x); }
-void dump (bool x)  { printf (x ? "true" : "false"); }
+void dump (float x)
+{
+  static const float EPS = 0.001f;
+
+  if (fabs (x) < EPS)
+    x = 0.0f;
+
+  printf ("%.3f", x);
+}
+
+void dump (bool x)
+{
+  printf (x ? "true" : "false");
+}
 
 template <class T>
 void dump (const angle<T>& ang)
@@ -26,7 +38,7 @@ void dump (const vector<T, Size>& v)
 {
   printf ("[");
 
-  for (int i=0; i<Size; i++)
+  for (unsigned int i=0; i<Size; i++)
   {
     if (i)
       printf (", ");
@@ -57,7 +69,7 @@ void dump (const quat<T>& q)
 template <class T, unsigned int Size>
 void dump (const matrix<T, Size>& m)
 {
-  for (int i=0; i<Size; i++)
+  for (unsigned int i=0; i<Size; i++)
   {
     printf ("\n");
     dump (m [i]);

@@ -593,25 +593,25 @@ template <class T, unsigned int Size>
 vector<T, Size-1> matrix<T, Size>::operator * (const math::vector<T, Size-1>& v) const
 {
   return math::vector<T, Size-1> (*this, v, detail::matrix_mul_vec (), return_value_tag ());
-} 
+}
 
 template <class T, unsigned int Size>
 vector<T, Size> operator * (const vector<T, Size>& v, const matrix<T, Size>& m)
 {
   return vector<T, Size> (v, m, detail::vec_mul_matrix (), return_value_tag ());
-} 
+}
 
 template <class T, unsigned int Size>
 vector<T, Size> operator * (const vector<T, Size>& v, const matrix<T, Size+1>& m)
 {
   return vector<T, Size> (v, m, detail::vec_mul_matrix (), return_value_tag ());
-} 
+}
 
 template <class T, unsigned int Size>
 vector<T, Size>& operator *= (vector<T, Size>& v, const matrix<T, Size>& m)
 {
   return v = v * m;
-}
+} 
 
 template <class T, unsigned int Size>
 vector<T, Size>& operator *= (vector<T, Size>& v, const matrix<T, Size+1>& m)
@@ -802,4 +802,14 @@ typename matrix<T, 3>::value_type minor (const matrix<T, 3>& src, unsigned int m
                    src [(m+2)%3][(n+2)%3]*src [(m+1)%3][(n+1)%3]
                  : src [(m+2)%3][(n+2)%3]*src [(m+1)%3][(n+1)%3] -
                    src [(m+2)%3][(n+1)%3]*src [(m+1)%3][(n+2)%3];
+}
+
+/*
+    Приведение к строке
+*/
+
+template <class String, class T, unsigned int Size>
+void to_string (String& buffer, const matrix<T, Size>& value)
+{
+  detail::to_string_helper<Size * Size> (buffer, &value [0][0]);
 }

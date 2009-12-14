@@ -50,7 +50,7 @@ class vector: public vector_base<T, Size>
     template <unsigned int Size1> vector (const vector<value_type, Size1>&);
 
       //дл€ использовани€ оптимизации возвращаемого значени€
-    template <class T, class Fn>                      vector (const T& arg, Fn fn, return_value_tag);                   //fn (arg, *this)
+    template <class T1, class Fn>                     vector (const T1& arg, Fn fn, return_value_tag);                  //fn (arg, *this)
     template <class T1, class T2, class Fn>           vector (const T1& arg1, const T2& arg2, Fn fn, return_value_tag); //fn (arg1, arg2, *this)
     template <class T1, class T2, class T3, class Fn> vector (const T1& arg1, const T2& arg2, const T3& arg3, Fn fn, return_value_tag); //fn (arg1, arg2, arg3, *this)
 
@@ -192,6 +192,12 @@ vector<T, 3> cross (const vector<T, 3>& a, const vector<T, 3>& b);
 
 template <class T>
 vector<T, 4> cross (const vector<T, 4>& a, const vector<T, 4>& b);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕриведение к строке
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class String, class T, unsigned int Size>
+void to_string (String& buffer, const vector<T, Size>& value);
 
 #include <math/detail/vector.inl>
 

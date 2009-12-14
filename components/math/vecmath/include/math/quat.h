@@ -33,7 +33,7 @@ class quat
     quat (const quat& q);
     
         //дл€ использовани€ оптимизации возвращаемого значени€
-    template <class T, class Fn>                      quat (const T& arg, Fn fn, return_value_tag); //fn (arg, *this)
+    template <class T1, class Fn>                     quat (const T1& arg, Fn fn, return_value_tag); //fn (arg, *this)
     template <class T1, class T2, class Fn>           quat (const T1& arg1, const T2& arg2, Fn fn, return_value_tag); //fn (arg1, arg2, *this)
     template <class T1, class T2, class T3, class Fn> quat (const T1& arg1, const T2& arg2, const T3& arg3, Fn fn, return_value_tag); //fn (arg1, arg2, arg3, *this)
     
@@ -145,6 +145,12 @@ typename quat<T>::value_type inner (const quat<T>&, const quat<T>&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T>
 quat<T> inverse (const quat<T>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕриведение к строке
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class String, class T>
+void to_string (String& buffer, const quat<T>& value);
 
 #include <math/detail/quat.inl>
 

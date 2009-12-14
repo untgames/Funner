@@ -12,10 +12,16 @@ int main ()
   
   dump ("mat4f*vec4f", m*v1);
   dump ("vec4f*mat4f", v1*m);
-  dump ("vec4f*=mat4f", vec4f (v1)*=m);
+  
+  vec4f v3 = v1; v3 *= m;
+  
+  dump ("vec4f*=mat4f", v3);
   dump ("mat4f*vec3f", m*v2);
   dump ("vec3f*mat4f", v2*m);
-  dump ("vec3f*=mat4f", vec3f (v2)*=m);
+  
+  vec3f v4 = v2; v4 *= m;
+  
+  dump ("vec3f*=mat4f", v4);
 
   return 0;
 }
