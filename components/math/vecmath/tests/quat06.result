@@ -1,0 +1,5 @@
+Results of quat06_test:
+q: [1.000, 2.000, 3.000] 4.000
+norm(q): 30.000
+length(q): 5.477
+normalize(q): [0.183, 0.365, 0.548] 0.730

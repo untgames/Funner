@@ -1,0 +1,7 @@
+Results of quat01_test:
+default constructor: [0.000, 0.000, 0.000] 1.000
+scalar constructor: [2.000, 2.000, 2.000] 2.000
+component constructor: [1.000, 2.000, 3.000] 4.000
+copy constructor: [1.000, 2.000, 3.000] 4.000
+scalar assignment: [5.000, 5.000, 5.000] 5.000
+quat assignment: [2.000, 2.000, 2.000] 2.000

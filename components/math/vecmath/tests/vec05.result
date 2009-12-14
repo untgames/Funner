@@ -1,0 +1,7 @@
+Results of vec05_test:
+a==b: true
+a!=b: false
+a==c: false
+a!=c: true
+equal1: true
+equal2: false

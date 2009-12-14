@@ -1,0 +1,7 @@
+Results of vec01_test:
+default constructor: [0.000, 0.000, 0.000, 0.000]
+scalar constructor: [1.000, 1.000, 1.000, 1.000]
+vector constructor1: [1.000, 2.000, 3.000, 4.000]
+vector constructor2: [1.000, 2.000, 3.000, 0.000]
+vector constructor3: [5.000, 6.000, 7.000, 8.000]
+vector constructor4: [5.000, 6.000, 7.000]

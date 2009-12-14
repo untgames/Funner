@@ -1,0 +1,10 @@
+Results of angle01_test:
+default constructor: 0.000 deg
+degree constructor: 30.000 deg
+radian constructor: 90.000 deg
+convert constructor: 60.000 deg
+copy constructor: 45.000 deg
+assignment degree: 10.000 deg
+assignment radian: 60.000 deg
+assignment with convert: 45.000 deg
+assignment: 0.000 deg

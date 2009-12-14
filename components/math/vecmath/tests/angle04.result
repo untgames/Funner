@@ -1,0 +1,8 @@
+Results of angle04_test:
+a: 45.000 deg
+a.to_radian (): 0.7854
+a.to_degree (): 45.0000
+a.get (radian_tag ()): 0.7854
+a.get (degree_tag ()): 45.0000
+radian (a): 0.7854
+degree (a): 45.0000

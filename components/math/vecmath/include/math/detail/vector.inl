@@ -1,51 +1,314 @@
+namespace detail
+{
+
+#ifdef VECMATH_SSE
+
+__forceinline __m128 to_m128 (const vector<float, 4>& v)
+{
+  return _mm_loadu_ps (&v.x);
+}
+
+#endif
+
 /*
-        Конструкторы
+    Покомпонентные векторные операции
 */
 
-template <class T,size_t size>
-inline vec<T,size>::vec ()
-{
-  vec_assign_scalar (*this,T (0));
+struct vec_add {
+  template <class T, unsigned int Size>
+  void operator () (const vector<T, Size>& a, const vector<T, Size>& b, vector<T, Size>& res) const
+  {
+    for (unsigned int i=0; i<Size; i++)
+      res [i] = a [i] + b [i];
+  }
+  
+#ifdef VECMATH_SSE
+  __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
+  {
+    _mm_storeu_ps (&res [0], _mm_add_ps (to_m128 (a), to_m128 (b)));
+  }
+#endif
+};
+
+struct vec_sub {
+  template <class T, unsigned int Size>
+  void operator () (const vector<T, Size>& a, const vector<T, Size>& b, vector<T, Size>& res) const
+  {
+    for (unsigned int i=0; i<Size; i++)
+      res [i] = a [i] - b [i];
+  }
+  
+#ifdef VECMATH_SSE
+  __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
+  {
+    _mm_storeu_ps (&res [0], _mm_sub_ps (to_m128 (a), to_m128 (b)));
+  }
+#endif
+};
+
+struct vec_mul {
+  template <class T, unsigned int Size>
+  void operator () (const vector<T, Size>& a, const vector<T, Size>& b, vector<T, Size>& res) const
+  {
+    for (unsigned int i=0; i<Size; i++) res [i] = a [i] * b [i];
+  }
+  
+#ifdef VECMATH_SSE
+  __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
+  {
+    _mm_storeu_ps (&res [0], _mm_mul_ps (to_m128 (a), to_m128 (b)));
+  }
+#endif
+};
+
+struct vec_div {
+  template <class T, unsigned int Size>
+  void operator () (const vector<T, Size>& a, const vector<T, Size>& b, vector<T, Size>& res) const
+  {
+    for (unsigned int i=0; i<Size; i++)
+      res [i] = a [i] / b [i];
+  }
+  
+#ifdef VECMATH_SSE
+  __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
+  {
+    _mm_storeu_ps (&res [0], _mm_div_ps (to_m128 (a), to_m128 (b)));
+  }
+#endif
+};
+
+struct vec_mul_scalar {
+  template <class T, unsigned int Size>
+  void operator () (const vector<T, Size>& a, const T& b, vector<T, Size>& res) const
+  {
+    for (unsigned int i=0; i<Size; i++)
+      res [i] = a [i] * b;
+  }
+};
+
+struct vec_div_scalar {
+  template <class T, unsigned int Size>
+  void operator () (const vector<T, Size>& a, const T& b, vector<T, Size>& res) const
+  {
+    vec_mul_scalar ()(a, T (1) / b, res);
+  }
+};
+
+/*
+    Векторное присваивание
+*/
+
+struct vec_copy {
+  template <class T, unsigned int Size1, unsigned int Size2>
+  void operator () (const vector<T, Size2>& src, vector<T, Size1>& res) const
+  {
+    const unsigned int s1 = Size1 < Size2 ? Size1 : Size2;
+    
+    int i;
+  
+    for (i=0; i<s1; i++) res [i] = src [i];
+    for (; i<Size1; i++) res [i] = 0;
+  }
+  
+#ifdef VECMATH_SSE
+  __forceinline void operator () (const vector<float, 4>& a, vector<float, 4>& res) const
+  {
+    _mm_storeu_ps (&res.x, to_m128 (a));
+  }
+#endif
+};
+
+struct vec_assign_scalar {
+  template <class T, unsigned int Size>
+  void operator () (const T& a, vector<T, Size>& res) const
+  {
+    for (unsigned int i=0; i<Size; i++)
+      res [i] = a;
+  }
+  
+#ifdef VECMATH_SSE
+  inline void operator () (float a, vector<float, 4>& res) const
+  {
+    _mm_storeu_ps (&res [0], _mm_set_ps1 (a));
+  }
+#endif
+};
+
+/*
+        Утилиты
+*/
+
+struct vec_neg {
+  template <class T, unsigned int Size>
+  void operator () (const vector<T, Size>& src, vector<T, Size>& res) const
+  {
+    for (unsigned int i=0; i<Size; i++)
+      res [i] = -src [i];
+  }
+  
+#ifdef VECMATH_SSE
+  __forceinline void operator () (const vector<float, 4>& src, vector<float, 4>& res) const
+  {
+    static union {
+      size_t i;
+      float  f;  
+    } mask = {0x80000000};
+
+    _mm_storeu_ps (&res.x, _mm_xor_ps (to_m128 (src), _mm_set_ps1 (mask.f)));
+  }
+#endif
+};
+
+struct vec_abs {
+  template <class T, unsigned int Size>
+  void operator () (const vector<T, Size>& src, vector<T, Size>& res) const
+  {
+    for (unsigned int i=0; i<Size; i++)
+      res [i] = src [i] < T (0) ? -src [i] : src [i];
+  }
+
+#ifdef VECMATH_SSE    
+  __forceinline void operator () (const vector<float, 4>& src, vector<float, 4>& res) const
+  {
+    static union {
+      size_t i;
+      float  f;  
+    } mask = {0x7FFFFFFF};
+
+    _mm_storeu_ps (&res.x, _mm_and_ps (to_m128 (src), _mm_set_ps1 (mask.f)));
+  }
+#endif
+};
+
+struct vec_min {
+  template <class T, unsigned int Size>
+  void operator () (const vector<T, Size>& a, const vector<T, Size>& b, vector<T, Size>& res) const
+  {
+    for (unsigned int i=0; i<Size; i++)
+      res [i] = a [i] < b [i] ? a [i] : b [i];
+  }
+
+#ifdef VECMATH_SSE  
+  __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
+  {
+    _mm_storeu_ps (&res.x, _mm_min_ps (to_m128 (a), to_m128 (b)));
+  }
+#endif
+};
+
+struct vec_max {
+  template <class T, unsigned int Size>
+  void operator () (const vector<T, Size>& a, const vector<T, Size>& b, vector<T, Size>& res) const
+  {
+    for (unsigned int i=0; i<Size; i++)
+      res [i] = a [i] > b [i] ? a [i] : b [i];
+  }
+  
+#ifdef VECMATH_SSE  
+  __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
+  {
+    _mm_storeu_ps (&res.x, _mm_max_ps (to_m128 (a), to_m128 (b)));
+  }
+#endif
+};
+
+/*
+    Векторное произведение
+*/
+
+struct vec_cross_product {
+  template <class T>
+  void operator () (const vector<T, 3>& a, const vector<T, 3>& b, vector<T, 3>& res) const
+  {
+    res [0] = a [1] * b [2] - b [1] * a [2];
+    res [1] = b [0] * a [2] - b [2] * a [0];
+    res [2] = a [0] * b [1] - b [0] * a [1];
+  }
+
+  template <class T>
+  void operator () (const vector<T, 4>& a, const vector<T, 4>& b, vector<T, 4>& res) const
+  {
+    (*this) (reinterpret_cast<const vector<T, 3>&> (a), reinterpret_cast<const vector<T, 3>&> (b), reinterpret_cast<vector<T, 3>&> (res));
+  
+    res [3] = 0;
+  }
+  
+#ifdef VECMATH_SSE
+  __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
+  {
+    __m128 r0, r1, r2;
+
+    r0 = _mm_shuffle_ps (to_m128 (a), to_m128 (a), _MM_SHUFFLE (3, 1, 0, 2));
+    r1 = _mm_shuffle_ps (to_m128 (b), to_m128 (b), _MM_SHUFFLE (3, 0, 2, 1));
+    r2 = _mm_mul_ps     (r1, r0);
+
+    r0 = _mm_shuffle_ps (r0, r0, _MM_SHUFFLE (3, 1, 0, 2));
+    r1 = _mm_shuffle_ps (r1, r1, _MM_SHUFFLE (3, 0, 2, 1));
+    r1 = _mm_mul_ps     (r1, r0);
+
+    r1 = _mm_sub_ps     (r1,r2);
+
+    _mm_storeu_ps (&res.x, r1);
+  }
+#endif
+};
+
 }
 
-template <class T,size_t size> template <size_t size1>
-vec<T,size>::vec (const vec<T,size1>& v) 
+/*
+    Конструкторы
+*/
+
+template <class T, unsigned int Size>
+vector<T, Size>::vector ()
 {
-  vec_copy (*this,v);
+  detail::vec_assign_scalar ()(T (0), *this);
 }
 
-template <class T,size_t size> 
-vec<T,size>::vec (const T& a)
+template <class T, unsigned int Size> template <unsigned int Size1>
+vector<T, Size>::vector (const vector<T, Size1>& v) 
 {
-  vec_assign_scalar (*this,a);
+  detail::vec_copy ()(v, *this);
 }
 
-template <class T,size_t size> 
-vec<T,size>::vec (const base& b)
+template <class T, unsigned int Size> 
+vector<T, Size>::vector (const T& a)
+{
+  detail::vec_assign_scalar ()(a, *this);
+}
+
+template <class T, unsigned int Size> 
+vector<T, Size>::vector (const base& b)
   : base (b)
 {  
 }
 
-template <class T,size_t size> template <class T1>
-vec<T,size>::vec (const T1& a,void (*eval)(vec&,const T1&))
+template <class T, unsigned int Size> template <class T1, class Fn>
+vector<T, Size>::vector (const T1& a, Fn fn, return_value_tag)
 {
-  eval (*this,a);
+  fn (a, *this);
 }
 
-template <class T,size_t size> template <class T1,class T2>
-vec<T,size>::vec (const T1& a,const T2& b,void (*eval)(vec&,const T1&,const T2&))
+template <class T, unsigned int Size> template <class T1, class T2, class Fn>
+vector<T, Size>::vector (const T1& a, const T2& b, Fn fn, return_value_tag)
 {
-  eval (*this,a,b);  
+  fn (a, b, *this);
 }
 
-template <class T,size_t size>
-vec<T,size>::vec (const T& x1,const T& x2,const T& x3,const T& x4)
+template <class T, unsigned int Size> template <class T1, class T2, class T3, class Fn>
+vector<T, Size>::vector (const T1& a, const T2& b, const T3& c, Fn fn, return_value_tag)
 {
-  switch (size)
+  fn (a, b, c, *this);
+}
+
+template <class T, unsigned int Size>
+vector<T, Size>::vector (const T& x1, const T& x2, const T& x3, const T& x4)
+{
+  switch (Size)
   {
     default:
     {
-      for (size_t i=0;i<size-4;i++)
+      for (unsigned int i=0; i<Size-4; i++)
         (*this)[i+4] = T(0);
     }  
     case 4: (*this)[3] = x4;
@@ -56,262 +319,273 @@ vec<T,size>::vec (const T& x1,const T& x2,const T& x3,const T& x4)
   }
 }
 
-template <class T,size_t size>
-vec<T,size>::vec (const vec<T,size-1>& v,const T& a)
+template <class T, unsigned int Size>
+vector<T, Size>::vector (const vector<value_type, size-1>& v, const value_type& a)
 {
-  for (size_t i=0;i<size-1;i++)
+  for (unsigned int i=0;i<Size-1;i++)
     (*this)[i] = v [i];
 
-  (*this)[size-1] = a;
+  (*this)[Size-1] = a;
 }
 
 /*
-        Привсаивание
+    Присваивание
 */
 
-template <class T,size_t size> template <size_t size1>
-vec<T,size>& vec<T,size>::operator = (const vec<T,size1>& v)
+template <class T, unsigned int Size> template <unsigned int Size1>
+vector<T, Size>& vector<T, Size>::operator = (const vector<T, Size1>& v)
 {
-  vec_copy (*this,v);
+  detail::vec_copy ()(v, *this);
   return *this;
 } 
 
-template <class T,size_t size>
-vec<T,size>& vec<T,size>::operator = (const base& b)
+template <class T, unsigned int Size>
+vector<T, Size>& vector<T, Size>::operator = (const base& b)
 {
   base::operator = (b);
   return *this;
 } 
 
-template <class T,size_t size> 
-vec<T,size>& vec<T,size>::operator = (const T& a)
+template <class T, unsigned int Size> 
+vector<T, Size>& vector<T, Size>::operator = (const T& a)
 {
-  vec_assign_scalar (*this,a);
+  detail::vec_assign_scalar ()(a, *this);
   return *this;
 }
 
 /*
-        Базовые унарные опреации
+    Операции доступа
 */
 
-template <class T,size_t size>
-const vec<T,size>& vec<T,size>::operator + () const
-{ 
-  return *this; 
+template <class T, unsigned int Size>
+typename vector<T, Size>::value_type& vector<T, Size>::operator [] (unsigned int index)
+{
+  return (&x) [index];
 }
 
-template <class T,size_t size>
-const vec<T,size> vec<T,size>::operator - () const
-{ 
-  return vec (*this,vec_neg<T,size>);
-}
-
-template <class T,size_t size> 
-T vec<T,size>::operator ~ () const
-{ 
-  return vec_length (*this); 
+template <class T, unsigned int Size>
+const typename vector<T, Size>::value_type& vector<T, Size>::operator [] (unsigned int index) const
+{
+  return (&x) [index];
 }
 
 /*
-        Базовые бинарные операции
+    Базовые унарные опреации
 */
 
-template <class T,size_t size>
-T vec<T,size>::operator & (const vec& v) const
+template <class T, unsigned int Size>
+const vector<T, Size>& vector<T, Size>::operator + () const
 { 
-  return vec_dot_product (*this,v);
+  return *this;
 }
 
-template <class T,size_t size>
-vec<T,size>& vec<T,size>::operator += (const vec& v) 
+template <class T, unsigned int Size>
+vector<T, Size> vector<T, Size>::operator - () const
 { 
-  vec_add (*this,*this,v);
+  return vector (*this, detail::vec_neg (), return_value_tag ());
+}
+
+/*
+    Базовые бинарные операции
+*/
+
+template <class T, unsigned int Size>
+vector<T, Size>& vector<T, Size>::operator += (const vector& v) 
+{ 
+  detail::vec_add ()(*this, v, *this);
   return *this; 
 }
 
-template <class T,size_t size>
-vec<T,size>& vec<T,size>::operator -= (const vec& v) 
+template <class T, unsigned int Size>
+vector<T, Size>& vector<T, Size>::operator -= (const vector& v) 
 { 
-  vec_sub (*this,*this,v);
+  detail::vec_sub ()(*this, v, *this);
   return *this; 
 }
 
-template <class T,size_t size>
-vec<T,size>& vec<T,size>::operator *= (const vec& v) 
+template <class T, unsigned int Size>
+vector<T, Size>& vector<T, Size>::operator *= (const vector& v) 
 { 
-  vec_mul (*this,*this,v);
+  detail::vec_mul ()(*this, v, *this);
   return *this; 
 }
 
-template <class T,size_t size>
-vec<T,size>& vec<T,size>::operator /= (const vec& v) 
+template <class T, unsigned int Size>
+vector<T, Size>& vector<T, Size>::operator /= (const vector& v) 
 { 
-  vec_div (*this,*this,v);
+  detail::vec_div ()(*this, v, *this);
   return *this; 
 }
         
-template <class T,size_t size>
-vec<T,size>& vec<T,size>::operator *= (const T& d)
+template <class T, unsigned int Size>
+vector<T, Size>& vector<T, Size>::operator *= (const value_type& d)
 { 
-  vec_mul_scalar (*this,*this,d);
+  detail::vec_mul_scalar ()(*this, d, *this);
   return *this; 
 }
 
-template <class T,size_t size>
-vec<T,size>& vec<T,size>::operator /= (const T& d)
+template <class T, unsigned int Size>
+vector<T, Size>& vector<T, Size>::operator /= (const value_type& d)
 { 
-  vec_div_scalar (*this,*this,d);
+  detail::vec_div_scalar ()(*this, d, *this);
   return *this; 
 }
 
-template <class T,size_t size>
-const vec<T,size> vec<T,size>::operator + (const vec& v) const  
+template <class T, unsigned int Size>
+vector<T, Size> vector<T, Size>::operator + (const vector& v) const  
 { 
-  return vec (*this,v,vec_add<T,size>);
+  return vector (*this, v, detail::vec_add (), return_value_tag ());
 }
 
-template <class T,size_t size>
-const vec<T,size> vec<T,size>::operator - (const vec& v) const  
+template <class T, unsigned int Size>
+vector<T, Size> vector<T, Size>::operator - (const vector& v) const  
 { 
-  return vec (*this,v,vec_sub<T,size>);
+  return vector (*this, v, detail::vec_sub (), return_value_tag ());
 }
 
-template <class T,size_t size>
-const vec<T,size> vec<T,size>::operator * (const vec& v) const  
+template <class T, unsigned int Size>
+vector<T, Size> vector<T, Size>::operator * (const vector& v) const  
 { 
-  return vec (*this,v,vec_mul<T,size>);
+  return vector (*this, v, detail::vec_mul (), return_value_tag ());
 }
 
-template <class T,size_t size>
-const vec<T,size> vec<T,size>::operator / (const vec& v) const  
+template <class T, unsigned int Size>
+vector<T, Size> vector<T, Size>::operator / (const vector& v) const  
 { 
-  return vec (*this,v,vec_div<T,size>);
+  return vector (*this, v, detail::vec_div (), return_value_tag ());
 }
 
-template <class T,size_t size>
-const vec<T,size> vec<T,size>::operator * (const T& a) const  
+template <class T, unsigned int Size>
+vector<T, Size> vector<T, Size>::operator * (const T& a) const  
 { 
-  return vec (*this,a,vec_mul_scalar<T,size>);
+  return vector (*this, a, detail::vec_mul_scalar (), return_value_tag ());
 }
 
-template <class T,size_t size> 
-const vec<T,size> vec<T,size>::operator / (const T& a) const  
+template <class T, unsigned int Size> 
+vector<T, Size> operator * (const T& a, const vector<T, Size>& v)
+{
+  return v * a;
+}
+
+template <class T, unsigned int Size> 
+vector<T, Size> vector<T, Size>::operator / (const T& a) const  
 { 
-  return vec (*this,a,vec_div_scalar<T,size>);
+  return vector (*this, a, detail::vec_div_scalar (), return_value_tag ());
 }
 
 /*
-        Сравнение векторов
+    Сравнение векторов
 */
 
-template <class T,size_t size>
-bool vec<T,size>::operator == (const vec& v) const
+template <class T, unsigned int Size>
+bool vector<T, Size>::operator == (const vector& v) const
 {
-  return vec_equal (*this,v);
+  for (unsigned int i=0; i<Size; i++)
+    if ((*this)[i] != v [i])
+      return false;
+
+  return true;
 }
 
-template <class T,size_t size>
-bool vec<T,size>::operator != (const vec& v) const
+template <class T, unsigned int Size>
+bool vector<T, Size>::operator != (const vector& v) const
 {
-  return vec_nequal (*this,v);
+  return !(*this == v);
 }
-
-/*template <class T,size_t size>
-vec<T,size>::operator const vec<T,size-1>& () const
-{
-  return *(const vec<T,size-1>*)this;
-}
-
-template <class T,size_t size>
-vec<T,size>::operator vec<T,size-1>& ()
-{
-  return *(vec<T,size-1>*)this;
-} */
 
 /*
-        Утилиты
+    Утилиты
 */
 
-template <class T,size_t size> 
-T dot (const vec<T,size>& a,const vec<T,size>& b)
+template <class T, unsigned int Size> 
+typename vector<T, Size>::value_type dot (const vector<T, Size>& a, const vector<T, Size>& b)
 {
-  return vec_dot_product (a,b);
+  T result = 0;
+
+  for (unsigned int i=0; i<Size; i++)
+    result += a [i] * b [i];
+
+  return result;
 }
 
-template <class T,size_t size> 
-const vec<T,size> abs (const vec<T,size>& v)
+template <class T, unsigned int Size> 
+vector<T, Size> abs (const vector<T, Size>& v)
 {
-  return vec<T,size> (v,vec_abs<T,size>);
+  return vector<T, Size> (v, detail::vec_abs (), return_value_tag ());
 }
 
-template <class T,size_t size>
-const vec<T,size> min (const vec<T,size>& a,const vec<T,size>& b)
+template <class T, unsigned int Size>
+vector<T, Size> min (const vector<T, Size>& a, const vector<T, Size>& b)
 {
-  return vec<T,size> (a,b,vec_min<T,size>);
+  return vector<T, Size> (a, b, detail::vec_min (), return_value_tag ());
 }
 
-template <class T,size_t size>
-const vec<T,size> max (const vec<T,size>& a,const vec<T,size>& b)
+template <class T, unsigned int Size>
+vector<T, Size> max (const vector<T, Size>& a, const vector<T, Size>& b)
 {
-  return vec<T,size> (a,b,vec_max<T,size>);
+  return vector<T, Size> (a, b, detail::vec_max (), return_value_tag ());
 } 
 
-template <class T,size_t size> 
-const vec<T,size> normalize (const vec<T,size>& v)
+/*
+    Длина и нормализация
+*/
+
+template <class T, unsigned int Size> 
+typename vector<T, Size>::value_type qlen (const vector<T, Size>& v)
 {
-  return vec<T,size> (v,vec_normalize<T,size>);
+  return dot (v, v);
 }
 
-template <class T,size_t size> 
-T length (const vec<T,size>& v)
+template <class T, unsigned int Size>
+T length (const vector<T, Size>& v)
 {
-  return vec_length (v);
+  return sqrt (qlen (v));
 }
 
-template <class T,size_t size> 
-T qlen (const vec<T,size>& v)
+template <unsigned int Size>
+float length (const vector<float, Size>& v)
 {
-  return vec_qlength (v);
+  return sqrtf (qlen (v));
 }
 
-template <class T,size_t size> 
-bool equal (const vec<T,size>& a,const vec<T,size>& b,const T& eps)
+template <unsigned int Size>
+long double length (const vector<long double, Size>& v)
 {
-  return vec_equal (a,b,eps);
+  return sqrtl (qlen (v));
 }
 
-template <class T,size_t size>
-T angle (const vec<T,size>& a,const vec<T,size>& b)
+template <class T, unsigned int Size> 
+vector<T, Size> normalize (const vector<T, Size>& v)
 {
-  T ang = acos((a&b)/sqrt(qlen(a)*qlen(b)));
+  return vector<T, Size> (v, length (v), detail::vec_div_scalar (), return_value_tag ());
+}
 
-  return _isnan(ang)?0:ang;
+template <class T, unsigned int Size> 
+bool equal (const vector<T, Size>& a, const vector<T, Size>& b, const T& eps)
+{
+  vector<T, Size> tmp (a, b, detail::vec_sub (), return_value_tag ());
+
+  detail::vec_abs ()(tmp, tmp);
+
+  for (unsigned int i=0; i<Size; i++)
+    if (tmp [i] > eps)
+      return false;
+
+  return true;
 }
 
 /*
     Векторное произведение
 */
 
-template <class type>
-vec<type,3> cross (const vec<type,3>& a,const vec<type,3>& b)
+template <class T>
+vector<T, 3> cross (const vector<T, 3>& a, const vector<T, 3>& b)
 {
-  return vec<type,3> (a,b,vec_cross_product<type>);
+  return vector<T, 3> (a, b, detail::vec_cross_product (), return_value_tag ());
 }
 
-template <class type>
-vec<type,4> cross (const vec<type,4>& a,const vec<type,4>& b)
+template <class T>
+vector<T, 4> cross (const vector<T, 4>& a, const vector<T, 4>& b)
 {
-  return vec<type,4> (a,b,vec_cross_product<type>);
-}
-
-template <class type>
-vec<type,3> operator ^ (const vec<type,3>& a,const vec<type,3>& b)
-{
-  return vec<type,3> (a,b,vec_cross_product<type>);
-}
-
-template <class type>
-vec<type,4> operator ^ (const vec<type,4>& a,const vec<type,4>& b)
-{
-  return vec<type,4> (a,b,vec_cross_product<type>);
+  return vector<T, 4> (a, b, detail::vec_cross_product (), return_value_tag ());
 }

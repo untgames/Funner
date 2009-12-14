@@ -1,0 +1,4 @@
+Results of utility_to_quat_test:
+to_quat(m): [0.000, 0.000, 0.707] 0.707
+to_quat(angle, axis): [0.000, 0.000, 0.707] 0.707
+to_quat(pitch, yaw, roll): [0.000, 0.000, 0.707] 0.707

@@ -1,7 +1,7 @@
-#ifndef MATHLIB_IO_HEADER
-#define MATHLIB_IO_HEADER
+#ifndef MATHLIB_VECMATH_IO_HEADER
+#define MATHLIB_VECMATH_IO_HEADER
 
-#include <stddef.h>
+#include <cstddef>
 
 #include <xtl/lexical_cast.h>
 #include <xtl/token_iterator.h>

@@ -1,0 +1,14 @@
+Results of angle02_test:
+a1: 30.000 deg
+a2: 45.000 deg
++a1: 30.000 deg
+-a1: -30.000 deg
+a1+a2: 75.000 deg
+a1-a2: -15.000 deg
+a1*2: 60.000 deg
+2*a1: 60.000 deg
+a1/2: 15.000 deg
+a1+=a2: 75.000 deg
+a1-=a2: -15.000 deg
+a1*=2: 60.000 deg
+a1/=2: 15.000 deg

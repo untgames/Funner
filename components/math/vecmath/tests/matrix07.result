@@ -1,0 +1,7 @@
+Results of matrix07_test:
+m1==m1: true
+m1!=m1: false
+m1==m2: false
+m1!=m2: true
+equal(m1,m2,0.1): true
+equal(m1,m2,0.05): false

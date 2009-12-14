@@ -1,10 +1,12 @@
-#ifndef __MATHLIB_VECTOR__
-#define __MATHLIB_VECTOR__
+#ifndef MATHLIB_VECMATH_VECTOR_HEADER
+#define MATHLIB_VECMATH_VECTOR_HEADER
 
-#include <stddef.h>
+#ifdef VECMATH_SSE
+  #include <xmmintrin.h>
+#endif
 
 #ifdef _MSC_VER
-  #pragma pack (push,1)
+  #pragma pack (push, 1)
 #endif
 
 #undef min
@@ -13,204 +15,185 @@
 namespace math
 {
 
+//для оптимизации возвращаемого значения
+struct return_value_tag {};
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///Векторная база по умолчанию
 ////////////////////////////////////////////////////////////////////////////////////////////
-template <class type,size_t size> struct vec_base
-{
-  type&       operator [] (size_t index)       { return x [index]; }
-  const type& operator [] (size_t index) const { return x [index]; }
- 
-  type x [size];
-};
-
-template <class type> struct vec_base<type,2>
-{
-  type&       operator [] (size_t index)       { return (&x) [index]; }
-  const type& operator [] (size_t index) const { return (&x) [index]; }
- 
-  type x,y;
-};
-
-template <class type> struct vec_base<type,3>
-{
-  type&       operator [] (size_t index)       { return (&x) [index]; }
-  const type& operator [] (size_t index) const { return (&x) [index]; }
- 
-  type x,y,z;
-};
-
-template <class type> struct vec_base<type,4>
-{
-  type&       operator [] (size_t index)       { return (&x) [index]; }
-  const type& operator [] (size_t index) const { return (&x) [index]; }
- 
-  type x,y,z,w;
-};
+template <class T, unsigned int Size> struct vector_base       { T x [Size]; };
+template <class T>                    struct vector_base<T, 2> { T x, y; };
+template <class T>                    struct vector_base<T, 3> { T x, y, z; };
+template <class T>                    struct vector_base<T, 4> { T x, y, z, w; };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //Вектор 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class type,size_t size>
-class vec: public vec_base<type,size>
+template <class T, unsigned int Size>
+class vector: public vector_base<T, Size>
 {
   public:
-    typedef vec_base<type,size> base;
-    typedef type                value_type;
+    typedef vector_base<T, Size> base;
+    typedef T                    value_type;
 
-    enum { _size = size }; //исправить!!!
+    enum { size = Size };
 
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
-////////////////////////////////////////////////////////////////////////////////////////////
-    vec ();
-    vec (const type&);
-    vec (const base&);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    vector ();
+    vector (const value_type&);
+    vector (const base&);
+    vector (const value_type&, const value_type&, const value_type& = 0, const value_type& = 0); 
+    vector (const vector<value_type, size-1>&, const value_type&);
 
-      //это решение - не лучшее, но оно меня устраивает
-    vec (const type&,const type&,const type& = 0,const type& = 0); 
-    vec (const vec<type,size-1>&,const type&);
+    template <unsigned int Size1> vector (const vector<value_type, Size1>&);
 
       //для использования оптимизации возвращаемого значения
-    template <class T>           vec (const T&,void (*eval)(vec&,const T&));
-    template <class T1,class T2> vec (const T1&,const T2&,void (*eval)(vec&,const T1&,const T2&));
+    template <class T, class Fn>                      vector (const T& arg, Fn fn, return_value_tag);                   //fn (arg, *this)
+    template <class T1, class T2, class Fn>           vector (const T1& arg1, const T2& arg2, Fn fn, return_value_tag); //fn (arg1, arg2, *this)
+    template <class T1, class T2, class T3, class Fn> vector (const T1& arg1, const T2& arg2, const T3& arg3, Fn fn, return_value_tag); //fn (arg1, arg2, arg3, *this)
 
-    template <size_t size1>         vec (const vec<type,size1>&); 
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Унарный +,-, длина (~)
-////////////////////////////////////////////////////////////////////////////////////////////
-    const vec&   operator +  () const;
-    const vec    operator -  () const;
-          type   operator ~  () const;
-
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Присваивание
-////////////////////////////////////////////////////////////////////////////////////////////
-    vec&   operator =  (const type&); 
-    vec&   operator =  (const base&);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    vector& operator = (const value_type&); 
+    vector& operator = (const base&);
 
-    template <size_t size1> vec& operator = (const vec<type,size1>&); 
+    template <unsigned int Size1> vector& operator = (const vector<value_type, Size1>&); 
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Индексирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    value_type&       operator [] (unsigned int index);
+    const value_type& operator [] (unsigned int index) const;
 
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Унарные операции
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const vector& operator + () const;
+          vector  operator - () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Основные бинарные операции
-////////////////////////////////////////////////////////////////////////////////////////////
-    vec&      operator += (const vec&);
-    vec&      operator -= (const vec&);
-    vec&      operator *= (const vec&);
-    vec&      operator /= (const vec&);
-    vec&      operator *= (const type&);
-    vec&      operator /= (const type&);
-    const vec operator +  (const vec&) const;
-    const vec operator -  (const vec&) const;
-    const vec operator *  (const vec&) const;
-    const vec operator /  (const vec&) const;
-    const vec operator *  (const type&) const;
-    const vec operator /  (const type&) const;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    vector& operator += (const vector&);
+    vector& operator -= (const vector&);
+    vector& operator *= (const vector&);
+    vector& operator /= (const vector&);
+    vector& operator *= (const value_type&);
+    vector& operator /= (const value_type&);
+    vector  operator +  (const vector&) const;
+    vector  operator -  (const vector&) const;
+    vector  operator *  (const vector&) const;
+    vector  operator /  (const vector&) const;
+    vector  operator *  (const value_type&) const;
+    vector  operator /  (const value_type&) const;
 
-    friend const vec operator *  (const type& a,const vec& v)    { return v * a; }
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Умножение вектора строки на матрицу столбец
-////////////////////////////////////////////////////////////////////////////////////////////
-    vec&      operator *= (const matrix<type,size>&);
-    vec&      operator *= (const matrix<type,size+1>&);
-
-    const vec operator *  (const matrix<type,size>&) const;
-    const vec operator *  (const matrix<type,size+1>&) const;
-
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отношения между векторами           
-////////////////////////////////////////////////////////////////////////////////////////////
-    bool operator == (const vec&) const;      
-    bool operator != (const vec&) const;
-
-////////////////////////////////////////////////////////////////////////////////////////////
-///Cкалярное произведение
-////////////////////////////////////////////////////////////////////////////////////////////
-    type operator &  (const vec&) const;
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool operator == (const vector&) const;
+    bool operator != (const vector&) const;
 };
-
-template <class type> class vec<type,0> {};
 
 #ifdef _MSC_VER
   #pragma pack(pop)
 #endif
 
-////////////////////////////////////////////////////////////////////////////////////////////
-///Базовые операции
-////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> class vector<T, 0> {};
 
-////////////////////////////////////////////////////////////////////////////////////////////
-///Утилиты
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Переопределения типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef vector<float,2>          vec2f;
+typedef vector<double,2>         vec2d;
+typedef vector<int,2>            vec2i;
+typedef vector<unsigned int,2>   vec2ui;
+typedef vector<short,2>          vec2s;
+typedef vector<unsigned short,2> vec2us;
+typedef vector<char,2>           vec2b;
+typedef vector<unsigned char,2>  vec2ub;
 
-////////////////////////////////////////////////////////////////////////////////////////////
+typedef vector<float,3>          vec3f;
+typedef vector<double,3>         vec3d;
+typedef vector<int,3>            vec3i;
+typedef vector<unsigned int,3>   vec3ui;
+typedef vector<short,3>          vec3s;
+typedef vector<unsigned short,3> vec3us;
+typedef vector<char,3>           vec3b;
+typedef vector<unsigned char,3>  vec3ub;
+
+typedef vector<float,4>          vec4f;
+typedef vector<double,4>         vec4d;
+typedef vector<int,4>            vec4i;
+typedef vector<unsigned int,4>   vec4ui;
+typedef vector<short,4>          vec4s;
+typedef vector<unsigned short,4> vec4us;
+typedef vector<char,4>           vec4b;
+typedef vector<unsigned char,4>  vec4ub;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Умножение скаляра на вектор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T, unsigned int Size> 
+vector<T, Size> operator * (const T& a, const vector<T, Size>& v);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Скалярное произведение
-////////////////////////////////////////////////////////////////////////////////////////////
-template <class type,size_t size> 
-type dot (const vec<type,size>&,const vec<type,size>&); 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T, unsigned int Size> 
+typename vector<T, Size>::value_type dot (const vector<T, Size>&, const vector<T, Size>&); 
 
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Равенство векторов с заданной погрешностью
-////////////////////////////////////////////////////////////////////////////////////////////    
-template <class type,size_t size>
-bool equal (const vec<type,size>&,const vec<type,size>&,const type& eps); 
+///////////////////////////////////////////////////////////////////////////////////////////////////    
+template <class T, unsigned int Size>
+bool equal (const vector<T, Size>&, const vector<T, Size>&, const T& eps); 
 
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Длина вектора
-////////////////////////////////////////////////////////////////////////////////////////////                
-template <class type,size_t size>                          
-type length (const vec<type,size>&); 
+///////////////////////////////////////////////////////////////////////////////////////////////////                
+template <class T, unsigned int Size>                          
+typename vector<T, Size>::value_type length (const vector<T, Size>&); 
 
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Квадрат длины
-////////////////////////////////////////////////////////////////////////////////////////////                
-template <class type,size_t size>
-type qlen (const vec<type,size>&);
+///////////////////////////////////////////////////////////////////////////////////////////////////                
+template <class T, unsigned int Size>
+typename vector<T, Size>::value_type qlen (const vector<T, Size>&);
 
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Возвращает нормированный вектор
-////////////////////////////////////////////////////////////////////////////////////////////                
-template <class type,size_t size>                          
-const vec<type,size> normalize (const vec<type,size>&);
+///////////////////////////////////////////////////////////////////////////////////////////////////                
+template <class T, unsigned int Size>                          
+vector<T, Size> normalize (const vector<T, Size>&);
 
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Возвращает покоординатный модуль
-////////////////////////////////////////////////////////////////////////////////////////////                
-template <class type,size_t size>                          
-const vec<type,size> abs (const vec<type,size>&); 
+///////////////////////////////////////////////////////////////////////////////////////////////////                
+template <class T, unsigned int Size>                          
+vector<T, Size> abs (const vector<T, Size>&); 
 
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Покомпонентный минимум/максимум
-////////////////////////////////////////////////////////////////////////////////////////////                
-template <class type,size_t size>
-const vec<type,size> min (const vec<type,size>&,const vec<type,size>&); 
+///////////////////////////////////////////////////////////////////////////////////////////////////                
+template <class T, unsigned int Size>
+vector<T, Size> min (const vector<T, Size>&, const vector<T, Size>&); 
 
-template <class type,size_t size>
-const vec<type,size> max (const vec<type,size>&,const vec<type,size>&); 
+template <class T, unsigned int Size>
+vector<T, Size> max (const vector<T, Size>&, const vector<T, Size>&); 
 
-////////////////////////////////////////////////////////////////////////////////////////////
-///Угол между векторами
-////////////////////////////////////////////////////////////////////////////////////////////
-template <class type,size_t size>
-type angle (const vec<type,size>& a,const vec<type,size>& b);
-
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Векторное произведение
-////////////////////////////////////////////////////////////////////////////////////////////
-template <class type>
-vec<type,3> cross (const vec<type,3>& a,const vec<type,3>& b);
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T>
+vector<T, 3> cross (const vector<T, 3>& a, const vector<T, 3>& b);
 
-template <class type>
-vec<type,4> cross (const vec<type,4>& a,const vec<type,4>& b);
+template <class T>
+vector<T, 4> cross (const vector<T, 4>& a, const vector<T, 4>& b);
 
-template <class type>
-vec<type,3> operator ^ (const vec<type,3>& a,const vec<type,3>& b);
-
-template <class type>
-vec<type,4> operator ^ (const vec<type,4>& a,const vec<type,4>& b);
+#include <math/detail/vector.inl>
 
 }
 

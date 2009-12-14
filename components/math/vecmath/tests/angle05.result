@@ -1,0 +1,9 @@
+Results of angle05_test:
+abs(degree(-30.0f)): 30.000 deg
+a: 0.000 deg
+sin(a)=0.0000
+cos(a)=1.0000
+tan(a)=0.0000
+sinh(a)=0.0000
+cosh(a)=1.0000
+tanh(a)=0.0000

@@ -1,0 +1,4 @@
+Results of quat08_test:
+q: [1.000, 2.000, 3.000] 4.000
+inverse (q): [-0.033, -0.067, -0.100] 0.133
+test inverse: true

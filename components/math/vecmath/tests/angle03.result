@@ -1,0 +1,12 @@
+Results of angle03_test:
+a1: 30.000 deg
+a2: 45.000 deg
+a1==a1: true
+a1==a2: false
+a1!=a2: true
+a1<a2: true
+a1>a2: false
+a1<=a2: true
+a1>=a2: false
+a1<=a1: true
+a1>=a1: true
