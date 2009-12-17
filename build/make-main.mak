@@ -690,11 +690,15 @@ define import_variables
   $2.COMPONENTS           := $$($2.COMPONENTS) $$($1.COMPONENTS)  
 endef
 
-#Импортирование настроек (имя зависимости, имя цели)
-define import_settings
+#Предварительный импорт настроек - построение списка импорта (имя зависимости, имя цели, имя переменной со списком)
+define prepare_to_import_settings
+
 # Проверка циклического импорта
-ifeq (,$$(filter $1,$$(PROCESSED_IMPORTS)))
-  PROCESSED_IMPORTS := $$(PROCESSED_IMPORTS) $1
+ifneq (,$$(filter $1,$$($3)))
+  $3 := $$(foreach imp,$$($3),$$(if $$(filter $1,$$(imp)),,$$(imp)))
+endif
+
+  $3 := $$($3) $1
 
 #Проверка наличия компонента
 ifeq (,$$(paths.$1))
@@ -703,17 +707,17 @@ ifeq (,$$(paths.$1))
   endif
 endif
 
-#Изменение настроек  
-  $$(eval $$(call import_variables,$(EXPORT_VAR_PREFIX).$1,$2,$$(patsubst $(COMPONENT_DIR)%,%,$$(paths.$1))))
-  $$(foreach profile,$(PROFILES),$$(eval $$(call import_variables,$(EXPORT_VAR_PREFIX).$1.$$(profile),$2,$$(patsubst $(COMPONENT_DIR)%,%,$$(paths.$1)))))
-
 #Импортирование вложенных зависимостей
   DEPENDENCY_IMPORTS := $$($(EXPORT_VAR_PREFIX).$1.IMPORTS) $$(foreach profile,$(PROFILES),$$($(EXPORT_VAR_PREFIX).$1.$$(profile).IMPORTS))
 
-  $$(foreach imp,$$(DEPENDENCY_IMPORTS),$$(eval $$(call import_settings,$$(imp),$2)))
+  $$(foreach imp,$$(DEPENDENCY_IMPORTS),$$(eval $$(call prepare_to_import_settings,$$(imp),$2,$3)))
+endef
 
-endif
-
+#Импортирование настроек (имя зависимости, имя цели)
+define import_settings
+#Изменение настроек  
+  $$(eval $$(call import_variables,$(EXPORT_VAR_PREFIX).$1,$2,$$(patsubst $(COMPONENT_DIR)%,%,$$(paths.$1))))
+  $$(foreach profile,$(PROFILES),$$(eval $$(call import_variables,$(EXPORT_VAR_PREFIX).$1.$$(profile),$2,$$(patsubst $(COMPONENT_DIR)%,%,$$(paths.$1)))))
 endef
 
 #Импорт значений toolset-настроек (имя цели, имя профиля)
@@ -729,8 +733,13 @@ define process_target_common
   $$(foreach profile,$$(PROFILES),$$(eval $1.IMPORTS := $$($1.IMPORTS) $$($1.$$(profile).IMPORTS)))  
 
     #Импорт настроек
-  $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
-  
+
+  $1.PROCESSED_IMPORTS :=
+
+#  $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
+  $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call prepare_to_import_settings,$$(imp),$1,$1.PROCESSED_IMPORTS)))
+  $$(foreach imp,$$($1.PROCESSED_IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
+
     #Добавление toolset-настроек к общему списку настроек
   $$(foreach profile,$$(PROFILES),$$(eval $$(call import_toolset_settings,$1,$$(profile))))  
 
