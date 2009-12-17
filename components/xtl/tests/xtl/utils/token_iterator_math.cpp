@@ -1,7 +1,8 @@
 #include <stdio.h>
+#include <math/vector.h>
+#include <math/matrix.h>
+#include <math/quat.h>
 #include <xtl/token_iterator.h>
-#include <mathlib.h>
-#include <math/io.h>
 
 void print (const char* s)
 {
@@ -19,7 +20,7 @@ void print (double v)
 }
 
 template <class T, size_t size>
-void print (const math::vec<T, size>& v)
+void print (const math::vector<T, size>& v)
 {
   printf ("value=[");
 

@@ -39,27 +39,27 @@ inline list_iterator<T>::list_iterator (Node* _node)
  { }  
  
 template <class T>
-inline list_iterator<T>::list_iterator (const iterator& i)
-  : node (((list_iterator&)i).node)
- { }   
- 
+list_iterator<T>::list_iterator (const iterator& i)
+  : node (const_cast<Node*> (i.node))
+ { }
+
 template <class T>
-inline list_iterator<T>& list_iterator<T>::operator = (const iterator& i)
+list_iterator<T>& list_iterator<T>::operator = (const iterator& i)
 { 
-  node = ((list_iterator&)i).node;
+  node = const_cast<Node*> (i.node);
   return *this;
-}    
+}
     
 template <class T> 
 inline typename list_iterator<T>::reference list_iterator<T>::operator * () const
 {
-  return ((typename list<T>::Node*)node)->data;
+  return static_cast<typename list<value_type>::Node*> (node)->data;
 }
 
 template <class T> 
 inline typename list_iterator<T>::pointer list_iterator<T>::operator -> () const
 {
-  return &((typename list<T>::Node*)node)->data;
+  return &**this;
 }
 
 template <class T> 
@@ -203,7 +203,7 @@ template <class T,class Allocator> inline typename list<T,Allocator>::iterator l
 template <class T,class Allocator>
 inline typename list<T,Allocator>::iterator list<T,Allocator>::end ()
 {
-  return &base;
+  return const_cast<list_node_base*> (&base);
 }
 
 template <class T,class Allocator>
@@ -215,7 +215,7 @@ inline typename list<T,Allocator>::const_iterator list<T,Allocator>::begin () co
 template <class T,class Allocator>
 inline typename list<T,Allocator>::const_iterator list<T,Allocator>::end () const
 {
-  return (Node*)&base;
+  return const_cast<list_node_base*> (&base);
 }
 
 template <class T,class Allocator>
@@ -445,7 +445,7 @@ void list<T,Allocator>::clear ()
     delete_node (tmp);
   }
   
-  base.prev = base.next = &base;
+  base.prev = base.next = const_cast<list_node_base*> (&base);
 }
 
 /*
@@ -523,8 +523,8 @@ inline void list<T,Allocator>::swap (list<T,Allocator>& x)
   {
     list_node_base *prev = base.prev, *x_prev = x.base.prev;
 
-    prev->next   = base.next->prev   = &x.base;
-    x_prev->next = x.base.next->prev = &base;
+    prev->next   = base.next->prev   = const_cast<list_node_base*> (&x.base);
+    x_prev->next = x.base.next->prev = const_cast<list_node_base*> (&base);
     
     stl::swap (base.prev,x.base.prev);
     stl::swap (base.next,x.base.next);  

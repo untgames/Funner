@@ -70,6 +70,8 @@ class rbtree_iterator
     rbtree_iterator ();
     rbtree_iterator (const iterator&);
     
+    rbtree_iterator& operator = (const iterator&);
+    
     reference         operator *  () const;
     pointer           operator -> () const;
     rbtree_iterator&  operator ++ ();

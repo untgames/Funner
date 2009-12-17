@@ -37,6 +37,7 @@ XTL.XTL.TESTS.EXECTUTION_DIR       :=
 XTL.XTL.TESTS.LIBS                 :=
 XTL.XTL.TESTS.COMPILER_CFLAGS      :=
 XTL.XTL.TESTS.COMPILER_DEFINES     := __MYSTL_STANDALONE__
+XTL.XTL.TESTS.IMPORTS              := compile.math.vecmath
 XTL.XTL.TESTS.haswchar.SOURCE_DIRS := tests/xtl/utils/wchar
 
 #XTL SDK

@@ -7,7 +7,7 @@
 namespace stl
 {
 
-//implementation forwards
+//forward declarations
 template <class Iter>      struct iterator_traits;
 template <class Container> class  back_insert_iterator;
 template <class Container> class  front_insert_iterator;
@@ -15,6 +15,16 @@ template <class Container> class  insert_iterator;
                            struct random_access_iterator_tag;
 
 template <class T, class CharT, class Allocator> class basic_string;
+
+}
+
+namespace math
+{
+
+//forward declarations
+template <class T, unsigned int Size> class vector;
+template <class T, unsigned int Size> class matrix;
+template <class T>                    class quat;
 
 }
 
@@ -196,7 +206,20 @@ template <class Value, class Token, class BaseIter> Value get (token_iterator<To
 template <class Token, class BaseIter, class Value>
 void read (token_iterator<Token, BaseIter>&, Value& value, const Value& default_value);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Чтение математических типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Token, class BaseIter, class T, unsigned int Size>
+bool read (token_iterator<Token, BaseIter>&, math::vector<T, Size>&);
+
+template <class Token, class BaseIter, class T, unsigned int Size>
+bool read (token_iterator<Token, BaseIter>&, math::matrix<T, Size>&);
+
+template <class Token, class BaseIter, class T>
+bool read (token_iterator<Token, BaseIter>&, math::quat<T>&);
+
 #include <xtl/detail/io/token_iterator.inl>
+#include <xtl/detail/io/token_iterator_math.inl>
 
 }
 

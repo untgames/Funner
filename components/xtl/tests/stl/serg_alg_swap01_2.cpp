@@ -24,8 +24,8 @@ int main ()
   print ("v1 =", v1.begin (), v1.end ());
   print ("l1 =", l1.begin (), l1.end ());
 
-  iter_swap (v1.begin (), l1.begin ());
-
+  iter_swap (v1.begin (), l1.begin ());  
+  
   printf ("After exchanging first elements:\n");
   print ("v1 =", v1.begin (), v1.end ());
   print ("l1 =", l1.begin (), l1.end ());

@@ -30,6 +30,21 @@ struct list_node_base
   list_node_base ();
   
   static void transfer (list_node_base* position,list_node_base* first,list_node_base* last);
+
+  private:
+    list_node_base (const list_node_base&); //no implementation
+    list_node_base& operator = (const list_node_base&); //no implementation
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+///Типизированный узел списка
+/////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct list_node: public list_node_base
+{
+  T data;
+
+  private:
+    list_node (const T&); //avoid MSVC warnings (no implementation)
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +101,7 @@ class list_iterator
   private:          
     typedef list_node_base Node;
 
-    list_iterator (Node*);    
+    list_iterator (Node*);
 
   private:  
     Node* node;  
@@ -98,8 +113,8 @@ class list_iterator
 template <class T,class Allocator=typename default_allocator<T>::allocator_type>
 class list
 {
-  friend class list_iterator<T>;
-  struct Node;
+  template <class T1> friend class list_iterator;
+  typedef list_node<typename non_const_type<T>::value_type> Node;
   public:      
     typedef typename Allocator::template rebind<Node>::other allocator_type;
     typedef size_t                                           size_type;
@@ -231,13 +246,6 @@ class list
     bool operator >= (const list&) const;
 
   private:
-    struct Node: public list_node_base
-    {
-      value_type data;
-      
-      Node (const value_type&); //avoid MSVC warnings (no implementation)
-    };
-     
     Node* create_node (const value_type&);
     Node* create_node ();
     void  delete_node (Node*);
@@ -251,7 +259,7 @@ class list
         
   private:
     allocator_type allocator;
-    list_node_base base;
+    volatile list_node_base base; //avoid gcc 4.3.0 optimization bug
 };
 
 /////////////////////////////////////////////////////////////////////////

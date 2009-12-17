@@ -341,19 +341,26 @@ inline rbtree_iterator<Val,Ref,Ptr>::rbtree_iterator (link_type link)
 
 template <class Val,class Ref,class Ptr>
 inline rbtree_iterator<Val,Ref,Ptr>::rbtree_iterator (const iterator& i)
-  : node (((rbtree_iterator&)i).node)
+  : node (static_cast<rbtree_node<Val>*> (i.node))
 { }
+
+template <class Val,class Ref,class Ptr>
+inline rbtree_iterator<Val,Ref,Ptr>& rbtree_iterator<Val,Ref,Ptr>::operator = (const iterator& i)
+{
+  node = static_cast<rbtree_node<Val>*> (i.node);
+  return *this;
+}
     
 template <class Val,class Ref,class Ptr>
 inline typename rbtree_iterator<Val,Ref,Ptr>::reference rbtree_iterator<Val,Ref,Ptr>::operator * () const
 {
-  return ((rbtree_node<Val>*)node)->value;
+  return static_cast<rbtree_node<Val>*> (node)->value;
 }
 
 template <class Val,class Ref,class Ptr>
 inline typename rbtree_iterator<Val,Ref,Ptr>::pointer rbtree_iterator<Val,Ref,Ptr>::operator -> () const
 {
-  return &((rbtree_node<Val>*)node)->value;
+  return &**this;
 }
 
 template <class Val,class Ref,class Ptr>
