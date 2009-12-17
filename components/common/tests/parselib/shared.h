@@ -10,8 +10,8 @@
 
 #include <xtl/function.h>
 
-#include <mathlib.h>
-#include <math/io.h>
+#include <math/matrix.h>
+#include <math/quat.h>
 
 #include <common/parser.h>
 #include <common/strlib.h>

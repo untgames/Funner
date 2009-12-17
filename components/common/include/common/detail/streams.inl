@@ -89,3 +89,25 @@ inline void write (OutputTextStream& stream, const xtl::iterator_range<FwdIter>&
 {
   write_range (stream, range.begin (), range.end ());
 }
+
+/*
+    Сериализация математических типов
+*/
+
+template <class T, unsigned int Size>
+inline void write (common::OutputTextStream& stream, const math::vector<T, Size>& value, const char* format)
+{
+  write_range (stream, &value [0], &value [Size], format);
+}
+
+template <class T, unsigned int Size>
+inline void write (common::OutputTextStream& stream, const math::matrix<T, Size>& value, const char* format)
+{
+  write_range (stream, &value [0][0], &value [Size-1][Size], format);
+}
+
+template <class T>
+inline void write (common::OutputTextStream& stream, const math::quat<T>& value, const char* format)
+{
+  write_range (stream, &value [0], &value [4], format);
+}

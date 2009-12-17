@@ -79,7 +79,7 @@ void Test::Translate (const char* type_name, const char* tag, const T& default_v
 template <class T>
 void Test::TranslateArray (const char* type_name, const char* tag, size_t count)
 {
-  vector<T> v;
+  stl::vector<T> v;
 
   read (parser.Root (), tag, back_inserter (v), count);
   Print (type_name, tag, v.size (), &v [0]);

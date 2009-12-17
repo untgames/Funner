@@ -14,8 +14,8 @@
 #include <common/wxf_writer.h>
 #include <common/xml_writer.h>
 
-#include <mathlib.h>
-#include <math/io.h>
+#include <math/matrix.h>
+#include <math/quat.h>
 
 using namespace common;
 using namespace math;

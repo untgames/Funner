@@ -21,6 +21,16 @@ template <class FwdIter> class iterator_range;
 
 }
 
+namespace math
+{
+
+//forward declarations
+template <class T, unsigned int Size> class vector;
+template <class T, unsigned int Size> class matrix;
+template <class T>                    class quat;
+
+}
+
 namespace common
 {
 
@@ -253,6 +263,18 @@ void write (OutputTextStream&, long double value, const char* format="");
 ///    ""      - вывод в численном виде (0, 1)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void write (OutputTextStream&, bool value, const char* format);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сериализация математических типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T, size_t size>
+void write (OutputTextStream&, const math::vector<T, size>& value, const char* format="");
+
+template <class T, size_t size>
+void write (OutputTextStream&, const math::matrix<T, size>& value, const char* format="");
+
+template <class T>
+void write (OutputTextStream&, const math::quat<T>& value, const char* format="");
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Вывод интервалов
