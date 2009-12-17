@@ -257,14 +257,14 @@ struct vec_cross_product {
     Приведение к строке
 */
 
-template <size_t size, class String, class T>
+template <unsigned int size, class String, class T>
 void to_string_helper (String& buffer, const T* values)
 {
   buffer.clear ();
   
   String item_buffer;
 
-  for (size_t i=0; i<size; i++)
+  for (unsigned  i=0; i<size; i++)
   {
     to_string (item_buffer, values [i]);
 

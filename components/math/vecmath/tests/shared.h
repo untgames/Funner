@@ -1,7 +1,7 @@
 #ifndef MATHLIB_VECMATH_TESTS_SHARED_HEADER
 #define MATHLIB_VECMATH_TESTS_SHARED_HEADER
 
-#include <cstdio>
+#include <stdio.h>
 
 #include <math/angle.h>
 #include <math/matrix.h>

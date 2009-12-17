@@ -1,7 +1,7 @@
 #ifndef MATHLIB_VECMATH_ANGLE_HEADER
 #define MATHLIB_VECMATH_ANGLE_HEADER
 
-#include <cmath>
+#include <math.h>
 
 #include <math/constants.h>
 
