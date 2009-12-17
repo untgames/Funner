@@ -1,7 +1,7 @@
 #ifndef MATHLIB_VECMATH_UTILITY_HEADER
 #define MATHLIB_VECMATH_UTILITY_HEADER
 
-#include <math.h>
+#include <cmath>
 
 #include <math/angle.h>
 #include <math/matrix.h>

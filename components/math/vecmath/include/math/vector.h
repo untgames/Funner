@@ -1,6 +1,8 @@
 #ifndef MATHLIB_VECMATH_VECTOR_HEADER
 #define MATHLIB_VECMATH_VECTOR_HEADER
 
+#include <cmath>
+
 #ifdef VECMATH_SSE
   #include <xmmintrin.h>
 #endif
