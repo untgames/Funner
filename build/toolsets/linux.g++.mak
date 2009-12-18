@@ -7,6 +7,7 @@
 ###################################################################################################
 EXE_SUFFIX :=
 DLL_SUFFIX := .so
+DLL_PREFIX := lib
 
 PROFILES += linux unistd x11 haswchar
 

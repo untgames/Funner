@@ -124,6 +124,7 @@ $(call check_toolset_constant,LIB_SUFFIX)
 $(call check_toolset_constant,OBJ_SUFFIX)
 $(call check_toolset_constant,DLL_SUFFIX)
 $(call check_toolset_constant,EXE_SUFFIX)
+$(call check_toolset_constant,DLL_PREFIX)
 
 ###################################################################################################
 #Подключение файлов конфигурации компонента и файлов экспорта
@@ -366,11 +367,11 @@ define process_target.dynamic-lib
     $$(error Empty dynamic library name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
   
-  $1.DLL_FILE                      := $(DIST_BIN_DIR)/$$($1.NAME)$(DLL_SUFFIX)
+  $1.DLL_FILE                      := $(DIST_BIN_DIR)/$(DLL_PREFIX)$$($1.NAME)$(DLL_SUFFIX)
   $1.LIB_FILE                      := $(DIST_LIB_DIR)/$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(DLL_LIB_SUFFIX)
   $1.LIB_TMP_FILE                  := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(DLL_LIB_SUFFIX)
   TARGET_FILES                     := $$(TARGET_FILES) $$($1.DLL_FILE) $$($1.LIB_FILE)
-  $1.TARGET_DLLS                   := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
+  $1.TARGET_DLLS                   := $$($1.DLLS:%=$(DIST_BIN_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
   DIST_DIRS                        := $$(DIST_DIRS) $$(dir $$($1.DLL_FILE))
   $1.SOURCE_INSTALLATION_DLL_FILES := $$($1.TARGET_DLLS) $$($1.DLL_FILE)
   $1.SOURCE_INSTALLATION_LIB_FILES := $$($1.LIB_FILE)  
@@ -398,7 +399,7 @@ define process_target.application
 
   $1.EXE_FILE                      := $(DIST_BIN_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,$(EXE_SUFFIX))
   TARGET_FILES                     := $$(TARGET_FILES) $$($1.EXE_FILE)
-  $1.TARGET_DLLS                   := $$($1.DLLS:%=$(DIST_BIN_DIR)/%$(DLL_SUFFIX))
+  $1.TARGET_DLLS                   := $$($1.DLLS:%=$(DIST_BIN_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
   DIST_DIRS                        := $$(DIST_DIRS) $$(dir $$($1.EXE_FILE))
   $1.SOURCE_INSTALLATION_DLL_FILES := $$($1.TARGET_DLLS)
   $1.SOURCE_INSTALLATION_EXE_FILES := $$($1.EXE_FILE)
@@ -435,7 +436,7 @@ define process_tests_source_dir
   $2.TEST_EXE_FILES     := $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$(patsubst $$($2.TMP_DIR)/%$(OBJ_SUFFIX),$$($2.TARGET_DIR)/%$(EXE_SUFFIX),$$($2.OBJECT_FILES)))
   $2.TEST_RESULT_FILES  := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
   $2.EXECUTION_DIR      := $$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR))
-  $1.TARGET_DLLS        := $$($1.TARGET_DLLS) $$($1.DLLS:%=$$($2.TARGET_DIR)/%$(DLL_SUFFIX))
+  $1.TARGET_DLLS        := $$($1.TARGET_DLLS) $$($1.DLLS:%=$$($2.TARGET_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
   $1.USED_APPLICATIONS  := $$($1.USED_APPLICATIONS:%=$$(DIST_BIN_DIR)/%$(EXE_SUFFIX))
 
   build: $$($2.TEST_EXE_FILES)
