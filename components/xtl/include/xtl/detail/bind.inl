@@ -172,19 +172,6 @@ struct bind_not_greater { template <class T1, class T2> bool operator () (const 
 struct bind_logical_not { template <class T> bool operator () (const T& a) const { return !a; } };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Определение типа возвращаемого значения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class Ret, class Fn> struct bind_result_of
-{
-  typedef Ret type;
-};
-
-template <class Fn> struct bind_result_of<unspecified_result, Fn>
-{
-  typedef typename result_of<Fn>::type type;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Определение типа возвращаемого значения class members
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef _MSC_VER
@@ -205,25 +192,35 @@ template <class T> struct bind_is_ref<T&>  { enum { value = 1 }; };
 template <class T> struct bind_is_ref<T*>  { enum { value = 1 }; };
 
 template <class Fn, class Arg, bool IsMemPtr = !(functional_traits<Fn>::is_function || functional_traits<Fn>::is_memfun || functional_traits<Fn>::is_ptrfun)>
-struct bind_class_member_result_helper
+struct bind_result_of_dispatch
 {
-  typedef typename bind_result_of<unspecified_result, Fn>::type type;
+  typedef typename result_of<Fn>::type type;
 };
 
-template <class M, class T, class Arg> struct bind_class_member_result_helper<M T::*, Arg, true>
+template <class M, class T, class Arg> struct bind_result_of_dispatch<M T::*, Arg, true>
 {
   typedef typename bind_add_cref<M T::*, 1>::type type;
 };
 
 template <class M, class T, class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
-struct bind_class_member_result_helper<M T::*, binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9>, true>
+struct bind_result_of_dispatch<M T::*, binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9>, true>
 {
   typedef typename binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9>::result_type nested_result_type;
   typedef typename bind_add_cref<M T::*, bind_is_ref<nested_result_type>::value>::type   type;
 };
 
-template <class Fn, class Arg>
-struct bind_class_member_result: public bind_class_member_result_helper<Fn, Arg> {};
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Определение типа возвращаемого значения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Ret, class Fn, class A1> struct bind_result_of
+{
+  typedef Ret type;
+};
+
+template <class Fn, class A1> struct bind_result_of<unspecified_result, Fn, A1>
+{
+  typedef typename bind_result_of_dispatch<Fn, A1>::type type;
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обёртка над bind-выражениями
@@ -245,7 +242,7 @@ struct binder
   typedef typename detail::access_traits<T8>::const_type arg8_type;
   typedef typename detail::access_traits<T9>::const_type arg9_type;
   public:
-    typedef typename bind_result_of<Ret, Fn>::type result_type;
+    typedef typename bind_result_of<Ret, Fn, arg1_type>::type result_type;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы
@@ -466,9 +463,9 @@ inline detail::binder<detail::unspecified_result, Fn> bind (Fn fn)
 }
 
 template <class Fn, class T1>
-inline detail::binder<typename detail::bind_class_member_result<Fn, T1>::type, Fn, T1> bind (Fn fn, T1 arg1)
+inline detail::binder<detail::unspecified_result, Fn, T1> bind (Fn fn, T1 arg1)
 {
-  return detail::binder<typename detail::bind_class_member_result<Fn, T1>::type, Fn, T1> (fn, arg1);
+  return detail::binder<detail::unspecified_result, Fn, T1> (fn, arg1);
 }
 
 template <class Fn, class T1, class T2>
@@ -577,12 +574,6 @@ template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5,
 inline detail::binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9> bind (Fn fn, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
 {
   return detail::binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9> (fn, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-}
-
-template <class MemberT, class T, class Arg>
-inline detail::binder<typename detail::bind_class_member_result<MemberT T::*, Arg>::type, MemberT T::*, Arg> bind (MemberT T::* mptr, Arg arg1)
-{
-  return detail::binder<typename detail::bind_class_member_result<MemberT T::*, Arg>::type, MemberT T::*, Arg> (mptr, arg1);
 }
 
 /*

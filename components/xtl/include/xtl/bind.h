@@ -18,8 +18,6 @@ struct binder;
 
 struct unspecified_result;
 
-template <class Fn, class Arg> struct bind_class_member_result;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +112,7 @@ template <class Fn>
 detail::binder<detail::unspecified_result, Fn> bind (Fn);
 
 template <class Fn, class T1>
-detail::binder<typename detail::bind_class_member_result<Fn, T1>::type, Fn, T1> bind (Fn, T1);
+detail::binder<detail::unspecified_result, Fn, T1> bind (Fn, T1);
 
 template <class Fn, class T1, class T2>
 detail::binder<detail::unspecified_result, Fn, T1, T2> bind (Fn, T1, T2);
@@ -139,9 +137,6 @@ detail::binder<detail::unspecified_result, Fn, T1, T2, T3, T4, T5, T6, T7, T8> b
 
 template <class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 detail::binder<detail::unspecified_result, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9> bind (Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9);
-
-template <class MemberT, class T, class Arg>
-detail::binder<typename detail::bind_class_member_result<MemberT T::*, Arg>::type, MemberT T::*, Arg> bind (MemberT T::*, Arg);
 
 #include <xtl/detail/bind.inl>
 
