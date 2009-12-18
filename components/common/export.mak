@@ -6,6 +6,7 @@ export.compile.common.COMPILER_DEFINES :=
 export.link.common.LIBS := funner.common funner.extern.pcre
 export.link.common.carbon.LINK_FLAGS := -framework Carbon
 export.link.common.iphone.LINK_FLAGS := -framework CoreFoundation 
+export.link.common.unistd.LIBS       := pthread
 
 # AES link exports
 export.link.common.aes.LIBS          := funner.common.aes
@@ -34,4 +35,4 @@ export.link.common.xml.IMPORTS       := link.common
 # ZIP file system link exports
 export.link.common.zip_file_system.LIBS          := funner.common.zip_file_system
 export.link.common.zip_file_system.LINK_INCLUDES := ZipFileSystem
-export.link.common.zip_file_system.IMPORTS       := link.common link.extern.zlib link.extern.zzip
+export.link.common.zip_file_system.IMPORTS       := link.common link.extern.zlib link.extern.zzip run.extern.zzip
