@@ -428,17 +428,29 @@ template <class DstT> struct dynamic_caster<DstT*>
   static DstT* cast (dynamic_cast_root* source) { return dynamic_caster_helper<DstT>::cast (source); }
 };
 
+namespace detail
+{
+
+template <class T> struct any_return_value_wrapper
+{
+  T value;
+  
+  any_return_value_wrapper () : value () {}
+};
+
+}
+
 //попытка приведения строки в значение
 template <class T>
 inline T try_lexical_cast (const stl::string& buffer, type<T>)
 {
   using adl_defaults::to_value;
 
-  T value;
+  detail::any_return_value_wrapper<T> value_wrapper;
 
-  to_value (buffer, value);
+  to_value (buffer, value_wrapper.value);
 
-  return value;
+  return value_wrapper.value;
 }
 
 template <class T>

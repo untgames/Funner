@@ -58,11 +58,13 @@ inline shared_ptr<T>::shared_ptr (const shared_ptr<T1>& p)
 }
 
 template <class T> template <class T1>
-shared_ptr<T>::shared_ptr (const weak_ptr<T1>& p)
-  : ptr (p.ptr), counter (p.counter)
+inline shared_ptr<T>::shared_ptr (const weak_ptr<T1>& p)
 {
-  if (!counter || !counter->add_ref_lock ())
+  if (!p.counter || !p.counter->add_ref_lock ())
     throw bad_weak_ptr ();
+
+  ptr     = p.ptr;
+  counter = p.counter;
 }
 
 template <class T> template <class T1>
@@ -81,7 +83,7 @@ inline shared_ptr<T>::shared_ptr (stl::auto_ptr<T1>& p)
 template <class T> template <class Ptr>
 inline shared_ptr<T>::shared_ptr (Ptr p, typename detail::sp_enable_if_auto_ptr<Ptr, int>::type)
   : ptr (p.get ())
-{
+{ 
   typedef typename Ptr::element_type element_type;
 
   element_type* tmp = p.get ();

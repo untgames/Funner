@@ -19,12 +19,12 @@ void print (double v)
   printf ("%g", v);
 }
 
-template <class T, size_t size>
+template <class T, unsigned int size>
 void print (const math::vector<T, size>& v)
 {
   printf ("value=[");
 
-  for (size_t i=0; i<size; i++)
+  for (unsigned int i=0; i<size; i++)
   {
     printf (" ");
     print  (v [i]);
@@ -33,16 +33,16 @@ void print (const math::vector<T, size>& v)
   printf (" ]\n");
 }
 
-template <class T, size_t size>
+template <class T, unsigned int size>
 void print (const math::matrix<T, size>& v)
 {
   printf ("value=[");
 
-  for (size_t j=0; j<size; j++)
+  for (unsigned int j=0; j<size; j++)
   {
     printf (" [");
 
-    for (size_t i=0; i<size; i++)
+    for (unsigned int i=0; i<size; i++)
     {
       printf (" ");
       print (v [j][i]);

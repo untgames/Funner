@@ -185,6 +185,47 @@ template <class Fn> struct bind_result_of<unspecified_result, Fn>
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Определение типа возвращаемого значения class members
+///////////////////////////////////////////////////////////////////////////////////////////////////
+#ifdef _MSC_VER
+  #pragma warning (push)
+  #pragma warning (disable : 4180) // qualifier applied to a function type has no meaning
+#endif
+
+template <class T, int I>   struct bind_add_cref;
+template <class M, class T> struct bind_add_cref<M T::*, 0> { typedef M         type; };
+template <class M, class T> struct bind_add_cref<M T::*, 1> { typedef M const & type; };
+
+#ifdef _MSC_VER
+  #pragma warning (pop)
+#endif
+
+template <class T> struct bind_is_ref      { enum { value = 0 }; };
+template <class T> struct bind_is_ref<T&>  { enum { value = 1 }; };
+template <class T> struct bind_is_ref<T*>  { enum { value = 1 }; };
+
+template <class Fn, class Arg, bool IsMemPtr = !(functional_traits<Fn>::is_function || functional_traits<Fn>::is_memfun || functional_traits<Fn>::is_ptrfun)>
+struct bind_class_member_result_helper
+{
+  typedef typename bind_result_of<unspecified_result, Fn>::type type;
+};
+
+template <class M, class T, class Arg> struct bind_class_member_result_helper<M T::*, Arg, true>
+{
+  typedef typename bind_add_cref<M T::*, 1>::type type;
+};
+
+template <class M, class T, class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
+struct bind_class_member_result_helper<M T::*, binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9>, true>
+{
+  typedef typename binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9>::result_type nested_result_type;
+  typedef typename bind_add_cref<M T::*, bind_is_ref<nested_result_type>::value>::type   type;
+};
+
+template <class Fn, class Arg>
+struct bind_class_member_result: public bind_class_member_result_helper<Fn, Arg> {};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обёртка над bind-выражениями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
@@ -425,9 +466,9 @@ inline detail::binder<detail::unspecified_result, Fn> bind (Fn fn)
 }
 
 template <class Fn, class T1>
-inline detail::binder<detail::unspecified_result, Fn, T1> bind (Fn fn, T1 arg1)
+inline detail::binder<typename detail::bind_class_member_result<Fn, T1>::type, Fn, T1> bind (Fn fn, T1 arg1)
 {
-  return detail::binder<detail::unspecified_result, Fn, T1> (fn, arg1);
+  return detail::binder<typename detail::bind_class_member_result<Fn, T1>::type, Fn, T1> (fn, arg1);
 }
 
 template <class Fn, class T1, class T2>
@@ -536,6 +577,12 @@ template <class Ret, class Fn, class T1, class T2, class T3, class T4, class T5,
 inline detail::binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9> bind (Fn fn, T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9)
 {
   return detail::binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9> (fn, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+}
+
+template <class MemberT, class T, class Arg>
+inline detail::binder<typename detail::bind_class_member_result<MemberT T::*, Arg>::type, MemberT T::*, Arg> bind (MemberT T::* mptr, Arg arg1)
+{
+  return detail::binder<typename detail::bind_class_member_result<MemberT T::*, Arg>::type, MemberT T::*, Arg> (mptr, arg1);
 }
 
 /*
