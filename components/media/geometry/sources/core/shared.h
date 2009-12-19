@@ -11,7 +11,7 @@
 #include <xtl/reference_counter.h>
 #include <xtl/common_exceptions.h>
 
-#include <mathlib.h>
+#include <math/vector.h>
 
 #include <common/strlib.h>
 #include <common/hash.h>

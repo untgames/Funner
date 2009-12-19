@@ -16,8 +16,7 @@
 #include <common/component.h>
 #include <common/strlib.h>
 
-#include <mathlib.h>
-#include <math/io.h>
+#include <math/vector.h>
 
 #include <media/geometry/mesh_library.h>
 

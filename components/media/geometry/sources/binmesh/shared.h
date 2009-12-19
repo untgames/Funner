@@ -12,7 +12,7 @@
 #include <common/component.h>
 #include <common/file.h>
 
-#include <mathlib.h>
+#include <math/vector.h>
 
 #include <media/geometry/mesh_library.h>
 

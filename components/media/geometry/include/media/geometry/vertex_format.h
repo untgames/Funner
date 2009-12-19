@@ -1,7 +1,7 @@
 #ifndef MEDIALIB_GEOMETRY_VERTEX_FORMAT_HEADER
 #define MEDIALIB_GEOMETRY_VERTEX_FORMAT_HEADER
 
-#include <stddef.h>
+#include <cstddef>
 #include <common/singleton.h>
 
 namespace media

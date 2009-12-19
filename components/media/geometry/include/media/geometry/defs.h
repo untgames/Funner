@@ -1,7 +1,7 @@
 #ifndef MEDIALIB_GEOMETRY_DEFINES_HEADER
 #define MEDIALIB_GEOMETRY_DEFINES_HEADER
 
-#include <stddef.h>
+#include <cstddef>
 
 namespace media
 {

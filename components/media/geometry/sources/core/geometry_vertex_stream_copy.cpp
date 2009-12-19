@@ -27,7 +27,7 @@ inline void copy_attribute (const VertexInfluence& src, VertexInfluence& dst)
 }
 
 template <class T1, size_t Size1, class T2, size_t Size2>
-inline void copy_attribute (const vec<T1, Size1>& src, vec<T2, Size2>& dst)
+inline void copy_attribute (const vector<T1, Size1>& src, vector<T2, Size2>& dst)
 {
   size_t min_size, max_size, i;
   

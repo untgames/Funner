@@ -91,7 +91,7 @@ inline void check_attribute (Log& log, CheckContext& context, const VertexInflue
 }
 
 template <size_t Size>
-inline void check_attribute (Log& log, CheckContext& context, const vec<float, Size>& attribute)
+inline void check_attribute (Log& log, CheckContext& context, const math::vector<float, Size>& attribute)
 {
   static const char* component_name [] = {"x", "y", "z", "w"};
 

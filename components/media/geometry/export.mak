@@ -1,6 +1,6 @@
 # Compile exports
 export.compile.media.geometry.INCLUDE_DIRS := include
-export.compile.media.geometry.IMPORTS      := compile.common
+export.compile.media.geometry.IMPORTS      := compile.math.vecmath compile.common
 
 # Link exports
 export.link.media.geometry.LIBS    := funner.media.geometry 

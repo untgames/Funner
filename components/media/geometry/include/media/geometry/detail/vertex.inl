@@ -12,13 +12,13 @@ template <VertexAttributeType in_value> struct attribute_type_helper
 
 template <class T> struct attribute_type;
 
-template <> struct attribute_type<math::vec<float, 2> >         : public attribute_type_helper<VertexAttributeType_Float2> {};
-template <> struct attribute_type<math::vec<float, 3> >         : public attribute_type_helper<VertexAttributeType_Float3> {};
-template <> struct attribute_type<math::vec<float, 4> >         : public attribute_type_helper<VertexAttributeType_Float4> {};
-template <> struct attribute_type<math::vec<short, 2> >         : public attribute_type_helper<VertexAttributeType_Short2> {};
-template <> struct attribute_type<math::vec<short, 3> >         : public attribute_type_helper<VertexAttributeType_Short3> {};
-template <> struct attribute_type<math::vec<short, 4> >         : public attribute_type_helper<VertexAttributeType_Short4> {};
-template <> struct attribute_type<math::vec<unsigned char, 4> > : public attribute_type_helper<VertexAttributeType_UByte4> {};
+template <> struct attribute_type<math::vector<float, 2> >         : public attribute_type_helper<VertexAttributeType_Float2> {};
+template <> struct attribute_type<math::vector<float, 3> >         : public attribute_type_helper<VertexAttributeType_Float3> {};
+template <> struct attribute_type<math::vector<float, 4> >         : public attribute_type_helper<VertexAttributeType_Float4> {};
+template <> struct attribute_type<math::vector<short, 2> >         : public attribute_type_helper<VertexAttributeType_Short2> {};
+template <> struct attribute_type<math::vector<short, 3> >         : public attribute_type_helper<VertexAttributeType_Short3> {};
+template <> struct attribute_type<math::vector<short, 4> >         : public attribute_type_helper<VertexAttributeType_Short4> {};
+template <> struct attribute_type<math::vector<unsigned char, 4> > : public attribute_type_helper<VertexAttributeType_UByte4> {};
 
 /*
     ѕолучение смещени€ пол€ в структуре (аналог offsetof, компилируемый без предупреждений на gcc)
@@ -40,7 +40,7 @@ template <class Vertex, class T, size_t Size> struct vertex_format<Vertex, Posit
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_Position, attribute_type<math::vec<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, position));
+    format.AddAttribute (VertexAttributeSemantic_Position, attribute_type<math::vector<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, position));
   }
 };
 
@@ -48,7 +48,7 @@ template <class Vertex, class T> struct vertex_format<Vertex, Normal<T> >
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_Normal, attribute_type<math::vec<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, normal));
+    format.AddAttribute (VertexAttributeSemantic_Normal, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, normal));
   }
 };
 
@@ -56,7 +56,7 @@ template <class Vertex, class T> struct vertex_format<Vertex, Tangent<T> >
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_Tangent, attribute_type<math::vec<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, tangent));
+    format.AddAttribute (VertexAttributeSemantic_Tangent, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, tangent));
   }
 };
 
@@ -64,7 +64,7 @@ template <class Vertex, class T> struct vertex_format<Vertex, Binormal<T> >
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_Binormal, attribute_type<math::vec<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, binormal));
+    format.AddAttribute (VertexAttributeSemantic_Binormal, attribute_type<math::vector<T, 3> >::value, GEOMETRY_OFFSETOF (Vertex, binormal));
   }
 };
 
@@ -72,7 +72,7 @@ template <class Vertex, class T, size_t Size> struct vertex_format<Vertex, Color
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_Color, attribute_type<math::vec<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, color));
+    format.AddAttribute (VertexAttributeSemantic_Color, attribute_type<math::vector<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, color));
   }
 };
 
@@ -80,7 +80,7 @@ template <class Vertex, class T, size_t Size> struct vertex_format<Vertex, TexCo
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_TexCoord0, attribute_type<math::vec<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord0));
+    format.AddAttribute (VertexAttributeSemantic_TexCoord0, attribute_type<math::vector<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord0));
   }
 };
 
@@ -88,7 +88,7 @@ template <class Vertex, class T, size_t Size> struct vertex_format<Vertex, TexCo
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_TexCoord1, attribute_type<math::vec<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord1));
+    format.AddAttribute (VertexAttributeSemantic_TexCoord1, attribute_type<math::vector<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord1));
   }
 };
 
@@ -96,7 +96,7 @@ template <class Vertex, class T, size_t Size> struct vertex_format<Vertex, TexCo
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_TexCoord2, attribute_type<math::vec<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord2));
+    format.AddAttribute (VertexAttributeSemantic_TexCoord2, attribute_type<math::vector<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord2));
   }
 };
 
@@ -104,7 +104,7 @@ template <class Vertex, class T, size_t Size> struct vertex_format<Vertex, TexCo
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_TexCoord3, attribute_type<math::vec<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord3));
+    format.AddAttribute (VertexAttributeSemantic_TexCoord3, attribute_type<math::vector<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord3));
   }
 };
 
@@ -112,7 +112,7 @@ template <class Vertex, class T, size_t Size> struct vertex_format<Vertex, TexCo
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_TexCoord4, attribute_type<math::vec<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord4));
+    format.AddAttribute (VertexAttributeSemantic_TexCoord4, attribute_type<math::vector<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord4));
   }
 };
 
@@ -120,7 +120,7 @@ template <class Vertex, class T, size_t Size> struct vertex_format<Vertex, TexCo
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_TexCoord5, attribute_type<math::vec<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord5));
+    format.AddAttribute (VertexAttributeSemantic_TexCoord5, attribute_type<math::vector<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord5));
   }
 };
 
@@ -128,7 +128,7 @@ template <class Vertex, class T, size_t Size> struct vertex_format<Vertex, TexCo
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_TexCoord6, attribute_type<math::vec<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord6));
+    format.AddAttribute (VertexAttributeSemantic_TexCoord6, attribute_type<math::vector<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord6));
   }
 };
 
@@ -136,7 +136,7 @@ template <class Vertex, class T, size_t Size> struct vertex_format<Vertex, TexCo
 {
   static void get_format (VertexFormat& format)
   {
-    format.AddAttribute (VertexAttributeSemantic_TexCoord7, attribute_type<math::vec<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord7));
+    format.AddAttribute (VertexAttributeSemantic_TexCoord7, attribute_type<math::vector<T, Size> >::value, GEOMETRY_OFFSETOF (Vertex, texcoord7));
   }
 };
 
