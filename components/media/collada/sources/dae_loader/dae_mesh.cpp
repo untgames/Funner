@@ -369,7 +369,7 @@ class VertexStreamReader
   private:
 ///Чтение вектора
     template <size_t N>
-    void SetField (const float* src, math::vec<float, N>& res)
+    void SetField (const float* src, math::vector<float, N>& res)
     {
       for (size_t i=0; i<N; i++)
         res [i] = src [i];

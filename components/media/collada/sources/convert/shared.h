@@ -1,7 +1,7 @@
 #ifndef MEDIALIB_COLLADA_CONVERT_SHARED_HEADER
 #define MEDIALIB_COLLADA_CONVERT_SHARED_HEADER
 
-#include <mathlib.h>
+#include <math/matrix.h>
 
 #include <stl/hash_map>
 #include <stl/vector>

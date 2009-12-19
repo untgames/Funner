@@ -1,7 +1,7 @@
 #ifndef MEDIALIB_COLLADA_MATERIAL_HEADER
 #define MEDIALIB_COLLADA_MATERIAL_HEADER
 
-#include <math/mathlib.h>
+#include <math/matrix.h>
 #include <xtl/intrusive_ptr.h>
 
 namespace media

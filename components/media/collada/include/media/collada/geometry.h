@@ -2,7 +2,7 @@
 #define MEDIALIB_COLLADA_GEOMETRY_HEADER
 
 #include <media/collada/collection.h>
-#include <math/mathlib.h>
+#include <math/vector.h>
 #include <xtl/intrusive_ptr.h>
 
 namespace media

@@ -1,6 +1,6 @@
 # Compile exports
 export.compile.media.collada.INCLUDE_DIRS := include
-export.compile.media.collada.IMPORTS      := compile.common
+export.compile.media.collada.IMPORTS      := compile.math.vecmath compile.common
 
 # Link exports
 export.link.media.collada.LIBS    := funner.media.collada

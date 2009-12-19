@@ -135,7 +135,7 @@ void DaeParser::ParseTransform (Parser::Iterator iter, mat4f& tm)
     {
       vec4f r = get<vec4f> (*i, "#text");
 
-      tm = rotatef (deg2rad (r.w), r.x, r.y, r.z) * tm;
+      tm = rotate (degree (r.w), vec3f (r.x, r.y, r.z)) * tm;
     }
     else if (!strcmp (name, "scale"))
     {

@@ -8,7 +8,7 @@ using namespace math;
     Разбор источника
 */
 
-void DaeParser::ParseFloatArray (Parser::Iterator iter, vector<mat4f>& source)
+void DaeParser::ParseFloatArray (Parser::Iterator iter, stl::vector<mat4f>& source)
 {
   Parser::Iterator accessor_iter = get_first_child (*iter, "technique_common.accessor");  
 
@@ -26,7 +26,7 @@ void DaeParser::ParseFloatArray (Parser::Iterator iter, vector<mat4f>& source)
     read (*iter, "float_array.#text", source.begin (), count);
 }
 
-void DaeParser::ParseNameArray (Parser::Iterator iter, vector<string>& source)
+void DaeParser::ParseNameArray (Parser::Iterator iter, stl::vector<string>& source)
 {
   size_t data_count = get<size_t> (*iter, "Name_array.count");
   
@@ -42,9 +42,9 @@ void DaeParser::ParseNameArray (Parser::Iterator iter, vector<string>& source)
 
 void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
 {
-  vector<string> joints;
-  vector<mat4f>  inv_matrixes;
-  mat4f          bind_shape_matrix (1);
+  stl::vector<string> joints;
+  stl::vector<mat4f>  inv_matrixes;
+  mat4f               bind_shape_matrix (1);
 
   common::ParseNode vertex_weights_node = get_first_child (*iter, "vertex_weights");
 
@@ -174,7 +174,7 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
     skin.SetJointInvMatrix (i, inv_matrixes[i]);
   }
   
-  vector<float> weights;
+  stl::vector<float> weights;
 
   for (Parser::NamesakeIterator weights_iter=vertex_weights_node.First ("input"); weights_iter; ++weights_iter)
   {
@@ -201,7 +201,7 @@ void DaeParser::ParseSkin (Parser::Iterator iter, const char* id)
     }
   }
 
-  vector<int> indices (skin.WeightsCount () * 2);
+  stl::vector<int> indices (skin.WeightsCount () * 2);
 
   read (vertex_weights_node, "v.#text", indices.begin (), skin.WeightsCount () * 2);
 

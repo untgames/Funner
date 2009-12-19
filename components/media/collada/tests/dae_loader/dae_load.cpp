@@ -29,12 +29,17 @@ void print_space (int count)
 //печать числа с плавающей точкой
 void print (float value)
 {
+  static float EPS = 0.001f;
+  
+  if (fabs (value) < EPS && value < 0.0f)
+    value = 0.0f;
+
   printf ("%+.3f", value);
 }
 
 //печать вектора
 template <class T, size_t N>
-void print (const math::vec<T, N>& v)
+void print (const math::vector<T, N>& v)
 {
   printf ("[");
   

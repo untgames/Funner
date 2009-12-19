@@ -21,7 +21,7 @@
 
 #include <media/collada.h>
 
-#include <math/io.h>
+#include <math/utility.h>
 
 using namespace media::collada;
 using namespace common;

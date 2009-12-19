@@ -7,7 +7,7 @@ using namespace media::collada;
     Разбор источника
 */
 
-void DaeParser::ParseFloatArray (Parser::Iterator iter, vector<float>& source)
+void DaeParser::ParseFloatArray (Parser::Iterator iter, stl::vector<float>& source)
 {
   Parser::Iterator accessor_iter = get_first_child (*iter, "technique_common.accessor");    
 
@@ -25,7 +25,7 @@ void DaeParser::ParseFloatArray (Parser::Iterator iter, vector<float>& source)
     read (*iter, "float_array.#text", source.begin (), data_count);
 }
 
-void DaeParser::ParseIdrefArray (Parser::Iterator iter, vector<string>& source)
+void DaeParser::ParseIdrefArray (Parser::Iterator iter, stl::vector<string>& source)
 {
   size_t data_count = get<size_t> (*iter, "IDREF_array.count");  
 
@@ -43,8 +43,8 @@ void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
 {
   const char* base_mesh = get<const char*> (*iter, "source");
 
-  vector<string> targets;
-  vector<float>  weights;
+  stl::vector<string> targets;
+  stl::vector<float>  weights;
 
   size_t target_source_count = 0, weight_source_count = 0;
 

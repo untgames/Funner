@@ -3,7 +3,7 @@
 
 #include <media/collada/collection.h>
 #include <xtl/intrusive_ptr.h>
-#include <mathlib.h>
+#include <math/matrix.h>
 
 namespace media
 {

@@ -1,7 +1,7 @@
 #ifndef MEDIALIB_COLLADA_LIBRARY_HEADER
 #define MEDIALIB_COLLADA_LIBRARY_HEADER
 
-#include <stddef.h>
+#include <cstddef>
 
 namespace xtl
 {
