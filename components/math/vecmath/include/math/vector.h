@@ -195,12 +195,6 @@ vector<T, 3> cross (const vector<T, 3>& a, const vector<T, 3>& b);
 template <class T>
 vector<T, 4> cross (const vector<T, 4>& a, const vector<T, 4>& b);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Приведение к строке
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class String, class T, unsigned int Size>
-void to_string (String& buffer, const vector<T, Size>& value);
-
 #include <math/detail/vector.inl>
 
 }

@@ -249,22 +249,22 @@ bool angle<T>::operator >= (const angle& ang) const
     Конвертации углов
 */
 
-anglef radian (float value)
+inline anglef radian (float value)
 {
   return anglef (value, radian_tag ());
 }
 
-angled radian (double value)
+inline angled radian (double value)
 {
   return angled (value, radian_tag ());
 }
 
-anglef degree (float value)
+inline anglef degree (float value)
 {
   return anglef (value, degree_tag ());
 }
 
-angled degree (double value)
+inline angled degree (double value)
 {
   return angled (value, degree_tag ());
 }

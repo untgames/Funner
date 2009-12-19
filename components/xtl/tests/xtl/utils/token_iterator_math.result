@@ -6,3 +6,6 @@ failed read next token
 empty: 0
 iter == 0: 0
 available: 1
+vector to_string: 1 2 3
+matrix to_string: 3 0 0 0 3 0 0 0 3
+quat to_string: 2 2 2 2

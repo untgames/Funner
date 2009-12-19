@@ -3,6 +3,7 @@
 #include <math/matrix.h>
 #include <math/quat.h>
 #include <xtl/token_iterator.h>
+#include <xtl/lexical_cast.h>
 
 void print (const char* s)
 {
@@ -95,6 +96,10 @@ int main ()
   printf ("empty: %d\n", iter.empty ());
   printf ("iter == 0: %d\n", iter == 0);
   printf ("available: %lu\n", iter.available ());
+  
+  printf ("vector to_string: %s\n", xtl::to_string (math::vec3f (1.0f, 2.0f, 3.0f)).c_str ());
+  printf ("matrix to_string: %s\n", xtl::to_string (math::mat3f (3.0f)).c_str ());
+  printf ("quat to_string: %s\n", xtl::to_string (math::quatf (2.0f)).c_str ());
 
   return 0;
 }

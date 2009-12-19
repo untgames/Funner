@@ -803,13 +803,3 @@ typename matrix<T, 3>::value_type minor (const matrix<T, 3>& src, unsigned int m
                  : src [(m+2)%3][(n+2)%3]*src [(m+1)%3][(n+1)%3] -
                    src [(m+2)%3][(n+1)%3]*src [(m+1)%3][(n+2)%3];
 }
-
-/*
-    Приведение к строке
-*/
-
-template <class String, class T, unsigned int Size>
-void to_string (String& buffer, const matrix<T, Size>& value)
-{
-  detail::to_string_helper<Size * Size> (buffer, &value [0][0]);
-}

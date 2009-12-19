@@ -162,12 +162,6 @@ typename matrix<T, Size>::value_type minor (const matrix<T, Size>&, unsigned int
 template <class T, unsigned int Size> 
 bool equal (const matrix<T, Size>&, const matrix<T, Size>&, const T& eps);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Приведение к строке
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class String, class T, unsigned int Size>
-void to_string (String& buffer, const matrix<T, Size>& value);
-
 #include <math/detail/matrix.inl>
 
 }

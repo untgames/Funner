@@ -8,6 +8,16 @@
 #include <xtl/string.h>
 #include <xtl/token_parser.h>
 
+namespace math
+{
+
+//forward declarations
+template <class T, unsigned int Size> class vector;
+template <class T, unsigned int Size> class matrix;
+template <class T>                    class quat;
+
+}
+
 namespace xtl
 {
 
@@ -69,6 +79,24 @@ template <class T> T to_value (const stl::string&);
 ///Лексикографическое преобразование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class DstT, class SrcT> DstT lexical_cast (const SrcT&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вывод диапазонов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class Iter>
+void to_string (stl::string& buffer, Iter first, Iter last, const char* separator);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Приведение к строке математических типов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class String, class T, unsigned int Size>
+void to_string (String& buffer, const math::vector<T, Size>& value);
+
+template <class String, class T, unsigned int Size>
+void to_string (String& buffer, const math::matrix<T, Size>& value);
+
+template <class String, class T>
+void to_string (String& buffer, const math::quat<T>& value);
 
 #include <xtl/detail/lexical_cast.inl>
 

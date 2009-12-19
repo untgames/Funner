@@ -480,13 +480,3 @@ quat<T> inverse (const quat<T>& q)
 {
   return quat<T> (q, detail::quat_inverse (), return_value_tag ());
 }
-
-/*
-    Приведение к строке
-*/
-
-template <class String, class T>
-void to_string (String& buffer, const quat<T>& value)
-{
-  detail::to_string_helper<4> (buffer, &value [0]);
-}

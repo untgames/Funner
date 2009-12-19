@@ -321,3 +321,53 @@ inline T to_value (const stl::string& buffer)
   
   return value;
 }
+
+/*
+  Вывод диапазонов
+*/
+
+template <class Iter>
+void to_string (stl::string& buffer, Iter first, Iter last, const char* separator)
+{
+  if (!separator)
+    separator = "";
+
+  buffer.clear ();
+  
+  stl::string item_buffer;
+  bool        need_separator = false;
+
+  for (;first!=last; ++first)
+  {  
+    if (need_separator)
+      buffer += separator;
+      
+    need_separator = true;
+  
+    to_string (item_buffer, *first);
+
+    buffer += item_buffer;
+  }
+}
+
+/*
+    Приведение к строке математических типов
+*/
+
+template <class String, class T, unsigned int Size>
+void to_string (String& buffer, const math::vector<T, Size>& value)
+{
+  to_string (buffer, &value [0], &value [Size], " ");
+}
+
+template <class String, class T, unsigned int Size>
+void to_string (String& buffer, const math::matrix<T, Size>& value)
+{
+  to_string (buffer, &value [0][0], &value [Size-1][Size], " ");
+}
+
+template <class String, class T>
+void to_string (String& buffer, const math::quat<T>& value)
+{
+  to_string (buffer, &value [0], &value [4], " ");
+}

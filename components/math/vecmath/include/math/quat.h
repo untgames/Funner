@@ -146,12 +146,6 @@ typename quat<T>::value_type inner (const quat<T>&, const quat<T>&);
 template <class T>
 quat<T> inverse (const quat<T>&);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Приведение к строке
-///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class String, class T>
-void to_string (String& buffer, const quat<T>& value);
-
 #include <math/detail/quat.inl>
 
 }
