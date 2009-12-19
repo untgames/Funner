@@ -443,8 +443,8 @@ void idle (Test& test)
 
   angle += 0.5f*dt;
 
-  my_shader_parameters.object_tm = math::rotatef (angle, 0, 0, 1) *
-                                   math::rotatef (angle*0.2f, 1, 0, 0);
+  my_shader_parameters.object_tm = math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) *
+                                   math::rotate (math::radian (angle*0.2f), math::vec3f (1, 0, 0));
 
   my_shader_parameters.light_pos = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);
   my_shader_parameters.light_dir = -normalize (my_shader_parameters.light_pos);
@@ -522,7 +522,7 @@ int main ()
     MyShaderParameters my_shader_parameters;
 
     my_shader_parameters.proj_tm   = get_ortho_proj (-100, 100, -100, 100, -1000, 1000);
-    my_shader_parameters.view_tm = invert (math::lookatf (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
+    my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
 
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 

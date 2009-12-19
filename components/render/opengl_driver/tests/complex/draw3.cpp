@@ -69,7 +69,7 @@ void idle (Test& test)
   cb->GetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
 
 //  my_shader_parameters2.transform = math::rotatef (math::deg2rad (angle+=1.f), 0, 0, 1);
-  my_shader_parameters2.transform = math::rotatef (math::deg2rad (angle+=0.5f), 1, 1, 0);
+  my_shader_parameters2.transform = math::rotate (math::degree (angle+=0.5f), math::vec3f (1, 1, 0));
 
   cb->SetData (0, sizeof my_shader_parameters2, &my_shader_parameters2);
 

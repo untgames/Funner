@@ -1,14 +1,15 @@
 #ifndef RENDER_GL_DRIVER_DEVICE_TESTS_SHARED_HEADER
 #define RENDER_GL_DRIVER_DEVICE_TESTS_SHARED_HEADER
 
-#include <stdio.h>
+#include <cstdio>
+#include <float.h>
 #include <memory.h>
 #include <math.h>
 #include <time.h>
 
 #include <exception>
 
-#include <mathlib.h>
+#include <math/matrix.h>
 
 #include <syslib/window.h>
 

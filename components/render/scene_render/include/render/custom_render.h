@@ -3,8 +3,6 @@
 
 #include <xtl/functional_fwd>
 
-#include <mathlib.h>
-
 #include <render/common.h>
 
 namespace xtl

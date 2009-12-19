@@ -1,7 +1,7 @@
 #ifndef RENDER_MID_LEVEL_RENDERER_HEADER
 #define RENDER_MID_LEVEL_RENDERER_HEADER
 
-#include <mathlib.h>
+#include <math/vector.h>
 
 namespace media
 {

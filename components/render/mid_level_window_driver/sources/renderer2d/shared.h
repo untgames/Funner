@@ -1,10 +1,14 @@
 #ifndef RENDER_MID_WINDOW_DRIVER_RENDERER2D_SHARED_HEADER
 #define RENDER_MID_WINDOW_DRIVER_RENDERER2D_SHARED_HEADER
 
+#include <float.h>
+
 #include <stl/algorithm>
 
 #include <xtl/common_exceptions.h>
 #include <xtl/uninitialized_storage.h>
+
+#include <math/utility.h>
 
 #include <common/log.h>
 

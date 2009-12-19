@@ -14,6 +14,8 @@
 #include <xtl/token_parser.h>
 #include <xtl/trackable.h>
 
+#include <math/utility.h>
+
 #include <common/component.h>
 #include <common/strlib.h>
 

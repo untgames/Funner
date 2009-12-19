@@ -3,7 +3,7 @@
 
 #include <stl/string_fwd>
 
-#include <mathlib.h>
+#include <math/vector.h>
 
 #include <render/common.h>
 

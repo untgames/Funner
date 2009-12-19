@@ -4,8 +4,6 @@
 #include <stl/auto_ptr.h>
 #include <xtl/functional_fwd>
 
-#include <mathlib.h>
-
 #include <render/screen.h>
 
 //!!добавить тесты RenderTarget на смену SceneRender::SetRenderer

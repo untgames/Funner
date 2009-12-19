@@ -6,9 +6,11 @@
 #include <math.h>
 #include <time.h>
 
+#include <float.h>
+
 #include <exception>
 
-#include <mathlib.h>
+#include <math/vector.h>
 
 #include <syslib/window.h>
 

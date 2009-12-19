@@ -52,7 +52,7 @@ class Test: public BasicTest
 ///Обработчик главного цикла приложения
     void OnIdle ()
     {
-      primitive->SetTransform (rotatef (rotation_angle, 0, 0, 1));
+      primitive->SetTransform (rotate (radian (rotation_angle), vec3f (0, 0, 1)));
 
       rotation_angle += 0.05f;
     }

@@ -15,6 +15,8 @@
 #include <xtl/shared_ptr.h>
 #include <xtl/trackable.h>
 
+#include <math/utility.h>
+
 #include <common/component.h>
 #include <common/file.h>
 #include <common/log.h>

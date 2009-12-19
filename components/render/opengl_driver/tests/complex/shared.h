@@ -5,7 +5,10 @@
 #include <cmath>
 #include <exception>
 
-#include <mathlib.h>
+#include <float.h>
+
+#include <math/matrix.h>
+#include <math/utility.h>
 
 #include <syslib/window.h>
 #include <syslib/application.h>

@@ -1,6 +1,8 @@
 #ifndef RENDER_MID_LEVEL_RENDERER2D_HEADER
 #define RENDER_MID_LEVEL_RENDERER2D_HEADER
 
+#include <math/matrix.h>
+
 #include <render/mid_level/common.h>
 #include <render/mid_level/renderer.h>
 

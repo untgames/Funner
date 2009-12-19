@@ -63,8 +63,8 @@ class Test: public BasicTest
     {
       static const float PI = 3.1415926f;
 
-      mat4f tm1 = rotatef (sprite_rotation, 0, 0, 1) * translatef (cos (sprite_angle) * 10 + 5, sin (sprite_angle) * 10 + 5, 0.1f) * scalef (40, 40, 1) * rotatef (-sprite_rotation, 0, 0, 1);
-      mat4f tm2 = translatef (cos (sprite_angle + PI) * 10 + 5, sin (sprite_angle + PI) * 10 + 5, 0.2f) * rotatef (sprite_rotation, 0, 0, 1) * scalef (40, 40, 1) * rotatef (-sprite_rotation, 0, 0, 1);
+      mat4f tm1 = rotate (radian (sprite_rotation), vec3f (0, 0, 1)) * translate (vec3f (cos (sprite_angle) * 10 + 5, sin (sprite_angle) * 10 + 5, 0.1f)) * scale (vec3f (40, 40, 1)) * rotate (-radian (sprite_rotation), vec3f (0, 0, 1));
+      mat4f tm2 = translate (vec3f (cos (sprite_angle + PI) * 10 + 5, sin (sprite_angle + PI) * 10 + 5, 0.2f)) * rotate (radian (sprite_rotation), vec3f (0, 0, 1)) * scale (vec3f (40, 40, 1)) * rotate (-radian (sprite_rotation), vec3f (0, 0, 1));
 
       primitive1->SetTransform (tm1);
       primitive2->SetTransform (tm2);
