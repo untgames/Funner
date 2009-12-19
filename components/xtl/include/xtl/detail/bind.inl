@@ -231,16 +231,16 @@ struct binder
   template <class Ret1, class Fn1, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9>
   friend struct binder;
 
-  typedef typename detail::make_tuple_mapper<T1, T2, T3, T4, T5, T6, T7, T8, T9>::type binded_arguments_type;
-  typedef typename detail::access_traits<T1>::const_type arg1_type;
-  typedef typename detail::access_traits<T2>::const_type arg2_type;
-  typedef typename detail::access_traits<T3>::const_type arg3_type;
-  typedef typename detail::access_traits<T4>::const_type arg4_type;
-  typedef typename detail::access_traits<T5>::const_type arg5_type;
-  typedef typename detail::access_traits<T6>::const_type arg6_type;
-  typedef typename detail::access_traits<T7>::const_type arg7_type;
-  typedef typename detail::access_traits<T8>::const_type arg8_type;
-  typedef typename detail::access_traits<T9>::const_type arg9_type;
+  typedef typename make_tuple_mapper<T1, T2, T3, T4, T5, T6, T7, T8, T9>::type binded_arguments_type;
+  typedef typename access_traits<T1>::const_type arg1_type;
+  typedef typename access_traits<T2>::const_type arg2_type;
+  typedef typename access_traits<T3>::const_type arg3_type;
+  typedef typename access_traits<T4>::const_type arg4_type;
+  typedef typename access_traits<T5>::const_type arg5_type;
+  typedef typename access_traits<T6>::const_type arg6_type;
+  typedef typename access_traits<T7>::const_type arg7_type;
+  typedef typename access_traits<T8>::const_type arg8_type;
+  typedef typename access_traits<T9>::const_type arg9_type;
   public:
     typedef typename bind_result_of<Ret, Fn, arg1_type>::type result_type;
 
