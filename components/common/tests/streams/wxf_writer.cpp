@@ -25,9 +25,9 @@ int main ()
     writer.BeginFrame   ("scalar");
     writer.Write        ("int", -1);
     writer.Write        ("size_t", (size_t)-1);
-    writer.Write        ("float", (float)M_PI);
-    writer.Write        ("double", (double)M_PI);
-    writer.Write        ("long_double", (long double)M_PI);
+    writer.Write        ("float", math::constf::pi);
+    writer.Write        ("double", math::constd::pi);
+    writer.Write        ("long_double", math::constants<long double>::pi);
     writer.Write        ("string", "Hello world");
     writer.Write        ("char", 'x');
     writer.EndFrame     ();
@@ -35,7 +35,7 @@ int main ()
     writer.BeginFrame   ("mathlib");
     writer.Write        ("vec3f", vec3f (1.1f, 2.2f, 3.3f));
     writer.Write        ("mat4f", mat4f (1.0f));
-    writer.Write        ("quatd", quatd (M_PI));
+    writer.Write        ("quatd", quatd (math::constd::pi));
     writer.EndFrame     ();
     writer.WriteComment ("Intervals serialization");
     writer.BeginFrame   ("intervals");

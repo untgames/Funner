@@ -14,6 +14,7 @@
 #include <common/wxf_writer.h>
 #include <common/xml_writer.h>
 
+#include <math/constants.h>
 #include <math/matrix.h>
 #include <math/quat.h>
 
