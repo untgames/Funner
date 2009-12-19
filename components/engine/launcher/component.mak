@@ -38,7 +38,7 @@ ENGINE.FUNNER_SHARED_LIBRARY.iphone.IMPORTS      := link.media.image.pvr link.in
                                              link.engine.subsystems.iphone_audio_session
 
 #Цель - сборка движка
-ifneq (,$(filter iphone,$(PROFILES)))
+ifneq (,$(filter no_dll,$(PROFILES)))
 ENGINE.FUNNER_LIBRARY.TYPE                := fat-static-lib
 else
 ENGINE.FUNNER_LIBRARY.TYPE                := dynamic-lib

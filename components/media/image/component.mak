@@ -20,7 +20,7 @@ MEDIA.XATLAS.SOURCES.IMPORTS     := compile.media.image
 #Цель - Left-bottom packer sources
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.TYPE         := static-lib
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.NAME         := funner.media.image.left_bottom_packer
-MEDIA.LEFT_BOTTOM_PACKER.SOURCES.INCLUDE_DIRS := ../../bound_volumes/include
+MEDIA.LEFT_BOTTOM_PACKER.SOURCES.INCLUDE_DIRS := ../../math/bound_volumes/include
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.SOURCE_DIRS  := sources/packers/left_bottom
 MEDIA.LEFT_BOTTOM_PACKER.SOURCES.IMPORTS      := compile.media.image
 
@@ -32,7 +32,7 @@ MEDIA.PVR_LOADER.SOURCES.IMPORTS      := compile.media.image
 
 #Цель - Image tests
 MEDIA.IMAGE.TESTS.TYPE         := test-suite
-MEDIA.IMAGE.TESTS.INCLUDE_DIRS := ../../bound_volumes/include
+MEDIA.IMAGE.TESTS.INCLUDE_DIRS := ../../math/bound_volumes/include
 MEDIA.IMAGE.TESTS.SOURCE_DIRS  := tests/image tests/atlas
 MEDIA.IMAGE.TESTS.IMPORTS      := compile.media.image link.media.image link.media.image.xatlas link.media.image.left_bottom_packer run.extern.devil link.media.image.pvr
 

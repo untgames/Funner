@@ -7,7 +7,7 @@ export.link.extern.devil.LIBS    := funner.extern.devil funner.extern.ilu
 export.link.extern.devil.IMPORTS := link.extern.jpeg link.extern.tiff link.extern.libpng link.extern.zlib
 
 # Run exports
-ifeq (,$(filter iphone,$(PROFILES)))
+ifeq (,$(filter no_dll,$(PROFILES)))
 export.run.extern.devil.DLLS := funner.extern.devil funner.extern.ilu
 else
 export.run.extern.devil.DLLS :=

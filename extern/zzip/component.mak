@@ -4,7 +4,7 @@
 TARGETS := EXTERN.ZZIP
 
 #Цель №1 - ZZIP
-ifneq (,$(filter iphone,$(PROFILES)))
+ifneq (,$(filter no_dll,$(PROFILES)))
 EXTERN.ZZIP.TYPE                       := static-lib
 else
 EXTERN.ZZIP.TYPE                       := dynamic-lib

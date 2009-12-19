@@ -5,7 +5,7 @@ export.compile.extern.zzip.macosx.COMPILER_DEFINES  := ZZIP_1_H
 export.compile.extern.zzip.iphone.COMPILER_DEFINES  := ZZIP_1_H
 export.compile.extern.zzip.mingw.COMPILER_DEFINES   := ZZIP_2_H
 
-ifeq (,$(filter iphone,$(PROFILES)))
+ifeq (,$(filter no_dll,$(PROFILES)))
 export.compile.extern.zzip.COMPILER_DEFINES            := ZZIP_DLL
 endif
 
@@ -13,7 +13,7 @@ endif
 export.link.extern.zzip.LIBS := funner.extern.zzip
 
 # Run exports
-ifeq (,$(filter iphone,$(PROFILES)))
+ifeq (,$(filter no_dll,$(PROFILES)))
 export.run.extern.zzip.DLLS := funner.extern.zzip
 else
 export.run.extern.zzip.DLLS :=

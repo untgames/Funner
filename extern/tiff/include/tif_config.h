@@ -20,7 +20,9 @@
 #endif
 
 /* Define to 1 if you have the <search.h> header file. */
-#define HAVE_SEARCH_H 1
+#ifndef ANDROID
+  #define HAVE_SEARCH_H 1
+#endif
 
 /* The size of a `int', as computed by sizeof. */
 #define SIZEOF_INT 4

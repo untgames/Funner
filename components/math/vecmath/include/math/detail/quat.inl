@@ -451,12 +451,12 @@ typename quat<T>::value_type length (const quat<T>& v)
   return sqrt (norm (v));
 }
 
+#ifdef _MSC_VER
+
 inline float length (const quat<float>& v)
 {
   return sqrtf (norm (v));
 }
-
-#ifdef _MSC_VER
 
 inline long double length (const quat<long double>& v)
 {

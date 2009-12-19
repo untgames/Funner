@@ -6,7 +6,7 @@ TARGETS := SCENE_GRAPH.CORE.SOURCES SCENE_GRAPH.CORE.TESTS
 #Öåëü ¹1 - SG components sources
 SCENE_GRAPH.CORE.SOURCES.TYPE             := static-lib
 SCENE_GRAPH.CORE.SOURCES.NAME             := funner.scene_graph.core
-SCENE_GRAPH.CORE.SOURCES.INCLUDE_DIRS     := ../../bound_volumes/include
+SCENE_GRAPH.CORE.SOURCES.INCLUDE_DIRS     := ../../math/bound_volumes/include
 SCENE_GRAPH.CORE.SOURCES.SOURCE_DIRS      := sources
 SCENE_GRAPH.CORE.SOURCES.LIB_DIRS         :=  
 SCENE_GRAPH.CORE.SOURCES.LIBS             :=
