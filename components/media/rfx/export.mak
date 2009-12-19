@@ -1,6 +1,6 @@
 # Compile exports
 export.compile.media.rfx.INCLUDE_DIRS := include
-export.compile.media.rfx.IMPORTS      := compile.common
+export.compile.media.rfx.IMPORTS      := compile.math.vecmath compile.common
 
 # Link exports
 export.link.media.rfx.LIBS    := funner.media.rfx

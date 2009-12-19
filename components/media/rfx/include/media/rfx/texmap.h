@@ -1,7 +1,7 @@
 #ifndef MEDIALIB_RFX_TEXTURE_HEADER
 #define MEDIALIB_RFX_TEXTURE_HEADER
 
-#include <mathlib.h>
+#include <math/matrix.h>
 #include <stl/auto_ptr.h>
 
 namespace media

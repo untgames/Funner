@@ -36,12 +36,12 @@ inline float clamp (float value, float min_value, float max_value)
 }
 
 template <class T, size_t Size>
-inline math::vec<T, Size> clamp
- (const math::vec<T, Size>& value,
-  const math::vec<T, Size>& min_value,
-  const math::vec<T, Size>& max_value)
+inline math::vector<T, Size> clamp
+ (const math::vector<T, Size>& value,
+  const math::vector<T, Size>& min_value,
+  const math::vector<T, Size>& max_value)
 {
-  math::vec<T, Size> result;
+  math::vector<T, Size> result;
 
   for (size_t i=0; i<Size; i++)
     result [i] = clamp (value [i], min_value [i], max_value [i]);

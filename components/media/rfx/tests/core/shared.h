@@ -1,8 +1,10 @@
 #ifndef MEDIALIB_RFX_TESTS_SHARED_HEADER
 #define MEDIALIB_RFX_TESTS_SHARED_HEADER
 
-#include <stdio.h>
+#include <cstdio>
 #include <exception>
+
+#include <math/utility.h>
 
 #include <media/rfx.h>
 

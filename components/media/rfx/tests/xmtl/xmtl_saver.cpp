@@ -31,7 +31,7 @@ int main ()
     sprite_material->SetTileSize (10, 20);
     sprite_material->SetBlendMode (SpriteBlendMode_Translucent);
     
-    texmap.SetTransform  (math::translatef (1, 2, 3));
+    texmap.SetTransform  (math::translate (vec3f (1, 2, 3)));
     texmap.SetSource     (Texcoord_S, TexcoordSource_SphereMap);
     texmap.SetSource     (Texcoord_T, 2);    
     texmap.SetSource     (Texcoord_Q, TexcoordSource_ReflectionMap);

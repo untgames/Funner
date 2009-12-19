@@ -1,7 +1,7 @@
 #include "shared.h"
 
 template <size_t Size>
-void dump (const vec<float, Size>& v)
+void dump (const vector<float, Size>& v)
 {
   printf ("[");
   
@@ -152,7 +152,7 @@ int main ()
 
   Texmap& texmap = shader->Map (CommonMaterialMap_Transparent);
 
-  texmap.SetTransform  (translatef (1.0f, 0.5f, 0.0f));
+  texmap.SetTransform  (translate (vec3f (1.0f, 0.5f, 0.0f)));
   texmap.SetImage      ("image1");
   texmap.SetWrap       (Texcoord_T, TexcoordWrap_ClampToBorder);
   texmap.SetSource     (Texcoord_Q, TexcoordSource_ReflectionMap);

@@ -3,7 +3,7 @@
 
 #include <media/rfx/material.h>
 #include <media/rfx/texmap.h>
-#include <mathlib.h>
+#include <math/vector.h>
 
 namespace media
 {
