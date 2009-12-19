@@ -1,7 +1,7 @@
 #ifndef INPUT_SYSTEM_CURSOR_HEADER
 #define INPUT_SYSTEM_CURSOR_HEADER
 
-#include <mathlib.h>
+#include <math/vector.h>
 
 namespace input
 {

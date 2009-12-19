@@ -1,5 +1,6 @@
 # Manager compile exports
 export.compile.input.manager.INCLUDE_DIRS := include ../../xtl/include
+export.compile.input.manager.IMPORTS      := compile.math.vecmath
 
 # Manager link exports
 export.link.input.manager.LIBS    := funner.input.manager
