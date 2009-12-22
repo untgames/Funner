@@ -26,7 +26,7 @@ inline void copy_attribute (const VertexInfluence& src, VertexInfluence& dst)
   dst = src;
 }
 
-template <class T1, size_t Size1, class T2, size_t Size2>
+template <class T1, unsigned int Size1, class T2, unsigned int Size2>
 inline void copy_attribute (const vector<T1, Size1>& src, vector<T2, Size2>& dst)
 {
   size_t min_size, max_size, i;

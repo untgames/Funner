@@ -1,6 +1,6 @@
 #include "shared.h"
 
-template <size_t Size>
+template <unsigned int Size>
 void dump (const vector<float, Size>& v)
 {
   printf ("[");
@@ -11,7 +11,7 @@ void dump (const vector<float, Size>& v)
   printf (" ]");
 }
 
-template <size_t Size>
+template <unsigned int Size>
 void dump (const matrix<float, Size>& m)
 {
   printf ("[");

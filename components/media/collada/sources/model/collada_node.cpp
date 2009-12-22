@@ -6,11 +6,11 @@ using namespace media::collada;
     Описание реализации узла
 */
 
-typedef CollectionImpl<Node>               NodeListImpl;
-typedef CollectionImpl<Light>              LightListImpl;
-typedef CollectionImpl<Camera>             CameraListImpl;
-typedef CollectionImpl<InstanceMesh>       InstanceMeshListImpl;
-typedef CollectionImpl<InstanceController> InstanceControllerListImpl;
+typedef media::CollectionImpl<Node, ICollection<Node> >                             NodeListImpl;
+typedef media::CollectionImpl<Light,ICollection<Light> >                            LightListImpl;
+typedef media::CollectionImpl<Camera, ICollection<Camera> >                         CameraListImpl;
+typedef media::CollectionImpl<InstanceMesh, ICollection<InstanceMesh> >             InstanceMeshListImpl;
+typedef media::CollectionImpl<InstanceController, ICollection<InstanceController> > InstanceControllerListImpl;
 
 struct Node::Impl: public xtl::reference_counter
 {

@@ -90,7 +90,7 @@ inline void check_attribute (Log& log, CheckContext& context, const VertexInflue
                context.vertex_buffer_index, context.stream_index, context.vertex_index, weights_sum);
 }
 
-template <size_t Size>
+template <unsigned int Size>
 inline void check_attribute (Log& log, CheckContext& context, const math::vector<float, Size>& attribute)
 {
   static const char* component_name [] = {"x", "y", "z", "w"};
@@ -101,7 +101,7 @@ inline void check_attribute (Log& log, CheckContext& context, const math::vector
     #define isfinite _finite
     #endif
     
-    if (!isfinite (attribute [i]))
+    if (!std::isfinite (attribute [i]))
       log.Error ("infinite value vertex_buffer[%u].stream[%u].vertex[%u].%s.%s (attribute_type='%s')",
                  context.vertex_buffer_index, context.stream_index, context.vertex_index, get_semantic_name (context.attribute->semantic), component_name [i],
                  get_type_name (context.attribute->type));

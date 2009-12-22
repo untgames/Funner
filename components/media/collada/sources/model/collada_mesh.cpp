@@ -7,12 +7,12 @@ using namespace common;
     Реализация Mesh
 */
 
-typedef CollectionImpl<Surface> SurfaceCollection;
+typedef media::CollectionImpl<Surface, ICollection<Surface> > SurfaceCollection;
 
 struct Mesh::Impl: public xtl::reference_counter
 {
   SurfaceCollection surfaces; //поверхности меша
-  stl::string       id;       //идентификатор меша  
+  stl::string       id;       //идентификатор меша
 };
 
 /*

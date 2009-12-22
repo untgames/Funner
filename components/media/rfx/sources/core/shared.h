@@ -23,7 +23,7 @@ namespace rfx
 {
 
 /*
-    Утилиты    
+    Утилиты
 */
 
 //отсечение по границе
@@ -35,7 +35,7 @@ inline float clamp (float value, float min_value, float max_value)
   return value;
 }
 
-template <class T, size_t Size>
+template <class T, unsigned int Size>
 inline math::vector<T, Size> clamp
  (const math::vector<T, Size>& value,
   const math::vector<T, Size>& min_value,

@@ -12,9 +12,9 @@
 #include <common/component.h>
 
 #include <media/collada.h>
+#include <media/collection.h>
 #include <media/resource_library.h>
 
 #include "library.h"
-#include "collection.h"
 
 #endif

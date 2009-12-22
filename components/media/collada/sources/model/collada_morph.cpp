@@ -83,16 +83,16 @@ float MorphTarget::Weight () const
 }
 
 /*
-    Морфер    
+    Морфер
 */
 
-typedef CollectionImpl<MorphTarget> MorphTargetListImpl;
+typedef media::CollectionImpl<MorphTarget, ICollection<MorphTarget> > MorphTargetListImpl;
 
 struct Morph::Impl: public xtl::reference_counter
 {
   MorphMethod         method;    //метод морфинга
   MorphTargetListImpl targets;   //цели морфинга
-  stl::string         base_mesh; //базовый меш  
+  stl::string         base_mesh; //базовый меш
   stl::string         id;        //идентификатор морфера
   
   Impl () : method (MorphMethod_Normalized) {}

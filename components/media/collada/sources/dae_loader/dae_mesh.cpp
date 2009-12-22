@@ -276,7 +276,7 @@ class VertexStreamReader
       ReadCore (semantic, set, params, buffer, field_selector<T, Field> (field));
     }
 
-///Ќепосредственное чтение канала данных    
+///Ќепосредственное чтение канала данных
     template <class T>
     void Read (const char* semantic, const char* set, const char* params, T* buffer)
     {
@@ -368,7 +368,7 @@ class VertexStreamReader
     
   private:
 ///„тение вектора
-    template <size_t N>
+    template <unsigned int N>
     void SetField (const float* src, math::vector<float, N>& res)
     {
       for (size_t i=0; i<N; i++)
@@ -606,7 +606,7 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
   read (*p_iter, "#text", &input_indices [0], input_indices_count);
 
     //построение исходного вершинного буфера (каждый элемент - указатель на массив индексов во входных каналах данных)
-    //резервирование максимально возможного размера буфера вершин и буфера индексов    
+    //резервирование максимально возможного размера буфера вершин и буфера индексов
 
   MeshVertexBuffer vertex_buffer (inputs_count, input_indices_count);
 
@@ -624,7 +624,7 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
     *index = vertex_buffer.AddVertex (&*index_iter);
   }  
 
-    //создание поверхности    
+    //создание поверхности
     
   Surface surface (surface_info.primitive_type, vertex_buffer.GetVerticesCount (), indices_count);
   
@@ -636,7 +636,7 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
 
   stl::copy (output_indices.begin (), output_indices.end (), surface.Indices ());
 
-    //создание объекта, читающего каналы вершинных данных  
+    //создание объекта, читающего каналы вершинных данных
 
   VertexStreamReader stream_reader (*this, *surface_iter, surface_info.inputs, vertex_buffer);
  

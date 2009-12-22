@@ -38,7 +38,7 @@ void print (float value)
 }
 
 //печать вектора
-template <class T, size_t N>
+template <class T, unsigned int N>
 void print (const math::vector<T, N>& v)
 {
   printf ("[");
@@ -53,7 +53,7 @@ void print (const math::vector<T, N>& v)
 }
 
 //печать матрицы
-template <class T, size_t N>
+template <class T, unsigned int N>
 void print (const math::matrix<T, N>& v)
 {
   printf ("[");
