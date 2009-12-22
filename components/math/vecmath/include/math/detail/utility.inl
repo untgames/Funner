@@ -17,18 +17,18 @@ struct quat_to_matrix {
       xx = q.x * x2;   xy = q.x * y2;   xz = q.x * z2;
       yy = q.y * y2;   yz = q.y * z2;   zz = q.z * z2;
       wx = q.w * x2;   wy = q.w * y2;   wz = q.w * z2;
+      
+      res [0][0] = T(1) - (yy + zz);
+      res [0][1] = xy - wz;
+      res [0][2] = xz + wy;
 
-      res [0][0] = T (1) - (yy + zz);
-      res [1][0] = xy - wz;
-      res [2][0] = xz + wy;
+      res [1][0] = xy + wz;
+      res [1][1] = T(1) - (xx + zz);
+      res [1][2] = yz - wx;
 
-      res [0][1] = xy + wz;
-      res [1][1] = T (1) - (xx + zz);
-      res [2][1] = yz - wx;
-
-      res [0][2] = xz - wy;
-      res [1][2] = yz + wx;
-      res [2][2] = T (1) - (xx + yy);
+      res [2][0] = xz - wy;
+      res [2][1] = yz + wx;
+      res [2][2] = T(1) - (xx + yy);
     }
     
   public:
