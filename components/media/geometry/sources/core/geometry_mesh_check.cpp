@@ -98,10 +98,12 @@ inline void check_attribute (Log& log, CheckContext& context, const math::vector
   for (size_t i=0; i<Size; i++)
   {
     #ifdef _MSC_VER
-    #define isfinite _finite
+      #define isfinite _finite
+    #else
+      #define isfinite std::isfinite
     #endif
     
-    if (!std::isfinite (attribute [i]))
+    if (!isfinite (attribute [i]))
       log.Error ("infinite value vertex_buffer[%u].stream[%u].vertex[%u].%s.%s (attribute_type='%s')",
                  context.vertex_buffer_index, context.stream_index, context.vertex_index, get_semantic_name (context.attribute->semantic), component_name [i],
                  get_type_name (context.attribute->type));

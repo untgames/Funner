@@ -1,6 +1,8 @@
 #ifndef MEDIALIB_GEOMETRY_SHARED_HEADER
 #define MEDIALIB_GEOMETRY_SHARED_HEADER
 
+#include <cmath>
+
 #include <memory.h>
 #include <float.h>
 
