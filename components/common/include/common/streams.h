@@ -267,10 +267,10 @@ void write (OutputTextStream&, bool value, const char* format);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сериализация математических типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T, size_t size>
+template <class T, unsigned int size>
 void write (OutputTextStream&, const math::vector<T, size>& value, const char* format="");
 
-template <class T, size_t size>
+template <class T, unsigned int size>
 void write (OutputTextStream&, const math::matrix<T, size>& value, const char* format="");
 
 template <class T>
