@@ -10,7 +10,7 @@ int main ()
     
   node->SetPosition    (1, 1, 1);
   parent->SetPosition    (2, 2, 2);
-  parent->SetOrientation (90, 1, 0, 0);
+  parent->SetOrientation (degree (90.f), 1, 0, 0);
   parent->SetScale       (2, 2, 2);
   
   vec3f test_point;

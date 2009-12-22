@@ -13,10 +13,10 @@ const float EPS = 1e-6f;
 
 struct PerspectiveCamera::Impl
 {
-  float fov_x;  //угол обзора по горизонтали
-  float fov_y;  //угол обзора по вертикали
-  float z_near; //ближн€€ плоскость отсечени€
-  float z_far;  //дальн€€ плоскость отсечени€
+  anglef fov_x;  //угол обзора по горизонтали
+  anglef fov_y;  //угол обзора по вертикали
+  float  z_near; //ближн€€ плоскость отсечени€
+  float  z_far;  //дальн€€ плоскость отсечени€
 };
 
 /*
@@ -26,8 +26,8 @@ struct PerspectiveCamera::Impl
 PerspectiveCamera::PerspectiveCamera ()
   : impl (new Impl)
 {
-  impl->fov_x  = 1;
-  impl->fov_y  = 1;
+  impl->fov_x  = degree (1.0f);
+  impl->fov_y  = degree (1.0f);
   impl->z_near = 0;
   impl->z_far  = 1;
 }
@@ -50,24 +50,24 @@ PerspectiveCamera::Pointer PerspectiveCamera::Create ()
     ѕараметры
 */
 
-void PerspectiveCamera::SetFovX (float fov_x)
+void PerspectiveCamera::SetFovX (const math::anglef& fov_x)
 {
   impl->fov_x = fov_x;
   UpdateBoundsNotify ();
 }
 
-float PerspectiveCamera::FovX () const
+const math::anglef& PerspectiveCamera::FovX () const
 {
   return impl->fov_x;
 }
 
-void PerspectiveCamera::SetFovY (float fov_y)
+void PerspectiveCamera::SetFovY (const math::anglef& fov_y)
 {
   impl->fov_y = fov_y;
   UpdateBoundsNotify ();
 }
 
-float PerspectiveCamera::FovY () const
+const math::anglef& PerspectiveCamera::FovY () const
 {
   return impl->fov_y; 
 }
@@ -96,8 +96,8 @@ float PerspectiveCamera::ZFar () const
 
 void PerspectiveCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
 {
-  float width  = tan (deg2rad (impl->fov_x * 0.5f)) * impl->z_near, 
-        height = tan (deg2rad (impl->fov_y * 0.5f)) * impl->z_near,
+  float width  = tan (impl->fov_x * 0.5f) * impl->z_near, 
+        height = tan (impl->fov_y * 0.5f) * impl->z_near,
         depth  = impl->z_far - impl->z_near;
 
   if (fabs (width)  < EPS) throw xtl::format_operation_exception ("scene_graph::PerspectiveCamera::ComputeProjectionMatrix", "Zero camera width");
@@ -116,8 +116,8 @@ void PerspectiveCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
 
 void PerspectiveCamera::UpdateBoundsCore ()
 {
-  float half_width  = tan (deg2rad (impl->fov_x / 2)) * stl::max (fabs (impl->z_near), fabs (impl->z_far)), 
-        half_height = tan (deg2rad (impl->fov_y / 2)) * stl::max (fabs (impl->z_near), fabs (impl->z_far));
+  float half_width  = tan (impl->fov_x / 2) * stl::max (fabs (impl->z_near), fabs (impl->z_far)), 
+        half_height = tan (impl->fov_y / 2) * stl::max (fabs (impl->z_near), fabs (impl->z_far));
 
   SetBoundBox (axis_aligned_box <float> (-half_width, -half_height, -impl->z_far,
                                           half_width,  half_height, -impl->z_near));

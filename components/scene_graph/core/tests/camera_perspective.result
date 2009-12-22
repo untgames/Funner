@@ -1,6 +1,6 @@
 Results of camera_perspective_test:
 Perspective camera params:
- fovx = 16.000000, fovy = 9.000000, znear = 1.000000, zfar = 4.000000
+ fovx = 15.999999, fovy = 9.000000, znear = 1.000000, zfar = 4.000000
 Projection matrix:
 [ [ +14.231 +0.000 +0.000 +0.000 ] [ +0.000 +25.412 +0.000 +0.000 ] [ +0.000 +0.000 +1.667 -2.667 ] [ +0.000 +0.000 +1.000 +0.000 ] ]
 camera '' bound:

@@ -1,7 +1,9 @@
 #ifndef SCENE_GRAPH_NODE_HEADER
 #define SCENE_GRAPH_NODE_HEADER
 
-#include <mathlib.h>
+#include <math/angle.h>
+#include <math/matrix.h>
+#include <math/quat.h>
 
 #include <xtl/functional_fwd>
 #include <xtl/dynamic_cast_root.h>
@@ -236,12 +238,12 @@ class Node: public xtl::dynamic_cast_root
 ///ќриентаци€ узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetOrientation      (const math::quatf&);
-    void SetOrientation      (float angle_in_degrees, float axis_x, float axis_y, float axis_z);
-    void SetOrientation      (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees); //углы Ёйлера
+    void SetOrientation      (const math::anglef& angle, float axis_x, float axis_y, float axis_z);
+    void SetOrientation      (const math::anglef& pitch, const math::anglef& yaw, const math::anglef& roll); //углы Ёйлера
     void ResetOrientation    ();
     void SetWorldOrientation (const math::quatf&);
-    void SetWorldOrientation (float angle_in_degrees, float axis_x, float axis_y, float axis_z);
-    void SetWorldOrientation (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees); //углы Ёйлера
+    void SetWorldOrientation (const math::anglef& angle, float axis_x, float axis_y, float axis_z);
+    void SetWorldOrientation (const math::anglef& pitch, const math::anglef& yaw, const math::anglef& roll); //углы Ёйлера
 
     const math::quatf& Orientation      () const;
     const math::quatf& WorldOrientation () const;
@@ -278,8 +280,8 @@ class Node: public xtl::dynamic_cast_root
     void Translate (const math::vec3f&, NodeTransformSpace = NodeTransformSpace_Parent);
     void Translate (float offset_x, float offset_y, float offset_z, NodeTransformSpace = NodeTransformSpace_Parent);
     void Rotate    (const math::quatf&, NodeTransformSpace = NodeTransformSpace_Parent);
-    void Rotate    (float angle_in_degrees, float axis_x, float axis_y, float axis_z, NodeTransformSpace = NodeTransformSpace_Parent);
-    void Rotate    (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees, NodeTransformSpace = NodeTransformSpace_Parent);
+    void Rotate    (const math::anglef& angle, float axis_x, float axis_y, float axis_z, NodeTransformSpace = NodeTransformSpace_Parent);
+    void Rotate    (const math::anglef& pitch, const math::anglef& yaw, const math::anglef& roll, NodeTransformSpace = NodeTransformSpace_Parent);
     void Scale     (const math::vec3f&);
     void Scale     (float sx, float sy, float sz);
 

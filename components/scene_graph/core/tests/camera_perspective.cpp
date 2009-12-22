@@ -6,7 +6,7 @@ void print (float value)
 }
 
 template <class T, size_t N>
-void dump_vector (const math::vec<T, N>& v)
+void dump_vector (const math::vector<T, N>& v)
 {
   printf ("[");
   
@@ -59,12 +59,12 @@ int main ()
   
   PerspectiveCamera::Pointer camera (PerspectiveCamera::Create ());
 
-  camera->SetFovX   (16);
-  camera->SetFovY   (9);
+  camera->SetFovX   (degree (16.0f));
+  camera->SetFovY   (degree (9.0f));
   camera->SetZNear  (1);
   camera->SetZFar   (4);
 
-  printf ("Perspective camera params:\n fovx = %f, fovy = %f, znear = %f, zfar = %f\n", camera->FovX (), camera->FovY (), camera->ZNear (), camera->ZFar ());
+  printf ("Perspective camera params:\n fovx = %f, fovy = %f, znear = %f, zfar = %f\n", degree (camera->FovX ()), degree (camera->FovY ()), camera->ZNear (), camera->ZFar ());
 
   printf ("Projection matrix:\n");
   dump_matrix (camera->ProjectionMatrix ());

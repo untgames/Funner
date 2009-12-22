@@ -110,10 +110,10 @@ class SpotLight : public Light
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры источника света
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void  SetAngle    (float angle);
-    void  SetExponent (float exponent);
-    float Angle       () const;
-    float Exponent    () const;
+    void                SetAngle    (const math::anglef& angle);
+    void                SetExponent (float exponent);
+    const math::anglef& Angle       () const;
+    float               Exponent    () const;
     
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

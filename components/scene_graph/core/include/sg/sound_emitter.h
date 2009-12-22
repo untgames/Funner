@@ -1,7 +1,6 @@
 #ifndef SCENE_GRAPH_SOUND_EMITTER_HEADER
 #define SCENE_GRAPH_SOUND_EMITTER_HEADER
 
-#include <mathlib.h>
 #include <xtl/functional_fwd>
 #include <sg/entity.h>
 

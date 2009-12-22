@@ -1,5 +1,5 @@
 Results of sprite_pivot_test:
 position: [4.00 4.00 4.00]
-axis_x:   [0.00 1.00 0.00]
-axis_y:   [-1.00 0.00 0.00]
+axis_x:   [-0.00 1.00 0.00]
+axis_y:   [-1.00 -0.00 0.00]
 axis_z:   [0.00 0.00 1.00]

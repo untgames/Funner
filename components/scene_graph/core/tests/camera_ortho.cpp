@@ -6,7 +6,7 @@ void print (float value)
 }
 
 template <class T, size_t N>
-void dump_vector (const math::vec<T, N>& v)
+void dump_vector (const math::vector<T, N>& v)
 {
   printf ("[");
   

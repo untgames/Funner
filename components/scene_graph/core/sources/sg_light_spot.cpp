@@ -12,8 +12,8 @@ const float LIGHT_INFINITY = 1e9;  //если радиус/расстояние источника света прев
 
 struct SpotLight::Impl
 {
-  float angle;         //угол света
-  float exponent;      //экспонента рассеивания по углу
+  anglef angle;         //угол света
+  float  exponent;      //экспонента рассеивания по углу
 };
 
 /*
@@ -23,7 +23,7 @@ struct SpotLight::Impl
 SpotLight::SpotLight ()
   : impl (new Impl)
 {
-  impl->angle    = 0;
+  impl->angle    = radian (0.0f);
   impl->exponent = 0;
 }
 
@@ -45,13 +45,13 @@ SpotLight::Pointer SpotLight::Create ()
     Параметры действия источника света
 */
 
-void SpotLight::SetAngle (float angle)
+void SpotLight::SetAngle (const math::anglef& angle)
 {
   impl->angle = angle;
   UpdateBoundsNotify ();
 }
 
-float SpotLight::Angle () const
+const math::anglef& SpotLight::Angle () const
 {
   return impl->angle;
 }
@@ -76,7 +76,7 @@ void SpotLight::UpdateBoundsCore ()
     SetInfiniteBounds ();
   else
   {
-    float half_width  = tan (deg2rad (impl->angle / 2)) * Range (); 
+    float half_width = tan (impl->angle / 2) * Range (); 
   
     SetBoundBox (axis_aligned_box <float> (-half_width, -half_width, 0, half_width, half_width, Range ()));
   }

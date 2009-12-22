@@ -25,7 +25,7 @@ int main ()
   
   printf ("rotate parent\n");
   
-  parent->Rotate (180, 0, 1, 0);
+  parent->Rotate (degree (180.f), 0, 1, 0);
   
   printf ("parent orientation: ");
   dump_orientation (*parent);

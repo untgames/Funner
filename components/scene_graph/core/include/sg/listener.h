@@ -1,7 +1,6 @@
 #ifndef SCENE_GRAPH_LISTENER_HEADER
 #define SCENE_GRAPH_LISTENER_HEADER
 
-#include <mathlib.h>
 #include <sg/entity.h>
 
 namespace scene_graph

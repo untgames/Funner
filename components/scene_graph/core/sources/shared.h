@@ -11,14 +11,16 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/lexical_cast.h>
 #include <xtl/reference_counter.h>
 #include <xtl/shared_ptr.h>
 #include <xtl/signal.h>
 #include <xtl/token_parser.h>
+#include <xtl/token_iterator.h>
 #include <xtl/uninitialized_storage.h>
 #include <xtl/visitor.h>
 
-#include <math/io.h>
+#include <math/utility.h>
 
 #include <common/component.h>
 #include <common/singleton.h>

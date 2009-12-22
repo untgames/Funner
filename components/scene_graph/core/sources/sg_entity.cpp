@@ -165,13 +165,13 @@ bool Entity::IsInfiniteBounds () const
 //ограничивающий объём потомков в локальной системе координат узла
 aaboxf Entity::ChildrenBoundBox () const
 {
-  return WorldChildrenBoundBox () * invert (WorldTM ());
+  return WorldChildrenBoundBox () * inverse (WorldTM ());
 }
 
 //полный ограничивающий объём узла с потомками в локальной системе координат узла
 aaboxf Entity::FullBoundBox () const
 {
-  return WorldFullBoundBox () * invert (WorldTM ());
+  return WorldFullBoundBox () * inverse (WorldTM ());
 }
 
 //ограничивающий объём потомков в мировой системе координат

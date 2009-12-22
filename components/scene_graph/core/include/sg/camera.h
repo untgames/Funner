@@ -1,7 +1,7 @@
 #ifndef SCENE_GRAPH_CAMERA_HEADER
 #define SCENE_GRAPH_CAMERA_HEADER
 
-#include <mathlib.h>
+#include <math/matrix.h>
 #include <sg/entity.h>
 
 namespace scene_graph
@@ -66,14 +66,14 @@ class PerspectiveCamera : public Camera
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void  SetFovX  (float fov_x);
-    void  SetFovY  (float fov_y);
-    void  SetZNear (float z_near);
-    void  SetZFar  (float z_far);        
-    float FovX     () const;
-    float FovY     () const;
-    float ZNear    () const;
-    float ZFar     () const;
+    void                SetFovX  (const math::anglef& fov_x);
+    void                SetFovY  (const math::anglef& fov_y);
+    void                SetZNear (float z_near);
+    void                SetZFar  (float z_far);
+    const math::anglef& FovX     () const;
+    const math::anglef& FovY     () const;
+    float               ZNear    () const;
+    float               ZFar     () const;
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -17,11 +17,11 @@ int main ()
   Node::Pointer node (Node::Create ()), parent (Node::Create ());
   
   node->BindToParent (*parent);
-  node->SetOrientation (0, 60, 0);
+  node->SetOrientation (degree (0.f), degree (60.f), degree (0.f));
   
   parent->SetScale (1, 2, 3);
   parent->SetPosition (3, 4, 5);
-  parent->SetOrientation (90, 0, 0);
+  parent->SetOrientation (degree (90.0f), degree (0.0f), degree (0.0f));
   
   printf ("initial state\n");
   
@@ -29,19 +29,19 @@ int main ()
  
   printf ("rotate node in parent space\n");
   
-  node->Rotate (-90, 0, -60, NodeTransformSpace_Parent); 
+  node->Rotate (degree (-90.0f), degree (0.0f), degree (-60.0f), NodeTransformSpace_Parent); 
 
   dump_state (*node, *parent);
   
   printf ("rotate node in local space\n");
   
-  node->Rotate (0, 30, 0, NodeTransformSpace_Local);
+  node->Rotate (degree (0.0f), degree (30.0f), degree (0.f), NodeTransformSpace_Local);
   
   dump_state (*node, *parent);  
  
   printf ("rotate node in world space\n");
   
-  node->Rotate (0, 0, 90, NodeTransformSpace_World);
+  node->Rotate (degree (0.0f), degree (0.f), degree (90.f), NodeTransformSpace_World);
   
   dump_state (*node, *parent);
 

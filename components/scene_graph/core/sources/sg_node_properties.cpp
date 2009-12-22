@@ -937,7 +937,7 @@ void NodeProperties::SetProperty (size_t property_index, const math::vec4f& valu
     switch (property.type)
     {
       case NodePropertyType_String:
-        to_string (static_cast<NodePropertyImpl<NodePropertyType_String>&> (property).value, value);
+        xtl::to_string (static_cast<NodePropertyImpl<NodePropertyType_String>&> (property).value, value);
         break;
       case NodePropertyType_Vector:
         static_cast<NodePropertyImpl<NodePropertyType_Vector>&> (property).value = value;
@@ -971,7 +971,7 @@ void NodeProperties::SetProperty (size_t property_index, const math::mat4f& valu
     switch (property.type)
     {
       case NodePropertyType_String:
-        to_string (static_cast<NodePropertyImpl<NodePropertyType_String>&> (property).value, value);
+        xtl::to_string (static_cast<NodePropertyImpl<NodePropertyType_String>&> (property).value, value);
         break;
       case NodePropertyType_Matrix:
         static_cast<NodePropertyImpl<NodePropertyType_Matrix>&> (property).value = value;
@@ -1152,10 +1152,10 @@ void NodeProperties::GetProperty (size_t property_index, stl::string& result) co
         xtl::to_string (result, static_cast<NodePropertyImpl<NodePropertyType_Float>&> (property).value);        
         break;
       case NodePropertyType_Vector:    
-        to_string (result, static_cast<NodePropertyImpl<NodePropertyType_Vector>&> (property).value);
+        xtl::to_string (result, static_cast<NodePropertyImpl<NodePropertyType_Vector>&> (property).value);
         break;    
       case NodePropertyType_Matrix:    
-        to_string (result, static_cast<NodePropertyImpl<NodePropertyType_Matrix>&> (property).value);
+        xtl::to_string (result, static_cast<NodePropertyImpl<NodePropertyType_Matrix>&> (property).value);
         break;    
       default:
         throw xtl::format_operation_exception ("", "Internal error: wrong property '%s' type %d", property.name.c_str (), property.type);

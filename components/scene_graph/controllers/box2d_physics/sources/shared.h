@@ -13,8 +13,6 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 
-#include <math/io.h>
-
 #include <common/component.h>
 #include <common/log.h>
 #include <common/parser.h>

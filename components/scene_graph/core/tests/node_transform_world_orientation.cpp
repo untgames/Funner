@@ -9,7 +9,7 @@ int main ()
   node->BindToParent (*parent);
     
   printf ("set orientation result: ");
-  node->SetOrientation (30, 0, 0);
+  node->SetOrientation (degree (30.f), degree (0.f), degree (0.f));
   dump_orientation (*node);
   printf ("\n");
 
@@ -25,7 +25,7 @@ int main ()
   
   printf ("rotate parent\n");
   
-  parent->Rotate (30, 0, 0);
+  parent->Rotate (degree (30.f), degree (0.f), degree (0.f));
   
   printf ("parent orientation: ");
   dump_orientation (*parent);

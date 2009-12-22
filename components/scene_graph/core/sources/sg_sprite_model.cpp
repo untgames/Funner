@@ -14,12 +14,12 @@ struct SpriteModel::Impl
   stl::string       material;                       //имя материала
   SpriteModelSignal signals [SpriteModelEvent_Num]; //сигналы модели 
   vec3f             pivot_position;                 //положение центра в локальной системе координат
-  float             pivot_rotation;                 //поворот центра в локальной системе координат
+  anglef            pivot_rotation;                 //поворот центра в локальной системе координат
   float             alpha_reference;                //параметр, используемый для альфа-теста
   bool              need_recalc_world_tm;           //необходим пересчёт мировой матрицы преобразований
   mat4f             world_tm;                       //мировая матрица преобразований
 
-  Impl () : pivot_rotation (0.0f), alpha_reference (0.f), need_recalc_world_tm (true) {}
+  Impl () : pivot_rotation (), alpha_reference (0.f), need_recalc_world_tm (true) {}
 
     //оповещение о событии
   void Notify (SpriteModel& sender, SpriteModelEvent event_id)
@@ -101,15 +101,15 @@ void SpriteModel::SetPivotPosition (float x, float y, float z)
 }
 
 //поворот центра относительно Oz
-void SpriteModel::SetPivotRotation (float angle_in_degrees)
+void SpriteModel::SetPivotRotation (const anglef& angle)
 {
-  SetPivot (impl->pivot_position, angle_in_degrees);
+  SetPivot (impl->pivot_position, angle);
 }
 
-void SpriteModel::SetPivot (const vec3f& position, float angle_in_degrees)
+void SpriteModel::SetPivot (const vec3f& position, const anglef& angle)
 {
   impl->pivot_position       = position;
-  impl->pivot_rotation       = angle_in_degrees;
+  impl->pivot_rotation       = angle;
   impl->need_recalc_world_tm = true;    
 
     //оповещение об обновлении
@@ -122,7 +122,7 @@ const vec3f& SpriteModel::PivotPosition () const
   return impl->pivot_position;
 }
 
-float SpriteModel::PivotRotation () const
+const anglef& SpriteModel::PivotRotation () const
 {
   return impl->pivot_rotation;
 }
@@ -135,9 +135,9 @@ namespace
 {
 
 //расчёт матрицы центра
-void eval_pivot_tm (const math::vec3f& position, float angle, math::mat4f& pivot_tm)
+void eval_pivot_tm (const math::vec3f& position, const anglef& angle, math::mat4f& pivot_tm)
 {
-  pivot_tm = translate (-position) * fromAxisAngle (deg2rad (angle), vec3f (0, 0, 1));
+  pivot_tm = translate (-position) * rotate (angle, vec3f (0, 0, 1));
 }
 
 }

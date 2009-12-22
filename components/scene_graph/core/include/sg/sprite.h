@@ -55,12 +55,12 @@ class SpriteModel: public Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Положение и ориентиация центра модели
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void               SetPivot         (const math::vec3f& position, float angle_in_degrees);
-    void               SetPivotPosition (const math::vec3f& position);
-    void               SetPivotPosition (float x, float y, float z);
-    void               SetPivotRotation (float angle_in_degrees); //поворот центра относительно Oz
-    const math::vec3f& PivotPosition    () const;
-    float              PivotRotation    () const;
+    void                SetPivot         (const math::vec3f& position, const math::anglef& angle);
+    void                SetPivotPosition (const math::vec3f& position);
+    void                SetPivotPosition (float x, float y, float z);
+    void                SetPivotRotation (const math::anglef& angle); //поворот центра относительно Oz
+    const math::vec3f&  PivotPosition    () const;
+    const math::anglef& PivotRotation    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение матриц преобразования после применения pivot-преобразования

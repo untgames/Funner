@@ -7,7 +7,7 @@ int main ()
   Sprite::Pointer model = Sprite::Create ();
 
   model->SetPivotPosition (1, 2, 3);
-  model->SetPivotRotation (90);
+  model->SetPivotRotation (degree (90.f));
   
   mat4f tm;
 

@@ -20,12 +20,12 @@ int main ()
   node->BindToParent (*parent);
     
   node->SetPosition (1, 1, 1);
-  node->SetOrientation (180, 0, 0, 1);
+  node->SetOrientation (degree (180.f), 0, 0, 1);
 
   printf ("parent:\n");
   
   parent->SetPosition    (1, 2, 3);
-  parent->SetOrientation (90, 0, 0);
+  parent->SetOrientation (degree (90.f), degree (0.f), degree (0.f));
   parent->SetScale       (2, 2, 2);
   
   dump_transform (*parent);

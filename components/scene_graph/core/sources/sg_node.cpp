@@ -1029,29 +1029,29 @@ void Node::SetOrientation (const quatf& orientation)
   impl->UpdateLocalTransformNotify ();
 }
 
-void Node::SetOrientation (float angle_in_degrees, float axis_x, float axis_y, float axis_z)
+void Node::SetOrientation (const math::anglef& angle, float axis_x, float axis_y, float axis_z)
 {
-  SetOrientation (fromAxisAnglef (deg2rad (angle_in_degrees), axis_x, axis_y, axis_z));
+  SetOrientation (to_quat (angle, vec3f (axis_x, axis_y, axis_z)));
 }
 
-void Node::SetOrientation (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees)
+void Node::SetOrientation (const math::anglef& pitch, const math::anglef& yaw, const math::anglef& roll)
 {
-  SetOrientation (fromEulerAnglef (deg2rad (pitch_in_degrees), deg2rad (yaw_in_degrees), deg2rad (roll_in_degrees)));
+  SetOrientation (to_quat (pitch, yaw, roll));
 }
 
 void Node::SetWorldOrientation (const quatf& orientation)
 {
-  Rotate (orientation * invert (WorldOrientation ()), NodeTransformSpace_World);
+  Rotate (orientation * inverse (WorldOrientation ()), NodeTransformSpace_World);
 }
 
-void Node::SetWorldOrientation (float angle_in_degrees, float axis_x, float axis_y, float axis_z)
+void Node::SetWorldOrientation (const math::anglef& angle, float axis_x, float axis_y, float axis_z)
 {
-  SetWorldOrientation (fromAxisAnglef (deg2rad (angle_in_degrees), axis_x, axis_y, axis_z));
+  SetWorldOrientation (to_quat (angle, vec3f (axis_x, axis_y, axis_z)));
 }
 
-void Node::SetWorldOrientation (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees)
+void Node::SetWorldOrientation (const math::anglef& pitch, const math::anglef& yaw, const math::anglef& roll)
 {
-  SetWorldOrientation (fromEulerAnglef (deg2rad (pitch_in_degrees), deg2rad (yaw_in_degrees), deg2rad (roll_in_degrees)));
+  SetWorldOrientation (to_quat (pitch, yaw, roll));
 }
 
 void Node::ResetOrientation ()
@@ -1089,7 +1089,7 @@ void Node::LookTo (const vec3f& target_point, const vec3f& up, NodeTransformSpac
       break;
     case NodeTransformSpace_Parent:
     {
-      quatf q = invert (normalize (Orientation ()));
+      quatf q = inverse (normalize (Orientation ()));
 
       z = normalize (q * vec4f (target_point - Position ()));
       y = normalize (q * vec4f (up, 0));
@@ -1098,7 +1098,7 @@ void Node::LookTo (const vec3f& target_point, const vec3f& up, NodeTransformSpac
     }
     case NodeTransformSpace_World:
     {            
-      quatf q = invert (normalize (WorldOrientation ()));
+      quatf q = inverse (normalize (WorldOrientation ()));
 
       z = normalize (q * vec4f (target_point - WorldPosition ()));
       y = normalize (q * vec4f (up, 0));
@@ -1110,22 +1110,21 @@ void Node::LookTo (const vec3f& target_point, const vec3f& up, NodeTransformSpac
   }
   
   static const float EPS = 0.001f;
-
+  
   if (qlen (y) < EPS || qlen (z) < EPS || equal (y, z, EPS))
     return; //игнорирование позиционирования на начало локальной системы координат
 
-  mat4f view;
+  mat3f view;
 
   x = cross (y, z);
-  y = z ^ x;
+  y = cross (z, x);
 
-  view [0] = vec4f (x, 0.0f);
-  view [1] = vec4f (y, 0.0f);
-  view [2] = vec4f (z, 0.0f);
-  view [3] = vec4f (0.0f, 0.0f, 0.0f, 1.0f);
-  view     = transpose (view);
-
-  quatf rotation = normalize (quatf (view));
+  view [0] = x;
+  view [1] = y;
+  view [2] = z;
+  view     = transpose (view);  
+  
+  quatf rotation = normalize (to_quat (view));  
 
   SetOrientation (rotation * impl->local_orientation);
 }
@@ -1146,7 +1145,7 @@ void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt i
       break;
     case NodeTransformSpace_Parent:
     {
-      quatf q = invert (normalize (Orientation ()));
+      quatf q = inverse (normalize (Orientation ()));
 
       local_dir = normalize (q * vec4f (target_point - Position ()));
 
@@ -1154,7 +1153,7 @@ void Node::LookTo (const math::vec3f& target_point, NodeOrt direction, NodeOrt i
     }
     case NodeTransformSpace_World:
     {            
-      quatf q = invert (normalize (WorldOrientation ()));      
+      quatf q = inverse (normalize (WorldOrientation ()));      
 
       local_dir = normalize (q * vec4f (target_point - WorldPosition ()));
 
@@ -1362,7 +1361,7 @@ void Node::Translate (const math::vec3f& offset, NodeTransformSpace space)
       impl->local_position += offset;
       break;
     case NodeTransformSpace_World:
-      if (impl->parent) impl->local_position += invert (impl->parent->WorldOrientation ()) * offset / impl->parent->WorldScale (); 
+      if (impl->parent) impl->local_position += inverse (impl->parent->WorldOrientation ()) * offset / impl->parent->WorldScale (); 
       else              impl->local_position += offset;
 
       break;
@@ -1393,7 +1392,7 @@ void Node::Rotate (const math::quatf& q, NodeTransformSpace space)
     {
       const quatf& world_orientation = WorldOrientation ();
 
-      impl->local_orientation = impl->local_orientation * invert (world_orientation) * q * world_orientation;
+      impl->local_orientation = impl->local_orientation * inverse (world_orientation) * q * world_orientation;
       break;
     }      
     default:
@@ -1404,14 +1403,14 @@ void Node::Rotate (const math::quatf& q, NodeTransformSpace space)
   impl->UpdateLocalTransformNotify ();
 }
 
-void Node::Rotate (float angle_in_degrees, float axis_x, float axis_y, float axis_z, NodeTransformSpace space)
+void Node::Rotate (const math::anglef& angle, float axis_x, float axis_y, float axis_z, NodeTransformSpace space)
 {
-  Rotate (fromAxisAnglef (deg2rad (angle_in_degrees), axis_x, axis_y, axis_z), space);
+  Rotate (to_quat (angle, vec3f (axis_x, axis_y, axis_z)), space);
 }
 
-void Node::Rotate (float pitch_in_degrees, float yaw_in_degrees, float roll_in_degrees, NodeTransformSpace space)
+void Node::Rotate (const math::anglef& pitch, const math::anglef& yaw, const math::anglef& roll, NodeTransformSpace space)
 {
-  Rotate (fromEulerAnglef (deg2rad (pitch_in_degrees), deg2rad (yaw_in_degrees), deg2rad (roll_in_degrees)), space);
+  Rotate (to_quat (pitch, yaw, roll), space);
 }
 
 void Node::Scale (const math::vec3f& scale)
@@ -1436,7 +1435,7 @@ namespace
 //композиция преобразований
 void affine_compose (const vec3f& position, const quatf& orientation, const vec3f& scale, mat4f& tm)
 {
-  tm = math::translate (position) * mat4f (orientation) * math::scale (scale);
+  tm = math::translate (position) * to_matrix (orientation) * math::scale (scale);
 }
 
 }
@@ -1511,7 +1510,7 @@ vec3f Node::Ort (NodeOrt ort, NodeTransformSpace space) const
     case NodeOrt_Z: local_ort = vec4f (0, 0, 1, 0); break;
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "ort", ort);
-  }
+  }  
   
   return normalize (vec3f (*tm * local_ort));
 }
@@ -1522,7 +1521,7 @@ vec3f Node::Ort (NodeOrt ort, NodeTransformSpace space) const
 
 mat4f Node::ObjectTM (Node& object) const
 {
-  return invert (WorldTM ()) * object.WorldTM ();
+  return inverse (WorldTM ()) * object.WorldTM ();
 }
 
 /*
