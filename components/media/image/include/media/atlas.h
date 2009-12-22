@@ -7,7 +7,7 @@
 
 #include <common/serializer_manager.h>
 
-#include <mathlib.h>
+#include <math/vector.h>
 
 namespace media
 {

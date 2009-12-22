@@ -1,6 +1,6 @@
 # Compile exports
 export.compile.media.image.INCLUDE_DIRS := include
-export.compile.media.image.IMPORTS      := compile.common
+export.compile.media.image.IMPORTS      := compile.math.vecmath compile.common
 
 # Link exports
 export.link.media.image.LIBS             := funner.media.image

@@ -48,7 +48,7 @@ class TileImageBuilder
 {
   private:
     typedef stl::vector<vec2ui> ImagesArray;
-    typedef vector<size_t>      IndexArray;
+    typedef stl::vector<size_t> IndexArray;
 
   public:
     void AddImages (size_t images_count, const math::vec2ui* in_sizes)
