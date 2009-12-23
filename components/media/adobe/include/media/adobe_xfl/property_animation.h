@@ -1,6 +1,8 @@
 #ifndef MEDIALIB_ADOBE_XFL_PROPERTY_ANIMATION_HEADER
 #define MEDIALIB_ADOBE_XFL_PROPERTY_ANIMATION_HEADER
 
+#include <cstddef>
+
 namespace media
 {
 

@@ -1,6 +1,8 @@
 #ifndef MEDIALIB_ADOBE_XFL_FRAME_ELEMENT_HEADER
 #define MEDIALIB_ADOBE_XFL_FRAME_ELEMENT_HEADER
 
+#include <cstddef>
+
 namespace media
 {
 
@@ -52,10 +54,10 @@ class FrameElement
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Положение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const vec2f& Translation            () const;
-    const vec2f& TransformationPoint    () const;
-    void         SetTranslation         (const vec2f& translation);
-    void         SetTransformationPoint (const vec2f& transformation_point);
+    const math::vec2f& Translation            () const;
+    const math::vec2f& TransformationPoint    () const;
+    void               SetTranslation         (const math::vec2f& translation);
+    void               SetTransformationPoint (const math::vec2f& transformation_point);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

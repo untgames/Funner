@@ -1,7 +1,7 @@
 #ifndef MEDIALIB_ADOBE_XFL_COLLECTION_HEADER
 #define MEDIALIB_ADOBE_XFL_COLLECTION_HEADER
 
-#include <stddef.h>
+#include <cstddef>
 
 namespace xtl
 {
