@@ -1,9 +1,11 @@
 #ifndef MEDIALIB_ADOBE_XFL_DOCUMENT_HEADER
 #define MEDIALIB_ADOBE_XFL_DOCUMENT_HEADER
 
-#include <media/adobe_xfl/collection.h>
-#include <media/adobe_xfl/symbol.h>
-#include <media/adobe_xfl/timeline.h>
+#include <cstddef>
+
+#include <media/adobe/xfl_collection.h>
+#include <media/adobe/xfl_symbol.h>
+#include <media/adobe/xfl_timeline.h>
 
 namespace media
 {
@@ -50,8 +52,8 @@ class Document
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t Width     () const;
     size_t Height    () const;
-    void   SetWidth  (float width);
-    void   SetHeight (float height);
+    void   SetWidth  (size_t width);
+    void   SetHeight (size_t height);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Используемые ресурсы

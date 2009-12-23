@@ -1,9 +1,11 @@
 #ifndef MEDIALIB_ADOBE_XFL_FRAME_HEADER
 #define MEDIALIB_ADOBE_XFL_FRAME_HEADER
 
-#include <media/adobe_xfl/animation_core.h>
-#include <media/adobe_xfl/collection.h>
-#include <media/adobe_xfl/frame_element.h>
+#include <cstddef>
+
+#include <media/adobe/xfl_animation_core.h>
+#include <media/adobe/xfl_collection.h>
+#include <media/adobe/xfl_frame_element.h>
 
 namespace media
 {
