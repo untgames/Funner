@@ -684,5 +684,5 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
 
     //присоединение поверхности к мешу
 
-  surface_info.mesh->Surfaces ().Insert (surface);
+  surface_info.mesh->Surfaces ().Add (surface);
 }

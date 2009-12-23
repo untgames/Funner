@@ -66,7 +66,7 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
   
     //биндинг к родительскому узлу
     
-  parent.Nodes ().Insert (node);
+  parent.Nodes ().Add (node);
   
     //установка дополнительного идентификатора
 
@@ -171,7 +171,7 @@ void DaeParser::ParseInstanceLight (Parser::Iterator iter, Node::LightList& ligh
 
     //добавление источнкиа света в коллекцию узла
 
-  lights.Insert (*light);
+  lights.Add (*light);
 }
 
 /*
@@ -191,7 +191,7 @@ void DaeParser::ParseInstanceCamera (Parser::Iterator iter, Node::CameraList& ca
 
     //добавление камеры в коллекцию узла
 
-  cameras.Insert (*camera);
+  cameras.Add (*camera);
 }
 
 /*
@@ -219,7 +219,7 @@ void DaeParser::ParseInstanceGeometry (Parser::Iterator iter, Node::MeshList& me
   
     //добавление меша в коллекцию узла
     
-  meshes.Insert (imesh);
+  meshes.Add (imesh);
 }
 
 /*
@@ -257,7 +257,7 @@ void DaeParser::ParseInstanceController (Parser::Iterator iter, Node::Controller
 
     //добавление контроллера в коллекцию узла
 
-  controllers.Insert (icontroller);
+  controllers.Add (icontroller);
 }
 
 /*

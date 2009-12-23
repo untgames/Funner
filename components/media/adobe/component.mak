@@ -1,8 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIALIB_COMPONENTS
+TARGETS := MEDIALIB_ADOBE_COMPONENTS
 
 #Цель №1 - MediaLib components
-MEDIALIB_COMPONENTS.TYPE        := package
-MEDIALIB_COMPONENTS.COMPONENTS  := image sound font geometry rfx collada rms players adobe
+MEDIALIB_ADOBE_COMPONENTS.TYPE        := package
+MEDIALIB_ADOBE_COMPONENTS.COMPONENTS  := xfl

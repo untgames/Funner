@@ -144,10 +144,10 @@ void DaeParser::ParseMorph (Parser::Iterator iter, const char* id)
 
       //добавление цели в морфер
       
-    morph.Targets ().Insert (target);
+    morph.Targets ().Add (target);
   }
   
-    //добавление морфера в библиотеку    
+    //добавление морфера в библиотеку
     
   model.Morphs ().Insert (id, morph);
 }

@@ -3,6 +3,8 @@
 
 #include <cstddef>
 
+#include <math/vector.h>
+
 namespace media
 {
 
@@ -14,8 +16,8 @@ namespace xfl
 
 enum FrameElementType
 {
-  FrameElementType_ResourceInstance,
-  FrameElementType_SymbolInstance
+  FrameElementType_ResourceInstance,     //имя фрейма является именем ресурса в родительском документе
+  FrameElementType_SymbolInstance        //имя фрейма является именем элемента анимации в родительском документе
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

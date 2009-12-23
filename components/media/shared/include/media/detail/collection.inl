@@ -71,7 +71,7 @@ typename CollectionImpl<Item, BaseClass>::Iterator CollectionImpl<Item, BaseClas
 {
   return Iterator (items.begin (), items.begin (), items.end ());
 }
-    
+
 template <class Item, class BaseClass>
 typename CollectionImpl<Item, BaseClass>::ConstIterator CollectionImpl<Item, BaseClass>::CreateIterator () const
 {
@@ -79,11 +79,27 @@ typename CollectionImpl<Item, BaseClass>::ConstIterator CollectionImpl<Item, Bas
 }
 
 /*
+   Резервирование элементов
+*/
+
+template <class Item, class BaseClass>
+size_t CollectionImpl<Item, BaseClass>::Capacity () const
+{
+  return items.capacity ();
+}
+
+template <class Item, class BaseClass>
+void CollectionImpl<Item, BaseClass>::Reserve (size_t count)
+{
+  items.reserve (count);
+}
+
+/*
    Добавление элемента в коллекцию
 */
 
 template <class Item, class BaseClass>
-size_t CollectionImpl<Item, BaseClass>::Insert (Item& item)
+size_t CollectionImpl<Item, BaseClass>::Add (Item& item)
 {
   items.push_back (item);
 
