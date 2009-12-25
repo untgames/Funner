@@ -67,7 +67,7 @@ void XflParser::ParseRoot (Parser::Iterator iter)
       iter->SetPath (full_resource_path.c_str ());
     }
 
-  //TODO check links
+  CheckDocument ();
 }
 
 /*

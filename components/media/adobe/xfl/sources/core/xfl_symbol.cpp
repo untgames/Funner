@@ -64,6 +64,11 @@ const media::adobe::xfl::Timeline& Symbol::Timeline () const
   return impl->timeline;
 }
 
+media::adobe::xfl::Timeline& Symbol::Timeline ()
+{
+  return impl->timeline;
+}
+
 void Symbol::SetTimeline (const xfl::Timeline& timeline)
 {
   impl->timeline = timeline;

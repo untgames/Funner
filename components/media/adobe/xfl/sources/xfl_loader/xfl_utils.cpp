@@ -57,3 +57,54 @@ float XflParser::ReadFloatFromVec2 (Parser::Iterator iter, const char* property_
 
   return return_value;
 }
+
+/*
+   Проверка корректности прочитанного документа
+*/
+
+void XflParser::CheckDocument ()
+{
+  for (Document::SymbolList::Iterator iter = document.Symbols ().CreateIterator (); iter; ++iter)
+    if (!CheckTimeline (iter->Timeline ()))
+      log.Printf ("Removed invalid frame element from symbol '%s'", iter->Name ());
+
+  for (Document::TimelineList::Iterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
+    if (!CheckTimeline (*iter))
+      log.Printf ("Removing invalid frame element from timeline '%s'", iter->Name ());
+}
+
+bool XflParser::CheckTimeline (Timeline& timeline)
+{
+  bool timeline_valid = true;
+
+  for (Timeline::LayerList::Iterator layer_iter = timeline.Layers ().CreateIterator (); layer_iter; ++layer_iter)
+    for (Layer::FrameList::Iterator frame_iter = layer_iter->Frames ().CreateIterator (); frame_iter; ++frame_iter)
+    {
+      ICollection<FrameElement>& elements = frame_iter->Elements ();
+
+      for (size_t i = 0; i < elements.Size ();)
+      {
+        if (!CheckFrameElement (elements [i]))
+        {
+          log.Printf ("Removing invalid frame element '%s'", elements [i].Name ());
+          elements.Remove (i);
+          timeline_valid = false;
+        }
+        else
+          i++;
+      }
+    }
+
+  return timeline_valid;
+}
+
+bool XflParser::CheckFrameElement (const FrameElement& element)
+{
+  switch (element.Type ())
+  {
+    case FrameElementType_ResourceInstance: return document.Resources ().Find (element.Name ()) != 0;
+    case FrameElementType_SymbolInstance:   return document.Symbols ().Find (element.Name ()) != 0;
+  }
+
+  return false;
+}

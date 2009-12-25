@@ -51,7 +51,7 @@ template <class Item, class BaseClass>
 const Item& CollectionImpl<Item, BaseClass>::operator [] (size_t index) const
 {
   if (index >= items.size ())
-    throw xtl::make_range_exception ("media::collada::ICollection::operator []", "index", index, items.size ());
+    throw xtl::make_range_exception ("media::ICollection::operator []", "index", index, items.size ());
 
   return items [index];
 }
