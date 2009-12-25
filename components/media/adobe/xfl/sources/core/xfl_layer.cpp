@@ -74,23 +74,6 @@ const Layer::FrameList& Layer::Frames () const
   return impl->frames;
 }
 
-Frame* Layer::FindFrame (const char* frame_name)
-{
-  return const_cast<Frame*> (const_cast<const Layer&> (*this).FindFrame (frame_name));
-}
-
-const Frame* Layer::FindFrame (const char* frame_name) const
-{
-  if (!frame_name)
-    throw xtl::make_null_argument_exception ("media::adobe::xfl::Layer::FindFrame", "frame_name");
-
-  for (FrameCollection::ConstIterator iter = impl->frames.CreateIterator (); iter; ++iter)
-    if (!xtl::xstrcmp (frame_name, iter->Name ()))
-      return &(*iter);
-
-  return 0;
-}
-
 /*
    Ξαμεν
 */

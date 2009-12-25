@@ -10,7 +10,6 @@ typedef media::CollectionImpl<FrameElement, ICollection<FrameElement> > FrameEle
 
 struct Frame::Impl : public xtl::reference_counter
 {
-  stl::string            name;        //имя кадра
   size_t                 first_frame; //номер кадра (в глобальном времени), с которого начинается отображение данного кадра
   size_t                 duration;    //длительность отображения данного кадра в количестве кадров (в глобальном времени)
   FrameElementCollection elements;    //кадры анимации слоя
@@ -44,23 +43,6 @@ Frame& Frame::operator = (const Frame& source)
   impl = source.impl;
 
   return *this;
-}
-
-/*
-   Имя
-*/
-
-const char* Frame::Name () const
-{
-  return impl->name.c_str ();
-}
-
-void Frame::SetName (const char* name)
-{
-  if (!name)
-    throw xtl::make_null_argument_exception ("media::adobe::xfl::Frame::SetName", "name");
-
-  impl->name = name;
 }
 
 /*

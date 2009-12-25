@@ -18,4 +18,4 @@ MEDIA.ADOBE.XFL.LOADER.SOURCES.IMPORTS     := compile.media.adobe.xfl
 #Цель XFL loader tests
 MEDIA.ADOBE.XFL.TESTS.TYPE        := test-suite
 MEDIA.ADOBE.XFL.TESTS.SOURCE_DIRS := tests
-MEDIA.ADOBE.XFL.TESTS.IMPORTS     := compile.media.adobe.xfl link.media.adobe.xfl.loader
+MEDIA.ADOBE.XFL.TESTS.IMPORTS     := compile.media.adobe.xfl link.media.adobe.xfl.loader link.common.zip_file_system

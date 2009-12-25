@@ -36,44 +36,38 @@ XflParser::~XflParser ()
 }
 
 /*
-    Печать лога парсинга
-*/
-
-void XflParser::PrintLog ()
-{
-  const ParseLog& parser_log = parser.Log ();
-
-  try
-  {  
-    for (size_t i = 0; i < parser_log.MessagesCount (); ++i)
-      log.Print (parser_log.Message (i));
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
-}
-
-/*
     Разбор корневого узла
 */
 
 void XflParser::ParseRoot (Parser::Iterator iter)
 {
   if (!iter)
-    raise_parser_exception (parser.Root (), "Wrong file format. No '%s' tag", ROOT_TAG);
+    raise_parser_exception (*iter, "Wrong file format. No '%s' tag", ROOT_TAG);
 
   document.SetFrameRate (get<float> (*iter, "frameRate"));
   document.SetWidth     (get<size_t> (*iter, "width"));
   document.SetHeight    (get<size_t> (*iter, "height"));
 
-    //TODO read color
+  math::vec3f background_color;
+
+  if (!ReadHexColor (get<const char*> (*iter, "backgroundColor"), background_color))
+    raise_parser_exception (*iter, "Wrong color format in 'backgroundColor' attribute");
+
+  document.SetBackgroundColor (background_color);
 
     //разбор библиотек
 
   ParseLibraries (iter);
 
-   //TODO rebuild paths
+  if (!path_prefix.empty ())
+    for (Document::ResourceList::Iterator iter = document.Resources ().CreateIterator (); iter; ++iter)
+    {
+      stl::string full_resource_path = common::format ("%s/%s", path_prefix.c_str (), iter->Path ());
+
+      iter->SetPath (full_resource_path.c_str ());
+    }
+
+  //TODO check links
 }
 
 /*
@@ -82,11 +76,7 @@ void XflParser::ParseRoot (Parser::Iterator iter)
 
 void XflParser::ParseLibraries (Parser::Iterator iter)
 {
-/*  for_each_child (*iter, "library_effects", bind (&XflParser::ParseLibraryEffects, this, _1));
-  for_each_child (*iter, "library_materials", bind (&XflParser::ParseLibraryMaterials, this, _1));
-  for_each_child (*iter, "library_geometries", bind (&XflParser::ParseLibraryGeometries, this, _1));
-  for_each_child (*iter, "library_controllers", bind (&XflParser::ParseLibraryControllers, this, _1));
-  for_each_child (*iter, "library_lights", bind (&XflParser::ParseLibraryLights, this, _1));
-  for_each_child (*iter, "library_cameras", bind (&XflParser::ParseLibraryCameras, this, _1));
-  for_each_child (*iter, "library_visual_scenes", bind (&XflParser::ParseLibraryVisualScenes, this, _1));*/
+  for_each_child (*iter, "media",     xtl::bind (&XflParser::ParseResources, this, _1));
+  for_each_child (*iter, "symbols",   xtl::bind (&XflParser::ParseSymbols,   this, _1));
+  for_each_child (*iter, "timelines", xtl::bind (&XflParser::ParseTimelines, this, _1));
 }

@@ -121,8 +121,6 @@ void dump (const FrameElement& element, int level)
 void dump (const Frame& frame, int level)
 {
   print_space (level++);
-  printf      ("Frame '%s'\n", frame.Name ());
-  print_space (level);
   printf      ("First frame: %u\n", frame.FirstFrame ());
   print_space (level);
   printf      ("Duration:    %u\n", frame.Duration ());

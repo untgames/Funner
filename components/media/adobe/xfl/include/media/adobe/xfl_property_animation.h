@@ -19,7 +19,7 @@ struct PropertyAnimationKeyframe
   float anchor;
   float next;
   float previous;
-  float roving;
+  bool  roving;
   float timevalue;  //время начала активности кейфрема в секундах
 };
 
