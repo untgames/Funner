@@ -3,7 +3,7 @@
 
 #include <exception>
 
-#include <mathlib.h>
+#include <math/vector.h>
 
 #include <sound/listener.h>
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include <mathlib.h>
+
+#include <math/angle.h>
 
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
@@ -48,8 +49,8 @@ void print (float value)
 }
 
 //печать вектора
-template <class T, size_t N>
-void print (const math::vec<T, N>& v)
+template <class T, unsigned int N>
+void print (const math::vector<T, N>& v)
 {
   printf ("[");
 
@@ -94,7 +95,7 @@ void dump (Source& source)
 
 void TimerHandler (IDevice* sound_system, Timer&)
 {
-  source.position = vec3f (sin (deg2rad (source_angle)), 0, cos (deg2rad (source_angle)));
+  source.position = vec3f (sin (degree (source_angle)), 0, cos (degree (source_angle)));
   source_angle++;
   sound_system->SetSource (1, source);
 }

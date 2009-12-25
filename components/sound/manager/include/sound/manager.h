@@ -4,7 +4,7 @@
 #include <xtl/functional_fwd>
 #include <xtl/trackable.h>
 #include <stl/auto_ptr.h>
-#include <mathlib.h>
+#include <math/vector.h>
 #include <sound/listener.h>
 
 namespace sound

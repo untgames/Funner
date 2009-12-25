@@ -19,7 +19,7 @@
 
 #include <sound/scene_player.h>
 
-#include <math/mathlib.h>
+#include <math/vector.h>
 
 #include <syslib/timer.h>
 

@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <mathlib.h>
 #include <syslib/timer.h>
 #include <syslib/application.h>
 #include <xtl/function.h>
@@ -26,8 +25,8 @@ void print (float value)
 }
 
 //печать вектора
-template <class T, size_t N>
-void print (const math::vec<T, N>& v)
+template <class T, unsigned int N>
+void print (const math::vector<T, N>& v)
 {
   printf ("[");
 
