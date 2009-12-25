@@ -398,6 +398,7 @@ class FileSystemImpl
 ///Добавление / удаление пользоватльских типов пак-файлов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Mount       (const char* path_prefix,ICustomFileSystemPtr file_system);
+    void Mount       (const char* path_prefix,const char* path,const char* force_extension);
     void Unmount     (const char* path_prefix);
     void Unmount     (ICustomFileSystemPtr file_system);
     void UnmountAll  ();

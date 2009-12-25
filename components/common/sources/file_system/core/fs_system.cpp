@@ -365,6 +365,64 @@ void FileSystemImpl::Mount (const char* _path_prefix,ICustomFileSystemPtr file_s
   mounts.push_front (MountFileSystem (prefix.c_str (),hash,file_system));
 }
 
+void FileSystemImpl::Mount (const char* path_prefix,const char* _path,const char* force_extension)
+{
+  static const char* METHOD_NAME = "common::FileSystem::Mount";
+
+  if (!path_prefix)
+    throw xtl::make_null_argument_exception (METHOD_NAME,"path_prefix");
+
+  if (!_path)
+    throw xtl::make_null_argument_exception (METHOD_NAME,"path");
+
+  static ComponentLoader custom_file_systems_loader (FILE_SYSTEM_ADDONS_MASK);
+
+  string path = FileSystem::GetNormalizedFileName (_path), type;
+  
+  if (force_extension)
+  {
+    type = force_extension;
+  }
+  else
+  {
+    type = suffix (path);
+    
+    if (!type.empty ())
+      type.erase (type.begin ());    
+  }
+  
+  size_t path_hash = strhash (path.c_str ()), type_hash = strhash (type.c_str ());
+
+  for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();++i)
+    if (i->file_name_hash == path_hash)
+    {
+      Mount (path_prefix, i->file_system.get ());
+      return;
+    }
+
+  for (PackFileTypeList::iterator i=pack_types.begin ();i!=pack_types.end ();++i)
+    if (i->extension_hash == type_hash)
+    {
+      ICustomFileSystemPtr pack_file_system (i->creater (path.c_str ()),false);
+
+      pack_files.push_front (PackFile (strihash (path.c_str ()),0,pack_file_system));                  
+
+      try
+      {
+        Mount (path_prefix, pack_file_system.get ());          
+      }
+      catch (...)
+      {
+        pack_files.pop_front ();
+        throw;
+      }
+      
+      return;
+    }
+
+  throw xtl::format_operation_exception (METHOD_NAME, "Fail to open pack-file '%s'. Undefined type '%s'",_path,type.c_str ());
+}
+
 void FileSystemImpl::Unmount (const char* _path_prefix)
 {
   if (!_path_prefix)
@@ -795,6 +853,11 @@ void FileSystem::UnregisterPackFile (const char* extension)
 void FileSystem::Mount (const char* path_prefix,ICustomFileSystemPtr file_system)
 {
   FileSystemSingleton::Instance ()->Mount (path_prefix,file_system);
+}
+
+void FileSystem::Mount (const char* path_prefix,const char* path,const char* force_extension)
+{
+  FileSystemSingleton::Instance ()->Mount (path_prefix,path,force_extension);
 }
 
 void FileSystem::Unmount (const char* path_prefix)

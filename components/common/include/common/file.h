@@ -503,6 +503,7 @@ class FileSystem
 ///Монтирование пользовательской файловой системы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void Mount       (const char* path_prefix,ICustomFileSystemPtr file_system);
+    static void Mount       (const char* path_prefix,const char* path,const char* force_extension=0);
     static void Unmount     (const char* path_prefix);
     static void Unmount     (ICustomFileSystemPtr file_system);
     static void UnmountAll  ();
