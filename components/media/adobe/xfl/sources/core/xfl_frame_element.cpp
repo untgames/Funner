@@ -13,16 +13,33 @@ struct FrameElement::Impl : public xtl::reference_counter
   size_t           first_frame;          //номер кадра (в глобальном времени), с которого начинается отображение данного кадра
   math::vec2f      translation;          //смещение
   math::vec2f      transformation_point; //пивот
+  
+  Impl (FrameElementType in_type)
+    : type (in_type)
+    , first_frame (0)
+   { }
 };
 
 /*
     Конструкторы / деструктор / присваивание
 */
 
-FrameElement::FrameElement ()
-  : impl (new Impl)
-  {}
-  
+FrameElement::FrameElement (FrameElementType type)
+{
+  static const char* METHOD_NAME = "media::adobe::xfl::FrameElement::FrameElement";
+
+  switch (type)
+  {
+    case FrameElementType_ResourceInstance:
+    case FrameElementType_SymbolInstance:
+      break;
+    default:
+      throw xtl::make_argument_exception (METHOD_NAME, "type");
+  }
+
+  impl = new Impl (type);
+}
+
 FrameElement::FrameElement (const FrameElement& source)
   : impl (source.impl)
 {
@@ -36,10 +53,7 @@ FrameElement::~FrameElement ()
 
 FrameElement& FrameElement::operator = (const FrameElement& source)
 {
-  addref (source.impl);
-  release (impl);
-
-  impl = source.impl;
+  FrameElement (source).Swap (*this);
 
   return *this;
 }
@@ -57,7 +71,7 @@ void FrameElement::SetName (const char* name)
 {
   if (!name)
     throw xtl::make_null_argument_exception ("media::adobe::xfl::FrameElement::SetName", "name");
-
+    
   impl->name = name;
 }
 
@@ -68,11 +82,6 @@ void FrameElement::SetName (const char* name)
 FrameElementType FrameElement::Type () const
 {
   return impl->type;
-}
-
-void FrameElement::SetType (FrameElementType type)
-{
-  impl->type = type;
 }
 
 /*

@@ -9,7 +9,10 @@ typedef media::CollectionImpl<Timeline, ICollection<Timeline> > TimelineCollecti
 namespace
 {
 
-const char* XFL_LOADERS_MASK = "media.adobe.xfl.loaders.*"; //маска имён компонентов загрузки xfl-документов
+const char*  XFL_LOADERS_MASK   = "media.adobe.xfl.loaders.*"; //маска имён компонентов загрузки xfl-документов
+const float  DEFAULT_FRAME_RATE = 25.0f;                       //количество кадров в секунду по умолчанию
+const size_t DEFAULT_WIDTH      = 1;                           //ширина по умолчанию
+const size_t DEFAULT_HУШПРЕ     = 1;                           //высота по умолчанию
 
 }
 
@@ -27,6 +30,13 @@ struct Document::Impl : public xtl::reference_counter
   ResourceCollection resources;        //ресурсы
   SymbolCollection   symbols;          //элементы анимации
   TimelineCollection timelines;        //анимации
+  
+  Impl ()
+    : framerate (DEFAULT_FRAME_RATE)
+    , width (DEFAULT_WIDTH)
+    , height (DEFAULT_HEIGHT)
+  {
+  }
 };
 
 /*
@@ -51,7 +61,7 @@ Document::Document (const char* file_name)
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");
 
-    static common::ComponentLoader loader (XFL_LOADERS_MASK);
+    static common::ComponentLoader loader (XFL_LOADERS_MASK);    
 
     DocumentManager::GetLoader (file_name, common::SerializerFindMode_ByName)(file_name, *this);
   }
@@ -70,10 +80,7 @@ Document::~Document ()
 
 Document& Document::operator = (const Document& source)
 {
-  addref (source.impl);
-  release (impl);
-
-  impl = source.impl;
+  Document (source).Swap (*this);
 
   return *this;
 }
@@ -169,7 +176,7 @@ Resource* Document::FindResource (const char* resource_name)
 const Resource* Document::FindResource (const char* resource_name) const
 {
   if (!resource_name)
-    throw xtl::make_null_argument_exception ("media::adobe::xfl::Document::FindResource", "resource_name");
+    return 0;
 
   for (ResourceCollection::ConstIterator iter = impl->resources.CreateIterator (); iter; ++iter)
     if (!xtl::xstrcmp (resource_name, iter->Name ()))
@@ -200,7 +207,7 @@ Symbol* Document::FindSymbol (const char* symbol_name)
 const Symbol* Document::FindSymbol (const char* symbol_name) const
 {
   if (!symbol_name)
-    throw xtl::make_null_argument_exception ("media::adobe::xfl::Document::FindSymbol", "symbol_name");
+    return 0;
 
   for (SymbolCollection::ConstIterator iter = impl->symbols.CreateIterator (); iter; ++iter)
     if (!xtl::xstrcmp (symbol_name, iter->Name ()))
@@ -231,7 +238,7 @@ Timeline* Document::FindTimeline (const char* timeline_name)
 const Timeline* Document::FindTimeline (const char* timeline_name) const
 {
   if (!timeline_name)
-    throw xtl::make_null_argument_exception ("media::adobe::xfl::Document::FindTimeline", "timeline_name");
+    return 0;
 
   for (TimelineCollection::ConstIterator iter = impl->timelines.CreateIterator (); iter; ++iter)
     if (!xtl::xstrcmp (timeline_name, iter->Name ()))

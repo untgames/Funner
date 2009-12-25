@@ -10,9 +10,13 @@ typedef media::CollectionImpl<PropertyAnimationKeyframe, ICollection<PropertyAni
 
 struct PropertyAnimation::Impl : public xtl::reference_counter
 {
-  stl::string        id;        //идентификатор типа свойства
+  stl::string        name;      //имя свойства
   bool               enabled;   //статус
   KeyframeCollection keyframes; //ключевые точки
+  
+  Impl ()
+    : enabled (true)
+  { }
 };
 
 /*
@@ -36,29 +40,26 @@ PropertyAnimation::~PropertyAnimation ()
 
 PropertyAnimation& PropertyAnimation::operator = (const PropertyAnimation& source)
 {
-  addref (source.impl);
-  release (impl);
-
-  impl = source.impl;
+  PropertyAnimation (source).Swap (*this);
 
   return *this;
 }
 
 /*
-   Идентификатор типа свойства
+   Имя свойства
 */
 
-const char* PropertyAnimation::Id () const
+const char* PropertyAnimation::Name () const
 {
-  return impl->id.c_str ();
+  return impl->name.c_str ();
 }
 
-void PropertyAnimation::SetId (const char* id)
+void PropertyAnimation::SetName (const char* name)
 {
-  if (!id)
-    throw xtl::make_null_argument_exception ("media::adobe::xfl::PropertyAnimation::SetId", "id");
+  if (!name)
+    throw xtl::make_null_argument_exception ("media::adobe::xfl::PropertyAnimation::SetName", "name");
 
-  impl->id = id;
+  impl->name = name;
 }
 
 /*

@@ -14,6 +14,11 @@ struct Frame::Impl : public xtl::reference_counter
   size_t                 duration;    //длительность отображения данного кадра в количестве кадров (в глобальном времени)
   FrameElementCollection elements;    //кадры анимации слоя
   AnimationCore          animation;   //анимация
+  
+  Impl ()
+    : first_frame (0)
+    , duration (0)
+  { }
 };
 
 /*
@@ -37,10 +42,7 @@ Frame::~Frame ()
 
 Frame& Frame::operator = (const Frame& source)
 {
-  addref (source.impl);
-  release (impl);
-
-  impl = source.impl;
+  Frame (source).Swap (*this);
 
   return *this;
 }
@@ -91,7 +93,7 @@ FrameElement* Frame::FindElement (const char* element_name)
 const FrameElement* Frame::FindElement (const char* element_name) const
 {
   if (!element_name)
-    throw xtl::make_null_argument_exception ("media::adobe::xfl::Frame::FindElement", "element_name");
+    return 0;
 
   for (FrameElementCollection::ConstIterator iter = impl->elements.CreateIterator (); iter; ++iter)
     if (!xtl::xstrcmp (element_name, iter->Name ()))

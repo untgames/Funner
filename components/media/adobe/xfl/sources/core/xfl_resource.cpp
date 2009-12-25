@@ -33,10 +33,7 @@ Resource::~Resource ()
 
 Resource& Resource::operator = (const Resource& source)
 {
-  addref (source.impl);
-  release (impl);
-
-  impl = source.impl;
+  Resource (source).Swap (*this);
 
   return *this;
 }

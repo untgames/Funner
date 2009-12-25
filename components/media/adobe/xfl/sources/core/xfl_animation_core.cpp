@@ -13,6 +13,8 @@ struct AnimationCore::Impl : public xtl::reference_counter
   float                       duration;       //длительность в секундах
   bool                        orient_to_path; //автоориентация по пути
   PropertyAnimationCollection properties;     //анимируемые свойства
+
+  Impl () : duration (0.0f), orient_to_path (false) {}
 };
 
 /*
@@ -36,10 +38,7 @@ AnimationCore::~AnimationCore ()
 
 AnimationCore& AnimationCore::operator = (const AnimationCore& source)
 {
-  addref (source.impl);
-  release (impl);
-
-  impl = source.impl;
+  AnimationCore (source).Swap (*this);
 
   return *this;
 }
@@ -94,7 +93,7 @@ PropertyAnimation* AnimationCore::FindProperty (const char* property_id)
 const PropertyAnimation* AnimationCore::FindProperty (const char* property_id) const
 {
   if (!property_id)
-    throw xtl::make_null_argument_exception ("media::adobe::xfl::AnimationCore::FindProperty", "property_id");
+    return 0;
 
   for (PropertyAnimationCollection::ConstIterator iter = impl->properties.CreateIterator (); iter; ++iter)
     if (!xtl::xstrcmp (property_id, iter->Id ()))

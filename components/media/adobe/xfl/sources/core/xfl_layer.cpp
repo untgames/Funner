@@ -35,10 +35,7 @@ Layer::~Layer ()
 
 Layer& Layer::operator = (const Layer& source)
 {
-  addref (source.impl);
-  release (impl);
-
-  impl = source.impl;
+  Layer (source).Swap (*this);
 
   return *this;
 }

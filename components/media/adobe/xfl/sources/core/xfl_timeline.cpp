@@ -35,10 +35,7 @@ Timeline::~Timeline ()
 
 Timeline& Timeline::operator = (const Timeline& source)
 {
-  addref (source.impl);
-  release (impl);
-
-  impl = source.impl;
+  Timeline (source).Swap (*this);
 
   return *this;
 }
@@ -82,7 +79,7 @@ Layer* Timeline::FindLayer (const char* layer_name)
 const Layer* Timeline::FindLayer (const char* layer_name) const
 {
   if (!layer_name)
-    throw xtl::make_null_argument_exception ("media::adobe::xfl::Timeline::FindLayer", "layer_name");
+    return 0;
 
   for (LayerCollection::ConstIterator iter = impl->layers.CreateIterator (); iter; ++iter)
     if (!xtl::xstrcmp (layer_name, iter->Name ()))

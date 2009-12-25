@@ -33,10 +33,7 @@ Symbol::~Symbol ()
 
 Symbol& Symbol::operator = (const Symbol& source)
 {
-  addref (source.impl);
-  release (impl);
-
-  impl = source.impl;
+  Symbol (source).Swap (*this);
 
   return *this;
 }
