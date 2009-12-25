@@ -12,7 +12,7 @@ namespace
 const char*  XFL_LOADERS_MASK   = "media.adobe.xfl.loaders.*"; //маска имён компонентов загрузки xfl-документов
 const float  DEFAULT_FRAME_RATE = 25.0f;                       //количество кадров в секунду по умолчанию
 const size_t DEFAULT_WIDTH      = 1;                           //ширина по умолчанию
-const size_t DEFAULT_HУШПРЕ     = 1;                           //высота по умолчанию
+const size_t DEFAULT_HEIGHT     = 1;                           //высота по умолчанию
 
 }
 

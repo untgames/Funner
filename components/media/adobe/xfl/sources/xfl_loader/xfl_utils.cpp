@@ -30,7 +30,10 @@ bool XflParser::ReadHexColor (const char* hex_string, math::vec3f& color)
 {
   unsigned int int_value = 0;
 
-  if (xtl::io::read (hex_string + 1, int_value))
+  if (*hex_string != '#')
+    return false;
+
+  if (!xtl::io::read (hex_string + 1, int_value))
     return false;
 
   color.x = int_value / 255 / 255;

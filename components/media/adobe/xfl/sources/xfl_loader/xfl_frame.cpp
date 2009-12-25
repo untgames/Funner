@@ -13,26 +13,10 @@ void XflParser::ParseFrame (Parser::Iterator iter, Frame& frame)
   frame.SetDuration   (get<size_t> (*iter, "duration", 1));
 
   for (Parser::NamesakeIterator i = iter->First ("elements.DOMSymbolInstance"); i; ++i)
-  {
-    FrameElement new_frame_element;
-
-    ParseFrameElement (i, new_frame_element);
-
-    new_frame_element.SetType (FrameElementType_SymbolInstance);
-
-    frame.Elements ().Add (new_frame_element);
-  }
+    ParseFrameElement (i, frame.Elements (), FrameElementType_SymbolInstance);
 
   for (Parser::NamesakeIterator i = iter->First ("elements.DOMBitmapInstance"); i; ++i)
-  {
-    FrameElement new_frame_element;
-
-    ParseFrameElement (i, new_frame_element);
-
-    new_frame_element.SetType (FrameElementType_ResourceInstance);
-
-    frame.Elements ().Add (new_frame_element);
-  }
+    ParseFrameElement (i, frame.Elements (), FrameElementType_ResourceInstance);
 
   Parser::Iterator animation_core_iter = iter->First ("motionObjectXML.AnimationCore");
 

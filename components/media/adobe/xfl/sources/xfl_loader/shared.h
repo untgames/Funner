@@ -67,7 +67,7 @@ class XflParser
     void ParseTimeline      (common::Parser::Iterator, Timeline&);
     void ParseLayer         (common::Parser::Iterator, Layer&);
     void ParseFrame         (common::Parser::Iterator, Frame&);
-    void ParseFrameElement  (common::Parser::Iterator, FrameElement&);
+    void ParseFrameElement  (common::Parser::Iterator, Frame::FrameElementList&, FrameElementType);
     void ParseAnimationCore (common::Parser::Iterator, AnimationCore&);
 
     void ParsePropertyAnimationContainer (common::Parser::Iterator, AnimationCore&, const char* property_prefix);

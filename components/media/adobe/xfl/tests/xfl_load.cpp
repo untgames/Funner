@@ -6,7 +6,8 @@
 
 using namespace media::adobe::xfl;
 
-const char* file_name = "data/test.xfl";
+const char* MOUNT_POINT = "/mount/test.xfl";
+const char* FILE_NAME   = "data/test.xfl";
 
 template <class Item>
 void dump (const char* collection_name, const ICollection<Item>& collection, int level);
@@ -51,26 +52,18 @@ void dump (const PropertyAnimationKeyframe& keyframe, int level)
   print_space (level++);
   printf      ("Keyframe\n");
   print_space (level);
-  printf      ("Anchor:    %.3f\n", keyframe.roving);
+  printf      ("Value: %.3f\n", keyframe.value);
   print_space (level);
-  printf      ("Next:      %.3f\n", keyframe.next);
-  print_space (level);
-  printf      ("Previous:  %.3f\n", keyframe.previous);
-  print_space (level);
-  printf      ("Roving:    %.3f\n", keyframe.roving);
-  print_space (level);
-  printf      ("Timevalue: %.3f\n", keyframe.timevalue);
+  printf      ("Time:  %.3f\n", keyframe.time);
 }
 
 //печать анимируемого параметра
 void dump (const PropertyAnimation& property, int level)
 {
   print_space (level++);
-  printf      ("Property '%s'\n", property.Id ());
+  printf      ("Property '%s'\n", property.Name ());
   print_space (level);
   printf      ("Enabled: %s\n", property.Enabled () ? "yes" : "no");
-  print_space (level);
-  printf      ("Keyframes:\n");
 
   dump ("keyframes", property.Keyframes (), level);
 }
@@ -78,12 +71,10 @@ void dump (const PropertyAnimation& property, int level)
 //печать анимации кадра анимации
 void dump (const AnimationCore& animation, int level)
 {
-  print_space (level++);
+  print_space (++level);
   printf      ("Duration:       %.3f\n", animation.Duration ());
   print_space (level);
   printf      ("Orient to path: %s\n", animation.OrientToPath () ? "yes" : "no");
-  print_space (level);
-  printf      ("Properties:\n");
 
   dump ("animation properties", animation.Properties (), level);
 }
@@ -121,14 +112,14 @@ void dump (const FrameElement& element, int level)
 void dump (const Frame& frame, int level)
 {
   print_space (level++);
+  printf      ("Frame:\n");
+  print_space (level);
   printf      ("First frame: %u\n", frame.FirstFrame ());
   print_space (level);
   printf      ("Duration:    %u\n", frame.Duration ());
   print_space (level);
   printf      ("Animation:\n");
   dump        (frame.Animation (), level);
-  print_space (level);
-  printf      ("Elements:\n");
 
   dump ("frame elements", frame.Elements (), level);
 }
@@ -138,8 +129,6 @@ void dump (const Layer& layer, int level)
 {
   print_space (level++);
   printf      ("Layer '%s'\n", layer.Name ());
-  print_space (level);
-  printf      ("Frames:\n");
 
   dump ("frames", layer.Frames (), level);
 }
@@ -149,8 +138,6 @@ void dump (const Timeline& timeline, int level)
 {
   print_space (level++);
   printf      ("Timeline '%s'\n", timeline.Name ());
-  print_space (level);
-  printf      ("Layers:\n");
 
   dump ("layers", timeline.Layers (), level);
 }
@@ -169,8 +156,6 @@ void dump (const Symbol& symbol, int level)
 {
   print_space (level++);
   printf      ("Symbol '%s'\n", symbol.Name ());
-  print_space (level);
-  printf      ("timeline:\n");
 
   dump (symbol.Timeline (), level);
 }
@@ -192,14 +177,14 @@ int main ()
 
   try
   {
-    common::FileSystem::AddSearchPath (file_name);
+    common::FileSystem::Mount (MOUNT_POINT, FILE_NAME, "zip");
 
-    printf ("--- Parse xfl document '%s' ---\n", file_name);
+    printf ("--- Parse xfl document '%s' ---\n", FILE_NAME);
 
-    Document document (file_name);
+    Document document (MOUNT_POINT);
 
     printf ("---  Xfl document dump ---\n");
-    printf ("Document '%s'\n", file_name);
+    printf ("Document '%s'\n", document.Name ());
     print_space (1);
     printf ("framerate:        %.3f\n", document.FrameRate ());
     print_space (1);
@@ -220,8 +205,6 @@ int main ()
   {
     printf ("exception: %s\n",exception.what ()); 
   }
-
-  common::FileSystem::RemoveSearchPath (file_name);
 
   return 0;
 }

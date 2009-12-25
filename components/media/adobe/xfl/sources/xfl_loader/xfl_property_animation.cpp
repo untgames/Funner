@@ -11,7 +11,7 @@ void XflParser::ParsePropertyAnimation (Parser::Iterator iter, PropertyAnimation
 {
   stl::string property_id = common::format ("%s.%s", property_prefix, get<const char*> (*iter, "id"));
 
-  property.SetId      (property_id.c_str ());
+  property.SetName    (property_id.c_str ());
   property.SetEnabled (get<bool> (*iter, "enabled"));
 
   for (Parser::NamesakeIterator i = iter->First ("Keyframe"); i; ++i)
@@ -26,9 +26,13 @@ void XflParser::ParsePropertyAnimation (Parser::Iterator iter, PropertyAnimation
 
 void XflParser::ParsePropertyAnimationKeyframe (Parser::Iterator iter, PropertyAnimationKeyframe& keyframe)
 {
-  keyframe.anchor    = ReadFloatFromVec2 (iter, "anchor");
-  keyframe.next      = ReadFloatFromVec2 (iter, "next");
-  keyframe.previous  = ReadFloatFromVec2 (iter, "previous");
-  keyframe.roving    = get<bool>  (*iter, "roving");
-  keyframe.timevalue = get<float> (*iter, "timevalue");
+  float anchor   = ReadFloatFromVec2 (iter, "anchor"),
+        next     = ReadFloatFromVec2 (iter, "next"),
+        previous = ReadFloatFromVec2 (iter, "anchor");
+
+  if (anchor != next || anchor != previous)
+    raise_parser_exception (*iter, "Wrong keyframe format, 'anchor', 'next' and 'previous' attributes must be equal");
+
+  keyframe.value = anchor;
+  keyframe.time  = get<float> (*iter, "timevalue");
 }

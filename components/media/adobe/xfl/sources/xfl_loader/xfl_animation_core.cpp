@@ -28,7 +28,7 @@ void XflParser::ParseAnimationCore (Parser::Iterator iter, AnimationCore& animat
 
   for (AnimationCore::PropertyAnimationList::Iterator property = animation.Properties ().CreateIterator (); property; ++property)
     for (PropertyAnimation::KeyframeList::Iterator keyframe = property->Keyframes ().CreateIterator (); keyframe; ++keyframe)
-      keyframe->timevalue /= timescale;
+      keyframe->time /= timescale;
 }
 
 /*

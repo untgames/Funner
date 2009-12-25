@@ -96,7 +96,7 @@ const PropertyAnimation* AnimationCore::FindProperty (const char* property_id) c
     return 0;
 
   for (PropertyAnimationCollection::ConstIterator iter = impl->properties.CreateIterator (); iter; ++iter)
-    if (!xtl::xstrcmp (property_id, iter->Id ()))
+    if (!xtl::xstrcmp (property_id, iter->Name ()))
       return &(*iter);
 
   return 0;
