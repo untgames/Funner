@@ -22,7 +22,7 @@ namespace xfl
 class Frame
 {
   public:
-    typedef ICollection<FrameElement> FrameElementList;
+    typedef INamedCollection<FrameElement> FrameElementList;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
@@ -46,9 +46,6 @@ class Frame
 ///////////////////////////////////////////////////////////////////////////////////////////////////
           FrameElementList& Elements ();
     const FrameElementList& Elements () const;
-
-          FrameElement* FindElement (const char* element_name);
-    const FrameElement* FindElement (const char* element_name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Анимация кадра

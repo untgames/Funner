@@ -19,7 +19,7 @@ namespace xfl
 class AnimationCore
 {
   public:
-    typedef ICollection<PropertyAnimation> PropertyAnimationList;
+    typedef INamedCollection<PropertyAnimation> PropertyAnimationList;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
@@ -47,9 +47,6 @@ class AnimationCore
 ///////////////////////////////////////////////////////////////////////////////////////////////////
           PropertyAnimationList& Properties ();
     const PropertyAnimationList& Properties () const;
-
-          PropertyAnimation* FindProperty (const char* property_id);
-    const PropertyAnimation* FindProperty (const char* property_id) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

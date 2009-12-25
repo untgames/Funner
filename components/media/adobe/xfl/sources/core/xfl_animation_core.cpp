@@ -2,7 +2,7 @@
 
 using namespace media::adobe::xfl;
 
-typedef media::CollectionImpl<PropertyAnimation, ICollection<PropertyAnimation> > PropertyAnimationCollection;
+typedef media::CollectionImpl<PropertyAnimation, INamedCollection<PropertyAnimation> > PropertyAnimationCollection;
 
 /*
    Описание реализации анимации кадра
@@ -83,23 +83,6 @@ AnimationCore::PropertyAnimationList& AnimationCore::Properties ()
 const AnimationCore::PropertyAnimationList& AnimationCore::Properties () const
 {
   return impl->properties;
-}
-
-PropertyAnimation* AnimationCore::FindProperty (const char* property_id)
-{
-  return const_cast<PropertyAnimation*> (const_cast<const AnimationCore&> (*this).FindProperty (property_id));
-}
-
-const PropertyAnimation* AnimationCore::FindProperty (const char* property_id) const
-{
-  if (!property_id)
-    return 0;
-
-  for (PropertyAnimationCollection::ConstIterator iter = impl->properties.CreateIterator (); iter; ++iter)
-    if (!xtl::xstrcmp (property_id, iter->Name ()))
-      return &(*iter);
-
-  return 0;
 }
 
 /*

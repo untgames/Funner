@@ -2,7 +2,7 @@
 
 using namespace media::adobe::xfl;
 
-typedef media::CollectionImpl<FrameElement, ICollection<FrameElement> > FrameElementCollection;
+typedef media::CollectionImpl<FrameElement, INamedCollection<FrameElement> > FrameElementCollection;
 
 /*
     Описание реализации кадра анимации
@@ -83,23 +83,6 @@ Frame::FrameElementList& Frame::Elements ()
 const Frame::FrameElementList& Frame::Elements () const
 {
   return impl->elements;
-}
-
-FrameElement* Frame::FindElement (const char* element_name)
-{
-  return const_cast<FrameElement*> (const_cast<const Frame&> (*this).FindElement (element_name));
-}
-
-const FrameElement* Frame::FindElement (const char* element_name) const
-{
-  if (!element_name)
-    return 0;
-
-  for (FrameElementCollection::ConstIterator iter = impl->elements.CreateIterator (); iter; ++iter)
-    if (!xtl::xstrcmp (element_name, iter->Name ()))
-      return &(*iter);
-
-  return 0;
 }
 
 /*

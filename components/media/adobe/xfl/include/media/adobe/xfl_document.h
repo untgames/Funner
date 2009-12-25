@@ -25,9 +25,9 @@ namespace xfl
 class Document
 {
   public:
-    typedef ICollection<Resource> ResourceList;
-    typedef ICollection<Symbol>   SymbolList;
-    typedef ICollection<Timeline> TimelineList;
+    typedef INamedCollection<Resource> ResourceList;
+    typedef INamedCollection<Symbol>   SymbolList;
+    typedef INamedCollection<Timeline> TimelineList;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
@@ -71,26 +71,17 @@ class Document
           ResourceList& Resources ();
     const ResourceList& Resources () const;
 
-          Resource* FindResource (const char* resource_name);
-    const Resource* FindResource (const char* resource_name) const;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Элементы анимации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
           SymbolList& Symbols ();
     const SymbolList& Symbols () const;
 
-          Symbol* FindSymbol (const char* symbol_name);
-    const Symbol* FindSymbol (const char* symbol_name) const;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Анимации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
           TimelineList& Timelines ();
     const TimelineList& Timelines () const;
-
-          Timeline* FindTimeline (const char* timeline_name);
-    const Timeline* FindTimeline (const char* timeline_name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

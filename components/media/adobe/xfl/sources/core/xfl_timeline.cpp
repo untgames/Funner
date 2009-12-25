@@ -2,7 +2,7 @@
 
 using namespace media::adobe::xfl;
 
-typedef media::CollectionImpl<Layer, ICollection<Layer> > LayerCollection;
+typedef media::CollectionImpl<Layer, INamedCollection<Layer> > LayerCollection;
 
 /*
     Описание реализации анимации
@@ -69,23 +69,6 @@ Timeline::LayerList& Timeline::Layers ()
 const Timeline::LayerList& Timeline::Layers () const
 {
   return impl->layers;
-}
-
-Layer* Timeline::FindLayer (const char* layer_name)
-{
-  return const_cast<Layer*> (const_cast<const Timeline&> (*this).FindLayer (layer_name));
-}
-
-const Layer* Timeline::FindLayer (const char* layer_name) const
-{
-  if (!layer_name)
-    return 0;
-
-  for (LayerCollection::ConstIterator iter = impl->layers.CreateIterator (); iter; ++iter)
-    if (!xtl::xstrcmp (layer_name, iter->Name ()))
-      return &(*iter);
-
-  return 0;
 }
 
 /*

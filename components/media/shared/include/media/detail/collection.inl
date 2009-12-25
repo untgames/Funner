@@ -63,6 +63,65 @@ Item& CollectionImpl<Item, BaseClass>::operator [] (size_t index)
 }
 
 /*
+   Доступ к элементу по имени (в случае отсутствия - исключение)
+*/
+
+template <class Item, class BaseClass>
+Item& CollectionImpl<Item, BaseClass>::operator [] (const char* name)
+{
+  return const_cast<Item&> (const_cast<const CollectionImpl<Item, BaseClass>&> (*this).CollectionImpl::operator [] (name));
+}
+
+template <class Item, class BaseClass>
+const Item& CollectionImpl<Item, BaseClass>::operator [] (const char* name) const
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("media::ICollection::operator []", "name");
+
+  const Item* item = Find (name);
+
+  if (!item)
+    throw xtl::make_argument_exception ("media::ICollection::operator []", "name", name);
+
+  return *item;
+}
+
+/*
+   Поиск элемента по имени (в случае отсутствия возвращает 0)
+*/
+
+template <class Item, class BaseClass>
+Item* CollectionImpl<Item, BaseClass>::Find (const char* name)
+{
+  return const_cast<Item*> (const_cast<const CollectionImpl<Item, BaseClass>&> (*this).Find (name));
+}
+
+namespace
+{
+
+template <class Item>
+bool isNameEqual (const Item& item, const char* name)
+{
+  return !xtl::xstrcmp (get_name (item), name);
+}
+
+}
+
+template <class Item, class BaseClass>
+const Item* CollectionImpl<Item, BaseClass>::Find (const char* name) const
+{
+  if (!name)
+    return 0;
+
+  typename CollectionImpl<Item, BaseClass>::ItemArray::const_iterator item = stl::find_if (items.begin (), items.end (), xtl::bind (isNameEqual<Item>, _1, name));
+
+  if (item == items.end ())
+    return 0;
+
+  return &(*item);
+}
+
+/*
    Получение итератора
 */
 

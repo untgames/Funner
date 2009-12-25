@@ -2,9 +2,9 @@
 
 using namespace media::adobe::xfl;
 
-typedef media::CollectionImpl<Resource, ICollection<Resource> > ResourceCollection;
-typedef media::CollectionImpl<Symbol,   ICollection<Symbol> >   SymbolCollection;
-typedef media::CollectionImpl<Timeline, ICollection<Timeline> > TimelineCollection;
+typedef media::CollectionImpl<Resource, INamedCollection<Resource> > ResourceCollection;
+typedef media::CollectionImpl<Symbol,   INamedCollection<Symbol> >   SymbolCollection;
+typedef media::CollectionImpl<Timeline, INamedCollection<Timeline> > TimelineCollection;
 
 namespace
 {
@@ -168,23 +168,6 @@ const Document::ResourceList& Document::Resources () const
   return impl->resources;
 }
 
-Resource* Document::FindResource (const char* resource_name)
-{
-  return const_cast<Resource*> (const_cast<const Document&> (*this).FindResource (resource_name));
-}
-
-const Resource* Document::FindResource (const char* resource_name) const
-{
-  if (!resource_name)
-    return 0;
-
-  for (ResourceCollection::ConstIterator iter = impl->resources.CreateIterator (); iter; ++iter)
-    if (!xtl::xstrcmp (resource_name, iter->Name ()))
-      return &(*iter);
-
-  return 0;
-}
-
 /*
    Элементы анимации
 */
@@ -199,23 +182,6 @@ const Document::SymbolList& Document::Symbols () const
   return impl->symbols;
 }
 
-Symbol* Document::FindSymbol (const char* symbol_name)
-{
-  return const_cast<Symbol*> (const_cast<const Document&> (*this).FindSymbol (symbol_name));
-}
-
-const Symbol* Document::FindSymbol (const char* symbol_name) const
-{
-  if (!symbol_name)
-    return 0;
-
-  for (SymbolCollection::ConstIterator iter = impl->symbols.CreateIterator (); iter; ++iter)
-    if (!xtl::xstrcmp (symbol_name, iter->Name ()))
-      return &(*iter);
-
-  return 0;
-}
-
 /*
    Анимации
 */
@@ -228,23 +194,6 @@ Document::TimelineList& Document::Timelines ()
 const Document::TimelineList& Document::Timelines () const
 {
   return impl->timelines;
-}
-
-Timeline* Document::FindTimeline (const char* timeline_name)
-{
-  return const_cast<Timeline*> (const_cast<const Document&> (*this).FindTimeline (timeline_name));
-}
-
-const Timeline* Document::FindTimeline (const char* timeline_name) const
-{
-  if (!timeline_name)
-    return 0;
-
-  for (TimelineCollection::ConstIterator iter = impl->timelines.CreateIterator (); iter; ++iter)
-    if (!xtl::xstrcmp (timeline_name, iter->Name ()))
-      return &(*iter);
-
-  return 0;
 }
 
 /*
