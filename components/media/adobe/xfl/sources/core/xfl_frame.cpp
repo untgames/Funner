@@ -64,6 +64,30 @@ void Frame::SetName (const char* name)
 }
 
 /*
+   Тайминги
+*/
+
+size_t Frame::FirstFrame () const
+{
+  return impl->first_frame;
+}
+
+size_t Frame::Duration () const
+{
+  return impl->duration;
+}
+
+void Frame::SetFirstFrame (size_t first_frame)
+{
+  impl->first_frame = first_frame;
+}
+
+void Frame::SetDuration (size_t duration)
+{
+  impl->duration = duration;
+}
+
+/*
    Кадры анимации слоя
 */
 

@@ -3,6 +3,8 @@
 
 #include <cstddef>
 
+#include <common/serializer_manager.h>
+
 #include <media/adobe/xfl_collection.h>
 #include <media/adobe/xfl_resource.h>
 #include <media/adobe/xfl_symbol.h>
@@ -31,6 +33,7 @@ class Document
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Document  ();
+    Document  (const char* file_name);
     Document  (const Document&);
     ~Document ();
 
@@ -103,6 +106,12 @@ class Document
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (Document&, Document&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Менеджер документов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef common::ResourceSerializerManager<void (const char* file_name, Document& document),
+  void (const char* file_name, const Document& document)> DocumentManager;
 
 }
 

@@ -8,6 +8,8 @@
 #include <xtl/iterator.h>
 #include <xtl/reference_counter.h>
 
+#include <common/component.h>
+
 #include <media/collection.h>
 
 #include <media/adobe/xfl.h>

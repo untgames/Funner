@@ -6,6 +6,13 @@ typedef media::CollectionImpl<Resource, ICollection<Resource> > ResourceCollecti
 typedef media::CollectionImpl<Symbol,   ICollection<Symbol> >   SymbolCollection;
 typedef media::CollectionImpl<Timeline, ICollection<Timeline> > TimelineCollection;
 
+namespace
+{
+
+const char* XFL_LOADERS_MASK = "media.adobe.xfl.loaders.*"; //маска имён компонентов загрузки xfl-документов
+
+}
+
 /*
     Описание реализации XFL документа
 */
@@ -34,6 +41,26 @@ Document::Document (const Document& source)
   : impl (source.impl)
 {
   addref (impl);
+}
+
+Document::Document (const char* file_name)
+  : impl (new Impl)
+{
+  try
+  {
+    if (!file_name)
+      throw xtl::make_null_argument_exception ("", "file_name");
+
+    static common::ComponentLoader loader (XFL_LOADERS_MASK);
+
+    DocumentManager::GetLoader (file_name, common::SerializerFindMode_ByName)(file_name, *this);
+  }
+  catch (xtl::exception& exception)
+  {
+    release (impl);
+    exception.touch ("media::adobe::xfl::Document::Document(const char*)");
+    throw;
+  }
 }
 
 Document::~Document ()
