@@ -5,7 +5,7 @@ void print (float value)
   printf ("%+.3f", value);
 }
 
-template <class T, size_t N>
+template <class T, unsigned int N>
 void dump_vector (const math::vector<T, N>& v)
 {
   printf ("[");
@@ -19,7 +19,7 @@ void dump_vector (const math::vector<T, N>& v)
   printf (" ]");
 }
 
-template <class T, size_t N>
+template <class T, unsigned int N>
 void dump_matrix (const math::matrix<T, N>& v)
 {
   printf ("[");
