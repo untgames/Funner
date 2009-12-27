@@ -13,11 +13,6 @@ export.link.common.aes.LIBS          := funner.common.aes
 export.link.common.aes.LINK_INCLUDES := AesCrypto
 export.link.common.aes.IMPORTS       := link.common
 
-# Configurator link exports
-export.link.common.configurator.LIBS          := funner.common.configurator
-export.link.common.configurator.LINK_INCLUDES := Configurator
-export.link.common.configurator.IMPORTS       := link.common link.common.xml
-
 # DefaultConsoleHandler link exports
 export.link.common.default_console_handler.LINK_INCLUDES := DefaultConsoleHandler
 export.link.common.default_console_handler.IMPORTS       := link.common

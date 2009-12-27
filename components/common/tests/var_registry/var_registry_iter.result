@@ -1,9 +1,0 @@
-Results of var_registry_iter_test:
-TestVarRegistry::TestVarRegistry()
-First enumeration:
-name='y' vars_count=2
-name='z' vars_count=1
-Second enumeration:
-name='y' vars_count=1
-name='z' vars_count=2
-TestVarRegistry::~TestVarRegistry

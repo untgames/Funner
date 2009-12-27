@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.CONFIGURATOR COMMON.AES COMMON.TESTS \
+TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SYSTEM COMMON.AES COMMON.TESTS \
   COMMON.UTILS.FILE_CRYPTER COMMON.INFO
 
 #Цель - CommonLib sources
@@ -10,7 +10,7 @@ COMMON.SOURCES.NAME                              := funner.common
 COMMON.SOURCES.INCLUDE_DIRS                      := include ../xtl/include ../../extern/pcre/include sources
 COMMON.SOURCES.SOURCE_DIRS                       := sources/file_system/core sources/streams sources/hash sources/crypto/core sources/memory \
                                                     sources/parselib/tree sources/parselib/manager sources/strlib sources/utils sources/log \
-                                                    sources/var_registry sources/platform/default
+                                                    sources/platform/default
 COMMON.SOURCES.DOCUMENTATION_DIRS                := include
 COMMON.SOURCES.COMPILER_DEFINES                  := PCRE_STATIC
 COMMON.SOURCES.iphone.COMPILER_DEFINES           := __IPHONE__
@@ -41,12 +41,6 @@ COMMON.ZIP_FILE_SYSTEM.SOURCE_DIRS  := sources/file_system/zip
 COMMON.ZIP_FILE_SYSTEM.IMPORTS      := compile.extern.zzip
 
 #Цель - CommonLib zip file system sources
-COMMON.CONFIGURATOR.TYPE             := static-lib
-COMMON.CONFIGURATOR.NAME             := funner.common.configurator
-COMMON.CONFIGURATOR.SOURCE_DIRS      := sources/var_registry/configurator
-COMMON.CONFIGURATOR.IMPORTS          := compile.common
-
-#Цель - CommonLib zip file system sources
 COMMON.AES.TYPE             := static-lib
 COMMON.AES.NAME             := funner.common.aes
 COMMON.AES.SOURCE_DIRS      := sources/crypto/aes
@@ -57,9 +51,9 @@ COMMON.TESTS.TYPE             := test-suite
 COMMON.TESTS.LIBS             :=
 COMMON.TESTS.DLL_DIRS         := 
 COMMON.TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils \
-                                 tests/memory tests/log tests/parselib tests/crypto tests/var_registry
+                                 tests/memory tests/log tests/parselib tests/crypto
 COMMON.TESTS.IMPORTS          := compile.math.vecmath compile.common link.common.aes link.common.xml link.common.wxf \
-                                 link.common.configurator link.common.zip_file_system link.common.default_console_handler
+                                 link.common.zip_file_system link.common.default_console_handler
 
 #Цель - CommonLib crypter
 COMMON.UTILS.FILE_CRYPTER.TYPE             := application

@@ -1,7 +1,0 @@
-Results of var_registry_link1_test:
-TestVarRegistry::TestVarRegistry()
-enumerate all vars:
-x=x; y=y; x.y=x.y; xxxx.y=xxxx.y; 
-enumerate 'x*' vars:
-x=x; x.y=x.y; xxxx.y=xxxx.y; 
-TestVarRegistry::~TestVarRegistry

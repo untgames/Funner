@@ -1,3 +1,0 @@
-Results of null_var_registry_test:
-exception: Invalid argument <var_name>='x'. Registry not mounted
-    at common::VarRegistry::Impl::SetValue

@@ -24,7 +24,6 @@ namespace
     Константы
 */
 
-const char* CONFIGURATION_BRANCH_NAME = "Configuration.WindowSettings"; //имя ветки реестра с настройками
 const char* CONFIGURATION_FILE_NAME   = "media/config.xml"; //имя файла конфигурации
 const char* MID_LEVEL_RENDERER_NAME   = "MyRenderer"; //имя системы визуализации среднего уровня
 const char* MATERIAL_LIB_FILE_NAME    = "media/materials.xmtl"; //имя файла с материалами
@@ -46,31 +45,9 @@ const char* DEFAULT_DEVICE_INIT_STRING = ""; //строка инициализации устройства р
     Утилиты
 */
 
-template <class T> T get (VarRegistry& registry, const char* name, const T& default_value)
+template <class T> T get (ParseNode& node, const char* name, const T& default_value)
 {
-//  printf ("Read value of %s, branch name is %s\n", name, registry.BranchName ());
-
-  if (!registry.HasVariable (name))
-    return default_value;
-
-//  printf ("Readed value of %s\n", name);
-
-  try
-  {
-    return xtl::any_multicast<T> (registry.GetValue (name));
-  }
-  catch (...)
-  {
-    return default_value;
-  }
-}
-
-stl::string get (VarRegistry& registry, const char* name, const char* default_value) //??????
-{
-  if (!registry.HasVariable (name))
-    return default_value;
-
-  return to_string (registry.GetValue (name));
+  return common::get<T> (node, name, default_value);
 }
 
 void log_print (const char* message)
@@ -86,12 +63,11 @@ void log_print (const char* message)
 
 struct TestApplication::Impl
 {
-  VarRegistry                    config;              //реестр конфигурационных настроек
   stl::auto_ptr<syslib::Window>  window;              //главное окно приложения
   xtl::auto_connection           app_idle_connection; //соединение сигнала обработчика холостого хода приложения
   SceneRender                    render;              //рендер сцены
   render::RenderTarget           render_target;       //цель рендеринга
-
+  
   void OnClose ()
   {
     syslib::Application::Exit (0);
@@ -139,19 +115,18 @@ TestApplication::TestApplication ()
 {
   try
   {
-      //чтение настроек
-
-    impl->config.Open (CONFIGURATION_BRANCH_NAME);
-
+    common::Parser cfg_parser (CONFIGURATION_FILE_NAME);
+    common::ParseNode cfg_root = cfg_parser.Root ().First ("Configuration");    
+    
       //создание окна
 
-    impl->window = new syslib::Window (get (impl->config, "FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) ?
-        syslib::WindowStyle_PopUp : syslib::WindowStyle_Overlapped, get (impl->config, "WindowWidth", DEFAULT_WINDOW_WIDTH),
-        get (impl->config, "WindowHeight", DEFAULT_WINDOW_HEIGHT));
+    impl->window = new syslib::Window (get (cfg_root, "FullScreen", DEFAULT_FB_FULL_SCREEN_STATE) ?
+        syslib::WindowStyle_PopUp : syslib::WindowStyle_Overlapped, get (cfg_root, "WindowWidth", DEFAULT_WINDOW_WIDTH),
+        get (cfg_root, "WindowHeight", DEFAULT_WINDOW_HEIGHT));
 
     impl->window->SetDebugLog (&log_print);
 
-    impl->window->SetTitle (get (impl->config, "WindowTitle", DEFAULT_WINDOW_TITLE).c_str ());
+    impl->window->SetTitle (get (cfg_root, "WindowTitle", DEFAULT_WINDOW_TITLE));
 
     impl->window->Show ();
 
@@ -161,9 +136,6 @@ TestApplication::TestApplication ()
     impl->window->RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Impl::OnClose, &*impl));
 
       //инициализация системы рендеринга
-
-    common::Parser cfg_parser (CONFIGURATION_FILE_NAME);
-    common::ParseNode cfg_root = cfg_parser.Root ().First ("Configuration");
 
     render::mid_level::WindowDriver::RegisterRenderer (MID_LEVEL_RENDERER_NAME, cfg_root);
     render::mid_level::WindowDriver::RegisterWindow (MID_LEVEL_RENDERER_NAME, *impl->window, cfg_root);

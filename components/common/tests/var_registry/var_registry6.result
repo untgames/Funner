@@ -1,7 +1,0 @@
-Results of var_registry6_test:
-TestVarRegistry::TestVarRegistry()
-TestVarRegistry::TestVarRegistry()
-enumerate all vars:
-test.x=x; a.b.x=x; 
-TestVarRegistry::~TestVarRegistry
-TestVarRegistry::~TestVarRegistry
