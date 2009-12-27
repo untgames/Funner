@@ -1,7 +1,27 @@
 namespace detail
 {
 
-//Обёртка для инициализации результата сплайна
+namespace adl
+{
+
+///Проверка равенства двух значений
+template <class T1, class T2>
+bool equal (const T1& a, const T1& b, const T2& eps)
+{
+  T1 diff = a - b;
+
+  return diff <= eps || -diff <= eps;
+}
+
+template <class T1, class T2>
+bool check_equal (const T1& a, const T1& b, const T2& eps)
+{
+  return equal (a, b, eps);
+}
+
+}
+
+///Обёртка для инициализации результата сплайна
 template <class T> struct spline_result_wrapper
 {
   T value;
@@ -12,12 +32,15 @@ template <class T> struct spline_result_wrapper
 ///Фрейм
 template <class Key> struct spline_key_frame
 {
-  typedef Key                           key_type;
-  typedef typename key_type::value_type value_type;
-  typedef value_type                    factors_type [4];
+  typedef Key                            key_type;
+  typedef typename key_type::time_type   time_type;
+  typedef typename key_type::scalar_type scalar_type;
+  typedef typename key_type::value_type  value_type;
+  typedef math::vector<value_type, 4>    factors_type;
 
   key_type     key;
   factors_type factors;
+  time_type    time_factor;
   
   spline_key_frame (const key_type& in_key)
     : key (in_key)
@@ -35,36 +58,138 @@ template <class Frame> struct spline_key_frame_less
   
   bool operator () (const Frame& frame, const typename Frame::time_type& time) const
   {
-    return frame.time < time;
-  }  
+    return frame.key.time < time;
+  }
 };
+
+///Нормирование времени
+template <class Time, class Frame>
+Time normalize_time (const Time& time, const Frame& frame)
+{
+  return (time - frame.key.time) * frame.time_factor;
+}
 
 ///Интерполяция
 template <class Time, class Value>
-void spline_interpolate (const Time& time, Value factors [4], Value& result)
+void spline_interpolate (const Time& time, const math::vector<Value, 4>& factors, Value& result)
 {    
-  result = Value ();
+  Time time2 = time * time;
   
-  Time t (1);
+  result = dot (math::vector<Value, 4> (Value (1), Value (time), Value (time2), Value (time2 * time)), factors);
+}
 
-  for (unsigned int i=3; i<4; result += factors [i] * t, i++, t *= time);
+///Раcчёт коэффициентов TCB-сплайна
+template <class Frame>
+void spline_recompute_hermite (const Frame& prev, const Frame& cur, const Frame& next1, const Frame& next2, Frame& result)
+{
+  typedef typename Frame::value_type   value_type;
+  typedef typename Frame::scalar_type  scalar_type;
+  typedef typename Frame::time_type    time_type;
+  
+  static value_type one (1), two (2);
+
+  static value_type hermite_basis_matrix_factors [16] ={
+    value_type ( 1),      0,               0,                        0,
+                  0,      0, value_type ( 1),                        0,
+    value_type (-3), value_type ( 3), value_type (-2), value_type (-1),
+    value_type ( 2), value_type (-2), value_type ( 1), value_type ( 1),
+  };
+  
+  static math::matrix<value_type, 4> hermite_basis_matrix (hermite_basis_matrix_factors);
+  
+  const scalar_type &tension    = cur.key.tension,
+                    &continuity = cur.key.continuity,
+                    &bias       = cur.key.bias;
+
+  value_type g  (next1.key.value - cur.key.value),
+             t0 (((one-tension)*(one+bias)*(one+continuity) * (cur.key.value - prev.key.value) +
+                 (one-tension)*(one-bias)*(one-continuity) * g) / two),
+             t1 (((one-tension)*(one+bias)*(one-continuity) * g +
+                 (one-tension)*(one-bias)*(one+continuity) * (next2.key.value - next1.key.value)) / two);
+  
+  result.factors     = hermite_basis_matrix * math::vector<value_type, 4> (cur.key.value, next1.key.value, t0, t1);
+  
+  time_type duration = next1.key.time - cur.key.time;  
+  
+  static time_type EPS (0.0001f);
+
+  result.time_factor = duration <= EPS ? time_type (0) : time_type (1) / duration;
+}
+
+template <class Frame> struct spline_frame_selector
+{
+  spline_frame_selector (Frame* in_first, Frame* in_last, bool in_closed)
+    : first (in_first)
+    , last (in_last)
+    , count (in_last - in_first)
+    , closed (in_closed)
+  {
+  }
+  
+  Frame& operator () (Frame* frame) const
+  {
+    if (frame < first)
+    {
+      if (!closed)
+        return *first;  
+        
+      return first [(count - (first - frame)) % count];
+    }
+    
+    if (frame >= last)
+    {
+      if (!closed)
+        return last [-1];
+        
+      return first [(frame - first) % count];
+    }
+    
+    return *frame;
+  }
+
+  Frame        *first, *last;
+  unsigned int count;
+  bool         closed;
+};
+
+template <class Frame>
+void spline_recompute_hermite (Frame* frame, const spline_frame_selector<Frame>& selector)
+{
+  spline_recompute_hermite (selector (frame-1), *frame, selector (frame+1), selector (frame+2), *frame);
 }
 
 template <class T>
-void spline_recompute_hermite (const T& p0, const T& p1, const T& t0, const T& t1, T factors [4])
+void recompute (spline_key_frame<spline_tcb_key<T> >* first, spline_key_frame<spline_tcb_key<T> >* last, bool closed)
 {
-     //[p0,p1,t0=p0',t1=p1']*[Hermite matrix]
+  if (first == last)
+    return;
 
-  factors [0] = T (2) * p0 - T (2) * p1 + t0 + t1;
-  factors [1] = -T (3) * p0 + T(3) * p1 - T (2) * t0 - t1;
-  factors [2] = t0;
-  factors [3] = p0;
+  static T one (1), two (2);
+
+  typedef spline_key_frame<spline_tcb_key<T> > frame_type;
+  
+    //расчёт коэффициентов для средних точек
+  
+  for (frame_type* frame=first+1; frame<last-2; ++frame)
+    spline_recompute_hermite (frame [-1], frame [0], frame [1], frame [2], *frame);
+  
+    //расчёт коэффициентов для крайних точек
+    
+  spline_frame_selector<frame_type> frame_selector (first, last, closed);
+
+  spline_recompute_hermite (first, frame_selector);
+
+  if (last - 2 > first)
+    spline_recompute_hermite (last - 2, frame_selector);  
+
+  if (last - 1 > first)
+    spline_recompute_hermite (last - 1, frame_selector);
 }
 
 }
 
 /*
-    Инициализация ключей сплайна
+    TCB сплайн
 */
 
 template <class T>
@@ -81,7 +206,7 @@ spline_key<T>::spline_key (const time_type& in_time, const value_type& in_value)
 {
 }
 
-template <class T>  
+template <class T>
 spline_tcb_key<T>::spline_tcb_key ()
   : tension ()
   , bias ()
@@ -99,13 +224,17 @@ spline_tcb_key<T>::spline_tcb_key (const time_type& in_time, const value_type& i
 }
 
 template <class T>  
-spline_tcb_key<T>::spline_tcb_key (const time_type& in_time, const value_type& in_value, const scalar_type& in_tension, const scalar_type& in_bias, const scalar_type& in_continuity)
+spline_tcb_key<T>::spline_tcb_key (const time_type& in_time, const value_type& in_value, const scalar_type& in_tension, const scalar_type& in_continuity, const scalar_type& in_bias)
   : spline_key<T> (in_time, in_value)
   , tension (in_tension)
-  , bias (in_bias)
   , continuity (in_continuity)
+  , bias (in_bias)
 {
 }
+
+/*
+    Безье сплайн
+*/
 
 template <class T>
 spline_bezier_key<T>::spline_bezier_key ()
@@ -146,6 +275,8 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
   time_type   min_time;         //минимальное время
   time_type   max_time;         //максимальное время
   frame_list  frames;           //фреймы
+  scalar_type closed_eps;       //погрешность для определения закрытости сплайна
+  bool        closed;           //закрытый ли сплайн
   bool        need_recompute;   //ключи требуют перерасчёта
   bool        need_sort;        //ключи требуют сортировки
 
@@ -155,7 +286,10 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
     , end_wrap (spline_wrap_default)
     , min_time ()
     , max_time ()
+    , closed_eps (0)
+    , closed (false)
     , need_recompute (true)    
+    , need_sort (true)
   {
   }
   
@@ -169,8 +303,8 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
 
     if (!frames.empty ())
     {
-      min_time = frames.back ().time;
-      max_time = frames.front ().time;
+      min_time = frames.front ().key.time;
+      max_time = frames.back ().key.time;
     }
     else
     {
@@ -188,11 +322,10 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
       return;
       
     sort ();
-
-    for (frame_list::iterator iter=frames.begin (), end=frames.end (); iter!=end; ++iter)
-    {
-      
-    } 
+    
+    closed = frames.empty () || detail::adl::check_equal (frames.front ().key.value, frames.back ().key.value, closed_eps);
+    
+    detail::recompute (&*frames.begin (), &*frames.end (), closed);
 
     need_recompute = false;
   }
@@ -204,7 +337,7 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
   }
     
 ///Поиск ключевого кадра
-  frame_type& get_frame (const time_type& time)
+  frame_type& get_frame (time_type time)
   {
       //перерасчёт
       
@@ -249,10 +382,13 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
     
       //поиск кадра
 
-    typename frame_list::iterator iter = stl::lower_bound (frames.begin (), frames.end (), detail::spline_key_frame_less<frame_type> ());
-
+    typename frame_list::iterator iter = stl::lower_bound (frames.begin (), frames.end (), time, detail::spline_key_frame_less<frame_type> ());
+    
     if (iter == frames.end ())
       throw xtl::format_operation_exception ("math::basic_spline<T>::implementation::get_frame", "No frames");
+      
+    if (time < iter->key.time)
+      --iter;
 
     return *iter;    
   }
@@ -264,7 +400,7 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
 
 template <class Key>
 basic_spline<Key>::basic_spline ()
-  : impl (new Impl)
+  : impl (new implementation)
 {
 }
 
@@ -288,7 +424,7 @@ basic_spline<Key>::~basic_spline ()
 }
 
 template <class Key>
-basic_spline<Key>::& basic_spline<Key>::operator = (const basic_spline& s)
+basic_spline<Key>& basic_spline<Key>::operator = (const basic_spline& s)
 {
   basic_spline::operator = (s);
   return *this;
@@ -362,6 +498,31 @@ bool basic_spline<Key>::empty () const
 }
 
 /*
+    Закрытый ли сплайна
+*/
+
+template <class Key>
+bool basic_spline<Key>::closed () const
+{
+  impl->recompute ();
+
+  return impl->closed;
+}
+
+template <class Key>
+void basic_spline<Key>::set_closed_eps (const scalar_type& eps)
+{
+  impl->closed_eps     = eps;
+  impl->need_recompute = true;
+}
+
+template <class Key>
+const typename basic_spline<Key>::scalar_type& basic_spline<Key>::closed_eps () const
+{
+  return impl->closed_eps;
+}
+
+/*
     Резервирование ключей
 */
 
@@ -411,10 +572,12 @@ size_t basic_spline<Key>::add_keys (size_t keys_count, const key_type* keys)
   if (keys_count && !keys)
     throw xtl::make_null_argument_exception ("math::basic_spline<Key>::add_keys", "keys");
 
-  impl->frames.insert (keys, keys + keys_count);
+  impl->frames.insert (impl->frames.end (), keys, keys + keys_count);
 
   impl->need_recompute = true;
   impl->need_sort      = true;
+  
+  return impl->frames.size () - keys_count;
 }
 
 template <class Key>
@@ -473,15 +636,15 @@ void basic_spline<Key>::sort ()
 template <class Key>
 void basic_spline<Key>::eval (const time_type& time, value_type& out_value) const
 {
-  frame_type& frame = impl->get_frame (time);
-    
-  detail::spline_interpolate (time, frame.factors, out_value);
+  typename implementation::frame_type& frame = impl->get_frame (time);
+  
+  detail::spline_interpolate (detail::normalize_time (time, frame), frame.factors, out_value);
 }
 
 template <class Key>
 typename basic_spline<Key>::value_type basic_spline<Key>::eval (const time_type& time) const
 {
-  detail::spline_result_wrapper result;
+  detail::spline_result_wrapper<typename Key::value_type> result;
   
   eval (time, result.value);
   
@@ -492,6 +655,26 @@ template <class Key>
 typename basic_spline<Key>::value_type basic_spline<Key>::operator () (const time_type& time) const
 {
   return eval (time);
+}
+
+/*
+  Минимальное и максимальное время
+*/
+
+template <class Key>
+const typename basic_spline<Key>::time_type& basic_spline<Key>::min_time () const
+{
+  impl->sort ();
+  
+  return impl->min_time;
+}
+
+template <class Key>
+const typename basic_spline<Key>::time_type& basic_spline<Key>::max_time () const
+{
+  impl->sort ();
+  
+  return impl->max_time;
 }
 
 /*

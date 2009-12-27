@@ -3,6 +3,14 @@
 
 #include <cstddef>
 
+#ifndef MATH_CURVES_SPLINE_NO_DETAILS
+  #include <stl/algorithm>
+  #include <stl/vector>
+  #include <xtl/common_exceptions.h>
+  #include <xtl/reference_counter.h>
+  #include <math/matrix.h>
+#endif
+
 namespace math
 {
 
@@ -22,9 +30,9 @@ template <class T>                    struct spline_scalar_type<quat<T> >       
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> struct spline_key
 {
-  typedef T                                  value_type;
-  typedef spline_scalar_type<T>::scalar_type scalar_type;
-  typedef scalar_type                        time_type;
+  typedef T                                    value_type;
+  typedef typename spline_scalar_type<T>::type scalar_type;
+  typedef scalar_type                          time_type;
 
   time_type  time;      //время актуализации значения
   value_type value;     //значение
@@ -41,12 +49,12 @@ template <class T> struct spline_tcb_key: public spline_key<T>
   typedef typename spline_key<T>::scalar_type scalar_type;
 
   scalar_type tension;    //напряженность кривой
-  scalar_type bias;       //ассимметричность кривой
   scalar_type continuity; //пологость кривойывафыва
+  scalar_type bias;       //ассимметричность кривой
 
   spline_tcb_key ();
   spline_tcb_key (const time_type& time, const value_type& value);
-  spline_tcb_key (const time_type& time, const value_type& value, const scalar_type& tension, const scalar_type& bias, const scalar_type& continuity);
+  spline_tcb_key (const time_type& time, const value_type& value, const scalar_type& tension, const scalar_type& continuity, const scalar_type& bias);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,6 +130,19 @@ class basic_spline
     size_t capacity () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Закрытый ли сплайн
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    bool               closed         () const;
+    void               set_closed_eps (const scalar_type& eps);
+    const scalar_type& closed_eps     () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Минимальное и максимальное время
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const time_type& min_time () const;
+    const time_type& max_time () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение / обновление ключа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const key_type& get_key (size_t index) const;
@@ -159,10 +180,11 @@ class basic_spline
     void swap (basic_spline&);
     
   private:
+    struct implementation;  
+  
     basic_spline (implementation*);
 
   private:
-    struct implementation;
     implementation* impl;
 };
 
@@ -175,18 +197,13 @@ void swap (basic_spline<Key>&, basic_spline<Key>&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Переопределения типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef spline<float>             splinef;
-typedef spline<vector<float, 2> > spline2f;
-typedef spline<vector<float, 3> > spline3f;
-typedef spline<vector<float, 4> > spline4f;
-typedef spline<quat<float> >      rotation_splinef;
+typedef basic_spline<spline_tcb_key<float> >             tcb_splinef;
+typedef basic_spline<spline_tcb_key<vector<float, 2> > > tcb_spline2f;
+typedef basic_spline<spline_tcb_key<vector<float, 3> > > tcb_spline3f;
+typedef basic_spline<spline_tcb_key<vector<float, 4> > > tcb_spline4f;
+typedef basic_spline<spline_tcb_key<quat<float> > >      tcb_rotation_splinef;
 
 #ifndef MATH_CURVES_SPLINE_NO_DETAILS
-  #include <stl/algorithm>
-  #include <stl/vector>
-  #include <xtl/common_exceptions.h>
-  #include <xtl/reference_counter.h>
-  
   #include <math/detail/basic_spline.inl>
 #endif
 
