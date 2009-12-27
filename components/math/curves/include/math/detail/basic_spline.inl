@@ -89,8 +89,8 @@ void spline_recompute_hermite (const Frame& prev, const Frame& cur, const Frame&
   static value_type one (1), two (2);
 
   static value_type hermite_basis_matrix_factors [16] ={
-    value_type ( 1),      0,               0,                        0,
-                  0,      0, value_type ( 1),                        0,
+    value_type ( 1),               0,               0,               0,
+                  0,               0, value_type ( 1),               0,
     value_type (-3), value_type ( 3), value_type (-2), value_type (-1),
     value_type ( 2), value_type (-2), value_type ( 1), value_type ( 1),
   };
@@ -107,7 +107,7 @@ void spline_recompute_hermite (const Frame& prev, const Frame& cur, const Frame&
              t1 (((one-tension)*(one+bias)*(one-continuity) * g +
                  (one-tension)*(one-bias)*(one+continuity) * (next2.key.value - next1.key.value)) / two);
   
-  result.factors     = hermite_basis_matrix * math::vector<value_type, 4> (cur.key.value, next1.key.value, t0, t1);
+  result.factors = hermite_basis_matrix * math::vector<value_type, 4> (cur.key.value, next1.key.value, t0, t1);
   
   time_type duration = next1.key.time - cur.key.time;  
   
@@ -184,6 +184,47 @@ void recompute (spline_key_frame<spline_tcb_key<T> >* first, spline_key_frame<sp
 
   if (last - 1 > first)
     spline_recompute_hermite (last - 1, frame_selector);
+}
+
+///Расчёт коэффициентов Безье сплайна
+template <class T>
+void recompute (spline_key_frame<spline_bezier_key<T> >* first, spline_key_frame<spline_bezier_key<T> >* last, bool closed)
+{
+  if (first == last)
+    return;
+    
+  typedef spline_key_frame<spline_bezier_key<T> > frame_type;
+  typedef typename frame_type::value_type         value_type;
+  typedef typename frame_type::time_type          time_type;
+    
+  static value_type bezier_basis_matrix_factors [16] ={
+    value_type ( 1),               0,               0,               0,
+    value_type (-3), value_type ( 3),               0,               0,
+    value_type ( 3), value_type (-6), value_type ( 3),               0,
+    value_type (-1), value_type ( 3), value_type (-3), value_type ( 1),
+  };
+
+  static math::matrix<value_type, 4> bezier_basis_matrix (bezier_basis_matrix_factors);  
+  
+  static time_type EPS (0.0001f);
+
+  for (frame_type* frame=first; frame<last-1; ++frame)
+  {
+    time_type duration = frame [1].key.time - frame->key.time;
+  
+    frame->factors     = bezier_basis_matrix * math::vector<value_type, 4> (frame->key.value, frame->key.value + frame->key.outer_value, frame [1].key.value + frame [1].key.inner_value, frame [1].key.value);
+    frame->time_factor = duration <= EPS ? time_type (0) : time_type (1) / duration;
+  }
+
+  if (last - 1 >= first)
+  {
+    frame_type* cur = last - 1, *next = closed ? first : cur;
+  
+    time_type duration = next->key.time - cur->key.time;
+  
+    cur->factors     = bezier_basis_matrix * math::vector<value_type, 4> (cur->key.value, cur->key.value + cur->key.outer_value, next->key.value + next->key.inner_value, next->key.value);
+    cur->time_factor = duration <= EPS ? time_type (0) : time_type (1) / duration;
+  } 
 }
 
 }

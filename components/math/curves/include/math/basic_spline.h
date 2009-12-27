@@ -197,11 +197,15 @@ void swap (basic_spline<Key>&, basic_spline<Key>&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Переопределения типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef basic_spline<spline_tcb_key<float> >             tcb_splinef;
-typedef basic_spline<spline_tcb_key<vector<float, 2> > > tcb_spline2f;
-typedef basic_spline<spline_tcb_key<vector<float, 3> > > tcb_spline3f;
-typedef basic_spline<spline_tcb_key<vector<float, 4> > > tcb_spline4f;
-typedef basic_spline<spline_tcb_key<quat<float> > >      tcb_rotation_splinef;
+typedef basic_spline<spline_tcb_key<float> >                tcb_splinef;
+typedef basic_spline<spline_tcb_key<vector<float, 2> > >    tcb_spline2f;
+typedef basic_spline<spline_tcb_key<vector<float, 3> > >    tcb_spline3f;
+typedef basic_spline<spline_tcb_key<vector<float, 4> > >    tcb_spline4f;
+typedef basic_spline<spline_tcb_key<quat<float> > >         tcb_rotation_splinef;
+typedef basic_spline<spline_bezier_key<float> >             bezier_splinef;
+typedef basic_spline<spline_bezier_key<vector<float, 2> > > bezier_spline2f;
+typedef basic_spline<spline_bezier_key<vector<float, 3> > > bezier_spline3f;
+typedef basic_spline<spline_bezier_key<vector<float, 4> > > bezier_spline4f;
 
 #ifndef MATH_CURVES_SPLINE_NO_DETAILS
   #include <math/detail/basic_spline.inl>
