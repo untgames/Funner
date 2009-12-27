@@ -11,6 +11,58 @@ __forceinline __m128 to_m128 (const vector<float, 4>& v)
 #endif
 
 /*
+    Получение указателя на компоненты
+*/
+
+template <class T, unsigned int Size>
+inline T* get_components (vector<T, Size>& v)
+{
+  return static_cast<T*> (v.x);
+}
+
+template <class T, unsigned int Size>
+inline const T* get_components (const vector<T, Size>& v)
+{
+  return static_cast<const T*> (v.x);
+}
+
+template <class T>
+inline T* get_components (vector<T, 4>& v)
+{
+  return static_cast<T*> (&v.x);
+}
+
+template <class T>
+inline const T* get_components (const vector<T, 4>& v)
+{
+  return static_cast<const T*> (&v.x);
+}
+
+template <class T>
+inline T* get_components (vector<T, 3>& v)
+{
+  return static_cast<T*> (&v.x);
+}
+
+template <class T>
+inline const T* get_components (const vector<T, 3>& v)
+{
+  return static_cast<const T*> (&v.x);
+}
+
+template <class T>
+inline T* get_components (vector<T, 2>& v)
+{
+  return static_cast<T*> (&v.x);
+}
+
+template <class T>
+inline const T* get_components (const vector<T, 2>& v)
+{
+  return static_cast<const T*> (&v.x);
+}
+
+/*
     Покомпонентные векторные операции
 */
 
@@ -360,13 +412,13 @@ vector<T, Size>& vector<T, Size>::operator = (const T& a)
 template <class T, unsigned int Size>
 typename vector<T, Size>::value_type& vector<T, Size>::operator [] (unsigned int index)
 {
-  return static_cast<value_type*> (&this->x) [index];
+  return detail::get_components (*this)[index];
 }
 
 template <class T, unsigned int Size>
 const typename vector<T, Size>::value_type& vector<T, Size>::operator [] (unsigned int index) const
 {
-  return static_cast<const value_type*> (&this->x) [index];
+  return detail::get_components (*this)[index];
 }
 
 /*
