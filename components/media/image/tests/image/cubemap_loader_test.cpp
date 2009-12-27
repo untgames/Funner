@@ -30,14 +30,14 @@ int main ()
     if (!FileSystem::IsDir (results_dir))
       FileSystem::Mkdir (results_dir);
 
-    image.Save ("results/pic1.tga.cubemap");
+    image.Save ("results/pic1.png.cubemap");
 
-    print_hash ("results/pic1_px.tga");
-    print_hash ("results/pic1_nx.tga");
-    print_hash ("results/pic1_py.tga");
-    print_hash ("results/pic1_ny.tga");
-    print_hash ("results/pic1_pz.tga");
-    print_hash ("results/pic1_nz.tga");
+    print_hash ("results/pic1_px.png");
+    print_hash ("results/pic1_nx.png");
+    print_hash ("results/pic1_py.png");
+    print_hash ("results/pic1_ny.png");
+    print_hash ("results/pic1_pz.png");
+    print_hash ("results/pic1_nz.png");
   }
   catch (std::exception& exception)
   {                                               

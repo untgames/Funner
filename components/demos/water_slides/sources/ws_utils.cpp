@@ -20,12 +20,12 @@ math::mat4f get_ortho_proj (float left, float right, float bottom, float top, fl
 }
 
 //получение перспективной матрицы проекции
-math::mat4f get_perspective_proj (float fov_x, float fov_y, float znear, float zfar)
+math::mat4f get_perspective_proj (const math::anglef& fov_x, const math::anglef& fov_y, float znear, float zfar)
 {
   math::mat4f proj_matrix;
 
-  float width  = tan (math::deg2rad (fov_x)) * znear,
-        height = tan (math::deg2rad (fov_y)) * znear,
+  float width  = tan (fov_x) * znear,
+        height = tan (fov_y) * znear,
         depth  = zfar - znear;
 
   proj_matrix [0] = math::vec4f (2.0f * znear / width, 0, 0, 0);

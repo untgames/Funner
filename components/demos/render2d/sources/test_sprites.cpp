@@ -117,7 +117,7 @@ struct Test
 
         sprite_list->Invalidate ();
 
-        this->sprite->Rotate (1, 0, 0, 1);
+        this->sprite->Rotate (math::degree (1.0f), 0, 0, 1);
 
         last_update = common::milliseconds ();
       }

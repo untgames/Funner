@@ -30,14 +30,14 @@ int main ()
     if (!FileSystem::IsDir (results_dir))
       FileSystem::Mkdir (results_dir);      
 
-    image.Save ("results/pic1.tga.skybox");
+    image.Save ("results/pic1.png.skybox");
 
-    print_hash ("results/pic1_up.tga");
-    print_hash ("results/pic1_down.tga");
-    print_hash ("results/pic1_left.tga");
-    print_hash ("results/pic1_right.tga");
-    print_hash ("results/pic1_front.tga");
-    print_hash ("results/pic1_back.tga");
+    print_hash ("results/pic1_up.png");
+    print_hash ("results/pic1_down.png");
+    print_hash ("results/pic1_left.png");
+    print_hash ("results/pic1_right.png");
+    print_hash ("results/pic1_front.png");
+    print_hash ("results/pic1_back.png");
   }
   catch (std::exception& exception)
   {                                               

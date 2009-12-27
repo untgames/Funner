@@ -485,12 +485,12 @@ class TestView: public IGameView
 
       shader_parameters.object_matrix     = 1.0f;
       shader_parameters.projection_matrix = get_ortho_proj (-1, 1, -1, 1, -30, 30);
-      shader_parameters.view_matrix       = math::translatef (0, 0, -15.5);
+      shader_parameters.view_matrix       = math::translate (math::vec3f (0, 0, -15.5));
 
       constant_buffer->SetData (0, sizeof shader_parameters, &shader_parameters);
       
-      shader_parameters.object_matrix = math::translatef (float (boat_x) / 50.0f - 1.0f, float (boat_y) / 50.0f - 1.0f, 2.0f) * 
-                                        math::scalef (0.1f, 0.1f, 0.1f);
+      shader_parameters.object_matrix = math::translate (math::vec3f (float (boat_x) / 50.0f - 1.0f, float (boat_y) / 50.0f - 1.0f, 2.0f)) * 
+                                        math::scale (math::vec3f (0.1f, 0.1f, 0.1f));
 
       boat_constant_buffer->SetData (0, sizeof shader_parameters, &shader_parameters);
     }

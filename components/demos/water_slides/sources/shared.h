@@ -22,7 +22,8 @@
 #include <common/time.h>
 #include <common/parser.h>
 
-#include <mathlib.h>
+#include <math/matrix.h>
+#include <math/utility.h>
 
 #include <syslib/window.h>
 #include <syslib/application.h>
@@ -135,7 +136,7 @@ class MyApplication
 math::mat4f get_ortho_proj (float left, float right, float bottom, float top, float znear, float zfar);
 
 //получение перспективной матрицы проекции
-math::mat4f get_perspective_proj (float fov_x, float fov_y, float znear, float zfar);
+math::mat4f get_perspective_proj (const math::anglef& fov_x, const math::anglef& fov_y, float znear, float zfar);
 
 //создание игровых отображений
 GameView create_test_game_view ();

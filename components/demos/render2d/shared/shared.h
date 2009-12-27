@@ -14,8 +14,6 @@
 #include <xtl/ref.h>
 #include <xtl/shared_ptr.h>
 
-#include <math/io.h>
-
 #include <common/log.h>
 #include <common/parser.h>
 #include <common/strlib.h>

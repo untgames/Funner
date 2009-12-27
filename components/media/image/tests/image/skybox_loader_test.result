@@ -1,7 +1,7 @@
 Results of skybox loader test:
-File 'results/pic1_up.tga'	hash: {d7,e0,5e,b0,1f,c4,f1,44,f0,9c,dc,d3,ca,64,0d,dd}
-File 'results/pic1_down.tga'	hash: {d7,e0,5e,b0,1f,c4,f1,44,f0,9c,dc,d3,ca,64,0d,dd}
-File 'results/pic1_left.tga'	hash: {d7,e0,5e,b0,1f,c4,f1,44,f0,9c,dc,d3,ca,64,0d,dd}
-File 'results/pic1_right.tga'	hash: {d7,e0,5e,b0,1f,c4,f1,44,f0,9c,dc,d3,ca,64,0d,dd}
-File 'results/pic1_front.tga'	hash: {d7,e0,5e,b0,1f,c4,f1,44,f0,9c,dc,d3,ca,64,0d,dd}
-File 'results/pic1_back.tga'	hash: {d7,e0,5e,b0,1f,c4,f1,44,f0,9c,dc,d3,ca,64,0d,dd}
+File 'results/pic1_up.png'	hash: {3a,1f,f2,0f,08,59,95,e1,f0,d8,8c,74,f2,5f,73,9e}
+File 'results/pic1_down.png'	hash: {3a,1f,f2,0f,08,59,95,e1,f0,d8,8c,74,f2,5f,73,9e}
+File 'results/pic1_left.png'	hash: {3a,1f,f2,0f,08,59,95,e1,f0,d8,8c,74,f2,5f,73,9e}
+File 'results/pic1_right.png'	hash: {3a,1f,f2,0f,08,59,95,e1,f0,d8,8c,74,f2,5f,73,9e}
+File 'results/pic1_front.png'	hash: {3a,1f,f2,0f,08,59,95,e1,f0,d8,8c,74,f2,5f,73,9e}
+File 'results/pic1_back.png'	hash: {3a,1f,f2,0f,08,59,95,e1,f0,d8,8c,74,f2,5f,73,9e}

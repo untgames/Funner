@@ -12852,7 +12852,7 @@ Model 'data/ape.dae'
                 Node 'Box54-node'
                   sid: 'Box54-node'
                   name: 'Box54'
-                  transform: [ [ -0.072 -0.496 -0.866 +0.000 ] [ -0.992 +0.129 +0.008 +0.000 ] [ +0.108 +0.859 -0.501 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                  transform: [ [ -0.072 -0.496 -0.866 -0.000 ] [ -0.992 +0.129 +0.008 +0.000 ] [ +0.108 +0.859 -0.501 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                   Collection 'instance_meshes' (0 items)
                   Collection 'instance_controllers' (0 items)
                   Collection 'lights' (0 items)

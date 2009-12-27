@@ -4,7 +4,8 @@
 
 #include <xtl/visitor.h>
 
-#include <mathlib.h>
+#include <math/matrix.h>
+#include <math/utility.h>
 
 #include <common/component.h>
 
@@ -241,8 +242,8 @@ struct RenderViewVisitor: public xtl::visitor<void, VisualModel>
 //      device->OSSetBlendState (trajectory_blend_state);
     }
 
-    shader_parameters->object_tm = math::rotatef (angle, 0, 0, 1) * math::rotatef (angle, 0, 1, 0) *
-                                   math::rotatef (angle, 1, 0, 0) * model.WorldTM ();
+    shader_parameters->object_tm = math::rotate (math::radian (angle), math::vec3f (0, 0, 1)) * math::rotate (math::radian (angle), math::vec3f (0, 1, 0)) *
+                                   math::rotate (math::radian (angle), math::vec3f (1, 0, 0)) * model.WorldTM ();
 
     cb->SetData (0, sizeof *shader_parameters, shader_parameters);
 
@@ -422,7 +423,7 @@ class ModelerView: public IRenderView, public xtl::reference_counter, public ren
       MyShaderParameters my_shader_parameters;
 
       my_shader_parameters.proj_tm      = camera->ProjectionMatrix ();
-      my_shader_parameters.view_tm      = invert (camera->WorldTM ());
+      my_shader_parameters.view_tm      = inverse (camera->WorldTM ());
       my_shader_parameters.light_enable = 1;
 
       device.SSSetProgram (shader.get ());
