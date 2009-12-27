@@ -36,9 +36,9 @@ bool XflParser::ReadHexColor (const char* hex_string, math::vec3f& color)
   if (!xtl::io::read (hex_string + 1, int_value))
     return false;
 
-  color.x = int_value / 255 / 255;
-  color.y = int_value / 255 % 255;
-  color.z = int_value % 255;
+  color.x = (int_value / 255 / 255) / 255.0f;
+  color.y = (int_value / 255 % 255) / 255.0f;
+  color.z = (int_value % 255) / 255.0f;
 
   return true;
 }

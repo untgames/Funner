@@ -1,3 +1,5 @@
+#include <cstdio>
+
 #include <xtl/iterator.h>
 
 #include <common/file.h>
