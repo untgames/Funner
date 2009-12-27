@@ -24,7 +24,6 @@ namespace engine
 
 void bind_common_file_library (script::Environment&);
 void bind_common_string_tree  (script::Environment&);
-void bind_common_var_registry (script::Environment&);
 void bind_common_signals      (script::Environment&);
 void bind_common_action_queue (script::Environment&);
 void bind_common_timer        (script::Environment&);
