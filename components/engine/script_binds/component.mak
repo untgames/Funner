@@ -15,7 +15,7 @@ ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS      := compile.script.core compile.scene_gr
 #Öåëü ¹2 - SCRIPT_BINDS tests
 ENGINE.SCRIPT_BINDS.TESTS.TYPE        := test-suite
 ENGINE.SCRIPT_BINDS.TESTS.SOURCE_DIRS := tests/lua
-ENGINE.SCRIPT_BINDS.TESTS.IMPORTS	  	:= compile.script.core compile.common compile.system link.script.lua \
+ENGINE.SCRIPT_BINDS.TESTS.IMPORTS	  	:= compile.script.core compile.math.vecmath compile.common compile.system link.script.lua \
                                          link.engine.script_binds.bv link.engine.script_binds.sg link.engine.script_binds.math \
                                          link.engine.script_binds.render link.engine.script_binds.common link.engine.script_binds.system \
                                          link.engine.script_binds.engine link.engine.script_binds.input \

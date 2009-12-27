@@ -135,12 +135,12 @@ entity2 has 1 intersections:
 entity3 has 1 intersections:
   entity1
 Perspective camera test
-FovX  = 1
-FovY  = 1
+FovX  = 0.99999994039536
+FovY  = 0.99999994039536
 ZNear = 0
 ZFar  = 1
 FovX = 36
-FovY  = 20
+FovY  = 19.999998092651
 ZNear = 10
 ZFar  = 1000
 Ortho camera test
@@ -171,7 +171,7 @@ Name =
 Angle = 0
 Exponent = 0
 Name = light1
-Angle = 75
+Angle = 74.999992370605
 Exponent = 0.69999998807907
 BoxHelper test
 Listener test

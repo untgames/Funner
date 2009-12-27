@@ -1,7 +1,5 @@
 #include "shared.h"
 
-#include <math/io.h>
-
 #include <bv/axis_aligned_box.h>
 
 using namespace script;

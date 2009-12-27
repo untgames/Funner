@@ -1,7 +1,8 @@
 #include "shared.h"
 
-#include <mathlib.h>
-#include <math/io.h>
+#include <math/angle.h>
+#include <math/matrix.h>
+#include <math/quat.h>
 
 #include <sg/camera.h>
 #include <sg/helper.h>
@@ -18,6 +19,40 @@ using namespace script;
 using namespace scene_graph;
 using namespace math;
 using namespace xtl;
+
+/*
+    Взаимодействие math::angle со стеком аргументов
+*/
+
+namespace script
+{
+
+namespace detail
+{
+
+template <class T>
+inline T make_invoker_argument (const math::angle<T>& angle)
+{
+  return degree (angle);
+}
+
+template <class T>
+inline T make_invoker_argument (math::angle<T>& angle)
+{
+  return degree (angle);
+}
+
+template <class T>
+struct argument_selector<math::angle<T> >
+{
+  typedef float dump_type;
+
+  static math::angle<T> get (IStack& stack, size_t index) { return degree (stack.GetFloat (index)); }
+};
+
+}
+
+}
 
 namespace
 {
@@ -197,10 +232,10 @@ InvokerRegistry& bind_node_library (Environment& environment)
   lib.Register ("ResetPosition",            make_invoker (&Node::ResetPosition));
   lib.Register ("set_Orientation",          make_invoker (implicit_cast<void (Node::*) (const quatf&)> (&Node::SetOrientation)));
   lib.Register ("set_WorldOrientation",     make_invoker (implicit_cast<void (Node::*) (const quatf&)> (&Node::SetWorldOrientation)));
-  lib.Register ("SetOrientation",           make_invoker (implicit_cast<void (Node::*) (float, float, float, float)> (&Node::SetOrientation)));
-  lib.Register ("SetWorldOrientation",      make_invoker (implicit_cast<void (Node::*) (float, float, float, float)> (&Node::SetWorldOrientation)));
-  lib.Register ("SetEulerOrientation",      make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetOrientation)));
-  lib.Register ("SetWorldEulerOrientation", make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetWorldOrientation)));
+  lib.Register ("SetOrientation",           make_invoker<void (Node*, math::anglef, float, float, float)> (implicit_cast<void (Node::*) (const math::anglef&, float, float, float)> (&Node::SetOrientation)));
+  lib.Register ("SetWorldOrientation",      make_invoker<void (Node*, math::anglef, float, float, float)> (implicit_cast<void (Node::*) (const math::anglef&, float, float, float)> (&Node::SetWorldOrientation)));
+  lib.Register ("SetEulerOrientation",      make_invoker<void (Node*, math::anglef, math::anglef, math::anglef)> (implicit_cast<void (Node::*) (const math::anglef&, const math::anglef&, const math::anglef&)> (&Node::SetOrientation)));
+  lib.Register ("SetWorldEulerOrientation", make_invoker<void (Node*, math::anglef, math::anglef, math::anglef)> (implicit_cast<void (Node::*) (const math::anglef&, const math::anglef&, const math::anglef&)> (&Node::SetWorldOrientation)));
   lib.Register ("ResetOrientation",         make_invoker (&Node::ResetOrientation));
   lib.Register ("set_Scale",                make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetScale)));
   lib.Register ("set_WorldScale",           make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetWorldScale)));
@@ -268,11 +303,11 @@ InvokerRegistry& bind_node_library (Environment& environment)
                  make_invoker<void (Node&, const vec3f&)> (xtl::bind (implicit_cast<void (Node::*) (const vec3f&, NodeTransformSpace)> (&Node::Translate), _1, _2, NodeTransformSpace_Parent)),
                  make_invoker<void (Node&, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Translate), _1, _2, _3, _4, NodeTransformSpace_Parent))));
   lib.Register ("Rotate", make_invoker (make_invoker (implicit_cast<void (Node::*) (const quatf&, NodeTransformSpace)> (&Node::Rotate)),
-                 make_invoker (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Rotate)),
-                 make_invoker (implicit_cast<void (Node::*) (float, float, float, float, NodeTransformSpace)> (&Node::Rotate)),
+                 make_invoker<void (Node*, math::anglef, math::anglef, math::anglef, NodeTransformSpace)> (implicit_cast<void (Node::*) (const math::anglef&, const math::anglef&, const math::anglef&, NodeTransformSpace)> (&Node::Rotate)),
+                 make_invoker<void (Node*, math::anglef, float, float, float, NodeTransformSpace)> (implicit_cast<void (Node::*) (const math::anglef&, float, float, float, NodeTransformSpace)> (&Node::Rotate)),
                  make_invoker<void (Node&, const quatf&)> (xtl::bind (implicit_cast<void (Node::*) (const quatf&, NodeTransformSpace)> (&Node::Rotate), _1, _2, NodeTransformSpace_Parent)),
-                 make_invoker<void (Node&, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, NodeTransformSpace)> (&Node::Rotate), _1, _2, _3, _4, NodeTransformSpace_Parent)),
-                 make_invoker<void (Node&, float, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (float, float, float, float, NodeTransformSpace)> (&Node::Rotate), _1, _2, _3, _4, _5, NodeTransformSpace_Parent))));
+                 make_invoker<void (Node&, math::anglef, math::anglef, math::anglef)> (xtl::bind (implicit_cast<void (Node::*) (const math::anglef&, const math::anglef&, const math::anglef&, NodeTransformSpace)> (&Node::Rotate), _1, _2, _3, _4, NodeTransformSpace_Parent)),
+                 make_invoker<void (Node&, math::anglef, float, float, float)> (xtl::bind (implicit_cast<void (Node::*) (const math::anglef&, float, float, float, NodeTransformSpace)> (&Node::Rotate), _1, _2, _3, _4, _5, NodeTransformSpace_Parent))));
   lib.Register ("Rescale", make_invoker (make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::Scale)),
                                          make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::Scale))));
 
@@ -483,12 +518,12 @@ void bind_perspective_camera_library (Environment& environment)
 
     //регистрация операций
 
-  lib.Register ("set_FovX",  make_invoker (&PerspectiveCamera::SetFovX));
-  lib.Register ("set_FovY",  make_invoker (&PerspectiveCamera::SetFovY));
+  lib.Register ("set_FovX",  make_invoker<void (PerspectiveCamera&, math::anglef)> (&PerspectiveCamera::SetFovX));
+  lib.Register ("set_FovY",  make_invoker<void (PerspectiveCamera&, math::anglef)> (&PerspectiveCamera::SetFovY));
   lib.Register ("set_ZNear", make_invoker (&PerspectiveCamera::SetZNear));
   lib.Register ("set_ZFar",  make_invoker (&PerspectiveCamera::SetZFar));
-  lib.Register ("get_FovX",  make_invoker (&PerspectiveCamera::FovX));
-  lib.Register ("get_FovY",  make_invoker (&PerspectiveCamera::FovY));
+  lib.Register ("get_FovX",  make_invoker<math::anglef (PerspectiveCamera&)> (&PerspectiveCamera::FovX));
+  lib.Register ("get_FovY",  make_invoker<math::anglef (PerspectiveCamera&)> (&PerspectiveCamera::FovY));
   lib.Register ("get_ZNear", make_invoker (&PerspectiveCamera::ZNear));
   lib.Register ("get_ZFar",  make_invoker (&PerspectiveCamera::ZFar));
 
@@ -588,9 +623,9 @@ void bind_spot_light_library (Environment& environment)
 
     //регистрация операций
 
-  lib.Register ("set_Angle",    make_invoker (&SpotLight::SetAngle));
+  lib.Register ("set_Angle",    make_invoker<void (SpotLight&, math::anglef)> (&SpotLight::SetAngle));
   lib.Register ("set_Exponent", make_invoker (&SpotLight::SetExponent));
-  lib.Register ("get_Angle",    make_invoker (&SpotLight::Angle));
+  lib.Register ("get_Angle",    make_invoker<math::anglef (SpotLight&)> (&SpotLight::Angle));
   lib.Register ("get_Exponent", make_invoker (&SpotLight::Exponent));
 
     //регистрация типов данных
@@ -795,8 +830,8 @@ void bind_sprite_model_library (Environment& environment)
   lib.Register ("get_AlphaReference",     make_invoker (&SpriteModel::AlphaReference));
   lib.Register ("set_PivotPosition",      make_invoker (implicit_cast<void (SpriteModel::*)(const vec3f&)> (&SpriteModel::SetPivotPosition)));
   lib.Register ("get_PivotPosition",      make_invoker (&SpriteModel::PivotPosition));
-  lib.Register ("set_PivotRotation",      make_invoker (&SpriteModel::SetPivotRotation));
-  lib.Register ("get_PivotRotation",      make_invoker (&SpriteModel::PivotRotation));
+  lib.Register ("set_PivotRotation",      make_invoker<void (SpriteModel&, math::anglef)> (&SpriteModel::SetPivotRotation));
+  lib.Register ("get_PivotRotation",      make_invoker<math::anglef (SpriteModel&)> (&SpriteModel::PivotRotation));
   lib.Register ("get_LocalTMAfterPivot",  make_invoker (&get_transformation_after_pivot<NodeTransformSpace_Local>));
   lib.Register ("get_ParentTMAfterPivot", make_invoker (&get_transformation_after_pivot<NodeTransformSpace_Parent>));
   lib.Register ("get_WorldTMAfterPivot",  make_invoker (&get_transformation_after_pivot<NodeTransformSpace_World>));

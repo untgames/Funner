@@ -15,8 +15,8 @@
 #include <common/strlib.h>
 #include <common/var_registry_container.h>
 
-#include <mathlib.h>
-#include <math/io.h>
+#include <math/matrix.h>
+#include <math/quat.h>
 
 #include <script/environment.h>
 #include <script/bind.h>

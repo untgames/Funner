@@ -2,8 +2,9 @@
 
 #include <stl/numeric>
 
-#include <mathlib.h>
-#include <math/io.h>
+#include <math/vector.h>
+#include <math/matrix.h>
+#include <math/quat.h>
 
 using namespace script;
 using namespace math;
@@ -48,32 +49,32 @@ inline Invoker make_unary_invoker ()
 
 template <class T> struct vec_get_element
 {
-  vec_get_element (size_t in_index) : index (in_index) {}
+  vec_get_element (unsigned int in_index) : index (in_index) {}
   
   typename T::value_type operator () (const T& v) const { return v [index]; }
 
-  size_t index;
+  unsigned int index;
 };
 
 template <class T> struct vec_set_element
 {
   typedef typename T::value_type value_type;
 
-  vec_set_element (size_t in_index) : index (in_index) {}
+  vec_set_element (unsigned int in_index) : index (in_index) {}
   
   value_type operator () (T& v, const value_type& value) const { return v [index] = value; }
   
-  size_t index;
+  unsigned int index;
 };
 
 /*
     Селекторы кортежей
 */
 
-template <class T, size_t Size, size_t TupleSize> class vec_get_tuple
+template <class T, unsigned int Size, unsigned int TupleSize> class vec_get_tuple
 {
   public:
-    vec_get_tuple (size_t i1, size_t i2=0, size_t i3=0, size_t i4=0)
+    vec_get_tuple (unsigned int i1, unsigned int i2=0, unsigned int i3=0, unsigned int i4=0)
     {
       index [0] = i1;
       index [1] = i2;
@@ -81,26 +82,26 @@ template <class T, size_t Size, size_t TupleSize> class vec_get_tuple
       index [3] = i4;
     }  
     
-    vec<T, TupleSize> operator () (const vec<T, Size>& v) const
+    vector<T, TupleSize> operator () (const vector<T, Size>& v) const
     {    
-      return vec<T, TupleSize> (select (v, 0), select (v, 1), select (v, 2), select (v, 3));
+      return vector<T, TupleSize> (select (v, 0), select (v, 1), select (v, 2), select (v, 3));
     }
   
   private:
-    T select (const vec<T, Size>& v, size_t base_index) const
+    T select (const vector<T, Size>& v, unsigned int base_index) const
     {
-      size_t new_index = index [base_index];
+      unsigned int new_index = index [base_index];
 
       return new_index < Size ? v [new_index] : T (0);
     }
 
-    size_t index [4];
+    unsigned int index [4];
 };
 
-template <class T, size_t Size, size_t TupleSize> class vec_set_tuple
+template <class T, unsigned int Size, unsigned int TupleSize> class vec_set_tuple
 {
   public:
-    vec_set_tuple (size_t i1, size_t i2=0, size_t i3=0, size_t i4=0)
+    vec_set_tuple (unsigned int i1, unsigned int i2=0, unsigned int i3=0, unsigned int i4=0)
     {
       index [0] = i1;
       index [1] = i2;
@@ -108,58 +109,58 @@ template <class T, size_t Size, size_t TupleSize> class vec_set_tuple
       index [3] = i4;
     }
 
-    void operator () (vec<T, Size>& res, const vec<T, TupleSize>& src) const
+    void operator () (vector<T, Size>& res, const vector<T, TupleSize>& src) const
     {
-      for (size_t i=0; i<TupleSize; i++)
+      for (unsigned int i=0; i<TupleSize; i++)
         select (res, i) = src [i];
     }
     
   private:
-    T& select (vec<T, Size>& v, size_t base_index) const
+    T& select (vector<T, Size>& v, unsigned int base_index) const
     {
       static T dummy;
       
-      size_t new_index = index [base_index];
+      unsigned int new_index = index [base_index];
 
       return new_index < Size ? v [new_index] : dummy;
     }
 
   private:
-    size_t index [4];
+    unsigned int index [4];
 };
 
-template <class Vector, size_t TupleSize>
-inline Invoker make_vec_get_tuple_invoker (size_t i1, size_t i2=0, size_t i3=0, size_t i4=0)
+template <class Vector, unsigned int TupleSize>
+inline Invoker make_vec_get_tuple_invoker (unsigned int i1, unsigned int i2=0, unsigned int i3=0, unsigned int i4=0)
 {
   typedef typename Vector::value_type type;
 
-  enum { size = Vector::_size };  
+  enum { size = Vector::size };  
 
-  return make_invoker<vec<type, TupleSize> (const Vector&)> (vec_get_tuple<type, size, TupleSize> (i1, i2, i3, i4));
+  return make_invoker<vector<type, TupleSize> (const Vector&)> (vec_get_tuple<type, size, TupleSize> (i1, i2, i3, i4));
 }
 
-template <class Vector, size_t TupleSize>
-inline Invoker make_vec_set_tuple_invoker (size_t i1, size_t i2=0, size_t i3=0, size_t i4=0)
+template <class Vector, unsigned int TupleSize>
+inline Invoker make_vec_set_tuple_invoker (unsigned int i1, unsigned int i2=0, unsigned int i3=0, unsigned int i4=0)
 {
   typedef typename Vector::value_type type;
 
-  enum { size = Vector::_size };  
+  enum { size = Vector::size };  
 
-  return make_invoker<void (Vector&, const vec<type, TupleSize>&)> (vec_set_tuple<type, size, TupleSize> (i1, i2, i3, i4));
+  return make_invoker<void (Vector&, const vector<type, TupleSize>&)> (vec_set_tuple<type, size, TupleSize> (i1, i2, i3, i4));
 }
 
 /*
     Утилиты
 */
 
-template <class T, size_t Size>
-vec<T, Size> vec_normalize (const vec<T, Size>& v)
+template <class T, unsigned int Size>
+vector<T, Size> vec_normalize (const vector<T, Size>& v)
 {
   return normalize (v);
 }
 
-template <class T, size_t Size>
-vec<T, Size> vec_cross (const vec<T, Size>& v1, const vec<T, Size>& v2)
+template <class T, unsigned int Size>
+vector<T, Size> vec_cross (const vector<T, Size>& v1, const vector<T, Size>& v2)
 {
   return cross (v1, v2);
 }
@@ -168,17 +169,17 @@ vec<T, Size> vec_cross (const vec<T, Size>& v1, const vec<T, Size>& v2)
     Селекторы компонент матрицы
 */
 
-vec3f get_mat4f_row (const mat4f& m, size_t i)
+vec3f get_mat4f_row (const mat4f& m, unsigned int i)
 {
   return vec3f (m.row (i));
 }
 
-vec3f get_mat4f_column (mat4f m, size_t i)
+vec3f get_mat4f_column (mat4f m, unsigned int i)
 {
   return m.column (i);
 }
 
-float get_mat4f_element (mat4f m, size_t i, size_t j)
+float get_mat4f_element (mat4f m, unsigned int i, unsigned int j)
 {
   return m [i][j];
 }
@@ -187,8 +188,8 @@ float get_mat4f_element (mat4f m, size_t i, size_t j)
     Селекторы элементов матрицы
 */
 
-template <class T, size_t Size>
-T matrix_get_element (const matrix<T, Size>& m, size_t row, size_t column)
+template <class T, unsigned int Size>
+T matrix_get_element (const matrix<T, Size>& m, unsigned int row, unsigned int column)
 {
   if (row >= Size)
     throw xtl::make_range_exception ("script::matrix_get_element", "row", row, Size);
@@ -199,8 +200,8 @@ T matrix_get_element (const matrix<T, Size>& m, size_t row, size_t column)
   return m [row][column];
 }
 
-template <class T, size_t Size>
-void matrix_set_element (matrix<T, Size>& m, size_t row, size_t column, T value)
+template <class T, unsigned int Size>
+void matrix_set_element (matrix<T, Size>& m, unsigned int row, unsigned int column, T value)
 {
   if (row >= Size)
     throw xtl::make_range_exception ("script::matrix_set_element", "row", row, Size);
@@ -215,28 +216,28 @@ void matrix_set_element (matrix<T, Size>& m, size_t row, size_t column, T value)
     Селекторы строк матрицы
 */
 
-template <class T, size_t Size> struct matrix_get_row
+template <class T, unsigned int Size> struct matrix_get_row
 {
-  matrix_get_row (size_t in_index) : index (in_index) {}
+  matrix_get_row (unsigned int in_index) : index (in_index) {}
   
-  xtl::reference_wrapper<vec<T, Size> > operator () (matrix<T, Size>& m) const
+  xtl::reference_wrapper<vector<T, Size> > operator () (matrix<T, Size>& m) const
   {
     return xtl::ref (m [index]);
   }
 
-  size_t index;
+  unsigned int index;
 };
 
-template <class T, size_t Size> struct matrix_set_row
+template <class T, unsigned int Size> struct matrix_set_row
 {
-  matrix_set_row (size_t in_index) : index (in_index) {}
+  matrix_set_row (unsigned int in_index) : index (in_index) {}
   
-  void operator () (matrix<T, Size>& m, const vec<T, Size>& value) const
+  void operator () (matrix<T, Size>& m, const vector<T, Size>& value) const
   {
     m [index] = value;
   }
   
-  size_t index;
+  unsigned int index;
 };
 
 /*
@@ -287,7 +288,7 @@ mat4f create_mat4 (float a)
 */
 
 template <class T>
-T quat_get_element (const quat<T>& q, size_t index)
+T quat_get_element (const quat<T>& q, unsigned int index)
 {
   if (index >= 4)
     throw xtl::make_range_exception ("script::quat_get_element", "index", index, 4);
@@ -296,7 +297,7 @@ T quat_get_element (const quat<T>& q, size_t index)
 }
 
 template <class T>
-void quat_set_element (quat<T>& q, size_t index, T value)
+void quat_set_element (quat<T>& q, unsigned int index, T value)
 {
   if (index >= 4)
     throw xtl::make_range_exception ("script::quat_set_element", "index", index, 4);
@@ -334,14 +335,14 @@ quat<T> quat_normalize (const quat<T>& q)
     Генерация последовательностей xyz
 */
 
-template <class VecType, size_t Size>
-void register_vector_selector (size_t index, InvokerRegistry& lib)
+template <class VecType, unsigned int Size>
+void register_vector_selector (unsigned int index, InvokerRegistry& lib)
 { 
     //расчёт индексов компонент
     
-  size_t indices [Size < 4 ? 4 : Size] = {0, 0, 0, 0};
+  unsigned int indices [Size < 4 ? 4 : Size] = {0, 0, 0, 0};
 
-  for (size_t i=0; i<Size; index /= 4, i++)
+  for (unsigned int i=0; i<Size; index /= 4, i++)
     indices [i] = index % 4;
 
     //формирование базового имени
@@ -350,7 +351,7 @@ void register_vector_selector (size_t index, InvokerRegistry& lib)
 
   char name [16] = "get_", *s = name + 4;
   
-  for (size_t i=0; i<Size; i++, s++)
+  for (unsigned int i=0; i<Size; i++, s++)
     *s = component_names [indices [i]];
 
   *s = '\0';
@@ -364,10 +365,10 @@ void register_vector_selector (size_t index, InvokerRegistry& lib)
   lib.Register (name, make_vec_set_tuple_invoker<VecType, Size> (indices [0], indices [1], indices [2], indices [3]));  
 }
 
-template <class VecType, size_t Size>
+template <class VecType, unsigned int Size>
 void register_vector_selectors (InvokerRegistry& lib)
 {
-  for (size_t i=0, count=stl::power (4, Size); i<count; i++)
+  for (unsigned int i=0, count=stl::power (4, Size); i<count; i++)
     register_vector_selector<VecType, Size> (i, lib);
 }
 
@@ -375,10 +376,10 @@ void register_vector_selectors (InvokerRegistry& lib)
     Регистрация библиотеки работы с векторами
 */
 
-template <class T, size_t Size>
+template <class T, unsigned int Size>
 void bind_vec_library (InvokerRegistry& vec_lib)
 {
-  typedef vec<T, Size>      vec_type;
+  typedef vector<T, Size>   vec_type;
   typedef matrix<T, Size>   matrix_type;
   typedef matrix<T, Size+1> big_matrix_type;
 
@@ -425,7 +426,7 @@ void bind_vec_library (InvokerRegistry& vec_lib)
 
     //регистрация функций
 
-  vec_lib.Register ("get_length",  make_invoker<T (vec_type)> (&math::length<T, Size>));
+  vec_lib.Register ("get_length",  make_invoker<T (vec_type)> (xtl::implicit_cast<typename vec_type::value_type (*)(const vec_type&)> (&math::length)));
   vec_lib.Register ("get_qlength", make_invoker<T (vec_type)> (&math::qlen<T, Size>));
   vec_lib.Register ("normalize",   make_invoker<vec_type (vec_type)> (&vec_normalize<T, Size>));
   vec_lib.Register ("dot",         make_invoker<T (vec_type, vec_type)> (&math::dot<T, Size>));
@@ -434,12 +435,12 @@ void bind_vec_library (InvokerRegistry& vec_lib)
   vec_lib.Register ("max",         make_invoker<vec_type (vec_type, vec_type)> (&math::max<T, Size>));
 }
 
-template <class T, size_t Size>
+template <class T, unsigned int Size>
 void bind_matrix_library (InvokerRegistry& mat_lib)
 {
   typedef matrix<T, Size> matrix_type;
-  typedef vec<T, Size>    vec_type;
-  typedef vec<T, Size-1>  small_vec_type;
+  typedef vector<T, Size>    vec_type;
+  typedef vector<T, Size-1>  small_vec_type;
 
     //регистрация селекторов
 
@@ -472,7 +473,7 @@ void bind_matrix_library (InvokerRegistry& mat_lib)
     //регистрация функций над матрицами  
     
   mat_lib.Register ("transpose", make_invoker (&math::transpose<T, Size>));
-  mat_lib.Register ("inverse", make_invoker (&math::invert<T, Size>));
+  mat_lib.Register ("inverse", make_invoker (&math::inverse<T, Size>));
   mat_lib.Register ("det", make_invoker (&math::det<T, Size>));
 }
 
@@ -480,7 +481,7 @@ template <class T>
 void bind_quat_library (InvokerRegistry& quat_lib)
 {
 //  typedef matrix<T, Size> matrix_type;
-//  typedef vec<T, Size>    vec_type;
+//  typedef vector<T, Size>    vec_type;
   typedef quat<T>         quat_type;  
 
     //регистрация селекторов
