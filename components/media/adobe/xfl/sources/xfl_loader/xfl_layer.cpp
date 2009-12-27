@@ -26,6 +26,7 @@ void XflParser::ParseLayer (Parser::Iterator iter, Layer& layer)
 
     ParseFrame (i, new_frame);
 
-    layer.Frames ().Add (new_frame);
+    if (new_frame.Elements ().Size ())
+      layer.Frames ().Add (new_frame);
   }
 }

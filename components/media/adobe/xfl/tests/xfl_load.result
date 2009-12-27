@@ -1,0 +1,1393 @@
+Results of xfl_load_test:
+--- Parse xfl document 'data/test.xfl' ---
+---  Xfl document dump ---
+Document ''
+  framerate:        24.000
+  width:            1906
+  height:           1080
+  background color: [ +0.000 +0.000 +0.000 ]
+  Collection 'resources' (22 items)
+    Resource 'balls example 1.png'
+      Path: '/mount/test.xfl/LIBRARY/balls example 1.png'
+    Resource 'balls example 5.png'
+      Path: '/mount/test.xfl/LIBRARY/balls example 5.png'
+    Resource 'bottle inside orange.png'
+      Path: '/mount/test.xfl/LIBRARY/bottle inside orange.png'
+    Resource 'bottle light.png'
+      Path: '/mount/test.xfl/LIBRARY/bottle light.png'
+    Resource 'bottle.png'
+      Path: '/mount/test.xfl/LIBRARY/bottle.png'
+    Resource 'maps menu 4.png/1.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/1.png'
+    Resource 'maps menu 4.png/2.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/2.png'
+    Resource 'maps menu 4.png/3.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/3.png'
+    Resource 'maps menu 4.png/4.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/4.png'
+    Resource 'maps menu 4.png/5.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/5.png'
+    Resource 'maps menu 4.png/6.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/6.png'
+    Resource 'maps menu 4.png/7.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/7.png'
+    Resource 'maps menu 4.png/8.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/8.png'
+    Resource 'maps menu 4.png/9.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/9.png'
+    Resource 'maps menu 4.png/10.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/10.png'
+    Resource 'maps menu 4.png/11.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/11.png'
+    Resource 'maps menu 4.png/12.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/12.png'
+    Resource 'maps menu 4.png/13.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/13.png'
+    Resource 'maps menu 4.png/14.png'
+      Path: '/mount/test.xfl/LIBRARY/maps menu 4.png/14.png'
+    Resource 'tablet 5.png'
+      Path: '/mount/test.xfl/LIBRARY/tablet 5.png'
+    Resource 'tablet 6.png'
+      Path: '/mount/test.xfl/LIBRARY/tablet 6.png'
+    Resource 'times.png'
+      Path: '/mount/test.xfl/LIBRARY/times.png'
+  Collection 'symbols' (9 items)
+    Symbol 'maps menu 4_1.png'
+      Timeline 'maps menu 4_1.png'
+        Collection 'layers' (1 items)
+          Layer 'Layer 1'
+            Collection 'frames' (14 items)
+              Frame:
+                First frame: 0
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/1.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+              Frame:
+                First frame: 1
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/2.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+              Frame:
+                First frame: 2
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/3.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+              Frame:
+                First frame: 3
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/4.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+              Frame:
+                First frame: 4
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/5.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+              Frame:
+                First frame: 5
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/6.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+              Frame:
+                First frame: 6
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/7.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+              Frame:
+                First frame: 7
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/8.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+              Frame:
+                First frame: 8
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/9.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+              Frame:
+                First frame: 9
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/10.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+              Frame:
+                First frame: 10
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/11.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+              Frame:
+                First frame: 11
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/12.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+              Frame:
+                First frame: 12
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/13.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+              Frame:
+                First frame: 13
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'maps menu 4.png/14.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+    Symbol 'balls example 1_1.png'
+      Timeline 'balls example 1_1.png'
+        Collection 'layers' (1 items)
+          Layer 'Layer 1'
+            Collection 'frames' (1 items)
+              Frame:
+                First frame: 0
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'balls example 1.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+    Symbol 'balls example 5_1.png'
+      Timeline 'balls example 5_1.png'
+        Collection 'layers' (1 items)
+          Layer 'Layer 1'
+            Collection 'frames' (1 items)
+              Frame:
+                First frame: 0
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'balls example 5.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+    Symbol 'tablet 6_1.png'
+      Timeline 'tablet 6_1.png'
+        Collection 'layers' (1 items)
+          Layer 'Layer 1'
+            Collection 'frames' (1 items)
+              Frame:
+                First frame: 0
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'tablet 6.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+    Symbol 'tablet 5_1.png'
+      Timeline 'tablet 5_1.png'
+        Collection 'layers' (1 items)
+          Layer 'Layer 1'
+            Collection 'frames' (1 items)
+              Frame:
+                First frame: 0
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'tablet 5.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+    Symbol 'bottle_1.png'
+      Timeline 'bottle_1.png'
+        Collection 'layers' (1 items)
+          Layer 'Layer 1'
+            Collection 'frames' (1 items)
+              Frame:
+                First frame: 0
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'bottle.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+    Symbol 'bottle light_1.png'
+      Timeline 'bottle light_1.png'
+        Collection 'layers' (1 items)
+          Layer 'Layer 1'
+            Collection 'frames' (1 items)
+              Frame:
+                First frame: 0
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'bottle light.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+    Symbol 'bottle inside orange_1.png'
+      Timeline 'bottle inside orange_1.png'
+        Collection 'layers' (1 items)
+          Layer 'Layer 1'
+            Collection 'frames' (1 items)
+              Frame:
+                First frame: 0
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'bottle inside orange.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+    Symbol 'times_1.png'
+      Timeline 'times_1.png'
+        Collection 'layers' (1 items)
+          Layer 'Layer 1'
+            Collection 'frames' (1 items)
+              Frame:
+                First frame: 0
+                Duration:    1
+                Animation:
+                  Duration:       0.000
+                  Orient to path: no
+                  Collection 'animation properties' (0 items)
+                Collection 'frame elements' (1 items)
+                  Frame element 'times.png'
+                    Type:                 ResourceInstance
+                    First frame:          0
+                    Translation:          [ +0.000 +0.000 ]
+                    Transformation point: [ +0.000 +0.000 ]
+  Collection 'timelines' (1 items)
+    Timeline 'Mini 6'
+      Collection 'layers' (9 items)
+        Layer '[maps menu 4.png]'
+          Collection 'frames' (1 items)
+            Frame:
+              First frame: 998
+              Duration:    95
+              Animation:
+                Duration:       3.958
+                Orient to path: no
+                Collection 'animation properties' (8 items)
+                  Property 'headContainer.Basic_Motion.Motion_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Motion_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Rotation_Z'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Colors.Alpha_Color.Alpha_Amount'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+              Collection 'frame elements' (1 items)
+                Frame element 'maps menu 4_1.png'
+                  Type:                 SymbolInstance
+                  First frame:          0
+                  Translation:          [ +0.000 +0.000 ]
+                  Transformation point: [ +0.000 +0.000 ]
+        Layer '[balls example 1.png]'
+          Collection 'frames' (1 items)
+            Frame:
+              First frame: 294
+              Duration:    110
+              Animation:
+                Duration:       4.583
+                Orient to path: no
+                Collection 'animation properties' (8 items)
+                  Property 'headContainer.Basic_Motion.Motion_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Motion_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Rotation_Z'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Colors.Alpha_Color.Alpha_Amount'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+              Collection 'frame elements' (1 items)
+                Frame element 'balls example 1_1.png'
+                  Type:                 SymbolInstance
+                  First frame:          0
+                  Translation:          [ +0.000 +0.000 ]
+                  Transformation point: [ +953.000 +540.000 ]
+        Layer '[balls example 5.png]'
+          Collection 'frames' (1 items)
+            Frame:
+              First frame: 695
+              Duration:    40
+              Animation:
+                Duration:       1.667
+                Orient to path: no
+                Collection 'animation properties' (8 items)
+                  Property 'headContainer.Basic_Motion.Motion_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Motion_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Rotation_Z'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Colors.Alpha_Color.Alpha_Amount'
+                    Enabled: yes
+                    Collection 'keyframes' (11 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                      Keyframe
+                        Value: 20.000
+                        Time:  0.042
+                      Keyframe
+                        Value: 40.000
+                        Time:  0.083
+                      Keyframe
+                        Value: 60.000
+                        Time:  0.125
+                      Keyframe
+                        Value: 80.000
+                        Time:  0.167
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.208
+                      Keyframe
+                        Value: 100.000
+                        Time:  1.458
+                      Keyframe
+                        Value: 80.000
+                        Time:  1.500
+                      Keyframe
+                        Value: 60.000
+                        Time:  1.542
+                      Keyframe
+                        Value: 40.000
+                        Time:  1.583
+                      Keyframe
+                        Value: 20.000
+                        Time:  1.625
+              Collection 'frame elements' (1 items)
+                Frame element 'balls example 5_1.png'
+                  Type:                 SymbolInstance
+                  First frame:          0
+                  Translation:          [ +0.000 +0.000 ]
+                  Transformation point: [ +953.000 +540.000 ]
+        Layer '[tablet 6.png]'
+          Collection 'frames' (1 items)
+            Frame:
+              First frame: 591
+              Duration:    14
+              Animation:
+                Duration:       0.583
+                Orient to path: no
+                Collection 'animation properties' (8 items)
+                  Property 'headContainer.Basic_Motion.Motion_X'
+                    Enabled: yes
+                    Collection 'keyframes' (14 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                      Keyframe
+                        Value: -44.925
+                        Time:  0.042
+                      Keyframe
+                        Value: -89.847
+                        Time:  0.083
+                      Keyframe
+                        Value: -134.770
+                        Time:  0.125
+                      Keyframe
+                        Value: -179.703
+                        Time:  0.167
+                      Keyframe
+                        Value: -224.616
+                        Time:  0.208
+                      Keyframe
+                        Value: -269.540
+                        Time:  0.250
+                      Keyframe
+                        Value: -314.461
+                        Time:  0.292
+                      Keyframe
+                        Value: -359.383
+                        Time:  0.333
+                      Keyframe
+                        Value: -404.302
+                        Time:  0.375
+                      Keyframe
+                        Value: -449.229
+                        Time:  0.417
+                      Keyframe
+                        Value: -494.151
+                        Time:  0.458
+                      Keyframe
+                        Value: -539.076
+                        Time:  0.500
+                      Keyframe
+                        Value: -584.000
+                        Time:  0.542
+                  Property 'headContainer.Basic_Motion.Motion_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (14 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                      Keyframe
+                        Value: -12.924
+                        Time:  0.042
+                      Keyframe
+                        Value: -25.847
+                        Time:  0.083
+                      Keyframe
+                        Value: -38.769
+                        Time:  0.125
+                      Keyframe
+                        Value: -51.695
+                        Time:  0.167
+                      Keyframe
+                        Value: -64.616
+                        Time:  0.208
+                      Keyframe
+                        Value: -77.539
+                        Time:  0.250
+                      Keyframe
+                        Value: -90.461
+                        Time:  0.292
+                      Keyframe
+                        Value: -103.384
+                        Time:  0.333
+                      Keyframe
+                        Value: -116.306
+                        Time:  0.375
+                      Keyframe
+                        Value: -129.230
+                        Time:  0.417
+                      Keyframe
+                        Value: -142.153
+                        Time:  0.458
+                      Keyframe
+                        Value: -155.077
+                        Time:  0.500
+                      Keyframe
+                        Value: -168.000
+                        Time:  0.542
+                  Property 'headContainer.Basic_Motion.Rotation_Z'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Colors.Alpha_Color.Alpha_Amount'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+              Collection 'frame elements' (1 items)
+                Frame element 'tablet 6_1.png'
+                  Type:                 SymbolInstance
+                  First frame:          0
+                  Translation:          [ +54.000 +40.000 ]
+                  Transformation point: [ +953.000 +540.000 ]
+        Layer '[tablet 5.png]'
+          Collection 'frames' (1 items)
+            Frame:
+              First frame: 530
+              Duration:    14
+              Animation:
+                Duration:       0.583
+                Orient to path: no
+                Collection 'animation properties' (8 items)
+                  Property 'headContainer.Basic_Motion.Motion_X'
+                    Enabled: yes
+                    Collection 'keyframes' (14 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                      Keyframe
+                        Value: -35.848
+                        Time:  0.042
+                      Keyframe
+                        Value: -71.693
+                        Time:  0.083
+                      Keyframe
+                        Value: -107.539
+                        Time:  0.125
+                      Keyframe
+                        Value: -143.393
+                        Time:  0.167
+                      Keyframe
+                        Value: -179.231
+                        Time:  0.208
+                      Keyframe
+                        Value: -215.078
+                        Time:  0.250
+                      Keyframe
+                        Value: -250.922
+                        Time:  0.292
+                      Keyframe
+                        Value: -286.768
+                        Time:  0.333
+                      Keyframe
+                        Value: -322.611
+                        Time:  0.375
+                      Keyframe
+                        Value: -358.460
+                        Time:  0.417
+                      Keyframe
+                        Value: -394.306
+                        Time:  0.458
+                      Keyframe
+                        Value: -430.153
+                        Time:  0.500
+                      Keyframe
+                        Value: -466.000
+                        Time:  0.542
+                  Property 'headContainer.Basic_Motion.Motion_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (14 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                      Keyframe
+                        Value: 14.462
+                        Time:  0.042
+                      Keyframe
+                        Value: 28.923
+                        Time:  0.083
+                      Keyframe
+                        Value: 43.385
+                        Time:  0.125
+                      Keyframe
+                        Value: 57.849
+                        Time:  0.167
+                      Keyframe
+                        Value: 72.308
+                        Time:  0.208
+                      Keyframe
+                        Value: 86.770
+                        Time:  0.250
+                      Keyframe
+                        Value: 101.231
+                        Time:  0.292
+                      Keyframe
+                        Value: 115.692
+                        Time:  0.333
+                      Keyframe
+                        Value: 130.152
+                        Time:  0.375
+                      Keyframe
+                        Value: 144.615
+                        Time:  0.417
+                      Keyframe
+                        Value: 159.076
+                        Time:  0.458
+                      Keyframe
+                        Value: 173.538
+                        Time:  0.500
+                      Keyframe
+                        Value: 188.000
+                        Time:  0.542
+                  Property 'headContainer.Basic_Motion.Rotation_Z'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Colors.Alpha_Color.Alpha_Amount'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+              Collection 'frame elements' (1 items)
+                Frame element 'tablet 5_1.png'
+                  Type:                 SymbolInstance
+                  First frame:          0
+                  Translation:          [ -78.000 +52.000 ]
+                  Transformation point: [ +953.000 +540.000 ]
+        Layer '[bottle.png]'
+          Collection 'frames' (1 items)
+            Frame:
+              First frame: 248
+              Duration:    793
+              Animation:
+                Duration:       33.042
+                Orient to path: no
+                Collection 'animation properties' (8 items)
+                  Property 'headContainer.Basic_Motion.Motion_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Motion_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Rotation_Z'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Colors.Alpha_Color.Alpha_Amount'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+              Collection 'frame elements' (1 items)
+                Frame element 'bottle_1.png'
+                  Type:                 SymbolInstance
+                  First frame:          0
+                  Translation:          [ +0.000 +0.000 ]
+                  Transformation point: [ +953.000 +540.000 ]
+        Layer '[bottle light.png]'
+          Collection 'frames' (1 items)
+            Frame:
+              First frame: 248
+              Duration:    793
+              Animation:
+                Duration:       33.042
+                Orient to path: no
+                Collection 'animation properties' (8 items)
+                  Property 'headContainer.Basic_Motion.Motion_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Motion_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Rotation_Z'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Colors.Alpha_Color.Alpha_Amount'
+                    Enabled: yes
+                    Collection 'keyframes' (85 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                      Keyframe
+                        Value: 0.000
+                        Time:  3.958
+                      Keyframe
+                        Value: 2.000
+                        Time:  4.000
+                      Keyframe
+                        Value: 4.000
+                        Time:  4.042
+                      Keyframe
+                        Value: 6.000
+                        Time:  4.083
+                      Keyframe
+                        Value: 8.000
+                        Time:  4.125
+                      Keyframe
+                        Value: 10.000
+                        Time:  4.167
+                      Keyframe
+                        Value: 10.000
+                        Time:  6.417
+                      Keyframe
+                        Value: 12.000
+                        Time:  6.458
+                      Keyframe
+                        Value: 14.000
+                        Time:  6.500
+                      Keyframe
+                        Value: 16.000
+                        Time:  6.542
+                      Keyframe
+                        Value: 18.000
+                        Time:  6.583
+                      Keyframe
+                        Value: 20.000
+                        Time:  6.625
+                      Keyframe
+                        Value: 20.000
+                        Time:  10.625
+                      Keyframe
+                        Value: 22.000
+                        Time:  10.667
+                      Keyframe
+                        Value: 24.000
+                        Time:  10.708
+                      Keyframe
+                        Value: 26.000
+                        Time:  10.750
+                      Keyframe
+                        Value: 28.000
+                        Time:  10.792
+                      Keyframe
+                        Value: 30.000
+                        Time:  10.833
+                      Keyframe
+                        Value: 30.000
+                        Time:  14.833
+                      Keyframe
+                        Value: 32.000
+                        Time:  14.875
+                      Keyframe
+                        Value: 34.000
+                        Time:  14.917
+                      Keyframe
+                        Value: 36.000
+                        Time:  14.958
+                      Keyframe
+                        Value: 38.000
+                        Time:  15.000
+                      Keyframe
+                        Value: 40.000
+                        Time:  15.042
+                      Keyframe
+                        Value: 40.000
+                        Time:  16.875
+                      Keyframe
+                        Value: 32.000
+                        Time:  16.917
+                      Keyframe
+                        Value: 24.000
+                        Time:  16.958
+                      Keyframe
+                        Value: 16.000
+                        Time:  17.000
+                      Keyframe
+                        Value: 8.000
+                        Time:  17.042
+                      Keyframe
+                        Value: 0.000
+                        Time:  17.083
+                      Keyframe
+                        Value: 0.000
+                        Time:  18.000
+                      Keyframe
+                        Value: 2.000
+                        Time:  18.042
+                      Keyframe
+                        Value: 4.000
+                        Time:  18.083
+                      Keyframe
+                        Value: 6.000
+                        Time:  18.125
+                      Keyframe
+                        Value: 8.000
+                        Time:  18.167
+                      Keyframe
+                        Value: 10.000
+                        Time:  18.208
+                      Keyframe
+                        Value: 12.000
+                        Time:  18.250
+                      Keyframe
+                        Value: 14.000
+                        Time:  18.292
+                      Keyframe
+                        Value: 16.000
+                        Time:  18.333
+                      Keyframe
+                        Value: 18.000
+                        Time:  18.375
+                      Keyframe
+                        Value: 20.000
+                        Time:  18.417
+                      Keyframe
+                        Value: 22.000
+                        Time:  18.458
+                      Keyframe
+                        Value: 24.000
+                        Time:  18.500
+                      Keyframe
+                        Value: 26.000
+                        Time:  18.542
+                      Keyframe
+                        Value: 28.000
+                        Time:  18.583
+                      Keyframe
+                        Value: 30.000
+                        Time:  18.625
+                      Keyframe
+                        Value: 32.000
+                        Time:  18.667
+                      Keyframe
+                        Value: 34.000
+                        Time:  18.708
+                      Keyframe
+                        Value: 36.000
+                        Time:  18.750
+                      Keyframe
+                        Value: 38.000
+                        Time:  18.792
+                      Keyframe
+                        Value: 40.000
+                        Time:  18.833
+                      Keyframe
+                        Value: 42.000
+                        Time:  18.875
+                      Keyframe
+                        Value: 44.000
+                        Time:  18.917
+                      Keyframe
+                        Value: 46.000
+                        Time:  18.958
+                      Keyframe
+                        Value: 48.000
+                        Time:  19.000
+                      Keyframe
+                        Value: 50.000
+                        Time:  19.042
+                      Keyframe
+                        Value: 52.000
+                        Time:  19.083
+                      Keyframe
+                        Value: 54.000
+                        Time:  19.125
+                      Keyframe
+                        Value: 56.000
+                        Time:  19.167
+                      Keyframe
+                        Value: 58.000
+                        Time:  19.208
+                      Keyframe
+                        Value: 60.000
+                        Time:  19.250
+                      Keyframe
+                        Value: 62.000
+                        Time:  19.292
+                      Keyframe
+                        Value: 64.000
+                        Time:  19.333
+                      Keyframe
+                        Value: 66.000
+                        Time:  19.375
+                      Keyframe
+                        Value: 68.000
+                        Time:  19.417
+                      Keyframe
+                        Value: 70.000
+                        Time:  19.458
+                      Keyframe
+                        Value: 72.000
+                        Time:  19.500
+                      Keyframe
+                        Value: 74.000
+                        Time:  19.542
+                      Keyframe
+                        Value: 76.000
+                        Time:  19.583
+                      Keyframe
+                        Value: 78.000
+                        Time:  19.625
+                      Keyframe
+                        Value: 80.000
+                        Time:  19.667
+                      Keyframe
+                        Value: 82.000
+                        Time:  19.708
+                      Keyframe
+                        Value: 84.000
+                        Time:  19.750
+                      Keyframe
+                        Value: 86.000
+                        Time:  19.792
+                      Keyframe
+                        Value: 88.000
+                        Time:  19.833
+                      Keyframe
+                        Value: 90.000
+                        Time:  19.875
+                      Keyframe
+                        Value: 92.000
+                        Time:  19.917
+                      Keyframe
+                        Value: 94.000
+                        Time:  19.958
+                      Keyframe
+                        Value: 96.000
+                        Time:  20.000
+                      Keyframe
+                        Value: 98.000
+                        Time:  20.042
+                      Keyframe
+                        Value: 100.000
+                        Time:  20.083
+                      Keyframe
+                        Value: 100.000
+                        Time:  28.250
+                      Keyframe
+                        Value: 50.000
+                        Time:  28.292
+                      Keyframe
+                        Value: 0.000
+                        Time:  28.333
+              Collection 'frame elements' (1 items)
+                Frame element 'bottle light_1.png'
+                  Type:                 SymbolInstance
+                  First frame:          0
+                  Translation:          [ +0.000 +0.000 ]
+                  Transformation point: [ +953.000 +540.000 ]
+        Layer '[bottle inside orange.png]'
+          Collection 'frames' (1 items)
+            Frame:
+              First frame: 248
+              Duration:    793
+              Animation:
+                Duration:       33.042
+                Orient to path: no
+                Collection 'animation properties' (8 items)
+                  Property 'headContainer.Basic_Motion.Motion_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Motion_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Rotation_Z'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Colors.Alpha_Color.Alpha_Amount'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+              Collection 'frame elements' (1 items)
+                Frame element 'bottle inside orange_1.png'
+                  Type:                 SymbolInstance
+                  First frame:          0
+                  Translation:          [ +0.000 +0.000 ]
+                  Transformation point: [ +953.000 +540.000 ]
+        Layer '[times.png]'
+          Collection 'frames' (1 items)
+            Frame:
+              First frame: 248
+              Duration:    793
+              Animation:
+                Duration:       33.042
+                Orient to path: no
+                Collection 'animation properties' (8 items)
+                  Property 'headContainer.Basic_Motion.Motion_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Motion_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Basic_Motion.Rotation_Z'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Scale_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_X'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Transformation.Skew_Y'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 0.000
+                        Time:  0.000
+                  Property 'headContainer.Colors.Alpha_Color.Alpha_Amount'
+                    Enabled: yes
+                    Collection 'keyframes' (1 items)
+                      Keyframe
+                        Value: 100.000
+                        Time:  0.000
+              Collection 'frame elements' (1 items)
+                Frame element 'times_1.png'
+                  Type:                 SymbolInstance
+                  First frame:          0
+                  Translation:          [ +0.000 +0.000 ]
+                  Transformation point: [ +953.000 +540.000 ]
