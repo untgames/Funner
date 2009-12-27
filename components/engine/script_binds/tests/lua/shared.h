@@ -13,7 +13,6 @@
 #include <common/file.h>
 #include <common/log.h>
 #include <common/strlib.h>
-#include <common/var_registry_container.h>
 
 #include <math/matrix.h>
 #include <math/quat.h>
