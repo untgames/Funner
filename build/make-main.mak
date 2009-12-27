@@ -71,7 +71,7 @@ DLL_PATH                                := $(strip $(DLL_PATH))
 DOXYGEN_TEMPLATE_DIR                    := $(BUILD_DIR)$(DOXYGEN_TEMPLATE_DIR_SHORT_NAME)
 DOXYGEN_TEMPLATE_CFG_FILE               := $(DOXYGEN_TEMPLATE_DIR)/$(DOXYGEN_TEMPLATE_CFG_FILE_SHORT_NAME)
 DOXYGEN_DEFAULT_TOPIC                   := $(DOXYGEN_TEMPLATE_DIR)/$(DOXYGEN_DEFAULT_TOPIC_SHORT_NAME)
-DOXYGEN_TOOL                            := $(DOXYGEN_DIR)/doxygen
+DOXYGEN_TOOL                            := $(DOXYGEN_DIR)/bin/doxygen
 
 ###################################################################################################
 #Если не указан фильтры - обрабатываем все доступные
@@ -110,8 +110,8 @@ include $(TOOLSET_FILE)
 ###################################################################################################
 #Константы, зависящие от утилит сборки
 ###################################################################################################
-TAGS_DIR := $(strip $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$(TAGS_DIR_SHORT_NAME))
-TMP_DIRS += $(TAGS_DIR)
+DOXYGEN_TAGS_DIR := $(strip $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$(DOXYGEN_TAGS_DIR_SHORT_NAME))
+TMP_DIRS         += $(DOXYGEN_TAGS_DIR)
 
 ###################################################################################################
 #Проверка наличия констант
@@ -568,7 +568,7 @@ define process_target.doxygen-info
   $1.TMP_DIR               := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
   $1.SOURCE_DIRS           := $$(call specialize_paths,$$($1.SOURCE_DIRS))
   $1.DOXYGEN_CFG_FILE      := $$($1.TMP_DIR)/doxygen.cfg
-  $1.DOXYGEN_TAG_FILE      := $(TAGS_DIR)/$1.tag
+  $1.DOXYGEN_TAG_FILE      := $(DOXYGEN_TAGS_DIR)/$1.tag
   $1.DOXYGEN_CHM_FILE      := $$(DIST_INFO_DIR)/$$($1.CHM_NAME).chm
   $1.DOXYGEN_SELF_CHM_FILE := $$(if $$(strip $$($1.IMPORT_CHM)),$$($1.TMP_DIR)/index.chm,$$($1.DOXYGEN_CHM_FILE))
   $1.IMPORT_CHM            := $$($1.IMPORT_CHM:%=$$(DIST_INFO_DIR)/%.chm)
@@ -591,10 +591,10 @@ ifneq (,$$($1.SOURCE_DIRS))
     endif
   endif
 
-  $$($1.DOXYGEN_SELF_CHM_FILE): $(TAGS_DIR) $$(DIST_INFO_DIR) $$($1.TMP_DIR) $$($1.DOXYGEN_CFG_FILE)
+  $$($1.DOXYGEN_SELF_CHM_FILE): $(DOXYGEN_TAGS_DIR) $$(DIST_INFO_DIR) $$($1.TMP_DIR) $$($1.DOXYGEN_CFG_FILE)
 		@echo Generate $$(notdir $$@)...
-		@"$$(DOXYGEN_DIR)/doxygen" $$($1.DOXYGEN_CFG_FILE)
-		@$(MV) $$($1.TMP_DIR)/index.chm "$$@"
+		@"$$(DOXYGEN_TOOL)" $$($1.DOXYGEN_CFG_FILE)
+		@cp "$$($1.TMP_DIR)/html/index.chm" "$$@"
 
   $$($1.DOXYGEN_CFG_FILE): $$($1.TMP_DIR) force  
 		@cp "$$(DOXYGEN_TEMPLATE_CFG_FILE)" "$$@"
@@ -602,7 +602,8 @@ ifneq (,$$($1.SOURCE_DIRS))
 		@echo "INCLUDE_PATH = $$($1.INCLUDE_DIRS)" >> "$$@"
 		@echo "INPUT = $$($1.SOURCE_DIRS)" >> "$$@"
 		@echo "GENERATE_TAGFILE =  $$($1.DOXYGEN_TAG_FILE)" >> "$$@"
-		@echo TAGFILES = `cd $(TAGS_DIR) && for file in $$$$(ls); do if [ $(TAGS_DIR)/$$$$file != $$($1.DOXYGEN_TAG_FILE) ]; then echo $(TAGS_DIR)/$$$$file=../../../$$$$(basename $$$$file .tag)/html; fi; done` >> "$$@"
+		@echo 'HHC_LOCATION = "$(HHC_DIR)/hhc"' >> "$$@"
+		@echo TAGFILES = `cd $(DOXYGEN_TAGS_DIR) && for file in $$$$(ls); do if [ $(DOXYGEN_TAGS_DIR)/$$$$file != $$($1.DOXYGEN_TAG_FILE) ]; then echo $(DOXYGEN_TAGS_DIR)/$$$$file=../../../$$$$(basename $$$$file .tag)/html; fi; done` >> "$$@"
 		
   $1.IMPORT_CHM := $$($1.IMPORT_CHM) $$($1.DOXYGEN_SELF_CHM_FILE)
 
