@@ -20,6 +20,8 @@ XflParser::XflParser (const char* file_name, const char* path_prefix, Document& 
 {
   try
   {
+    document.SetName (path_prefix);
+
     ParseRoot (parser.Root ().First (ROOT_TAG));
   }
   catch (...)
