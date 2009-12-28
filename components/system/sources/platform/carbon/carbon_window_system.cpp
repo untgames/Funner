@@ -353,6 +353,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
         switch (event_kind)
         {
           case kEventRawKeyDown: //нажатие клавиши клавиатуры
+          {
             UInt32 key_modifiers = GetCurrentEventKeyModifiers ();
 
             if (key_modifiers & cmdKey)
@@ -379,6 +380,7 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
               window_impl->Notify (window_handle, WindowEvent_OnKeyDown, context);
 
             break;
+          }
           case kEventRawKeyRepeat: //удержание клавиши клавиатуры
             window_impl->Notify (window_handle, WindowEvent_OnKeyDown, context);
             break;
