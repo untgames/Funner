@@ -1,5 +1,6 @@
 #include <cstdio>
 
+#include <stl/map>
 #include <stl/string>
 
 #include <xtl/common_exceptions.h>
@@ -57,27 +58,49 @@ const FrameElement& get_first_resource_frame_for_symbol (const Document& documen
   throw xtl::format_operation_exception ("get_resource_for_symbol", "Symbol '%s' has no resources", symbol.Name ());
 }
 
-void write_track_key (XmlWriter& writer, float time, vec2f value)
+void write_track_key (XmlWriter& writer, float time, const char* value, const char* value_attribute = "Value")
 {
   XmlWriter::Scope key_scope (writer, "Key");
 
-  writer.WriteAttribute ("Time", time);
+  writer.WriteAttribute ("Time",  time);
+  writer.WriteAttribute (value_attribute, value);
+}
 
+void write_track_key (XmlWriter& writer, float time, vec2f value)
+{
   stl::string value_string = common::format ("%f;%f", value.x, value.y);
 
-  writer.WriteAttribute ("Value", value_string);
+  write_track_key (writer, time, value_string.c_str ());
 }
 
 void write_track_key (XmlWriter& writer, float time, float value)
 {
-  XmlWriter::Scope key_scope (writer, "Key");
-
-  writer.WriteAttribute ("Time", time);
-
   stl::string value_string = common::format ("%f", value);
 
-  writer.WriteAttribute ("Value", value_string);
+  write_track_key (writer, time, value_string.c_str ());
 }
+
+stl::string get_base_path (const char* path)
+{
+  const char* base_path_end = strrchr (path, '/');
+
+  if (!base_path_end)
+    return stl::string ();
+
+  return stl::string (path, base_path_end - path + 1);
+}
+
+stl::string get_extension (const char* path)
+{
+  const char* extension_begin = strrchr (path, '.');
+
+  if (!extension_begin)
+    return stl::string ();
+
+  return stl::string (extension_begin);
+}
+
+typedef stl::map<float, stl::string, stl::less<float> > ActivateSpritesMap;
 
 void save_timeline (const Document& document, const Timeline& timeline)
 {
@@ -95,7 +118,9 @@ void save_timeline (const Document& document, const Timeline& timeline)
         y_scale           = (float)TARGET_HEIGHT / document.Height ();
   vec2f screen_center ((LEFT_X + TARGET_WIDTH) / 2.f, (TOP_Y + TARGET_HEIGHT) / 2.f);
 
-  for (size_t i = timeline.Layers ().Size () - 1; i; i--)
+  ActivateSpritesMap activate_sprites_info;
+
+  for (int i = timeline.Layers ().Size () - 1; i >= 0; i--)
   {
     const Layer& layer = ((ICollection<Layer>&)timeline.Layers ()) [i];
 
@@ -106,26 +131,90 @@ void save_timeline (const Document& document, const Timeline& timeline)
           continue;
 
         float begin_time = frame_iter->FirstFrame () / document.FrameRate (),
-              end_time   = (frame_iter->FirstFrame () + frame_iter->Duration ()) / document.FrameRate ();
+              duration   = frame_iter->Duration () / document.FrameRate ();
 
         XmlWriter::Scope sprite_scope (writer, "Sprite");
 
-        const FrameElement& resource_element = get_first_resource_frame_for_symbol (document, document.Symbols () [element_iter->Name ()]);
-        const Resource&     resource         = document.Resources () [resource_element.Name ()];
+          //Поиск и верификация картинок
+        const Timeline& symbol_timeline = document.Symbols () [element_iter->Name ()].Timeline ();
+
+        if (symbol_timeline.Layers ().Size () > 1)
+          xtl::format_operation_exception (METHOD_NAME, "Can't process frame element '%s' of layer '%s', referenced symbol has more than one layer",
+                                           element_iter->Name (), layer.Name ());
+
+        const Layer& symbol_layer = ((const ICollection<Layer>&)symbol_timeline.Layers ()) [0];
+
+        size_t bitmaps_count = 0;
+
+        const Frame&        first_symbol_frame = ((const ICollection<Frame>&)symbol_layer.Frames ()) [0];
+        const FrameElement& resource_element   = ((const ICollection<FrameElement>&)first_symbol_frame.Elements ()) [0];
+        const Resource&     resource           = document.Resources () [resource_element.Name ()];
 
         Image image (resource.Path ());
 
         size_t image_width  = image.Width (),
                image_height = image.Height ();
 
+        writer.WriteAttribute ("Active", "false");
         writer.WriteAttribute ("Name", resource.Name ());
-        writer.WriteAttribute ("Material", resource.Name ());
+
+        ActivateSpritesMap::iterator activate_iter = activate_sprites_info.find (begin_time);
+
+        if (activate_iter == activate_sprites_info.end ())
+          activate_sprites_info.insert_pair (begin_time, common::format ("ActivateSprite('%s');", resource.Name ()));
+        else
+          activate_iter->second.append (common::format ("ActivateSprite('%s');", resource.Name ()));
+
+        for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
+          for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, bitmaps_count++)
+          {
+            if (symbol_element_iter->Type () != FrameElementType_ResourceInstance)
+              throw xtl::format_operation_exception (METHOD_NAME, "Can't process frame element '%s' of layer '%s', referenced symbol elements other than resource instance",
+                                                     element_iter->Name (), layer.Name ());
+          }
+
+        if (!bitmaps_count)
+          throw xtl::format_operation_exception (METHOD_NAME, "Can't process frame element '%s' of layer '%s', referenced symbol elements has no resource instance",
+                                                 element_iter->Name (), layer.Name ());
+
+        if (bitmaps_count == 1)
+          writer.WriteAttribute ("Material", resource.Name ());
+        else
+        {
+          stl::string resource_base_name = get_base_path (resource.Name ()),
+                      resource_extension = get_extension (resource.Path ());
+
+          size_t check_frame = 1;
+
+          for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
+            for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, check_frame++)
+            {
+              stl::string correct_element_name = common::format ("%s/%u%s", resource_base_name.c_str (), check_frame, resource_extension.c_str ());
+
+              if (!xtl::xstrcmp (correct_element_name.c_str (), symbol_element_iter->Name ()))
+                throw xtl::format_operation_exception (METHOD_NAME, "Can't process frame element '%s' of layer '%s', referenced symbol elements named not sequentially",
+                                                       element_iter->Name (), layer.Name ());
+
+              if (symbol_frame_iter->FirstFrame () != check_frame - 1)
+                throw xtl::format_operation_exception (METHOD_NAME, "Can't process frame element '%s' of layer '%s', referenced frame animation has unsupported framerate",
+                                                       element_iter->Name (), layer.Name ());
+            }
+
+          stl::string material_animation_string = common::format ("%s%%u%s; 1; %u", resource_base_name.c_str (), resource_extension.c_str (), bitmaps_count),
+                      fps_string                = common::format ("%f", document.FrameRate ());
+
+          writer.WriteAttribute ("MaterialAnimation", material_animation_string);
+          writer.WriteAttribute ("Fps",               fps_string);
+          writer.WriteAttribute ("RepeatMode",        "clamp_to_end");
+        }
 
         stl::string pivot_value_string = common::format ("%f;%f;0", (element_iter->TransformationPoint ().x + resource_element.TransformationPoint ().x) / image_width - 0.5f,
                                                                     (element_iter->TransformationPoint ().y + resource_element.TransformationPoint ().y) / image_height - 0.5f);
 
-        writer.WriteAttribute ("PivotPosition", pivot_value_string);
+        if (bitmaps_count == 1)
+          writer.WriteAttribute ("PivotPosition", pivot_value_string);
 
+          //Сохранение треков
         {
           XmlWriter::Scope track_scope (writer, "Track");
 
@@ -142,23 +231,11 @@ void save_timeline (const Document& document, const Timeline& timeline)
           const PropertyAnimation&               alpha_track = frame_iter->Animation ().Properties () ["headContainer.Colors.Alpha_Color.Alpha_Amount"];
           const PropertyAnimation::KeyframeList& keyframes   = alpha_track.Keyframes ();
 
-          if (frame_iter->FirstFrame ())
-          {
-            write_track_key (writer, 0, 0);
-            write_track_key (writer, begin_time - FADE_TIME, 0);
-          }
-
           if (alpha_track.Enabled ())
           {
-            write_track_key (writer, begin_time, keyframes [0].value / 100.f);
-
             for (PropertyAnimation::KeyframeList::ConstIterator keyframe_iter = keyframes.CreateIterator (); keyframe_iter; ++keyframe_iter)
-              write_track_key (writer, begin_time + keyframe_iter->time, keyframe_iter->value / 100.f);
-
-            write_track_key (writer, end_time, keyframes [keyframes.Size () - 1].value / 100.f);
+              write_track_key (writer, keyframe_iter->time, keyframe_iter->value / 100.f);
           }
-
-          write_track_key (writer, end_time + FADE_TIME, 0);
         }
 
         {
@@ -189,7 +266,7 @@ void save_timeline (const Document& document, const Timeline& timeline)
               const PropertyAnimationKeyframe &x_keyframe = x_keyframes [j],
                                               &y_keyframe = y_keyframes [j];
 
-              write_track_key (writer, begin_time + x_keyframe.time, base_point + vec2f (x_keyframe.value * x_scale, y_keyframe.value * y_scale));
+              write_track_key (writer, x_keyframe.time, base_point + vec2f (x_keyframe.value * x_scale, y_keyframe.value * y_scale));
             }
           }
         }
@@ -217,9 +294,19 @@ void save_timeline (const Document& document, const Timeline& timeline)
               const PropertyAnimationKeyframe &x_keyframe = x_keyframes [j],
                                               &y_keyframe = y_keyframes [j];
 
-              write_track_key (writer, begin_time + x_keyframe.time, vec2f (x_keyframe.value / 100.f, y_keyframe.value / 100.f));
+              write_track_key (writer, x_keyframe.time, vec2f (x_keyframe.value / 100.f, y_keyframe.value / 100.f));
             }
           }
+        }
+
+        {
+          XmlWriter::Scope track_scope (writer, "Track");
+
+          writer.WriteAttribute ("Name", "events");
+
+          stl::string event_string = common::format ("DeactivateSprite ('%s')", resource.Name ());
+
+          write_track_key (writer, duration, event_string.c_str (), "Event");
         }
 
         {
@@ -247,6 +334,18 @@ void save_timeline (const Document& document, const Timeline& timeline)
         }
       }
   }
+
+  XmlWriter::Scope sprite_scope (writer, "Sprite");
+
+  writer.WriteAttribute ("Name", "_____SpriteManager_____");
+  writer.WriteAttribute ("Material", "transparent");
+
+  XmlWriter::Scope track_scope (writer, "Track");
+
+  writer.WriteAttribute ("Name", "events");
+
+  for (ActivateSpritesMap::const_iterator iter = activate_sprites_info.begin (), end = activate_sprites_info.end (); iter != end; ++iter)
+    write_track_key (writer, iter->first, iter->second.c_str (), "Event");
 }
 
 int main (int argc, char *argv[])
