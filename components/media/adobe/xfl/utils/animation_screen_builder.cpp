@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include <stl/map>
+#include <stl/hash_set>
 #include <stl/string>
 #include <stl/vector>
 
@@ -56,6 +57,7 @@ struct rgba_t
   unsigned char alpha;
 };
 
+typedef stl::hash_set<const char*>                                 UsedResourcesSet;
 typedef stl::multimap<float, stl::string, stl::less<float> >       ActivateSpritesMap;
 typedef CollectionImpl<Vec2fKeyframe, ICollection<Vec2fKeyframe> > Vec2fKeyframes;
 
@@ -289,6 +291,8 @@ void preprocess_symbols (Document& document)
 {
   static const char* METHOD_NAME = "preprocess_symbols";
 
+  UsedResourcesSet used_resources;
+
   if (!FileSystem::IsDir (CROPPED_ANIMATIONS_DIR))
     FileSystem::Mkdir (CROPPED_ANIMATIONS_DIR);
 
@@ -345,8 +349,23 @@ void preprocess_symbols (Document& document)
     if (!bitmaps_count)
       throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced symbol elements has no resource instance", symbol_iter->Name ());
 
-    if (bitmaps_count > 1)  //анимация
+    if (bitmaps_count == 1)
+      used_resources.insert (resource.Name ());
+    else if (bitmaps_count > 1)  //анимация
     {
+      if (!crop_rect.width || !crop_rect.height)
+      {
+        printf ("Can't process symbol '%s', referenced frame animation has empty image\n", symbol_iter->Name ());
+
+        Document::SymbolList::Iterator remove_iter = symbol_iter;
+
+        --symbol_iter;
+
+        document.Symbols ().Remove (stl::distance (document.Symbols ().CreateIterator (), remove_iter));
+
+        continue;
+      }
+
       stl::string resource_base_name = get_base_path (resource.Name ()),
                   resource_extension = get_extension (resource.Path ());
 
@@ -414,8 +433,15 @@ void preprocess_symbols (Document& document)
           cropped_frame.Save (correct_element_name.c_str ());
 
           symbol_element_iter->SetName (correct_element_name.c_str ());
-          frame_resource.SetName       (correct_element_name.c_str ());
-          frame_resource.SetPath       (correct_element_name.c_str ());
+
+          Resource new_resource;
+
+          new_resource.SetName (correct_element_name.c_str ());
+          new_resource.SetPath (correct_element_name.c_str ());
+
+          document.Resources ().Add (new_resource);
+
+          used_resources.insert (new_resource.Name ());
 
             //update transformation and translation
           vec2f current_transformation_point = symbol_element_iter->TransformationPoint ();
@@ -423,6 +449,16 @@ void preprocess_symbols (Document& document)
           symbol_element_iter->SetTransformationPoint (vec2f ((image_width / 2.f - current_transformation_point.x - crop_rect.x), (image_height / 2.f - current_transformation_point.y - crop_rect.y)));
         }
     }
+  }
+
+  ICollection<Resource>& resources = document.Resources ();
+
+  for (size_t i = 0; i < resources.Size ();)
+  {
+    if (used_resources.find (resources [i].Name ()) == used_resources.end ())
+      resources.Remove (i);
+    else
+      i++;
   }
 }
 
@@ -456,13 +492,21 @@ void save_timeline (Document& document, const Timeline& timeline)
         if (element_iter->Type () != FrameElementType_SymbolInstance)
           continue;
 
+          //Поиск и верификация картинок
+        const Symbol* symbol = document.Symbols ().Find (element_iter->Name ());
+
+        if (!symbol)
+        {
+          printf ("Can't process animation for frame element '%s' of layer '%s', references symbol not found\n", element_iter->Name (), layer.Name ());
+          continue;
+        }
+
         float begin_time = frame_iter->FirstFrame () / document.FrameRate (),
               duration   = frame_iter->Duration () / document.FrameRate ();
 
         XmlWriter::Scope sprite_scope (writer, "Sprite");
 
-          //Поиск и верификация картинок
-        const Timeline&     symbol_timeline    = document.Symbols () [element_iter->Name ()].Timeline ();
+        const Timeline&     symbol_timeline    = symbol->Timeline ();
         const Layer&        symbol_layer       = ((const ICollection<Layer>&)symbol_timeline.Layers ()) [0];
         const Frame&        first_symbol_frame = ((const ICollection<Frame>&)symbol_layer.Frames ()) [0];
         const FrameElement& resource_element   = ((const ICollection<FrameElement>&)first_symbol_frame.Elements ()) [0];
