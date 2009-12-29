@@ -2,7 +2,9 @@
 
 #include <stl/map>
 #include <stl/string>
+#include <stl/vector>
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/iterator.h>
 
@@ -12,6 +14,7 @@
 #include <common/xml_writer.h>
 
 #include <media/adobe/xfl.h>
+#include <media/collection.h>
 #include <media/image.h>
 
 using namespace math;
@@ -24,6 +27,7 @@ const int TOP_Y         = 0;
 const int TARGET_WIDTH  = 1024;
 const int TARGET_HEIGHT = -768;
 
+const float EPSILON   = 0.001;
 const float FADE_TIME = 0.1;
 
 void save_materials (const Document& document)
@@ -100,7 +104,89 @@ stl::string get_extension (const char* path)
   return stl::string (extension_begin);
 }
 
-typedef stl::map<float, stl::string, stl::less<float> > ActivateSpritesMap;
+struct Vec2fKeyframe
+{
+  float time;
+  vec2f value;
+};
+
+typedef stl::map<float, stl::string, stl::less<float> >            ActivateSpritesMap;
+typedef CollectionImpl<Vec2fKeyframe, ICollection<Vec2fKeyframe> > Vec2fKeyframes;
+
+void compose_vec2f_keyframes (const PropertyAnimation::KeyframeList& x_keyframes, const PropertyAnimation::KeyframeList& y_keyframes, Vec2fKeyframes& keyframes)
+{
+  keyframes.Reserve (stl::max (x_keyframes.Size (), y_keyframes.Size ()));
+
+  size_t x_keyframes_count        = x_keyframes.Size (),
+         y_keyframes_count        = y_keyframes.Size (),
+         current_x_keyframe_index = 0,
+         current_y_keyframe_index = 0;
+
+  PropertyAnimation::KeyframeList::ConstIterator current_x_keyframe = x_keyframes.CreateIterator (),
+                                                 current_y_keyframe = y_keyframes.CreateIterator ();
+
+  float last_exported_time = -1;
+
+  while (current_x_keyframe_index < x_keyframes_count || current_y_keyframe_index < y_keyframes_count)
+  {
+    Vec2fKeyframe new_keyframe;
+
+    if ((current_x_keyframe_index >= x_keyframes_count) || (current_x_keyframe->time > current_y_keyframe->time && current_y_keyframe_index < y_keyframes_count))
+    {
+      if (current_y_keyframe->time > last_exported_time + EPSILON)
+      {
+        last_exported_time = current_y_keyframe->time;
+
+        new_keyframe.time = current_y_keyframe->time;
+
+        new_keyframe.value.y = current_y_keyframe->value;
+
+        if (!current_x_keyframe_index || (current_x_keyframe_index >= x_keyframes_count))
+          new_keyframe.value.x = current_x_keyframe->value;
+        else
+        {
+          const PropertyAnimationKeyframe& previous_x_keyframe = x_keyframes [current_x_keyframe_index - 1];
+
+          new_keyframe.value.x = (current_x_keyframe->value - previous_x_keyframe.value) / (current_x_keyframe->time - previous_x_keyframe.time) * (current_y_keyframe->time - previous_x_keyframe.time);
+        }
+
+        keyframes.Add (new_keyframe);
+      }
+
+      current_y_keyframe_index++;
+
+      if (current_y_keyframe_index < y_keyframes_count)
+        ++current_y_keyframe;
+    }
+    else
+    {
+      if (current_x_keyframe->time > last_exported_time + EPSILON)
+      {
+        last_exported_time = current_x_keyframe->time;
+
+        new_keyframe.time = current_x_keyframe->time;
+
+        new_keyframe.value.x = current_x_keyframe->value;
+
+        if (!current_y_keyframe_index || (current_y_keyframe_index >= y_keyframes_count))
+          new_keyframe.value.y = current_y_keyframe->value;
+        else
+        {
+          const PropertyAnimationKeyframe& previous_y_keyframe = y_keyframes [current_y_keyframe_index - 1];
+
+          new_keyframe.value.y = (current_y_keyframe->value - previous_y_keyframe.value) / (current_y_keyframe->time - previous_y_keyframe.time) * (current_x_keyframe->time - previous_y_keyframe.time);
+        }
+
+        keyframes.Add (new_keyframe);
+      }
+
+      current_x_keyframe_index++;
+
+      if (current_x_keyframe_index < x_keyframes_count)
+        ++current_x_keyframe;
+    }
+  }
+}
 
 void save_timeline (const Document& document, const Timeline& timeline)
 {
@@ -196,8 +282,17 @@ void save_timeline (const Document& document, const Timeline& timeline)
                                                        element_iter->Name (), layer.Name ());
 
               if (symbol_frame_iter->FirstFrame () != check_frame - 1)
-                throw xtl::format_operation_exception (METHOD_NAME, "Can't process frame element '%s' of layer '%s', referenced frame animation has unsupported framerate",
-                                                       element_iter->Name (), layer.Name ());
+              {
+                if (check_frame > 1)
+                {
+                  bitmaps_count = check_frame - 2;
+                  printf ("Can't fully process frame element '%s' of layer '%s', referenced frame animation has unsupported framerate\n",
+                           element_iter->Name (), layer.Name ());
+                }
+                else
+                  throw xtl::format_operation_exception (METHOD_NAME, "Can't process frame element '%s' of layer '%s', referenced frame animation has unsupported framerate",
+                                                         element_iter->Name (), layer.Name ());
+              }
             }
 
           stl::string material_animation_string = common::format ("%s%%u%s; 1; %u", resource_base_name.c_str (), resource_extension.c_str (), bitmaps_count),
@@ -248,26 +343,19 @@ void save_timeline (const Document& document, const Timeline& timeline)
           const PropertyAnimation::KeyframeList &x_keyframes    = motion_x_track.Keyframes (),
                                                 &y_keyframes    = motion_y_track.Keyframes ();
 
-          if (x_keyframes.Size () != y_keyframes.Size ())
-            throw xtl::format_operation_exception (METHOD_NAME, "Can't save motion track for frame element '%s' of layer '%s', x and y motion has different count of keyframes",
-                                                   element_iter->Name (), layer.Name ());
-
           vec2f base_point (TARGET_WIDTH / 2.f + (element_iter->Translation ().x + resource_element.Translation ().x) / TARGET_WIDTH,
                             TARGET_HEIGHT / 2.f + (element_iter->Translation ().y + resource_element.Translation ().y) / TARGET_HEIGHT);
 
           if (!motion_x_track.Enabled () || !motion_y_track.Enabled ())
-          {
             write_track_key (writer, 0, base_point);
-          }
           else
           {
-            for (size_t j = 0, count = x_keyframes.Size (); j < count; j++)
-            {
-              const PropertyAnimationKeyframe &x_keyframe = x_keyframes [j],
-                                              &y_keyframe = y_keyframes [j];
+            Vec2fKeyframes keyframes;
 
-              write_track_key (writer, x_keyframe.time, base_point + vec2f (x_keyframe.value * x_scale, y_keyframe.value * y_scale));
-            }
+            compose_vec2f_keyframes (x_keyframes, y_keyframes, keyframes);
+
+            for (Vec2fKeyframes::ConstIterator iter = keyframes.CreateIterator (); iter; ++iter)
+              write_track_key (writer, iter->time, base_point + vec2f (iter->value.x * x_scale, iter->value.y * y_scale));
           }
         }
 
@@ -283,19 +371,14 @@ void save_timeline (const Document& document, const Timeline& timeline)
           const PropertyAnimation::KeyframeList &x_keyframes   = scale_x_track.Keyframes (),
                                                 &y_keyframes   = scale_y_track.Keyframes ();
 
-          if (x_keyframes.Size () != y_keyframes.Size ())
-            throw xtl::format_operation_exception (METHOD_NAME, "Can't save scale track for frame element '%s' of layer '%s', x and y scale has different count of keyframes",
-                                                   element_iter->Name (), layer.Name ());
-
           if (scale_x_track.Enabled () && scale_y_track.Enabled ())
           {
-            for (size_t j = 0, count = x_keyframes.Size (); j < count; j++)
-            {
-              const PropertyAnimationKeyframe &x_keyframe = x_keyframes [j],
-                                              &y_keyframe = y_keyframes [j];
+            Vec2fKeyframes keyframes;
 
-              write_track_key (writer, x_keyframe.time, vec2f (x_keyframe.value / 100.f, y_keyframe.value / 100.f));
-            }
+            compose_vec2f_keyframes (x_keyframes, y_keyframes, keyframes);
+
+            for (Vec2fKeyframes::ConstIterator iter = keyframes.CreateIterator (); iter; ++iter)
+              write_track_key (writer, iter->time, vec2f (iter->value.x / 100.f, iter->value.y / 100.f));
           }
         }
 
