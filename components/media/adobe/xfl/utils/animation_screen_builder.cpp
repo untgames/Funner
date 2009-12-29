@@ -10,6 +10,7 @@
 
 #include <math/vector.h>
 
+#include <common/file.h>
 #include <common/strlib.h>
 #include <common/xml_writer.h>
 
@@ -22,13 +23,41 @@ using namespace common;
 using namespace media;
 using namespace media::adobe::xfl;
 
+const char* CROPPED_ANIMATIONS_DIR = "cropped_animations";
+
 const int LEFT_X        = 0;
 const int TOP_Y         = 0;
 const int TARGET_WIDTH  = 1024;
 const int TARGET_HEIGHT = -768;
 
+const size_t CROP_ALPHA = 1;
+
 const float EPSILON   = 0.001;
 const float FADE_TIME = 0.1;
+
+//прямоугольная область
+struct Rect
+{
+  int    x, y;
+  size_t width, height;
+};
+
+struct Vec2fKeyframe
+{
+  float time;
+  vec2f value;
+};
+
+struct rgba_t
+{
+  unsigned char red;
+  unsigned char green;
+  unsigned char blue;
+  unsigned char alpha;
+};
+
+typedef stl::map<float, stl::string, stl::less<float> >            ActivateSpritesMap;
+typedef CollectionImpl<Vec2fKeyframe, ICollection<Vec2fKeyframe> > Vec2fKeyframes;
 
 void save_materials (const Document& document)
 {
@@ -103,15 +132,6 @@ stl::string get_extension (const char* path)
 
   return stl::string (extension_begin);
 }
-
-struct Vec2fKeyframe
-{
-  float time;
-  vec2f value;
-};
-
-typedef stl::map<float, stl::string, stl::less<float> >            ActivateSpritesMap;
-typedef CollectionImpl<Vec2fKeyframe, ICollection<Vec2fKeyframe> > Vec2fKeyframes;
 
 void compose_vec2f_keyframes (const PropertyAnimation::KeyframeList& x_keyframes, const PropertyAnimation::KeyframeList& y_keyframes, Vec2fKeyframes& keyframes)
 {
@@ -188,9 +208,229 @@ void compose_vec2f_keyframes (const PropertyAnimation::KeyframeList& x_keyframes
   }
 }
 
-void save_timeline (const Document& document, const Timeline& timeline)
+//обрезание
+void crop_by_alpha (size_t width, size_t height, const rgba_t* image, size_t crop_alpha, Rect& cropped_rect)
+{
+  int  min_x = 0, min_y = 0, max_x = 0, max_y = 0;
+  bool first_point_found = false;
+
+  for (int y = 0; y < (int)height; y++)
+  {
+    const rgba_t* data = image + y * width;
+
+    for (int x = 0; x < (int)width; x++, data++)
+    {
+      if (data->alpha < crop_alpha)
+        continue;
+
+      if (!first_point_found)
+      {
+        min_x             = max_x = x;
+        min_y             = max_y = y;
+        first_point_found = true;
+
+        continue;
+      }
+
+      if (x < min_x) min_x = x;
+      if (y < min_y) min_y = y;
+      if (x > max_x) max_x = x;
+      if (y > max_y) max_y = y;
+    }
+  }
+
+  if (!first_point_found)
+  {
+    cropped_rect.x      = 0;
+    cropped_rect.y      = 0;
+    cropped_rect.width  = 0;
+    cropped_rect.height = 0;
+
+    return;
+  }
+
+  if (!cropped_rect.width || !cropped_rect.height)
+  {
+    cropped_rect.x      = min_x;
+    cropped_rect.y      = min_y;
+    cropped_rect.width  = max_x - min_x + 1;
+    cropped_rect.height = max_y - min_y + 1;
+  }
+  else
+  {
+    if (min_x < cropped_rect.x) cropped_rect.x = min_x;
+    if (min_y < cropped_rect.y) cropped_rect.y = min_y;
+
+    if (max_x > (int)(cropped_rect.x + cropped_rect.width))
+      cropped_rect.width = max_x - cropped_rect.x + 1;
+
+    if (max_y > (int)(cropped_rect.y + cropped_rect.height))
+      cropped_rect.height = max_y - cropped_rect.y + 1;
+  }
+}
+
+void union_rect (const Rect& rect1, Rect& target_rect)
+{
+  if (target_rect.width && target_rect.height)
+  {
+    size_t left_side = stl::max (rect1.x + rect1.width, target_rect.x + target_rect.width),
+           top_side  = stl::max (rect1.y + rect1.height, target_rect.y + target_rect.height);
+
+    target_rect.x      = stl::min (rect1.x, target_rect.x);
+    target_rect.y      = stl::min (rect1.y, target_rect.y);
+    target_rect.width  = left_side - target_rect.x;
+    target_rect.height = top_side - target_rect.y;
+  }
+  else
+    target_rect = rect1;
+}
+
+void preprocess_symbols (Document& document)
+{
+  static const char* METHOD_NAME = "preprocess_symbols";
+
+  if (!FileSystem::IsDir (CROPPED_ANIMATIONS_DIR))
+    FileSystem::Mkdir (CROPPED_ANIMATIONS_DIR);
+
+  for (Document::SymbolList::Iterator symbol_iter = document.Symbols ().CreateIterator (); symbol_iter; ++symbol_iter)
+  {
+    const Timeline& symbol_timeline = symbol_iter->Timeline ();
+
+    if (symbol_timeline.Layers ().Size () > 1)
+      xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', it has more than one layer", symbol_iter->Name ());
+
+    Layer&        symbol_layer       = ((ICollection<Layer>&)symbol_timeline.Layers ()) [0];
+    Frame&        first_symbol_frame = ((ICollection<Frame>&)symbol_layer.Frames ()) [0];
+    FrameElement& resource_element   = ((ICollection<FrameElement>&)first_symbol_frame.Elements ()) [0];
+    Resource&     resource           = document.Resources () [resource_element.Name ()];
+
+    size_t bitmaps_count = 0;
+
+    Image image (resource.Path ());
+
+    size_t image_width  = image.Width (),
+           image_height = image.Height ();
+
+    Rect crop_rect;
+
+    memset (&crop_rect, 0, sizeof (crop_rect));
+
+    for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
+      for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, bitmaps_count++)
+      {
+        if (symbol_element_iter->Type () != FrameElementType_ResourceInstance)
+          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains elements other than resource instance", symbol_iter->Name ());
+
+        const Resource& frame_resource = document.Resources () [symbol_element_iter->Name ()];
+
+        Image frame (frame_resource.Path ());
+
+        size_t frame_width  = frame.Width (),
+               frame_height = frame.Height ();
+
+        if (frame_width != image_width || frame_height != image_height)
+          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains animations with different frame size", symbol_iter->Name ());
+
+        if (frame.Format () != PixelFormat_RGBA8)
+          continue;
+
+        Rect frame_crop_rect;
+
+        memset (&frame_crop_rect, 0, sizeof (frame_crop_rect));
+
+        crop_by_alpha (frame_width, frame_height, (rgba_t*)frame.Bitmap (), CROP_ALPHA, frame_crop_rect);
+        union_rect    (frame_crop_rect, crop_rect);
+      }
+
+    if (!bitmaps_count)
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced symbol elements has no resource instance", symbol_iter->Name ());
+
+    if (bitmaps_count > 1)  //анимация
+    {
+      stl::string resource_base_name = get_base_path (resource.Name ()),
+                  resource_extension = get_extension (resource.Path ());
+
+      size_t check_frame = 1;
+
+      xtl::uninitialized_storage<char> image_copy_buffer (get_bytes_per_pixel (image.Format ()) * crop_rect.width * crop_rect.height);
+
+      Layer::FrameList &layer_frames = symbol_layer.Frames ();
+
+      for (Layer::FrameList::Iterator symbol_frame_iter = layer_frames.CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
+        for (Frame::FrameElementList::Iterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, check_frame++)
+        {
+          if (symbol_frame_iter->FirstFrame () != check_frame - 1)
+          {
+            if (check_frame > 1)
+            {
+              bitmaps_count = check_frame - 2;
+              printf ("Can't fully process symbol '%s', referenced frame animation has unsupported framerate\n", symbol_iter->Name ());
+
+              size_t invalid_frame_index = stl::distance (layer_frames.CreateIterator (), symbol_frame_iter);
+
+              ICollection<Resource>& resources = document.Resources ();
+
+              for (size_t remove_frame_index = layer_frames.Size () - 1; remove_frame_index >= invalid_frame_index; remove_frame_index--)
+              {
+                Frame& remove_frame = layer_frames [remove_frame_index];
+
+                for (Frame::FrameElementList::Iterator remove_element_iter = remove_frame.Elements ().CreateIterator (); remove_element_iter; ++remove_element_iter)
+                  for (size_t resource_index = 0, count = resources.Size (); resource_index < count; resource_index++)
+                  {
+                    if (!xtl::xstrcmp (resources [resource_index].Name (), remove_element_iter->Name ()))
+                    {
+                      resources.Remove (resource_index);
+                      break;
+                    }
+                  }
+
+                layer_frames.Remove (remove_frame_index);
+              }
+
+              symbol_frame_iter.clear ();
+              break;
+            }
+            else
+              throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced frame animation has unsupported framerate", symbol_iter->Name ());
+          }
+
+          stl::string save_folder_name     = common::format ("%s/%s", CROPPED_ANIMATIONS_DIR, resource_base_name.c_str ()),
+                      correct_element_name = common::format ("%s%u%s", save_folder_name.c_str (), check_frame, resource_extension.c_str ());
+
+          if (!FileSystem::IsDir (save_folder_name.c_str ()))
+            FileSystem::Mkdir (save_folder_name.c_str ());
+
+          Resource& frame_resource = document.Resources () [symbol_element_iter->Name ()];
+
+          Image frame (frame_resource.Path ());
+
+          if (frame.Format () != PixelFormat_RGBA8)
+            throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains frames with not RGBA8 pixel format", symbol_iter->Name ());
+
+          frame.GetImage (crop_rect.x, crop_rect.y, 0, crop_rect.width, crop_rect.height, 1, PixelFormat_RGBA8, image_copy_buffer.data ());
+
+          Image cropped_frame (crop_rect.width, crop_rect.height, 1, PixelFormat_RGBA8, image_copy_buffer.data ());
+
+          cropped_frame.Save (correct_element_name.c_str ());
+
+          symbol_element_iter->SetName (correct_element_name.c_str ());
+          frame_resource.SetName       (correct_element_name.c_str ());
+          frame_resource.SetPath       (correct_element_name.c_str ());
+
+            //update transformation and translation
+          vec2f current_transformation_point = symbol_element_iter->TransformationPoint ();
+
+          symbol_element_iter->SetTransformationPoint (vec2f ((image_width / 2.f - current_transformation_point.x - crop_rect.x), (image_height / 2.f - current_transformation_point.y - crop_rect.y)));
+        }
+    }
+  }
+}
+
+void save_timeline (Document& document, const Timeline& timeline)
 {
   static const char* METHOD_NAME = "save_timeline";
+
+  preprocess_symbols (document);
 
   stl::string xml_name = common::format ("%s.xml", timeline.Name ());
 
@@ -222,19 +462,13 @@ void save_timeline (const Document& document, const Timeline& timeline)
         XmlWriter::Scope sprite_scope (writer, "Sprite");
 
           //Поиск и верификация картинок
-        const Timeline& symbol_timeline = document.Symbols () [element_iter->Name ()].Timeline ();
-
-        if (symbol_timeline.Layers ().Size () > 1)
-          xtl::format_operation_exception (METHOD_NAME, "Can't process frame element '%s' of layer '%s', referenced symbol has more than one layer",
-                                           element_iter->Name (), layer.Name ());
-
-        const Layer& symbol_layer = ((const ICollection<Layer>&)symbol_timeline.Layers ()) [0];
-
-        size_t bitmaps_count = 0;
-
+        const Timeline&     symbol_timeline    = document.Symbols () [element_iter->Name ()].Timeline ();
+        const Layer&        symbol_layer       = ((const ICollection<Layer>&)symbol_timeline.Layers ()) [0];
         const Frame&        first_symbol_frame = ((const ICollection<Frame>&)symbol_layer.Frames ()) [0];
         const FrameElement& resource_element   = ((const ICollection<FrameElement>&)first_symbol_frame.Elements ()) [0];
         const Resource&     resource           = document.Resources () [resource_element.Name ()];
+
+        size_t bitmaps_count = 0;
 
         Image image (resource.Path ());
 
@@ -252,50 +486,15 @@ void save_timeline (const Document& document, const Timeline& timeline)
           activate_iter->second.append (common::format ("ActivateSprite('%s');", resource.Name ()));
 
         for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
-          for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, bitmaps_count++)
-          {
-            if (symbol_element_iter->Type () != FrameElementType_ResourceInstance)
-              throw xtl::format_operation_exception (METHOD_NAME, "Can't process frame element '%s' of layer '%s', referenced symbol elements other than resource instance",
-                                                     element_iter->Name (), layer.Name ());
-          }
-
-        if (!bitmaps_count)
-          throw xtl::format_operation_exception (METHOD_NAME, "Can't process frame element '%s' of layer '%s', referenced symbol elements has no resource instance",
-                                                 element_iter->Name (), layer.Name ());
+          for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, bitmaps_count++);
 
         if (bitmaps_count == 1)
           writer.WriteAttribute ("Material", resource.Name ());
         else
         {
-          stl::string resource_base_name = get_base_path (resource.Name ()),
-                      resource_extension = get_extension (resource.Path ());
-
-          size_t check_frame = 1;
-
-          for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
-            for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, check_frame++)
-            {
-              stl::string correct_element_name = common::format ("%s/%u%s", resource_base_name.c_str (), check_frame, resource_extension.c_str ());
-
-              if (!xtl::xstrcmp (correct_element_name.c_str (), symbol_element_iter->Name ()))
-                throw xtl::format_operation_exception (METHOD_NAME, "Can't process frame element '%s' of layer '%s', referenced symbol elements named not sequentially",
-                                                       element_iter->Name (), layer.Name ());
-
-              if (symbol_frame_iter->FirstFrame () != check_frame - 1)
-              {
-                if (check_frame > 1)
-                {
-                  bitmaps_count = check_frame - 2;
-                  printf ("Can't fully process frame element '%s' of layer '%s', referenced frame animation has unsupported framerate\n",
-                           element_iter->Name (), layer.Name ());
-                }
-                else
-                  throw xtl::format_operation_exception (METHOD_NAME, "Can't process frame element '%s' of layer '%s', referenced frame animation has unsupported framerate",
-                                                         element_iter->Name (), layer.Name ());
-              }
-            }
-
-          stl::string material_animation_string = common::format ("%s%%u%s; 1; %u", resource_base_name.c_str (), resource_extension.c_str (), bitmaps_count),
+          stl::string resource_base_name        = get_base_path (resource.Name ()),
+                      resource_extension        = get_extension (resource.Path ()),
+                      material_animation_string = common::format ("%s%%u%s; 1; %u", resource_base_name.c_str (), resource_extension.c_str (), bitmaps_count),
                       fps_string                = common::format ("%f", document.FrameRate ());
 
           writer.WriteAttribute ("MaterialAnimation", material_animation_string);
@@ -306,8 +505,7 @@ void save_timeline (const Document& document, const Timeline& timeline)
         stl::string pivot_value_string = common::format ("%f;%f;0", (element_iter->TransformationPoint ().x + resource_element.TransformationPoint ().x) / image_width - 0.5f,
                                                                     (element_iter->TransformationPoint ().y + resource_element.TransformationPoint ().y) / image_height - 0.5f);
 
-        if (bitmaps_count == 1)
-          writer.WriteAttribute ("PivotPosition", pivot_value_string);
+        writer.WriteAttribute ("PivotPosition", pivot_value_string.c_str());
 
           //Сохранение треков
         {
@@ -443,10 +641,10 @@ int main (int argc, char *argv[])
   {
     Document document (argv [1]);
 
-    save_materials (document);
-
     for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
       save_timeline (document, *iter);
+
+    save_materials (document);
   }
   catch (std::exception& exception)
   {
