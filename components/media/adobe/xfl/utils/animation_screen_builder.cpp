@@ -56,7 +56,7 @@ struct rgba_t
   unsigned char alpha;
 };
 
-typedef stl::map<float, stl::string, stl::less<float> >            ActivateSpritesMap;
+typedef stl::multimap<float, stl::string, stl::less<float> >       ActivateSpritesMap;
 typedef CollectionImpl<Vec2fKeyframe, ICollection<Vec2fKeyframe> > Vec2fKeyframes;
 
 void save_materials (const Document& document)
@@ -478,12 +478,7 @@ void save_timeline (Document& document, const Timeline& timeline)
         writer.WriteAttribute ("Active", "false");
         writer.WriteAttribute ("Name", resource.Name ());
 
-        ActivateSpritesMap::iterator activate_iter = activate_sprites_info.find (begin_time);
-
-        if (activate_iter == activate_sprites_info.end ())
-          activate_sprites_info.insert_pair (begin_time, common::format ("ActivateSprite('%s');", resource.Name ()));
-        else
-          activate_iter->second.append (common::format ("ActivateSprite('%s');", resource.Name ()));
+        activate_sprites_info.insert_pair (begin_time, common::format ("ActivateSprite('%s')", resource.Name ()));
 
         for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
           for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, bitmaps_count++);
