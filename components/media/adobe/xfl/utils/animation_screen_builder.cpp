@@ -32,6 +32,10 @@ const int TARGET_WIDTH  = 1024;
 const int TARGET_HEIGHT = -768;
 
 const size_t CROP_ALPHA = 1;
+const size_t RESIZE_WIDTH = 640;
+const size_t RESIZE_HEIGHT = 480;
+
+const bool FORCE_ANIMATION_PIVOT = false;
 
 const float EPSILON   = 0.001;
 const float FADE_TIME = 0.1;
@@ -82,17 +86,6 @@ void save_materials (const Document& document)
   }
 }
 
-const FrameElement& get_first_resource_frame_for_symbol (const Document& document, const Symbol& symbol)
-{
-  for (Timeline::LayerList::ConstIterator layer_iter = symbol.Timeline ().Layers ().CreateIterator (); layer_iter; ++layer_iter)
-    for (Layer::FrameList::ConstIterator frame_iter = layer_iter->Frames ().CreateIterator (); frame_iter; ++frame_iter)
-      for (Frame::FrameElementList::ConstIterator element_iter = frame_iter->Elements ().CreateIterator (); element_iter; ++element_iter)
-        if (element_iter->Type () == FrameElementType_ResourceInstance)
-          return *element_iter;
-
-  throw xtl::format_operation_exception ("get_resource_for_symbol", "Symbol '%s' has no resources", symbol.Name ());
-}
-
 void write_track_key (XmlWriter& writer, float time, const char* value, const char* value_attribute = "Value")
 {
   XmlWriter::Scope key_scope (writer, "Key");
@@ -113,26 +106,6 @@ void write_track_key (XmlWriter& writer, float time, float value)
   stl::string value_string = common::format ("%f", value);
 
   write_track_key (writer, time, value_string.c_str ());
-}
-
-stl::string get_base_path (const char* path)
-{
-  const char* base_path_end = strrchr (path, '/');
-
-  if (!base_path_end)
-    return stl::string ();
-
-  return stl::string (path, base_path_end - path + 1);
-}
-
-stl::string get_extension (const char* path)
-{
-  const char* extension_begin = strrchr (path, '.');
-
-  if (!extension_begin)
-    return stl::string ();
-
-  return stl::string (extension_begin);
 }
 
 void compose_vec2f_keyframes (const PropertyAnimation::KeyframeList& x_keyframes, const PropertyAnimation::KeyframeList& y_keyframes, Vec2fKeyframes& keyframes)
@@ -366,8 +339,8 @@ void preprocess_symbols (Document& document)
         continue;
       }
 
-      stl::string resource_base_name = get_base_path (resource.Name ()),
-                  resource_extension = get_extension (resource.Path ());
+      stl::string resource_base_name = common::dir (resource.Name ()),
+                  resource_extension = common::suffix (resource.Path ());
 
       size_t check_frame = 1;
 
@@ -444,9 +417,21 @@ void preprocess_symbols (Document& document)
           used_resources.insert (new_resource.Name ());
 
             //update transformation and translation
-          vec2f current_transformation_point = symbol_element_iter->TransformationPoint ();
+          vec2f current_transformation_point = symbol_element_iter->TransformationPoint (),
+                current_translation          = symbol_element_iter->Translation ();
 
-          symbol_element_iter->SetTransformationPoint (vec2f ((image_width / 2.f - current_transformation_point.x - crop_rect.x), (image_height / 2.f - current_transformation_point.y - crop_rect.y)));
+          if (FORCE_ANIMATION_PIVOT)
+          {
+            symbol_element_iter->SetTransformationPoint (vec2f (image_width / 2.f + current_transformation_point.x - crop_rect.x, image_height / 2.f + current_transformation_point.y - crop_rect.y));
+            symbol_element_iter->SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
+//            symbol_element_iter->SetTransformationPoint (vec2f (image_width / 2.f + current_transformation_point.x - crop_rect.x, image_height / 2.f + current_transformation_point.y - crop_rect.y));
+//            symbol_element_iter->SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
+          }
+          else
+          {
+            symbol_element_iter->SetTransformationPoint (vec2f (current_transformation_point.x - crop_rect.x, current_transformation_point.y - crop_rect.y));
+            symbol_element_iter->SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
+          }
         }
     }
   }
@@ -531,8 +516,8 @@ void save_timeline (Document& document, const Timeline& timeline)
           writer.WriteAttribute ("Material", resource.Name ());
         else
         {
-          stl::string resource_base_name        = get_base_path (resource.Name ()),
-                      resource_extension        = get_extension (resource.Path ()),
+          stl::string resource_base_name        = common::dir (resource.Name ()),
+                      resource_extension        = common::suffix (resource.Path ()),
                       material_animation_string = common::format ("%s%%u%s; 1; %u", resource_base_name.c_str (), resource_extension.c_str (), bitmaps_count),
                       fps_string                = common::format ("%f", document.FrameRate ());
 
@@ -541,8 +526,11 @@ void save_timeline (Document& document, const Timeline& timeline)
           writer.WriteAttribute ("RepeatMode",        "clamp_to_end");
         }
 
-        stl::string pivot_value_string = common::format ("%f;%f;0", (element_iter->TransformationPoint ().x + resource_element.TransformationPoint ().x) / image_width - 0.5f,
-                                                                    (element_iter->TransformationPoint ().y + resource_element.TransformationPoint ().y) / image_height - 0.5f);
+        vec2f transformation_point (element_iter->TransformationPoint ().x + resource_element.TransformationPoint ().x,
+                                    element_iter->TransformationPoint ().y + resource_element.TransformationPoint ().y);
+
+        stl::string pivot_value_string = common::format ("%f;%f;0", transformation_point.x / image_width - 0.5f,
+                                                                    transformation_point.y / image_height - 0.5f);
 
         writer.WriteAttribute ("PivotPosition", pivot_value_string.c_str());
 
@@ -580,8 +568,10 @@ void save_timeline (Document& document, const Timeline& timeline)
           const PropertyAnimation::KeyframeList &x_keyframes    = motion_x_track.Keyframes (),
                                                 &y_keyframes    = motion_y_track.Keyframes ();
 
-          vec2f base_point (TARGET_WIDTH / 2.f + (element_iter->Translation ().x + resource_element.Translation ().x) / TARGET_WIDTH,
-                            TARGET_HEIGHT / 2.f + (element_iter->Translation ().y + resource_element.Translation ().y) / TARGET_HEIGHT);
+          vec2f base_point ((transformation_point.x + element_iter->Translation ().x + resource_element.Translation ().x) / document.Width () * TARGET_WIDTH,
+                            (transformation_point.y + element_iter->Translation ().y + resource_element.Translation ().y) / document.Height () * TARGET_HEIGHT);
+//          vec2f base_point (transformation_point.x / document.Width () * TARGET_WIDTH + (element_iter->Translation ().x + resource_element.Translation ().x),
+//                            transformation_point.y / document.Height () * TARGET_HEIGHT - (element_iter->Translation ().y + resource_element.Translation ().y));
 
           if (!motion_x_track.Enabled () || !motion_y_track.Enabled ())
             write_track_key (writer, 0, base_point);
