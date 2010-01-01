@@ -574,12 +574,21 @@ ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,
 
 ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,string& result_file_name)
 {
+  static const char* METHOD_NAME = "common::FileSystemImpl::FindFileSystem";
+
   string file_name = FileSystem::GetNormalizedFileName (src_file_name);
 
     //пытаемс€ найти файл не использу€ путей поиска
 
   if (file_name [0] == '/')
-    return FindMountFileSystem (file_name.c_str (),result_file_name);
+  {
+    ICustomFileSystemPtr return_value = FindMountFileSystem (file_name.c_str (),result_file_name);
+
+    if (!return_value)
+      throw xtl::make_argument_exception (METHOD_NAME, "src_file_name", src_file_name, "Can't find mount file system for this file");
+
+    return return_value;
+  }
 
     //пытаемс€ найти файл по дефолтному пути поиска
 
@@ -621,7 +630,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
     //возвращаем ссылку на файловую систему включающую путь по умолчанию
 
   if (!default_file_system)
-    throw format_operation_exception ("","File '%s' does not belong to any file system",src_file_name);
+    throw format_operation_exception (METHOD_NAME, "File '%s' does not belong to any file system",src_file_name);
 
   swap (result_file_name,default_mount_name);
 
