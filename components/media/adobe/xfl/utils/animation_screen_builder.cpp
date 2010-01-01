@@ -739,170 +739,136 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
       throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced symbol elements has no resource instance", symbol_iter->Name ());
 
     stl::string resource_dir     = common::dir (resource.Name ()),
-                save_folder_name = common::format ("%s/%s", params.output_textures_dir_name.c_str (), resource_dir.c_str ());
+                save_folder_name;
+
+    if (resource_dir == "./")
+      save_folder_name = common::format ("%s/", params.output_textures_dir_name.c_str ());
+    else
+      save_folder_name = common::format ("%s/%s", params.output_textures_dir_name.c_str (), resource_dir.c_str ());
 
     if (!FileSystem::IsDir (save_folder_name.c_str ()))
       FileSystem::Mkdir (save_folder_name.c_str ());
 
     xtl::uninitialized_storage<char> image_copy_buffer (get_bytes_per_pixel (image.Format ()) * crop_rect.width * crop_rect.height);
 
-    if (bitmaps_count == 1)
+    if (!crop_rect.width || !crop_rect.height)
     {
-      stl::string resource_file_base_name = common::notdir (common::basename (resource.Path ())),
-                  correct_element_name    = common::format ("%s%s.%s", save_folder_name.c_str (), resource_file_base_name.c_str (), params.textures_format.c_str ());
+      if (!params.silent)
+        printf ("Can't process symbol '%s', referenced frame animation has empty image\n", symbol_iter->Name ());
 
-      size_t new_image_width  = crop_rect.width,
-             new_image_height = crop_rect.height;
+      Document::SymbolList::Iterator remove_iter = symbol_iter;
 
-      if (params.need_pot_extent)
-      {
-        new_image_width  = get_next_higher_power_of_two (new_image_width),
-        new_image_height = get_next_higher_power_of_two (new_image_height);
-      }
+      --symbol_iter;
 
-      Image new_image (new_image_width, new_image_height, 1, image.Format ());
+      document.Symbols ().Remove (stl::distance (document.Symbols ().CreateIterator (), remove_iter));
 
-      image.GetImage (crop_rect.x, crop_rect.y, 0, crop_rect.width, crop_rect.height, 1, image.Format (), image_copy_buffer.data ());
-      new_image.PutImage (0, new_image_height - crop_rect.height, 0, crop_rect.width, crop_rect.height, 1, image.Format (), image_copy_buffer.data ());
-
-      new_image.Save (correct_element_name.c_str ());
-
-      tiling_map.insert_pair (correct_element_name.c_str (), vec2ui (crop_rect.width, crop_rect.height));
-
-      //update transformation and translation
-      vec2f current_transformation_point = resource_element.TransformationPoint (),
-            current_translation          = resource_element.Translation ();
-
-      resource_element.SetTransformationPoint (vec2f (current_transformation_point.x - crop_rect.x, current_transformation_point.y - crop_rect.y));
-      resource_element.SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
-
-      resource_element.SetName (correct_element_name.c_str ());
-
-      Resource new_resource;
-
-      new_resource.SetName (correct_element_name.c_str ());
-      new_resource.SetPath (correct_element_name.c_str ());
-
-      document.Resources ().Add (new_resource);
-
-      used_resources.insert (new_resource.Name ());
+      continue;
     }
-    else if (bitmaps_count > 1)  //анимация
-    {
-      if (!crop_rect.width || !crop_rect.height)
+
+    size_t check_frame = 1;
+
+    Layer::FrameList &layer_frames = symbol_layer.Frames ();
+
+    for (Layer::FrameList::Iterator symbol_frame_iter = layer_frames.CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
+      for (Frame::FrameElementList::Iterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, check_frame++)
       {
-        if (!params.silent)
-          printf ("Can't process symbol '%s', referenced frame animation has empty image\n", symbol_iter->Name ());
-
-        Document::SymbolList::Iterator remove_iter = symbol_iter;
-
-        --symbol_iter;
-
-        document.Symbols ().Remove (stl::distance (document.Symbols ().CreateIterator (), remove_iter));
-
-        continue;
-      }
-
-      size_t check_frame = 1;
-
-      Layer::FrameList &layer_frames = symbol_layer.Frames ();
-
-      for (Layer::FrameList::Iterator symbol_frame_iter = layer_frames.CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
-        for (Frame::FrameElementList::Iterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, check_frame++)
+        if (symbol_frame_iter->FirstFrame () != check_frame - 1)
         {
-          if (symbol_frame_iter->FirstFrame () != check_frame - 1)
+          if (check_frame > 1)
           {
-            if (check_frame > 1)
+            if (!params.silent)
+              printf ("Can't fully process symbol '%s', referenced frame animation has unsupported framerate\n", symbol_iter->Name ());
+
+            bitmaps_count = check_frame - 2;
+
+            size_t invalid_frame_index = stl::distance (layer_frames.CreateIterator (), symbol_frame_iter);
+
+            ICollection<Resource>& resources = document.Resources ();
+
+            for (size_t remove_frame_index = layer_frames.Size () - 1; remove_frame_index >= invalid_frame_index; remove_frame_index--)
             {
-              if (!params.silent)
-                printf ("Can't fully process symbol '%s', referenced frame animation has unsupported framerate\n", symbol_iter->Name ());
+              Frame& remove_frame = layer_frames [remove_frame_index];
 
-              bitmaps_count = check_frame - 2;
-
-              size_t invalid_frame_index = stl::distance (layer_frames.CreateIterator (), symbol_frame_iter);
-
-              ICollection<Resource>& resources = document.Resources ();
-
-              for (size_t remove_frame_index = layer_frames.Size () - 1; remove_frame_index >= invalid_frame_index; remove_frame_index--)
-              {
-                Frame& remove_frame = layer_frames [remove_frame_index];
-
-                for (Frame::FrameElementList::Iterator remove_element_iter = remove_frame.Elements ().CreateIterator (); remove_element_iter; ++remove_element_iter)
-                  for (size_t resource_index = 0, count = resources.Size (); resource_index < count; resource_index++)
+              for (Frame::FrameElementList::Iterator remove_element_iter = remove_frame.Elements ().CreateIterator (); remove_element_iter; ++remove_element_iter)
+                for (size_t resource_index = 0, count = resources.Size (); resource_index < count; resource_index++)
+                {
+                  if (!xtl::xstrcmp (resources [resource_index].Name (), remove_element_iter->Name ()))
                   {
-                    if (!xtl::xstrcmp (resources [resource_index].Name (), remove_element_iter->Name ()))
-                    {
-                      resources.Remove (resource_index);
-                      break;
-                    }
+                    resources.Remove (resource_index);
+                    break;
                   }
+                }
 
-                layer_frames.Remove (remove_frame_index);
-              }
-
-              symbol_frame_iter.clear ();
-              break;
+              layer_frames.Remove (remove_frame_index);
             }
-            else
-              throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced frame animation has unsupported framerate", symbol_iter->Name ());
-          }
 
-          stl::string correct_element_name = common::format ("%s%u.%s", save_folder_name.c_str (), check_frame, params.textures_format.c_str ());
-
-          Resource& frame_resource = document.Resources () [symbol_element_iter->Name ()];
-
-          Image frame (frame_resource.Path ());
-
-          if (params.need_crop_alpha)
-            if (frame.Format () != PixelFormat_RGBA8)
-              throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains frames with not RGBA8 pixel format", symbol_iter->Name ());
-
-          frame.GetImage (crop_rect.x, crop_rect.y, 0, crop_rect.width, crop_rect.height, 1, PixelFormat_RGBA8, image_copy_buffer.data ());
-
-          size_t new_image_width = crop_rect.width,
-                 new_image_height = crop_rect.height;
-
-          if (params.need_pot_extent)
-          {
-            new_image_width  = get_next_higher_power_of_two (new_image_width);
-            new_image_height = get_next_higher_power_of_two (new_image_height);
-          }
-
-          Image cropped_frame (new_image_width, new_image_height, 1, PixelFormat_RGBA8);
-
-          cropped_frame.PutImage (0, new_image_height - crop_rect.height, 0, crop_rect.width, crop_rect.height, 1, PixelFormat_RGBA8, image_copy_buffer.data ());
-
-          cropped_frame.Save (correct_element_name.c_str ());
-
-          tiling_map.insert_pair (correct_element_name.c_str (), vec2ui (crop_rect.width, crop_rect.height));
-
-          symbol_element_iter->SetName (correct_element_name.c_str ());
-
-          Resource new_resource;
-
-          new_resource.SetName (correct_element_name.c_str ());
-          new_resource.SetPath (correct_element_name.c_str ());
-
-          document.Resources ().Add (new_resource);
-
-          used_resources.insert (new_resource.Name ());
-
-            //update transformation and translation
-          vec2f current_transformation_point = symbol_element_iter->TransformationPoint (),
-                current_translation          = symbol_element_iter->Translation ();
-
-          if (params.animations_needs_pivot)
-          {
-            symbol_element_iter->SetTransformationPoint (vec2f (image_width / 2.f + current_transformation_point.x - crop_rect.x, image_height / 2.f + current_transformation_point.y - crop_rect.y));
-            symbol_element_iter->SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
+            symbol_frame_iter.clear ();
+            break;
           }
           else
-          {
-            symbol_element_iter->SetTransformationPoint (vec2f (current_transformation_point.x - crop_rect.x, current_transformation_point.y - crop_rect.y));
-            symbol_element_iter->SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
-          }
+            throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced frame animation has unsupported framerate", symbol_iter->Name ());
         }
-    }
+
+        stl::string correct_element_name;
+
+        if (bitmaps_count > 1)
+          correct_element_name = common::format ("%s%u.%s", save_folder_name.c_str (), check_frame, params.textures_format.c_str ());
+        else
+        {
+          stl::string resource_file_base_name = common::notdir (common::basename (resource.Path ()));
+          correct_element_name    = common::format ("%s%s.%s", save_folder_name.c_str (), resource_file_base_name.c_str (), params.textures_format.c_str ());
+        }
+
+        Resource& frame_resource = document.Resources () [symbol_element_iter->Name ()];
+
+        Image frame (frame_resource.Path ());
+
+        frame.GetImage (crop_rect.x, crop_rect.y, 0, crop_rect.width, crop_rect.height, 1, frame.Format (), image_copy_buffer.data ());
+
+        size_t new_image_width = crop_rect.width,
+               new_image_height = crop_rect.height;
+
+        if (params.need_pot_extent)
+        {
+          new_image_width  = get_next_higher_power_of_two (new_image_width);
+          new_image_height = get_next_higher_power_of_two (new_image_height);
+        }
+
+        Image cropped_frame (new_image_width, new_image_height, 1, frame.Format ());
+
+        cropped_frame.PutImage (0, new_image_height - crop_rect.height, 0, crop_rect.width, crop_rect.height, 1, frame.Format (), image_copy_buffer.data ());
+
+        cropped_frame.Save (correct_element_name.c_str ());
+
+        if (crop_rect.width != new_image_width || crop_rect.height != new_image_height)
+          tiling_map.insert_pair (correct_element_name.c_str (), vec2ui (crop_rect.width, crop_rect.height));
+
+        symbol_element_iter->SetName (correct_element_name.c_str ());
+
+        Resource new_resource;
+
+        new_resource.SetName (correct_element_name.c_str ());
+        new_resource.SetPath (correct_element_name.c_str ());
+
+        document.Resources ().Add (new_resource);
+
+        used_resources.insert (new_resource.Name ());
+
+          //update transformation and translation
+        vec2f current_transformation_point = symbol_element_iter->TransformationPoint (),
+              current_translation          = symbol_element_iter->Translation ();
+
+        if (params.animations_needs_pivot && bitmaps_count > 1)
+        {
+          symbol_element_iter->SetTransformationPoint (vec2f (image_width / 2.f + current_transformation_point.x - crop_rect.x, image_height / 2.f + current_transformation_point.y - crop_rect.y));
+          symbol_element_iter->SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
+        }
+        else
+        {
+          symbol_element_iter->SetTransformationPoint (vec2f (current_transformation_point.x - crop_rect.x, current_transformation_point.y - crop_rect.y));
+          symbol_element_iter->SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
+        }
+      }
   }
 
   ICollection<Resource>& resources = document.Resources ();
@@ -1027,7 +993,7 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
 
           writer.WriteAttribute ("Name", "size");
 
-          write_track_key (writer, 0, vec2f (image.Width () * target_width_abs / (float)document.Width (), image.Height () * target_height_abs / (float)document.Height ()));
+          write_track_key (writer, 0, vec2f (image_width * target_width_abs / (float)document.Width (), image_height * target_height_abs / (float)document.Height ()));
         }
 
         {
