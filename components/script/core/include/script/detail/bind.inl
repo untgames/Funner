@@ -43,8 +43,8 @@ inline int         make_invoker_argument (unsigned int value)       { return val
 inline int         make_invoker_argument (long value)               { return value; }
 inline int         make_invoker_argument (unsigned long value)      { return value; }
 inline float       make_invoker_argument (float value)              { return value; }
-inline float       make_invoker_argument (const double& value)      { return static_cast<float> (value); }
-inline float       make_invoker_argument (const long double& value) { return static_cast<float> (value); }
+inline float       make_invoker_argument (double value)             { return static_cast<float> (value); }
+inline float       make_invoker_argument (long double value)        { return static_cast<float> (value); }
 inline void*       make_invoker_argument (void* value)              { return value; }
 inline void*       make_invoker_argument (const void* value)        { return (void*)value; }
 inline const char* make_invoker_argument (const char* string)       { return string; }
