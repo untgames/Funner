@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include <stl/map>
+#include <stl/hash_map>
 #include <stl/hash_set>
 #include <stl/string>
 #include <stl/vector>
@@ -92,9 +93,28 @@ struct rgba_t
   unsigned char alpha;
 };
 
-typedef stl::hash_set<const char*>                                 UsedResourcesSet;
+typedef stl::hash_set<stl::hash_key<const char*> >                 UsedResourcesSet;
+typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>          ResourceTilingMap;
 typedef stl::multimap<float, stl::string, stl::less<float> >       ActivateSpritesMap;
 typedef CollectionImpl<Vec2fKeyframe, ICollection<Vec2fKeyframe> > Vec2fKeyframes;
+
+//получение ближайшей сверху степени двойки
+size_t get_next_higher_power_of_two (size_t k)
+{
+  if (!k)
+    return 1;
+
+  if (!(k & (k-1)))
+    return k;
+
+  k--;
+
+  for (size_t i=1; i < sizeof (size_t) * 8; i *= 2)
+          k |= k >> i;
+
+  return k + 1;
+}
+
 
 //печать ошибки с выходом из программы
 void error (const char* format, ...)
@@ -436,7 +456,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
   }
 }
 
-void save_materials (const Params& params, const Document& document)
+void save_materials (const Params& params, const Document& document, const ResourceTilingMap& tiling_map)
 {
   stl::string xmtl_name = params.materials_file_name;
 
@@ -461,6 +481,15 @@ void save_materials (const Params& params, const Document& document)
 
     writer.WriteAttribute ("image", iter->Path ());
     writer.WriteAttribute ("blend_mode", "translucent");
+
+    ResourceTilingMap::const_iterator tiling = tiling_map.find (iter->Name ());
+
+    if (tiling != tiling_map.end ())
+    {
+      writer.WriteAttribute ("tiling", "1");
+      writer.WriteAttribute ("tile_width", tiling->second.x);
+      writer.WriteAttribute ("tile_height", tiling->second.y);
+    }
   }
 }
 
@@ -638,7 +667,7 @@ void union_rect (const Rect& rect1, Rect& target_rect)
     target_rect = rect1;
 }
 
-void preprocess_symbols (const Params& params, Document& document)
+void preprocess_symbols (const Params& params, Document& document, ResourceTilingMap& tiling_map)
 {
   static const char* METHOD_NAME = "preprocess_symbols";
 
@@ -670,7 +699,7 @@ void preprocess_symbols (const Params& params, Document& document)
 
     memset (&crop_rect, 0, sizeof (crop_rect));
 
-    if (!params.need_crop_alpha)
+    if (!params.need_crop_alpha || image.Format () != PixelFormat_RGBA8)
     {
       crop_rect.width  = image_width;
       crop_rect.height = image_height;
@@ -715,12 +744,37 @@ void preprocess_symbols (const Params& params, Document& document)
     if (!FileSystem::IsDir (save_folder_name.c_str ()))
       FileSystem::Mkdir (save_folder_name.c_str ());
 
+    xtl::uninitialized_storage<char> image_copy_buffer (get_bytes_per_pixel (image.Format ()) * crop_rect.width * crop_rect.height);
+
     if (bitmaps_count == 1)
     {
       stl::string resource_file_base_name = common::notdir (common::basename (resource.Path ())),
                   correct_element_name    = common::format ("%s%s.%s", save_folder_name.c_str (), resource_file_base_name.c_str (), params.textures_format.c_str ());
 
-      image.Save (correct_element_name.c_str ());
+      size_t new_image_width  = crop_rect.width,
+             new_image_height = crop_rect.height;
+
+      if (params.need_pot_extent)
+      {
+        new_image_width  = get_next_higher_power_of_two (new_image_width),
+        new_image_height = get_next_higher_power_of_two (new_image_height);
+      }
+
+      Image new_image (new_image_width, new_image_height, 1, image.Format ());
+
+      image.GetImage (crop_rect.x, crop_rect.y, 0, crop_rect.width, crop_rect.height, 1, image.Format (), image_copy_buffer.data ());
+      new_image.PutImage (0, new_image_height - crop_rect.height, 0, crop_rect.width, crop_rect.height, 1, image.Format (), image_copy_buffer.data ());
+
+      new_image.Save (correct_element_name.c_str ());
+
+      tiling_map.insert_pair (correct_element_name.c_str (), vec2ui (crop_rect.width, crop_rect.height));
+
+      //update transformation and translation
+      vec2f current_transformation_point = resource_element.TransformationPoint (),
+            current_translation          = resource_element.Translation ();
+
+      resource_element.SetTransformationPoint (vec2f (current_transformation_point.x - crop_rect.x, current_transformation_point.y - crop_rect.y));
+      resource_element.SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
 
       resource_element.SetName (correct_element_name.c_str ());
 
@@ -750,8 +804,6 @@ void preprocess_symbols (const Params& params, Document& document)
       }
 
       size_t check_frame = 1;
-
-      xtl::uninitialized_storage<char> image_copy_buffer (get_bytes_per_pixel (image.Format ()) * crop_rect.width * crop_rect.height);
 
       Layer::FrameList &layer_frames = symbol_layer.Frames ();
 
@@ -802,18 +854,27 @@ void preprocess_symbols (const Params& params, Document& document)
           Image frame (frame_resource.Path ());
 
           if (params.need_crop_alpha)
-          {
             if (frame.Format () != PixelFormat_RGBA8)
               throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains frames with not RGBA8 pixel format", symbol_iter->Name ());
 
-            frame.GetImage (crop_rect.x, crop_rect.y, 0, crop_rect.width, crop_rect.height, 1, PixelFormat_RGBA8, image_copy_buffer.data ());
+          frame.GetImage (crop_rect.x, crop_rect.y, 0, crop_rect.width, crop_rect.height, 1, PixelFormat_RGBA8, image_copy_buffer.data ());
 
-            Image cropped_frame (crop_rect.width, crop_rect.height, 1, PixelFormat_RGBA8, image_copy_buffer.data ());
+          size_t new_image_width = crop_rect.width,
+                 new_image_height = crop_rect.height;
 
-            cropped_frame.Save (correct_element_name.c_str ());
+          if (params.need_pot_extent)
+          {
+            new_image_width  = get_next_higher_power_of_two (new_image_width);
+            new_image_height = get_next_higher_power_of_two (new_image_height);
           }
-          else
-            frame.Save (correct_element_name.c_str ());
+
+          Image cropped_frame (new_image_width, new_image_height, 1, PixelFormat_RGBA8);
+
+          cropped_frame.PutImage (0, new_image_height - crop_rect.height, 0, crop_rect.width, crop_rect.height, 1, PixelFormat_RGBA8, image_copy_buffer.data ());
+
+          cropped_frame.Save (correct_element_name.c_str ());
+
+          tiling_map.insert_pair (correct_element_name.c_str (), vec2ui (crop_rect.width, crop_rect.height));
 
           symbol_element_iter->SetName (correct_element_name.c_str ());
 
@@ -855,11 +916,11 @@ void preprocess_symbols (const Params& params, Document& document)
   }
 }
 
-void save_timeline (const Params& params, Document& document, const Timeline& timeline)
+void save_timeline (const Params& params, Document& document, const Timeline& timeline, ResourceTilingMap& tiling_map)
 {
   static const char* METHOD_NAME = "save_timeline";
 
-  preprocess_symbols (params, document);
+  preprocess_symbols (params, document, tiling_map);
 
   stl::string xml_name;
 
@@ -921,6 +982,14 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
 
         size_t image_width  = image.Width (),
                image_height = image.Height ();
+
+        ResourceTilingMap::const_iterator tiling = tiling_map.find (resource.Name ());
+
+        if (tiling != tiling_map.end ())
+        {
+          image_width  = tiling->second.x;
+          image_height = tiling->second.y;
+        }
 
         writer.WriteAttribute ("Active", "false");
         writer.WriteAttribute ("Name", resource.Name ());
@@ -1093,10 +1162,12 @@ void export_data (Params& params)
     params.bottom_y = params.top_y - params.target_height;
   }
 
-  for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
-    save_timeline (params, document, *iter);
+  ResourceTilingMap tiling_map;
 
-  save_materials (params, document);
+  for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
+    save_timeline (params, document, *iter, tiling_map);
+
+  save_materials (params, document, tiling_map);
 }
 
 //проверка корректности ввода
