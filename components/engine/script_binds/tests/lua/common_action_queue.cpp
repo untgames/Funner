@@ -8,6 +8,8 @@ int main ()
 
   try
   {
+//    common::LogFilter filter ("*", &print_log);
+    
     xtl::shared_ptr<Environment> env (new Environment);
 
     Shell shell ("lua", env);

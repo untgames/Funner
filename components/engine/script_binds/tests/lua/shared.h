@@ -26,6 +26,11 @@
 using namespace script;
 using namespace math;
 
+void print_log (const char* log, const char* message)
+{
+  printf ("%s: %s\n", log, message);
+}
+
 inline void print (float x)
 {
   printf ("%g", x);

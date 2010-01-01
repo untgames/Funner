@@ -17,7 +17,7 @@ export.link.engine.script_binds.engine.IMPORTS       := link.engine.script_binds
 
 # Link input exports
 export.link.engine.script_binds.input.LINK_INCLUDES := InputScriptBind
-export.link.engine.script_binds.input.IMPORTS       := link.engine.script_binds
+export.link.engine.script_binds.input.IMPORTS       := link.engine.script_binds link.input.manager
 
 # Link lua override exports
 export.link.engine.script_binds.lua_override.LINK_INCLUDES := LuaOverrideScriptBind
