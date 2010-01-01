@@ -676,12 +676,13 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
   if (!FileSystem::IsDir (params.output_textures_dir_name.c_str ()))
     FileSystem::Mkdir (params.output_textures_dir_name.c_str ());
 
-  for (Document::SymbolList::Iterator symbol_iter = document.Symbols ().CreateIterator (); symbol_iter; ++symbol_iter)
+  for (size_t symbol_index = 0; symbol_index < document.Symbols ().Size (); symbol_index++)
   {
-    const Timeline& symbol_timeline = symbol_iter->Timeline ();
+    const Symbol&   symbol          = ((ICollection<Symbol>&)document.Symbols ()) [symbol_index];
+    const Timeline& symbol_timeline = symbol.Timeline ();
 
     if (symbol_timeline.Layers ().Size () > 1)
-      xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', it has more than one layer", symbol_iter->Name ());
+      xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', it has more than one layer", symbol.Name ());
 
     Layer&        symbol_layer       = ((ICollection<Layer>&)symbol_timeline.Layers ()) [0];
     Frame&        first_symbol_frame = ((ICollection<Frame>&)symbol_layer.Frames ()) [0];
@@ -709,7 +710,7 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
       for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, bitmaps_count++)
       {
         if (symbol_element_iter->Type () != FrameElementType_ResourceInstance)
-          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains elements other than resource instance", symbol_iter->Name ());
+          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains elements other than resource instance", symbol.Name ());
 
         const Resource& frame_resource = document.Resources () [symbol_element_iter->Name ()];
 
@@ -719,7 +720,7 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
                frame_height = frame.Height ();
 
         if (frame_width != image_width || frame_height != image_height)
-          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains animations with different frame size", symbol_iter->Name ());
+          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains animations with different frame size", symbol.Name ());
 
         if (frame.Format () != PixelFormat_RGBA8)
           continue;
@@ -736,9 +737,9 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
       }
 
     if (!bitmaps_count)
-      throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced symbol elements has no resource instance", symbol_iter->Name ());
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced symbol elements has no resource instance", symbol.Name ());
 
-    stl::string resource_dir     = common::dir (resource.Name ()),
+    stl::string resource_dir = common::dir (resource.Name ()),
                 save_folder_name;
 
     if (resource_dir == "./")
@@ -754,13 +755,9 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
     if (!crop_rect.width || !crop_rect.height)
     {
       if (!params.silent)
-        printf ("Can't process symbol '%s', referenced frame animation has empty image\n", symbol_iter->Name ());
+        printf ("Can't process symbol '%s', referenced frame animation has empty image\n", symbol.Name ());
 
-      Document::SymbolList::Iterator remove_iter = symbol_iter;
-
-      --symbol_iter;
-
-      document.Symbols ().Remove (stl::distance (document.Symbols ().CreateIterator (), remove_iter));
+      document.Symbols ().Remove (symbol_index--);
 
       continue;
     }
@@ -777,7 +774,7 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
           if (check_frame > 1)
           {
             if (!params.silent)
-              printf ("Can't fully process symbol '%s', referenced frame animation has unsupported framerate\n", symbol_iter->Name ());
+              printf ("Can't fully process symbol '%s', referenced frame animation has unsupported framerate\n", symbol.Name ());
 
             bitmaps_count = check_frame - 2;
 
@@ -806,7 +803,7 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
             break;
           }
           else
-            throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced frame animation has unsupported framerate", symbol_iter->Name ());
+            throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced frame animation has unsupported framerate", symbol.Name ());
         }
 
         stl::string correct_element_name;
@@ -958,9 +955,9 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
         }
 
         writer.WriteAttribute ("Active", "false");
-        writer.WriteAttribute ("Name", resource.Name ());
+        writer.WriteAttribute ("Name", element_iter->Name ());
 
-        activate_sprites_info.insert_pair (begin_time, common::format ("ActivateSprite('%s')", resource.Name ()));
+        activate_sprites_info.insert_pair (begin_time, common::format ("ActivateSprite('%s')", element_iter->Name ()));
 
         for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
           for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, bitmaps_count++);
@@ -1065,7 +1062,7 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
 
           writer.WriteAttribute ("Name", "events");
 
-          stl::string event_string = common::format ("DeactivateSprite ('%s')", resource.Name ());
+          stl::string event_string = common::format ("DeactivateSprite ('%s')", element_iter->Name ());
 
           write_track_key (writer, duration, event_string.c_str (), "Event");
         }
