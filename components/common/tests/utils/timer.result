@@ -1,0 +1,14 @@
+Results of timer_test:
+default timer: time=0.000 auto_update=true started=false
+timer with source: time=0.000 auto_update=true started=true
+timer with source (after time change): time=1.200 auto_update=true started=true
+timer with source (after stop & time change): time=1.200 auto_update=true started=false
+timer with source (after resume): time=1.200 auto_update=true started=true
+timer with source (after resume & time change): time=1.500 auto_update=true started=true
+timer with source (no auto update): time=1.500 auto_update=false started=true
+timer with source (after manual update): time=1.800 auto_update=false started=true
+child timer: time=0.000 auto_update=true started=true
+child timer (after time change): time=0.500 auto_update=true started=true
+child timer (after parent timer stop): time=0.500 auto_update=true started=true
+child timer (after parent timer resume): time=0.600 auto_update=true started=true
+child timer (after parent timer reset): time=-1.800 auto_update=true started=true
