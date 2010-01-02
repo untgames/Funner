@@ -56,6 +56,8 @@ struct Params
   stl::string   textures_format;          //формат текстур
   stl::string   materials_file_name;      //файл материалов
   stl::string   animation_dir_name;       //папка файлов анимаций
+  stl::string   crop_exclude;             //необрезаемые слои
+  stl::string   layers_exclude;           //неэкспортируемые слои
   size_t        crop_alpha;               //коэффициент обрезания по прозрачности
   size_t        resize_width;             //целевой размер для пережатия текстур
   size_t        resize_height;            //целевой размер для пережатия текстур
@@ -202,6 +204,18 @@ void command_line_animation_dir_name (const char* file_name, Params& params)
   params.animation_dir_name = file_name;
 }
 
+//установка необрезаемых слоёв
+void command_line_crop_exclude (const char* string, Params& params)
+{
+  params.crop_exclude = string;
+}
+
+//установка неэкспортируемых слоёв
+void command_line_layers_exclude (const char* string, Params& params)
+{
+  params.layers_exclude = string;
+}
+
 //установка целевого размера экрана для пережатия текстур
 void command_line_resize_width (const char* value, Params& params)
 {
@@ -285,6 +299,8 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_result_textures_format,     "textures-format",       0,   "string",    "set output textures format string"},
     {command_line_materials_file_name,        "materials-file",        0,   "file",      "set output materials file"},
     {command_line_animation_dir_name,         "animation-dir",         0,   "dir",       "set output animation directory"},
+    {command_line_crop_exclude,               "crop-exclude",          0,   "wildcards", "exclude selected layers from crop"},
+    {command_line_layers_exclude,             "layers-exclude",        0,   "wildcards", "exclude selected layers from export"},
     {command_line_resize_width,               "resize-width",          0,   "value",     "set target screen width for texture resizing"},
     {command_line_resize_height,              "resize-height",         0,   "value",     "set target screen height for texture resizing"},
     {command_line_left_x,                     "left-x",                0,   "value",     "set left x coordinate for animation calculation"},
@@ -707,6 +723,8 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
   if (!FileSystem::IsDir (params.output_textures_dir_name.c_str ()))
     FileSystem::Mkdir (params.output_textures_dir_name.c_str ());
 
+  common::StringArray crop_exclude_list = common::split (params.crop_exclude.c_str ());
+
   for (size_t symbol_index = 0; symbol_index < document.Symbols ().Size (); symbol_index++)
   {
     const Symbol&   symbol          = ((ICollection<Symbol>&)document.Symbols ()) [symbol_index];
@@ -714,6 +732,22 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
 
     if (symbol_timeline.Layers ().Size () > 1)
       xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', it has more than one layer", symbol.Name ());
+
+    bool need_crop_alpha = params.need_crop_alpha;
+
+    if (need_crop_alpha)
+    {
+      for (size_t i = 0, count = crop_exclude_list.Size (); i < count; i++)
+      {
+        const char* mask = crop_exclude_list [i];
+
+        if (common::wcmatch (symbol.Name (), mask))
+        {
+          need_crop_alpha = false;
+          break;
+        }
+      }
+    }
 
     Layer&        symbol_layer       = ((ICollection<Layer>&)symbol_timeline.Layers ()) [0];
     Frame&        first_symbol_frame = ((ICollection<Frame>&)symbol_layer.Frames ()) [0];
@@ -731,7 +765,7 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
 
     memset (&crop_rect, 0, sizeof (crop_rect));
 
-    if (!params.need_crop_alpha || image.Format () != PixelFormat_RGBA8)
+    if (!need_crop_alpha || image.Format () != PixelFormat_RGBA8)
     {
       crop_rect.width  = image_width;
       crop_rect.height = image_height;
@@ -756,7 +790,7 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
         if (frame.Format () != PixelFormat_RGBA8)
           continue;
 
-        if (params.need_crop_alpha)
+        if (need_crop_alpha)
         {
           Rect frame_crop_rect;
 
@@ -948,9 +982,27 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
 
   ActivateSpritesMap activate_sprites_info;
 
+  common::StringArray layers_exclude_list = common::split (params.layers_exclude.c_str ());
+
   for (int i = timeline.Layers ().Size () - 1; i >= 0; i--)
   {
     const Layer& layer = ((ICollection<Layer>&)timeline.Layers ()) [i];
+
+    bool ignore_layer = false;
+
+    for (size_t j = 0, count = layers_exclude_list.Size (); j < count; j++)
+    {
+      const char* mask = layers_exclude_list [j];
+
+      if (common::wcmatch (layer.Name (), mask))
+      {
+        ignore_layer = true;
+        break;
+      }
+    }
+
+    if (ignore_layer)
+      continue;
 
     for (Layer::FrameList::ConstIterator frame_iter = layer.Frames ().CreateIterator (); frame_iter; ++frame_iter)
       for (Frame::FrameElementList::ConstIterator element_iter = frame_iter->Elements ().CreateIterator (); element_iter; ++element_iter)
