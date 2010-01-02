@@ -711,7 +711,7 @@ void union_rect (const Rect& rect1, Rect& target_rect)
     target_rect = rect1;
 }
 
-void preprocess_symbols (const Params& params, Document& document, ResourceTilingMap& tiling_map, MaterialInstancesList& material_instances)
+void preprocess_symbols (const Params& params, Document& document, const UsedResourcesSet& used_symbols, ResourceTilingMap& tiling_map, MaterialInstancesList& material_instances)
 {
   static const char* METHOD_NAME = "preprocess_symbols";
 
@@ -727,7 +727,11 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
 
   for (size_t symbol_index = 0; symbol_index < document.Symbols ().Size (); symbol_index++)
   {
-    const Symbol&   symbol          = ((ICollection<Symbol>&)document.Symbols ()) [symbol_index];
+    const Symbol& symbol = ((ICollection<Symbol>&)document.Symbols ()) [symbol_index];
+
+    if (used_symbols.find (symbol.Name ()) == used_symbols.end ())
+      continue;
+
     const Timeline& symbol_timeline = symbol.Timeline ();
 
     if (symbol_timeline.Layers ().Size () > 1)
@@ -954,8 +958,6 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
 void save_timeline (const Params& params, Document& document, const Timeline& timeline, ResourceTilingMap& tiling_map, MaterialInstancesList& material_instances)
 {
   static const char* METHOD_NAME = "save_timeline";
-
-  preprocess_symbols (params, document, tiling_map, material_instances);
 
   stl::string xml_name;
 
@@ -1195,6 +1197,40 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
     write_track_key (writer, iter->first, iter->second.c_str (), "Event");
 }
 
+//построение списка используемых символов
+void build_used_symbols (const Params& params, const Timeline& timeline, UsedResourcesSet& used_symbols)
+{
+  common::StringArray layers_exclude_list = common::split (params.layers_exclude.c_str ());
+
+  for (Timeline::LayerList::ConstIterator layer_iter = timeline.Layers ().CreateIterator (); layer_iter; ++layer_iter)
+  {
+    bool ignore_layer = false;
+
+    for (size_t i = 0, count = layers_exclude_list.Size (); i < count; i++)
+    {
+      const char* mask = layers_exclude_list [i];
+
+      if (common::wcmatch (layer_iter->Name (), mask))
+      {
+        ignore_layer = true;
+        break;
+      }
+    }
+
+    if (ignore_layer)
+      continue;
+
+    for (Layer::FrameList::ConstIterator frame_iter = layer_iter->Frames ().CreateIterator (); frame_iter; ++frame_iter)
+      for (Frame::FrameElementList::ConstIterator element_iter = frame_iter->Elements ().CreateIterator (); element_iter; ++element_iter)
+      {
+        if (element_iter->Type () != FrameElementType_SymbolInstance)
+          continue;
+
+        used_symbols.insert (element_iter->Name ());
+      }
+  }
+}
+
 //экспорт
 void export_data (Params& params)
 {
@@ -1237,6 +1273,12 @@ void export_data (Params& params)
 
   ResourceTilingMap     tiling_map;
   MaterialInstancesList material_instances;
+  UsedResourcesSet      used_symbols;
+
+  for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
+    build_used_symbols (params, *iter, used_symbols);
+
+  preprocess_symbols (params, document, used_symbols, tiling_map, material_instances);
 
   for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
     save_timeline (params, document, *iter, tiling_map, material_instances);
