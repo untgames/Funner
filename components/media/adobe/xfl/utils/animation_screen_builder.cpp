@@ -30,7 +30,7 @@ const char* XFL_MOUNT_POINT  = "/mount_points/animation.xfl";
 
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 
-const float EPSILON   = 0.001;
+const float EPSILON = 0.001;
 
 struct Params;
 
@@ -97,6 +97,15 @@ typedef stl::hash_set<stl::hash_key<const char*> >                 UsedResources
 typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>          ResourceTilingMap;
 typedef stl::multimap<float, stl::string, stl::less<float> >       ActivateSpritesMap;
 typedef CollectionImpl<Vec2fKeyframe, ICollection<Vec2fKeyframe> > Vec2fKeyframes;
+
+//сравнение дробных чисел
+bool float_compare (float v1, float v2)
+{
+  if ((v1 > v2 + EPSILON) || (v1 < v2 - EPSILON))
+    return false;
+
+  return true;
+}
 
 //получение ближайшей сверху степени двойки
 size_t get_next_higher_power_of_two (size_t k)
@@ -671,6 +680,9 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
 {
   static const char* METHOD_NAME = "preprocess_symbols";
 
+  float resize_x_factor = params.resize_width ? params.resize_width / (float)document.Width () : 1.f,
+        resize_y_factor = params.resize_height ? params.resize_height / (float)document.Height () : 1.f;
+
   UsedResourcesSet used_resources;
 
   if (!FileSystem::IsDir (params.output_textures_dir_name.c_str ()))
@@ -739,19 +751,6 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
     if (!bitmaps_count)
       throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced symbol elements has no resource instance", symbol.Name ());
 
-    stl::string resource_dir = common::dir (resource.Name ()),
-                save_folder_name;
-
-    if (resource_dir == "./")
-      save_folder_name = common::format ("%s/", params.output_textures_dir_name.c_str ());
-    else
-      save_folder_name = common::format ("%s/%s", params.output_textures_dir_name.c_str (), resource_dir.c_str ());
-
-    if (!FileSystem::IsDir (save_folder_name.c_str ()))
-      FileSystem::Mkdir (save_folder_name.c_str ());
-
-    xtl::uninitialized_storage<char> image_copy_buffer (get_bytes_per_pixel (image.Format ()) * crop_rect.width * crop_rect.height);
-
     if (!crop_rect.width || !crop_rect.height)
     {
       if (!params.silent)
@@ -762,7 +761,37 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
       continue;
     }
 
+    stl::string resource_dir = common::dir (resource.Name ()),
+                save_folder_name;
+
+    if (resource_dir == "./")
+      save_folder_name = common::format ("%s/", params.output_textures_dir_name.c_str ());
+    else
+      save_folder_name = common::format ("%s/%s", params.output_textures_dir_name.c_str (), resource_dir.c_str ());
+
+    size_t resized_image_width  = image_width      * resize_x_factor,
+           resized_image_height = image_height     * resize_y_factor,
+           resized_crop_width   = crop_rect.width  * resize_x_factor,
+           resized_crop_height  = crop_rect.height * resize_y_factor,
+           resized_crop_x       = crop_rect.x      * resize_x_factor,
+           resized_crop_y       = crop_rect.y      * resize_y_factor;
+
+    if (!params.resize_width)
+    {
+       resized_image_width  = image_width,
+       resized_image_height = image_height,
+       resized_crop_width   = crop_rect.width,
+       resized_crop_height  = crop_rect.height,
+       resized_crop_x       = crop_rect.x,
+       resized_crop_y       = crop_rect.y;
+    }
+
+    xtl::uninitialized_storage<char> image_copy_buffer (get_bytes_per_pixel (image.Format ()) * resized_crop_width * resized_crop_height);
+
     size_t check_frame = 1;
+
+    if (!FileSystem::IsDir (save_folder_name.c_str ()))
+      FileSystem::Mkdir (save_folder_name.c_str ());
 
     Layer::FrameList &layer_frames = symbol_layer.Frames ();
 
@@ -820,10 +849,13 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
 
         Image frame (frame_resource.Path ());
 
-        frame.GetImage (crop_rect.x, crop_rect.y, 0, crop_rect.width, crop_rect.height, 1, frame.Format (), image_copy_buffer.data ());
+        if (params.resize_width)
+          frame.Resize (resized_image_width, resized_image_height, 1);
 
-        size_t new_image_width = crop_rect.width,
-               new_image_height = crop_rect.height;
+        frame.GetImage (resized_crop_x, resized_crop_y, 0, resized_crop_width, resized_crop_height, 1, frame.Format (), image_copy_buffer.data ());
+
+        size_t new_image_width = resized_crop_width,
+               new_image_height = resized_crop_height;
 
         if (params.need_pot_extent)
         {
@@ -833,12 +865,12 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
 
         Image cropped_frame (new_image_width, new_image_height, 1, frame.Format ());
 
-        cropped_frame.PutImage (0, new_image_height - crop_rect.height, 0, crop_rect.width, crop_rect.height, 1, frame.Format (), image_copy_buffer.data ());
+        cropped_frame.PutImage (0, new_image_height - resized_crop_height, 0, resized_crop_width, resized_crop_height, 1, frame.Format (), image_copy_buffer.data ());
 
         cropped_frame.Save (correct_element_name.c_str ());
 
-        if (crop_rect.width != new_image_width || crop_rect.height != new_image_height)
-          tiling_map.insert_pair (correct_element_name.c_str (), vec2ui (crop_rect.width, crop_rect.height));
+        if (resized_crop_width != new_image_width || resized_crop_height != new_image_height)
+          tiling_map.insert_pair (correct_element_name.c_str (), vec2ui (resized_crop_width, resized_crop_height));
 
         symbol_element_iter->SetName (correct_element_name.c_str ());
 
@@ -904,7 +936,9 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
   int   target_width_abs  = abs (params.target_width),
         target_height_abs = abs (params.target_height);
   float x_scale           = (float)params.target_width / document.Width (),
-        y_scale           = (float)params.target_height / document.Height ();
+        y_scale           = (float)params.target_height / document.Height (),
+        resize_x_factor   = params.resize_width ? params.resize_width / (float)document.Width () : 1.f,
+        resize_y_factor   = params.resize_height ? params.resize_height / (float)document.Height () : 1.f;
 
   ActivateSpritesMap activate_sprites_info;
 
@@ -979,8 +1013,8 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
         vec2f transformation_point (element_iter->TransformationPoint ().x + resource_element.TransformationPoint ().x,
                                     element_iter->TransformationPoint ().y + resource_element.TransformationPoint ().y);
 
-        stl::string pivot_value_string = common::format ("%f;%f;0", transformation_point.x / image_width - 0.5f,
-                                                                    transformation_point.y / image_height - 0.5f);
+        stl::string pivot_value_string = common::format ("%f;%f;0", transformation_point.x / image_width * resize_x_factor - 0.5f,
+                                                                    transformation_point.y / image_height * resize_y_factor - 0.5f);
 
         writer.WriteAttribute ("PivotPosition", pivot_value_string.c_str());
 
@@ -990,7 +1024,7 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
 
           writer.WriteAttribute ("Name", "size");
 
-          write_track_key (writer, 0, vec2f (image_width * target_width_abs / (float)document.Width (), image_height * target_height_abs / (float)document.Height ()));
+          write_track_key (writer, 0, vec2f (image_width / resize_x_factor * target_width_abs / (float)document.Width (), image_height / resize_y_factor * target_height_abs / (float)document.Height ()));
         }
 
         {
@@ -1117,13 +1151,34 @@ void export_data (Params& params)
 
   Document document (params.xfl_name.c_str ());
 
+  size_t document_width  = document.Width (),
+         document_height = document.Height ();
+
   if (!params.target_width || !params.target_height)
   {
-    params.target_width  = document.Width ();
-    params.target_height = document.Height ();
-    params.right_x  = params.left_x + params.target_width;
-    params.bottom_y = params.top_y - params.target_height;
+    params.target_width  = document_width;
+    params.target_height = document_height;
+    params.right_x       = params.left_x + params.target_width;
+    params.bottom_y      = params.top_y - params.target_height;
   }
+
+  float document_aspect_ratio = document_width / (float)document_height;
+
+  if (!params.resize_width && params.resize_height)
+    params.resize_width = params.resize_height * document_aspect_ratio;
+  else if (params.resize_width && !params.resize_height)
+    params.resize_height = params.resize_width / document_aspect_ratio;
+
+  if (params.resize_width && params.resize_height)
+  {
+    float resize_aspect_ratio = params.resize_width / (float)params.resize_height;
+
+    if (!float_compare (document_aspect_ratio, resize_aspect_ratio) && !params.silent)
+      printf ("Requested resize will greatly change image aspect ratio");
+  }
+
+  if ((params.resize_width > document_width || params.resize_height > document_height) && !params.silent)
+    printf ("Requested resize to bigger size, image quality will be reduced\n");
 
   ResourceTilingMap tiling_map;
 
