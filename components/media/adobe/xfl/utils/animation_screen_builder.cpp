@@ -93,9 +93,20 @@ struct rgba_t
   unsigned char alpha;
 };
 
+struct MaterialInstance
+{
+  stl::string material_id;
+  stl::string source_material;
+
+  MaterialInstance (const char* in_material_id, const char* in_source_material)
+    : material_id (in_material_id), source_material (in_source_material)
+    {}
+};
+
 typedef stl::hash_set<stl::hash_key<const char*> >                 UsedResourcesSet;
 typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>          ResourceTilingMap;
 typedef stl::multimap<float, stl::string, stl::less<float> >       ActivateSpritesMap;
+typedef stl::list<MaterialInstance>                                MaterialInstancesList;
 typedef CollectionImpl<Vec2fKeyframe, ICollection<Vec2fKeyframe> > Vec2fKeyframes;
 
 //сравнение дробных чисел
@@ -465,7 +476,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
   }
 }
 
-void save_materials (const Params& params, const Document& document, const ResourceTilingMap& tiling_map)
+void save_materials (const Params& params, const Document& document, const ResourceTilingMap& tiling_map, const MaterialInstancesList& material_instances)
 {
   stl::string xmtl_name = params.materials_file_name;
 
@@ -499,6 +510,14 @@ void save_materials (const Params& params, const Document& document, const Resou
       writer.WriteAttribute ("tile_width", tiling->second.x);
       writer.WriteAttribute ("tile_height", tiling->second.y);
     }
+  }
+
+  for (MaterialInstancesList::const_iterator iter = material_instances.begin (), end = material_instances.end (); iter != end; ++iter)
+  {
+    XmlWriter::Scope material_scope (writer, "instance_material");
+
+    writer.WriteAttribute ("id",     iter->material_id.c_str ());
+    writer.WriteAttribute ("source", iter->source_material.c_str ());
   }
 }
 
@@ -676,7 +695,7 @@ void union_rect (const Rect& rect1, Rect& target_rect)
     target_rect = rect1;
 }
 
-void preprocess_symbols (const Params& params, Document& document, ResourceTilingMap& tiling_map)
+void preprocess_symbols (const Params& params, Document& document, ResourceTilingMap& tiling_map, MaterialInstancesList& material_instances)
 {
   static const char* METHOD_NAME = "preprocess_symbols";
 
@@ -795,47 +814,34 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
 
     Layer::FrameList &layer_frames = symbol_layer.Frames ();
 
+    stl::string correct_element_name;
+
     for (Layer::FrameList::Iterator symbol_frame_iter = layer_frames.CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
       for (Frame::FrameElementList::Iterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, check_frame++)
       {
-        if (symbol_frame_iter->FirstFrame () != check_frame - 1)
+        size_t symbol_frame_first_frame = symbol_frame_iter->FirstFrame ();
+
+        if (symbol_frame_first_frame != check_frame - 1)
         {
-          if (check_frame > 1)
+          if (check_frame == 1)
+            throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced frame animation starts not from 0 frame (%u)", symbol.Name (), symbol_frame_first_frame);
+
+          for (size_t instance_index = check_frame, last_instance_index = symbol_frame_first_frame + 1; instance_index < last_instance_index; instance_index++)
           {
-            if (!params.silent)
-              printf ("Can't fully process symbol '%s', referenced frame animation has unsupported framerate\n", symbol.Name ());
+            stl::string instance_element_name = common::format ("%s%u.%s", save_folder_name.c_str (), instance_index, params.textures_format.c_str ());
 
-            bitmaps_count = check_frame - 2;
+            material_instances.push_back (MaterialInstance (instance_element_name.c_str (), correct_element_name.c_str ()));
 
-            size_t invalid_frame_index = stl::distance (layer_frames.CreateIterator (), symbol_frame_iter);
+            Resource new_resource;
 
-            ICollection<Resource>& resources = document.Resources ();
+            new_resource.SetName (instance_element_name.c_str ());
+            new_resource.SetPath (correct_element_name.c_str ());
 
-            for (size_t remove_frame_index = layer_frames.Size () - 1; remove_frame_index >= invalid_frame_index; remove_frame_index--)
-            {
-              Frame& remove_frame = layer_frames [remove_frame_index];
-
-              for (Frame::FrameElementList::Iterator remove_element_iter = remove_frame.Elements ().CreateIterator (); remove_element_iter; ++remove_element_iter)
-                for (size_t resource_index = 0, count = resources.Size (); resource_index < count; resource_index++)
-                {
-                  if (!xtl::xstrcmp (resources [resource_index].Name (), remove_element_iter->Name ()))
-                  {
-                    resources.Remove (resource_index);
-                    break;
-                  }
-                }
-
-              layer_frames.Remove (remove_frame_index);
-            }
-
-            symbol_frame_iter.clear ();
-            break;
+            document.Resources ().Add (new_resource);
           }
-          else
-            throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced frame animation has unsupported framerate", symbol.Name ());
-        }
 
-        stl::string correct_element_name;
+          check_frame = symbol_frame_first_frame + 1;
+        }
 
         if (bitmaps_count > 1)
           correct_element_name = common::format ("%s%u.%s", save_folder_name.c_str (), check_frame, params.textures_format.c_str ());
@@ -854,7 +860,7 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
 
         frame.GetImage (resized_crop_x, resized_crop_y, 0, resized_crop_width, resized_crop_height, 1, frame.Format (), image_copy_buffer.data ());
 
-        size_t new_image_width = resized_crop_width,
+        size_t new_image_width  = resized_crop_width,
                new_image_height = resized_crop_height;
 
         if (params.need_pot_extent)
@@ -911,11 +917,11 @@ void preprocess_symbols (const Params& params, Document& document, ResourceTilin
   }
 }
 
-void save_timeline (const Params& params, Document& document, const Timeline& timeline, ResourceTilingMap& tiling_map)
+void save_timeline (const Params& params, Document& document, const Timeline& timeline, ResourceTilingMap& tiling_map, MaterialInstancesList& material_instances)
 {
   static const char* METHOD_NAME = "save_timeline";
 
-  preprocess_symbols (params, document, tiling_map);
+  preprocess_symbols (params, document, tiling_map, material_instances);
 
   stl::string xml_name;
 
@@ -973,8 +979,6 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
         const FrameElement& resource_element   = ((const ICollection<FrameElement>&)first_symbol_frame.Elements ()) [0];
         const Resource&     resource           = document.Resources () [resource_element.Name ()];
 
-        size_t bitmaps_count = 0;
-
         Image image (resource.Path ());
 
         size_t image_width  = image.Width (),
@@ -993,8 +997,7 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
 
         activate_sprites_info.insert_pair (begin_time, common::format ("ActivateSprite('%s')", element_iter->Name ()));
 
-        for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
-          for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, bitmaps_count++);
+        size_t bitmaps_count = symbol_layer.Frames () [symbol_layer.Frames ().Size () - 1].FirstFrame () + 1;
 
         if (bitmaps_count == 1)
           writer.WriteAttribute ("Material", resource.Name ());
@@ -1174,18 +1177,19 @@ void export_data (Params& params)
     float resize_aspect_ratio = params.resize_width / (float)params.resize_height;
 
     if (!float_compare (document_aspect_ratio, resize_aspect_ratio) && !params.silent)
-      printf ("Requested resize will greatly change image aspect ratio");
+      printf ("Requested resize will greatly change image aspect ratio\n");
   }
 
   if ((params.resize_width > document_width || params.resize_height > document_height) && !params.silent)
     printf ("Requested resize to bigger size, image quality will be reduced\n");
 
-  ResourceTilingMap tiling_map;
+  ResourceTilingMap     tiling_map;
+  MaterialInstancesList material_instances;
 
   for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
-    save_timeline (params, document, *iter, tiling_map);
+    save_timeline (params, document, *iter, tiling_map, material_instances);
 
-  save_materials (params, document, tiling_map);
+  save_materials (params, document, tiling_map, material_instances);
 }
 
 //проверка корректности ввода
