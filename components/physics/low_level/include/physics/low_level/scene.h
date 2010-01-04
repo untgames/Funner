@@ -39,13 +39,12 @@ class IScene : virtual public IObject
     virtual float SimulationStep    () = 0;
     virtual void  SetSimulationStep (float) = 0;
 
-    virtual void  PreformSimulation (float dt) = 0;
+    virtual void  PerformSimulation (float dt) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание/удаление тел в сцене
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual IRigidBody* CreateRigidBody (IShape* shape, float mass, const math::mat4f& world_position) = 0;
-    virtual void        DeleteRigidBody (IRigidBody*) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание соединений между телами
@@ -53,7 +52,6 @@ class IScene : virtual public IObject
     virtual IJoint* CreateSphericalJoint (IRigidBody* body1, IRigidBody* body2, const math::vec3f& body1_anchor, const math::vec3f& body2_anchor) = 0;
     virtual IJoint* CreateHingeJoint     (IRigidBody* body1, IRigidBody* body2, const math::vec3f& body1_anchor, const math::vec3f& body2_anchor, const math::vec3f& body1_axis, const math::vec3f& body2_axis) = 0;
     virtual IJoint* CreatePrismaticJoint (IRigidBody* body1, IRigidBody* body2, const math::vec3f& body1_anchor, const math::vec3f& body2_anchor, const math::vec3f& body1_axis, const math::vec3f& body2_axis) = 0;
-    virtual void    DeleteJoint          (IJoint*) = 0;
 };
 
 }

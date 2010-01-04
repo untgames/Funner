@@ -17,20 +17,13 @@ struct RenderablePoint
 
 struct RenderableLine
 {
-  math::vec3f begin;
-  math::vec3f end;
-  math::vec3f begin_color;
-  math::vec3f end_color;
+  RenderablePoint begin;
+  RenderablePoint end;
 };
 
 struct RenderableTriangle
 {
-  math::vec3f point1;
-  math::vec3f point2;
-  math::vec3f point3;
-  math::vec3f point1_color;
-  math::vec3f point2_color;
-  math::vec3f point3_color;
+  RenderablePoint point [3];
 };
 
 struct RenderableText
