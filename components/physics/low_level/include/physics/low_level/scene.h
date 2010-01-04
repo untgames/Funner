@@ -1,6 +1,9 @@
 #ifndef PHYSICS_LOW_LEVEL_SCENE_HEADER
 #define PHYSICS_LOW_LEVEL_SCENE_HEADER
 
+#include <math/matrix.h>
+#include <math/vector.h>
+
 namespace physics
 {
 
@@ -8,6 +11,8 @@ namespace low_level
 {
 
 //forward declarations
+class IJoint;
+class IDebugRenderable;
 class IRigidBody;
 class IShape;
 
@@ -17,6 +22,11 @@ class IShape;
 class IScene : virtual public IObject
 {
   public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение данных для отладочной отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual IDebugRenderable* DebugRenderable () = 0;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление гравитацией
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,16 +42,18 @@ class IScene : virtual public IObject
     virtual void  PreformSimulation (float dt) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление/удаление тел в сцену
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void AddRigidBody (IRigidBody*) = 0;
-    virtual void RemoveRigidBody (IRigidBody*) = 0;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание тел
+///Создание/удаление тел в сцене
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual IRigidBody* CreateRigidBody (IShape* shape, float mass, const math::mat4f& world_position) = 0;
+    virtual void        DeleteRigidBody (IRigidBody*) = 0;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание соединений между телами
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual IJoint* CreateSphericalJoint (IRigidBody* body1, IRigidBody* body2, const math::vec3f& body1_anchor, const math::vec3f& body2_anchor) = 0;
+    virtual IJoint* CreateHingeJoint     (IRigidBody* body1, IRigidBody* body2, const math::vec3f& body1_anchor, const math::vec3f& body2_anchor, const math::vec3f& body1_axis, const math::vec3f& body2_axis) = 0;
+    virtual IJoint* CreatePrismaticJoint (IRigidBody* body1, IRigidBody* body2, const math::vec3f& body1_anchor, const math::vec3f& body2_anchor, const math::vec3f& body1_axis, const math::vec3f& body2_axis) = 0;
+    virtual void    DeleteJoint          (IJoint*) = 0;
 };
 
 }
