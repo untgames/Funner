@@ -6,6 +6,8 @@
 #include <math/matrix.h>
 #include <math/vector.h>
 
+#include <physics/low_level/joints.h>
+
 namespace physics
 {
 
@@ -13,31 +15,41 @@ namespace low_level
 {
 
 //forward declarations
-class IJoint;
 class IDebugRenderable;
 class IRigidBody;
 class IShape;
 
-enum CollisionEvent
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Типы событий столкновений
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum CollisionEventType
 {
-  CollisionEvent_Begin,
-  CollisionEvent_Process,
-  CollisionEvent_End
+  CollisionEventType_Begin,   //начало столкновения
+  CollisionEventType_Process, //в процессе столкновения
+  CollisionEventType_End      //конец столкновения
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Настройки создания конического соединения
+///Событие столкновения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct ConeTwistJointDesc
+struct CollisionEvent
 {
-  IRigidBody* body1;
-  IRigidBody* body2;
-  math::vec3f body1_anchor;
-  math::vec3f body2_anchor;
-  math::vec3f body1_axis;
-  math::vec3f body2_axis;
-  float       swing_limit;
-  float       twist_limit;
+  CollisionEventType type;         //тип события
+  IRigidBody*        body [2];     //столкнувшиеся тела
+  size_t             points_count; //количество точек столкновения
+  math::vec3f*       points;       //мировые координаты точек столкновения
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Режим обработки столкновения тел
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum CollisionMode
+{
+  CollisionMode_Never,  //никогда не сталкиваются
+  CollisionMode_Always, //всегда сталкиваются
+  CollisionMode_Filter, //не сталкиваются, если фильтр вернул false
+  
+  CollisionMode_Default = CollisionMode_
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,49 +61,48 @@ class IScene : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение данных для отладочной отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual IDebugRenderable* DebugRenderable () = 0;
+//    virtual IDebugRenderable* DebugRenderable () = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление гравитацией
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const math::vec3f& Gravity    () = 0;
-    virtual void               SetGravity (const math::vec3f&) = 0;
+    virtual void               SetGravity (const math::vec3f& value) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Симуляция
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual float SimulationStep    () = 0;
-    virtual void  SetSimulationStep (float) = 0;
+    virtual void  SetSimulationStep (float step) = 0;
 
     virtual void  PerformSimulation (float dt) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание тел в сцене
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual IRigidBody* CreateRigidBody (IShape* shape, float mass, const math::mat4f& world_position) = 0;
+    virtual IRigidBody* CreateRigidBody (IShape* shape, float mass) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание соединений между телами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual IJoint* CreateSphericalJoint (IRigidBody* body1, IRigidBody* body2, const math::vec3f& body1_anchor, const math::vec3f& body2_anchor) = 0;
-    virtual IJoint* CreateConeTwistJoint (const ConeTwistJointDesc&) = 0;
-    virtual IJoint* CreateHingeJoint     (IRigidBody* body1, IRigidBody* body2, const math::vec3f& body1_anchor, const math::vec3f& body2_anchor, const math::vec3f& body1_axis, const math::vec3f& body2_axis) = 0;
-    virtual IJoint* CreatePrismaticJoint (IRigidBody* body1, IRigidBody* body2, const math::vec3f& body1_anchor, const math::vec3f& body2_anchor, const math::vec3f& body1_axis, const math::vec3f& body2_axis) = 0;
+    virtual IJoint* CreateSphericalJoint (IRigidBody* body1, IRigidBody* body2, const SphericalJointDesc& desc) = 0;
+    virtual IJoint* CreateConeTwistJoint (IRigidBody* body1, IRigidBody* body2, const ConeTwistJointDesc& desc) = 0;
+    virtual IJoint* CreateHingeJoint     (IRigidBody* body1, IRigidBody* body2, const HingeJointDesc& desc) = 0;
+    virtual IJoint* CreatePrismaticJoint (IRigidBody* body1, IRigidBody* body2, const PrismaticJointDesc& desc) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Фильтрация столкновений объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<bool (IRigidBody*, IRigidBody*)> BroadphaseCollisionFilter;
 
-    virtual void SetBroadphaseCollisionFilter    (BroadphaseCollisionFilter* filter) = 0;
-    virtual void SetCollisionGroupPairProcessing (size_t group1, size_t group2, bool collides) = 0;
+    virtual void SetCollisionFilter (size_t group1, size_t group2, bool collides, const BroadphaseCollisionFilter& filter = BroadphaseCollisionFilter ()) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка столкновений объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (IRigidBody*, IRigidBody*, size_t points_count, math::vec3f* points)> CollisionCallback;
+    typedef xtl::function<void (const CollisionEvent& event)> CollisionCallback;
 
-    virtual xtl::connection RegisterCollisionCallback (CollisionEvent, const CollisionCallback&) = 0;
+    virtual xtl::connection RegisterCollisionCallback (CollisionEventType event_type, const CollisionCallback& callback_handler) = 0;
 };
 
 }

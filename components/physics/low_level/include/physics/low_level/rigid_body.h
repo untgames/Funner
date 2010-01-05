@@ -1,8 +1,12 @@
 #ifndef PHYSICS_LOW_LEVEL_RIGID_BODY_HEADER
 #define PHYSICS_LOW_LEVEL_RIGID_BODY_HEADER
 
+#include <cstddef>
+
 #include <math/matrix.h>
 #include <math/vector.h>
+
+#include <physics/low_level/shape.h>
 
 namespace physics
 {
@@ -45,7 +49,7 @@ class IRigidBody : virtual public IObject
 ///Материал
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual IMaterial* Material    () = 0;
-    virtual void       SetMaterial (IMaterial*) = 0;
+    virtual void       SetMaterial (IMaterial* material) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Флаги поведения
@@ -65,14 +69,14 @@ class IRigidBody : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const math::vec3f& LinearVelocity     () = 0;
     virtual const math::vec3f& AngularVelocity    () = 0;
-    virtual void               SetLinearVelocity  (const math::vec3f&) = 0;
-    virtual void               SetAngularVelocity (const math::vec3f&) = 0;
+    virtual void               SetLinearVelocity  (const math::vec3f& velocity) = 0;
+    virtual void               SetAngularVelocity (const math::vec3f& velocity) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление положением центра масс
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const math::vec3f& CenterOfMassLocalPosition    () = 0;
-    virtual void               SetCenterOfMassLocalPosition (const math::vec3f&) = 0;
+    virtual void               SetCenterOfMassLocalPosition (const math::vec3f& value) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление массой
@@ -84,15 +88,15 @@ class IRigidBody : virtual public IObject
 ///Управление тензором
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const math::vec3f&  MassSpaceInertiaTensor    () = 0;
-    virtual void                SetMassSpaceInertiaTensor (const math::vec3f&) = 0;
+    virtual void                SetMassSpaceInertiaTensor (const math::vec3f& value) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление сном
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual float SleepLinearVelocity     () = 0;
     virtual float SleepAngularVelocity    () = 0;
-    virtual void  SetSleepLinearVelocity  (float) = 0;
-    virtual void  SetSleepAngularVelocity (float) = 0;
+    virtual void  SetSleepLinearVelocity  (float value) = 0;
+    virtual void  SetSleepAngularVelocity (float value) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление пороговым значением скорости перехода в режим непрерывного движения
@@ -104,13 +108,15 @@ class IRigidBody : virtual public IObject
 ///Согласование объекта с группой
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual size_t CollisionGroup    () = 0;
-    virtual void   SetCollisionGroup (size_t) = 0;
+    virtual void   SetCollisionGroup (size_t group_number) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Мировое положение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const math::mat4f& WorldTransform    () = 0;
-    virtual void               SetWorldTransform (const math::mat4f&) = 0;
+    virtual const math::vec3f& WorldPosition       () = 0;
+    virtual const math::quatf& WorldOrientation    () = 0;
+    virtual void               SetWorldPosition    (const math::vec3f& position) = 0;
+    virtual void               SetWorldOrientation (const math::quatf& orientation) = 0;
 };
 
 }

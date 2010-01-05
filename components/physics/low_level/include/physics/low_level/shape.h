@@ -1,6 +1,8 @@
 #ifndef PHYSICS_LOW_LEVEL_SHAPE_HEADER
 #define PHYSICS_LOW_LEVEL_SHAPE_HEADER
 
+#include <physics/low_level/object.h>
+
 namespace physics
 {
 
@@ -17,7 +19,7 @@ class IShape : virtual public IObject
 ///Толщина полей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual float Margin    () = 0;
-    virtual void  GetMargin (float) = 0;
+    virtual void  GetMargin (float value) = 0;
 };
 
 }

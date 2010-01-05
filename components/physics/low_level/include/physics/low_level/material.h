@@ -3,6 +3,8 @@
 
 #include <math/vector.h>
 
+#include <physics/low_level/object.h>
+
 namespace physics
 {
 
@@ -20,22 +22,22 @@ class IMaterial : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const math::vec3f& LinearDamping     () = 0;
     virtual const math::vec3f& AngularDamping    () = 0;
-    virtual void               SetLinearDamping  (const math::vec3f&) = 0;
-    virtual void               SetAngularDamping (const math::vec3f&) = 0;
+    virtual void               SetLinearDamping  (const math::vec3f& value) = 0;
+    virtual void               SetAngularDamping (const math::vec3f& value) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление трением
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual float Friction               () = 0;
     virtual float AnisotropicFriction    () = 0;
-    virtual void  SetFriction            (float) = 0;
-    virtual void  SetAnisotropicFriction (float) = 0;
+    virtual void  SetFriction            (float value) = 0;
+    virtual void  SetAnisotropicFriction (float value) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление упругостью
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual float Restitution    () = 0;
-    virtual void  SetRestitution (float) = 0;
+    virtual void  SetRestitution (float value) = 0;
 };
 
 }
