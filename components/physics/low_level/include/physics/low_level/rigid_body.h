@@ -4,6 +4,7 @@
 #include <cstddef>
 
 #include <math/matrix.h>
+#include <math/quat.h>
 #include <math/vector.h>
 
 #include <physics/low_level/shape.h>

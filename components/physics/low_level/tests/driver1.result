@@ -1,0 +1,2 @@
+Results of driver1_test:
+exception: Method 'TestScene::CreateRigidBody' doesn't implemented

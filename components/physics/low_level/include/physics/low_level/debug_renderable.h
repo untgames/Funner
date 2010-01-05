@@ -3,6 +3,8 @@
 
 #include <math/vector.h>
 
+#include <physics/low_level/object.h>
+
 namespace physics
 {
 
