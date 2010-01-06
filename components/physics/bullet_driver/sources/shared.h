@@ -33,6 +33,10 @@
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <LinearMath/btDefaultMotionState.h>
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4250) //'class1' : inherits 'class2::member' via dominance
+#endif
+
 namespace physics
 {
 

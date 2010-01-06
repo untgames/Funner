@@ -6,7 +6,7 @@ using namespace physics::low_level::bullet;
 namespace
 {
 
-const math::vec3f DEFAULT_GRAVITY (0, -9.8, 0);
+const math::vec3f DEFAULT_GRAVITY (0, -9.8f, 0);
 const float       DEFAULT_SIMULATION_STEP = 1.f / 60.f;
 const size_t      MAX_SIMULATION_SUBSTEPS = 120;
 
