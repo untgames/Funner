@@ -7,7 +7,7 @@
 #include <math/quat.h>
 #include <math/vector.h>
 
-#include <physics/low_level/shape.h>
+#include <physics/low_level/common.h>
 
 namespace physics
 {
@@ -83,7 +83,7 @@ class IRigidBody : virtual public IObject
 ///Управление массой
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual float Mass    () = 0;
-    virtual float SetMass (float mass) = 0;
+    virtual void  SetMass (float mass) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление тензором
@@ -114,10 +114,8 @@ class IRigidBody : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Мировое положение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const math::vec3f& WorldPosition       () = 0;
-    virtual const math::quatf& WorldOrientation    () = 0;
-    virtual void               SetWorldPosition    (const math::vec3f& position) = 0;
-    virtual void               SetWorldOrientation (const math::quatf& orientation) = 0;
+    virtual const Transform& WorldTransform    () = 0;
+    virtual void             SetWorldTransform (const Transform& transform) = 0;
 };
 
 }

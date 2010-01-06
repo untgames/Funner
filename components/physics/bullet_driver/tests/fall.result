@@ -1,0 +1,35 @@
+Results of fall_test:
+Driver description = 'physics::low_level::bullet::Driver'
+Default scene gravity = 0.00; -9.80; 0.00 
+Default scene simulation step = 0.017
+Initial static body state:
+  mass = 0.00
+Body world transform:
+  position = 0.00; 0.00; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
+Initial light falling body state:
+  mass = 1.00
+Body world transform:
+  position = -10.00; 0.00; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
+Initial heavy falling body state:
+  mass = 5.00
+Body world transform:
+  position = 10.00; 0.00; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
+Simulating one second
+static body state:
+  mass = 0.00
+Body world transform:
+  position = 0.00; 0.00; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
+light falling body state:
+  mass = 1.00
+Body world transform:
+  position = -10.00; -4.98; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
+heavy falling body state:
+  mass = 5.00
+Body world transform:
+  position = 10.00; -4.98; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00

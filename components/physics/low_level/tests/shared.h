@@ -7,6 +7,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 
+#include <physics/low_level/common.h>
 #include <physics/low_level/debug_renderable.h>
 #include <physics/low_level/driver.h>
 #include <physics/low_level/joints.h>
@@ -155,7 +156,7 @@ class TestDriver: public IDriver, public Object
       throw xtl::make_not_implemented_exception ("TestDriver::CreateTriangleShape");
     }
 
-    IShape* CreateCompoundShape (size_t shapes_count, IShape* shapes, math::mat4f* local_transforms)
+    IShape* CreateCompoundShape (size_t shapes_count, IShape* shapes, Transform* local_transforms)
     {
       throw xtl::make_not_implemented_exception ("TestDriver::CreateCompoundShape");
     }

@@ -4,6 +4,7 @@
 #include <math/matrix.h>
 #include <math/vector.h>
 
+#include <physics/low_level/common.h>
 #include <physics/low_level/object.h>
 
 namespace physics
@@ -41,7 +42,7 @@ class IDriver : virtual public IObject
     virtual IShape* CreatePlaneShape        (const math::vec3f& normal, float d) = 0;
     virtual IShape* CreateConvexShape       (size_t vertices_count, math::vec3f* vertices) = 0;
     virtual IShape* CreateTriangleMeshShape (size_t vertices_count, math::vec3f* vertices, size_t triangles_count, int* triangles) = 0;
-    virtual IShape* CreateCompoundShape     (size_t shapes_count, IShape* shapes, math::mat4f* local_transforms) = 0;
+    virtual IShape* CreateCompoundShape     (size_t shapes_count, IShape* shapes, Transform* local_transforms) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
