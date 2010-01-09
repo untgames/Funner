@@ -19,6 +19,8 @@
 
 using namespace physics::low_level;
 
+const char* DRIVER_NAME = "Bullet";
+
 typedef xtl::com_ptr<IRigidBody> RigidBodyPtr;
 typedef xtl::com_ptr<IScene>     ScenePtr;
 typedef xtl::com_ptr<IShape>     ShapePtr;

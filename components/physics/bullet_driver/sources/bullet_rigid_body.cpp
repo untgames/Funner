@@ -17,13 +17,14 @@ struct RigidBody::Impl
   ShapePtr            shape;                 //геометрическое представление тела
   Transform           world_transform;       //положение тела в мировых координатах
   size_t              collision_group;       //группа коллизий тела
+  size_t              flags;                 //флаги поведения тела
   math::vec3f         inertia_tensor;        //тензор инерции
   math::vec3f         linear_velocity;       //линейная скорость
   math::vec3f         angular_velocity;      //угловая скорость
   BeforeDestroySignal before_destroy_signal; //сигнал удаления тела
 
   Impl (IShape* in_shape, float mass)
-    : collision_group (0)
+    : collision_group (0), flags (0)
   {
     if (!in_shape)
       throw xtl::make_null_argument_exception ("physics::low_level::bullet::RigidBody::RigidBody", "shape");
@@ -86,12 +87,39 @@ void RigidBody::SetMaterial (IMaterial* material)
 
 size_t RigidBody::Flags ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::Flags");
+  return impl->flags;
 }
 
 void RigidBody::SetFlags (size_t flags)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::SetFlags");
+  impl->flags = flags;
+
+  btVector3 linear_factor (1.f, 1.f, 1.f);
+
+  if (flags & RigidBodyFlag_FrozenPositionX)
+    linear_factor.setX (0);
+  if (flags & RigidBodyFlag_FrozenPositionY)
+    linear_factor.setY (0);
+  if (flags & RigidBodyFlag_FrozenPositionZ)
+    linear_factor.setZ (0);
+
+  impl->body->setLinearFactor (linear_factor);
+
+  btVector3 angular_factor (1.f, 1.f, 1.f);
+
+  if (flags & RigidBodyFlag_FrozenRotationX)
+    angular_factor.setX (0);
+  if (flags & RigidBodyFlag_FrozenRotationY)
+    angular_factor.setY (0);
+  if (flags & RigidBodyFlag_FrozenRotationZ)
+    angular_factor.setZ (0);
+
+  impl->body->setAngularFactor (angular_factor);
+
+  if (flags & RigidBodyFlag_Kinematic)
+    impl->body->setCollisionFlags (impl->body->getCollisionFlags () | btCollisionObject::CF_KINEMATIC_OBJECT);
+  else
+    impl->body->setCollisionFlags (impl->body->getCollisionFlags () & ~btCollisionObject::CF_KINEMATIC_OBJECT);
 }
 
 /*

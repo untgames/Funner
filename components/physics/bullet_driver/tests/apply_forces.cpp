@@ -1,7 +1,5 @@
 #include "shared.h"
 
-const char* DRIVER_NAME = "Bullet";
-
 int main ()
 {
   printf ("Results of apply_forces_test:\n");
