@@ -33,6 +33,8 @@ struct RigidBody::Impl
     motion_state = new btDefaultMotionState ();
 
     body = new btRigidBody (mass, motion_state, shape->BulletCollisionShape ());
+
+    //???????как то нужно инициализировать тензор, без тензора не работает вращение???????
   }
 
   ~Impl ()
@@ -98,17 +100,31 @@ void RigidBody::SetFlags (size_t flags)
 
 void RigidBody::AddForce (const math::vec3f& force, const math::vec3f& relative_position)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::AddForce");
+  btVector3 bullet_force, bullet_relative_position;
+
+  bullet_vector_from_vector (force, bullet_force);
+  bullet_vector_from_vector (relative_position, bullet_relative_position);
+
+  impl->body->applyForce (bullet_force, bullet_relative_position);
 }
 
 void RigidBody::AddImpulse (const math::vec3f& impulse, const math::vec3f& relative_position)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::AddImpulse");
+  btVector3 bullet_impulse, bullet_relative_position;
+
+  bullet_vector_from_vector (impulse, bullet_impulse);
+  bullet_vector_from_vector (relative_position, bullet_relative_position);
+
+  impl->body->applyImpulse (bullet_impulse, bullet_relative_position);
 }
 
-void RigidBody::AddTorque (const math::vec3f& torgue)
+void RigidBody::AddTorque (const math::vec3f& torque)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::AddTorgue");
+  btVector3 bullet_torque;
+
+  bullet_vector_from_vector (torque, bullet_torque);
+
+  impl->body->applyTorque (bullet_torque);
 }
 
 /*
@@ -157,6 +173,7 @@ float RigidBody::Mass ()
 void RigidBody::SetMass (float mass)
 {
   impl->body->setMassProps (mass, impl->body->getInvInertiaDiagLocal ());
+  impl->body->updateInertiaTensor ();
 }
 
 /*
@@ -175,6 +192,7 @@ void RigidBody::SetMassSpaceInertiaTensor (const math::vec3f& value)
   btVector3 inertia (value.x, value.y, value.z);
 
   impl->body->setInvInertiaDiagLocal (inertia); //????
+  impl->body->updateInertiaTensor ();
 }
 
 /*

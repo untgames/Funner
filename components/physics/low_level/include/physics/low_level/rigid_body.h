@@ -63,7 +63,7 @@ class IRigidBody : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void AddForce   (const math::vec3f& force,   const math::vec3f& relative_position = 0) = 0;
     virtual void AddImpulse (const math::vec3f& impulse, const math::vec3f& relative_position = 0) = 0;
-    virtual void AddTorque  (const math::vec3f& torgue) = 0;
+    virtual void AddTorque  (const math::vec3f& torque) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление линейной/угловой скоростями
