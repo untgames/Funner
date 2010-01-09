@@ -3,7 +3,8 @@
 using namespace physics::low_level;
 using namespace physics::low_level::bullet;
 
-typedef xtl::com_ptr<Shape> ShapePtr;
+typedef xtl::com_ptr<Shape>            ShapePtr;
+typedef xtl::signal<void (RigidBody*)> BeforeDestroySignal;
 
 /*
     ќписание реализации твердого тела
@@ -11,12 +12,18 @@ typedef xtl::com_ptr<Shape> ShapePtr;
 
 struct RigidBody::Impl
 {
-  btRigidBody   *body;           //тело
-  btMotionState *motion_state;   //описание начального состо€ни€ движени€
-  ShapePtr      shape;           //геометрическое представление тела
-  Transform     world_transform; //положение тела в мировых координатах
+  btRigidBody         *body;                 //тело
+  btMotionState       *motion_state;         //описание начального состо€ни€ движени€
+  ShapePtr            shape;                 //геометрическое представление тела
+  Transform           world_transform;       //положение тела в мировых координатах
+  size_t              collision_group;       //группа коллизий тела
+  math::vec3f         inertia_tensor;        //тензор инерции
+  math::vec3f         linear_velocity;       //линейна€ скорость
+  math::vec3f         angular_velocity;      //углова€ скорость
+  BeforeDestroySignal before_destroy_signal; //сигнал удалени€ тела
 
   Impl (IShape* in_shape, float mass)
+    : collision_group (0)
   {
     if (!in_shape)
       throw xtl::make_null_argument_exception ("physics::low_level::bullet::RigidBody::RigidBody", "shape");
@@ -36,12 +43,17 @@ struct RigidBody::Impl
 };
 
 /*
-     онструктор
+     онструктор/деструктор
 */
 
 RigidBody::RigidBody (IShape* shape, float mass)
   : impl (new Impl (shape, mass))
   {}
+
+RigidBody::~RigidBody ()
+{
+  impl->before_destroy_signal (this);
+}
 
 /*
    √еометрическое представление
@@ -105,36 +117,30 @@ void RigidBody::AddTorque (const math::vec3f& torgue)
 
 const math::vec3f& RigidBody::LinearVelocity ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::LinearVelocity");
+  vector_from_bullet_vector (impl->body->getLinearVelocity (), impl->linear_velocity);
+
+  return impl->linear_velocity;
 }
 
 const math::vec3f& RigidBody::AngularVelocity ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::AngularVelocity");
+  vector_from_bullet_vector (impl->body->getAngularVelocity (), impl->angular_velocity);
+
+  return impl->angular_velocity;
 }
 
 void RigidBody::SetLinearVelocity (const math::vec3f& velocity)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::SetLinearVelocity");
+  btVector3 linear_velocity (velocity.x, velocity.y, velocity.z);
+
+  impl->body->setLinearVelocity (linear_velocity);
 }
 
 void RigidBody::SetAngularVelocity (const math::vec3f& velocity)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::SetAngularVelocity");
-}
+  btVector3 angular_velocity (velocity.x, velocity.y, velocity.z);
 
-/*
-   ”правление положением центра масс
-*/
-
-const math::vec3f& RigidBody::CenterOfMassLocalPosition ()
-{
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::CenterOfMassLocalPosition");
-}
-
-void RigidBody::SetCenterOfMassLocalPosition (const math::vec3f& value)
-{
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::SetCenterOfMassLocalPosition");
+  impl->body->setAngularVelocity (angular_velocity);
 }
 
 /*
@@ -150,7 +156,7 @@ float RigidBody::Mass ()
 
 void RigidBody::SetMass (float mass)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::SetMass");
+  impl->body->setMassProps (mass, impl->body->getInvInertiaDiagLocal ());
 }
 
 /*
@@ -159,12 +165,16 @@ void RigidBody::SetMass (float mass)
 
 const math::vec3f& RigidBody::MassSpaceInertiaTensor ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::MassSpaceInertiaTensor");
+  vector_from_bullet_vector (impl->body->getInvInertiaDiagLocal (), impl->inertia_tensor);
+
+  return impl->inertia_tensor;  //????
 }
 
 void RigidBody::SetMassSpaceInertiaTensor (const math::vec3f& value)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::SetMassSpaceInertiaTensor");
+  btVector3 inertia (value.x, value.y, value.z);
+
+  impl->body->setInvInertiaDiagLocal (inertia); //????
 }
 
 /*
@@ -173,22 +183,22 @@ void RigidBody::SetMassSpaceInertiaTensor (const math::vec3f& value)
 
 float RigidBody::SleepLinearVelocity ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::SleepLinearVelocity");
+  return impl->body->getLinearSleepingThreshold ();
 }
 
 float RigidBody::SleepAngularVelocity ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::SleepAngularVelocity");
+  return impl->body->getAngularSleepingThreshold ();
 }
 
 void RigidBody::SetSleepLinearVelocity (float value)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::SetSleepLinearVelocity");
+  impl->body->setSleepingThresholds (value, SleepAngularVelocity ());
 }
 
 void RigidBody::SetSleepAngularVelocity (float value)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::SetSleepAngularVelocity");
+  impl->body->setSleepingThresholds (SleepLinearVelocity (), value);
 }
 
 /*
@@ -197,12 +207,12 @@ void RigidBody::SetSleepAngularVelocity (float value)
 
 float RigidBody::CcdMotionThreshold ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::CcdMotionThreshold");
+  return impl->body->getCcdMotionThreshold ();
 }
 
-void RigidBody::SetCcdMotionThreshold (float)
+void RigidBody::SetCcdMotionThreshold (float value)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::SetCcdMotionThreshold");
+  impl->body->setCcdMotionThreshold (value);
 }
 
 /*
@@ -211,12 +221,12 @@ void RigidBody::SetCcdMotionThreshold (float)
 
 size_t RigidBody::CollisionGroup ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::CollisionGroup");
+  return impl->collision_group;
 }
 
 void RigidBody::SetCollisionGroup (size_t group_number)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::SetCollisionGroup");
+  impl->collision_group = group_number;
 }
 
 /*
@@ -227,18 +237,8 @@ const Transform& RigidBody::WorldTransform ()
 {
   const btTransform& world_transform = impl->body->getWorldTransform ();
 
-  const btVector3& origin = world_transform.getOrigin ();
-
-  impl->world_transform.position.x = origin.x ();
-  impl->world_transform.position.y = origin.y ();
-  impl->world_transform.position.z = origin.z ();
-
-  const btQuaternion& rotation = world_transform.getRotation ();
-
-  impl->world_transform.orientation.x = rotation.getX ();
-  impl->world_transform.orientation.y = rotation.getY ();
-  impl->world_transform.orientation.z = rotation.getZ ();
-  impl->world_transform.orientation.w = rotation.getW ();
+  vector_from_bullet_vector         (world_transform.getOrigin (),   impl->world_transform.position);
+  quaternion_from_bullet_quaternion (world_transform.getRotation (), impl->world_transform.orientation);
 
   return impl->world_transform;
 }
@@ -246,18 +246,12 @@ const Transform& RigidBody::WorldTransform ()
 void RigidBody::SetWorldTransform (const Transform& transform)
 {
   btTransform new_world_transform;
-  btVector3&  transform_position = new_world_transform.getOrigin ();
 
-  transform_position.setX (transform.position.x);
-  transform_position.setY (transform.position.y);
-  transform_position.setZ (transform.position.z);
+  bullet_vector_from_vector (transform.position, new_world_transform.getOrigin ());
 
   btQuaternion transform_rotation;
 
-  transform_rotation.setX (transform.orientation.x);
-  transform_rotation.setY (transform.orientation.y);
-  transform_rotation.setZ (transform.orientation.z);
-  transform_rotation.setW (transform.orientation.w);
+  bullet_quaternion_from_quaternion (transform.orientation, transform_rotation);
 
   new_world_transform.setRotation (transform_rotation);
 
@@ -271,4 +265,13 @@ void RigidBody::SetWorldTransform (const Transform& transform)
 btRigidBody* RigidBody::BulletRigidBody ()
 {
   return impl->body;
+}
+
+/*
+   ѕодписка на удаление объекта
+*/
+
+xtl::connection RigidBody::RegisterDestroyHandler (const BeforeDestroyHandler& handler)
+{
+  return impl->before_destroy_signal.connect (handler);
 }

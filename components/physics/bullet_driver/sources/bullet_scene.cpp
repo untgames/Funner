@@ -12,19 +12,22 @@ const size_t      MAX_SIMULATION_SUBSTEPS = 120;
 
 }
 
+typedef stl::hash_map<RigidBody*, xtl::auto_connection> BodyDestroyConnectionsMap;
+
 /*
     ќписание реализации физической сцены
 */
 
 struct Scene::Impl
 {
-  btDefaultCollisionConfiguration     *collision_configuration; //конфигураци€ обработчика коллизий
-  btCollisionDispatcher               *collision_dispatcher;    //обработчик коллизий
-  btBroadphaseInterface               *broadphase_interface;    //обработчик фазы broadphase
-  btSequentialImpulseConstraintSolver *solver;                  //рассчетчик соединений
-  btDiscreteDynamicsWorld             *dynamics_world;          //физический мир
-  math::vec3f                         gravity;                  //гравитаци€
-  float                               simulation_step;          //шаг симул€ции
+  btDefaultCollisionConfiguration     *collision_configuration;   //конфигураци€ обработчика коллизий
+  btCollisionDispatcher               *collision_dispatcher;      //обработчик коллизий
+  btBroadphaseInterface               *broadphase_interface;      //обработчик фазы broadphase
+  btSequentialImpulseConstraintSolver *solver;                    //рассчетчик соединений
+  btDiscreteDynamicsWorld             *dynamics_world;            //физический мир
+  math::vec3f                         gravity;                    //гравитаци€
+  float                               simulation_step;            //шаг симул€ции
+  BodyDestroyConnectionsMap           body_destroy_connections;   //соединени€ удалени€ тел
 
   Impl ()
   {
@@ -45,6 +48,13 @@ struct Scene::Impl
     delete broadphase_interface;
     delete collision_dispatcher;
     delete collision_configuration;
+  }
+
+  void OnRigidBodyDestroy (RigidBody* body)
+  {
+    dynamics_world->removeRigidBody (body->BulletRigidBody ());
+
+    body_destroy_connections.erase (body);
   }
 };
 
@@ -106,6 +116,8 @@ RigidBody* Scene::CreateRigidBody (IShape* shape, float mass)
     throw xtl::make_null_argument_exception ("physics::low_level::bullet::Scene::CreateRigidBody", "shape");
 
   RigidBody* return_value = new RigidBody (shape, mass);
+
+  impl->body_destroy_connections [return_value] = return_value->RegisterDestroyHandler (xtl::bind (&Scene::Impl::OnRigidBodyDestroy, impl.get (), _1));
 
   impl->dynamics_world->addRigidBody (return_value->BulletRigidBody ());
 

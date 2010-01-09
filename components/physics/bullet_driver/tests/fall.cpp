@@ -40,9 +40,16 @@ int main ()
 
     printf ("Initial static body state:\n");
     printf ("  mass = %.2f\n", static_body->Mass ());
+    printf ("  linear sleeping threshold = %.2f\n", static_body->SleepLinearVelocity ());
+    printf ("  angular sleeping threshold = %.2f\n", static_body->SleepAngularVelocity ());
+    printf ("  ccd motion threshold = %.2f\n", static_body->CcdMotionThreshold ());
+    printf ("  collision group = %u\n", static_body->CollisionGroup ());
     dump_body_position (static_body.get ());
     printf ("Initial light falling body state:\n");
     printf ("  mass = %.2f\n", light_falling_body->Mass ());
+    printf ("  linear sleeping threshold = %.2f\n", light_falling_body->SleepLinearVelocity ());
+    printf ("  angular sleeping threshold = %.2f\n", light_falling_body->SleepAngularVelocity ());
+    printf ("  ccd motion threshold = %.2f\n", light_falling_body->CcdMotionThreshold ());
     dump_body_position (light_falling_body.get ());
     printf ("Initial heavy falling body state:\n");
     printf ("  mass = %.2f\n", heavy_falling_body->Mass ());
@@ -61,6 +68,43 @@ int main ()
     printf ("heavy falling body state:\n");
     printf ("  mass = %.2f\n", heavy_falling_body->Mass ());
     dump_body_position (heavy_falling_body.get ());
+
+    math::vec3f  plane_normal (0, 1, 0);
+    ShapePtr     plane_shape  (bullet_driver->CreatePlaneShape (plane_normal, 0));
+    RigidBodyPtr ground_plane (scene->CreateRigidBody (plane_shape.get (), 0), false);
+
+    body_transform.position.x = 0;
+    body_transform.position.y = -15;
+
+    ground_plane->SetWorldTransform (body_transform);
+
+    printf ("ground plane state:\n");
+    printf ("  mass = %.2f\n", ground_plane->Mass ());
+    dump_body_position (ground_plane.get ());
+
+    scene->PerformSimulation (1.f);
+
+    printf ("Simulating one second\n");
+
+    printf ("ground plane state:\n");
+    dump_body_position (ground_plane.get ());
+    printf ("light falling body state:\n");
+    dump_body_position (light_falling_body.get ());
+    printf ("heavy falling body state:\n");
+    dump_body_position (heavy_falling_body.get ());
+
+    ground_plane = 0;
+
+    scene->PerformSimulation (1.f);
+
+    printf ("Simulating one second after deleting ground\n");
+
+    printf ("light falling body state:\n");
+    dump_body_position (light_falling_body.get ());
+    printf ("heavy falling body state:\n");
+    dump_body_position (heavy_falling_body.get ());
+
+    scene = 0;
   }
   catch (std::exception& exception)
   {

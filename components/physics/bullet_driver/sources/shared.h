@@ -2,12 +2,15 @@
 #define PHYSICS_BULLET_DRIVER_SHARED_HEADER
 
 #include <stl/auto_ptr.h>
+#include <stl/hash_map>
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
+#include <xtl/signal.h>
 
 #include <common/component.h>
 
@@ -140,9 +143,10 @@ class RigidBody : public IRigidBody, public Object
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RigidBody (IShape* shape, float mass);
+    RigidBody  (IShape* shape, float mass);
+    ~RigidBody ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Геометрическое представление
@@ -175,12 +179,6 @@ class RigidBody : public IRigidBody, public Object
     const math::vec3f& AngularVelocity    ();
     void               SetLinearVelocity  (const math::vec3f& velocity);
     void               SetAngularVelocity (const math::vec3f& velocity);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Управление положением центра масс
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    const math::vec3f& CenterOfMassLocalPosition    ();
-    void               SetCenterOfMassLocalPosition (const math::vec3f& value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление массой
@@ -224,6 +222,13 @@ class RigidBody : public IRigidBody, public Object
 ///Получение bullet тела
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     btRigidBody* BulletRigidBody ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Подписка на удаление объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function <void (RigidBody*)> BeforeDestroyHandler;
+
+    xtl::connection RegisterDestroyHandler (const BeforeDestroyHandler& handler);
 
   private:
     struct Impl;
@@ -341,6 +346,14 @@ class Driver : public IDriver, public Object
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
+
+//преобразование векторов
+void vector_from_bullet_vector (const btVector3& bullet_vector, math::vec3f& target_vector);
+void bullet_vector_from_vector (const math::vec3f& vector, btVector3& target_vector);
+
+//преобразование кватернионов
+void quaternion_from_bullet_quaternion (const btQuaternion& bullet_quaternion, math::quatf& target_quaternion);
+void bullet_quaternion_from_quaternion (const math::quatf& quaternion, btQuaternion& target_quaternion);
 
 }
 
