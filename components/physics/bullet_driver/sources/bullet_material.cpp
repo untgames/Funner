@@ -3,12 +3,44 @@
 using namespace physics::low_level;
 using namespace physics::low_level::bullet;
 
+namespace
+{
+
+const float       DEFAULT_ANGULAR_DAMPING      = 0.f;
+const math::vec3f DEFAULT_ANISOTROPIC_FRICTION (1.f);
+const float       DEFAULT_FRICTION             = 0.5f;
+const float       DEFAULT_LINEAR_DAMPING       = 0.f;
+const float       DEFAULT_RESTITUTION          = 0.f;
+
+typedef xtl::signal<void ()> UpdateSignal;
+
+}
+
 /*
     Описание реализации материала тела
 */
 
 struct Material::Impl
 {
+  math::vec3f  anisotropic_friction;  //трение по другим осям
+  float        linear_damping;        //линейная амортизация
+  float        angular_damping;       //угловая амортизация
+  float        friction;              //трение
+  float        restitution;           //упругость
+  UpdateSignal update_signal;         //сигнал обновления свойств объекта
+
+  Impl ()
+    : anisotropic_friction (DEFAULT_ANISOTROPIC_FRICTION)
+    , linear_damping       (DEFAULT_LINEAR_DAMPING)
+    , angular_damping      (DEFAULT_ANGULAR_DAMPING)
+    , friction             (DEFAULT_FRICTION)
+    , restitution          (DEFAULT_RESTITUTION)
+    {}
+
+  void OnUpdate ()
+  {
+    update_signal ();
+  }
 };
 
 /*
@@ -23,24 +55,28 @@ Material::Material ()
    Управление линейной/угловой аммортизацией
 */
 
-const math::vec3f& Material::LinearDamping ()
+float Material::LinearDamping ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::Material::LinearDamping");
+  return impl->linear_damping;
 }
 
-const math::vec3f& Material::AngularDamping ()
+float Material::AngularDamping ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::Material::AngularDamping");
+  return impl->angular_damping;
 }
 
-void Material::SetLinearDamping (const math::vec3f& value)
+void Material::SetLinearDamping (float value)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::Material::SetLinearDamping");
+  impl->linear_damping = value;
+
+  impl->OnUpdate ();
 }
 
-void Material::SetAngularDamping (const math::vec3f& value)
+void Material::SetAngularDamping (float value)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::Material::SetAngularDamping");
+  impl->angular_damping = value;
+
+  impl->OnUpdate ();
 }
 
 /*
@@ -49,22 +85,26 @@ void Material::SetAngularDamping (const math::vec3f& value)
 
 float Material::Friction ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::Material::Friction");
+  return impl->friction;
 }
 
-float Material::AnisotropicFriction ()
+const math::vec3f& Material::AnisotropicFriction ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::Material::AnisotropicFriction");
+  return impl->anisotropic_friction;
 }
 
 void Material::SetFriction (float value)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::Material::SetFriction");
+  impl->friction = value;
+
+  impl->OnUpdate ();
 }
 
-void Material::SetAnisotropicFriction (float value)
+void Material::SetAnisotropicFriction (const math::vec3f& value)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::Material::SetAnisotropicFriction");
+  impl->anisotropic_friction = value;
+
+  impl->OnUpdate ();
 }
 
 /*
@@ -73,10 +113,21 @@ void Material::SetAnisotropicFriction (float value)
 
 float Material::Restitution ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::Material::Restitution");
+  return impl->restitution;
 }
 
 void Material::SetRestitution (float value)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::Material::SetRestitution");
+  impl->restitution = value;
+
+  impl->OnUpdate ();
+}
+
+/*
+   Подписка на обновление свойств
+*/
+
+xtl::connection Material::RegisterUpdateHandler (const UpdateHandler& handler)
+{
+  return impl->update_signal.connect (handler);
 }

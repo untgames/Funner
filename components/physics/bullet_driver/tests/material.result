@@ -1,0 +1,46 @@
+Results of material_test:
+Simulating one second
+body1 state:
+Body world transform:
+  position = -10.00; -3.98; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
+body2 state:
+Body world transform:
+  position = 10.00; -4.98; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
+Simulating two second
+body1 state:
+Body world transform:
+  position = -10.00; -9.00; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
+body2 state:
+Body world transform:
+  position = 10.00; -8.57; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
+Simulating two second
+body1 state:
+Body world transform:
+  position = -10.00; -9.00; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
+body2 state:
+Body world transform:
+  position = 10.00; -9.00; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
+Simulating two second
+body1 state:
+Body world transform:
+  position = -10.00; -9.00; 1.30
+  orientation = 0.00; 0.00; 0.00; 1.00
+body2 state:
+Body world transform:
+  position = 10.00; -9.00; 0.05
+  orientation = 0.00; 0.00; 0.00; 1.00
+Simulating two second
+body1 state:
+Body world transform:
+  position = -10.00; -9.00; 3.85
+  orientation = 0.00; 0.00; 0.96; 0.30
+body2 state:
+Body world transform:
+  position = 10.00; -9.00; 0.07
+  orientation = 0.00; 0.00; 0.03; 1.00

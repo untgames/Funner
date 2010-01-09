@@ -20,18 +20,18 @@ class IMaterial : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление линейной/угловой аммортизацией
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const math::vec3f& LinearDamping     () = 0;
-    virtual const math::vec3f& AngularDamping    () = 0;
-    virtual void               SetLinearDamping  (const math::vec3f& value) = 0;
-    virtual void               SetAngularDamping (const math::vec3f& value) = 0;
+    virtual float LinearDamping     () = 0;
+    virtual float AngularDamping    () = 0;
+    virtual void  SetLinearDamping  (float value) = 0;
+    virtual void  SetAngularDamping (float value) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление трением
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual float Friction               () = 0;
-    virtual float AnisotropicFriction    () = 0;
-    virtual void  SetFriction            (float value) = 0;
-    virtual void  SetAnisotropicFriction (float value) = 0;
+    virtual float              Friction               () = 0;
+    virtual const math::vec3f& AnisotropicFriction    () = 0;
+    virtual void               SetFriction            (float value) = 0;
+    virtual void               SetAnisotropicFriction (const math::vec3f& value) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление упругостью

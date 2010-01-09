@@ -3,6 +3,7 @@
 using namespace physics::low_level;
 using namespace physics::low_level::bullet;
 
+typedef xtl::com_ptr<IMaterial>        MaterialPtr;
 typedef xtl::com_ptr<Shape>            ShapePtr;
 typedef xtl::signal<void (RigidBody*)> BeforeDestroySignal;
 
@@ -12,16 +13,18 @@ typedef xtl::signal<void (RigidBody*)> BeforeDestroySignal;
 
 struct RigidBody::Impl
 {
-  btRigidBody         *body;                 //тело
-  btMotionState       *motion_state;         //описание начального состояния движения
-  ShapePtr            shape;                 //геометрическое представление тела
-  Transform           world_transform;       //положение тела в мировых координатах
-  size_t              collision_group;       //группа коллизий тела
-  size_t              flags;                 //флаги поведения тела
-  math::vec3f         inertia_tensor;        //тензор инерции
-  math::vec3f         linear_velocity;       //линейная скорость
-  math::vec3f         angular_velocity;      //угловая скорость
-  BeforeDestroySignal before_destroy_signal; //сигнал удаления тела
+  btRigidBody          *body;                       //тело
+  btMotionState        *motion_state;               //описание начального состояния движения
+  ShapePtr             shape;                       //геометрическое представление тела
+  MaterialPtr          material;                    //материал
+  Transform            world_transform;             //положение тела в мировых координатах
+  size_t               collision_group;             //группа коллизий тела
+  size_t               flags;                       //флаги поведения тела
+  math::vec3f          inertia_tensor;              //тензор инерции
+  math::vec3f          linear_velocity;             //линейная скорость
+  math::vec3f          angular_velocity;            //угловая скорость
+  BeforeDestroySignal  before_destroy_signal;       //сигнал удаления тела
+  xtl::auto_connection material_update_connection;  //соединение обновления свойств материала
 
   Impl (IShape* in_shape, float mass)
     : collision_group (0), flags (0)
@@ -43,6 +46,18 @@ struct RigidBody::Impl
     delete body;
     delete motion_state;
   }
+
+  void UpdateMaterialProperties ()
+  {
+    const math::vec3f &anisotropic_friction = material->AnisotropicFriction ();
+
+    btVector3 bullet_anisotropic_friction (anisotropic_friction.x, anisotropic_friction.y, anisotropic_friction.z);
+
+    body->setDamping             (material->LinearDamping (), material->LinearDamping ());
+    body->setFriction            (material->Friction ());
+    body->setAnisotropicFriction (bullet_anisotropic_friction);
+    body->setRestitution         (material->Restitution ());
+  }
 };
 
 /*
@@ -51,7 +66,11 @@ struct RigidBody::Impl
 
 RigidBody::RigidBody (IShape* shape, float mass)
   : impl (new Impl (shape, mass))
-  {}
+{
+  MaterialPtr default_material (new bullet::Material, false);
+
+  SetMaterial (default_material.get ());
+}
 
 RigidBody::~RigidBody ()
 {
@@ -71,14 +90,21 @@ Shape* RigidBody::Shape ()
    Материал
 */
 
-Material* RigidBody::Material ()
+IMaterial* RigidBody::Material ()
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::Material");
+  return impl->material.get ();
 }
 
 void RigidBody::SetMaterial (IMaterial* material)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::RigidBody::SetMaterial");
+  if (!material)
+    throw xtl::make_null_argument_exception ("physics::low_level::bullet::RigidBody::SetMaterial", "material");
+
+  impl->material = material;
+
+  impl->material_update_connection = ((bullet::Material*)material)->RegisterUpdateHandler (xtl::bind (&RigidBody::Impl::UpdateMaterialProperties, impl.get ()));
+
+  impl->UpdateMaterialProperties ();
 }
 
 /*
