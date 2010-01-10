@@ -7,6 +7,13 @@ typedef xtl::com_ptr<IMaterial>        MaterialPtr;
 typedef xtl::com_ptr<Shape>            ShapePtr;
 typedef xtl::signal<void (RigidBody*)> BeforeDestroySignal;
 
+namespace
+{
+
+const math::vec3f DEFAULT_MASS_SPACE_INERTIA_TENSOR (1.f);
+
+}
+
 /*
     Описание реализации твердого тела
 */
@@ -37,8 +44,6 @@ struct RigidBody::Impl
     motion_state = new btDefaultMotionState ();
 
     body = new btRigidBody (mass, motion_state, shape->BulletCollisionShape ());
-
-    //???????как то нужно инициализировать тензор, без тензора не работает вращение???????
   }
 
   ~Impl ()
@@ -70,6 +75,9 @@ RigidBody::RigidBody (IShape* shape, float mass)
   MaterialPtr default_material (new bullet::Material, false);
 
   SetMaterial (default_material.get ());
+
+  if (mass)
+    SetMassSpaceInertiaTensor (DEFAULT_MASS_SPACE_INERTIA_TENSOR);
 }
 
 RigidBody::~RigidBody ()

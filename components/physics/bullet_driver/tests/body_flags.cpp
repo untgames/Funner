@@ -27,16 +27,6 @@ int main ()
                  rotation_frozen_body   (scene->CreateRigidBody (sphere_shape.get (), 1), false),
                  kinematic_body         (scene->CreateRigidBody (sphere_shape.get (), 1), false);
 
-    position_x_frozen_body->SetMassSpaceInertiaTensor (1);
-    position_y_frozen_body->SetMassSpaceInertiaTensor (1);
-    position_z_frozen_body->SetMassSpaceInertiaTensor (1);
-    position_frozen_body->SetMassSpaceInertiaTensor (1);
-    rotation_x_frozen_body->SetMassSpaceInertiaTensor (1);
-    rotation_y_frozen_body->SetMassSpaceInertiaTensor (1);
-    rotation_z_frozen_body->SetMassSpaceInertiaTensor (1);
-    rotation_frozen_body->SetMassSpaceInertiaTensor (1);
-    kinematic_body->SetMassSpaceInertiaTensor (1);
-
     position_x_frozen_body->SetFlags (RigidBodyFlag_FrozenPositionX);
     position_y_frozen_body->SetFlags (RigidBodyFlag_FrozenPositionY);
     position_z_frozen_body->SetFlags (RigidBodyFlag_FrozenPositionZ);

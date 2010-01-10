@@ -17,8 +17,6 @@ int main ()
 
     RigidBodyPtr falling_body (scene->CreateRigidBody (sphere_shape.get (), 1), false);
 
-    falling_body->SetMassSpaceInertiaTensor (1);
-
     math::vec3f  plane_normal (0, 1, 0);
     ShapePtr     plane_shape  (bullet_driver->CreatePlaneShape (plane_normal, 0));
     RigidBodyPtr ground_plane (scene->CreateRigidBody (plane_shape.get (), 0), false);

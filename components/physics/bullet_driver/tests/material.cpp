@@ -18,6 +18,9 @@ int main ()
     RigidBodyPtr body1 (scene->CreateRigidBody (sphere_shape.get (), 1), false),
                  body2 (scene->CreateRigidBody (sphere_shape.get (), 1), false);
 
+    body1->SetMassSpaceInertiaTensor (0);
+    body2->SetMassSpaceInertiaTensor (0);
+
     Transform body_transform;
 
     body_transform.position.x = -10;
@@ -53,7 +56,7 @@ int main ()
 
     scene->PerformSimulation (1.f);
 
-    printf ("Simulating two second\n");
+    printf ("Simulating one second\n");
 
     printf ("body1 state:\n");
     dump_body_position (body1.get ());
@@ -62,7 +65,7 @@ int main ()
 
     scene->PerformSimulation (1.f);
 
-    printf ("Simulating two second\n");
+    printf ("Simulating one second\n");
 
     printf ("body1 state:\n");
     dump_body_position (body1.get ());
@@ -81,7 +84,7 @@ int main ()
 
     scene->PerformSimulation (1.f);
 
-    printf ("Simulating two second\n");
+    printf ("Simulating one second\n");
 
     printf ("body1 state:\n");
     dump_body_position (body1.get ());
@@ -101,7 +104,7 @@ int main ()
 
     scene->PerformSimulation (1.f);
 
-    printf ("Simulating two second\n");
+    printf ("Simulating one second\n");
 
     printf ("body1 state:\n");
     dump_body_position (body1.get ());
