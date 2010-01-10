@@ -27,10 +27,14 @@
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
 #include <BulletCollision/CollisionDispatch/btCollisionDispatcher.h>
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
+#include <BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h>
 #include <BulletCollision/CollisionShapes/btCapsuleShape.h>
 #include <BulletCollision/CollisionShapes/btCollisionShape.h>
+#include <BulletCollision/CollisionShapes/btCompoundShape.h>
+#include <BulletCollision/CollisionShapes/btConvexHullShape.h>
 #include <BulletCollision/CollisionShapes/btStaticPlaneShape.h>
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
+#include <BulletCollision/CollisionShapes/btTriangleMesh.h>
 #include <BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
@@ -80,7 +84,8 @@ class Shape : public IShape, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Shape (btCollisionShape* shape);
+    Shape  (btCollisionShape* shape);
+    ~Shape ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Толщина полей
@@ -94,8 +99,23 @@ class Shape : public IShape, public Object
     btCollisionShape* BulletCollisionShape ();
 
   private:
-    struct Impl;
-    stl::auto_ptr<Impl> impl;
+    btCollisionShape* collision_shape;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Геометрическое тело представленное сеткой
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class TriangleMeshShape : public Shape
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    TriangleMeshShape (btCollisionShape* shape, btStridingMeshInterface* in_mesh) : Shape (shape), mesh (in_mesh) {}
+    ~TriangleMeshShape () { delete mesh; }
+
+  private:
+    btStridingMeshInterface* mesh;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -346,8 +366,8 @@ class Driver : public IDriver, public Object
     Shape* CreateCapsuleShape      (float radius, float height);
     Shape* CreatePlaneShape        (const math::vec3f& normal, float d);
     Shape* CreateConvexShape       (size_t vertices_count, math::vec3f* vertices);
-    Shape* CreateTriangleMeshShape (size_t vertices_count, math::vec3f* vertices, size_t triangles_count, int* triangles);
-    Shape* CreateCompoundShape     (size_t shapes_count, IShape* shapes, Transform* local_transforms);
+    Shape* CreateTriangleMeshShape (size_t vertices_count, math::vec3f* vertices, size_t triangles_count, size_t* triangles);
+    Shape* CreateCompoundShape     (size_t shapes_count, IShape** shapes, Transform* local_transforms);
 
   private:
     struct Impl;

@@ -7,30 +7,18 @@ using namespace physics::low_level::bullet;
     Описание реализации геометрического тела
 */
 
-struct Shape::Impl
-{
-  btCollisionShape* collision_shape;
-
-  Impl (btCollisionShape* shape)
-    : collision_shape (shape)
-  {
-    if (!shape)
-      throw xtl::make_null_argument_exception ("physics::low_level::bullet::Shape::Shape", "shape");
-  }
-
-  ~Impl ()
-  {
-    delete collision_shape;
-  }
-};
-
 /*
     Конструктор
 */
 
 Shape::Shape (btCollisionShape* shape)
-  : impl (new Impl (shape))
+  : collision_shape (shape)
   {}
+
+Shape::~Shape ()
+{
+  delete collision_shape;
+}
 
 /*
    Толщина полей
@@ -38,12 +26,12 @@ Shape::Shape (btCollisionShape* shape)
 
 float Shape::Margin ()
 {
-  return impl->collision_shape->getMargin ();
+  return collision_shape->getMargin ();
 }
 
 void Shape::GetMargin (float value)
 {
-  impl->collision_shape->setMargin (value);
+  collision_shape->setMargin (value);
 }
 
 /*
@@ -52,5 +40,5 @@ void Shape::GetMargin (float value)
 
 btCollisionShape* Shape::BulletCollisionShape ()
 {
-  return impl->collision_shape;
+  return collision_shape;
 }

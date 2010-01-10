@@ -151,12 +151,12 @@ class TestDriver: public IDriver, public Object
       throw xtl::make_not_implemented_exception ("TestDriver::CreateConvexShape");
     }
 
-    IShape* CreateTriangleMeshShape (size_t vertices_count, math::vec3f* vertices, size_t triangles_count, int* triangles)
+    IShape* CreateTriangleMeshShape (size_t vertices_count, math::vec3f* vertices, size_t triangles_count, size_t* triangles)
     {
       throw xtl::make_not_implemented_exception ("TestDriver::CreateTriangleShape");
     }
 
-    IShape* CreateCompoundShape (size_t shapes_count, IShape* shapes, Transform* local_transforms)
+    IShape* CreateCompoundShape (size_t shapes_count, IShape** shapes, Transform* local_transforms)
     {
       throw xtl::make_not_implemented_exception ("TestDriver::CreateCompoundShape");
     }
