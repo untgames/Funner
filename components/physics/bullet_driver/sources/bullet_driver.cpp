@@ -152,6 +152,9 @@ Shape* Driver::CreateCompoundShape (size_t shapes_count, IShape** shapes, Transf
   if (!local_transforms)
     throw xtl::make_null_argument_exception (METHOD_NAME, "local_transforms");
 
+  for (size_t i = 0; i < shapes_count; i++)
+    cast_object<Shape, IShape> (shapes [i], METHOD_NAME, "shapes");
+
   btCompoundShape* compound_shape = new btCompoundShape ();
 
   btVector3    bullet_vector;

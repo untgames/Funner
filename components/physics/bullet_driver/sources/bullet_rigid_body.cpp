@@ -33,13 +33,13 @@ struct RigidBody::Impl
   BeforeDestroySignal  before_destroy_signal;       //сигнал удаления тела
   xtl::auto_connection material_update_connection;  //соединение обновления свойств материала
 
-  Impl (IShape* in_shape, float mass)
+  Impl (bullet::Shape* in_shape, float mass)
     : collision_group (0), flags (0)
   {
     if (!in_shape)
       throw xtl::make_null_argument_exception ("physics::low_level::bullet::RigidBody::RigidBody", "shape");
 
-    shape = (bullet::Shape*)in_shape;
+    shape = in_shape;
 
     motion_state = new btDefaultMotionState ();
 
@@ -69,7 +69,7 @@ struct RigidBody::Impl
     Конструктор/деструктор
 */
 
-RigidBody::RigidBody (IShape* shape, float mass)
+RigidBody::RigidBody (bullet::Shape* shape, float mass)
   : impl (new Impl (shape, mass))
 {
   MaterialPtr default_material (new bullet::Material, false);
@@ -105,12 +105,16 @@ IMaterial* RigidBody::Material ()
 
 void RigidBody::SetMaterial (IMaterial* material)
 {
+  static const char* METHOD_NAME = "physics::low_level::bullet::RigidBody::SetMaterial";
+
   if (!material)
-    throw xtl::make_null_argument_exception ("physics::low_level::bullet::RigidBody::SetMaterial", "material");
+    throw xtl::make_null_argument_exception (METHOD_NAME, "material");
+
+  bullet::Material* bullet_material = cast_object<bullet::Material, IMaterial> (material, METHOD_NAME, "material");
 
   impl->material = material;
 
-  impl->material_update_connection = ((bullet::Material*)material)->RegisterUpdateHandler (xtl::bind (&RigidBody::Impl::UpdateMaterialProperties, impl.get ()));
+  impl->material_update_connection = bullet_material->RegisterUpdateHandler (xtl::bind (&RigidBody::Impl::UpdateMaterialProperties, impl.get ()));
 
   impl->UpdateMaterialProperties ();
 }

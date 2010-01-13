@@ -35,7 +35,11 @@
 #include <BulletCollision/CollisionShapes/btStaticPlaneShape.h>
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
 #include <BulletCollision/CollisionShapes/btTriangleMesh.h>
+#include <BulletDynamics/ConstraintSolver/btConeTwistConstraint.h>
+#include <BulletDynamics/ConstraintSolver/btHingeConstraint.h>
+#include <BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h>
 #include <BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
+#include <BulletDynamics/ConstraintSolver/btSliderConstraint.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <LinearMath/btDefaultMotionState.h>
@@ -172,7 +176,7 @@ class RigidBody : public IRigidBody, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RigidBody  (IShape* shape, float mass);
+    RigidBody  (bullet::Shape* shape, float mass);
     ~RigidBody ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -269,15 +273,28 @@ class Joint : public IJoint, public Object
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Joint ();
+    Joint (RigidBody* body1, RigidBody* body2, btTypedConstraint* joint);
+    ~Joint ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t     ObjectsCount ();
-    RigidBody* GetObject    (size_t index);
+    size_t      ObjectsCount ();
+    IRigidBody* GetObject    (size_t index);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение bullet соединения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    btTypedConstraint* BulletJoint ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Подписка на удаление объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function <void (Joint*)> BeforeDestroyHandler;
+
+    xtl::connection RegisterDestroyHandler (const BeforeDestroyHandler& handler);
 
   private:
     struct Impl;
@@ -381,6 +398,14 @@ void bullet_vector_from_vector (const math::vec3f& vector, btVector3& target_vec
 //преобразование кватернионов
 void quaternion_from_bullet_quaternion (const btQuaternion& bullet_quaternion, math::quatf& target_quaternion);
 void bullet_quaternion_from_quaternion (const math::quatf& quaternion, btQuaternion& target_quaternion);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Приведение типов объектов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class DstT, class SrcT>
+DstT* cast_object (SrcT* ptr, const char* source, const char* argument_name);
+
+#include "detail/object.inl"
 
 }
 
