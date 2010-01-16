@@ -100,6 +100,23 @@ size_t Effect::Id () const
 }
 
 /*
+    Имя эффекта
+*/
+
+const char* Effect::Name () const
+{
+  return impl->name.c_str ();
+}
+
+void Effect::SetName (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("media::rfx::Effect::SetName", "name");
+    
+  impl->name = name;
+}
+
+/*
     Количество техник
 */
 
@@ -246,7 +263,7 @@ int Effect::FindParameter (const char* name) const
     return -1;
     
   for (ParameterArray::iterator iter=impl->parameters.begin (), end=impl->parameters.end (); iter!=end; ++iter)
-    if (strcmp (iter->Name (), name))
+    if (!strcmp (iter->Name (), name))
       return iter - impl->parameters.begin ();
       
   return -1;
@@ -288,6 +305,19 @@ void Effect::RemoveAllParameters ()
 common::PropertyMap Effect::Properties () const
 {
   return impl->properties;
+}
+
+/*
+    Очистка
+*/
+
+void Effect::Clear ()
+{
+  RemoveAllTechniques ();
+  RemoveAllParameters ();
+  
+  impl->name.clear ();
+  impl->properties.Clear ();
 }
 
 /*

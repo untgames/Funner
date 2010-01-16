@@ -1,0 +1,5 @@
+Results of shader_test:
+default constructor: shader (name='', profile='', source_size=0, source='')
+after change properties: shader (name='shader1', profile='my_profile', source_size=11, source='hello world')
+clone not affects: shader (name='shader1', profile='my_profile', source_size=11, source='hello world')
+clone: shader (name='test', profile='my_profile', source_size=11, source='hello world')

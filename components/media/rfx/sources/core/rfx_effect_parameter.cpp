@@ -147,9 +147,37 @@ namespace media
 namespace rfx
 {
 
+/*
+    Обмен
+*/
+
 void swap (EffectParameter& param1, EffectParameter& param2)
 {
   param1.Swap (param2);
+}
+
+/*
+    Имя типа параметр эффекта
+*/
+
+const char* get_name (EffectParameterType type)
+{
+  switch (type)
+  {
+    case EffectParameterType_Int:      return "int";
+    case EffectParameterType_Float:    return "float";
+    case EffectParameterType_Int2:     return "int2";
+    case EffectParameterType_Float2:   return "float2";
+    case EffectParameterType_Int3:     return "int3";
+    case EffectParameterType_Float3:   return "float3";
+    case EffectParameterType_Int4:     return "int4";
+    case EffectParameterType_Float4:   return "float4";
+    case EffectParameterType_Float2x2: return "float2x2";
+    case EffectParameterType_Float3x3: return "float3x3";
+    case EffectParameterType_Float4x4: return "float4x4";
+    default:
+      throw xtl::make_argument_exception ("media::rfx::get_name(EffectParameterType)", "type", type);
+  }
 }
 
 }

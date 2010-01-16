@@ -1,0 +1,5 @@
+Results of material_test:
+default constructor: material (name='', effect='', properties=[])
+after change properties: material (name='material1', effect='my_effect', properties=[String='Hello world', Integer=1, Float=2.340, Vector=[1.000 2.000 3.000 4.000]])
+clone affects: material (name='material1', effect='my_effect', properties=[String='Hello world', Integer=1, Float=2.340, Vector=[1.000 2.000 3.000 4.000]])
+clone: material (name='material1', effect='my_effect', properties=[String='Hello world', Integer=1, Float=2.340, Vector=[1.000 2.000 3.000 4.000], Matrix=[[3.000 0.000 0.000 0.000] [0.000 3.000 0.000 0.000] [0.000 0.000 3.000 0.000] [0.000 0.000 0.000 3.000]]])

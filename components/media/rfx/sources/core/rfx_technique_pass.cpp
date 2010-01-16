@@ -80,6 +80,15 @@ common::PropertyMap TechniquePass::Properties () const
 }
 
 /*
+    Очистка
+*/
+
+void TechniquePass::Clear ()
+{
+  impl->properties.Clear ();
+}
+
+/*
     Обмен
 */
 

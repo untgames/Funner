@@ -168,6 +168,18 @@ common::PropertyMap Technique::Properties () const
 }
 
 /*
+    Очистка
+*/
+
+void Technique::Clear ()
+{
+  RemoveAllPasses ();
+
+  impl->name.clear ();
+  impl->properties.Clear ();
+}
+
+/*
     Обмен
 */
 

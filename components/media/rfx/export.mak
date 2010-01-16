@@ -6,7 +6,7 @@ export.compile.media.rfx.IMPORTS      := compile.math.vecmath compile.common
 export.link.media.rfx.LIBS    := funner.media.rfx
 export.link.media.rfx.IMPORTS := link.common
 
-# XMtl link exports
-export.link.media.rfx.xmtl.LIBS          := funner.media.rfx.xmtl
-export.link.media.rfx.xmtl.LINK_INCLUDES := XMtlLoader XMtlSaver
-export.link.media.rfx.xmtl.IMPORTS       := link.media.rfx link.common.xml
+# Default serializers link exports
+export.link.media.rfx.default_serializers.LIBS          := funner.media.rfx.default_serializers
+export.link.media.rfx.default_serializers.LINK_INCLUDES := XMtlLoader XMtlSaver
+export.link.media.rfx.default_serializers.IMPORTS       := link.media.rfx link.common.xml
