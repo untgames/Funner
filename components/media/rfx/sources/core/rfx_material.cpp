@@ -1,21 +1,27 @@
 #include "shared.h"
 
 using namespace media::rfx;
-using namespace media;
-using namespace common;
 
 /*
     Описание реализации Material
 */
 
-struct Material::Impl
+struct Material::Impl: public xtl::reference_counter
 {
-  xtl::reference_counter ref_count;  //счётчик ссылок
-  stl::string            name;       //имя материала
-  size_t                 name_hash;  //хэш имени
-  int                    sort_group; //группа сортировки
+  stl::string         name;       //имя материала
+  stl::string         effect;     //имя эффекта
+  common::PropertyMap properties; //свойства материала
+  
+  Impl ()
+  {
+  }
 
-  Impl () : name_hash (strhash ("")), sort_group (0) {}
+  Impl (const Impl& impl)
+    : name (impl.name)
+    , effect (impl.effect)
+    , properties (impl.properties.Clone ())
+  {
+  }
 };
 
 /*
@@ -24,28 +30,48 @@ struct Material::Impl
 
 Material::Material ()
   : impl (new Impl)
-  {}
+{
+}
+
+Material::Material (Impl* in_impl)
+  : impl (in_impl)
+{
+}
 
 Material::Material (const Material& material)
-  : impl (new Impl (*material.impl))
-  {}
+  : impl (material.impl)
+{
+  addref (impl);
+}
 
 Material::~Material ()
 {
+  release (impl);
+}
+
+Material& Material::operator = (const Material& material)
+{
+  Material (material).Swap (*this);
+  
+  return *this;
 }
 
 /*
     Копирование
 */
 
-Material::Pointer Material::Clone () const
+Material Material::Clone () const
 {
-  return Pointer (CloneCore (), false);
+  return Material (new Impl (*impl));
 }
 
-Material* Material::CloneCore () const
+/*
+    Идентификатор
+*/
+   
+size_t Material::Id () const
 {
-  return new Material (*this);
+  return reinterpret_cast<size_t> (impl);
 }
 
 /*
@@ -57,59 +83,60 @@ const char* Material::Name () const
   return impl->name.c_str ();
 }
 
-size_t Material::NameHash () const
-{
-  return impl->name_hash;
-}
-
-void Material::Rename (const char* name)
+void Material::SetName (const char* name)
 {
   if (!name)
-    throw xtl::make_null_argument_exception ("media::rfx::Material::Rename", "name");
+    throw xtl::make_null_argument_exception ("media::rfx::Material::SetName", "name");
         
-  impl->name      = name;
-  impl->name_hash = strhash (name);
+  impl->name = name;
 }
 
 /*
-    Динамическая диспетчеризация
+    Имя эффекта
 */
 
-void Material::Accept (Visitor& visitor)
+void Material::SetEffect (const char* name)
 {
-  AcceptCore (visitor);
+  if (!name)
+    throw xtl::make_null_argument_exception ("media::rfx::Material::SetEffect", "name");
+    
+  impl->effect = name;
 }
 
-void Material::AcceptCore (Visitor& visitor)
+const char* Material::Effect () const
 {
-  visitor (*this);
+  return impl->effect.c_str ();
 }
 
 /*
-    Установка группы сортировки
+    Свойства материала
 */
 
-void Material::SetSortGroup (int group)
+common::PropertyMap Material::Properties () const
 {
-  impl->sort_group = group;
-}
-
-int Material::SortGroup () const
-{
-  return impl->sort_group;
+  return impl->properties;
 }
 
 /*
-    Подсчёт ссылок
+    Обмен
 */
 
-void Material::AddRef () const
+void Material::Swap (Material& material)
 {
-  impl->ref_count.increment ();
+  stl::swap (impl, material.impl);
 }
 
-void Material::Release () const
+namespace media
 {
-  if (impl->ref_count.decrement ())
-    delete this;
+
+namespace rfx
+{
+
+void swap (Material& material1, Material& material2)
+{
+  material1.Swap (material2);
+}
+
+}
+
 }

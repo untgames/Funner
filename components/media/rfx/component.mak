@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.RFX.SOURCES MEDIA.RFX.XMTL.SOURCES MEDIA.RFX.TESTS MEDIA.RFX.XMTL.TESTS
+TARGETS := MEDIA.RFX.SOURCES #MEDIA.RFX.XMTL.SOURCES MEDIA.RFX.TESTS MEDIA.RFX.XMTL.TESTS
 
 #Цель №1 - sources
 MEDIA.RFX.SOURCES.TYPE             := static-lib

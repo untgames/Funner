@@ -1,35 +1,51 @@
 #include "shared.h"
 
 using namespace media::rfx;
-using namespace media;
-using namespace stl;
 using namespace common;
+
+namespace
+{
+
+/*
+    Дескриптор материала
+*/
+
+struct MaterialDesc
+{
+  Material    material;
+  stl::string name;
+  
+  MaterialDesc (const char* in_name, const Material& in_material)
+    : material (in_material)
+    , name (in_name)
+  {
+  }
+};
+
+}
 
 /*
     Описание реализации библиотеки материалов
 */
 
-typedef hash_map<string, Material::Pointer> MaterialMap;
+typedef stl::hash_map<stl::hash_key<const char*>, MaterialDesc> MaterialMap;
 
 struct MaterialLibrary::Impl
 {
-  string      name;      //имя модели
+  stl::string name;      //имя библиотеки
   MaterialMap materials; //библиотека материалов
+  
+  Impl ()
+  {
+  }
+  
+  Impl (const Impl& impl)
+    : name (impl.name)
+  {
+    for (MaterialMap::const_iterator iter=impl.materials.begin (), end=impl.materials.end (); iter!=end; ++iter)
+      materials.insert_pair (iter->first, MaterialDesc (iter->second.name.c_str (), iter->second.material.Clone ()));
+  }
 };
-
-/*
-    Утилиты
-*/
-
-namespace
-{
-
-//функция протоколирования по умолчанию
-void default_log_handler (const char*)
-{
-}
-
-}
 
 /*
     Конструкторы / деструктор
@@ -37,46 +53,37 @@ void default_log_handler (const char*)
 
 MaterialLibrary::MaterialLibrary ()
   : impl (new Impl)
-  {}
-
-MaterialLibrary::MaterialLibrary (const char* file_name, const LogHandler& log_handler)
-  : impl (new Impl)
 {
-  Init (file_name, log_handler);
 }
 
 MaterialLibrary::MaterialLibrary (const char* file_name)
   : impl (new Impl)
-{
-  Init (file_name, &default_log_handler);
-}
-
-MaterialLibrary::MaterialLibrary (const MaterialLibrary& library)
-  : impl (new Impl (*library.impl))
-  {}
-
-MaterialLibrary::~MaterialLibrary ()
-{
-}
-
-void MaterialLibrary::Init (const char* file_name, const LogHandler& log_handler)
 {
   try
   {
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");
       
-    static ComponentLoader loader ("media.rfx.loaders.*");
+    static ComponentLoader loader ("media.rfx.material.loaders.*");
 
-    MaterialLibraryManager::GetLoader (file_name, SerializerFindMode_ByName)(file_name, *this, log_handler);
+    MaterialLibraryManager::GetLoader (file_name, SerializerFindMode_ByName)(file_name, *this);
 
-    Rename (file_name);    
+    SetName (file_name);
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("media::rfx::MaterialLibrary::MaterialLibrary");
     throw;
   }
+}
+
+MaterialLibrary::MaterialLibrary (const MaterialLibrary& library)
+  : impl (new Impl (*library.impl))
+{
+}
+
+MaterialLibrary::~MaterialLibrary ()
+{
 }
 
 /*
@@ -98,16 +105,16 @@ const char* MaterialLibrary::Name () const
   return impl->name.c_str ();
 }
 
-void MaterialLibrary::Rename (const char* name)
+void MaterialLibrary::SetName (const char* name)
 {
   if (!name)
-    throw xtl::make_null_argument_exception ("media::rfx::MaterialLibrary::Rename", name);
+    throw xtl::make_null_argument_exception ("media::rfx::MaterialLibrary::SetName", name);
     
   impl->name = name;
 }
 
 /*
-    Количество мешей / проверка на пустоту
+    Количество материалов / проверка на пустоту
 */
 
 size_t MaterialLibrary::Size () const
@@ -131,19 +138,19 @@ namespace
 template <class T>
 struct material_selector
 {
-  template <class T1> T& operator () (T1& value) const { return value.second; }
+  template <class T1> T& operator () (T1& value) const { return value.second.material; }
 };
 
 }
 
 MaterialLibrary::Iterator MaterialLibrary::CreateIterator ()
 {
-  return const_cast<const MaterialLibrary&> (*this).CreateIterator ();
+  return Iterator (impl->materials.begin (), impl->materials.begin (), impl->materials.end (), material_selector<Material> ());
 }
 
-MaterialLibrary::Iterator MaterialLibrary::CreateIterator () const
+MaterialLibrary::ConstIterator MaterialLibrary::CreateIterator () const
 {
-  return ConstIterator (impl->materials.begin (), impl->materials.begin (), impl->materials.end (), material_selector<Material::Pointer> ());
+  return ConstIterator (impl->materials.begin (), impl->materials.begin (), impl->materials.end (), material_selector<Material> ());
 }
 
 /*
@@ -157,38 +164,38 @@ const char* MaterialLibrary::ItemId (const ConstIterator& i) const
   if (!iter)
     throw xtl::make_argument_exception ("media::rfx::MaterialLibrary::ItemId", "iterator", "wrong-type");
 
-  return (*iter)->first.c_str ();
+  return (*iter)->second.name.c_str ();
 }
 
 /*
     Поиск
 */
 
-Material::Pointer MaterialLibrary::Find (const char* name)
+Material* MaterialLibrary::Find (const char* name)
 {
-  return xtl::const_pointer_cast<Material> (const_cast<const MaterialLibrary&> (*this).Find (name));
+  return const_cast<Material*> (const_cast<const MaterialLibrary&> (*this).Find (name));
 }
 
-Material::ConstPointer MaterialLibrary::Find (const char* name) const
+const Material* MaterialLibrary::Find (const char* name) const
 {
   if (!name)
     return 0;
     
   MaterialMap::const_iterator iter = impl->materials.find (name);
   
-  return iter != impl->materials.end () ? iter->second : 0;
+  return iter != impl->materials.end () ? &iter->second.material : 0;
 }
 
 /*
     Присоединение материалов
 */
 
-void MaterialLibrary::Attach (const char* id, const Material::Pointer& material)
+void MaterialLibrary::Attach (const char* id, const Material& material)
 {
   if (!id)
     throw xtl::make_null_argument_exception ("media::rfx::MaterialLibrary::Insert", "id");
     
-  impl->materials.insert_pair (id, material);
+  impl->materials.insert_pair (id, MaterialDesc (id, material));
 }
 
 void MaterialLibrary::Detach (const char* id)
@@ -219,11 +226,11 @@ void MaterialLibrary::Clear ()
     Загрузка / сохранение
 */
 
-void MaterialLibrary::Load (const char* file_name, const LogHandler& log_handler)
+void MaterialLibrary::Load (const char* file_name)
 {
   try
   {
-    MaterialLibrary (file_name, log_handler).Swap (*this);
+    MaterialLibrary (file_name).Swap (*this);
   }
   catch (xtl::exception& exception)
   {
@@ -232,32 +239,22 @@ void MaterialLibrary::Load (const char* file_name, const LogHandler& log_handler
   }
 }
 
-void MaterialLibrary::Load (const char* file_name)
-{
-  Load (file_name, &default_log_handler);
-}
-
-void MaterialLibrary::Save (const char* file_name, const LogHandler& log_handler)
+void MaterialLibrary::Save (const char* file_name)
 {
   try
   {
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");    
       
-    static ComponentLoader loader ("media.rfx.savers.*");      
+    static ComponentLoader loader ("media.rfx.material.savers.*");
 
-    MaterialLibraryManager::GetSaver (file_name, SerializerFindMode_ByName)(file_name, *this, log_handler);
+    MaterialLibraryManager::GetSaver (file_name, SerializerFindMode_ByName)(file_name, *this);
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("media::rfx::MaterialLibrary::Save");
     throw;
   }
-}
-
-void MaterialLibrary::Save (const char* file_name)
-{
-  Save (file_name, &default_log_handler);
 }
 
 /*
