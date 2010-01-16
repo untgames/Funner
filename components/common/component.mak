@@ -13,6 +13,7 @@ COMMON.SOURCES.SOURCE_DIRS                       := sources/file_system/core sou
                                                     sources/platform/default
 COMMON.SOURCES.DOCUMENTATION_DIRS                := include
 COMMON.SOURCES.COMPILER_DEFINES                  := PCRE_STATIC
+COMMON.SOURCES.IMPORTS                           := compile.math.vecmath
 COMMON.SOURCES.iphone.COMPILER_DEFINES           := __IPHONE__
 COMMON.SOURCES.unistd.SOURCE_DIRS                := sources/platform/unistd
 COMMON.SOURCES.carbon.SOURCE_DIRS                := sources/platform/carbon
