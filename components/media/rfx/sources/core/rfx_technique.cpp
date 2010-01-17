@@ -162,7 +162,12 @@ void Technique::RemoveAllPasses ()
     Свойства прохода - параметры рендеринга
 */
 
-common::PropertyMap Technique::Properties () const
+common::PropertyMap& Technique::Properties ()
+{
+  return impl->properties;
+}
+
+const common::PropertyMap& Technique::Properties () const
 {
   return impl->properties;
 }

@@ -74,7 +74,12 @@ size_t TechniquePass::Id () const
     Свойства прохода - параметры рендеринга
 */
 
-common::PropertyMap TechniquePass::Properties () const
+common::PropertyMap& TechniquePass::Properties ()
+{
+  return impl->properties;
+}
+
+const common::PropertyMap& TechniquePass::Properties () const
 {
   return impl->properties;
 }

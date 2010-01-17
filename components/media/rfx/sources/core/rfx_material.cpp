@@ -112,7 +112,12 @@ const char* Material::Effect () const
     Свойства материала
 */
 
-common::PropertyMap Material::Properties () const
+common::PropertyMap& Material::Properties ()
+{
+  return impl->properties;
+}
+
+const common::PropertyMap& Material::Properties () const
 {
   return impl->properties;
 }

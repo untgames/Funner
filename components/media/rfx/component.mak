@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.RFX.SOURCES MEDIA.RFX.TESTS #MEDIA.RFX.DEFAULT_SERIALIZERS.SOURCES MEDIA.RFX.TESTS MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS
+TARGETS := MEDIA.RFX.SOURCES MEDIA.RFX.DEFAULT_SERIALIZERS.SOURCES MEDIA.RFX.TESTS MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS
 
 #Цель №1 - sources
 MEDIA.RFX.SOURCES.TYPE             := static-lib
@@ -38,9 +38,9 @@ MEDIA.RFX.TESTS.IMPORTS          := link.media.rfx compile.media.rfx
 #Цель №4 - XMTL tests
 MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.TYPE             := test-suite
 MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.INCLUDE_DIRS     :=
-MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.SOURCE_DIRS      := tests/xmtl
+MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.SOURCE_DIRS      := tests/default_serializers
 MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.LIB_DIRS         :=  
 MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.LIBS             :=
 MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.COMPILER_CFLAGS  :=
 MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.COMPILER_DEFINES :=
-MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.IMPORTS          := link.media.rfx.xmtl compile.media.rfx
+MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.IMPORTS          := link.media.rfx.default_serializers compile.media.rfx

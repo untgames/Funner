@@ -302,7 +302,12 @@ void Effect::RemoveAllParameters ()
     Свойства техники - параметры рендеринга
 */
 
-common::PropertyMap Effect::Properties () const
+common::PropertyMap& Effect::Properties ()
+{
+  return impl->properties;
+}
+
+const common::PropertyMap& Effect::Properties () const
 {
   return impl->properties;
 }
