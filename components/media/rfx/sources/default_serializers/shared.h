@@ -14,6 +14,7 @@
 #include <math/matrix.h>
 
 #include <common/component.h>
+#include <common/file.h>
 #include <common/log.h>
 #include <common/parser.h>
 #include <common/xml_writer.h>

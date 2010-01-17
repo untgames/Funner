@@ -113,3 +113,9 @@ void dump (const Material& material, const char* id)
   dump (material.Properties (), "    ");
 }
 
+void dump (const Shader& shader, const char* id)
+{
+  printf ("shader:\n  id='%s'\n  name='%s'\n  profile='%s'\n  source_length=%u\n  source:\n%s\n",
+    id, shader.Name (), shader.Profile (), shader.SourceCodeSize (), shader.SourceCode ());
+}
+
