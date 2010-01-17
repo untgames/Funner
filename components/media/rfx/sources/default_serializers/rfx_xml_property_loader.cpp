@@ -60,7 +60,7 @@ void PropertiesLoader::LoadTemplateProperty (Parser::Iterator parse_iter, Proper
     log.Warning (*parse_iter, "Unknown property type '%s'", type);
   }
   
-  tmpl.insert_pair (name, result_type);
+  tmpl.insert_pair (name, PropertyTemplate (parse_iter, result_type));
 }
 
 /*
@@ -120,7 +120,17 @@ void PropertiesLoader::LoadProperty (Parser::Iterator parse_iter, PropertyMap& p
       return;
     }
     
-    for_each_child (*parse_iter, xtl::bind (&PropertiesLoader::LoadPropertyWithTemplate, this, _1, xtl::ref (properties), xtl::ref (*iter->second)));
+    PropertyTemplateMap& template_map = *iter->second;
+    
+    for (PropertyTemplateMap::iterator iter=template_map.begin (), end=template_map.end (); iter!=end; ++iter)
+    {
+      PropertyTemplate& tmpl = iter->second;
+      
+      if (tmpl.iter->First ("Value"))
+        LoadProperty (tmpl.iter, properties);
+    }
+    
+    for_each_child (*parse_iter, xtl::bind (&PropertiesLoader::LoadPropertyWithTemplate, this, _1, xtl::ref (properties), xtl::ref (template_map)));
   }
 }
 

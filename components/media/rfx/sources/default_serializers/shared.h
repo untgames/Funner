@@ -1,11 +1,13 @@
 #ifndef MEDIALIB_RFX_DEFAULT_SERIALIZERS_SHARED_HEADER
 #define MEDIALIB_RFX_DEFAULT_SERIALIZERS_SHARED_HEADER
 
-#include <stl/vector>
 #include <stl/hash_map>
+#include <stl/string>
+#include <stl/vector>
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/iterator.h>
 #include <xtl/ref.h>
 #include <xtl/shared_ptr.h>
 
@@ -14,6 +16,7 @@
 #include <common/component.h>
 #include <common/log.h>
 #include <common/parser.h>
+#include <common/xml_writer.h>
 
 #include <media/rfx/effect_library.h>
 #include <media/rfx/material_library.h>
@@ -53,9 +56,13 @@ class PropertiesLoader
   private:
     struct PropertyTemplate
     {
-      common::PropertyType type;
+      common::PropertyType     type;
+      common::Parser::Iterator iter;
 
-      PropertyTemplate (common::PropertyType in_type) : type (in_type) {} 
+      PropertyTemplate (common::Parser::Iterator in_iter, common::PropertyType in_type)
+        : type (in_type)
+        , iter (in_iter)
+      {}
     };
         
     typedef stl::hash_map<stl::hash_key<const char*>, PropertyTemplate>       PropertyTemplateMap;
@@ -68,7 +75,7 @@ class PropertiesLoader
     void LoadPropertyWithTemplate (common::Parser::Iterator parse_iter, common::PropertyMap& properties, PropertyTemplateMap& tmpl);
 
   private:
-    TemplateMap       properties_templates; //шаблоны свойств
+    TemplateMap      properties_templates; //шаблоны свойств
     common::ParseLog log;                  //протокол загрузки
 };
 

@@ -103,15 +103,31 @@ class XmtlLoader
     void LoadMaterial (Parser::Iterator parse_iter)
     {
       const char* id     = get<const char*> (*parse_iter, "Name");
-      const char* effect = get<const char*> (*parse_iter, "Effect");
+      const char* sid    = get<const char*> (*parse_iter, "SubName", id);
+      const char* effect = get<const char*> (*parse_iter, "Effect", "");
       
       Material material;
       
-      material.SetName (id);
+      material.SetName (sid);
       material.SetEffect (effect);
       
       properties_loader.LoadProperties (parse_iter, material.Properties ());
       
+      int effect_property_index = material.Properties ().IndexOf ("Effect");
+      
+      if (effect_property_index != -1)
+      {
+        material.SetEffect (material.Properties ().GetString (effect_property_index));
+        
+        material.Properties ().RemoveProperty (effect_property_index);
+      }
+      
+      if (!*material.Effect ())
+      {
+        log.Error (*parse_iter, "Material '%s' has no effect", id);
+        return;
+      }
+
       library.Attach (id, material);
     }
 

@@ -1,0 +1,13 @@
+Results of xmtl_saver_test:
+<?xml version="1.0" encoding="utf-8"?>
+<MaterialLibrary>
+  <Materials>
+    <Material Name="material1" Effect="my_effect">
+      <Property Name="A" Type="string" Value="B"/>
+      <Property Name="C" Type="float" Value="3.14"/>
+      <Property Name="BlendEnable" Type="int" Value="0"/>
+      <Property Name="ClearColor" Type="vector" Value="1 0 1 0"/>
+    </Material>
+    <InstanceMaterial Name="material2" Source="material1"/>
+  </Materials>
+</MaterialLibrary>
