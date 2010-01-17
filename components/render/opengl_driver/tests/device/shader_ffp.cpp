@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const char* SHADER_FILE_NAME = "data/fpp_shader.wxf";
+const char* SHADER_FILE_NAME = "data/ffp_shader.wxf";
 
 struct MyShaderParameters
 {
@@ -15,15 +15,15 @@ void print (const char* message)
 
 int main ()
 {
-  printf ("Results of shader_fpp_test:\n");
+  printf ("Results of shader_ffp_test:\n");
   
   try
   {
-    Test test (L"OpenGL device test window (shader_fpp)");
+    Test test (L"OpenGL device test window (shader_ffp)");
 
     stl::string shader_source = read_shader (SHADER_FILE_NAME);
 
-    ShaderDesc shader_desc = {"my_shader", size_t (-1), shader_source.c_str (), "fpp", ""};
+    ShaderDesc shader_desc = {"my_shader", size_t (-1), shader_source.c_str (), "ffp", ""};
 
     ProgramPtr program (test.device->CreateProgram (1, &shader_desc, &print));
     

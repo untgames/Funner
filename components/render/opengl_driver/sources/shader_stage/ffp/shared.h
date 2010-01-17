@@ -1,5 +1,5 @@
-#ifndef RENDER_GL_DRIVER_FPP_SHADER_MANAGER_SHARED_HEADER
-#define RENDER_GL_DRIVER_FPP_SHADER_MANAGER_SHARED_HEADER
+#ifndef RENDER_GL_DRIVER_FFP_SHADER_MANAGER_SHARED_HEADER
+#define RENDER_GL_DRIVER_FFP_SHADER_MANAGER_SHARED_HEADER
 
 #include "../shared.h"
 
@@ -23,7 +23,7 @@ namespace opengl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Константы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-const size_t FPP_MAX_LIGHTS_COUNT = 8; //максимальное количество источников освещения
+const size_t FFP_MAX_LIGHTS_COUNT = 8; //максимальное количество источников освещения
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип источника света
@@ -164,13 +164,13 @@ struct RasterizationDesc
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Состояние фиксированной программы шейдинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct FppState
+struct FfpState
 {
   ModesDesc         modes;                              //режимы визуализации
   ViewerDesc        viewer;                             //параметры наблюдателя
   ObjectDesc        object;                             //параметры объекта
   RasterizationDesc rasterization;                      //параметры растеризации
-  LightDesc         lights [FPP_MAX_LIGHTS_COUNT];      //параметры источников освещения
+  LightDesc         lights [FFP_MAX_LIGHTS_COUNT];      //параметры источников освещения
   MaterialDesc      material;                           //праметры материала
   TexmapDesc        maps [DEVICE_SAMPLER_SLOTS_COUNT];  //параметры текстурирования
 };
@@ -178,52 +178,52 @@ struct FppState
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип динамического параметра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum FppDynamicParameterType
+enum FfpDynamicParameterType
 {
-  FppDynamicParameterType_Int,   //целое число
-  FppDynamicParameterType_Float, //вещественное число
+  FfpDynamicParameterType_Int,   //целое число
+  FfpDynamicParameterType_Float, //вещественное число
   
-  FppDynamicParameterType_Num
+  FfpDynamicParameterType_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Массив смещений полей структуры FppState, обновляемых вместе с динамическим параметром
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef stl::vector<size_t> FppFieldOffsetArray;
+typedef stl::vector<size_t> FfpFieldOffsetArray;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Динамический параметр fpp-шейдера (аналог uniform-var в glsl)
+///Динамический параметр ffp-шейдера (аналог uniform-var в glsl)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct FppDynamicParameter
+struct FfpDynamicParameter
 {
-  FppDynamicParameterType type;          //тип параметра
+  FfpDynamicParameterType type;          //тип параметра
   size_t                  count;         //количество элементов
-  FppFieldOffsetArray     field_offsets; //смещения полей в структуре FppState, обновляемых при изменении параметра
+  FfpFieldOffsetArray     field_offsets; //смещения полей в структуре FfpState, обновляемых при изменении параметра
 };
 
-typedef stl::hash_map<stl::hash_key<const char*>, FppDynamicParameter> FppDynamicParameterMap;
+typedef stl::hash_map<stl::hash_key<const char*>, FfpDynamicParameter> FfpDynamicParameterMap;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Fixed-pipeline-program
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class FppProgram: virtual public ICompiledProgram, virtual public IShader, public ContextObject
+class FfpProgram: virtual public ICompiledProgram, virtual public IShader, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FppProgram  (const ContextManager&, const ShaderDesc& shader_desc, const LogFunction& error_log);
-    ~FppProgram ();
+    FfpProgram  (const ContextManager&, const ShaderDesc& shader_desc, const LogFunction& error_log);
+    ~FfpProgram ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовое состояние фиксированной программы шейдинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const FppState& GetBaseState () const { return base_state; }
+    const FfpState& GetBaseState () const { return base_state; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с динамическими параметрами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const FppDynamicParameter* FindDynamicParameter (const char* name) const;
+    const FfpDynamicParameter* FindDynamicParameter (const char* name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание программы, устанавливаемой в контекст OpenGL
@@ -231,20 +231,20 @@ class FppProgram: virtual public ICompiledProgram, virtual public IShader, publi
     IBindableProgram* CreateBindableProgram (ProgramParametersLayout* layout);
 
   private:
-    FppState               base_state;         //базовое состояние фиксированной программы шейдинга
-    FppDynamicParameterMap dynamic_parameters; //массив динамических параметров
+    FfpState               base_state;         //базовое состояние фиксированной программы шейдинга
+    FfpDynamicParameterMap dynamic_parameters; //массив динамических параметров
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Fixed-pipeline-program устанавливаемая в контекст OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class FppBindableProgram: virtual public IBindableProgram, public ContextObject
+class FfpBindableProgram: virtual public IBindableProgram, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FppBindableProgram (const ContextManager& manager, FppProgram& compiled_program, ProgramParametersLayout* layout);
+    FfpBindableProgram (const ContextManager& manager, FfpProgram& compiled_program, ProgramParametersLayout* layout);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка программы в контекст OpenGL
@@ -264,7 +264,7 @@ class FppBindableProgram: virtual public IBindableProgram, public ContextObject
   private:
     ParameterArray  parameters;         //параметры программы
     GroupArray      groups;             //группы параметров
-    FppState        fpp_state;          //состояние фиксированной программы шейдинга
+    FfpState        ffp_state;          //состояние фиксированной программы шейдинга
     Matrix4f        view_object_matrix; //композиция преобразований вида и объекта
     size_t          viewer_hash;        //хэш параметров наблюдателя
     size_t          object_hash;        //хэш параметров объекта
@@ -278,13 +278,13 @@ class FppBindableProgram: virtual public IBindableProgram, public ContextObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер fixed-pipeline-program шейдеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class FppShaderManager : virtual public IShaderManager, public ContextObject
+class FfpShaderManager : virtual public IShaderManager, public ContextObject
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FppShaderManager (const ContextManager& manager);
+    FfpShaderManager (const ContextManager& manager);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество поддерживаемых профилей

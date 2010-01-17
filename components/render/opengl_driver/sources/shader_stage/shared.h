@@ -30,13 +30,13 @@ namespace opengl
 enum ShadingStageCacheEntry
 {
   CacheEntry_UsedProgram = CacheEntry_ShadingStagePrivateFirst, //ID текущей используемой программы
-  CacheEntry_FppViewerStateHash,             //хэш параметров наблюдателя
-  CacheEntry_FppObjectStateHash,             //хэш параметров объекта
-  CacheEntry_FppRasterizationStateHash,      //хэш параметров растеризации
-  CacheEntry_FppMaterialStateHash,           //хэш параметров материала
-  CacheEntry_FppLightingStateHash,           //хэш параметров освещения
-  CacheEntry_FppTexmapsStateHash,            //хэш параметров текстурирования
-  CacheEntry_FppModesStateHash,              //хэш режимов визуализации
+  CacheEntry_FfpViewerStateHash,             //хэш параметров наблюдателя
+  CacheEntry_FfpObjectStateHash,             //хэш параметров объекта
+  CacheEntry_FfpRasterizationStateHash,      //хэш параметров растеризации
+  CacheEntry_FfpMaterialStateHash,           //хэш параметров материала
+  CacheEntry_FfpLightingStateHash,           //хэш параметров освещения
+  CacheEntry_FfpTexmapsStateHash,            //хэш параметров текстурирования
+  CacheEntry_FfpModesStateHash,              //хэш режимов визуализации
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,7 +149,7 @@ class IShaderManager : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание шейдер менеджеров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-IShaderManager* create_fpp_shader_manager  (const ContextManager& manager);
+IShaderManager* create_ffp_shader_manager  (const ContextManager& manager);
 IShaderManager* create_glsl_shader_manager (const ContextManager& manager);
 
 }

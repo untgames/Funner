@@ -11,7 +11,7 @@ namespace
     Константы
 */
 
-const size_t FPP_DYNAMIC_PARAMETER_FIELDS_RESERVE_SIZE = 8; //резервируемое количество смещений динамических параметров
+const size_t FFP_DYNAMIC_PARAMETER_FIELDS_RESERVE_SIZE = 8; //резервируемое количество смещений динамических параметров
 
 /*
     Пара: тэг - значение
@@ -24,13 +24,13 @@ struct Tag2Value
 };
 
 /*
-    Парсер FPP-шейдеров
+    Парсер FFP-шейдеров
 */
 
-class FppProgramParser
+class FfpProgramParser
 {
   public:
-    FppProgramParser (FppState& in_base_state, FppDynamicParameterMap& in_dynamic_parameters, const ShaderDesc& shader_desc, const LogFunction& error_log)
+    FfpProgramParser (FfpState& in_base_state, FfpDynamicParameterMap& in_dynamic_parameters, const ShaderDesc& shader_desc, const LogFunction& error_log)
      : base_state (in_base_state),
        dynamic_parameters (in_dynamic_parameters),
        parser (shader_desc.name, shader_desc.source_code_size, shader_desc.source_code, "wxf")
@@ -47,14 +47,14 @@ class FppProgramParser
         error_log (log.Message (i));
 
       if (log.HasErrors ())
-        throw xtl::format_exception<xtl::bad_argument> ("render::low_level::opengl::FppProgramParser::FppProgramParser", "Errors in shader '%s'", shader_desc.name);
+        throw xtl::format_exception<xtl::bad_argument> ("render::low_level::opengl::FfpProgramParser::FfpProgramParser", "Errors in shader '%s'", shader_desc.name);
     }
     
   private:
       //добавление динамического параметра
-    void AddDynamicParameter (Parser::Iterator line_iter, const char* name, FppDynamicParameterType type, size_t count)
+    void AddDynamicParameter (Parser::Iterator line_iter, const char* name, FfpDynamicParameterType type, size_t count)
     {
-      FppDynamicParameterMap::iterator iter = dynamic_parameters.find (name);
+      FfpDynamicParameterMap::iterator iter = dynamic_parameters.find (name);
 
       if (iter != dynamic_parameters.end ())
       {
@@ -62,18 +62,18 @@ class FppProgramParser
         return;
       }
 
-      FppDynamicParameter& param = dynamic_parameters.insert_pair (name, FppDynamicParameter ()).first->second;
+      FfpDynamicParameter& param = dynamic_parameters.insert_pair (name, FfpDynamicParameter ()).first->second;
 
       param.type   = type;
       param.count  = count;      
 
-      param.field_offsets.reserve (FPP_DYNAMIC_PARAMETER_FIELDS_RESERVE_SIZE);
+      param.field_offsets.reserve (FFP_DYNAMIC_PARAMETER_FIELDS_RESERVE_SIZE);
     }
     
       //добавление смещения на динамический параметр
-    void AddDynamicParameterField (Parser::Iterator line_iter, const char* name, size_t offset, FppDynamicParameterType type, size_t count)
+    void AddDynamicParameterField (Parser::Iterator line_iter, const char* name, size_t offset, FfpDynamicParameterType type, size_t count)
     {
-      FppDynamicParameterMap::iterator iter = dynamic_parameters.find (name);
+      FfpDynamicParameterMap::iterator iter = dynamic_parameters.find (name);
 
       if (iter == dynamic_parameters.end ())
       {
@@ -81,7 +81,7 @@ class FppProgramParser
         return;
       }
       
-      FppDynamicParameter& param = iter->second;
+      FfpDynamicParameter& param = iter->second;
       
       if (param.type != type)
       {
@@ -100,7 +100,7 @@ class FppProgramParser
     }  
     
       //разбор значений
-    template <class T, FppDynamicParameterType Type>
+    template <class T, FfpDynamicParameterType Type>
     void ParseValues (Parser::Iterator iter, const char* node_name, size_t offset, size_t count)
     {
       iter = iter->First (node_name);
@@ -142,13 +142,13 @@ class FppProgramParser
       //разбор целочисленных значений
     void ParseIntegerValues (Parser::Iterator iter, const char* node_name, size_t offset, size_t count)
     {
-      ParseValues<int, FppDynamicParameterType_Int> (iter, node_name, offset, count);
+      ParseValues<int, FfpDynamicParameterType_Int> (iter, node_name, offset, count);
     }
 
       //разбор вещественных значений
     void ParseFloatValues (Parser::Iterator iter, const char* node_name, size_t offset, size_t count)
     {
-      ParseValues<float, FppDynamicParameterType_Float> (iter, node_name, offset, count);
+      ParseValues<float, FfpDynamicParameterType_Float> (iter, node_name, offset, count);
     }
     
       //разбор векторов
@@ -169,7 +169,7 @@ class FppProgramParser
     }
     
       //разбор объявления параметров
-    void ParseParameterDeclarations (Parser::Iterator params_iter, const char* name, FppDynamicParameterType type, size_t count)
+    void ParseParameterDeclarations (Parser::Iterator params_iter, const char* name, FfpDynamicParameterType type, size_t count)
     {
       for (Parser::NamesakeIterator iter=params_iter->First (name); iter; ++iter)
       {
@@ -285,14 +285,14 @@ class FppProgramParser
         
       if (params_iter)
       {        
-        ParseParameterDeclarations (params_iter, "float",    FppDynamicParameterType_Float, 1);
-        ParseParameterDeclarations (params_iter, "float3",   FppDynamicParameterType_Float, 3);
-        ParseParameterDeclarations (params_iter, "float4",   FppDynamicParameterType_Float, 4);
-        ParseParameterDeclarations (params_iter, "float4x4", FppDynamicParameterType_Float, 16);
-        ParseParameterDeclarations (params_iter, "int",      FppDynamicParameterType_Int, 1);
-        ParseParameterDeclarations (params_iter, "int3",     FppDynamicParameterType_Int, 3);
-        ParseParameterDeclarations (params_iter, "int4",     FppDynamicParameterType_Int, 4);
-        ParseParameterDeclarations (params_iter, "int4x4",   FppDynamicParameterType_Int, 16);
+        ParseParameterDeclarations (params_iter, "float",    FfpDynamicParameterType_Float, 1);
+        ParseParameterDeclarations (params_iter, "float3",   FfpDynamicParameterType_Float, 3);
+        ParseParameterDeclarations (params_iter, "float4",   FfpDynamicParameterType_Float, 4);
+        ParseParameterDeclarations (params_iter, "float4x4", FfpDynamicParameterType_Float, 16);
+        ParseParameterDeclarations (params_iter, "int",      FfpDynamicParameterType_Int, 1);
+        ParseParameterDeclarations (params_iter, "int3",     FfpDynamicParameterType_Int, 3);
+        ParseParameterDeclarations (params_iter, "int4",     FfpDynamicParameterType_Int, 4);
+        ParseParameterDeclarations (params_iter, "int4x4",   FfpDynamicParameterType_Int, 16);
 
         if (params_iter->NextNamesake ())
           parser.Log ().Warning (params_iter->NextNamesake (), "Second (and others) 'Parameters' block(s) ignored");
@@ -300,25 +300,25 @@ class FppProgramParser
       
         //разбор параметров растеризации
 
-      ParseFloatValues   (program_iter, "PointSize",          offsetof (FppState, rasterization.point_size), 1);
-      ParseFloatValues   (program_iter, "LineWidth",          offsetof (FppState, rasterization.line_width), 1);
-      ParseIntegerValues (program_iter, "LineStippleFactor",  offsetof (FppState, rasterization.line_stipple_factor), 1);
-      ParseIntegerValues (program_iter, "LineStipplePattern", offsetof (FppState, rasterization.line_stipple_pattern), 1);
+      ParseFloatValues   (program_iter, "PointSize",          offsetof (FfpState, rasterization.point_size), 1);
+      ParseFloatValues   (program_iter, "LineWidth",          offsetof (FfpState, rasterization.line_width), 1);
+      ParseIntegerValues (program_iter, "LineStippleFactor",  offsetof (FfpState, rasterization.line_stipple_factor), 1);
+      ParseIntegerValues (program_iter, "LineStipplePattern", offsetof (FfpState, rasterization.line_stipple_pattern), 1);
 
 
         //разбор параметров трансформации
 
-      ParseMatrix4f (program_iter, "ProjectionMatrix", offsetof (FppState, viewer.projection_matrix));
-      ParseMatrix4f (program_iter, "ViewMatrix", offsetof (FppState, viewer.view_matrix));
-      ParseMatrix4f (program_iter, "ObjectMatrix", offsetof (FppState, object.matrix));
+      ParseMatrix4f (program_iter, "ProjectionMatrix", offsetof (FfpState, viewer.projection_matrix));
+      ParseMatrix4f (program_iter, "ViewMatrix", offsetof (FfpState, viewer.view_matrix));
+      ParseMatrix4f (program_iter, "ObjectMatrix", offsetof (FfpState, object.matrix));
       
         //разбор параметров материала
       
-      ParseVector4f    (program_iter, "EmissionColor", offsetof (FppState, material.emission_color));
-      ParseVector4f    (program_iter, "AmbientColor",  offsetof (FppState, material.ambient_color));
-      ParseVector4f    (program_iter, "DiffuseColor",  offsetof (FppState, material.diffuse_color));
-      ParseVector4f    (program_iter, "SpecularColor", offsetof (FppState, material.specular_color));
-      ParseFloatValues (program_iter, "Shininess",     offsetof (FppState, material.shininess), 1);
+      ParseVector4f    (program_iter, "EmissionColor", offsetof (FfpState, material.emission_color));
+      ParseVector4f    (program_iter, "AmbientColor",  offsetof (FfpState, material.ambient_color));
+      ParseVector4f    (program_iter, "DiffuseColor",  offsetof (FfpState, material.diffuse_color));
+      ParseVector4f    (program_iter, "SpecularColor", offsetof (FfpState, material.specular_color));
+      ParseFloatValues (program_iter, "Shininess",     offsetof (FfpState, material.shininess), 1);
       
       static const Tag2Value color_material_modes [] = {
         {"Explicit",          ColorMaterial_Explicit},
@@ -330,7 +330,7 @@ class FppProgramParser
         {0, 0}
       };
 
-      ParseEnum (program_iter, "ColorMaterial", offsetof (FppState, material.color_material), color_material_modes);
+      ParseEnum (program_iter, "ColorMaterial", offsetof (FfpState, material.color_material), color_material_modes);
 
       static const Tag2Value compare_modes [] = {
         {"AlwaysFail",   CompareMode_AlwaysFail},
@@ -344,17 +344,17 @@ class FppProgramParser
         {0, 0}
       };
 
-      ParseEnum          (program_iter, "AlphaCompareMode", offsetof (FppState, material.alpha_compare_mode), compare_modes);
-      ParseFloatValues   (program_iter, "AlphaReference",   offsetof (FppState, material.alpha_reference), 1);
-      ParseIntegerValues (program_iter, "Normalize",        offsetof (FppState, modes.normalize), 1);
+      ParseEnum          (program_iter, "AlphaCompareMode", offsetof (FfpState, material.alpha_compare_mode), compare_modes);
+      ParseFloatValues   (program_iter, "AlphaReference",   offsetof (FfpState, material.alpha_reference), 1);
+      ParseIntegerValues (program_iter, "Normalize",        offsetof (FfpState, modes.normalize), 1);
 
         //разбор параметров освещения
         
       size_t light_index = 0;
         
-      for (Parser::Iterator light_iter = program_iter->First ("Light"); light_iter && light_index < FPP_MAX_LIGHTS_COUNT; ++light_iter, ++light_index)
+      for (Parser::Iterator light_iter = program_iter->First ("Light"); light_iter && light_index < FFP_MAX_LIGHTS_COUNT; ++light_iter, ++light_index)
       {
-        ParseLight (light_iter, offsetof (FppState, lights [0]) + light_index * sizeof (LightDesc));
+        ParseLight (light_iter, offsetof (FfpState, lights [0]) + light_index * sizeof (LightDesc));
       }
 
         //разбор параметров текстурирования
@@ -368,14 +368,14 @@ class FppProgramParser
         Parser::Iterator texmap_iter = program_iter->First (texmap_name);
         
         if (texmap_iter)
-          ParseTexmap (texmap_iter, offsetof (FppState, maps [0]) + i * sizeof (TexmapDesc));
+          ParseTexmap (texmap_iter, offsetof (FfpState, maps [0]) + i * sizeof (TexmapDesc));
       }
     }    
 
   private:
-    FppState&               base_state;         //базовое состояние fpp-шейдера
-    FppDynamicParameterMap& dynamic_parameters; //динамические параметры
-    Parser                  parser;             //парсер исходного текста fpp-шейдера
+    FfpState&               base_state;         //базовое состояние ffp-шейдера
+    FfpDynamicParameterMap& dynamic_parameters; //динамические параметры
+    Parser                  parser;             //парсер исходного текста ffp-шейдера
 };
 
 }
@@ -384,12 +384,12 @@ class FppProgramParser
     Конструктор / деструктор
 */
 
-FppProgram::FppProgram (const ContextManager& manager, const ShaderDesc& shader_desc, const LogFunction& error_log)
+FfpProgram::FfpProgram (const ContextManager& manager, const ShaderDesc& shader_desc, const LogFunction& error_log)
   : ContextObject (manager)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::FppProgram::FppProgram";
+  static const char* METHOD_NAME = "render::low_level::opengl::FfpProgram::FfpProgram";
 
-    //инициализация состояния fpp-шейдера
+    //инициализация состояния ffp-шейдера
     
   memset (&base_state, 0, sizeof base_state);
   
@@ -399,7 +399,7 @@ FppProgram::FppProgram (const ContextManager& manager, const ShaderDesc& shader_
 
   base_state.material.alpha_compare_mode = CompareMode_AlwaysPass;
 
-  for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
+  for (size_t i=0; i<FFP_MAX_LIGHTS_COUNT; i++)
   {
     LightDesc& light = base_state.lights [i];
     
@@ -419,7 +419,7 @@ FppProgram::FppProgram (const ContextManager& manager, const ShaderDesc& shader_
   base_state.rasterization.line_stipple_pattern = ~0;
   base_state.rasterization.line_stipple_factor  = 1;
 
-    //разбор fpp-шейдера
+    //разбор ffp-шейдера
 
   if (!shader_desc.profile)
     throw xtl::make_null_argument_exception (METHOD_NAME, "shader_desc.profile");
@@ -432,10 +432,10 @@ FppProgram::FppProgram (const ContextManager& manager, const ShaderDesc& shader_
 
   error_log (format ("Compiling '%s'...", shader_desc.name).c_str ());
 
-  FppProgramParser (base_state, dynamic_parameters, shader_desc, error_log);
+  FfpProgramParser (base_state, dynamic_parameters, shader_desc, error_log);
 }
 
-FppProgram::~FppProgram ()
+FfpProgram::~FfpProgram ()
 {
 }
 
@@ -443,12 +443,12 @@ FppProgram::~FppProgram ()
     Работа с динамическими параметрами
 */
 
-const FppDynamicParameter* FppProgram::FindDynamicParameter (const char* name) const
+const FfpDynamicParameter* FfpProgram::FindDynamicParameter (const char* name) const
 {
   if (!name)
     return 0;
     
-  FppDynamicParameterMap::const_iterator iter = dynamic_parameters.find (name);
+  FfpDynamicParameterMap::const_iterator iter = dynamic_parameters.find (name);
   
   if (iter == dynamic_parameters.end ())
     return 0;
@@ -460,15 +460,15 @@ const FppDynamicParameter* FppProgram::FindDynamicParameter (const char* name) c
     Создание программы, устанавливаемой в контекст OpenGL
 */
 
-IBindableProgram* FppProgram::CreateBindableProgram (ProgramParametersLayout* layout)
+IBindableProgram* FfpProgram::CreateBindableProgram (ProgramParametersLayout* layout)
 {
   try
   {
-    return new FppBindableProgram (GetContextManager (), *this, layout);
+    return new FfpBindableProgram (GetContextManager (), *this, layout);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::low_level::opengl::FppProgram::CreateBindableProgram");
+    exception.touch ("render::low_level::opengl::FfpProgram::CreateBindableProgram");
     throw;
   }
 }

@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const char* SHADER_FILE_NAME = "data/fpp_shader.wxf";
+const char* SHADER_FILE_NAME = "data/ffp_shader.wxf";
 
 #pragma pack (1)
 
@@ -47,7 +47,7 @@ int main ()
     Test test;        
 
     ShaderDesc shader_descs [] = {
-      {"fpp_shader", ~0, "", "fpp", ""},
+      {"ffp_shader", ~0, "", "ffp", ""},
     };    
 
     ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print));        

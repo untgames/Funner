@@ -5,17 +5,17 @@ using namespace render::low_level::opengl;
 using namespace common;
 
 /*
-    Описание параметра и группы параметров fpp-программы
+    Описание параметра и группы параметров ffp-программы
 */
 
-struct FppBindableProgram::Parameter
+struct FfpBindableProgram::Parameter
 {
-  const FppDynamicParameter* location; //указатель на динамический параметр шейдера
+  const FfpDynamicParameter* location; //указатель на динамический параметр шейдера
   size_t                     offset;   //смещение относительно начала константного буфера
   size_t                     size;     //размер параметра в байтах
 };
 
-struct FppBindableProgram::Group
+struct FfpBindableProgram::Group
 {
   size_t     slot;        //номер слота с константым буфером
   size_t     data_hash;   //хеш данных константного буфера
@@ -27,9 +27,9 @@ struct FppBindableProgram::Group
     Конструктор
 */
 
-FppBindableProgram::FppBindableProgram
+FfpBindableProgram::FfpBindableProgram
  (const ContextManager&    context_manager,
-  FppProgram&              program,
+  FfpProgram&              program,
   ProgramParametersLayout* parameters_layout)
    : ContextObject (context_manager)
 {
@@ -37,7 +37,7 @@ FppBindableProgram::FppBindableProgram
   {
       //получение базового состояния фиксированной программы шейдинга
     
-    fpp_state = program.GetBaseState ();  
+    ffp_state = program.GetBaseState ();  
     
     identity_matrix (view_object_matrix);
 
@@ -80,44 +80,44 @@ FppBindableProgram::FppBindableProgram
 
           //проверка соответствия типов
           
-        const FppDynamicParameter& dyn_param = *dst_param.location;
+        const FfpDynamicParameter& dyn_param = *dst_param.location;
 
         bool check_status = false;
 
         switch (src_param.type)
         {
           case ProgramParameterType_Int:
-            check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 1;
+            check_status = dyn_param.type == FfpDynamicParameterType_Int && dyn_param.count == 1;
             break;
           case ProgramParameterType_Float:
-            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 1;
+            check_status = dyn_param.type == FfpDynamicParameterType_Float && dyn_param.count == 1;
             break;
           case ProgramParameterType_Int2:
-            check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 2;
+            check_status = dyn_param.type == FfpDynamicParameterType_Int && dyn_param.count == 2;
             break;
           case ProgramParameterType_Float2:
-            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 2;
+            check_status = dyn_param.type == FfpDynamicParameterType_Float && dyn_param.count == 2;
             break;
           case ProgramParameterType_Int3:
-            check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 3;
+            check_status = dyn_param.type == FfpDynamicParameterType_Int && dyn_param.count == 3;
             break;
           case ProgramParameterType_Float3:
-            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 3;
+            check_status = dyn_param.type == FfpDynamicParameterType_Float && dyn_param.count == 3;
             break;
           case ProgramParameterType_Int4:
-            check_status = dyn_param.type == FppDynamicParameterType_Int && dyn_param.count == 4;
+            check_status = dyn_param.type == FfpDynamicParameterType_Int && dyn_param.count == 4;
             break;
           case ProgramParameterType_Float4:
-            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 4;
+            check_status = dyn_param.type == FfpDynamicParameterType_Float && dyn_param.count == 4;
             break;
           case ProgramParameterType_Float2x2:
-            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 4;
+            check_status = dyn_param.type == FfpDynamicParameterType_Float && dyn_param.count == 4;
             break;
           case ProgramParameterType_Float3x3:
-            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 9;
+            check_status = dyn_param.type == FfpDynamicParameterType_Float && dyn_param.count == 9;
             break;
           case ProgramParameterType_Float4x4:
-            check_status = dyn_param.type == FppDynamicParameterType_Float && dyn_param.count == 16;
+            check_status = dyn_param.type == FfpDynamicParameterType_Float && dyn_param.count == 16;
             break;
           default:
             LogPrintf ("Internal error: undefined program parameter type %d", src_param.type);
@@ -126,10 +126,10 @@ FppBindableProgram::FppBindableProgram
         
         switch (dyn_param.type)
         {
-          case FppDynamicParameterType_Int:
+          case FfpDynamicParameterType_Int:
             dst_param.size = dyn_param.count * sizeof (int);
             break;
-          case FppDynamicParameterType_Float:
+          case FfpDynamicParameterType_Float:
             dst_param.size = dyn_param.count * sizeof (float);
             break;         
           default:
@@ -143,8 +143,8 @@ FppBindableProgram::FppBindableProgram
 
           switch (dyn_param.type)
           {
-            case FppDynamicParameterType_Int:    dyn_param_type_name = "int"; break;
-            case FppDynamicParameterType_Float:  dyn_param_type_name = "float"; break;         
+            case FfpDynamicParameterType_Int:    dyn_param_type_name = "int"; break;
+            case FfpDynamicParameterType_Float:  dyn_param_type_name = "float"; break;         
             default:                             dyn_param_type_name = "__unknown__"; break;
           }
 
@@ -178,7 +178,7 @@ FppBindableProgram::FppBindableProgram
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::low_level::opengl::FppBindableProgram::FppBindableProgram");
+    exception.touch ("render::low_level::opengl::FfpBindableProgram::FfpBindableProgram");
     throw;
   }
 }
@@ -212,9 +212,9 @@ void load_transpose_matrix (Matrix4f matrix, const ContextCaps& caps)
 
 }
 
-void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
+void FfpBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::FppBindableProgram::Bind";
+  static const char* METHOD_NAME = "render::low_level::opengl::FfpBindableProgram::Bind";
   
     //проверка корректности аргументов
     
@@ -226,13 +226,13 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
   const ContextCaps& caps = GetCaps ();
                    
   const size_t current_program            = GetContextCacheValue (CacheEntry_UsedProgram),
-               current_viewer_hash        = GetContextCacheValue (CacheEntry_FppViewerStateHash),
-               current_object_hash        = GetContextCacheValue (CacheEntry_FppObjectStateHash),
-               current_rasterization_hash = GetContextCacheValue (CacheEntry_FppRasterizationStateHash),
-               current_material_hash      = GetContextCacheValue (CacheEntry_FppMaterialStateHash),
-               current_lighting_hash      = GetContextCacheValue (CacheEntry_FppLightingStateHash),
-               current_texmaps_hash       = GetContextCacheValue (CacheEntry_FppTexmapsStateHash),
-               current_modes_hash         = GetContextCacheValue (CacheEntry_FppModesStateHash);
+               current_viewer_hash        = GetContextCacheValue (CacheEntry_FfpViewerStateHash),
+               current_object_hash        = GetContextCacheValue (CacheEntry_FfpObjectStateHash),
+               current_rasterization_hash = GetContextCacheValue (CacheEntry_FfpRasterizationStateHash),
+               current_material_hash      = GetContextCacheValue (CacheEntry_FfpMaterialStateHash),
+               current_lighting_hash      = GetContextCacheValue (CacheEntry_FfpLightingStateHash),
+               current_texmaps_hash       = GetContextCacheValue (CacheEntry_FfpTexmapsStateHash),
+               current_modes_hash         = GetContextCacheValue (CacheEntry_FfpModesStateHash);
 
 #ifndef OPENGL_ES_SUPPORT               
                
@@ -250,7 +250,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
     //извлечение параметров из кэша расположения параметров
     
-  char* dst_data = (char*)&fpp_state;
+  char* dst_data = (char*)&ffp_state;
 
     //обновление динамических параметров
     
@@ -288,7 +288,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       const Parameter& param      = group.parameters [j];
       const char*      src_data   = buffer_base + param.offset;
 
-        //обновление всех полей FppState, ассоциированных с динамическим параметром
+        //обновление всех полей FfpState, ассоциированных с динамическим параметром
 
       const size_t* offset      = &param.location->field_offsets [0],
                     update_size = param.size;
@@ -302,7 +302,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     group.data_hash = buffer->GetDataHash ();    
   }
   
-    //обновление хэшей FppState
+    //обновление хэшей FfpState
     
   if (need_update_hashes)
   {
@@ -324,20 +324,20 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     
   if (need_update_modes)
   {
-    if (fpp_state.modes.normalize) glEnable  (GL_NORMALIZE);
+    if (ffp_state.modes.normalize) glEnable  (GL_NORMALIZE);
     else                           glDisable (GL_NORMALIZE);
 
-    SetContextCacheValue (CacheEntry_FppModesStateHash, modes_hash);
+    SetContextCacheValue (CacheEntry_FfpModesStateHash, modes_hash);
   }    
   
     //установка параметров растеризации
     
   if (need_update_rasterization)
   {
-    float point_size = fpp_state.rasterization.point_size,
-          line_width = fpp_state.rasterization.line_width;
+    float point_size = ffp_state.rasterization.point_size,
+          line_width = ffp_state.rasterization.line_width;
           
-    unsigned short line_stipple_factor = fpp_state.rasterization.line_stipple_factor;        
+    unsigned short line_stipple_factor = ffp_state.rasterization.line_stipple_factor;        
 
     if (point_size <= 0.0f)        point_size = 1.0f;
     if (line_width <= 0.0f)        line_width = 1.0f;    
@@ -348,9 +348,9 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     glLineWidth (line_width);
     
       //проблемы с поддержкой на MSOGL
-//    glLineStipple (line_stipple_factor, static_cast<unsigned short> (fpp_state.rasterization.line_stipple_pattern));
+//    glLineStipple (line_stipple_factor, static_cast<unsigned short> (ffp_state.rasterization.line_stipple_pattern));
 
-    SetContextCacheValue (CacheEntry_FppRasterizationStateHash, rasterization_hash);
+    SetContextCacheValue (CacheEntry_FfpRasterizationStateHash, rasterization_hash);
   }
 
     //установка параметров источников освещения
@@ -359,8 +359,8 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
   {
     bool lighting = false;
     
-    for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
-      if (fpp_state.lights [i].enable)
+    for (size_t i=0; i<FFP_MAX_LIGHTS_COUNT; i++)
+      if (ffp_state.lights [i].enable)
       {
         lighting = true;
         break;
@@ -381,15 +381,15 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
       glMatrixMode (GL_MODELVIEW);
 
-      load_transpose_matrix (fpp_state.viewer.view_matrix, caps);
+      load_transpose_matrix (ffp_state.viewer.view_matrix, caps);
 
       need_update_modelview_matrix = true;
       
         //установка параметров источника
 
-      for (size_t i=0; i<FPP_MAX_LIGHTS_COUNT; i++)
+      for (size_t i=0; i<FFP_MAX_LIGHTS_COUNT; i++)
       {
-        const LightDesc& light    = fpp_state.lights [i];
+        const LightDesc& light    = ffp_state.lights [i];
         GLenum           light_id = GL_LIGHT0 + i;
 
         if (!light.enable)
@@ -418,22 +418,22 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
       glDisable (GL_LIGHTING);    
     }
 
-    SetContextCacheValue (CacheEntry_FppLightingStateHash, lighting_hash);
+    SetContextCacheValue (CacheEntry_FfpLightingStateHash, lighting_hash);
   }    
   
     //установка параметров материала
 
   if (need_update_material)
   {
-    glMaterialfv (GL_FRONT_AND_BACK, GL_EMISSION,  (GLfloat*)&fpp_state.material.emission_color);
-    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT,   (GLfloat*)&fpp_state.material.ambient_color);
-    glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE,   (GLfloat*)&fpp_state.material.diffuse_color);
-    glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR,  (GLfloat*)&fpp_state.material.specular_color);
-    glMaterialf  (GL_FRONT_AND_BACK, GL_SHININESS, fpp_state.material.shininess);
+    glMaterialfv (GL_FRONT_AND_BACK, GL_EMISSION,  (GLfloat*)&ffp_state.material.emission_color);
+    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT,   (GLfloat*)&ffp_state.material.ambient_color);
+    glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE,   (GLfloat*)&ffp_state.material.diffuse_color);
+    glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR,  (GLfloat*)&ffp_state.material.specular_color);
+    glMaterialf  (GL_FRONT_AND_BACK, GL_SHININESS, ffp_state.material.shininess);
 
       //настройка передачи цвета материала
 
-    if (fpp_state.material.color_material == ColorMaterial_Explicit)
+    if (ffp_state.material.color_material == ColorMaterial_Explicit)
     {
       glDisable (GL_COLOR_MATERIAL);
     }
@@ -442,7 +442,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 #ifndef OPENGL_ES_SUPPORT
       GLenum mode;
       
-      switch (fpp_state.material.color_material)
+      switch (ffp_state.material.color_material)
       {
         case ColorMaterial_Emission:          mode = GL_EMISSION; break;
         case ColorMaterial_Ambient:           mode = GL_AMBIENT; break;
@@ -460,13 +460,13 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
       //включение параметров альфа-теста
 
-    if (fpp_state.material.alpha_compare_mode != CompareMode_AlwaysPass)
+    if (ffp_state.material.alpha_compare_mode != CompareMode_AlwaysPass)
     {
       glEnable (GL_ALPHA_TEST);
       
       GLenum gl_mode;
       
-      switch (fpp_state.material.alpha_compare_mode)
+      switch (ffp_state.material.alpha_compare_mode)
       {      
         case CompareMode_AlwaysFail:   gl_mode = GL_NEVER;    break;
         default:
@@ -479,14 +479,14 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
         case CompareMode_GreaterEqual: gl_mode = GL_GEQUAL;   break;
       }
 
-      glAlphaFunc (gl_mode, fpp_state.material.alpha_reference);
+      glAlphaFunc (gl_mode, ffp_state.material.alpha_reference);
     }
     else
     {
       glDisable (GL_ALPHA_TEST);
     }
 
-    SetContextCacheValue (CacheEntry_FppMaterialStateHash, material_hash);
+    SetContextCacheValue (CacheEntry_FfpMaterialStateHash, material_hash);
   }  
 
     //установка параметров текстурирования
@@ -526,7 +526,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
         
       glEnable (GL_TEXTURE_2D);        
       
-      TexmapDesc& texmap = fpp_state.maps [i];
+      TexmapDesc& texmap = ffp_state.maps [i];
       
         //установка параметров смешивания цветов
         
@@ -587,7 +587,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 #endif
     }    
     
-    SetContextCacheValue (CacheEntry_FppTexmapsStateHash, texmaps_hash);
+    SetContextCacheValue (CacheEntry_FfpTexmapsStateHash, texmaps_hash);
   }
   
     //установка параметров наблюдателя    
@@ -597,9 +597,9 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
   if (need_update_viewer)
   {    
     glMatrixMode          (GL_PROJECTION);
-    load_transpose_matrix (fpp_state.viewer.projection_matrix, caps);
+    load_transpose_matrix (ffp_state.viewer.projection_matrix, caps);
 
-    SetContextCacheValue (CacheEntry_FppViewerStateHash, viewer_hash);
+    SetContextCacheValue (CacheEntry_FfpViewerStateHash, viewer_hash);
 
     need_compute_view_object_matrix = true;
   }
@@ -608,14 +608,14 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
   if (need_update_object)
   {
-    SetContextCacheValue (CacheEntry_FppObjectStateHash, object_hash);
+    SetContextCacheValue (CacheEntry_FfpObjectStateHash, object_hash);
 
     need_compute_view_object_matrix = true;
   }
 
   if (need_compute_view_object_matrix)
   {
-    mult_matrix (fpp_state.viewer.view_matrix, fpp_state.object.matrix, view_object_matrix);
+    mult_matrix (ffp_state.viewer.view_matrix, ffp_state.object.matrix, view_object_matrix);
 
     need_update_modelview_matrix = true;
   }
@@ -635,13 +635,13 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
     Обновление хэшей
 */
 
-void FppBindableProgram::UpdateHashes ()
+void FfpBindableProgram::UpdateHashes ()
 {
-  viewer_hash        = crc32 (&fpp_state.viewer, sizeof (fpp_state.viewer));
-  object_hash        = crc32 (&fpp_state.object, sizeof (fpp_state.object));
-  rasterization_hash = crc32 (&fpp_state.rasterization, sizeof (fpp_state.rasterization));
-  material_hash      = crc32 (&fpp_state.material, sizeof (fpp_state.material));
-  lighting_hash      = crc32 (fpp_state.lights, sizeof (fpp_state.lights));
-  texmaps_hash       = crc32 (fpp_state.maps, sizeof (fpp_state.maps));
-  modes_hash         = crc32 (&fpp_state.modes, sizeof (fpp_state.modes));
+  viewer_hash        = crc32 (&ffp_state.viewer, sizeof (ffp_state.viewer));
+  object_hash        = crc32 (&ffp_state.object, sizeof (ffp_state.object));
+  rasterization_hash = crc32 (&ffp_state.rasterization, sizeof (ffp_state.rasterization));
+  material_hash      = crc32 (&ffp_state.material, sizeof (ffp_state.material));
+  lighting_hash      = crc32 (ffp_state.lights, sizeof (ffp_state.lights));
+  texmaps_hash       = crc32 (ffp_state.maps, sizeof (ffp_state.maps));
+  modes_hash         = crc32 (&ffp_state.modes, sizeof (ffp_state.modes));
 }
