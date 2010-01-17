@@ -409,7 +409,7 @@ class TestView: public IGameView
       
       common::FileSystem::LoadTextFile (name, shader_source);
       
-      ShaderDesc shader_desc = {name, size_t (-1), shader_source.c_str (), "fpp", ""};
+      ShaderDesc shader_desc = {name, size_t (-1), shader_source.c_str (), "ffp", ""};
 
       return ProgramPtr (current_device->CreateProgram (1, &shader_desc, &PrintShaderError));
     }    
