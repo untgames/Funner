@@ -1,0 +1,19 @@
+Results of xmtl_loader_test:
+material:
+  id='material1'
+  name='material1'
+  effect='my_effect'
+  parameters:
+    A='B'
+    C=3.140
+    BlendEnable=0
+    ClearColor=[1.000 0.000 1.000 0.000]
+material:
+  id='material2'
+  name='material1'
+  effect='my_effect'
+  parameters:
+    A='B'
+    C=3.140
+    BlendEnable=0
+    ClearColor=[1.000 0.000 1.000 0.000]

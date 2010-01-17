@@ -105,3 +105,11 @@ void dump (const Effect& effect, const char* id)
     dump (effect.Technique (i));
   }
 }
+
+void dump (const Material& material, const char* id)
+{
+  printf ("material:\n  id='%s'\n  name='%s'\n  effect='%s'\n  parameters:\n", id, material.Name (), material.Effect ());
+  
+  dump (material.Properties (), "    ");
+}
+

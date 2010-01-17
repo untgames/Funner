@@ -3,10 +3,6 @@
 using namespace media::rfx;
 using namespace common;
 
-#ifdef _MSC_VER
-  #pragma warning (disable : 4503) //decorated name length exceeded, name was truncated
-#endif
-
 namespace
 {
 
@@ -51,6 +47,7 @@ class XrfxLoader
     XrfxLoader (const char* in_name, EffectLibrary& in_library)
       : parser (in_name, "xml")
       , log (parser.Log ())
+      , properties_loader (log)
     {
       try
       {
@@ -133,154 +130,14 @@ class XrfxLoader
 ///Загрузка шаблона
     void LoadPropertiesTemplate (Parser::Iterator parse_iter)
     {
-      const char* name = get<const char*> (*parse_iter, "Name");
-      
-      PropertyTemplateMapPtr tmpl (new PropertyTemplateMap);
-      
-      for_each_child (*parse_iter, "Property", xtl::bind (&XrfxLoader::LoadPropertyTemplate, this, _1, xtl::ref (*tmpl)));
-      
-      properties_templates.insert_pair (name, tmpl);
+      properties_loader.LoadTemplate (parse_iter);
     }
     
-///Загрузка шаблона свойства
-    void LoadPropertyTemplate (Parser::Iterator parse_iter, PropertyTemplateMap& tmpl)
-    {
-      const char* name = get<const char*> (*parse_iter, "Name");
-      const char* type = get<const char*> (*parse_iter, "Type");
-      
-      PropertyType result_type = PropertyType_String;
-      
-      if (!strcmp (type, "string"))
-      {
-        result_type = PropertyType_String;
-      }
-      else if (!strcmp (type, "int"))
-      {
-        result_type = PropertyType_Integer;
-      }
-      else if (!strcmp (type, "float"))
-      {
-        result_type = PropertyType_Float;
-      }
-      else if (!strcmp (type, "vector"))
-      {
-        result_type = PropertyType_Vector;
-      }
-      else if (!strcmp (type, "matrix"))
-      {
-        result_type = PropertyType_Matrix;
-      }
-      else
-      {
-        log.Warning (*parse_iter, "Unknown property type '%s'", type);
-      }
-      
-      tmpl.insert_pair (name, result_type);
-    }
 
 ///Загрузка свойств
     void LoadProperties (Parser::Iterator parse_iter, PropertyMap& properties)
     {
-      for_each_child (*parse_iter, xtl::bind (&XrfxLoader::LoadProperty, this, _1, xtl::ref (properties)));
-    }
-    
-///Загрузка свойства
-    void LoadProperty (Parser::Iterator parse_iter, PropertyMap& properties)
-    {
-      if (!strcmp (parse_iter->Name (), "Property"))
-      {
-        const char* name = get<const char*> (*parse_iter, "Name");
-        const char* type = get<const char*> (*parse_iter, "Type", "string");
-        
-        if (!strcmp (type, "string"))
-        {
-          properties.SetProperty (name, get<const char*> (*parse_iter, "Value"));
-        }
-        else if (!strcmp (type, "int"))
-        {
-          properties.SetProperty (name, get<int> (*parse_iter, "Value"));
-        }
-        else if (!strcmp (type, "float"))
-        {
-          properties.SetProperty (name, get<float> (*parse_iter, "Value"));
-        }
-        else if (!strcmp (type, "vector"))
-        {
-          properties.SetProperty (name, math::vec4f ());
-          properties.SetProperty (name, get<const char*> (*parse_iter, "Value"));
-        }
-        else if (!strcmp (type, "matrix"))
-        {
-          properties.SetProperty (name, math::mat4f ());
-          properties.SetProperty (name, get<const char*> (*parse_iter, "Value"));
-        }
-        else
-        {
-          log.Warning (*parse_iter, "Unknown property type '%s'", type);
-        }
-      }
-      else if (!strcmp (parse_iter->Name (), "Name"))
-      {
-        //игнорирование чтения атрибута имени
-      }
-      else
-      {
-        TemplateMap::iterator iter = properties_templates.find (parse_iter->Name ());
-        
-        if (iter == properties_templates.end ())
-        {
-          log.Error (*parse_iter, "Undefined template '%s' used", parse_iter->Name ());
-          return;
-        }
-        
-        for_each_child (*parse_iter, xtl::bind (&XrfxLoader::LoadPropertyWithTemplate, this, _1, xtl::ref (properties), xtl::ref (*iter->second)));
-      }
-    }
-    
-///Загрузка значения шаблонного свойства
-    void LoadPropertyWithTemplate (Parser::Iterator parse_iter, PropertyMap& properties, PropertyTemplateMap& tmpl)
-    {
-      const char* name = parse_iter->Name ();
-      
-      PropertyTemplateMap::iterator iter = tmpl.find (name);
-      
-      if (iter == tmpl.end ())
-      {
-        log.Error (*parse_iter, "Undefined property '%s' used", name);
-        return;
-      }
-      
-      PropertyType type = iter->second.type;
-      
-      switch (type)
-      {
-        case PropertyType_String:
-          properties.SetProperty (name, get<const char*> (*parse_iter, ""));
-          break;
-        case PropertyType_Integer:
-          properties.SetProperty (name, get<int> (*parse_iter, ""));
-          break;
-        case PropertyType_Float:
-          properties.SetProperty (name, get<float> (*parse_iter, ""));
-          break;
-        case PropertyType_Vector:
-        {
-          properties.SetProperty (name, math::vec4f ());
-          properties.SetProperty (name, get<const char*> (*parse_iter, ""));
-
-          break;
-        }
-        case PropertyType_Matrix:
-        {
-          properties.SetProperty (name, math::mat4f ());
-          properties.SetProperty (name, get<const char*> (*parse_iter, ""));
-
-          break;
-        }
-        default:
-          log.Error (*parse_iter, "Bad property template '%s' type %d. Internal error", name, type);
-          break;
-      }
+      properties_loader.LoadProperties (parse_iter, properties);
     }
     
 ///Загрузка прохода
@@ -567,7 +424,7 @@ class XrfxLoader
     EffectLibrary     library;              //библиотека эффектов
     Parser            parser;               //парсер
     ParseLog          log;                  //протокол парсинга
-    TemplateMap       properties_templates; //шаблоны свойств
+    PropertiesLoader  properties_loader;    //загрузчик свойств
     ParameterBlockMap parameter_blocks;     //блоки параметров
     PassMap           passes;               //проходы
     TechniqueMap      techniques;           //техники

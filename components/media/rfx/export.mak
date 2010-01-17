@@ -8,5 +8,5 @@ export.link.media.rfx.IMPORTS := link.common
 
 # Default serializers link exports
 export.link.media.rfx.default_serializers.LIBS          := funner.media.rfx.default_serializers
-export.link.media.rfx.default_serializers.LINK_INCLUDES := XrfxLoader
+export.link.media.rfx.default_serializers.LINK_INCLUDES := XrfxLoader XmtlLoader
 export.link.media.rfx.default_serializers.IMPORTS       := link.media.rfx link.common.xml

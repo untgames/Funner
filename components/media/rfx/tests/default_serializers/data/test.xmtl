@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MaterialLibrary>
+  <Templates>
+    <Properties Name="OutputStageState">
+      <Property Name="BlendEnable" Type="int"/>
+      <Property Name="ClearColor" Type="vector"/>
+    </Properties>
+  </Templates>
+  <Materials>
+    <Material Name="material1" Effect="my_effect">
+      <Property Name="A" Value="B"/>
+      <Property Name="C" Value="3.14" Type="float"/>
+      <OutputStageState
+        BlendEnable="0"
+        ClearColor="1 0 1 0"
+      />
+    </Material>
+    <InstanceMaterial Name="material2" Source="material1"/>
+  </Materials>
+</MaterialLibrary>
