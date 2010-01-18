@@ -32,9 +32,9 @@ void print (float value)
   static float EPS = 0.001f;
   
   if (fabs (value) < EPS && value < 0.0f)
-    value = 0.0f;
-
-  printf ("%+.3f", value);
+    printf ("%+.3f", 0.f);
+  else
+    printf ("%+.3f", value);
 }
 
 //печать вектора
@@ -257,6 +257,13 @@ void dump (Mesh& mesh, int level, Model& model)
 
   for (size_t i=0; i<mesh.Surfaces ().Size (); i++)
     dump (mesh.Surfaces () [i], level, model);
+}
+
+//печать картинки
+void dump (Image& image, int level, Model& model)
+{
+  print_space (level);
+  printf      ("Image '%s', path = '%s'\n", image.Id (), image.Path ());
 }
 
 //печать цели морфа
@@ -567,6 +574,7 @@ int main ()
     print_space (1);
     printf ("Active scene: '%s'\n", model.ActiveSceneName ());
 
+    dump ("library_images", model.Images (), 1, model);
     dump ("library_effects", model.Effects (), 1, model);
     dump ("library_materials", model.Materials (), 1, model);
     dump ("library_meshes", model.Meshes (), 1, model);

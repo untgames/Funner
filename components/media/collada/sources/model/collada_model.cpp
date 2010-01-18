@@ -12,11 +12,12 @@ struct Model::Impl
   stl::string           name;         //имя модели
   stl::string           active_scene; //имя активной сцены
   LibraryImpl<Effect>   effects;      //библиотека эффектов
+  LibraryImpl<Image>    images;       //библиотека картинок
   LibraryImpl<Material> materials;    //библиотека материалов
   LibraryImpl<Mesh>     meshes;       //библиотека мешей
   LibraryImpl<Morph>    morphs;       //библиотека морферов
   LibraryImpl<Skin>     skins;        //библиотека скинов
-  LibraryImpl<Node>     nodes;        //библиотека узлов  
+  LibraryImpl<Node>     nodes;        //библиотека узлов
   LibraryImpl<Node>     scenes;       //библиотека сцен
   LibraryImpl<Light>    lights;       //библиотека источников света
   LibraryImpl<Camera>   cameras;      //библиотека камер
@@ -154,6 +155,16 @@ EffectLibrary& Model::Effects ()
 const EffectLibrary& Model::Effects () const
 {
   return impl->effects;
+}
+
+ImageLibrary& Model::Images ()
+{
+  return impl->images;
+}
+
+const ImageLibrary& Model::Images () const
+{
+  return impl->images;
 }
 
 MeshLibrary& Model::Meshes ()

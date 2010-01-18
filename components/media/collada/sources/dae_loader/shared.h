@@ -102,6 +102,7 @@ class DaeParser
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void ParseRoot                (Parser::Iterator);
     void ParseLibraries           (Parser::Iterator);
+    void ParseLibraryImages       (Parser::Iterator);
     void ParseLibraryEffects      (Parser::Iterator);
     void ParseLibraryMaterials    (Parser::Iterator);
     void ParseLibraryGeometries   (Parser::Iterator);

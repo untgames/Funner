@@ -224,6 +224,72 @@ void XmlLexer::ReadString (char border)
     }
 }
 
+void XmlLexer::ReadTextString ()
+{
+  char* write_position = position;
+
+  current_token = position;
+  current_lexem = XmlLexem_String;
+  cursor        = position;
+
+  for (;; position++, write_position++)
+    switch (*position)
+    {
+      case '&':
+      {
+        struct Marker
+        {
+          const char* marker;
+          char        replacement;
+        };
+
+        static Marker       markers []    = {{"lt", '<'}, {"gt", '>'}, {"amp", '&'}};
+        static const size_t markers_count = sizeof markers / sizeof *markers;
+
+        const Marker* m = markers;
+
+        for (size_t i=0; i<markers_count; i++, m++)
+        {
+          const char* s1 = m->marker;
+          char*       s2 = position + 1;
+
+          for (; *s1 && *s2 && *s1 == *s2; s1++, s2++);
+
+          if (!*s1) //соответствие найдено
+          {
+            position        = s2;
+            *write_position = m->replacement;
+
+            break;
+          }
+        }
+
+        if (m == markers + markers_count) //если соответствие не найдено
+        {
+          SetError (XmlLexerStatus_UnclosedString, current_token);
+          return;
+        }
+
+        break;
+      }
+      case '\n':
+      case '\0':
+      case '\r':
+      case ' ':
+      case '<':
+        if (write_position == position)
+        {
+          erased_char          = *write_position;
+          erased_char_position = position;
+        }
+
+        *write_position = '\0';
+        return;
+      default:
+        *write_position = *position;
+    }
+}
+
 void XmlLexer::ReadCData ()
 {
   current_token = position;
@@ -289,11 +355,44 @@ void XmlLexer::ReadIdentifier (bool identifier)
   }
 }
 
-XmlLexem XmlLexer::NextLexem ()
+void XmlLexer::ProcessTagBeginBracket (bool process_cdata)
 {
   static const char CDATA_TAG []   = "[CDATA[";
   static const int  CDATA_TAG_SIZE = strlen (CDATA_TAG);
 
+  switch (*++position)
+  {
+    case '/':
+      position++;
+      current_lexem = XmlLexem_TagCloseFrame;
+      break;
+    case '?':
+      position++;
+      current_lexem = XmlLexem_InstructionBeginBracket;
+      break;
+    case '!':
+      position++;
+
+      current_lexem = XmlLexem_Keyword;
+
+      if (process_cdata && !strncmp (position, CDATA_TAG, CDATA_TAG_SIZE))
+      {
+        position += CDATA_TAG_SIZE;
+
+        ReadCData ();
+
+        current_lexem = XmlLexem_CData;
+      }
+
+      break;
+    default:
+      current_lexem = XmlLexem_TagBeginBracket;
+      break;
+  }
+}
+
+XmlLexem XmlLexer::NextLexem ()
+{
   char* old_erased_char_position = erased_char_position;
 
   *erased_char_position = erased_char;
@@ -315,35 +414,7 @@ XmlLexem XmlLexer::NextLexem ()
         current_lexem = XmlLexem_EndOfFile;
         break;
       case '<':
-        switch (*++position)
-        {
-          case '/':
-            position++;
-            current_lexem = XmlLexem_TagCloseFrame;
-            break;
-          case '?':
-            position++;
-            current_lexem = XmlLexem_InstructionBeginBracket;
-            break;
-          case '!':
-            position++;
-
-            current_lexem = XmlLexem_Keyword;
-
-            if (!strncmp (position, CDATA_TAG, CDATA_TAG_SIZE))
-            {
-              position += CDATA_TAG_SIZE;
-
-              ReadCData ();
-
-              current_lexem = XmlLexem_CData;
-            }
-
-            break;
-          default:
-            current_lexem = XmlLexem_TagBeginBracket;
-            break;
-        }
+        ProcessTagBeginBracket (false);
         break;
       case '?':
         if (position [1] == '>')
@@ -416,6 +487,48 @@ XmlLexem XmlLexer::NextLexem ()
 
         SetError (XmlLexerStatus_WrongChar, position++);
         break;
+    }
+  }
+
+  *old_erased_char_position = '\0';
+
+  return current_lexem;
+}
+
+XmlLexem XmlLexer::NextTextLexem ()
+{
+  char* old_erased_char_position = erased_char_position;
+
+  *erased_char_position = erased_char;
+  current_lexem         = XmlLexem_Undefined;
+  current_status        = XmlLexerStatus_NoError;
+  current_token         = "";
+  erased_char           = ' ';
+  erased_char_position  = &DUMMY_CHAR;
+
+  Skip ();
+
+  cursor = position;
+
+  if (current_status == XmlLexerStatus_NoError)
+  {
+    switch (*position)
+    {
+      case '\0':
+        current_lexem = XmlLexem_EndOfFile;
+        break;
+      case '<':
+        ProcessTagBeginBracket (true);
+        break;
+      case ']':
+        if (position [1] == ']' && position [2] == '>')
+          SetError (XmlLexerStatus_WrongChar, position++);
+        break;
+      case '\n':
+        NextLine ();
+        break;
+      default:
+        ReadTextString ();
     }
   }
 

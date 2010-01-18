@@ -14,6 +14,7 @@ namespace collada
 
 //forward declarations
 class Effect;
+class Image;
 class Material;
 class Mesh;
 class Morph;
@@ -26,6 +27,7 @@ class Node;
 ///Библиотеки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef ILibrary<Effect>   EffectLibrary;
+typedef ILibrary<Image>    ImageLibrary;
 typedef ILibrary<Material> MaterialLibrary;
 typedef ILibrary<Mesh>     MeshLibrary;
 typedef ILibrary<Morph>    MorphLibrary;
@@ -78,6 +80,7 @@ class Model
 ///////////////////////////////////////////////////////////////////////////////////////////////////
           collada::MaterialLibrary& Materials ();
           collada::EffectLibrary&   Effects   ();
+          collada::ImageLibrary&    Images    ();
           collada::MeshLibrary&     Meshes    ();
           collada::MorphLibrary&    Morphs    ();
           collada::SkinLibrary&     Skins     ();          
@@ -87,6 +90,7 @@ class Model
           collada::NodeLibrary&     Scenes    ();
     const collada::MaterialLibrary& Materials () const;
     const collada::EffectLibrary&   Effects   () const;
+    const collada::ImageLibrary&    Images    () const;
     const collada::MeshLibrary&     Meshes    () const;
     const collada::MorphLibrary&    Morphs    () const;
     const collada::SkinLibrary&     Skins     () const;

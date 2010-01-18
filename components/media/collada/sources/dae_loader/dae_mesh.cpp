@@ -85,6 +85,7 @@ class MeshInputBuilder
   public:   
 ///Конструктор
     MeshInputBuilder ()
+      : max_offset (0)
     {       
       inputs.reserve (DEFAULT_INPUTS_RESERVE);
       sets.reserve (DEFAULT_SETS_RESERVE);
@@ -103,6 +104,9 @@ class MeshInputBuilder
         return false; //этот канал уже был зарегистрирован
 
       inputs.push_back (MeshInput (node, source, offset));
+
+      if (offset > max_offset)
+        max_offset = offset;
 
       try
       {       
@@ -144,6 +148,9 @@ class MeshInputBuilder
 ///Количество подмножеств
     size_t GetSetsCount () const { return sets.size (); }
     
+///Максимальное смещение канала
+    size_t GetMaxOffset () const { return max_offset; }
+
 ///Получение имени подмножества
     const char* GetSetName (size_t index) const { return sets [index]; }
 
@@ -169,6 +176,7 @@ class MeshInputBuilder
     MeshInputArray inputs;
     MeshInputMap   input_map;
     SetArray       sets;
+    size_t         max_offset;
 };
 
 /*
@@ -341,7 +349,8 @@ class VertexStreamReader
       }
       
       if (input->source->params != params)
-        raise_parser_exception (input->node, "Wrong params '%s'. Must be '%s'", input->source->params.c_str (), params);
+        if (xtl::xstrcmp (params, "STP") || input->source->params != "ST")
+          raise_parser_exception (input->node, "Wrong params '%s'. Must be '%s'", input->source->params.c_str (), params);
 
       const float* source         = &input->source->data [0];
       size_t       max_count      = input->source->count,
@@ -598,7 +607,7 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
 
   IndexBuffer input_indices;
 
-  size_t inputs_count        = surface_info.inputs.GetChannelsCount (),
+  size_t inputs_count        = surface_info.inputs.GetMaxOffset () + 1,
          input_indices_count = indices_count * inputs_count;
 
   input_indices.resize (input_indices_count);

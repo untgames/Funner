@@ -74,7 +74,8 @@ class XmlLexer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сканирование следующей лексемы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    XmlLexem NextLexem  ();
+    XmlLexem NextLexem ();
+    XmlLexem NextTextLexem ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Состояние разбора
@@ -95,6 +96,8 @@ class XmlLexer
     void ReadCData ();
     void ReadIdentifier (bool identifier);
     void SetError (XmlLexerStatus error, const char* position);
+    void ProcessTagBeginBracket (bool process_cdata);
+    void ReadTextString ();
 
   private:
     XmlLexem       current_lexem;

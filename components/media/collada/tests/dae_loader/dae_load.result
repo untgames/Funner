@@ -1,11 +1,15 @@
 Results of dae_load_test:
 --- Parse collada model 'data/ape.dae' ---
 data/ape.dae(1): warning: not yet implement. Encoding='utf-8'
-data/ape.dae(16376): warning: node 'morph': No targets
-data/ape.dae(16376): warning: node 'morph': No weights
+data/ape.dae(16387): warning: node 'morph': No targets
+data/ape.dae(16387): warning: node 'morph': No weights
 ---  Collada model dump ---
 Model 'data/ape.dae'
   Active scene: 'Ape.max'
+  Library 'library_images' (3 items)
+    Image 'file21', path = 'file:///C:/shatle/New_Project/sourceimages/VANCONTA.JPG'
+    Image 'file3', path = 'file:///C:/shatle/New_Project/sourceimages/VANENGFL.JPG'
+    Image 'file48', path = 'file:///C:/shatle/New_Project/sourceimages/VANcont1.jpg'
   Library 'library_effects' (5 items)
     Effect: 'eyes-fx'
       shader type: blinn
@@ -12852,7 +12856,7 @@ Model 'data/ape.dae'
                 Node 'Box54-node'
                   sid: 'Box54-node'
                   name: 'Box54'
-                  transform: [ [ -0.072 -0.496 -0.866 -0.000 ] [ -0.992 +0.129 +0.008 +0.000 ] [ +0.108 +0.859 -0.501 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                  transform: [ [ -0.072 -0.496 -0.866 +0.000 ] [ -0.992 +0.129 +0.008 +0.000 ] [ +0.108 +0.859 -0.501 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                   Collection 'instance_meshes' (0 items)
                   Collection 'instance_controllers' (0 items)
                   Collection 'lights' (0 items)
