@@ -1,7 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.COLLADA.SOURCES MEDIA.COLLADA.DAE.SOURCES MEDIA.COLLADA.CONVERT.SOURCES MEDIA.COLLADA.DAE.TESTS MEDIA.COLLADA.CONVERTER
+TARGETS := MEDIA.COLLADA.SOURCES MEDIA.COLLADA.DAE.SOURCES MEDIA.COLLADA.CONVERT.SOURCES MEDIA.COLLADA.DAE.TESTS MEDIA.COLLADA.CONVERTER \
+  MEDIA.COLLADA.CONVERTER.TESTS
 
 #Цель - sources
 MEDIA.COLLADA.SOURCES.TYPE             := static-lib
@@ -39,4 +40,10 @@ MEDIA.COLLADA.CONVERTER.NAME        := collada-converter
 MEDIA.COLLADA.CONVERTER.SOURCE_DIRS := utils/collada_converter
 MEDIA.COLLADA.CONVERTER.IMPORTS     := compile.media.collada compile.media.image compile.media.geometry \
                                        link.media.collada.dae link.media.collada.convert link.media.image link.media.geometry.xmesh
-                                                
+
+#Цель - collada convert tests
+MEDIA.COLLADA.CONVERTER.TESTS.TYPE               := test-suite
+MEDIA.COLLADA.CONVERTER.TESTS.SOURCE_DIRS        := tests/collada_converter
+MEDIA.COLLADA.CONVERTER.TESTS.EXECUTION_DIR      := tests/collada_converter
+MEDIA.COLLADA.CONVERTER.TESTS.USED_APPLICATIONS  := collada-converter
+                                                                                       
