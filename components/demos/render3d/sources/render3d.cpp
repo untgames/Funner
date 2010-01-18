@@ -31,7 +31,11 @@ struct CommonShaderParams
   math::mat4f proj_tm;
   math::vec3f light_pos;
   math::vec3f light_dir;
-  int         samplers [SamplerChannel_Num];
+  int         diffuse_sampler;
+  int         specular_sampler;
+  int         bump_sampler;
+  int         ambient_sampler;
+  int         emission_sampler;
 };
 
 enum ShaderType
@@ -397,7 +401,8 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
 
         dst_primitive.vertex_buffer = model_mesh->vertex_buffers [src_primitive.vertex_buffer];
         dst_primitive.first         = src_primitive.first;
-        dst_primitive.material      = FindMaterial (src_primitive.material);
+//        dst_primitive.material      = FindMaterial (src_primitive.material);
+        dst_primitive.material      = FindMaterial (common::format ("%s-fx", src_primitive.material).c_str ());
         
         if (!dst_primitive.material)
         {
@@ -770,8 +775,6 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
           
         device->SSSetConstantBuffer (ConstantBufferSemantic_Material, &*material.constant_buffer);  
         
-        printf ("!!! mesh='%s' primitive=%u\n", mesh.name.c_str (), iter-mesh.primitives.begin ());
-
         device->ISSetInputLayout (vb.input_layout.get ());
 
         for (size_t i=0; i<vb.vertex_streams.size (); i++)
@@ -928,11 +931,11 @@ int main ()
       {"ObjectMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, object_tm)},
       {"LightPos", ProgramParameterType_Float3, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, light_pos)},
       {"LightDir", ProgramParameterType_Float3, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, light_dir)},
-      {"BumpTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, samplers [SamplerChannel_Bump])},
-      {"DiffuseTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, samplers [SamplerChannel_Diffuse])},
-      {"AmbientTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, samplers [SamplerChannel_Ambient])},
-      {"SpecularTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, samplers [SamplerChannel_Specular])},
-      {"EmissionTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, samplers [SamplerChannel_Emission])},
+      {"BumpTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, bump_sampler)},
+      {"DiffuseTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, diffuse_sampler)},
+      {"AmbientTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, ambient_sampler)},
+      {"SpecularTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, specular_sampler)},
+      {"EmissionTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, emission_sampler)},
       
       {"ShaderType", ProgramParameterType_Int, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, shader_type)},
       {"Reflectivity", ProgramParameterType_Float, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, reflectivity)},
@@ -971,9 +974,12 @@ int main ()
     my_shader_parameters.proj_tm = get_ortho_proj (-10, 10, -10, 10, -1000, 1000);
     my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
     
-    for (int i=0; i<SamplerChannel_Num; i++)
-      my_shader_parameters.samplers [i] = (SamplerChannel)i;
-
+    my_shader_parameters.bump_sampler     = SamplerChannel_Bump;
+    my_shader_parameters.diffuse_sampler  = SamplerChannel_Diffuse;
+    my_shader_parameters.specular_sampler = SamplerChannel_Specular;
+    my_shader_parameters.ambient_sampler  = SamplerChannel_Ambient;
+    my_shader_parameters.emission_sampler = SamplerChannel_Emission;
+    
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
     test.device->SSSetProgram (shader.get ());
