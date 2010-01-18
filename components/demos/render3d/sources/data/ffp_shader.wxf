@@ -1,13 +1,13 @@
 Parameters
 {
-  float4x4 myViewMatrix myObjectMatrix myProjMatrix
-  float3   lightPos
-  float3   lightDir
+  float4x4 ViewMatrix ObjectMatrix ProjectionMatrix
+  float3   LightPos
+  float3   LightDir
 }
 
-ProjectionMatrix myProjMatrix
-ViewMatrix       myViewMatrix
-ObjectMatrix     myObjectMatrix
+ProjectionMatrix ProjectionMatrix
+ViewMatrix       ViewMatrix
+ObjectMatrix     ObjectMatrix
 
 DiffuseColor 0.2 0 0 0
 SpecularColor 0.4 0 0 0
@@ -21,6 +21,6 @@ Light
   DiffuseColor  1 1 1 1
   SpecularColor 1 1 1 1
   AmbientColor  1 1 1 1
-  Position      lightPos
-  Direction     lightDir
+  Position      LightPos
+  Direction     LightDir
 }

@@ -2,6 +2,7 @@
 <MaterialLibrary>
   <Templates>
     <Properties Name="ShaderParameters">
+      <Property Name="Effect" Type="string" Value="default"/>
       <Property Name="ShaderType" Type="string"/>
       <Property Name="Reflectivity" Type="float"/>
       <Property Name="Transparency" Type="float"/>
@@ -9,16 +10,16 @@
       <Property Name="BumpAmount" Type="float"/>
       <Property Name="BumpTexture" Type="string"/>
       <Property Name="BumpTextureChannel" Type="int"/>
-      <Property Name="Diffuse" Type="float4"/>
+      <Property Name="Diffuse" Type="vector"/>
       <Property Name="DiffuseTexture" Type="string"/>
       <Property Name="DiffuseTextureChannel" Type="int"/>
-      <Property Name="Ambient" Type="float4"/>
+      <Property Name="Ambient" Type="vector"/>
       <Property Name="AmbientTexture" Type="string"/>
       <Property Name="AmbientTextureChannel" Type="int"/>
-      <Property Name="Specular" Type="float4"/>
+      <Property Name="Specular" Type="vector"/>
       <Property Name="SpecularTexture" Type="string"/>
       <Property Name="SpecularTextureChannel" Type="int"/>
-      <Property Name="Emission" Type="float4"/>
+      <Property Name="Emission" Type="vector"/>
       <Property Name="EmissionTexture" Type="string"/>
       <Property Name="EmissionTextureChannel" Type="int"/>
     </Properties>
