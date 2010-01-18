@@ -183,8 +183,11 @@ class Converter
       const TexVertexChannelList& tex_channels   = src_surface.TexVertexChannels ();
       const ColorChannelList&     color_channels = src_surface.ColorChannels ();
 
+      printf ("tex_channels count = %u\n", tex_channels.Size ());
+
       for (size_t i=0; i<tex_channels.Size (); i++)
       {
+        printf ("Channel name = '%s'\n", tex_channels.Name (i));
           //определение вида потока: текстурные координаты либо текстурные координат + цвет
 
         int color_channel_index = color_channels.Find (tex_channels.Name (i));
