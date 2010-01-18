@@ -41,7 +41,7 @@ const char* BUMP_TEXTURE_CHANNEL_ATTRIBUTE     = "BumpTextureChannel";
 
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 
-const float EPSILON = 0.001;
+const float EPSILON = 0.001f;
 
 typedef stl::hash_map<stl::hash_key<const char*>, stl::string> ImagesMap;
 
