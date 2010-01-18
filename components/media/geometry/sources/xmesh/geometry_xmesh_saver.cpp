@@ -251,29 +251,6 @@ class XmlMeshLibrarySaver
       if (!mesh.VertexBuffersCount () || !mesh.PrimitivesCount ())
         return;
 
-      printf ("Saving mesh '%s':\n", mesh.Id ());
-      
-      for (size_t i = 0; i < mesh.VertexBuffersCount (); i++)
-      {
-        const VertexBuffer& vb = mesh.VertexBuffer (i);
-
-        printf ("  Vertex buffer %d - id '%s':\n", i, vb.Id ());
-
-        for (size_t j = 0; j < vb.StreamsCount (); j++)
-        {
-          const VertexStream& vs = vb.Stream (j);
-
-          printf ("    Vertex stream %d; id '%s':\n", j, vs.Id ());
-
-          for (size_t k = 0; k < vs.Format ().AttributesCount (); k++)
-          {
-            const VertexAttribute& va = vs.Format ().Attribute (k);
-
-            printf ("        Vertex attribute %d semantic %d\n", k, va.semantic);
-          }
-        }
-      }
-
       XmlWriter::Scope scope (writer, "mesh");
       
       writer.WriteAttribute ("name", mesh.Name ());

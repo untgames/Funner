@@ -115,7 +115,6 @@ class Converter
       //преобразование текстурных вершин
     media::geometry::VertexStream CreateTexVertices (const media::collada::Surface& src_surface, size_t channel_index)
     {
-            printf ("2\n");
       typedef media::geometry::Vertex<media::geometry::TexChannel<0>::Coord3f, media::geometry::Tangentf,
                                       media::geometry::Binormalf> ColladaTexVertex;
 
@@ -132,7 +131,7 @@ class Converter
 
       if (!dst_vertex)
         return vs; //throw!!!
-        
+
       for (size_t j=0; j<vertices_count; j++, src_vertex++, dst_vertex++)
       {
         dst_vertex->texcoord0 = src_vertex->coord;
@@ -146,14 +145,12 @@ class Converter
       //преобразование текстурных вершин с цветами
     media::geometry::VertexStream CreateTexColoredVertices (const media::collada::Surface& src_surface, size_t tex_channel_index, size_t color_channel_index)
     {
-      printf ("1\n");
       typedef media::geometry::Vertex<media::geometry::Color3f, media::geometry::TexChannel<0>::Coord3f,
                                       media::geometry::Tangentf, media::geometry::Binormalf> ColladaTexVertex;
 
       size_t vertices_count = src_surface.VerticesCount ();
 
         //создание вершинного потока
-
       media::geometry::VertexStream vs (vertices_count, media::geometry::make_vertex_declaration<ColladaTexVertex> ());
 
         //преобразование данных
@@ -185,11 +182,8 @@ class Converter
       const TexVertexChannelList& tex_channels   = src_surface.TexVertexChannels ();
       const ColorChannelList&     color_channels = src_surface.ColorChannels ();
 
-      printf ("tex_channels count = %u\n", tex_channels.Size ());
-
       for (size_t i=0; i<tex_channels.Size (); i++)
       {
-        printf ("Channel name = '%s'\n", tex_channels.Name (i));
           //определение вида потока: текстурные координаты либо текстурные координат + цвет
 
         int color_channel_index = color_channels.Find (tex_channels.Name (i));
@@ -200,10 +194,8 @@ class Converter
                                            CreateTexVertices (src_surface, i);
 
           //регистрация вершинного потока в поверхности
-          
-          printf ("save channel '%s'\n", tex_channels.Name (i));
 
-        dst_surface.vertex_streams.insert_pair (common::format ("texchannels.%s", tex_channels.Name (i)).c_str (), vs);
+        dst_surface.vertex_streams.insert_pair (common::format ("texchannels.TEX%s", tex_channels.Name (i)).c_str (), vs);
       }
     }
     
@@ -415,8 +407,6 @@ class Converter
         const char*                    channel_name = texture.TexcoordChannel ();
         
           //поиск канала текстурных координат
-          
-          printf ("search for '%s'\n", channel_name);
           
         VertexStreamMap::iterator iter = surface.vertex_streams.find (common::format ("texchannels.%s", channel_name).c_str ());
         
