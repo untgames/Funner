@@ -610,6 +610,14 @@ void save_materials (const Params& params, const Model& model, ImagesMap& images
     XmlWriter::Scope properties_scope (writer, "Properties");
     writer.WriteAttribute ("Name", "ShaderParameters");
 
+    {
+      XmlWriter::Scope scope (writer, "Property");
+
+      writer.WriteAttribute ("Name", "Effect");
+      writer.WriteAttribute ("Type", "string");
+      writer.WriteAttribute ("Value", "default");
+    }
+
     save_property_declaration (SHADER_TYPE_ATTRIBUTE, "string", writer);
     save_property_declaration (REFLECTIVITY_ATTRIBUTE, "float", writer);
     save_property_declaration (TRANSPARENCY_ATTRIBUTE, "float", writer);
@@ -618,16 +626,16 @@ void save_materials (const Params& params, const Model& model, ImagesMap& images
     save_property_declaration (BUMP_AMOUNT_ATTRIBUTE,              "float",  writer);
     save_property_declaration (BUMP_TEXTURE_ATTRIBUTE,             "string", writer);
     save_property_declaration (BUMP_TEXTURE_CHANNEL_ATTRIBUTE,     "int",    writer);
-    save_property_declaration (DIFFUSE_ATTRIBUTE,                  "float4", writer);
+    save_property_declaration (DIFFUSE_ATTRIBUTE,                  "vector", writer);
     save_property_declaration (DIFFUSE_TEXTURE_ATTRIBUTE,          "string", writer);
     save_property_declaration (DIFFUSE_TEXTURE_CHANNEL_ATTRIBUTE,  "int",    writer);
-    save_property_declaration (AMBIENT_ATTRIBUTE,                  "float4", writer);
+    save_property_declaration (AMBIENT_ATTRIBUTE,                  "vector", writer);
     save_property_declaration (AMBIENT_TEXTURE_ATTRIBUTE,          "string", writer);
     save_property_declaration (AMBIENT_TEXTURE_CHANNEL_ATTRIBUTE,  "int",    writer);
-    save_property_declaration (SPECULAR_ATTRIBUTE,                 "float4", writer);
+    save_property_declaration (SPECULAR_ATTRIBUTE,                 "vector", writer);
     save_property_declaration (SPECULAR_TEXTURE_ATTRIBUTE,         "string", writer);
     save_property_declaration (SPECULAR_TEXTURE_CHANNEL_ATTRIBUTE, "int",    writer);
-    save_property_declaration (EMISSION_ATTRIBUTE,                 "float4", writer);
+    save_property_declaration (EMISSION_ATTRIBUTE,                 "vector", writer);
     save_property_declaration (EMISSION_TEXTURE_ATTRIBUTE,         "string", writer);
     save_property_declaration (EMISSION_TEXTURE_CHANNEL_ATTRIBUTE, "int",    writer);
   }
