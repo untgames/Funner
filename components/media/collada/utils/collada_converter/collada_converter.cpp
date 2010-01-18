@@ -47,6 +47,7 @@ struct Params
   stl::string   output_textures_dir_name; //имя каталога с сохранёнными текстурами
   stl::string   textures_format;          //формат текстур
   stl::string   materials_file_name;      //файл материалов
+  stl::string   scene_file_name;          //файл сцены
   stl::string   output_meshes_dir_name;   //имя каталога с сохраненными мешами
   stl::string   meshes_format;            //формат мешей
   bool          silent;                   //минимальное число сообщений
@@ -137,6 +138,12 @@ void command_line_materials_file_name (const char* file_name, Params& params)
   params.materials_file_name = file_name;
 }
 
+//установка файла сцены
+void command_line_scene_file_name (const char* file_name, Params& params)
+{
+  params.scene_file_name = file_name;
+}
+
 //установка папки мешей
 void command_line_result_meshes_dir_name (const char* file_name, Params& params)
 {
@@ -170,6 +177,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_result_textures_dir,        "textures-dir",          'o', "dir",       "set output textures directory"},
     {command_line_result_textures_format,     "textures-format",       0,   "string",    "set output textures format string"},
     {command_line_materials_file_name,        "materials-file",        0,   "file",      "set output materials file"},
+    {command_line_scene_file_name,            "scene-file",            0,   "file",      "set output scene file"},
     {command_line_result_meshes_dir_name,     "meshes-dir",            0,   "dir",       "set output meshes directory"},
     {command_line_result_meshes_format,       "meshes-format",         0,   "string",    "set output meshes format string"},
     {command_line_silent,                     "silent",                's', 0,           "quiet mode"},
@@ -461,6 +469,46 @@ void save_meshes (const Params& params, const Model& model)
   mesh_library.Save (save_name.c_str ());
 }
 
+void save_node (const Node& node, XmlWriter& writer)
+{
+  XmlWriter::Scope scope (writer, "node");
+
+  writer.WriteAttribute ("transform", node.Transform ());
+
+  size_t mesh_index = 0;
+
+  for (Node::MeshList::ConstIterator iter = node.Meshes ().CreateIterator (); iter; ++iter)
+  {
+    stl::string mesh_name = common::format ("%s.mesh#%u", node.Id (), mesh_index++);
+
+    XmlWriter::Scope scope (writer, "mesh");
+
+    writer.WriteAttribute ("name", mesh_name.c_str ());
+  }
+
+  for (Node::NodeList::ConstIterator iter = node.Nodes ().CreateIterator (); iter; ++iter)
+    save_node (*iter, writer);
+}
+
+void save_scene (const Params& params, const Model& model)
+{
+  stl::string xml_name = params.scene_file_name;
+
+  if (xml_name.empty ())
+  {
+    stl::string model_base_name = common::notdir (model.Name ());
+
+    xml_name = common::format ("%s.xscene", model_base_name.c_str ());
+  }
+
+  XmlWriter writer (xml_name.c_str ());
+
+  XmlWriter::Scope scope (writer, "scene");
+
+  for (NodeLibrary::ConstIterator i = model.Nodes ().CreateIterator (); i; ++i)
+    save_node (*i, writer);
+}
+
 //печать протокола
 void print (const char* message)
 {
@@ -474,6 +522,7 @@ void export_data (Params& params)
 
   save_materials (params, model);
   save_meshes (params, model);
+  save_scene (params, model);
 }
 
 //проверка корректности ввода

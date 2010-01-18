@@ -29,7 +29,7 @@ class Converter
     //преобразованная поверхность
     struct Surface
     {
-      VertexStreamMap                vertex_streams; //вершинный потоки      
+      VertexStreamMap                vertex_streams; //вершинный потоки
       media::geometry::PrimitiveType primitive_type; //тип примитивов
       size_t                         first_index;    //номер первого индекса
       size_t                         indices_count;  //количество индексов
@@ -470,7 +470,7 @@ class Converter
         ConvertInstanceSurface (**i, binds, "", 0, dst_mesh);
         
         //регистрация меша в библиотеке
-        
+
       mesh_library.Attach (id, dst_mesh);
     }
     
@@ -480,7 +480,7 @@ class Converter
     
     void ConvertInstanceController (const char* id, const media::collada::InstanceController& icontroller)
     {
-        //поиск инстанцируемого меша        
+        //поиск инстанцируемого меша
 
       SkinMap::iterator iter = skin_map.find (icontroller.Controller ());
 
