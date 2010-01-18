@@ -73,6 +73,7 @@ struct Params
   stl::string   output_meshes_dir_name;   //имя каталога с сохраненными мешами
   stl::string   meshes_format;            //формат мешей
   stl::string   nodes_exclude;            //неэкспортируемые узлы сцены
+  bool          skip_materials;           //не сохранять картинки и материалы
   bool          silent;                   //минимальное число сообщений
   bool          print_help;               //нужно ли печатать сообщение помощи
 };
@@ -184,6 +185,12 @@ void command_line_nodes_exclude (const char* string, Params& params)
   params.nodes_exclude = string;
 }
 
+//установка параметра пропуска сохранения картинок и материалов
+void command_line_skip_materials (const char*, Params& params)
+{
+  params.skip_materials = true;
+}
+
 //установка параметра вывода детальной информации
 void command_line_silent (const char*, Params& params)
 {
@@ -195,13 +202,14 @@ void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
     {command_line_source_textures_path,       "textures-path",         'o', "dir",       "set source textures path"},
-    {command_line_result_textures_dir,        "textures-dir",          'o', "dir",       "set output textures directory"},
+    {command_line_result_textures_dir,        "textures-dir",          0, "dir",       "set output textures directory"},
     {command_line_result_textures_format,     "textures-format",       0,   "string",    "set output textures format string"},
     {command_line_materials_file_name,        "materials-file",        0,   "file",      "set output materials file"},
     {command_line_scene_file_name,            "scene-file",            0,   "file",      "set output scene file"},
     {command_line_result_meshes_dir_name,     "meshes-dir",            0,   "dir",       "set output meshes directory"},
     {command_line_result_meshes_format,       "meshes-format",         0,   "string",    "set output meshes format string"},
     {command_line_nodes_exclude,              "nodes-exclude",         0,   "wildcards", "exclude selected nodes from export"},
+    {command_line_skip_materials,             "skip-materials",        0,   0,           "don't save images and materials"},
     {command_line_silent,                     "silent",                's', 0,           "quiet mode"},
     {command_line_help,                       "help",                  '?', 0,           "print help message"},
   };
@@ -643,10 +651,14 @@ void export_data (Params& params)
 
   ImagesMap images_map;
 
-  save_images (params, model, images_map);
+  if (!params.skip_materials)
+  {
+    save_images (params, model, images_map);
+    save_materials (params, model, images_map);
+  }
+
   save_meshes (params, model);
   save_scene (params, model);
-  save_materials (params, model, images_map);
 }
 
 //проверка корректности ввода
@@ -677,6 +689,7 @@ int main (int argc, const char *argv[])
     params.options_count   = 0;
     params.textures_format = "png";
     params.meshes_format   = "xmesh";
+    params.skip_materials  = false;
     params.silent          = false;
     params.print_help      = false;
 
