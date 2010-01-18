@@ -44,7 +44,9 @@
 #include <sg/scene.h>
 #include <sg/visual_model.h>
 
+#include <media/image.h>
 #include <media/mesh.h>
+#include <media/rfx/material_library.h>
 
 using namespace render::low_level;
 
@@ -112,12 +114,12 @@ struct Test
 
     memset (&desc, 0, sizeof (desc));
 
-    desc.frame_buffer.color_bits   = 32;
-    desc.frame_buffer.alpha_bits   = 8;
-    desc.frame_buffer.depth_bits   = 24;
-    desc.frame_buffer.stencil_bits = 8;
+    desc.frame_buffer.color_bits   = 24;
+    desc.frame_buffer.alpha_bits   = 0;
+    desc.frame_buffer.depth_bits   = 16;
+    desc.frame_buffer.stencil_bits = 0;
     desc.buffers_count             = 2;
-    desc.samples_count             = 4;
+    desc.samples_count             = 0;
     desc.swap_method               = SwapMethod_Discard;
     desc.vsync                     = false;
     desc.window_handle             = window.Handle ();
