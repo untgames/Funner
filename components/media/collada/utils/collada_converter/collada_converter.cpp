@@ -50,6 +50,7 @@ struct Params
   stl::string   scene_file_name;          //файл сцены
   stl::string   output_meshes_dir_name;   //имя каталога с сохраненными мешами
   stl::string   meshes_format;            //формат мешей
+  stl::string   nodes_exclude;            //неэкспортируемые узлы сцены
   bool          silent;                   //минимальное число сообщений
   bool          print_help;               //нужно ли печатать сообщение помощи
   bool          need_pot_extent;          //нужно ли расширять изображения до ближайшей степени двойки
@@ -156,6 +157,11 @@ void command_line_result_meshes_format (const char* value, Params& params)
   params.meshes_format = value;
 }
 
+//установка неэкспортируемых узлов сцены
+void command_line_nodes_exclude (const char* string, Params& params)
+{
+  params.nodes_exclude = string;
+}
 
 //установка параметра вывода детальной информации
 void command_line_silent (const char*, Params& params)
@@ -180,6 +186,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_scene_file_name,            "scene-file",            0,   "file",      "set output scene file"},
     {command_line_result_meshes_dir_name,     "meshes-dir",            0,   "dir",       "set output meshes directory"},
     {command_line_result_meshes_format,       "meshes-format",         0,   "string",    "set output meshes format string"},
+    {command_line_nodes_exclude,              "nodes-exclude",         0,   "wildcards", "exclude selected nodes from export"},
     {command_line_silent,                     "silent",                's', 0,           "quiet mode"},
     {command_line_help,                       "help",                  '?', 0,           "print help message"},
     {command_line_pot,                        "pot",                   0,   0,           "extent textures size to nearest greater power of two"},
@@ -469,8 +476,18 @@ void save_meshes (const Params& params, const Model& model)
   mesh_library.Save (save_name.c_str ());
 }
 
-void save_node (const Node& node, XmlWriter& writer)
+void save_node (const Params& params, const Node& node, XmlWriter& writer)
 {
+  common::StringArray nodes_exclude_list = common::split (params.nodes_exclude.c_str ());
+
+  for (size_t i = 0, count = nodes_exclude_list.Size (); i < count; i++)
+  {
+    const char* mask = nodes_exclude_list [i];
+
+    if (common::wcmatch (node.Name (), mask))
+      return;
+  }
+
   XmlWriter::Scope scope (writer, "node");
 
   writer.WriteAttribute ("transform", node.Transform ());
@@ -487,7 +504,7 @@ void save_node (const Node& node, XmlWriter& writer)
   }
 
   for (Node::NodeList::ConstIterator iter = node.Nodes ().CreateIterator (); iter; ++iter)
-    save_node (*iter, writer);
+    save_node (params, *iter, writer);
 }
 
 void save_scene (const Params& params, const Model& model)
@@ -505,8 +522,8 @@ void save_scene (const Params& params, const Model& model)
 
   XmlWriter::Scope scope (writer, "scene");
 
-  for (NodeLibrary::ConstIterator i = model.Nodes ().CreateIterator (); i; ++i)
-    save_node (*i, writer);
+  for (NodeLibrary::ConstIterator i = model.Scenes ().CreateIterator (); i; ++i)
+    save_node (params, *i, writer);
 }
 
 //печать протокола
@@ -520,8 +537,8 @@ void export_data (Params& params)
 {
   Model model (params.source_name.c_str (), &print);
 
-  save_materials (params, model);
-  save_meshes (params, model);
+ // save_materials (params, model);
+  //save_meshes (params, model);
   save_scene (params, model);
 }
 

@@ -127,6 +127,49 @@ inline bool read (const char* string, math::mat4f& result)
 
 }
 
+//декомпозиция аффинных преобразований из матрицы преобразований
+void affine_decompose (const math::mat4f& matrix, math::vec3f& position, math::vec3f& rotation, math::vec3f& scale)
+{
+  math::mat4f local_matrix (transpose (matrix)); //копия матрицы преобразований
+
+  //выделение преобразования переноса  
+  for (size_t i = 0; i < 3; i++)
+  {
+    position [i] = local_matrix [3][i];
+    local_matrix [3][i] = 0;
+  }
+
+  //выделение преобразования масштабирования
+  for (size_t i = 0; i < 3; i++)
+  {
+    //определение длины вектора-столбца преобразований
+    float square_length = 0;
+
+    for (size_t j = 0; j < 3; j++)
+      square_length += local_matrix [j][i] * local_matrix [j][i];
+
+    scale [i] = sqrt (square_length);
+
+    //нормирование
+    for (size_t j = 0; j < 3; j++)
+      local_matrix [j][i] /= scale [i];
+  }
+
+  //выделение преобразования поворота
+  rotation [1] = asin (-local_matrix [0][2]);
+
+  if (cos (rotation [1]) != 0.0)
+  {
+    rotation [0] = atan2 (local_matrix [1][2], local_matrix [2][2]);
+    rotation [2] = atan2 (local_matrix [0][1], local_matrix [0][0]);
+  }
+  else
+  {
+    rotation [0] = atan2 (-local_matrix [2][0], local_matrix [1][1]);
+    rotation [2] = 0;
+  }
+}
+
 struct Model : public xtl::visitor<void, scene_graph::VisualModel>
 {
   DevicePtr                    device;
@@ -164,7 +207,13 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
     if (!read (transform_string, transform))
       throw xtl::format_operation_exception ("ReadNodeInfo", "Invalid transform format at line %u", node->LineNumber ());
 
-    new_node->Translate (transform.column (3));
+    math::vec3f translation, rotation, scale;
+
+    affine_decompose (transform, translation, rotation, scale);
+
+    new_node->SetPosition    (translation);
+    new_node->SetOrientation (math::radian (rotation.x), math::radian (rotation.y), math::radian (rotation.z));
+    new_node->SetScale       (scale);
 
     new_node->BindToParent (*parent, scene_graph::NodeBindMode_AddRef);
 
@@ -644,7 +693,7 @@ int main ()
 
     MyShaderParameters my_shader_parameters;
 
-    my_shader_parameters.proj_tm   = get_ortho_proj (-10, 10, -10, 10, -1000, 1000);
+    my_shader_parameters.proj_tm = get_ortho_proj (-10, 10, -10, 10, -1000, 1000);
     my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
 
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
