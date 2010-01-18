@@ -1,6 +1,6 @@
 #include <cstdio>
 
-#include <stl/hash_set>
+#include <stl/hash_map>
 #include <stl/string>
 
 #include <xtl/common_exceptions.h>
@@ -19,9 +19,31 @@ using namespace media::collada;
 
 const char* APPLICATION_NAME = "collada_converter";
 
+const char* SHADER_TYPE_ATTRIBUTE              = "ShaderType";
+const char* REFLECTIVITY_ATTRIBUTE             = "Reflectivity";
+const char* TRANSPARENCY_ATTRIBUTE             = "Transparency";
+const char* SHININESS_ATTRIBUTE                = "Shininess";
+const char* DIFFUSE_ATTRIBUTE                  = "Diffuse";
+const char* DIFFUSE_TEXTURE_ATTRIBUTE          = "DiffuseTexture";
+const char* DIFFUSE_TEXTURE_CHANNEL_ATTRIBUTE  = "DiffuseTextureChannel";
+const char* AMBIENT_ATTRIBUTE                  = "Ambient";
+const char* AMBIENT_TEXTURE_ATTRIBUTE          = "AmbientTexture";
+const char* AMBIENT_TEXTURE_CHANNEL_ATTRIBUTE  = "AmbientTextureChannel";
+const char* SPECULAR_ATTRIBUTE                 = "Specular";
+const char* SPECULAR_TEXTURE_ATTRIBUTE         = "SpecularTexture";
+const char* SPECULAR_TEXTURE_CHANNEL_ATTRIBUTE = "SpecularTextureChannel";
+const char* EMISSION_ATTRIBUTE                 = "Emission";
+const char* EMISSION_TEXTURE_ATTRIBUTE         = "EmissionTexture";
+const char* EMISSION_TEXTURE_CHANNEL_ATTRIBUTE = "EmissionTextureChannel";
+const char* BUMP_AMOUNT_ATTRIBUTE              = "BumpAmount";
+const char* BUMP_TEXTURE_ATTRIBUTE             = "BumpTexture";
+const char* BUMP_TEXTURE_CHANNEL_ATTRIBUTE     = "BumpTextureChannel";
+
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 
 const float EPSILON = 0.001;
+
+typedef stl::hash_map<stl::hash_key<const char*>, stl::string> ImagesMap;
 
 struct Params;
 
@@ -53,7 +75,6 @@ struct Params
   stl::string   nodes_exclude;            //неэкспортируемые узлы сцены
   bool          silent;                   //минимальное число сообщений
   bool          print_help;               //нужно ли печатать сообщение помощи
-  bool          need_pot_extent;          //нужно ли расширять изображения до ближайшей степени двойки
 };
 
 //получение ближайшей сверху степени двойки
@@ -169,12 +190,6 @@ void command_line_silent (const char*, Params& params)
   params.silent = true;
 }
 
-//установка параметра генерации слоёв размерами кратными степени двойки
-void command_line_pot (const char*, Params& params)
-{
-  params.need_pot_extent = true;
-}
-
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
@@ -189,7 +204,6 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_nodes_exclude,              "nodes-exclude",         0,   "wildcards", "exclude selected nodes from export"},
     {command_line_silent,                     "silent",                's', 0,           "quiet mode"},
     {command_line_help,                       "help",                  '?', 0,           "print help message"},
-    {command_line_pot,                        "pot",                   0,   0,           "extent textures size to nearest greater power of two"},
   };
 
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -368,100 +382,6 @@ void command_line_parse (int argc, const char* argv [], Params& params)
   }
 }
 
-void save_materials (const Params& params, const Model& model)
-{
-  stl::string xmtl_name = params.materials_file_name;
-
-  if (xmtl_name.empty ())
-  {
-    stl::string model_base_name = common::notdir (model.Name ());
-
-    xmtl_name = common::format ("%s.xmtl", model_base_name.c_str ());
-  }
-
-  XmlWriter writer (xmtl_name.c_str ());
-
-  XmlWriter::Scope scope (writer, "material_library");
-
-  typedef stl::hash_set<stl::hash_key<const char*> > UsedTextures;
-
-  UsedTextures used_textures;
-
-  const EffectLibrary& model_effects = model.Effects ();
-
-  if (!FileSystem::IsDir (params.output_textures_dir_name.c_str ()))
-    FileSystem::Mkdir (params.output_textures_dir_name.c_str ());
-
-  for (MaterialLibrary::ConstIterator iter = model.Materials ().CreateIterator (); iter; ++iter)
-  {
-    const Effect& effect = model_effects [iter->Effect ()];
-
-    for (int i = 0; i < TextureMap_Num; i++)
-      if (effect.HasTexture ((TextureMap)i))
-      {
-        const char* texture_image = effect.Texture ((TextureMap)i).Image ();
-
-        if (used_textures.find (texture_image) == used_textures.end ())
-        {
-          static const char* FILE_URL_PREFIX = "file://";
-
-          stl::string texture_base_name = common::basename (texture_image),
-                      save_name         = common::format ("%s/%s.%s", params.output_textures_dir_name.c_str (), texture_base_name.c_str (), params.textures_format.c_str ());
-
-          stl::string texture_path = common::notdir (model.Images () [texture_image].Path ()),
-                      full_texture_path;
-
-          if (!params.source_textures_path.empty ())
-          {
-            full_texture_path = params.source_textures_path;
-            full_texture_path += '/';
-          }
-
-          if (!xtl::xstrncmp (texture_path.c_str (), FILE_URL_PREFIX, xtl::xstrlen (FILE_URL_PREFIX)))
-            full_texture_path.append (texture_path.c_str () + xtl::xstrlen (FILE_URL_PREFIX));
-          else
-            full_texture_path += texture_path;
-
-          media::Image image (full_texture_path.c_str ());
-
-          size_t image_width      = image.Width (),
-                 image_height     = image.Height (),
-                 new_image_width  = image_width,
-                 new_image_height = image_height;
-
-          if (params.need_pot_extent)
-          {
-            new_image_width  = get_next_higher_power_of_two (new_image_width);
-            new_image_height = get_next_higher_power_of_two (new_image_height);
-          }
-
-          if (image_width != new_image_width || image_height != new_image_height)
-            image.Resize (new_image_width, new_image_height, image.Depth ());
-
-          image.Save (save_name.c_str ());
-
-          XmlWriter::Scope material_scope (writer, "material");
-
-          writer.WriteAttribute ("id", texture_image);
-
-          XmlWriter::Scope sprite_profile (writer, "sprite_profile");
-
-          writer.WriteAttribute ("image", save_name.c_str ());
-          writer.WriteAttribute ("blend_mode", "translucent");
-
-          if (image_width != new_image_width || image_height != new_image_height)
-          {
-            writer.WriteAttribute ("tiling", "1");
-            writer.WriteAttribute ("tile_width", image_width);
-            writer.WriteAttribute ("tile_height", image_height);
-          }
-
-          used_textures.insert (texture_image);
-        }
-      }
-  }
-}
-
 void save_meshes (const Params& params, const Model& model)
 {
   if (!FileSystem::IsDir (params.output_meshes_dir_name.c_str ()))
@@ -526,6 +446,190 @@ void save_scene (const Params& params, const Model& model)
     save_node (params, *i, writer);
 }
 
+void save_images (const Params& params, const Model& model, ImagesMap& images_map)
+{
+  const EffectLibrary& model_effects = model.Effects ();
+
+  if (!FileSystem::IsDir (params.output_textures_dir_name.c_str ()))
+    FileSystem::Mkdir (params.output_textures_dir_name.c_str ());
+
+  for (MaterialLibrary::ConstIterator iter = model.Materials ().CreateIterator (); iter; ++iter)
+  {
+    const Effect& effect = model_effects [iter->Effect ()];
+
+    for (int i = 0; i < TextureMap_Num; i++)
+      if (effect.HasTexture ((TextureMap)i))
+      {
+        const char* texture_image = effect.Texture ((TextureMap)i).Image ();
+
+        if (images_map.find (texture_image) == images_map.end ())
+        {
+          static const char* FILE_URL_PREFIX = "file://";
+
+          stl::string texture_base_name = common::basename (texture_image),
+                      save_name         = common::format ("%s/%s.%s", params.output_textures_dir_name.c_str (), texture_base_name.c_str (), params.textures_format.c_str ());
+
+          stl::string texture_path = common::notdir (model.Images () [texture_image].Path ()),
+                      full_texture_path;
+
+          if (!params.source_textures_path.empty ())
+          {
+            full_texture_path = params.source_textures_path;
+            full_texture_path += '/';
+          }
+
+          if (!xtl::xstrncmp (texture_path.c_str (), FILE_URL_PREFIX, xtl::xstrlen (FILE_URL_PREFIX)))
+            full_texture_path.append (texture_path.c_str () + xtl::xstrlen (FILE_URL_PREFIX));
+          else
+            full_texture_path += texture_path;
+
+          media::Image image (full_texture_path.c_str ());
+
+          image.Save (save_name.c_str ());
+
+          images_map.insert_pair (texture_image, save_name);
+        }
+      }
+  }
+}
+
+int get_texture_channel_number (const char* texture_channel)
+{
+  if (strstr (texture_channel, "TEX") != texture_channel)
+    throw xtl::format_operation_exception ("get_texture_channel_number", "Invalid texture channel name format, must begin from 'TEX'");
+
+  return atoi (texture_channel + xtl::xstrlen ("TEX"));
+}
+
+void save_material (const Effect& effect, ImagesMap& images_map, XmlWriter& writer)
+{
+  XmlWriter::Scope material_scope (writer, "Material");
+
+  writer.WriteAttribute ("Name", effect.Id ());
+
+  XmlWriter::Scope shader_parameters_scope (writer, "ShaderParameters");
+
+  switch (effect.ShaderType ())
+  {
+    case ShaderType_Constant:
+      writer.WriteAttribute (SHADER_TYPE_ATTRIBUTE, "Constant");
+      break;
+    case ShaderType_Lambert:
+      writer.WriteAttribute (SHADER_TYPE_ATTRIBUTE, "Lambert");
+      break;
+    case ShaderType_Phong:
+      writer.WriteAttribute (SHADER_TYPE_ATTRIBUTE, "Phong");
+      break;
+    case ShaderType_Blinn:
+      writer.WriteAttribute (SHADER_TYPE_ATTRIBUTE, "Blinn");
+      break;
+    default:
+      throw xtl::format_operation_exception ("save_material", "Effect '%s' has unknown shader type", effect.Id ());
+  }
+
+  writer.WriteAttribute (REFLECTIVITY_ATTRIBUTE, effect.Param (EffectParam_Reflectivity));
+  writer.WriteAttribute (TRANSPARENCY_ATTRIBUTE, effect.Param (EffectParam_Transparency));
+  writer.WriteAttribute (SHININESS_ATTRIBUTE,    effect.Param (EffectParam_Shininess));
+  writer.WriteAttribute (DIFFUSE_ATTRIBUTE,      effect.MapColor (TextureMap_Diffuse));
+  writer.WriteAttribute (AMBIENT_ATTRIBUTE,      effect.MapColor (TextureMap_Ambient));
+  writer.WriteAttribute (SPECULAR_ATTRIBUTE,     effect.MapColor (TextureMap_Specular));
+  writer.WriteAttribute (EMISSION_ATTRIBUTE,     effect.MapColor (TextureMap_Emission));
+
+  if (effect.HasTexture (TextureMap_Bump))
+  {
+    const Texture& texture = effect.Texture (TextureMap_Bump);
+
+    writer.WriteAttribute (BUMP_TEXTURE_ATTRIBUTE, images_map [texture.Image ()].c_str ());
+    writer.WriteAttribute (BUMP_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
+    writer.WriteAttribute (BUMP_AMOUNT_ATTRIBUTE, texture.Amount ());
+  }
+
+  if (effect.HasTexture (TextureMap_Diffuse))
+  {
+    const Texture& texture = effect.Texture (TextureMap_Diffuse);
+
+    writer.WriteAttribute (DIFFUSE_TEXTURE_ATTRIBUTE, images_map [texture.Image ()].c_str ());
+    writer.WriteAttribute (DIFFUSE_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
+  }
+  if (effect.HasTexture (TextureMap_Ambient))
+  {
+    const Texture& texture = effect.Texture (TextureMap_Ambient);
+
+    writer.WriteAttribute (AMBIENT_TEXTURE_ATTRIBUTE, images_map [texture.Image ()].c_str ());
+    writer.WriteAttribute (AMBIENT_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
+  }
+  if (effect.HasTexture (TextureMap_Specular))
+  {
+    const Texture& texture = effect.Texture (TextureMap_Specular);
+
+    writer.WriteAttribute (SPECULAR_TEXTURE_ATTRIBUTE, images_map [texture.Image ()].c_str ());
+    writer.WriteAttribute (SPECULAR_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
+  }
+  if (effect.HasTexture (TextureMap_Emission))
+  {
+    const Texture& texture = effect.Texture (TextureMap_Emission);
+
+    writer.WriteAttribute (EMISSION_TEXTURE_ATTRIBUTE, images_map [texture.Image ()].c_str ());
+    writer.WriteAttribute (EMISSION_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
+  }
+}
+
+void save_property_declaration (const char* name, const char* type, XmlWriter& writer)
+{
+  XmlWriter::Scope scope (writer, "Property");
+
+  writer.WriteAttribute ("Name", name);
+  writer.WriteAttribute ("Type", type);
+}
+
+void save_materials (const Params& params, const Model& model, ImagesMap& images_map)
+{
+  stl::string xmtl_name = params.materials_file_name;
+
+  if (xmtl_name.empty ())
+  {
+    stl::string model_base_name = common::notdir (model.Name ());
+
+    xmtl_name = common::format ("%s.xmtl", model_base_name.c_str ());
+  }
+
+  XmlWriter writer (xmtl_name.c_str ());
+
+  XmlWriter::Scope library_scope (writer, "MaterialLibrary");
+
+  {
+    XmlWriter::Scope templates_scope  (writer, "Templates");
+    XmlWriter::Scope properties_scope (writer, "Properties");
+    writer.WriteAttribute ("Name", "ShaderParameters");
+
+    save_property_declaration (SHADER_TYPE_ATTRIBUTE, "string", writer);
+    save_property_declaration (REFLECTIVITY_ATTRIBUTE, "float", writer);
+    save_property_declaration (TRANSPARENCY_ATTRIBUTE, "float", writer);
+    //?????Refraction??????
+    save_property_declaration (SHININESS_ATTRIBUTE,                "float",  writer);
+    save_property_declaration (BUMP_AMOUNT_ATTRIBUTE,              "float",  writer);
+    save_property_declaration (BUMP_TEXTURE_ATTRIBUTE,             "string", writer);
+    save_property_declaration (BUMP_TEXTURE_CHANNEL_ATTRIBUTE,     "int",    writer);
+    save_property_declaration (DIFFUSE_ATTRIBUTE,                  "float4", writer);
+    save_property_declaration (DIFFUSE_TEXTURE_ATTRIBUTE,          "string", writer);
+    save_property_declaration (DIFFUSE_TEXTURE_CHANNEL_ATTRIBUTE,  "int",    writer);
+    save_property_declaration (AMBIENT_ATTRIBUTE,                  "float4", writer);
+    save_property_declaration (AMBIENT_TEXTURE_ATTRIBUTE,          "string", writer);
+    save_property_declaration (AMBIENT_TEXTURE_CHANNEL_ATTRIBUTE,  "int",    writer);
+    save_property_declaration (SPECULAR_ATTRIBUTE,                 "float4", writer);
+    save_property_declaration (SPECULAR_TEXTURE_ATTRIBUTE,         "string", writer);
+    save_property_declaration (SPECULAR_TEXTURE_CHANNEL_ATTRIBUTE, "int",    writer);
+    save_property_declaration (EMISSION_ATTRIBUTE,                 "float4", writer);
+    save_property_declaration (EMISSION_TEXTURE_ATTRIBUTE,         "string", writer);
+    save_property_declaration (EMISSION_TEXTURE_CHANNEL_ATTRIBUTE, "int",    writer);
+  }
+
+  XmlWriter::Scope scope (writer, "Materials");
+
+  for (EffectLibrary::ConstIterator i = model.Effects ().CreateIterator (); i; ++i)
+    save_material (*i, images_map, writer);
+}
+
 //печать протокола
 void print (const char* message)
 {
@@ -537,9 +641,12 @@ void export_data (Params& params)
 {
   Model model (params.source_name.c_str (), &print);
 
- // save_materials (params, model);
-  //save_meshes (params, model);
+  ImagesMap images_map;
+
+  save_images (params, model, images_map);
+  save_meshes (params, model);
   save_scene (params, model);
+  save_materials (params, model, images_map);
 }
 
 //проверка корректности ввода
@@ -572,7 +679,6 @@ int main (int argc, const char *argv[])
     params.meshes_format   = "xmesh";
     params.silent          = false;
     params.print_help      = false;
-    params.need_pot_extent = false;
 
       //разбор командной строки
     command_line_parse (argc, argv, params);
