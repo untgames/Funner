@@ -15,39 +15,55 @@ inline void xml_write (OutputTextStream& stream, const T& value, const char* for
 }
 
 template <class T>
-inline void xml_write_data (OutputTextStream& stream, const T& value)
+inline void XmlWriter::WriteXmlTextData (const T& value)
 {
-  write (stream, value);
+  write (Stream (), value);
 }
 
 template <class T>
-inline void xml_write_data (OutputTextStream& stream, const T& value, const char* format)
+inline void XmlWriter::WriteXmlTextData (const T& value, const char* format)
 {
-  write (stream, value, format);
+  write (Stream (), value, format);
 }
 
-inline void xml_write_data (OutputTextStream& stream, const char* value)
+inline void XmlWriter::WriteXmlTextData (const char* value)
 {
-  write (stream, '\'');
-  write (stream, value);
-  write (stream, '\'');
+  if (strstr (value, " "))
+  {
+    CheckEndOfDocument ("common::XmlWriter::BeginCData");
+    CloseAttributeList ();
+    write              (Stream (), "<![CDATA[");
+
+    try
+    {
+      xml_write (Stream (), value);
+      write     (Stream (), "]]>");
+    }
+    catch (...)
+    {
+      write (Stream (), "]]>");
+      throw;
+    }
+  }
+  else
+    write (Stream (), value);
 }
 
-inline void xml_write_data (OutputTextStream& stream, const char* value, const char* format)
+inline void XmlWriter::WriteXmlTextData (const char* value, const char* format)
 {
-  xml_write_data (stream, value);
+  WriteXmlTextData (value);
 }
 
 template <class Char, class Traits, class Allocator>
-inline void xml_write_data (OutputTextStream& stream, const stl::basic_string<Char, Traits, Allocator>& value)
+inline void XmlWriter::WriteXmlTextData (const stl::basic_string<Char, Traits, Allocator>& value)
 {
-  xml_write_data (stream, value.c_str ());
+  WriteXmlTextData (value.c_str ());
 }
 
 template <class Char, class Traits, class Allocator>
-inline void xml_write_data (OutputTextStream& stream, const stl::basic_string<Char, Traits, Allocator>& value, const char* format)
+inline void XmlWriter::WriteXmlTextData (const stl::basic_string<Char, Traits, Allocator>& value, const char* format)
 {
-  xml_write_data (stream, value);
+  WriteXmlTextData (value);
 }
 
 /*
@@ -99,7 +115,7 @@ inline void XmlWriter::WriteData (const T& value)
   
   try
   {
-    xml_write_data (Stream (), value);
+    WriteXmlTextData (value);
     EndData   ();
   }
   catch (...)
@@ -116,7 +132,7 @@ inline void XmlWriter::WriteData (const T& value, const char* format)
   
   try
   {
-    xml_write_data (Stream (), value, format);
+    WriteXmlTextData (value, format);
     EndData   ();
   }
   catch (...)

@@ -33,13 +33,13 @@ data/test.xmesh(65): warning: node 'primitive': Empty primitive
   <vertex_buffers>
     <vertex_buffer id="vb#1">
       <streams>
-        'vs#1'
+        vs#1
       </streams>
     </vertex_buffer>
     <vertex_buffer id="vb#2" weights="vws#1">
       <streams>
-        'vs#1'
-        'vs#2'
+        vs#1
+        vs#2
       </streams>
     </vertex_buffer>
   </vertex_buffers>
@@ -51,7 +51,7 @@ data/test.xmesh(65): warning: node 'primitive': Empty primitive
   <meshes>
     <mesh name="mesh1" index_buffer="ib#1">
       <vertex_buffers>
-        'vb#1'
+        vb#1
       </vertex_buffers>
       <primitives>
         <primitive type="triangle_list" material="material1" vertex_buffer="0" first="0" count="1"/>
@@ -60,7 +60,7 @@ data/test.xmesh(65): warning: node 'primitive': Empty primitive
     </mesh>
     <mesh name="mesh2">
       <vertex_buffers>
-        'vb#2'
+        vb#2
       </vertex_buffers>
       <primitives>
         <primitive type="line_list" material="material1" vertex_buffer="0" first="0" count="1"/>

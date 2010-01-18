@@ -4,14 +4,14 @@ Results of snddecl_saver_test:
   <declaration id="declaration1" name="" type="Type1" looping="1">
     <params gain="0.7" min_gain="0.1" max_gain="0.95" inner_angle="20" outer_angle="60" outer_gain="0.4" reference_distance="25" maximum_distance="90" cull_distance="95"/>
     <samples count="2">
-      'sound1.ogg'
-      'sound2.ogg'
+      sound1.ogg
+      sound2.ogg
     </samples>
   </declaration>
   <declaration id="declaration2" name="" type="Type2" looping="0">
     <params gain="0.2" min_gain="0.1" max_gain="0.95" inner_angle="20" outer_angle="2" outer_gain="0.4" reference_distance="25" maximum_distance="90" cull_distance="95"/>
     <samples count="1">
-      'sound2.ogg'
+      sound2.ogg
     </samples>
   </declaration>
 </sound_declaration_library>
