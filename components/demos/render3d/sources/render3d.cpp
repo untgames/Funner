@@ -66,10 +66,16 @@ struct MaterialShaderParams
   int         emission_texture_channel;
 };
 
+struct ModelTexmap
+{
+  TexturePtr      texture;
+  SamplerStatePtr sampler;
+};
+
 struct ModelMaterial
 {
-  TexturePtr textures [SamplerChannel_Num];
-  BufferPtr  constant_buffer;
+  ModelTexmap texmaps [SamplerChannel_Num];
+  BufferPtr   constant_buffer;
 };
 
 typedef xtl::shared_ptr<ModelMaterial>  ModelMaterialPtr;
@@ -238,12 +244,15 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
   VertexBufferMap              vertex_buffers;
   BufferMap                    index_buffers;
   TextureMap                   textures;
+  SamplerStatePtr              default_sampler;
   ModelMaterialMap             materials;
   ModelMeshArray               meshes;
   scene_graph::Scene           scene;
 
   Model (const DevicePtr& in_device, const char* name) : device (in_device), library (name)
   {
+    default_sampler = CreateSampler ();
+    
     LoadMaterials ();
     LoadVertexBuffers ();
     LoadMeshes ();
@@ -582,28 +591,31 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
     
     if (properties.IndexOf ("DiffuseTexture") != -1)
     {    
-      dst_mtl->textures [SamplerChannel_Diffuse] = LoadTexture (properties.GetString ("DiffuseTexture"));
+      dst_mtl->texmaps [SamplerChannel_Diffuse].texture = LoadTexture (properties.GetString ("DiffuseTexture"));
     }
     
     if (properties.IndexOf ("SpecularTexture") != -1)
     {    
-      dst_mtl->textures [SamplerChannel_Specular] = LoadTexture (properties.GetString ("SpecularTexture"));
+      dst_mtl->texmaps [SamplerChannel_Specular].texture = LoadTexture (properties.GetString ("SpecularTexture"));
     }
     
     if (properties.IndexOf ("AmbientTexture") != -1)
     {    
-      dst_mtl->textures [SamplerChannel_Ambient] = LoadTexture (properties.GetString ("AmbientTexture"));
+      dst_mtl->texmaps [SamplerChannel_Ambient].texture = LoadTexture (properties.GetString ("AmbientTexture"));
     }
     
     if (properties.IndexOf ("BumpTexture") != -1)
     {    
-      dst_mtl->textures [SamplerChannel_Bump] = LoadTexture (properties.GetString ("BumpTexture"));
+      dst_mtl->texmaps [SamplerChannel_Bump].texture = LoadTexture (properties.GetString ("BumpTexture"));
     }
     
     if (properties.IndexOf ("EmissionTexture") != -1)
     {    
-      dst_mtl->textures [SamplerChannel_Emission] = LoadTexture (properties.GetString ("EmissionTexture"));
+      dst_mtl->texmaps [SamplerChannel_Emission].texture = LoadTexture (properties.GetString ("EmissionTexture"));
     }
+    
+    for (int i=0; i<SamplerChannel_Num; i++)
+      dst_mtl->texmaps [i].sampler = default_sampler;
     
     const char* shader_type_string = properties.GetString ("ShaderType");
     
@@ -729,6 +741,27 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
     
     return texture;
   }
+  
+  //создание сэмплера
+  SamplerStatePtr CreateSampler ()
+  {
+    SamplerDesc sampler_desc;
+
+    memset (&sampler_desc, 0, sizeof (sampler_desc));
+
+    sampler_desc.min_filter           = TexMinFilter_LinearMipLinear;
+    sampler_desc.mag_filter           = TexMagFilter_Linear;
+    sampler_desc.max_anisotropy       = 1;
+    sampler_desc.wrap_u               = TexcoordWrap_Clamp;
+    sampler_desc.wrap_v               = TexcoordWrap_Clamp;
+//    sampler_desc.wrap_u               = TexcoordWrap_Repeat;
+//    sampler_desc.wrap_v               = TexcoordWrap_Repeat;
+    sampler_desc.comparision_function = CompareMode_AlwaysPass;
+    sampler_desc.min_lod              = 0;
+    sampler_desc.max_lod              = FLT_MAX;
+
+    return SamplerStatePtr (device->CreateSamplerState (sampler_desc), false);
+  }
 
   void visit (scene_graph::VisualModel& model)
   {
@@ -771,13 +804,15 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
           continue;
           
         for (int i=0; i<SamplerChannel_Num; i++)
-          if (material.textures [i])
+          if (material.texmaps [i].texture && material.texmaps [i].sampler)
           {
-            device->SSSetTexture (i, &*material.textures [i]);
+            device->SSSetTexture (i, &*material.texmaps [i].texture);
+            device->SSSetSampler (i, &*material.texmaps [i].sampler);
           }
           else
           {
             device->SSSetTexture (i, 0);
+            device->SSSetSampler (i, 0);
           }
           
         device->SSSetConstantBuffer (ConstantBufferSemantic_Material, &*material.constant_buffer);  
@@ -903,7 +938,7 @@ void idle (Test& test)
 
   cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
-  angle += 0.5f*dt;
+  angle += 5.0f*dt;
 
   my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (sin (angle) * 400, cos (angle) * 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
 
