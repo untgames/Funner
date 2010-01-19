@@ -977,11 +977,7 @@ int main ()
     Test test (L"OpenGL device test window (model_load)", &redraw, &reload, "Open*", "max_texture_size=1024");
 
     test.window.Show ();
-
-    ModelPtr model = load_model (test.device, MODEL_NAME);
-
-    model_ptr = model.get ();
-
+    
     printf ("Set shader stage\n");
     
     reload_shaders (test);
@@ -1043,6 +1039,12 @@ int main ()
 
     test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());
     test.device->SSSetConstantBuffer (ConstantBufferSemantic_Common, cb.get ());
+
+    printf ("Load model\n");
+
+    ModelPtr model = load_model (test.device, MODEL_NAME);
+
+    model_ptr = model.get ();
 
     printf ("Register callbacks\n");
 
