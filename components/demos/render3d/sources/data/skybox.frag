@@ -24,5 +24,11 @@ varying vec4 DiffuseTexcoord;
 
 void main (void)
 {
-  gl_FragColor = textureCube (DiffuseTexture, DiffuseTexcoord.xyz);
+  vec3 texcoord = DiffuseTexcoord.xyz;
+
+  texcoord.z = 1.0 - texcoord.z;
+//  texcoord.y = 1.0 - texcoord.y;
+  texcoord = -texcoord;
+
+  gl_FragColor = textureCube (DiffuseTexture, texcoord);
 }

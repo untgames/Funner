@@ -179,6 +179,8 @@ TexturePtr MaterialManager::LoadTexture (const char* name)
 
   memset (&tex_desc, 0, sizeof (tex_desc));
   
+  printf ("Load texture '%s' %ux%ux%u\n", name, image.Width (), image.Height (), image.Depth ());
+  
   switch (image.Depth ())
   {
     case 1:
