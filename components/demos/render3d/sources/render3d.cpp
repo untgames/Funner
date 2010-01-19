@@ -904,12 +904,11 @@ void idle (Test& test)
   if (test.window.IsClosed ())
     return;
 
+  static size_t start = common::milliseconds ();
   static size_t last = 0;
   static float angle;
 
   static size_t last_fps = 0;
-
-  float dt = float (common::milliseconds () - last) / 1000.f;
 
   if (common::milliseconds () - last > 25)
   {
@@ -938,7 +937,7 @@ void idle (Test& test)
 
   cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
-  angle += 5.0f*dt;
+  angle = (common::milliseconds () - start) / 500.f;
 
   my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (sin (angle) * 400, cos (angle) * 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
 
