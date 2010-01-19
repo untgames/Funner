@@ -3,6 +3,10 @@
 namespace
 {
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
+
 const float HORIZONTAL_SPEED          = 2.0f;
 const float VERTICAL_SPEED            = HORIZONTAL_SPEED;
 const float HORIZONTAL_ROTATION_SPEED = 8.0f;
@@ -31,6 +35,9 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
   : window (syslib::WindowStyle_Overlapped, 800, 600),
     redraw (in_redraw),
     reload (in_reload),
+    scene_renderer (*this),
+    mesh_manager (*this),
+    material_manager (*this),
     x_camera_speed (0),
     y_camera_speed (0),
     x_camera_rotation_speed (0),
@@ -64,7 +71,7 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
 
   camera->SetPosition (0, 0, -10);
 
-  camera->BindToScene (scene);
+  camera->BindToScene (scene_manager.Scene ());
 
   camera->RegisterEventHandler (NodeEvent_AfterUpdate, xtl::bind (&Test::OnCameraUpdate, this));
 
@@ -85,7 +92,6 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
 
 void Test::OnCameraUpdate ()
 {
-  update_view_matrix (device, camera->WorldTM ());
 }
 
 void Test::OnKeyPressed (const syslib::WindowEventContext& context)
@@ -127,10 +133,10 @@ void Test::OnKeyPressed (const syslib::WindowEventContext& context)
       x_camera_rotation_speed += HORIZONTAL_ROTATION_SPEED;
       break;
     case syslib::Key_Up:
-      y_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
+      y_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
       break;
     case syslib::Key_Down:
-      y_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
+      y_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
       break;
     default:
       break;
@@ -178,16 +184,16 @@ void Test::OnResize ()
   {
     syslib::Rect rect = window.ClientRect ();
 
-    float width  = rect.right - rect.left,
-          height = rect.bottom - rect.top,
+    float width  = (float)(rect.right - rect.left),
+          height = (float)(rect.bottom - rect.top),
           ar     = width / height;
 
     Viewport vp;
 
     vp.x         = rect.left;
     vp.y         = rect.top;
-    vp.width     = width;
-    vp.height    = height;
+    vp.width     = (int)width;
+    vp.height    = (int)height;
     vp.min_depth = 0;
     vp.max_depth = 1;
 
@@ -195,8 +201,6 @@ void Test::OnResize ()
 
     camera->SetFovX   (math::degree (FOV_X_ASPECT_RATIO));
     camera->SetFovY   (math::degree (FOV_X_ASPECT_RATIO / ar));
-
-    update_proj_matrix (device, camera->ProjectionMatrix ());
   }
   catch (std::exception& e)
   {

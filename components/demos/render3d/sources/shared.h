@@ -77,7 +77,226 @@ typedef xtl::com_ptr<IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<IPredicate>               PredicatePtr;
 
-//тестовое приложение
+struct Test;
+
+//менеджер сцен
+class SceneManager
+{
+  public:
+    scene_graph::Scene& Scene () { return scene; }
+
+    void LoadScene (const char* file_name);
+    
+  private:
+    void ReadNodeInfo (common::Parser::Iterator node, scene_graph::Node::Pointer parent);
+    void ReadMeshInfo (common::Parser::Iterator node, scene_graph::Node::Pointer parent);
+
+  private:
+    scene_graph::Scene scene;
+};
+
+//чтение ихсодного текста шейдера в строку
+stl::string read_shader (const char* file_name);
+
+#ifdef _MSC_VER
+  #pragma pack(push)
+#endif
+
+#pragma pack (1)
+
+enum ConstantBufferSemantic
+{
+  ConstantBufferSemantic_Common,
+  ConstantBufferSemantic_Transformations,
+  ConstantBufferSemantic_Material,
+};
+
+struct CommonShaderParams
+{
+  math::vec3f light_pos;
+  math::vec3f light_dir;
+  int         diffuse_sampler;
+  int         specular_sampler;
+  int         bump_sampler;
+  int         ambient_sampler;
+  int         emission_sampler;
+  int         reflection_sampler;
+};
+
+struct TransformationsShaderParams
+{
+  math::mat4f object_tm;
+  math::mat4f model_view_tm;
+  math::mat4f model_view_proj_tm;
+};
+
+//построение сферы
+enum SamplerChannel
+{
+  SamplerChannel_Diffuse,
+  SamplerChannel_Specular,
+  SamplerChannel_Bump,
+  SamplerChannel_Ambient,
+  SamplerChannel_Emission,
+  SamplerChannel_Reflection,
+  
+  SamplerChannel_Num
+};
+
+enum ShaderType
+{
+  ShaderType_Phong,
+  ShaderType_Lambert,
+  ShaderType_Constant
+};
+
+struct MaterialShaderParams
+{
+  ShaderType  shader_type;
+  float       reflectivity;
+  float       transparency;
+  float       shininess;
+  float       bump_amount;
+  int         bump_texture_channel;
+  math::vec4f diffuse_color;
+  int         diffuse_texture_channel;
+  math::vec4f ambient_color;
+  int         ambient_texture_channel;  
+  math::vec4f specular_color;
+  int         specular_texture_channel;
+  math::vec4f emission_color;
+  int         emission_texture_channel;
+};
+
+struct ModelTexmap
+{
+  TexturePtr      texture;
+  SamplerStatePtr sampler;
+};
+
+struct ModelMaterial
+{
+  ModelTexmap texmaps [SamplerChannel_Num];
+  BufferPtr   constant_buffer;
+};
+
+typedef xtl::shared_ptr<ModelMaterial>  ModelMaterialPtr;
+typedef stl::hash_map<stl::hash_key<const char*>, ModelMaterialPtr> ModelMaterialMap;
+
+typedef stl::vector<BufferPtr> BufferArray;
+
+struct ModelVertexBuffer
+{
+  BufferArray    vertex_streams;
+  InputLayoutPtr input_layout;
+  size_t         id;
+};
+
+typedef xtl::shared_ptr<ModelVertexBuffer>     VertexBufferPtr;
+typedef stl::hash_map<size_t, VertexBufferPtr> VertexBufferMap;
+typedef stl::hash_map<size_t, BufferPtr>       BufferMap;
+typedef stl::vector<VertexBufferPtr>           VertexBufferArray;
+
+struct ModelPrimitive
+{
+  PrimitiveType    type;          //тип примитива
+  ModelMaterialPtr material;      //материал
+  VertexBufferPtr  vertex_buffer; //вершинный буфер
+  size_t           first;         //индекс первой вершины/индекса
+  size_t           count;         //количество примитивов
+};
+
+typedef stl::vector<ModelPrimitive> PrimitiveArray;
+
+struct ModelMesh
+{
+  VertexBufferArray vertex_buffers;
+  BufferPtr         index_buffer;
+  PrimitiveArray    primitives;
+  stl::string       name;
+
+  ModelMesh (const char* in_name)
+    : name (in_name)
+    {}
+};
+
+typedef xtl::shared_ptr<ModelMesh> ModelMeshPtr;
+
+///Менеджер материалов
+class MaterialManager
+{
+  public:
+    MaterialManager (Test& test);
+    
+///Установка текстуры отражений
+    void SetReflectionTexture (const char* name);
+  
+///Загрузка материалов  
+    void LoadMaterials (const char* file_name);
+
+///Поиск материала
+    ModelMaterialPtr FindMaterial (const char* name);
+
+  private:
+    void            LoadMaterial (const char* id, const media::rfx::Material& src_mtl);
+    SamplerStatePtr CreateSampler ();
+    TexturePtr      LoadTexture (const char* name);
+    PixelFormat     GetPixelFormat (media::Image& image);
+    
+    typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr> TextureMap;
+  
+  private:
+    Test&            test;
+    TextureMap       textures;
+    SamplerStatePtr  default_sampler;
+    ModelMaterialMap materials;
+    TexturePtr       default_reflection_texture;
+};
+
+typedef stl::vector<ModelMeshPtr> ModelMeshArray;  
+
+///Менеджер мешей
+class MeshManager
+{
+  public:
+    MeshManager (Test& test);
+  
+///Загрузка мешей
+    void LoadMeshes (const char* file_name);
+    
+///Поиск меша
+    ModelMeshPtr FindMesh (const char* name);
+    
+  private:  
+    Test&          test;
+    ModelMeshArray meshes;  
+};
+
+//создание сферы
+ModelMeshPtr create_sphere (size_t parallels, size_t meridians);
+
+void draw (IDevice&, ModelMesh&);
+
+///Визуализатор сцены
+class SceneRenderer: public xtl::visitor<void, scene_graph::VisualModel>
+{
+  public:
+    SceneRenderer (Test&);
+    
+///Рисование сцены
+    void Draw (scene_graph::Camera&);
+        
+  protected:
+///Рисование объектов  
+    void visit (scene_graph::VisualModel&);
+    
+  private:  
+    Test&       test;
+    math::mat4f view_projection_tm;
+    math::mat4f view_tm;
+};
+
+///Тестовое приложение
 struct Test
 {
   public:
@@ -89,7 +308,10 @@ struct Test
     CallbackFn                 redraw;
     CallbackFn                 reload;
     ProgramPtr                 shader;
-    Scene                      scene;
+    SceneManager               scene_manager;
+    SceneRenderer              scene_renderer;
+    MeshManager                mesh_manager;
+    MaterialManager            material_manager;
     PerspectiveCamera::Pointer camera;
     float                      x_camera_speed;
     float                      y_camera_speed;
@@ -108,12 +330,8 @@ struct Test
     void OnCameraUpdate ();
 };
 
-//обновление матрицы проецирования
-void update_proj_matrix (DevicePtr device, const math::mat4f& proj_matrix);
-//обновление матрицы вида
-void update_view_matrix (DevicePtr device, const math::mat4f& view_matrix);
-
-//чтение ихсодного текста шейдера в строку
-stl::string read_shader (const char* file_name);
+#ifdef _MSC_VER
+  #pragma pack (pop)
+#endif
 
 #endif
