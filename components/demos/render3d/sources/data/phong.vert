@@ -18,6 +18,7 @@ uniform vec4  SpecularColor;
 uniform vec4  EmissionColor;
 
 varying vec4 DiffuseTexcoord;
+varying vec4 BumpTexcoord;
 varying vec4 SpecularTexcoord;
 varying vec3 Normal;
 varying vec3 LocalLightDirection;
@@ -34,6 +35,7 @@ void main(void)
   LocalLightDirection = -normalize (LightDirection);
 
   DiffuseTexcoord  = gl_MultiTexCoord0;
+  BumpTexcoord     = gl_MultiTexCoord1;
   SpecularTexcoord = gl_MultiTexCoord2;
 
   gl_FrontColor = gl_Color;

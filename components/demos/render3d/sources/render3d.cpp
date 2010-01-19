@@ -937,11 +937,13 @@ void idle (Test& test)
 
   cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
-  angle = (common::milliseconds () - start) / 500.f;
+  angle = (common::milliseconds () - start) / 1500.f;
 
-  my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (sin (angle) * 400, cos (angle) * 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
+  my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (sin (angle) * 400, cos (angle) * 400, sin (angle) * 400), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
+  
+  static float light_phi = -3.14 / 3;
 
-  my_shader_parameters.light_pos = math::vec3f (40 * cos (angle), 40 * sin (angle), 0.0f);
+  my_shader_parameters.light_pos = math::vec3f (400 * cos (light_phi), 400 * sin (light_phi), 0.0f);
   my_shader_parameters.light_dir = -normalize (my_shader_parameters.light_pos);
 
   cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
