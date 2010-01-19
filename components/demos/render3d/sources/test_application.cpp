@@ -168,10 +168,10 @@ void Test::OnKeyReleased (const syslib::WindowEventContext& context)
       x_camera_rotation_speed -= HORIZONTAL_ROTATION_SPEED;
       break;
     case syslib::Key_Up:
-      y_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
+      y_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
       break;
     case syslib::Key_Down:
-      y_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
+      y_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
       break;
     default:
       break;
