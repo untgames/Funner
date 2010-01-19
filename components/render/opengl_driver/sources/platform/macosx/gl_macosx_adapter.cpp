@@ -52,7 +52,7 @@ const char* Adapter::GetPath ()
 
 const char* Adapter::GetName ()
 {
-  return "MacOSXAdapter";
+  return "OpenGL";
 }
 
 const char* Adapter::GetDescription ()
