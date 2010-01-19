@@ -7,6 +7,8 @@ const char* MATERIAL_LIBRARY         = "data/materials.xmtl";
 const char* SCENE_NAME               = "data/scene.xscene";
 const char* REFLECTION_TEXTURE       = "env/EnvGala_000_D2.tga";
 
+const float EPS = 0.001;
+
 enum ConstantBufferSemantic
 {
   ConstantBufferSemantic_Common,
@@ -241,7 +243,7 @@ void affine_decompose (const math::mat4f& matrix, math::vec3f& position, math::v
 
 struct Model : public xtl::visitor<void, scene_graph::VisualModel>
 {
-  DevicePtr                    device;
+  Test&                        test;
   media::geometry::MeshLibrary library;
   BufferMap                    vertex_streams;
   VertexBufferMap              vertex_buffers;
@@ -250,10 +252,9 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
   SamplerStatePtr              default_sampler;
   ModelMaterialMap             materials;
   ModelMeshArray               meshes;
-  scene_graph::Scene           scene;
   TexturePtr                   default_reflection_texture;
 
-  Model (const DevicePtr& in_device, const char* name) : device (in_device), library (name)
+  Model (Test& in_test, const char* name) : test (in_test), library (name)
   {
     default_sampler = CreateSampler ();
     default_reflection_texture = LoadTexture (REFLECTION_TEXTURE);
@@ -303,7 +304,7 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
     common::Parser   p (SCENE_NAME);
     common::ParseLog log = p.Log ();
 
-    for_each_child (p.Root (), "scene.node", xtl::bind (&Model::ReadNodeInfo, this, _1, scene_graph::Node::Pointer (&scene.Root ())));
+    for_each_child (p.Root (), "scene.node", xtl::bind (&Model::ReadNodeInfo, this, _1, scene_graph::Node::Pointer (&test.scene.Root ())));
 
     for (size_t i = 0; i < log.MessagesCount (); i++)
       switch (log.MessageType (i))
@@ -369,7 +370,7 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
           for (size_t i=0; i<ib.Size (); i++, src_index++, dst_index++)
             *dst_index = static_cast<unsigned short> (*src_index);
 
-          BufferPtr (device->CreateBuffer (desc), false).swap (ib_buffer);
+          BufferPtr (test.device->CreateBuffer (desc), false).swap (ib_buffer);
 
           ib_buffer->SetData (0, desc.size, &index_data [0]);
         }
@@ -418,7 +419,6 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
 
         dst_primitive.vertex_buffer = model_mesh->vertex_buffers [src_primitive.vertex_buffer];
         dst_primitive.first         = src_primitive.first;
-//        dst_primitive.material      = FindMaterial (src_primitive.material);
         dst_primitive.material      = FindMaterial (common::format ("%s-fx", src_primitive.material).c_str ());
         
         if (!dst_primitive.material)
@@ -468,7 +468,7 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
             desc.bind_flags   = BindFlag_VertexBuffer;
             desc.access_flags = AccessFlag_Read | AccessFlag_Write;
 
-            vs_buffer = BufferPtr (device->CreateBuffer (desc), false);
+            vs_buffer = BufferPtr (test.device->CreateBuffer (desc), false);
 
             vs_buffer->SetData (0, desc.size, vs.Data ());
 
@@ -563,7 +563,7 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
         layout_desc.index_type              = InputDataType_UShort;
         layout_desc.index_buffer_offset     = 0;
 
-        model_vb->input_layout = InputLayoutPtr (device->CreateInputLayout (layout_desc), false);
+        model_vb->input_layout = InputLayoutPtr (test.device->CreateInputLayout (layout_desc), false);
 
         vertex_buffers [vb.Id ()] = model_vb;
       }
@@ -681,7 +681,7 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
     cb_desc.bind_flags   = BindFlag_ConstantBuffer;
     cb_desc.access_flags = AccessFlag_ReadWrite;
 
-    BufferPtr cb (device->CreateBuffer (cb_desc), false);
+    BufferPtr cb (test.device->CreateBuffer (cb_desc), false);
 
     cb->SetData (0, sizeof (MaterialShaderParams), &params);
     
@@ -741,7 +741,7 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
     tex_desc.bind_flags           = BindFlag_Texture;
     tex_desc.access_flags         = AccessFlag_ReadWrite;
 
-    TexturePtr texture = TexturePtr (device->CreateTexture (tex_desc), false);
+    TexturePtr texture = TexturePtr (test.device->CreateTexture (tex_desc), false);
 
     texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, tex_desc.format, image.Bitmap ());
     
@@ -762,13 +762,11 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
     sampler_desc.max_anisotropy       = 1;
     sampler_desc.wrap_u               = TexcoordWrap_Clamp;
     sampler_desc.wrap_v               = TexcoordWrap_Clamp;
-//    sampler_desc.wrap_u               = TexcoordWrap_Repeat;
-//    sampler_desc.wrap_v               = TexcoordWrap_Repeat;
     sampler_desc.comparision_function = CompareMode_AlwaysPass;
     sampler_desc.min_lod              = 0;
     sampler_desc.max_lod              = FLT_MAX;
 
-    return SamplerStatePtr (device->CreateSamplerState (sampler_desc), false);
+    return SamplerStatePtr (test.device->CreateSamplerState (sampler_desc), false);
   }
 
   void visit (scene_graph::VisualModel& model)
@@ -782,7 +780,7 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
 
       CommonShaderParams my_shader_parameters;
 
-      IBuffer* common_cb = device->SSGetConstantBuffer (ConstantBufferSemantic_Common);
+      IBuffer* common_cb = test.device->SSGetConstantBuffer (ConstantBufferSemantic_Common);
 
       if (!common_cb)
       {
@@ -801,7 +799,7 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
 
       common_cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
       
-      device->ISSetIndexBuffer (mesh.index_buffer.get ());
+      test.device->ISSetIndexBuffer (mesh.index_buffer.get ());
 
       for (PrimitiveArray::const_iterator iter=mesh.primitives.begin (); iter!=mesh.primitives.end (); ++iter)
       {
@@ -815,33 +813,33 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
         for (int i=0; i<SamplerChannel_Num; i++)
           if (material.texmaps [i].texture && material.texmaps [i].sampler)
           {
-            device->SSSetTexture (i, &*material.texmaps [i].texture);
-            device->SSSetSampler (i, &*material.texmaps [i].sampler);
+            test.device->SSSetTexture (i, &*material.texmaps [i].texture);
+            test.device->SSSetSampler (i, &*material.texmaps [i].sampler);
           }
           else
           {
-            device->SSSetTexture (i, 0);
-            device->SSSetSampler (i, 0);
+            test.device->SSSetTexture (i, 0);
+            test.device->SSSetSampler (i, 0);
           }
           
-        device->SSSetConstantBuffer (ConstantBufferSemantic_Material, &*material.constant_buffer);  
+        test.device->SSSetConstantBuffer (ConstantBufferSemantic_Material, &*material.constant_buffer);
         
-        device->ISSetInputLayout (vb.input_layout.get ());
+        test.device->ISSetInputLayout (vb.input_layout.get ());
 
         for (size_t i=0; i<vb.vertex_streams.size (); i++)
         {
           BufferPtr vs = vb.vertex_streams [i];
 
-          device->ISSetVertexBuffer (i, vs.get ());
+          test.device->ISSetVertexBuffer (i, vs.get ());
         }
         
         if (mesh.index_buffer)
         {
-          device->DrawIndexed (primitive.type, primitive.first, primitive.count, 0);
+          test.device->DrawIndexed (primitive.type, primitive.first, primitive.count, 0);
         }
         else
         {
-          device->Draw (primitive.type, primitive.first, primitive.count);
+          test.device->Draw (primitive.type, primitive.first, primitive.count);
         }
       }
 
@@ -853,17 +851,17 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
 
   void Draw ()
   {
-    scene.VisitEach (*this);
+    test.scene.VisitEach (*this);
   }
 };
 
 typedef xtl::shared_ptr<Model> ModelPtr;
 
-ModelPtr load_model (const DevicePtr& device, const char* file_name)
+ModelPtr load_model (Test& test, const char* file_name)
 {
   printf ("Load model '%s':\n", file_name);
 
-  return ModelPtr (new Model (device, file_name));
+  return ModelPtr (new Model (test, file_name));
 }
 
 void print (const char* message)
@@ -913,23 +911,25 @@ void idle (Test& test)
   if (test.window.IsClosed ())
     return;
 
-  static size_t start = common::milliseconds ();
-  static size_t last = 0;
-  static float angle;
-
+  static size_t last     = 0;
   static size_t last_fps = 0;
 
-  if (common::milliseconds () - last > 25)
-  {
-    last = common::milliseconds ();
-    return;
-  }
+  size_t current_time = common::milliseconds ();
 
-  if (common::milliseconds () - last_fps > 1000)
-  {
-    printf ("FPS: %.2f\n", float (frames_count)/float (common::milliseconds () - last_fps)*1000.f);
+  float dt = (current_time - last) / 1000.f;
 
-    last_fps = common::milliseconds ();
+  last = current_time;
+
+  if (fabs (test.x_camera_speed) > EPS || fabs (test.y_camera_speed) > EPS)
+    test.camera->Translate (math::vec3f (dt * test.x_camera_speed, dt * test.y_camera_speed, 0.f), NodeTransformSpace_Local);
+  if (fabs (test.x_camera_rotation_speed) > EPS || fabs (test.y_camera_rotation_speed) > EPS)
+    test.camera->Rotate (math::degree (dt * test.y_camera_rotation_speed), math::degree (dt * test.x_camera_rotation_speed), math::degree (0.f));
+
+  if (current_time - last_fps > 1000)
+  {
+    printf ("FPS: %.2f\n", float (frames_count) / float (current_time - last_fps) * 1000.f);
+
+    last_fps = current_time;
     frames_count = 0;
     return;
   }
@@ -945,10 +945,6 @@ void idle (Test& test)
   }
 
   cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
-
-  angle = (common::milliseconds () - start) / 1500.f;
-
-  my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (sin (angle) * 400, cos (angle) * 400, sin (angle) * 400), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
   
   static float light_phi = -3.14 / 2;
 
@@ -960,23 +956,44 @@ void idle (Test& test)
   test.window.Invalidate ();
 }
 
-//получение ортографической матрицы проекции
-math::mat4f get_ortho_proj (float left, float right, float bottom, float top, float znear, float zfar)
+//обновление матрицы проецирования
+void update_proj_matrix (DevicePtr device, const math::mat4f& proj_matrix)
 {
-  math::mat4f proj_matrix;
+  CommonShaderParams my_shader_parameters;
 
-  float width  = right - left,
-        height = top - bottom,
-        depth  = zfar - znear;
+  IBuffer* cb = device->SSGetConstantBuffer (0);
 
-    //выбрана матрица проецирования, используемая gluOrtho2D
+  if (!cb)
+  {
+    printf ("Null constant buffer #0\n");
+    return;
+  }
 
-  proj_matrix [0] = math::vec4f (2.0f / width, 0, 0, - (right + left) / width);
-  proj_matrix [1] = math::vec4f (0, 2.0f / height, 0, - (top + bottom) / height);
-  proj_matrix [2] = math::vec4f (0, 0, -2.0f / depth, - (znear + zfar) / depth);
-  proj_matrix [3] = math::vec4f (0, 0, 0, 1);
+  cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
-  return proj_matrix;
+  my_shader_parameters.proj_tm = proj_matrix;
+
+  cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+}
+
+//обновление матрицы проецирования
+void update_view_matrix (DevicePtr device, const math::mat4f& view_matrix)
+{
+  CommonShaderParams my_shader_parameters;
+
+  IBuffer* cb = device->SSGetConstantBuffer (0);
+
+  if (!cb)
+  {
+    printf ("Null constant buffer #0\n");
+    return;
+  }
+
+  cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+
+  my_shader_parameters.view_tm = inverse (view_matrix);
+
+  cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 }
 
 int main ()
@@ -985,7 +1002,7 @@ int main ()
 
   try
   {
-    Test test (L"OpenGL device test window (model_load)", &redraw, &reload, "Open*", "max_texture_size=1024 GL_ARB_texture_non_power_of_two=0");
+    Test test (L"OpenGL device test window (model_load)", &redraw, &reload, "*", "max_texture_size=1024 GL_ARB_texture_non_power_of_two=0");
 
     test.window.Show ();
     
@@ -1038,8 +1055,8 @@ int main ()
 
     CommonShaderParams my_shader_parameters;
 
-    my_shader_parameters.proj_tm = get_ortho_proj (-10, 10, -5, 10, -1000, 1000);
-    my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
+    my_shader_parameters.proj_tm = test.camera->ProjectionMatrix ();
+    my_shader_parameters.view_tm = inverse (test.camera->WorldTM ());
     
     my_shader_parameters.bump_sampler       = SamplerChannel_Bump;
     my_shader_parameters.diffuse_sampler    = SamplerChannel_Diffuse;
@@ -1055,7 +1072,7 @@ int main ()
 
     printf ("Load model\n");
 
-    ModelPtr model = load_model (test.device, MODEL_NAME);
+    ModelPtr model = load_model (test, MODEL_NAME);
 
     model_ptr = model.get ();
 

@@ -41,6 +41,7 @@
 #include <common/strlib.h>
 #include <common/time.h>
 
+#include <sg/camera.h>
 #include <sg/scene.h>
 #include <sg/visual_model.h>
 
@@ -49,6 +50,7 @@
 #include <media/rfx/material_library.h>
 
 using namespace render::low_level;
+using namespace scene_graph;
 
 /*
     Получение смещения поля в структуре (аналог offsetof, компилируемый без предупреждений на gcc)
@@ -78,25 +80,38 @@ typedef xtl::com_ptr<IPredicate>               PredicatePtr;
 //тестовое приложение
 struct Test
 {
-  typedef xtl::function<void (Test&)> CallbackFn;
+  public:
+    typedef xtl::function<void (Test&)> CallbackFn;
 
-  syslib::Window     window;
-  SwapChainPtr       swap_chain;
-  DevicePtr          device;
-  CallbackFn         redraw;
-  CallbackFn         reload;
-  ProgramPtr         shader;
+    syslib::Window  window;
+    SwapChainPtr    swap_chain;
+    DevicePtr       device;
+    CallbackFn      redraw;
+    CallbackFn      reload;
+    ProgramPtr      shader;
+    Scene           scene;
+    Camera::Pointer camera;
+    float           x_camera_speed;
+    float           y_camera_speed;
+    float           x_camera_rotation_speed;
+    float           y_camera_rotation_speed;
+    bool            pressed_keys [syslib::Key_Num];
 
-  Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn& in_reload, const char* adapter_mask="*", const char* init_string="");
-  
-  void OnKeyPressed (const syslib::WindowEventContext& context);
+    Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn& in_reload, const char* adapter_mask="*", const char* init_string="");
 
-  void OnResize ();
-
-  void OnRedraw ();
-
-  void OnClose ();
+  private:
+    void OnKeyPressed  (const syslib::WindowEventContext& context);
+    void OnKeyReleased (const syslib::WindowEventContext& context);
+    void OnResize ();
+    void OnRedraw ();
+    void OnClose ();
+    void OnCameraUpdate ();
 };
+
+//обновление матрицы проецирования
+void update_proj_matrix (DevicePtr device, const math::mat4f& proj_matrix);
+//обновление матрицы вида
+void update_view_matrix (DevicePtr device, const math::mat4f& view_matrix);
 
 //чтение ихсодного текста шейдера в строку
 stl::string read_shader (const char* file_name);

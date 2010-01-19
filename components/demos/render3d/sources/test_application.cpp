@@ -1,5 +1,13 @@
 #include "shared.h"
 
+namespace
+{
+
+const float HORIZONTAL_SPEED          = 2.0f;
+const float VERTICAL_SPEED            = HORIZONTAL_SPEED;
+const float HORIZONTAL_ROTATION_SPEED = 8.0f;
+const float VERTICAL_ROTATION_SPEED   = HORIZONTAL_ROTATION_SPEED;
+
 //протокол теста
 struct TestLogFilter
 {
@@ -16,10 +24,16 @@ struct TestLogFilter
 
 typedef common::Singleton<TestLogFilter> TestLogFilterSingleton;
 
+}
+
 Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn& in_reload, const char* adapter_mask, const char* init_string)
   : window (syslib::WindowStyle_Overlapped, 800, 600),
     redraw (in_redraw),
-    reload (in_reload)
+    reload (in_reload),
+    x_camera_speed (0),
+    y_camera_speed (0),
+    x_camera_rotation_speed (0),
+    y_camera_rotation_speed (0)
 {
   TestLogFilterSingleton::Instance (); //инициализация фильтра протокольных сообщений
 
@@ -42,7 +56,24 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
 
   DriverManager::CreateSwapChainAndDevice ("OpenGL", adapter_mask, desc, init_string, swap_chain, device);
 
+  scene_graph::PerspectiveCamera::Pointer perspective_camera = scene_graph::PerspectiveCamera::Create ();
+
+  perspective_camera->SetFovX   (math::degree (100.f));
+  perspective_camera->SetFovY   (math::degree (70.f));
+  perspective_camera->SetZNear  (1);
+  perspective_camera->SetZFar   (100);
+
+  camera = perspective_camera;
+
+  camera->SetPosition (0, 0, -10);
+
+  camera->BindToScene (scene);
+
+  camera->RegisterEventHandler (NodeEvent_AfterUpdate, xtl::bind (&Test::OnCameraUpdate, this));
+
 //    swap_chain->SetFullscreenState (true);
+
+  memset (pressed_keys, 0, sizeof (pressed_keys));
 
   OnResize ();
 
@@ -50,12 +81,23 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
   window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Test::OnResize, this));
   window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Test::OnClose, this));
   window.RegisterEventHandler (syslib::WindowEvent_OnKeyDown, xtl::bind (&Test::OnKeyPressed, this, _3));
+  window.RegisterEventHandler (syslib::WindowEvent_OnKeyUp, xtl::bind (&Test::OnKeyReleased, this, _3));
 
   window.Invalidate ();
 }
-  
+
+void Test::OnCameraUpdate ()
+{
+  update_view_matrix (device, camera->WorldTM ());
+}
+
 void Test::OnKeyPressed (const syslib::WindowEventContext& context)
 {
+  if (pressed_keys [context.key])
+    return;
+
+  pressed_keys [context.key] = true;
+
   switch (context.key)
   {
     case syslib::Key_F5:
@@ -68,6 +110,65 @@ void Test::OnKeyPressed (const syslib::WindowEventContext& context)
         printf ("reload exception: %s\n", e.what ());
       }
 
+      break;
+    case syslib::Key_A:
+      x_camera_speed -= HORIZONTAL_SPEED;
+      break;
+    case syslib::Key_D:
+      x_camera_speed += HORIZONTAL_SPEED;
+      break;
+    case syslib::Key_W:
+      y_camera_speed += VERTICAL_SPEED;
+      break;
+    case syslib::Key_S:
+      y_camera_speed -= VERTICAL_SPEED;
+      break;
+    case syslib::Key_Left:
+      x_camera_rotation_speed -= HORIZONTAL_ROTATION_SPEED;
+      break;
+    case syslib::Key_Right:
+      x_camera_rotation_speed += HORIZONTAL_ROTATION_SPEED;
+      break;
+    case syslib::Key_Up:
+      y_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
+      break;
+    case syslib::Key_Down:
+      y_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
+      break;
+    default:
+      break;
+  }
+}
+
+void Test::OnKeyReleased (const syslib::WindowEventContext& context)
+{
+  pressed_keys [context.key] = false;
+
+  switch (context.key)
+  {
+    case syslib::Key_A:
+      x_camera_speed += HORIZONTAL_SPEED;
+      break;
+    case syslib::Key_D:
+      x_camera_speed -= HORIZONTAL_SPEED;
+      break;
+    case syslib::Key_W:
+      y_camera_speed -= VERTICAL_SPEED;
+      break;
+    case syslib::Key_S:
+      y_camera_speed += VERTICAL_SPEED;
+      break;
+    case syslib::Key_Left:
+      x_camera_rotation_speed += HORIZONTAL_ROTATION_SPEED;
+      break;
+    case syslib::Key_Right:
+      x_camera_rotation_speed -= HORIZONTAL_ROTATION_SPEED;
+      break;
+    case syslib::Key_Up:
+      y_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
+      break;
+    case syslib::Key_Down:
+      y_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
       break;
     default:
       break;
