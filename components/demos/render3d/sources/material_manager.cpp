@@ -178,11 +178,23 @@ TexturePtr MaterialManager::LoadTexture (const char* name)
   TextureDesc tex_desc;
 
   memset (&tex_desc, 0, sizeof (tex_desc));
+  
+  switch (image.Depth ())
+  {
+    case 1:
+      tex_desc.dimension = TextureDimension_2D;
+      break;
+    case 6:
+      tex_desc.dimension = TextureDimension_Cubemap;
+      break;
+    default:
+      tex_desc.dimension = TextureDimension_3D;
+      break;
+  }
 
-  tex_desc.dimension            = TextureDimension_2D;
   tex_desc.width                = image.Width ();
   tex_desc.height               = image.Height ();
-  tex_desc.layers               = 1;
+  tex_desc.layers               = image.Depth ();
   tex_desc.format               = GetPixelFormat (image);
   tex_desc.generate_mips_enable = true;
   tex_desc.bind_flags           = BindFlag_Texture;
@@ -190,8 +202,9 @@ TexturePtr MaterialManager::LoadTexture (const char* name)
 
   TexturePtr texture = TexturePtr (test.device->CreateTexture (tex_desc), false);
 
-  texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, tex_desc.format, image.Bitmap ());
-  
+  for (int i=0, count=image.Depth (); i<count; i++)
+    texture->SetData (i, 0, 0, 0, tex_desc.width, tex_desc.height, tex_desc.format, image.Bitmap (i));
+
   textures.insert_pair (name, texture);
   
   return texture;

@@ -26,7 +26,7 @@
   </Templates>
   <Materials>
     <Material Name="_SkyMaterial">
-      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" 
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1"  DiffuseTexture="env/GK_CM_SK009_cm_dxt5.dds"
        Effect="skybox"/>
     </Material>
   </Materials>

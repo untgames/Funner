@@ -10,7 +10,7 @@ const char*  SCENE_NAME               = "data/scene.xscene";
 const char*  REFLECTION_TEXTURE       = "env/EnvGala_000_D2.tga";
 const char*  SKY_MESH                 = "_SkyMesh";
 const char*  SKY_MATERIAL             = "_SkyMaterial";
-const size_t SKY_PARALLELS            = 30;                        
+const size_t SKY_PARALLELS            = 30;
 const size_t SKY_MERIDIANS            = 30;
 const float  SKY_RADIUS               = 100;
 

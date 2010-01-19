@@ -41,43 +41,34 @@ struct Build
 
 void build_volume (Build& build,size_t parallels,size_t meridians)
 {
-  float a1    = 0.0f,
-        da1   = 6.28 / float (meridians),
-        da2   = (float)3.14f / float (parallels);
+  float delta_parallel_angle = 3.14f / parallels,
+        delta_meridian_angle = 6.28f / meridians;
         
-//  build.push_vertex (math::vec3f (0.0f,1.0f,0.0f),math::vec3f (0.0f,1.0f,0.0f));
-//  build.push_vertex (math::vec3f (0.0f,-1.0f,0.0f),math::vec3f (0.0f,-1.0f,0.0f));
-        
-  for (size_t i=0;i<meridians;i++,a1+=da1)
+  int vertex_index = 0;
+
+  for (size_t parallel=0; parallel<=parallels; parallel++)
   {
-    float a2 = 0;
-    
-    float x = cos (a1),
-          z = sin (a1);
-    
-    for (size_t j=0;j<=parallels;j++,a2+=da2)
+    float r0 = sin (parallel * delta_parallel_angle),
+          y0 = cos (parallel * delta_parallel_angle);
+          
+    for (size_t meridian=0; meridian<=meridians; meridian++)
     {
-      float r = sin (a2);
-      math::vec3f v (r*x,cos (a2),r*z);
+      float x0 = r0 * sin (meridian * delta_meridian_angle),
+            z0 = r0 * cos (meridian * delta_meridian_angle);
+            
+      math::vec3f v (x0, y0, z0);
+           
+      build.push_vertex (v, v);
       
-      build.push_vertex (v,v);
-    }        
-  }
-  
-  for (size_t i=0;i<meridians;i++) 
-  {   
-    int v1 = (i % meridians) * (parallels+1),
-        v2 = ((i+1) % meridians) * (parallels+1);
+      if (meridian != meridians)
+      {
+        build.push_face (vertex_index + meridians + 1, vertex_index, vertex_index + meridians);
+        build.push_face (vertex_index + meridians + 1, vertex_index + 1, vertex_index);
         
-//    build.push_face (0,v1,v2);
-//    build.push_face (1,v2+parallels-1,v1+parallels-1);
-    
-    for (size_t j=0;j<parallels;j++)
-    {            
-      build.push_face (v1+j,v1+j+1,v2+j+1);
-      build.push_face (v1+j,v2+j+1,v2+j);
+        vertex_index++;
+      }
     }
-  }  
+  }
 }
 
 }
@@ -109,8 +100,8 @@ ModelMeshPtr create_sphere (const char* name, IDevice& device, size_t parallels,
   vs->SetData (0, vs_desc.size, &build.verts [0]);
   
   static const VertexAttribute vertex_attributes [] = {
-    {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, sizeof (Vertex)},
-    {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, sizeof (Vertex)},    
+    {VertexAttributeSemantic_Position, InputDataFormat_Vector3, InputDataType_Float, 0, 0, sizeof (Vertex)},
+    {VertexAttributeSemantic_Normal, InputDataFormat_Vector3, InputDataType_Float, 0, sizeof (math::vec3f), sizeof (Vertex)},    
   };
   
   static const size_t vertex_attributes_count = sizeof (vertex_attributes) / sizeof (*vertex_attributes);

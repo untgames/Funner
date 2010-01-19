@@ -18,26 +18,9 @@ uniform vec4  SpecularColor;
 uniform vec4  EmissionColor;
 
 varying vec4 DiffuseTexcoord;
-varying vec4 BumpTexcoord;
-varying vec4 SpecularTexcoord;
-varying vec3 Normal;
-varying vec3 LocalLightDirection;
-varying vec3 EyeLightDirection;
-varying vec3 EyeDirection;
 
 void main(void)
 {
-  vec4 pos = ModelViewMatrix * gl_Vertex;
-
-  Normal              = vec3 (normalize (ModelViewMatrix * vec4 (gl_Normal, 0.0)));
-  EyeDirection        = normalize (pos.xyz);
-  EyeLightDirection   = normalize (LightPosition - pos.xyz);
-  LocalLightDirection = -normalize (LightDirection);
-
-  DiffuseTexcoord  = gl_MultiTexCoord0;
-  BumpTexcoord     = gl_MultiTexCoord1;
-  SpecularTexcoord = gl_MultiTexCoord2;
-
-  gl_FrontColor = gl_Color;
-  gl_Position   = ModelViewProjectionMatrix * gl_Vertex;
+  DiffuseTexcoord = normalize (gl_Vertex);
+  gl_Position     = ModelViewProjectionMatrix * gl_Vertex;
 }                
