@@ -1028,7 +1028,7 @@ int main ()
 
     CommonShaderParams my_shader_parameters;
 
-    my_shader_parameters.proj_tm = get_ortho_proj (-7, 7, -5, 15, -1000, 1000);
+    my_shader_parameters.proj_tm = get_ortho_proj (-10, 10, -5, 10, -1000, 1000);
     my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
     
     my_shader_parameters.bump_sampler     = SamplerChannel_Bump;
