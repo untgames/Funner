@@ -228,7 +228,12 @@ int main ()
     test.material_manager.FindMaterial (SKY_MATERIAL)));
 
     printf ("Load scene\n");
-    test.scene_manager.LoadScene (SCENE_NAME);
+    Node::Pointer main_ship = test.scene_manager.LoadScene (SCENE_NAME);
+
+    main_ship->Rotate (math::degree (10.f), math::degree (180.f), math::degree (0.f));
+    main_ship->Translate (0, -5, 25);
+
+    main_ship->BindToParent (*test.camera);
     
     printf ("Add SkyBox\n");
     
