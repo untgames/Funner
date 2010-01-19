@@ -131,7 +131,9 @@ void MaterialManager::LoadMaterial (const char* id, const media::rfx::Material& 
   cb->SetData (0, sizeof (MaterialShaderParams), &params);
   
   dst_mtl->constant_buffer = cb;
-  
+
+  dst_mtl->shader = test.shader_manager.GetShader (src_mtl.Effect ());
+
   materials.insert_pair (id, dst_mtl);
 }
 

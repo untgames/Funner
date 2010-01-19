@@ -105,6 +105,14 @@ stl::string read_shader (const char* file_name);
 
 #pragma pack (1)
 
+struct ModelShader
+{
+  stl::string name;
+  ProgramPtr  program;
+};
+
+typedef xtl::shared_ptr<ModelShader> ModelShaderPtr;
+
 enum ConstantBufferSemantic
 {
   ConstantBufferSemantic_Common,
@@ -177,8 +185,9 @@ struct ModelTexmap
 
 struct ModelMaterial
 {
-  ModelTexmap texmaps [SamplerChannel_Num];
-  BufferPtr   constant_buffer;
+  ModelTexmap    texmaps [SamplerChannel_Num];
+  BufferPtr      constant_buffer;
+  ModelShaderPtr shader;
 };
 
 typedef xtl::shared_ptr<ModelMaterial>  ModelMaterialPtr;
@@ -222,6 +231,38 @@ struct ModelMesh
 };
 
 typedef xtl::shared_ptr<ModelMesh> ModelMeshPtr;
+
+///Менеджер шейдеров
+class ShaderManager
+{
+  public:
+    ShaderManager (Test&);
+    
+///Установка каталога шейдеров
+    void SetShadersDir (const char* name);
+    const char* ShadersDir ();
+  
+///Загрузка шейдера  
+    void LoadShader (const char* name);
+    
+///Поиск шейдера
+    ModelShaderPtr FindShader (const char* name);
+    ModelShaderPtr GetShader  (const char* name);
+    
+///Перезагрузка шейдеров
+    void ReloadShaders ();
+    
+  private:
+    ProgramPtr CreateProgram (const char* name);
+  
+  private:
+    typedef stl::vector<ModelShaderPtr> ShaderArray;
+    
+  private:
+    Test&       test;
+    ShaderArray shaders;
+    stl::string shaders_dir;
+};
 
 ///Менеджер материалов
 class MaterialManager
@@ -274,7 +315,7 @@ class MeshManager
 };
 
 //создание сферы
-ModelMeshPtr create_sphere (size_t parallels, size_t meridians);
+ModelMeshPtr create_sphere (size_t parallels, size_t meridians, ModelMaterialPtr& material);
 
 void draw (IDevice&, ModelMesh&);
 
@@ -308,7 +349,7 @@ struct Test
     DevicePtr                  device;
     CallbackFn                 redraw;
     CallbackFn                 reload;
-    ProgramPtr                 shader;
+    ShaderManager              shader_manager;
     SceneManager               scene_manager;
     SceneRenderer              scene_renderer;
     MeshManager                mesh_manager;

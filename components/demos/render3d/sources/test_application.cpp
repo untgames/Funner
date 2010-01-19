@@ -35,6 +35,7 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
   : window (syslib::WindowStyle_Overlapped, 800, 600),
     redraw (in_redraw),
     reload (in_reload),
+    shader_manager (*this),
     scene_renderer (*this),
     mesh_manager (*this),
     material_manager (*this),

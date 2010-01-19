@@ -2,7 +2,7 @@
 <MaterialLibrary>
   <Templates>
     <Properties Name="ShaderParameters">
-      <Property Name="Effect" Type="string" Value="default"/>
+      <Property Name="Effect" Type="string" Value="phong"/>
       <Property Name="ShaderType" Type="string"/>
       <Property Name="Reflectivity" Type="float"/>
       <Property Name="Transparency" Type="float"/>

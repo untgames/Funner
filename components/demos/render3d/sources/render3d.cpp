@@ -2,6 +2,7 @@
 
 const char* VERTEX_SHADER_FILE_NAME  = "data/phong.vert";
 const char* PIXEL_SHADER_FILE_NAME   = "data/phong.frag";
+const char* SHADERS_DIR              = "data";
 const char* CONFIG_NAME              = "data/config.xml";
 const char* MODEL_NAME               = "data/meshes.xmesh";
 const char* MATERIAL_LIBRARY         = "data/materials.xmtl";
@@ -10,28 +11,11 @@ const char* REFLECTION_TEXTURE       = "env/EnvGala_000_D2.tga";
 
 const float EPS = 0.001f;
 
-void print (const char* message)
-{
-  printf ("Shader message: '%s'\n", message);
-}
-
 void reload_shaders (Test& test)
 {
   printf ("Load shaders\n");
 
-  stl::string vertex_shader_source = read_shader (VERTEX_SHADER_FILE_NAME),
-              pixel_shader_source  = read_shader (PIXEL_SHADER_FILE_NAME);
-
-  ShaderDesc shader_descs [] = {
-    {VERTEX_SHADER_FILE_NAME, size_t (-1), vertex_shader_source.c_str (), "glsl.vs", ""},
-    {PIXEL_SHADER_FILE_NAME, size_t (-1), pixel_shader_source.c_str (), "glsl.ps", ""},
-  };
-
-  ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print), false);
-  
-  test.device->SSSetProgram (shader.get ());
-
-  test.shader = shader;
+  test.shader_manager.ReloadShaders ();
 }
 
 void reload (Test& test)
@@ -127,6 +111,8 @@ int main ()
     test.window.Show ();
     
     printf ("Setup shader stage\n");
+    
+    test.shader_manager.SetShadersDir (SHADERS_DIR);
     
     reload_shaders (test);
 

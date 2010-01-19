@@ -71,22 +71,22 @@ inline bool read (const char* string, math::mat4f& result)
 
 }
 
-//декомпозиция аффинных преобразований из матрицы преобразований
+//фхъюьяючшЎш  рЇЇшээ√ї яЁхюсЁрчютрэшщ шч ьрЄЁшЎ√ яЁхюсЁрчютрэшщ
 void affine_decompose (const math::mat4f& matrix, math::vec3f& position, math::vec3f& rotation, math::vec3f& scale)
 {
-  math::mat4f local_matrix (transpose (matrix)); //копия матрицы преобразований
+  math::mat4f local_matrix (transpose (matrix)); //ъюяш  ьрЄЁшЎ√ яЁхюсЁрчютрэшщ
 
-  //выделение преобразования переноса  
+  //т√фхыхэшх яЁхюсЁрчютрэш  яхЁхэюёр а
   for (size_t i = 0; i < 3; i++)
   {
     position [i] = local_matrix [3][i];
     local_matrix [3][i] = 0;
   }
 
-  //выделение преобразования масштабирования
+  //т√фхыхэшх яЁхюсЁрчютрэш  ьрё°ЄрсшЁютрэш 
   for (size_t i = 0; i < 3; i++)
   {
-    //определение длины вектора-столбца преобразований
+    //юяЁхфхыхэшх фышэ√ тхъЄюЁр-ёЄюысЎр яЁхюсЁрчютрэшщ
     float square_length = 0;
 
     for (size_t j = 0; j < 3; j++)
@@ -94,12 +94,12 @@ void affine_decompose (const math::mat4f& matrix, math::vec3f& position, math::v
 
     scale [i] = sqrt (square_length);
 
-    //нормирование
+    //эюЁьшЁютрэшх
     for (size_t j = 0; j < 3; j++)
       local_matrix [j][i] /= scale [i];
   }
 
-  //выделение преобразования поворота
+  //т√фхыхэшх яЁхюсЁрчютрэш  яютюЁюЄр
   rotation [1] = asin (-local_matrix [0][2]);
 
   if (cos (rotation [1]) != 0.0)

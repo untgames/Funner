@@ -10,9 +10,11 @@ void draw (IDevice& device, ModelMesh& mesh)
     ModelVertexBuffer&    vb        = *primitive.vertex_buffer;
     ModelMaterial&        material  = *primitive.material;
     
-    if (!&material)
+    if (!&material || !&*material.shader || !&*material.shader->program)
       continue;
-      
+
+    device.SSSetProgram (material.shader->program.get ());
+
     for (int i=0; i<SamplerChannel_Num; i++)
       if (material.texmaps [i].texture && material.texmaps [i].sampler)
       {
