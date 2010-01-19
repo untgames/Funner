@@ -7,6 +7,7 @@ const float HORIZONTAL_SPEED          = 2.0f;
 const float VERTICAL_SPEED            = HORIZONTAL_SPEED;
 const float HORIZONTAL_ROTATION_SPEED = 8.0f;
 const float VERTICAL_ROTATION_SPEED   = HORIZONTAL_ROTATION_SPEED;
+const float FOV_X_ASPECT_RATIO        = 90.f;
 
 //протокол теста
 struct TestLogFilter
@@ -56,14 +57,10 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
 
   DriverManager::CreateSwapChainAndDevice ("OpenGL", adapter_mask, desc, init_string, swap_chain, device);
 
-  scene_graph::PerspectiveCamera::Pointer perspective_camera = scene_graph::PerspectiveCamera::Create ();
+  camera = scene_graph::PerspectiveCamera::Create ();
 
-  perspective_camera->SetFovX   (math::degree (100.f));
-  perspective_camera->SetFovY   (math::degree (70.f));
-  perspective_camera->SetZNear  (1);
-  perspective_camera->SetZFar   (100);
-
-  camera = perspective_camera;
+  camera->SetZNear (1);
+  camera->SetZFar  (100);
 
   camera->SetPosition (0, 0, -10);
 
@@ -181,16 +178,25 @@ void Test::OnResize ()
   {
     syslib::Rect rect = window.ClientRect ();
 
+    float width  = rect.right - rect.left,
+          height = rect.bottom - rect.top,
+          ar     = width / height;
+
     Viewport vp;
 
     vp.x         = rect.left;
     vp.y         = rect.top;
-    vp.width     = rect.right - rect.left;
-    vp.height    = rect.bottom - rect.top;
+    vp.width     = width;
+    vp.height    = height;
     vp.min_depth = 0;
     vp.max_depth = 1;
 
     device->RSSetViewport (vp);
+
+    camera->SetFovX   (math::degree (FOV_X_ASPECT_RATIO));
+    camera->SetFovY   (math::degree (FOV_X_ASPECT_RATIO / ar));
+
+    update_proj_matrix (device, camera->ProjectionMatrix ());
   }
   catch (std::exception& e)
   {

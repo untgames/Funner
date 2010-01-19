@@ -790,8 +790,8 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
 
       common_cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
       
-//      math::mat4f modelview = model.WorldTM () * my_shader_parameters.view_tm;
-      math::mat4f modelview = my_shader_parameters.view_tm * model.WorldTM ();
+      math::mat4f modelview = model.WorldTM () * my_shader_parameters.view_tm;
+//      math::mat4f modelview = my_shader_parameters.view_tm * model.WorldTM ();
                                           
       my_shader_parameters.object_tm          = model.WorldTM ();
       my_shader_parameters.model_view_tm      = transpose (modelview);

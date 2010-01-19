@@ -83,19 +83,19 @@ struct Test
   public:
     typedef xtl::function<void (Test&)> CallbackFn;
 
-    syslib::Window  window;
-    SwapChainPtr    swap_chain;
-    DevicePtr       device;
-    CallbackFn      redraw;
-    CallbackFn      reload;
-    ProgramPtr      shader;
-    Scene           scene;
-    Camera::Pointer camera;
-    float           x_camera_speed;
-    float           y_camera_speed;
-    float           x_camera_rotation_speed;
-    float           y_camera_rotation_speed;
-    bool            pressed_keys [syslib::Key_Num];
+    syslib::Window             window;
+    SwapChainPtr               swap_chain;
+    DevicePtr                  device;
+    CallbackFn                 redraw;
+    CallbackFn                 reload;
+    ProgramPtr                 shader;
+    Scene                      scene;
+    PerspectiveCamera::Pointer camera;
+    float                      x_camera_speed;
+    float                      y_camera_speed;
+    float                      x_camera_rotation_speed;
+    float                      y_camera_rotation_speed;
+    bool                       pressed_keys [syslib::Key_Num];
 
     Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn& in_reload, const char* adapter_mask="*", const char* init_string="");
 
