@@ -2,6 +2,7 @@
 
 const char* VERTEX_SHADER_FILE_NAME  = "data/phong.vert";
 const char* PIXEL_SHADER_FILE_NAME   = "data/phong.frag";
+const char* CONFIG_NAME              = "data/config.xml";
 const char* MODEL_NAME               = "data/meshes.xmesh";
 const char* MATERIAL_LIBRARY         = "data/materials.xmtl";
 const char* SCENE_NAME               = "data/scene.xscene";
@@ -1002,7 +1003,23 @@ int main ()
 
   try
   {
-    Test test (L"OpenGL device test window (model_load)", &redraw, &reload, "*", "max_texture_size=1024 GL_ARB_texture_non_power_of_two=0");
+    common::Parser    p (CONFIG_NAME);
+    common::ParseLog  log         = p.Log ();
+    common::ParseNode config_root = p.Root ().First ("Config");
+
+    for (size_t i = 0; i < log.MessagesCount (); i++)
+      switch (log.MessageType (i))
+      {
+        case common::ParseLogMessageType_Error:
+        case common::ParseLogMessageType_FatalError:
+          throw xtl::format_operation_exception ("LoadScene", log.Message (i));
+        default:
+          break;
+      }
+
+    Test test (L"OpenGL device test window (model_load)", &redraw, &reload, common::get<const char*> (config_root, "DriverMask", "*"), common::get<const char*> (config_root, "InitString", ""));
+
+    test.window.SetSize (common::get<size_t> (config_root, "WindowWidth", 800), common::get<size_t> (config_root, "WindowHeight", 600));
 
     test.window.Show ();
     
