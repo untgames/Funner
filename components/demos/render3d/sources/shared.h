@@ -145,7 +145,7 @@ struct Test
   {
     switch (context.key)
     {
-      case syslib::Key_F12:
+      case syslib::Key_F5:
         try
         {
           reload (*this);

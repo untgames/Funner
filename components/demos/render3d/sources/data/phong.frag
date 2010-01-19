@@ -38,7 +38,8 @@ vec2 SphereMap (const in vec3 r)
 
 vec3 ComputeDiffuseColor ()
 {
-  return vec3 (texture2D (DiffuseTexture, DiffuseTexcoord.xy)) + DiffuseColor.rgb;
+  return DiffuseTexcoord.xyz;
+//  return vec3 (texture2D (DiffuseTexture, DiffuseTexcoord.xy)) + DiffuseColor.rgb;
 }
 
 void main (void)
