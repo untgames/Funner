@@ -504,7 +504,7 @@ void save_images (const Params& params, const Model& model, ImagesMap& images_ma
 int get_texture_channel_number (const char* texture_channel)
 {
   if (strstr (texture_channel, "TEX") != texture_channel)
-    throw xtl::format_operation_exception ("get_texture_channel_number", "Invalid texture channel name format, must begin from 'TEX'");
+    return atoi (texture_channel);
 
   return atoi (texture_channel + xtl::xstrlen ("TEX"));
 }
