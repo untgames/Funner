@@ -1,13 +1,18 @@
 #include "shared.h"
 
-const char* VERTEX_SHADER_FILE_NAME  = "data/phong.vert";
-const char* PIXEL_SHADER_FILE_NAME   = "data/phong.frag";
-const char* SHADERS_DIR              = "data";
-const char* CONFIG_NAME              = "data/config.xml";
-const char* MODEL_NAME               = "data/meshes.xmesh";
-const char* MATERIAL_LIBRARY         = "data/materials.xmtl";
-const char* SCENE_NAME               = "data/scene.xscene";
-const char* REFLECTION_TEXTURE       = "env/EnvGala_000_D2.tga";
+const char*  VERTEX_SHADER_FILE_NAME  = "data/phong.vert";
+const char*  PIXEL_SHADER_FILE_NAME   = "data/phong.frag";
+const char*  SHADERS_DIR              = "data";
+const char*  CONFIG_NAME              = "data/config.xml";
+const char*  MODEL_NAME               = "data/meshes.xmesh";
+const char*  MATERIAL_LIBRARIES []    = {"data/materials.xmtl", "data/custom.xmtl"};
+const char*  SCENE_NAME               = "data/scene.xscene";
+const char*  REFLECTION_TEXTURE       = "env/EnvGala_000_D2.tga";
+const char*  SKY_MESH                 = "_SkyMesh";
+const char*  SKY_MATERIAL             = "_SkyMaterial";
+const size_t SKY_PARALLELS            = 30;                        
+const size_t SKY_MERIDIANS            = 30;
+const float  SKY_RADIUS               = 100;
 
 const float EPS = 0.001f;
 
@@ -110,6 +115,24 @@ int main ()
 
     test.window.Show ();
     
+    printf ("Initialize rasterizer\n");
+    
+    RasterizerDesc rasterizer_desc;
+    
+    memset (&rasterizer_desc, 0, sizeof (rasterizer_desc));
+    
+    rasterizer_desc.fill_mode               = FillMode_Solid;
+    rasterizer_desc.cull_mode               = CullMode_None;
+    rasterizer_desc.front_counter_clockwise = true;
+    rasterizer_desc.depth_bias              = 0;
+    rasterizer_desc.scissor_enable          = false;
+    rasterizer_desc.multisample_enable      = false;
+    rasterizer_desc.antialiased_line_enable = false;
+    
+    RasterizerStatePtr rasterizer (test.device->CreateRasterizerState (rasterizer_desc), false);
+
+    test.device->RSSetState (rasterizer.get ());
+    
     printf ("Setup shader stage\n");
     
     test.shader_manager.SetShadersDir (SHADERS_DIR);
@@ -189,15 +212,31 @@ int main ()
     
     test.material_manager.SetReflectionTexture (REFLECTION_TEXTURE);
     
-    test.material_manager.LoadMaterials (MATERIAL_LIBRARY);
+    for (size_t i=0; i<sizeof (MATERIAL_LIBRARIES) / sizeof (*MATERIAL_LIBRARIES); i++)
+      test.material_manager.LoadMaterials (MATERIAL_LIBRARIES [i]);
     
     printf ("Load meshes\n");
     
     test.mesh_manager.LoadMeshes (MODEL_NAME);
+    
+    printf ("Create custom meshes\n");
+    
+    test.mesh_manager.RegisterMesh (create_sphere (SKY_MESH, *test.device, SKY_PARALLELS, SKY_MERIDIANS, 
+      test.material_manager.FindMaterial (SKY_MATERIAL)));
 
     printf ("Load scene\n");
 
     test.scene_manager.LoadScene (SCENE_NAME);
+    
+    printf ("Add SkyBox\n");
+    
+    scene_graph::VisualModel::Pointer sky = scene_graph::VisualModel::Create ();
+
+    sky->SetMeshName           (SKY_MESH);
+    sky->SetScale              (math::vec3f (SKY_RADIUS));
+    sky->SetOrientationInherit (false);
+    sky->SetScaleInherit       (false);    
+    sky->BindToParent          (*test.camera, scene_graph::NodeBindMode_AddRef);
 
     printf ("Register callbacks\n");
 

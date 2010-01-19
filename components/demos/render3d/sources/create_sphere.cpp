@@ -41,24 +41,21 @@ struct Build
 
 void build_volume (Build& build,size_t parallels,size_t meridians)
 {
-  float angle = 2.0f * 3.14f;
   float a1    = 0.0f,
-        da1   = angle / float (meridians-1),
-        da2   = (float)3.14f / float (parallels+2);        
+        da1   = 6.28 / float (meridians),
+        da2   = (float)3.14f / float (parallels);
         
-  build.push_vertex (math::vec3f (0.0f,1.0f,0.0f),math::vec3f (0.0f,1.0f,0.0f));
-  build.push_vertex (math::vec3f (0.0f,-1.0f,0.0f),math::vec3f (0.0f,-1.0f,0.0f));
-        
-  int vbase = build.verts.size () - 1;
+//  build.push_vertex (math::vec3f (0.0f,1.0f,0.0f),math::vec3f (0.0f,1.0f,0.0f));
+//  build.push_vertex (math::vec3f (0.0f,-1.0f,0.0f),math::vec3f (0.0f,-1.0f,0.0f));
         
   for (size_t i=0;i<meridians;i++,a1+=da1)
   {
-    float a2 = da2;
+    float a2 = 0;
     
     float x = cos (a1),
           z = sin (a1);
     
-    for (size_t j=0;j<parallels;j++,a2+=da2)
+    for (size_t j=0;j<=parallels;j++,a2+=da2)
     {
       float r = sin (a2);
       math::vec3f v (r*x,cos (a2),r*z);
@@ -68,14 +65,14 @@ void build_volume (Build& build,size_t parallels,size_t meridians)
   }
   
   for (size_t i=0;i<meridians;i++) 
-  {
-    int v1 = vbase + i * parallels,
-        v2 = vbase + (i+1) % meridians * parallels;
+  {   
+    int v1 = (i % meridians) * (parallels+1),
+        v2 = ((i+1) % meridians) * (parallels+1);
         
-    build.push_face (0,v1,v2);
-    build.push_face (1,v2+parallels-1,v1+parallels-1);
+//    build.push_face (0,v1,v2);
+//    build.push_face (1,v2+parallels-1,v1+parallels-1);
     
-    for (size_t j=0;j<parallels-1;j++)
+    for (size_t j=0;j<parallels;j++)
     {            
       build.push_face (v1+j,v1+j+1,v2+j+1);
       build.push_face (v1+j,v2+j+1,v2+j);
@@ -86,7 +83,7 @@ void build_volume (Build& build,size_t parallels,size_t meridians)
 }
 
 //создание сферы
-ModelMeshPtr create_sphere (IDevice& device, size_t parallels, size_t meridians, ModelMaterialPtr& material)
+ModelMeshPtr create_sphere (const char* name, IDevice& device, size_t parallels, size_t meridians, ModelMaterialPtr& material)
 {
   parallels = stl::max (1u, parallels);
   meridians = stl::max (2u, meridians);
@@ -94,7 +91,7 @@ ModelMeshPtr create_sphere (IDevice& device, size_t parallels, size_t meridians,
   Build build;
   
   build.verts.reserve (parallels*meridians+2);
-  build.verts.reserve (2 * (parallels+1) * meridians * 3);  
+  build.indices.reserve (2 * (parallels+1) * meridians * 3);  
 
   build_volume (build, parallels, meridians);
   
@@ -124,7 +121,7 @@ ModelMeshPtr create_sphere (IDevice& device, size_t parallels, size_t meridians,
   
   layout_desc.vertex_attributes_count = vertex_attributes_count;
   layout_desc.vertex_attributes       = vertex_attributes;
-  layout_desc.index_type              = InputDataType_Int;
+  layout_desc.index_type              = InputDataType_UInt;
   layout_desc.index_buffer_offset     = 0;
   
   InputLayoutPtr layout (device.CreateInputLayout (layout_desc), false);
@@ -149,7 +146,7 @@ ModelMeshPtr create_sphere (IDevice& device, size_t parallels, size_t meridians,
   vb->id           = 0;
   vb->input_layout = layout;
     
-  ModelMeshPtr mesh (new ModelMesh (""));
+  ModelMeshPtr mesh (new ModelMesh (name));
   
   mesh->vertex_buffers.push_back (vb);
   
@@ -161,7 +158,7 @@ ModelMeshPtr create_sphere (IDevice& device, size_t parallels, size_t meridians,
   primitive.material      = material;
   primitive.vertex_buffer = vb;
   primitive.first         = 0;
-  primitive.count         = build.indices.size () / 3;
+  primitive.count         = build.indices.size ();
   
   mesh->primitives.push_back (primitive);
   

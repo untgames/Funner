@@ -306,6 +306,9 @@ class MeshManager
 ///Загрузка мешей
     void LoadMeshes (const char* file_name);
     
+///Регистрация меша
+    void RegisterMesh (const ModelMeshPtr&);
+    
 ///Поиск меша
     ModelMeshPtr FindMesh (const char* name);
     
@@ -315,7 +318,8 @@ class MeshManager
 };
 
 //создание сферы
-ModelMeshPtr create_sphere (size_t parallels, size_t meridians, ModelMaterialPtr& material);
+ModelMeshPtr create_sphere (const char* name, IDevice& device, 
+size_t parallels, size_t meridians, ModelMaterialPtr& material);
 
 void draw (IDevice&, ModelMesh&);
 

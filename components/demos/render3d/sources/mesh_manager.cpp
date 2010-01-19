@@ -288,6 +288,12 @@ void MeshManager::LoadMeshes (const char* file_name)
   MeshLoader (test, meshes, file_name);
 }
 
+///Регистрация меша
+void MeshManager::RegisterMesh (const ModelMeshPtr& mesh)
+{
+  meshes.push_back (mesh);
+}
+
 ///Поиск меша
 ModelMeshPtr MeshManager::FindMesh (const char* name)
 {
