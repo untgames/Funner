@@ -100,10 +100,13 @@ struct Test
   SwapChainPtr       swap_chain;
   DevicePtr          device;
   CallbackFn         redraw;
+  CallbackFn         reload;
+  ProgramPtr         shader;
 
-  Test (const wchar_t* title, const CallbackFn& in_redraw, const char* adapter_mask="*", const char* init_string="") :
+  Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn& in_reload, const char* adapter_mask="*", const char* init_string="") :
     window (syslib::WindowStyle_Overlapped, 800, 600),
-    redraw (in_redraw)
+    redraw (in_redraw),
+    reload (in_reload)
   {
     TestLogFilterSingleton::Instance (); //инициализация фильтра протокольных сообщений
 
@@ -133,8 +136,27 @@ struct Test
     window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Test::OnRedraw, this));
     window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Test::OnResize, this));
     window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Test::OnClose, this));
+    window.RegisterEventHandler (syslib::WindowEvent_OnKeyDown, xtl::bind (&Test::OnKeyPressed, this, _3));
 
     window.Invalidate ();
+  }
+  
+  void OnKeyPressed (const syslib::WindowEventContext& context)
+  {
+    switch (context.key)
+    {
+      case syslib::Key_F12:
+        try
+        {
+          reload (*this);
+        }
+        catch (std::exception& e)
+        {
+          printf ("reload exception: %s\n", e.what ());
+        }
+        
+        break;
+    }
   }
 
   void OnResize ()

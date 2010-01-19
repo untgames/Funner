@@ -1,9 +1,10 @@
 #include "shared.h"
 
-const char* SHADER_FILE_NAME  = "data/ffp_shader.wxf";
-const char* MODEL_NAME        = "data/meshes.xmesh";
-const char* MATERIAL_LIBRARY  = "data/materials.xmtl";
-const char* SCENE_NAME        = "data/scene.xscene";
+const char* VERTEX_SHADER_FILE_NAME  = "data/phong.vert";
+const char* PIXEL_SHADER_FILE_NAME   = "data/phong.frag";
+const char* MODEL_NAME               = "data/meshes.xmesh";
+const char* MATERIAL_LIBRARY         = "data/materials.xmtl";
+const char* SCENE_NAME               = "data/scene.xscene";
 
 enum ConstantBufferSemantic
 {
@@ -29,6 +30,8 @@ struct CommonShaderParams
   math::mat4f object_tm;
   math::mat4f view_tm;
   math::mat4f proj_tm;
+  math::mat4f model_view_tm;
+  math::mat4f model_view_proj_tm;
   math::vec3f light_pos;
   math::vec3f light_dir;
   int         diffuse_sampler;
@@ -747,8 +750,12 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
       }
 
       common_cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
-
-      my_shader_parameters.object_tm = model.WorldTM ();
+      
+      math::mat4f modelview = model.WorldTM () * my_shader_parameters.view_tm;
+                                          
+      my_shader_parameters.object_tm          = model.WorldTM ();
+      my_shader_parameters.model_view_tm      = transpose (modelview);
+      my_shader_parameters.model_view_proj_tm = transpose (my_shader_parameters.proj_tm * modelview);
 
       common_cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
       
@@ -818,6 +825,30 @@ ModelPtr load_model (const DevicePtr& device, const char* file_name)
 void print (const char* message)
 {
   printf ("Shader message: '%s'\n", message);
+}
+
+void reload_shaders (Test& test)
+{
+  printf ("Load shaders\n");
+
+  stl::string vertex_shader_source = read_shader (VERTEX_SHADER_FILE_NAME),
+              pixel_shader_source  = read_shader (PIXEL_SHADER_FILE_NAME);
+
+  ShaderDesc shader_descs [] = {
+    {VERTEX_SHADER_FILE_NAME, size_t (-1), vertex_shader_source.c_str (), "glsl.vs", ""},
+    {PIXEL_SHADER_FILE_NAME, size_t (-1), pixel_shader_source.c_str (), "glsl.ps", ""},
+  };
+
+  ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print), false);
+  
+  test.device->SSSetProgram (shader.get ());
+
+  test.shader = shader;
+}
+
+void reload (Test& test)
+{
+  reload_shaders (test);
 }
 
 Model* model_ptr = 0;
@@ -909,7 +940,7 @@ int main ()
 
   try
   {
-    Test test (L"OpenGL device test window (model_load)", &redraw, "Open*", "max_texture_size=1024");
+    Test test (L"OpenGL device test window (model_load)", &redraw, &reload, "Open*", "max_texture_size=1024");
 
     test.window.Show ();
 
@@ -918,19 +949,14 @@ int main ()
     model_ptr = model.get ();
 
     printf ("Set shader stage\n");
-
-    stl::string shader_source  = read_shader (SHADER_FILE_NAME);
-
-    ShaderDesc shader_descs [] = {
-      {"ffp_shader", size_t (-1), shader_source.c_str (), "ffp", ""},
-    };
+    
+    reload_shaders (test);
 
     static ProgramParameter shader_parameters[] = {
-      {"ProjectionMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, proj_tm)},
-      {"ViewMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, view_tm)},
-      {"ObjectMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, object_tm)},
-      {"LightPos", ProgramParameterType_Float3, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, light_pos)},
-      {"LightDir", ProgramParameterType_Float3, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, light_dir)},
+      {"ModelViewProjectionMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, model_view_proj_tm)},
+      {"ModelViewMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, model_view_tm)},
+      {"LightPosition", ProgramParameterType_Float3, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, light_pos)},
+      {"LightDirection", ProgramParameterType_Float3, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, light_dir)},
       {"BumpTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, bump_sampler)},
       {"DiffuseTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, diffuse_sampler)},
       {"AmbientTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, ambient_sampler)},
@@ -954,8 +980,7 @@ int main ()
     };
     
     ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
-
-    ProgramPtr shader (test.device->CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, &print), false);
+    
     ProgramParametersLayoutPtr program_parameters_layout (test.device->CreateProgramParametersLayout (program_parameters_layout_desc), false);
 
     BufferDesc cb_desc;
@@ -982,7 +1007,6 @@ int main ()
     
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
-    test.device->SSSetProgram (shader.get ());
     test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());
     test.device->SSSetConstantBuffer (ConstantBufferSemantic_Common, cb.get ());
 
