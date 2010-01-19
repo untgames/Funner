@@ -23,6 +23,7 @@ uniform sampler2D BumpTexture;
 uniform sampler2D SpecularTexture;
 uniform sampler2D EmissionTexture;
 uniform sampler2D AmbientTexture;
+uniform sampler2D ReflectionTexture;
 
 varying vec4 DiffuseTexcoord;
 varying vec4 BumpTexcoord;
@@ -52,19 +53,30 @@ vec3 ComputeSpecularColor ()
   return vec3 (texture2D (SpecularTexture, SpecularTexcoord.xy)) + SpecularColor.rgb;
 }
 
+vec3 ComputeReflectionColor (const in vec3 normal)
+{
+  vec3 reflection          = reflect (EyeDirection, normal);  
+  vec2 reflection_texcoord = SphereMap (reflection);
+
+  reflection_texcoord.y = 1.0 - reflection_texcoord.y;
+
+  return vec3 (texture2D (ReflectionTexture, reflection_texcoord));
+}
+
 void main (void)
 {
   vec3 normal;
 
   normal   = vec3 (texture2D (BumpTexture, BumpTexcoord.xy));
   normal   = (normal - 0.5) * 2.0;
-//    norm.y = -norm.y;
-  normal   = normalize (normal + BumpAmount * (normal - vec3 (0,0,1)));
+//    normal.y = -normal.y;
+  normal   = normalize (Normal + BumpAmount * (normal - vec3 (0,0,1)));
 
   float diffuse_factor  = max (dot (LocalLightDirection, normal), 0.0);
-  float specular_factor = min (pow (max (dot (reflect (EyeLightDirection, normal), EyeDirection), 0.0), Shininess), 1.0);
+  float specular_factor = pow (max (dot (reflect (EyeLightDirection, normal), EyeDirection), 0.0), Shininess);
 
-  vec3 color = ComputeDiffuseColor () * diffuse_factor + ComputeSpecularColor () * specular_factor;
+  vec3 color = ComputeDiffuseColor () * diffuse_factor + ComputeSpecularColor () * specular_factor +
+               ComputeReflectionColor (normal) * Reflectivity;
 
   gl_FragColor = vec4 (color, 1.0);
 }

@@ -5,6 +5,7 @@ const char* PIXEL_SHADER_FILE_NAME   = "data/phong.frag";
 const char* MODEL_NAME               = "data/meshes.xmesh";
 const char* MATERIAL_LIBRARY         = "data/materials.xmtl";
 const char* SCENE_NAME               = "data/scene.xscene";
+const char* REFLECTION_TEXTURE       = "env/EnvGala_000_D2.tga";
 
 enum ConstantBufferSemantic
 {
@@ -21,6 +22,7 @@ enum SamplerChannel
   SamplerChannel_Bump,
   SamplerChannel_Ambient,
   SamplerChannel_Emission,
+  SamplerChannel_Reflection,
   
   SamplerChannel_Num
 };
@@ -39,6 +41,7 @@ struct CommonShaderParams
   int         bump_sampler;
   int         ambient_sampler;
   int         emission_sampler;
+  int         reflection_sampler;
 };
 
 enum ShaderType
@@ -248,10 +251,12 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
   ModelMaterialMap             materials;
   ModelMeshArray               meshes;
   scene_graph::Scene           scene;
+  TexturePtr                   default_reflection_texture;
 
   Model (const DevicePtr& in_device, const char* name) : device (in_device), library (name)
   {
     default_sampler = CreateSampler ();
+    default_reflection_texture = LoadTexture (REFLECTION_TEXTURE);
     
     LoadMaterials ();
     LoadVertexBuffers ();
@@ -614,6 +619,8 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
       dst_mtl->texmaps [SamplerChannel_Emission].texture = LoadTexture (properties.GetString ("EmissionTexture"));
     }
     
+    dst_mtl->texmaps [SamplerChannel_Reflection].texture = default_reflection_texture;
+    
     for (int i=0; i<SamplerChannel_Num; i++)
       dst_mtl->texmaps [i].sampler = default_sampler;
     
@@ -696,9 +703,9 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
     return iter->second;
   }
   
-  static render::low_level::PixelFormat GetPixelFormat (media::PixelFormat format)
+  static render::low_level::PixelFormat GetPixelFormat (media::Image& image)
   {
-    switch (format)
+    switch (image.Format ())
     {
       case media::PixelFormat_RGB8:  return render::low_level::PixelFormat_RGB8;
       case media::PixelFormat_RGBA8: return render::low_level::PixelFormat_RGBA8;
@@ -706,7 +713,8 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
       case media::PixelFormat_L8:    return render::low_level::PixelFormat_A8;
       case media::PixelFormat_LA8:   return render::low_level::PixelFormat_LA8;
       default:
-        printf ("Unsupported image format %s", media::get_format_name (format));
+        printf ("Unsupported image format %s", media::get_format_name (image.Format ()));
+        image.Convert (media::PixelFormat_RGBA8);
         return render::low_level::PixelFormat_RGBA8;
     }
   }
@@ -728,7 +736,7 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
     tex_desc.width                = image.Width ();
     tex_desc.height               = image.Height ();
     tex_desc.layers               = 1;
-    tex_desc.format               = GetPixelFormat (image.Format ());
+    tex_desc.format               = GetPixelFormat (image);
     tex_desc.generate_mips_enable = true;
     tex_desc.bind_flags           = BindFlag_Texture;
     tex_desc.access_flags         = AccessFlag_ReadWrite;
@@ -784,7 +792,8 @@ struct Model : public xtl::visitor<void, scene_graph::VisualModel>
 
       common_cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
       
-      math::mat4f modelview = model.WorldTM () * my_shader_parameters.view_tm;
+//      math::mat4f modelview = model.WorldTM () * my_shader_parameters.view_tm;
+      math::mat4f modelview = my_shader_parameters.view_tm * model.WorldTM ();
                                           
       my_shader_parameters.object_tm          = model.WorldTM ();
       my_shader_parameters.model_view_tm      = transpose (modelview);
@@ -976,7 +985,7 @@ int main ()
 
   try
   {
-    Test test (L"OpenGL device test window (model_load)", &redraw, &reload, "*", "max_texture_size=1024");
+    Test test (L"OpenGL device test window (model_load)", &redraw, &reload, "Open*", "max_texture_size=1024 GL_ARB_texture_non_power_of_two=0");
 
     test.window.Show ();
     
@@ -994,6 +1003,7 @@ int main ()
       {"AmbientTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, ambient_sampler)},
       {"SpecularTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, specular_sampler)},
       {"EmissionTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, emission_sampler)},
+      {"ReflectionTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, reflection_sampler)},      
       
       {"ShaderType", ProgramParameterType_Int, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, shader_type)},
       {"Reflectivity", ProgramParameterType_Float, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, reflectivity)},
@@ -1031,11 +1041,12 @@ int main ()
     my_shader_parameters.proj_tm = get_ortho_proj (-10, 10, -5, 10, -1000, 1000);
     my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
     
-    my_shader_parameters.bump_sampler     = SamplerChannel_Bump;
-    my_shader_parameters.diffuse_sampler  = SamplerChannel_Diffuse;
-    my_shader_parameters.specular_sampler = SamplerChannel_Specular;
-    my_shader_parameters.ambient_sampler  = SamplerChannel_Ambient;
-    my_shader_parameters.emission_sampler = SamplerChannel_Emission;
+    my_shader_parameters.bump_sampler       = SamplerChannel_Bump;
+    my_shader_parameters.diffuse_sampler    = SamplerChannel_Diffuse;
+    my_shader_parameters.specular_sampler   = SamplerChannel_Specular;
+    my_shader_parameters.ambient_sampler    = SamplerChannel_Ambient;
+    my_shader_parameters.emission_sampler   = SamplerChannel_Emission;
+    my_shader_parameters.reflection_sampler = SamplerChannel_Reflection;
     
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
