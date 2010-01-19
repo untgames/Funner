@@ -5,8 +5,10 @@ const char*  PIXEL_SHADER_FILE_NAME   = "data/phong.frag";
 const char*  SHADERS_DIR              = "data";
 const char*  CONFIG_NAME              = "data/config.xml";
 const char*  MODEL_NAME               = "data/meshes.xmesh";
-const char*  MATERIAL_LIBRARIES []    = {"data/materials.xmtl", "data/custom.xmtl"};
+const char*  ENTERPRISE_MODEL_NAME    = "data/enterprise_meshes.xmesh";
+const char*  MATERIAL_LIBRARIES []    = {"data/materials.xmtl", "data/custom.xmtl", "data/enterprise_materials.xmtl"};
 const char*  SCENE_NAME               = "data/scene.xscene";
+const char* ENTERPRISE_SCENE_NAME     = "data/enterprise_scene.xscene";
 const char*  REFLECTION_TEXTURE       = "env/EnvGala_000_D2.tga";
 const char*  SKY_MESH                 = "_SkyMesh";
 const char*  SKY_MATERIAL             = "_SkyMaterial";
@@ -218,14 +220,14 @@ int main ()
     printf ("Load meshes\n");
     
     test.mesh_manager.LoadMeshes (MODEL_NAME);
+    test.mesh_manager.LoadMeshes (ENTERPRISE_MODEL_NAME);
     
     printf ("Create custom meshes\n");
     
     test.mesh_manager.RegisterMesh (create_sphere (SKY_MESH, *test.device, SKY_PARALLELS, SKY_MERIDIANS, 
-      test.material_manager.FindMaterial (SKY_MATERIAL)));
+    test.material_manager.FindMaterial (SKY_MATERIAL)));
 
     printf ("Load scene\n");
-
     test.scene_manager.LoadScene (SCENE_NAME);
     
     printf ("Add SkyBox\n");
@@ -237,6 +239,15 @@ int main ()
     sky->SetOrientationInherit (false);
     sky->SetScaleInherit       (false);    
     sky->BindToParent          (*test.camera, scene_graph::NodeBindMode_AddRef);
+
+    printf ("Load enterprise scene\n");
+
+    for (size_t i = 0; i < 5; i++)
+    {
+      Node::Pointer enterprise = test.scene_manager.LoadScene (ENTERPRISE_SCENE_NAME);
+
+      enterprise->Translate (rand () % 50 - 25, rand () % 50 - 25, rand () % 50 - 25);
+    }
 
     printf ("Register callbacks\n");
 

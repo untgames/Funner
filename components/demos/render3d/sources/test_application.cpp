@@ -7,7 +7,7 @@ namespace
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
 #endif
 
-const float HORIZONTAL_SPEED          = 2.0f;
+const float HORIZONTAL_SPEED          = 5.0f;
 const float VERTICAL_SPEED            = HORIZONTAL_SPEED;
 const float HORIZONTAL_ROTATION_SPEED = 30.0f;
 const float VERTICAL_ROTATION_SPEED   = HORIZONTAL_ROTATION_SPEED;
@@ -71,7 +71,7 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
   camera->SetZNear (1);
   camera->SetZFar  (100);
 
-  camera->SetPosition (0, 0, -10);
+  camera->SetPosition (0, 0, -20);
 
   camera->BindToScene (scene_manager.Scene ());
 

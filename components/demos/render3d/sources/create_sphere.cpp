@@ -74,10 +74,10 @@ void build_volume (Build& build,size_t parallels,size_t meridians)
 }
 
 //создание сферы
-ModelMeshPtr create_sphere (const char* name, IDevice& device, size_t parallels, size_t meridians, ModelMaterialPtr& material)
+ModelMeshPtr create_sphere (const char* name, IDevice& device, size_t parallels, size_t meridians, const ModelMaterialPtr& material)
 {
-  parallels = stl::max (1u, parallels);
-  meridians = stl::max (2u, meridians);
+  parallels = stl::max ((size_t)1, parallels);
+  meridians = stl::max ((size_t)2, meridians);
   
   Build build;
   

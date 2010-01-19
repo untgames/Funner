@@ -86,7 +86,7 @@ class SceneManager
   public:
     scene_graph::Scene& Scene () { return scene; }
 
-    void LoadScene (const char* file_name);
+    Node::Pointer LoadScene (const char* file_name);
     
   private:
     void ReadNodeInfo (common::Parser::Iterator node, scene_graph::Node::Pointer parent);
@@ -242,7 +242,7 @@ class ShaderManager
     void SetShadersDir (const char* name);
     const char* ShadersDir ();
   
-///Загрузка шейдера  
+///Загрузка шейдера
     void LoadShader (const char* name);
     
 ///Поиск шейдера
@@ -319,7 +319,7 @@ class MeshManager
 
 //создание сферы
 ModelMeshPtr create_sphere (const char* name, IDevice& device, 
-size_t parallels, size_t meridians, ModelMaterialPtr& material);
+size_t parallels, size_t meridians, const ModelMaterialPtr& material);
 
 void draw (IDevice&, ModelMesh&);
 

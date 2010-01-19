@@ -127,8 +127,23 @@ struct MeshLoader
         
         if (!dst_primitive.material)
         {
-          printf ("No material '%s' for mesh '%s' primitive %u\n", src_primitive.material, mesh.Name (), i);
-          continue;
+          dst_primitive.material = test.material_manager.FindMaterial (common::format ("%s", src_primitive.material).c_str ());
+
+          if (!dst_primitive.material)
+          {
+            char* material_suffix_begin = strstr (src_primitive.material, "-material");
+
+            if (material_suffix_begin)
+            {
+              dst_primitive.material = test.material_manager.FindMaterial (stl::string (src_primitive.material, material_suffix_begin - src_primitive.material).c_str ());
+
+              if (!dst_primitive.material)
+              {
+                printf ("No material '%s' for mesh '%s' primitive %u\n", src_primitive.material, mesh.Name (), i);
+                continue;
+              }
+            }
+          }
         }
         
         model_mesh->primitives.push_back (dst_primitive);
