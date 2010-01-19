@@ -88,10 +88,8 @@ void idle (Test& test)
 
   cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
   
-  static float light_phi = -3.14f / 2.f;
-
-  my_shader_parameters.light_pos = math::vec3f (10 * cos (light_phi), 0.f, 10 * sin (light_phi));
-  my_shader_parameters.light_dir = -normalize (my_shader_parameters.light_pos);
+  my_shader_parameters.light_pos = test.light->WorldPosition ();
+  my_shader_parameters.light_dir = test.light->WorldOrtZ ();
 
   cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 

@@ -42,6 +42,7 @@
 #include <common/time.h>
 
 #include <sg/camera.h>
+#include <sg/light.h>
 #include <sg/scene.h>
 #include <sg/visual_model.h>
 
@@ -231,7 +232,7 @@ class MaterialManager
 ///Установка текстуры отражений
     void SetReflectionTexture (const char* name);
   
-///Загрузка материалов  
+///Загрузка материалов
     void LoadMaterials (const char* file_name);
 
 ///Поиск материала
@@ -287,7 +288,7 @@ class SceneRenderer: public xtl::visitor<void, scene_graph::VisualModel>
     void Draw (scene_graph::Camera&);
         
   protected:
-///Рисование объектов  
+///Рисование объектов
     void visit (scene_graph::VisualModel&);
     
   private:  
@@ -313,6 +314,7 @@ struct Test
     MeshManager                mesh_manager;
     MaterialManager            material_manager;
     PerspectiveCamera::Pointer camera;
+    DirectLight::Pointer       light;
     float                      x_camera_speed;
     float                      y_camera_speed;
     float                      x_camera_rotation_speed;

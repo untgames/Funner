@@ -9,7 +9,7 @@ namespace
 
 const float HORIZONTAL_SPEED          = 2.0f;
 const float VERTICAL_SPEED            = HORIZONTAL_SPEED;
-const float HORIZONTAL_ROTATION_SPEED = 8.0f;
+const float HORIZONTAL_ROTATION_SPEED = 30.0f;
 const float VERTICAL_ROTATION_SPEED   = HORIZONTAL_ROTATION_SPEED;
 const float FOV_X_ASPECT_RATIO        = 90.f;
 
@@ -73,7 +73,9 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
 
   camera->BindToScene (scene_manager.Scene ());
 
-  camera->RegisterEventHandler (NodeEvent_AfterUpdate, xtl::bind (&Test::OnCameraUpdate, this));
+  light = scene_graph::DirectLight::Create ();
+
+  light->BindToParent (*camera);
 
 //    swap_chain->SetFullscreenState (true);
 
@@ -88,10 +90,6 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
   window.RegisterEventHandler (syslib::WindowEvent_OnKeyUp, xtl::bind (&Test::OnKeyReleased, this, _3));
 
   window.Invalidate ();
-}
-
-void Test::OnCameraUpdate ()
-{
 }
 
 void Test::OnKeyPressed (const syslib::WindowEventContext& context)
