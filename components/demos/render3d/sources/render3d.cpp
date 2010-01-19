@@ -941,9 +941,9 @@ void idle (Test& test)
 
   my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (sin (angle) * 400, cos (angle) * 400, sin (angle) * 400), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
   
-  static float light_phi = -3.14 / 3;
+  static float light_phi = -3.14 / 2;
 
-  my_shader_parameters.light_pos = math::vec3f (400 * cos (light_phi), 400 * sin (light_phi), 0.0f);
+  my_shader_parameters.light_pos = math::vec3f (10 * cos (light_phi), 0.f, 10 * sin (light_phi));
   my_shader_parameters.light_dir = -normalize (my_shader_parameters.light_pos);
 
   cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
@@ -976,7 +976,7 @@ int main ()
 
   try
   {
-    Test test (L"OpenGL device test window (model_load)", &redraw, &reload, "Open*", "max_texture_size=1024");
+    Test test (L"OpenGL device test window (model_load)", &redraw, &reload, "*", "max_texture_size=1024");
 
     test.window.Show ();
     
@@ -1028,7 +1028,7 @@ int main ()
 
     CommonShaderParams my_shader_parameters;
 
-    my_shader_parameters.proj_tm = get_ortho_proj (-10, 10, -10, 10, -1000, 1000);
+    my_shader_parameters.proj_tm = get_ortho_proj (-7, 7, -5, 15, -1000, 1000);
     my_shader_parameters.view_tm = inverse (math::lookat (math::vec3f (0, 400, 0), math::vec3f (0.0f), math::vec3f (0, 0, 1)));
     
     my_shader_parameters.bump_sampler     = SamplerChannel_Bump;
