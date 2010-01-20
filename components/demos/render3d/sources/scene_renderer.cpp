@@ -30,6 +30,7 @@ void SceneRenderer::visit (scene_graph::VisualModel& model)
   }
 
   params.object_tm          = model.WorldTM ();
+  params.view_tm            = transpose (view_tm);
   params.model_view_tm      = transpose (view_tm * model.WorldTM ());
   params.model_view_proj_tm = transpose (view_projection_tm * model.WorldTM ());
 

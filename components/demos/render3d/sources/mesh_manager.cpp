@@ -131,7 +131,7 @@ struct MeshLoader
 
           if (!dst_primitive.material)
           {
-            char* material_suffix_begin = strstr (src_primitive.material, "-material");
+            char* material_suffix_begin = strstr ((char*)src_primitive.material, "-material");
 
             if (material_suffix_begin)
             {

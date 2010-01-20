@@ -1,6 +1,5 @@
 uniform mat4  ProjectionMatrix;
 uniform mat4  ViewMatrix;
-uniform mat4  ObjectMatrix;
 uniform vec3  LightPosition;
 uniform vec3  LightDirection;
 uniform int   ShaderType;
@@ -50,7 +49,7 @@ vec3 ComputeDiffuseColor ()
 
 vec3 ComputeSpecularColor ()
 {
-  return vec3 (texture2D (SpecularTexture, SpecularTexcoord.xy)) + SpecularColor.rgb;
+  return vec3 (texture2D (DiffuseTexture, SpecularTexcoord.xy)) + SpecularColor.rgb;
 }
 
 vec3 ComputeReflectionColor (const in vec3 normal)
@@ -70,13 +69,18 @@ void main (void)
   normal   = vec3 (texture2D (BumpTexture, BumpTexcoord.xy));
   normal   = (normal - 0.5) * 2.0;
 //    normal.y = -normal.y;
-  normal   = normalize (Normal + BumpAmount * (normal - vec3 (0,0,1)));
+  normal   = normalize (Normal + BumpAmount * (normal - vec3 (0,0,-1)));
 
   float diffuse_factor  = max (dot (LocalLightDirection, normal), 0.0);
   float specular_factor = pow (max (dot (reflect (EyeLightDirection, normal), EyeDirection), 0.0), Shininess);
 
-  vec3 color = ComputeDiffuseColor () * diffuse_factor + ComputeSpecularColor () * specular_factor +
-               ComputeReflectionColor (normal) * Reflectivity;
+  vec3 color = 
+               ComputeDiffuseColor () * diffuse_factor +
+               ComputeSpecularColor () * specular_factor +
+               ComputeReflectionColor (normal) * Reflectivity * 0.3
+;
 
-  gl_FragColor = vec4 (color, 1.0);
+//gl_FragColor = vec4 (diffuse_factor);
+  gl_FragColor = vec4 (color, Transparency);
+//  gl_FragColor = vec4 (EyeLightDirection, 1.0);
 }

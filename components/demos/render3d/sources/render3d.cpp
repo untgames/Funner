@@ -166,6 +166,7 @@ int main ()
     static ProgramParameter shader_parameters[] = {
       {"ModelViewProjectionMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Transformations, 1, TEST_OFFSETOF (TransformationsShaderParams, model_view_proj_tm)},
       {"ModelViewMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Transformations, 1, TEST_OFFSETOF (TransformationsShaderParams, model_view_tm)},
+      {"ViewMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Transformations, 1, TEST_OFFSETOF (TransformationsShaderParams, view_tm)},      
 
       {"LightPosition", ProgramParameterType_Float3, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, light_pos)},
       {"LightDirection", ProgramParameterType_Float3, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, light_dir)},
@@ -273,7 +274,7 @@ int main ()
     {
       Node::Pointer enterprise = test.scene_manager.LoadScene (ENTERPRISE_SCENE_NAME);
 
-      enterprise->Translate (rand () % 75 - 30, rand () % 75 - 30, rand () % 75 - 30);
+      enterprise->Translate ((float)(rand () % 75 - 30), (float)(rand () % 75 - 30), (float)(rand () % 75 - 30));
 
       xtl::com_ptr<physics::low_level::IShape> sphere_shape = test.physics_driver->CreateSphereShape (8.f);
 

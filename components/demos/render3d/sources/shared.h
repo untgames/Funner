@@ -142,6 +142,7 @@ struct CommonShaderParams
 struct TransformationsShaderParams
 {
   math::mat4f object_tm;
+  math::mat4f view_tm;  
   math::mat4f model_view_tm;
   math::mat4f model_view_proj_tm;
 };
@@ -234,7 +235,7 @@ struct ModelMesh
 
   ModelMesh (const char* in_name)
     : name (in_name)
-    {}
+    {}    
 };
 
 typedef xtl::shared_ptr<ModelMesh> ModelMeshPtr;

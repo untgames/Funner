@@ -1,3 +1,4 @@
+uniform mat4  ViewMatrix;
 uniform mat4  ModelViewMatrix;
 uniform mat4  ModelViewProjectionMatrix;
 uniform vec3  LightPosition;
@@ -27,12 +28,13 @@ varying vec3 EyeDirection;
 
 void main(void)
 {
-  vec4 pos = ModelViewMatrix * gl_Vertex;
+  vec4 view_pos       = ModelViewMatrix * gl_Vertex;
+  vec3 view_light_pos = (ViewMatrix * vec4 (LightPosition, 1.0)).xyz;
 
   Normal              = vec3 (normalize (ModelViewMatrix * vec4 (gl_Normal, 0.0)));
-  EyeDirection        = normalize (pos.xyz);
-  EyeLightDirection   = normalize (LightPosition - pos.xyz);
-  LocalLightDirection = -normalize (LightDirection);
+  EyeDirection        = -normalize (view_pos.xyz);
+  EyeLightDirection   = -normalize (view_pos.xyz - view_light_pos);
+  LocalLightDirection = normalize (ViewMatrix * vec4 (LightDirection, 0.0)).xyz;
 
   DiffuseTexcoord  = gl_MultiTexCoord0;
   BumpTexcoord     = gl_MultiTexCoord1;

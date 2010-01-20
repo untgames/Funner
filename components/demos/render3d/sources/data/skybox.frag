@@ -1,6 +1,5 @@
 uniform mat4  ProjectionMatrix;
 uniform mat4  ViewMatrix;
-uniform mat4  ObjectMatrix;
 uniform vec3  LightPosition;
 uniform vec3  LightDirection;
 uniform int   ShaderType;
