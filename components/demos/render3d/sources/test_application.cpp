@@ -70,7 +70,7 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
   camera = scene_graph::PerspectiveCamera::Create ();
 
   camera->SetZNear (1);
-  camera->SetZFar  (100);
+  camera->SetZFar  (1000);
 
   camera->SetPosition (0, 0, -20);
 
@@ -110,6 +110,19 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
 
   rigid_bodies.insert_pair (camera, camera_body);
 
+    //create input handling
+  input_driver = input::low_level::DriverManager::FindDriver ("DirectInput8");
+
+  if (!input_driver)
+    throw xtl::format_operation_exception ("", "Can't find direct input 8 driver");
+
+  for (size_t i = 0; i < input_driver->GetDevicesCount (); i++)
+  {
+    input_devices.push_back (InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", input_driver->GetDeviceName (i), "buffer_size=0"), false));
+
+    input_devices.back ()->RegisterEventHandler (xtl::bind (&Test::OnInputEvent, this, _1));
+  }
+
   OnResize ();
 
   window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&Test::OnRedraw, this));
@@ -119,6 +132,28 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
   window.RegisterEventHandler (syslib::WindowEvent_OnKeyUp, xtl::bind (&Test::OnKeyReleased, this, _3));
 
   window.Invalidate ();
+}
+
+void Test::OnInputEvent (const char* event)
+{
+  common::StringArray event_components = common::split (event);
+
+  if (!xtl::xstrcmp (event_components [0], "'Axis1'"))
+    y_camera_speed = -(float)atof (event_components [2]) * HORIZONTAL_SPEED;
+  if (!xtl::xstrcmp (event_components [0], "'Axis2'"))
+    x_camera_speed = (float)atof (event_components [2]) * VERTICAL_SPEED;
+  if (!xtl::xstrcmp (event_components [0], "'Axis3'"))
+    x_camera_rotation_speed = (float)atof (event_components [2]) * HORIZONTAL_ROTATION_SPEED;
+  if (!xtl::xstrcmp (event_components [0], "'Axis4'"))
+    y_camera_rotation_speed = -(float)atof (event_components [2]) * VERTICAL_ROTATION_SPEED;
+  if (!xtl::xstrcmp (event_components [0], "'Button6'") && !xtl::xstrcmp (event_components [1], "down"))
+    z_camera_rotation_speed = -VERTICAL_ROTATION_SPEED;
+  if (!xtl::xstrcmp (event_components [0], "'Button6'") && !xtl::xstrcmp (event_components [1], "up"))
+    z_camera_rotation_speed = 0;
+  if (!xtl::xstrcmp (event_components [0], "'Button7'") && !xtl::xstrcmp (event_components [1], "down"))
+    z_camera_rotation_speed = VERTICAL_ROTATION_SPEED;
+  if (!xtl::xstrcmp (event_components [0], "'Button7'") && !xtl::xstrcmp (event_components [1], "up"))
+    z_camera_rotation_speed = 0;
 }
 
 void Test::OnKeyPressed (const syslib::WindowEventContext& context)

@@ -3,7 +3,7 @@
 namespace
 {
 
-const float EPS = 0.0001;
+const float EPS = 0.0001f;
 
 }
 

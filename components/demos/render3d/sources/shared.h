@@ -57,6 +57,9 @@
 #include <physics/low_level/shape.h>
 #include <physics/low_level/rigid_body.h>
 
+#include <input/low_level/device.h>
+#include <input/low_level/driver.h>
+
 using namespace render::low_level;
 using namespace scene_graph;
 
@@ -360,6 +363,9 @@ struct Test
     typedef xtl::com_ptr<physics::low_level::IDriver>    PhysicsDriverPtr;
     typedef xtl::com_ptr<physics::low_level::IScene>     PhysicsScenePtr;
     typedef stl::map<Node::Pointer, RigidBodyPtr>        RigidBodiesMap;
+    typedef xtl::com_ptr<input::low_level::IDriver>      InputDriverPtr;
+    typedef xtl::com_ptr<input::low_level::IDevice>      InputDevicePtr;
+    typedef stl::vector<InputDevicePtr>				     InputDevices;
 
     syslib::Window             window;
     SwapChainPtr               swap_chain;
@@ -377,6 +383,8 @@ struct Test
     PhysicsScenePtr            physics_scene;
     RigidBodiesMap             rigid_bodies;
     RigidBodyPtr               camera_body;
+    InputDriverPtr             input_driver;
+    InputDevices               input_devices;
     float                      x_camera_speed;
     float                      y_camera_speed;
     float                      x_camera_rotation_speed;
@@ -393,6 +401,7 @@ struct Test
     void OnRedraw ();
     void OnClose ();
     void OnCameraUpdate ();
+    void OnInputEvent (const char* event);
 };
 
 #ifdef _MSC_VER
