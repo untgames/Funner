@@ -20,6 +20,7 @@
 
 #include <stl/string>
 #include <stl/hash_map>
+#include <stl/map>
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
@@ -49,6 +50,12 @@
 #include <media/image.h>
 #include <media/mesh.h>
 #include <media/rfx/material_library.h>
+
+#include <physics/low_level/driver.h>
+#include <physics/low_level/material.h>
+#include <physics/low_level/scene.h>
+#include <physics/low_level/shape.h>
+#include <physics/low_level/rigid_body.h>
 
 using namespace render::low_level;
 using namespace scene_graph;
@@ -342,11 +349,16 @@ class SceneRenderer: public xtl::visitor<void, scene_graph::VisualModel>
     math::mat4f view_tm;
 };
 
+typedef xtl::com_ptr<physics::low_level::IRigidBody> RigidBodyPtr;
+
 ///Тестовое приложение
 struct Test
 {
   public:
-    typedef xtl::function<void (Test&)> CallbackFn;
+    typedef xtl::function<void (Test&)>                  CallbackFn;
+    typedef xtl::com_ptr<physics::low_level::IDriver>    PhysicsDriverPtr;
+    typedef xtl::com_ptr<physics::low_level::IScene>     PhysicsScenePtr;
+    typedef stl::map<Node::Pointer, RigidBodyPtr>        RigidBodiesMap;
 
     syslib::Window             window;
     SwapChainPtr               swap_chain;
@@ -360,10 +372,15 @@ struct Test
     MaterialManager            material_manager;
     PerspectiveCamera::Pointer camera;
     DirectLight::Pointer       light;
+    PhysicsDriverPtr           physics_driver;
+    PhysicsScenePtr            physics_scene;
+    RigidBodiesMap             rigid_bodies;
+    RigidBodyPtr               camera_body;
     float                      x_camera_speed;
     float                      y_camera_speed;
     float                      x_camera_rotation_speed;
     float                      y_camera_rotation_speed;
+    float                      z_camera_rotation_speed;
     bool                       pressed_keys [syslib::Key_Num];
 
     Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn& in_reload, const char* adapter_mask="*", const char* init_string="");

@@ -9,7 +9,7 @@ namespace
 
 const float HORIZONTAL_SPEED          = 5.0f;
 const float VERTICAL_SPEED            = HORIZONTAL_SPEED;
-const float HORIZONTAL_ROTATION_SPEED = 30.0f;
+const float HORIZONTAL_ROTATION_SPEED = 1.0f;
 const float VERTICAL_ROTATION_SPEED   = HORIZONTAL_ROTATION_SPEED;
 const float FOV_X_ASPECT_RATIO        = 90.f;
 
@@ -42,7 +42,8 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
     x_camera_speed (0),
     y_camera_speed (0),
     x_camera_rotation_speed (0),
-    y_camera_rotation_speed (0)
+    y_camera_rotation_speed (0),
+    z_camera_rotation_speed (0)
 {
   TestLogFilterSingleton::Instance (); //инициализация фильтра протокольных сообщений
 
@@ -82,6 +83,32 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
 //    swap_chain->SetFullscreenState (true);
 
   memset (pressed_keys, 0, sizeof (pressed_keys));
+
+    //create physics scene
+  physics_driver = physics::low_level::DriverManager::FindDriver ("Bullet");
+
+  if (!physics_driver)
+    throw xtl::format_operation_exception ("", "Can't find physics driver");
+
+  physics_scene = PhysicsScenePtr (physics_driver->CreateScene (), false);
+
+  physics_scene->SetGravity (0);
+
+  xtl::com_ptr<physics::low_level::IShape> box_shape = physics_driver->CreateBoxShape (math::vec3f (1.f, 5.f, 20.f));
+
+  camera_body = RigidBodyPtr (physics_scene->CreateRigidBody (box_shape.get (), 1.f), false);
+
+  camera_body->Material ()->SetLinearDamping (0.5f);
+  camera_body->Material ()->SetAngularDamping (0.5f);
+
+  physics::low_level::Transform camera_transform;
+
+  camera_transform.position    = camera->WorldPosition ();
+  camera_transform.orientation = camera->WorldOrientation ();
+
+  camera_body->SetWorldTransform (camera_transform);
+
+  rigid_bodies.insert_pair (camera, camera_body);
 
   OnResize ();
 
@@ -138,6 +165,12 @@ void Test::OnKeyPressed (const syslib::WindowEventContext& context)
     case syslib::Key_Down:
       y_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
       break;
+    case syslib::Key_Q:
+      z_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
+      break;
+    case syslib::Key_E:
+      z_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
+      break;
     default:
       break;
   }
@@ -172,6 +205,12 @@ void Test::OnKeyReleased (const syslib::WindowEventContext& context)
       break;
     case syslib::Key_Down:
       y_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
+      break;
+    case syslib::Key_Q:
+      z_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
+      break;
+    case syslib::Key_E:
+      z_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
       break;
     default:
       break;
