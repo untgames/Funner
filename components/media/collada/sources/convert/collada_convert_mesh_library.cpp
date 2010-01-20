@@ -195,7 +195,7 @@ class Converter
 
           //регистрация вершинного потока в поверхности
 
-        dst_surface.vertex_streams.insert_pair (common::format ("texchannels.TEX%s", tex_channels.Name (i)).c_str (), vs);
+        dst_surface.vertex_streams.insert_pair (common::format ("texchannels.%s", tex_channels.Name (i)).c_str (), vs);
       }
     }
     
@@ -407,12 +407,17 @@ class Converter
         const char*                    channel_name = texture.TexcoordChannel ();
         
           //поиск канала текстурных координат
-          
+
+        if (strstr (channel_name, "CHANNEL") == channel_name)
+          channel_name += strlen ("CHANNEL");
+        else if (strstr (channel_name, "TEX") == channel_name)
+          channel_name += strlen ("TEX");
+
         VertexStreamMap::iterator iter = surface.vertex_streams.find (common::format ("texchannels.%s", channel_name).c_str ());
-        
+
         if (iter == surface.vertex_streams.end ())
           continue; //вершинный канал не найден
-          
+
           //добавление канала
           
         vertex_buffer.Attach (iter->second);
