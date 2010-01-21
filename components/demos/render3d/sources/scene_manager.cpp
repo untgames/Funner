@@ -232,7 +232,7 @@ void SceneManager::SetDrawShattles (bool draw)
 
 void SceneManager::SetDrawMainShips (bool draw)
 {
-  for (NodesArray::iterator iter = main_ships.begin (), end = shattles.end (); iter != end; ++iter)
+  for (NodesArray::iterator iter = main_ships.begin (), end = main_ships.end (); iter != end; ++iter)
   {
     if (draw)
       (*iter)->BindToScene (scene);

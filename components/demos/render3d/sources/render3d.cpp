@@ -12,6 +12,7 @@ const char* ENTERPRISE_SCENE_NAME     = "data/enterprise_scene.xscene";
 const char*  REFLECTION_TEXTURE       = "env/EnvGala_000_D2.tga";
 const char*  SKY_MESH                 = "_SkyMesh";
 const char*  SKY_MATERIAL             = "_SkyMaterial";
+const size_t ADDITIONAL_SHIPS_RANGE   = 80;
 const size_t SKY_PARALLELS            = 30;
 const size_t SKY_MERIDIANS            = 30;
 const float  SKY_RADIUS               = 9000;
@@ -291,7 +292,9 @@ int main ()
     {
       Node::Pointer enterprise = test.scene_manager.LoadScene (ENTERPRISE_SCENE_NAME);
 
-      enterprise->Translate ((float)(rand () % 75 - 30), (float)(rand () % 75 - 30), (float)(rand () % 75 - 30));
+      enterprise->Translate ((float)(rand () % ADDITIONAL_SHIPS_RANGE - ADDITIONAL_SHIPS_RANGE / 2.f),
+                             (float)(rand () % ADDITIONAL_SHIPS_RANGE - ADDITIONAL_SHIPS_RANGE / 2.f),
+                             (float)(rand () % ADDITIONAL_SHIPS_RANGE - ADDITIONAL_SHIPS_RANGE / 2.f));
 
       xtl::com_ptr<physics::low_level::IShape> sphere_shape = test.physics_driver->CreateSphereShape (8.f);
 
@@ -308,6 +311,34 @@ int main ()
 
       test.scene_manager.AddShattle (enterprise);
     }
+
+    printf ("Load main ship scene\n");
+
+    for (size_t i = 0; i < 10; i++)
+    {
+      Node::Pointer node = test.scene_manager.LoadScene (SCENE_NAME);
+
+      node->Translate ((float)(rand () % ADDITIONAL_SHIPS_RANGE - ADDITIONAL_SHIPS_RANGE / 2),
+                       (float)(rand () % ADDITIONAL_SHIPS_RANGE - ADDITIONAL_SHIPS_RANGE / 2),
+                       (float)(rand () % ADDITIONAL_SHIPS_RANGE - ADDITIONAL_SHIPS_RANGE / 2));
+
+      xtl::com_ptr<physics::low_level::IShape> sphere_shape = test.physics_driver->CreateSphereShape (8.f);
+
+      RigidBodyPtr node_body (test.physics_scene->CreateRigidBody (sphere_shape.get (), 1), false);
+
+      physics::low_level::Transform node_transform;
+
+      node_transform.position    = node->WorldPosition ();
+      node_transform.orientation = node->WorldOrientation ();
+
+      node_body->SetWorldTransform (node_transform);
+
+      test.rigid_bodies.insert_pair (node, node_body);
+
+      test.scene_manager.AddMainShip (node);
+    }
+
+    test.scene_manager.SetDrawMainShips (false);
 
     printf ("Register callbacks\n");
 

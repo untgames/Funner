@@ -97,7 +97,7 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
 
   physics_scene->SetGravity (0);
 
-  xtl::com_ptr<physics::low_level::IShape> box_shape = physics_driver->CreateBoxShape (math::vec3f (1.f, 5.f, 20.f));
+  xtl::com_ptr<physics::low_level::IShape> box_shape = physics_driver->CreateBoxShape (math::vec3f (1.f, 3.f, 5.f));
 
   camera_body = RigidBodyPtr (physics_scene->CreateRigidBody (box_shape.get (), 1.f), false);
 
