@@ -9,7 +9,7 @@ namespace
 
 const float HORIZONTAL_SPEED          = 5.0f;
 const float VERTICAL_SPEED            = HORIZONTAL_SPEED;
-const float HORIZONTAL_ROTATION_SPEED = 1.0f;
+const float HORIZONTAL_ROTATION_SPEED = 10.0f;
 const float VERTICAL_ROTATION_SPEED   = HORIZONTAL_ROTATION_SPEED;
 const float FOV_X_ASPECT_RATIO        = 90.f;
 
@@ -113,15 +113,13 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
     //create input handling
   input_driver = input::low_level::DriverManager::FindDriver ("DirectInput8");
 
-  if (!input_driver)
-    throw xtl::format_operation_exception ("", "Can't find direct input 8 driver");
+  if (input_driver)
+    for (size_t i = 0; i < input_driver->GetDevicesCount (); i++)
+    {
+      input_devices.push_back (InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", input_driver->GetDeviceName (i), "buffer_size=0"), false));
 
-  for (size_t i = 0; i < input_driver->GetDevicesCount (); i++)
-  {
-    input_devices.push_back (InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", input_driver->GetDeviceName (i), "buffer_size=0"), false));
-
-    input_devices.back ()->RegisterEventHandler (xtl::bind (&Test::OnInputEvent, this, _1));
-  }
+      input_devices.back ()->RegisterEventHandler (xtl::bind (&Test::OnInputEvent, this, _1));
+    }
 
   OnResize ();
 

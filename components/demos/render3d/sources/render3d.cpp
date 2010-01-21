@@ -51,7 +51,7 @@ void idle (Test& test)
 
   float dt = (current_time - last) / 1000.f;
 
-  test.physics_scene->PerformSimulation (dt);
+  /*test.physics_scene->PerformSimulation (dt);
 
   for (Test::RigidBodiesMap::iterator iter = test.rigid_bodies.begin (), end = test.rigid_bodies.end (); iter != end; ++iter)
   {
@@ -59,7 +59,7 @@ void idle (Test& test)
 
     iter->first->SetWorldPosition (body_transform.position);
     iter->first->SetWorldOrientation (body_transform.orientation);
-  }
+  }*/
 
   last = current_time;
   
@@ -72,10 +72,10 @@ void idle (Test& test)
   
 */
 
-//  if (fabs (test.x_camera_speed) > EPS || fabs (test.y_camera_speed) > EPS)
-//    test.camera->Translate (math::vec3f (dt * test.x_camera_speed, 0.f, dt * test.y_camera_speed), NodeTransformSpace_Local);
-//  if (fabs (test.x_camera_rotation_speed) > EPS || fabs (test.y_camera_rotation_speed) > EPS)
-//    test.camera->Rotate (math::degree (dt * test.y_camera_rotation_speed), math::degree (dt * test.x_camera_rotation_speed), math::degree (0.f), NodeTransformSpace_Local);
+  if (fabs (test.x_camera_speed) > EPS || fabs (test.y_camera_speed) > EPS)
+    test.camera->Translate (math::vec3f (dt * test.x_camera_speed, 0.f, dt * test.y_camera_speed), NodeTransformSpace_Local);
+  if (fabs (test.x_camera_rotation_speed) > EPS || fabs (test.y_camera_rotation_speed) > EPS)
+    test.camera->Rotate (math::degree (dt * test.y_camera_rotation_speed), math::degree (dt * test.x_camera_rotation_speed), math::degree (0.f), NodeTransformSpace_Local);
 
 /*  physics::low_level::Transform camera_transform;
 
