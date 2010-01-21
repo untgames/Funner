@@ -43,8 +43,11 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
     y_camera_speed (0),
     x_camera_rotation_speed (0),
     y_camera_rotation_speed (0),
-    z_camera_rotation_speed (0)
+    z_camera_rotation_speed (0),
+    physics_enabled (false)
 {
+  memset (pressed_keys, 0, sizeof (pressed_keys));
+
   TestLogFilterSingleton::Instance (); //инициализация фильтра протокольных сообщений
 
   window.SetTitle (title);
@@ -81,8 +84,6 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
   light->BindToParent (*camera);
 
 //    swap_chain->SetFullscreenState (true);
-
-  memset (pressed_keys, 0, sizeof (pressed_keys));
 
     //create physics scene
   physics_driver = physics::low_level::DriverManager::FindDriver ("Bullet");
@@ -206,6 +207,9 @@ void Test::OnKeyPressed (const syslib::WindowEventContext& context)
       break;
     case syslib::Key_E:
       z_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
+      break;
+    case syslib::Key_P:
+      physics_enabled = !physics_enabled;
       break;
     default:
       break;

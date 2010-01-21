@@ -51,38 +51,32 @@ void idle (Test& test)
 
   float dt = (current_time - last) / 1000.f;
 
-  /*test.physics_scene->PerformSimulation (dt);
-
-  for (Test::RigidBodiesMap::iterator iter = test.rigid_bodies.begin (), end = test.rigid_bodies.end (); iter != end; ++iter)
-  {
-    const physics::low_level::Transform& body_transform = iter->second->WorldTransform ();
-
-    iter->first->SetWorldPosition (body_transform.position);
-    iter->first->SetWorldOrientation (body_transform.orientation);
-  }*/
-
   last = current_time;
-  
-/*
+
+  if (test.physics_enabled)
+  {
+    test.physics_scene->PerformSimulation (dt);
+
+    for (Test::RigidBodiesMap::iterator iter = test.rigid_bodies.begin (), end = test.rigid_bodies.end (); iter != end; ++iter)
+    {
+      const physics::low_level::Transform& body_transform = iter->second->WorldTransform ();
+
+      iter->first->SetWorldPosition (body_transform.position);
+      iter->first->SetWorldOrientation (body_transform.orientation);
+    }
 
 //  test.camera_body->SetLinearVelocity (math::vec3f (test.x_camera_speed, 0, test.y_camera_speed) * inverse (test.camera->WorldTM ()));
 //  test.camera_body->SetAngularVelocity (math::vec3f (test.y_camera_rotation_speed, test.x_camera_rotation_speed, test.z_camera_rotation_speed) * inverse (test.camera->WorldTM ()));
-  test.camera_body->AddForce (math::vec3f (test.x_camera_speed, 0, test.y_camera_speed) * inverse (test.camera->WorldTM ()));
-  test.camera_body->AddTorque (math::vec3f (test.y_camera_rotation_speed, test.x_camera_rotation_speed, -test.z_camera_rotation_speed) * inverse (test.camera->WorldTM ()));
-  
-*/
-
-  if (fabs (test.x_camera_speed) > EPS || fabs (test.y_camera_speed) > EPS)
-    test.camera->Translate (math::vec3f (dt * test.x_camera_speed, 0.f, dt * test.y_camera_speed), NodeTransformSpace_Local);
-  if (fabs (test.x_camera_rotation_speed) > EPS || fabs (test.y_camera_rotation_speed) > EPS || fabs (test.z_camera_rotation_speed) > EPS)
-    test.camera->Rotate (math::degree (dt * test.y_camera_rotation_speed), math::degree (dt * test.x_camera_rotation_speed), math::degree (dt * test.z_camera_rotation_speed), NodeTransformSpace_Local);
-
-/*  physics::low_level::Transform camera_transform;
-
-  camera_transform.position    = test.camera->WorldPosition ();
-  camera_transform.orientation = test.camera->WorldOrientation ();
-
-  test.camera_body->SetWorldTransform (camera_transform);*/
+    test.camera_body->AddForce (math::vec3f (test.x_camera_speed, 0, test.y_camera_speed) * inverse (test.camera->WorldTM ()));
+    test.camera_body->AddTorque (math::vec3f (test.y_camera_rotation_speed / 20.f, test.x_camera_rotation_speed / 20.f, test.z_camera_rotation_speed / 20.f) * inverse (test.camera->WorldTM ()));
+  }
+  else
+  {
+    if (fabs (test.x_camera_speed) > EPS || fabs (test.y_camera_speed) > EPS)
+      test.camera->Translate (math::vec3f (dt * test.x_camera_speed, 0.f, dt * test.y_camera_speed), NodeTransformSpace_Local);
+    if (fabs (test.x_camera_rotation_speed) > EPS || fabs (test.y_camera_rotation_speed) > EPS || fabs (test.z_camera_rotation_speed) > EPS)
+      test.camera->Rotate (math::degree (dt * test.y_camera_rotation_speed), math::degree (dt * test.x_camera_rotation_speed), math::degree (dt * test.z_camera_rotation_speed), NodeTransformSpace_Local);
+  }
 
   if (current_time - last_fps > 1000)
   {
@@ -293,7 +287,7 @@ int main ()
 
     printf ("Load enterprise scene\n");
 
-/*    for (size_t i = 0; i < 10; i++)
+    for (size_t i = 0; i < 10; i++)
     {
       Node::Pointer enterprise = test.scene_manager.LoadScene (ENTERPRISE_SCENE_NAME);
 
@@ -311,7 +305,7 @@ int main ()
       enterprise_body->SetWorldTransform (enterprise_transform);
 
       test.rigid_bodies.insert_pair (enterprise, enterprise_body);
-    }*/
+    }
 
     printf ("Register callbacks\n");
 

@@ -390,6 +390,7 @@ struct Test
     float                      x_camera_rotation_speed;
     float                      y_camera_rotation_speed;
     float                      z_camera_rotation_speed;
+    bool                       physics_enabled;
     bool                       pressed_keys [syslib::Key_Num];
 
     Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn& in_reload, const char* adapter_mask="*", const char* init_string="");
