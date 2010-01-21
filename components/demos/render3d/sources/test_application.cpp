@@ -9,7 +9,7 @@ namespace
 
 const float HORIZONTAL_SPEED          = 5.0f;
 const float VERTICAL_SPEED            = HORIZONTAL_SPEED;
-const float HORIZONTAL_ROTATION_SPEED = 10.0f;
+const float HORIZONTAL_ROTATION_SPEED = 20.0f;
 const float VERTICAL_ROTATION_SPEED   = HORIZONTAL_ROTATION_SPEED;
 const float FOV_X_ASPECT_RATIO        = 90.f;
 
@@ -199,10 +199,10 @@ void Test::OnKeyPressed (const syslib::WindowEventContext& context)
       y_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
       break;
     case syslib::Key_Q:
-      z_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
+      z_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
       break;
     case syslib::Key_E:
-      z_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
+      z_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
       break;
     default:
       break;
@@ -240,10 +240,10 @@ void Test::OnKeyReleased (const syslib::WindowEventContext& context)
       y_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
       break;
     case syslib::Key_Q:
-      z_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
+      z_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
       break;
     case syslib::Key_E:
-      z_camera_rotation_speed -= VERTICAL_ROTATION_SPEED;
+      z_camera_rotation_speed += VERTICAL_ROTATION_SPEED;
       break;
     default:
       break;
