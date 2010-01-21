@@ -117,7 +117,7 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
   if (input_driver)
     for (size_t i = 0; i < input_driver->GetDevicesCount (); i++)
     {
-      if (!common::wcmatch (input_driver->GetDeviceName (i), "*Axis*"))
+      if (!common::wcmatch (input_driver->GetDeviceName (i), "*Joystick*"))
         continue;
 
       input_devices.push_back (InputDevicePtr (input::low_level::DriverManager::CreateDevice ("*", input_driver->GetDeviceName (i), "buffer_size=0"), false));
