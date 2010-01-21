@@ -70,7 +70,7 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
   camera = scene_graph::PerspectiveCamera::Create ();
 
   camera->SetZNear (1);
-  camera->SetZFar  (1000);
+  camera->SetZFar  (10000);
 
   camera->SetPosition (0, 0, -20);
 

@@ -77,7 +77,7 @@ void main (void)
   vec3 color = 
                ComputeDiffuseColor () * diffuse_factor +
                ComputeSpecularColor () * specular_factor +
-               ComputeReflectionColor (normal) * Reflectivity * 0.3
+               ComputeReflectionColor (normal) * Reflectivity
 ;
 
 //gl_FragColor = vec4 (diffuse_factor);

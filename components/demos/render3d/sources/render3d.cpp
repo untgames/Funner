@@ -14,7 +14,7 @@ const char*  SKY_MESH                 = "_SkyMesh";
 const char*  SKY_MATERIAL             = "_SkyMaterial";
 const size_t SKY_PARALLELS            = 30;
 const size_t SKY_MERIDIANS            = 30;
-const float  SKY_RADIUS               = 100;
+const float  SKY_RADIUS               = 10000;
 
 const float EPS = 0.001f;
 
@@ -62,18 +62,22 @@ void idle (Test& test)
   }
 
   last = current_time;
+  
+/*
 
 //  test.camera_body->SetLinearVelocity (math::vec3f (test.x_camera_speed, 0, test.y_camera_speed) * inverse (test.camera->WorldTM ()));
 //  test.camera_body->SetAngularVelocity (math::vec3f (test.y_camera_rotation_speed, test.x_camera_rotation_speed, test.z_camera_rotation_speed) * inverse (test.camera->WorldTM ()));
   test.camera_body->AddForce (math::vec3f (test.x_camera_speed, 0, test.y_camera_speed) * inverse (test.camera->WorldTM ()));
   test.camera_body->AddTorque (math::vec3f (test.y_camera_rotation_speed, test.x_camera_rotation_speed, -test.z_camera_rotation_speed) * inverse (test.camera->WorldTM ()));
+  
+*/
 
-/*  if (fabs (test.x_camera_speed) > EPS || fabs (test.y_camera_speed) > EPS)
-    test.camera->Translate (math::vec3f (dt * test.x_camera_speed, 0.f, dt * test.y_camera_speed), NodeTransformSpace_Local);
-  if (fabs (test.x_camera_rotation_speed) > EPS || fabs (test.y_camera_rotation_speed) > EPS)
-    test.camera->Rotate (math::degree (dt * test.y_camera_rotation_speed), math::degree (dt * test.x_camera_rotation_speed), math::degree (0.f), NodeTransformSpace_Local);
+//  if (fabs (test.x_camera_speed) > EPS || fabs (test.y_camera_speed) > EPS)
+//    test.camera->Translate (math::vec3f (dt * test.x_camera_speed, 0.f, dt * test.y_camera_speed), NodeTransformSpace_Local);
+//  if (fabs (test.x_camera_rotation_speed) > EPS || fabs (test.y_camera_rotation_speed) > EPS)
+//    test.camera->Rotate (math::degree (dt * test.y_camera_rotation_speed), math::degree (dt * test.x_camera_rotation_speed), math::degree (0.f), NodeTransformSpace_Local);
 
-  physics::low_level::Transform camera_transform;
+/*  physics::low_level::Transform camera_transform;
 
   camera_transform.position    = test.camera->WorldPosition ();
   camera_transform.orientation = test.camera->WorldOrientation ();
@@ -139,7 +143,7 @@ int main ()
 
     test.window.Show ();
     
-    printf ("Initialize rasterizer\n");
+    printf ("Setup rasterizer stage\n");
     
     RasterizerDesc rasterizer_desc;
     
@@ -156,6 +160,25 @@ int main ()
     RasterizerStatePtr rasterizer (test.device->CreateRasterizerState (rasterizer_desc), false);
 
     test.device->RSSetState (rasterizer.get ());
+    
+    printf ("Setup output stage\n");
+    
+/*    BlendDesc blend_desc;
+
+    memset (&blend_desc, 0, sizeof (blend_desc));
+
+    blend_desc.blend_enable                     = true;
+    blend_desc.blend_color_operation            = BlendOperation_Add;
+    blend_desc.blend_alpha_operation            = BlendOperation_Add;
+    blend_desc.blend_color_source_argument      = BlendArgument_SourceAlpha;
+    blend_desc.blend_color_destination_argument = BlendArgument_InverseSourceAlpha;
+    blend_desc.blend_alpha_source_argument      = BlendArgument_SourceAlpha;
+    blend_desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;
+    blend_desc.color_write_mask                 = ColorWriteFlag_All;
+    
+    BlendStatePtr blend_state (test.device->CreateBlendState (blend_desc), false);
+    
+    test.device->OSSetBlendState (blend_state.get ());*/
     
     printf ("Setup shader stage\n");
     
@@ -253,10 +276,10 @@ int main ()
     printf ("Load scene\n");
     Node::Pointer main_ship = test.scene_manager.LoadScene (SCENE_NAME);
 
-    main_ship->Rotate (math::degree (10.f), math::degree (180.f), math::degree (0.f));
-    main_ship->Translate (0, -5, 25);
+//    main_ship->Rotate (math::degree (10.f), math::degree (180.f), math::degree (0.f));
+//    main_ship->Translate (0, -5, 25);
 
-    main_ship->BindToParent (*test.camera);
+//    main_ship->BindToParent (*test.camera);
     
     printf ("Add SkyBox\n");
     
@@ -270,7 +293,7 @@ int main ()
 
     printf ("Load enterprise scene\n");
 
-    for (size_t i = 0; i < 10; i++)
+/*    for (size_t i = 0; i < 10; i++)
     {
       Node::Pointer enterprise = test.scene_manager.LoadScene (ENTERPRISE_SCENE_NAME);
 
@@ -288,7 +311,7 @@ int main ()
       enterprise_body->SetWorldTransform (enterprise_transform);
 
       test.rigid_bodies.insert_pair (enterprise, enterprise_body);
-    }
+    }*/
 
     printf ("Register callbacks\n");
 
