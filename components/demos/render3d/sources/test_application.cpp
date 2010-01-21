@@ -44,7 +44,9 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
     x_camera_rotation_speed (0),
     y_camera_rotation_speed (0),
     z_camera_rotation_speed (0),
-    physics_enabled (false)
+    physics_enabled (false),
+    draw_shattles (true),
+    draw_main_ships (true)
 {
   memset (pressed_keys, 0, sizeof (pressed_keys));
 
@@ -210,6 +212,14 @@ void Test::OnKeyPressed (const syslib::WindowEventContext& context)
       break;
     case syslib::Key_P:
       physics_enabled = !physics_enabled;
+      break;
+    case syslib::Key_1:
+      draw_shattles = !draw_shattles;
+      scene_manager.SetDrawShattles (draw_shattles);
+      break;
+    case syslib::Key_2:
+      draw_main_ships = !draw_main_ships;
+      scene_manager.SetDrawMainShips (draw_main_ships);
       break;
     default:
       break;

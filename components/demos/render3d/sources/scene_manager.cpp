@@ -208,3 +208,35 @@ Node::Pointer SceneManager::LoadScene (const char* file_name)
 
   return root;
 }
+
+void SceneManager::AddShattle (Node::Pointer shattle)
+{
+  shattles.push_back (shattle);
+}
+
+void SceneManager::AddMainShip (Node::Pointer ship)
+{
+  main_ships.push_back (ship);
+}
+
+void SceneManager::SetDrawShattles (bool draw)
+{
+  for (NodesArray::iterator iter = shattles.begin (), end = shattles.end (); iter != end; ++iter)
+  {
+    if (draw)
+      (*iter)->BindToScene (scene);
+    else
+      (*iter)->Unbind ();
+  }
+}
+
+void SceneManager::SetDrawMainShips (bool draw)
+{
+  for (NodesArray::iterator iter = main_ships.begin (), end = shattles.end (); iter != end; ++iter)
+  {
+    if (draw)
+      (*iter)->BindToScene (scene);
+    else
+      (*iter)->Unbind ();
+  }
+}

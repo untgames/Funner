@@ -98,12 +98,23 @@ class SceneManager
 
     Node::Pointer LoadScene (const char* file_name);
     
+    void AddShattle  (Node::Pointer shattle);
+    void AddMainShip (Node::Pointer ship);
+
+    void SetDrawShattles  (bool draw);
+    void SetDrawMainShips (bool draw);
+
   private:
     void ReadNodeInfo (common::Parser::Iterator node, scene_graph::Node::Pointer parent);
     void ReadMeshInfo (common::Parser::Iterator node, scene_graph::Node::Pointer parent);
 
   private:
+    typedef stl::vector<Node::Pointer> NodesArray;
+
+  private:
     scene_graph::Scene scene;
+    NodesArray         shattles;
+    NodesArray         main_ships;
 };
 
 //чтение ихсодного текста шейдера в строку
@@ -365,7 +376,7 @@ struct Test
     typedef stl::map<Node::Pointer, RigidBodyPtr>        RigidBodiesMap;
     typedef xtl::com_ptr<input::low_level::IDriver>      InputDriverPtr;
     typedef xtl::com_ptr<input::low_level::IDevice>      InputDevicePtr;
-    typedef stl::vector<InputDevicePtr>				     InputDevices;
+    typedef stl::vector<InputDevicePtr>                  InputDevices;
 
     syslib::Window             window;
     SwapChainPtr               swap_chain;
@@ -391,6 +402,8 @@ struct Test
     float                      y_camera_rotation_speed;
     float                      z_camera_rotation_speed;
     bool                       physics_enabled;
+    bool                       draw_shattles;
+    bool                       draw_main_ships;
     bool                       pressed_keys [syslib::Key_Num];
 
     Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn& in_reload, const char* adapter_mask="*", const char* init_string="");

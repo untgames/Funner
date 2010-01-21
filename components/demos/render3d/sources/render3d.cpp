@@ -305,6 +305,8 @@ int main ()
       enterprise_body->SetWorldTransform (enterprise_transform);
 
       test.rigid_bodies.insert_pair (enterprise, enterprise_body);
+
+      test.scene_manager.AddShattle (enterprise);
     }
 
     printf ("Register callbacks\n");
