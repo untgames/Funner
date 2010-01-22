@@ -9,10 +9,10 @@ const char*  ENTERPRISE_MODEL_NAME    = "data/enterprise_meshes.xmesh";
 const char*  MATERIAL_LIBRARIES []    = {"data/materials.xmtl", "data/custom.xmtl", "data/enterprise_materials.xmtl"};
 const char*  SCENE_NAME               = "data/scene.xscene";
 const char* ENTERPRISE_SCENE_NAME     = "data/enterprise_scene.xscene";
-const char*  REFLECTION_TEXTURE       = "env/EnvGala_000_D2.tga";
+const char*  REFLECTION_TEXTURE       = "env/EnvGala_000_D.tga";
 const char*  SKY_MESH                 = "_SkyMesh";
 const char*  SKY_MATERIAL             = "_SkyMaterial";
-const size_t ADDITIONAL_SHIPS_RANGE   = 80;
+const size_t ADDITIONAL_SHIPS_RANGE   = 70;
 const size_t SKY_PARALLELS            = 30;
 const size_t SKY_MERIDIANS            = 30;
 const float  SKY_RADIUS               = 9000;
@@ -149,7 +149,8 @@ int main ()
     rasterizer_desc.front_counter_clockwise = true;
     rasterizer_desc.depth_bias              = 0;
     rasterizer_desc.scissor_enable          = false;
-    rasterizer_desc.multisample_enable      = false;
+//    rasterizer_desc.multisample_enable      = false;
+    rasterizer_desc.multisample_enable      = true;
     rasterizer_desc.antialiased_line_enable = false;
     
     RasterizerStatePtr rasterizer (test.device->CreateRasterizerState (rasterizer_desc), false);

@@ -14,8 +14,10 @@ void draw (IDevice& device, ModelMesh& mesh)
       continue;
 
     device.SSSetProgram (material.shader->program.get ());
+    
+    int samplers_count = stl::min ((int)MAX_SAMPLERS, (int)SamplerChannel_Num);
 
-    for (int i=0; i<SamplerChannel_Num; i++)
+    for (int i=0; i<samplers_count; i++)
       if (material.texmaps [i].texture && material.texmaps [i].sampler)
       {
         device.SSSetTexture (i, &*material.texmaps [i].texture);

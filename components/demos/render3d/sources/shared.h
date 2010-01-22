@@ -63,6 +63,8 @@
 using namespace render::low_level;
 using namespace scene_graph;
 
+const size_t MAX_SAMPLERS = 4;
+
 /*
     ѕолучение смещени€ пол€ в структуре (аналог offsetof, компилируемый без предупреждений на gcc)
 */
@@ -166,10 +168,10 @@ enum SamplerChannel
 {
   SamplerChannel_Diffuse,
   SamplerChannel_Specular,
+  SamplerChannel_Reflection,
   SamplerChannel_Bump,
   SamplerChannel_Ambient,
   SamplerChannel_Emission,
-  SamplerChannel_Reflection,
   
   SamplerChannel_Num
 };
