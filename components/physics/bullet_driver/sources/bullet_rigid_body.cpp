@@ -44,10 +44,14 @@ struct RigidBody::Impl
     motion_state = new btDefaultMotionState ();
 
     body = new btRigidBody (mass, motion_state, shape->BulletCollisionShape ());
+
+    body->setCollisionFlags (body->getCollisionFlags () | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
   }
 
   ~Impl ()
   {
+    delete (RigidBodyInfo*)body->getUserPointer ();
+
     delete body;
     delete motion_state;
   }
@@ -78,8 +82,6 @@ RigidBody::RigidBody (bullet::Shape* shape, float mass)
 
   if (mass)
     SetMassSpaceInertiaTensor (DEFAULT_MASS_SPACE_INERTIA_TENSOR);
-
-  impl->body->setUserPointer (this);
 }
 
 RigidBody::~RigidBody ()

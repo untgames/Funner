@@ -16,6 +16,25 @@ bool true_filter (IRigidBody* body1, IRigidBody* body2)
   return true;
 }
 
+void collision_event_handler (const CollisionEvent& event)
+{
+  printf ("new collision event detected: \n  type is ");
+
+  switch (event.type)
+  {
+    case CollisionEventType_Begin:
+      printf ("ColisionEventType_Begin\n");
+      break;
+    case CollisionEventType_End:
+      printf ("ColisionEventType_End\n");
+      break;
+    default:
+      printf ("Unknown\n");
+  }
+
+  printf ("  position is %.2f %.2f %.2f\n", event.point.x, event.point.y, event.point.z);
+}
+
 int main ()
 {
   printf ("Results of collision_filter_test:\n");
@@ -28,6 +47,9 @@ int main ()
       throw xtl::format_operation_exception ("", "Can't find driver '%s'", DRIVER_NAME);
 
     ScenePtr scene (bullet_driver->CreateScene (), false);
+
+    xtl::connection collision_begin_connection = scene->RegisterCollisionCallback (CollisionEventType_Begin, &collision_event_handler),
+                    collision_end_connection   = scene->RegisterCollisionCallback (CollisionEventType_End, &collision_event_handler);
 
     scene->SetCollisionFilter (0, 0, true,  &false_filter);
     scene->SetCollisionFilter (0, 1, true,  &false_filter);
@@ -64,6 +86,8 @@ int main ()
     ground_plane->SetWorldTransform (body_transform);
 
     scene->PerformSimulation (1.f);
+
+    collision_begin_connection.disconnect ();
 
     printf ("Simulating one seconds\n");
 

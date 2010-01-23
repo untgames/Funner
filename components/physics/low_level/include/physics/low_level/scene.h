@@ -25,8 +25,9 @@ class IShape;
 enum CollisionEventType
 {
   CollisionEventType_Begin,   //начало столкновения
-  CollisionEventType_Process, //в процессе столкновения
-  CollisionEventType_End      //конец столкновения
+  CollisionEventType_End,     //конец столкновения
+
+  CollisionEventType_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,8 +37,7 @@ struct CollisionEvent
 {
   CollisionEventType type;         //тип события
   IRigidBody*        body [2];     //столкнувшиеся тела
-  size_t             points_count; //количество точек столкновения
-  math::vec3f*       points;       //мировые координаты точек столкновения
+  math::vec3f        point;        //мировые координаты точки столкновения
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

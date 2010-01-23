@@ -10,6 +10,53 @@ const math::vec3f DEFAULT_GRAVITY (0, -9.8f, 0);
 const float       DEFAULT_SIMULATION_STEP = 1.f / 60.f;
 const size_t      MAX_SIMULATION_SUBSTEPS = 120;
 
+//Информация о точке касания (необходимо для обработчика удаления касания)
+struct ContactPointInfo
+{
+  Scene*         scene;  //сцена
+  CollisionEvent event;  //событие
+};
+
+bool contact_added_callback (btManifoldPoint& contact_point,
+                             const btCollisionObject* object0,
+                             int part_id0,
+                             int index0,
+                             const btCollisionObject* object1,
+                             int part_id1,
+                             int index1)
+{
+  RigidBodyInfo *body0_info = (RigidBodyInfo*)object0->getUserPointer (),
+                *body1_info = (RigidBodyInfo*)object1->getUserPointer ();
+
+  ContactPointInfo *contact_point_info = new ContactPointInfo;
+
+  contact_point_info->scene          = body0_info->scene;
+  contact_point_info->event.type     = CollisionEventType_Begin;
+  contact_point_info->event.body [0] = body0_info->body;
+  contact_point_info->event.body [1] = body1_info->body;
+
+  vector_from_bullet_vector (contact_point.getPositionWorldOnA (), contact_point_info->event.point);
+
+  body0_info->scene->ColissionNotify (contact_point_info->event);
+
+  contact_point.m_userPersistentData = contact_point_info;
+
+  return false;
+}
+
+bool contact_destroyed_callback (void* user_persistent_data)
+{
+  ContactPointInfo* contact_point_info = (ContactPointInfo*)user_persistent_data;
+
+  contact_point_info->event.type = CollisionEventType_End;
+
+  contact_point_info->scene->ColissionNotify (contact_point_info->event);
+
+  delete contact_point_info;
+
+  return false;
+}
+
 void check_create_joint_arguments (const char* source, IRigidBody* body1, IRigidBody* body2, RigidBody*& casted_body1, RigidBody*& casted_body2)
 {
   if (!body1)
@@ -42,6 +89,7 @@ typedef stl::hash_map<RigidBody*, xtl::auto_connection>        BodyDestroyConnec
 typedef stl::hash_map<Joint*, xtl::auto_connection>            JointDestroyConnectionsMap;
 typedef stl::pair<size_t, size_t>                              CollisionGroupPair;
 typedef stl::hash_map<CollisionGroupPair, CollisionFilterDesc> CollisionFiltersMap;
+typedef xtl::signal<void (const CollisionEvent&)>              CollisionSignal;
 
 /*
     Описание реализации физической сцены
@@ -59,6 +107,7 @@ struct Scene::Impl : public btOverlapFilterCallback
   BodyDestroyConnectionsMap           body_destroy_connections;   //соединения удаления тел
   JointDestroyConnectionsMap          joint_destroy_connections;  //соединения удаления соединений тел
   CollisionFiltersMap                 collision_filters_map;      //карта фильтров коллизий (ключ - пара номеров групп, первое значение не больше второго)
+  CollisionSignal                     collision_signals [CollisionEventType_Num]; //сигналы обработки коллизий
 
   Impl ()
   {
@@ -110,8 +159,8 @@ struct Scene::Impl : public btOverlapFilterCallback
 
   bool needBroadphaseCollision (btBroadphaseProxy* proxy0, btBroadphaseProxy* proxy1) const
   {
-    RigidBody *body0 = (RigidBody*)((btCollisionObject*)proxy0->m_clientObject)->getUserPointer (),
-              *body1 = (RigidBody*)((btCollisionObject*)proxy1->m_clientObject)->getUserPointer ();
+    RigidBody *body0 = ((RigidBodyInfo*)((btCollisionObject*)proxy0->m_clientObject)->getUserPointer ())->body,
+              *body1 = ((RigidBodyInfo*)((btCollisionObject*)proxy1->m_clientObject)->getUserPointer ())->body;
 
     size_t group0 = body0->CollisionGroup (),
            group1 = body1->CollisionGroup ();
@@ -143,6 +192,12 @@ struct Scene::Impl : public btOverlapFilterCallback
 Scene::Scene ()
   : impl (new Impl)
 {
+  if (!gContactAddedCallback)
+  {
+    gContactAddedCallback     = contact_added_callback;
+    gContactDestroyedCallback = contact_destroyed_callback;
+  }
+
   SetGravity (DEFAULT_GRAVITY);
   SetSimulationStep (DEFAULT_SIMULATION_STEP);
 }
@@ -198,6 +253,13 @@ RigidBody* Scene::CreateRigidBody (IShape* shape, float mass)
   Shape* bullet_shape = cast_object<Shape, IShape> (shape, METHOD_NAME, "shape");
 
   RigidBody* return_value = new RigidBody (bullet_shape, mass);
+
+  RigidBodyInfo* body_info = new RigidBodyInfo;
+
+  body_info->body  = return_value;
+  body_info->scene = this;
+
+  return_value->BulletRigidBody ()->setUserPointer (body_info);
 
   impl->body_destroy_connections [return_value] = return_value->RegisterDestroyHandler (xtl::bind (&Scene::Impl::OnRigidBodyDestroy, impl.get (), _1));
 
@@ -293,5 +355,17 @@ void Scene::SetCollisionFilter (size_t group1, size_t group2, bool collides, con
 
 xtl::connection Scene::RegisterCollisionCallback (CollisionEventType event_type, const CollisionCallback& callback_handler)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::Scene::RegisterCollisionCallback");
+  if (event_type < 0 || event_type >= CollisionEventType_Num)
+    throw xtl::make_argument_exception ("physics::low_level::bullet_driver::Scene::RegisterCollisionCallback", "event_type", event_type);
+
+  return impl->collision_signals [event_type].connect (callback_handler);
+}
+
+/*
+   Оповещение о коллизии
+*/
+
+void Scene::ColissionNotify (const CollisionEvent& event)
+{
+  impl->collision_signals [event.type] (event);
 }

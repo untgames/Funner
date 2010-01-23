@@ -349,6 +349,11 @@ class Scene : public IScene, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::connection RegisterCollisionCallback (CollisionEventType event_type, const CollisionCallback& callback_handler);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Оповещение о коллизии
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void ColissionNotify (const CollisionEvent& event);
+
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
@@ -389,6 +394,13 @@ class Driver : public IDriver, public Object
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
+};
+
+//хранится в btRigidBody
+struct RigidBodyInfo
+{
+  RigidBody* body;
+  Scene*     scene;
 };
 
 //преобразование векторов
