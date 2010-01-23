@@ -1,0 +1,12 @@
+Results of node_transform_pivot_test:
+parent position: local=[+0.00 +0.00 +0.00] world=[+1.00 -1.00 +0.00]
+node position: local=[+2.00 +0.00 +0.00] world=[+1.00 +1.00 +0.00]
+test point: [-1.00 +1.00 +0.00]
+test local translate: local=[+4.00 +0.00 +0.00] world=[+1.00 +3.00 +0.00]
+restore position: local=[+2.00 +0.00 +0.00] world=[+1.00 +1.00 +0.00]
+test parent translate: local=[+2.00 -2.00 +0.00] world=[+3.00 +1.00 +0.00]
+test world translate: local=[+0.00 +0.00 +0.00] world=[+1.00 -1.00 +0.00]
+create sub child
+test node position: local=[+2.00 +0.00 +0.00] world=[+3.00 +2.00 +0.00]
+test child position: local=[-1.00 -1.00 +0.00] world=[+7.00 +2.00 +0.00]
+test point: [+9.00 +0.00 +0.00]

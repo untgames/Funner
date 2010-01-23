@@ -233,6 +233,14 @@ class Node: public xtl::dynamic_cast_root
     void               SetWorldPosition (float x, float y, float z);
     const math::vec3f& Position         () const;
     const math::vec3f& WorldPosition    () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Центр узла в локальной системе координат (точка применения поворотов и масштаба)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void               SetPivotPosition   (const math::vec3f& pivot);
+    void               SetPivotPosition   (float x, float y, float z);
+    void               ResetPivotPosition ();
+    const math::vec3f& PivotPosition      () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ориентация узла
@@ -246,7 +254,7 @@ class Node: public xtl::dynamic_cast_root
     void SetWorldOrientation (const math::anglef& pitch, const math::anglef& yaw, const math::anglef& roll); //углы Эйлера
 
     const math::quatf& Orientation      () const;
-    const math::quatf& WorldOrientation () const;
+    const math::quatf& WorldOrientation () const;        
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Масштаб узла

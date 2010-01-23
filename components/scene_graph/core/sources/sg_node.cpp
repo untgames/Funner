@@ -30,6 +30,10 @@ struct Node::Impl
   bool                    signal_process [NodeEvent_Num];   //флаги обработки сигналов
   SubTreeNodeSignal       subtree_signals [NodeSubTreeEvent_Num]; //сигналы событий, возникающих в узлах-потомках
   bool                    subtree_signal_process [NodeSubTreeEvent_Num]; //флаги обработки сигналов, возникающих в узлах потомках
+  bool                    pivot_enabled;                    //включён ли центр поворотов
+  bool                    need_local_position_after_pivot_update; //необходимо обновлять локальное положени с учётом центра поворотов
+  vec3f                   pivot_position;                   //центр поворотов  
+  vec3f                   local_position_after_pivot;       //локальное положение с учётом центра поворотов
   vec3f                   local_position;                   //локальное положение
   quatf                   local_orientation;                //локальная ориентация
   vec3f                   local_scale;                      //локальный масштаб
@@ -65,23 +69,25 @@ struct Node::Impl
     name_hash             = strhash (name.c_str ());
     first_updatable_child = 0;
     prev_updatable_child  = 0;
-    next_updatable_child  = 0;
+    next_updatable_child  = 0;    
 
       //масштаб по умолчанию
 
     local_scale = 1.0f;
     world_scale = 1.0f;
 
-      //по умолчанию узел наследует все преобразования родителя
+      //по умолчанию узел наследует все преобразования родителя, pivot отключен
 
     orientation_inherit = true;
     scale_inherit       = true;
+    pivot_enabled       = false;
 
       //преобразования рассчитаны
 
-    need_world_transform_update = false;
-    need_local_tm_update        = false;
-    need_world_tm_update        = false;  
+    need_world_transform_update            = false;
+    need_local_tm_update                   = false;
+    need_world_tm_update                   = false;
+    need_local_position_after_pivot_update = false;
     
       //очистка массива флагов обработки сигналов
       
@@ -96,7 +102,26 @@ struct Node::Impl
     bind_lock = false;
     need_release_at_unbind = false;
   }
-
+  
+  vec3f PositionAfterPivot ()
+  {
+    if (need_local_position_after_pivot_update)
+    {
+      if (pivot_enabled)
+      {
+        local_position_after_pivot = local_orientation * (local_scale * -pivot_position) + pivot_position + local_position;
+      }
+      else
+      {
+        local_position_after_pivot = local_position;
+      }
+      
+      need_local_position_after_pivot_update = false;
+    }
+    
+    return local_position_after_pivot;
+  }
+  
   //оповещение об изменении узла
   void UpdateNotify ()
   {
@@ -147,7 +172,8 @@ struct Node::Impl
 
   void UpdateLocalTransformNotify ()
   {
-    need_local_tm_update = true;
+    need_local_tm_update                   = true;
+    need_local_position_after_pivot_update = true;
     
     UpdateWorldTransformNotify ();
   }
@@ -165,14 +191,14 @@ struct Node::Impl
 
       if (scale_inherit) world_scale = parent_scale * local_scale;
       else               world_scale = local_scale;
-      
-      world_position = parent_orientation * (parent_scale * local_position) + parent->WorldPosition ();
+
+      world_position = parent_orientation * (parent_scale * PositionAfterPivot ()) + parent->WorldPosition ();
     }
     else
     {
       world_orientation = local_orientation;
-      world_position    = local_position;
-      world_scale       = local_scale;
+      world_scale       = local_scale;      
+      world_position    = PositionAfterPivot ();
     }
 
     need_world_transform_update = false;
@@ -1000,7 +1026,7 @@ void Node::SetWorldPosition (const vec3f& position)
   Translate (position - WorldPosition (), NodeTransformSpace_World);
 }
 
-void Node::SetWorldPosition  (float x, float y, float z)
+void Node::SetWorldPosition (float x, float y, float z)
 {
   SetWorldPosition (vec3f (x, y, z));
 }
@@ -1016,6 +1042,46 @@ const vec3f& Node::WorldPosition () const
     impl->UpdateWorldTransform ();
     
   return impl->world_position;
+}
+
+/*
+    Центр узла в локальной системе координат (точка применения поворотов и масштаба)
+*/
+
+void Node::SetPivotPosition (const math::vec3f& pivot)
+{
+  static float       EPS = 0.001f;
+  static math::vec3f ZERO_VEC (0.0f);
+
+  if (equal (pivot, ZERO_VEC, EPS))
+  {
+    ResetPivotPosition ();
+  }
+  else
+  {
+    impl->pivot_position = pivot;
+    impl->pivot_enabled  = true;
+    
+    impl->UpdateLocalTransformNotify ();
+  }
+}
+
+void Node::SetPivotPosition (float x, float y, float z)
+{
+  SetPivotPosition (math::vec3f (x, y, z));
+}
+
+void Node::ResetPivotPosition ()
+{
+  impl->pivot_enabled  = false;
+  impl->pivot_position = math::vec3f (0.0f);
+  
+  impl->UpdateLocalTransformNotify ();
+}
+
+const math::vec3f& Node::PivotPosition () const
+{
+  return impl->pivot_position;
 }
 
 /*
@@ -1360,14 +1426,13 @@ void Node::Translate (const math::vec3f& offset, NodeTransformSpace space)
     case NodeTransformSpace_Parent:
       impl->local_position += offset;
       break;
-    case NodeTransformSpace_World:
-      if (impl->parent) impl->local_position += inverse (impl->parent->WorldOrientation ()) * offset / impl->parent->WorldScale (); 
+    case NodeTransformSpace_World:   
+      if (impl->parent) impl->local_position += inverse (impl->parent->WorldOrientation ()) * offset / impl->parent->WorldScale ();
       else              impl->local_position += offset;
 
       break;
     default:
       throw xtl::make_argument_exception ("scene_graph::Node::Translate", "space", space);
-      break;
   }
   
   impl->UpdateLocalTransformNotify ();
@@ -1449,7 +1514,7 @@ const mat4f& Node::TransformationMatrix (NodeTransformSpace space) const
     case NodeTransformSpace_Local:
       if (impl->need_local_tm_update)
       {
-        affine_compose (impl->local_position, impl->local_orientation, impl->local_scale, impl->local_tm);
+        affine_compose (impl->PositionAfterPivot (), impl->local_orientation, impl->local_scale, impl->local_tm);
 
         impl->need_local_tm_update = false;
       }
@@ -1468,7 +1533,6 @@ const mat4f& Node::TransformationMatrix (NodeTransformSpace space) const
       return impl->world_tm;
     default:
       throw xtl::make_argument_exception ("scene_graph::Node::TransformationMatrix", "space", space);
-      return idNode;
   } 
 }
 
