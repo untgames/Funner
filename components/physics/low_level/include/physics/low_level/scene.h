@@ -79,7 +79,9 @@ class IScene : virtual public IObject
     virtual IJoint* CreatePrismaticJoint (IRigidBody* body1, IRigidBody* body2, const PrismaticJointDesc& desc) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Фильтрация столкновений объектов
+///Фильтрация столкновений объектов (объекты сталкиваются, если не задан фильтр, если задан дефолтный
+///фильтр и collides = true, если заданный фильтр возвращает true и collides = true, и если заданный
+///фильтр возвращает false и collides = false)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<bool (IRigidBody*, IRigidBody*)> BroadphaseCollisionFilter;
 

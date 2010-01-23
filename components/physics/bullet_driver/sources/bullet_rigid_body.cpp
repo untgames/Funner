@@ -78,6 +78,8 @@ RigidBody::RigidBody (bullet::Shape* shape, float mass)
 
   if (mass)
     SetMassSpaceInertiaTensor (DEFAULT_MASS_SPACE_INERTIA_TENSOR);
+
+  impl->body->setUserPointer (this);
 }
 
 RigidBody::~RigidBody ()

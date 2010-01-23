@@ -22,16 +22,32 @@ void check_create_joint_arguments (const char* source, IRigidBody* body1, IRigid
   casted_body2 = cast_object<RigidBody, IRigidBody> (body2, source, "body1");
 }
 
+struct CollisionFilterDesc
+{
+  IScene::BroadphaseCollisionFilter filter;     //фильтр
+  bool                              collides;   //режим фильтрации
+
+  CollisionFilterDesc ()
+    : collides (true)
+    {}
+
+  CollisionFilterDesc (const IScene::BroadphaseCollisionFilter& in_filter, bool in_collides)
+    : filter (in_filter), collides (in_collides)
+    {}
+};
+
 }
 
-typedef stl::hash_map<RigidBody*, xtl::auto_connection> BodyDestroyConnectionsMap;
-typedef stl::hash_map<Joint*, xtl::auto_connection>     JointDestroyConnectionsMap;
+typedef stl::hash_map<RigidBody*, xtl::auto_connection>        BodyDestroyConnectionsMap;
+typedef stl::hash_map<Joint*, xtl::auto_connection>            JointDestroyConnectionsMap;
+typedef stl::pair<size_t, size_t>                              CollisionGroupPair;
+typedef stl::hash_map<CollisionGroupPair, CollisionFilterDesc> CollisionFiltersMap;
 
 /*
     ќписание реализации физической сцены
 */
 
-struct Scene::Impl
+struct Scene::Impl : public btOverlapFilterCallback
 {
   btDefaultCollisionConfiguration     *collision_configuration;   //конфигураци€ обработчика коллизий
   btCollisionDispatcher               *collision_dispatcher;      //обработчик коллизий
@@ -42,6 +58,7 @@ struct Scene::Impl
   float                               simulation_step;            //шаг симул€ции
   BodyDestroyConnectionsMap           body_destroy_connections;   //соединени€ удалени€ тел
   JointDestroyConnectionsMap          joint_destroy_connections;  //соединени€ удалени€ соединений тел
+  CollisionFiltersMap                 collision_filters_map;      //карта фильтров коллизий (ключ - пара номеров групп, первое значение не больше второго)
 
   Impl ()
   {
@@ -53,6 +70,8 @@ struct Scene::Impl
     solver = new btSequentialImpulseConstraintSolver ();
 
     dynamics_world = new btDiscreteDynamicsWorld (collision_dispatcher, broadphase_interface, solver, collision_configuration);
+
+    dynamics_world->getPairCache ()->setOverlapFilterCallback (this);
   }
 
   ~Impl ()
@@ -87,6 +106,33 @@ struct Scene::Impl
     dynamics_world->addConstraint (joint);
 
     return return_value;
+  }
+
+  bool needBroadphaseCollision (btBroadphaseProxy* proxy0, btBroadphaseProxy* proxy1) const
+  {
+    RigidBody *body0 = (RigidBody*)((btCollisionObject*)proxy0->m_clientObject)->getUserPointer (),
+              *body1 = (RigidBody*)((btCollisionObject*)proxy1->m_clientObject)->getUserPointer ();
+
+    size_t group0 = body0->CollisionGroup (),
+           group1 = body1->CollisionGroup ();
+
+    if (group0 > group1)
+    {
+      size_t temp = group0;
+
+      group0 = group1;
+      group1 = temp;
+    }
+
+    CollisionFiltersMap::const_iterator iter = collision_filters_map.find (CollisionGroupPair (group0, group1));
+
+    if (iter == collision_filters_map.end ())
+      return true;
+
+    if (!iter->second.filter)
+      return iter->second.collides;
+
+    return !(iter->second.filter (body0, body1) ^ iter->second.collides);
   }
 };
 
@@ -228,9 +274,17 @@ Joint* Scene::CreatePrismaticJoint (IRigidBody* body1, IRigidBody* body2, const 
    ‘ильтраци€ столкновений объектов
 */
 
-void Scene::SetCollisionFilter (size_t group1, size_t group2, bool collides, const BroadphaseCollisionFilter& filter = BroadphaseCollisionFilter ())
+void Scene::SetCollisionFilter (size_t group1, size_t group2, bool collides, const BroadphaseCollisionFilter& filter)
 {
-  throw xtl::make_not_implemented_exception ("physics::low_level::bullet::Scene::SetCollisionFilter");
+  if (group1 > group2)
+  {
+    size_t temp = group1;
+
+    group1 = group2;
+    group2 = temp;
+  }
+
+  impl->collision_filters_map [CollisionGroupPair (group1, group2)] = CollisionFilterDesc (filter, collides);
 }
 
 /*
