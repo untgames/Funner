@@ -1,7 +1,6 @@
 #include "shared.h"
 
 using namespace syslib;
-using namespace common;
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
@@ -51,7 +50,7 @@ void Timer::Impl::SetTimer (size_t in_period)
   period = in_period;
 
   sys_timer  = Platform::CreateTimer (period, &TimerHandler, this);
-  start_time = milliseconds ();
+  start_time = common::milliseconds ();
 }
 
 void Timer::Impl::KillTimer ()
@@ -135,5 +134,5 @@ TimerState Timer::State () const
 
 size_t Timer::ElapsedMilliseconds () const
 {
-  return milliseconds () - impl->start_time;
+  return common::milliseconds () - impl->start_time;
 }
