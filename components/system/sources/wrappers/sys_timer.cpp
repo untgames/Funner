@@ -10,15 +10,15 @@ using namespace syslib;
     Описание реализации таймера
 */
 
-struct syslib::Timer::Impl
+struct Timer::Impl
 {
-  syslib::Timer&    timer;      //таймер
+  Timer&            timer;      //таймер
   TickHandler       handler;    //обработчик срабатываний таймера
   size_t            period;     //период срабатываний (в милисекундах)
   Platform::timer_t sys_timer;  //дескриптор системного таймера
   size_t            start_time; //время старта таймера
 
-  Impl  (syslib::Timer& in_timer, const TickHandler& in_handler);
+  Impl  (Timer& in_timer, const TickHandler& in_handler);
   ~Impl ();
 
   void SetTimer  (size_t period);
@@ -31,16 +31,16 @@ struct syslib::Timer::Impl
     Impl
 */
 
-syslib::Timer::Impl::Impl (syslib::Timer& in_timer, const TickHandler& in_handler)
+Timer::Impl::Impl (Timer& in_timer, const TickHandler& in_handler)
   : timer (in_timer), handler (in_handler), period (0), sys_timer (0)
   {}
 
-syslib::Timer::Impl::~Impl ()
+Timer::Impl::~Impl ()
 {
   KillTimer ();
 }
 
-void syslib::Timer::Impl::SetTimer (size_t in_period)
+void Timer::Impl::SetTimer (size_t in_period)
 {
   if (sys_timer && period == in_period)
     return;
@@ -53,7 +53,7 @@ void syslib::Timer::Impl::SetTimer (size_t in_period)
   start_time = common::milliseconds ();
 }
 
-void syslib::Timer::Impl::KillTimer ()
+void Timer::Impl::KillTimer ()
 {
   if (!sys_timer)
     return;
@@ -63,7 +63,7 @@ void syslib::Timer::Impl::KillTimer ()
   sys_timer = 0;
 }
 
-void syslib::Timer::Impl::TimerHandler (void* user_data)
+void Timer::Impl::TimerHandler (void* user_data)
 {
   Impl* impl = (Impl*)user_data;
 
@@ -74,14 +74,14 @@ void syslib::Timer::Impl::TimerHandler (void* user_data)
     Конструктор / деструктор
 */
 
-syslib::Timer::Timer (const TickHandler& in_handler, size_t period_in_milliseconds, TimerState initial_state)
+Timer::Timer (const TickHandler& in_handler, size_t period_in_milliseconds, TimerState initial_state)
   : impl (new Impl (*this, in_handler))
 {
   SetPeriod (period_in_milliseconds);
   SetState (initial_state);
 }
 
-syslib::Timer::~Timer ()
+Timer::~Timer ()
 {
   delete impl;
 }
@@ -90,7 +90,7 @@ syslib::Timer::~Timer ()
     Обработчик
 */
 
-const syslib::Timer::TickHandler& syslib::Timer::Handler () const
+const Timer::TickHandler& Timer::Handler () const
 {
   return impl->handler;
 }
@@ -99,12 +99,12 @@ const syslib::Timer::TickHandler& syslib::Timer::Handler () const
     Период
 */
 
-size_t syslib::Timer::Period () const
+size_t Timer::Period () const
 {
   return impl->period;
 }
 
-void syslib::Timer::SetPeriod (size_t period_in_milliseconds)
+void Timer::SetPeriod (size_t period_in_milliseconds)
 {
   impl->SetTimer (period_in_milliseconds);
 }
@@ -113,7 +113,7 @@ void syslib::Timer::SetPeriod (size_t period_in_milliseconds)
     Приостановка / возобновление работы таймера
 */
 
-void syslib::Timer::SetState (TimerState state)
+void Timer::SetState (TimerState state)
 {
   switch (state)
   {
@@ -123,7 +123,7 @@ void syslib::Timer::SetState (TimerState state)
   }
 }
 
-TimerState syslib::Timer::State () const
+TimerState Timer::State () const
 {
   return impl->sys_timer ? TimerState_Running : TimerState_Paused;
 }
@@ -132,7 +132,7 @@ TimerState syslib::Timer::State () const
     Количество милисекунд, прошедшее с момента старта таймера
 */
 
-size_t syslib::Timer::ElapsedMilliseconds () const
+size_t Timer::ElapsedMilliseconds () const
 {
   return common::milliseconds () - impl->start_time;
 }
