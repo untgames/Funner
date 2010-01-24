@@ -3,9 +3,10 @@
 using namespace physics::low_level;
 using namespace physics::low_level::bullet;
 
-typedef xtl::com_ptr<IMaterial>        MaterialPtr;
-typedef xtl::com_ptr<Shape>            ShapePtr;
-typedef xtl::signal<void (RigidBody*)> BeforeDestroySignal;
+typedef xtl::com_ptr<IMaterial>         MaterialPtr;
+typedef xtl::com_ptr<Shape>             ShapePtr;
+typedef xtl::signal<void (RigidBody*)>  BeforeDestroySignal;
+typedef xtl::signal<void (IRigidBody*)> TransformUpdateSignal;
 
 namespace
 {
@@ -18,32 +19,31 @@ const math::vec3f DEFAULT_MASS_SPACE_INERTIA_TENSOR (1.f);
     ќписание реализации твердого тела
 */
 
-struct RigidBody::Impl
+struct RigidBody::Impl : public btDefaultMotionState
 {
-  btRigidBody          *body;                       //тело
-  btMotionState        *motion_state;               //описание начального состо€ни€ движени€
-  ShapePtr             shape;                       //геометрическое представление тела
-  MaterialPtr          material;                    //материал
-  Transform            world_transform;             //положение тела в мировых координатах
-  size_t               collision_group;             //группа коллизий тела
-  size_t               flags;                       //флаги поведени€ тела
-  math::vec3f          inertia_tensor;              //тензор инерции
-  math::vec3f          linear_velocity;             //линейна€ скорость
-  math::vec3f          angular_velocity;            //углова€ скорость
-  BeforeDestroySignal  before_destroy_signal;       //сигнал удалени€ тела
-  xtl::auto_connection material_update_connection;  //соединение обновлени€ свойств материала
+  RigidBody             *rigid_body;                 //родительский объект
+  btRigidBody           *body;                       //тело
+  ShapePtr              shape;                       //геометрическое представление тела
+  MaterialPtr           material;                    //материал
+  Transform             world_transform;             //положение тела в мировых координатах
+  size_t                collision_group;             //группа коллизий тела
+  size_t                flags;                       //флаги поведени€ тела
+  math::vec3f           inertia_tensor;              //тензор инерции
+  math::vec3f           linear_velocity;             //линейна€ скорость
+  math::vec3f           angular_velocity;            //углова€ скорость
+  BeforeDestroySignal   before_destroy_signal;       //сигнал удалени€ тела
+  TransformUpdateSignal transform_update_signal;     //сигнал обновлени€ положени€ тела
+  xtl::auto_connection  material_update_connection;  //соединение обновлени€ свойств материала
 
-  Impl (bullet::Shape* in_shape, float mass)
-    : collision_group (0), flags (0)
+  Impl (bullet::Shape* in_shape, float mass, RigidBody* in_rigid_body)
+    : rigid_body (in_rigid_body), collision_group (0), flags (0)
   {
     if (!in_shape)
       throw xtl::make_null_argument_exception ("physics::low_level::bullet::RigidBody::RigidBody", "shape");
 
     shape = in_shape;
 
-    motion_state = new btDefaultMotionState ();
-
-    body = new btRigidBody (mass, motion_state, shape->BulletCollisionShape ());
+    body = new btRigidBody (mass, this, shape->BulletCollisionShape ());
 
     body->setCollisionFlags (body->getCollisionFlags () | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
   }
@@ -53,7 +53,6 @@ struct RigidBody::Impl
     delete (RigidBodyInfo*)body->getUserPointer ();
 
     delete body;
-    delete motion_state;
   }
 
   void UpdateMaterialProperties ()
@@ -67,6 +66,14 @@ struct RigidBody::Impl
     body->setAnisotropicFriction (bullet_anisotropic_friction);
     body->setRestitution         (material->Restitution ());
   }
+
+  //–еализаци€ btMotionState
+  void setWorldTransform (const btTransform& worldTrans)
+  {
+    transform_update_signal (rigid_body);
+
+    btDefaultMotionState::setWorldTransform (worldTrans);
+  }
 };
 
 /*
@@ -74,7 +81,7 @@ struct RigidBody::Impl
 */
 
 RigidBody::RigidBody (bullet::Shape* shape, float mass)
-  : impl (new Impl (shape, mass))
+  : impl (new Impl (shape, mass, this))
 {
   MaterialPtr default_material (new bullet::Material, false);
 
@@ -344,6 +351,11 @@ void RigidBody::SetWorldTransform (const Transform& transform)
   new_world_transform.setRotation (transform_rotation);
 
   impl->body->setWorldTransform (new_world_transform);
+}
+
+xtl::connection RigidBody::RegisterTransformUpdateCallback (const TransformUpdateCallback& handler)
+{
+  return impl->transform_update_signal.connect (handler);
 }
 
 /*

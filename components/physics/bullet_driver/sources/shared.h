@@ -246,8 +246,9 @@ class RigidBody : public IRigidBody, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Мировое положение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const Transform& WorldTransform    ();
-    void             SetWorldTransform (const Transform& transform);
+    const Transform& WorldTransform                  ();
+    void             SetWorldTransform               (const Transform& transform);
+    xtl::connection  RegisterTransformUpdateCallback (const TransformUpdateCallback& callback_handler);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение bullet тела

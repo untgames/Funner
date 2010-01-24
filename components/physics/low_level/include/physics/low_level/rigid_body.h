@@ -110,6 +110,10 @@ class IRigidBody : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual const Transform& WorldTransform    () = 0;
     virtual void             SetWorldTransform (const Transform& transform) = 0;
+
+    typedef xtl::function<void (IRigidBody* body)> TransformUpdateCallback;
+
+    virtual xtl::connection RegisterTransformUpdateCallback (const TransformUpdateCallback& callback_handler) = 0;
 };
 
 }
