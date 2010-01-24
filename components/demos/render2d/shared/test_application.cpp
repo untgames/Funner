@@ -5,7 +5,6 @@
 #include <xtl/ref.h>
 #include <xtl/any.h>
 
-#include <common/var_registry.h>
 #include <common/strlib.h>
 
 #include <syslib/window.h>
