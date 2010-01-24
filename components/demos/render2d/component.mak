@@ -22,6 +22,6 @@ DEMOS.RENDER2D.TESTS.LIBS             := funner.demos.render2d.shared
 DEMOS.RENDER2D.TESTS.LINK_INCLUDES    :=
 DEMOS.RENDER2D.TESTS.IMPORTS          := link.system compile.common compile.scene_graph.core compile.render.scene_render link.render.scene_render.render2d \
                                          link.render.mid_level.window_driver link.render.low_level.opengl_driver \
-                                         link.media.rfx.xmtl link.render.mid_level.debug_renderer_driver link.common.configurator link.common.wxf \
+                                         link.media.rfx.xmtl link.render.mid_level.debug_renderer_driver link.common.wxf \
                                          link.media.image.pvr run.render.low_level.opengl_driver
 

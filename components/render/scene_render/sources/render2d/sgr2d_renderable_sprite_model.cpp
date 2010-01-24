@@ -318,9 +318,7 @@ void RenderableSpriteModel::Update ()
     
       //обновление матрицы трансформаций
 
-    math::mat4f world_tm;
-
-    model->EvalWorldTMAfterPivot (world_tm);
+    const math::mat4f& world_tm = model->WorldTM ();
 
     size_t world_tm_hash = common::crc32 (&world_tm, sizeof (math::mat4f));
 
