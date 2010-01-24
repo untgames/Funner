@@ -76,10 +76,14 @@ int main ()
 
   printf ("test node position: ");
   dump_position (*node);
+  printf (" test_world=");
+  dump (node->Parent ()->WorldTM () * node->Position ());
   printf ("\n");  
   
   printf ("test child position: ");
   dump_position (*child);
+  printf (" test_world=");
+  dump (child->Parent ()->WorldTM () * child->Position ());
   printf ("\n");  
   
   printf ("test point: ");
