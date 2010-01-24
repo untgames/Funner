@@ -230,6 +230,10 @@ InvokerRegistry& bind_node_library (Environment& environment)
   lib.Register ("SetPosition",              make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetPosition)));
   lib.Register ("SetWorldPosition",         make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetWorldPosition)));
   lib.Register ("ResetPosition",            make_invoker (&Node::ResetPosition));
+  lib.Register ("ResetPivotPosition",       make_invoker (&Node::ResetPivotPosition));
+  lib.Register ("SetPivotPosition",         make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetPivotPosition)));
+  lib.Register ("set_PivotPosition",        make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetPivotPosition)));
+  lib.Register ("get_PivotPosition",        make_invoker (&Node::PivotPosition));
   lib.Register ("set_Orientation",          make_invoker (implicit_cast<void (Node::*) (const quatf&)> (&Node::SetOrientation)));
   lib.Register ("set_WorldOrientation",     make_invoker (implicit_cast<void (Node::*) (const quatf&)> (&Node::SetWorldOrientation)));
   lib.Register ("SetOrientation",           make_invoker<void (Node*, math::anglef, float, float, float)> (implicit_cast<void (Node::*) (const math::anglef&, float, float, float)> (&Node::SetOrientation)));
@@ -824,19 +828,10 @@ void bind_sprite_model_library (Environment& environment)
 
     //регистрация операций
 
-  lib.Register ("set_Material",           make_invoker (&SpriteModel::SetMaterial));
-  lib.Register ("get_Material",           make_invoker (&SpriteModel::Material));
-  lib.Register ("set_AlphaReference",     make_invoker (&SpriteModel::SetAlphaReference));
-  lib.Register ("get_AlphaReference",     make_invoker (&SpriteModel::AlphaReference));
-  lib.Register ("set_PivotPosition",      make_invoker (implicit_cast<void (SpriteModel::*)(const vec3f&)> (&SpriteModel::SetPivotPosition)));
-  lib.Register ("get_PivotPosition",      make_invoker (&SpriteModel::PivotPosition));
-  lib.Register ("set_PivotRotation",      make_invoker<void (SpriteModel&, math::anglef)> (&SpriteModel::SetPivotRotation));
-  lib.Register ("get_PivotRotation",      make_invoker<math::anglef (SpriteModel&)> (&SpriteModel::PivotRotation));
-  lib.Register ("get_LocalTMAfterPivot",  make_invoker (&get_transformation_after_pivot<NodeTransformSpace_Local>));
-  lib.Register ("get_ParentTMAfterPivot", make_invoker (&get_transformation_after_pivot<NodeTransformSpace_Parent>));
-  lib.Register ("get_WorldTMAfterPivot",  make_invoker (&get_transformation_after_pivot<NodeTransformSpace_World>));
-  lib.Register ("SetPivotPosition",       make_invoker (implicit_cast<void (SpriteModel::*)(float, float, float)> (&SpriteModel::SetPivotPosition)));
-  lib.Register ("SetPivot",               make_invoker (&SpriteModel::SetPivot));
+  lib.Register ("set_Material",       make_invoker (&SpriteModel::SetMaterial));
+  lib.Register ("get_Material",       make_invoker (&SpriteModel::Material));
+  lib.Register ("set_AlphaReference", make_invoker (&SpriteModel::SetAlphaReference));
+  lib.Register ("get_AlphaReference", make_invoker (&SpriteModel::AlphaReference));
 
     //регистрация типов данных
 
