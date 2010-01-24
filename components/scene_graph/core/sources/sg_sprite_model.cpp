@@ -13,13 +13,9 @@ struct SpriteModel::Impl
 {
   stl::string       material;                       //имя материала
   SpriteModelSignal signals [SpriteModelEvent_Num]; //сигналы модели 
-  vec3f             pivot_position;                 //положение центра в локальной системе координат
-  anglef            pivot_rotation;                 //поворот центра в локальной системе координат
   float             alpha_reference;                //параметр, используемый для альфа-теста
-  bool              need_recalc_world_tm;           //необходим пересчёт мировой матрицы преобразований
-  mat4f             world_tm;                       //мировая матрица преобразований
 
-  Impl () : pivot_rotation (), alpha_reference (0.f), need_recalc_world_tm (true) {}
+  Impl () : alpha_reference (0.f) {}
 
     //оповещение о событии
   void Notify (SpriteModel& sender, SpriteModelEvent event_id)
@@ -87,101 +83,6 @@ float SpriteModel::AlphaReference () const
 }
 
 /*
-    Положение и ориентиация центра модели
-*/
-
-void SpriteModel::SetPivotPosition (const vec3f& position)
-{
-  SetPivot (position, impl->pivot_rotation);
-}
-
-void SpriteModel::SetPivotPosition (float x, float y, float z)
-{
-  SetPivotPosition (vec3f (x, y, z));
-}
-
-//поворот центра относительно Oz
-void SpriteModel::SetPivotRotation (const anglef& angle)
-{
-  SetPivot (impl->pivot_position, angle);
-}
-
-void SpriteModel::SetPivot (const vec3f& position, const anglef& angle)
-{
-  impl->pivot_position       = position;
-  impl->pivot_rotation       = angle;
-  impl->need_recalc_world_tm = true;    
-
-    //оповещение об обновлении
-
-  UpdateNotify ();
-}
-
-const vec3f& SpriteModel::PivotPosition () const
-{
-  return impl->pivot_position;
-}
-
-const anglef& SpriteModel::PivotRotation () const
-{
-  return impl->pivot_rotation;
-}
-
-/*
-    Получение матриц преобразования после применения pivot-преобразования
-*/
-
-namespace
-{
-
-//расчёт матрицы центра
-void eval_pivot_tm (const math::vec3f& position, const anglef& angle, math::mat4f& pivot_tm)
-{
-  pivot_tm = translate (-position) * rotate (angle, vec3f (0, 0, 1));
-}
-
-}
-
-void SpriteModel::EvalTransformationAfterPivot (NodeTransformSpace space, math::mat4f& result) const
-{
-  switch (space)
-  {
-    case NodeTransformSpace_Local:
-    {
-      eval_pivot_tm (impl->pivot_position, impl->pivot_rotation, result);
-      break;
-    }
-    case NodeTransformSpace_Parent:
-    {
-      math::mat4f pivot_tm;
-
-      eval_pivot_tm (impl->pivot_position, impl->pivot_rotation, pivot_tm);
-
-      result = LocalTM () * pivot_tm;
-
-      break;
-    }
-    case NodeTransformSpace_World:
-      if (impl->need_recalc_world_tm)
-      {        
-        math::mat4f pivot_tm;
-
-        eval_pivot_tm (impl->pivot_position, impl->pivot_rotation, pivot_tm);
-
-        impl->world_tm = WorldTM () * pivot_tm;
-
-        impl->need_recalc_world_tm = false;
-      }
-
-      result = impl->world_tm;
-
-      break;
-    default:
-      throw xtl::make_argument_exception ("scene_graph::SpriteModel::EvalTransformationAfterPivot", "space", space);
-  }
-}
-
-/*
     Количество спрайтов / получение массива спрайтов
 */
 
@@ -220,17 +121,6 @@ xtl::connection SpriteModel::RegisterEventHandler (SpriteModelEvent event, const
   }
   
   return impl->signals [event].connect (handler);
-}
-
-/*
-    Оповещение об изменении мировой матрицы преобразований
-*/
-
-void SpriteModel::AfterUpdateWorldTransformEvent ()
-{
-  Entity::AfterUpdateWorldTransformEvent ();
-
-  impl->need_recalc_world_tm = true;
 }
 
 /*

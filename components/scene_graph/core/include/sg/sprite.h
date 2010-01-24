@@ -53,24 +53,6 @@ class SpriteModel: public Entity
     float AlphaReference    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ѕоложение и ориентиаци€ центра модели
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void                SetPivot         (const math::vec3f& position, const math::anglef& angle);
-    void                SetPivotPosition (const math::vec3f& position);
-    void                SetPivotPosition (float x, float y, float z);
-    void                SetPivotRotation (const math::anglef& angle); //поворот центра относительно Oz
-    const math::vec3f&  PivotPosition    () const;
-    const math::anglef& PivotRotation    () const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///ѕолучение матриц преобразовани€ после применени€ pivot-преобразовани€
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void EvalTransformationAfterPivot (NodeTransformSpace space, math::mat4f& result) const;
-    void EvalLocalTMAfterPivot        (math::mat4f& result) const { EvalTransformationAfterPivot (NodeTransformSpace_Local, result); }
-    void EvalParentTMAfterPivot       (math::mat4f& result) const { EvalTransformationAfterPivot (NodeTransformSpace_Parent, result); }
-    void EvalWorldTMAfterPivot        (math::mat4f& result) const { EvalTransformationAfterPivot (NodeTransformSpace_World, result); }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕодписка на событи€ модели
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (SpriteModel& sender, SpriteModelEvent event_id)> EventHandler;
@@ -95,11 +77,6 @@ class SpriteModel: public Entity
 ///ќповещение об изменении данных спрайтов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void UpdateSpriteDescsNotify ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///ќповещение об изменении мировой матрицы преобразований
-///////////////////////////////////////////////////////////////////////////////////////////////////    
-    void AfterUpdateWorldTransformEvent ();
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
