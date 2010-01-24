@@ -24,8 +24,9 @@ class IShape;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum CollisionEventType
 {
-  CollisionEventType_Begin,   //начало столкновения
-  CollisionEventType_End,     //конец столкновения
+  CollisionEventType_Begin,    //начало столкновения
+  CollisionEventType_Process,  //в процессе столкновения
+  CollisionEventType_End,      //конец столкновения
 
   CollisionEventType_Num
 };

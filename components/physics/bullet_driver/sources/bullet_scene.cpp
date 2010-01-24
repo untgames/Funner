@@ -28,16 +28,34 @@ bool contact_added_callback (btManifoldPoint& contact_point,
   RigidBodyInfo *body0_info = (RigidBodyInfo*)object0->getUserPointer (),
                 *body1_info = (RigidBodyInfo*)object1->getUserPointer ();
 
-  ContactPointInfo *contact_point_info = new ContactPointInfo;
+  ContactPointInfo *contact_point_info;
 
-  contact_point_info->scene          = body0_info->scene;
-  contact_point_info->event.type     = CollisionEventType_Begin;
-  contact_point_info->event.body [0] = body0_info->body;
-  contact_point_info->event.body [1] = body1_info->body;
+  if (contact_point.m_userPersistentData)
+  {
+    contact_point_info = (ContactPointInfo*)contact_point.m_userPersistentData;
+
+    contact_point_info->event.type = CollisionEventType_Process;
+  }
+  else
+  {
+    contact_point_info = new ContactPointInfo;
+
+    contact_point_info->event.type     = CollisionEventType_Begin;
+    contact_point_info->scene          = body0_info->scene;
+    contact_point_info->event.body [0] = body0_info->body;
+    contact_point_info->event.body [1] = body1_info->body;
+  }
 
   vector_from_bullet_vector (contact_point.getPositionWorldOnA (), contact_point_info->event.point);
 
-  body0_info->scene->ColissionNotify (contact_point_info->event);
+  try
+  {
+    body0_info->scene->ColissionNotify (contact_point_info->event);
+  }
+  catch (...)
+  {
+    //подавление исключений
+  }
 
   contact_point.m_userPersistentData = contact_point_info;
 
@@ -50,7 +68,14 @@ bool contact_destroyed_callback (void* user_persistent_data)
 
   contact_point_info->event.type = CollisionEventType_End;
 
-  contact_point_info->scene->ColissionNotify (contact_point_info->event);
+  try
+  {
+    contact_point_info->scene->ColissionNotify (contact_point_info->event);
+  }
+  catch (...)
+  {
+    //подавление исключений
+  }
 
   delete contact_point_info;
 

@@ -25,6 +25,9 @@ void collision_event_handler (const CollisionEvent& event)
     case CollisionEventType_Begin:
       printf ("ColisionEventType_Begin\n");
       break;
+    case CollisionEventType_Process:
+      printf ("ColisionEventType_Process\n");
+      break;
     case CollisionEventType_End:
       printf ("ColisionEventType_End\n");
       break;
@@ -48,8 +51,9 @@ int main ()
 
     ScenePtr scene (bullet_driver->CreateScene (), false);
 
-    xtl::connection collision_begin_connection = scene->RegisterCollisionCallback (CollisionEventType_Begin, &collision_event_handler),
-                    collision_end_connection   = scene->RegisterCollisionCallback (CollisionEventType_End, &collision_event_handler);
+    xtl::connection collision_begin_connection   = scene->RegisterCollisionCallback (CollisionEventType_Begin, &collision_event_handler),
+                    collision_process_connection = scene->RegisterCollisionCallback (CollisionEventType_Process, &collision_event_handler),
+                    collision_end_connection     = scene->RegisterCollisionCallback (CollisionEventType_End, &collision_event_handler);
 
     scene->SetCollisionFilter (0, 0, true,  &false_filter);
     scene->SetCollisionFilter (0, 1, true,  &false_filter);
@@ -88,6 +92,7 @@ int main ()
     scene->PerformSimulation (1.f);
 
     collision_begin_connection.disconnect ();
+    collision_process_connection.disconnect ();
 
     printf ("Simulating one seconds\n");
 
