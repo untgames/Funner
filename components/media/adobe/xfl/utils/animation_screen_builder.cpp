@@ -30,7 +30,7 @@ const char* XFL_MOUNT_POINT  = "/mount_points/animation.xfl";
 
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 
-const float EPSILON = 0.001;
+const float EPSILON = 0.001f;
 
 struct Params;
 
@@ -231,37 +231,37 @@ void command_line_resize_height (const char* value, Params& params)
 //установка левой координаты для перерасчета анимаций
 void command_line_left_x (const char* value, Params& params)
 {
-  params.left_x = atof (value);
+  params.left_x = static_cast<float> (atof (value));
 }
 
 //установка правой координаты для перерасчета анимаций
 void command_line_right_x (const char* value, Params& params)
 {
-  params.right_x = atof (value);
+  params.right_x = static_cast<float> (atof (value));
 }
 
 //установка верхней координаты для перерасчета анимаций
 void command_line_top_y (const char* value, Params& params)
 {
-  params.top_y = atof (value);
+  params.top_y = static_cast<float> (atof (value));
 }
 
 //установка нижней координаты для перерасчета анимаций
 void command_line_bottom_y (const char* value, Params& params)
 {
-  params.bottom_y = atof (value);
+  params.bottom_y = static_cast<float> (atof (value));
 }
 
 //установка ширины виртуального экрана для перерасчета анимаций
 void command_line_target_width (const char* value, Params& params)
 {
-  params.target_width = atof (value);
+  params.target_width = static_cast<float> (atof (value));
 }
 
 //установка высоты виртуального экрана для перерасчета анимаций
 void command_line_target_height (const char* value, Params& params)
 {
-  params.target_height = atof (value);
+  params.target_height = static_cast<float> (atof (value));
 }
 
 //установка параметра вывода детальной информации
@@ -826,12 +826,12 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
     else
       save_folder_name = common::format ("%s/%s", params.output_textures_dir_name.c_str (), resource_dir.c_str ());
 
-    size_t resized_image_width  = image_width      * resize_x_factor,
-           resized_image_height = image_height     * resize_y_factor,
-           resized_crop_width   = crop_rect.width  * resize_x_factor,
-           resized_crop_height  = crop_rect.height * resize_y_factor,
-           resized_crop_x       = crop_rect.x      * resize_x_factor,
-           resized_crop_y       = crop_rect.y      * resize_y_factor;
+    size_t resized_image_width  = static_cast<size_t> (image_width      * resize_x_factor),
+           resized_image_height = static_cast<size_t> (image_height     * resize_y_factor),
+           resized_crop_width   = static_cast<size_t> (crop_rect.width  * resize_x_factor),
+           resized_crop_height  = static_cast<size_t> (crop_rect.height * resize_y_factor),
+           resized_crop_x       = static_cast<size_t> (crop_rect.x      * resize_x_factor),
+           resized_crop_y       = static_cast<size_t> (crop_rect.y      * resize_y_factor);
 
     if (!params.resize_width)
     {
@@ -975,12 +975,12 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
 
   XmlWriter::Scope screen_scope (writer, "AnimationScreenPart");
 
-  int   target_width_abs  = abs (params.target_width),
-        target_height_abs = abs (params.target_height);
-  float x_scale           = (float)params.target_width / document.Width (),
-        y_scale           = (float)params.target_height / document.Height (),
-        resize_x_factor   = params.resize_width ? params.resize_width / (float)document.Width () : 1.f,
-        resize_y_factor   = params.resize_height ? params.resize_height / (float)document.Height () : 1.f;
+  int   target_width_abs  = abs (static_cast<int> (params.target_width)),
+        target_height_abs = abs (static_cast<int> (params.target_height));
+  float x_scale           = static_cast<float> (params.target_width) / document.Width (),
+        y_scale           = static_cast<float> (params.target_height) / document.Height (),
+        resize_x_factor   = params.resize_width ? params.resize_width / static_cast<float> (document.Width ()) : 1.f,
+        resize_y_factor   = params.resize_height ? params.resize_height / static_cast<float> (document.Height ()) : 1.f;
 
   ActivateSpritesMap activate_sprites_info;
 
@@ -1247,8 +1247,8 @@ void export_data (Params& params)
 
   if (!params.target_width || !params.target_height)
   {
-    params.target_width  = document_width;
-    params.target_height = document_height;
+    params.target_width  = static_cast<float> (document_width);
+    params.target_height = static_cast<float> (document_height);
     params.right_x       = params.left_x + params.target_width;
     params.bottom_y      = params.top_y - params.target_height;
   }
@@ -1256,9 +1256,13 @@ void export_data (Params& params)
   float document_aspect_ratio = document_width / (float)document_height;
 
   if (!params.resize_width && params.resize_height)
-    params.resize_width = params.resize_height * document_aspect_ratio;
+  {
+    params.resize_width = static_cast<size_t> (params.resize_height * document_aspect_ratio);
+  }
   else if (params.resize_width && !params.resize_height)
-    params.resize_height = params.resize_width / document_aspect_ratio;
+  {
+    params.resize_height = static_cast<size_t> (params.resize_width / document_aspect_ratio);
+  }
 
   if (params.resize_width && params.resize_height)
   {
