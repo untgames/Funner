@@ -5,6 +5,7 @@
 #include <stl/string>
 #include <stl/vector>
 
+#include <xtl/intrusive_ptr.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/shared_ptr.h>

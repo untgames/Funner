@@ -3,6 +3,7 @@
 #include <cstring>
 #include <exception>
 
+#include <stl/hash_map>
 #include <stl/list>
 #include <stl/vector>
 
@@ -369,6 +370,12 @@ void build (Params& params)
 {
   try
   {
+      //загрузка картинок
+    stl::hash_map<stl::hash_key<const char*>, media::Image> images;
+
+    for (size_t i = 0, count = params.sources.size (); i < count; i++)
+      images.insert_pair (params.sources [i], media::Image (params.sources [i]));
+
       //конфигурирование построителя атласа
 
     media::AtlasBuilder builder;
@@ -398,11 +405,9 @@ void build (Params& params)
 
       for (size_t i = 0, count = sources_to_process.size (); i < count; i++)
       {
-        const char* source_name = sources_to_process [i];
-
         try
         {
-          builder.Insert (source_name);
+          builder.Insert (images [sources_to_process [i]], media::AtlasBuilderInsertMode_Reference);
         }
         catch (...)
         {
@@ -412,9 +417,11 @@ void build (Params& params)
           throw;
         }
 
+        size_t result_image_width = 0, result_image_height = 0;
+
         try
         {
-          builder.Build (atlas, atlas_image, pack_flags);
+          builder.GetBuildResults (result_image_width, result_image_height, pack_flags);
         }
         catch (...)
         {
@@ -424,12 +431,12 @@ void build (Params& params)
           throw;
         }
 
-        if (atlas_image.Width () > params.max_image_size || atlas_image.Height () > params.max_image_size)
+        if (result_image_width > params.max_image_size || result_image_height > params.max_image_size)
         {
           builder.Reset ();
 
           for (ProcessedSourcesList::iterator iter = processed_sources.begin (), end = processed_sources.end (); iter != end; ++iter)
-            builder.Insert (iter->first);
+            builder.Insert (images [iter->first], media::AtlasBuilderInsertMode_Reference);
         }
         else
           processed_sources.push_back (SourceDescPair (sources_to_process [i], i));

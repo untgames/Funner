@@ -16,8 +16,9 @@ class Image;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum AtlasBuilderInsertMode
 {
-  AtlasBuilderInsertMode_Copy,    //копирование изображения при вставке
-  AtlasBuilderInsertMode_Capture, //захват изображения при вставке
+  AtlasBuilderInsertMode_Copy,      //копирование изображения при вставке
+  AtlasBuilderInsertMode_Capture,   //захват изображения при вставке
+  AtlasBuilderInsertMode_Reference, //хранение ссылки на изображение при вставке
   
   AtlasBuilderInsertMode_Default = AtlasBuilderInsertMode_Copy,
   
@@ -68,9 +69,10 @@ class AtlasBuilder
     void Reset ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Построение карты
+///Построение карты/получение размеров результирующей картинки без формирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Build (media::Atlas& out_atlas, media::Image& out_atlas_image, size_t pack_flags);
+    void Build           (media::Atlas& out_atlas, media::Image& out_atlas_image, size_t pack_flags);
+    void GetBuildResults (size_t& image_width, size_t& image_height, size_t pack_flags);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
