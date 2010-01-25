@@ -1,14 +1,10 @@
 Results of atlas_builder_test3:
-Load image 'data/1.bmp'
-Load image 'data/2.tga'
 Build atlas 231x128
 Save atlas 'results/atlas1.png' and layout 'results/atlas1.xatlas'
 Build successfull!
-Load image 'data/3.jpg'
 Build atlas 171x128
 Save atlas 'results/atlas2.png' and layout 'results/atlas2-custom.xatlas'
 Build successfull!
-Load image 'data/1.bmp'
 Build atlas 60x60
 Save atlas 'results/my image.png' and layout 'results/my.xatlas'
 Build successfull!

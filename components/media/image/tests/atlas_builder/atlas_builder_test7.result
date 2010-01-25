@@ -1,16 +1,10 @@
 Results of atlas_builder_test5:
-Load image 'data/1.bmp'
-Load image 'data/2.tga'
 Build atlas 231x128
 Save atlas 'results/invert-x.png' and layout 'results/invert-x.xatlas'
 Build successfull!
-Load image 'data/1.bmp'
-Load image 'data/2.tga'
 Build atlas 231x128
 Save atlas 'results/invert-y.png' and layout 'results/invert-y.xatlas'
 Build successfull!
-Load image 'data/1.bmp'
-Load image 'data/2.tga'
 Build atlas 231x128
 Save atlas 'results/invert-xy.png' and layout 'results/invert-xy.xatlas'
 Build successfull!

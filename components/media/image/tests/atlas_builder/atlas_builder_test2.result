@@ -5,6 +5,7 @@ atlas-builder [<OPTIONS>] <SOURCE> ...
     --silent, -s               quiet mode
     --atlas=<file>, -o <file>  set output atlas file
     --layout=<file>, -l <file> set output layout file
+    --max-image-size=<size>    set maximum atlas image side size
     --no-layout                don't generate layout file
     --pot                      resize atlas texture to nearest greater power of two sizes
     --invert-x                 invert X coordinate in layout of tiles

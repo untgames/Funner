@@ -1,7 +1,4 @@
 Results of atlas_builder_test5:
-Load image 'data/1.bmp'
-Load image 'data/3.jpg'
-Load image 'data/2.tga'
 Build atlas 256x256
 Save atlas 'results/swap-axises.png' and layout 'results/swap-axises.xatlas'
 Build successfull!

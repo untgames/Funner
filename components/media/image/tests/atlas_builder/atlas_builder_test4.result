@@ -1,6 +1,4 @@
 Results of atlas_builder_test4:
-Load image 'data/1.bmp'
-Load image 'data/2.tga'
 Build atlas 256x128
 Save atlas 'results/pot.png' and layout 'results/pot.xatlas'
 Build successfull!
