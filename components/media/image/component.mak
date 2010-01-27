@@ -2,7 +2,7 @@
 #Определения и константы
 ###################################################################################################
 TARGETS := MEDIA.IMAGE.SOURCES MEDIA.XATLAS.SOURCES MEDIA.LEFT_BOTTOM_PACKER.SOURCES MEDIA.PVR_LOADER.SOURCES MEDIA.IMAGE.TESTS \
-           MEDIA.IMAGE.ANIMATION_ENHANCER MEDIA.IMAGE.SPRITE_COMPOSER MEDIA.IMAGE.PSD_EXPORTER.SOURCES \
+           MEDIA.IMAGE.SPRITE_COMPOSER MEDIA.IMAGE.PSD_EXPORTER.SOURCES \
            MEDIA.IMAGE.PSD_EXPORTER.TESTS MEDIA.XATLAS_BUILDER.SOURCES MEDIA.XATLAS_BUILDER.TESTS
 
 #Цель - Image sources
@@ -35,12 +35,6 @@ MEDIA.IMAGE.TESTS.TYPE         := test-suite
 MEDIA.IMAGE.TESTS.INCLUDE_DIRS := ../../math/bound_volumes/include
 MEDIA.IMAGE.TESTS.SOURCE_DIRS  := tests/image tests/atlas
 MEDIA.IMAGE.TESTS.IMPORTS      := compile.media.image link.media.image link.media.image.xatlas link.media.image.left_bottom_packer run.extern.devil link.media.image.pvr
-
-#Цель - Animation enhancer sources
-MEDIA.IMAGE.ANIMATION_ENHANCER.TYPE        := application
-MEDIA.IMAGE.ANIMATION_ENHANCER.NAME        := animation_enhancer
-MEDIA.IMAGE.ANIMATION_ENHANCER.SOURCE_DIRS := utils/animation_enhancer
-MEDIA.IMAGE.ANIMATION_ENHANCER.IMPORTS     := compile.media.image link.media.image
 
 #Цель - Sprite composer sources
 MEDIA.IMAGE.SPRITE_COMPOSER.TYPE        := application
