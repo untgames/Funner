@@ -205,7 +205,23 @@ struct Node::Impl
       
       if (pivot_enabled)
       {
-        world_position_after_pivot = parent_orientation * (parent_scale * PositionAfterPivot ()) + parent->impl->WorldPositionAfterPivot ();
+        vec3f local_pivot_offset;
+        
+        if (!scale_inherit || !orientation_inherit)
+        {
+          local_pivot_offset = PositionAfterPivot () - local_position;          
+          
+          if (!scale_inherit)       local_pivot_offset /= parent_scale;
+          if (!orientation_inherit) local_pivot_offset  = inverse (parent_orientation) * local_pivot_offset;
+
+          local_pivot_offset += local_position;
+        }
+        else
+        {
+          local_pivot_offset = PositionAfterPivot ();
+        }
+
+        world_position_after_pivot = parent_orientation * (parent_scale * local_pivot_offset) + parent->impl->WorldPositionAfterPivot ();
       }
       else
       {

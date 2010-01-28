@@ -92,7 +92,7 @@ int main ()
   
   dump (test);
   
-  printf ("\n");  
+  printf ("\n");    
   
   return 0;
 }
