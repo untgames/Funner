@@ -808,16 +808,6 @@ SpriteList::Pointer create_sprite_list ()
      Регистрация библиотеки работы с спрайтовыми моделями
 */
 
-template <NodeTransformSpace space>
-mat4f get_transformation_after_pivot (SpriteModel& model)
-{
-  mat4f result;
-
-  model.EvalTransformationAfterPivot (space, result);
-
-  return result;
-}
-
 void bind_sprite_model_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_SPRITE_MODEL_LIBRARY);
