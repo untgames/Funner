@@ -272,10 +272,15 @@ struct ScenePlayer::Impl
 
     void ProcessDetachNode (Node& sender, Node& node, NodeSubTreeEvent event)
     {
-      EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&node));
+      SoundEmitter*        emitter      = (scene_graph::SoundEmitter*) (&node);
+      EmitterSet::iterator emitter_iter = emitters.find (emitter);
 
       if (emitter_iter == emitters.end ())
         return;
+
+      emitter->AddRef (); //необходимо, так как StopEmitter вызовет release
+
+      StopEmitter (*emitter);
 
       emitters.erase (emitter_iter);
     }
