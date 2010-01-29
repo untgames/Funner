@@ -313,7 +313,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_help,                       "help",                  '?', 0,           "print help message"},
     {command_line_pot,                        "pot",                   0,   0,           "extent textures size to nearest greater power of two"},
     {command_line_crop_alpha,                 "crop-alpha",            0,   "value",     "crop layers by alpha that less than value"},
-    {command_line_animation_needs_pivot,      "animation-needs-pivot", 0,   0,           "exclude selected layers from crop"},
+    {command_line_animation_needs_pivot,      "animation-needs-pivot", 0,   0,           "use pivot for fullscreen animations"},
   };
 
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -957,8 +957,6 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
 
 void save_timeline (const Params& params, Document& document, const Timeline& timeline, ResourceTilingMap& tiling_map, MaterialInstancesList& material_instances)
 {
-  static const char* METHOD_NAME = "save_timeline";
-
   stl::string xml_name;
 
   if (params.animation_dir_name.empty ())
@@ -1164,10 +1162,6 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
           const PropertyAnimation::KeyframeList &x_keyframes  = skew_x_track.Keyframes (),
                                                 &y_keyframes  = skew_y_track.Keyframes ();
 
-          if (x_keyframes.Size () != y_keyframes.Size ())
-            throw xtl::format_operation_exception (METHOD_NAME, "Invalid skew track for frame element '%s' of layer '%s', x and y skew has different count of keyframes",
-                                                   element_iter->Name (), layer.Name ());
-
           if (skew_x_track.Enabled () && skew_y_track.Enabled ())
           {
             for (size_t j = 0, count = x_keyframes.Size (); j < count; j++)
@@ -1176,8 +1170,7 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
                                               &y_keyframe = y_keyframes [j];
 
               if (x_keyframe.value || y_keyframe.value)
-                throw xtl::format_operation_exception (METHOD_NAME, "Unsupported animation for frame element '%s' of layer '%s', skew not supported",
-                                                   element_iter->Name (), layer.Name ());
+                printf ("Unsupported animation for frame element '%s' of layer '%s', skew not supported\n", element_iter->Name (), layer.Name ());
             }
           }
         }
@@ -1269,7 +1262,7 @@ void export_data (Params& params)
     float resize_aspect_ratio = params.resize_width / (float)params.resize_height;
 
     if (!float_compare (document_aspect_ratio, resize_aspect_ratio) && !params.silent)
-      printf ("Requested resize will greatly change image aspect ratio\n");
+      printf ("Requested resize %u %u will greatly change image aspect ratio %f\n", params.resize_width, params.resize_height, document_aspect_ratio);
   }
 
   if ((params.resize_width > document_width || params.resize_height > document_height) && !params.silent)
