@@ -1217,6 +1217,12 @@ bool Node::ScalePivotEnabled () const
   return impl->pivot ? impl->pivot->scale_pivot_enabled : DEFAULT_SCALE_PIVOT_ENABLED;
 }
 
+//проверка: присутствует ли pivot в данном узле
+bool Node::PivotEnabled () const
+{
+  return impl->pivot && impl->pivot->pivot_enabled && (impl->pivot->orientation_pivot_enabled || impl->pivot->scale_pivot_enabled);
+}
+
 /*
     Ориентация узла
 */

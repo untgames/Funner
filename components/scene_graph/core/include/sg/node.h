@@ -245,6 +245,7 @@ class Node: public xtl::dynamic_cast_root
     void               SetScalePivotEnabled       (bool state); //установка флага применения центра масштаба
     bool               OrientationPivotEnabled    () const;
     bool               ScalePivotEnabled          () const;
+    bool               PivotEnabled               () const; //проверка: присутствует ли pivot в данном узле
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ориентация узла

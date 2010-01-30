@@ -1,0 +1,6 @@
+Results of node_transform_pivot_flags_test:
+pivot=false orientation_pivot=true scale_pivot=true
+pivot=true orientation_pivot=true scale_pivot=true
+pivot=true orientation_pivot=false scale_pivot=true
+pivot=false orientation_pivot=false scale_pivot=false
+pivot=false orientation_pivot=true scale_pivot=true
