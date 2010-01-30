@@ -21,8 +21,8 @@ delayed_handler called with dt=0.2 timer =1.5
 delayed_handler called with dt=0.2 timer =1.7
 action_queue_pause_handler paused action_queue with dt=2.6 timer=1.8
 action_queue_pause_handler resumed action_queue with dt=1.0 timer=2.8
-registered_in_pause_handler called with dt=0.00 timer =2.78
+registered_in_pause_handler called with dt=0.00 timer =2.80
 delayed_handler called with dt=0.2 timer =2.9
-registered_in_pause_handler called with dt=0.25 timer =3.03
+registered_in_pause_handler called with dt=0.25 timer =3.05
 delayed_handler called with dt=0.2 timer =3.1
 exit_handler called with dt=3 timer=3.2

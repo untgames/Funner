@@ -234,6 +234,11 @@ InvokerRegistry& bind_node_library (Environment& environment)
   lib.Register ("SetPivotPosition",         make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetPivotPosition)));
   lib.Register ("set_PivotPosition",        make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetPivotPosition)));
   lib.Register ("get_PivotPosition",        make_invoker (&Node::PivotPosition));
+  lib.Register ("set_OrientationPivotEnabled", make_invoker (&Node::SetOrientationPivotEnabled));
+  lib.Register ("set_ScalePivotEnabled",       make_invoker (&Node::SetScalePivotEnabled));
+  lib.Register ("get_OrientationPivotEnabled", make_invoker (&Node::OrientationPivotEnabled));
+  lib.Register ("get_ScalePivotEnabled",       make_invoker (&Node::ScalePivotEnabled));
+  lib.Register ("get_PivotEnabled",         make_invoker (&Node::PivotEnabled));
   lib.Register ("set_Orientation",          make_invoker (implicit_cast<void (Node::*) (const quatf&)> (&Node::SetOrientation)));
   lib.Register ("set_WorldOrientation",     make_invoker (implicit_cast<void (Node::*) (const quatf&)> (&Node::SetWorldOrientation)));
   lib.Register ("SetOrientation",           make_invoker<void (Node*, math::anglef, float, float, float)> (implicit_cast<void (Node::*) (const math::anglef&, float, float, float)> (&Node::SetOrientation)));
