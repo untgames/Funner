@@ -1,0 +1,4 @@
+Results of node_transform_pivot_bind_test:
+position before: [+3.00 +0.00 +0.00]
+position after bind: [+3.00 +0.00 +0.00]
+position after rotate: [+3.00 +0.00 +0.00]

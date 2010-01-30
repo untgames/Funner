@@ -31,7 +31,7 @@ int main ()
 
   printf ("\n");  
   
-  node->SetOrientationInherit (false);    
+  node->SetOrientationInherit (false);
     
   printf ("test point (no orientation inherit): ");
 

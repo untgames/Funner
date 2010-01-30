@@ -237,10 +237,14 @@ class Node: public xtl::dynamic_cast_root
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Центр узла в локальной системе координат (точка применения поворотов и масштаба)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void               SetPivotPosition   (const math::vec3f& pivot);
-    void               SetPivotPosition   (float x, float y, float z);
-    void               ResetPivotPosition ();
-    const math::vec3f& PivotPosition      () const;
+    void               SetPivotPosition           (const math::vec3f& pivot);
+    void               SetPivotPosition           (float x, float y, float z);
+    void               ResetPivotPosition         ();
+    const math::vec3f& PivotPosition              () const;
+    void               SetOrientationPivotEnabled (bool state); //установка флага применения центра поворотов
+    void               SetScalePivotEnabled       (bool state); //установка флага применения центра масштаба
+    bool               OrientationPivotEnabled    () const;
+    bool               ScalePivotEnabled          () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ориентация узла

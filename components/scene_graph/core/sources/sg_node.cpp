@@ -5,12 +5,45 @@ using namespace math;
 using namespace common;
 
 /*
-    Описание реализации Node
+    Вспомогательные структуры
 */
 
-typedef xtl::signal<void (Node& sender, NodeEvent event)> NodeSignal;
+namespace
+{
+
+const bool DEFAULT_SCALE_PIVOT_ENABLED       = true; //значение по умолчанию для использования центра масштабирования
+const bool DEFAULT_ORIENTATION_PIVOT_ENABLED = true; //значение по умолчанию для использования центра поворотов
+
+///центр объекта
+struct Pivot
+{
+  bool  pivot_enabled;                          //включён ли центр
+  bool  need_local_position_after_pivot_update; //необходимо обновлять локальное положение с учётом центра
+  bool  orientation_pivot_enabled;              //включён центр поворотов
+  bool  scale_pivot_enabled;                    //включён центр масштабирования  
+  vec3f pivot_position;                         //локальное положение центра
+  vec3f local_position_after_pivot;             //локальное положение с учётом центра
+  vec3f world_position_after_pivot;             //мировое положение с учётом центра
+  
+  Pivot ()
+    : pivot_enabled (false)
+    , need_local_position_after_pivot_update (false)
+    , orientation_pivot_enabled (DEFAULT_ORIENTATION_PIVOT_ENABLED)
+    , scale_pivot_enabled (DEFAULT_SCALE_PIVOT_ENABLED)
+  {
+  }
+};
+
+typedef stl::auto_ptr<Pivot>                                                  PivotPtr;
+typedef xtl::signal<void (Node& sender, NodeEvent event)>                     NodeSignal;
 typedef xtl::signal<void (Node& sender, Node& child, NodeSubTreeEvent event)> SubTreeNodeSignal;
-typedef xtl::signal<void (float dt)> UpdateSignal;
+typedef xtl::signal<void (float dt)>                                          UpdateSignal;
+
+}
+
+/*
+    Описание реализации Node
+*/
 
 struct Node::Impl
 {
@@ -30,15 +63,11 @@ struct Node::Impl
   bool                    signal_process [NodeEvent_Num];   //флаги обработки сигналов
   SubTreeNodeSignal       subtree_signals [NodeSubTreeEvent_Num]; //сигналы событий, возникающих в узлах-потомках
   bool                    subtree_signal_process [NodeSubTreeEvent_Num]; //флаги обработки сигналов, возникающих в узлах потомках
-  bool                    pivot_enabled;                    //включён ли центр поворотов
-  bool                    need_local_position_after_pivot_update; //необходимо обновлять локальное положени с учётом центра поворотов
-  vec3f                   pivot_position;                   //центр поворотов  
-  vec3f                   local_position_after_pivot;       //локальное положение с учётом центра поворотов
+  PivotPtr                pivot;                            //центр объекта
   vec3f                   local_position;                   //локальное положение
   quatf                   local_orientation;                //локальная ориентация
   vec3f                   local_scale;                      //локальный масштаб
   mat4f                   local_tm;                         //матрица локальных преобразований
-  vec3f                   world_position_after_pivot;       //мировое положение с учётом центра поворотов
   vec3f                   world_position;                   //мировое положение
   quatf                   world_orientation;                //мировая ориентация
   vec3f                   world_scale;                      //мировой масштаб
@@ -81,14 +110,12 @@ struct Node::Impl
 
     orientation_inherit = true;
     scale_inherit       = true;
-    pivot_enabled       = false;
 
       //преобразования рассчитаны
 
-    need_world_transform_update            = false;
-    need_local_tm_update                   = false;
-    need_world_tm_update                   = false;
-    need_local_position_after_pivot_update = false;
+    need_world_transform_update = false;
+    need_local_tm_update        = false;
+    need_world_tm_update        = false;
     
       //очистка массива флагов обработки сигналов
       
@@ -104,31 +131,54 @@ struct Node::Impl
     need_release_at_unbind = false;
   }
   
+  Pivot& GetPivot ()
+  {
+    if (pivot)
+      return *pivot;
+      
+    pivot = PivotPtr (new Pivot);
+    
+    return *pivot;
+  }
+  
   const vec3f& PositionAfterPivot ()
   {
-    if (need_local_position_after_pivot_update)
+    if (!pivot)
+      return local_position;
+    
+    if (pivot->need_local_position_after_pivot_update)
     {
-      if (pivot_enabled)
+      bool pivot_enabled = pivot->pivot_enabled && (pivot->orientation_pivot_enabled || pivot->scale_pivot_enabled);      
+      
+      if (pivot->pivot_enabled)
       {
-        local_position_after_pivot = local_orientation * (local_scale * -pivot_position) + pivot_position + local_position;
+        static vec3f default_scale (1.0f);
+        static quatf default_orientation;
+
+        const vec3f& pivot_scale       = pivot->scale_pivot_enabled ? default_scale : local_scale;
+        const quatf& pivot_orientation = pivot->orientation_pivot_enabled ? default_orientation : local_orientation;
+
+        pivot->local_position_after_pivot = local_position
+          + pivot_orientation * (pivot_scale * pivot->pivot_position)
+          - local_orientation * (local_scale * pivot->pivot_position);
       }
       else
       {
-        local_position_after_pivot = local_position;
+        pivot->local_position_after_pivot = local_position;
       }
       
-      need_local_position_after_pivot_update = false;
+      pivot->need_local_position_after_pivot_update = false;
     }
     
-    return local_position_after_pivot;
+    return pivot->local_position_after_pivot;
   }
   
   const vec3f& WorldPositionAfterPivot ()
   {
     if (need_world_transform_update)
       UpdateWorldTransform ();
-
-    return world_position_after_pivot;
+      
+    return pivot ? pivot->world_position_after_pivot : world_position;
   }
   
   //оповещение об изменении узла
@@ -181,14 +231,18 @@ struct Node::Impl
 
   void UpdateLocalTransformNotify ()
   {
-    need_local_tm_update                   = true;
-    need_local_position_after_pivot_update = true;
+    need_local_tm_update = true;
+    
+    if (pivot)
+      pivot->need_local_position_after_pivot_update = true;
     
     UpdateWorldTransformNotify ();
   }
 
   void UpdateWorldTransform ()
   {
+    bool pivot_enabled = pivot && pivot->pivot_enabled && (pivot->orientation_pivot_enabled || pivot->scale_pivot_enabled);
+    
     if (parent)
     {
       const quatf& parent_orientation = parent->WorldOrientation ();
@@ -203,37 +257,36 @@ struct Node::Impl
 
       world_position = parent_orientation * (parent_scale * local_position) + parent->impl->WorldPositionAfterPivot ();
       
-      if (pivot_enabled)
+      if (pivot)
       {
-        vec3f local_pivot_offset;
-        
-        if (!scale_inherit || !orientation_inherit)
+        if (pivot_enabled)
         {
-          local_pivot_offset = PositionAfterPivot () - local_position;          
-          
-          if (!scale_inherit)       local_pivot_offset /= parent_scale;
-          if (!orientation_inherit) local_pivot_offset  = inverse (parent_orientation) * local_pivot_offset;
+          static vec3f default_scale (1.0f);
+          static quatf default_orientation;
 
-          local_pivot_offset += local_position;
+          const vec3f& pivot_scale       = pivot->scale_pivot_enabled ? scale_inherit ? parent_scale : default_scale : world_scale;
+          const quatf& pivot_orientation = pivot->orientation_pivot_enabled ? orientation_inherit ? parent_orientation : default_orientation : world_orientation;
+          
+          pivot->world_position_after_pivot = world_position
+            + pivot_orientation * (pivot_scale * pivot->pivot_position)
+            - world_orientation * (world_scale * pivot->pivot_position);
         }
         else
         {
-          local_pivot_offset = PositionAfterPivot ();
+          pivot->world_position_after_pivot = world_position;
         }
-
-        world_position_after_pivot = parent_orientation * (parent_scale * local_pivot_offset) + parent->impl->WorldPositionAfterPivot ();
-      }
-      else
-      {
-        world_position_after_pivot = world_position;
       }
     }
     else
     {
-      world_orientation          = local_orientation;
-      world_scale                = local_scale;      
-      world_position_after_pivot = pivot_enabled ? PositionAfterPivot () : local_position;
-      world_position             = local_position;
+      world_orientation = local_orientation;
+      world_scale       = local_scale;      
+      world_position    = local_position;      
+
+      if (pivot)
+      {
+        pivot->world_position_after_pivot = PositionAfterPivot ();
+      }
     }
 
     need_world_transform_update = false;
@@ -249,19 +302,19 @@ struct Node::Impl
       //определяем инвариантное пространство преобразований
       
     bool  need_transform_in_world_space = false;
-    vec3f old_world_position, old_world_scale;
+    vec3f old_world_position_after_pivot, old_world_scale;
     quatf old_world_orientation;
-
+    
     switch (invariant_space)
     {
       case NodeTransformSpace_Parent:
       case NodeTransformSpace_Local:
         break;
       case NodeTransformSpace_World:
-        need_transform_in_world_space = true;
-        old_world_position            = this_node->WorldPosition ();
-        old_world_scale               = this_node->WorldScale ();
-        old_world_orientation         = this_node->WorldOrientation ();
+        need_transform_in_world_space  = true;
+        old_world_position_after_pivot = WorldPositionAfterPivot ();
+        old_world_scale                = this_node->WorldScale ();
+        old_world_orientation          = this_node->WorldOrientation ();
         break;
       default:
         throw xtl::make_argument_exception ("scene_graph::Node::BindToParent", "invariant_space", invariant_space);
@@ -391,19 +444,19 @@ struct Node::Impl
       
       if (parent)
       {
-        this_node->SetWorldPosition    (old_world_position);
         this_node->SetWorldOrientation (old_world_orientation);
         this_node->SetWorldScale       (old_world_scale);
+        this_node->Translate           (old_world_position_after_pivot - WorldPositionAfterPivot (), NodeTransformSpace_World);
       }
       else
       {
-        this_node->SetPosition    (old_world_position);
         this_node->SetOrientation (old_world_orientation);
         this_node->SetScale       (old_world_scale);
+        this_node->Translate      (old_world_position_after_pivot - WorldPositionAfterPivot (), NodeTransformSpace_World);
       }
       
       this_node->EndUpdate ();
-    }
+    }    
 
       //снятие блокировки на вызов BindToParent
 
@@ -1083,19 +1136,21 @@ const vec3f& Node::WorldPosition () const
     Центр узла в локальной системе координат (точка применения поворотов и масштаба)
 */
 
-void Node::SetPivotPosition (const math::vec3f& pivot)
+void Node::SetPivotPosition (const math::vec3f& pivot_position)
 {
   static float       EPS = 0.001f;
   static math::vec3f ZERO_VEC (0.0f);
 
-  if (equal (pivot, ZERO_VEC, EPS))
+  if (equal (pivot_position, ZERO_VEC, EPS))
   {
     ResetPivotPosition ();
   }
   else
   {
-    impl->pivot_position = pivot;
-    impl->pivot_enabled  = true;
+    Pivot& pivot = impl->GetPivot ();
+    
+    pivot.pivot_position = pivot_position;
+    pivot.pivot_enabled  = true;
     
     impl->UpdateLocalTransformNotify ();
   }
@@ -1108,15 +1163,58 @@ void Node::SetPivotPosition (float x, float y, float z)
 
 void Node::ResetPivotPosition ()
 {
-  impl->pivot_enabled  = false;
-  impl->pivot_position = math::vec3f (0.0f);
+  if (!impl->pivot)
+    return;
+
+  Pivot& pivot = impl->GetPivot ();
+
+  pivot.pivot_enabled  = false;
+  pivot.pivot_position = math::vec3f (0.0f);
   
   impl->UpdateLocalTransformNotify ();
 }
 
 const math::vec3f& Node::PivotPosition () const
 {
-  return impl->pivot_position;
+  static vec3f ZERO_VEC (0.0f);
+
+  return impl->pivot ? impl->pivot->pivot_position : ZERO_VEC;
+}
+
+//установка флага применения центра поворотов
+void Node::SetOrientationPivotEnabled (bool state)
+{
+  if (!impl->pivot && state == DEFAULT_ORIENTATION_PIVOT_ENABLED)
+    return;
+    
+  Pivot& pivot = impl->GetPivot ();
+  
+  pivot.orientation_pivot_enabled = state;
+  
+  impl->UpdateLocalTransformNotify ();
+}
+
+//установка флага применения центра масштаба
+void Node::SetScalePivotEnabled (bool state)
+{
+  if (!impl->pivot && state == DEFAULT_SCALE_PIVOT_ENABLED)
+    return;
+    
+  Pivot& pivot = impl->GetPivot ();
+  
+  pivot.scale_pivot_enabled = state;
+  
+  impl->UpdateLocalTransformNotify ();
+}
+
+bool Node::OrientationPivotEnabled () const
+{
+  return impl->pivot ? impl->pivot->orientation_pivot_enabled : DEFAULT_ORIENTATION_PIVOT_ENABLED;
+}
+
+bool Node::ScalePivotEnabled () const
+{
+  return impl->pivot ? impl->pivot->scale_pivot_enabled : DEFAULT_SCALE_PIVOT_ENABLED;
 }
 
 /*
@@ -1142,7 +1240,14 @@ void Node::SetOrientation (const math::anglef& pitch, const math::anglef& yaw, c
 
 void Node::SetWorldOrientation (const quatf& orientation)
 {
-  Rotate (orientation * inverse (WorldOrientation ()), NodeTransformSpace_World);
+//  if (impl->orientation_inherit)
+//  {
+    Rotate (orientation * inverse (WorldOrientation ()), NodeTransformSpace_World);
+//  }
+//  else
+//  {
+//    SetOrientation (orientation);
+//  }
 }
 
 void Node::SetWorldOrientation (const math::anglef& angle, float axis_x, float axis_y, float axis_z)
@@ -1383,7 +1488,14 @@ void Node::SetScale (float sx, float sy, float sz)
 
 void Node::SetWorldScale (const vec3f& scale)
 {
-  Scale (scale / WorldScale ());
+//  if (impl->scale_inherit)
+//  {
+    Scale (scale / WorldScale ());
+//  }
+//  else
+//  {
+//    SetScale (scale);
+//  }
 }
 
 void Node::SetWorldScale (float sx, float sy, float sz)
