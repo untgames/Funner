@@ -105,11 +105,13 @@ struct MaterialInstance
     {}
 };
 
-typedef stl::hash_set<stl::hash_key<const char*> >                 UsedResourcesSet;
-typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>          ResourceTilingMap;
-typedef stl::multimap<float, stl::string, stl::less<float> >       ActivateSpritesMap;
-typedef stl::list<MaterialInstance>                                MaterialInstancesList;
-typedef CollectionImpl<Vec2fKeyframe, ICollection<Vec2fKeyframe> > Vec2fKeyframes;
+typedef stl::hash_set<stl::hash_key<const char*> >                  UsedResourcesSet;
+typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>           ResourceTilingMap;
+typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>           ResourceDimensionsMap;
+typedef stl::hash_map<size_t, stl::string>                          ImagesHashesMap;
+typedef stl::multimap<float, stl::string, stl::less<float> >        ActivateSpritesMap;
+typedef stl::hash_map<stl::hash_key<const char*>, MaterialInstance> MaterialInstancesMap;
+typedef CollectionImpl<Vec2fKeyframe, ICollection<Vec2fKeyframe> >  Vec2fKeyframes;
 
 //сравнение дробных чисел
 bool float_compare (float v1, float v2)
@@ -492,7 +494,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
   }
 }
 
-void save_materials (const Params& params, const Document& document, const ResourceTilingMap& tiling_map, const MaterialInstancesList& material_instances)
+void save_materials (const Params& params, const Document& document, const ResourceTilingMap& tiling_map, const MaterialInstancesMap& material_instances)
 {
   stl::string xmtl_name = params.materials_file_name;
 
@@ -509,6 +511,9 @@ void save_materials (const Params& params, const Document& document, const Resou
 
   for (Document::ResourceList::ConstIterator iter = document.Resources ().CreateIterator (); iter; ++iter)
   {
+    if (material_instances.find (iter->Name ()) != material_instances.end ())
+      continue;
+
     XmlWriter::Scope material_scope (writer, "material");
 
     writer.WriteAttribute ("id", iter->Name ());
@@ -528,12 +533,12 @@ void save_materials (const Params& params, const Document& document, const Resou
     }
   }
 
-  for (MaterialInstancesList::const_iterator iter = material_instances.begin (), end = material_instances.end (); iter != end; ++iter)
+  for (MaterialInstancesMap::const_iterator iter = material_instances.begin (), end = material_instances.end (); iter != end; ++iter)
   {
     XmlWriter::Scope material_scope (writer, "instance_material");
 
-    writer.WriteAttribute ("id",     iter->material_id.c_str ());
-    writer.WriteAttribute ("source", iter->source_material.c_str ());
+    writer.WriteAttribute ("id",     iter->second.material_id.c_str ());
+    writer.WriteAttribute ("source", iter->second.source_material.c_str ());
   }
 }
 
@@ -711,19 +716,27 @@ void union_rect (const Rect& rect1, Rect& target_rect)
     target_rect = rect1;
 }
 
-void preprocess_symbols (const Params& params, Document& document, const UsedResourcesSet& used_symbols, ResourceTilingMap& tiling_map, MaterialInstancesList& material_instances)
+void preprocess_symbols (const Params& params, Document& document, const UsedResourcesSet& used_symbols,
+                         ResourceTilingMap& tiling_map, MaterialInstancesMap& material_instances,
+                         ResourceDimensionsMap& resources_dimensions)
 {
   static const char* METHOD_NAME = "preprocess_symbols";
+
+  if (!params.silent)
+    printf ("preprocessing symbols...\n");
 
   float resize_x_factor = params.resize_width ? params.resize_width / (float)document.Width () : 1.f,
         resize_y_factor = params.resize_height ? params.resize_height / (float)document.Height () : 1.f;
 
   UsedResourcesSet used_resources;
+  ImagesHashesMap  duplicate_images;
 
   if (!FileSystem::IsDir (params.output_textures_dir_name.c_str ()))
     FileSystem::Mkdir (params.output_textures_dir_name.c_str ());
 
   common::StringArray crop_exclude_list = common::split (params.crop_exclude.c_str ());
+
+  Document::ResourceList& resources = document.Resources ();
 
   for (size_t symbol_index = 0; symbol_index < document.Symbols ().Size (); symbol_index++)
   {
@@ -753,10 +766,10 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
       }
     }
 
-    Layer&        symbol_layer       = ((ICollection<Layer>&)symbol_timeline.Layers ()) [0];
-    Frame&        first_symbol_frame = ((ICollection<Frame>&)symbol_layer.Frames ()) [0];
-    FrameElement& resource_element   = ((ICollection<FrameElement>&)first_symbol_frame.Elements ()) [0];
-    Resource&     resource           = document.Resources () [resource_element.Name ()];
+    Layer&              symbol_layer       = ((ICollection<Layer>&)symbol_timeline.Layers ()) [0];
+    const Frame&        first_symbol_frame = ((ICollection<Frame>&)symbol_layer.Frames ()) [0];
+    const FrameElement& resource_element   = ((ICollection<FrameElement>&)first_symbol_frame.Elements ()) [0];
+    const Resource&     resource           = resources [resource_element.Name ()];
 
     size_t bitmaps_count = 0;
 
@@ -781,7 +794,7 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
         if (symbol_element_iter->Type () != FrameElementType_ResourceInstance)
           throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains elements other than resource instance", symbol.Name ());
 
-        const Resource& frame_resource = document.Resources () [symbol_element_iter->Name ()];
+        const Resource& frame_resource = resources [symbol_element_iter->Name ()];
 
         Image frame (frame_resource.Path ());
 
@@ -847,9 +860,6 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
 
     size_t check_frame = 1;
 
-    if (!FileSystem::IsDir (save_folder_name.c_str ()))
-      FileSystem::Mkdir (save_folder_name.c_str ());
-
     Layer::FrameList &layer_frames = symbol_layer.Frames ();
 
     stl::string correct_element_name;
@@ -866,30 +876,31 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
 
           for (size_t instance_index = check_frame, last_instance_index = symbol_frame_first_frame + 1; instance_index < last_instance_index; instance_index++)
           {
+            stl::string source_material_name;
+
+            MaterialInstancesMap::const_iterator instance_iter = material_instances.find (correct_element_name.c_str ());
+
+            if (instance_iter == material_instances.end ())
+              source_material_name = correct_element_name;
+            else
+              source_material_name = instance_iter->second.source_material;
+
             stl::string instance_element_name = common::format ("%s%u.%s", save_folder_name.c_str (), instance_index, params.textures_format.c_str ());
 
-            material_instances.push_back (MaterialInstance (instance_element_name.c_str (), correct_element_name.c_str ()));
+            material_instances.insert_pair (instance_element_name.c_str (), MaterialInstance (instance_element_name.c_str (), source_material_name.c_str ()));
 
             Resource new_resource;
 
             new_resource.SetName (instance_element_name.c_str ());
-            new_resource.SetPath (correct_element_name.c_str ());
+            new_resource.SetPath (source_material_name.c_str ());
 
-            document.Resources ().Add (new_resource);
+            resources.Add (new_resource);
           }
 
           check_frame = symbol_frame_first_frame + 1;
         }
 
-        if (bitmaps_count > 1)
-          correct_element_name = common::format ("%s%u.%s", save_folder_name.c_str (), check_frame, params.textures_format.c_str ());
-        else
-        {
-          stl::string resource_file_base_name = common::notdir (common::basename (resource.Path ()));
-          correct_element_name    = common::format ("%s%s.%s", save_folder_name.c_str (), resource_file_base_name.c_str (), params.textures_format.c_str ());
-        }
-
-        Resource& frame_resource = document.Resources () [symbol_element_iter->Name ()];
+        Resource& frame_resource = resources [symbol_element_iter->Name ()];
 
         Image frame (frame_resource.Path ());
 
@@ -898,34 +909,62 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
 
         frame.GetImage (resized_crop_x, resized_crop_y, 0, resized_crop_width, resized_crop_height, 1, frame.Format (), image_copy_buffer.data ());
 
-        size_t new_image_width  = resized_crop_width,
-               new_image_height = resized_crop_height;
+        size_t cropped_image_hash = common::crc32 (image_copy_buffer.data (), image_copy_buffer.size (), 0) + resized_crop_width * 2 + resized_crop_height * 3;
 
-        if (params.need_pot_extent)
+        ImagesHashesMap::iterator duplicate_image_iter = duplicate_images.find (cropped_image_hash);
+
+        if (bitmaps_count > 1)
+          correct_element_name = common::format ("%s%u.%s", save_folder_name.c_str (), check_frame, params.textures_format.c_str ());
+        else
         {
-          new_image_width  = get_next_higher_power_of_two (new_image_width);
-          new_image_height = get_next_higher_power_of_two (new_image_height);
+          stl::string resource_file_base_name = common::notdir (common::basename (resource.Path ()));
+          correct_element_name = common::format ("%s%s.%s", save_folder_name.c_str (), resource_file_base_name.c_str (), params.textures_format.c_str ());
         }
-
-        Image cropped_frame (new_image_width, new_image_height, 1, frame.Format ());
-
-        cropped_frame.PutImage (0, new_image_height - resized_crop_height, 0, resized_crop_width, resized_crop_height, 1, frame.Format (), image_copy_buffer.data ());
-
-        cropped_frame.Save (correct_element_name.c_str ());
-
-        if (resized_crop_width != new_image_width || resized_crop_height != new_image_height)
-          tiling_map.insert_pair (correct_element_name.c_str (), vec2ui (resized_crop_width, resized_crop_height));
-
-        symbol_element_iter->SetName (correct_element_name.c_str ());
 
         Resource new_resource;
 
         new_resource.SetName (correct_element_name.c_str ());
         new_resource.SetPath (correct_element_name.c_str ());
 
-        document.Resources ().Add (new_resource);
+        if (duplicate_image_iter == duplicate_images.end ())
+        {
+          size_t new_image_width  = resized_crop_width,
+                 new_image_height = resized_crop_height;
+
+          if (params.need_pot_extent)
+          {
+            new_image_width  = get_next_higher_power_of_two (new_image_width);
+            new_image_height = get_next_higher_power_of_two (new_image_height);
+          }
+
+          Image cropped_frame (new_image_width, new_image_height, 1, frame.Format ());
+
+          cropped_frame.PutImage (0, new_image_height - resized_crop_height, 0, resized_crop_width, resized_crop_height, 1, frame.Format (), image_copy_buffer.data ());
+
+          if (!FileSystem::IsDir (save_folder_name.c_str ()))
+            FileSystem::Mkdir (save_folder_name.c_str ());
+
+          cropped_frame.Save (correct_element_name.c_str ());
+
+          if (resized_crop_width != new_image_width || resized_crop_height != new_image_height)
+            tiling_map.insert_pair (correct_element_name.c_str (), vec2ui (resized_crop_width, resized_crop_height));
+
+          duplicate_images.insert_pair (cropped_image_hash, correct_element_name);
+
+          resources_dimensions.insert_pair (correct_element_name.c_str (), math::vec2ui (resized_crop_width, resized_crop_height));
+        }
+        else if (correct_element_name != duplicate_image_iter->second && !resources.Find (correct_element_name.c_str ()))
+        {
+          material_instances.insert_pair (correct_element_name.c_str (), MaterialInstance (correct_element_name.c_str (), duplicate_image_iter->second.c_str ()));
+          resources_dimensions.insert_pair (correct_element_name.c_str (), resources_dimensions [duplicate_image_iter->second.c_str ()]);
+        }
+
+        if (!resources.Find (correct_element_name.c_str ()))
+          resources.Add (new_resource);
 
         used_resources.insert (new_resource.Name ());
+
+        symbol_element_iter->SetName (correct_element_name.c_str ());
 
           //update transformation and translation
         vec2f current_transformation_point = symbol_element_iter->TransformationPoint (),
@@ -944,19 +983,21 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
       }
   }
 
-  ICollection<Resource>& resources = document.Resources ();
-
   for (size_t i = 0; i < resources.Size ();)
   {
-    if (used_resources.find (resources [i].Name ()) == used_resources.end ())
+    if (used_resources.find (((ICollection<Resource>&)resources) [i].Name ()) == used_resources.end ())
       resources.Remove (i);
     else
       i++;
   }
 }
 
-void save_timeline (const Params& params, Document& document, const Timeline& timeline, ResourceTilingMap& tiling_map, MaterialInstancesList& material_instances)
+void save_timeline (const Params& params, const Document& document, const Timeline& timeline,
+                    const ResourceDimensionsMap& resources_dimensions)
 {
+  if (!params.silent)
+    printf ("saving timeline...\n");
+
   stl::string xml_name;
 
   if (params.animation_dir_name.empty ())
@@ -1023,26 +1064,32 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
         float begin_time = frame_iter->FirstFrame () / document.FrameRate (),
               duration   = frame_iter->Duration () / document.FrameRate ();
 
-        XmlWriter::Scope sprite_scope (writer, "Sprite");
-
         const Timeline&     symbol_timeline    = symbol->Timeline ();
         const Layer&        symbol_layer       = ((const ICollection<Layer>&)symbol_timeline.Layers ()) [0];
         const Frame&        first_symbol_frame = ((const ICollection<Frame>&)symbol_layer.Frames ()) [0];
         const FrameElement& resource_element   = ((const ICollection<FrameElement>&)first_symbol_frame.Elements ()) [0];
         const Resource&     resource           = document.Resources () [resource_element.Name ()];
 
-        Image image (resource.Path ());
+        ResourceDimensionsMap::const_iterator dimensions_iter = resources_dimensions.find (resource.Path ());
 
-        size_t image_width  = image.Width (),
-               image_height = image.Height ();
-
-        ResourceTilingMap::const_iterator tiling = tiling_map.find (resource.Name ());
-
-        if (tiling != tiling_map.end ())
+        if (dimensions_iter == resources_dimensions.end ())
         {
-          image_width  = tiling->second.x;
-          image_height = tiling->second.y;
+          if (!params.silent)
+            printf ("Can't find dimensions for resource '%s'\n", resource.Path ());
+          continue;
         }
+
+        size_t image_width  = dimensions_iter->second.x,
+               image_height = dimensions_iter->second.y;
+
+        if (!image_width || !image_height)
+        {
+          if (!params.silent)
+            printf ("Resource '%s' has zero dimensions, skipping\n", resource.Path ());
+          continue;
+        }
+
+        XmlWriter::Scope sprite_scope (writer, "Sprite");
 
         writer.WriteAttribute ("Active", "false");
         writer.WriteAttribute ("Name", element_iter->Name ());
@@ -1169,7 +1216,7 @@ void save_timeline (const Params& params, Document& document, const Timeline& ti
               const PropertyAnimationKeyframe &x_keyframe = x_keyframes [j],
                                               &y_keyframe = y_keyframes [j];
 
-              if (x_keyframe.value || y_keyframe.value)
+              if (!params.silent && (x_keyframe.value || y_keyframe.value))
                 printf ("Unsupported animation for frame element '%s' of layer '%s', skew not supported\n", element_iter->Name (), layer.Name ());
             }
           }
@@ -1269,16 +1316,17 @@ void export_data (Params& params)
     printf ("Requested resize to bigger size, image quality will be reduced\n");
 
   ResourceTilingMap     tiling_map;
-  MaterialInstancesList material_instances;
+  MaterialInstancesMap  material_instances;
   UsedResourcesSet      used_symbols;
+  ResourceDimensionsMap resource_dimensions;
 
   for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
     build_used_symbols (params, *iter, used_symbols);
 
-  preprocess_symbols (params, document, used_symbols, tiling_map, material_instances);
+  preprocess_symbols (params, document, used_symbols, tiling_map, material_instances, resource_dimensions);
 
   for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
-    save_timeline (params, document, *iter, tiling_map, material_instances);
+    save_timeline (params, document, *iter, resource_dimensions);
 
   save_materials (params, document, tiling_map, material_instances);
 }
