@@ -14,7 +14,6 @@
 
 #include <common/file.h>
 #include <common/strlib.h>
-#include <common/time.h>
 #include <common/xml_writer.h>
 
 #include <media/adobe/xfl.h>
@@ -639,11 +638,6 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
 {
   static const char* METHOD_NAME = "preprocess_symbols";
 
-  size_t calculate_crop_rect_time = 0,
-         resize_time              = 0;
-
-  size_t start_time = common::milliseconds ();
-
   if (!params.silent)
     printf ("preprocessing symbols...\n");
 
@@ -710,8 +704,6 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
       crop_rect.height = image_height;
     }
 
-    size_t crop_calculate_begin_time = common::milliseconds ();
-
     for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
       for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, bitmaps_count++)
       {
@@ -732,8 +724,6 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
           crop_by_alpha (frame, params.crop_alpha, crop_rect.x, crop_rect.y, crop_rect.width, crop_rect.height);
       }
 
-    calculate_crop_rect_time += common::milliseconds () - crop_calculate_begin_time;
-
     if (!bitmaps_count)
       throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced symbol elements has no resource instance", symbol.Name ());
 
@@ -753,24 +743,16 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
     else
       save_folder_name = common::format ("%s/%s", params.output_textures_dir_name.c_str (), resource_dir.c_str ());
 
-    size_t resized_image_width  = stl::max ((size_t)(image_width      * resize_x_factor), (size_t)1),
-           resized_image_height = stl::max ((size_t)(image_height     * resize_y_factor), (size_t)1),
-           resized_crop_width   = stl::max ((size_t)(crop_rect.width  * resize_x_factor), (size_t)1),
-           resized_crop_height  = stl::max ((size_t)(crop_rect.height * resize_y_factor), (size_t)1),
-           resized_crop_x       = stl::max ((size_t)(crop_rect.x      * resize_x_factor), (size_t)1),
-           resized_crop_y       = stl::max ((size_t)(crop_rect.y      * resize_y_factor), (size_t)1);
+    size_t resized_crop_width  = stl::max ((size_t)ceil(crop_rect.width  * resize_x_factor), (size_t)1),
+           resized_crop_height = stl::max ((size_t)ceil(crop_rect.height * resize_y_factor), (size_t)1);
 
     if (!params.resize_width)
     {
-       resized_image_width  = image_width,
-       resized_image_height = image_height,
-       resized_crop_width   = crop_rect.width,
-       resized_crop_height  = crop_rect.height,
-       resized_crop_x       = crop_rect.x,
-       resized_crop_y       = crop_rect.y;
+       resized_crop_width   = crop_rect.width;
+       resized_crop_height  = crop_rect.height;
     }
 
-    xtl::uninitialized_storage<char> image_copy_buffer (get_bytes_per_pixel (image.Format ()) * resized_crop_width * resized_crop_height);
+    xtl::uninitialized_storage<char> image_copy_buffer (get_bytes_per_pixel (image.Format ()) * crop_rect.width * crop_rect.height);
 
     size_t check_frame = 1;
 
@@ -818,16 +800,9 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
 
         Image frame (frame_resource_path.c_str ());
 
-        size_t before_resize_time = common::milliseconds ();
+        frame.GetImage (crop_rect.x, crop_rect.y, 0, crop_rect.width, crop_rect.height, 1, frame.Format (), image_copy_buffer.data ());
 
-        if (params.resize_width)
-          frame.Resize (resized_image_width, resized_image_height, 1);
-
-        resize_time += common::milliseconds () - before_resize_time;
-
-        frame.GetImage (resized_crop_x, resized_crop_y, 0, resized_crop_width, resized_crop_height, 1, frame.Format (), image_copy_buffer.data ());
-
-        size_t cropped_image_hash = common::crc32 (image_copy_buffer.data (), image_copy_buffer.size (), 0) + resized_crop_width * 2 + resized_crop_height * 3;
+        size_t cropped_image_hash = common::crc32 (image_copy_buffer.data (), image_copy_buffer.size (), 0) + crop_rect.width * 2 + crop_rect.height * 3;
 
         ImagesHashesMap::iterator duplicate_image_iter = duplicate_images.find (cropped_image_hash);
 
@@ -855,7 +830,18 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
             new_image_height = get_next_higher_power_of_two (new_image_height);
           }
 
+          if (params.resize_width)
+          {
+            Image resizing_image (crop_rect.width, crop_rect.height, 1, frame.Format (), image_copy_buffer.data ());
+
+            resizing_image.Resize (resized_crop_width, resized_crop_height, 1);
+
+            resizing_image.GetImage (0, 0, 0, resized_crop_width, resized_crop_height, 1, frame.Format (), image_copy_buffer.data ());
+          }
+
           Image cropped_frame (new_image_width, new_image_height, 1, frame.Format ());
+
+          memset (cropped_frame.Bitmap (), 0, new_image_width * new_image_height * get_bytes_per_pixel (frame.Format ()));
 
           cropped_frame.PutImage (0, new_image_height - resized_crop_height, 0, resized_crop_width, resized_crop_height, 1, frame.Format (), image_copy_buffer.data ());
 
@@ -908,8 +894,6 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
     else
       i++;
   }
-
-  printf ("Calculate crop rect time is %u, resize time is %u, total time = %u\n", calculate_crop_rect_time, resize_time, common::milliseconds () - start_time);
 }
 
 void save_timeline (const Params& params, const Document& document, const Timeline& timeline,
