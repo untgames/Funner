@@ -79,7 +79,7 @@ struct Params
 //прямоугольная область
 struct Rect
 {
-  int    x, y;
+  size_t x, y;
   size_t width, height;
 };
 
@@ -87,14 +87,6 @@ struct Vec2fKeyframe
 {
   float time;
   vec2f value;
-};
-
-struct rgba_t
-{
-  unsigned char red;
-  unsigned char green;
-  unsigned char blue;
-  unsigned char alpha;
 };
 
 struct MaterialInstance
@@ -641,83 +633,6 @@ void compose_vec2f_keyframes (const PropertyAnimation::KeyframeList& x_keyframes
   }
 }
 
-//обрезание
-void crop_by_alpha (size_t width, size_t height, const rgba_t* image, size_t crop_alpha, Rect& cropped_rect)
-{
-  int  min_x = 0, min_y = 0, max_x = 0, max_y = 0;
-  bool first_point_found = false;
-
-  for (int y = 0; y < (int)height; y++)
-  {
-    const rgba_t* data = image + y * width;
-
-    for (int x = 0; x < (int)width; x++, data++)
-    {
-      if (data->alpha < crop_alpha)
-        continue;
-
-      if (!first_point_found)
-      {
-        min_x             = max_x = x;
-        min_y             = max_y = y;
-        first_point_found = true;
-
-        continue;
-      }
-
-      if (x < min_x) min_x = x;
-      if (y < min_y) min_y = y;
-      if (x > max_x) max_x = x;
-      if (y > max_y) max_y = y;
-    }
-  }
-
-  if (!first_point_found)
-  {
-    cropped_rect.x      = 0;
-    cropped_rect.y      = 0;
-    cropped_rect.width  = 0;
-    cropped_rect.height = 0;
-
-    return;
-  }
-
-  if (!cropped_rect.width || !cropped_rect.height)
-  {
-    cropped_rect.x      = min_x;
-    cropped_rect.y      = min_y;
-    cropped_rect.width  = max_x - min_x + 1;
-    cropped_rect.height = max_y - min_y + 1;
-  }
-  else
-  {
-    if (min_x < cropped_rect.x) cropped_rect.x = min_x;
-    if (min_y < cropped_rect.y) cropped_rect.y = min_y;
-
-    if (max_x > (int)(cropped_rect.x + cropped_rect.width))
-      cropped_rect.width = max_x - cropped_rect.x + 1;
-
-    if (max_y > (int)(cropped_rect.y + cropped_rect.height))
-      cropped_rect.height = max_y - cropped_rect.y + 1;
-  }
-}
-
-void union_rect (const Rect& rect1, Rect& target_rect)
-{
-  if (target_rect.width && target_rect.height)
-  {
-    size_t left_side = stl::max (rect1.x + rect1.width, target_rect.x + target_rect.width),
-           top_side  = stl::max (rect1.y + rect1.height, target_rect.y + target_rect.height);
-
-    target_rect.x      = stl::min (rect1.x, target_rect.x);
-    target_rect.y      = stl::min (rect1.y, target_rect.y);
-    target_rect.width  = left_side - target_rect.x;
-    target_rect.height = top_side - target_rect.y;
-  }
-  else
-    target_rect = rect1;
-}
-
 void preprocess_symbols (const Params& params, Document& document, const UsedResourcesSet& used_symbols,
                          ResourceTilingMap& tiling_map, MaterialInstancesMap& material_instances,
                          ResourceDimensionsMap& resources_dimensions)
@@ -789,7 +704,7 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
 
     memset (&crop_rect, 0, sizeof (crop_rect));
 
-    if (!need_crop_alpha || image.Format () != PixelFormat_RGBA8)
+    if (!need_crop_alpha)
     {
       crop_rect.width  = image_width;
       crop_rect.height = image_height;
@@ -813,18 +728,8 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
         if (frame_width != image_width || frame_height != image_height)
           throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains animations with different frame size", symbol.Name ());
 
-        if (frame.Format () != PixelFormat_RGBA8)
-          continue;
-
         if (need_crop_alpha)
-        {
-          Rect frame_crop_rect;
-
-          memset (&frame_crop_rect, 0, sizeof (frame_crop_rect));
-
-          crop_by_alpha (frame_width, frame_height, (rgba_t*)frame.Bitmap (), params.crop_alpha, frame_crop_rect);
-          union_rect    (frame_crop_rect, crop_rect);
-        }
+          crop_by_alpha (frame, params.crop_alpha, crop_rect.x, crop_rect.y, crop_rect.width, crop_rect.height);
       }
 
     calculate_crop_rect_time += common::milliseconds () - crop_calculate_begin_time;
