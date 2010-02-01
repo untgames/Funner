@@ -14,6 +14,7 @@
 
 #include <common/file.h>
 #include <common/strlib.h>
+#include <common/time.h>
 #include <common/xml_writer.h>
 
 #include <media/adobe/xfl.h>
@@ -25,8 +26,9 @@ using namespace common;
 using namespace media;
 using namespace media::adobe::xfl;
 
-const char* APPLICATION_NAME = "animation_screen_builder";
-const char* XFL_MOUNT_POINT  = "/mount_points/animation.xfl";
+const char* APPLICATION_NAME   = "animation_screen_builder";
+const char* XFL_MOUNT_POINT    = "/mount_points/animation.xfl";
+const char* IMAGES_ROOT_FOLDER = "/mount_points/animation.xfl/LIBRARY/";
 
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 
@@ -722,6 +724,11 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
 {
   static const char* METHOD_NAME = "preprocess_symbols";
 
+  size_t calculate_crop_rect_time = 0,
+         resize_time              = 0;
+
+  size_t start_time = common::milliseconds ();
+
   if (!params.silent)
     printf ("preprocessing symbols...\n");
 
@@ -788,6 +795,8 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
       crop_rect.height = image_height;
     }
 
+    size_t crop_calculate_begin_time = common::milliseconds ();
+
     for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
       for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, bitmaps_count++)
       {
@@ -818,17 +827,17 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
         }
       }
 
+    calculate_crop_rect_time += common::milliseconds () - crop_calculate_begin_time;
+
     if (!bitmaps_count)
       throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced symbol elements has no resource instance", symbol.Name ());
 
     if (!crop_rect.width || !crop_rect.height)
     {
-      if (!params.silent)
-        printf ("Can't process symbol '%s', referenced frame animation has empty image\n", symbol.Name ());
-
-      document.Symbols ().Remove (symbol_index--);
-
-      continue;
+      crop_rect.x      = 0;
+      crop_rect.y      = 0;
+      crop_rect.width  = 1;
+      crop_rect.height = 1;
     }
 
     stl::string resource_dir = common::dir (resource.Name ()),
@@ -839,12 +848,12 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
     else
       save_folder_name = common::format ("%s/%s", params.output_textures_dir_name.c_str (), resource_dir.c_str ());
 
-    size_t resized_image_width  = static_cast<size_t> (image_width      * resize_x_factor),
-           resized_image_height = static_cast<size_t> (image_height     * resize_y_factor),
-           resized_crop_width   = static_cast<size_t> (crop_rect.width  * resize_x_factor),
-           resized_crop_height  = static_cast<size_t> (crop_rect.height * resize_y_factor),
-           resized_crop_x       = static_cast<size_t> (crop_rect.x      * resize_x_factor),
-           resized_crop_y       = static_cast<size_t> (crop_rect.y      * resize_y_factor);
+    size_t resized_image_width  = stl::max ((size_t)(image_width      * resize_x_factor), (size_t)1),
+           resized_image_height = stl::max ((size_t)(image_height     * resize_y_factor), (size_t)1),
+           resized_crop_width   = stl::max ((size_t)(crop_rect.width  * resize_x_factor), (size_t)1),
+           resized_crop_height  = stl::max ((size_t)(crop_rect.height * resize_y_factor), (size_t)1),
+           resized_crop_x       = stl::max ((size_t)(crop_rect.x      * resize_x_factor), (size_t)1),
+           resized_crop_y       = stl::max ((size_t)(crop_rect.y      * resize_y_factor), (size_t)1);
 
     if (!params.resize_width)
     {
@@ -900,12 +909,16 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
           check_frame = symbol_frame_first_frame + 1;
         }
 
-        Resource& frame_resource = resources [symbol_element_iter->Name ()];
+        stl::string frame_resource_path = resources [symbol_element_iter->Name ()].Path ();
 
-        Image frame (frame_resource.Path ());
+        Image frame (frame_resource_path.c_str ());
+
+        size_t before_resize_time = common::milliseconds ();
 
         if (params.resize_width)
           frame.Resize (resized_image_width, resized_image_height, 1);
+
+        resize_time += common::milliseconds () - before_resize_time;
 
         frame.GetImage (resized_crop_x, resized_crop_y, 0, resized_crop_width, resized_crop_height, 1, frame.Format (), image_copy_buffer.data ());
 
@@ -970,7 +983,7 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
         vec2f current_transformation_point = symbol_element_iter->TransformationPoint (),
               current_translation          = symbol_element_iter->Translation ();
 
-        if (params.animations_needs_pivot && bitmaps_count > 1)
+        if (params.animations_needs_pivot && common::dir (frame_resource_path) != IMAGES_ROOT_FOLDER)
         {
           symbol_element_iter->SetTransformationPoint (vec2f (image_width / 2.f + current_transformation_point.x - crop_rect.x, image_height / 2.f + current_transformation_point.y - crop_rect.y));
           symbol_element_iter->SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
@@ -990,6 +1003,8 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
     else
       i++;
   }
+
+  printf ("Calculate crop rect time is %u, resize time is %u, total time = %u\n", calculate_crop_rect_time, resize_time, common::milliseconds () - start_time);
 }
 
 void save_timeline (const Params& params, const Document& document, const Timeline& timeline,
