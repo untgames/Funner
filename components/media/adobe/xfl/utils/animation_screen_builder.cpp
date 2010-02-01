@@ -27,7 +27,6 @@ using namespace media::adobe::xfl;
 
 const char* APPLICATION_NAME   = "animation_screen_builder";
 const char* XFL_MOUNT_POINT    = "/mount_points/animation.xfl";
-const char* IMAGES_ROOT_FOLDER = "/mount_points/animation.xfl/LIBRARY/";
 
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 
@@ -72,7 +71,6 @@ struct Params
   bool          print_help;               //нужно ли печатать сообщение помощи
   bool          need_pot_extent;          //нужно ли расширять изображения до ближайшей степени двойки
   bool          need_crop_alpha;          //нужно ли обрезать картинку по нулевой прозрачности
-  bool          animations_needs_pivot;   //нужно ли выставлять точку трансформации покадровым анимациям
 };
 
 //прямоугольная область
@@ -99,6 +97,7 @@ struct MaterialInstance
 };
 
 typedef stl::hash_set<stl::hash_key<const char*> >                  UsedResourcesSet;
+typedef stl::hash_set<stl::hash_key<const char*> >                  FullscreenSymbolsSet;
 typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>           ResourceTilingMap;
 typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>           ResourceDimensionsMap;
 typedef stl::hash_map<size_t, stl::string>                          ImagesHashesMap;
@@ -280,12 +279,6 @@ void command_line_crop_alpha (const char* value_string, Params& params)
   params.need_crop_alpha = true;
 }
 
-//установка параметра генерации координат точки трансформации покадровых анимаций
-void command_line_animation_needs_pivot (const char*, Params& params)
-{
-  params.animations_needs_pivot = true;
-}
-
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
@@ -308,7 +301,6 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_help,                       "help",                  '?', 0,           "print help message"},
     {command_line_pot,                        "pot",                   0,   0,           "extent textures size to nearest greater power of two"},
     {command_line_crop_alpha,                 "crop-alpha",            0,   "value",     "crop layers by alpha that less than value"},
-    {command_line_animation_needs_pivot,      "animation-needs-pivot", 0,   0,           "use pivot for fullscreen animations"},
   };
 
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -634,7 +626,7 @@ void compose_vec2f_keyframes (const PropertyAnimation::KeyframeList& x_keyframes
 
 void preprocess_symbols (const Params& params, Document& document, const UsedResourcesSet& used_symbols,
                          ResourceTilingMap& tiling_map, MaterialInstancesMap& material_instances,
-                         ResourceDimensionsMap& resources_dimensions)
+                         ResourceDimensionsMap& resources_dimensions, FullscreenSymbolsSet& fullscreen_symbols)
 {
   static const char* METHOD_NAME = "preprocess_symbols";
 
@@ -693,6 +685,9 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
 
     size_t image_width  = image.Width (),
            image_height = image.Height ();
+
+    if (image_width == document.Width () && image_height == document.Height ())
+      fullscreen_symbols.insert (symbol.Name ());
 
     Rect crop_rect;
 
@@ -874,16 +869,8 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
         vec2f current_transformation_point = symbol_element_iter->TransformationPoint (),
               current_translation          = symbol_element_iter->Translation ();
 
-        if (params.animations_needs_pivot && common::dir (frame_resource_path) != IMAGES_ROOT_FOLDER)
-        {
-          symbol_element_iter->SetTransformationPoint (vec2f (image_width / 2.f + current_transformation_point.x - crop_rect.x, image_height / 2.f + current_transformation_point.y - crop_rect.y));
-          symbol_element_iter->SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
-        }
-        else
-        {
-          symbol_element_iter->SetTransformationPoint (vec2f (current_transformation_point.x - crop_rect.x, current_transformation_point.y - crop_rect.y));
-          symbol_element_iter->SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
-        }
+        symbol_element_iter->SetTransformationPoint (vec2f (current_transformation_point.x - crop_rect.x, current_transformation_point.y - crop_rect.y));
+        symbol_element_iter->SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
       }
   }
 
@@ -897,7 +884,8 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
 }
 
 void save_timeline (const Params& params, const Document& document, const Timeline& timeline,
-                    const ResourceDimensionsMap& resources_dimensions)
+                    const ResourceDimensionsMap& resources_dimensions,
+                    const FullscreenSymbolsSet& fullscreen_symbols)
 {
   if (!params.silent)
     printf ("saving timeline...\n");
@@ -918,12 +906,14 @@ void save_timeline (const Params& params, const Document& document, const Timeli
 
   XmlWriter::Scope screen_scope (writer, "AnimationScreenPart");
 
-  int   target_width_abs  = abs (static_cast<int> (params.target_width)),
-        target_height_abs = abs (static_cast<int> (params.target_height));
-  float x_scale           = static_cast<float> (params.target_width) / document.Width (),
-        y_scale           = static_cast<float> (params.target_height) / document.Height (),
-        resize_x_factor   = params.resize_width ? params.resize_width / static_cast<float> (document.Width ()) : 1.f,
-        resize_y_factor   = params.resize_height ? params.resize_height / static_cast<float> (document.Height ()) : 1.f;
+  size_t document_width    = document.Width (),
+         document_height   = document.Height ();
+  int    target_width_abs  = abs (static_cast<int> (params.target_width)),
+         target_height_abs = abs (static_cast<int> (params.target_height));
+  float  x_scale           = static_cast<float> (params.target_width) / document_width,
+         y_scale           = static_cast<float> (params.target_height) / document_height,
+         resize_x_factor   = params.resize_width ? params.resize_width / static_cast<float> (document_width) : 1.f,
+         resize_y_factor   = params.resize_height ? params.resize_height / static_cast<float> (document_height) : 1.f;
 
   ActivateSpritesMap activate_sprites_info;
 
@@ -1018,6 +1008,12 @@ void save_timeline (const Params& params, const Document& document, const Timeli
 
         vec2f transformation_point (element_iter->TransformationPoint ().x + resource_element.TransformationPoint ().x,
                                     element_iter->TransformationPoint ().y + resource_element.TransformationPoint ().y);
+
+        if (fullscreen_symbols.find (symbol->Name ()) != fullscreen_symbols.end () && !element_iter->TransformationPoint ().x && !element_iter->TransformationPoint ().y)
+        {
+          transformation_point.x += document_width / 2.f;
+          transformation_point.y += document_height / 2.f;
+        }
 
         stl::string pivot_value_string = common::format ("%f;%f;0", transformation_point.x / image_width * resize_x_factor - 0.5f,
                                                                     transformation_point.y / image_height * resize_y_factor - 0.5f);
@@ -1222,15 +1218,16 @@ void export_data (Params& params)
   ResourceTilingMap     tiling_map;
   MaterialInstancesMap  material_instances;
   UsedResourcesSet      used_symbols;
+  FullscreenSymbolsSet  fullscreen_symbols;
   ResourceDimensionsMap resource_dimensions;
 
   for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
     build_used_symbols (params, *iter, used_symbols);
 
-  preprocess_symbols (params, document, used_symbols, tiling_map, material_instances, resource_dimensions);
+  preprocess_symbols (params, document, used_symbols, tiling_map, material_instances, resource_dimensions, fullscreen_symbols);
 
   for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
-    save_timeline (params, document, *iter, resource_dimensions);
+    save_timeline (params, document, *iter, resource_dimensions, fullscreen_symbols);
 
   save_materials (params, document, tiling_map, material_instances);
 }
@@ -1288,7 +1285,6 @@ int main (int argc, const char *argv[])
     params.print_help             = false;
     params.need_pot_extent        = false;
     params.need_crop_alpha        = false;
-    params.animations_needs_pivot = false;
 
       //разбор командной строки
     command_line_parse (argc, argv, params);
