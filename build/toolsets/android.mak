@@ -17,6 +17,7 @@ EXE_SUFFIX       :=
 DLL_SUFFIX       := so #no suffix, this is for dll correct dll dispatch at link
 DLL_PREFIX       :=
 NDK_HOST         := windows
+ANDROID_PLATFORM := android-3
 NDK_ROOT         := /$(subst :,,$(call convert_path,$(ANDROID_NDK)))
 ARM_EABI_DIR     := $(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1
 CYGWIN_BIN       := /$(subst :,,$(call convert_path,$(CYGHOME)))/bin
@@ -26,20 +27,22 @@ LINKER_GCC       := $(GCC_TOOLS_DIR)/arm-eabi-gcc.exe
 LIB_GCC          := $(GCC_TOOLS_DIR)/arm-eabi-ar
 ADDITIONAL_PATHS += $(CYGWIN_BIN)
 BUILD_PATHS      := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-eabi/4.2.1
-COMMON_CFLAGS    += -fexceptions -frtti -mandroid -ffunction-sections -fdata-sections -Os -g --sysroot=$(NDK_ROOT)/build/platforms/android-1.5/arch-arm \
+COMMON_CFLAGS    += -fexceptions -frtti -mandroid -ffunction-sections -fdata-sections -Os -g \
+                    --sysroot=$(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm \
                     -fPIC -fvisibility=hidden -D__NEW__ -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ \
                     -D__ARM_ARCH_5TE__ -DANDROID -DSK_RELEASE -DNDEBUG \
                     -UDEBUG -march=armv5te -mtune=xscale -msoft-float -mthumb-interwork -fpic -ffunction-sections \
-                    -funwind-tables -fstack-protector -fmessage-length=0 -Bdynamic
+                    -funwind-tables -fstack-protector -fmessage-length=0 -Bdynamic -fno-strict-aliasing
 COMMON_LINK_FLAGS += --sysroot=$(NDK_ROOT)/build/platforms/android-4/arch-arm
 COMMON_LINK_FLAGS += -Bdynamic -Wl,-dynamic-linker,/system/bin/linker -Wl,--gc-sections -Wl,-z,nocopyreloc
 COMMON_LINK_FLAGS += -L$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/lib/gcc/arm-eabi/4.2.1/android
 COMMON_LINK_FLAGS += -L$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/lib/gcc/arm-eabi/4.2.1
 COMMON_LINK_FLAGS += -L$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/lib/gcc
 COMMON_LINK_FLAGS += -L$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/arm-eabi/lib
-COMMON_LINK_FLAGS += -L$(NDK_ROOT)/build/platforms/android-1.5/arch-arm/usr/lib
+COMMON_LINK_FLAGS += -L$(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib
 COMMON_LINK_FLAGS += -nostdlib -lc -llog -lgcc -lm -lstdc++ \
-                     --no-undefined -z $(NDK_ROOT)/build/platforms/android-1.5/arch-arm/usr/lib/crtbegin_dynamic.o $(NDK_ROOT)/build/platforms/android-1.5/arch-arm/usr/lib/crtend_android.o
+                     --no-undefined -z $(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib/crtbegin_dynamic.o \
+                     $(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib/crtend_android.o
 
 include $(TOOLSETS_DIR)/g++.mak
 
