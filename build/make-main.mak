@@ -414,7 +414,7 @@ define process_target.application
   
   $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
-		$$(call $(LINK_TOOL),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+		@$$(call $(LINK_TOOL),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
