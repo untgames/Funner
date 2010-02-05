@@ -25,8 +25,10 @@ using namespace common;
 using namespace media;
 using namespace media::adobe::xfl;
 
-const char* APPLICATION_NAME   = "animation_screen_builder";
-const char* XFL_MOUNT_POINT    = "/mount_points/animation.xfl";
+const char* APPLICATION_NAME            = "animation_screen_builder";
+const char* MOTION_X_ANIMATION_PROPERTY = "headContainer.Basic_Motion.Motion_X";
+const char* MOTION_Y_ANIMATION_PROPERTY = "headContainer.Basic_Motion.Motion_Y";
+const char* XFL_MOUNT_POINT             = "/mount_points/animation.xfl";
 
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 
@@ -100,6 +102,7 @@ typedef stl::hash_set<stl::hash_key<const char*> >                  UsedResource
 typedef stl::hash_set<stl::hash_key<const char*> >                  FullscreenSymbolsSet;
 typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>           ResourceTilingMap;
 typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>           ResourceDimensionsMap;
+typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>           ResourceCropMap;
 typedef stl::hash_map<size_t, stl::string>                          ImagesHashesMap;
 typedef stl::multimap<float, stl::string, stl::less<float> >        ActivateSpritesMap;
 typedef stl::hash_map<stl::hash_key<const char*>, MaterialInstance> MaterialInstancesMap;
@@ -583,7 +586,7 @@ void compose_vec2f_keyframes (const PropertyAnimation::KeyframeList& x_keyframes
         {
           const PropertyAnimationKeyframe& previous_x_keyframe = x_keyframes [current_x_keyframe_index - 1];
 
-          new_keyframe.value.x = (current_x_keyframe->value - previous_x_keyframe.value) / (current_x_keyframe->time - previous_x_keyframe.time) * (current_y_keyframe->time - previous_x_keyframe.time);
+          new_keyframe.value.x = previous_x_keyframe.value + (current_x_keyframe->value - previous_x_keyframe.value) / (current_x_keyframe->time - previous_x_keyframe.time) * (current_y_keyframe->time - previous_x_keyframe.time);
         }
 
         keyframes.Add (new_keyframe);
@@ -610,7 +613,7 @@ void compose_vec2f_keyframes (const PropertyAnimation::KeyframeList& x_keyframes
         {
           const PropertyAnimationKeyframe& previous_y_keyframe = y_keyframes [current_y_keyframe_index - 1];
 
-          new_keyframe.value.y = (current_y_keyframe->value - previous_y_keyframe.value) / (current_y_keyframe->time - previous_y_keyframe.time) * (current_x_keyframe->time - previous_y_keyframe.time);
+          new_keyframe.value.y = previous_y_keyframe.value + (current_y_keyframe->value - previous_y_keyframe.value) / (current_y_keyframe->time - previous_y_keyframe.time) * (current_x_keyframe->time - previous_y_keyframe.time);
         }
 
         keyframes.Add (new_keyframe);
@@ -626,7 +629,8 @@ void compose_vec2f_keyframes (const PropertyAnimation::KeyframeList& x_keyframes
 
 void preprocess_symbols (const Params& params, Document& document, const UsedResourcesSet& used_symbols,
                          ResourceTilingMap& tiling_map, MaterialInstancesMap& material_instances,
-                         ResourceDimensionsMap& resources_dimensions, FullscreenSymbolsSet& fullscreen_symbols)
+                         ResourceDimensionsMap& resources_dimensions, FullscreenSymbolsSet& fullscreen_symbols,
+                         ResourceCropMap& resource_crops)
 {
   static const char* METHOD_NAME = "preprocess_symbols";
 
@@ -675,11 +679,19 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
     }
 
     Layer&              symbol_layer       = ((ICollection<Layer>&)symbol_timeline.Layers ()) [0];
-    const Frame&        first_symbol_frame = ((ICollection<Frame>&)symbol_layer.Frames ()) [0];
+    Frame&              first_symbol_frame = ((ICollection<Frame>&)symbol_layer.Frames ()) [0];
     const FrameElement& resource_element   = ((ICollection<FrameElement>&)first_symbol_frame.Elements ()) [0];
     const Resource&     resource           = resources [resource_element.Name ()];
 
     size_t bitmaps_count = 0;
+
+    for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
+      for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, bitmaps_count++)
+        if (symbol_element_iter->Type () != FrameElementType_ResourceInstance)
+          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains elements other than resource instance", symbol.Name ());
+
+    if (!bitmaps_count)
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced symbol elements has no resource instance", symbol.Name ());
 
     Image image (resource.Path ());
 
@@ -689,47 +701,6 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
     if (image_width == document.Width () && image_height == document.Height ())
       fullscreen_symbols.insert (symbol.Name ());
 
-    Rect crop_rect;
-
-    memset (&crop_rect, 0, sizeof (crop_rect));
-
-    if (!need_crop_alpha)
-    {
-      crop_rect.width  = image_width;
-      crop_rect.height = image_height;
-    }
-
-    for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
-      for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, bitmaps_count++)
-      {
-        if (symbol_element_iter->Type () != FrameElementType_ResourceInstance)
-          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains elements other than resource instance", symbol.Name ());
-
-        const Resource& frame_resource = resources [symbol_element_iter->Name ()];
-
-        Image frame (frame_resource.Path ());
-
-        size_t frame_width  = frame.Width (),
-               frame_height = frame.Height ();
-
-        if (frame_width != image_width || frame_height != image_height)
-          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains animations with different frame size", symbol.Name ());
-
-        if (need_crop_alpha)
-          crop_by_alpha (frame, params.crop_alpha, crop_rect.x, crop_rect.y, crop_rect.width, crop_rect.height);
-      }
-
-    if (!bitmaps_count)
-      throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced symbol elements has no resource instance", symbol.Name ());
-
-    if (!crop_rect.width || !crop_rect.height)
-    {
-      crop_rect.x      = 0;
-      crop_rect.y      = 0;
-      crop_rect.width  = 1;
-      crop_rect.height = 1;
-    }
-
     stl::string resource_dir = common::dir (resource.Name ()),
                 save_folder_name;
 
@@ -738,29 +709,32 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
     else
       save_folder_name = common::format ("%s/%s", params.output_textures_dir_name.c_str (), resource_dir.c_str ());
 
-    size_t resized_crop_width  = stl::max ((size_t)ceil(crop_rect.width  * resize_x_factor), (size_t)1),
-           resized_crop_height = stl::max ((size_t)ceil(crop_rect.height * resize_y_factor), (size_t)1);
-
-    if (!params.resize_width)
-    {
-       resized_crop_width   = crop_rect.width;
-       resized_crop_height  = crop_rect.height;
-    }
-
-    xtl::uninitialized_storage<char> image_copy_buffer (get_bytes_per_pixel (image.Format ()) * crop_rect.width * crop_rect.height);
-
     size_t check_frame = 1;
 
     Layer::FrameList &layer_frames = symbol_layer.Frames ();
 
     stl::string correct_element_name;
 
+    PropertyAnimation motion_x_animation, motion_y_animation;
+
+    motion_x_animation.SetName (MOTION_X_ANIMATION_PROPERTY);
+    motion_y_animation.SetName (MOTION_Y_ANIMATION_PROPERTY);
+
+    PropertyAnimation::KeyframeList &motion_x_animation_keyframes = motion_x_animation.Keyframes (),
+                                    &motion_y_animation_keyframes = motion_y_animation.Keyframes ();
+
+    float last_x_motion = 0, last_y_motion = 0, first_frame_crop_x = 0, first_frame_crop_y = 0;
+
     for (Layer::FrameList::Iterator symbol_frame_iter = layer_frames.CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
+    {
+      size_t symbol_frame_first_frame = symbol_frame_iter->FirstFrame ();
+
       for (Frame::FrameElementList::Iterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, check_frame++)
       {
-        size_t symbol_frame_first_frame = symbol_frame_iter->FirstFrame ();
+        if (symbol_element_iter->Type () != FrameElementType_ResourceInstance)
+          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains elements other than resource instance", symbol.Name ());
 
-        if (symbol_frame_first_frame != check_frame - 1)
+        if (symbol_frame_first_frame != check_frame - 1) //генерация промежуточных кадров если анимация содержит разрывы
         {
           if (check_frame == 1)
             throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced frame animation starts not from 0 frame (%u)", symbol.Name (), symbol_frame_first_frame);
@@ -786,14 +760,66 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
             new_resource.SetPath (source_material_name.c_str ());
 
             resources.Add (new_resource);
+
+            PropertyAnimationKeyframe motion_x_keyframe, motion_y_keyframe;
+
+            motion_x_keyframe.value = last_x_motion;
+            motion_y_keyframe.value = last_y_motion;
+            motion_x_keyframe.time  = motion_y_keyframe.time = (instance_index - 1) / document.FrameRate ();
+
+            motion_x_animation_keyframes.Add (motion_x_keyframe);
+            motion_y_animation_keyframes.Add (motion_y_keyframe);
           }
 
           check_frame = symbol_frame_first_frame + 1;
         }
 
-        stl::string frame_resource_path = resources [symbol_element_iter->Name ()].Path ();
+        const Resource& frame_resource = resources [symbol_element_iter->Name ()];
 
-        Image frame (frame_resource_path.c_str ());
+        Image frame (frame_resource.Path ());
+
+        size_t frame_width  = frame.Width (),
+               frame_height = frame.Height ();
+
+        if (frame_width != image_width || frame_height != image_height)
+          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains animations with different frame size", symbol.Name ());
+
+        Rect crop_rect;
+
+        memset (&crop_rect, 0, sizeof (crop_rect));
+
+        if (need_crop_alpha)
+        {
+          crop_by_alpha (frame, params.crop_alpha, crop_rect.x, crop_rect.y, crop_rect.width, crop_rect.height);
+
+          if (!crop_rect.width || !crop_rect.height)
+          {
+            crop_rect.x      = 0;
+            crop_rect.y      = 0;
+            crop_rect.width  = 1;
+            crop_rect.height = 1;
+          }
+        }
+        else
+        {
+          crop_rect.width  = image_width;
+          crop_rect.height = image_height;
+        }
+
+        size_t resized_crop_width, resized_crop_height;
+
+        if (params.resize_width)
+        {
+          resized_crop_width  = stl::max ((size_t)ceil(crop_rect.width  * resize_x_factor), (size_t)1);
+          resized_crop_height = stl::max ((size_t)ceil(crop_rect.height * resize_y_factor), (size_t)1);
+        }
+        else
+        {
+          resized_crop_width  = crop_rect.width;
+          resized_crop_height = crop_rect.height;
+        }
+
+        xtl::uninitialized_storage<char> image_copy_buffer (get_bytes_per_pixel (image.Format ()) * crop_rect.width * crop_rect.height);
 
         frame.GetImage (crop_rect.x, crop_rect.y, 0, crop_rect.width, crop_rect.height, 1, frame.Format (), image_copy_buffer.data ());
 
@@ -869,9 +895,44 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
         vec2f current_transformation_point = symbol_element_iter->TransformationPoint (),
               current_translation          = symbol_element_iter->Translation ();
 
-        symbol_element_iter->SetTransformationPoint (vec2f (current_transformation_point.x - crop_rect.x, current_transformation_point.y - crop_rect.y));
-        symbol_element_iter->SetTranslation         (vec2f (current_translation.x + crop_rect.x, current_translation.y + crop_rect.y));
+        if (check_frame == 1)
+        {
+          first_frame_crop_x = crop_rect.x;
+          first_frame_crop_y = crop_rect.y;
+        }
+
+        last_x_motion = current_translation.x + crop_rect.x - first_frame_crop_x;
+        last_y_motion = current_translation.y + crop_rect.y - first_frame_crop_y;
+
+        if ((bitmaps_count > 1) && (!float_compare (current_transformation_point.x, 0) || !float_compare (current_transformation_point.y, 0)))
+          throw xtl::format_not_supported_exception (METHOD_NAME, "Can't process symbol '%s', animated sprites transformation point not supported", symbol.Name ());
+
+        PropertyAnimationKeyframe motion_x_keyframe, motion_y_keyframe;
+
+        motion_x_keyframe.value = last_x_motion;
+        motion_y_keyframe.value = last_y_motion;
+        motion_x_keyframe.time  = motion_y_keyframe.time = (check_frame - 1) / document.FrameRate ();
+
+        motion_x_animation_keyframes.Add (motion_x_keyframe);
+        motion_y_animation_keyframes.Add (motion_y_keyframe);
+
+        resource_crops.insert_pair (correct_element_name.c_str (), vec2ui (crop_rect.x, crop_rect.y));
       }
+    }
+
+    AnimationCore frame_animation (first_symbol_frame.Animation ());
+
+    frame_animation.SetDuration (first_symbol_frame.Duration ());
+
+    AnimationCore::PropertyAnimationList& animated_properties = frame_animation.Properties ();
+
+    if (animated_properties.Find (MOTION_X_ANIMATION_PROPERTY) || animated_properties.Find (MOTION_Y_ANIMATION_PROPERTY))
+      throw xtl::format_not_supported_exception (METHOD_NAME, "Can't process symbol '%s', symbol frame animation not supported", symbol.Name ());
+
+    animated_properties.Add (motion_x_animation);
+    animated_properties.Add (motion_y_animation);
+
+    first_symbol_frame.SetAnimation (frame_animation);
   }
 
   for (size_t i = 0; i < resources.Size ();)
@@ -885,7 +946,8 @@ void preprocess_symbols (const Params& params, Document& document, const UsedRes
 
 void save_timeline (const Params& params, const Document& document, const Timeline& timeline,
                     const ResourceDimensionsMap& resources_dimensions,
-                    const FullscreenSymbolsSet& fullscreen_symbols)
+                    const FullscreenSymbolsSet& fullscreen_symbols,
+                    const ResourceCropMap& resource_crops)
 {
   if (!params.silent)
     printf ("saving timeline...\n");
@@ -965,11 +1027,19 @@ void save_timeline (const Params& params, const Document& document, const Timeli
         const Resource&     resource           = document.Resources () [resource_element.Name ()];
 
         ResourceDimensionsMap::const_iterator dimensions_iter = resources_dimensions.find (resource.Path ());
+        ResourceCropMap::const_iterator       crop_iter       = resource_crops.find (resource.Path ());
 
         if (dimensions_iter == resources_dimensions.end ())
         {
           if (!params.silent)
             printf ("Can't find dimensions for resource '%s'\n", resource.Path ());
+          continue;
+        }
+
+        if (crop_iter == resource_crops.end ())
+        {
+          if (!params.silent)
+            printf ("Can't find crop info for resource '%s'\n", resource.Path ());
           continue;
         }
 
@@ -992,8 +1062,21 @@ void save_timeline (const Params& params, const Document& document, const Timeli
 
         size_t bitmaps_count = symbol_layer.Frames () [symbol_layer.Frames ().Size () - 1].FirstFrame () + 1;
 
+        vec2f transformation_point (element_iter->TransformationPoint ().x + resource_element.TransformationPoint ().x,
+                                    element_iter->TransformationPoint ().y + resource_element.TransformationPoint ().y);
+
+        int additional_x_offset = 0, additional_y_offset = 0;
+
         if (bitmaps_count == 1)
+        {
           writer.WriteAttribute ("Material", resource.Name ());
+
+          if (fullscreen_symbols.find (symbol->Name ()) != fullscreen_symbols.end () && !element_iter->TransformationPoint ().x && !element_iter->TransformationPoint ().y)
+          {
+            additional_x_offset -= document.Width () / 2.f;
+            additional_y_offset -= document.Height () / 2.f;
+          }
+        }
         else
         {
           stl::string resource_dir              = common::dir (resource.Name ()),
@@ -1006,17 +1089,15 @@ void save_timeline (const Params& params, const Document& document, const Timeli
           writer.WriteAttribute ("RepeatMode",        "clamp_to_end");
         }
 
-        vec2f transformation_point (element_iter->TransformationPoint ().x + resource_element.TransformationPoint ().x,
-                                    element_iter->TransformationPoint ().y + resource_element.TransformationPoint ().y);
+        stl::string pivot_value_string;
 
-        if (fullscreen_symbols.find (symbol->Name ()) != fullscreen_symbols.end () && !element_iter->TransformationPoint ().x && !element_iter->TransformationPoint ().y)
+        if ((bitmaps_count > 1) || (fullscreen_symbols.find (symbol->Name ()) != fullscreen_symbols.end () && !element_iter->TransformationPoint ().x && !element_iter->TransformationPoint ().y))
+          pivot_value_string = "-0.5;-0.5;0";
+        else
         {
-          transformation_point.x += document_width / 2.f;
-          transformation_point.y += document_height / 2.f;
+          pivot_value_string = common::format ("%f;%f;0", (transformation_point.x - crop_iter->second.x) / image_width * resize_x_factor - 0.5f,
+                                                          (transformation_point.y - crop_iter->second.y) / image_height * resize_y_factor - 0.5f);
         }
-
-        stl::string pivot_value_string = common::format ("%f;%f;0", transformation_point.x / image_width * resize_x_factor - 0.5f,
-                                                                    transformation_point.y / image_height * resize_y_factor - 0.5f);
 
         writer.WriteAttribute ("PivotPosition", pivot_value_string.c_str());
 
@@ -1049,13 +1130,19 @@ void save_timeline (const Params& params, const Document& document, const Timeli
 
           writer.WriteAttribute ("Name", "position");
 
-          const PropertyAnimation               &motion_x_track = frame_iter->Animation ().Properties () ["headContainer.Basic_Motion.Motion_X"],
-                                                &motion_y_track = frame_iter->Animation ().Properties () ["headContainer.Basic_Motion.Motion_Y"];
+          const PropertyAnimation               &motion_x_track = frame_iter->Animation ().Properties () [MOTION_X_ANIMATION_PROPERTY],
+                                                &motion_y_track = frame_iter->Animation ().Properties () [MOTION_Y_ANIMATION_PROPERTY];
           const PropertyAnimation::KeyframeList &x_keyframes    = motion_x_track.Keyframes (),
                                                 &y_keyframes    = motion_y_track.Keyframes ();
 
-          vec2f base_point (params.left_x + (transformation_point.x + element_iter->Translation ().x + resource_element.Translation ().x) / document.Width () * params.target_width,
-                            params.top_y - (transformation_point.y + element_iter->Translation ().y + resource_element.Translation ().y) / document.Height () * params.target_height);
+          vec2f base_point;
+
+          if (bitmaps_count > 1)
+            base_point = vec2f (params.left_x + (crop_iter->second.x + element_iter->Translation ().x + resource_element.Translation ().x) / document.Width () * params.target_width,
+                                params.top_y - (document.Height () - crop_iter->second.y + element_iter->Translation ().y + resource_element.Translation ().y) / document.Height () * params.target_height);
+          else
+            base_point = vec2f (params.left_x + (transformation_point.x + element_iter->Translation ().x + resource_element.Translation ().x) / document.Width () * params.target_width,
+                                params.top_y - (transformation_point.y + element_iter->Translation ().y + resource_element.Translation ().y) / document.Height () * params.target_height);
 
           if (!motion_x_track.Enabled () || !motion_y_track.Enabled ())
             write_track_key (writer, 0, base_point);
@@ -1067,6 +1154,28 @@ void save_timeline (const Params& params, const Document& document, const Timeli
 
             for (Vec2fKeyframes::ConstIterator iter = keyframes.CreateIterator (); iter; ++iter)
               write_track_key (writer, iter->time, base_point + vec2f (iter->value.x * x_scale, -iter->value.y * y_scale));
+          }
+        }
+
+        {
+          const PropertyAnimation *motion_x_track = first_symbol_frame.Animation ().Properties ().Find (MOTION_X_ANIMATION_PROPERTY),
+                                  *motion_y_track = first_symbol_frame.Animation ().Properties ().Find (MOTION_Y_ANIMATION_PROPERTY);
+
+          if (motion_x_track && motion_y_track && motion_x_track->Enabled () && motion_y_track->Enabled ())
+          {
+            XmlWriter::Scope track_scope (writer, "Track");
+
+            writer.WriteAttribute ("Name", "offset");
+
+            const PropertyAnimation::KeyframeList &x_keyframes = motion_x_track->Keyframes (),
+                                                  &y_keyframes = motion_y_track->Keyframes ();
+
+            Vec2fKeyframes keyframes;
+
+            compose_vec2f_keyframes (x_keyframes, y_keyframes, keyframes);
+
+            for (Vec2fKeyframes::ConstIterator iter = keyframes.CreateIterator (); iter; ++iter)
+              write_track_key (writer, iter->time, vec2f ((iter->value.x + additional_x_offset) * x_scale, (iter->value.y + additional_y_offset) * y_scale));
           }
         }
 
@@ -1220,14 +1329,15 @@ void export_data (Params& params)
   UsedResourcesSet      used_symbols;
   FullscreenSymbolsSet  fullscreen_symbols;
   ResourceDimensionsMap resource_dimensions;
+  ResourceCropMap       resource_crops;
 
   for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
     build_used_symbols (params, *iter, used_symbols);
 
-  preprocess_symbols (params, document, used_symbols, tiling_map, material_instances, resource_dimensions, fullscreen_symbols);
+  preprocess_symbols (params, document, used_symbols, tiling_map, material_instances, resource_dimensions, fullscreen_symbols, resource_crops);
 
   for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
-    save_timeline (params, document, *iter, resource_dimensions, fullscreen_symbols);
+    save_timeline (params, document, *iter, resource_dimensions, fullscreen_symbols, resource_crops);
 
   save_materials (params, document, tiling_map, material_instances);
 }
