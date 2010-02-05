@@ -27,7 +27,8 @@ LINKER_GCC       := $(GCC_TOOLS_DIR)/arm-eabi-gcc.exe
 LIB_GCC          := $(GCC_TOOLS_DIR)/arm-eabi-ar
 ADDITIONAL_PATHS += $(CYGWIN_BIN)
 BUILD_PATHS      := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-eabi/4.2.1
-COMMON_CFLAGS    += -fexceptions -frtti -mandroid -ffunction-sections -fdata-sections -Os -g \
+COMMON_CPPFLAGS  += -fexceptions -frtti
+COMMON_CFLAGS    += -mandroid -ffunction-sections -fdata-sections -Os -g \
                     --sysroot=$(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm \
                     -fPIC -fvisibility=hidden -D__NEW__ -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ \
                     -D__ARM_ARCH_5TE__ -DANDROID -DSK_RELEASE -DNDEBUG \
@@ -35,14 +36,17 @@ COMMON_CFLAGS    += -fexceptions -frtti -mandroid -ffunction-sections -fdata-sec
                     -funwind-tables -fstack-protector -fmessage-length=0 -Bdynamic -fno-strict-aliasing
 COMMON_LINK_FLAGS += --sysroot=$(NDK_ROOT)/build/platforms/android-4/arch-arm
 COMMON_LINK_FLAGS += -Bdynamic -Wl,-dynamic-linker,/system/bin/linker -Wl,--gc-sections -Wl,-z,nocopyreloc
-COMMON_LINK_FLAGS += -L$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/lib/gcc/arm-eabi/4.2.1/android
-COMMON_LINK_FLAGS += -L$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/lib/gcc/arm-eabi/4.2.1
-COMMON_LINK_FLAGS += -L$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/lib/gcc
-COMMON_LINK_FLAGS += -L$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/arm-eabi/lib
-COMMON_LINK_FLAGS += -L$(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib
+COMMON_LINK_FLAGS += -Wl,-L,$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/lib/gcc/arm-eabi/4.2.1/android
+COMMON_LINK_FLAGS += -Wl,-L,$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/lib/gcc/arm-eabi/4.2.1
+COMMON_LINK_FLAGS += -Wl,-L,$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/lib/gcc
+COMMON_LINK_FLAGS += -Wl,-L,$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/arm-eabi/lib
+COMMON_LINK_FLAGS += -Wl,-L,$(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib
 COMMON_LINK_FLAGS += -nostdlib -lc -llog -lgcc -lm -lstdc++ \
                      --no-undefined -z $(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib/crtbegin_dynamic.o \
                      $(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib/crtend_android.o
+CYGWIN            := nodosfilewarning
+
+export CYGWIN
 
 include $(TOOLSETS_DIR)/g++.mak
 
@@ -54,7 +58,7 @@ export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.c++compile,$1,$2,$3,$4,$5,
 endef
 
 define tools.link
-export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,$3,$4,$5,$6,$7,$8,$9)
+export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,,$4,$5 $(foreach dir,$3,-Wl,-L,$(dir)),$6,$7,$8,$9)
 endef
 
 define tools.lib
