@@ -23,7 +23,7 @@ COMPILER_GCC      := $(DEVKITARM)/bin/arm-eabi-gcc.exe
 LINKER_GCC        := $(DEVKITARM)/bin/arm-eabi-g++.exe
 LIB_GCC           := $(DEVKITARM)/bin/arm-eabi-ar.exe
 EXE_SUFFIX        := .nds
-PROFILES          += unistd no_windows
+PROFILES          += unistd no_windows haswchar
 
 include $(TOOLSETS_DIR)/g++.mak
 

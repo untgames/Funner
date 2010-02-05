@@ -12,7 +12,7 @@ endif
 ###################################################################################################
 #Константы
 ###################################################################################################
-PROFILES         += android unistd no_dll
+PROFILES         += android no_dll unistd
 EXE_SUFFIX       :=
 DLL_SUFFIX       := so #no suffix, this is for dll correct dll dispatch at link
 DLL_PREFIX       :=
