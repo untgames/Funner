@@ -163,7 +163,7 @@ void plot (const stl::vector<Point>& points, size_t width, size_t height)
     
     printf ("bounds: (%.3f-%.3f)-(%.3f-%.3f)\n", min_x, min_y, max_x, max_y);
     
-    for (stl::vector<Point>::const_iterator iter=points.begin (); iter!=points.end (); ++iter)
+    for (typename stl::vector<Point>::const_iterator iter=points.begin (); iter!=points.end (); ++iter)
     {
       const Point& point = *iter;
       
