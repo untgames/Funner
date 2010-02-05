@@ -20,13 +20,13 @@ XTL.TR1.TESTS.INCLUDE_DIRS        := include
 XTL.TR1.TESTS.SOURCE_DIRS         := tests/tr1/type_traits tests/tr1/smart_ptr tests/tr1/functional tests/tr1/tuple tests/tr1/array
 XTL.TR1.TESTS.LIB_DIRS            :=  
 XTL.TR1.TESTS.EXECTUTION_DIR      :=
-XTL.TR1.TESTS.unistd.LIBS         := pthread
 XTL.TR1.TESTS.COMPILER_CFLAGS     :=
 XTL.TR1.TESTS.COMPILER_DEFINES    := __MYSTL_STANDALONE__
 XTL.TR1.TESTS.msvc.SOURCE_DIRS    := tests/tr1/functional/msvc
 XTL.TR1.TESTS.cygwin.COMPILER_CFLAGS := --no-warn
 XTL.TR1.TESTS.win32.SOURCE_DIRS    := tests/tr1/smart_ptr/mt-tests
 XTL.TR1.TESTS.unistd.SOURCE_DIRS   := tests/tr1/smart_ptr/mt-tests
+XTL.TR1.TESTS.pthread_static_library.LIBS := pthread
 
 #Öåëü ¹3 - XTL tests
 XTL.XTL.TESTS.TYPE                 := test-suite

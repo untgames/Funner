@@ -52,6 +52,7 @@ COMMON.TESTS.LIBS             :=
 COMMON.TESTS.DLL_DIRS         := 
 COMMON.TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils \
                                  tests/memory tests/log tests/parselib tests/crypto
+COMMON.TESTS.haswchar.SOURCE_DIRS := tests/strlib/wchar
 COMMON.TESTS.IMPORTS          := compile.math.vecmath compile.common link.common.aes link.common.xml link.common.wxf \
                                  link.common.zip_file_system link.common.default_console_handler
 

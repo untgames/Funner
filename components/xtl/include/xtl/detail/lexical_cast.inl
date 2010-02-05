@@ -37,6 +37,8 @@ inline void to_string (stl::string& buffer, const char* value)
   buffer = value ? value : "(null)";
 }
 
+#ifndef XTL_NO_WCHAR
+
 inline void to_string (stl::string& buffer, const wchar_t* string)
 {
   if (!string)
@@ -50,6 +52,8 @@ inline void to_string (stl::string& buffer, const wchar_t* string)
 
   buffer.resize (result_size <= 0 ? 0 : result_size);
 }
+
+#endif
 
 inline void to_string (stl::string& buffer, const stl::wstring& value)
 {
@@ -208,6 +212,8 @@ inline void to_value (const stl::string& buffer, stl::string& value)
   value = buffer;
 }
 
+#ifndef XTL_NO_WCHAR
+
 inline void to_value (const stl::string& buffer, stl::wstring& value)
 {
   if (buffer.empty ())
@@ -225,6 +231,8 @@ inline void to_value (const stl::string& buffer, stl::wstring& value)
 
   value.fast_resize (result_size);
 }
+
+#endif
 
 #ifndef XTL_NO_WCHAR
 
