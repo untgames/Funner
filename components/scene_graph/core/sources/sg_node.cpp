@@ -148,8 +148,6 @@ struct Node::Impl
     
     if (pivot->need_local_position_after_pivot_update)
     {
-      bool pivot_enabled = pivot->pivot_enabled && (pivot->orientation_pivot_enabled || pivot->scale_pivot_enabled);      
-      
       if (pivot->pivot_enabled)
       {
         static vec3f default_scale (1.0f);
