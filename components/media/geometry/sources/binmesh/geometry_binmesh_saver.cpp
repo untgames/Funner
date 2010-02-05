@@ -30,7 +30,7 @@ namespace
     Константы
 */
 
-const int HEADER  = 'BMSH';
+const char HEADER [4] = {'B', 'M', 'S', 'H'};
 const int VERSION = 1;
 
 void file_write (OutputFile& file, const void* data, size_t size)
@@ -404,7 +404,7 @@ class BinMeshLibrarySaver
 
     void SaveHeader ()
     {
-      file_write (result_file, &HEADER, sizeof (HEADER));
+      file_write (result_file, HEADER, sizeof (HEADER));
       file_write (result_file, &VERSION, sizeof (VERSION));
     }
 
