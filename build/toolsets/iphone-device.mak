@@ -16,4 +16,4 @@ LINKER_GCC   := /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/g++-4.0
 
 IPHONE_SDK_PATH  := /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS$(IPHONEOS_DEPLOYMENT_TARGET).sdk
 
-include $(TOOLSETS_DIR)/iphone.g++.mak
+include $(TOOLSETS_DIR)/iphone.mak

@@ -9,4 +9,4 @@ LINKER_GCC   := /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/
 
 IPHONE_SDK_PATH  := /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator3.0.sdk
 
-include $(TOOLSETS_DIR)/iphone.g++.mak
+include $(TOOLSETS_DIR)/iphone.mak
