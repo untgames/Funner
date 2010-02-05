@@ -13,7 +13,7 @@ EXE_SUFFIX     :=
 DLL_SUFFIX     := .dylib
 DLL_LIB_SUFFIX := .dylib
 
-PROFILES += iphone unistd has_windows haswchar gles no_dll haswchar
+PROFILES += iphone unistd has_windows haswchar gles no_dll haswchar pthread_static_library
 DLL_PATH := DYLD_LIBRARY_PATH
 
 COMMON_CFLAGS     += -Os -isysroot $(IPHONE_SDK_PATH) -DIPHONE

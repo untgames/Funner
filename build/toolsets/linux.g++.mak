@@ -10,7 +10,7 @@ DLL_SUFFIX := .so
 DLL_PREFIX := lib
 DLL_PATH   := LD_LIBRARY_PATH
 
-PROFILES += linux unistd x11 haswchar
+PROFILES += linux unistd x11 haswchar pthread_static_library
 
 include $(TOOLSETS_DIR)/g++.mak
 

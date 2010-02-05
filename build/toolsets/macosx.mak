@@ -17,7 +17,7 @@ EXE_SUFFIX     :=
 DLL_SUFFIX     := .dylib
 DLL_LIB_SUFFIX := .dylib
 
-PROFILES += macosx unistd carbon has_windows haswchar
+PROFILES += macosx unistd carbon has_windows haswchar pthread_static_library
 DLL_PATH := DYLD_LIBRARY_PATH
 
 MACOSX_DEPLOYMENT_TARGET := $(MACOSX_VERSION)
