@@ -1,9 +1,6 @@
 #ifndef SCRIPTLIB_LUA_SHARED_HEADER
 #define SCRIPTLIB_LUA_SHARED_HEADER
 
-#include <script/interpreter.h>
-#include <script/environment.h>
-
 #include <stl/hash_map>
 
 #include <xtl/any.h>
@@ -20,6 +17,9 @@
 #include <common/component.h>
 #include <common/heap.h>
 #include <common/strlib.h>
+
+#include <script/interpreter.h>
+#include <script/environment.h>
 
 #include <lua.h>
 #include <lualib.h>
