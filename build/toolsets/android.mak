@@ -35,15 +35,12 @@ COMMON_CFLAGS    += -mandroid -ffunction-sections -fdata-sections -Os -g \
                     -UDEBUG -march=armv5te -mtune=xscale -msoft-float -mthumb-interwork -fpic -ffunction-sections \
                     -funwind-tables -fstack-protector -fmessage-length=0 -Bdynamic -fno-strict-aliasing
 COMMON_LINK_FLAGS += --sysroot=$(NDK_ROOT)/build/platforms/android-4/arch-arm
-COMMON_LINK_FLAGS += -Bdynamic -Wl,-dynamic-linker,/system/bin/linker -Wl,--gc-sections -Wl,-z,nocopyreloc
-COMMON_LINK_FLAGS += -Wl,-L,$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/lib/gcc/arm-eabi/4.2.1/android
-COMMON_LINK_FLAGS += -Wl,-L,$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/lib/gcc/arm-eabi/4.2.1
-COMMON_LINK_FLAGS += -Wl,-L,$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/lib/gcc
-COMMON_LINK_FLAGS += -Wl,-L,$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1/arm-eabi/lib
+COMMON_LINK_FLAGS += -Bdynamic -Wl,-dynamic-linker,//system/bin/linker
+COMMON_LINK_FLAGS += -Wl,--gc-sections -Wl,-z,nocopyreloc
 COMMON_LINK_FLAGS += -Wl,-L,$(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib
-COMMON_LINK_FLAGS += -nostdlib -lc -llog -lgcc -lm -lstdc++ \
-                     --no-undefined -z $(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib/crtbegin_dynamic.o \
-                     $(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib/crtend_android.o
+COMMON_LINK_FLAGS += -Wl,-rpath-link=$(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib
+COMMON_LINK_FLAGS += -nostdlib -lc -llog -lm -lstdc++ \
+                     --no-undefined -z $(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib/crtbegin_dynamic.o
 CYGWIN            := nodosfilewarning
 
 export CYGWIN
