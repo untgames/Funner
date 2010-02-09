@@ -98,18 +98,18 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
         glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, gl_internal_format, level_desc.width, level_desc.height, 0, gl_uncompressed_format, gl_uncompressed_type, level_data.data);
       }
 
-#ifndef OPENGL_ES_SUPPORT
-
-      glGetTexLevelParameteriv (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
-      
-#endif
-
       data_selector.Next ();
     }
   }
-  
+
    //установка реального внутреннего формата хранения пикселей (связано с установкой сжатого формата)
-   
+
+#ifndef OPENGL_ES_SUPPORT
+
+  glGetTexLevelParameteriv (GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&gl_internal_format);
+      
+#endif
+
   try
   {
     SetFormat (get_pixel_format (gl_internal_format));
