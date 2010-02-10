@@ -65,9 +65,12 @@ class SpriteMaterial: public Material
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройка тайлинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void   SetTileSize (size_t width, size_t height);
-    size_t TileWidth   () const;
-    size_t TileHeight  () const;
+    void   SetTileSize   (size_t width, size_t height);
+    void   SetTileOffset (size_t x, size_t y);
+    size_t TileWidth     () const;
+    size_t TileHeight    () const;
+    size_t TileOffsetX   () const;
+    size_t TileOffsetY   () const;
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -8,13 +8,15 @@ using namespace media::rfx;
 
 struct SpriteMaterial::Impl
 {
-  stl::string     image;        //базовое изображение
-  SpriteBlendMode blend_mode;   //режим смешивания
-  bool            tiling_state; //включен ли тайлинг
-  size_t          tile_width;   //ширина тайла
-  size_t          tile_height;  //высота тайла
+  stl::string     image;         //базовое изображение
+  SpriteBlendMode blend_mode;    //режим смешивания
+  bool            tiling_state;  //включен ли тайлинг
+  size_t          tile_width;    //ширина тайла
+  size_t          tile_height;   //высота тайла
+  size_t          tile_offset_x; //смещение X тайла
+  size_t          tile_offset_y; //смещение Y тайла
   
-  Impl () : blend_mode (SpriteBlendMode_None), tiling_state (false), tile_width (0), tile_height (0) {}
+  Impl () : blend_mode (SpriteBlendMode_None), tiling_state (false), tile_width (0), tile_height (0), tile_offset_x (0), tile_offset_y (0) {}
 };
 
 /*
@@ -52,7 +54,7 @@ void SpriteMaterial::SetImage (const char* image_name)
 {
   if (!image_name)
     throw xtl::make_null_argument_exception ("media::rfx::SpriteMaterial::SetImage", "image_name");
-    
+
   impl->image = image_name;
 }
 
@@ -111,6 +113,12 @@ void SpriteMaterial::SetTileSize (size_t width, size_t height)
   impl->tile_height = height;
 }
 
+void SpriteMaterial::SetTileOffset (size_t x, size_t y)
+{
+  impl->tile_offset_x = x;
+  impl->tile_offset_y = y;
+}
+
 size_t SpriteMaterial::TileWidth () const
 {
   return impl->tile_width;
@@ -119,6 +127,16 @@ size_t SpriteMaterial::TileWidth () const
 size_t SpriteMaterial::TileHeight  () const
 {
   return impl->tile_height;
+}
+
+size_t SpriteMaterial::TileOffsetX () const
+{
+  return impl->tile_offset_x;
+}
+
+size_t SpriteMaterial::TileOffsetY () const
+{
+  return impl->tile_offset_y;
 }
 
 /*

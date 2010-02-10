@@ -16,6 +16,7 @@ struct RenderableSpriteModel::Impl: public xtl::trackable
   bool                        need_update_sprites;             //флаг необходимости обновления массива спрайтов
   size_t                      tile_columns, tile_rows;         //количество столбцов / строк тайлов
   float                       tile_tex_width, tile_tex_height; //размеры тайла в текстурных координатах
+  math::vec3f                 tile_tex_offset;                 //смещение от начала текстуры
   size_t                      current_world_tm_hash;           //хэш текущей матрицы трансформации
   size_t                      current_material_name_hash;      //хэш текущего имени материала
   float                       current_alpha_reference;         //текущее значение параметра альфа-отсечения
@@ -275,6 +276,7 @@ void RenderableSpriteModel::Update ()
           
         impl->tile_tex_width  = tile_width / float (texture_width);
         impl->tile_tex_height = tile_height / float (texture_height);
+        impl->tile_tex_offset = math::vec2f (material->TileOffsetX () / float (texture_width), material->TileOffsetY () / float (texture_height));
       }
       else
       {
@@ -355,12 +357,12 @@ void RenderableSpriteModel::Update ()
                  tile_row    = frame / impl->tile_columns % impl->tile_rows,
                  tile_column = frame % impl->tile_columns;
 
-          dst_sprite.tex_offset = math::vec2f (tile_column * impl->tile_tex_width, 1.0f - tile_row * impl->tile_tex_height - impl->tile_tex_height) + impl->current_texture_scroll;
+          dst_sprite.tex_offset = math::vec2f (tile_column * impl->tile_tex_width, 1.0f - tile_row * impl->tile_tex_height - impl->tile_tex_height) + impl->current_texture_scroll + impl->tile_tex_offset;
           dst_sprite.tex_size   = math::vec2f (impl->tile_tex_width, impl->tile_tex_height);
         }
         else
         {
-          dst_sprite.tex_offset = impl->current_texture_scroll;
+          dst_sprite.tex_offset = impl->current_texture_scroll + impl->tile_tex_offset;
           dst_sprite.tex_size   = math::vec2f (1.0f);
         }
 
