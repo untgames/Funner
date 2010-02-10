@@ -216,15 +216,15 @@ class PvrCompressedImage: public ICustomCompressedImage
     
   private:
     typedef xtl::uninitialized_storage<char>      Buffer;        
-    typedef stl::vector<CompressedImageBlockDesc> MipLevelArrray;
+    typedef stl::vector<CompressedImageBlockDesc> MipLevelArray;
 
   private:
-    size_t         format;     //формат изображения
-    bool           has_alpha;  //присутствует ли в изображении альфа-канал
-    size_t         width;      //ширина изображения
-    size_t         height;     //высота изображения
-    Buffer         data;       //данные изображения
-    MipLevelArrray mip_levels; //мип-уровни
+    size_t        format;     //формат изображения
+    bool          has_alpha;  //присутствует ли в изображении альфа-канал
+    size_t        width;      //ширина изображения
+    size_t        height;     //высота изображения
+    Buffer        data;       //данные изображения
+    MipLevelArray mip_levels; //мип-уровни
 };
 
 /*
