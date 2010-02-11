@@ -29,30 +29,12 @@ struct Atlas::Impl
       if (this == &source)
         return *this;
 
-      image_name = source.image_name;
-
       tiles.resize (source.tiles.size ());
 
       for (size_t i = 0; i < source.tiles.size (); i++)
         tiles[i] = source.tiles[i];
 
       return *this; 
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка/получение имени картинки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetImage (const char* image)
-    {
-      if (!image)
-        throw xtl::make_null_argument_exception ("media::Atlas::SetImage", "image");
-
-      image_name = image;
-    }
-
-    const char* Image () const
-    {
-      return image_name.c_str ();
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +58,8 @@ struct Atlas::Impl
       if (iter == tiles.end ())
         return 0;
 
-      iter->tile.name = iter->name.c_str ();
+      iter->tile.name  = iter->name.c_str ();
+      iter->tile.image = iter->image.c_str ();
 
       return &(iter->tile);
     }
@@ -89,7 +72,8 @@ struct Atlas::Impl
       if (index >= TilesCount ())
         throw xtl::make_range_exception ("media::Atlas::Tile", "index", index, 0u, TilesCount ());
 
-      tiles[index].tile.name = tiles[index].name.c_str ();
+      tiles[index].tile.name  = tiles[index].name.c_str ();
+      tiles[index].tile.image = tiles[index].image.c_str ();
 
       return tiles[index].tile;
     }
@@ -101,14 +85,12 @@ struct Atlas::Impl
       if (!name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
-      TilesArray::iterator iter = FindTile (name);
+      const media::Tile* tile = Find (name);
 
-      if (iter == tiles.end ())
+      if (!tile)
         throw xtl::make_argument_exception (METHOD_NAME, "name", name, "No tile with this name");
 
-      iter->tile.name = iter->name.c_str ();
-
-      return iter->tile;
+      return *tile;
     }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,20 +98,26 @@ struct Atlas::Impl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t Insert (const media::Tile& new_tile)
     {
-      tiles.push_back (TileEntry (new_tile, new_tile.name));
+      tiles.push_back (TileEntry (new_tile, new_tile.name, new_tile.image));
       return tiles.size ();
     }
 
-    size_t Insert (const char* name, const math::vec2ui& origin, const math::vec2ui& size)
+    size_t Insert (const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size)
     {
+      static const char* METHOD_NAME = "media::Atlas::Insert";
+
       if (!name)
-        throw xtl::make_null_argument_exception ("media::Atlas::Insert", "name");
+        throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+
+      if (!image)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "image");
 
       media::Tile new_tile;
 
       new_tile.origin = origin;
       new_tile.size   = size;
       new_tile.name   = name;
+      new_tile.image  = image;
 
       return Insert (new_tile);
     }
@@ -142,21 +130,36 @@ struct Atlas::Impl
       if (tile_index >= TilesCount ())
         throw xtl::make_range_exception ("media::Atlas::Set", "tile_index", tile_index, 0u, TilesCount ());
 
-      tiles[tile_index].tile = new_tile;
-      tiles[tile_index].name = new_tile.name;
+      TileEntry& tile = tiles[tile_index];
+
+      tile.tile       = new_tile;
+      tile.name       = new_tile.name;
+      tile.image      = new_tile.image;
+      tile.tile.name  = tile.name.c_str ();
+      tile.tile.image = tile.image.c_str ();
     }
 
-    void Set (size_t tile_index, const char* name, const math::vec2ui& origin, const math::vec2ui& size)
+    void Set (size_t tile_index, const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size)
     {
+      static const char* METHOD_NAME = "media::Atlas::Set";
+
       if (tile_index >= TilesCount ())
-        throw xtl::make_range_exception ("media::Atlas::Set", "tile_index", tile_index, 0u, TilesCount ());
+        throw xtl::make_range_exception (METHOD_NAME, "tile_index", tile_index, 0u, TilesCount ());
 
       if (!name)
-        throw xtl::make_null_argument_exception ("media::Atlas::Set", "name");
+        throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
-      tiles[tile_index].tile.origin = origin;
-      tiles[tile_index].tile.size   = size;
-      tiles[tile_index].name        = name;
+      if (!image)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "image");
+
+      media::Tile new_tile;
+
+      new_tile.origin = origin;
+      new_tile.size   = size;
+      new_tile.name   = name;
+      new_tile.image  = image;
+
+      Set (tile_index, new_tile);
     }
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -191,9 +194,12 @@ struct Atlas::Impl
     {
       media::Tile tile;
       stl::string name;
+      stl::string image;
     
       TileEntry () {}
-      TileEntry (const media::Tile& in_tile, const char* in_name) : tile (in_tile), name (in_name) {}
+      TileEntry (const media::Tile& in_tile, const char* in_name, const char* in_image)
+        : tile (in_tile), name (in_name), image (in_image)
+        {}
     };
 
     typedef stl::vector<TileEntry> TilesArray;
@@ -203,7 +209,7 @@ struct Atlas::Impl
     {
       for (TilesArray::iterator iter = tiles.begin (), end = tiles.end (); iter != end; ++iter)
       {
-        if (!xtl::xstrcmp (name, iter->name.c_str ()))
+        if (iter->name == name)
           return iter;
       }
 
@@ -211,7 +217,6 @@ struct Atlas::Impl
     }
 
   private:
-    stl::string image_name;
     TilesArray  tiles;
 };
 
@@ -270,20 +275,6 @@ Atlas& Atlas::operator = (const Atlas& source)
 }
 
 /*
-   Установка/получение имени картинки
-*/
-
-void Atlas::SetImage (const char* image)
-{
-  impl->SetImage (image);
-}
-
-const char* Atlas::Image () const
-{
-  return impl->Image ();
-}
-
-/*
    Количество
 */
 
@@ -324,9 +315,9 @@ size_t Atlas::Insert (const media::Tile& new_tile)
   return impl->Insert (new_tile);
 }
 
-size_t Atlas::Insert (const char* name, const math::vec2ui& origin, const math::vec2ui& size)
+size_t Atlas::Insert (const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size)
 {
-  return impl->Insert (name, origin, size);
+  return impl->Insert (name, image, origin, size);
 }
 
 /*
@@ -338,9 +329,9 @@ void Atlas::Set (size_t tile_index, const media::Tile& new_tile)
   impl->Set (tile_index, new_tile);
 }
 
-void Atlas::Set (size_t tile_index, const char* name, const math::vec2ui& origin, const math::vec2ui& size)
+void Atlas::Set (size_t tile_index, const char* name, const char* image, const math::vec2ui& origin, const math::vec2ui& size)
 {
-  impl->Set (tile_index, name, origin, size);
+  impl->Set (tile_index, name, image, origin, size);
 }
     
 /*

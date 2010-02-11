@@ -3,7 +3,7 @@ atlas-builder [<OPTIONS>] <SOURCE> ...
   OPTIONS:
     --help, -?                 print help message
     --silent, -s               quiet mode
-    --atlas=<file>, -o <file>  set output atlas file
+    --atlas=<file>, -o <file>  set output atlas file format
     --layout=<file>, -l <file> set output layout file
     --max-image-size=<size>    set maximum atlas image side size
     --no-layout                don't generate layout file

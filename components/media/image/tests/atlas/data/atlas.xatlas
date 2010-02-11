@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Atlas Image="texture.tga">
-  <Tile Id="wood" XPosition="0" YPosition="0" Width="64" Heigth="64"/>
-  <Tile Id="stone" XPosition="0" YPosition="64" Width="64" Heigth="64"/>
+<Atlas>
+  <Image Name="texture.tga">
+    <Tile Name="wood" Left="0" Bottom="0" Width="64" Height="64"/>
+    <Tile Name="stone" Left="0" Bottom="64" Width="64" Height="64"/>
+  </Image>
 </Atlas>

@@ -1,26 +1,35 @@
 Results of atlas_builder_test3:
 Build atlas 231x128
-Save atlas 'results/atlas1.png' and layout 'results/atlas1.xatlas'
+Save atlas 'results/atlas1.png'
+Save layout 'results/atlas1.xatlas'
 Build successfull!
 Build atlas 171x128
-Save atlas 'results/atlas2.png' and layout 'results/atlas2-custom.xatlas'
+Save atlas 'results/atlas2.png'
+Save layout 'results/atlas2-custom.xatlas'
 Build successfull!
 Build atlas 60x60
-Save atlas 'results/my image.png' and layout 'results/my.xatlas'
+Save atlas 'results/my image.png'
+Save layout 'results/my.xatlas'
 Build successfull!
 results/atlas1.xatlas
 <?xml version="1.0" encoding="utf-8"?>
-<Atlas Image="results/atlas1.png">
-  <Tile Id="data/1.bmp" XPosition="0" YPosition="0" Width="60" Height="60"/>
-  <Tile Id="data/2.tga" XPosition="60" YPosition="0" Width="171" Height="128"/>
+<Atlas>
+  <Image Name="results/atlas1.png">
+    <Tile Name="data/1.bmp" Left="0" Bottom="0" Width="60" Height="60"/>
+    <Tile Name="data/2.tga" Left="60" Bottom="0" Width="171" Height="128"/>
+  </Image>
 </Atlas>
 results/atlas2-custom.xatlas
 <?xml version="1.0" encoding="utf-8"?>
-<Atlas Image="results/atlas2.png">
-  <Tile Id="data/3.jpg" XPosition="0" YPosition="0" Width="171" Height="128"/>
+<Atlas>
+  <Image Name="results/atlas2.png">
+    <Tile Name="data/3.jpg" Left="0" Bottom="0" Width="171" Height="128"/>
+  </Image>
 </Atlas>
 results/my.xatlas
 <?xml version="1.0" encoding="utf-8"?>
-<Atlas Image="results/my image.png">
-  <Tile Id="data/1.bmp" XPosition="0" YPosition="0" Width="60" Height="60"/>
+<Atlas>
+  <Image Name="results/my image.png">
+    <Tile Name="data/1.bmp" Left="0" Bottom="0" Width="60" Height="60"/>
+  </Image>
 </Atlas>

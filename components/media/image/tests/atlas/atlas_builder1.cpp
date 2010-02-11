@@ -5,9 +5,9 @@ using namespace common;
 
 const char* SOURCE_IMAGE_NAME                  = "data/pic1.jpg";
 const char* RESULTS_DIR                        = "results";
-const char* RESULT_POWER_OF_TWO_ATLAS_NAME     = "results/power_of_two_atlas.xatlas";
-const char* RESULT_NON_POWER_OF_TWO_ATLAS_NAME = "results/non_power_of_two_atlas.xatlas";
-const char* RESULT_EMPTY_ATLAS_NAME            = "results/empty_atlas.xatlas";
+const char* RESULT_POWER_OF_TWO_ATLAS_NAME     = "/io/stdout/power_of_two_atlas.xatlas";
+const char* RESULT_NON_POWER_OF_TWO_ATLAS_NAME = "/io/stdout/non_power_of_two_atlas.xatlas";
+const char* RESULT_EMPTY_ATLAS_NAME            = "/io/stdout/empty_atlas.xatlas";
 const char* RESULT_POWER_OF_TWO_IMAGE_NAME     = "results/power_of_two_image.bmp";
 const char* RESULT_NON_POWER_OF_TWO_IMAGE_NAME = "results/non_power_of_two_image.bmp";
 const char* RESULT_EMPTY_IMAGE_NAME            = "results/empty_image.bmp";
@@ -67,11 +67,13 @@ int main ()
 
     atlas_builder.Build (result_atlas, result_image, AtlasPackFlag_PowerOfTwoEdges);
 
+    printf ("Saving power of two atlas\n");
     result_atlas.Save (RESULT_POWER_OF_TWO_ATLAS_NAME);
     result_image.Save (RESULT_POWER_OF_TWO_IMAGE_NAME);
 
     atlas_builder.Build (result_atlas, result_image, 0);
 
+    printf ("Saving non power of two atlas\n");
     result_atlas.Save (RESULT_NON_POWER_OF_TWO_ATLAS_NAME);
     result_image.Save (RESULT_NON_POWER_OF_TWO_IMAGE_NAME);
 
@@ -79,12 +81,10 @@ int main ()
 
     atlas_builder.Build (result_atlas, result_image, AtlasPackFlag_PowerOfTwoEdges);
 
+    printf ("Saving emty atlas\n");
     result_atlas.Save (RESULT_EMPTY_ATLAS_NAME);
     result_image.Save (RESULT_EMPTY_IMAGE_NAME);
 
-    dump_hash (RESULT_POWER_OF_TWO_ATLAS_NAME);
-    dump_hash (RESULT_NON_POWER_OF_TWO_ATLAS_NAME);
-    dump_hash (RESULT_EMPTY_ATLAS_NAME);
     dump_hash (RESULT_POWER_OF_TWO_IMAGE_NAME);
     dump_hash (RESULT_NON_POWER_OF_TWO_IMAGE_NAME);
 //    dump_hash (RESULT_EMPTY_IMAGE_NAME);

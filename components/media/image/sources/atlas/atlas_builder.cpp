@@ -193,8 +193,6 @@ struct AtlasBuilder::Impl
         size_t result_image_width = 0;
         size_t result_image_height = 0;                                  
 
-        result_atlas.SetImage (atlas_image_name.c_str ());          
-
         CalculatePackResults (pack_flags, sizes, origins, result_image_width, result_image_height);
         
         for (size_t i = 0; i < images.size (); i++)
@@ -209,6 +207,7 @@ struct AtlasBuilder::Impl
           if (pack_flags & AtlasPackFlag_InvertTilesY) origin.y = result_image_height - origin.y - size.y;          
 
           new_tile.name   = current_image_desc->image_holder->image->Name ();
+          new_tile.image  = atlas_image_name.c_str ();
           new_tile.origin = origin;
           new_tile.size   = size;
 

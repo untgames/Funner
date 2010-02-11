@@ -1,11 +1,14 @@
 Results of atlas_builder_test5:
 Build atlas 256x256
-Save atlas 'results/swap-axises.png' and layout 'results/swap-axises.xatlas'
+Save atlas 'results/swap-axises.png'
+Save layout 'results/swap-axises.xatlas'
 Build successfull!
 results/swap-axises.xatlas
 <?xml version="1.0" encoding="utf-8"?>
-<Atlas Image="results/swap-axises.png">
-  <Tile Id="data/1.bmp" XPosition="0" YPosition="0" Width="60" Height="60"/>
-  <Tile Id="data/3.jpg" XPosition="60" YPosition="0" Width="171" Height="128"/>
-  <Tile Id="data/2.tga" XPosition="0" YPosition="128" Width="171" Height="128"/>
+<Atlas>
+  <Image Name="results/swap-axises.png">
+    <Tile Name="data/1.bmp" Left="0" Bottom="0" Width="60" Height="60"/>
+    <Tile Name="data/3.jpg" Left="60" Bottom="0" Width="171" Height="128"/>
+    <Tile Name="data/2.tga" Left="0" Bottom="128" Width="171" Height="128"/>
+  </Image>
 </Atlas>
