@@ -153,12 +153,18 @@ class XmlMaterialLibrarySaver: public xtl::visitor<void, CommonMaterial, MultiPa
       writer.WriteAttribute ("image", material.Image ());
       writer.WriteAttribute ("blend_mode", get_name (material.BlendMode ()));
       writer.WriteAttribute ("tiling", material.IsTiled ());            
-      
+
+      if (material.IsTiled () || material.TileOffsetX ())
+        writer.WriteAttribute ("tile_offset_x", material.TileOffsetX ());
+
+      if (material.IsTiled () || material.TileOffsetY ())
+        writer.WriteAttribute ("tile_offset_y", material.TileOffsetY ());
+
       if (material.IsTiled () || material.TileWidth ())
         writer.WriteAttribute ("tile_width", material.TileWidth ());
         
       if (material.IsTiled () || material.TileHeight ())        
-        writer.WriteAttribute ("tile_height", material.TileHeight ());
+        writer.WriteAttribute ("tile_height", material.TileHeight ());        
     }
     
     /*

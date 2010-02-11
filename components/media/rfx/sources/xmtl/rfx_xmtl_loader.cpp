@@ -320,11 +320,13 @@ class XmlMaterialLibraryLoader
 
       if (tiling)
       {
-        material->SetTiling   (true);
-        material->SetTileSize (get<size_t> (*profile_iter, "tile_width", material->TileWidth ()),
-                               get<size_t> (*profile_iter, "tile_height", material->TileHeight ()));
+        material->SetTiling     (true);
+        material->SetTileOffset (get<size_t> (*profile_iter, "tile_offset_x", material->TileOffsetX ()),
+                                 get<size_t> (*profile_iter, "tile_offset_y", material->TileOffsetY ()));
+        material->SetTileSize   (get<size_t> (*profile_iter, "tile_width", material->TileWidth ()),
+                                 get<size_t> (*profile_iter, "tile_height", material->TileHeight ()));
       }
-                        
+
       return material;
     }
     

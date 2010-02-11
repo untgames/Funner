@@ -29,6 +29,7 @@ int main ()
     sprite_material->SetImage ("image1.tga");
     sprite_material->EnableTiling ();
     sprite_material->SetTileSize (10, 20);
+    sprite_material->SetTileOffset (1, 3);
     sprite_material->SetBlendMode (SpriteBlendMode_Translucent);
     
     texmap.SetTransform  (math::translate (vec3f (1, 2, 3)));

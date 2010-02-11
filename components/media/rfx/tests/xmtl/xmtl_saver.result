@@ -50,6 +50,6 @@ Results of xmtl_saver_test:
   </material>
   <instance_material id="material2" source="material1"/>
   <material id="sprite_material" name="sprite_material" sort_group="0">
-    <sprite_profile image="image1.tga" blend_mode="translucent" tiling="1" tile_width="10" tile_height="20"/>
+    <sprite_profile image="image1.tga" blend_mode="translucent" tiling="1" tile_offset_x="1" tile_offset_y="3" tile_width="10" tile_height="20"/>
   </material>
 </material_library>
