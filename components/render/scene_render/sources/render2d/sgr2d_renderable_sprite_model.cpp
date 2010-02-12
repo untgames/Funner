@@ -276,7 +276,7 @@ void RenderableSpriteModel::Update ()
           
         impl->tile_tex_width  = tile_width / float (texture_width);
         impl->tile_tex_height = tile_height / float (texture_height);
-        impl->tile_tex_offset = math::vec2f (material->TileOffsetX () / float (texture_width), (material->TileOffsetY () + material->TileHeight ())/ float (texture_height));
+        impl->tile_tex_offset = math::vec2f (material->TileOffsetX () / float (texture_width), material->TileOffsetY () / float (texture_height));
       }
       else
       {
