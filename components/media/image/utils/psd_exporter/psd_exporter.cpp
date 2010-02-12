@@ -69,6 +69,7 @@ struct Params
   stl::string   layers_format;           //строка форматирования имён слоёв
   stl::string   crop_exclude;            //необрезаемые слои
   size_t        crop_alpha;              //коэффициент обрезания по прозрачности
+  size_t        max_image_size;          //максимальный размер выходного изображения
   bool          silent;                  //минимальное число сообщений
   bool          print_help;              //нужно ли печатать сообщение помощи
   bool          need_layout;             //нужно генерировать файл разметки
@@ -191,6 +192,12 @@ void command_line_crop_exclude (const char* string, Params& params)
   params.crop_exclude = string;
 }
 
+//установка максимального размера выходного изображения
+void command_line_max_image_size (const char* value_string, Params& params)
+{
+  params.max_image_size = (size_t)atoi (value_string);
+}
+
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
@@ -206,6 +213,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_pot,                      "pot",               0,           0, "extent layers image size to nearest greater power of two"},
     {command_line_crop_alpha,               "crop-alpha",        0,     "value", "crop layers by alpha that less than value"},
     {command_line_crop_exclude,             "crop-exclude",      0, "wildcards", "exclude selected layers from crop"},
+    {command_line_max_image_size,           "max-image-size",    0,     "value", "max output image size (image with greater size will be rescaled)"},
   };
   
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -229,7 +237,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {
       if (!params.source_file_name.empty ())
       {
-        error ("source file msut be on");
+        error ("source file must be on");
         return;
       }
     
@@ -725,9 +733,34 @@ void export_data (Params& params)
         memset (image.Bitmap (), 0, get_bytes_per_pixel (image.Format ()) * image.Width () * image.Height ());                 
 
       convert_image_data (layer.width, layer.height, layer.image_data, cropped_rect, image_width, image_height, image.Bitmap ());
+      
+      if (params.max_image_size)
+      {
+        if (image.Width () > params.max_image_size || image.Height () > params.max_image_size)
+        {
+          size_t new_image_width, new_image_height;
+          
+          if (image.Width () > image.Height ())
+          {
+            new_image_width  = params.max_image_size;
+            new_image_height = (size_t)(image.Height () * (new_image_width / (float)image.Width ()));
+          }
+          else
+          {
+            new_image_height = params.max_image_size;
+            new_image_width  = (size_t)(image.Width () * (new_image_height / (float)image.Height ()));            
+          }
+          
+          if (!params.silent)
+            printf ("  rescale '%s' from %ux%u to %ux%u...\n", dst_image_name.c_str (), image.Width (), image.Height (),
+              new_image_width, new_image_height);
+              
+          image.Resize (new_image_width, new_image_height, 1);
+        }
+      }
 
       image.Save (dst_image_name.c_str ());
-      
+
       image_index++;
     }
   }
@@ -748,6 +781,7 @@ int main (int argc, const char* argv [])
     params.options_count   = 0;
     params.layers_format   = "image%03u.png";
     params.crop_alpha      = 0;
+    params.max_image_size  = 0;
     params.print_help      = false;
     params.silent          = false;
     params.need_layout     = true;

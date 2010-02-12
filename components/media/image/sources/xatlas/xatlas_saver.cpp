@@ -6,9 +6,6 @@ using namespace common;
 namespace
 {
 
-typedef stl::list     <const Tile*>                            TilesList;
-typedef stl::hash_map <stl::hash_key <const char*>, TilesList> TilesMap;
-
 /*
     Вспомогательный класс сохранения карт картинок
 */
@@ -35,28 +32,18 @@ class XmlAtlasSaver
     {
       XmlWriter::Scope scope (writer, "Atlas");
 
-      TilesMap tiles_map;
-
-      for (size_t i = 0, count = atlas.TilesCount (); i < count; i++)
-      {
-        const Tile& tile = atlas.Tile (i);
-
-        TilesMap::iterator iter = tiles_map.find (tile.image);
-
-        if (iter == tiles_map.end ())
-          iter = tiles_map.insert_pair (tile.image, TilesList ()).first;
-
-        iter->second.push_back (&tile);
-      }
-
-      for (TilesMap::iterator iter = tiles_map.begin (), end = tiles_map.end (); iter != end; ++iter)
+      for (size_t image_index=0, images_count=atlas.ImagesCount (); image_index<images_count; image_index++)
       {
         XmlWriter::Scope scope (writer, "Image");
+        
+        const math::vec2ui& size = atlas.ImageSize (image_index);
 
-        writer.WriteAttribute ("Name", (*iter->second.begin ())->image);
+        writer.WriteAttribute ("Name",   atlas.ImageName (image_index));        
+        writer.WriteAttribute ("Width",  size.x);
+        writer.WriteAttribute ("Height", size.y);
 
-        for (TilesList::iterator list_iter = iter->second.begin (), list_end = iter->second.end (); list_iter != list_end; ++list_iter)
-          SaveTile (*list_iter);
+        for (size_t tile_index=0, tiles_count=atlas.ImageTilesCount (image_index); tile_index<tiles_count; tile_index++)
+          SaveTile (atlas.ImageTile (image_index, tile_index));
       }
     }
 
@@ -64,15 +51,15 @@ class XmlAtlasSaver
         Сохранение тайлов
     */
 
-    void SaveTile (const Tile* tile)
+    void SaveTile (const Tile& tile)
     {
       XmlWriter::Scope scope (writer, "Tile");
 
-      writer.WriteAttribute ("Name",   tile->name);
-      writer.WriteAttribute ("Left",   tile->origin.x);
-      writer.WriteAttribute ("Bottom", tile->origin.y);
-      writer.WriteAttribute ("Width",  tile->size.x);
-      writer.WriteAttribute ("Height", tile->size.y);
+      writer.WriteAttribute ("Name",   tile.name);
+      writer.WriteAttribute ("Left",   tile.origin.x);
+      writer.WriteAttribute ("Bottom", tile.origin.y);
+      writer.WriteAttribute ("Width",  tile.size.x);
+      writer.WriteAttribute ("Height", tile.size.y);
     }
     
   private:

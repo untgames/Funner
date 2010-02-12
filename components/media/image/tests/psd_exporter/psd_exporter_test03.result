@@ -12,3 +12,4 @@ psd-exporter [<OPTIONS>] <SOURCE> ...
     --pot                      extent layers image size to nearest greater power of two
     --crop-alpha=<value>       crop layers by alpha that less than value
     --crop-exclude=<wildcards> exclude selected layers from crop
+    --max-image-size=<value>   max output image size (image with greater size will be rescaled)

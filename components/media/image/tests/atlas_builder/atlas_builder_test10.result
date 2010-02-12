@@ -6,7 +6,7 @@ Build successfull!
 results/pot-margin.xatlas
 <?xml version="1.0" encoding="utf-8"?>
 <Atlas>
-  <Image Name="results/pot-margin.png">
+  <Image Name="results/pot-margin.png" Width="256" Height="128">
     <Tile Name="data/1.bmp" Left="0" Bottom="0" Width="60" Height="60"/>
     <Tile Name="data/2.tga" Left="70" Bottom="0" Width="171" Height="128"/>
   </Image>

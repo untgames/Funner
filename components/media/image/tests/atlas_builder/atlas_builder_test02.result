@@ -1,9 +1,10 @@
-Results of atlas_builder_test2:
+Results of atlas_builder_test02:
 atlas-builder [<OPTIONS>] <SOURCE> ...
   OPTIONS:
     --help, -?                 print help message
     --silent, -s               quiet mode
     --atlas=<file>, -o <file>  set output atlas file format
+    --layout-atlas=<file>      set output atlas file format that used in layout
     --layout=<file>, -l <file> set output layout file
     --max-image-size=<size>    set maximum atlas image side size
     --margin=<size>            set margin beetween images in atlas
@@ -12,4 +13,5 @@ atlas-builder [<OPTIONS>] <SOURCE> ...
     --invert-x                 invert X coordinate in layout of tiles
     --invert-y                 invert Y coordinate in layout of tiles
     --swap-axises              swap axises at layout tiles
+    --isolated-images=<wildcard> set wildcard for standalone images which will be isolate from general atlases
 successfull!

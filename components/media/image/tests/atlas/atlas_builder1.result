@@ -4,7 +4,7 @@ Atlas image name is 'atlas_image'
 Saving power of two atlas
 <?xml version="1.0" encoding="utf-8"?>
 <Atlas>
-  <Image Name="atlas_image">
+  <Image Name="atlas_image" Width="256" Height="256">
     <Tile Name="data/pic1.jpg" Left="0" Bottom="0" Width="171" Height="128"/>
     <Tile Name="" Left="0" Bottom="128" Width="123" Height="61"/>
   </Image>
@@ -12,7 +12,7 @@ Saving power of two atlas
 Saving non power of two atlas
 <?xml version="1.0" encoding="utf-8"?>
 <Atlas>
-  <Image Name="atlas_image">
+  <Image Name="atlas_image" Width="294" Height="128">
     <Tile Name="data/pic1.jpg" Left="0" Bottom="0" Width="171" Height="128"/>
     <Tile Name="" Left="171" Bottom="0" Width="123" Height="61"/>
   </Image>

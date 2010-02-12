@@ -58,7 +58,9 @@ void xatlas_load (const char* file_name, Atlas& atlas)
     
   for (Parser::NamesakeIterator i = iter->First ("Image"); i; ++i)
   {
-    const char* image_name = common::get<const char*> (*i, "Name");
+    const char* image_name   = common::get<const char*> (*i, "Name");
+    size_t      image_width  = common::get<size_t> (*i, "Width", 0u);
+    size_t      image_height = common::get<size_t> (*i, "Height", 0u);
 
     for (Parser::NamesakeIterator j = i->First ("Tile"); j; ++j)
     {
@@ -73,6 +75,8 @@ void xatlas_load (const char* file_name, Atlas& atlas)
 
       new_atlas.Insert (tile_name, image_name, origin, size);
     }
+
+    new_atlas.SetImageSize (image_name, image_width, image_height);
   }
 
   atlas.Swap (new_atlas);

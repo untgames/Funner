@@ -234,6 +234,8 @@ struct AtlasBuilder::Impl
                                  current_image_desc->image_holder->image->Format (), current_image_desc->image_holder->image->Bitmap ());
         }
 
+        result_atlas.SetImageSize (atlas_image_name.c_str (), result_image_width, result_image_height);
+
         result_atlas.Swap (out_atlas);
         result_image.Swap (out_atlas_image);
       }
