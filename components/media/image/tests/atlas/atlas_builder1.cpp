@@ -65,13 +65,13 @@ int main ()
     Atlas result_atlas;
     Image result_image;
 
-    atlas_builder.Build (result_atlas, result_image, AtlasPackFlag_PowerOfTwoEdges);
+    atlas_builder.Build (result_atlas, result_image, 0, AtlasPackFlag_PowerOfTwoEdges);
 
     printf ("Saving power of two atlas\n");
     result_atlas.Save (RESULT_POWER_OF_TWO_ATLAS_NAME);
     result_image.Save (RESULT_POWER_OF_TWO_IMAGE_NAME);
 
-    atlas_builder.Build (result_atlas, result_image, 0);
+    atlas_builder.Build (result_atlas, result_image, 0, 0);
 
     printf ("Saving non power of two atlas\n");
     result_atlas.Save (RESULT_NON_POWER_OF_TWO_ATLAS_NAME);
@@ -79,7 +79,7 @@ int main ()
 
     atlas_builder.Reset ();
 
-    atlas_builder.Build (result_atlas, result_image, AtlasPackFlag_PowerOfTwoEdges);
+    atlas_builder.Build (result_atlas, result_image, 0, AtlasPackFlag_PowerOfTwoEdges);
 
     printf ("Saving emty atlas\n");
     result_atlas.Save (RESULT_EMPTY_ATLAS_NAME);

@@ -69,6 +69,7 @@ struct Params
   stl::string   atlas_file_format; //имя результирующего изображения
   stl::string   layout_file_name;  //имя файла разметки
   size_t        max_image_size;    //максимальный размер одного изображения
+  size_t        margin;            //отступ между картинками в атласе
   bool          silent;            //минимальное число сообщений
   bool          print_help;        //нужно ли печатать сообщение помощи
   bool          need_layout;       //нужно генерировать файл разметки
@@ -123,6 +124,12 @@ void command_line_max_image_size (const char* size, Params& params)
   params.max_image_size = atoi (size);
 }
 
+//установка отступа между картинками
+void command_line_margin (const char* size, Params& params)
+{
+  params.margin = atoi (size);
+}
+
 //установка флага генерации файла разметки
 void command_line_no_layout (const char* file_name, Params& params)
 {
@@ -168,6 +175,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_result_atlas,   "atlas",          'o', "file", "set output atlas file format"},
     {command_line_result_layout,  "layout",         'l', "file", "set output layout file"},
     {command_line_max_image_size, "max-image-size", 0,   "size", "set maximum atlas image side size"},
+    {command_line_margin,         "margin",         0,   "size", "set margin beetween images in atlas"},
     {command_line_no_layout,      "no-layout",      0,        0, "don't generate layout file"},
     {command_line_pot,            "pot",            0,        0, "resize atlas texture to nearest greater power of two sizes"},
     {command_line_invert_x,       "invert-x",       0,        0, "invert X coordinate in layout of tiles"},
@@ -419,7 +427,7 @@ void build (Params& params)
 
         try
         {
-          builder.GetBuildResults (result_image_width, result_image_height, pack_flags);
+          builder.GetBuildResults (result_image_width, result_image_height, params.margin, pack_flags);
         }
         catch (...)
         {
@@ -462,7 +470,7 @@ void build (Params& params)
 
       try
       {
-        builder.Build (atlas, atlas_image, pack_flags);
+        builder.Build (atlas, atlas_image, params.margin, pack_flags);
 
         for (size_t i = 0, count = atlas.TilesCount (); i < count; i++)
           result_atlas.Insert (atlas.Tile (i));
@@ -536,6 +544,7 @@ int main (int argc, const char* argv [])
   params.options_count     = 0;
   params.atlas_file_format = DEFAULT_ATLAS_FILE_NAME;
   params.max_image_size    = -1;
+  params.margin            = 0;
   params.print_help        = false;
   params.silent            = false;
   params.need_layout       = true;

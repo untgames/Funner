@@ -80,7 +80,7 @@ class TileImageBuilder
         images[i] = in_sizes[i];
     }
 
-    void BuildTileImage (math::vec2ui* out_origins, size_t pack_flags)
+    void BuildTileImage (math::vec2ui* out_origins, size_t margin, size_t pack_flags)
     {
       size_t minimum_area = 0;
       size_t result_image_horisontal_side, result_image_vertical_side;
@@ -117,7 +117,7 @@ class TileImageBuilder
 
         do
         {
-          pack_result = PackImages ((pack_flags & AtlasPackFlag_SwapAxises) != 0, result_image_horisontal_side, result_image_vertical_side, out_origins, indices);
+          pack_result = PackImages (margin, (pack_flags & AtlasPackFlag_SwapAxises) != 0, result_image_horisontal_side, result_image_vertical_side, out_origins, indices);
 
           if (pack_result) break;
 
@@ -167,7 +167,7 @@ class TileImageBuilder
       }
     };
 
-    bool PackImages (bool swap_axises, size_t result_image_horizontal_side, size_t result_image_vertical_side, math::vec2ui* out_origins, const IndexArray& indices)
+    bool PackImages (size_t margin, bool swap_axises, size_t result_image_horizontal_side, size_t result_image_vertical_side, math::vec2ui* out_origins, const IndexArray& indices)
     {
       typedef set<FreeSpace, less<FreeSpace> > FreeSpacesSet;
 
@@ -186,6 +186,16 @@ class TileImageBuilder
         {
           if ((iter->width < image_size.x) || (iter->height < image_size.y))
             continue;
+
+          //проверяем можно ли вставить картинку с отступом в это место
+          if ((iter->x_pos + iter->width != result_image_horizontal_side) && (iter->width < image_size.x + margin))
+            continue;
+
+          if ((iter->y_pos + iter->height != result_image_vertical_side) && (iter->height < image_size.y + margin))
+            continue;
+
+          image_size.x = stl::min (image_size.x + margin, iter->width);
+          image_size.y = stl::min (image_size.y + margin, iter->height);
 
           out_origin.x = iter->x_pos;
           out_origin.y = iter->y_pos;
@@ -252,7 +262,7 @@ class TileImageBuilder
     const int*  random_array;
 };
 
-void left_bottom_pack (const int* random_array, size_t images_count, const math::vec2ui* in_sizes, math::vec2ui* out_origins, size_t pack_flags)
+void left_bottom_pack (const int* random_array, size_t images_count, const math::vec2ui* in_sizes, math::vec2ui* out_origins, size_t margin, size_t pack_flags)
 {
   static const char* METHOD_NAME = "media::LeftBottomPacker";
 
@@ -265,7 +275,7 @@ void left_bottom_pack (const int* random_array, size_t images_count, const math:
   TileImageBuilder tile_image_builder (random_array);
 
   tile_image_builder.AddImages (images_count, in_sizes);
-  tile_image_builder.BuildTileImage (out_origins, pack_flags);
+  tile_image_builder.BuildTileImage (out_origins, margin, pack_flags);
 }
 
 /*
@@ -281,7 +291,7 @@ class LeftBottomPackerComponent
       for (size_t i = 0; i < RANDOM_ARRAY_SIZE; i++)
         random_array [i] = rand ();
 
-      AtlasBuilderManager::PackHandler pack_handler = xtl::bind (&left_bottom_pack, random_array, _1, _2, _3, _4);
+      AtlasBuilderManager::PackHandler pack_handler = xtl::bind (&left_bottom_pack, random_array, _1, _2, _3, _4, _5);
 
       AtlasBuilderManager::RegisterPacker ("default", pack_handler);
       AtlasBuilderManager::RegisterPacker ("left_bottom", pack_handler);

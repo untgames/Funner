@@ -42,7 +42,7 @@ enum AtlasPackFlag
 class AtlasBuilder
 {
   public:
-    typedef xtl::function<void (size_t images_count, const math::vec2ui* in_sizes, math::vec2ui* out_origins, size_t pack_flags)> PackHandler;
+    typedef xtl::function<void (size_t images_count, const math::vec2ui* in_sizes, math::vec2ui* out_origins, size_t margin, size_t pack_flags)> PackHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
@@ -71,8 +71,8 @@ class AtlasBuilder
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Построение карты/получение размеров результирующей картинки без формирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Build           (media::Atlas& out_atlas, media::Image& out_atlas_image, size_t pack_flags);
-    void GetBuildResults (size_t& image_width, size_t& image_height, size_t pack_flags);
+    void Build           (media::Atlas& out_atlas, media::Image& out_atlas_image, size_t margin, size_t pack_flags);
+    void GetBuildResults (size_t& image_width, size_t& image_height, size_t margin, size_t pack_flags);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

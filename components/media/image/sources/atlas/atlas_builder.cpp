@@ -131,7 +131,7 @@ struct AtlasBuilder::Impl
 /*
    Построение карты
 */
-    void CalculatePackResults (size_t pack_flags, xtl::uninitialized_storage<math::vec2ui>& sizes,
+    void CalculatePackResults (size_t margin, size_t pack_flags, xtl::uninitialized_storage<math::vec2ui>& sizes,
                                xtl::uninitialized_storage<math::vec2ui>& origins,
                                size_t& result_image_width, size_t& result_image_height)
     {
@@ -155,7 +155,7 @@ struct AtlasBuilder::Impl
         current_size++;
       }
 
-      pack_handler (sizes.size (), sizes.data (), origins.data (), pack_flags & ~AtlasPackFlag_InvertTilesX & ~AtlasPackFlag_InvertTilesY);
+      pack_handler (sizes.size (), sizes.data (), origins.data (), margin, pack_flags & ~AtlasPackFlag_InvertTilesX & ~AtlasPackFlag_InvertTilesY);
 
       for (size_t i = 0; i < origins.size (); i++)
       {
@@ -172,7 +172,7 @@ struct AtlasBuilder::Impl
       }
     }
 
-    void Build (Atlas& out_atlas, Image& out_atlas_image, size_t pack_flags)
+    void Build (Atlas& out_atlas, Image& out_atlas_image, size_t margin, size_t pack_flags)
     {
       if (images.empty ())
       {
@@ -193,7 +193,7 @@ struct AtlasBuilder::Impl
         size_t result_image_width = 0;
         size_t result_image_height = 0;                                  
 
-        CalculatePackResults (pack_flags, sizes, origins, result_image_width, result_image_height);
+        CalculatePackResults (margin, pack_flags, sizes, origins, result_image_width, result_image_height);
         
         for (size_t i = 0; i < images.size (); i++)
         {
@@ -244,11 +244,11 @@ struct AtlasBuilder::Impl
       }
     }
 
-    void GetBuildResults (size_t& image_width, size_t& image_height, size_t pack_flags)
+    void GetBuildResults (size_t& image_width, size_t& image_height, size_t margin, size_t pack_flags)
     {
       xtl::uninitialized_storage<math::vec2ui> sizes, origins;
 
-      CalculatePackResults (pack_flags, sizes, origins, image_width, image_height);
+      CalculatePackResults (margin, pack_flags, sizes, origins, image_width, image_height);
     }
 
   private:
@@ -399,14 +399,14 @@ void AtlasBuilder::Reset ()
    Построение карты/получение размеров результирующей картинки без формирования
 */
 
-void AtlasBuilder::Build (Atlas& out_atlas, Image& out_atlas_image, size_t pack_flags)
+void AtlasBuilder::Build (Atlas& out_atlas, Image& out_atlas_image, size_t margin, size_t pack_flags)
 {
-  impl->Build (out_atlas, out_atlas_image, pack_flags);
+  impl->Build (out_atlas, out_atlas_image, margin, pack_flags);
 }
 
-void AtlasBuilder::GetBuildResults (size_t& image_width, size_t& image_height, size_t pack_flags)
+void AtlasBuilder::GetBuildResults (size_t& image_width, size_t& image_height, size_t margin, size_t pack_flags)
 {
-  impl->GetBuildResults (image_width, image_height, pack_flags);
+  impl->GetBuildResults (image_width, image_height, margin, pack_flags);
 }
 
 /*
