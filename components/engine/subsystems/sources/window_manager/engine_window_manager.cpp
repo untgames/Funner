@@ -90,6 +90,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
            is_cursor_visible = get<bool> (node, "CursorVisible", window.IsCursorVisible ());
 
       window.SetVisible (is_window_visible);
+      window.SetActive  (is_window_visible);
       window.SetCursorVisible (is_cursor_visible);
 
         //сохранение точки привязки родительского окна
