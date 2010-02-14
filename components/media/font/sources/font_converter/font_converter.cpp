@@ -236,7 +236,7 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
 
     //Формирование позиций глифов
 
-  pack_handler (glyphs_count, glyph_sizes.data (), glyph_origins.data (), AtlasPackFlag_PowerOfTwoEdges);
+  pack_handler (glyphs_count, glyph_sizes.data (), glyph_origins.data (), 0, AtlasPackFlag_PowerOfTwoEdges);
 
   size_t result_image_width = 0, result_image_height = 0;
 
