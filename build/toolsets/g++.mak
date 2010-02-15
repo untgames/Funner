@@ -30,7 +30,7 @@ endef
 
 define tools.g++.c++compile
 $(call for_each_file,src,$(if $(filter -x c++,$6),,$(filter %.c,$1)),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $6,$7,$8)) && \
-$(call for_each_file,src,$(filter %.cpp,$1)$(if $(filter -x c++,$6), $(filter %.c,$1)),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $(COMMON_CPPFLAGS) $(DISABLE_CPP_WARNINGS) $6,$7,$8))
+$(call for_each_file,src,$(filter %.cpp %.mm,$1)$(if $(filter -x c++,$6), $(filter %.c,$1)),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $(COMMON_CPPFLAGS) $(DISABLE_CPP_WARNINGS) $6,$7,$8))
 endef
 
 ###################################################################################################
