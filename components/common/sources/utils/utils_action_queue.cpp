@@ -67,20 +67,21 @@ namespace
 class ActionWithCallback
 {
   public:
-    ActionWithCallback (const ActionQueue::ActionHandler& in_action, const ActionQueue::ActionHandler& in_complete_handler)
+    ActionWithCallback (const ActionQueue::ActionHandler& in_action, const ActionQueue::CallbackHandler& in_complete_handler)
       : action (in_action)
       , complete_callback (in_complete_handler)
     {
     }
     
-    void operator () () const
+    void operator () (Action& state) const
     {
-      action ();
+      action (state);
       complete_callback ();
     }
 
   private:
-    ActionQueue::ActionHandler action, complete_callback;
+    ActionQueue::ActionHandler   action;
+    ActionQueue::CallbackHandler complete_callback;
 };
 
 /*
@@ -134,10 +135,10 @@ class ThreadActionQueue: public xtl::reference_counter
 ///Получение действия
     ActionPtr PopAction ()
     {
-      for (ActionList::iterator iter=actions.begin (), end=actions.end (); iter!=end;)
+      for (ActionList::iterator iter=actions.begin (); iter!=actions.end ();)
       {
         ActionLock action (actions.front ().get ());
-
+        
         if (action->is_canceled || action->is_completed)
         {
           ActionList::iterator next = iter;
@@ -150,7 +151,7 @@ class ThreadActionQueue: public xtl::reference_counter
 
           continue;
         }
-
+        
         if (action->next_time > action->timer.Time ())
         {
           ++iter;
@@ -159,7 +160,7 @@ class ThreadActionQueue: public xtl::reference_counter
 
         if (action->is_periodic)
           return action.Get ();
-
+          
         actions.erase (iter);
 
         return action.Get ();
@@ -190,6 +191,7 @@ class ActionQueueImpl
       : default_wait_handler (xtl::bind (&ActionQueueImpl::DefaultWaitHandler, _1, _2))
       , default_action (new ActionImpl (ActionHandler (), false, default_timer, 0.0, 0.0, default_wait_handler), false)
     {
+      default_timer.Start ();
     }
   
 ///Добавление действия в очередь
@@ -203,16 +205,18 @@ class ActionQueueImpl
 
         queue.PushAction (action);
         
+        Action result = action->GetWrapper ();
+
         try
         {
-          signals [ActionQueueEvent_OnPushAction] (thread);
+          signals [ActionQueueEvent_OnPushAction] (thread, result);
         }
         catch (...)
         {
           //подавление всех исключений
         }
-        
-        return action->GetWrapper ();
+
+        return result;
       }
       catch (xtl::exception& e)
       {
@@ -231,18 +235,20 @@ class ActionQueueImpl
         ActionPtr action = queue.PopAction ();
         
         if (!action)
-          return action->GetWrapper ();
+          return default_action->GetWrapper ();
+          
+        Action result = action->GetWrapper ();
           
         try
         {
-          signals [ActionQueueEvent_OnPopAction] (thread);
+          signals [ActionQueueEvent_OnPopAction] (thread, result);
         }
         catch (...)
         {
           //подавление всех исключений
         }        
 
-        return action->GetWrapper ();
+        return result;
       }
       catch (xtl::exception& e)
       {
@@ -341,12 +347,12 @@ class ActionQueueImpl
   private:
     typedef xtl::intrusive_ptr<ThreadActionQueue>                     ThreadActionQueuePtr;
     typedef stl::hash_map<Platform::threadid_t, ThreadActionQueuePtr> ThreadActionQueueMap;
-    typedef xtl::signal<void (ActionThread)>                          Signal;
+    typedef xtl::signal<void (ActionThread, Action&)>                 Signal;
 
   private:
     Timer                       default_timer;
-    ActionPtr                   default_action;
     Action::WaitCompleteHandler default_wait_handler;
+    ActionPtr                   default_action;
     ThreadActionQueue           main_thread_queue;
     ThreadActionQueue           background_queue;
     ThreadActionQueueMap        thread_queues;
@@ -389,12 +395,12 @@ Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread
   return queue->PushAction (action, thread, true, delay, period, timer);
 }
 
-Action ActionQueue::PushAction (const ActionHandler& action, const ActionHandler& complete_callback, ActionThread thread, time_t delay)
+Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread, time_t delay)
 {
   return PushAction (ActionWithCallback (action, complete_callback), thread, delay);
 }
 
-Action ActionQueue::PushAction (const ActionHandler& action, const ActionHandler& complete_callback, ActionThread thread, time_t delay, Timer& timer)
+Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread, time_t delay, Timer& timer)
 {
   return PushAction (ActionWithCallback (action, complete_callback), thread, delay, timer);
 }
@@ -426,6 +432,7 @@ Action::Action ()
 Action::Action (ActionImpl* in_impl)
   : impl (in_impl)
 {
+  addref (impl);
 }
 
 Action::Action (const Action& action)
@@ -456,7 +463,7 @@ bool Action::IsEmpty () const
 }
 
 bool Action::IsCompleted () const
-{  
+{
   return ActionLock (impl)->is_completed;
 }
 
@@ -490,7 +497,7 @@ void Action::Perform ()
     if (impl->is_canceled)
       throw xtl::format_operation_exception ("", "Action already canceled");
 
-    impl->action_handler ();
+    impl->action_handler (*this);
 
     if (!impl->is_periodic)
       impl->is_completed = true;

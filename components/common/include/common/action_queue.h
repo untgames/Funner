@@ -75,7 +75,7 @@ class Action
 ///Установить функтор ожидания завершения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                       SetWaitHandler (const WaitCompleteHandler&);
-    const WaitCompleteHandler& WaitHandler    () const;    
+    const WaitCompleteHandler& WaitHandler    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -100,8 +100,9 @@ void swap (Action&, Action&);
 class ActionQueue
 {
   public:
-    typedef Timer::time_t           time_t;  
-    typedef xtl::function<void ()>  ActionHandler;
+    typedef Timer::time_t                  time_t;  
+    typedef xtl::function<void (Action&)>  ActionHandler;
+    typedef xtl::function<void ()>         CallbackHandler;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Постановка действия в очередь
@@ -110,8 +111,8 @@ class ActionQueue
     static Action PushAction (const ActionHandler& action, ActionThread thread, time_t delay, time_t period);
     static Action PushAction (const ActionHandler& action, ActionThread thread, time_t delay, Timer& timer);
     static Action PushAction (const ActionHandler& action, ActionThread thread, time_t delay, time_t period, Timer& timer);
-    static Action PushAction (const ActionHandler& action, const ActionHandler& complete_callback, ActionThread thread = ActionThread_Current, time_t delay = 0.0);
-    static Action PushAction (const ActionHandler& action, const ActionHandler& complete_callback, ActionThread thread, time_t delay, Timer& timer);
+    static Action PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread = ActionThread_Current, time_t delay = 0.0);
+    static Action PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread, time_t delay, Timer& timer);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение действий из очереди
@@ -126,7 +127,7 @@ class ActionQueue
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (ActionThread thread)> EventHandler;
+    typedef xtl::function<void (ActionThread thread, Action& action)> EventHandler;
 
     static xtl::connection RegisterEventHandler (ActionQueueEvent event, const EventHandler& handler);
 };

@@ -1,19 +1,53 @@
 Results of action_queue_test:
-Action queue empty - y
-Action queue has action 0 - n
-Action queue has action 1 - n
-Action queue empty - n
-Action queue has action 0 - y
-Action queue has action 1 - y
-action 0 executed.
-New log message: Exception occured during executing of action 2
+-- perform test --
+push action to thread 0
+push action to thread 0
+push action to thread 0
+pop action from thread 0
+time=00, action:
+  action 1 executed
+  callback 1
+  wait 100 milliseconds
+  wait: true
+  after perform action: completed
+time=01, action: empty
+pop action from thread 0
+time=02, action:
+  exception: Exception occured during executing of action 2
     at action_handler
-action 1 executed.
-action 1 executed.
-action 1 executed.
-Action queue empty - n
-Action queue has action 0 - n
-Action queue has action 1 - y
-Action queue has action 1 - n
-Action queue empty - n
-Action queue empty - y
+    at common::Action::Perform
+  after perform action:
+pop action from thread 0
+time=03, action:
+  action 3 executed
+  wait 100 milliseconds
+  wait: false
+  after perform action:
+pop action from thread 0
+time=04, action:
+  action 3 executed
+  wait 100 milliseconds
+  wait: false
+  after perform action:
+pop action from thread 0
+time=05, action:
+  action 3 executed
+  wait 100 milliseconds
+  wait: false
+  after perform action:
+pop action from thread 0
+time=06, action:
+  action 3 executed
+  wait 100 milliseconds
+  wait: false
+  after perform action:
+pop action from thread 0
+time=07, action:
+  action 3 executed
+  wait 100 milliseconds
+  wait: false
+  after perform action: canceled
+time=08, action: empty
+time=09, action: empty
+-- cleanup current thread --
+exit
