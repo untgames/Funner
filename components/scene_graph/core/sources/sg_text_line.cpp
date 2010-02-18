@@ -146,6 +146,8 @@ void TextLine::SetCharsColorFactors (size_t first, size_t count, const math::vec
   stl::fill (impl->chars_colors_factors.begin () + first, impl->chars_colors_factors.begin () + end, color);
 
   impl->chars_colors_need_update = true;
+
+  UpdateNotify ();
 }
 
 const math::vec4f& TextLine::CharColor (size_t index) const
