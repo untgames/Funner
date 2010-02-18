@@ -3,12 +3,33 @@
 using namespace scene_graph;
 using namespace math;
 
+namespace
+{
+
+float clamp (float x)
+{
+  if (x < 0.0f) return 0.0f;
+  if (x > 1.0f) return 1.0f;
+
+  return x;
+}
+
+vec4f clamp (const vec4f& color)
+{
+  return vec4f (clamp (color.x), clamp (color.y), clamp (color.z), clamp (color.w));
+}
+
+}
+
+
 /*
     Описание реализации TextLine
 */
 
 struct TextLine::Impl
 {
+  typedef stl::vector <math::vec4f> CharsColors;
+
   stl::string       text;
   stl::wstring      text_unicode;
   size_t            text_hash;
@@ -17,8 +38,12 @@ struct TextLine::Impl
   bool              text_unicode_need_update;
   stl::string       font_name;
   vec4f             color;
+  vec4f             last_asked_char_color;    //переменная для хранения возвращаемого значения
   TextLineAlignment horizontal_alignment;
   TextLineAlignment vertical_alignment;
+  CharsColors       chars_colors_factors;     //множители цвета букв
+  CharsColors       chars_colors;
+  bool              chars_colors_need_update;
 
   Impl ()
    : text_hash (common::strhash ("")),
@@ -27,7 +52,27 @@ struct TextLine::Impl
      text_unicode_need_update (false),
      color (1.f, 1.f, 1.f, 1.f), 
      horizontal_alignment (TextLineAlignment_Left),
-     vertical_alignment (TextLineAlignment_Top) {}
+     vertical_alignment (TextLineAlignment_Top),
+     chars_colors_need_update (false)
+   {}
+
+  void OnTextChanged ()
+  {
+    chars_colors_factors.clear ();
+    chars_colors.clear ();
+  }
+
+  void UpdateCharsColors ()
+  {
+    size_t chars_count = chars_colors_factors.size ();
+
+    chars_colors.resize (chars_count);
+
+    for (size_t i = 0; i < chars_count; i++)
+      chars_colors [i] = clamp (color * chars_colors_factors [i]);
+
+    chars_colors_need_update = true;
+  }
 };
 
 /*
@@ -56,24 +101,6 @@ TextLine::Pointer TextLine::Create ()
     Цвет текста
 */
 
-namespace
-{
-
-float clamp (float x)
-{
-  if (x < 0.0f) return 0.0f;
-  if (x > 1.0f) return 1.0f;
-  
-  return x;
-}
-
-vec4f clamp (const vec4f& color)
-{
-  return vec4f (clamp (color.x), clamp (color.y), clamp (color.z), clamp (color.w));
-}
-
-}
-
 void TextLine::SetColor (const vec4f& color)
 {
   impl->color = clamp (color);
@@ -97,6 +124,72 @@ const vec4f& TextLine::Color () const
 }
 
 /*
+   Цвет определенных символов текста
+*/
+
+void TextLine::SetCharsColorFactors (size_t first, size_t count, const math::vec4f& color)
+{
+  static const char* METHOD_NAME = "scene_graph::TextLine::SetCharsColor";
+
+  size_t text_length = TextLength (),
+         end         = first + count;
+
+  if (first >= text_length)
+    throw xtl::make_range_exception (METHOD_NAME, "first", first, 0u, text_length);
+
+  if (end > text_length)
+    throw xtl::make_range_exception (METHOD_NAME, "first + count", end, 0u, text_length + 1);
+
+  if (impl->chars_colors_factors.empty ())
+    impl->chars_colors_factors.resize (TextLength (), 1);
+
+  stl::fill (impl->chars_colors_factors.begin () + first, impl->chars_colors_factors.begin () + end, color);
+
+  impl->chars_colors_need_update = true;
+}
+
+const math::vec4f& TextLine::CharColor (size_t index) const
+{
+  if (index >= TextLength ())
+    throw xtl::make_range_exception ("scene_graph::TextLine::SetCharsColor", "index", index, 0u, TextLength ());
+
+  if (impl->chars_colors_need_update)
+    impl->UpdateCharsColors ();
+
+  if (impl->chars_colors.empty ())
+    return Color ();
+
+  return impl->chars_colors [index];
+}
+
+void TextLine::CharsColors (size_t first, size_t count, math::vec4f* colors) const
+{
+  static const char* METHOD_NAME = "scene_graph::TextLine::CharsColor";
+
+  size_t text_length = TextLength (),
+         end         = first + count;
+
+  if (first >= text_length)
+    throw xtl::make_range_exception (METHOD_NAME, "first", first, 0u, text_length);
+
+  if (end > text_length)
+    throw xtl::make_range_exception (METHOD_NAME, "first + count", end, 0u, text_length + 1);
+
+  if (impl->chars_colors_need_update)
+    impl->UpdateCharsColors ();
+
+  if (impl->chars_colors.empty ())
+  {
+    const math::vec4f& color = Color ();
+
+    for (size_t i = 0; i < count; i++, colors++)
+      *colors = color;
+  }
+  else
+    stl::copy (impl->chars_colors.begin () + first, impl->chars_colors.begin () + end, colors);
+}
+
+/*
    Установка/получение текста
 */
 
@@ -110,6 +203,8 @@ void TextLine::SetText (const char* text)
   impl->text_need_update         = false;
   impl->text_unicode_need_update = true;
 
+  impl->OnTextChanged ();
+
   UpdateNotify ();
 }
 
@@ -122,6 +217,8 @@ void TextLine::SetText (const wchar_t* text)
   impl->text_unicode_hash        = common::strhash (impl->text_unicode.c_str ());
   impl->text_unicode_need_update = false;
   impl->text_need_update         = true;
+
+  impl->OnTextChanged ();
 
   UpdateNotify ();
 }
@@ -148,6 +245,16 @@ const wchar_t* TextLine::TextUnicode () const
   }
 
   return impl->text_unicode.c_str ();
+}
+
+size_t TextLine::TextLength  () const
+{
+  if (!impl->text_need_update)
+    return impl->text.length ();
+  else if (!impl->text_need_update)
+    return impl->text_unicode.length ();
+  else
+    return xtl::xstrlen (Text ());
 }
 
 /*

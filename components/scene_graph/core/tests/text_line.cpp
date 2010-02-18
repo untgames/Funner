@@ -22,6 +22,7 @@ int main ()
   printf ("TextLine text = '%s'\n", text_line->Text ());
   printf ("TextLine unicode text = '%S'\n", text_line->TextUnicode ());
   printf ("TextLine font name = '%s'\n", text_line->Font ());
+  printf ("TextLine length = %u\n", text_line->TextLength ());
   printf ("TextLine horizontal alignment = '%s', vertical_alignment = '%s'\n", get_name (text_line->HorizontalAlignment ()), get_name (text_line->VerticalAlignment ()));
 
   text_line->SetColor (0.1f, 0.2f, 0.3f, 0.4f);
@@ -33,12 +34,14 @@ int main ()
   printf ("TextLine text = '%s'\n", text_line->Text ());
   printf ("TextLine unicode text = '%S'\n", text_line->TextUnicode ());
   printf ("TextLine font name = '%s'\n", text_line->Font ());
+  printf ("TextLine length = %u\n", text_line->TextLength ());
   printf ("TextLine horizontal alignment = '%s', vertical_alignment = '%s'\n", get_name (text_line->HorizontalAlignment ()), get_name (text_line->VerticalAlignment ()));
 
   text_line->SetText (L"Unicode text");
 
   printf ("TextLine text = '%s'\n", text_line->Text ());
   printf ("TextLine unicode text = '%S'\n", text_line->TextUnicode ());
+  printf ("TextLine length = %u\n", text_line->TextLength ());
 
   text_line->SetHorizontalAlignment (TextLineAlignment_Right);
   text_line->SetVerticalAlignment   (TextLineAlignment_Center);

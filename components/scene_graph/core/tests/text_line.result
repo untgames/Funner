@@ -3,13 +3,16 @@ TextLine color = [1.00 1.00 1.00 1.00]
 TextLine text = ''
 TextLine unicode text = ''
 TextLine font name = ''
+TextLine length = 0
 TextLine horizontal alignment = 'TextLineAlignment_Left/TextLineAlignment_Top', vertical_alignment = 'TextLineAlignment_Left/TextLineAlignment_Top'
 TextLine color = [0.10 0.20 0.30 0.40]
 TextLine text = 'Non-unicode text'
 TextLine unicode text = 'Non-unicode text'
 TextLine font name = 'font'
+TextLine length = 16
 TextLine horizontal alignment = 'TextLineAlignment_Center', vertical_alignment = 'TextLineAlignment_Right/TextLineAlignment_Bottom'
 TextLine text = 'Unicode text'
 TextLine unicode text = 'Unicode text'
+TextLine length = 12
 TextLine horizontal alignment = 'TextLineAlignment_Right/TextLineAlignment_Bottom', vertical_alignment = 'TextLineAlignment_Center'
 TextLine horizontal alignment = 'TextLineAlignment_BaseLine', vertical_alignment = 'TextLineAlignment_BaseLine'

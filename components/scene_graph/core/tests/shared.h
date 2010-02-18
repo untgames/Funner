@@ -6,6 +6,7 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/signal.h>
 #include <xtl/string.h>
+#include <xtl/uninitialized_storage.h>
 #include <xtl/visitor.h>
 
 #include <stl/string>
