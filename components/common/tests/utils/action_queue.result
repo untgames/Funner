@@ -23,31 +23,21 @@ time=03, action:
   wait 100 milliseconds
   wait: false
   after perform action:
-pop action from thread 0
-time=04, action:
-  action 3 executed
-  wait 100 milliseconds
-  wait: false
-  after perform action:
+time=04, action: empty
 pop action from thread 0
 time=05, action:
   action 3 executed
   wait 100 milliseconds
   wait: false
   after perform action:
+time=06, action: empty
+time=07, action: empty
 pop action from thread 0
-time=06, action:
-  action 3 executed
-  wait 100 milliseconds
-  wait: false
-  after perform action:
-pop action from thread 0
-time=07, action:
+time=08, action:
   action 3 executed
   wait 100 milliseconds
   wait: false
   after perform action: canceled
-time=08, action: empty
 time=09, action: empty
 -- cleanup current thread --
 exit

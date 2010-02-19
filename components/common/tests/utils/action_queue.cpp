@@ -24,7 +24,7 @@ template <int I> void action_handler (Action& action)
       {
         static size_t periodic_counter = 0;
         
-        if (periodic_counter++ == 4)
+        if (periodic_counter++ == 2)
           action.Cancel ();
       }
       
