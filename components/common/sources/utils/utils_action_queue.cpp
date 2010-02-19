@@ -4,6 +4,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/lock_ptr.h>
 #include <xtl/reference_counter.h>
 #include <xtl/signal.h>
 
@@ -26,9 +27,8 @@ namespace common
     Реализация действия
 */
 
-struct ActionImpl: public xtl::reference_counter
+struct ActionImpl: public xtl::reference_counter, public Lockable
 {
-  Lockable                    lockable;
   ActionQueue::ActionHandler  action_handler; //обработчик выполнения действия
   Action::WaitCompleteHandler wait_handler;   //обработчик ожидания выполнения операции  
   Timer                       timer;          //таймер, связанный с действием
@@ -84,31 +84,7 @@ class ActionWithCallback
     ActionQueue::CallbackHandler complete_callback;
 };
 
-/*
-    Блокировка действия
-*/
-
-class ActionLock
-{
-  public:
-    ActionLock (ActionImpl* in_impl)
-      : impl (in_impl)
-      , lock (impl->lockable)
-    {
-    }
-
-    ActionImpl* operator -> () { return impl.get (); }
-    
-    ActionImpl* Get () { return impl.get (); }
-
-  private:
-    ActionLock (const ActionLock&); //no impl
-    ActionLock& operator = (const ActionLock&); //no impl
-    
-  private:
-    ActionPtr impl;
-    Lock      lock;
-};
+typedef xtl::lock_ptr<ActionImpl, xtl::intrusive_ptr<ActionImpl> > ActionLock;
 
 /*
     Очередь нити
@@ -117,10 +93,22 @@ class ActionLock
 class ThreadActionQueue: public xtl::reference_counter
 {
   public:
+///Конструктор
+    ThreadActionQueue ()
+    {
+      actions_count = 0;
+    }
+  
 ///Проверка на пустоту
     bool IsEmpty ()
     {
       return actions.empty ();
+    }
+    
+///Количество действий в очереди
+    size_t Size ()
+    {
+      return actions_count;
     }
   
 ///Добавление действия
@@ -130,6 +118,8 @@ class ThreadActionQueue: public xtl::reference_counter
         return;
         
       actions.push_back (action);
+      
+      actions_count++;
     }    
     
 ///Получение действия
@@ -146,6 +136,8 @@ class ThreadActionQueue: public xtl::reference_counter
           ++next;
 
           actions.erase (iter);
+          
+          actions_count--;
 
           iter = next;
 
@@ -159,11 +151,13 @@ class ThreadActionQueue: public xtl::reference_counter
         }
 
         if (action->is_periodic)
-          return action.Get ();
+          return action.get ();
           
         actions.erase (iter);
+        
+        actions_count--;
 
-        return action.Get ();
+        return action.get ();
       }
 
       return ActionPtr ();
@@ -173,6 +167,7 @@ class ThreadActionQueue: public xtl::reference_counter
     typedef stl::list<ActionPtr> ActionList;
 
   private:
+    size_t     actions_count;
     ActionList actions;
 };
 
@@ -193,7 +188,7 @@ class ActionQueueImpl
     {
       default_timer.Start ();
     }
-  
+
 ///Добавление действия в очередь
     Action PushAction (const ActionHandler& action, ActionThread thread, bool is_periodic, time_t delay, time_t period, Timer& timer)
     {
@@ -204,7 +199,7 @@ class ActionQueueImpl
         ThreadActionQueue& queue = GetQueue (thread);
 
         queue.PushAction (action);
-        
+
         Action result = action->GetWrapper ();
 
         try
@@ -221,6 +216,41 @@ class ActionQueueImpl
       catch (xtl::exception& e)
       {
         e.touch ("common::ActionQueue::PushAction");
+        throw;
+      }
+    }
+
+///Размер очереди
+    size_t ActionsCount (ActionThread thread)
+    {
+      try
+      {
+        switch (thread)
+        {
+          case ActionThread_Main:
+            return main_thread_queue.Size ();
+          case ActionThread_Background:
+            return background_queue.Size ();
+          case ActionThread_Current:
+          {        
+            Platform::threadid_t thread_id = Platform::GetCurrentThreadId ();
+
+            ThreadActionQueueMap::iterator iter = thread_queues.find (thread_id);
+
+            if (iter == thread_queues.end ())
+              return 0;
+
+            ThreadActionQueuePtr queue = iter->second;
+
+            return queue->Size ();
+          }
+          default:
+            throw xtl::make_argument_exception ("", "thread", thread);
+        }
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("common::ActionQueue::QueueActionsCount");
         throw;
       }
     }
@@ -403,6 +433,11 @@ Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandl
 Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread, time_t delay, Timer& timer)
 {
   return PushAction (ActionWithCallback (action, complete_callback), thread, delay, timer);
+}
+
+size_t ActionQueue::ActionsCount (ActionThread thread)
+{
+  return ActionQueueSingleton::Instance ()->ActionsCount (thread);
 }
 
 Action ActionQueue::PopAction (ActionThread thread)
