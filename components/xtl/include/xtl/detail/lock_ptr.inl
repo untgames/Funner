@@ -4,7 +4,7 @@
 
 template <class T, class Ptr>
 inline lock_ptr<T, Ptr>::lock_ptr ()
-  : ptr_object ()
+  : ptr ()
 {
 }
 
