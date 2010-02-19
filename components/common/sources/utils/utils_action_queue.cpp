@@ -9,6 +9,7 @@
 #include <xtl/signal.h>
 
 #include <common/action_queue.h>
+#include <common/component.h>
 #include <common/lockable.h>
 #include <common/singleton.h>
 
@@ -22,6 +23,12 @@ using namespace common;
 
 namespace common
 {
+
+/*
+    Константы
+*/
+
+const char* ACTION_QUEUE_LISTENERS_COMPONENT_MASK = "common.action_queue.*"; //маска имён компонентов слушателй событий очереди действий
 
 /*
     Реализация действия
@@ -151,7 +158,10 @@ class ThreadActionQueue: public xtl::reference_counter
         }
 
         if (action->is_periodic)
+        {
+          action->next_time += action->period;
           return action.get ();
+        }
           
         actions.erase (iter);
         
@@ -204,6 +214,8 @@ class ActionQueueImpl
 
         try
         {
+          static common::ComponentLoader loader (ACTION_QUEUE_LISTENERS_COMPONENT_MASK);
+          
           signals [ActionQueueEvent_OnPushAction] (thread, result);
         }
         catch (...)
