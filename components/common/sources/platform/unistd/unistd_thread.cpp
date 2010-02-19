@@ -10,5 +10,5 @@ using namespace common;
    
 UnistdPlatform::threadid_t UnistdPlatform::GetCurrentThreadId ()
 {
-  return (threadid_t)::GetCurrentThreadId ();
+  return (UnistdPlatform::threadid_t)pthread_self ();
 }
