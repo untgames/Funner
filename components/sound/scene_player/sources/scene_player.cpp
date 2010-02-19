@@ -21,10 +21,7 @@
 
 #include <math/vector.h>
 
-#include <syslib/timer.h>
-
 using namespace sound;
-using namespace syslib;
 using namespace xtl;
 using namespace common;
 using namespace scene_graph;
@@ -33,6 +30,17 @@ using namespace math;
 #ifdef _MSC_VER
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
 #endif
+
+namespace
+{
+
+/*
+    Константы
+*/
+
+const double STOP_EMITTER_DELAY = 0.2; //запаздывание при остановке звука
+
+}
 
 /*
     Описание реализации ScenePlayer
@@ -47,8 +55,14 @@ struct ScenePlayerEmitter
   clock_t         play_start_time;   //время начала проигрывания
   float           play_start_offset; //смещение начала проигрывания
   bool            is_playing;        //проигрывается ли звук
+  Action          auto_stop_action;  //действие автоматической остановки звука
 
   ScenePlayerEmitter (const char* source_name, xtl::connection in_play_connection, xtl::connection in_stop_connection, xtl::connection in_update_connection);
+  
+  ~ScenePlayerEmitter ()
+  {
+    auto_stop_action.Cancel ();
+  }
 };
 
 ScenePlayerEmitter::ScenePlayerEmitter (const char* source_name, xtl::connection in_play_connection, xtl::connection in_stop_connection, xtl::connection in_update_connection)
@@ -64,13 +78,6 @@ ScenePlayerEmitter::ScenePlayerEmitter (const char* source_name, xtl::connection
 typedef xtl::shared_ptr<ScenePlayerEmitter>                              ScenePlayerEmitterPtr;
 typedef stl::hash_map<scene_graph::SoundEmitter*, ScenePlayerEmitterPtr> EmitterSet;
 
-namespace
-{
-
-const size_t ACTION_QUEUE_PROCESS_MILLISECONDS = 100;
-
-}
-
 struct ScenePlayer::Impl
 {
   scene_graph::Listener* listener;                   //слушатель
@@ -81,13 +88,10 @@ struct ScenePlayer::Impl
   auto_connection        update_connection;          //соединение события обновления свойств
   auto_connection        listener_unbind_connection; //соединение события удаления слушателя
   auto_connection        manager_destroy_connection; //соединение события удаления менеджера
-  ActionQueue            action_queue;               //очередь событий остановки проигрывания эмиттера
-  syslib::Timer          action_queue_timer;         //таймер вызова обработки очереди
 
   Impl ()
-    : listener (0),
-      sound_manager (0),
-      action_queue_timer (xtl::bind (&ScenePlayer::Impl::DoActions, this), ACTION_QUEUE_PROCESS_MILLISECONDS)
+    : listener (0)
+    , sound_manager (0)
     {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -191,14 +195,6 @@ struct ScenePlayer::Impl
   }
 
   private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вызов обработчика очереди событий
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void DoActions ()
-    {
-      action_queue.DoActions (action_queue_timer.ElapsedMilliseconds ());
-    }
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка удаления менеджера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,10 +305,11 @@ struct ScenePlayer::Impl
       emitter.AddRef ();
 
       if (!sound_manager->IsLooping (emitter_iter->second->emitter))
-        action_queue.SetAction ((size_t)&emitter, size_t(sound_manager->Duration (emitter_iter->second->emitter) * 1000.f + ACTION_QUEUE_PROCESS_MILLISECONDS * 2),
-                                bind (&ScenePlayer::Impl::StopEmitter, this, xtl::ref (emitter)));
+      {
+        emitter_iter->second->auto_stop_action = common::ActionQueue::PushAction (bind (&ScenePlayer::Impl::StopEmitter, this, xtl::ref (emitter)), common::ActionThread_Current, sound_manager->Duration (emitter_iter->second->emitter) + STOP_EMITTER_DELAY);
+      }
     }
-
+    
     void StopEmitter (SoundEmitter& emitter)
     {
       if (!sound_manager)
