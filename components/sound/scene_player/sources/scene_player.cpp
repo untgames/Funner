@@ -61,7 +61,14 @@ struct ScenePlayerEmitter
   
   ~ScenePlayerEmitter ()
   {
-    auto_stop_action.Cancel ();
+    try
+    {
+      auto_stop_action.Cancel ();
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
   }
 };
 
@@ -245,9 +252,9 @@ struct ScenePlayer::Impl
       if (emitter)
       {
         ScenePlayerEmitterPtr scene_player_emitter (new ScenePlayerEmitter (emitter->SoundDeclarationName (),
-                                                                  emitter->RegisterEventHandler (SoundEmitterEvent_Play, bind (&ScenePlayer::Impl::PlayEmitter, this, _1, _2)),
-                                                                  emitter->RegisterEventHandler (SoundEmitterEvent_Stop, bind (&ScenePlayer::Impl::StopEmitter, this, _1)),
-                                                                  node.RegisterEventHandler     (NodeEvent_AfterUpdate,  bind (&ScenePlayer::Impl::EmitterUpdate, this, _1, _2))));
+          emitter->RegisterEventHandler (SoundEmitterEvent_Play, bind (&ScenePlayer::Impl::PlayEmitter, this, _1, _2)),
+          emitter->RegisterEventHandler (SoundEmitterEvent_Stop, bind (&ScenePlayer::Impl::StopEmitter, this, _1)),
+          node.RegisterEventHandler     (NodeEvent_AfterUpdate,  bind (&ScenePlayer::Impl::EmitterUpdate, this, _1, _2))));
 
         emitters.insert_pair (emitter, scene_player_emitter);
       }
