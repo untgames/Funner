@@ -50,7 +50,7 @@ int main ()
   printf ("TextLine color = [%.2f %.2f %.2f %.2f]\n", text_line->Color ().x, text_line->Color ().y, text_line->Color ().z, text_line->Color ().w);
   print_chars_colors (text_line);
 
-  text_line->SetCharsColorFactors (2, 3, math::vec4f (1.f, 2.f, 0.1, 0.f));
+  text_line->SetCharsColorFactors (2, 3, math::vec4f (1.f, 2.f, 0.1f, 0.f));
 
   printf ("TextLine color = [%.2f %.2f %.2f %.2f]\n", text_line->Color ().x, text_line->Color ().y, text_line->Color ().z, text_line->Color ().w);
   print_chars_colors (text_line);
