@@ -1,0 +1,22 @@
+Results of lock_ptr_test:
+A::A(1)
+lock A(1)
+lock A(1)
+A::A(2)
+lock A(2)
+expression '!p == false' is true
+expression 'p2' is true
+expression 'p == p1' is true
+expression 'p1 != p2' is true
+expression 'p1.get () == p' is true
+expression 'p1.get () != p2' is true
+expression 'p == p1.get ()' is true
+expression 'p1 != p2.get ()' is true
+lock A(1)
+unlock A(1)
+expression '(p1 = p1) == p1' is true
+unlock A(2)
+A::~A(2)
+unlock A(1)
+unlock A(1)
+A::~A(1)
