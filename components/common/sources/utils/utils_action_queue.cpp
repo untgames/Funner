@@ -200,11 +200,11 @@ class ActionQueueImpl
     }
 
 ///Добавление действия в очередь
-    Action PushAction (const ActionHandler& action, ActionThread thread, bool is_periodic, time_t delay, time_t period, Timer& timer)
+    Action PushAction (const ActionHandler& action_handler, ActionThread thread, bool is_periodic, time_t delay, time_t period, Timer& timer)
     {
       try
       {
-        ActionPtr action (new ActionImpl (action, is_periodic, timer, delay, period, default_wait_handler), false);
+        ActionPtr action (new ActionImpl (action_handler, is_periodic, timer, delay, period, default_wait_handler), false);
 
         ThreadActionQueue& queue = GetQueue (thread);
 
