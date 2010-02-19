@@ -1,9 +1,6 @@
 #ifndef XTL_LOCK_PTR_HEADER
 #define XTL_LOCK_PTR_HEADER
 
-#include <xtl/trackable.h>
-#include <xtl/default_cast_type.h>
-
 namespace xtl
 {
 
