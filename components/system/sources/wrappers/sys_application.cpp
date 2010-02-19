@@ -113,6 +113,11 @@ class ApplicationImpl: private IRunLoopContext
     void OnIdle          ();
     void OnEnterRunLoop  ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обработка действий
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void ProcessActions (ActionThread);
+
   private:
     ApplicationSignal  idle_signal;                    //сигнал обработки события ApplicationEvent_OnIdle
     ApplicationSignal  exit_signal;                    //сигнал обработки события ApplicationEvent_OnExit
@@ -215,7 +220,7 @@ void ApplicationImpl::DoCustomRunLoop ()
 
      //если нет обработчиков OnIdle - приостанавливаем приложение
 
-    if (idle_signal.empty ())
+    if (idle_signal.empty () && !ActionQueue::ActionsCount (ActionThread_Main) && !ActionQueue::ActionsCount (ActionThread_Current))
     {
       if (!is_exit_detected && Platform::IsMessageQueueEmpty ())
         Suspend ();
@@ -232,9 +237,34 @@ void ApplicationImpl::OnExit (int code)
   Exit (code);
 }
 
+void ApplicationImpl::ProcessActions (ActionThread thread)
+{
+  size_t count = ActionQueue::ActionsCount (thread);
+  
+  for (size_t i=0; i<count; i++)
+  {
+    try
+    {
+      Action action = ActionQueue::PopAction (thread);
+      
+      if (action.IsEmpty ())
+        continue;
+        
+      action.Perform ();
+    }
+    catch (...)
+    {
+      //подавление исключений
+    }
+  }  
+}
+
 void ApplicationImpl::OnIdle ()
 {
-  Notify (idle_signal);
+  ProcessActions (ActionThread_Main);
+  ProcessActions (ActionThread_Current);
+
+  Notify (idle_signal);  
 }
 
 void ApplicationImpl::OnEnterRunLoop ()
