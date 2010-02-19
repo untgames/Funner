@@ -71,8 +71,8 @@ Draw primitive (id=8)
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=4):
     sprite #0: position=[0.30 0.32 0.00] size=[0.53 0.67] color=[0.10 0.20 0.30 0.40] tex_offset=[0.02 0.09] tex_size=[0.02 0.04]
-    sprite #1: position=[0.80 0.22 0.00] size=[0.36 0.47] color=[0.10 0.20 0.30 0.40] tex_offset=[0.36 0.10] tex_size=[0.01 0.03]
-    sprite #2: position=[1.26 0.21 0.00] size=[0.45 0.45] color=[0.10 0.20 0.30 0.40] tex_offset=[0.68 0.10] tex_size=[0.01 0.03]
+    sprite #1: position=[0.80 0.22 0.00] size=[0.36 0.47] color=[0.20 0.20 0.03 0.00] tex_offset=[0.36 0.10] tex_size=[0.01 0.03]
+    sprite #2: position=[1.26 0.21 0.00] size=[0.45 0.45] color=[0.20 0.20 0.03 0.00] tex_offset=[0.68 0.10] tex_size=[0.01 0.03]
     sprite #3: position=[1.65 0.30 0.00] size=[0.27 0.59] color=[0.10 0.20 0.30 0.40] tex_offset=[0.60 0.09] tex_size=[0.01 0.04]
 End draw frame (id=7)
 End draw frames (id=2, frame_id=2)

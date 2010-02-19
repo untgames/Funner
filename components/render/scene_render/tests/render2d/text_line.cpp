@@ -57,6 +57,7 @@ int main ()
 
     render_target.Update ();
 
+    text_line->SetCharsColorFactors (1, 2, math::vec4f (2.f, 1.f, 0.1f, 0.f));
     text_line->SetAlignment (TextLineAlignment_BaseLine, TextLineAlignment_BaseLine);
 
     render_target.Update ();

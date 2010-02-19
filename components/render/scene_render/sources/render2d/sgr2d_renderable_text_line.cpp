@@ -22,6 +22,8 @@ inline bool is_symbol_valid (size_t symbol_code, size_t first_code, size_t last_
   return symbol_code >= first_code && symbol_code < last_code;
 }
 
+typedef xtl::uninitialized_storage <math::vec4f> CharsColors;
+
 }
 
 /*
@@ -34,7 +36,7 @@ struct RenderableTextLine::Impl
   scene_graph::TextLine*         text_line;                    //исходная линия текста
   PrimitivePtr                   primitive;                    //визуализируемый примитив
   SpritesBuffer                  sprites_buffer;               //буфер спрайтов
-  math::vec4f                    current_color;                //текущий цвет
+  CharsColors                    current_chars_colors;         //текущие цвета букв
   RenderableFont*                current_renderable_font;      //текущий шрифт
   size_t                         current_text_hash;            //текущий хэш текста
   TextDimensions                 current_text_dimensions;      //текущие границы текста
@@ -92,7 +94,18 @@ struct RenderableTextLine::Impl
 
         //определение необходимости обновления цвета текста
 
-      bool need_update_color = current_color != text_line->Color ();
+      size_t text_length = text_line->TextLength ();
+
+      if (need_update_text)
+        current_chars_colors.resize (text_length);
+
+      CharsColors actual_chars_colors (text_length);
+
+      text_line->CharsColors (0, text_length, actual_chars_colors.data ());
+
+      bool need_update_color = need_update_text || memcmp (current_chars_colors.data (), actual_chars_colors.data (), current_chars_colors.size () * sizeof (CharsColors::value_type));
+
+      current_chars_colors.swap (actual_chars_colors);
 
         //определение необходимости обновления всех полей
 
@@ -112,7 +125,6 @@ struct RenderableTextLine::Impl
           //инициализация параметров рендеринга текста
 
         const wchar_t*          text_unicode      = text_line->TextUnicode ();
-        size_t                  text_length       = xtl::xstrlen (text_unicode);
         const media::Font&      font              = renderable_font->GetFont ();
         const media::GlyphInfo* glyphs            = font.Glyphs ();
         size_t                  glyphs_count      = font.GlyphsTableSize (),
@@ -121,7 +133,6 @@ struct RenderableTextLine::Impl
         float                   current_pen_x     = 0.0f,
                                 current_pen_y     = 0.0f,
                                 max_glyph_side    = (float)renderable_font->GetMaxGlyphSide ();
-        math::vec4f             color             = text_line->Color ();
         TextDimensions          text_dimensions;
 
           //резервирование места для буфера спрайтов
@@ -176,7 +187,7 @@ struct RenderableTextLine::Impl
 
           dst_sprite->position   = math::vec3f (current_pen_x + bearing_x + src_sprite.size.x / 2.f,
                                                 current_pen_y + bearing_y - src_sprite.size.y / 2.f, 0.f);
-          dst_sprite->color      = color;
+          dst_sprite->color      = current_chars_colors.data () [i];
           dst_sprite->size       = src_sprite.size;
           dst_sprite->tex_offset = src_sprite.tex_offset;
           dst_sprite->tex_size   = src_sprite.tex_size;
@@ -296,20 +307,12 @@ struct RenderableTextLine::Impl
 
       if (need_update_color)
       {
-          //получение цвета
-
-        math::vec4f color = text_line->Color ();
-
           //обновление цвета в спрайтах
 
         mid_level::renderer2d::Sprite* sprite = sprites_buffer.data ();
 
         for (size_t i=0, count=sprites_buffer.size (); i<count; i++, sprite++)
-          sprite->color = color;
-
-          //обновление параметров
-
-        current_color = text_line->Color ();
+          sprite->color = current_chars_colors.data () [i];
 
           //обновление флагов
 

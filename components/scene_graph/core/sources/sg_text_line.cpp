@@ -134,9 +134,6 @@ void TextLine::SetCharsColorFactors (size_t first, size_t count, const math::vec
   size_t text_length = TextLength (),
          end         = first + count;
 
-  if (first >= text_length)
-    throw xtl::make_range_exception (METHOD_NAME, "first", first, 0u, text_length);
-
   if (end > text_length)
     throw xtl::make_range_exception (METHOD_NAME, "first + count", end, 0u, text_length + 1);
 
@@ -170,9 +167,6 @@ void TextLine::CharsColors (size_t first, size_t count, math::vec4f* colors) con
 
   size_t text_length = TextLength (),
          end         = first + count;
-
-  if (first >= text_length)
-    throw xtl::make_range_exception (METHOD_NAME, "first", first, 0u, text_length);
 
   if (end > text_length)
     throw xtl::make_range_exception (METHOD_NAME, "first + count", end, 0u, text_length + 1);
