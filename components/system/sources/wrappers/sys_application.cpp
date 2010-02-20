@@ -227,7 +227,7 @@ void ApplicationImpl::DoCustomRunLoop ()
     }
     else
     {
-      Notify (idle_signal);
+      OnIdle ();
     }
   }
 }
