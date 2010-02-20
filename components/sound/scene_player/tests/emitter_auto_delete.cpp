@@ -23,8 +23,6 @@ using namespace scene_graph;
 
 const char* library_file = "data/test.snddecl";
 
-const size_t TEST_WORK_TIME = 8000;  //время работы теста (в милисекундах)
-
 typedef scene_graph::Listener::Pointer     ListenerPtr;
 typedef scene_graph::SoundEmitter::Pointer SoundEmitterPtr;
 
