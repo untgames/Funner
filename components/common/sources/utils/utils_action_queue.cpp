@@ -194,7 +194,6 @@ class ActionQueueImpl
 ///Конструктор
     ActionQueueImpl ()
       : default_wait_handler (xtl::bind (&ActionQueueImpl::DefaultWaitHandler, _1, _2))
-      , default_action (new ActionImpl (ActionHandler (), false, default_timer, 0.0, 0.0, default_wait_handler), false)
     {
       default_timer.Start ();
     }
@@ -277,7 +276,7 @@ class ActionQueueImpl
         ActionPtr action = queue.PopAction ();
         
         if (!action)
-          return default_action->GetWrapper ();
+          return Action ();
           
         Action result = action->GetWrapper ();
           
@@ -341,10 +340,7 @@ class ActionQueueImpl
     }
 
 ///Получение таймера по умолчанию
-    Timer& DefaultTimer () { return default_timer; }
-    
-///Получение действия по умолчанию
-    ActionPtr DefaultAction () { return default_action; }
+    Timer& DefaultTimer () { return default_timer; }    
 
   private:
 ///Получение очереди нити
@@ -394,7 +390,6 @@ class ActionQueueImpl
   private:
     Timer                       default_timer;
     Action::WaitCompleteHandler default_wait_handler;
-    ActionPtr                   default_action;
     ThreadActionQueue           main_thread_queue;
     ThreadActionQueue           background_queue;
     ThreadActionQueueMap        thread_queues;
@@ -472,29 +467,32 @@ void ActionQueue::CleanupCurrentThread ()
 */
 
 Action::Action ()
-  : impl (ActionQueueSingleton::Instance ()->DefaultAction ().get ())
+  : impl (0)
 {
 }
 
 Action::Action (ActionImpl* in_impl)
   : impl (in_impl)
 {
-  addref (impl);
+  if (impl)
+    addref (impl);
 }
 
 Action::Action (const Action& action)
   : impl (action.impl)
 {
-  ActionLock lock (impl);
+  ActionLock locked_impl (impl);
 
-  addref (impl);
+  if (impl)
+    addref (impl);
 }
 
 Action::~Action ()
 {
-  ActionLock lock (impl);
+  ActionLock locked_impl (impl);
 
-  release (impl);
+  if (impl)
+    release (impl);
 }
 
 Action& Action::operator = (const Action& action)
@@ -506,24 +504,33 @@ Action& Action::operator = (const Action& action)
 
 bool Action::IsEmpty () const
 {
-  return impl == ActionQueueSingleton::Instance ()->DefaultAction ().get ();
+  return impl == 0;
 }
 
 bool Action::IsCompleted () const
 {
-  return ActionLock (impl)->is_completed;
+  ActionLock locked_impl (impl);
+
+  return impl ? impl->is_completed : false;
 }
 
 bool Action::IsCanceled () const
 {
-  return ActionLock (impl)->is_canceled;
+  ActionLock locked_impl (impl);
+
+  return impl ? locked_impl->is_canceled : false;
 }
 
 bool Action::Wait (size_t milliseconds)
 {
   try
   {
-    return ActionLock (impl)->wait_handler (*this, milliseconds);
+    ActionLock locked_impl (impl);
+    
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Can't wait for empty action is empty");
+
+    return impl->wait_handler (*this, milliseconds);
   }
   catch (xtl::exception& e)
   {
@@ -536,7 +543,10 @@ void Action::Perform ()
 {
   try
   {
-    ActionLock lock (impl);
+    ActionLock locked_impl (impl);
+    
+    if (!impl)
+      return;
 
     if (impl->is_completed)
       throw xtl::format_operation_exception ("", "Action already completed");
@@ -558,22 +568,47 @@ void Action::Perform ()
 
 void Action::Cancel ()
 {
-  ActionLock (impl)->is_canceled = true;
+  ActionLock locked_impl (impl);
+  
+  if (!impl)
+    return;
+
+  impl->is_canceled = true;
 }
 
 void Action::SetWaitHandler (const WaitCompleteHandler& handler)
 {
-  ActionLock (impl)->wait_handler = handler;
+  ActionLock locked_impl (impl);
+  
+  if (!impl)
+    throw xtl::format_operation_exception ("common::Action::SetWaitHandler", "Can't set wait handler for empty action");
+
+  impl->wait_handler = handler;
 }
 
 const Action::WaitCompleteHandler& Action::WaitHandler () const
 {
-  return ActionLock (impl)->wait_handler;
+  ActionLock locked_impl (impl);
+
+  return impl->wait_handler;
 }
 
 void Action::Swap (Action& action)
 {
-  stl::swap (impl, action.impl);
+  if (impl < action.impl)
+  {
+    ActionLock locked_impl1 (impl);
+    ActionLock locked_impl2 (action.impl);
+    
+    stl::swap (impl, action.impl);
+  }
+  else
+  {
+    ActionLock locked_impl1 (action.impl);
+    ActionLock locked_impl2 (impl);
+
+    stl::swap (impl, action.impl);    
+  }
 }
 
 namespace common
