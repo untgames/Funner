@@ -246,13 +246,14 @@ class XmlMeshLibrarySaver
     }
     
       //сохранение меша
-    void SaveMesh (const Mesh& mesh)
+    void SaveMesh (const char* id, const Mesh& mesh)
     {
       if (!mesh.VertexBuffersCount () || !mesh.PrimitivesCount ())
         return;
 
       XmlWriter::Scope scope (writer, "mesh");
       
+      writer.WriteAttribute ("id", id);
       writer.WriteAttribute ("name", mesh.Name ());
       
       ResourceMap::const_iterator ib_iter = index_buffers.find (mesh.IndexBuffer ().Id ());
@@ -314,7 +315,7 @@ class XmlMeshLibrarySaver
       XmlWriter::Scope scope (writer, "meshes");      
       
       for (MeshLibrary::ConstIterator i=library.CreateIterator (); i; ++i)
-        SaveMesh (*i);
+        SaveMesh (library.ItemId (i), *i);
     }
     
       //сохранение библиотеки

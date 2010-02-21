@@ -245,10 +245,15 @@ class BinMeshLibrarySaver
     }
 
       //сохранение меша
-    void SaveMesh (const Mesh& mesh)
+    void SaveMesh (const char* id, const Mesh& mesh)
     {
       if (!mesh.VertexBuffersCount () || !mesh.PrimitivesCount ())
-        return;
+        return;        
+        
+      size_t id_length = xtl::xstrlen (id);
+      
+      file_write (result_file, &id_length, sizeof (id_length));
+      file_write (result_file, id, sizeof (char) * id_length);
 
       size_t name_length = xtl::xstrlen (mesh.Name ());
 
@@ -399,7 +404,7 @@ class BinMeshLibrarySaver
       file_write (result_file, &meshes_count, sizeof (meshes_count));
 
       for (MeshLibrary::ConstIterator i = library.CreateIterator (); i; ++i)
-        SaveMesh (*i);
+        SaveMesh (library.ItemId (i), *i);
     }
 
     void SaveHeader ()

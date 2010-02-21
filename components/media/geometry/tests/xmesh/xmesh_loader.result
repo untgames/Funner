@@ -1,5 +1,4 @@
 Results of xmesh_loader_test:
-data/test.xmesh(1): warning: not yet implement. Encoding='utf-8'
 data/test.xmesh(65): warning: node 'primitive': Empty primitive
 <?xml version="1.0" encoding="utf-8"?>
 <mesh_library>
@@ -49,7 +48,7 @@ data/test.xmesh(65): warning: node 'primitive': Empty primitive
     </index_buffer>
   </index_buffers>
   <meshes>
-    <mesh name="mesh1" index_buffer="ib#1">
+    <mesh id="mesh1" name="mesh1" index_buffer="ib#1">
       <vertex_buffers>
         vb#1
       </vertex_buffers>
@@ -58,7 +57,7 @@ data/test.xmesh(65): warning: node 'primitive': Empty primitive
         <primitive type="triangle_strip" material="material2" vertex_buffer="0" first="1" count="1"/>
       </primitives>
     </mesh>
-    <mesh name="mesh2">
+    <mesh id="mesh2" name="mesh2">
       <vertex_buffers>
         vb#2
       </vertex_buffers>

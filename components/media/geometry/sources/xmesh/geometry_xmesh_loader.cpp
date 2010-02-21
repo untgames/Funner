@@ -330,7 +330,9 @@ class XmlMeshLibraryLoader
       
         //чтение имён: меша, индексного буфера (если есть)
       
-      const char *name  = get<const char*> (*mesh_iter, "name", ""), *ib_id = "";
+      const char *id    = get<const char*> (*mesh_iter, "id"),
+                 *name  = get<const char*> (*mesh_iter, "name", ""),
+                 *ib_id = "";
       
       try_read (*mesh_iter, "index_buffer", ib_id);
                  
@@ -375,7 +377,7 @@ class XmlMeshLibraryLoader
 
         //присоединение меша к модели
 
-      library.Attach (name, mesh);
+      library.Attach (id, mesh);
     }
   
       //разбор библиотеки
