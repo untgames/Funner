@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Config
-  AdapterMask="Open*"
-  InitString="max_texture_size=1024 GL_ARB_texture_non_power_of_two=0"
-  WindowWidth="1024"
-  WindowHeight="768">
-</Config>
