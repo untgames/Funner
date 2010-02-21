@@ -572,7 +572,7 @@ class XmlParser
           break;
         }
         case XmlInstruction_Encoding:
-          Warning (line, "not yet implement. Encoding='%s'", value);
+//          Warning (line, "not yet implement. Encoding='%s'", value);
           break;
         case XmlInstruction_Standalone:
         {

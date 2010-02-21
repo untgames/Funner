@@ -787,8 +787,11 @@ bool FileSystemImpl::IsFileExist (const char* src_file_name)
 
     ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
 
-    if (!file_system)
+    if (!file_system)        
       return false;
+      
+    if (!file_name.empty () && file_name [file_name.size ()-1] == '/')
+      file_name.pop_back ();
 
     return file_system->IsFileExist (file_name.c_str ());
   }
