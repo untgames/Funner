@@ -39,7 +39,7 @@ MEDIA.COLLADA.CONVERTER.TYPE        := application
 MEDIA.COLLADA.CONVERTER.NAME        := collada-converter
 MEDIA.COLLADA.CONVERTER.SOURCE_DIRS := utils/collada_converter
 MEDIA.COLLADA.CONVERTER.IMPORTS     := compile.media.collada compile.media.image compile.media.geometry \
-                                       link.media.collada.dae link.media.collada.convert link.media.image link.media.geometry.xmesh
+                                       link.media.collada.dae link.media.collada.convert link.media.image link.media.geometry.xmesh link.media.geometry.binmesh
 
 #Цель - collada convert tests
 MEDIA.COLLADA.CONVERTER.TESTS.TYPE               := test-suite

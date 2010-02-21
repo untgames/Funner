@@ -10,6 +10,7 @@
 #include <xtl/common_exceptions.h>
 
 #include <common/component.h>
+#include <common/strlib.h>
 
 #include <media/collada.h>
 #include <media/collection.h>
