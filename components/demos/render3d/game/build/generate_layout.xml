@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:output method="xml" version="1.0" encoding="iso-8859-1" indent="yes"/>
+<xsl:strip-space elements="LayerMap"/>
+<xsl:template match="LayerMap">
+  <LayerMap>
+    <xsl:apply-templates select="Layer"/>
+  </LayerMap>
+</xsl:template>
+<xsl:template match="Layer">
+  <Layer>
+    <xsl:attribute name="Name">
+      <xsl:value-of select="@Name"/>
+    </xsl:attribute>
+    <xsl:attribute name="Material">
+      <xsl:value-of select="$ResourceGroup"/>
+      <xsl:text>.</xsl:text>
+      <xsl:value-of select="@Name"/>
+    </xsl:attribute>    
+    <xsl:attribute name="Left">
+      <xsl:value-of select="@Left"/>
+    </xsl:attribute>
+    <xsl:attribute name="Top">
+      <xsl:value-of select="@Top"/>
+    </xsl:attribute>      
+    <xsl:attribute name="Width">
+      <xsl:value-of select="@Width"/>
+    </xsl:attribute>
+    <xsl:attribute name="Height">
+      <xsl:value-of select="@Height"/>
+    </xsl:attribute>
+    <xsl:attribute name="Opacity">
+      <xsl:value-of select="@Opacity"/>
+    </xsl:attribute>    
+  </Layer>
+</xsl:template>
+</xsl:stylesheet>

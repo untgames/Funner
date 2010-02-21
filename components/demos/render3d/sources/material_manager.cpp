@@ -67,42 +67,10 @@ void MaterialManager::LoadMaterial (const char* id, const media::rfx::Material& 
   dst_mtl->texmaps [SamplerChannel_Reflection].texture = default_reflection_texture;
   
   for (int i=0; i<SamplerChannel_Num; i++)
-    dst_mtl->texmaps [i].sampler = default_sampler;
-  
-  const char* shader_type_string = properties.GetString ("ShaderType");
-  
-  ShaderType shader_type = (ShaderType)-1;
-  
-  struct Name2Map 
-  {
-    const char* name;
-    ShaderType  type;
-  };
-  
-  static const Name2Map shader_type_map [] = {
-    {"Phong", ShaderType_Phong},
-    {"Lambert", ShaderType_Lambert},
-    {"Constant", ShaderType_Constant},
-  };
-  
-  static const size_t shader_type_map_size = sizeof (shader_type_map) / sizeof (*shader_type_map);
-  
-  for (size_t i=0; i<shader_type_map_size; i++)
-    if (!strcmp (shader_type_map [i].name, shader_type_string))
-    {
-      shader_type = shader_type_map [i].type;
-      break;
-    }
-    
-  if (shader_type == (ShaderType)-1)
-  {
-    printf ("Bad material '%s' shader type '%s'\n", id, shader_type_string);
-    return;
-  }
+    dst_mtl->texmaps [i].sampler = default_sampler;  
   
   MaterialShaderParams params;
   
-  params.shader_type              = shader_type;
   params.reflectivity             = properties.GetFloat ("Reflectivity");
   params.transparency             = properties.GetFloat ("Transparency");
   params.shininess                = properties.GetFloat ("Shininess");
@@ -160,7 +128,7 @@ render::low_level::PixelFormat MaterialManager::GetPixelFormat (media::Image& im
     case media::PixelFormat_L8:    return render::low_level::PixelFormat_A8;
     case media::PixelFormat_LA8:   return render::low_level::PixelFormat_LA8;
     default:
-      printf ("Unsupported image format %s", media::get_format_name (image.Format ()));
+      printf ("Unsupported image format %s\n", media::get_format_name (image.Format ()));
       image.Convert (media::PixelFormat_RGBA8);
       return render::low_level::PixelFormat_RGBA8;
   }

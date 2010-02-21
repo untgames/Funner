@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:output method="xml" version="1.0" encoding="iso-8859-1" indent="yes"/>
+<xsl:variable name="LayoutDocument" select="document($LayoutFile)"/>
+<xsl:strip-space elements="Atlas"/>
+<xsl:template match="Atlas">
+  <material_library>
+    <xsl:apply-templates select="Image"/>
+  </material_library>
+</xsl:template>
+<xsl:template match="Image">
+  <xsl:apply-templates select="Tile"/>
+</xsl:template>
+<xsl:template match="Tile">
+  <material>    
+    <xsl:attribute name="id">
+      <xsl:variable name="CurrentImageName" select="@Name"/>      
+      <xsl:for-each select="$LayoutDocument/LayerMap/Layer[@Image=$CurrentImageName]">
+        <xsl:value-of select="$ResourceGroup"/>
+        <xsl:text>.</xsl:text>      
+        <xsl:value-of select="@Name"/>          
+      </xsl:for-each>    
+    </xsl:attribute>
+    <sprite_profile>
+      <xsl:attribute name="image">
+        <xsl:value-of select="../@Name"/>
+      </xsl:attribute>
+      <xsl:attribute name="blend_mode">translucent</xsl:attribute>
+      <xsl:attribute name="tiling">1</xsl:attribute>
+      <xsl:attribute name="tile_offset_x">
+        <xsl:value-of select="@Left"/>
+      </xsl:attribute>
+      <xsl:attribute name="tile_offset_y">
+        <xsl:value-of select="(@Bottom)+(@Height)"/>
+      </xsl:attribute>
+      <xsl:attribute name="tile_width">
+        <xsl:value-of select="@Width"/>
+      </xsl:attribute>
+      <xsl:attribute name="tile_height">
+        <xsl:value-of select="@Height"/>
+      </xsl:attribute>    
+    </sprite_profile>
+  </material>  
+</xsl:template>
+</xsl:stylesheet>

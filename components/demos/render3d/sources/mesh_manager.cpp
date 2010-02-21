@@ -26,10 +26,11 @@ struct MeshLoader
     for (media::geometry::MeshLibrary::Iterator iter=library.CreateIterator (); iter; ++iter)
     {
       media::geometry::Mesh& mesh = *iter;
+      const char*            id   = library.ItemId (iter);
 
-      printf ("Load mesh '%s'\n", mesh.Name ());
+      printf ("Load mesh '%s'\n", id);
 
-      ModelMeshPtr model_mesh (new ModelMesh (mesh.Name ()));
+      ModelMeshPtr model_mesh (new ModelMesh (id));
 
       for (size_t i=0, vb_count=mesh.VertexBuffersCount (); i<vb_count; i++)
       {

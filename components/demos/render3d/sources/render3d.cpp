@@ -1,15 +1,13 @@
 #include "shared.h"
 
-const char*  VERTEX_SHADER_FILE_NAME  = "data/phong.vert";
-const char*  PIXEL_SHADER_FILE_NAME   = "data/phong.frag";
-const char*  SHADERS_DIR              = "data";
-const char*  CONFIG_NAME              = "data/config.xml";
-const char*  MODEL_NAME               = "data/meshes.xmesh";
-const char*  ENTERPRISE_MODEL_NAME    = "data/enterprise_meshes.xmesh";
-const char*  MATERIAL_LIBRARIES []    = {"data/materials.xmtl", "data/custom.xmtl", "data/enterprise_materials.xmtl"};
-const char*  SCENE_NAME               = "data/scene.xscene";
-const char* ENTERPRISE_SCENE_NAME     = "data/enterprise_scene.xscene";
-const char*  REFLECTION_TEXTURE       = "env/EnvGala_000_D.tga";
+const char*  SHADERS_DIR              = "data/shaders";
+const char*  CONFIG_NAME              = "config.xml";
+const char*  MODEL_NAME               = "data/meshes/main_ship.binmesh";
+const char*  ENTERPRISE_MODEL_NAME    = "data/meshes/filter_35.binmesh";
+const char*  MATERIAL_LIBRARIES []    = {"data/materials/main_ship.xmtl", "data/materials/filter_35.xmtl", "data/materials/sky.xmtl"};
+const char*  SCENE_NAME               = "data/scenes/main_ship.xscene";
+const char*  ENTERPRISE_SCENE_NAME    = "data/scenes/filter_35.xscene";
+const char*  REFLECTION_TEXTURE       = "data/textures/environment/EnvGala_000_D.tga";
 const char*  SKY_MESH                 = "_SkyMesh";
 const char*  SKY_MATERIAL             = "_SkyMaterial";
 const size_t ADDITIONAL_SHIPS_RANGE   = 70;
@@ -196,7 +194,6 @@ int main ()
       {"EmissionTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, emission_sampler)},
       {"ReflectionTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, reflection_sampler)},      
       
-      {"ShaderType", ProgramParameterType_Int, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, shader_type)},
       {"Reflectivity", ProgramParameterType_Float, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, reflectivity)},
       {"Transparency", ProgramParameterType_Float, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, transparency)},   
       {"Shininess", ProgramParameterType_Float, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, shininess)},
@@ -289,7 +286,7 @@ int main ()
 
     printf ("Load enterprise scene\n");
 
-    for (size_t i = 0; i < 10; i++)
+    for (size_t i = 0; i < 2; i++)
     {
       Node::Pointer enterprise = test.scene_manager.LoadScene (ENTERPRISE_SCENE_NAME);
 
@@ -315,7 +312,7 @@ int main ()
 
     printf ("Load main ship scene\n");
 
-    for (size_t i = 0; i < 10; i++)
+    for (size_t i = 0; i < 2; i++)
     {
       Node::Pointer node = test.scene_manager.LoadScene (SCENE_NAME);
 

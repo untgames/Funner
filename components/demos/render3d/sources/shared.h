@@ -119,9 +119,6 @@ class SceneManager
     NodesArray         main_ships;
 };
 
-//чтение ихсодного текста шейдера в строку
-stl::string read_shader (const char* file_name);
-
 #ifdef _MSC_VER
   #pragma pack(push)
 #endif
@@ -176,16 +173,8 @@ enum SamplerChannel
   SamplerChannel_Num
 };
 
-enum ShaderType
-{
-  ShaderType_Phong,
-  ShaderType_Lambert,
-  ShaderType_Constant
-};
-
 struct MaterialShaderParams
 {
-  ShaderType  shader_type;
   float       reflectivity;
   float       transparency;
   float       shininess;
