@@ -12,8 +12,8 @@ namespace scene_graph
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum SoundEmitterEvent
 {
-  SoundEmitterEvent_Play,     //срабатывает при начале проигрывания
-  SoundEmitterEvent_Stop,     //срабатывает при остановке проигрывания
+  SoundEmitterEvent_OnPlay,     //срабатывает при начале проигрывания
+  SoundEmitterEvent_OnStop,     //срабатывает при остановке проигрывания
 
   SoundEmitterEvent_Num
 };
@@ -55,6 +55,8 @@ class SoundEmitter : public Entity
     typedef xtl::function<void (SoundEmitter& sender, SoundEmitterEvent event)> EventHandler;
 
     xtl::connection RegisterEventHandler (SoundEmitterEvent, const EventHandler& handler) const;
+    
+    using Entity::RegisterEventHandler;
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

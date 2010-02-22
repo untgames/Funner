@@ -101,12 +101,12 @@ const char* SoundEmitter::SoundDeclarationName () const
 
 void SoundEmitter::Play ()
 {
-  impl->Notify (*this, SoundEmitterEvent_Play);
+  impl->Notify (*this, SoundEmitterEvent_OnPlay);
 }
 
 void SoundEmitter::Stop ()
 {
-  impl->Notify (*this, SoundEmitterEvent_Stop);
+  impl->Notify (*this, SoundEmitterEvent_OnStop);
 }
 
 /*
