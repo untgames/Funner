@@ -37,7 +37,7 @@ CONVERT_COLLADA_$1.EXCLUDE_NODES    := pSphere1 pPlane1
 TARGETS                             += CONVERT_COLLADA_$1
 endef
 
-COLLADA_MODELS := main_ship filter_35 ship_01a ship_04a ship_10a ship_11a ship_20a ship_21a ship_23a ship_24a ship_34a
+COLLADA_MODELS := main_ship filter_35 ship_01a ship_11a ship_20a ship_21a
 
 #CONVERT_COLLADA_main_ship.EXCLUDE_NODES := pSphere1
 #CONVERT_COLLADA_filter_35.EXCLUDE_NODES := pSphere1
