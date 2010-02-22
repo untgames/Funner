@@ -40,7 +40,7 @@ class ItemsSelector
         if (select_flags & ModelSelect_ActiveScene)
           SelectActiveScene ();
         
-          //выбор сцен    
+          //выбор сцен
         
         SelectScenes ();
         
@@ -357,7 +357,7 @@ class ItemsSelector
     {
       try
       {
-        for (ILibrary<Item>::ConstIterator iter=collection.CreateIterator (); iter; ++iter)
+        for (typename ICollection<Item>::ConstIterator iter=collection.CreateIterator (); iter; ++iter)
           Select (*iter);
       }
       catch (xtl::exception& e)
@@ -450,7 +450,7 @@ class ItemsSelector
     {
       try
       {
-        for (ILibrary<Item>::ConstIterator iter=library.CreateIterator (); iter; ++iter)
+        for (typename ILibrary<Item>::ConstIterator iter=library.CreateIterator (); iter; ++iter)
         {
           if (!IsNeedSelect (library.ItemId (iter), flags))
             continue;
@@ -469,7 +469,7 @@ class ItemsSelector
     const Model& source_model; //исходная модель
     Model        target_model; //результирующая модель
     size_t       select_flags; //флаги выбора
-    StringArray  force_select; //список масок идентификаторов ресурсов, обязательно выбираемых   
+    StringArray  force_select; //список масок идентификаторов ресурсов, обязательно выбираемых
 };
 
 }
