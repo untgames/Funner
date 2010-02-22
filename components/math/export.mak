@@ -1,2 +1,2 @@
-COMPONENT_DIRS := vecmath bound_volumes
+COMPONENT_DIRS := vecmath bound_volumes curves
 

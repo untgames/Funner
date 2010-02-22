@@ -86,8 +86,6 @@ void spline_recompute_hermite (const Frame& prev, const Frame& cur, const Frame&
   typedef typename Frame::scalar_type  scalar_type;
   typedef typename Frame::time_type    time_type;
   
-  static value_type one (1), two (2);
-
   static value_type hermite_basis_matrix_factors [16] ={
     value_type ( 1),               0,               0,               0,
                   0,               0, value_type ( 1),               0,
@@ -100,7 +98,9 @@ void spline_recompute_hermite (const Frame& prev, const Frame& cur, const Frame&
   const scalar_type &tension    = cur.key.tension,
                     &continuity = cur.key.continuity,
                     &bias       = cur.key.bias;
-
+                    
+  static const value_type one (1), two (2);
+  
   value_type g  (next1.key.value - cur.key.value),
              t0 (((one-tension)*(one+bias)*(one+continuity) * (cur.key.value - prev.key.value) +
                  (one-tension)*(one-bias)*(one-continuity) * g) / two),
@@ -163,8 +163,6 @@ void recompute (spline_key_frame<spline_tcb_key<T> >* first, spline_key_frame<sp
 {
   if (first == last)
     return;
-
-  static T one (1), two (2);
 
   typedef spline_key_frame<spline_tcb_key<T> > frame_type;
   
@@ -250,23 +248,23 @@ spline_key<T>::spline_key (const time_type& in_time, const value_type& in_value)
 template <class T>
 spline_tcb_key<T>::spline_tcb_key ()
   : tension ()
-  , bias ()
   , continuity ()
+  , bias ()  
 {
 }
 
 template <class T>  
 spline_tcb_key<T>::spline_tcb_key (const time_type& in_time, const value_type& in_value)
-  : spline_key<T> (in_time, in_value)
+  : base (in_time, in_value)
   , tension ()
-  , bias ()
   , continuity ()
+  , bias ()
 {
 }
 
 template <class T>  
 spline_tcb_key<T>::spline_tcb_key (const time_type& in_time, const value_type& in_value, const scalar_type& in_tension, const scalar_type& in_continuity, const scalar_type& in_bias)
-  : spline_key<T> (in_time, in_value)
+  : base (in_time, in_value)
   , tension (in_tension)
   , continuity (in_continuity)
   , bias (in_bias)
@@ -286,7 +284,7 @@ spline_bezier_key<T>::spline_bezier_key ()
 
 template <class T>  
 spline_bezier_key<T>::spline_bezier_key (const time_type& in_time, const value_type& in_value)
-  : spline_key<T> (in_time, in_value)
+  : base (in_time, in_value)
   , inner_value ()
   , outer_value ()
 {
@@ -294,7 +292,7 @@ spline_bezier_key<T>::spline_bezier_key (const time_type& in_time, const value_t
 
 template <class T>  
 spline_bezier_key<T>::spline_bezier_key (const time_type& in_time, const value_type& in_value, const value_type& in_inner_value, const value_type& in_outer_value)
-  : spline_key<T> (in_time, in_value)
+  : base (in_time, in_value)
   , inner_value (in_inner_value)
   , outer_value (in_outer_value)
 {
@@ -467,7 +465,7 @@ basic_spline<Key>::~basic_spline ()
 template <class Key>
 basic_spline<Key>& basic_spline<Key>::operator = (const basic_spline& s)
 {
-  basic_spline::operator = (s);
+  basic_spline (s).swap (*this);
   return *this;
 }
 
@@ -515,11 +513,13 @@ void basic_spline<Key>::wrap (spline_wrap begin_wrap, spline_wrap end_wrap)
 template <class Key>
 spline_wrap basic_spline<Key>::begin_wrap () const
 {
+  return impl->begin_wrap;
 }
 
 template <class Key>
 spline_wrap basic_spline<Key>::end_wrap () const
 {
+  return impl->end_wrap;
 }
 
 /*

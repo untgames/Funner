@@ -46,15 +46,21 @@ template <class T> struct spline_key
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> struct spline_tcb_key: public spline_key<T>
 {
-  typedef typename spline_key<T>::scalar_type scalar_type;
+  private:
+    typedef spline_key<T> base;
 
-  scalar_type tension;    //напряженность кривой
-  scalar_type continuity; //пологость кривойывафыва
-  scalar_type bias;       //ассимметричность кривой
+  public:
+    typedef typename base::time_type   time_type;
+    typedef typename base::value_type  value_type;
+    typedef typename base::scalar_type scalar_type;
 
-  spline_tcb_key ();
-  spline_tcb_key (const time_type& time, const value_type& value);
-  spline_tcb_key (const time_type& time, const value_type& value, const scalar_type& tension, const scalar_type& continuity, const scalar_type& bias);
+    scalar_type tension;    //напряженность кривой
+    scalar_type continuity; //пологость кривойывафыва
+    scalar_type bias;       //ассимметричность кривой
+
+    spline_tcb_key ();
+    spline_tcb_key (const time_type& time, const value_type& value);
+    spline_tcb_key (const time_type& time, const value_type& value, const scalar_type& tension, const scalar_type& continuity, const scalar_type& bias);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,14 +68,20 @@ template <class T> struct spline_tcb_key: public spline_key<T>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> struct spline_bezier_key: public spline_key<T>
 {
-  typedef typename spline_key<T>::value_type value_type;
+  private:
+    typedef spline_key<T> base;
 
-  value_type inner_value; //входящее значение
-  value_type outer_value; //исходящее значение
+  public:
+    typedef typename base::time_type   time_type;
+    typedef typename base::value_type  value_type;
+    typedef typename base::scalar_type scalar_type;
+
+    value_type inner_value; //входящее значение
+    value_type outer_value; //исходящее значение
   
-  spline_bezier_key ();
-  spline_bezier_key (const time_type& time, const value_type& value);
-  spline_bezier_key (const time_type& time, const value_type& value, const value_type& inner_value, const value_type& outer_value);
+    spline_bezier_key ();
+    spline_bezier_key (const time_type& time, const value_type& value);
+    spline_bezier_key (const time_type& time, const value_type& value, const value_type& inner_value, const value_type& outer_value);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
