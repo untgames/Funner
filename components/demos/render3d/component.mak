@@ -8,6 +8,7 @@ DEMOS.RENDER3D.SOURCES.TYPE          := application
 DEMOS.RENDER3D.SOURCES.NAME          := capsule3d
 DEMOS.RENDER3D.SOURCES.SOURCE_DIRS   := sources
 DEMOS.RENDER3D.SOURCES.EXECUTION_DIR := sources
+DEMOS.RENDER3D.SOURCES.DISABLE_RUN   := 1 #цель не регистрируется в сборке по команде run
 DEMOS.RENDER3D.SOURCES.IMPORTS       := compile.system compile.render.low_level compile.media.geometry compile.media.rfx \
                                         compile.media.image compile.physics.low_level \
                                         compile.scene_graph.core compile.input.low_level\

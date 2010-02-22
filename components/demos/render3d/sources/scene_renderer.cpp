@@ -1,8 +1,134 @@
 #include "shared.h"
 
+namespace
+{
+
+enum ConstantBufferSemantic
+{
+  ConstantBufferSemantic_Common,
+  ConstantBufferSemantic_Transformations,
+  ConstantBufferSemantic_Material,
+};
+
+struct CommonShaderParams
+{
+  math::vec3f light_pos;
+  math::vec3f light_dir;
+  int         diffuse_sampler;
+  int         specular_sampler;
+  int         bump_sampler;
+  int         ambient_sampler;
+  int         emission_sampler;
+  int         reflection_sampler;
+};
+
+struct TransformationsShaderParams
+{
+  math::mat4f object_tm;
+  math::mat4f view_tm;  
+  math::mat4f model_view_tm;
+  math::mat4f model_view_proj_tm;
+};
+
+}
+
 SceneRenderer::SceneRenderer (Test& in_test)
   : test (in_test)
 {
+}
+
+///Инициализация ресурсов
+void SceneRenderer::InitializeResources ()
+{
+  printf ("Setup rasterizer stage\n");
+
+  RasterizerDesc rasterizer_desc;
+
+  memset (&rasterizer_desc, 0, sizeof (rasterizer_desc));
+  
+  rasterizer_desc.fill_mode               = FillMode_Solid;
+  rasterizer_desc.cull_mode               = CullMode_None;
+  rasterizer_desc.front_counter_clockwise = true;
+  rasterizer_desc.depth_bias              = 0;
+  rasterizer_desc.scissor_enable          = false;
+//    rasterizer_desc.multisample_enable      = false;
+  rasterizer_desc.multisample_enable      = true;
+  rasterizer_desc.antialiased_line_enable = false;
+  
+  rasterizer = RasterizerStatePtr (test.device->CreateRasterizerState (rasterizer_desc), false);
+
+  test.device->RSSetState (rasterizer.get ());
+ 
+  printf ("Setup shader stage\n");
+
+  static ProgramParameter shader_parameters[] = {
+    {"ModelViewProjectionMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Transformations, 1, TEST_OFFSETOF (TransformationsShaderParams, model_view_proj_tm)},
+    {"ModelViewMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Transformations, 1, TEST_OFFSETOF (TransformationsShaderParams, model_view_tm)},
+    {"ViewMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Transformations, 1, TEST_OFFSETOF (TransformationsShaderParams, view_tm)},      
+
+    {"LightPosition", ProgramParameterType_Float3, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, light_pos)},
+    {"LightDirection", ProgramParameterType_Float3, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, light_dir)},
+    {"BumpTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, bump_sampler)},
+    {"DiffuseTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, diffuse_sampler)},
+    {"AmbientTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, ambient_sampler)},
+    {"SpecularTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, specular_sampler)},
+    {"EmissionTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, emission_sampler)},
+    {"ReflectionTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, reflection_sampler)},      
+    
+    {"Reflectivity", ProgramParameterType_Float, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, reflectivity)},
+    {"Transparency", ProgramParameterType_Float, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, transparency)},   
+    {"Shininess", ProgramParameterType_Float, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, shininess)},
+    {"BumpAmount", ProgramParameterType_Float, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, bump_amount)},
+    {"BumpTextureChannel", ProgramParameterType_Int, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, bump_texture_channel)},
+    {"DiffuseTextureChannel", ProgramParameterType_Int, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, diffuse_texture_channel)},
+    {"AmbientTextureChannel", ProgramParameterType_Int, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, ambient_texture_channel)},
+    {"SpecularTextureChannel", ProgramParameterType_Int, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, specular_texture_channel)},
+    {"EmissionTextureChannel", ProgramParameterType_Int, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, emission_texture_channel)},
+    {"DiffuseColor", ProgramParameterType_Float4, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, diffuse_color)},
+    {"AmbientColor", ProgramParameterType_Float4, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, ambient_color)},
+    {"SpecularColor", ProgramParameterType_Float4, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, specular_color)},
+    {"EmissionColor", ProgramParameterType_Float4, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, emission_color)},
+  };
+  
+  ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
+  
+  program_parameters_layout = ProgramParametersLayoutPtr (test.device->CreateProgramParametersLayout (program_parameters_layout_desc), false);
+
+  BufferDesc cb_desc;
+
+  memset (&cb_desc, 0, sizeof cb_desc);
+
+  cb_desc.size         = sizeof (CommonShaderParams);
+  cb_desc.usage_mode   = UsageMode_Default;
+  cb_desc.bind_flags   = BindFlag_ConstantBuffer;
+  cb_desc.access_flags = AccessFlag_ReadWrite;
+
+  common_cb = BufferPtr (test.device->CreateBuffer (cb_desc), false);
+
+  CommonShaderParams common_shader_params;
+  
+  common_shader_params.bump_sampler       = SamplerChannel_Bump;
+  common_shader_params.diffuse_sampler    = SamplerChannel_Diffuse;
+  common_shader_params.specular_sampler   = SamplerChannel_Specular;
+  common_shader_params.ambient_sampler    = SamplerChannel_Ambient;
+  common_shader_params.emission_sampler   = SamplerChannel_Emission;
+  common_shader_params.reflection_sampler = SamplerChannel_Reflection;
+  
+  common_cb->SetData (0, sizeof common_shader_params, &common_shader_params);
+
+  test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());        
+  test.device->SSSetConstantBuffer (ConstantBufferSemantic_Common, common_cb.get ());    
+  
+  memset (&cb_desc, 0, sizeof cb_desc);
+
+  cb_desc.size         = sizeof (TransformationsShaderParams);
+  cb_desc.usage_mode   = UsageMode_Default;
+  cb_desc.bind_flags   = BindFlag_ConstantBuffer;
+  cb_desc.access_flags = AccessFlag_ReadWrite;
+
+  transformations_cb = BufferPtr (test.device->CreateBuffer (cb_desc), false);
+
+  test.device->SSSetConstantBuffer (ConstantBufferSemantic_Transformations, transformations_cb.get ());  
 }
 
 ///Рисование сцены
@@ -13,8 +139,30 @@ void SceneRenderer::Draw (scene_graph::Camera& camera)
 
   view_tm            = inverse (camera.WorldTM ());
   view_projection_tm = camera.ProjectionMatrix () * view_tm;
+  
+  UpdateLights ();
 
   camera.Scene ()->VisitEach (*this);
+}
+
+void SceneRenderer::UpdateLights ()
+{
+  CommonShaderParams my_shader_parameters;
+
+  IBuffer* cb = test.device->SSGetConstantBuffer (0);
+
+  if (!cb)
+  {
+    printf ("Null constant buffer #0\n");
+    return;
+  }
+
+  cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+  
+  my_shader_parameters.light_pos = test.light->WorldPosition ();
+  my_shader_parameters.light_dir = test.light->WorldOrtZ ();
+
+  cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 }
 
 void SceneRenderer::visit (scene_graph::VisualModel& model)
@@ -44,5 +192,53 @@ void SceneRenderer::visit (scene_graph::VisualModel& model)
     return;
   }
 
-  draw (*test.device, *mesh);
+  IDevice& device = *test.device;
+
+  device.ISSetIndexBuffer (mesh->index_buffer.get ());
+
+  for (PrimitiveArray::const_iterator iter=mesh->primitives.begin (); iter!=mesh->primitives.end (); ++iter)
+  {
+    const ModelPrimitive& primitive = *iter;
+    ModelVertexBuffer&    vb        = *primitive.vertex_buffer;
+    ModelMaterial&        material  = *primitive.material;
+    
+    if (!&material || !&*material.shader || !&*material.shader->program)
+      continue;
+
+    device.SSSetProgram (material.shader->program.get ());
+    
+    int samplers_count = stl::min ((int)MAX_SAMPLERS, (int)SamplerChannel_Num);
+
+    for (int i=0; i<samplers_count; i++)
+      if (material.texmaps [i].texture && material.texmaps [i].sampler)
+      {
+        device.SSSetTexture (i, &*material.texmaps [i].texture);
+        device.SSSetSampler (i, &*material.texmaps [i].sampler);
+      }
+      else
+      {
+        device.SSSetTexture (i, 0);
+        device.SSSetSampler (i, 0);
+      }
+      
+    device.SSSetConstantBuffer (ConstantBufferSemantic_Material, &*material.constant_buffer);  
+    
+    device.ISSetInputLayout (vb.input_layout.get ());
+
+    for (size_t i=0; i<vb.vertex_streams.size (); i++)
+    {
+      BufferPtr vs = vb.vertex_streams [i];
+
+      device.ISSetVertexBuffer (i, vs.get ());
+    }
+    
+    if (mesh->index_buffer)
+    {
+      device.DrawIndexed (primitive.type, primitive.first, primitive.count, 0);
+    }
+    else
+    {
+      device.Draw (primitive.type, primitive.first, primitive.count);
+    }
+  }
 }

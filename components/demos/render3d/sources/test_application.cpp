@@ -133,7 +133,7 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
   window.RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Test::OnResize, this));
   window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Test::OnClose, this));
   window.RegisterEventHandler (syslib::WindowEvent_OnKeyDown, xtl::bind (&Test::OnKeyPressed, this, _3));
-  window.RegisterEventHandler (syslib::WindowEvent_OnKeyUp, xtl::bind (&Test::OnKeyReleased, this, _3));
+  window.RegisterEventHandler (syslib::WindowEvent_OnKeyUp, xtl::bind (&Test::OnKeyReleased, this, _3));    
 
   window.Invalidate ();
 }

@@ -421,7 +421,9 @@ define process_target.application
 		@$$(call prepare_to_execute,$$($1.EXECUTION_DIR),$$(dir $$($1.EXE_FILE)) $$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args)
 
   ifneq (,$$(filter $$(files:%=$(DIST_BIN_DIR)/%$(EXE_SUFFIX)),$$($1.EXE_FILE)))
-    run: RUN.$1
+    ifeq (,$$($1.DISABLE_RUN))
+      run: RUN.$1
+    endif
   endif
 endef
 

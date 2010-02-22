@@ -86,23 +86,6 @@ void idle (Test& test)
     return;
   }
 
-  CommonShaderParams my_shader_parameters;
-
-  IBuffer* cb = test.device->SSGetConstantBuffer (0);
-
-  if (!cb)
-  {
-    printf ("Null constant buffer #0\n");
-    return;
-  }
-
-  cb->GetData (0, sizeof my_shader_parameters, &my_shader_parameters);
-  
-  my_shader_parameters.light_pos = test.light->WorldPosition ();
-  my_shader_parameters.light_dir = test.light->WorldOrtZ ();
-
-  cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
-
   test.window.Invalidate ();
 }
 
@@ -134,120 +117,17 @@ int main ()
 
     test.window.SetSize (common::get<size_t> (config_root, "WindowWidth", 800), common::get<size_t> (config_root, "WindowHeight", 600));
 
-    test.window.Show ();
+    test.window.Show ();       
     
-    printf ("Setup rasterizer stage\n");
+    printf ("Initialize renderer\n");
     
-    RasterizerDesc rasterizer_desc;
+    test.scene_renderer.InitializeResources ();
     
-    memset (&rasterizer_desc, 0, sizeof (rasterizer_desc));
-    
-    rasterizer_desc.fill_mode               = FillMode_Solid;
-    rasterizer_desc.cull_mode               = CullMode_None;
-    rasterizer_desc.front_counter_clockwise = true;
-    rasterizer_desc.depth_bias              = 0;
-    rasterizer_desc.scissor_enable          = false;
-//    rasterizer_desc.multisample_enable      = false;
-    rasterizer_desc.multisample_enable      = true;
-    rasterizer_desc.antialiased_line_enable = false;
-    
-    RasterizerStatePtr rasterizer (test.device->CreateRasterizerState (rasterizer_desc), false);
-
-    test.device->RSSetState (rasterizer.get ());
-    
-    printf ("Setup output stage\n");
-    
-/*    BlendDesc blend_desc;
-
-    memset (&blend_desc, 0, sizeof (blend_desc));
-
-    blend_desc.blend_enable                     = true;
-    blend_desc.blend_color_operation            = BlendOperation_Add;
-    blend_desc.blend_alpha_operation            = BlendOperation_Add;
-    blend_desc.blend_color_source_argument      = BlendArgument_SourceAlpha;
-    blend_desc.blend_color_destination_argument = BlendArgument_InverseSourceAlpha;
-    blend_desc.blend_alpha_source_argument      = BlendArgument_SourceAlpha;
-    blend_desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;
-    blend_desc.color_write_mask                 = ColorWriteFlag_All;
-    
-    BlendStatePtr blend_state (test.device->CreateBlendState (blend_desc), false);
-    
-    test.device->OSSetBlendState (blend_state.get ());*/
-    
-    printf ("Setup shader stage\n");
-    
-    test.shader_manager.SetShadersDir (SHADERS_DIR);
-    
-    reload_shaders (test);
-
-    static ProgramParameter shader_parameters[] = {
-      {"ModelViewProjectionMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Transformations, 1, TEST_OFFSETOF (TransformationsShaderParams, model_view_proj_tm)},
-      {"ModelViewMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Transformations, 1, TEST_OFFSETOF (TransformationsShaderParams, model_view_tm)},
-      {"ViewMatrix", ProgramParameterType_Float4x4, ConstantBufferSemantic_Transformations, 1, TEST_OFFSETOF (TransformationsShaderParams, view_tm)},      
-
-      {"LightPosition", ProgramParameterType_Float3, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, light_pos)},
-      {"LightDirection", ProgramParameterType_Float3, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, light_dir)},
-      {"BumpTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, bump_sampler)},
-      {"DiffuseTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, diffuse_sampler)},
-      {"AmbientTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, ambient_sampler)},
-      {"SpecularTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, specular_sampler)},
-      {"EmissionTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, emission_sampler)},
-      {"ReflectionTexture", ProgramParameterType_Int, ConstantBufferSemantic_Common, 1, TEST_OFFSETOF (CommonShaderParams, reflection_sampler)},      
+    printf ("Load shaders\n");
       
-      {"Reflectivity", ProgramParameterType_Float, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, reflectivity)},
-      {"Transparency", ProgramParameterType_Float, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, transparency)},   
-      {"Shininess", ProgramParameterType_Float, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, shininess)},
-      {"BumpAmount", ProgramParameterType_Float, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, bump_amount)},
-      {"BumpTextureChannel", ProgramParameterType_Int, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, bump_texture_channel)},
-      {"DiffuseTextureChannel", ProgramParameterType_Int, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, diffuse_texture_channel)},
-      {"AmbientTextureChannel", ProgramParameterType_Int, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, ambient_texture_channel)},
-      {"SpecularTextureChannel", ProgramParameterType_Int, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, specular_texture_channel)},
-      {"EmissionTextureChannel", ProgramParameterType_Int, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, emission_texture_channel)},
-      {"DiffuseColor", ProgramParameterType_Float4, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, diffuse_color)},
-      {"AmbientColor", ProgramParameterType_Float4, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, ambient_color)},
-      {"SpecularColor", ProgramParameterType_Float4, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, specular_color)},
-      {"EmissionColor", ProgramParameterType_Float4, ConstantBufferSemantic_Material, 1, TEST_OFFSETOF (MaterialShaderParams, emission_color)},
-    };
-    
-    ProgramParametersLayoutDesc program_parameters_layout_desc = {sizeof shader_parameters / sizeof *shader_parameters, shader_parameters};
-    
-    ProgramParametersLayoutPtr program_parameters_layout (test.device->CreateProgramParametersLayout (program_parameters_layout_desc), false);
-
-    BufferDesc cb_desc;
-
-    memset (&cb_desc, 0, sizeof cb_desc);
-
-    cb_desc.size         = sizeof (CommonShaderParams);
-    cb_desc.usage_mode   = UsageMode_Default;
-    cb_desc.bind_flags   = BindFlag_ConstantBuffer;
-    cb_desc.access_flags = AccessFlag_ReadWrite;
-
-    BufferPtr common_cb (test.device->CreateBuffer (cb_desc), false);
-
-    CommonShaderParams common_shader_params;
-    
-    common_shader_params.bump_sampler       = SamplerChannel_Bump;
-    common_shader_params.diffuse_sampler    = SamplerChannel_Diffuse;
-    common_shader_params.specular_sampler   = SamplerChannel_Specular;
-    common_shader_params.ambient_sampler    = SamplerChannel_Ambient;
-    common_shader_params.emission_sampler   = SamplerChannel_Emission;
-    common_shader_params.reflection_sampler = SamplerChannel_Reflection;
-    
-    common_cb->SetData (0, sizeof common_shader_params, &common_shader_params);
-
-    test.device->SSSetProgramParametersLayout (program_parameters_layout.get ());        
-    test.device->SSSetConstantBuffer (ConstantBufferSemantic_Common, common_cb.get ());    
-    
-    memset (&cb_desc, 0, sizeof cb_desc);
-
-    cb_desc.size         = sizeof (TransformationsShaderParams);
-    cb_desc.usage_mode   = UsageMode_Default;
-    cb_desc.bind_flags   = BindFlag_ConstantBuffer;
-    cb_desc.access_flags = AccessFlag_ReadWrite;
-
-    BufferPtr transformations_cb = BufferPtr (test.device->CreateBuffer (cb_desc), false);
-
-    test.device->SSSetConstantBuffer (ConstantBufferSemantic_Transformations, transformations_cb.get ());
+    test.shader_manager.SetShadersDir (SHADERS_DIR);
+  
+    reload_shaders (test);    
     
     printf ("Load materials\n");
     

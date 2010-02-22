@@ -133,44 +133,10 @@ struct ModelShader
 
 typedef xtl::shared_ptr<ModelShader> ModelShaderPtr;
 
-enum ConstantBufferSemantic
+struct ModelTexmap
 {
-  ConstantBufferSemantic_Common,
-  ConstantBufferSemantic_Transformations,
-  ConstantBufferSemantic_Material,
-};
-
-struct CommonShaderParams
-{
-  math::vec3f light_pos;
-  math::vec3f light_dir;
-  int         diffuse_sampler;
-  int         specular_sampler;
-  int         bump_sampler;
-  int         ambient_sampler;
-  int         emission_sampler;
-  int         reflection_sampler;
-};
-
-struct TransformationsShaderParams
-{
-  math::mat4f object_tm;
-  math::mat4f view_tm;  
-  math::mat4f model_view_tm;
-  math::mat4f model_view_proj_tm;
-};
-
-//построение сферы
-enum SamplerChannel
-{
-  SamplerChannel_Diffuse,
-  SamplerChannel_Specular,
-  SamplerChannel_Reflection,
-  SamplerChannel_Bump,
-  SamplerChannel_Ambient,
-  SamplerChannel_Emission,
-  
-  SamplerChannel_Num
+  TexturePtr      texture;
+  SamplerStatePtr sampler;
 };
 
 struct MaterialShaderParams
@@ -190,10 +156,17 @@ struct MaterialShaderParams
   int         emission_texture_channel;
 };
 
-struct ModelTexmap
+//построение сферы
+enum SamplerChannel
 {
-  TexturePtr      texture;
-  SamplerStatePtr sampler;
+  SamplerChannel_Diffuse,
+  SamplerChannel_Specular,
+  SamplerChannel_Reflection,
+  SamplerChannel_Bump,
+  SamplerChannel_Ambient,
+  SamplerChannel_Emission,
+  
+  SamplerChannel_Num
 };
 
 struct ModelMaterial
@@ -342,17 +315,27 @@ class SceneRenderer: public xtl::visitor<void, scene_graph::VisualModel>
   public:
     SceneRenderer (Test&);
     
+///Инициализация ресурсов
+    void InitializeResources ();
+    
 ///Рисование сцены
     void Draw (scene_graph::Camera&);
         
   protected:
+///Обновление источников света
+    void UpdateLights ();
+  
 ///Рисование объектов
     void visit (scene_graph::VisualModel&);
     
   private:  
-    Test&       test;
-    math::mat4f view_projection_tm;
-    math::mat4f view_tm;
+    Test&                      test;
+    math::mat4f                view_projection_tm;
+    math::mat4f                view_tm;
+    RasterizerStatePtr         rasterizer;
+    ProgramParametersLayoutPtr program_parameters_layout;
+    BufferPtr                  common_cb;
+    BufferPtr                  transformations_cb;
 };
 
 typedef xtl::com_ptr<physics::low_level::IRigidBody> RigidBodyPtr;
