@@ -7,7 +7,7 @@ namespace
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
 #endif
 
-const float HORIZONTAL_SPEED          = 5.0f;
+const float HORIZONTAL_SPEED          = 25.0f;
 const float VERTICAL_SPEED            = HORIZONTAL_SPEED;
 const float HORIZONTAL_ROTATION_SPEED = 20.0f;
 const float VERTICAL_ROTATION_SPEED   = HORIZONTAL_ROTATION_SPEED;
@@ -44,7 +44,7 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
     x_camera_rotation_speed (0),
     y_camera_rotation_speed (0),
     z_camera_rotation_speed (0),
-    physics_enabled (false),
+    physics_enabled (true),
     draw_shattles (true),
     draw_main_ships (true)
 {

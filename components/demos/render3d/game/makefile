@@ -321,7 +321,7 @@ define process_target.convert-collada
   $1.TEXTURES_DIR   := $(OUT_DIR)/$(MODEL_TEXTURES_DIR)/$$($1.OUT_NAME)
   $1.CONVERT_FLAGS  := $$($1.CONVERT_FLAGS) $$($1.INCLUDE_DIRS:%=-I %)
   $1.CONVERT_FLAGS  := $$($1.CONVERT_FLAGS) $$(if $$($1.MAX_TEXTURE_SIZE),--max-texture-size=$$($1.MAX_TEXTURE_SIZE))
-  $1.CONVERT_FLAGS  := $$($1.CONVERT_FLAGS) $$(if $$($1.EXCLUDE_NODES),--exclude-nodes=$$($1.EXCLUDE_NODES))
+  $1.CONVERT_FLAGS  := $$($1.CONVERT_FLAGS) $$(if $$($1.EXCLUDE_NODES),--exclude-nodes='$$($1.EXCLUDE_NODES))'
   $1.TARGET_FILES   := $$($1.MATERIALS_FILE) $$($1.MESHES_FILE) $$($1.SCENE_FILE)
   
   DIST_DIRS := $$(DIST_DIRS) $$(dir $$($1.TARGET_FILES)) $$($1.TEXTURES_DIR)

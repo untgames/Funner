@@ -167,6 +167,7 @@ struct MeshLoader
         VertexBufferPtr model_vb (new ModelVertexBuffer);
 
         model_vb->id = vb.Id ();
+        model_vb->source_vertex_buffer = vb;
 
         stl::vector<VertexAttribute> vertex_attributes;
 

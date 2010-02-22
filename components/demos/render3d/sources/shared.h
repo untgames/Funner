@@ -105,13 +105,15 @@ class SceneManager
 
     void SetDrawShattles  (bool draw);
     void SetDrawMainShips (bool draw);
+    
+    typedef stl::vector<Node::Pointer> NodesArray;    
+    
+    NodesArray& Shattles () { return shattles; }
+    NodesArray& MainShips () { return main_ships; }
 
   private:
     void ReadNodeInfo (common::Parser::Iterator node, scene_graph::Node::Pointer parent);
     void ReadMeshInfo (common::Parser::Iterator node, scene_graph::Node::Pointer parent);
-
-  private:
-    typedef stl::vector<Node::Pointer> NodesArray;
 
   private:
     scene_graph::Scene scene;
@@ -183,9 +185,10 @@ typedef stl::vector<BufferPtr> BufferArray;
 
 struct ModelVertexBuffer
 {
-  BufferArray    vertex_streams;
-  InputLayoutPtr input_layout;
-  size_t         id;
+  BufferArray                   vertex_streams;
+  InputLayoutPtr                input_layout;
+  media::geometry::VertexBuffer source_vertex_buffer;
+  size_t                        id;
 };
 
 typedef xtl::shared_ptr<ModelVertexBuffer>     VertexBufferPtr;
@@ -203,18 +206,22 @@ struct ModelPrimitive
 };
 
 typedef stl::vector<ModelPrimitive> PrimitiveArray;
+typedef stl::vector<math::vec3f>    VertexArray;
 
 struct ModelMesh
 {
   VertexBufferArray vertex_buffers;
   BufferPtr         index_buffer;
   PrimitiveArray    primitives;
+  VertexArray       vertices;
   stl::string       name;
 
   ModelMesh (const char* in_name)
     : name (in_name)
     {}    
 };
+
+void build_vertices (Node& root, Test& test, VertexArray& verts);
 
 typedef xtl::shared_ptr<ModelMesh> ModelMeshPtr;
 

@@ -3,17 +3,18 @@
 const char*  SHADERS_DIR              = "data/shaders";
 const char*  CONFIG_NAME              = "config.xml";
 const char*  MODEL_NAME               = "data/meshes/main_ship.binmesh";
-const char*  ENTERPRISE_MODEL_NAME    = "data/meshes/filter_35.binmesh";
-const char*  MATERIAL_LIBRARIES []    = {"data/materials/main_ship.xmtl", "data/materials/filter_35.xmtl", "data/materials/sky.xmtl"};
+const char*  ENTERPRISE_MODEL_NAME    = "data/meshes/ship_01a.binmesh";
+const char*  MATERIAL_LIBRARIES []    = {"data/materials/main_ship.xmtl", "data/materials/ship_01a.xmtl", "data/materials/sky.xmtl"};
 const char*  SCENE_NAME               = "data/scenes/main_ship.xscene";
-const char*  ENTERPRISE_SCENE_NAME    = "data/scenes/filter_35.xscene";
+const char*  ENTERPRISE_SCENE_NAME    = "data/scenes/ship_01a.xscene";
 const char*  REFLECTION_TEXTURE       = "data/textures/environment/EnvGala_000_D.tga";
 const char*  SKY_MESH                 = "_SkyMesh";
 const char*  SKY_MATERIAL             = "_SkyMaterial";
-const size_t ADDITIONAL_SHIPS_RANGE   = 70;
+const int    ADDITIONAL_SHIPS_RANGE   = 70;
 const size_t SKY_PARALLELS            = 30;
 const size_t SKY_MERIDIANS            = 30;
 const float  SKY_RADIUS               = 9000;
+const float  PHYS_TARGET_REACH_DELAY  = 3.0f;
 
 const float EPS = 0.001f;
 
@@ -54,6 +55,42 @@ void idle (Test& test)
 
   if (test.physics_enabled)
   {
+    for (SceneManager::NodesArray::iterator iter=test.scene_manager.Shattles ().begin (), end=test.scene_manager.Shattles ().end (); iter!=end; ++iter)
+    {
+      Node&                           enemy_node   = **iter;
+      physics::low_level::IRigidBody& enemy_body   = *test.rigid_bodies [&enemy_node];
+      Node*                           target_node  = 0;
+      float                           min_distance = 0;            
+
+      for (SceneManager::NodesArray::iterator iter=test.scene_manager.MainShips ().begin (), end=test.scene_manager.MainShips ().end (); iter!=end; ++iter)
+      {
+        Node& main_ship_node = **iter;
+        float distance       = length (main_ship_node.WorldPosition () - enemy_node.WorldPosition ());
+        
+        if (!target_node || distance < min_distance)
+        {
+          distance    = min_distance;
+          target_node = &main_ship_node;
+        }
+      }      
+      
+      if (!target_node)
+        continue;                
+        
+      math::vec3f target_position     = target_node->WorldPosition (),
+                  target_direction    = target_position - enemy_node.WorldPosition (),
+                  current_velocity    = enemy_body.LinearVelocity (),
+                  target_acceleration = 2.0f * (target_direction - current_velocity * PHYS_TARGET_REACH_DELAY) / PHYS_TARGET_REACH_DELAY / PHYS_TARGET_REACH_DELAY,
+                  target_force        = target_acceleration * enemy_body.Mass ();                  
+                  
+      enemy_body.AddForce (target_force);
+    }
+    
+//  test.camera_body->SetLinearVelocity (math::vec3f (test.x_camera_speed, 0, test.y_camera_speed) * inverse (test.camera->WorldTM ()));
+//  test.camera_body->SetAngularVelocity (math::vec3f (test.y_camera_rotation_speed, test.x_camera_rotation_speed, test.z_camera_rotation_speed) * inverse (test.camera->WorldTM ()));
+    test.camera_body->AddForce (math::vec3f (test.x_camera_speed, 0, test.y_camera_speed) * inverse (test.camera->WorldTM ()));
+    test.camera_body->AddTorque (math::vec3f (test.y_camera_rotation_speed / 20.f, test.x_camera_rotation_speed / 20.f, test.z_camera_rotation_speed / 20.f) * inverse (test.camera->WorldTM ()));    
+    
     test.physics_scene->PerformSimulation (dt);
 
     for (Test::RigidBodiesMap::iterator iter = test.rigid_bodies.begin (), end = test.rigid_bodies.end (); iter != end; ++iter)
@@ -63,11 +100,6 @@ void idle (Test& test)
       iter->first->SetWorldPosition (body_transform.position);
       iter->first->SetWorldOrientation (body_transform.orientation);
     }
-
-//  test.camera_body->SetLinearVelocity (math::vec3f (test.x_camera_speed, 0, test.y_camera_speed) * inverse (test.camera->WorldTM ()));
-//  test.camera_body->SetAngularVelocity (math::vec3f (test.y_camera_rotation_speed, test.x_camera_rotation_speed, test.z_camera_rotation_speed) * inverse (test.camera->WorldTM ()));
-    test.camera_body->AddForce (math::vec3f (test.x_camera_speed, 0, test.y_camera_speed) * inverse (test.camera->WorldTM ()));
-    test.camera_body->AddTorque (math::vec3f (test.y_camera_rotation_speed / 20.f, test.x_camera_rotation_speed / 20.f, test.z_camera_rotation_speed / 20.f) * inverse (test.camera->WorldTM ()));
   }
   else
   {
@@ -166,22 +198,28 @@ int main ()
 
     printf ("Load enterprise scene\n");
 
-    for (size_t i = 0; i < 2; i++)
+    for (size_t i = 0; i < 3; i++)
     {
       Node::Pointer enterprise = test.scene_manager.LoadScene (ENTERPRISE_SCENE_NAME);
+      
+      VertexArray verts;
+      
+      build_vertices (*enterprise, test, verts);
 
-      enterprise->Translate ((float)(rand () % ADDITIONAL_SHIPS_RANGE - ADDITIONAL_SHIPS_RANGE / 2.f),
-                             (float)(rand () % ADDITIONAL_SHIPS_RANGE - ADDITIONAL_SHIPS_RANGE / 2.f),
-                             (float)(rand () % ADDITIONAL_SHIPS_RANGE - ADDITIONAL_SHIPS_RANGE / 2.f));
+      enterprise->Translate ((float)((int)(rand () % ADDITIONAL_SHIPS_RANGE) - ADDITIONAL_SHIPS_RANGE / 2.f),
+                             (float)((int)(rand () % ADDITIONAL_SHIPS_RANGE) - ADDITIONAL_SHIPS_RANGE / 2.f),
+                             (float)((int)(rand () % ADDITIONAL_SHIPS_RANGE) - ADDITIONAL_SHIPS_RANGE / 2.f));                             
 
-      xtl::com_ptr<physics::low_level::IShape> sphere_shape = test.physics_driver->CreateSphereShape (8.f);
+//      xtl::com_ptr<physics::low_level::IShape> shape = test.physics_driver->CreateSphereShape (8.f);
 
-      RigidBodyPtr enterprise_body (test.physics_scene->CreateRigidBody (sphere_shape.get (), 1), false);
+      xtl::com_ptr<physics::low_level::IShape> shape (test.physics_driver->CreateConvexShape (verts.size (), &verts [0]), false);
+
+      RigidBodyPtr enterprise_body (test.physics_scene->CreateRigidBody (shape.get (), 1), false);
 
       physics::low_level::Transform enterprise_transform;
 
       enterprise_transform.position    = enterprise->WorldPosition ();
-      enterprise_transform.orientation = enterprise->WorldOrientation ();
+      enterprise_transform.orientation = enterprise->WorldOrientation ();      
 
       enterprise_body->SetWorldTransform (enterprise_transform);
 
@@ -192,17 +230,22 @@ int main ()
 
     printf ("Load main ship scene\n");
 
-    for (size_t i = 0; i < 2; i++)
+    for (size_t i = 0; i < 1; i++)
     {
       Node::Pointer node = test.scene_manager.LoadScene (SCENE_NAME);
+      
+      VertexArray verts;
+      
+      build_vertices (*node, test, verts);
+      
+      node->Translate ((float)((int)(rand () % ADDITIONAL_SHIPS_RANGE) - ADDITIONAL_SHIPS_RANGE / 2),
+                       (float)((int)(rand () % ADDITIONAL_SHIPS_RANGE) - ADDITIONAL_SHIPS_RANGE / 2),
+                       (float)((int)(rand () % ADDITIONAL_SHIPS_RANGE) - ADDITIONAL_SHIPS_RANGE / 2));
+                       
+//      xtl::com_ptr<physics::low_level::IShape> shape = test.physics_driver->CreateSphereShape (3.f);
+      xtl::com_ptr<physics::low_level::IShape> shape (test.physics_driver->CreateConvexShape (verts.size (), &verts [0]), false);
 
-      node->Translate ((float)(rand () % ADDITIONAL_SHIPS_RANGE - ADDITIONAL_SHIPS_RANGE / 2),
-                       (float)(rand () % ADDITIONAL_SHIPS_RANGE - ADDITIONAL_SHIPS_RANGE / 2),
-                       (float)(rand () % ADDITIONAL_SHIPS_RANGE - ADDITIONAL_SHIPS_RANGE / 2));
-
-      xtl::com_ptr<physics::low_level::IShape> sphere_shape = test.physics_driver->CreateSphereShape (8.f);
-
-      RigidBodyPtr node_body (test.physics_scene->CreateRigidBody (sphere_shape.get (), 1), false);
+      RigidBodyPtr node_body (test.physics_scene->CreateRigidBody (shape.get (), 1), false);
 
       physics::low_level::Transform node_transform;
 
@@ -213,7 +256,7 @@ int main ()
 
       test.rigid_bodies.insert_pair (node, node_body);
 
-      test.scene_manager.AddMainShip (node);
+      test.scene_manager.AddMainShip (node);      
     }
 
     test.scene_manager.SetDrawMainShips (false);
@@ -229,6 +272,7 @@ int main ()
   catch (std::exception& e)
   {
     printf ("exception: %s\n", e.what ());
+    for (;;);
   }
 
   return 0;

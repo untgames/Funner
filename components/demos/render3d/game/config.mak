@@ -33,7 +33,7 @@ CONVERT_COLLADA_$1.OUT_NAME         := $1
 CONVERT_COLLADA_$1.SOURCE_FILE      := media/models/$1/model.dae
 CONVERT_COLLADA_$1.INCLUDE_DIRS     := media/models/$1/textures media/textures media/textures/environment
 CONVERT_COLLADA_$1.MAX_TEXTURE_SIZE := 1024
-CONVERT_COLLADA_$1.EXCLUDE_NODES    := pSphere1
+CONVERT_COLLADA_$1.EXCLUDE_NODES    := pSphere1 pPlane1
 TARGETS                             += CONVERT_COLLADA_$1
 endef
 
