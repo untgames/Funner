@@ -465,7 +465,7 @@ basic_spline<Key>::~basic_spline ()
 template <class Key>
 basic_spline<Key>& basic_spline<Key>::operator = (const basic_spline& s)
 {
-  basic_spline::operator = (s);
+  basic_spline (s).swap (*this);
   return *this;
 }
 
