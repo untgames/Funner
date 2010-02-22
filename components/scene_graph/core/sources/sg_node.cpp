@@ -1683,10 +1683,13 @@ void Node::Update (float dt, NodeTraverseMode mode)
   
   if (mode != NodeTraverseMode_OnlyThis && impl->first_updatable_child)
   {
-    impl->first_updatable_child->Update (dt, mode);
-  
-    for (Node* node=impl->first_updatable_child; node!=impl->first_updatable_child; node=node->impl->next_updatable_child)
-      node->Update (dt, mode);
+    impl->first_updatable_child->Update (dt, mode);    
+      
+    if (impl->first_updatable_child) //проверка нужна на случай удаления контроллера в Update
+    {  
+      for (Node* node=impl->first_updatable_child->impl->next_updatable_child; node!=impl->first_updatable_child; node=node->impl->next_updatable_child)
+        node->Update (dt, mode);
+    }
   }
   
   if (mode == NodeTraverseMode_BottomToTop)
