@@ -1,24 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ParticleLibrary>  
-  <Spline Id="ship_trail_fade_out" WrapMode="clamp">
+  <Spline Id="enemy_ship_trail_fade_out" WrapMode="clamp">
     <Key Time="0" Value="1"/>
     <Key Time="4" Value="0"/>
   </Spline>
 
-  <Spline Id="ship_trail_sprites_count" WrapMode="clamp">
+  <Spline Id="enemy_ship_trail_sprites_count" WrapMode="clamp">
     <Key Time="0" Value="0"/>
     <Key Time="5" Value="100"/>
   </Spline>
   
-  <ParticleSystem Id="ship_trail">
+  <ParticleSystem Id="enemy_ship_trail">
     <Emitter 
       Size="1 1"
-      Count="ship_trail_sprites_count"
+      Count="enemy_ship_trail_sprites_count"
       MaxCount="100"
       LifeTime="5"
       Material="ship_trail"
-      Color="1 1 1"
-      Alpha="ship_trail_fade_out"
+      Color="0.1 0.1 1"
+      Alpha="enemy_ship_trail_fade_out"
+    />
+  </ParticleSystem>
+  
+  <Spline Id="main_ship_trail_fade_out" WrapMode="clamp">
+    <Key Time="0" Value="1"/>
+    <Key Time="14" Value="0"/>
+  </Spline>
+
+  <Spline Id="main_ship_trail_sprites_count" WrapMode="clamp">
+    <Key Time="0" Value="0"/>
+    <Key Time="15" Value="1000"/>
+  </Spline>
+  
+  <ParticleSystem Id="main_ship_trail">
+    <Emitter 
+      Size="1 1"
+      Count="main_ship_trail_sprites_count"
+      MaxCount="1000"
+      LifeTime="15"
+      Material="ship_trail"
+      Color="1 0.2 0"
+      Alpha="main_ship_trail_fade_out"
     />
   </ParticleSystem>
 </ParticleLibrary>

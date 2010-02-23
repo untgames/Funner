@@ -225,8 +225,8 @@ int main ()
         
         ship->AttachController (EnemyAi (test, *ship, *phys_body->rigid_body)); 
         
-        Node::Pointer left_particle_system  = test.particle_systems_manager.CreateParticleSystem ("ship_trail", test.scene_manager.Scene ().Root ()),
-                      right_particle_system = test.particle_systems_manager.CreateParticleSystem ("ship_trail", test.scene_manager.Scene ().Root ());
+        Node::Pointer left_particle_system  = test.particle_systems_manager.CreateParticleSystem ("enemy_ship_trail", test.scene_manager.Scene ().Root ()),
+                      right_particle_system = test.particle_systems_manager.CreateParticleSystem ("enemy_ship_trail", test.scene_manager.Scene ().Root ());
 
         left_particle_system->SetPosition (-2.5, -0.5, -4.5);
         left_particle_system->BindToParent (*ship, NodeBindMode_AddRef);
@@ -245,6 +245,14 @@ int main ()
         test.camera_body = phys_body->rigid_body;        
 
         test.scene_manager.AddMainShip (ship);                
+
+        Node::Pointer left_particle_system  = test.particle_systems_manager.CreateParticleSystem ("main_ship_trail", test.scene_manager.Scene ().Root ()),
+                      right_particle_system = test.particle_systems_manager.CreateParticleSystem ("main_ship_trail", test.scene_manager.Scene ().Root ());
+
+        left_particle_system->SetPosition (-1.8, 0.f, 7.2);
+        left_particle_system->BindToParent (*ship, NodeBindMode_AddRef);
+        right_particle_system->SetPosition (2.8, 0.f, 7.2);
+        right_particle_system->BindToParent (*ship, NodeBindMode_AddRef);
       }
     }
 

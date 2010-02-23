@@ -135,7 +135,7 @@ class ParticleSystem : public scene_graph::Entity
 
       scene_graph::SpriteModel::SpriteDesc *sprite_desc = particles_node->Sprites ();
 
-      for (ParticlesList::iterator iter = particles.begin (), end = particles.end (); iter != end; ++iter, sprite_desc++)
+      for (ParticlesList::reverse_iterator iter = particles.rbegin (), end = particles.rend (); iter != end; ++iter, sprite_desc++)
       {
         float particle_time = (time - (*iter)->born_time) / 1000.f;
 
