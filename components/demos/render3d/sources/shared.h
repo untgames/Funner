@@ -186,6 +186,7 @@ struct ModelMaterial
   ModelTexmap    texmaps [SamplerChannel_Num];
   BufferPtr      constant_buffer;
   ModelShaderPtr shader;
+  bool           blended;
 };
 
 typedef xtl::shared_ptr<ModelMaterial>  ModelMaterialPtr;

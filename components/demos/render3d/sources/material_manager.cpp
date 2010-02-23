@@ -1,5 +1,12 @@
 #include "shared.h"
 
+namespace
+{
+
+const char* BLENDED_MATERIALS [] = { "ship_trail" };
+
+}
+
 MaterialManager::MaterialManager (Test& in_test)
   : test (in_test)
 {
@@ -101,6 +108,12 @@ void MaterialManager::LoadMaterial (const char* id, const media::rfx::Material& 
   dst_mtl->constant_buffer = cb;
 
   dst_mtl->shader = test.shader_manager.GetShader (src_mtl.Effect ());
+
+  dst_mtl->blended = false;
+
+  for (size_t i = 0, count = sizeof (BLENDED_MATERIALS) / sizeof (*BLENDED_MATERIALS); i < count; i++)
+    if (!xtl::xstrcmp (BLENDED_MATERIALS [i], id))
+      dst_mtl->blended = true;
 
   materials.insert_pair (id, dst_mtl);
 }

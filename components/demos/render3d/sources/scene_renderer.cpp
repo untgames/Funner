@@ -44,7 +44,7 @@ class Renderable : public xtl::reference_counter
     virtual ~Renderable () {}
 
 ///Отрисовка
-    virtual void Draw (Test&) = 0;
+    virtual void Draw (Test& test, const math::mat4f& view_tm, const math::mat4f& view_projection_tm) = 0;
 
 ///Получение материала
     virtual ModelMaterial* Material () = 0;
@@ -253,6 +253,8 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
   BlendStatePtr              no_blend_state;
   BlendStatePtr              additive_blend_state;
   RenderablesArray           renderables;
+  DepthStencilStatePtr       depth_write_enabled_state;
+  DepthStencilStatePtr       depth_write_disabled_state;
 
   Impl (Test& in_test)
     : test (in_test)
@@ -386,6 +388,41 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
     blend_desc.blend_alpha_destination_argument = BlendArgument_One;
 
     additive_blend_state = BlendStatePtr (test.device->CreateBlendState (blend_desc), false);
+
+    DepthStencilDesc depth_stencil_desc;
+
+    memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
+
+    depth_stencil_desc.depth_test_enable  = true;
+    depth_stencil_desc.depth_write_enable = true;
+    depth_stencil_desc.depth_compare_mode = CompareMode_Less;
+
+    depth_write_enabled_state = DepthStencilStatePtr (test.device->CreateDepthStencilState (depth_stencil_desc), false);
+
+    depth_stencil_desc.depth_write_enable = false;
+
+    depth_write_disabled_state = DepthStencilStatePtr (test.device->CreateDepthStencilState (depth_stencil_desc), false);
+  }
+
+  void SetMaterial (IDevice& device, ModelMaterial& material)
+  {
+    device.SSSetProgram (material.shader->program.get ());
+
+    int samplers_count = stl::min ((int)MAX_SAMPLERS, (int)SamplerChannel_Num);
+
+    for (int i = 0; i < samplers_count; i++)
+      if (material.texmaps [i].texture && material.texmaps [i].sampler)
+      {
+        device.SSSetTexture (i, &*material.texmaps [i].texture);
+        device.SSSetSampler (i, &*material.texmaps [i].sampler);
+      }
+      else
+      {
+        device.SSSetTexture (i, 0);
+        device.SSSetSampler (i, 0);
+      }
+
+    device.SSSetConstantBuffer (ConstantBufferSemantic_Material, &*material.constant_buffer);
   }
 
 ///Рисование сцены
@@ -404,6 +441,43 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
     renderables.clear ();
 
     camera->Scene ()->VisitEach (*this);
+
+    DrawCore ();
+  }
+
+  void DrawCore ()
+  {
+    IDevice& device = *test.device;
+
+    device.OSSetDepthStencilState (depth_write_enabled_state.get ());
+    device.OSSetBlendState (no_blend_state.get ());
+
+    for (RenderablesArray::iterator iter = renderables.begin (), end = renderables.end (); iter != end; ++iter)
+    {
+      ModelMaterial* material = (*iter)->Material ();
+
+      if (!material || material->blended)
+        continue;
+
+      SetMaterial (device, *material);
+
+      (*iter)->Draw (test, view_tm, view_projection_tm);
+    }
+
+    device.OSSetBlendState (additive_blend_state.get ());
+    device.OSSetDepthStencilState (depth_write_disabled_state.get ());
+
+    for (RenderablesArray::iterator iter = renderables.begin (), end = renderables.end (); iter != end; ++iter)
+    {
+      ModelMaterial* material = (*iter)->Material ();
+
+      if (!material || !material->blended)
+        continue;
+
+      SetMaterial (device, *material);
+
+      (*iter)->Draw (test, view_tm, view_projection_tm);
+    }
 
     renderables.clear ();
   }
@@ -428,46 +502,8 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
   }
 
-  void SetMaterial (IDevice& device, ModelMaterial& material)
-  {
-    device.SSSetProgram (material.shader->program.get ());
-
-    int samplers_count = stl::min ((int)MAX_SAMPLERS, (int)SamplerChannel_Num);
-
-    for (int i = 0; i < samplers_count; i++)
-      if (material.texmaps [i].texture && material.texmaps [i].sampler)
-      {
-        device.SSSetTexture (i, &*material.texmaps [i].texture);
-        device.SSSetSampler (i, &*material.texmaps [i].sampler);
-      }
-      else
-      {
-        device.SSSetTexture (i, 0);
-        device.SSSetSampler (i, 0);
-      }
-
-    device.SSSetConstantBuffer (ConstantBufferSemantic_Material, &*material.constant_buffer);
-  }
-
   void visit (scene_graph::VisualModel& model)
   {
-    TransformationsShaderParams params;
-
-    IBuffer* cb = test.device->SSGetConstantBuffer (ConstantBufferSemantic_Transformations);
-
-    if (!cb)
-    {
-      printf ("Null transformations constant buffer\n");
-      return;
-    }
-
-    params.object_tm          = model.WorldTM ();
-    params.view_tm            = transpose (view_tm);
-    params.model_view_tm      = transpose (view_tm * model.WorldTM ());
-    params.model_view_proj_tm = transpose (view_projection_tm * model.WorldTM ());
-
-    cb->SetData (0, sizeof params, &params);
-
     ModelMeshPtr mesh = test.mesh_manager.FindMesh (model.MeshName ());
 
     if (!mesh)
@@ -476,159 +512,19 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
       return;
     }
 
-    IDevice& device = *test.device;
-
-    device.ISSetIndexBuffer (mesh->index_buffer.get ());
-    device.OSSetBlendState  (no_blend_state.get ());
-
-  /*  DepthStencilDesc depth_stencil_desc;
-
-    memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
-
-    depth_stencil_desc.depth_test_enable   = false;
-    depth_stencil_desc.depth_write_enable  = false;
-    depth_stencil_desc.depth_compare_mode  = CompareMode_Less;
-
-    DepthStencilStatePtr depth_stencil_state (device.CreateDepthStencilState (depth_stencil_desc), false);
-
-    device.OSSetDepthStencilState (depth_stencil_state.get ());*/
-
     for (PrimitiveArray::const_iterator iter=mesh->primitives.begin (); iter!=mesh->primitives.end (); ++iter)
     {
-      const ModelPrimitive& primitive = *iter;
-      ModelVertexBuffer&    vb        = *primitive.vertex_buffer;
-      ModelMaterial&        material  = *primitive.material;
+      RenderablePtr renderable (new RenderablePrimitive (model, *iter), false);
 
-      if (!&material || !&*material.shader || !&*material.shader->program)
-        continue;
-
-      SetMaterial (device, material);
-
-      device.ISSetInputLayout (vb.input_layout.get ());
-
-      for (size_t i=0; i<vb.vertex_streams.size (); i++)
-      {
-        BufferPtr vs = vb.vertex_streams [i];
-
-        device.ISSetVertexBuffer (i, vs.get ());
-      }
-
-      if (mesh->index_buffer)
-      {
-        device.DrawIndexed (primitive.type, primitive.first, primitive.count, 0);
-      }
-      else
-      {
-        device.Draw (primitive.type, primitive.first, primitive.count);
-      }
+      renderables.push_back (renderable);
     }
   }
 
   void visit (scene_graph::SpriteList& sprite)
   {
-    TransformationsShaderParams params;
+    RenderablePtr renderable (new RenderableSpriteList (test, sprite, particle_vertices_input_layout), false);
 
-    IBuffer* cb = test.device->SSGetConstantBuffer (ConstantBufferSemantic_Transformations);
-
-    if (!cb)
-    {
-      printf ("Null transformations constant buffer\n");
-      return;
-    }
-
-    math::quatf billboard_quat = inverse (sprite.WorldOrientation ()) * camera->WorldOrientation ();
-    math::mat4f billboard_tm   = to_matrix (billboard_quat);
-
-    params.object_tm          = sprite.WorldTM ();
-    params.view_tm            = transpose (view_tm);
-    params.model_view_tm      = transpose (view_tm * sprite.WorldTM ());
-    params.model_view_proj_tm = transpose (view_projection_tm * sprite.WorldTM ());
-
-    cb->SetData (0, sizeof params, &params);
-
-    IDevice& device = *test.device;
-
-    ModelMaterialPtr material = test.material_manager.FindMaterial (sprite.Material ());
-
-    if (!material)
-      throw xtl::format_operation_exception ("SceneRenderer::visit (scene_graph::SpriteList&)", "Can't find material '%s'", sprite.Material ());
-
-    SetMaterial (device, *material);
-
-    size_t sprites_count  = sprite.SpritesCount (),
-           vertices_count = sprites_count * 6;
-
-    xtl::uninitialized_storage<SpriteVertex> vertices (vertices_count);
-
-    SpriteVertex*                           current_vertex      = vertices.data ();
-    scene_graph::SpriteModel::SpriteDesc*   current_sprite_desc = sprite.Sprites ();
-
-    math::vec4f ort_x (1, 0, 0, 0),
-                ort_y (0, 1, 0, 0),
-                normal (0, 0, -1, 0);
-
-    ort_x = billboard_tm * ort_x;
-    ort_y = billboard_tm * ort_y;
-    normal = billboard_tm * normal;
-
-    for (size_t i = 0; i < sprites_count; i++, current_vertex += 6, current_sprite_desc++)
-    {
-      math::vec3f right = ort_x * current_sprite_desc->size.x / 2.f,
-                  up    = ort_y * current_sprite_desc->size.y / 2.f;
-
-      current_vertex [0].position = current_sprite_desc->position - right + up;
-      current_vertex [1].position = current_sprite_desc->position + right + up;
-      current_vertex [2].position = current_sprite_desc->position - right - up;
-      current_vertex [3].position = current_sprite_desc->position + right + up;
-      current_vertex [4].position = current_sprite_desc->position + right - up;
-      current_vertex [5].position = current_sprite_desc->position - right - up;
-
-      current_vertex [0].tex_coord = math::vec2f (0, 1);
-      current_vertex [1].tex_coord = math::vec2f (1, 1);
-      current_vertex [2].tex_coord = math::vec2f (0, 0);
-      current_vertex [3].tex_coord = math::vec2f (1, 1);
-      current_vertex [4].tex_coord = math::vec2f (1, 0);
-      current_vertex [5].tex_coord = math::vec2f (0, 0);
-
-      current_vertex [0].color = current_sprite_desc->color;
-      current_vertex [1].color = current_sprite_desc->color;
-      current_vertex [2].color = current_sprite_desc->color;
-      current_vertex [3].color = current_sprite_desc->color;
-      current_vertex [4].color = current_sprite_desc->color;
-      current_vertex [5].color = current_sprite_desc->color;
-    }
-
-    BufferDesc vb_desc;
-
-    memset (&vb_desc, 0, sizeof vb_desc);
-
-    vb_desc.size         = sizeof (SpriteVertex) * vertices_count;
-    vb_desc.usage_mode   = UsageMode_Default;
-    vb_desc.bind_flags   = BindFlag_VertexBuffer;
-    vb_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
-
-    BufferPtr vb (device.CreateBuffer (vb_desc), false);
-
-    vb->SetData (0, vb_desc.size, vertices.data ());
-
-    device.ISSetInputLayout  (particle_vertices_input_layout.get ());
-    device.ISSetVertexBuffer (0, vb.get ());
-
-    device.OSSetBlendState (additive_blend_state.get ());
-
-    DepthStencilDesc depth_stencil_desc;
-
-    memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
-
-    depth_stencil_desc.depth_test_enable   = true;
-    depth_stencil_desc.depth_write_enable  = false;
-    depth_stencil_desc.depth_compare_mode  = CompareMode_Less;
-
-    DepthStencilStatePtr depth_stencil_state (device.CreateDepthStencilState (depth_stencil_desc), false);
-
-//    device.OSSetDepthStencilState (depth_stencil_state.get ());
-
-    device.Draw (PrimitiveType_TriangleList, 0, vertices_count);
+    renderables.push_back (renderable);
   }
 };
 
