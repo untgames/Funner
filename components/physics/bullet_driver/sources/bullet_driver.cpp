@@ -100,7 +100,7 @@ Shape* Driver::CreateConvexShape (size_t vertices_count, math::vec3f* vertices)
     current_bullet_vertex [2] = current_vertex->z;
   }
 
-  return new Shape (new btConvexHullShape (bullet_vertices.data (), vertices_count, 3));
+  return new Shape (new btConvexHullShape (bullet_vertices.data (), vertices_count, 3 * sizeof (float)));
 }
 
 Shape* Driver::CreateTriangleMeshShape (size_t vertices_count, math::vec3f* vertices, size_t triangles_count, size_t* triangles)

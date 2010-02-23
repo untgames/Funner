@@ -13,7 +13,8 @@ using namespace physics::low_level::bullet;
 
 Shape::Shape (btCollisionShape* shape)
   : collision_shape (shape)
-  {}
+{
+}
 
 Shape::~Shape ()
 {
