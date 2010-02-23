@@ -328,34 +328,21 @@ size_t parallels, size_t meridians, const ModelMaterialPtr& material);
 void draw (IDevice&, ModelMesh&);
 
 ///Визуализатор сцены
-class SceneRenderer: public xtl::visitor<void, scene_graph::VisualModel, scene_graph::SpriteList>
+class SceneRenderer
 {
   public:
     SceneRenderer (Test&);
+    ~SceneRenderer ();
     
 ///Инициализация ресурсов
     void InitializeResources ();
     
 ///Рисование сцены
     void Draw (scene_graph::Camera&);
-        
-  protected:
-///Обновление источников света
-    void UpdateLights ();
-  
-///Рисование объектов
-    void visit (scene_graph::VisualModel&);
-    void visit (scene_graph::SpriteList&);
     
-  private:  
-    Test&                      test;
-    math::mat4f                view_projection_tm;
-    math::mat4f                view_tm;
-    scene_graph::Camera*       camera;
-    RasterizerStatePtr         rasterizer;
-    ProgramParametersLayoutPtr program_parameters_layout;
-    BufferPtr                  common_cb;
-    BufferPtr                  transformations_cb;
+  private:
+    struct Impl;
+    Impl* impl;
 };
 
 //менеджер систем частиц
