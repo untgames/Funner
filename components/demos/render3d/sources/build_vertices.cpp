@@ -34,9 +34,11 @@ struct VertexBuilder: public xtl::visitor<void, scene_graph::VisualModel>
     
     media::geometry::VertexDeclaration target_declaration (format);    
       
-    math::mat4f tm    = root.ObjectTM (model);
-    math::vec3f scale = root.WorldScale ();
+    math::mat4f tm    = inverse (root.WorldTM ()) * model.WorldTM ();
+    math::vec3f scale = 1.0f;//root.WorldScale ();
     
+    math::vec3f p = tm * math::vec3f (0.0f);
+
     media::geometry::Mesh& source_mesh = mesh->source_mesh;
     
     size_t primitives_count = source_mesh.PrimitivesCount ();
@@ -115,7 +117,7 @@ void build_sphere (const VertexArray& verts, math::vec3f& center, float& radius)
   float factor = 1.0f / verts.size ();
 
   for (VertexArray::const_iterator iter=verts.begin (), end=verts.end (); iter!=end; ++iter)
-    center += *iter * factor;    
+    center += *iter * factor;
     
   math::vec3f max_dim;
   

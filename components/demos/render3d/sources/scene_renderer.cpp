@@ -132,17 +132,20 @@ void SceneRenderer::InitializeResources ()
 }
 
 ///Рисование сцены
-void SceneRenderer::Draw (scene_graph::Camera& camera)
+void SceneRenderer::Draw (scene_graph::Camera& in_camera)
 {
-  if (!camera.Scene ())
+  camera = &in_camera;
+
+  if (!camera->Scene ())
     return;
 
-  view_tm            = inverse (camera.WorldTM ());
-  view_projection_tm = camera.ProjectionMatrix () * view_tm;
+  //view_tm            = inverse (camera->WorldTM ());
+  view_tm            = inverse (camera->WorldTM ());
+  view_projection_tm = camera->ProjectionMatrix () * view_tm;
   
   UpdateLights ();
 
-  camera.Scene ()->VisitEach (*this);
+  camera->Scene ()->VisitEach (*this);
 }
 
 void SceneRenderer::UpdateLights ()
@@ -241,4 +244,177 @@ void SceneRenderer::visit (scene_graph::VisualModel& model)
       device.Draw (primitive.type, primitive.first, primitive.count);
     }
   }
+}
+
+namespace
+{
+
+struct SpriteVertex
+{
+  math::vec3f position;
+  math::vec3f normal;
+  math::vec4f tex_coord;
+  math::vec4f color;
+};
+
+}
+
+void SceneRenderer::visit (scene_graph::SpriteList& sprite)
+{
+  TransformationsShaderParams params;
+
+  IBuffer* cb = test.device->SSGetConstantBuffer (ConstantBufferSemantic_Transformations);
+
+  if (!cb)
+  {
+    printf ("Null transformations constant buffer\n");
+    return;
+  }
+
+  math::quatf billboard_quat = inverse (sprite.WorldOrientation ()) * camera->WorldOrientation ();
+  math::mat4f billboard_tm   = to_matrix (billboard_quat);
+
+  params.object_tm          = sprite.WorldTM ();
+  params.view_tm            = transpose (view_tm);
+  params.model_view_tm      = transpose (view_tm * sprite.WorldTM ());
+  params.model_view_proj_tm = transpose (view_projection_tm * sprite.WorldTM ());
+
+  cb->SetData (0, sizeof params, &params);
+
+  IDevice& device = *test.device;
+
+  ModelMaterialPtr material = test.material_manager.FindMaterial (sprite.Material ());
+
+  if (!material)
+    throw xtl::format_operation_exception ("SceneRenderer::visit (scene_graph::SpriteList&)", "Can't find material '%s'", sprite.Material ());
+
+  device.SSSetProgram (material->shader->program.get ());
+
+  int samplers_count = stl::min ((int)MAX_SAMPLERS, (int)SamplerChannel_Num);
+
+  for (int i=0; i<samplers_count; i++)
+    if (material->texmaps [i].texture && material->texmaps [i].sampler)
+    {
+      device.SSSetTexture (i, &*material->texmaps [i].texture);
+      device.SSSetSampler (i, &*material->texmaps [i].sampler);
+    }
+    else
+    {
+      device.SSSetTexture (i, 0);
+      device.SSSetSampler (i, 0);
+    }
+
+  device.SSSetConstantBuffer (ConstantBufferSemantic_Material, &*material->constant_buffer);
+
+  size_t sprites_count  = sprite.SpritesCount (),
+         vertices_count = sprites_count * 6;
+
+  xtl::uninitialized_storage<SpriteVertex> vertices (vertices_count);
+
+  SpriteVertex*                           current_vertex      = vertices.data ();
+  scene_graph::SpriteModel::SpriteDesc*   current_sprite_desc = sprite.Sprites ();
+
+  math::vec4f ort_x (1, 0, 0, 0),
+              ort_y (0, 1, 0, 0);
+
+  ort_x = billboard_tm * ort_x;
+  ort_y = billboard_tm * ort_y;
+
+  //ort_x = sprite.WorldTM () * ort_x;
+  //ort_y = sprite.WorldTM () * ort_y;
+
+  for (size_t i = 0; i < sprites_count; i++, current_vertex += 6, current_sprite_desc++)
+  {
+    math::vec3f right = ort_x * current_sprite_desc->size.x / 2.f,
+                up    = ort_y * current_sprite_desc->size.y / 2.f;
+
+    current_vertex [0].position = current_sprite_desc->position - right + up;
+    current_vertex [1].position = current_sprite_desc->position + right + up;
+    current_vertex [2].position = current_sprite_desc->position - right - up;
+    current_vertex [3].position = current_sprite_desc->position + right + up;
+    current_vertex [4].position = current_sprite_desc->position + right - up;
+    current_vertex [5].position = current_sprite_desc->position - right - up;
+
+    current_vertex [0].normal = math::vec3f (0, 0, -1);
+    current_vertex [1].normal = math::vec3f (0, 0, -1);
+    current_vertex [2].normal = math::vec3f (0, 0, -1);
+    current_vertex [3].normal = math::vec3f (0, 0, -1);
+    current_vertex [4].normal = math::vec3f (0, 0, -1);
+    current_vertex [5].normal = math::vec3f (0, 0, -1);
+
+    current_vertex [0].tex_coord = math::vec2f (0, 1);
+    current_vertex [1].tex_coord = math::vec2f (1, 1);
+    current_vertex [2].tex_coord = math::vec2f (0, 0);
+    current_vertex [3].tex_coord = math::vec2f (1, 1);
+    current_vertex [4].tex_coord = math::vec2f (1, 0);
+    current_vertex [5].tex_coord = math::vec2f (0, 0);
+
+    current_vertex [0].color = current_sprite_desc->color;
+    current_vertex [1].color = current_sprite_desc->color;
+    current_vertex [2].color = current_sprite_desc->color;
+    current_vertex [3].color = current_sprite_desc->color;
+    current_vertex [4].color = current_sprite_desc->color;
+    current_vertex [5].color = current_sprite_desc->color;
+  }
+
+  current_sprite_desc--;
+
+  math::vec3f right = ort_x * current_sprite_desc->size.x / 2.f,
+              up    = ort_y * current_sprite_desc->size.y / 2.f;
+
+  math::vec3f pos = current_sprite_desc->position - right + up;
+
+  //printf ("last sprite position = %.3f %.3f %.3f\n", pos.x, pos.y, pos.z);
+
+  BufferDesc vb_desc;
+
+  memset (&vb_desc, 0, sizeof vb_desc);
+
+  vb_desc.size         = sizeof (SpriteVertex) * vertices_count;
+  vb_desc.usage_mode   = UsageMode_Default;
+  vb_desc.bind_flags   = BindFlag_VertexBuffer;
+  vb_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
+
+  BufferPtr vb (device.CreateBuffer (vb_desc), false);
+
+  vb->SetData (0, vb_desc.size, vertices.data ());
+
+  VertexAttribute attributes [] = {
+    {VertexAttributeSemantic_Position,  InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (SpriteVertex, position), sizeof (SpriteVertex)},
+    {VertexAttributeSemantic_Normal,    InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (SpriteVertex, normal), sizeof (SpriteVertex)},
+    {VertexAttributeSemantic_TexCoord0, InputDataFormat_Vector2, InputDataType_Float, 0, offsetof (SpriteVertex, tex_coord), sizeof (SpriteVertex)},
+    {VertexAttributeSemantic_Color,     InputDataFormat_Vector4, InputDataType_Float, 0, offsetof (SpriteVertex, color), sizeof (SpriteVertex)},
+  };
+
+  InputLayoutDesc layout_desc;
+
+  memset (&layout_desc, 0, sizeof layout_desc);
+
+  layout_desc.vertex_attributes_count = sizeof attributes / sizeof *attributes;
+  layout_desc.vertex_attributes       = attributes;
+  layout_desc.index_type              = InputDataType_UByte;
+
+  InputLayoutPtr layout (device.CreateInputLayout (layout_desc), false);
+
+  device.ISSetInputLayout  (layout.get ());
+  device.ISSetVertexBuffer (0, vb.get ());
+
+  BlendDesc blend_desc;
+
+  memset (&blend_desc, 0, sizeof (blend_desc));
+
+  blend_desc.blend_enable                     = true;
+  blend_desc.blend_color_operation            = BlendOperation_Add;
+  blend_desc.blend_alpha_operation            = BlendOperation_Add;
+  blend_desc.blend_color_source_argument      = BlendArgument_SourceAlpha;
+  blend_desc.blend_color_destination_argument = BlendArgument_InverseSourceAlpha;
+  blend_desc.blend_alpha_source_argument      = BlendArgument_SourceAlpha;
+  blend_desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;
+  blend_desc.color_write_mask                 = ColorWriteFlag_All;
+
+  BlendStatePtr blend_state (device.CreateBlendState (blend_desc), false);
+
+  device.OSSetBlendState (blend_state.get ());
+
+  device.Draw (PrimitiveType_TriangleList, 0, vertices_count);
 }

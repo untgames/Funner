@@ -8,6 +8,7 @@
 #include <float.h>
 
 #include <math/matrix.h>
+#include <math/basic_spline.h>
 #include <math/utility.h>
 
 #include <syslib/window.h>
@@ -45,6 +46,7 @@
 #include <sg/camera.h>
 #include <sg/light.h>
 #include <sg/scene.h>
+#include <sg/sprite.h>
 #include <sg/visual_model.h>
 
 #include <media/image.h>
@@ -89,6 +91,14 @@ typedef xtl::com_ptr<IRasterizerState>         RasterizerStatePtr;
 typedef xtl::com_ptr<IProgram>                 ProgramPtr;
 typedef xtl::com_ptr<IProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::com_ptr<IPredicate>               PredicatePtr;
+
+namespace math
+{
+
+bool read (const char* string, math::vec4f& result);
+bool read (const char* string, math::mat4f& result);
+
+}
 
 struct Test;
 
@@ -318,7 +328,7 @@ size_t parallels, size_t meridians, const ModelMaterialPtr& material);
 void draw (IDevice&, ModelMesh&);
 
 ///Визуализатор сцены
-class SceneRenderer: public xtl::visitor<void, scene_graph::VisualModel>
+class SceneRenderer: public xtl::visitor<void, scene_graph::VisualModel, scene_graph::SpriteList>
 {
   public:
     SceneRenderer (Test&);
@@ -335,15 +345,40 @@ class SceneRenderer: public xtl::visitor<void, scene_graph::VisualModel>
   
 ///Рисование объектов
     void visit (scene_graph::VisualModel&);
+    void visit (scene_graph::SpriteList&);
     
   private:  
     Test&                      test;
     math::mat4f                view_projection_tm;
     math::mat4f                view_tm;
+    scene_graph::Camera*       camera;
     RasterizerStatePtr         rasterizer;
     ProgramParametersLayoutPtr program_parameters_layout;
     BufferPtr                  common_cb;
     BufferPtr                  transformations_cb;
+};
+
+//менеджер систем частиц
+class ParticleSystemsManager
+{
+  public:
+///Конструктор/деструктор
+    ParticleSystemsManager ();
+    ~ParticleSystemsManager ();
+
+///Загрузка описаний систем частиц
+    void LoadParticleSystems (const char* file_name);
+
+///Создание узла системы частиц
+    Node::Pointer CreateParticleSystem (const char* id, Node& particles_parent);
+
+  private:
+    ParticleSystemsManager (const ParticleSystemsManager&); //no impl
+    ParticleSystemsManager& operator = (const ParticleSystemsManager&); //no impl
+
+  private:
+    struct Impl;
+    Impl* impl;
 };
 
 typedef xtl::com_ptr<physics::low_level::IRigidBody> RigidBodyPtr;
@@ -404,6 +439,7 @@ struct Test
     SceneRenderer              scene_renderer;
     MeshManager                mesh_manager;
     MaterialManager            material_manager;
+    ParticleSystemsManager     particle_systems_manager;
     PerspectiveCamera::Pointer camera;
     DirectLight::Pointer       light;
     PhysicsDriverPtr           physics_driver;
@@ -433,6 +469,8 @@ struct Test
     void OnCameraUpdate ();
     void OnInputEvent (const char* event);
 };
+
+extern Test* global_test;
 
 #ifdef _MSC_VER
   #pragma pack (pop)
