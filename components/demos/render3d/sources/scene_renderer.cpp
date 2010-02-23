@@ -191,13 +191,25 @@ void SceneRenderer::visit (scene_graph::VisualModel& model)
 
   if (!mesh)
   {
-    printf ("Can't find mesh '%s'\n", model.MeshName ());      
+    printf ("Can't find mesh '%s'\n", model.MeshName ());
     return;
   }
 
   IDevice& device = *test.device;
 
   device.ISSetIndexBuffer (mesh->index_buffer.get ());
+
+/*  DepthStencilDesc depth_stencil_desc;
+
+  memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
+
+  depth_stencil_desc.depth_test_enable   = false;
+  depth_stencil_desc.depth_write_enable  = false;
+  depth_stencil_desc.depth_compare_mode  = CompareMode_Less;
+
+  DepthStencilStatePtr depth_stencil_state (device.CreateDepthStencilState (depth_stencil_desc), false);
+
+  device.OSSetDepthStencilState (depth_stencil_state.get ());*/
 
   for (PrimitiveArray::const_iterator iter=mesh->primitives.begin (); iter!=mesh->primitives.end (); ++iter)
   {
@@ -315,13 +327,12 @@ void SceneRenderer::visit (scene_graph::SpriteList& sprite)
   scene_graph::SpriteModel::SpriteDesc*   current_sprite_desc = sprite.Sprites ();
 
   math::vec4f ort_x (1, 0, 0, 0),
-              ort_y (0, 1, 0, 0);
+              ort_y (0, 1, 0, 0),
+              normal (0, 0, -1, 0);
 
   ort_x = billboard_tm * ort_x;
   ort_y = billboard_tm * ort_y;
-
-  //ort_x = sprite.WorldTM () * ort_x;
-  //ort_y = sprite.WorldTM () * ort_y;
+  normal = billboard_tm * normal;
 
   for (size_t i = 0; i < sprites_count; i++, current_vertex += 6, current_sprite_desc++)
   {
@@ -335,12 +346,12 @@ void SceneRenderer::visit (scene_graph::SpriteList& sprite)
     current_vertex [4].position = current_sprite_desc->position + right - up;
     current_vertex [5].position = current_sprite_desc->position - right - up;
 
-    current_vertex [0].normal = math::vec3f (0, 0, -1);
-    current_vertex [1].normal = math::vec3f (0, 0, -1);
-    current_vertex [2].normal = math::vec3f (0, 0, -1);
-    current_vertex [3].normal = math::vec3f (0, 0, -1);
-    current_vertex [4].normal = math::vec3f (0, 0, -1);
-    current_vertex [5].normal = math::vec3f (0, 0, -1);
+    current_vertex [0].normal = normal;
+    current_vertex [1].normal = normal;
+    current_vertex [2].normal = normal;
+    current_vertex [3].normal = normal;
+    current_vertex [4].normal = normal;
+    current_vertex [5].normal = normal;
 
     current_vertex [0].tex_coord = math::vec2f (0, 1);
     current_vertex [1].tex_coord = math::vec2f (1, 1);
@@ -356,15 +367,6 @@ void SceneRenderer::visit (scene_graph::SpriteList& sprite)
     current_vertex [4].color = current_sprite_desc->color;
     current_vertex [5].color = current_sprite_desc->color;
   }
-
-  current_sprite_desc--;
-
-  math::vec3f right = ort_x * current_sprite_desc->size.x / 2.f,
-              up    = ort_y * current_sprite_desc->size.y / 2.f;
-
-  math::vec3f pos = current_sprite_desc->position - right + up;
-
-  //printf ("last sprite position = %.3f %.3f %.3f\n", pos.x, pos.y, pos.z);
 
   BufferDesc vb_desc;
 
@@ -415,6 +417,18 @@ void SceneRenderer::visit (scene_graph::SpriteList& sprite)
   BlendStatePtr blend_state (device.CreateBlendState (blend_desc), false);
 
   device.OSSetBlendState (blend_state.get ());
+
+/*  DepthStencilDesc depth_stencil_desc;
+
+  memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
+
+  depth_stencil_desc.depth_test_enable   = true;
+  depth_stencil_desc.depth_write_enable  = false;
+  depth_stencil_desc.depth_compare_mode  = CompareMode_Less;
+
+  DepthStencilStatePtr depth_stencil_state (device.CreateDepthStencilState (depth_stencil_desc), false);
+
+  device.OSSetDepthStencilState (depth_stencil_state.get ());*/
 
   device.Draw (PrimitiveType_TriangleList, 0, vertices_count);
 }

@@ -87,8 +87,6 @@ void idle (Test& test)
 //      iter->first->Translate (math::vec3f (dt, dt, dt), NodeTransformSpace_World);
       
       math::vec3f p = iter->first->WorldPosition ();
-          
-      printf ("position: %.3f %.3f %.3f ||| %.3f %.3f %.3f\n", p.x, p.y, p.z, body_transform.position.x, body_transform.position.y, body_transform.position.z);
     }
   }
   else
@@ -112,8 +110,6 @@ void idle (Test& test)
 
   test.window.Invalidate ();
 }
-
-Test* global_test = 0;
 
 int main ()
 {
@@ -208,9 +204,13 @@ int main ()
       
       Node::Pointer enterprise = Node::Create ();
 
-      Node::Pointer particle_system = test.particle_systems_manager.CreateParticleSystem ("ship_trail", test.scene_manager.Scene ().Root ());
+      Node::Pointer left_particle_system  = test.particle_systems_manager.CreateParticleSystem ("ship_trail", test.scene_manager.Scene ().Root ()),
+                    right_particle_system = test.particle_systems_manager.CreateParticleSystem ("ship_trail", test.scene_manager.Scene ().Root ());
 
-      particle_system->BindToParent (*enterprise, NodeBindMode_AddRef);
+      left_particle_system->SetPosition (-2.5, -0.5, -4.5);
+      left_particle_system->BindToParent (*enterprise, NodeBindMode_AddRef);
+      right_particle_system->SetPosition (2.5, -0.5, -4.5);
+      right_particle_system->BindToParent (*enterprise, NodeBindMode_AddRef);
 
       enterprise_subnode->SetPosition  (-center);
       enterprise_subnode->BindToParent (*enterprise, NodeBindMode_AddRef);
@@ -249,8 +249,6 @@ int main ()
     test.scene_manager.SetDrawMainShips (false);
 
     printf ("Register callbacks\n");
-
-    global_test = &test;
 
     syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (test)));
 

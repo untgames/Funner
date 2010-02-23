@@ -25,7 +25,7 @@
   </Templates>
   <Materials>
     <Material Name="ship_trail">
-      <ShaderParameters Reflectivity="0" Transparency="1" Shininess="0" Diffuse="1 1 1 1" Ambient="0 0 0 0" Specular="0 0 0 0" Emission="0 0 0 0"  DiffuseTexture="data/textures/bottom.jpg"
+      <ShaderParameters Reflectivity="0" Transparency="1" Shininess="0" Diffuse="1 1 1 1" Ambient="0 0 0 0" Specular="0 0 0 0" Emission="0 0 0 0"  DiffuseTexture="data/textures/ship_trail.png"
        Effect="particle"/>
     </Material>
   </Materials>

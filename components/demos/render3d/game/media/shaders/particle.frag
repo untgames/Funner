@@ -6,5 +6,7 @@ varying vec4 DiffuseTexcoord;
 
 void main (void)
 {
-  gl_FragColor = vec4 (vec3 (texture2D (DiffuseTexture, DiffuseTexcoord.xy)), gl_Color.w * Transparency);
+  vec4 texel = texture2D (DiffuseTexture, DiffuseTexcoord.xy);
+
+  gl_FragColor = vec4 (vec3 (texel), texel.w * gl_Color.w * Transparency);
 }

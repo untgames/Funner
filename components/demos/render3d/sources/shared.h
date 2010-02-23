@@ -470,8 +470,6 @@ struct Test
     void OnInputEvent (const char* event);
 };
 
-extern Test* global_test;
-
 #ifdef _MSC_VER
   #pragma pack (pop)
 #endif
