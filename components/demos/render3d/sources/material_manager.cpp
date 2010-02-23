@@ -3,7 +3,7 @@
 namespace
 {
 
-const char* BLENDED_MATERIALS [] = { "ship_trail" };
+const char* BLENDED_MATERIALS [] = { "ship_trail", "main_ship.glasshard_1-fx", "main_ship.glassoft_1-fx" };
 
 }
 

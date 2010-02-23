@@ -131,11 +131,13 @@ class ParticleSystem : public scene_graph::Entity
         particles.push_back (particle_desc);
       }
 
-      particles_node->Resize (count);
+      particles_node->Resize (particles.size ());
 
       scene_graph::SpriteModel::SpriteDesc *sprite_desc = particles_node->Sprites ();
 
-      for (ParticlesList::reverse_iterator iter = particles.rbegin (), end = particles.rend (); iter != end; ++iter, sprite_desc++)
+      size_t i = 0;
+
+      for (ParticlesList::iterator iter = particles.begin (), end = particles.end (); iter != end; ++iter, sprite_desc++)
       {
         float particle_time = (time - (*iter)->born_time) / 1000.f;
 
@@ -143,6 +145,8 @@ class ParticleSystem : public scene_graph::Entity
         sprite_desc->size     = desc->emitter_desc.size;
         sprite_desc->color    = desc->emitter_desc.color;
         sprite_desc->color.w  = desc->emitter_desc.alpha.eval (particle_time);
+
+        i++;
       }
     }
 
