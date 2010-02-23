@@ -381,29 +381,39 @@ struct PhysBody: public xtl::reference_counter
 typedef xtl::intrusive_ptr<PhysBody> PhysBodyPtr;
 
 ///Противник
-class EnemyAi: public xtl::reference_counter
+class EnemyAi
 {
   public: 
-    EnemyAi (Test& test, Node& node, physics::low_level::IRigidBody& body);
+    EnemyAi  (Test& test, Node& node, physics::low_level::IRigidBody& body);
+    EnemyAi  (const EnemyAi&);
+    ~EnemyAi ();
   
     void operator () (float dt);
     
   private:
-    enum State
-    {
-      State_Attack,
-      State_Guard
-    };
-    
-    bool CompensateDirections (const math::vec3f& source, const math::vec3f& target);
+    EnemyAi& operator = (const EnemyAi&); //no impl  
 
   private:
-    Test&                           test;
-    Node&                           enemy_node;
-    physics::low_level::IRigidBody& enemy_body;  
-    State                           state;
-    size_t                          state_change_time;
-    math::vec3f                     guard_target_point;
+    struct Impl;
+    Impl* impl;
+};
+
+//Следование за узлом
+class FollowNode
+{
+  public:
+    FollowNode (Node& source, Node& follower);
+    FollowNode (const FollowNode&);
+    ~FollowNode ();  
+    
+    void operator () (float dt);
+  
+  private:
+    FollowNode& operator = (const FollowNode&); //no impl
+
+  private:
+    struct Impl;
+    Impl* impl;
 };
 
 ///Тестовое приложение

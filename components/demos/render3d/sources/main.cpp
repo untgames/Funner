@@ -235,14 +235,19 @@ int main ()
       }
       else
       {
+        Node::Pointer follower = Node::Create ();
+        
         test.camera->SetScaleInherit (false);
 
-        test.camera->BindToParent (*ship);
+        follower->BindToScene (test.scene_manager.Scene (), NodeBindMode_AddRef);
+        follower->AttachController (FollowNode (*ship, *follower));
 
         test.camera->SetPosition (0, 10, 20);
         test.camera->Rotate (math::degree (10.0f), math::degree (180.0f), math::degree (0.0f));
+//        test.camera->BindToParent (*follower);
+        test.camera->BindToParent (*ship);
 
-        test.camera_body = phys_body->rigid_body;        
+        test.camera_body = phys_body->rigid_body;
 
         test.scene_manager.AddMainShip (ship);                
 
