@@ -31,6 +31,8 @@ struct MeshLoader
       printf ("Load mesh '%s'\n", id);
 
       ModelMeshPtr model_mesh (new ModelMesh (id));
+      
+      model_mesh->source_mesh = mesh;
 
       for (size_t i=0, vb_count=mesh.VertexBuffersCount (); i<vb_count; i++)
       {
@@ -167,7 +169,6 @@ struct MeshLoader
         VertexBufferPtr model_vb (new ModelVertexBuffer);
 
         model_vb->id = vb.Id ();
-        model_vb->source_vertex_buffer = vb;
 
         stl::vector<VertexAttribute> vertex_attributes;
 

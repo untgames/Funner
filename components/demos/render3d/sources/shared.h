@@ -185,10 +185,9 @@ typedef stl::vector<BufferPtr> BufferArray;
 
 struct ModelVertexBuffer
 {
-  BufferArray                   vertex_streams;
-  InputLayoutPtr                input_layout;
-  media::geometry::VertexBuffer source_vertex_buffer;
-  size_t                        id;
+  BufferArray    vertex_streams;
+  InputLayoutPtr input_layout;
+  size_t         id;
 };
 
 typedef xtl::shared_ptr<ModelVertexBuffer>     VertexBufferPtr;
@@ -210,11 +209,12 @@ typedef stl::vector<math::vec3f>    VertexArray;
 
 struct ModelMesh
 {
-  VertexBufferArray vertex_buffers;
-  BufferPtr         index_buffer;
-  PrimitiveArray    primitives;
-  VertexArray       vertices;
-  stl::string       name;
+  VertexBufferArray     vertex_buffers;
+  BufferPtr             index_buffer;
+  PrimitiveArray        primitives;
+  VertexArray           vertices;
+  media::geometry::Mesh source_mesh;
+  stl::string           name;
 
   ModelMesh (const char* in_name)
     : name (in_name)
@@ -222,6 +222,7 @@ struct ModelMesh
 };
 
 void build_vertices (Node& root, Test& test, VertexArray& verts);
+void build_sphere (const VertexArray& verts, math::vec3f& center, float& radius);
 
 typedef xtl::shared_ptr<ModelMesh> ModelMeshPtr;
 
@@ -347,6 +348,40 @@ class SceneRenderer: public xtl::visitor<void, scene_graph::VisualModel>
 
 typedef xtl::com_ptr<physics::low_level::IRigidBody> RigidBodyPtr;
 
+///Физическое тело
+struct PhysBody: public xtl::reference_counter
+{
+  RigidBodyPtr rigid_body;
+  math::vec3f  center;
+};
+
+typedef xtl::intrusive_ptr<PhysBody> PhysBodyPtr;
+
+///Противник
+class EnemyAi: public xtl::reference_counter
+{
+  public: 
+    EnemyAi (Test& test, Node& node, physics::low_level::IRigidBody& body);
+  
+    void operator () (float dt);
+    
+  private:
+    enum State
+    {
+      State_Attack,
+      State_Guard
+    };
+    
+    bool CompensateDirections (const math::vec3f& source, const math::vec3f& target);
+
+  private:
+    Test&                           test;
+    Node&                           enemy_node;
+    physics::low_level::IRigidBody& enemy_body;  
+    State                           state;
+    size_t                          state_change_time;
+};
+
 ///Тестовое приложение
 struct Test
 {
@@ -354,7 +389,7 @@ struct Test
     typedef xtl::function<void (Test&)>                  CallbackFn;
     typedef xtl::com_ptr<physics::low_level::IDriver>    PhysicsDriverPtr;
     typedef xtl::com_ptr<physics::low_level::IScene>     PhysicsScenePtr;
-    typedef stl::map<Node::Pointer, RigidBodyPtr>        RigidBodiesMap;
+    typedef stl::map<Node::Pointer, PhysBodyPtr>         PhysBodiesMap;
     typedef xtl::com_ptr<input::low_level::IDriver>      InputDriverPtr;
     typedef xtl::com_ptr<input::low_level::IDevice>      InputDevicePtr;
     typedef stl::vector<InputDevicePtr>                  InputDevices;
@@ -373,7 +408,7 @@ struct Test
     DirectLight::Pointer       light;
     PhysicsDriverPtr           physics_driver;
     PhysicsScenePtr            physics_scene;
-    RigidBodiesMap             rigid_bodies;
+    PhysBodiesMap              physics_bodies;
     RigidBodyPtr               camera_body;
     InputDriverPtr             input_driver;
     InputDevices               input_devices;

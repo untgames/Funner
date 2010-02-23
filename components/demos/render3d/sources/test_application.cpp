@@ -97,21 +97,26 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
 
   physics_scene->SetGravity (0);
 
-  xtl::com_ptr<physics::low_level::IShape> box_shape = physics_driver->CreateBoxShape (math::vec3f (1.f, 3.f, 5.f));
+//  xtl::com_ptr<physics::low_level::IShape> box_shape = physics_driver->CreateBoxShape (math::vec3f (1.f, 3.f, 5.f));
+  xtl::com_ptr<physics::low_level::IShape> box_shape = physics_driver->CreateBoxShape (math::vec3f (0.05f));
 
-  camera_body = RigidBodyPtr (physics_scene->CreateRigidBody (box_shape.get (), 1.f), false);
+  PhysBodyPtr camera_phys_body (new PhysBody, false);
 
-  camera_body->Material ()->SetLinearDamping (0.5f);
-  camera_body->Material ()->SetAngularDamping (0.5f);
+  camera_phys_body->rigid_body = RigidBodyPtr (physics_scene->CreateRigidBody (box_shape.get (), 1.f), false);
+
+  camera_phys_body->rigid_body->Material ()->SetLinearDamping (0.5f);
+  camera_phys_body->rigid_body->Material ()->SetAngularDamping (0.5f);
+  
+  camera_body = camera_phys_body->rigid_body;
 
   physics::low_level::Transform camera_transform;
 
   camera_transform.position    = camera->WorldPosition ();
   camera_transform.orientation = camera->WorldOrientation ();
 
-  camera_body->SetWorldTransform (camera_transform);
+  camera_phys_body->rigid_body->SetWorldTransform (camera_transform);
 
-  rigid_bodies.insert_pair (camera, camera_body);
+  physics_bodies.insert_pair (camera, camera_phys_body);
 
     //create input handling
   input_driver = input::low_level::DriverManager::FindDriver ("DirectInput8");
