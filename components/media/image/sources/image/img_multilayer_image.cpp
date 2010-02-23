@@ -302,7 +302,7 @@ ImageImpl* create_cubemap_image (const char* file_name)
 
 ImageImpl* create_skybox_image (const char* file_name)
 {
-  static const char* suffixes [6] = {"_up", "_down", "_left", "_right", "_front", "_back"};
+  static const char* suffixes [6] = {"_right", "_left", "_down", "_up", "_front", "_back"};
 
   Image images [6];
   
