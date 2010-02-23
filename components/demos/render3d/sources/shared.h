@@ -402,6 +402,7 @@ class EnemyAi: public xtl::reference_counter
     physics::low_level::IRigidBody& enemy_body;  
     State                           state;
     size_t                          state_change_time;
+    math::vec3f                     guard_target_point;
 };
 
 ///Тестовое приложение

@@ -6,8 +6,7 @@ const char*  MODEL_NAME               = "data/meshes/main_ship.binmesh";
 const char*  ENTERPRISE_MODEL_NAME    = "data/meshes/ship_01a.binmesh";
 const char*  MATERIAL_LIBRARIES []    = { "data/materials/main_ship.xmtl", "data/materials/ship_01a.xmtl", "data/materials/sky.xmtl", "data/materials/particles.xmtl" };
 const char*  PARTICLE_SYSTEMS []      = { "data/particle_systems/particles.xml" };
-//const char*  SCENE_NAME               = "data/scenes/main_ship.xscene";
-const char*  SCENE_NAME               = "data/scenes/ship_01a.xscene";
+const char*  SCENE_NAME               = "data/scenes/main_ship.xscene";
 const char*  ENTERPRISE_SCENE_NAME    = "data/scenes/ship_01a.xscene";
 const char*  REFLECTION_TEXTURE       = "data/textures/environment/EnvGala_000_D.tga";
 const char*  SKY_MESH                 = "_SkyMesh";
@@ -56,9 +55,6 @@ void idle (Test& test)
 
   if (test.physics_enabled)
   {
-
-//  test.camera_body->SetLinearVelocity (math::vec3f (test.x_camera_speed, 0, test.y_camera_speed) * inverse (test.camera->WorldTM ()));
-//  test.camera_body->SetAngularVelocity (math::vec3f (test.y_camera_rotation_speed, test.x_camera_rotation_speed, test.z_camera_rotation_speed) * inverse (test.camera->WorldTM ()));
     test.camera_body->AddForce (math::vec3f (test.x_camera_speed, 0, test.y_camera_speed) * inverse (test.camera->WorldTM ()));
 
     math::quatf rotation = math::to_quat (math::radian (test.y_camera_rotation_speed / 20.f), math::radian (test.x_camera_rotation_speed / 20.f), math::radian (test.z_camera_rotation_speed / 20.f));
@@ -70,23 +66,14 @@ void idle (Test& test)
 
     test.camera_body->AddTorque (math::vec3f (radian (pitch), radian (yaw), radian (roll)));
 
-
-//    test.camera_body->AddTorque (math::vec3f (test.y_camera_rotation_speed / 20.f, test.x_camera_rotation_speed / 20.f, test.z_camera_rotation_speed / 20.f));
-    //test.camera_body->AddTorque (math::vec3f (test.y_camera_rotation_speed / 20.f, test.x_camera_rotation_speed / 20.f, test.z_camera_rotation_speed / 20.f) * inverse (test.camera->WorldTM ()));
-
     test.physics_scene->PerformSimulation (dt);
 
     for (Test::PhysBodiesMap::iterator iter = test.physics_bodies.begin (), end = test.physics_bodies.end (); iter != end; ++iter)
     {
       const physics::low_level::Transform& body_transform = iter->second->rigid_body->WorldTransform ();
 
-      //if (iter->second->rigid_body != test.camera_body)
-        iter->first->SetWorldOrientation (body_transform.orientation);
-      iter->first->SetWorldPosition (body_transform.position);
-
-//      iter->first->Translate (math::vec3f (dt, dt, dt), NodeTransformSpace_World);
-      
-      math::vec3f p = iter->first->WorldPosition ();
+      iter->first->SetWorldOrientation (body_transform.orientation);
+      iter->first->SetWorldPosition (body_transform.position);      
     }
   }
   else
@@ -185,38 +172,35 @@ int main ()
     sky->SetScaleInherit       (false);    
     sky->BindToParent          (*test.camera, scene_graph::NodeBindMode_AddRef);
 
-    printf ("Load enterprise scene\n");
+    printf ("Load ships\n");
 
-    for (size_t i = 0; i < 3; i++)
+    for (size_t i = 0; i < 5; i++)
     {
-      Node::Pointer enterprise_subnode = test.scene_manager.LoadScene (i ? ENTERPRISE_SCENE_NAME : SCENE_NAME);
+      Node::Pointer ship_subnode = test.scene_manager.LoadScene (i ? ENTERPRISE_SCENE_NAME : SCENE_NAME);
 
       VertexArray verts;
       
-      build_vertices (*enterprise_subnode, test, verts);
+      build_vertices (*ship_subnode, test, verts);
       
       math::vec3f center;
+      math::vec3f scale = ship_subnode->WorldScale ();
       float       radius = 1.0f;
       
       build_sphere (verts, center, radius);
       
-      printf ("model: [%.3f %.3f %.3f] radius=%.3f\n", center.x, center.y, center.z, radius);
+      printf ("model: center=[%.3f %.3f %.3f] radius=%.3f scale=[%.3f %.3f %.3f]\n", center.x, center.y, center.z, radius,
+        scale.x, scale.y, scale.z);
+        
+      for (VertexArray::iterator iter=verts.begin (), end=verts.end (); iter!=end; ++iter)
+        *iter -= center;
       
-      Node::Pointer enterprise = Node::Create ();
+      Node::Pointer ship = Node::Create ();
+           
+      ship_subnode->SetPosition  (-center);
+      ship_subnode->BindToParent (*ship, NodeBindMode_AddRef);
+      ship->BindToScene          (test.scene_manager.Scene (), NodeBindMode_AddRef);
 
-      Node::Pointer left_particle_system  = test.particle_systems_manager.CreateParticleSystem ("ship_trail", test.scene_manager.Scene ().Root ()),
-                    right_particle_system = test.particle_systems_manager.CreateParticleSystem ("ship_trail", test.scene_manager.Scene ().Root ());
-
-      left_particle_system->SetPosition (-2.5, -0.5, -4.5);
-      left_particle_system->BindToParent (*enterprise, NodeBindMode_AddRef);
-      right_particle_system->SetPosition (2.5, -0.5, -4.5);
-      right_particle_system->BindToParent (*enterprise, NodeBindMode_AddRef);
-
-      enterprise_subnode->SetPosition  (-center);
-      enterprise_subnode->BindToParent (*enterprise, NodeBindMode_AddRef);
-      enterprise->BindToScene          (test.scene_manager.Scene (), NodeBindMode_AddRef);
-
-      enterprise->Translate ((float)((int)(rand () % ADDITIONAL_SHIPS_RANGE) - ADDITIONAL_SHIPS_RANGE / 2.f),
+      ship->Translate ((float)((int)(rand () % ADDITIONAL_SHIPS_RANGE) - ADDITIONAL_SHIPS_RANGE / 2.f),
                              (float)((int)(rand () % ADDITIONAL_SHIPS_RANGE) - ADDITIONAL_SHIPS_RANGE / 2.f),
                              (float)((int)(rand () % ADDITIONAL_SHIPS_RANGE) - ADDITIONAL_SHIPS_RANGE / 2.f));
 
@@ -226,27 +210,46 @@ int main ()
 
       phys_body->rigid_body = RigidBodyPtr (test.physics_scene->CreateRigidBody (shape.get (), 1), false);
 
-      physics::low_level::Transform enterprise_transform;
+      physics::low_level::Transform ship_transform;
 
-      enterprise_transform.position    = enterprise->WorldPosition ();
-      enterprise_transform.orientation = enterprise->WorldOrientation ();      
+      ship_transform.position    = ship->WorldPosition ();
+      ship_transform.orientation = ship->WorldOrientation ();      
 
-      phys_body->rigid_body->SetWorldTransform (enterprise_transform);
+      phys_body->rigid_body->SetWorldTransform (ship_transform);
 
-      test.physics_bodies.insert_pair (enterprise, phys_body);
+      test.physics_bodies.insert_pair (ship, phys_body);
 
       if (i)
       {
-        test.scene_manager.AddShattle (enterprise);
-        enterprise->AttachController (EnemyAi (test, *enterprise, *phys_body->rigid_body));
+        test.scene_manager.AddShattle (ship);
+        
+        ship->AttachController (EnemyAi (test, *ship, *phys_body->rigid_body)); 
+        
+        Node::Pointer left_particle_system  = test.particle_systems_manager.CreateParticleSystem ("ship_trail", test.scene_manager.Scene ().Root ()),
+                      right_particle_system = test.particle_systems_manager.CreateParticleSystem ("ship_trail", test.scene_manager.Scene ().Root ());
+
+        left_particle_system->SetPosition (-2.5, -0.5, -4.5);
+        left_particle_system->BindToParent (*ship, NodeBindMode_AddRef);
+        right_particle_system->SetPosition (2.5, -0.5, -4.5);
+        right_particle_system->BindToParent (*ship, NodeBindMode_AddRef);
       }
       else
       {
-        test.scene_manager.AddMainShip (enterprise);
+        test.camera->SetScaleInherit (false);
+
+        test.camera->BindToParent (*ship);
+
+        test.camera->SetPosition (0, 10, 20);
+        test.camera->Rotate (math::degree (10.0f), math::degree (180.0f), math::degree (0.0f));
+
+        test.camera_body = phys_body->rigid_body;        
+
+        test.scene_manager.AddMainShip (ship);                
       }
     }
 
-    test.scene_manager.SetDrawMainShips (false);
+    test.camera_body->Material ()->SetLinearDamping (0.5f);
+    test.camera_body->Material ()->SetAngularDamping (0.5f);
 
     printf ("Register callbacks\n");
 

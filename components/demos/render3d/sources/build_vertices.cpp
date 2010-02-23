@@ -35,9 +35,7 @@ struct VertexBuilder: public xtl::visitor<void, scene_graph::VisualModel>
     media::geometry::VertexDeclaration target_declaration (format);    
       
     math::mat4f tm    = inverse (root.WorldTM ()) * model.WorldTM ();
-    math::vec3f scale = 1.0f;//root.WorldScale ();
-    
-    math::vec3f p = tm * math::vec3f (0.0f);
+    math::vec3f scale = 1.0f;    
 
     media::geometry::Mesh& source_mesh = mesh->source_mesh;
     
@@ -82,26 +80,6 @@ struct VertexBuilder: public xtl::visitor<void, scene_graph::VisualModel>
         target_verts.push_back (v);
       }
     }
-
-/*    for (size_t i=0, count=mesh->vertex_buffers.size (); i<count; i++)
-    {
-      media::geometry::VertexBuffer& source_vertex_buffer = mesh->vertex_buffers [i]->source_vertex_buffer;
-      media::geometry::VertexStream  target_vertex_stream (source_vertex_buffer, target_declaration);
-
-      TargetVertex* verts = target_vertex_stream.Data<TargetVertex> ();
-
-      if (!verts)
-        continue;                
-
-      target_verts.insert (target_verts.end (), &verts->position, &verts->position + target_vertex_stream.Size ());
-
-      for (VertexArray::iterator iter=target_verts.end ()-target_vertex_stream.Size (), end=target_verts.end (); iter!=end; ++iter)
-      {
-        math::vec3f v = *iter;
-
-        *iter = (tm * v) * scale;
-      }
-    }    */
   }
 };
 

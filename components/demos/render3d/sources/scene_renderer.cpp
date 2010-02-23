@@ -417,7 +417,7 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
 
     DepthStencilStatePtr depth_stencil_state (device.CreateDepthStencilState (depth_stencil_desc), false);
 
-    device.OSSetDepthStencilState (depth_stencil_state.get ());
+//    device.OSSetDepthStencilState (depth_stencil_state.get ());
 
     device.Draw (PrimitiveType_TriangleList, 0, vertices_count);
   }
