@@ -33,7 +33,6 @@ struct TransformationsShaderParams
 struct SpriteVertex
 {
   math::vec3f position;
-  math::vec3f normal;
   math::vec4f tex_coord;
   math::vec4f color;
 };
@@ -50,6 +49,9 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
   ProgramParametersLayoutPtr program_parameters_layout;
   BufferPtr                  common_cb;
   BufferPtr                  transformations_cb;
+  InputLayoutPtr             particle_vertices_input_layout;
+  BlendStatePtr              no_blend_state;
+  BlendStatePtr              translucent_blend_state;
 
   Impl (Test& in_test) : test (in_test) {}
 
@@ -144,6 +146,41 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
     transformations_cb = BufferPtr (test.device->CreateBuffer (cb_desc), false);
 
     test.device->SSSetConstantBuffer (ConstantBufferSemantic_Transformations, transformations_cb.get ());
+
+    VertexAttribute particle_vertices_input_layout_attributes [] = {
+      {VertexAttributeSemantic_Position,  InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (SpriteVertex, position), sizeof (SpriteVertex)},
+      {VertexAttributeSemantic_TexCoord0, InputDataFormat_Vector2, InputDataType_Float, 0, offsetof (SpriteVertex, tex_coord), sizeof (SpriteVertex)},
+      {VertexAttributeSemantic_Color,     InputDataFormat_Vector4, InputDataType_Float, 0, offsetof (SpriteVertex, color), sizeof (SpriteVertex)},
+    };
+
+    InputLayoutDesc particle_vertices_input_layout_desc;
+
+    memset (&particle_vertices_input_layout_desc, 0, sizeof particle_vertices_input_layout_desc);
+
+    particle_vertices_input_layout_desc.vertex_attributes_count = sizeof particle_vertices_input_layout_attributes / sizeof *particle_vertices_input_layout_attributes;
+    particle_vertices_input_layout_desc.vertex_attributes       = particle_vertices_input_layout_attributes;
+    particle_vertices_input_layout_desc.index_type              = InputDataType_UByte;
+
+    particle_vertices_input_layout = InputLayoutPtr (test.device->CreateInputLayout (particle_vertices_input_layout_desc), false);
+
+    BlendDesc blend_desc;
+
+    memset (&blend_desc, 0, sizeof (blend_desc));
+
+    blend_desc.blend_enable = false;
+
+    no_blend_state = BlendStatePtr (test.device->CreateBlendState (blend_desc), false);
+
+    blend_desc.blend_enable                     = true;
+    blend_desc.blend_color_operation            = BlendOperation_Add;
+    blend_desc.blend_alpha_operation            = BlendOperation_Add;
+    blend_desc.blend_color_source_argument      = BlendArgument_SourceAlpha;
+    blend_desc.blend_color_destination_argument = BlendArgument_InverseSourceAlpha;
+    blend_desc.blend_alpha_source_argument      = BlendArgument_SourceAlpha;
+    blend_desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;
+    blend_desc.color_write_mask                 = ColorWriteFlag_All;
+
+    translucent_blend_state = BlendStatePtr (test.device->CreateBlendState (blend_desc), false);
   }
 
 ///Рисование сцены
@@ -180,6 +217,27 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
     my_shader_parameters.light_dir = test.light->WorldOrtZ ();
 
     cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
+  }
+
+  void SetMaterial (IDevice& device, ModelMaterial& material)
+  {
+    device.SSSetProgram (material.shader->program.get ());
+
+    int samplers_count = stl::min ((int)MAX_SAMPLERS, (int)SamplerChannel_Num);
+
+    for (int i = 0; i < samplers_count; i++)
+      if (material.texmaps [i].texture && material.texmaps [i].sampler)
+      {
+        device.SSSetTexture (i, &*material.texmaps [i].texture);
+        device.SSSetSampler (i, &*material.texmaps [i].sampler);
+      }
+      else
+      {
+        device.SSSetTexture (i, 0);
+        device.SSSetSampler (i, 0);
+      }
+
+    device.SSSetConstantBuffer (ConstantBufferSemantic_Material, &*material.constant_buffer);
   }
 
   void visit (scene_graph::VisualModel& model)
@@ -234,23 +292,7 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
       if (!&material || !&*material.shader || !&*material.shader->program)
         continue;
 
-      device.SSSetProgram (material.shader->program.get ());
-
-      int samplers_count = stl::min ((int)MAX_SAMPLERS, (int)SamplerChannel_Num);
-
-      for (int i=0; i<samplers_count; i++)
-        if (material.texmaps [i].texture && material.texmaps [i].sampler)
-        {
-          device.SSSetTexture (i, &*material.texmaps [i].texture);
-          device.SSSetSampler (i, &*material.texmaps [i].sampler);
-        }
-        else
-        {
-          device.SSSetTexture (i, 0);
-          device.SSSetSampler (i, 0);
-        }
-
-      device.SSSetConstantBuffer (ConstantBufferSemantic_Material, &*material.constant_buffer);
+      SetMaterial (device, material);
 
       device.ISSetInputLayout (vb.input_layout.get ());
 
@@ -301,23 +343,7 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
     if (!material)
       throw xtl::format_operation_exception ("SceneRenderer::visit (scene_graph::SpriteList&)", "Can't find material '%s'", sprite.Material ());
 
-    device.SSSetProgram (material->shader->program.get ());
-
-    int samplers_count = stl::min ((int)MAX_SAMPLERS, (int)SamplerChannel_Num);
-
-    for (int i=0; i<samplers_count; i++)
-      if (material->texmaps [i].texture && material->texmaps [i].sampler)
-      {
-        device.SSSetTexture (i, &*material->texmaps [i].texture);
-        device.SSSetSampler (i, &*material->texmaps [i].sampler);
-      }
-      else
-      {
-        device.SSSetTexture (i, 0);
-        device.SSSetSampler (i, 0);
-      }
-
-    device.SSSetConstantBuffer (ConstantBufferSemantic_Material, &*material->constant_buffer);
+    SetMaterial (device, *material);
 
     size_t sprites_count  = sprite.SpritesCount (),
            vertices_count = sprites_count * 6;
@@ -347,13 +373,6 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
       current_vertex [4].position = current_sprite_desc->position + right - up;
       current_vertex [5].position = current_sprite_desc->position - right - up;
 
-      current_vertex [0].normal = normal;
-      current_vertex [1].normal = normal;
-      current_vertex [2].normal = normal;
-      current_vertex [3].normal = normal;
-      current_vertex [4].normal = normal;
-      current_vertex [5].normal = normal;
-
       current_vertex [0].tex_coord = math::vec2f (0, 1);
       current_vertex [1].tex_coord = math::vec2f (1, 1);
       current_vertex [2].tex_coord = math::vec2f (0, 0);
@@ -382,42 +401,10 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
 
     vb->SetData (0, vb_desc.size, vertices.data ());
 
-    VertexAttribute attributes [] = {
-      {VertexAttributeSemantic_Position,  InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (SpriteVertex, position), sizeof (SpriteVertex)},
-      {VertexAttributeSemantic_Normal,    InputDataFormat_Vector3, InputDataType_Float, 0, offsetof (SpriteVertex, normal), sizeof (SpriteVertex)},
-      {VertexAttributeSemantic_TexCoord0, InputDataFormat_Vector2, InputDataType_Float, 0, offsetof (SpriteVertex, tex_coord), sizeof (SpriteVertex)},
-      {VertexAttributeSemantic_Color,     InputDataFormat_Vector4, InputDataType_Float, 0, offsetof (SpriteVertex, color), sizeof (SpriteVertex)},
-    };
-
-    InputLayoutDesc layout_desc;
-
-    memset (&layout_desc, 0, sizeof layout_desc);
-
-    layout_desc.vertex_attributes_count = sizeof attributes / sizeof *attributes;
-    layout_desc.vertex_attributes       = attributes;
-    layout_desc.index_type              = InputDataType_UByte;
-
-    InputLayoutPtr layout (device.CreateInputLayout (layout_desc), false);
-
-    device.ISSetInputLayout  (layout.get ());
+    device.ISSetInputLayout  (particle_vertices_input_layout.get ());
     device.ISSetVertexBuffer (0, vb.get ());
 
-    BlendDesc blend_desc;
-
-    memset (&blend_desc, 0, sizeof (blend_desc));
-
-    blend_desc.blend_enable                     = true;
-    blend_desc.blend_color_operation            = BlendOperation_Add;
-    blend_desc.blend_alpha_operation            = BlendOperation_Add;
-    blend_desc.blend_color_source_argument      = BlendArgument_SourceAlpha;
-    blend_desc.blend_color_destination_argument = BlendArgument_InverseSourceAlpha;
-    blend_desc.blend_alpha_source_argument      = BlendArgument_SourceAlpha;
-    blend_desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;
-    blend_desc.color_write_mask                 = ColorWriteFlag_All;
-
-    BlendStatePtr blend_state (device.CreateBlendState (blend_desc), false);
-
-    device.OSSetBlendState (blend_state.get ());
+    device.OSSetBlendState (translucent_blend_state.get ());
 
     DepthStencilDesc depth_stencil_desc;
 
