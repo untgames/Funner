@@ -32,7 +32,7 @@ typedef common::Singleton<TestLogFilter> TestLogFilterSingleton;
 }
 
 Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn& in_reload, const char* adapter_mask, const char* init_string)
-  : window (syslib::WindowStyle_Overlapped, 800, 600),
+  : window (syslib::WindowStyle_Overlapped, 1024, 768),
     redraw (in_redraw),
     reload (in_reload),
     shader_manager (*this),

@@ -15,7 +15,7 @@
       Size="1 1"
       Count="ship_trail_sprites_count"
       MaxCount="100"
-      LifeTime="4"
+      LifeTime="5"
       Material="ship_trail"
       Color="1 1 1"
       Alpha="ship_trail_fade_out"

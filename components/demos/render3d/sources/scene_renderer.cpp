@@ -51,7 +51,7 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
   BufferPtr                  transformations_cb;
   InputLayoutPtr             particle_vertices_input_layout;
   BlendStatePtr              no_blend_state;
-  BlendStatePtr              translucent_blend_state;
+  BlendStatePtr              additive_blend_state;
 
   Impl (Test& in_test) : test (in_test) {}
 
@@ -167,7 +167,8 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
 
     memset (&blend_desc, 0, sizeof (blend_desc));
 
-    blend_desc.blend_enable = false;
+    blend_desc.blend_enable     = false;
+    blend_desc.color_write_mask = ColorWriteFlag_All;
 
     no_blend_state = BlendStatePtr (test.device->CreateBlendState (blend_desc), false);
 
@@ -175,12 +176,11 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
     blend_desc.blend_color_operation            = BlendOperation_Add;
     blend_desc.blend_alpha_operation            = BlendOperation_Add;
     blend_desc.blend_color_source_argument      = BlendArgument_SourceAlpha;
-    blend_desc.blend_color_destination_argument = BlendArgument_InverseSourceAlpha;
+    blend_desc.blend_color_destination_argument = BlendArgument_One;
     blend_desc.blend_alpha_source_argument      = BlendArgument_SourceAlpha;
-    blend_desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;
-    blend_desc.color_write_mask                 = ColorWriteFlag_All;
+    blend_desc.blend_alpha_destination_argument = BlendArgument_One;
 
-    translucent_blend_state = BlendStatePtr (test.device->CreateBlendState (blend_desc), false);
+    additive_blend_state = BlendStatePtr (test.device->CreateBlendState (blend_desc), false);
   }
 
 ///Рисование сцены
@@ -270,6 +270,7 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
     IDevice& device = *test.device;
 
     device.ISSetIndexBuffer (mesh->index_buffer.get ());
+    device.OSSetBlendState  (no_blend_state.get ());
 
   /*  DepthStencilDesc depth_stencil_desc;
 
@@ -404,7 +405,7 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
     device.ISSetInputLayout  (particle_vertices_input_layout.get ());
     device.ISSetVertexBuffer (0, vb.get ());
 
-    device.OSSetBlendState (translucent_blend_state.get ());
+    device.OSSetBlendState (additive_blend_state.get ());
 
     DepthStencilDesc depth_stencil_desc;
 

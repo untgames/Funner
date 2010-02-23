@@ -120,7 +120,7 @@ class ParticleSystem : public scene_graph::Entity
       math::vec3f particles_node_world_position = particles_node->WorldPosition (),
                   emitter_world_position        = WorldPosition ();
 
-      while (particles.size () < count)
+      if (particles.size () < count)
       {
         ParticleDescPtr particle_desc (new ParticleDesc, false);
 
