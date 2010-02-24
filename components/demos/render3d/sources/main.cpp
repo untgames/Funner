@@ -1,22 +1,23 @@
 #include "shared.h"
 
-const char*  SHADERS_DIR              = "data/shaders";
-const char*  CONFIG_NAME              = "config.xml";
-const char*  MODEL_NAME               = "data/meshes/main_ship.binmesh";
-const char*  ENTERPRISE_MODEL_NAME    = "data/meshes/ship_01a.binmesh";
-const char*  MATERIAL_LIBRARIES []    = { "data/materials/main_ship.xmtl", "data/materials/ship_01a.xmtl", "data/materials/sky.xmtl",
-                                          "data/materials/particles.xmtl", "data/materials/gfx.xmtl" };
-const char*  PARTICLE_SYSTEMS []      = { "data/particle_systems/particles.xml" };
-const char*  SCENE_NAME               = "data/scenes/main_ship.xscene";
-const char*  ENTERPRISE_SCENE_NAME    = "data/scenes/ship_01a.xscene";
-const char*  REFLECTION_TEXTURE       = "data/textures/environment/EnvGala_000_D.tga";
-const char*  SKY_MESH                 = "_SkyMesh";
-const char*  SKY_MATERIAL             = "_SkyMaterial";
-const char*  GUN_NODE_NAME            = "gun";
-const int    ADDITIONAL_SHIPS_RANGE   = 200;
-const size_t SKY_PARALLELS            = 30;
-const size_t SKY_MERIDIANS            = 30;
-const float  SKY_RADIUS               = 9000;
+const char*  SHADERS_DIR               = "data/shaders";
+const char*  CONFIG_NAME               = "config.xml";
+const char*  MODEL_NAME                = "data/meshes/main_ship.binmesh";
+const char*  ENTERPRISE_MODEL_NAMES [] = {"data/meshes/ship_01a.binmesh", "data/meshes/ship_11a.binmesh"};
+const char*  MATERIAL_LIBRARIES []     = { "data/materials/main_ship.xmtl", "data/materials/ship_01a.xmtl", "data/materials/sky.xmtl",
+                                          "data/materials/particles.xmtl", "data/materials/gfx.xmtl", "data/materials/ship_11a.xmtl" };
+const char*  PARTICLE_SYSTEMS []       = { "data/particle_systems/particles.xml" };
+const char*  SCENE_NAME                = "data/scenes/main_ship.xscene";
+const char*  ENTERPRISE_SCENE_NAMES [] = {"data/scenes/ship_01a.xscene", "data/scenes/ship_11a.xscene"};
+const char*  REFLECTION_TEXTURE        = "data/textures/environment/EnvGala_000_D.tga";
+const char*  SKY_MESH                  = "_SkyMesh";
+const char*  SKY_MATERIAL              = "_SkyMaterial";
+const char*  GUN_NODE_NAME             = "gun";
+const int    ADDITIONAL_SHIPS_RANGE    = 200;
+const size_t SKY_PARALLELS             = 30;
+const size_t SKY_MERIDIANS             = 30;
+const float  SKY_RADIUS                = 9000;
+const size_t ENTERPRISE_MODELS_COUNT   = sizeof (ENTERPRISE_SCENE_NAMES) / sizeof (*ENTERPRISE_SCENE_NAMES);
 const float  SHOT_RATE                = 10;
 
 const math::vec4f PLAYER_SHOT_COLOR (0.f, 0.8f, 1.f, 1.f);
@@ -41,7 +42,10 @@ size_t frames_count = 0;
 
 void redraw (Test& test)
 {
-  test.scene_renderer.Draw (*test.camera);
+  if (!test.current_camera)
+    return;
+
+  test.scene_renderer.Draw (*test.current_camera);
 
   frames_count++;
 }
@@ -180,7 +184,9 @@ int main ()
     printf ("Load meshes\n");
     
     test.mesh_manager.LoadMeshes (MODEL_NAME);
-    test.mesh_manager.LoadMeshes (ENTERPRISE_MODEL_NAME);
+    
+    for (int i=0; i<ENTERPRISE_MODELS_COUNT; i++)
+      test.mesh_manager.LoadMeshes (ENTERPRISE_MODEL_NAMES [i]);
     
     printf ("Create custom meshes\n");
     
@@ -201,9 +207,11 @@ int main ()
 
     printf ("Load ships\n");
 
-    for (size_t i = 0; i < 5; i++)
+    for (size_t i = 0; i < 10; i++)
     {
-      Node::Pointer ship_subnode = test.scene_manager.LoadScene (i ? ENTERPRISE_SCENE_NAME : SCENE_NAME);
+      const char* scene_name = i ? ENTERPRISE_SCENE_NAMES [rand () % ENTERPRISE_MODELS_COUNT] : SCENE_NAME;
+      
+      Node::Pointer ship_subnode = test.scene_manager.LoadScene (scene_name);
 
       VertexArray verts;
       
@@ -252,28 +260,31 @@ int main ()
         
         ship->AttachController (EnemyAi (test, *ship, *phys_body->rigid_body)); 
         
-        Node::Pointer left_gun_node  = Node::Create (),
-                      right_gun_node = Node::Create ();
+        if (!strcmp (scene_name, ENTERPRISE_SCENE_NAMES [0]))
+        {
+          Node::Pointer left_gun_node  = Node::Create (),
+                        right_gun_node = Node::Create ();
 
-        left_gun_node->SetName (GUN_NODE_NAME);
-        left_gun_node->SetPosition    (-4, 0, 3.5);
-        left_gun_node->SetOrientation (math::degree (0.f), math::degree (180.f), math::degree (0.f));
+          left_gun_node->SetName (GUN_NODE_NAME);
+          left_gun_node->SetPosition    (-4, 0, 3.5);
+          left_gun_node->SetOrientation (math::degree (0.f), math::degree (180.f), math::degree (0.f));
 
-        left_gun_node->BindToParent (*ship, NodeBindMode_AddRef);
+          left_gun_node->BindToParent (*ship, NodeBindMode_AddRef);
 
-        right_gun_node->SetName (GUN_NODE_NAME);
-        right_gun_node->SetPosition    (4, 0, 3.5);
-        right_gun_node->SetOrientation (math::degree (0.f), math::degree (180.f), math::degree (0.f));
+          right_gun_node->SetName (GUN_NODE_NAME);
+          right_gun_node->SetPosition    (4, 0, 3.5);
+          right_gun_node->SetOrientation (math::degree (0.f), math::degree (180.f), math::degree (0.f));
 
-        right_gun_node->BindToParent (*ship, NodeBindMode_AddRef);
+          right_gun_node->BindToParent (*ship, NodeBindMode_AddRef);
 
-        Node::Pointer left_particle_system  = test.particle_systems_manager.CreateParticleSystem ("enemy_ship_trail", test.scene_manager.Scene ().Root ()),
-                      right_particle_system = test.particle_systems_manager.CreateParticleSystem ("enemy_ship_trail", test.scene_manager.Scene ().Root ());
+          Node::Pointer left_particle_system  = test.particle_systems_manager.CreateParticleSystem ("enemy_ship_trail", test.scene_manager.Scene ().Root ()),
+                        right_particle_system = test.particle_systems_manager.CreateParticleSystem ("enemy_ship_trail", test.scene_manager.Scene ().Root ());
 
-        left_particle_system->SetPosition (-2.5, -0.5, -4.5);
-        left_particle_system->BindToParent (*ship, NodeBindMode_AddRef);
-        right_particle_system->SetPosition (2.5, -0.5, -4.5);
-        right_particle_system->BindToParent (*ship, NodeBindMode_AddRef);
+          left_particle_system->SetPosition (-2.5, -0.5, -4.5);
+          left_particle_system->BindToParent (*ship, NodeBindMode_AddRef);
+          right_particle_system->SetPosition (2.5, -0.5, -4.5);
+          right_particle_system->BindToParent (*ship, NodeBindMode_AddRef);
+        }
       }
       else
       {
@@ -290,6 +301,10 @@ int main ()
         test.camera->BindToParent (*ship);
 
         test.camera_body = phys_body->rigid_body;
+        
+        test.inside_camera->SetPosition (0.5, 0.25, -8.5);
+        test.inside_camera->Rotate (math::degree (10.0f), math::degree (180.0f), math::degree (0.0f));
+        test.inside_camera->BindToParent (*ship);
 
         test.scene_manager.AddMainShip (ship);                
 

@@ -472,6 +472,8 @@ struct Test
     ParticleSystemsManager     particle_systems_manager;
     GfxManager                 gfx_manager;
     PerspectiveCamera::Pointer camera;
+    PerspectiveCamera::Pointer inside_camera;
+    scene_graph::Camera*       current_camera;
     DirectLight::Pointer       light;
     PhysicsDriverPtr           physics_driver;
     PhysicsScenePtr            physics_scene;

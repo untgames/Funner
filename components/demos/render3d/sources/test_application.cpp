@@ -40,6 +40,7 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
     mesh_manager (*this),
     material_manager (*this),
     gfx_manager (*this),
+    current_camera (0),
     x_camera_speed (0),
     y_camera_speed (0),
     x_camera_rotation_speed (0),
@@ -78,6 +79,13 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
 
   camera->SetZNear (0.1f);
   camera->SetZFar  (10000.0f);
+  
+  inside_camera = scene_graph::PerspectiveCamera::Create ();
+
+  inside_camera->SetZNear (0.1f);
+  inside_camera->SetZFar  (10000.0f);  
+  
+  current_camera = camera.get ();  
 
   //camera->SetPosition (0, 0, -20);
 
@@ -101,24 +109,6 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
 
 //  xtl::com_ptr<physics::low_level::IShape> box_shape = physics_driver->CreateBoxShape (math::vec3f (1.f, 3.f, 5.f));
   xtl::com_ptr<physics::low_level::IShape> box_shape = physics_driver->CreateBoxShape (math::vec3f (0.05f));
-
-/*  PhysBodyPtr camera_phys_body (new PhysBody, false);
-
-  camera_phys_body->rigid_body = RigidBodyPtr (physics_scene->CreateRigidBody (box_shape.get (), 1.f), false);
-
-  camera_phys_body->rigid_body->Material ()->SetLinearDamping (0.5f);
-  camera_phys_body->rigid_body->Material ()->SetAngularDamping (0.5f);
-  
-  camera_body = camera_phys_body->rigid_body;
-
-  physics::low_level::Transform camera_transform;
-
-  camera_transform.position    = camera->WorldPosition ();
-  camera_transform.orientation = camera->WorldOrientation ();
-
-  camera_phys_body->rigid_body->SetWorldTransform (camera_transform);
-
-  physics_bodies.insert_pair (camera, camera_phys_body);*/
 
     //create input handling
   input_driver = input::low_level::DriverManager::FindDriver ("DirectInput8");
@@ -275,6 +265,10 @@ void Test::OnKeyReleased (const syslib::WindowEventContext& context)
     case syslib::Key_Space:
       shot_pressed = false;
       break;
+    case syslib::Key_Enter:
+      if (current_camera == camera.get ()) current_camera = inside_camera.get ();
+      else                                 current_camera = camera.get ();
+      break;
     default:
       break;
   }
@@ -303,6 +297,8 @@ void Test::OnResize ()
 
     camera->SetFovX   (math::degree (FOV_X_ASPECT_RATIO));
     camera->SetFovY   (math::degree (FOV_X_ASPECT_RATIO / ar));
+    inside_camera->SetFovX   (math::degree (FOV_X_ASPECT_RATIO));
+    inside_camera->SetFovY   (math::degree (FOV_X_ASPECT_RATIO / ar));    
   }
   catch (std::exception& e)
   {

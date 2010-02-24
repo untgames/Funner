@@ -5,12 +5,12 @@ namespace
 
 const float  PHYS_TARGET_REACH_DELAY  = 4.0f;
 const float  PHYS_ANGLE_REACH_DELAY   = 1.5f;
-const float  MIN_ATTACK_DIRECTION     = 20.0f;
+const float  MIN_ATTACK_DIRECTION     = 100.0f;
 const size_t STATE_MAX_DURATION       = 5000;
 const float  GUARD_DISTANCE           = 280.0f;
 const float  MIN_ROTATION_ANGLE       = 5.0f;
 const float  MIN_VELOCITY             = 120.0f;
-const float  GUARD_FORCE_FACTOR       = 40.0f;
+const float  GUARD_FORCE_FACTOR       = 180.0f;
 const float  MAX_SHOT_ANGLE           = 20.f;
 
 const math::vec4f ENEMY_SHOT_COLOR (1.f, 0.4f, 0.f, 1.f);
