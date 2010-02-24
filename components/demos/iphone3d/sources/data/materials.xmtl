@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MaterialLibrary>
+  <Templates>
+    <Properties Name="ShaderParameters">
+      <Property Name="Effect" Type="string" Value="phong"/>
+      <Property Name="ShaderType" Type="string"/>
+      <Property Name="Reflectivity" Type="float"/>
+      <Property Name="Transparency" Type="float"/>
+      <Property Name="Shininess" Type="float"/>
+      <Property Name="BumpAmount" Type="float"/>
+      <Property Name="BumpTexture" Type="string"/>
+      <Property Name="BumpTextureChannel" Type="int"/>
+      <Property Name="Diffuse" Type="vector"/>
+      <Property Name="DiffuseTexture" Type="string"/>
+      <Property Name="DiffuseTextureChannel" Type="int"/>
+      <Property Name="Ambient" Type="vector"/>
+      <Property Name="AmbientTexture" Type="string"/>
+      <Property Name="AmbientTextureChannel" Type="int"/>
+      <Property Name="Specular" Type="vector"/>
+      <Property Name="SpecularTexture" Type="string"/>
+      <Property Name="SpecularTextureChannel" Type="int"/>
+      <Property Name="Emission" Type="vector"/>
+      <Property Name="EmissionTexture" Type="string"/>
+      <Property Name="EmissionTextureChannel" Type="int"/>
+    </Properties>
+  </Templates>
+  <Materials>
+    <Material Name="container_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file48.png" BumpTextureChannel="1" BumpAmount="0.1" DiffuseTexture="export/file21.png" DiffuseTextureChannel="0" SpecularTexture="export/file48.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="engflames_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file3.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="engines1_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.4" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file50.png" BumpTextureChannel="1" BumpAmount="0.1" DiffuseTexture="export/file39.png" DiffuseTextureChannel="0" SpecularTexture="export/file50.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="nosepanel5_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file14.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="engines2_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.1" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file51.png" BumpTextureChannel="1" BumpAmount="0.1" DiffuseTexture="export/file6.png" DiffuseTextureChannel="0" SpecularTexture="export/file51.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="noseinner1_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.3" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file64.png" BumpTextureChannel="1" BumpAmount="0.2" DiffuseTexture="export/file15.png" DiffuseTextureChannel="0" SpecularTexture="export/file64.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="nosepanel1_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file13.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="seatsoft_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file55.png" BumpTextureChannel="1" BumpAmount="0.25" DiffuseTexture="export/file27.png" DiffuseTextureChannel="0" SpecularTexture="export/file55.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="glasshard_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="1 1 1 1" Emission="0 0 0 1" DiffuseTexture="export/file38.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="glassoft_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="1 1 1 1" Emission="0 0 0 1" DiffuseTexture="export/file37.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="inerwallpanels_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file36.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="ladders_2-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file2.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="ladders_3-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file1.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="lambert1-fx">
+      <ShaderParameters ShaderType="Lambert" Reflectivity="0" Transparency="1" Shininess="0" Diffuse="0.4 0.4 0.4 1" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1"/>
+    </Material>
+    <Material Name="plastic-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.2" Transparency="1" Shininess="20" Diffuse="0.8 0.8 0.8 1" Ambient="0 0 0 1" Specular="1 1 1 1" Emission="0 0 0 1"/>
+    </Material>
+    <Material Name="rearout1_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file58.png" BumpTextureChannel="1" BumpAmount="0.3" DiffuseTexture="export/file8.png" DiffuseTextureChannel="0" SpecularTexture="export/file58.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="lights_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file42.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="maindesk4panel_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file22.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="mainfloor_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file75.png" BumpTextureChannel="1" BumpAmount="0.25" DiffuseTexture="export/file43.png" DiffuseTextureChannel="0" SpecularTexture="export/file75.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="mainner1_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file74.png" BumpTextureChannel="1" BumpAmount="0.3" DiffuseTexture="export/file40.png" DiffuseTextureChannel="0" SpecularTexture="export/file74.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="mainner2_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file73.png" BumpTextureChannel="1" BumpAmount="0.2" DiffuseTexture="export/file45.png" DiffuseTextureChannel="0" SpecularTexture="export/file73.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="surfaceShader1-fx">
+      <ShaderParameters ShaderType="Constant" Reflectivity="0" Transparency="0" Shininess="0" Diffuse="0 0 0 0" Ambient="0 0 0 0" Specular="0 0 0 0" Emission="0 0 0 0" EmissionTexture="export/file47.png" EmissionTextureChannel="0"/>
+    </Material>
+    <Material Name="mainner3_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file72.png" BumpTextureChannel="1" BumpAmount="0.2" DiffuseTexture="export/file31.png" DiffuseTextureChannel="0" SpecularTexture="export/file72.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="mainout1_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file70.png" BumpTextureChannel="1" BumpAmount="0.25" DiffuseTexture="export/file46.png" DiffuseTextureChannel="0" SpecularTexture="export/file70.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="mainout2_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.15" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file71.png" BumpTextureChannel="1" BumpAmount="0.25" DiffuseTexture="export/file44.png" DiffuseTextureChannel="0" SpecularTexture="export/file71.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="mainpanel1_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file28.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="mainpanel2L_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file23.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="mainpanel2R_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file34.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="rearpanels_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file41.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="mainpanel3_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file30.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="mainpanelextra_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file35.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="module1_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file69.png" BumpTextureChannel="1" BumpAmount="0.25" DiffuseTexture="export/file29.png" DiffuseTextureChannel="0" SpecularTexture="export/file69.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="reargate_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file59.png" BumpTextureChannel="1" BumpAmount="0.25" DiffuseTexture="export/file5.png" DiffuseTextureChannel="0" SpecularTexture="export/file59.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="module2_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.3" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file68.png" BumpTextureChannel="1" BumpAmount="0.25" DiffuseTexture="export/file24.png" DiffuseTextureChannel="0" SpecularTexture="export/file68.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="module3_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file67.png" BumpTextureChannel="1" BumpAmount="0.2" DiffuseTexture="export/file26.png" DiffuseTextureChannel="0" SpecularTexture="export/file67.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="noseaccessories_-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.1" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file66.png" BumpTextureChannel="1" BumpAmount="0.25" DiffuseTexture="export/file17.png" DiffuseTextureChannel="0" SpecularTexture="export/file66.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="seathard_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file56.png" BumpTextureChannel="1" BumpAmount="0.45" DiffuseTexture="export/file25.png" DiffuseTextureChannel="0" SpecularTexture="export/file56.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="nosefloor_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.1" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file65.png" BumpTextureChannel="1" BumpAmount="0.35" DiffuseTexture="export/file19.png" DiffuseTextureChannel="0" SpecularTexture="export/file65.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="noseinner2_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file63.png" BumpTextureChannel="1" BumpAmount="0.35" DiffuseTexture="export/file16.png" DiffuseTextureChannel="0" SpecularTexture="export/file63.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="noseinner3_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file62.png" BumpTextureChannel="1" BumpAmount="0.15" DiffuseTexture="export/file10.png" DiffuseTextureChannel="0" SpecularTexture="export/file62.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="noseout1_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file61.png" BumpTextureChannel="1" BumpAmount="0.3" DiffuseTexture="export/file20.png" DiffuseTextureChannel="0" SpecularTexture="export/file61.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="noseout2_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file60.png" BumpTextureChannel="1" BumpAmount="0.3" DiffuseTexture="export/file18.png" DiffuseTextureChannel="0" SpecularTexture="export/file60.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="nosepanel2_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file12.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="nosepanel3_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file11.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="nosepanel4_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" DiffuseTexture="export/file9.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="rearout2_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file57.png" BumpTextureChannel="1" BumpAmount="0.25" DiffuseTexture="export/file7.png" DiffuseTextureChannel="0" SpecularTexture="export/file57.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="subgate_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0.6 0.6 0.6 1" Emission="0 0 0 1" BumpTexture="export/file54.png" BumpTextureChannel="1" BumpAmount="0.25" DiffuseTexture="export/file4.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="turretgun_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file53.png" BumpTextureChannel="1" BumpAmount="0.3" DiffuseTexture="export/file32.png" DiffuseTextureChannel="0" SpecularTexture="export/file53.png" SpecularTextureChannel="2"/>
+    </Material>
+    <Material Name="wingsrearacc_1-fx">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0.5" Transparency="1" Shininess="20" Diffuse="0 0 0 0" Ambient="0 0 0 1" Specular="0 0 0 0" Emission="0 0 0 1" BumpTexture="export/file52.png" BumpTextureChannel="1" BumpAmount="0.35" DiffuseTexture="export/file33.png" DiffuseTextureChannel="0" SpecularTexture="export/file52.png" SpecularTextureChannel="2"/>
+    </Material>
+  </Materials>
+</MaterialLibrary>

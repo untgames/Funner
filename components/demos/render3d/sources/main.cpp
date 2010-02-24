@@ -4,13 +4,15 @@ const char*  SHADERS_DIR              = "data/shaders";
 const char*  CONFIG_NAME              = "config.xml";
 const char*  MODEL_NAME               = "data/meshes/main_ship.binmesh";
 const char*  ENTERPRISE_MODEL_NAME    = "data/meshes/ship_01a.binmesh";
-const char*  MATERIAL_LIBRARIES []    = { "data/materials/main_ship.xmtl", "data/materials/ship_01a.xmtl", "data/materials/sky.xmtl", "data/materials/particles.xmtl" };
+const char*  MATERIAL_LIBRARIES []    = { "data/materials/main_ship.xmtl", "data/materials/ship_01a.xmtl", "data/materials/sky.xmtl",
+                                          "data/materials/particles.xmtl", "data/materials/gfx.xmtl" };
 const char*  PARTICLE_SYSTEMS []      = { "data/particle_systems/particles.xml" };
 const char*  SCENE_NAME               = "data/scenes/main_ship.xscene";
 const char*  ENTERPRISE_SCENE_NAME    = "data/scenes/ship_01a.xscene";
 const char*  REFLECTION_TEXTURE       = "data/textures/environment/EnvGala_000_D.tga";
 const char*  SKY_MESH                 = "_SkyMesh";
 const char*  SKY_MATERIAL             = "_SkyMaterial";
+const char*  GUN_NODE_NAME            = "gun";
 const int    ADDITIONAL_SHIPS_RANGE   = 200;
 const size_t SKY_PARALLELS            = 30;
 const size_t SKY_MERIDIANS            = 30;
@@ -225,6 +227,21 @@ int main ()
         
         ship->AttachController (EnemyAi (test, *ship, *phys_body->rigid_body)); 
         
+        Node::Pointer left_gun_node  = Node::Create (),
+                      right_gun_node = Node::Create ();
+
+        left_gun_node->SetName (GUN_NODE_NAME);
+        left_gun_node->SetPosition    (-4, 0, 3.5);
+        left_gun_node->SetOrientation (math::degree (0.f), math::degree (180.f), math::degree (0.f));
+
+        left_gun_node->BindToParent (*ship, NodeBindMode_AddRef);
+
+        right_gun_node->SetName (GUN_NODE_NAME);
+        right_gun_node->SetPosition    (4, 0, 3.5);
+        right_gun_node->SetOrientation (math::degree (0.f), math::degree (180.f), math::degree (0.f));
+
+        right_gun_node->BindToParent (*ship, NodeBindMode_AddRef);
+
         Node::Pointer left_particle_system  = test.particle_systems_manager.CreateParticleSystem ("enemy_ship_trail", test.scene_manager.Scene ().Root ()),
                       right_particle_system = test.particle_systems_manager.CreateParticleSystem ("enemy_ship_trail", test.scene_manager.Scene ().Root ());
 
@@ -250,6 +267,23 @@ int main ()
         test.camera_body = phys_body->rigid_body;
 
         test.scene_manager.AddMainShip (ship);                
+
+        Node::Pointer left_gun_node = Node::Create (),
+                      right_gun_node = Node::Create ();
+
+        left_gun_node->SetName (GUN_NODE_NAME);
+        left_gun_node->SetPosition    (7, -2, -3);
+        left_gun_node->SetOrientation (math::degree (0.f), math::degree (180.f), math::degree (0.f));
+
+        left_gun_node->BindToParent (*ship, NodeBindMode_AddRef);
+
+        right_gun_node->SetName (GUN_NODE_NAME);
+        right_gun_node->SetPosition    (-6, -2, -3);
+        right_gun_node->SetOrientation (math::degree (0.f), math::degree (180.f), math::degree (0.f));
+
+        right_gun_node->BindToParent (*ship, NodeBindMode_AddRef);
+
+        test.player_ship = ship;
 
         Node::Pointer left_particle_system  = test.particle_systems_manager.CreateParticleSystem ("main_ship_trail", test.scene_manager.Scene ().Root ()),
                       right_particle_system = test.particle_systems_manager.CreateParticleSystem ("main_ship_trail", test.scene_manager.Scene ().Root ());

@@ -4,7 +4,7 @@ namespace
 {
 
 const char* TRANSPARENCY_MATERIALS [] = { "main_ship.glasshard_1-fx", "main_ship.glassoft_1-fx" };
-const char* ADDITIVE_MATERIALS [] = { "ship_trail"};
+const char* ADDITIVE_MATERIALS [] = { "ship_trail", "shot_trail" };
 
 }
 

@@ -62,10 +62,14 @@
 #include <input/low_level/device.h>
 #include <input/low_level/driver.h>
 
+#include "gfx.h"
+
 using namespace render::low_level;
 using namespace scene_graph;
 
 const size_t MAX_SAMPLERS = 4;
+
+extern const char* GUN_NODE_NAME;
 
 /*
     Получение смещения поля в структуре (аналог offsetof, компилируемый без предупреждений на gcc)
@@ -376,6 +380,26 @@ class ParticleSystemsManager
     Impl* impl;
 };
 
+//менеджер эффектов
+class GfxManager
+{
+  public:
+///Конструктор/деструктор
+    GfxManager (Test& test);
+    ~GfxManager ();
+
+///Выстрел из пушки
+    void PerformShot (const scene_graph::Node& gun, const math::vec4f& color, float distance);
+
+  private:
+    GfxManager (const GfxManager&); //no impl
+    GfxManager& operator = (const GfxManager&); //no impl
+
+  private:
+    struct Impl;
+    Impl* impl;
+};
+
 typedef xtl::com_ptr<physics::low_level::IRigidBody> RigidBodyPtr;
 
 ///Физическое тело
@@ -446,6 +470,7 @@ struct Test
     MeshManager                mesh_manager;
     MaterialManager            material_manager;
     ParticleSystemsManager     particle_systems_manager;
+    GfxManager                 gfx_manager;
     PerspectiveCamera::Pointer camera;
     DirectLight::Pointer       light;
     PhysicsDriverPtr           physics_driver;
@@ -454,6 +479,7 @@ struct Test
     RigidBodyPtr               camera_body;
     InputDriverPtr             input_driver;
     InputDevices               input_devices;
+    Node::Pointer              player_ship;
     float                      x_camera_speed;
     float                      y_camera_speed;
     float                      x_camera_rotation_speed;

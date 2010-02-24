@@ -11,6 +11,10 @@ const float  GUARD_DISTANCE           = 280.0f;
 const float  MIN_ROTATION_ANGLE       = 5.0f;
 const float  MIN_VELOCITY             = 120.0f;
 const float  GUARD_FORCE_FACTOR       = 40.0f;
+const float  MAX_SHOT_ANGLE           = 20.f;
+
+const math::vec4f ENEMY_SHOT_COLOR (1.f, 0.4f, 0.f, 1.f);
+const float       ENEMY_SHOT_DISTANCE = 1000.f;
 
 enum State
 {
@@ -50,6 +54,13 @@ struct EnemyAi::Impl: public xtl::reference_counter
     , state_change_time (common::milliseconds ())
   {
   }  
+
+  bool CheckAngle (const math::vec3f& current_ort, const math::vec3f& target_ort, const math::anglef& max_angle)
+  {
+    math::anglef rotation_angle = find_angle (current_ort, target_ort);
+
+    return rotation_angle < max_angle;
+  }
   
   bool CompensateDirections (const math::vec3f& current_ort, const math::vec3f& target_ort)
   {
@@ -122,7 +133,7 @@ void EnemyAi::operator () (float dt)
     
     Node&                           ship_node = **iter;
     physics::low_level::IRigidBody& ship_body = *impl->test.physics_bodies [&ship_node]->rigid_body;
-    float                           distance  = length (ship_body.WorldTransform ().position - impl->enemy_body.WorldTransform ().position);    
+//    float                           distance  = length (ship_body.WorldTransform ().position - impl->enemy_body.WorldTransform ().position);
 
     target_force += get_guard_force (impl->enemy_body.WorldTransform ().position, ship_body.WorldTransform ().position);    
   }  
@@ -169,6 +180,14 @@ void EnemyAi::operator () (float dt)
   impl->enemy_body.AddForce (target_force);      
 
   impl->CompensateDirections (impl->enemy_node.WorldOrtZ (), normalize (target_force));
+
+  if (impl->CheckAngle (impl->enemy_node.WorldOrtZ (), normalize (target_direction), math::degree (MAX_SHOT_ANGLE)))
+  {
+    Node::Pointer gun = impl->enemy_node.FindChild (GUN_NODE_NAME);
+
+/*    if (gun)
+      impl->test.gfx_manager.PerformShot (*gun, ENEMY_SHOT_COLOR, ENEMY_SHOT_DISTANCE);*/
+  }
 //    CompensateDirections (enemy_node.WorldOrtY (), math::vec3f (0.0f, 1.0f, 0.0f));        
  
 //  printf ("distance=%.3f\n", length (target_direction));

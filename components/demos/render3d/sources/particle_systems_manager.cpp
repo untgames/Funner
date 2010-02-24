@@ -63,7 +63,7 @@ class ParticleSystem : public scene_graph::Entity
     ParticleSystem (ParticleSystemDescPtr in_desc, Node& particles_parent)
       : desc (in_desc), time (0), was_updated (false)
     {
-      particles_node = SpriteList::Create ();
+      particles_node = BillboardSpriteList::Create ();
 
       particles_node->BindToParent (particles_parent);
       particles_node->SetMaterial  (desc->emitter_desc.material.c_str ());
@@ -135,8 +135,6 @@ class ParticleSystem : public scene_graph::Entity
 
       scene_graph::SpriteModel::SpriteDesc *sprite_desc = particles_node->Sprites ();
 
-      size_t i = 0;
-
       for (ParticlesList::iterator iter = particles.begin (), end = particles.end (); iter != end; ++iter, sprite_desc++)
       {
         float particle_time = (time - (*iter)->born_time) / 1000.f;
@@ -145,8 +143,6 @@ class ParticleSystem : public scene_graph::Entity
         sprite_desc->size     = desc->emitter_desc.size;
         sprite_desc->color    = desc->emitter_desc.color;
         sprite_desc->color.w  = desc->emitter_desc.alpha.eval (particle_time);
-
-        i++;
       }
     }
 
@@ -172,13 +168,13 @@ class ParticleSystem : public scene_graph::Entity
     typedef stl::list <ParticleDescPtr> ParticlesList;
 
   private:
-    scene_graph::SpriteList::Pointer particles_node;
-    ParticleSystemDescPtr            desc;
-    xtl::auto_connection             update_connection;
-    xtl::auto_connection             particles_parent_destroy_connection;
-    ParticlesList                    particles;
-    size_t                           time;
-    bool                             was_updated;
+    BillboardSpriteList::Pointer particles_node;
+    ParticleSystemDescPtr        desc;
+    xtl::auto_connection         update_connection;
+    xtl::auto_connection         particles_parent_destroy_connection;
+    ParticlesList                particles;
+    size_t                       time;
+    bool                         was_updated;
 };
 
 }

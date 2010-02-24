@@ -1,0 +1,26 @@
+Parameters
+{
+  float4x4 ViewMatrix ObjectMatrix ProjectionMatrix
+  float3   LightPos
+  float3   LightDir
+}
+
+ProjectionMatrix ProjectionMatrix
+ViewMatrix       ViewMatrix
+ObjectMatrix     ObjectMatrix
+
+DiffuseColor 0.2 0 0 0
+SpecularColor 0.4 0 0 0
+AmbientColor 0 0 0 0
+EmissionColor 0 0 0 0
+
+Light
+{
+  Enable        1
+  Type          Point
+  DiffuseColor  1 1 1 1
+  SpecularColor 1 1 1 1
+  AmbientColor  1 1 1 1
+  Position      LightPos
+  Direction     LightDir
+}

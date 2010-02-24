@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MaterialLibrary>
+  <Templates>
+    <Properties Name="ShaderParameters">
+      <Property Name="Effect" Type="string" Value="phong"/>
+      <Property Name="ShaderType" Type="string"/>
+      <Property Name="Reflectivity" Type="float"/>
+      <Property Name="Transparency" Type="float"/>
+      <Property Name="Shininess" Type="float"/>
+      <Property Name="BumpAmount" Type="float"/>
+      <Property Name="BumpTexture" Type="string"/>
+      <Property Name="BumpTextureChannel" Type="int"/>
+      <Property Name="Diffuse" Type="vector"/>
+      <Property Name="DiffuseTexture" Type="string"/>
+      <Property Name="DiffuseTextureChannel" Type="int"/>
+      <Property Name="Ambient" Type="vector"/>
+      <Property Name="AmbientTexture" Type="string"/>
+      <Property Name="AmbientTextureChannel" Type="int"/>
+      <Property Name="Specular" Type="vector"/>
+      <Property Name="SpecularTexture" Type="string"/>
+      <Property Name="SpecularTextureChannel" Type="int"/>
+      <Property Name="Emission" Type="vector"/>
+      <Property Name="EmissionTexture" Type="string"/>
+      <Property Name="EmissionTextureChannel" Type="int"/>
+    </Properties>
+  </Templates>
+  <Materials>
+    <Material Name="Material__57">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0" Transparency="1" Shininess="10" Diffuse="0 0 0 0" Ambient="0.588 0.588 0.588 1" Specular="0.9 0.9 0.9 1" Emission="0 0 0 1" BumpTexture="enterprise/Shuttletop1_jpg.png" BumpTextureChannel="0" BumpAmount="1" DiffuseTexture="enterprise/Shuttletop1_jpg.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="Material__58">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0" Transparency="1" Shininess="10" Diffuse="0 0 0 0" Ambient="0.588 0.588 0.588 1" Specular="0.9 0.9 0.9 1" Emission="0 0 0 1" BumpTexture="enterprise/HeatTiles_jpg.png" BumpTextureChannel="0" BumpAmount="1" DiffuseTexture="enterprise/HeatTiles_jpg.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="Material__59">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0" Transparency="1" Shininess="10" Diffuse="0 0 0 0" Ambient="0.588 0.588 0.588 1" Specular="0.9 0.9 0.9 1" Emission="0 0 0 1" DiffuseTexture="enterprise/Tail_jpg.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="Material__60">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0" Transparency="1" Shininess="10" Diffuse="0 0 0 0" Ambient="0.588 0.588 0.588 1" Specular="0.9 0.9 0.9 1" Emission="0 0 0 1" BumpTexture="enterprise/rocketengine_jpg.png" BumpTextureChannel="0" BumpAmount="1" DiffuseTexture="enterprise/rocketengine_jpg.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="Material__61">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0" Transparency="1" Shininess="10" Diffuse="0 0 0 0" Ambient="0.588 0.588 0.588 1" Specular="0.9 0.9 0.9 1" Emission="0 0 0 1" BumpTexture="enterprise/Shuttletop1_jpg.png" BumpTextureChannel="0" BumpAmount="1" DiffuseTexture="enterprise/Shuttletop1_jpg.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="Material__62">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0" Transparency="1" Shininess="10" Diffuse="0 0 0 0" Ambient="0.588 0.588 0.588 1" Specular="0.9 0.9 0.9 1" Emission="0 0 0 1" DiffuseTexture="enterprise/Shuttletopnose_jpg.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="Material__63">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0" Transparency="1" Shininess="10" Diffuse="0.588 0.588 0.588 1" Ambient="0.588 0.588 0.588 1" Specular="0.9 0.9 0.9 1" Emission="0 0 0 1"/>
+    </Material>
+    <Material Name="Material__64">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0" Transparency="1" Shininess="10" Diffuse="0 0 0 0" Ambient="0.588 0.588 0.588 1" Specular="0.9 0.9 0.9 1" Emission="0 0 0 1" DiffuseTexture="enterprise/Shuttletop1_jpg.png" DiffuseTextureChannel="0"/>
+    </Material>
+    <Material Name="Material__66">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0" Transparency="1" Shininess="10" Diffuse="0.588 0.588 0.588 1" Ambient="0.588 0.588 0.588 1" Specular="0.9 0.9 0.9 1" Emission="0 0 0 1"/>
+    </Material>
+    <Material Name="Material__65">
+      <ShaderParameters ShaderType="Phong" Reflectivity="0" Transparency="1" Shininess="10" Diffuse="0.588 0.588 0.588 1" Ambient="0.588 0.588 0.588 1" Specular="0.9 0.9 0.9 1" Emission="0 0 0 1"/>
+    </Material>
+  </Materials>
+</MaterialLibrary>

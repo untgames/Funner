@@ -128,10 +128,10 @@ class RenderablePrimitive : public Renderable
     const ModelPrimitive&           primitive;
 };
 
-class RenderableSpriteList : public Renderable
+class RenderableBillboardSpriteList : public Renderable
 {
   public:
-    RenderableSpriteList (Test& in_test, const scene_graph::SpriteList& in_sprite_list, InputLayoutPtr in_particle_vertices_input_layout)
+    RenderableBillboardSpriteList (Test& in_test, const scene_graph::SpriteList& in_sprite_list, InputLayoutPtr in_particle_vertices_input_layout)
       : test (in_test), sprite (in_sprite_list), particle_vertices_input_layout (in_particle_vertices_input_layout)
       {}
 
@@ -169,12 +169,10 @@ class RenderableSpriteList : public Renderable
       const scene_graph::SpriteModel::SpriteDesc* current_sprite_desc = sprite.Sprites ();
 
       math::vec4f ort_x (1, 0, 0, 0),
-                  ort_y (0, 1, 0, 0),
-                  normal (0, 0, -1, 0);
+                  ort_y (0, 1, 0, 0);
 
       ort_x = billboard_tm * ort_x;
       ort_y = billboard_tm * ort_y;
-      normal = billboard_tm * normal;
 
       for (size_t i = 0; i < sprites_count; i++, current_vertex += 6, current_sprite_desc++)
       {
@@ -234,12 +232,115 @@ class RenderableSpriteList : public Renderable
     InputLayoutPtr                 particle_vertices_input_layout;
 };
 
+class RenderableShotGfx : public Renderable
+{
+  public:
+    RenderableShotGfx (Test& in_test, const scene_graph::ShotGfx& in_sprite_list, InputLayoutPtr in_particle_vertices_input_layout)
+      : test (in_test), sprite (in_sprite_list), particle_vertices_input_layout (in_particle_vertices_input_layout)
+      {}
+
+///Отрисовка
+    void Draw (Test& test, const math::mat4f& view_tm, const math::mat4f& view_projection_tm)
+    {
+      TransformationsShaderParams params;
+
+      IBuffer* cb = test.device->SSGetConstantBuffer (ConstantBufferSemantic_Transformations);
+
+      if (!cb)
+      {
+        printf ("Null transformations constant buffer\n");
+        return;
+      }
+
+      params.object_tm          = sprite.WorldTM ();
+      params.view_tm            = transpose (view_tm);
+      params.model_view_tm      = transpose (view_tm * sprite.WorldTM ());
+      params.model_view_proj_tm = transpose (view_projection_tm * sprite.WorldTM ());
+
+      cb->SetData (0, sizeof params, &params);
+
+      IDevice& device = *test.device;
+
+      size_t sprites_count  = sprite.SpritesCount (),
+             vertices_count = sprites_count * 6;
+
+      xtl::uninitialized_storage<SpriteVertex> vertices (vertices_count);
+
+      SpriteVertex*                               current_vertex      = vertices.data ();
+      const scene_graph::SpriteModel::SpriteDesc* current_sprite_desc = sprite.Sprites ();
+
+      math::vec3f ort_x (sprite.ShotDirection ()),
+                  ort_y (normalize (math::cross (test.camera->WorldOrtZ (), ort_x)));
+
+/*      printf ("rendering shot, ort_x = %.3f %.3f %.3f, ort_y = %.3f %.3f %.3f, camera_ort = %.3f %.3f %.3f\n",
+              ort_x.x, ort_x.y, ort_x.z, ort_y.x, ort_y.y, ort_y.z, test.camera->WorldOrtZ ().x, test.camera->WorldOrtZ ().y, test.camera->WorldOrtZ ().z);*/
+
+      for (size_t i = 0; i < sprites_count; i++, current_vertex += 6, current_sprite_desc++)
+      {
+        math::vec3f right = ort_x * current_sprite_desc->size.x / 2.f,
+                    up    = ort_y * current_sprite_desc->size.y / 2.f;
+
+//        printf ("up = %.3f %.3f %.3f\n", up.x, up.y, up.z);
+
+        current_vertex [0].position = current_sprite_desc->position - right + up;
+        current_vertex [1].position = current_sprite_desc->position + right + up;
+        current_vertex [2].position = current_sprite_desc->position - right - up;
+        current_vertex [3].position = current_sprite_desc->position + right + up;
+        current_vertex [4].position = current_sprite_desc->position + right - up;
+        current_vertex [5].position = current_sprite_desc->position - right - up;
+
+        current_vertex [0].tex_coord = math::vec2f (0, 1);
+        current_vertex [1].tex_coord = math::vec2f (1, 1);
+        current_vertex [2].tex_coord = math::vec2f (0, 0);
+        current_vertex [3].tex_coord = math::vec2f (1, 1);
+        current_vertex [4].tex_coord = math::vec2f (1, 0);
+        current_vertex [5].tex_coord = math::vec2f (0, 0);
+
+        current_vertex [0].color = current_sprite_desc->color;
+        current_vertex [1].color = current_sprite_desc->color;
+        current_vertex [2].color = current_sprite_desc->color;
+        current_vertex [3].color = current_sprite_desc->color;
+        current_vertex [4].color = current_sprite_desc->color;
+        current_vertex [5].color = current_sprite_desc->color;
+      }
+
+      BufferDesc vb_desc;
+
+      memset (&vb_desc, 0, sizeof vb_desc);
+
+      vb_desc.size         = sizeof (SpriteVertex) * vertices_count;
+      vb_desc.usage_mode   = UsageMode_Default;
+      vb_desc.bind_flags   = BindFlag_VertexBuffer;
+      vb_desc.access_flags = AccessFlag_Read | AccessFlag_Write;
+
+      BufferPtr vb (device.CreateBuffer (vb_desc), false);
+
+      vb->SetData (0, vb_desc.size, vertices.data ());
+
+      device.ISSetInputLayout  (particle_vertices_input_layout.get ());
+      device.ISSetVertexBuffer (0, vb.get ());
+
+      device.Draw (PrimitiveType_TriangleList, 0, vertices_count);
+    }
+
+///Получение материала
+    ModelMaterial* Material ()
+    {
+      return test.material_manager.FindMaterial (sprite.Material ()).get ();
+    }
+
+  private:
+    Test&                       test;
+    const scene_graph::ShotGfx& sprite;
+    InputLayoutPtr              particle_vertices_input_layout;
+};
+
 }
 
 typedef xtl::com_ptr <Renderable>   RenderablePtr;
 typedef stl::vector <RenderablePtr> RenderablesArray;
 
-struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel, scene_graph::SpriteList>
+struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel, scene_graph::BillboardSpriteList, scene_graph::ShotGfx>
 {
   Test&                      test;
   math::mat4f                view_projection_tm;
@@ -542,9 +643,16 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
     }
   }
 
-  void visit (scene_graph::SpriteList& sprite)
+  void visit (scene_graph::BillboardSpriteList& sprite)
   {
-    RenderablePtr renderable (new RenderableSpriteList (test, sprite, particle_vertices_input_layout), false);
+    RenderablePtr renderable (new RenderableBillboardSpriteList (test, sprite, particle_vertices_input_layout), false);
+
+    renderables.push_back (renderable);
+  }
+
+  void visit (scene_graph::ShotGfx& sprite)
+  {
+    RenderablePtr renderable (new RenderableShotGfx (test, sprite, particle_vertices_input_layout), false);
 
     renderables.push_back (renderable);
   }

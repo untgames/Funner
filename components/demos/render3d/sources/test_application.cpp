@@ -13,6 +13,9 @@ const float HORIZONTAL_ROTATION_SPEED = 20.0f;
 const float VERTICAL_ROTATION_SPEED   = HORIZONTAL_ROTATION_SPEED;
 const float FOV_X_ASPECT_RATIO        = 90.f;
 
+const math::vec4f SHOT_COLOR (0.f, 0.8f, 1.f, 1.f);
+const float       SHOT_DISTANCE = 1000.f;
+
 //протокол теста
 struct TestLogFilter
 {
@@ -39,6 +42,7 @@ Test::Test (const wchar_t* title, const CallbackFn& in_redraw, const CallbackFn&
     scene_renderer (*this),
     mesh_manager (*this),
     material_manager (*this),
+    gfx_manager (*this),
     x_camera_speed (0),
     y_camera_speed (0),
     x_camera_rotation_speed (0),
@@ -226,6 +230,24 @@ void Test::OnKeyPressed (const syslib::WindowEventContext& context)
       draw_main_ships = !draw_main_ships;
       scene_manager.SetDrawMainShips (draw_main_ships);
       break;
+    case syslib::Key_Space:
+    {
+      if (!player_ship)
+        break;
+
+      Node::Pointer gun = player_ship->FindChild (GUN_NODE_NAME);
+
+      if (gun)
+        gfx_manager.PerformShot (*gun, SHOT_COLOR, SHOT_DISTANCE);
+
+      while (gun = gun->NextChild ())
+      {
+        if (!xtl::xstrcmp (gun->Name (), GUN_NODE_NAME))
+          gfx_manager.PerformShot (*gun, SHOT_COLOR, SHOT_DISTANCE);
+      }
+
+      break;
+    }
     default:
       break;
   }
