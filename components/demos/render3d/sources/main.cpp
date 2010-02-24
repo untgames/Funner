@@ -17,6 +17,11 @@ const int    ADDITIONAL_SHIPS_RANGE   = 200;
 const size_t SKY_PARALLELS            = 30;
 const size_t SKY_MERIDIANS            = 30;
 const float  SKY_RADIUS               = 9000;
+const float  SHOT_RATE                = 10;
+
+const math::vec4f PLAYER_SHOT_COLOR (0.f, 0.8f, 1.f, 1.f);
+const float       PLAYER_SHOT_DISTANCE = 1000.f;
+
 
 const float EPS = 0.001f;
 
@@ -84,6 +89,26 @@ void idle (Test& test)
       test.camera->Translate (math::vec3f (dt * test.x_camera_speed, 0.f, dt * test.y_camera_speed), NodeTransformSpace_Local);
     if (fabs (test.x_camera_rotation_speed) > EPS || fabs (test.y_camera_rotation_speed) > EPS || fabs (test.z_camera_rotation_speed) > EPS)
       test.camera->Rotate (math::degree (dt * test.y_camera_rotation_speed), math::degree (dt * test.x_camera_rotation_speed), math::degree (dt * test.z_camera_rotation_speed), NodeTransformSpace_Local);
+  }
+
+  if (test.shot_pressed && test.player_ship)
+  {
+    static size_t last_shot_time = 0;
+
+    if (current_time - last_shot_time > 1000 / SHOT_RATE)
+    {
+      Node::Pointer gun = test.player_ship->FindChild (GUN_NODE_NAME);
+
+      while (gun)
+      {
+        if (!xtl::xstrcmp (gun->Name (), GUN_NODE_NAME))
+          test.gfx_manager.PerformShot (*gun, PLAYER_SHOT_COLOR, PLAYER_SHOT_DISTANCE);
+
+        gun = gun->NextChild ();
+      }
+
+      last_shot_time = current_time;
+    }
   }
 
   test.scene_manager.Scene ().Root ().Update (dt);

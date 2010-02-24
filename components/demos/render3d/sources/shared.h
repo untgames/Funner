@@ -485,6 +485,7 @@ struct Test
     float                      x_camera_rotation_speed;
     float                      y_camera_rotation_speed;
     float                      z_camera_rotation_speed;
+    bool                       shot_pressed;
     bool                       physics_enabled;
     bool                       draw_shattles;
     bool                       draw_main_ships;

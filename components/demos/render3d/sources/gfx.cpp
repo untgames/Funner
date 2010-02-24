@@ -6,7 +6,7 @@ namespace
 {
 
 const char* SHOT_TRAIL_MATERIAL = "shot_trail";
-const float SHOT_TRAIL_DURATION = 4.f;
+const float SHOT_TRAIL_DURATION = 1.f;
 const float SHOT_TRAIL_SIZE     = 1.f;
 
 }
