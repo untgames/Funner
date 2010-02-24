@@ -1,1 +1,1 @@
-LAUNCH_COMMAND := start capsule3d > res
+LAUNCH_COMMAND := start capsule3d
