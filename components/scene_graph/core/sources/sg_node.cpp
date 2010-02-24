@@ -249,7 +249,7 @@ struct Node::Impl
 
       UnbindNotify ();
 
-        //отсоединям узел от родителя    
+        //отсоединям узел от родителя
       
       if (prev_child) prev_child->impl->next_child = next_child;
       else            parent->impl->first_child    = next_child;
@@ -1667,7 +1667,9 @@ void Node::DetachAllControllers ()
 
 void Node::Update (float dt, NodeTraverseMode mode)
 {  
-    //проверка корректности аргументов    
+    //проверка корректности аргументов
+
+  Pointer lock (this);
 
   switch (mode)
   {
@@ -1687,8 +1689,16 @@ void Node::Update (float dt, NodeTraverseMode mode)
       
     if (impl->first_updatable_child) //проверка нужна на случай удаления контроллера в Update
     {  
-      for (Node* node=impl->first_updatable_child->impl->next_updatable_child; node!=impl->first_updatable_child; node=node->impl->next_updatable_child)
+      Pointer next_lock;
+
+      for (Node* node=impl->first_updatable_child->impl->next_updatable_child; node!=impl->first_updatable_child;)
+      {
+        next_lock = Pointer (node->impl->next_updatable_child);
+
         node->Update (dt, mode);
+
+        node = next_lock.get ();
+      }
     }
   }
   
