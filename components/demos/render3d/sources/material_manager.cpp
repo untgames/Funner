@@ -3,7 +3,8 @@
 namespace
 {
 
-const char* BLENDED_MATERIALS [] = { "ship_trail", "main_ship.glasshard_1-fx", "main_ship.glassoft_1-fx" };
+const char* TRANSPARENCY_MATERIALS [] = { "main_ship.glasshard_1-fx", "main_ship.glassoft_1-fx" };
+const char* ADDITIVE_MATERIALS [] = { "ship_trail"};
 
 }
 
@@ -109,12 +110,16 @@ void MaterialManager::LoadMaterial (const char* id, const media::rfx::Material& 
 
   dst_mtl->shader = test.shader_manager.GetShader (src_mtl.Effect ());
 
-  dst_mtl->blended = false;
+  dst_mtl->blend_mode = BlendMode_No;
 
-  for (size_t i = 0, count = sizeof (BLENDED_MATERIALS) / sizeof (*BLENDED_MATERIALS); i < count; i++)
-    if (!xtl::xstrcmp (BLENDED_MATERIALS [i], id))
-      dst_mtl->blended = true;
+  for (size_t i = 0, count = sizeof (TRANSPARENCY_MATERIALS) / sizeof (*TRANSPARENCY_MATERIALS); i < count; i++)
+    if (!xtl::xstrcmp (TRANSPARENCY_MATERIALS [i], id))
+      dst_mtl->blend_mode = BlendMode_Transparency;
 
+  for (size_t i = 0, count = sizeof (ADDITIVE_MATERIALS) / sizeof (*ADDITIVE_MATERIALS); i < count; i++)
+    if (!xtl::xstrcmp (ADDITIVE_MATERIALS [i], id))
+      dst_mtl->blend_mode = BlendMode_Additive;
+      
   materials.insert_pair (id, dst_mtl);
 }
 

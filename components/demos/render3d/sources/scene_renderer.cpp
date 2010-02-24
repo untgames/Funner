@@ -252,6 +252,7 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
   InputLayoutPtr             particle_vertices_input_layout;
   BlendStatePtr              no_blend_state;
   BlendStatePtr              additive_blend_state;
+  BlendStatePtr              transparency_blend_state;  
   RenderablesArray           renderables;
   DepthStencilStatePtr       depth_write_enabled_state;
   DepthStencilStatePtr       depth_write_disabled_state;
@@ -389,6 +390,16 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
 
     additive_blend_state = BlendStatePtr (test.device->CreateBlendState (blend_desc), false);
 
+    blend_desc.blend_enable                     = true;
+    blend_desc.blend_color_operation            = BlendOperation_Add;
+    blend_desc.blend_alpha_operation            = BlendOperation_Add;
+    blend_desc.blend_color_source_argument      = BlendArgument_SourceAlpha;
+    blend_desc.blend_color_destination_argument = BlendArgument_InverseSourceAlpha;
+    blend_desc.blend_alpha_source_argument      = BlendArgument_SourceAlpha;
+    blend_desc.blend_alpha_destination_argument = BlendArgument_InverseSourceAlpha;
+
+    transparency_blend_state = BlendStatePtr (test.device->CreateBlendState (blend_desc), false);    
+
     DepthStencilDesc depth_stencil_desc;
 
     memset (&depth_stencil_desc, 0, sizeof (depth_stencil_desc));
@@ -455,8 +466,8 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
     for (RenderablesArray::iterator iter = renderables.begin (), end = renderables.end (); iter != end; ++iter)
     {
       ModelMaterial* material = (*iter)->Material ();
-
-      if (!material || material->blended)
+      
+      if (!material || material->blend_mode != BlendMode_No)
         continue;
 
       SetMaterial (device, *material);
@@ -464,15 +475,26 @@ struct SceneRenderer::Impl : public xtl::visitor<void, scene_graph::VisualModel,
       (*iter)->Draw (test, view_tm, view_projection_tm);
     }
 
-    device.OSSetBlendState (additive_blend_state.get ());
     device.OSSetDepthStencilState (depth_write_disabled_state.get ());
 
     for (RenderablesArray::iterator iter = renderables.begin (), end = renderables.end (); iter != end; ++iter)
     {
       ModelMaterial* material = (*iter)->Material ();
 
-      if (!material || !material->blended)
+      if (!material)
         continue;
+        
+      switch (material->blend_mode)
+      {
+        case BlendMode_Additive:
+          device.OSSetBlendState (additive_blend_state.get ());        
+          break;
+        case BlendMode_Transparency:
+          device.OSSetBlendState (transparency_blend_state.get ());        
+          break;
+        default:
+          continue;
+      }
 
       SetMaterial (device, *material);
 

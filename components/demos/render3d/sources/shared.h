@@ -181,12 +181,19 @@ enum SamplerChannel
   SamplerChannel_Num
 };
 
+enum BlendMode
+{
+  BlendMode_No,
+  BlendMode_Additive,
+  BlendMode_Transparency
+};
+
 struct ModelMaterial
 {
   ModelTexmap    texmaps [SamplerChannel_Num];
   BufferPtr      constant_buffer;
   ModelShaderPtr shader;
-  bool           blended;
+  BlendMode      blend_mode;
 };
 
 typedef xtl::shared_ptr<ModelMaterial>  ModelMaterialPtr;
