@@ -2,18 +2,20 @@
 
 struct GfxManager::Impl
 {
-  Test& test;
+  Test&            test;
+  ShotGfx::Pointer shot_sprites;
 
-  Impl (Test& in_test) : test (in_test) {}
+  Impl (Test& in_test)
+    : test (in_test)
+  {
+    shot_sprites = ShotGfx::Create ();
+
+    shot_sprites->BindToScene (test.scene_manager.Scene (), NodeBindMode_AddRef);
+  }
 
   void PerformShot (const scene_graph::Node& gun, const math::vec4f& color, float distance)
   {
-    ShotGfx::Pointer shot_gfx (ShotGfx::Create (color, distance));
-
-    shot_gfx->SetShotDirection (gun.WorldOrtZ ());
-    shot_gfx->SetPosition      (gun.WorldPosition () + gun.WorldOrtZ () * distance / 2.f);
-
-    shot_gfx->BindToScene (test.scene_manager.Scene (), NodeBindMode_AddRef);
+    shot_sprites->AddShot (gun, color, distance);
   }
 };
 

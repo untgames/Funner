@@ -12,14 +12,17 @@ class ShotGfx : public SpriteList
     typedef xtl::com_ptr <const ShotGfx> ConstPointer;
 
 ///Создание эффекта
-    static Pointer Create (const math::vec4f& color, float distance);
+    static Pointer Create ();
 
-    void               SetShotDirection (const math::vec3f& in_shot_direction) { shot_direction = in_shot_direction; }
-    const math::vec3f& ShotDirection    () const { return shot_direction; }
+///Добавление выстрела
+    void AddShot (const scene_graph::Node& gun, const math::vec4f& color, float distance);
+
+///Получение направления выстрела
+    const math::vec3f& ShotDirection (size_t sprite) const;
 
   protected:
 ///Конструктор / деструктор
-    ShotGfx (const math::vec4f& in_color, float distance);
+    ShotGfx ();
     ~ShotGfx ();
 
 ///Метод, вызываемый при посещении данного объекта
@@ -30,9 +33,25 @@ class ShotGfx : public SpriteList
     void UpdateEffect (float dt);
 
   private:
-    math::vec4f          color;
-    math::vec3f          shot_direction;
-    float                life_time;
+    struct ShotDesc : public xtl::reference_counter
+    {
+      math::vec3f position;
+      math::vec3f direction;
+      math::vec4f color;
+      float       distance;
+      size_t      born_time;
+
+      void AddRef  () { addref  (this); }
+      void Release () { release (this); }
+    };
+
+  private:
+    typedef xtl::com_ptr <ShotDesc>   ShotDescPtr;
+    typedef stl::vector <ShotDescPtr> ShotsArray;
+
+  private:
+    size_t               time;
+    ShotsArray           shots;
     xtl::auto_connection update_connection;
 };
 

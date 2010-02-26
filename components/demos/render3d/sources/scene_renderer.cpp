@@ -269,14 +269,14 @@ class RenderableShotGfx : public Renderable
       SpriteVertex*                               current_vertex      = vertices.data ();
       const scene_graph::SpriteModel::SpriteDesc* current_sprite_desc = sprite.Sprites ();
 
-      math::vec3f ort_x (sprite.ShotDirection ()),
-                  ort_y (normalize (math::cross (test.camera->WorldOrtZ (), ort_x)));
-
 /*      printf ("rendering shot, ort_x = %.3f %.3f %.3f, ort_y = %.3f %.3f %.3f, camera_ort = %.3f %.3f %.3f\n",
               ort_x.x, ort_x.y, ort_x.z, ort_y.x, ort_y.y, ort_y.z, test.camera->WorldOrtZ ().x, test.camera->WorldOrtZ ().y, test.camera->WorldOrtZ ().z);*/
 
       for (size_t i = 0; i < sprites_count; i++, current_vertex += 6, current_sprite_desc++)
       {
+        math::vec3f ort_x (sprite.ShotDirection (i)),
+                    ort_y (normalize (math::cross (test.camera->WorldOrtZ (), ort_x)));
+
         math::vec3f right = ort_x * current_sprite_desc->size.x / 2.f,
                     up    = ort_y * current_sprite_desc->size.y / 2.f;
 
