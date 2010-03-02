@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 
+#include <xtl/bind.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/signal.h>
 #include <xtl/string.h>

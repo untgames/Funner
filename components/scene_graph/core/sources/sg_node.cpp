@@ -20,7 +20,7 @@ struct Pivot
   bool  pivot_enabled;                          //включён ли центр
   bool  need_local_position_after_pivot_update; //необходимо обновлять локальное положение с учётом центра
   bool  orientation_pivot_enabled;              //включён центр поворотов
-  bool  scale_pivot_enabled;                    //включён центр масштабирования  
+  bool  scale_pivot_enabled;                    //включён центр масштабирования
   vec3f pivot_position;                         //локальное положение центра
   vec3f local_position_after_pivot;             //локальное положение с учётом центра
   vec3f world_position_after_pivot;             //мировое положение с учётом центра
@@ -361,7 +361,7 @@ struct Node::Impl
 
       UnbindNotify ();
 
-        //отсоединям узел от родителя    
+        //отсоединям узел от родителя
       
       if (prev_child) prev_child->impl->next_child = next_child;
       else            parent->impl->first_child    = next_child;
@@ -548,9 +548,15 @@ struct Node::Impl
     
       //обновление сцены в потомках
 
-    for (Node* volatile node=first_child; node; node=node->impl->next_child)
+    for (Node* volatile node=first_child; node;)
+    {
+      Node* next = node->impl->next_child;
+
       node->impl->SetScene (scene);
       
+      node = next;
+    }
+
       //оповещение о присоединии к новой сцене
       
     if (!in_scene)
@@ -621,9 +627,15 @@ struct Node::Impl
       return;
       
       //оповещаем о возникновении события относительно всех потомков child
+
+    for (Node* node=child.impl->first_child; node;)
+    {
+      Node* next = node->impl->next_child;
+
+      Notify (*node, event);
       
-    for (Node* node=child.impl->first_child; node; node=node->impl->next_child)
-      Notify (*node, event);    
+      node = next;
+    }
       
       //устанавливаем флаг обработки события
 
@@ -1882,7 +1894,7 @@ void Node::DetachAllControllers ()
 
 void Node::Update (float dt, NodeTraverseMode mode)
 {  
-    //проверка корректности аргументов    
+    //проверка корректности аргументов
 
   switch (mode)
   {
@@ -1902,8 +1914,16 @@ void Node::Update (float dt, NodeTraverseMode mode)
     
     if (impl->first_updatable_child) //проверка нужна на случай удаления контроллера в Update
     {  
-      for (Node* node=impl->first_updatable_child->impl->next_updatable_child; node!=impl->first_updatable_child; node=node->impl->next_updatable_child)
+      Pointer next_lock;
+
+      for (Node* node=impl->first_updatable_child->impl->next_updatable_child; node!=impl->first_updatable_child;)
+      {
+        next_lock = Pointer (node->impl->next_updatable_child);
+
         node->Update (dt, mode);
+
+        node = next_lock.get ();
+      }
     }  
   }
   

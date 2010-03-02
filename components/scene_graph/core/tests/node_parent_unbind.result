@@ -1,0 +1,3 @@
+Results of node_parent_unbind_test:
+Child1 has scene is y, child2 has scene is y, child3 has scene is y
+child2 has scene is n, child3 has scene is n
