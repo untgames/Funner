@@ -127,6 +127,23 @@ struct Output::Impl
     }
   }
 
+#elif defined BADA
+
+///Платформо-зависимая инициализация
+  void PlatformInitialize ()
+  {
+    native_display = EGL_DEFAULT_DISPLAY;
+
+    log.Printf ("...get control name");
+    
+    strncpy (name, common::tostring (reinterpret_cast<Osp::Ui::Control*> (native_window)->GetName ().GetPointer ()).c_str (), sizeof (name));
+  }
+  
+///Платформо-зависимое освобождение ресурсов
+  void PlatformDone ()
+  {    
+  }
+
 #else
   #error Unknown platform!
 #endif  

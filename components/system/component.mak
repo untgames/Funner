@@ -9,7 +9,7 @@ SYSTEMLIB.SOURCES.NAME                              := funner.system
 SYSTEMLIB.SOURCES.INCLUDE_DIRS                      := sources
 SYSTEMLIB.SOURCES.SOURCE_DIRS                       := sources/wrappers
 SYSTEMLIB.SOURCES.IMPORTS                           := compile.system
-SYSTEMLIB.SOURCES.win32.SOURCE_DIRS                 := sources/platform/win32
+SYSTEMLIB.SOURCES.win32.SOURCE_DIRS                 := sources/platform/win32 sources/platform/win32/application sources/platform/win32/thread sources/platform/win32/non_unistd
 SYSTEMLIB.SOURCES.unistd.SOURCE_DIRS                := sources/platform/pthread sources/platform/unistd
 SYSTEMLIB.SOURCES.msvc.COMPILER_CFLAGS              := -wd4355
 SYSTEMLIB.SOURCES.no_windows.SOURCE_DIRS            := sources/platform/no_windows
@@ -24,6 +24,9 @@ SYSTEMLIB.SOURCES.iphone.COMPILER_CFLAGS            := -I$(IPHONE_SDK_PATH)/Syst
                                                        -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/UIKit.framework/Headers/ \
                                                        -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/QuartzCore.framework/Headers/
 SYSTEMLIB.SOURCES.x11.SOURCE_DIRS                   := sources/platform/x11
+SYSTEMLIB.SOURCES.bada_simulator.SOURCE_DIRS        := sources/platform/win32 sources/platform/win32/thread sources/platform/win32/non_unistd
+SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/pthread
+SYSTEMLIB.SOURCES.bada.SOURCE_DIRS                  := sources/platform/bada
 
 #Öåëü ¹2 - System library tests
 SYSTEMLIB.TESTS.TYPE             := test-suite

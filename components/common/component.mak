@@ -20,6 +20,7 @@ COMMON.SOURCES.iphone.SOURCE_DIRS                := sources/platform/iphone
 COMMON.SOURCES.iphone.COMPILER_CFLAGS            := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers
 COMMON.SOURCES.carbon.COMPILER_CFLAGS            := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers
 COMMON.SOURCES.win32.SOURCE_DIRS                 := sources/platform/win32
+COMMON.SOURCES.bada_simulator.SOURCE_DIRS        := sources/platform/win32
 
 #Цель - WxfParser
 COMMON.WXF_PARSER.TYPE             := static-lib

@@ -551,7 +551,7 @@ void Device::Bind (size_t base_vertex, size_t base_index, IndicesLayout* out_ind
     
       //установка состояния входного уровня
 
-    if (context_manager.NeedStageRebind (Stage_Input) || base_vertex != cached_base_vertex || base_index != cached_base_index && out_indices_layout)
+    if (context_manager.NeedStageRebind (Stage_Input) || base_vertex != cached_base_vertex || (base_index != cached_base_index && out_indices_layout))
     {
       input_stage.Bind (base_vertex, base_index, out_indices_layout);
       

@@ -202,7 +202,7 @@ struct TextureManager::Impl: public ContextObject
 
         GLenum texture_target      = is_active_slot ? texture_desc.target : 0;
         bool   need_change_sampler = is_active_slot && texture->GetSamplerHash () != sampler_state->GetDescHash (),
-               need_bind           = need_change_sampler || is_active_slot && current_texture_id [i] != texture->GetId (),
+               need_bind           = need_change_sampler || (is_active_slot && current_texture_id [i] != texture->GetId ()),
                need_change_mode    = current_texture_target [i] != texture_target,
                need_set_slot       = need_bind || need_change_mode;
 

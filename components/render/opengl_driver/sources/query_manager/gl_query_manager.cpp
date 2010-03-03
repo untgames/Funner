@@ -91,8 +91,6 @@ struct QueryManager::Impl: public ContextObject, public QueryManagerState
 ///—оздание предикатов
     IPredicate* CreatePredicate ()
     {
-      static const char* METHOD_NAME = "render::low_level::opengl::QueryManager::Impl::CreatePredicate";
-
         //проверка наличи€ необходимых расширений
 
       if (!GetCaps ().has_arb_occlusion_query)
@@ -110,7 +108,7 @@ struct QueryManager::Impl: public ContextObject, public QueryManagerState
 
       glGetQueryiv (GL_SAMPLES_PASSED, GL_QUERY_COUNTER_BITS, &query_counter_bits);
 
-      CheckErrors (METHOD_NAME);
+      CheckErrors ("render::low_level::opengl::QueryManager::Impl::CreatePredicate");
 
         //в случае невозможности получени€ корректного результата - создаЄм эмул€цию
 

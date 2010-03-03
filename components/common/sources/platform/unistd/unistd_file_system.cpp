@@ -49,7 +49,7 @@ class UnistdFileSystem: public StdioFileSystem
     void Mkdir (const char* dir_name)
     {
       static const char* METHOD_NAME = "UnistdFileSystem::Mkdir";
-
+      
       if (mkdir (dir_name,S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH))
       {
         switch (errno)

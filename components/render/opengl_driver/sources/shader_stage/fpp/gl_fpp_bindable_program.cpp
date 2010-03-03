@@ -225,8 +225,7 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
 
   const ContextCaps& caps = GetCaps ();
                    
-  const size_t current_program            = GetContextCacheValue (CacheEntry_UsedProgram),
-               current_viewer_hash        = GetContextCacheValue (CacheEntry_FppViewerStateHash),
+  const size_t current_viewer_hash        = GetContextCacheValue (CacheEntry_FppViewerStateHash),
                current_object_hash        = GetContextCacheValue (CacheEntry_FppObjectStateHash),
                current_rasterization_hash = GetContextCacheValue (CacheEntry_FppRasterizationStateHash),
                current_material_hash      = GetContextCacheValue (CacheEntry_FppMaterialStateHash),
@@ -235,6 +234,8 @@ void FppBindableProgram::Bind (ConstantBufferPtr* constant_buffers)
                current_modes_hash         = GetContextCacheValue (CacheEntry_FppModesStateHash);
 
 #ifndef OPENGL_ES_SUPPORT               
+
+  const size_t current_program = GetContextCacheValue (CacheEntry_UsedProgram);
                
     //отключение glsl-шейдеров  
 

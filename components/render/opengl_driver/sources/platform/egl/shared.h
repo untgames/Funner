@@ -16,8 +16,50 @@
 #include <shared/platform.h>
 #include <shared/property_list.h>
 
-#include <egl/egl.h>
-#include <gles/gl.h>
+#ifdef BADA
+  #include <stl/string>
+  #include <common/utf_converter.h>
+#endif
+
+#ifdef BADA
+  #include <FUiControl.h>
+
+  namespace Osp { namespace Graphics { namespace Opengl {
+
+  #include <egl.h>
+  
+  }}}
+  
+  using Osp::Graphics::Opengl::NativeWindowType;
+  using Osp::Graphics::Opengl::NativeDisplayType;
+  using Osp::Graphics::Opengl::EGLNativeDisplayType;
+  using Osp::Graphics::Opengl::EGLint;
+  using Osp::Graphics::Opengl::EGLConfig;
+  using Osp::Graphics::Opengl::EGLDisplay;
+  using Osp::Graphics::Opengl::EGLSurface;
+  using Osp::Graphics::Opengl::EGLContext;
+  using Osp::Graphics::Opengl::eglInitialize;
+  using Osp::Graphics::Opengl::eglTerminate;
+  using Osp::Graphics::Opengl::eglGetDisplay;
+  using Osp::Graphics::Opengl::eglCreateWindowSurface;
+  using Osp::Graphics::Opengl::eglDestroySurface;
+  using Osp::Graphics::Opengl::eglChooseConfig;
+  using Osp::Graphics::Opengl::eglGetConfigAttrib;
+  using Osp::Graphics::Opengl::eglQuerySurface;
+  using Osp::Graphics::Opengl::eglQueryString;
+  using Osp::Graphics::Opengl::eglSwapBuffers;
+  using Osp::Graphics::Opengl::eglCreateContext;
+  using Osp::Graphics::Opengl::eglDestroyContext;
+  using Osp::Graphics::Opengl::eglMakeCurrent;
+  using Osp::Graphics::Opengl::eglSwapInterval;
+  using Osp::Graphics::Opengl::eglGetProcAddress;
+  using Osp::Graphics::Opengl::eglGetError;
+    
+#else
+  #include <egl/egl.h>
+#endif
+
+#include <shared/gl.h>
 
 namespace render
 {

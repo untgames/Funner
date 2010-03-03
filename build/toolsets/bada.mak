@@ -23,7 +23,7 @@ BADA_TOOLCHAIN_BIN_DIR := $(BADA_TOOLCHAIN_DIR)/bin
 COMPILER_GCC           := $(BADA_TOOLCHAIN_BIN_DIR)/$(BADA_TOOLCHAIN_PREFIX)gcc
 LINKER_GCC             := $(BADA_TOOLCHAIN_BIN_DIR)/$(BADA_TOOLCHAIN_PREFIX)g++
 LIB_GCC                := $(BADA_TOOLCHAIN_BIN_DIR)/$(BADA_TOOLCHAIN_PREFIX)ar
-COMMON_CFLAGS          += -DBADA -fno-strict-aliasing
+COMMON_CFLAGS          += -fno-strict-aliasing -DBADA -I$(BADA_SDK_HOME)/Include 
 COMMON_LINK_FLAGS      +=
 DLL_SUFFIX             := .so
 

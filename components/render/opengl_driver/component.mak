@@ -38,13 +38,16 @@ RENDER.OPENGL_DRIVER.SOURCES.msvc.COMPILER_CFLAGS   := -wd4355
 RENDER.OPENGL_DRIVER.SOURCES.gles.COMPILER_DEFINES  := OPENGL_ES_SUPPORT
 RENDER.OPENGL_DRIVER.SOURCES.iphone.SOURCE_DIRS     := sources/platform/iphone
 RENDER.OPENGL_DRIVER.SOURCES.egl.SOURCE_DIRS        := sources/platform/egl
-RENDER.OPENGL_DRIVER.SOURCES.egl.IMPORTS            := compile.extern.gles_win32
 
 ifeq (,$(filter gles,$(PROFILES)))
 
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS        += sources/shader_stage/glsl
 RENDER.OPENGL_DRIVER.SOURCES.win32.SOURCE_DIRS  := sources/platform/win32
 RENDER.OPENGL_DRIVER.SOURCES.macosx.SOURCE_DIRS := sources/platform/macosx
+
+else
+
+RENDER.OPENGL_DRIVER.SOURCES.win32.IMPORTS  := compile.extern.gles_win32
 
 endif
 
