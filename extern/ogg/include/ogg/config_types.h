@@ -39,7 +39,7 @@ typedef int32_t   ogg_int32_t;
 typedef __uint32_t  ogg_uint32_t;
 typedef int64_t   ogg_int64_t;
 
-#elif defined (__ARM_ARCH_5__)
+#elif defined (__ARM_ARCH_5__) || defined (BADA_DEVICE)
 
 typedef short          ogg_int16_t;
 typedef unsigned short ogg_uint16_t;
