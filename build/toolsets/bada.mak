@@ -25,7 +25,6 @@ LINKER_GCC             := $(BADA_TOOLCHAIN_BIN_DIR)/$(BADA_TOOLCHAIN_PREFIX)g++
 LIB_GCC                := $(BADA_TOOLCHAIN_BIN_DIR)/$(BADA_TOOLCHAIN_PREFIX)ar
 COMMON_CFLAGS          += -DBADA -fno-strict-aliasing
 COMMON_LINK_FLAGS      +=
-EXE_SUFFIX             :=
 DLL_SUFFIX             := .so
 
 ###################################################################################################

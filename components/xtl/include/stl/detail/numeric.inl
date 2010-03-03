@@ -3,7 +3,7 @@
 */
 
 template <class InIter,class T,class BinOperation>
-T accumulate (InIter first,InIter last,T init,BinOperation binary_op)
+inline T accumulate (InIter first,InIter last,T init,BinOperation binary_op)
 {
   for (;first!=last;++first) init = binary_op (init,*first);
   return init;

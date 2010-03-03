@@ -219,7 +219,7 @@ struct Node::Impl
 
       //оповещение всех потомков о необходимости пересчёта мировых преобразований
     
-    for (Node* node=first_child; node; node=node->impl->next_child)
+    for (Node* node=first_child; node; node=node->impl->next_child) //!!!
       node->impl->UpdateWorldTransformNotify ();
   }
 
@@ -548,7 +548,7 @@ struct Node::Impl
     
       //обновление сцены в потомках
 
-    for (Node* volatile node=first_child; node;)
+    for (Node* volatile node=first_child; node;) //!!!
     {
       Node* next = node->impl->next_child;
 
@@ -628,7 +628,7 @@ struct Node::Impl
       
       //оповещаем о возникновении события относительно всех потомков child
 
-    for (Node* node=child.impl->first_child; node;)
+    for (Node* node=child.impl->first_child; node;) //!!!
     {
       Node* next = node->impl->next_child;
 
@@ -1040,7 +1040,7 @@ void Node::Traverse (const TraverseFunction& fn, NodeTraverseMode mode) const
 
   if (mode != NodeTraverseMode_OnlyThis)
   {
-    for (Node* node=impl->first_child; node; node=node->impl->next_child)
+    for (Node* node=impl->first_child; node; node=node->impl->next_child) ///!!!
       node->Traverse (fn, mode);
   }
     
@@ -1065,7 +1065,7 @@ void Node::Traverse (INodeTraverser& traverser, NodeTraverseMode mode) const
 
   if (mode != NodeTraverseMode_OnlyThis)
   {
-    for (Node* node=impl->first_child; node; node=node->impl->next_child)
+    for (Node* node=impl->first_child; node; node=node->impl->next_child) ///!!!
       node->Traverse (traverser, mode);
   }
 
@@ -1090,7 +1090,7 @@ void Node::VisitEach (Visitor& visitor, NodeTraverseMode mode) const
 
   if (mode != NodeTraverseMode_OnlyThis)
   {
-    for (Node* node=impl->first_child; node; node=node->impl->next_child)
+    for (Node* node=impl->first_child; node; node=node->impl->next_child) //!!!
       node->VisitEach (visitor, mode);
   }
 
@@ -1916,7 +1916,7 @@ void Node::Update (float dt, NodeTraverseMode mode)
     {  
       Pointer next_lock;
 
-      for (Node* node=impl->first_updatable_child->impl->next_updatable_child; node!=impl->first_updatable_child;)
+      for (Node* node=impl->first_updatable_child->impl->next_updatable_child; node!=impl->first_updatable_child;) //!!!
       {
         next_lock = Pointer (node->impl->next_updatable_child);
 
