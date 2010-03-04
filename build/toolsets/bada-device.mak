@@ -1,4 +1,4 @@
-PROFILES              += bada_device unistd
+PROFILES              += bada_device
 BADA_TOOLCHAIN        := ARM
 BADA_TOOLCHAIN_PREFIX := arm-samsung-nucleuseabi-
 COMMON_CFLAGS         += -DBADA_DEVICE -Wno-psabi -Wno-uninitialized

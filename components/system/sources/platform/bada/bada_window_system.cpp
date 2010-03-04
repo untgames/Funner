@@ -5,8 +5,6 @@ using namespace syslib;
 namespace
 {
 
-const char* LOG_NAME = "syslib.Platform";
-
 /*
     Описание реализации окна
 */
