@@ -41,6 +41,7 @@ struct ActionImpl: public xtl::reference_counter, public Lockable
   Timer                       timer;          //таймер, связанный с действием
   ActionQueue::time_t         next_time;      //время следующего выполнения действия
   ActionQueue::time_t         period;         //период выполнения действия
+  size_t                      thread_id;      //идентификатор нити, в которой создано действие
   bool                        is_periodic;    //является ли действие периодическим
   bool                        is_completed;   //завершено ли действие
   bool                        is_canceled;    //действие отменено
@@ -49,8 +50,9 @@ struct ActionImpl: public xtl::reference_counter, public Lockable
     : action_handler (in_handler)
     , wait_handler (in_wait_handler)
     , timer (in_timer)
-    , next_time (timer.Time () + delay)
+    , next_time (timer.Time () + delay)    
     , period (in_period)
+    , thread_id (Platform::GetCurrentThreadId ())
     , is_periodic (in_is_periodic)
     , is_completed (false)
     , is_canceled (false)
@@ -500,6 +502,11 @@ Action& Action::operator = (const Action& action)
   Action (action).Swap (*this);
 
   return *this;
+}
+
+size_t Action::CreaterThreadId () const
+{
+  return impl ? impl->thread_id : 0;
 }
 
 bool Action::IsEmpty () const
