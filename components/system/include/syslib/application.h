@@ -5,6 +5,8 @@
 
 #include <xtl/functional_fwd>
 
+#include <syslib/application_delegate.h>
+
 namespace syslib
 {
 
@@ -14,9 +16,9 @@ namespace syslib
 enum ApplicationEvent
 {
   ApplicationEvent_OnExit,          //получен сигнал завершения приложения
-  ApplicationEvent_OnIdle,          //очередь сообщений пуста
-  ApplicationEvent_OnEnterRunLoop,  //инициализация приложения завершена
-  ApplicationEvent_OnDoEvents,      //обработка пользовательских очередей сообщений
+  ApplicationEvent_OnIdle,          //событие обработки пользовательских очередей сообщений
+  ApplicationEvent_OnRunLoopEnter,  //событие входа в очередь обработки сообщений
+  ApplicationEvent_OnRunLoopExit,   //событие выхода из очереди обработки сообщений
 
   ApplicationEvent_Num
 };
@@ -28,15 +30,16 @@ class Application
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обработка сообщений в очереди сообщений
+///Установка делегата приложения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void DoEvents ();
+    static void PushDelegate (IApplicationDelegate*);
+    static void PopDelegate  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запуск обработки очереди сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void Run ();
-    static bool IsMessageLoop (); //находится ли сейчас приложение в состоянии обработки сообщений
+    static void Run (IApplicationDelegate* delegate = 0);
+    static bool IsMessageLoop ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Прекращение обработки очереди сообщений
@@ -53,10 +56,8 @@ class Application
 ///Подписка на события приложения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void ()> EventHandler;
-    typedef xtl::function<bool ()> SuspendHandler; //функция, вызываемая перед приостановкой нити приложения
 
-    static xtl::connection RegisterEventHandler   (ApplicationEvent event, const EventHandler& handler);
-    static xtl::connection RegisterSuspendHandler (const SuspendHandler& handler);
+    static xtl::connection RegisterEventHandler (ApplicationEvent event, const EventHandler& handler);
 };
 
 }

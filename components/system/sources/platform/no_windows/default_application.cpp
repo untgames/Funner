@@ -2,36 +2,75 @@
 
 using namespace syslib;
 
-/*
-    Работа с очередью сообщений
-*/
-
-bool Platform::IsMessageQueueEmpty ()
+namespace
 {
-  return true;
-}
 
-void Platform::DoNextEvent ()
+class DefaultApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter
 {
-}
+  public:
+///Конструктор
+    DefaultApplicationDelegate ()
+    {
+      idle_enabled = false;
+      is_exited    = false;
+      listener     = 0;
+    }
 
-void Platform::WaitMessage ()
-{
-}
+///Запуск цикла обработки сообщений
+    void Run ()
+    {
+      while (!is_exited)
+      {
+        if (idle_enabled && listener)
+          listener->OnIdle ();
+      }
+    }
 
-void Platform::UpdateMessageQueue ()
-{
-}
+///Выход из приложения
+    void Exit (int code)
+    {
+      is_exited = true;
 
-/*
-    Запуск приложения
-*/
+      if (listener)
+        listener->OnExit (code);
+    }
 
-void Platform::RunLoop (IRunLoopContext* context)
-{
-  if (!context)
-    throw xtl::make_null_argument_exception ("syslib::DefaultPlatform::RunLoop", "context");
+///Установка необходимости вызова событий idle
+    void SetIdleState (bool state)
+    {
+      idle_enabled = state;
+    }
+
+///Установка слушателя событий приложения
+    void SetListener (IApplicationListener* in_listener)
+    {
+      listener = in_listener;
+    }
     
-  context->DoCustomRunLoop ();
+///Подсчёт ссылок
+    void AddRef ()
+    {
+      addref (this);
+    }
+    
+    void Release ()
+    {
+      release (this);
+    }    
+
+  private:
+    bool                  idle_enabled;
+    bool                  is_exited;
+    IApplicationListener* listener;
+};
+
 }
 
+/*
+    Создание делегата приложения
+*/
+
+IApplicationDelegate* Platform::CreateDefaultApplicationDelegate ()
+{
+  return new DefaultApplicationDelegate;
+}

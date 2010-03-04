@@ -2,6 +2,7 @@
 #include <ctime>
 
 #include <stl/hash_map>
+#include <stl/stack>
 #include <stl/string>
 
 #include <xtl/bind.h>

@@ -1,6 +1,7 @@
 #ifndef SYSLIB_PLATFORM_HEADER
 #define SYSLIB_PLATFORM_HEADER
 
+#include <syslib/application_delegate.h>
 #include <syslib/window.h>
 
 namespace syslib
@@ -50,21 +51,6 @@ class IThreadCleanupCallback
 
   protected:
     virtual ~IThreadCleanupCallback () {}
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-/// онтекст главного цикла приложени€
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class IRunLoopContext
-{
-  public:
-    virtual void DoCustomRunLoop () {} //может быть не вызван, если платформа сама монопольно управл€ет главным циклом (например, iPhone)
-    virtual void OnExit          (int code) {}
-    virtual void OnIdle          () {}
-    virtual void OnEnterRunLoop  () {}
-
-  protected:
-    virtual ~IRunLoopContext () {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,17 +146,9 @@ class Platform
     static void    KillTimer   (timer_t handle);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///«апуск приложени€
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RunLoop (IRunLoopContext*);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–абота с очередью сообщений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static bool IsMessageQueueEmpty ();
-    static void DoNextEvent         ();
-    static void WaitMessage         (); //приостановка выполнени€ приложени€ до по€влени€ следующего сообщени€
-    static void UpdateMessageQueue  ();
+    static IApplicationDelegate* CreateDefaultApplicationDelegate ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///«агрузка динамических библиотек

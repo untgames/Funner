@@ -2,4 +2,4 @@ Results of application_suspend_test:
 do_events
 do_events
 do_events
-suspend
+exit

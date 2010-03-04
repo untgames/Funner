@@ -4,324 +4,338 @@ using namespace syslib;
 using namespace xtl;
 using namespace common;
 
-namespace
-{
-
-/*
-    Враппер для упрощения подсчёта вхождений в обработчик очереди сообщений
-*/
-
-class MessageLoopScope
-{
-  public:
-    MessageLoopScope  (size_t& in_counter) : counter (in_counter) { counter++; }
-    ~MessageLoopScope () { counter--; }
-
-  private:
-    size_t& counter;
-};
-
-/*
-    Аккумулятор сигнала с операцией OR
-*/
-
-struct or_signal_accumulator
-{
-  typedef bool result_type;
-
-  template <class InIter> bool operator () (InIter first, InIter last) const
-  {
-    for (; first!=last; ++first)
-      if (*first)
-        return true;
-
-    return false;
-  }
-};
-
-/*
-    Аккумулятор сигнала do-events
-*/
-
-struct do_events_accumulator
-{
-  typedef void result_type;
-
-  template <class InIter> void operator () (InIter first, InIter last) const
-  {
-    if (first == last)
-      return;
-
-    *--last;
-  }
-};
-
-}
+typedef xtl::com_ptr<IApplicationDelegate> DelegatePtr;
 
 /*
     Описание реализации приложения
 */
 
-class ApplicationImpl: private IRunLoopContext
+class ApplicationImpl: private IApplicationListener
 {
-  public:
-    ApplicationImpl ();
+  public:  
+///Конструктор
+    ApplicationImpl ()
+    {
+      exit_code          = 0;
+      message_loop_count = false;
+      is_exit_detected   = false;
+      on_push_action     = ActionQueue::RegisterEventHandler (ActionQueueEvent_OnPushAction, xtl::bind (&ApplicationImpl::OnPushAction, this, _1, _2));
+    }      
+    
+///Работа с делегатами
+    void PushDelegate (IApplicationDelegate* delegate)
+    {          
+      try
+      {
+        if (!delegate)
+          throw xtl::make_null_argument_exception ("", "delegate");                  
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обработка сообщений в очереди сообщений
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void DoEvents ();
+        delegates.push (delegate);
+        
+        try
+        {
+          delegate->SetListener (this);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Запуск обработки очереди сообщений
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Run ();
-    bool IsMessageLoop () const { return message_loop_count > 0; }
+          UpdateIdleState ();
+        }
+        catch (...)
+        {
+          delegates.pop ();
+          throw;
+        }
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::Application::PushDelegate");
+        throw;
+      }
+    }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Прекращение обработки очереди сообщений
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Exit        (int code);
-    int  GetExitCode () const { return exit_code; }
+    void PopDelegate ()
+    {
+      try
+      {
+        if (delegates.empty ())
+          throw xtl::format_operation_exception ("", "No delegates in stack");
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+        delegates.pop ();      
+
+        UpdateIdleState ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::Application::PopDelegate");
+        throw;
+      }
+    }
+
+///Работа с очередью сообщений
+    void EnterMessageLoop ()
+    {            
+      if (!message_loop_count++)
+      {
+        Notify (enter_run_loop_signal);        
+      }
+    }
+    
+    void ExitMessageLoop ()
+    {
+      if (!--message_loop_count)
+      {
+        Notify (exit_run_loop_signal);        
+      }
+    }
+    
+    bool IsMessageLoop () const
+    {
+      return message_loop_count > 0;
+    }    
+    
+///Прекращение работы приложения
+    void Exit (int code, bool need_notify_delegate = true)
+    {
+      if (is_exit_detected)
+        return;
+
+      is_exit_detected = true;
+      exit_code        = code;
+
+      Notify (exit_signal);
+      
+      try
+      {
+        if (!delegates.empty ())
+          delegates.top ()->Exit (code);
+      }
+      catch (...)
+      {
+        ///подавление всех исключений
+      }
+    }
+        
+    int GetExitCode () const
+    {
+      return exit_code; 
+    }
+
 ///Подписка на события приложения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    connection RegisterEventHandler   (ApplicationEvent event, const Application::EventHandler& handler);
-    connection RegisterSuspendHandler (const Application::SuspendHandler& handler);
+    connection RegisterEventHandler (ApplicationEvent event, const Application::EventHandler& handler)
+    {
+      try
+      {
+        switch (event)
+        {
+          case ApplicationEvent_OnExit:         return exit_signal.connect (handler);
+          case ApplicationEvent_OnRunLoopEnter: return enter_run_loop_signal.connect (handler);
+          case ApplicationEvent_OnRunLoopExit:  return exit_run_loop_signal.connect (handler);
+          case ApplicationEvent_OnIdle:
+            UpdateIdleState ();
+            return idle_signal.connect (handler);        
+          default:
+            throw xtl::make_argument_exception ("", "event", event);
+        }
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::Application::RegisterEventHandler");
+        throw;
+      }
+    }
 
   private:
-    typedef xtl::signal<void ()>                        ApplicationSignal;
-    typedef xtl::signal<bool (), or_signal_accumulator> SuspendSignal;
-    typedef xtl::signal<void (), do_events_accumulator> DoEventsSignal;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::signal<void ()> ApplicationSignal;        
+    
 ///Оповещение о возникновении события
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Notify (ApplicationSignal&);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Засыпание
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Suspend ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Оболочки над стандартными вызовами обработки главного цикла приложения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void DoCustomRunLoop (); //может быть не вызван, если платформа сама монопольно управляет главным циклом (например, iPhone)
-    void OnExit          (int code);
-    void OnIdle          ();
-    void OnEnterRunLoop  ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Notify (ApplicationSignal& signal)
+    {
+      try
+      {
+        signal ();
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }          
+    
 ///Обработка действий
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ProcessActions (ActionThread);
+    void ProcessActions (ActionThread thread)
+    {
+      size_t count = ActionQueue::ActionsCount (thread);
+      
+      for (size_t i=0; i<count; i++)
+      {
+        try
+        {
+          Action action = ActionQueue::PopAction (thread);
+
+          if (action.IsEmpty ())
+            continue;
+            
+          action.Perform ();
+        }
+        catch (...)
+        {
+          //подавление исключений
+        }
+      }  
+    }    
+    
+///Включен ли Idle режим?
+    bool IsIdleEnabled ()
+    {
+      return !idle_signal.empty () || ActionQueue::ActionsCount (ActionThread_Main) != 0 || ActionQueue::ActionsCount (ActionThread_Current) != 0;
+    }
+
+///Обновление idle-режима
+    void UpdateIdleState ()
+    {
+      try
+      {
+        if (!delegates.empty ())
+          delegates.top ()->SetIdleState (IsIdleEnabled ());
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::ApplicationImpl::UpdateIdleState");
+        throw;
+      }
+    }    
+    
+///Обработка idle
+    void OnIdle ()
+    {
+      try
+      {
+        ProcessActions (ActionThread_Main);
+        ProcessActions (ActionThread_Current);
+
+        Notify (idle_signal);
+      
+        UpdateIdleState ();
+      }
+      catch (...)
+      {
+        ///подавление всех исключений
+      }
+    }
+    
+///Обработка событий exit
+    void OnExit (int code)
+    {
+      try
+      {
+        Exit (code, false);
+      }
+      catch (...)
+      {
+        ///подавление всех исключений
+      }
+    }
+       
+///Событие добавлено в очередь событий
+    void OnPushAction (ActionThread thread, Action& action)
+    {
+      switch (thread)
+      {
+        case ActionThread_Current:
+          if (action.CreaterThreadId () != Platform::GetCurrentThreadId ())
+            return;        
+        case ActionThread_Main:
+        {
+          try
+          {
+            UpdateIdleState ();
+          }
+          catch (...)
+          {
+          }
+
+          break;
+        }
+        default:
+          break;
+      }              
+    }    
+    
+  private:
+    typedef stl::stack<DelegatePtr> DelegateStack;
 
   private:
-    ApplicationSignal  idle_signal;                    //сигнал обработки события ApplicationEvent_OnIdle
-    ApplicationSignal  exit_signal;                    //сигнал обработки события ApplicationEvent_OnExit
-    ApplicationSignal  enter_run_loop_signal;          //сигнал обработки события ApplicationEvent_OnStartup
-    DoEventsSignal     do_events_signal;               //сигнал обработки события ApplicationEvent_DoEvents
-    SuspendSignal      suspend_handler;                //сигнал проверки наличия необработанных сообщений
-    int                exit_code;                      //код завершения приложения
-    bool               is_exit_detected;               //получен сигнал завершения приложения
-    size_t             message_loop_count;             //количество вхождений в обработчик очереди сообщений
+    DelegateStack        delegates;             //делегаты приложения
+    ApplicationSignal    idle_signal;           //сигнал обработки события ApplicationEvent_OnIdle
+    ApplicationSignal    exit_signal;           //сигнал обработки события ApplicationEvent_OnExit
+    ApplicationSignal    enter_run_loop_signal; //сигнал обработки события ApplicationEvent_OnRunLoopEnter
+    ApplicationSignal    exit_run_loop_signal;  //сигнал обработки события ApplicationEvent_OnRunLoopExit
+    int                  exit_code;             //код завершения приложения
+    bool                 is_exit_detected;      //получен сигнал завершения приложения
+    size_t               message_loop_count;    //количество вхождений в обработчик очереди сообщений
+    xtl::auto_connection on_push_action;        //в очередь добавлено действие
 };
 
 typedef Singleton<ApplicationImpl> ApplicationSingleton;
 
 /*
-    Конструктор
-*/
-
-ApplicationImpl::ApplicationImpl ()
-{
-  exit_code          = 0;
-  message_loop_count = false;
-  is_exit_detected   = false;
-}
-
-/*
-    Прекращение обработки очереди сообщений
-*/
-
-void ApplicationImpl::Exit (int code)
-{
-  if (is_exit_detected)
-    return;
-
-  is_exit_detected = true;
-  exit_code        = code;
-
-  Notify (exit_signal);
-}
-
-/*
-    Засыпание
-*/
-
-void ApplicationImpl::Suspend ()
-{
-  try
-  {
-    if (suspend_handler && !suspend_handler ())
-      return;
-
-    if (!is_exit_detected)
-      Platform::WaitMessage ();
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
-}
-
-/*
-    Обработка сообщений в очереди сообщений
-*/
-
-void ApplicationImpl::DoEvents ()
-{
-  MessageLoopScope scope (message_loop_count);
-
-  if (do_events_signal.empty ())
-  {
-    if (!is_exit_detected)
-    {
-      while (!Platform::IsMessageQueueEmpty () && !is_exit_detected)
-        Platform::DoNextEvent ();
-    }
-  }
-  else
-  {
-    do_events_signal (); //исключения не блокируются
-  }
-}
-
-void ApplicationImpl::Run ()
-{
-  Platform::RunLoop (this);
-}
-
-/*
-    Оболочки над стандартными вызовами обработки главного цикла приложения
-*/
-
-void ApplicationImpl::DoCustomRunLoop ()
-{
-  MessageLoopScope scope (message_loop_count);
-
-  while (!is_exit_detected)
-  {
-    Platform::UpdateMessageQueue ();
-
-    DoEvents ();
-
-     //если нет обработчиков OnIdle - приостанавливаем приложение
-
-    if (idle_signal.empty () && !ActionQueue::ActionsCount (ActionThread_Main) && !ActionQueue::ActionsCount (ActionThread_Current))
-    {
-      if (!is_exit_detected && Platform::IsMessageQueueEmpty ())
-        Suspend ();
-    }
-    else
-    {
-      OnIdle ();
-    }
-  }
-}
-
-void ApplicationImpl::OnExit (int code)
-{
-  Exit (code);
-}
-
-void ApplicationImpl::ProcessActions (ActionThread thread)
-{
-  size_t count = ActionQueue::ActionsCount (thread);
-  
-  for (size_t i=0; i<count; i++)
-  {
-    try
-    {
-      Action action = ActionQueue::PopAction (thread);
-      
-      if (action.IsEmpty ())
-        continue;
-        
-      action.Perform ();
-    }
-    catch (...)
-    {
-      //подавление исключений
-    }
-  }  
-}
-
-void ApplicationImpl::OnIdle ()
-{
-  ProcessActions (ActionThread_Main);
-  ProcessActions (ActionThread_Current);
-
-  Notify (idle_signal);  
-}
-
-void ApplicationImpl::OnEnterRunLoop ()
-{
-  Notify (enter_run_loop_signal);
-}
-
-/*
-    Подписка на события приложения
-*/
-
-connection ApplicationImpl::RegisterEventHandler (ApplicationEvent event, const Application::EventHandler& handler)
-{
-  switch (event)
-  {
-    case ApplicationEvent_OnExit:         return exit_signal.connect (handler);
-    case ApplicationEvent_OnIdle:         return idle_signal.connect (handler);
-    case ApplicationEvent_OnEnterRunLoop: return enter_run_loop_signal.connect (handler);
-    case ApplicationEvent_OnDoEvents:     return do_events_signal.connect (handler);
-    default:
-      throw xtl::make_argument_exception ("syslib::Application::RegisterEventHandler", "event", event);
-  }
-}
-
-connection ApplicationImpl::RegisterSuspendHandler (const Application::SuspendHandler& handler)
-{
-  return suspend_handler.connect (handler);
-}
-
-/*
-    Оповещение о событиях приложения
-*/
-
-void ApplicationImpl::Notify (ApplicationSignal& signal)
-{
-  try
-  {
-    signal ();
-  }
-  catch (...)
-  {
-    //подавление всех исключений
-  }
-}
-
-/*
     Обёртки над вызовами
 */
 
-void Application::DoEvents ()
+void Application::PushDelegate (IApplicationDelegate* delegate)
 {
-  ApplicationSingleton::Instance ()->DoEvents ();
+  ApplicationSingleton::Instance ()->PushDelegate (delegate);
 }
 
-void Application::Run ()
+void Application::PopDelegate ()
 {
-  ApplicationSingleton::Instance ()->Run ();
+  ApplicationSingleton::Instance ()->PopDelegate ();
+}
+
+void Application::Run (IApplicationDelegate* in_delegate)
+{
+  try
+  {
+    DelegatePtr delegate = in_delegate;
+    
+    if (!delegate)
+      delegate = DelegatePtr (Platform::CreateDefaultApplicationDelegate (), false);
+      
+    try
+    {
+      {
+        ApplicationSingleton::Instance app;
+      
+        app->PushDelegate (delegate.get ());
+      
+        app->EnterMessageLoop ();
+      }
+
+      try
+      {
+        delegate->Run ();
+      }
+      catch (...)
+      {
+        ApplicationSingleton::Instance ()->ExitMessageLoop ();
+        throw;
+      }
+    }
+    catch (...)
+    {
+      ApplicationSingleton::Instance ()->PopDelegate ();
+      throw;
+    }      
+
+    {
+      ApplicationSingleton::Instance app;
+      
+      app->ExitMessageLoop ();      
+      app->PopDelegate ();
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Application::Run");
+    throw;
+  }
 }
 
 bool Application::IsMessageLoop ()
@@ -342,11 +356,6 @@ int Application::GetExitCode ()
 connection Application::RegisterEventHandler (ApplicationEvent event, const EventHandler& handler)
 {
   return ApplicationSingleton::Instance ()->RegisterEventHandler (event, handler);
-}
-
-connection Application::RegisterSuspendHandler (const SuspendHandler& handler)
-{
-  return ApplicationSingleton::Instance ()->RegisterSuspendHandler (handler);
 }
 
 void Application::Sleep (size_t milliseconds)

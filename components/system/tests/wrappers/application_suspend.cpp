@@ -1,38 +1,32 @@
 #include "shared.h"
 
-xtl::connection do_events_connection;
-
 static size_t count = 3;
 
-void on_do_events ()
+void on_do_events (common::Action& action)
 {
   printf ("do_events\n");
 
   if (!--count)
-    do_events_connection.disconnect ();
+  {
+    action.Cancel ();
+  }
 }
 
-bool on_suspend ()
+void on_exit (common::Action&)
 {
-  if (count)
-    return false;
-
-  printf ("suspend\n");
-    
+  printf ("exit\n");
   Application::Exit (0);
-
-  return true;
 }
 
 int main ()
 {
   printf ("Results of application_suspend_test:\n");
-  
+
   try
   {
-    do_events_connection = Application::RegisterEventHandler   (ApplicationEvent_OnDoEvents, &on_do_events);
-    Application::RegisterSuspendHandler (&on_suspend);
-    
+    common::ActionQueue::PushAction (&on_do_events, common::ActionThread_Current, 0, 0);    
+    common::ActionQueue::PushAction (&on_exit, common::ActionThread_Background, 2.0);
+
     Application::Run ();            
   }  
   catch (std::exception& exception)

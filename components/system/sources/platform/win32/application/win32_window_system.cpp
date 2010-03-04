@@ -33,8 +33,8 @@ struct WindowImpl
     : user_data (in_user_data)
     , message_handler (handler)
     , is_cursor_visible (true)
-    , cursor (LoadCursor (GetApplicationInstance (), IDC_ARROW))
     , is_cursor_in_window (false)
+    , cursor (LoadCursor (GetApplicationInstance (), IDC_ARROW))    
   {
   }
 

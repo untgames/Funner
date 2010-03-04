@@ -5,4 +5,7 @@
 
 #include <platform/platform.h>
 
+#include <FBase.h>
+#include <FApp.h>
+
 #endif
