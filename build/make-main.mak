@@ -412,7 +412,7 @@ endef
 
 #Копирование файла на устройство (имя локального файла, имя удалённого файла, имя файла-флага инсталляции)
 define install_target_file
-  $$(warning install src='$1' dst='$2' flag='$3')
+#  $$(warning install src='$1' dst='$2' flag='$3')
 
   $3: $1
 		$$(call $(INSTALL_TOOL),$1,$2)

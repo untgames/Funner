@@ -17,7 +17,8 @@ endif
 #Константы
 ###################################################################################################
 PROFILES          += android no_dll unistd
-REMOTE_DEBUG_DIR  ?= //sdcard/tests/funner
+#REMOTE_DEBUG_DIR  ?= //sdcard/tests/funner
+REMOTE_DEBUG_DIR  ?= //data/misc/tests/funner
 EXE_SUFFIX        :=
 DLL_SUFFIX        := so #no suffix, this is for dll correct dll dispatch at link
 DLL_PREFIX        :=
