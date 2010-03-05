@@ -35,6 +35,9 @@ class ApplicationImpl: private IApplicationListener
         try
         {
           delegate->SetListener (this);
+          
+          if (is_exit_detected)
+            delegate->Exit (exit_code);
 
           UpdateIdleState ();
         }

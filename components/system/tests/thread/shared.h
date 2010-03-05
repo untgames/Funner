@@ -23,6 +23,7 @@ using namespace common;
 void print_log (const char* log, const char* message)
 {
   printf ("%s: %s\n", log, message);
+  fflush (stdout);
 }
 
 #endif
