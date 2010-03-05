@@ -40,7 +40,7 @@ class CarbonTimer
 */
 
 CarbonTimer::CarbonTimer (size_t period_in_milliseconds, const TimerHandler& in_handler, void* in_user_data)
-  : timer (0), handler (in_handler), user_data (in_user_data), log (LOG_NAME)
+  : timer (0), handler (in_handler), user_data (in_user_data), dummy_event (0), log (LOG_NAME)
 {
   try
   {
@@ -64,6 +64,9 @@ CarbonTimer::CarbonTimer (size_t period_in_milliseconds, const TimerHandler& in_
 CarbonTimer::~CarbonTimer ()
 {
   RemoveEventLoopTimer (timer);
+
+  if (dummy_event)
+    ReleaseEvent (dummy_event);
 }
 
 void CarbonTimer::TimerProc (EventLoopTimerRef in_timer, void* user_data)
