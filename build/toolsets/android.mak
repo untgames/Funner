@@ -5,6 +5,10 @@ ifeq ($(strip $(ANDROID_NDK)),)
   $(error "Please set ANDROID_NDK variable in your environment")
 endif
 
+ifeq ($(strip $(ANDROID_SDK)),)
+  $(error "Please set ANDROID_SDK variable in your environment")
+endif
+
 ifeq ($(strip $(CYGHOME)),)
   $(error "Please set CYGHOME in your environment")
 endif
@@ -12,23 +16,27 @@ endif
 ###################################################################################################
 #Константы
 ###################################################################################################
-PROFILES         += android no_dll unistd
-EXE_SUFFIX       :=
-DLL_SUFFIX       := so #no suffix, this is for dll correct dll dispatch at link
-DLL_PREFIX       :=
-NDK_HOST         := windows
-ANDROID_PLATFORM := android-3
-NDK_ROOT         := /$(subst :,,$(call convert_path,$(ANDROID_NDK)))
-ARM_EABI_DIR     := $(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1
-CYGWIN_BIN       := /$(subst :,,$(call convert_path,$(CYGHOME)))/bin
-GCC_TOOLS_DIR    := $(ARM_EABI_DIR)/bin
-COMPILER_GCC     := $(GCC_TOOLS_DIR)/arm-eabi-gcc.exe
-LINKER_GCC       := $(GCC_TOOLS_DIR)/arm-eabi-gcc.exe
-LIB_GCC          := $(GCC_TOOLS_DIR)/arm-eabi-ar
-ADDITIONAL_PATHS += $(CYGWIN_BIN)
-BUILD_PATHS      := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-eabi/4.2.1
-COMMON_CPPFLAGS  += -fexceptions -frtti
-COMMON_CFLAGS    += -mandroid -ffunction-sections -fdata-sections -Os -g \
+PROFILES          += android no_dll unistd
+REMOTE_DEBUG_DIR  ?= //sdcard/tests/funner
+EXE_SUFFIX        :=
+DLL_SUFFIX        := so #no suffix, this is for dll correct dll dispatch at link
+DLL_PREFIX        :=
+NDK_HOST          := windows
+ANDROID_PLATFORM  := android-3
+NDK_ROOT          := /$(subst :,,$(call convert_path,$(ANDROID_NDK)))
+SDK_ROOT          := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
+ARM_EABI_DIR      := $(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.2.1
+CYGWIN_BIN        := /$(subst :,,$(call convert_path,$(CYGHOME)))/bin
+GCC_TOOLS_DIR     := $(ARM_EABI_DIR)/bin
+COMPILER_GCC      := $(GCC_TOOLS_DIR)/arm-eabi-gcc.exe
+LINKER_GCC        := $(GCC_TOOLS_DIR)/arm-eabi-gcc.exe
+LIB_GCC           := $(GCC_TOOLS_DIR)/arm-eabi-ar
+ANDROID_TOOLS_DIR := $(SDK_ROOT)/tools
+ADB               := $(ANDROID_TOOLS_DIR)/adb
+ADDITIONAL_PATHS  += $(CYGWIN_BIN)
+BUILD_PATHS       := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-eabi/4.2.1
+COMMON_CPPFLAGS   += -fexceptions -frtti
+COMMON_CFLAGS     += -mandroid -ffunction-sections -fdata-sections -Os -g \
                     --sysroot=$(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm \
                     -fPIC -fvisibility=hidden -D__NEW__ -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ \
                     -D__ARM_ARCH_5TE__ -DANDROID -DSK_RELEASE -DNDEBUG \
@@ -60,4 +68,25 @@ endef
 
 define tools.lib
 export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.lib,$1,$2,$3,$4,$5,$6,$7,$8,$9)
+endef
+
+###################################################################################################
+#Отладка на устройстве
+###################################################################################################
+
+#Копирование файла на устройство (имя локального файла, имя удалённого файла)
+define tools.install_file
+  $1::
+		@echo -n "Install $$(notdir $2): "
+		@$(ADB) push $2 $(REMOTE_DEBUG_DIR)/$3/$$(notdir $2)
+endef
+
+#Инсталляция файла на целевое устройство 
+define tools.install
+  $(foreach file,$2,$(eval $(call tools.install_file,$1,$(file),$3)))
+endef
+
+#Выполнение команды (команда, каталог запуска, базовый каталог, дополнительные пути поиска библиотек и приложений, файл результатов)
+define tools.run
+$(ADB) shell "chmod 775 $(REMOTE_DEBUG_DIR)/$3/$(notdir $(firstword $1)) && cd $(REMOTE_DEBUG_DIR)/$3/ && $(REMOTE_DEBUG_DIR)/$3/$(notdir $(firstword $1)) $(subst $(firstword $1),,$1) $(if $5, > $(REMOTE_DEBUG_DIR)/$3/$(notdir $5))" $(if $5, && $(ADB) pull $(REMOTE_DEBUG_DIR)/$3/$(notdir $5) "$(CURDIR)/$5")
 endef
