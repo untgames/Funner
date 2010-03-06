@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Manifest>
+    <Id>93bt1p123e</Id>
+    <Secret>9C645DDBA19C71BAD1204DA4DAA7A0B9</Secret>
+    <Privileges>
+    </Privileges>
+    <DeviceProfile>
+        <CPU>ARM11</CPU>
+	      <MinimumHeapSize>200</MinimumHeapSize>
+        <Accelerator3D>OpenGL-ES 1.1</Accelerator3D>
+	      <Accelerator3D>OpenGL-ES 2.0</Accelerator3D>
+        <BluetoothProfile>OPP</BluetoothProfile>
+	      <WifiMode>Ad-hoc</WifiMode>
+	      <Sensor>GPS</Sensor>
+	      <Sensor>Accelerometer</Sensor>
+	      <InputDevice>Touch</InputDevice>
+	      <ScreenSize>480x800</ScreenSize>
+    </DeviceProfile>
+</Manifest>

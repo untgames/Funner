@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Application>
+    <Entry>application</Entry>
+    <Name>
+        <English>Firstapp</English>
+    </Name>
+    <Vendor/>
+    <Description/>
+    <Icons>
+        <MainMenu>firstapp.png</MainMenu>
+        <Setting/>
+        <Ticker/>
+        <QuickPanel/>
+        <LaunchImage/>
+    </Icons>
+</Application>
