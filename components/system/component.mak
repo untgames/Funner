@@ -25,7 +25,7 @@ SYSTEMLIB.SOURCES.iphone.COMPILER_CFLAGS            := -I$(IPHONE_SDK_PATH)/Syst
                                                        -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/QuartzCore.framework/Headers/
 SYSTEMLIB.SOURCES.x11.SOURCE_DIRS                   := sources/platform/x11
 SYSTEMLIB.SOURCES.bada_simulator.SOURCE_DIRS        := sources/platform/win32 sources/platform/win32/thread sources/platform/win32/non_unistd sources/platform/bada/startup_simulator
-SYSTEMLIB.SOURCES.bada_simulator.COMPILER_DEFINES   := SHP USE_FBASE_ALLOCATOR BUILD_DLL WIN32
+SYSTEMLIB.SOURCES.bada_simulator.COMPILER_DEFINES   := #SHP USE_FBASE_ALLOCATOR BUILD_DLL WIN32
 #SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/pthread
 SYSTEMLIB.SOURCES.bada.SOURCE_DIRS                  := sources/platform/bada
 SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/no_threads

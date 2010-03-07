@@ -5,6 +5,7 @@
 
 #include <common/singleton.h>
 
+#include <syslib/window.h>
 #include <syslib/platform/bada.h>
 
 #include <platform/platform.h>
@@ -19,10 +20,21 @@ namespace syslib
 namespace bada
 {
 
+//генерация системного исключения
 void raise (const char* source, result r);
 
+//получение экземпляра текущего приложения
+Osp::App::Application& get_application ();
+
 }
 
 }
+
+//получение числа аргументов при вызове OspMain
+extern "C" int get_osp_main_argc ();
+
+//получение указателя на список аргументов OspMain
+extern "C" const char** get_osp_main_argv ();
+
 
 #endif

@@ -18,7 +18,10 @@ const char*  STDOUT_EXIT_MARKER        = "BADA APPLICATION EXITED. RETURN CODE I
     Статические переменные
 */
 
-static HANDLE stdout_file_handle = 0;
+static HANDLE       stdout_file_handle = 0;
+static int          osp_main_argc      = 0;
+static const char*  osp_main_args []   = {""};
+static const char** osp_main_argv      = osp_main_args;
 
 /*
     Переопределение функций
@@ -156,6 +159,9 @@ int printf (const char* format, ...)
 ///точка входа в приложение
 _EXPORT_ int OspMain (int argc, char *argv [])
 {
+  osp_main_argc = argc;
+  osp_main_argv = (const char**)argv;
+
   const char* env [] = {0};
 
   int result = main (argc, argv, env);
@@ -164,5 +170,20 @@ _EXPORT_ int OspMain (int argc, char *argv [])
   
   close_stdout ();
   
+  osp_main_argc = 0;
+  osp_main_argv = osp_main_args;
+  
   return result;
+}
+
+//получение числа аргументов при вызове OspMain
+int get_osp_main_argc ()
+{
+  return osp_main_argc;
+}
+
+//получение указателя на список аргументов OspMain
+const char** get_osp_main_argv ()
+{
+  return osp_main_argv;
 }

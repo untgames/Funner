@@ -28,6 +28,9 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
       {
         main_thread_id = GetCurrentThreadId ();
         
+        if (listener)
+          listener->OnInitialized ();
+        
         while (!is_exited)
         {
           while (!IsMessageQueueEmpty ())

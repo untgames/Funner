@@ -15,6 +15,9 @@ class IApplicationListener
     
 ///Приложение получило сигнал завершиться
     virtual void OnExit (int code) {}
+    
+///Приложение инициализировано
+    virtual void OnInitialized () {}
 
   protected:
     virtual ~IApplicationListener () {}

@@ -19,6 +19,7 @@ enum ApplicationEvent
   ApplicationEvent_OnIdle,          //событие обработки пользовательских очередей сообщений
   ApplicationEvent_OnRunLoopEnter,  //событие входа в очередь обработки сообщений
   ApplicationEvent_OnRunLoopExit,   //событие выхода из очереди обработки сообщений
+  ApplicationEvent_OnInitialized,   //событие иницализации приложения
 
   ApplicationEvent_Num
 };
@@ -32,8 +33,8 @@ class Application
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка делегата приложения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void PushDelegate (IApplicationDelegate*);
-    static void PopDelegate  ();
+    static void BeginDelegate (IApplicationDelegate*);
+    static void EndDelegate   ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запуск обработки очереди сообщений

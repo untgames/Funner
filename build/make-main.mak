@@ -424,7 +424,7 @@ define install_target_file
 #  $$(warning install src='$1' dst='$2' flag='$3')
 
   $3: $1
-		$$(call $(INSTALL_TOOL),$1,$2)
+		@$$(call $(INSTALL_TOOL),$1,$2)
 		@echo successfull > $$@
 
 endef
@@ -563,7 +563,7 @@ define process_tests_source_dir
   .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2 INSTALL_MODULE.$2 UNINSTALL_MODULE.$2
   
 #»нсталл€ци€
-  ifeq (,$$(filter $1.INSTALLATION_FILES,$$(.VARS)))
+  ifeq (,$$(filter $1.INSTALLATION_FILES,$$(.VARIABLES)))
     $2.INSTALLATION_FILES := $$(foreach file,$(DEFAULT_INSTALLATION_FILES),$$(wildcard $$($2.EXECUTION_DIR)/$$(file)))
   else
     $2.INSTALLATION_FILES := $$($1.INSTALLATION_FILES)

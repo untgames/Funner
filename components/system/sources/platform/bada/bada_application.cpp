@@ -10,9 +10,10 @@ namespace
     Константы
 */
 
-const wchar_t* APPLICATION_NAME   = L"TestApplication";                  //имя приложения
-const wchar_t* APPLICATION_ID     = L"aospd00017";                       //идентификатор приложения
-const wchar_t* APPLICATION_SECRET = L"AF60E5CB8B43BC9650412311E01BAB6C"; //секретный код приложения
+//const char*    LOG_NAME           = "system.bada.application"; //поток протоколирования
+const wchar_t* APPLICATION_NAME   = DEFAULT_APP_NAME;          //имя приложения
+const wchar_t* APPLICATION_ID     = DEFAULT_APP_ID;            //идентификатор приложения
+const wchar_t* APPLICATION_SECRET = DEFAULT_APP_SECRET;        //секретный код приложения
 
 /*
     Описание реализации bada-приложения
@@ -36,6 +37,12 @@ struct ApplicationDelegate: public IApplicationDelegate
     Osp::Base::Collection::ArrayList* args = new Osp::Base::Collection::ArrayList;
 
     args->Construct ();    
+    
+    int          argc = get_osp_main_argc ();
+    const char** argv = get_osp_main_argv ();
+    
+    for (int i= 0; i<argc; i++)
+      args->Add (*(new Osp::Base::String (argv [i])));
 
     result res = Osp::App::Application::Execute (DefaultApplication::CreateInstance, args);
     
@@ -81,11 +88,10 @@ struct ApplicationDelegate: public IApplicationDelegate
 ///Оповещение о старте приложения  
   bool OnAppInitializing (Osp::App::Application& app, Osp::App::AppRegistry& app_registry)
   {
-    Osp::Ui::Controls::Form* form = new Osp::Ui::Controls::Form;
-    
-//    form->Initialize ();
-    
-    app.GetAppFrame ()->GetFrame ()->AddControl (*form);
+    if (listener)
+      listener->OnInitialized ();
+
+//    app.GetAppFrame ()->GetFrame ()->AddControl (*form);
 
     return true;    
   }
@@ -117,6 +123,9 @@ struct ApplicationDelegate: public IApplicationDelegate
   }
 };
 
+//текущее приложение
+DefaultApplication* current_application = 0;
+
 }
 
 typedef common::Singleton<ApplicationDelegate> ApplicationSingleton;
@@ -128,16 +137,24 @@ typedef common::Singleton<ApplicationDelegate> ApplicationSingleton;
 ///Конструктор
 DefaultApplication::DefaultApplication ()
 {
+  if (current_application)
+    throw xtl::format_operation_exception ("syslib::bada::DefaultApplication::DefaultApplication", "Application has already created");
+    
+  current_application = this;
 }
     
 ///Деструктор
 DefaultApplication::~DefaultApplication ()
 {
+  current_application = 0;
 }
   
 ///Создание экземпляра приложения
 Osp::App::Application* DefaultApplication::CreateInstance ()
 {
+  if (current_application)
+    return 0;
+
   return new DefaultApplication;
 }
 
@@ -208,4 +225,26 @@ Osp::App::AppSecret DefaultApplication::GetAppSecret () const
 IApplicationDelegate* Platform::CreateDefaultApplicationDelegate ()
 {
   return &*ApplicationSingleton::Instance ();
+}
+
+/*
+    Получение экземпляра текущего приложения
+*/
+
+namespace syslib
+{
+
+namespace bada
+{
+
+Osp::App::Application& get_application ()
+{
+  if (!current_application)
+    throw xtl::format_operation_exception ("syslib::bada::get_application", "Application has not initialized");
+    
+  return *current_application;
+}
+
+}
+
 }

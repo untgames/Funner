@@ -301,6 +301,15 @@ void Platform::DestroyWindow (window_t handle)
 }
 
 /*
+    Получение платформо-зависимого дескриптора окна
+*/
+
+const void* Platform::GetNativeWindowHandle (window_t handle)
+{
+  return reinterpret_cast<const void*> (handle);
+}
+
+/*
     Заголовок окна
 */
 

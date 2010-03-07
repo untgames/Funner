@@ -8,7 +8,7 @@ namespace bada
 
 void raise (const char* source, result r)
 {
-  throw xtl::format_operation_exception (source, "%s (result=%04x)", GetErrorMessage (r), r);
+  throw xtl::format_operation_exception (source, "Bada error %s (result=%04x)", GetErrorMessage (r), r);
 }
 
 }

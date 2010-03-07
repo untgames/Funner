@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Application>
-    <Entry>application</Entry>
+    <Entry>FunnerTestApplication</Entry>
     <Name>
-        <English>Firstapp</English>
+        <English>FunnerTestApplication</English>
     </Name>
-    <Vendor/>
-    <Description/>
+    <Vendor>UNT Games Studio</Vendor>
+    <Description>This is default funner engine test application</Description>
     <Icons>
-        <MainMenu>firstapp.png</MainMenu>
+        <MainMenu>FunnerTestApplication.png</MainMenu>
         <Setting/>
         <Ticker/>
         <QuickPanel/>

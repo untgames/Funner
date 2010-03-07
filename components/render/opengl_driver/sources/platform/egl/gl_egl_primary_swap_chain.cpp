@@ -111,10 +111,18 @@ struct PrimarySwapChain::Impl
       
         //установка свойств цепочки обмена
         
-      properties.AddProperty ("egl_vendor",      GetEglString (EGL_VENDOR));
-      properties.AddProperty ("egl_version",     GetEglString (EGL_VERSION));
-      properties.AddProperty ("egl_extensions",  GetEglString (EGL_EXTENSIONS));
-      properties.AddProperty ("egl_client_apis", GetEglString (EGL_CLIENT_APIS));
+      try
+      {
+        properties.AddProperty ("egl_vendor",      GetEglString (EGL_VENDOR));
+        properties.AddProperty ("egl_version",     GetEglString (EGL_VERSION));
+        properties.AddProperty ("egl_extensions",  GetEglString (EGL_EXTENSIONS));
+        properties.AddProperty ("egl_client_apis", GetEglString (EGL_CLIENT_APIS));
+      }
+      catch (...)
+      {
+        //исключени€ при вз€тии свойств EGL не €вл€ютс€ критичными дл€ работы
+        //(обход бага egl дл€ bada)
+      }
     }
     catch (...)
     {

@@ -10,6 +10,6 @@ export.link.system.win32.LIBS         := user32
 export.link.system.macosx.LINK_FLAGS  := -framework CoreFoundation
 export.link.system.iphone.LINK_FLAGS  := -framework CoreFoundation -framework Foundation -framework UIKit -framework QuartzCore
 export.link.system.linux.LIBS         := dl pthread
-export.link.system.bada.LIBS          := FApp FBase FUiControls 
+export.link.system.bada.LIBS          := FApp FBase FUiControls FUi FGraphics
 export.link.system.bada.LINK_FLAGS    := -shared 
 export.link.system.bada.LINK_INCLUDES := OspMain

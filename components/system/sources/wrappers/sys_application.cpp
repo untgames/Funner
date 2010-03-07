@@ -23,19 +23,22 @@ class ApplicationImpl: private IApplicationListener
     }      
     
 ///–абота с делегатами
-    void PushDelegate (IApplicationDelegate* delegate)
+    void BeginDelegate (IApplicationDelegate* delegate)
     {          
       try
       {
         if (!delegate)
-          throw xtl::make_null_argument_exception ("", "delegate");                  
+          throw xtl::make_null_argument_exception ("", "delegate");
+          
+        if (current_delegate)
+          throw xtl::format_operation_exception ("", "Application has delegate already");
+          
+        current_delegate = delegate;
 
-        delegates.push (delegate);
-        
         try
         {
           delegate->SetListener (this);
-          
+            
           if (is_exit_detected)
             delegate->Exit (exit_code);
 
@@ -43,31 +46,29 @@ class ApplicationImpl: private IApplicationListener
         }
         catch (...)
         {
-          delegates.pop ();
+          current_delegate = 0;
           throw;
         }
       }
       catch (xtl::exception& e)
       {
-        e.touch ("syslib::Application::PushDelegate");
+        e.touch ("syslib::Application::BeginDelegate");
         throw;
       }
     }
 
-    void PopDelegate ()
+    void EndDelegate ()
     {
       try
       {
-        if (delegates.empty ())
-          throw xtl::format_operation_exception ("", "No delegates in stack");
-
-        delegates.pop ();      
-
-        UpdateIdleState ();
+        if (!current_delegate)
+          return;
+          
+        current_delegate = 0;
       }
       catch (xtl::exception& e)
       {
-        e.touch ("syslib::Application::PopDelegate");
+        e.touch ("syslib::Application::EndDelegate");
         throw;
       }
     }
@@ -77,7 +78,7 @@ class ApplicationImpl: private IApplicationListener
     {            
       if (!message_loop_count++)
       {
-        Notify (enter_run_loop_signal);        
+        Notify (ApplicationEvent_OnRunLoopEnter);
       }
     }
     
@@ -85,7 +86,7 @@ class ApplicationImpl: private IApplicationListener
     {
       if (!--message_loop_count)
       {
-        Notify (exit_run_loop_signal);        
+        Notify (ApplicationEvent_OnRunLoopExit);
       }
     }
     
@@ -103,12 +104,12 @@ class ApplicationImpl: private IApplicationListener
       is_exit_detected = true;
       exit_code        = code;
 
-      Notify (exit_signal);
+      Notify (ApplicationEvent_OnExit);
       
       try
       {
-        if (!delegates.empty ())
-          delegates.top ()->Exit (code);
+        if (current_delegate)
+          current_delegate->Exit (code);
       }
       catch (...)
       {
@@ -128,12 +129,14 @@ class ApplicationImpl: private IApplicationListener
       {
         switch (event)
         {
-          case ApplicationEvent_OnExit:         return exit_signal.connect (handler);
-          case ApplicationEvent_OnRunLoopEnter: return enter_run_loop_signal.connect (handler);
-          case ApplicationEvent_OnRunLoopExit:  return exit_run_loop_signal.connect (handler);
+          case ApplicationEvent_OnExit:
+          case ApplicationEvent_OnRunLoopEnter:
+          case ApplicationEvent_OnRunLoopExit:
+          case ApplicationEvent_OnInitialized:
+            return signals [event].connect (handler);
           case ApplicationEvent_OnIdle:
             UpdateIdleState ();
-            return idle_signal.connect (handler);        
+            return signals [ApplicationEvent_OnIdle].connect (handler);
           default:
             throw xtl::make_argument_exception ("", "event", event);
         }
@@ -149,11 +152,11 @@ class ApplicationImpl: private IApplicationListener
     typedef xtl::signal<void ()> ApplicationSignal;        
     
 ///ќповещение о возникновении событи€
-    void Notify (ApplicationSignal& signal)
+    void Notify (ApplicationEvent event)
     {
       try
       {
-        signal ();
+        signals [event] ();
       }
       catch (...)
       {
@@ -187,7 +190,7 @@ class ApplicationImpl: private IApplicationListener
 ///¬ключен ли Idle режим?
     bool IsIdleEnabled ()
     {
-      return !idle_signal.empty () || ActionQueue::ActionsCount (ActionThread_Main) != 0 || ActionQueue::ActionsCount (ActionThread_Current) != 0;
+      return !signals [ApplicationEvent_OnIdle].empty () || ActionQueue::ActionsCount (ActionThread_Main) != 0 || ActionQueue::ActionsCount (ActionThread_Current) != 0;
     }
 
 ///ќбновление idle-режима
@@ -195,15 +198,28 @@ class ApplicationImpl: private IApplicationListener
     {
       try
       {
-        if (!delegates.empty ())
-          delegates.top ()->SetIdleState (IsIdleEnabled ());
+        if (current_delegate)
+          current_delegate->SetIdleState (IsIdleEnabled ());
       }
       catch (xtl::exception& e)
       {
         e.touch ("syslib::ApplicationImpl::UpdateIdleState");
         throw;
       }
-    }    
+    }
+
+///ќбработка инициализации приложени€
+    void OnInitialized ()
+    {
+      try
+      {
+        Notify (ApplicationEvent_OnInitialized);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }
     
 ///ќбработка idle
     void OnIdle ()
@@ -213,7 +229,7 @@ class ApplicationImpl: private IApplicationListener
         ProcessActions (ActionThread_Main);
         ProcessActions (ActionThread_Current);
 
-        Notify (idle_signal);
+        Notify (ApplicationEvent_OnIdle);
       
         UpdateIdleState ();
       }
@@ -262,18 +278,12 @@ class ApplicationImpl: private IApplicationListener
     }    
     
   private:
-    typedef stl::stack<DelegatePtr> DelegateStack;
-
-  private:
-    DelegateStack        delegates;             //делегаты приложени€
-    ApplicationSignal    idle_signal;           //сигнал обработки событи€ ApplicationEvent_OnIdle
-    ApplicationSignal    exit_signal;           //сигнал обработки событи€ ApplicationEvent_OnExit
-    ApplicationSignal    enter_run_loop_signal; //сигнал обработки событи€ ApplicationEvent_OnRunLoopEnter
-    ApplicationSignal    exit_run_loop_signal;  //сигнал обработки событи€ ApplicationEvent_OnRunLoopExit
-    int                  exit_code;             //код завершени€ приложени€
-    bool                 is_exit_detected;      //получен сигнал завершени€ приложени€
-    size_t               message_loop_count;    //количество вхождений в обработчик очереди сообщений
-    xtl::auto_connection on_push_action;        //в очередь добавлено действие
+    DelegatePtr          current_delegate;               //текущий делегат приложени€        
+    ApplicationSignal    signals [ApplicationEvent_Num]; //сигналы приложени€
+    int                  exit_code;                      //код завершени€ приложени€
+    bool                 is_exit_detected;               //получен сигнал завершени€ приложени€
+    size_t               message_loop_count;             //количество вхождений в обработчик очереди сообщений
+    xtl::auto_connection on_push_action;                 //в очередь добавлено действие
 };
 
 typedef Singleton<ApplicationImpl> ApplicationSingleton;
@@ -282,14 +292,14 @@ typedef Singleton<ApplicationImpl> ApplicationSingleton;
     ќбЄртки над вызовами
 */
 
-void Application::PushDelegate (IApplicationDelegate* delegate)
+void Application::BeginDelegate (IApplicationDelegate* delegate)
 {
-  ApplicationSingleton::Instance ()->PushDelegate (delegate);
+  ApplicationSingleton::Instance ()->BeginDelegate (delegate);
 }
 
-void Application::PopDelegate ()
+void Application::EndDelegate ()
 {
-  ApplicationSingleton::Instance ()->PopDelegate ();
+  ApplicationSingleton::Instance ()->EndDelegate ();
 }
 
 void Application::Run (IApplicationDelegate* in_delegate)
@@ -306,7 +316,7 @@ void Application::Run (IApplicationDelegate* in_delegate)
       {
         ApplicationSingleton::Instance app;
       
-        app->PushDelegate (delegate.get ());
+        app->BeginDelegate (delegate.get ());
       
         app->EnterMessageLoop ();
       }
@@ -323,7 +333,7 @@ void Application::Run (IApplicationDelegate* in_delegate)
     }
     catch (...)
     {
-      ApplicationSingleton::Instance ()->PopDelegate ();
+      ApplicationSingleton::Instance ()->EndDelegate ();
       throw;
     }      
 
@@ -331,7 +341,7 @@ void Application::Run (IApplicationDelegate* in_delegate)
       ApplicationSingleton::Instance app;
       
       app->ExitMessageLoop ();      
-      app->PopDelegate ();
+      app->EndDelegate ();
     }
   }
   catch (xtl::exception& e)

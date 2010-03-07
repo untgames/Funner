@@ -90,7 +90,7 @@ struct Output::Impl
     }
   }
   
-#ifdef _WIN32
+#if defined ( _WIN32 ) && !defined ( BADA )
 
 ///Платформо-зависимая инициализация
   void PlatformInitialize ()

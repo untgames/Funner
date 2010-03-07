@@ -29,6 +29,9 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
       try
       {
         main_thread_id = Platform::GetCurrentThreadId ();
+        
+        if (listener)
+          listener->OnInitialized ();
 
         while (!is_exited)
         {
