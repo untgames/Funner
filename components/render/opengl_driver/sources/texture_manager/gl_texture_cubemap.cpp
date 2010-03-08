@@ -64,11 +64,11 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
   glGetTexLevelParameteriv (GL_PROXY_TEXTURE_CUBE_MAP, 1, GL_TEXTURE_WIDTH, &proxy_width);
 
-  if (!proxy_width)
-  {
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create cubemap texture %ux%u@%s. Reason: proxy texure fail",
-                       tex_desc.width, tex_desc.height, get_name (tex_desc.format));
-  }
+//  if (!proxy_width)
+//  {
+//    throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create cubemap texture %ux%u@%s. Reason: proxy texure fail",
+//                       tex_desc.width, tex_desc.height, get_name (tex_desc.format));
+//  }
     
 #endif
 

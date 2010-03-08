@@ -47,15 +47,15 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
 
     //проверка возможности создания текстуры
 
-  glTexImage2D (GL_PROXY_TEXTURE_2D, 1, gl_internal_format, tex_desc.width, tex_desc.height, 0, gl_uncompressed_format, gl_uncompressed_type, 0);
+//  glTexImage2D (GL_PROXY_TEXTURE_2D, 1, gl_internal_format, tex_desc.width, tex_desc.height, 0, gl_uncompressed_format, gl_uncompressed_type, 0);
 
-  GLint proxy_width = 0;
+//  GLint proxy_width = 0;
 
-  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 1, GL_TEXTURE_WIDTH, &proxy_width);
+//  glGetTexLevelParameteriv (GL_PROXY_TEXTURE_2D, 1, GL_TEXTURE_WIDTH, &proxy_width);
 
-  if (!proxy_width)
-    throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 2D texture %ux%u@%s. Reason: proxy texure fail", tex_desc.width,
-      tex_desc.height, get_name (tex_desc.format));
+//  if (!proxy_width)
+//    throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 2D texture %ux%u@%s. Reason: proxy texure fail", tex_desc.width,
+//      tex_desc.height, get_name (tex_desc.format));
             
 #endif
 
