@@ -2,6 +2,7 @@
 #define RENDER_MID_LEVEL_MANAGER_HEADER
 
 ///???экспортируемые свойства рендеринга из материалов через entity
+///???добавить пустые конструкторы и check_ptr в реализацию
 
 #include <render/mid_level/entity.h>
 #include <render/mid_level/dynamic_resource.h>

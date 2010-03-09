@@ -41,13 +41,9 @@ class EntityImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const PrimitivePtr& Primitive           (size_t level_of_detail);
     void                SetPrimitive        (const PrimitivePtr&, size_t level_of_detail);
+    void                ResetPrimitive      (size_t level_of_detail);
     bool                HasPrimitive        (size_t level_of_detail);
     void                ResetAllPrimitives  ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение обёртки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Entity Wrap ();
 
   private:
     struct Impl;

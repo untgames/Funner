@@ -48,12 +48,12 @@ const RenderTargetPtr& FrameImpl::DepthStencilTarget ()
     Область вывода
 */
 
-void FrameImpl::SetViewport (const Rect&)
+void FrameImpl::SetViewport (const render::mid_level::Rect&)
 {
   throw xtl::make_not_implemented_exception ("render::mid_level::FrameImpl::SetViewport");
 }
 
-const Rect& FrameImpl::Viewport ()
+const render::mid_level::Rect& FrameImpl::Viewport ()
 {
   throw xtl::make_not_implemented_exception ("render::mid_level::FrameImpl::Viewport");
 }
@@ -62,12 +62,12 @@ const Rect& FrameImpl::Viewport ()
     Область отсечения
 */
 
-void FrameImpl::SetScissor (const Rect&)
+void FrameImpl::SetScissor (const render::mid_level::Rect&)
 {
   throw xtl::make_not_implemented_exception ("render::mid_level::FrameImpl::SetScissor");
 }
 
-const Rect& FrameImpl::Scissor ()
+const render::mid_level::Rect& FrameImpl::Scissor ()
 {
   throw xtl::make_not_implemented_exception ("render::mid_level::FrameImpl::Scissor");
 }
@@ -167,7 +167,7 @@ void FrameImpl::SetTechnique (const char* name)
   throw xtl::make_not_implemented_exception ("render::mid_level::FrameImpl::SetTechnique");
 }
 
-const char* FrameImpl::Tehcnique ()
+const char* FrameImpl::Technique ()
 {
   throw xtl::make_not_implemented_exception ("render::mid_level::FrameImpl::Technique");
 }
@@ -209,7 +209,7 @@ void FrameImpl::RemoveAllEntities ()
     Добавление пре-рендеринга и пост-рендеринга
 */
 
-void FrameImpl::AddFrame (FrameOrder order, const Frame& frame)
+void FrameImpl::AddFrame (FrameOrder order, const FramePtr& frame)
 {
   throw xtl::make_not_implemented_exception ("render::mid_level::FrameImpl::AddFrame");
 }
@@ -254,13 +254,4 @@ void FrameImpl::RemoveAll ()
 void FrameImpl::Draw ()
 {
   throw xtl::make_not_implemented_exception ("render::mid_level::FrameImpl::Draw");
-}
-
-/*
-    Получение обёртки
-*/
-
-Frame FrameImpl::Wrap ()
-{
-  return Wrappers::Wrap<Frame> (this);
 }

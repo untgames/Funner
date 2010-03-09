@@ -115,8 +115,8 @@ class Primitive
 ///Работа с линиями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t LinesCount       () const;
-    size_t AddLines         (size_t lines_count, const Line* Lines, const Material& material);
-    void   UpdateLines      (size_t first_lines, size_t lines_count, const Line* Lines);
+    size_t AddLines         (size_t lines_count, const Line* lines, const Material& material);
+    void   UpdateLines      (size_t first_lines, size_t lines_count, const Line* lines);
     void   SetLinesMaterial (size_t first_lines, size_t lines_count, const Material& material);
     void   RemoveLines      (size_t first_lines, size_t lines_count);
     void   RemoveAllLines   ();

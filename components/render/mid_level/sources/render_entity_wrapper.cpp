@@ -1,7 +1,6 @@
 #include "shared.h"
 
 using namespace render::mid_level;
-using namespace render::low_level;
 
 Entity::Entity (EntityImpl* in_impl)
   : impl (in_impl)
@@ -31,7 +30,7 @@ void Entity::SetProperties (const common::PropertyMap& properties)
   return impl->SetProperties (properties);  
 }
 
-const common::PropertyMap& Properties () const
+const common::PropertyMap& Entity::Properties () const
 {
   return impl->Properties ();
 }
@@ -71,14 +70,14 @@ size_t Entity::LodsCount () const
   return impl->LodsCount ();
 }
 
-const mid_level::Primitive& Entity::Primitive (size_t level_of_detail) const
+Primitive Entity::Primitive (size_t level_of_detail) const
 {
-  return impl->Primitive (level_of_detail);
+  return Wrappers::Wrap<render::mid_level::Primitive> (impl->Primitive (level_of_detail));
 }
 
-void Entity::SetPrimitive (const mid_level::Primitive& primitive, size_t level_of_detail)
+void Entity::SetPrimitive (const render::mid_level::Primitive& primitive, size_t level_of_detail)
 {
-  impl->SetPrimitive (Wrappers::Unwrap (primitive), level_of_detail);
+  impl->SetPrimitive (Wrappers::Unwrap<PrimitiveImpl> (primitive), level_of_detail);
 }
 
 void Entity::ResetPrimitive (size_t level_of_detail)

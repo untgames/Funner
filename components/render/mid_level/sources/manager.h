@@ -18,7 +18,7 @@ class RenderManagerImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание окна рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    WindowPtr CreateWindow (const char* name, syslib::Window& window, common::PropertyMap& properties);
+    WindowPtr CreateWindow (syslib::Window& window, common::PropertyMap& properties);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор окон рендеринга
@@ -35,15 +35,13 @@ class RenderManagerImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    PrimitivePtr CreatePrimitive      ();
-    PrimitivePtr CreatePrimitive      (const char* name, ResourceInstanceMode mode = ResourceInstanceMode_Default);
-    FramePtr     CreateFrame          ();
-    TexturePtr   CreateTexture        (const media::Image& image);
-    TexturePtr   CreateTexture        (const media::Image& image, TextureDimension dimension);
-    TexturePtr   CreateTexture2D      (size_t width, size_t height, PixelFormat format);
-    TexturePtr   CreateTexture3D      (size_t width, size_t height, size_t depth, PixelFormat format);
-    TexturePtr   CreateTextureCubemap (size_t size, PixelFormat format);
-    MaterialPtr  CreateMaterial       ();
+    PrimitivePtr CreatePrimitive ();
+    PrimitivePtr CreatePrimitive (const char* name, ResourceInstanceMode mode);
+    FramePtr     CreateFrame     ();
+    TexturePtr   CreateTexture   (const media::Image& image);
+    TexturePtr   CreateTexture   (const media::Image& image, TextureDimension dimension);
+    TexturePtr   CreateTexture   (TextureDimension dimension, size_t width, size_t height, size_t depth, PixelFormat format);
+    MaterialPtr  CreateMaterial  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка ресурсов
@@ -60,11 +58,6 @@ class RenderManagerImpl: public Object
     typedef RenderManager::WindowEventHandler WindowEventHandler;
 
     xtl::connection RegisterWindowEventHandler (RenderManagerWindowEvent event, const WindowEventHandler& handler) const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение обёртки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderManager Wrap ();
 
   private:
     struct Impl;

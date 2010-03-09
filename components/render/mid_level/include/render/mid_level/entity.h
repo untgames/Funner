@@ -63,11 +63,11 @@ class Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с примитивом
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const mid_level::Primitive& Primitive           (size_t level_of_detail = 0) const;
-    void                        SetPrimitive        (const mid_level::Primitive&, size_t level_of_detail = 0);    
-    void                        ResetPrimitive      (size_t level_of_detail = 0);    
-    bool                        HasPrimitive        (size_t level_of_detail = 0) const;
-    void                        ResetAllPrimitives  ();
+    mid_level::Primitive Primitive           (size_t level_of_detail = 0) const;
+    void                 SetPrimitive        (const mid_level::Primitive&, size_t level_of_detail = 0);    
+    void                 ResetPrimitive      (size_t level_of_detail = 0);    
+    bool                 HasPrimitive        (size_t level_of_detail = 0) const;
+    void                 ResetAllPrimitives  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

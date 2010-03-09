@@ -37,8 +37,8 @@ class PrimitiveImpl: public Object
 ///Работа с линиями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t LinesCount       ();
-    size_t AddLines         (size_t lines_count, const Line* Lines, const MaterialPtr& material);
-    void   UpdateLines      (size_t first_lines, size_t lines_count, const Line* Lines);
+    size_t AddLines         (size_t lines_count, const Line* lines, const MaterialPtr& material);
+    void   UpdateLines      (size_t first_lines, size_t lines_count, const Line* lines);
     void   SetLinesMaterial (size_t first_lines, size_t lines_count, const MaterialPtr& material);
     void   RemoveLines      (size_t first_lines, size_t lines_count);
     void   RemoveAllLines   ();
@@ -55,11 +55,6 @@ class PrimitiveImpl: public Object
     void   RemoveAllSprites   ();
     void   ReserveSprites     (size_t sprites_count);
     
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение обёртки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Primitive Wrap ();
-
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;

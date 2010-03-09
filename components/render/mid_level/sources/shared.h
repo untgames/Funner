@@ -5,6 +5,7 @@
 
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/signal.h>
 
 #include <media/image.h>
 
