@@ -9,7 +9,6 @@
 #include <render/mid_level/dynamic_resource.h>
 
 ///???экспортируемые свойства рендеринга из материалов через entity
-///???техники и entity
 
 namespace render
 {
