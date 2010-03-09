@@ -1,93 +1,55 @@
-#ifndef RENDER_MID_LEVEL_ENTITY_HEADER
-#define RENDER_MID_LEVEL_ENTITY_HEADER
-
-#include <common/property_map.h>
-
-#include <math/matrix.h>
-
-#include <render/mid_level/primitive.h>
-
-namespace render
-{
-
-namespace mid_level
-{
-
-//implementation forwards
-class EntityImpl;
-class Wrappers;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Объект рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Entity
+class EntityImpl: public Object
 {
-  friend class Wrappers;
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструкторы / деструктор / присваивание
+///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Entity  (const Entity&);
-    ~Entity ();
-    
-    Entity& operator = (const Entity&);
-    
-    ///????????scene-render properties??? from materials
-    
+    EntityImpl  ();
+    ~EntityImpl ();
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Свойства рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                       SetProperties (const common::PropertyMap&);
-    const common::PropertyMap& Properties    () const;
+    const common::PropertyMap& Properties    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Матрица преобразований
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void               SetTransformation (const math::mat4f&);
-    const math::vec4f& Transformation    () const;
+    const math::vec4f& Transformation    ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с костями (для скиннинга)
 ///  преобразования умножаются на матрицу Entity::Transformation в случае если она не единична
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void               SetJointsCount         (size_t count);
-    size_t             JointsCount            () const;
+    size_t             JointsCount            ();
     void               SetJointTransformation (size_t joint_index, const math::mat4f&);
-    const math::mat4f& JointTransformation    (size_t joint_index) const;
+    const math::mat4f& JointTransformation    (size_t joint_index);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с уровнями детализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t LodsCount () const;
+    size_t LodsCount ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с примитивом
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const mid_level::Primitive& Primitive           (size_t level_of_detail = 0) const;
-    void                        SetPrimitive        (const mid_level::Primitive&, size_t level_of_detail = 0);    
-    void                        ResetPrimitive      (size_t level_of_detail = 0);    
-    bool                        HasPrimitive        (size_t level_of_detail = 0) const;
-    void                        ResetAllPrimitives  ();
+    const PrimitivePtr& Primitive           (size_t level_of_detail);
+    void                SetPrimitive        (const PrimitivePtr&, size_t level_of_detail);
+    bool                HasPrimitive        (size_t level_of_detail);
+    void                ResetAllPrimitives  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обмен
+///Получение обёртки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Swap (Entity&);
-    
+    Entity Wrap ();
+
   private:
-    Entity (EntityImpl*);
-    
-  private:
-    EntityImpl* impl;
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обмен
-///////////////////////////////////////////////////////////////////////////////////////////////////
-void swap (Entity&, Entity&);
-
-}
-
-}
-
-#endif

@@ -7,7 +7,8 @@ TARGETS := RENDER.MID_LEVEL.SOURCES RENDER.MID_LEVEL.TESTS
 RENDER.MID_LEVEL.SOURCES.TYPE             := static-lib
 RENDER.MID_LEVEL.SOURCES.NAME             := funner.render.mid_level
 RENDER.MID_LEVEL.SOURCES.SOURCE_DIRS      := sources
-RENDER.MID_LEVEL.SOURCES.IMPORTS          := compile.render.mid_level compile.common compile.media.image
+RENDER.MID_LEVEL.SOURCES.IMPORTS          := compile.render.mid_level compile.media.image compile.media.geometry \
+                                             compile.media.rfx compile.system compile.render.low_level
 
 #Öåëü ¹2 - RENDER system tests
 RENDER.MID_LEVEL.TESTS.TYPE             := test-suite
