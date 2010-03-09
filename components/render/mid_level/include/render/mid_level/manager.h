@@ -1,14 +1,22 @@
 #ifndef RENDER_MID_LEVEL_MANAGER_HEADER
 #define RENDER_MID_LEVEL_MANAGER_HEADER
 
-#include <render/mid_level/resource_library.h>
-#include <render/mid_level/window.h>
-#include <render/mid_level/entity.h>
-#include <render/mid_level/material.h>
-#include <render/mid_level/texture.h>
-#include <render/mid_level/dynamic_resource.h>
-
 ///???экспортируемые свойства рендеринга из материалов через entity
+
+#include <render/mid_level/entity.h>
+#include <render/mid_level/dynamic_resource.h>
+#include <render/mid_level/material.h>
+#include <render/mid_level/resource_library.h>
+#include <render/mid_level/texture.h>
+#include <render/mid_level/window.h>
+
+namespace syslib
+{
+
+//forward declaration
+class Window;
+
+}
 
 namespace render
 {
@@ -64,14 +72,15 @@ class RenderManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание окна рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Window CreateWindow (syslib::Window& window, common::PropertyMap& properties);
+    mid_level::Window CreateWindow (syslib::Window& window, common::PropertyMap& properties);
+    mid_level::Window CreateWindow (const char* name, syslib::Window& window, common::PropertyMap& properties);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор окон рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t       WindowsCount () const;
-    const Window Window       (size_t index) const;
-          Window Window       (size_t index);
+    size_t                  WindowsCount () const;
+    const mid_level::Window Window       (size_t index) const;
+          mid_level::Window Window       (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание целей рендеринга
@@ -104,7 +113,7 @@ class RenderManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация на события
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (RenderManager& manager, Window& window)> WindowEventHandler;
+    typedef xtl::function<void (RenderManager& manager, mid_level::Window& window)> WindowEventHandler;
 
     xtl::connection RegisterWindowEventHandler (RenderManagerWindowEvent event, const WindowEventHandler& handler) const;
 

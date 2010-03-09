@@ -1,6 +1,25 @@
 #ifndef RENDER_MID_LEVEL_PRIMITIVE_HEADER
 #define RENDER_MID_LEVEL_PRIMITIVE_HEADER
 
+#include <render/mid_level/material.h>
+
+namespace media
+{
+
+namespace geometry
+{
+
+//forward declarations
+class VertexStream;
+class VertexBuffer;
+class IndexBuffer;
+class Mesh;
+class MeshLibrary;
+
+}
+
+}
+
 namespace render
 {
 

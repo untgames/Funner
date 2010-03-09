@@ -1,6 +1,8 @@
 #ifndef RENDER_MID_LEVEL_ENTITY_HEADER
 #define RENDER_MID_LEVEL_ENTITY_HEADER
 
+#include <common/property_map.h>
+
 #include <math/matrix.h>
 
 #include <render/mid_level/primitive.h>
@@ -51,14 +53,6 @@ class Entity
     void               JointsCount            () const;
     void               SetJointTransformation (size_t joint_index, const math::mat4f&);
     const math::mat4f& JointTransformation    (size_t joint_index) const;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Область отсечения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void     SetScissor      (const Viewport&);
-    Viewport Scissor         () const;
-    void     SetScissorState (bool state);
-    bool     ScissorState    () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с уровнями детализации
@@ -68,8 +62,8 @@ class Entity
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с примитивом
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void             SetPrimitive (const Primitive&, size_t level_of_detail = 0);
-    const Primitive& Primitive    (size_t level_of_detail = 0) const;
+    void                        SetPrimitive (const mid_level::Primitive&, size_t level_of_detail = 0);
+    const mid_level::Primitive& Primitive    (size_t level_of_detail = 0) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

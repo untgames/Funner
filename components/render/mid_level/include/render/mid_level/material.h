@@ -9,6 +9,9 @@ namespace rfx
 
 //forward declaration
 class Material;
+class MaterialLibrary;
+class EffectLibrary;
+class ShaderLibrary;
 
 }
 

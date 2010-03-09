@@ -3,7 +3,7 @@
 
 #include <xtl/functional_fwd>
 
-#include <render/frame.h>
+#include <render/mid_level/frame.h>
 
 namespace render
 {
@@ -54,13 +54,11 @@ template <class Resource> class DynamicResourceManager
     static void UnregisterAll ();
 };
 
+//implementation in library
 typedef IDynamicResource<Texture>         DynamicTexture;
 typedef IDynamicResource<Primitive>       DynamicPrimitive;
 typedef DynamicResourceManager<Texture>   DynamicTextureManager;
 typedef DynamicResourceManager<Primitive> DynamicPrimitiveManager;
-
-template DynamicTextureManager;
-template DynamicPrimitiveManager;
 
 }
 
