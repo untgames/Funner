@@ -12,8 +12,10 @@ namespace scene_graph
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum HeightMapEvent
 {
-  HeightMapEvent_OnSizesUpdate,   //обновились размеры поля
-  HeightMapEvent_OnVerticesUpdate //обновились вершины карты высот
+  HeightMapEvent_OnSizesUpdate,    //обновились размеры поля
+  HeightMapEvent_OnVerticesUpdate, //обновились вершины карты высот
+  
+  HeightMapEvent_Num
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,6 +73,8 @@ class HeightMap: public Entity
     typedef xtl::function<void (HeightMap& sender, HeightMapEvent event_id)> EventHandler;    
 
     xtl::connection RegisterEventHandler (HeightMapEvent event, const EventHandler& handler);
+    
+    using Entity::RegisterEventHandler;    
 
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////

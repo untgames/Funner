@@ -11,11 +11,10 @@ typedef xtl::signal<void (HeightMap&, HeightMapEvent)> HeightMapSignal;
 
 struct HeightMap::Impl
 {
-  VertexArray     vertices;               //вершины карты высот
-  size_t          rows_count;             //количество строк
-  size_t          columns_count;          //количество столбцов
-  HeightMapSignal update_vertices_signal; //сигнал обновления вершин
-  HeightMapSignal update_sizes_signal;    //сигнал обновления размеров поля
+  VertexArray     vertices;                     //вершины карты высот
+  size_t          rows_count;                   //количество строк
+  size_t          columns_count;                //количество столбцов
+  HeightMapSignal signals [HeightMapEvent_Num]; //сигналы
   
   Impl () : rows_count (0), columns_count (0) {}
 };
@@ -58,6 +57,9 @@ void HeightMap::SetColumnsCount (size_t columns_count)
 
 void HeightMap::SetCellsCount (size_t rows_count, size_t columns_count)
 {
+  if (rows_count == impl->rows_count && columns_count == impl->columns_count)
+    return;
+
   if (!rows_count && !columns_count)
   {
     impl->vertices.clear ();
@@ -67,11 +69,13 @@ void HeightMap::SetCellsCount (size_t rows_count, size_t columns_count)
 
     try
     {
-      impl->update_sizes_signal (*this, HeightMapEvent_OnSizesUpdate);
+      impl->signals [HeightMapEvent_OnSizesUpdate] (*this, HeightMapEvent_OnSizesUpdate);
     }
     catch (...)
     {      
     }
+    
+    UpdateVerticesNotify ();
     
     return;
   }
@@ -80,12 +84,12 @@ void HeightMap::SetCellsCount (size_t rows_count, size_t columns_count)
 
   if (!rows_count)
     throw xtl::make_null_argument_exception (METHOD_NAME, "rows_count");
-    
+
   if (!columns_count)
     throw xtl::make_null_argument_exception (METHOD_NAME, "columns_count");
-    
+
   VertexArray new_vertices (rows_count * columns_count);
-    
+
   for (size_t i=0, count=stl::min (impl->rows_count, rows_count); i<count; i++)
   {
     const VertexDesc* src = &impl->vertices [i * impl->columns_count];
@@ -98,14 +102,16 @@ void HeightMap::SetCellsCount (size_t rows_count, size_t columns_count)
 
   impl->rows_count    = rows_count;
   impl->columns_count = columns_count;
-  
+
   try
   {
-    impl->update_sizes_signal (*this, HeightMapEvent_OnSizesUpdate);
+    impl->signals [HeightMapEvent_OnSizesUpdate] (*this, HeightMapEvent_OnSizesUpdate);
   }
   catch (...)
   {      
   }  
+  
+  UpdateVerticesNotify ();
 }
 
 size_t HeightMap::RowsCount () const
@@ -158,10 +164,10 @@ void HeightMap::UpdateVerticesNotify ()
 {
   try
   {
-    if (impl->update_vertices_signal.empty ())
+    if (impl->signals [HeightMapEvent_OnVerticesUpdate].empty ())
       return;
 
-    impl->update_vertices_signal (*this, HeightMapEvent_OnVerticesUpdate);
+    impl->signals [HeightMapEvent_OnVerticesUpdate] (*this, HeightMapEvent_OnVerticesUpdate);
   }
   catch (...)
   {
@@ -183,7 +189,7 @@ xtl::connection HeightMap::RegisterEventHandler (HeightMapEvent event, const Eve
       throw xtl::make_argument_exception ("scene_graph::HeightMap::RegisterEventHandler", "event", event);
   }
 
-  return impl->update_vertices_signal.connect (handler);
+  return impl->signals [event].connect (handler);
 }
 
 /*
