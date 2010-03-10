@@ -45,7 +45,6 @@ Controller::Controller (scene_graph::Node& node)
 
 Controller::~Controller ()
 {
-  Detach ();
 }
 
 /*
@@ -64,7 +63,10 @@ void Controller::Release () const
     return;
 
   if (!--impl->ref_count)
+  {
+    const_cast<Controller&> (*this).Detach ();
     delete this;
+  }
 }
 
 size_t Controller::UseCount () const
@@ -94,6 +96,8 @@ void Controller::OnDestroyNode ()
 {
   if (!impl->node)
     return;
+    
+  OnNodeDestroyed ();
 
   impl->node = 0;
 
@@ -102,6 +106,10 @@ void Controller::OnDestroyNode ()
   
   if (impl->owner_mode == ControllerOwnerMode_NodeOwnsController)
     Release ();
+}
+
+void Controller::OnNodeDestroyed ()
+{
 }
 
 /*
