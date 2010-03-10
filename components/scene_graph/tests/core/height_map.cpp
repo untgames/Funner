@@ -36,6 +36,8 @@ void height_map_event_handler (const HeightMap& map, HeightMapEvent event)
     case HeightMapEvent_OnVerticesUpdate:
       printf ("height map vertices updated\n");
       break;
+    default:
+      printf ("unknown height map event occured\n");
   }
 }
 
