@@ -18,8 +18,6 @@ void dump (const HeightMap& map)
       dump (v.normal);
       printf (" color=");
       dump (v.color);
-      printf (" texcoord=");
-      dump (v.tex_coord);
 
       printf ("]\n");
     }
@@ -62,6 +60,12 @@ int main ()
 
   map->SetCellsCount (3, 3);
   
+  dump (*map);
+
+  map->SetVerticesHeight (0.4f);
+  map->SetVerticesNormal (math::vec3f (0.1f, 0.2f, 0.3f));
+  map->SetVerticesColor  (math::vec4f (0.4f, 0.3f, 0.2f, 0.1f));
+
   dump (*map);
 
   return 0;

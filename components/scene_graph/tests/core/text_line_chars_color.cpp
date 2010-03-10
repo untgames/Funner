@@ -1,10 +1,5 @@
 #include "shared.h"
 
-inline void dump (const vec4f& v)
-{
-  printf ("[%+.2f %+.2f %+.2f %+.2f]", v.x, v.y, v.z, v.w);
-}
-
 void print_chars_colors (TextLine::Pointer text_line)
 {
   size_t text_length = text_line->TextLength ();

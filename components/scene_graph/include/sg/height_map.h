@@ -35,9 +35,8 @@ class HeightMap: public Entity
       float       height;
       math::vec3f normal;
       math::vec4f color;
-      math::vec3f tex_coord;
       
-      VertexDesc () : height () {}
+      VertexDesc () : height (0.f) {}
     };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,6 +60,13 @@ class HeightMap: public Entity
           VertexDesc* Vertices ();
     const VertexDesc& Vertex   (size_t row, size_t column) const;
           VertexDesc& Vertex   (size_t row, size_t column);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Групповые операции
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetVerticesHeight (float height);
+    void SetVerticesNormal (const math::vec3f& normal);
+    void SetVerticesColor  (const math::vec4f& color);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение об обновлении вершин

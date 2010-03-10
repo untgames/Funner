@@ -65,6 +65,11 @@ inline void dump (const vec3f& v)
   printf ("[%+.2f %+.2f %+.2f]", v.x, v.y, v.z);
 }
 
+inline void dump (const vec4f& v)
+{
+  printf ("[%+.2f %+.2f %+.2f %+.2f]", v.x, v.y, v.z, v.w);
+}
+
 inline void dump (const quatf& q)
 {
 /*  float pitch, yaw, roll;

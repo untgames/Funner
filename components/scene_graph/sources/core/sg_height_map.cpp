@@ -157,6 +157,28 @@ HeightMap::VertexDesc& HeightMap::Vertex (size_t row, size_t column)
 }
 
 /*
+   Групповые операции
+*/
+
+void HeightMap::SetVerticesHeight (float height)
+{
+  for (VertexArray::iterator iter = impl->vertices.begin (), end = impl->vertices.end (); iter != end; ++iter)
+    iter->height = height;
+}
+
+void HeightMap::SetVerticesNormal (const math::vec3f& normal)
+{
+  for (VertexArray::iterator iter = impl->vertices.begin (), end = impl->vertices.end (); iter != end; ++iter)
+    iter->normal = normal;
+}
+
+void HeightMap::SetVerticesColor (const math::vec4f& color)
+{
+  for (VertexArray::iterator iter = impl->vertices.begin (), end = impl->vertices.end (); iter != end; ++iter)
+    iter->color = color;
+}
+
+/*
     Оповещение об обновлении вершин
 */
 
