@@ -1,7 +1,10 @@
 #ifndef SYSTEMLIB_BADA_SHARED_HEADER
 #define SYSTEMLIB_BADA_SHARED_HEADER
 
+#include <climits>
+
 #include <xtl/common_exceptions.h>
+#include <xtl/intrusive_ptr.h>
 
 #include <common/singleton.h>
 
