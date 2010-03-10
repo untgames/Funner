@@ -186,14 +186,14 @@ void HeightMap::UpdateVerticesNotify ()
 {
   try
   {
-    if (impl->signals [HeightMapEvent_OnVerticesUpdate].empty ())
-      return;
-
-    impl->signals [HeightMapEvent_OnVerticesUpdate] (*this, HeightMapEvent_OnVerticesUpdate);
+    if (!impl->signals [HeightMapEvent_OnVerticesUpdate].empty ())
+      impl->signals [HeightMapEvent_OnVerticesUpdate] (*this, HeightMapEvent_OnVerticesUpdate);
   }
   catch (...)
   {
   }
+  
+  UpdateNotify ();
 }
 
 /*

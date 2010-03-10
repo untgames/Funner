@@ -1818,61 +1818,6 @@ void Node::SetScene (scene_graph::Scene* in_scene)
     ѕрисоединение / отсоединение контроллера
 */
 
-xtl::connection Node::AttachController (const char* controller_name)
-{
-  xtl::any_reference ref;
-  
-  return AttachController (controller_name, ref);
-}
-
-xtl::connection Node::AttachController (const char* controller_name, const char* init_string)
-{
-  xtl::any_reference ref (init_string);
-
-  return AttachController (controller_name, ref);
-}
-
-namespace
-{
-
-//адаптер вызова контроллера
-struct ControllerAdapter
-{
-  typedef xtl::shared_ptr<IController> ControllerPtr;
-
-  ControllerAdapter (IController* in_controller) : controller (in_controller) {}
-  
-  void operator () (float dt) { controller->Update (dt); }
-
-  ControllerPtr controller;
-};
-
-}
-
-xtl::connection Node::AttachController (const char* controller_name, const xtl::any_reference& param)
-{
-  try
-  {
-      //проверка корректности аргументов
-
-    if (!controller_name)
-      throw xtl::make_null_argument_exception ("", "controller_name");
-
-      //создание контроллера
-
-    ControllerAdapter adapter = create_controller (*this, controller_name, param);
-
-      //присоединение контроллера к узлу
-
-    return AttachController (adapter);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("scene_graph::Node::AttachController(const char*, const xtl::any_reference&)");
-    throw;
-  }
-}
-
 xtl::connection Node::AttachController (const UpdateHandler& fn)
 {
   impl->BindToParentUpdateList ();

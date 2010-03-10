@@ -353,9 +353,6 @@ class Node: public xtl::dynamic_cast_root
     typedef xtl::function<void (float dt)> UpdateHandler;
 
     xtl::connection AttachController     (const UpdateHandler&);
-    xtl::connection AttachController     (const char* controller_name);
-    xtl::connection AttachController     (const char* controller_name, const char* init_string);
-    xtl::connection AttachController     (const char* controller_name, const xtl::any_reference& param);
     void            DetachAllControllers ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
