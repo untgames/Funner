@@ -423,15 +423,21 @@ endef
 define install_target_file
 #  $$(warning install src='$1' dst='$2' flag='$3')
 
+ifeq (,$$(filter $3,$$(INSTALLATION_TARGETS)))
+  
   $3: $1
 		@$$(call $(INSTALL_TOOL),$1,$2)
 		@echo successfull > $$@
+		
+  INSTALLATION_TARGETS := $$(INSTALLATION_TARGETS) $3
+		
+endif
 
 endef
 
 #»нсталл€ци€ списка файлов на целевое устройство (им€ модул€, имена локальных файлов, удалЄнный каталог)
 define process_target_file_list_installation_impl
-  ifneq (,$(INSTALL_TOOL))  
+  ifneq (,$(filter $(INSTALL_TOOL),$(.VARIABLES)))  
 
     $1.INSTALLATION_FLAGS_DIR := $$($1.TMP_DIR)/installation_flags/$$(patsubst $$($1.BASE_DIR)/%,%,$3)
     $1.INSTALLATION_FLAGS     := $$($1.INSTALLATION_FLAGS) $$(foreach file,$2,$$($1.INSTALLATION_FLAGS_DIR)/$$(notdir $$(file))$(INSTALLATION_FLAG_SUFFIX))
