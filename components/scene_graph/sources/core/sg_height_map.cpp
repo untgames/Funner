@@ -93,7 +93,7 @@ void HeightMap::SetCellsCount (size_t rows_count, size_t columns_count)
   for (size_t i=0, count=stl::min (impl->rows_count, rows_count); i<count; i++)
   {
     const VertexDesc* src = &impl->vertices [i * impl->columns_count];
-    VertexDesc*       dst = &new_vertices [i * rows_count];
+    VertexDesc*       dst = &new_vertices [i * columns_count];
 
     stl::copy (src, src + stl::min (impl->columns_count, columns_count), dst);
   }

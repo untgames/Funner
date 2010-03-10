@@ -5,6 +5,7 @@
 #include <math/quat.h>
 
 #include <sg/camera.h>
+#include <sg/height_map.h>
 #include <sg/helper.h>
 #include <sg/light.h>
 #include <sg/listener.h>
@@ -89,6 +90,7 @@ const char* SCENE_SPRITE_MODEL_LIBRARY                = "Scene.SpriteModel";
 const char* SCENE_SPRITE_LIBRARY                      = "Scene.Sprite";
 const char* SCENE_TEXT_LINE_LIBRARY                   = "Scene.TextLine";
 const char* SCENE_VISUAL_MODEL_LIBRARY                = "Scene.VisualModel";
+const char* SCENE_HEIGHT_MAP_LIBRARY                  = "Scene.HeightMap";
 const char* BINDER_NAME                               = "SceneGraph";
 const char* COMPONENT_NAME                            = "script.binds.SceneGraph";
 
@@ -967,6 +969,83 @@ void bind_visual_model_library (Environment& environment)
 }
 
 /*
+    Создание карты высот
+*/
+
+HeightMap::Pointer create_height_map ()
+{
+  return HeightMap::Create ();
+}
+
+void set_height_map_cell_height (HeightMap& map, size_t row, size_t column, float height)
+{
+  map.Vertex (row, column).height = height;
+}
+
+float get_height_map_cell_height (HeightMap& map, size_t row, size_t column)
+{
+  return map.Vertex (row, column).height;
+}
+
+void set_height_map_cell_normal (HeightMap& map, size_t row, size_t column, const math::vec3f& normal)
+{
+  map.Vertex (row, column).normal = normal;
+}
+
+const math::vec3f& get_height_map_cell_normal (HeightMap& map, size_t row, size_t column)
+{
+  return map.Vertex (row, column).normal;
+}
+
+void set_height_map_cell_color (HeightMap& map, size_t row, size_t column, const math::vec4f& color)
+{
+  map.Vertex (row, column).color = color;
+}
+
+math::vec4f& get_height_map_cell_color (HeightMap& map, size_t row, size_t column)
+{
+  return map.Vertex (row, column).color;
+}
+
+/*
+   Регистрация библиотеки работы с картами высот
+*/
+
+void bind_height_map_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_HEIGHT_MAP_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+
+    //регистрация функций создания
+
+  lib.Register ("Create", make_invoker (&create_height_map));
+
+    //регистрация операций
+
+  lib.Register ("set_RowsCount",    make_invoker (&HeightMap::SetRowsCount));
+  lib.Register ("set_ColumnsCount", make_invoker (&HeightMap::SetColumnsCount));
+  lib.Register ("get_RowsCount",    make_invoker (&HeightMap::RowsCount));
+  lib.Register ("get_ColumnsCount", make_invoker (&HeightMap::ColumnsCount));
+
+  lib.Register ("SetCellsCount",     make_invoker (&HeightMap::SetCellsCount));
+  lib.Register ("SetVerticesHeight", make_invoker (&HeightMap::SetVerticesHeight));
+  lib.Register ("SetVerticesNormal", make_invoker (&HeightMap::SetVerticesNormal));
+  lib.Register ("SetVerticesColor",  make_invoker (&HeightMap::SetVerticesColor));
+
+  lib.Register ("SetVertexHeight", make_invoker (&set_height_map_cell_height));
+  lib.Register ("GetVertexHeight", make_invoker (&get_height_map_cell_height));
+  lib.Register ("SetVertexNormal", make_invoker (&set_height_map_cell_normal));
+  lib.Register ("GetVertexNormal", make_invoker (&get_height_map_cell_normal));
+  lib.Register ("SetVertexColor",  make_invoker (&set_height_map_cell_color));
+  lib.Register ("GetVertexColor",  make_invoker (&get_height_map_cell_color));
+
+  environment.RegisterType<HeightMap> (SCENE_HEIGHT_MAP_LIBRARY);
+}
+
+/*
     Регистрация библиотеки работы со сценой
 */
 
@@ -990,6 +1069,7 @@ void bind_scene_graph_library (Environment& environment)
   bind_sprite_library             (environment);
   bind_text_line_library          (environment);
   bind_visual_model_library       (environment);
+  bind_height_map_library         (environment);
 }
 
 /*

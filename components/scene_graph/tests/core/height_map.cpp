@@ -68,5 +68,9 @@ int main ()
 
   dump (*map);
 
+  map->SetCellsCount (4, 2);
+
+  dump (*map);
+
   return 0;
 }
