@@ -216,7 +216,7 @@ void Water::PutStorm (const math::vec3f& position, float radius)
       if (v < 0.0f)
         v = 0.0f;
         
-      impl->prev_field [affected_row * columns_count + affected_column] -= v * 0.004f; //magic???
+      impl->prev_field [affected_row * columns_count + affected_column] += v * 0.004f; //magic???
     }
   }
 }

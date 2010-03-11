@@ -16,8 +16,11 @@
 #include <sg/text_line.h>
 #include <sg/visual_model.h>
 
+#include <sg/controllers/water.h>
+
 using namespace script;
 using namespace scene_graph;
+using namespace scene_graph::controllers;
 using namespace math;
 using namespace xtl;
 
@@ -72,10 +75,12 @@ const char* SCENE_STATIC_NODE_SUBTREE_EVENT_LIBRARY   = "Scene.NodeSubTreeEvent"
 const char* SCENE_STATIC_NODE_ARRAY_LINK_MODE_LIBRARY = "Scene.NodeArrayLinkMode";
 const char* SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY  = "Scene.TextLineAlignment";
 const char* SCENE_STATIC_NODE_PROPERTY_TYPE_LIBRARY   = "Scene.NodePropertyType";
+const char* SCENE_CONTROLLER_OWNER_MODE_LIBRARY       = "Scene.ControllerOwnerMode";
 const char* SCENE_SCENE_LIBRARY                       = "Scene.Scene";
 const char* SCENE_NODE_LIBRARY                        = "Scene.Node";
 const char* SCENE_NODE_PROPERTIES_LIBRARY             = "Scene.NodeProperties";
 const char* SCENE_NODE_ARRAY_LIBRARY                  = "Scene.NodeArray";
+const char* SCENE_CONTROLLER_LIBRARY                  = "Scene.Controller";
 const char* SCENE_ENTITY_LIBRARY                      = "Scene.Entity";
 const char* SCENE_PERSPECTIVE_CAMERA_LIBRARY          = "Scene.PerspectiveCamera";
 const char* SCENE_ORTHO_CAMERA_LIBRARY                = "Scene.OrthoCamera";
@@ -91,6 +96,7 @@ const char* SCENE_SPRITE_LIBRARY                      = "Scene.Sprite";
 const char* SCENE_TEXT_LINE_LIBRARY                   = "Scene.TextLine";
 const char* SCENE_VISUAL_MODEL_LIBRARY                = "Scene.VisualModel";
 const char* SCENE_HEIGHT_MAP_LIBRARY                  = "Scene.HeightMap";
+const char* SCENE_CONTROLLER_WATER_LIBRARY            = "Scene.Controllers.Water";
 const char* BINDER_NAME                               = "SceneGraph";
 const char* COMPONENT_NAME                            = "script.binds.SceneGraph";
 
@@ -333,6 +339,10 @@ InvokerRegistry& bind_node_library (Environment& environment)
 
   lib.Register ("BeginUpdate", make_invoker (&Node::BeginUpdate));
   lib.Register ("EndUpdate",   make_invoker (&Node::EndUpdate));
+  
+  lib.Register ("AttachController",     make_invoker (&Node::AttachController));
+  lib.Register ("DetachAllControllers", make_invoker (&Node::DetachAllControllers));
+  lib.Register ("Update",               make_invoker (make_invoker (&Node::Update), make_invoker<void (Node&, float)> (xtl::bind (&Node::Update, _1, _2, NodeTraverseMode_Default))));
 
   lib.Register ("CreateEventHandler",          make_callback_invoker<Node::EventHandler::signature_type> ());
   lib.Register ("CreateSubTreeEventHandler",   make_callback_invoker<Node::SubTreeEventHandler::signature_type> ());
@@ -460,7 +470,38 @@ void bind_node_array_library (Environment& environment)
 }
 
 /*
-   Регистрация библиотеки работы с объектами сцены
+    Регистрация библиотеки работы с контроллером
+*/
+
+void bind_controller_owner_mode_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_CONTROLLER_OWNER_MODE_LIBRARY);
+
+  lib.Register ("get_None",               make_const (ControllerOwnerMode_None));
+  lib.Register ("get_ControllerOwnsNode", make_const (ControllerOwnerMode_ControllerOwnsNode));  
+  lib.Register ("get_NodeOwnsController", make_const (ControllerOwnerMode_NodeOwnsController));
+}
+
+void bind_controller_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_CONTROLLER_LIBRARY);
+
+    //регистрация операций
+
+  lib.Register ("get_AttachedNode",   make_invoker ((Node* (Controller::*)())&Controller::AttachedNode));
+  lib.Register ("get_OwnerMode",      make_invoker (&Controller::OwnerMode));
+  lib.Register ("set_OwnerMode",      make_invoker (&Controller::SetOwnerMode));
+  lib.Register ("ControllerOwnsNode", make_invoker (&Controller::ControllerOwnsNode));
+  lib.Register ("NodeOwnsController", make_invoker (&Controller::NodeOwnsController));
+  lib.Register ("Detach",             make_invoker (&Controller::Detach));
+
+    //регистрация типов данных
+
+  environment.RegisterType<Controller> (SCENE_CONTROLLER_LIBRARY);
+}
+
+/*
+    Регистрация библиотеки работы с объектами сцены
 */
 
 InvokerRegistry& bind_entity_library (Environment& environment)
@@ -1024,11 +1065,14 @@ void bind_height_map_library (Environment& environment)
   lib.Register ("Create", make_invoker (&create_height_map));
 
     //регистрация операций
+    
+  lib.Register ("set_Material", make_invoker (&HeightMap::SetMaterial));
+  lib.Register ("get_Material", make_invoker (&HeightMap::Material));
 
   lib.Register ("set_RowsCount",    make_invoker (&HeightMap::SetRowsCount));
   lib.Register ("set_ColumnsCount", make_invoker (&HeightMap::SetColumnsCount));
   lib.Register ("get_RowsCount",    make_invoker (&HeightMap::RowsCount));
-  lib.Register ("get_ColumnsCount", make_invoker (&HeightMap::ColumnsCount));
+  lib.Register ("get_ColumnsCount", make_invoker (&HeightMap::ColumnsCount));    
 
   lib.Register ("SetCellsCount",     make_invoker (&HeightMap::SetCellsCount));
   lib.Register ("SetVerticesHeight", make_invoker (&HeightMap::SetVerticesHeight));
@@ -1046,30 +1090,61 @@ void bind_height_map_library (Environment& environment)
 }
 
 /*
+    Регистрация библиотеки работы с контроллером воды
+*/
+
+void bind_controller_water_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_CONTROLLER_WATER_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_CONTROLLER_LIBRARY);
+
+    //регистрация функций создания
+
+  lib.Register ("Create", make_invoker (&Water::Create));
+
+    //регистрация операций
+    
+  lib.Register ("set_Viscosity", make_invoker (&Water::SetViscosity));
+  lib.Register ("get_Viscosity", make_invoker (&Water::Viscosity));
+  lib.Register ("PutStorm",      make_invoker (make_invoker (&Water::PutStorm), make_invoker<void (Water&, const math::vec3f&)> (xtl::bind (&Water::PutStorm, _1, _2, 0.05f))));
+  lib.Register ("PutWorldStorm", make_invoker (make_invoker (&Water::PutWorldStorm), make_invoker<void (Water&, const math::vec3f&)> (xtl::bind (&Water::PutWorldStorm, _1, _2, 0.05f))));  
+  
+    //регистрация типа данных
+
+  environment.RegisterType<Water> (SCENE_CONTROLLER_WATER_LIBRARY);
+}
+
+/*
     Регистрация библиотеки работы со сценой
 */
 
 void bind_scene_graph_library (Environment& environment)
 {
-  bind_scene_library              (environment);
-  bind_node_library               (environment);
-  bind_node_properties_library    (environment);
-  bind_node_array_library         (environment);
-  bind_entity_library             (environment);
-  bind_perspective_camera_library (environment);
-  bind_ortho_camera_library       (environment);
-  bind_light_library              (environment);
-  bind_direct_light_library       (environment);
-  bind_spot_light_library         (environment);
-  bind_point_light_library        (environment);
-  bind_box_helper_library         (environment);
-  bind_listener_library           (environment);
-  bind_sound_emitter_library      (environment);
-  bind_sprite_model_library       (environment);
-  bind_sprite_library             (environment);
-  bind_text_line_library          (environment);
-  bind_visual_model_library       (environment);
-  bind_height_map_library         (environment);
+  bind_scene_library                 (environment);
+  bind_node_library                  (environment);
+  bind_node_properties_library       (environment);
+  bind_node_array_library            (environment);
+  bind_controller_owner_mode_library (environment);  
+  bind_controller_library            (environment);
+  bind_entity_library                (environment);
+  bind_perspective_camera_library    (environment);
+  bind_ortho_camera_library          (environment);
+  bind_light_library                 (environment);
+  bind_direct_light_library          (environment);
+  bind_spot_light_library            (environment);
+  bind_point_light_library           (environment);
+  bind_box_helper_library            (environment);
+  bind_listener_library              (environment);
+  bind_sound_emitter_library         (environment);
+  bind_sprite_model_library          (environment);
+  bind_sprite_library                (environment);
+  bind_text_line_library             (environment);
+  bind_visual_model_library          (environment);
+  bind_height_map_library            (environment);
+  bind_controller_water_library      (environment);
 }
 
 /*
