@@ -1,11 +1,17 @@
 #include "shared.h"
 
-const size_t GRID_SIZE = 64;
+const size_t GRID_SIZE = 128;
+
+float frand (float min_value=0.0f, float max_value=1.0f)
+{
+  return min_value + float (rand ()) / RAND_MAX * (max_value - min_value);
+}
 
 struct Test
 {
   TestApplication      application;
   HeightMap::Pointer   height_map;
+  Water::Pointer       water;
   OrthoCamera::Pointer camera;
   Scene                scene;
   Screen               screen;
@@ -23,8 +29,9 @@ struct Test
     height_map->Translate   (0, 0, -5);
     height_map->Scale       (10.0f, 10.0f, 1.0f);
     height_map->SetVerticesColor (math::vec4f (1.0f, 1.0f, 1.0f, 1.0f));
+    height_map->SetVerticesNormal (math::vec3f (0, 0, -1.0f));
     
-    Water::Pointer water = Water::Create (*height_map);
+    water = Water::Create (*height_map);
     
     water->NodeOwnsController ();
 
@@ -87,9 +94,13 @@ struct Test
     {
       static size_t last_update = 0;
 
-      if (common::milliseconds () - last_update >= 40)
+      if (common::milliseconds () - last_update >= 10)
       {
         height_map->Update ((common::milliseconds () - last_update) / 1000.0f);
+        
+        water->PutStorm (math::vec3f (frand ()-0.5, frand ()-0.5, 0.0f));
+        
+        last_update = common::milliseconds ();
       }
 
       application.PostRedraw ();

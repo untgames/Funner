@@ -168,6 +168,8 @@ void RenderableHeightMap::Update ()
             dst_vertex->tex_coord = math::vec2f (x + x_offset [j] + 0.5f, y + y_offset [j] + 0.5f);
           }
         }
+        
+        src_vertex++;
       }
       
       impl->primitive->AddSprites (cells_count, &dst_vertices [0]);

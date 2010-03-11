@@ -69,6 +69,14 @@ const char* REFLECTION_SHADER_SOURCE_CODE =
 "ProjectionMatrix currentProjMatrix\n"
 "ViewMatrix       currentViewMatrix\n"
 "AlphaCompareMode AlwaysPass\n"
+"Normalize 1\n"
+"Texmap0\n"
+"{\n"
+"  TexcoordU SphereMap\n"
+"  TexcoordV SphereMap\n"
+"  Blend     Modulate\n"
+"}\n";
+/*
 "DiffuseColor  1 1 1 1\n"
 "SpecularColor 1 1 1 1\n"
 "Shininess     95\n"
@@ -82,12 +90,7 @@ const char* REFLECTION_SHADER_SOURCE_CODE =
 "  SpecularColor 1 1 1 1\n"
 "  Position  0 0 0\n"
 "}\n"
-"Texmap0\n"
-"{\n"
-"  TexcoordU SphereMap\n"
-"  TexcoordV SphereMap\n"
-"  Blend     Modulate\n"
-"}\n";
+*/
 
 //создание состояния смешивания цветов
 BlendStatePtr create_blend_state
