@@ -15,4 +15,7 @@
   <material id="pistol_material">
     <sprite_profile image="media/pistol_mflash_strip.tga" blend_mode="additive" tiling="1" tile_width="43" tile_height="64"/>
   </material>
+  <material id="water_material">
+    <sprite_profile image="media/sky.jpg" blend_mode="translucent"/>
+  </material>
 </material_library>

@@ -22,10 +22,14 @@
 #include <sg/scene.h>
 #include <sg/camera.h>
 #include <sg/sprite.h>
+#include <sg/height_map.h>
+
+#include <sg/controllers/water.h>
 
 #include <render/scene_render.h>
 
 using namespace scene_graph;
+using namespace scene_graph::controllers;
 using namespace render;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

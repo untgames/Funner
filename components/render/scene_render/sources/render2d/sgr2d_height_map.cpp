@@ -134,7 +134,7 @@ void RenderableHeightMap::Update ()
     {
       impl->primitive->RemoveAllSprites ();
 
-      size_t cells_count = height_map->RowsCount () * height_map->ColumnsCount ();
+      size_t cells_count = (height_map->RowsCount () - 1) * (height_map->ColumnsCount () - 1);
 
       impl->primitive->ReserveSprites (cells_count);
       
@@ -143,13 +143,13 @@ void RenderableHeightMap::Update ()
       const scene_graph::HeightMap::VertexDesc*    src_vertex = height_map->Vertices ();
       render::mid_level::renderer2d::SpriteVertex* dst_vertex = &dst_vertices [0];
       
-      int indices [4] = {0, 1, height_map->ColumnsCount (), height_map->ColumnsCount () + 1};
+      int indices [4] = {0, 1, height_map->ColumnsCount () + 1, height_map->ColumnsCount ()};
       
       float dx = 1.0f / height_map->ColumnsCount (),
             dy = 1.0f / height_map->RowsCount (),
             y  = -0.5f;
             
-      float x_offset [4] = {0, dx, 0, dx},
+      float x_offset [4] = {0, dx, dx, 0},
             y_offset [4] = {0, 0, dy, dy};
 
       for (size_t row=0, rows_count=height_map->RowsCount (); row<rows_count-1; row++, y += dy)
@@ -162,10 +162,10 @@ void RenderableHeightMap::Update ()
           {
             const scene_graph::HeightMap::VertexDesc& v = src_vertex [indices [j]];
             
-            dst_vertex [j].position  = math::vec3f (x + x_offset [j], y + y_offset [j], v.height);
-            dst_vertex [j].normal    = v.normal;
-            dst_vertex [j].color     = v.color;
-            dst_vertex [j].tex_coord = math::vec2f (x + x_offset [j] + 0.5f, y + y_offset [j] + 0.5f);
+            dst_vertex->position  = math::vec3f (x + x_offset [j], y + y_offset [j], v.height);
+            dst_vertex->normal    = v.normal;
+            dst_vertex->color     = v.color;
+            dst_vertex->tex_coord = math::vec2f (x + x_offset [j] + 0.5f, y + y_offset [j] + 0.5f);
           }
         }
       }
