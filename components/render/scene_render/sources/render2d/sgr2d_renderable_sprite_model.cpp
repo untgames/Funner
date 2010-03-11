@@ -294,8 +294,9 @@ void RenderableSpriteModel::Update ()
       
         //установка параметров примитива
 
-      impl->primitive->SetBlendMode (blend_mode);
-      impl->primitive->SetTexture   (texture);      
+      impl->primitive->SetBlendMode  (blend_mode);
+      impl->primitive->SetShaderMode (shader_mode);
+      impl->primitive->SetTexture    (texture);      
 
       impl->current_material_name_hash = material_name_hash;
     }

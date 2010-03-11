@@ -28,6 +28,7 @@
 #include <sg/camera.h>
 #include <sg/scene.h>
 #include <sg/sprite.h>
+#include <sg/height_map.h>
 #include <sg/text_line.h>
 
 #include <render/mid_level/renderer2d.h>
@@ -105,6 +106,27 @@ class RenderableSpriteModel: public Renderable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     RenderableSpriteModel (scene_graph::SpriteModel* model, Render& render);
     ~RenderableSpriteModel ();
+
+  private:
+    void Update ();
+    void DrawCore (IFrame&);
+
+  private:
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Модель, описанная картой высот
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class RenderableHeightMap: public Renderable
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    RenderableHeightMap (scene_graph::HeightMap* model, Render& render);
+    ~RenderableHeightMap ();
 
   private:
     void Update ();
@@ -303,6 +325,7 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
 ///Работа с кэшем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Renderable*     GetRenderable (scene_graph::SpriteModel*);  // дублирование!!!
+    Renderable*     GetRenderable (scene_graph::HeightMap*);  // дублирование!!!
     Renderable*     GetRenderable (scene_graph::TextLine*);     // дублирование!!!
     ITexture*       GetTexture    (const char* file_name, bool need_alpha, RenderQueryPtr& out_query);
     SpriteMaterial* GetMaterial   (const char* name);

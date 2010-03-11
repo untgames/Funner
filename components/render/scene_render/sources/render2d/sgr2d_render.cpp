@@ -302,6 +302,24 @@ Renderable* Render::GetRenderable (scene_graph::SpriteModel* entity)
   return &*renderable;
 }
 
+Renderable* Render::GetRenderable (scene_graph::HeightMap* entity)
+{
+    //попытка найти объект в кэше
+
+  RenderableMap::iterator iter = renderables_cache.find (entity);
+
+  if (iter != renderables_cache.end ())
+    return iter->second.renderable.get ();
+
+    //создание нового спрайта
+
+  RenderablePtr renderable (new RenderableHeightMap (entity, *this), false);
+
+  InsertRenderable (entity, renderable);
+
+  return &*renderable;
+}
+
 Renderable* Render::GetRenderable (scene_graph::TextLine* entity)
 {
     //попытка найти объект в кэше
