@@ -27,7 +27,10 @@ Draw primitive (id=11)
   scissor_state=false
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
-    sprite #0: position=[0.00 0.00 0.00] size=[1.00 1.00] color=[1.00 1.00 1.00 1.00] tex_offset=[0.00 0.84] tex_size=[0.06 0.16]
+    vertex #0: position=[-0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 1.00]
+    vertex #1: position=[0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.06 1.00]
+    vertex #2: position=[0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.06 0.84]
+    vertex #3: position=[-0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 0.84]
 End draw frame (id=10)
 End draw frames (id=2, frame_id=0)
 Destroy frame2d (id=10)

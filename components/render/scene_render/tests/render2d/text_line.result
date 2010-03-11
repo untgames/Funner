@@ -24,10 +24,22 @@ Draw primitive (id=8)
   scissor_state=false
   transform=[[1.00 0.00 0.00] [-0.89 0.00 1.00] [0.00 -0.32 0.00] [0.00 1.00 0.00]]
   sprites (count=4):
-    sprite #0: position=[0.30 0.32 0.00] size=[0.53 0.67] color=[0.10 0.20 0.30 0.40] tex_offset=[0.02 0.09] tex_size=[0.02 0.04]
-    sprite #1: position=[0.80 0.22 0.00] size=[0.36 0.47] color=[0.10 0.20 0.30 0.40] tex_offset=[0.36 0.10] tex_size=[0.01 0.03]
-    sprite #2: position=[1.26 0.21 0.00] size=[0.45 0.45] color=[0.10 0.20 0.30 0.40] tex_offset=[0.68 0.10] tex_size=[0.01 0.03]
-    sprite #3: position=[1.65 0.30 0.00] size=[0.27 0.59] color=[0.10 0.20 0.30 0.40] tex_offset=[0.60 0.09] tex_size=[0.01 0.04]
+    vertex #0: position=[0.03 0.66 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.02 0.13]
+    vertex #1: position=[0.56 0.66 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.04 0.13]
+    vertex #2: position=[0.56 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.04 0.09]
+    vertex #3: position=[0.03 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.02 0.09]
+    vertex #4: position=[0.63 0.45 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.36 0.13]
+    vertex #5: position=[0.98 0.45 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.37 0.13]
+    vertex #6: position=[0.98 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.37 0.10]
+    vertex #7: position=[0.63 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.36 0.10]
+    vertex #8: position=[1.03 0.44 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.68 0.13]
+    vertex #9: position=[1.48 0.44 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.69 0.13]
+    vertex #10: position=[1.48 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.69 0.10]
+    vertex #11: position=[1.03 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.68 0.10]
+    vertex #12: position=[1.52 0.59 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.60 0.13]
+    vertex #13: position=[1.78 0.59 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.61 0.13]
+    vertex #14: position=[1.78 0.00 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.61 0.09]
+    vertex #15: position=[1.52 0.00 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.60 0.09]
 End draw frame (id=7)
 End draw frames (id=2, frame_id=0)
 Begin draw frames (id=2, frame_id=1)
@@ -47,10 +59,22 @@ Draw primitive (id=8)
   scissor_state=false
   transform=[[1.00 0.00 0.00] [-1.78 0.00 1.00] [0.00 -0.66 0.00] [0.00 1.00 0.00]]
   sprites (count=4):
-    sprite #0: position=[0.30 0.32 0.00] size=[0.53 0.67] color=[0.10 0.20 0.30 0.40] tex_offset=[0.02 0.09] tex_size=[0.02 0.04]
-    sprite #1: position=[0.80 0.22 0.00] size=[0.36 0.47] color=[0.10 0.20 0.30 0.40] tex_offset=[0.36 0.10] tex_size=[0.01 0.03]
-    sprite #2: position=[1.26 0.21 0.00] size=[0.45 0.45] color=[0.10 0.20 0.30 0.40] tex_offset=[0.68 0.10] tex_size=[0.01 0.03]
-    sprite #3: position=[1.65 0.30 0.00] size=[0.27 0.59] color=[0.10 0.20 0.30 0.40] tex_offset=[0.60 0.09] tex_size=[0.01 0.04]
+    vertex #0: position=[0.03 0.66 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.02 0.13]
+    vertex #1: position=[0.56 0.66 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.04 0.13]
+    vertex #2: position=[0.56 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.04 0.09]
+    vertex #3: position=[0.03 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.02 0.09]
+    vertex #4: position=[0.63 0.45 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.36 0.13]
+    vertex #5: position=[0.98 0.45 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.37 0.13]
+    vertex #6: position=[0.98 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.37 0.10]
+    vertex #7: position=[0.63 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.36 0.10]
+    vertex #8: position=[1.03 0.44 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.68 0.13]
+    vertex #9: position=[1.48 0.44 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.69 0.13]
+    vertex #10: position=[1.48 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.69 0.10]
+    vertex #11: position=[1.03 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.68 0.10]
+    vertex #12: position=[1.52 0.59 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.60 0.13]
+    vertex #13: position=[1.78 0.59 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.61 0.13]
+    vertex #14: position=[1.78 0.00 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.61 0.09]
+    vertex #15: position=[1.52 0.00 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.60 0.09]
 End draw frame (id=7)
 End draw frames (id=2, frame_id=1)
 Begin draw frames (id=2, frame_id=2)
@@ -70,10 +94,22 @@ Draw primitive (id=8)
   scissor_state=false
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=4):
-    sprite #0: position=[0.30 0.32 0.00] size=[0.53 0.67] color=[0.10 0.20 0.30 0.40] tex_offset=[0.02 0.09] tex_size=[0.02 0.04]
-    sprite #1: position=[0.80 0.22 0.00] size=[0.36 0.47] color=[0.20 0.20 0.03 0.00] tex_offset=[0.36 0.10] tex_size=[0.01 0.03]
-    sprite #2: position=[1.26 0.21 0.00] size=[0.45 0.45] color=[0.20 0.20 0.03 0.00] tex_offset=[0.68 0.10] tex_size=[0.01 0.03]
-    sprite #3: position=[1.65 0.30 0.00] size=[0.27 0.59] color=[0.10 0.20 0.30 0.40] tex_offset=[0.60 0.09] tex_size=[0.01 0.04]
+    vertex #0: position=[0.03 0.66 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.02 0.13]
+    vertex #1: position=[0.56 0.66 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.04 0.13]
+    vertex #2: position=[0.56 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.04 0.09]
+    vertex #3: position=[0.03 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.02 0.09]
+    vertex #4: position=[0.63 0.45 0.00] normal=[0.00 0.00 1.00] color=[0.20 0.20 0.03 0.00] tex_coord=[0.36 0.13]
+    vertex #5: position=[0.98 0.45 0.00] normal=[0.00 0.00 1.00] color=[0.20 0.20 0.03 0.00] tex_coord=[0.37 0.13]
+    vertex #6: position=[0.98 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.20 0.20 0.03 0.00] tex_coord=[0.37 0.10]
+    vertex #7: position=[0.63 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.20 0.20 0.03 0.00] tex_coord=[0.36 0.10]
+    vertex #8: position=[1.03 0.44 0.00] normal=[0.00 0.00 1.00] color=[0.20 0.20 0.03 0.00] tex_coord=[0.68 0.13]
+    vertex #9: position=[1.48 0.44 0.00] normal=[0.00 0.00 1.00] color=[0.20 0.20 0.03 0.00] tex_coord=[0.69 0.13]
+    vertex #10: position=[1.48 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.20 0.20 0.03 0.00] tex_coord=[0.69 0.10]
+    vertex #11: position=[1.03 -0.02 0.00] normal=[0.00 0.00 1.00] color=[0.20 0.20 0.03 0.00] tex_coord=[0.68 0.10]
+    vertex #12: position=[1.52 0.59 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.60 0.13]
+    vertex #13: position=[1.78 0.59 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.61 0.13]
+    vertex #14: position=[1.78 0.00 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.61 0.09]
+    vertex #15: position=[1.52 0.00 0.00] normal=[0.00 0.00 1.00] color=[0.10 0.20 0.30 0.40] tex_coord=[0.60 0.09]
 End draw frame (id=7)
 End draw frames (id=2, frame_id=2)
 Destroy frame2d (id=7)

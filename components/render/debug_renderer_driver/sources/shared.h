@@ -419,22 +419,26 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
 ///Спрайты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t GetSpritesCount  ();
-    void   GetSprite        (size_t index, mid_level::renderer2d::Sprite& sprite);
-    size_t AddSprites       (size_t sprites_count, const mid_level::renderer2d::Sprite* sprites);
-    void   RemoveSprites    (size_t first_sprite, size_t sprites_count);
+    void   AddSprites       (size_t sprites_count, const mid_level::renderer2d::Sprite* sprites);
+    void   AddSprites       (size_t sprites_count, const mid_level::renderer2d::SpriteVertex* verts);
     void   RemoveAllSprites ();
     void   ReserveSprites   (size_t sprites_count);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение вершин спрайта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const mid_level::renderer2d::SpriteVertex* Vertices () const;
+
   private:
-    typedef stl::vector<mid_level::renderer2d::Sprite> SpriteArray;
-    typedef xtl::com_ptr<Texture>                      TexturePtr;
+    typedef stl::vector<mid_level::renderer2d::SpriteVertex> SpriteArray;
+    typedef xtl::com_ptr<Texture>                            TexturePtr;
 
   private:
     math::mat4f                      transform;
     TexturePtr                       texture;
     mid_level::renderer2d::BlendMode blend_mode;
     float                            alpha_reference;
-    SpriteArray                      sprites;
+    SpriteArray                      vertices;
     Viewport                         scissor_rect;
     bool                             scissor_state;
 };

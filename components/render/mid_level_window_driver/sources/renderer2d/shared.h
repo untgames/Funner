@@ -69,6 +69,7 @@ struct DynamicProgramParameters
 struct RenderableVertex
 {
   math::vec3f  position; //положение вершины в пространстве
+  math::vec3f  normal;   //нормаль вершины в пространстве
   math::vec2f  texcoord; //текстурные координаты
   math::vec4ub color;    //цвет вершины
 };
@@ -300,9 +301,8 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
 ///Спрайты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t GetSpritesCount  ();
-    void   GetSprite        (size_t index, mid_level::renderer2d::Sprite& sprite);
-    size_t AddSprites       (size_t sprites_count, const mid_level::renderer2d::Sprite* sprites);
-    void   RemoveSprites    (size_t first_sprite, size_t sprites_count);
+    void   AddSprites       (size_t sprites_count, const mid_level::renderer2d::Sprite* sprites);
+    void   AddSprites       (size_t sprites_count, const mid_level::renderer2d::SpriteVertex* vertices);
     void   RemoveAllSprites ();
     void   ReserveSprites   (size_t sprites_count);
 
@@ -318,14 +318,14 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
     void UpdateRenderableSprites ();
 
   private:
-    typedef stl::vector<mid_level::renderer2d::Sprite>    SpriteArray;
-    typedef xtl::uninitialized_storage<RenderableSprite>  RenderableSpriteArray;
-    typedef xtl::com_ptr<mid_level::renderer2d::ITexture> TexturePtr;
+    typedef stl::vector<mid_level::renderer2d::SpriteVertex>  VertexArray;
+    typedef xtl::uninitialized_storage<RenderableSprite>      RenderableSpriteArray;
+    typedef xtl::com_ptr<mid_level::renderer2d::ITexture>     TexturePtr;
 
   private:
     math::mat4f             transform;                      //матрица преобразований примитива
     TexturePtr              texture;                        //текстура
-    SpriteArray             sprites;                        //массив спрайтов
+    VertexArray             sprite_vertices;                //массив вершин спрайтов
     RenderablePrimitive     renderable_primitive;           //параметры, необходимые для визуализации примитива
     RenderableSpriteArray   renderable_sprites;             //массив визуализируемых спрайтов
     render::low_level::Rect scissor_rect;                   //область отсечения

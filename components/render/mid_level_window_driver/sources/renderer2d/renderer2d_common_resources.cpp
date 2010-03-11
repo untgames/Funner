@@ -191,7 +191,7 @@ SamplerStatePtr create_sampler (IDevice& device)
 //создание объекта расположения входной геометрии
 InputLayoutPtr create_input_layout (IDevice& device)
 {
-  VertexAttribute attributes [3];
+  VertexAttribute attributes [4];
 
   memset (attributes, 0, sizeof (attributes));
 
@@ -215,6 +215,13 @@ InputLayoutPtr create_input_layout (IDevice& device)
   attributes [2].slot     = 0;
   attributes [2].offset   = offsetof (RenderableVertex, color);
   attributes [2].stride   = sizeof (RenderableVertex);
+  
+  attributes [3].semantic = VertexAttributeSemantic_Normal;
+  attributes [3].format   = InputDataFormat_Vector3;
+  attributes [3].type     = InputDataType_Float;
+  attributes [3].slot     = 0;
+  attributes [3].offset   = offsetof (RenderableVertex, normal);
+  attributes [3].stride   = sizeof (RenderableVertex);
 
   InputLayoutDesc layout_desc;
 

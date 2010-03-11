@@ -170,19 +170,19 @@ void Frame::DrawCore ()
       object_tm [2][0], object_tm [2][1], object_tm [2][2], object_tm [2][3],
       object_tm [3][0], object_tm [3][1], object_tm [3][2], object_tm [3][3]);
       
-    size_t sprites_count=primitive.GetSpritesCount ();
+    size_t sprites_count = primitive.GetSpritesCount ();
 
     log.Printf ("  sprites (count=%u):", sprites_count);
+    
+    const SpriteVertex* verts = primitive.Vertices ();
 
-    for (size_t i=0; i<sprites_count; i++)
+    for (size_t i=0; i<sprites_count*4; i++)
     {
-      Sprite s;
+      const SpriteVertex& v = verts [i];
 
-      primitive.GetSprite (i, s);
-
-      log.Printf ("    sprite #%u: position=[%.2f %.2f %.2f] size=[%.2f %.2f] color=[%.2f %.2f %.2f %.2f] tex_offset=[%.2f %.2f] tex_size=[%.2f %.2f]",
-        i, s.position.x, s.position.y, s.position.z, s.size.x, s.size.y, s.color.x, s.color.y, s.color.z, s.color.w, 
-        s.tex_offset.x, s.tex_offset.y, s.tex_size.x, s.tex_size.y);
+      log.Printf ("    vertex #%u: position=[%.2f %.2f %.2f] normal=[%.2f %.2f %.2f] color=[%.2f %.2f %.2f %.2f] tex_coord=[%.2f %.2f]",
+        i, v.position.x, v.position.y, v.position.z, v.normal.x, v.normal.y, v.normal.z, v.color.x, v.color.y, v.color.z, v.color.w, 
+        v.tex_coord.x, v.tex_coord.y);
     }
   }
 }

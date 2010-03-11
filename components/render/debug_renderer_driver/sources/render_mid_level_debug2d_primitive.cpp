@@ -153,48 +153,73 @@ bool Primitive::GetScissorState ()
 //количество спрайтов
 size_t Primitive::GetSpritesCount ()
 {
-  return sprites.size ();
-}
-
-//получение спрайта
-void Primitive::GetSprite (size_t index, Sprite& sprite)
-{
-  if (index >= sprites.size ())
-    throw xtl::make_range_exception ("render::mid_level::debug::renderer2d::Primitive::GetSprite", "index", index, sprites.size ());
-
-  sprite = sprites [index];
+  return vertices.size () / 4;
 }
 
 //добавление спрайтов
-size_t Primitive::AddSprites (size_t sprites_count, const Sprite* sprites_array)
+void Primitive::AddSprites (size_t sprites_count, const Sprite* sprites_array)
 {
-  size_t first = sprites.size ();
+  if (!sprites_count)
+    return;
 
-  sprites.insert (sprites.begin (), sprites_array, sprites_array + sprites_count);
+  if (!sprites_array)
+    throw xtl::make_null_argument_exception ("render::mid_level::debug::render2d::Primitive::AddSprites", "sprites_array");
+
+  stl::vector<SpriteVertex> verts (sprites_count * 4);
   
-  return first;
+  for (size_t i=0; i<sprites_count; i++)
+  {
+    const Sprite& sprite = sprites_array [i];
+    SpriteVertex* vert   = &verts [i * 4];
+    
+    vert [0].position = math::vec3f (sprite.position.x - sprite.size.x / 2.0f, sprite.position.y + sprite.size.y / 2.0f, sprite.position.z);
+    vert [1].position = math::vec3f (sprite.position.x + sprite.size.x / 2.0f, sprite.position.y + sprite.size.y / 2.0f, sprite.position.z);
+    vert [2].position = math::vec3f (sprite.position.x + sprite.size.x / 2.0f, sprite.position.y - sprite.size.y / 2.0f, sprite.position.z);
+    vert [3].position = math::vec3f (sprite.position.x - sprite.size.x / 2.0f, sprite.position.y - sprite.size.y / 2.0f, sprite.position.z);
+
+    vert [0].tex_coord = math::vec2f (sprite.tex_offset.x, sprite.tex_offset.y + sprite.tex_size.y);
+    vert [1].tex_coord = sprite.tex_offset + sprite.tex_size;
+    vert [2].tex_coord = math::vec2f (sprite.tex_offset.x + sprite.tex_size.x, sprite.tex_offset.y);
+    vert [3].tex_coord = sprite.tex_offset;
+    
+    for (size_t j=0; j<4; j++)
+    {
+      vert [j].color  = sprite.color;
+      vert [j].normal = math::vec3f (0, 0, 1.0f);
+    }
+  }
+
+  AddSprites (sprites_count, &verts [0]);
 }
 
-//удаление спрайтов
-void Primitive::RemoveSprites (size_t first_sprite, size_t sprites_count)
+void Primitive::AddSprites (size_t sprites_count, const SpriteVertex* verts)
 {
-  if (first_sprite >= sprites.size ())
+  if (!sprites_count)
     return;
-    
-  if (first_sprite > sprites.size () - sprites_count)
-    sprites_count = sprites.size () - first_sprite;
 
-  sprites.erase (sprites.begin () + first_sprite, sprites.begin () + first_sprite + sprites_count);  
+  if (!verts)
+    throw xtl::make_null_argument_exception ("render::mid_level::debug::render2d::Primitive::AddSprites", "vers");
+
+  vertices.insert (vertices.begin (), verts, verts + sprites_count * 4);
 }
 
 //удаление всех спрайтов
 void Primitive::RemoveAllSprites ()
 {
-  sprites.clear ();
+  vertices.clear ();
 }
 
 //резервирование места для спрайтов
 void Primitive::ReserveSprites (size_t sprites_count)
 {
-  sprites.reserve (sprites_count);
+  vertices.reserve (sprites_count * 4);
+}
+
+/*
+    Получение вершин спрайта
+*/
+
+const SpriteVertex* Primitive::Vertices () const
+{
+  return vertices.empty () ? 0 : &vertices [0];
 }

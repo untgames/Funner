@@ -56,6 +56,17 @@ struct Sprite
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Вершины спрайта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct SpriteVertex
+{
+  math::vec3f position;   //положение вершины
+  math::vec3f normal;     //нормаль вершины
+  math::vec4f color;      //цвет вершины
+  math::vec2f tex_coord;  //текстурная координата
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Примитив
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class IPrimitive: virtual public IObject
@@ -96,12 +107,11 @@ class IPrimitive: virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Спрайты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual size_t GetSpritesCount  () = 0;                                            //количество спрайтов
-    virtual void   GetSprite        (size_t index, Sprite& sprite) = 0;                //получение спрайта
-    virtual size_t AddSprites       (size_t sprites_count, const Sprite* sprites) = 0; //добавление спрайтов
-    virtual void   RemoveSprites    (size_t first_sprite, size_t sprites_count) = 0;   //удаление спрайтов
-    virtual void   RemoveAllSprites () = 0;                                            //удаление всех спрайтов
-    virtual void   ReserveSprites   (size_t sprites_count) = 0;                        //резервирование места для спрайтов
+    virtual size_t GetSpritesCount   () = 0;
+    virtual void   AddSprites        (size_t sprites_count, const Sprite* sprites) = 0;
+    virtual void   AddSprites        (size_t sprites_count, const SpriteVertex* verts) = 0; //группами по 4 вершины
+    virtual void   RemoveAllSprites  () = 0;
+    virtual void   ReserveSprites    (size_t sprites_count) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

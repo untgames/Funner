@@ -156,54 +156,67 @@ bool Primitive::GetScissorState ()
 //количество спрайтов
 size_t Primitive::GetSpritesCount ()
 {
-  return sprites.size ();
-}
-
-//получение спрайта
-void Primitive::GetSprite (size_t index, Sprite& sprite)
-{
-  if (index >= sprites.size ())
-    throw xtl::make_range_exception ("render::mid_level::window_driver::renderer2d::Primitive::GetSprite", "index", index, sprites.size ());
-
-  sprite = sprites [index];
+  return sprite_vertices.size () / SPRITE_VERTICES_COUNT;
 }
 
 //добавление спрайтов
-size_t Primitive::AddSprites (size_t sprites_count, const Sprite* sprites_array)
+void Primitive::AddSprites (size_t sprites_count, const Sprite* sprites_array)
 {
-  size_t first = sprites.size ();
-
   if (!sprites_count)
-    return first;
+    return;
 
   if (!sprites_array)
     throw xtl::make_null_argument_exception ("render::mid_level::window_driver::Primitive::AddSprites", "sprites_array");
+    
+  size_t first = sprite_vertices.size ();
+    
+  sprite_vertices.resize (sprite_vertices.size () + sprites_count * SPRITE_VERTICES_COUNT);
 
-  sprites.insert (sprites.end (), sprites_array, sprites_array + sprites_count);
+  const Sprite* sprite = sprites_array;
+  SpriteVertex* vertex = &sprite_vertices [first];
+
+  for (size_t i=0; i<sprites_count; i++, sprite++, vertex += SPRITE_VERTICES_COUNT)
+  {
+    const math::vec2f &offset = sprite->tex_offset,
+                      &size   = sprite->tex_size;
+                      
+    vertex [0].position = math::vec3f (sprite->position.x - sprite->size.x / 2.0f, sprite->position.y + sprite->size.y / 2.0f, sprite->position.z);
+    vertex [1].position = math::vec3f (sprite->position.x + sprite->size.x / 2.0f, sprite->position.y + sprite->size.y / 2.0f, sprite->position.z);
+    vertex [2].position = math::vec3f (sprite->position.x + sprite->size.x / 2.0f, sprite->position.y - sprite->size.y / 2.0f, sprite->position.z);
+    vertex [3].position = math::vec3f (sprite->position.x - sprite->size.x / 2.0f, sprite->position.y - sprite->size.y / 2.0f, sprite->position.z);
+
+    vertex [0].tex_coord = math::vec2f (offset.x, offset.y + size.y);
+    vertex [1].tex_coord = offset + size;
+    vertex [2].tex_coord = math::vec2f (offset.x + size.x, offset.y);
+    vertex [3].tex_coord = offset;
+
+    for (size_t j=0; j<SPRITE_VERTICES_COUNT; j++)
+    {
+      vertex [j].color  = sprite->color;
+      vertex [j].normal = math::vec3f (0, 0, 1.0f);
+    }
+  }
   
   need_update_renderable_sprites = true;
-
-  return first;
 }
 
-//удаление спрайтов
-void Primitive::RemoveSprites (size_t first_sprite, size_t sprites_count)
+void Primitive::AddSprites (size_t sprites_count, const SpriteVertex* verts)
 {
-  if (first_sprite >= sprites.size ())
+  if (!sprites_count)
     return;
-    
-  if (first_sprite > sprites.size () - sprites_count)
-    sprites_count = sprites.size () - first_sprite;
 
-  sprites.erase (sprites.begin () + first_sprite, sprites.begin () + first_sprite + sprites_count);  
+  if (!verts)
+    throw xtl::make_null_argument_exception ("render::mid_level::window_driver::Primitive::AddSprites", "verts");
 
+  sprite_vertices.insert (sprite_vertices.begin (), verts, verts + sprites_count * SPRITE_VERTICES_COUNT);
+  
   need_update_renderable_sprites = true;
 }
 
 //удаление всех спрайтов
 void Primitive::RemoveAllSprites ()
 {
-  sprites.clear ();
+  sprite_vertices.clear ();
   
   need_update_renderable_sprites = true;
 }
@@ -211,7 +224,7 @@ void Primitive::RemoveAllSprites ()
 //резервирование места для спрайтов
 void Primitive::ReserveSprites (size_t sprites_count)
 {
-  sprites.reserve (sprites_count);
+  sprite_vertices.reserve (sprites_count * SPRITE_VERTICES_COUNT);
 }
 
 /*
@@ -221,36 +234,34 @@ void Primitive::ReserveSprites (size_t sprites_count)
 void Primitive::UpdateRenderableSprites ()
 {
     //обновление содержимого массива спрайтов
+    
+  size_t sprites_count = sprite_vertices.size () / SPRITE_VERTICES_COUNT;
 
   if (need_update_renderable_sprites)
   {
       //изменение размера массива спрайтов
-
-    renderable_sprites.resize (sprites.size (), false);
-    
-      //добавление спрайтов      
       
-    const Sprite*     src_sprite = &sprites [0];
-    RenderableSprite* dst_sprite = renderable_sprites.data ();
+    renderable_sprites.resize (sprites_count, false);
+    
+      //добавление спрайтов
+      
+    const SpriteVertex* src_vertex = &sprite_vertices [0];
+    RenderableSprite*   dst_sprite = renderable_sprites.data ();
 
-    for (size_t count=sprites.size (); count--; src_sprite++, dst_sprite++)
+    for (size_t i=0; i<sprites_count; i++, dst_sprite++)
     {
-      const math::vec2f &offset = src_sprite->tex_offset,
-                        &size   = src_sprite->tex_size;
-      RenderableVertex* verts   = dst_sprite->vertices;
+      RenderableVertex* dst_vertex = dst_sprite->vertices;
 
       dst_sprite->primitive = &renderable_primitive;
-
-      verts [0].texcoord = offset;
-      verts [1].texcoord = math::vec2f (offset.x + size.x, offset.y);
-      verts [2].texcoord = offset + size;
-      verts [3].texcoord = math::vec2f (offset.x, offset.y + size.y);
-
-      const math::vec4ub color ((unsigned char)(src_sprite->color.x * 255.0f), (unsigned char)(src_sprite->color.y * 255.0f),
-                                (unsigned char)(src_sprite->color.z * 255.0f), (unsigned char)(src_sprite->color.w * 255.0f));
       
-      for (size_t i=0; i<SPRITE_VERTICES_COUNT; i++)
-        verts [i].color = color;
+      for (size_t j=0; j<SPRITE_VERTICES_COUNT; j++, dst_vertex++, src_vertex++)
+      {
+        dst_vertex->position  = src_vertex->position;
+        dst_vertex->normal    = src_vertex->normal;
+        dst_vertex->texcoord  = src_vertex->tex_coord;
+        dst_vertex->color     = math::vec4ub ((unsigned char)(src_vertex->color.x * 255.0f), (unsigned char)(src_vertex->color.y * 255.0f),
+         (unsigned char)(src_vertex->color.z * 255.0f), (unsigned char)(src_vertex->color.w * 255.0f));
+      }
     }
     
     need_update_renderable_sprites = false;
@@ -261,20 +272,19 @@ void Primitive::UpdateRenderableSprites ()
   
   if (need_update_transform)
   {
-    const Sprite*     src_sprite = &sprites [0];
-    RenderableSprite* dst_sprite = renderable_sprites.data ();
+    const SpriteVertex* src_vertex = &sprite_vertices [0];
+    RenderableSprite*   dst_sprite = renderable_sprites.data ();
 
-    for (size_t count=sprites.size (); count--; src_sprite++, dst_sprite++)
+    for (size_t i=0; i<sprites_count; i++, dst_sprite++)
     {
-      const math::vec3f& pos   = src_sprite->position;
-      math::vec2f        size  = src_sprite->size * 0.5f;
-      RenderableVertex*  verts = dst_sprite->vertices;
-
-      verts [0].position = transform * math::vec3f (pos.x - size.x, pos.y - size.y, pos.z);
-      verts [1].position = transform * math::vec3f (pos.x + size.x, pos.y - size.y, pos.z);
-      verts [2].position = transform * math::vec3f (pos.x + size.x, pos.y + size.y, pos.z);      
-      verts [3].position = transform * math::vec3f (pos.x - size.x, pos.y + size.y, pos.z);
-    }    
+      RenderableVertex* dst_vertex = dst_sprite->vertices;
+      
+      for (size_t j=0; j<SPRITE_VERTICES_COUNT; j++, dst_vertex++, src_vertex++)
+      {
+        dst_vertex->position = transform * src_vertex->position;
+        dst_vertex->normal   = transform * math::vec4f (src_vertex->normal, 0.0f);
+      }
+    }
 
     need_update_transform = false;
   }  
