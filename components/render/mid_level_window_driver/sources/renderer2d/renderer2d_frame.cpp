@@ -253,6 +253,8 @@ void draw_solid_sprites (RenderContext& context, const RenderableSprite** sprite
         case ShaderMode_Reflection:
           context.device->SSSetProgram (context.resources->GetReflectionProgram ());
           break;
+        default:
+          break;
       }
       
       context.current_shader_mode = shader_mode;
@@ -330,6 +332,8 @@ void draw_blend_sprites (RenderContext& context, const RenderableSprite** sprite
           break;
         case ShaderMode_Reflection:
           context.device->SSSetProgram (context.resources->GetReflectionProgram ());
+          break;
+        default:
           break;
       }
       
