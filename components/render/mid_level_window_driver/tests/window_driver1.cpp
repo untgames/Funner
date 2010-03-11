@@ -38,7 +38,7 @@ class Test: public BasicTest
       primitive2->SetTexture (texture.get ());
 
       primitive1->SetBlendMode (BlendMode_Translucent);
-      primitive2->SetBlendMode (BlendMode_AlphaClamp);
+      primitive2->SetShaderMode (ShaderMode_AlphaClamp);
 
       printf ("Primitive1 sprites count is %u\n", primitive1->GetSpritesCount ());
 

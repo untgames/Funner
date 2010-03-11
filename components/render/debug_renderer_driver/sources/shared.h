@@ -394,6 +394,12 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
     void                             SetTexture (mid_level::renderer2d::ITexture*);
     mid_level::renderer2d::ITexture* GetTexture ();
     size_t                           GetTextureId () { return texture ? texture->Id () : 0; }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Режим шейдинга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                                      SetShaderMode (render::mid_level::renderer2d::ShaderMode mode);
+    render::mid_level::renderer2d::ShaderMode GetShaderMode ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим смешивания цветов
@@ -434,13 +440,14 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
     typedef xtl::com_ptr<Texture>                            TexturePtr;
 
   private:
-    math::mat4f                      transform;
-    TexturePtr                       texture;
-    mid_level::renderer2d::BlendMode blend_mode;
-    float                            alpha_reference;
-    SpriteArray                      vertices;
-    Viewport                         scissor_rect;
-    bool                             scissor_state;
+    math::mat4f                       transform;
+    TexturePtr                        texture;
+    mid_level::renderer2d::BlendMode  blend_mode;
+    mid_level::renderer2d::ShaderMode shader_mode;
+    float                             alpha_reference;
+    SpriteArray                       vertices;
+    Viewport                          scissor_rect;
+    bool                              scissor_state;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

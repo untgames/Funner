@@ -24,6 +24,7 @@ View point=[0.00 0.00 0.00]
 Draw primitive (id=11)
   texture_id=6
   blend=translucent
+  shader=normal
   scissor_state=false
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):

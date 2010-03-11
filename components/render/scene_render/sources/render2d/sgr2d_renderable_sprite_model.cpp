@@ -215,31 +215,37 @@ void RenderableSpriteModel::Update ()
       
         //преобразование режима смешивания цветов
 
-      BlendMode blend_mode;
-      bool      need_alpha;
+      BlendMode                                 blend_mode;
+      render::mid_level::renderer2d::ShaderMode shader_mode;
+      bool                                      need_alpha;
 
       switch (material->BlendMode ())
       {
         default:
         case media::rfx::SpriteBlendMode_None:
-          blend_mode = render::mid_level::renderer2d::BlendMode_None;
-          need_alpha = false;
+          blend_mode  = render::mid_level::renderer2d::BlendMode_None;
+          shader_mode = render::mid_level::renderer2d::ShaderMode_Normal;
+          need_alpha  = false;
           break;
         case media::rfx::SpriteBlendMode_Translucent:
-          blend_mode = render::mid_level::renderer2d::BlendMode_Translucent;
-          need_alpha = false;
+          blend_mode  = render::mid_level::renderer2d::BlendMode_Translucent;
+          shader_mode = render::mid_level::renderer2d::ShaderMode_Normal;
+          need_alpha  = false;
           break;
         case media::rfx::SpriteBlendMode_Mask:
-          blend_mode = render::mid_level::renderer2d::BlendMode_Mask;
-          need_alpha = false;
+          blend_mode  = render::mid_level::renderer2d::BlendMode_Mask;
+          shader_mode = render::mid_level::renderer2d::ShaderMode_Normal;
+          need_alpha  = false;
           break;
         case media::rfx::SpriteBlendMode_Additive:
-          blend_mode = render::mid_level::renderer2d::BlendMode_Additive;
-          need_alpha = false;
+          blend_mode  = render::mid_level::renderer2d::BlendMode_Additive;
+          shader_mode = render::mid_level::renderer2d::ShaderMode_Normal;
+          need_alpha  = false;
           break;
         case media::rfx::SpriteBlendMode_AlphaClamp:
-          blend_mode = render::mid_level::renderer2d::BlendMode_AlphaClamp;
-          need_alpha = true;
+          blend_mode  = render::mid_level::renderer2d::BlendMode_Translucent;
+          shader_mode = render::mid_level::renderer2d::ShaderMode_AlphaClamp;
+          need_alpha  = true;
           break;
       }
 

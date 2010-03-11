@@ -60,6 +60,35 @@ const char* ALPHA_CLAMP_SHADER_SOURCE_CODE =
 "  Blend     Modulate\n"
 "}";
 
+//текст шейдера программы отражения
+const char* REFLECTION_SHADER_SOURCE_CODE =
+"Parameters\n"
+"{\n"
+"  float4x4 currentViewMatrix currentProjMatrix\n"
+"}\n"
+"ProjectionMatrix currentProjMatrix\n"
+"ViewMatrix       currentViewMatrix\n"
+"AlphaCompareMode AlwaysPass\n"
+"DiffuseColor  1 1 1 1\n"
+"SpecularColor 1 1 1 1\n"
+"Shininess     95\n"
+"Normalize 1\n"
+"Light\n"
+"{\n"
+"  Enable 1\n"
+"  Type   Point\n"
+"  AmbientColor  1 1 1 1\n"
+"  DiffuseColor  1 1 1 1\n"
+"  SpecularColor 1 1 1 1\n"
+"  Position  0 0 0\n"
+"}\n"
+"Texmap0\n"
+"{\n"
+"  TexcoordU SphereMap\n"
+"  TexcoordV SphereMap\n"
+"  Blend     Modulate\n"
+"}\n";
+
 //создание состояния смешивания цветов
 BlendStatePtr create_blend_state
  (IDevice&      device,
@@ -273,6 +302,9 @@ CommonResources::CommonResources (IDevice* device)
 
   alpha_clamp_program = create_program (*device, "render.mid_level.window_driver.renderer2d.Renderer.alpha_clamp_program",
                                         ALPHA_CLAMP_SHADER_SOURCE_CODE);
+                                        
+  reflection_program = create_program (*device, "render.mid_level.window_driver.renderer2d.Renderer.reflection_program",
+                                        REFLECTION_SHADER_SOURCE_CODE);
 
   program_parameters_layout = create_program_parameters (*device);
 
@@ -286,7 +318,6 @@ CommonResources::CommonResources (IDevice* device)
   blend_states [BlendMode_Translucent] = create_blend_state (*device, BlendArgument_SourceAlpha, BlendArgument_InverseSourceAlpha);
   blend_states [BlendMode_Mask]        = create_blend_state (*device, true, BlendArgument_Zero, BlendArgument_SourceColor, BlendArgument_SourceAlpha);
   blend_states [BlendMode_Additive]    = create_blend_state (*device, BlendArgument_SourceAlpha, BlendArgument_One);
-  blend_states [BlendMode_AlphaClamp]  = blend_states [BlendMode_None];
 
   depth_stencil_states [0] = create_depth_stencil_state (*device, false);
   depth_stencil_states [1] = create_depth_stencil_state (*device, true);

@@ -141,9 +141,21 @@ void Frame::DrawCore ()
       case BlendMode_Additive:
         log.Printf ("  blend=additive");
         break;
-      case BlendMode_AlphaClamp:
-        log.Printf ("  blend=alpha_clamp");
+      default:
+        break;
+    }
+    
+    switch (primitive.GetShaderMode ())
+    {
+      case ShaderMode_Normal:
+        log.Printf ("  shader=normal");
+        break;
+      case ShaderMode_AlphaClamp:
+        log.Printf ("  shader=alpha_clamp");
         log.Printf ("  alpha_reference=%.2f", primitive.GetAlphaReference ());
+        break;
+      case ShaderMode_Reflection:
+        log.Printf ("  shader=reflection");
         break;
       default:
         break;

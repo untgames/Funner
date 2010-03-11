@@ -20,6 +20,7 @@ Primitive::Primitive ()
   scissor_rect.height = 0;
 
   renderable_primitive.blend_mode      = BlendMode_None;
+  renderable_primitive.shader_mode     = ShaderMode_Normal;
   renderable_primitive.texture         = 0;
   renderable_primitive.alpha_reference = 0.0f;
   renderable_primitive.scissor         = 0;
@@ -87,7 +88,6 @@ void Primitive::SetBlendMode (BlendMode in_blend_mode)
     case BlendMode_Translucent:
     case BlendMode_Mask:
     case BlendMode_Additive:
-    case BlendMode_AlphaClamp:
       break;
     default:
       throw xtl::make_argument_exception ("render::mid_level::window_driver::renderer2d::Primitive::SetBlendMode", "blend_mode", in_blend_mode);
@@ -99,6 +99,30 @@ void Primitive::SetBlendMode (BlendMode in_blend_mode)
 BlendMode Primitive::GetBlendMode ()
 {
   return renderable_primitive.blend_mode;
+}
+
+/*
+    Режим шейдинга
+*/
+
+void Primitive::SetShaderMode (ShaderMode mode)
+{
+  switch (mode)
+  {
+    case ShaderMode_Normal:
+    case ShaderMode_AlphaClamp:
+    case ShaderMode_Reflection:
+      break;
+    default:  
+      throw xtl::make_argument_exception ("render::mid_level::window_driver::renderer2d::Primitive::SetShaderMode", "shader_mode", mode);
+  }
+  
+  renderable_primitive.shader_mode = mode;
+}
+
+ShaderMode Primitive::GetShaderMode ()
+{
+  return renderable_primitive.shader_mode;
 }
 
 /*

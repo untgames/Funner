@@ -11,6 +11,7 @@ using namespace render::mid_level::debug::renderer2d;
 
 Primitive::Primitive ()
   : blend_mode (BlendMode_None)
+  , shader_mode (ShaderMode_Normal)
   , alpha_reference (0.0f)
   , scissor_state (false)
 {
@@ -97,6 +98,30 @@ void Primitive::SetBlendMode (BlendMode in_blend_mode)
 BlendMode Primitive::GetBlendMode ()
 {
   return blend_mode;
+}
+
+/*
+    Режим шейдинга
+*/
+
+void Primitive::SetShaderMode (ShaderMode in_shader_mode)
+{
+  switch (in_shader_mode)
+  {
+    case ShaderMode_Normal:
+    case ShaderMode_AlphaClamp:
+    case ShaderMode_Reflection:
+      break;
+    default:
+      throw xtl::make_argument_exception ("render::mid_level::debug::renderer2d::Primitive::SetShaderMode", "shader_mode", in_shader_mode);
+  }
+  
+  shader_mode = in_shader_mode;
+}
+
+ShaderMode Primitive::GetShaderMode ()
+{
+  return shader_mode;
 }
 
 /*

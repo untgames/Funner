@@ -26,6 +26,7 @@ View point=[0.00 0.00 0.00]
 Draw primitive (id=11)
   texture_id=7
   blend=translucent
+  shader=normal
   scissor_state=false
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
@@ -36,6 +37,7 @@ Draw primitive (id=11)
 Draw primitive (id=11)
   texture_id=7
   blend=translucent
+  shader=normal
   scissor_state=false
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
@@ -46,47 +48,7 @@ Draw primitive (id=11)
 Draw primitive (id=11)
   texture_id=7
   blend=translucent
-  scissor_state=false
-  transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
-  sprites (count=1):
-    vertex #0: position=[-0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 1.00]
-    vertex #1: position=[0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.04 1.00]
-    vertex #2: position=[0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.04 0.96]
-    vertex #3: position=[-0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 0.96]
-End draw frame (id=13)
-Begin draw frame (id=12)
-Set render targets: render-target=7, depth-stencil-target=8
-Clear render target [0.00 0.00 0.00 0.00]
-Clear depth-stencil target [1.000 0]
-End draw frame (id=12)
-Begin draw frame (id=13)
-Set render targets: render-target=7, depth-stencil-target=8
-Set viewport (left=0, top=0, width=256, height=512)
-Projection matrix=[[2.00 0.00 0.00] [-1.00 0.00 2.00] [0.00 -1.00 0.00] [0.00 2.00 -1.00]]
-View point=[0.00 0.00 0.00]
-Draw primitive (id=11)
-  texture_id=7
-  blend=translucent
-  scissor_state=false
-  transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
-  sprites (count=1):
-    vertex #0: position=[-0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 1.00]
-    vertex #1: position=[0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.04 1.00]
-    vertex #2: position=[0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.04 0.96]
-    vertex #3: position=[-0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 0.96]
-Draw primitive (id=11)
-  texture_id=7
-  blend=translucent
-  scissor_state=false
-  transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
-  sprites (count=1):
-    vertex #0: position=[-0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 1.00]
-    vertex #1: position=[0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.04 1.00]
-    vertex #2: position=[0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.04 0.96]
-    vertex #3: position=[-0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 0.96]
-Draw primitive (id=11)
-  texture_id=7
-  blend=translucent
+  shader=normal
   scissor_state=false
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
@@ -108,6 +70,7 @@ View point=[0.00 0.00 0.00]
 Draw primitive (id=11)
   texture_id=7
   blend=translucent
+  shader=normal
   scissor_state=false
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
@@ -118,6 +81,7 @@ Draw primitive (id=11)
 Draw primitive (id=11)
   texture_id=7
   blend=translucent
+  shader=normal
   scissor_state=false
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
@@ -128,6 +92,51 @@ Draw primitive (id=11)
 Draw primitive (id=11)
   texture_id=7
   blend=translucent
+  shader=normal
+  scissor_state=false
+  transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
+  sprites (count=1):
+    vertex #0: position=[-0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 1.00]
+    vertex #1: position=[0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.04 1.00]
+    vertex #2: position=[0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.04 0.96]
+    vertex #3: position=[-0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 0.96]
+End draw frame (id=13)
+Begin draw frame (id=12)
+Set render targets: render-target=7, depth-stencil-target=8
+Clear render target [0.00 0.00 0.00 0.00]
+Clear depth-stencil target [1.000 0]
+End draw frame (id=12)
+Begin draw frame (id=13)
+Set render targets: render-target=7, depth-stencil-target=8
+Set viewport (left=0, top=0, width=256, height=512)
+Projection matrix=[[2.00 0.00 0.00] [-1.00 0.00 2.00] [0.00 -1.00 0.00] [0.00 2.00 -1.00]]
+View point=[0.00 0.00 0.00]
+Draw primitive (id=11)
+  texture_id=7
+  blend=translucent
+  shader=normal
+  scissor_state=false
+  transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
+  sprites (count=1):
+    vertex #0: position=[-0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 1.00]
+    vertex #1: position=[0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.04 1.00]
+    vertex #2: position=[0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.04 0.96]
+    vertex #3: position=[-0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 0.96]
+Draw primitive (id=11)
+  texture_id=7
+  blend=translucent
+  shader=normal
+  scissor_state=false
+  transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
+  sprites (count=1):
+    vertex #0: position=[-0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 1.00]
+    vertex #1: position=[0.50 0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.04 1.00]
+    vertex #2: position=[0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.04 0.96]
+    vertex #3: position=[-0.50 -0.50 0.00] normal=[0.00 0.00 1.00] color=[1.00 1.00 1.00 1.00] tex_coord=[0.00 0.96]
+Draw primitive (id=11)
+  texture_id=7
+  blend=translucent
+  shader=normal
   scissor_state=false
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):
@@ -149,6 +158,7 @@ View point=[0.00 0.00 0.00]
 Draw primitive (id=11)
   texture_id=7
   blend=translucent
+  shader=normal
   scissor_state=false
   transform=[[1.00 0.00 0.00] [0.00 0.00 1.00] [0.00 0.00 0.00] [0.00 1.00 0.00]]
   sprites (count=1):

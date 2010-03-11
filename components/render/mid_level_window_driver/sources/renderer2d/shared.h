@@ -79,10 +79,11 @@ struct RenderableVertex
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RenderablePrimitive
 {
-  float                            alpha_reference; //параметр для альфа-теста
-  render::low_level::ITexture*     texture;         //текстура
-  render::low_level::Rect*         scissor;         //область отсечения
-  mid_level::renderer2d::BlendMode blend_mode;      //режим смешивания цветов
+  float                             alpha_reference; //параметр для альфа-теста
+  render::low_level::ITexture*      texture;         //текстура
+  render::low_level::Rect*          scissor;         //область отсечения
+  mid_level::renderer2d::BlendMode  blend_mode;      //режим смешивания цветов
+  mid_level::renderer2d::ShaderMode shader_mode;     //режим шейдинга
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,6 +113,7 @@ class CommonResources : public Object
     render::low_level::IDepthStencilState*       GetDepthStencilState (bool depth_write_enabled);
     render::low_level::IProgram*                 GetDefaultProgram    () { return default_program.get (); }
     render::low_level::IProgram*                 GetAlphaClampProgram () { return alpha_clamp_program.get (); }
+    render::low_level::IProgram*                 GetReflectionProgram () { return reflection_program.get (); }
     render::low_level::IProgramParametersLayout* GetProgramParametersLayout () { return program_parameters_layout.get (); }
     render::low_level::ISamplerState*            GetSamplerState      () { return sampler.get (); }
     render::low_level::IInputLayout*             GetInputLayout       () { return input_layout.get (); }
@@ -122,6 +124,7 @@ class CommonResources : public Object
     DepthStencilStatePtr       depth_stencil_states [2];
     ProgramPtr                 default_program;
     ProgramPtr                 alpha_clamp_program;
+    ProgramPtr                 reflection_program;
     ProgramParametersLayoutPtr program_parameters_layout;
     SamplerStatePtr            sampler;
     InputLayoutPtr             input_layout;
@@ -282,6 +285,12 @@ class Primitive: virtual public mid_level::renderer2d::IPrimitive, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                             SetBlendMode (mid_level::renderer2d::BlendMode blend_mode);
     mid_level::renderer2d::BlendMode GetBlendMode ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Режим шейдинга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                              SetShaderMode (mid_level::renderer2d::ShaderMode mode);
+    mid_level::renderer2d::ShaderMode GetShaderMode ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка параметра для работы альфа-теста
