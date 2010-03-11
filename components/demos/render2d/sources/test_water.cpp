@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const size_t GRID_SIZE = 128;
+const size_t GRID_SIZE = 80;
 
 float frand (float min_value=0.0f, float max_value=1.0f)
 {
@@ -26,10 +26,10 @@ struct Test
 
     height_map->SetMaterial ("water_material");
     height_map->BindToScene (scene);
-    height_map->Translate   (0, 0, -5);
+    height_map->Translate   (0, 0, 15);
     height_map->Scale       (10.0f, 10.0f, 1.0f);
     height_map->SetVerticesColor (math::vec4f (1.0f, 1.0f, 1.0f, 1.0f));
-    height_map->SetVerticesNormal (math::vec3f (0, 0, -1.0f));
+//    height_map->SetVerticesNormal (normalize (math::vec3f (1.0f, 0, 1.0f)));
     
     water = Water::Create (*height_map);
     
@@ -39,12 +39,12 @@ struct Test
 
     camera->BindToScene (scene);
     camera->SetName     ("Camera1");
-    camera->SetPosition (0, 0, -3);
+    camera->SetPosition (0, 0, 0);
     camera->SetLeft     (-10);
     camera->SetRight    (10);
     camera->SetTop      (10);
     camera->SetBottom   (-10);
-    camera->SetZNear    (-20);
+    camera->SetZNear    (0);
     camera->SetZFar     (20);
 
       //создание областей вывода
@@ -98,7 +98,7 @@ struct Test
       {
         height_map->Update ((common::milliseconds () - last_update) / 1000.0f);
         
-        water->PutStorm (math::vec3f (frand ()-0.5, frand ()-0.5, 0.0f));
+//        water->PutStorm (math::vec3f (frand ()-0.5, frand ()-0.5, 0.0f), 0.1);
         
         last_update = common::milliseconds ();
       }

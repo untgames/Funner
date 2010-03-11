@@ -11,6 +11,7 @@ namespace
 */
 
 const float DEFAULT_VISCOSITY = 0.1f;  //вязкость по умолчанию
+const float PLANE_CURVATURE   = 0.1f;  //кривизна поверхности
 
 }
 
@@ -86,32 +87,36 @@ void Water::Update (float)
   if (!impl->prev_field || !impl->next_field || !impl->height_map)
     return;
     
-  HeightMap::VertexDesc* vertices      = impl->height_map->Vertices ();
-  float                  normal_z      = -4.0f / impl->height_map->RowsCount (), //magic value???
-                         viscosity     = impl->viscosity;
   int                    rows_count    = (int)impl->height_map->RowsCount (),
                          columns_count = (int)impl->height_map->ColumnsCount ();
+  HeightMap::VertexDesc* vertices      = impl->height_map->Vertices ();
+  float                  normal_z      = -4.0f / impl->height_map->RowsCount (), //magic value???
+                         viscosity     = impl->viscosity,
+                         ndy           = PLANE_CURVATURE / rows_count,
+                         ny            = -PLANE_CURVATURE / 2.0f + ndy;
 
-  for (int row=1; row<rows_count-1; row++)
+  for (int row=1; row<rows_count-1; row++, ny += ndy)
   {
     size_t                 index            = row * impl->height_map->ColumnsCount () + 1;
     HeightMap::VertexDesc* vertex           = &vertices [index];
     const float*           prev_field_value = &impl->prev_field [index];
     float*                 next_field_value = &impl->next_field [index];
+    float                  ndx              = PLANE_CURVATURE / columns_count,
+                           nx               = -PLANE_CURVATURE / 2.0f + ndx;
     
-    for (int column=1; column<columns_count-1; column++, vertex++, prev_field_value++, next_field_value++)
+    for (int column=1; column<columns_count-1; column++, vertex++, prev_field_value++, next_field_value++, nx += ndx)
     {
       vertex->height = *prev_field_value;
       vertex->normal = math::vec3f (prev_field_value [-columns_count] - prev_field_value [columns_count],
                                     prev_field_value [-1] - prev_field_value [1],
-                                    normal_z);
+                                    -normal_z);                                    
                                     
-//      vertex->normal.z = -sqrt (1.0f - vertex->normal.x * vertex->normal.x + vertex->normal.y * vertex->normal.y);
+      vertex->normal.z = sqrt (1.0f - vertex->normal.x * vertex->normal.x - vertex->normal.y * vertex->normal.y);
                                     
       float laplas = (prev_field_value [-columns_count] + prev_field_value [columns_count] +
                      prev_field_value [1] + prev_field_value [-1]) * 0.25f - *prev_field_value;
 
-      *next_field_value = ((2.0f - viscosity) * *prev_field_value - *prev_field_value * (1.0f - viscosity) + laplas);
+      *next_field_value = (2.0f - viscosity) * *prev_field_value - *next_field_value * (1.0f - viscosity) + laplas;
     }
   }
 
@@ -188,12 +193,12 @@ void Water::OnNodeDestroyed ()
 void Water::PutStorm (const math::vec3f& position, float radius)
 {
   if (!impl->height_map)
-    return;
+    return;    
 
   int    storm_rows    = (int)(impl->height_map->RowsCount () * radius),
          storm_columns = (int)(impl->height_map->ColumnsCount () * radius),
-         row           = (int)((position.x + 0.5f) * impl->height_map->RowsCount ()),
-         column        = (int)((position.y + 0.5f) * impl->height_map->ColumnsCount ()),
+         row           = (int)((position.y + 0.5f) * impl->height_map->RowsCount ()),
+         column        = (int)((position.x + 0.5f) * impl->height_map->ColumnsCount ()),
          rows_count    = (int)impl->height_map->RowsCount (),
          columns_count = (int)impl->height_map->ColumnsCount ();
          
