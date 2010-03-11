@@ -2,7 +2,7 @@
 
 void dump (const HeightMap& map)
 {
-  printf ("height_map %ux%u:\n", map.RowsCount (), map.ColumnsCount ());
+  printf ("height_map %ux%u (material='%s'):\n", map.RowsCount (), map.ColumnsCount (), map.Material ());
   
   for (size_t i=0; i<map.RowsCount (); i++)
   {
@@ -49,6 +49,8 @@ int main ()
   map->RegisterEventHandler (HeightMapEvent_OnSizesUpdate, &height_map_event_handler);
   
   map->SetCellsCount (2, 2);
+  
+  map->SetMaterial ("material1");
   
   dump (*map);
   

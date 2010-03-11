@@ -101,7 +101,7 @@ void Water::Update (float)
     
     for (int column=1; column<columns_count-1; column++, vertex++, prev_field_value++, next_field_value++)
     {
-      vertex->height = *prev_field_value - 1.0f; //1??? magic value
+      vertex->height = *prev_field_value;
       vertex->normal = math::vec3f (prev_field_value [-columns_count] - prev_field_value [columns_count],
                                     prev_field_value [-1] - prev_field_value [1],
                                     normal_z);

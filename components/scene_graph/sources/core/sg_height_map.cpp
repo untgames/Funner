@@ -15,6 +15,7 @@ struct HeightMap::Impl
   size_t          rows_count;                   //количество строк
   size_t          columns_count;                //количество столбцов
   HeightMapSignal signals [HeightMapEvent_Num]; //сигналы
+  stl::string     material;                     //имя материала
   
   Impl () : rows_count (0), columns_count (0) {}
 };
@@ -122,6 +123,25 @@ size_t HeightMap::RowsCount () const
 size_t HeightMap::ColumnsCount () const
 {
   return impl->columns_count;
+}
+
+/*
+    Материал
+*/
+
+void HeightMap::SetMaterial (const char* material)
+{
+  if (!material)
+    throw xtl::make_null_argument_exception ("scene_graph::HeightMap::SetMaterial", "material");
+    
+  impl->material = material;
+  
+  UpdateNotify ();
+}
+
+const char* HeightMap::Material () const
+{
+  return impl->material.c_str ();
 }
 
 /*
