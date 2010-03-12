@@ -11,7 +11,8 @@ namespace
 */
 
 const float DEFAULT_VISCOSITY = 0.1f;  //вязкость по умолчанию
-const float PLANE_CURVATURE   = 0.1f;  //кривизна поверхности
+const float TIME_STEP         = 0.03f; //шаг интеграции
+const float NORMAL_Z_FACTOR   = -4.0f; //коэффициент масштабирования нормали
 
 }
 
@@ -25,6 +26,7 @@ struct Water::Impl
 {
   HeightMap*  height_map; //карта высот
   float       viscosity;  //вязкость
+  float       current_dt; //текущее накопленный шаг времени
   WaterField  fields [2]; //поля расчёт воды
   float*      prev_field; //предыдущее поле
   float*      next_field; //следующее поле
@@ -32,6 +34,7 @@ struct Water::Impl
   Impl (HeightMap& in_height_map)
     : height_map (&in_height_map)
     , viscosity (DEFAULT_VISCOSITY)
+    , current_dt (0)
     , prev_field (0)
     , next_field (0)
   {
@@ -82,46 +85,55 @@ float Water::Viscosity () const
     Обновление
 */
 
-void Water::Update (float)
+void Water::Update (float dt)
 {
   if (!impl->prev_field || !impl->next_field || !impl->height_map)
+    return;
+    
+  impl->current_dt += dt;
+  
+  if (impl->current_dt < TIME_STEP)
     return;
     
   int                    rows_count    = (int)impl->height_map->RowsCount (),
                          columns_count = (int)impl->height_map->ColumnsCount ();
   HeightMap::VertexDesc* vertices      = impl->height_map->Vertices ();
-  float                  normal_z      = -4.0f / impl->height_map->RowsCount (), //magic value???
-                         viscosity     = impl->viscosity,
-                         ndy           = PLANE_CURVATURE / rows_count,
-                         ny            = -PLANE_CURVATURE / 2.0f + ndy;
-
-  for (int row=1; row<rows_count-1; row++, ny += ndy)
+  float                  normal_z      = -NORMAL_Z_FACTOR / stl::max (impl->height_map->RowsCount (), impl->height_map->ColumnsCount ()),
+                         viscosity     = impl->viscosity;
+                         
+  for (;impl->current_dt >= TIME_STEP; impl->current_dt -= TIME_STEP)
   {
-    size_t                 index            = row * impl->height_map->ColumnsCount () + 1;
-    HeightMap::VertexDesc* vertex           = &vertices [index];
-    const float*           prev_field_value = &impl->prev_field [index];
-    float*                 next_field_value = &impl->next_field [index];
-    float                  ndx              = PLANE_CURVATURE / columns_count,
-                           nx               = -PLANE_CURVATURE / 2.0f + ndx;
+    bool need_update_vertices = impl->current_dt < TIME_STEP * 2.0f;
     
-    for (int column=1; column<columns_count-1; column++, vertex++, prev_field_value++, next_field_value++, nx += ndx)
+    for (int row=1; row<rows_count-1; row++)
     {
-      vertex->height = *prev_field_value;
-      vertex->normal = math::vec3f (prev_field_value [-columns_count] - prev_field_value [columns_count],
-                                    prev_field_value [-1] - prev_field_value [1],
-                                    -normal_z);                                    
-                                    
-      vertex->normal.z = sqrt (1.0f - vertex->normal.x * vertex->normal.x - vertex->normal.y * vertex->normal.y);
-      vertex->color.w  = fabs (*prev_field_value);
-                                    
-      float laplas = (prev_field_value [-columns_count] + prev_field_value [columns_count] +
-                     prev_field_value [1] + prev_field_value [-1]) * 0.25f - *prev_field_value;
+      size_t                 index            = row * impl->height_map->ColumnsCount () + 1;
+      HeightMap::VertexDesc* vertex           = &vertices [index];
+      const float*           prev_field_value = &impl->prev_field [index];
+      float*                 next_field_value = &impl->next_field [index];
+      
+      for (int column=1; column<columns_count-1; column++, vertex++, prev_field_value++, next_field_value++)
+      {
+        if (need_update_vertices)
+        {
+          vertex->height = *prev_field_value;
+          vertex->normal = math::vec3f (prev_field_value [-columns_count] - prev_field_value [columns_count],
+                                        prev_field_value [-1] - prev_field_value [1],
+                                        -normal_z);
 
-      *next_field_value = (2.0f - viscosity) * *prev_field_value - *next_field_value * (1.0f - viscosity) + laplas;
+    //      vertex->normal.z = -sqrt (1.0f - vertex->normal.x * vertex->normal.x - vertex->normal.y * vertex->normal.y);
+          vertex->color.w  = fabs (*prev_field_value);
+        }
+
+        float laplas = (prev_field_value [-columns_count] + prev_field_value [columns_count] +
+                       prev_field_value [1] + prev_field_value [-1]) * 0.25f - *prev_field_value;
+
+        *next_field_value = (2.0f - viscosity) * *prev_field_value - *next_field_value * (1.0f - viscosity) + laplas;
+      }
     }
-  }
 
-  stl::swap (impl->next_field, impl->prev_field);
+    stl::swap (impl->next_field, impl->prev_field);
+  }
   
   impl->height_map->UpdateVerticesNotify ();
 }
@@ -191,10 +203,10 @@ void Water::OnNodeDestroyed ()
     Добавление возмущения
 */
 
-void Water::PutStorm (const math::vec3f& position, float radius)
+void Water::PutStorm (const math::vec3f& position, float amplitude, float radius)
 {
   if (!impl->height_map)
-    return;    
+    return;        
 
   int    storm_rows    = (int)(impl->height_map->RowsCount () * radius),
          storm_columns = (int)(impl->height_map->ColumnsCount () * radius),
@@ -202,6 +214,8 @@ void Water::PutStorm (const math::vec3f& position, float radius)
          column        = (int)((position.x + 0.5f) * impl->height_map->ColumnsCount ()),
          rows_count    = (int)impl->height_map->RowsCount (),
          columns_count = (int)impl->height_map->ColumnsCount ();
+         
+  float max_v = (float)(storm_rows * storm_rows + storm_columns * storm_columns);  
          
   for (int i=-storm_rows; i<=storm_rows; i++)
   {
@@ -217,20 +231,17 @@ void Water::PutStorm (const math::vec3f& position, float radius)
       if (affected_column >= columns_count || affected_column < 0)
         continue;
 
-      float v = 6.0f - i * i - j * j; //magic???
+      float v = max_v - (float)(i * i - j * j);
 
-      if (v < 0.0f)
-        v = 0.0f;
-        
-      impl->prev_field [affected_row * columns_count + affected_column] += v * 0.004f; //magic???
+      impl->prev_field [affected_row * columns_count + affected_column] += v * amplitude;
     }
   }
 }
 
-void Water::PutWorldStorm (const math::vec3f& position, float radius)
+void Water::PutWorldStorm (const math::vec3f& position, float amplitude, float radius)
 {
   if (!impl->height_map)
     return;
 
-  PutStorm (inverse (impl->height_map->WorldTM ()) * position, radius);
+  PutStorm (inverse (impl->height_map->WorldTM ()) * position, amplitude, radius);
 }

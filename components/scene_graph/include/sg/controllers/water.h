@@ -33,8 +33,8 @@ class Water: public Controller
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление возмущения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-   void PutStorm      (const math::vec3f& position, float radius = 0.05f); //в локальных кординатах
-   void PutWorldStorm (const math::vec3f& position, float radius = 0.05f); //в мировых координатах
+   void PutStorm      (const math::vec3f& position, float amplitude = 0.0005f, float radius = 0.05f); //в локальных кординатах
+   void PutWorldStorm (const math::vec3f& position, float amplitude = 0.0005f, float radius = 0.05f); //в мировых координатах
     
   protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
