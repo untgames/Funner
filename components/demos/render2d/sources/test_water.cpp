@@ -98,7 +98,7 @@ struct Test
       {
         height_map->Update ((common::milliseconds () - last_update) / 1000.0f);
         
-//        water->PutStorm (math::vec3f (frand ()-0.5, frand ()-0.5, 0.0f), 0.1);
+        water->PutStorm (math::vec3f (frand ()-0.5, frand ()-0.5, 0.0f), 0.1);
         
         last_update = common::milliseconds ();
       }

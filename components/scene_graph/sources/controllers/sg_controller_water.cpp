@@ -112,6 +112,7 @@ void Water::Update (float)
                                     -normal_z);                                    
                                     
       vertex->normal.z = sqrt (1.0f - vertex->normal.x * vertex->normal.x - vertex->normal.y * vertex->normal.y);
+      vertex->color.w  = fabs (*prev_field_value);
                                     
       float laplas = (prev_field_value [-columns_count] + prev_field_value [columns_count] +
                      prev_field_value [1] + prev_field_value [-1]) * 0.25f - *prev_field_value;
