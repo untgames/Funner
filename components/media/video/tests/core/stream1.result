@@ -1,0 +1,15 @@
+Results of stream1_test:
+Stream '':
+  frames_count:      0
+  frames_per_second: 1
+  width:             0
+  height:            0
+  frame_size:        0
+  duration:          0.000
+Stream 'stream2':
+  frames_count:      0
+  frames_per_second: 1
+  width:             0
+  height:            0
+  frame_size:        0
+  duration:          0.000

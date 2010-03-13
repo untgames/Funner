@@ -3,6 +3,8 @@
 
 #include <cstddef>
 
+#include <stl/auto_ptr.h>
+
 #include <xtl/functional_fwd>
 
 #include <common/serializer_manager.h>
@@ -66,10 +68,10 @@ class VideoStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VideoStream  ();
     VideoStream  (const char* file_name, VideoQuality quality = VideoQuality_Default);
-    VideoStream  (const Video&);
+    VideoStream  (const VideoStream&);
     ~VideoStream ();
 
-    VideoStream& operator = (const Video&);
+    VideoStream& operator = (const VideoStream&);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя потока
@@ -80,18 +82,19 @@ class VideoStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение параметров видео
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    VideoQuality Quality          () const;
-    size_t       FramesPerSecond  () const;
-    size_t       Width            () const;
-    size_t       Height           () const;
-    float        PixelAspectRatio () const;
-    float        Duration         () const;
-    size_t       FrameSize        () const;
+    VideoQuality Quality          () const; //качество декодирования видео
+    size_t       FramesCount      () const; //количество кадров
+    size_t       FramesPerSecond  () const; //количество кадров в секунду
+    size_t       Width            () const; //ширина кадра
+    size_t       Height           () const; //высота кадра
+    float        PixelAspectRatio () const; //соотношение сторон для каждого пикселя (x / y)
+    float        Duration         () const; //длительность видео в секундах
+    size_t       FrameSize        () const; //размер кадра в байтах
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение декодированного кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Decode (size_t frame_number, Image& image, size_t image_offset_x = 0, size_t image_offset_y = 0);
+    void Decode (size_t frame_number, Image& image, size_t image_offset_x = 0, size_t image_offset_y = 0, size_t image_offset_z = 0);
     void Decode (size_t frame_number, Pixel* frame_buffer);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,7 +120,8 @@ void swap (VideoStream&, VideoStream&);
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///Система управления видео потоками
 //////////////////////////////////////////////////////////////////////////////////////////////////
-typedef common::ResourceSerializerManager<IVideoDecoder* (const char* file_name, VideoQuality quality)> VideoStreamManager;
+typedef common::ResourceSerializerManager<IVideoDecoder* (const char* file_name, VideoQuality quality),
+  void (const char* file_name, VideoStream&)> VideoStreamManager;
 
 }
 
