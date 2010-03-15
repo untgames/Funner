@@ -38,6 +38,7 @@ struct ActionImpl: public xtl::reference_counter, public Lockable
 {
   ActionQueue::ActionHandler  action_handler; //обработчик выполнения действия
   Action::WaitCompleteHandler wait_handler;   //обработчик ожидания выполнения операции  
+  ActionThread                thread_type;    //тип нити
   Timer                       timer;          //таймер, связанный с действием
   ActionQueue::time_t         next_time;      //время следующего выполнения действия
   ActionQueue::time_t         period;         //период выполнения действия
@@ -46,9 +47,10 @@ struct ActionImpl: public xtl::reference_counter, public Lockable
   bool                        is_completed;   //завершено ли действие
   bool                        is_canceled;    //действие отменено
 
-  ActionImpl (const ActionQueue::ActionHandler& in_handler, bool in_is_periodic, Timer& in_timer, ActionQueue::time_t delay, ActionQueue::time_t in_period, const Action::WaitCompleteHandler& in_wait_handler)
+  ActionImpl (const ActionQueue::ActionHandler& in_handler, ActionThread in_thread_type, bool in_is_periodic, Timer& in_timer, ActionQueue::time_t delay, ActionQueue::time_t in_period, const Action::WaitCompleteHandler& in_wait_handler)
     : action_handler (in_handler)
     , wait_handler (in_wait_handler)
+    , thread_type (in_thread_type)
     , timer (in_timer)
     , next_time (timer.Time () + delay)    
     , period (in_period)
@@ -205,7 +207,7 @@ class ActionQueueImpl
     {
       try
       {
-        ActionPtr action (new ActionImpl (action_handler, is_periodic, timer, delay, period, default_wait_handler), false);
+        ActionPtr action (new ActionImpl (action_handler, thread, is_periodic, timer, delay, period, default_wait_handler), false);
 
         ThreadActionQueue& queue = GetQueue (thread);
 
@@ -377,9 +379,19 @@ class ActionQueueImpl
 ///Функция ожидания по умолчанию
     static bool DefaultWaitHandler (Action& action, size_t milliseconds)
     {
-      size_t end_time = common::milliseconds () + milliseconds;
+      size_t       end_time = common::milliseconds () + milliseconds;
+      bool         infinite = milliseconds == ~0u;
+      ActionThread thread   = action.ThreadType ();
       
-      while (!action.IsCompleted () && !action.IsCanceled () && common::milliseconds () < end_time);
+      while (!action.IsCompleted () && !action.IsCanceled () && (infinite || common::milliseconds () < end_time))
+      {
+        Action performed_action = ActionQueue::PopAction (thread);
+        
+        if (performed_action.IsEmpty () || performed_action.IsCanceled () || performed_action.IsCompleted ())
+          continue;
+
+        performed_action.Perform ();
+      }
 
       return action.IsCompleted ();
     }
@@ -507,6 +519,11 @@ Action& Action::operator = (const Action& action)
 size_t Action::CreaterThreadId () const
 {
   return impl ? impl->thread_id : 0;
+}
+
+ActionThread Action::ThreadType () const
+{
+  return impl ? impl->thread_type : ActionThread_Current;
 }
 
 bool Action::IsEmpty () const

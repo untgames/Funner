@@ -1,0 +1,12 @@
+Results of async_test:
+A::A(1)
+A::A(A(1))
+A::~A(1)
+  is_completed: 1
+result1: 1
+  is_completed: 0
+A::~A(1)
+exception: Test exception
+    at ::g()
+    at common::detail::AsyncAction::Perform
+    at common::AsyncResult::Result<Ret> ()
