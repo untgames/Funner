@@ -34,7 +34,7 @@ typedef stl::auto_ptr<IVideoDecoder>     DecoderPtr;
 class DefaultDecoder: public IVideoDecoder
 {
   public:
-    size_t GetFramesPerSecond  () { return 1; } 
+    float  GetFramesPerSecond  () { return 1.f; }
     size_t GetWidth            () { return 0; }
     size_t GetHeight           () { return 0; }
     size_t GetFramesCount      () { return 0; }
@@ -205,7 +205,7 @@ size_t VideoStream::FramesCount () const
   return impl->frames_count;
 }
 
-size_t VideoStream::FramesPerSecond  () const
+float VideoStream::FramesPerSecond  () const
 {
   return impl->frames_per_second;
 }

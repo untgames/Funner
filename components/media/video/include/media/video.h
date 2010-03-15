@@ -47,7 +47,7 @@ class IVideoDecoder
 ///Операции
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual        ~IVideoDecoder      () {}    //деструктор
-    virtual size_t GetFramesPerSecond  () = 0;  //количество кадров в секунду
+    virtual float  GetFramesPerSecond  () = 0;  //количество кадров в секунду
     virtual size_t GetWidth            () = 0;  //ширина изображения декодированного видео
     virtual size_t GetHeight           () = 0;  //высота изображения декодированного видео
     virtual size_t GetFramesCount      () = 0;  //количество кадров в видео
@@ -84,7 +84,7 @@ class VideoStream
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     VideoQuality Quality          () const; //качество декодирования видео
     size_t       FramesCount      () const; //количество кадров
-    size_t       FramesPerSecond  () const; //количество кадров в секунду
+    float        FramesPerSecond  () const; //количество кадров в секунду
     size_t       Width            () const; //ширина кадра
     size_t       Height           () const; //высота кадра
     float        PixelAspectRatio () const; //соотношение сторон для каждого пикселя (x / y)

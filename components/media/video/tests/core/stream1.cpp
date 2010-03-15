@@ -4,7 +4,7 @@ void dump (const VideoStream& s)
 {
   printf ("Stream '%s':\n", s.Name ());
   printf ("  frames_count:      %u\n", s.FramesCount ());
-  printf ("  frames_per_second: %u\n", s.FramesPerSecond ());
+  printf ("  frames_per_second: %.4f\n", s.FramesPerSecond ());
   printf ("  width:             %u\n", s.Width ());
   printf ("  height:            %u\n", s.Height ());
   printf ("  frame_size:        %u\n", s.FrameSize ());
