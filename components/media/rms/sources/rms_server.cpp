@@ -105,10 +105,10 @@ class Resource: public xtl::noncopyable, public xtl::reference_counter
 {
   public:
 ///Конструктор
-    Resource (const char* in_name, IResourceDestroyListener* in_destroy_listener) :
-      name (in_name),
-      state (ResourceState_Unloaded),
-      destroy_listener (in_destroy_listener)
+    Resource (const char* in_name, IResourceDestroyListener* in_destroy_listener)
+      : name (in_name)
+      , state (ResourceState_Unloaded)
+      , destroy_listener (in_destroy_listener)
     {}
 
 ///Деструктор
@@ -168,8 +168,16 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
       try
       {
           //оповещение о групповой выгрузке ресурсов со ссылкой только на данную группу
+        for (ResourceArray::reverse_iterator iter=resources.rbegin (); iter!=resources.rend (); ++iter)
+        {
+          Resource& resource = **iter;
 
-        SetResourcesState (ResourceState_Unloaded, &ICustomServer::UnloadResource, DestructorPredicate (), true, true);
+          if (resource.State () > ResourceState_Unloaded && resource.use_count () == 1)
+          {
+            do_query (&servers [0], servers.size (), resource.Name (), &ICustomServer::UnloadResource, true, true);
+            resource.SetState (ResourceState_Unloaded);
+          }
+        }
       }
       catch (...)
       {
@@ -179,71 +187,155 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
         //удаление из списка групп связывания
 
       group_bindings.erase (group_bindings_pos);
-    }
-
-///Предвыборка группы ресурсов
-    void Prefetch ()
-    {
-      SetResourcesState (ResourceState_Prefetched, &ICustomServer::PrefetchResource, StatePredicate<stl::less<ResourceState> > (), true);
-    }
+    }    
 
 ///Загрузка группы ресурсов
-    void Load ()
+    void AsyncLoad (AsyncOperation& async_operation)
     {
-      SetResourcesState (ResourceState_Loaded, &ICustomServer::LoadResource, StatePredicate<stl::less<ResourceState> > (), false);
+      async_operation.AddEstimateSteps (resources.size () * 2);
+      
+      async_operation.AddTask (CreateTask (ResourceState_Prefetched));      
+      async_operation.AddTask (CreateTask (ResourceState_Loaded));
     }
 
-///Выгрузка группы ресурсов
-    void Unload ()
+///Выгрузка группы ресурсов                                                            
+    void AsyncUnload (AsyncOperation& async_operation)
     {
-      SetResourcesState (ResourceState_Unloaded, &ICustomServer::UnloadResource, StatePredicate<stl::greater<ResourceState> > (), true, true);
+      async_operation.AddEstimateSteps (resources.size ());
+      
+      async_operation.AddTask (CreateTask (ResourceState_Unloaded));
     }
+    
+///Синхронная выгрузка ресурсов
+    void SyncUnload ()
+    {      
+      for (ResourceArray::reverse_iterator iter=resources.rbegin (), end=resources.rend ();iter != end; ++iter)
+      {
+        Resource& resource = **iter;       
 
-///Получение объекта, оповещающего о досрочном удалении GroupBinding
-    xtl::trackable* GetTrackable () { return this; }
+        try
+        {
+          if (resource.State () > ResourceState_Unloaded)
+          {
+            do_query (&servers [0], servers.size (), resource.Name (), &ICustomServer::UnloadResource, true, true);
+
+            resource.SetState (ResourceState_Unloaded);
+          }
+        }
+        catch (...)
+        {         
+        }      
+      }
+    }
 
 ///Получение массива ресурсов
     ResourceArray& Resources () { return resources; }
-        
-  private:
-    template <class Fn, class Pred, class Iter> void SetResourcesState (ResourceState state, Fn fn, Pred pred, bool ignore_exceptions, bool reverse_order, Iter first, Iter last)
+    
+///Оповещение об удалении
+    xtl::trackable* GetTrackable () { return this; }
+    
+  private:      
+///Обработчик загрузки ресурсов
+    template <class Fn, class Pred, class Iter> class AsyncResourceProcessing
     {
-      for (; first!=last; ++first)        
-      {
-        Resource& resource = **first;
-
-        if (pred (resource, state))
+      public:
+        AsyncResourceProcessing (GroupBinding* in_group, const char* in_stage, Iter in_first, Iter in_last, ResourceState in_state, Fn in_fn, Pred in_predicate, bool in_ignore_exceptions, bool in_reverse_order)
+          : group (in_group)
+          , stage (in_stage)
+          , first (in_first)
+          , last (in_last)
+          , unprocessed_count (stl::distance (first, last))
+          , state (in_state)
+          , predicate (in_predicate)
+          , fn (in_fn)
+          , ignore_exceptions (in_ignore_exceptions)
+          , reverse_order (in_reverse_order)
         {
-          do_query (&servers [0], servers.size (), resource.Name (), fn, ignore_exceptions, reverse_order);
-          resource.SetState (state);
         }
+
+        bool operator () (AsyncOperation& async_operation)
+        {
+          if (!group)
+          {
+            async_operation.AddFinishedSteps (unprocessed_count);
+            
+            return true;
+          }
+          
+          if (first == last)
+            return true;
+            
+          async_operation.SetStage (stage.c_str ());
+
+          bool processed = false; 
+           
+          for (;first != last && !processed; ++first)
+          {
+            Resource& resource = **first;
+           
+            unprocessed_count--;
+            
+            try
+            {
+              if (predicate (resource.State (), state))
+              {
+                async_operation.SetResource (resource.Name ());
+        
+                async_operation.UpdateProgress ();
+
+                do_query (&group->servers [0], group->servers.size (), resource.Name (), fn, ignore_exceptions, reverse_order);
+                
+                resource.SetState (state);
+                
+                processed = true;
+              }
+            }
+            catch (...)
+            {
+              async_operation.AddFinishedSteps (1);
+              
+              if (!ignore_exceptions)
+                throw;
+            }
+
+            async_operation.AddFinishedSteps (1);
+          }          
+ 
+          return first == last;
+        }
+        
+      private:
+        typedef xtl::trackable_ptr<GroupBinding> GroupBindingPtr;
+
+      private:
+        GroupBindingPtr group;
+        stl::string     stage;
+        Iter            first, last;
+        size_t          unprocessed_count;
+        ResourceState   state;
+        Pred            predicate;
+        Fn              fn;
+        bool            ignore_exceptions;
+        bool            reverse_order;
+    };
+    
+    AsyncOperation::TaskHandler CreateTask (ResourceState state)
+    {
+      switch (state)
+      {
+        case ResourceState_Unloaded:
+          return AsyncResourceProcessing<void (ICustomServer::*)(const char*), stl::greater<ResourceState>, typename ResourceArray::reverse_iterator> 
+            (this, "Unloading", resources.rbegin (), resources.rend (), state, &ICustomServer::UnloadResource, stl::greater<ResourceState> (), true, true);
+        case ResourceState_Loaded:
+          return AsyncResourceProcessing<void (ICustomServer::*)(const char*), stl::less<ResourceState>, typename ResourceArray::iterator> 
+            (this, "Loading", resources.begin (), resources.end (), state, &ICustomServer::LoadResource, stl::less<ResourceState> (), false, false);
+        case ResourceState_Prefetched:
+          return AsyncResourceProcessing<void (ICustomServer::*)(const char*), stl::less<ResourceState>, typename ResourceArray::iterator> 
+            (this, "Prefetching", resources.begin (), resources.end (), state, &ICustomServer::PrefetchResource, stl::less<ResourceState> (), true, false);
+        default:
+          throw xtl::make_argument_exception ("media::rms::GroupBinding::CreateTask", "state", state);
       }
     }
-  
-    template <class Fn, class Pred> void SetResourcesState (ResourceState state, Fn fn, Pred pred, bool ignore_exceptions, bool reverse_order = false)
-    {
-      if (reverse_order)
-      {
-        SetResourcesState (state, fn, pred, ignore_exceptions, reverse_order, resources.rbegin (), resources.rend ());
-      }
-      else
-      {
-        SetResourcesState (state, fn, pred, ignore_exceptions, reverse_order, resources.begin (), resources.end ());
-      }
-    }
-
-    template <class Pred> struct StatePredicate
-    {
-      bool operator () (const Resource& resource, ResourceState state) const { return Pred () (resource.State (), state); }
-    };
-
-    struct DestructorPredicate
-    {
-      bool operator () (const Resource& resource, ResourceState state) const
-      {
-        return resource.State () > state && resource.use_count () == 1;
-      }
-    };
 
   private:
     ServerList&                servers;            //список серверов ресурсов
@@ -260,13 +352,13 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
 
 struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupInstance, public xtl::reference_counter
 {
-  ServerList          servers;        //сервер управления ресурсами (ссылка без владения)
-  stl::string         name;           //имя сервера
-  stl::string         filters_string; //строка, содержащая фильтры обрабатываемых ресурсов
-  common::StringArray filters;        //массив фильтров новых ресурсов
-  ResourceMap         resources;      //ресурсы
-  GroupBindingList    group_bindings; //список групп связывания
-  bool                cache_state;    //используется ли кэш ресурсов
+  ServerList          servers;         //сервер управления ресурсами (ссылка без владения)
+  stl::string         name;            //имя сервера
+  stl::string         filters_string;  //строка, содержащая фильтры обрабатываемых ресурсов
+  common::StringArray filters;         //массив фильтров новых ресурсов
+  ResourceMap         resources;       //ресурсы
+  GroupBindingList    group_bindings;  //список групп связывания
+  bool                cache_state;     //используется ли кэш ресурсов
 
 ///Конструктор
   Impl (const char* in_name)
@@ -299,8 +391,8 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
     {
       GroupBinding* binding = group_bindings.back ();
 
-      binding->Unload ();
-
+      binding->SyncUnload ();
+      
       delete binding;
     }
 
@@ -345,6 +437,83 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
   }
 
 ///Сброс неиспользуемых ресурсов
+  struct AsyncFlushUnusedResourcesProcessing
+  {
+    AsyncFlushUnusedResourcesProcessing (Impl* in_impl)
+      : impl (in_impl)
+      , initialized (false)
+    {
+    }
+    
+    bool operator () (AsyncOperation& async_operation)
+    {
+      async_operation.SetStage ("Flushing");
+      
+      if (!impl->cache_state) //работа метода имеет смысл только в случае включенного кэширования неиспользуемых ресурсов
+        return true;
+      
+      if (!initialized)
+      {
+          //построение массива обрабатываемых ресурсов
+        
+        resources.reserve (impl->resources.size ());
+        
+        for (ResourceMap::reverse_iterator iter = impl->resources.rbegin (); iter != impl->resources.rend (); ++iter) 
+        {
+          Resource& resource = *iter->second;
+
+          if (resource.use_count () == 1) //если ресурс находится только в кеше
+            resources.push_back (&resource);
+        }
+
+        async_operation.AddEstimateSteps (resources.size ());
+
+        this->iter  = resources.begin ();
+        initialized = true;
+      }
+      
+      if (iter == resources.end ())
+        return true;
+        
+      Resource& resource = **iter++;
+
+      if (resource.State () > ResourceState_Unloaded)
+      {
+        try
+        {
+          const char* resource_name = resource.Name ();          
+          
+          async_operation.SetResource (resource_name);
+
+          async_operation.UpdateProgress ();          
+
+          do_query (&impl->servers [0], impl->servers.size (), resource_name, &ICustomServer::UnloadResource, true, true);
+        }
+        catch (...)
+        {
+          //подавление всех исключений
+        }
+      }
+
+      release (&resource);
+
+      async_operation.AddFinishedSteps (1);
+      
+      return false;
+    }
+    
+    bool                     initialized;
+    xtl::intrusive_ptr<Impl> impl;
+    ResourceArray            resources;
+    ResourceArray::iterator  iter;
+  };
+  
+  void AsyncFlushUnusedResources (AsyncOperation& async_operation)
+  {
+    async_operation.AddTask (AsyncFlushUnusedResourcesProcessing (this));
+  }
+
+///Синхронная версия метода выгрузки неиспользуемых ресурсов
   void FlushUnusedResources ()
   {
       //работа метода имеет смысл только в случае включенного кэширования неиспользуемых ресурсов
@@ -361,13 +530,6 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
         ResourceMap::reverse_iterator next = iter;        
 
         ++++next;
-        
-        if (resource.State () > ResourceState_Unloaded)
-        {
-          do_query (&servers [0], servers.size (), resource.Name (), &ICustomServer::UnloadResource, true, true);
-
-          resource.SetState (ResourceState_Unloaded);
-        }
 
         release (&resource);
         
@@ -383,10 +545,95 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
     return name.c_str ();
   }
   
+///Создание связывания
+  Binding CreateBinding (const Group& group)
+  {
+    try
+    {
+        //создание массива ресурсов группы
+
+      ResourceArray group_resources;
+
+      group_resources.reserve (RESOURCE_ARRAY_RESERVE_SIZE);
+
+          //создание группы ресурсов
+
+      for (size_t i=0, group_count=group.Size (); i<group_count; i++)
+      {
+        const char* resource_name = group.Item (i);
+
+        for (size_t j=0, filter_count=filters.Size (); j<filter_count; j++)
+        {
+          const char* filter = filters [j];
+
+          if (!common::wcimatch (resource_name, filter))
+            continue;
+
+            //имя ресурса соответствует фильтру
+
+            //поиск ресурса среди уже зарегистрированных
+
+          ResourceMap::iterator iter = resources.find (resource_name);
+
+          if (iter != resources.end ())
+          {
+              //ресурс уже присутствует в карте - добавление ресурса в группу
+
+            group_resources.push_back (iter->second);
+          }
+          else
+          {
+              //создание ресурса
+
+            ResourcePtr resource (new Resource (resource_name, this), false);
+
+              //добавление ресурса в группу
+
+            group_resources.push_back (resource);
+
+              //регистрация ресурса
+
+            resources.insert_pair (resource_name, resource.get ());
+          }
+        }
+      }
+
+        //создание группы связывания
+
+      GroupBinding* group_binding = new GroupBinding (servers, group_resources, group_bindings);
+
+      Binding binding (group_binding);
+
+        //дополнительное увеличение числа ссылок новых ресурсов для возможности кэширования
+
+      if (cache_state)
+      {
+        for (ResourceArray::iterator iter=group_binding->Resources ().begin (), end=group_binding->Resources ().end (); iter!=end; ++iter)
+        {
+          Resource& resource = **iter;
+
+          if (resource.use_count () == 1) //если ресурс захвачен только новой группой
+          {
+              //увеличиваем число ссылок на ресурс для возможности сохранения ресурса в кеше после удаления
+
+            addref (resource);
+          }
+        }
+      }
+
+      return binding;
+    }
+    catch (xtl::exception& exception)
+    {
+      exception.touch ("media::rms::ServerGroup::Impl::CreateBinding");
+      throw;
+    }    
+  }
+  
 ///Получение экземпляра
   ServerGroup Instance ()
   {
-    return ServerGroup (this);
+    return this;
   }
   
 ///Подсчёт ссылок
@@ -584,78 +831,7 @@ Binding ServerGroup::CreateBinding (const Group& group)
 {
   try
   {
-      //создание массива ресурсов группы
-
-    ResourceArray group_resources;
-
-    group_resources.reserve (RESOURCE_ARRAY_RESERVE_SIZE);
-
-        //создание группы ресурсов
-
-    for (size_t i=0, group_count=group.Size (); i<group_count; i++)
-    {
-      const char* resource_name = group.Item (i);
-
-      for (size_t j=0, filter_count=impl->filters.Size (); j<filter_count; j++)
-      {
-        const char* filter = impl->filters [j];
-
-        if (!common::wcimatch (resource_name, filter))
-          continue;
-
-          //имя ресурса соответствует фильтру
-
-          //поиск ресурса среди уже зарегистрированных
-
-        ResourceMap::iterator iter = impl->resources.find (resource_name);
-
-        if (iter != impl->resources.end ())
-        {
-            //ресурс уже присутствует в карте - добавление ресурса в группу
-
-          group_resources.push_back (iter->second);
-        }
-        else
-        {
-            //создание ресурса
-
-          ResourcePtr resource (new Resource (resource_name, impl), false);
-
-            //добавление ресурса в группу
-
-          group_resources.push_back (resource);
-
-            //регистрация ресурса
-
-          impl->resources.insert_pair (resource_name, resource.get ());
-        }
-      }
-    }
-
-      //создание группы связывания
-
-    GroupBinding* group_binding = new GroupBinding (impl->servers, group_resources, impl->group_bindings);
-
-    Binding binding (group_binding);
-
-      //дополнительное увеличение числа ссылок новых ресурсов для возможности кэширования
-
-    if (impl->cache_state)
-    {
-      for (ResourceArray::iterator iter=group_binding->Resources ().begin (), end=group_binding->Resources ().end (); iter!=end; ++iter)
-      {
-        Resource& resource = **iter;
-
-        if (resource.use_count () == 1) //если ресурс захвачен только новой группой
-        {
-            //увеличиваем число ссылок не ресурс для возможности сохранения ресурса в кеше после удаления
-
-          addref (resource);
-        }
-      }
-    }
-
-    return binding;
+    return impl->CreateBinding (group);
   }
   catch (xtl::exception& exception)
   {
@@ -677,7 +853,7 @@ void ServerGroup::SetCacheState (bool state)
   {
       //отключение кэша - сбрасываем кэш ресурсов, уменьшаем число ссылок всех оставшихся ресурсов
 
-    FlushUnusedResources ();    
+    impl->FlushUnusedResources ();    
 
     for (ResourceMap::reverse_iterator iter=impl->resources.rbegin (), end=impl->resources.rend (); iter!=end;)
     {
@@ -710,7 +886,15 @@ bool ServerGroup::CacheState () const
 
 void ServerGroup::FlushUnusedResources ()
 {
-  impl->FlushUnusedResources ();
+  try
+  {
+    AsyncOperation::Pointer async_operation = AsyncOperation::Create ();
+
+    impl->AsyncFlushUnusedResources (*async_operation);
+  }
+  catch (...)
+  {
+  }
 }
 
 /*

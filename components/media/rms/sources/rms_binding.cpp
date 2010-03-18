@@ -68,25 +68,198 @@ Binding& Binding::operator = (const Binding& binding)
 }
 
 /*
-    Операции над связанными объектами
+    Синхронная загрузка и выгрузка ресурсов
 */
+
+namespace
+{
+
+struct AsyncWaiter
+{
+  bool& done;
+  
+  AsyncWaiter (bool& in_done) : done (in_done) {}
+  
+  bool operator () (AsyncOperation&)
+  {
+    done = true;
+    return true;
+  }
+};
+
+void default_load_progress_handler (Progress& progress)
+{
+}
+
+void default_unload_progress_handler (Progress&)
+{
+}
+
+}
 
 void Binding::Load ()
 {
-  if (impl->binding)
-    impl->binding->Load ();
-}
+  if (!impl->binding)
+    return;
 
-void Binding::Prefetch ()
-{
-  if (impl->binding)
-    impl->binding->Prefetch ();
+  try
+  {
+    bool done = false, prepared = false;
+    
+    AsyncOperation::Pointer async_operation = AsyncOperation::Create (&default_load_progress_handler);    
+    
+    async_operation->AddTask (AsyncWaiter (prepared));
+    
+    impl->binding->AsyncLoad (*async_operation);
+    
+    async_operation->AddTask (AsyncWaiter (done));
+    
+    while (!prepared)    
+    {
+      try
+      {
+        AsyncOperation::DoStep ();
+      }
+      catch (...)
+      {
+      }
+    }
+    
+    while (!done)
+      AsyncOperation::DoStep ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::rms::Binding::Load");
+    throw;
+  }
 }
 
 void Binding::Unload ()
 {
-  if (impl->binding)
-    impl->binding->Unload ();
+  if (!impl->binding)
+    return;
+
+  try
+  {
+    bool done = false;
+
+    AsyncOperation::Pointer async_operation = AsyncOperation::Create (&default_unload_progress_handler);
+
+    impl->binding->AsyncUnload (*async_operation);
+
+    async_operation->AddTask (AsyncWaiter (done));
+
+    while (!done) 
+    {
+      try
+      {
+        AsyncOperation::DoStep ();
+      }
+      catch (...)
+      {
+      }
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::rms::Binding::Unload");
+    throw;
+  }
+}
+
+/*
+    Асинхронная загрузка и выгрузка ресурсов
+*/
+
+void Binding::AsyncLoad (const ProgressHandler& progress_handler)
+{
+  if (!impl->binding)
+    return;
+  
+  try
+  {
+    impl->binding->AsyncLoad (*AsyncOperation::Create (progress_handler));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::rms::Binding::AsyncLoad");
+    throw;
+  }
+}
+
+void Binding::AsyncUnload (const ProgressHandler& progress_handler)
+{
+  if (!impl->binding)
+    return;
+    
+  try
+  {
+    impl->binding->AsyncUnload (*AsyncOperation::Create (progress_handler));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::rms::Binding::AsyncUnload(const ProgressHandler&)");
+    throw;
+  }
+}
+
+void Binding::AsyncLoad (AsyncOperation& async_operation)
+{
+  if (!impl->binding)
+    return;
+
+  try
+  {
+    impl->binding->AsyncLoad (async_operation);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::rms::Binding::AsyncLoad(AsyncOperation&)");
+    throw;
+  }
+}
+
+void Binding::AsyncUnload (AsyncOperation& async_operation)
+{
+  if (!impl->binding)
+    return;
+
+  try
+  {
+    impl->binding->AsyncUnload (async_operation);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::rms::Binding::AsyncUnload(AsyncOperation&)");
+    throw;
+  }
+}
+
+void Binding::AsyncLoad ()
+{
+  try
+  {
+    AsyncLoad (&default_load_progress_handler);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::rms::Binding::AsyncLoad()");
+    throw;
+  }
+}
+
+void Binding::AsyncUnload ()
+{
+  try
+  {
+    AsyncUnload (&default_unload_progress_handler);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::rms::Binding::AsyncUnload()");
+    throw;
+  }  
 }
 
 /*

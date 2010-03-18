@@ -55,50 +55,37 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
       }
     }
 
-///Предвыборка ресурсов
-    void Prefetch ()
+///Загрузка ресурсов
+    void AsyncLoad (AsyncOperation& async_operation)
     {
       for (ServerBindingList::iterator iter=server_bindings.begin (), end=server_bindings.end (); iter!=end; ++iter)
       {
         try
         {
-          iter->binding.Prefetch ();
+          iter->binding.AsyncLoad (async_operation);
         }
         catch (...)
         {
-          //подавление всех исключений
         }
-      }
-    }
-
-///Загрузка ресурсов
-    void Load ()
-    {
-      for (ServerBindingList::iterator iter=server_bindings.begin (), end=server_bindings.end (); iter!=end; ++iter)
-      {
-          //исключения загрузки не подавляются
-
-        iter->binding.Load ();
       }
     }
 
 ///Выгрузка ресурсов
-    void Unload ()
+    void AsyncUnload (AsyncOperation& async_operation)
     {
       for (ServerBindingList::iterator iter=server_bindings.begin (), end=server_bindings.end (); iter!=end; ++iter)
       {
         try
         {
-          iter->binding.Unload ();
+          iter->binding.AsyncUnload (async_operation);
         }
         catch (...)
         {
-          //подавление всех исключений
         }
       }
     }
-
-///Получение объекта, оповещающего об удалении текущего объекта (может быть 0)
+    
+///Оповещение об удалении
     xtl::trackable* GetTrackable () { return this; }
 
   private:
@@ -108,7 +95,7 @@ class ManagerBinding: public ICustomBinding, public xtl::trackable
       IServerGroupInstance* server_group;
 
       ServerBinding (const Group& resource_group, IServerGroupInstance* in_server_group)
-        : binding (in_server_group->Instance ().CreateBinding (resource_group))
+        : binding (in_server_group->CreateBinding (resource_group))
         , server_group (in_server_group)
       {
       }
@@ -245,8 +232,24 @@ IServerGroupInstance* ResourceManagerImpl::ServerGroup (size_t index) const
 
 void ResourceManagerImpl::FlushUnusedResources ()
 {
-  for (ServerGroupList::iterator iter=impl->groups.begin (), end=impl->groups.end (); iter!=end; ++iter)
-    (*iter)->Instance ().FlushUnusedResources ();
+  try
+  {
+    AsyncOperation::Pointer async_operation = AsyncOperation::Create ();
+    
+    for (ServerGroupList::iterator iter=impl->groups.begin (), end=impl->groups.end (); iter!=end; ++iter)
+    {
+      try
+      {
+        (*iter)->AsyncFlushUnusedResources (*async_operation);
+      }
+      catch (...)
+      {
+      }
+    }
+  }
+  catch (...)
+  {
+  }
 }
 
 /*
@@ -271,4 +274,17 @@ media::rms::ServerGroup ResourceManager::ServerGroup (size_t index)
 void ResourceManager::FlushUnusedResources ()
 {
   ResourceManagerSingleton::Instance ()->FlushUnusedResources ();
+}
+
+void ResourceManager::WaitForAsyncComplete ()
+{
+  try
+  {
+    while (AsyncOperation::DoStep ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::rms::ResourceManager::WaitForAsyncComplete");
+    throw;
+  }
 }
