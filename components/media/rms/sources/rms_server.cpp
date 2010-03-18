@@ -198,7 +198,7 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
       async_operation.AddTask (CreateTask (ResourceState_Loaded));
     }
 
-///Выгрузка группы ресурсов                                                            
+///Выгрузка группы ресурсов
     void AsyncUnload (AsyncOperation& async_operation)
     {
       async_operation.AddEstimateSteps (resources.size ());
@@ -324,13 +324,13 @@ class GroupBinding: public ICustomBinding, public xtl::trackable
       switch (state)
       {
         case ResourceState_Unloaded:
-          return AsyncResourceProcessing<void (ICustomServer::*)(const char*), stl::greater<ResourceState>, typename ResourceArray::reverse_iterator> 
+          return AsyncResourceProcessing<void (ICustomServer::*)(const char*), stl::greater<ResourceState>, ResourceArray::reverse_iterator>
             (this, "Unloading", resources.rbegin (), resources.rend (), state, &ICustomServer::UnloadResource, stl::greater<ResourceState> (), true, true);
         case ResourceState_Loaded:
-          return AsyncResourceProcessing<void (ICustomServer::*)(const char*), stl::less<ResourceState>, typename ResourceArray::iterator> 
+          return AsyncResourceProcessing<void (ICustomServer::*)(const char*), stl::less<ResourceState>, ResourceArray::iterator>
             (this, "Loading", resources.begin (), resources.end (), state, &ICustomServer::LoadResource, stl::less<ResourceState> (), false, false);
         case ResourceState_Prefetched:
-          return AsyncResourceProcessing<void (ICustomServer::*)(const char*), stl::less<ResourceState>, typename ResourceArray::iterator> 
+          return AsyncResourceProcessing<void (ICustomServer::*)(const char*), stl::less<ResourceState>, ResourceArray::iterator>
             (this, "Prefetching", resources.begin (), resources.end (), state, &ICustomServer::PrefetchResource, stl::less<ResourceState> (), true, false);
         default:
           throw xtl::make_argument_exception ("media::rms::GroupBinding::CreateTask", "state", state);
@@ -502,8 +502,8 @@ struct ServerGroup::Impl: public IResourceDestroyListener, public IServerGroupIn
       return false;
     }
     
-    bool                     initialized;
     xtl::intrusive_ptr<Impl> impl;
+    bool                     initialized;
     ResourceArray            resources;
     ResourceArray::iterator  iter;
   };
