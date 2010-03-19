@@ -32,9 +32,9 @@ void YCbCr2RGBA (size_t yuv_pixel, IVideoDecoder::Pixel& result)
     int U  = yuv [1] - 128;
     int V  = yuv [0] - 128;
 
-    result.red   = clamp_to_unsigned_char ((OY + 516 * U + 128) >> 8);           // B
+    result.red   = clamp_to_unsigned_char ((OY + 409 * V + 128) >> 8);           // R
     result.green = clamp_to_unsigned_char ((OY - 100 * U - 208 * V + 128) >> 8); // G
-    result.blue  = clamp_to_unsigned_char ((OY + 409 * V + 128) >> 8);           // R
+    result.blue  = clamp_to_unsigned_char ((OY + 516 * U + 128) >> 8);           // B
     result.alpha = 0xff;                                                         // A
 }
 
