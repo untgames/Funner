@@ -226,6 +226,9 @@ class ApplicationImpl: private IApplicationListener
     {
       try
       {
+        if (is_exit_detected)
+          return;
+        
         ProcessActions (ActionThread_Main);
         ProcessActions (ActionThread_Current);
 
