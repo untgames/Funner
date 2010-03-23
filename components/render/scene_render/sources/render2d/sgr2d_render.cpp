@@ -114,13 +114,19 @@ void Render::LoadResource (const char* tag, const char* file_name)
   try
   {
     const char* MATERIAL_LIBRARY_TAG = "material_library";
+    const char* TEXTURE_TAG          = "texture";    
 
     if (!strcmp (tag, "auto"))
     {
         //автоматическое определение тэга
+        
+      stl::string suffix = common::suffix (file_name);        
 
-      if (common::suffix (file_name) == ".xmtl")
-        tag = MATERIAL_LIBRARY_TAG;
+      if (suffix == ".xmtl")
+        tag = MATERIAL_LIBRARY_TAG;        
+        
+      if (suffix == ".png" || suffix == ".tga" || suffix == ".jpg" || suffix == ".bmp")
+        tag = TEXTURE_TAG; 
     }
 
       //диспетчеризация тэгов
@@ -129,6 +135,13 @@ void Render::LoadResource (const char* tag, const char* file_name)
     {
       LoadMaterialLibrary (file_name);
     }
+    
+    if (!strcmp (tag, TEXTURE_TAG))
+    {
+      RenderQueryPtr query;
+      
+      GetTexture (file_name, true, query);
+    }    
   }
   catch (xtl::exception& exception)
   {
