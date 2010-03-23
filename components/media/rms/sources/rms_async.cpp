@@ -62,7 +62,7 @@ class AsyncOperationManager
       {
         if (action.IsEmpty ())
         {
-          action = common::ActionQueue::PushAction (action_handler, common::ActionThread_Current, 0, MAX_OPERATION_STEP_DURATION);
+          action = common::ActionQueue::PushAction (action_handler, common::ActionThread_Current, 0, MAX_OPERATION_STEP_DURATION / 1000.0);
         }
       }
       catch (...)
@@ -107,7 +107,7 @@ class AsyncOperationManager
       static const char* METHOD_NAME = "media::rms::AsyncOperationManager::DoStep";
       
       if (operations.empty ())
-        return false;
+        return false;        
       
       try
       {
