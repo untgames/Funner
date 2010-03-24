@@ -4,14 +4,84 @@ using namespace render;
 using namespace render::render2d;
 using namespace scene_graph;
 
+namespace
+{
+
 /*
      онстанты
 */
 
-namespace
-{
-
 const char* DYNAMIC_STRING_MARKER = "dynamic"; //маркер динамической текстуры
+const char* VIDEO_STRING_MARKER   = "video";   //маркер видео текстуры
+
+/*
+    ƒинамическа€ текстура
+*/
+
+class DynamicTexturePrerender: public IRenderablePrerequisite
+{
+  public:
+    DynamicTexturePrerender (const RenderQueryPtr& in_query) : query (in_query) {}
+    
+    void Update ()
+    {
+      query->Update ();
+    }
+  
+  private:
+    RenderQueryPtr query;
+};
+
+/*
+    ¬идео текстура
+*/
+
+class VideoTexturePrerender: public IRenderablePrerequisite
+{
+  public:
+    VideoTexturePrerender (Renderable* in_renderable, const char* video_file_name, render::mid_level::renderer2d::IRenderer& renderer)
+      : renderable (in_renderable)
+      , stream (video_file_name)
+      , buffer (stream.Width (), stream.Height (), 1, media::PixelFormat_RGBA8)
+      , texture (renderer.CreateTexture (buffer), false)
+      , current_frame (stream.FramesCount ())
+    {
+    }
+    
+    void Update ()
+    {
+      if (!stream.FramesCount ())
+        return;
+      
+      try
+      {
+        size_t frame = ((size_t)(renderable->VideoPosition () * stream.FramesPerSecond ())) % stream.FramesCount ();
+        
+        if (frame == current_frame)
+          return;
+
+        stream.Decode (frame, buffer);        
+
+        texture->Update (buffer);
+        
+        current_frame = frame;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::VideoTexturePrerender::Update");
+        throw;
+      }
+    }
+    
+    render::mid_level::renderer2d::ITexture* GetTexture () { return texture.get (); }
+
+  private:  
+    Renderable*        renderable;
+    media::VideoStream stream;
+    media::Image       buffer;
+    TexturePtr         texture;
+    size_t             current_frame;
+};
 
 }
 
@@ -138,9 +208,10 @@ void Render::LoadResource (const char* tag, const char* file_name)
     
     if (!strcmp (tag, TEXTURE_TAG))
     {
-      RenderQueryPtr query;
-      
-      GetTexture (file_name, true, query);
+      if (xtl::xstrncmp (file_name, VIDEO_STRING_MARKER, strlen (VIDEO_STRING_MARKER)))
+      {      
+        GetTexture (file_name, true);
+      }
     }    
   }
   catch (xtl::exception& exception)
@@ -197,9 +268,10 @@ void Render::LoadMaterialLibrary (const char* file_name)
 
         try
         {
-          RenderQueryPtr query;
-
-          GetTexture (sprite_material->Image (), sprite_material->BlendMode () == media::rfx::SpriteBlendMode_AlphaClamp ? true : false, query); //???? не загружаетс€ альфа текстур текста
+          if (xtl::xstrncmp (sprite_material->Image (), VIDEO_STRING_MARKER, strlen (VIDEO_STRING_MARKER)))
+          {
+            GetTexture (sprite_material->Image (), sprite_material->BlendMode () == media::rfx::SpriteBlendMode_AlphaClamp ? true : false); //???? не загружаетс€ альфа текстур текста
+          }
         }
         catch (std::exception& exception)
         {
@@ -363,7 +435,7 @@ void Render::RemoveRenderable (scene_graph::Entity* entity)
   renderables_cache.erase (entity);
 }
 
-ITexture* Render::GetTexture (const char* file_name, bool need_alpha, RenderQueryPtr& out_query)
+ITexture* Render::GetTexture (const char* file_name, bool need_alpha, Renderable* renderable)
 {
     //попытка найти текстуру в кеше
 
@@ -373,7 +445,8 @@ ITexture* Render::GetTexture (const char* file_name, bool need_alpha, RenderQuer
   {
     TextureHolder& holder = iter->second;
 
-    out_query = holder.query;
+    if (holder.prerender)
+      renderable->AddPrerender (holder.prerender);
 
       //если альфа-канал не требуетс€ - возвращаем базовую текстуру
 
@@ -387,11 +460,11 @@ ITexture* Render::GetTexture (const char* file_name, bool need_alpha, RenderQuer
 
       //если альфа-текстура отсутствует - создаЄм еЄ и возвращаем
 
-    bool has_alpha = false;
+    bool has_alpha = false, is_shared = false;
+    
+    PrerequisitePtr prerender;
 
-    RenderQueryPtr tmp_query;
-
-    holder.alpha_texture = CreateTexture (file_name, true, has_alpha, tmp_query);
+    holder.alpha_texture = CreateTexture (file_name, true, has_alpha, is_shared, renderable, prerender);
 
     return holder.alpha_texture.get ();
   }
@@ -400,13 +473,23 @@ ITexture* Render::GetTexture (const char* file_name, bool need_alpha, RenderQuer
   {
       //создание новой текстуры
 
-    bool has_alpha = false;
+    bool has_alpha = false, is_shared = false;
+    
+    PrerequisitePtr prerender;
 
-    TexturePtr texture = CreateTexture (file_name, need_alpha, has_alpha, out_query);
+    TexturePtr texture = CreateTexture (file_name, need_alpha, has_alpha, is_shared, renderable, prerender);    
+    
+    if (is_shared)
+    {
+        //добавление текстуры в кэш
 
-      //добавление текстуры в кэш
+      textures.insert_pair (file_name, TextureHolder (texture, has_alpha ? texture : TexturePtr (), prerender));
+    }    
 
-    textures.insert_pair (file_name, TextureHolder (texture, has_alpha ? texture : TexturePtr (), out_query));
+    if (prerender && renderable)
+    {
+      renderable->AddPrerender (prerender);
+    }
 
     return texture.get ();
   }
@@ -421,26 +504,34 @@ ITexture* Render::GetTexture (const char* file_name, bool need_alpha, RenderQuer
     —оздание текстур
 */
 
-TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& has_alpha, RenderQueryPtr& out_query)
+TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& has_alpha, bool& is_shared, Renderable* renderable, PrerequisitePtr& prerender)
 {
   try
   {
     if (!file_name)
       throw xtl::make_null_argument_exception ("", "file_name");
+     
+    is_shared = true;
 
       //проверка маски динамической текстуры
 
     if (!xtl::xstrncmp (file_name, DYNAMIC_STRING_MARKER, strlen (DYNAMIC_STRING_MARKER)))
     {
-      has_alpha = true;
+      has_alpha = true;            
 
-      return CreateDynamicTexture (file_name, out_query);
+      return CreateDynamicTexture (file_name, prerender);
     }
+        
+      //проверка маски видео текстуры
 
-      //отсутствие динамической текстуры - отсутствие запроса дочернего рендеринга
+    if (!xtl::xstrncmp (file_name, VIDEO_STRING_MARKER, strlen (VIDEO_STRING_MARKER)))
+    {
+      has_alpha = true;
+      is_shared = false;
 
-    out_query = 0;
-    
+      return CreateVideoTexture (file_name, renderable, prerender);
+    }    
+
     static common::ComponentLoader loader ("media.compressed_image.*");
     
     if (media::CompressedImageManager::FindLoader (file_name, common::SerializerFindMode_ByName))
@@ -527,7 +618,7 @@ TexturePtr Render::CreateTexture (const char* file_name, bool need_alpha, bool& 
   }
 }
 
-TexturePtr Render::CreateDynamicTexture (const char* name, RenderQueryPtr& out_query)
+TexturePtr Render::CreateDynamicTexture (const char* name, PrerequisitePtr& prerender)
 {
     //разбор запроса динамического рендеринга
 
@@ -549,9 +640,44 @@ TexturePtr Render::CreateDynamicTexture (const char* name, RenderQueryPtr& out_q
 
     //создание запроса
 
-  out_query = RenderQueryPtr (query_handler (texture.get (), depth_stencil_buffer.get (), query_string), false);
+  RenderQueryPtr query (query_handler (texture.get (), depth_stencil_buffer.get (), query_string), false);
+  
+    //создание пререндера
+    
+  prerender = PrerequisitePtr (new DynamicTexturePrerender (query), false);
 
   return texture;
+}
+
+TexturePtr Render::CreateVideoTexture (const char* name, Renderable* renderable, PrerequisitePtr& prerender)
+{
+  try
+  {
+    if (!renderable)
+      throw xtl::make_null_argument_exception ("", "renderable");
+
+      //разбор запроса динамического рендеринга
+
+    common::StringArray tokens = common::parse (name , "video *\\( *'(.*)' *\\).*");
+
+    if (tokens.Size () != 2)
+      throw xtl::make_argument_exception ("", "name", name, "Wrong format. Expected: video('video_file_name')");
+
+    const char* video_file_name = tokens [1];
+    
+      //создание пререндера
+      
+    xtl::intrusive_ptr<VideoTexturePrerender> video_prerender (new VideoTexturePrerender (renderable, video_file_name, *renderer), false);
+    
+    prerender = video_prerender;
+
+    return video_prerender->GetTexture ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::render2d::Render::CreateVideoTexture");
+    throw;
+  }
 }
 
 /*

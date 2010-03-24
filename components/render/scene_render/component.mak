@@ -16,7 +16,8 @@ RENDER.SCENE_RENDER.RENDER2D.SOURCES.NAME                 := funner.render.scene
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.SOURCE_DIRS          := sources/render2d
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.IMPORTS              := compile.render.scene_render compile.common compile.scene_graph.core \
                                                              compile.render.mid_level compile.media.rfx \
-                                                             compile.media.image compile.media.font
+                                                             compile.media.image compile.media.font \
+                                                             compile.media.video
 RENDER.SCENE_RENDER.RENDER2D.SOURCES.msvc.COMPILER_CFLAGS := -wd4355
 
 #Öåëü ¹3 - Scene render tests

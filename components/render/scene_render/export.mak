@@ -8,4 +8,4 @@ export.link.render.scene_render.IMPORTS  := link.common link.scene_graph.core li
 # Link exports
 export.link.render.scene_render.render2d.LIBS          := funner.render.scene_render.render2d
 export.link.render.scene_render.render2d.LINK_INCLUDES := SceneRender2d
-export.link.render.scene_render.render2d.IMPORTS       := link.render.scene_render link.media.rfx
+export.link.render.scene_render.render2d.IMPORTS       := link.render.scene_render link.media.rfx link.media.video

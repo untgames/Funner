@@ -17,11 +17,9 @@ struct RenderableFont::Impl
   {
     size_t glyphs_count = font.GlyphsTableSize ();
 
-      //загрузка текстуры, содержащей битовые карты символов
-    
-    RenderQueryPtr query;
+      //загрузка текстуры, содержащей битовые карты символов    
 
-    texture = render.GetTexture (font.ImageName (), true, query);         
+    texture = render.GetTexture (font.ImageName (), true);
     
       //определение максимальной стороны глифов
 

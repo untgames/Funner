@@ -12,7 +12,6 @@ struct RenderableHeightMap::Impl: public xtl::trackable
   Render&                     render;                          //ссылка на рендер
   scene_graph::HeightMap*     height_map;                      //исходная модель
   PrimitivePtr                primitive;                       //визуализируемый примитив
-  RenderQueryPtr              query;                           //запрос дочернего рендеринга
   bool                        need_update_sprites;             //флаг необходимости обновления массива спрайтов
   size_t                      current_world_tm_hash;           //хэш текущей матрицы трансформации
   size_t                      current_material_name_hash;      //хэш текущего имени материала
@@ -104,7 +103,7 @@ void RenderableHeightMap::Update ()
 
         //получение текстуры из кэша
         
-      ITexture* texture = impl->render.GetTexture (material->Image (), need_alpha, impl->query);
+      ITexture* texture = impl->render.GetTexture (material->Image (), need_alpha, this);
       
         //установка параметров примитива
 
@@ -199,9 +198,6 @@ void RenderableHeightMap::DrawCore (IFrame& frame)
 {
   if (impl->primitive->GetSpritesCount ())
   {
-    if (impl->query)
-      impl->query->Update ();    
-
     frame.AddPrimitive (impl->primitive.get ());
   }
 }

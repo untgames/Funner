@@ -12,7 +12,6 @@ struct RenderableSpriteModel::Impl: public xtl::trackable
   Render&                     render;                          //ссылка на рендер
   scene_graph::SpriteModel*   model;                           //исходна€ модель
   PrimitivePtr                primitive;                       //визуализируемый примитив
-  RenderQueryPtr              query;                           //запрос дочернего рендеринга
   bool                        need_update_sprites;             //флаг необходимости обновлени€ массива спрайтов
   size_t                      tile_columns, tile_rows;         //количество столбцов / строк тайлов
   float                       tile_tex_width, tile_tex_height; //размеры тайла в текстурных координатах
@@ -22,10 +21,12 @@ struct RenderableSpriteModel::Impl: public xtl::trackable
   float                       current_alpha_reference;         //текущее значение параметра альфа-отсечени€
   math::vec2f                 current_texture_scroll;          //текущее смещение текстуры
   bool                        current_scissor_state;           //состо€ние области отсечени€
-  render::mid_level::Viewport current_scissor_rect;            //разрмеры области отсечени€  
+  render::mid_level::Viewport current_scissor_rect;            //размеры области отсечени€  
+  float                       current_video_position;          //смещение по времени проигрывани€ видео
   size_t                      texture_scroll_property_index;   //текущее значение индекса свойства смещени€ текстурных координат
   size_t                      scissor_rect_property_index;     //текущее значение индекса свойства области отсечени€
   size_t                      scissor_state_property_index;    //текущее значение индекса свойства состо€ни€ области отсечени€
+  size_t                      video_position_property_index;   //текущее значение индекса свойства времени проигрывани€ видео
   size_t                      properties_structure_hash;       //текущий хэш структуры свойств узла
   size_t                      properties_hash;                 //текущий хэш свойств узла
 
@@ -39,9 +40,11 @@ struct RenderableSpriteModel::Impl: public xtl::trackable
     current_material_name_hash (0),
     current_texture_scroll (0.0f),
     current_scissor_state (false),
+    current_video_position (0.0f),
     texture_scroll_property_index (0),
     scissor_rect_property_index (0),
     scissor_state_property_index (0),
+    video_position_property_index (0),
     properties_structure_hash (0),
     properties_hash (0)
   {
@@ -99,6 +102,7 @@ void RenderableSpriteModel::Update ()
       impl->scissor_rect_property_index   = 0;
       impl->scissor_state_property_index  = 0;
       impl->current_texture_scroll        = math::vec2f (0.0f);
+      impl->current_video_position        = 0.0f;
       impl->need_update_sprites           = true;
       need_update_scissor                 = true;
       scissor_state                       = false;
@@ -113,6 +117,7 @@ void RenderableSpriteModel::Update ()
         impl->texture_scroll_property_index = properties.IndexOf ("render.texture_scroll");
         impl->scissor_rect_property_index   = properties.IndexOf ("render.scissor_rect");
         impl->scissor_state_property_index  = properties.IndexOf ("render.scissor_state");
+        impl->video_position_property_index = properties.IndexOf ("render.video_position");
         impl->properties_structure_hash     = properties.StructureHash ();
       }
 
@@ -199,7 +204,12 @@ void RenderableSpriteModel::Update ()
         
         scissor_state = false;
       }
-      
+
+      if (impl->video_position_property_index != size_t (-1))
+      {
+        SetVideoPosition (properties.GetFloat (impl->video_position_property_index));
+      }
+
       impl->properties_hash = properties.Hash ();
     }    
     
@@ -251,7 +261,7 @@ void RenderableSpriteModel::Update ()
 
         //получение текстуры из кэша
         
-      ITexture* texture = impl->render.GetTexture (material->Image (), need_alpha, impl->query);
+      ITexture* texture = impl->render.GetTexture (material->Image (), need_alpha, this);
       
         //проверка корректности данных - получение размеров текстуры и тайла
         
@@ -377,7 +387,7 @@ void RenderableSpriteModel::Update ()
       }
       
       impl->need_update_sprites = false;
-    }      
+    }          
   }
   catch (std::exception& exception)
   {
@@ -399,11 +409,11 @@ void RenderableSpriteModel::Update ()
 
 void RenderableSpriteModel::DrawCore (IFrame& frame)
 {
+  if (impl->model->Properties () && impl->properties_hash != impl->model->Properties ()->Hash ())
+    Update ();
+
   if (impl->primitive->GetSpritesCount ())
   {
-    if (impl->query)
-      impl->query->Update ();    
-
     frame.AddPrimitive (impl->primitive.get ());
   }
 }

@@ -24,6 +24,7 @@
 #include <media/font.h>
 #include <media/rfx/material_library.h>
 #include <media/rfx/sprite_material.h>
+#include <media/video.h>
 
 #include <sg/camera.h>
 #include <sg/scene.h>
@@ -60,6 +61,22 @@ typedef media::rfx::SpriteMaterial         SpriteMaterial;
 typedef SpriteMaterial::Pointer            SpriteMaterialPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Объект, требующий обновления при рендеринге entity
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class IRenderablePrerequisite: public xtl::reference_counter
+{
+  public:
+    virtual ~IRenderablePrerequisite () {}  
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обновление
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void Update () = 0;
+};
+
+typedef xtl::intrusive_ptr<IRenderablePrerequisite> PrerequisitePtr;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Базовый визуализируемый объект
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Renderable: public xtl::reference_counter
@@ -75,6 +92,20 @@ class Renderable: public xtl::reference_counter
 ///Рисование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Draw (IFrame& frame);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Информация для обновления видео текстур
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void  SetVideoPosition (float position);
+    float VideoPosition    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление объектов, требующих пререндеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////  
+    void AddPrerender (const PrerequisitePtr&);
+
+  private:
+    void UpdateNotify ();    
 
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,13 +117,15 @@ class Renderable: public xtl::reference_counter
 ///Рисование объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void DrawCore (IFrame& frame) = 0;
-
+    
   private:
-    void UpdateNotify ();
+    typedef stl::vector<PrerequisitePtr> PrerequisiteList;
 
   private:
     xtl::auto_connection on_update_connection;  //соединение на сигнал оповещения об обновлении объекта
     bool                 need_update;           //флаг необходимости обновления внутренних структур данных объекта
+    float                video_position;        //позиция для видео текстур
+    PrerequisiteList     prerender;             //список объектов, требующих предварительного рендеринга
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,7 +205,6 @@ class RenderableFont
 
   private:
     typedef xtl::uninitialized_storage<render::mid_level::renderer2d::Sprite> SpritesBuffer;
-    typedef xtl::com_ptr<ITexture>                                            TextuerPtr;
 
   private:
     struct Impl;
@@ -327,7 +359,7 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
     Renderable*     GetRenderable (scene_graph::SpriteModel*);  // дублирование!!!
     Renderable*     GetRenderable (scene_graph::HeightMap*);  // дублирование!!!
     Renderable*     GetRenderable (scene_graph::TextLine*);     // дублирование!!!
-    ITexture*       GetTexture    (const char* file_name, bool need_alpha, RenderQueryPtr& out_query);
+    ITexture*       GetTexture    (const char* file_name, bool need_alpha, Renderable* renderable = 0);
     SpriteMaterial* GetMaterial   (const char* name);
     RenderableFont* GetFont       (const char* name);
 
@@ -356,8 +388,9 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание текстур
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TexturePtr CreateTexture        (const char* file_name, bool need_alpha, bool& has_alpha, RenderQueryPtr& out_query);
-    TexturePtr CreateDynamicTexture (const char* name, RenderQueryPtr& out_query);
+    TexturePtr CreateTexture        (const char* file_name, bool need_alpha, bool& has_alpha, bool& is_shared, Renderable* renderable, PrerequisitePtr& prerender);
+    TexturePtr CreateDynamicTexture (const char* name, PrerequisitePtr& prerender);
+    TexturePtr CreateVideoTexture   (const char* name, Renderable* renderable, PrerequisitePtr& prerender);
 
   private:
     struct RenderableHolder
@@ -371,18 +404,20 @@ class Render: public ICustomSceneRender, public xtl::reference_counter
 
     struct TextureHolder
     {
-      TexturePtr     base_texture;  //базовая текстура
-      TexturePtr     alpha_texture; //альфа-текстура
-      RenderQueryPtr query;         //запрос дочернего рендеринга
+      TexturePtr      base_texture;   //базовая текстура
+      TexturePtr      alpha_texture;  //альфа-текстура
+      PrerequisitePtr prerender;      //пререндер
 
-      TextureHolder (const TexturePtr& in_base_texture, const TexturePtr& in_alpha_texture, const RenderQueryPtr& in_query) :
-        base_texture (in_base_texture), alpha_texture (in_alpha_texture), query (in_query) {}
+      TextureHolder (const TexturePtr& in_base_texture, const TexturePtr& in_alpha_texture, const PrerequisitePtr& in_prerender) 
+        : base_texture (in_base_texture)
+        , alpha_texture (in_alpha_texture)
+        , prerender (in_prerender)
+      { }
     };
 
     typedef stl::hash_map<scene_graph::Entity*, RenderableHolder>        RenderableMap;
     typedef stl::hash_map<stl::hash_key<const char*>, SpriteMaterialPtr> MaterialMap;
     typedef stl::hash_map<stl::hash_key<const char*>, TextureHolder>     TextureMap;
-
     typedef xtl::shared_ptr<RenderableFont>                              RenderableFontPtr;
     typedef stl::hash_map<stl::hash_key<const char*>, RenderableFontPtr> RenderableFontMap;
 

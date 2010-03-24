@@ -65,3 +65,15 @@ void Texture::CaptureImage (media::Image& image)
 
   log.Printf ("Capture image from texture (id=%u)", Id ());  
 }
+
+/*
+    Обновление текстуры
+*/
+
+void Texture::Update (media::Image& image)
+{
+  if (image.Width () != GetWidth () || image.Height () != GetHeight () || format != image.Format ())
+    throw xtl::format_operation_exception ("render::mid_level::debug::renderer2d::Texture::Update", "Incompatible image");
+
+  log.Printf ("Update texture (id=%u)", Id ());
+}

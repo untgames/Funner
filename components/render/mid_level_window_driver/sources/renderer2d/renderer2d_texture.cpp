@@ -72,8 +72,6 @@ ImageTexture::ImageTexture (render::low_level::IDevice& device, const media::Ima
 {
   try
   {
-    TextureDesc tex_desc;
-
     memset (&tex_desc, 0, sizeof (tex_desc));
 
     tex_desc.dimension            = TextureDimension_2D;
@@ -100,8 +98,6 @@ ImageTexture::ImageTexture (render::low_level::IDevice& device, const media::Com
 {
   try
   {
-    TextureDesc tex_desc;
-
     memset (&tex_desc, 0, sizeof (tex_desc));
 
     tex_desc.dimension            = TextureDimension_2D;
@@ -190,7 +186,33 @@ void ImageTexture::CaptureImage (media::Image& image)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::mid_level::window_driver::ImageTexture::CaptureImage");
+    exception.touch ("render::mid_level::window_driver::renderer2d::ImageTexture::CaptureImage");
+    throw;
+  }
+}
+
+/*
+    Обновление текстуры
+*/
+
+void ImageTexture::Update (media::Image& image)
+{
+  try
+  {
+    if (image.Width () != tex_desc.width)
+      throw xtl::format_operation_exception ("", "Image width %u mismatch texture width %u", image.Width (), tex_desc.width);
+      
+    if (image.Height () != tex_desc.height)
+      throw xtl::format_operation_exception ("", "Image height %u mismatch texture height %u", image.Height (), tex_desc.height);
+      
+    if (tex_desc.format != get_pixel_format (image.Format ()))
+      throw xtl::format_operation_exception ("", "Image format %s mismatch texture format %s", get_name (get_pixel_format (image.Format ())), get_name (tex_desc.format));
+    
+    texture->SetData (0, 0, 0, 0, tex_desc.width, tex_desc.height, tex_desc.format, image.Bitmap ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::mid_level::window_driver::renderer2d::ImageTexture::Update");
     throw;
   }
 }
@@ -263,4 +285,14 @@ RenderTargetTexture::ViewPtr RenderTargetTexture::CreateView
     exception.touch ("render::mid_level::window_driver::renderer2d::RenderTargetTexture::CreateView");
     throw;
   }  
+}
+
+/*
+    Обновление текстуры
+*/
+
+void RenderTargetTexture::Update (media::Image&)
+{
+  throw xtl::format_not_supported_exception ("render::mid_level::window_driver::renderer2d::RenderTargetTexture::Update",
+    "Render target textures can't be updated from image");
 }

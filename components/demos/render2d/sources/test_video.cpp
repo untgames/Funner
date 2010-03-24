@@ -10,8 +10,7 @@ float frand (float min_value=0.0f, float max_value=1.0f)
 struct Test
 {
   TestApplication      application;
-  HeightMap::Pointer   height_map;
-  Water::Pointer       water;
+  Sprite::Pointer      sprite;
   OrthoCamera::Pointer camera;
   Scene                scene;
   Screen               screen;
@@ -20,20 +19,14 @@ struct Test
   {
       //создание сцены
 
-    height_map = HeightMap::Create ();
+    sprite = Sprite::Create ();
     
-    height_map->SetCellsCount (GRID_SIZE, GRID_SIZE);
-
-    height_map->SetMaterial ("water_material");
-    height_map->BindToScene (scene);
-    height_map->Translate   (0, 0, 15);
-    height_map->Scale       (10.0f, 10.0f, 1.0f);
-    height_map->SetVerticesColor (math::vec4f (1.0f, 1.0f, 1.0f, 1.0f));
-//    height_map->SetVerticesNormal (normalize (math::vec3f (1.0f, 0, 1.0f)));
+    sprite->SetMaterial ("video_material");
+    sprite->SetScale (15.0f, 15.0f, 1.0f);    
     
-    water = Water::Create (*height_map);
+    sprite->SetProperties (NodeProperties::Create ());
     
-    water->NodeOwnsController ();
+    sprite->BindToScene (scene);
 
     camera = OrthoCamera::Create ();
 
@@ -96,9 +89,7 @@ struct Test
 
       if (common::milliseconds () - last_update >= 10)
       {
-        height_map->Update ((common::milliseconds () - last_update) / 1000.0f);
-        
-        water->PutStorm (math::vec3f (frand ()-0.5f, frand ()-0.5f, 0.0f), 0.1f);
+        sprite->Properties ()->SetProperty ("render.video_position", 25.0f * common::milliseconds () / 1000.0f);
         
         last_update = common::milliseconds ();
       }
@@ -119,7 +110,7 @@ void log_print (const char* log, const char* message)
 
 int main ()
 {
-  printf ("Results of test_water:\n");
+  printf ("Results of test_video:\n");
 
   try
   {

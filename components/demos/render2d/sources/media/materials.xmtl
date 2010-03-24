@@ -18,4 +18,7 @@
   <material id="water_material">
     <sprite_profile image="media/sky.jpg" blend_mode="translucent"/>
   </material>
+  <material id="video_material">
+    <sprite_profile image="video('media/test.ogv')" blend_mode="translucent"/>
+  </material>
 </material_library>

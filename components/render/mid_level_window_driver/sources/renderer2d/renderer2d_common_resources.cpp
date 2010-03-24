@@ -76,21 +76,6 @@ const char* REFLECTION_SHADER_SOURCE_CODE =
 "  TexcoordV SphereMap\n"
 "  Blend     Modulate\n"
 "}\n";
-/*
-"DiffuseColor  1 1 1 1\n"
-"SpecularColor 1 1 1 1\n"
-"Shininess     95\n"
-"Normalize 1\n"
-"Light\n"
-"{\n"
-"  Enable 1\n"
-"  Type   Point\n"
-"  AmbientColor  1 1 1 1\n"
-"  DiffuseColor  1 1 1 1\n"
-"  SpecularColor 1 1 1 1\n"
-"  Position  0 0 0\n"
-"}\n"
-*/
 
 //создание состояния смешивания цветов
 BlendStatePtr create_blend_state
