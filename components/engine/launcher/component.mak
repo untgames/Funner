@@ -30,7 +30,7 @@ ENGINE.FUNNER_SHARED_LIBRARY.IMPORTS           := compile.engine.core compile.co
                                              link.engine.subsystems.input_manager link.engine.subsystems.shell \
                                              link.engine.subsystems.log link.engine.subsystems.file_system \
                                              link.engine.subsystems.resource_system \
-                                             link.media.image.pvr
+                                             link.media.image.pvr link.media.video.gvd link.media.video.theora
 ENGINE.FUNNER_SHARED_LIBRARY.has_windows.IMPORTS := link.render.low_level.opengl_driver link.engine.subsystems.window_input_driver \
                                              link.engine.subsystems.window_manager link.engine.subsystems.window_renderer
 ENGINE.FUNNER_SHARED_LIBRARY.win32.IMPORTS       := link.input.direct_input_driver
