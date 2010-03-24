@@ -65,7 +65,7 @@ int main ()
 
         stream.Decode (j, image);
 
-        stl::string image_name = common::format ("%s/%s_%03u.tga", RESULTS_DIR, 
+        stl::string image_name = common::format ("%s/%s_%03u.png", RESULTS_DIR, 
           common::notdir (common::basename (TEST_FILES [i])).c_str (), j);
 
         image.Save (image_name.c_str ());

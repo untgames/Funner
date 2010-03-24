@@ -1027,7 +1027,7 @@ class GVDDecoder: public IVideoDecoder
           
         _video_file_name = file_name;          
 
-        size_t headSize = 0, framesCount = 0;
+        size_t framesCount = 0;
 
         memcpy (&framesCount, _data.data (), 4);
 
@@ -1050,8 +1050,8 @@ class GVDDecoder: public IVideoDecoder
         _frames_offset   = (size_t)(y * orgW + x) * sizeof (Pixel);
         _pitch           = (size_t)orgW * sizeof (Pixel);
 
-        size_t offset0          = 12, offset1 = 16;
-        unsigned char* framesHeaderData = _data.data () + offset1;
+        size_t offset = 16;
+        unsigned char* framesHeaderData = _data.data () + offset;
         size_t         frameStructSize  = sizeof (VideoFrameHeader);
 
         _frames.clear ();
@@ -1123,7 +1123,7 @@ class GVDDecoder: public IVideoDecoder
       if ((size_t)frame_width > _width)              frame_width  = 0;
       if ((size_t)frame_height > _height)            frame_height = 0;            
 
-      if (_width != frame_width || _height != frame_height)
+      if (_width != (size_t)frame_width || _height != (size_t)frame_height)
       {
         memset (data_buffer, 0, _width * _height * sizeof (Pixel));
       }
