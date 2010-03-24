@@ -64,7 +64,7 @@ struct VideoStream::Impl
   stl::string  name;               //имя видео потока
   VideoQuality quality;            //качество декодирования видео
   size_t       frames_count;       //количество кадров
-  size_t       frames_per_second;  //количество кадров в секунду
+  float        frames_per_second;  //количество кадров в секунду
   size_t       width;              //ширина кадра
   size_t       height;             //высота кадра
   float        pixel_aspect_ratio; //соотношение сторон кадра

@@ -284,7 +284,7 @@ class TheoraDecoderImpl : public IVideoDecoder
 
       GetLastOggPacket ();
 
-      total_frames_count = th_granule_frame (th_decoding_context, ogg_data_packet.granulepos) + 1;
+      total_frames_count = (size_t)th_granule_frame (th_decoding_context, ogg_data_packet.granulepos) + 1;
 
       GetOggPacket (first_video_packet_index);
 
@@ -406,7 +406,7 @@ class TheoraDecoderImpl : public IVideoDecoder
 
     void GetLastOggPacket ()
     {
-      long min_seek_value = -video_file.Size ();
+      long min_seek_value = -(int)video_file.Size ();
 
       for (long current_seek_value = LAST_PACKET_SEEK_STEP;; current_seek_value = stl::max (current_seek_value + LAST_PACKET_SEEK_STEP, min_seek_value))
       {

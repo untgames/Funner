@@ -1,0 +1,27 @@
+Results of gvd1_test:
+Opening file 'data/test1.gvd'
+Stream 'data/test1.gvd':
+  frames_count:      18
+  frames_per_second: 1.0000
+  width:             515
+  height:            747
+  frame_size:        1538820
+  duration:          18.000
+  file 'results/test1_000.tga' hash: {fc,01,2c,e4,d2,75,8f,50,e8,d0,6f,85,15,40,0a,c8}
+  file 'results/test1_001.tga' hash: {a7,a5,df,0f,79,9e,e8,e0,47,65,66,c4,ef,c6,6e,36}
+  file 'results/test1_002.tga' hash: {9c,6c,d4,f2,1b,50,3e,64,d2,ce,5f,52,13,2d,8f,e0}
+  file 'results/test1_003.tga' hash: {cf,69,0b,9f,cf,11,f8,bf,cd,a9,d4,0d,18,cd,42,6f}
+  file 'results/test1_004.tga' hash: {b0,1b,26,70,09,c8,62,de,c4,2b,c1,b7,29,8b,59,0a}
+  file 'results/test1_005.tga' hash: {b7,8f,49,64,23,cc,b8,da,59,4a,08,16,9f,73,36,ff}
+  file 'results/test1_006.tga' hash: {1f,df,eb,a5,15,4d,68,59,23,3b,2a,f1,e6,04,a8,a3}
+  file 'results/test1_007.tga' hash: {43,0d,89,80,56,4d,f1,7d,c8,e5,c5,03,92,79,e7,ef}
+  file 'results/test1_008.tga' hash: {a0,f6,bf,a1,de,a5,b1,46,02,18,31,39,ef,69,b0,0c}
+  file 'results/test1_009.tga' hash: {a1,47,66,03,97,35,b4,90,3f,ea,c6,3f,9b,6f,46,78}
+  file 'results/test1_010.tga' hash: {2b,89,00,97,a0,78,3a,79,5d,ce,10,16,40,23,12,24}
+  file 'results/test1_011.tga' hash: {86,28,b5,f6,b1,00,ee,13,b7,91,eb,dc,c7,03,1d,bc}
+  file 'results/test1_012.tga' hash: {f9,cb,71,b7,05,23,4d,5f,5b,6c,d7,7c,b8,dd,46,3a}
+  file 'results/test1_013.tga' hash: {ed,f5,9a,a5,2d,dc,86,ec,cc,7c,d7,6b,ca,e6,97,ee}
+  file 'results/test1_014.tga' hash: {21,4a,bd,10,ca,e7,f1,6d,02,63,c8,26,f3,59,e0,14}
+  file 'results/test1_015.tga' hash: {be,1d,59,1d,c6,91,45,1e,71,aa,6f,ee,c7,b2,2f,23}
+  file 'results/test1_016.tga' hash: {47,a6,c6,60,dc,44,eb,26,8f,4b,11,6c,17,96,81,2b}
+  file 'results/test1_017.tga' hash: {9f,b9,9c,7b,d0,e8,92,4e,53,b3,eb,9a,cb,64,4e,40}
