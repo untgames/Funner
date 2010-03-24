@@ -12,7 +12,7 @@
 
 using namespace media;
 
-#ifndef _MSC_VER
+#ifdef _MSC_VER
   typedef unsigned __int64 uint64;
 #else
   typedef unsigned long long uint64;
