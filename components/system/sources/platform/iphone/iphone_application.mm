@@ -13,28 +13,103 @@ namespace
 
 const size_t IDLE_TIMER_PERIOD = 1000 / 70; //ограничение в 70 fps
 
-IRunLoopContext* run_loop_context     = 0;
-bool             application_launched = false;
+class ApplicationDelegateImpl;
+
+bool                     application_launched = false;
+ApplicationDelegateImpl* application_delegate = 0;
+
+class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::reference_counter
+{
+  public:
+///Конструктор
+    ApplicationDelegateImpl ()
+      : idle_enabled (false), is_exited (false), listener (0)
+      {}
+
+    ~ApplicationDelegateImpl ()
+    {
+      if (application_delegate == this)
+        application_delegate = 0;
+    }
+
+///Запуск цикла обработки сообщений
+    void Run ()
+    {
+      if (application_delegate)
+        throw xtl::format_operation_exception ("syslib::iPhonePlatform::ApplicationDelegateImpl::ApplicationDelegateImpl::Run", "Loop already runned");
+
+      NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
+      application_delegate = this;
+
+      UIApplicationMain (0, 0, nil, @"ApplicationDelegate");
+
+      [pool release];
+    }
+
+///Выход из приложения
+    void Exit (int code)
+    {
+      throw xtl::format_not_supported_exception ("Application exit not supported on iphone platform");
+    }
+
+///Установка необходимости вызова событий idle
+    void SetIdleState (bool state)
+    {
+      idle_enabled = state;
+    }
+
+///Установка слушателя событий приложения
+    void SetListener (syslib::IApplicationListener* in_listener)
+    {
+      listener = in_listener;
+    }
+
+///События приложения
+    void OnIdle ()
+    {
+      if (idle_enabled && listener)
+        listener->OnIdle ();
+    }
+
+    void OnInitialized ()
+    {
+      if (listener)
+        listener->OnInitialized ();
+    }
+
+    void OnExit ()
+    {
+      if (listener)
+        listener->OnExit (0);
+    }
+
+///Подсчёт ссылок
+    void AddRef ()
+    {
+      addref (this);
+    }
+
+    void Release ()
+    {
+      release (this);
+    }
+
+  private:
+    bool                          idle_enabled;
+    bool                          is_exited;
+    syslib::IApplicationListener* listener;
+};
 
 void idle_handler (Timer& timer)
 {
-  if (run_loop_context)
-    run_loop_context->OnIdle ();
+  if (application_delegate)
+    application_delegate->OnIdle ();
 }
 
 }
 
-namespace syslib
-{
-
-bool is_in_run_loop () //запущен ли главный цикл
-{
-  return application_launched;
-}
-
-}
-
-typedef stl::vector<IApplicationListener*> ListenerArray;
+typedef stl::vector<syslib::iphone::IApplicationListener*> ListenerArray;
 
 @interface ApplicationDelegate : NSObject
 {
@@ -46,8 +121,8 @@ typedef stl::vector<IApplicationListener*> ListenerArray;
 -(id) init;
 -(void) dealloc;
 
--(void) attachListener:(IApplicationListener*)listener;
--(void) detachListener:(IApplicationListener*)listener;
+-(void) attachListener:(syslib::iphone::IApplicationListener*)listener;
+-(void) detachListener:(syslib::iphone::IApplicationListener*)listener;
 
 @end
 
@@ -82,7 +157,6 @@ typedef stl::vector<IApplicationListener*> ListenerArray;
 
 -(void) dealloc
 {
-  run_loop_context     = 0;
   application_launched = false;
 
   delete idle_timer;
@@ -93,14 +167,13 @@ typedef stl::vector<IApplicationListener*> ListenerArray;
 
 -(void) applicationWillFinishLaunching:(UIApplication*)application
 {
-//  run_loop_context->OnEnterRunLoop ();  
 }
 
 -(void) applicationDidFinishLaunching:(UIApplication*)application
 {
   application_launched = true;
   
-  run_loop_context->OnEnterRunLoop ();  
+  application_delegate->OnInitialized ();
 
   idle_timer->Run ();  
 }
@@ -109,7 +182,7 @@ typedef stl::vector<IApplicationListener*> ListenerArray;
 {
   idle_timer->Pause ();
 
-  run_loop_context->OnExit (0);
+  application_delegate->OnExit ();
 }
 
 -(void) applicationDidReceiveMemoryWarning:(UIApplication*)application
@@ -134,64 +207,25 @@ typedef stl::vector<IApplicationListener*> ListenerArray;
    Добавление/удаление подписчиков
 */
 
--(void) attachListener:(IApplicationListener*)listener
+-(void) attachListener:(syslib::iphone::IApplicationListener*)listener
 {
   listeners->push_back (listener);
 }
 
--(void) detachListener:(IApplicationListener*)listener
+-(void) detachListener:(syslib::iphone::IApplicationListener*)listener
 {
   listeners->erase (stl::remove (listeners->begin (), listeners->end (), listener), listeners->end ());
 }
 
 @end
 
-/*
-    Работа с очередью сообщений
-*/
-
-bool Platform::IsMessageQueueEmpty ()
-{
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::IsMessageQueueEmpty", "Message queue not supported");
-}
-
-void Platform::DoNextEvent ()
-{
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::DoNextEvent", "Message queue not supported");
-}
-
-void Platform::WaitMessage ()
-{
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::WaitMessage", "Message queue not supported");
-}
-
-void Platform::UpdateMessageQueue ()
-{
-}
-
-/*
-    Запуск приложения
-*/
-
-void Platform::RunLoop (IRunLoopContext* context)
-{
-  if (!context)
-    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::RunLoop", "context");
-
-  if (run_loop_context)
-    throw xtl::format_operation_exception ("syslib::iPhonePlatform::RunLoop", "Loop already runned");
-
-  NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-
-  run_loop_context = context;
-
-  UIApplicationMain (0, 0, nil, @"ApplicationDelegate");
-
-  [pool release];
-}
-
 namespace syslib
 {
+
+bool is_in_run_loop () //запущен ли главный цикл
+{
+  return application_launched;
+}
 
 namespace iphone
 {
@@ -200,7 +234,7 @@ namespace iphone
    Добавление/удаление подписчиков на события приложения
 */
 
-void attach_application_listener (IApplicationListener* listener)
+void attach_application_listener (syslib::iphone::IApplicationListener* listener)
 {
   if  (!listener)
     return;
@@ -211,7 +245,7 @@ void attach_application_listener (IApplicationListener* listener)
   [(ApplicationDelegate*)([UIApplication sharedApplication].delegate) attachListener:listener];
 }
 
-void detach_application_listener (IApplicationListener* listener)
+void detach_application_listener (syslib::iphone::IApplicationListener* listener)
 {
   if (!is_in_run_loop ())
     return;
@@ -221,4 +255,13 @@ void detach_application_listener (IApplicationListener* listener)
 
 }
 
+}
+
+/*
+    Создание делегата приложения
+*/
+
+IApplicationDelegate* Platform::CreateDefaultApplicationDelegate ()
+{
+  return new ApplicationDelegateImpl;
 }

@@ -64,7 +64,7 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
     WindowImpl            *window_impl;        //окно
     ListenerArray         *listeners;          //подписчика на события
     TouchDescriptionArray *touch_descriptions; //массив для хранения описаний текущего события
-    WindowEventContext    event_context;      //контекст, передаваемый обработчикам событий
+    WindowEventContext    *event_context;      //контекст, передаваемый обработчикам событий
 }
 
 @property (nonatomic, readwrite) WindowImpl* window_impl;
@@ -100,6 +100,7 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 {
   delete touch_descriptions;
   delete listeners;
+  delete event_context;
 
   [super dealloc];
 }
@@ -115,20 +116,20 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
   if (self)
   {
-    window_impl          = 0;
-    listeners            = 0;
-    touch_descriptions   = 0;
-    event_context.handle = self;
-
     [self layer].delegate = self;
 
     try
     {
-      listeners          = new ListenerArray ();
+      event_context = new WindowEventContext;
+
+      event_context->handle = self;
+
+      listeners          = new ListenerArray;
       touch_descriptions = new TouchDescriptionArray (DEFAULT_TOUCH_BUFFER_SIZE);
     }
     catch (...)
     {
+      delete event_context;
       delete listeners;
       delete touch_descriptions;
 
@@ -235,7 +236,7 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
 -(WindowEventContext&) getEventContext
 {
-  return event_context;
+  return *event_context;
 }
 
 /*

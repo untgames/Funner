@@ -9,7 +9,6 @@
 #include <xtl/string.h>
 
 #include <common/component.h>
-#include <common/log.h>
 #include <common/parser.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
@@ -37,7 +36,6 @@ namespace
 
 const char* SUBSYSTEM_NAME = "IPhoneAudioSession";                   //имя подсистемы
 const char* COMPONENT_NAME = "engine.subsystems.IPhoneAudioSession"; //имя компонента
-const char* LOG_NAME       = COMPONENT_NAME;                         //имя лога
 
 class IPhoneAudioSessionSubsystem;
 
@@ -122,7 +120,7 @@ class IPhoneAudioSessionSubsystem : public ISubsystem, public xtl::reference_cou
   public:
 /// Конструктор/деструктор
     IPhoneAudioSessionSubsystem (common::ParseNode& node, SubsystemManager& in_subsystem_manager)
-      : log (LOG_NAME), subsystem_manager (in_subsystem_manager)
+      : subsystem_manager (in_subsystem_manager)
     {
       try
       {
@@ -187,7 +185,6 @@ class IPhoneAudioSessionSubsystem : public ISubsystem, public xtl::reference_cou
     typedef stl::vector <AffectedSubsystemDescPtr>  AffectedSubsystemsDescsArray;
 
   private:
-    common::Log                  log;
     SubsystemManager&            subsystem_manager;
     AffectedSubsystemsDescsArray affected_subsystems;
 };

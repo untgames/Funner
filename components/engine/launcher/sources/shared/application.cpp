@@ -125,7 +125,7 @@ class Application: public IFunnerApi
       {
           //регистрация обработчика старта приложения
 
-        syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnRunLoopEnter, xtl::bind (&Application::StartupHandler, this));
+        syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this));
 
           //запуск основного цикла
   
