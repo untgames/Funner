@@ -72,7 +72,7 @@ void Texture::CaptureImage (media::Image& image)
 
 void Texture::Update (media::Image& image)
 {
-  if (image.Width () != GetWidth () || image.Height () != GetHeight () || format != image.Format ())
+  if (image.Width () != GetWidth () || image.Height () != GetHeight () || format != get_format (image.Format ()))
     throw xtl::format_operation_exception ("render::mid_level::debug::renderer2d::Texture::Update", "Incompatible image");
 
   log.Printf ("Update texture (id=%u)", Id ());
