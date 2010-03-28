@@ -23,7 +23,7 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
   public:
 ///Конструктор
     ApplicationDelegateImpl ()
-      : idle_enabled (false), is_exited (false), listener (0)
+      : idle_enabled (false), listener (0)
       {}
 
     ~ApplicationDelegateImpl ()
@@ -97,7 +97,6 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
 
   private:
     bool                          idle_enabled;
-    bool                          is_exited;
     syslib::IApplicationListener* listener;
 };
 
