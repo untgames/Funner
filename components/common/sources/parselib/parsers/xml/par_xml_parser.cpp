@@ -247,7 +247,7 @@ class XmlParser
 
       attributes_count = 0;
 
-      for (;; lexer.NextLexem ())
+      for (;; lexer.NextTextLexem ())
         switch (lexer.Lexem ())
         {
           case XmlLexem_Token:
@@ -340,7 +340,7 @@ class XmlParser
             break;
         }
 
-        lexer.NextLexem ();
+        lexer.NextTextLexem ();
       }      
     }
     
@@ -443,7 +443,7 @@ class XmlParser
             builder.EndNode (); //восстановление после ошибки
             return;
           case XmlLexem_TagEndBracket:
-            lexer.NextLexem ();
+            lexer.NextTextLexem ();
             ParseContentElements ();
           case XmlLexem_TagClose:
             builder.EndNode ();
@@ -572,7 +572,7 @@ class XmlParser
           break;
         }
         case XmlInstruction_Encoding:
-          Warning (line, "not yet implement. Encoding='%s'", value);
+//          Warning (line, "not yet implement. Encoding='%s'", value);
           break;
         case XmlInstruction_Standalone:
         {

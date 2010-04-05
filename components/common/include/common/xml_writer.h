@@ -94,6 +94,16 @@ class XmlWriter
     void BeginCData ();
     void EndCData ();
 
+    template <class T> void WriteXmlTextData (const T& value);
+    template <class T> void WriteXmlTextData (const T& value, const char* format);
+    template <class Char, class Traits, class Allocator>
+    void WriteXmlTextData (const stl::basic_string<Char, Traits, Allocator>& value);
+    template <class Char, class Traits, class Allocator>
+    void WriteXmlTextData (const stl::basic_string<Char, Traits, Allocator>& value, const char* format);
+    void WriteXmlTextData (const char* value);
+    void WriteXmlTextData (const char* value, const char* format);
+
+
   private:
     XmlWriter (const XmlWriter&); //no impl
     XmlWriter& operator = (const XmlWriter&); //no impl

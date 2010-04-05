@@ -19,12 +19,12 @@
   -->  
 
   <MATERIAL 
-    NAME = "Mat3" 
-    COLOR = "000099" 
-    EPS = '10' 
-    MU = "1" 
+    NAME="Ma//t3" 
+    COLOR = "00//0099" 
+    EPS = '//10' 
+    MU = "1//" 
     SIGMA = "100"/>
-
+  //ad///sa//
   <New1>
     1.001 2.001 3.001 4.001
   <New2/>
@@ -55,6 +55,7 @@
     X = "0.5" />
 
   <New>
+<Tag>text</Tag>
   </New>
 
 </NAME>
