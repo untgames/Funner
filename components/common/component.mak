@@ -9,7 +9,7 @@ COMMON.SOURCES.TYPE                              := static-lib
 COMMON.SOURCES.NAME                              := funner.common
 COMMON.SOURCES.INCLUDE_DIRS                      := include ../xtl/include ../../extern/pcre/include sources
 COMMON.SOURCES.SOURCE_DIRS                       := sources/file_system/core sources/streams sources/hash sources/crypto/core sources/memory \
-                                                    sources/parselib/tree sources/parselib/manager sources/strlib sources/utils sources/log \
+                                                    sources/parselib/tree sources/parselib/manager sources/parselib/utils sources/strlib sources/utils sources/log \
                                                     sources/platform/default
 COMMON.SOURCES.DOCUMENTATION_DIRS                := include
 COMMON.SOURCES.COMPILER_DEFINES                  := PCRE_STATIC

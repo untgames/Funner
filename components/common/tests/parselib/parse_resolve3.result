@@ -1,0 +1,10 @@
+Results of parse_resolve3_test:
+Parse successfull
+root (source='', line=0): {}
+ A (source='', line=1): {}
+  B (source='data/test5.wxf', line=3): { Hello}
+  C (source='data/test5.wxf', line=4): {Hello world}
+data/test5.wxf(3): error: node 'B': Invalid argument <name>='A.C'. Property has not registered
+    at common::PropertyMap::Impl::GetIndex
+    at common::PropertyMap::GetProperty(const char*,stl::string&)
+    at common::ParseResolver::Resolve

@@ -14,6 +14,7 @@
 #include <math/quat.h>
 
 #include <common/parser.h>
+#include <common/property_map.h>
 #include <common/strlib.h>
 
 using namespace common;

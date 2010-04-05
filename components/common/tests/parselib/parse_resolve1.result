@@ -1,0 +1,6 @@
+Results of parse_resolve1_test:
+Parse successfull
+root (source='', line=0): {}
+ node (source='', line=1): {A}
+  node (source='data/test4.wxf', line=3): {B, replacement.test1 replacement.test2 replacement.test3 {{test5} test4}
+  node (source='data/test4.wxf', line=4): {C, replacement._test2 _test3}
