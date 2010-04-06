@@ -21,6 +21,11 @@ const char* REGISTRY_COMPONENTS_MASK = "engine.subsystems.*";  //маска имени авт
 struct StartupManagerImpl::Impl
 {
   public:
+///Конструктор
+    Impl ()
+    {
+    }
+  
 ///Регистрация обработчика запуска подсистемы
     void RegisterStartupHandler (const char* configuration_node_name, const StartupHandler& startup_handler)
     {
@@ -51,19 +56,56 @@ struct StartupManagerImpl::Impl
     {
       startup_handlers.clear ();
     }
-
+    
 ///Запуск подсистем
     void Start (common::ParseNode& node, const char* wc_mask, SubsystemManager& manager)
     {
       static common::ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
+      
+      common::Log log (common::format ("%s.%s", LOG_PREFIX, manager.Name ()).c_str ());      
 
-      common::Log log (common::format ("%s.%s", LOG_PREFIX, manager.Name ()).c_str ());
+      log.Printf ("Start subsystems...");      
+      
+      common::PropertyMap properties;
 
-      log.Printf ("Start subsystems...");
+      StartCore (node, wc_mask, manager, properties);
 
+      log.Printf ("Subsystems successfully started");
+    }
+
+  private:
+///Запуск подсистем
+    void StartCore (common::ParseNode& node, const char* wc_mask, SubsystemManager& manager, common::PropertyMap& properties)
+    {
+      common::Log log (common::format ("%s.%s", LOG_PREFIX, manager.Name ()).c_str ());      
+      
       for (common::ParseNode iter=node.First (); iter; iter=iter.Next ())
       {
         const char* node_name = iter.Name ();
+
+        if (!strcmp (node_name, "Include"))
+        {
+          try
+          {
+            IncludeSubsystems (iter, wc_mask, manager, properties);
+          }
+          catch (std::exception& exception)
+          {
+            log.Printf ("Exception %s(%u): node '%s': %s", iter.Source (), iter.LineNumber (), node_name, exception.what ());
+          }
+          catch (...)
+          {
+            log.Printf ("Exception %s(%u): node '%s': unknown exception", iter.Source (), iter.LineNumber (), node_name);
+          }
+
+          continue;
+        }
+        else if (!strcmp (node_name, "Properties"))
+        {                    
+          ReadProperties (iter, properties, log);
+          
+          continue;
+        }
 
         if (!common::wcmatch (node_name, wc_mask))
           continue;
@@ -84,19 +126,61 @@ struct StartupManagerImpl::Impl
 
         try
         {
-          entry.handler (iter, manager);
+          entry.handler (resolve_references (iter, properties), manager);
         }
         catch (std::exception& exception)
         {
-          log.Printf ("Exception %s(%u): node '%s': %s\n", iter.Source (), iter.LineNumber (), node_name, exception.what ());
+          log.Printf ("Exception %s(%u): node '%s': %s", iter.Source (), iter.LineNumber (), node_name, exception.what ());
         }
         catch (...)
         {
-          log.Printf ("Exception %s(%u): node '%s': unknown exception\n", iter.Source (), iter.LineNumber (), node_name);
+          log.Printf ("Exception %s(%u): node '%s': unknown exception", iter.Source (), iter.LineNumber (), node_name);
         }
       }
+    }  
+  
+///Подключение подсистем, описанных в другом файле
+    void IncludeSubsystems (common::ParseNode& node, const char* wc_mask, SubsystemManager& manager, common::PropertyMap& properties)
+    {
+      try
+      {
+        const char* file_name = common::get<const char*> (node, "Source");
+        
+        common::Parser parser (file_name);
+        common::Log log (LOG_PREFIX);
 
-      log.Printf ("Subsystems successfully started");
+        parser.Log ().Print (xtl::bind (&common::Log::Print, &log, _1));
+
+        StartCore (parser.Root ().First ("Configuration"), wc_mask, manager, properties);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::StartupManagerImpl::IncludeHandler");
+        throw;
+      }
+    }
+    
+///Чтение свойств
+    void ReadProperties (common::ParseNode& node, common::PropertyMap& properties, common::Log& log)
+    {
+      for (common::Parser::Iterator iter=node.First ("Property"); iter; ++iter)
+      {
+        try
+        {
+          const char* name  = common::get<const char*> (*iter, "Name");
+          const char* value = common::get<const char*> (*iter, "Value");
+
+          properties.SetProperty (name, value);
+        }
+        catch (std::exception& exception)
+        {
+          log.Printf ("Exception %s(%u): %s", iter->Source (), iter->LineNumber (), exception.what ());
+        }
+        catch (...)
+        {
+          log.Printf ("Exception %s(%u): unknown exception", iter->Source (), iter->LineNumber ());
+        }
+      }
     }
 
   private:

@@ -63,8 +63,8 @@ class VideoTexturePrerender: public IRenderablePrerequisite
         stream.Decode (frame, buffer);        
 
         texture->Update (buffer);
-        
-        current_frame = frame;
+
+        current_frame = frame;        
       }
       catch (xtl::exception& e)
       {

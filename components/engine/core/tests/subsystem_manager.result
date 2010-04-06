@@ -9,7 +9,6 @@ engine.SubsystemManager1: Add subsystem 'Subsystem01'
 Starting subsystem 'Subsystem11', value='1'
 engine.SubsystemManager1: Add subsystem 'Subsystem11'
 engine.SubsystemManager1: Subsystems successfully started
-engine.SubsystemManager1: data/configuration.xml(1): warning: not yet implement. Encoding='windows-1251'
 Subsystems count is 4
   #1: 'Subsystem22'
   #2: 'Subsystem12'

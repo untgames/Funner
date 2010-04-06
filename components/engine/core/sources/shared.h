@@ -20,6 +20,7 @@
 #include <common/component.h>
 #include <common/log.h>
 #include <common/parser.h>
+#include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 

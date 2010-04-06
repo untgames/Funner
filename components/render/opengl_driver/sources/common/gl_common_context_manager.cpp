@@ -366,16 +366,17 @@ struct ContextManager::Impl: public xtl::reference_counter
 //Проверка ошибок OpenGL
     void CheckErrors (const char* source)
     {
-      if (!GetValidationState ())
+      printf ("1\n");
+      if (!GetValidationState ())      
         return;
-
+      printf ("2\n");
       if (!source)
         source = "render::low_level::ContextManager::Impl::CheckErrors";
-
+      printf ("3\n");
       MakeContextCurrent (false);
-
+      printf ("4\n");
       GLenum error = glGetError ();
-
+      printf ("5 %04x\n", error);
       switch (error)
       {
         case GL_NO_ERROR:
@@ -397,6 +398,7 @@ struct ContextManager::Impl: public xtl::reference_counter
         default:
           throw xtl::format_exception<OpenGLException> (source, "OpenGL error: code=0x%04x", error);
       }
+      printf ("6\n");
     }
 
 ///Очистка текущей ошибки OpenGL

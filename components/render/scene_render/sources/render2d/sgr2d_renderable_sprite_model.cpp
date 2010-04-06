@@ -415,5 +415,5 @@ void RenderableSpriteModel::DrawCore (IFrame& frame)
   if (impl->primitive->GetSpritesCount ())
   {
     frame.AddPrimitive (impl->primitive.get ());
-  }
+  }  
 }

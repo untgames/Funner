@@ -158,6 +158,15 @@ struct SubsystemManager::Impl
         subsystems.erase (subsystems.end () - 1);
       }
     }
+    
+///Выполнение команды
+    void Execute (const char* command)
+    {
+      for (Subsystems::iterator iter=subsystems.begin (), end=subsystems.end (); iter!=end; ++iter)
+      {
+        (*iter)->subsystem->Execute (command);
+      }
+    }
 
   private:
     typedef xtl::com_ptr<ISubsystem> SubsystemPtr;
@@ -311,4 +320,24 @@ void SubsystemManager::Remove (const char* wc_mask)
 void SubsystemManager::RemoveAll ()
 {
   impl->RemoveAll ();
+}
+
+/*
+    Посылка команды подсистемам
+*/
+
+void SubsystemManager::Execute (const char* command)
+{
+  try
+  {
+    if (!command)
+      throw xtl::make_null_argument_exception ("", "command");
+      
+    impl->Execute (command);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("engine::SubsystemManager::Execute");
+    throw;
+  }
 }
