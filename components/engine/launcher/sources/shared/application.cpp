@@ -42,8 +42,8 @@ const char* KEY_VERSION_SHORT = "-v";             //вывод справки в стандартный 
 const char* KEY_HELP          = "--help";         //вывод справки в стандартный поток вывода
 
 const char* HELP [] = {
-  "Usage: app_name [args]\n",
-  "  args:\n",
+  "Usage: app_name [flags] [source] ...\n",
+  "  flags:\n",
   "    --config=config_file_name - launch with specified config file\n",
   "    --version (-v)            - print version\n",
   "    --no-main-loop            - app exits after starting subsystems\n",
@@ -100,6 +100,10 @@ class Application: public IFunnerApi
           else if (!xtl::xstrcmp (argument, KEY_HELP))
           {
             need_print_help = true;
+          }
+          else
+          {
+            manager.Execute (argument);
           }
         }
         

@@ -5,7 +5,7 @@
     <Console Filters="engine.*"/>
     <File FileName="/io/stdout" Filters="engine.*" Flush="1">
       <OutputFormat 
-        Replacement="{log}: {message}" 
+        Replacement="{{log}: {{message}" 
         SortOrder="1"
       >
         Filter="*" 

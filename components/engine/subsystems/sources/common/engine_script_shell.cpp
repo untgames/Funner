@@ -68,6 +68,23 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
       if (*command)
         shell.Execute (command);
     }
+    
+///Выполнение команды
+    void Execute (const char* command)
+    {
+      if (!wcimatch (command, "*.lua") && !wcimatch (command, "*.luac"))
+        return;        
+        
+      try
+      {
+        shell.ExecuteFile (command);
+      }
+      catch (xtl::exception& e)
+      { 
+        e.touch ("engine::ShellSubsystem::Execute");
+        throw;
+      }
+    }
 
 /// Подсчёт ссылок
     void AddRef ()  { addref (this); }

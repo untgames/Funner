@@ -50,6 +50,6 @@ WorldOrtY = 0 0 -1
 WorldOrtZ = 0 1 0
 engine.SubsystemManager1: Add subsystem 'Shell'
 engine.SubsystemManager1: Subsystems successfully started
-engine.SubsystemManager1: config_shell.xml(1): warning: not yet implement. Encoding='windows-1251'
+Hello world
 engine.SubsystemManager1: Remove subsystem 'Shell'
 engine.SubsystemManager1: Remove subsystem 'Log'
