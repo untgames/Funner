@@ -10,6 +10,7 @@
 #include <xtl/string.h>
 
 #include <common/console.h>
+#include <common/string.h>
 
 #include <syslib/application.h>
 
@@ -74,7 +75,9 @@ class Application: public IFunnerApi
     {
       try
       {
-        for (size_t i=0; i<args_count; i++)
+        commands.Reserve (args_count);
+        
+        for (size_t i=1; i<args_count; i++)
         {
           const char* argument = args [i];
 
@@ -100,10 +103,11 @@ class Application: public IFunnerApi
           else if (!xtl::xstrcmp (argument, KEY_HELP))
           {
             need_print_help = true;
+            has_main_loop   = false;
           }
           else
           {
-            manager.Execute (argument);
+            commands.Add (argument);
           }
         }
         
@@ -152,8 +156,6 @@ class Application: public IFunnerApi
       {      
           //запуск подсистем
 
-        manager.Start (configuration_name.c_str ());
-
         if (need_print_version)
           common::Console::Printf ("Application version: %s\n", VERSION);
 
@@ -164,7 +166,27 @@ class Application: public IFunnerApi
           //если основного цикла нет - выход из приложения
 
         if (!has_main_loop)
-          syslib::Application::Exit (0);
+          syslib::Application::Exit (0);            
+
+        if (!need_print_help && !need_print_version)
+        {
+          try
+          {
+            manager.Start (configuration_name.c_str ());
+            
+            for (size_t i=0, count=commands.Size (); i<count; i++)
+            {
+              const char* command = commands [i];
+
+              manager.Execute (command);
+            }
+          }
+          catch (...)
+          {
+            syslib::Application::Exit (-1);
+            throw;
+          }
+        }
       }
       catch (std::exception& exception)
       {
@@ -177,12 +199,13 @@ class Application: public IFunnerApi
     }
 
   private:
-    SubsystemManager manager;                    //менеджер подсистем
-    bool             has_main_loop;              //есть ли главный цикл приложения
-    bool             has_explicit_configuration; //конфигурация приложения указана явно
-    stl::string      configuration_name;         //имя конфигурации
-    bool             need_print_version;         //нужно распечатать строку версии
-    bool             need_print_help;            //нужно распечатать помощь по запуску приложения
+    SubsystemManager    manager;                    //менеджер подсистем
+    bool                has_main_loop;              //есть ли главный цикл приложения
+    bool                has_explicit_configuration; //конфигурация приложения указана явно
+    stl::string         configuration_name;         //имя конфигурации
+    bool                need_print_version;         //нужно распечатать строку версии
+    bool                need_print_help;            //нужно распечатать помощь по запуску приложения
+    common::StringArray commands;                   //команды на выполнение подсистемами
 };
 
 }

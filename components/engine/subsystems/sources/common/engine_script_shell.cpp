@@ -35,13 +35,11 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
 
       const char *interpreter = get<const char*> (node, "Interpreter"),
                  *libraries   = get<const char*> (node, "Libraries", ""),
-                 *sources     = get<const char*> (node, "Sources"),
+                 *sources     = get<const char*> (node, "Sources", ""),
                  *command     = get<const char*> (node, "Execute", "");
 
       StringArray lib_list = split (libraries),
                   src_list = split (sources);
-
-        //установка потока протоколирования
 
         //загрузка библиотек
 
@@ -73,7 +71,7 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
     void Execute (const char* command)
     {
       if (!wcimatch (command, "*.lua") && !wcimatch (command, "*.luac"))
-        return;        
+        return;                
         
       try
       {
