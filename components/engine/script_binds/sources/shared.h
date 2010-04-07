@@ -1,6 +1,8 @@
 #ifndef SCRIPTBINDS_SHARED_HEADER
 #define SCRIPTBINDS_SHARED_HEADER
 
+#include <stl/hash_set>
+
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
@@ -14,6 +16,7 @@
 #include <common/console.h>
 #include <common/file.h>
 #include <common/log.h>
+#include <common/strlib.h>
 
 #include <script/bind.h>
 #include <script/environment.h>

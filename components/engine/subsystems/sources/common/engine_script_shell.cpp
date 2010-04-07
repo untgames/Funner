@@ -33,10 +33,22 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
     {
         //чтение конфигурации
 
-      const char *interpreter = get<const char*> (node, "Interpreter"),
-                 *libraries   = get<const char*> (node, "Libraries", ""),
-                 *sources     = get<const char*> (node, "Sources", ""),
-                 *command     = get<const char*> (node, "Execute", "");
+      const char *interpreter         = get<const char*> (node, "Interpreter"),
+                 *libraries           = get<const char*> (node, "Libraries", ""),
+                 *sources             = get<const char*> (node, "Sources", ""),
+                 *command             = get<const char*> (node, "Execute", ""),
+                 *config_search_paths = get<const char*> (node, "SearchPaths", ""),
+                 *shell_search_paths  = getenv ("LUA_SEARCH_PATHS");
+
+      stl::string search_paths = config_search_paths;
+
+      if (shell_search_paths)
+      {
+        if (!search_paths.empty ())
+          search_paths.push_back (';');
+
+        search_paths += shell_search_paths;
+      }
 
       StringArray lib_list = split (libraries),
                   src_list = split (sources);
@@ -49,8 +61,10 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
         //регистрация менеджера подсистем
 
       InvokerRegistry& engine_lib = environment->Library ("Engine");
+      InvokerRegistry& global_lib = environment->Library ("global");
 
       engine_lib.Register ("get_SubsystemManager", make_const (xtl::ref (manager)));
+      global_lib.Register ("searchpaths", make_const (search_paths));
 
         //создание интерпретатора
 

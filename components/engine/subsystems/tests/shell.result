@@ -1,5 +1,6 @@
 Results of shell_test:
 engine.SubsystemManager1: Add subsystem 'Log'
+included_fn
 Node test
 Name = 
 Position = 0 0 0
