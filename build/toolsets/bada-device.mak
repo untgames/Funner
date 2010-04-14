@@ -2,6 +2,7 @@ PROFILES              += bada_device
 BADA_TOOLCHAIN        := ARM
 BADA_TOOLCHAIN_PREFIX := arm-samsung-nucleuseabi-
 COMMON_CFLAGS         += -DBADA_DEVICE -Wno-psabi -Wno-uninitialized
+COMMON_LINK_FLAGS     += #-nostdlib
 DLL_LIB_SUFFIX        := .so
 DLL_PREFIX            := lib
 EXE_SUFFIX            :=

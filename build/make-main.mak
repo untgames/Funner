@@ -24,7 +24,7 @@ PCH_SHORT_NAME                          := pch.h         #Базовое имя PCH файла
 EXPORT_VAR_PREFIX                       := export        #Префикс имени переменной экспортирования настроек компонента
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag    #Базовое имя файла-флага пакетной компиляции
 VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package doxygen-info #Допустимые типы целей
-PACKAGE_COMMANDS                        := build clean test check run install #Команды, делегируемые компонентам пакета
+PACKAGE_COMMANDS                        := build clean test check run install export #Команды, делегируемые компонентам пакета
 COMPILE_TOOL                            := tools.c++compile     #Имя макроса утилиты компиляции C++ файлов
 LINK_TOOL                               := tools.link           #Имя макроса утилиты редактора связей
 LIB_TOOL                                := tools.lib            #Имя макроса утилиты архивирования объектных файлов
@@ -92,6 +92,9 @@ DOXYGEN_TEMPLATE_DIR                    := $(BUILD_DIR)$(DOXYGEN_TEMPLATE_DIR_SH
 DOXYGEN_TEMPLATE_CFG_FILE               := $(DOXYGEN_TEMPLATE_DIR)/$(DOXYGEN_TEMPLATE_CFG_FILE_SHORT_NAME)
 DOXYGEN_DEFAULT_TOPIC                   := $(DOXYGEN_TEMPLATE_DIR)/$(DOXYGEN_DEFAULT_TOPIC_SHORT_NAME)
 DOXYGEN_TOOL                            := $(DOXYGEN_DIR)/bin/doxygen
+EXPORT_DIR                              ?= $(DIST_DIR)/export
+EXPORT_LIB_DIR                          := $(EXPORT_DIR)/lib
+EXPORT_INCLUDE_DIR                      := $(EXPORT_DIR)/include
 
 ###################################################################################################
 #Если не указан фильтры - обрабатываем все доступные
@@ -128,7 +131,7 @@ define process_files_impl
   
   FILE_LIST :=
 
-  -include $$($2.CONFIG_FILE)
+  -include $$($2.CONFIG_FILE)  
 
   ifneq (,$$(filter %*,$4))
     #Обработка файловых масок
@@ -155,7 +158,7 @@ define process_files_impl
         $2.SOURCE_INSTALLATION_FILES := $$(FILE_LIST:%=$3%)
       endif
     endif
-  endif    
+  endif      
 
 #Обработка вложений
   $$(foreach dir,$$($2.SOURCE_INSTALLATION_DIRS),$$(eval $$(call process_subdir,$1,$$(dir),$5/$$(dir:$3%=%),$6)))
@@ -175,6 +178,42 @@ ifneq (,$5)
   endif
 endif
 
+endef
+
+###################################################################################################
+#Копирование файлов
+###################################################################################################
+
+#Копирование файла (исходный файл, целевой файл)
+define copy_file
+$2: $1
+	@cp -v "$$<" "$$@"
+endef
+
+#Копирование файлов между папками (имя цели, список файлов, целевой каталог)
+define copy_files
+  $1.COPY_FILES := $$(addprefix $3/,$$(notdir $2))
+
+  DIST_DIRS := $$(DIST_DIRS) $3  
+
+  export: $3 $$($1.COPY_FILES)
+
+  $$(foreach file,$2,$$(eval $$(call copy_file,$$(file),$3/$$(notdir $$(file)))))
+endef
+
+#Обработчик копирования файлов (имя файла, результирующий каталог, имя цели)
+define process_copy_files
+  ifneq (,$$(filter %/,$$(wildcard $1/)))
+    $$(eval $$(call process_files,$3,$1,*,$2,copy_files))  
+  else  
+    DESTINATION_FILE := $2/$$(notdir $1)       
+    DIST_DIRS        := $$(DIST_DIRS) $2
+
+    export: $2 $$(DESTINATION_FILE)
+
+    $$(DESTINATION_FILE): $1
+			@cp -v "$$<" "$$@"
+  endif    
 endef
 
 ###################################################################################################
@@ -825,9 +864,21 @@ define process_target_common
 
   .PHONY: DUMP.$1
   
+#Обработка экспорта файлов
+  $1.EXPORT.COMPONENT_FILES := $$(call specialize_paths,$$($1.EXPORT.COMPONENT_FILES))
+  $1.EXPORT.OUT_DIR         := $$(EXPORT_DIR)/$$($1.EXPORT.OUT_DIR)
+
+  $$(foreach source,$$($1.EXPORT.COMPONENT_FILES),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR),$1)))
+  
+  $1.EXPORT.LIBS     := $$($1.EXPORT.LIBS:%=$(DIST_LIB_DIR)/$(LIB_PREFIX)%$(LIB_SUFFIX))  
+  $1.EXPORT.INCLUDES := $$(call specialize_paths,$$($1.EXPORT.INCLUDES))      
+
+  $$(foreach source,$$($1.EXPORT.LIBS),$$(eval $$(call process_copy_files,$$(source),$$(EXPORT_LIB_DIR),$1)))
+  $$(foreach source,$$($1.EXPORT.INCLUDES),$$(eval $$(call process_copy_files,$$(source),$$(EXPORT_INCLUDE_DIR),$1)))
+		
 #Обработка специфических правил для каждого типа целей
   
-  $$(eval $$(call process_target.$$(strip $$($1.TYPE)),$1))  
+  $$(eval $$(call process_target.$$(strip $$($1.TYPE)),$1))    
 endef
 
 #Проверка корректности типа цели (тип цели)
@@ -848,9 +899,10 @@ reinstall: uninstall install
 install: build
 test: install
 check: build
+export: build
 force:
 
-.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall
+.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export
 
 #Специализация списка целей (в зависимости от профиля)
 $(foreach profile,$(PROFILES),$(eval TARGETS := $$(TARGETS) $$(TARGETS.$$(profile))))  
