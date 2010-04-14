@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE Scene SYSTEM "UIForm.dtd">
+<Scene Dversion="2">
+    <Form id="IDF_FORM1">
+        <property BGColor="" BGColorOpacity="0" Orientation="Automatic:2Dir" softKey0NormalIcon="" softKey0PressedIcon="" softKey0Text="" softKey1NormalIcon="" softKey1PressedIcon="" softKey1Text="" title="Hello bada!" titleAlign="ALIGN_LEFT" titleIcon=""/>
+        <layout mode="Portrait" style="FORM_STYLE_TITLE|FORM_STYLE_INDICATOR|FORM_STYLE_SOFTKEY_0"/>
+        <layout mode="Landscape" style="FORM_STYLE_TITLE|FORM_STYLE_INDICATOR|FORM_STYLE_SOFTKEY_0"/>
+    </Form>
+    <Button id="IDC_BUTTON_OK" parent="IDF_FORM1">
+        <property DisabledBitmapPath="" NormalBGBitmapPath="" NormalBitmapPath="" PressedBGBitmapPath="" PressedBitmapPath="" disableTextColor="" hAlign="ALIGN_CENTER" normalTextColor="" pressedTextColor="" text="OK" vAlign="ALIGN_MIDDLE"/>
+        <layout height="91" mode="Portrait" width="241" x="120" y="236"/>
+        <layout height="103" mode="Landscape" width="401" x="200" y="108"/>
+    </Button>
+</Scene>

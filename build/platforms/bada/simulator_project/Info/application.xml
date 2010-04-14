@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Application>
+    <Entry>FunnerTestApplication</Entry>
+    <Name>
+        <English>FunnerTestApplication</English>
+    </Name>
+    <Vendor>UNT Games Studio</Vendor>
+    <Description>This is default funner engine test application</Description>
+    <Icons>
+        <MainMenu>FunnerTestApplication.png</MainMenu>
+        <Setting/>
+        <Ticker/>
+        <QuickPanel/>
+        <LaunchImage/>
+    </Icons>
+</Application>

@@ -1,0 +1,10 @@
+<Application ID="1" Name="FunnerTestApplication">
+    <Icon></Icon>
+    <Manufacturer></Manufacturer>
+    <Version>1.0.0</Version>
+    <Size>12875247</Size>
+    <DataSize></DataSize>
+    <PurchaseDate>2010-03-06</PurchaseDate>
+    <ExpirationDate></ExpirationDate>
+    <Description>This is default funner engine test application</Description>
+</Application>
