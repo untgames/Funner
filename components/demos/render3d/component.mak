@@ -17,4 +17,3 @@ DEMOS.RENDER3D.SOURCES.IMPORTS       := compile.system compile.render.low_level 
                                         link.media.rfx.default_serializers link.media.image link.scene_graph.core \
                                         link.physics.low_level.bullet_driver link.input.low_level
 DEMOS.RENDER3D.SOURCES.win32.IMPORTS := link.input.direct_input_driver 
-                                        
