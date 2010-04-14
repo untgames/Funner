@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := SDKS.FUNNER3D
+TARGETS := SDKS.FUNNER3D SDKS.FUNNER3D.BUILD
                                        
 SDKS.FUNNER3D.TYPE          := sdk
 SDKS.FUNNER3D.NAME          := funner3d
@@ -15,3 +15,7 @@ SDKS.FUNNER3D.IMPORTS       :=  compile.system compile.render.low_level compile.
                                 link.media.rfx.default_serializers link.media.image link.scene_graph.core \
                                 link.physics.low_level.bullet_driver link.input.low_level
 SDKS.FUNNER3D.win32.IMPORTS  := link.input.direct_input_driver
+
+SDKS.FUNNER3D.BUILD.TYPE           := sdk
+SDKS.FUNNER3D.BUILD.OUT_DIR        := funner3d/build
+SDKS.FUNNER3D.BUILD.SOURCE_FILES   := ../../../build

@@ -794,10 +794,13 @@ endef
 
 #Сборка SDK (имя цели)
 define process_target.sdk
-  $1.EXPORT.LIBS          := $$($1.LIBS)
-  $1.EXPORT.INCLUDES      := $$($1.INCLUDE_DIRS)
-  $1.EXPORT.LIB_FILTER    := $$($1.LIB_FILTER)
-  $1.EXPORT.OUT_DIR       := $$($1.NAME)
+  $1.EXPORT.LIBS            := $$($1.LIBS)
+  $1.EXPORT.INCLUDES        := $$($1.INCLUDE_DIRS)
+  $1.EXPORT.LIB_FILTER      := $$($1.LIB_FILTER)
+  $1.EXPORT.OUT_DIR         := $$(if $$($1.OUT_DIR),$$($1.OUT_DIR),$$($1.NAME))
+  $1.EXPORT.COMPONENT_FILES := $$($1.SOURCE_FILES)
+  
+ifneq (,$$($1.NAME))
   $1.EXPORT.CONFIG_FILE   := $$(EXPORT_DIR)/$$($1.NAME)/$$(EXPORT_FILE_SHORT_NAME)
   $1.COMPILE_PREFIX       := export.compile.$$($1.NAME)
   $1.LINK_PREFIX          := export.link.$$($1.NAME)
@@ -816,6 +819,9 @@ define process_target.sdk
 		@echo '$$($1.LINK_PREFIX).LIB_DIRS        := $$(notdir $$(EXPORT_LIB_DIR))' >> $$@
 		@echo '$$($1.LINK_PREFIX).LIBS            := $$(strip $$($1.LIBS))' >> $$@		
 		@echo '$$($1.LINK_PREFIX).LINK_INCLUDES   := $$($1.LINK_INCLUDES)' >> $$@
+		
+endif
+
 endef
 
 #Импортирование переменных (префикс источника, префикс приёмника, относительный путь к используемому компоненту)
@@ -902,7 +908,8 @@ define process_target_common
   $$(eval $$(call process_target.$$(strip $$($1.TYPE)),$1))    
   
 #Обработка экспорта файлов
-  $1.EXPORT.COMPONENT_FILES := $$(call specialize_paths,$$($1.EXPORT.COMPONENT_FILES))
+
+  $1.EXPORT.COMPONENT_FILES := $$(call specialize_paths,$$($1.EXPORT.COMPONENT_FILES))  
   $1.EXPORT.OUT_DIR         := $$(if $$($1.EXPORT.OUT_DIR),$$(EXPORT_DIR)/$$($1.EXPORT.OUT_DIR),$$(EXPORT_DIR))
 
   $$(foreach source,$$($1.EXPORT.COMPONENT_FILES),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR),$1)))
