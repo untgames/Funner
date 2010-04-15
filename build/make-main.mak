@@ -8,19 +8,20 @@ default: build
 ###################################################################################################
 #Константы сборки
 ###################################################################################################
-COMPONENT_CONFIGURATION_FILE_SHORT_NAME := component.mak #Базовое имя файла конфигурации компонента
-EXPORT_FILE_SHORT_NAME                  := export.mak    #Базовое имя файла экспорта
-PROCESS_DIR_CONFIG_FILE_SHORT_NAME      := config.mak    #Базовое имя файла конфигурации обработки директории
-TMP_DIR_SHORT_NAME                      := tmp           #Базовое имя каталога с временными файлами
+COMPONENT_CONFIGURATION_FILE_SHORT_NAME ?= component.mak #Базовое имя файла конфигурации компонента
+EXPORT_FILE_SHORT_NAME                  ?= export.mak    #Базовое имя файла экспорта
+PROCESS_DIR_CONFIG_FILE_SHORT_NAME      ?= config.mak    #Базовое имя файла конфигурации обработки директории
+TMP_DIR_SHORT_NAME                      ?= tmp           #Базовое имя каталога с временными файлами
+TMP_DIR_SHORT_NAME                      ?= tmp           #Базовое имя каталога с временными файлами сборки
+DEFAULT_INSTALLATION_FILES              ?= data                 #Список файлов, папок и файловых масок, инсталлируемых по умолчанию
+DIST_DIR_SHORT_NAME                     ?= dist          #Базовое имя каталога с результатами сборки
+PCH_SHORT_NAME                          ?= pch.h         #Базовое имя PCH файла
 SOURCE_FILES_SUFFIXES                   := c cpp         #Расширения исходных файлов
-TMP_DIR_SHORT_NAME                      := tmp           #Базовое имя каталога с временными файлами сборки
-DIST_DIR_SHORT_NAME                     := dist          #Базовое имя каталога с результатами сборки
 TOOLSETS_DIR_SHORT_NAME                 := toolsets      #Базовое имя каталога с конфигурациями toolset-ов
 DOXYGEN_TEMPLATE_DIR_SHORT_NAME         := doxygen       #Базовое имя каталога с шаблонами doxygen
 DOXYGEN_DEFAULT_TOPIC_SHORT_NAME        := default_topic.html #Базовое имя страницы по умолчанию doxygen
 DOXYGEN_TEMPLATE_CFG_FILE_SHORT_NAME    := template.cfg  #Имя шаблонного файла с конфигурацией doxygen
 DOXYGEN_TAGS_DIR_SHORT_NAME             := ~DOXYGEN_TAGS #Имя каталога с тэгами документации
-PCH_SHORT_NAME                          := pch.h         #Базовое имя PCH файла
 EXPORT_VAR_PREFIX                       := export        #Префикс имени переменной экспортирования настроек компонента
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag    #Базовое имя файла-флага пакетной компиляции
 VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package doxygen-info sdk #Допустимые типы целей
@@ -33,7 +34,6 @@ UNINSTALL_TOOL                          := tools.uninstall      #Имя макроса ути
 RUN_TOOL                                := tools.run            #Имя макроса утилиты запуска приложения
 DLL_PATH                                := PATH                 #Имя переменной среды для указания путей к длл-файлам
 AUTO_COMPILER_DEFINES                   := NAME TYPE LINK_INCLUDES_COMMA COMPILER_CFLAGS EXECUTION_DIR
-DEFAULT_INSTALLATION_FILES              := data                 #Список файлов, папок и файловых масок, инсталлируемых по умолчанию
 INSTALLATION_FLAG_SUFFIX                := .installation-flag   #Суффикс инсталляционных флагов
 
 ###################################################################################################
@@ -95,6 +95,8 @@ DOXYGEN_TOOL                            := $(DOXYGEN_DIR)/bin/doxygen
 EXPORT_DIR                              ?= $(DIST_DIR)/export
 EXPORT_LIB_DIR                          := lib
 EXPORT_INCLUDE_DIR                      := include
+EXPORT_DLL_DIR                          := bin
+EXPORT_BIN_DIR                          := bin
 
 ###################################################################################################
 #Если не указан фильтры - обрабатываем все доступные
@@ -555,9 +557,10 @@ define process_target.application
     $$(error Empty application name at build target '$1' component-dir='$(COMPONENT_DIR)')
   endif
 
-  $1.EXE_FILE                      := $(DIST_BIN_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,$(EXE_SUFFIX))
+  $1.OUT_DIR                       := $$(if $$($1.OUT_DIR),$$(COMPONENT_DIR)/$$($1.OUT_DIR),$$(DIST_BIN_DIR))
+  $1.EXE_FILE                      := $$($1.OUT_DIR)/$$($1.NAME)$$(if $$(suffix $$($1.NAME)),,$(EXE_SUFFIX))
   TARGET_FILES                     := $$(TARGET_FILES) $$($1.EXE_FILE)
-  $1.TARGET_DLLS                   := $$($1.DLLS:%=$(DIST_BIN_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
+  $1.TARGET_DLLS                   := $$($1.DLLS:%=$$($1.OUT_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))  
   DIST_DIRS                        := $$(DIST_DIRS) $$(dir $$($1.EXE_FILE))
   $1.SOURCE_INSTALLATION_DLL_FILES := $$($1.TARGET_DLLS)
   $1.SOURCE_INSTALLATION_EXE_FILES := $$($1.EXE_FILE)
@@ -567,7 +570,7 @@ define process_target.application
   $$(eval $$(call process_target_with_sources,$1))
   
   ifeq (,$$($1.EXECUTION_DIR))
-    $1.EXECUTION_DIR := $(DIST_BIN_DIR)
+    $1.EXECUTION_DIR := $$($1.OUT_DIR)
   endif
   
   $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
@@ -578,7 +581,7 @@ define process_target.application
 		@echo Running $$(notdir $$<)...
 		@$$(call prepare_to_execute,$$($1.EXECUTION_DIR),$$(dir $$($1.EXE_FILE)) $$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args)
 
-  ifneq (,$$(filter $$(files:%=$(DIST_BIN_DIR)/%$(EXE_SUFFIX)),$$($1.EXE_FILE)))
+  ifneq (,$$(filter $$(files:%=$$($1.OUT_DIR)/%$(EXE_SUFFIX)),$$($1.EXE_FILE)))
     ifeq (,$$($1.DISABLE_RUN))
       run: RUN.$1
     endif
@@ -796,21 +799,24 @@ endef
 define process_target.sdk
   $1.EXPORT.LIBS            := $$($1.LIBS)
   $1.EXPORT.INCLUDES        := $$($1.INCLUDE_DIRS)
+  $1.EXPORT.DLLS            := $$($1.DLLS)
+  $1.EXPORT.EXECUTABLES     := $$($1.EXECUTABLES)
   $1.EXPORT.LIB_FILTER      := $$($1.LIB_FILTER)
   $1.EXPORT.OUT_DIR         := $$(if $$($1.OUT_DIR),$$($1.OUT_DIR),$$($1.NAME))
   $1.EXPORT.COMPONENT_FILES := $$($1.SOURCE_FILES)
-  
+
 ifneq (,$$($1.NAME))
   $1.EXPORT.CONFIG_FILE   := $$(EXPORT_DIR)/$$($1.NAME)/$$(EXPORT_FILE_SHORT_NAME)
   $1.COMPILE_PREFIX       := export.compile.$$($1.NAME)
   $1.LINK_PREFIX          := export.link.$$($1.NAME)
-  DIST_DIRS               := $$(DIST_DIRS) $$(dir $$($1.EXPORT.CONFIG_FILE))
+  $1.RUN_PREFIX           := export.run.$$($1.NAME)
+  DIST_DIRS               := $$(DIST_DIRS) $$(dir $$($1.EXPORT.CONFIG_FILE))  
 
-  export: EXPORT.$1
+  export: EXPORTCFG.$1
   
-  EXPORT.$1: $$($1.EXPORT.CONFIG_FILE)
+  .PHONY: EXPORTCFG.$1
   
-  .PHONY: EXPORT.$1
+  EXPORTCFG.$1: $$($1.EXPORT.CONFIG_FILE)    
   
   $$($1.EXPORT.CONFIG_FILE): $$(dir $$($1.EXPORT.CONFIG_FILE))
 		@echo Create SDK export file for $$($1.NAME)...
@@ -819,7 +825,9 @@ ifneq (,$$($1.NAME))
 		@echo '$$($1.LINK_PREFIX).LIB_DIRS        := $$(notdir $$(EXPORT_LIB_DIR))' >> $$@
 		@echo '$$($1.LINK_PREFIX).LIBS            := $$(strip $$($1.LIBS))' >> $$@		
 		@echo '$$($1.LINK_PREFIX).LINK_INCLUDES   := $$($1.LINK_INCLUDES)' >> $$@
-		
+		@echo '$$($1.RUN_PREFIX).DLLS             := $$($1.DLLS)' >> $$@
+		@echo '$$($1.RUN_PREFIX).DLL_DIRS         := $$(notdir $$(EXPORT_DLL_DIR))' >> $$@
+
 endif
 
 endef
@@ -902,10 +910,10 @@ define process_target_common
   dump: DUMP.$1
 
   .PHONY: DUMP.$1  
-		
+
 #Обработка специфических правил для каждого типа целей
-  
-  $$(eval $$(call process_target.$$(strip $$($1.TYPE)),$1))    
+
+  $$(eval $$(call process_target.$$(strip $$($1.TYPE)),$1))
   
 #Обработка экспорта файлов
 
@@ -914,13 +922,20 @@ define process_target_common
 
   $$(foreach source,$$($1.EXPORT.COMPONENT_FILES),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR),$1)))
   
-  $1.EXPORT.LIB_FILTER ?= %
-  $1.EXPORT.LIBS       := $$(filter $$($1.EXPORT.LIB_FILTER),$$($1.EXPORT.LIBS))
-  $1.EXPORT.LIBS       := $$($1.EXPORT.LIBS:%=$(DIST_LIB_DIR)/$(LIB_PREFIX)%$(LIB_SUFFIX))
-  $1.EXPORT.INCLUDES   := $$(call specialize_paths,$$($1.EXPORT.INCLUDES))      
+  $1.EXPORT.LIB_FILTER  ?= %
+  $1.EXPORT.LIBS        := $$(filter $$($1.EXPORT.LIB_FILTER),$$($1.EXPORT.LIBS))
+  $1.EXPORT.LIBS        := $$($1.EXPORT.LIBS:%=$(DIST_LIB_DIR)/$(LIB_PREFIX)%$(LIB_SUFFIX))
+  $1.EXPORT.INCLUDES    := $$(call specialize_paths,$$($1.EXPORT.INCLUDES))
+  $1.EXPORT.DLLS        := $$($1.EXPORT.DLLS:%=$$($1.EXPORT.OUT_DIR)/$$(EXPORT_DLL_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
+  $1.EXPORT.EXECUTABLES := $$($1.EXPORT.EXECUTABLES:%=$$(DIST_BIN_DIR)/%$(EXE_SUFFIX))
+
+  export: $$($1.EXPORT.DLLS)
 
   $$(foreach source,$$($1.EXPORT.LIBS),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_LIB_DIR),$1)))
-  $$(foreach source,$$($1.EXPORT.INCLUDES),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_INCLUDE_DIR),$1)))  
+  $$(foreach source,$$($1.EXPORT.INCLUDES),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_INCLUDE_DIR),$1)))
+  $$(foreach source,$$($1.EXPORT.EXECUTABLES),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_BIN_DIR),$1)))
+
+  $$(foreach file,$$($1.EXPORT.DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
 endef
 
 #Проверка корректности типа цели (тип цели)
