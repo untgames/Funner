@@ -16,6 +16,10 @@
 #include <physics/low_level/scene.h>
 #include <physics/low_level/shape.h>
 
+#ifdef _MSC_VER
+  #pragma warning (disable : 4250) //'class1' : inherits 'class2::member' via dominance
+#endif
+
 using namespace physics::low_level;
 
 class Object : virtual public IObject, public xtl::reference_counter
@@ -31,7 +35,7 @@ class Object : virtual public IObject, public xtl::reference_counter
 class TestScene : public IScene, public Object
 {
   public:
-    TestScene () : gravity (0, -9.8, 0), simulation_step (1.f / 60.f) {}
+    TestScene () : gravity (0.0f, -9.8f, 0.0f), simulation_step (1.f / 60.f) {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление гравитацией

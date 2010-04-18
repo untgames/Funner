@@ -35,7 +35,11 @@
 #include <BulletCollision/CollisionShapes/btStaticPlaneShape.h>
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
 #include <BulletCollision/CollisionShapes/btTriangleMesh.h>
+#include <BulletDynamics/ConstraintSolver/btConeTwistConstraint.h>
+#include <BulletDynamics/ConstraintSolver/btHingeConstraint.h>
+#include <BulletDynamics/ConstraintSolver/btPoint2PointConstraint.h>
 #include <BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
+#include <BulletDynamics/ConstraintSolver/btSliderConstraint.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <LinearMath/btDefaultMotionState.h>
@@ -172,7 +176,7 @@ class RigidBody : public IRigidBody, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RigidBody  (IShape* shape, float mass);
+    RigidBody  (bullet::Shape* shape, float mass);
     ~RigidBody ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,8 +246,9 @@ class RigidBody : public IRigidBody, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Мировое положение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const Transform& WorldTransform    ();
-    void             SetWorldTransform (const Transform& transform);
+    const Transform& WorldTransform                  ();
+    void             SetWorldTransform               (const Transform& transform);
+    xtl::connection  RegisterTransformUpdateCallback (const TransformUpdateCallback& callback_handler);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение bullet тела
@@ -269,15 +274,28 @@ class Joint : public IJoint, public Object
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктор
+///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Joint ();
+    Joint (RigidBody* body1, RigidBody* body2, btTypedConstraint* joint);
+    ~Joint ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t     ObjectsCount ();
-    RigidBody* GetObject    (size_t index);
+    size_t      ObjectsCount ();
+    IRigidBody* GetObject    (size_t index);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение bullet соединения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    btTypedConstraint* BulletJoint ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Подписка на удаление объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function <void (Joint*)> BeforeDestroyHandler;
+
+    xtl::connection RegisterDestroyHandler (const BeforeDestroyHandler& handler);
 
   private:
     struct Impl;
@@ -332,6 +350,11 @@ class Scene : public IScene, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::connection RegisterCollisionCallback (CollisionEventType event_type, const CollisionCallback& callback_handler);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Оповещение о коллизии
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void ColissionNotify (const CollisionEvent& event);
+
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
@@ -374,6 +397,13 @@ class Driver : public IDriver, public Object
     stl::auto_ptr<Impl> impl;
 };
 
+//хранится в btRigidBody
+struct RigidBodyInfo
+{
+  RigidBody* body;
+  Scene*     scene;
+};
+
 //преобразование векторов
 void vector_from_bullet_vector (const btVector3& bullet_vector, math::vec3f& target_vector);
 void bullet_vector_from_vector (const math::vec3f& vector, btVector3& target_vector);
@@ -381,6 +411,14 @@ void bullet_vector_from_vector (const math::vec3f& vector, btVector3& target_vec
 //преобразование кватернионов
 void quaternion_from_bullet_quaternion (const btQuaternion& bullet_quaternion, math::quatf& target_quaternion);
 void bullet_quaternion_from_quaternion (const math::quatf& quaternion, btQuaternion& target_quaternion);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Приведение типов объектов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class DstT, class SrcT>
+DstT* cast_object (SrcT* ptr, const char* source, const char* argument_name);
+
+#include "detail/object.inl"
 
 }
 
