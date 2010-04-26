@@ -688,7 +688,6 @@ void Device::DrawIndexed (PrimitiveType primitive_type, size_t first_index, size
   }
   catch (xtl::exception& exception)
   {
-    printf ("exception: %s\n", exception.what ());
     exception.touch ("render::low_level::opengl::Device::DrawIndexed");
 
     throw;
