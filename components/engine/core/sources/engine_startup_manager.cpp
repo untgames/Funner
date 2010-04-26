@@ -126,7 +126,9 @@ struct StartupManagerImpl::Impl
 
         try
         {
-          entry.handler (resolve_references (iter, properties), manager);
+          common::ParseNode parse_node = resolve_references (iter, properties);
+
+          entry.handler (parse_node, manager);
         }
         catch (std::exception& exception)
         {
@@ -151,7 +153,9 @@ struct StartupManagerImpl::Impl
 
         parser.Log ().Print (xtl::bind (&common::Log::Print, &log, _1));
 
-        StartCore (parser.Root ().First ("Configuration"), wc_mask, manager, properties);
+        common::ParseNode configuration_node = parser.Root ().First ("Configuration");
+
+        StartCore (configuration_node, wc_mask, manager, properties);
       }
       catch (xtl::exception& e)
       {
