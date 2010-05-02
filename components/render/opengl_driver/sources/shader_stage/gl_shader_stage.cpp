@@ -457,12 +457,13 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 
         try
         {
-          xtl::trackable::function_type on_destroy (xtl::bind (&Impl::RemoveBindableProgram, this, iter));
+          xtl::trackable::function_type on_destroy_program (xtl::bind (&Impl::RemoveBindableProgram, this, program, (ProgramParametersLayout*)0));
+          xtl::trackable::function_type on_destroy_layout (xtl::bind (&Impl::RemoveBindableProgram, this, (ICompiledProgram*)0, layout));
 
-          c = program->RegisterDestroyHandler (on_destroy, bindable_program->GetTrackable ());
+          c = program->RegisterDestroyHandler (on_destroy_program, GetTrackable ());
 
           if (layout)
-            layout->RegisterDestroyHandler (on_destroy, bindable_program->GetTrackable ());
+            layout->RegisterDestroyHandler (on_destroy_layout, GetTrackable ());
         }
         catch (...)
         {
@@ -491,10 +492,24 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
     }
     
 ///Удаление программы, устанавливаемой в контекст OpenGL
-    void RemoveBindableProgram (const BindableProgramMap::iterator& iter)
+    void RemoveBindableProgram (ICompiledProgram* program, ProgramParametersLayout* layout)
     {
-      bindable_programs.erase (iter);
-    }    
+      for (BindableProgramMap::iterator iter = bindable_programs.begin (), end = bindable_programs.end (); iter != end;)
+      {
+        if (iter->first.program == program || iter->first.parameters_layout == layout)
+        {
+          BindableProgramMap::iterator next = iter;
+
+          ++next;
+
+          bindable_programs.erase (iter);
+
+          iter = next;
+        }
+        else
+          ++iter;
+      }
+    }
 
 ///Протоколирование ошибок шейдера
     void LogShaderMessage (const char* message)
