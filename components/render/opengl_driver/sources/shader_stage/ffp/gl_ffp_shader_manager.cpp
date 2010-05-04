@@ -8,7 +8,7 @@ using namespace common;
     Конструктор / деструктор
 */
 
-FppShaderManager::FppShaderManager (const ContextManager& context_manager)
+FfpShaderManager::FfpShaderManager (const ContextManager& context_manager)
   : ContextObject (context_manager)
 {
 }
@@ -17,7 +17,7 @@ FppShaderManager::FppShaderManager (const ContextManager& context_manager)
     Количество поддерживаемых профилей
 */
 
-size_t FppShaderManager::GetProfilesCount ()
+size_t FfpShaderManager::GetProfilesCount ()
 {
   return 1;
 }
@@ -26,30 +26,30 @@ size_t FppShaderManager::GetProfilesCount ()
     Имена поддерживаемых профилей
 */
 
-const char* FppShaderManager::GetProfile (size_t index)
+const char* FfpShaderManager::GetProfile (size_t index)
 {
   if (index)
-    throw xtl::make_range_exception ("render::low_level::opengl::FppShaderManager::GetProfile", "index", index, 1);
+    throw xtl::make_range_exception ("render::low_level::opengl::FfpShaderManager::GetProfile", "index", index, 1);
     
-  return "fpp";
+  return "ffp";
 }
 
 /*
     Создание шейдера
 */
 
-IShader* FppShaderManager::CreateShader  (const ShaderDesc& shader_desc, const LogFunction& error_log)
+IShader* FfpShaderManager::CreateShader  (const ShaderDesc& shader_desc, const LogFunction& error_log)
 {
-  return new FppProgram (GetContextManager (), shader_desc, error_log);
+  return new FfpProgram (GetContextManager (), shader_desc, error_log);
 }
 
 /*
     Создание программы
 */
 
-ICompiledProgram* FppShaderManager::CreateProgram (size_t shaders_count, IShader** shaders, const LogFunction&)
+ICompiledProgram* FfpShaderManager::CreateProgram (size_t shaders_count, IShader** shaders, const LogFunction&)
 {
-  static const char* METHOD_NAME = "render::low_level::opengl::FppShaderManager::CreateProgram";
+  static const char* METHOD_NAME = "render::low_level::opengl::FfpShaderManager::CreateProgram";
 
     //проверка корректности аргументов
 
@@ -59,7 +59,7 @@ ICompiledProgram* FppShaderManager::CreateProgram (size_t shaders_count, IShader
   if (shaders_count > 1)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Multiple shaders not supported (shaders_count=%u)", shaders_count);
 
-  FppProgram* program = cast_object<FppProgram> (*this, shaders [0], METHOD_NAME, "shaders[0]");
+  FfpProgram* program = cast_object<FfpProgram> (*this, shaders [0], METHOD_NAME, "shaders[0]");
 
   if (!program)
     throw xtl::make_null_argument_exception (METHOD_NAME, "shaders[0]");
@@ -84,9 +84,9 @@ namespace low_level
 namespace opengl
 {
 
-IShaderManager* create_fpp_shader_manager (const ContextManager& context_manager)
+IShaderManager* create_ffp_shader_manager (const ContextManager& context_manager)
 {
-  return new FppShaderManager (context_manager);
+  return new FfpShaderManager (context_manager);
 }
 
 }

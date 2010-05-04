@@ -143,7 +143,7 @@ ProgramPtr create_program (IDevice& device, const char* shader_name, const char*
   shader_desc.name             = shader_name;
   shader_desc.source_code_size = strlen (shader_source);
   shader_desc.source_code      = shader_source;
-  shader_desc.profile          = "fpp";
+  shader_desc.profile          = "ffp";
   shader_desc.options          = "";
 
   return ProgramPtr (device.CreateProgram (1, &shader_desc, &shader_error_log), false);

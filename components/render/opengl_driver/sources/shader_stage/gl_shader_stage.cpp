@@ -179,7 +179,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 
 #endif
 
-        RegisterManager (ShaderManagerPtr (create_fpp_shader_manager (context_manager), false));
+        RegisterManager (ShaderManagerPtr (create_ffp_shader_manager (context_manager), false));
         
           //регистрация программы "по умолчанию"
           
@@ -190,7 +190,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
         shader_desc.name             = "Default shader-stage program";
         shader_desc.source_code_size = ~0;
         shader_desc.source_code      = "";
-        shader_desc.profile          = "fpp";
+        shader_desc.profile          = "ffp";
         
         default_program = ProgramPtr (CreateProgram (1, &shader_desc, xtl::bind (&Impl::LogShaderMessage, this, _1)), false);                
       }

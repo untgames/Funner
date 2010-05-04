@@ -29,7 +29,7 @@ RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            := sources/common \
                                                        sources/texture_manager \
                                                        sources/texture_manager/nv_dxt \
                                                        sources/shader_stage \
-                                                       sources/shader_stage/fpp \
+                                                       sources/shader_stage/ffp \
                                                        sources/output_stage \
                                                        sources/query_manager \
                                                        sources/render_target_manager/swap_chain_manager

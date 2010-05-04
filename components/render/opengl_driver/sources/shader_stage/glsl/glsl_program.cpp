@@ -64,7 +64,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
 
       //проверка состо€ни€ программы
 
-    if (link_status)
+/*    if (link_status)
     {
       if (glValidateProgram) glValidateProgram    (handle);
       else                   glValidateProgramARB (handle);
@@ -74,7 +74,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
 
       GetProgramLog (log_buffer);
       error_log     (log_buffer.c_str ());
-    }
+    }*/
 
       //проверка ошибок
 

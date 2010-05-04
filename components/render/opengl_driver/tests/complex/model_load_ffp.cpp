@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const char* SHADER_FILE_NAME  = "data/fpp_shader.wxf";
+const char* SHADER_FILE_NAME  = "data/ffp_shader.wxf";
 const char* MODEL_NAME        = "data/spy.xmesh";
 
 #pragma pack (1)
@@ -492,7 +492,7 @@ int main ()
     stl::string shader_source  = read_shader (SHADER_FILE_NAME);
 
     ShaderDesc shader_descs [] = {
-      {"fpp_shader", size_t (-1), shader_source.c_str (), "fpp", ""},
+      {"ffp_shader", size_t (-1), shader_source.c_str (), "ffp", ""},
     };
 
     static ProgramParameter shader_parameters[] = {
