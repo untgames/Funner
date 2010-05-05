@@ -5,6 +5,12 @@
 ###################################################################################################
 #Выбор конфигурации MSVC
 ###################################################################################################
+ifneq (,$(VS100COMNTOOLS))
+  MSVC_PATH         ?= $(VS100COMNTOOLS)../../vc
+  MSVS_COMMON_PATH  ?= $(VS100COMNTOOLS)../../Common7/Ide
+  PROFILES          += vc10 haswchar
+endif
+
 ifneq (,$(VS90COMNTOOLS))
   MSVC_PATH         ?= $(VS90COMNTOOLS)../../vc
   MSVS_COMMON_PATH  ?= $(VS90COMNTOOLS)../../Common7/Ide
