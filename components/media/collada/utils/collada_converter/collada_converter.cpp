@@ -487,6 +487,49 @@ void save_meshes (const Params& params, const Model& model)
     printf ("Ok\n");
 }
 
+//сохранение анимации
+void save_animation_channel (const Params& params, const AnimationChannel& channel, XmlWriter& writer)
+{
+  XmlWriter::Scope scope (writer, "channel");
+
+  writer.WriteAttribute ("target", channel.TargetName ());
+  writer.WriteAttribute ("parameter", channel.ParameterName ());
+
+  switch (channel.Semantic ())
+  {
+    case AnimationChannelSemantic_Transform:
+    {
+      writer.WriteAttribute ("semantic", "transform");
+
+      const AnimationSampleTransform* sample = channel.Samples <AnimationSampleTransform> ();
+
+      for (size_t i = 0, count = channel.SamplesCount (); i < count; i++, sample++)
+      {
+        XmlWriter::Scope sample_scope (writer, "sample");
+
+        writer.WriteAttribute ("time", sample->time);
+        writer.WriteAttribute ("value", sample->value);
+      }
+      break;
+    }
+    default:
+      throw xtl::format_operation_exception ("save_animation_channel", "can't save channel, unsupported semantic");
+  }
+}
+
+//сохранение анимации
+void save_animation (const Params& params, const Animation& animation, XmlWriter& writer)
+{
+  XmlWriter::Scope scope (writer, "animation");
+
+  writer.WriteAttribute ("id", animation.Id ());
+
+  for (AnimationList::ConstIterator iter = animation.Animations ().CreateIterator (); iter; ++iter)
+    save_animation (params, *iter, writer);
+  for (Animation::AnimationChannelList::ConstIterator iter = animation.Channels ().CreateIterator (); iter; ++iter)
+    save_animation_channel (params, *iter, writer);
+}
+
 //сохранение узла
 void save_node (const Params& params, const Node& node, XmlWriter& writer)
 {
@@ -502,6 +545,7 @@ void save_node (const Params& params, const Node& node, XmlWriter& writer)
 
   XmlWriter::Scope scope (writer, "node");
 
+  writer.WriteAttribute ("id", node.Id ());
   writer.WriteAttribute ("transform", node.Transform ());
   
     //метод экспорта связан с правилами именования инстанцированных мешей в конвертере
@@ -542,6 +586,9 @@ void save_scene (const Params& params, const Model& model)
   for (NodeLibrary::ConstIterator i = model.Scenes ().CreateIterator (); i; ++i)
     save_node (params, *i, writer);
     
+  for (AnimationList::ConstIterator i = model.Animations ().CreateIterator (); i; ++i)
+    save_animation (params, *i, writer);
+
   if (!params.silent)
     printf ("Ok\n");
 }

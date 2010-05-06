@@ -13,7 +13,7 @@ void DaeParser::ParseFloatArray (Parser::Iterator iter, stl::vector<float>& sour
 
   size_t data_count = get<size_t> (*iter, "float_array.count"),
          count      = get<size_t> (*accessor_iter, "count"),
-         stride     = get<size_t> (*accessor_iter, "stride");   
+         stride     = get<size_t> (*accessor_iter, "stride", 1);
 
   if (data_count < count * stride)
     raise_parser_exception (*accessor_iter, "Wrong count/stride attribute. count * stride > float_array.count. count=%u, stride=%u, "
