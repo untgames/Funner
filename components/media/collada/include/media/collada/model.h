@@ -3,6 +3,7 @@
 
 #include <xtl/functional_fwd>
 #include <stl/auto_ptr.h>
+#include <media/collada/collection.h>
 #include <media/collada/library.h>
 #include <common/serializer_manager.h>
 
@@ -13,6 +14,7 @@ namespace collada
 {
 
 //forward declarations
+class Animation;
 class Effect;
 class Image;
 class Material;
@@ -26,15 +28,17 @@ class Node;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Библиотеки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef ILibrary<Effect>   EffectLibrary;
-typedef ILibrary<Image>    ImageLibrary;
-typedef ILibrary<Material> MaterialLibrary;
-typedef ILibrary<Mesh>     MeshLibrary;
-typedef ILibrary<Morph>    MorphLibrary;
-typedef ILibrary<Skin>     SkinLibrary;
-typedef ILibrary<Light>    LightLibrary;
-typedef ILibrary<Camera>   CameraLibrary;
-typedef ILibrary<Node>     NodeLibrary;
+typedef ICollection<Animation> AnimationList;
+
+typedef ILibrary<Effect>    EffectLibrary;
+typedef ILibrary<Image>     ImageLibrary;
+typedef ILibrary<Material>  MaterialLibrary;
+typedef ILibrary<Mesh>      MeshLibrary;
+typedef ILibrary<Morph>     MorphLibrary;
+typedef ILibrary<Skin>      SkinLibrary;
+typedef ILibrary<Light>     LightLibrary;
+typedef ILibrary<Camera>    CameraLibrary;
+typedef ILibrary<Node>      NodeLibrary;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Модель
@@ -78,26 +82,28 @@ class Model
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Библиотеки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          collada::MaterialLibrary& Materials ();
-          collada::EffectLibrary&   Effects   ();
-          collada::ImageLibrary&    Images    ();
-          collada::MeshLibrary&     Meshes    ();
-          collada::MorphLibrary&    Morphs    ();
-          collada::SkinLibrary&     Skins     ();          
-          collada::LightLibrary&    Lights    ();
-          collada::CameraLibrary&   Cameras   ();
-          collada::NodeLibrary&     Nodes     ();
-          collada::NodeLibrary&     Scenes    ();
-    const collada::MaterialLibrary& Materials () const;
-    const collada::EffectLibrary&   Effects   () const;
-    const collada::ImageLibrary&    Images    () const;
-    const collada::MeshLibrary&     Meshes    () const;
-    const collada::MorphLibrary&    Morphs    () const;
-    const collada::SkinLibrary&     Skins     () const;
-    const collada::LightLibrary&    Lights    () const;
-    const collada::CameraLibrary&   Cameras   () const;
-    const collada::NodeLibrary&     Nodes     () const;
-    const collada::NodeLibrary&     Scenes    () const;
+          collada::AnimationList&     Animations ();
+          collada::MaterialLibrary&   Materials  ();
+          collada::EffectLibrary&     Effects    ();
+          collada::ImageLibrary&      Images     ();
+          collada::MeshLibrary&       Meshes     ();
+          collada::MorphLibrary&      Morphs     ();
+          collada::SkinLibrary&       Skins      ();
+          collada::LightLibrary&      Lights     ();
+          collada::CameraLibrary&     Cameras    ();
+          collada::NodeLibrary&       Nodes      ();
+          collada::NodeLibrary&       Scenes     ();
+    const collada::AnimationList&     Animations () const;
+    const collada::MaterialLibrary&   Materials  () const;
+    const collada::EffectLibrary&     Effects    () const;
+    const collada::ImageLibrary&      Images     () const;
+    const collada::MeshLibrary&       Meshes     () const;
+    const collada::MorphLibrary&      Morphs     () const;
+    const collada::SkinLibrary&       Skins      () const;
+    const collada::LightLibrary&      Lights     () const;
+    const collada::CameraLibrary&     Cameras    () const;
+    const collada::NodeLibrary&       Nodes      () const;
+    const collada::NodeLibrary&       Scenes     () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -130,6 +136,7 @@ enum ModelSelect
   ModelSelect_Images      = 256,  //выбрать ресурсы, входящие в библиотеку картинок
   ModelSelect_Effects     = 512,  //выбрать ресурсы, входящие в библиотеку эффектов
   ModelSelect_Materials   = 1024, //выбрать ресурсы, входящие в библиотеку материалов
+  ModelSelect_Animations  = 2048, //выбрать ресурсы, входящие в библиотеку анимаций
   
   ModelSelect_Default     = ModelSelect_ActiveScene,
   ModelSelect_All         = ~0

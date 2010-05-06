@@ -56,7 +56,13 @@ class ItemsSelector
         SelectLibrary (source_model.Effects (), ModelSelect_Effects, "effects");
         SelectLibrary (source_model.Materials (), ModelSelect_Materials, "materials");
 
-          //обмен моделей
+        //выбор анимаций
+
+        if (select_flags & ModelSelect_Animations)
+          for (AnimationList::Iterator iter = const_cast <AnimationList&> (source_model.Animations ()).CreateIterator (); iter; ++iter)
+            target_model.Animations ().Add (*iter);
+
+        //обмен моделей
 
         model.Swap (target_model);
       }

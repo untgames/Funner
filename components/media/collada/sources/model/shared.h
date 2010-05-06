@@ -5,9 +5,9 @@
 #include <stl/vector>
 #include <stl/hash_map>
 
-#include <xtl/reference_counter.h>
-#include <xtl/functional>
 #include <xtl/common_exceptions.h>
+#include <xtl/functional>
+#include <xtl/reference_counter.h>
 
 #include <common/component.h>
 #include <common/strlib.h>

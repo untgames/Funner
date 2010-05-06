@@ -132,4 +132,5 @@ void DaeParser::ParseLibraries (Parser::Iterator iter)
   for_each_child (*iter, "library_lights", bind (&DaeParser::ParseLibraryLights, this, _1));
   for_each_child (*iter, "library_cameras", bind (&DaeParser::ParseLibraryCameras, this, _1));
   for_each_child (*iter, "library_visual_scenes", bind (&DaeParser::ParseLibraryVisualScenes, this, _1));
+  for_each_child (*iter, "library_animations", bind (&DaeParser::ParseLibraryAnimations, this, _1));
 }

@@ -56,7 +56,7 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
 
   mat4f tm;
    
-  ParseTransform (iter, tm);
+  ParseTransform (iter, id, tm);
   
     //создание узла
   
@@ -111,7 +111,7 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
     Разбор преобразований узла
 */
 
-void DaeParser::ParseTransform (Parser::Iterator iter, mat4f& tm)
+void DaeParser::ParseTransform (Parser::Iterator iter, const char* node_id, mat4f& tm)
 {  
   for (Parser::Iterator i=iter->First (); i; ++i)
   {
@@ -124,6 +124,16 @@ void DaeParser::ParseTransform (Parser::Iterator iter, mat4f& tm)
       read (*i, "#text", sub_tm);
         
       tm = sub_tm * tm;
+
+      //занесение ссылки на матрицу в карту семантик анимаций
+      const char* sid = get<const char*> (*i, "sid", "");
+
+      if (xtl::xstrlen (sid))
+      {
+        stl::string target_name (common::format ("%s/%s", node_id, sid));
+
+        animation_semantics.insert_pair (target_name.c_str (), AnimationChannelSemantic_Transform);
+      }
     }
     else if (!strcmp (name, "translate"))
     {
