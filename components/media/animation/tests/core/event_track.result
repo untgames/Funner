@@ -1,0 +1,41 @@
+Results of event_track_test:
+track capacity is 0
+track size is 0
+event '0-1 event (0)' executed in time 0.00
+event '0-0 event (2)' executed in time 0.00
+event '0-5 event (4)' executed in time 0.00
+event '0-1 event (0)' executed in time 1.00
+event '1-0 event (1)' executed in time 1.00
+event '0-1 event (0)' executed in time 2.00
+event '2-3 event (3)' executed in time 2.00
+event '0-1 event (0)' executed in time 3.00
+event '0-1 event (0)' executed in time 4.00
+event '0-1 event (0)' executed in time 5.00
+event '2-3 event (3)' executed in time 5.00
+event '0-5 event (4)' executed in time 5.00
+event '0-1 event (0)' executed in time 6.00
+event '0-1 event (0)' executed in time 7.00
+event '0-1 event (0)' executed in time 8.00
+event '2-3 event (3)' executed in time 8.00
+event '0-1 event (0)' executed in time 9.00
+track capacity is 1024
+track size is 5
+Event 2 delay is 0.00, period is 0.00, event is '0-0 event (2)'
+event '0-1 event (0)' executed in time 0.00
+event 'new event (2)' executed in time 0.00
+event '0-1 event (0)' executed in time 1.00
+event '1-0 event (1)' executed in time 1.00
+event '1.5-2.5 new event (3)' executed in time 1.50
+event '0-1 event (0)' executed in time 2.00
+event '0-1 event (0)' executed in time 3.00
+event '0-1 event (0)' executed in time 4.00
+event '1.5-2.5 new event (3)' executed in time 4.00
+event '0-1 event (0)' executed in time 5.00
+event '0-1 event (0)' executed in time 6.00
+event '1.5-2.5 new event (3)' executed in time 6.50
+event '0-1 event (0)' executed in time 7.00
+event '0-1 event (0)' executed in time 8.00
+event '0-1 event (0)' executed in time 9.00
+event '1.5-2.5 new event (3)' executed in time 9.00
+track size is 4
+track size is 0
