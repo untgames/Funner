@@ -145,6 +145,29 @@ void read_value_from_property (const PropertyImpl<PropertyType_String>& property
       property.name.c_str (), get_name (property.type), property.value.c_str (), get_name (dst_type));
 }
 
+/*
+    Связывание
+*/
+
+const size_t UNASSIGNED_PROPERTY_INDEX = ~0u;
+
+struct Binding: public xtl::reference_counter
+{
+  stl::auto_ptr<IPropertySetter> setter; //функция установки свойства
+  stl::auto_ptr<IPropertyGetter> getter; //функция получения свойства
+  stl::string                    name;   //имя свойства
+  size_t                         index;  //индекс свойства
+
+  Binding (const char* in_name)
+    : name (in_name)
+    , index (UNASSIGNED_PROPERTY_INDEX)
+  {
+  }
+};
+
+typedef xtl::intrusive_ptr<Binding> BindingPtr;
+typedef stl::vector<BindingPtr>     BindingArray;
+
 }
 
 /*
@@ -228,11 +251,14 @@ inline bool read (const char* string, math::mat4f& result)
 
 struct PropertyMap::Impl: public xtl::reference_counter
 {
-  bool          need_hash_update; //необходимо ли обновить хэш
-  size_t        hash;             //хэш параметров (композиция хэша данных и хэша структуры)
-  size_t        data_hash;        //хэш данных
-  size_t        structure_hash;   //хэш структуры
-  PropertyArray properties;       //свойства
+  bool          need_hash_update;        //необходимо ли обновить хэш
+  size_t        hash;                    //хэш параметров (композиция хэша данных и хэша структуры)
+  size_t        data_hash;               //хэш данных
+  size_t        structure_hash;          //хэш структуры
+  size_t        bindings_data_hash;      //хэш отправленных параметров  
+  size_t        bindings_structure_hash; //хэш структуры отправленных параметров
+  PropertyArray properties;              //свойства
+  BindingArray  bindings;                //связывания
 
 ///Конструкторы
   Impl ()  
@@ -240,6 +266,8 @@ struct PropertyMap::Impl: public xtl::reference_counter
     , hash (0)
     , data_hash (0)
     , structure_hash (0)
+    , bindings_data_hash (0)
+    , bindings_structure_hash (0)
   {
     properties.reserve (PROPERTY_ARRAY_RESERVE_SIZE);
   }
@@ -274,13 +302,13 @@ struct PropertyMap::Impl: public xtl::reference_counter
       throw;
     }
   }
-  
+
 ///Деструктор
   ~Impl ()
   {
     Clear ();
   }
-  
+
 ///Получение индекса свойства
   size_t GetIndex (const char* name)
   {
@@ -298,7 +326,7 @@ struct PropertyMap::Impl: public xtl::reference_counter
         
     throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Property has not registered");
   }
-  
+
 ///Создание нового свойства
   static stl::auto_ptr<BasicProperty> CreateProperty (const char* name, common::PropertyType type)
   {
@@ -366,6 +394,55 @@ struct PropertyMap::Impl: public xtl::reference_counter
     need_hash_update = false;
   }
   
+///Получение связывания
+  Binding& GetBinding (const char* name)
+  {
+      //попытка найти связывание
+    
+    for (BindingArray::iterator iter=bindings.begin (), end=bindings.end (); iter!=end; ++iter)
+      if ((*iter)->name == name)
+        return **iter;
+
+      //создание связывания
+
+    BindingPtr binding (new Binding (name), false);
+
+    if (bindings.empty ())
+      bindings.reserve (PROPERTY_ARRAY_RESERVE_SIZE);
+
+    bindings.push_back (binding);
+    
+    bindings_structure_hash = 0;
+    bindings_data_hash      = 0;
+
+    return *binding;
+  }
+  
+///Обновление структуры связываний
+  void UpdateBindingsStructure ()
+  {
+    UpdateHashes ();
+    
+    for (BindingArray::iterator iter=bindings.begin (), end=bindings.end (); iter!=end; ++iter)
+    {
+      Binding& binding = **iter;
+
+      size_t hash  = common::strhash (binding.name.c_str ());
+      size_t index = 0;
+      
+      binding.index = UNASSIGNED_PROPERTY_INDEX;
+
+      for (PropertyArray::iterator iter=properties.begin (), end=properties.end (); iter!=end; ++iter, ++index)
+        if ((*iter)->name_hash == hash)
+        {
+          binding.index = index;
+          break;
+        }
+    }
+
+    bindings_structure_hash = structure_hash;
+  }
+
 ///Установка свойства
   template <class T>
   static void SetProperty (PropertyMap& properties, const char* name, common::PropertyType type, const T& value)
@@ -405,7 +482,7 @@ struct PropertyMap::Impl: public xtl::reference_counter
     properties.clear ();
     
     need_hash_update = true;
-  }
+  }  
 };
 
 /*
@@ -1413,6 +1490,137 @@ const math::mat4f& PropertyMap::GetMatrix (size_t property_index) const
       throw xtl::format_operation_exception (METHOD_NAME, "Could not convert property '%s' from %s to %s", property.name.c_str (), get_name (property.type), get_name (PropertyType_Matrix));
     default:
       throw xtl::format_operation_exception (METHOD_NAME, "Internal error: wrong property '%s' type %d", property.name.c_str (), property.type);
+  }
+}
+
+/*
+    Связывание свойств
+*/
+
+void PropertyMap::BindProperty (const char* name, IPropertyGetter* in_getter)
+{
+  stl::auto_ptr<IPropertyGetter> getter (in_getter);
+  
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+
+    if (!getter)
+      throw xtl::make_null_argument_exception ("", "getter");
+      
+    impl->GetBinding (name).getter = getter;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::PropertyMap::BindProperty(const char*, IPropertyGetter*)");
+    throw;
+  }
+}
+
+void PropertyMap::BindProperty (const char* name, IPropertySetter* in_setter)
+{
+  stl::auto_ptr<IPropertySetter> setter (in_setter);
+  
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+
+    if (!setter)
+      throw xtl::make_null_argument_exception ("", "setter");
+      
+    impl->GetBinding (name).setter = setter;
+    
+    impl->bindings_data_hash = 0;      
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::PropertyMap::BindProperty(const char*, IPropertySetter*)");
+    throw;
+  }
+}
+
+void PropertyMap::UnbindProperty (const char* name)
+{
+  if (!name)
+    return;
+    
+  for (BindingArray::iterator iter=impl->bindings.begin (), end=impl->bindings.end (); iter!=end; ++iter)
+  {
+    impl->bindings.erase (iter);
+    return;
+  }
+}
+
+void PropertyMap::UnbindAllProperties ()
+{
+  impl->bindings.clear ();
+}
+
+/*
+    Обновление связываний
+*/
+
+void PropertyMap::UpdateBindings ()
+{
+  try
+  {
+    if (impl->bindings_structure_hash != StructureHash ())
+      impl->UpdateBindingsStructure ();
+
+    for (BindingArray::iterator iter=impl->bindings.begin (), end=impl->bindings.end (); iter!=end; ++iter)
+    {
+      Binding& binding = **iter;
+      
+      if (!binding.getter)
+        continue;
+        
+      if (binding.index != UNASSIGNED_PROPERTY_INDEX)
+      {
+        binding.getter->Update (*this, binding.index);
+      }
+      else
+      {
+        binding.getter->Update (*this, binding.name.c_str ());
+      }
+    }
+    
+    impl->bindings_data_hash = Hash ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::PropertyMap::UpdateBindings");
+    throw;
+  }
+}
+
+void PropertyMap::CommitBindings () const
+{
+  try
+  {
+    if (impl->bindings_data_hash == Hash ())
+      return;
+      
+    if (impl->bindings_structure_hash != StructureHash ())
+      impl->UpdateBindingsStructure ();
+      
+    for (BindingArray::iterator iter=impl->bindings.begin (), end=impl->bindings.end (); iter!=end; ++iter)
+    {
+      Binding& binding = **iter;
+      
+      if (!binding.setter || binding.index == UNASSIGNED_PROPERTY_INDEX)
+        continue;
+
+      binding.setter->Update (*this, binding.index);
+    }
+      
+    impl->bindings_data_hash = Hash ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::PropertyMap::CommitBindings");
+    throw;
   }
 }
 
