@@ -1,7 +1,7 @@
 #ifndef ANIMATION_ANIMATION_LIBRARY_HEADER
 #define ANIMATION_ANIMATION_LIBRARY_HEADER
 
-#include <animation/animation.h>
+#include <media/animation/animation.h>
 #include <common/serializer_manager.h>
 
 namespace xtl
