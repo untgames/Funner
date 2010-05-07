@@ -12,6 +12,9 @@ template <class T> class iterator;
 
 }
 
+namespace media
+{
+
 namespace animation
 {
 
@@ -21,7 +24,7 @@ namespace animation
 class AnimationLibrary
 {
   public:
-    typedef xtl::iterator<Material::Pointer> Iterator, ConstIterator;
+    typedef xtl::iterator<Animation> Iterator, ConstIterator;
     typedef xtl::function<void (const char*)> LogHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,6 +103,8 @@ typedef common::ResourceSerializerManager
   void (const char* file_name, AnimationLibrary& library, const AnimationLibrary::LogHandler& log_handler),
   void (const char* file_name, const AnimationLibrary& library, const AnimationLibrary::LogHandler& log_handler)
 > AnimationLibraryManager;
+
+}
 
 }
 
