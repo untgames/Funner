@@ -21,7 +21,7 @@ struct Light::Impl
 Light::Light ()
   : impl (new Impl)
 {
-  impl->color       = 0;
+  impl->color       = math::vec3f (1.0f);
   impl->attenuation = 0;
   impl->range       = DEFAULT_LIGHT_RANGE;
 }
