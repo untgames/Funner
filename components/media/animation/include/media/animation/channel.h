@@ -128,6 +128,10 @@ class Channel
     void Swap (Channel&);
 
   private:
+    struct Impl;  
+  
+    Channel (Impl*);
+  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка трека
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,7 +144,6 @@ class Channel
     void RaiseTypeError (const char* source, const std::type_info& type) const;
 
   private:
-    struct Impl;
     Impl* impl;
 };
 

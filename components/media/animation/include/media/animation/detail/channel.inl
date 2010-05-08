@@ -1,18 +1,17 @@
 namespace detail
 {
 
+///базовый класс контейнера функции анимационного канала
 class IEvaluatorBase : public xtl::reference_counter
 {
   public:
-/*
-   Тип трека / тип значения
-*/
-    virtual const std::type_info& TrackType () = 0;
-    virtual const std::type_info& ValueType () = 0;
+    virtual const std::type_info& TrackType () = 0; //тип трека
+    virtual const std::type_info& ValueType () = 0; //тип значения результата
     
-    virtual ~IEvaluatorBase () {};
+    virtual ~IEvaluatorBase () {}
 };
 
+///шаблонный интерфейс функции анимационного канала
 template <class T> class IEvaluator : public IEvaluatorBase
 {
   public:
@@ -24,6 +23,7 @@ template <class T> class IEvaluator : public IEvaluatorBase
     }
 };
 
+///реализация функции анимационного канала
 template <class Fn> class TrackImpl : public IEvaluator<typename TrackResultType<Fn>::Type> 
 {
   public:
@@ -31,7 +31,8 @@ template <class Fn> class TrackImpl : public IEvaluator<typename TrackResultType
     
     TrackImpl (Fn in_fn)
       : fn (in_fn)
-      {}
+    {
+    }
 
     void Eval (float time, ValueType& value)
     {
@@ -47,12 +48,16 @@ template <class Fn> class TrackImpl : public IEvaluator<typename TrackResultType
     {
       return typeid (Fn);
     }
-    
+
   private:
     Fn fn;
 };
 
 }
+
+/*
+    class Evaluator<T>
+*/
 
 /*
    Конструкторы / деструктор / присваивание
@@ -81,13 +86,13 @@ Evaluator<T>::~Evaluator ()
 template <class T>
 Evaluator<T>& Evaluator<T>::operator = (const Evaluator<T>& source)
 {
-  Evaluator (source.impl).Swap (*this);
+  Evaluator (source).Swap (*this);
   
   return *this;  
 }
 
 /*
-   Обмен
+    Обмен
 */
 
 template <class T>
@@ -106,14 +111,26 @@ void swap (Evaluator<T>& evaluator1, Evaluator<T>& evaluator2)
    Вычисление значений
 */
 
+namespace detail
+{
+
+template <class Ret> struct ResultValue
+{
+  Ret value;
+  
+  ResultValue () {}
+};
+
+}
+
 template <class T>
 typename Evaluator<T>::ValueType Evaluator<T>::operator () (float time) const
 {
-  ValueType value;
+  detail::ResultValue<T> result;
   
-  impl->Eval (time, value);
+  impl->Eval (time, result.value);
   
-  return value;
+  return result.value;
 }
 
 template <class T>
@@ -123,7 +140,25 @@ void Evaluator<T>::operator () (float time, ValueType& value)
 }
 
 /*
-   Сплайн
+    class Channel
+*/
+
+/*
+    Вычисление значений по времени
+*/
+
+template <class Ret> Ret Channel::Eval (float time) const
+{
+  return Evaluator<Ret> () (time);
+}
+
+template <class Ret> void Channel::Eval (float time, Ret& result) const
+{
+  Evaluator<Ret> () (time, result);
+}
+
+/*
+    Сплайн
 */
 
 template <class Fn> void Channel::SetTrack (const Fn& fn)
@@ -145,25 +180,7 @@ template <class Fn> Fn* Channel::Track ()
 }
 
 /*
-   Вычисление значений по времени
-*/
-
-template <class Ret> Ret Channel::Eval (float time) const
-{
-  Ret value;
-  
-  Eval (time, value);
-  
-  return value;
-}
-
-template <class Ret> void Channel::Eval (float time, Ret& result) const
-{
-  Evaluator<Ret> () (time, result);
-}
-
-/*
-   Получение функции вычисления значений
+    Получение функции вычисления значений
 */
 
 template <class T> animation::Evaluator<T> Channel::Evaluator () const

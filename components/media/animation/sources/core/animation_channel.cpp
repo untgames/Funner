@@ -18,7 +18,8 @@ struct Channel::Impl : public xtl::reference_counter
 
   Impl ()
     : track_type (&typeid (void)), value_type (&typeid (void))
-    {}
+  {
+  }  
 };
 
 /*
@@ -27,7 +28,13 @@ struct Channel::Impl : public xtl::reference_counter
 
 Channel::Channel ()
   : impl (new Impl)
-  {}
+{
+}
+
+Channel::Channel (Impl* in_impl)
+  : impl (in_impl)
+{
+}
 
 Channel::Channel (const Channel& source)
   : impl (source.impl)
@@ -42,12 +49,7 @@ Channel::~Channel ()
 
 Channel& Channel::operator = (const Channel& source)
 {
-  if (impl == source.impl)
-    return *this;
-  
-  release (impl);
-  impl = source.impl;
-  addref (impl);
+  Channel (source).Swap (*this);
   
   return *this;
 }
@@ -58,11 +60,7 @@ Channel& Channel::operator = (const Channel& source)
 
 Channel Channel::Clone () const
 {
-  Channel return_value;
-
-  return_value.impl = new Impl (*impl);
-
-  return return_value;
+  return Channel (new Impl (*impl));
 }
     
 /*
@@ -71,11 +69,11 @@ Channel Channel::Clone () const
 
 size_t Channel::Id () const
 {
-  return (size_t)impl;
+  return reinterpret_cast<size_t> (impl);
 }
 
 /*
-   Имя анимируемого параметра
+    Имя анимируемого параметра
 */
 
 const char* Channel::ParameterName () const
@@ -92,7 +90,7 @@ void Channel::SetParameterName (const char* name)
 }
 
 /*
-   Тип трека / тип значения
+    Тип трека / тип значения
 */
 
 const std::type_info& Channel::TrackType () const
@@ -106,16 +104,7 @@ const std::type_info& Channel::ValueType () const
 }
 
 /*
-   Обмен
-*/
-
-void Channel::Swap (Channel& source)
-{
-  stl::swap (impl, source.impl);
-}
-
-/*
-   Установка трека
+    Установка трека
 */
 
 void Channel::SetTrackCore (detail::IEvaluatorBase* in_track)
@@ -139,7 +128,7 @@ detail::IEvaluatorBase* Channel::TrackCore () const
 }
 
 /*
-   Выброс исключения несоответствия типа
+    Выброс исключения несоответствия типа
 */
 
 void Channel::RaiseTypeError (const char* source, const std::type_info& type) const
@@ -147,15 +136,20 @@ void Channel::RaiseTypeError (const char* source, const std::type_info& type) co
   throw xtl::format_operation_exception (source, "Type mismatch, requested type '%s', but channel type is '%s'", type.name (), ValueType ().name ());
 }
 
+/*
+    Обмен
+*/
+
+void Channel::Swap (Channel& source)
+{
+  stl::swap (impl, source.impl);
+}
+
 namespace media
 {
 
 namespace animation
 {
-
-/*
-   Обмен
-*/
 
 void swap (Channel& channel1, Channel& channel2)
 {
