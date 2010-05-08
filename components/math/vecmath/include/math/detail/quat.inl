@@ -8,11 +8,6 @@ template <> struct quat_base<float>
 {
   float x, y, z, w;
   
-  __forceinline __m128 data () const
-  {
-    return _mm_loadu_ps (&x);
-  }
-  
   __forceinline void store (__m128 in_data)
   {
     _mm_storeu_ps (&x, in_data);
@@ -39,7 +34,7 @@ struct quat_add {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const quat<float>& a, const quat<float>& b, quat<float>& res) const
   { 
-    res.store (_mm_add_ps (a.data (), b.data ()));
+    res.store (_mm_add_ps (_mm_loadu_ps (&a.x), _mm_loadu_ps (&b.x)));
   }
 #endif
 };
@@ -55,7 +50,7 @@ struct quat_sub {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const quat<float>& a, const quat<float>& b, quat<float>& res) const
   { 
-    res.store (_mm_sub_ps (a.data (), b.data ()));
+    res.store (_mm_sub_ps (_mm_loadu_ps (&a.x), _mm_loadu_ps (&b.x)));
   }
 #endif
 };
@@ -109,7 +104,7 @@ struct quat_copy {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const quat<float>& src, quat<float>& res) const
   {
-    res.store (src.data ());
+    res.store (_mm_loadu_ps (&src.x));
   }
 #endif
 };
@@ -146,7 +141,7 @@ struct quat_neg {
       float  f;  
     } mask = {0x80000000};
 
-    res.store (_mm_xor_ps (src.data (), _mm_set_ps1 (mask.f)));
+    res.store (_mm_xor_ps (_mm_loadu_ps (&src.x), _mm_set_ps1 (mask.f)));
   }
 #endif
 };

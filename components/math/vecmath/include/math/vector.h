@@ -32,7 +32,7 @@ template <class T>                    struct vector_base<T, 4> { T x, y, z, w; }
 //Вектор 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T, unsigned int Size>
-class vector: public vector_base<T, Size>
+class __declspec(align(1)) vector: public vector_base<T, Size>
 {
   public:
     typedef vector_base<T, Size> base;
