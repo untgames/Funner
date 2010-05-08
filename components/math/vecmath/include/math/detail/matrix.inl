@@ -340,7 +340,9 @@ struct matrix_inverse {
 
   __forceinline void operator () (const matrix<float, 4>& src, matrix<float, 4>& res) const
   {
-    matrix<float, 4> a = src;
+    __declspec(align(16)) matrix<float, 4> a = src;
+    __declspec(align(16)) vector<float, 4> t;
+
     res = 1.0f;
 
     for (unsigned int i=0; i<4; i++)
@@ -354,7 +356,7 @@ struct matrix_inverse {
             break;
           }
 
-      vector<float, 4> t = 1.0f / a[i][i];
+      t = 1.0f / a[i][i];
 
       res [i] *= t;
       a [i]   *= t;
@@ -363,16 +365,14 @@ struct matrix_inverse {
 
       for (j=0; j<i; j++)
       {
-        vector<float, 4> t = a [j][i];
-
+        t        = a [j][i];
         a   [j] -= a   [i] * t;
         res [j] -= res [i] * t;
       }
 
       for (j++; j<4; j++)
       {
-        vector<float, 4> t = a [j][i];
-
+        t        = a [j][i];
         a   [j] -= a   [i] * t;
         res [j] -= res [i] * t;
       }
