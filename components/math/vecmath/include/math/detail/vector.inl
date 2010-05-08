@@ -1,14 +1,20 @@
-namespace detail
-{
-
 #ifdef VECMATH_SSE
-
-__forceinline __m128 to_m128 (const vector<float, 4>& v)
+template <> struct vector_base<float, 4>
 {
-  return _mm_loadu_ps (&v.x);
-}
+  union
+  {
+    struct
+    {
+      float x, y, z, w;
+    };
+    __m128 data;
+  };
+};
 
 #endif
+
+namespace detail
+{
 
 /*
     Получение указателя на компоненты
@@ -77,7 +83,7 @@ struct vec_add {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res [0], _mm_add_ps (to_m128 (a), to_m128 (b)));
+    res.data = _mm_add_ps (a.data, b.data);
   }
 #endif
 };
@@ -93,7 +99,7 @@ struct vec_sub {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res [0], _mm_sub_ps (to_m128 (a), to_m128 (b)));
+    res.data = _mm_sub_ps (a.data, b.data);
   }
 #endif
 };
@@ -108,7 +114,7 @@ struct vec_mul {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res [0], _mm_mul_ps (to_m128 (a), to_m128 (b)));
+    res.data = _mm_mul_ps (a.data, b.data);
   }
 #endif
 };
@@ -124,7 +130,7 @@ struct vec_div {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res [0], _mm_div_ps (to_m128 (a), to_m128 (b)));
+    res.data = _mm_div_ps (a.data, b.data);
   }
 #endif
 };
@@ -165,7 +171,7 @@ struct vec_copy {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res.x, to_m128 (a));
+    res.data = a.data;
   }
 #endif
 };
@@ -181,7 +187,7 @@ struct vec_assign_scalar {
 #ifdef VECMATH_SSE
   inline void operator () (float a, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res [0], _mm_set_ps1 (a));
+    res.data = _mm_set_ps1 (a);
   }
 #endif
 };
@@ -206,7 +212,7 @@ struct vec_neg {
       float  f;  
     } mask = {0x80000000};
 
-    _mm_storeu_ps (&res.x, _mm_xor_ps (to_m128 (src), _mm_set_ps1 (mask.f)));
+    res.data = _mm_xor_ps (src.data, _mm_set_ps1 (mask.f));
   }
 #endif
 };
@@ -227,7 +233,7 @@ struct vec_abs {
       float  f;  
     } mask = {0x7FFFFFFF};
 
-    _mm_storeu_ps (&res.x, _mm_and_ps (to_m128 (src), _mm_set_ps1 (mask.f)));
+    res.data = _mm_and_ps (src.data, _mm_set_ps1 (mask.f));
   }
 #endif
 };
@@ -243,7 +249,7 @@ struct vec_min {
 #ifdef VECMATH_SSE  
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res.x, _mm_min_ps (to_m128 (a), to_m128 (b)));
+    res.data = _mm_min_ps (a.data, b.data);
   }
 #endif
 };
@@ -259,7 +265,7 @@ struct vec_max {
 #ifdef VECMATH_SSE  
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res.x, _mm_max_ps (to_m128 (a), to_m128 (b)));
+    res.data = _mm_max_ps (a.data, b.data);
   }
 #endif
 };
@@ -290,8 +296,8 @@ struct vec_cross_product {
   {
     __m128 r0, r1, r2;
 
-    r0 = _mm_shuffle_ps (to_m128 (a), to_m128 (a), _MM_SHUFFLE (3, 1, 0, 2));
-    r1 = _mm_shuffle_ps (to_m128 (b), to_m128 (b), _MM_SHUFFLE (3, 0, 2, 1));
+    r0 = _mm_shuffle_ps (a.data, a.data, _MM_SHUFFLE (3, 1, 0, 2));
+    r1 = _mm_shuffle_ps (b.data, b.data, _MM_SHUFFLE (3, 0, 2, 1));
     r2 = _mm_mul_ps     (r1, r0);
 
     r0 = _mm_shuffle_ps (r0, r0, _MM_SHUFFLE (3, 1, 0, 2));
@@ -300,7 +306,7 @@ struct vec_cross_product {
 
     r1 = _mm_sub_ps     (r1,r2);
 
-    _mm_storeu_ps (&res.x, r1);
+    res.data = r1;
   }
 #endif
 };

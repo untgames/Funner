@@ -1,15 +1,25 @@
-namespace detail
-{
-
 #ifdef VECMATH_SSE
 
-__forceinline __m128 to_m128 (const quat<float>& q)
+/*
+    База кватерниона
+*/
+
+template <> struct quat_base<float>
 {
-  return _mm_loadu_ps (&q.x);
-}
+  union
+  {
+    struct
+    {
+      float x, y, z, w;
+    };
+    __m128 data;
+  };
+};
 
 #endif
 
+namespace detail
+{
 
 /*
     Бинарные операции
@@ -26,7 +36,7 @@ struct quat_add {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const quat<float>& a, const quat<float>& b, quat<float>& res) const
   { 
-    _mm_storeu_ps (&res.x, _mm_add_ps (to_m128 (a), to_m128 (b)));
+    res.data = _mm_add_ps (a.data, b.data);
   }
 #endif
 };
@@ -42,7 +52,7 @@ struct quat_sub {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const quat<float>& a, const quat<float>& b, quat<float>& res) const
   { 
-    _mm_storeu_ps (&res.x, _mm_sub_ps (to_m128 (a), to_m128 (b)));
+    res.data = _mm_sub_ps (a.data, b.data);
   }
 #endif
 };
@@ -96,7 +106,7 @@ struct quat_copy {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const quat<float>& src, quat<float>& res) const
   {
-    _mm_storeu_ps (&res.x, to_m128 (src));
+    res.data = src.data;
   }
 #endif
 };
@@ -112,7 +122,7 @@ struct quat_assign_scalar {
 #ifdef VECMATH_SSE
   __forceinline void operator () (float a, quat<float>& res) const
   {
-    _mm_storeu_ps (&res.x, _mm_set_ps1 (a));
+    res.data = _mm_set_ps1 (a);
   }
 #endif
 };
@@ -133,7 +143,7 @@ struct quat_neg {
       float  f;  
     } mask = {0x80000000};
 
-    _mm_storeu_ps (&res.x, _mm_xor_ps (to_m128 (src), _mm_set_ps1 (mask.f)));
+    res.data = _mm_xor_ps (src.data, _mm_set_ps1 (mask.f));
   }
 #endif
 };
@@ -193,11 +203,11 @@ struct quat_inverse {
 
 template <class T>
 quat<T>::quat ()
-  : x (0)
-  , y (0)
-  , z (0)
-  , w (1)
 {
+  x = 0;
+  y = 0;
+  z = 0;
+  w = 1;
 }
 
 template <class T> template <class T1, class Fn>
@@ -220,11 +230,11 @@ quat<T>::quat (const T1& a, const T2& b, const T3& c, Fn fn, return_value_tag)
 
 template <class T> 
 quat<T>::quat (const value_type& in_x, const value_type& in_y, const value_type& in_z, const value_type& in_w)
-  : x (in_x)
-  , y (in_y)
-  , z (in_z)
-  , w (in_w)
 {  
+  x = in_x;
+  y = in_y;
+  z = in_z;
+  w = in_w;
 }
 
 template <class T>
