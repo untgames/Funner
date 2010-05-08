@@ -67,10 +67,10 @@ struct matrix_mul {
 
     for (unsigned int i=0; i<4; i++)
     {            
-      r0 = _mm_mul_ps     (a [i].data, transposed_b [0].data);
-      r1 = _mm_mul_ps     (a [i].data, transposed_b [1].data);
-      r2 = _mm_mul_ps     (a [i].data, transposed_b [2].data);
-      r3 = _mm_mul_ps     (a [i].data, transposed_b [3].data);
+      r0 = _mm_mul_ps     (a [i].data (), transposed_b [0].data ());
+      r1 = _mm_mul_ps     (a [i].data (), transposed_b [1].data ());
+      r2 = _mm_mul_ps     (a [i].data (), transposed_b [2].data ());
+      r3 = _mm_mul_ps     (a [i].data (), transposed_b [3].data ());
 
       r5 = r0;
       r5 = _mm_movelh_ps  (r5, r1);
@@ -99,10 +99,10 @@ struct matrix_mul {
 
     for (unsigned int i=0; i<4; i++)
     {            
-      r0 = _mm_mul_ps     (a [i].data, transposed_b [0].data);
-      r1 = _mm_mul_ps     (a [i].data, transposed_b [1].data);
-      r2 = _mm_mul_ps     (a [i].data, transposed_b [2].data);
-      r3 = _mm_mul_ps     (a [i].data, transposed_b [3].data);
+      r0 = _mm_mul_ps     (a [i].data (), transposed_b [0].data ());
+      r1 = _mm_mul_ps     (a [i].data (), transposed_b [1].data ());
+      r2 = _mm_mul_ps     (a [i].data (), transposed_b [2].data ());
+      r3 = _mm_mul_ps     (a [i].data (), transposed_b [3].data ());
 
       r5 = r0;
       r5 = _mm_movelh_ps  (r5, r1);
@@ -139,7 +139,7 @@ struct matrix_mul_scalar {
     __m128 r = _mm_set_ps1 (b);
 
     for (unsigned int i=0; i<4; i++)
-      res [i].store (_mm_mul_ps (a [i].data, r));
+      res [i].store (_mm_mul_ps (a [i].data (), r));
   }
 #endif
 };
@@ -269,10 +269,10 @@ struct matrix_transpose {
   {
     __m128 r3, r2, r1, r0;
 
-    r0 = _mm_shuffle_ps (src [0].data, src [1].data, 0x44);
-    r2 = _mm_shuffle_ps (src [0].data, src [1].data, 0xEE);
-    r1 = _mm_shuffle_ps (src [2].data, src [3].data, 0x44);
-    r3 = _mm_shuffle_ps (src [2].data, src [3].data, 0xEE);
+    r0 = _mm_shuffle_ps (src [0].data (), src [1].data (), 0x44);
+    r2 = _mm_shuffle_ps (src [0].data (), src [1].data (), 0xEE);
+    r1 = _mm_shuffle_ps (src [2].data (), src [3].data (), 0x44);
+    r3 = _mm_shuffle_ps (src [2].data (), src [3].data (), 0xEE);
 
     res [0].store (_mm_shuffle_ps (r0, r1, 0x88));
     res [1].store (_mm_shuffle_ps (r0, r1, 0xDD));
@@ -714,9 +714,9 @@ inline float det (const matrix<float, 4>& m)
   __m128 r1, r2, r3, r4, r5, r6; 
   float res;
   
-  r1 = _mm_shuffle_ps (m [1].data, m [1].data, _MM_SHUFFLE (0, 3, 2, 1));
-  r2 = _mm_shuffle_ps (m [2].data, m [2].data, _MM_SHUFFLE (2, 1, 0, 3));
-  r3 = _mm_shuffle_ps (m [3].data, m [3].data, _MM_SHUFFLE (1, 0, 3, 2));
+  r1 = _mm_shuffle_ps (m [1].data (), m [1].data (), _MM_SHUFFLE (0, 3, 2, 1));
+  r2 = _mm_shuffle_ps (m [2].data (), m [2].data (), _MM_SHUFFLE (2, 1, 0, 3));
+  r3 = _mm_shuffle_ps (m [3].data (), m [3].data (), _MM_SHUFFLE (1, 0, 3, 2));
 
   r5 = _mm_mul_ps     (r1, r2);  
  
@@ -753,7 +753,7 @@ inline float det (const matrix<float, 4>& m)
   r5 = _mm_mul_ps     (r5, r3);
   r6 = _mm_add_ps     (r6, r5);
 
-  r6 = _mm_mul_ps     (r6, m [0].data);
+  r6 = _mm_mul_ps     (r6, m [0].data ());
 
   r4 = _mm_shuffle_ps (r6, r6, _MM_SHUFFLE (1, 0, 3, 2));
   r6 = _mm_add_ps     (r6, r4);

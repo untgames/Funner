@@ -101,6 +101,7 @@ void SamplerState::Bind (GLenum tex_target, bool is_depth)
   {
     glTexParameteri (tex_target, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
     glTexParameteri (tex_target, GL_TEXTURE_COMPARE_FUNC, impl->gl_comparision_function);
+    glTexParameteri (tex_target, GL_DEPTH_TEXTURE_MODE,   GL_LUMINANCE);
   }
   
   glTexParameterfv (tex_target, GL_TEXTURE_BORDER_COLOR, (const float*)impl->desc.border_color);  

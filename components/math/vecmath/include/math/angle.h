@@ -5,6 +5,10 @@
 
 #include <math/constants.h>
 
+#ifdef _MSC_VER
+  #pragma pack (push, 1)
+#endif
+
 namespace math
 {
 
@@ -131,6 +135,10 @@ template <class T> typename angle<T>::value_type tan  (const angle<T>&);
 template <class T> typename angle<T>::value_type tanh (const angle<T>&);
 
 #include <math/detail/angle.inl>
+
+#ifdef _MSC_VER
+  #pragma pack(pop)
+#endif
 
 }
 

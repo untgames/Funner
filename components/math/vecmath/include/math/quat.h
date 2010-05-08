@@ -90,10 +90,6 @@ class quat: public quat_base<T>
    vector<value_type, 3> operator * (const vector<value_type, 3>&) const;
 };
 
-#ifdef _MSC_VER
-  #pragma pack (pop)
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Переопределения типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,5 +153,9 @@ quat<T> inverse (const quat<T>&);
 #include <math/detail/quat.inl>
 
 }
+
+#ifdef _MSC_VER
+  #pragma pack (pop)
+#endif
 
 #endif

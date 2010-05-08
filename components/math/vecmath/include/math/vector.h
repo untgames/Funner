@@ -99,10 +99,6 @@ class vector: public vector_base<T, Size>
     bool operator != (const vector&) const;
 };
 
-#ifdef _MSC_VER
-  #pragma pack(pop)
-#endif
-
 template <class T> class vector<T, 0> {};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,5 +194,9 @@ vector<T, 4> cross (const vector<T, 4>& a, const vector<T, 4>& b);
 #include <math/detail/vector.inl>
 
 }
+
+#ifdef _MSC_VER
+  #pragma pack(pop)
+#endif
 
 #endif
