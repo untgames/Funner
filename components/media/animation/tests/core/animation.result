@@ -1,0 +1,15 @@
+Results of animation_test:
+Animation name is '', target name is ''
+Channels count is '0'
+Sub-animations count is '0'
+Events count is 0
+Animation name is 'my_animation', target name is 'my_animation_target'
+Channels count is '2'
+Sub-animations count is '2'
+Events count is 1
+Channels count is '1'
+Sub-animations count is '1'
+Channels count is '0'
+Sub-animations count is '0'
+Exception: Invalid argument <animation>='Attempt to add animation to one of it's sub animations'
+    at media::animation::Animation::AddSubAnimation
