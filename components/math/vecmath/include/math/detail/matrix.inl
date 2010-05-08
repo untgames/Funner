@@ -333,15 +333,15 @@ struct matrix_inverse {
 #ifdef VECMATH_SSE
   __forceinline void swaprow (matrix<float,4>& a, unsigned int i, unsigned int j) const
   {
-    vector<float, 4> tmp = a [i];
+    __declspec(align(1)) vector<float, 4> tmp = a [i];
     a [i]                = a [j];
     a [j]                = tmp;      
   }
 
   __forceinline void operator () (const matrix<float, 4>& src, matrix<float, 4>& res) const
   {
-    __declspec(align(16)) matrix<float, 4> a = src;
-    __declspec(align(16)) vector<float, 4> t;
+    __declspec(align(1)) matrix<float, 4> a = src;
+    __declspec(align(1)) vector<float, 4> t;
 
     res = 1.0f;
 
@@ -356,10 +356,8 @@ struct matrix_inverse {
             break;
           }
 
-      t = 1.0f / a[i][i];
-
-      res [i] *= t;
-      a [i]   *= t;
+      res [i] /= a[i][i];
+      a [i]   /= a[i][i];
       
       unsigned int j;
 
