@@ -7,7 +7,7 @@ int main ()
   try
   {
     bezier_splinef spline;
-    
+
     spline.add_key (2.0f, 1.0f);
     spline.add_key (1.0f, 0.0f);
     

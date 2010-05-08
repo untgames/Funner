@@ -87,7 +87,7 @@ struct matrix_mul {
       r5 = _mm_shuffle_ps (r5, r3, _MM_SHUFFLE (3, 1, 3, 1));
       r6 = _mm_add_ps     (r6, r5);
 
-      res [i].data = r6;
+      res [i].store (r6);
     }
   } 
 
@@ -119,7 +119,7 @@ struct matrix_mul {
       r5 = _mm_shuffle_ps (r5, r3, _MM_SHUFFLE (3, 1, 3, 1));
       r6 = _mm_add_ps     (r6, r5);
 
-      a [i].data = r6;
+      a [i].store (r6);
     }
   } 
 #endif
@@ -139,7 +139,7 @@ struct matrix_mul_scalar {
     __m128 r = _mm_set_ps1 (b);
 
     for (unsigned int i=0; i<4; i++)
-      res [i].data = _mm_mul_ps (a [i].data, r);
+      res [i].store (_mm_mul_ps (a [i].data, r));
   }
 #endif
 };
@@ -238,10 +238,10 @@ struct matrix_assign_scalar {
   {
     __m128 r = _mm_set_ps (0.0f, 0.0f, 0.0f, value);
     
-    res [0].data = r;
-    res [1].data = _mm_shuffle_ps (r, r, _MM_SHUFFLE (1, 1, 0, 1));
-    res [2].data = _mm_shuffle_ps (r, r, _MM_SHUFFLE (1, 0, 1, 1));
-    res [3].data = _mm_shuffle_ps (r, r, _MM_SHUFFLE (0, 1, 1, 1));
+    res [0].store (r);
+    res [1].store (_mm_shuffle_ps (r, r, _MM_SHUFFLE (1, 1, 0, 1)));
+    res [2].store (_mm_shuffle_ps (r, r, _MM_SHUFFLE (1, 0, 1, 1)));
+    res [3].store (_mm_shuffle_ps (r, r, _MM_SHUFFLE (0, 1, 1, 1)));
   }
 #endif
 };
@@ -274,10 +274,10 @@ struct matrix_transpose {
     r1 = _mm_shuffle_ps (src [2].data, src [3].data, 0x44);
     r3 = _mm_shuffle_ps (src [2].data, src [3].data, 0xEE);
 
-    res [0].data = _mm_shuffle_ps (r0, r1, 0x88);
-    res [1].data = _mm_shuffle_ps (r0, r1, 0xDD);
-    res [2].data = _mm_shuffle_ps (r2, r3, 0x88);
-    res [3].data = _mm_shuffle_ps (r2, r3, 0xDD);
+    res [0].store (_mm_shuffle_ps (r0, r1, 0x88));
+    res [1].store (_mm_shuffle_ps (r0, r1, 0xDD));
+    res [2].store (_mm_shuffle_ps (r2, r3, 0x88));
+    res [3].store (_mm_shuffle_ps (r2, r3, 0xDD));
   }
 #endif
 };

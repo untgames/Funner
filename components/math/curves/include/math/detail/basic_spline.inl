@@ -39,13 +39,13 @@ template <class Key> struct spline_key_frame
   typedef math::vector<value_type, 4>    factors_type;
 
   key_type     key;
-  factors_type factors;
   time_type    time_factor;
+  factors_type factors;
   
   spline_key_frame (const key_type& in_key)
     : key (in_key)
   {
-  }  
+  }
 };
 
 ///Компаратор для фреймов
@@ -262,7 +262,7 @@ spline_tcb_key<T>::spline_tcb_key (const time_type& in_time, const value_type& i
 {
 }
 
-template <class T>  
+template <class T>
 spline_tcb_key<T>::spline_tcb_key (const time_type& in_time, const value_type& in_value, const scalar_type& in_tension, const scalar_type& in_continuity, const scalar_type& in_bias)
   : base (in_time, in_value)
   , tension (in_tension)
@@ -616,7 +616,7 @@ size_t basic_spline<Key>::add_keys (size_t keys_count, const key_type* keys)
   impl->frames.insert (impl->frames.end (), keys, keys + keys_count);
 
   impl->need_recompute = true;
-  impl->need_sort      = true;
+  impl->need_sort      = true;  
   
   return impl->frames.size () - keys_count;
 }
@@ -630,7 +630,9 @@ size_t basic_spline<Key>::add_key (const key_type& key)
 template <class Key>
 size_t basic_spline<Key>::add_key (const time_type& time, const value_type& value)
 {
-  return add_key (key_type (time, value));
+  key_type key (time, value);
+
+  return add_keys (1, &key);
 }
 
 /*

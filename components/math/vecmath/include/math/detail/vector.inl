@@ -1,4 +1,5 @@
 #ifdef VECMATH_SSE
+
 template <> struct vector_base<float, 4>
 {
   union
@@ -8,7 +9,12 @@ template <> struct vector_base<float, 4>
       float x, y, z, w;
     };
     __m128 data;
-  };
+  };  
+  
+  __forceinline void store (__m128 in_data)
+  {
+    _mm_storeu_ps (&x, in_data);
+  }
 };
 
 #endif
@@ -83,7 +89,7 @@ struct vec_add {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    res.data = _mm_add_ps (a.data, b.data);
+    res.store (_mm_add_ps (a.data, b.data));
   }
 #endif
 };
@@ -99,7 +105,7 @@ struct vec_sub {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    res.data = _mm_sub_ps (a.data, b.data);
+    res.store (_mm_sub_ps (a.data, b.data));
   }
 #endif
 };
@@ -114,7 +120,7 @@ struct vec_mul {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    res.data = _mm_mul_ps (a.data, b.data);
+    res.store (_mm_mul_ps (a.data, b.data));
   }
 #endif
 };
@@ -130,7 +136,7 @@ struct vec_div {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    res.data = _mm_div_ps (a.data, b.data);
+    res.store (_mm_div_ps (a.data, b.data));
   }
 #endif
 };
@@ -171,7 +177,7 @@ struct vec_copy {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, vector<float, 4>& res) const
   {
-    res.data = a.data;
+    res.store (a.data);
   }
 #endif
 };
@@ -187,7 +193,7 @@ struct vec_assign_scalar {
 #ifdef VECMATH_SSE
   inline void operator () (float a, vector<float, 4>& res) const
   {
-    res.data = _mm_set_ps1 (a);
+    res.store (_mm_set_ps1 (a));
   }
 #endif
 };
@@ -212,7 +218,7 @@ struct vec_neg {
       float  f;  
     } mask = {0x80000000};
 
-    res.data = _mm_xor_ps (src.data, _mm_set_ps1 (mask.f));
+    res.store (_mm_xor_ps (src.data, _mm_set_ps1 (mask.f)));
   }
 #endif
 };
@@ -233,7 +239,7 @@ struct vec_abs {
       float  f;  
     } mask = {0x7FFFFFFF};
 
-    res.data = _mm_and_ps (src.data, _mm_set_ps1 (mask.f));
+    res.store (_mm_and_ps (src.data, _mm_set_ps1 (mask.f)));
   }
 #endif
 };
@@ -249,7 +255,7 @@ struct vec_min {
 #ifdef VECMATH_SSE  
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    res.data = _mm_min_ps (a.data, b.data);
+    res.store (_mm_min_ps (a.data, b.data));
   }
 #endif
 };
@@ -265,7 +271,7 @@ struct vec_max {
 #ifdef VECMATH_SSE  
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    res.data = _mm_max_ps (a.data, b.data);
+    res.store (_mm_max_ps (a.data, b.data));
   }
 #endif
 };
@@ -306,7 +312,7 @@ struct vec_cross_product {
 
     r1 = _mm_sub_ps     (r1,r2);
 
-    res.data = r1;
+    res.store (r1);
   }
 #endif
 };
