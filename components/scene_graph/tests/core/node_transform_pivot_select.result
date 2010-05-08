@@ -1,0 +1,55 @@
+Results of node_transform_pivot_select_test:
+parent Orienation & Scale pivots, node Orientation & Scale pivots
+  parent position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
+  parent zero point: [+3.00 +1.00 +0.00]
+  node position: local=[+1.00 +0.00 +0.00] world=[+3.00 +4.00 +0.00]
+  node zero point: [+9.00 +7.00 +0.00]
+  test point: [+3.00 +7.00 +0.00]
+parent Orienation pivot, node Orientation & Scale pivots
+  parent position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
+  parent zero point: [+3.00 +3.00 +0.00]
+  node position: local=[+1.00 +0.00 +0.00] world=[+3.00 +6.00 +0.00]
+  node zero point: [+9.00 +9.00 +0.00]
+  test point: [+3.00 +9.00 +0.00]
+parent Scale pivot, node Orientation & Scale pivots
+  parent position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
+  parent zero point: [+2.00 +0.00 +0.00]
+  node position: local=[+1.00 +0.00 +0.00] world=[+2.00 +3.00 +0.00]
+  node zero point: [+8.00 +6.00 +0.00]
+  test point: [+2.00 +6.00 +0.00]
+parent Orientation & Scale pivots, node Orientation pivot
+  parent position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
+  parent zero point: [+3.00 +1.00 +0.00]
+  node position: local=[+1.00 +0.00 +0.00] world=[+3.00 +4.00 +0.00]
+  node zero point: [+9.00 +10.00 +0.00]
+  test point: [+3.00 +10.00 +0.00]
+parent Orientation & Scale pivots, node Scale pivot
+  parent position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
+  parent zero point: [+3.00 +1.00 +0.00]
+  node position: local=[+1.00 +0.00 +0.00] world=[+3.00 +4.00 +0.00]
+  node zero point: [+6.00 +4.00 +0.00]
+  test point: [+0.00 +4.00 +0.00]
+parent Orientation & Scale pivots, node Scale pivot, no scale inherit
+  parent position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
+  parent zero point: [+3.00 +1.00 +0.00]
+  node position: local=[+1.00 +0.00 +0.00] world=[+3.00 +4.00 +0.00]
+  node zero point: [+4.00 +4.00 +0.00]
+  test point: [+2.00 +4.00 +0.00]
+parent Orientation & Scale pivots, node Scale pivot, no orientation inherit
+  parent position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
+  parent zero point: [+3.00 +1.00 +0.00]
+  node position: local=[+1.00 +0.00 +0.00] world=[+3.00 +4.00 +0.00]
+  node zero point: [+3.00 +1.00 +0.00]
+  test point: [+3.00 +7.00 +0.00]
+parent Orientation & Scale pivots, node Orientation pivot, no scale inherit
+  parent position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
+  parent zero point: [+3.00 +1.00 +0.00]
+  node position: local=[+1.00 +0.00 +0.00] world=[+3.00 +4.00 +0.00]
+  node zero point: [+5.00 +6.00 +0.00]
+  test point: [+3.00 +6.00 +0.00]
+parent Orientation & Scale pivots, node Orientation pivot, no orientation inherit
+  parent position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
+  parent zero point: [+3.00 +1.00 +0.00]
+  node position: local=[+1.00 +0.00 +0.00] world=[+3.00 +4.00 +0.00]
+  node zero point: [+9.00 -2.00 +0.00]
+  test point: [+9.00 +4.00 +0.00]

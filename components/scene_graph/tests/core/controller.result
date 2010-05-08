@@ -1,0 +1,21 @@
+Results of controller_test:
+-- basic usage --
+local=[+1.00 +2.00 +3.00] world=[+1.00 +2.00 +3.00]
+MyController::~MyController
+node destroyed
+-- node owns controller --
+exit
+node destroyed
+MyController::~MyController
+-- controller owns node --
+exit
+node destroyed
+MyController::~MyController
+-- change ownership --
+MyController::~MyController
+exit
+node destroyed
+-- detach --
+MyController::~MyController
+exit
+node destroyed
