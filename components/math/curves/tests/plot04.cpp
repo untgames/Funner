@@ -2,7 +2,7 @@
 
 int main ()
 {
-  printf ("Results of plot03_test:\n");
+  printf ("Results of plot04_test:\n");
   
   try
   {
@@ -10,11 +10,11 @@ int main ()
     
     typedef tcb_spline2f::key_type key;
     
-    spline.add_key (key (1.0f, vec2f (0.0f, 1.0f), 0.0f, -1.0f, 0.0f));
-    spline.add_key (key (2.0f, vec2f (1.0f, 0.0f), 0.0f, -1.0f, 0.0f));
-    spline.add_key (key (3.0f, vec2f (0.0f, -1.0f), 0.0f, -1.0f, 0.0f));
-    spline.add_key (key (4.0f, vec2f (-1.0f, 0.0f), 0.0f, -1.0f, 0.0f));
-    spline.add_key (key (5.0f, vec2f (0.0f, 1.0f), 0.0f, -1.0f, 0.0f));
+    spline.add_key (key (1.0f, vec2f (0.0f, 1.0f), 0.0f, 1.0f, 0.0f));
+    spline.add_key (key (2.0f, vec2f (1.0f, 0.0f), 0.0f, 1.0f, 0.0f));
+    spline.add_key (key (3.0f, vec2f (0.0f, -1.0f), 0.0f, 1.0f, 0.0f));
+    spline.add_key (key (4.0f, vec2f (-1.0f, 0.0f), 0.0f, 1.0f, 0.0f));
+    spline.add_key (key (5.0f, vec2f (0.0f, 1.0f), 0.0f, 1.0f, 0.0f));
     
     dump ("closed", spline.closed ());
     
