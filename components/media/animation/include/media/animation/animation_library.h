@@ -25,7 +25,6 @@ class AnimationLibrary
 {
   public:
     typedef xtl::iterator<Animation> Iterator, ConstIterator;
-    typedef xtl::function<void (const char*)> LogHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
@@ -33,7 +32,6 @@ class AnimationLibrary
     AnimationLibrary  ();
     AnimationLibrary  (const AnimationLibrary&);
     AnimationLibrary  (const char* file_name);
-    AnimationLibrary  (const char* file_name, const LogHandler& log_handler);
     ~AnimationLibrary ();
 
     AnimationLibrary& operator = (const AnimationLibrary&);
@@ -64,20 +62,14 @@ class AnimationLibrary
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление / удаление элементов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Attach    (const char* id, const Animation&);
+    void Attach    (const char* id, Animation&);
     void Detach    (const char* id);
     void DetachAll ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Очистка
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Clear ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка / сохранение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Load (const char* file_name);
-    void Load (const char* file_name, const LogHandler& log_handler);
     void Save (const char* file_name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,8 +92,8 @@ void swap (AnimationLibrary&, AnimationLibrary&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef common::ResourceSerializerManager
 <
-  void (const char* file_name, AnimationLibrary& library, const AnimationLibrary::LogHandler& log_handler),
-  void (const char* file_name, const AnimationLibrary& library, const AnimationLibrary::LogHandler& log_handler)
+  void (const char* file_name, AnimationLibrary& library),
+  void (const char* file_name, const AnimationLibrary& library)
 > AnimationLibraryManager;
 
 }

@@ -7,7 +7,7 @@ using namespace media::animation;
    Канал анимации
 */
 
-typedef xtl::intrusive_ptr<detail::IEvaluatorBase> EvaluatorBasePtr;
+typedef xtl::intrusive_ptr<animation::detail::IEvaluatorBase> EvaluatorBasePtr;
 
 struct Channel::Impl : public xtl::reference_counter
 {
@@ -107,7 +107,7 @@ const std::type_info& Channel::ValueType () const
     Установка трека
 */
 
-void Channel::SetTrackCore (detail::IEvaluatorBase* in_track)
+void Channel::SetTrackCore (animation::detail::IEvaluatorBase* in_track)
 {
   if (!in_track)
     throw xtl::make_null_argument_exception ("media::animation::Channel::SetTrackCore", "track");
@@ -122,7 +122,7 @@ void Channel::SetTrackCore (detail::IEvaluatorBase* in_track)
   impl->value_type = &value_type;
 }
 
-detail::IEvaluatorBase* Channel::TrackCore () const
+animation::detail::IEvaluatorBase* Channel::TrackCore () const
 {
   return impl->track.get ();
 }

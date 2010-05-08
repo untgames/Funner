@@ -171,6 +171,9 @@ void MeshLibrary::Load (const char* file_name)
 
 void MeshLibrary::Save (const char* file_name)
 {
+  if (!file_name)
+    throw xtl::make_null_argument_exception ("media::MeshLibrary::Save", "file_name");
+
   try
   {
     static ComponentLoader loader ("media.geometry.savers.*");

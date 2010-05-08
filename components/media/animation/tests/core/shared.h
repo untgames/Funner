@@ -4,6 +4,7 @@
 #include <stl/string>
 
 #include <xtl/common_exceptions.h>
+#include <xtl/iterator.h>
 
 #include <media/animation/animation_library.h>
 #include <media/animation/animation.h>

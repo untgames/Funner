@@ -7,7 +7,7 @@ TARGETS := MEDIA.ANIMATION.SOURCES MEDIA.ANIMATION.TESTS
 MEDIA.ANIMATION.SOURCES.TYPE        := static-lib
 MEDIA.ANIMATION.SOURCES.NAME        := funner.media.animation
 MEDIA.ANIMATION.SOURCES.SOURCE_DIRS := sources/core
-MEDIA.ANIMATION.SOURCES.IMPORTS     := compile.media.animation
+MEDIA.ANIMATION.SOURCES.IMPORTS     := compile.media.animation compile.media.shared
 
 #Цель - tests
 MEDIA.ANIMATION.TESTS.TYPE        := test-suite
