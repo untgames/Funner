@@ -104,7 +104,7 @@ class basic_spline
 {
   public:
     typedef Key                            key_type;
-    typedef typename key_type::value_type  value_type;    
+    typedef typename key_type::value_type  value_type, result_type;
     typedef typename key_type::scalar_type scalar_type;
     typedef typename key_type::time_type   time_type;
 
@@ -185,6 +185,7 @@ class basic_spline
     value_type eval (const time_type& time) const;
 
     value_type operator () (const time_type& time) const;
+    void       operator () (const time_type& time, value_type& value) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ξαμεν

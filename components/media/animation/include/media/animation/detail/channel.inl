@@ -168,7 +168,7 @@ template <class Fn> void Channel::SetTrack (const Fn& fn)
 
 template <class Fn> const Fn* Channel::Track () const
 {
-  if (&typeid (detail::TrackImpl<Fn>) != &TrackType ())
+  if (&typeid (Fn) != &TrackType ())
     return 0;
   
   return &static_cast<detail::TrackImpl<Fn>*> (TrackCore ())->Function ();

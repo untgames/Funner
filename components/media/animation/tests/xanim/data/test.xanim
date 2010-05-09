@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation_library>
+  <animation id="animation1" name="animation1" target_name="animation1 target">
+    <event_track>
+      <event event="0.11-0.21 event" delay="0.11" period="0.21"/>
+      <event event="0.51-0.31 event" delay="0.51" period="0.31"/>
+    </event_track>
+    <channels>
+      <channel parameter_name="position" track_type="basic_spline<spline_tcb_key<vec3f>>">
+        <key time="0" value="1 1 1" tension="0.1" continuity="0.2" bias="0.3"/>
+        <key time="1" value="2 2 2" tension="0.2" continuity="0.3" bias="0.4"/>
+        <key time="2" value="3 3 3" tension="0.5" continuity="0.4" bias="0.3"/>
+      </channel>
+      <channel parameter_name="color" track_type="basic_spline<spline_tcb_key<vec4f>>">
+        <key time="0" value="1 1 1 1" tension="0.5" continuity="0.4" bias="0.3"/>
+        <key time="1" value="2 2 2 2" tension="0.2" continuity="0.3" bias="0.4"/>
+        <key time="2" value="3 3 3 3" tension="0.1" continuity="0.2" bias="0.3"/>
+      </channel>
+    </channels>
+    <animations>
+      <animation name="sub_animation" target_name="sub_animation target">
+        <event_track>
+          <event event="0.1-0.2 event" delay="0.1" period="0.2"/>
+          <event event="0.5-0.3 event" delay="0.5" period="0.3"/>
+        </event_track>
+        <channels>
+          <channel parameter_name="some_bezier_parameter" track_type="basic_spline<spline_bezier_key<vec2f>>">
+            <key time="0" value="1 1" inner_value="0.1 0.1" outer_value="0.2 0.2"/>
+            <key time="1" value="2 2" inner_value="0.2 0.2" outer_value="0.3 0.3"/>
+            <key time="2" value="3 3" inner_value="0.9 0.9" outer_value="0.8 0.8"/>
+          </channel>
+        </channels>
+      </animation>
+    </animations>
+  </animation>
+  <animation id="animation2" name="" target_name=""/>
+</animation_library>

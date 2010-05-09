@@ -700,6 +700,12 @@ typename basic_spline<Key>::value_type basic_spline<Key>::operator () (const tim
   return eval (time);
 }
 
+template <class Key>
+void basic_spline<Key>::operator () (const time_type& time, typename basic_spline<Key>::value_type& value) const
+{
+  eval (time, value);
+}
+
 /*
   Минимальное и максимальное время
 */
