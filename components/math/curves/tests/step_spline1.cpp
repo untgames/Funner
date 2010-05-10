@@ -1,16 +1,12 @@
 #include "shared.h"
 
-typedef basic_spline<spline_step_key<vec3f> > step_spline_vec3f;
-typedef basic_spline<spline_step_key<vec4f> > step_spline_vec4f;
-typedef basic_spline<spline_step_key<mat4f> > step_spline_mat4f;
-
 int main ()
 {
   printf ("Results of step_spline1_test:\n");
   
   try
   {
-    step_spline_vec3f spline;
+    step_spline3f spline;
 
     spline.add_key (1.f, 1.f);
     spline.add_key (2.f, 2.f);
@@ -24,7 +20,7 @@ int main ()
 
   try
   {
-    step_spline_vec4f spline;
+    step_spline4f spline;
 
     spline.add_key (1.f, 1.f);
     spline.add_key (2.f, 2.f);

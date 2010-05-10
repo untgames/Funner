@@ -237,6 +237,11 @@ typedef basic_spline<spline_bezier_key<float> >             bezier_splinef;
 typedef basic_spline<spline_bezier_key<vector<float, 2> > > bezier_spline2f;
 typedef basic_spline<spline_bezier_key<vector<float, 3> > > bezier_spline3f;
 typedef basic_spline<spline_bezier_key<vector<float, 4> > > bezier_spline4f;
+typedef basic_spline<spline_step_key<float> >               step_splinef;
+typedef basic_spline<spline_step_key<vector<float, 2> > >   step_spline2f;
+typedef basic_spline<spline_step_key<vector<float, 3> > >   step_spline3f;
+typedef basic_spline<spline_step_key<vector<float, 4> > >   step_spline4f;
+typedef basic_spline<spline_step_key<matrix<float, 4> > >   step_spline_mat4f;
 
 #ifndef MATH_CURVES_SPLINE_NO_DETAILS
   #include <math/detail/basic_spline.inl>
