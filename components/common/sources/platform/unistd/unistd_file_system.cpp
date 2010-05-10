@@ -1,6 +1,6 @@
 #include <unistd.h>
 
-#ifndef ARM9
+#if !defined ( ARM9 ) && !defined ( BADA )
   #include <dirent.h>
 #endif
 
@@ -28,7 +28,7 @@ namespace
 class UnistdFileSystem: public StdioFileSystem
 {
   public:
-#ifndef ARM9
+#if !defined ( ARM9 ) && !defined ( BADA )
     void FileResize (file_t file,filesize_t new_size)
     {
       static const char* METHOD_NAME = "UnistdFileSystem::FileResize";
@@ -49,7 +49,7 @@ class UnistdFileSystem: public StdioFileSystem
     void Mkdir (const char* dir_name)
     {
       static const char* METHOD_NAME = "UnistdFileSystem::Mkdir";
-
+      
       if (mkdir (dir_name,S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH))
       {
         switch (errno)
@@ -61,7 +61,7 @@ class UnistdFileSystem: public StdioFileSystem
       }
     }
 
-#ifndef ARM9
+#if !defined ( ARM9 ) && !defined ( BADA )
     void Search (const char* full_mask,const FileSearchHandler& find_handler)
     {
       string dir_name = dir (full_mask), mask = full_mask + dir_name.size (), file_name;

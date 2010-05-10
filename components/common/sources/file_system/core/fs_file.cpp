@@ -155,18 +155,21 @@ filepos_t File::Seek (filepos_t pos,FileSeekMode seek_mode)
   if (!(impl->Mode () & FileMode_Seek))
     throw xtl::format_not_supported_exception ("File::Seek","This file can't be seek");
 
-  size_t position = 0;
+  filepos_t position = 0;
 
   switch (seek_mode)
   {
     case FileSeekMode_Set:     position = pos; break;
     case FileSeekMode_Current: position = impl->Tell () + pos; break;
-    case FileSeekMode_End:     position = impl->Size () + pos; break;
+    case FileSeekMode_End:     position = (filepos_t)impl->Size () + pos; break;
     default:                   throw xtl::make_argument_exception ("File::Seek","seek_mode",seek_mode);
   }
 
-  if (position > Size () && (impl->Mode () & FileMode_Resize))
-    impl->Resize (position);
+  if (position < 0)
+    throw xtl::format_operation_exception ("File::Seek", "Negative seek position %d", position);
+
+  if ((filesize_t)position > Size () && (impl->Mode () & FileMode_Resize))
+    impl->Resize ((filesize_t)position);
 
   return impl->Seek (position);
 }

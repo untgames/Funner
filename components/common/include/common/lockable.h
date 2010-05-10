@@ -37,18 +37,11 @@ class Lockable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Блокировка в пределах блока
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Lock //заменить на xtl::scope!!
+class Lock
 {
   public:
-    Lock (Lockable& in_lockable) : lockable (in_lockable)
-    {
-      lockable.Lock ();
-    }
-
-    ~Lock ()
-    {
-      lockable.Unlock ();
-    }
+    Lock  (Lockable& in_lockable);
+    ~Lock ();
 
   private:
     Lock (const Lock&); //no impl
@@ -57,6 +50,14 @@ class Lock //заменить на xtl::scope!!
   private:
     Lockable& lockable;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Функции для взаимодействия с XTL
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void lock   (Lockable&);
+void unlock (Lockable&);
+
+#include <common/detail/lockable.inl>
 
 }
 

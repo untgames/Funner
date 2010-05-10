@@ -1,278 +1,646 @@
-#include <exception>
-
 #include <stl/hash_map>
-#include <stl/queue>
 
+#include <xtl/bind.h>
+#include <xtl/common_exceptions.h>
 #include <xtl/function.h>
+#include <xtl/intrusive_ptr.h>
+#include <xtl/lock_ptr.h>
+#include <xtl/reference_counter.h>
+#include <xtl/signal.h>
 
 #include <common/action_queue.h>
+#include <common/component.h>
+#include <common/lockable.h>
+#include <common/singleton.h>
+
+#include <platform/platform.h>
+
+#ifdef _MSC_VER
+  #pragma warning (disable : 4355) //'this' : used in base member initializer list
+#endif
 
 using namespace common;
+
+namespace common
+{
+
+/*
+    Константы
+*/
+
+const char* ACTION_QUEUE_LISTENERS_COMPONENT_MASK = "common.action_queue.*"; //маска имён компонентов слушателй событий очереди действий
+
+/*
+    Реализация действия
+*/
+
+struct ActionImpl: public xtl::reference_counter, public Lockable
+{
+  ActionQueue::ActionHandler  action_handler; //обработчик выполнения действия
+  Action::WaitCompleteHandler wait_handler;   //обработчик ожидания выполнения операции  
+  ActionThread                thread_type;    //тип нити
+  Timer                       timer;          //таймер, связанный с действием
+  ActionQueue::time_t         next_time;      //время следующего выполнения действия
+  ActionQueue::time_t         period;         //период выполнения действия
+  size_t                      thread_id;      //идентификатор нити, в которой создано действие
+  bool                        is_periodic;    //является ли действие периодическим
+  bool                        is_completed;   //завершено ли действие
+  bool                        is_canceled;    //действие отменено
+
+  ActionImpl (const ActionQueue::ActionHandler& in_handler, ActionThread in_thread_type, bool in_is_periodic, Timer& in_timer, ActionQueue::time_t delay, ActionQueue::time_t in_period, const Action::WaitCompleteHandler& in_wait_handler)
+    : action_handler (in_handler)
+    , wait_handler (in_wait_handler)
+    , thread_type (in_thread_type)
+    , timer (in_timer)
+    , next_time (timer.Time () + delay)    
+    , period (in_period)
+    , thread_id (Platform::GetCurrentThreadId ())
+    , is_periodic (in_is_periodic)
+    , is_completed (false)
+    , is_canceled (false)
+  {
+  }
+  
+  Action GetWrapper () { return Action (this); }
+};
+
+typedef xtl::intrusive_ptr<ActionImpl> ActionPtr;
+
+}
 
 namespace
 {
 
-struct Action
-{
-  size_t                     action_id;
-  size_t                     next_time;     //время с создания до следующего срабатывания
-  size_t                     creation_time; //время создания
-  size_t                     period;        //периодичность срабатывания
-  size_t                     count;         //количество в очереди
-  bool                       is_deleted;
-  ActionQueue::ActionHandler handler;
-
-  Action ()
-    : period (0), is_deleted (false)
-    {}
-
-  Action (size_t in_action_id, size_t in_next_time, size_t in_creation_time, size_t in_period, const ActionQueue::ActionHandler& in_handler)
-    : action_id (in_action_id), next_time (in_next_time), creation_time (in_creation_time), period (in_period), count (0), is_deleted (false), handler (in_handler)
-    {}
-};
-
-void dummy_handler (const char*)
-{
-}
-
-}
-
 /*
-   Описание реализации класса ActionQueue
+    Действие с обратным вызовом по завершению
 */
 
-struct ActionQueue::Impl
+class ActionWithCallback
+{
+  public:
+    ActionWithCallback (const ActionQueue::ActionHandler& in_action, const ActionQueue::CallbackHandler& in_complete_handler)
+      : action (in_action)
+      , complete_callback (in_complete_handler)
+    {
+    }
+    
+    void operator () (Action& state) const
+    {
+      action (state);
+      complete_callback ();
+    }
+
+  private:
+    ActionQueue::ActionHandler   action;
+    ActionQueue::CallbackHandler complete_callback;
+};
+
+typedef xtl::lock_ptr<ActionImpl, xtl::intrusive_ptr<ActionImpl> > ActionLock;
+
+/*
+    Очередь нити
+*/
+
+class ThreadActionQueue: public xtl::reference_counter
 {
   public:
 ///Конструктор
-    Impl ()
-      : cur_time (0), action_queue (&cur_time)
-      {}
-
-///Добавление/удаление действий
-    void SetAction (size_t action_id, time_t first_time, time_t period, const ActionHandler& handler)
+    ThreadActionQueue ()
     {
-      SetAction (action_id, cur_time, first_time, period, handler);
+      actions_count = 0;
     }
-
-    void RemoveAction (size_t action_id)
+  
+///Проверка на пустоту
+    bool IsEmpty ()
     {
-      ActionMapIterator iter = action_map.find (action_id);
-
-      if (iter == action_map.end ())
+      return actions.empty ();
+    }
+    
+///Количество действий в очереди
+    size_t Size ()
+    {
+      return actions_count;
+    }
+  
+///Добавление действия
+    void PushAction (const ActionPtr& action)
+    {
+      if (!action)
         return;
-
-      iter->second.is_deleted = true;
-    }
-
-    void Clear ()
+        
+      actions.push_back (action);
+      
+      actions_count++;
+    }    
+    
+///Получение действия
+    ActionPtr PopAction ()
     {
-      action_map.clear ();
-      while (!action_queue.empty ())
-        action_queue.pop ();
-    }
-
-///Получение состояний
-    bool IsEmpty () const
-    {
-      return action_map.empty ();
-    }
-
-    bool HasAction (size_t action_id) const
-    {
-      ActionMap::const_iterator iter = action_map.find (action_id);
-
-      if (iter == action_map.end () || iter->second.is_deleted)
-        return false;
-
-      return true;
-    }
-
-///Инициация действий (no throw)
-    void DoActions (time_t time, const LogHandler& handler)
-    {
-      while (!action_queue.empty () && ((action_queue.top ().iterator->second.next_time <= (time - action_queue.top ().iterator->second.creation_time)) || action_queue.top ().iterator->second.is_deleted))
+      for (ActionList::iterator iter=actions.begin (); iter!=actions.end ();)
       {
-        ActionMapIterator iter = action_queue.top ().iterator;
-
-        if (iter->second.is_deleted)
+        ActionLock action (actions.front ().get ());
+        
+        if (action->is_canceled || action->is_completed)
         {
-          Pop ();
+          ActionList::iterator next = iter;
+
+          ++next;
+
+          actions.erase (iter);
+          
+          actions_count--;
+
+          iter = next;
 
           continue;
         }
-
-        if (iter->second.next_time  <= (time - iter->second.creation_time))
+        
+        if (action->next_time > action->timer.Time ())
         {
-          try
-          {
-            iter->second.handler (iter->second.action_id);
-          }
-          catch (std::exception& e)
-          {
-            LogMessage (e.what (), handler);
-          }
-          catch (...)
-          {
-            LogMessage ("Unknown exception", handler);
-          }
-
-          if (iter->second.period)
-            SetAction (iter->second.action_id, iter->second.creation_time + iter->second.next_time, iter->second.period, iter->second.period, iter->second.handler);
-          else
-            iter->second.is_deleted = true;
-
-          Pop ();
-        }
-      }
-
-      cur_time = time;
-    }
-
-  private:
-///Добавление действий
-        void SetAction (size_t action_id, size_t creation_time, time_t first_time, time_t period, const ActionHandler& handler)
-        {
-          ActionMapIterator iter = action_map.find (action_id);
-
-          if (iter == action_map.end ())
-            iter = action_map.insert_pair (action_id, Action (action_id, first_time, creation_time, period, handler)).first;
-          else
-          {
-            iter->second.next_time     = first_time;
-            iter->second.creation_time = creation_time;
-            iter->second.period        = period;
-            iter->second.handler       = handler;
-          }
-
-          action_queue.push (ActionQueueElement (iter));
-          iter->second.count++;
-          iter->second.is_deleted = false;
+          ++iter;
+          continue;
         }
 
-///Удаление элемента из начала очереди
-    void Pop ()
-    {
-      ActionMapIterator iter = action_queue.top ().iterator;
+        if (action->is_periodic)
+        {
+          action->next_time += action->period;
+          return action.get ();
+        }
+          
+        actions.erase (iter);
+        
+        actions_count--;
 
-      action_queue.pop ();
-      iter->second.count--;
-
-      if (!iter->second.count)
-        action_map.erase (iter);
-    }
-
-///Логгирование
-    void LogMessage (const char* message, const LogHandler& handler)
-    {
-      try
-      {
-        handler (message);
+        return action.get ();
       }
-      catch (...)
-      {
-      }
+
+      return ActionPtr ();
     }
 
   private:
-    typedef stl::hash_map<size_t, Action> ActionMap;
-    typedef ActionMap::iterator           ActionMapIterator;
-
-    struct ActionQueueElement
-    {
-      ActionMapIterator iterator;
-
-      ActionQueueElement (ActionMapIterator& in_iterator)
-        : iterator (in_iterator)
-        {}
-    };
-
-    struct ActionMapComparator
-    {
-      ActionMapComparator (time_t *in_cur_time)
-        : cur_time (in_cur_time)
-        {}
-
-      bool operator () (const ActionQueueElement& left, const ActionQueueElement& right)
-      {
-        size_t left_time_to_action  = left.iterator->second.creation_time - *cur_time + left.iterator->second.next_time,
-               right_time_to_action = right.iterator->second.creation_time - *cur_time + right.iterator->second.next_time;
-
-        return left_time_to_action > right_time_to_action;
-      }
-
-      time_t* cur_time;
-    };
-
-    typedef stl::priority_queue<ActionQueueElement, stl::vector<ActionQueueElement>, ActionMapComparator> ActionQueue;
+    typedef stl::list<ActionPtr> ActionList;
 
   private:
-    time_t      cur_time;
-    ActionMap   action_map;
-    ActionQueue action_queue;
+    size_t     actions_count;
+    ActionList actions;
 };
 
 /*
-   Конструкторы / деструктор
+    Реализация очереди действий
 */
 
-ActionQueue::ActionQueue ()
-  : impl (new Impl)
-  {}
-
-ActionQueue::~ActionQueue ()
+class ActionQueueImpl
 {
-  delete impl;
+  public:
+    typedef ActionQueue::time_t        time_t;
+    typedef ActionQueue::ActionHandler ActionHandler;
+    
+///Конструктор
+    ActionQueueImpl ()
+      : default_wait_handler (xtl::bind (&ActionQueueImpl::DefaultWaitHandler, _1, _2))
+    {
+      default_timer.Start ();
+    }
+
+///Добавление действия в очередь
+    Action PushAction (const ActionHandler& action_handler, ActionThread thread, bool is_periodic, time_t delay, time_t period, Timer& timer)
+    {
+      try
+      {
+        ActionPtr action (new ActionImpl (action_handler, thread, is_periodic, timer, delay, period, default_wait_handler), false);
+
+        ThreadActionQueue& queue = GetQueue (thread);
+
+        queue.PushAction (action);
+
+        Action result = action->GetWrapper ();
+
+        try
+        {
+          static common::ComponentLoader loader (ACTION_QUEUE_LISTENERS_COMPONENT_MASK);
+          
+          signals [ActionQueueEvent_OnPushAction] (thread, result);
+        }
+        catch (...)
+        {
+          //подавление всех исключений
+        }
+
+        return result;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("common::ActionQueue::PushAction");
+        throw;
+      }
+    }
+
+///Размер очереди
+    size_t ActionsCount (ActionThread thread)
+    {
+      try
+      {
+        switch (thread)
+        {
+          case ActionThread_Main:
+            return main_thread_queue.Size ();
+          case ActionThread_Background:
+            return background_queue.Size ();
+          case ActionThread_Current:
+          {        
+            Platform::threadid_t thread_id = Platform::GetCurrentThreadId ();
+
+            ThreadActionQueueMap::iterator iter = thread_queues.find (thread_id);
+
+            if (iter == thread_queues.end ())
+              return 0;
+
+            ThreadActionQueuePtr queue = iter->second;
+
+            return queue->Size ();
+          }
+          default:
+            throw xtl::make_argument_exception ("", "thread", thread);
+        }
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("common::ActionQueue::QueueActionsCount");
+        throw;
+      }
+    }
+
+///Извлечение действия из очереди
+    Action PopAction (ActionThread thread)
+    {
+      try
+      {
+        ThreadActionQueue& queue = GetQueue (thread);
+
+        ActionPtr action = queue.PopAction ();
+        
+        if (!action)
+          return Action ();
+          
+        Action result = action->GetWrapper ();
+          
+        try
+        {
+          signals [ActionQueueEvent_OnPopAction] (thread, result);
+        }
+        catch (...)
+        {
+          //подавление всех исключений
+        }        
+
+        return result;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("common::ActionQueue::PopAction");
+        throw;
+      }      
+    }
+
+///Очистка вспомогательных структур для текущей нити
+    void CleanupCurrentThread ()
+    {
+      try
+      {
+        Platform::threadid_t thread_id = Platform::GetCurrentThreadId ();
+
+        ThreadActionQueueMap::iterator iter = thread_queues.find (thread_id);
+
+        if (iter == thread_queues.end ())
+          return;
+
+        ThreadActionQueuePtr queue = iter->second;
+
+        if (!queue->IsEmpty ())
+          throw xtl::format_operation_exception ("", "Can't cleanup current thread queue. Queue is not empty");
+
+        thread_queues.erase (iter);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("common::ActionQueue::CleanupCurrentThread");
+        throw;
+      }
+    }
+    
+///Регистрация обработчиков событий
+    xtl::connection RegisterEventHandler (ActionQueueEvent event, const ActionQueue::EventHandler& handler)
+    {
+      switch (event)
+      {
+        case ActionQueueEvent_OnPushAction:
+        case ActionQueueEvent_OnPopAction:
+          break;
+        default:
+          throw xtl::make_argument_exception ("common::ActionQueue::RegisterEventHandler", "event", event);
+      }
+
+      return signals [event].connect (handler);
+    }
+
+///Получение таймера по умолчанию
+    Timer& DefaultTimer () { return default_timer; }    
+
+  private:
+///Получение очереди нити
+    ThreadActionQueue& GetQueue (ActionThread thread)
+    {
+      switch (thread)
+      {
+        case ActionThread_Main:
+          return main_thread_queue;
+        case ActionThread_Background:
+          return background_queue;
+        case ActionThread_Current:
+        {
+          Platform::threadid_t thread_id = Platform::GetCurrentThreadId ();
+          
+          ThreadActionQueueMap::iterator iter = thread_queues.find (thread_id);
+          
+          if (iter != thread_queues.end ())
+            return *iter->second;
+            
+          ThreadActionQueuePtr queue (new ThreadActionQueue, false);
+
+          thread_queues.insert_pair (thread_id, queue);
+
+          return *queue;
+        }
+        default:
+          throw xtl::make_argument_exception ("common::ActionQueueImpl::GetQueue", "thread", thread);
+      }
+    }
+    
+///Функция ожидания по умолчанию
+    static bool DefaultWaitHandler (Action& action, size_t milliseconds)
+    {
+      size_t       end_time = common::milliseconds () + milliseconds;
+      bool         infinite = milliseconds == ~0u;
+      ActionThread thread   = action.ThreadType ();
+      
+      while (!action.IsCompleted () && !action.IsCanceled () && (infinite || common::milliseconds () < end_time))
+      {
+        Action performed_action = ActionQueue::PopAction (thread);
+        
+        if (performed_action.IsEmpty () || performed_action.IsCanceled () || performed_action.IsCompleted ())
+          continue;
+
+        performed_action.Perform ();
+      }
+
+      return action.IsCompleted ();
+    }
+
+  private:
+    typedef xtl::intrusive_ptr<ThreadActionQueue>                     ThreadActionQueuePtr;
+    typedef stl::hash_map<Platform::threadid_t, ThreadActionQueuePtr> ThreadActionQueueMap;
+    typedef xtl::signal<void (ActionThread, Action&)>                 Signal;
+
+  private:
+    Timer                       default_timer;
+    Action::WaitCompleteHandler default_wait_handler;
+    ThreadActionQueue           main_thread_queue;
+    ThreadActionQueue           background_queue;
+    ThreadActionQueueMap        thread_queues;
+    Signal                      signals [ActionQueueEvent_Num];
+};
+
+typedef common::Singleton<ActionQueueImpl> ActionQueueSingleton;
+
 }
 
 /*
-   Добавление/удаление действий
+    Врапперы
 */
 
-void ActionQueue::SetAction (size_t action_id, time_t target_time, const ActionHandler& handler)
+Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread, time_t delay)
 {
-  impl->SetAction (action_id, target_time, 0, handler);
+  ActionQueueSingleton::Instance queue;
+
+  return queue->PushAction (action, thread, false, delay, 0.0, queue->DefaultTimer ());
 }
 
-void ActionQueue::SetAction (size_t action_id, time_t first_time, time_t period, const ActionHandler& handler)
+Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread, time_t delay, time_t period)
 {
-  impl->SetAction (action_id, first_time, period, handler);
+  ActionQueueSingleton::Instance queue;
+
+  return queue->PushAction (action, thread, true, delay, period, queue->DefaultTimer ());
 }
 
-void ActionQueue::RemoveAction (size_t action_id)
+Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread, time_t delay, Timer& timer)
 {
-  impl->RemoveAction (action_id);
+  ActionQueueSingleton::Instance queue;
+
+  return queue->PushAction (action, thread, false, delay, 0.0, timer);
 }
 
-void ActionQueue::Clear ()
+Action ActionQueue::PushAction (const ActionHandler& action, ActionThread thread, time_t delay, time_t period, Timer& timer)
 {
-  impl->Clear ();
+  ActionQueueSingleton::Instance queue;
+
+  return queue->PushAction (action, thread, true, delay, period, timer);
+}
+
+Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread, time_t delay)
+{
+  return PushAction (ActionWithCallback (action, complete_callback), thread, delay);
+}
+
+Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread, time_t delay, Timer& timer)
+{
+  return PushAction (ActionWithCallback (action, complete_callback), thread, delay, timer);
+}
+
+size_t ActionQueue::ActionsCount (ActionThread thread)
+{
+  return ActionQueueSingleton::Instance ()->ActionsCount (thread);
+}
+
+Action ActionQueue::PopAction (ActionThread thread)
+{
+  return ActionQueueSingleton::Instance ()->PopAction (thread);
+}
+
+xtl::connection ActionQueue::RegisterEventHandler (ActionQueueEvent event, const EventHandler& handler)
+{
+  return ActionQueueSingleton::Instance ()->RegisterEventHandler (event, handler);
+}
+
+void ActionQueue::CleanupCurrentThread ()
+{
+  ActionQueueSingleton::Instance ()->CleanupCurrentThread ();
 }
 
 /*
-   Получение состояний
+    Действие
 */
 
-bool ActionQueue::IsEmpty () const
+Action::Action ()
+  : impl (0)
 {
-  return impl->IsEmpty ();
 }
 
-bool ActionQueue::HasAction (size_t action_id) const
+Action::Action (ActionImpl* in_impl)
+  : impl (in_impl)
 {
-  return impl->HasAction (action_id);
+  if (impl)
+    addref (impl);
 }
 
-/*
-   Инициация действий
-*/
-
-void ActionQueue::DoActions (time_t time, const LogHandler& handler)
+Action::Action (const Action& action)
+  : impl (action.impl)
 {
-  impl->DoActions (time, handler);
+  ActionLock locked_impl (impl);
+
+  if (impl)
+    addref (impl);
 }
 
-void ActionQueue::DoActions (time_t time)
+Action::~Action ()
 {
-  impl->DoActions (time, &dummy_handler);
+  ActionLock locked_impl (impl);
+
+  if (impl)
+    release (impl);
+}
+
+Action& Action::operator = (const Action& action)
+{
+  Action (action).Swap (*this);
+
+  return *this;
+}
+
+size_t Action::CreaterThreadId () const
+{
+  return impl ? impl->thread_id : 0;
+}
+
+ActionThread Action::ThreadType () const
+{
+  return impl ? impl->thread_type : ActionThread_Current;
+}
+
+bool Action::IsEmpty () const
+{
+  return impl == 0;
+}
+
+bool Action::IsCompleted () const
+{
+  ActionLock locked_impl (impl);
+
+  return impl ? impl->is_completed : false;
+}
+
+bool Action::IsCanceled () const
+{
+  ActionLock locked_impl (impl);
+
+  return impl ? locked_impl->is_canceled : false;
+}
+
+bool Action::Wait (size_t milliseconds)
+{
+  try
+  {
+    ActionLock locked_impl (impl);
+    
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Can't wait for empty action is empty");
+
+    return impl->wait_handler (*this, milliseconds);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::Action::Wait");
+    throw;
+  }
+}
+
+void Action::Perform ()
+{
+  try
+  {
+    ActionLock locked_impl (impl);
+    
+    if (!impl)
+      return;
+
+    if (impl->is_completed)
+      throw xtl::format_operation_exception ("", "Action already completed");
+
+    if (impl->is_canceled)
+      throw xtl::format_operation_exception ("", "Action already canceled");
+
+    impl->action_handler (*this);
+
+    if (!impl->is_periodic)
+      impl->is_completed = true;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::Action::Perform");
+    throw;
+  }
+}
+
+void Action::Cancel ()
+{
+  ActionLock locked_impl (impl);
+  
+  if (!impl)
+    return;
+
+  impl->is_canceled = true;
+}
+
+void Action::SetWaitHandler (const WaitCompleteHandler& handler)
+{
+  ActionLock locked_impl (impl);
+  
+  if (!impl)
+    throw xtl::format_operation_exception ("common::Action::SetWaitHandler", "Can't set wait handler for empty action");
+
+  impl->wait_handler = handler;
+}
+
+const Action::WaitCompleteHandler& Action::WaitHandler () const
+{
+  ActionLock locked_impl (impl);
+
+  return impl->wait_handler;
+}
+
+void Action::Swap (Action& action)
+{
+  if (impl < action.impl)
+  {
+    ActionLock locked_impl1 (impl);
+    ActionLock locked_impl2 (action.impl);
+    
+    stl::swap (impl, action.impl);
+  }
+  else
+  {
+    ActionLock locked_impl1 (action.impl);
+    ActionLock locked_impl2 (impl);
+
+    stl::swap (impl, action.impl);    
+  }
+}
+
+namespace common
+{
+
+void swap (Action& action1, Action& action2)
+{
+  action1.Swap (action2);
+}
+
 }

@@ -195,7 +195,7 @@ struct SoundManager::Impl : public xtl::trackable
 
         manager_emitter->sound_declaration_gain = manager_emitter->sound_declaration.Param (SoundParam_Gain);
 
-        manager_emitter->source.gain               = emitter.Volume();
+        manager_emitter->source.gain               = emitter.Volume() * manager_emitter->sound_declaration_gain;
         manager_emitter->source.minimum_gain       = manager_emitter->sound_declaration.Param (SoundParam_MinimumGain);
         manager_emitter->source.maximum_gain       = manager_emitter->sound_declaration.Param (SoundParam_MaximumGain);
         manager_emitter->source.inner_angle        = manager_emitter->sound_declaration.Param (SoundParam_InnerAngle);

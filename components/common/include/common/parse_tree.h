@@ -2,6 +2,9 @@
 #define COMMONLIB_PARSE_TREE_HEADER
 
 #include <stl/auto_ptr.h>
+#include <stl/string_fwd>
+
+#include <xtl/functional_fwd>
 
 namespace common
 {
@@ -10,6 +13,7 @@ namespace common
 class ParseTree;
 class ParseLog;
 class ParseTreeBuilder;
+class PropertyMap;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Узел грамматического разбора
@@ -163,6 +167,13 @@ class ParseTreeBuilder
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (ParseTreeBuilder&, ParseTreeBuilder&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Разрешение ссылок в дереве разбора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+ParseNode resolve_references (const ParseNode& source_tree, const xtl::function<void (const char* reference_name, stl::string& reference_value)>& resolver);
+ParseNode resolve_references (const ParseNode& source_tree, const ParseNode& reference_values);
+ParseNode resolve_references (const ParseNode& source_tree, const PropertyMap& reference_values);
 
 }
 

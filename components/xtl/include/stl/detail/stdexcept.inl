@@ -82,7 +82,7 @@ void raise (const char* format,...)
 }
 
 template <class Container>
-inline const char* stl_get_container_name (const Container&)
+inline char const* stl_get_container_name (const Container&)
 {
   return typeid (Container).name ();
 }

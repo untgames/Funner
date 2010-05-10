@@ -1,5 +1,3 @@
-#include <time.h>
-
 #include <stl/hash_map>
 
 #include <xtl/bind.h>
@@ -7,9 +5,9 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 #include <xtl/ref.h>
-#include <xtl/shared_ptr.h>
 
 #include <common/action_queue.h>
+#include <common/time.h>
 
 #include <sg/scene.h>
 #include <sg/node.h>
@@ -21,309 +19,450 @@
 
 #include <math/vector.h>
 
-#include <syslib/timer.h>
-
 using namespace sound;
-using namespace syslib;
-using namespace xtl;
 using namespace common;
 using namespace scene_graph;
-using namespace math;
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4355) //'this' : used in base member initializer list
 #endif
 
-/*
-    Описание реализации ScenePlayer
-*/
-
-struct ScenePlayerEmitter
-{
-  sound::Emitter  emitter;           //эмиттер
-  auto_connection play_connection;   //соединение события запуска проигрывания
-  auto_connection stop_connection;   //соединение события остановки проигрывания
-  auto_connection update_connection; //соединение события обновления свойств
-  clock_t         play_start_time;   //время начала проигрывания
-  float           play_start_offset; //смещение начала проигрывания
-  bool            is_playing;        //проигрывается ли звук
-
-  ScenePlayerEmitter (const char* source_name, xtl::connection in_play_connection, xtl::connection in_stop_connection, xtl::connection in_update_connection);
-};
-
-ScenePlayerEmitter::ScenePlayerEmitter (const char* source_name, xtl::connection in_play_connection, xtl::connection in_stop_connection, xtl::connection in_update_connection)
-  : play_connection (in_play_connection),
-    stop_connection (in_stop_connection),
-    update_connection (in_update_connection),
-    play_start_offset (0.f),
-    is_playing (false)
-  {
-    emitter.SetSource (source_name);
-  }
-
-typedef xtl::shared_ptr<ScenePlayerEmitter>                              ScenePlayerEmitterPtr;
-typedef stl::hash_map<scene_graph::SoundEmitter*, ScenePlayerEmitterPtr> EmitterSet;
-
 namespace
 {
 
-const size_t ACTION_QUEUE_PROCESS_MILLISECONDS = 100;
+/*
+    Константы
+*/
+
+const double STOP_EMITTER_DELAY = 0.2; //запаздывание при остановке звука
 
 }
 
-struct ScenePlayer::Impl
+/*
+    Эмиттер сцены
+*/
+
+class ScenePlayerEmitter: public xtl::trackable
 {
-  scene_graph::Listener* listener;                   //слушатель
-  sound::SoundManager*   sound_manager;              //менеджер
-  EmitterSet             emitters;                   //эмиттеры
-  auto_connection        bind_node_connection;       //соединение события появления нового узла в сцене
-  auto_connection        unbind_node_connection;     //соединение события удаления узла в сцене
-  auto_connection        update_connection;          //соединение события обновления свойств
-  auto_connection        listener_unbind_connection; //соединение события удаления слушателя
-  auto_connection        manager_destroy_connection; //соединение события удаления менеджера
-  ActionQueue            action_queue;               //очередь событий остановки проигрывания эмиттера
-  syslib::Timer          action_queue_timer;         //таймер вызова обработки очереди
-
-  Impl ()
-    : listener (0),
-      sound_manager (0),
-      action_queue_timer (xtl::bind (&ScenePlayer::Impl::DoActions, this), ACTION_QUEUE_PROCESS_MILLISECONDS)
-    {}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка слушателя
-///////////////////////////////////////////////////////////////////////////////////////////////////
-  void SetListener (scene_graph::Listener* in_listener)
-  {
-    if (listener == in_listener)
-      return;
-
-    if (!in_listener)
+  public:
+///Конструктор
+    ScenePlayerEmitter (SoundEmitter& in_scene_emitter)
+      : sound_manager (0)
+      , scene_emitter (in_scene_emitter)
+      , play_start_time (0)
+      , play_start_offset (0.0f)
+      , is_playing (false)
+      , need_release_scene_emitter (false)
     {
-      listener = in_listener;
+      emitter.SetSource (scene_emitter.SoundDeclarationName ());
 
-      update_connection.disconnect ();
-      listener_unbind_connection.disconnect ();
-
-      if (sound_manager)
-        sound_manager->SetMute (true);
-
-      return;
+      connect_tracker (scene_emitter.RegisterEventHandler (SoundEmitterEvent_OnPlay,   xtl::bind (&ScenePlayerEmitter::OnPlay, this)));
+      connect_tracker (scene_emitter.RegisterEventHandler (SoundEmitterEvent_OnStop,   xtl::bind (&ScenePlayerEmitter::OnStop, this)));
+      connect_tracker (scene_emitter.RegisterEventHandler (NodeEvent_AfterUpdate,      xtl::bind (&ScenePlayerEmitter::OnUpdate, this)));
+      
+      on_change_scene = scene_emitter.RegisterEventHandler (NodeEvent_AfterSceneChange, xtl::bind (&ScenePlayerEmitter::OnSceneChange, this));
     }
-
-    scene_graph::Scene* scene = in_listener->Scene ();
-
-    if (!scene)
-      throw xtl::format_operation_exception ("sound::ScenePlayer::SetListener", "Listener is not binded to any scene.");
-
-    if (!listener || (listener->Scene () != scene))
+    
+///Деструктор
+    ~ScenePlayerEmitter ()
     {
-      if (sound_manager)
-        for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
-          sound_manager->StopSound (i->second->emitter);
-
-      emitters.clear ();
-
-      scene->Traverse (xtl::bind (&ScenePlayer::Impl::CheckNode, this, _1));
-
-      bind_node_connection   = scene->Root ().RegisterEventHandler (NodeSubTreeEvent_AfterBind,    bind (&ScenePlayer::Impl::ProcessAttachNode, this, _1, _2, _3));
-      unbind_node_connection = scene->Root ().RegisterEventHandler (NodeSubTreeEvent_BeforeUnbind, bind (&ScenePlayer::Impl::ProcessDetachNode, this, _1, _2, _3));
-    }
-
-    listener = in_listener;
-
-    update_connection          = in_listener->RegisterEventHandler (NodeEvent_AfterUpdate,  bind (&ScenePlayer::Impl::ListenerUpdate, this, _1, _2));
-    listener_unbind_connection = in_listener->RegisterEventHandler (NodeEvent_BeforeUnbind, bind (&ScenePlayer::Impl::ListenerUnbind, this, _1, _2));
-
-    if (sound_manager)
-    {
-      sound_manager->SetMute (false);
-      ListenerUpdate (*listener, NodeEvent_AfterUpdate);
-    }
-  }
-
-  scene_graph::Listener* Listener () const
-  {
-    return listener;
-  }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка менеджера
-///////////////////////////////////////////////////////////////////////////////////////////////////
-  void SetManager (sound::SoundManager* in_sound_manager)
-  {
-    if (sound_manager == in_sound_manager)
-      return;
-
-    if (!in_sound_manager)
-    {
-      for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
-        sound_manager->StopSound (i->second->emitter);
-
-      manager_destroy_connection.disconnect ();
-
-      sound_manager = 0;
-
-      return;
-    }
-
-    sound_manager = in_sound_manager;
-
-    manager_destroy_connection = in_sound_manager->RegisterDestroyHandler (bind (&ScenePlayer::Impl::ProcessDestroyManager, this));
-
-    if (listener)
-      SetListener (listener);
-
-    for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
-      if (i->second->is_playing)
+      try
       {
-        i->second->play_start_offset += (float)(clock () - i->second->play_start_time) / CLOCKS_PER_SEC;
-
-        i->second->play_start_time = clock ();
-
-        sound_manager->PlaySound (i->second->emitter, i->second->play_start_offset);
+        on_change_scene.disconnect ();
+        
+        OnStop ();
       }
-  }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }  
+    
+///Изменение менеджера звуков
+    void SetSoundManager (SoundManager* in_sound_manager)
+    {
+      if (!in_sound_manager)
+      {
+        if (sound_manager)
+          sound_manager->StopSound (emitter);
 
-  sound::SoundManager* Manager () const
-  {
-    return sound_manager;
-  }
+        sound_manager = 0;
+
+        return;
+      }
+
+      sound_manager = in_sound_manager;
+      
+      if (!sound_manager)
+        return;
+      
+      if (!is_playing)
+        return;
+        
+      play_start_offset += (common::milliseconds () - play_start_time) / 1000.0f;
+      play_start_time    = common::milliseconds ();
+
+      sound_manager->PlaySound (emitter, play_start_offset);
+    }
+    
+    SoundManager* GetSoundManager () { return sound_manager; }
+    
+  private:
+///Обработчик события обновления эмиттера сцены
+    void OnUpdate ()
+    {
+      emitter.SetPosition  (scene_emitter.WorldPosition ());
+      emitter.SetDirection (scene_emitter.WorldOrtZ ());
+      emitter.SetVolume    (scene_emitter.Gain ());
+    }
+    
+///Обработчик начала проигрывания звука в эмиттере
+    void OnPlay ()
+    {
+      if (is_playing)
+        OnStop ();
+            
+      emitter.SetSampleIndex (rand ());
+
+      is_playing        = true;
+      play_start_time   = common::milliseconds ();
+      play_start_offset = 0.f;
+
+      if (!sound_manager)
+        return;
+
+      sound_manager->PlaySound (emitter);
+
+      scene_emitter.AddRef ();
+      
+      need_release_scene_emitter = true;
+
+      if (!sound_manager->IsLooping (emitter))
+      {
+        auto_stop_action = common::ActionQueue::PushAction (xtl::bind (&ScenePlayerEmitter::OnStop, this),
+          common::ActionThread_Current, sound_manager->Duration (emitter) + STOP_EMITTER_DELAY);
+      }      
+    }
+
+///Обработчик остановки проигрывания звука в эмиттере
+    void OnStop ()
+    {      
+      if (!is_playing)
+        return;                
+      
+      auto_stop_action.Cancel ();
+      
+      auto_stop_action = Action ();
+      is_playing       = false;      
+
+      if (sound_manager)
+        sound_manager->StopSound (emitter);
+
+      if (need_release_scene_emitter)
+      {
+        need_release_scene_emitter = false;
+
+        scene_emitter.Release (); //должна быть последней операцией, поскольку может инициировать удаление текущего объекта
+      }      
+    }
+
+///Обработчик события изменения сцены
+    void OnSceneChange ()
+    {     
+      delete this;
+    }
 
   private:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Вызов обработчика очереди событий
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void DoActions ()
+    SoundManager*        sound_manager;              //менеджер звуков
+    SoundEmitter&        scene_emitter;              //эмиттер в сцене
+    sound::Emitter       emitter;                    //эмиттер в менеджере звуков
+    size_t               play_start_time;            //время начала проигрывания
+    float                play_start_offset;          //смещение начала проигрывания
+    bool                 is_playing;                 //проигрывается ли звук
+    bool                 need_release_scene_emitter; //нужно освобождать эмиттер в сцене
+    Action               auto_stop_action;           //действие автоматической остановки звука
+    xtl::auto_connection on_change_scene;            //соединение события изменения сцены
+};
+
+/*
+    Слушатель сцены
+*/
+
+class ScenePlayerListener: public xtl::trackable
+{
+  public:
+///Конструктор  
+    ScenePlayerListener (scene_graph::Listener& in_scene_listener)
+      : sound_manager (0)
+      , scene_listener (in_scene_listener)
     {
-      action_queue.DoActions (action_queue_timer.ElapsedMilliseconds ());
+      connect_tracker (scene_listener.RegisterEventHandler (NodeEvent_AfterUpdate, xtl::bind (&ScenePlayerListener::OnUpdate, this)));
+      connect_tracker (scene_listener.RegisterEventHandler (NodeEvent_AfterDestroy, xtl::bind (&ScenePlayerListener::OnDestroy, this)));
+    }
+    
+///Деструктор
+    ~ScenePlayerListener ()
+    {
+      try
+      {
+        SetSoundManager (0);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }
+    
+///Изменение менеджера звуков
+    void SetSoundManager (SoundManager* in_sound_manager)
+    {
+      if (sound_manager)
+      {
+        sound_manager->SetMute (true);
+      }
+      
+      sound_manager = in_sound_manager;
+      
+      if (!sound_manager)
+        return;
+        
+      sound_manager->SetMute (false);
+      
+      OnUpdate ();
+    }
+    
+    SoundManager* GetSoundManager () { return sound_manager; }
+    
+///Слушатель сцены
+    scene_graph::Listener& GetSceneListener () { return scene_listener; }
+
+  private:
+///Обработка события обновления слушателя
+    void OnUpdate ()
+    {
+      if (!sound_manager)
+        return;        
+
+      sound::Listener sound_listener;
+
+      math::mat4f listener_world_tm = scene_listener.WorldTM ();
+
+      sound_listener.position  = listener_world_tm * math::vec3f (0.f);
+      sound_listener.direction = listener_world_tm * math::vec4f (0.f, 0.f, -1.f, 0.f);
+      sound_listener.up        = listener_world_tm * math::vec4f (0.f, 1.f, 0.f, 0.f);
+
+      sound_manager->SetListener (sound_listener);
+      sound_manager->SetVolume   (scene_listener.Gain ());
+    }
+    
+///Обработка события удаления слушателя
+    void OnDestroy ()
+    {
+      delete this;
     }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обработка удаления менеджера
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ProcessDestroyManager ()
+  private:
+    SoundManager*          sound_manager;  //менеджер звуков
+    scene_graph::Listener& scene_listener; //слушатель в сцене
+};
+
+/*
+    Описание реализация проигрывателя звуков сцены
+*/
+
+struct ScenePlayer::Impl
+{
+  public:
+///Конструктор
+    Impl ()
+      : sound_manager (0)
+      , scene (0)
     {
-      sound_manager = 0;
     }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обновление свойств слушателя/эмиттеров
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ListenerUpdate (Node& sender, NodeEvent event)
+///Деструктор
+    ~Impl ()
     {
-      if (!listener || !sound_manager)
+      try      
+      {
+        SetSoundManager (0);
+        SetListener (0);
+        SetScene (0);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }
+
+///Установка слушателя
+    void SetListener (scene_graph::Listener* in_listener, bool need_destroy_listener = true)
+    {
+      if (!listener && !in_listener || listener && &listener->GetSceneListener () == in_listener)
+        return;        
+        
+      on_destroy_listener.disconnect ();
+      on_change_listener_scene.disconnect ();        
+      
+      if (need_destroy_listener) listener.reset ();
+      else                       listener.release ();      
+
+      if (!in_listener)
+      {
+        SetScene (0);
+        return;
+      }
+
+      listener = stl::auto_ptr<ScenePlayerListener> (new ScenePlayerListener (*in_listener));
+
+      try
+      {
+        SetScene (in_listener->Scene ());
+
+        listener->SetSoundManager (sound_manager);
+        
+        on_destroy_listener      = listener->connect_tracker (xtl::bind (&ScenePlayer::Impl::OnDestroyListener, this));
+        on_change_listener_scene = in_listener->RegisterEventHandler (NodeEvent_AfterSceneChange, xtl::bind (&ScenePlayer::Impl::OnChangeListenerScene, this));
+      }
+      catch (...)
+      {
+        SetListener (0);
+        throw;
+      }      
+    }
+
+    scene_graph::Listener* GetListener () const
+    {
+      return &listener->GetSceneListener ();
+    }
+
+///Установка менеджера
+    void SetSoundManager (sound::SoundManager* in_sound_manager)
+    {
+      if (sound_manager == in_sound_manager)
+        return;
+        
+      on_manager_destroy_connection.disconnect ();
+        
+      if (listener)
+        listener->SetSoundManager (in_sound_manager);
+
+      for (EmitterSet::iterator i = emitters.begin (); i != emitters.end (); ++i)
+        i->second->SetSoundManager (in_sound_manager);        
+
+      sound_manager = in_sound_manager;
+      
+      if (!sound_manager)
+        return;
+      
+      try
+      {
+        on_manager_destroy_connection = sound_manager->RegisterDestroyHandler (xtl::bind (&ScenePlayer::Impl::SetSoundManager, this, (SoundManager*)0));
+      }
+      catch (...)
+      {
+        SetSoundManager (0);
+        throw;
+      }
+    }
+
+    SoundManager* GetSoundManager () const
+    {
+      return sound_manager;
+    }
+
+  private:
+///Смена сцены
+    void SetScene (Scene* in_scene)
+    {
+      if (in_scene == scene)
+        return;        
+        
+      on_bind_node_connection.disconnect ();
+        
+        //удаление всех эмиттеров
+        
+      while (!emitters.empty ())      
+        delete emitters.begin ()->second;
+        
+      emitters.clear ();
+                        
+        //изменение сцены
+
+      scene = in_scene;      
+      
+      if (!scene)
         return;
 
-      sound::Listener snd_listener;
+      try
+      {
+          //добавление всех эмиттеров доступных в сцене
 
-      mat4f listener_world_tm = listener->WorldTM ();
+        scene->Traverse (xtl::bind (&ScenePlayer::Impl::OnNewNode, this, _1));
 
-      snd_listener.position  = listener_world_tm * vec3f (0.f);                              //!!!!!!!!добавить скорость
-      snd_listener.direction = listener_world_tm * vec4f (0.f,0.f,-1.f, 0.f);
-      snd_listener.up        = listener_world_tm * vec4f (0.f,1.f,0.f, 0.f);
+          //подписка на появление новых объектов
 
-      sound_manager->SetListener (snd_listener);
-      sound_manager->SetVolume   (listener->Gain ());
+        on_bind_node_connection = scene->Root ().RegisterEventHandler (NodeSubTreeEvent_AfterBind, xtl::bind (&ScenePlayer::Impl::OnNewNode, this, _2)); 
+      }
+      catch (...)
+      {
+        SetScene (0);
+        throw;
+      }      
     }
-
-    void EmitterUpdate (Node& sender, NodeEvent event)
+    
+///Обработка события изменения сцены у слушателя
+    void OnChangeListenerScene ()
     {
-      EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&sender));
-
-      if (emitter_iter == emitters.end ())
+      if (!listener)
         return;
-
-      emitter_iter->second->emitter.SetPosition  (sender.WorldPosition ());               //!!!!!!!!добавить скорость
-      emitter_iter->second->emitter.SetDirection (sender.WorldOrientation () * vec3f(0.f,0.f,1.f));
-      emitter_iter->second->emitter.SetVolume    (((scene_graph::SoundEmitter*)&sender)->Gain ());
+      
+      SetScene (listener->GetSceneListener ().Scene ());
     }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление Node сцены в список, если является эмиттером
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void CheckNode (scene_graph::Node& node)
+    
+///Обработка события удаления слушателя
+    void OnDestroyListener ()
+    {
+      SetListener (0, false);
+    }
+  
+///Обработка события появления нового узла
+    void OnNewNode (Node& node)
     {
       scene_graph::SoundEmitter* emitter = dynamic_cast<scene_graph::SoundEmitter*> (&node);
 
-      if (emitter)
-      {
-        ScenePlayerEmitterPtr scene_player_emitter (new ScenePlayerEmitter (emitter->SoundDeclarationName (),
-                                                                  emitter->RegisterEventHandler (SoundEmitterEvent_Play, bind (&ScenePlayer::Impl::PlayEmitter, this, _1, _2)),
-                                                                  emitter->RegisterEventHandler (SoundEmitterEvent_Stop, bind (&ScenePlayer::Impl::StopEmitter, this, _1)),
-                                                                  node.RegisterEventHandler     (NodeEvent_AfterUpdate,  bind (&ScenePlayer::Impl::EmitterUpdate, this, _1, _2))));
-
-        emitters.insert_pair (emitter, scene_player_emitter);
-      }
-    }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обработка добавления/удаления нодов в сцене
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ListenerUnbind (Node& sender, NodeEvent event)
-    {
-      SetListener (0);
-    }
-
-    void ProcessAttachNode (Node& sender, Node& node, NodeSubTreeEvent event)
-    {
-      CheckNode (node);
-    }
-
-    void ProcessDetachNode (Node& sender, Node& node, NodeSubTreeEvent event)
-    {
-      EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&node));
-
-      if (emitter_iter == emitters.end ())
+      if (!emitter)
         return;
 
-      emitters.erase (emitter_iter);
+      stl::auto_ptr<ScenePlayerEmitter> scene_player_emitter (new ScenePlayerEmitter (*emitter));
+
+      scene_player_emitter->SetSoundManager (sound_manager);
+
+      scene_player_emitter->connect_tracker (xtl::bind (&ScenePlayer::Impl::OnDestroyEmitter, this, emitter));
+
+      emitters.insert_pair (emitter, scene_player_emitter.get ());
+
+      scene_player_emitter.release ();
     }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проигрывание эмиттеров
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void PlayEmitter (SoundEmitter& emitter, SoundEmitterEvent event)
+///Обработка события удаления эмиттера
+    void OnDestroyEmitter (SoundEmitter* node)
     {
-      EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&emitter));
-
-      if (emitter_iter == emitters.end ())
-        return;
-
-      emitter_iter->second->emitter.SetSampleIndex (rand ());
-
-      emitter_iter->second->is_playing        = true;
-      emitter_iter->second->play_start_time   = clock ();
-      emitter_iter->second->play_start_offset = 0.f;
-
-      if (!sound_manager)
-        return;
-
-      sound_manager->PlaySound (emitter_iter->second->emitter);
-
-      emitter.AddRef ();
-
-      if (!sound_manager->IsLooping (emitter_iter->second->emitter))
-        action_queue.SetAction ((size_t)&emitter, size_t(sound_manager->Duration (emitter_iter->second->emitter) * 1000.f + ACTION_QUEUE_PROCESS_MILLISECONDS * 2),
-                                bind (&ScenePlayer::Impl::StopEmitter, this, xtl::ref (emitter)));
+      emitters.erase (node);
     }
 
-    void StopEmitter (SoundEmitter& emitter)
-    {
-      if (!sound_manager)
-        return;
+  private:
+    typedef stl::hash_map<SoundEmitter*, ScenePlayerEmitter*> EmitterSet;      
 
-      EmitterSet::iterator emitter_iter = emitters.find ((scene_graph::SoundEmitter*) (&emitter));
-
-      if (emitter_iter == emitters.end ())
-        return;
-
-      sound_manager->StopSound (emitter_iter->second->emitter);
-
-      emitter.Release ();
-
-      emitter_iter->second->is_playing = false;
-    }
+  private:
+    stl::auto_ptr<ScenePlayerListener> listener;                      //слушатель
+    sound::SoundManager*               sound_manager;                 //менеджер звуков
+    EmitterSet                         emitters;                      //эмиттеры
+    Scene*                             scene;                         //текущая сцена
+    xtl::auto_connection               on_manager_destroy_connection; //соединение события удаления менеджера    
+    xtl::auto_connection               on_bind_node_connection;       //соединение события появления нового узла в сцене
+    xtl::auto_connection               on_destroy_listener;           //соединение события удаления слушателя
+    xtl::auto_connection               on_change_listener_scene;      //соединение события изменения сцены слушателя
 };
 
 /*
@@ -344,12 +483,12 @@ ScenePlayer::~ScenePlayer ()
 
 void ScenePlayer::SetManager (sound::SoundManager* sound_manager)
 {
-  impl->SetManager (sound_manager);
+  impl->SetSoundManager (sound_manager);
 }
 
 sound::SoundManager* ScenePlayer::Manager () const
 {
-  return impl->Manager ();
+  return impl->GetSoundManager ();
 }
 
 /*
@@ -363,5 +502,5 @@ void ScenePlayer::SetListener (scene_graph::Listener* listener)
 
 scene_graph::Listener* ScenePlayer::Listener () const
 {
-  return impl->Listener ();
+  return impl->GetListener ();
 }

@@ -9,7 +9,7 @@ COMMON.SOURCES.TYPE                              := static-lib
 COMMON.SOURCES.NAME                              := funner.common
 COMMON.SOURCES.INCLUDE_DIRS                      := include ../xtl/include ../../extern/pcre/include sources
 COMMON.SOURCES.SOURCE_DIRS                       := sources/file_system/core sources/streams sources/hash sources/crypto/core sources/memory \
-                                                    sources/parselib/tree sources/parselib/manager sources/strlib sources/utils sources/log \
+                                                    sources/parselib/tree sources/parselib/manager sources/parselib/utils sources/strlib sources/utils sources/log \
                                                     sources/platform/default
 COMMON.SOURCES.DOCUMENTATION_DIRS                := include
 COMMON.SOURCES.COMPILER_DEFINES                  := PCRE_STATIC
@@ -21,6 +21,7 @@ COMMON.SOURCES.iphone.SOURCE_DIRS                := sources/platform/iphone
 COMMON.SOURCES.iphone.COMPILER_CFLAGS            := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers
 COMMON.SOURCES.carbon.COMPILER_CFLAGS            := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers
 COMMON.SOURCES.win32.SOURCE_DIRS                 := sources/platform/win32
+COMMON.SOURCES.bada_simulator.SOURCE_DIRS        := sources/platform/win32
 
 #Цель - WxfParser
 COMMON.WXF_PARSER.TYPE             := static-lib
@@ -53,6 +54,7 @@ COMMON.TESTS.LIBS             :=
 COMMON.TESTS.DLL_DIRS         := 
 COMMON.TESTS.SOURCE_DIRS      := tests/file_system tests/streams tests/hash tests/strlib tests/utils \
                                  tests/memory tests/log tests/parselib tests/crypto
+COMMON.TESTS.haswchar.SOURCE_DIRS := tests/strlib/wchar
 COMMON.TESTS.IMPORTS          := compile.math.vecmath compile.common link.common.aes link.common.xml link.common.wxf \
                                  link.common.zip_file_system link.common.default_console_handler
 

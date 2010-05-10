@@ -1,0 +1,5 @@
+node A
+{
+  node B 'test0 {test1 } { test2} { test3 } {{test5} test4'
+  node C '_test1 {_test2} _test3'
+}

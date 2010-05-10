@@ -103,9 +103,10 @@ inline void auto_ptr<T>::reset (T* p) throw ()
   if (p == ptr)
     return;
     
-  delete ptr;
-      
-  ptr = p;  
+  T* tmp = ptr;
+  ptr    = p;    
+
+  delete tmp;
 }
 
 template <class T> template <class T1> 

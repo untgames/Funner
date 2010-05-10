@@ -273,5 +273,5 @@ inline bool operator == (const T1* p1, const trackable_ptr<T2>& p2)
 template <class T1, class T2>
 inline bool operator != (const T1* p1, const trackable_ptr<T2>& p2)
 {
-  return p1 == p2.get ();
+  return p1 != p2.get ();
 }
