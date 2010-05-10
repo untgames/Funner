@@ -15,6 +15,7 @@ namespace math
 {
 
 //forward declarations
+template <class T, unsigned int Size> class matrix;
 template <class T, unsigned int Size> class vector;
 template <class T>                    class quat;
 
@@ -23,6 +24,7 @@ template <class T>                    class quat;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T>                    struct spline_scalar_type                   { typedef T type; };
 template <class T, unsigned int Size> struct spline_scalar_type<vector<T, Size> > { typedef T type; };
+template <class T, unsigned int Size> struct spline_scalar_type<matrix<T, Size> > { typedef T type; };
 template <class T>                    struct spline_scalar_type<quat<T> >         { typedef T type; };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,6 +41,22 @@ template <class T> struct spline_key
 
   spline_key ();
   spline_key (const time_type& time, const value_type& value);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ключ сплайна без интерполяции
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct spline_step_key: public spline_key<T>
+{
+  private:
+    typedef spline_key<T> base;
+
+  public:
+    typedef typename base::time_type  time_type;
+    typedef typename base::value_type value_type;
+
+    spline_step_key ();
+    spline_step_key (const time_type& time, const value_type& value);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

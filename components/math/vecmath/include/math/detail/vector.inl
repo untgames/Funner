@@ -319,7 +319,7 @@ struct vec_cross_product {
 template <class T, unsigned int Size>
 vector<T, Size>::vector ()
 {
-  detail::vec_assign_scalar ()(T (0), *this);
+  detail::vec_assign_scalar ()(T (), *this);
 }
 
 template <class T, unsigned int Size> template <unsigned int Size1>
@@ -366,7 +366,7 @@ vector<T, Size>::vector (const T& x1, const T& x2, const T& x3, const T& x4)
     default:
     {
       for (unsigned int i=0; i<Size-4; i++)
-        (*this)[i+4] = T(0);
+        (*this)[i+4] = T();
     }  
     case 4: (*this)[3] = x4;
     case 3: (*this)[2] = x3;

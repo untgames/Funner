@@ -225,6 +225,12 @@ void recompute (spline_key_frame<spline_bezier_key<T> >* first, spline_key_frame
   } 
 }
 
+///–асчЄт сплайна без интерпол€ции
+template <class T>
+void recompute (spline_key_frame<spline_step_key<T> >* first, spline_key_frame<spline_step_key<T> >* last, bool closed)
+{
+}
+
 }
 
 /*
@@ -268,6 +274,21 @@ spline_tcb_key<T>::spline_tcb_key (const time_type& in_time, const value_type& i
   , tension (in_tension)
   , continuity (in_continuity)
   , bias (in_bias)
+{
+}
+
+/*
+    —плайн без интерпол€ции
+*/
+
+template <class T>
+spline_step_key<T>::spline_step_key ()
+{
+}
+
+template <class T>
+spline_step_key<T>::spline_step_key (const time_type& time, const value_type& value)
+  : base (time, value)
 {
 }
 
@@ -682,6 +703,14 @@ void basic_spline<Key>::eval (const time_type& time, value_type& out_value) cons
   typename implementation::frame_type& frame = impl->get_frame (time);
   
   detail::spline_interpolate (detail::normalize_time (time, frame), frame.factors, out_value);
+}
+
+template <>
+void basic_spline<spline_step_key<matrix<float, 4> > >::eval (const time_type& time, value_type& out_value) const
+{
+  implementation::frame_type& frame = impl->get_frame (time);
+
+  out_value = frame.key.value;
 }
 
 template <class Key>
