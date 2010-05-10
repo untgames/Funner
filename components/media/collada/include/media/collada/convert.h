@@ -13,6 +13,13 @@ class MeshLibrary;
 
 }
 
+namespace animation
+{
+
+class AnimationLibrary;
+
+}
+
 namespace collada
 {
 
@@ -20,6 +27,11 @@ namespace collada
 ///Преобразование коллада-модели в библиотеку мешей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void convert (const collada::Model& source, geometry::MeshLibrary& destination);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Преобразование коллада-модели в библиотеку анимаций
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void convert (const collada::Model& source, animation::AnimationLibrary& destination);
 
 }
 

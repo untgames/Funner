@@ -2,7 +2,7 @@
 #Определения и константы
 ###################################################################################################
 TARGETS := MEDIA.COLLADA.SOURCES MEDIA.COLLADA.DAE.SOURCES MEDIA.COLLADA.CONVERT.SOURCES MEDIA.COLLADA.DAE.TESTS MEDIA.COLLADA.CONVERTER \
-  MEDIA.COLLADA.CONVERTER.TESTS
+  MEDIA.COLLADA.CONVERT.TESTS MEDIA.COLLADA.CONVERTER.TESTS
 
 #Цель - sources
 MEDIA.COLLADA.SOURCES.TYPE             := static-lib
@@ -20,7 +20,7 @@ MEDIA.COLLADA.DAE.SOURCES.IMPORTS          := compile.media.collada link.media.c
 MEDIA.COLLADA.CONVERT.SOURCES.TYPE             := static-lib
 MEDIA.COLLADA.CONVERT.SOURCES.NAME             := funner.media.collada.convert
 MEDIA.COLLADA.CONVERT.SOURCES.SOURCE_DIRS      := sources/convert
-MEDIA.COLLADA.CONVERT.SOURCES.IMPORTS          := compile.media.collada compile.media.geometry
+MEDIA.COLLADA.CONVERT.SOURCES.IMPORTS          := compile.media.collada compile.media.geometry compile.media.animation compile.math.curves
 
 #Цель - DAE loader tests
 MEDIA.COLLADA.DAE.TESTS.TYPE             := test-suite
@@ -30,16 +30,17 @@ MEDIA.COLLADA.DAE.TESTS.IMPORTS          := compile.media.collada link.media.col
 #Цель - collada convert tests
 MEDIA.COLLADA.CONVERT.TESTS.TYPE             := test-suite
 MEDIA.COLLADA.CONVERT.TESTS.SOURCE_DIRS      := tests/convert
-MEDIA.COLLADA.CONVERT.TESTS.IMPORTS          := compile.media.collada compile.media.geometry \
+MEDIA.COLLADA.CONVERT.TESTS.IMPORTS          := compile.media.collada compile.media.geometry compile.media.animation \
                                                 link.media.collada.dae link.media.collada.convert link.media.geometry \
-                                                link.media.geometry.xmesh
+                                                link.media.geometry.xmesh link.media.animation.xanim link.media.animation.binanim
 
 #Цель - Collada converter
 MEDIA.COLLADA.CONVERTER.TYPE        := application
 MEDIA.COLLADA.CONVERTER.NAME        := collada-converter
 MEDIA.COLLADA.CONVERTER.SOURCE_DIRS := utils/collada_converter
-MEDIA.COLLADA.CONVERTER.IMPORTS     := compile.media.collada compile.media.image compile.media.geometry \
-                                       link.media.collada.dae link.media.collada.convert link.media.image link.media.geometry.xmesh link.media.geometry.binmesh
+MEDIA.COLLADA.CONVERTER.IMPORTS     := compile.media.collada compile.media.image compile.media.geometry compile.media.animation \
+                                       link.media.collada.dae link.media.collada.convert link.media.image link.media.geometry.xmesh \
+                                       link.media.geometry.binmesh link.media.animation.xanim link.media.animation.binanim
 
 #Цель - collada convert tests
 MEDIA.COLLADA.CONVERTER.TESTS.TYPE               := test-suite

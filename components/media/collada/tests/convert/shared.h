@@ -5,6 +5,7 @@
 
 #include <xtl/function.h>
 
+#include <media/animation/animation_library.h>
 #include <media/mesh.h>
 #include <media/collada.h>
 

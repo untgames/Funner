@@ -11,6 +11,8 @@
 #include <common/strlib.h>
 #include <common/xml_writer.h>
 
+#include <media/animation/animation_library.h>
+
 #include <media/collada.h>
 #include <media/image.h>
 #include <media/mesh.h>
@@ -71,23 +73,24 @@ struct Option
 //параметры запуска
 struct Params
 {
-  const Option* options;                    //массив опций
-  size_t        options_count;              //количество опций
-  stl::string   source_name;                //имя исходного файла
-  StringArray   source_search_paths;        //пути к каталогам поиск ресурсов
-  stl::string   output_textures_dir_name;   //имя каталога с сохранёнными текстурами
-  stl::string   output_textures_format;     //формат текстур
-  stl::string   output_materials_file_name; //файл материалов
-  stl::string   output_scene_file_name;     //файл сцены
-  stl::string   output_meshes_file_name;    //имя файла с сохранёнными мешами
-  stl::string   output_remove_file_prefix;  //отбрасываемый префикс имён файлов
-  stl::string   output_resources_namespace; //пространство имён, применяемое при сохранении ресурсов
-  stl::string   exclude_nodes;              //неэкспортируемые узлы сцены
-  size_t        max_texture_size;           //максимальный размер текстуры
-  bool          pot;                        //нужно ли масштабировать текстуры до ближайшей степени двойки  
-  bool          silent;                     //минимальное число сообщений
-  bool          remove_unused_resources;    //нужно ли выбрасывать неиспользуемые ресурсы
-  bool          print_help;                 //нужно ли печатать сообщение помощи
+  const Option* options;                     //массив опций
+  size_t        options_count;               //количество опций
+  stl::string   source_name;                 //имя исходного файла
+  StringArray   source_search_paths;         //пути к каталогам поиск ресурсов
+  stl::string   output_textures_dir_name;    //имя каталога с сохранёнными текстурами
+  stl::string   output_textures_format;      //формат текстур
+  stl::string   output_materials_file_name;  //файл материалов
+  stl::string   output_scene_file_name;      //файл сцены
+  stl::string   output_animations_file_name; //файл анимаций
+  stl::string   output_meshes_file_name;     //имя файла с сохранёнными мешами
+  stl::string   output_remove_file_prefix;   //отбрасываемый префикс имён файлов
+  stl::string   output_resources_namespace;  //пространство имён, применяемое при сохранении ресурсов
+  stl::string   exclude_nodes;               //неэкспортируемые узлы сцены
+  size_t        max_texture_size;            //максимальный размер текстуры
+  bool          pot;                         //нужно ли масштабировать текстуры до ближайшей степени двойки
+  bool          silent;                      //минимальное число сообщений
+  bool          remove_unused_resources;     //нужно ли выбрасывать неиспользуемые ресурсы
+  bool          print_help;                  //нужно ли печатать сообщение помощи
 };
 
 typedef xtl::shared_ptr<media::Image> TexturePtr;
@@ -191,6 +194,12 @@ void command_line_output_scene_file_name (const char* file_name, Params& params)
   params.output_scene_file_name = file_name;
 }
 
+//установка файла анимаций
+void command_line_output_animations_file_name (const char* file_name, Params& params)
+{
+  params.output_animations_file_name = file_name;
+}
+
 //установка папки мешей
 void command_line_output_meshes_file_name (const char* file_name, Params& params)
 {
@@ -237,20 +246,21 @@ void command_line_set_resources_namespace (const char* prefix, Params& params)
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
-    {command_line_source_search_path,         "include",               'I', "dir",       "add path to resources search paths"},
-    {command_line_output_textures_dir_name,   "out-textures-dir",        0, "dir",       "set output textures directory"},
-    {command_line_output_textures_format,     "out-textures-format",     0, "string",    "set output textures format string"},
-    {command_line_output_max_texture_size,    "max-texture-size",        0, "value",     "set maximum output textures size"},
-    {command_line_pot,                        "pot",                     0, 0,           "rescale textures to power of two"},
-    {command_line_output_materials_file_name, "out-materials",           0, "file",      "set output materials file"},
-    {command_line_output_meshes_file_name,    "out-meshes",              0, "file",      "set output meshes file name"},
-    {command_line_output_scene_file_name,     "out-scene",               0, "file",      "set output scene file"},
-    {command_line_set_remove_file_prefix,     "remove-file-prefix",      0, "string",    "remove file prefix from all file links"},
-    {command_line_set_resources_namespace,    "resources-namespace",     0, "string",    "set resources namespace"},
-    {command_line_exclude_nodes,              "exclude-nodes",           0, "wildcards", "exclude selected nodes from export"},
-    {command_line_remove_unused_resources,    "remove-unused",           0, 0,           "remove unused resources from export"},
-    {command_line_silent,                     "silent",                's', 0,           "quiet mode"},
-    {command_line_help,                       "help",                  '?', 0,           "print help message"},
+    {command_line_source_search_path,          "include",               'I', "dir",       "add path to resources search paths"},
+    {command_line_output_textures_dir_name,    "out-textures-dir",        0, "dir",       "set output textures directory"},
+    {command_line_output_textures_format,      "out-textures-format",     0, "string",    "set output textures format string"},
+    {command_line_output_max_texture_size,     "max-texture-size",        0, "value",     "set maximum output textures size"},
+    {command_line_pot,                         "pot",                     0, 0,           "rescale textures to power of two"},
+    {command_line_output_materials_file_name,  "out-materials",           0, "file",      "set output materials file"},
+    {command_line_output_meshes_file_name,     "out-meshes",              0, "file",      "set output meshes file name"},
+    {command_line_output_scene_file_name,      "out-scene",               0, "file",      "set output scene file"},
+    {command_line_output_animations_file_name, "out-animations",          0, "file",      "set output animations file"},
+    {command_line_set_remove_file_prefix,      "remove-file-prefix",      0, "string",    "remove file prefix from all file links"},
+    {command_line_set_resources_namespace,     "resources-namespace",     0, "string",    "set resources namespace"},
+    {command_line_exclude_nodes,               "exclude-nodes",           0, "wildcards", "exclude selected nodes from export"},
+    {command_line_remove_unused_resources,     "remove-unused",           0, 0,           "remove unused resources from export"},
+    {command_line_silent,                      "silent",                's', 0,           "quiet mode"},
+    {command_line_help,                        "help",                  '?', 0,           "print help message"},
   };
 
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -487,47 +497,14 @@ void save_meshes (const Params& params, const Model& model)
     printf ("Ok\n");
 }
 
-//сохранение анимации
-void save_animation_channel (const Params& params, const AnimationChannel& channel, XmlWriter& writer)
+//сохранение анимаций
+void save_animations (const Params& params, const Model& model)
 {
-  XmlWriter::Scope scope (writer, "channel");
+  media::animation::AnimationLibrary animation_library;
 
-  writer.WriteAttribute ("target", channel.TargetName ());
-  writer.WriteAttribute ("parameter", channel.ParameterName ());
+  convert (model, animation_library);
 
-  switch (channel.Semantic ())
-  {
-    case AnimationChannelSemantic_Transform:
-    {
-      writer.WriteAttribute ("semantic", "transform");
-
-      const AnimationSampleTransform* sample = channel.Samples <AnimationSampleTransform> ();
-
-      for (size_t i = 0, count = channel.SamplesCount (); i < count; i++, sample++)
-      {
-        XmlWriter::Scope sample_scope (writer, "sample");
-
-        writer.WriteAttribute ("time", sample->time);
-        writer.WriteAttribute ("value", sample->value);
-      }
-      break;
-    }
-    default:
-      throw xtl::format_operation_exception ("save_animation_channel", "can't save channel, unsupported semantic");
-  }
-}
-
-//сохранение анимации
-void save_animation (const Params& params, const Animation& animation, XmlWriter& writer)
-{
-  XmlWriter::Scope scope (writer, "animation");
-
-  writer.WriteAttribute ("id", animation.Id ());
-
-  for (AnimationList::ConstIterator iter = animation.Animations ().CreateIterator (); iter; ++iter)
-    save_animation (params, *iter, writer);
-  for (Animation::AnimationChannelList::ConstIterator iter = animation.Channels ().CreateIterator (); iter; ++iter)
-    save_animation_channel (params, *iter, writer);
+  animation_library.Save (params.output_animations_file_name.c_str ());
 }
 
 //сохранение узла
@@ -585,9 +562,6 @@ void save_scene (const Params& params, const Model& model)
 
   for (NodeLibrary::ConstIterator i = model.Scenes ().CreateIterator (); i; ++i)
     save_node (params, *i, writer);
-    
-  for (AnimationList::ConstIterator i = model.Animations ().CreateIterator (); i; ++i)
-    save_animation (params, *i, writer);
 
   if (!params.silent)
     printf ("Ok\n");
@@ -924,6 +898,9 @@ void export_data (Params& params)
 
   if (!params.output_scene_file_name.empty ())
     save_scene (params, model);
+
+  if (!params.output_animations_file_name.empty ())
+    save_animations (params, model);
 }
 
 //проверка корректности ввода
