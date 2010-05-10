@@ -48,6 +48,21 @@ template <class Key> struct spline_key_frame
   }
 };
 
+template <class T> struct spline_key_frame<spline_step_key<T> >
+{
+  typedef spline_step_key<T>             key_type;
+  typedef typename key_type::time_type   time_type;
+  typedef typename key_type::scalar_type scalar_type;
+  typedef typename key_type::value_type  value_type;
+
+  key_type key;
+
+  spline_key_frame (const key_type& in_key)
+    : key (in_key)
+  {
+  }
+};
+
 ///Компаратор для фреймов
 template <class Frame> struct spline_key_frame_less
 {
@@ -70,12 +85,18 @@ Time normalize_time (const Time& time, const Frame& frame)
 }
 
 ///Интерполяция
-template <class Time, class Value>
-void spline_interpolate (const Time& time, const math::vector<Value, 4>& factors, Value& result)
+template <class Time, class Frame, class Value>
+void spline_eval (const Time& unclamped_time, const Frame& frame, Value& result)
 {    
-  Time time2 = time * time;
-  
-  result = dot (math::vector<Value, 4> (Value (1), Value (time), Value (time2), Value (time2 * time)), factors);
+  Time time = normalize_time (unclamped_time, frame), time2 = time * time;
+
+  result = dot (math::vector<Value, 4> (Value (1), Value (time), Value (time2), Value (time2 * time)), frame.factors);
+}
+
+template <class Time, class Value>
+void spline_eval (const Time&, const spline_key_frame<spline_step_key<Value> >& frame, Value& result)
+{
+  result = frame.key.value;
 }
 
 ///Раcчёт коэффициентов TCB-сплайна
@@ -702,15 +723,7 @@ void basic_spline<Key>::eval (const time_type& time, value_type& out_value) cons
 {
   typename implementation::frame_type& frame = impl->get_frame (time);
   
-  detail::spline_interpolate (detail::normalize_time (time, frame), frame.factors, out_value);
-}
-
-template <>
-void basic_spline<spline_step_key<matrix<float, 4> > >::eval (const time_type& time, value_type& out_value) const
-{
-  implementation::frame_type& frame = impl->get_frame (time);
-
-  out_value = frame.key.value;
+  detail::spline_eval (time, frame, out_value);
 }
 
 template <class Key>
