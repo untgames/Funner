@@ -25,14 +25,14 @@ Window& Window::operator = (const Window& window)
   return *this;
 }
 
-void Window::SetId (const char* name)
+void Window::SetName (const char* name)
 {
-  impl->SetId (name);
+  impl->SetName (name);
 }
 
-const char* Window::Id () const
+const char* Window::Name () const
 {
-  return impl->Id ();
+  return impl->Name ();
 }
 
 RenderTarget Window::ColorBuffer () const

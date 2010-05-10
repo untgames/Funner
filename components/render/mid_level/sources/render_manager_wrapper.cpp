@@ -7,6 +7,12 @@ RenderManager::RenderManager ()
 {
 }
 
+RenderManager::RenderManager (RenderManagerImpl* in_impl)
+  : impl (in_impl)
+{
+  addref (impl);
+}
+
 RenderManager::RenderManager (const RenderManager& manager)
   : impl (manager.impl)
 {
@@ -32,23 +38,6 @@ const char* RenderManager::Description () const
 Window RenderManager::CreateWindow (syslib::Window& window, common::PropertyMap& properties)
 {
   return Wrappers::Wrap<render::mid_level::Window> (impl->CreateWindow (window, properties));
-}
-
-Window RenderManager::CreateWindow (const char* name, syslib::Window& window, common::PropertyMap& properties)
-{
-  try
-  {
-    render::mid_level::Window render_window = CreateWindow (window, properties);
-  
-    render_window.SetId (name);
-    
-    return render_window;
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::mid_level::RenderManager::CreateWindow");
-    throw;
-  }
 }
 
 size_t RenderManager::WindowsCount () const

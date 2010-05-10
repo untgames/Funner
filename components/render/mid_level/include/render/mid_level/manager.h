@@ -2,7 +2,6 @@
 #define RENDER_MID_LEVEL_MANAGER_HEADER
 
 ///???экспортируемые свойства рендеринга из материалов через entity
-///???добавить пустые конструкторы и check_ptr в реализацию
 
 #include <render/mid_level/entity.h>
 #include <render/mid_level/dynamic_resource.h>
@@ -76,7 +75,6 @@ class RenderManager
 ///Создание окна рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     mid_level::Window CreateWindow (syslib::Window& window, common::PropertyMap& properties);
-    mid_level::Window CreateWindow (const char* name, syslib::Window& window, common::PropertyMap& properties);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор окон рендеринга
@@ -124,6 +122,9 @@ class RenderManager
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Swap (RenderManager&);
+    
+  private:
+    RenderManager (RenderManagerImpl*);
     
   private:
     RenderManagerImpl* impl;

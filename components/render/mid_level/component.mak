@@ -14,4 +14,4 @@ RENDER.MID_LEVEL.SOURCES.IMPORTS          := compile.render.mid_level compile.me
 RENDER.MID_LEVEL.TESTS.TYPE             := test-suite
 RENDER.MID_LEVEL.TESTS.INCLUDE_DIRS     := ../../xtl/include
 RENDER.MID_LEVEL.TESTS.SOURCE_DIRS      := tests
-RENDER.MID_LEVEL.TESTS.IMPORTS          := compile.render.mid_level link.render.mid_level
+RENDER.MID_LEVEL.TESTS.IMPORTS          := compile.render.mid_level link.render.mid_level compile.system link.render.low_level.opengl_driver run.render.low_level.opengl_driver

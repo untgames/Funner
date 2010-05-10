@@ -60,9 +60,9 @@ size_t Texture::Depth () const
   return impl->Depth ();
 }
 
-RenderTarget Texture::RenderTarget () const
+RenderTarget Texture::RenderTarget (size_t layer, size_t mip_level) const
 {
-  return Wrappers::Wrap<render::mid_level::RenderTarget> (impl->RenderTarget ());
+  return Wrappers::Wrap<render::mid_level::RenderTarget> (impl->RenderTarget (layer, mip_level));
 }
 
 void Texture::Update (const media::Image& image)

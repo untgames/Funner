@@ -81,7 +81,7 @@ size_t TextureImpl::Depth ()
     Получение цели рендеринга
 */
 
-const RenderTargetPtr& TextureImpl::RenderTarget ()
+RenderTargetPtr TextureImpl::RenderTarget (size_t layer, size_t mip_level)
 {
   throw xtl::make_not_implemented_exception ("render::mid_level::TextureImpl::RenderTarget");
 }

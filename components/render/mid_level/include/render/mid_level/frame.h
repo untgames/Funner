@@ -61,6 +61,7 @@ class Frame
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Целевые буферы отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+//добавить интерфейсную возможность MRT!!!
     void                          SetRenderTargets   (const mid_level::RenderTarget& render_target, const mid_level::RenderTarget& depth_stencil_target);
           mid_level::RenderTarget RenderTarget       ();
           mid_level::RenderTarget DepthStencilTarget ();

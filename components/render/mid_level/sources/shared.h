@@ -2,15 +2,19 @@
 #define RENDER_MID_LEVEL_SHARED_HEADER
 
 #include <stl/auto_ptr.h>
+#include <stl/string>
+#include <stl/vector>
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/signal.h>
+#include <xtl/trackable.h>
+
+#include <common/log.h>
 
 #include <media/image.h>
-
 #include <media/geometry/mesh_library.h>
-
 #include <media/rfx/effect_library.h>
 #include <media/rfx/material_library.h>
 #include <media/rfx/shader_library.h>
@@ -28,9 +32,13 @@ namespace render
 namespace mid_level
 {
 
+//implementation forwards
+class DeviceManager;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+typedef xtl::intrusive_ptr<DeviceManager>       DeviceManagerPtr;
 typedef xtl::intrusive_ptr<EntityImpl>          EntityPtr;
 typedef xtl::intrusive_ptr<FrameImpl>           FramePtr;
 typedef xtl::intrusive_ptr<MaterialImpl>        MaterialPtr;
@@ -88,6 +96,8 @@ class Wrappers
 ///Подключение заголовочных файлов реализации
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 #include "object.h"
+#include "device_manager.h"
+#include "log.h"
 
 #include "entity.h"
 #include "frame.h"
