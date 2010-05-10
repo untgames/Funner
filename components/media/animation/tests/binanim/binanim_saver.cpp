@@ -40,16 +40,16 @@ int main ()
     sub_animation.Events ().AddEvent (0.1f, 0.2f, "0.1-0.2 event");
     sub_animation.Events ().AddEvent (0.5f, 0.3f, "0.5-0.3 event");
 
-    math::tcb_spline3f    channel1_track;
-    math::tcb_spline4f    channel2_track;
-    math::bezier_spline2f sub_animation_channel_track;
+    math::tcb_spline3f      channel1_track;
+    math::step_spline_mat4f channel2_track;
+    math::bezier_spline2f   sub_animation_channel_track;
 
     channel1_track.add_key (math::spline_tcb_key<math::vec3f> (0.f, 1.f, 0.1f, 0.2f, 0.3f));
     channel1_track.add_key (math::spline_tcb_key<math::vec3f> (1.f, 2.f, 0.2f, 0.3f, 0.4f));
     channel1_track.add_key (math::spline_tcb_key<math::vec3f> (2.f, 3.f, 0.5f, 0.4f, 0.3f));
-    channel2_track.add_key (math::spline_tcb_key<math::vec4f> (0.f, 1.f, 0.5f, 0.4f, 0.3f));
-    channel2_track.add_key (math::spline_tcb_key<math::vec4f> (1.f, 2.f, 0.2f, 0.3f, 0.4f));
-    channel2_track.add_key (math::spline_tcb_key<math::vec4f> (2.f, 3.f, 0.1f, 0.2f, 0.3f));
+    channel2_track.add_key (math::spline_step_key<math::mat4f> (0.f, 1.f));
+    channel2_track.add_key (math::spline_step_key<math::mat4f> (1.f, 2.f));
+    channel2_track.add_key (math::spline_step_key<math::mat4f> (2.f, 3.f));
     sub_animation_channel_track.add_key (math::spline_bezier_key<math::vec2f> (0.f, 1.f, 0.1f, 0.2f));
     sub_animation_channel_track.add_key (math::spline_bezier_key<math::vec2f> (1.f, 2.f, 0.2f, 0.3f));
     sub_animation_channel_track.add_key (math::spline_bezier_key<math::vec2f> (2.f, 3.f, 0.9f, 0.8f));

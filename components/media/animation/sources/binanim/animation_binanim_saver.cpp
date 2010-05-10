@@ -92,10 +92,16 @@ class BinAnimationLibrarySaver
       file_write (result_file, &outer_value, sizeof (outer_value));
     }
 
-    template <class T> void SaveSpline (const T* spline)
+    template <class T> void SaveSpecificKeyInfo (const math::spline_step_key<T>& key)
+    {
+    }
+
+    template <class T> void SaveSpline (const char* spline_id, const T* spline)
     {
       if (!spline)
         throw xtl::make_null_argument_exception ("media::animation::BinAnimationLibrarySaver::SaveSpline", "spline");
+
+      file_write (result_file, spline_id);
 
       unsigned int keys_count = spline->keys_count ();
 
@@ -122,53 +128,31 @@ class BinAnimationLibrarySaver
       const std::type_info& track_type = channel.TrackType ();
 
       if (track_type == typeid (math::tcb_splinef))
-      {
-        file_write (result_file, "basic_spline<spline_tcb_key<float>>");
-
-        SaveSpline (channel.Track<math::tcb_splinef> ());
-      }
+        SaveSpline ("basic_spline<spline_tcb_key<float>>", channel.Track<math::tcb_splinef> ());
       else if (track_type == typeid (math::tcb_spline2f))
-      {
-        file_write (result_file, "basic_spline<spline_tcb_key<vec2f>>");
-
-        SaveSpline (channel.Track<math::tcb_spline2f> ());
-      }
+        SaveSpline ("basic_spline<spline_tcb_key<vec2f>>", channel.Track<math::tcb_spline2f> ());
       else if (track_type == typeid (math::tcb_spline3f))
-      {
-        file_write (result_file, "basic_spline<spline_tcb_key<vec3f>>");
-
-        SaveSpline (channel.Track<math::tcb_spline3f> ());
-      }
+        SaveSpline ("basic_spline<spline_tcb_key<vec3f>>", channel.Track<math::tcb_spline3f> ());
       else if (track_type == typeid (math::tcb_spline4f))
-      {
-        file_write (result_file, "basic_spline<spline_tcb_key<vec4f>>");
-
-        SaveSpline (channel.Track<math::tcb_spline4f> ());
-      }
+        SaveSpline ("basic_spline<spline_tcb_key<vec4f>>", channel.Track<math::tcb_spline4f> ());
       else if (track_type == typeid (math::bezier_splinef))
-      {
-        file_write (result_file, "basic_spline<spline_bezier_key<float>>");
-
-        SaveSpline (channel.Track<math::bezier_splinef> ());
-      }
+        SaveSpline ("basic_spline<spline_bezier_key<float>>", channel.Track<math::bezier_splinef> ());
       else if (track_type == typeid (math::bezier_spline2f))
-      {
-        file_write (result_file, "basic_spline<spline_bezier_key<vec2f>>");
-
-        SaveSpline (channel.Track<math::bezier_spline2f> ());
-      }
+        SaveSpline ("basic_spline<spline_bezier_key<vec2f>>", channel.Track<math::bezier_spline2f> ());
       else if (track_type == typeid (math::bezier_spline3f))
-      {
-        file_write (result_file, "basic_spline<spline_bezier_key<vec3f>>");
-
-        SaveSpline (channel.Track<math::bezier_spline3f> ());
-      }
+        SaveSpline ("basic_spline<spline_bezier_key<vec3f>>", channel.Track<math::bezier_spline3f> ());
       else if (track_type == typeid (math::bezier_spline4f))
-      {
-        file_write (result_file, "basic_spline<spline_bezier_key<vec4f>>");
-
-        SaveSpline (channel.Track<math::bezier_spline4f> ());
-      }
+        SaveSpline ("basic_spline<spline_bezier_key<vec4f>>", channel.Track<math::bezier_spline4f> ());
+      else if (track_type == typeid (math::step_splinef))
+        SaveSpline ("basic_spline<spline_step_key<float>>", channel.Track<math::step_splinef> ());
+      else if (track_type == typeid (math::step_spline2f))
+        SaveSpline ("basic_spline<spline_step_key<vec2f>>", channel.Track<math::step_spline2f> ());
+      else if (track_type == typeid (math::step_spline3f))
+        SaveSpline ("basic_spline<spline_step_key<vec3f>>", channel.Track<math::step_spline3f> ());
+      else if (track_type == typeid (math::step_spline4f))
+        SaveSpline ("basic_spline<spline_step_key<vec4f>>", channel.Track<math::step_spline4f> ());
+      else if (track_type == typeid (math::step_spline_mat4f))
+        SaveSpline ("basic_spline<spline_step_key<mat4f>>", channel.Track<math::step_spline_mat4f> ());
       else
         throw xtl::format_operation_exception ("media::animation::BinAnimationLibrarySaver::SaveAnimationChannel",
                                                "Unsupported channel track type '%s'", track_type.name ());

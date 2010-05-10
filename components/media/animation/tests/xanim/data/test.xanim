@@ -11,10 +11,10 @@
         <key time="1" value="2 2 2" tension="0.2" continuity="0.3" bias="0.4"/>
         <key time="2" value="3 3 3" tension="0.5" continuity="0.4" bias="0.3"/>
       </channel>
-      <channel parameter_name="color" track_type="basic_spline<spline_tcb_key<vec4f>>">
-        <key time="0" value="1 1 1 1" tension="0.5" continuity="0.4" bias="0.3"/>
-        <key time="1" value="2 2 2 2" tension="0.2" continuity="0.3" bias="0.4"/>
-        <key time="2" value="3 3 3 3" tension="0.1" continuity="0.2" bias="0.3"/>
+      <channel parameter_name="color" track_type="basic_spline<spline_step_key<mat4f>>">
+        <key time="0" value="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>
+        <key time="1" value="2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 2"/>
+        <key time="2" value="3 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3"/>
       </channel>
     </channels>
     <animations>

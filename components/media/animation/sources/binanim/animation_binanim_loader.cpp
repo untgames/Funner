@@ -90,6 +90,10 @@ class BinAnimationLibraryLoader
       file_read (input_file, &key.outer_value, sizeof (key.outer_value));
     }
 
+    template <class T> void ReadSpecificKeyInfo (math::spline_step_key<T>& key)
+    {
+    }
+
     template <class T> void ReadSplineKey (T& spline)
     {
         typename T::key_type key;
@@ -143,6 +147,16 @@ class BinAnimationLibraryLoader
         ReadSpline<math::bezier_spline3f> (channel);
       else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_bezier_key<vec4f>>"))
         ReadSpline<math::bezier_spline4f> (channel);
+      else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_step_key<float>>"))
+        ReadSpline<math::step_splinef> (channel);
+      else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_step_key<vec2f>>"))
+        ReadSpline<math::step_spline2f> (channel);
+      else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_step_key<vec3f>>"))
+        ReadSpline<math::step_spline3f> (channel);
+      else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_step_key<vec4f>>"))
+        ReadSpline<math::step_spline4f> (channel);
+      else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_step_key<mat4f>>"))
+        ReadSpline<math::step_spline_mat4f> (channel);
       else
         throw xtl::format_operation_exception ("media::animation::BinAnimationLibraryLoader::ReadAnimationChannel",
                                                "Unsupported channel track type '%s'", track_type);

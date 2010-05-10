@@ -51,6 +51,10 @@ class XmlAnimationLibrarySaver
       writer.WriteAttribute ("outer_value", key.outer_value, FLOAT_FORMAT);
     }
 
+    template <class T> void SaveSpecificKeyInfo (const math::spline_step_key<T>& key)
+    {
+    }
+
     template <class T> void SaveSpline (const T* spline)
     {
       if (!spline)
@@ -124,6 +128,36 @@ class XmlAnimationLibrarySaver
         writer.WriteAttribute ("track_type", "basic_spline<spline_bezier_key<vec4f>>");
 
         SaveSpline (channel.Track<math::bezier_spline4f> ());
+      }
+      else if (track_type == typeid (math::step_splinef))
+      {
+        writer.WriteAttribute ("track_type", "basic_spline<spline_step_key<float>>");
+
+        SaveSpline (channel.Track<math::step_splinef> ());
+      }
+      else if (track_type == typeid (math::step_spline2f))
+      {
+        writer.WriteAttribute ("track_type", "basic_spline<spline_step_key<vec2f>>");
+
+        SaveSpline (channel.Track<math::step_spline2f> ());
+      }
+      else if (track_type == typeid (math::step_spline3f))
+      {
+        writer.WriteAttribute ("track_type", "basic_spline<spline_step_key<vec3f>>");
+
+        SaveSpline (channel.Track<math::step_spline3f> ());
+      }
+      else if (track_type == typeid (math::step_spline4f))
+      {
+        writer.WriteAttribute ("track_type", "basic_spline<spline_step_key<vec4f>>");
+
+        SaveSpline (channel.Track<math::step_spline4f> ());
+      }
+      else if (track_type == typeid (math::step_spline_mat4f))
+      {
+        writer.WriteAttribute ("track_type", "basic_spline<spline_step_key<mat4f>>");
+
+        SaveSpline (channel.Track<math::step_spline_mat4f> ());
       }
       else
         throw xtl::format_operation_exception ("media::animation::XmlAnimationLibrarySaver::SaveAnimationChannel",

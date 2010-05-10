@@ -24,6 +24,19 @@ void read (Parser::Iterator iter, const char* str, math::vector <float, Size>& v
     value [i] = (float)atof (components [i]);
 }
 
+template <unsigned int Size>
+void read (Parser::Iterator iter, const char* str, math::matrix <float, Size>& value)
+{
+  StringArray components = common::split (str);
+
+  if (components.Size () != Size * Size)
+    raise_parser_exception (*iter, "Invalid matrix format");
+
+  for (size_t i = 0; i < Size; i++)
+    for (size_t j = 0; j < Size; j++)
+      value [i][j] = (float)atof (components [i * Size + j]);
+}
+
 void read (Parser::Iterator iter, const char* str, float& value)
 {
   value = (float)atof (str);
@@ -65,6 +78,10 @@ class XmlAnimationLibraryLoader
 
       read (key_iter, inner_value_string, key.inner_value);
       read (key_iter, outer_value_string, key.outer_value);
+    }
+
+    template <class T> void ParseSpecificKeyInfo (Parser::Iterator key_iter, math::spline_step_key<T>& key)
+    {
     }
 
     template <class T> void ParseSplineKey (Parser::Iterator key_iter, T& spline)
@@ -118,6 +135,16 @@ class XmlAnimationLibraryLoader
         ParseSpline<math::bezier_spline3f> (channel_iter, channel);
       else if (!xtl::xstrcmp (track_type, "basic_spline<spline_bezier_key<vec4f>>"))
         ParseSpline<math::bezier_spline4f> (channel_iter, channel);
+      else if (!xtl::xstrcmp (track_type, "basic_spline<spline_step_key<float>>"))
+        ParseSpline<math::step_splinef> (channel_iter, channel);
+      else if (!xtl::xstrcmp (track_type, "basic_spline<spline_step_key<vec2f>>"))
+        ParseSpline<math::step_spline2f> (channel_iter, channel);
+      else if (!xtl::xstrcmp (track_type, "basic_spline<spline_step_key<vec3f>>"))
+        ParseSpline<math::step_spline3f> (channel_iter, channel);
+      else if (!xtl::xstrcmp (track_type, "basic_spline<spline_step_key<vec4f>>"))
+        ParseSpline<math::step_spline4f> (channel_iter, channel);
+      else if (!xtl::xstrcmp (track_type, "basic_spline<spline_step_key<mat4f>>"))
+        ParseSpline<math::step_spline_mat4f> (channel_iter, channel);
       else
         throw xtl::format_operation_exception ("media::animation::XmlAnimationLibraryLoader::ParseAnimationChannel",
                                                "Unsupported channel track type '%s'", track_type);
