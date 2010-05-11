@@ -7,40 +7,48 @@ using namespace media::animation;
    Реализация анимации
 */
 
-typedef stl::vector<Channel>   ChannelsArray;
-typedef stl::vector<Animation> AnimationsArray;
+namespace
+{
+
+typedef stl::vector<Channel> ChannelsArray;
+
+struct ChannelGroup : public xtl::reference_counter
+{
+  stl::string   target_name; //имя анимируемого объекта
+  ChannelsArray channels;    //каналы
+
+  ChannelGroup (const char* in_target_name)
+    : target_name (in_target_name)
+    {}
+};
+
+typedef xtl::intrusive_ptr<ChannelGroup> ChannelGroupPtr;
+typedef stl::vector<ChannelGroupPtr>     ChannelGroupsArray;
+
+}
 
 struct Animation::Impl : public xtl::reference_counter
 {
-  stl::string     name;             //имя анимации
-  stl::string     target_name;      //имя анимируемого объекта
-  EventTrack      event_track;      //трек событий
-  ChannelsArray   channels;         //каналы анимации
-  AnimationsArray sub_animations; //дочерние анимации
+  stl::string        name;            //имя анимации
+  EventTrack         event_track;     //трек событий
+  ChannelGroupsArray channel_groups;  //каналы анимации
 
   Impl () {}
 
   Impl (const Impl& source)
-    : name (source.name), target_name (source.target_name), event_track (source.event_track.Clone ())
+    : name (source.name), event_track (source.event_track.Clone ())
   {
-    channels.reserve (source.channels.size ());
+    channel_groups.reserve (source.channel_groups.size ());
 
-    for (ChannelsArray::const_iterator iter = source.channels.begin (), end = source.channels.end (); iter != end; ++iter)
-      channels.push_back (iter->Clone ());
+    for (ChannelGroupsArray::const_iterator group_iter = source.channel_groups.begin (), group_end = source.channel_groups.end (); group_iter != group_end; ++group_iter)
+    {
+      ChannelGroupPtr new_group (new ChannelGroup ((*group_iter)->target_name.c_str ()), false);
 
-    sub_animations.reserve (source.sub_animations.size ());
+      for (ChannelsArray::const_iterator iter = (*group_iter)->channels.begin (), end = (*group_iter)->channels.end (); iter != end; ++iter)
+        new_group->channels.push_back (iter->Clone ());
 
-    for (AnimationsArray::const_iterator iter = source.sub_animations.begin (), end = source.sub_animations.end (); iter != end; ++iter)
-      sub_animations.push_back (iter->Clone ());
-  }
-
-  void CheckAnimationBindToItself (const Animation& sub_animation, const Animation& parent_animation)
-  {
-    if (parent_animation.impl == sub_animation.impl)
-      throw xtl::make_argument_exception ("media::animation::Animation::AddSubAnimation", "animation", "Attempt to add animation to one of it's sub animations");
-
-    for (AnimationsArray::iterator iter = sub_animation.impl->sub_animations.begin (), end = sub_animation.impl->sub_animations.end (); iter != end; ++iter)
-      iter->impl->CheckAnimationBindToItself (*iter, parent_animation);
+      channel_groups.push_back (new_group);
+    }
   }
 };
 
@@ -112,70 +120,131 @@ void Animation::Rename (const char* name)
 }
     
 /*
-   Имя анимируемого объекта
+   Перебор анимируемых объектов
 */
 
-void Animation::SetTargetName (const char* name)
+size_t Animation::TargetsCount () const
 {
-  if (!name)
-    throw xtl::make_null_argument_exception ("media::animation::Animation::SetTargetName", "name");
-
-  impl->target_name = name;
+  return impl->channel_groups.size ();
 }
 
-const char* Animation::TargetName () const
+const char* Animation::TargetName (size_t target_index) const
 {
-  return impl->target_name.c_str ();
+  if (target_index >= impl->channel_groups.size ())
+    throw xtl::make_range_exception ("media::animation::Animation::TargetName", "target_index", target_index, 0u, impl->channel_groups.size ());
+
+  return impl->channel_groups [target_index]->target_name.c_str ();
 }
-    
+
+int Animation::FindTarget (const char* target_name) const
+{
+  if (!target_name)
+    throw xtl::make_null_argument_exception ("media::animation::Animation::FindTarget", "target_name");
+
+  for (size_t i = 0, count = impl->channel_groups.size (); i < count; i++)
+    if (impl->channel_groups [i]->target_name == target_name)
+      return i;
+
+  return -1;
+}
+
 /*
    Количество каналов
 */
 
-size_t Animation::ChannelsCount () const
+size_t Animation::ChannelsCount (size_t target_index) const
 {
-  return impl->channels.size ();
+  if (target_index >= impl->channel_groups.size ())
+    throw xtl::make_range_exception ("media::animation::Animation::ChannelsCount", "target_index", target_index, 0u, impl->channel_groups.size ());
+
+  return impl->channel_groups [target_index]->channels.size ();
 }
 
 /*
    Перебор каналов
 */
 
-const animation::Channel& Animation::Channel (size_t index) const
+const animation::Channel& Animation::Channel (size_t target_index, size_t channel_index) const
 {
-  if (index >= impl->channels.size ())
-    throw xtl::make_range_exception ("media::animation::Animation::Channel", "index", index, 0u, impl->channels.size ());
+  static const char* METHOD_NAME = "media::animation::Animation::ChannelsCount";
 
-  return impl->channels [index];
+  if (target_index >= impl->channel_groups.size ())
+    throw xtl::make_range_exception (METHOD_NAME, "target_index", target_index, 0u, impl->channel_groups.size ());
+
+  ChannelGroupPtr group = impl->channel_groups [target_index];
+
+  if (channel_index >= group->channels.size ())
+    throw xtl::make_range_exception (METHOD_NAME, "channel_index", channel_index, 0u, group->channels.size ());
+
+  return group->channels [channel_index];
 }
 
-animation::Channel& Animation::Channel (size_t index)
+animation::Channel& Animation::Channel (size_t target_index, size_t channel_index)
 {
-  return const_cast<animation::Channel&> (const_cast<const Animation&> (*this).Channel (index));
+  return const_cast<animation::Channel&> (const_cast<const Animation&> (*this).Channel (target_index, channel_index));
 }
           
 /*
    Добавление/удаление каналов
 */
 
-size_t Animation::AddChannel (const animation::Channel& channel)
+void Animation::AddChannel (size_t target_index, const animation::Channel& channel)
 {
-  impl->channels.push_back (channel);
+  if (target_index >= impl->channel_groups.size ())
+    throw xtl::make_range_exception ("media::animation::Animation::AddChannel", "target_index", target_index, 0u, impl->channel_groups.size ());
 
-  return impl->channels.size () - 1;
+  impl->channel_groups [target_index]->channels.push_back (channel);
 }
 
-void Animation::RemoveChannel (size_t channel_index)
+void Animation::AddChannel (const char* target_name, const animation::Channel& channel)
 {
-  if (channel_index >= impl->channels.size ())
+  static const char* METHOD_NAME = "media::animation::Animation::AddChannel";
+
+  if (!target_name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "target_name");
+
+  int target_index = FindTarget (target_name);
+
+  ChannelGroupPtr group;
+
+  if (target_index < 0)
+  {
+    group = ChannelGroupPtr (new ChannelGroup (target_name), false);
+    impl->channel_groups.push_back (group);
+  }
+  else
+    group = impl->channel_groups [target_index];
+
+  group->channels.push_back (channel);
+}
+
+void Animation::RemoveChannel (size_t target_index, size_t channel_index)
+{
+  if (target_index >= impl->channel_groups.size ())
     return;
 
-  impl->channels.erase (impl->channels.begin () + channel_index);
+  ChannelGroupPtr group = impl->channel_groups [target_index];
+
+  if (channel_index >= group->channels.size ())
+    return;
+
+  group->channels.erase (group->channels.begin () + channel_index);
+
+  if (group->channels.empty ())
+    impl->channel_groups.erase (impl->channel_groups.begin () + target_index);
+}
+
+void Animation::RemoveAllChannels (size_t target_index)
+{
+  if (target_index >= impl->channel_groups.size ())
+    return;
+
+  impl->channel_groups.erase (impl->channel_groups.begin () + target_index);
 }
 
 void Animation::RemoveAllChannels ()
 {
-  impl->channels.clear ();
+  impl->channel_groups.clear ();
 }
 
 /*
@@ -190,58 +259,6 @@ const EventTrack Animation::Events () const
 EventTrack Animation::Events ()
 {
   return impl->event_track;
-}
-
-/*
-   Количество вложенных анимаций
-*/
-
-size_t Animation::SubAnimationsCount () const
-{
-  return impl->sub_animations.size ();
-}
-
-/*
-   Перебор анимаций
-*/
-
-const Animation& Animation::SubAnimation (size_t index) const
-{
-  if (index >= impl->sub_animations.size ())
-    throw xtl::make_range_exception ("media::animation::Animation::SubAnimation", "index", index, 0u, impl->channels.size ());
-
-  return impl->sub_animations [index];
-}
-
-Animation& Animation::SubAnimation (size_t index)
-{
-  return const_cast<animation::Animation&> (const_cast<const Animation&> (*this).SubAnimation (index));
-}
-
-/*
-   Добавление/удаление анимаций
-*/
-
-size_t Animation::AddSubAnimation (const Animation& animation)
-{
-  impl->CheckAnimationBindToItself (animation, *this);
-
-  impl->sub_animations.push_back (animation);
-
-  return impl->sub_animations.size () - 1;
-}
-
-void Animation::RemoveSubAnimation (size_t animation_index)
-{
-  if (animation_index >= impl->sub_animations.size ())
-    return;
-
-  impl->sub_animations.erase (impl->sub_animations.begin () + animation_index);
-}
-
-void Animation::RemoveAllSubAnimations ()
-{
-  impl->sub_animations.clear ();
 }
 
 /*

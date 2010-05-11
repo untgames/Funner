@@ -113,7 +113,8 @@ class XmlAnimationLibraryLoader
     void ParseAnimationChannel (Parser::Iterator channel_iter, Animation& parent)
     {
       const char *parameter_name = get<const char*> (*channel_iter, "parameter_name"),
-                 *track_type     = get<const char*> (*channel_iter, "track_type");
+                 *track_type     = get<const char*> (*channel_iter, "track_type"),
+                 *target_name    = get<const char*> (*channel_iter, "target_name");
 
       Channel channel;
 
@@ -149,17 +150,18 @@ class XmlAnimationLibraryLoader
         throw xtl::format_operation_exception ("media::animation::XmlAnimationLibraryLoader::ParseAnimationChannel",
                                                "Unsupported channel track type '%s'", track_type);
 
-      parent.AddChannel (channel);
+      parent.AddChannel (target_name, channel);
     }
 
     //разбор анимации
-    void ParseAnimationCore (Parser::Iterator animation_iter, Animation& animation)
+    void ParseAnimation (Parser::Iterator animation_iter, AnimationLibrary& library)
     {
-      const char *name        = get<const char*> (*animation_iter, "name"),
-                 *target_name = get<const char*> (*animation_iter, "target_name");
+      const char *id   = get<const char*> (*animation_iter, "id"),
+                 *name = get<const char*> (*animation_iter, "name");
 
-      animation.Rename        (name);
-      animation.SetTargetName (target_name);
+      Animation animation;
+
+      animation.Rename (name);
 
       for_each_child (*animation_iter, "event_track.event",
                       xtl::bind (&XmlAnimationLibraryLoader::ParseEvent, this, _1, xtl::ref (animation.Events ())));
@@ -167,35 +169,14 @@ class XmlAnimationLibraryLoader
       for_each_child (*animation_iter, "channels.channel",
                       xtl::bind (&XmlAnimationLibraryLoader::ParseAnimationChannel, this, _1, xtl::ref (animation)));
 
-      for_each_child (*animation_iter, "animations.animation",
-                      xtl::bind (&XmlAnimationLibraryLoader::ParseSubAnimation, this, _1, xtl::ref (animation)));
-    }
-
-    void ParseLibraryAnimation (Parser::Iterator animation_iter, AnimationLibrary& library)
-    {
-      const char *id = get<const char*> (*animation_iter, "id");
-
-      Animation animation;
-
-      ParseAnimationCore (animation_iter, animation);
-
       library.Attach (id, animation);
-    }
-
-    void ParseSubAnimation (Parser::Iterator animation_iter, Animation& parent)
-    {
-      Animation animation;
-
-      ParseAnimationCore (animation_iter, animation);
-
-      parent.AddSubAnimation (animation);
     }
 
   public:
     XmlAnimationLibraryLoader (const char* file_name, AnimationLibrary& library) : parser (file_name, "xml")
     {
       for_each_child (parser.Root ().First ("animation_library"), "animation",
-                      xtl::bind (&XmlAnimationLibraryLoader::ParseLibraryAnimation, this, _1, xtl::ref (library)));
+                      xtl::bind (&XmlAnimationLibraryLoader::ParseAnimation, this, _1, xtl::ref (library)));
 
         //протоколирование
 

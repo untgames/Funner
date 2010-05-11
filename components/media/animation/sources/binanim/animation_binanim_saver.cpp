@@ -8,13 +8,12 @@ using namespace media::animation;
  *
  * File format: int header; int version; data
  *
- * data format: array<library_animation>
+ * data format: array<animation>
  *
- * library_animation format: array<char> id; array<char> name; array<char> target_name; array<event> event_track; array<channel> channel; array<sub_animation> sub_animations
+ * animation format: array<char> id; array<char> name; array<event> event_track; array<channel> channel
  *
  * event format: array<char> event; float delay; float period
- * sub_animation format: array<char> name; array<char> target_name; array<event> event_track; array<channel> channel; array<sub_animation> sub_animations
- * channel format: array<char> parameter_name; array<char> track_type; array<channel_key> keys;
+ * channel format: array<char> parameter_name; array<char> target_name; array<char> track_type; array<channel_key> keys;
  */
 
 namespace
@@ -121,9 +120,10 @@ class BinAnimationLibrarySaver
       }
     }
 
-    void SaveAnimationChannel (const Channel& channel)
+    void SaveAnimationChannel (const Channel& channel, const char* target_name)
     {
       file_write (result_file, channel.ParameterName ());
+      file_write (result_file, target_name);
 
       const std::type_info& track_type = channel.TrackType ();
 
@@ -159,29 +159,27 @@ class BinAnimationLibrarySaver
     }
 
     //сохранение анимации
-    void SaveAnimation (const Animation& animation, const char* id = 0)
+    void SaveAnimation (const Animation& animation, const char* id)
     {
-      if (id)
-        file_write (result_file, id);
-
+      file_write (result_file, id);
       file_write (result_file, animation.Name ());
-      file_write (result_file, animation.TargetName ());
 
       SaveEventTrack (animation.Events ());
 
-      unsigned int channels_count = animation.ChannelsCount ();
+      unsigned int channels_count = 0;
+
+      for (size_t i = 0, targets_count = animation.TargetsCount (); i < targets_count; i++)
+        channels_count += animation.ChannelsCount (i);
 
       file_write (result_file, &channels_count, sizeof (channels_count));
 
-      for (size_t i = 0; i < channels_count; i++)
-        SaveAnimationChannel (animation.Channel (i));
+      for (size_t i = 0, targets_count = animation.TargetsCount (); i < targets_count; i++)
+      {
+        const char* target_name = animation.TargetName (i);
 
-      unsigned int sub_animations_count = animation.SubAnimationsCount ();
-
-      file_write (result_file, &sub_animations_count, sizeof (sub_animations_count));
-
-      for (size_t i = 0; i < sub_animations_count; i++)
-        SaveAnimation (animation.SubAnimation (i));
+        for (size_t j = 0, channels_count = animation.ChannelsCount (i); j < channels_count; j++)
+          SaveAnimationChannel (animation.Channel (i, j), target_name);
+      }
     }
 
     void SaveHeader ()

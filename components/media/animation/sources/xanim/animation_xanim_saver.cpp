@@ -73,10 +73,11 @@ class XmlAnimationLibrarySaver
       }
     }
 
-    void SaveAnimationChannel (const Channel& channel)
+    void SaveAnimationChannel (const Channel& channel, const char* target_name)
     {
       XmlWriter::Scope scope (writer, "channel");
 
+      writer.WriteAttribute ("target_name", target_name);
       writer.WriteAttribute ("parameter_name", channel.ParameterName ());
 
       const std::type_info& track_type = channel.TrackType ();
@@ -165,32 +166,26 @@ class XmlAnimationLibrarySaver
     }
 
     //сохранение анимации
-    void SaveAnimation (const Animation& animation, const char* id = 0)
+    void SaveAnimation (const Animation& animation, const char* id)
     {
       XmlWriter::Scope scope (writer, "animation");
 
-      if (id)
-        writer.WriteAttribute ("id", id);
-
+      writer.WriteAttribute ("id", id);
       writer.WriteAttribute ("name", animation.Name ());
-      writer.WriteAttribute ("target_name", animation.TargetName ());
 
       SaveEventTrack (animation.Events ());
 
-      if (animation.ChannelsCount ())
+      if (animation.TargetsCount ())
       {
         XmlWriter::Scope scope (writer, "channels");
 
-        for (size_t i = 0, count = animation.ChannelsCount (); i < count; i++)
-          SaveAnimationChannel (animation.Channel (i));
-      }
+        for (size_t i = 0, targets_count = animation.TargetsCount (); i < targets_count; i++)
+        {
+          const char* target_name = animation.TargetName (i);
 
-      if (animation.SubAnimationsCount ())
-      {
-        XmlWriter::Scope scope (writer, "animations");
-
-        for (size_t i = 0, count = animation.SubAnimationsCount (); i < count; i++)
-          SaveAnimation (animation.SubAnimation (i));
+          for (size_t j = 0, channels_count = animation.ChannelsCount (i); j < channels_count; j++)
+            SaveAnimationChannel (animation.Channel (i, j), target_name);
+        }
       }
     }
     

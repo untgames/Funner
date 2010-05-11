@@ -8,13 +8,12 @@ using namespace media::animation;
  *
  * File format: int header; int version; data
  *
- * data format: array<library_animation>
+ * data format: array<animation>
  *
- * library_animation format: array<char> id; array<char> name; array<char> target_name; array<event> event_track; array<channel> channel; array<sub_animation> sub_animations
+ * animation format: array<char> id; array<char> name; array<event> event_track; array<channel> channel
  *
  * event format: array<char> event; float delay; float period
- * sub_animation format: array<char> name; array<char> target_name; array<event> event_track; array<channel> channel; array<sub_animation> sub_animations
- * channel format: array<char> parameter_name; array<char> track_type; array<channel_key> keys;
+ * channel format: array<char> parameter_name; array<char> target_name; array<char> track_type; array<channel_key> keys;
  */
 
 namespace
@@ -122,9 +121,10 @@ class BinAnimationLibraryLoader
 
     void ReadAnimationChannel (Animation& parent)
     {
-      xtl::uninitialized_storage<char> parameter_name, track_type;
+      xtl::uninitialized_storage<char> parameter_name, target_name, track_type;
 
       file_read (input_file, parameter_name);
+      file_read (input_file, target_name);
       file_read (input_file, track_type);
 
       Channel channel;
@@ -161,7 +161,7 @@ class BinAnimationLibraryLoader
         throw xtl::format_operation_exception ("media::animation::BinAnimationLibraryLoader::ReadAnimationChannel",
                                                "Unsupported channel track type '%s'", track_type);
 
-      parent.AddChannel (channel);
+      parent.AddChannel (target_name.data (), channel);
     }
 
     void ReadChannels (Animation& animation)
@@ -175,51 +175,21 @@ class BinAnimationLibraryLoader
     }
 
     //чтение анимации
-    void ReadSubAnimations (Animation& animation)
+    void ReadAnimation (AnimationLibrary& library)
     {
-      unsigned int sub_animations_count;
+      xtl::uninitialized_storage<char> id, name;
 
-      file_read (input_file, &sub_animations_count, sizeof (sub_animations_count));
-
-      for (size_t i = 0; i < sub_animations_count; i++)
-        ReadSubAnimation (animation);
-    }
-
-    void ReadAnimationCore (Animation& animation)
-    {
-      xtl::uninitialized_storage<char> name, target_name;
-
+      file_read (input_file, id);
       file_read (input_file, name);
-      file_read (input_file, target_name);
+
+      Animation animation;
 
       animation.Rename        (name.data ());
-      animation.SetTargetName (target_name.data ());
 
       ReadEvents (animation.Events ());
       ReadChannels (animation);
-      ReadSubAnimations (animation);
-    }
-
-    void ReadLibraryAnimation (AnimationLibrary& library)
-    {
-      xtl::uninitialized_storage<char> id;
-
-      file_read (input_file, id);
-
-      Animation animation;
-
-      ReadAnimationCore (animation);
 
       library.Attach (id.data (), animation);
-    }
-
-    void ReadSubAnimation (Animation& parent)
-    {
-      Animation animation;
-
-      ReadAnimationCore (animation);
-
-      parent.AddSubAnimation (animation);
     }
 
   public:
@@ -254,7 +224,7 @@ class BinAnimationLibraryLoader
       file_read (input_file, &animations_count, sizeof (animations_count));
 
       for (size_t i = 0; i < animations_count; i++)
-        ReadLibraryAnimation (library);
+        ReadAnimation (library);
     }
     
   private:
