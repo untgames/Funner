@@ -1,5 +1,4 @@
 Results of xmtl_loader_test:
-data/test.xmtl(1): warning: not yet implement. Encoding='utf-8'
 data/test.xmtl(24): error: node 'material': Unknown profile at load material 'test_material2'
 data/test.xmtl(44): error: node 'pass': Material 'test_material2' not found
 data/test.xmtl(45): error: node 'pass': Material 'test_material2' not found
