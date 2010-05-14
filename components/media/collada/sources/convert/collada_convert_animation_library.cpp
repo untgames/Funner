@@ -81,6 +81,16 @@ class Converter
       for (AnimationList::ConstIterator i = model.Animations ().CreateIterator (); i; ++i)
         AddAnimationToLibrary (*i, library);
     }
+
+    Converter (const media::collada::Model& model, media::animation::AnimationLibrary& library, const char* merge_animation)
+    {
+      media::animation::Animation root_animation;
+
+      for (AnimationList::ConstIterator i = model.Animations ().CreateIterator (); i; ++i)
+        ConvertAnimation (*i, root_animation, true);
+
+      library.Attach (merge_animation, root_animation);
+    }
 };
 
 }
@@ -95,6 +105,14 @@ namespace collada
 void convert (const media::collada::Model& src_model, animation::AnimationLibrary& dst_library)
 {
   Converter (src_model, dst_library);
+}
+
+void convert (const collada::Model& source, animation::AnimationLibrary& destination, const char* merge_animation)
+{
+  if (!merge_animation)
+    throw xtl::make_null_argument_exception ("media::collada::convert (const collada::Model&, AnimationLibrary&, const char*)", "merge_animation");
+
+  Converter (source, destination, merge_animation);
 }
 
 }

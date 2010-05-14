@@ -32,6 +32,7 @@ void convert (const collada::Model& source, geometry::MeshLibrary& destination);
 ///Преобразование коллада-модели в библиотеку анимаций
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void convert (const collada::Model& source, animation::AnimationLibrary& destination);
+void convert (const collada::Model& source, animation::AnimationLibrary& destination, const char* merge_animation);
 
 }
 

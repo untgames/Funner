@@ -86,6 +86,7 @@ struct Params
   stl::string   output_remove_file_prefix;   //отбрасываемый префикс имён файлов
   stl::string   output_resources_namespace;  //пространство имён, применяемое при сохранении ресурсов
   stl::string   exclude_nodes;               //неэкспортируемые узлы сцены
+  stl::string   merge_animation;             //имя анимации в которую должны быть вклеены все остальные анимации
   size_t        max_texture_size;            //максимальный размер текстуры
   bool          pot;                         //нужно ли масштабировать текстуры до ближайшей степени двойки
   bool          silent;                      //минимальное число сообщений
@@ -212,6 +213,12 @@ void command_line_exclude_nodes (const char* string, Params& params)
   params.exclude_nodes = string;
 }
 
+//установка имени анимации для склеивания
+void command_line_merge_animation (const char* string, Params& params)
+{
+  params.merge_animation = string;
+}
+
 //установка необходимости масштабировать текстуры до ближайшей степени двойки
 void command_line_pot (const char*, Params& params)
 {
@@ -258,6 +265,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_set_remove_file_prefix,      "remove-file-prefix",      0, "string",    "remove file prefix from all file links"},
     {command_line_set_resources_namespace,     "resources-namespace",     0, "string",    "set resources namespace"},
     {command_line_exclude_nodes,               "exclude-nodes",           0, "wildcards", "exclude selected nodes from export"},
+    {command_line_merge_animation,             "merge-animation",         0, "string",    "merge all animations in one with given name"},
     {command_line_remove_unused_resources,     "remove-unused",           0, 0,           "remove unused resources from export"},
     {command_line_silent,                      "silent",                's', 0,           "quiet mode"},
     {command_line_help,                        "help",                  '?', 0,           "print help message"},
@@ -502,7 +510,10 @@ void save_animations (const Params& params, const Model& model)
 {
   media::animation::AnimationLibrary animation_library;
 
-  convert (model, animation_library);
+  if (params.merge_animation.empty ())
+    convert (model, animation_library);
+  else
+    convert (model, animation_library, params.merge_animation.c_str ());
 
   animation_library.Save (params.output_animations_file_name.c_str ());
 }
