@@ -877,7 +877,7 @@ void export_data (Params& params)
     if (!params.silent)
       printf ("Remove unused resources...");
       
-    remove_unused_resources (model);
+    remove_unused_resources (model, ModelSelect_ActiveScene | ModelSelect_Animations);
     
     if (!params.silent)
       printf ("Ok\n");
