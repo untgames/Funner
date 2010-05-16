@@ -33,6 +33,7 @@ ScaledTexture::ScaledTexture
     else
       scaled_width = get_next_higher_power_of_two (original_desc.width);
   }
+
   if (!scaled_height)
   {
     if (original_desc.height > caps.max_texture_size)
