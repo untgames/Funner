@@ -25,16 +25,6 @@ Texture& Texture::operator = (const Texture& texture)
   return *this;
 }
 
-const char* Texture::Id () const
-{
-  return impl->Id ();
-}
-
-void Texture::SetId (const char* name)
-{
-  impl->SetId (name);
-}
-
 TextureDimension Texture::Dimension () const
 {
   return impl->Dimension ();
@@ -68,6 +58,16 @@ RenderTarget Texture::RenderTarget (size_t layer, size_t mip_level) const
 void Texture::Update (const media::Image& image)
 {
   impl->Update (image);
+}
+
+void Texture::Capture (size_t layer, size_t mip_level, media::Image& image)
+{
+  impl->Capture (layer, mip_level, image);
+}
+
+void Texture::Capture (size_t mip_level, media::Image& image)
+{
+  impl->Capture (mip_level, image);
 }
 
 void Texture::Swap (Texture& texture)

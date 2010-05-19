@@ -1,6 +1,8 @@
 #ifndef RENDER_MID_LEVEL_PRIMITIVE_HEADER
 #define RENDER_MID_LEVEL_PRIMITIVE_HEADER
 
+//добавить генерацию стандартных примитивов!!!
+
 #include <render/mid_level/material.h>
 
 namespace media

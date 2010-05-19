@@ -80,21 +80,21 @@ Frame RenderManager::CreateFrame ()
   return Wrappers::Wrap<Frame> (impl->CreateFrame ());
 }
 
-Texture RenderManager::CreateTexture (const media::Image& image)
+Texture RenderManager::CreateTexture (const media::Image& image, bool generate_mips_enable)
 {
-  return Wrappers::Wrap<Texture> (impl->CreateTexture (image));
+  return Wrappers::Wrap<Texture> (impl->CreateTexture (image, generate_mips_enable));
 }
 
-Texture RenderManager::CreateTexture (const media::Image& image, TextureDimension dimension)
+Texture RenderManager::CreateTexture (const media::Image& image, TextureDimension dimension, bool generate_mips_enable)
 {
-  return Wrappers::Wrap<Texture> (impl->CreateTexture (image, dimension));
+  return Wrappers::Wrap<Texture> (impl->CreateTexture (image, dimension, generate_mips_enable));
 }
 
-Texture RenderManager::CreateTexture2D (size_t width, size_t height, PixelFormat format)
+Texture RenderManager::CreateTexture2D (size_t width, size_t height, PixelFormat format, bool generate_mips_enable)
 {
   try
   {
-    return Wrappers::Wrap<Texture> (impl->CreateTexture (TextureDimension_2D, width, height, 1, format));
+    return Wrappers::Wrap<Texture> (impl->CreateTexture (TextureDimension_2D, width, height, 1, format, generate_mips_enable));
   }
   catch (xtl::exception& e)
   {
@@ -103,11 +103,11 @@ Texture RenderManager::CreateTexture2D (size_t width, size_t height, PixelFormat
   }
 }
 
-Texture RenderManager::CreateTexture3D (size_t width, size_t height, size_t depth, PixelFormat format)
+Texture RenderManager::CreateTexture3D (size_t width, size_t height, size_t depth, PixelFormat format, bool generate_mips_enable)
 {
   try
   {
-    return Wrappers::Wrap<Texture> (impl->CreateTexture (TextureDimension_3D, width, height, depth, format));
+    return Wrappers::Wrap<Texture> (impl->CreateTexture (TextureDimension_3D, width, height, depth, format, generate_mips_enable));
   }
   catch (xtl::exception& e)
   {
@@ -116,11 +116,11 @@ Texture RenderManager::CreateTexture3D (size_t width, size_t height, size_t dept
   }
 }
 
-Texture RenderManager::CreateTextureCubemap (size_t size, PixelFormat format)
+Texture RenderManager::CreateTextureCubemap (size_t size, PixelFormat format, bool generate_mips_enable)
 {
   try
   {
-    return Wrappers::Wrap<Texture> (impl->CreateTexture (TextureDimension_Cubemap, size, size, size, format));
+    return Wrappers::Wrap<Texture> (impl->CreateTexture (TextureDimension_Cubemap, size, size, 6, format, generate_mips_enable));
   }
   catch (xtl::exception& e)
   {

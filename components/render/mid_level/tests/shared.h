@@ -10,6 +10,8 @@
 
 #include <render/mid_level/manager.h>
 
+#include <media/image.h>
+
 #include <syslib/application.h>
 #include <syslib/window.h>
 
@@ -33,6 +35,12 @@ class Test: private xtl::trackable
       window.Show ();
       
       connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Test::OnWindowClose, this)));
+    }
+    
+///Получение менеджера рендеринга
+    render::mid_level::RenderManager RenderManager ()
+    {
+      return render_manager;
     }
     
 ///Главный цикл
@@ -94,9 +102,9 @@ class Test: private xtl::trackable
 ///Обработка
   
   private:
-    syslib::Window window;
-    RenderManager  render_manager;
-    Window         render_window;
+    syslib::Window                    window;
+    render::mid_level::RenderManager  render_manager;
+    Window                            render_window;
 };
 
 #endif

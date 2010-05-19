@@ -19,6 +19,7 @@ typedef stl::vector<WindowImpl*>                    WindowArray;
 struct RenderManagerImpl::Impl: public xtl::trackable
 {
   RenderManagerImpl* owner;                                         //владелец
+  Log                log;                                           //протокол сообщений
   DeviceManagerPtr   device_manager;                                //менеджер устройства отрисовки
   WindowSignal       window_signals [RenderManagerWindowEvent_Num]; //оконные сигналы
   WindowArray        windows;                                       //окна
@@ -244,19 +245,97 @@ FramePtr RenderManagerImpl::CreateFrame ()
   throw xtl::make_not_implemented_exception ("render::mid_level::RenderManagerImpl::CreateFrame");
 }
 
-TexturePtr RenderManagerImpl::CreateTexture (const media::Image& image)
+TexturePtr RenderManagerImpl::CreateTexture (const media::Image& image, bool generate_mips_enable)
 {
-  throw xtl::make_not_implemented_exception ("render::mid_level::RenderManagerImpl::CreateTexture(const media::Image&)");
+  try
+  {
+    TextureDimension dimension;
+    
+    switch (image.Depth ())
+    {
+      case 1:
+        dimension = TextureDimension_2D;
+        break;
+      case 6:
+        dimension = TextureDimension_Cubemap;
+        break;
+      default:
+        dimension = TextureDimension_3D;
+        break;
+    }
+
+    return CreateTexture (image, dimension, generate_mips_enable);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::mid_level::RenderManagerImpl::CreateTexture(const media::Image&,bool)");
+    throw;
+  }
 }
 
-TexturePtr RenderManagerImpl::CreateTexture (const media::Image& image, render::mid_level::TextureDimension dimension)
+TexturePtr RenderManagerImpl::CreateTexture (const media::Image& image, render::mid_level::TextureDimension dimension, bool generate_mips_enable)
 {
-  throw xtl::make_not_implemented_exception ("render::mid_level::RenderManagerImpl::CreateTexture(const media::Image&,TextureDimension)");
+  try
+  {
+    PixelFormat format;
+    
+    switch (image.Format ())
+    {
+      case media::PixelFormat_BGR8:
+      case media::PixelFormat_RGB16:
+        impl->log.Printf ("Convert image '%s' from '%s' to '%s'", image.Name (), media::get_format_name (image.Format ()), get_name (PixelFormat_RGB8));
+      case media::PixelFormat_RGB8:
+        format = PixelFormat_RGB8;
+        break;
+      case media::PixelFormat_BGRA8:
+      case media::PixelFormat_RGBA16:
+        impl->log.Printf ("Convert image '%s' from '%s' to '%s'", image.Name (), media::get_format_name (image.Format ()), get_name (PixelFormat_RGBA8));
+      case media::PixelFormat_RGBA8:
+        format = PixelFormat_RGBA8;
+        break;
+      case media::PixelFormat_L8:
+        format = PixelFormat_L8;
+        break;
+      case media::PixelFormat_A8:
+        format = PixelFormat_A8;
+        break;
+      case media::PixelFormat_LA8:
+        format = PixelFormat_LA8;
+        break;
+      default:
+        throw xtl::format_not_supported_exception ("", "Unsupported image '%s' format '%s'", image.Name (), media::get_format_name (image.Format ()));
+    }
+
+    TexturePtr texture = CreateTexture (dimension, image.Width (), image.Height (), image.Depth (), format, generate_mips_enable);
+
+    texture->Update (image);
+
+    return texture;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::mid_level::RenderManagerImpl::CreateTexture(const media::Image&,TextureDimension,bool)");
+    throw;
+  }
 }
 
-TexturePtr RenderManagerImpl::CreateTexture (render::mid_level::TextureDimension, size_t width, size_t height, size_t depth, render::mid_level::PixelFormat format)
+TexturePtr RenderManagerImpl::CreateTexture
+ (render::mid_level::TextureDimension dimension,
+  size_t                              width,
+  size_t                              height,
+  size_t                              depth,
+  render::mid_level::PixelFormat      format,
+  bool                                generate_mips_enable)
 {
-  throw xtl::make_not_implemented_exception ("render::mid_level::RenderManagerImpl::CreateTexture(TextureDimension,size_t,size_t,size_t,PixelFormat)");
+  try
+  {
+    return TexturePtr (new TextureImpl (&impl->DeviceManager (), dimension, width, height, depth, format, generate_mips_enable), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::mid_level::RenderManagerImpl::CreateTexture(TextureDimension,size_t,size_t,size_t,PixelFormat,bool)");
+    throw;
+  }
 }
 
 MaterialPtr RenderManagerImpl::CreateMaterial ()

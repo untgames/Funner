@@ -95,16 +95,17 @@ class RenderManager
     Primitive CreatePrimitive      ();
     Primitive CreatePrimitive      (const char* name, ResourceInstanceMode mode = ResourceInstanceMode_Default);
     Frame     CreateFrame          ();
-    Texture   CreateTexture        (const media::Image& image);
-    Texture   CreateTexture        (const media::Image& image, TextureDimension dimension);
-    Texture   CreateTexture2D      (size_t width, size_t height, PixelFormat format);
-    Texture   CreateTexture3D      (size_t width, size_t height, size_t depth, PixelFormat format);
-    Texture   CreateTextureCubemap (size_t size, PixelFormat format);
+    Texture   CreateTexture        (const media::Image& image, bool generate_mipmaps = true);
+    Texture   CreateTexture        (const media::Image& image, TextureDimension dimension, bool generate_mipmaps = true);
+    Texture   CreateTexture2D      (size_t width, size_t height, PixelFormat format, bool generate_mipmaps = true);
+    Texture   CreateTexture3D      (size_t width, size_t height, size_t depth, PixelFormat format, bool generate_mipmaps = true);
+    Texture   CreateTextureCubemap (size_t size, PixelFormat format, bool generate_mipmaps = true);
     Material  CreateMaterial       ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///продумать имя результата???
     ResourceLibrary Load (const char* resource_name);
     ResourceLibrary Load (const media::rfx::MaterialLibrary&);
     ResourceLibrary Load (const media::rfx::EffectLibrary&);
