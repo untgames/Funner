@@ -117,9 +117,30 @@ class Converter
     }
 
       //преобразование текстурных вершин
-    media::geometry::VertexStream CreateTexVertices (const media::collada::Surface& src_surface, size_t channel_index)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<0>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
     {
-      typedef media::geometry::Vertex<media::geometry::TexChannel<0>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf> ColladaTexVertex;
+      dst_vertex.texcoord0 = src_vertex.coord;
+    }
+
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<1>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord1 = src_vertex.coord;
+    }
+
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<2>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord2 = src_vertex.coord;
+    }
+
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<3>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord3 = src_vertex.coord;
+    }
+
+    template<size_t channel_index>
+    media::geometry::VertexStream CreateTexVertices (const media::collada::Surface& src_surface)
+    {
+      typedef media::geometry::Vertex<media::geometry::TexChannel<channel_index>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf> ColladaTexVertex;
 
       size_t vertices_count = src_surface.VerticesCount ();
 
@@ -137,7 +158,8 @@ class Converter
 
       for (size_t j=0; j<vertices_count; j++, src_vertex++, dst_vertex++)
       {
-        dst_vertex->texcoord0 = src_vertex->coord;
+        SetVertexTexCoord (*src_vertex, *dst_vertex);
+
         dst_vertex->tangent   = src_vertex->tangent;
         dst_vertex->binormal  = src_vertex->binormal;
       }
@@ -192,9 +214,31 @@ class Converter
         int color_channel_index = color_channels.Find (tex_channels.Name (i));
         
           //преобразование вершинного потока
-        
-        media::geometry::VertexStream vs = color_channel_index != -1 ? CreateTexColoredVertices (src_surface, i, color_channel_index) :
-                                           CreateTexVertices (src_surface, i);
+
+        media::geometry::VertexStream vs (0, media::geometry::VertexDeclaration (media::geometry::VertexFormat ()));
+
+        if (color_channel_index != -1)
+          vs = CreateTexColoredVertices (src_surface, i, color_channel_index);
+        else
+        {
+          switch (i)
+          {
+            case 0:
+              vs = CreateTexVertices<0> (src_surface);
+              break;
+            case 1:
+              vs = CreateTexVertices<1> (src_surface);
+              break;
+            case 2:
+              vs = CreateTexVertices<2> (src_surface);
+              break;
+            case 3:
+              vs = CreateTexVertices<3> (src_surface);
+              break;
+            default:
+              throw xtl::format_operation_exception ("media::collada::Converter::ConvertSurfaceTexVertexChannels", "Unsupported texture channel");
+          }
+        }
 
           //регистрация вершинного потока в поверхности
 
