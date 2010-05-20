@@ -534,8 +534,13 @@ void save_node (const Params& params, const Node& node, XmlWriter& writer)
   XmlWriter::Scope scope (writer, "node");
 
   writer.WriteAttribute ("id", node.Id ());
-  writer.WriteAttribute ("sub_id", node.SubId ());
-  writer.WriteAttribute ("name", node.Name ());
+
+  if (xtl::xstrlen (node.SubId ()))
+    writer.WriteAttribute ("sub_id", node.SubId ());
+
+  if (xtl::xstrlen (node.Name ()))
+    writer.WriteAttribute ("name", node.Name ());
+
   writer.WriteAttribute ("transform", node.Transform ());
   
     //метод экспорта связан с правилами именования инстанцированных мешей в конвертере
