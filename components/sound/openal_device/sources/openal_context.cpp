@@ -98,8 +98,11 @@ OpenALContext::OpenALContext (const char* device_name, const char* init_string)
 
     if (!context)
     {
+      const char* alc_error_message = get_alc_error_message (alcGetError (device));
+
       alcCloseDevice (device);
-      throw xtl::format_exception<OpenALException> ("", "Can't create context. %s", get_alc_error_message (alcGetError (device)));
+
+      throw xtl::format_exception<OpenALException> ("", "Can't create context. %s", alc_error_message);
     }
   }
   catch (xtl::exception& exception)
