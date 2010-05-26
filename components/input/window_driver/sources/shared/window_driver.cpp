@@ -62,8 +62,8 @@ class Driver: virtual public IDriver, public xtl::reference_counter
     IDevice* CreateDevice (const char* name, const char*)
     {
       for (DeviceEntries::iterator iter = device_entries.begin (), end = device_entries.end (); iter != end; ++iter)
-        if (!xtl::xstrcmp ((*iter)->device_name.c_str (), name))
-          return new Device ((*iter)->window, name, (*iter)->device_full_name.c_str ());
+        if (!xtl::xstrcmp ((*iter)->device_full_name.c_str (), name))
+          return new Device ((*iter)->window, (*iter)->device_name.c_str (), (*iter)->device_full_name.c_str ());
 
       throw xtl::make_argument_exception ("input::low_level::window::Driver::CreateDevice", "name", name);
     }
