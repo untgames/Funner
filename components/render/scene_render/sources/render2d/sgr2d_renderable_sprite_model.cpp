@@ -302,6 +302,8 @@ void RenderableSpriteModel::Update ()
         impl->tile_rows    = 0;
       }
       
+      impl->need_update_sprites = true;
+      
         //установка параметров примитива
 
       impl->primitive->SetBlendMode  (blend_mode);
