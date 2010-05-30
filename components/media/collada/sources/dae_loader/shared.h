@@ -132,7 +132,7 @@ class DaeParser
     void ParseCamera              (Parser::Iterator);
     void ParseVisualScene         (Parser::Iterator);
     void ParseNode                (Parser::Iterator, Node& parent);
-    void ParseTransform           (Parser::Iterator, const char* node_id, math::mat4f& tm);
+    void ParseTransform           (Parser::Iterator, const char* node_id, Node& node);
     void ParseInstanceLight       (Parser::Iterator, Node::LightList& lights);
     void ParseInstanceCamera      (Parser::Iterator, Node::CameraList& cameras);
     void ParseInstanceGeometry    (Parser::Iterator, Node::MeshList& meshes);
