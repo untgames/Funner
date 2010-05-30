@@ -123,7 +123,7 @@ void DaeParser::ParseTransform (Parser::Iterator iter, const char* node_id, mat4
       
       read (*i, "#text", sub_tm);
         
-      tm = sub_tm * tm;
+      tm = tm * sub_tm;
 
       //занесение ссылки на матрицу в карту семантик анимаций
       const char* sid = get<const char*> (*i, "sid", "");
@@ -139,19 +139,19 @@ void DaeParser::ParseTransform (Parser::Iterator iter, const char* node_id, mat4
     {
       vec3f offset = get<vec3f> (*i, "#text");
 
-      tm = translate (offset) * tm;
+      tm = tm * translate (offset);
     }
     else if (!strcmp (name, "rotate"))
     {
       vec4f r = get<vec4f> (*i, "#text");
 
-      tm = rotate (degree (r.w), vec3f (r.x, r.y, r.z)) * tm;
+      tm = tm * rotate (degree (r.w), vec3f (r.x, r.y, r.z));
     }
     else if (!strcmp (name, "scale"))
     {
       vec3f s = get<vec3f> (*i, "#text");
 
-      tm = scale (s) * tm;
+      tm = tm * scale (s);
     }
     else if (!strcmp (name, "lookat"))
     {
