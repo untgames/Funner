@@ -58,7 +58,7 @@ const size_t STARTUP_MAIN_LOOP_DELAY = 10; //задержка перед запуском главной нит
     Приложение
 */
 
-class Application: public IFunnerApi
+class Application: public IEngine
 {
   public:
 ///Конструктор
@@ -218,7 +218,7 @@ extern "C" int MAKE_TARGET_LINK_INCLUDES_COMMA;
 
 static int touch [] = {MAKE_TARGET_LINK_INCLUDES_COMMA};
 
-FUNNER_C_API IFunnerApi* FunnerInit ()
+FUNNER_C_API IEngine* FunnerInit ()
 {
   try
   {    

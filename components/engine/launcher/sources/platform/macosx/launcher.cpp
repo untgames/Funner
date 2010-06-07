@@ -8,6 +8,8 @@
 
 #include <engine/launcher.h>
 
+using namespace funner;
+
 namespace
 {
 
@@ -87,7 +89,7 @@ int main (int argc, const char* argv [])
     return 1;
   }
 
-  IFunnerApi* funner = FunnerInit ();
+  IEngine* funner = FunnerInit ();
 
   if (!funner)
   {
