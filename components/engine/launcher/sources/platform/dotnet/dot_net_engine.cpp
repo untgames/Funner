@@ -48,36 +48,33 @@ public ref class Window: public Form
 public ref class Engine
 {
   public:
-///Конструктор
-    Engine ()
-    {
-      engine = FunnerInit ();
-      
-      if (!engine)
-        throw gcnew InvalidOperationException ("Funner native engine has bad entries");
-    }
-    
-///Деструктор
-    ~Engine ()
-    {
-      delete engine;
-
-      engine = 0;
-    }
-
 ///Создание интерфейса поддержки внешних окон
-    Window^ CreateWindow (const char* name)
+    static Window^ CreateWindow (String^ name)
     {
-      return gcnew Window (engine, name);
+      return gcnew Window (GetEngine (), AutoString (name).Data ());
     }
 
   private:
 ///Запрос native API движка
     [DllImport ("funner.dll")]
     static IEngine* FunnerInit ();
+    
+///Получение движка
+    static IEngine* GetEngine ()
+    {
+      if (engine)
+        return engine;
+      
+      engine = FunnerInit ();
+      
+      if (!engine)
+        throw gcnew InvalidOperationException ("Funner native engine has bad entries");
+        
+      return engine;
+    }
 
   private:
-    IEngine* engine; //указатель на объект движка
+    static IEngine* engine = 0; //указатель на объект движка
 };
 
 }
