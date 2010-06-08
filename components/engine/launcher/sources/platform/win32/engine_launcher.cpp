@@ -2,9 +2,10 @@
 
 #include <windows.h>
 
-#include <engine/launcher.h>
+#undef CreateWindow
+#include <engine/engine.h>
 
-using namespace funner;
+using namespace engine;
 
 namespace
 {

@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS        := ENGINE.FUNNER_SHARED_LIBRARY ENGINE.FUNNER_LIBRARY ENGINE.LAUNCHER.SOURCES
+TARGETS        := ENGINE.FUNNER_SHARED_LIBRARY ENGINE.FUNNER_LIBRARY ENGINE.LAUNCHER.SOURCES ENGINE.DOT_NET_WRAPPER
 TARGETS.win32  := ENGINE.CLAUNCHER.SOURCES
 TARGETS.iphone := ENGINE.FUNNER_LIBRARY_LIPO
 
@@ -81,3 +81,11 @@ ENGINE.CLAUNCHER.SOURCES.IMPORTS             := $(ENGINE.LAUNCHER.SOURCES.IMPORT
 ENGINE.CLAUNCHER.SOURCES.has_windows.IMPORTS := $(ENGINE.LAUNCHER.SOURCES.has_windows.IMPORTS)
 ENGINE.CLAUNCHER.SOURCES.win32.IMPORTS       := $(ENGINE.LAUNCHER.SOURCES.win32.IMPORTS)
 ENGINE.CLAUNCHER.SOURCES.win32.SOURCE_DIRS   := sources/platform/win32
+
+#Цель - обёртка для взаимодействия с .Net
+ENGINE.DOT_NET_WRAPPER.TYPE            := dynamic-lib
+ENGINE.DOT_NET_WRAPPER.NAME            := funner.net
+ENGINE.DOT_NET_WRAPPER.SOURCE_DIRS     := sources/platform/dotnet
+ENGINE.DOT_NET_WRAPPER.INCLUDE_DIRS    := include
+ENGINE.DOT_NET_WRAPPER.COMPILER_CFLAGS := -clr
+ENGINE.DOT_NET_WRAPPER.IMPORTS         := compile.xtl

@@ -1,22 +1,4 @@
-#include <cstdio>
-#include <exception>
-
-#include <stl/auto_ptr.h>
-#include <stl/string>
-
-#include <xtl/bind.h>
-#include <xtl/connection.h>
-#include <xtl/function.h>
-#include <xtl/string.h>
-
-#include <common/console.h>
-#include <common/string.h>
-
-#include <syslib/application.h>
-
-#include <engine/subsystem_manager.h>
-
-#include <engine/launcher.h>
+#include "shared.h"
 
 using namespace engine;
 
@@ -51,8 +33,6 @@ const char* HELP [] = {
   "    --main-loop               - app runs main loop after starting subsystems\n",
   "    --help                    - print this help\n",
 };
-
-const size_t STARTUP_MAIN_LOOP_DELAY = 10; //задержка перед запуском главной нити приложения (в милисекундах) - необходимо для работы на iPhone
 
 /*
     Приложение
@@ -123,6 +103,20 @@ class Application: public IEngine
       }
       
       return false;
+    }
+    
+///Создание окна
+    IWindow* CreateWindow (const char* name)
+    {
+      try
+      {
+        return create_window (name);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::Application::CreateWindow");
+        throw;
+      }
     }
 
 ///Выполнение приложения
@@ -235,3 +229,4 @@ FUNNER_C_API IEngine* FunnerInit ()
 
   return 0;
 }
+
