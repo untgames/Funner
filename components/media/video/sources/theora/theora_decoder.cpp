@@ -192,12 +192,7 @@ class TheoraDecoderImpl : public IVideoDecoder
         current_frame = 0;
 
       for (; current_frame < (int)frame; current_frame++)
-      {
         GetOggPacket ();
-
-        if (ogg_page_eos (&ogg_data_page))
-          throw xtl::format_operation_exception (METHOD_NAME, "Can't seek further %u frame, stream ended", current_frame);
-      }
 
       if (th_decode_packetin (th_decoding_context, &ogg_data_packet, 0))
         throw xtl::format_operation_exception (METHOD_NAME, "Can't decode video frame");
