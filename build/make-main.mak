@@ -797,13 +797,15 @@ endef
 
 #—борка SDK (им€ цели)
 define process_target.sdk
-  $1.EXPORT.LIBS            := $$($1.LIBS)
-  $1.EXPORT.INCLUDES        := $$($1.INCLUDE_DIRS)
-  $1.EXPORT.DLLS            := $$($1.DLLS)
-  $1.EXPORT.EXECUTABLES     := $$($1.EXECUTABLES)
-  $1.EXPORT.LIB_FILTER      := $$($1.LIB_FILTER)
-  $1.EXPORT.OUT_DIR         := $$(if $$($1.OUT_DIR),$$($1.OUT_DIR),$$($1.NAME))
-  $1.EXPORT.COMPONENT_FILES := $$($1.SOURCE_FILES)
+  $1.EXPORT.LIBS               := $$($1.LIBS)
+  $1.EXPORT.LIB_DIRS           := $$($1.LIB_DIRS) $$(DIST_LIB_DIR)
+  $1.EXPORT.INCLUDES           := $$($1.INCLUDE_DIRS)
+  $1.EXPORT.DLLS               := $$($1.DLLS)
+  $1.EXPORT.EXECUTABLES        := $$($1.EXECUTABLES)
+  $1.EXPORT.LIB_FILTER         := $$(strip $$($1.LIB_FILTER))
+  $1.EXPORT.LIB_EXCLUDE_FILTER := $$($1.LIB_EXCLUDE_FILTER)  
+  $1.EXPORT.OUT_DIR            := $$(if $$($1.OUT_DIR),$$($1.OUT_DIR),$$($1.NAME))
+  $1.EXPORT.COMPONENT_FILES    := $$($1.SOURCE_FILES)
 
 ifneq (,$$($1.NAME))
   $1.EXPORT.CONFIG_FILE   := $$(EXPORT_DIR)/$$($1.NAME)/$$(EXPORT_FILE_SHORT_NAME)
@@ -922,9 +924,11 @@ define process_target_common
 
   $$(foreach source,$$($1.EXPORT.COMPONENT_FILES),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR),$1)))
   
-  $1.EXPORT.LIB_FILTER  ?= %
+  $1.EXPORT.LIB_FILTER  := $$(if $$($1.EXPORT.LIB_FILTER),$$($1.EXPORT.LIB_FILTER),%)
   $1.EXPORT.LIBS        := $$(filter $$($1.EXPORT.LIB_FILTER),$$($1.EXPORT.LIBS))
-  $1.EXPORT.LIBS        := $$($1.EXPORT.LIBS:%=$(DIST_LIB_DIR)/$(LIB_PREFIX)%$(LIB_SUFFIX))
+  $1.EXPORT.LIBS        := $$(filter-out $$($1.EXPORT.LIB_EXCLUDE_FILTER),$$($1.EXPORT.LIBS))
+  $1.EXPORT.LIBS        := $$($1.EXPORT.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
+  $1.EXPORT.LIBS        := $$(foreach lib,$$($1.EXPORT.LIBS),$$(firstword $$(wildcard $$($1.EXPORT.LIB_DIRS:%=%/$$(lib))) $$(lib)))
   $1.EXPORT.INCLUDES    := $$(call specialize_paths,$$($1.EXPORT.INCLUDES))
   $1.EXPORT.DLLS        := $$($1.EXPORT.DLLS:%=$$($1.EXPORT.OUT_DIR)/$$(EXPORT_DLL_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
   $1.EXPORT.EXECUTABLES := $$($1.EXPORT.EXECUTABLES:%=$$(DIST_BIN_DIR)/%$(EXE_SUFFIX))
