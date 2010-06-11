@@ -64,7 +64,8 @@ class TheoraDecoderImpl : public IVideoDecoder
 /// онструктор/деструктор
     TheoraDecoderImpl (const char* file_name, VideoQuality quality)
       : log (LOG_NAME), video_file (file_name), th_data_setup_info (0), th_decoding_context (0),
-        first_video_packet_index (0), total_frames_count (0), current_frame (-1)
+        first_video_packet_index (0), total_frames_count (0), buffer_frame_number (-1),
+        decoded_frame_number (-1)
     {
       static const char* METHOD_NAME = "media::TheoraDecoderImpl::TheoraDecoderImpl";
 
@@ -185,24 +186,59 @@ class TheoraDecoderImpl : public IVideoDecoder
       if (!data_buffer)
         throw xtl::make_null_argument_exception (METHOD_NAME, "data_buffer");
 
-      if (current_frame > (int)frame)
+      if (buffer_frame_number > (int)frame)
         throw xtl::format_not_supported_exception (METHOD_NAME, "Backward seek in theora files not supported yet");
 
-      if (current_frame < 0)
-        current_frame = 0;
+      for (; decoded_frame_number < (int)frame;)
+      {
+        try
+        {
+          if (decoded_frame_number >= 0)  //первый пакет прочитан во врем€ инициализации
+            GetOggPacket ();
 
-      for (; current_frame < (int)frame; current_frame++)
-        GetOggPacket ();
+          if (th_decode_packetin (th_decoding_context, &ogg_data_packet, 0))
+            throw xtl::format_operation_exception (METHOD_NAME, "Can't decode video frame");
+        }
+        catch (xtl::exception& e) //подавление исключений декодировани€ св€занных с некорректными данными
+        {
+          log.Printf ("Exception while decoding frame %d: '%s'\n", decoded_frame_number + 1, e.what ());
+        }
+        catch (...)
+        {
+          log.Printf ("Unknown exception while decoding frame %d\n", decoded_frame_number + 1);
+        }
 
-      if (th_decode_packetin (th_decoding_context, &ogg_data_packet, 0))
-        throw xtl::format_operation_exception (METHOD_NAME, "Can't decode video frame");
+        decoded_frame_number = (int)th_granule_frame (th_decoding_context, ogg_data_packet.granulepos);
 
-      if (th_decode_ycbcr_out (th_decoding_context, th_decoded_buffer))
-        throw xtl::format_operation_exception (METHOD_NAME, "Can't get decoded video frame");
+        try
+        {
+          if (decoded_frame_number <= (int)frame || buffer_frame_number < 0)
+          {
+            if (th_decode_ycbcr_out (th_decoding_context, th_decoded_buffer))
+              throw xtl::format_operation_exception (METHOD_NAME, "Can't get decoded video frame");
+
+            process_theora_YCbCr (ycbcr_buffer.data (), th_decoded_buffer, th_data_info.frame_width, th_data_info.frame_height);
+
+            buffer_frame_number = decoded_frame_number;
+          }
+        }
+        catch (xtl::exception& e) //подавление исключений декодировани€ св€занных с некорректными данными
+        {
+          log.Printf ("Exception while getting decoded frame %d: '%s'\n", decoded_frame_number, e.what ());
+        }
+        catch (...)
+        {
+          log.Printf ("Unknown exception while getting decoded frame %d\n", decoded_frame_number);
+        }
+      }
+
+      if (buffer_frame_number < 0)
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't get first video frame");
+
+      if (buffer_frame_number != frame)
+        log.Printf ("Can't decode frame %u, returning data of frame %d instead", frame, buffer_frame_number);
 
       size_t *ycbcr_data = ycbcr_buffer.data ();
-
-      process_theora_YCbCr (ycbcr_data, th_decoded_buffer, th_data_info.frame_width, th_data_info.frame_height);
 
       for (int y = th_data_info.frame_height - 1; y >= 0; y--)
       {
@@ -457,7 +493,8 @@ class TheoraDecoderImpl : public IVideoDecoder
     th_ycbcr_buffer   th_decoded_buffer;
     size_t            first_video_packet_index;
     size_t            total_frames_count;
-    int               current_frame;
+    int               buffer_frame_number;
+    int               decoded_frame_number;
 };
 
 
