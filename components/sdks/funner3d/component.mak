@@ -3,9 +3,9 @@
 ###################################################################################################
 TARGETS := SDKS.FUNNER3D SDKS.FUNNER3D.BUILD
                                        
-SDKS.FUNNER3D.TYPE          := sdk
-SDKS.FUNNER3D.NAME          := funner3d
-SDKS.FUNNER3D.LIB_FILTER    := funner.%
+SDKS.FUNNER3D.TYPE               := sdk
+SDKS.FUNNER3D.NAME               := funner3d
+SDKS.FUNNER3D.LIB_EXCLUDE_FILTER := gdi32 ole32 uuid user32
 SDKS.FUNNER3D.LIBS          :=
 SDKS.FUNNER3D.DLLS          :=
 SDKS.FUNNER3D.EXECUTABLES   := collada-converter
