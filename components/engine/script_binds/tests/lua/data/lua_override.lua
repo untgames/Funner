@@ -1,6 +1,10 @@
+function searchpaths ()
+  return "data/?.lua"
+end
+
 function test ()
   print ("Print override")
-  print ("Dofile override = " .. dofile ("data/dofile.lua"))
+  print ("Dofile override = " .. dofile ("dofile"))
   
   local function indent_test()
     assert (false)

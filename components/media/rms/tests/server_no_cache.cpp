@@ -45,7 +45,7 @@ int main ()
           
           printf ("Prefetch resources for group2\n");
           
-          binding2.Prefetch ();
+          binding2.AsyncLoad ();
           
           printf ("Unload resources for group2\n");
           

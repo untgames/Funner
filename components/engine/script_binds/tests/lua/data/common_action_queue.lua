@@ -37,7 +37,7 @@ function exit_handler (dt)
 end
 
 function registered_in_pause_handler (dt)
-  print ("registered_in_pause_handler called with dt=" .. string.format ("%1.1f", dt) .. " timer =" .. string.format ("%1.1f", timer.Time))
+  print ("registered_in_pause_handler called with dt=" .. string.format ("%1.2f", dt) .. " timer =" .. string.format ("%1.2f", timer.Time))
 end
 
 function action_queue_pause_handler (dt)
@@ -51,7 +51,7 @@ function action_queue_pause_handler (dt)
   
     action_queue:Pause ()
     action_queue_paused = true
-    action_queue:RegisterEventHandler (0, 0.3, Common.ActionQueue.CreateEventHandler ("registered_in_pause_handler"))  
+    action_queue:RegisterEventHandler (0, 0.25, Common.ActionQueue.CreateEventHandler ("registered_in_pause_handler"))  
   end  
 end
 

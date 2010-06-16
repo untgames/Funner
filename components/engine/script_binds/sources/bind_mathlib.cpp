@@ -82,13 +82,13 @@ template <class T, unsigned int Size, unsigned int TupleSize> class vec_get_tupl
       index [3] = i4;
     }  
     
-    vector<T, TupleSize> operator () (const vector<T, Size>& v) const
+    math::vector<T, TupleSize> operator () (const math::vector<T, Size>& v) const
     {    
-      return vector<T, TupleSize> (select (v, 0), select (v, 1), select (v, 2), select (v, 3));
+      return math::vector<T, TupleSize> (select (v, 0), select (v, 1), select (v, 2), select (v, 3));
     }
   
   private:
-    T select (const vector<T, Size>& v, unsigned int base_index) const
+    T select (const math::vector<T, Size>& v, unsigned int base_index) const
     {
       unsigned int new_index = index [base_index];
 
@@ -109,14 +109,14 @@ template <class T, unsigned int Size, unsigned int TupleSize> class vec_set_tupl
       index [3] = i4;
     }
 
-    void operator () (vector<T, Size>& res, const vector<T, TupleSize>& src) const
+    void operator () (math::vector<T, Size>& res, const math::vector<T, TupleSize>& src) const
     {
       for (unsigned int i=0; i<TupleSize; i++)
         select (res, i) = src [i];
     }
     
   private:
-    T& select (vector<T, Size>& v, unsigned int base_index) const
+    T& select (math::vector<T, Size>& v, unsigned int base_index) const
     {
       static T dummy;
       
@@ -136,7 +136,7 @@ inline Invoker make_vec_get_tuple_invoker (unsigned int i1, unsigned int i2=0, u
 
   enum { size = Vector::size };  
 
-  return make_invoker<vector<type, TupleSize> (const Vector&)> (vec_get_tuple<type, size, TupleSize> (i1, i2, i3, i4));
+  return make_invoker<math::vector<type, TupleSize> (const Vector&)> (vec_get_tuple<type, size, TupleSize> (i1, i2, i3, i4));
 }
 
 template <class Vector, unsigned int TupleSize>
@@ -146,7 +146,7 @@ inline Invoker make_vec_set_tuple_invoker (unsigned int i1, unsigned int i2=0, u
 
   enum { size = Vector::size };  
 
-  return make_invoker<void (Vector&, const vector<type, TupleSize>&)> (vec_set_tuple<type, size, TupleSize> (i1, i2, i3, i4));
+  return make_invoker<void (Vector&, const math::vector<type, TupleSize>&)> (vec_set_tuple<type, size, TupleSize> (i1, i2, i3, i4));
 }
 
 /*
@@ -154,13 +154,13 @@ inline Invoker make_vec_set_tuple_invoker (unsigned int i1, unsigned int i2=0, u
 */
 
 template <class T, unsigned int Size>
-vector<T, Size> vec_normalize (const vector<T, Size>& v)
+math::vector<T, Size> vec_normalize (const math::vector<T, Size>& v)
 {
   return normalize (v);
 }
 
 template <class T, unsigned int Size>
-vector<T, Size> vec_cross (const vector<T, Size>& v1, const vector<T, Size>& v2)
+math::vector<T, Size> vec_cross (const math::vector<T, Size>& v1, const math::vector<T, Size>& v2)
 {
   return cross (v1, v2);
 }
@@ -220,7 +220,7 @@ template <class T, unsigned int Size> struct matrix_get_row
 {
   matrix_get_row (unsigned int in_index) : index (in_index) {}
   
-  xtl::reference_wrapper<vector<T, Size> > operator () (matrix<T, Size>& m) const
+  xtl::reference_wrapper<math::vector<T, Size> > operator () (matrix<T, Size>& m) const
   {
     return xtl::ref (m [index]);
   }
@@ -232,7 +232,7 @@ template <class T, unsigned int Size> struct matrix_set_row
 {
   matrix_set_row (unsigned int in_index) : index (in_index) {}
   
-  void operator () (matrix<T, Size>& m, const vector<T, Size>& value) const
+  void operator () (matrix<T, Size>& m, const math::vector<T, Size>& value) const
   {
     m [index] = value;
   }
@@ -379,9 +379,9 @@ void register_vector_selectors (InvokerRegistry& lib)
 template <class T, unsigned int Size>
 void bind_vec_library (InvokerRegistry& vec_lib)
 {
-  typedef vector<T, Size>   vec_type;
-  typedef matrix<T, Size>   matrix_type;
-  typedef matrix<T, Size+1> big_matrix_type;
+  typedef math::vector<T, Size> vec_type;
+  typedef matrix<T, Size>       matrix_type;
+  typedef matrix<T, Size+1>     big_matrix_type;
 
     //регистраци€ скал€рных селекторов
 
@@ -438,9 +438,9 @@ void bind_vec_library (InvokerRegistry& vec_lib)
 template <class T, unsigned int Size>
 void bind_matrix_library (InvokerRegistry& mat_lib)
 {
-  typedef matrix<T, Size> matrix_type;
-  typedef vector<T, Size>    vec_type;
-  typedef vector<T, Size-1>  small_vec_type;
+  typedef matrix<T, Size>         matrix_type;
+  typedef math::vector<T, Size>   vec_type;
+  typedef math::vector<T, Size-1> small_vec_type;
 
     //регистраци€ селекторов
 
@@ -470,7 +470,7 @@ void bind_matrix_library (InvokerRegistry& mat_lib)
                                            make_binary_invoker<matrix_type, matrix_type, T, multiplies> (),
                                            make_binary_invoker<matrix_type, T, matrix_type, multiplies> ()));
 
-    //регистраци€ функций над матрицами  
+    //регистраци€ функций над матрицами
     
   mat_lib.Register ("transpose", make_invoker (&math::transpose<T, Size>));
   mat_lib.Register ("inverse", make_invoker (&math::inverse<T, Size>));
@@ -505,7 +505,7 @@ void bind_quat_library (InvokerRegistry& quat_lib)
   quat_lib.Register ("set_2", "set_z");
   quat_lib.Register ("set_3", "set_w");  
   
-    //регистраци€ операций  
+    //регистраци€ операций
     
   quat_lib.Register ("__unm", make_unary_invoker<quat_type, quat_type, negate> ());
   quat_lib.Register ("__add", make_binary_invoker<quat_type, quat_type, quat_type, plus> ());

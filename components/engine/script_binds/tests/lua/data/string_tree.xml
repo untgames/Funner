@@ -4,7 +4,6 @@
     <Array>0 1 2 3 4 5</Array>   
     <ChildLevelTwo>      
       Attribute1
-      'Mega Attribute'
       Attribute2
       <ChildInAttributes Name="ChildInAttributes"/>
       Attribute3

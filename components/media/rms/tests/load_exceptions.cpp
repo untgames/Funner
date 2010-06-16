@@ -23,15 +23,15 @@ int main ()
     
     printf ("Prefetch resources\n");    
     
-    binding.Prefetch ();
+    binding.AsyncLoad ();
     
     printf ("Unload resources\n");    
     
-    binding.Unload ();    
+    binding.Unload ();
 
     printf ("Load resources\n");
 
-    binding.Load ();
+    binding.Load ();        
   }
   catch (std::exception& e)
   {

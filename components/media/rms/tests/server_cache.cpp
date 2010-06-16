@@ -69,9 +69,9 @@ int main ()
       
       server_group.EnableCache ();
       
-      printf ("Prefetch resources for group3\n");      
+      printf ("Load resources for group3\n");      
 
-      binding_that_destroyes_after_server.Prefetch ();      
+      binding_that_destroyes_after_server.Load ();      
       
       printf ("Recreate binding (check cache)\n");
       

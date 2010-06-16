@@ -5,6 +5,7 @@
 #include <math/quat.h>
 
 #include <sg/camera.h>
+#include <sg/height_map.h>
 #include <sg/helper.h>
 #include <sg/light.h>
 #include <sg/listener.h>
@@ -15,8 +16,11 @@
 #include <sg/text_line.h>
 #include <sg/visual_model.h>
 
+#include <sg/controllers/water.h>
+
 using namespace script;
 using namespace scene_graph;
+using namespace scene_graph::controllers;
 using namespace math;
 using namespace xtl;
 
@@ -71,10 +75,12 @@ const char* SCENE_STATIC_NODE_SUBTREE_EVENT_LIBRARY   = "Scene.NodeSubTreeEvent"
 const char* SCENE_STATIC_NODE_ARRAY_LINK_MODE_LIBRARY = "Scene.NodeArrayLinkMode";
 const char* SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY  = "Scene.TextLineAlignment";
 const char* SCENE_STATIC_NODE_PROPERTY_TYPE_LIBRARY   = "Scene.NodePropertyType";
+const char* SCENE_CONTROLLER_OWNER_MODE_LIBRARY       = "Scene.ControllerOwnerMode";
 const char* SCENE_SCENE_LIBRARY                       = "Scene.Scene";
 const char* SCENE_NODE_LIBRARY                        = "Scene.Node";
 const char* SCENE_NODE_PROPERTIES_LIBRARY             = "Scene.NodeProperties";
 const char* SCENE_NODE_ARRAY_LIBRARY                  = "Scene.NodeArray";
+const char* SCENE_CONTROLLER_LIBRARY                  = "Scene.Controller";
 const char* SCENE_ENTITY_LIBRARY                      = "Scene.Entity";
 const char* SCENE_PERSPECTIVE_CAMERA_LIBRARY          = "Scene.PerspectiveCamera";
 const char* SCENE_ORTHO_CAMERA_LIBRARY                = "Scene.OrthoCamera";
@@ -89,6 +95,8 @@ const char* SCENE_SPRITE_MODEL_LIBRARY                = "Scene.SpriteModel";
 const char* SCENE_SPRITE_LIBRARY                      = "Scene.Sprite";
 const char* SCENE_TEXT_LINE_LIBRARY                   = "Scene.TextLine";
 const char* SCENE_VISUAL_MODEL_LIBRARY                = "Scene.VisualModel";
+const char* SCENE_HEIGHT_MAP_LIBRARY                  = "Scene.HeightMap";
+const char* SCENE_CONTROLLER_WATER_LIBRARY            = "Scene.Controllers.Water";
 const char* BINDER_NAME                               = "SceneGraph";
 const char* COMPONENT_NAME                            = "script.binds.SceneGraph";
 
@@ -230,6 +238,15 @@ InvokerRegistry& bind_node_library (Environment& environment)
   lib.Register ("SetPosition",              make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetPosition)));
   lib.Register ("SetWorldPosition",         make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetWorldPosition)));
   lib.Register ("ResetPosition",            make_invoker (&Node::ResetPosition));
+  lib.Register ("ResetPivotPosition",       make_invoker (&Node::ResetPivotPosition));
+  lib.Register ("SetPivotPosition",         make_invoker (implicit_cast<void (Node::*) (float, float, float)> (&Node::SetPivotPosition)));
+  lib.Register ("set_PivotPosition",        make_invoker (implicit_cast<void (Node::*) (const vec3f&)> (&Node::SetPivotPosition)));
+  lib.Register ("get_PivotPosition",        make_invoker (&Node::PivotPosition));
+  lib.Register ("set_OrientationPivotEnabled", make_invoker (&Node::SetOrientationPivotEnabled));
+  lib.Register ("set_ScalePivotEnabled",       make_invoker (&Node::SetScalePivotEnabled));
+  lib.Register ("get_OrientationPivotEnabled", make_invoker (&Node::OrientationPivotEnabled));
+  lib.Register ("get_ScalePivotEnabled",       make_invoker (&Node::ScalePivotEnabled));
+  lib.Register ("get_PivotEnabled",         make_invoker (&Node::PivotEnabled));
   lib.Register ("set_Orientation",          make_invoker (implicit_cast<void (Node::*) (const quatf&)> (&Node::SetOrientation)));
   lib.Register ("set_WorldOrientation",     make_invoker (implicit_cast<void (Node::*) (const quatf&)> (&Node::SetWorldOrientation)));
   lib.Register ("SetOrientation",           make_invoker<void (Node*, math::anglef, float, float, float)> (implicit_cast<void (Node::*) (const math::anglef&, float, float, float)> (&Node::SetOrientation)));
@@ -322,6 +339,10 @@ InvokerRegistry& bind_node_library (Environment& environment)
 
   lib.Register ("BeginUpdate", make_invoker (&Node::BeginUpdate));
   lib.Register ("EndUpdate",   make_invoker (&Node::EndUpdate));
+  
+  lib.Register ("AttachController",     make_invoker (&Node::AttachController));
+  lib.Register ("DetachAllControllers", make_invoker (&Node::DetachAllControllers));
+  lib.Register ("Update",               make_invoker (make_invoker (&Node::Update), make_invoker<void (Node&, float)> (xtl::bind (&Node::Update, _1, _2, NodeTraverseMode_Default))));
 
   lib.Register ("CreateEventHandler",          make_callback_invoker<Node::EventHandler::signature_type> ());
   lib.Register ("CreateSubTreeEventHandler",   make_callback_invoker<Node::SubTreeEventHandler::signature_type> ());
@@ -449,7 +470,38 @@ void bind_node_array_library (Environment& environment)
 }
 
 /*
-   Регистрация библиотеки работы с объектами сцены
+    Регистрация библиотеки работы с контроллером
+*/
+
+void bind_controller_owner_mode_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_CONTROLLER_OWNER_MODE_LIBRARY);
+
+  lib.Register ("get_None",               make_const (ControllerOwnerMode_None));
+  lib.Register ("get_ControllerOwnsNode", make_const (ControllerOwnerMode_ControllerOwnsNode));  
+  lib.Register ("get_NodeOwnsController", make_const (ControllerOwnerMode_NodeOwnsController));
+}
+
+void bind_controller_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_CONTROLLER_LIBRARY);
+
+    //регистрация операций
+
+  lib.Register ("get_AttachedNode",   make_invoker ((Node* (Controller::*)())&Controller::AttachedNode));
+  lib.Register ("get_OwnerMode",      make_invoker (&Controller::OwnerMode));
+  lib.Register ("set_OwnerMode",      make_invoker (&Controller::SetOwnerMode));
+  lib.Register ("ControllerOwnsNode", make_invoker (&Controller::ControllerOwnsNode));
+  lib.Register ("NodeOwnsController", make_invoker (&Controller::NodeOwnsController));
+  lib.Register ("Detach",             make_invoker (&Controller::Detach));
+
+    //регистрация типов данных
+
+  environment.RegisterType<Controller> (SCENE_CONTROLLER_LIBRARY);
+}
+
+/*
+    Регистрация библиотеки работы с объектами сцены
 */
 
 InvokerRegistry& bind_entity_library (Environment& environment)
@@ -804,16 +856,6 @@ SpriteList::Pointer create_sprite_list ()
      Регистрация библиотеки работы с спрайтовыми моделями
 */
 
-template <NodeTransformSpace space>
-mat4f get_transformation_after_pivot (SpriteModel& model)
-{
-  mat4f result;
-
-  model.EvalTransformationAfterPivot (space, result);
-
-  return result;
-}
-
 void bind_sprite_model_library (Environment& environment)
 {
   InvokerRegistry& lib = environment.CreateLibrary (SCENE_SPRITE_MODEL_LIBRARY);
@@ -824,19 +866,10 @@ void bind_sprite_model_library (Environment& environment)
 
     //регистрация операций
 
-  lib.Register ("set_Material",           make_invoker (&SpriteModel::SetMaterial));
-  lib.Register ("get_Material",           make_invoker (&SpriteModel::Material));
-  lib.Register ("set_AlphaReference",     make_invoker (&SpriteModel::SetAlphaReference));
-  lib.Register ("get_AlphaReference",     make_invoker (&SpriteModel::AlphaReference));
-  lib.Register ("set_PivotPosition",      make_invoker (implicit_cast<void (SpriteModel::*)(const vec3f&)> (&SpriteModel::SetPivotPosition)));
-  lib.Register ("get_PivotPosition",      make_invoker (&SpriteModel::PivotPosition));
-  lib.Register ("set_PivotRotation",      make_invoker<void (SpriteModel&, math::anglef)> (&SpriteModel::SetPivotRotation));
-  lib.Register ("get_PivotRotation",      make_invoker<math::anglef (SpriteModel&)> (&SpriteModel::PivotRotation));
-  lib.Register ("get_LocalTMAfterPivot",  make_invoker (&get_transformation_after_pivot<NodeTransformSpace_Local>));
-  lib.Register ("get_ParentTMAfterPivot", make_invoker (&get_transformation_after_pivot<NodeTransformSpace_Parent>));
-  lib.Register ("get_WorldTMAfterPivot",  make_invoker (&get_transformation_after_pivot<NodeTransformSpace_World>));
-  lib.Register ("SetPivotPosition",       make_invoker (implicit_cast<void (SpriteModel::*)(float, float, float)> (&SpriteModel::SetPivotPosition)));
-  lib.Register ("SetPivot",               make_invoker (&SpriteModel::SetPivot));
+  lib.Register ("set_Material",       make_invoker (&SpriteModel::SetMaterial));
+  lib.Register ("get_Material",       make_invoker (&SpriteModel::Material));
+  lib.Register ("set_AlphaReference", make_invoker (&SpriteModel::SetAlphaReference));
+  lib.Register ("get_AlphaReference", make_invoker (&SpriteModel::AlphaReference));
 
     //регистрация типов данных
 
@@ -921,6 +954,7 @@ void bind_text_line_library (Environment& environment)
 
   lib.Register ("set_Text",                make_invoker (implicit_cast<void (TextLine::*) (const char*)> (&TextLine::SetText)));
   lib.Register ("get_Text",                make_invoker (&TextLine::Text));
+  lib.Register ("get_TextLength",          make_invoker (&TextLine::TextLength));
   lib.Register ("set_TextUnicode",         make_invoker (implicit_cast<void (TextLine::*) (const wchar_t*)> (&TextLine::SetText)));
   lib.Register ("get_TextUnicode",         make_invoker (&TextLine::TextUnicode));
   lib.Register ("set_Font",                make_invoker (&TextLine::SetFont));
@@ -934,6 +968,8 @@ void bind_text_line_library (Environment& environment)
 
   lib.Register ("SetColor", make_invoker (make_invoker (implicit_cast<void (TextLine::*) (float, float, float, float)> (&TextLine::SetColor)),
                                           make_invoker (implicit_cast<void (TextLine::*) (float, float, float)>        (&TextLine::SetColor))));
+  lib.Register ("SetCharsColorFactors", make_invoker (&TextLine::SetCharsColorFactors));
+  lib.Register ("CharColor", make_invoker (&TextLine::CharColor));
 
   lib.Register ("SetAlignment", make_invoker (&TextLine::SetAlignment));
 
@@ -974,29 +1010,149 @@ void bind_visual_model_library (Environment& environment)
 }
 
 /*
+    Создание карты высот
+*/
+
+HeightMap::Pointer create_height_map ()
+{
+  return HeightMap::Create ();
+}
+
+void set_height_map_cell_height (HeightMap& map, size_t row, size_t column, float height)
+{
+  map.Vertex (row, column).height = height;
+}
+
+float get_height_map_cell_height (HeightMap& map, size_t row, size_t column)
+{
+  return map.Vertex (row, column).height;
+}
+
+void set_height_map_cell_normal (HeightMap& map, size_t row, size_t column, const math::vec3f& normal)
+{
+  map.Vertex (row, column).normal = normal;
+}
+
+const math::vec3f& get_height_map_cell_normal (HeightMap& map, size_t row, size_t column)
+{
+  return map.Vertex (row, column).normal;
+}
+
+void set_height_map_cell_color (HeightMap& map, size_t row, size_t column, const math::vec4f& color)
+{
+  map.Vertex (row, column).color = color;
+}
+
+math::vec4f& get_height_map_cell_color (HeightMap& map, size_t row, size_t column)
+{
+  return map.Vertex (row, column).color;
+}
+
+/*
+   Регистрация библиотеки работы с картами высот
+*/
+
+void bind_height_map_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_HEIGHT_MAP_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_ENTITY_LIBRARY);
+
+    //регистрация функций создания
+
+  lib.Register ("Create", make_invoker (&create_height_map));
+
+    //регистрация операций
+    
+  lib.Register ("set_Material", make_invoker (&HeightMap::SetMaterial));
+  lib.Register ("get_Material", make_invoker (&HeightMap::Material));
+
+  lib.Register ("set_RowsCount",    make_invoker (&HeightMap::SetRowsCount));
+  lib.Register ("set_ColumnsCount", make_invoker (&HeightMap::SetColumnsCount));
+  lib.Register ("get_RowsCount",    make_invoker (&HeightMap::RowsCount));
+  lib.Register ("get_ColumnsCount", make_invoker (&HeightMap::ColumnsCount));    
+
+  lib.Register ("SetCellsCount",     make_invoker (&HeightMap::SetCellsCount));
+  lib.Register ("SetVerticesHeight", make_invoker (&HeightMap::SetVerticesHeight));
+  lib.Register ("SetVerticesNormal", make_invoker (&HeightMap::SetVerticesNormal));
+  lib.Register ("SetVerticesColor",  make_invoker (&HeightMap::SetVerticesColor));
+
+  lib.Register ("SetVertexHeight", make_invoker (&set_height_map_cell_height));
+  lib.Register ("GetVertexHeight", make_invoker (&get_height_map_cell_height));
+  lib.Register ("SetVertexNormal", make_invoker (&set_height_map_cell_normal));
+  lib.Register ("GetVertexNormal", make_invoker (&get_height_map_cell_normal));
+  lib.Register ("SetVertexColor",  make_invoker (&set_height_map_cell_color));
+  lib.Register ("GetVertexColor",  make_invoker (&get_height_map_cell_color));
+
+  environment.RegisterType<HeightMap> (SCENE_HEIGHT_MAP_LIBRARY);
+}
+
+/*
+    Регистрация библиотеки работы с контроллером воды
+*/
+
+void bind_controller_water_library (Environment& environment)
+{
+  InvokerRegistry& lib = environment.CreateLibrary (SCENE_CONTROLLER_WATER_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_CONTROLLER_LIBRARY);
+
+    //регистрация функций создания
+
+  lib.Register ("Create", make_invoker (&Water::Create));
+
+    //регистрация операций
+    
+  lib.Register ("set_Viscosity", make_invoker (&Water::SetViscosity));
+  lib.Register ("get_Viscosity", make_invoker (&Water::Viscosity));
+  lib.Register ("PutStorm",      make_invoker (
+                                   make_invoker (&Water::PutStorm), 
+                                   make_invoker<void (Water&, const math::vec3f&, float)> (xtl::bind (&Water::PutStorm, _1, _2, _3, 0.05f)),
+                                   make_invoker<void (Water&, const math::vec3f&)> (xtl::bind (&Water::PutStorm, _1, _2, 0.0005f, 0.05f))
+  ));
+  lib.Register ("PutWorldStorm",   make_invoker (
+                                   make_invoker (&Water::PutWorldStorm), 
+                                   make_invoker<void (Water&, const math::vec3f&, float)> (xtl::bind (&Water::PutWorldStorm, _1, _2, _3, 0.05f)),
+                                   make_invoker<void (Water&, const math::vec3f&)> (xtl::bind (&Water::PutWorldStorm, _1, _2, 0.0005f, 0.05f))
+  ));
+
+    //регистрация типа данных
+
+  environment.RegisterType<Water> (SCENE_CONTROLLER_WATER_LIBRARY);
+}
+
+/*
     Регистрация библиотеки работы со сценой
 */
 
 void bind_scene_graph_library (Environment& environment)
 {
-  bind_scene_library              (environment);
-  bind_node_library               (environment);
-  bind_node_properties_library    (environment);
-  bind_node_array_library         (environment);
-  bind_entity_library             (environment);
-  bind_perspective_camera_library (environment);
-  bind_ortho_camera_library       (environment);
-  bind_light_library              (environment);
-  bind_direct_light_library       (environment);
-  bind_spot_light_library         (environment);
-  bind_point_light_library        (environment);
-  bind_box_helper_library         (environment);
-  bind_listener_library           (environment);
-  bind_sound_emitter_library      (environment);
-  bind_sprite_model_library       (environment);
-  bind_sprite_library             (environment);
-  bind_text_line_library          (environment);
-  bind_visual_model_library       (environment);
+  bind_scene_library                 (environment);
+  bind_node_library                  (environment);
+  bind_node_properties_library       (environment);
+  bind_node_array_library            (environment);
+  bind_controller_owner_mode_library (environment);  
+  bind_controller_library            (environment);
+  bind_entity_library                (environment);
+  bind_perspective_camera_library    (environment);
+  bind_ortho_camera_library          (environment);
+  bind_light_library                 (environment);
+  bind_direct_light_library          (environment);
+  bind_spot_light_library            (environment);
+  bind_point_light_library           (environment);
+  bind_box_helper_library            (environment);
+  bind_listener_library              (environment);
+  bind_sound_emitter_library         (environment);
+  bind_sprite_model_library          (environment);
+  bind_sprite_library                (environment);
+  bind_text_line_library             (environment);
+  bind_visual_model_library          (environment);
+  bind_height_map_library            (environment);
+  bind_controller_water_library      (environment);
 }
 
 /*

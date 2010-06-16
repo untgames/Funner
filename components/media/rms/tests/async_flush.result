@@ -1,0 +1,26 @@
+Results of async_flush_test:
+Create groups
+Create bindings
+Async load
+Async unload
+Async flush unused resources
+Wait
+MyServer::PrefetchResource(resource1)
+MyServer::PrefetchResource(resource2)
+MyServer::PrefetchResource(resource3)
+MyServer::PrefetchResource(resource4)
+MyServer::LoadResource(resource1)
+MyServer::LoadResource(resource2)
+MyServer::LoadResource(resource3)
+MyServer::LoadResource(resource4)
+MyServer::PrefetchResource(resource5)
+MyServer::LoadResource(resource5)
+MyServer::PrefetchResource(resource6)
+MyServer::LoadResource(resource6)
+MyServer::UnloadResource(resource6)
+MyServer::UnloadResource(resource5)
+MyServer::UnloadResource(resource4)
+MyServer::UnloadResource(resource3)
+MyServer::UnloadResource(resource1)
+Exit
+MyServer::UnloadResource(resource2)

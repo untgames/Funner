@@ -171,6 +171,67 @@ function test_node ()
   print ("IsInUpdateTransaction = " .. tostring (node1.IsInUpdateTransaction))
 end
 
+function test_node_pivot ()
+  print ("Node pivot test")
+  
+  local node = Scene.Node.Create ()
+  local parent = Scene.Node.Create ()
+  
+  parent:SetEulerOrientation (0, 0, 90)
+  parent:SetPivotPosition (1, 0, 0)
+  node:SetPosition (2, 0, 0)
+  node:SetEulerOrientation (0, 0, 90)
+  
+  node:BindToParent (parent)
+  
+  print (string.format ("parent position: local=[%s] world=[%s]", tostring (parent.Position), tostring (parent.WorldPosition)))
+  print (string.format ("node position: local=[%s] world=[%s]", tostring (node.Position), tostring (node.WorldPosition)))
+  
+  local test = node.WorldTM * vec3 (2, 0, 0)
+  
+  print (string.format ("test point: [%s]", tostring (test)))
+  
+  local saved_position = node.Position
+  
+  node:Translate (0, -2, 0, Scene.NodeTransformSpace.Local)
+  
+  print (string.format ("test local translate: local=[%s] world=[%s]", tostring (node.Position), tostring (node.WorldPosition)))
+  
+  node.Position = saved_position
+  
+  node:Translate (0, -2, 0, Scene.NodeTransformSpace.Parent)
+  
+  print (string.format ("test parent translate: local=[%s] world=[%s]", tostring (node.Position), tostring (node.WorldPosition)))
+  
+  node.Position = saved_position
+
+  node:Translate (0, -2, 0, Scene.NodeTransformSpace.World)
+  
+  print (string.format ("test world translate: local=[%s] world=[%s]", tostring (node.Position), tostring (node.WorldPosition)))
+  
+  print ("create sub child")
+  
+  local child = Scene.Node.Create ()
+  
+  child:BindToParent (node)
+ 
+  node:SetPosition (2, 0, 0)
+  node:SetScale (2, 2, 1)
+  
+  node.PivotPosition = vec3 (1, 0, 0)
+  
+  child:SetPosition    (-1, -1, 0)
+  child:SetPivotPosition (-1, 0, 0)
+  child:SetEulerOrientation (0, 0, 90)
+
+  print (string.format ("test node position: local=[%s] world=[%s]", tostring (node.Position), tostring (node.WorldPosition)))
+  print (string.format ("test child position: local=[%s] world=[%s]", tostring (child.Position), tostring (child.WorldPosition)))
+  
+  test = child.WorldTM * vec3 (1, 1, 0)
+  
+  print (string.format ("test point: [%s]", tostring (test)))
+end
+
 function node_event_handler (node, event)
   local name = ""  
   
@@ -553,31 +614,6 @@ function test_sprite ()
   
 end
 
-function test_sprite_pivot ()
-  print ("Sprite pivot test")
-
-  local sprite = Scene.Sprite.Create ()
-
-  sprite.PivotPosition = vec3 (1, 2, 3)
-  sprite.PivotRotation = 90
-
-  local tm = sprite.WorldTMAfterPivot
- 
-  sprite:SetPosition (5, 6, 7)
-
-  tm = sprite.WorldTMAfterPivot
-
-  local position = tm * vec3 (0)
-  local axis_x   = tm * vec4 (1, 0, 0, 0)
-  local axis_y   = tm * vec4 (0, 1, 0, 0)
-  local axis_z   = tm * vec4 (0, 0, 1, 0)
-
-  print ("position: " .. tostring (position))
-  print ("axis_x:   " .. tostring (axis_x))
-  print ("axis_y:   " .. tostring (axis_y))
-  print ("axis_z:   " .. tostring (axis_z))
-end
-
 function test_visual_model ()
   print ("VisualModel test")
 
@@ -646,6 +682,8 @@ end
 function test ()
   test_node ()    
   
+  test_node_pivot ()
+  
   test_events ()
   
   test_node_properties ()
@@ -673,8 +711,6 @@ function test ()
   test_visual_model ()
 
   test_sprite ()
-
-  test_sprite_pivot ()
 
   test_scene ()
 

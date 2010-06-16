@@ -60,6 +60,17 @@ Child name - node1
 IsInUpdateTransaction = false
 IsInUpdateTransaction = true
 IsInUpdateTransaction = false
+Node pivot test
+parent position: local=[0 0 0] world=[0 0 0]
+node position: local=[2 0 0] world=[1 1 0]
+test point: [-1 1 0]
+test local translate: local=[4 0 0] world=[1 3 0]
+test parent translate: local=[2 -2 0] world=[3 1 0]
+test world translate: local=[0 0 0] world=[1 -1 0]
+create sub child
+test node position: local=[2 0 0] world=[1 1 0]
+test child position: local=[-1 -1 0] world=[5 4 0]
+test point: [9 0 0]
 Node events test
 Node 'Node1' event 'AfterSceneAttach'
 Node 'Node1' event 'AfterSceneChange'
@@ -194,11 +205,6 @@ Frame number = 9
 Color = 1 0 0 0.7
 Color = 0 0 1 0.3
 Color = 0 1 0 0.3
-Sprite pivot test
-position: 4 4 4
-axis_x:   0 1 0 0
-axis_y:   -1 0 0 0
-axis_z:   0 0 1 0
 Scene test
 Name = 
 Entities count = 0

@@ -1,7 +1,6 @@
 function test () 
   local binding1 = Engine.ResourceManager.CreateFileGroupBinding ("*")
   
-  binding1:Prefetch ()
   binding1:Load ()
   binding1:Unload ()
   
