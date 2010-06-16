@@ -22,6 +22,7 @@ SDKS.FUNNER3D.IMPORTS       := compile.system compile.render.low_level compile.m
                                link.scene_graph.core link.sound.scene_player link.sound.low_level.openal_driver \
                                link.physics.low_level.bullet_driver link.input.manager link.input.window_driver \
                                link.input.manager.xkeymap link.input.manager.xkeyreg link.script.lua \
+                               link.engine.script_binds.sg link.engine.script_binds.lua_override link.engine.script_binds.math \
                                run.extern.devil run.extern.zzip run.sound.low_level.openal_driver
 SDKS.FUNNER3D.win32.IMPORTS := link.input.direct_input_driver
 
