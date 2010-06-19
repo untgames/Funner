@@ -140,7 +140,7 @@ class Converter
     template<size_t channel_index>
     media::geometry::VertexStream CreateTexVertices (const media::collada::Surface& src_surface)
     {
-      typedef media::geometry::Vertex<media::geometry::TexChannel<channel_index>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf> ColladaTexVertex;
+      typedef media::geometry::Vertex<typename media::geometry::TexChannel<channel_index>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf> ColladaTexVertex;
 
       size_t vertices_count = src_surface.VerticesCount ();
 

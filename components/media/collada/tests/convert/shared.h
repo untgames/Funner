@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+#include <stl/algorithm>
+
 #include <xtl/function.h>
 
 #include <media/animation/animation_library.h>

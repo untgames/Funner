@@ -279,7 +279,7 @@ void EventTrack::GetEvents (float previous_time, float current_time, const Event
 
     for (size_t i = 0; i < events_to_fire_count; i++)
     {
-      float dt, delay = impl->events_to_fire [i]->delay, period = impl->events_to_fire [i]->period;
+      float dt = min_dt, delay = impl->events_to_fire [i]->delay, period = impl->events_to_fire [i]->period;
 
       if (delay > t + EPSILON)
         dt = delay - t;

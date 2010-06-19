@@ -54,7 +54,7 @@ class BinAnimationLibraryLoader
 {
   private:
     //чтение трека событий
-    void ReadEvents (EventTrack& track)
+    void ReadEvents (EventTrack track)
     {
       unsigned int events_count;
 
@@ -159,7 +159,7 @@ class BinAnimationLibraryLoader
         ReadSpline<math::step_spline_mat4f> (channel);
       else
         throw xtl::format_operation_exception ("media::animation::BinAnimationLibraryLoader::ReadAnimationChannel",
-                                               "Unsupported channel track type '%s'", track_type);
+                                               "Unsupported channel track type '%s'", track_type.data ());
 
       parent.AddChannel (target_name.data (), channel);
     }
@@ -184,7 +184,7 @@ class BinAnimationLibraryLoader
 
       Animation animation;
 
-      animation.Rename        (name.data ());
+      animation.Rename (name.data ());
 
       ReadEvents (animation.Events ());
       ReadChannels (animation);

@@ -132,6 +132,12 @@ size_t AnimationChannel::SamplesCount () const
   return impl->samples.size () / impl->SampleSize ();
 }
 
+namespace media
+{
+
+namespace collada
+{
+
 template <>
 const AnimationSampleTransform* AnimationChannel::Samples () const
 {
@@ -145,4 +151,8 @@ template <>
 AnimationSampleTransform* AnimationChannel::Samples ()
 {
   return const_cast<AnimationSampleTransform*> (const_cast<const AnimationChannel&> (*this).Samples<AnimationSampleTransform> ());
+}
+
+}
+
 }

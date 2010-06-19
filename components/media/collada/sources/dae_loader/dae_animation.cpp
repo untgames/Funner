@@ -55,7 +55,7 @@ void DaeParser::ParseAnimationChannel (Parser::Iterator channel_iter, Parser::It
   if (path_end == target)
     raise_parser_exception (*channel_iter, "Incorrect 'channel' tag target attribute, empty target name");
 
-  if (!path_end || path_end - target == target_length - 1)
+  if (!path_end || path_end - target == (int)target_length - 1)
     raise_parser_exception (*channel_iter, "Incorrect 'channel' tag target attribute, target name not contains property name");
 
   const char* subparameter_start = strchr (target, '.');
@@ -106,7 +106,7 @@ void DaeParser::ParseAnimationChannel (Parser::Iterator channel_iter, Parser::It
 
     bool is_source_found = false;
 
-    int source_size;
+    int source_size = 0;
 
     for (Parser::NamesakeIterator animation_source_iter = animation_iter->First ("source"); animation_source_iter; ++animation_source_iter)
     {

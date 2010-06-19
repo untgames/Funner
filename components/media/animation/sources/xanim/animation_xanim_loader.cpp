@@ -62,7 +62,7 @@ class XmlAnimationLibraryLoader
     //разбор канала анимации
     template <class T> void ParseSpecificKeyInfo (Parser::Iterator key_iter, math::spline_tcb_key<T>& key)
     {
-      typedef math::spline_tcb_key<T>::scalar_type scalar_type;
+      typedef typename math::spline_tcb_key<T>::scalar_type scalar_type;
 
       key.tension    = get<scalar_type> (*key_iter, "tension");
       key.continuity = get<scalar_type> (*key_iter, "continuity");
@@ -71,7 +71,7 @@ class XmlAnimationLibraryLoader
 
     template <class T> void ParseSpecificKeyInfo (Parser::Iterator key_iter, math::spline_bezier_key<T>& key)
     {
-      typedef math::spline_bezier_key<T>::value_type value_type;
+      typedef typename math::spline_bezier_key<T>::value_type value_type;
 
       const char *inner_value_string = get<const char*> (*key_iter, "inner_value"),
                  *outer_value_string = get<const char*> (*key_iter, "outer_value");
@@ -93,7 +93,7 @@ class XmlAnimationLibraryLoader
 
         read (key_iter, value_string, value);
 
-        T::key_type key (time, value);
+        typename T::key_type key (time, value);
 
         ParseSpecificKeyInfo (key_iter, key);
 
@@ -163,8 +163,10 @@ class XmlAnimationLibraryLoader
 
       animation.Rename (name);
 
+
+
       for_each_child (*animation_iter, "event_track.event",
-                      xtl::bind (&XmlAnimationLibraryLoader::ParseEvent, this, _1, xtl::ref (animation.Events ())));
+                      xtl::bind (&XmlAnimationLibraryLoader::ParseEvent, this, _1, animation.Events ()));
 
       for_each_child (*animation_iter, "channels.channel",
                       xtl::bind (&XmlAnimationLibraryLoader::ParseAnimationChannel, this, _1, xtl::ref (animation)));
