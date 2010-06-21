@@ -12,6 +12,11 @@ void ClosedFileImpl::Raise (const char* source)
   throw xtl::format_operation_exception (source, "File already closed");
 }
 
+const char* ClosedFileImpl::GetPath ()
+{
+  Raise ("File::GetPath");
+}
+
 size_t ClosedFileImpl::Read (void*,size_t)
 {
   Raise ("File::Read");

@@ -42,13 +42,19 @@ const size_t DEFAULT_FILE_BUF_SIZE = 8192; //размер буфера файла по умолчанию
 class FileImpl: public xtl::reference_counter
 {
   public:
-            FileImpl (filemode_t mode);
-    virtual ~FileImpl () {}
+            FileImpl  (filemode_t mode);
+    virtual ~FileImpl ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим работы файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     filemode_t Mode () const { return mode; }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение пути к файлу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual const char* GetPath   ();
+            void        ResetPath ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение / запись
@@ -86,7 +92,8 @@ class FileImpl: public xtl::reference_counter
     virtual bool IsClosedFileType () { return false; }
 
   private:
-    filemode_t mode; //режим работы файла
+    filemode_t                 mode;                //режим работы файла
+    stl::auto_ptr<stl::string> anonymous_file_path; //сгенерированный путь к файлу
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,15 +107,16 @@ class ClosedFileImpl: public FileImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Переопределение основных методов
 ///////////////////////////////////////////////////////////////////////////////////////////////////  
-    size_t      Read   (void* buf,size_t size);
-    size_t      Write  (const void* buf,size_t size);
-    filepos_t   Tell   ();
-    filepos_t   Seek   (filepos_t new_pos);
-    void        Rewind ();
-    filesize_t  Size   ();
-    void        Resize (filesize_t new_size);
-    bool        Eof    ();
-    void        Flush  ();
+    const char* GetPath ();
+    size_t      Read    (void* buf,size_t size);
+    size_t      Write   (const void* buf,size_t size);
+    filepos_t   Tell    ();
+    filepos_t   Seek    (filepos_t new_pos);
+    void        Rewind  ();
+    filesize_t  Size    ();
+    void        Resize  (filesize_t new_size);
+    bool        Eof     ();
+    void        Flush   ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка: является ли данный класс ClosedFileImpl
@@ -137,21 +145,25 @@ class CustomFileImpl: public FileImpl
     CustomFileImpl  (ICustomFileSystemPtr file_system,file_t handle,filemode_t mode_flags,bool auto_close);
     ~CustomFileImpl ();
 
-    size_t      Read   (void* buf,size_t size);
-    size_t      Write  (const void* buf,size_t size);
-    filepos_t   Tell   ();
-    filepos_t   Seek   (filepos_t new_pos);
-    void        Rewind ();
-    filesize_t  Size   ();
-    void        Resize (filesize_t new_size);
-    bool        Eof    ();
-    void        Flush  ();
+    void        SetPath       (const char* path);
+    const char* GetPath       ();
+    size_t      Read          (void* buf,size_t size);
+    size_t      Write         (const void* buf,size_t size);
+    filepos_t   Tell          ();
+    filepos_t   Seek          (filepos_t new_pos);
+    void        Rewind        ();
+    filesize_t  Size          ();
+    void        Resize        (filesize_t new_size);
+    bool        Eof           ();
+    void        Flush         ();
     size_t      GetBufferSize ();
 
   private:
-    ICustomFileSystemPtr file_system; //файловая система
-    file_t              file_handle; //хандлер файла в файловой системе
-    bool                auto_close;  //необходимо ли закрывать файл при уничтожении объекта
+    ICustomFileSystemPtr file_system;   //файловая система
+    file_t               file_handle;   //хандлер файла в файловой системе
+    bool                 auto_close;    //необходимо ли закрывать файл при уничтожении объекта
+    bool                 has_file_path; //путь к файлу определен
+    stl::string          file_path;     //путь к файлу
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,7 +175,7 @@ class MemFileImpl: public FileImpl
     MemFileImpl  (FileImplPtr base_file);
     MemFileImpl  (void* buffer,size_t buffer_size,filemode_t mode);
     ~MemFileImpl ();
-
+    
     size_t      Read   (void* buf,size_t size);
     size_t      Write  (const void* buf,size_t size);
     filepos_t   Tell   ();
@@ -189,15 +201,16 @@ class BufferedFileImpl: public FileImpl
     BufferedFileImpl  (FileImplPtr base_file,size_t buffer_size);
     ~BufferedFileImpl ();
 
-    size_t      Read   (void* buf,size_t size);
-    size_t      Write  (const void* buf,size_t size);
-    filepos_t   Tell   ();
-    filepos_t   Seek   (filepos_t new_pos);
-    void        Rewind ();
-    filesize_t  Size   ();
-    void        Resize (filesize_t new_size);
-    bool        Eof    ();
-    void        Flush  ();
+    const char* GetPath       ();
+    size_t      Read          (void* buf,size_t size);
+    size_t      Write         (const void* buf,size_t size);
+    filepos_t   Tell          ();
+    filepos_t   Seek          (filepos_t new_pos);
+    void        Rewind        ();
+    filesize_t  Size          ();
+    void        Resize        (filesize_t new_size);
+    bool        Eof           ();
+    void        Flush         ();
     size_t      GetBufferSize ();
 
   private:
@@ -215,15 +228,16 @@ class CryptoFileImpl: public FileImpl
     CryptoFileImpl  (const FileImplPtr& file,size_t buffer_size,const char* read_crypto_method,const void* key,size_t key_bits);
     ~CryptoFileImpl ();
 
-    size_t      Read   (void* buf,size_t size);
-    size_t      Write  (const void* buf,size_t size);
-    filepos_t   Tell   ();
-    filepos_t   Seek   (filepos_t new_pos);
-    void        Rewind ();
-    filesize_t  Size   ();
-    void        Resize (filesize_t new_size);
-    bool        Eof    ();
-    void        Flush  ();
+    const char* GetPath       ();
+    size_t      Read          (void* buf,size_t size);
+    size_t      Write         (const void* buf,size_t size);
+    filepos_t   Tell          ();
+    filepos_t   Seek          (filepos_t new_pos);
+    void        Rewind        ();
+    filesize_t  Size          ();
+    void        Resize        (filesize_t new_size);
+    bool        Eof           ();
+    void        Flush         ();
     size_t      GetBufferSize ();
 
   private:
@@ -346,6 +360,67 @@ class MountPointFileSystem: public ICustomFileSystem
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Фиктивная файловая система для хранения списка анонимных файлов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class AnonymousFileSystem: public ICustomFileSystem, public xtl::reference_counter
+{
+  public:
+    AnonymousFileSystem ();
+    ~AnonymousFileSystem ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с путями анонимных файлов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* AddFilePath        (const FileImplPtr&);
+    void        RemoveFilePath     (const FileImplPtr&);
+    void        RemoveAllFilePaths ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Захва файла по имени
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FileImplPtr RetainFile (const char* path,filemode_t mode_flags);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Переопределение основных операций
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    file_t     FileOpen    (const char* name,filemode_t mode_flags,size_t);
+    void       FileClose   (file_t);
+    size_t     FileRead    (file_t,void* buf,size_t size);
+    size_t     FileWrite   (file_t,const void* buf,size_t size);
+    void       FileRewind  (file_t);
+    filepos_t  FileSeek    (file_t,filepos_t pos);
+    filepos_t  FileTell    (file_t);
+    filesize_t FileSize    (file_t);
+    void       FileResize  (file_t,filesize_t new_size);
+    bool       FileEof     (file_t);
+    void       FileFlush   (file_t);
+    void       Remove      (const char* file_name);
+    void       Rename      (const char* file_name,const char* new_name);
+    void       Mkdir       (const char* dir_name);
+    bool       IsFileExist (const char* file_name);
+    bool       GetFileInfo (const char* file_name,FileInfo& info);
+    void       Search      (const char* mask,const FileSearchHandler&);
+    void       AddRef      ();
+    void       Release     ();
+    
+  private:
+    struct AnonymousFile
+    {
+      stl::string path;
+      FileImpl*   file;
+      
+      AnonymousFile (const char* in_path, FileImpl* in_file)
+        : path (in_path)
+        , file (in_file) { }
+    };
+
+    typedef stl::list<AnonymousFile> AnonymousFileList;
+
+  private:
+    AnonymousFileList anonymous_files; //список анономных файлов
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Смонтированная файловая система
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct MountFileSystem
@@ -405,6 +480,13 @@ class FileSystemImpl
     bool IsPathMount (const char* path) const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с путями анонимных файлов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    stl::string AddAnonymousFilePath        (const FileImplPtr&);
+    void        RemoveAnonymousFilePath     (const FileImplPtr&);
+    void        RemoveAllAnonymousFilePaths ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройка шифрования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                 SetCryptoParameters       (const char* path, const FileCryptoParameters& parameters);
@@ -444,13 +526,6 @@ class FileSystemImpl
     FileList Search (const char* wc_mask,size_t flags);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация открытых файлов / закрытие всех открытых файлов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterFile   (File&);
-    void UnregisterFile (File&);
-    void CloseAllFiles  ();
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Утилиты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const char* CompressPath (const char* path); //формирование сокращённого пути
@@ -473,24 +548,24 @@ class FileSystemImpl
     void MountSearch (FileListBuilder& builder,const char* wc_mask,const char* prefix,size_t flags);
    
   private:
-    typedef stl::hash_set<File*>                                            OpenFileSet;
     typedef stl::list<SearchPath>                                           SearchPathList;
     typedef stl::list<PackFile>                                             PackFileList;
     typedef stl::list<PackFileType>                                         PackFileTypeList;
     typedef stl::list<MountFileSystem>                                      MountList;
     typedef stl::hash_map<stl::hash_key<const char*>, FileCryptoParameters> CryptoMap;
+    typedef xtl::intrusive_ptr<AnonymousFileSystem>                         AnonymousFileSystemPtr;
 
   private:    
-    OpenFileSet       open_files;               //список открытых файлов
-    PackFileTypeList  pack_types;               //список типов пак-файлов
-    PackFileList      pack_files;               //список пак-файлов и пользовательских файловых систем
-    MountList         mounts;                   //список смонтированных файловых систем
-    SearchPathList    search_paths;             //список путей поиска
-    FileImplPtr       closed_file;              //закрытый файл
-    CryptoMap         crypto_parameters;        //параметры шифрования файлов
-    stl::string       default_path;             //путь по умолчанию (аналог текущего каталога)
-    stl::string       compress_path;            //буфер для формирования сокращённого пути
-    size_t            default_file_buffer_size; //размер буфера файла по умолчанию
+    PackFileTypeList       pack_types;               //список типов пак-файлов
+    PackFileList           pack_files;               //список пак-файлов и пользовательских файловых систем
+    MountList              mounts;                   //список смонтированных файловых систем
+    SearchPathList         search_paths;             //список путей поиска
+    FileImplPtr            closed_file;              //закрытый файл
+    AnonymousFileSystemPtr anonymous_file_system;    //система анонимных файлов
+    CryptoMap              crypto_parameters;        //параметры шифрования файлов
+    stl::string            default_path;             //путь по умолчанию (аналог текущего каталога)
+    stl::string            compress_path;            //буфер для формирования сокращённого пути
+    size_t                 default_file_buffer_size; //размер буфера файла по умолчанию
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

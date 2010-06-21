@@ -14,31 +14,20 @@ using namespace stl;
 File::File ()
   : impl (ClosedFileImpl::Instance ())
 {
-  FileSystemSingleton::Instance ()->RegisterFile (*this);
 }
 
 File::File (FileImplPtr _impl)
   : impl (_impl)
 {
-  FileSystemSingleton::Instance ()->RegisterFile (*this);
 }
 
 File::File (const File& file)
   : impl (file.impl)
 {
-  FileSystemSingleton::Instance ()->RegisterFile (*this);
 }
 
 File::~File ()
 {
-  try
-  {
-    if (FileSystemSingleton::IsInitialized ()) //если менеджера файловой системы уже уничтожен регистрация не нужна
-      FileSystemSingleton::Instance ()->UnregisterFile (*this);
-  }
-  catch (...)
-  {
-  }
 }
 
 File& File::operator = (const File& file)
@@ -46,6 +35,15 @@ File& File::operator = (const File& file)
   impl = file.impl;
 
   return *this;
+}
+
+/*
+    Получение полного пути к файлу
+*/
+
+const char* File::Path () const
+{
+  return impl->GetPath ();
 }
 
 /*
@@ -253,7 +251,16 @@ FileImplPtr File::GetImpl () const
 
 FileImpl::FileImpl (filemode_t _mode)
   : mode (_mode)
-  { }
+{
+}
+
+FileImpl::~FileImpl ()
+{
+  if (anonymous_file_path && FileSystemSingleton::IsInitialized ()) //если менеджера файловой системы уже уничтожен регистрация не нужна
+  {
+    FileSystemSingleton::Instance ()->RemoveAnonymousFilePath (this);
+  }
+}
 
 size_t FileImpl::Read (void*,size_t)
 {
@@ -297,4 +304,17 @@ bool FileImpl::Eof ()
 
 void FileImpl::Flush ()
 {
+}
+
+void FileImpl::ResetPath ()
+{
+  anonymous_file_path = 0;
+}
+
+const char* FileImpl::GetPath ()
+{
+  if (!anonymous_file_path)
+    anonymous_file_path = stl::auto_ptr<stl::string> (new stl::string (FileSystemSingleton::Instance ()->AddAnonymousFilePath (this)));
+
+  return anonymous_file_path->c_str ();
 }

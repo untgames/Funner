@@ -132,6 +132,15 @@ BufferedFileImpl::~BufferedFileImpl ()
 }
 
 /*
+    Получение пути к файлу
+*/
+
+const char* BufferedFileImpl::GetPath ()
+{
+  return impl->base_file->GetPath ();
+}
+
+/*
     Размер буфера
 */
 

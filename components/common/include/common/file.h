@@ -111,16 +111,16 @@ class ICustomFileSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef void* file_t;
 
-    virtual file_t     FileOpen   (const char* name,filemode_t mode_flags,size_t buffer_size) = 0;
+    virtual file_t     FileOpen   (const char* name, filemode_t mode_flags, size_t buffer_size) = 0;
     virtual void       FileClose  (file_t) = 0;
     virtual size_t     FileBufferSize (file_t) { return 0; } //ret (size_t)-1 - буферизация невозможна
-    virtual size_t     FileRead   (file_t,void* buf,size_t size) = 0;
-    virtual size_t     FileWrite  (file_t,const void* buf,size_t size) = 0;
+    virtual size_t     FileRead   (file_t, void* buf, size_t size) = 0;
+    virtual size_t     FileWrite  (file_t, const void* buf, size_t size) = 0;
     virtual void       FileRewind (file_t) = 0;
-    virtual filepos_t  FileSeek   (file_t,filepos_t pos) = 0;
+    virtual filepos_t  FileSeek   (file_t, filepos_t pos) = 0;
     virtual filepos_t  FileTell   (file_t) = 0;
     virtual filesize_t FileSize   (file_t) = 0;
-    virtual void       FileResize (file_t,filesize_t new_size) = 0; 
+    virtual void       FileResize (file_t, filesize_t new_size) = 0; 
     virtual bool       FileEof    (file_t) = 0;    
     virtual void       FileFlush  (file_t) = 0;
 
@@ -128,21 +128,21 @@ class ICustomFileSystem
 ///Управление расположением файлов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void Remove (const char* file_name) = 0;
-    virtual void Rename (const char* file_name,const char* new_name) = 0;
+    virtual void Rename (const char* file_name, const char* new_name) = 0;
     virtual void Mkdir  (const char* dir_name) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение информации о файле
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual bool IsFileExist (const char* file_name) = 0;
-    virtual bool GetFileInfo (const char* file_name,FileInfo& info) = 0;
+    virtual bool GetFileInfo (const char* file_name, FileInfo& info) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (const char* file, const FileInfo& info)> FileSearchHandler;
 
-    virtual void Search (const char* wc_mask,const FileSearchHandler& handler) = 0;
+    virtual void Search (const char* wc_mask, const FileSearchHandler& handler) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подсчёт ссылок
@@ -176,6 +176,11 @@ class File
 ///Присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     File& operator = (const File&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение пути к файлу
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* Path () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Режим работы файла
@@ -194,14 +199,14 @@ class File
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение / запись
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Read  (void* buf,size_t size);
-    size_t Write (const void* buf,size_t size);
+    size_t Read  (void* buf, size_t size);
+    size_t Write (const void* buf, size_t size);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Файловый указатель
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void      Rewind ();
-    filepos_t Seek   (filepos_t pos,FileSeekMode mode = FileSeekMode_Set);
+    filepos_t Seek   (filepos_t pos, FileSeekMode mode = FileSeekMode_Set);
     filepos_t Tell   () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -245,8 +250,8 @@ class File
 class StdFile: public File
 {
   public:
-    StdFile (const char* file_name,filemode_t mode_flags);
-    StdFile (const char* file_name,filemode_t mode_flags,size_t buffer_size);
+    StdFile (const char* file_name, filemode_t mode_flags);
+    StdFile (const char* file_name, filemode_t mode_flags, size_t buffer_size);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,7 +261,7 @@ class InputFile: public StdFile
 {
   public:
     explicit InputFile (const char* file_name);
-             InputFile (const char* file_name,size_t buffer_size);
+             InputFile (const char* file_name, size_t buffer_size);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -266,7 +271,7 @@ class OutputFile: public StdFile
 {
   public:
     explicit OutputFile (const char* file_name);
-             OutputFile (const char* file_name,size_t buffer_size);
+             OutputFile (const char* file_name, size_t buffer_size);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -276,7 +281,7 @@ class AppendFile: public StdFile
 {
   public:
     explicit AppendFile (const char* file_name);
-             AppendFile (const char* file_name,size_t buffer_size);
+             AppendFile (const char* file_name, size_t buffer_size);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,7 +290,7 @@ class AppendFile: public StdFile
 class MemFile: public File
 {
   public:
-    MemFile (void* buf,size_t size,filemode_t mode_flags=FileMode_ReadWrite);
+    MemFile (void* buf, size_t size, filemode_t mode_flags = FileMode_Write | FileMode_Read | FileMode_Seek | FileMode_Rewind);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -294,10 +299,10 @@ class MemFile: public File
 class CustomFile: public File
 {
   public:
-    CustomFile (ICustomFileSystemPtr file_system,const char* file_name,filemode_t mode);
-    CustomFile (ICustomFileSystemPtr      file_system,
-                ICustomFileSystem::file_t handle,
-                filemode_t                mode,
+    CustomFile (ICustomFileSystemPtr file_system, const char* file_name, filemode_t mode);
+    CustomFile (ICustomFileSystemPtr      file_system, 
+                ICustomFileSystem::file_t handle, 
+                filemode_t                mode, 
                 bool                      auto_close = false);
 };
 
@@ -307,14 +312,14 @@ class CustomFile: public File
 class CryptoFile: public File
 {
   public:
-    CryptoFile (const File& source_file,
-                const char* read_crypto_method,
-                const void* key,
+    CryptoFile (const File& source_file, 
+                const char* read_crypto_method, 
+                const void* key, 
                 size_t      key_bits);
-    CryptoFile (const File& source_file,
-                const char* read_crypto_method,
-                const char* write_crypto_method,
-                const void* key,
+    CryptoFile (const File& source_file, 
+                const char* read_crypto_method, 
+                const char* write_crypto_method, 
+                const void* key, 
                 size_t      key_bits);
 };
 
@@ -445,8 +450,8 @@ class FileCryptoParameters
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    FileCryptoParameters  (const char* read_method,const char* write_method,const void* key,size_t key_bits);
-    FileCryptoParameters  (const char* read_method,const char* write_method,const char* key_string);
+    FileCryptoParameters  (const char* read_method, const char* write_method, const void* key, size_t key_bits);
+    FileCryptoParameters  (const char* read_method, const char* write_method, const char* key_string);
     FileCryptoParameters  (const FileCryptoParameters&);
     ~FileCryptoParameters ();
 
@@ -489,21 +494,21 @@ class FileSystem
 ///Добавление путей поиска
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void AddSearchPath        (const char* path);
-    static void AddSearchPath        (const char* path,const LogHandler& log_handler);
+    static void AddSearchPath        (const char* path, const LogHandler& log_handler);
     static void RemoveSearchPath     (const char* path);
     static void RemoveAllSearchPaths ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление / удаление пользовательских типов пак-файлов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterPackFile   (const char* extension,const PackFileCreater& creater);
+    static void RegisterPackFile   (const char* extension, const PackFileCreater& creater);
     static void UnregisterPackFile (const char* extension);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Монтирование пользовательской файловой системы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void Mount       (const char* path_prefix,ICustomFileSystemPtr file_system);
-    static void Mount       (const char* path_prefix,const char* path,const char* force_extension=0);
+    static void Mount       (const char* path_prefix, ICustomFileSystemPtr file_system);
+    static void Mount       (const char* path_prefix, const char* path, const char* force_extension=0);
     static void Unmount     (const char* path_prefix);
     static void Unmount     (ICustomFileSystemPtr file_system);
     static void UnmountAll  ();
@@ -512,10 +517,10 @@ class FileSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Настройка шифрования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void SetCryptoParameters (const char* path,
-                                     const char* read_crypto_method,
-                                     const char* write_crypto_method,
-                                     const void* key,
+    static void SetCryptoParameters (const char* path, 
+                                     const char* read_crypto_method, 
+                                     const char* write_crypto_method, 
+                                     const void* key, 
                                      size_t      key_bits);
     static void                 SetCryptoParameters       (const char* path, const FileCryptoParameters& parameters);
     static bool                 HasCryptoParameters       (const char* path);
@@ -532,13 +537,13 @@ class FileSystem
 ///Удаление / переименование файла, создание каталога
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void Remove (const char* file_name);
-    static void Rename (const char* file_name,const char* new_name);
+    static void Rename (const char* file_name, const char* new_name);
     static void Mkdir  (const char* dir_name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о файле
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static bool       GetFileInfo (const char* file_name,FileInfo& info);
+    static bool       GetFileInfo (const char* file_name, FileInfo& info);
     static bool       IsFileExist (const char* file_name);
     static bool       IsDir       (const char* file_name);
     static filetime_t GetFileTime (const char* file_name);
@@ -547,13 +552,13 @@ class FileSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рассчёт хэш сумм содержимого файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////        
-    static void GetFileHash (File& file,FileHash& out_hash_value);
-    static void GetFileHash (const char* file_name,FileHash& out_hash_value);
+    static void GetFileHash (File& file, FileHash& out_hash_value);
+    static void GetFileHash (const char* file_name, FileHash& out_hash_value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о файле
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static FileList Search (const char* wc_mask,size_t flags=FileSearch_FilesAndDirs);
+    static FileList Search (const char* wc_mask, size_t flags=FileSearch_FilesAndDirs);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка размера буфера файла по умолчанию

@@ -70,7 +70,7 @@ void parse_format_string (const char* format_string, const xtl::function<void (c
 */
 
 StringArray parse   (const char* string,const char* re_pattern, const char* flags="");
-stl::string  replace (const char* string,const char* re_pattern,const char* replacement, const char* flags="");
+stl::string replace (const char* string,const char* re_pattern,const char* replacement, const char* flags="");
 
 bool rematch  (const char* string,const char* re_pattern, const char* flags="");
 bool wcmatch  (const char* string,const char* wildcard);
