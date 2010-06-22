@@ -280,58 +280,80 @@ ILint ILAPIENTRY devil_file_write (const void* buffer, ILuint size, ILuint count
    Компонент работы с DevIL картинками
 */
 
+enum DevILComponentType
+{
+  DevILComponentType_Loaders,
+  DevILComponentType_Savers
+};
+
+int devil_init_count = 0; //количество инициализаций DevILComponent
+
+template <DevILComponentType type>
 class DevILComponent
 {
   public:
     //загрузка компонента
     DevILComponent ()
     {
-//      ilSetMemory (&devil_allocate, &devil_deallocate); //Необходимо вызывать до вызова ilInit ();
+      if (!devil_init_count++)
+      {
+  //      ilSetMemory (&devil_allocate, &devil_deallocate); //Необходимо вызывать до вызова ilInit ();
 
-      ilInit ();
+        ilInit ();
 
-      ilSetRead  (&devil_file_open_read_only, &devil_file_close, &devil_file_eof, &devil_file_getc,  //Необходимо вызывать после вызова ilInit ();
-                  &devil_file_read, &devil_file_seek, &devil_file_tell);
-      ilSetWrite (&devil_file_open_write_only, &devil_file_close, &devil_file_putc, &devil_file_seek,
-                  &devil_file_tell, &devil_file_write);
+        ilSetRead  (&devil_file_open_read_only, &devil_file_close, &devil_file_eof, &devil_file_getc,  //Необходимо вызывать после вызова ilInit ();
+                    &devil_file_read, &devil_file_seek, &devil_file_tell);
+        ilSetWrite (&devil_file_open_write_only, &devil_file_close, &devil_file_putc, &devil_file_seek,
+                    &devil_file_tell, &devil_file_write);
 
-      iluInit      ();
-      ilEnable     (IL_FILE_OVERWRITE);
-      ilEnable     (IL_ORIGIN_SET);
-      ilOriginFunc (IL_ORIGIN_LOWER_LEFT);
+        iluInit      ();
+        ilEnable     (IL_FILE_OVERWRITE);
+        ilEnable     (IL_ORIGIN_SET);
+        ilOriginFunc (IL_ORIGIN_LOWER_LEFT);                
+      }            
 
-      ImageManager::RegisterLoader ("jpg",     &Image::DefaultLoader);
-      ImageManager::RegisterLoader ("png",     &Image::DefaultLoader);
-      ImageManager::RegisterLoader ("bmp",     &Image::DefaultLoader);
-      ImageManager::RegisterLoader ("tga",     &Image::DefaultLoader);
-      ImageManager::RegisterLoader ("tif",     &Image::DefaultLoader);
-      ImageManager::RegisterLoader ("ico",     &Image::DefaultLoader);      
-      ImageManager::RegisterLoader ("dds",     &Image::DefaultLoader);
-      ImageManager::RegisterLoader ("psd",     &Image::DefaultLoader);
-      ImageManager::RegisterLoader ("cubemap", &Image::CubemapLoader);
-      ImageManager::RegisterLoader ("skybox",  &Image::SkyBoxLoader);
-
-      ImageManager::RegisterSaver  ("jpg",     &Image::DefaultSaver);
-      ImageManager::RegisterSaver  ("png",     &Image::DefaultSaver);
-      ImageManager::RegisterSaver  ("bmp",     &Image::DefaultSaver);
-      ImageManager::RegisterSaver  ("tga",     &Image::DefaultSaver);
-      ImageManager::RegisterSaver  ("ico",     &Image::DefaultSaver);
-      ImageManager::RegisterSaver  ("cubemap", &Image::DefaultSaver);
-      ImageManager::RegisterSaver  ("skybox",  &Image::DefaultSaver);
-      ImageManager::RegisterSaver  ("dds",     &Image::DefaultSaver);
+      switch (type)
+      {
+        case DevILComponentType_Loaders:
+          ImageManager::RegisterLoader ("jpg",     &Image::DefaultLoader);
+          ImageManager::RegisterLoader ("png",     &Image::DefaultLoader);
+          ImageManager::RegisterLoader ("bmp",     &Image::DefaultLoader);
+          ImageManager::RegisterLoader ("tga",     &Image::DefaultLoader);
+          ImageManager::RegisterLoader ("tif",     &Image::DefaultLoader);
+          ImageManager::RegisterLoader ("ico",     &Image::DefaultLoader);      
+          ImageManager::RegisterLoader ("dds",     &Image::DefaultLoader);
+          ImageManager::RegisterLoader ("psd",     &Image::DefaultLoader);
+          ImageManager::RegisterLoader ("cubemap", &Image::CubemapLoader);
+          ImageManager::RegisterLoader ("skybox",  &Image::SkyBoxLoader);
+          break;
+        case DevILComponentType_Savers:        
+          ImageManager::RegisterSaver  ("jpg",     &Image::DefaultSaver);
+          ImageManager::RegisterSaver  ("png",     &Image::DefaultSaver);
+          ImageManager::RegisterSaver  ("bmp",     &Image::DefaultSaver);
+          ImageManager::RegisterSaver  ("tga",     &Image::DefaultSaver);
+          ImageManager::RegisterSaver  ("ico",     &Image::DefaultSaver);
+          ImageManager::RegisterSaver  ("cubemap", &Image::DefaultSaver);
+          ImageManager::RegisterSaver  ("skybox",  &Image::DefaultSaver);
+          ImageManager::RegisterSaver  ("dds",     &Image::DefaultSaver);
+          break;
+        default:
+          break;
+      }
     }
 
     //выгрузка компонента
     ~DevILComponent ()
     {
-      ilShutDown ();
+      if (!--devil_init_count)
+        ilShutDown ();
     }
 };
 
 extern "C"
 {
 
-ComponentRegistrator<DevILComponent> DevIL ("media.image.loaders.DevIL");
+ComponentRegistrator<DevILComponent<DevILComponentType_Loaders> > DevILLoaders ("media.image.loaders.DevIL");
+ComponentRegistrator<DevILComponent<DevILComponentType_Savers> > DevILSavers ("media.image.savers.DevIL");
 
 }
 

@@ -4,7 +4,7 @@ export.compile.media.image.IMPORTS      := compile.math.vecmath compile.common
 
 # Link exports
 export.link.media.image.LIBS             := funner.media.image
-export.link.media.image.LINK_INCLUDES    := DevIL
+export.link.media.image.LINK_INCLUDES    := DevILLoaders DevILSavers
 export.link.media.image.IMPORTS          := link.common link.extern.devil
 
 # XAtlas link exports
