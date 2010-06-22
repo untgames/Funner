@@ -2,6 +2,7 @@
 
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/reference_counter.h>
 
 #include <common/log.h>
 

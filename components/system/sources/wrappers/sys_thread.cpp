@@ -57,10 +57,13 @@ typedef common::Singleton <ThreadManager> ThreadManagerSingleton;
     Описание реализации нити
 */
 
-struct Thread::Impl: public IThreadCallback, public xtl::reference_counter
+struct Thread::Impl: public IThreadCallback, public xtl::reference_counter, public Lockable
 {
+  typedef xtl::lock_ptr<Impl, xtl::intrusive_ptr<Impl> > LockPtr;
+
   Function           thread_function;  //функция нити
   Platform::thread_t handle;           //идентификатор нити
+  size_t             id;               //численный идентификатор нити
   stl::string        name;             //имя нити
   int                exit_code;        //код выхода нити
   bool               cancel_requested; //был ли получен запрос на отмену нити
@@ -69,9 +72,21 @@ struct Thread::Impl: public IThreadCallback, public xtl::reference_counter
   Impl (const char* in_name, const Function& in_thread_function)
     : thread_function (in_thread_function)
     , name (in_name)
-    , cancel_requested (false)
+    , cancel_requested (false)    
   {
-    handle = Platform::CreateThread (this);
+    try
+    {
+      addref (this);
+      
+      handle = Platform::CreateThread (this);
+    }
+    catch (...)
+    {
+      release (this);
+      throw;
+    }
+
+    id = Platform::GetThreadId (handle);
   }
 
 ///Деструктор
@@ -92,8 +107,11 @@ struct Thread::Impl: public IThreadCallback, public xtl::reference_counter
   {
     try
     {
+      release (this); //компенсация увеличения ссылок в конструкторе
+      
       try
       {
+        id        = Platform::GetCurrentThreadId ();
         exit_code = thread_function ();
       }
       catch (std::exception& exception)
@@ -164,11 +182,22 @@ Thread::Thread (const char* name, const Function& thread_function)
 
 Thread::~Thread ()
 {
+  Lock lock (*impl);
+
   ThreadManagerSingleton::Instance manager = ThreadManagerSingleton::Instance ();
 
   manager->RemoveThread (Platform::GetThreadId (impl->handle));
 
   release (impl);
+}
+
+/*
+    Идентификатор нити
+*/
+
+Thread::threadid_t Thread::Id () const
+{
+  return Impl::LockPtr (impl)->id;
 }
 
 /*
@@ -186,7 +215,7 @@ Thread::~Thread ()
 
 void Thread::Cancel ()
 {
-  impl->cancel_requested = true;
+  Impl::LockPtr (impl)->cancel_requested = true;
 }
 
 /*
@@ -195,9 +224,11 @@ void Thread::Cancel ()
 
 int Thread::Join ()
 {
-  Platform::JoinThread (impl->handle);
+  Impl::LockPtr thread_impl (impl);
 
-  return impl->exit_code;
+  Platform::JoinThread (thread_impl->handle);
+
+  return thread_impl->exit_code;
 }
 
 /*
@@ -225,7 +256,7 @@ Thread& Thread::GetCurrent ()
 
 void Thread::TestCancel ()
 {
-  Impl* current_thread_impl;
+  Impl::LockPtr current_thread_impl;
 
   try
   {
@@ -237,7 +268,7 @@ void Thread::TestCancel ()
     throw;
   }
 
-  if  (!current_thread_impl->cancel_requested)
+  if (!current_thread_impl->cancel_requested)
     return;
 
   current_thread_impl->exit_code = THREAD_CANCELED_EXIT_CODE;

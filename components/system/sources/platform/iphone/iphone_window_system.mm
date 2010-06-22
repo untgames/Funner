@@ -64,7 +64,7 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
     WindowImpl            *window_impl;        //окно
     ListenerArray         *listeners;          //подписчика на событи€
     TouchDescriptionArray *touch_descriptions; //массив дл€ хранени€ описаний текущего событи€
-    WindowEventContext    event_context;      //контекст, передаваемый обработчикам событий
+    WindowEventContext    *event_context;      //контекст, передаваемый обработчикам событий
 }
 
 @property (nonatomic, readwrite) WindowImpl* window_impl;
@@ -100,6 +100,7 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 {
   delete touch_descriptions;
   delete listeners;
+  delete event_context;
 
   [super dealloc];
 }
@@ -115,20 +116,20 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
   if (self)
   {
-    window_impl          = 0;
-    listeners            = 0;
-    touch_descriptions   = 0;
-    event_context.handle = self;
-
     [self layer].delegate = self;
 
     try
     {
-      listeners          = new ListenerArray ();
+      event_context = new WindowEventContext;
+
+      event_context->handle = self;
+
+      listeners          = new ListenerArray;
       touch_descriptions = new TouchDescriptionArray (DEFAULT_TOUCH_BUFFER_SIZE);
     }
     catch (...)
     {
+      delete event_context;
       delete listeners;
       delete touch_descriptions;
 
@@ -235,7 +236,7 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
 -(WindowEventContext&) getEventContext
 {
-  return event_context;
+  return *event_context;
 }
 
 /*
@@ -298,6 +299,15 @@ void Platform::DestroyWindow (window_t handle)
   window->Notify (WindowEvent_OnDestroy, [(UIWindowWrapper*)handle getEventContext]);
 
   delete window;
+}
+
+/*
+    ѕолучение платформо-зависимого дескриптора окна
+*/
+
+const void* Platform::GetNativeWindowHandle (window_t handle)
+{
+  return reinterpret_cast<const void*> (handle);
 }
 
 /*

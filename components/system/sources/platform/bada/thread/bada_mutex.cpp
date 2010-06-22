@@ -1,15 +1,12 @@
-#include "shared.h"
+#include "../shared.h"
 
 using namespace syslib;
+using namespace syslib::bada;
 
 struct Platform::mutex_handle
 {
-  HANDLE mutex;
+  Osp::Base::Runtime::Mutex mutex;
 };
-
-#ifdef CreateMutex
-  #undef CreateMutex
-#endif
 
 //создание исключающего семафора
 Platform::mutex_t Platform::CreateMutex ()
@@ -18,16 +15,16 @@ Platform::mutex_t Platform::CreateMutex ()
   {
     stl::auto_ptr<mutex_handle> handle (new mutex_handle);
 
-    handle->mutex = CreateMutexA (0, FALSE, 0);
+    result r = handle->mutex.Create ();
 
-    if (!handle->mutex)
-      raise_error ("::CreateMutex");
+    if (IsFailed (r))
+      raise ("Osp::Base::Runtime::Mutex::Create", r);
 
     return handle.release ();
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Win32Platform::CreateMutex");
+    exception.touch ("syslib::BadaPlatform::CreateMutex");
     throw;
   }
 }
@@ -35,10 +32,8 @@ Platform::mutex_t Platform::CreateMutex ()
 //удаление исключающего семафора
 void Platform::DestroyMutex (mutex_t handle)
 {
-  if (!handle || !handle->mutex)
+  if (!handle)
     return;
-
-  CloseHandle (handle->mutex);
 
   delete handle;
 }
@@ -57,12 +52,14 @@ void Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "mutex");
 
-    if (WaitForSingleObject (handle->mutex, wait_in_milliseconds) == WAIT_FAILED)
-      raise_error ("::WaitForSingleObject");
+    result r = handle->mutex.Acquire (wait_in_milliseconds);
+
+    if (IsFailed (r))
+      raise ("Osp::Base::Runtime::Mutex::Acquire", r);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Win32Platform::LockMutex(mutex_t, size_t)");
+    exception.touch ("syslib::BadaPlatform::LockMutex(mutex_t, size_t)");
     throw;
   }
 }
@@ -73,23 +70,22 @@ bool Platform::TryLockMutex (mutex_t handle)
   try
   {
     if (!handle)
-      throw xtl::make_null_argument_exception ("", "mutex");
+      throw xtl::make_null_argument_exception ("", "handle");
 
-    DWORD status = WaitForSingleObject (handle->mutex, 0);
+    result r = handle->mutex.Acquire (0);   //!!!!!!!!need testing
 
-    switch (status)
+    switch (r)
     {
-      case WAIT_ABANDONED:
-      case WAIT_OBJECT_0:  return true;
-      case WAIT_TIMEOUT:   return false;
+      case E_SUCCESS: return true;
+      case E_TIMEOUT: return false;
       default:
-        raise_error ("::WaitForSingleObject");
+        raise ("Osp::Base::Runtime::Mutex::Acquire", r);
         return false;
     }
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Win32Platform::TryLockMutex");
+    exception.touch ("syslib::BadaPlatform::TryLockMutex");
     throw;
   }
 }
@@ -102,12 +98,14 @@ void Platform::UnlockMutex (mutex_t handle)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "mutex");
 
-    if (!ReleaseMutex (handle->mutex))
-      raise_error ("::ReleaseMutex");
+    result r = handle->mutex.Release ();
+
+    if (IsFailed (r))
+      raise ("Osp::Base::Runtime::Mutex::Release", r);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Win32Platform::UnlockMutex");
+    exception.touch ("syslib::BadaPlatform::UnlockMutex");
     throw;
   }
 }

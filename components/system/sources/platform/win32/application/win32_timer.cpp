@@ -1,4 +1,4 @@
-#include "shared.h"
+#include "../shared.h"
 
 using namespace syslib;
 using namespace common;
@@ -105,16 +105,6 @@ VOID CALLBACK Win32Timer::TimerProc (HWND, UINT, UINT_PTR timer, DWORD)
     //подавл€ем все исключени€
     //в будущем желательно протоколировать информацию об исключени€х в Platform::DebugLog
   }
-}
-
-/*
-    ѕриостановка выполнени€ приложени€ на miliseconds милисекунд
-*/
-
-void Platform::Sleep (size_t miliseconds)
-{
-  SetLastError (0);
-  ::Sleep (miliseconds);
 }
 
 /*

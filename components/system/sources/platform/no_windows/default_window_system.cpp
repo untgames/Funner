@@ -38,6 +38,15 @@ void Platform::DestroyWindow (window_t)
 }
 
 /*
+    Получение платформо-зависимого дескриптора окна
+*/
+
+const void* Platform::GetNativeWindowHandle (window_t)
+{
+  raise ("syslib::DefaultPlatform::GetNativeWindowHandle");
+}
+
+/*
     Заголовок окна
 */
 

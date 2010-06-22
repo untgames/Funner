@@ -317,7 +317,7 @@ void bind (PropertyMap& map, const char* property_name, xtl::function<void (Valu
 template <class Value>
 void bind (PropertyMap& map, const char* property_name, xtl::function<Value ()>& get_fn)
 {
-  map.BindProperty (property_name, new detail::PropertyFunctionGetter<Value, xtl::function<Value ()> > (get_fn));
+  map.BindProperty (property_name, new detail::PropertyFunctionGetter<xtl::function<Value ()> > (get_fn));
 }
 
 template <class Value>

@@ -420,7 +420,15 @@ bool Window::IsClosed () const
 
 const void* Window::Handle () const
 {
-  return impl->Handle ();
+  try
+  {
+    return Platform::GetNativeWindowHandle (impl->Handle ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Window::Handle");
+    throw;
+  }
 }
 
 /*

@@ -1,4 +1,4 @@
-#include "shared.h"
+#include "../shared.h"
 
 using namespace syslib;
 using namespace common;
@@ -33,8 +33,8 @@ struct WindowImpl
     : user_data (in_user_data)
     , message_handler (handler)
     , is_cursor_visible (true)
-    , cursor (LoadCursor (GetApplicationInstance (), IDC_ARROW))
     , is_cursor_in_window (false)
+    , cursor (LoadCursor (GetApplicationInstance (), IDC_ARROW))    
   {
   }
 
@@ -575,6 +575,15 @@ void Platform::DestroyWindow (window_t handle)
     exception.touch ("syslib::Win32Platform::DestroyWindow");
     throw;
   }
+}
+
+/*
+    Получение платформо-зависимого дескриптора окна
+*/
+
+const void* Platform::GetNativeWindowHandle (window_t handle)
+{
+  return reinterpret_cast<const void*> (handle);
 }
 
 /*

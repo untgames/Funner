@@ -751,7 +751,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
 
 void Platform::CloseWindow (window_t handle)
 {
-  EventRef close_window_event;
+  EventRef close_window_event = 0;
 
   try
   {
@@ -763,14 +763,20 @@ void Platform::CloseWindow (window_t handle)
   }
   catch (xtl::exception& exception)
   {
+    if (close_window_event)
+      ReleaseEvent (close_window_event);
+
     exception.touch ("syslib::CarbonPlatform::CloseWindow");
     throw;
   }
+
+  if (close_window_event)
+    ReleaseEvent (close_window_event);
 }
 
 void Platform::DestroyWindow (window_t handle)
 {
-  EventRef closed_window_event;
+  EventRef closed_window_event = 0;
 
   try
   {
@@ -782,9 +788,24 @@ void Platform::DestroyWindow (window_t handle)
   }
   catch (xtl::exception& exception)
   {
+    if (closed_window_event)
+      ReleaseEvent (closed_window_event);
+
     exception.touch ("syslib::CarbonPlatform::DestroyWindow");
     throw;
   }
+
+  if (closed_window_event)
+    ReleaseEvent (closed_window_event);
+}
+
+/*
+    Получение платформо-зависимого дескриптора окна
+*/
+
+const void* Platform::GetNativeWindowHandle (window_t handle)
+{
+  return reinterpret_cast<const void*> (handle);
 }
 
 /*

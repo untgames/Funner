@@ -1,4 +1,4 @@
-#include "shared.h"
+#include "../shared.h"
 
 using namespace syslib;
 using namespace common;

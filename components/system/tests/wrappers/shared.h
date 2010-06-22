@@ -5,6 +5,7 @@
 #include <xtl/bind.h>
 #include <xtl/ref.h>
 
+#include <common/action_queue.h>
 #include <common/time.h>
 
 #include <syslib/window.h>

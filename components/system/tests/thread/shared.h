@@ -7,6 +7,7 @@
 #include <xtl/function.h>
 #include <xtl/shared_ptr.h>
 
+#include <common/action_queue.h>
 #include <common/lockable.h>
 #include <common/log.h>
 #include <common/time.h>
@@ -22,6 +23,7 @@ using namespace common;
 void print_log (const char* log, const char* message)
 {
   printf ("%s: %s\n", log, message);
+  fflush (stdout);
 }
 
 #endif
