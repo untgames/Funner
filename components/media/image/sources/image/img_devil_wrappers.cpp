@@ -305,6 +305,7 @@ class DevILComponent
       ImageManager::RegisterLoader ("bmp",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("tga",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("tif",     &Image::DefaultLoader);
+      ImageManager::RegisterLoader ("ico",     &Image::DefaultLoader);      
       ImageManager::RegisterLoader ("dds",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("psd",     &Image::DefaultLoader);
       ImageManager::RegisterLoader ("cubemap", &Image::CubemapLoader);
@@ -314,6 +315,7 @@ class DevILComponent
       ImageManager::RegisterSaver  ("png",     &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("bmp",     &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("tga",     &Image::DefaultSaver);
+      ImageManager::RegisterSaver  ("ico",     &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("cubemap", &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("skybox",  &Image::DefaultSaver);
       ImageManager::RegisterSaver  ("dds",     &Image::DefaultSaver);
@@ -329,7 +331,7 @@ class DevILComponent
 extern "C"
 {
 
-ComponentRegistrator<DevILComponent> DevIL ("media.image.DevIL");
+ComponentRegistrator<DevILComponent> DevIL ("media.image.loaders.DevIL");
 
 }
 

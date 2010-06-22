@@ -26,7 +26,7 @@ Image::Image (const char* file_name, PixelFormat format)
 
   try
   {
-    static ComponentLoader loader ("media.image.*");
+    static ComponentLoader loader ("media.image.loaders.*");
 
     ImageManager::GetLoader (file_name, SerializerFindMode_ByName) (file_name, *this);
     

@@ -2,7 +2,7 @@
 #Определения и константы
 ###################################################################################################
 TARGETS := MEDIA.IMAGE.SOURCES MEDIA.XATLAS.SOURCES MEDIA.LEFT_BOTTOM_PACKER.SOURCES MEDIA.PVR_LOADER.SOURCES  \
-           MEDIA.IMAGE.TESTS \
+           MEDIA.IMAGE.ANI_CURSORS MEDIA.IMAGE.TESTS \
            MEDIA.IMAGE.SPRITE_COMPOSER MEDIA.IMAGE.PSD_EXPORTER.SOURCES \
            MEDIA.IMAGE.PSD_EXPORTER.TESTS MEDIA.XATLAS_BUILDER.SOURCES MEDIA.XATLAS_BUILDER.TESTS
 
@@ -31,18 +31,18 @@ MEDIA.PVR_LOADER.SOURCES.NAME         := funner.media.image.pvr_loader
 MEDIA.PVR_LOADER.SOURCES.SOURCE_DIRS  := sources/compressed_image_loaders/pvr
 MEDIA.PVR_LOADER.SOURCES.IMPORTS      := compile.media.image
 
-#Цель - DDS loader
-MEDIA.DDS_LOADER.SOURCES.TYPE         := static-lib
-MEDIA.DDS_LOADER.SOURCES.NAME         := funner.media.image.dds_loader
-MEDIA.DDS_LOADER.SOURCES.SOURCE_DIRS  := sources/compressed_image_loaders/dds
-MEDIA.DDS_LOADER.SOURCES.IMPORTS      := compile.media.image
+#Цель - ANI cursors
+MEDIA.IMAGE.ANI_CURSORS.TYPE        := static-lib
+MEDIA.IMAGE.ANI_CURSORS.NAME        := funner.media.image.ani_cursors
+MEDIA.IMAGE.ANI_CURSORS.SOURCE_DIRS := sources/ani_cursors
+MEDIA.IMAGE.ANI_CURSORS.IMPORTS     := compile.media.image
 
 #Цель - Image tests
 MEDIA.IMAGE.TESTS.TYPE         := test-suite
 MEDIA.IMAGE.TESTS.INCLUDE_DIRS := ../../math/bound_volumes/include
 MEDIA.IMAGE.TESTS.SOURCE_DIRS  := tests/image tests/atlas
 MEDIA.IMAGE.TESTS.IMPORTS      := compile.media.image link.media.image link.media.image.xatlas \
-                                  link.media.image.left_bottom_packer run.extern.devil link.media.image.pvr
+                                  link.media.image.left_bottom_packer run.extern.devil link.media.image.pvr link.media.image.ani_cursor_loader
 
 #Цель - Sprite composer sources
 MEDIA.IMAGE.SPRITE_COMPOSER.TYPE        := application
