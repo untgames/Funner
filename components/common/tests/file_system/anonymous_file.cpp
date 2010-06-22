@@ -1,3 +1,4 @@
+#include <stl/string>
 #include <common/file.h>
 #include <stdio.h>
 

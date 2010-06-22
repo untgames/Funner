@@ -15,6 +15,7 @@ void ClosedFileImpl::Raise (const char* source)
 const char* ClosedFileImpl::GetPath ()
 {
   Raise ("File::GetPath");
+  return "";
 }
 
 size_t ClosedFileImpl::Read (void*,size_t)

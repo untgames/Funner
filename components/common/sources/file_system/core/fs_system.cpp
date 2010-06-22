@@ -692,7 +692,7 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
 
     size_t self_buffer_size = base_file->GetBufferSize ();
 
-    if (!buffer_size || self_buffer_size >= buffer_size || self_buffer_size >= base_file->Size () && !(base_file->Mode () & FileMode_Resize))
+    if (!buffer_size || self_buffer_size >= buffer_size || (self_buffer_size >= base_file->Size () && !(base_file->Mode () & FileMode_Resize)))
       return base_file;
 
     if (base_file->Size () < default_file_buffer_size && !(mode_flags & (FileMode_Resize|FileMode_Write)))
