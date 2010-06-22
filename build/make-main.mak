@@ -12,7 +12,6 @@ COMPONENT_CONFIGURATION_FILE_SHORT_NAME ?= component.mak #Базовое имя файла конф
 EXPORT_FILE_SHORT_NAME                  ?= export.mak    #Базовое имя файла экспорта
 PROCESS_DIR_CONFIG_FILE_SHORT_NAME      ?= config.mak    #Базовое имя файла конфигурации обработки директории
 TMP_DIR_SHORT_NAME                      ?= tmp           #Базовое имя каталога с временными файлами
-TMP_DIR_SHORT_NAME                      ?= tmp           #Базовое имя каталога с временными файлами сборки
 DEFAULT_INSTALLATION_FILES              ?= data                 #Список файлов, папок и файловых масок, инсталлируемых по умолчанию
 DIST_DIR_SHORT_NAME                     ?= dist          #Базовое имя каталога с результатами сборки
 PCH_SHORT_NAME                          ?= pch.h         #Базовое имя PCH файла
@@ -34,6 +33,7 @@ UNINSTALL_TOOL                          := tools.uninstall      #Имя макроса ути
 RUN_TOOL                                := tools.run            #Имя макроса утилиты запуска приложения
 DLL_PATH                                := PATH                 #Имя переменной среды для указания путей к длл-файлам
 AUTO_COMPILER_DEFINES                   := NAME TYPE LINK_INCLUDES_COMMA COMPILER_CFLAGS EXECUTION_DIR
+DEFAULT_INSTALLATION_FILES              := data                 #Список файлов, папок и файловых масок, инсталлируемых по умолчанию
 INSTALLATION_FLAG_SUFFIX                := .installation-flag   #Суффикс инсталляционных флагов
 
 ###################################################################################################
