@@ -107,8 +107,6 @@ class Converter
       {
         dst_vertex->position = src_vertex->coord;
         dst_vertex->normal   = src_vertex->normal;
-//        dst_vertex->tangent  = src_vertex->tangent;
-//        dst_vertex->binormal = src_vertex->binormal;
       }
 
         //добавление потока в карту вершинных потоков поверхности

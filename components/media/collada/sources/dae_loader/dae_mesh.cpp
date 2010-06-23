@@ -653,10 +653,8 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
     
   Vertex* vertices = surface.Vertices ();
   
-  stream_reader.Read ("VERTEX",   "", "XYZ", vertices, &Vertex::coord);
-  stream_reader.Read ("NORMAL",   "", "XYZ", vertices, &Vertex::normal);
-  stream_reader.Read ("TANGENT",  "", "XYZ", vertices, &Vertex::tangent);
-  stream_reader.Read ("BINORMAL", "", "XYZ", vertices, &Vertex::binormal);
+  stream_reader.Read ("VERTEX", "", "XYZ", vertices, &Vertex::coord);
+  stream_reader.Read ("NORMAL", "", "XYZ", vertices, &Vertex::normal);
 
     //построение каналов текстурных координат
     
