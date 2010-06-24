@@ -197,9 +197,14 @@ const char* AnonymousFileSystem::AddFilePath (const FileImplPtr& file)
 {
   for (AnonymousFileList::iterator iter=anonymous_files.begin (),  end=anonymous_files.end (); iter!=end; ++iter)
     if (iter->file == file)
-      return iter->path.c_str ();
+      return iter->path.c_str ();        
 
   stl::string path = common::format ("%p", file.get ());
+  
+  for (AnonymousFileList::iterator iter=anonymous_files.begin (),  end=anonymous_files.end (); iter!=end; ++iter)
+    if (iter->path == path)
+      throw xtl::format_operation_exception ("common::AnonymousFileSystem::AddFilePath", "Anonymous file '%s' already registered",
+        path.c_str ());
 
   anonymous_files.push_back (AnonymousFile (path.c_str (), file.get ()));
 

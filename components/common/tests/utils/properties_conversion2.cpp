@@ -47,6 +47,5 @@ int main ()
   catch (std::exception& e)
   {
     printf ("exception: %s\n", e.what ());
-    throw;
   }
 }
