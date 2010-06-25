@@ -30,7 +30,7 @@ int main ()
 {
   try
   {
-    printf ("Results of multilayer image test:\n");
+    printf ("Results of multi_layer_image_test:\n");
     
     Image layers [2] = {Image (file_name2), Image (file_name3)};
     Image img (2, layers);

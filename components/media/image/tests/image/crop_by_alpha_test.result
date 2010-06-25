@@ -43,3 +43,4 @@ empty image crop coords is 0 0, size is 4 4
 2-2 image crop coords is 0 0, size is 4 4
 testing crop for format 'a8'
 exception: Method 'media::get_devil_format(PixelFormat_A8)' doesn't implemented
+    at media::Image(size_t,size_t,size_t,PixelFormat,const void*)

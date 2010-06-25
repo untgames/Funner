@@ -85,36 +85,46 @@ class MultilayerImageImpl: public ImageImpl
 
 MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersCloneMode clone_mode)
 {
-  if (!count)
-    throw xtl::make_null_argument_exception ("media::MultilayerImageImpl::MultilayerImageImpl", "count");
+  try
+  {
+    if (!count)
+      throw xtl::make_null_argument_exception ("", "count");
+      
+    if (!images)
+      throw xtl::make_null_argument_exception ("", "images");
+
+    layers_width  = images [0].Width ();
+    layers_height = images [0].Height ();
+    layers_format = images [0].Format ();
     
-  if (!images)
-    throw xtl::make_null_argument_exception ("media::MultilayerImageImpl::MultilayerImageImpl", "images");
+    switch (clone_mode)
+    {
+      case LayersCloneMode_Capture:
+        layers.assign (images, images + count);
+        break;
+      case LayersCloneMode_Copy:
+      {
+        layers.resize (count);
 
-  layers_width  = images [0].Width ();
-  layers_height = images [0].Height ();
-  layers_format = images [0].Format ();
-  
-  switch (clone_mode)
-  {
-    case LayersCloneMode_Copy:
-      layers.assign (images, images + count);
-      break;
-    case LayersCloneMode_Capture:
-      layers.resize (count);  //не эффективно!!
+        for (size_t i=0; i<count; i++)
+          layers [i] = images [i].Clone ();
 
-      for (size_t i=0; i<count; i++)      
-        images [i].Swap (layers [i]);
-      break;
-    default:
-      throw xtl::make_argument_exception ("media::MultilayerImageImpl::MultilayerImageImpl", "clone_mode", clone_mode);
-      break;
+        break;
+      }
+      default:
+        throw xtl::make_argument_exception ("media::MultilayerImageImpl::MultilayerImageImpl", "clone_mode", clone_mode);
+    }
+
+    for (size_t i=1; i<count; i++)
+    {
+      layers [i].Resize (layers_width, layers_height, layers [i].Depth ());
+      layers [i].Convert (layers_format);
+    }
   }
-
-  for (size_t i=1; i<count; i++)
+  catch (xtl::exception& e)
   {
-    layers [i].Resize (layers_width, layers_height, layers [i].Depth ());
-    layers [i].Convert (layers_format);
+    e.touch ("media::MultilayerImageImpl::MultilayerImageImpl");
+    throw;
   }
 }
 

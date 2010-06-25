@@ -29,7 +29,7 @@ namespace media
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание реализации картинки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ImageImpl
+class ImageImpl: public xtl::reference_counter
 {
   public:
     virtual ~ImageImpl () {}
@@ -100,6 +100,7 @@ class ImageImpl
 ImageImpl* create_bitmap_image ();
 ImageImpl* create_bitmap_image (size_t width, size_t height, size_t depth, PixelFormat format, const void* data);
 ImageImpl* create_bitmap_image (const char* file_name);
+ImageImpl* create_null_image ();
 
 ImageImpl* create_multilayer_image (size_t count, Image* images, LayersCloneMode clone_mode);
 ImageImpl* create_cubemap_image    (const char* file_name);

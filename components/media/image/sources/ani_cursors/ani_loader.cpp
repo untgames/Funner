@@ -66,12 +66,7 @@ class AniLoader
           throw xtl::format_operation_exception ("", "Empty cursor file");
           
         if (frames.empty ())
-        {
-          frames.resize (images.size ());
-          
-          for (size_t i=0; i<images.size (); i++)
-            frames [i] = *images [i];
-        }
+          frames = images;          
 
         Image result (frames.size (), &frames [0]);
 
@@ -159,9 +154,7 @@ class AniLoader
 
         common::FileSystem::Rename (old_path.c_str (), new_path.c_str ());
 
-        ImagePtr image (new media::Image (new_path.c_str ()));
-
-        images.push_back (image);
+        images.push_back (media::Image (new_path.c_str ()));
       }
       catch (xtl::exception& e)
       {
@@ -192,7 +185,7 @@ class AniLoader
           if (index >= images.size ())
             throw xtl::format_operation_exception ("", "Attempt to access to image #%u in sequence with %u images", index, images.size ());
 
-          frames.push_back (*images [index]);
+          frames.push_back (images [index]);
         }
       }
       catch (xtl::exception& e)
@@ -221,9 +214,8 @@ class AniLoader
     }
 
   private:
-    typedef xtl::shared_ptr<media::Image> ImagePtr;
-    typedef stl::vector<ImagePtr>         ImageList;
-    typedef stl::vector<Image>            FrameList;
+    typedef stl::vector<Image> ImageList;
+    typedef stl::vector<Image> FrameList;
 
   private:
     AniHeader                        ani_header;  //заголовок анимированного курсора

@@ -45,7 +45,7 @@ int main ()
 {
   try
   {
-    printf ("Results of single layer  image test:\n");
+    printf ("Results of single_layer_image_test:\n");
 
     Image image1, image2 (file_name2), image3 (image2,PixelFormat_RGBA8), image4, image5 (file_name3);
     ImageManager::RegisterSaver ("tiff", &Image::DefaultSaver);
