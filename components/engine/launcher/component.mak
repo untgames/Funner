@@ -1,8 +1,8 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS        := ENGINE.FUNNER_SHARED_LIBRARY ENGINE.FUNNER_LIBRARY ENGINE.LAUNCHER.SOURCES ENGINE.DOT_NET_WRAPPER
-TARGETS.win32  := ENGINE.CLAUNCHER.SOURCES
+TARGETS        := ENGINE.FUNNER_SHARED_LIBRARY ENGINE.FUNNER_LIBRARY ENGINE.LAUNCHER.SOURCES
+TARGETS.win32  := ENGINE.CLAUNCHER.SOURCES ENGINE.DOT_NET_WRAPPER
 TARGETS.iphone := ENGINE.FUNNER_LIBRARY_LIPO
 
 #PROFILES += gles_win32 egl
