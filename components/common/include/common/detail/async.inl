@@ -79,6 +79,8 @@ template <class Ret> class AsyncResultException: public IAsyncResultHolder<Ret>
 class IAsyncAction
 {
   public:
+    virtual ~IAsyncAction () {}
+
     virtual IAsyncResult* Perform () = 0;
 };
 

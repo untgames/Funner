@@ -248,8 +248,6 @@ namespace
 //приведение формата к printf-форме
 void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SIZE], size_t int_size)
 {
-  const char* s = format;
-
   char* pos = buffer;
   
   bool has_sign = false;
