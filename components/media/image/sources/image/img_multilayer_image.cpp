@@ -34,7 +34,10 @@ class MultilayerImageImpl: public ImageImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ImageImpl* Clone () { return new MultilayerImageImpl (*this); }
+    ImageImpl* Clone ()
+    {
+      return new MultilayerImageImpl (layers.size (), &layers [0], LayersCloneMode_Copy);
+    }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Преобразование формата
@@ -72,9 +75,9 @@ class MultilayerImageImpl: public ImageImpl
     typedef stl::vector<Image> ImageArray;
 
   private:
+    ImageArray  layers;  
     size_t      layers_width, layers_height;
     PixelFormat layers_format;
-    ImageArray  layers;
 };
 
 }
@@ -82,6 +85,8 @@ class MultilayerImageImpl: public ImageImpl
 /*
     Конструкторы
 */
+
+
 
 MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersCloneMode clone_mode)
 {
@@ -95,7 +100,7 @@ MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersClo
 
     layers_width  = images [0].Width ();
     layers_height = images [0].Height ();
-    layers_format = images [0].Format ();
+    layers_format = images [0].Format ();    
     
     switch (clone_mode)
     {
@@ -104,10 +109,10 @@ MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersClo
         break;
       case LayersCloneMode_Copy:
       {
-        layers.resize (count);
+        layers.reserve (count);
 
         for (size_t i=0; i<count; i++)
-          layers [i] = images [i].Clone ();
+          layers.push_back (images [i].Clone ());
 
         break;
       }
@@ -198,11 +203,15 @@ void MultilayerImageImpl::Resize (size_t width, size_t height, size_t new_layers
 void MultilayerImageImpl::Convert (PixelFormat new_format)
 {
   ImageArray new_layers;
-  
-  new_layers.reserve (layers.size ());
+
+  new_layers.reserve (12);
 
   for (ImageArray::iterator i=layers.begin (), end=layers.end (); i!=end; ++i)
-    new_layers.push_back (Image (*i, new_format));   
+  {
+    Image new_image (i->Clone (), new_format);
+
+    new_layers.push_back (new_image);
+  }
 
   layers_format = new_format;
 

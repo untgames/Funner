@@ -5,4 +5,4 @@ image new_name format - BGR8
 image new_name format - RGB8
 multilayer image width - 400, height - 400, depth - 4
 new multilayer image width - 1000, height - 1000, depth - 6
-File 'results/multilayer_image_up.bmp' size: 4000054
+File 'results/multilayer_image_up.bmp' size: 3000054

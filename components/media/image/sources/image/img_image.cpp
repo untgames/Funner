@@ -17,7 +17,7 @@ Image::Image ()
 {
   try
   {
-    impl = create_bitmap_image ();
+    impl = create_bitmap_image ();    
   }
   catch (xtl::exception& e)
   {
@@ -29,7 +29,7 @@ Image::Image ()
 Image::Image (const Image& source)
   : impl (source.impl)
 {
-  addref (impl);
+  addref (impl);  
 }
 
 Image::Image (const Image& source, PixelFormat format)
@@ -64,7 +64,7 @@ Image::Image (const Image& source, PixelFormat format)
 
 Image::Image (const char* file_name, PixelFormat format)
   : impl (create_null_image ())
-{  
+{
   try
   {
     if (!file_name)
@@ -140,8 +140,7 @@ Image::~Image ()
 
 Image& Image::operator = (const Image& source)
 {
-  if (this != &source)
-    Image (source).Swap (*this);
+  Image (source).Swap (*this);
 
   return *this; 
 }
