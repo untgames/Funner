@@ -73,7 +73,8 @@ class Image
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
              Image  ();
-             Image  (const Image& source, PixelFormat format = PixelFormat_Default);
+             Image  (const Image& source);
+             Image  (const Image& source, PixelFormat format);
              Image  (size_t width, size_t height, size_t depth, PixelFormat format, const void* data = 0);
              Image  (size_t layers_count, Image* layers, LayersCloneMode clone_mode = LayersCloneMode_Default);
     explicit Image  (const char* file_name, PixelFormat format = PixelFormat_Default);

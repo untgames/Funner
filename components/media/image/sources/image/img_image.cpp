@@ -26,6 +26,12 @@ Image::Image ()
   }
 }
 
+Image::Image (const Image& source)
+  : impl (source.impl)
+{
+  addref (impl);
+}
+
 Image::Image (const Image& source, PixelFormat format)
   : impl (source.impl)
 {
@@ -59,17 +65,17 @@ Image::Image (const Image& source, PixelFormat format)
 Image::Image (const char* file_name, PixelFormat format)
   : impl (create_null_image ())
 {  
-  if (!file_name)
-    throw xtl::make_null_argument_exception ("media::Image::Image", "file_name");
-
   try
   {
+    if (!file_name)
+      throw xtl::make_null_argument_exception ("", "file_name");
+        
     static ComponentLoader loader ("media.image.loaders.*");
 
     ImageManager::GetLoader (file_name, SerializerFindMode_ByName) (file_name, *this);
     
     if (!impl)
-      throw xtl::format_operation_exception ("media::Image::Image", "Error at load image '%s' (format=%s)", file_name, get_format_name (format));
+      throw xtl::format_operation_exception ("", "Error at load image '%s' (format=%s)", file_name, get_format_name (format));
 
     Rename  (file_name);
     Convert (format);
