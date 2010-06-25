@@ -1,0 +1,45 @@
+Results of server_cache_test:
+Create groups
+Create binding for group1
+Load resources for group1
+MyServer::PrefetchResource(resource1)
+MyServer::PrefetchResource(resource2)
+MyServer::PrefetchResource(resource3)
+MyServer::PrefetchResource(resource4)
+MyServer::LoadResource(resource1)
+MyServer::LoadResource(resource2)
+MyServer::LoadResource(resource3)
+MyServer::LoadResource(resource4)
+Create binding for group2
+Load resources for group2
+MyServer::PrefetchResource(resource5)
+MyServer::LoadResource(resource5)
+Delete binding for group2
+Disable cache
+MyServer::UnloadResource(resource5)
+Delete binding for group1
+MyServer::UnloadResource(resource4)
+MyServer::UnloadResource(resource3)
+MyServer::UnloadResource(resource2)
+MyServer::UnloadResource(resource1)
+Create binding for group3 = group1 + group2 - 'resource1'
+Enable cache
+Load resources for group3
+MyServer::PrefetchResource(resource1)
+MyServer::PrefetchResource(resource3)
+MyServer::PrefetchResource(resource4)
+MyServer::PrefetchResource(resource5)
+MyServer::PrefetchResource(resource6)
+MyServer::LoadResource(resource1)
+MyServer::LoadResource(resource3)
+MyServer::LoadResource(resource4)
+MyServer::LoadResource(resource5)
+MyServer::LoadResource(resource6)
+Recreate binding (check cache)
+Remove server
+MyServer::UnloadResource(resource6)
+MyServer::UnloadResource(resource5)
+MyServer::UnloadResource(resource4)
+MyServer::UnloadResource(resource3)
+MyServer::UnloadResource(resource1)
+Remove binding for group3

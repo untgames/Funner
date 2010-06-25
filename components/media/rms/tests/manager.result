@@ -1,0 +1,20 @@
+Results of manager_test:
+Attach servers
+Create binding
+Load resources
+MyServer1::PrefetchResource(resource1)
+MyServer2::PrefetchResource(resource1)
+MyServer1::PrefetchResource(resource2)
+MyServer2::PrefetchResource(resource2)
+MyServer2::LoadResource(resource1)
+MyServer1::LoadResource(resource1)
+MyServer2::LoadResource(resource2)
+MyServer1::LoadResource(resource2)
+Delete server2
+MyServer2::UnloadResource(resource2)
+MyServer2::UnloadResource(resource1)
+Delete resource manager
+MyServer1::UnloadResource(resource2)
+MyServer1::UnloadResource(resource1)
+Delete binding
+Delete server1
