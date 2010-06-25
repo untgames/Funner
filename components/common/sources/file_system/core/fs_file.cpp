@@ -311,10 +311,25 @@ void FileImpl::ResetPath ()
   anonymous_file_path = 0;
 }
 
+void FileImpl::SetPath (const char* path)
+{
+  if (!path)
+    throw xtl::make_null_argument_exception ("common::FileImpl::SetPath", "path");
+    
+  if (!anonymous_file_path)
+  {    
+    anonymous_file_path = stl::auto_ptr<stl::string> (new stl::string (path));
+  }
+  else
+  {
+    *anonymous_file_path = path;
+  }
+}
+
 const char* FileImpl::GetPath ()
 {
   if (!anonymous_file_path)
-    anonymous_file_path = stl::auto_ptr<stl::string> (new stl::string (FileSystemSingleton::Instance ()->AddAnonymousFilePath (this)));
+    SetPath (FileSystemSingleton::Instance ()->AddAnonymousFilePath (this).c_str ());
 
   return anonymous_file_path->c_str ();
 }

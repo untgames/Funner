@@ -122,6 +122,8 @@ void AnonymousFileSystem::Rename (const char* file_name, const char* new_name)
       
       iter->path.swap (new_name_copied);
       
+      iter->file->SetPath (new_name);
+      
       return;
     }
 
