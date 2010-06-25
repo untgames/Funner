@@ -474,7 +474,6 @@ class BinMeshLoaderComponent
   public:
     BinMeshLoaderComponent ()
     {
-      FileSystem::SetDefaultFileBufferSize (0);     //???????? обход бага!!!!!!!!!!!
       MeshLibraryManager::RegisterLoader ("binmesh", &LoadLibrary);
     }
 

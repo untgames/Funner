@@ -450,7 +450,6 @@ class BinMeshSaverComponent
   public:
     BinMeshSaverComponent ()
     {
-      FileSystem::SetDefaultFileBufferSize (0);   //???????? обход бага!!!!!!!!!!!
       MeshLibraryManager::RegisterSaver ("binmesh", &SaveLibrary);
     }
 
