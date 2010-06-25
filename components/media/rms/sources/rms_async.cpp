@@ -47,7 +47,8 @@ class AsyncOperationManager
     
     ~AsyncOperationManager ()
     {
-      operations.clear ();
+      while (!operations.empty ())
+        operations.pop_back ();
     }
   
 ///Добавление операции
