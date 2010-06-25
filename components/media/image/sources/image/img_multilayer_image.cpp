@@ -197,13 +197,15 @@ void MultilayerImageImpl::Resize (size_t width, size_t height, size_t new_layers
 
 void MultilayerImageImpl::Convert (PixelFormat new_format)
 {
-  ImageArray new_layers = layers;
+  ImageArray new_layers;
+  
+  new_layers.reserve (layers.size ());
 
-  for (ImageArray::iterator i=new_layers.begin (), end=new_layers.end (); i!=end; ++i)
-    i->Convert (new_format);
-    
+  for (ImageArray::iterator i=layers.begin (), end=layers.end (); i!=end; ++i)
+    new_layers.push_back (Image (*i, new_format));   
+
   layers_format = new_format;
-    
+
   layers.swap (new_layers);
 }
 
