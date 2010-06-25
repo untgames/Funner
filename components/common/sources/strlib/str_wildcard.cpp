@@ -1,7 +1,34 @@
+#include <xtl/common_exceptions.h>
+
 #include <common/strlib.h>
 
-bool common::wcmatch (const char* s,const char* pattern)
+namespace
 {
+
+inline const char* _strichr (const char* s,char _c)
+{
+  char c = tolower (_c);
+
+  while (*s && tolower (*s) != c) s++;
+
+  return tolower (*s) == c ? s : NULL;
+}
+
+}
+
+namespace common
+{
+
+bool wcmatch (const char* s,const char* pattern)
+{
+  static const char* METHOD_NAME = "common::wcmatch";
+
+  if (!s)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "s");
+
+  if (!pattern)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "pattern");
+
   while (*s)
     switch (*pattern)
     {
@@ -32,17 +59,16 @@ bool common::wcmatch (const char* s,const char* pattern)
   return true;
 }
 
-inline const char* _strichr (const char* s,char _c)
+bool wcimatch (const char* s,const char* pattern)
 {
-  char c = tolower (_c);
+  static const char* METHOD_NAME = "common::wcimatch";
   
-  while (*s && tolower (*s) != c) s++;
-  
-  return tolower (*s) == c ? s : NULL;
-}
+  if (!s)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "s");
 
-bool common::wcimatch (const char* s,const char* pattern)
-{
+  if (!pattern)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "pattern");
+  
   while (*s)
     switch (*pattern)
     {
@@ -73,10 +99,15 @@ bool common::wcimatch (const char* s,const char* pattern)
   return true;
 }
 
-bool common::is_wildcard (const char* string)
+bool is_wildcard (const char* string)
 {
+  if (!string)
+    throw xtl::make_null_argument_exception ("common::is_wildcard", "string");
+
   if (strstr (string, "*") || strstr (string, "?"))
     return true;
 
   return false;
+}
+
 }
