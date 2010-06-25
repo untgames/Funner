@@ -15,7 +15,7 @@ int main ()
     write (stream, "\n");
     write (stream, 3.14f);
     write (stream, "\n");
-    write (stream, 3.14f, "-.#");
+    write (stream, 300.14f, "-.##");
     write (stream, "\n");
     write (stream, 3.14f, "###.000");
     write (stream, "\n");

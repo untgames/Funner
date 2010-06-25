@@ -238,7 +238,7 @@ void write (OutputTextStream& stream, unsigned long value, const char* format)
   Вывод чисел с плавающей точкой
     format (аналогично целым числам, исключая системы счисления):
       отсутствие точки - печать дробной части с форматированием по умолчанию
-      ".##" - ширина не больше 2-х (1.2=1.2, 1.211=1.2)
+      ".##" - ширина не больше 2-х (1.2=1.2, 1.21=1.21)
       ".00" - ширина 2 (1.2=1.20, 1.211=1.21)
 */
 
@@ -246,8 +246,10 @@ namespace
 {
 
 //приведение формата к printf-форме
-void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SIZE])
+void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SIZE], size_t int_size)
 {
+  const char* s = format;
+
   char* pos = buffer;
   
   bool has_sign = false;
@@ -272,16 +274,22 @@ void get_float_printf_format (const char*& format, char buffer [FORMAT_BUFFER_SI
     size_t      frac_size   = strlen (frac_format),    
                 width       = dot - format + frac_size + 1;
                 
-    if (has_sign && *frac_format != '0')
+    if (*frac_format != '0')
     {
-      width++;
-      frac_size++;
-    }
+      if (has_sign)
+      {
+        width++;
+        frac_size++;
+      }
+
+      width     += int_size;
+      frac_size += int_size;
+    }                
     
     if (dot - format)
     {
       xtl::xsnprintf (pos, FORMAT_BUFFER_SIZE - (pos - buffer), "%s%u.%u%s",
-        *format == '0' ? "0" : "", width, frac_size, *frac_format == '0' ? "f" : "g");      
+        *format == '0' ? "0" : "", width, frac_size, *frac_format == '0' ? "f" : "g");
     }
     else
     {
@@ -305,8 +313,16 @@ void write (OutputTextStream& stream, double value, const char* format)
     throw xtl::make_null_argument_exception ("common::write", "format");
 
   char format_buffer [FORMAT_BUFFER_SIZE], value_buffer [16];
+  
+  get_int_printf_format (format, true, format_buffer);
 
-  get_float_printf_format (format, format_buffer);
+  xtl::xsnprintf (value_buffer, sizeof (value_buffer), format_buffer, int (value));
+  
+  const char* pos = value_buffer;
+  
+  while (*pos == ' ') pos++;
+
+  get_float_printf_format (format, format_buffer, strlen (pos));
 
   xtl::xsnprintf (value_buffer, sizeof (value_buffer), format_buffer, value);
 
