@@ -74,16 +74,16 @@ void InstanceController::SetController (const char* controller_id)
     Определение имени базового меша
 */
 
-const char* InstanceController::FindBaseMesh (Model& model) const
+const char* InstanceController::FindBaseMesh (const Model& model) const
 {
   const char* controller_id = impl->controller.c_str ();
 
-  Morph* morph = model.Morphs ().Find (controller_id);
+  const Morph* morph = model.Morphs ().Find (controller_id);
   
   if (morph)
     return morph->BaseMesh ();
   
-  Skin* skin = model.Skins ().Find (controller_id);
+  const Skin* skin = model.Skins ().Find (controller_id);
 
   if (!skin)
     return 0;

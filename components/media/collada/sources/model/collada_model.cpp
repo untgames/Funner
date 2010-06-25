@@ -7,19 +7,23 @@ using namespace common;
     Описание реализации модели
 */
 
+typedef media::CollectionImpl<Animation, ICollection<Animation> > AnimationListImpl;
+
 struct Model::Impl
 {
-  stl::string           name;         //имя модели
-  stl::string           active_scene; //имя активной сцены
-  LibraryImpl<Effect>   effects;      //библиотека эффектов
-  LibraryImpl<Material> materials;    //библиотека материалов
-  LibraryImpl<Mesh>     meshes;       //библиотека мешей
-  LibraryImpl<Morph>    morphs;       //библиотека морферов
-  LibraryImpl<Skin>     skins;        //библиотека скинов
-  LibraryImpl<Node>     nodes;        //библиотека узлов  
-  LibraryImpl<Node>     scenes;       //библиотека сцен
-  LibraryImpl<Light>    lights;       //библиотека источников света
-  LibraryImpl<Camera>   cameras;      //библиотека камер
+  stl::string            name;         //имя модели
+  stl::string            active_scene; //имя активной сцены
+  AnimationListImpl      animations;   //библиотека анимаций
+  LibraryImpl<Effect>    effects;      //библиотека эффектов
+  LibraryImpl<Image>     images;       //библиотека картинок
+  LibraryImpl<Material>  materials;    //библиотека материалов
+  LibraryImpl<Mesh>      meshes;       //библиотека мешей
+  LibraryImpl<Morph>     morphs;       //библиотека морферов
+  LibraryImpl<Skin>      skins;        //библиотека скинов
+  LibraryImpl<Node>      nodes;        //библиотека узлов
+  LibraryImpl<Node>      scenes;       //библиотека сцен
+  LibraryImpl<Light>     lights;       //библиотека источников света
+  LibraryImpl<Camera>    cameras;      //библиотека камер
 };
 
 /*
@@ -136,6 +140,16 @@ void Model::SetActiveSceneName (const char* scene_name)
     Библиотеки
 */
 
+AnimationList& Model::Animations ()
+{
+  return impl->animations;
+}
+
+const AnimationList& Model::Animations () const
+{
+  return impl->animations;
+}
+
 MaterialLibrary& Model::Materials ()
 {
   return impl->materials;
@@ -154,6 +168,16 @@ EffectLibrary& Model::Effects ()
 const EffectLibrary& Model::Effects () const
 {
   return impl->effects;
+}
+
+ImageLibrary& Model::Images ()
+{
+  return impl->images;
+}
+
+const ImageLibrary& Model::Images () const
+{
+  return impl->images;
 }
 
 MeshLibrary& Model::Meshes ()

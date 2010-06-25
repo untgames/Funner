@@ -51,18 +51,16 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
   const char *id   = get<const char*> (*iter, "id"),
              *sid  = get<const char*> (*iter, "sid", ""),
              *name = get<const char*> (*iter, "name", "");
-
-    //разбор преобразований узла
-
-  mat4f tm;
-   
-  ParseTransform (iter, tm);
   
     //создание узла
   
   Node node;
   
   node.SetId (id);
+
+    //разбор преобразований узла
+
+  ParseTransform (iter, id, node);
   
     //биндинг к родительскому узлу
     
@@ -76,11 +74,7 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
     //установка имени узла
     
   if (*name)
-    node.SetName (name);
-    
-    //установка преобразований узла
- 
-  node.SetTransform (tm);
+    node.SetName (name);    
   
     //добавление узла в библиотеку
     
@@ -111,8 +105,10 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
     Разбор преобразований узла
 */
 
-void DaeParser::ParseTransform (Parser::Iterator iter, mat4f& tm)
+void DaeParser::ParseTransform (Parser::Iterator iter, const char* node_id, Node& node)
 {  
+  math::mat4f tm;
+
   for (Parser::Iterator i=iter->First (); i; ++i)
   {
     const char* name = i->Name ();
@@ -120,38 +116,63 @@ void DaeParser::ParseTransform (Parser::Iterator iter, mat4f& tm)
     if (!strcmp (name, "matrix"))
     {
       mat4f sub_tm;
-      
+
       read (*i, "#text", sub_tm);
-        
-      tm = sub_tm * tm;
+
+      tm = tm * sub_tm;
+
+      //занесение ссылки на матрицу в карту семантик анимаций
+      const char* sid = get<const char*> (*i, "sid", "");
+
+      if (xtl::xstrlen (sid))
+      {
+        stl::string target_name (common::format ("%s/%s", node_id, sid));
+
+        animation_semantics.insert_pair (target_name.c_str (), AnimationChannelSemantic_Transform);
+      }
     }
     else if (!strcmp (name, "translate"))
-    {
+    {            
       vec3f offset = get<vec3f> (*i, "#text");
 
-      tm = translate (offset) * tm;
+      tm = tm * translate (offset);
+      
+      const char* sid = get<const char*> (*i, "sid", "");            
+
+      if (!strcmp (sid, "rotatePivot"))
+      {
+        node.SetRotationPivot (offset);
+      }
+      else if (!strcmp (sid, "scalePivot"))
+      {
+        node.SetScalePivot (offset);
+      }
     }
     else if (!strcmp (name, "rotate"))
     {
       vec4f r = get<vec4f> (*i, "#text");
 
-      tm = rotate (degree (r.w), vec3f (r.x, r.y, r.z)) * tm;
+      tm = tm * rotate (degree (r.w), vec3f (r.x, r.y, r.z));
     }
     else if (!strcmp (name, "scale"))
     {
       vec3f s = get<vec3f> (*i, "#text");
 
-      tm = scale (s) * tm;
+      tm = tm * scale (s);
     }
     else if (!strcmp (name, "lookat"))
     {
-      raise_parser_exception (*i, "Lookat transform doesn't supported");
+      iter->Log ().Warning (*i, "Lookat transform doesn't supported");
     }
     else if (!strcmp (name, "skew"))
     {
-      raise_parser_exception (*i, "Skew transform doesn't supported");
+      iter->Log ().Warning (*i, "Skew transform doesn't supported");
     }
   }
+
+    //установка преобразований узла
+ 
+  node.SetTransform (tm);  
 }
 
 /*

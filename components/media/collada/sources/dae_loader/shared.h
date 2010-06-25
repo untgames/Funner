@@ -102,6 +102,8 @@ class DaeParser
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void ParseRoot                (Parser::Iterator);
     void ParseLibraries           (Parser::Iterator);
+    void ParseLibraryAnimations   (Parser::Iterator);
+    void ParseLibraryImages       (Parser::Iterator);
     void ParseLibraryEffects      (Parser::Iterator);
     void ParseLibraryMaterials    (Parser::Iterator);
     void ParseLibraryGeometries   (Parser::Iterator);
@@ -109,6 +111,8 @@ class DaeParser
     void ParseLibraryLights       (Parser::Iterator);
     void ParseLibraryCameras      (Parser::Iterator);
     void ParseLibraryVisualScenes (Parser::Iterator);
+    void ParseAnimation           (Parser::Iterator, AnimationList& collection);
+    void ParseAnimationChannel    (Parser::Iterator channel_iter, Parser::Iterator animation_iter, Animation& animation);
     void ParseImage               (Parser::Iterator);
     void ParseEffect              (Parser::Iterator);
     void ParseEffectProfileCommon (Parser::Iterator, Effect& effect);
@@ -128,7 +132,7 @@ class DaeParser
     void ParseCamera              (Parser::Iterator);
     void ParseVisualScene         (Parser::Iterator);
     void ParseNode                (Parser::Iterator, Node& parent);
-    void ParseTransform           (Parser::Iterator, math::mat4f& tm);
+    void ParseTransform           (Parser::Iterator, const char* node_id, Node& node);
     void ParseInstanceLight       (Parser::Iterator, Node::LightList& lights);
     void ParseInstanceCamera      (Parser::Iterator, Node::CameraList& cameras);
     void ParseInstanceGeometry    (Parser::Iterator, Node::MeshList& meshes);
@@ -140,12 +144,14 @@ class DaeParser
     void ParseFloatArray          (Parser::Iterator iter, stl::vector<math::mat4f>& source);
 
   private:
-    typedef stl::hash_map<stl::hash_key<const char*>, VertexIndexMapPtr> VertexIndexMaps;
+    typedef stl::hash_map<stl::hash_key<const char*>, VertexIndexMapPtr>        VertexIndexMaps;
+    typedef stl::hash_map<stl::hash_key<const char*>, AnimationChannelSemantic> AnimationSemanticsMap;
 
   private:
-    Model&          model;             //загружаемая модель
-    Parser          parser;            //парсер
-    VertexIndexMaps vertex_index_maps; //карты вершинных индексов
+    Model&                model;               //загружаемая модель
+    Parser                parser;              //парсер
+    VertexIndexMaps       vertex_index_maps;   //карты вершинных индексов
+    AnimationSemanticsMap animation_semantics; //найденные возможные семантики анимаций
 };
 
 }

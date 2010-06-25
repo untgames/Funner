@@ -5,3 +5,4 @@
 #include <media/collada/morph.h>
 #include <media/collada/skin.h>
 #include <media/collada/convert.h>
+#include <media/collada/animation.h>

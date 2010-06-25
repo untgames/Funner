@@ -14,15 +14,17 @@ typedef media::CollectionImpl<InstanceController, ICollection<InstanceController
 
 struct Node::Impl: public xtl::reference_counter
 {
-  stl::string                id;          //идентификатор узла
-  stl::string                sid;         //идентификатор узла в пределах родителя
-  stl::string                name;        //имя узла
-  math::mat4f                tm;          //матрица преобразований узла
-  NodeListImpl               nodes;       //вложенные узлы
-  LightListImpl              lights;      //источники света
-  CameraListImpl             cameras;     //камеры
-  InstanceMeshListImpl       meshes;      //меши
-  InstanceControllerListImpl controllers; //контроллеры
+  stl::string                id;             //идентификатор узла
+  stl::string                sid;            //идентификатор узла в пределах родителя
+  stl::string                name;           //имя узла
+  math::mat4f                tm;             //матрица преобразований узла
+  math::vec3f                rotation_pivot; //центр поворотов
+  math::vec3f                scale_pivot;    //центр масштабирования
+  NodeListImpl               nodes;          //вложенные узлы
+  LightListImpl              lights;         //источники света
+  CameraListImpl             cameras;        //камеры
+  InstanceMeshListImpl       meshes;         //меши
+  InstanceControllerListImpl controllers;    //контроллеры
 };
 
 /*
@@ -124,6 +126,30 @@ const math::mat4f& Node::Transform () const
 void Node::SetTransform (const math::mat4f& tm)
 {
   impl->tm = tm;
+}
+
+/*
+    Центры поворота и масштабирования
+*/
+
+const math::vec3f& Node::RotationPivot () const
+{
+  return impl->rotation_pivot;
+}
+
+const math::vec3f& Node::ScalePivot () const
+{
+  return impl->scale_pivot;
+}
+
+void Node::SetRotationPivot (const math::vec3f& pivot)
+{
+  impl->rotation_pivot = pivot;
+}
+
+void Node::SetScalePivot (const math::vec3f& pivot)
+{
+  impl->scale_pivot = pivot;
 }
 
 /*

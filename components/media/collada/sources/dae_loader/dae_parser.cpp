@@ -55,7 +55,7 @@ void DaeParser::PrintLog (const LogHandler& log_fn)
 }
 
 /*
-    Создание и поиск карт вершинных индексов    
+    Создание и поиск карт вершинных индексов
 */
 
 VertexIndexMapPtr DaeParser::GetVertexIndicesMap (const char* mesh_id, size_t surface_index)
@@ -124,6 +124,7 @@ void DaeParser::ParseRoot (Parser::Iterator iter)
 
 void DaeParser::ParseLibraries (Parser::Iterator iter)
 {
+  for_each_child (*iter, "library_images", bind (&DaeParser::ParseLibraryImages, this, _1));
   for_each_child (*iter, "library_effects", bind (&DaeParser::ParseLibraryEffects, this, _1));
   for_each_child (*iter, "library_materials", bind (&DaeParser::ParseLibraryMaterials, this, _1));
   for_each_child (*iter, "library_geometries", bind (&DaeParser::ParseLibraryGeometries, this, _1));
@@ -131,4 +132,5 @@ void DaeParser::ParseLibraries (Parser::Iterator iter)
   for_each_child (*iter, "library_lights", bind (&DaeParser::ParseLibraryLights, this, _1));
   for_each_child (*iter, "library_cameras", bind (&DaeParser::ParseLibraryCameras, this, _1));
   for_each_child (*iter, "library_visual_scenes", bind (&DaeParser::ParseLibraryVisualScenes, this, _1));
+  for_each_child (*iter, "library_animations", bind (&DaeParser::ParseLibraryAnimations, this, _1));
 }

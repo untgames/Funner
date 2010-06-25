@@ -29,7 +29,7 @@ class Converter
     //преобразованная поверхность
     struct Surface
     {
-      VertexStreamMap                vertex_streams; //вершинный потоки      
+      VertexStreamMap                vertex_streams; //вершинный потоки
       media::geometry::PrimitiveType primitive_type; //тип примитивов
       size_t                         first_index;    //номер первого индекса
       size_t                         indices_count;  //количество индексов
@@ -89,6 +89,8 @@ class Converter
       //преобразование положений и нормалей
     void ConvertSurfaceVertices (const media::collada::Surface& src_surface, Surface& dst_surface)
     {
+//      typedef media::geometry::Vertex<media::geometry::Position3f, media::geometry::Normalf,
+//        media::geometry::Tangentf, media::geometry::Binormalf> ColladaVertex;
       typedef media::geometry::Vertex<media::geometry::Position3f, media::geometry::Normalf> ColladaVertex;
 
       size_t vertices_count = src_surface.VerticesCount ();
@@ -113,10 +115,30 @@ class Converter
     }
 
       //преобразование текстурных вершин
-    media::geometry::VertexStream CreateTexVertices (const media::collada::Surface& src_surface, size_t channel_index)
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<0>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
     {
-      typedef media::geometry::Vertex<media::geometry::TexChannel<0>::Coord3f, media::geometry::Tangentf,
-                                      media::geometry::Binormalf> ColladaTexVertex;
+      dst_vertex.texcoord0 = src_vertex.coord;
+    }
+
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<1>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord1 = src_vertex.coord;
+    }
+
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<2>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord2 = src_vertex.coord;
+    }
+
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<3>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord3 = src_vertex.coord;
+    }
+
+    template<size_t channel_index>
+    media::geometry::VertexStream CreateTexVertices (const media::collada::Surface& src_surface)
+    {
+      typedef media::geometry::Vertex<typename media::geometry::TexChannel<channel_index>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf> ColladaTexVertex;
 
       size_t vertices_count = src_surface.VerticesCount ();
 
@@ -134,7 +156,8 @@ class Converter
 
       for (size_t j=0; j<vertices_count; j++, src_vertex++, dst_vertex++)
       {
-        dst_vertex->texcoord0 = src_vertex->coord;
+        SetVertexTexCoord (*src_vertex, *dst_vertex);
+
         dst_vertex->tangent   = src_vertex->tangent;
         dst_vertex->binormal  = src_vertex->binormal;
       }
@@ -151,7 +174,6 @@ class Converter
       size_t vertices_count = src_surface.VerticesCount ();
 
         //создание вершинного потока
-
       media::geometry::VertexStream vs (vertices_count, media::geometry::make_vertex_declaration<ColladaTexVertex> ());
 
         //преобразование данных
@@ -190,9 +212,31 @@ class Converter
         int color_channel_index = color_channels.Find (tex_channels.Name (i));
         
           //преобразование вершинного потока
-        
-        media::geometry::VertexStream vs = color_channel_index != -1 ? CreateTexColoredVertices (src_surface, i, color_channel_index) :
-                                           CreateTexVertices (src_surface, i);
+
+        media::geometry::VertexStream vs (0, media::geometry::VertexDeclaration (media::geometry::VertexFormat ()));
+
+        if (color_channel_index != -1)
+          vs = CreateTexColoredVertices (src_surface, i, color_channel_index);
+        else
+        {
+          switch (i)
+          {
+            case 0:
+              vs = CreateTexVertices<0> (src_surface);
+              break;
+            case 1:
+              vs = CreateTexVertices<1> (src_surface);
+              break;
+            case 2:
+              vs = CreateTexVertices<2> (src_surface);
+              break;
+            case 3:
+              vs = CreateTexVertices<3> (src_surface);
+              break;
+            default:
+              throw xtl::format_operation_exception ("media::collada::Converter::ConvertSurfaceTexVertexChannels", "Unsupported texture channel");
+          }
+        }
 
           //регистрация вершинного потока в поверхности
 
@@ -408,12 +452,17 @@ class Converter
         const char*                    channel_name = texture.TexcoordChannel ();
         
           //поиск канала текстурных координат
-          
+
+        if (strstr (channel_name, "CHANNEL") == channel_name)
+          channel_name += strlen ("CHANNEL");
+        else if (strstr (channel_name, "TEX") == channel_name)
+          channel_name += strlen ("TEX");
+
         VertexStreamMap::iterator iter = surface.vertex_streams.find (common::format ("texchannels.%s", channel_name).c_str ());
-        
+
         if (iter == surface.vertex_streams.end ())
           continue; //вершинный канал не найден
-          
+
           //добавление канала
           
         vertex_buffer.Attach (iter->second);
@@ -470,7 +519,7 @@ class Converter
         ConvertInstanceSurface (**i, binds, "", 0, dst_mesh);
         
         //регистрация меша в библиотеке
-        
+
       mesh_library.Attach (id, dst_mesh);
     }
     
@@ -480,7 +529,7 @@ class Converter
     
     void ConvertInstanceController (const char* id, const media::collada::InstanceController& icontroller)
     {
-        //поиск инстанцируемого меша        
+        //поиск инстанцируемого меша
 
       SkinMap::iterator iter = skin_map.find (icontroller.Controller ());
 

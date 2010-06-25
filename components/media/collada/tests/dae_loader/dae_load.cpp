@@ -18,6 +18,15 @@ static TexmapName texmaps [] = {
   {(TextureMap)0, 0}
 };
 
+const char* get_name (AnimationChannelSemantic semantic)
+{
+  switch (semantic)
+  {
+    case AnimationChannelSemantic_Transform: return "transform";
+    default:                                 return "unknown";
+  }
+}
+
 //печать строки пробелов (отступ)
 void print_space (int count)
 {
@@ -32,9 +41,9 @@ void print (float value)
   static float EPS = 0.001f;
   
   if (fabs (value) < EPS && value < 0.0f)
-    value = 0.0f;
-
-  printf ("%+.3f", value);
+    printf ("%+.3f", 0.f);
+  else
+    printf ("%+.3f", value);
 }
 
 //печать вектора
@@ -257,6 +266,53 @@ void dump (Mesh& mesh, int level, Model& model)
 
   for (size_t i=0; i<mesh.Surfaces ().Size (); i++)
     dump (mesh.Surfaces () [i], level, model);
+}
+
+//печать картинки
+void dump (Image& image, int level, Model& model)
+{
+  print_space (level);
+  printf      ("Image '%s', path = '%s'\n", image.Id (), image.Path ());
+}
+
+//печать анимации
+void dump (const AnimationChannel& channel, int level)
+{
+  print_space (level++);
+  printf ("Channel target is '%s', parameter is '%s', semantic is '%s', samples count is %u\n",
+          channel.TargetName (), channel.ParameterName (), get_name (channel.Semantic ()),
+          channel.SamplesCount ());
+}
+
+void dump (const Animation& animation, int level);
+
+void dump (const AnimationList& animations, int level)
+{
+  print_space (level++);
+  printf      ("Child animations (%u items):\n", animations.Size ());
+
+  for (size_t i = 0; i < animations.Size (); i++)
+    dump (animations [i], level);
+}
+
+void dump (const Animation& animation, int level)
+{
+  print_space (level++);
+  printf ("Animation '%s'\n", animation.Id ());
+
+  if (animation.Animations ().Size ())
+    dump (animation.Animations (), level);
+
+  size_t channels_count = animation.Channels ().Size ();
+
+  if (channels_count)
+  {
+    print_space (level);
+    printf ("Animation channels (%u items):\n", channels_count);
+
+    for (size_t i = 0; i < channels_count; i++)
+      dump (animation.Channels () [i], level + 1);
+  }
 }
 
 //печать цели морфа
@@ -497,6 +553,15 @@ template <class Item> void dump (const char* name, ICollection<Item>& collection
   }
 }
 
+void dump (const char* name, AnimationList& animations, int level)
+{
+  print_space (level++);
+  printf      ("Animations collection '%s' (%u items)\n", name, animations.Size ());
+
+  for (size_t i = 0; i < animations.Size (); i++)
+    dump (animations [i], level);
+}
+
 //печать узла
 void dump (Node& node, int level, Model& model)
 {
@@ -567,6 +632,7 @@ int main ()
     print_space (1);
     printf ("Active scene: '%s'\n", model.ActiveSceneName ());
 
+    dump ("library_images", model.Images (), 1, model);
     dump ("library_effects", model.Effects (), 1, model);
     dump ("library_materials", model.Materials (), 1, model);
     dump ("library_meshes", model.Meshes (), 1, model);
@@ -575,6 +641,7 @@ int main ()
     dump ("library_lights", model.Lights (), 1, model);
     dump ("library_cameras", model.Cameras (), 1, model);
     dump ("library_scenes", model.Scenes (), 1, model);
+    dump ("library_animations", model.Animations (), 1);
   }
   catch (std::exception& exception)
   {

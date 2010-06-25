@@ -1,0 +1,2 @@
+echo Results of collada_converter1:
+collada-converter --textures-path=sourceimages --materials-file=materials.xmtl --scene-file=scene.xscene --nodes-exclude="*Plane* *Sphere*" --skip-materials export.dae

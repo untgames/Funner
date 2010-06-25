@@ -1,10 +1,384 @@
 Results of dae_load_test:
 --- Parse collada model 'data/ape.dae' ---
-data/ape.dae(16376): warning: node 'morph': No targets
-data/ape.dae(16376): warning: node 'morph': No weights
+data/ape.dae(16387): warning: node 'morph': No targets
+data/ape.dae(16387): warning: node 'morph': No weights
+data/ape.dae(187): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(188): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(189): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(27): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(245): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(191): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(301): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(247): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(357): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(303): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(675): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(611): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(731): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(677): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(787): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(733): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(843): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(789): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(909): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(845): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(965): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(911): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1021): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(967): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1077): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(1023): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1143): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(1079): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1199): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(1145): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1255): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(1201): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1311): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(1257): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1377): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(1313): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1433): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(1379): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1489): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(1435): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1545): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(1491): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1601): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(1547): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1657): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(1603): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1713): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(1659): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1887): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(1823): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1943): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(1889): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(1999): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(1945): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2055): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2001): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2111): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2057): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2167): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2113): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2203): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2169): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2259): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2205): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2315): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2261): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2351): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2317): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2407): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2353): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2443): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2409): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2479): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2445): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2535): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2481): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2591): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2537): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2627): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2593): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2683): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2629): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2719): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2685): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2755): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2721): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2811): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2757): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2847): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2813): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2903): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2849): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2959): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2905): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(2995): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2961): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3031): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(2997): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3087): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3033): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3143): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3089): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3179): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3145): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3235): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3181): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3291): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3237): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3327): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3293): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3383): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3329): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3439): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3385): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3475): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3441): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3531): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3477): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3587): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3533): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3623): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3589): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3833): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(3769): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3889): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3835): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(3945): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3891): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4001): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(3947): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4057): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4003): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4113): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4059): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4149): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4115): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4205): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4151): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4261): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4207): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4297): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4263): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4353): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4299): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4409): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4355): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4445): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4411): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4501): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4447): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4537): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4503): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4573): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4539): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4629): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4575): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4665): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4631): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4721): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4667): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4777): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4723): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4813): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4779): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4849): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4815): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4905): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4851): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4961): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4907): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(4997): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4963): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5053): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(4999): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5109): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5055): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5145): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5111): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5201): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5147): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5237): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5203): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5273): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5239): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5329): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5275): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5385): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5331): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5421): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5387): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5477): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5423): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5533): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5479): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5569): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5535): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5625): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5571): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5681): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5627): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5737): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(5683): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5875): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(5811): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(5941): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(5877): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6007): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(5943): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6063): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6009): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6119): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6065): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6175): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6121): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6231): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6177): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6287): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6233): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6343): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6289): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6409): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(6345): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6465): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6411): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6521): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6467): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6577): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6523): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6643): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(6579): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6699): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6645): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6755): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6701): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6811): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6757): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6867): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6813): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6923): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6869): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(6979): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(6925): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(7045): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(6981): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(7101): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7047): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(7157): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7103): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(7213): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7159): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(7279): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(7215): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(7335): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7281): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(7391): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7337): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(7447): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7393): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(7609): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7610): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7611): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7449): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(7668): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7613): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(7725): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7670): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(7782): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7727): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(7944): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7945): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7946): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7784): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(8003): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(7948): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(8060): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8005): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(8117): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8062): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(8279): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8280): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8281): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8119): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(8338): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8283): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(8395): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8340): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(8452): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8397): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(8614): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8615): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8616): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8454): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(8672): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8618): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(8728): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8674): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(8784): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8730): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(8820): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(8786): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(8982): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8983): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8984): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8822): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(9041): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(8986): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(9098): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9043): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(9155): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9100): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(9317): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9318): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9319): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9157): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(9376): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9321): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(9433): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9378): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(9490): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9435): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(9652): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9653): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9654): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9492): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(9816): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9817): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9818): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9656): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(9980): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9981): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9982): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(9820): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(10048): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(9984): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(10084): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(10050): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(10246): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10247): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10248): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10086): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(10304): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10250): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(10360): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10306): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(10416): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10362): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(10482): error: node 'channel': Incorrect 'channel' tag, can't determine semantic for this animation
+data/ape.dae(10418): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(10644): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10645): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10646): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10484): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(10703): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10648): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(10760): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10705): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(10817): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10762): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(10979): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10980): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10981): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10819): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(11038): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(10983): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(11095): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(11040): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(11152): error: node 'channel': Unsupported 'channel' tag 'target' attribute, property components animation not supported yet
+data/ape.dae(11097): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
+data/ape.dae(11296): error: node 'channel': Incorrect 'channel' tag target attribute, target name not contains property name
+data/ape.dae(11262): error: node 'animation': Incorrect 'animation' tag, must contain at least one 'animation' sub-tag or 'sampler'/'channel' pair
 ---  Collada model dump ---
 Model 'data/ape.dae'
   Active scene: 'Ape.max'
+  Library 'library_images' (3 items)
+    Image 'file21', path = 'file:///C:/shatle/New_Project/sourceimages/VANCONTA.JPG'
+    Image 'file3', path = 'file:///C:/shatle/New_Project/sourceimages/VANENGFL.JPG'
+    Image 'file48', path = 'file:///C:/shatle/New_Project/sourceimages/VANcont1.jpg'
   Library 'library_effects' (5 items)
     Effect: 'eyes-fx'
       shader type: blinn
@@ -12803,7 +13177,7 @@ Model 'data/ape.dae'
       Node 'main_body_dummy-node'
         sid: ''
         name: 'main_body_dummy'
-        transform: [ [ +0.998 +0.063 +0.000 +39.606 ] [ -0.063 +0.998 +0.000 +52.148 ] [ +0.000 +0.000 +1.000 +66.918 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.998 +0.063 +0.000 +36.226 ] [ -0.063 +0.998 +0.000 +54.568 ] [ +0.000 +0.000 +1.000 +66.904 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -12811,7 +13185,7 @@ Model 'data/ape.dae'
         Node 'Box03-node'
           sid: 'Box03-node'
           name: 'Box03'
-          transform: [ [ +0.000 +0.000 +1.000 -0.053 ] [ +0.588 +0.809 +0.000 +0.189 ] [ -0.809 +0.588 +0.000 +0.118 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+          transform: [ [ +0.000 +0.000 +1.000 +0.016 ] [ +0.588 +0.809 +0.000 +0.222 ] [ -0.809 +0.588 +0.000 -0.053 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
           Collection 'instance_meshes' (0 items)
           Collection 'instance_controllers' (0 items)
           Collection 'lights' (0 items)
@@ -12851,7 +13225,7 @@ Model 'data/ape.dae'
                 Node 'Box54-node'
                   sid: 'Box54-node'
                   name: 'Box54'
-                  transform: [ [ -0.072 -0.496 -0.866 -0.000 ] [ -0.992 +0.129 +0.008 +0.000 ] [ +0.108 +0.859 -0.501 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                  transform: [ [ -0.072 -0.496 -0.866 +0.000 ] [ -0.992 +0.129 +0.008 +0.000 ] [ +0.108 +0.859 -0.501 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                   Collection 'instance_meshes' (0 items)
                   Collection 'instance_controllers' (0 items)
                   Collection 'lights' (0 items)
@@ -12867,7 +13241,7 @@ Model 'data/ape.dae'
                     Node 'Box55-node'
                       sid: 'Box55-node'
                       name: 'Box55'
-                      transform: [ [ -0.999 -0.007 -0.037 -1.716 ] [ +0.010 -0.997 -0.071 -0.235 ] [ -0.036 -0.071 +0.997 +1.208 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                      transform: [ [ -0.999 -0.007 -0.037 +1.669 ] [ +0.010 -0.997 -0.071 +0.161 ] [ -0.036 -0.071 +0.997 +1.284 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                       Collection 'instance_meshes' (0 items)
                       Collection 'instance_controllers' (0 items)
                       Collection 'lights' (0 items)
@@ -12875,7 +13249,7 @@ Model 'data/ape.dae'
                       Node 'Box56-node'
                         sid: 'Box56-node'
                         name: 'Box56'
-                        transform: [ [ +0.946 +0.000 -0.326 +3.003 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.326 +0.000 +0.946 -8.723 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                        transform: [ [ +0.946 +0.000 -0.326 +0.000 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.326 +0.000 +0.946 -9.225 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                         Collection 'instance_meshes' (0 items)
                         Collection 'instance_controllers' (0 items)
                         Collection 'lights' (0 items)
@@ -12883,7 +13257,7 @@ Model 'data/ape.dae'
                   Node 'Box57-node'
                     sid: 'Box57-node'
                     name: 'Box57'
-                    transform: [ [ -0.041 -0.604 -0.796 +3.382 ] [ +0.848 -0.442 +0.292 -3.861 ] [ -0.528 -0.663 +0.531 -10.291 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                    transform: [ [ -0.041 -0.604 -0.796 +2.017 ] [ +0.848 -0.442 +0.292 +6.487 ] [ -0.528 -0.663 +0.531 -9.278 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                     Collection 'instance_meshes' (0 items)
                     Collection 'instance_controllers' (0 items)
                     Collection 'lights' (0 items)
@@ -12891,7 +13265,7 @@ Model 'data/ape.dae'
                     Node 'Box58-node'
                       sid: 'Box58-node'
                       name: 'Box58'
-                      transform: [ [ +0.954 +0.000 +0.301 -4.795 ] [ +0.029 +0.995 -0.091 +1.458 ] [ -0.299 +0.096 +0.949 -15.137 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                      transform: [ [ +0.954 +0.000 +0.301 +0.000 ] [ +0.029 +0.995 -0.091 +0.000 ] [ -0.299 +0.096 +0.949 -15.945 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                       Collection 'instance_meshes' (0 items)
                       Collection 'instance_controllers' (0 items)
                       Collection 'lights' (0 items)
@@ -12899,7 +13273,7 @@ Model 'data/ape.dae'
                       Node 'Box59-node'
                         sid: 'Box59-node'
                         name: 'Box59'
-                        transform: [ [ +0.839 +0.000 -0.545 +5.025 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.545 +0.000 +0.839 -7.737 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                        transform: [ [ +0.839 +0.000 -0.545 +0.000 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.545 +0.000 +0.839 -9.225 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                         Collection 'instance_meshes' (0 items)
                         Collection 'instance_controllers' (0 items)
                         Collection 'lights' (0 items)
@@ -12955,7 +13329,7 @@ Model 'data/ape.dae'
                     Node 'Box66-node'
                       sid: 'Box66-node'
                       name: 'Box66'
-                      transform: [ [ -0.999 -0.007 -0.037 -1.716 ] [ +0.010 -0.997 -0.071 -0.235 ] [ -0.036 -0.071 +0.997 +1.208 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                      transform: [ [ -0.999 -0.007 -0.037 +1.669 ] [ +0.010 -0.997 -0.071 +0.161 ] [ -0.036 -0.071 +0.997 +1.284 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                       Collection 'instance_meshes' (0 items)
                       Collection 'instance_controllers' (0 items)
                       Collection 'lights' (0 items)
@@ -12963,7 +13337,7 @@ Model 'data/ape.dae'
                       Node 'Box67-node'
                         sid: 'Box67-node'
                         name: 'Box67'
-                        transform: [ [ +0.946 +0.000 -0.326 +3.003 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.326 +0.000 +0.946 -8.723 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                        transform: [ [ +0.946 +0.000 -0.326 +0.000 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.326 +0.000 +0.946 -9.225 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                         Collection 'instance_meshes' (0 items)
                         Collection 'instance_controllers' (0 items)
                         Collection 'lights' (0 items)
@@ -12971,7 +13345,7 @@ Model 'data/ape.dae'
                   Node 'Box68-node'
                     sid: 'Box68-node'
                     name: 'Box68'
-                    transform: [ [ +0.000 +0.595 -0.803 +3.960 ] [ -0.878 -0.385 -0.285 +2.937 ] [ -0.479 +0.705 +0.523 -11.463 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                    transform: [ [ +0.000 +0.595 -0.803 +2.914 ] [ -0.878 -0.385 -0.285 -6.856 ] [ -0.479 +0.705 +0.523 -10.010 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                     Collection 'instance_meshes' (0 items)
                     Collection 'instance_controllers' (0 items)
                     Collection 'lights' (0 items)
@@ -12979,7 +13353,7 @@ Model 'data/ape.dae'
                     Node 'Box69-node'
                       sid: 'Box69-node'
                       name: 'Box69'
-                      transform: [ [ +0.946 -0.090 +0.312 -4.969 ] [ +0.079 +0.996 +0.047 -0.752 ] [ -0.315 -0.020 +0.949 -15.132 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                      transform: [ [ +0.946 -0.090 +0.312 +0.000 ] [ +0.079 +0.996 +0.047 +0.000 ] [ -0.315 -0.020 +0.949 -15.945 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                       Collection 'instance_meshes' (0 items)
                       Collection 'instance_controllers' (0 items)
                       Collection 'lights' (0 items)
@@ -12987,7 +13361,7 @@ Model 'data/ape.dae'
                       Node 'Box70-node'
                         sid: 'Box70-node'
                         name: 'Box70'
-                        transform: [ [ +0.839 +0.000 -0.545 +5.025 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.545 +0.000 +0.839 -7.737 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                        transform: [ [ +0.839 +0.000 -0.545 +0.000 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.545 +0.000 +0.839 -9.225 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                         Collection 'instance_meshes' (0 items)
                         Collection 'instance_controllers' (0 items)
                         Collection 'lights' (0 items)
@@ -13003,7 +13377,7 @@ Model 'data/ape.dae'
         Node 'Point18-node'
           sid: ''
           name: 'Point18'
-          transform: [ [ +1.000 +0.000 +0.001 +0.016 ] [ +0.000 +1.000 +0.007 -1.748 ] [ +0.000 -0.007 +1.000 +5.506 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+          transform: [ [ +1.000 +0.000 +0.001 +0.011 ] [ +0.000 +1.000 +0.007 -1.788 ] [ +0.000 -0.007 +1.000 +5.493 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
           Collection 'instance_meshes' (0 items)
           Collection 'instance_controllers' (0 items)
           Collection 'lights' (0 items)
@@ -13011,7 +13385,7 @@ Model 'data/ape.dae'
           Node 'Box02-node'
             sid: 'Box02-node'
             name: 'Box02'
-            transform: [ [ +0.001 -0.786 +0.618 +10.761 ] [ +0.001 -0.618 -0.786 -13.544 ] [ +1.000 +0.001 +0.001 +0.004 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+            transform: [ [ +0.001 +0.000 +1.000 -0.006 ] [ +0.786 +0.618 +0.000 -0.098 ] [ -0.618 +0.786 +0.001 +17.299 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
             Collection 'instance_meshes' (0 items)
             Collection 'instance_controllers' (0 items)
             Collection 'lights' (0 items)
@@ -13019,7 +13393,7 @@ Model 'data/ape.dae'
             Node 'Box01_NAB-node'
               sid: ''
               name: 'Box01_NAB'
-              transform: [ [ +1.000 -0.006 +0.000 -60.750 ] [ +0.006 +1.000 +0.000 +4.822 ] [ +0.000 +0.000 +1.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+              transform: [ [ +1.000 -0.006 +0.000 -60.721 ] [ +0.006 +1.000 +0.000 +5.179 ] [ +0.000 +0.000 +1.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
               Collection 'instance_meshes' (0 items)
               Collection 'instance_controllers' (0 items)
               Collection 'lights' (0 items)
@@ -13027,7 +13401,7 @@ Model 'data/ape.dae'
               Node 'Point06-node'
                 sid: ''
                 name: 'Point06'
-                transform: [ [ +0.782 -0.623 +0.000 -20.908 ] [ +0.623 +0.782 +0.000 -26.752 ] [ +0.000 +0.000 +1.000 +0.005 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                transform: [ [ +0.782 -0.623 +0.000 -33.017 ] [ +0.623 +0.782 +0.000 -7.914 ] [ +0.000 +0.000 +1.000 +0.006 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                 Collection 'instance_meshes' (0 items)
                 Collection 'instance_controllers' (0 items)
                 Collection 'lights' (0 items)
@@ -13035,7 +13409,7 @@ Model 'data/ape.dae'
               Node 'MainChest-node'
                 sid: 'MainChest-node'
                 name: 'MainChest'
-                transform: [ [ +0.996 +0.000 -0.087 +0.783 ] [ -0.011 +0.991 -0.131 +15.342 ] [ +0.086 +0.131 +0.988 +2.098 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                transform: [ [ +0.996 -0.011 -0.086 +0.786 ] [ +0.000 +0.991 -0.131 +15.485 ] [ +0.087 +0.131 +0.988 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                 Collection 'instance_meshes' (0 items)
                 Collection 'instance_controllers' (0 items)
                 Collection 'lights' (0 items)
@@ -13075,7 +13449,7 @@ Model 'data/ape.dae'
                       Node 'Box39-node'
                         sid: 'Box39-node'
                         name: 'Box39'
-                        transform: [ [ -0.996 +0.049 +0.076 +0.465 ] [ +0.072 +0.937 +0.342 +1.664 ] [ -0.055 +0.346 -0.937 -3.958 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                        transform: [ [ -0.996 -0.020 +0.088 -0.127 ] [ -0.049 +0.939 -0.339 +0.212 ] [ -0.076 -0.342 -0.937 +4.312 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                         Collection 'instance_meshes' (0 items)
                         Collection 'instance_controllers' (0 items)
                         Collection 'lights' (0 items)
@@ -13083,7 +13457,7 @@ Model 'data/ape.dae'
                         Node 'Box40-node'
                           sid: 'Box40-node'
                           name: 'Box40'
-                          transform: [ [ +1.000 +0.000 +0.000 -0.835 ] [ +0.000 +0.444 +0.896 -26.596 ] [ +0.000 -0.896 +0.444 -13.804 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                          transform: [ [ +1.000 +0.000 +0.000 -0.835 ] [ +0.000 +0.444 +0.896 +0.554 ] [ +0.000 -0.896 +0.444 -29.960 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                           Collection 'instance_meshes' (0 items)
                           Collection 'instance_controllers' (0 items)
                           Collection 'lights' (0 items)
@@ -13091,7 +13465,7 @@ Model 'data/ape.dae'
                           Node 'Box41-node'
                             sid: 'Box41-node'
                             name: 'Box41'
-                            transform: [ [ +0.999 +0.018 +0.030 -1.009 ] [ -0.032 +0.804 +0.593 -6.784 ] [ -0.013 -0.594 +0.804 -9.807 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                            transform: [ [ +0.999 -0.003 +0.035 -0.662 ] [ -0.018 +0.805 +0.593 +0.349 ] [ -0.030 -0.593 +0.804 -11.944 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                             Collection 'instance_meshes' (0 items)
                             Collection 'instance_controllers' (0 items)
                             Collection 'lights' (0 items)
@@ -13099,7 +13473,7 @@ Model 'data/ape.dae'
                             Node 'Box42-node'
                               sid: 'Box42-node'
                               name: 'Box42'
-                              transform: [ [ +1.000 +0.000 +0.000 -0.308 ] [ +0.000 +0.905 +0.424 -2.725 ] [ +0.000 -0.424 +0.905 -6.349 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                              transform: [ [ +1.000 +0.000 +0.000 -0.308 ] [ +0.000 +0.905 +0.424 +0.228 ] [ +0.000 -0.424 +0.905 -6.905 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                               Collection 'instance_meshes' (0 items)
                               Collection 'instance_controllers' (0 items)
                               Collection 'lights' (0 items)
@@ -13107,7 +13481,7 @@ Model 'data/ape.dae'
                         Node 'Box74-node'
                           sid: 'Box74-node'
                           name: 'Box74'
-                          transform: [ [ +0.995 -0.046 +0.094 -11.977 ] [ -0.060 +0.488 +0.871 -25.272 ] [ -0.086 -0.872 +0.482 -14.149 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                          transform: [ [ +0.995 -0.104 +0.005 -9.187 ] [ +0.046 +0.480 +0.876 +0.554 ] [ -0.094 -0.871 +0.482 -29.960 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                           Collection 'instance_meshes' (0 items)
                           Collection 'instance_controllers' (0 items)
                           Collection 'lights' (0 items)
@@ -13115,7 +13489,7 @@ Model 'data/ape.dae'
                           Node 'Box75-node'
                             sid: 'Box75-node'
                             name: 'Box75'
-                            transform: [ [ +1.000 +0.000 +0.000 -0.662 ] [ +0.000 +0.878 +0.478 -4.901 ] [ +0.000 -0.478 +0.878 -9.735 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                            transform: [ [ +1.000 +0.000 +0.000 -0.662 ] [ +0.000 +0.878 +0.478 +0.349 ] [ +0.000 -0.478 +0.878 -10.894 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                             Collection 'instance_meshes' (0 items)
                             Collection 'instance_controllers' (0 items)
                             Collection 'lights' (0 items)
@@ -13123,7 +13497,7 @@ Model 'data/ape.dae'
                             Node 'Box76-node'
                               sid: 'Box76-node'
                               name: 'Box76'
-                              transform: [ [ +1.000 +0.000 +0.000 -0.308 ] [ +0.000 +0.849 +0.528 -3.562 ] [ +0.000 -0.528 +0.849 -5.725 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                              transform: [ [ +1.000 +0.000 +0.000 -0.308 ] [ +0.000 +0.849 +0.528 +0.001 ] [ +0.000 -0.528 +0.849 -6.743 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                               Collection 'instance_meshes' (0 items)
                               Collection 'instance_controllers' (0 items)
                               Collection 'lights' (0 items)
@@ -13131,7 +13505,7 @@ Model 'data/ape.dae'
                         Node 'Box43-node'
                           sid: 'Box43-node'
                           name: 'Box43'
-                          transform: [ [ +0.421 -0.704 +0.572 -2.408 ] [ +0.339 +0.707 +0.621 +2.159 ] [ -0.842 -0.068 +0.536 +2.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                          transform: [ [ +0.421 -0.704 +0.572 -1.965 ] [ +0.339 +0.707 +0.621 +3.086 ] [ -0.842 -0.068 +0.536 +1.037 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                           Collection 'instance_meshes' (0 items)
                           Collection 'instance_controllers' (0 items)
                           Collection 'lights' (0 items)
@@ -13139,7 +13513,7 @@ Model 'data/ape.dae'
                           Node 'Box44-node'
                             sid: 'Box44-node'
                             name: 'Box44'
-                            transform: [ [ +0.881 +0.431 -0.197 +2.229 ] [ -0.404 +0.901 +0.160 -0.743 ] [ +0.246 -0.061 +0.967 -15.117 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                            transform: [ [ +0.881 +0.462 -0.103 -1.451 ] [ -0.431 +0.872 +0.232 +1.218 ] [ +0.197 -0.160 +0.967 -15.181 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                             Collection 'instance_meshes' (0 items)
                             Collection 'instance_controllers' (0 items)
                             Collection 'lights' (0 items)
@@ -13147,7 +13521,7 @@ Model 'data/ape.dae'
                             Node 'Box45-node'
                               sid: 'Box45-node'
                               name: 'Box45'
-                              transform: [ [ +0.961 +0.000 -0.222 +1.880 ] [ +0.000 +1.000 +0.000 +1.240 ] [ +0.276 +0.000 +0.775 -7.657 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                              transform: [ [ +0.961 +0.000 -0.276 -0.303 ] [ +0.000 +1.000 +0.000 +1.240 ] [ +0.222 +0.000 +0.775 -9.770 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                               Collection 'instance_meshes' (0 items)
                               Collection 'instance_controllers' (0 items)
                               Collection 'lights' (0 items)
@@ -13155,7 +13529,7 @@ Model 'data/ape.dae'
                         Node 'Box71-node'
                           sid: 'Box71-node'
                           name: 'Box71'
-                          transform: [ [ +0.997 +0.034 -0.071 +10.164 ] [ +0.055 +0.338 +0.939 -26.175 ] [ +0.056 -0.940 +0.336 -8.746 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                          transform: [ [ +0.997 +0.078 +0.009 +8.208 ] [ -0.034 +0.334 +0.942 -0.285 ] [ +0.071 -0.939 +0.336 -28.240 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                           Collection 'instance_meshes' (0 items)
                           Collection 'instance_controllers' (0 items)
                           Collection 'lights' (0 items)
@@ -13163,7 +13537,7 @@ Model 'data/ape.dae'
                           Node 'Box72-node'
                             sid: 'Box72-node'
                             name: 'Box72'
-                            transform: [ [ +0.994 +0.048 +0.102 -1.631 ] [ -0.093 +0.865 +0.493 -4.397 ] [ -0.065 -0.499 +0.864 -8.483 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                            transform: [ [ +0.994 -0.009 +0.113 -0.662 ] [ -0.048 +0.870 +0.490 +0.349 ] [ -0.102 -0.493 +0.864 -9.664 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                             Collection 'instance_meshes' (0 items)
                             Collection 'instance_controllers' (0 items)
                             Collection 'lights' (0 items)
@@ -13171,7 +13545,7 @@ Model 'data/ape.dae'
                             Node 'Box73-node'
                               sid: 'Box73-node'
                               name: 'Box73'
-                              transform: [ [ +0.999 +0.006 +0.043 -0.578 ] [ -0.026 +0.880 +0.475 -3.189 ] [ -0.035 -0.476 +0.879 -5.317 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                              transform: [ [ +0.999 -0.015 +0.041 -0.308 ] [ -0.006 +0.880 +0.475 -0.279 ] [ -0.043 -0.475 +0.879 -6.213 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                               Collection 'instance_meshes' (0 items)
                               Collection 'instance_controllers' (0 items)
                               Collection 'lights' (0 items)
@@ -13179,7 +13553,7 @@ Model 'data/ape.dae'
                       Node 'Point01-node'
                         sid: ''
                         name: 'Point01'
-                        transform: [ [ -0.996 -0.020 +0.088 +4.205 ] [ -0.049 +0.939 -0.339 -0.581 ] [ -0.076 -0.342 -0.937 -33.853 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                        transform: [ [ -0.996 -0.020 +0.088 -1.582 ] [ -0.049 +0.939 -0.339 +10.955 ] [ -0.076 -0.342 -0.937 +32.273 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                         Collection 'instance_meshes' (0 items)
                         Collection 'instance_controllers' (0 items)
                         Collection 'lights' (0 items)
@@ -13187,7 +13561,7 @@ Model 'data/ape.dae'
                     Node 'XtraWristTwist-node'
                       sid: 'XtraWristTwist-node'
                       name: 'XtraWristTwist'
-                      transform: [ [ +1.000 +0.000 +0.000 +0.000 ] [ +0.000 -1.000 +0.000 +0.000 ] [ +0.000 +0.000 -1.000 +22.357 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                      transform: [ [ +1.000 +0.000 +0.000 +0.000 ] [ +0.000 -1.000 +0.000 +0.000 ] [ +0.000 +0.000 -1.000 -22.357 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                       Collection 'instance_meshes' (0 items)
                       Collection 'instance_controllers' (0 items)
                       Collection 'lights' (0 items)
@@ -13195,7 +13569,7 @@ Model 'data/ape.dae'
                   Node 'Box46-node'
                     sid: 'Box46-node'
                     name: 'Box46'
-                    transform: [ [ -0.998 -0.051 -0.042 -0.626 ] [ -0.038 -0.080 +0.996 +17.026 ] [ -0.054 +0.995 +0.078 -1.608 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                    transform: [ [ -0.998 -0.051 -0.042 +0.059 ] [ -0.038 -0.080 +0.996 -2.931 ] [ -0.054 +0.995 +0.078 +16.860 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                     Collection 'instance_meshes' (0 items)
                     Collection 'instance_controllers' (0 items)
                     Collection 'lights' (0 items)
@@ -13243,7 +13617,7 @@ Model 'data/ape.dae'
                         Node 'Box77-node'
                           sid: 'Box77-node'
                           name: 'Box77'
-                          transform: [ [ +0.025 +0.023 +0.999 +0.846 ] [ -0.995 +0.092 +0.023 -3.869 ] [ -0.092 -0.995 +0.025 -2.802 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                          transform: [ [ +0.025 +0.015 +1.000 +4.130 ] [ -0.023 +1.000 -0.015 +2.451 ] [ -0.999 -0.023 +0.025 +0.686 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                           Collection 'instance_meshes' (0 items)
                           Collection 'instance_controllers' (0 items)
                           Collection 'lights' (0 items)
@@ -13251,7 +13625,7 @@ Model 'data/ape.dae'
                           Node 'Box78-node'
                             sid: 'Box78-node'
                             name: 'Box78'
-                            transform: [ [ +1.000 +0.000 +0.000 +0.835 ] [ +0.000 +0.348 +0.938 +27.899 ] [ +0.000 -0.938 +0.348 +10.935 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                            transform: [ [ +1.000 +0.000 +0.000 +0.835 ] [ +0.000 +0.348 +0.938 -0.554 ] [ +0.000 -0.938 +0.348 +29.960 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                             Collection 'instance_meshes' (0 items)
                             Collection 'instance_controllers' (0 items)
                             Collection 'lights' (0 items)
@@ -13259,7 +13633,7 @@ Model 'data/ape.dae'
                             Node 'Box79-node'
                               sid: 'Box79-node'
                               name: 'Box79'
-                              transform: [ [ +0.999 +0.018 +0.030 +1.009 ] [ -0.034 +0.700 +0.713 +8.251 ] [ -0.008 -0.714 +0.700 +8.610 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                              transform: [ [ +0.999 -0.008 +0.034 +0.662 ] [ -0.018 +0.701 +0.713 -0.349 ] [ -0.030 -0.713 +0.700 +11.944 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                               Collection 'instance_meshes' (0 items)
                               Collection 'instance_controllers' (0 items)
                               Collection 'lights' (0 items)
@@ -13267,7 +13641,7 @@ Model 'data/ape.dae'
                               Node 'Box80-node'
                                 sid: 'Box80-node'
                                 name: 'Box80'
-                                transform: [ [ +1.000 +0.000 +0.000 +0.308 ] [ +0.000 +0.827 +0.562 +3.696 ] [ +0.000 -0.562 +0.827 +5.838 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                                transform: [ [ +1.000 +0.000 +0.000 +0.308 ] [ +0.000 +0.827 +0.562 -0.228 ] [ +0.000 -0.562 +0.827 +6.905 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                                 Collection 'instance_meshes' (0 items)
                                 Collection 'instance_controllers' (0 items)
                                 Collection 'lights' (0 items)
@@ -13275,7 +13649,7 @@ Model 'data/ape.dae'
                           Node 'Box81-node'
                             sid: 'Box81-node'
                             name: 'Box81'
-                            transform: [ [ +0.421 -0.704 +0.572 +2.408 ] [ +0.339 +0.707 +0.621 -2.159 ] [ -0.842 -0.068 +0.536 -2.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                            transform: [ [ +0.421 -0.704 +0.572 +1.965 ] [ +0.339 +0.707 +0.621 -3.086 ] [ -0.842 -0.068 +0.536 -1.037 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                             Collection 'instance_meshes' (0 items)
                             Collection 'instance_controllers' (0 items)
                             Collection 'lights' (0 items)
@@ -13283,7 +13657,7 @@ Model 'data/ape.dae'
                             Node 'Box82-node'
                               sid: 'Box82-node'
                               name: 'Box82'
-                              transform: [ [ +0.869 +0.424 -0.256 -3.136 ] [ -0.406 +0.905 +0.123 +0.179 ] [ +0.284 -0.003 +0.959 +14.973 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                              transform: [ [ +0.869 +0.465 -0.172 +1.451 ] [ -0.424 +0.877 +0.226 -1.218 ] [ +0.256 -0.123 +0.959 +15.181 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                               Collection 'instance_meshes' (0 items)
                               Collection 'instance_controllers' (0 items)
                               Collection 'lights' (0 items)
@@ -13291,7 +13665,7 @@ Model 'data/ape.dae'
                               Node 'Box83-node'
                                 sid: 'Box83-node'
                                 name: 'Box83'
-                                transform: [ [ +0.943 +0.000 -0.333 -2.971 ] [ +0.000 +1.000 +0.000 -1.240 ] [ +0.333 +0.000 +0.943 +9.312 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                                transform: [ [ +0.943 +0.000 -0.333 +0.303 ] [ +0.000 +1.000 +0.000 -1.240 ] [ +0.333 +0.000 +0.943 +9.770 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                                 Collection 'instance_meshes' (0 items)
                                 Collection 'instance_controllers' (0 items)
                                 Collection 'lights' (0 items)
@@ -13299,7 +13673,7 @@ Model 'data/ape.dae'
                           Node 'Box84-node'
                             sid: 'Box84-node'
                             name: 'Box84'
-                            transform: [ [ +0.996 +0.034 -0.086 -10.587 ] [ +0.080 +0.138 +0.987 +27.258 ] [ +0.046 -0.990 +0.134 +3.136 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                            transform: [ [ +0.996 +0.090 +0.023 -8.208 ] [ -0.034 +0.132 +0.991 +0.285 ] [ +0.086 -0.987 +0.134 +28.240 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                             Collection 'instance_meshes' (0 items)
                             Collection 'instance_controllers' (0 items)
                             Collection 'lights' (0 items)
@@ -13307,7 +13681,7 @@ Model 'data/ape.dae'
                             Node 'Box85-node'
                               sid: 'Box85-node'
                               name: 'Box85'
-                              transform: [ [ +0.994 +0.048 +0.102 +1.631 ] [ -0.102 +0.776 +0.623 +5.683 ] [ -0.049 -0.629 +0.775 +7.681 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                              transform: [ [ +0.994 -0.026 +0.110 +0.662 ] [ -0.048 +0.782 +0.622 -0.349 ] [ -0.102 -0.623 +0.775 +9.664 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                               Collection 'instance_meshes' (0 items)
                               Collection 'instance_controllers' (0 items)
                               Collection 'lights' (0 items)
@@ -13315,7 +13689,7 @@ Model 'data/ape.dae'
                               Node 'Box86-node'
                                 sid: 'Box86-node'
                                 name: 'Box86'
-                                transform: [ [ +0.999 +0.006 +0.043 +0.578 ] [ -0.031 +0.793 +0.608 +3.990 ] [ -0.031 -0.609 +0.793 +4.746 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                                transform: [ [ +0.999 -0.021 +0.038 +0.308 ] [ -0.006 +0.794 +0.608 +0.279 ] [ -0.043 -0.608 +0.793 +6.213 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                                 Collection 'instance_meshes' (0 items)
                                 Collection 'instance_controllers' (0 items)
                                 Collection 'lights' (0 items)
@@ -13323,7 +13697,7 @@ Model 'data/ape.dae'
                           Node 'Box87-node'
                             sid: 'Box87-node'
                             name: 'Box87'
-                            transform: [ [ +0.993 -0.046 +0.109 +12.421 ] [ -0.075 +0.470 +0.879 +25.399 ] [ -0.092 -0.881 +0.463 +13.525 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                            transform: [ [ +0.993 -0.118 +0.010 +9.187 ] [ +0.046 +0.461 +0.886 -0.554 ] [ -0.109 -0.879 +0.463 +29.960 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                             Collection 'instance_meshes' (0 items)
                             Collection 'instance_controllers' (0 items)
                             Collection 'lights' (0 items)
@@ -13331,7 +13705,7 @@ Model 'data/ape.dae'
                             Node 'Box88-node'
                               sid: 'Box88-node'
                               name: 'Box88'
-                              transform: [ [ +1.000 +0.000 +0.000 +0.662 ] [ +0.000 +0.791 +0.612 +6.387 ] [ +0.000 -0.612 +0.791 +8.832 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                              transform: [ [ +1.000 +0.000 +0.000 +0.662 ] [ +0.000 +0.791 +0.612 -0.349 ] [ +0.000 -0.612 +0.791 +10.894 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                               Collection 'instance_meshes' (0 items)
                               Collection 'instance_controllers' (0 items)
                               Collection 'lights' (0 items)
@@ -13339,7 +13713,7 @@ Model 'data/ape.dae'
                               Node 'Box89-node'
                                 sid: 'Box89-node'
                                 name: 'Box89'
-                                transform: [ [ +1.000 +0.000 +0.000 +0.308 ] [ +0.000 +0.754 +0.657 +4.427 ] [ +0.000 -0.657 +0.754 +5.086 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                                transform: [ [ +1.000 +0.000 +0.000 +0.308 ] [ +0.000 +0.754 +0.657 +0.000 ] [ +0.000 -0.657 +0.754 +6.743 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                                 Collection 'instance_meshes' (0 items)
                                 Collection 'instance_controllers' (0 items)
                                 Collection 'lights' (0 items)
@@ -13347,7 +13721,7 @@ Model 'data/ape.dae'
                   Node 'Box24-node'
                     sid: 'Box24-node'
                     name: 'Box24'
-                    transform: [ [ -0.998 -0.055 -0.037 +0.686 ] [ -0.033 -0.072 +0.997 -17.059 ] [ -0.058 +0.996 +0.070 +1.684 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                    transform: [ [ -0.998 -0.055 -0.037 -0.218 ] [ -0.033 -0.072 +0.997 +2.872 ] [ -0.058 +0.996 +0.070 -16.912 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                     Collection 'instance_meshes' (0 items)
                     Collection 'instance_controllers' (0 items)
                     Collection 'lights' (0 items)
@@ -13355,7 +13729,7 @@ Model 'data/ape.dae'
                 Node 'Box21-node'
                   sid: 'Box21-node'
                   name: 'Box21'
-                  transform: [ [ +0.883 -0.393 +0.257 -22.444 ] [ +0.321 +0.905 +0.278 -64.680 ] [ -0.342 -0.163 +0.925 +25.693 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                  transform: [ [ +0.883 -0.393 +0.257 -49.394 ] [ +0.321 +0.905 +0.278 -53.923 ] [ -0.342 -0.163 +0.925 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                   Collection 'instance_meshes' (0 items)
                   Collection 'instance_controllers' (0 items)
                   Collection 'lights' (0 items)
@@ -13363,7 +13737,7 @@ Model 'data/ape.dae'
                 Node 'Box20-node'
                   sid: 'Box20-node'
                   name: 'Box20'
-                  transform: [ [ -0.883 +0.393 -0.257 +22.444 ] [ -0.321 -0.905 -0.278 +64.680 ] [ -0.342 -0.163 +0.925 +25.693 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                  transform: [ [ -0.883 +0.393 -0.257 -49.394 ] [ -0.321 -0.905 -0.278 -53.923 ] [ -0.342 -0.163 +0.925 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                   Collection 'instance_meshes' (0 items)
                   Collection 'instance_controllers' (0 items)
                   Collection 'lights' (0 items)
@@ -13371,7 +13745,7 @@ Model 'data/ape.dae'
                 Node 'Box22-node'
                   sid: 'Box22-node'
                   name: 'Box22'
-                  transform: [ [ +0.707 +0.707 +0.000 -40.761 ] [ -0.664 +0.664 -0.343 +13.219 ] [ -0.242 +0.242 +0.939 +4.822 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                  transform: [ [ +0.707 +0.664 -0.242 -38.772 ] [ -0.707 +0.664 -0.242 -18.873 ] [ +0.000 +0.343 +0.939 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                   Collection 'instance_meshes' (0 items)
                   Collection 'instance_controllers' (0 items)
                   Collection 'lights' (0 items)
@@ -13453,7 +13827,7 @@ Model 'data/ape.dae'
                   Node 'Teeth-node'
                     sid: ''
                     name: 'Teeth'
-                    transform: [ [ +0.000 +0.118 -0.993 -4.697 ] [ +0.000 +0.993 +0.118 -43.317 ] [ +1.000 +0.000 +0.000 -7.546 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                    transform: [ [ +0.000 +0.118 -0.993 -7.549 ] [ +0.000 +0.993 +0.118 -43.568 ] [ +1.000 +0.000 +0.000 -0.451 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                     Collection 'instance_meshes' (0 items)
                     Collection 'instance_controllers' (1 items)
                       Instance controller 'Teeth-mesh-morpher'
@@ -13464,7 +13838,7 @@ Model 'data/ape.dae'
                 Node 'Breathering-node'
                   sid: 'Breathering-node'
                   name: 'Breathering'
-                  transform: [ [ +0.003 -1.000 +0.000 +56.792 ] [ +0.000 +0.000 -1.000 -2.333 ] [ +1.000 +0.003 +0.000 -22.284 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+                  transform: [ [ +0.003 -1.000 +0.000 -22.112 ] [ +0.000 +0.000 -1.000 -56.859 ] [ +1.000 +0.003 +0.000 +2.334 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
                   Collection 'instance_meshes' (0 items)
                   Collection 'instance_controllers' (0 items)
                   Collection 'lights' (0 items)
@@ -13516,7 +13890,7 @@ Model 'data/ape.dae'
       Node 'Spot06.Target-node'
         sid: ''
         name: 'Spot06.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13524,7 +13898,7 @@ Model 'data/ape.dae'
       Node 'Spot07.Target-node'
         sid: ''
         name: 'Spot07.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13532,7 +13906,7 @@ Model 'data/ape.dae'
       Node 'Spot08.Target-node'
         sid: ''
         name: 'Spot08.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13567,7 +13941,7 @@ Model 'data/ape.dae'
       Node 'Spot09.Target-node'
         sid: ''
         name: 'Spot09.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13584,7 +13958,7 @@ Model 'data/ape.dae'
       Node 'Spot11.Target-node'
         sid: ''
         name: 'Spot11.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13592,7 +13966,7 @@ Model 'data/ape.dae'
       Node 'Spot12.Target-node'
         sid: ''
         name: 'Spot12.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13618,7 +13992,7 @@ Model 'data/ape.dae'
       Node 'Spot13.Target-node'
         sid: ''
         name: 'Spot13.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13635,7 +14009,7 @@ Model 'data/ape.dae'
       Node 'Spot14.Target-node'
         sid: ''
         name: 'Spot14.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13643,7 +14017,7 @@ Model 'data/ape.dae'
       Node 'Spot16.Target-node'
         sid: ''
         name: 'Spot16.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13651,7 +14025,7 @@ Model 'data/ape.dae'
       Node 'Spot17.Target-node'
         sid: ''
         name: 'Spot17.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13668,7 +14042,7 @@ Model 'data/ape.dae'
       Node 'Spot18.Target-node'
         sid: ''
         name: 'Spot18.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13703,7 +14077,7 @@ Model 'data/ape.dae'
       Node 'Spot19.Target-node'
         sid: ''
         name: 'Spot19.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13720,7 +14094,7 @@ Model 'data/ape.dae'
       Node 'Spot21.Target-node'
         sid: ''
         name: 'Spot21.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13728,7 +14102,7 @@ Model 'data/ape.dae'
       Node 'Spot22.Target-node'
         sid: ''
         name: 'Spot22.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13736,7 +14110,7 @@ Model 'data/ape.dae'
       Node 'Spot23.Target-node'
         sid: ''
         name: 'Spot23.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13762,7 +14136,7 @@ Model 'data/ape.dae'
       Node 'Spot24.Target-node'
         sid: ''
         name: 'Spot24.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 +2.611 ] [ +0.000 +1.000 +0.000 -68.242 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +67.848 ] [ +0.000 +0.000 -1.000 -68.242 ] [ +0.000 +1.000 +0.000 -2.611 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13787,7 +14161,7 @@ Model 'data/ape.dae'
       Node 'Direct05.Target-node'
         sid: ''
         name: 'Direct05.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13795,7 +14169,7 @@ Model 'data/ape.dae'
       Node 'Direct06.Target-node'
         sid: ''
         name: 'Direct06.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13820,7 +14194,7 @@ Model 'data/ape.dae'
       Node 'Direct07.Target-node'
         sid: ''
         name: 'Direct07.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13862,7 +14236,7 @@ Model 'data/ape.dae'
       Node 'Direct08.Target-node'
         sid: ''
         name: 'Direct08.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13888,7 +14262,7 @@ Model 'data/ape.dae'
       Node 'Direct09.Target-node'
         sid: ''
         name: 'Direct09.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +71.634 ] [ +1.000 +0.000 +0.000 +62.838 ] [ +0.000 +1.000 +0.000 +13.082 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +62.838 ] [ +1.000 +0.000 +0.000 +13.082 ] [ +0.000 +1.000 +0.000 +71.634 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13896,7 +14270,7 @@ Model 'data/ape.dae'
       Node 'Direct10.Target-node'
         sid: ''
         name: 'Direct10.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +71.634 ] [ +1.000 +0.000 +0.000 +62.838 ] [ +0.000 +1.000 +0.000 +13.082 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +62.838 ] [ +1.000 +0.000 +0.000 +13.082 ] [ +0.000 +1.000 +0.000 +71.634 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13904,7 +14278,7 @@ Model 'data/ape.dae'
       Node 'Direct11.Target-node'
         sid: ''
         name: 'Direct11.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +71.634 ] [ +1.000 +0.000 +0.000 +62.838 ] [ +0.000 +1.000 +0.000 +13.082 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +62.838 ] [ +1.000 +0.000 +0.000 +13.082 ] [ +0.000 +1.000 +0.000 +71.634 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13921,7 +14295,7 @@ Model 'data/ape.dae'
       Node 'Direct12.Target-node'
         sid: ''
         name: 'Direct12.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +71.634 ] [ +1.000 +0.000 +0.000 +62.838 ] [ +0.000 +1.000 +0.000 +13.082 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +62.838 ] [ +1.000 +0.000 +0.000 +13.082 ] [ +0.000 +1.000 +0.000 +71.634 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13946,7 +14320,7 @@ Model 'data/ape.dae'
       Node 'jaw_pivot-node'
         sid: ''
         name: 'jaw_pivot'
-        transform: [ [ +0.000 +0.000 +1.000 +159.422 ] [ +1.000 +0.000 +0.000 +482.429 ] [ +0.000 +1.000 +0.000 -52.834 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +482.429 ] [ +1.000 +0.000 +0.000 -52.833 ] [ +0.000 +1.000 +0.000 +159.422 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -13954,7 +14328,7 @@ Model 'data/ape.dae'
       Node 'PH_main_heel_R-node'
         sid: ''
         name: 'PH_main_heel_R'
-        transform: [ [ -0.866 +0.500 +0.000 +8.971 ] [ +0.500 +0.866 +0.000 +45.606 ] [ +0.000 +0.000 -1.000 -0.407 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ -0.866 -0.500 +0.000 +15.023 ] [ -0.500 +0.866 +0.000 +43.985 ] [ +0.000 +0.000 -1.000 +0.415 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14010,7 +14384,7 @@ Model 'data/ape.dae'
       Node 'PH_main_heel_L-node'
         sid: ''
         name: 'PH_main_heel_L'
-        transform: [ [ -0.866 -0.500 +0.000 -71.762 ] [ +0.500 -0.866 +0.000 -9.350 ] [ +0.000 +0.000 +1.000 +0.420 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ -0.866 -0.500 +0.000 +57.472 ] [ +0.500 -0.866 +0.000 +43.978 ] [ +0.000 +0.000 +1.000 +0.420 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14042,7 +14416,7 @@ Model 'data/ape.dae'
           Node 'PH_ball_L-node'
             sid: ''
             name: 'PH_ball_L'
-            transform: [ [ -0.990 +0.000 +0.000 -19.623 ] [ +0.000 -0.990 +0.000 -1.636 ] [ +0.000 +0.000 -0.990 +0.230 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+            transform: [ [ -0.990 +0.000 +0.000 +19.820 ] [ +0.000 -0.990 +0.000 +1.652 ] [ +0.000 +0.000 -0.990 -0.232 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
             Collection 'instance_meshes' (0 items)
             Collection 'instance_controllers' (0 items)
             Collection 'lights' (0 items)
@@ -14066,7 +14440,7 @@ Model 'data/ape.dae'
       Node 'Direct20.Target-node'
         sid: ''
         name: 'Direct20.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14083,7 +14457,7 @@ Model 'data/ape.dae'
       Node 'Camera01.Target-node'
         sid: ''
         name: 'Camera01.Target'
-        transform: [ [ +0.999 -0.002 +0.052 +73.670 ] [ +0.052 +0.035 -0.998 -99.966 ] [ +0.000 +0.999 +0.035 +14.123 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.999 -0.002 +0.052 +68.337 ] [ +0.052 +0.035 -0.998 +10.496 ] [ +0.000 +0.999 +0.035 +104.114 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14091,7 +14465,7 @@ Model 'data/ape.dae'
       Node 'PH_handongroundpivot-node'
         sid: ''
         name: 'PH_handongroundpivot'
-        transform: [ [ +0.755 -0.656 +0.000 +96.579 ] [ +0.656 +0.755 +0.000 +81.475 ] [ +0.000 +0.000 +1.000 +3.241 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.755 -0.656 +0.000 +126.342 ] [ +0.656 +0.755 +0.000 -1.872 ] [ +0.000 +0.000 +1.000 +3.241 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14099,7 +14473,7 @@ Model 'data/ape.dae'
       Node 'Rhand_wrist-node'
         sid: ''
         name: 'Rhand_wrist'
-        transform: [ [ +0.946 +0.000 -0.326 +381.564 ] [ -0.090 +0.961 -0.260 -36.180 ] [ +0.313 +0.275 +0.909 +126.303 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.946 -0.090 -0.313 +403.550 ] [ +0.000 +0.961 -0.275 +0.000 ] [ +0.326 +0.260 +0.909 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14107,7 +14481,7 @@ Model 'data/ape.dae'
       Node '_LHWrist-node'
         sid: ''
         name: '_LHWrist'
-        transform: [ [ +0.973 +0.000 -0.232 +708.772 ] [ -0.079 +0.940 -0.331 -57.425 ] [ +0.218 +0.341 +0.915 +158.968 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.973 -0.079 -0.218 +728.647 ] [ +0.000 +0.940 -0.341 +0.000 ] [ +0.232 +0.331 +0.915 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14115,7 +14489,7 @@ Model 'data/ape.dae'
       Node 'Text01-node'
         sid: ''
         name: 'Text01'
-        transform: [ [ +1.000 +0.000 +0.000 +403.676 ] [ +0.000 +0.000 -1.000 +13.724 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +403.676 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -13.724 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14123,7 +14497,7 @@ Model 'data/ape.dae'
       Node 'Text02-node'
         sid: ''
         name: 'Text02'
-        transform: [ [ +1.000 +0.000 +0.000 +731.386 ] [ +0.000 +0.000 -1.000 +13.724 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +731.386 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -13.724 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14131,7 +14505,7 @@ Model 'data/ape.dae'
       Node 'middle02-node'
         sid: ''
         name: 'middle02'
-        transform: [ [ +1.000 +0.000 +0.000 +783.261 ] [ +0.000 +0.000 -1.000 +16.338 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +783.261 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -16.338 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14139,7 +14513,7 @@ Model 'data/ape.dae'
       Node 'middle03-node'
         sid: ''
         name: 'middle03'
-        transform: [ [ +1.000 +0.000 +0.000 +810.880 ] [ +0.000 +0.000 -1.000 +16.338 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +810.880 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -16.338 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14163,7 +14537,7 @@ Model 'data/ape.dae'
       Node 'ring03-node'
         sid: ''
         name: 'ring03'
-        transform: [ [ +1.000 +0.000 +0.000 +834.478 ] [ +0.000 +0.000 -1.000 +22.577 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +834.478 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -22.577 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14179,7 +14553,7 @@ Model 'data/ape.dae'
       Node '_thumbL-node'
         sid: ''
         name: '_thumbL'
-        transform: [ [ +0.999 +0.000 +0.036 +833.397 ] [ +0.000 +1.000 +0.000 +0.000 ] [ -0.036 +0.000 +0.999 -33.838 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.999 +0.000 +0.036 +834.076 ] [ +0.000 +1.000 +0.000 +0.000 ] [ -0.036 +0.000 +0.999 -3.638 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14187,7 +14561,7 @@ Model 'data/ape.dae'
       Node 'RindexL-node'
         sid: ''
         name: 'RindexL'
-        transform: [ [ +1.000 +0.000 +0.000 +759.199 ] [ +0.000 +0.000 -1.000 +22.577 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +759.199 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -22.577 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14195,7 +14569,7 @@ Model 'data/ape.dae'
       Node 'fingersall_01-node'
         sid: ''
         name: 'fingersall_01'
-        transform: [ [ +1.000 +0.000 +0.000 +875.893 ] [ +0.000 +0.000 -1.000 +21.734 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +875.893 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -21.734 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14219,7 +14593,7 @@ Model 'data/ape.dae'
       Node 'fingersall_02-node'
         sid: ''
         name: 'fingersall_02'
-        transform: [ [ +1.000 +0.000 +0.000 +903.440 ] [ +0.000 +0.000 -1.000 +33.337 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +903.440 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -33.337 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14235,7 +14609,7 @@ Model 'data/ape.dae'
       Node 'fingersall_03-node'
         sid: ''
         name: 'fingersall_03'
-        transform: [ [ +1.000 +0.000 +0.000 +930.987 ] [ +0.000 +0.000 -1.000 +21.734 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +930.987 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -21.734 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14243,7 +14617,7 @@ Model 'data/ape.dae'
       Node 'littleR-node'
         sid: ''
         name: 'littleR'
-        transform: [ [ +1.000 +0.000 +0.000 +511.320 ] [ +0.000 +0.000 -1.000 +16.338 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +511.320 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -16.338 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14251,7 +14625,7 @@ Model 'data/ape.dae'
       Node 'middleR-node'
         sid: ''
         name: 'middleR'
-        transform: [ [ +1.000 +0.000 +0.000 +483.701 ] [ +0.000 +0.000 -1.000 +16.338 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +483.701 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -16.338 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14259,7 +14633,7 @@ Model 'data/ape.dae'
       Node 'KlitR-node'
         sid: ''
         name: 'KlitR'
-        transform: [ [ +1.000 +0.000 +0.000 +631.427 ] [ +0.000 +0.000 -1.000 +21.734 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +631.427 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -21.734 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14267,7 +14641,7 @@ Model 'data/ape.dae'
       Node 'thumbR-node'
         sid: ''
         name: 'thumbR'
-        transform: [ [ +1.000 +0.000 +0.000 +534.917 ] [ +0.000 +0.000 -1.000 +22.577 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +534.917 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -22.577 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14275,7 +14649,7 @@ Model 'data/ape.dae'
       Node 'KmidR-node'
         sid: ''
         name: 'KmidR'
-        transform: [ [ +1.000 +0.000 +0.000 +603.880 ] [ +0.000 +0.000 -1.000 +33.337 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +603.880 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -33.337 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14283,7 +14657,7 @@ Model 'data/ape.dae'
       Node 'KIndxR-node'
         sid: ''
         name: 'KIndxR'
-        transform: [ [ +1.000 +0.000 +0.000 +576.332 ] [ +0.000 +0.000 -1.000 +21.734 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +576.332 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -21.734 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14331,7 +14705,7 @@ Model 'data/ape.dae'
       Node '_thumbR-node'
         sid: ''
         name: '_thumbR'
-        transform: [ [ +1.000 +0.000 +0.000 +534.516 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +1.000 -0.173 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +534.516 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +1.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14347,7 +14721,7 @@ Model 'data/ape.dae'
       Node 'index02-node'
         sid: ''
         name: 'index02'
-        transform: [ [ +1.000 +0.000 +0.000 +459.639 ] [ +0.000 +0.000 -1.000 +22.577 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +459.639 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -22.577 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14355,7 +14729,7 @@ Model 'data/ape.dae'
       Node 'middleR01-node'
         sid: ''
         name: 'middleR01'
-        transform: [ [ +1.000 +0.000 +0.000 +530.241 ] [ +0.000 +0.000 -1.000 +80.770 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +530.241 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -80.770 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14371,7 +14745,7 @@ Model 'data/ape.dae'
       Node 'middleR02-node'
         sid: ''
         name: 'middleR02'
-        transform: [ [ +1.000 +0.000 +0.000 +851.735 ] [ +0.000 +0.000 -1.000 +80.770 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +851.735 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -80.770 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14379,7 +14753,7 @@ Model 'data/ape.dae'
       Node 'KlitR01-node'
         sid: ''
         name: 'KlitR01'
-        transform: [ [ +1.000 +0.000 +0.000 +676.693 ] [ +0.000 +0.000 -1.000 +21.734 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +676.693 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -21.734 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14387,7 +14761,7 @@ Model 'data/ape.dae'
       Node 'KlitR02-node'
         sid: ''
         name: 'KlitR02'
-        transform: [ [ +1.000 +0.000 +0.000 +966.939 ] [ +0.000 +0.000 -1.000 +21.734 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +966.939 ] [ +0.000 +0.000 -1.000 +0.000 ] [ +0.000 +1.000 +0.000 -21.734 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14437,7 +14811,7 @@ Model 'data/ape.dae'
       Node 'Direct13.Target-node'
         sid: ''
         name: 'Direct13.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14462,7 +14836,7 @@ Model 'data/ape.dae'
       Node 'Direct14.Target-node'
         sid: ''
         name: 'Direct14.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14470,7 +14844,7 @@ Model 'data/ape.dae'
       Node 'Direct15.Target-node'
         sid: ''
         name: 'Direct15.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14478,7 +14852,7 @@ Model 'data/ape.dae'
       Node 'Direct16.Target-node'
         sid: ''
         name: 'Direct16.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14537,7 +14911,7 @@ Model 'data/ape.dae'
       Node 'Direct17.Target-node'
         sid: ''
         name: 'Direct17.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14562,7 +14936,7 @@ Model 'data/ape.dae'
       Node 'Direct18.Target-node'
         sid: ''
         name: 'Direct18.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14570,7 +14944,7 @@ Model 'data/ape.dae'
       Node 'Direct19.Target-node'
         sid: ''
         name: 'Direct19.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14595,7 +14969,7 @@ Model 'data/ape.dae'
       Node 'Direct21.Target-node'
         sid: ''
         name: 'Direct21.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14654,7 +15028,7 @@ Model 'data/ape.dae'
       Node 'Direct22.Target-node'
         sid: ''
         name: 'Direct22.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14662,7 +15036,7 @@ Model 'data/ape.dae'
       Node 'Direct23.Target-node'
         sid: ''
         name: 'Direct23.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14670,7 +15044,7 @@ Model 'data/ape.dae'
       Node 'Direct24.Target-node'
         sid: ''
         name: 'Direct24.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14729,7 +15103,7 @@ Model 'data/ape.dae'
       Node 'Direct25.Target-node'
         sid: ''
         name: 'Direct25.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14754,7 +15128,7 @@ Model 'data/ape.dae'
       Node 'Direct26.Target-node'
         sid: ''
         name: 'Direct26.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14779,7 +15153,7 @@ Model 'data/ape.dae'
       Node 'Direct27.Target-node'
         sid: ''
         name: 'Direct27.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14787,7 +15161,7 @@ Model 'data/ape.dae'
       Node 'Direct28.Target-node'
         sid: ''
         name: 'Direct28.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14829,7 +15203,7 @@ Model 'data/ape.dae'
       Node 'Direct29.Target-node'
         sid: ''
         name: 'Direct29.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14854,7 +15228,7 @@ Model 'data/ape.dae'
       Node 'Direct30.Target-node'
         sid: ''
         name: 'Direct30.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14862,7 +15236,7 @@ Model 'data/ape.dae'
       Node 'Direct31.Target-node'
         sid: ''
         name: 'Direct31.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14870,7 +15244,7 @@ Model 'data/ape.dae'
       Node 'Direct32.Target-node'
         sid: ''
         name: 'Direct32.Target'
-        transform: [ [ +0.000 +0.000 +1.000 +68.079 ] [ +1.000 +0.000 +0.000 +59.984 ] [ +0.000 +1.000 +0.000 -7.497 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +0.000 +0.000 +1.000 +59.984 ] [ +1.000 +0.000 +0.000 -7.497 ] [ +0.000 +1.000 +0.000 +68.079 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14904,7 +15278,7 @@ Model 'data/ape.dae'
       Node 'lefthandcontrols.Target-node'
         sid: ''
         name: 'lefthandcontrols.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +863.512 ] [ +0.000 +0.000 -1.000 +6.134 ] [ +0.000 +1.000 +0.000 +280.445 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +863.512 ] [ +0.000 +0.000 -1.000 +280.445 ] [ +0.000 +1.000 +0.000 -6.134 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14921,7 +15295,7 @@ Model 'data/ape.dae'
       Node 'righthandcontrols.Target-node'
         sid: ''
         name: 'righthandcontrols.Target'
-        transform: [ [ +1.000 +0.000 +0.000 +544.115 ] [ +0.000 +0.000 -1.000 +6.134 ] [ +0.000 +1.000 +0.000 +280.445 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+        transform: [ [ +1.000 +0.000 +0.000 +544.115 ] [ +0.000 +0.000 -1.000 +280.445 ] [ +0.000 +1.000 +0.000 -6.134 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
         Collection 'instance_meshes' (0 items)
         Collection 'instance_controllers' (0 items)
         Collection 'lights' (0 items)
@@ -14966,3 +15340,61 @@ Model 'data/ape.dae'
           Collection 'instance_controllers' (0 items)
           Collection 'lights' (0 items)
           Collection 'cameras' (0 items)
+  Animations collection 'library_animations' (19 items)
+    Animation 'Box52-node-transform'
+      Animation channels (1 items):
+        Channel target is 'Box52-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'Box53-node-transform'
+      Animation channels (1 items):
+        Channel target is 'Box53-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'Box54-node-transform'
+      Animation channels (1 items):
+        Channel target is 'Box54-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'Box61-node-transform'
+      Animation channels (1 items):
+        Channel target is 'Box61-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'Box62-node-transform'
+      Animation channels (1 items):
+        Channel target is 'Box62-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'Box63-node-transform'
+      Animation channels (1 items):
+        Channel target is 'Box63-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'Box64-node-transform'
+      Animation channels (1 items):
+        Channel target is 'Box64-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'Box37-node-transform'
+      Animation channels (1 items):
+        Channel target is 'Box37-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'Box38-node-transform'
+      Animation channels (1 items):
+        Channel target is 'Box38-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'PH_wrist_R-node-transform'
+      Animation channels (1 items):
+        Channel target is 'PH_wrist_R-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'Box29-node-transform'
+      Animation channels (1 items):
+        Channel target is 'Box29-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'Box25-node-transform'
+      Animation channels (1 items):
+        Channel target is 'Box25-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'PH_wrist_L-node-transform'
+      Animation channels (1 items):
+        Channel target is 'PH_wrist_L-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'Bone01-node-transform'
+      Animation channels (1 items):
+        Channel target is 'Bone01-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'LEye-node-transform'
+      Animation channels (1 items):
+        Channel target is 'LEye-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'REye-node-transform'
+      Animation channels (1 items):
+        Channel target is 'REye-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'Point02-node-transform'
+      Animation channels (1 items):
+        Channel target is 'Point02-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'PH_wrist_animation_L-node-transform'
+      Animation channels (1 items):
+        Channel target is 'PH_wrist_animation_L-node', parameter is 'transform', semantic is 'transform', samples count is 154
+    Animation 'PH_wrist_animation_R-node-transform'
+      Animation channels (1 items):
+        Channel target is 'PH_wrist_animation_R-node', parameter is 'transform', semantic is 'transform', samples count is 154

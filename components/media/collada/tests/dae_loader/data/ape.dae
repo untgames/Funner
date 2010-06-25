@@ -12,6 +12,17 @@
     <unit meter="0.0254" name="inch"/>
     <up_axis>Z_UP</up_axis>
   </asset>
+  <library_images>
+    <image id="file21" name="file21">
+      <init_from>file:///C:/shatle/New_Project/sourceimages/VANCONTA.JPG</init_from>
+    </image>
+    <image id="file3" name="file3">
+      <init_from>file:///C:/shatle/New_Project/sourceimages/VANENGFL.JPG</init_from>
+    </image>
+    <image id="file48" name="file48">
+      <init_from>file:///C:/shatle/New_Project/sourceimages/VANcont1.jpg</init_from>
+    </image>
+  </library_images>
   <library_animations>
     <animation id="main_body_dummy-node-translation">
       <source id="main_body_dummy-node-translation_main_body_dummy-node_translation.X-input">

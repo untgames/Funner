@@ -1,0 +1,8 @@
+Results of convert_animation_test:
+Load collada model 'data/ape.dae'
+data/ape.dae(5103): warning: node 'morph': No targets
+data/ape.dae(5103): warning: node 'morph': No weights
+Converting...
+Save XAnim library '/io/stdout/test.xanim'
+<?xml version="1.0" encoding="utf-8"?>
+<animation_library/>
