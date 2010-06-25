@@ -15,6 +15,7 @@ namespace math
 {
 
 //forward declarations
+template <class T, unsigned int Size> class matrix;
 template <class T, unsigned int Size> class vector;
 template <class T>                    class quat;
 
@@ -23,6 +24,7 @@ template <class T>                    class quat;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T>                    struct spline_scalar_type                   { typedef T type; };
 template <class T, unsigned int Size> struct spline_scalar_type<vector<T, Size> > { typedef T type; };
+template <class T, unsigned int Size> struct spline_scalar_type<matrix<T, Size> > { typedef T type; };
 template <class T>                    struct spline_scalar_type<quat<T> >         { typedef T type; };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,6 +41,22 @@ template <class T> struct spline_key
 
   spline_key ();
   spline_key (const time_type& time, const value_type& value);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ключ сплайна без интерполяции
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct spline_step_key: public spline_key<T>
+{
+  private:
+    typedef spline_key<T> base;
+
+  public:
+    typedef typename base::time_type  time_type;
+    typedef typename base::value_type value_type;
+
+    spline_step_key ();
+    spline_step_key (const time_type& time, const value_type& value);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +122,7 @@ class basic_spline
 {
   public:
     typedef Key                            key_type;
-    typedef typename key_type::value_type  value_type;    
+    typedef typename key_type::value_type  value_type, result_type;
     typedef typename key_type::scalar_type scalar_type;
     typedef typename key_type::time_type   time_type;
 
@@ -185,6 +203,7 @@ class basic_spline
     value_type eval (const time_type& time) const;
 
     value_type operator () (const time_type& time) const;
+    void       operator () (const time_type& time, value_type& value) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -218,6 +237,11 @@ typedef basic_spline<spline_bezier_key<float> >             bezier_splinef;
 typedef basic_spline<spline_bezier_key<vector<float, 2> > > bezier_spline2f;
 typedef basic_spline<spline_bezier_key<vector<float, 3> > > bezier_spline3f;
 typedef basic_spline<spline_bezier_key<vector<float, 4> > > bezier_spline4f;
+typedef basic_spline<spline_step_key<float> >               step_splinef;
+typedef basic_spline<spline_step_key<vector<float, 2> > >   step_spline2f;
+typedef basic_spline<spline_step_key<vector<float, 3> > >   step_spline3f;
+typedef basic_spline<spline_step_key<vector<float, 4> > >   step_spline4f;
+typedef basic_spline<spline_step_key<matrix<float, 4> > >   step_spline_mat4f;
 
 #ifndef MATH_CURVES_SPLINE_NO_DETAILS
   #include <math/detail/basic_spline.inl>

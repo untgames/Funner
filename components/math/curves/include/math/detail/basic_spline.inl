@@ -39,13 +39,28 @@ template <class Key> struct spline_key_frame
   typedef math::vector<value_type, 4>    factors_type;
 
   key_type     key;
-  factors_type factors;
   time_type    time_factor;
+  factors_type factors;
   
   spline_key_frame (const key_type& in_key)
     : key (in_key)
   {
-  }  
+  }
+};
+
+template <class T> struct spline_key_frame<spline_step_key<T> >
+{
+  typedef spline_step_key<T>             key_type;
+  typedef typename key_type::time_type   time_type;
+  typedef typename key_type::scalar_type scalar_type;
+  typedef typename key_type::value_type  value_type;
+
+  key_type key;
+
+  spline_key_frame (const key_type& in_key)
+    : key (in_key)
+  {
+  }
 };
 
 ///Компаратор для фреймов
@@ -70,12 +85,18 @@ Time normalize_time (const Time& time, const Frame& frame)
 }
 
 ///Интерполяция
-template <class Time, class Value>
-void spline_interpolate (const Time& time, const math::vector<Value, 4>& factors, Value& result)
+template <class Time, class Frame, class Value>
+void spline_eval (const Time& unclamped_time, const Frame& frame, Value& result)
 {    
-  Time time2 = time * time;
-  
-  result = dot (math::vector<Value, 4> (Value (1), Value (time), Value (time2), Value (time2 * time)), factors);
+  Time time = normalize_time (unclamped_time, frame), time2 = time * time;
+
+  result = dot (math::vector<Value, 4> (Value (1), Value (time), Value (time2), Value (time2 * time)), frame.factors);
+}
+
+template <class Time, class Value>
+void spline_eval (const Time&, const spline_key_frame<spline_step_key<Value> >& frame, Value& result)
+{
+  result = frame.key.value;
 }
 
 ///Раcчёт коэффициентов TCB-сплайна
@@ -225,6 +246,12 @@ void recompute (spline_key_frame<spline_bezier_key<T> >* first, spline_key_frame
   } 
 }
 
+///Расчёт сплайна без интерполяции
+template <class T>
+void recompute (spline_key_frame<spline_step_key<T> >* first, spline_key_frame<spline_step_key<T> >* last, bool closed)
+{
+}
+
 }
 
 /*
@@ -262,12 +289,27 @@ spline_tcb_key<T>::spline_tcb_key (const time_type& in_time, const value_type& i
 {
 }
 
-template <class T>  
+template <class T>
 spline_tcb_key<T>::spline_tcb_key (const time_type& in_time, const value_type& in_value, const scalar_type& in_tension, const scalar_type& in_continuity, const scalar_type& in_bias)
   : base (in_time, in_value)
   , tension (in_tension)
   , continuity (in_continuity)
   , bias (in_bias)
+{
+}
+
+/*
+    Сплайн без интерполяции
+*/
+
+template <class T>
+spline_step_key<T>::spline_step_key ()
+{
+}
+
+template <class T>
+spline_step_key<T>::spline_step_key (const time_type& time, const value_type& value)
+  : base (time, value)
 {
 }
 
@@ -616,7 +658,7 @@ size_t basic_spline<Key>::add_keys (size_t keys_count, const key_type* keys)
   impl->frames.insert (impl->frames.end (), keys, keys + keys_count);
 
   impl->need_recompute = true;
-  impl->need_sort      = true;
+  impl->need_sort      = true;  
   
   return impl->frames.size () - keys_count;
 }
@@ -630,7 +672,9 @@ size_t basic_spline<Key>::add_key (const key_type& key)
 template <class Key>
 size_t basic_spline<Key>::add_key (const time_type& time, const value_type& value)
 {
-  return add_key (key_type (time, value));
+  key_type key (time, value);
+
+  return add_keys (1, &key);
 }
 
 /*
@@ -679,7 +723,7 @@ void basic_spline<Key>::eval (const time_type& time, value_type& out_value) cons
 {
   typename implementation::frame_type& frame = impl->get_frame (time);
   
-  detail::spline_interpolate (detail::normalize_time (time, frame), frame.factors, out_value);
+  detail::spline_eval (time, frame, out_value);
 }
 
 template <class Key>
@@ -696,6 +740,12 @@ template <class Key>
 typename basic_spline<Key>::value_type basic_spline<Key>::operator () (const time_type& time) const
 {
   return eval (time);
+}
+
+template <class Key>
+void basic_spline<Key>::operator () (const time_type& time, typename basic_spline<Key>::value_type& value) const
+{
+  eval (time, value);
 }
 
 /*

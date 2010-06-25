@@ -6,6 +6,7 @@
 #include <stl/vector>
 
 #include <math/angle.h>
+#include <math/matrix.h>
 #include <math/vector.h>
 #include <math/quat.h>
 
@@ -49,6 +50,16 @@ void dump (const vector<T, Size>& v)
   }
   
   printf ("]");
+}
+
+template <class T, unsigned int Size>
+void dump (const matrix<T, Size>& m)
+{
+  for (unsigned int i=0; i<Size; i++)
+  {
+    printf ("\n");
+    dump (m [i]);
+  }
 }
 
 template <class Time, class Spline>
