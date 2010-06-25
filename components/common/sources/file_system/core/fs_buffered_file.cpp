@@ -43,7 +43,7 @@ struct BufferedFileImpl::Impl
         throw xtl::format_operation_exception ("", "Can't seek file");      
         
       char*  data = buffer.data () + data_dirty_start_pos - data_start_pos;
-      size_t size = data_dirty_end_pos - data_dirty_end_pos;
+      size_t size = data_dirty_end_pos - data_dirty_start_pos;
 
       size_t write_size = base_file->Write (data, size);
 
