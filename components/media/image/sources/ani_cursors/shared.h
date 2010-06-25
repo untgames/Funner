@@ -6,6 +6,7 @@
 
 #include <common/component.h>
 #include <common/file.h>
+#include <common/property_map.h>
 #include <common/strlib.h>
 
 #include <media/image.h>
