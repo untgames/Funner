@@ -47,7 +47,7 @@ class AsyncOperationManager
     
     ~AsyncOperationManager ()
     {
-      while (!operations.empty ())
+      while (!operations.empty ()) //not operations.clear (), because recursive delete
         operations.pop_back ();
     }
   
