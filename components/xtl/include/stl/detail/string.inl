@@ -4,7 +4,7 @@
 
 template <class T,class Traits,class Alloc>
 inline basic_string<T,Traits,Alloc>::basic_string (const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 { 
   allocate_block (BUF_SIZE);
   terminate_string ();
@@ -12,7 +12,7 @@ inline basic_string<T,Traits,Alloc>::basic_string (const allocator_type& _alloca
 
 template <class T,class Traits,class Alloc>
 basic_string<T,Traits,Alloc>::basic_string (_reserve,size_type count,const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 {
   allocate_block (count+1);
 
@@ -29,14 +29,14 @@ basic_string<T,Traits,Alloc>::basic_string (_reserve,size_type count,const alloc
 
 template <class T,class Traits,class Alloc>
 inline basic_string<T,Traits,Alloc>::basic_string (size_type count,value_type c,const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 {
   _init (count,c);
 }
 
 template <class T,class Traits,class Alloc>
 inline basic_string<T,Traits,Alloc>::basic_string (const basic_string& s)
-  : allocator (s.allocator)
+  : allocator_type (static_cast<const allocator_type&> (s))
 {
   _init (s.begin (),s.end ());
 }
@@ -47,7 +47,7 @@ inline basic_string<T,Traits,Alloc>::basic_string
   size_type              pos,
   size_type              count,
   const allocator_type&  _allocator)
-    : allocator (_allocator)
+    : allocator_type (_allocator)
 {
   if (!s.is_valid (pos))
     stl_raise_out_of_range (s,pos);
@@ -57,21 +57,21 @@ inline basic_string<T,Traits,Alloc>::basic_string
 
 template <class T,class Traits,class Alloc>
 inline basic_string<T,Traits,Alloc>::basic_string (const value_type* s,size_type count,const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 {
   _init (s,s+count);
 }
 
 template <class T,class Traits,class Alloc>
 inline basic_string<T,Traits,Alloc>::basic_string (const value_type* s,const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 {
   _init (s,s+traits_type::length (s));
 }
 
 template <class T,class Traits,class Alloc> template <class Iter> 
 inline basic_string<T,Traits,Alloc>::basic_string (Iter first,Iter last,const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 {
   _init (first,last);
 }
@@ -79,7 +79,7 @@ inline basic_string<T,Traits,Alloc>::basic_string (Iter first,Iter last,const al
 template <class T,class Traits,class Alloc>
 inline basic_string<T,Traits,Alloc>::~basic_string ()
 {  
-  destroy (start,finish+1);
+  stl::destroy (start,finish+1);
   deallocate_block ();
 }
 
@@ -98,7 +98,7 @@ void basic_string<T,Traits,Alloc>::_init (size_type count,value_type value)
   }
   catch (...)
   {
-    destroy (start,finish);
+    stl::destroy (start,finish);
     deallocate_block ();
     throw;
   }
@@ -122,7 +122,7 @@ void basic_string<T,Traits,Alloc>::_init (Iter first,Iter last,input_iterator_ta
   }
   catch (...)
   {
-    destroy (finish);
+    stl::destroy (finish);
     deallocate_block ();
     throw;
   }  
@@ -163,7 +163,7 @@ inline void basic_string<T,Traits,Alloc>::_init (Iter first,Iter last)
 template <class T,class Traits,class Alloc>
 inline typename basic_string<T,Traits,Alloc>::allocator_type basic_string<T,Traits,Alloc>::get_allocator () const
 {
-  return allocator;
+  return static_cast<const allocator_type&> (*this);
 }
 
 template <class T,class Traits,class Alloc>
@@ -195,7 +195,7 @@ inline typename basic_string<T,Traits,Alloc>::pointer basic_string<T,Traits,Allo
     allocated_size = BUF_SIZE;
     return buffer;
   }
-  else return allocator.allocate (allocated_size=count,buffer!=start?buffer:NULL);  
+  else return allocator_type::allocate (allocated_size=count,buffer!=start?buffer:NULL);  
 }
 
 template <class T,class Traits,class Alloc>
@@ -204,7 +204,7 @@ inline void basic_string<T,Traits,Alloc>::deallocate (pointer p,size_type count)
   if (p == buffer)
     return;
     
-  allocator.deallocate (p,count);
+  allocator_type::deallocate (p,count);
 }
 
 /*
@@ -215,7 +215,7 @@ inline void basic_string<T,Traits,Alloc>::deallocate (pointer p,size_type count)
 template <class T,class Traits,class Alloc>
 inline void basic_string<T,Traits,Alloc>::construct_null (value_type* p)
 {
-  construct (p,traits_type::null ());
+  stl::construct (p,traits_type::null ());
 }
 
 template <class T,class Traits,class Alloc>
@@ -227,7 +227,7 @@ void basic_string<T,Traits,Alloc>::terminate_string ()
   }
   catch (...)
   {
-    destroy (start,finish);
+    stl::destroy (start,finish);
     throw;
   }
 }
@@ -315,7 +315,7 @@ inline typename basic_string<T,Traits,Alloc>::size_type basic_string<T,Traits,Al
 template <class T,class Traits,class Alloc>
 inline typename basic_string<T,Traits,Alloc>::size_type basic_string<T,Traits,Alloc>::max_size () const
 {
-  return allocator.max_size () - 1;
+  return allocator_type::max_size () - 1;
 }
 
 template <class T,class Traits,class Alloc>
@@ -458,7 +458,7 @@ inline void basic_string<T,Traits,Alloc>::fast_resize (size_type new_size)
     }
     catch (...)
     {
-      destroy (finish+1,finish+count);
+      stl::destroy (finish+1,finish+count);
       throw;
     }
 
@@ -487,12 +487,12 @@ void basic_string<T,Traits,Alloc>::reserve (size_type new_size)
   }
   catch (...)
   {
-    destroy    (new_start,new_finish);
-    deallocate (new_start,new_size);
+    stl::destroy (new_start,new_finish);
+    deallocate   (new_start,new_size);
     throw;
   }
 
-  destroy (start,finish+1);
+  stl::destroy (start,finish+1);
   deallocate_block ();
   
   start  = new_start;
@@ -684,7 +684,7 @@ basic_string<T,Traits,Alloc>& basic_string<T,Traits,Alloc>::append (size_type co
     }
     catch (...)
     {
-      destroy (finish+1,finish+count);
+      stl::destroy (finish+1,finish+count);
       throw;
     }
 
@@ -735,12 +735,12 @@ void basic_string<T,Traits,Alloc>::_append (Iter first,Iter last,forward_iterato
     }
     catch (...)
     {
-      destroy    (new_start,new_finish);
-      deallocate (new_start,len);
+      stl::destroy (new_start,new_finish);
+      deallocate   (new_start,len);
       throw;
     }
 
-    destroy (start,finish+1);
+    stl::destroy (start,finish+1);
     deallocate_block ();
     
     start  = new_start;
@@ -759,7 +759,7 @@ void basic_string<T,Traits,Alloc>::_append (Iter first,Iter last,forward_iterato
     }
     catch (...)
     {
-      destroy (finish+1,finish+count);
+      stl::destroy (finish+1,finish+count);
       throw;
     }
 
@@ -824,7 +824,7 @@ template <class T,class Traits,class Alloc>
 inline void basic_string<T,Traits,Alloc>::pop_back ()
 {
   traits_type::assign (finish [-1],traits_type::null ());
-  destroy (finish);
+  stl::destroy (finish);
   --finish;
 }
 
@@ -915,7 +915,7 @@ inline typename basic_string<T,Traits,Alloc>::iterator basic_string<T,Traits,All
     stl_raise_out_of_range (*this,position);
 
   traits_type::move (position,position+1,finish-position);
-  destroy           (finish);
+  stl::destroy      (finish);
   
   --finish;
   
@@ -936,7 +936,7 @@ inline typename basic_string<T,Traits,Alloc>::iterator basic_string<T,Traits,All
   const iterator new_finish = finish-(last-first);
     
   traits_type::move (first,last,(finish-last)+1);
-  destroy           (new_finish+1,finish+1);
+  stl::destroy      (new_finish+1,finish+1);
   
   finish = new_finish;
   
@@ -950,7 +950,7 @@ inline void basic_string<T,Traits,Alloc>::clear ()
     return;
     
   traits_type::assign (*start,traits_type::null ());
-  destroy (start+1,finish+1);
+  stl::destroy (start+1,finish+1);
   
   finish = start;
 }
@@ -1008,7 +1008,7 @@ void basic_string<T,Traits,Alloc>::_insert (iterator position,Iter first,Iter la
       }
       catch (...)
       {
-        destroy (finish+1,finish+count-elems_after);
+        stl::destroy (finish+1,finish+count-elems_after);
         throw;
       }
       
@@ -1033,12 +1033,12 @@ void basic_string<T,Traits,Alloc>::_insert (iterator position,Iter first,Iter la
     }
     catch (...)
     {
-      destroy    (new_start,new_finish);
-      deallocate (new_start,len);
+      stl::destroy (new_start,new_finish);
+      deallocate   (new_start,len);
       throw;
     }
 
-    destroy (start,finish+1);
+    stl::destroy (start,finish+1);
     deallocate_block ();
     
     start  = new_start;
@@ -1085,7 +1085,7 @@ void basic_string<T,Traits,Alloc>::insert (iterator position,size_type count,val
       }
       catch (...)
       {
-        destroy (finish+1,finish+count-elems_after);
+        stl::destroy (finish+1,finish+count-elems_after);
         throw;
       }
                           
@@ -1109,12 +1109,12 @@ void basic_string<T,Traits,Alloc>::insert (iterator position,size_type count,val
     }
     catch (...)
     {
-      destroy    (new_start,new_finish);
-      deallocate (new_start,len);
+      stl::destroy (new_start,new_finish);
+      deallocate   (new_start,len);
       throw;
     }
 
-    destroy (start, finish + 1);
+    stl::destroy (start, finish + 1);
     deallocate_block ();
     
     start  = new_start;
@@ -1194,18 +1194,18 @@ typename basic_string<T,Traits,Alloc>::iterator basic_string<T,Traits,Alloc>::in
       try
       {
         new_pos = uninitialized_copy (start,pos,new_start);
-        construct (new_pos,c);
+        stl::construct (new_pos,c);
         new_finish = uninitialized_copy (pos,finish,new_finish=new_pos+1);
         construct_null (new_finish);
       }
       catch (...)
       {
-        destroy    (new_start,new_finish);
-        deallocate (new_start,len);
+        stl::destroy (new_start,new_finish);
+        deallocate   (new_start,len);
         throw;
       }
 
-      destroy (start,finish+1);
+      stl::destroy (start,finish+1);
       deallocate_block ();
       
       start  = new_start;
@@ -1386,7 +1386,7 @@ inline basic_string<T,Traits,Alloc>& basic_string<T,Traits,Alloc>::replace
 template <class T,class Traits,class Alloc>
 inline void basic_string<T,Traits,Alloc>::swap (basic_string& s)
 {
-  if (is_static () || s.is_static () || allocator != s.allocator)
+  if (is_static () || s.is_static () || static_cast<allocator_type&> (*this) != static_cast<allocator_type&> (s))
   {
     basic_string t = *this;
     *this          = s;

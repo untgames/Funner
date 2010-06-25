@@ -4,14 +4,14 @@
 
 template <class T,class Allocator>
 inline vector<T,Allocator>::vector (const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 {
-  start = finish = end_of_storage = NULL;
+  start = finish = end_of_storage = NULL;  
 }
 
 template <class T,class Allocator>
 inline vector<T,Allocator>::vector (size_type count,const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 {
   start = finish = end_of_storage = NULL;
   resize (count);
@@ -19,7 +19,7 @@ inline vector<T,Allocator>::vector (size_type count,const allocator_type& _alloc
 
 template <class T,class Allocator>
 inline vector<T,Allocator>::vector (size_type count,const value_type& value,const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 {
   start = finish = end_of_storage = NULL;
   resize (count,value);
@@ -27,7 +27,7 @@ inline vector<T,Allocator>::vector (size_type count,const value_type& value,cons
 
 template <class T,class Allocator>
 inline vector<T,Allocator>::vector (const vector& x)
-  : allocator (x.allocator)
+  : allocator_type (static_cast<const allocator_type&> (x))
 {
   start = finish = end_of_storage = NULL;
 
@@ -37,7 +37,7 @@ inline vector<T,Allocator>::vector (const vector& x)
 
 template <class T,class Allocator> template <class Iter> 
 inline vector<T,Allocator>::vector (Iter first,Iter last,const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 {
   start = finish = end_of_storage = NULL;  
   insert (finish,first,last);
@@ -46,8 +46,8 @@ inline vector<T,Allocator>::vector (Iter first,Iter last,const allocator_type& _
 template <class T,class Allocator>
 inline vector<T,Allocator>::~vector ()
 {
-  destroy (start,finish);
-  allocator.deallocate (start,end_of_storage-start);
+  stl::destroy (start,finish);
+  allocator_type::deallocate (start,end_of_storage-start);
 }               
 
 /*
@@ -57,7 +57,7 @@ inline vector<T,Allocator>::~vector ()
 template <class T,class Allocator>
 inline typename vector<T,Allocator>::allocator_type vector<T,Allocator>::get_allocator () const
 {
-  return allocator;
+  return static_cast<const allocator_type&> (*this);
 }
 
 /*
@@ -73,13 +73,13 @@ inline typename vector<T,Allocator>::size_type vector<T,Allocator>::size () cons
 template <class T,class Allocator>
 inline typename vector<T,Allocator>::size_type vector<T,Allocator>::max_size () const
 {
-  return allocator.max_size (); 
+  return allocator_type::max_size (); 
 }
 
 template <class T,class Allocator>
 inline typename vector<T,Allocator>::size_type vector<T,Allocator>::capacity () const
 {
-  return size_type (end_of_storage - begin ());
+  return size_type (end_of_storage - start);
 }
 
 template <class T,class Allocator>
@@ -229,7 +229,7 @@ inline typename vector<T,Allocator>::const_reference vector<T,Allocator>::back (
 template <class T,class Allocator> template <class Iter>
 void vector<T,Allocator>::realloc (size_type count,Iter first,Iter last)
 {
-  iterator tmp = allocator.allocate (count,start), new_finish;
+  iterator tmp = allocator_type::allocate (count,start), new_finish;
   
   try
   {
@@ -241,8 +241,8 @@ void vector<T,Allocator>::realloc (size_type count,Iter first,Iter last)
     throw;
   }
   
-  destroy (start,finish);
-  allocator.deallocate (start,end_of_storage-start);
+  stl::destroy (start,finish);
+  allocator_type::deallocate (start,end_of_storage-start);
   
   start          = tmp;
   finish         = new_finish;
@@ -274,7 +274,7 @@ vector<T,Allocator>& vector<T,Allocator>::operator = (const vector& x)
   }
   else if (size () >= xlen) 
   {
-    destroy (copy (x.begin (),x.end (),start),finish);
+    stl::destroy (copy (x.begin (),x.end (),start),finish);
   }
   else 
   {
@@ -329,7 +329,7 @@ void vector<T,Allocator>::_assign (Iter first,Iter last,forward_iterator_tag)
     }
     else if (size () >= len) 
     {
-      destroy (copy (first,last,start),finish);
+      stl::destroy (copy (first,last,start),finish);
     }
     else 
     {
@@ -389,21 +389,21 @@ void vector<T,Allocator>::assign (size_type count,const value_type& val)
 template <class T,class Allocator>
 inline void vector<T,Allocator>::push_back (const value_type& x)
 {
-  if (finish != end_of_storage)  construct (finish++,x);
+  if (finish != end_of_storage)  stl::construct (finish++,x);
   else                           _insert (end (),x);
 }
 
 template <class T,class Allocator>
 inline void vector<T,Allocator>::push_back ()
 {
-  if (finish != end_of_storage)  construct (finish++);
+  if (finish != end_of_storage)  stl::construct (finish++);
   else                           _insert (end (),T ());
 }
 
 template <class T,class Allocator>
 inline void vector<T,Allocator>::pop_back ()
 {
-  destroy (--finish);
+  stl::destroy (--finish);
 }
 
 /*
@@ -424,7 +424,7 @@ void vector<T,Allocator>::_insert (iterator position,const value_type& value)
 
   if (finish != end_of_storage) 
   {
-    construct (finish,finish [-1]);
+    stl::construct (finish,finish [-1]);
 
     ++finish;
     
@@ -440,26 +440,26 @@ void vector<T,Allocator>::_insert (iterator position,const value_type& value)
       stl_raise_length_error (*this,size ()+1);
   
     const volatile size_type len        = next_size (1);
-    volatile iterator        new_start  = allocator.allocate (len,start), //обход предупреждения на gcc: 'new_start' might be used uninitialized in this function
+    volatile iterator        new_start  = allocator_type::allocate (len,start), //обход предупреждения на gcc: 'new_start' might be used uninitialized in this function
                              new_finish = new_start;
              
     try 
     {
       new_finish = uninitialized_copy (start,position,new_start);
       
-      construct (new_finish++,value);
+      stl::construct (new_finish++,value);
             
       new_finish = uninitialized_copy (position,finish,new_finish);
     }
     catch (...)
     {
-      destroy (new_start,new_finish);
-      allocator.deallocate (new_start,len);
+      stl::destroy (new_start,new_finish);
+      allocator_type::deallocate (new_start,len);
       throw;
     }
     
-    destroy (begin (),end ());
-    allocator.deallocate (start,end_of_storage-start);
+    stl::destroy (begin (),end ());
+    allocator_type::deallocate (start,end_of_storage-start);
     
     start  = new_start;
     finish = new_finish;
@@ -474,8 +474,8 @@ inline typename vector<T,Allocator>::iterator vector<T,Allocator>::insert
 {       
   size_type count = position - begin ();
   
-  if (finish != end_of_storage && position == end ()) construct (finish++,value);
-  else                                                _insert   (position,value);
+  if (finish != end_of_storage && position == end ()) stl::construct (finish++,value);
+  else                                                _insert (position,value);
   
   return begin ()+count;
 }
@@ -524,7 +524,7 @@ void vector<T,Allocator>::insert (iterator position,size_type count,const value_
   else 
   {
     const volatile size_type len        = next_size (count);
-    volatile iterator        new_start  = allocator.allocate (len,start), new_finish = new_start;
+    volatile iterator        new_start  = allocator_type::allocate (len,start), new_finish = new_start;
 
     try
     {
@@ -534,13 +534,13 @@ void vector<T,Allocator>::insert (iterator position,size_type count,const value_
     }
     catch (...)
     {
-      destroy (new_start,new_finish);
-      allocator.deallocate (new_start,len);
+      stl::destroy (new_start,new_finish);
+      allocator_type::deallocate (new_start,len);
       throw;
     }
 
-    destroy (start,finish);
-    allocator.deallocate (start,end_of_storage-start);
+    stl::destroy (start,finish);
+    allocator_type::deallocate (start,end_of_storage-start);
     
     start  = new_start;
     finish = new_finish;
@@ -601,7 +601,7 @@ void vector<T,Allocator>::_insert_range (iterator position,Iter first,Iter last,
   else 
   {
     const size_type len        = next_size (count);
-    iterator        new_start  = allocator.allocate (len,start),
+    iterator        new_start  = allocator_type::allocate (len,start),
                     new_finish = new_start;
                     
     try
@@ -612,13 +612,13 @@ void vector<T,Allocator>::_insert_range (iterator position,Iter first,Iter last,
     }
     catch (...)
     {
-      destroy (new_start,new_finish);
-      allocator.deallocate (new_start,len);
+      stl::destroy (new_start,new_finish);
+      allocator_type::deallocate (new_start,len);
       throw;
     }
 
-    destroy (start,finish);
-    allocator.deallocate (start,end_of_storage-start);
+    stl::destroy (start,finish);
+    allocator_type::deallocate (start,end_of_storage-start);
     
     start  = new_start;
     finish = new_finish;
@@ -651,7 +651,7 @@ inline typename vector<T,Allocator>::iterator vector<T,Allocator>::erase (iterat
   if (i + 1 != end ())
     copy (i + 1,finish,i);
     
-  destroy (--finish);
+  stl::destroy (--finish);
   
   return i;
 }
@@ -664,7 +664,7 @@ typename vector<T,Allocator>::iterator vector<T,Allocator>::erase (iterator firs
 
   iterator i = copy (last,finish,first);
   
-  destroy (i,finish);
+  stl::destroy (i,finish);
   
   finish = finish - (last - first);
   
@@ -713,7 +713,7 @@ void vector<T,Allocator>::reserve (size_type count)
 template <class T,class Allocator>
 inline void vector<T,Allocator>::swap (vector& x)
 {
-  if (allocator == x.allocator)
+  if (static_cast<allocator_type&> (*this) == static_cast<allocator_type&> (x))
   {
     stl::swap (start,x.start);
     stl::swap (finish,x.finish);  
