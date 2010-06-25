@@ -12,9 +12,7 @@ int main ()
   
   try
   {
-    char buffer [128];
-    
-    MemFile out_file (buffer, sizeof buffer);
+    MemFile out_file;
     
     out_file.Write (MESSAGE, strlen (MESSAGE));
     
