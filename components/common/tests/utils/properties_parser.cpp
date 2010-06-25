@@ -1,9 +1,8 @@
 #include <cstdio>
 #include <exception>
 
-#include <stl/string>
-
 #include <common/property_map.h>
+#include <common/strlib.h>
 
 using namespace common;
 

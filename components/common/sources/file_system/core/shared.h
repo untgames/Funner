@@ -173,6 +173,7 @@ class MemFileImpl: public FileImpl
 {
   public: 
     MemFileImpl  (FileImplPtr base_file);
+    MemFileImpl  (size_t buffer_reserved_size,filemode_t mode);
     MemFileImpl  (void* buffer,size_t buffer_size,filemode_t mode);
     ~MemFileImpl ();
     
@@ -182,14 +183,14 @@ class MemFileImpl: public FileImpl
     filepos_t   Seek   (filepos_t new_pos);
     void        Rewind ();
     filesize_t  Size   ();
+    void        Resize (filesize_t new_size);
     bool        Eof    ();
-    size_t      GetBufferSize () { return finish-start; }
+    size_t      GetBufferSize ();
+    void*       GetBuffer ();
 
   private:
-    bool   is_auto_deleted;  //флаг определ€ющий нужно ли автоматически удал€ть буфер при закрытии файла
-    char*  start;        //указатель на начало буфера
-    char*  finish;       //указатель на конец буфера
-    char*  pos;          //указатель на текущую позицию внутри буфера
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -290,7 +290,10 @@ class AppendFile: public StdFile
 class MemFile: public File
 {
   public:
+    MemFile (size_t buffer_reserved_size = 0, filemode_t mode_flags = FileMode_ReadWrite);
     MemFile (void* buf, size_t size, filemode_t mode_flags = FileMode_Write | FileMode_Read | FileMode_Seek | FileMode_Rewind);
+    
+    void* Buffer () const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
