@@ -1,0 +1,11 @@
+Results of animation_test:
+Animation name is ''
+Events count is 0
+Targets count is '0'
+Animation name is 'my_animation'
+Events count is 1
+Targets count is '2'
+Target 0 name is 'test_channel_target', channels count is 1
+Target 1 name is 'test_channel_target2', channels count is 1
+Targets count is '1'
+Targets count is '0'
