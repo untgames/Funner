@@ -56,7 +56,7 @@ class AniLoader
           else if (!memcmp ("LIST", tag, sizeof tag)) ParseFramesList ();
           else if (!memcmp ("seq ", tag, sizeof tag)) ParseSequence ();
 
-          if (new_pos != file.Seek (new_pos))
+          if (new_pos != (size_t)file.Seek (new_pos))
             throw xtl::format_operation_exception ("", "Can' skip chunk '%s'", tag);
         }
         
@@ -92,7 +92,7 @@ class AniLoader
       
       if (ani_header.header_size != sizeof (AniHeader))
         throw xtl::format_operation_exception ("media::ani_cursors::AniLoader::ReadAniHeader", "Ani header size %u less than expected size %u",
-          ani_header.header_size, sizeof AniHeader);
+          ani_header.header_size, sizeof (AniHeader));
     }        
     
 ///Разбор списка кадров
@@ -114,7 +114,7 @@ class AniLoader
           
           size_t new_pos = file.Tell () + chunk_size;
 
-          if (new_pos != file.Seek (new_pos))
+          if (new_pos != (size_t)file.Seek (new_pos))
             throw xtl::format_operation_exception ("", "Can' skip chunk '%s'", tag);
         }
         else if (!memcmp ("fram", tag, sizeof tag))
@@ -208,10 +208,10 @@ class AniLoader
     {
       try
       {
-        size_t read_size = file.Read (&data, sizeof T);
+        size_t read_size = file.Read (&data, sizeof (T));
       
-        if (read_size != sizeof T)
-          throw xtl::format_operation_exception ("", "Can't read %u bytes from input file", sizeof T);
+        if (read_size != sizeof (T))
+          throw xtl::format_operation_exception ("", "Can't read %u bytes from input file", sizeof (T));
       }
       catch (xtl::exception& e)
       {
