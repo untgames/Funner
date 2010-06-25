@@ -113,7 +113,7 @@ class Mesh
     const geometry::Primitive& Primitive       (size_t index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ƒобавление/удаление примитивов примитивов
+///ƒобавление/удаление примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t AddPrimitive        (PrimitiveType type, size_t vertex_buffer, size_t first, size_t count, const char* material); //return: индекс примитива
     void   RemovePrimitive     (size_t primitive_index);

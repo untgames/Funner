@@ -193,7 +193,6 @@ class BinMeshLibraryLoader
       vertex_buffers.insert_pair (id, vb);
     }
 
-
       //чтение вершинных буферов
     void ReadVertexBuffers ()
     {
@@ -309,6 +308,18 @@ class BinMeshLibraryLoader
     void ReadMesh ()
     {
       static const char* METHOD_NAME = "media::geometry::BinMeshLibraryLoader::ParseMesh";
+      
+        //чтение идентификатора меша
+        
+      size_t id_length;
+      
+      file_read (input_file, &id_length, sizeof (id_length));
+      
+      xtl::uninitialized_storage<char> id (id_length + 1);
+      
+      file_read (input_file, id.data (), sizeof (char) * id_length);
+      
+      id.data ()[id_length] = '\0';
 
         //чтение имени меша
 
@@ -387,7 +398,7 @@ class BinMeshLibraryLoader
 
         //присоединение меша к модели
 
-      library.Attach (name.data (), mesh);
+      library.Attach (id.data (), mesh);
     }
 
       //чтение мешей

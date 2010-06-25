@@ -10,7 +10,7 @@ namespace
     Константы
 */
 
-const char* FLOAT_FORMAT = ".000"; //количество знаков после запятой при выводе вещественных чисел
+const char* FLOAT_FORMAT = ".#####"; //количество знаков после запятой при выводе вещественных чисел
 
 }
 
@@ -81,7 +81,7 @@ class XmlMeshLibrarySaver
       writer.WriteAttribute ("vertices_count", vs.Size ());
       writer.WriteAttribute ("vertex_size", vs.VertexSize ());
 
-        //сохранение вершинных данных        
+        //сохранение вершинных данных
         
       for (size_t i=0; i<vertex_format.AttributesCount (); i++)
       {
@@ -178,7 +178,7 @@ class XmlMeshLibrarySaver
         writer.WriteData (format ("vs#%u", iter->second));
       }      
       
-        //добавление буфера в список сохранённых      
+        //добавление буфера в список сохранённых
       
       vertex_buffers.insert_pair (vb.Id (), vertex_buffers.size () + 1);
     }
@@ -246,13 +246,14 @@ class XmlMeshLibrarySaver
     }
     
       //сохранение меша
-    void SaveMesh (const Mesh& mesh)
+    void SaveMesh (const char* id, const Mesh& mesh)
     {
       if (!mesh.VertexBuffersCount () || !mesh.PrimitivesCount ())
         return;
-      
+
       XmlWriter::Scope scope (writer, "mesh");
       
+      writer.WriteAttribute ("id", id);
       writer.WriteAttribute ("name", mesh.Name ());
       
       ResourceMap::const_iterator ib_iter = index_buffers.find (mesh.IndexBuffer ().Id ());
@@ -314,7 +315,7 @@ class XmlMeshLibrarySaver
       XmlWriter::Scope scope (writer, "meshes");      
       
       for (MeshLibrary::ConstIterator i=library.CreateIterator (); i; ++i)
-        SaveMesh (*i);
+        SaveMesh (library.ItemId (i), *i);
     }
     
       //сохранение библиотеки

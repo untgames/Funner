@@ -4,16 +4,16 @@ Results of xmesh_saver_test:
   <vertex_streams>
     <vertex_stream id="vs#1" vertices_count="4" vertex_size="36">
       <channel semantic="position" type="float3" offset="0">
-        0.000 0.000 0.000 1.000 2.000 3.000 2.000 4.000 6.000 3.000 6.000 9.000
+        0 0 0 1 2 3 2 4 6 3 6 9
       </channel>
       <channel semantic="normal" type="float3" offset="12">
-        0.000 1.000 0.000 1.000 0.000 0.000 0.000 1.000 0.000 1.000 0.000 0.000
+        0 1 0 1 0 0 0 1 0 1 0 0
       </channel>
       <channel semantic="color" type="ubyte4" offset="24">
         0 0 0 0 0 1 0 1 0 2 0 2 0 3 0 3
       </channel>
       <channel semantic="texcoord0" type="float2" offset="28">
-        0.000 -0.000 0.000 -1.000 0.000 -2.000 0.000 -3.000
+        0 -0 0 -1 0 -2 0 -3
       </channel>
     </vertex_stream>
     <vertex_stream id="vs#2" vertices_count="4" vertex_size="20">
@@ -21,11 +21,11 @@ Results of xmesh_saver_test:
         0 1 1 1 2 1 3 1
       </channel>
       <channel semantic="position" type="float3" offset="8">
-        0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000
+        0 0 0 0 0 0 0 0 0 0 0 0
       </channel>
     </vertex_stream>
     <vertex_weight_stream id="vws#1" weights_count="5">
-      0 0.000 1 0.200 2 0.400 3 0.600 4 0.800
+      0 0 1 0.2 2 0.4 3 0.6 4 0.8
     </vertex_weight_stream>
   </vertex_streams>
   <vertex_buffers>
@@ -47,7 +47,7 @@ Results of xmesh_saver_test:
     </index_buffer>
   </index_buffers>
   <meshes>
-    <mesh name="mesh1" index_buffer="ib#1">
+    <mesh id="mesh1" name="mesh1" index_buffer="ib#1">
       <vertex_buffers>
         vb#1
       </vertex_buffers>
@@ -56,7 +56,7 @@ Results of xmesh_saver_test:
         <primitive type="triangle_strip" material="material2" vertex_buffer="0" first="1" count="1"/>
       </primitives>
     </mesh>
-    <mesh name="mesh2">
+    <mesh id="mesh2" name="mesh2">
       <vertex_buffers>
         vb#2
       </vertex_buffers>
