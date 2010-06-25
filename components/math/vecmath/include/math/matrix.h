@@ -88,10 +88,6 @@ class matrix
     vector x [size];  
 };
 
-#ifdef _MSC_VER
-  #pragma pack(pop)
-#endif
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Переопределения типов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,5 +161,9 @@ bool equal (const matrix<T, Size>&, const matrix<T, Size>&, const T& eps);
 #include <math/detail/matrix.inl>
 
 }
+
+#ifdef _MSC_VER
+  #pragma pack(pop)
+#endif
 
 #endif

@@ -1,14 +1,19 @@
-namespace detail
-{
-
 #ifdef VECMATH_SSE
 
-__forceinline __m128 to_m128 (const vector<float, 4>& v)
+template <> struct __declspec(align(1)) vector_base<float, 4>
 {
-  return _mm_loadu_ps (&v.x);
-}
+  float x, y, z, w;  
+  
+  __forceinline void store (__m128 in_data)
+  {
+    _mm_storeu_ps (&x, in_data);
+  }    
+};
 
 #endif
+
+namespace detail
+{
 
 /*
     Получение указателя на компоненты
@@ -77,7 +82,7 @@ struct vec_add {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res [0], _mm_add_ps (to_m128 (a), to_m128 (b)));
+    res.store (_mm_add_ps (_mm_loadu_ps (&a.x), _mm_loadu_ps (&b.x)));
   }
 #endif
 };
@@ -93,7 +98,7 @@ struct vec_sub {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res [0], _mm_sub_ps (to_m128 (a), to_m128 (b)));
+    res.store (_mm_sub_ps (_mm_loadu_ps (&a.x), _mm_loadu_ps (&b.x)));
   }
 #endif
 };
@@ -108,7 +113,7 @@ struct vec_mul {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res [0], _mm_mul_ps (to_m128 (a), to_m128 (b)));
+    res.store (_mm_mul_ps (_mm_loadu_ps (&a.x), _mm_loadu_ps (&b.x)));
   }
 #endif
 };
@@ -124,7 +129,7 @@ struct vec_div {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res [0], _mm_div_ps (to_m128 (a), to_m128 (b)));
+    res.store (_mm_div_ps (_mm_loadu_ps (&a.x), _mm_loadu_ps (&b.x)));
   }
 #endif
 };
@@ -165,7 +170,7 @@ struct vec_copy {
 #ifdef VECMATH_SSE
   __forceinline void operator () (const vector<float, 4>& a, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res.x, to_m128 (a));
+    res.store (_mm_loadu_ps (&a.x));
   }
 #endif
 };
@@ -181,7 +186,7 @@ struct vec_assign_scalar {
 #ifdef VECMATH_SSE
   inline void operator () (float a, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res [0], _mm_set_ps1 (a));
+    res.store (_mm_set_ps1 (a));
   }
 #endif
 };
@@ -206,7 +211,7 @@ struct vec_neg {
       float  f;  
     } mask = {0x80000000};
 
-    _mm_storeu_ps (&res.x, _mm_xor_ps (to_m128 (src), _mm_set_ps1 (mask.f)));
+    res.store (_mm_xor_ps (_mm_loadu_ps (&src.x), _mm_set_ps1 (mask.f)));
   }
 #endif
 };
@@ -227,7 +232,7 @@ struct vec_abs {
       float  f;  
     } mask = {0x7FFFFFFF};
 
-    _mm_storeu_ps (&res.x, _mm_and_ps (to_m128 (src), _mm_set_ps1 (mask.f)));
+    res.store (_mm_and_ps (_mm_loadu_ps (&src.x), _mm_set_ps1 (mask.f)));
   }
 #endif
 };
@@ -243,7 +248,7 @@ struct vec_min {
 #ifdef VECMATH_SSE  
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res.x, _mm_min_ps (to_m128 (a), to_m128 (b)));
+    res.store (_mm_min_ps (_mm_loadu_ps (&a.x), _mm_loadu_ps (&b.x)));
   }
 #endif
 };
@@ -259,7 +264,7 @@ struct vec_max {
 #ifdef VECMATH_SSE  
   __forceinline void operator () (const vector<float, 4>& a, const vector<float, 4>& b, vector<float, 4>& res) const
   {
-    _mm_storeu_ps (&res.x, _mm_max_ps (to_m128 (a), to_m128 (b)));
+    res.store (_mm_max_ps (_mm_loadu_ps (&a.x), _mm_loadu_ps (&b.x)));
   }
 #endif
 };
@@ -290,8 +295,8 @@ struct vec_cross_product {
   {
     __m128 r0, r1, r2;
 
-    r0 = _mm_shuffle_ps (to_m128 (a), to_m128 (a), _MM_SHUFFLE (3, 1, 0, 2));
-    r1 = _mm_shuffle_ps (to_m128 (b), to_m128 (b), _MM_SHUFFLE (3, 0, 2, 1));
+    r0 = _mm_shuffle_ps (_mm_loadu_ps (&a.x), _mm_loadu_ps (&a.x), _MM_SHUFFLE (3, 1, 0, 2));
+    r1 = _mm_shuffle_ps (_mm_loadu_ps (&b.x), _mm_loadu_ps (&b.x), _MM_SHUFFLE (3, 0, 2, 1));
     r2 = _mm_mul_ps     (r1, r0);
 
     r0 = _mm_shuffle_ps (r0, r0, _MM_SHUFFLE (3, 1, 0, 2));
@@ -300,7 +305,7 @@ struct vec_cross_product {
 
     r1 = _mm_sub_ps     (r1,r2);
 
-    _mm_storeu_ps (&res.x, r1);
+    res.store (r1);
   }
 #endif
 };
@@ -314,7 +319,7 @@ struct vec_cross_product {
 template <class T, unsigned int Size>
 vector<T, Size>::vector ()
 {
-  detail::vec_assign_scalar ()(T (0), *this);
+  detail::vec_assign_scalar ()(T (), *this);
 }
 
 template <class T, unsigned int Size> template <unsigned int Size1>
@@ -361,7 +366,7 @@ vector<T, Size>::vector (const T& x1, const T& x2, const T& x3, const T& x4)
     default:
     {
       for (unsigned int i=0; i<Size-4; i++)
-        (*this)[i+4] = T(0);
+        (*this)[i+4] = T();
     }  
     case 4: (*this)[3] = x4;
     case 3: (*this)[2] = x3;

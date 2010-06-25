@@ -20,9 +20,9 @@ namespace math
 //для оптимизации возвращаемого значения
 struct return_value_tag {};
 
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Векторная база по умолчанию
-////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T, unsigned int Size> struct vector_base       { T x [Size]; };
 template <class T>                    struct vector_base<T, 2> { T x, y; };
 template <class T>                    struct vector_base<T, 3> { T x, y, z; };
@@ -98,10 +98,6 @@ class vector: public vector_base<T, Size>
     bool operator == (const vector&) const;
     bool operator != (const vector&) const;
 };
-
-#ifdef _MSC_VER
-  #pragma pack(pop)
-#endif
 
 template <class T> class vector<T, 0> {};
 
@@ -198,5 +194,9 @@ vector<T, 4> cross (const vector<T, 4>& a, const vector<T, 4>& b);
 #include <math/detail/vector.inl>
 
 }
+
+#ifdef _MSC_VER
+  #pragma pack(pop)
+#endif
 
 #endif
