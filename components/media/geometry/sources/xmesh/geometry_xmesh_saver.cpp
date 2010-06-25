@@ -254,7 +254,9 @@ class XmlMeshLibrarySaver
       XmlWriter::Scope scope (writer, "mesh");
       
       writer.WriteAttribute ("id", id);
-      writer.WriteAttribute ("name", mesh.Name ());
+      
+      if (strcmp (id, mesh.Name ()))
+        writer.WriteAttribute ("name", mesh.Name ());
       
       ResourceMap::const_iterator ib_iter = index_buffers.find (mesh.IndexBuffer ().Id ());
       
