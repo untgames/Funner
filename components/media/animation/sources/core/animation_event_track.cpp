@@ -279,22 +279,41 @@ void EventTrack::GetEvents (float previous_time, float current_time, const Event
 
     for (size_t i = 0; i < events_to_fire_count; i++)
     {
-      float dt = min_dt, delay = impl->events_to_fire [i]->delay, period = impl->events_to_fire [i]->period;
+      float dt = min_dt, delay = impl->events_to_fire [i]->delay - previous_time, period = impl->events_to_fire [i]->period;
 
-      if (delay > t + EPSILON)
+      if (delay > t)
+      {
+          //событие ещё не сработало (задержка больше текущего времени)
+        
         dt = delay - t;
+      }
       else
       {
-        if (fabs (period) < EPSILON && fabs (t - delay) < EPSILON)
-          handler (t, impl->events_to_fire [i]->event.c_str ());
+          //событие либо сработало в первый раз, либо уже срабатывало до времени t
+        
+        if (fabs (period) < EPSILON)
+        {
+            //событие - непериодическое
+          
+          if (fabs (t - delay) < EPSILON)
+          {
+              //событие сработало в первый и единственный раз
+            
+            handler (t + previous_time, impl->events_to_fire [i]->event.c_str ());
+          }
+        }
         else
         {
+            //событие периодическое
+
           float clamped_t = fmod (t - delay, period);
 
           dt = period - clamped_t;
 
           if (fabs (clamped_t) < EPSILON)
-            handler (t, impl->events_to_fire [i]->event.c_str ());
+          {
+            handler (t + previous_time, impl->events_to_fire [i]->event.c_str ());
+          }
         }
       }
 
