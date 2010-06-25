@@ -1,6 +1,7 @@
 Results of event_track_test:
 track capacity is 0
 track size is 0
+event 'first event' executed in time 1.00
 event '0-1 event (0)' executed in time 0.00
 event '0-0 event (2)' executed in time 0.00
 event '0-5 event (4)' executed in time 0.00

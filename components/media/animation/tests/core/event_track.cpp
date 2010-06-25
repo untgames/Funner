@@ -19,7 +19,9 @@ int main ()
     printf ("track size is %u\n", track.Size ());
 
     track.Reserve (1024);
-    track.GetEvents (0, 5, event_handler);
+    track.AddEvent (1, 0, "first event");
+    track.GetEvents (0.99f, 1.01f, event_handler);
+    track.Clear ();
     track.AddEvent (0, 1, "0-1 event (0)");
     track.AddEvent (1, 0, "1-0 event (1)");
     track.AddEvent (0, 0, "0-0 event (2)");
