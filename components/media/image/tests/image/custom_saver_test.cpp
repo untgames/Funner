@@ -6,7 +6,7 @@ using namespace common;
 const char* results_dir = "results";
 const char* file_name = "data/pic1.jpg";
 
-void MyBinSaver (const char* file_name, const Image& img)
+void MyBinSaver (const char* file_name, const Image& img, const char*)
 {
   FILE* save_file;
 

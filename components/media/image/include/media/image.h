@@ -88,7 +88,7 @@ class Image
 ///Загрузка / сохранение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Load (const char* file_name);
-    void Save (const char* file_name, PixelFormat format = PixelFormat_Default);
+    void Save (const char* file_name, PixelFormat format = PixelFormat_Default, const char* format_specific_flags = "");
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработчики загрузки/сохранения по умолчанию (в будущем убрать вообще!!!)
@@ -96,7 +96,7 @@ class Image
     static void DefaultLoader (const char* file_name, Image& image);
     static void CubemapLoader (const char* file_name, Image& image);
     static void SkyBoxLoader  (const char* file_name, Image& image);
-    static void DefaultSaver  (const char* file_name, const Image& image);
+    static void DefaultSaver  (const char* file_name, const Image& image, const char* format_specific_flags);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя картинки
@@ -160,7 +160,10 @@ void crop_by_alpha (const Image& image, size_t crop_alpha, size_t& crop_x, size_
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Система управления картинками
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef common::ResourceSerializerManager<void (const char* file_name, Image& image), void (const char* file_name, const Image& image)> ImageManager;
+typedef common::ResourceSerializerManager<
+  void (const char* file_name, Image& image),
+  void (const char* file_name, const Image& image, const char* format_specific_flags)>
+ImageManager;
 
 }
 
