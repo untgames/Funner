@@ -26,7 +26,3 @@ export.link.media.image.pvr.IMPORTS       := link.media.image
 export.link.media.image.ani_cursor_loader.LIBS          := funner.media.image.ani_cursors
 export.link.media.image.ani_cursor_loader.LINK_INCLUDES := AniCursorLoader
 export.link.media.image.ani_cursor_loader.IMPORTS       := link.media.image
-
-export.link.media.image.ani_cursor_saver.LIBS           := funner.media.image.ani_cursors
-export.link.media.image.ani_cursor_saver.LINK_INCLUDES  := AniCursorSaver
-export.link.media.image.ani_cursor_saver.IMPORTS        := link.media.image

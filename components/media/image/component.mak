@@ -43,7 +43,6 @@ MEDIA.IMAGE.TESTS.INCLUDE_DIRS := ../../math/bound_volumes/include
 MEDIA.IMAGE.TESTS.SOURCE_DIRS  := tests/image tests/atlas
 MEDIA.IMAGE.TESTS.IMPORTS      := compile.media.image link.media.image link.media.image.xatlas \
                                   link.media.image.left_bottom_packer run.extern.devil link.media.image.pvr link.media.image.ani_cursor_loader
-
 #Цель - Sprite composer sources
 MEDIA.IMAGE.SPRITE_COMPOSER.TYPE        := application
 MEDIA.IMAGE.SPRITE_COMPOSER.NAME        := sprite_composer

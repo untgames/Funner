@@ -177,7 +177,7 @@ class AniLoader
       {
         stl::vector<size_t> frame_indexes (ani_header.frames_count);
         
-        size_t required_size = frame_indexes.size () * sizeof size_t,
+        size_t required_size = frame_indexes.size () * sizeof (size_t),
                read_size     = file.Read (&frame_indexes [0], required_size);
         
         if (read_size != required_size)

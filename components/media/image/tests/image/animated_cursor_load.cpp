@@ -9,10 +9,10 @@ int main ()
 {
   try
   {
-    printf ("Results of animated_cursor_test:\n");
+    printf ("Results of animated_cursor_load_test:\n");
 
     Image image ("data/aero_busy.ani");
-    
+
     printf ("%u frames (%ux%ux%s):\n", image.Depth (), image.Width (), image.Height (), get_format_name (image.Format ()));
     
     if (!FileSystem::IsDir (results_dir))
