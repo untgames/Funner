@@ -24,6 +24,14 @@ struct TouchDescription
   size_t  tap_count;   //количество касаний
 };
 
+enum WindowOrientation
+{
+  WindowOrientation_Portrait           = 1,
+  WindowOrientation_PortraitUpsideDown = 1 << 1,
+  WindowOrientation_LandscapeLeft      = 1 << 2,
+  WindowOrientation_LandscapeRight     = 1 << 3
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Интерфейс слушателя событий окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,6 +51,11 @@ class IWindowListener
     virtual void OnShakeMotionBegan () {} //пользователь начал жест "тряски" телефона
     virtual void OnShakeMotionEnded () {} //пользователь закончил жест "тряски" телефона
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Другие события
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void OnOrientationChanged (WindowOrientation new_orientation) {} //изменилась ориентация окна
+
   protected:
     virtual ~IWindowListener () {}
 };
@@ -58,6 +71,12 @@ void detach_window_listener (const Window& window, IWindowListener* listener);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void set_multitouch_enabled (const Window& window, bool enabled);
 bool get_multitouch_enabled (const Window& window);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка/получение разрешенных ориентаций окна
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void set_allowed_orientations (const Window& window, int orientations_mask);
+int  get_allowed_orientations (const Window& window);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Интерфейс слушателя событий приложения

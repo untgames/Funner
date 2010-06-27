@@ -2,12 +2,13 @@
 
 #import <syslib/platform/iphone.h>
 
-#import <UIApplication.h>
-#import <UIScreen.h>
-#import <UITouch.h>
-#import <UIWindow.h>
+#import <UIKit/UIApplication.h>
+#import <UIKit/UIScreen.h>
+#import <UIKit/UITouch.h>
+#import <UIKit/UIViewController.h>
+#import <UIKit/UIWindow.h>
 
-#import <CAEAGLLayer.h>
+#import <QuartzCore/CAEAGLLayer.h>
 
 using namespace syslib;
 using namespace syslib::iphone;
@@ -61,34 +62,164 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 @interface UIWindowWrapper : UIWindow
 {
   @private
-    WindowImpl            *window_impl;        //окно
-    ListenerArray         *listeners;          //подписчика на событи€
-    TouchDescriptionArray *touch_descriptions; //массив дл€ хранени€ описаний текущего событи€
-    WindowEventContext    *event_context;      //контекст, передаваемый обработчикам событий
+    WindowImpl            *window_impl;          //окно
+    ListenerArray         *listeners;            //подписчика на событи€
+    TouchDescriptionArray *touch_descriptions;   //массив дл€ хранени€ описаний текущего событи€
+    WindowEventContext    *event_context;        //контекст, передаваемый обработчикам событий
+    UIViewController      *root_view_controller; //корневой контроллер
 }
 
-@property (nonatomic, readwrite) WindowImpl* window_impl;
+@property (nonatomic) WindowImpl* window_impl;
 
--(void) dealloc;
+-(void)onPaint;
 
-+(Class) layerClass;
+-(WindowEventContext&)getEventContext;
 
--(id) initWithFrame:(CGRect)rect;
--(void) drawRect:(CGRect)rect;
--(void) displayLayer:(CALayer*)layer;
+@end
 
-/*
-  ѕолучение контекста событи€
-*/
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// ласс, обрабатывающий событи€ ввода и отвечающий за отрисовку
+///////////////////////////////////////////////////////////////////////////////////////////////////
+@interface UIViewWrapper : UIView
+{
+}
 
--(WindowEventContext&) getEventContext;
+@end
 
-/*
-  ƒобавление/удаление подписчиков
-*/
+@implementation UIViewWrapper
 
--(void) attachListener:(IWindowListener*)listener;
--(void) detachListener:(IWindowListener*)listener;
++(Class)layerClass
+{
+  return [CAEAGLLayer class];
+}
+
+-(id)initWithFrame:(CGRect)rect
+{
+  self = [super initWithFrame:rect];
+
+  if (!self)
+    return nil;
+
+  self.layer.delegate = self;
+
+  return self;
+}
+
+-(void) drawRect:(CGRect)rect
+{
+  [(UIWindowWrapper*)self.window onPaint];
+}
+
+-(void) displayLayer:(CALayer*)layer
+{
+  [(UIWindowWrapper*)self.window onPaint];
+}
+
+-(void) touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window touchesBegan:touches withEvent:event];
+}
+
+-(void) touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window touchesEnded:touches withEvent:event];
+}
+
+-(void) touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window touchesMoved:touches withEvent:event];
+}
+
+-(void) touchesCancelled:(NSSet*)touches withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window touchesCancelled:touches withEvent:event];
+}
+
+-(void) motionBegan:(UIEventSubtype)motion withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window motionBegan:motion withEvent:event];
+}
+
+-(void) motionEnded:(UIEventSubtype)motion withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window motionEnded:motion withEvent:event];
+}
+
+-(void) motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent*)event
+{
+  [(UIWindowWrapper*)self.window motionCancelled:motion withEvent:event];
+}
+
+@end
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// ласс, отвечающий за управление ориентацией окна
+///////////////////////////////////////////////////////////////////////////////////////////////////
+@interface UIViewControllerWrapper : UIViewController
+{
+  @private
+    int allowed_orientations_mask;
+}
+
+@property (nonatomic) int allowed_orientations_mask;
+
+@end
+
+@implementation UIViewControllerWrapper
+
+@synthesize allowed_orientations_mask;
+
+-(void)dealloc
+{
+  self.view = nil;
+
+  [super dealloc];
+}
+
+-(id)init
+{
+  self = [super init];
+
+  if (!self)
+    return nil;
+
+  allowed_orientations_mask = WindowOrientation_Portrait;
+
+  return self;
+}
+
+-(void)loadView
+{
+  self.view = [[UIViewWrapper alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
+  [self.view release];
+}
+
+-(void)viewDidUnload
+{
+  [super viewDidUnload];
+
+  self.view = nil;
+}
+
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+  switch (interfaceOrientation)
+  {
+    case UIInterfaceOrientationPortrait:           return allowed_orientations_mask & WindowOrientation_Portrait;
+    case UIInterfaceOrientationPortraitUpsideDown: return allowed_orientations_mask & WindowOrientation_PortraitUpsideDown;
+    case UIInterfaceOrientationLandscapeLeft:      return allowed_orientations_mask & WindowOrientation_LandscapeLeft;
+    case UIInterfaceOrientationLandscapeRight:     return allowed_orientations_mask & WindowOrientation_LandscapeRight;
+  }
+
+  return NO;
+}
+
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+  UIWindowWrapper* parent_window = (UIWindowWrapper*)self.view.window;
+
+  parent_window.window_impl->Notify (WindowEvent_OnSize, [parent_window getEventContext]);
+}
 
 @end
 
@@ -105,56 +236,66 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
   [super dealloc];
 }
 
-+(Class) layerClass
+-(UIViewController*)rootViewController
 {
-  return [CAEAGLLayer class];
+  return root_view_controller;
+}
+
+-(void)setRootViewController:(UIViewController*)in_root_view_controller
+{
+  if (root_view_controller == in_root_view_controller)
+    return;
+
+  [root_view_controller.view removeFromSuperview];
+
+  [root_view_controller release];
+  root_view_controller = [in_root_view_controller retain];
+
+  root_view_controller.view.frame = self.bounds;
+  [self addSubview:root_view_controller.view];
 }
 
 -(id) initWithFrame:(CGRect)rect
 {
   self = [super initWithFrame:rect];
 
-  if (self)
+  if (!self)
+    return nil;
+
+  self.rootViewController = [[UIViewControllerWrapper alloc] init];
+  [self.rootViewController release];
+
+  try
   {
-    [self layer].delegate = self;
+    event_context = new WindowEventContext;
 
-    try
-    {
-      event_context = new WindowEventContext;
+    event_context->handle = self;
 
-      event_context->handle = self;
+    listeners          = new ListenerArray;
+    touch_descriptions = new TouchDescriptionArray (DEFAULT_TOUCH_BUFFER_SIZE);
+  }
+  catch (...)
+  {
+    delete event_context;
+    delete listeners;
+    delete touch_descriptions;
 
-      listeners          = new ListenerArray;
-      touch_descriptions = new TouchDescriptionArray (DEFAULT_TOUCH_BUFFER_SIZE);
-    }
-    catch (...)
-    {
-      delete event_context;
-      delete listeners;
-      delete touch_descriptions;
+    [self release];
 
-      [self release];
-
-      return nil;
-    }
+    return nil;
   }
 
   return self;
 }
 
+-(WindowEventContext&) getEventContext
+{
+  return *event_context;
+}
+
 -(void) onPaint
 {
   window_impl->Notify (WindowEvent_OnPaint, [self getEventContext]);
-}
-
--(void) drawRect:(CGRect)rect
-{
-  [self onPaint];
-}
-
--(void) displayLayer:(CALayer*)layer
-{
-  [self onPaint];
 }
 
 -(void) fillTouchDescriptionsBuffer:(NSSet*)touches
@@ -207,8 +348,6 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
   [self touchesEnded:touches withEvent:event];
 }
 
-#ifdef __IPHONE_3_0
-
 -(void) motionBegan:(UIEventSubtype)motion withEvent:(UIEvent*)event
 {
   if (motion != UIEventSubtypeMotionShake)
@@ -230,13 +369,6 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 -(void) motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent*)event
 {
   [self motionEnded:motion withEvent:event];
-}
-
-#endif
-
--(WindowEventContext&) getEventContext
-{
-  return *event_context;
 }
 
 /*
@@ -270,7 +402,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle window_style, WindowMessa
     throw xtl::format_not_supported_exception (METHOD_NAME, "Parent windows not supported for iPhonePlatform");
 
     //—оздание окна
-  UIWindowWrapper* new_window = [[UIWindowWrapper alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+  UIWindowWrapper* new_window = [[UIWindowWrapper alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
 
   if (!new_window)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't create window.");
@@ -421,13 +553,13 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
       case WindowFlag_Focus: //фокус ввода
         if (state)
         {
-          wnd.userInteractionEnabled = YES;
+          wnd.rootViewController.view.userInteractionEnabled = YES;
 
           window->Notify (WindowEvent_OnSetFocus, dummy_context);
         }
         else
         {
-          wnd.userInteractionEnabled = NO;
+          wnd.rootViewController.view.userInteractionEnabled = NO;
 
           window->Notify (WindowEvent_OnLostFocus, dummy_context);
         }
@@ -457,7 +589,7 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
       case WindowFlag_Active:
         return wnd == [UIApplication sharedApplication].keyWindow;
       case WindowFlag_Focus:
-        return wnd.userInteractionEnabled == YES;
+        return wnd.rootViewController.view.userInteractionEnabled == YES;
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
     }
@@ -489,7 +621,7 @@ Platform::window_t Platform::GetParentWindow (window_t child)
 
 void Platform::InvalidateWindow (window_t handle)
 {
-  [(UIView*)handle setNeedsDisplay];
+  [((UIWindowWrapper*)handle).rootViewController.view setNeedsDisplay];
 }
 
 /*
@@ -572,6 +704,20 @@ void set_multitouch_enabled (const Window& window, bool enabled)
 bool get_multitouch_enabled (const Window& window)
 {
   return ((UIWindowWrapper*)window.Handle ()).multipleTouchEnabled;
+}
+
+/*
+   ”становка/получение разрешенных ориентаций окна
+*/
+
+void set_allowed_orientations (const Window& window, int orientations_mask)
+{
+  ((UIViewControllerWrapper*)((UIWindowWrapper*)window.Handle ()).rootViewController).allowed_orientations_mask = orientations_mask;
+}
+
+int get_allowed_orientations (const Window& window)
+{
+  return ((UIViewControllerWrapper*)((UIWindowWrapper*)window.Handle ()).rootViewController).allowed_orientations_mask;
 }
 
 }

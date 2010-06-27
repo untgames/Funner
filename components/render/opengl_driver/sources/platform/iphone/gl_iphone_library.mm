@@ -8,7 +8,7 @@ namespace
 {
 
 #if TARGET_IPHONE_SIMULATOR
-  const char* OPENGL_DYLIB_PATH = "/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator3.0.sdk/System/Library/Frameworks/OpenGLES.framework/OpenGLES";
+  const char* OPENGL_DYLIB_PATH = "/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk/System/Library/Frameworks/OpenGLES.framework/OpenGLES";
 #else
   const char* OPENGL_DYLIB_PATH = "/System/Library/Frameworks/OpenGLES.framework/OpenGLES";
 #endif

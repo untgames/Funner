@@ -1,9 +1,9 @@
 #include "shared.h"
 
-#import <NSObject.h>
-#import <NSAutoreleasePool.h>
+#import <Foundation/NSObject.h>
+#import <Foundation/NSAutoreleasePool.h>
 
-#import <UIApplication.h>
+#import <UIKit/UIApplication.h>
 
 using namespace syslib;
 using namespace syslib::iphone;

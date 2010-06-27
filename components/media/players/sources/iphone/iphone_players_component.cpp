@@ -9,7 +9,6 @@ namespace
 const char* MUSIC_TARGET_NAME                  = "music";
 const char* VIDEO_DEFAULT_CONTROLS_TARGET_NAME = "video";
 const char* VIDEO_NO_CONTROLS_TARGET_NAME      = "video.no_controls";
-const char* VIDEO_VOLUME_CONTROLS_TARGET_NAME  = "video.volume_controls";
 const char* VIDEO_ALL_CONTROLS_TARGET_NAME     = "video.all_controls";
 
 /*
@@ -25,7 +24,6 @@ class PlayersComponent
       StreamPlayerManager::RegisterPlayer (MUSIC_TARGET_NAME, &PlayersComponent::CreatePlayer);
       StreamPlayerManager::RegisterPlayer (VIDEO_DEFAULT_CONTROLS_TARGET_NAME, &PlayersComponent::CreatePlayer);
       StreamPlayerManager::RegisterPlayer (VIDEO_NO_CONTROLS_TARGET_NAME, &PlayersComponent::CreatePlayer);
-      StreamPlayerManager::RegisterPlayer (VIDEO_VOLUME_CONTROLS_TARGET_NAME, &PlayersComponent::CreatePlayer);
       StreamPlayerManager::RegisterPlayer (VIDEO_ALL_CONTROLS_TARGET_NAME, &PlayersComponent::CreatePlayer);
     }
 
@@ -40,8 +38,6 @@ class PlayersComponent
         return create_music_player (source_name, &handler);
       else if (!xtl::xstrcmp (target_name, VIDEO_NO_CONTROLS_TARGET_NAME))
         return create_movie_player (source_name, &handler, VideoPlayerControlsType_NoControls);
-      else if (!xtl::xstrcmp (target_name, VIDEO_VOLUME_CONTROLS_TARGET_NAME))
-        return create_movie_player (source_name, &handler, VideoPlayerControlsType_VolumeControls);
       else if (!xtl::xstrcmp (target_name, VIDEO_ALL_CONTROLS_TARGET_NAME) || !xtl::xstrcmp (target_name, VIDEO_DEFAULT_CONTROLS_TARGET_NAME))
         return create_movie_player (source_name, &handler, VideoPlayerControlsType_AllControls);
 

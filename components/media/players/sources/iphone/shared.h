@@ -20,7 +20,6 @@ namespace iphone
 enum VideoPlayerControlsType
 {
   VideoPlayerControlsType_NoControls,
-  VideoPlayerControlsType_VolumeControls,
   VideoPlayerControlsType_AllControls
 };
 

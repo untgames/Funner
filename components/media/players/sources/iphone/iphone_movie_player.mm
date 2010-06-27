@@ -1,6 +1,7 @@
 #include "shared.h"
 
-#import <MPMoviePlayerController.h>
+#import <MediaPlayer/MPMoviePlayerController.h>
+#import <MediaPlayer/MPMoviePlayerViewController.h>
 
 using namespace media::players;
 using namespace media::players::iphone;
@@ -38,7 +39,7 @@ class MoviePlayer: public IStreamPlayer
   public:
 ///Конструктор
     MoviePlayer (const char* in_stream_name, const StreamPlayerManager::StreamEventHandler& in_handler, VideoPlayerControlsType controls_type)
-      : handler (in_handler), player (0)
+      : handler (in_handler), player_view_controller (0), player (0)
     {
       static const char* METHOD_NAME = "media::players::iphone::MoviePlayer::MoviePlayer";
 
@@ -51,7 +52,19 @@ class MoviePlayer: public IStreamPlayer
       if (!file_url)
         throw xtl::make_argument_exception (METHOD_NAME, "stream_name", in_stream_name, "Can't create NSURL from stream_name");
 
-      player = [[MPMoviePlayerController alloc] initWithContentURL: file_url];
+      Class MPMoviePlayerViewControllerClass = NSClassFromString (@"MPMoviePlayerViewController");
+
+      if (MPMoviePlayerViewControllerClass && [MPMoviePlayerViewControllerClass instancesRespondToSelector:@selector(moviePlayer)])
+      {
+        player_view_controller = [[MPMoviePlayerViewController alloc] initWithContentURL:file_url];
+
+        if (!player_view_controller)
+          throw xtl::format_operation_exception (METHOD_NAME, "Can't open file '%s' for playing", in_stream_name);
+
+        player = [player_view_controller.moviePlayer retain];
+      }
+      else
+        player = [[MPMoviePlayerController alloc] initWithContentURL:file_url];
 
       [file_url release];
 
@@ -60,11 +73,23 @@ class MoviePlayer: public IStreamPlayer
 
       switch (controls_type)
       {
-        case VideoPlayerControlsType_NoControls:     player.movieControlMode = MPMovieControlModeHidden;     break;
-        case VideoPlayerControlsType_VolumeControls: player.movieControlMode = MPMovieControlModeVolumeOnly; break;
-        case VideoPlayerControlsType_AllControls:    player.movieControlMode = MPMovieControlModeDefault;    break;
+        case VideoPlayerControlsType_NoControls:
+          if (player_view_controller)
+            player.controlStyle = MPMovieControlStyleNone;
+          else
+            player.movieControlMode = MPMovieControlModeHidden;
+
+          break;
+        case VideoPlayerControlsType_AllControls:
+          if (player_view_controller)
+            player.controlStyle = MPMovieControlStyleDefault;
+          else
+            player.movieControlMode = MPMovieControlModeDefault;
+
+          break;
         default:
           [player release];
+          [player_view_controller release];
           throw xtl::make_argument_exception (METHOD_NAME, "controls_type", controls_type, "Unknown controls type");
       }
 
@@ -75,18 +100,24 @@ class MoviePlayer: public IStreamPlayer
     ~MoviePlayer ()
     {
       [player_listener release];
+      [player_view_controller release];
       [player release];
     }
 
 ///Длительность потока
     float Duration ()
     {
+      //можно реализовать если отказаться от поддержки OS 2.2.1
+
       throw xtl::format_not_supported_exception("media::players::iphone::MoviePlayer::Duration");
     }
 
 ///Начать проигрывание
     void Play ()
     {
+      if (player_view_controller)
+        [[UIApplication sharedApplication].keyWindow.rootViewController presentModalViewController:player_view_controller animated:NO];
+
       [player play];
 
       OnEvent (StreamEvent_OnPlay);
@@ -95,6 +126,8 @@ class MoviePlayer: public IStreamPlayer
 ///Приостановить проигрывание
     void Pause ()
     {
+      //можно реализовать если отказаться от поддержки OS 2.2.1
+
       throw xtl::format_not_supported_exception("media::players::iphone::MoviePlayer::Pause");
     }
     
@@ -102,6 +135,9 @@ class MoviePlayer: public IStreamPlayer
     void Stop ()
     {
       [player stop];
+
+      if (player_view_controller)
+        [[UIApplication sharedApplication].keyWindow.rootViewController dismissModalViewControllerAnimated:NO];
 
       OnEvent (StreamEvent_OnManualStop);
     }
@@ -124,6 +160,8 @@ class MoviePlayer: public IStreamPlayer
 ///Установка режима циклического проигрывания
     void SetLooping (bool state)
     {
+      //можно реализовать если отказаться от поддержки OS 2.2.1
+
       if (state)
         throw xtl::make_argument_exception ("media::players::iphone::MoviePlayer::SetLooping", "state", state, "Looping not supported");
     }
@@ -149,9 +187,10 @@ class MoviePlayer: public IStreamPlayer
     typedef StreamPlayerManager::StreamEventHandler StreamEventHandler;
 
   private:
-    StreamEventHandler      handler;           //обработчик событий
-    MPMoviePlayerController *player;           //проигрыватель видео
-    VideoPlayerListener     *player_listener;  //слушатель событий проигрывателя
+    StreamEventHandler          handler;                 //обработчик событий
+    MPMoviePlayerViewController *player_view_controller; //окно проигрывателя видео
+    MPMoviePlayerController     *player;                 //проигрыватель видео
+    VideoPlayerListener         *player_listener;        //слушатель событий проигрывателя
 };
 
 }

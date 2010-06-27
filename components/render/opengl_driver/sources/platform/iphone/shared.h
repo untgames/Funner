@@ -1,14 +1,15 @@
 #ifndef RENDER_GL_DRIVER_IPHONE_SHARED_HEADER
 #define RENDER_GL_DRIVER_IPHONE_SHARED_HEADER
 
-#include <UIScreen.h>
-#include <UIView.h>
+#include <UIKit/UIScreen.h>
+#include <UIKit/UIViewController.h>
+#include <UIKit/UIWindow.h>
 
-#include <EAGL.h>
+#include <OpenGLES/EAGL.h>
 
-#include <CAEAGLLayer.h>
+#include <QuartzCore/CAEAGLLayer.h>
 
-#include <CGGeometry.h>
+#include <CoreGraphics/CGGeometry.h>
 
 #include <stl/auto_ptr.h>
 #include <stl/list>

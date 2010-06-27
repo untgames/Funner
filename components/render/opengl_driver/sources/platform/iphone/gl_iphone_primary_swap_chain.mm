@@ -1,5 +1,5 @@
-#include <ES1/gl.h>
-#include <ES1/glext.h>
+#include <OpenGLES/ES1/gl.h>
+#include <OpenGLES/ES1/glext.h>
 
 #include "shared.h"
 
@@ -104,7 +104,7 @@ struct PrimarySwapChain::Impl
 
       log.Printf ("...binding to drawable");
 
-      CAEAGLLayer* eagl_layer = (CAEAGLLayer*)[(UIView*)(desc.window_handle) layer];
+      CAEAGLLayer* eagl_layer = (CAEAGLLayer*)[((UIWindow*)desc.window_handle).rootViewController.view layer];
 
       eagl_layer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO],
                                        kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];

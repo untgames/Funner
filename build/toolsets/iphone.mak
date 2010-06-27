@@ -17,7 +17,7 @@ PROFILES += iphone unistd has_windows haswchar gles no_dll haswchar
 DLL_PATH := DYLD_LIBRARY_PATH
 
 COMMON_CFLAGS     += -Os -isysroot $(IPHONE_SDK_PATH) -DIPHONE
-COMMON_LINK_FLAGS += -isysroot $(IPHONE_SDK_PATH) -mmacosx-version-min=10.5
+COMMON_LINK_FLAGS += -isysroot $(IPHONE_SDK_PATH)
 
 include $(TOOLSETS_DIR)/g++.mak
 

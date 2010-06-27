@@ -17,10 +17,6 @@ RENDER.OPENGL_DRIVER.SOURCES.INCLUDE_DIRS           := sources
 RENDER.OPENGL_DRIVER.SOURCES.macosx.COMPILER_CFLAGS := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/ApplicationServices.framework/Frameworks/CoreGraphics.framework/Headers/ \
                                                        -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/IOKit.framework/Headers/graphics/ \
                                                        -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/AGL.framework/Headers/
-RENDER.OPENGL_DRIVER.SOURCES.iphone.COMPILER_CFLAGS := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/OpenGLES.framework/Headers/ \
-                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreGraphics.framework/Headers/ \
-                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/UIKit.framework/Headers/ \
-                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/QuartzCore.framework/Headers/
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            := sources/common \
                                                        sources/driver \
                                                        sources/render_target_manager \

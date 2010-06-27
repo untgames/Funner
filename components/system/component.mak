@@ -19,10 +19,6 @@ SYSTEMLIB.SOURCES.carbon.COMPILER_CFLAGS            := -I$(MACOSX_SDK_PATH)/Syst
                                                        -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/
 SYSTEMLIB.SOURCES.iphone.SOURCE_DIRS                := sources/platform/iphone
 SYSTEMLIB.SOURCES.iphone.COMPILER_DEFINES           := NO_PTHREAD_SEMAPHORES
-SYSTEMLIB.SOURCES.iphone.COMPILER_CFLAGS            := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers/ \
-                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/Foundation.framework/Headers/ \
-                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/UIKit.framework/Headers/ \
-                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/QuartzCore.framework/Headers/
 SYSTEMLIB.SOURCES.x11.SOURCE_DIRS                   := sources/platform/x11
 SYSTEMLIB.SOURCES.bada_simulator.SOURCE_DIRS        := sources/platform/win32 sources/platform/win32/thread sources/platform/win32/non_unistd sources/platform/bada/startup_simulator
 SYSTEMLIB.SOURCES.bada_simulator.COMPILER_DEFINES   := #SHP USE_FBASE_ALLOCATOR BUILD_DLL WIN32

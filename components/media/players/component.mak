@@ -25,13 +25,10 @@ MEDIA.PLAYERS.NULL.TESTS.SOURCE_DIRS := tests/null
 MEDIA.PLAYERS.NULL.TESTS.IMPORTS     := compile.media.players link.media.players.null compile.common
 
 #MediaPlayers iPhone
-MEDIA.PLAYERS.IPHONE.TYPE            := static-lib
-MEDIA.PLAYERS.IPHONE.NAME            := funner.media.players.iphone
-MEDIA.PLAYERS.IPHONE.SOURCE_DIRS     := sources/iphone
-MEDIA.PLAYERS.IPHONE.IMPORTS         := compile.media.players compile.common
-MEDIA.PLAYERS.IPHONE.COMPILER_CFLAGS := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/AVFoundation.framework/Headers/ \
-                                        -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/Foundation.framework/Headers/ \
-                                        -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/MediaPlayer.framework/Headers/
+MEDIA.PLAYERS.IPHONE.TYPE        := static-lib
+MEDIA.PLAYERS.IPHONE.NAME        := funner.media.players.iphone
+MEDIA.PLAYERS.IPHONE.SOURCE_DIRS := sources/iphone
+MEDIA.PLAYERS.IPHONE.IMPORTS     := compile.media.players compile.common
 
 #MediaPlayer iPhone tests
 MEDIA.PLAYERS.IPHONE.TESTS.TYPE        := test-suite
