@@ -39,7 +39,7 @@ struct PrimarySwapChain::Impl
 
     memset (&desc, 0, sizeof (desc));
 
-    CGRect window_frame = ((UIView*)in_desc.window_handle).frame;
+    CGRect window_frame = ((UIWindow*)in_desc.window_handle).rootViewController.view.frame;
 
     desc.frame_buffer.width        = window_frame.size.width;
     desc.frame_buffer.height       = window_frame.size.height;
@@ -58,7 +58,7 @@ struct PrimarySwapChain::Impl
     desc.swap_method               = SwapMethod_Discard;
     desc.vsync                     = true;
     desc.fullscreen                = false;
-    desc.window_handle             = in_desc.window_handle;    //?????????необходимо подписываться на изменение размеров окна
+    desc.window_handle             = in_desc.window_handle;
 
     log.Printf ("...choose pixel format (RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
       desc.frame_buffer.color_bits, desc.frame_buffer.alpha_bits, desc.frame_buffer.depth_bits,
@@ -115,6 +115,14 @@ struct PrimarySwapChain::Impl
       log.Printf ("...attaching renderbuffer");
 
       glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, render_buffer);
+
+      GLint renderbuffer_width, renderbuffer_height;
+
+      glGetRenderbufferParameterivOES (GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &renderbuffer_width);
+      glGetRenderbufferParameterivOES (GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &renderbuffer_height);
+
+      desc.frame_buffer.width  = renderbuffer_width;
+      desc.frame_buffer.height = renderbuffer_height;
 
       log.Printf ("...creating additional renderbuffers");
 

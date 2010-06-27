@@ -145,6 +145,16 @@ struct Device::Impl : public IWindowListener, public IApplicationListener
   {
     signals ("Application inactive");
   }
+
+  bool GetBinaryPropertyValue (const char* property_name, float value)
+  {
+    if (float_compare (value, 0.f))
+      return false;
+    else if (float_compare (value, 1.f))
+      return true;
+    else
+      throw xtl::format_operation_exception ("input::low_level::window::Device::SetProperty", "Set only 0 or 1 for property '%s'", property_name);
+  }
 };
 
 /*
@@ -195,14 +205,7 @@ void Device::SetProperty (const char* name, float value)
   static const char* METHOD_NAME = "input::low_level::window::Device::SetProperty";
 
   if (!xtl::xstrcmp (MULTITOUCH_ENABLED, name))
-  {
-    if (float_compare (value, 0.f))
-      set_multitouch_enabled (*impl->window, false);
-    else if (float_compare (value, 1.f))
-      set_multitouch_enabled (*impl->window, true);
-    else
-      throw xtl::format_operation_exception (METHOD_NAME, "Set only 0 or 1 for property '%s'", MULTITOUCH_ENABLED);
-  }
+    set_multitouch_enabled (*impl->window, impl->GetBinaryPropertyValue (name, value));
   else
     throw xtl::make_argument_exception (METHOD_NAME, "name", name);
 }

@@ -93,6 +93,11 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
   return [CAEAGLLayer class];
 }
 
+-(BOOL)canBecomeFirstResponder
+{
+  return YES;
+}
+
 -(id)initWithFrame:(CGRect)rect
 {
   self = [super initWithFrame:rect];
@@ -157,35 +162,17 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 @interface UIViewControllerWrapper : UIViewController
 {
-  @private
-    int allowed_orientations_mask;
 }
-
-@property (nonatomic) int allowed_orientations_mask;
 
 @end
 
 @implementation UIViewControllerWrapper
-
-@synthesize allowed_orientations_mask;
 
 -(void)dealloc
 {
   self.view = nil;
 
   [super dealloc];
-}
-
--(id)init
-{
-  self = [super init];
-
-  if (!self)
-    return nil;
-
-  allowed_orientations_mask = WindowOrientation_Portrait;
-
-  return self;
 }
 
 -(void)loadView
@@ -199,26 +186,6 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
   [super viewDidUnload];
 
   self.view = nil;
-}
-
--(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-  switch (interfaceOrientation)
-  {
-    case UIInterfaceOrientationPortrait:           return allowed_orientations_mask & WindowOrientation_Portrait;
-    case UIInterfaceOrientationPortraitUpsideDown: return allowed_orientations_mask & WindowOrientation_PortraitUpsideDown;
-    case UIInterfaceOrientationLandscapeLeft:      return allowed_orientations_mask & WindowOrientation_LandscapeLeft;
-    case UIInterfaceOrientationLandscapeRight:     return allowed_orientations_mask & WindowOrientation_LandscapeRight;
-  }
-
-  return NO;
-}
-
--(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-  UIWindowWrapper* parent_window = (UIWindowWrapper*)self.view.window;
-
-  parent_window.window_impl->Notify (WindowEvent_OnSize, [parent_window getEventContext]);
 }
 
 @end
@@ -251,8 +218,9 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
   [root_view_controller release];
   root_view_controller = [in_root_view_controller retain];
 
-  root_view_controller.view.frame = self.bounds;
   [self addSubview:root_view_controller.view];
+
+  [root_view_controller.view becomeFirstResponder];
 }
 
 -(id) initWithFrame:(CGRect)rect
@@ -261,9 +229,6 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
   if (!self)
     return nil;
-
-  self.rootViewController = [[UIViewControllerWrapper alloc] init];
-  [self.rootViewController release];
 
   try
   {
@@ -284,6 +249,9 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
     return nil;
   }
+
+  self.rootViewController = [[UIViewControllerWrapper alloc] init];
+  [self.rootViewController release];
 
   return self;
 }
@@ -407,8 +375,8 @@ Platform::window_t Platform::CreateWindow (WindowStyle window_style, WindowMessa
   if (!new_window)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't create window.");
 
-  new_window.clearsContextBeforeDrawing = NO;
-  new_window.multipleTouchEnabled       = YES;
+  new_window.rootViewController.view.clearsContextBeforeDrawing = NO;
+  new_window.rootViewController.view.multipleTouchEnabled       = YES;
 
   WindowImpl* window_impl = new WindowImpl (handler, user_data, new_window);
 
@@ -698,26 +666,12 @@ void detach_window_listener (const Window& window, IWindowListener* listener)
 
 void set_multitouch_enabled (const Window& window, bool enabled)
 {
-  ((UIWindowWrapper*)window.Handle ()).multipleTouchEnabled = enabled;
+  ((UIWindowWrapper*)window.Handle ()).rootViewController.view.multipleTouchEnabled = enabled;
 }
 
 bool get_multitouch_enabled (const Window& window)
 {
-  return ((UIWindowWrapper*)window.Handle ()).multipleTouchEnabled;
-}
-
-/*
-   Установка/получение разрешенных ориентаций окна
-*/
-
-void set_allowed_orientations (const Window& window, int orientations_mask)
-{
-  ((UIViewControllerWrapper*)((UIWindowWrapper*)window.Handle ()).rootViewController).allowed_orientations_mask = orientations_mask;
-}
-
-int get_allowed_orientations (const Window& window)
-{
-  return ((UIViewControllerWrapper*)((UIWindowWrapper*)window.Handle ()).rootViewController).allowed_orientations_mask;
+  return ((UIWindowWrapper*)window.Handle ()).rootViewController.view.multipleTouchEnabled;
 }
 
 }

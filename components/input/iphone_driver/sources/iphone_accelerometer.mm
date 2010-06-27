@@ -1,6 +1,6 @@
 #include "shared.h"
 
-#import <UIAccelerometer.h>
+#import <UIKit/UIAccelerometer.h>
 
 using namespace input::low_level::iphone_driver;
 

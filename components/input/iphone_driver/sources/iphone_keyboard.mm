@@ -1,9 +1,9 @@
 #include "shared.h"
 
-#import <UIApplication.h>
-#import <UIGeometry.h>
-#import <UITextField.h>
-#import <UIWindow.h>
+#import <UIKit/UIApplication.h>
+#import <UIKit/UIGeometry.h>
+#import <UIKit/UITextField.h>
+#import <UIKit/UIWindow.h>
 
 using namespace input::low_level::iphone_driver;
 
