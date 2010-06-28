@@ -391,10 +391,11 @@ define process_source_dir
   
   ifneq (,$$(wildcard $2/sources.mak))
     SOURCE_FILES :=
+    GENERATED_SOURCE_FILES :=
   
     include $2/sources.mak    
 
-    $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES:%=$2/%))
+    $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES:%=$2/%)) $$(GENERATED_SOURCE_FILES)
   else
     $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES_SUFFIXES:%=$2/*.%))
   endif  
@@ -446,6 +447,7 @@ define process_target_with_sources
   $1.TMP_DIRS            := $$($1.TMP_DIR)
   $1.INCLUDE_DIRS        := $$(call specialize_paths,$$($1.INCLUDE_DIRS))
   $1.SOURCE_DIRS         := $$(call specialize_paths,$$($1.SOURCE_DIRS))
+  $1.OBJECT_FILES        := $$(call specialize_paths,$$($1.OBJECT_FILES))
   $1.DOCUMENTATION_DIRS  := $$(call specialize_paths,$$($1.DOCUMENTATION_DIRS))
   $1.LIB_DIRS            := $$(call specialize_paths,$$($1.LIB_DIRS)) $(DIST_LIB_DIR)
   $1.DLL_DIRS            := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)

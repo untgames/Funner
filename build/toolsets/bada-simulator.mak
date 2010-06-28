@@ -1,4 +1,4 @@
-PROFILES                         += bada_simulator
+PROFILES                         += bada_simulator g++x86
 BADA_TOOLCHAIN                   := Win32
 BADA_TOOLCHAIN_PREFIX            := i686-mingw32-
 DLL_LIB_SUFFIX                   := .a

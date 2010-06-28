@@ -10,3 +10,7 @@ FUNNER_EXTERN_LIBS.COMPONENTS := zlib zzip pcre jpeg tiff libpng devil ogg vorbi
 ifeq (,$(filter iphone,$(PROFILES)))
   COMPONENT_DIRS += curl
 endif
+
+ifneq (,$(filter x86,$(PROFILES)))
+  COMPONENT_DIRS += luajit
+endif
