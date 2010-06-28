@@ -21,9 +21,18 @@
 #include <script/interpreter.h>
 #include <script/environment.h>
 
+#ifdef LUAJIT
+extern "C" {
+#include <luajit.h>
+#endif
+
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
+
+#ifdef LUAJIT
+}
+#endif
 
 namespace script
 {

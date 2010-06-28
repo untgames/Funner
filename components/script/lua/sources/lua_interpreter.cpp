@@ -69,7 +69,7 @@ Interpreter::Interpreter (const EnvironmentPointer& in_environment)
   };
 
   luaL_newmetatable (state, VARIANT_DEFAULT_TYPE_NAME);
-  luaI_openlib      (state, 0, user_data_meta_table, 0);
+  luaL_openlib      (state, 0, user_data_meta_table, 0);
 
     //регистрация обработчиков событий создания/удаления библиотек
 
@@ -160,8 +160,6 @@ void Interpreter::DoCommands (const char* buffer_name, const void* buffer, size_
 
 void Interpreter::Invoke (size_t arguments_count, size_t results_count)
 {
-    //возможно проще использовать call???
-
   if (lua_pcall (state, arguments_count, results_count, 0))
     raise_error (state, "script::lua::Interpreter::Invoke");
 }

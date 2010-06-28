@@ -53,7 +53,8 @@ void* reallocate (void* user_data, void* ptr, size_t old_size, size_t new_size)
 StateHolder::StateHolder ()
 {
   //state = lua_newstate (&reallocate, &MemoryManager::GetHeap ());
-  state = lua_open ();
+  //state = lua_open ();
+  state = luaL_newstate ();
 
   if (!state)
     throw xtl::format_exception<InterpreterException> ("script::lua::StateHolder::StateHolder", "Can't create lua state");
