@@ -18,10 +18,11 @@ EXTERN.LUAJIT_LIB.TYPE                   := static-lib
 EXTERN.LUAJIT_LIB.NAME                   := funner.extern.luajit
 EXTERN.LUAJIT_LIB.SOURCE_DIRS            := sources/ljit
 EXTERN.LUAJIT_LIB.INCLUDE_DIRS           := include $(LUAJIT_BUILD_INTERNALS_DIR)
-EXTERN.LUAJIT_LIB.g++.COMPILER_CFLAGS    := -fomit-frame-pointer -D_FILE_OFFSET_BITS=64 -U_FORTIFY_SOURCE -fno-stack-protector
+EXTERN.LUAJIT_LIB.g++.COMPILER_CFLAGS    := -fomit-frame-pointer -D_FILE_OFFSET_BITS=64 -U_FORTIFY_SOURCE -fno-stack-protector -funwind-tables
 EXTERN.LUAJIT_LIB.g++x86.COMPILER_CFLAGS := -march=i686
 EXTERN.LUAJIT_LIB.msvc.OBJECT_FILES      := $(LUAJIT_BUILD_INTERNALS_DIR)/lj_vm.obj
-#EXTERN.LUAJIT_LIB.msvc.COMPILER_DEFINES  := LJ_UNWIND_EXT
+#EXTERN.LUAJIT_LIB.msvc.COMPILER_DEFINES  := LJ_UNWIND_EXT=1
+EXTERN.LUAJIT_LIB.mingw.COMPILER_DEFINES  := LUAJIT_UNWIND_EXTERNAL
 
 #Öåëü ¹3 - build luajit
 EXTERN.LUAJIT_UTILITY.TYPE                   := test-suite
