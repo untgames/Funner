@@ -1,7 +1,7 @@
 Results of xfl_load_test:
 --- Parse xfl document 'data/test.xfl' ---
 ---  Xfl document dump ---
-Document ''
+Document '/mount/test.xfl'
   framerate:        24.000
   width:            1906
   height:           1080

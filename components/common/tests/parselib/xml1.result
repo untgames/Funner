@@ -40,7 +40,6 @@ root (source='', line=0): {}
  Uncorrect_tag_property_value (source='data/error_test1.xml', line=20): {}
   Tag (source='data/error_test1.xml', line=22): {}
  Uncorrect_tag_name (source='data/error_test1.xml', line=28): {}
-  #text (source='data/error_test1.xml', line=30): {}
  Uncorrect_empty_tag (source='data/error_test1.xml', line=35): {}
  MUST (source='data/error_test1.xml', line=42): {}
  Unclosed (source='data/error_test1.xml', line=44): {}
@@ -72,6 +71,7 @@ data/error_test1.xml(16): error: syntax error. Unexpected string 'string'. Tag e
 data/error_test1.xml(18): error: syntax error. Unexpected token '1token'. Tag expected
 data/error_test1.xml(22): error: syntax error. Unexpected identifier 'tara'
 data/error_test1.xml(30): error: syntax error. Wrong element name '1Tag'
+data/error_test1.xml(30): error: syntax error. Unexpected '>'
 data/error_test1.xml(31): error: syntax error. Expected identifier
 data/error_test1.xml(31): error: syntax error. Unexpected token '1Tag'
 data/error_test1.xml(31): error: syntax error. Closing tag '1Tag' without opening. Expected 'Uncorrect_tag_name'.
@@ -93,3 +93,16 @@ root (source='', line=0): {}
 data/error_test2.xml(8): error: syntax error. Closing tag 'Configuration' without opening. Expected 'WindowManager'.
 data/error_test2.xml(9): error: unexpected EOF (unclosed tag 'WindowManager')
 data/error_test2.xml(9): error: unexpected EOF (unclosed tag 'Configuration')
+root (source='', line=0): {}
+ test (source='data/character_reference_test.xml', line=2): {}
+  numeric (source='data/character_reference_test.xml', line=3): {}
+   attr (source='data/character_reference_test.xml', line=3): {<aa}
+   attr2 (source='data/character_reference_test.xml', line=3): {<}
+   #text (source='data/character_reference_test.xml', line=3): {<aa, <}
+  cdata_numeric (source='data/character_reference_test.xml', line=4): {}
+   #text (source='data/character_reference_test.xml', line=4): {&#60; &#x3c;}
+  symbolic (source='data/character_reference_test.xml', line=5): {}
+   attr (source='data/character_reference_test.xml', line=5): {<}
+   #text (source='data/character_reference_test.xml', line=5): {<start, frame="111">}
+  cdata_symbolic (source='data/character_reference_test.xml', line=6): {}
+   #text (source='data/character_reference_test.xml', line=6): {&lt;start frame=&quot;111&quot;&gt;}

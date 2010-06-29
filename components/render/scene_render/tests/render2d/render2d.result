@@ -4,7 +4,6 @@ Create color-buffer 800x600 (id=4)
 Create depth-stencil-buffer 800x600 (id=5)
 Create frame-buffer (id=3)
 Create 2D renderer (id=2)
-data/materials.xmtl(1): warning: not yet implement. Encoding='utf-8'
 Create texture 171x128 format=PixelFormat_RGB8 (id=6)
 Create texture 256x512 format=PixelFormat_RGBA8 (id=7)
 Create depth-stencil-buffer 256x512 (id=8)
