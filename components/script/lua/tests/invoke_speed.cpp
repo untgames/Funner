@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const size_t TOTAL = 100000;
+const size_t TOTAL = 1000000;
 
 using namespace script;
 
@@ -52,7 +52,7 @@ int main ()
 
     size_t end = common::milliseconds ();
 
-    printf ("Invokations per second: %.2fk\n", float (TOTAL)/float (end-start)/1000.0f);
+    printf ("Invokations per second: %.2fk\n", float (TOTAL)/float (end-start)*1000.0f);
   }
   catch (std::exception& exception)
   {
