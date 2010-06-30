@@ -45,12 +45,13 @@ enum XmlLexem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum XmlLexerStatus
 {
-  XmlLexerStatus_NoError,         //нет ошибки
-  XmlLexerStatus_UnclosedComment, //незакрытый коментарий
-  XmlLexerStatus_UnclosedString,  //незакрыта€ строка
-  XmlLexerStatus_UnclosedCData,   //незакрытый раздел CDATA
-  XmlLexerStatus_WrongChar,       //неверный символ
-  XmlLexerStatus_WrongIdentifier, //неверный идентификатор
+  XmlLexerStatus_NoError,                    //нет ошибки
+  XmlLexerStatus_UnclosedComment,            //незакрытый коментарий
+  XmlLexerStatus_UnclosedString,             //незакрыта€ строка
+  XmlLexerStatus_UnclosedCData,              //незакрытый раздел CDATA
+  XmlLexerStatus_WrongChar,                  //неверный символ
+  XmlLexerStatus_WrongIdentifier,            //неверный идентификатор
+  XmlLexerStatus_InvalidCharacterReference,  //неверна€ ссылка на символ
 
   XmlLexerStatus_Num
 };
@@ -74,8 +75,7 @@ class XmlLexer
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—канирование следующей лексемы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    XmlLexem NextLexem ();
-    XmlLexem NextTextLexem ();
+    XmlLexem NextLexem (bool content = false);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—осто€ние разбора
@@ -91,8 +91,9 @@ class XmlLexer
     void Skip ();
     void SkipBlockComment ();
     void NextLine ();
-    void ReadString (char border);
-    void ReadShiftedString (char border);
+    void ReadContentString ();
+    void ReadString (char border, char* terminators = 0, size_t terminators_count = 0);  //если встречаетс€ border - он замен€етс€ нулем и текуща€ позици€ переводитс€ на следующий символ, если встречаетс€ терминатор - разбор строки останавливаетс€
+    void ReadSymbolReference (char* write_position);
     void ReadCData ();
     void ReadIdentifier (bool identifier);
     void SetError (XmlLexerStatus error, const char* position);

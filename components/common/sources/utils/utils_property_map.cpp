@@ -1643,12 +1643,12 @@ void swap (PropertyMap& properties1, PropertyMap& properties2)
 
 }
 
+namespace common
+{
+
 /*
     Получение имени типа
 */
-
-namespace common
-{
 
 const char* get_name (PropertyType type)
 {

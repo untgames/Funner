@@ -10,6 +10,9 @@
 namespace common
 {
 
+//forward declarations
+class PropertyMap;
+
 /*
     Функции работы с именами путей
 */
@@ -62,15 +65,16 @@ StringArray split (const stl::string& str,const char* delimiters=" ",const char*
     Разбор строк инициализации (property1=value property2='string value')
 */
 
-void parse_init_string (const char* init_string, const xtl::function<void (const char* property, const char* value)>& fn);
-void parse_format_string (const char* format_string, const xtl::function<void (const char* prefix, const char* replacement_tag)>& fn);
+void        parse_init_string (const char* init_string, const xtl::function<void (const char* property, const char* value)>& fn);
+PropertyMap parse_init_string (const char* init_string);
+void        parse_format_string (const char* format_string, const xtl::function<void (const char* prefix, const char* replacement_tag)>& fn);
 
 /*
     Работа с регулярными выражениями
 */
 
 StringArray parse   (const char* string,const char* re_pattern, const char* flags="");
-stl::string  replace (const char* string,const char* re_pattern,const char* replacement, const char* flags="");
+stl::string replace (const char* string,const char* re_pattern,const char* replacement, const char* flags="");
 
 bool rematch  (const char* string,const char* re_pattern, const char* flags="");
 bool wcmatch  (const char* string,const char* wildcard);

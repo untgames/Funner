@@ -8,6 +8,7 @@ namespace
 {
 
 const char* FILE_SYSTEM_ADDONS_MASK = "common.file_systems.*"; //маска имён компонентов, пользовательских файловых систем
+const char* ANONYMOUS_FILES_PREFIX  = "/anonymous";            //префикс имён анонимных файлов
 
 }
 
@@ -53,39 +54,21 @@ inline MountFileSystem::MountFileSystem (const MountFileSystem& fs)
 FileSystemImpl::FileSystemImpl ()
 {
   default_file_buffer_size = DEFAULT_FILE_BUF_SIZE;
+  anonymous_file_system    = AnonymousFileSystemPtr (new AnonymousFileSystem, false);
 
   ClosedFileImpl::Instance ();
 
   Mount ("/std",Platform::GetFileSystem ());
   Mount ("/io",Platform::GetIOSystem ());
+  Mount (ANONYMOUS_FILES_PREFIX,anonymous_file_system.get ());
 
   default_path = "/std";
 }
 
 FileSystemImpl::~FileSystemImpl ()
-{
-  CloseAllFiles ();
+{  
   RemoveAllSearchPaths ();
   UnmountAll ();
-}
-
-/*
-    Регистрация открытых файлов / закрытие всех открытых файлов
-*/
-
-void FileSystemImpl::RegisterFile (File& file)
-{
-  open_files.insert (&file);
-}
-
-void FileSystemImpl::UnregisterFile (File& file)
-{
-  open_files.erase (&file);
-}
-
-void FileSystemImpl::CloseAllFiles ()
-{
-  for_each (open_files.begin (),open_files.end (),mem_fun (&File::Close));
 }
 
 /*
@@ -160,6 +143,25 @@ void FileSystemImpl::SetDefaultPath (const char* path)
     throw xtl::format_operation_exception ("common::FileSystem::SetCurrentDir","Can not set current dir '%s' because it is not dir",new_path.c_str ());
 
   swap (default_path,new_path);
+}
+
+/*
+    Работа с путями анонимных файлов
+*/
+
+stl::string FileSystemImpl::AddAnonymousFilePath (const FileImplPtr& file)
+{
+  return common::format ("%s/%s", ANONYMOUS_FILES_PREFIX, anonymous_file_system->AddFilePath (file));
+}
+
+void FileSystemImpl::RemoveAnonymousFilePath (const FileImplPtr& file)
+{
+  anonymous_file_system->RemoveFilePath (file);
+}
+
+void FileSystemImpl::RemoveAllAnonymousFilePaths ()
+{
+  anonymous_file_system->RemoveAllFilePaths ();
 }
 
 /*
@@ -592,7 +594,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
 
     //пытаемся найти файл по дефолтному пути поиска
 
-  string             full_name         = format ("%s/%s",default_path.c_str (),file_name.c_str ()), mount_name;
+  string               full_name         = format ("%s/%s",default_path.c_str (),file_name.c_str ()), mount_name;
   ICustomFileSystemPtr owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name);
 
   if (owner_file_system && owner_file_system->IsFileExist (mount_name.c_str ()))
@@ -652,34 +654,51 @@ FileImplPtr FileSystemImpl::OpenFile (const char* src_file_name,filemode_t mode_
 
   try
   {
-    volatile ICustomFileSystem::file_t file = file_system->FileOpen (file_name.c_str (),mode_flags,buffer_size);
-
-    try
+    FileImplPtr base_file;
+    
+    if (file_system == anonymous_file_system.get ())
     {
-      FileImplPtr base_file (new CustomFileImpl (file_system,file,mode_flags,true),false);
+      base_file = FileImplPtr (new BufferedFileImpl (anonymous_file_system->RetainFile (file_name.c_str (), mode_flags), buffer_size), false);
+    }
+    else
+    {
+      volatile ICustomFileSystem::file_t file = file_system->FileOpen (file_name.c_str (),mode_flags,buffer_size);      
 
-      if (HasCryptoParameters (src_file_name))
+      try
       {
-        FileCryptoParameters params = GetCryptoParameters (src_file_name);
-
-        base_file = FileImplPtr (new CryptoFileImpl (base_file, buffer_size, params.ReadMethod (), params.WriteMethod (), params.Key (), params.KeyBits ()), false);
+        xtl::intrusive_ptr<CustomFileImpl> custom_file (new CustomFileImpl (file_system,file,mode_flags,true),false);
+        
+        file = 0;
+        
+        custom_file->SetPath (src_file_name);
+        
+        base_file = custom_file;
       }
+      catch (...)
+      {
+        if (file)
+          file_system->FileClose (file);
 
-      size_t self_buffer_size = base_file->GetBufferSize ();
+        throw;
+      }
+    }         
 
-      if (!buffer_size || self_buffer_size >= buffer_size)
-        return base_file;
-
-      if (base_file->Size () < default_file_buffer_size && !(mode_flags & (FileMode_Resize|FileMode_Write)))
-        return FileImplPtr (new MemFileImpl (base_file), false);
-
-      return FileImplPtr (new BufferedFileImpl (base_file,buffer_size), false);
-    }
-    catch (...)
+    if (HasCryptoParameters (src_file_name))
     {
-      file_system->FileClose (file);
-      throw;
+      FileCryptoParameters params = GetCryptoParameters (src_file_name);
+
+      base_file = FileImplPtr (new CryptoFileImpl (base_file, buffer_size, params.ReadMethod (), params.WriteMethod (), params.Key (), params.KeyBits ()), false);
     }
+
+    size_t self_buffer_size = base_file->GetBufferSize ();
+
+    if (!buffer_size || self_buffer_size >= buffer_size || (self_buffer_size >= base_file->Size () && !(base_file->Mode () & FileMode_Resize)))
+      return base_file;
+
+    if (base_file->Size () < default_file_buffer_size && !(mode_flags & (FileMode_Resize|FileMode_Write)))
+      return FileImplPtr (new MemFileImpl (base_file), false);
+
+    return FileImplPtr (new BufferedFileImpl (base_file,buffer_size), false);
   }
   catch (xtl::exception& exception)
   {
@@ -737,13 +756,17 @@ void FileSystemImpl::Rename (const char* src_file_name,const char* new_name)
   if (!new_name)
     throw xtl::make_null_argument_exception ("common::FileSystem::Rename","new_name");
 
-  string file_name;
+  string file_name, new_file_name;
 
   try
   {
-    ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
+    ICustomFileSystemPtr file_system     = FindFileSystem (src_file_name,file_name);
+    ICustomFileSystemPtr new_file_system = FindFileSystem (new_name,new_file_name);
+    
+    if (new_file_system != file_system)
+      throw xtl::format_operation_exception ("", "Can't rename file '%s' to '%s'. Different file systems", src_file_name, new_name);
 
-    file_system->Rename (file_name.c_str (),new_name);
+    file_system->Rename (file_name.c_str (),new_file_name.c_str ());
   }
   catch (xtl::exception& exception)
   {
@@ -811,6 +834,9 @@ bool FileSystemImpl::GetFileInfo (const char* src_file_name,FileInfo& info)
     string file_name;
 
     ICustomFileSystemPtr file_system = FindFileSystem (src_file_name,file_name);
+    
+    if (!file_name.empty () && file_name [file_name.size () - 1] == '/')
+      file_name.pop_back ();
 
     return file_system->GetFileInfo (file_name.c_str (),info);
   }

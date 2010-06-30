@@ -133,11 +133,91 @@ void XmlLexer::Skip ()
     }
 }
 
-void XmlLexer::ReadShiftedString (char border)
+void XmlLexer::ReadSymbolReference (char* write_position)
 {
+  if (position [1] == '#')
+  {
+    char* symbol_code_start = position + 2;
+    int   base              = 10;
+
+    if (position [2] == 'x')
+    {
+      base = 16;
+      symbol_code_start++;
+    }
+
+    char*         symbol_code_end = 0;
+    unsigned long symbol_code     = strtoul (symbol_code_start, &symbol_code_end, base);
+
+    if (!symbol_code || !symbol_code_end || *symbol_code_end != ';' || symbol_code > 255)
+      SetError (XmlLexerStatus_InvalidCharacterReference, current_token);
+    else
+    {
+      position = symbol_code_end;
+
+      unsigned char* unsigned_write_position = (unsigned char*)write_position;
+      unsigned_write_position [0] = (unsigned char)symbol_code;
+    }
+  }
+  else
+  {
+    struct Marker
+    {
+      const char* marker;
+      char        replacement;
+    };
+
+    static Marker       markers []    = {{"lt;", '<'}, {"gt;", '>'}, {"amp;", '&'}, {"aposition;", '\''}, {"quot;", '"'}};
+    static const size_t markers_count = sizeof markers / sizeof *markers;
+
+    const Marker* m = markers;
+
+    for (size_t i=0; i<markers_count; i++, m++)
+    {
+      const char* s1 = m->marker;
+      char*       s2 = position + 1;
+
+      for (; *s1 && *s2 && *s1 == *s2; s1++, s2++);
+
+      if (!*s1) //соответствие найдено
+      {
+        position           = s2 - 1;
+        write_position [0] = m->replacement;
+
+        break;
+      }
+    }
+
+    if (m == markers + markers_count) //если соответствие не найдено
+      SetError (XmlLexerStatus_InvalidCharacterReference, current_token);
+  }
+}
+
+void XmlLexer::ReadString (char border, char* terminators, size_t terminators_count)
+{
+  current_token = position;
+  current_lexem = XmlLexem_String;
+  cursor        = position;
+
   char* write_position = position;
 
-  for (;; position++, write_position++)
+  for (;; write_position++, position++)
+  {
+    for (size_t i = 0; i < terminators_count; i++)
+      if (*position == terminators [i])
+      {
+        if (position != write_position)
+          *write_position = '\0';
+        else
+        {
+          erased_char          = *position;
+          erased_char_position = position;
+          *position            = '\0';
+        }
+
+        return;
+      }
+
     switch (*position)
     {
       case '\n':
@@ -146,148 +226,28 @@ void XmlLexer::ReadShiftedString (char border)
         SetError (XmlLexerStatus_UnclosedString, current_token);
         return;
       case '&':
-      {
-        struct Marker
-        {
-          const char* marker;
-          char        replacement;
-        };
-
-        static Marker       markers []    = {{"lt", '<'}, {"gt", '>'}, {"amp", '&'}, {"aposition", '\''}, {"quot", '"'}};
-        static const size_t markers_count = sizeof markers / sizeof *markers;
-
-        const Marker* m = markers;
-
-        for (size_t i=0; i<markers_count; i++, m++)
-        {
-          const char* s1 = m->marker;
-          char*       s2 = position + 1;
-
-          for (; *s1 && *s2 && *s1 == *s2; s1++, s2++);
-
-          if (!*s1) //соответствие найдено
-          {
-            position        = s2;
-            *write_position = m->replacement;
-
-            break;
-          }
-        }
-
-        if (m == markers + markers_count) //если соответствие не найдено
-          *write_position = *position;
-
+        ReadSymbolReference (write_position);
         break;
-      }
       default:
         if (*position == border)
         {
           *write_position = '\0';
           position++;
-
-          return;
-        }
-        else
-        {
-          *write_position = *position;
-        }
-
-        break;
-    }
-}
-
-void XmlLexer::ReadString (char border)
-{
-  current_token = position;
-  current_lexem = XmlLexem_String;
-  cursor        = position;
-
-  for (;; position++)
-    switch (*position)
-    {
-      case '\n':
-      case '\0':
-      case '\r':
-        SetError (XmlLexerStatus_UnclosedString, current_token);
-        return;
-      case '&':
-        ReadShiftedString (border);
-        return;
-      default:
-        if (*position == border)
-        {
-          *position++ = '\0';
           return;
         }
 
-        break;
-    }
-}
-
-void XmlLexer::ReadTextString ()
-{
-  char* write_position = position;
-
-  current_token = position;
-  current_lexem = XmlLexem_String;
-  cursor        = position;
-
-  for (;; position++, write_position++)
-    switch (*position)
-    {
-      case '&':
-      {
-        struct Marker
-        {
-          const char* marker;
-          char        replacement;
-        };
-
-        static Marker       markers []    = {{"lt", '<'}, {"gt", '>'}, {"amp", '&'}};
-        static const size_t markers_count = sizeof markers / sizeof *markers;
-
-        const Marker* m = markers;
-
-        for (size_t i=0; i<markers_count; i++, m++)
-        {
-          const char* s1 = m->marker;
-          char*       s2 = position + 1;
-
-          for (; *s1 && *s2 && *s1 == *s2; s1++, s2++);
-
-          if (!*s1) //соответствие найдено
-          {
-            position        = s2;
-            *write_position = m->replacement;
-
-            break;
-          }
-        }
-
-        if (m == markers + markers_count) //если соответствие не найдено
-        {
-          SetError (XmlLexerStatus_UnclosedString, current_token);
-          return;
-        }
-
-        break;
-      }
-      case '\n':
-      case '\0':
-      case '\r':
-      case ' ':
-      case '<':
-        if (write_position == position)
-        {
-          erased_char          = *write_position;
-          erased_char_position = position;
-        }
-
-        *write_position = '\0';
-        return;
-      default:
         *write_position = *position;
+
+        break;
     }
+  }
+}
+
+void XmlLexer::ReadContentString ()
+{
+  char terminators [] = { ' ', '<', '\n', '\t', '\r', '\0' };
+
+  ReadString (0, terminators, sizeof (terminators) / sizeof (*terminators));
 }
 
 void XmlLexer::ReadCData ()
@@ -391,7 +351,7 @@ void XmlLexer::ProcessTagBeginBracket (bool process_cdata)
   }
 }
 
-XmlLexem XmlLexer::NextLexem ()
+XmlLexem XmlLexer::NextLexem (bool content)
 {
   char* old_erased_char_position = erased_char_position;
 
@@ -414,7 +374,7 @@ XmlLexem XmlLexer::NextLexem ()
         current_lexem = XmlLexem_EndOfFile;
         break;
       case '<':
-        ProcessTagBeginBracket (false);
+        ProcessTagBeginBracket (content);
         break;
       case '?':
         if (position [1] == '>')
@@ -441,7 +401,11 @@ XmlLexem XmlLexer::NextLexem ()
         current_lexem = XmlLexem_SectorEndBracket;
         break;
       case '/':
-        if (position [1] == '>')
+        if (content)
+        {
+          ReadContentString ();
+        }
+        else if (position [1] == '>')
         {
           position += 2;
           current_lexem = XmlLexem_TagClose;
@@ -463,7 +427,13 @@ XmlLexem XmlLexer::NextLexem ()
       case '0': case '1': case '2': case '3':
       case '4': case '5': case '6': case '7':
       case '8': case '9': case '-': case '.':
-        ReadIdentifier (false);
+        if (content)
+        {
+          ReadContentString ();
+        }
+        else
+          ReadIdentifier (false);
+
         break;
       case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
       case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
@@ -476,59 +446,31 @@ XmlLexem XmlLexer::NextLexem ()
       case 's': case 't': case 'u': case 'v': case 'w': case 'x':
       case 'y': case 'z':
       case '_': case ':': case '#':
-        ReadIdentifier (true);
+        if (content)
+        {
+          ReadContentString ();
+        }
+        else
+        {
+          ReadIdentifier (true);
+        }
+
         break;
       case '\n':
         NextLine ();
         break;
+      case '&':
+        if (content)
+        {
+          ReadContentString ();
+          break;
+        }
       default:
         erased_char_position = position;
         erased_char          = *position;
 
         SetError (XmlLexerStatus_WrongChar, position++);
         break;
-    }
-  }
-
-  *old_erased_char_position = '\0';
-
-  return current_lexem;
-}
-
-XmlLexem XmlLexer::NextTextLexem ()
-{
-  char* old_erased_char_position = erased_char_position;
-
-  *erased_char_position = erased_char;
-  current_lexem         = XmlLexem_Undefined;
-  current_status        = XmlLexerStatus_NoError;
-  current_token         = "";
-  erased_char           = ' ';
-  erased_char_position  = &DUMMY_CHAR;
-
-  Skip ();
-
-  cursor = position;
-
-  if (current_status == XmlLexerStatus_NoError)
-  {
-    switch (*position)
-    {
-      case '\0':
-        current_lexem = XmlLexem_EndOfFile;
-        break;
-      case '<':
-        ProcessTagBeginBracket (true);
-        break;
-      case ']':
-        if (position [1] == ']' && position [2] == '>')
-          SetError (XmlLexerStatus_WrongChar, position++);
-        break;
-      case '\n':
-        NextLine ();
-        break;
-      default:
-        ReadTextString ();
     }
   }
 

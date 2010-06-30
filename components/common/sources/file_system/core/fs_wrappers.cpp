@@ -38,9 +38,21 @@ AppendFile::AppendFile (const char* file_name,size_t buffer_size)
   Seek (Size ());
 }
 
+MemFile::MemFile (size_t reserved_size,filemode_t mode)
+  : File (FileImplPtr (new MemFileImpl (reserved_size,mode), false))
+  { }
+
 MemFile::MemFile (void* buf,size_t size,filemode_t mode)
   : File (FileImplPtr (new MemFileImpl (buf,size,mode), false))
   { }
+  
+void* MemFile::Buffer () const
+{
+  if (MemFileImpl* mem_file = dynamic_cast<MemFileImpl*> (&*GetImpl ()))
+    return mem_file->GetBuffer ();
+
+  throw xtl::format_operation_exception ("common::MemFile::Buffer", "Wrong impementation of MemFile. No buffer");
+}
   
 CustomFile::CustomFile (ICustomFileSystemPtr file_system,const char* name,filemode_t mode)
  : File (FileImplPtr (new CustomFileImpl (file_system,name,mode), false))

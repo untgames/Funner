@@ -2,7 +2,7 @@
 
 using namespace common;
 
-const char* file_name [] = {"data/test1.xml", "data/error_test1.xml", "data/error_test2.xml"};
+const char* file_name [] = { "data/test1.xml", "data/error_test1.xml", "data/error_test2.xml", "data/character_reference_test.xml" };
 const size_t elements = sizeof file_name / sizeof *file_name;
 
 int main ()

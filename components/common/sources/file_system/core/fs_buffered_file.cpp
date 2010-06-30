@@ -42,8 +42,8 @@ struct BufferedFileImpl::Impl
       if (base_file->Seek (data_dirty_start_pos) != data_dirty_start_pos)
         throw xtl::format_operation_exception ("", "Can't seek file");      
         
-      char*  data = buffer.data () + data_dirty_start_pos - data_start_pos;
-      size_t size = data_dirty_end_pos - data_dirty_end_pos;
+      char*  data = buffer.data () + (data_dirty_start_pos - data_start_pos);
+      size_t size = data_dirty_end_pos - data_dirty_start_pos;
 
       size_t write_size = base_file->Write (data, size);
 
@@ -129,6 +129,15 @@ BufferedFileImpl::~BufferedFileImpl ()
   {
     //подавление всех исключений
   }
+}
+
+/*
+    Получение пути к файлу
+*/
+
+const char* BufferedFileImpl::GetPath ()
+{
+  return impl->base_file->GetPath ();
 }
 
 /*
@@ -286,7 +295,7 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
     }
 
     if (!size)
-      return 0;      
+      return 0;
 
     if (size > impl->buffer.size ())
     {
@@ -330,8 +339,8 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
 
       memcpy (dst, src, write_size);
       
-      if (pos < impl->data_dirty_start_pos)                               impl->data_dirty_start_pos = pos;
-      if ((filepos_t)(pos + write_size) > impl->data_dirty_end_pos - pos) impl->data_dirty_end_pos   = pos + write_size;
+      if (pos < impl->data_dirty_start_pos)                         impl->data_dirty_start_pos = pos;
+      if ((filepos_t)(pos + write_size) > impl->data_dirty_end_pos) impl->data_dirty_end_pos   = pos + write_size;
 
         //переход к следующему блоку
 

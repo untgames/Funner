@@ -127,6 +127,9 @@ class XmlParser
         case XmlLexerStatus_UnclosedCData:
           Error ("unclosed CDATA");
           break;
+        case XmlLexerStatus_InvalidCharacterReference:
+          Error ("invalid character reference");
+          break;
         case XmlLexerStatus_NoError:
           break;
         default:
@@ -247,7 +250,7 @@ class XmlParser
 
       attributes_count = 0;
 
-      for (;; lexer.NextTextLexem ())
+      for (;; lexer.NextLexem (true))
         switch (lexer.Lexem ())
         {
           case XmlLexem_Token:
@@ -340,7 +343,7 @@ class XmlParser
             break;
         }
 
-        lexer.NextTextLexem ();
+        lexer.NextLexem (true);
       }      
     }
     
@@ -443,7 +446,7 @@ class XmlParser
             builder.EndNode (); //восстановление после ошибки
             return;
           case XmlLexem_TagEndBracket:
-            lexer.NextTextLexem ();
+            lexer.NextLexem (true);
             ParseContentElements ();
           case XmlLexem_TagClose:
             builder.EndNode ();

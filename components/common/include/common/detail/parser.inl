@@ -123,7 +123,7 @@ inline void read (const ParseNode& node, const char* name, OutIter first, size_t
   size_t read_count = read_range (attr_iter, first, count);
 
   if (read_count != count)
-    raise_parser_exception (child, "Error at read node item #%u (requested_items_count=%u)", read_count, count);
+    raise_parser_exception (child, "Error at read node item #%u ('%s') (requested_items_count=%u)", read_count, child.Attributes () [read_count], count);
 }
 
 namespace detail

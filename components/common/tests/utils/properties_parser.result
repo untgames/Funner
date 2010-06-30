@@ -1,0 +1,4 @@
+Results of properties_parser_test:
+map has 2 properties (hash=524a6c46, structure_hash=1626d48f, data_hash=b0acbb32):
+ #0: name='A', type=string, value='1'
+ #1: name='B', type=string, value='2'

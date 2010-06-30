@@ -3,23 +3,29 @@
 using namespace common;
 
 CustomFileImpl::CustomFileImpl (ICustomFileSystemPtr _file_system,const char* _file_name,filemode_t mode_flags)
-  : FileImpl (mode_flags), auto_close (true)
+  : FileImpl (mode_flags)
+  , auto_close (true)
+  , has_file_path (false)
 {
   if (!_file_system)
-    throw xtl::make_null_argument_exception ("CustomFileImpl::CustomFileImpl","file_system");
+    throw xtl::make_null_argument_exception ("common::CustomFileImpl::CustomFileImpl","file_system");
 
   if (!_file_name)
-    throw xtl::make_null_argument_exception ("CustomFileImpl::CustomFileImpl","file_name");
+    throw xtl::make_null_argument_exception ("common::CustomFileImpl::CustomFileImpl","file_name");
 
   file_system = _file_system;
   file_handle = file_system->FileOpen (_file_name,mode_flags,0);
 }
 
 CustomFileImpl::CustomFileImpl (ICustomFileSystemPtr _file_system,file_t _handle,filemode_t mode_flags,bool _auto_close)
-  : FileImpl (mode_flags), file_system (_file_system), file_handle (_handle), auto_close (_auto_close)
+  : FileImpl (mode_flags)
+  , file_system (_file_system)
+  , file_handle (_handle)
+  , auto_close (_auto_close)
+  , has_file_path (false)
 {
   if (!_file_system)
-    throw xtl::make_null_argument_exception ("CustomFileImpl::CustomFileImpl","file_system");
+    throw xtl::make_null_argument_exception ("common::CustomFileImpl::CustomFileImpl","file_system");
 }
 
 CustomFileImpl::~CustomFileImpl ()
@@ -32,6 +38,23 @@ CustomFileImpl::~CustomFileImpl ()
   catch (...)
   {
   }
+}
+
+void CustomFileImpl::SetPath (const char* path)
+{
+  if (!path)
+    throw xtl::make_null_argument_exception ("common::CustomFileImpl::SetPath", "path");
+    
+  file_path     = path;
+  has_file_path = true;
+}
+
+const char* CustomFileImpl::GetPath ()
+{
+  if (!has_file_path)
+    SetPath (FileImpl::GetPath ());
+
+  return file_path.c_str ();
 }
 
 size_t CustomFileImpl::Read (void* buf,size_t size)

@@ -225,6 +225,15 @@ CryptoFileImpl::~CryptoFileImpl ()
 }
 
 /*
+    Получение пути к файлу
+*/
+
+const char* CryptoFileImpl::GetPath ()
+{
+  return impl->source_file->GetPath ();
+}
+
+/*
     Управление файловым указателем
 */
 
