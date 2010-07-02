@@ -358,6 +358,13 @@ angle<T> find_angle (const vector<T, Size>& a, const vector<T, Size>& b, const T
   
   if (mult_len < eps)
     return angle<T> ();
-    
-  return radian (T (acos (dot (a, b) / mult_len)));
+
+  float angle_cos = dot (a, b) / mult_len;
+
+  if (angle_cos > 1.f)
+    angle_cos = 1.f;
+  else if (angle_cos < -1.f)
+    angle_cos = -1.f;
+
+  return radian (T (acos (angle_cos)));
 }
