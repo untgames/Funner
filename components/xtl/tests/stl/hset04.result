@@ -1,0 +1,5 @@
+Results of hset4_test:
+hs1 = 10 20 30
+Found element: 20
+Element 40 Not Found!!!
+Found element: 30

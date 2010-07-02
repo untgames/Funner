@@ -1,0 +1,6 @@
+Results of list12_test:
+c1 = 5 100 5 200 5 300
+Size before remove: 6
+After removing elements with value 5, the list becomes:
+c1 = 100 200 300
+Size after remove: 3

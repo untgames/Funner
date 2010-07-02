@@ -1,0 +1,9 @@
+Results of hset7_test:
+hs1 = 1 2 3 4
+hs2 = 1 4 9 16
+hs1 == hs2 => false
+hs1 != hs2 => true
+hs1 <  hs2 => true
+hs1 >  hs2 => false
+hs1 <= hs2 => true
+hs1 >= hs2 => false

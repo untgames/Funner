@@ -1,0 +1,7 @@
+Results of alg_unique01_4:
+Before unique_copy:
+A = 5 -5 5 -5 5 -5 5 -5 4 4 4 4 7
+v1 = 0 0 0 0 0 0 0 0 0 0 0 0 0
+After unique_copy:
+A = 5 -5 5 -5 5 -5 5 -5 4 4 4 4 7
+v1 = 5 4 7

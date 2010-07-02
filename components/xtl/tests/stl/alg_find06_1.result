@@ -1,0 +1,4 @@
+Results of alg_find06_1:
+v1 = 0 5 10 15 20 0 5 10 15 20
+v2 = 5 10 15 20
+There is match of v2 in v1 at position 6.

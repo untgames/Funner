@@ -1,0 +1,12 @@
+Results of set11m_test:
+s1 = 10 10 20
+s2 = 100 100
+s3 = 300
+Result of 's1.swap (s2)':
+s1 = 100 100
+s2 = 10 10 20
+Result of 'swap (s1, s3)':
+s1 = 300
+s3 = 100 100
+Result of 'init_set (s3)':
+s3 = 1 2 3

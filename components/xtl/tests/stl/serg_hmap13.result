@@ -1,8 +1,0 @@
-Results of serg_hmap13_test:
-size before resize = 2
-size after resize = 2
-size after insertions = 4
-bucket_count: 389
-max_bucket_count: 389
-elems_in_bucket: 0
-hm1 = (b,2) (a,1) (c,3) (d,4)

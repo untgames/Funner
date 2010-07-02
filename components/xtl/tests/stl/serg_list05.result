@@ -1,8 +1,0 @@
-Results of serg_list5_test:
-c1 = 10 20 30 40 50
-After erasing the first element, the list becomes:
-c1 = 20 30 40 50
-After erasing all elements but the first, the list becomes:
-c1 = 20
-The size of the list is 1
-The size of list after clearing is 0

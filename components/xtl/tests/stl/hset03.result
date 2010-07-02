@@ -1,0 +1,12 @@
+Results of hset3_test:
+hs1 = 1 2 3 4
+hs2 = 1 4 9 16
+hs3 = 0 1 2 3
+After the 2nd element is deleted, the set hs1 is:
+hs1 = 1 3 4
+After the middle two elements are deleted, the set hs2 is:
+hs2 = 1 16
+After the element with a key of 2 is deleted, the set hs3 is:
+hs3 = 0 1 3
+The size of the hs3 is 3
+The size of hs3 after clearing is 0

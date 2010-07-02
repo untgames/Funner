@@ -1,0 +1,4 @@
+Results of hset6m_test:
+hs1 = 10 10 20
+Num of elements '10': 2
+Direct call to hs1.count (10): 2

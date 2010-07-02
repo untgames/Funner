@@ -1,0 +1,6 @@
+Results of hmap9_test:
+ 30
+hm1 = (1,10) (2,20) (3,30)
+1st element with key >= 2: 20
+1st element with key > 2: 30
+Not Found!

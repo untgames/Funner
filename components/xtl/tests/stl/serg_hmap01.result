@@ -1,6 +1,0 @@
-Results of serg_hmap1_test:
-hm0 =
-hm1 = ('one',0) ('two',10) ('three',20) ('four',30) ('five',40)
-hm2 = ('one',10) ('two',20)
-hm3 = ('one',0) ('two',10)
-hm4 = ('two',10) ('three',20)

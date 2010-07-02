@@ -1,5 +1,0 @@
-Results of serg_hmap5m_test:
-hm1 = (1,10) (2,20) (3,30) (4,30)
-Element with a key of 2 is: 20.
-Element with a key of 4 not found.
-The element of hm1 with a key matching that of the last element is: 30.

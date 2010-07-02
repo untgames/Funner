@@ -1,0 +1,8 @@
+Results of deque07_test:
+The deque contains the elements:
+c1 = 10 20 30 40 50
+The reversed deque is:
+c1 = 50 40 30 20 10
+Last element in the deque is 50
+First element in the deque is 10
+Last element in deque is now 40

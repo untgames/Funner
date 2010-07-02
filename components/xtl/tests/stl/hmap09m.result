@@ -1,0 +1,4 @@
+Results of hmap9m_test:
+hm1 = (3,10) (3,20) (3,30)
+Elements with key of 3:
+10 20 30 

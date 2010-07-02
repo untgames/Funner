@@ -1,6 +1,0 @@
-Results of serg_alg_find15_1:
-A1 = 3 1 4 1 5 9 3
-A2 = 3 1 4 1 5 9 7
-The two ranges do not differ.
-Mismatch in position 6
-Values are: 3, 7

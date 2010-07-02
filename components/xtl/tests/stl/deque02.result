@@ -1,0 +1,6 @@
+Results of deque02_test:
+The deque c1 is not empty.
+The queue c2 is empty.
+c1.size () = 1
+c2.size () = 0
+c1.max_size () = 1073741823

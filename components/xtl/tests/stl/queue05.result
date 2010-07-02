@@ -1,0 +1,7 @@
+Results of queue05_test:
+q1 == q2 => false
+q1 != q2 => true
+q1 <  q2 => true
+q1 >  q2 => false
+q1 <= q2 => true
+q1 >= q2 => false

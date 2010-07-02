@@ -1,0 +1,2 @@
+Results of hmap2_test:
+hm1 = ('one',1) ('two',20) ('three',3) ('five',0)

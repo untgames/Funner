@@ -1,0 +1,15 @@
+Results of hmap4_test:
+hm1 = (1,1) (2,2) (3,3) (4,4)
+hm2 = (1,1) (2,4) (3,9) (4,16)
+hm3 = (1,0) (2,1) (3,2) (4,3)
+Delete 2nd element from hm1:
+hm1 = (1,1) (3,3) (4,4)
+Delete [begin++, end--] from hm2:
+hm2 = (1,1) (4,16)
+Delete elements with key of 2 from hm3:
+hm3 = (1,0) (3,2) (4,3)
+Count of deleted elements: 1.
+Delete 2nd element: 
+hm3 = (1,0) (4,3)
+Size of hm3 before: 2
+Size of hm3 after: 0

@@ -1,0 +1,4 @@
+Results of alg_find10_2:
+A = -1 -1 0 0 1 1 2 2 3 3
+lowest position of value 1: 4
+lowest position of value -1: 4

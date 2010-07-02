@@ -1,0 +1,13 @@
+Results of map13m_test:
+m1 = (1,10) (2,20) (3,30)
+m2 = (10,100) (20,200)
+m3 = (20,200)
+Result of 'm1.swap (m2)':
+m1 = (10,100) (20,200)
+m2 = (1,10) (2,20) (3,30)
+Result of 'swap (m1, m3)':
+m1 = (20,200)
+m3 = (10,100) (20,200)
+Result swap of empty maps':
+m1 =
+m2 =

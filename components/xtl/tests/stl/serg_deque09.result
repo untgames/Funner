@@ -1,7 +1,0 @@
-Results of serg_deque09_test:
-c1 = 1 2 3
-c2 = 10 20
-c3 = 100
-After swapping with c2, deque c1 = 10 20
-After swapping with c3, deque c1 = 100
-After swapping with c2, deque c1 = 1 2 3

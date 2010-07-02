@@ -1,9 +1,0 @@
-Results of serg_hmap10_test:
-hm1 = (0,'one') (1,'two') (2,'three') (3,'four') (4,'five')
-hm2 = (0,'one') (1,'two') (4,'three') (9,'four') (16,'five')
-hm1 == hm2 => false
-hm1 != hm2 => true
-hm1 <  hm2 => true
-hm1 >  hm2 => false
-hm1 <= hm2 => true
-hm1 >= hm2 => false

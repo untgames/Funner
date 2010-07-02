@@ -1,0 +1,5 @@
+Results of hset4m_test:
+hs1 = 10 10 20
+First Found element: 10
+Element 40 Not Found!!!
+First Found element: 20

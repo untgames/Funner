@@ -1,0 +1,3 @@
+Results of alg_sort05_2:
+Before sort: A = f d B e A C F D b E a c
+After sort:  A = A a B b C c d D e E f F

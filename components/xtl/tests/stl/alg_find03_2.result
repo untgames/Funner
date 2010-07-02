@@ -1,0 +1,5 @@
+Results of alg_find03_2:
+v1 = 0 5 10 15 20 0 5 10 15 20
+v2 = 20 30 40
+Found sequence of elements at position 2.
+No match of v2 in v1.
