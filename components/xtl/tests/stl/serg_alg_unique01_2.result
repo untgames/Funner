@@ -1,5 +1,0 @@
-Results of serg_alg_unique01_2:
-Before unique:
-A = 5 -5 5 -5 5 -5 5 -5 4 4 4 4 7
-After unique:
-A = 5 4 7

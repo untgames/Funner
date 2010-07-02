@@ -1,0 +1,5 @@
+Results of queue02_test:
+The queue q1 is not empty.
+The queue q2 is empty.
+q1.size () = 1
+q2.size () = 0

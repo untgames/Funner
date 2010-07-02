@@ -1,0 +1,7 @@
+Results of alg_find12_1:
+A = -3 -2 -1 -1 0 0 1 2 3 4
+equal range for value 3: (8,9)
+equal range for value -3: (0,1)
+equal range for value 0: (4,6)
+equal range for value 4: (9,10)
+no equal range for value: 5

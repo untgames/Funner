@@ -16,7 +16,7 @@ namespace stl
 ///Динамический массив
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T,class Allocator=typename default_allocator<T>::allocator_type >
-class vector
+class vector: private Allocator::template rebind<T>::other
 {
   public:
     typedef typename Allocator::template rebind<T>::other allocator_type;
@@ -148,8 +148,7 @@ class vector
     template <class Iter> void realloc       (size_type count,Iter first,Iter last);
     
   private:
-    allocator_type allocator;
-    pointer        start, finish, end_of_storage;
+    pointer start, finish, end_of_storage;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

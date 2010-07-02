@@ -85,7 +85,7 @@ class deque_iterator: public deque_iterator_base<T,Allocator>
 ///Δεκ
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T,class Allocator=typename default_allocator<T>::allocator_type>
-class deque
+class deque: private Allocator::template rebind<T>::other
 {
   friend class deque_iterator<T,T&,T*,Allocator>;
   friend class deque_iterator<T,const T&,const T*,Allocator>;
@@ -233,10 +233,9 @@ class deque
     typedef typename Allocator::template rebind<pointer>::other map_allocator_type;
 
   private:
-    allocator_type     allocator;
-    map_allocator_type map_allocator;
     pointer*           map;
     size_type          map_size, seq_offset, seq_size;
+    map_allocator_type map_allocator;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

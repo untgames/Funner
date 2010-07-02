@@ -122,33 +122,33 @@ inline typename list_iterator<T>::iterator list_iterator<T>::get_unqualified_ite
 
 template <class T,class Allocator>
 inline list<T,Allocator>::list (const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 { }
 
 template <class T,class Allocator>
 inline list<T,Allocator>::list (size_type count,const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 {
   insert (begin (),count,T ());
 }
 
 template <class T,class Allocator>
 inline list<T,Allocator>::list (size_type count,const value_type& value,const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 {
   insert (begin (),count,value);
 }
 
 template <class T,class Allocator>
 inline list<T,Allocator>::list (const list& x)
-  : allocator (x.allocator)
+  : allocator_type (static_cast<const allocator_type&> (x))
 {
   insert (begin (),x.begin (),x.end ());  
 }
 
 template <class T,class Allocator> template <class Iter> 
 inline list<T,Allocator>::list (Iter first,Iter last,const allocator_type& _allocator)
-  : allocator (_allocator)
+  : allocator_type (_allocator)
 {
   insert (begin (),first,last);
 }
@@ -166,7 +166,7 @@ inline list<T,Allocator>::~list ()
 template <class T,class Allocator>
 inline typename list<T,Allocator>::allocator_type list<T,Allocator>::get_allocator () const
 {
-  return allocator;
+  return static_cast<const allocator_type&> (*this);
 }
 
 /*
@@ -188,7 +188,7 @@ inline typename list<T,Allocator>::size_type list<T,Allocator>::size () const
 template <class T,class Allocator>
 inline typename list<T,Allocator>::size_type list<T,Allocator>::max_size () const
 {
-  return allocator.max_size ();
+  return allocator_type::max_size ();
 }
 
 /*
@@ -277,15 +277,15 @@ inline typename list<T,Allocator>::const_reference list<T,Allocator>::back () co
 template <class T,class Allocator> 
 typename list<T,Allocator>::Node* list<T,Allocator>::create_node (const value_type& x)
 {
-  Node* p = allocator.allocate (1);
+  Node* p = allocator_type::allocate (1);
   
   try
   {
-    construct (&p->data,x);
+    stl::construct (&p->data,x);
   }
   catch (...)
   {
-    allocator.deallocate (p,1);
+    allocator_type::deallocate (p,1);
     throw;
   }
 
@@ -295,15 +295,15 @@ typename list<T,Allocator>::Node* list<T,Allocator>::create_node (const value_ty
 template <class T,class Allocator> 
 typename list<T,Allocator>::Node* list<T,Allocator>::create_node ()
 {
-  Node* p = allocator.allocate (1);
+  Node* p = allocator_type::allocate (1);
   
   try
   {
-    construct (&p->data);
+    stl::construct (&p->data);
   }
   catch (...)
   {
-    allocator.deallocate (p,1);
+    allocator_type::deallocate (p,1);
     throw;
   }
 
@@ -313,8 +313,8 @@ typename list<T,Allocator>::Node* list<T,Allocator>::create_node ()
 template <class T,class Allocator> 
 inline void list<T,Allocator>::delete_node (Node* p)
 {
-  destroy (&p->data);
-  allocator.deallocate (p,1);
+  stl::destroy (&p->data);
+  allocator_type::deallocate (p,1);
 }
 
 /*
@@ -519,7 +519,7 @@ inline void list<T,Allocator>::resize (size_type new_size)
 template <class T,class Allocator>
 inline void list<T,Allocator>::swap (list<T,Allocator>& x)
 { 
-  if (allocator == x.allocator)
+  if (static_cast<allocator_type&> (*this) == static_cast<allocator_type&> (x))
   {
     list_node_base *prev = base.prev, *x_prev = x.base.prev;
 
@@ -556,7 +556,7 @@ inline void list<T,Allocator>::splice (iterator dst_pos,list& x)
   if (x.empty ())
     return;
     
-  if (x.allocator == allocator)
+  if (static_cast<allocator_type&> (x) == static_cast<allocator_type&> (*this))
   {
     transfer (dst_pos,x.begin (),x.end ());    
   }  
@@ -576,7 +576,7 @@ inline void list<T,Allocator>::splice (iterator dst_pos,list& src_list,iterator 
   if (dst_pos == src_pos || dst_pos == j) 
     return;
 
-  if (allocator == src_list.allocator)
+  if (static_cast<allocator_type&> (*this) == static_cast<allocator_type&> (src_list))
   {
     transfer (dst_pos,src_pos,j);  
   }    
@@ -593,7 +593,7 @@ inline void list<T,Allocator>::splice (iterator dst_pos,list& src_list,iterator 
   if (src_first == src_last) 
     return;
     
-  if (allocator == src_list.allocator)
+  if (static_cast<allocator_type&> (*this) == static_cast<allocator_type&> (src_list))    
   {
     transfer (dst_pos,src_first,src_last);
   }
@@ -676,7 +676,7 @@ void list<T,Allocator>::merge (list& x,Compare less)
 {
   iterator first1 = begin (), last1 = end (), first2 = x.begin (), last2 = x.end (); 
       
-  if (allocator == x.allocator)
+  if (static_cast<allocator_type&> (*this) == static_cast<allocator_type&> (x))
   {
     while (first1!=last1 && first2!=last2)
     { 

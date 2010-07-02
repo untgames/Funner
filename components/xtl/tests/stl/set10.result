@@ -1,0 +1,5 @@
+Results of set10_test:
+s1 = 10 20 30 40
+The element 10 already exists: *pr.first = 10
+s1 = 10 20 30 40 50
+s2 = 20 30 40 100

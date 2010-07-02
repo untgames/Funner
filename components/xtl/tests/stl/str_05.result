@@ -1,0 +1,13 @@
+Results of str_05:
+The original string str1 is: 'dddd-1dd4-abdd'
+found str1[5] = '1'
+found str1[11] = 'b'
+The original string str2 is: 'BBB-1111'
+found str2[3] = '-'
+The elements of the substring 'B-1' were not found in str2.
+The original string str3 is: '444-555-GGG'
+found str3[7] = '-'
+found str3[3] = '-'
+The original string str4 is: '12-ab-12-ab'
+found str4[1] = '2'
+found str4[10] = 'b'

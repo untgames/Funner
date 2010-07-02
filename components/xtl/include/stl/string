@@ -22,7 +22,7 @@ namespace stl
 ///Строка
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T,class Traits,class Allocator>
-class basic_string
+class basic_string: private Allocator::template rebind<T>::other
 {
   public:
     typedef typename Allocator::template rebind<T>::other allocator_type;
@@ -327,9 +327,8 @@ class basic_string
     enum { BUF_SIZE = 20/sizeof (value_type)<1?1:20/sizeof (value_type) }; //размер внутреннего буфера
 
   protected:
-    allocator_type allocator;    
-    pointer        start, finish, end_of_storage;
-    value_type     buffer [BUF_SIZE];
+    pointer    start, finish, end_of_storage;
+    value_type buffer [BUF_SIZE];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

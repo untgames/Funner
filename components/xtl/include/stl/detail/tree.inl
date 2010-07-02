@@ -432,21 +432,24 @@ inline void rbtree<Key,Value,KeyOfValue,Compare,Allocator>::empty_init ()
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 inline rbtree<Key,Value,KeyOfValue,Compare,Allocator>::rbtree (const allocator_type& _allocator)
-  : allocator (_allocator), node_count (0)
+  : allocator_type (_allocator)
+  , node_count (0)
 {
   empty_init ();  
 }
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 inline rbtree<Key,Value,KeyOfValue,Compare,Allocator>::rbtree (const Compare& cmp,const allocator_type& _allocator)
-  : allocator (_allocator), node_count (0), compare (cmp)
+  : allocator_type (_allocator)
+  , node_count (0)
+  , compare (cmp)
 {
   empty_init ();
 }
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 inline rbtree<Key,Value,KeyOfValue,Compare,Allocator>::rbtree (const rbtree& x)
-  : allocator (x.allocator)
+  : allocator_type (static_cast<const allocator_type&> (x))
 {
   if (x.header.parent)
   {
@@ -474,7 +477,7 @@ template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 inline typename rbtree<Key,Value,KeyOfValue,Compare,Allocator>::allocator_type
 rbtree<Key,Value,KeyOfValue,Compare,Allocator>::get_allocator () const
 {
-  return allocator;
+  return static_cast<const allocator_type&> (*this);
 }
 
 /*
@@ -485,13 +488,13 @@ template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 inline typename rbtree<Key,Value,KeyOfValue,Compare,Allocator>::link_type 
 rbtree<Key,Value,KeyOfValue,Compare,Allocator>::allocate_node ()
 {
-  return allocator.allocate (1);
+  return allocator_type::allocate (1);
 } 
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 inline void rbtree<Key,Value,KeyOfValue,Compare,Allocator>::deallocate_node (link_type p)
 {
-  allocator.deallocate ((node_type*)p,1);
+  allocator_type::deallocate ((node_type*)p,1);
 } 
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
@@ -502,7 +505,7 @@ rbtree<Key,Value,KeyOfValue,Compare,Allocator>::create_node (const value_type& x
   
   try 
   {
-    construct (&tmp->value,x);
+    stl::construct (&tmp->value,x);
   }
   catch (...)
   {
@@ -527,7 +530,7 @@ inline rbtree<Key,Value,KeyOfValue,Compare,Allocator>::clone_node (link_type x)
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 inline void rbtree<Key,Value,KeyOfValue,Compare,Allocator>::destroy_node (link_type p)
 {
-  destroy (&((node_type*)p)->value);
+  stl::destroy (&((node_type*)p)->value);
   deallocate_node (p);
 }
   
@@ -597,7 +600,7 @@ template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 inline typename rbtree<Key,Value,KeyOfValue,Compare,Allocator>::size_type 
 rbtree<Key,Value,KeyOfValue,Compare,Allocator>::max_size () const
 {
-  return allocator.max_size ();
+  return allocator_type::max_size ();
 }
 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
@@ -1041,7 +1044,7 @@ rbtree<Key,Value,KeyOfValue,Compare,Allocator>::equal_range (const key_type& k) 
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
 void rbtree<Key,Value,KeyOfValue,Compare,Allocator>::swap (rbtree& t)
 {   
-  if (allocator == t.allocator)
+  if (static_cast<allocator_type&> (*this) == static_cast<allocator_type&> (t))
   {
     if (node_count && t.node_count)
     {  

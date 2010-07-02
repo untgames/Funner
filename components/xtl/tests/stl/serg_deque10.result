@@ -1,8 +1,0 @@
-Results of serg_deque10_test:
-c1 = 10 20 30
-size of c1 is: 4
-last element is 40
-size of c1 is now: 5
-last element is now 0
-reduced size of c1 is: 2
-last element is now 20

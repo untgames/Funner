@@ -96,7 +96,7 @@ class rbtree_iterator
 ///Красно-чёрное дерево
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Key,class Value,class KeyOfValue,class Compare,class Allocator>
-class rbtree
+class rbtree: private Allocator::template rebind<rbtree_node<Value> >::other
 {
   typedef rbtree_node<Value> node_type;
   public:
@@ -247,7 +247,6 @@ class rbtree
     link_type _upper_bound (const key_type&) const;
     
   private:    
-    allocator_type   allocator;
     size_type        node_count;
     Compare          compare;
     rbtree_node_base header;

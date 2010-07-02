@@ -1,5 +1,0 @@
-Results of serg_hmap11_test:
-hm1 = (1,10) (2,20) (3,30) (4,40)
-Insert failed: key 1 exist! Value: 10
-hm1 = (1,10) (2,20) (3,30) (4,40)
-hm2 = (10,100) (2,20) (3,30)

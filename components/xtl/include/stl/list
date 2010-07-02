@@ -111,7 +111,7 @@ class list_iterator
 ///Список
 /////////////////////////////////////////////////////////////////////////////////////////////
 template <class T,class Allocator=typename default_allocator<T>::allocator_type>
-class list
+class list: private Allocator::template rebind<list_node<typename non_const_type<T>::value_type> >::other
 {
   template <class T1> friend class list_iterator;
   typedef list_node<typename non_const_type<T>::value_type> Node;
@@ -258,7 +258,6 @@ class list
     template <class Iter> void _insert (iterator,Iter,Iter,input_iterator_tag);
         
   private:
-    allocator_type allocator;
     volatile list_node_base base; //avoid gcc 4.3.0 optimization bug
 };
 

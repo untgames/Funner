@@ -154,12 +154,22 @@ deque_iterator<T,Ref,Ptr,Allocator>::operator - (const base& i) const
 
 template <class T,class Allocator>
 inline deque<T,Allocator>::deque (const allocator_type& _allocator)
-  : allocator (_allocator), map_allocator (_allocator), map (0), map_size (0), seq_offset (0), seq_size (0)
+  : allocator_type (_allocator)
+  , map (0)
+  , map_size (0)
+  , seq_offset (0)
+  , seq_size (0)
+  , map_allocator (_allocator)
   {  }
 
 template <class T,class Allocator>
 deque<T,Allocator>::deque (size_type count,const value_type& value,const allocator_type& _allocator)
-  : allocator (_allocator), map_allocator (_allocator), map (0), map_size (0), seq_offset (0), seq_size (0)
+  : allocator_type (_allocator)
+  , map (0)
+  , map_size (0)
+  , seq_offset (0)
+  , seq_size (0)
+  , map_allocator (_allocator)
 {
   try
   {
@@ -174,7 +184,8 @@ deque<T,Allocator>::deque (size_type count,const value_type& value,const allocat
 
 template <class T,class Allocator> template <class Iter> 
 deque<T,Allocator>::deque (Iter first,Iter last,const allocator_type& _allocator)
-  : allocator (_allocator), map_allocator (_allocator)
+  : allocator_type (_allocator)
+  , map_allocator (_allocator)
 {
   map        = 0;
   map_size   = 0; 
@@ -194,7 +205,12 @@ deque<T,Allocator>::deque (Iter first,Iter last,const allocator_type& _allocator
 
 template <class T,class Allocator>
 deque<T,Allocator>::deque (const deque& x)
-  : allocator (x.allocator), map_allocator (x.map_allocator), map (0), map_size (0), seq_offset (0), seq_size (0)
+  : allocator_type (static_cast<const allocator_type&> (x))
+  , map (0)
+  , map_size (0)
+  , seq_offset (0)
+  , seq_size (0)
+  , map_allocator (x.map_allocator)  
 {
   try
   {
@@ -220,7 +236,7 @@ inline deque<T,Allocator>::~deque ()
 template <class T,class Allocator>
 inline typename deque<T,Allocator>::allocator_type deque<T,Allocator>::get_allocator () const
 {
-  return allocator;
+  return static_cast<const allocator_type&> (*this);
 }
 
 /*
@@ -267,7 +283,7 @@ inline typename deque<T,Allocator>::size_type deque<T,Allocator>::size () const
 template <class T,class Allocator>
 inline typename deque<T,Allocator>::size_type deque<T,Allocator>::max_size () const
 {
-  return allocator.max_size ();
+  return allocator_type::max_size ();
 }
 
 template <class T,class Allocator>
@@ -506,9 +522,9 @@ inline void deque<T,Allocator>::push_back (const value_type& val)
     block -= map_size;
     
   if (!map [block])
-    map [block] = allocator.allocate (BLOCK_SIZE);
+    map [block] = allocator_type::allocate (BLOCK_SIZE);
     
-  construct (map [block]+new_offset%BLOCK_SIZE,val);
+  stl::construct (map [block]+new_offset%BLOCK_SIZE,val);
   
   ++seq_size;    
 }
@@ -523,9 +539,9 @@ inline void deque<T,Allocator>::push_front (const value_type& val)
             block      = --new_offset / BLOCK_SIZE;
               
   if (!map [block])
-    map [block] = allocator.allocate (BLOCK_SIZE);    
+    map [block] = allocator_type::allocate (BLOCK_SIZE);    
     
-  construct (map [block]+new_offset%BLOCK_SIZE,val);  
+  stl::construct (map [block]+new_offset%BLOCK_SIZE,val);  
 
   seq_offset = new_offset;
 
@@ -556,7 +572,7 @@ void deque<T,Allocator>::pop_back ()
   if (map_size <= block)
     block -= map_size;
 
-  destroy (map [block]+new_offset%BLOCK_SIZE);   
+  stl::destroy (map [block]+new_offset%BLOCK_SIZE);   
 
   if (!--seq_size)
     seq_offset = 0;
@@ -570,7 +586,7 @@ void deque<T,Allocator>::pop_front ()
 
   size_type block = seq_offset / BLOCK_SIZE;
   
-  destroy (map [block]+seq_offset%BLOCK_SIZE);
+  stl::destroy (map [block]+seq_offset%BLOCK_SIZE);
 
   if (map_size * BLOCK_SIZE <= ++seq_offset) seq_offset = 0;
   if (!--seq_size) seq_offset = 0;
@@ -891,7 +907,7 @@ void deque<T,Allocator>::clear ()
   
   for (size_type cnt=map_size;cnt;)
     if (map [--cnt])
-      allocator.deallocate (map [cnt],BLOCK_SIZE);
+      allocator_type::deallocate (map [cnt],BLOCK_SIZE);
 
   if (map)
     map_allocator.deallocate (map,map_size);
@@ -907,7 +923,7 @@ void deque<T,Allocator>::clear ()
 template <class T,class Allocator>
 inline void deque<T,Allocator>::swap (deque& x)
 {
-  if (allocator == x.allocator && map_allocator == x.map_allocator)
+  if (static_cast<allocator_type&> (*this) == static_cast<allocator_type&> (x) && map_allocator == x.map_allocator)
   {
     stl::swap (map,x.map);
     stl::swap (map_size,x.map_size);

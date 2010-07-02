@@ -1,7 +1,0 @@
-Results of serg_queue03_test:
-The queue length is 3
-back of queue q1 is 30
-front of queue q1 is 10
-After swap (back, front):
-back of queue q1 is 10
-front of queue q1 is 30

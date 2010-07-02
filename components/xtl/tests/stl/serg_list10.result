@@ -1,8 +1,0 @@
-Results of serg_list10_test:
-c1 = 1 2 3
-After swapping with c2, list c1 is:
-c1 = 10 20
-c2 = 1 2 3
-After swapping with c3, list c1 is:
-c1 = 100
-c3 = 10 20

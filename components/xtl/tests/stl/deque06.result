@@ -1,0 +1,8 @@
+Results of deque06_test:
+c1 = 10 20 30 40 50
+After erasing the first element, the deque becomes:
+c1 = 20 30 40 50
+After erasing all elements but the first, deque becomes:
+c1 = 20
+size before clear(): 1
+size after clear(): 0

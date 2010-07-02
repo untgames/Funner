@@ -1,6 +1,0 @@
-Results of serg_list15_test:
-c1 = 3 6
-c2 = 2 4
-c3 = 5 1
-After merging c1 with c2 and sorting with >: c2 = 6 4 3 2
-After merging c3 with c2 according to the '>' comparison relation: c2 = 6 5 4 3 2 1

@@ -1,0 +1,7 @@
+Results of set8_test:
+s1 = 10 20 30
+lower_bound (20): 20
+upper_bound (20): 30
+A direct call of lower_bound (20) gives 20
+A direct call of upper_bound (20) gives 30
+Not Found!

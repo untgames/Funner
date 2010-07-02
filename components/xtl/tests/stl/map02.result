@@ -1,0 +1,8 @@
+Results of map2_test:
+m1 = (1,10) (2,20) (3,30) (4,40)
+max_size: 178956970
+size: 4
+empty: false
+kc (2, 3) return 'true'
+vc (val1, val2) return 'false'
+m1 = (1,10) (2,20) (3,30) (4,40) (5,50)

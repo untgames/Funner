@@ -1,0 +1,8 @@
+Results of hmap3_test:
+hm1 = ('serg',10) ('leny',20) ('jeny',30) ('igor',40)
+size: 4
+max_size: 268435455
+empty: false
+ke ('serg', 'leny') return 'false'
+hash_func ('serg') return 17573
+hm1 = ('serg',10) ('leny',20) ('jeny',30) ('igor',40)

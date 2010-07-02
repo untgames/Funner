@@ -1,0 +1,5 @@
+Results of alg_find11_1:
+A = 0 1 1 2 2 3 4 4 5 5
+highest position of value 3: 6
+highest position of value 5: 10
+highest position of value -1: 0
