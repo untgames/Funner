@@ -9,14 +9,14 @@ using namespace syslib;
 
 struct WindowCursor::Impl: public xtl::reference_counter
 {
-  stl::string        name;   //имя курсора
-  Platform::cursor_t handle; //дескриптор курсора
+  stl::string        image_name;   //имя курсора
+  Platform::cursor_t handle;       //дескриптор курсора
   
   Impl () : handle (0) {}
   
-  Impl (const char* file_name, int hotspot_x, int hotspot_y)
-    : name (file_name)
-    , handle (Platform::CreateCursor (file_name, hotspot_x, hotspot_y))
+  Impl (const char* in_image_name, int hotspot_x, int hotspot_y)
+    : image_name (in_image_name)
+    , handle (Platform::CreateCursor (in_image_name, hotspot_x, hotspot_y))
   {
   }
   
@@ -38,14 +38,14 @@ WindowCursor::WindowCursor ()
 {
 }
 
-WindowCursor::WindowCursor (const char* file_name, int hotspot_x, int hotspot_y)
+WindowCursor::WindowCursor (const char* image_name, int hotspot_x, int hotspot_y)
 {
   try
   {
-    if (!file_name)
-      throw xtl::make_null_argument_exception ("", "file_name");
+    if (!image_name)
+      throw xtl::make_null_argument_exception ("", "image_name");
       
-    impl = new Impl (file_name, hotspot_x, hotspot_y);
+    impl = new Impl (image_name, hotspot_x, hotspot_y);
   }
   catch (xtl::exception& e)
   {
@@ -76,9 +76,9 @@ WindowCursor& WindowCursor::operator = (const WindowCursor& cursor)
     Имя курсора
 */
 
-const char* WindowCursor::Name () const
+const char* WindowCursor::Image () const
 {
-  return impl->name.c_str ();
+  return impl->image_name.c_str ();
 }
 
 /*
