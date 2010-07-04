@@ -631,6 +631,25 @@ bool Platform::GetCursorVisible (window_t)
   return false;
 }
 
+/*
+    Изображение курсора
+*/
+
+Platform::cursor_t Platform::CreateCursor (const char*, int, int)
+{
+  throw format_not_supported_exception ("syslib::iPhonePlatform::CreateCursor", "No cursor for iPhone platform");
+}
+
+void Platform::DestroyCursor (cursor_t)
+{
+  throw format_not_supported_exception ("syslib::iPhonePlatform::DestroyCursor", "No cursor for iPhone platform");
+}
+
+void Platform::SetCursor (window_t, cursor_t)
+{
+  throw format_not_supported_exception ("syslib::iPhonePlatform::CreateCursor", "No cursor for iPhone platform");
+}
+
 namespace syslib
 {
 

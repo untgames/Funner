@@ -417,3 +417,22 @@ bool Platform::GetCursorVisible (window_t handle)
 {
   return false;
 }
+
+/*
+    Изображение курсора
+*/
+
+Platform::cursor_t Platform::CreateCursor (const char*, int, int)
+{
+  throw format_not_supported_exception ("syslib::BadaPlatform::CreateCursor", "No cursor for bada platform");
+}
+
+void Platform::DestroyCursor (cursor_t)
+{
+  throw format_not_supported_exception ("syslib::BadaPlatform::DestroyCursor", "No cursor for bada platform");
+}
+
+void Platform::SetCursor (window_t, cursor_t)
+{
+  throw format_not_supported_exception ("syslib::BadaPlatform::SetCursor", "No cursor for bada platform");
+}

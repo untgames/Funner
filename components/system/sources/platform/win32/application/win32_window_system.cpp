@@ -27,14 +27,16 @@ struct WindowImpl
   Platform::WindowMessageHandler message_handler;     //функция обработки сообщений окна
   bool                           is_cursor_visible;   //видим ли курсор
   bool                           is_cursor_in_window; //находится ли курсор в окне
-  HCURSOR                        cursor;              //изображение курсора
+  HCURSOR                        default_cursor;      //курсор по умолчанию
+  HCURSOR                        preferred_cursor;    //предпочитаемый курсор для данного окна
 
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data)
     , message_handler (handler)
     , is_cursor_visible (true)
     , is_cursor_in_window (false)
-    , cursor (LoadCursor (GetApplicationInstance (), IDC_ARROW))    
+    , default_cursor (LoadCursor (GetApplicationInstance (), IDC_ARROW))
+    , preferred_cursor (0)
   {
   }
 
@@ -252,19 +254,13 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     case WM_SETCURSOR: //изменение положения курсора
       if (LOWORD(lparam) == HTCLIENT) //наша клиентная область
       {
-        if (impl->is_cursor_visible && impl->cursor)
+        if (impl->is_cursor_visible)
         {
-          SetCursor (impl->cursor);
-
-          impl->cursor = 0;
+          SetCursor (impl->preferred_cursor ? impl->preferred_cursor : impl->default_cursor);
         }
-        else if (!impl->is_cursor_visible && !impl->cursor)
+        else if (!impl->is_cursor_visible)
         {
-            //сохранение текущего курсора
-
-          impl->cursor = (HCURSOR)GetClassLong (wnd, GCL_HCURSOR);
-
-          SetCursor (0); //отключение курсора для окна
+          SetCursor (0);
         }
 
         return 1;
@@ -1026,3 +1022,63 @@ bool Platform::GetCursorVisible (window_t handle)
   }
 }
 
+/*
+    Изображение курсора
+*/
+
+Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x, int hotspot_y)
+{
+  try
+  {
+    if (!file_name)
+      throw xtl::make_null_argument_exception ("", "file_name");
+    
+    if (hotspot_x != -1)
+      throw xtl::format_not_supported_exception ("", "Custom hotspot_x=%d not supported", hotspot_x);
+      
+    if (hotspot_y != -1)
+      throw xtl::format_not_supported_exception ("", "Custom hotspot_y=%d not supported", hotspot_y);
+      
+    HCURSOR cursor = LoadCursorFromFileA (file_name);
+    
+    if (!cursor)
+      raise_error ("::LoadCursorFromFileA");
+
+    return reinterpret_cast<Platform::cursor_t> (cursor);      
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Win32Platform::CreateCursor");
+    throw;
+  }
+}
+
+void Platform::DestroyCursor (cursor_t cursor)
+{
+  //shared курсоры находятся в памяти до завершения программы и не могут быть удалены
+}
+
+void Platform::SetCursor (window_t window, cursor_t cursor)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    HWND        wnd  = (HWND)window;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");    
+    
+    impl->preferred_cursor = reinterpret_cast<HCURSOR> (cursor);
+
+    if (impl->is_cursor_visible)
+      ::SetCursor (impl->preferred_cursor ? impl->preferred_cursor : impl->default_cursor);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Win32Platform::SetCursor");
+    throw;
+  }
+}

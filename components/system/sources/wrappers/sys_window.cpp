@@ -91,7 +91,10 @@ struct Window::Impl
         throw xtl::message_exception<ClosedWindowException> ("syslib::Window::Impl::CheckedHandle", "Closed window exception");
 
       return handle;
-    }    
+    }
+    
+///Курсор окна
+    WindowCursor& Cursor () { return cursor; }
 
 ///Установка низкоуровневого дескриптора окна
     void SetHandle (Platform::window_t new_handle)
@@ -280,11 +283,12 @@ struct Window::Impl
     Window*            window;                             //указатель на владельца
     Platform::window_t handle;                             //низкоуровневый дескриптор окна
     Platform::window_t parent_handle;                      //низкоуровневый дескриптор родительского окна
-    WindowStyle        style;                              //стиль окна
-    WindowSignal       signals [WindowEvent_Num];          //сигналы окна
+    WindowStyle        style;                              //стиль окна    
+    WindowSignal       signals [WindowEvent_Num];          //сигналы окна    
     bool               close_cancel_flag;                  //флаг отмены закрытия окна
     char               title [MAX_TITLE_LENGTH+1];         //заголовок окна
     wchar_t            title_unicode [MAX_TITLE_LENGTH+1]; //заголовок окна в Unicode
+    WindowCursor       cursor;                             //курсор окна
     LogHandler         debug_log;                          //функция отладочного протоколирования
 };
 
@@ -821,6 +825,30 @@ void Window::SetCursorVisible (bool state)
     exception.touch ("syslib::Window::SetCursorVisible");
     throw;
   }
+}
+
+/*
+    Установка изображения курсора
+*/
+
+void Window::SetCursor (const WindowCursor& cursor)
+{
+  try
+  {
+    Platform::SetCursor (impl->CheckedHandle (), (Platform::cursor_t)cursor.Handle ());
+    
+    impl->Cursor () = cursor;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Window::SetCursor");
+    throw;
+  }
+}
+
+WindowCursor Window::Cursor () const
+{
+  return impl->Cursor ();
 }
 
 /*

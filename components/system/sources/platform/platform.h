@@ -60,12 +60,14 @@ class Platform
 {
   public:
     struct window_handle;
+    struct cursor_handle;
     struct thread_handle;
     struct tls_handle;
     struct mutex_handle;
     struct semaphore_handle;
 
     typedef window_handle*    window_t;
+    typedef cursor_handle*    cursor_t;
     typedef thread_handle*    thread_t;
     typedef tls_handle*       tls_t;
     typedef mutex_handle*     mutex_t;
@@ -129,6 +131,13 @@ class Platform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void SetCursorVisible (window_t, bool state);
     static bool GetCursorVisible (window_t);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Изображение курсора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static cursor_t CreateCursor  (const char* name, int hotspot_x, int hotspot_y); //hotspot_x/hotspot_y = -1 - default value
+    static void     DestroyCursor (cursor_t);
+    static void     SetCursor     (window_t window, cursor_t cursor);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение имени клавиши

@@ -166,3 +166,22 @@ bool Platform::GetCursorVisible (window_t)
 
   return false;
 }
+
+/*
+    Изображение курсора
+*/
+
+Platform::cursor_t Platform::CreateCursor (const char*, int, int)
+{
+  raise ("syslib::DefaultPlatform::CreateCursor");
+}
+
+void Platform::DestroyCursor (cursor_t)
+{
+  raise ("syslib::DefaultPlatform::DestroyCursor");
+}
+
+void Platform::SetCursor (window_t, cursor_t)
+{
+  raise ("syslib::DefaultPlatform::SetCursor");
+}

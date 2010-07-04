@@ -1122,3 +1122,22 @@ bool Platform::GetCursorVisible (window_t handle)
 
   return return_value;
 }
+
+/*
+    Изображение курсора
+*/
+
+Platform::cursor_t Platform::CreateCursor (const char*, int, int)
+{
+  throw make_not_implemented_exception ("syslib::CarbonPlatform::CreateCursor");
+}
+
+void Platform::DestroyCursor (cursor_t)
+{
+  throw make_not_implemented_exception ("syslib::CarbonPlatform::DestroyCursor");
+}
+
+void Platform::SetCursor (window_t, cursor_t)
+{
+  throw make_not_implemented_exception ("syslib::CarbonPlatform::SetCursor");
+}
