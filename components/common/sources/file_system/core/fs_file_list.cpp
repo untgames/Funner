@@ -312,10 +312,7 @@ FileList FileListBuilder::Build (bool need_sort)
   const char* string_base = list->file_names.c_str ();
 
   for (FileInfoArray::iterator i=list->items.begin ();i!=list->items.end ();++i)
-  {
     i->name = string_base + (size_t)i->name;
-    printf ("::: '%s'\n", i->name);
-  }
 
   if (need_sort)
     sort (list->items.begin (),list->items.end (),CompareItems);
