@@ -1,5 +1,6 @@
 #include <stl/string>
 #include <stl/list>
+#include <stl/hash_map>
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
@@ -13,6 +14,10 @@
 #include <common/component.h>
 #include <common/log.h>
 #include <common/parser.h>
+#include <common/strlib.h>
+
+#include <media/rms/manager.h>
+#include <media/rms/server.h>
 
 #include <input/cursor.h>
 
@@ -34,6 +39,185 @@ namespace
 const char* SUBSYSTEM_NAME = "WindowManager";                   //имя подсистемы
 const char* COMPONENT_NAME = "engine.subsystems.WindowManager"; //имя компонента
 const char* LOG_NAME       = COMPONENT_NAME;                    //имя потока протоколирования
+
+//forwards
+class Window;
+class WindowManagerSubsystem;
+
+Window* create_window (ParseNode& node, WindowManagerSubsystem& manager);
+
+/*
+    Реализация подсистемы инициализации окна
+*/
+
+class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServer, public xtl::reference_counter
+{
+  public:
+///Конструктор
+    WindowManagerSubsystem (ParseNode& node)
+      : log (LOG_NAME)
+    {
+      try
+      {
+        resource_server = new media::rms::ServerGroupAttachment (get<const char*> (node, "ResourceServer", SUBSYSTEM_NAME), *this);
+
+        for (Parser::NamesakeIterator iter=node.First ("Window"); iter; ++iter)
+        {
+          WindowPtr window (create_window (*iter, *this), false);
+
+          windows.push_back (window);
+        }
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::subsystems::WindowManagerSubsystem::WindowManagerSubsystem");
+        throw;
+      }
+    }
+    
+///Деструктор
+    ~WindowManagerSubsystem ()
+    {
+      resource_server.reset ();
+    }
+    
+///Поиск курсора
+    syslib::WindowCursor GetCursor (const char* image_name)
+    {
+      return LoadCursor (image_name);
+    }
+
+///Подсчёт ссылок
+    void AddRef () { addref (this); }
+    void Release () { release (this); }
+    
+  private:
+///Управление ресурсами
+    void PrefetchResource (const char* resource_name)
+    {
+    }
+
+    void LoadResource (const char* resource_name)
+    {
+      static const char* METHOD_NAME = "engine::subsystems::WindowManagerSubsystem::LoadResource";
+
+      if (!resource_name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_name");
+
+      try
+      {
+        if (!xtl::xstricmp (common::suffix (resource_name).c_str (), "xhotspot"))
+        {
+          LoadHotspots (resource_name);          
+        }
+        else
+        {
+          LoadCursor (resource_name);
+        }
+      }
+      catch (xtl::exception& exception)
+      {
+        log.Printf ("Can't load resource '%s', exception: %s", resource_name, exception.what ());
+
+        exception.touch (METHOD_NAME);
+
+        throw;
+      }
+    }
+
+    void UnloadResource (const char* resource_name)
+    {
+      static const char* METHOD_NAME = "engine::subsystems::WindowManagerSubsystem::UnloadResource";
+
+      if (!resource_name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "resource_name");
+
+      if (!xtl::xstricmp (common::suffix (resource_name).c_str (), "xhotspot"))
+      {
+        hotspots.clear ();
+      }
+      else
+      {
+        cursors.erase (resource_name);
+      }
+    }  
+  
+///Загрузка точек курсора
+    void LoadHotspots (const char* file_name)
+    {
+      try
+      {
+        common::Parser parser (file_name);
+
+        for (size_t i=0; i<parser.Log ().MessagesCount (); ++i)
+           log.Printf ("%s", parser.Log ().Message (i));
+
+        if (common::ParseNode hotspots_node = parser.Root ().First ("hotspots"))
+        {
+          for (common::Parser::NamesakeIterator iter=hotspots_node.First ("cursor"); iter; ++iter)
+          {
+            const char* name = get<const char*> (*iter, "name");
+            int         x    = get<int> (*iter, "x"),
+                        y    = get<int> (*iter, "y");
+
+            hotspots [name] = math::vec2i (x, y);
+          }
+        }
+        else
+        {
+          throw xtl::format_operation_exception ("", "<hotspots> tag not found in resource '%s'", file_name);
+        }
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::subsystems::WindowManagerSubsystem::LoadHotspots");
+        throw;
+      }      
+    }
+    
+///Загрузка курсора
+    syslib::WindowCursor LoadCursor (const char* file_name)
+    {
+      try
+      {
+        CursorMap::iterator cursor_iter = cursors.find (file_name);
+        
+        if (cursor_iter != cursors.end ())
+          return cursor_iter->second;        
+
+        math::vec2i hotspot (-1, -1);
+        
+        HotspotMap::iterator iter = hotspots.find (file_name);
+        
+        if (iter != hotspots.end ())
+          hotspot = iter->second;
+        
+        syslib::WindowCursor cursor (file_name, hotspot.x, hotspot.y);
+        
+        cursors [file_name] = cursor;
+        
+        return cursor;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::subsystems::WindowManagerSubsystem::LoadCursor");
+        throw;
+      }
+    }
+
+  private:
+    typedef xtl::intrusive_ptr<Window>                                      WindowPtr;
+    typedef stl::list<WindowPtr>                                            WindowList;
+    typedef stl::hash_map<stl::hash_key<const char*>, math::vec2i>          HotspotMap;
+    typedef stl::hash_map<stl::hash_key<const char*>, syslib::WindowCursor> CursorMap;
+
+  private:
+    Log                                              log;  
+    WindowList                                       windows;    
+    stl::auto_ptr<media::rms::ServerGroupAttachment> resource_server;
+    HotspotMap                                       hotspots;
+    CursorMap                                        cursors;    
+};
 
 /*
     Утилиты
@@ -58,8 +242,9 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 {
   public:
 ///Конструктор
-    Window (ParseNode& node)
+    Window (ParseNode& node, WindowManagerSubsystem& in_manager)
       : log (LOG_NAME),
+        manager (in_manager),
         window (get_window_style (node)),
         cursor (0)
     {
@@ -194,6 +379,11 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
     {
       window.SetCursorVisible (state);
     }
+    
+    void OnChangeImage (const char* image_name)
+    {            
+      window.SetCursor (manager.GetCursor (image_name));
+    }
 
     void OnDestroy ()
     {
@@ -217,6 +407,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
         SetCursorPosition (window.CursorPosition (), window.ClientRect ());
         OnChangeVisible (cursor->IsVisible ());
+        OnChangeImage (cursor->Image ());
       }
     }
 
@@ -237,45 +428,21 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
     }
 
   private:
-    Log                  log;
-    syslib::Window       window;
-    input::Cursor*       cursor;
-    stl::string          attachment_name;
-    stl::string          parent_window_name;
-    stl::string          cursor_attachment_name;
-    math::vec2f          cached_cursor_position;
-    xtl::auto_connection on_mouse_move_connection;
+    Log                     log;
+    WindowManagerSubsystem& manager;
+    syslib::Window          window;
+    input::Cursor*          cursor;
+    stl::string             attachment_name;
+    stl::string             parent_window_name;
+    stl::string             cursor_attachment_name;
+    math::vec2f             cached_cursor_position;
+    xtl::auto_connection    on_mouse_move_connection;
 };
 
-/*
-    Реализация подсистемы инициализации окна
-*/
-
-class WindowManagerSubsystem: public ISubsystem, public xtl::reference_counter
+Window* create_window (ParseNode& node, WindowManagerSubsystem& manager)
 {
-  public:
-///Конструктор
-    WindowManagerSubsystem (ParseNode& node)
-    {
-      for (Parser::NamesakeIterator iter=node.First ("Window"); iter; ++iter)
-      {
-        WindowPtr window (new Window (*iter), false);
-
-        windows.push_back (window);
-      }
-    }
-
-///Подсчёт ссылок
-    void AddRef () { addref (this); }
-    void Release () { release (this); }
-
-  private:
-    typedef xtl::intrusive_ptr<Window> WindowPtr;
-    typedef stl::list<WindowPtr>       WindowList;
-
-  private:
-    WindowList windows;
-};
+  return new Window (node, manager);
+}
 
 /*
     Компонент подсистемы инциализации окон

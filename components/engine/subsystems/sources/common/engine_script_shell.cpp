@@ -51,7 +51,7 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
       }
 
       StringArray lib_list = split (libraries),
-                  src_list = split (sources);
+                  src_list = split (sources);                  
 
         //загрузка библиотек
 

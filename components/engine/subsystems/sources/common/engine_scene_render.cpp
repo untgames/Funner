@@ -96,7 +96,9 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 ///Деструктор
     ~SceneRenderSubsystem ()
     {
-      AttachmentRegistry::Detach<render::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
+      resource_server = 0;      
+      
+      AttachmentRegistry::Detach<render::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);      
     }
 
 /// События установки/удаления экрана
