@@ -13,6 +13,7 @@ struct Cursor::Impl: public xtl::reference_counter
   math::vec2f  position;   //положение курсора
   ListenerList listeners;  //слушатели событий курсора
   bool         visible;    //видим ли курсор
+  stl::string  image_name; //имя картинки
   
   Impl () : visible (true) {}
   
@@ -129,7 +130,36 @@ void Cursor::SetVisible (bool state)
     {
       //подавление всех исключений
     }
+  }
+}
+
+/*
+    Установка изображения курсора
+*/
+
+void Cursor::SetImage (const char* image_name)
+{
+  if (!image_name)
+    throw xtl::make_null_argument_exception ("input::Cursor::SetImage", "image_name");
+    
+  impl->image_name = image_name;
+  
+  for (ListenerList::iterator iter=impl->listeners.begin (), end=impl->listeners.end (); iter!=end; ++iter)
+  {
+    try    
+    {
+      (*iter)->OnChangeImage (image_name);
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
   }  
+}
+
+const char* Cursor::Image () const
+{
+  return impl->image_name.c_str ();
 }
 
 /*
