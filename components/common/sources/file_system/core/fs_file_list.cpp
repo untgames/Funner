@@ -279,9 +279,7 @@ void FileListBuilder::InsertInternal (const char* file_name,size_t file_name_siz
   if (file_name_size > offset)
     file_names.append (file_name+offset,file_name_size-offset);
 
-  file_names += " ";
-  file_names [file_names.size () - 1] = 0;
-
+  file_names.push_back (0);
   items.push_back (item);  
 }
 
