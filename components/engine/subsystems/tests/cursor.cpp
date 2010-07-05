@@ -54,7 +54,7 @@ int main ()
 
     AttachmentRegistry::Register ("MyCursor", cursor);
     
-    cursor.SetImage ("data/aero_busy.ani");
+    cursor.SetImage ("data/cursor.cur");
     
     syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnIdle, xtl::bind (&idle, xtl::ref (cursor)));
 
