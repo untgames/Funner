@@ -36,6 +36,8 @@ void bind_cursor_library (Environment& environment)
   lib.Register ("SetPosition",  make_invoker (xtl::implicit_cast<void (Cursor::*)(float, float)> (&Cursor::SetPosition)));
   lib.Register ("get_Visible",  make_invoker (&Cursor::IsVisible));
   lib.Register ("set_Visible",  make_invoker (&Cursor::SetVisible));
+  lib.Register ("get_Image",    make_invoker (&Cursor::Image));
+  lib.Register ("set_Image",    make_invoker (&Cursor::SetImage));
   lib.Register ("Show",         make_invoker (&Cursor::Show));
   lib.Register ("Hide",         make_invoker (&Cursor::Hide));
 
