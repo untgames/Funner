@@ -6,12 +6,12 @@ using namespace engine;
     Окно
 */
 
-class Window: public IWindow
+class Window: public IWindow, private xtl::trackable
 {
   public:
 ///Конструктор
     Window (const char* name)
-      : system_window (syslib::WindowStyle_PopUp)
+      : system_window (syslib::WindowStyle_Overlapped)
     {
       try
       {
@@ -21,6 +21,37 @@ class Window: public IWindow
         window_name = name;
         
         AttachmentRegistry::Register (name, xtl::make_const_ref (xtl::ref (system_window)));
+        
+        static syslib::WindowEvent events [] = {
+          syslib::WindowEvent_OnPaint,
+          syslib::WindowEvent_OnSize,
+          syslib::WindowEvent_OnMouseMove,
+          syslib::WindowEvent_OnMouseLeave,
+          syslib::WindowEvent_OnLeftButtonDown,
+          syslib::WindowEvent_OnLeftButtonUp,
+          syslib::WindowEvent_OnLeftButtonDoubleClick,
+          syslib::WindowEvent_OnRightButtonDown,
+          syslib::WindowEvent_OnRightButtonUp,
+          syslib::WindowEvent_OnRightButtonDoubleClick,
+          syslib::WindowEvent_OnMiddleButtonDown,
+          syslib::WindowEvent_OnMiddleButtonUp,
+          syslib::WindowEvent_OnMiddleButtonDoubleClick,
+          syslib::WindowEvent_OnXButton1Down,
+          syslib::WindowEvent_OnXButton1Up,
+          syslib::WindowEvent_OnXButton1DoubleClick,
+          syslib::WindowEvent_OnXButton2Down,
+          syslib::WindowEvent_OnXButton2Up,
+          syslib::WindowEvent_OnXButton2DoubleClick,
+          syslib::WindowEvent_OnKeyDown,
+          syslib::WindowEvent_OnKeyUp,
+        };
+        
+        static size_t events_count = sizeof (events) / sizeof (*events);
+        
+        syslib::Window::EventHandler handler (xtl::bind (&Window::WindowEventHandler, this, _2, _3));
+
+        for (size_t i=0; i<events_count; i++)
+          connect_tracker (system_window.RegisterEventHandler (events [i], handler));
       }
       catch (xtl::exception& e)
       {
@@ -33,6 +64,20 @@ class Window: public IWindow
     ~Window ()
     {
       AttachmentRegistry::Unregister (window_name.c_str (), system_window);
+    }
+    
+///Показ / скрытие окна
+    void Show (bool state)
+    {
+      try
+      {
+        system_window.SetVisible (state);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::Window::Show");
+        throw;
+      }
     }
 
 ///Установка дескриптора родительского окна
@@ -178,9 +223,13 @@ class Window: public IWindow
       switch (event)
       {
         case syslib::WindowEvent_OnPaint:
+        printf ("ONPAINT!!!!!!!!!!!!!!!! my\n");
+        fflush (stdout);        
           Notify (&IWindowListener::OnPaint);
           break;
         case syslib::WindowEvent_OnSize:
+        printf ("ONSIZE!!!!!!!!!!!!!!!! my\n");
+        fflush (stdout);
           Notify (&IWindowListener::OnSize, system_window.ClientWidth (), system_window.ClientHeight ());
           break;
         case syslib::WindowEvent_OnMouseMove:

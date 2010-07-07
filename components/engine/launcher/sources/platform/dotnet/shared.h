@@ -4,6 +4,7 @@
 #using <mscorlib.dll>
 #using <System.dll>
 #using <System.Windows.Forms.dll>
+#using <System.Drawing.dll>
 
 #include <msclr/auto_gcroot.h>
 
@@ -12,6 +13,9 @@
 #include <xtl/common_exceptions.h>
 
 #include <engine/engine.h>
+
+#include <windows.h> //for dll load
+#undef CreateWindow
 
 namespace engine
 {

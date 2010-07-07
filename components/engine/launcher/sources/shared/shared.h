@@ -14,6 +14,7 @@
 #include <xtl/function.h>
 #include <xtl/ref.h>
 #include <xtl/string.h>
+#include <xtl/trackable.h>
 
 #include <common/console.h>
 #include <common/string.h>

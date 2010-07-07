@@ -5,92 +5,128 @@ using namespace engine::dot_net;
 using namespace System;
 using namespace System::Runtime::InteropServices;
 using namespace System::Windows::Forms;
+using namespace System::Drawing;
+using namespace System::ComponentModel;
 
 namespace Funner
 {
 
-///Объявление делегатов
-public delegate void WindowPaintEventHandler ();
-public delegate void WindowSizeEventHandler  (unsigned int width, unsigned int height);
-public delegate void WindowMouseEventHandler (int x, int y);
-public delegate void WindowKeyEventHandler   (String^ key);
+/*
+    Класс движка
+*/
 
-///Реализация окна движка
-public ref class WindowImpl: public Form
+private ref class Engine
 {
-  public:
-    ///События
-    WindowPaintEventHandler^ EnginePaint;
-    WindowSizeEventHandler^  EngineSize;
-    WindowMouseEventHandler^ EngineMouseMove;
-    WindowMouseEventHandler^ EngineMouseEnter;
-    WindowMouseEventHandler^ EngineMouseLeave;
-    WindowMouseEventHandler^ EngineMouseHover;
-    WindowMouseEventHandler^ EngineLeftButtonDown;
-    WindowMouseEventHandler^ EngineLeftButtonUp;
-    WindowMouseEventHandler^ EngineLeftButtonDoubleClick;
-    WindowMouseEventHandler^ EngineRightButtonDown;
-    WindowMouseEventHandler^ EngineRightButtonUp;
-    WindowMouseEventHandler^ EngineRightButtonDoubleClick;
-    WindowMouseEventHandler^ EngineMiddleButtonDown;
-    WindowMouseEventHandler^ EngineMiddleButtonUp;
-    WindowMouseEventHandler^ EngineMiddleButtonDoubleClick;
-    WindowKeyEventHandler^   EngineKeyUp;
-    WindowKeyEventHandler^   EngineKeyDown;
+  public:    
+///Получение движка
+    static IEngine* GetEngine ()
+    {
+      if (engine)
+        return engine;
+        
+      HMODULE library = LoadLibrary ("funner.dll");
+
+      if (!library)
+        throw gcnew InvalidOperationException ("funner.dll library not found");
+      
+      FunnerInitProc FunnerInit = (FunnerInitProc)GetProcAddress (library, "FunnerInit");  
+      
+      try
+      {
+        engine = FunnerInit ();
+
+        if (!engine)
+          throw gcnew InvalidOperationException ("Funner native engine has bad entries");
+      }
+      finally
+      {
+//        FreeLibrary (module);
+      }
+
+      return engine;
+    }
+
+  private:
+    static IEngine* engine = 0; //указатель на объект движка
+};
+
+
+/*
+    Обёртка над слушателем событий окна движка
+*/
+
+private interface class IFunnerViewListener
+{
+  void OnEnginePaint      ();
+  void OnEngineResize     (EventArgs^);
+  void OnEngineMouseEnter (EventArgs^);
+  void OnEngineMouseLeave (EventArgs^);
+  void OnEngineMouseHover (EventArgs^);
+  void OnEngineMouseMove  (MouseEventArgs^);  
+  void OnEngineMouseDown  (MouseEventArgs^);
+  void OnEngineMouseUp    (MouseEventArgs^);
+  void OnEngineKeyDown    (KeyEventArgs^);
+  void OnEngineKeyUp      (KeyEventArgs^);
 };
 
 namespace
 {
 
-///Слушатель событий окна движка
-class EngineWindowListener: public IWindowListener
+/*
+    Слушатель событий окна движка
+*/
+
+class FunnerViewListener: public IWindowListener
 {
   public:
+    msclr::auto_gcroot<IFunnerViewListener^> Listener;
+  
     ///Конструктор
-    EngineWindowListener (msclr::auto_gcroot<WindowImpl^> in_window)
-      : window (in_window)
+    FunnerViewListener ()
+      : keys_converter (gcnew KeysConverter)
     {
     }
     
     ///Обработчик события перерисовки окна
     void OnPaint ()
     {
-      if (window->EnginePaint != nullptr)
-        window->EnginePaint ();
+      printf ("%s\n", __FUNCTION__);      
+      if (Listener)
+        Listener->OnEnginePaint ();
     }
     
     ///Обработчик изменения размеров окна
-    void OnSize (size_t width, size_t height)
+    void OnSize (size_t, size_t)
     {
-      if (window->EngineSize != nullptr)
-        window->EngineSize (width, height);    
-    }
-
-    ///Обработчики событий ввода
-    void OnMouseMove (int x, int y)
-    {
-      if (window->EngineMouseMove != nullptr)
-        window->EngineMouseMove (x, y);
+      if (Listener)
+        Listener->OnEngineResize (gcnew EventArgs ());      
     }
     
-    void OnMouseEnter (int x, int y)
+    ///Обработчики событий ввода    
+    void OnMouseEnter (int, int)
     {
-      if (window->EngineMouseEnter != nullptr)
-        window->EngineMouseEnter (x, y);
+      if (Listener)
+        Listener->OnEngineMouseEnter (gcnew EventArgs ());
     }
 
-    void OnMouseHover (int x, int y)
+    void OnMouseHover (int, int)
     {
-      if (window->EngineMouseHover != nullptr)
-        window->EngineMouseHover (x, y);
+      if (Listener)
+        Listener->OnEngineMouseHover (gcnew EventArgs ());
     }
 
-    void OnMouseLeave (int x, int y)
+    void OnMouseLeave (int, int)
     {
-      if (window->EngineMouseLeave != nullptr)
-        window->EngineMouseLeave (x, y);
+      if (Listener)
+        Listener->OnEngineMouseLeave (gcnew EventArgs ());
     }
-
+    
+/*    void OnMouseMove (int x, int y)
+    {
+      if (Listener)
+        Listener->OnEngineMouseMove ();
+    }
+    
     void OnMouseDown (MouseButton button, int x, int y)
     {
       switch (button)
@@ -162,103 +198,191 @@ class EngineWindowListener: public IWindowListener
           break;
       }
     }
-
+*/
     void OnKeyDown (const char* key)
-    {
-      if (window->EngineKeyDown != nullptr)
-        window->EngineKeyDown (gcnew String (key));
+    {      
+      if (Listener)
+        Listener->OnEngineKeyDown (gcnew KeyEventArgs ((Keys)keys_converter->ConvertFromString (gcnew String (key))));
     }
 
     void OnKeyUp (const char* key)
     {
-      if (window->EngineKeyUp != nullptr)
-        window->EngineKeyUp (gcnew String (key));
+      if (Listener)
+        Listener->OnEngineKeyUp (gcnew KeyEventArgs ((Keys)keys_converter->ConvertFromString (gcnew String (key))));
     }
 
   private:
-    msclr::auto_gcroot<WindowImpl^> window; //обратная ссылка на окно
+    msclr::auto_gcroot<KeysConverter^> keys_converter; //конвертер строк в коды клавиш
 };
 
 }
 
 ///Открытый интерфейс окна движка
-public ref class Window: public WindowImpl
+public ref class FunnerView: public UserControl, public IFunnerViewListener
 {
   public:
     ///Конструктор
-    Window (IEngine* in_engine, const char* name)
-      : engine (in_engine)
+    FunnerView ()
+      : engine (0)
       , window (0)
+      , window_listener (0)
     {
+      if (LicenseManager::UsageMode == LicenseUsageMode::Designtime)
+        return;
+        
+      engine = Engine::GetEngine ();
+
       if (!engine)
-        throw gcnew ArgumentException ("Null engine passed to constructor of Funner.Window class");
+        throw gcnew ArgumentException ("Null engine passed to constructor of Funner.FunnerView class");
         
-      if (!name)
-        throw gcnew ArgumentException ("Null name passed to constructor of Funner.Window class");
+//      if (!name)
+//        throw gcnew ArgumentException ("Null name passed to constructor of Funner.FunnerView class");
+
+      graphics = CreateGraphics ();
         
-      window_listener = new EngineWindowListener (this);
+      window_listener = new FunnerViewListener ();
 
       try
       {
-        window = engine->CreateWindow (name);
+        window = engine->CreateWindow ("Engine window");
+
+        if (!window)
+          throw gcnew InvalidOperationException ("Engine::CreateWindow failed");                 
+
+        window->AttachListener (window_listener);
+        
+        HandleCreated   += gcnew EventHandler (this, &FunnerView::OnCreateHandle);
+        HandleDestroyed += gcnew EventHandler (this, &FunnerView::OnDestroyHandle);
+        Resize          += gcnew EventHandler (this, &FunnerView::OnResize);
       }
       catch (...)
       {
+        delete window;
         delete window_listener;
         throw;
       }
     }
 
     ///Деструктор
-    ~Window ()
+    ~FunnerView ()
     {
-      delete window;
-      delete window_listener;
-      
-      window = 0;
-      window_listener = 0;
-    }
-    
-  private:
-    IEngine*              engine;          //указатель на движок
-    IWindow*              window;          //указатель на окно движка
-    EngineWindowListener* window_listener; //слушатель событий окна
-};
-
-/*
-    Класс движка
-*/
-
-public ref class Engine
-{
-  public:
-///Создание интерфейса поддержки внешних окон
-    static Window^ CreateWindow (String^ name)
-    {
-      return gcnew Window (GetEngine (), AutoString (name).Data ());
-    }
-
-  private:
-///Запрос native API движка
-    [DllImport ("funner.dll")]
-    static IEngine* FunnerInit ();
-    
-///Получение движка
-    static IEngine* GetEngine ()
-    {
-      if (engine)
-        return engine;
-      
-      engine = FunnerInit ();
-      
-      if (!engine)
-        throw gcnew InvalidOperationException ("Funner native engine has bad entries");
+      try
+      {
+        window->DetachListener (window_listener);
         
-      return engine;
+        delete window;
+        delete window_listener;
+        
+        window = 0;
+        window_listener = 0;
+      }
+      catch (...)
+      {
+        ///подавление всех исключений
+      }
+    }
+    
+///Обработка событий встроенного окна
+    virtual void OnEngineKeyDown (KeyEventArgs^ args)
+    {
+      UserControl::OnKeyDown (args);
     }
 
+    virtual void OnEngineKeyUp (KeyEventArgs^ args)
+    {
+      UserControl::OnKeyUp (args);
+    }
+    
+    virtual void OnEnginePaint ()
+    {
+      UserControl::OnPaint (gcnew PaintEventArgs (graphics, ClientRectangle));
+    }
+    
+    virtual void OnEngineResize (EventArgs^ args)
+    {
+      UserControl::OnResize (args);
+    }
+    
+    virtual void OnEngineMouseEnter (EventArgs^ args)
+    {
+      UserControl::OnMouseEnter (args);
+    }
+    
+    virtual void OnEngineMouseLeave (EventArgs^ args)
+    {
+      UserControl::OnMouseLeave (args);
+    }
+    
+    virtual void OnEngineMouseHover (EventArgs^ args)
+    {
+      UserControl::OnMouseHover (args);
+    }
+    
+    virtual void OnEngineMouseMove (MouseEventArgs^ args)
+    {
+      UserControl::OnMouseMove (args);
+    }
+    
+    virtual void OnEngineMouseDown (MouseEventArgs^ args)
+    {
+      UserControl::OnMouseDown (args);
+    }
+    
+    virtual void OnEngineMouseUp (MouseEventArgs^ args)
+    {
+      UserControl::OnMouseUp (args);
+    }    
+
   private:
-    static IEngine* engine = 0; //указатель на объект движка
+///Обновление родительского окна
+    void UpdateParent ()
+    {
+      window->SetParentHandle ((void*)Handle);
+    }
+
+///Обновление размеров
+    void UpdateRect ()
+    {
+      System::Drawing::Rectangle^ rect = ClientRectangle;
+
+      window->SetPosition (rect->Left, rect->Top);
+      window->SetSize     (rect->Width, rect->Height);
+    }
+
+///Обработка события создания дескриптора формы
+    void OnCreateHandle (System::Object^, EventArgs^)
+    {
+      window_listener->Listener = this;      
+      
+        //обновление параметров
+
+      UpdateParent ();
+      UpdateRect ();
+
+        //отображение окна
+
+      window->Show (true);
+    }
+
+///Обработка события уничтожения дескриптора формы
+    void OnDestroyHandle (System::Object^, EventArgs^)
+    {
+      window_listener->Listener = nullptr;
+      window->Show (false);
+      window->SetParentHandle (0);
+    }
+
+///Обработка события изменения размеров формы
+    void OnResize (Object^, EventArgs^)
+    {
+      UpdateRect ();
+    }            
+
+  private:
+    IEngine*            engine;
+    IWindow*            window;
+    FunnerViewListener* window_listener;
+    Graphics^           graphics;
 };
 
 }

@@ -60,6 +60,9 @@ class IWindow
     ///Деструктор
     virtual ~IWindow () {}
     
+    ///Показ / скрытие окна
+    virtual void Show (bool state) = 0;
+    
     ///Установка дескриптора родительского окна
     virtual void SetParentHandle (void* handle) = 0;
     
@@ -113,13 +116,13 @@ class IEngine
     virtual IWindow* CreateWindow (const char* name) = 0;
 };
 
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание приложения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef IEngine* (*FunnerInitProc)();
+typedef engine::IEngine* (*FunnerInitProc)();
 
-FUNNER_C_API IEngine* FunnerInit ();
-
-}
+FUNNER_C_API engine::IEngine* FunnerInit ();
 
 #endif
