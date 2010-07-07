@@ -5,6 +5,8 @@
 #using <System.dll>
 #using <System.Windows.Forms.dll>
 
+#include <msclr/auto_gcroot.h>
+
 #include <stl/auto_ptr.h>
 
 #include <xtl/common_exceptions.h>
