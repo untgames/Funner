@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const char* file_name = "data/ape.dae";
+const char* file_names [] = { "data/ape.dae", "data/user_properties.dae" };
 
 struct TexmapName
 {
@@ -571,6 +571,13 @@ void dump (Node& node, int level, Model& model)
   printf      ("sid: '%s'\n", node.SubId ());
   print_space (level);
   printf      ("name: '%s'\n", node.Name ());
+
+  if (xtl::xstrlen (node.UserProperties ()))
+  {
+    print_space (level);
+    printf      ("user properties: '%s'\n", node.UserProperties ());
+  }
+
   print_space (level);
   printf      ("transform: ");
   print       (node.Transform ());
@@ -623,25 +630,28 @@ int main ()
 
   try
   {
-    printf ("--- Parse collada model '%s' ---\n", file_name);
+    for (size_t i = 0, count = sizeof (file_names) / sizeof (*file_names); i < count; i++)
+    {
+      printf ("--- Parse collada model '%s' ---\n", file_names [i]);
 
-    Model model (file_name, &log_print);
+      Model model (file_names [i], &log_print);
 
-    printf ("---  Collada model dump ---\n");
-    printf ("Model '%s'\n", file_name);
-    print_space (1);
-    printf ("Active scene: '%s'\n", model.ActiveSceneName ());
+      printf ("---  Collada model dump ---\n");
+      printf ("Model '%s'\n", file_names [i]);
+      print_space (1);
+      printf ("Active scene: '%s'\n", model.ActiveSceneName ());
 
-    dump ("library_images", model.Images (), 1, model);
-    dump ("library_effects", model.Effects (), 1, model);
-    dump ("library_materials", model.Materials (), 1, model);
-    dump ("library_meshes", model.Meshes (), 1, model);
-    dump ("library_skins", model.Skins (), 1, model);
-    dump ("library_morphs", model.Morphs (), 1, model);
-    dump ("library_lights", model.Lights (), 1, model);
-    dump ("library_cameras", model.Cameras (), 1, model);
-    dump ("library_scenes", model.Scenes (), 1, model);
-    dump ("library_animations", model.Animations (), 1);
+      dump ("library_images", model.Images (), 1, model);
+      dump ("library_effects", model.Effects (), 1, model);
+      dump ("library_materials", model.Materials (), 1, model);
+      dump ("library_meshes", model.Meshes (), 1, model);
+      dump ("library_skins", model.Skins (), 1, model);
+      dump ("library_morphs", model.Morphs (), 1, model);
+      dump ("library_lights", model.Lights (), 1, model);
+      dump ("library_cameras", model.Cameras (), 1, model);
+      dump ("library_scenes", model.Scenes (), 1, model);
+      dump ("library_animations", model.Animations (), 1);
+    }
   }
   catch (std::exception& exception)
   {

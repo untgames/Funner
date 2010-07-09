@@ -14,17 +14,18 @@ typedef media::CollectionImpl<InstanceController, ICollection<InstanceController
 
 struct Node::Impl: public xtl::reference_counter
 {
-  stl::string                id;             //идентификатор узла
-  stl::string                sid;            //идентификатор узла в пределах родителя
-  stl::string                name;           //имя узла
-  math::mat4f                tm;             //матрица преобразований узла
-  math::vec3f                rotation_pivot; //центр поворотов
-  math::vec3f                scale_pivot;    //центр масштабирования
-  NodeListImpl               nodes;          //вложенные узлы
-  LightListImpl              lights;         //источники света
-  CameraListImpl             cameras;        //камеры
-  InstanceMeshListImpl       meshes;         //меши
-  InstanceControllerListImpl controllers;    //контроллеры
+  stl::string                id;              //идентификатор узла
+  stl::string                sid;             //идентификатор узла в пределах родителя
+  stl::string                name;            //имя узла
+  stl::string                user_properties; //пользовательские свойства узла
+  math::mat4f                tm;              //матрица преобразований узла
+  math::vec3f                rotation_pivot;  //центр поворотов
+  math::vec3f                scale_pivot;     //центр масштабирования
+  NodeListImpl               nodes;           //вложенные узлы
+  LightListImpl              lights;          //источники света
+  CameraListImpl             cameras;         //камеры
+  InstanceMeshListImpl       meshes;          //меши
+  InstanceControllerListImpl controllers;     //контроллеры
 };
 
 /*
@@ -114,6 +115,23 @@ void Node::SetName (const char* name)
   impl->name = name;
 }
   
+/*
+   Пользовательские свойства
+*/
+
+const char* Node::UserProperties () const
+{
+  return impl->user_properties.c_str ();
+}
+
+void Node::SetUserProperties (const char* properties)
+{
+  if (!properties)
+    throw xtl::make_null_argument_exception ("media::collada::Node::SetUserProperties", "properties");
+
+  impl->user_properties = properties;
+}
+
 /*
     Преобразование узла
 */

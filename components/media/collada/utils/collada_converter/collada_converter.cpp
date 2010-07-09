@@ -549,6 +549,13 @@ void save_node (const Params& params, const Node& node, XmlWriter& writer)
   if (!math::equal (node.ScalePivot (), math::vec3f (0.0f), EPSILON))
     writer.WriteAttribute ("scale_pivot", node.ScalePivot ());
 
+  if (xtl::xstrlen (node.UserProperties ()))
+  {
+    XmlWriter::Scope scope (writer, "properties");
+
+    writer.WriteData (node.UserProperties ());
+  }
+
     //метод экспорта связан с правилами именования инстанцированных мешей в конвертере
 
   size_t mesh_index = 0;

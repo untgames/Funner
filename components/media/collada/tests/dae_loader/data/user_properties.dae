@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <library_visual_scenes>
+    <visual_scene id="MaxScene">
+      <node id="node-Line01" name="Line01">
+        <matrix>-1.62921e-7 -4.37114e-8 -1 -6.2064e-6 -1 -2.98023e-8 1.62921e-7 6.120636 -2.98023e-8 1 -4.37114e-8 -51.36573 0 0 0 1</matrix>
+      </node>
+      <node id="node-player_point" name="player_point">
+        <matrix sid="matrix">0.9404333 -0.3341333 -0.06277207 1.74801e-4 0.3193803 0.8049757 0.5000106 -82.88181 -0.1165401 -0.4902748 0.8637413 -4437.198 0 0 0 1</matrix>
+        <extra>
+          <technique profile="OpenCOLLADA">
+            <user_properties>&lt;start frame=&quot;0&quot;&gt;</user_properties>
+          </technique>
+        </extra>
+      </node>
+      <node id="node-Line02" name="Line02">
+        <matrix>-1 6.60024e-15 1.50996e-7 377.9351 1.50996e-7 4.37114e-8 1 8.18783e-5 0 1 -4.37114e-8 -1863.113 0 0 0 1</matrix>
+      </node>
+      <node id="node-enemy_point01" name="enemy_point01">
+        <matrix sid="matrix">0.4387975 0.5537552 0.7076808 -210.988 -0.8044078 0.593063 0.03470558 1.17594e-4 -0.4004809 -0.5844926 0.7056794 -3529.141 0 0 0 1</matrix>
+        <extra>
+          <technique profile="OpenCOLLADA">
+            <user_properties>&lt;start frame=&quot;111&quot;&gt;</user_properties>
+          </technique>
+        </extra>
+      </node>
+      <node id="node-enemy_point02" name="enemy_point02">
+        <matrix sid="matrix">0.7018408 0.08128735 0.7076807 -297.2543 -0.1494434 0.988161 0.03470555 1.17594e-4 -0.6964813 -0.1301159 0.7056795 -3529.141 0 0 0 1</matrix>
+        <extra>
+          <technique profile="OpenCOLLADA">
+            <user_properties>&lt;start frame=&quot;106&quot;&gt;</user_properties>
+          </technique>
+        </extra>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#MaxScene"/>
+  </scene>
+</COLLADA>

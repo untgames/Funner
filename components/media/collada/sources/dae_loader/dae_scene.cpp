@@ -99,6 +99,31 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
     //разбор вложенных узлов
 
   for_each_child (*iter, "node", bind (&DaeParser::ParseNode, this, _1, ref (node)));  
+
+    //чтение пользовательских свойств
+
+  for (Parser::NamesakeIterator extra_technique_iter = iter->First ("extra.technique"); extra_technique_iter; ++extra_technique_iter)
+  {
+    if (!xtl::xstrcmp (common::get <const char*> (*extra_technique_iter, "profile"), "OpenCOLLADA"))
+    {
+      Parser::Iterator user_properties_iter = extra_technique_iter->First ("user_properties.#text");
+
+      if (user_properties_iter)
+      {
+        stl::string properties_string;
+
+        for (size_t i = 0, count = user_properties_iter->AttributesCount (); i < count; i++)
+        {
+          properties_string.append (user_properties_iter->Attribute (i));
+
+          if (i != count - 1)
+            properties_string.append (" ");
+        }
+
+        node.SetUserProperties (properties_string.c_str ());
+      }
+    }
+  }
 }
 
 /*
