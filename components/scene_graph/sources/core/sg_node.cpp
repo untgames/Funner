@@ -11,6 +11,8 @@ using namespace common;
 namespace
 {
 
+const char* LOG_NAME = "scene_graph.Node";
+
 const bool DEFAULT_SCALE_PIVOT_ENABLED       = true; //значение по умолчанию для использования центра масштабирования
 const bool DEFAULT_ORIENTATION_PIVOT_ENABLED = true; //значение по умолчанию для использования центра поворотов
 
@@ -725,6 +727,8 @@ struct Node::Impl
 
   void UpdateNode (float dt)
   {
+    static const char* METHOD_NAME = "scene_graph::Node::Impl::UpdateNode";
+
     if (update_signal.empty ())
       return;
     
@@ -736,8 +740,20 @@ struct Node::Impl
       
       this_node->EndUpdate ();
     }
+    catch (xtl::exception& e)
+    {
+      common::Log log (LOG_NAME);
+
+      log.Printf ("'%s': node '%s' update exception '%s'", METHOD_NAME, name.c_str (), e.what ());
+
+      //подавление всех исключений
+    }
     catch (...)
     {
+      common::Log log (LOG_NAME);
+
+      log.Printf ("'%s': node '%s' update unknown exception", METHOD_NAME, name.c_str ());
+
       //подавление всех исключений
     }
   }

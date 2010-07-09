@@ -1,0 +1,4 @@
+Results of node_update_exception_test:
+'scene_graph.Node': ''scene_graph::Node::Impl::UpdateNode': node 'node' update exception 'test exception
+    at my_updater''
+'scene_graph.Node': ''scene_graph::Node::Impl::UpdateNode': node 'node2' update unknown exception'
