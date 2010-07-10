@@ -1,3 +1,4 @@
+#if 0
 #include <cstdio>
 #include <exception>
 
@@ -93,3 +94,4 @@ int main ()
     printf ("exception: %s\n", e.what ());
   }
 }
+#endif

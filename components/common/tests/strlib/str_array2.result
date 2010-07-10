@@ -1,0 +1,3 @@
+Results of str_array1_test:
+sa1 (size=3, buffer_size=6, hash=5c632714): {1, 4, 5}
+sa2 (size=3, buffer_size=6, hash=5c632714): {1, 4, 5}

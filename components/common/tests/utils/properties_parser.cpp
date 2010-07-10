@@ -8,8 +8,8 @@ using namespace common;
 
 void dump_properties (const PropertyMap& properties)
 {
-  printf ("map has %u properties (hash=%08x, structure_hash=%08x, data_hash=%08x):\n",
-    properties.Size (), properties.Hash (), properties.StructureHash (), properties.DataHash ());    
+  printf ("map has %u properties (hash=%08x, layout_hash=%08x):\n",
+    properties.Size (), properties.Hash (), properties.LayoutHash ());
     
   for (size_t i=0, count=properties.Size (); i<count; i++)
   {  

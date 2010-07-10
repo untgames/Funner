@@ -1,21 +1,11 @@
-#include <cstdio>
-#include <exception>
-
-#include <stl/string>
-
-#include <math/vector.h>
-#include <math/matrix.h>
-
-#include <common/property_map.h>
-
-using namespace common;
+#include "shared.h"
 
 #define TEST(X) try { X; }catch (std::exception& e) { printf ("exception: %s\n", e.what ()); }
 
 void dump_properties (const PropertyMap& properties)
 {
-  printf ("map has %u properties (hash=%08x, structure_hash=%08x, data_hash=%08x):\n",
-    properties.Size (), properties.Hash (), properties.StructureHash (), properties.DataHash ());    
+  printf ("map has %u properties (hash=%08x, layout_hash=%08x):\n",
+    properties.Size (), properties.Hash (), properties.LayoutHash ());
     
   for (size_t i=0, count=properties.Size (); i<count; i++)
   {  
@@ -92,5 +82,6 @@ int main ()
   catch (std::exception& e)
   {
     printf ("exception: %s\n", e.what ());
+    throw;
   }
 }

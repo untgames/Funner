@@ -7,8 +7,8 @@ using namespace common;
 
 void dump (const char* title, const StringArray& sa, bool pointers=false)
 {
-  printf ("%s (size=%u, empty=%s, capacity=%u, buffer_size=%u): {", title, sa.Size (), sa.IsEmpty () ? "true" : "false",
-    sa.Capacity (), sa.BufferSize ());
+  printf ("%s (size=%u, empty=%s, capacity=%u, buffer_capacity=%u): {", title, sa.Size (), sa.IsEmpty () ? "true" : "false",
+    sa.Capacity (), sa.BufferCapacity ());
     
   for (size_t i=0; i<sa.Size (); i++)
   {
