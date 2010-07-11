@@ -1,9 +1,0 @@
-Results of properties_bindings_test:
-A::A(12)
-check PropertyMap::UpdateBindings
-  string value is 'Hello world'
-check PropertyMap::CommitBindings
-  vector value is [1.00 2.00 3.00]
-destroy test
-exit
-A::~A(12)
