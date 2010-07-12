@@ -75,63 +75,59 @@ void crop_by_alpha (const Image& image, size_t crop_alpha, size_t& crop_x, size_
       return;
     case PixelFormat_RGBA8:
     case PixelFormat_BGRA8:  alpha_offset = 3; break;
-    case PixelFormat_RGBA16: alpha_offset = 6; break;
     case PixelFormat_A8:     alpha_offset = 0; break;
     case PixelFormat_LA8:    alpha_offset = 1; break;
+    case PixelFormat_RGBA16:
+      throw xtl::format_not_supported_exception ("media::crop_by_alpha", "Can't crop image with format %s (not supported)", get_name (image.Format ()));
     default:
       throw xtl::format_operation_exception ("media::crop_by_alpha", "Unknown image pixel format %d", image.Format ());
   }
 
   const unsigned char* image_bitmap = (const unsigned char*)image.Bitmap ();
 
-  size_t max_x           = crop_x + crop_width,
-         max_y           = crop_y + crop_height,
-         bytes_per_pixel = get_bytes_per_pixel (image.Format ());
-  bool   pixel_found     = crop_width && crop_height;
+  size_t max_x       = image.Width (),
+         max_y       = image.Height ();
+  bool   pixel_found = false;
+  
+  size_t step = get_bytes_per_pixel (image.Format ());
 
   for (size_t y = 0; y < image_height; y++)
   {
-    if (y == crop_y && crop_height)
+    const unsigned char* data = image_bitmap + (image_height - 1 - y) * image_width * step + alpha_offset;
+    
+    for (size_t x = 0; x < image_width; x++, data += step)
     {
-      y += crop_height - 1;
-      continue;
-    }
-
-    const unsigned char* data;
-
-    for (size_t x = 0; x < image_width; x++)
-    {
-      if (x == crop_x && crop_width)
-      {
-        x += crop_width - 1;
-        continue;
-      }
-
-      data = image_bitmap + (y * image_width + x) * bytes_per_pixel;
-
-      if (*(data + alpha_offset) < crop_alpha)
+      if (*data < crop_alpha)
         continue;
 
       if (!pixel_found)
       {
-        crop_x = x;
-        crop_y = y;
-        max_x  = x;
-        max_y  = y;
+        crop_x      = x;
+        crop_y      = y;
+        max_x       = x;
+        max_y       = y;
+        pixel_found = true;        
+        
+        continue;
       }
 
       if (x < crop_x) crop_x = x;
       if (y < crop_y) crop_y = y;
       if (x > max_x)  max_x  = x;
       if (y > max_y)  max_y  = y;
-
-      pixel_found = true;
     }
   }
-
+  
   if (!pixel_found)
-    return;
+  {
+    crop_x      = 0;
+    crop_y      = 0;
+    crop_width  = 0;
+    crop_height = 0;
 
+    return;  
+  }
+  
   crop_width  = max_x - crop_x + 1;
   crop_height = max_y - crop_y + 1;
 }
