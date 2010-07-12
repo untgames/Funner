@@ -25,10 +25,9 @@ using namespace common;
 using namespace media;
 using namespace media::adobe::xfl;
 
-const char* APPLICATION_NAME            = "animation_screen_builder";
-const char* MOTION_X_ANIMATION_PROPERTY = "headContainer.Basic_Motion.Motion_X";
-const char* MOTION_Y_ANIMATION_PROPERTY = "headContainer.Basic_Motion.Motion_Y";
-const char* XFL_MOUNT_POINT             = "/mount_points/animation.xfl";
+const char* APPLICATION_NAME        = "xfl-converter";
+const char* DEFAULT_TEXTURES_FORMAT = "image%04u.png";
+const char* XFL_MOUNT_POINT         = "/mount_points/animation.xfl";
 
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 
@@ -51,28 +50,26 @@ struct Option
 //параметры запуска
 struct Params
 {
-  const Option* options;                  //массив опций
-  size_t        options_count;            //количество опций
-  stl::string   xfl_name;                 //имя исходного файла или папки
-  stl::string   output_textures_dir_name; //имя каталога с сохранёнными текстурами
-  stl::string   textures_format;          //формат текстур
-  stl::string   materials_file_name;      //файл материалов
-  stl::string   animation_dir_name;       //папка файлов анимаций
-  stl::string   crop_exclude;             //необрезаемые слои
-  stl::string   layers_exclude;           //неэкспортируемые слои
-  size_t        crop_alpha;               //коэффициент обрезания по прозрачности
-  size_t        resize_width;             //целевой размер для пережатия текстур
-  size_t        resize_height;            //целевой размер для пережатия текстур
-  float         left_x;                   //целевая координата левого края
-  float         right_x;                  //целевая координата правого края
-  float         top_y;                    //целевая координата верхнего края
-  float         bottom_y;                 //целевая координата нижнего края
-  float         target_width;             //целевая ширина
-  float         target_height;            //целевая высота
-  bool          silent;                   //минимальное число сообщений
-  bool          print_help;               //нужно ли печатать сообщение помощи
-  bool          need_pot_extent;          //нужно ли расширять изображения до ближайшей степени двойки
-  bool          need_crop_alpha;          //нужно ли обрезать картинку по нулевой прозрачности
+  const Option* options;                           //массив опций
+  size_t        options_count;                     //количество опций
+  stl::string   xfl_name;                          //имя исходного файла или папки
+  stl::string   output_textures_dir_name;          //имя каталога с сохранёнными текстурами
+  stl::string   output_material_textures_dir_name; //имя каталога с текстурами, используемое при генерации материала
+  stl::string   output_textures_format;            //формат имён файлов в папке с текстурами
+  stl::string   output_materials_file_name;        //имя файла с материалами
+  stl::string   output_scene_file_name;            //имя файла с анимациями
+  stl::string   material_prefix;                   //префикс имени материала
+  stl::string   material_exclude_suffix;           //исключаемые суффис имени материала
+  stl::string   crop_exclude;                      //необрезаемые слои
+  stl::string   layers_exclude;                    //неэкспортируемые слои
+  size_t        crop_alpha;                        //коэффициент обрезания по прозрачности
+  bool          silent;                            //минимальное число сообщений
+  bool          print_help;                        //нужно ли печатать сообщение помощи
+  bool          need_pot_extent;                   //нужно ли расширять изображения до ближайшей степени двойки
+  bool          need_crop_alpha;                   //нужно ли обрезать картинку по нулевой прозрачности
+  bool          need_inverse_x;                    //нужно ли инвертировать знак оси X
+  bool          need_inverse_y;                    //нужно ли инвертировать знак оси Y
+  bool          need_after_sprite;                 //нужно ли генерировать поле AfterSprite
 };
 
 //прямоугольная область
@@ -82,31 +79,43 @@ struct Rect
   size_t width, height;
 };
 
-struct Vec2fKeyframe
+//дескриптор изображения
+struct ImageDesc
 {
-  float time;
-  vec2f value;
+  size_t      x, y;
+  size_t      width, height;
+  size_t      full_width, full_height;
+  stl::string image_path;
+  stl::string source_resource_name;
 };
 
-struct MaterialInstance
+//событие
+struct Event
 {
-  stl::string material_id;
-  stl::string source_material;
-
-  MaterialInstance (const char* in_material_id, const char* in_source_material)
-    : material_id (in_material_id), source_material (in_source_material)
-    {}
+  float       time;
+  stl::string action;
 };
 
-typedef stl::hash_set<stl::hash_key<const char*> >                  UsedResourcesSet;
-typedef stl::hash_set<stl::hash_key<const char*> >                  FullscreenSymbolsSet;
-typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>           ResourceTilingMap;
-typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>           ResourceDimensionsMap;
-typedef stl::hash_map<stl::hash_key<const char*>, vec2ui>           ResourceCropMap;
-typedef stl::hash_map<size_t, stl::string>                          ImagesHashesMap;
-typedef stl::multimap<float, stl::string, stl::less<float> >        ActivateSpritesMap;
-typedef stl::hash_map<stl::hash_key<const char*>, MaterialInstance> MaterialInstancesMap;
-typedef CollectionImpl<Vec2fKeyframe, ICollection<Vec2fKeyframe> >  Vec2fKeyframes;
+typedef stl::hash_set<stl::hash_key<const char*> > UsedResourcesSet;
+typedef stl::hash_map<stl::string, ImageDesc>      ImageMap;
+typedef stl::list<Event>                           EventList;
+
+//параметры конвертации
+struct ConvertData
+{
+  Document                 document;
+  UsedResourcesSet         used_symbols;
+  ImageMap                 images;
+  stl::auto_ptr<XmlWriter> scene_writer;
+};
+
+enum LayerType
+{
+  LayerType_Undefined,
+  LayerType_Sprite,
+  LayerType_SpriteGroup,
+  LayerType_Instance,
+};
 
 //сравнение дробных чисел
 bool float_compare (float v1, float v2)
@@ -133,7 +142,6 @@ size_t get_next_higher_power_of_two (size_t k)
 
   return k + 1;
 }
-
 
 //печать ошибки с выходом из программы
 void error (const char* format, ...)
@@ -183,22 +191,28 @@ void command_line_result_textures_dir (const char* file_name, Params& params)
   params.output_textures_dir_name = file_name;
 }
 
+//установка имени пути сохранения текстур
+void command_line_result_material_textures_dir (const char* file_name, Params& params)
+{
+  params.output_material_textures_dir_name = file_name;
+}
+
 //установка формата сохранения текстур
 void command_line_result_textures_format (const char* value, Params& params)
 {
-  params.textures_format = value;
+  params.output_textures_format = value;
 }
 
 //установка файла материалов
 void command_line_materials_file_name (const char* file_name, Params& params)
 {
-  params.materials_file_name = file_name;
+  params.output_materials_file_name = file_name;
 }
 
 //установка папки анимаций
-void command_line_animation_dir_name (const char* file_name, Params& params)
+void command_line_scene_file_name (const char* file_name, Params& params)
 {
-  params.animation_dir_name = file_name;
+  params.output_scene_file_name = file_name;
 }
 
 //установка необрезаемых слоёв
@@ -211,54 +225,6 @@ void command_line_crop_exclude (const char* string, Params& params)
 void command_line_layers_exclude (const char* string, Params& params)
 {
   params.layers_exclude = string;
-}
-
-//установка целевого размера экрана для пережатия текстур
-void command_line_resize_width (const char* value, Params& params)
-{
-  params.resize_width = atoi (value);
-}
-
-//установка целевого размера экрана для пережатия текстур
-void command_line_resize_height (const char* value, Params& params)
-{
-  params.resize_height = atoi (value);
-}
-
-//установка левой координаты для перерасчета анимаций
-void command_line_left_x (const char* value, Params& params)
-{
-  params.left_x = static_cast<float> (atof (value));
-}
-
-//установка правой координаты для перерасчета анимаций
-void command_line_right_x (const char* value, Params& params)
-{
-  params.right_x = static_cast<float> (atof (value));
-}
-
-//установка верхней координаты для перерасчета анимаций
-void command_line_top_y (const char* value, Params& params)
-{
-  params.top_y = static_cast<float> (atof (value));
-}
-
-//установка нижней координаты для перерасчета анимаций
-void command_line_bottom_y (const char* value, Params& params)
-{
-  params.bottom_y = static_cast<float> (atof (value));
-}
-
-//установка ширины виртуального экрана для перерасчета анимаций
-void command_line_target_width (const char* value, Params& params)
-{
-  params.target_width = static_cast<float> (atof (value));
-}
-
-//установка высоты виртуального экрана для перерасчета анимаций
-void command_line_target_height (const char* value, Params& params)
-{
-  params.target_height = static_cast<float> (atof (value));
 }
 
 //установка параметра вывода детальной информации
@@ -282,28 +248,56 @@ void command_line_crop_alpha (const char* value_string, Params& params)
   params.need_crop_alpha = true;
 }
 
+//установка префикса для имён материалов
+void command_line_materials_prefix (const char* string, Params& params)
+{
+  params.material_prefix = string;
+}
+
+//установка исключаемого суффикса для имён материалов
+void command_line_materials_exclude_suffix (const char* string, Params& params)
+{
+  params.material_exclude_suffix = string;
+}
+
+//установка флага необходимости инвертирования координат по оси X
+void command_line_inverse_x (const char*, Params& params)
+{
+  params.need_inverse_x = true;
+}
+
+//установка флага необходимости инвертирования координат по оси Y
+void command_line_inverse_y (const char*, Params& params)
+{
+  params.need_inverse_y = true;
+}
+
+//установка флага необходимости генерирования поля AfterSprite
+void command_line_after_sprite (const char*, Params& params)
+{
+  params.need_after_sprite = true;
+}
+
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
-    {command_line_result_textures_dir,        "textures-dir",          'o', "dir",       "set output textures directory"},
-    {command_line_result_textures_format,     "textures-format",       0,   "string",    "set output textures format string"},
-    {command_line_materials_file_name,        "materials-file",        0,   "file",      "set output materials file"},
-    {command_line_animation_dir_name,         "animation-dir",         0,   "dir",       "set output animation directory"},
-    {command_line_crop_exclude,               "crop-exclude",          0,   "wildcards", "exclude selected layers from crop"},
-    {command_line_layers_exclude,             "layers-exclude",        0,   "wildcards", "exclude selected layers from export"},
-    {command_line_resize_width,               "resize-width",          0,   "value",     "set target screen width for texture resizing"},
-    {command_line_resize_height,              "resize-height",         0,   "value",     "set target screen height for texture resizing"},
-    {command_line_left_x,                     "left-x",                0,   "value",     "set left x coordinate for animation calculation"},
-    {command_line_right_x,                    "right-x",               0,   "value",     "set right x coordinate for animation calculation"},
-    {command_line_top_y,                      "top-y",                 0,   "value",     "set top y coordinate for animation calculation"},
-    {command_line_bottom_y,                   "bottom-y",              0,   "value",     "set bottom y coordinate for animation calculation"},
-    {command_line_target_width,               "target-width",          0,   "value",     "set target width for animation calculation"},
-    {command_line_target_height,              "target-height",         0,   "value",     "set target height for animation calculation"},
-    {command_line_silent,                     "silent",                's', 0,           "quiet mode"},
-    {command_line_help,                       "help",                  '?', 0,           "print help message"},
-    {command_line_pot,                        "pot",                   0,   0,           "extent textures size to nearest greater power of two"},
-    {command_line_crop_alpha,                 "crop-alpha",            0,   "value",     "crop layers by alpha that less than value"},
+    {command_line_result_textures_dir,          "out-textures-dir",          'o',        "dir",  "set output textures directory"},
+    {command_line_result_material_textures_dir, "out-material-textures-dir", 'o',        "dir",  "set output textures directory in material file"},
+    {command_line_result_textures_format,       "out-textures-format",         0,     "string",  "set output textures format string"},
+    {command_line_materials_file_name,          "out-materials",               0,       "file",  "set output materials file"},
+    {command_line_scene_file_name,              "out-scene",                   0,       "file",  "set output scene file"},
+    {command_line_crop_alpha,                   "crop-alpha",                  0,      "value",  "crop layers by alpha that less than value"},    
+    {command_line_crop_exclude,                 "crop-exclude",                0,  "wildcards",  "exclude selected layers from crop"},    
+    {command_line_layers_exclude,               "layers-exclude",              0,  "wildcards",  "exclude selected layers from export"},
+    {command_line_materials_prefix,             "materials-prefix",            0,     "string",  "set prefix for material names"},
+    {command_line_materials_exclude_suffix,     "materials-exclude-suffix",    0,     "string",  "set suffix that will be excluded from material name"},
+    {command_line_silent,                       "silent",                    's',            0,  "quiet mode"},
+    {command_line_help,                         "help",                      '?',            0,  "print help message"},
+    {command_line_pot,                          "pot",                         0,            0,  "extent textures size to nearest greater power of two"},
+    {command_line_inverse_x,                    "inverse-x",                   0,            0,  "inverse X ort"},
+    {command_line_inverse_y,                    "inverse-y",                   0,            0,  "inverse Y ort"},
+    {command_line_after_sprite,                 "after-sprite",                0,            0,  "generate AfterSprite attribute"}
   };
 
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -482,794 +476,722 @@ void command_line_parse (int argc, const char* argv [], Params& params)
   }
 }
 
-void save_materials (const Params& params, const Document& document, const ResourceTilingMap& tiling_map, const MaterialInstancesMap& material_instances)
+///проверка попадания имени в список строк
+bool is_present (const char* name, const StringArray& strings)
 {
-  stl::string xmtl_name = params.materials_file_name;
-
-  if (xmtl_name.empty ())
+  for (size_t i = 0, count = strings.Size (); i < count; i++)
   {
-    stl::string document_base_name = common::notdir (document.Name ());
+    const char* mask = strings [i];
 
-    xmtl_name = common::format ("%s.xmtl", document_base_name.c_str ());
+    if (common::wcmatch (name, mask))
+      return true;
   }
 
-  XmlWriter writer (xmtl_name.c_str ());
+  return false;
+}
+
+//получение полного имени материала
+stl::string get_full_material_name (const Params& params, const char* name)
+{
+  stl::string result = name;
+  
+  if (!params.material_exclude_suffix.empty ())
+  {
+    size_t pos = result.rfind (params.material_exclude_suffix.c_str ());
+    
+    if (pos != stl::string::npos)
+      result.erase (pos);
+  }
+  
+  if (!params.material_prefix.empty ())
+    result = params.material_prefix + result;
+    
+  return result;
+}
+
+//сохранение материалов
+void process_materials (Params& params, ConvertData& data)
+{
+  if (params.output_materials_file_name.empty ())
+    return; //если имя файла материалов не указано - экспорт не производится
+    
+  if (params.output_material_textures_dir_name.empty ())
+    params.output_material_textures_dir_name = params.output_textures_dir_name;
+
+  XmlWriter writer (params.output_materials_file_name.c_str ());
 
   XmlWriter::Scope scope (writer, "material_library");
-
-  for (Document::ResourceList::ConstIterator iter = document.Resources ().CreateIterator (); iter; ++iter)
+  
+  for (ImageMap::iterator iter=data.images.begin (); iter!=data.images.end (); ++iter)
   {
-    if (material_instances.find (iter->Name ()) != material_instances.end ())
-      continue;
-
-    XmlWriter::Scope material_scope (writer, "material");
-
-    writer.WriteAttribute ("id", iter->Name ());
-
-    XmlWriter::Scope sprite_profile (writer, "sprite_profile");
-
-    writer.WriteAttribute ("image", iter->Path ());
-    writer.WriteAttribute ("blend_mode", "translucent");
-
-    ResourceTilingMap::const_iterator tiling = tiling_map.find (iter->Name ());
-
-    if (tiling != tiling_map.end ())
+    ImageDesc&  desc = iter->second;
+    const char* id   = iter->first.c_str ();
+    
+    if (desc.source_resource_name == id)
     {
+      XmlWriter::Scope material_scope (writer, "material");
+
+      writer.WriteAttribute ("id", get_full_material_name (params, id).c_str ());
+
+      XmlWriter::Scope sprite_profile (writer, "sprite_profile");
+
+      writer.WriteAttribute ("image", common::format ("%s/%s", params.output_material_textures_dir_name.c_str (), common::notdir (desc.image_path.c_str ())).c_str ());
+      writer.WriteAttribute ("blend_mode", "translucent");
       writer.WriteAttribute ("tiling", "1");
-      writer.WriteAttribute ("tile_width", tiling->second.x);
-      writer.WriteAttribute ("tile_height", tiling->second.y);
-    }
-  }
-
-  for (MaterialInstancesMap::const_iterator iter = material_instances.begin (), end = material_instances.end (); iter != end; ++iter)
-  {
-    XmlWriter::Scope material_scope (writer, "instance_material");
-
-    writer.WriteAttribute ("id",     iter->second.material_id.c_str ());
-    writer.WriteAttribute ("source", iter->second.source_material.c_str ());
-  }
-}
-
-void write_track_key (XmlWriter& writer, float time, const char* value, const char* value_attribute = "Value")
-{
-  XmlWriter::Scope key_scope (writer, "Key");
-
-  writer.WriteAttribute ("Time",  time);
-  writer.WriteAttribute (value_attribute, value);
-}
-
-void write_track_key (XmlWriter& writer, float time, vec2f value)
-{
-  stl::string value_string = common::format ("%f;%f", value.x, value.y);
-
-  write_track_key (writer, time, value_string.c_str ());
-}
-
-void write_track_key (XmlWriter& writer, float time, float value)
-{
-  stl::string value_string = common::format ("%f", value);
-
-  write_track_key (writer, time, value_string.c_str ());
-}
-
-void compose_vec2f_keyframes (const PropertyAnimation::KeyframeList& x_keyframes, const PropertyAnimation::KeyframeList& y_keyframes, Vec2fKeyframes& keyframes)
-{
-  keyframes.Reserve (stl::max (x_keyframes.Size (), y_keyframes.Size ()));
-
-  size_t x_keyframes_count        = x_keyframes.Size (),
-         y_keyframes_count        = y_keyframes.Size (),
-         current_x_keyframe_index = 0,
-         current_y_keyframe_index = 0;
-
-  PropertyAnimation::KeyframeList::ConstIterator current_x_keyframe = x_keyframes.CreateIterator (),
-                                                 current_y_keyframe = y_keyframes.CreateIterator ();
-
-  float last_exported_time = -1;
-
-  while (current_x_keyframe_index < x_keyframes_count || current_y_keyframe_index < y_keyframes_count)
-  {
-    Vec2fKeyframe new_keyframe;
-
-    if ((current_x_keyframe_index >= x_keyframes_count) || (current_x_keyframe->time > current_y_keyframe->time && current_y_keyframe_index < y_keyframes_count))
-    {
-      if (current_y_keyframe->time > last_exported_time + EPSILON)
-      {
-        last_exported_time = current_y_keyframe->time;
-
-        new_keyframe.time = current_y_keyframe->time;
-
-        new_keyframe.value.y = current_y_keyframe->value;
-
-        if (!current_x_keyframe_index || (current_x_keyframe_index >= x_keyframes_count))
-          new_keyframe.value.x = current_x_keyframe->value;
-        else
-        {
-          const PropertyAnimationKeyframe& previous_x_keyframe = x_keyframes [current_x_keyframe_index - 1];
-
-          new_keyframe.value.x = previous_x_keyframe.value + (current_x_keyframe->value - previous_x_keyframe.value) / (current_x_keyframe->time - previous_x_keyframe.time) * (current_y_keyframe->time - previous_x_keyframe.time);
-        }
-
-        keyframes.Add (new_keyframe);
-      }
-
-      current_y_keyframe_index++;
-
-      if (current_y_keyframe_index < y_keyframes_count)
-        ++current_y_keyframe;
+      writer.WriteAttribute ("tile_width", desc.width);
+      writer.WriteAttribute ("tile_height", desc.height);      
     }
     else
     {
-      if (current_x_keyframe->time > last_exported_time + EPSILON)
-      {
-        last_exported_time = current_x_keyframe->time;
+      XmlWriter::Scope material_scope (writer, "instance_material");
 
-        new_keyframe.time = current_x_keyframe->time;
-
-        new_keyframe.value.x = current_x_keyframe->value;
-
-        if (!current_y_keyframe_index || (current_y_keyframe_index >= y_keyframes_count))
-          new_keyframe.value.y = current_y_keyframe->value;
-        else
-        {
-          const PropertyAnimationKeyframe& previous_y_keyframe = y_keyframes [current_y_keyframe_index - 1];
-
-          new_keyframe.value.y = previous_y_keyframe.value + (current_y_keyframe->value - previous_y_keyframe.value) / (current_y_keyframe->time - previous_y_keyframe.time) * (current_x_keyframe->time - previous_y_keyframe.time);
-        }
-
-        keyframes.Add (new_keyframe);
-      }
-
-      current_x_keyframe_index++;
-
-      if (current_x_keyframe_index < x_keyframes_count)
-        ++current_x_keyframe;
+      writer.WriteAttribute ("id",     id);
+      writer.WriteAttribute ("source", desc.source_resource_name.c_str ());
     }
   }
 }
 
-void preprocess_symbols (const Params& params, Document& document, const UsedResourcesSet& used_symbols,
-                         ResourceTilingMap& tiling_map, MaterialInstancesMap& material_instances,
-                         ResourceDimensionsMap& resources_dimensions, FullscreenSymbolsSet& fullscreen_symbols,
-                         ResourceCropMap& resource_crops)
+///обработка текстур
+void process_textures (Params& params, ConvertData& data)
 {
-  static const char* METHOD_NAME = "preprocess_symbols";
+    //в случае, если имя каталога с текстурами и формата текстур не задано - сохранение текстур не производится
 
   if (!params.silent)
-    printf ("preprocessing symbols...\n");
+    printf ("Processing textures...\n");
 
-  float resize_x_factor = params.resize_width ? params.resize_width / (float)document.Width () : 1.f,
-        resize_y_factor = params.resize_height ? params.resize_height / (float)document.Height () : 1.f;
-
-  UsedResourcesSet used_resources;
-  ImagesHashesMap  duplicate_images;
-
-  if (!FileSystem::IsDir (params.output_textures_dir_name.c_str ()))
-    FileSystem::Mkdir (params.output_textures_dir_name.c_str ());
-
-  common::StringArray crop_exclude_list = common::split (params.crop_exclude.c_str ());
-
-  Document::ResourceList& resources = document.Resources ();
-
-  for (size_t symbol_index = 0; symbol_index < document.Symbols ().Size (); symbol_index++)
+  if (!params.output_textures_dir_name.empty () || !params.output_textures_format.empty ())
   {
-    const Symbol& symbol = ((ICollection<Symbol>&)document.Symbols ()) [symbol_index];
+    if (params.output_textures_dir_name.empty ())
+      params.output_textures_dir_name = params.xfl_name;
+    
+    if (params.output_textures_format.empty ())
+      params.output_textures_format = DEFAULT_TEXTURES_FORMAT;
+      
+      //создание каталога для хранения текстур
 
-    if (used_symbols.find (symbol.Name ()) == used_symbols.end ())
+    if (!FileSystem::IsDir (params.output_textures_dir_name.c_str ()))
+      FileSystem::Mkdir (params.output_textures_dir_name.c_str ());
+  }
+
+    //построение списка текстур
+    
+  common::StringArray crop_exclude_list = common::split (params.crop_exclude.c_str ());
+  common::StringArray textures_list;
+  
+  typedef stl::hash_set<stl::hash_key<const char*> > TexturesSet;
+  typedef stl::hash_map<stl::hash_key<const char*>, stl::string> TexturesSymbolMap;
+  
+  TexturesSet       textures_set;
+  TexturesSymbolMap textures_symbol;
+  
+    //обход символов
+
+  for (size_t symbol_index = 0; symbol_index < data.document.Symbols ().Size (); symbol_index++)
+  {
+    const Symbol& symbol = data.document.Symbols () [symbol_index];
+
+      //исключение из обработки неиспользуемых символов
+    
+    if (data.used_symbols.find (symbol.Name ()) == data.used_symbols.end ())
       continue;
+      
+      //обработка таймлайна данного символа
 
     const Timeline& symbol_timeline = symbol.Timeline ();
 
-    if (symbol_timeline.Layers ().Size () > 1)
-      xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', it has more than one layer", symbol.Name ());
+    for (Timeline::LayerList::ConstIterator layer_iter=symbol_timeline.Layers ().CreateIterator (); layer_iter; ++layer_iter)
+    {
+      const Layer& symbol_layer = *layer_iter;
+      
+      for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
+        for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter)
+        {
+          const char* resource_name = symbol_element_iter->Name ();
+          
+          if (symbol_element_iter->Type () == FrameElementType_ResourceInstance && !textures_set.count (resource_name))
+          {
+            textures_set.insert (resource_name);
+            
+            textures_list += resource_name;
+            
+            textures_symbol [resource_name] = symbol.Name ();
+          }
+        }
+    }
+  }
+  
+    //кэш текстур
+  
+  typedef stl::hash_map<size_t, stl::string> ImageCache;
+  
+  ImageCache image_cache;
+  
+    //счётчик имён текстур
+    
+  size_t texture_name_index = 0;
+    
+    //обход используемых текстур
+    
+  for (size_t i=0; i<textures_list.Size (); i++)
+  {
+      //формирование имени исходной и целевой текстуры
+    
+    const char* resource_name = textures_list [i];
+    stl::string source_path   = data.document.Resources ()[resource_name].Path ();
+    stl::string target_path   = common::format (common::format ("%s/%s", params.output_textures_dir_name.c_str (), params.output_textures_format.c_str ()).c_str (), texture_name_index);
+    
+      //загрузка исходной текстуры
+    
+    Image source_image (source_path.c_str ());
 
-    bool need_crop_alpha = params.need_crop_alpha;
+        //отсечение по альфа
+        
+    bool need_crop_alpha = params.need_crop_alpha && !is_present (textures_symbol [resource_name].c_str (), crop_exclude_list);
+    
+    size_t offset_x = 0, offset_y = 0, full_width = source_image.Width (), full_height = source_image.Height ();
 
     if (need_crop_alpha)
     {
-      for (size_t i = 0, count = crop_exclude_list.Size (); i < count; i++)
+      Rect crop_rect;
+
+      memset (&crop_rect, 0, sizeof (crop_rect));      
+      
+      crop_by_alpha (source_image, params.crop_alpha, crop_rect.x, crop_rect.y, crop_rect.width, crop_rect.height);
+
+      if (!crop_rect.width || !crop_rect.height)
       {
-        const char* mask = crop_exclude_list [i];
-
-        if (common::wcmatch (symbol.Name (), mask))
-        {
-          need_crop_alpha = false;
-          break;
-        }
+        crop_rect.x      = 0;
+        crop_rect.y      = 0;
+        crop_rect.width  = 1;
+        crop_rect.height = 1;
       }
+      
+      xtl::uninitialized_storage<char> image_copy_buffer (get_bytes_per_pixel (source_image.Format ()) * crop_rect.width * crop_rect.height);
+
+      source_image.GetImage (crop_rect.x, crop_rect.y, 0, crop_rect.width, crop_rect.height, 1, source_image.Format (), image_copy_buffer.data ());
+      
+      media::Image (crop_rect.width, crop_rect.height, 1, source_image.Format (), image_copy_buffer.data ()).Swap (source_image);
+      
+        //сохранение смещения после отсечения
+     
+      offset_x = crop_rect.x;
+      offset_y = crop_rect.y;
+
+      if (!params.silent)
+        printf ("  crop layer '%s' %ux%u: (%u, %u)-(%u, %u)\n", source_path.c_str (), full_width, full_height, crop_rect.x, crop_rect.y, 
+          crop_rect.x + crop_rect.width, crop_rect.y + crop_rect.height);
     }
-
-    Layer&              symbol_layer       = ((ICollection<Layer>&)symbol_timeline.Layers ()) [0];
-    Frame&              first_symbol_frame = ((ICollection<Frame>&)symbol_layer.Frames ()) [0];
-    const FrameElement& resource_element   = ((ICollection<FrameElement>&)first_symbol_frame.Elements ()) [0];
-    const Resource&     resource           = resources [resource_element.Name ()];
-
-    size_t bitmaps_count = 0;
-
-    for (Layer::FrameList::ConstIterator symbol_frame_iter = symbol_layer.Frames ().CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
-      for (Frame::FrameElementList::ConstIterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, bitmaps_count++)
-        if (symbol_element_iter->Type () != FrameElementType_ResourceInstance)
-          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains elements other than resource instance", symbol.Name ());
-
-    if (!bitmaps_count)
-      throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced symbol elements has no resource instance", symbol.Name ());
-
-    Image image (resource.Path ());
-
-    size_t image_width  = image.Width (),
-           image_height = image.Height ();
-
-    if (image_width == document.Width () && image_height == document.Height ())
-      fullscreen_symbols.insert (symbol.Name ());
-
-    stl::string resource_dir = common::dir (resource.Name ()),
-                save_folder_name;
-
-    if (resource_dir == "./")
-      save_folder_name = common::format ("%s/", params.output_textures_dir_name.c_str ());
-    else
-      save_folder_name = common::format ("%s/%s", params.output_textures_dir_name.c_str (), resource_dir.c_str ());
-
-    size_t check_frame = 1;
-
-    Layer::FrameList &layer_frames = symbol_layer.Frames ();
-
-    stl::string correct_element_name;
-
-    PropertyAnimation motion_x_animation, motion_y_animation;
-
-    motion_x_animation.SetName (MOTION_X_ANIMATION_PROPERTY);
-    motion_y_animation.SetName (MOTION_Y_ANIMATION_PROPERTY);
-
-    PropertyAnimation::KeyframeList &motion_x_animation_keyframes = motion_x_animation.Keyframes (),
-                                    &motion_y_animation_keyframes = motion_y_animation.Keyframes ();
-
-    float last_x_motion = 0, last_y_motion = 0, first_frame_crop_x = 0, first_frame_crop_y = 0;
-
-    for (Layer::FrameList::Iterator symbol_frame_iter = layer_frames.CreateIterator (); symbol_frame_iter; ++symbol_frame_iter)
+    
+      //поиск изображения в кэше
+    
+    size_t               image_hash = common::crc32 (source_image.Bitmap (), get_bytes_per_pixel (source_image.Format ()) * source_image.Width () * source_image.Height ());
+    ImageCache::iterator image_iter = image_cache.find (image_hash);
+    
+    ImageDesc desc;
+    
+    desc.x           = offset_x;
+    desc.y           = offset_y;
+    desc.width       = source_image.Width ();
+    desc.height      = source_image.Height ();
+    desc.full_width  = full_width;
+    desc.full_height = full_height;
+    
+    if (image_iter != image_cache.end ())
     {
-      size_t symbol_frame_first_frame = symbol_frame_iter->FirstFrame ();
-
-      for (Frame::FrameElementList::Iterator symbol_element_iter = symbol_frame_iter->Elements ().CreateIterator (); symbol_element_iter; ++symbol_element_iter, check_frame++)
-      {
-        if (symbol_element_iter->Type () != FrameElementType_ResourceInstance)
-          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains elements other than resource instance", symbol.Name ());
-
-        if (symbol_frame_first_frame != check_frame - 1) //генерация промежуточных кадров если анимация содержит разрывы
-        {
-          if (check_frame == 1)
-            throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', referenced frame animation starts not from 0 frame (%u)", symbol.Name (), symbol_frame_first_frame);
-
-          for (size_t instance_index = check_frame, last_instance_index = symbol_frame_first_frame + 1; instance_index < last_instance_index; instance_index++)
-          {
-            stl::string source_material_name;
-
-            MaterialInstancesMap::const_iterator instance_iter = material_instances.find (correct_element_name.c_str ());
-
-            if (instance_iter == material_instances.end ())
-              source_material_name = correct_element_name;
-            else
-              source_material_name = instance_iter->second.source_material;
-
-            stl::string instance_element_name = common::format ("%s%u.%s", save_folder_name.c_str (), instance_index, params.textures_format.c_str ());
-
-            material_instances.insert_pair (instance_element_name.c_str (), MaterialInstance (instance_element_name.c_str (), source_material_name.c_str ()));
-
-            Resource new_resource;
-
-            new_resource.SetName (instance_element_name.c_str ());
-            new_resource.SetPath (source_material_name.c_str ());
-
-            resources.Add (new_resource);
-
-            PropertyAnimationKeyframe motion_x_keyframe, motion_y_keyframe;
-
-            motion_x_keyframe.value = last_x_motion;
-            motion_y_keyframe.value = last_y_motion;
-            motion_x_keyframe.time  = motion_y_keyframe.time = (instance_index - 1) / document.FrameRate ();
-
-            motion_x_animation_keyframes.Add (motion_x_keyframe);
-            motion_y_animation_keyframes.Add (motion_y_keyframe);
-          }
-
-          check_frame = symbol_frame_first_frame + 1;
-        }
-
-        const Resource& frame_resource = resources [symbol_element_iter->Name ()];
-
-        Image frame (frame_resource.Path ());
-
-        size_t frame_width  = frame.Width (),
-               frame_height = frame.Height ();
-
-        if (frame_width != image_width || frame_height != image_height)
-          throw xtl::format_operation_exception (METHOD_NAME, "Can't process symbol '%s', symbol contains animations with different frame size", symbol.Name ());
-
-        Rect crop_rect;
-
-        memset (&crop_rect, 0, sizeof (crop_rect));
-
-        if (need_crop_alpha)
-        {
-          crop_by_alpha (frame, params.crop_alpha, crop_rect.x, crop_rect.y, crop_rect.width, crop_rect.height);
-
-          if (!crop_rect.width || !crop_rect.height)
-          {
-            crop_rect.x      = 0;
-            crop_rect.y      = 0;
-            crop_rect.width  = 1;
-            crop_rect.height = 1;
-          }
-        }
-        else
-        {
-          crop_rect.width  = image_width;
-          crop_rect.height = image_height;
-        }
-
-        size_t resized_crop_width, resized_crop_height;
-
-        if (params.resize_width)
-        {
-          resized_crop_width  = stl::max ((size_t)ceil(crop_rect.width  * resize_x_factor), (size_t)1);
-          resized_crop_height = stl::max ((size_t)ceil(crop_rect.height * resize_y_factor), (size_t)1);
-        }
-        else
-        {
-          resized_crop_width  = crop_rect.width;
-          resized_crop_height = crop_rect.height;
-        }
-
-        xtl::uninitialized_storage<char> image_copy_buffer (get_bytes_per_pixel (image.Format ()) * crop_rect.width * crop_rect.height);
-
-        frame.GetImage (crop_rect.x, crop_rect.y, 0, crop_rect.width, crop_rect.height, 1, frame.Format (), image_copy_buffer.data ());
-
-        size_t cropped_image_hash = common::crc32 (image_copy_buffer.data (), image_copy_buffer.size (), 0) + crop_rect.width * 2 + crop_rect.height * 3;
-
-        ImagesHashesMap::iterator duplicate_image_iter = duplicate_images.find (cropped_image_hash);
-
-        if (bitmaps_count > 1)
-          correct_element_name = common::format ("%s%u.%s", save_folder_name.c_str (), check_frame, params.textures_format.c_str ());
-        else
-        {
-          stl::string resource_file_base_name = common::notdir (common::basename (resource.Path ()));
-          correct_element_name = common::format ("%s%s.%s", save_folder_name.c_str (), resource_file_base_name.c_str (), params.textures_format.c_str ());
-        }
-
-        Resource new_resource;
-
-        new_resource.SetName (correct_element_name.c_str ());
-        new_resource.SetPath (correct_element_name.c_str ());
-
-        if (duplicate_image_iter == duplicate_images.end ())
-        {
-          size_t new_image_width  = resized_crop_width,
-                 new_image_height = resized_crop_height;
-
-          if (params.need_pot_extent)
-          {
-            new_image_width  = get_next_higher_power_of_two (new_image_width);
-            new_image_height = get_next_higher_power_of_two (new_image_height);
-          }
-
-          if (params.resize_width)
-          {
-            Image resizing_image (crop_rect.width, crop_rect.height, 1, frame.Format (), image_copy_buffer.data ());
-
-            resizing_image.Resize (resized_crop_width, resized_crop_height, 1);
-
-            resizing_image.GetImage (0, 0, 0, resized_crop_width, resized_crop_height, 1, frame.Format (), image_copy_buffer.data ());
-          }
-
-          Image cropped_frame (new_image_width, new_image_height, 1, frame.Format ());
-
-          memset (cropped_frame.Bitmap (), 0, new_image_width * new_image_height * get_bytes_per_pixel (frame.Format ()));
-
-          cropped_frame.PutImage (0, new_image_height - resized_crop_height, 0, resized_crop_width, resized_crop_height, 1, frame.Format (), image_copy_buffer.data ());
-
-          if (!FileSystem::IsDir (save_folder_name.c_str ()))
-            FileSystem::Mkdir (save_folder_name.c_str ());
-
-          cropped_frame.Save (correct_element_name.c_str ());
-
-          if (resized_crop_width != new_image_width || resized_crop_height != new_image_height)
-            tiling_map.insert_pair (correct_element_name.c_str (), vec2ui (resized_crop_width, resized_crop_height));
-
-          duplicate_images.insert_pair (cropped_image_hash, correct_element_name);
-
-          resources_dimensions.insert_pair (correct_element_name.c_str (), math::vec2ui (resized_crop_width, resized_crop_height));
-        }
-        else if (correct_element_name != duplicate_image_iter->second && !resources.Find (correct_element_name.c_str ()))
-        {
-          material_instances.insert_pair (correct_element_name.c_str (), MaterialInstance (correct_element_name.c_str (), duplicate_image_iter->second.c_str ()));
-          resources_dimensions.insert_pair (correct_element_name.c_str (), resources_dimensions [duplicate_image_iter->second.c_str ()]);
-        }
-
-        if (!resources.Find (correct_element_name.c_str ()))
-          resources.Add (new_resource);
-
-        used_resources.insert (new_resource.Name ());
-
-        symbol_element_iter->SetName (correct_element_name.c_str ());
-
-          //update transformation and translation
-        vec2f current_transformation_point = symbol_element_iter->TransformationPoint (),
-              current_translation          = symbol_element_iter->Translation ();
-
-        if (check_frame == 1)
-        {
-          first_frame_crop_x = crop_rect.x;
-          first_frame_crop_y = crop_rect.y;
-        }
-
-        last_x_motion = current_translation.x + crop_rect.x - first_frame_crop_x;
-        last_y_motion = current_translation.y + crop_rect.y - first_frame_crop_y;
-
-        if ((bitmaps_count > 1) && (!float_compare (current_transformation_point.x, 0) || !float_compare (current_transformation_point.y, 0)))
-          throw xtl::format_not_supported_exception (METHOD_NAME, "Can't process symbol '%s', animated sprites transformation point not supported", symbol.Name ());
-
-        PropertyAnimationKeyframe motion_x_keyframe, motion_y_keyframe;
-
-        motion_x_keyframe.value = last_x_motion;
-        motion_y_keyframe.value = last_y_motion;
-        motion_x_keyframe.time  = motion_y_keyframe.time = (check_frame - 1) / document.FrameRate ();
-
-        motion_x_animation_keyframes.Add (motion_x_keyframe);
-        motion_y_animation_keyframes.Add (motion_y_keyframe);
-
-        resource_crops.insert_pair (correct_element_name.c_str (), vec2ui (crop_rect.x, crop_rect.y));
-      }
+        //сохранять изображения не нужно - достаточно сделать ссылку
+        
+      desc.image_path           = data.images [image_iter->second].image_path;
+      desc.source_resource_name = image_iter->second;
+    
+      data.images [resource_name] = desc;
+        
+      continue;
+    }
+    
+      //сохранение изображения
+      
+    desc.image_path           = target_path;
+    desc.source_resource_name = resource_name;
+    
+    data.images.insert_pair (resource_name, desc);
+    
+      //обновление кэша
+    
+    image_cache [image_hash] = resource_name;
+    
+      //увеличение до степени двойки
+      
+    if (params.need_pot_extent)
+    {
+      media::Image pot_image (get_next_higher_power_of_two (source_image.Width ()), get_next_higher_power_of_two (source_image.Height ()),
+        1, source_image.Format ());
+        
+      pot_image.PutImage (0, 0, 0, source_image.Width (), source_image.Height (), 1, source_image.Format (), source_image.Bitmap ());
+      
+      pot_image.Swap (source_image);
     }
 
-    AnimationCore frame_animation (first_symbol_frame.Animation ());
-
-    frame_animation.SetDuration (first_symbol_frame.Duration ());
-
-    AnimationCore::PropertyAnimationList& animated_properties = frame_animation.Properties ();
-
-    if (animated_properties.Find (MOTION_X_ANIMATION_PROPERTY) || animated_properties.Find (MOTION_Y_ANIMATION_PROPERTY))
-      throw xtl::format_not_supported_exception (METHOD_NAME, "Can't process symbol '%s', symbol frame animation not supported", symbol.Name ());
-
-    animated_properties.Add (motion_x_animation);
-    animated_properties.Add (motion_y_animation);
-
-    first_symbol_frame.SetAnimation (frame_animation);
-  }
-
-  for (size_t i = 0; i < resources.Size ();)
-  {
-    if (used_resources.find (((ICollection<Resource>&)resources) [i].Name ()) == used_resources.end ())
-      resources.Remove (i);
-    else
-      i++;
+    if (!params.output_textures_dir_name.empty () || !params.output_textures_format.empty ())
+      source_image.Save (target_path.c_str ());
+    
+    texture_name_index++;
   }
 }
 
-void save_timeline (const Params& params, const Document& document, const Timeline& timeline,
-                    const ResourceDimensionsMap& resources_dimensions,
-                    const FullscreenSymbolsSet& fullscreen_symbols,
-                    const ResourceCropMap& resource_crops)
+///определение типа слоя
+LayerType get_layer_type (const Layer& layer)
 {
-  if (!params.silent)
-    printf ("saving timeline...\n");
-
-  stl::string xml_name;
-
-  if (params.animation_dir_name.empty ())
-    xml_name = common::format ("%s.xml", timeline.Name ());
-  else
+  size_t resources_count = 0, symbols_count = 0;
+  
+  for (Layer::FrameList::ConstIterator frame_iter=layer.Frames ().CreateIterator (); frame_iter; ++frame_iter)
   {
-    if (!FileSystem::IsDir (params.animation_dir_name.c_str ()))
-      FileSystem::Mkdir (params.animation_dir_name.c_str ());
+    const Frame& frame = *frame_iter;
+    
+    if (frame.Elements ().Size () != 1)
+      return LayerType_Undefined;
 
-    xml_name = common::format ("%s/%s.xml", params.animation_dir_name.c_str (), timeline.Name ());
+    for (Frame::FrameElementList::ConstIterator element_iter=frame.Elements ().CreateIterator (); element_iter; ++element_iter)
+      switch (element_iter->Type ())
+      {
+        case FrameElementType_SymbolInstance:
+          symbols_count++;
+          break;
+        case FrameElementType_ResourceInstance:
+          resources_count++;
+          break;
+        default:
+          break;
+      }
+  }
+    
+  if (!resources_count && symbols_count)
+    return LayerType_Instance;
+    
+  if (!symbols_count && resources_count == 1)
+    return LayerType_Sprite;
+    
+  if (!symbols_count && resources_count > 1)
+    return LayerType_SpriteGroup;
+    
+  return LayerType_Undefined;
+}
+
+///компоновка трека
+void write_track
+ (ConvertData&             data,
+  const PropertyAnimation& x_track,
+  const PropertyAnimation& y_track,
+  const char*              name_prefix,
+  const math::vec2f&       offset,
+  const math::vec2f&       scale = math::vec2f (1.0f, 1.0f))
+{
+  if (x_track.Keyframes ().Size () != y_track.Keyframes ().Size ())
+    error ("Track sizes not equal for '%s'", name_prefix);
+    
+  for (size_t i=0, count=x_track.Keyframes ().Size (); i<count; i++)
+  {
+    const PropertyAnimationKeyframe &x_frame = x_track.Keyframes ()[i],
+                                    &y_frame = y_track.Keyframes ()[i];         
+
+    if (!float_compare (x_frame.time, y_frame.time))
+      error ("Different times for position track coordinates for '%s'", name_prefix);
+      
+    XmlWriter::Scope scope (*data.scene_writer, "Key");
+    
+    math::vec2f value (x_frame.value + offset.x, y_frame.value + offset.y);
+    
+    value *= scale;
+    
+    data.scene_writer->WriteAttribute ("Time", x_frame.time);
+    data.scene_writer->WriteAttribute ("Value", common::format ("%.3f; %.3f", value.x, value.y).c_str ());
+  }
+}
+
+void write_track (ConvertData& data, const PropertyAnimation& track, float scale = 1.0f)
+{
+  for (size_t i=0, count=track.Keyframes ().Size (); i<count; i++)
+  {
+    const PropertyAnimationKeyframe &frame = track.Keyframes ()[i];
+
+    XmlWriter::Scope scope (*data.scene_writer, "Key");
+    
+    data.scene_writer->WriteAttribute ("Time", frame.time);
+    data.scene_writer->WriteAttribute ("Value", frame.value * scale);
+  }
+}
+
+//обработка событий
+void write_events_track (ConvertData& data, const EventList& events)
+{
+  XmlWriter::Scope track_scope (*data.scene_writer, "Track");
+  
+  data.scene_writer->WriteAttribute ("Name", "events");
+
+  for (EventList::const_iterator iter=events.begin (), end=events.end (); iter!=end; ++iter)
+  {
+    const Event& event = *iter;
+    
+    XmlWriter::Scope key_scope (*data.scene_writer, "Key");
+    
+    data.scene_writer->WriteAttribute ("Time", event.time);
+    data.scene_writer->WriteAttribute ("Event", event.action.c_str ());
+  }
+}
+
+//запись таймлайн-спрайта
+void write_timeline_sprite_data (ConvertData& data, const char* name, const EventList& events)
+{
+  data.scene_writer->WriteAttribute ("Name", name);
+  data.scene_writer->WriteAttribute ("Material", "transparent");
+  data.scene_writer->WriteAttribute ("Active", "false");
+  data.scene_writer->WriteAttribute ("Z", 0);
+  
+  {
+    XmlWriter::Scope size_scope (*data.scene_writer, "Track");
+    
+    data.scene_writer->WriteAttribute ("Name", "size");
+    
+    XmlWriter::Scope key_scope (*data.scene_writer, "Key");
+    
+    data.scene_writer->WriteAttribute ("Time", 0.0f);
+    data.scene_writer->WriteAttribute ("Value", "1; 1");
+  }
+  
+  write_events_track (data, events);
+}
+
+///общая часть обработки спрайтов
+void process_sprite_common (Params& params, ConvertData& data, const Frame& frame, const char* name, const math::vec2f& position = math::vec2f (0.0f), const math::vec2f& scale = math::vec2f (1.0f))
+{
+    //получение объекта анимаций
+    
+  const AnimationCore& animation = frame.Animation ();
+
+    //сохранение положений
+  
+  const PropertyAnimation *x_track = animation.Properties ().Find ("headContainer.Basic_Motion.Motion_X"),
+                          *y_track = animation.Properties ().Find ("headContainer.Basic_Motion.Motion_Y");
+                          
+  if (x_track && y_track)
+  {
+    XmlWriter::Scope scope (*data.scene_writer, "Track");
+    
+    data.scene_writer->WriteAttribute ("Name", "position");
+    
+    write_track (data, *x_track, *y_track, name, position, math::vec2f (params.need_inverse_x ? -1.0f : 1.0f, params.need_inverse_y ? -1.0f : 1.0f) * scale);
+  }
+  else if (!equal (position, math::vec2f (.0f), EPSILON))
+  {
+    XmlWriter::Scope track_scope (*data.scene_writer, "Track");
+    
+    data.scene_writer->WriteAttribute ("Name", "position");
+
+    XmlWriter::Scope key_scope (*data.scene_writer, "Key");
+
+    data.scene_writer->WriteAttribute ("Time", 0.0f);
+    data.scene_writer->WriteAttribute ("Value", common::format ("%.3f; %.3f", params.need_inverse_x ? -position.x : position.x,
+      params.need_inverse_y ? -position.y : position.y).c_str ());    
+  }
+  
+    //сохранение масштаба
+    
+  const PropertyAnimation *x_scale_track = animation.Properties ().Find ("headContainer.Transformation.Scale_X"),
+                          *y_scale_track = animation.Properties ().Find ("headContainer.Transformation.Scale_Y");
+  
+  if (x_scale_track && y_scale_track)
+  {
+    XmlWriter::Scope scope (*data.scene_writer, "Track");
+    
+    data.scene_writer->WriteAttribute ("Name", "scale");
+    
+    write_track (data, *x_scale_track, *y_scale_track, name, math::vec2f (0.0f), math::vec2f (0.01f));
+  }
+  
+    //сохранение альфа
+    
+  const PropertyAnimation* alpha_track = animation.Properties ().Find ("headContainer.Colors.Alpha_Color.Alpha_Amount");
+  
+  if (alpha_track)
+  {
+    XmlWriter::Scope scope (*data.scene_writer, "Track");
+    
+    data.scene_writer->WriteAttribute ("Name", "alpha");
+    
+    write_track (data, *alpha_track, 0.01f);
+  }
+}
+
+///обработка спрайта
+void process_sprite (Params& params, ConvertData& data, const Frame& frame, const char* name, const char* parent)
+{
+  const FrameElement& element = frame.Elements ()[0u];
+
+  XmlWriter::Scope scope (*data.scene_writer, "Sprite");
+  
+    //запись имени спрайта
+  
+  data.scene_writer->WriteAttribute ("Name", name);
+  
+    //запись материала спрайта
+  
+  const char* resource_name = element.Name ();
+  
+  ImageMap::iterator mtl_iter = data.images.find (resource_name);
+  
+  if (mtl_iter == data.images.end ())
+  {
+    error ("Bad resource '%s' for sprite '%s'", resource_name, name);
+    return;
+  }
+  
+  const ImageDesc& image_desc = mtl_iter->second;
+  
+  data.scene_writer->WriteAttribute ("Material", get_full_material_name (params, resource_name).c_str ());
+  
+  if (*parent)
+  {
+    data.scene_writer->WriteAttribute ("Parent", parent);
+    data.scene_writer->WriteAttribute ("ScaleInherit", "false");
+    data.scene_writer->WriteAttribute ("OrientationInherit", "true");
+    data.scene_writer->WriteAttribute ("PositionSpace", "local");
+    data.scene_writer->WriteAttribute ("ScaleSpace", "local");
+    data.scene_writer->WriteAttribute ("OrientationSpace", "local");
+    data.scene_writer->WriteAttribute ("BindSpace", "parent");
+  }
+  
+  if (params.need_after_sprite)
+  {
+    stl::string sprite_name = resource_name;
+    
+    if (!params.material_exclude_suffix.empty ())
+    {
+      size_t pos = sprite_name.rfind (params.material_exclude_suffix.c_str ());
+      
+      if (pos != stl::string::npos)
+        sprite_name.erase (pos);
+    }
+    
+    data.scene_writer->WriteAttribute ("AfterSprite", sprite_name.c_str ());
   }
 
-  XmlWriter writer (xml_name.c_str ());
+  data.scene_writer->WriteAttribute ("Active", "false");
+  
+    //сохранение центра вращений
+    
+  const math::vec2f transformation_point = element.TransformationPoint ();
+    
+  stl::string pivot_value_string;
 
-  XmlWriter::Scope screen_scope (writer, "AnimationScreenPart");
+  pivot_value_string = common::format ("%.3f;%.3f", (transformation_point.x - image_desc.x) / image_desc.full_width  - 0.5f,
+                                                    (transformation_point.y - image_desc.y) / image_desc.full_height - 0.5f);
 
-  size_t document_width    = document.Width (),
-         document_height   = document.Height ();
-  int    target_width_abs  = abs (static_cast<int> (params.target_width)),
-         target_height_abs = abs (static_cast<int> (params.target_height));
-  float  x_scale           = static_cast<float> (params.target_width) / document_width,
-         y_scale           = static_cast<float> (params.target_height) / document_height,
-         resize_x_factor   = params.resize_width ? params.resize_width / static_cast<float> (document_width) : 1.f,
-         resize_y_factor   = params.resize_height ? params.resize_height / static_cast<float> (document_height) : 1.f;
-
-  ActivateSpritesMap activate_sprites_info;
-
-  common::StringArray layers_exclude_list = common::split (params.layers_exclude.c_str ());
-
-  for (int i = timeline.Layers ().Size () - 1; i >= 0; i--)
+  data.scene_writer->WriteAttribute ("PivotPosition", pivot_value_string.c_str ());
+  
+    //сохранение размера
+    
   {
-    const Layer& layer = ((ICollection<Layer>&)timeline.Layers ()) [i];
+    XmlWriter::Scope track_scope (*data.scene_writer, "Track");
+    
+    data.scene_writer->WriteAttribute ("Name",  "size");
+    
+    XmlWriter::Scope key_scope (*data.scene_writer, "Key");    
+    
+    data.scene_writer->WriteAttribute ("Time",  0.0f);
+    data.scene_writer->WriteAttribute ("Value", common::format ("%u; %u", image_desc.width, image_desc.height).c_str ());
+  }
+  
+    //сохранение общей части
+    
+  math::vec2f position = element.Translation () + math::vec2f (image_desc.width / 2.0f, image_desc.height / 2.0f) +
+    math::vec2f (float (image_desc.x), float (image_desc.y));
+  
+  process_sprite_common (params, data, frame, name, position);
+}
 
-    bool ignore_layer = false;
+///обработка группы спрайтов
+void process_sprite_group (Params& params, ConvertData& data, const Layer::FrameList& frames, const char* name_prefix)
+{
+  size_t frame_index = 1;
+  
+  for (Layer::FrameList::ConstIterator frame_iter=frames.CreateIterator (); frame_iter; ++frame_iter, ++frame_index)
+  {
+    const Frame& frame = *frame_iter;
 
-    for (size_t j = 0, count = layers_exclude_list.Size (); j < count; j++)
+    process_sprite (params, data, frame, common::format ("%s.frame%u", name_prefix, frame_index).c_str (), "");
+  }
+  
+    //сохранение группы
+    
+  XmlWriter::Scope group_scope (*data.scene_writer, "SpriteGroup");
+
+  data.scene_writer->WriteAttribute ("Name", name_prefix);
+  data.scene_writer->WriteAttribute ("Sprites", common::format ("%s.frame%%u; 1; %u", name_prefix, frame_index-1).c_str ());
+  data.scene_writer->WriteAttribute ("Fps", data.document.FrameRate ());
+  data.scene_writer->WriteAttribute ("Visible", "false");
+  
+//  process_sprite_common (data, frame, name_prefix);
+}
+
+void process_timeline (Params& params, ConvertData& data, const Timeline& timeline, const char* name_prefix, EventList& events);
+
+///обработка вложенного символа
+void process_symbol_instance (Params& params, ConvertData& data, const Frame& frame, const char* name_prefix)
+{
+  const FrameElement& element     = frame.Elements ()[0u];
+  const char*         symbol_name = element.Name ();
+  
+  if (!data.document.Symbols ().Find (symbol_name))
+    error ("Symbol '%s' not found while processing '%s'", symbol_name, name_prefix);
+    
+    //обработка вложений
+    
+  EventList events;
+
+  process_timeline (params, data, data.document.Symbols ()[symbol_name].Timeline (), name_prefix, events);
+  
+    //обработка спрайта
+    
+  XmlWriter::Scope sprite_scope (*data.scene_writer, "Sprite");
+  
+  write_timeline_sprite_data (data, name_prefix, events);
+  
+    //add pivot???  
+  
+  process_sprite_common (params, data, frame, name_prefix, element.Translation ());
+}
+
+///обработка таймлайна
+void process_timeline (Params& params, ConvertData& data, const Timeline& timeline, const char* parent_name, EventList& events)
+{
+    //обход слоёв
+    
+  for (Timeline::LayerList::ConstIterator layer_iter=timeline.Layers ().CreateIterator (); layer_iter; ++layer_iter)
+  {
+    const Layer& layer = *layer_iter;
+    
+      //определение типа слоя
+    
+    LayerType layer_type = get_layer_type (layer);
+    
+    stl::string name_prefix = *parent_name ? common::format ("%s.%s", parent_name, layer.Name ()) : stl::string (layer.Name ());
+    
+    switch (layer_type)
     {
-      const char* mask = layers_exclude_list [j];
-
-      if (common::wcmatch (layer.Name (), mask))
+      case LayerType_SpriteGroup:
       {
-        ignore_layer = true;
+        process_sprite_group (params, data, layer.Frames (), name_prefix.c_str ());
+        
+          //регистрация события запуска
+          
+        Event event;          
+        
+        const Frame& frame = layer.Frames ()[0u];
+        
+        event.time   = frame.FirstFrame () / data.document.FrameRate ();
+        event.action = common::format ("ShowSpriteGroup ('%s')", name_prefix.c_str ());
+        
+        events.push_back (event);
+        
+        if (frame.Duration () > 1)
+        {
+          event.time   += frame.Duration () / data.document.FrameRate ();
+          event.action  = common::format ("HideSpriteGroup ('%s')", name_prefix.c_str ());
+
+          events.push_back (event);
+        }
+
         break;
       }
-    }
-
-    if (ignore_layer)
-      continue;
-
-    for (Layer::FrameList::ConstIterator frame_iter = layer.Frames ().CreateIterator (); frame_iter; ++frame_iter)
-      for (Frame::FrameElementList::ConstIterator element_iter = frame_iter->Elements ().CreateIterator (); element_iter; ++element_iter)
+      case LayerType_Sprite:
       {
-        if (element_iter->Type () != FrameElementType_SymbolInstance)
-          continue;
-
-          //Поиск и верификация картинок
-        const Symbol* symbol = document.Symbols ().Find (element_iter->Name ());
-
-        if (!symbol)
+        process_sprite (params, data, layer.Frames ()[0u], name_prefix.c_str (), parent_name);
+        
+          //регистрация события запуска
+        
+        Event event;          
+        
+        const Frame& frame = layer.Frames ()[0u];
+        
+        event.time   = frame.FirstFrame () / data.document.FrameRate ();
+        event.action = common::format ("ActivateSprite ('%s')", name_prefix.c_str ());
+        
+        events.push_back (event);
+        
+        if (frame.Duration () > 1)
         {
-          if (!params.silent)
-            printf ("Can't process animation for frame element '%s' of layer '%s', references symbol not found\n", element_iter->Name (), layer.Name ());
-          continue;
+          event.time   += frame.Duration () / data.document.FrameRate ();
+          event.action  = common::format ("DeactivateSprite ('%s')", name_prefix.c_str ());
+
+          events.push_back (event);
         }
-
-        float begin_time = frame_iter->FirstFrame () / document.FrameRate (),
-              duration   = frame_iter->Duration () / document.FrameRate ();
-
-        const Timeline&     symbol_timeline    = symbol->Timeline ();
-        const Layer&        symbol_layer       = ((const ICollection<Layer>&)symbol_timeline.Layers ()) [0];
-        const Frame&        first_symbol_frame = ((const ICollection<Frame>&)symbol_layer.Frames ()) [0];
-        const FrameElement& resource_element   = ((const ICollection<FrameElement>&)first_symbol_frame.Elements ()) [0];
-        const Resource&     resource           = document.Resources () [resource_element.Name ()];
-
-        ResourceDimensionsMap::const_iterator dimensions_iter = resources_dimensions.find (resource.Path ());
-        ResourceCropMap::const_iterator       crop_iter       = resource_crops.find (resource.Path ());
-
-        if (dimensions_iter == resources_dimensions.end ())
-        {
-          if (!params.silent)
-            printf ("Can't find dimensions for resource '%s'\n", resource.Path ());
-          continue;
-        }
-
-        if (crop_iter == resource_crops.end ())
-        {
-          if (!params.silent)
-            printf ("Can't find crop info for resource '%s'\n", resource.Path ());
-          continue;
-        }
-
-        size_t image_width  = dimensions_iter->second.x,
-               image_height = dimensions_iter->second.y;
-
-        if (!image_width || !image_height)
-        {
-          if (!params.silent)
-            printf ("Resource '%s' has zero dimensions, skipping\n", resource.Path ());
-          continue;
-        }
-
-        XmlWriter::Scope sprite_scope (writer, "Sprite");
-
-        writer.WriteAttribute ("Active", "false");
-        writer.WriteAttribute ("Name", element_iter->Name ());
-
-        activate_sprites_info.insert_pair (begin_time, common::format ("ActivateSprite('%s')", element_iter->Name ()));
-
-        size_t bitmaps_count = symbol_layer.Frames () [symbol_layer.Frames ().Size () - 1].FirstFrame () + 1;
-
-        vec2f transformation_point (element_iter->TransformationPoint ().x + resource_element.TransformationPoint ().x,
-                                    element_iter->TransformationPoint ().y + resource_element.TransformationPoint ().y);
-
-        int additional_x_offset = 0, additional_y_offset = 0;
-
-        if (bitmaps_count == 1)
-        {
-          writer.WriteAttribute ("Material", resource.Name ());
-
-          if (fullscreen_symbols.find (symbol->Name ()) != fullscreen_symbols.end () && !element_iter->TransformationPoint ().x && !element_iter->TransformationPoint ().y)
-          {
-            additional_x_offset -= document.Width () / 2.f;
-            additional_y_offset -= document.Height () / 2.f;
-          }
-        }
-        else
-        {
-          stl::string resource_dir              = common::dir (resource.Name ()),
-                      resource_extension        = common::suffix (resource.Path ()),
-                      material_animation_string = common::format ("%s%%u%s; 1; %u", resource_dir.c_str (), resource_extension.c_str (), bitmaps_count),
-                      fps_string                = common::format ("%f", document.FrameRate ());
-
-          writer.WriteAttribute ("MaterialAnimation", material_animation_string);
-          writer.WriteAttribute ("Fps",               fps_string);
-          writer.WriteAttribute ("RepeatMode",        "clamp_to_end");
-        }
-
-        stl::string pivot_value_string;
-
-        if ((bitmaps_count > 1) || (fullscreen_symbols.find (symbol->Name ()) != fullscreen_symbols.end () && !element_iter->TransformationPoint ().x && !element_iter->TransformationPoint ().y))
-          pivot_value_string = "-0.5;-0.5;0";
-        else
-        {
-          pivot_value_string = common::format ("%f;%f;0", (transformation_point.x - crop_iter->second.x) / image_width * resize_x_factor - 0.5f,
-                                                          (transformation_point.y - crop_iter->second.y) / image_height * resize_y_factor - 0.5f);
-        }
-
-        writer.WriteAttribute ("PivotPosition", pivot_value_string.c_str());
-
-          //Сохранение треков
-        {
-          XmlWriter::Scope track_scope (writer, "Track");
-
-          writer.WriteAttribute ("Name", "size");
-
-          write_track_key (writer, 0, vec2f (image_width / resize_x_factor * target_width_abs / (float)document.Width (), image_height / resize_y_factor * target_height_abs / (float)document.Height ()));
-        }
-
-        {
-          XmlWriter::Scope track_scope (writer, "Track");
-
-          writer.WriteAttribute ("Name", "alpha");
-
-          const PropertyAnimation&               alpha_track = frame_iter->Animation ().Properties () ["headContainer.Colors.Alpha_Color.Alpha_Amount"];
-          const PropertyAnimation::KeyframeList& keyframes   = alpha_track.Keyframes ();
-
-          if (alpha_track.Enabled ())
-          {
-            for (PropertyAnimation::KeyframeList::ConstIterator keyframe_iter = keyframes.CreateIterator (); keyframe_iter; ++keyframe_iter)
-              write_track_key (writer, keyframe_iter->time, keyframe_iter->value / 100.f);
-          }
-        }
-
-        {
-          XmlWriter::Scope track_scope (writer, "Track");
-
-          writer.WriteAttribute ("Name", "position");
-
-          const PropertyAnimation               &motion_x_track = frame_iter->Animation ().Properties () [MOTION_X_ANIMATION_PROPERTY],
-                                                &motion_y_track = frame_iter->Animation ().Properties () [MOTION_Y_ANIMATION_PROPERTY];
-          const PropertyAnimation::KeyframeList &x_keyframes    = motion_x_track.Keyframes (),
-                                                &y_keyframes    = motion_y_track.Keyframes ();
-
-          vec2f base_point;
-
-          if (bitmaps_count > 1)
-            base_point = vec2f (params.left_x + (crop_iter->second.x + element_iter->Translation ().x + resource_element.Translation ().x) / document.Width () * params.target_width,
-                                params.top_y - (document.Height () - crop_iter->second.y + element_iter->Translation ().y + resource_element.Translation ().y) / document.Height () * params.target_height);
-          else
-            base_point = vec2f (params.left_x + (transformation_point.x + element_iter->Translation ().x + resource_element.Translation ().x) / document.Width () * params.target_width,
-                                params.top_y - (transformation_point.y + element_iter->Translation ().y + resource_element.Translation ().y) / document.Height () * params.target_height);
-
-          if (!motion_x_track.Enabled () || !motion_y_track.Enabled ())
-            write_track_key (writer, 0, base_point);
-          else
-          {
-            Vec2fKeyframes keyframes;
-
-            compose_vec2f_keyframes (x_keyframes, y_keyframes, keyframes);
-
-            for (Vec2fKeyframes::ConstIterator iter = keyframes.CreateIterator (); iter; ++iter)
-              write_track_key (writer, iter->time, base_point + vec2f (iter->value.x * x_scale, -iter->value.y * y_scale));
-          }
-        }
-
-        {
-          const PropertyAnimation *motion_x_track = first_symbol_frame.Animation ().Properties ().Find (MOTION_X_ANIMATION_PROPERTY),
-                                  *motion_y_track = first_symbol_frame.Animation ().Properties ().Find (MOTION_Y_ANIMATION_PROPERTY);
-
-          if (motion_x_track && motion_y_track && motion_x_track->Enabled () && motion_y_track->Enabled ())
-          {
-            XmlWriter::Scope track_scope (writer, "Track");
-
-            writer.WriteAttribute ("Name", "offset");
-
-            const PropertyAnimation::KeyframeList &x_keyframes = motion_x_track->Keyframes (),
-                                                  &y_keyframes = motion_y_track->Keyframes ();
-
-            Vec2fKeyframes keyframes;
-
-            compose_vec2f_keyframes (x_keyframes, y_keyframes, keyframes);
-
-            for (Vec2fKeyframes::ConstIterator iter = keyframes.CreateIterator (); iter; ++iter)
-              write_track_key (writer, iter->time, vec2f ((iter->value.x + additional_x_offset) * x_scale, (iter->value.y + additional_y_offset) * y_scale));
-          }
-        }
-
-        //TODO export rotation!
-
-        {
-          XmlWriter::Scope track_scope (writer, "Track");
-
-          writer.WriteAttribute ("Name", "scale");
-
-          const PropertyAnimation               &scale_x_track = frame_iter->Animation ().Properties () ["headContainer.Transformation.Scale_X"],
-                                                &scale_y_track = frame_iter->Animation ().Properties () ["headContainer.Transformation.Scale_Y"];
-          const PropertyAnimation::KeyframeList &x_keyframes   = scale_x_track.Keyframes (),
-                                                &y_keyframes   = scale_y_track.Keyframes ();
-
-          if (scale_x_track.Enabled () && scale_y_track.Enabled ())
-          {
-            Vec2fKeyframes keyframes;
-
-            compose_vec2f_keyframes (x_keyframes, y_keyframes, keyframes);
-
-            for (Vec2fKeyframes::ConstIterator iter = keyframes.CreateIterator (); iter; ++iter)
-              write_track_key (writer, iter->time, vec2f (iter->value.x / 100.f, iter->value.y / 100.f));
-          }
-        }
-
-        {
-          XmlWriter::Scope track_scope (writer, "Track");
-
-          writer.WriteAttribute ("Name", "events");
-
-          stl::string event_string = common::format ("DeactivateSprite ('%s')", element_iter->Name ());
-
-          write_track_key (writer, duration, event_string.c_str (), "Event");
-        }
-
-        {
-          const PropertyAnimation               &skew_x_track = frame_iter->Animation ().Properties () ["headContainer.Transformation.Skew_X"],
-                                                &skew_y_track = frame_iter->Animation ().Properties () ["headContainer.Transformation.Skew_Y"];
-          const PropertyAnimation::KeyframeList &x_keyframes  = skew_x_track.Keyframes (),
-                                                &y_keyframes  = skew_y_track.Keyframes ();
-
-          if (skew_x_track.Enabled () && skew_y_track.Enabled ())
-          {
-            for (size_t j = 0, count = x_keyframes.Size (); j < count; j++)
-            {
-              const PropertyAnimationKeyframe &x_keyframe = x_keyframes [j],
-                                              &y_keyframe = y_keyframes [j];
-
-              if (!params.silent && (x_keyframe.value || y_keyframe.value))
-                printf ("Unsupported animation for frame element '%s' of layer '%s', skew not supported\n", element_iter->Name (), layer.Name ());
-            }
-          }
-        }
+        
+        break;
       }
+      case LayerType_Instance:
+      {
+        process_symbol_instance (params, data, layer.Frames ()[0u], name_prefix.c_str ());
+        
+          //регистрация события запуска
+        
+        Event event;          
+        
+        event.time   = layer.Frames ()[0u].FirstFrame () / data.document.FrameRate ();
+        event.action = common::format ("ActivateSprite ('%s')", name_prefix.c_str ());
+        
+        events.push_back (event);
+        
+        break;
+      }
+      default:
+        error ("Undefined layer '%s' type", layer.Name ());
+        break;
+    }    
   }
+}
 
-  XmlWriter::Scope sprite_scope (writer, "Sprite");
+void process_timeline (Params& params, ConvertData& data)
+{
+  if (params.output_scene_file_name.empty ())
+    return; //в случае отсутствия файла сцены - экспорт не производится
+    
+  if (!params.silent)
+    printf ("Processing scene...\n");
 
-  writer.WriteAttribute ("Name", "_____SpriteManager_____");
-  writer.WriteAttribute ("Material", "transparent");
+  data.scene_writer = stl::auto_ptr<XmlWriter> (new XmlWriter (params.output_scene_file_name.c_str ()));
+  
+  XmlWriter::Scope scope (*data.scene_writer, "AnimationScreenPart");
+  
+  EventList events;
 
-  XmlWriter::Scope track_scope (writer, "Track");
+  process_timeline (params, data, data.document.Timelines ()[0u], data.document.Timelines ()[0u].Name (), events);
+  
+  XmlWriter::Scope sprite_scope (*data.scene_writer, "Sprite");
 
-  writer.WriteAttribute ("Name", "events");
-
-  for (ActivateSpritesMap::const_iterator iter = activate_sprites_info.begin (), end = activate_sprites_info.end (); iter != end; ++iter)
-    write_track_key (writer, iter->first, iter->second.c_str (), "Event");
+  write_timeline_sprite_data (data, data.document.Timelines ()[0u].Name (), events);  
 }
 
 //построение списка используемых символов
 void build_used_symbols (const Params& params, const Timeline& timeline, UsedResourcesSet& used_symbols)
 {
+    //построение списка исключенных их конвертации слоёв
+
   common::StringArray layers_exclude_list = common::split (params.layers_exclude.c_str ());
+  
+    //обход слоёв
 
   for (Timeline::LayerList::ConstIterator layer_iter = timeline.Layers ().CreateIterator (); layer_iter; ++layer_iter)
   {
-    bool ignore_layer = false;
+    const Layer& layer = *layer_iter;
+    
+    if (is_present (layer.Name (), layers_exclude_list))
+      continue; //пропускаем исключенные слои
+      
+      //обход фреймов данного слоя
 
-    for (size_t i = 0, count = layers_exclude_list.Size (); i < count; i++)
+    for (Layer::FrameList::ConstIterator frame_iter = layer.Frames ().CreateIterator (); frame_iter; ++frame_iter)
     {
-      const char* mask = layers_exclude_list [i];
-
-      if (common::wcmatch (layer_iter->Name (), mask))
-      {
-        ignore_layer = true;
-        break;
-      }
-    }
-
-    if (ignore_layer)
-      continue;
-
-    for (Layer::FrameList::ConstIterator frame_iter = layer_iter->Frames ().CreateIterator (); frame_iter; ++frame_iter)
+        //обход элементов фрейма 
+      
       for (Frame::FrameElementList::ConstIterator element_iter = frame_iter->Elements ().CreateIterator (); element_iter; ++element_iter)
       {
         if (element_iter->Type () != FrameElementType_SymbolInstance)
@@ -1277,6 +1199,7 @@ void build_used_symbols (const Params& params, const Timeline& timeline, UsedRes
 
         used_symbols.insert (element_iter->Name ());
       }
+    }
   }
 }
 
@@ -1289,57 +1212,38 @@ void export_data (Params& params)
     params.xfl_name = XFL_MOUNT_POINT;
   }
 
-  Document document (params.xfl_name.c_str ());
-
-  size_t document_width  = document.Width (),
-         document_height = document.Height ();
-
-  if (!params.target_width || !params.target_height)
-  {
-    params.target_width  = static_cast<float> (document_width);
-    params.target_height = static_cast<float> (document_height);
-    params.right_x       = params.left_x + params.target_width;
-    params.bottom_y      = params.top_y - params.target_height;
+  ConvertData data;
+  
+    //открытие документа
+    
+  {  
+    Document document (params.xfl_name.c_str ());
+    
+    if (!document.Timelines ().Size ())
+      error ("No timelines in XFL file");
+  
+    if (document.Timelines ().Size () > 1)
+      error ("More than one timeline in XFL file");
+    
+    data.document.Swap (document);
   }
+  
+    //построение списка используемых символов
 
-  float document_aspect_ratio = document_width / (float)document_height;
-
-  if (!params.resize_width && params.resize_height)
-  {
-    params.resize_width = static_cast<size_t> (params.resize_height * document_aspect_ratio);
-  }
-  else if (params.resize_width && !params.resize_height)
-  {
-    params.resize_height = static_cast<size_t> (params.resize_width / document_aspect_ratio);
-  }
-
-  if (params.resize_width && params.resize_height)
-  {
-    float resize_aspect_ratio = params.resize_width / (float)params.resize_height;
-
-    if (!float_compare (document_aspect_ratio, resize_aspect_ratio) && !params.silent)
-      printf ("Requested resize %u %u will greatly change image aspect ratio %f\n", params.resize_width, params.resize_height, document_aspect_ratio);
-  }
-
-  if ((params.resize_width > document_width || params.resize_height > document_height) && !params.silent)
-    printf ("Requested resize to bigger size, image quality will be reduced\n");
-
-  ResourceTilingMap     tiling_map;
-  MaterialInstancesMap  material_instances;
-  UsedResourcesSet      used_symbols;
-  FullscreenSymbolsSet  fullscreen_symbols;
-  ResourceDimensionsMap resource_dimensions;
-  ResourceCropMap       resource_crops;
-
-  for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
-    build_used_symbols (params, *iter, used_symbols);
-
-  preprocess_symbols (params, document, used_symbols, tiling_map, material_instances, resource_dimensions, fullscreen_symbols, resource_crops);
-
-  for (Document::TimelineList::ConstIterator iter = document.Timelines ().CreateIterator (); iter; ++iter)
-    save_timeline (params, document, *iter, resource_dimensions, fullscreen_symbols, resource_crops);
-
-  save_materials (params, document, tiling_map, material_instances);
+  for (Document::TimelineList::ConstIterator iter = data.document.Timelines ().CreateIterator (); iter; ++iter)
+    build_used_symbols (params, *iter, data.used_symbols);
+    
+    //обработка текстур
+    
+  process_textures (params, data);
+  
+    //обработка таймлайна
+    
+  process_timeline (params, data);
+    
+    //обработка материалов
+    
+  process_materials (params, data);
 }
 
 //проверка корректности ввода
@@ -1351,25 +1255,6 @@ void validate (Params& params)
     error ("no input file");
     return;
   }
-
-  if (params.output_textures_dir_name.empty ())
-    params.output_textures_dir_name = common::notdir (common::basename (params.xfl_name));
-
-  if (!params.target_width || !params.target_height)
-  {
-    if (params.left_x == params.right_x || params.top_y == params.bottom_y)
-      params.left_x = params.right_x = params.top_y = params.bottom_y = params.target_width = params.target_height = 0;
-    else
-    {
-      params.target_width  = params.right_x - params.left_x;
-      params.target_height = params.top_y - params.bottom_y;
-    }
-  }
-  else
-  {
-    params.right_x  = params.left_x + params.target_width;
-    params.bottom_y = params.top_y - params.target_height;
-  }
 }
 
 int main (int argc, const char *argv[])
@@ -1379,22 +1264,16 @@ int main (int argc, const char *argv[])
       //инициализация
     Params params;
 
-    params.options                = 0;
-    params.options_count          = 0;
-    params.textures_format        = "png";
-    params.crop_alpha             = 0;
-    params.resize_width           = 0;
-    params.resize_height          = 0;
-    params.left_x                 = 0;
-    params.right_x                = 0;
-    params.top_y                  = 0;
-    params.bottom_y               = 0;
-    params.target_width           = 0;
-    params.target_height          = 0;
-    params.silent                 = false;
-    params.print_help             = false;
-    params.need_pot_extent        = false;
-    params.need_crop_alpha        = false;
+    params.options           = 0;
+    params.options_count     = 0;
+    params.crop_alpha        = 0;
+    params.silent            = false;
+    params.print_help        = false;
+    params.need_pot_extent   = false;
+    params.need_crop_alpha   = false;
+    params.need_inverse_x    = false;
+    params.need_inverse_y    = false;
+    params.need_after_sprite = false;
 
       //разбор командной строки
     command_line_parse (argc, argv, params);

@@ -1,0 +1,832 @@
+Results of xfl_converter_test1
+Processing textures...
+  crop layer '/mount_points/animation.xfl/LIBRARY/ghost_left_movenment-clarices_bedroom.psd/1.png' 107x415: (23, 4)-(88, 271)
+  crop layer '/mount_points/animation.xfl/LIBRARY/ghost_left_static-clarices_bedroom.psd/1.png' 194x411: (37, 4)-(156, 368)
+  crop layer '/mount_points/animation.xfl/LIBRARY/ghost_left_background-clarices_bedroom.psd/1.png' 158x504: (40, 33)-(93, 431)
+Processing scene...
+<?xml version="1.0" encoding="utf-8"?>
+<AnimationScreenPart>
+  <Sprite Name="ghost_left_group.ghost_left_movenment.Layer 1" Material="ghost_left_movenment-clarices_bedroom.psd/1.png" Parent="ghost_left_group.ghost_left_movenment" ScaleInherit="false" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" Active="false" PivotPosition="-0.715;-0.510">
+    <Track Name="size">
+      <Key Time="0" Value="65; 267"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="55.500; 137.500"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="ghost_left_group.ghost_left_movenment" Material="transparent" Active="false" Z="0">
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('ghost_left_group.ghost_left_movenment.Layer 1')"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="225.000; 185.000"/>
+      <Key Time="0.0333333" Value="224.989; 185.137"/>
+      <Key Time="0.0666667" Value="224.968; 185.274"/>
+      <Key Time="0.1" Value="224.945; 185.409"/>
+      <Key Time="0.133333" Value="224.922; 185.542"/>
+      <Key Time="0.166667" Value="224.901; 185.674"/>
+      <Key Time="0.2" Value="224.883; 185.808"/>
+      <Key Time="0.233333" Value="224.868; 185.945"/>
+      <Key Time="0.266667" Value="224.857; 186.082"/>
+      <Key Time="0.3" Value="224.852; 186.219"/>
+      <Key Time="0.333333" Value="224.854; 186.356"/>
+      <Key Time="0.366667" Value="224.863; 186.492"/>
+      <Key Time="0.4" Value="224.881; 186.627"/>
+      <Key Time="0.433333" Value="224.910; 186.758"/>
+      <Key Time="0.466667" Value="224.951; 186.886"/>
+      <Key Time="0.5" Value="225.007; 187.015"/>
+      <Key Time="0.533333" Value="225.101; 187.187"/>
+      <Key Time="0.566667" Value="225.203; 187.356"/>
+      <Key Time="0.6" Value="225.309; 187.520"/>
+      <Key Time="0.633333" Value="225.420; 187.680"/>
+      <Key Time="0.666667" Value="225.535; 187.836"/>
+      <Key Time="0.7" Value="225.654; 187.990"/>
+      <Key Time="0.733333" Value="225.779; 188.140"/>
+      <Key Time="0.766667" Value="225.909; 188.287"/>
+      <Key Time="0.8" Value="226.044; 188.429"/>
+      <Key Time="0.833333" Value="226.186; 188.565"/>
+      <Key Time="0.866667" Value="226.336; 188.693"/>
+      <Key Time="0.9" Value="226.494; 188.810"/>
+      <Key Time="0.933333" Value="226.662; 188.908"/>
+      <Key Time="0.966667" Value="226.841; 188.977"/>
+      <Key Time="1" Value="227.033; 188.999"/>
+      <Key Time="1.03333" Value="227.237; 188.959"/>
+      <Key Time="1.06667" Value="227.435; 188.884"/>
+      <Key Time="1.1" Value="227.622; 188.791"/>
+      <Key Time="1.13333" Value="227.800; 188.687"/>
+      <Key Time="1.16667" Value="227.970; 188.574"/>
+      <Key Time="1.2" Value="228.133; 188.453"/>
+      <Key Time="1.23333" Value="228.290; 188.325"/>
+      <Key Time="1.26667" Value="228.441; 188.188"/>
+      <Key Time="1.3" Value="228.586; 188.042"/>
+      <Key Time="1.33333" Value="228.721; 187.887"/>
+      <Key Time="1.36667" Value="228.844; 187.721"/>
+      <Key Time="1.4" Value="228.948; 187.543"/>
+      <Key Time="1.43333" Value="229.022; 187.350"/>
+      <Key Time="1.46667" Value="229.041; 187.146"/>
+      <Key Time="1.5" Value="228.961; 186.935"/>
+      <Key Time="1.53333" Value="228.750; 186.714"/>
+      <Key Time="1.56667" Value="228.508; 186.528"/>
+      <Key Time="1.6" Value="228.256; 186.360"/>
+      <Key Time="1.63333" Value="227.996; 186.204"/>
+      <Key Time="1.66667" Value="227.729; 186.056"/>
+      <Key Time="1.7" Value="227.460; 185.915"/>
+      <Key Time="1.73333" Value="227.188; 185.780"/>
+      <Key Time="1.76667" Value="226.913; 185.651"/>
+      <Key Time="1.8" Value="226.635; 185.527"/>
+      <Key Time="1.83333" Value="226.354; 185.409"/>
+      <Key Time="1.86667" Value="226.071; 185.297"/>
+      <Key Time="1.9" Value="225.789; 185.194"/>
+      <Key Time="1.93333" Value="225.501; 185.101"/>
+      <Key Time="1.96667" Value="225.202; 185.025"/>
+      <Key Time="2" Value="224.949; 185.003"/>
+      <Key Time="2.03333" Value="224.806; 185.051"/>
+      <Key Time="2.06667" Value="224.702; 185.160"/>
+      <Key Time="2.1" Value="224.645; 185.300"/>
+      <Key Time="2.13333" Value="224.620; 185.450"/>
+      <Key Time="2.16667" Value="224.616; 185.603"/>
+      <Key Time="2.2" Value="224.625; 185.755"/>
+      <Key Time="2.23333" Value="224.646; 185.906"/>
+      <Key Time="2.26667" Value="224.674; 186.055"/>
+      <Key Time="2.3" Value="224.708; 186.202"/>
+      <Key Time="2.33333" Value="224.748; 186.348"/>
+      <Key Time="2.36667" Value="224.794; 186.493"/>
+      <Key Time="2.4" Value="224.844; 186.637"/>
+      <Key Time="2.43333" Value="224.900; 186.780"/>
+      <Key Time="2.46667" Value="224.962; 186.920"/>
+      <Key Time="2.5" Value="225.037; 187.072"/>
+      <Key Time="2.53333" Value="225.134; 187.244"/>
+      <Key Time="2.56667" Value="225.238; 187.411"/>
+      <Key Time="2.6" Value="225.346; 187.574"/>
+      <Key Time="2.63333" Value="225.458; 187.733"/>
+      <Key Time="2.66667" Value="225.574; 187.888"/>
+      <Key Time="2.7" Value="225.695; 188.041"/>
+      <Key Time="2.73333" Value="225.822; 188.190"/>
+      <Key Time="2.76667" Value="225.954; 188.335"/>
+      <Key Time="2.8" Value="226.091; 188.476"/>
+      <Key Time="2.83333" Value="226.236; 188.609"/>
+      <Key Time="2.86667" Value="226.388; 188.734"/>
+      <Key Time="2.9" Value="226.550; 188.845"/>
+      <Key Time="2.93333" Value="226.721; 188.935"/>
+      <Key Time="2.96667" Value="226.904; 188.991"/>
+      <Key Time="3" Value="227.102; 188.991"/>
+      <Key Time="3.03333" Value="227.305; 188.937"/>
+      <Key Time="3.06667" Value="227.499; 188.855"/>
+      <Key Time="3.1" Value="227.683; 188.757"/>
+      <Key Time="3.13333" Value="227.858; 188.650"/>
+      <Key Time="3.16667" Value="228.025; 188.534"/>
+      <Key Time="3.2" Value="228.186; 188.412"/>
+      <Key Time="3.23333" Value="228.341; 188.281"/>
+      <Key Time="3.26667" Value="228.490; 188.141"/>
+      <Key Time="3.3" Value="228.632; 187.992"/>
+      <Key Time="3.33333" Value="228.764; 187.833"/>
+      <Key Time="3.36667" Value="228.881; 187.664"/>
+      <Key Time="3.4" Value="228.977; 187.482"/>
+      <Key Time="3.43333" Value="229.036; 187.283"/>
+      <Key Time="3.46667" Value="229.030; 187.080"/>
+      <Key Time="3.5" Value="228.898; 186.857"/>
+      <Key Time="3.53333" Value="228.672; 186.650"/>
+      <Key Time="3.56667" Value="228.425; 186.470"/>
+      <Key Time="3.6" Value="228.170; 186.307"/>
+      <Key Time="3.63333" Value="227.908; 186.154"/>
+      <Key Time="3.66667" Value="227.640; 186.008"/>
+      <Key Time="3.7" Value="227.370; 185.869"/>
+      <Key Time="3.73333" Value="227.096; 185.736"/>
+      <Key Time="3.76667" Value="226.820; 185.609"/>
+      <Key Time="3.8" Value="226.541; 185.487"/>
+      <Key Time="3.83333" Value="226.260; 185.371"/>
+      <Key Time="3.86667" Value="225.977; 185.261"/>
+      <Key Time="3.9" Value="225.693; 185.161"/>
+      <Key Time="3.93333" Value="225.402; 185.072"/>
+      <Key Time="3.96667" Value="225.099; 185.007"/>
+      <Key Time="4" Value="224.898; 185.012"/>
+      <Key Time="4.03333" Value="224.765; 185.082"/>
+      <Key Time="4.06667" Value="224.678; 185.205"/>
+      <Key Time="4.1" Value="224.633; 185.350"/>
+      <Key Time="4.13333" Value="224.616; 185.501"/>
+      <Key Time="4.16667" Value="224.618; 185.654"/>
+      <Key Time="4.2" Value="224.631; 185.806"/>
+      <Key Time="4.23333" Value="224.654; 185.956"/>
+      <Key Time="4.26667" Value="224.684; 186.104"/>
+      <Key Time="4.3" Value="224.721; 186.251"/>
+      <Key Time="4.33333" Value="224.763; 186.397"/>
+      <Key Time="4.36667" Value="224.810; 186.542"/>
+      <Key Time="4.4" Value="224.862; 186.685"/>
+      <Key Time="4.43333" Value="224.920; 186.827"/>
+      <Key Time="4.46667" Value="224.983; 186.966"/>
+      <Key Time="4.5" Value="225.069; 187.130"/>
+      <Key Time="4.53333" Value="225.168; 187.300"/>
+      <Key Time="4.56667" Value="225.274; 187.466"/>
+      <Key Time="4.6" Value="225.383; 187.628"/>
+      <Key Time="4.63333" Value="225.496; 187.785"/>
+      <Key Time="4.66667" Value="225.614; 187.939"/>
+      <Key Time="4.7" Value="225.737; 188.091"/>
+      <Key Time="4.73333" Value="225.865; 188.239"/>
+      <Key Time="4.76667" Value="225.999; 188.383"/>
+      <Key Time="4.8" Value="226.139; 188.521"/>
+      <Key Time="4.83333" Value="226.286; 188.652"/>
+      <Key Time="4.86667" Value="226.441; 188.773"/>
+      <Key Time="4.9" Value="226.606; 188.878"/>
+      <Key Time="4.93333" Value="226.781; 188.959"/>
+      <Key Time="4.96667" Value="226.968; 188.999"/>
+      <Key Time="5" Value="227.171; 188.977"/>
+      <Key Time="5.03333" Value="227.371; 188.911"/>
+      <Key Time="5.06667" Value="227.561; 188.823"/>
+      <Key Time="5.1" Value="227.743; 188.722"/>
+      <Key Time="5.13333" Value="227.915; 188.612"/>
+      <Key Time="5.16667" Value="228.080; 188.494"/>
+      <Key Time="5.2" Value="228.239; 188.369"/>
+      <Key Time="5.23333" Value="228.392; 188.235"/>
+      <Key Time="5.26667" Value="228.539; 188.092"/>
+      <Key Time="5.3" Value="228.678; 187.940"/>
+      <Key Time="5.33333" Value="228.805; 187.778"/>
+      <Key Time="5.36667" Value="228.916; 187.604"/>
+      <Key Time="5.4" Value="229.002; 187.417"/>
+      <Key Time="5.43333" Value="229.043; 187.214"/>
+      <Key Time="5.46667" Value="229.007; 187.015"/>
+      <Key Time="5.5" Value="228.824; 186.790"/>
+      <Key Time="5.53333" Value="228.580; 186.607"/>
+      <Key Time="5.56667" Value="228.322; 186.450"/>
+      <Key Time="5.6" Value="228.056; 186.307"/>
+      <Key Time="5.63333" Value="227.785; 186.172"/>
+      <Key Time="5.66667" Value="227.511; 186.045"/>
+      <Key Time="5.7" Value="227.235; 185.922"/>
+      <Key Time="5.73333" Value="226.957; 185.804"/>
+      <Key Time="5.76667" Value="226.678; 185.688"/>
+      <Key Time="5.8" Value="226.398; 185.574"/>
+      <Key Time="5.83333" Value="226.117; 185.462"/>
+      <Key Time="5.86667" Value="225.839; 185.351"/>
+      <Key Time="5.9" Value="225.561; 185.240"/>
+      <Key Time="5.93333" Value="225.279; 185.125"/>
+      <Key Time="5.96667" Value="225.000; 185.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="0"/>
+      <Key Time="0.0333333" Value="0.0121889"/>
+      <Key Time="0.0666667" Value="0.0243778"/>
+      <Key Time="0.1" Value="0.0365666"/>
+      <Key Time="0.133333" Value="0.0487555"/>
+      <Key Time="0.166667" Value="0.0609444"/>
+      <Key Time="0.2" Value="0.0731333"/>
+      <Key Time="0.233333" Value="0.0853222"/>
+      <Key Time="0.266667" Value="0.097511"/>
+      <Key Time="0.3" Value="0.1097"/>
+      <Key Time="0.333333" Value="0.121889"/>
+      <Key Time="0.366667" Value="0.134078"/>
+      <Key Time="0.4" Value="0.146267"/>
+      <Key Time="0.433333" Value="0.158455"/>
+      <Key Time="0.466667" Value="0.170644"/>
+      <Key Time="0.5" Value="0.182833"/>
+      <Key Time="0.533333" Value="0.195022"/>
+      <Key Time="0.566667" Value="0.207211"/>
+      <Key Time="0.6" Value="0.2194"/>
+      <Key Time="0.633333" Value="0.231589"/>
+      <Key Time="0.666667" Value="0.243778"/>
+      <Key Time="0.7" Value="0.255966"/>
+      <Key Time="0.733333" Value="0.268155"/>
+      <Key Time="0.766667" Value="0.280344"/>
+      <Key Time="0.8" Value="0.292533"/>
+      <Key Time="0.833333" Value="0.304722"/>
+      <Key Time="0.866667" Value="0.316911"/>
+      <Key Time="0.9" Value="0.3291"/>
+      <Key Time="0.933333" Value="0.341289"/>
+      <Key Time="0.966667" Value="0.353478"/>
+      <Key Time="1" Value="0.365666"/>
+      <Key Time="1.03333" Value="0.377855"/>
+      <Key Time="1.06667" Value="0.390044"/>
+      <Key Time="1.1" Value="0.402233"/>
+      <Key Time="1.13333" Value="0.414422"/>
+      <Key Time="1.16667" Value="0.426611"/>
+      <Key Time="1.2" Value="0.4388"/>
+      <Key Time="1.23333" Value="0.450989"/>
+      <Key Time="1.26667" Value="0.463177"/>
+      <Key Time="1.3" Value="0.475366"/>
+      <Key Time="1.33333" Value="0.487555"/>
+      <Key Time="1.36667" Value="0.499744"/>
+      <Key Time="1.4" Value="0.511933"/>
+      <Key Time="1.43333" Value="0.524122"/>
+      <Key Time="1.46667" Value="0.536311"/>
+      <Key Time="1.5" Value="0.5485"/>
+      <Key Time="1.53333" Value="0.560688"/>
+      <Key Time="1.56667" Value="0.572877"/>
+      <Key Time="1.6" Value="0.585066"/>
+      <Key Time="1.63333" Value="0.597255"/>
+      <Key Time="1.66667" Value="0.609444"/>
+      <Key Time="1.7" Value="0.621633"/>
+      <Key Time="1.73333" Value="0.633822"/>
+      <Key Time="1.76667" Value="0.646011"/>
+      <Key Time="1.8" Value="0.6582"/>
+      <Key Time="1.83333" Value="0.670388"/>
+      <Key Time="1.86667" Value="0.682577"/>
+      <Key Time="1.9" Value="0.694766"/>
+      <Key Time="1.93333" Value="0.706955"/>
+      <Key Time="1.96667" Value="0.719144"/>
+      <Key Time="2" Value="0.731333"/>
+      <Key Time="2.03333" Value="0.743522"/>
+      <Key Time="2.06667" Value="0.755711"/>
+      <Key Time="2.1" Value="0.767899"/>
+      <Key Time="2.13333" Value="0.780088"/>
+      <Key Time="2.16667" Value="0.792277"/>
+      <Key Time="2.2" Value="0.804466"/>
+      <Key Time="2.23333" Value="0.816655"/>
+      <Key Time="2.26667" Value="0.828844"/>
+      <Key Time="2.3" Value="0.841033"/>
+      <Key Time="2.33333" Value="0.853222"/>
+      <Key Time="2.36667" Value="0.86541"/>
+      <Key Time="2.4" Value="0.877599"/>
+      <Key Time="2.43333" Value="0.889788"/>
+      <Key Time="2.46667" Value="0.901977"/>
+      <Key Time="2.5" Value="0.914166"/>
+      <Key Time="2.53333" Value="0.926355"/>
+      <Key Time="2.56667" Value="0.938544"/>
+      <Key Time="2.6" Value="0.950733"/>
+      <Key Time="2.63333" Value="0.962922"/>
+      <Key Time="2.66667" Value="0.97511"/>
+      <Key Time="2.7" Value="0.987299"/>
+      <Key Time="2.73333" Value="0.999488"/>
+      <Key Time="2.76667" Value="1"/>
+      <Key Time="3.26667" Value="1"/>
+      <Key Time="3.3" Value="0.997795"/>
+      <Key Time="3.33333" Value="0.985323"/>
+      <Key Time="3.36667" Value="0.972851"/>
+      <Key Time="3.4" Value="0.960378"/>
+      <Key Time="3.43333" Value="0.947906"/>
+      <Key Time="3.46667" Value="0.935433"/>
+      <Key Time="3.5" Value="0.922961"/>
+      <Key Time="3.53333" Value="0.910488"/>
+      <Key Time="3.56667" Value="0.898016"/>
+      <Key Time="3.6" Value="0.885543"/>
+      <Key Time="3.63333" Value="0.873071"/>
+      <Key Time="3.66667" Value="0.860599"/>
+      <Key Time="3.7" Value="0.848126"/>
+      <Key Time="3.73333" Value="0.835654"/>
+      <Key Time="3.76667" Value="0.823181"/>
+      <Key Time="3.8" Value="0.810709"/>
+      <Key Time="3.83333" Value="0.798236"/>
+      <Key Time="3.86667" Value="0.785764"/>
+      <Key Time="3.9" Value="0.773291"/>
+      <Key Time="3.93333" Value="0.760819"/>
+      <Key Time="3.96667" Value="0.748347"/>
+      <Key Time="4" Value="0.735874"/>
+      <Key Time="4.03333" Value="0.723402"/>
+      <Key Time="4.06667" Value="0.710929"/>
+      <Key Time="4.1" Value="0.698457"/>
+      <Key Time="4.13333" Value="0.685984"/>
+      <Key Time="4.16667" Value="0.673512"/>
+      <Key Time="4.2" Value="0.661039"/>
+      <Key Time="4.23333" Value="0.648567"/>
+      <Key Time="4.26667" Value="0.636095"/>
+      <Key Time="4.3" Value="0.623622"/>
+      <Key Time="4.33333" Value="0.61115"/>
+      <Key Time="4.36667" Value="0.598677"/>
+      <Key Time="4.4" Value="0.586205"/>
+      <Key Time="4.43333" Value="0.573732"/>
+      <Key Time="4.46667" Value="0.56126"/>
+      <Key Time="4.5" Value="0.548787"/>
+      <Key Time="4.53333" Value="0.536315"/>
+      <Key Time="4.56667" Value="0.523843"/>
+      <Key Time="4.6" Value="0.51137"/>
+      <Key Time="4.63333" Value="0.498898"/>
+      <Key Time="4.66667" Value="0.486425"/>
+      <Key Time="4.7" Value="0.473953"/>
+      <Key Time="4.73333" Value="0.46148"/>
+      <Key Time="4.76667" Value="0.449008"/>
+      <Key Time="4.8" Value="0.436535"/>
+      <Key Time="4.83333" Value="0.424063"/>
+      <Key Time="4.86667" Value="0.411591"/>
+      <Key Time="4.9" Value="0.399118"/>
+      <Key Time="4.93333" Value="0.386646"/>
+      <Key Time="4.96667" Value="0.374173"/>
+      <Key Time="5" Value="0.361701"/>
+      <Key Time="5.03333" Value="0.349228"/>
+      <Key Time="5.06667" Value="0.336756"/>
+      <Key Time="5.1" Value="0.324284"/>
+      <Key Time="5.13333" Value="0.311811"/>
+      <Key Time="5.16667" Value="0.299339"/>
+      <Key Time="5.2" Value="0.286866"/>
+      <Key Time="5.23333" Value="0.274394"/>
+      <Key Time="5.26667" Value="0.261921"/>
+      <Key Time="5.3" Value="0.249449"/>
+      <Key Time="5.33333" Value="0.236976"/>
+      <Key Time="5.36667" Value="0.224504"/>
+      <Key Time="5.4" Value="0.212032"/>
+      <Key Time="5.43333" Value="0.199559"/>
+      <Key Time="5.46667" Value="0.187087"/>
+      <Key Time="5.5" Value="0.174614"/>
+      <Key Time="5.53333" Value="0.162142"/>
+      <Key Time="5.56667" Value="0.149669"/>
+      <Key Time="5.6" Value="0.137197"/>
+      <Key Time="5.63333" Value="0.124724"/>
+      <Key Time="5.66667" Value="0.112252"/>
+      <Key Time="5.7" Value="0.0997795"/>
+      <Key Time="5.73333" Value="0.0873071"/>
+      <Key Time="5.76667" Value="0.0748347"/>
+      <Key Time="5.8" Value="0.0623622"/>
+      <Key Time="5.83333" Value="0.0498898"/>
+      <Key Time="5.86667" Value="0.0374173"/>
+      <Key Time="5.9" Value="0.0249449"/>
+      <Key Time="5.93333" Value="0.0124724"/>
+      <Key Time="5.96667" Value="0"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="ghost_left_group.ghost_left_static.Layer 1" Material="ghost_left_static-clarices_bedroom.psd/1.png" Parent="ghost_left_group.ghost_left_static" ScaleInherit="false" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" Active="false" PivotPosition="-0.691;-0.510">
+    <Track Name="size">
+      <Key Time="0" Value="119; 364"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="96.500; 186.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="ghost_left_group.ghost_left_static" Material="transparent" Active="false" Z="0">
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('ghost_left_group.ghost_left_static.Layer 1')"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="208.000; 185.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="0"/>
+      <Key Time="1.36667" Value="0"/>
+      <Key Time="1.4" Value="0.0216116"/>
+      <Key Time="1.43333" Value="0.0432232"/>
+      <Key Time="1.46667" Value="0.0648347"/>
+      <Key Time="1.5" Value="0.0864463"/>
+      <Key Time="1.53333" Value="0.108058"/>
+      <Key Time="1.56667" Value="0.129669"/>
+      <Key Time="1.6" Value="0.151281"/>
+      <Key Time="1.63333" Value="0.172893"/>
+      <Key Time="1.66667" Value="0.194504"/>
+      <Key Time="1.7" Value="0.216116"/>
+      <Key Time="1.73333" Value="0.237727"/>
+      <Key Time="1.76667" Value="0.259339"/>
+      <Key Time="1.8" Value="0.280951"/>
+      <Key Time="1.83333" Value="0.302562"/>
+      <Key Time="1.86667" Value="0.324174"/>
+      <Key Time="1.9" Value="0.345785"/>
+      <Key Time="1.93333" Value="0.367397"/>
+      <Key Time="1.96667" Value="0.389008"/>
+      <Key Time="2" Value="0.41062"/>
+      <Key Time="2.03333" Value="0.432232"/>
+      <Key Time="2.06667" Value="0.453843"/>
+      <Key Time="2.1" Value="0.475455"/>
+      <Key Time="2.13333" Value="0.497066"/>
+      <Key Time="2.16667" Value="0.518678"/>
+      <Key Time="2.2" Value="0.54029"/>
+      <Key Time="2.23333" Value="0.561901"/>
+      <Key Time="2.26667" Value="0.583513"/>
+      <Key Time="2.3" Value="0.605124"/>
+      <Key Time="2.33333" Value="0.626736"/>
+      <Key Time="2.36667" Value="0.648347"/>
+      <Key Time="2.4" Value="0.669959"/>
+      <Key Time="2.43333" Value="0.691571"/>
+      <Key Time="2.46667" Value="0.713182"/>
+      <Key Time="2.5" Value="0.734794"/>
+      <Key Time="2.53333" Value="0.756405"/>
+      <Key Time="2.56667" Value="0.778017"/>
+      <Key Time="2.6" Value="0.799629"/>
+      <Key Time="2.63333" Value="0.82124"/>
+      <Key Time="2.66667" Value="0.842852"/>
+      <Key Time="2.7" Value="0.864463"/>
+      <Key Time="2.73333" Value="0.886075"/>
+      <Key Time="2.76667" Value="0.907686"/>
+      <Key Time="2.8" Value="0.929298"/>
+      <Key Time="2.83333" Value="0.95091"/>
+      <Key Time="2.86667" Value="0.972521"/>
+      <Key Time="2.9" Value="0.994133"/>
+      <Key Time="2.93333" Value="1"/>
+      <Key Time="3.06667" Value="1"/>
+      <Key Time="3.1" Value="0.992702"/>
+      <Key Time="3.13333" Value="0.973972"/>
+      <Key Time="3.16667" Value="0.955241"/>
+      <Key Time="3.2" Value="0.936511"/>
+      <Key Time="3.23333" Value="0.917781"/>
+      <Key Time="3.26667" Value="0.899051"/>
+      <Key Time="3.3" Value="0.88032"/>
+      <Key Time="3.33333" Value="0.86159"/>
+      <Key Time="3.36667" Value="0.84286"/>
+      <Key Time="3.4" Value="0.82413"/>
+      <Key Time="3.43333" Value="0.8054"/>
+      <Key Time="3.46667" Value="0.786669"/>
+      <Key Time="3.5" Value="0.767939"/>
+      <Key Time="3.53333" Value="0.749209"/>
+      <Key Time="3.56667" Value="0.730479"/>
+      <Key Time="3.6" Value="0.711748"/>
+      <Key Time="3.63333" Value="0.693018"/>
+      <Key Time="3.66667" Value="0.674288"/>
+      <Key Time="3.7" Value="0.655558"/>
+      <Key Time="3.73333" Value="0.636828"/>
+      <Key Time="3.76667" Value="0.618097"/>
+      <Key Time="3.8" Value="0.599367"/>
+      <Key Time="3.83333" Value="0.580637"/>
+      <Key Time="3.86667" Value="0.561907"/>
+      <Key Time="3.9" Value="0.543176"/>
+      <Key Time="3.93333" Value="0.524446"/>
+      <Key Time="3.96667" Value="0.505716"/>
+      <Key Time="4" Value="0.486986"/>
+      <Key Time="4.03333" Value="0.468256"/>
+      <Key Time="4.06667" Value="0.449525"/>
+      <Key Time="4.1" Value="0.430795"/>
+      <Key Time="4.13333" Value="0.412065"/>
+      <Key Time="4.16667" Value="0.393335"/>
+      <Key Time="4.2" Value="0.374604"/>
+      <Key Time="4.23333" Value="0.355874"/>
+      <Key Time="4.26667" Value="0.337144"/>
+      <Key Time="4.3" Value="0.318414"/>
+      <Key Time="4.33333" Value="0.299684"/>
+      <Key Time="4.36667" Value="0.280953"/>
+      <Key Time="4.4" Value="0.262223"/>
+      <Key Time="4.43333" Value="0.243493"/>
+      <Key Time="4.46667" Value="0.224763"/>
+      <Key Time="4.5" Value="0.206032"/>
+      <Key Time="4.53333" Value="0.187302"/>
+      <Key Time="4.56667" Value="0.168572"/>
+      <Key Time="4.6" Value="0.149842"/>
+      <Key Time="4.63333" Value="0.131112"/>
+      <Key Time="4.66667" Value="0.112381"/>
+      <Key Time="4.7" Value="0.0936511"/>
+      <Key Time="4.73333" Value="0.0749209"/>
+      <Key Time="4.76667" Value="0.0561907"/>
+      <Key Time="4.8" Value="0.0374604"/>
+      <Key Time="4.83333" Value="0.0187302"/>
+      <Key Time="4.86667" Value="0"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="ghost_left_group.ghost_left_background.Layer 1" Material="ghost_left_background-clarices_bedroom.psd/1.png" Parent="ghost_left_group.ghost_left_background" ScaleInherit="false" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" Active="false" PivotPosition="-0.753;-0.565">
+    <Track Name="size">
+      <Key Time="0" Value="53; 398"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="66.500; 232.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="ghost_left_group.ghost_left_background" Material="transparent" Active="false" Z="0">
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('ghost_left_group.ghost_left_background.Layer 1')"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="209.000; 203.375"/>
+      <Key Time="0.0333333" Value="209.212; 203.369"/>
+      <Key Time="0.0666667" Value="209.424; 203.357"/>
+      <Key Time="0.1" Value="209.635; 203.337"/>
+      <Key Time="0.133333" Value="209.845; 203.310"/>
+      <Key Time="0.166667" Value="210.055; 203.277"/>
+      <Key Time="0.2" Value="210.263; 203.237"/>
+      <Key Time="0.233333" Value="210.470; 203.190"/>
+      <Key Time="0.266667" Value="210.676; 203.137"/>
+      <Key Time="0.3" Value="210.879; 203.077"/>
+      <Key Time="0.333333" Value="211.081; 203.010"/>
+      <Key Time="0.366667" Value="211.280; 202.936"/>
+      <Key Time="0.4" Value="211.476; 202.857"/>
+      <Key Time="0.433333" Value="211.669; 202.770"/>
+      <Key Time="0.466667" Value="211.860; 202.678"/>
+      <Key Time="0.5" Value="212.047; 202.578"/>
+      <Key Time="0.533333" Value="212.231; 202.473"/>
+      <Key Time="0.566667" Value="212.410; 202.361"/>
+      <Key Time="0.6" Value="212.586; 202.243"/>
+      <Key Time="0.633333" Value="212.758; 202.119"/>
+      <Key Time="0.666667" Value="212.924; 201.989"/>
+      <Key Time="0.7" Value="213.087; 201.853"/>
+      <Key Time="0.733333" Value="213.244; 201.711"/>
+      <Key Time="0.766667" Value="213.396; 201.563"/>
+      <Key Time="0.8" Value="213.542; 201.410"/>
+      <Key Time="0.833333" Value="213.683; 201.251"/>
+      <Key Time="0.866667" Value="213.817; 201.086"/>
+      <Key Time="0.9" Value="213.944; 200.917"/>
+      <Key Time="0.933333" Value="214.066; 200.743"/>
+      <Key Time="0.966667" Value="214.180; 200.565"/>
+      <Key Time="1" Value="214.287; 200.382"/>
+      <Key Time="1.03333" Value="214.386; 200.195"/>
+      <Key Time="1.06667" Value="214.479; 200.005"/>
+      <Key Time="1.1" Value="214.564; 199.811"/>
+      <Key Time="1.13333" Value="214.641; 199.614"/>
+      <Key Time="1.16667" Value="214.711; 199.415"/>
+      <Key Time="1.2" Value="214.773; 199.212"/>
+      <Key Time="1.23333" Value="214.828; 199.008"/>
+      <Key Time="1.26667" Value="214.875; 198.801"/>
+      <Key Time="1.3" Value="214.914; 198.593"/>
+      <Key Time="1.33333" Value="214.946; 198.383"/>
+      <Key Time="1.36667" Value="214.971; 198.173"/>
+      <Key Time="1.4" Value="214.988; 197.961"/>
+      <Key Time="1.43333" Value="214.998; 197.749"/>
+      <Key Time="1.46667" Value="215.002; 197.536"/>
+      <Key Time="1.5" Value="214.999; 197.324"/>
+      <Key Time="1.53333" Value="214.989; 197.112"/>
+      <Key Time="1.56667" Value="214.974; 196.900"/>
+      <Key Time="1.6" Value="214.953; 196.689"/>
+      <Key Time="1.63333" Value="214.926; 196.479"/>
+      <Key Time="1.66667" Value="214.892; 196.269"/>
+      <Key Time="1.7" Value="214.852; 196.062"/>
+      <Key Time="1.73333" Value="214.805; 195.855"/>
+      <Key Time="1.76667" Value="214.752; 195.651"/>
+      <Key Time="1.8" Value="214.691; 195.448"/>
+      <Key Time="1.83333" Value="214.624; 195.248"/>
+      <Key Time="1.86667" Value="214.550; 195.050"/>
+      <Key Time="1.9" Value="214.469; 194.856"/>
+      <Key Time="1.93333" Value="214.382; 194.664"/>
+      <Key Time="1.96667" Value="214.287; 194.476"/>
+      <Key Time="2" Value="214.185; 194.291"/>
+      <Key Time="2.03333" Value="214.077; 194.110"/>
+      <Key Time="2.06667" Value="213.962; 193.934"/>
+      <Key Time="2.1" Value="213.840; 193.762"/>
+      <Key Time="2.13333" Value="213.712; 193.594"/>
+      <Key Time="2.16667" Value="213.578; 193.432"/>
+      <Key Time="2.2" Value="213.437; 193.274"/>
+      <Key Time="2.23333" Value="213.291; 193.122"/>
+      <Key Time="2.26667" Value="213.139; 192.975"/>
+      <Key Time="2.3" Value="212.982; 192.834"/>
+      <Key Time="2.33333" Value="212.819; 192.699"/>
+      <Key Time="2.36667" Value="212.652; 192.570"/>
+      <Key Time="2.4" Value="212.481; 192.448"/>
+      <Key Time="2.43333" Value="212.305; 192.331"/>
+      <Key Time="2.46667" Value="212.125; 192.221"/>
+      <Key Time="2.5" Value="211.942; 192.118"/>
+      <Key Time="2.53333" Value="211.755; 192.020"/>
+      <Key Time="2.56667" Value="211.564; 191.930"/>
+      <Key Time="2.6" Value="211.371; 191.846"/>
+      <Key Time="2.63333" Value="211.174; 191.768"/>
+      <Key Time="2.66667" Value="210.975; 191.697"/>
+      <Key Time="2.7" Value="210.773; 191.633"/>
+      <Key Time="2.73333" Value="210.570; 191.576"/>
+      <Key Time="2.76667" Value="210.364; 191.526"/>
+      <Key Time="2.8" Value="210.157; 191.482"/>
+      <Key Time="2.83333" Value="209.948; 191.447"/>
+      <Key Time="2.86667" Value="209.738; 191.418"/>
+      <Key Time="2.9" Value="209.528; 191.396"/>
+      <Key Time="2.93333" Value="209.317; 191.382"/>
+      <Key Time="2.96667" Value="209.106; 191.375"/>
+      <Key Time="3" Value="208.896; 191.377"/>
+      <Key Time="3.03333" Value="208.687; 191.386"/>
+      <Key Time="3.06667" Value="208.480; 191.403"/>
+      <Key Time="3.1" Value="208.273; 191.428"/>
+      <Key Time="3.13333" Value="208.067; 191.462"/>
+      <Key Time="3.16667" Value="207.863; 191.503"/>
+      <Key Time="3.2" Value="207.660; 191.551"/>
+      <Key Time="3.23333" Value="207.459; 191.607"/>
+      <Key Time="3.26667" Value="207.261; 191.671"/>
+      <Key Time="3.3" Value="207.064; 191.742"/>
+      <Key Time="3.33333" Value="206.870; 191.819"/>
+      <Key Time="3.36667" Value="206.679; 191.904"/>
+      <Key Time="3.4" Value="206.491; 191.995"/>
+      <Key Time="3.43333" Value="206.306; 192.092"/>
+      <Key Time="3.46667" Value="206.124; 192.196"/>
+      <Key Time="3.5" Value="205.946; 192.305"/>
+      <Key Time="3.53333" Value="205.772; 192.421"/>
+      <Key Time="3.56667" Value="205.602; 192.542"/>
+      <Key Time="3.6" Value="205.436; 192.668"/>
+      <Key Time="3.63333" Value="205.273; 192.800"/>
+      <Key Time="3.66667" Value="205.115; 192.937"/>
+      <Key Time="3.7" Value="204.961; 193.079"/>
+      <Key Time="3.73333" Value="204.812; 193.225"/>
+      <Key Time="3.76667" Value="204.667; 193.377"/>
+      <Key Time="3.8" Value="204.527; 193.533"/>
+      <Key Time="3.83333" Value="204.392; 193.693"/>
+      <Key Time="3.86667" Value="204.262; 193.857"/>
+      <Key Time="3.9" Value="204.137; 194.026"/>
+      <Key Time="3.93333" Value="204.018; 194.198"/>
+      <Key Time="3.96667" Value="203.904; 194.374"/>
+      <Key Time="4" Value="203.796; 194.553"/>
+      <Key Time="4.03333" Value="203.695; 194.735"/>
+      <Key Time="4.06667" Value="203.599; 194.921"/>
+      <Key Time="4.1" Value="203.510; 195.109"/>
+      <Key Time="4.13333" Value="203.427; 195.301"/>
+      <Key Time="4.16667" Value="203.350; 195.494"/>
+      <Key Time="4.2" Value="203.281; 195.691"/>
+      <Key Time="4.23333" Value="203.219; 195.889"/>
+      <Key Time="4.26667" Value="203.164; 196.089"/>
+      <Key Time="4.3" Value="203.117; 196.291"/>
+      <Key Time="4.33333" Value="203.077; 196.495"/>
+      <Key Time="4.36667" Value="203.046; 196.700"/>
+      <Key Time="4.4" Value="203.022; 196.907"/>
+      <Key Time="4.43333" Value="203.007; 197.114"/>
+      <Key Time="4.46667" Value="203.000; 197.322"/>
+      <Key Time="4.5" Value="203.005; 197.528"/>
+      <Key Time="4.53333" Value="203.023; 197.734"/>
+      <Key Time="4.56667" Value="203.054; 197.938"/>
+      <Key Time="4.6" Value="203.095; 198.140"/>
+      <Key Time="4.63333" Value="203.145; 198.341"/>
+      <Key Time="4.66667" Value="203.203; 198.540"/>
+      <Key Time="4.7" Value="203.268; 198.736"/>
+      <Key Time="4.73333" Value="203.340; 198.930"/>
+      <Key Time="4.76667" Value="203.417; 199.122"/>
+      <Key Time="4.8" Value="203.500; 199.311"/>
+      <Key Time="4.83333" Value="203.588; 199.498"/>
+      <Key Time="4.86667" Value="203.681; 199.682"/>
+      <Key Time="4.9" Value="203.779; 199.864"/>
+      <Key Time="4.93333" Value="203.881; 200.044"/>
+      <Key Time="4.96667" Value="203.988; 200.221"/>
+      <Key Time="5" Value="204.099; 200.395"/>
+      <Key Time="5.03333" Value="204.215; 200.566"/>
+      <Key Time="5.06667" Value="204.335; 200.734"/>
+      <Key Time="5.1" Value="204.458; 200.899"/>
+      <Key Time="5.13333" Value="204.586; 201.061"/>
+      <Key Time="5.16667" Value="204.718; 201.220"/>
+      <Key Time="5.2" Value="204.855; 201.375"/>
+      <Key Time="5.23333" Value="204.995; 201.527"/>
+      <Key Time="5.26667" Value="205.140; 201.674"/>
+      <Key Time="5.3" Value="205.288; 201.818"/>
+      <Key Time="5.33333" Value="205.441; 201.957"/>
+      <Key Time="5.36667" Value="205.598; 202.092"/>
+      <Key Time="5.4" Value="205.759; 202.222"/>
+      <Key Time="5.43333" Value="205.923; 202.346"/>
+      <Key Time="5.46667" Value="206.092; 202.465"/>
+      <Key Time="5.5" Value="206.264; 202.578"/>
+      <Key Time="5.53333" Value="206.441; 202.685"/>
+      <Key Time="5.56667" Value="206.621; 202.786"/>
+      <Key Time="5.6" Value="206.805; 202.880"/>
+      <Key Time="5.63333" Value="206.992; 202.967"/>
+      <Key Time="5.66667" Value="207.183; 203.046"/>
+      <Key Time="5.7" Value="207.377; 203.118"/>
+      <Key Time="5.73333" Value="207.574; 203.181"/>
+      <Key Time="5.76667" Value="207.773; 203.236"/>
+      <Key Time="5.8" Value="207.974; 203.282"/>
+      <Key Time="5.83333" Value="208.177; 203.319"/>
+      <Key Time="5.86667" Value="208.381; 203.347"/>
+      <Key Time="5.9" Value="208.587; 203.366"/>
+      <Key Time="5.93333" Value="208.793; 203.375"/>
+      <Key Time="5.96667" Value="209.000; 203.375"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="0"/>
+      <Key Time="0.0333333" Value="0.0173005"/>
+      <Key Time="0.0666667" Value="0.034601"/>
+      <Key Time="0.1" Value="0.0519015"/>
+      <Key Time="0.133333" Value="0.069202"/>
+      <Key Time="0.166667" Value="0.0865026"/>
+      <Key Time="0.2" Value="0.103803"/>
+      <Key Time="0.233333" Value="0.121104"/>
+      <Key Time="0.266667" Value="0.138404"/>
+      <Key Time="0.3" Value="0.155705"/>
+      <Key Time="0.333333" Value="0.173005"/>
+      <Key Time="0.366667" Value="0.190306"/>
+      <Key Time="0.4" Value="0.207606"/>
+      <Key Time="0.433333" Value="0.224907"/>
+      <Key Time="0.466667" Value="0.242207"/>
+      <Key Time="0.5" Value="0.259508"/>
+      <Key Time="0.533333" Value="0.276808"/>
+      <Key Time="0.566667" Value="0.294109"/>
+      <Key Time="0.6" Value="0.311409"/>
+      <Key Time="0.633333" Value="0.32871"/>
+      <Key Time="0.666667" Value="0.34601"/>
+      <Key Time="0.7" Value="0.363311"/>
+      <Key Time="0.733333" Value="0.380611"/>
+      <Key Time="0.766667" Value="0.397912"/>
+      <Key Time="0.8" Value="0.415212"/>
+      <Key Time="0.833333" Value="0.432513"/>
+      <Key Time="0.866667" Value="0.449813"/>
+      <Key Time="0.9" Value="0.467114"/>
+      <Key Time="0.933333" Value="0.484414"/>
+      <Key Time="0.966667" Value="0.501715"/>
+      <Key Time="1" Value="0.519015"/>
+      <Key Time="1.03333" Value="0.536316"/>
+      <Key Time="1.06667" Value="0.553616"/>
+      <Key Time="1.1" Value="0.570917"/>
+      <Key Time="1.13333" Value="0.588217"/>
+      <Key Time="1.16667" Value="0.605518"/>
+      <Key Time="1.2" Value="0.622818"/>
+      <Key Time="1.23333" Value="0.640119"/>
+      <Key Time="1.26667" Value="0.657419"/>
+      <Key Time="1.3" Value="0.67472"/>
+      <Key Time="1.33333" Value="0.69202"/>
+      <Key Time="1.36667" Value="0.709321"/>
+      <Key Time="1.4" Value="0.726622"/>
+      <Key Time="1.43333" Value="0.743922"/>
+      <Key Time="1.46667" Value="0.761223"/>
+      <Key Time="1.5" Value="0.778523"/>
+      <Key Time="1.53333" Value="0.795824"/>
+      <Key Time="1.56667" Value="0.813124"/>
+      <Key Time="1.6" Value="0.830425"/>
+      <Key Time="1.63333" Value="0.847725"/>
+      <Key Time="1.66667" Value="0.865026"/>
+      <Key Time="1.7" Value="0.882326"/>
+      <Key Time="1.73333" Value="0.899627"/>
+      <Key Time="1.76667" Value="0.916927"/>
+      <Key Time="1.8" Value="0.934228"/>
+      <Key Time="1.83333" Value="0.951528"/>
+      <Key Time="1.86667" Value="0.968829"/>
+      <Key Time="1.9" Value="0.986129"/>
+      <Key Time="1.93333" Value="1"/>
+      <Key Time="4.2" Value="1"/>
+      <Key Time="4.23333" Value="0.996016"/>
+      <Key Time="4.26667" Value="0.976862"/>
+      <Key Time="4.3" Value="0.957707"/>
+      <Key Time="4.33333" Value="0.938553"/>
+      <Key Time="4.36667" Value="0.919399"/>
+      <Key Time="4.4" Value="0.900245"/>
+      <Key Time="4.43333" Value="0.881091"/>
+      <Key Time="4.46667" Value="0.861937"/>
+      <Key Time="4.5" Value="0.842783"/>
+      <Key Time="4.53333" Value="0.823628"/>
+      <Key Time="4.56667" Value="0.804474"/>
+      <Key Time="4.6" Value="0.78532"/>
+      <Key Time="4.63333" Value="0.766166"/>
+      <Key Time="4.66667" Value="0.747012"/>
+      <Key Time="4.7" Value="0.727858"/>
+      <Key Time="4.73333" Value="0.708704"/>
+      <Key Time="4.76667" Value="0.689549"/>
+      <Key Time="4.8" Value="0.670395"/>
+      <Key Time="4.83333" Value="0.651241"/>
+      <Key Time="4.86667" Value="0.632087"/>
+      <Key Time="4.9" Value="0.612933"/>
+      <Key Time="4.93333" Value="0.593779"/>
+      <Key Time="4.96667" Value="0.574624"/>
+      <Key Time="5" Value="0.55547"/>
+      <Key Time="5.03333" Value="0.536316"/>
+      <Key Time="5.06667" Value="0.517162"/>
+      <Key Time="5.1" Value="0.498008"/>
+      <Key Time="5.13333" Value="0.478854"/>
+      <Key Time="5.16667" Value="0.4597"/>
+      <Key Time="5.2" Value="0.440545"/>
+      <Key Time="5.23333" Value="0.421391"/>
+      <Key Time="5.26667" Value="0.402237"/>
+      <Key Time="5.3" Value="0.383083"/>
+      <Key Time="5.33333" Value="0.363929"/>
+      <Key Time="5.36667" Value="0.344775"/>
+      <Key Time="5.4" Value="0.325621"/>
+      <Key Time="5.43333" Value="0.306466"/>
+      <Key Time="5.46667" Value="0.287312"/>
+      <Key Time="5.5" Value="0.268158"/>
+      <Key Time="5.53333" Value="0.249004"/>
+      <Key Time="5.56667" Value="0.22985"/>
+      <Key Time="5.6" Value="0.210696"/>
+      <Key Time="5.63333" Value="0.191541"/>
+      <Key Time="5.66667" Value="0.172387"/>
+      <Key Time="5.7" Value="0.153233"/>
+      <Key Time="5.73333" Value="0.134079"/>
+      <Key Time="5.76667" Value="0.114925"/>
+      <Key Time="5.8" Value="0.0957707"/>
+      <Key Time="5.83333" Value="0.0766166"/>
+      <Key Time="5.86667" Value="0.0574624"/>
+      <Key Time="5.9" Value="0.0383083"/>
+      <Key Time="5.93333" Value="0.0191541"/>
+      <Key Time="5.96667" Value="0"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="ghost_left_group" Material="transparent" Active="false" Z="0">
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('ghost_left_group.ghost_left_movenment')"/>
+      <Key Time="0" Event="ActivateSprite ('ghost_left_group.ghost_left_static')"/>
+      <Key Time="0" Event="ActivateSprite ('ghost_left_group.ghost_left_background')"/>
+    </Track>
+  </Sprite>
+</AnimationScreenPart>

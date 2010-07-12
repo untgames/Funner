@@ -10,7 +10,7 @@ using namespace media::adobe::xfl;
 void XflParser::ParsePropertyAnimation (Parser::Iterator iter, PropertyAnimation& property, const char* property_prefix)
 {
   stl::string property_id = common::format ("%s.%s", property_prefix, get<const char*> (*iter, "id"));
-
+  
   property.SetName    (property_id.c_str ());
   property.SetEnabled (get<bool> (*iter, "enabled"));
 
