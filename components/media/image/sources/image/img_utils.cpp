@@ -78,7 +78,7 @@ void crop_by_alpha (const Image& image, size_t crop_alpha, size_t& crop_x, size_
     case PixelFormat_A8:     alpha_offset = 0; break;
     case PixelFormat_LA8:    alpha_offset = 1; break;
     case PixelFormat_RGBA16:
-      throw xtl::format_not_supported_exception ("media::crop_by_alpha", "Can't crop image with format %s (not supported)", get_name (image.Format ()));
+      throw xtl::format_not_supported_exception ("media::crop_by_alpha", "Can't crop image with format %s (not supported)", get_format_name (image.Format ()));
     default:
       throw xtl::format_operation_exception ("media::crop_by_alpha", "Unknown image pixel format %d", image.Format ());
   }
