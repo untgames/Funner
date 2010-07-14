@@ -58,8 +58,10 @@ struct Params
   stl::string   output_textures_format;            //формат имён файлов в папке с текстурами
   stl::string   output_materials_file_name;        //имя файла с материалами
   stl::string   output_scene_file_name;            //имя файла с анимациями
-  stl::string   material_prefix;                   //префикс имени материала
-  stl::string   material_exclude_suffix;           //исключаемые суффис имени материала
+  stl::string   material_name_pattern;             //строка шаблона поиска имени материала
+  stl::string   material_name_replacement;         //строка преобразования имени материала
+  stl::string   sprite_name_pattern;               //строка шаблона поиска имени спрайта
+  stl::string   sprite_name_replacement;           //строка преобразования имени спрайта
   stl::string   crop_exclude;                      //необрезаемые слои
   stl::string   layers_exclude;                    //неэкспортируемые слои
   size_t        crop_alpha;                        //коэффициент обрезания по прозрачности
@@ -69,7 +71,7 @@ struct Params
   bool          need_crop_alpha;                   //нужно ли обрезать картинку по нулевой прозрачности
   bool          need_inverse_x;                    //нужно ли инвертировать знак оси X
   bool          need_inverse_y;                    //нужно ли инвертировать знак оси Y
-  bool          need_after_sprite;                 //нужно ли генерировать поле AfterSprite
+  bool          need_relative;                     //нужно генерировать данные в относительной системе координат
 };
 
 //прямоугольная область
@@ -248,16 +250,28 @@ void command_line_crop_alpha (const char* value_string, Params& params)
   params.need_crop_alpha = true;
 }
 
-//установка префикса для имён материалов
-void command_line_materials_prefix (const char* string, Params& params)
+//установка строки замены имени материала
+void command_line_material_replacement (const char* string, Params& params)
 {
-  params.material_prefix = string;
+  common::StringArray tokens = common::split (string, ",", "");
+  
+  if (tokens.Size () != 2)
+    error ("bad material replacement string '%s'", string);
+    
+  params.material_name_pattern     = tokens [0];
+  params.material_name_replacement = tokens [1];  
 }
 
-//установка исключаемого суффикса для имён материалов
-void command_line_materials_exclude_suffix (const char* string, Params& params)
+//установка строки замены имени спрайта
+void command_line_sprite_name_replacement (const char* string, Params& params)
 {
-  params.material_exclude_suffix = string;
+  common::StringArray tokens = common::split (string, ",", "");
+  
+  if (tokens.Size () != 2)
+    error ("bad sprite name replacement string '%s'", string);
+
+  params.sprite_name_pattern     = tokens [0];
+  params.sprite_name_replacement = tokens [1];
 }
 
 //установка флага необходимости инвертирования координат по оси X
@@ -272,10 +286,10 @@ void command_line_inverse_y (const char*, Params& params)
   params.need_inverse_y = true;
 }
 
-//установка флага необходимости генерирования поля AfterSprite
-void command_line_after_sprite (const char*, Params& params)
+//установка флага необходимости генерации в относительной системе координат
+void command_line_relative (const char*, Params& params)
 {
-  params.need_after_sprite = true;
+  params.need_relative = true;
 }
 
 //разбор командной строки
@@ -283,21 +297,21 @@ void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
     {command_line_result_textures_dir,          "out-textures-dir",          'o',        "dir",  "set output textures directory"},
-    {command_line_result_material_textures_dir, "out-material-textures-dir", 'o',        "dir",  "set output textures directory in material file"},
     {command_line_result_textures_format,       "out-textures-format",         0,     "string",  "set output textures format string"},
+    {command_line_result_material_textures_dir, "out-material-textures-dir", 'o',        "dir",  "set output textures directory in material file"},    
     {command_line_materials_file_name,          "out-materials",               0,       "file",  "set output materials file"},
     {command_line_scene_file_name,              "out-scene",                   0,       "file",  "set output scene file"},
     {command_line_crop_alpha,                   "crop-alpha",                  0,      "value",  "crop layers by alpha that less than value"},    
     {command_line_crop_exclude,                 "crop-exclude",                0,  "wildcards",  "exclude selected layers from crop"},    
     {command_line_layers_exclude,               "layers-exclude",              0,  "wildcards",  "exclude selected layers from export"},
-    {command_line_materials_prefix,             "materials-prefix",            0,     "string",  "set prefix for material names"},
-    {command_line_materials_exclude_suffix,     "materials-exclude-suffix",    0,     "string",  "set suffix that will be excluded from material name"},
-    {command_line_silent,                       "silent",                    's',            0,  "quiet mode"},
-    {command_line_help,                         "help",                      '?',            0,  "print help message"},
+    {command_line_material_replacement,         "material-replacement",        0,     "string",  "set material name replacement string separated by ','"},
+    {command_line_sprite_name_replacement,      "sprite-replacement",          0,     "string",  "set sprite name replacement string separated by ','"},
     {command_line_pot,                          "pot",                         0,            0,  "extent textures size to nearest greater power of two"},
     {command_line_inverse_x,                    "inverse-x",                   0,            0,  "inverse X ort"},
     {command_line_inverse_y,                    "inverse-y",                   0,            0,  "inverse Y ort"},
-    {command_line_after_sprite,                 "after-sprite",                0,            0,  "generate AfterSprite attribute"}
+    {command_line_relative,                     "relative",                    0,            0,  "relative coordinates"},
+    {command_line_silent,                       "silent",                    's',            0,  "quiet mode"},
+    {command_line_help,                         "help",                      '?',            0,  "print help message"},    
   };
 
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -466,7 +480,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
 
     if (!option->argument_name && !option_argument.empty ())
     {
-      error ("option '%s' has not arguments", option_name.c_str ());
+      error ("option '%s' has no arguments", option_name.c_str ());
 
       return;
     }
@@ -493,20 +507,19 @@ bool is_present (const char* name, const StringArray& strings)
 //получение полного имени материала
 stl::string get_full_material_name (const Params& params, const char* name)
 {
-  stl::string result = name;
-  
-  if (!params.material_exclude_suffix.empty ())
-  {
-    size_t pos = result.rfind (params.material_exclude_suffix.c_str ());
-    
-    if (pos != stl::string::npos)
-      result.erase (pos);
-  }
-  
-  if (!params.material_prefix.empty ())
-    result = params.material_prefix + result;
-    
-  return result;
+  if (params.material_name_pattern.empty ())
+    return name;
+
+  return common::replace (name, params.material_name_pattern.c_str (), params.material_name_replacement.c_str ());
+}
+
+//получение имени спрайта
+stl::string get_sprite_name (const Params& params, const char* name)
+{
+  if (params.sprite_name_pattern.empty ())
+    return name;
+
+  return common::replace (name, params.sprite_name_pattern.c_str (), params.sprite_name_replacement.c_str ());
 }
 
 //сохранение материалов
@@ -785,24 +798,60 @@ void write_track
   const math::vec2f&       offset,
   const math::vec2f&       scale = math::vec2f (1.0f, 1.0f))
 {
-  if (x_track.Keyframes ().Size () != y_track.Keyframes ().Size ())
-    error ("Track sizes not equal for '%s'", name_prefix);
-    
-  for (size_t i=0, count=x_track.Keyframes ().Size (); i<count; i++)
-  {
-    const PropertyAnimationKeyframe &x_frame = x_track.Keyframes ()[i],
-                                    &y_frame = y_track.Keyframes ()[i];         
+  if (!x_track.Keyframes ().Size () || !y_track.Keyframes ().Size ())
+    error ("Empty animation tracks for X/Y channels");
 
-    if (!float_compare (x_frame.time, y_frame.time))
-      error ("Different times for position track coordinates for '%s'", name_prefix);
-      
+  float       prev_time = -1.0f, max_time = stl::max (x_track.Keyframes ()[x_track.Keyframes ().Size ()-1].time, y_track.Keyframes ()[y_track.Keyframes ().Size ()-1].time);
+  math::vec2f prev_value;
+
+  for (size_t xi=0, yi=0, xcount=x_track.Keyframes ().Size (), ycount=y_track.Keyframes ().Size (); prev_time < max_time;)
+  {
+    const PropertyAnimationKeyframe &x_frame = x_track.Keyframes ()[xi], &y_frame = y_track.Keyframes ()[yi];        
+    
+    if (!xi && !yi)
+    {
+      prev_time  = stl::min (x_frame.time, y_frame.time);
+      prev_value = math::vec2f (x_frame.value, y_frame.value);
+    }
+    
     XmlWriter::Scope scope (*data.scene_writer, "Key");
-    
-    math::vec2f value (x_frame.value + offset.x, y_frame.value + offset.y);
-    
-    value *= scale;
-    
-    data.scene_writer->WriteAttribute ("Time", x_frame.time);
+
+    math::vec2f value;
+    float       time;
+
+    if (float_compare (x_frame.time, y_frame.time))
+    {
+      value = math::vec2f (x_frame.value, y_frame.value);
+      time  = x_frame.time;
+
+      if (yi != ycount - 1) yi++;
+      if (xi != xcount - 1) xi++;
+    }
+    else
+    {
+      if (y_frame.time < x_frame.time)
+      {
+        time    = y_frame.time;
+        value.x = float_compare (time, prev_time) ? x_frame.value : prev_value.x + (x_frame.value - prev_value.x) / (x_frame.time - prev_time) * (time - prev_time);
+        value.y = y_frame.value;
+        
+        if (yi != ycount - 1) yi++;
+      }
+      else
+      {
+        time    = x_frame.time;
+        value.x = x_frame.value;
+        value.y = float_compare (time, prev_time) ? y_frame.value : prev_value.y + (y_frame.value - prev_value.y) / (y_frame.time - prev_time) * (time - prev_time);
+
+        if (xi != xcount - 1) xi++;
+      }            
+    }      
+
+    prev_value = value;
+    prev_time  = time;
+    value      = (value + offset) * scale;
+
+    data.scene_writer->WriteAttribute ("Time", time);
     data.scene_writer->WriteAttribute ("Value", common::format ("%.3f; %.3f", value.x, value.y).c_str ());
   }
 }
@@ -861,7 +910,13 @@ void write_timeline_sprite_data (ConvertData& data, const char* name, const Even
 }
 
 ///общая часть обработки спрайтов
-void process_sprite_common (Params& params, ConvertData& data, const Frame& frame, const char* name, const math::vec2f& position = math::vec2f (0.0f), const math::vec2f& scale = math::vec2f (1.0f))
+void process_sprite_common
+ (Params&            params,
+  ConvertData&       data,
+  const Frame&       frame,
+  const char*        name,
+  const math::vec2f& position = math::vec2f (0.0f),
+  const math::vec2f& scale = math::vec2f (1.0f))
 {
     //получение объекта анимаций
     
@@ -876,11 +931,12 @@ void process_sprite_common (Params& params, ConvertData& data, const Frame& fram
   {
     XmlWriter::Scope scope (*data.scene_writer, "Track");
     
-    data.scene_writer->WriteAttribute ("Name", "position");
+    data.scene_writer->WriteAttribute ("Name", params.need_relative ? "offset" : "position");
     
-    write_track (data, *x_track, *y_track, name, position, math::vec2f (params.need_inverse_x ? -1.0f : 1.0f, params.need_inverse_y ? -1.0f : 1.0f) * scale);
+    write_track (data, *x_track, *y_track, name, params.need_relative ? math::vec3f (0.0f) : position,
+      math::vec2f (params.need_inverse_x ? -1.0f : 1.0f, params.need_inverse_y ? -1.0f : 1.0f) * scale);
   }
-  else if (!equal (position, math::vec2f (.0f), EPSILON))
+  else if (!equal (position, math::vec2f (.0f), EPSILON) && !params.need_relative)
   {
     XmlWriter::Scope track_scope (*data.scene_writer, "Track");
     
@@ -905,6 +961,19 @@ void process_sprite_common (Params& params, ConvertData& data, const Frame& fram
     data.scene_writer->WriteAttribute ("Name", "scale");
     
     write_track (data, *x_scale_track, *y_scale_track, name, math::vec2f (0.0f), math::vec2f (0.01f));
+  }
+  
+    //сохранение угла
+    
+  const PropertyAnimation *angle_track = animation.Properties ().Find ("headContainer.Basic_Motion.Rotation_Z");
+  
+  if (angle_track)
+  {
+    XmlWriter::Scope scope (*data.scene_writer, "Track");
+
+    data.scene_writer->WriteAttribute ("Name", "angle");
+
+    write_track (data, *angle_track, -1.0f);
   }
   
     //сохранение альфа
@@ -959,36 +1028,35 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
     data.scene_writer->WriteAttribute ("BindSpace", "parent");
   }
   
-  if (params.need_after_sprite)
+  if (params.need_relative)
   {
-    stl::string sprite_name = resource_name;
+    stl::string sprite_name = get_sprite_name (params, resource_name);
     
-    if (!params.material_exclude_suffix.empty ())
-    {
-      size_t pos = sprite_name.rfind (params.material_exclude_suffix.c_str ());
-      
-      if (pos != stl::string::npos)
-        sprite_name.erase (pos);
-    }
-    
-    data.scene_writer->WriteAttribute ("AfterSprite", sprite_name.c_str ());
+    data.scene_writer->WriteAttribute ("Layout", sprite_name.c_str ());
   }
 
   data.scene_writer->WriteAttribute ("Active", "false");
   
     //сохранение центра вращений
     
-  const math::vec2f transformation_point = element.TransformationPoint ();
+  math::vec2f transformation_point = (element.TransformationPoint () - math::vec2f ((float)image_desc.x, (float)image_desc.y)) /
+    math::vec2f ((float)image_desc.width, (float)image_desc.height) - math::vec2f (0.5f);
+    
+  if (params.need_inverse_x)
+    transformation_point.x *= -1.0f;
+    
+  if (params.need_inverse_y)
+    transformation_point.y *= -1.0f;
     
   stl::string pivot_value_string;
 
-  pivot_value_string = common::format ("%.3f;%.3f", (transformation_point.x - image_desc.x) / image_desc.full_width  - 0.5f,
-                                                    (transformation_point.y - image_desc.y) / image_desc.full_height - 0.5f);
+  pivot_value_string = common::format ("%.3f;%.3f", transformation_point.x, transformation_point.y);
 
   data.scene_writer->WriteAttribute ("PivotPosition", pivot_value_string.c_str ());
   
     //сохранение размера
-    
+  
+  if (!params.need_relative)
   {
     XmlWriter::Scope track_scope (*data.scene_writer, "Track");
     
@@ -1053,9 +1121,26 @@ void process_symbol_instance (Params& params, ConvertData& data, const Frame& fr
     
   XmlWriter::Scope sprite_scope (*data.scene_writer, "Sprite");
   
-  write_timeline_sprite_data (data, name_prefix, events);
+    //сохранение центра вращений
+    
+  math::vec2f transformation_point = element.TransformationPoint ();
   
-    //add pivot???  
+  if (params.need_relative)
+    transformation_point += element.Translation ();
+  
+  if (params.need_inverse_x)
+    transformation_point.x *= -1.0f;
+
+  if (params.need_inverse_y)
+    transformation_point.y *= -1.0f;  
+    
+  stl::string pivot_value_string = common::format ("%.3f;%.3f", transformation_point.x, transformation_point.y);
+
+  data.scene_writer->WriteAttribute ("PivotPosition", pivot_value_string.c_str ());
+  
+  write_timeline_sprite_data (data, name_prefix, events);  
+  
+    //add pivot
   
   process_sprite_common (params, data, frame, name_prefix, element.Translation ());
 }
@@ -1132,13 +1217,23 @@ void process_timeline (Params& params, ConvertData& data, const Timeline& timeli
         process_symbol_instance (params, data, layer.Frames ()[0u], name_prefix.c_str ());
         
           //регистрация события запуска
+          
+        const Frame& frame = layer.Frames ()[0u];          
         
         Event event;          
         
-        event.time   = layer.Frames ()[0u].FirstFrame () / data.document.FrameRate ();
+        event.time   = frame.FirstFrame () / data.document.FrameRate ();
         event.action = common::format ("ActivateSprite ('%s')", name_prefix.c_str ());
         
         events.push_back (event);
+        
+        if (frame.Duration () > 1)
+        {
+          event.time   += frame.Duration () / data.document.FrameRate ();
+          event.action  = common::format ("DeactivateSprite ('%s')", name_prefix.c_str ());
+
+          events.push_back (event);
+        }        
         
         break;
       }
@@ -1273,7 +1368,7 @@ int main (int argc, const char *argv[])
     params.need_crop_alpha   = false;
     params.need_inverse_x    = false;
     params.need_inverse_y    = false;
-    params.need_after_sprite = false;
+    params.need_relative     = false;
 
       //разбор командной строки
     command_line_parse (argc, argv, params);
