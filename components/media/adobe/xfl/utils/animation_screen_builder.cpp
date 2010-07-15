@@ -887,14 +887,9 @@ void write_events_track (ConvertData& data, const EventList& events)
   }
 }
 
-//запись таймлайн-спрайта
-void write_timeline_sprite_data (ConvertData& data, const char* name, const EventList& events)
+//запись треков таймлайн-спрйта
+void write_timeline_sprite_tracks (ConvertData& data, const EventList& events)
 {
-  data.scene_writer->WriteAttribute ("Name", name);
-  data.scene_writer->WriteAttribute ("Material", "transparent");
-  data.scene_writer->WriteAttribute ("Active", "false");
-  data.scene_writer->WriteAttribute ("Z", 0);
-  
   {
     XmlWriter::Scope size_scope (*data.scene_writer, "Track");
     
@@ -907,6 +902,15 @@ void write_timeline_sprite_data (ConvertData& data, const char* name, const Even
   }
   
   write_events_track (data, events);
+}
+
+//запись таймлайн-спрайта
+void write_timeline_sprite_data (ConvertData& data, const char* name)
+{
+  data.scene_writer->WriteAttribute ("Name", name);
+  data.scene_writer->WriteAttribute ("Material", "transparent");
+  data.scene_writer->WriteAttribute ("Active", "false");
+  data.scene_writer->WriteAttribute ("Z", 0);  
 }
 
 ///общая часть обработки спрайтов
@@ -1020,12 +1024,14 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
   if (*parent)
   {
     data.scene_writer->WriteAttribute ("Parent", parent);
-    data.scene_writer->WriteAttribute ("ScaleInherit", "false");
+    data.scene_writer->WriteAttribute ("ScaleInherit", "true");
     data.scene_writer->WriteAttribute ("OrientationInherit", "true");
     data.scene_writer->WriteAttribute ("PositionSpace", "local");
     data.scene_writer->WriteAttribute ("ScaleSpace", "local");
     data.scene_writer->WriteAttribute ("OrientationSpace", "local");
     data.scene_writer->WriteAttribute ("BindSpace", "parent");
+    data.scene_writer->WriteAttribute ("ScalePivotEnabled", "true");
+    data.scene_writer->WriteAttribute ("OrientationPivotEnabled", "true");
   }
   
   if (params.need_relative)
@@ -1040,14 +1046,14 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
     //сохранение центра вращений
     
   math::vec2f transformation_point = (element.TransformationPoint () - math::vec2f ((float)image_desc.x, (float)image_desc.y)) /
-    math::vec2f ((float)image_desc.width, (float)image_desc.height) - math::vec2f (0.5f);
-    
+    math::vec2f ((float)image_desc.width, (float)image_desc.height);
+
   if (params.need_inverse_x)
     transformation_point.x *= -1.0f;
-    
+
   if (params.need_inverse_y)
     transformation_point.y *= -1.0f;
-    
+
   stl::string pivot_value_string;
 
   pivot_value_string = common::format ("%.3f;%.3f", transformation_point.x, transformation_point.y);
@@ -1121,6 +1127,8 @@ void process_symbol_instance (Params& params, ConvertData& data, const Frame& fr
     
   XmlWriter::Scope sprite_scope (*data.scene_writer, "Sprite");
   
+  write_timeline_sprite_data (data, name_prefix);  
+  
     //сохранение центра вращений
     
   math::vec2f transformation_point = element.TransformationPoint ();
@@ -1137,12 +1145,11 @@ void process_symbol_instance (Params& params, ConvertData& data, const Frame& fr
   stl::string pivot_value_string = common::format ("%.3f;%.3f", transformation_point.x, transformation_point.y);
 
   data.scene_writer->WriteAttribute ("PivotPosition", pivot_value_string.c_str ());
-  
-  write_timeline_sprite_data (data, name_prefix, events);  
-  
-    //add pivot
-  
+  data.scene_writer->WriteAttribute ("ScalePivotEnabled", "true");
+  data.scene_writer->WriteAttribute ("OrientationPivotEnabled", "true");
+
   process_sprite_common (params, data, frame, name_prefix, element.Translation ());
+  write_timeline_sprite_tracks (data, events);
 }
 
 ///обработка таймлайна
@@ -1262,7 +1269,8 @@ void process_timeline (Params& params, ConvertData& data)
   
   XmlWriter::Scope sprite_scope (*data.scene_writer, "Sprite");
 
-  write_timeline_sprite_data (data, data.document.Timelines ()[0u].Name (), events);  
+  write_timeline_sprite_data (data, data.document.Timelines ()[0u].Name ());  
+  write_timeline_sprite_tracks (data, events);
 }
 
 //построение списка используемых символов
