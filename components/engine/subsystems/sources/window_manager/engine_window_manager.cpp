@@ -106,11 +106,13 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
 
       try
       {
-        if (!xtl::xstricmp (common::suffix (resource_name).c_str (), "xhotspot"))
+        stl::string suffix = common::suffix (resource_name);
+        
+        if (!xtl::xstricmp (suffix.c_str (), ".xhotspot"))
         {
           LoadHotspots (resource_name);          
         }
-        else
+        else if (!xtl::xstricmp (suffix.c_str (), ".cur") || !xtl::xstricmp (suffix.c_str (), ".ani")) //добавить в Window проверку является ли файл курсором
         {
           LoadCursor (resource_name);
         }
