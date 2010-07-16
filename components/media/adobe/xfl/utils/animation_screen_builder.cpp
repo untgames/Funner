@@ -1030,7 +1030,7 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
     data.scene_writer->WriteAttribute ("ScaleSpace", "local");
     data.scene_writer->WriteAttribute ("OrientationSpace", "local");
     data.scene_writer->WriteAttribute ("BindSpace", "parent");
-    data.scene_writer->WriteAttribute ("ScalePivotEnabled", "true");
+    data.scene_writer->WriteAttribute ("ScalePivotEnabled", "false");
     data.scene_writer->WriteAttribute ("OrientationPivotEnabled", "true");
   }
   
@@ -1106,10 +1106,10 @@ void process_sprite_group (Params& params, ConvertData& data, const Layer::Frame
 //  process_sprite_common (data, frame, name_prefix);
 }
 
-void process_timeline (Params& params, ConvertData& data, const Timeline& timeline, const char* name_prefix, EventList& events);
+float process_timeline (Params& params, ConvertData& data, const Timeline& timeline, const char* name_prefix, EventList& events);
 
-///обработка вложенного символа
-void process_symbol_instance (Params& params, ConvertData& data, const Frame& frame, const char* name_prefix)
+///обработка вложенного символа (возвращает время окончания анимации включая все вложения)
+float process_symbol_instance (Params& params, ConvertData& data, const Frame& frame, const char* name_prefix)
 {
   const FrameElement& element     = frame.Elements ()[0u];
   const char*         symbol_name = element.Name ();
@@ -1121,7 +1121,7 @@ void process_symbol_instance (Params& params, ConvertData& data, const Frame& fr
     
   EventList events;
 
-  process_timeline (params, data, data.document.Symbols ()[symbol_name].Timeline (), name_prefix, events);
+  float end_time = process_timeline (params, data, data.document.Symbols ()[symbol_name].Timeline (), name_prefix, events);
   
     //обработка спрайта
     
@@ -1150,12 +1150,16 @@ void process_symbol_instance (Params& params, ConvertData& data, const Frame& fr
 
   process_sprite_common (params, data, frame, name_prefix, element.Translation ());
   write_timeline_sprite_tracks (data, events);
+  
+  return end_time;
 }
 
-///обработка таймлайна
-void process_timeline (Params& params, ConvertData& data, const Timeline& timeline, const char* parent_name, EventList& events)
+///обработка таймлайна (возвращает время окончания анимации включая все вложения)
+float process_timeline (Params& params, ConvertData& data, const Timeline& timeline, const char* parent_name, EventList& events)
 {
     //обход слоёв
+    
+  float end_time = 0.0f;
     
   for (Timeline::LayerList::ConstIterator layer_iter=timeline.Layers ().CreateIterator (); layer_iter; ++layer_iter)
   {
@@ -1188,6 +1192,9 @@ void process_timeline (Params& params, ConvertData& data, const Timeline& timeli
         {
           event.time   += frame.Duration () / data.document.FrameRate ();
           event.action  = common::format ("HideSpriteGroup ('%s')", name_prefix.c_str ());
+          
+          if (event.time > end_time)
+            end_time = event.time;
 
           events.push_back (event);
         }
@@ -1213,6 +1220,9 @@ void process_timeline (Params& params, ConvertData& data, const Timeline& timeli
         {
           event.time   += frame.Duration () / data.document.FrameRate ();
           event.action  = common::format ("DeactivateSprite ('%s')", name_prefix.c_str ());
+          
+          if (event.time > end_time)
+            end_time = event.time;
 
           events.push_back (event);
         }
@@ -1221,7 +1231,10 @@ void process_timeline (Params& params, ConvertData& data, const Timeline& timeli
       }
       case LayerType_Instance:
       {
-        process_symbol_instance (params, data, layer.Frames ()[0u], name_prefix.c_str ());
+        float symbol_end_time = process_symbol_instance (params, data, layer.Frames ()[0u], name_prefix.c_str ());        
+        
+        if (symbol_end_time > end_time)
+          end_time = symbol_end_time;
         
           //регистрация события запуска
           
@@ -1238,6 +1251,9 @@ void process_timeline (Params& params, ConvertData& data, const Timeline& timeli
         {
           event.time   += frame.Duration () / data.document.FrameRate ();
           event.action  = common::format ("DeactivateSprite ('%s')", name_prefix.c_str ());
+          
+          if (event.time > end_time)
+            end_time = event.time;
 
           events.push_back (event);
         }        
@@ -1249,6 +1265,20 @@ void process_timeline (Params& params, ConvertData& data, const Timeline& timeli
         break;
     }    
   }
+  
+    //автоматическая деактивация
+    
+  if (!float_compare (end_time, 0.0f))
+  {    
+    Event event;
+
+    event.time   = end_time;
+    event.action = "DeactivateSprite (sprite)";
+
+    events.push_back (event);
+  }
+  
+  return end_time;
 }
 
 void process_timeline (Params& params, ConvertData& data)
