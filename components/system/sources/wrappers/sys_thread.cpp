@@ -210,6 +210,17 @@ Thread::threadid_t Thread::Id () const
 }*/
 
 /*
+   Установка приоритета нити
+*/
+
+void Thread::SetPriority (ThreadPriority thread_priority)
+{
+  Impl::LockPtr thread_impl (impl);
+
+  Platform::SetThreadPriority (thread_impl->handle, thread_priority);
+}
+
+/*
     Отмена нити
 */
 

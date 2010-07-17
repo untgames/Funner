@@ -81,8 +81,46 @@ void Platform::DestroyThread (thread_t thread)
     return;
 
   CloseHandle ((HANDLE)thread->thread);
-
+  
   delete thread;
+}
+
+/*
+   Установка приоритета нити
+*/
+
+void Platform::SetThreadPriority (thread_t thread, ThreadPriority thread_priority)
+{
+  try
+  {
+    if (!thread || !thread->thread)
+      throw xtl::make_null_argument_exception ("", "thread");
+
+    int priority;  
+            
+    switch (thread_priority)
+    {
+      case ThreadPriority_Low:
+        priority = THREAD_PRIORITY_BELOW_NORMAL;
+        break;
+      case ThreadPriority_Normal:
+        priority = THREAD_PRIORITY_NORMAL;
+        break;
+      case ThreadPriority_High:
+        priority = THREAD_PRIORITY_ABOVE_NORMAL;
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "thread_priority", thread_priority);
+    }
+    
+    if (!::SetThreadPriority ((HANDLE)thread->thread, priority))
+      raise_error ("::SetThreadPriority");
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Win32Platform::SetThreadPriority");
+    throw;
+  }
 }
 
 /*
