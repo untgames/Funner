@@ -84,6 +84,10 @@ class XmlAnimationLibraryLoader
     {
     }
 
+    template <class T> void ParseSpecificKeyInfo (Parser::Iterator key_iter, math::spline_linear_key<T>& key)
+    {
+    }
+
     template <class T> void ParseSplineKey (Parser::Iterator key_iter, T& spline)
     {
         typename T::time_type time         = get<typename T::time_type> (*key_iter, "time");
@@ -136,6 +140,16 @@ class XmlAnimationLibraryLoader
         ParseSpline<math::bezier_spline3f> (channel_iter, channel);
       else if (!xtl::xstrcmp (track_type, "basic_spline<spline_bezier_key<vec4f>>"))
         ParseSpline<math::bezier_spline4f> (channel_iter, channel);
+      else if (!xtl::xstrcmp (track_type, "basic_spline<spline_linear_key<float>>"))
+        ParseSpline<math::linear_splinef> (channel_iter, channel);
+      else if (!xtl::xstrcmp (track_type, "basic_spline<spline_linear_key<vec2f>>"))
+        ParseSpline<math::linear_spline2f> (channel_iter, channel);
+      else if (!xtl::xstrcmp (track_type, "basic_spline<spline_linear_key<vec3f>>"))
+        ParseSpline<math::linear_spline3f> (channel_iter, channel);
+      else if (!xtl::xstrcmp (track_type, "basic_spline<spline_linear_key<vec4f>>"))
+        ParseSpline<math::linear_spline4f> (channel_iter, channel);
+      else if (!xtl::xstrcmp (track_type, "basic_spline<spline_linear_key<mat4f>>"))
+        ParseSpline<math::linear_spline_mat4f> (channel_iter, channel);
       else if (!xtl::xstrcmp (track_type, "basic_spline<spline_step_key<float>>"))
         ParseSpline<math::step_splinef> (channel_iter, channel);
       else if (!xtl::xstrcmp (track_type, "basic_spline<spline_step_key<vec2f>>"))

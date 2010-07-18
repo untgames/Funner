@@ -22,7 +22,7 @@ class Converter
       {
         case AnimationChannelSemantic_Transform:
         {
-          math::step_spline_mat4f        spline;
+          math::linear_spline_mat4f      spline;
           const AnimationSampleTransform *current_sample = collada_channel.Samples<AnimationSampleTransform> ();
 
           for (size_t i = 0, samples_count = collada_channel.SamplesCount (); i < samples_count; i++, current_sample++)
