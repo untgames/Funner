@@ -63,6 +63,23 @@ template <class T> struct spline_key_frame<spline_step_key<T> >
   }
 };
 
+template <class T> struct spline_key_frame<spline_linear_key<T> >
+{
+  typedef spline_linear_key<T>           key_type;
+  typedef typename key_type::time_type   time_type;
+  typedef typename key_type::scalar_type scalar_type;
+  typedef typename key_type::value_type  value_type;
+
+  key_type   key;
+  time_type  time_diff;
+  value_type value_diff;
+
+  spline_key_frame (const key_type& in_key)
+    : key (in_key)
+  {
+  }
+};
+
 ///Компаратор для фреймов
 template <class Frame> struct spline_key_frame_less
 {
@@ -97,6 +114,12 @@ template <class Time, class Value>
 void spline_eval (const Time&, const spline_key_frame<spline_step_key<Value> >& frame, Value& result)
 {
   result = frame.key.value;
+}
+
+template <class Time, class Value>
+void spline_eval (const Time& time, const spline_key_frame<spline_linear_key<Value> >& frame, Value& result)
+{
+  result = frame.key.value + frame.value_diff * (time - frame.key.time) / frame.time_diff;
 }
 
 ///Раcчёт коэффициентов TCB-сплайна
@@ -252,6 +275,33 @@ void recompute (spline_key_frame<spline_step_key<T> >* first, spline_key_frame<s
 {
 }
 
+///Расчёт сплайна без интерполяции
+template <class T>
+void recompute (spline_key_frame<spline_linear_key<T> >* first, spline_key_frame<spline_linear_key<T> >* last, bool closed)
+{
+  if (first == last)
+    return;
+
+  typedef spline_key_frame<spline_linear_key<T> > frame_type;
+
+  for (frame_type* frame=first; frame<last-1; ++frame)
+  {
+    frame->value_diff = frame [1].key.value - frame->key.value;
+    frame->time_diff  = frame [1].key.time - frame->key.time;
+  }
+    
+  if (last - 1 > first)
+  {
+    last [-1].value_diff = last [-1].key.value - last [-2].key.value;  
+    last [-1].time_diff  = last [-1].key.time - last [-2].key.time;
+  }
+  else
+  {
+    last [-1].value_diff = 0;  
+    last [-1].time_diff  = 1;
+  }
+}
+
 }
 
 /*
@@ -309,6 +359,21 @@ spline_step_key<T>::spline_step_key ()
 
 template <class T>
 spline_step_key<T>::spline_step_key (const time_type& time, const value_type& value)
+  : base (time, value)
+{
+}
+
+/*
+    Сплайн с линейной интерполяцией
+*/
+
+template <class T>
+spline_linear_key<T>::spline_linear_key ()
+{
+}
+
+template <class T>
+spline_linear_key<T>::spline_linear_key (const time_type& time, const value_type& value)
   : base (time, value)
 {
 }
