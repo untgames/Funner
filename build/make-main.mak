@@ -391,10 +391,11 @@ define process_source_dir
   
   ifneq (,$$(wildcard $2/sources.mak))
     SOURCE_FILES :=
+    GENERATED_SOURCE_FILES :=
   
     include $2/sources.mak    
 
-    $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES:%=$2/%))
+    $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES:%=$2/%)) $$(GENERATED_SOURCE_FILES)
   else
     $$(MODULE_NAME).SOURCE_FILES := $$(wildcard $$(SOURCE_FILES_SUFFIXES:%=$2/*.%))
   endif  
@@ -446,6 +447,7 @@ define process_target_with_sources
   $1.TMP_DIRS            := $$($1.TMP_DIR)
   $1.INCLUDE_DIRS        := $$(call specialize_paths,$$($1.INCLUDE_DIRS))
   $1.SOURCE_DIRS         := $$(call specialize_paths,$$($1.SOURCE_DIRS))
+  $1.OBJECT_FILES        := $$(call specialize_paths,$$($1.OBJECT_FILES))
   $1.DOCUMENTATION_DIRS  := $$(call specialize_paths,$$($1.DOCUMENTATION_DIRS))
   $1.LIB_DIRS            := $$(call specialize_paths,$$($1.LIB_DIRS)) $(DIST_LIB_DIR)
   $1.DLL_DIRS            := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)
@@ -714,7 +716,7 @@ ifneq (,$$($1.SOURCE_DIRS))
 
   $$($1.DOXYGEN_SELF_CHM_FILE): $(DOXYGEN_TAGS_DIR) $$(DIST_INFO_DIR) $$($1.TMP_DIR) $$($1.DOXYGEN_CFG_FILE)
 		@echo Generate $$(notdir $$@)...
-		@"$$(DOXYGEN_TOOL)" $$($1.DOXYGEN_CFG_FILE)
+		@export PATH="$$(subst ;,:,$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(HHC_DIR);)$$(PATH)))" && "$$(DOXYGEN_TOOL)" $$($1.DOXYGEN_CFG_FILE)
 		@cp "$$($1.TMP_DIR)/html/index.chm" "$$@"
 
   $$($1.DOXYGEN_CFG_FILE): $$($1.TMP_DIR) force  
@@ -788,7 +790,7 @@ endif
 ifeq ($$($1.DEFAULT_TOPIC),$$(DOXYGEN_DEFAULT_TOPIC))
 		@echo Default topic for doxygen documentation merge not defined. Using default (set target property DEFAULT_TOPIC for use custom default topic page)
 endif
-		@$$(HHC_DIR)/hhc $$($1.MERGE_HHP) || true
+		@"$$(HHC_DIR)/hhc" $$($1.MERGE_HHP) || true
 		@mv $$($1.TMP_DIR)/merged.chm "$$@"
 
 endif

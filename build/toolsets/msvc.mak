@@ -60,13 +60,13 @@ VALID_TARGET_TYPES += cs-dynamic-lib cs-application
 ###################################################################################################
 #Константы
 ###################################################################################################
-LIB_SUFFIX     := .lib
-OBJ_SUFFIX     := .obj
-EXE_SUFFIX     := .exe
-DLL_SUFFIX     := .dll
-DLL_LIB_SUFFIX := .lib
-DLL_PREFIX     :=
-PROFILES   += msvc win32 has_windows x86
+LIB_SUFFIX        := .lib
+OBJ_SUFFIX        := .obj
+EXE_SUFFIX        := .exe
+DLL_SUFFIX        := .dll
+DLL_LIB_SUFFIX    := .lib
+DLL_PREFIX        :=
+PROFILES          += msvc win32 has_windows x86 vcx86
 COMMON_LINK_FLAGS += -stack:128000 /MACHINE:X86
 
 ###################################################################################################

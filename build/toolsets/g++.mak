@@ -5,20 +5,21 @@
 ###################################################################################################
 #Константы
 ###################################################################################################
-LIB_SUFFIX           ?= .a
-OBJ_SUFFIX           ?= .o
-EXE_SUFFIX           ?= .exe
-DLL_SUFFIX           ?= .dll
-DLL_PREFIX           ?=
-DLL_LIB_SUFFIX       ?= .a
-LIB_PREFIX           ?= lib
-COMPILER_GCC         ?= gcc
-LINKER_GCC           ?= g++
-LIB_GCC              ?= ar
-PROFILES             += g++
-DEFAULT_LIBS         +=
-COMMON_CFLAGS        := -Os -Wall -Wno-format $(COMMON_CFLAGS)
-DISABLE_CPP_WARNINGS += -Wno-invalid-offsetof
+LIB_SUFFIX            ?= .a
+OBJ_SUFFIX            ?= .o
+EXE_SUFFIX            ?= .exe
+DLL_SUFFIX            ?= .dll
+DLL_PREFIX            ?=
+DLL_LIB_SUFFIX        ?= .a
+LIB_PREFIX            ?= lib
+COMPILER_GCC          ?= gcc
+LINKER_GCC            ?= g++
+LIB_GCC               ?= ar
+PROFILES              += g++
+DEFAULT_LIBS          +=
+COMMON_CFLAGS         := -Os -Wall -Wno-format $(COMMON_CFLAGS)
+DISABLE_CPP_WARNINGS  += -Wno-invalid-offsetof
+SOURCE_FILES_SUFFIXES += s
 
 ###################################################################################################
 #Компиляция исходников (исходный файл, список подключаемых каталогов, список подключаемых файлов, каталог с объектными файлами,
@@ -30,7 +31,9 @@ endef
 
 define tools.g++.c++compile
 $(call for_each_file,src,$(if $(filter -x c++,$6),,$(filter %.c,$1)),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $6,$7,$8)) && \
-$(call for_each_file,src,$(filter %.cpp %.mm,$1)$(if $(filter -x c++,$6), $(filter %.c,$1)),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $(COMMON_CPPFLAGS) $(DISABLE_CPP_WARNINGS) $6,$7,$8))
+$(call for_each_file,src,$(filter %.cpp,$1)$(if $(filter -x c++,$6), $(filter %.c,$1)),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $(COMMON_CPPFLAGS) $(DISABLE_CPP_WARNINGS) $6,$7,$8)) && \
+$(call for_each_file,src,$(filter %.mm,$1),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $(COMMON_CPPFLAGS) $(COMMON_MMFLAGS) $(DISABLE_CPP_WARNINGS) $6,$7,$8)) && \
+$(call for_each_file,src,$(filter %.s,$1),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $6,$7,$8)) 
 endef
 
 ###################################################################################################
