@@ -31,3 +31,5 @@ export.link.common.xml.IMPORTS       := link.common
 export.link.common.zip_file_system.LIBS          := funner.common.zip_file_system
 export.link.common.zip_file_system.LINK_INCLUDES := ZipFileSystem
 export.link.common.zip_file_system.IMPORTS       := link.common link.extern.zlib link.extern.zzip run.extern.zzip
+
+export.info.common.CHMS := funner.common

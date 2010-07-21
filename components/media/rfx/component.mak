@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.RFX.SOURCES MEDIA.RFX.DEFAULT_SERIALIZERS.SOURCES MEDIA.RFX.TESTS MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS
+TARGETS := MEDIA.RFX.SOURCES MEDIA.RFX.DEFAULT_SERIALIZERS.SOURCES MEDIA.RFX.TESTS MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS MEDIA.RFX.INFO
 
 #Цель №1 - sources
 MEDIA.RFX.SOURCES.TYPE             := static-lib
@@ -44,3 +44,9 @@ MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.LIBS             :=
 MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.COMPILER_CFLAGS  :=
 MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.COMPILER_DEFINES :=
 MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS.IMPORTS          := link.media.rfx.default_serializers compile.media.rfx
+
+#Цель - сборка документации
+MEDIA.RFX.INFO.TYPE        := doxygen-info
+MEDIA.RFX.INFO.CHM_NAME    := funner.media.rfx
+MEDIA.RFX.INFO.SOURCE_DIRS := include
+MEDIA.RFX.INFO.IMPORTS     := compile.media.rfx

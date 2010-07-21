@@ -15,3 +15,5 @@ export.link.media.video.theora.IMPORTS       := link.media.video link.extern.the
 export.link.media.video.gvd.LIBS          := funner.media.video.gvd
 export.link.media.video.gvd.LINK_INCLUDES := GvdDecoder
 export.link.media.video.gvd.IMPORTS       := link.media.video
+
+export.info.media.video.CHMS := funner.media.video

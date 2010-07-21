@@ -24,7 +24,12 @@ SDKS.FUNNER3D.IMPORTS       := compile.system compile.render.low_level compile.m
                                link.input.manager.xkeymap link.input.manager.xkeyreg link.script.lua \
                                link.engine.script_binds.sg link.engine.script_binds.lua_override link.engine.script_binds.math \
                                link.engine.script_binds.common \
-                               run.extern.devil run.extern.zzip run.sound.low_level.openal_driver
+                               run.extern.devil run.extern.zzip run.sound.low_level.openal_driver \
+                               info.math.bound_volumes info.common info.input.low_level info.input.manager \
+                               info.math.vecmath info.math.curves info.media.image info.media.animation \
+                               info.media.geometry info.media.sound info.media.video info.media.rfx \
+                               info.physics.low_level info.render.low_level info.scene_graph.core \
+                               info.system info.xtl info.script.core
 SDKS.FUNNER3D.win32.IMPORTS := link.input.direct_input_driver
 
 SDKS.FUNNER3D.BUILD.TYPE           := sdk

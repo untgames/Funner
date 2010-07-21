@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := SOUND.LOW_LEVEL.SOURCES SOUND.LOW_LEVEL.TESTS
+TARGETS := SOUND.LOW_LEVEL.SOURCES SOUND.LOW_LEVEL.TESTS SOUND.LOW_LEVEL.INFO
 
 #Цель №1 - Sound system sources
 SOUND.LOW_LEVEL.SOURCES.TYPE             := static-lib
@@ -25,3 +25,9 @@ SOUND.LOW_LEVEL.TESTS.DLL_DIRS         :=
 SOUND.LOW_LEVEL.TESTS.COMPILER_CFLAGS  :=
 SOUND.LOW_LEVEL.TESTS.COMPILER_DEFINES :=
 SOUND.LOW_LEVEL.TESTS.IMPORTS          := compile.sound.low_level link.sound.low_level compile.common
+
+#Цель - сборка документации
+SOUND.LOW_LEVEL.INFO.TYPE        := doxygen-info
+SOUND.LOW_LEVEL.INFO.CHM_NAME    := funner.sound.low_level
+SOUND.LOW_LEVEL.INFO.SOURCE_DIRS := include
+SOUND.LOW_LEVEL.INFO.IMPORTS     := compile.sound.low_level

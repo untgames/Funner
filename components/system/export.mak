@@ -13,3 +13,5 @@ export.link.system.linux.LIBS         := dl pthread
 export.link.system.bada.LIBS          := FApp FBase FUiControls FUi FGraphics
 export.link.system.bada.LINK_FLAGS    := -shared 
 export.link.system.bada.LINK_INCLUDES := OspMain
+
+export.info.system.CHMS := funner.system

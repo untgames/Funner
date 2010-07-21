@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS
+TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS SYSTEMLIB.INFO
 
 #Цель №1 - System library sources
 SYSTEMLIB.SOURCES.TYPE                              := static-lib
@@ -34,3 +34,9 @@ SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/no_threa
 SYSTEMLIB.TESTS.TYPE             := test-suite
 SYSTEMLIB.TESTS.SOURCE_DIRS      := tests/wrappers tests/thread
 SYSTEMLIB.TESTS.IMPORTS          := compile.system link.system
+
+#Цель - сборка документации
+SYSTEMLIB.INFO.TYPE        := doxygen-info
+SYSTEMLIB.INFO.CHM_NAME    := funner.system
+SYSTEMLIB.INFO.SOURCE_DIRS := include
+SYSTEMLIB.INFO.IMPORTS     := compile.system

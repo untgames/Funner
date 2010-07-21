@@ -2,7 +2,7 @@
 #Определения и константы
 ###################################################################################################
 TARGETS := MEDIA.ANIMATION.SOURCES MEDIA.ANIMATION.XANIM.SOURCES MEDIA.ANIMATION.BINANIM.SOURCES \
-           MEDIA.ANIMATION.TESTS MEDIA.ANIMATION.XANIM.TESTS MEDIA.ANIMATION.BINANIM.TESTS
+           MEDIA.ANIMATION.TESTS MEDIA.ANIMATION.XANIM.TESTS MEDIA.ANIMATION.BINANIM.TESTS MEDIA.ANIMATION.INFO
 
 #Цель - sources
 MEDIA.ANIMATION.SOURCES.TYPE        := static-lib
@@ -36,3 +36,9 @@ MEDIA.ANIMATION.XANIM.TESTS.IMPORTS     := compile.media.animation compile.math.
 MEDIA.ANIMATION.BINANIM.TESTS.TYPE        := test-suite
 MEDIA.ANIMATION.BINANIM.TESTS.SOURCE_DIRS := tests/binanim
 MEDIA.ANIMATION.BINANIM.TESTS.IMPORTS     := compile.media.animation compile.math.curves link.media.animation.binanim
+
+#Цель - сборка документации
+MEDIA.ANIMATION.INFO.TYPE        := doxygen-info
+MEDIA.ANIMATION.INFO.CHM_NAME    := funner.media.animation
+MEDIA.ANIMATION.INFO.SOURCE_DIRS := include
+MEDIA.ANIMATION.INFO.IMPORTS     := compile.media.animation

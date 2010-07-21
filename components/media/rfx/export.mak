@@ -10,3 +10,5 @@ export.link.media.rfx.IMPORTS := link.common
 export.link.media.rfx.default_serializers.LIBS          := funner.media.rfx.default_serializers
 export.link.media.rfx.default_serializers.LINK_INCLUDES := XrfxLoader XmtlLoader XmtlSaver DefaultShaderLoader
 export.link.media.rfx.default_serializers.IMPORTS       := link.media.rfx link.common.xml
+
+export.info.media.rfx.CHMS := funner.media.rfx

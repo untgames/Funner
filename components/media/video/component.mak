@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.VIDEO.CORE MEDIA.VIDEO.THEORA.SOURCES MEDIA.VIDEO.GVD.SOURCES MEDIA.VIDEO.TESTS
+TARGETS := MEDIA.VIDEO.CORE MEDIA.VIDEO.THEORA.SOURCES MEDIA.VIDEO.GVD.SOURCES MEDIA.VIDEO.TESTS MEDIA.VIDEO.INFO
 
 #Video sources
 MEDIA.VIDEO.CORE.TYPE        := static-lib
@@ -25,3 +25,9 @@ MEDIA.VIDEO.GVD.SOURCES.IMPORTS       := compile.media.video compile.media.image
 MEDIA.VIDEO.TESTS.TYPE        := test-suite
 MEDIA.VIDEO.TESTS.SOURCE_DIRS := tests/core tests/theora tests/gvd
 MEDIA.VIDEO.TESTS.IMPORTS     := compile.media.video link.media.video compile.media.image link.media.video.theora link.media.video.gvd
+
+#Цель - сборка документации
+MEDIA.VIDEO.INFO.TYPE        := doxygen-info
+MEDIA.VIDEO.INFO.CHM_NAME    := funner.media.video
+MEDIA.VIDEO.INFO.SOURCE_DIRS := include
+MEDIA.VIDEO.INFO.IMPORTS     := compile.media.video

@@ -24,7 +24,7 @@ DOXYGEN_TAGS_DIR_SHORT_NAME             := ~DOXYGEN_TAGS #Имя каталога с тэгами 
 EXPORT_VAR_PREFIX                       := export        #Префикс имени переменной экспортирования настроек компонента
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := batch-flag    #Базовое имя файла-флага пакетной компиляции
 VALID_TARGET_TYPES                      := static-lib dynamic-lib application test-suite package doxygen-info sdk #Допустимые типы целей
-PACKAGE_COMMANDS                        := build clean test check run install export #Команды, делегируемые компонентам пакета
+PACKAGE_COMMANDS                        := build clean test check run install export info #Команды, делегируемые компонентам пакета
 COMPILE_TOOL                            := tools.c++compile     #Имя макроса утилиты компиляции C++ файлов
 LINK_TOOL                               := tools.link           #Имя макроса утилиты редактора связей
 LIB_TOOL                                := tools.lib            #Имя макроса утилиты архивирования объектных файлов
@@ -69,7 +69,7 @@ TOOLSET_FILE                            := $(TOOLSETS_DIR)/$(CURRENT_TOOLSET).ma
 DIST_DIR                                := $(ROOT)/$(DIST_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)
 DIST_LIB_DIR                            := $(DIST_DIR)/lib
 DIST_BIN_DIR                            := $(DIST_DIR)/bin
-DIST_INFO_DIR                           := $(DIST_DIR)/info
+DIST_INFO_DIR                           := $(DIST_DIR)/doc
 PCH_SHORT_NAME                          := $(strip $(PCH_SHORT_NAME))
 BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := $(strip $(BATCH_COMPILE_FLAG_FILE_SHORT_NAME))
 ROOT_TMP_DIR                            := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)
@@ -97,6 +97,7 @@ EXPORT_LIB_DIR                          := lib
 EXPORT_INCLUDE_DIR                      := include
 EXPORT_DLL_DIR                          := bin
 EXPORT_BIN_DIR                          := bin
+EXPORT_INFO_DIR                         := doc
 
 ###################################################################################################
 #Если не указан фильтры - обрабатываем все доступные
@@ -804,6 +805,7 @@ define process_target.sdk
   $1.EXPORT.INCLUDES           := $$($1.INCLUDE_DIRS)
   $1.EXPORT.DLLS               := $$($1.DLLS)
   $1.EXPORT.EXECUTABLES        := $$($1.EXECUTABLES)
+  $1.EXPORT.CHMS               := $$($1.CHMS)
   $1.EXPORT.LIB_FILTER         := $$(strip $$($1.LIB_FILTER))
   $1.EXPORT.LIB_EXCLUDE_FILTER := $$($1.LIB_EXCLUDE_FILTER)  
   $1.EXPORT.OUT_DIR            := $$(if $$($1.OUT_DIR),$$($1.OUT_DIR),$$($1.NAME))
@@ -827,9 +829,9 @@ ifneq (,$$($1.NAME))
 		@echo '#Exports for $$($1.NAME)'> $$@
 		@echo '$$($1.COMPILE_PREFIX).INCLUDE_DIRS := $$(notdir $$(EXPORT_INCLUDE_DIR))' >> $$@		
 		@echo '$$($1.LINK_PREFIX).LIB_DIRS        := $$(notdir $$(EXPORT_LIB_DIR))' >> $$@
-		@echo '$$($1.LINK_PREFIX).LIBS            := $$(strip $$($1.LIBS))' >> $$@		
-		@echo '$$($1.LINK_PREFIX).LINK_INCLUDES   := $$($1.LINK_INCLUDES)' >> $$@
-		@echo '$$($1.RUN_PREFIX).DLLS             := $$($1.DLLS)' >> $$@
+		@echo '$$($1.LINK_PREFIX).LIBS            := $$(foreach lib,$$($1.LIBS),$$(lib) )' >> $$@		
+		@echo '$$($1.LINK_PREFIX).LINK_INCLUDES   := $$(foreach link,$$($1.LINK_INCLUDES),$$(link) )' >> $$@
+		@echo '$$($1.RUN_PREFIX).DLLS             := $$(foreach dll,$$($1.DLLS),$$(dll) )' >> $$@
 		@echo '$$($1.RUN_PREFIX).DLL_DIRS         := $$(notdir $$(EXPORT_DLL_DIR))' >> $$@
 
 endif
@@ -846,6 +848,7 @@ define import_variables
   $2.DLL_DIRS             := $$($2.DLL_DIRS) $$($1.DLL_DIRS:%=$3%)
   $2.DLLS                 := $$($2.DLLS) $$($1.DLLS)
   $2.LIBS                 := $$($2.LIBS) $$($1.LIBS)
+  $2.CHMS                 := $$($2.CHMS) $$($1.CHMS)
   $2.EXCLUDE_DEFAULT_LIBS := $$($2.EXCLUDE_DEFAULT_LIBS) $$($1.EXCLUDE_DEFAULT_LIBS)
   $2.COMPILER_CFLAGS      := $$($2.COMPILER_CFLAGS) $$($1.COMPILER_CFLAGS)
   $2.COMPILER_DEFINES     := $$($2.COMPILER_DEFINES) $$($1.COMPILER_DEFINES)
@@ -934,12 +937,14 @@ define process_target_common
   $1.EXPORT.INCLUDES    := $$(call specialize_paths,$$($1.EXPORT.INCLUDES))
   $1.EXPORT.DLLS        := $$($1.EXPORT.DLLS:%=$$($1.EXPORT.OUT_DIR)/$$(EXPORT_DLL_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
   $1.EXPORT.EXECUTABLES := $$($1.EXPORT.EXECUTABLES:%=$$(DIST_BIN_DIR)/%$(EXE_SUFFIX))
+  $1.EXPORT.CHMS        := $$($1.EXPORT.CHMS:%=$$(DIST_INFO_DIR)/%.chm)  
 
-  export: $$($1.EXPORT.DLLS)
+  export: $$($1.EXPORT.DLLS) $$($1.EXPORT.CHMS)
 
   $$(foreach source,$$($1.EXPORT.LIBS),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_LIB_DIR),$1)))
   $$(foreach source,$$($1.EXPORT.INCLUDES),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_INCLUDE_DIR),$1)))
   $$(foreach source,$$($1.EXPORT.EXECUTABLES),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_BIN_DIR),$1)))
+  $$(foreach source,$$($1.EXPORT.CHMS),$$(eval $$(call process_copy_files,$$(source),$$($1.EXPORT.OUT_DIR)/$$(EXPORT_INFO_DIR),$1)))  
 
   $$(foreach file,$$($1.EXPORT.DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))
 endef

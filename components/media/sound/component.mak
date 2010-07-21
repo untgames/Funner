@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.SOUND.SOURCES MEDIA.SOUND.DEFAULT_DECODERS MEDIA.SOUND.SNDDECL MEDIA.SOUND.TESTS
+TARGETS := MEDIA.SOUND.SOURCES MEDIA.SOUND.DEFAULT_DECODERS MEDIA.SOUND.SNDDECL MEDIA.SOUND.TESTS MEDIA.SOUND.INFO
 
 #Цель №1 - Sound sources
 MEDIA.SOUND.SOURCES.TYPE             := static-lib
@@ -45,3 +45,9 @@ MEDIA.SOUND.TESTS.LIBS             :=
 MEDIA.SOUND.TESTS.COMPILER_CFLAGS  :=
 MEDIA.SOUND.TESTS.COMPILER_DEFINES :=
 MEDIA.SOUND.TESTS.IMPORTS          := compile.media.sound link.media.sound link.media.sound.default_decoders link.media.sound.snddecl
+
+#Цель - сборка документации
+MEDIA.SOUND.INFO.TYPE        := doxygen-info
+MEDIA.SOUND.INFO.CHM_NAME    := funner.media.sound
+MEDIA.SOUND.INFO.SOURCE_DIRS := include
+MEDIA.SOUND.INFO.IMPORTS     := compile.media.sound

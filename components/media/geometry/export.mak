@@ -16,4 +16,4 @@ export.link.media.geometry.xmesh.LIBS          := funner.media.geometry.xmesh
 export.link.media.geometry.xmesh.LINK_INCLUDES := XMeshLoader XMeshSaver
 export.link.media.geometry.xmesh.IMPORTS       := link.media.geometry link.common.xml
 
-
+export.info.media.geometry.CHMS := funner.media.geometry

@@ -21,3 +21,5 @@ export.link.media.image.left_bottom_packer.IMPORTS       := link.media.image
 export.link.media.image.pvr.LIBS          := funner.media.image.pvr_loader
 export.link.media.image.pvr.LINK_INCLUDES := PvrLoader
 export.link.media.image.pvr.IMPORTS       := link.media.image
+
+export.info.media.image.CHMS := funner.media.image
