@@ -716,7 +716,7 @@ ifneq (,$$($1.SOURCE_DIRS))
 
   $$($1.DOXYGEN_SELF_CHM_FILE): $(DOXYGEN_TAGS_DIR) $$(DIST_INFO_DIR) $$($1.TMP_DIR) $$($1.DOXYGEN_CFG_FILE)
 		@echo Generate $$(notdir $$@)...
-		@"$$(DOXYGEN_TOOL)" $$($1.DOXYGEN_CFG_FILE)
+		@export PATH="$$(subst ;,:,$$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$$(HHC_DIR);)$$(PATH)))" && "$$(DOXYGEN_TOOL)" $$($1.DOXYGEN_CFG_FILE)
 		@cp "$$($1.TMP_DIR)/html/index.chm" "$$@"
 
   $$($1.DOXYGEN_CFG_FILE): $$($1.TMP_DIR) force  
@@ -790,7 +790,7 @@ endif
 ifeq ($$($1.DEFAULT_TOPIC),$$(DOXYGEN_DEFAULT_TOPIC))
 		@echo Default topic for doxygen documentation merge not defined. Using default (set target property DEFAULT_TOPIC for use custom default topic page)
 endif
-		@$$(HHC_DIR)/hhc $$($1.MERGE_HHP) || true
+		@"$$(HHC_DIR)/hhc" $$($1.MERGE_HHP) || true
 		@mv $$($1.TMP_DIR)/merged.chm "$$@"
 
 endif

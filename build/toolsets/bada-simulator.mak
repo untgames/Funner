@@ -15,7 +15,7 @@ SIMULATOR_TEMPLATE_PROJECT_FILES := $(patsubst $(SIMULATOR_TEMPLATE_PROJECT_DIR)
 SIMULATOR                        := $(call convert_path,$(BADA_SDK_HOME))/Lib/WinSgpp/Simulator
 SIMULATOR_WATCHER                := $(BUILD_DIR)platforms/bada/watch_simulator.sh
 COMMON_CFLAGS                    += -DBADA_SIMULATOR -DDEFAULT_APP_ID='L"$(SIMULATOR_APP_ID)"' -DDEFAULT_APP_SECRET='L"$(SIMULATOR_APP_SECRET)"' -DDEFAULT_APP_NAME='L"$(SIMULATOR_APP_NAME)"'
-COMMON_LINK_FLAGS                += -L$(BADA_SDK_HOME)/Lib/WinSgpp
+COMMON_LINK_FLAGS                += -L$(BADA_SDK_HOME)/Model/S8500/Simulator
 
 include $(TOOLSETS_DIR)/bada.mak
 
