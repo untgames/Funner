@@ -1034,7 +1034,7 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
     data.scene_writer->WriteAttribute ("OrientationPivotEnabled", "true");
   }
   
-  if (params.need_relative)
+//  if (params.need_relative)
   {
     stl::string sprite_name = get_sprite_name (params, resource_name);
     
