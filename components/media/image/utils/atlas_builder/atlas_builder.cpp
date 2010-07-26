@@ -80,6 +80,7 @@ struct Params
   bool          invert_x;                 //инвертирование координаты X тайлов
   bool          invert_y;                 //инвертирование координаты Y тайлов
   bool          swap_axises;              //обмен осей местами
+  bool          square_axises;          //квадратные текстуры
 };
 
 //получение подсказки по программе
@@ -175,6 +176,12 @@ void command_line_swap_axises (const char*, Params& params)
   params.swap_axises = true;
 }
 
+//установка параметра квадратных текстур
+void command_line_square_axises (const char*, Params& params)
+{
+  params.square_axises = true;
+}
+
 //установка маски изолированных изображений
 void command_line_isolated_images (const char* string, Params& params)
 {
@@ -198,6 +205,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_invert_y,            "invert-y",        0,          0, "invert Y coordinate in layout of tiles"},
     {command_line_swap_axises,         "swap-axises",     0,          0, "swap axises at layout tiles"},
     {command_line_isolated_images,     "isolated-images", 0, "wildcard", "set wildcard for standalone images which will be isolate from general atlases"},
+    {command_line_square_axises,       "square",          0,          0, "square axises"},    
   };
   
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -447,6 +455,7 @@ void build (Params& params)
     if (params.invert_x)         pack_flags |= media::AtlasPackFlag_InvertTilesX;
     if (params.invert_y)         pack_flags |= media::AtlasPackFlag_InvertTilesY;
     if (params.swap_axises)      pack_flags |= media::AtlasPackFlag_SwapAxises;      
+    if (params.square_axises)    pack_flags |= media::AtlasPackFlag_SquareAxises;
       
     while (!sources_to_process.empty ())
     {
@@ -632,6 +641,7 @@ int main (int argc, const char* argv [])
   params.invert_x          = false;
   params.invert_y          = false;
   params.swap_axises       = false;
+  params.square_axises     = false;
 
     //разбор командной строки
 

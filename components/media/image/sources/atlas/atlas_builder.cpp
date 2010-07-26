@@ -215,6 +215,11 @@ struct AtlasBuilder::Impl
         }
 
           //создание изображения атласа
+          
+        if (pack_flags & AtlasPackFlag_SquareAxises)
+        {
+          result_image_width = result_image_height = stl::max (result_image_width, result_image_height);
+        }
 
         Image result_image (result_image_width, result_image_height, 1, (*images.begin ())->image_holder->image->Format ());
 

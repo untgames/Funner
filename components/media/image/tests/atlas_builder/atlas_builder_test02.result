@@ -14,4 +14,5 @@ atlas-builder [<OPTIONS>] <SOURCE> ...
     --invert-y                 invert Y coordinate in layout of tiles
     --swap-axises              swap axises at layout tiles
     --isolated-images=<wildcard> set wildcard for standalone images which will be isolate from general atlases
+    --square                   square axises
 successfull!
