@@ -548,7 +548,7 @@ void process_materials (Params& params, ConvertData& data)
 
       XmlWriter::Scope sprite_profile (writer, "sprite_profile");
 
-      writer.WriteAttribute ("image", common::format ("%s/%s", params.output_material_textures_dir_name.c_str (), common::notdir (desc.image_path.c_str ())).c_str ());
+      writer.WriteAttribute ("image", common::format ("%s/%s", params.output_material_textures_dir_name.c_str (), common::notdir (desc.image_path.c_str ()).c_str ()).c_str ());
       writer.WriteAttribute ("blend_mode", "translucent");
       writer.WriteAttribute ("tiling", "1");
       writer.WriteAttribute ("tile_width", desc.width);
@@ -937,7 +937,7 @@ void process_sprite_common
     
     data.scene_writer->WriteAttribute ("Name", params.need_relative ? "offset" : "position");
     
-    write_track (data, *x_track, *y_track, name, params.need_relative ? math::vec3f (0.0f) : position,
+    write_track (data, *x_track, *y_track, name, params.need_relative ? math::vec2f (0.0f) : position,
       math::vec2f (params.need_inverse_x ? -1.0f : 1.0f, params.need_inverse_y ? -1.0f : 1.0f) * scale);
   }
   else if (!equal (position, math::vec2f (.0f), EPSILON) && !params.need_relative)
@@ -1034,12 +1034,9 @@ void process_sprite (Params& params, ConvertData& data, const Frame& frame, cons
     data.scene_writer->WriteAttribute ("OrientationPivotEnabled", "true");
   }
   
-//  if (params.need_relative)
-  {
-    stl::string sprite_name = get_sprite_name (params, resource_name);
+  stl::string sprite_name = get_sprite_name (params, resource_name);
     
-    data.scene_writer->WriteAttribute ("Layout", sprite_name.c_str ());
-  }
+  data.scene_writer->WriteAttribute ("Layout", sprite_name.c_str ());
 
   data.scene_writer->WriteAttribute ("Active", "false");
   
