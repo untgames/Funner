@@ -28,25 +28,7 @@ inline void XmlWriter::WriteXmlTextData (const T& value, const char* format)
 
 inline void XmlWriter::WriteXmlTextData (const char* value)
 {
-  if (strstr (value, " "))
-  {
-    CheckEndOfDocument ("common::XmlWriter::BeginCData");
-    CloseAttributeList ();
-    write              (Stream (), "<![CDATA[");
-
-    try
-    {
-      xml_write (Stream (), value);
-      write     (Stream (), "]]>");
-    }
-    catch (...)
-    {
-      write (Stream (), "]]>");
-      throw;
-    }
-  }
-  else
-    write (Stream (), value);
+  write (Stream (), value);
 }
 
 inline void XmlWriter::WriteXmlTextData (const char* value, const char* format)
