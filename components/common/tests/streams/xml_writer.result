@@ -13,15 +13,15 @@ Results of xml_writer_test:
     <!-- Scalar types serialization -->
     <scalar int="-1" size_t="ffffffff" float="3.14159" double="3.14159" long_double="3.14159">
       <string>
-        <![CDATA[Hello world]]>
+        Hello world
       </string>
       <char>
         x
       </char>
       <text>
+        Hello world!
         <![CDATA[Hello world!]]>
-        <![CDATA[Hello world!]]>
-        <![CDATA[Hello world!]]>
+        Hello world!
       </text>
     </scalar>
     <!-- Mathlib types serialization -->
