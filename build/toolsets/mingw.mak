@@ -18,6 +18,7 @@ LINKER_GCC        := $(MINGW_BIN)/g++.exe
 LIB_GCC           := $(MINGW_BIN)/ar
 COMMON_CFLAGS     += -mwin32
 COMMON_LINK_FLAGS += -Wl,--stack,128000
+EXCLUDE_LIBS      := uuid
 
 ###################################################################################################
 #Подключение родительского скрипта сборки

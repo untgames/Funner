@@ -856,10 +856,11 @@ endef
 
 #Предварительный импорт настроек - построение списка импорта (имя зависимости, имя цели, имя переменной со списком)
 define prepare_to_import_settings
-
 # Проверка циклического импорта
 ifneq (,$$(filter $1,$$($3)))
-  $3 := $$(foreach imp,$$($3),$$(if $$(filter $1,$$(imp)),,$$(imp)))
+  ifneq (1,$$(strip $$($(EXPORT_VAR_PREFIX).$1.MULTI_IMPORTS)))
+    $3 := $$(foreach imp,$$($3),$$(if $$(filter $1,$$(imp)),,$$(imp)))
+  endif
 endif
 
   $3 := $$($3) $1
@@ -909,7 +910,7 @@ define process_target_common
 
   DUMP.$1:
 		@echo Dump target \'$1\' settings
-		@$$(foreach var,$$(sort $$(filter $1.%,$(.VARIABLES))),echo '    $$(var:$1.%=%) = $$($$(var))' && ) true
+		@$$(foreach var,$$(sort $$(filter $1.%,$(.VARIABLES) $1.PROCESSED_IMPORTS)),echo '    $$(var:$1.%=%) = $$($$(var))' && ) true
 
   dump: DUMP.$1
 
