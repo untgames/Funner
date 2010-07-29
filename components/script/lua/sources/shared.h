@@ -22,6 +22,9 @@
 #include <script/environment.h>
 
 #ifdef LUAJIT
+
+#include <float.h>
+
 extern "C" {
 #include <luajit.h>
 #endif

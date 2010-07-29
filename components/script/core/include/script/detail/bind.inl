@@ -5,63 +5,6 @@
 namespace detail
 {
 
-template <class T, bool is_enum=xtl::type_traits::is_enum<T>::value>
-struct make_invoker_argument_helper
-{
-    //все не скалярные типы данных приводятся к xtl::any
-
-  typedef xtl::any result_type;
-  
-  static result_type get (T& value) { return xtl::make_ref_any (value); }
-};
-
-template <class T>
-struct make_invoker_argument_helper<T, true>
-{
-    //enum-типы приводятся к int
-
-  typedef int result_type;
-  
-  static result_type get (const T& value) { return static_cast<result_type> (value); }
-};
-
-template <class T>
-inline typename make_invoker_argument_helper<T>::result_type make_invoker_argument (T& value)
-{
-  return make_invoker_argument_helper<T>::get (value);
-}
-
-inline xtl::any    make_invoker_argument (const xtl::any& value)    { return value; }
-inline bool        make_invoker_argument (bool value)               { return value; }
-inline int         make_invoker_argument (char value)               { return value; }
-inline int         make_invoker_argument (signed char value)        { return value; }
-inline int         make_invoker_argument (unsigned char value)      { return value; }
-inline int         make_invoker_argument (short value)              { return value; }
-inline int         make_invoker_argument (unsigned short value)     { return value; }
-inline int         make_invoker_argument (int value)                { return value; }
-inline int         make_invoker_argument (unsigned int value)       { return value; }
-inline int         make_invoker_argument (long value)               { return value; }
-inline int         make_invoker_argument (unsigned long value)      { return value; }
-inline float       make_invoker_argument (float value)              { return value; }
-inline float       make_invoker_argument (double value)             { return static_cast<float> (value); }
-inline float       make_invoker_argument (long double value)        { return static_cast<float> (value); }
-inline void*       make_invoker_argument (void* value)              { return value; }
-inline void*       make_invoker_argument (const void* value)        { return (void*)value; }
-inline const char* make_invoker_argument (const char* string)       { return string; }
-inline const char* make_invoker_argument (char* string)             { return string; }
-
-template <class Traits, class Allocator>
-inline const char* make_invoker_argument (const stl::basic_string<char, Traits, Allocator>& s)
-{
-  return s.c_str ();
-}
-
-template <class Traits, class Allocator>
-inline const char* make_invoker_argument (stl::basic_string<char, Traits, Allocator>& s)
-{
-  return s.c_str ();
-}
-
 /*
     Извлечение аргументов из стека
 */
@@ -71,7 +14,7 @@ template <class T, bool is_enum=xtl::type_traits::is_enum<T>::value> struct comm
 {
   typedef T dump_type;
 
-  static T get (IStack& stack, size_t index) { return xtl::any_multicast<T> (stack.GetVariant (index)); }
+  static T get (IStack& stack, size_t index) { return xtl::any_multicast<T> (stack.GetVariant (index)); }  
 };
 
 //извлечение enum-типов
@@ -160,6 +103,73 @@ template <> struct argument_selector<bool>
 
 template <class Traits, class Allocator>
 struct argument_selector<stl::basic_string<char, Traits, Allocator> > : public string_argument_selector {};
+
+/*
+    Помещение аргумента в стек
+*/
+
+template <class T>
+struct argument_invoker
+{
+  typedef xtl::any type;
+
+  static type make (const T& value) { return xtl::make_ref_any (value); }  
+};
+
+template <class T, bool is_enum=xtl::type_traits::is_enum<T>::value>
+struct argument_invoker_helper: public argument_invoker<T> {};
+
+template <class T>
+struct argument_invoker_helper<T, true>
+{
+    //enum-типы приводятся к int
+
+  typedef int type;
+
+  static int make (const T& value) { return static_cast<int> (value); }
+};
+
+template <class T>
+inline typename argument_invoker_helper<T>::type make_invoker_argument (const T& value)
+{
+  return argument_invoker_helper<T>::make (value);
+}
+
+inline xtl::any    make_invoker_argument (const xtl::any& value)    { return value; }
+inline bool        make_invoker_argument (bool value)               { return value; }
+inline int         make_invoker_argument (char value)               { return value; }
+inline int         make_invoker_argument (signed char value)        { return value; }
+inline int         make_invoker_argument (unsigned char value)      { return value; }
+inline int         make_invoker_argument (short value)              { return value; }
+inline int         make_invoker_argument (unsigned short value)     { return value; }
+inline int         make_invoker_argument (int value)                { return value; }
+inline int         make_invoker_argument (unsigned int value)       { return value; }
+inline int         make_invoker_argument (long value)               { return value; }
+inline int         make_invoker_argument (unsigned long value)      { return value; }
+inline float       make_invoker_argument (float value)              { return value; }
+inline float       make_invoker_argument (double value)             { return static_cast<float> (value); }
+inline float       make_invoker_argument (long double value)        { return static_cast<float> (value); }
+inline void*       make_invoker_argument (void* value)              { return value; }
+inline void*       make_invoker_argument (const void* value)        { return (void*)value; }
+inline const char* make_invoker_argument (const char* string)       { return string; }
+inline const char* make_invoker_argument (char* string)             { return string; }
+
+template <unsigned int N> inline const char* make_invoker_argument (const char string [N]) { return &string [0]; }
+template <unsigned int N> inline const char* make_invoker_argument (char string [N])       { return &string [0]; }
+template <unsigned int N> inline const char* make_invoker_argument (const unsigned char string [N]) { return (const char*)&string [0]; }
+template <unsigned int N> inline const char* make_invoker_argument (unsigned char string [N])       { return (const char*)&string [0]; }
+
+template <class Traits, class Allocator>
+inline const char* make_invoker_argument (const stl::basic_string<char, Traits, Allocator>& s)
+{
+  return s.c_str ();
+}
+
+template <class Traits, class Allocator>
+inline const char* make_invoker_argument (stl::basic_string<char, Traits, Allocator>& s)
+{
+  return s.c_str ();
+}
 
 //взятие аргумента из стека
 template <class T>

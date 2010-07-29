@@ -69,7 +69,16 @@ Interpreter::Interpreter (const EnvironmentPointer& in_environment)
   };
 
   luaL_newmetatable (state, VARIANT_DEFAULT_TYPE_NAME);
-  luaL_openlib      (state, 0, user_data_meta_table, 0);
+
+#ifdef LUAJIT    
+    //restore default float precision for luajit
+
+  _clearfp   ();
+  _control87 (_RC_NEAR + _PC_53 + _EM_INVALID + _EM_ZERODIVIDE + _EM_OVERFLOW + _EM_UNDERFLOW + _EM_INEXACT + _EM_DENORMAL, 0xfffff);
+  
+#endif
+
+  luaL_openlib (state, 0, user_data_meta_table, 0);
 
     //регистрация обработчиков событий создания/удаления библиотек
 
