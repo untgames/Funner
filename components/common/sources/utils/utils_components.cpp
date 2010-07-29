@@ -129,7 +129,7 @@ class ComponentManagerImpl
 
             node.component->Load ();
 
-            LogPrintf (log_handler, "Component '%s' loaded successull", node.name);
+            LogPrintf (log_handler, "Component '%s' loaded successfully", node.name);
             
             node.is_loaded = true;
           }
@@ -155,7 +155,7 @@ class ComponentManagerImpl
       load_indent--;
 
       if (!load_indent)
-        log.Printf ("...components loaded successull");
+        log.Printf ("...components loaded successfully");
     }
     
       //выгрузка компонента
@@ -207,7 +207,7 @@ class ComponentManagerImpl
       load_indent--;
       
       if (!load_indent)      
-        log.Printf ("...components unloaded successull");
+        log.Printf ("...components unloaded successfully");
     }
     
       //создание итератора
