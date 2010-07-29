@@ -11,7 +11,7 @@ export.link.render.low_level.opengl_driver.bada.LIBS         := FGraphicsEgl FGr
 export.run.render.low_level.opengl_driver.IMPORTS :=
 
 # Win32 egl flags
-ifeq (,$(filter gles,$(PROFILES)))
+ifneq (,$(filter gles,$(PROFILES)))
 export.link.render.low_level.opengl_driver.win32.IMPORTS := link.extern.gles_win32
 export.run.render.low_level.opengl_driver.win32.IMPORTS  := run.extern.gles_win32
 endif

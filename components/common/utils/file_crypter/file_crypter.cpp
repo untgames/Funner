@@ -90,7 +90,7 @@ int main (int argc, char* argv [])
       
       processed_size += size;
       
-      printf ("\rProgress %.1f%%", 100.0f * float (processed_size)/float (file_size));
+//      printf ("\rProgress %.1f%%", 100.0f * float (processed_size)/float (file_size));
     }
   }
   catch (std::exception& exception)
