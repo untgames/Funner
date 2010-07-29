@@ -1,6 +1,7 @@
 # Link subsystems exports
 export.link.engine.subsystems.LIBS    := funner.engine.subsystems
 export.link.engine.subsystems.IMPORTS := link.engine.core
+export.link.engine.subsystems.MULTI_IMPORTS := 1
 
 # Link direct input exports
 export.link.engine.subsystems.direct_input_driver.LINK_INCLUDES := DirectInputDriverSubsystem
@@ -45,7 +46,7 @@ export.link.engine.subsystems.window_input_driver.IMPORTS       := link.engine.s
 
 # Link window manager exports
 export.link.engine.subsystems.window_manager.LINK_INCLUDES := WindowManagerSubsystem
-export.link.engine.subsystems.window_manager.IMPORTS       := link.engine.subsystems link.system
+export.link.engine.subsystems.window_manager.IMPORTS       := link.engine.subsystems link.system link.media.rms
 
 # Link window renderer exports
 export.link.engine.subsystems.window_renderer.LINK_INCLUDES := WindowRendererSubsystem

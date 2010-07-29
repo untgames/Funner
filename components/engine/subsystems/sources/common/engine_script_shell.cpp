@@ -84,12 +84,24 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
 ///Выполнение команды
     void Execute (const char* command)
     {
-      if (!wcimatch (command, "*.lua") && !wcimatch (command, "*.luac"))
+      if (!wcimatch (command, "*.lua") && !wcimatch (command, "*.luac") && !wcimatch (command, "lua:*"))
         return;                
         
       try
       {
-        shell.ExecuteFile (command);
+        if (wcimatch (command, "lua:*"))
+        {
+          static const char* PREFIX_STRING = "lua:";
+          static size_t      PREFIX_LENGTH = strlen (PREFIX_STRING);
+
+          command += PREFIX_LENGTH;
+          
+          shell.Execute (command);
+        }
+        else
+        {
+          shell.ExecuteFile (command);          
+        }
       }
       catch (xtl::exception& e)
       { 

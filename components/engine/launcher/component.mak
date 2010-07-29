@@ -2,10 +2,11 @@
 #Определения и константы
 ###################################################################################################
 TARGETS        := ENGINE.FUNNER_SHARED_LIBRARY ENGINE.FUNNER_LIBRARY ENGINE.LAUNCHER.SOURCES
-TARGETS.win32  := ENGINE.CLAUNCHER.SOURCES ENGINE.DOT_NET_WRAPPER
+TARGETS.win32  := ENGINE.CLAUNCHER.SOURCES
+TARGETS.msvc   := ENGINE.DOT_NET_WRAPPER
 TARGETS.iphone := ENGINE.FUNNER_LIBRARY_LIPO
 
-#PROFILES += gles_win32 egl
+PROFILES += gles_win32 egl
 
 LAUNCHER_VERSION_STRING := "Launcher version 1.0"
 

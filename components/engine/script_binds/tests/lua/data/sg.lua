@@ -460,18 +460,18 @@ function test_perspective_camera ()
 
   local camera1 = Scene.PerspectiveCamera.Create ()
 
-  print ("FovX  = " .. camera1.FovX)
-  print ("FovY  = " .. camera1.FovY)
-  print ("ZNear = " .. camera1.ZNear)
-  print ("ZFar  = " .. camera1.ZFar)
+  print ("FovX  = " .. tostring (camera1.FovX))
+  print ("FovY  = " .. tostring (camera1.FovY))
+  print ("ZNear = " .. tostring (camera1.ZNear))
+  print ("ZFar  = " .. tostring (camera1.ZFar))
   camera1.FovX  = 36
   camera1.FovY  = 20
   camera1.ZNear = 10
   camera1.ZFar  = 1000
-  print ("FovX = " .. camera1.FovX)
-  print ("FovY  = " .. camera1.FovY)
-  print ("ZNear = " .. camera1.ZNear)
-  print ("ZFar  = " .. camera1.ZFar)
+  print ("FovX = " .. tostring (camera1.FovX))
+  print ("FovY  = " .. tostring (camera1.FovY))
+  print ("ZNear = " .. tostring (camera1.ZNear))
+  print ("ZFar  = " .. tostring (camera1.ZFar))
 end
 
 function test_ortho_camera ()
@@ -479,24 +479,24 @@ function test_ortho_camera ()
 
   local camera1 = Scene.OrthoCamera.Create ()
 
-  print ("Left   = " .. camera1.Left)
-  print ("Right  = " .. camera1.Right)
-  print ("Top    = " .. camera1.Top)
-  print ("Bottom = " .. camera1.Bottom)
-  print ("ZNear  = " .. camera1.ZNear)
-  print ("ZFar   = " .. camera1.ZFar)
+  print ("Left   = " .. tostring (camera1.Left))
+  print ("Right  = " .. tostring (camera1.Right))
+  print ("Top    = " .. tostring (camera1.Top))
+  print ("Bottom = " .. tostring (camera1.Bottom))
+  print ("ZNear  = " .. tostring (camera1.ZNear))
+  print ("ZFar   = " .. tostring (camera1.ZFar))
   camera1.Left   = -18
   camera1.Right  = 18
   camera1.Top    = 10
   camera1.Bottom = -10
   camera1.ZNear  = 10
   camera1.ZFar   = 1000
-  print ("Left   = " .. camera1.Left)
-  print ("Right  = " .. camera1.Right)
-  print ("Top    = " .. camera1.Top)
-  print ("Bottom = " .. camera1.Bottom)
-  print ("ZNear  = " .. camera1.ZNear)
-  print ("ZFar   = " .. camera1.ZFar)
+  print ("Left   = " .. tostring (camera1.Left))
+  print ("Right  = " .. tostring (camera1.Right))
+  print ("Top    = " .. tostring (camera1.Top))
+  print ("Bottom = " .. tostring (camera1.Bottom))
+  print ("ZNear  = " .. tostring (camera1.ZNear))
+  print ("ZFar   = " .. tostring (camera1.ZFar))
 end
 
 function test_light ()
@@ -506,7 +506,7 @@ function test_light ()
 
   print ("LightColor = " .. tostring (light1.LightColor))
   print ("Attenuation = " .. tostring (light1.Attenuation))
-  print ("Range = " .. light1.Range)
+  print ("Range = " .. tostring (light1.Range))
 
   light1.LightColor  = vec3 (1, 0, 0)
   light1.Attenuation = vec3 (1, 1, 0)
@@ -514,7 +514,7 @@ function test_light ()
 
   print ("LightColor = " .. tostring (light1.LightColor))
   print ("Attenuation = " .. tostring (light1.Attenuation))
-  print ("Range = " .. light1.Range)
+  print ("Range = " .. tostring (light1.Range))
 end
 
 function test_direct_light ()
@@ -522,11 +522,11 @@ function test_direct_light ()
 
   local light1 = Scene.DirectLight.Create ()
 
-  print ("Radius = " .. light1.Radius)
+  print ("Radius = " .. tostring (light1.Radius))
 
   light1.Radius = 763
 
-  print ("Radius = " .. light1.Radius)
+  print ("Radius = " .. tostring (light1.Radius))
 end
 
 function test_spot_light ()
@@ -535,16 +535,16 @@ function test_spot_light ()
   local light1 = Scene.SpotLight.Create ()
 
   print ("Name = " .. light1.Name)
-  print ("Angle = " .. light1.Angle)
-  print ("Exponent = " .. light1.Exponent)
+  print ("Angle = " .. tostring (light1.Angle))
+  print ("Exponent = " .. tostring (light1.Exponent))
 
   light1.Angle = 75
   light1.Exponent = 0.7
   light1.Name = "light1"
 
   print ("Name = " .. light1.Name)
-  print ("Angle = " .. light1.Angle)
-  print ("Exponent = " .. light1.Exponent)
+  print ("Angle = " .. tostring (light1.Angle))
+  print ("Exponent = " .. tostring (light1.Exponent))
 end
 
 function test_box_helper ()
@@ -558,11 +558,11 @@ function test_listener ()
 
   local listener1 = Scene.Listener.Create ()
 
-  print ("Gain = " .. listener1.Gain)
+  print ("Gain = " .. tostring (listener1.Gain))
 
   listener1.Gain = 0.75
 
-  print ("Gain = " .. listener1.Gain)
+  print ("Gain = " .. tostring (listener1.Gain))
 end
 
 function test_sound_emitter ()
@@ -570,11 +570,11 @@ function test_sound_emitter ()
 
   local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
 
-  print ("Gain = " .. sound_emitter1.Gain)
+  print ("Gain = " .. tostring (sound_emitter1.Gain))
 
   sound_emitter1.Gain = 0.7
   
-  print ("Gain = " .. sound_emitter1.Gain)
+  print ("Gain = " .. tostring (sound_emitter1.Gain))
 
   sound_emitter1:Play ()
   sound_emitter1:Stop ()
@@ -595,10 +595,10 @@ function test_sprite ()
   sprite1.Frame    = 9
   sprite1.AlphaReference = 0.4
 
-  print ("Alpha value = " .. sprite1.Alpha)
-  print ("Alpha reference = " .. sprite1.AlphaReference)
+  print ("Alpha value = " .. tostring (sprite1.Alpha))
+  print ("Alpha reference = " .. tostring (sprite1.AlphaReference))
   print ("Material name = " .. sprite1.Material)
-  print ("Frame number = " .. sprite1.Frame)
+  print ("Frame number = " .. tostring (sprite1.Frame))
    
   sprite1.Color    = vec4 (1, 0, 0, 0.7)
 

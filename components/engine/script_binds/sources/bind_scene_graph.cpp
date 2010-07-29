@@ -34,24 +34,22 @@ namespace script
 namespace detail
 {
 
-template <class T>
-inline T make_invoker_argument (const math::angle<T>& angle)
-{
-  return degree (angle);
-}
-
-template <class T>
-inline T make_invoker_argument (math::angle<T>& angle)
-{
-  return degree (angle);
-}
-
-template <class T>
-struct argument_selector<math::angle<T> >
+template <>
+struct argument_selector<math::angle<float> >
 {
   typedef float dump_type;
 
-  static math::angle<T> get (IStack& stack, size_t index) { return degree (stack.GetFloat (index)); }
+  static math::angle<float> get (IStack& stack, size_t index) { return degree (stack.GetFloat (index)); }
+  
+  static float make_invoker_argument (const math::angle<float>& angle) { return degree (angle); }
+};
+
+template <>
+struct argument_invoker<math::angle<float> >
+{
+  typedef float type;
+  
+  static float make (const math::angle<float>& angle) { return degree (angle); }  
 };
 
 }
@@ -573,8 +571,8 @@ void bind_perspective_camera_library (Environment& environment)
   lib.Register ("set_FovY",  make_invoker<void (PerspectiveCamera&, math::anglef)> (&PerspectiveCamera::SetFovY));
   lib.Register ("set_ZNear", make_invoker (&PerspectiveCamera::SetZNear));
   lib.Register ("set_ZFar",  make_invoker (&PerspectiveCamera::SetZFar));
-  lib.Register ("get_FovX",  make_invoker<math::anglef (PerspectiveCamera&)> (&PerspectiveCamera::FovX));
-  lib.Register ("get_FovY",  make_invoker<math::anglef (PerspectiveCamera&)> (&PerspectiveCamera::FovY));
+  lib.Register ("get_FovX",  make_invoker (&PerspectiveCamera::FovX));
+  lib.Register ("get_FovY",  make_invoker (&PerspectiveCamera::FovY));
   lib.Register ("get_ZNear", make_invoker (&PerspectiveCamera::ZNear));
   lib.Register ("get_ZFar",  make_invoker (&PerspectiveCamera::ZFar));
 
