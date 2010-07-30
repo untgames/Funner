@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <stl/bitset>
+#include <xtl/common_exceptions.h>
 
 using namespace stl;
 
@@ -13,80 +13,92 @@ namespace common
     Функции работы с именами путей
 */
 
-inline string basename (const char* src,size_t len,string::allocator_type allocator)
+inline string basename (const char* src, size_t len, string::allocator_type allocator)
 {
   for (const char* s=src+len;len--;)
     if (*--s == '.')
-      return string (src,s-src,allocator);
+      return string (src, s-src, allocator);
 
-  return string (src,allocator);
+  return string (src, allocator);
 }
 
-inline string suffix (const char* src,size_t len,string::allocator_type allocator)
+inline string suffix (const char* src, size_t len, string::allocator_type allocator)
 {
   for (const char* s=src+len;s!=src;)
     if (*--s == '.')
-      return string (s,len-(s-src),allocator);
+      return string (s, len-(s-src), allocator);
 
-  return string ("",allocator);
+  return string ("", allocator);
 }
 
-inline string dir (const char* src,size_t len,string::allocator_type allocator)
+inline string dir (const char* src, size_t len, string::allocator_type allocator)
 {
   for (const char* s=src+len;len--;)
     if (*--s == '/')
-      return string (src,s-src+1,allocator);
+      return string (src, s-src+1, allocator);
 
-  return string ("./",allocator);
+  return string ("./", allocator);
 }
 
-inline string notdir (const char* src,size_t len,string::allocator_type allocator)
+inline string notdir (const char* src, size_t len, string::allocator_type allocator)
 {
   for (const char* s=src+len;s!=src;)
     if (*--s == '/')
-      return string (s+1,len-(s-src)-1,allocator);
+      return string (s+1, len-(s-src)-1, allocator);
 
-  return string (src,allocator);
+  return string (src, allocator);
 }
 
 string basename (const string& s)
 {
-  return basename (s.c_str (),s.size (),s.get_allocator ());
+  return basename (s.c_str (), s.size (), s.get_allocator ());
 }
 
 string basename (const char* s)
 {
-  return basename (s,strlen (s),string::allocator_type ());
+  if (!s)
+    throw xtl::make_null_argument_exception ("common::basename", "s");
+
+  return basename (s, strlen (s), string::allocator_type ());
 }
 
 string suffix (const string& s)
 {
-  return suffix (s.c_str (),s.size (),s.get_allocator ());
+  return suffix (s.c_str (), s.size (), s.get_allocator ());
 }
 
 string suffix (const char* s)
 {
-  return suffix (s,strlen (s),string::allocator_type ());
+  if (!s)
+    throw xtl::make_null_argument_exception ("common::suffix", "s");
+
+  return suffix (s, strlen (s), string::allocator_type ());
 }
 
 string dir (const string& s)
 {
-  return dir (s.c_str (),s.size (),s.get_allocator ());
+  return dir (s.c_str (), s.size (), s.get_allocator ());
 }
 
 string dir (const char* s)
 {
-  return dir (s,strlen (s),string::allocator_type ());
+  if (!s)
+    throw xtl::make_null_argument_exception ("common::dir", "s");
+
+  return dir (s, strlen (s), string::allocator_type ());
 }
 
 string notdir (const string& s)
 {
-  return notdir (s.c_str (),s.size (),s.get_allocator ());
+  return notdir (s.c_str (), s.size (), s.get_allocator ());
 }
 
 string notdir (const char* s)
 {
-  return notdir (s,strlen (s),string::allocator_type ());
+  if (!s)
+    throw xtl::make_null_argument_exception ("common::notdir", "s");
+
+  return notdir (s, strlen (s), string::allocator_type ());
 }
 
 /*
@@ -94,14 +106,14 @@ string notdir (const char* s)
       Реализация функций основана на коде glib
 */
 
-inline string compress (const char* src,size_t len,string::allocator_type allocator)
+inline string compress (const char* src, size_t len, string::allocator_type allocator)
 {
   string res (allocator);
   string::iterator dst;
 
   res.fast_resize (len);
 
-  for (dst=res.begin ();len--;src++,dst++)
+  for (dst=res.begin ();len--;src++, dst++)
   {
     switch (*src)
     {
@@ -138,7 +150,7 @@ inline string compress (const char* src,size_t len,string::allocator_type alloca
   return res;
 }
 
-inline string decompress (const char* src,size_t len,const char* exceptions,string::allocator_type allocator)
+inline string decompress (const char* src, size_t len, const char* exceptions, string::allocator_type allocator)
 {
   string res (allocator);
   string::iterator dst;
@@ -147,12 +159,12 @@ inline string decompress (const char* src,size_t len,const char* exceptions,stri
 
   unsigned char excmap [256];
 
-  memset (excmap,0,sizeof (excmap));
+  memset (excmap, 0, sizeof (excmap));
 
   if (exceptions)
     for (const unsigned char* i=(const unsigned char*)exceptions;*i;excmap [*i++]=1);
 
-  for (dst=res.begin ();len--;src++,dst++)
+  for (dst=res.begin ();len--;src++, dst++)
   {
     if (excmap [(unsigned char)*src])
     {
@@ -188,22 +200,31 @@ inline string decompress (const char* src,size_t len,const char* exceptions,stri
 
 string compress (const char* s)
 {
-  return compress (s,strlen (s),string::allocator_type ());
+  if (!s)
+    throw xtl::make_null_argument_exception ("common::compress", "s");
+
+  return compress (s, strlen (s), string::allocator_type ());
 }
 
 string compress (const string& s)
 {
-  return compress (s.c_str (),s.size (),s.get_allocator ());
+  return compress (s.c_str (), s.size (), s.get_allocator ());
 }
 
-string decompress (const char* s,const char* exceptions)
+string decompress (const char* s, const char* exceptions)
 {
-  return decompress (s,strlen (s),exceptions,string::allocator_type ());
+  if (!s)
+    throw xtl::make_null_argument_exception ("common::decompress", "s");
+    
+  if (!s)
+    throw xtl::make_null_argument_exception ("common::decompress", "exceptions");    
+
+  return decompress (s, strlen (s), exceptions, string::allocator_type ());
 }
 
-string decompress (const string& s,const char* exceptions)
+string decompress (const string& s, const char* exceptions)
 {
-  return decompress (s.c_str (),s.size (),exceptions,s.get_allocator ());
+  return decompress (s.c_str (), s.size (), exceptions, s.get_allocator ());
 }
 
 /*
@@ -297,6 +318,15 @@ inline string word (const char* str, size_t word_index, const char* delimiters, 
 {
   if (!*str)
     return "";
+    
+  if (!delimiters)
+    throw xtl::make_null_argument_exception ("common::word", "delimiters");
+    
+  if (!spaces)
+    throw xtl::make_null_argument_exception ("common::word", "spaces");    
+    
+  if (!brackets)
+    throw xtl::make_null_argument_exception ("common::word", "brackets");
 
   WordParser parser (str, delimiters, spaces, brackets);
 
@@ -310,6 +340,18 @@ inline string word (const char* str, size_t word_index, const char* delimiters, 
 
 inline void split (const char* str, const char* delimiters, const char* spaces, const char* brackets, string::allocator_type allocator, StringArray& res)
 {
+  if (!str)
+    throw xtl::make_null_argument_exception ("common::split", "str");
+
+  if (!delimiters)
+    throw xtl::make_null_argument_exception ("common::split", "delimiters");
+    
+  if (!spaces)
+    throw xtl::make_null_argument_exception ("common::split", "spaces");    
+    
+  if (!str)
+    throw xtl::make_null_argument_exception ("common::split", "brackets");    
+
   if (!*str) //частный случай для пустой строки
     return;
 
@@ -355,6 +397,78 @@ StringArray split (const string& str, const char* delimiters, const char* spaces
   split (str.c_str (), delimiters, spaces, brackets, str.get_allocator (), res);
 
   return res;
+}
+
+/*
+    Отсечение пробелов
+*/
+
+inline stl::string strip (const char* str, size_t len, const char* spaces, string::allocator_type allocator)
+{
+  const char* end = str + len - 1;
+  
+  for (;end >= str; --end)
+  {
+    const char* s = spaces;
+    
+    for (; *s && *s != *end; s++);
+
+    if (!*s)
+      break;
+  }
+  
+  return stl::string (str, end + 1, allocator);
+}
+
+stl::string strip (const char* str, const char* spaces)
+{
+  if (!str)
+    throw xtl::make_null_argument_exception ("common::strip", "str");
+    
+  if (!spaces)
+    throw xtl::make_null_argument_exception ("common::strip", "str");    
+
+  return strip (str, strlen (str), spaces, string::allocator_type ());
+}
+
+inline stl::string trim (const char* str, size_t len, const char* spaces, string::allocator_type allocator)
+{
+  const char* end = str + len - 1;
+
+  for (;end >= str; --end)
+  {
+    const char* s = spaces;
+    
+    for (; *s && *s != *end; s++);
+
+    if (!*s)
+      break;
+  }
+  
+  const char* start = str;
+  
+  for (;end >= start; ++start)
+  {
+    const char* s = spaces;
+    
+    for (; *s && *s != *start; s++);
+
+    if (!*s)
+      break;
+  }  
+  
+  return stl::string (start, end + 1, allocator);
+}
+
+stl::string trim (const char* str, const char* spaces)
+{
+  if (!str)
+    throw xtl::make_null_argument_exception ("common::trim", "str");
+    
+  if (!spaces)
+    throw xtl::make_null_argument_exception ("common::trim", "spaces");
+
+  return trim (str, strlen (str), spaces, string::allocator_type ());
 }
 
 }
