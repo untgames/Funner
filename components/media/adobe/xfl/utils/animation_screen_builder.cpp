@@ -997,7 +997,7 @@ void process_sprite_common
 ///обработка спрайта
 void process_sprite (Params& params, ConvertData& data, const Frame& frame, const char* name, const char* parent)
 {
-  const FrameElement& element = frame.Elements ()[0u];
+  const FrameElement& element = frame.Elements ()[(size_t)0];
 
   XmlWriter::Scope scope (*data.scene_writer, "Sprite");
   
@@ -1108,7 +1108,7 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
 ///обработка вложенного символа (возвращает время окончания анимации включая все вложения)
 float process_symbol_instance (Params& params, ConvertData& data, const Frame& frame, const char* name_prefix)
 {
-  const FrameElement& element     = frame.Elements ()[0u];
+  const FrameElement& element     = frame.Elements ()[(size_t)0];
   const char*         symbol_name = element.Name ();
   
   if (!data.document.Symbols ().Find (symbol_name))
@@ -1292,11 +1292,11 @@ void process_timeline (Params& params, ConvertData& data)
   
   EventList events;
 
-  process_timeline (params, data, data.document.Timelines ()[0u], data.document.Timelines ()[0u].Name (), events);
+  process_timeline (params, data, data.document.Timelines ()[(size_t)0], data.document.Timelines ()[(size_t)0].Name (), events);
   
   XmlWriter::Scope sprite_scope (*data.scene_writer, "Sprite");
 
-  write_timeline_sprite_data (data, data.document.Timelines ()[0u].Name ());  
+  write_timeline_sprite_data (data, data.document.Timelines ()[(size_t)0].Name ());
   write_timeline_sprite_tracks (data, events);
 }
 
@@ -1320,7 +1320,7 @@ void build_used_symbols (const Params& params, const Timeline& timeline, UsedRes
 
     for (Layer::FrameList::ConstIterator frame_iter = layer.Frames ().CreateIterator (); frame_iter; ++frame_iter)
     {
-        //обход элементов фрейма 
+        //обход элементов фрейма
       
       for (Frame::FrameElementList::ConstIterator element_iter = frame_iter->Elements ().CreateIterator (); element_iter; ++element_iter)
       {
