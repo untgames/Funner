@@ -13,3 +13,4 @@ psd-exporter [<OPTIONS>] <SOURCE> ...
     --crop-alpha=<value>       crop layers by alpha that less than value
     --crop-exclude=<wildcards> exclude selected layers from crop
     --max-image-size=<value>   max output image size (image with greater size will be rescaled)
+    --trim-names               trim spaces in all layers names

@@ -76,6 +76,7 @@ struct Params
   bool          need_layers;             //нужно сохранять слои
   bool          need_pot_extent;         //нужно ли расширять изображения до ближайшей степени двойки
   bool          need_crop_alpha;         //нужно ли обрезать картинку по нулевой прозрачности
+  bool          need_trim_name_spaces;  //нужно ли отсекать пробелы в именах
 };
 
 //форматы пикселя
@@ -198,6 +199,12 @@ void command_line_max_image_size (const char* value_string, Params& params)
   params.max_image_size = (size_t)atoi (value_string);
 }
 
+//установка необходимости отсечения пробелов в именах
+void command_line_trim_name_spaces (const char*, Params& params)
+{
+  params.need_trim_name_spaces = true;
+}
+
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
@@ -214,6 +221,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_crop_alpha,               "crop-alpha",        0,     "value", "crop layers by alpha that less than value"},
     {command_line_crop_exclude,             "crop-exclude",      0, "wildcards", "exclude selected layers from crop"},
     {command_line_max_image_size,           "max-image-size",    0,     "value", "max output image size (image with greater size will be rescaled)"},
+    {command_line_trim_name_spaces,         "trim-names",        0,           0, "trim spaces in all layers names"},    
   };
   
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -572,7 +580,7 @@ void export_data (Params& params)
   for (int i=0; i<context->layer_count; i++)
   {
     psd_layer_record& layer = context->layer_records [i];
-    stl::string       name ((char*)layer.layer_name);      
+    stl::string       name = params.need_trim_name_spaces ? common::trim ((char*)layer.layer_name) : stl::string ((char*)layer.layer_name);
 
     if (!strncmp (name.c_str (), "</", 2))
       continue;
@@ -644,7 +652,7 @@ void export_data (Params& params)
     for (int i=0; i<context->layer_count; i++)
     {
       psd_layer_record& layer = context->layer_records [i];
-      stl::string       name ((char*)layer.layer_name);
+      stl::string       name  = params.need_trim_name_spaces ? common::trim ((char*)layer.layer_name) : stl::string ((char*)layer.layer_name);
 
       if (!strncmp (name.c_str (), "</", 2))
         continue;
@@ -698,7 +706,7 @@ void export_data (Params& params)
     for (int i=0; i<context->layer_count; i++)
     {
       psd_layer_record& layer = context->layer_records [i];
-      stl::string       name ((char*)layer.layer_name);      
+      stl::string       name  = params.need_trim_name_spaces ? common::trim ((char*)layer.layer_name) : stl::string ((char*)layer.layer_name);
 
       if (!strncmp (name.c_str (), "</", 2))
         continue;
@@ -777,17 +785,18 @@ int main (int argc, const char* argv [])
 
     Params params;
       
-    params.options         = 0;
-    params.options_count   = 0;
-    params.layers_format   = "image%03u.png";
-    params.crop_alpha      = 0;
-    params.max_image_size  = 0;
-    params.print_help      = false;
-    params.silent          = false;
-    params.need_layout     = true;
-    params.need_layers     = true;    
-    params.need_pot_extent = false;
-    params.need_crop_alpha = false;
+    params.options               = 0;
+    params.options_count         = 0;
+    params.layers_format         = "image%03u.png";
+    params.crop_alpha            = 0;
+    params.max_image_size        = 0;
+    params.print_help            = false;
+    params.silent                = false;
+    params.need_layout           = true;
+    params.need_layers           = true;
+    params.need_pot_extent       = false;
+    params.need_crop_alpha       = false;
+    params.need_trim_name_spaces = false;
 
       //разбор командной строки
 
