@@ -1,1 +1,1 @@
-COMPONENT_DIRS := core script_binds subsystems
+COMPONENT_DIRS := core script_binds subsystems launcher

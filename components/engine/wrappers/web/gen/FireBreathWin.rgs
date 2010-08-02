@@ -1,0 +1,17 @@
+HKCU
+{
+    NoRemove Software
+    {
+        NoRemove ClassesB
+        {
+            NoRemove AppID
+            {
+                '%APPID%' = s 'FireBreathWin'
+                'npFireBreath.dll'
+                {
+                    val AppID = s '%APPID%'
+                }
+            }
+        }
+    }
+}
