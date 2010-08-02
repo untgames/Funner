@@ -68,12 +68,13 @@ DLL_LIB_SUFFIX := .lib
 DLL_PREFIX     :=
 PROFILES   += msvc win32 has_windows x86 vcx86
 COMMON_LINK_FLAGS += -stack:128000 /MACHINE:X86
+SOURCE_PROCESS_MACROSES += process_idl process_rc
 
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
 ###################################################################################################
-INCLUDE := $(MSVC_PATH)/include;$(INCLUDE)
-LIB     := $(MSVC_PATH)/lib;$(LIB)
+INCLUDE := $(MSVC_PATH)/include;$(MSVC_PATH)/atlmfc/include;$(INCLUDE)
+LIB     := $(MSVC_PATH)/lib;$(MSVC_PATH)/atlmfc/lib;$(LIB)
 
 ifeq (,$(PLATFORM_SDK_PATH))
   $(error 'Microsoft SDKs not detected (empty PLATFORM_SDK_PATH)')  
@@ -90,7 +91,8 @@ export LIB
 #список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
 ###################################################################################################
 define tools.c++compile
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/cl" -c -Fo"$4\\" $(patsubst %,-I"%",$2) $(patsubst %,-FI"%",$3) $(COMMON_CFLAGS) $6 $(if $(filter -clr,$6),$(foreach dir,$8 $(DIST_BIN_DIR),-AI $(dir)) -MD,-EHsc -MT) $(foreach def,$5,-D$(subst %,$(SPACE),$(def))) $1 $(if $7,-FI"$7" -Yc"$7" -Fp"$4\\")
+export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" \
+&& "$(MSVC_BIN_PATH)/cl" -c -Fo"$4\\" $(patsubst %,-I"%",$2) $(patsubst %,-FI"%",$3) $(COMMON_CFLAGS) $6 $(if $(filter -clr,$6),$(foreach dir,$8 $(DIST_BIN_DIR),-AI $(dir)) -MD,-EHsc -MT) $(foreach def,$5,-D$(subst %,$(SPACE),$(def))) $(filter %.c,$1) $(filter %.cpp,$1) $(if $7,-FI"$7" -Yc"$7" -Fp"$4\\")
 endef
 
 ###################################################################################################
@@ -113,6 +115,32 @@ endef
 ###################################################################################################
 define tools.run
 $(call prepare_to_execute,$2,$4) && chmod u+x "$(CURDIR)/$(firstword $1)" && "$(CURDIR)/$(firstword $1)" $(if $5, > "$(CURDIR)/$5")
+endef
+
+###################################################################################################
+#Обработка IDL-файлов (цель, имя модуля)
+###################################################################################################
+define process_idl
+  $2.IDL_SOURCE_LIST := $$(wildcard $$($2.SOURCE_DIR)/*.idl)
+  $2.TLB_LIST        := $$($2.IDL_SOURCE_LIST:$$($2.SOURCE_DIR)/%.idl=$$($2.TMP_DIR)/%.tlb)
+  $1.FLAG_FILES      := $$($2.TLB_LIST) $$($1.FLAG_FILES)
+  $1.TLB_LIST        := $$($1.TLB_LIST) $$($2.TLB_LIST)
+
+  $$($2.TMP_DIR)/%.tlb: $$($2.SOURCE_DIR)/%.idl
+		@echo Compile $$(notdir $$<)...
+		@export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" && "$(PLATFORM_SDK_PATH)/bin/midl" -nologo $$(patsubst %,-I"%",$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS)) $$(foreach def,$$($2.COMPILER_DEFINES),-D$$(subst %,$(SPACE),$$(def))) -tlb "$$@" -cstub $$($2.SOURCE_DIR)/$$(notdir $$(basename $$@)).c -h $$($2.SOURCE_DIR)/$$(notdir $$(basename $$@)).h $$<
+endef
+
+###################################################################################################
+#Обработка RC-файлов (цель, имя модуля)
+###################################################################################################
+define process_rc
+  $2.RC_SOURCE_LIST := $$(wildcard $$($2.SOURCE_DIR)/*.rc)
+  $1.OBJECT_FILES   := $$($1.OBJECT_FILES) $$($2.RC_SOURCE_LIST:$$($2.SOURCE_DIR)/%.rc=$$($2.TMP_DIR)/%.res)
+
+  $$($2.TMP_DIR)/%.res: $$($2.SOURCE_DIR)/%.rc $$($1.TLB_LIST)
+		@echo Compile $$(notdir $$<)...
+		@export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" && "$(PLATFORM_SDK_PATH)/bin/rc" -nologo $$(patsubst %,-i"%",$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS) $$($2.TMP_DIR)) $$(foreach def,$$($2.COMPILER_DEFINES),-d$$(subst %,$(SPACE),$$(def))) -fo "$$@" $$<
 endef
 
 ###################################################################################################

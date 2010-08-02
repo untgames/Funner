@@ -405,6 +405,8 @@ define process_source_dir
   $$(MODULE_NAME).TMP_DIR    := $$($1.TMP_DIR)/$$(MODULE_PATH)
   $$(MODULE_NAME).BASE_DIR   := $1/$$(MODULE_PATH)
   $1.TMP_DIRS                := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)
+  
+  $$(foreach macros,$(SOURCE_PROCESS_MACROSES),$$(eval $$(call $$(macros),$1,$$(MODULE_NAME))))  
 
   ifneq (,$$($$(MODULE_NAME).SOURCE_FILES))
     $$(MODULE_NAME).OBJECT_FILES := $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%$(OBJ_SUFFIX),$$(notdir $$(basename $$($$(MODULE_NAME).SOURCE_FILES))))
@@ -516,7 +518,7 @@ define process_target.static-lib
 
   $$(eval $$(call process_target_with_sources,$1))  
 
-  $$($1.LIB_FILE): $$($1.FLAG_FILES)
+  $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.OBJECT_FILES)
 		@echo Create library $$(notdir $$@)...
 		@$$(call $(LIB_TOOL),$$@,$$($1.OBJECT_FILES))
 endef
@@ -544,7 +546,7 @@ define process_target.dynamic-lib
   
   $$($1.LIB_FILE): $$($1.DLL_FILE)
 
-  $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
+  $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES)
 		@echo Create dynamic library $$(notdir $$($1.DLL_FILE))...
 		@$$(call $(LINK_TOOL),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 		@$(RM) $$(basename $$($1.DLL_FILE)).exp
@@ -575,7 +577,7 @@ define process_target.application
     $1.EXECUTION_DIR := $$($1.OUT_DIR)
   endif
   
-  $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
+  $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES)
 		@echo Linking $$(notdir $$@)...
 		@$$(call $(LINK_TOOL),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
@@ -842,6 +844,7 @@ define import_variables
 
   $2.INCLUDE_DIRS         := $$($2.INCLUDE_DIRS) $$($1.INCLUDE_DIRS:%=$3%)
   $2.INCLUDE_FILES        := $$($2.INCLUDE_FILES) $$($1.INCLUDE_FILES)
+  $2.SOURCE_DIRS          := $$($2.SOURCE_DIRS) $$($1.SOURCE_DIRS:%=$3%)
   $2.LIB_DIRS             := $$($2.LIB_DIRS) $$($1.LIB_DIRS:%=$3%)
   $2.DLL_DIRS             := $$($2.DLL_DIRS) $$($1.DLL_DIRS:%=$3%)
   $2.DLLS                 := $$($2.DLLS) $$($1.DLLS)
