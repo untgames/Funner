@@ -354,7 +354,8 @@ ImageImpl::ImageImpl ()
 }
 
 ImageImpl::ImageImpl (const ImageImpl& impl)
-  : name (impl.name)
+  : reference_counter (impl)
+  , name (impl.name)
 {
 }
 

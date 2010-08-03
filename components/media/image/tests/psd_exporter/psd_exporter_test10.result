@@ -16,3 +16,7 @@ Save layers to dir 'test'...
   <Layer Name="Layer 3" Image="test/image003.png" Left="22" Top="71" Width="0" Height="0" Opacity="255" Visible="1"/>
   <Layer Name="Layer 4" Image="test/image004.png" Left="59" Top="41" Width="0" Height="0" Opacity="255" Visible="1"/>
 </LayerMap>
+413044ec107a57ec3b37ed0e18794eb9 *test/image001.png
+48ae9d0cc5d1b1a616728cf298643a5b *test/image002.png
+413044ec107a57ec3b37ed0e18794eb9 *test/image003.png
+413044ec107a57ec3b37ed0e18794eb9 *test/image004.png

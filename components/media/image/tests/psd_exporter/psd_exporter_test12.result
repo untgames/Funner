@@ -1,8 +1,12 @@
 Results of psd_exporter_test11:
 <?xml version="1.0" encoding="utf-8"?>
 <LayerMap TotalWidth="100" TotalHeight="100">
-  <Layer Name="Layer 1" Image="my_layers/my_image_0001.tga" Left="8" Top="6" Width="25" Height="19" Opacity="255" Visible="1"/>
-  <Layer Name="Layer 2" Image="my_layers/my_image_0002.tga" Left="0" Top="0" Width="100" Height="100" Opacity="255" Visible="1"/>
-  <Layer Name="Layer 3" Image="my_layers/my_image_0003.tga" Left="22" Top="71" Width="21" Height="21" Opacity="255" Visible="1"/>
-  <Layer Name="Layer 4" Image="my_layers/my_image_0004.tga" Left="59" Top="41" Width="19" Height="17" Opacity="255" Visible="1"/>
+  <Layer Name="Layer 1" Image="my_layers/my_image_0001.bmp" Left="8" Top="6" Width="25" Height="19" Opacity="255" Visible="1"/>
+  <Layer Name="Layer 2" Image="my_layers/my_image_0002.bmp" Left="0" Top="0" Width="100" Height="100" Opacity="255" Visible="1"/>
+  <Layer Name="Layer 3" Image="my_layers/my_image_0003.bmp" Left="22" Top="71" Width="21" Height="21" Opacity="255" Visible="1"/>
+  <Layer Name="Layer 4" Image="my_layers/my_image_0004.bmp" Left="59" Top="41" Width="19" Height="17" Opacity="255" Visible="1"/>
 </LayerMap>
+c90fd7bb2552a29e57e1cd747338bf0f *my_layers/my_image_0001.bmp
+35c55dc6b97c3224859ec439cd922663 *my_layers/my_image_0002.bmp
+6acde6ab1aa430a7b851f5ea11c8c54d *my_layers/my_image_0003.bmp
+052359257e3f2b64bff7fedc513dafa7 *my_layers/my_image_0004.bmp

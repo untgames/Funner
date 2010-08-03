@@ -6,3 +6,7 @@ Results of psd_exporter_test08:
   <Layer Name="Layer 3" Image="test/image003.png" Left="22" Top="71" Width="21" Height="21" Opacity="255" Visible="1"/>
   <Layer Name="Layer 4" Image="test/image004.png" Left="59" Top="41" Width="19" Height="17" Opacity="255" Visible="1"/>
 </LayerMap>
+1cf3a6d8503c2edd343200debe40ab15 *test/image001.png
+48ae9d0cc5d1b1a616728cf298643a5b *test/image002.png
+0e10a23667d2ae380e5a7b6c9fdda295 *test/image003.png
+06e643face380b97697b3531f80f93f8 *test/image004.png

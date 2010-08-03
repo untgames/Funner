@@ -8,3 +8,4 @@ Save layers to dir 'crop'...
 <LayerMap TotalWidth="128" TotalHeight="128">
   <Layer Name="Layer 1" Image="crop/image001.png" Left="28" Top="25" Width="77" Height="77" Opacity="255" Visible="1"/>
 </LayerMap>
+b6f071eef592ee6d8e0566ca4db009da *crop/image001.png

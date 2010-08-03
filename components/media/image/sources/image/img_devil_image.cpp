@@ -286,7 +286,14 @@ DevILImageImpl::DevILImageImpl (size_t in_width, size_t in_height, size_t in_dep
 {
   LoadComponent ();
 
-  ilGenImages        (1, &il_image);
+  ilGenImages (1, &il_image);
+  
+  if (!il_image) //workaround for il_image = 0
+  {
+    ilDeleteImages (1, &il_image);
+    ilGenImages    (1, &il_image);    
+  }
+  
   check_devil_errors ("media::DevILImageImpl::DevILImageImpl(size_t,size_t,size_t,PixelFormat,const void*)", "ilGenImages");
 
   try
