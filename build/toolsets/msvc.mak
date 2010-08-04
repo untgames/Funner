@@ -140,7 +140,7 @@ define process_rc
 
   $$($2.TMP_DIR)/%.res: $$($2.SOURCE_DIR)/%.rc $$($1.TLB_LIST)
 		@echo Compile $$(notdir $$<)...
-		@export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" && "$(PLATFORM_SDK_PATH)/bin/rc" "-nologo" $$(patsubst %,-i"%",$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS) $$($2.TMP_DIR)) $$(foreach def,$$($2.COMPILER_DEFINES),-d$$(subst %,$(SPACE),$$(def))) -fo "$$@" $$<
+		@export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" && "$(PLATFORM_SDK_PATH)/bin/rc" $$(patsubst %,-i"%",$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS) $$($2.TMP_DIR)) $$(foreach def,$$($2.COMPILER_DEFINES),-d$$(subst %,$(SPACE),$$(def))) -fo "$$@" $$<
 endef
 
 ###################################################################################################
