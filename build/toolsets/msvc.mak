@@ -128,7 +128,7 @@ define process_idl
 
   $$($2.TMP_DIR)/%.tlb: $$($2.SOURCE_DIR)/%.idl
 		@echo Compile $$(notdir $$<)...
-		@export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" && "$(PLATFORM_SDK_PATH)/bin/midl" -nologo $$(patsubst %,-I"%",$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS)) $$(foreach def,$$($2.COMPILER_DEFINES),-D$$(subst %,$(SPACE),$$(def))) -tlb "$$@" -cstub $$($2.SOURCE_DIR)/$$(notdir $$(basename $$@)).c -h $$($2.SOURCE_DIR)/$$(notdir $$(basename $$@)).h $$<
+		@export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" && "$(PLATFORM_SDK_PATH)/bin/midl" -nologo $$(patsubst %,-I"%",$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS)) $$(foreach def,$$($2.COMPILER_DEFINES),-D$$(subst %,$(SPACE),$$(def))) -tlb "$$@" -cstub $$($2.SOURCE_DIR)/$$(notdir $$(basename $$@)).c -h $$($2.SOURCE_DIR)/$$(notdir $$(basename $$@))_i.h $$<
 endef
 
 ###################################################################################################
