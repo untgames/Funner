@@ -533,6 +533,7 @@ define process_target.dynamic-lib
   
   $1.DLL_FILE                      := $(DIST_BIN_DIR)/$(DLL_PREFIX)$$($1.NAME)$(DLL_SUFFIX)
   $1.LIB_FILE                      := $(DIST_LIB_DIR)/$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(DLL_LIB_SUFFIX)
+  $1.DEF_FILE                      := $$(call specialize_paths,$$($1.DEF_FILE))
   $1.LIB_TMP_FILE                  := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(DLL_LIB_SUFFIX)
   TARGET_FILES                     := $$(TARGET_FILES) $$($1.DLL_FILE) $$($1.LIB_FILE)
   $1.TARGET_DLLS                   := $$($1.DLLS:%=$(DIST_BIN_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
@@ -546,9 +547,9 @@ define process_target.dynamic-lib
   
   $$($1.LIB_FILE): $$($1.DLL_FILE)
 
-  $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES)
+  $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES) $$($1.DEF_FILE)
 		@echo Create dynamic library $$(notdir $$($1.DLL_FILE))...
-		@$$(call $(LINK_TOOL),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+		@$$(call $(LINK_TOOL),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS),$$($1.DEF_FILE))
 		@$(RM) $$(basename $$($1.DLL_FILE)).exp
 		@if [ -e $$($1.LIB_TMP_FILE) ]; then mv -f $$($1.LIB_TMP_FILE) $(DIST_LIB_DIR); fi
 endef

@@ -97,10 +97,10 @@ endef
 
 ###################################################################################################
 #Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
-#список подключаемых символов линковки, флаги линковки)
+#список подключаемых символов линковки, флаги линковки, def файл)
 ###################################################################################################
 define tools.link
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2 $(COMMON_LINK_FLAGS) $(if $(map),-MAP:$(basename $1).map -MAPINFO:EXPORTS)
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2 $(COMMON_LINK_FLAGS) $(if $(map),-MAP:$(basename $1).map -MAPINFO:EXPORTS) $(if $6,-DEF:"$6")
 endef
 
 ###################################################################################################
@@ -128,7 +128,7 @@ define process_idl
 
   $$($2.TMP_DIR)/%.tlb: $$($2.SOURCE_DIR)/%.idl
 		@echo Compile $$(notdir $$<)...
-		@export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" && "$(PLATFORM_SDK_PATH)/bin/midl" -nologo $$(patsubst %,-I"%",$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS)) $$(foreach def,$$($2.COMPILER_DEFINES),-D$$(subst %,$(SPACE),$$(def))) -tlb "$$@" -cstub $$($2.SOURCE_DIR)/$$(notdir $$(basename $$@)).c -h $$($2.SOURCE_DIR)/$$(notdir $$(basename $$@))_i.h $$<
+		@export PATH="$(MSVS_COMMON_PATH);$(MSVC_PATH)/bin;$$PATH" && "$(PLATFORM_SDK_PATH)/bin/midl" -nologo $$(patsubst %,-I"%",$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS)) $$(foreach def,$$($2.COMPILER_DEFINES),-D$$(subst %,$(SPACE),$$(def))) -tlb "$$@" -iid $$($2.SOURCE_DIR)/$$(notdir $$(basename $$@))_i.c  -h $$($2.SOURCE_DIR)/$$(notdir $$(basename $$@))_i.h $$<
 endef
 
 ###################################################################################################
