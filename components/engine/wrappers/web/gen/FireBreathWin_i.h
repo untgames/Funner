@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 7.00.0555 */
-/* at Mon Aug 02 22:37:07 2010
+/* at Wed Aug 04 12:37:00 2010
  */
 /* Compiler settings for ../gen/FireBreathWin.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 7.00.0555 
@@ -32,8 +32,8 @@
 #endif // __RPCNDR_H_VERSION__
 
 
-#ifndef __FireBreathWin_h__
-#define __FireBreathWin_h__
+#ifndef __FireBreathWin_i_h__
+#define __FireBreathWin_i_h__
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
