@@ -187,7 +187,11 @@ class TheoraDecoderImpl : public IVideoDecoder
         throw xtl::make_null_argument_exception (METHOD_NAME, "data_buffer");
 
       if (buffer_frame_number > (int)frame)
-        throw xtl::format_not_supported_exception (METHOD_NAME, "Backward seek in theora files not supported yet");
+      {
+        GetOggPacket (first_video_packet_index);
+        buffer_frame_number  = -1;
+        decoded_frame_number = -1;
+      }
 
       for (; decoded_frame_number < (int)frame;)
       {
