@@ -2,18 +2,11 @@
 
 #include <unistd.h>
 
-#include <CFBundle.h>
+#include <CoreFoundation/CFBundle.h>
 
 #include <engine/engine.h>
 
 using namespace engine;
-
-namespace
-{
-
-const char* ENGINE_LIBRARY_NAME = "funner.dylib";
-
-}
 
 //точка входа
 int main (int argc, const char* argv [])

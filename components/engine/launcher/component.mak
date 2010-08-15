@@ -36,7 +36,6 @@ ENGINE.FUNNER_SHARED_LIBRARY.has_windows.IMPORTS := link.render.low_level.opengl
 ENGINE.FUNNER_SHARED_LIBRARY.win32.IMPORTS       := link.input.direct_input_driver
 ENGINE.FUNNER_SHARED_LIBRARY.iphone.IMPORTS      := link.media.image.pvr link.input.iphone_driver link.media.players.iphone \
                                              link.engine.subsystems.iphone_audio_session
-
 #Цель - сборка движка
 ifneq (,$(filter no_dll,$(PROFILES)))
 ENGINE.FUNNER_LIBRARY.TYPE                := fat-static-lib
@@ -56,7 +55,7 @@ ENGINE.FUNNER_LIBRARY.iphone.IMPORTS      := $(ENGINE.FUNNER_SHARED_LIBRARY.ipho
 ENGINE.FUNNER_LIBRARY_LIPO.NAME     := funner
 ENGINE.FUNNER_LIBRARY_LIPO.TYPE     := lipo-lib
 ENGINE.FUNNER_LIBRARY_LIPO.LIBS     := funner
-ENGINE.FUNNER_LIBRARY_LIPO.PROFILES := iphone-device.g++ iphone-simulator.g++
+ENGINE.FUNNER_LIBRARY_LIPO.PROFILES := iphone-device-armv6 iphone-device-armv7 iphone-simulator
 
 #Цель - application
 ENGINE.LAUNCHER.SOURCES.TYPE                   := application
@@ -64,13 +63,15 @@ ENGINE.LAUNCHER.SOURCES.NAME                   := launcher
 ENGINE.LAUNCHER.SOURCES.INCLUDE_DIRS           := include
 ENGINE.LAUNCHER.SOURCES.EXECUTION_DIR          := sources
 ENGINE.LAUNCHER.SOURCES.macosx.COMPILER_CFLAGS := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers/
-ENGINE.LAUNCHER.SOURCES.iphone.COMPILER_CFLAGS := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers/
 ENGINE.LAUNCHER.SOURCES.macosx.LINK_FLAGS      := -framework CoreFoundation
-ENGINE.LAUNCHER.SOURCES.iphone.LINK_FLAGS      := -framework CoreFoundation
+ENGINE.LAUNCHER.SOURCES.iphone.LINK_FLAGS      := -framework CoreFoundation -framework OpenAL -framework UIKit -framework Foundation \
+                                                  -framework OpenGLES -framework MediaPlayer -framework AVFoundation \
+                                                  -framework AudioToolbox -framework QuartzCore
 ENGINE.LAUNCHER.SOURCES.msvc.LINK_FLAGS        := -subsystem:windows -entry:mainCRTStartup
 ENGINE.LAUNCHER.SOURCES.win32.SOURCE_DIRS      := sources/platform/win32
 ENGINE.LAUNCHER.SOURCES.macosx.SOURCE_DIRS     := sources/platform/macosx
 ENGINE.LAUNCHER.SOURCES.iphone.SOURCE_DIRS     := sources/platform/iphone
+ENGINE.LAUNCHER.SOURCES.iphone.LIBS            := funner
 
 #Цель - console application
 ENGINE.CLAUNCHER.SOURCES.TYPE                := application
