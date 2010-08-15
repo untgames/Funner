@@ -1,3 +1,7 @@
+#import <AppKit/NSCursor.h>
+#import <AppKit/NSImage.h>
+#import <Foundation/NSData.h>
+
 #if ! defined (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) || (__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 1040)
   #error "__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ not defined or less then 1040"
 #endif
@@ -18,6 +22,7 @@ const char* LOG_NAME = "syslib.Platform";
 const OSType WINDOW_PROPERTY_CREATOR     = 'untg';  //тег приложени€
 const OSType FULLSCREEN_PROPERTY_TAG     = 'fscr';  //тег свойства полноэкранности
 const OSType CURSOR_VISIBLE_PROPERTY_TAG = 'hcrs';  //тег видимости курсора (если истина - курсор виден)
+const OSType WINDOW_IMPL_PROPERTY        = 'impl';  //указатель на реализацию данного окна
 
 const size_t CHAR_CODE_BUFFER_SIZE = 4;  //размер буффера дл€ декодированного имени символа
 
@@ -36,11 +41,13 @@ struct WindowImpl
   WindowRef                      carbon_window;                           //окно
   UniChar                        char_code_buffer[CHAR_CODE_BUFFER_SIZE]; //буффер дл€ получени€ имени введенного символа
   bool                           is_cursor_in_window;                     //находитс€ ли курсор в окне
+  NSCursor                       *cursor;                                 //курсор отображаемый над окном
 
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data), message_handler (handler), carbon_window_event_handler (0),
       carbon_window_event_handler_proc (0), carbon_application_event_handler (0),
-      carbon_application_event_handler_proc (0), carbon_window (0), is_cursor_in_window (false)
+      carbon_application_event_handler_proc (0), carbon_window (0), is_cursor_in_window (false),
+      cursor ([[NSCursor arrowCursor] retain])
     {}
 
   ~WindowImpl ()
@@ -59,6 +66,8 @@ struct WindowImpl
 
     if (carbon_window)
       DisposeWindow (carbon_window);
+
+    [cursor release];
   }
 
   void Notify (Platform::window_t window, WindowEvent event, const WindowEventContext& context)
@@ -470,8 +479,10 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             if (!mouse_in_client_rect)
               break;
 
-            if (!Platform::GetCursorVisible (window_handle) && !window_impl->is_cursor_in_window) //если курсор невидим - пр€чем его при входе в окно
+            if (!Platform::GetCursorVisible (window_handle) && CGCursorIsVisible ()) //если курсор невидим - пр€чем его при входе в окно
               check_quartz_error (CGDisplayHideCursor (kCGDirectMainDisplay), "::CGDisplayHideCursor", "Can't hide cursor");
+            else
+              [window_impl->cursor set];
 
             window_impl->is_cursor_in_window = true;
 
@@ -584,7 +595,10 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
           window_impl->Notify (window_handle, WindowEvent_OnMouseLeave, context);
 
           if (!Platform::GetCursorVisible (window_handle)) //если курсор невидим - показываем его при выходе из окна
-            CGDisplayShowCursor (kCGDirectMainDisplay);
+            while (!CGCursorIsVisible ())
+              CGDisplayShowCursor (kCGDirectMainDisplay);
+
+          [[NSCursor arrowCursor] set];
         }
 
         break;
@@ -725,6 +739,9 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
 
       check_window_manager_error (SetWindowProperty (new_window, WINDOW_PROPERTY_CREATOR, CURSOR_VISIBLE_PROPERTY_TAG,
                                   sizeof (is_cursor_visible), &is_cursor_visible), "::SetWindowProperty", "Can't set window property");
+
+      check_window_manager_error (SetWindowProperty (new_window, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+                                  sizeof (window_impl), &window_impl), "::SetWindowProperty", "Can't set window property");
 
       SetMouseCoalescingEnabled (false, 0);
 
@@ -1016,9 +1033,14 @@ void Platform::SetCursorPosition (const Point& position)
 
   try
   {
-    check_quartz_error (CGWarpMouseCursorPosition (new_cursor_position), "::CGWarpMouseCursorPosition", "Can't set cursor position");
-    check_quartz_error (CGAssociateMouseAndMouseCursorPosition (true), "::CGAssociateMouseAndMouseCursorPosition",
-                        "Can't reassociate mouse and cursor");
+    CGEventRef event = CGEventCreateMouseEvent (0, kCGEventMouseMoved, new_cursor_position, 0);
+
+    if (!event)
+      throw xtl::format_operation_exception ("::CGEventCreateMouseEvent", "Can't create mouse event");
+
+    CGEventPost (kCGHIDEventTap, event);
+
+    CFRelease (event);
   }
   catch (xtl::exception& exception)
   {
@@ -1098,9 +1120,15 @@ void Platform::SetCursorVisible (window_t handle, bool state)
     if (is_cursor_in_client_region ((WindowRef)handle))
     {
       if (state)
-        check_quartz_error (CGDisplayShowCursor (kCGDirectMainDisplay), "::CGDisplayShowCursor", "Can't show cursor");
+      {
+        while (!CGCursorIsVisible ())
+          check_quartz_error (CGDisplayShowCursor (kCGDirectMainDisplay), "::CGDisplayShowCursor", "Can't show cursor");
+      }
       else
-        check_quartz_error (CGDisplayHideCursor (kCGDirectMainDisplay), "::CGDisplayHideCursor", "Can't hide cursor");
+      {
+        if (CGCursorIsVisible ())
+          check_quartz_error (CGDisplayHideCursor (kCGDirectMainDisplay), "::CGDisplayHideCursor", "Can't hide cursor");
+      }
     }
 
     check_window_manager_error (SetWindowProperty ((WindowRef)handle, WINDOW_PROPERTY_CREATOR, CURSOR_VISIBLE_PROPERTY_TAG,
@@ -1127,17 +1155,95 @@ bool Platform::GetCursorVisible (window_t handle)
     »зображение курсора
 */
 
-Platform::cursor_t Platform::CreateCursor (const char*, int, int)
+Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x, int hotspot_y)
 {
-  throw make_not_implemented_exception ("syslib::CarbonPlatform::CreateCursor");
+  try
+  {
+    if (!file_name)
+      throw xtl::make_null_argument_exception ("", "file_name");
+
+    common::InputFile image_file (file_name);
+
+    size_t bytes_to_read = image_file.Size ();
+
+    NSMutableData* image_data = [[NSMutableData alloc] initWithLength:bytes_to_read];
+
+    if (!image_data)
+      throw xtl::format_operation_exception ("[NSMutableData initWithLength:]", "Can't create mutable data with size %u", bytes_to_read);
+
+    char* read_buffer = (char*)[image_data mutableBytes];
+
+    try
+    {
+      while (bytes_to_read)
+      {
+        size_t readed_bytes = image_file.Read (read_buffer, bytes_to_read);
+
+        bytes_to_read -= readed_bytes;
+        read_buffer   += readed_bytes;
+      }
+    }
+    catch (...)
+    {
+      [image_data release];
+      throw;
+    }
+
+    NSImage* cursor_image = [[NSImage alloc] initWithData:image_data];
+
+    [image_data release];
+
+    if (!cursor_image)
+      throw xtl::format_operation_exception ("[NSImage initWithData:]", "Can't create image");
+
+    NSPoint cursor_hot_spot;
+
+    cursor_hot_spot.x = hotspot_x == -1 ? 0 : hotspot_x;
+    cursor_hot_spot.y = hotspot_y == -1 ? 0 : hotspot_y;
+
+    NSCursor *cursor = [[NSCursor alloc] initWithImage:cursor_image hotSpot:cursor_hot_spot];
+
+    [cursor_image release];
+
+    if (!cursor)
+      throw xtl::format_operation_exception ("[NSCursor initWithImage:hotSpot:]", "Can't create cursor");
+
+    return reinterpret_cast<Platform::cursor_t> (cursor);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::CarbonPlatform::CreateCursor");
+    throw;
+  }
 }
 
-void Platform::DestroyCursor (cursor_t)
+void Platform::DestroyCursor (cursor_t cursor)
 {
-  throw make_not_implemented_exception ("syslib::CarbonPlatform::DestroyCursor");
+  [(NSCursor*)cursor release];
 }
 
-void Platform::SetCursor (window_t, cursor_t)
+void Platform::SetCursor (window_t handle, cursor_t cursor)
 {
-  throw make_not_implemented_exception ("syslib::CarbonPlatform::SetCursor");
+  try
+  {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+
+    WindowImpl *impl;
+
+    check_window_manager_error (GetWindowProperty ((WindowRef)handle, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+                                sizeof (impl), 0, &impl), "::GetWindowProperty", "Can't get window property");
+
+    [impl->cursor release];
+
+    impl->cursor = (NSCursor*)cursor ? [(NSCursor*)cursor retain] : [[NSCursor arrowCursor] retain];
+
+    if (is_cursor_in_client_region ((WindowRef)handle))
+      [impl->cursor set];
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::CarbonPlatform::SetCursor");
+    throw;
+  }
 }

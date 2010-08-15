@@ -1,3 +1,6 @@
+#import <AppKit/NSApplication.h>
+#import <Foundation/NSAutoreleasePool.h>
+
 #include "shared.h"
 
 using namespace syslib;
@@ -26,6 +29,10 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
 ///Запуск цикла обработки сообщений
     void Run ()
     {
+      NSApplicationLoad ();
+
+      NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+
       try
       {
         main_thread_id = Platform::GetCurrentThreadId ();
@@ -60,9 +67,12 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
       }
       catch (xtl::exception& e)
       {
+        [pool release];
         e.touch ("syslib::CarbonApplicationDelegate::Run");
         throw;
       }
+
+      [pool release];
     }
 
 ///Выход из приложения

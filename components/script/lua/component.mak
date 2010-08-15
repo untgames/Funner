@@ -10,10 +10,10 @@ SCRIPT.LUA.SOURCES.SOURCE_DIRS      := sources
 #SCRIPT.LUA.SOURCES.COMPILER_DEFINES := __STRICT_ANSI__
 SCRIPT.LUA.SOURCES.IMPORTS				  := compile.script.core compile.common 
 
-ifeq (x86,$(filter x86,$(PROFILES))$(filter msvc,$(PROFILES)))
-SCRIPT.LUA.SOURCES.IMPORTS += compile.extern.luajit
-else
+ifeq (,$(filter msvc,$(PROFILES)))
 SCRIPT.LUA.SOURCES.IMPORTS += compile.extern.lua
+else
+SCRIPT.LUA.SOURCES.IMPORTS += compile.extern.luajit
 endif
 
 #SCRIPT_LUA tests
