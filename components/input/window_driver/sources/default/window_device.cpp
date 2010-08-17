@@ -85,7 +85,13 @@ struct Device::Impl : private xtl::trackable
                                       WindowEvent_OnKeyDown,
                                       WindowEvent_OnKeyUp,
                                       WindowEvent_OnChar,
-                                      WindowEvent_OnClose
+                                      WindowEvent_OnClose,
+                                      WindowEvent_OnActivate,
+                                      WindowEvent_OnDeactivate,
+                                      WindowEvent_OnShow,
+                                      WindowEvent_OnHide,
+                                      WindowEvent_OnSetFocus,
+                                      WindowEvent_OnLostFocus
       };
 
       static size_t events_num = sizeof (events) / sizeof (*events);
@@ -310,6 +316,24 @@ struct Device::Impl : private xtl::trackable
         break;
       case WindowEvent_OnClose:
         signals ("Window closed");
+        break;
+      case WindowEvent_OnActivate:
+        signals ("Window activated");
+        break;
+      case WindowEvent_OnDeactivate:
+        signals ("Window deactivated");
+        break;
+      case WindowEvent_OnShow:
+        signals ("Window shown");
+        break;
+      case WindowEvent_OnHide:
+        signals ("Window hidden");
+        break;
+      case WindowEvent_OnSetFocus:
+        signals ("Window set_focus");
+        break;
+      case WindowEvent_OnLostFocus:
+        signals ("Window lost_focus");
         break;
       default:
         break;
