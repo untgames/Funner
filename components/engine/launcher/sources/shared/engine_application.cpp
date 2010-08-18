@@ -124,6 +124,14 @@ class Application: public IEngine
     {
       try
       {
+          //загрузка лицензии
+        common::Parser p (configuration_name.c_str ());
+
+        if (p.Root ().First ("Configuration.License.Path"))
+          common::LicenseManager::Load (common::get<const char*> (p.Root ().First ("Configuration.License"), "Path"));
+        else
+          printf ("There is no license information in configuration\n");
+
           //регистрация обработчика старта приложения
 
         syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this));

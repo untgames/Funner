@@ -17,6 +17,8 @@
 #include <xtl/trackable.h>
 
 #include <common/console.h>
+#include <common/license_manager.h>
+#include <common/parser.h>
 #include <common/string.h>
 
 #include <syslib/application.h>
