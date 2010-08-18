@@ -1,0 +1,25 @@
+Results of license_manager_test:
+Component 'common.zip_file_system' allowed: yes
+Component 'media.video.loaders.theora' allowed: Exception: 'License not loaded
+    at common::LicenseManager::IsComponentAllowed'
+Loading license 'data/expired_license.xml'
+Exception: 'License 'data/expired_license.xml' has expired
+    at common::LicenseManager::Load'
+Loading license 'data/future_license.xml'
+Exception: 'License 'data/future_license.xml' is not valid yet
+    at common::LicenseManager::Load'
+Loading license 'data/invalid_date_license.xml'
+Exception: 'Can't convert date string '2036005006'
+    at common::LicenseManager::ParseDate
+    at common::LicenseManager::Load'
+Loading license 'data/invalid_license.xml'
+Exception: 'Invalid license file 'data/invalid_license.xml', hash mismatch
+    at common::LicenseManager::Load'
+Loading license 'data/valid_license.xml'
+Component 'common.zip_file_system' allowed: yes
+Component 'media.video.loaders.theora' allowed: yes
+Component 'media.font.savers.xfont' allowed: no
+Loading license 'data/check_files_license.xml'
+Component 'common.zip_file_system' allowed: yes
+Component 'media.video.loaders.theora' allowed: no
+Component 'media.font.savers.xfont' allowed: yes

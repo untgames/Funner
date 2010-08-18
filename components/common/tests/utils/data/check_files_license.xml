@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<License SinceDate="2010-08-18" TillDate="2020-07-18" AllowedComponents="common.zip* media.image.loaders* media.font.*" LicenseHash="ed8f9042691b0837bfe2c8681373fcc4">
+  <CheckFiles>
+    <File Path="data/valid_license.xml"/>
+    <File Path="data/invalid_license.xml"/>
+  </CheckFiles>
+</License>
