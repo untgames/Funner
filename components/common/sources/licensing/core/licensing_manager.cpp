@@ -126,7 +126,7 @@ class LicenseManagerImpl
 
       time (&current_time);
 
-      return difftime (till_time, current_time) / (60.f * 60.f * 24.f);
+      return (int)(difftime (till_time, current_time) / (60.f * 60.f * 24.f));
     }
 
     ///–абота с предопределенными свойствами
