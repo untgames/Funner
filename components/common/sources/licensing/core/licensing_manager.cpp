@@ -43,7 +43,7 @@ class LicenseManagerImpl
         properties.Clear ();
         allowed_components.Clear ();
 
-        Parser    p (license_path);
+        Parser    p (license_path, "xml");
         ParseLog  log = p.Log ();
         ParseNode root = p.Root ().First ("License");
 
@@ -117,6 +117,8 @@ class LicenseManagerImpl
     {
       static const char* METHOD_NAME = "common::LicenseManager::DaysToExpiration";
 
+      LoadDefaultLicenses ();
+
       if (!license_loaded)
         throw xtl::format_operation_exception (METHOD_NAME, "License not loaded");
 
@@ -136,6 +138,8 @@ class LicenseManagerImpl
         if (common::wcmatch (component_name, ALLOWED_COMPONENTS [i]))
           return true;
 
+      LoadDefaultLicenses ();
+
       if (!license_loaded)
         throw xtl::format_operation_exception (METHOD_NAME, "License not loaded");
 
@@ -151,6 +155,8 @@ class LicenseManagerImpl
     {
       static const char* METHOD_NAME = "common::LicenseManager::GetProperty";
 
+      LoadDefaultLicenses ();
+
       if (!license_loaded)
         throw xtl::format_operation_exception (METHOD_NAME, "License not loaded");
 
@@ -160,6 +166,8 @@ class LicenseManagerImpl
     const char* GetProperty (size_t property_index)
     {
       static const char* METHOD_NAME = "common::LicenseManager::GetProperty";
+
+      LoadDefaultLicenses ();
 
       if (!license_loaded)
         throw xtl::format_operation_exception (METHOD_NAME, "License not loaded");
@@ -171,6 +179,8 @@ class LicenseManagerImpl
     {
       static const char* METHOD_NAME = "common::LicenseManager::GetPropertyName";
 
+      LoadDefaultLicenses ();
+
       if (!license_loaded)
         throw xtl::format_operation_exception (METHOD_NAME, "License not loaded");
 
@@ -181,6 +191,8 @@ class LicenseManagerImpl
     {
       static const char* METHOD_NAME = "common::LicenseManager::HasProperty";
 
+      LoadDefaultLicenses ();
+
       if (!license_loaded)
         throw xtl::format_operation_exception (METHOD_NAME, "License not loaded");
 
@@ -190,6 +202,8 @@ class LicenseManagerImpl
     size_t PropertiesCount ()
     {
       static const char* METHOD_NAME = "common::LicenseManager::PropertiesCount";
+
+      LoadDefaultLicenses ();
 
       if (!license_loaded)
         throw xtl::format_operation_exception (METHOD_NAME, "License not loaded");
@@ -249,6 +263,11 @@ class LicenseManagerImpl
         throw xtl::format_operation_exception (METHOD_NAME, "Can't convert date string '%s'", date_string);
 
       result_date = date;
+    }
+
+    void LoadDefaultLicenses ()
+    {
+      static ComponentLoader loader ("common.licensing.loaders.*");
     }
 
   private:

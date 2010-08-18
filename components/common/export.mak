@@ -1,12 +1,17 @@
+# Auto license generator link exports
+export.link.common.auto_license_generator.LIBS          := funner.common.auto_license_generator funner.common.parsers.xml
+export.link.common.auto_license_generator.LINK_INCLUDES := AutoLicenseGenerator XmlParser
+
 # Compile exports for
 export.compile.common.INCLUDE_DIRS     := include ../xtl/include
 export.compile.common.COMPILER_DEFINES :=
 
 # Link exports
-export.link.common.LIBS := funner.common funner.extern.pcre
-export.link.common.carbon.LINK_FLAGS := -framework Carbon
-export.link.common.iphone.LINK_FLAGS := -framework CoreFoundation 
+export.link.common.LIBS                        := funner.common funner.extern.pcre
+export.link.common.carbon.LINK_FLAGS           := -framework Carbon
+export.link.common.iphone.LINK_FLAGS           := -framework CoreFoundation 
 export.link.common.pthread_static_library.LIBS := pthread
+export.link.common.IMPORTS                     := link.common.auto_license_generator
 
 # AES link exports
 export.link.common.aes.LIBS          := funner.common.aes

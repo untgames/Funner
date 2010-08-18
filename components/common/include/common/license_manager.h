@@ -1,6 +1,8 @@
 #ifndef COMMONLIB_LICENSE_MANAGER_HEADER
 #define COMMONLIB_LICENSE_MANAGER_HEADER
 
+#include <cstddef>
+
 namespace common
 {
 

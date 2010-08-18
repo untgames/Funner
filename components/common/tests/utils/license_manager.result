@@ -1,7 +1,7 @@
 Results of license_manager_test:
 Component 'common.zip_file_system' allowed: yes
-Component 'media.video.loaders.theora' allowed: Exception: 'License not loaded
-    at common::LicenseManager::IsComponentAllowed'
+Component 'media.video.loaders.theora' allowed: yes
+Component 'media.font.savers.xfont' allowed: yes
 Loading license 'data/expired_license.xml'
 Exception: 'License 'data/expired_license.xml' has expired
     at common::LicenseManager::Load'

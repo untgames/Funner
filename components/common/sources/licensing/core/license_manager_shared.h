@@ -7,6 +7,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/reference_counter.h>
 
+#include <common/component.h>
 #include <common/file.h>
 #include <common/license_manager.h>
 #include <common/parser.h>
@@ -18,7 +19,7 @@
 namespace common
 {
 
-void calculate_license_hash (StringArray& check_files_list, PropertyMap& properties, unsigned char hash [16]);
+void calculate_license_hash (const StringArray& check_files_list, const PropertyMap& properties, unsigned char hash [16]);
 
 }
 

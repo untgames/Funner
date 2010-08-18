@@ -36,6 +36,8 @@ ENGINE.FUNNER_SHARED_LIBRARY.has_windows.IMPORTS := link.render.low_level.opengl
 ENGINE.FUNNER_SHARED_LIBRARY.win32.IMPORTS       := link.input.direct_input_driver
 ENGINE.FUNNER_SHARED_LIBRARY.iphone.IMPORTS      := link.media.image.pvr link.input.iphone_driver link.media.players.iphone \
                                              link.engine.subsystems.iphone_audio_session
+ENGINE.FUNNER_SHARED_LIBRARY.EXCLUDE_IMPORTS := link.common.auto_license_generator                                             
+                                             
 #Цель - сборка движка
 ifneq (,$(filter no_dll,$(PROFILES)))
 ENGINE.FUNNER_LIBRARY.TYPE                := fat-static-lib
@@ -50,6 +52,7 @@ ENGINE.FUNNER_LIBRARY.IMPORTS             := $(ENGINE.FUNNER_SHARED_LIBRARY.IMPO
 ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := $(ENGINE.FUNNER_SHARED_LIBRARY.has_windows.IMPORTS)
 ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := $(ENGINE.FUNNER_SHARED_LIBRARY.win32.IMPORTS)
 ENGINE.FUNNER_LIBRARY.iphone.IMPORTS      := $(ENGINE.FUNNER_SHARED_LIBRARY.iphone.IMPORTS)
+ENGINE.FUNNER_LIBRARY.EXCLUDE_IMPORTS     := link.common.auto_license_generator                                             
 
 #Цель - объединение библиотек для iPhone
 ENGINE.FUNNER_LIBRARY_LIPO.NAME     := funner
@@ -62,7 +65,6 @@ ENGINE.LAUNCHER.SOURCES.TYPE                   := application
 ENGINE.LAUNCHER.SOURCES.NAME                   := launcher
 ENGINE.LAUNCHER.SOURCES.INCLUDE_DIRS           := include
 ENGINE.LAUNCHER.SOURCES.EXECUTION_DIR          := sources
-ENGINE.LAUNCHER.SOURCES.macosx.COMPILER_CFLAGS := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers/
 ENGINE.LAUNCHER.SOURCES.macosx.LINK_FLAGS      := -framework CoreFoundation
 ENGINE.LAUNCHER.SOURCES.iphone.LINK_FLAGS      := -framework CoreFoundation -framework OpenAL -framework UIKit -framework Foundation \
                                                   -framework OpenGLES -framework MediaPlayer -framework AVFoundation \

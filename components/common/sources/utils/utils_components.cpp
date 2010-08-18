@@ -1,4 +1,5 @@
 #include <common/component.h>
+#include <common/license_manager.h>
 #include <common/log.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
@@ -95,7 +96,7 @@ class ComponentManagerImpl
     {
       if (!wc_component_mask)
         return;
-        
+
       Log log (COMPONENT_MANAGER_DEFAULT_LOG);      
       
       if (load_indent)
@@ -120,6 +121,12 @@ class ComponentManagerImpl
         {
           if (!wcimatch (node.name, wc_component_mask))
             continue;
+
+          if (!LicenseManager::IsComponentAllowed (node.name))
+          {
+            log.Printf ("Can't load component '%s', not allowed by license", node.name);
+            continue;
+          }
 
           node.is_locked = true;
 

@@ -26,7 +26,7 @@ bool property_desc_compare (PropertyDescPtr property1, PropertyDescPtr property2
 namespace common
 {
 
-void calculate_license_hash (StringArray& check_files_list, PropertyMap& properties, unsigned char hash [16])
+void calculate_license_hash (const StringArray& check_files_list, const PropertyMap& properties, unsigned char hash [16])
 {
   try
   {

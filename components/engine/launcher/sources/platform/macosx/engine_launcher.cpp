@@ -4,7 +4,7 @@
 #include <dlfcn.h>
 #include <unistd.h>
 
-#include <CFBundle.h>
+#include <CoreFoundation/CFBundle.h>
 
 #include <engine/engine.h>
 
