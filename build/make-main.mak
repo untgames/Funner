@@ -907,6 +907,9 @@ define process_target_common
 
 #  $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
   $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call prepare_to_import_settings,$$(imp),$1,$1.PROCESSED_IMPORTS)))
+  
+  $$(foreach exclude_import,$$($1.EXCLUDE_IMPORTS),$$(eval $1.PROCESSED_IMPORTS := $$(subst $$(exclude_import),,$$($1.PROCESSED_IMPORTS))))
+
   $$(foreach imp,$$($1.PROCESSED_IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
 
     #ƒобавление toolset-настроек к общему списку настроек
