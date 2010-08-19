@@ -16,8 +16,10 @@
 #include <xtl/string.h>
 #include <xtl/trackable.h>
 
+#include <common/file.h>
 #include <common/console.h>
 #include <common/license_manager.h>
+#include <common/log.h>
 #include <common/parser.h>
 #include <common/string.h>
 

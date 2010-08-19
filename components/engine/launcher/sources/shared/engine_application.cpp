@@ -18,6 +18,7 @@ const char* DEFAULT_CONFIGURATION_FILE_NAME = "config.xml";       //имя конфигур
 const bool  DEFAULT_HAS_MAIN_LOOP           = true;               //наличие главного цикла приложения по умолчанию
 
 const char* KEY_CONFIGURATION = "--config=";      //имя ключа конфигурационного файла
+const char* KEY_SEARCH_PATH   = "--search-path="; //путь к каталогу поиска файлов
 const char* KEY_NO_MAIN_LOOP  = "--no-main-loop"; //отключение главного цикла приложения
 const char* KEY_MAIN_LOOP     = "--main-loop";    //включение главного цикла приложения
 const char* KEY_VERSION       = "--version";      //вывод справки в стандартный поток вывода
@@ -28,7 +29,8 @@ const char* HELP [] = {
   "Usage: app_name [flags] [source] ...\n",
   "  flags:\n",
   "    --config=config_file_name - launch with specified config file\n",
-  "    --version (-v)            - print version\n",
+  "    --search-path=dir_name    - add dir_name to search paths\n",
+  "    --version (-v)            - print version\n",  
   "    --no-main-loop            - app exits after starting subsystems\n",
   "    --main-loop               - app runs main loop after starting subsystems\n",
   "    --help                    - print this help\n",
@@ -67,6 +69,10 @@ class Application: public IEngine
           if (!xtl::xstrncmp (argument, KEY_CONFIGURATION, xtl::xstrlen (KEY_CONFIGURATION)))
           {
             configuration_name = argument + xtl::xstrlen (KEY_CONFIGURATION);
+          }
+          else if (!xtl::xstrcmp (argument, KEY_SEARCH_PATH))
+          {
+            search_paths.Add (argument);
           }
           else if (!xtl::xstrcmp (argument, KEY_MAIN_LOOP))
           {
@@ -125,16 +131,18 @@ class Application: public IEngine
       try
       {
           //загрузка лицензии
+
         common::Parser p (configuration_name.c_str ());
 
-        if (p.Root ().First ("Configuration.License.Path"))
-          common::LicenseManager::Load (common::get<const char*> (p.Root ().First ("Configuration.License"), "Path"));
+        if (p.Root ().First ("Configuration.LicenseFile"))
+          common::LicenseManager::Load (common::get<const char*> (p.Root ().First ("Configuration"), "LicenseFile"));
         else
           printf ("There is no license information in configuration\n");
-
+        
+        
           //регистрация обработчика старта приложения
 
-        syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this));
+        syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this, xtl::ref (p.Root ())));
 
           //запуск основного цикла
   
@@ -152,7 +160,7 @@ class Application: public IEngine
 
   private:
 ///Обработчик старта приложения
-    void StartupHandler ()
+    void StartupHandler (common::ParseNode& config_node)
     {
       try
       {      
@@ -174,8 +182,19 @@ class Application: public IEngine
         {
           try
           {
-            manager.Start (configuration_name.c_str ());
-            
+            common::Log log ("launcher");
+
+            common::FileSystem::LogHandler log_handler (xtl::bind (&common::Log::Print, &log, _1));
+
+            for (size_t i=0; i<search_paths.Size (); i++)
+            {
+              const char* path = search_paths [i];
+
+              common::FileSystem::AddSearchPath (path, log_handler);
+            }
+
+            manager.Start (config_node);
+
             for (size_t i=0, count=commands.Size (); i<count; i++)
             {
               const char* command = commands [i];
@@ -208,6 +227,7 @@ class Application: public IEngine
     bool                need_print_version;         //нужно распечатать строку версии
     bool                need_print_help;            //нужно распечатать помощь по запуску приложения
     common::StringArray commands;                   //команды на выполнение подсистемами
+    common::StringArray search_paths;               //пути поиска
 };
 
 }

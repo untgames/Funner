@@ -14,28 +14,7 @@ ENGINE.FUNNER_SHARED_LIBRARY.NAME              := funner.engine.shared
 ENGINE.FUNNER_SHARED_LIBRARY.SOURCE_DIRS       := sources/shared
 ENGINE.FUNNER_SHARED_LIBRARY.INCLUDE_DIRS      := include
 ENGINE.FUNNER_SHARED_LIBRARY.COMPILER_DEFINES  := LAUNCHER_VERSION='$(LAUNCHER_VERSION_STRING)' FUNNER_BUILD=1
-ENGINE.FUNNER_SHARED_LIBRARY.IMPORTS           := compile.engine.core compile.common compile.system \
-                                             link.common.default_console_handler link.common.zip_file_system link.common.aes \
-                                             link.media.rms link.media.rfx.xmtl link.media.sound.snddecl link.media.sound.default_decoders \
-                                             link.media.font.xfont link.media.players.null \
-                                             link.input.manager.xkeymap link.input.manager.xkeyreg link.input.window_driver \
-                                             link.render.scene_render.render2d link.script.lua \
-                                             link.engine.script_binds.math link.engine.script_binds.sg link.engine.script_binds.bv \
-                                             link.engine.script_binds.render link.engine.script_binds.engine \
-                                             link.engine.script_binds.input link.engine.script_binds.lua_override \
-                                             link.engine.script_binds.system link.engine.script_binds.common \
-                                             link.engine.script_binds.rms link.engine.script_binds.media.players \
-                                             link.sound.low_level.openal_driver run.sound.low_level.openal_driver \
-                                             link.engine.subsystems.scene_render link.engine.subsystems.scene_player \
-                                             link.engine.subsystems.input_manager link.engine.subsystems.shell \
-                                             link.engine.subsystems.log link.engine.subsystems.file_system \
-                                             link.engine.subsystems.resource_system \
-                                             link.media.image.pvr link.media.video.theora
-ENGINE.FUNNER_SHARED_LIBRARY.has_windows.IMPORTS := link.render.low_level.opengl_driver link.engine.subsystems.window_input_driver \
-                                             link.engine.subsystems.window_manager link.engine.subsystems.window_renderer
-ENGINE.FUNNER_SHARED_LIBRARY.win32.IMPORTS       := link.input.direct_input_driver
-ENGINE.FUNNER_SHARED_LIBRARY.iphone.IMPORTS      := link.media.image.pvr link.input.iphone_driver link.media.players.iphone \
-                                             link.engine.subsystems.iphone_audio_session
+ENGINE.FUNNER_SHARED_LIBRARY.IMPORTS           := compile.engine.core compile.common compile.system link.engine.launcher_shared
 ENGINE.FUNNER_SHARED_LIBRARY.EXCLUDE_IMPORTS := link.common.auto_license_generator                                             
                                              
 #Цель - сборка движка
@@ -45,13 +24,8 @@ else
 ENGINE.FUNNER_LIBRARY.TYPE                := dynamic-lib
 endif
 ENGINE.FUNNER_LIBRARY.NAME                := funner
-ENGINE.FUNNER_LIBRARY.LIBS                := funner.engine.shared
-ENGINE.FUNNER_LIBRARY.LINK_INCLUDES       := FunnerInit
 #ENGINE.FUNNER_LIBRARY.win32.LINK_FLAGS    := -noentry
 ENGINE.FUNNER_LIBRARY.IMPORTS             := $(ENGINE.FUNNER_SHARED_LIBRARY.IMPORTS)
-ENGINE.FUNNER_LIBRARY.has_windows.IMPORTS := $(ENGINE.FUNNER_SHARED_LIBRARY.has_windows.IMPORTS)
-ENGINE.FUNNER_LIBRARY.win32.IMPORTS       := $(ENGINE.FUNNER_SHARED_LIBRARY.win32.IMPORTS)
-ENGINE.FUNNER_LIBRARY.iphone.IMPORTS      := $(ENGINE.FUNNER_SHARED_LIBRARY.iphone.IMPORTS)
 ENGINE.FUNNER_LIBRARY.EXCLUDE_IMPORTS     := link.common.auto_license_generator                                             
 
 #Цель - объединение библиотек для iPhone
@@ -74,6 +48,7 @@ ENGINE.LAUNCHER.SOURCES.win32.SOURCE_DIRS      := sources/platform/win32
 ENGINE.LAUNCHER.SOURCES.macosx.SOURCE_DIRS     := sources/platform/macosx
 ENGINE.LAUNCHER.SOURCES.iphone.SOURCE_DIRS     := sources/platform/iphone
 ENGINE.LAUNCHER.SOURCES.iphone.LIBS            := funner
+ENGINE.LAUNCHER.SOURCES.IMPORTS                := link.engine.launcher
 
 #Цель - console application
 ENGINE.CLAUNCHER.SOURCES.TYPE                := application
