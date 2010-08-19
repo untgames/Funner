@@ -25,8 +25,8 @@ ENGINE.FUNNER_LIBRARY.TYPE                := dynamic-lib
 endif
 ENGINE.FUNNER_LIBRARY.NAME                := funner
 #ENGINE.FUNNER_LIBRARY.win32.LINK_FLAGS    := -noentry
-ENGINE.FUNNER_LIBRARY.IMPORTS             := $(ENGINE.FUNNER_SHARED_LIBRARY.IMPORTS)
-ENGINE.FUNNER_LIBRARY.EXCLUDE_IMPORTS     := link.common.auto_license_generator                                             
+ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core compile.common compile.system link.engine.launcher
+ENGINE.FUNNER_LIBRARY.EXCLUDE_IMPORTS     := link.common.auto_license_generator
 
 #Цель - объединение библиотек для iPhone
 ENGINE.FUNNER_LIBRARY_LIPO.NAME     := funner
@@ -48,7 +48,6 @@ ENGINE.LAUNCHER.SOURCES.win32.SOURCE_DIRS      := sources/platform/win32
 ENGINE.LAUNCHER.SOURCES.macosx.SOURCE_DIRS     := sources/platform/macosx
 ENGINE.LAUNCHER.SOURCES.iphone.SOURCE_DIRS     := sources/platform/iphone
 ENGINE.LAUNCHER.SOURCES.iphone.LIBS            := funner
-ENGINE.LAUNCHER.SOURCES.IMPORTS                := link.engine.launcher
 
 #Цель - console application
 ENGINE.CLAUNCHER.SOURCES.TYPE                := application
