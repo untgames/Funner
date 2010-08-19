@@ -237,6 +237,9 @@ void generate_license (Params& params)
 
   calculate_license_hash (params.check_files, params.properties, hash);
 
+    //Убираем свойство компонентов
+  params.properties.RemoveProperty ("AllowedComponents");
+
   stl::string hex_hash_string;
 
   for (size_t i = 0; i < 16; i++)
@@ -273,6 +276,18 @@ void generate_license (Params& params)
       writer.WriteAttribute ("Path", params.check_files [i]);
     }
   }
+
+  if (!params.allowed_components.IsEmpty ())
+  {
+    XmlWriter::Scope allowed_components_scope (writer, "AllowedComponents");
+
+    for (size_t i = 0, count = params.allowed_components.Size (); i < count; i++)
+    {
+      XmlWriter::Scope component_scope (writer, "Component");
+
+      writer.WriteAttribute ("Wildcard", params.allowed_components [i]);
+    }
+  }
 }
 
 int main (int argc, const char *argv[])
@@ -287,8 +302,8 @@ int main (int argc, const char *argv[])
       {xtl::bind (&command_line_allowed_components, _1, xtl::ref (params)), "components",  'c', "component-list", "allowed components list"},
       {xtl::bind (&command_line_check_files,        _1, xtl::ref (params)), "check-files", 'f', "file-list",      "check-files list"},
       {xtl::bind (&command_line_license_period,     _1, xtl::ref (params)), "period",      'p', "period",         "license validity period ('y-mm')"},
-      {xtl::bind (&command_line_since_date,         _1, xtl::ref (params)), "since_date",  's', "date",           "since date"},
-      {xtl::bind (&command_line_till_date,          _1, xtl::ref (params)), "till_date",   't', "date",           "till date"},
+      {xtl::bind (&command_line_since_date,         _1, xtl::ref (params)), "since-date",  's', "date",           "since date"},
+      {xtl::bind (&command_line_till_date,          _1, xtl::ref (params)), "till-date",   't', "date",           "till date"},
       {xtl::bind (&command_line_force,              _1, xtl::ref (params)), "force",       0,   0,                "force (ignore errors)"},
       {xtl::bind (&command_line_silent,             _1, xtl::ref (params)), "silent",      0,   0,                "silent mode"},
       {xtl::bind (&command_line_help,               _1, xtl::ref (params)), "help",        '?', 0,                "print help message"},
@@ -331,12 +346,7 @@ int main (int argc, const char *argv[])
                 allowed_components_string;
 
     for (size_t i = 0, count = params.allowed_components.Size (); i < count; i++)
-    {
       allowed_components_string += params.allowed_components [i];
-
-      if (i != count - 1)
-        allowed_components_string += " ";
-    }
 
     params.properties.SetProperty ("SinceDate",         since_date_string.c_str ());
     params.properties.SetProperty ("TillDate",          till_date_string.c_str ());

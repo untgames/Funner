@@ -7,8 +7,8 @@ using namespace common;
 namespace
 {
 
-const char* ALLOWED_COMPONENTS = "*";
-const char* COMPONENT_NAME     = "common.licensing.loaders.AutoLicenseGenerator";
+const char* ALLOWED_COMPONENT = "*";
+const char* COMPONENT_NAME    = "common.licensing.loaders.AutoLicenseGenerator";
 
 //генерация и загрузка лицензии
 void load_license ()
@@ -40,7 +40,7 @@ void load_license ()
 
   properties.SetProperty ("SinceDate", since_date_string.c_str ());
   properties.SetProperty ("TillDate", till_date_string.c_str ());
-  properties.SetProperty ("AllowedComponents", ALLOWED_COMPONENTS);
+  properties.SetProperty ("AllowedComponents", ALLOWED_COMPONENT);
 
   calculate_license_hash (StringArray (), properties, license_hash);
 
@@ -49,8 +49,8 @@ void load_license ()
   for (size_t i = 0; i < 16; i++)
     license_hash_string += common::format ("%02x", license_hash [i]);
 
-  stl::string license_string = common::format ("<?xml version='1.0' encoding='utf-8'?><License SinceDate='%s' TillDate='%s' AllowedComponents='%s' LicenseHash='%s'/>",
-                                               since_date_string.c_str (), till_date_string.c_str (), ALLOWED_COMPONENTS, license_hash_string.c_str ());
+  stl::string license_string = common::format ("<?xml version='1.0' encoding='utf-8'?><License SinceDate='%s' TillDate='%s' LicenseHash='%s'><AllowedComponents><Component Wildcard='%s'/></AllowedComponents></License>",
+                                               since_date_string.c_str (), till_date_string.c_str (), license_hash_string.c_str (), ALLOWED_COMPONENT);
 
   MemFile license_file;
 

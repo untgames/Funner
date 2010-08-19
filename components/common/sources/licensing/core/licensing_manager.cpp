@@ -12,7 +12,7 @@ namespace
 const size_t COMPONENTS_ARRAY_RESERVE_SIZE = 64; //резервируемое количество компонентов
 
 const char* ALLOWED_COMPONENTS [] = { "common.*" };
-const char* IGNORED_PROPERTIES [] = { "CheckFiles", "LicenseHash" };
+const char* IGNORED_PROPERTIES [] = { "CheckFiles", "LicenseHash", "AllowedComponents" };
 
 const size_t IGNORED_PROPERTIES_COUNT = sizeof (IGNORED_PROPERTIES) / sizeof (*IGNORED_PROPERTIES);
 
@@ -60,9 +60,10 @@ class LicenseManagerImpl
               break;
           }
 
+          //чтение периода действия лицензии
+
         const char *since_date_string       = common::get<const char*> (root, "SinceDate"),
                    *till_date_string        = common::get<const char*> (root, "TillDate"),
-                   *allowed_components_list = common::get<const char*> (root, "AllowedComponents", ""),
                    *license_hash            = common::get<const char*> (root, "LicenseHash");
 
         time_t since_time;
@@ -80,12 +81,25 @@ class LicenseManagerImpl
         if (difftime (till_time, current_time) < 0)
           throw xtl::format_operation_exception ("", "License '%s' has expired", license_path);
 
-        allowed_components = split (allowed_components_list);
+          //чтение произвольных свойств
 
         for (ParseNode node = root.First (); node; node = node.Next ())
           AddNodeProperties (node, "");
 
-        //проверка корректности содержимого лицензии
+          //чтение разрешенных компонентов
+
+        for (Parser::NamesakeIterator component_iter = root.First ("AllowedComponents.Component"); component_iter; ++component_iter)
+          allowed_components.Add (common::get<const char*> (*component_iter, "Wildcard"));
+
+        stl::string allowed_components_property_string;
+
+        for (size_t i = 0, count = allowed_components.Size (); i < count; i++)
+          allowed_components_property_string += allowed_components [i];
+
+        properties.SetProperty ("AllowedComponents", allowed_components_property_string.c_str ());
+
+          //проверка корректности содержимого лицензии
+
         StringArray check_files_list;
 
         for (Parser::NamesakeIterator check_file_iter = root.First ("CheckFiles.File"); check_file_iter; ++check_file_iter)
