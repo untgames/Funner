@@ -1039,10 +1039,10 @@ Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x,
     if (hotspot_y != -1)
       throw xtl::format_not_supported_exception ("", "Custom hotspot_y=%d not supported", hotspot_y);
       
-    HCURSOR cursor = LoadCursorFromFileA (file_name);
+    HANDLE cursor = LoadImageA (0, file_name, IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE);
     
     if (!cursor)
-      raise_error ("::LoadCursorFromFileA");
+      raise_error ("::LoadImageA");
 
     return reinterpret_cast<Platform::cursor_t> (cursor);      
   }
@@ -1055,7 +1055,19 @@ Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x,
 
 void Platform::DestroyCursor (cursor_t cursor)
 {
-  //shared курсоры находятся в памяти до завершения программы и не могут быть удалены
+  try
+  {
+    if (GetCursor () == reinterpret_cast<HCURSOR> (cursor))
+      throw xtl::format_operation_exception ("", "Can't destroy active cursor");
+
+    if (!::DestroyCursor (reinterpret_cast<HCURSOR> (cursor)))
+      raise_error ("::DestroyCursor");
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Win32Platform::DestroyCursor");
+    throw;
+  }
 }
 
 void Platform::SetCursor (window_t window, cursor_t cursor)
