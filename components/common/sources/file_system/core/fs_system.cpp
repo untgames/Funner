@@ -1209,3 +1209,50 @@ void FileSystem::GetFileCryptoKey (const char* file_name, filecryptokey_t key)
     throw;
   }
 }
+
+/*
+    Копирование файла
+*/
+
+void FileSystem::CopyFile (const char* source_file_name, const char* destination_file_name, size_t buffer_size)
+{
+  try
+  {
+    if (!source_file_name)
+      throw xtl::make_null_argument_exception ("", "source_file_name");
+
+    if (!destination_file_name)
+      throw xtl::make_null_argument_exception ("", "destination_file_name");
+      
+    if (!buffer_size)
+      buffer_size = GetDefaultFileBufferSize ();
+      
+    if (!buffer_size)
+      buffer_size = 4096;
+
+    InputFile input_file (source_file_name);
+    OutputFile output_file (destination_file_name);
+
+    output_file.Resize (0);
+
+    xtl::uninitialized_storage<char> buffer (buffer_size);
+
+    while (!input_file.Eof ())
+    {
+      size_t read_size = input_file.Read (buffer.data (), buffer.size ());
+
+      if (!read_size)
+        break;
+
+      output_file.Write (buffer.data (), read_size);
+    }
+
+    if (input_file.Eof ())
+      throw xtl::format_operation_exception ("", "Internal error: can't read input file");
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::FileSystem::CopyFile");
+    throw;
+  }
+}
