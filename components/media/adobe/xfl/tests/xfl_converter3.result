@@ -1,0 +1,485 @@
+Results of xfl_converter_test3
+Processing textures...
+  crop layer '/mount_points/animation.xfl/LIBRARY/grid_cutted-staircase.psd/1.png' 121x129: (0, 0)-(121, 129)
+  crop layer '/mount_points/animation.xfl/LIBRARY/rasp-staircase.psd/1.png' 276x235: (0, 0)-(179, 149)
+  crop layer '/mount_points/animation.xfl/LIBRARY/cut_line1-staircase.psd/1.png' 15x2: (0, 0)-(15, 2)
+  crop layer '/mount_points/animation.xfl/LIBRARY/cut_line2-staircase.psd/1.png' 15x2: (0, 0)-(15, 2)
+  crop layer '/mount_points/animation.xfl/LIBRARY/cut_line3-staircase.psd/1.png' 25x2: (2, 0)-(25, 2)
+  crop layer '/mount_points/animation.xfl/LIBRARY/cut_line4-staircase.psd/1.png' 21x2: (0, 0)-(21, 2)
+  crop layer '/mount_points/animation.xfl/LIBRARY/cut_line5-staircase.psd/1.png' 17x2: (0, 0)-(17, 2)
+  crop layer '/mount_points/animation.xfl/LIBRARY/cut_line6-staircase.psd/1.png' 16x2: (0, 0)-(16, 2)
+  crop layer '/mount_points/animation.xfl/LIBRARY/leaves-staircase.psd/1.png' 282x354: (0, 0)-(282, 354)
+  crop layer '/mount_points/animation.xfl/LIBRARY/grid-staircase.psd/1.png' 150x227: (0, 0)-(150, 227)
+  crop layer '/mount_points/animation.xfl/LIBRARY/frog-staircase.psd/1.png' 150x163: (0, 0)-(150, 163)
+  crop layer '/mount_points/animation.xfl/LIBRARY/frog_frame_background-staircase.psd/1.png' 340x354: (9, 76)-(302, 350)
+Processing scene...
+<?xml version="1.0" encoding="utf-8"?>
+<AnimationScreenPart>
+  <Sprite Name="frog_frame_group_final.grid_cutted_overlay.Layer 1" Material="grid_cutted-staircase.psd/1.png" Parent="frog_frame_group_final.grid_cutted_overlay" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="grid_cutted-staircase.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="121; 129"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="60.500; 64.500"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.grid_cutted_overlay" Material="transparent" Active="false" Z="0" PivotPosition="60.500;64.500" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="543.000; 226.000"/>
+      <Key Time="0.2" Value="543.000; 226.000"/>
+      <Key Time="0.24" Value="543.000; 243.647"/>
+      <Key Time="0.28" Value="543.000; 261.294"/>
+      <Key Time="0.32" Value="543.000; 278.941"/>
+      <Key Time="0.36" Value="543.000; 296.589"/>
+      <Key Time="0.4" Value="543.000; 314.237"/>
+      <Key Time="0.44" Value="543.000; 331.886"/>
+      <Key Time="0.48" Value="543.000; 349.529"/>
+      <Key Time="0.52" Value="543.000; 367.177"/>
+      <Key Time="0.56" Value="543.000; 384.823"/>
+      <Key Time="0.6" Value="543.000; 402.470"/>
+      <Key Time="0.64" Value="543.000; 420.114"/>
+      <Key Time="0.68" Value="543.000; 437.760"/>
+      <Key Time="0.72" Value="543.000; 455.412"/>
+      <Key Time="0.76" Value="543.000; 473.059"/>
+      <Key Time="0.8" Value="543.000; 490.706"/>
+      <Key Time="0.84" Value="543.000; 508.353"/>
+      <Key Time="0.88" Value="543.000; 526.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+      <Key Time="0.04" Value="1.026; 1.026"/>
+      <Key Time="0.08" Value="1.052; 1.052"/>
+      <Key Time="0.12" Value="1.078; 1.078"/>
+      <Key Time="0.16" Value="1.104; 1.104"/>
+      <Key Time="0.2" Value="1.130; 1.130"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+      <Key Time="0.2" Value="-0"/>
+      <Key Time="0.24" Value="0.941176"/>
+      <Key Time="0.28" Value="1.88235"/>
+      <Key Time="0.32" Value="2.82353"/>
+      <Key Time="0.36" Value="3.76471"/>
+      <Key Time="0.4" Value="4.70588"/>
+      <Key Time="0.44" Value="5.64706"/>
+      <Key Time="0.48" Value="6.58824"/>
+      <Key Time="0.52" Value="7.52941"/>
+      <Key Time="0.56" Value="8.47059"/>
+      <Key Time="0.6" Value="9.41176"/>
+      <Key Time="0.64" Value="10.3529"/>
+      <Key Time="0.68" Value="11.2941"/>
+      <Key Time="0.72" Value="12.2353"/>
+      <Key Time="0.76" Value="13.1765"/>
+      <Key Time="0.8" Value="14.1176"/>
+      <Key Time="0.84" Value="15.0588"/>
+      <Key Time="0.88" Value="16"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+      <Key Time="0.4" Value="1"/>
+      <Key Time="0.44" Value="0.916667"/>
+      <Key Time="0.48" Value="0.833333"/>
+      <Key Time="0.52" Value="0.75"/>
+      <Key Time="0.56" Value="0.666667"/>
+      <Key Time="0.6" Value="0.583333"/>
+      <Key Time="0.64" Value="0.5"/>
+      <Key Time="0.68" Value="0.416667"/>
+      <Key Time="0.72" Value="0.333333"/>
+      <Key Time="0.76" Value="0.25"/>
+      <Key Time="0.8" Value="0.166667"/>
+      <Key Time="0.84" Value="0.0833333"/>
+      <Key Time="0.88" Value="0"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.grid_cutted_overlay.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.rasp.Layer 1" Material="rasp-staircase.psd/1.png" Parent="frog_frame_group_final.rasp" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="rasp-staircase.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="179; 149"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="89.500; 74.500"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.rasp" Material="transparent" Active="false" Z="0" PivotPosition="138.000;117.500" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="723.000; 428.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+      <Key Time="0.04" Value="0.933333"/>
+      <Key Time="0.08" Value="0.866667"/>
+      <Key Time="0.12" Value="0.8"/>
+      <Key Time="0.16" Value="0.733333"/>
+      <Key Time="0.2" Value="0.666667"/>
+      <Key Time="0.24" Value="0.6"/>
+      <Key Time="0.28" Value="0.533333"/>
+      <Key Time="0.32" Value="0.466667"/>
+      <Key Time="0.36" Value="0.4"/>
+      <Key Time="0.4" Value="0.333333"/>
+      <Key Time="0.44" Value="0.266667"/>
+      <Key Time="0.48" Value="0.2"/>
+      <Key Time="0.52" Value="0.133333"/>
+      <Key Time="0.56" Value="0.0666667"/>
+      <Key Time="0.6" Value="0"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.rasp.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.cut_line1.Layer 1" Material="cut_line1-staircase.psd/1.png" Parent="frog_frame_group_final.cut_line1" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="cut_line1-staircase.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="15; 2"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="7.500; 1.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.cut_line1" Material="transparent" Active="false" Z="0" PivotPosition="7.500;1.000" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="561.000; 225.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.cut_line1.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.cut_line2.Layer 1" Material="cut_line2-staircase.psd/1.png" Parent="frog_frame_group_final.cut_line2" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="cut_line2-staircase.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="15; 2"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="7.500; 1.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.cut_line2" Material="transparent" Active="false" Z="0" PivotPosition="7.500;1.000" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="610.000; 225.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.cut_line2.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.cut_line3.Layer 1" Material="cut_line3-staircase.psd/1.png" Parent="frog_frame_group_final.cut_line3" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="cut_line3-staircase.psd/1.png" Active="false" PivotPosition="-0.087;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="23; 2"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="13.500; 1.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.cut_line3" Material="transparent" Active="false" Z="0" PivotPosition="12.500;1.000" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="538.000; 354.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.cut_line3.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.cut_line4.Layer 1" Material="cut_line4-staircase.psd/1.png" Parent="frog_frame_group_final.cut_line4" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="cut_line4-staircase.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="21; 2"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="10.500; 1.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.cut_line4" Material="transparent" Active="false" Z="0" PivotPosition="10.500;1.000" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="575.000; 354.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.cut_line4.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.cut_line5.Layer 1" Material="cut_line5-staircase.psd/1.png" Parent="frog_frame_group_final.cut_line5" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="cut_line5-staircase.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="17; 2"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="8.500; 1.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.cut_line5" Material="transparent" Active="false" Z="0" PivotPosition="8.500;1.000" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="643.000; 354.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.cut_line5.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.cut_line6.Layer 1" Material="cut_line6-staircase.psd/1.png" Parent="frog_frame_group_final.cut_line6" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="cut_line6-staircase.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="16; 2"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="8.000; 1.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.cut_line6" Material="transparent" Active="false" Z="0" PivotPosition="8.000;1.000" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="645.000; 225.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.cut_line6.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.leaves.Layer 1" Material="leaves-staircase.psd/1.png" Parent="frog_frame_group_final.leaves" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="leaves-staircase.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="282; 354"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="141.000; 177.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.leaves" Material="transparent" Active="false" Z="0" PivotPosition="141.000;177.000" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="469.000; 78.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.leaves.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.grid_cutted.Layer 1" Material="grid_cutted-staircase.psd/1.png" Parent="frog_frame_group_final.grid_cutted" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="grid_cutted-staircase.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="121; 129"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="60.500; 64.500"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.grid_cutted" Material="transparent" Active="false" Z="0" PivotPosition="60.500;64.500" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="543.000; 226.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="0"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.grid_cutted.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.grid.Layer 1" Material="grid-staircase.psd/1.png" Parent="frog_frame_group_final.grid" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="grid-staircase.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="150; 227"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="75.000; 113.500"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.grid" Material="transparent" Active="false" Z="0" PivotPosition="75.000;113.500" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="514.000; 176.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.grid.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.frog.Layer 1" Material="frog-staircase.psd/1.png" Parent="frog_frame_group_final.frog" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="frog-staircase.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="150; 163"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="75.000; 81.500"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.frog" Material="transparent" Active="false" Z="0" PivotPosition="75.000;81.500" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="530.000; 212.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.frog.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.frog_frame_background.Layer 1" Material="frog_frame_background-staircase.psd/1.png" Parent="frog_frame_group_final.frog_frame_background" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="frog_frame_background-staircase.psd/1.png" Active="false" PivotPosition="-0.031;-0.277">
+    <Track Name="size">
+      <Key Time="0" Value="293; 274"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="155.500; 213.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final.frog_frame_background" Material="transparent" Active="false" Z="0" PivotPosition="170.000;177.000" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="477.000; 90.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.frog_frame_background.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="frog_frame_group_final" Material="transparent" Active="false" Z="0">
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.grid_cutted_overlay')"/>
+      <Key Time="0.96" Event="DeactivateSprite ('frog_frame_group_final.grid_cutted_overlay')"/>
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.rasp')"/>
+      <Key Time="0.96" Event="DeactivateSprite ('frog_frame_group_final.rasp')"/>
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.cut_line1')"/>
+      <Key Time="0.96" Event="DeactivateSprite ('frog_frame_group_final.cut_line1')"/>
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.cut_line2')"/>
+      <Key Time="0.96" Event="DeactivateSprite ('frog_frame_group_final.cut_line2')"/>
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.cut_line3')"/>
+      <Key Time="0.96" Event="DeactivateSprite ('frog_frame_group_final.cut_line3')"/>
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.cut_line4')"/>
+      <Key Time="0.96" Event="DeactivateSprite ('frog_frame_group_final.cut_line4')"/>
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.cut_line5')"/>
+      <Key Time="0.96" Event="DeactivateSprite ('frog_frame_group_final.cut_line5')"/>
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.cut_line6')"/>
+      <Key Time="0.96" Event="DeactivateSprite ('frog_frame_group_final.cut_line6')"/>
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.leaves')"/>
+      <Key Time="0.96" Event="DeactivateSprite ('frog_frame_group_final.leaves')"/>
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.grid_cutted')"/>
+      <Key Time="0.96" Event="DeactivateSprite ('frog_frame_group_final.grid_cutted')"/>
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.grid')"/>
+      <Key Time="0.96" Event="DeactivateSprite ('frog_frame_group_final.grid')"/>
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.frog')"/>
+      <Key Time="0.96" Event="DeactivateSprite ('frog_frame_group_final.frog')"/>
+      <Key Time="0" Event="ActivateSprite ('frog_frame_group_final.frog_frame_background')"/>
+      <Key Time="0.96" Event="DeactivateSprite ('frog_frame_group_final.frog_frame_background')"/>
+      <Key Time="0.96" Event="DeactivateSprite (sprite)"/>
+    </Track>
+  </Sprite>
+</AnimationScreenPart>

@@ -829,21 +829,31 @@ void write_track
     }
     else
     {
-      if (y_frame.time < x_frame.time)
+      if (y_frame.time < x_frame.time && (yi != ycount - 1 || prev_time < y_frame.time))
       {
         time    = y_frame.time;
-        value.x = float_compare (time, prev_time) ? x_frame.value : prev_value.x + (x_frame.value - prev_value.x) / (x_frame.time - prev_time) * (time - prev_time);
+
+        if (xi != xcount - 1)
+          value.x = float_compare (time, prev_time) ? x_frame.value : prev_value.x + (x_frame.value - prev_value.x) / (x_frame.time - prev_time) * (time - prev_time);
+        else
+          value.x = x_frame.value;
+
         value.y = y_frame.value;
         
         if (yi != ycount - 1) yi++;
       }
       else
       {
-        time    = x_frame.time;
+        time    = (xi != xcount - 1 || prev_time < x_frame.time) ? x_frame.time : y_frame.time;
         value.x = x_frame.value;
-        value.y = float_compare (time, prev_time) ? y_frame.value : prev_value.y + (y_frame.value - prev_value.y) / (y_frame.time - prev_time) * (time - prev_time);
+
+        if (yi != ycount - 1)
+          value.y = float_compare (time, prev_time) ? y_frame.value : prev_value.y + (y_frame.value - prev_value.y) / (y_frame.time - prev_time) * (time - prev_time);
+        else
+          value.y = y_frame.value;
 
         if (xi != xcount - 1) xi++;
+        else if (yi != ycount - 1) yi++;
       }            
     }      
 
@@ -936,7 +946,7 @@ void process_sprite_common
     XmlWriter::Scope scope (*data.scene_writer, "Track");
     
     data.scene_writer->WriteAttribute ("Name", params.need_relative ? "offset" : "position");
-    
+
     write_track (data, *x_track, *y_track, name, params.need_relative ? math::vec2f (0.0f) : position,
       math::vec2f (params.need_inverse_x ? -1.0f : 1.0f, params.need_inverse_y ? -1.0f : 1.0f) * scale);
   }
@@ -952,7 +962,7 @@ void process_sprite_common
     data.scene_writer->WriteAttribute ("Value", common::format ("%.3f; %.3f", params.need_inverse_x ? -position.x : position.x,
       params.need_inverse_y ? -position.y : position.y).c_str ());    
   }
-  
+
     //сохранение масштаба
     
   const PropertyAnimation *x_scale_track = animation.Properties ().Find ("headContainer.Transformation.Scale_X"),
@@ -966,7 +976,7 @@ void process_sprite_common
     
     write_track (data, *x_scale_track, *y_scale_track, name, math::vec2f (0.0f), math::vec2f (0.01f));
   }
-  
+
     //сохранение угла
     
   const PropertyAnimation *angle_track = animation.Properties ().Find ("headContainer.Basic_Motion.Rotation_Z");
@@ -979,7 +989,7 @@ void process_sprite_common
 
     write_track (data, *angle_track, -1.0f);
   }
-  
+
     //сохранение альфа
     
   const PropertyAnimation* alpha_track = animation.Properties ().Find ("headContainer.Colors.Alpha_Color.Alpha_Amount");
@@ -1113,7 +1123,7 @@ float process_symbol_instance (Params& params, ConvertData& data, const Frame& f
   
   if (!data.document.Symbols ().Find (symbol_name))
     error ("Symbol '%s' not found while processing '%s'", symbol_name, name_prefix);
-    
+
     //обработка вложений
     
   EventList events;
@@ -1125,7 +1135,7 @@ float process_symbol_instance (Params& params, ConvertData& data, const Frame& f
   XmlWriter::Scope sprite_scope (*data.scene_writer, "Sprite");
   
   write_timeline_sprite_data (data, name_prefix);  
-  
+
     //сохранение центра вращений
     
   math::vec2f transformation_point = element.TransformationPoint ();
@@ -1138,7 +1148,7 @@ float process_symbol_instance (Params& params, ConvertData& data, const Frame& f
 
   if (params.need_inverse_y)
     transformation_point.y *= -1.0f;  
-    
+
   stl::string pivot_value_string = common::format ("%.3f;%.3f", transformation_point.x, transformation_point.y);
 
   data.scene_writer->WriteAttribute ("PivotPosition", pivot_value_string.c_str ());
@@ -1147,7 +1157,7 @@ float process_symbol_instance (Params& params, ConvertData& data, const Frame& f
 
   process_sprite_common (params, data, frame, name_prefix, element.Translation ());
   write_timeline_sprite_tracks (data, events);
-  
+
   return end_time;
 }
 
@@ -1157,7 +1167,7 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
     //обход слоёв
     
   float end_time = 0.0f;
-    
+
   for (Timeline::LayerList::ConstIterator layer_iter=timeline.Layers ().CreateIterator (); layer_iter; ++layer_iter)
   {
     const Layer& layer = *layer_iter;
@@ -1262,7 +1272,7 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
         break;
     }    
   }
-  
+
     //автоматическая деактивация
     
   if (!float_compare (end_time, 0.0f))
@@ -1274,7 +1284,7 @@ float process_timeline (Params& params, ConvertData& data, const Timeline& timel
 
     events.push_back (event);
   }
-  
+
   return end_time;
 }
 
