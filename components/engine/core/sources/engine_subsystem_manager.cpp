@@ -232,9 +232,7 @@ void SubsystemManager::Start (const common::ParseNode& configuration_root, const
     if (!subsystem_name_mask)
       throw xtl::make_null_argument_exception ("", "subsystem_name_mask");
 
-    common::ParseNode copy = configuration_root;
-
-    StartupManagerSingleton::Instance ()->Start (copy, subsystem_name_mask, *this);
+    StartupManagerSingleton::Instance ()->Start (configuration_root, subsystem_name_mask, *this);
   }
   catch (xtl::exception& exception)
   {

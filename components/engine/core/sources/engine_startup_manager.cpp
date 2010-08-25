@@ -58,7 +58,7 @@ struct StartupManagerImpl::Impl
     }
     
 ///Запуск подсистем
-    void Start (common::ParseNode& node, const char* wc_mask, SubsystemManager& manager)
+    void Start (const common::ParseNode& node, const char* wc_mask, SubsystemManager& manager)
     {
       static common::ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
       
@@ -75,7 +75,7 @@ struct StartupManagerImpl::Impl
 
   private:
 ///Запуск подсистем
-    void StartCore (common::ParseNode& node, const char* wc_mask, SubsystemManager& manager, common::PropertyMap& properties)
+    void StartCore (const common::ParseNode& node, const char* wc_mask, SubsystemManager& manager, common::PropertyMap& properties)
     {
       common::Log log (common::format ("%s.%s", LOG_PREFIX, manager.Name ()).c_str ());      
       
@@ -240,7 +240,7 @@ void StartupManagerImpl::UnregisterAllStartupHandlers ()
     Запуск обработчиков
 */
 
-void StartupManagerImpl::Start (common::ParseNode& node, const char* wc_mask, SubsystemManager& manager)
+void StartupManagerImpl::Start (const common::ParseNode& node, const char* wc_mask, SubsystemManager& manager)
 {
   impl->Start (node, wc_mask, manager);
 }

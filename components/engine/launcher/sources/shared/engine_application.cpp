@@ -139,10 +139,9 @@ class Application: public IEngine
         else
           printf ("There is no license information in configuration\n");
         
-        
           //регистрация обработчика старта приложения
 
-        syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this, xtl::ref (p.Root ())));
+        syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this, p.Root ().First ("Configuration")));
 
           //запуск основного цикла
   
@@ -160,7 +159,7 @@ class Application: public IEngine
 
   private:
 ///Обработчик старта приложения
-    void StartupHandler (common::ParseNode& config_node)
+    void StartupHandler (common::ParseNode config_node)
     {
       try
       {      
