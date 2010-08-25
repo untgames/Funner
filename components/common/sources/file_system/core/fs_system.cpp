@@ -399,9 +399,7 @@ void FileSystemImpl::Mount (const char* path_prefix,const char* _path,const char
 
   FileInfo info;
 
-  GetFileInfo (_path,info);
-  
-  if (info.is_dir)
+  if (GetFileInfo (_path,info) && info.is_dir)
   {
     if (!*path_prefix)
       throw xtl::make_argument_exception (METHOD_NAME, "path_prefix", path_prefix, "Path prefix must be non empty");
@@ -855,6 +853,25 @@ void FileSystemImpl::Rename (const char* src_file_name,const char* new_name)
   }
 }
 
+namespace
+{
+
+void MkdirRecursive (ICustomFileSystem& fs, const char* dir_name)
+{
+  stl::string parent_dir_name = dir (dir_name);
+  
+  parent_dir_name.pop_back ();
+  
+  FileInfo info;
+  
+  if (parent_dir_name != "." && !(fs.GetFileInfo (parent_dir_name.c_str (), info) && info.is_dir))
+    MkdirRecursive (fs, parent_dir_name.c_str ());
+
+  fs.Mkdir (dir_name);
+}
+
+}
+
 void FileSystemImpl::Mkdir (const char* src_dir_name)
 {
   if (!src_dir_name)
@@ -865,8 +882,8 @@ void FileSystemImpl::Mkdir (const char* src_dir_name)
   try
   {
     ICustomFileSystemPtr file_system = FindFileSystem (src_dir_name,dir_name);
-
-    file_system->Mkdir (dir_name.c_str ());
+    
+    MkdirRecursive (*file_system, dir_name.c_str ());
   }
   catch (xtl::exception& exception)
   {
