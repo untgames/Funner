@@ -15,19 +15,23 @@
 
 #include "PluginCore.h"
 
+#ifdef CreateWindow
+#undef CreateWindow
+#endif
+
+#include <memory>
+
+#include <engine/engine.h>
+
 class FunnerEngine : public FB::PluginCore
 {
-public:
-    static void StaticInitialize();
-    static void StaticDeinitialize();
+  public:
+    FunnerEngine  ();
+    ~FunnerEngine ();
 
-public:
-    FunnerEngine();
-    virtual ~FunnerEngine();
-
-public:
-    virtual FB::JSAPI* createJSAPI();
-    virtual bool IsWindowless() { return false; }
+  public:
+    FB::JSAPI* createJSAPI ();
+    bool IsWindowless () { return false; }
 
     BEGIN_PLUGIN_EVENT_MAP()
         EVENTTYPE_CASE(FB::MouseDownEvent, onMouseDown, FB::PluginWindow)
@@ -45,6 +49,12 @@ public:
     virtual bool onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *);
     virtual bool onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *);
     /** END EVENTDEF -- DON'T CHANGE THIS LINE **/
+
+    static void StaticInitialize   ();
+    static void StaticDeinitialize ();  
+
+  private:
+    std::auto_ptr<engine::IWindow> window;
 };
 
 #endif
