@@ -18,6 +18,52 @@ HINSTANCE GetApplicationInstance ()
 }
 
 /*
+    Копирование файла в папку temp
+*/
+
+class TempFile
+{
+  public:
+    TempFile (const char* source_file_name)
+    {
+      if (!source_file_name)
+        throw xtl::make_null_argument_exception ("syslib::TempFile::TempFile", "source_file_name");
+        
+        //генерация имени нового файла
+        
+      stl::string dir_name;
+      
+      dir_name.fast_resize (MAX_PATH);
+      
+      DWORD dir_len = GetTempPath (dir_name.size (), &dir_name [0]);
+      
+      if (!dir_len || dir_len > MAX_PATH)
+        raise_error ("::GetTempPath");
+        
+      file_name.fast_resize (MAX_PATH);
+        
+      if (!GetTempFileName (dir_name.c_str (), TEXT("TEMP"), 0, &file_name [0]))
+        raise_error ("::GetTempFileName");
+        
+        //копирование содержимого
+        
+      #undef CopyFile
+        
+      FileSystem::CopyFile (source_file_name, file_name.c_str ());
+    }
+    
+    ~TempFile ()
+    {
+      FileSystem::Remove (file_name.c_str ());
+    }
+    
+    const char* Path () const { return file_name.c_str (); }
+  
+  private:
+    stl::string file_name; //имя файла
+};
+
+/*
     Описание реализации окна
 */
 
@@ -1039,7 +1085,9 @@ Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x,
     if (hotspot_y != -1)
       throw xtl::format_not_supported_exception ("", "Custom hotspot_y=%d not supported", hotspot_y);
       
-    HANDLE cursor = LoadImageA (0, file_name, IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE);
+    TempFile cursor_file (file_name);
+      
+    HANDLE cursor = LoadImageA (0, cursor_file.Path (), IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE);
     
     if (!cursor)
       raise_error ("::LoadImageA");

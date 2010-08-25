@@ -27,4 +27,4 @@ SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/no_threa
 #Öåëü ¹2 - System library tests
 SYSTEMLIB.TESTS.TYPE             := test-suite
 SYSTEMLIB.TESTS.SOURCE_DIRS      := tests/wrappers tests/thread
-SYSTEMLIB.TESTS.IMPORTS          := compile.system link.system
+SYSTEMLIB.TESTS.IMPORTS          := compile.system link.system link.common.zip_file_system
