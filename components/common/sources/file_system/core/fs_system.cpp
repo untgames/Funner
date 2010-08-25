@@ -637,7 +637,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
 
   size_t replacement_count = 0;
 
-  for (SymbolicLinkList::iterator iter=symbolic_links.begin (), end=symbolic_links.end (); iter!=end; ++iter)
+  for (SymbolicLinkList::iterator iter=symbolic_links.begin (), end=symbolic_links.end (); iter!=end;)
     if (!xstrncmp (file_name.c_str (), iter->prefix.c_str (), iter->prefix.size () - 1))    
     {
       if (file_name.size () > iter->prefix.size () && file_name [iter->prefix.size () - 1] == '/')
@@ -657,7 +657,8 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
       if (replacement_count < MAX_SYMBOLIC_LINKS_REPLACEMENT_COUNT)
         iter = symbolic_links.begin ();
     }    
-
+    else ++iter;
+  
     //пытаемс€ найти файл не использу€ путей поиска
 
   if (file_name [0] == '/')

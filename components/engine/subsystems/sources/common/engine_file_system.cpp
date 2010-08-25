@@ -49,13 +49,21 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
         
         //монтирование путей
         
-      for (Parser::NamesakeIterator iter=crypto_node.First ("Mount"); iter; ++iter)
-      {
-        const char* link_name       = get<const char*> (*iter, "Link");
-        const char* path            = get<const char*> (*iter, "Path");
-        const char* force_extension = get<const char*> (*iter, "ForceExtension", (const char*)0);
+      ParseNode mount_node = node.First ("Mount");
+      
+      if (mount_node)
+      {        
+        for (Parser::NamesakeIterator iter=mount_node.First ("File"); iter; ++iter)
+        {
+          const char* link_name       = get<const char*> (*iter, "Name");
+          const char* path            = get<const char*> (*iter, "Path");
+          const char* force_extension = get<const char*> (*iter, "ForceExtension", (const char*)0);
+          
+          if (!common::FileSystem::IsDir (path) && !common::FileSystem::IsFileExist (path))
+            common::FileSystem::Mkdir (path);
 
-        common::FileSystem::Mount (link_name, path, force_extension);
+          common::FileSystem::Mount (link_name, path, force_extension);
+        }
       }
 
         //добавление путей поиска

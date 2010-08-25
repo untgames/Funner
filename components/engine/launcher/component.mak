@@ -27,6 +27,7 @@ ENGINE.FUNNER_LIBRARY.NAME                := funner
 #ENGINE.FUNNER_LIBRARY.win32.LINK_FLAGS    := -noentry
 ENGINE.FUNNER_LIBRARY.IMPORTS             := compile.engine.core compile.common compile.system link.engine.launcher
 ENGINE.FUNNER_LIBRARY.EXCLUDE_IMPORTS     := link.common.auto_license_generator
+ENGINE.FUNNER_LIBRARY.LINK_INCLUDES       :=
 
 #Цель - объединение библиотек для iPhone
 ENGINE.FUNNER_LIBRARY_LIPO.NAME     := funner
