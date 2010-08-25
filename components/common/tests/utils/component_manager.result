@@ -3,6 +3,7 @@ Before load
 Components:
   component 'common.console.DefaultConsoleHandler' not loaded
   component 'common.crypto.aes' not loaded
+  component 'common.file_systems.StandardFilePathsMount' not loaded
   component 'common.file_systems.ZipFileSystem' not loaded
   component 'common.licensing.loaders.AutoLicenseGenerator' not loaded
   component 'common.parsers.wxf' not loaded
@@ -13,6 +14,7 @@ After load
 Components:
   component 'common.console.DefaultConsoleHandler' loaded
   component 'common.crypto.aes' loaded
+  component 'common.file_systems.StandardFilePathsMount' loaded
   component 'common.file_systems.ZipFileSystem' loaded
   component 'common.licensing.loaders.AutoLicenseGenerator' loaded
   component 'common.parsers.wxf' loaded
@@ -22,6 +24,7 @@ Unload MyComponent
 Components:
   component 'common.console.DefaultConsoleHandler' not loaded
   component 'common.crypto.aes' not loaded
+  component 'common.file_systems.StandardFilePathsMount' not loaded
   component 'common.file_systems.ZipFileSystem' not loaded
   component 'common.licensing.loaders.AutoLicenseGenerator' not loaded
   component 'common.parsers.wxf' not loaded
@@ -31,6 +34,7 @@ After unregister
 Components:
   component 'common.console.DefaultConsoleHandler' not loaded
   component 'common.crypto.aes' not loaded
+  component 'common.file_systems.StandardFilePathsMount' not loaded
   component 'common.file_systems.ZipFileSystem' not loaded
   component 'common.licensing.loaders.AutoLicenseGenerator' not loaded
   component 'common.parsers.wxf' not loaded
