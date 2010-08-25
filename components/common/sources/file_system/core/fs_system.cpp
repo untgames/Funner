@@ -642,9 +642,9 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
   for (SymbolicLinkList::iterator iter=symbolic_links.begin (), end=symbolic_links.end (); iter!=end; ++iter)
     if (!xstrncmp (file_name.c_str (), iter->prefix.c_str (), iter->prefix.size () - 1))    
     {
-      if (file_name [file_name.size () - 1] == '/')
+      if (file_name.size () > iter->prefix.size () && file_name [iter->prefix.size () - 1] == '/')
       {
-        file_name.replace (0, iter->prefix.size (), iter->link);
+        file_name.replace (0, iter->prefix.size () - 1, iter->link);
       }
       else if (file_name.size () == iter->prefix.size () - 1)
       {
