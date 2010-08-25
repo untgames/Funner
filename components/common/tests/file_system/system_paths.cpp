@@ -5,7 +5,7 @@ int main ()
   printf ("Results of system_paths_test:\n");
 
   static const char* DIRS [] = {"/system/personal", "/system/cookies", "/system/profile", "/system/appdata", "/system/inetcache",
-    "/system/baddir", "/my/link"};
+    "/system/baddir", "/my/link", "/system/temp"};
 
   FileSystem::Mount ("/my/link", "/system/personal");
 

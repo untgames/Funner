@@ -1312,7 +1312,8 @@ void FileSystem::CopyFile (const char* source_file_name, const char* destination
     InputFile input_file (source_file_name);
     OutputFile output_file (destination_file_name);
 
-    output_file.Resize (0);
+    if (output_file.Size ())
+      output_file.Resize (0);
 
     xtl::uninitialized_storage<char> buffer (buffer_size);
 
@@ -1326,7 +1327,7 @@ void FileSystem::CopyFile (const char* source_file_name, const char* destination
       output_file.Write (buffer.data (), read_size);
     }
 
-    if (input_file.Eof ())
+    if (!input_file.Eof ())
       throw xtl::format_operation_exception ("", "Internal error: can't read input file");
   }
   catch (xtl::exception& e)
