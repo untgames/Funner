@@ -84,6 +84,13 @@ FileSystemImpl::~FileSystemImpl ()
 
 void FileSystemImpl::LoadFileSystems ()
 {
+  static bool initialized = false;
+  
+  if (initialized)
+    return;
+    
+  initialized = true;
+
   static ComponentLoader custom_file_systems_loader (FILE_SYSTEM_ADDONS_MASK);
 }
 
