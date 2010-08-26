@@ -19,26 +19,21 @@
 
 #include "FunnerEngine.h"
 
+#include <engine/engine.h>
+
 namespace
 {
 
-void log (const char* msg, ...)
-{
-  va_list list;
-  
-  va_start (list, msg);    
-  
-  FILE* f = fopen ("D:/work/unt/funner/components/engine/wrappers/web/gen/log.txt", "a");
-  
-  if (f)
-  {  
-    vfprintf (f, msg, list);  
-    fclose (f);
-  }  
-}
+/*
+    Константы
+*/
 
 const char*    WINDOW_NAME          = "FunnerWebWindow";
 const wchar_t* ENGINE_LIBRARY_NAME  = L"funner.dll";
+
+/*
+    Синглтон для хранения объекта движка
+*/
 
 class EngineHolder
 {
@@ -67,7 +62,7 @@ class EngineHolder
       
       if (!::GetModuleFileNameW (gInstance, module_path, sizeof (module_path)))
       {
-        log ("Can't get module path");
+//        log ("Can't get module path");
         abort ();
       }
       
@@ -79,7 +74,7 @@ class EngineHolder
       
       if (!SetDllDirectory (module_path))
       {
-        log ("Can't set DLL search directory\n");
+//        log ("Can't set DLL search directory\n");
         abort ();
       }
 
@@ -91,7 +86,7 @@ class EngineHolder
       
       if (!library)
       {
-        log ("Can't load engine library '%S'\n", module_path);
+//        log ("Can't load engine library '%S'\n", module_path);
         abort ();
       }
       
@@ -99,7 +94,7 @@ class EngineHolder
       
       if (!FunnerInit)
       {
-        log ("Bad library (entries not found)\n");
+//        log ("Bad library (entries not found)\n");
         abort ();
       }
 
@@ -107,7 +102,7 @@ class EngineHolder
 
       if (!&*instance)
       {
-        log ("Engine startup failed!");
+//        log ("Engine startup failed!");
         abort ();
       }
     }
@@ -120,7 +115,172 @@ class EngineHolder
     std::auto_ptr<engine::IEngine> instance;
 };
 
+/*
+    Нить
+*/
+
+class PlatformThread
+{
+  public:
+    PlatformThread ()
+    {
+#ifdef _WIN32
+      thread = 0;
+#endif      
+    }
+
+    ~PlatformThread ()
+    {
+      CloseThread ();
+    }    
+    
+    void Start ()
+    {
+      CreateThread ();
+    }    
+
+#ifdef _WIN32
+    void Terminate ()
+    {
+      TerminateThread (thread, 0);
+    }
+
+#endif
+
+  private:
+    virtual void Run () = 0;
+
+    PlatformThread (const PlatformThread&);
+    PlatformThread& operator = (const PlatformThread&);
+
+  private:
+#ifdef _WIN32
+    void CreateThread ()
+    {
+      thread = (HANDLE)_beginthread (&PlatformThread::ThreadRoutine, 0, this);
+    }
+
+    void CloseThread ()
+    {
+      CloseHandle (thread);
+    }
+
+    static void ThreadRoutine (void* this_thread)
+    {
+      if (!this_thread)
+        return;
+
+      reinterpret_cast<PlatformThread*> (this_thread)->Run ();
+    }
+
+    HANDLE thread;    
+#endif
+};
+
+template <class Fn> class ThreadTemplate: public PlatformThread
+{
+  public:
+    ThreadTemplate (Fn in_fn) : fn (in_fn) {}
+
+  private:
+    void Run ()
+    {
+      fn ();
+    }
+
+  private:
+    Fn fn;
+};
+
+template <class Fn>
+PlatformThread* make_thread (Fn fn)
+{
+  return new ThreadTemplate<Fn> (fn);
 }
+
+}
+
+/*
+    Описание реализации FunnerEngine
+*/
+
+struct FunnerEngine::Impl
+{
+  FB::PluginWindow*              plugin_window;
+  std::auto_ptr<engine::IWindow> engine_window;
+  std::auto_ptr<PlatformThread>  thread;
+  
+  Impl ()
+    : plugin_window (0)
+  {
+  }
+  
+  ~Impl ()
+  {
+    if (&*thread)
+      thread->Terminate ();
+  }
+  
+  void ThreadRoutine (void* wnd, size_t width, size_t height)
+  {
+    engine::IEngine& engine = EngineHolder::Instance ();
+    
+    engine.SetBaseDir ("/std/d:/---");
+
+    std::auto_ptr<engine::IWindow> window (engine.CreateWindow (WINDOW_NAME));
+
+    window->SetParentHandle (wnd);
+    window->SetSize         (width, height);
+    window->Show            (true);
+    
+    engine_window = window;
+
+    engine.Run ();
+  }
+
+  bool CreateWindow (FB::PluginWindow *new_window)
+  {
+    if (&*engine_window)
+      return false;
+    
+    if (!new_window)
+      return false;                
+
+#ifdef _WIN32
+    if (FB::PluginWindowWin* window_win = dynamic_cast<FB::PluginWindowWin*> (new_window))
+    {
+      RECT window_rect;    
+
+      if (!::GetClientRect (window_win->getHWND (), &window_rect))
+        return false;
+
+      thread = std::auto_ptr<PlatformThread> (make_thread (boost::bind (&Impl::ThreadRoutine, this, reinterpret_cast<void*> (window_win->getHWND ()),
+        window_rect.right - window_rect.left, window_rect.bottom - window_rect.top)));
+        
+      thread->Start ();
+    }
+
+#endif
+
+    plugin_window = new_window;
+    
+    return true;
+  }  
+  
+  void DestroyWindow (FB::PluginWindow *window)
+  {
+    if (window != plugin_window)
+      return;
+
+    plugin_window = 0;
+
+    engine_window.reset ();
+
+    thread->Terminate ();
+
+    thread.reset ();
+  }
+};
 
 void FunnerEngine::StaticInitialize()
 {
@@ -135,6 +295,7 @@ void FunnerEngine::StaticDeinitialize()
 }
 
 FunnerEngine::FunnerEngine()
+  : impl (new Impl)
 {
 }
 
@@ -150,73 +311,27 @@ FB::JSAPI* FunnerEngine::createJSAPI()
 
 bool FunnerEngine::onMouseDown(FB::MouseDownEvent *evt, FB::PluginWindow *)
 {
-  //printf("Mouse down at: %d, %d\n", evt->m_x, evt->m_y);
   return false;
 }
 
 bool FunnerEngine::onMouseUp(FB::MouseUpEvent *evt, FB::PluginWindow *)
 {
-  //printf("Mouse up at: %d, %d\n", evt->m_x, evt->m_y);
   return false;
 }
 
 bool FunnerEngine::onMouseMove(FB::MouseMoveEvent *evt, FB::PluginWindow *)
 {
-  //printf("Mouse move at: %d, %d\n", evt->m_x, evt->m_y);
   return false;
 }
 
-bool FunnerEngine::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *new_window)
+bool FunnerEngine::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *window)
 {
-  // The window is attached; act appropriately
-  
-  if (!new_window)
-    return false;
-
-  std::auto_ptr<engine::IWindow> engine_window (EngineHolder::Instance ().CreateWindow (WINDOW_NAME));
-
-#ifdef _WIN32
-  if (FB::PluginWindowWin* window_win = dynamic_cast<FB::PluginWindowWin*> (new_window))
-  {
-    RECT window_rect;    
-
-    if (!::GetClientRect (window_win->getHWND (), &window_rect))
-      return false;
-
-    engine_window->SetParentHandle (reinterpret_cast<void*> (window_win->getHWND ()));    
-    engine_window->SetSize         (window_rect.right - window_rect.left, window_rect.bottom - window_rect.top);        
-    
-    wchar_t path[512];
-
-    *path = 0;
-
-    ::GetCurrentDirectoryW (sizeof (path), path);
-
-    log ("path='%S'\n", path);
-
-    log ("width=%u height=%u\n", engine_window->GetWidth (), engine_window->GetHeight ());    
-
-    SetCurrentDirectoryW (L"d:/---");
-    
-    const char* args [] = {"npFunnerEngine.dll", "--no-main-loop"};
-    
-    EngineHolder::Instance ().ParseCommandLine (1, args);
-    
-    EngineHolder::Instance ().Run ();
-  }
-  
-#endif
-
-  window = engine_window;
-
-  return true;
+  return impl->CreateWindow (window);
 }
 
-bool FunnerEngine::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow*)
+bool FunnerEngine::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow* window)
 {
-  // The window is about to be detached; act appropriately
-  
-  window.reset ();
-  
+  impl->DestroyWindow (window);  
+
   return true;
 }

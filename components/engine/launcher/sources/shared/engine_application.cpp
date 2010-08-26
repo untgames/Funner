@@ -51,6 +51,34 @@ class Application: public IEngine
       need_print_version = false;
       need_print_help    = false;
     }
+    
+    ///”становка базовой директории
+    void SetBaseDir (const char* dir_name)
+    {
+      try
+      {
+        common::FileSystem::SetCurrentDir (dir_name);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::Application::SetBaseDir");
+        throw;
+      }      
+    }
+    
+    ///ѕолучение базовой директории
+    const char* GetBaseDir ()
+    {
+      try
+      {
+        return common::FileSystem::GetCurrentDir ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::Application::GetBaseDir");
+        throw;
+      }      
+    }
         
 ///–азбор параметров командой строки
     bool ParseCommandLine (unsigned int args_count, const char** args)
@@ -141,7 +169,7 @@ class Application: public IEngine
         
           //регистраци€ обработчика старта приложени€
 
-        syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this, p.Root ().First ("Configuration")));
+        syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this, p.Root ().First ("Configuration")));        
 
           //запуск основного цикла
   
@@ -190,9 +218,9 @@ class Application: public IEngine
               const char* path = search_paths [i];
 
               common::FileSystem::AddSearchPath (path, log_handler);
-            }
+            }            
 
-            manager.Start (config_node);
+            manager.Start (config_node);            
 
             for (size_t i=0, count=commands.Size (); i<count; i++)
             {

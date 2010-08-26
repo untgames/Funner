@@ -4,9 +4,9 @@
 
 
  /* File created by MIDL compiler version 7.00.0555 */
-/* at Thu Aug 26 00:24:26 2010
+/* at Thu Aug 26 12:40:42 2010
  */
-/* Compiler settings for gen/FireBreathWin.idl:
+/* Compiler settings for ../gen/FireBreathWin.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 7.00.0555 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 

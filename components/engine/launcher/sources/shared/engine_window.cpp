@@ -11,7 +11,7 @@ class Window: public IWindow, private xtl::trackable
   public:
 ///Конструктор
     Window (const char* name)
-      : system_window (syslib::WindowStyle_Overlapped)
+      : system_window (syslib::WindowStyle_PopUp)
     {
       try
       {
@@ -223,13 +223,9 @@ class Window: public IWindow, private xtl::trackable
       switch (event)
       {
         case syslib::WindowEvent_OnPaint:
-        printf ("ONPAINT!!!!!!!!!!!!!!!! my\n");
-        fflush (stdout);        
           Notify (&IWindowListener::OnPaint);
           break;
         case syslib::WindowEvent_OnSize:
-        printf ("ONSIZE!!!!!!!!!!!!!!!! my\n");
-        fflush (stdout);
           Notify (&IWindowListener::OnSize, system_window.ClientWidth (), system_window.ClientHeight ());
           break;
         case syslib::WindowEvent_OnMouseMove:

@@ -21,8 +21,6 @@
 
 #include <memory>
 
-#include <engine/engine.h>
-
 class FunnerEngine : public FB::PluginCore
 {
   public:
@@ -51,10 +49,11 @@ class FunnerEngine : public FB::PluginCore
     /** END EVENTDEF -- DON'T CHANGE THIS LINE **/
 
     static void StaticInitialize   ();
-    static void StaticDeinitialize ();  
-
+    static void StaticDeinitialize ();
+    
   private:
-    std::auto_ptr<engine::IWindow> window;
+    struct Impl;
+    std::auto_ptr<Impl> impl;
 };
 
 #endif

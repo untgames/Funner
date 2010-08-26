@@ -113,7 +113,7 @@ struct StartupManagerImpl::Impl
           //поиск обработчика запуска
 
         StartupHandlers::iterator startup_iter = startup_handlers.find (node_name);
-
+        
         if (startup_iter == startup_handlers.end ())
         {
           log.Printf ("Unknown configuration node '%s'", node_name);

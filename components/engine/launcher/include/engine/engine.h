@@ -105,6 +105,12 @@ class IEngine
   public:
     ///Деструктор
     virtual ~IEngine () {}
+    
+    ///Установка базовой директории
+    virtual void SetBaseDir (const char* dir_name) = 0;
+    
+    ///Получение базовой директории
+    virtual const char* GetBaseDir () = 0;
 
     ///Разбор командной строки и конфигурирование запуска движка
     virtual bool ParseCommandLine (unsigned int arguments_count, const char** arguments) = 0;
