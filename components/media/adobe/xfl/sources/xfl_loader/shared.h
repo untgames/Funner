@@ -1,6 +1,8 @@
 #ifndef MEDIALIB_ADOBE_XFL_LOADER_SHARED_HEADER
 #define MEDIALIB_ADOBE_XFL_LOADER_SHARED_HEADER
 
+#include <errno.h>
+
 #include <stl/string>
 
 #include <xtl/bind.h>

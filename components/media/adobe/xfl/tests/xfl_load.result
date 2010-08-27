@@ -5,7 +5,7 @@ Document '/mount/test.xfl'
   framerate:        24.000
   width:            1906
   height:           1080
-  background color: [ +0.000 +0.000 +0.000 ]
+  background color: [ +1.000 +0.059 +0.980 ]
   Collection 'resources' (22 items)
     Resource 'balls example 1.png'
       Path: '/mount/test.xfl/LIBRARY/balls example 1.png'
