@@ -1,0 +1,22 @@
+#ifndef NETWORK_PLATFORM_HEADER
+#define NETWORK_PLATFORM_HEADER
+
+namespace network
+{
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Менеджер работы с сокетами по умолчанию
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class DefaultSocketManager
+{
+  public:
+    struct socket_handle;
+    
+    typedef socket_handle* socket_t;
+    
+    
+};
+
+}
+
+#endif
