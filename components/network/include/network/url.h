@@ -14,7 +14,7 @@ class Url
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Url  (const char* spec);
-    Url  (const char* protocol, const char* host_name, int port, const char* file);
+    Url  (const char* protocol, const char* host_name, unsigned short port, const char* file);
     Url  (const char* protocol, const char* host_name, const char* file);
     Url  (const Url&);
     ~Url ();
@@ -24,20 +24,25 @@ class Url
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Параметры URL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* Authority () const;
-    const char* Host      () const;
-    int         Port      () const;
-    const char* File      () const;
-    const char* Query     () const;
+    const char*    Protocol () const;
+    const char*    Host     () const;
+    unsigned short Port     () const;
+    const char*    File     () const;
+    const char*    Query    () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление параметров запроса
+///Параметры запроса
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t      RequestPropertiesCount     () const;
     void        SetRequestProperty         (const char* key, const char* value);
     const char* GetRequestProperty         (const char* key) const;
+    const char* GetRequestProperty         (size_t index) const;
+    int         FindRequestProperty        (const char* key) const; //-1 if not found
+    bool        HasRequestProperty         (const char* key) const;
     void        RemoveRequestProperty      (const char* key);
+    void        RemoveRequestProperty      (size_t index);
     void        RemoveAllRequestProperties ();
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Приведение к строке
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +67,7 @@ class Url
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-void Swap (Url&, Url&);
+void swap (Url&, Url&);
 
 }
 

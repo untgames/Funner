@@ -8,5 +8,7 @@
 #include <common/strlib.h>
 
 #include <network/inet_address.h>
-#include <network/socket_address.h>
 #include <network/socket.h>
+#include <network/socket_address.h>
+#include <network/url.h>
+#include <network/url_connection.h>

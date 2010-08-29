@@ -114,6 +114,15 @@ void Socket::Connect (const SocketAddress& address, size_t timeout)
 }
 
 /*
+    Приём соединений
+*/
+
+Socket Socket::Accept ()
+{
+  throw xtl::make_not_implemented_exception ("network::Socket::Accept");
+}
+
+/*
     Флаги сокета
 */
 
