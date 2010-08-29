@@ -16,8 +16,8 @@ class SocketAddress
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     SocketAddress  ();
-    SocketAddress  (const InetAddress& inet_address, int port);
-    SocketAddress  (int port);
+    SocketAddress  (const network::InetAddress& inet_address, unsigned short port);
+    SocketAddress  (unsigned short port);
     SocketAddress  (const SocketAddress&);
     ~SocketAddress ();
 
@@ -26,10 +26,8 @@ class SocketAddress
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сетевой адрес / порт
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const network::InetAddress& InetAddress    () const;
-    int                         Port           () const;
-    void                        SetInetAddress (const InetAddress&);
-    void                        SetPort        (int port);
+    const network::InetAddress& InetAddress () const;
+    unsigned short              Port        () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сравнение двух адресов

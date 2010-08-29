@@ -17,11 +17,11 @@ class InetAddress
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     InetAddress  ();    
     InetAddress  (const char* host_name);
-    InetAddress  (size_t address_size, const size_t* address);
+    InetAddress  (size_t address_size, const unsigned char* address);
+    InetAddress  (const unsigned char (&address)[4]);
+    InetAddress  (const unsigned char (&address)[16]);
     InetAddress  (const InetAddress&);
     ~InetAddress ();
-
-    template <size_t N> InetAddress (size_t (&address)[N]);
 
     InetAddress& operator = (const InetAddress&);        
 
@@ -33,8 +33,7 @@ class InetAddress
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение частей адреса
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t  operator [] (size_t index) const;
-    size_t& operator [] (size_t index);
+    unsigned char operator [] (size_t index) const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Сравнение двух адресов
@@ -50,10 +49,7 @@ class InetAddress
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Стандартные адреса
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static InetAddress Any       ();
-    static InetAddress Broadcast ();
-    static InetAddress Loopback  ();
-    static InetAddress None      ();
+    static InetAddress Loopback ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Свойства адреса

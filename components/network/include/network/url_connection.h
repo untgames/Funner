@@ -1,6 +1,8 @@
 #ifndef NETWORK_URL_CONNECTION_HEADER
 #define NETWORK_URL_CONNECTION_HEADER
 
+#include <xtl/functional_fwd>
+
 #include <network/url.h>
 
 namespace network
