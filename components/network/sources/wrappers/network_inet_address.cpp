@@ -54,7 +54,25 @@ InetAddress::InetAddress ()
 
 InetAddress::InetAddress (const char* host_name)
 {
-  throw xtl::make_not_implemented_exception ("network::InetAddress::InetAddress(const char*)");
+  try
+  {
+    if (!host_name)
+      throw xtl::make_null_argument_exception ("", "host_name");
+
+    size_t        address_size = 0;
+    unsigned char address [16];
+
+    memset (address, 0, sizeof (address));
+
+    Platform::GetAddressByHostName (host_name, address_size, address);
+
+    impl = new Impl (address_size, address);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("network::InetAddress::InetAddress(const char*)");
+    throw;
+  }
 }
 
 InetAddress::InetAddress (size_t address_size, const unsigned char* address)
@@ -213,13 +231,14 @@ const char* InetAddress::ToString () const
 namespace
 {
 
-unsigned char localhost_address [4] = {127, 0, 0, 1};
+unsigned char ipv4_localhost_address [4]  = {127, 0, 0, 1};
+unsigned char ipv6_localhost_address [16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
 
 struct InetAddressesHolder
 {
   InetAddress loopback;
   
-  InetAddressesHolder () : loopback (localhost_address) {}
+  InetAddressesHolder () : loopback (ipv4_localhost_address) {}
 };
 
 }
@@ -240,7 +259,21 @@ bool InetAddress::IsAny () const
 
 bool InetAddress::IsLoopback () const
 {
-  throw xtl::make_not_implemented_exception ("network::InetAddress::IsLoopback");
+  unsigned char* localhost_address;
+
+  switch (impl->address_size)
+  {
+    case 4:
+      localhost_address = ipv4_localhost_address;
+      break;
+    case 16:
+      localhost_address = ipv6_localhost_address;
+      break;
+    default:
+      throw xtl::format_operation_exception ("network::InetAddress::IsLoopback", "Loopback address not defined for address size %u", Size ());
+  }
+
+  return memcmp (localhost_address, impl->address, impl->address_size * sizeof (unsigned char)) == 0;
 }
 
 bool InetAddress::IsBroadcast () const

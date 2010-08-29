@@ -1,3 +1,6 @@
+#ifndef NETWORK_WRAPPERS_SHARED_HEADER
+#define NETWORK_WRAPPERS_SHARED_HEADER
+
 #include <stl/auto_ptr.h>
 #include <stl/string>
 
@@ -12,3 +15,7 @@
 #include <network/socket_address.h>
 #include <network/url.h>
 #include <network/url_connection.h>
+
+#include <platform/platform.h>
+
+#endif
