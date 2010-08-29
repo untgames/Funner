@@ -18,7 +18,7 @@ class UrlConnection
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     UrlConnection  ();
-    UrlConnection  (const network::Url&);
+    UrlConnection  (const network::Url& url, const char* params = "");
     UrlConnection  (const UrlConnection&);
     ~UrlConnection ();
     
@@ -45,8 +45,8 @@ class UrlConnection
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение / запись данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Receive (void* buffer, size_t size, size_t timeout_in_milliseconds = 0);
-    size_t Send    (const void* buffer, size_t size, size_t timeout_in_milliseconds = 0);
+    size_t Receive (void* buffer, size_t size);
+    size_t Send    (const void* buffer, size_t size);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Размеры окна приёма / передачи
@@ -78,41 +78,49 @@ class IUrlStream
   public:
     virtual ~IUrlStream () {}
     
-    virtual size_t      ContentLength   () = 0;
-    virtual const char* ContentEncoding () = 0;
-    virtual const char* ContentType     () = 0;
-};
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Параметры потока
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual size_t      GetContentLength   () = 0;
+    virtual const char* GetContentEncoding () = 0;
+    virtual const char* GetContentType     () = 0;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Передача данных
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual size_t SendData (const void* buffer, size_t size) = 0;
+    
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработчик обратной связи потока URL соединения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class IUrlStreamCallback
-{
-  public:
+  class IListener
+  {
+    public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка получения данных
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void   WriteReceivedData (const void* buffer, size_t size) = 0;
-    virtual size_t ReadSendData      (void* buffer, size_t size) = 0;
+      virtual void WriteReceivedData (const void* buffer, size_t size) = 0;
+      virtual void FinishReceiveData () = 0;
 
-  protected:
-    virtual ~IUrlStreamCallback () {}
+    protected:
+      virtual ~IListener () {}
+  };
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Менеджер URL запросов
+///Менеджер URL потоков
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class UrlQueryManager
+class UrlStreamManager
 {
   public:
-    typedef xtl::function<IUrlStream* (const char* url, IUrlStreamCallback& stream)> ConnectionHandler;
+    typedef xtl::function<IUrlStream* (const char* url, const char* params, IUrlStream::IListener& stream)> StreamCreator;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация обработчиков URL запросов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterQueryHandler       (const char* url_regexp, const ConnectionHandler& handler);
-    static void UnregisterQueryHandler     (const char* url_regexp);
-    static void UnregisterAllQueryHandlers ();
+    static void RegisterStreamCreator       (const char* url_regexp, const StreamCreator& creator);
+    static void UnregisterStreamCreator     (const char* url_regexp);
+    static void UnregisterAllStreamCreators ();
 };
 
 }

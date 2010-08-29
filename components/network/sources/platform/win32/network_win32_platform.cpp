@@ -1,8 +1,4 @@
-#include <Winsock2.h>
-
-#include <xtl/common_exceptions.h>
-
-#include <platform/platform.h>
+#include "shared.h"
 
 using namespace network;
 
@@ -69,7 +65,7 @@ class WinSockInitializer
     {
       WSADATA wsa_data;
 
-      int result = WSAStartup (MAKEWORD(2, 2), &wsa-data);
+      int result = WSAStartup (MAKEWORD(2, 2), &wsa_data);
 
       if (result)
         raise_error ("::WSAStartup", result);
@@ -77,19 +73,7 @@ class WinSockInitializer
 
     ~WinSockInitializer ()
     {
-      try
-      {
-        if (WSACleanup ())
-          check_errors ("::WSACleanup", WSAGetLastError ());
-      }
-      catch (xtl::exception& e)
-      {
-        printf ("Can't close Winsock library, exception '%s'\n", e.what ());
-      }
-      catch (...)
-      {
-        printf ("Can't close Winsock library, unknown exception\n");
-      }
+      WSACleanup ();
     }
 };
 
@@ -113,7 +97,7 @@ void Win32Platform::GetAddressByHostName (const char* host_name, size_t& address
     hostent *entry = gethostbyname (host_name);
 
     if (!entry)
-      check_errors ("::gethostbyname", WSAGetLastError ());
+      check_errors ("::gethostbyname");
 
     if ((size_t)entry->h_length > sizeof (address))
       throw xtl::format_operation_exception ("", "Host name '%s' resolved, but host address is too long.", host_name);
