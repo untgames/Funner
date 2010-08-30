@@ -65,6 +65,7 @@ class Platform
     struct tls_handle;
     struct mutex_handle;
     struct semaphore_handle;
+    struct condition_handle;
 
     typedef window_handle*    window_t;
     typedef cursor_handle*    cursor_t;
@@ -72,6 +73,7 @@ class Platform
     typedef tls_handle*       tls_t;
     typedef mutex_handle*     mutex_t;
     typedef semaphore_handle* semaphore_t;
+    typedef condition_handle* condition_t;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание/закрытие/уничтожение окна
@@ -193,11 +195,6 @@ class Platform
     static size_t GetCurrentThreadId ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение имени текущей нити
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//    static const char* GetCurrentThreadName () = 0;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с локальными данными нити
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static tls_t CreateTls  (IThreadCleanupCallback* cleanup);
@@ -224,6 +221,15 @@ class Platform
     static void        WaitSemaphore     (semaphore_t, size_t wait_in_milliseconds);
     static bool        TryWaitSemaphore  (semaphore_t);
     static void        PostSemaphore     (semaphore_t);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с условиями
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static condition_t CreateCondition    ();
+    static void        DestroyCondition   (condition_t);
+    static void        WaitCondition      (condition_t, mutex_t);
+    static void        WaitCondition      (condition_t, mutex_t, size_t wait_in_milliseconds);
+    static void        NotifyCondition    (condition_t, bool broadcast);
 };
 
 }

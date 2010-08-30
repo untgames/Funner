@@ -2,11 +2,6 @@
 
 using namespace syslib;
 
-struct Platform::mutex_handle
-{
-  pthread_mutex_t mutex;
-};
-
 //создание исключающего семафора
 Platform::mutex_t Platform::CreateMutex ()
 {

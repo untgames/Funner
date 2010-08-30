@@ -22,6 +22,7 @@
 #include <common/utf_converter.h>
 
 #include <syslib/application.h>
+#include <syslib/condition.h>
 #include <syslib/dll.h>
 #include <syslib/keydefs.h>
 #include <syslib/mutex.h>
