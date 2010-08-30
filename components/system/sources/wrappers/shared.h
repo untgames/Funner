@@ -29,6 +29,7 @@
 #include <syslib/semaphore.h>
 #include <syslib/timer.h>
 #include <syslib/thread.h>
+#include <syslib/tls.h>
 #include <syslib/window.h>
 
 #include <platform/platform.h>
