@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2009, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2010, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,11 +20,9 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: connect.h,v 1.27 2009-05-07 20:00:44 bagder Exp $
  ***************************************************************************/
 
-int Curl_nonblock(curl_socket_t sockfd,    /* operate on this */
-                  int nonblock   /* TRUE or FALSE */);
+#include "nonblock.h" /* for curlx_nonblock(), formerly Curl_nonblock() */
 
 CURLcode Curl_is_connected(struct connectdata *conn,
                            int sockindex,
@@ -69,5 +67,7 @@ void Curl_sndbufset(curl_socket_t sockfd);
 #else
 #define Curl_sndbufset(y)
 #endif
+
+void Curl_updateconninfo(struct connectdata *conn, curl_socket_t sockfd);
 
 #endif

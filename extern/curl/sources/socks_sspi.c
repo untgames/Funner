@@ -18,7 +18,6 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: socks_sspi.c,v 1.7 2009-04-21 10:26:59 yangtse Exp $
  ***************************************************************************/
 
 
@@ -42,6 +41,7 @@
 #define _MPRINTF_REPLACE /* use the internal *printf() functions */
 #include <curl/mprintf.h>
 
+#include "curl_memory.h"
 /* The last #include file should be: */
 #include "memdebug.h"
 

@@ -18,7 +18,6 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: http_negotiate.c,v 1.35 2009-04-21 11:46:17 yangtse Exp $
  ***************************************************************************/
 #include "setup.h"
 
@@ -306,9 +305,15 @@ CURLcode Curl_output_negotiate(struct connectdata *conn, bool proxy)
       infof(conn->data, "Make SPNEGO Initial Token failed\n");
     }
     else {
-      free(neg_ctx->output_token.value);
+      free(responseToken);
       responseToken = NULL;
+      free(neg_ctx->output_token.value);
       neg_ctx->output_token.value = malloc(spnegoTokenLength);
+      if(neg_ctx->output_token.value == NULL) {
+        free(spnegoToken);
+        spnegoToken = NULL;
+        return CURLE_OUT_OF_MEMORY;
+      }
       memcpy(neg_ctx->output_token.value, spnegoToken,spnegoTokenLength);
       neg_ctx->output_token.length = spnegoTokenLength;
       free(spnegoToken);
