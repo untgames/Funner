@@ -60,7 +60,7 @@ void Platform::WaitCondition (condition_t handle, mutex_t mutex_handle)
     if (!mutex_handle)
       throw xtl::make_null_argument_exception ("", "mutex");
       
-    int status = pthread_cond_wait (&handle->condition, &handle->mutex);
+    int status = pthread_cond_wait (&handle->condition, &mutex_handle->mutex);
 
     if (status)
       pthread_raise_error ("::pthread_cond_wait", status);
