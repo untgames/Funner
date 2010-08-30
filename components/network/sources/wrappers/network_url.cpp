@@ -8,15 +8,33 @@ using namespace network;
 
 struct Url::Impl: public xtl::reference_counter
 {
+  stl::string address;
+  
+///Конструктор
+  Impl (const char* in_address)
+    : address (in_address)
+  {
+  }
 };
 
 /*
     Конструкторы / деструктор / присваивание
 */
 
-Url::Url (const char* spec)
+Url::Url (const char* address)
 {
-  throw xtl::make_not_implemented_exception ("network::Url::Url(const char*)");
+  try
+  {
+    if (!address)
+      throw xtl::make_null_argument_exception ("", "address");
+    
+    impl = new Impl (address);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("network::Url::Url(const char*)");
+    throw;
+  }
 }
 
 Url::Url (const char* protocol, const char* host_name, unsigned short port, const char* file)
@@ -131,7 +149,7 @@ void Url::RemoveAllRequestProperties ()
 
 const char* Url::ToString () const
 {
-  throw xtl::make_not_implemented_exception ("network::Url::ToString");
+  return impl->address.c_str ();
 }
 
 /*

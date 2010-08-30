@@ -118,8 +118,8 @@ class UrlStreamManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация обработчиков URL запросов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void RegisterStreamCreator       (const char* url_regexp, const StreamCreator& creator);
-    static void UnregisterStreamCreator     (const char* url_regexp);
+    static void RegisterStreamCreator       (const char* url_wcmask, const StreamCreator& creator);
+    static void UnregisterStreamCreator     (const char* url_wcmask);
     static void UnregisterAllStreamCreators ();
 };
 

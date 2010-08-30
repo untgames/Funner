@@ -31,9 +31,10 @@ struct Guard
 {
   syslib::Mutex& mutex;
   
-  Guard (syslib::Mutex& in_mutex) : mutex (in_mutex) { mutex.Lock (); }
+//  Guard (syslib::Mutex& in_mutex) : mutex (in_mutex) { mutex.Lock (); }
+  Guard (syslib::Mutex& in_mutex) : mutex (in_mutex) {  }
   
-  ~Guard () { mutex.Unlock (); }
+//  ~Guard () { mutex.Unlock (); }
 };
 
 }
@@ -45,7 +46,7 @@ struct Guard
 struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IListener
 {
   syslib::Mutex             mutex;            //блокировка соединени€
-  syslib::ThreadCondition   recv_condition;   //событи€ приЄма данных
+//  syslib::ThreadCondition   recv_condition;   //событи€ приЄма данных //???????????????
   network::Url              url;              //URL ресурса
   stl::auto_ptr<IUrlStream> stream;           //поток URL данных
   stl::string               content_type;     //тип контента
@@ -117,7 +118,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
       total_recv_size += write_size;
     }
     
-    recv_condition.NotifyAll ();
+//    recv_condition.NotifyAll (); //?????????????
   }
   
 /// онец приЄма данных
@@ -149,17 +150,19 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
     while (size)
     {
         //ожидание данных
+        
+      size_t available;
       
-      for (size_t available; (available = total_recv_size - recv_offset) == 0;)
+      while ((available = total_recv_size - recv_offset) == 0)
       {
         if (recv_finish)
           return result;
           
-        recv_condition.Wait (mutex);
+//        recv_condition.Wait (mutex); //?????????????
       }
       
         //получение блока
-      
+        
       if (recv_list.empty ())
         throw xtl::format_operation_exception ("", "Internal error: empty receive list");
       
@@ -170,6 +173,9 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
       size_t block_offset         = recv_offset % RECEIVE_BLOCK_SIZE,
              block_available_size = RECEIVE_BLOCK_SIZE - recv_offset,
              read_size            = size < block_available_size ? size : block_available_size;
+             
+      if (read_size > available)
+        read_size = available;
       
         //чтение данных
         

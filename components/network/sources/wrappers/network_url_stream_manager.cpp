@@ -6,16 +6,22 @@ namespace
 {
 
 /*
+     онстанты
+*/
+
+const char* COMPONENT_MASK = "network.url_stream.*"; //маска имени компонентов URL потоков
+
+/*
     ќбработчик URL запроса
 */
 
 struct UrlQueryHandler: public xtl::reference_counter
 {
-  stl::string                         query_regexp;   //регул€рное выражение, соответствующее запросу
+  stl::string                         query_wcmask;   //регул€рное выражение, соответствующее запросу
   UrlStreamManagerImpl::StreamCreator stream_creator; //создатель потока
   
-  UrlQueryHandler (const char* regexp, const UrlStreamManager::StreamCreator& creator)
-    : query_regexp (regexp)
+  UrlQueryHandler (const char* wcmask, const UrlStreamManager::StreamCreator& creator)
+    : query_wcmask (wcmask)
     , stream_creator (creator)
   {
   }
@@ -52,27 +58,27 @@ UrlStreamManagerImpl::~UrlStreamManagerImpl ()
     –егистраци€ обработчиков URL запросов
 */
 
-void UrlStreamManagerImpl::RegisterStreamCreator (const char* url_regexp, const StreamCreator& creator)
+void UrlStreamManagerImpl::RegisterStreamCreator (const char* url_wcmask, const StreamCreator& creator)
 {
   static const char* METHOD_NAME = "network::UrlStreamManagerImpl::RegisterStreamCreator";
   
-  if (!url_regexp)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "url_regexp");
+  if (!url_wcmask)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "url_wcmask");
     
   for (UrlQueryHandlerList::iterator iter=impl->query_handlers.begin (), end=impl->query_handlers.end (); iter!=end; ++iter)
-    if ((*iter)->query_regexp == url_regexp)
-      throw xtl::make_argument_exception (METHOD_NAME, "url_regexp", url_regexp, "Stream creator has already registered");
+    if ((*iter)->query_wcmask == url_wcmask)
+      throw xtl::make_argument_exception (METHOD_NAME, "url_wcmask", url_wcmask, "Stream creator has already registered");
       
-  impl->query_handlers.push_front (UrlQueryHandlerPtr (new UrlQueryHandler (url_regexp, creator), false));
+  impl->query_handlers.push_front (UrlQueryHandlerPtr (new UrlQueryHandler (url_wcmask, creator), false));
 }
 
-void UrlStreamManagerImpl::UnregisterStreamCreator (const char* url_regexp)
+void UrlStreamManagerImpl::UnregisterStreamCreator (const char* url_wcmask)
 {
-  if (!url_regexp)
+  if (!url_wcmask)
     return;
     
   for (UrlQueryHandlerList::iterator iter=impl->query_handlers.begin (), end=impl->query_handlers.end (); iter!=end; ++iter)
-    if ((*iter)->query_regexp == url_regexp)
+    if ((*iter)->query_wcmask == url_wcmask)
     {
       impl->query_handlers.erase (iter);
       return;
@@ -98,9 +104,13 @@ IUrlStream* UrlStreamManagerImpl::CreateStream (const char* url, const char* par
     if (!params)
       params = "";
       
+    static common::ComponentLoader loader (COMPONENT_MASK);
+      
     for (UrlQueryHandlerList::iterator iter=impl->query_handlers.begin (), end=impl->query_handlers.end (); iter!=end; ++iter)
-      if (common::rematch (url, (*iter)->query_regexp.c_str ()))
+    {
+      if (common::wcmatch (url, (*iter)->query_wcmask.c_str ()))
         return (*iter)->stream_creator (url, params, stream);
+    }
     
     throw xtl::format_operation_exception ("", "Stream creator for URL '%s' not found", url);
   }
@@ -109,4 +119,23 @@ IUrlStream* UrlStreamManagerImpl::CreateStream (const char* url, const char* par
     e.touch ("network::UrlStreamManagerImpl::CreateStream");
     throw;
   }
+}
+
+/*
+    ќбЄртки
+*/
+
+void UrlStreamManager::RegisterStreamCreator (const char* url_wcmask, const StreamCreator& creator)
+{
+  UrlStreamManagerSingleton::Instance ()->RegisterStreamCreator (url_wcmask, creator);
+}
+
+void UrlStreamManager::UnregisterStreamCreator (const char* url_wcmask)
+{
+  UrlStreamManagerSingleton::Instance ()->UnregisterStreamCreator (url_wcmask);
+}
+
+void UrlStreamManager::UnregisterAllStreamCreators ()
+{
+  UrlStreamManagerSingleton::Instance ()->UnregisterAllStreamCreators ();
 }

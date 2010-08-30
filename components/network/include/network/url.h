@@ -13,7 +13,7 @@ class Url
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /// онструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Url  (const char* spec);
+    Url  (const char* address);
     Url  (const char* protocol, const char* host_name, unsigned short port, const char* file);
     Url  (const char* protocol, const char* host_name, const char* file);
     Url  (const Url&);
