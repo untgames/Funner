@@ -89,7 +89,7 @@ void Condition::Wait (Mutex& lock)
 {
   try
   {
-    Platform::WaitCondition (impl->condition);
+    Platform::WaitCondition (impl->condition, reinterpret_cast<Platform::mutex_t> (lock.Handle ()));
   }
   catch (xtl::exception& exception)
   {
@@ -102,7 +102,7 @@ void Condition::Wait (Mutex& lock, size_t wait_in_milliseconds)
 {
   try
   {
-    Platform::WaitCondition (impl->condition, wait_in_milliseconds);
+    Platform::WaitCondition (impl->condition, reinterpret_cast<Platform::mutex_t> (lock.Handle ()), wait_in_milliseconds);
   }
   catch (xtl::exception& exception)
   {

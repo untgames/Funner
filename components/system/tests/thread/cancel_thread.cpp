@@ -8,6 +8,7 @@ int thread2_run ()
   while (!cancel_flag);
 
   printf ("thread2 started\n");
+  fflush (stdout);
 
   thread [0]->Cancel ();
 
@@ -17,6 +18,7 @@ int thread2_run ()
 int thread1_run ()
 {
   printf ("thread1 started\n");
+  fflush (stdout);  
 
   cancel_flag = true;
 
@@ -24,6 +26,7 @@ int thread1_run ()
     Thread::TestCancel();
 
   printf ("thread1 finished\n");
+  fflush (stdout);  
 
   return 12;
 }
@@ -42,7 +45,9 @@ int main ()
     thread [1] = &thread2;
 
     printf ("join thread2: %d\n", thread [1]->Join ());
+    fflush (stdout);    
     printf ("join thread1: %d\n", thread [0]->Join ());
+    fflush (stdout);    
   }
   catch (std::exception& exception)
   {

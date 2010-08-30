@@ -72,7 +72,7 @@ void Platform::WaitCondition (condition_t handle, mutex_t mutex_handle)
   }
 }
 
-void Platform::WaitCondition (condition_t, size_t wait_in_milliseconds)
+void Platform::WaitCondition (condition_t, mutex_t, size_t wait_in_milliseconds)
 {
   throw xtl::make_not_implemented_exception ("syslib::PThreadsPlatform::WaitCondition(condition_t,size_t)");
 }

@@ -1,7 +1,7 @@
 Results of cancel_thread_test:
 thread1 started
 thread2 started
-join thread2: 0
 system.threads.Thread1: Thread cancelled
     at syslib::Thread::TestCancel
+join thread2: 0
 join thread1: -1
