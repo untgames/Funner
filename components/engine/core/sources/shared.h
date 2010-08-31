@@ -18,6 +18,7 @@
 #include <xtl/signal.h>
 
 #include <common/component.h>
+#include <common/file.h>
 #include <common/log.h>
 #include <common/parser.h>
 #include <common/property_map.h>

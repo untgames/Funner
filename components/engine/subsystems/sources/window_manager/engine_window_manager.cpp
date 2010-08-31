@@ -82,9 +82,14 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
     }
     
 ///Поиск курсора
-    syslib::WindowCursor GetCursor (const char* image_name)
+    syslib::WindowCursor GetCursor (const char* image_name)    
     {
-      return LoadCursor (image_name);
+      CursorMap::iterator cursor_iter = cursors.find (image_name);
+
+      if (cursor_iter != cursors.end ())
+        return cursor_iter->second;
+        
+      throw xtl::make_argument_exception ("engine::WindowManagerSubsystem::GetCursor", "image_name", image_name, "Cursor not found");
     }
 
 ///Подсчёт ссылок
@@ -106,15 +111,24 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
 
       try
       {
-        stl::string suffix = common::suffix (resource_name);
-        
+        stl::string suffix = common::suffix (resource_name);        
+
         if (!xtl::xstricmp (suffix.c_str (), ".xhotspot"))
         {
           LoadHotspots (resource_name);          
+          
+          log.Printf ("Cursors hotspots '%s' loaded", resource_name);          
         }
-        else if (!xtl::xstricmp (suffix.c_str (), ".cur") || !xtl::xstricmp (suffix.c_str (), ".ani")) //добавить в Window проверку является ли файл курсором
+        else if (wcmatch (resource_name, "cursor(*)"))
         {
-          LoadCursor (resource_name);
+          common::StringArray tokens = common::parse (resource_name, "cursor\\( *'(.*)' *, *'(.*)' *\\).*");          
+
+          if (tokens.Size () != 3)
+            throw xtl::make_argument_exception ("engine::WindowManagerSubsystem::LoadResource", "resource_name", resource_name, "Bad cursor name");
+
+          LoadCursor (tokens [1], tokens [2]);
+          
+          log.Printf ("Cursor '%s' loaded (path='%s')", tokens [1], tokens [2]);
         }
       }
       catch (xtl::exception& exception)
@@ -137,10 +151,19 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
       if (!xtl::xstricmp (common::suffix (resource_name).c_str (), "xhotspot"))
       {
         hotspots.clear ();
+        
+        log.Printf ("Cursor hotspots '%s' unloaded", resource_name);
       }
-      else
+      else if (wcmatch (resource_name, "cursor(*)"))
       {
-        cursors.erase (resource_name);
+        common::StringArray tokens = common::parse (resource_name, "cursor\\( *'(.*)' *, *'(.*)' *\\).*");
+
+        if (tokens.Size () != 3)
+          return;
+
+        cursors.erase (tokens [1]);
+        
+        log.Printf ("Cursor '%s' unloaded (path='%s')", tokens [1], tokens [2]);
       }
     }  
   
@@ -178,11 +201,11 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
     }
     
 ///Загрузка курсора
-    syslib::WindowCursor LoadCursor (const char* file_name)
+    syslib::WindowCursor LoadCursor (const char* name, const char* file_name)
     {
       try
       {
-        CursorMap::iterator cursor_iter = cursors.find (file_name);
+        CursorMap::iterator cursor_iter = cursors.find (name);
         
         if (cursor_iter != cursors.end ())
           return cursor_iter->second;        
@@ -196,7 +219,7 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
         
         syslib::WindowCursor cursor (file_name, hotspot.x, hotspot.y);
         
-        cursors [file_name] = cursor;
+        cursors [name] = cursor;
         
         return cursor;
       }

@@ -146,8 +146,12 @@ struct StartupManagerImpl::Impl
     {
       try
       {
-        const char* file_name = common::get<const char*> (node, "Source");
+        const char* file_name             = common::get<const char*> (node, "Source");        
+        bool        ignore_unavailability = common::get<int> (node, "IgnoreUnavailability", 0) == 1;
         
+        if (!common::FileSystem::IsFileExist (file_name) && ignore_unavailability)
+          return;
+
         common::Parser parser (file_name);
         common::Log log (LOG_PREFIX);
 
