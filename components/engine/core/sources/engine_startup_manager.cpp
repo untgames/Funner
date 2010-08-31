@@ -82,7 +82,7 @@ struct StartupManagerImpl::Impl
       for (common::ParseNode iter=node.First (); iter; iter=iter.Next ())
       {
         const char* node_name = iter.Name ();
-
+        
         if (!strcmp (node_name, "Include"))
         {
           try
@@ -177,7 +177,7 @@ struct StartupManagerImpl::Impl
         {
           const char* name  = common::get<const char*> (*iter, "Name");
           const char* value = common::get<const char*> (*iter, "Value");
-
+          
           properties.SetProperty (name, value);
         }
         catch (std::exception& exception)
