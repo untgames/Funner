@@ -1,8 +1,8 @@
 Results of condition_broadcast_test:
 create mutex & condition
 create thread
-wait started
 sleep
+wait started
 wait started
 wake
 wait finished

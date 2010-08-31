@@ -36,11 +36,15 @@ int main ()
 
     printf ("create thread\n");
     fflush (stdout);
+    
+    mutex->Lock ();
 
-    Thread thread1 (&run), thread2 (&run);
+    Thread thread1 (&run), thread2 (&run);    
     
     printf ("sleep\n");
     fflush (stdout);    
+    
+    mutex->Unlock ();    
 
     Application::Sleep (3000);
     

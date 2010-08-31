@@ -10,7 +10,7 @@ int thread2_run ()
   printf ("thread2 started\n");
   fflush (stdout);
 
-  thread [0]->Cancel ();
+  thread [0]->Cancel ();  
 
   return 0;
 }
@@ -43,11 +43,12 @@ int main ()
 
     thread [0] = &thread1;
     thread [1] = &thread2;
+    
+    int result1 = thread [1]->Join (), result0 = thread [0]->Join ();
 
-    printf ("join thread2: %d\n", thread [1]->Join ());
-    fflush (stdout);    
-    printf ("join thread1: %d\n", thread [0]->Join ());
-    fflush (stdout);    
+    printf ("join thread2: %d\n", result1);
+    printf ("join thread1: %d\n", result0);
+    fflush (stdout);
   }
   catch (std::exception& exception)
   {
