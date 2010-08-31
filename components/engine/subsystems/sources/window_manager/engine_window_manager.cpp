@@ -44,7 +44,9 @@ const char* LOG_NAME       = COMPONENT_NAME;                    //имя потока про
 class Window;
 class WindowManagerSubsystem;
 
-Window* create_window (ParseNode& node, WindowManagerSubsystem& manager);
+Window*     create_window (ParseNode& node, WindowManagerSubsystem& manager);
+const char* get_cursor_image_name (Window&);
+void        reset_cursor (Window&);
 
 /*
     Реализация подсистемы инициализации окна
@@ -162,6 +164,14 @@ class WindowManagerSubsystem: public ISubsystem, private media::rms::ICustomServ
           return;
 
         cursors.erase (tokens [1]);
+        
+        stl::string cursor_name = tokens [1];
+        
+        for (WindowList::iterator iter=windows.begin (), end=windows.end (); iter!=end; ++iter)
+        {
+          if (get_cursor_image_name (**iter) == cursor_name)
+            reset_cursor (**iter);
+        }
         
         log.Printf ("Cursor '%s' unloaded (path='%s')", tokens [1], tokens [2]);
       }
@@ -351,6 +361,18 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this));
       AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));
     }
+    
+///Имя курсора
+    const char* CursorImageName ()
+    {
+      return cursor ? cursor->Image () : "";
+    }
+    
+///Сброс курсора
+    void ResetCursor ()
+    {
+      window.SetCursor (syslib::WindowCursor ());
+    }
 
 ///Обработчик события регистрации окна
     void OnRegisterAttachment (const char* attachment_name, syslib::Window& in_window)
@@ -467,6 +489,16 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 Window* create_window (ParseNode& node, WindowManagerSubsystem& manager)
 {
   return new Window (node, manager);
+}
+
+const char* get_cursor_image_name (Window& window)
+{
+  return window.CursorImageName ();
+}
+
+void reset_cursor (Window& window)
+{
+  window.ResetCursor ();
 }
 
 /*
