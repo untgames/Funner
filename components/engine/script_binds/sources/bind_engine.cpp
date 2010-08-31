@@ -26,7 +26,7 @@ namespace
 const char* COMPONENT_NAME             = "script.binds.Engine";
 const char* BINDER_NAME                = "Engine";
 const char* ATTACHMENT_REGISTRY_PREFIX = "Engine";
-const char* SUBSYSTEM_MANAGER_LIBRARY  = "Engine.SubsystemManagerClass";
+const char* SUBSYSTEM_MANAGER_LIBRARY  = "Engine.SubsystemManager";
 
 /*
     Регистрация библиотек
