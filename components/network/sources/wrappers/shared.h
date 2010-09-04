@@ -14,8 +14,9 @@
 #include <common/singleton.h>
 #include <common/strlib.h>
 
-#include <syslib/thread.h>
+#include <syslib/condition.h>
 #include <syslib/mutex.h>
+#include <syslib/thread.h>
 
 #include <network/inet_address.h>
 #include <network/socket.h>

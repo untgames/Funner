@@ -26,17 +26,6 @@ struct ReceiveBlock: public xtl::reference_counter
 typedef xtl::intrusive_ptr<ReceiveBlock> ReceiveBlockPtr;
 typedef stl::list<ReceiveBlockPtr>       ReceiveBlockList;
 
-///Запирание мьютекса
-struct Guard
-{
-  syslib::Mutex& mutex;
-  
-//  Guard (syslib::Mutex& in_mutex) : mutex (in_mutex) { mutex.Lock (); }
-  Guard (syslib::Mutex& in_mutex) : mutex (in_mutex) {  }
-  
-//  ~Guard () { mutex.Unlock (); }
-};
-
 }
 
 /*
@@ -46,7 +35,7 @@ struct Guard
 struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IListener
 {
   syslib::Mutex             mutex;            //блокировка соединения
-//  syslib::ThreadCondition   recv_condition;   //события приёма данных //???????????????
+  syslib::Condition         recv_condition;   //события приёма данных
   network::Url              url;              //URL ресурса
   stl::auto_ptr<IUrlStream> stream;           //поток URL данных
   stl::string               content_type;     //тип контента
@@ -89,13 +78,19 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
     content_length   = stream->GetContentLength ();
   }
   
+///Деструктор
+  ~Impl ()
+  {
+    mutex.Lock (); //без вызова Unlock, поскольку Mutex будет удалён
+  }
+  
 ///Обработка события получения данных
   void WriteReceivedData (const void* buffer, size_t size)
   {
     if (!buffer && size)
       throw xtl::make_null_argument_exception ("network::UrlConnection::Impl::WriteReceivedData", "buffer");
 
-    Guard lock (mutex);
+    syslib::Lock lock (mutex);
 
     const char* src = reinterpret_cast<const char*> (buffer);
       
@@ -118,13 +113,13 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
       total_recv_size += write_size;
     }
     
-//    recv_condition.NotifyAll (); //?????????????
+    recv_condition.NotifyAll ();
   }
   
 ///Конец приёма данных
   void FinishReceiveData ()
   {
-    Guard lock (mutex);
+    syslib::Lock lock (mutex);
     
     recv_finish = true;
   }
@@ -132,7 +127,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
 ///Приём данных
   size_t Receive (void* buffer, size_t size)
   {
-    Guard lock (mutex);    
+    syslib::Lock lock (mutex);    
     
     if (!&*stream)
       throw xtl::format_operation_exception ("", "Can't receive data from closed URL stream");
@@ -158,7 +153,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
         if (recv_finish)
           return result;
           
-//        recv_condition.Wait (mutex); //?????????????
+        recv_condition.Wait (mutex);
       }
       
         //получение блока
@@ -223,15 +218,13 @@ UrlConnection::UrlConnection (const network::Url& url, const char* params)
 UrlConnection::UrlConnection (const UrlConnection& connection)
   : impl (connection.impl)
 {
-  Guard lock (impl->mutex);
+  syslib::Lock lock (impl->mutex);
 
   addref (impl);
 }
 
 UrlConnection::~UrlConnection ()
 {
-  Guard lock (impl->mutex);
-
   release (impl);
 }
 
@@ -248,7 +241,7 @@ UrlConnection& UrlConnection::operator = (const UrlConnection& connection)
 
 const network::Url& UrlConnection::Url () const
 {
-  Guard lock (impl->mutex);
+  syslib::Lock lock (impl->mutex);
 
   return impl->url;
 }
@@ -259,14 +252,14 @@ const network::Url& UrlConnection::Url () const
 
 void UrlConnection::Close ()
 {
-  Guard lock (impl->mutex);
+  syslib::Lock lock (impl->mutex);
   
   UrlConnection ().Swap (*this);
 }
 
 bool UrlConnection::IsClosed () const
 {
-  Guard lock (impl->mutex);
+  syslib::Lock lock (impl->mutex);
 
   return &*impl->stream == 0;
 }
@@ -311,7 +304,7 @@ size_t UrlConnection::Send (const void* buffer, size_t size)
 {
   try
   {
-    Guard lock (impl->mutex);    
+    syslib::Lock lock (impl->mutex);    
     
     if (!&*impl->stream)
       throw xtl::format_operation_exception ("", "Can't send data to closed URL stream");
@@ -338,7 +331,7 @@ size_t UrlConnection::Send (const void* buffer, size_t size)
 //количество байт доступных для чтения без блокировки
 size_t UrlConnection::ReceiveAvailable () const
 {
-  Guard lock (impl->mutex);
+  syslib::Lock lock (impl->mutex);
 
   return impl->total_recv_size - impl->recv_offset;
 }
@@ -346,7 +339,7 @@ size_t UrlConnection::ReceiveAvailable () const
 //общее число полученных байт
 size_t UrlConnection::ReceivedDataSize () const
 {
-  Guard lock (impl->mutex);
+  syslib::Lock lock (impl->mutex);
 
   return impl->total_recv_size;
 }
@@ -354,7 +347,7 @@ size_t UrlConnection::ReceivedDataSize () const
 //общее число переданных байт
 size_t UrlConnection::SendDataSize () const
 {
-  Guard lock (impl->mutex);
+  syslib::Lock lock (impl->mutex);
 
   return impl->total_send_size;
 }
@@ -365,8 +358,8 @@ size_t UrlConnection::SendDataSize () const
 
 void UrlConnection::Swap (UrlConnection& connection)
 {
-  Guard lock1 (impl->mutex);
-  Guard lock2 (connection.impl->mutex);
+  syslib::Lock lock1 (impl->mutex);
+  syslib::Lock lock2 (connection.impl->mutex);
 
   stl::swap (impl, connection.impl);
 }
