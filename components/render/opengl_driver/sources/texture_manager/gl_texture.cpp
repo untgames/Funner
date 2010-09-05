@@ -107,11 +107,14 @@ Texture::Texture
   
     //включение автоматической генерации    
 
-  if (mips_count > 1 && desc.generate_mips_enable && GetCaps ().has_sgis_generate_mipmap)
+  if (mips_count > 1)
   {
     Bind ();
 
-    glTexParameteri (target, GL_GENERATE_MIPMAP, GL_TRUE);
+    glTexParameteri (target, GL_TEXTURE_MAX_LEVEL, mips_count - 1);
+
+    if (desc.generate_mips_enable && GetCaps ().has_sgis_generate_mipmap)
+      glTexParameteri (target, GL_GENERATE_MIPMAP, GL_TRUE);
   }
 
     //проверка ошибок
