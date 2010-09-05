@@ -81,7 +81,7 @@ struct WindowImpl
     , message_handler (handler)
     , is_cursor_visible (true)
     , is_cursor_in_window (false)
-    , default_cursor (LoadCursor (GetApplicationInstance (), IDC_ARROW))
+    , default_cursor (LoadCursor (0, IDC_ARROW))
     , preferred_cursor (0)
   {
   }
@@ -1032,7 +1032,7 @@ void Platform::SetCursorVisible (window_t handle, bool state)
 
     impl->is_cursor_visible = state;
 
-      //послыка WM_SETCURSOR
+      //посылка WM_SETCURSOR
 
     POINT position;
 
@@ -1106,7 +1106,8 @@ void Platform::DestroyCursor (cursor_t cursor)
   try
   {
     if (GetCursor () == reinterpret_cast<HCURSOR> (cursor))
-      throw xtl::format_operation_exception ("", "Can't destroy active cursor");
+      ::SetCursor (LoadCursor (0, IDC_ARROW));
+//      throw xtl::format_operation_exception ("", "Can't destroy active cursor");
 
     if (!::DestroyCursor (reinterpret_cast<HCURSOR> (cursor)))
       raise_error ("::DestroyCursor");
