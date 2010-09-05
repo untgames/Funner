@@ -15,4 +15,4 @@ NETWORK.SOURCES.IMPORTS            := compile.network compile.system compile.com
 #Цель №2 - System library tests
 NETWORK.TESTS.TYPE        := test-suite
 NETWORK.TESTS.SOURCE_DIRS := tests/wrappers
-NETWORK.TESTS.IMPORTS     := compile.network link.network
+NETWORK.TESTS.IMPORTS     := compile.network link.network compile.common

@@ -12,19 +12,168 @@ namespace
 const char*  DEFAULT_URL              = "http://localhost/";  //URL по умолчанию
 const char*  DEFAULT_CONTENT_TYPE     = "text";               //тип контента по умолчанию
 const char*  DEFAULT_CONTENT_ENCODING = "utf-8";              //кодировка контента по умолчанию
-const size_t RECEIVE_BLOCK_SIZE       = 16384;                //размер буфера приёма по умолчанию
+const size_t BLOCK_SIZE               = 16384;                //размер буфера блока по умолчанию
 
 /*
     Вспомогательные структуры
 */
 
-struct ReceiveBlock: public xtl::reference_counter
+///Блок буфера данных
+struct Block: public xtl::reference_counter
 {
-  char buffer [RECEIVE_BLOCK_SIZE]; //буфер данных
+  char buffer [BLOCK_SIZE]; //буфер данных
 };
 
-typedef xtl::intrusive_ptr<ReceiveBlock> ReceiveBlockPtr;
-typedef stl::list<ReceiveBlockPtr>       ReceiveBlockList;
+typedef xtl::intrusive_ptr<Block> BlockPtr;
+typedef stl::list<BlockPtr>       BlockList;
+
+///Буфера данных
+class Buffer
+{
+  public:
+    Buffer (syslib::Mutex& in_mutex)
+      : mutex (in_mutex)
+      , total_size (0)
+      , offset (0)
+      , put_finished (false)
+    {
+    }
+    
+///Доступный объём данных
+    size_t Available ()
+    {
+      syslib::Lock lock (mutex);
+      
+      return total_size - offset;
+    }
+    
+///Общий объём данных
+    size_t TotalSize ()
+    {
+      syslib::Lock lock (mutex);
+      
+      return total_size;
+    }
+    
+///Прекращение помещения данных в буфер
+    void FinishPut ()
+    {
+      syslib::Lock lock (mutex);
+      put_finished = true;
+    }
+    
+///Помещение данных в буфер
+    void Put (const void* buffer, size_t size)
+    {
+      if (!buffer && size)
+        throw xtl::make_null_argument_exception ("network::BufferPut", "buffer");
+        
+      syslib::Lock lock (mutex);
+      
+      if (put_finished)
+        throw xtl::format_operation_exception ("network::Buffer::Put", "Buffer has being closed for data writing");
+
+      const char* src = reinterpret_cast<const char*> (buffer);
+        
+      while (size)
+      {
+        size_t available_size       = total_size - offset,
+               block_offset         = available_size % BLOCK_SIZE,
+               available_block_size = BLOCK_SIZE - block_offset,
+               write_size           = size < available_block_size ? size : available_block_size;
+               
+        BlockPtr block = block_offset == 0 ? BlockPtr (new Block, false) : blocks.back ();
+        
+        memcpy (block->buffer + block_offset, src, write_size);
+              
+        if (block != blocks.back ())
+          blocks.push_back (block);
+          
+        size       -= write_size;
+        src        += write_size;
+        total_size += write_size;
+      }
+      
+      condition.NotifyAll ();
+    }
+    
+///Получение данных из буфера
+    size_t Get (void* buffer, size_t size)
+    {
+      syslib::Lock lock (mutex);    
+      
+      if (!buffer && size)
+        throw xtl::make_null_argument_exception ("network::Buffer::Get", "buffer");
+
+      if (!size)
+        return 0;
+        
+      size_t result = 0;
+      
+      char* dst = reinterpret_cast<char*> (buffer);
+
+      while (size)
+      {
+          //ожидание данных
+          
+        size_t available;
+        
+        while ((available = total_size - offset) == 0)
+        {
+          if (put_finished)
+            return result;
+            
+          condition.Wait (mutex);
+        }
+        
+          //получение блока
+          
+        if (blocks.empty ())
+          throw xtl::format_operation_exception ("", "Internal error: empty list");
+        
+        BlockPtr block = blocks.front ();
+        
+          //расчёт смещений
+          
+        size_t block_offset         = offset % BLOCK_SIZE,
+               block_available_size = BLOCK_SIZE - block_offset,
+               read_size            = size < block_available_size ? size : block_available_size;
+               
+        if (read_size > available)
+          read_size = available;
+        
+          //чтение данных
+          
+        memcpy (dst, block->buffer + block_offset, read_size);
+        
+          //обновление списка
+          
+        if (read_size == block_available_size)
+          blocks.pop_front ();
+        
+          //обновление указателей
+          
+        result += read_size;
+        size   -= read_size;
+        dst    += read_size;
+        offset += read_size;
+      }
+      
+      return result;
+    }
+  
+  private:
+    Buffer (const Buffer&); //no impl
+    Buffer& operator = (const Buffer&); //no impl
+  
+  private:
+    syslib::Mutex&    mutex;        //блокировка
+    syslib::Condition condition;    //событие приёма данных
+    size_t            total_size;   //общий объём данных
+    size_t            offset;       //смещение для первого блока данных
+    BlockList         blocks;       //блоки данных
+    bool              put_finished; //помещение данных в буфера завершено
+};
 
 }
 
@@ -35,17 +184,15 @@ typedef stl::list<ReceiveBlockPtr>       ReceiveBlockList;
 struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IListener
 {
   syslib::Mutex             mutex;            //блокировка соединения
-  syslib::Condition         recv_condition;   //события приёма данных
   network::Url              url;              //URL ресурса
   stl::auto_ptr<IUrlStream> stream;           //поток URL данных
   stl::string               content_type;     //тип контента
   stl::string               content_encoding; //кодировка
   size_t                    content_length;   //длина контента
-  size_t                    total_send_size;  //общий объём переданных данных
-  size_t                    total_recv_size;  //общий объём полученных данных
-  size_t                    recv_offset;      //смещение для первого блока полученных данных
-  ReceiveBlockList          recv_list;        //список принятых блоков
-  bool                      recv_finish;      //приём данных окончен
+  Buffer                    send_buffer;      //буфер приёма
+  Buffer                    recv_buffer;      //буфер передачи
+  bool                      send_closed;      //канал отправки данных закрыт
+  bool                      recv_closed;      //канал приёма данных закрыт
 
 ///Конструкторы
   Impl ()
@@ -53,20 +200,20 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
     , content_type (DEFAULT_CONTENT_TYPE)
     , content_encoding (DEFAULT_CONTENT_ENCODING)
     , content_length (0)
-    , total_send_size (0)
-    , total_recv_size (0)
-    , recv_offset (0)
-    , recv_finish (true)
+    , send_buffer (mutex)
+    , recv_buffer (mutex)
+    , send_closed (false)
+    , recv_closed (false)
   {
   }
   
   Impl (const network::Url& in_url, const char* params)
     : url (in_url)
     , content_length (0)
-    , total_send_size (0)
-    , total_recv_size (0)
-    , recv_offset (0)
-    , recv_finish (false)
+    , send_buffer (mutex)
+    , recv_buffer (mutex)
+    , send_closed (false)
+    , recv_closed (false)
   {
     stream = stl::auto_ptr<IUrlStream> (UrlStreamManagerSingleton::Instance ()->CreateStream (url.ToString (), params, *this));
     
@@ -87,109 +234,87 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
 ///Обработка события получения данных
   void WriteReceivedData (const void* buffer, size_t size)
   {
-    if (!buffer && size)
-      throw xtl::make_null_argument_exception ("network::UrlConnection::Impl::WriteReceivedData", "buffer");
-
-    syslib::Lock lock (mutex);
-
-    const char* src = reinterpret_cast<const char*> (buffer);
-      
-    while (size)
+    try
     {
-      size_t available_size       = total_recv_size - recv_offset,
-             block_offset         = available_size % RECEIVE_BLOCK_SIZE,
-             available_block_size = RECEIVE_BLOCK_SIZE - block_offset,
-             write_size           = size < available_block_size ? size : available_block_size;
-             
-      ReceiveBlockPtr block = block_offset == 0 ? ReceiveBlockPtr (new ReceiveBlock, false) : recv_list.back ();
-      
-      memcpy (block->buffer + block_offset, src, write_size);
-            
-      if (block != recv_list.back ())
-        recv_list.push_back (block);
-        
-      size            -= write_size;
-      src             += write_size;
-      total_recv_size += write_size;
+      recv_buffer.Put (buffer, size);
     }
-    
-    recv_condition.NotifyAll ();
+    catch (xtl::exception& e)
+    {
+      e.touch ("network::UrlConnection::Impl::WriteReceivedData");
+      throw;
+    }
   }
   
 ///Конец приёма данных
   void FinishReceiveData ()
   {
-    syslib::Lock lock (mutex);
-    
-    recv_finish = true;
+    try
+    {
+      recv_buffer.FinishPut ();
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("network::UrlConnection::Impl::FinishReceiveData");
+      throw;
+    }
   }
   
 ///Приём данных
   size_t Receive (void* buffer, size_t size)
   {
-    syslib::Lock lock (mutex);    
-    
-    if (!&*stream)
-      throw xtl::format_operation_exception ("", "Can't receive data from closed URL stream");
-
-    if (!buffer && size)
-      throw xtl::make_null_argument_exception ("", "buffer");
-
-    if (!size)
-      return 0;
-      
-    size_t result = 0;
-    
-    char* dst = reinterpret_cast<char*> (buffer);
-
-    while (size)
+    try
     {
-        //ожидание данных
-        
-      size_t available;
-      
-      while ((available = total_recv_size - recv_offset) == 0)
       {
-        if (recv_finish)
-          return result;
-          
-        recv_condition.Wait (mutex);
+        syslib::Lock lock (mutex);
+      
+        if (!&*stream)
+          throw xtl::format_operation_exception ("", "Can't receive data from closed URL stream");
       }
       
-        //получение блока
-        
-      if (recv_list.empty ())
-        throw xtl::format_operation_exception ("", "Internal error: empty receive list");
-      
-      ReceiveBlockPtr block = recv_list.front ();
-      
-        //расчёт смещений
-        
-      size_t block_offset         = recv_offset % RECEIVE_BLOCK_SIZE,
-             block_available_size = RECEIVE_BLOCK_SIZE - recv_offset,
-             read_size            = size < block_available_size ? size : block_available_size;
-             
-      if (read_size > available)
-        read_size = available;
-      
-        //чтение данных
-        
-      memcpy (dst, block->buffer + block_offset, read_size);
-      
-        //обновление списка
-        
-      if (read_size == block_available_size)
-        recv_list.pop_front ();
-      
-        //обновление указателей
-        
-      result      += read_size;
-      size        -= read_size;
-      dst         += read_size;
-      recv_offset += read_size;
+      return recv_buffer.Get (buffer, size);
     }
-    
-    return result;
+    catch (xtl::exception& e)
+    {
+      e.touch ("network::UrlConnection::Impl::Receive");
+      throw;
+    }
+  }
+  
+///Обработка события отсылки данных
+  size_t ReadSendData (void* buffer, size_t size)
+  {
+    try
+    {
+      return send_buffer.Get (buffer, size);
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("network::UrlConnection::Impl::ReadSendData");
+      throw;
+    }
+  }
+  
+///Отсылка данных
+  size_t Send (const void* buffer, size_t size)
+  {
+    try
+    {
+      {
+        syslib::Lock lock (mutex);    
+      
+        if (!&*stream)
+          throw xtl::format_operation_exception ("", "Can't send data to closed URL stream");
+      }
+
+      send_buffer.Put (buffer, size); 
+
+      return size;
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("network::UrlConnection::Impl::Send");
+      throw;
+    }
   }
 };
 
@@ -265,6 +390,40 @@ bool UrlConnection::IsClosed () const
 }
 
 /*
+    Закрытие каналов передачи данных
+*/
+
+bool UrlConnection::IsReceiveClosed () const
+{
+  syslib::Lock lock (impl->mutex);
+
+  return impl->recv_closed;
+}
+
+bool UrlConnection::IsSendClosed () const
+{
+  syslib::Lock lock (impl->mutex);
+
+  return impl->send_closed;
+}
+
+void UrlConnection::CloseReceive ()
+{
+  syslib::Lock lock (impl->mutex);
+  
+  impl->recv_closed = true;
+}
+
+void UrlConnection::CloseSend ()
+{
+  syslib::Lock lock (impl->mutex);
+  
+  impl->send_closed = true;
+  
+  impl->send_buffer.FinishPut ();
+}
+
+/*
     Параметры содержимого
 */
 
@@ -304,18 +463,7 @@ size_t UrlConnection::Send (const void* buffer, size_t size)
 {
   try
   {
-    syslib::Lock lock (impl->mutex);    
-    
-    if (!&*impl->stream)
-      throw xtl::format_operation_exception ("", "Can't send data to closed URL stream");
-    
-    if (!buffer && size)
-      throw xtl::make_null_argument_exception ("", "buffer");
-      
-    if (!size)
-      return 0;
-
-    return impl->stream->SendData (buffer, size);
+    return impl->Send (buffer, size);
   }
   catch (xtl::exception& e)
   {
@@ -333,7 +481,7 @@ size_t UrlConnection::ReceiveAvailable () const
 {
   syslib::Lock lock (impl->mutex);
 
-  return impl->total_recv_size - impl->recv_offset;
+  return impl->recv_buffer.Available ();
 }
 
 //общее число полученных байт
@@ -341,7 +489,7 @@ size_t UrlConnection::ReceivedDataSize () const
 {
   syslib::Lock lock (impl->mutex);
 
-  return impl->total_recv_size;
+  return impl->recv_buffer.TotalSize ();
 }
 
 //общее число переданных байт
@@ -349,7 +497,7 @@ size_t UrlConnection::SendDataSize () const
 {
   syslib::Lock lock (impl->mutex);
 
-  return impl->total_send_size;
+  return impl->send_buffer.TotalSize ();
 }
 
 /*

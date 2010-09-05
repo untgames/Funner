@@ -1,9 +1,4 @@
-#include <cstdio>
-#include <exception>
-
-#include <network/url_connection.h>
-
-using namespace network;
+#include "shared.h"
 
 int main ()
 {
@@ -11,14 +6,20 @@ int main ()
 
   try
   {
+    common::LogFilter filter ("*", &print_log);
+    
     UrlConnection connection ("http://www.google.com");
     
-    while (connection.ReceiveAvailable ())
+    printf ("content-type: '%s'\n", connection.ContentType ());
+    printf ("content-encoding: '%s'\n", connection.ContentEncoding ());
+    printf ("content-length: %u\n", connection.ContentLength ());
+    
+    char buffer [16];
+    
+    size_t size;
+    
+    while ((size = connection.Receive (buffer, sizeof (buffer) - 1)) != 0)
     {
-      char buffer [16];
-      
-      size_t size = connection.Receive (buffer, sizeof (buffer) - 1);
-      
       buffer [size] = 0;
       
       printf ("%s", buffer);
