@@ -50,6 +50,8 @@ Texture::Texture
 
         //проверка корректности начальных размеров
 
+      mips_count = get_mips_count (desc.width < desc.height ? desc.width : desc.height);  //необходимо разобраться как задаются мип-уровни для уровней с размером стороны меньше 4 пикселов
+
       if (mips_count < 3)
       {
         if (desc.width % 4)  throw xtl::make_argument_exception (METHOD_NAME, "desc.width", desc.width, "Reason: width is not multiple of 4");
