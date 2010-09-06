@@ -32,7 +32,7 @@ template <class Ret> AsyncResult async_invoke (const xtl::function<Ret ()>&);
 template <class Ret> AsyncResult async_invoke (const xtl::function<Ret ()>&, const xtl::function<void (AsyncResult&)>& callback);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Результат асинхронной операции
+///Результат асинхронной операции (thread safe)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class AsyncResult
 {
