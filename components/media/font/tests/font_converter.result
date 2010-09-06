@@ -1,4 +1,47 @@
 Results of font_converter_test:
+'media.font.font_converter': 'Freetype returned null for character 32 ( ).'
+'media.font.font_converter': 'Freetype returned null for character 33 (!).'
+'media.font.font_converter': 'Freetype returned null for character 34 (").'
+'media.font.font_converter': 'Freetype returned null for character 35 (#).'
+'media.font.font_converter': 'Freetype returned null for character 36 ($).'
+'media.font.font_converter': 'Freetype returned null for character 37 (%).'
+'media.font.font_converter': 'Freetype returned null for character 38 (&).'
+'media.font.font_converter': 'Freetype returned null for character 39 (').'
+'media.font.font_converter': 'Freetype returned null for character 40 (().'
+'media.font.font_converter': 'Freetype returned null for character 41 ()).'
+'media.font.font_converter': 'Freetype returned null for character 42 (*).'
+'media.font.font_converter': 'Freetype returned null for character 43 (+).'
+'media.font.font_converter': 'Freetype returned null for character 44 (,).'
+'media.font.font_converter': 'Freetype returned null for character 45 (-).'
+'media.font.font_converter': 'Freetype returned null for character 46 (.).'
+'media.font.font_converter': 'Freetype returned null for character 47 (/).'
+'media.font.font_converter': 'Freetype returned null for character 48 (0).'
+'media.font.font_converter': 'Freetype returned null for character 49 (1).'
+'media.font.font_converter': 'Freetype returned null for character 50 (2).'
+'media.font.font_converter': 'Freetype returned null for character 51 (3).'
+'media.font.font_converter': 'Freetype returned null for character 52 (4).'
+'media.font.font_converter': 'Freetype returned null for character 53 (5).'
+'media.font.font_converter': 'Freetype returned null for character 54 (6).'
+'media.font.font_converter': 'Freetype returned null for character 55 (7).'
+'media.font.font_converter': 'Freetype returned null for character 56 (8).'
+'media.font.font_converter': 'Freetype returned null for character 57 (9).'
+'media.font.font_converter': 'Freetype returned null for character 58 (:).'
+'media.font.font_converter': 'Freetype returned null for character 59 (;).'
+'media.font.font_converter': 'Freetype returned null for character 60 (<).'
+'media.font.font_converter': 'Freetype returned null for character 61 (=).'
+'media.font.font_converter': 'Freetype returned null for character 62 (>).'
+'media.font.font_converter': 'Freetype returned null for character 63 (?).'
+'media.font.font_converter': 'Freetype returned null for character 64 (@).'
+'media.font.font_converter': 'Freetype returned null for character 91 ([).'
+'media.font.font_converter': 'Freetype returned null for character 92 (\).'
+'media.font.font_converter': 'Freetype returned null for character 93 (]).'
+'media.font.font_converter': 'Freetype returned null for character 94 (^).'
+'media.font.font_converter': 'Freetype returned null for character 96 (`).'
+'media.font.font_converter': 'Freetype returned null for character 123 ({).'
+'media.font.font_converter': 'Freetype returned null for character 124 (|).'
+'media.font.font_converter': 'Freetype returned null for character 125 (}).'
+'media.font.font_converter': 'Freetype returned null for character 126 (~).'
+'media.font.font_converter': 'Font 'data/a_damn_mess.ttf' has no char 127 ().'
 <?xml version="1.0" encoding="utf-8"?>
 <Font Name="/io/stdout/a_damn_mess.xfont" FontFile="data/a_damn_mess.tga" FirstCharCode="32">
   <Glyphs>
@@ -97,7 +140,7 @@ Results of font_converter_test:
     <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="0" AdvanceY="0"/>
     <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="0" AdvanceY="0"/>
     <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="0" AdvanceY="0"/>
-    <Glyph XPos="119" YPos="136" Width="25" Height="51" BearingX="4" BearingY="51" AdvanceX="32" AdvanceY="0"/>
+    <Glyph XPos="0" YPos="0" Width="0" Height="0" BearingX="0" BearingY="0" AdvanceX="0" AdvanceY="0"/>
   </Glyphs>
   <Kernings>
     <Kerning LeftGlyph="2" RightGlyph="14" XKerning="-8.000" YKerning="0.000"/>
@@ -467,4 +510,4 @@ Results of font_converter_test:
     <Kerning LeftGlyph="90" RightGlyph="90" XKerning="-13.000" YKerning="0.000"/>
   </Kernings>
 </Font>
-Image 'data/a_damn_mess.tga' hash: {b8,3d,0c,f0,c9,70,e2,bd,3e,c4,d8,c2,fe,8f,1c,07}
+Image 'data/a_damn_mess.tga' hash: {3d,47,00,83,b3,22,d7,e1,72,62,59,f3,d6,10,b6,af}

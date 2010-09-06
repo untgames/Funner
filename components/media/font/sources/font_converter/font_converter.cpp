@@ -185,18 +185,29 @@ void convert (const FontDesc& font_desc, Font& result_font, Image& result_image)
   
   for (size_t i = 0; i < char_codes_count; i++, current_glyph++)
   {
-    if (FT_Load_Char (face, font_desc.char_codes_line [i], FT_LOAD_RENDER))
+    wchar_t char_code = font_desc.char_codes_line [i];
+
+    if (!FT_Get_Char_Index (face, char_code))
     {
       set_null_glyph_data (current_glyph);
 
-      get_log ().Printf ("Can't load char %u.", i);
+      get_log ().Printf ("Font '%s' has no char %u (%C).", font_desc.file_name, char_code, char_code);
+
+      continue;
+    }
+
+    if (FT_Load_Char (face, char_code, FT_LOAD_RENDER))
+    {
+      set_null_glyph_data (current_glyph);
+
+      get_log ().Printf ("Can't load char %u (%C).", char_code, char_code);
     
       continue;
     }
 
     if (!face->glyph->bitmap.buffer)
     {
-      get_log ().Printf ("Freetype returned null for character %u.", i);
+      get_log ().Printf ("Freetype returned null for character %u (%C).", char_code, char_code);
       
       set_null_glyph_data (current_glyph);
       current_glyph->advance_x = face->glyph->metrics.horiAdvance >> 6;
