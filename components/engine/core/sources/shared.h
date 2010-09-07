@@ -56,7 +56,7 @@ class StartupManagerImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запуск подсистем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Start (const common::ParseNode& node, const char* wc_mask, SubsystemManager& manager);
+    void Start (const common::ParseNode& node, const char* subsystems_name_masks, SubsystemManager& manager);
 
   private:
     struct Impl;

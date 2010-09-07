@@ -58,7 +58,7 @@ struct StartupManagerImpl::Impl
     }
     
 ///Запуск подсистем
-    void Start (const common::ParseNode& node, const char* wc_mask, SubsystemManager& manager)
+    void Start (const common::ParseNode& node, const char* subsystems_name_mask, SubsystemManager& manager)
     {
       static common::ComponentLoader loader (REGISTRY_COMPONENTS_MASK);
       
@@ -68,16 +68,18 @@ struct StartupManagerImpl::Impl
       
       common::PropertyMap properties;
 
-      StartCore (node, wc_mask, manager, properties);
+      StartCore (node, subsystems_name_mask, manager, properties);
 
       log.Printf ("Subsystems successfully started");
     }
 
   private:
 ///Запуск подсистем
-    void StartCore (const common::ParseNode& node, const char* wc_mask, SubsystemManager& manager, common::PropertyMap& properties)
-    {
+    void StartCore (const common::ParseNode& node, const char* subsystems_name_mask, SubsystemManager& manager, common::PropertyMap& properties)
+    {      
       common::Log log (common::format ("%s.%s", LOG_PREFIX, manager.Name ()).c_str ());      
+      
+      common::StringArray masks = common::split (subsystems_name_mask);
       
       for (common::ParseNode iter=node.First (); iter; iter=iter.Next ())
       {
@@ -87,7 +89,7 @@ struct StartupManagerImpl::Impl
         {
           try
           {
-            IncludeSubsystems (iter, wc_mask, manager, properties);
+            IncludeSubsystems (iter, subsystems_name_mask, manager, properties);
           }
           catch (std::exception& exception)
           {
@@ -107,7 +109,16 @@ struct StartupManagerImpl::Impl
           continue;
         }
 
-        if (!common::wcmatch (node_name, wc_mask))
+        bool match = false;
+        
+        for (size_t i=0; i<masks.Size (); i++)          
+          if (common::wcmatch (node_name, masks [i]))
+          {
+            match = true;
+            break;
+          }
+          
+        if (!match)
           continue;
 
           //поиск обработчика запуска
@@ -142,7 +153,7 @@ struct StartupManagerImpl::Impl
     }  
   
 ///Подключение подсистем, описанных в другом файле
-    void IncludeSubsystems (common::ParseNode& node, const char* wc_mask, SubsystemManager& manager, common::PropertyMap& properties)
+    void IncludeSubsystems (common::ParseNode& node, const char* subsystems_name_mask, SubsystemManager& manager, common::PropertyMap& properties)
     {
       try
       {
@@ -159,7 +170,7 @@ struct StartupManagerImpl::Impl
 
         common::ParseNode configuration_node = parser.Root ().First ("Configuration");
 
-        StartCore (configuration_node, wc_mask, manager, properties);
+        StartCore (configuration_node, subsystems_name_mask, manager, properties);
       }
       catch (xtl::exception& e)
       {
@@ -244,9 +255,9 @@ void StartupManagerImpl::UnregisterAllStartupHandlers ()
     Запуск обработчиков
 */
 
-void StartupManagerImpl::Start (const common::ParseNode& node, const char* wc_mask, SubsystemManager& manager)
+void StartupManagerImpl::Start (const common::ParseNode& node, const char* subsystems_name_mask, SubsystemManager& manager)
 {
-  impl->Start (node, wc_mask, manager);
+  impl->Start (node, subsystems_name_mask, manager);
 }
 
 /*

@@ -125,26 +125,38 @@ struct SubsystemManager::Impl
     }
 
 ///Удаление подсистем по маске имени
-    void Remove (const char* wc_mask)
+    void Remove (const char* subsystems_name_masks)
     {
-      if (!wc_mask)
+      if (!subsystems_name_masks)
         return;
+        
+      common::StringArray masks = common::split (subsystems_name_masks);
 
       for (Subsystems::reverse_iterator iter=subsystems.rbegin (); iter!=subsystems.rend ();)
       {
-        if (common::wcmatch ((*iter)->name.c_str (), wc_mask))
+        bool removed = false;
+        
+        for (size_t i=0; i<masks.Size (); i++)
         {
-          log.Printf ("Remove subsystem '%s'", (*iter)->name.c_str ());
+          if (common::wcmatch ((*iter)->name.c_str (), masks [i]))
+          {
+            log.Printf ("Remove subsystem '%s'", (*iter)->name.c_str ());
 
-          Subsystems::reverse_iterator next = iter;
+            Subsystems::reverse_iterator next = iter;
 
-          ++next;
+            ++next;
 
-          subsystems.erase (iter.base () - 1);
+            subsystems.erase (iter.base () - 1);
 
-          iter = next;
+            iter    = next;
+            removed = true;
+            
+            break;
+          }
         }
-        else ++iter;
+
+        if (!removed)
+          ++iter;
       }
     }
 
@@ -225,14 +237,14 @@ const char* SubsystemManager::Name () const
     Запуск систем
 */
 
-void SubsystemManager::Start (const common::ParseNode& configuration_root, const char* subsystem_name_mask)
+void SubsystemManager::Start (const common::ParseNode& configuration_root, const char* subsystems_name_masks)
 {
   try
   {
-    if (!subsystem_name_mask)
-      throw xtl::make_null_argument_exception ("", "subsystem_name_mask");
+    if (!subsystems_name_masks)
+      throw xtl::make_null_argument_exception ("", "subsystems_name_mask");
 
-    StartupManagerSingleton::Instance ()->Start (configuration_root, subsystem_name_mask, *this);
+    StartupManagerSingleton::Instance ()->Start (configuration_root, subsystems_name_masks, *this);
   }
   catch (xtl::exception& exception)
   {
@@ -241,7 +253,7 @@ void SubsystemManager::Start (const common::ParseNode& configuration_root, const
   }
 }
 
-void SubsystemManager::Start (const char* configuration_file_name, const char* subsystem_name_mask)
+void SubsystemManager::Start (const char* configuration_file_name, const char* subsystems_name_masks)
 {
   try
   {
@@ -250,7 +262,7 @@ void SubsystemManager::Start (const char* configuration_file_name, const char* s
 
     common::Parser parser (configuration_file_name);
 
-    Start (parser.Root ().First ("Configuration"), subsystem_name_mask);
+    Start (parser.Root ().First ("Configuration"), subsystems_name_masks);
 
     parser.Log ().Print (xtl::bind (&common::Log::Print, &impl->Log (), _1));
   }
@@ -265,16 +277,16 @@ void SubsystemManager::Start (const char* configuration_file_name, const char* s
    Перезапуск подсистем
 */
 
-void SubsystemManager::Restart (const common::ParseNode& configuration_root, const char* subsystem_name_mask)
+void SubsystemManager::Restart (const common::ParseNode& configuration_root, const char* subsystems_name_masks)
 {
-  Remove (subsystem_name_mask);
-  Start  (configuration_root, subsystem_name_mask);
+  Remove (subsystems_name_masks);
+  Start  (configuration_root, subsystems_name_masks);
 }
 
-void SubsystemManager::Restart (const char* configuration_file_name, const char* subsystem_name_mask)
+void SubsystemManager::Restart (const char* configuration_file_name, const char* subsystems_name_masks)
 {
-  Remove (subsystem_name_mask);
-  Start  (configuration_file_name, subsystem_name_mask);
+  Remove (subsystems_name_masks);
+  Start  (configuration_file_name, subsystems_name_masks);
 }
 
 /*
@@ -310,9 +322,9 @@ void SubsystemManager::Remove (ISubsystem* subsystem)
   impl->Remove (subsystem);
 }
 
-void SubsystemManager::Remove (const char* wc_mask)
+void SubsystemManager::Remove (const char* subsystems_name_masks)
 {
-  impl->Remove (wc_mask);
+  impl->Remove (subsystems_name_masks);
 }
 
 void SubsystemManager::RemoveAll ()
