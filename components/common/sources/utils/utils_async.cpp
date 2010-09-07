@@ -170,7 +170,7 @@ AsyncResult& AsyncResult::operator = (const AsyncResult& result)
 
 bool AsyncResult::IsCompleted () const
 {
-  common::Lock lock (*this);
+  common::Lock lock (*impl);
 
   return impl->completed;
 }
@@ -179,7 +179,7 @@ void AsyncResult::WaitCompleted ()
 {
   try
   {
-    common::Lock lock (*this);
+    common::Lock lock (*impl);
     
     impl->action.Wait (~0u);
   }
@@ -194,7 +194,7 @@ detail::IAsyncResult* AsyncResult::Result ()
 {
   try
   {
-    common::Lock lock (*this);    
+    common::Lock lock (*impl);
     
     if (!impl->action.IsCompleted ())
       WaitCompleted ();
