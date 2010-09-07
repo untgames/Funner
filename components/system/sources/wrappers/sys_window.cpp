@@ -912,6 +912,36 @@ void Window::SetVisible (bool state)
 }
 
 /*
+    Максимизация и минимизация окна
+*/
+
+void Window::Maximize ()
+{
+  try
+  {
+    Platform::SetWindowFlag (impl->CheckedHandle (), WindowFlag_Maximized, true);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::Maximize");
+    throw;
+  }
+}
+
+void Window::Minimize ()
+{
+  try
+  {
+    Platform::SetWindowFlag (impl->CheckedHandle (), WindowFlag_Minimized, true);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::Minimize");
+    throw;
+  }
+}
+
+/*
     Работа с фокусом ввода
 */
 
@@ -937,6 +967,62 @@ void Window::SetFocus (bool state)
   catch (xtl::exception& exception)
   {
     exception.touch ("syslib::Window::SetFocus");
+    throw;
+  }
+}
+
+/*
+    Цвет фона
+*/
+
+void Window::SetBackgroundColor (const Color& color)
+{
+  try
+  {
+    Platform::SetBackgroundColor (impl->CheckedHandle (), color);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::SetBackgroundColor");
+    throw;
+  }
+}
+
+void Window::SetBackgroundState (bool state)
+{
+  try
+  {
+    Platform::SetBackgroundState (impl->CheckedHandle (), state);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::SetBackgroundState");
+    throw;
+  }
+}
+
+Color Window::BackgroundColor () const
+{
+  try
+  {
+    return Platform::GetBackgroundColor (impl->CheckedHandle ());
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::GetBackgroundColor");
+    throw;
+  }
+}
+
+bool Window::IsBackgroundEnabled () const
+{
+  try
+  {
+    return Platform::GetBackgroundState (impl->CheckedHandle ());
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::IsBackgroundEnabled");
     throw;
   }
 }

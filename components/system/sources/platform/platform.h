@@ -12,9 +12,11 @@ namespace syslib
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum WindowFlag
 {
-  WindowFlag_Visible, //видимость окна
-  WindowFlag_Active,  //активность окна
-  WindowFlag_Focus    //фокус ввода окна
+  WindowFlag_Visible,   //видимость окна
+  WindowFlag_Active,    //активность окна
+  WindowFlag_Focus,     //фокус ввода окна
+  WindowFlag_Maximized, //максимальный размер окна
+  WindowFlag_Minimized, //минимальный размер окна
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,6 +142,14 @@ class Platform
     static cursor_t CreateCursor  (const char* name, int hotspot_x, int hotspot_y); //hotspot_x/hotspot_y = -1 - default value
     static void     DestroyCursor (cursor_t);
     static void     SetCursor     (window_t window, cursor_t cursor);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///÷вет фона
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void  SetBackgroundColor (window_t window, const Color& color);
+    static void  SetBackgroundState (window_t window, bool state);
+    static Color GetBackgroundColor (window_t window);
+    static bool  GetBackgroundState (window_t window);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕолучение имени клавиши

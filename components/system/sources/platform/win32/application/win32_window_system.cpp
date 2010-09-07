@@ -75,6 +75,9 @@ struct WindowImpl
   bool                           is_cursor_in_window; //находится ли курсор в окне
   HCURSOR                        default_cursor;      //курсор по умолчанию
   HCURSOR                        preferred_cursor;    //предпочитаемый курсор для данного окна
+  HBRUSH                         background_brush;    //кисть для очистки заднего фона
+  Color                          background_color;    //цвет заднего фона
+  bool                           background_state;    //включен ли задний фон
 
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data)
@@ -83,7 +86,11 @@ struct WindowImpl
     , is_cursor_in_window (false)
     , default_cursor (LoadCursor (0, IDC_ARROW))
     , preferred_cursor (0)
+    , background_brush (CreateSolidBrush (RGB (0, 0, 0)))
+    , background_state (false)
   {
+    if (!background_brush)
+      raise_error ("::CreateSolidBrush");
   }
 
   void TrackCursor (HWND wnd)
@@ -122,10 +129,8 @@ struct WindowImpl
     Получение контекста события
 */
 
-void GetEventContext (HWND wnd, WindowEventContext& context)
+void GetEventContext (HWND wnd, WindowEventContext& context, RECT& client_rect)
 {
-  RECT client_rect;
-
   memset (&context, 0, sizeof (context));
 
   context.handle = wnd;
@@ -257,8 +262,9 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     //получение контекста события
 
   WindowEventContext context;
+  RECT               client_rect;
 
-  GetEventContext (wnd, context);
+  GetEventContext (wnd, context, client_rect);
 
     //обработка сообщений
 
@@ -319,7 +325,13 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     {
       PAINTSTRUCT ps;
 
-      BeginPaint (wnd, &ps);
+      HDC dc = BeginPaint (wnd, &ps);
+      
+      if (impl->background_state && impl->background_brush)
+      {
+        SelectObject (dc, impl->background_brush);
+        Rectangle (dc, client_rect.left, client_rect.top, client_rect.right, client_rect.bottom);
+      }
 
       impl->Notify (window_handle, WindowEvent_OnPaint, context);
 
@@ -821,6 +833,27 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
         if (!SetFocus (state ? wnd : HWND_TOP))
           raise_error ("::SetFocus");
         break;
+      case WindowFlag_Maximized:
+        if (state)
+        {
+          ShowWindow (wnd, SW_MAXIMIZE);
+        }
+        else
+        {
+          ShowWindow (wnd, SW_SHOW);
+        }
+
+        break;
+      case WindowFlag_Minimized:
+        if (state)
+        {
+          ShowWindow (wnd, SW_MINIMIZE);
+        }
+        else
+        {
+          ShowWindow (wnd, SW_SHOW);
+        }
+        break;
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
         break;
@@ -865,9 +898,11 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
 
         return focus_wnd == wnd;
       }
+      case WindowFlag_Minimized:
+      case WindowFlag_Maximized:
+        throw xtl::format_operation_exception ("", "Can't get window flag %d value", flag);
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
-        break;
     }
   }
   catch (xtl::exception& exception)
@@ -1140,6 +1175,109 @@ void Platform::SetCursor (window_t window, cursor_t cursor)
   catch (xtl::exception& e)
   {
     e.touch ("syslib::Win32Platform::SetCursor");
+    throw;
+  }
+}
+
+/*
+    Цвет фона
+*/
+
+void Platform::SetBackgroundColor (window_t window, const Color& color)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+      
+    HWND        wnd  = (HWND)window;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
+      
+    if (impl->background_brush)
+    {
+      DeleteObject (impl->background_brush);
+      impl->background_brush = 0;
+    }
+    
+    impl->background_brush = CreateSolidBrush (RGB (color.red, color.green, color.blue));
+    
+    if (!impl->background_brush)
+      raise_error ("::CreateSolidBrush");
+      
+    impl->background_color = color; 
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Win32Platform::SetBackgroundColor");
+    throw;
+  }
+}
+
+void Platform::SetBackgroundState (window_t window, bool state)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+      
+    HWND        wnd  = (HWND)window;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
+      
+    impl->background_state = state;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Win32Platform::SetBackgroundState");
+    throw;
+  }
+}
+
+Color Platform::GetBackgroundColor (window_t window)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+      
+    HWND        wnd  = (HWND)window;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
+      
+    return impl->background_color;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Win32Platform::GetBackgroundColor");
+    throw;
+  }
+}
+
+bool Platform::GetBackgroundState (window_t window)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+      
+    HWND        wnd  = (HWND)window;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
+      
+    return impl->background_state;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Win32Platform::GetBackgroundState");
     throw;
   }
 }

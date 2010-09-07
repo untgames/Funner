@@ -4,12 +4,13 @@
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/connection.h>
 #include <xtl/function.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/iterator.h>
 #include <xtl/ref.h>
 #include <xtl/reference_counter.h>
-#include <xtl/connection.h>
+#include <xtl/trackable.h>
 
 #include <common/component.h>
 #include <common/log.h>
@@ -273,7 +274,7 @@ syslib::WindowStyle get_window_style (ParseNode& node)
 */
 
 class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttachmentRegistryListener<input::Cursor>,
-              private input::ICursorListener, public xtl::reference_counter
+              private input::ICursorListener, public xtl::reference_counter, private xtl::trackable
 {
   public:
 ///Конструктор
@@ -281,42 +282,129 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       : log (LOG_NAME),
         manager (in_manager),
         window (get_window_style (node)),
-        cursor (0)
+        cursor (0),
+        aspect_ratio (0),
+        parent_auto_size (false)
     {
         //создание окна
-
-      size_t width       = get<size_t> (node, "Width"),
-             height      = get<size_t> (node, "Height");
-      bool   client_size = get<bool> (node, "ClientSize", true);
-
-      if (client_size)
-        window.SetClientSize (width, height);
-      else
-        window.SetSize (width, height);
 
       const char* title = get<const char*> (node, "Title", (const char*)0);
 
       if (title)
         window.SetTitle (title);
-
-      syslib::Point position = window.Position ();
-
-      position.x = get<size_t> (node, "XPosition", position.x);
-      position.y = get<size_t> (node, "YPosition", position.y);
-
-      window.SetPosition (position);
-
-      bool is_window_visible = get<bool> (node, "Visible", window.IsVisible ()),
-           is_cursor_visible = get<bool> (node, "CursorVisible", window.IsCursorVisible ());
-
-      window.SetVisible (is_window_visible);
-      window.SetActive  (is_window_visible);
-      window.SetCursorVisible (is_cursor_visible);
-
+        
         //сохранение точки привязки родительского окна
 
       parent_window_name = get<const char*> (node, "Parent", "");
+      
+      syslib::Window* parent_window = 0;
+      
+      if (!parent_window_name.empty ())
+      {
+        parent_window = &AttachmentRegistry::Get<syslib::Window> (parent_window_name.c_str ());
+        
+        window.SetParentHandle (parent_window->Handle ());
+      }
+        
+        //цвет заднего фона
+        
+      const char* background_color_string = get<const char*> (node, "BackgroundColor", "");
+      
+      common::StringArray background_color_tokens = common::split (background_color_string, " ");
+      
+      if (background_color_tokens.Size () >= 3)
+      {
+        syslib::Color color;
+        
+        color.red   = static_cast<unsigned char> (xtl::io::get<unsigned int> (background_color_tokens [0]));
+        color.green = static_cast<unsigned char> (xtl::io::get<unsigned int> (background_color_tokens [1]));
+        color.blue  = static_cast<unsigned char> (xtl::io::get<unsigned int> (background_color_tokens [2]));
+        
+        window.EnableBackground ();
+        window.SetBackgroundColor (color);
+      }
+      
+        //соотношение сторон
+        
+      const char* aspect_ratio_string = get<const char*> (node, "ChildAspectRatio", "");
+      
+      if (*aspect_ratio_string)
+      {
+        common::StringArray aspect_ratio_tokens = common::split (aspect_ratio_string, ":");
+        
+        if (aspect_ratio_tokens.Size () == 2)
+        {
+          double kx = xtl::io::get<double> (aspect_ratio_tokens [0]),
+                 ky = xtl::io::get<double> (aspect_ratio_tokens [1]);
+                 
+          aspect_ratio = kx / ky;
+        }
+      }
+      
+        //размеры и положение окна
+        
+      bool maximized = get<bool> (node, "Maximize", false),
+           minimized = get<bool> (node, "Minimize", false);
 
+      if (!maximized && !minimized)
+      {
+        size_t width       = get<size_t> (node, "Width"),
+               height      = get<size_t> (node, "Height");
+        bool   client_size = get<bool> (node, "ClientSize", true);
+
+        if (client_size)
+          window.SetClientSize (width, height);
+        else
+          window.SetSize (width, height);        
+        
+        syslib::Point position = window.Position ();
+
+        position.x = get<size_t> (node, "XPosition", position.x);
+        position.y = get<size_t> (node, "YPosition", position.y);
+
+        window.SetPosition (position);
+        
+        bool is_window_visible = get<bool> (node, "Visible", window.IsVisible ());
+
+        window.SetVisible (is_window_visible);
+        window.SetActive  (is_window_visible);
+      }
+      else if (maximized && minimized)
+      {
+        throw xtl::format_operation_exception ("engine::Window::Window", "Window can't be maximized and minimized at one time");
+      }
+      else if (maximized)
+      {
+        if (parent_window)
+        {
+          if (aspect_ratio != 0.0)
+            parent_auto_size = true;
+          
+          connect_tracker (parent_window->RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Window::OnParentSize, this, _1)));
+          
+          OnParentSize (*parent_window);
+          
+          window.Show ();
+        }
+        else
+        {
+          window.Maximize ();          
+        }
+        
+        window.SetActive (true);        
+      }
+      else if (minimized)
+      {
+        window.Minimize ();
+        window.SetActive (false);
+      }
+      
+        //видимость курсора
+      
+      bool is_cursor_visible = get<bool> (node, "CursorVisible", window.IsCursorVisible ());
+
+      window.SetCursorVisible (is_cursor_visible);
+      
         //установка протокола
 
       const char* log_name = get<const char*> (node, "Log", "");
@@ -328,7 +416,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 
         //подписка на события окна
 
-      on_mouse_move_connection = window.RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Window::OnMouseMove, this, _1, _3));
+      connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Window::OnMouseMove, this, _1, _3)));
 
         //регистрация окна
 
@@ -349,6 +437,10 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       {
         AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<syslib::Window>*> (this));
         AttachmentRegistry::Detach (static_cast<IAttachmentRegistryListener<input::Cursor>*> (this));
+        
+        if (!attachment_name.empty ())
+          AttachmentRegistry::Unregister (attachment_name.c_str (), window);
+
         throw;
       }
     }
@@ -377,7 +469,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
 ///Обработчик события регистрации окна
     void OnRegisterAttachment (const char* attachment_name, syslib::Window& in_window)
     {
-      if (parent_window_name.empty () || attachment_name != parent_window_name)
+      if (parent_window_name.empty () || attachment_name != parent_window_name || in_window.Handle () == window.ParentHandle ())
         return;
 
       window.SetParentHandle (in_window.Handle ());
@@ -473,6 +565,45 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
     {
       SetCursorPosition (context.cursor_position, window.ClientRect ());
     }
+    
+    void OnParentSize (syslib::Window& parent_window)
+    {
+      if (!parent_auto_size)
+        return;
+        
+      size_t parent_width  = parent_window.ClientWidth (),
+             parent_height = parent_window.ClientHeight ();             
+                   
+      double parent_aspect_ratio = double (parent_width) / double (parent_height);
+      
+      size_t window_width = 0, window_height = 0;
+      
+      if (parent_aspect_ratio / aspect_ratio < 1.0)
+      {
+          //полосы по вертикали
+          
+        window_width  = parent_width;
+        window_height = size_t (window_width / aspect_ratio);
+
+        window.SetSize (window_width, window_height);       
+      }
+      else
+      {
+          //полосы по горизонтали
+          
+        window_height = parent_height;
+        window_width  = size_t (window_height * aspect_ratio);
+               
+        window.SetSize (window_width, window_height);
+      }
+      
+      size_t center_x = (parent_width - window_width) / 2,
+             center_y = (parent_height - window_height) / 2;
+
+      window.SetPosition (center_x, center_y);
+      
+//      parent_window.Invalidate ();
+    }
 
   private:
     Log                     log;
@@ -483,7 +614,8 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
     stl::string             parent_window_name;
     stl::string             cursor_attachment_name;
     math::vec2f             cached_cursor_position;
-    xtl::auto_connection    on_mouse_move_connection;
+    bool                    parent_auto_size;
+    double                  aspect_ratio;
 };
 
 Window* create_window (ParseNode& node, WindowManagerSubsystem& manager)

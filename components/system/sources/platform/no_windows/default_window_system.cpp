@@ -185,3 +185,31 @@ void Platform::SetCursor (window_t, cursor_t)
 {
   raise ("syslib::DefaultPlatform::SetCursor");
 }
+
+/*
+    Цвет фона
+*/
+
+void Platform::SetBackgroundColor (window_t window, const Color& color)
+{
+  raise ("syslib::SetBackgroundColor");
+}
+
+void Platform::SetBackgroundState (window_t window, bool state)
+{
+  raise ("syslib::SetBackgroundState");
+}
+
+Color Platform::GetBackgroundColor (window_t window)
+{
+  raise ("syslib::GetBackgroundColor");
+
+  return Color (0, 0, 0);
+}
+
+bool Platform::GetBackgroundState (window_t window)
+{
+  raise ("syslib::GetBackgroundState");
+  
+  return false;
+}
