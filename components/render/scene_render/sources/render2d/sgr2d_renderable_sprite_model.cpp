@@ -21,7 +21,7 @@ struct RenderableSpriteModel::Impl: public xtl::trackable
   float                       current_alpha_reference;         //текущее значение параметра альфа-отсечения
   math::vec2f                 current_texture_scroll;          //текущее смещение текстуры
   bool                        current_scissor_state;           //состояние области отсечения
-  render::mid_level::Viewport current_scissor_rect;            //размеры области отсечения  
+  math::vec4f                 current_scissor_rect;            //размеры области отсечения  
   float                       current_video_position;          //смещение по времени проигрывания видео
   size_t                      texture_scroll_property_index;   //текущее значение индекса свойства смещения текстурных координат
   size_t                      scissor_rect_property_index;     //текущее значение индекса свойства области отсечения
@@ -92,7 +92,6 @@ void RenderableSpriteModel::Update ()
       
     bool need_update_scissor = false;
     bool scissor_state       = impl->current_scissor_state;
-    render::mid_level::Viewport scissor_rect = {0, 0, 0, 0};
       
     if (!model->Properties () && impl->properties_hash)
     {
@@ -176,16 +175,9 @@ void RenderableSpriteModel::Update ()
 
       if (impl->scissor_rect_property_index != size_t (-1))
       {
-        math::vec4f rect;
-        
         try
         {
-          properties.GetProperty (impl->scissor_rect_property_index, rect);
-          
-          scissor_rect.x      = (int)rect [0];
-          scissor_rect.y      = (int)rect [1];
-          scissor_rect.width  = (size_t)rect [2];
-          scissor_rect.height = (size_t)rect [3];
+          properties.GetProperty (impl->scissor_rect_property_index, impl->current_scissor_rect);
 
           if (impl->scissor_state_property_index == size_t (-1))
             scissor_state = true;
@@ -327,14 +319,7 @@ void RenderableSpriteModel::Update ()
         impl->primitive->SetScissorState (scissor_state);
       }
       
-      if (impl->current_scissor_rect.x != scissor_rect.x || impl->current_scissor_rect.y != scissor_rect.y ||
-        impl->current_scissor_rect.width != scissor_rect.width || impl->current_scissor_rect.height != scissor_rect.height)
-      {
-        impl->primitive->SetScissor (scissor_rect);
-      }
-      
       impl->current_scissor_state = scissor_state;
-      impl->current_scissor_rect  = scissor_rect;
     }
     
       //обновление матрицы трансформаций
@@ -413,6 +398,22 @@ void RenderableSpriteModel::DrawCore (IFrame& frame)
 {
   if (impl->model->Properties () && impl->properties_hash != impl->model->Properties ()->Hash ())
     Update ();
+    
+  if (impl->current_scissor_state)
+  {
+    render::mid_level::Viewport viewport = {0, 0, 0, 0};
+    
+    frame.GetViewport (viewport);
+    
+    render::mid_level::Viewport scissor_rect = {0, 0, 0, 0};    
+    
+    scissor_rect.x      = (int)(viewport.x + viewport.width * impl->current_scissor_rect [0]);
+    scissor_rect.y      = (int)(viewport.y + viewport.height * impl->current_scissor_rect [1]);
+    scissor_rect.width  = (size_t)(viewport.width * impl->current_scissor_rect [2]);
+    scissor_rect.height = (size_t)(viewport.height * impl->current_scissor_rect [3]);
+    
+    impl->primitive->SetScissor (scissor_rect);
+  }
 
   if (impl->primitive->GetSpritesCount ())
   {
