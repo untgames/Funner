@@ -585,6 +585,9 @@ void get_average_color (rgba_t* (&source_pixels) [source_count], rgba_t& result)
 //исправление ошибки с цветом пикселей с нулевой альфой
 void fix_zero_alpha_color (size_t width, size_t height, rgba_t* bitmap, unsigned char fix_alpha_value, size_t passes_count)
 {
+  if (!width || !height)
+    return;
+
     //первый проход - зануление цвета под полностью прозрачными пикселями (alpha = 0)
 
   for (size_t i=0; i<height; i++)
