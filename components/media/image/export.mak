@@ -22,6 +22,11 @@ export.link.media.image.pvr.LIBS          := funner.media.image.pvr_loader
 export.link.media.image.pvr.LINK_INCLUDES := PvrLoader
 export.link.media.image.pvr.IMPORTS       := link.media.image
 
+# DDS loader exports
+export.link.media.image.dds.LIBS          := funner.media.image.dds_loader
+export.link.media.image.dds.LINK_INCLUDES := DdsLoader
+export.link.media.image.dds.IMPORTS       := link.media.image
+
 # ANI cursors exports
 export.link.media.image.ani_cursor_loader.LIBS          := funner.media.image.ani_cursors
 export.link.media.image.ani_cursor_loader.LINK_INCLUDES := AniCursorLoader
