@@ -510,10 +510,10 @@ class DdsCompressedImage: public ICustomCompressedImage
 
       result.reserve (4);
 
-      result.push_back ((char)((code >> 24) & 0xFF));
-      result.push_back ((char)((code >> 16) & 0xFF));
-      result.push_back ((char)((code >> 8) & 0xFF));
       result.push_back ((char)(code & 0xFF));
+      result.push_back ((char)((code >> 8) & 0xFF));
+      result.push_back ((char)((code >> 16) & 0xFF));
+      result.push_back ((char)((code >> 24) & 0xFF));
 
       return result;
     }
