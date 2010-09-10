@@ -283,8 +283,8 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         manager (in_manager),
         window (get_window_style (node)),
         cursor (0),
-        aspect_ratio (0),
-        parent_auto_size (false)
+        parent_auto_size (false),
+        aspect_ratio (0)
     {
         //создание окна
 
