@@ -42,12 +42,15 @@ struct WindowImpl
   UniChar                        char_code_buffer[CHAR_CODE_BUFFER_SIZE]; //буффер для получения имени введенного символа
   bool                           is_cursor_in_window;                     //находится ли курсор в окне
   NSCursor                       *cursor;                                 //курсор отображаемый над окном
+  bool                           background_state;                        //включен ли задний фон
+  Color                          background_color;                        //цвет заднего фона
 
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data), message_handler (handler), carbon_window_event_handler (0),
       carbon_window_event_handler_proc (0), carbon_application_event_handler (0),
       carbon_application_event_handler_proc (0), carbon_window (0), is_cursor_in_window (false),
-      cursor ([[NSCursor arrowCursor] retain])
+      cursor ([[NSCursor arrowCursor] retain]),
+      background_state (false)
     {}
 
   ~WindowImpl ()
@@ -950,6 +953,13 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
       case WindowFlag_Focus: //фокус ввода
         check_window_manager_error (SetUserFocusWindow (state ? wnd : kUserFocusAuto), "::SetUserFocusWindow", "Can't set focus window");
         break;
+      case WindowFlag_Maximized:
+        ShowWindow (wnd);
+        ZoomWindow (wnd, inZoomOut, true);
+        break;
+      case WindowFlag_Minimized:
+        check_window_manager_error (CollapseWindow (wnd, state), "::CollapseWindow", "Can't minimize window");
+        break;
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
         break;
@@ -976,6 +986,10 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
         return IsWindowActive (wnd);
       case WindowFlag_Focus:
         return GetUserFocusWindow () == wnd;
+      case WindowFlag_Maximized:
+        throw xtl::format_operation_exception ("", "Can't get window flag %d value", flag);
+      case WindowFlag_Minimized:
+        return IsWindowCollapsed (wnd);
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
         break;
@@ -1244,6 +1258,116 @@ void Platform::SetCursor (window_t handle, cursor_t cursor)
   catch (xtl::exception& exception)
   {
     exception.touch ("syslib::CarbonPlatform::SetCursor");
+    throw;
+  }
+}
+
+/*
+   Цвет фона
+*/
+
+void Platform::SetBackgroundColor (window_t window, const Color& color)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    WindowImpl *impl;
+
+    check_window_manager_error (GetWindowProperty ((WindowRef)window, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+                                sizeof (impl), 0, &impl), "::GetWindowProperty", "Can't get window property");
+
+    RGBColor rgb_color;
+
+    rgb_color.red   = color.red / 255.f * 0xffff;
+    rgb_color.green = color.green / 255.f * 0xffff;
+    rgb_color.blue  = color.blue / 255.f * 0xffff;
+
+    check_window_manager_error (SetWindowContentColor ((WindowRef)window, &rgb_color), "::SetWindowContentColor", "Can't set window content color");
+
+    impl->background_color = color;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::CarbonPlatform::SetBackgroundColor");
+    throw;
+  }
+}
+
+void Platform::SetBackgroundState (window_t window, bool state)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    WindowImpl *impl;
+
+    check_window_manager_error (GetWindowProperty ((WindowRef)window, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+                                sizeof (impl), 0, &impl), "::GetWindowProperty", "Can't get window property");
+
+    if (impl->background_state == state)
+      return;
+
+    impl->background_state = state;
+
+    Color default_color;
+
+    memset (&default_color, 0, sizeof (default_color));
+
+    SetBackgroundColor (window, state ? impl->background_color : default_color);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::CarbonPlatform::SetBackgroundState");
+    throw;
+  }
+}
+
+Color Platform::GetBackgroundColor (window_t window)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    RGBColor rgb_color;
+
+    check_window_manager_error (GetWindowContentColor ((WindowRef)window, &rgb_color), "::GetWindowContentColor", "Can't set window content color");
+
+    Color return_value;
+
+    return_value.red   = rgb_color.red;
+    return_value.green = rgb_color.green;
+    return_value.blue  = rgb_color.blue;
+
+    return return_value;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::CarbonPlatform::SetBackgroundColor");
+    throw;
+  }
+}
+
+bool Platform::GetBackgroundState (window_t window)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    WindowImpl *impl;
+
+    check_window_manager_error (GetWindowProperty ((WindowRef)window, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+                                sizeof (impl), 0, &impl), "::GetWindowProperty", "Can't get window property");
+
+    return impl->background_state;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::CarbonPlatform::GetBackgroundState");
     throw;
   }
 }

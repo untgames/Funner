@@ -19,7 +19,7 @@ int main ()
     window.SetBackgroundColor (Color (255, 0, 0));
     
     window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
-    
+
     window.Maximize ();
 
     Application::Run ();
