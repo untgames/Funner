@@ -44,13 +44,20 @@ struct WindowImpl
   NSCursor                       *cursor;                                 //курсор отображаемый над окном
   bool                           background_state;                        //включен ли задний фон
   Color                          background_color;                        //цвет заднего фона
+  WindowGroupRef                 window_group;
 
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
-    : user_data (in_user_data), message_handler (handler), carbon_window_event_handler (0),
-      carbon_window_event_handler_proc (0), carbon_application_event_handler (0),
-      carbon_application_event_handler_proc (0), carbon_window (0), is_cursor_in_window (false),
-      cursor ([[NSCursor arrowCursor] retain]),
-      background_state (false)
+    : user_data (in_user_data)
+    , message_handler (handler)
+    , carbon_window_event_handler (0)
+    , carbon_window_event_handler_proc (0)
+    , carbon_application_event_handler (0)
+    , carbon_application_event_handler_proc (0)
+    , carbon_window (0)
+    , is_cursor_in_window (false)
+    , cursor ([[NSCursor arrowCursor] retain])
+    , background_state (false)
+    , window_group (0)
     {}
 
   ~WindowImpl ()
@@ -69,6 +76,9 @@ struct WindowImpl
 
     if (carbon_window)
       DisposeWindow (carbon_window);
+
+    if (window_group)
+      ReleaseWindowGroup (window_group);
 
     [cursor release];
   }
@@ -670,8 +680,6 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
 
       RepositionWindow (new_window, 0, kWindowCenterOnMainScreen);
 
-//      SetParentWindow ((window_t)new_window, parent);
-
         //Установка обработчика событий окна
 
       EventHandlerRef window_event_handler;
@@ -749,6 +757,13 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       SetMouseCoalescingEnabled (false, 0);
 
       transform_process_type ();
+
+      check_window_manager_error (CreateWindowGroup (kWindowGroupAttrMoveTogether | kWindowGroupAttrLayerTogether | kWindowGroupAttrSharedActivation | kWindowGroupAttrHideOnCollapse,
+                                  &window_impl->window_group), "::CreateWindowGroup", "Can't create window group");
+
+      check_window_manager_error (SetWindowGroup (new_window, window_impl->window_group), "::SetWindowGroup", "Can't set window group");
+
+      SetParentWindow ((window_t)new_window, parent);
 
       return (window_t)new_window;
     }
@@ -1008,7 +1023,35 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
 
 void Platform::SetParentWindow (window_t child, window_t parent)
 {
-  throw xtl::make_not_implemented_exception ("syslib::CarbonPlatform::SetParentWindow");
+  try
+  {
+    if (!child)
+      throw xtl::make_null_argument_exception ("", "child");
+
+    if (!parent)
+    {
+      WindowImpl *child_impl;
+
+      check_window_manager_error (GetWindowProperty ((WindowRef)child, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+                                  sizeof (child_impl), 0, &child_impl), "::GetWindowProperty", "Can't get window property");
+
+      check_window_manager_error (SetWindowGroup ((WindowRef)child, child_impl->window_group), "::SetWindowGroup", "Can't set window group");
+    }
+    else
+    {
+      WindowImpl *parent_impl;
+
+      check_window_manager_error (GetWindowProperty ((WindowRef)parent, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+          sizeof (parent_impl), 0, &parent_impl), "::GetWindowProperty", "Can't get window property");
+
+      check_window_manager_error (SetWindowGroup ((WindowRef)child, parent_impl->window_group), "::SetWindowGroup", "Can't set window group");
+    }
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::CarbonPlatform::SetParentWindow");
+    throw;
+  }
 }
 
 Platform::window_t Platform::GetParentWindow (window_t child)
