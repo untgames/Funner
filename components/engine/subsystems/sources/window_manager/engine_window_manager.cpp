@@ -600,7 +600,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       size_t center_x = (parent_width - window_width) / 2,
              center_y = (parent_height - window_height) / 2;
 
-      window.SetPosition (center_x, center_y);
+      window.SetPosition (center_x, center_y);      
       
 //      parent_window.Invalidate ();
     }

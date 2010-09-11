@@ -292,7 +292,12 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
 
   if (!owner_file_system || !owner_file_system->GetFileInfo (mount_path.c_str (),file_info))
   {
-    log_handler (format ("Search path '%s' doesn't exist",path.c_str ()).c_str ());
+    path = FileSystem::GetNormalizedFileName (_path);
+    
+    log_handler (format ("Search path '%s' doesn't exist (try to create)",path.c_str ()).c_str ());
+    
+    AddPackFile (path.c_str (),0,log_handler);
+    
     return;
   }
 

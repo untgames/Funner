@@ -305,6 +305,8 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         xtl::uninitialized_storage<char> buffer (DOWNLOAD_BUFFER_SIZE);
         
         TempFile file ("/system/inetcache/funner_url_file%06u");
+        
+        Log ("network.url_file_system").Printf ("Attempt to download URL '%s' to file '%s'", connection.Url ().ToString (), file.Path ());
 
         size_t size;
         

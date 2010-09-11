@@ -216,7 +216,10 @@ class CurlStream: public IUrlStream
           common::StringArray tokens = common::parse (str.c_str (), "Content-Type: *([^;]*); *charset=(.*)");
           
           if (tokens.Size () != 3)
-            throw xtl::format_operation_exception ("", "Bad content-type for URL='%s'", url.c_str ());
+          {
+            log.Printf ("Bad content-type for URL='%s' (header='%s')", url.c_str (), str.c_str ());
+            return size;
+          }
             
           content_encoding = tokens [2];
           content_type     = tokens [1];
@@ -226,7 +229,10 @@ class CurlStream: public IUrlStream
           common::StringArray tokens = common::parse (str.c_str (), "Content-Length: *(.*)");
           
           if (tokens.Size () != 2)
-            throw xtl::format_operation_exception ("", "Bad content-length for URL='%s'", url.c_str ());
+          {
+            log.Printf ("Bad content-length for URL='%s' (header='%s')", url.c_str (), str.c_str ());
+            return size;
+          }
             
           content_length = atoi (tokens [1]);
         }
@@ -366,7 +372,7 @@ class CurlStream: public IUrlStream
 //            log.Printf ("Receive header '%s' (URL='%s')", GetDebugMessage (data, size).c_str (), url.c_str ());
             break;
           case CURLINFO_DATA_IN:
-//            log.Printf ("Receive data (URL='%s')", url.c_str ());
+            log.Printf ("Receive data (URL='%s')", url.c_str ());
             break;
           case CURLINFO_SSL_DATA_IN:
 //            log.Printf ("Receive SSL data (URL='%s')", url.c_str ());
