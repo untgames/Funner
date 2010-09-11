@@ -16,8 +16,9 @@ class Image;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum AtlasBuilderInsertMode
 {
-  AtlasBuilderInsertMode_Copy,    //копирование изображения при вставке
-  AtlasBuilderInsertMode_Capture, //захват изображения при вставке
+  AtlasBuilderInsertMode_Copy,      //копирование изображения при вставке
+  AtlasBuilderInsertMode_Capture,   //захват изображения при вставке
+  AtlasBuilderInsertMode_Reference, //хранение ссылки на изображение при вставке
   
   AtlasBuilderInsertMode_Default = AtlasBuilderInsertMode_Copy,
   
@@ -29,10 +30,11 @@ enum AtlasBuilderInsertMode
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum AtlasPackFlag
 {
-  AtlasPackFlag_PowerOfTwoEdges = 1, //стороны степени двойки
-  AtlasPackFlag_InvertTilesX    = 2, //инвертировать расположение тайлов по оси X
-  AtlasPackFlag_InvertTilesY    = 4, //инвертировать расположение тайлов по оси Y
-  AtlasPackFlag_SwapAxises      = 8, //изменить расположение осей при размещении тайлов
+  AtlasPackFlag_PowerOfTwoEdges = 1,  //стороны степени двойки
+  AtlasPackFlag_InvertTilesX    = 2,  //инвертировать расположение тайлов по оси X
+  AtlasPackFlag_InvertTilesY    = 4,  //инвертировать расположение тайлов по оси Y
+  AtlasPackFlag_SwapAxises      = 8,  //изменить расположение осей при размещении тайлов
+  AtlasPackFlag_SquareAxises    = 16, //равные размер осей
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +43,7 @@ enum AtlasPackFlag
 class AtlasBuilder
 {
   public:
-    typedef xtl::function<void (size_t images_count, const math::vec2ui* in_sizes, math::vec2ui* out_origins, size_t pack_flags)> PackHandler;
+    typedef xtl::function<void (size_t images_count, const math::vec2ui* in_sizes, math::vec2ui* out_origins, size_t margin, size_t pack_flags)> PackHandler;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
@@ -68,9 +70,10 @@ class AtlasBuilder
     void Reset ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Построение карты
+///Построение карты/получение размеров результирующей картинки без формирования
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Build (media::Atlas& out_atlas, media::Image& out_atlas_image, size_t pack_flags);
+    void Build           (media::Atlas& out_atlas, media::Image& out_atlas_image, size_t margin, size_t pack_flags);
+    void GetBuildResults (size_t& image_width, size_t& image_height, size_t margin, size_t pack_flags);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

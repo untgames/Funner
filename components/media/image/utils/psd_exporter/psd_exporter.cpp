@@ -20,6 +20,7 @@
 */
 
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
+const size_t DEFAULT_BLUR_PASSES_COUNT  = 4;
 
 /*
     Утилиты
@@ -60,21 +61,26 @@ struct Option
 //параметры запуска
 struct Params
 {
-  const Option* options;                 //массив опций
-  size_t        options_count;           //количество опций
-  stl::string   source_file_name;        //имя исходного файла
-  stl::string   layout_file_name;        //имя файла разметки
-  stl::string   layers_dir_name;         //имя каталога с сохранёнными слоями
-  stl::string   layout_layers_dir_name;  //имя каталога с сохранёнными слоями, используемое в файле разметки
-  stl::string   layers_format;           //строка форматирования имён слоёв
-  stl::string   crop_exclude;            //необрезаемые слои
-  size_t        crop_alpha;              //коэффициент обрезания по прозрачности
-  bool          silent;                  //минимальное число сообщений
-  bool          print_help;              //нужно ли печатать сообщение помощи
-  bool          need_layout;             //нужно генерировать файл разметки
-  bool          need_layers;             //нужно сохранять слои
-  bool          need_pot_extent;         //нужно ли расширять изображения до ближайшей степени двойки
-  bool          need_crop_alpha;         //нужно ли обрезать картинку по нулевой прозрачности
+  const Option* options;                   //массив опций
+  size_t        options_count;             //количество опций
+  stl::string   source_file_name;          //имя исходного файла
+  stl::string   layout_file_name;          //имя файла разметки
+  stl::string   layers_dir_name;           //имя каталога с сохранёнными слоями
+  stl::string   layout_layers_dir_name;    //имя каталога с сохранёнными слоями, используемое в файле разметки
+  stl::string   layers_format;             //строка форматирования имён слоёв
+  stl::string   crop_exclude;              //необрезаемые слои
+  size_t        crop_alpha;                //коэффициент обрезания по прозрачности
+  size_t        zero_alpha_fix_value;      //коэффициент определения необходимости исправления цвета прозрачного пикселя
+  size_t        blur_passes_count;         //количество проходов, используемое при блюре
+  size_t        max_image_size;            //максимальный размер выходного изображения
+  bool          silent;                    //минимальное число сообщений
+  bool          print_help;                //нужно ли печатать сообщение помощи
+  bool          need_layout;               //нужно генерировать файл разметки
+  bool          need_layers;               //нужно сохранять слои
+  bool          need_pot_extent;           //нужно ли расширять изображения до ближайшей степени двойки
+  bool          need_crop_alpha;           //нужно ли обрезать картинку по нулевой прозрачности
+  bool          need_trim_name_spaces;     //нужно ли отсекать пробелы в именах
+  bool          need_fix_zero_alpha_color; //нужно исправлять ошибку с цветом нулевой альфы
 };
 
 //форматы пикселя
@@ -191,6 +197,31 @@ void command_line_crop_exclude (const char* string, Params& params)
   params.crop_exclude = string;
 }
 
+//установка максимального размера выходного изображения
+void command_line_max_image_size (const char* value_string, Params& params)
+{
+  params.max_image_size = (size_t)atoi (value_string);
+}
+
+//установка необходимости отсечения пробелов в именах
+void command_line_trim_name_spaces (const char*, Params& params)
+{
+  params.need_trim_name_spaces = true;
+}
+
+//установка необходимости исправление цвета прозрачной альфы
+void command_line_fix_zero_alpha_color (const char* value, Params& params)
+{
+  params.need_fix_zero_alpha_color = true;
+  params.zero_alpha_fix_value      = (size_t)atoi (value);
+}
+
+//установка количества проходо блюра
+void command_line_blur_passes_count (const char* value, Params& params)
+{
+  params.blur_passes_count = (size_t)atoi (value);
+}
+
 //разбор командной строки
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
@@ -206,6 +237,10 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_pot,                      "pot",               0,           0, "extent layers image size to nearest greater power of two"},
     {command_line_crop_alpha,               "crop-alpha",        0,     "value", "crop layers by alpha that less than value"},
     {command_line_crop_exclude,             "crop-exclude",      0, "wildcards", "exclude selected layers from crop"},
+    {command_line_fix_zero_alpha_color,     "fix-zero-alpha",    0,     "value", "fixup color of pixels with alpha <= value"},
+    {command_line_blur_passes_count,        "blur-passes-count", 0,     "value", "number of blur passes (used in zero alpha fixup)"},
+    {command_line_max_image_size,           "max-image-size",    0,     "value", "max output image size (image with greater size will be rescaled)"},
+    {command_line_trim_name_spaces,         "trim-names",        0,           0, "trim spaces in all layers names"},    
   };
   
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -229,7 +264,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {
       if (!params.source_file_name.empty ())
       {
-        error ("source file msut be on");
+        error ("source file must be on");
         return;
       }
     
@@ -523,6 +558,264 @@ void crop_by_alpha (size_t width, size_t height, const psd_argb_color* image, si
   }  
 }
 
+//усреднение цвета
+template <size_t source_count>
+void get_average_color (rgba_t* (&source_pixels) [source_count], rgba_t& result)
+{
+  size_t avg_red = 0, avg_green = 0, avg_blue = 0;
+                            
+  for (size_t k=0; k<source_count; k++)
+  {
+    const rgba_t& src_pixel = *source_pixels [k];
+    
+    avg_red   += src_pixel.red;
+    avg_green += src_pixel.green;
+    avg_blue  += src_pixel.blue;
+  }
+
+  avg_red   /= source_count;
+  avg_green /= source_count;
+  avg_blue  /= source_count;
+  
+  result.red   = static_cast<unsigned char> (avg_red);
+  result.green = static_cast<unsigned char> (avg_green);
+  result.blue  = static_cast<unsigned char> (avg_blue);
+}
+
+//исправление ошибки с цветом пикселей с нулевой альфой
+void fix_zero_alpha_color (size_t width, size_t height, rgba_t* bitmap, unsigned char fix_alpha_value, size_t passes_count)
+{
+  if (!width || !height)
+    return;
+
+    //первый проход - зануление цвета под полностью прозрачными пикселями (alpha = 0)
+
+  for (size_t i=0; i<height; i++)
+  {
+    rgba_t* pixel = bitmap + width * i;
+
+    for (size_t j=0; j<width; j++, pixel++)
+    {
+      if (pixel->alpha <= fix_alpha_value)
+      {
+        pixel->red   = 0;
+        pixel->green = 0;
+        pixel->blue  = 0;
+      }
+    }         
+  }
+  
+    //блюр картинки
+    
+  media::Image tmp_image (width, height, 1, media::PixelFormat_RGBA8);  
+  
+  rgba_t* tmp_bitmap = reinterpret_cast<rgba_t*> (tmp_image.Bitmap (0));
+  
+  memcpy (tmp_bitmap, bitmap, width * height * sizeof (rgba_t));
+  
+  for (size_t pass=0; pass<passes_count; pass++)
+  {
+      //усреднение верхней линии
+    
+    if (height > 1)
+    {
+      rgba_t* pixel = tmp_bitmap;
+      
+      if (width > 1)
+      {
+        rgba_t* avg_pixels [4] = {pixel, pixel + 1, pixel + width, pixel + width + 1};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+      else
+      {
+        rgba_t* avg_pixels [2] = {pixel, pixel + width};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+
+      ++pixel;
+      
+      for (size_t j=1; j<width-1; j++, pixel++)
+      {
+        rgba_t* avg_pixels [6] = {pixel - 1, pixel, pixel + 1, pixel + width - 1, pixel + width, pixel + width + 1};
+                                  
+        get_average_color (avg_pixels, *pixel);
+      }
+      
+      if (width > 1)
+      {
+        rgba_t* avg_pixels [4] = {pixel + width, pixel + width - 1, pixel, pixel - 1};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+      else
+      {
+        rgba_t* avg_pixels [2] = {pixel + width, pixel};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+    }    
+    else
+    {
+      rgba_t* pixel = tmp_bitmap;
+      
+      if (width > 1)
+      {
+        rgba_t* avg_pixels [2] = {pixel, pixel + 1};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+
+      ++pixel;
+      
+      for (size_t j=1; j<width-1; j++, pixel++)
+      {
+        rgba_t* avg_pixels [3] = {pixel - 1, pixel, pixel + 1};
+                                  
+        get_average_color (avg_pixels, *pixel);
+      }
+      
+      if (width > 1)
+      {
+        rgba_t* avg_pixels [2] = {pixel, pixel - 1};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+    }
+    
+      //усреднение центра
+    
+    for (size_t i=1; i<height-1; i++)    
+    {
+      rgba_t* pixel = tmp_bitmap + width * i;
+      
+      if (width > 1)
+      {
+        rgba_t* avg_pixels [6] = {pixel - width, pixel - width + 1, pixel, pixel + 1, pixel + width, pixel + width + 1};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+      else
+      {
+        rgba_t* avg_pixels [3] = {pixel - width, pixel, pixel + width};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+
+      ++pixel;
+      
+      for (size_t j=1; j<width-1; j++, pixel++)
+      {
+        rgba_t* avg_pixels [9] = {pixel - width - 1, pixel - width, pixel - width + 1, pixel - 1, pixel, pixel + 1,
+                                  pixel + width - 1, pixel + width, pixel + width + 1};
+                                  
+        get_average_color (avg_pixels, *pixel);
+      }
+      
+      if (width > 1)
+      {
+        rgba_t* avg_pixels [6] = {pixel - width, pixel - width - 1, pixel, pixel - 1, pixel + width, pixel + width - 1};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+      else
+      {
+        rgba_t* avg_pixels [3] = {pixel - width, pixel, pixel + width};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+    }
+    
+      //усреднение нижней линии
+    
+    if (height > 1)
+    {
+      rgba_t* pixel = tmp_bitmap + (height-1) * width;
+      
+      if (width > 1)
+      {
+        rgba_t* avg_pixels [4] = {pixel, pixel + 1, pixel - width, pixel - width + 1};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+      else
+      {
+        rgba_t* avg_pixels [2] = {pixel, pixel - width};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+
+      ++pixel;
+      
+      for (size_t j=1; j<width-1; j++, pixel++)
+      {
+        rgba_t* avg_pixels [6] = {pixel - 1, pixel, pixel + 1, pixel - width - 1, pixel - width, pixel - width + 1};
+                                  
+        get_average_color (avg_pixels, *pixel);
+      }
+      
+      if (width > 1)
+      {
+        rgba_t* avg_pixels [4] = {pixel - width, pixel - width - 1, pixel, pixel - 1};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+      else
+      {
+        rgba_t* avg_pixels [2] = {pixel - width, pixel};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+    }    
+    else
+    {
+      rgba_t* pixel = tmp_bitmap;
+      
+      if (width > 1)
+      {
+        rgba_t* avg_pixels [2] = {pixel, pixel + 1};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+
+      ++pixel;
+      
+      for (size_t j=1; j<width-1; j++, pixel++)
+      {
+        rgba_t* avg_pixels [3] = {pixel - 1, pixel, pixel + 1};
+                                  
+        get_average_color (avg_pixels, *pixel);
+      }
+      
+      if (width > 1)
+      {
+        rgba_t* avg_pixels [2] = {pixel, pixel - 1};
+        
+        get_average_color (avg_pixels, *pixel);
+      }
+    }    
+  }
+  
+    //формирование окончательного изображения
+    
+  for (size_t i=0; i<height; i++)
+  {
+    rgba_t* pixel        = bitmap + width * i;
+    rgba_t* blured_pixel = tmp_bitmap + width * i;
+
+    for (size_t j=0; j<width; j++, pixel++, blured_pixel++)
+    {
+      if (pixel->alpha <= fix_alpha_value)
+      {
+        pixel->red   = blured_pixel->red;
+        pixel->green = blured_pixel->green;
+        pixel->blue  = blured_pixel->blue;
+      }
+    }         
+  }  
+}
+
 //получение ближайшей сверху степени двойки
 size_t get_next_higher_power_of_two (size_t k) 
 {
@@ -564,7 +857,7 @@ void export_data (Params& params)
   for (int i=0; i<context->layer_count; i++)
   {
     psd_layer_record& layer = context->layer_records [i];
-    stl::string       name ((char*)layer.layer_name);      
+    stl::string       name = params.need_trim_name_spaces ? common::trim ((char*)layer.layer_name) : stl::string ((char*)layer.layer_name);
 
     if (!strncmp (name.c_str (), "</", 2))
       continue;
@@ -636,7 +929,7 @@ void export_data (Params& params)
     for (int i=0; i<context->layer_count; i++)
     {
       psd_layer_record& layer = context->layer_records [i];
-      stl::string       name ((char*)layer.layer_name);
+      stl::string       name  = params.need_trim_name_spaces ? common::trim ((char*)layer.layer_name) : stl::string ((char*)layer.layer_name);
 
       if (!strncmp (name.c_str (), "</", 2))
         continue;
@@ -690,7 +983,7 @@ void export_data (Params& params)
     for (int i=0; i<context->layer_count; i++)
     {
       psd_layer_record& layer = context->layer_records [i];
-      stl::string       name ((char*)layer.layer_name);      
+      stl::string       name  = params.need_trim_name_spaces ? common::trim ((char*)layer.layer_name) : stl::string ((char*)layer.layer_name);
 
       if (!strncmp (name.c_str (), "</", 2))
         continue;
@@ -725,9 +1018,42 @@ void export_data (Params& params)
         memset (image.Bitmap (), 0, get_bytes_per_pixel (image.Format ()) * image.Width () * image.Height ());                 
 
       convert_image_data (layer.width, layer.height, layer.image_data, cropped_rect, image_width, image_height, image.Bitmap ());
+      
+      if (params.need_fix_zero_alpha_color)
+      {
+        if (!params.silent)
+          printf ("  fix zero alpha pixels for '%s'...\n", dst_image_name.c_str ());
+        
+        fix_zero_alpha_color (image.Width (), image.Height (), reinterpret_cast<rgba_t*> (image.Bitmap ()), params.zero_alpha_fix_value, params.blur_passes_count);
+      }
+      
+      if (params.max_image_size)
+      {
+        if (image.Width () > params.max_image_size || image.Height () > params.max_image_size)
+        {
+          size_t new_image_width, new_image_height;
+          
+          if (image.Width () > image.Height ())
+          {
+            new_image_width  = params.max_image_size;
+            new_image_height = (size_t)(image.Height () * (new_image_width / (float)image.Width ()));
+          }
+          else
+          {
+            new_image_height = params.max_image_size;
+            new_image_width  = (size_t)(image.Width () * (new_image_height / (float)image.Height ()));            
+          }
+          
+          if (!params.silent)
+            printf ("  rescale '%s' from %ux%u to %ux%u...\n", dst_image_name.c_str (), image.Width (), image.Height (),
+              new_image_width, new_image_height);
+              
+          image.Resize (new_image_width, new_image_height, 1);
+        }
+      }
 
       image.Save (dst_image_name.c_str ());
-      
+
       image_index++;
     }
   }
@@ -744,16 +1070,21 @@ int main (int argc, const char* argv [])
 
     Params params;
       
-    params.options         = 0;
-    params.options_count   = 0;
-    params.layers_format   = "image%03u.png";
-    params.crop_alpha      = 0;
-    params.print_help      = false;
-    params.silent          = false;
-    params.need_layout     = true;
-    params.need_layers     = true;    
-    params.need_pot_extent = false;
-    params.need_crop_alpha = false;
+    params.options                   = 0;
+    params.options_count             = 0;
+    params.layers_format             = "image%03u.png";
+    params.crop_alpha                = 0;
+    params.zero_alpha_fix_value      = 0;
+    params.blur_passes_count         = DEFAULT_BLUR_PASSES_COUNT;
+    params.max_image_size            = 0;
+    params.print_help                = false;
+    params.silent                    = false;
+    params.need_layout               = true;
+    params.need_layers               = true;
+    params.need_pot_extent           = false;
+    params.need_crop_alpha           = false;
+    params.need_trim_name_spaces     = false;
+    params.need_fix_zero_alpha_color = false;
 
       //разбор командной строки
 

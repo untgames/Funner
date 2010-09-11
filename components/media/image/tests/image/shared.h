@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cstring>
 #include <exception>
 
 #include <xtl/functional>

@@ -25,12 +25,23 @@ void xatlas_load (const char* file_name, Atlas& atlas)
 
   static const char* METHOD_NAME = "media::xatlas_load";
 
-  for (Parser::NamesakeIterator i = iter->First ("Tile"); i; ++i)
-    if (!test (*i, "Id") || !test (*i, "XPosition") || !test (*i, "YPosition") || !test (*i, "Width") || !test (*i, "Heigth"))
+  for (Parser::NamesakeIterator i = iter->First ("Image"); i; ++i)
+  {
+    if (!test (*i, "Name"))
     {
-      log.Error (*i, "Incorrect file format, one of tag property missing");
+      log.Error (*i, "Incorrect file format, 'Name' property missing");
       break;
     }
+
+    for (Parser::NamesakeIterator j = i->First ("Tile"); j; ++j)
+    {
+      if (!test (*j, "Name") || !test (*j, "Left") || !test (*j, "Bottom") || !test (*j, "Width") || !test (*j, "Height"))
+      {
+        log.Error (*j, "Incorrect file format, one of tag property missing");
+        break;
+      }
+    }
+  }
 
   for (size_t i = 0; i < log.MessagesCount (); i++)
     switch (log.MessageType (i))
@@ -45,28 +56,27 @@ void xatlas_load (const char* file_name, Atlas& atlas)
   if (!iter)
     throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'Atlas' root tag");
     
-  if (!test (*iter, "Image"))
-    throw xtl::format_operation_exception (METHOD_NAME, "Incorrect file format, no 'Image' property");
-    
-  stl::string string_buffer;    
-
-  read (*iter, "Image", string_buffer);
-
-  new_atlas.SetImage (string_buffer.c_str ());
-
-  for (Parser::NamesakeIterator i = iter->First ("Tile"); i; ++i)
+  for (Parser::NamesakeIterator i = iter->First ("Image"); i; ++i)
   {
-    Tile new_tile;
+    const char* image_name   = common::get<const char*> (*i, "Name");
+    size_t      image_width  = common::get<size_t> (*i, "Width", 0u);
+    size_t      image_height = common::get<size_t> (*i, "Height", 0u);
 
-    read (*i, "Id",        string_buffer);
-    read (*i, "XPosition", new_tile.origin.x);
-    read (*i, "YPosition", new_tile.origin.y);
-    read (*i, "Width",     new_tile.size.x);
-    read (*i, "Heigth",    new_tile.size.y);
+    for (Parser::NamesakeIterator j = i->First ("Tile"); j; ++j)
+    {
+      const char* tile_name = common::get<const char*> (*j, "Name");
 
-    new_tile.name = string_buffer.c_str ();
+      math::vec2ui origin, size;
 
-    new_atlas.Insert (new_tile);
+      origin.x = common::get<unsigned int> (*j, "Left");
+      origin.y = common::get<unsigned int> (*j, "Bottom");
+      size.x   = common::get<unsigned int> (*j, "Width");
+      size.y   = common::get<unsigned int> (*j, "Height");
+
+      new_atlas.Insert (tile_name, image_name, origin, size);
+    }
+
+    new_atlas.SetImageSize (image_name, image_width, image_height);
   }
 
   atlas.Swap (new_atlas);

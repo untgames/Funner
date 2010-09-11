@@ -34,7 +34,10 @@ class MultilayerImageImpl: public ImageImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Копирование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ImageImpl* Clone () { return new MultilayerImageImpl (*this); }
+    ImageImpl* Clone ()
+    {
+      return new MultilayerImageImpl (layers.size (), &layers [0], LayersCloneMode_Copy);
+    }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Преобразование формата
@@ -72,9 +75,9 @@ class MultilayerImageImpl: public ImageImpl
     typedef stl::vector<Image> ImageArray;
 
   private:
+    ImageArray  layers;  
     size_t      layers_width, layers_height;
     PixelFormat layers_format;
-    ImageArray  layers;
 };
 
 }
@@ -83,38 +86,50 @@ class MultilayerImageImpl: public ImageImpl
     Конструкторы
 */
 
+
+
 MultilayerImageImpl::MultilayerImageImpl (size_t count, Image* images, LayersCloneMode clone_mode)
 {
-  if (!count)
-    throw xtl::make_null_argument_exception ("media::MultilayerImageImpl::MultilayerImageImpl", "count");
+  try
+  {
+    if (!count)
+      throw xtl::make_null_argument_exception ("", "count");
+      
+    if (!images)
+      throw xtl::make_null_argument_exception ("", "images");
+
+    layers_width  = images [0].Width ();
+    layers_height = images [0].Height ();
+    layers_format = images [0].Format ();    
     
-  if (!images)
-    throw xtl::make_null_argument_exception ("media::MultilayerImageImpl::MultilayerImageImpl", "images");
+    switch (clone_mode)
+    {
+      case LayersCloneMode_Capture:
+        layers.assign (images, images + count);
+        break;
+      case LayersCloneMode_Copy:
+      {
+        layers.reserve (count);
 
-  layers_width  = images [0].Width ();
-  layers_height = images [0].Height ();
-  layers_format = images [0].Format ();
-  
-  switch (clone_mode)
-  {
-    case LayersCloneMode_Copy:
-      layers.assign (images, images + count);
-      break;
-    case LayersCloneMode_Capture:
-      layers.resize (count);  //не эффективно!!
+        for (size_t i=0; i<count; i++)
+          layers.push_back (images [i].Clone ());
 
-      for (size_t i=0; i<count; i++)      
-        images [i].Swap (layers [i]);
-      break;
-    default:
-      throw xtl::make_argument_exception ("media::MultilayerImageImpl::MultilayerImageImpl", "clone_mode", clone_mode);
-      break;
+        break;
+      }
+      default:
+        throw xtl::make_argument_exception ("media::MultilayerImageImpl::MultilayerImageImpl", "clone_mode", clone_mode);
+    }
+
+    for (size_t i=1; i<count; i++)
+    {
+      layers [i].Resize (layers_width, layers_height, layers [i].Depth ());
+      layers [i].Convert (layers_format);
+    }
   }
-
-  for (size_t i=1; i<count; i++)
+  catch (xtl::exception& e)
   {
-    layers [i].Resize (layers_width, layers_height, layers [i].Depth ());
-    layers [i].Convert (layers_format);
+    e.touch ("media::MultilayerImageImpl::MultilayerImageImpl");
+    throw;
   }
 }
 
@@ -187,13 +202,19 @@ void MultilayerImageImpl::Resize (size_t width, size_t height, size_t new_layers
 
 void MultilayerImageImpl::Convert (PixelFormat new_format)
 {
-  ImageArray new_layers = layers;
+  ImageArray new_layers;
 
-  for (ImageArray::iterator i=new_layers.begin (), end=new_layers.end (); i!=end; ++i)
-    i->Convert (new_format);
-    
+  new_layers.reserve (12);
+
+  for (ImageArray::iterator i=layers.begin (), end=layers.end (); i!=end; ++i)
+  {
+    Image new_image (i->Clone (), new_format);
+
+    new_layers.push_back (new_image);
+  }
+
   layers_format = new_format;
-    
+
   layers.swap (new_layers);
 }
 

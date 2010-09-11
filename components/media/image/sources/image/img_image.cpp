@@ -8,69 +8,130 @@ using namespace media;
     Конструкторы / деструктор
 */
 
-Image::Image ()
-  : impl (create_bitmap_image ())
+Image::Image (ImageImpl* in_impl)
+  : impl (in_impl)
 {
+}
+
+Image::Image ()
+{
+  try
+  {
+    impl = create_bitmap_image ();    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::Image::Image()");
+    throw;
+  }
+}
+
+Image::Image (const Image& source)
+  : impl (source.impl)
+{
+  addref (impl);  
 }
 
 Image::Image (const Image& source, PixelFormat format)
-  : impl (source.impl->Clone ())
+  : impl (source.impl)
 {
-  Convert (format);
+  try
+  {    
+    if (format == PixelFormat_Default)
+    {
+      addref (impl);
+      return;
+    }
+    
+    impl = source.impl->Clone ();
+
+    try
+    {
+      Convert (format);      
+    }
+    catch (...)
+    {
+      release (impl);
+      throw;
+    }    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::Image(const Image&,PixelFormat)");
+    throw;
+  }
 }
 
 Image::Image (const char* file_name, PixelFormat format)
-{  
-  if (!file_name)
-    throw xtl::make_null_argument_exception ("media::Image::Image", "file_name");
-
+  : impl (create_null_image ())
+{
   try
   {
-    static ComponentLoader loader ("media.image.*");
+    if (!file_name)
+      throw xtl::make_null_argument_exception ("", "file_name");
+        
+    static ComponentLoader loader ("media.image.loaders.*");
 
     ImageManager::GetLoader (file_name, SerializerFindMode_ByName) (file_name, *this);
     
-    if (!impl.get ())
-      throw xtl::format_operation_exception ("media::Image::Image", "Error at load image '%s' (format=%s)", file_name, get_format_name (format));
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Error at load image '%s' (format=%s)", file_name, get_format_name (format));
 
     Rename  (file_name);
     Convert (format);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("media::Image::Image");
+    release (impl);    
+    exception.touch ("media::Image::Image(const char*,PixelFormat)");
     throw;
   }
 }
 
 Image::Image (size_t layers_count, Image* layers, LayersCloneMode clone_mode)
 {
-  if (!layers_count)
-    throw xtl::make_null_argument_exception ("media::Image::Image", "layers_count");
-    
-  if (!layers)
-    throw xtl::make_null_argument_exception ("media::Image::Image", "layers");
-    
-  switch (clone_mode)
+  try
   {
-    case LayersCloneMode_Copy:
-    case LayersCloneMode_Capture:
-      break;
-    default:
-      throw xtl::make_argument_exception ("media::Image::Image", "clone_mode", clone_mode);
-      break;
-  }
+    if (!layers_count)
+      throw xtl::make_null_argument_exception ("", "layers_count");
+      
+    if (!layers)
+      throw xtl::make_null_argument_exception ("", "layers");
+      
+    switch (clone_mode)
+    {
+      case LayersCloneMode_Copy:
+      case LayersCloneMode_Capture:
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "clone_mode", clone_mode);
+    }
 
-  impl = create_multilayer_image (layers_count, layers, clone_mode);
+    impl = create_multilayer_image (layers_count, layers, clone_mode);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::Image::Image(size_t,Image*,LayersCloneMode)");
+    throw;
+  }
 }
 
 Image::Image (size_t width, size_t height, size_t depth, PixelFormat format, const void* data)
-  : impl (create_bitmap_image (width, height, depth, format, data))
 {
+  try
+  {
+    impl = create_bitmap_image (width, height, depth, format, data);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::Image(size_t,size_t,size_t,PixelFormat,const void*)");
+    throw;
+  }
 }
 
 Image::~Image ()
 {
+  release (impl);
 }
 
 /*
@@ -79,10 +140,26 @@ Image::~Image ()
 
 Image& Image::operator = (const Image& source)
 {
-  if (this != &source)
-    Image (source).Swap (*this);
+  Image (source).Swap (*this);
 
   return *this; 
+}
+
+/*
+    Клонирование
+*/
+
+Image Image::Clone () const
+{
+  try
+  {
+    return Image (impl->Clone ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("media::Image::Clone");
+    throw;
+  }
 }
 
 /*
@@ -199,17 +276,20 @@ void Image::Load (const char* file_name)
   }
 }
 
-void Image::Save (const char* file_name, PixelFormat recommended_format)
+void Image::Save (const char* file_name, PixelFormat recommended_format, const char* format_specific_flags)
 {
   if (!file_name)
     throw xtl::make_null_argument_exception ("media::Image::Save", "file_name");
     
+  if (!format_specific_flags)
+    throw xtl::make_null_argument_exception ("media::Image::Save", "format_specific_flags");
+
   if (recommended_format < 0 || recommended_format >= PixelFormat_Num)
     throw xtl::make_argument_exception ("media::Image::Save", "recommended_format", recommended_format);
 
   if (recommended_format != PixelFormat_Default && recommended_format != Format ())
   {  
-    Image (*this, recommended_format).Save (file_name);
+    Image (*this, recommended_format).Save (file_name, PixelFormat_Default, format_specific_flags);
     return;
   }
 
@@ -217,7 +297,7 @@ void Image::Save (const char* file_name, PixelFormat recommended_format)
   {
     static ComponentLoader loader ("media.image.savers.*");
 
-    ImageManager::GetSaver (file_name, SerializerFindMode_ByName) (file_name, *this);
+    ImageManager::GetSaver (file_name, SerializerFindMode_ByName) (file_name, *this, format_specific_flags);
   }
   catch (xtl::exception& exception)
   {
@@ -228,20 +308,20 @@ void Image::Save (const char* file_name, PixelFormat recommended_format)
 
 void Image::DefaultLoader (const char* file_name, Image& image)
 {
-  image.impl = create_bitmap_image (file_name);
+  image = Image (create_bitmap_image (file_name));
 }
 
 void Image::CubemapLoader (const char* file_name, Image& image)
 {
-  image.impl = create_cubemap_image (file_name);
+  image = Image (create_cubemap_image (file_name));
 }
 
 void Image::SkyBoxLoader (const char* file_name, Image& image)
 {
-  image.impl = create_skybox_image (file_name);
+  image = Image (create_skybox_image (file_name));
 }
 
-void Image::DefaultSaver (const char* file_name, const Image& image)
+void Image::DefaultSaver (const char* file_name, const Image& image, const char*)
 {
   image.impl->Save (file_name);
 }
@@ -252,7 +332,7 @@ void Image::DefaultSaver (const char* file_name, const Image& image)
 
 void Image::Swap (Image& image)
 {
-  swap (impl, image.impl);
+  stl::swap (impl, image.impl);
 }
 
 namespace media
@@ -274,7 +354,8 @@ ImageImpl::ImageImpl ()
 }
 
 ImageImpl::ImageImpl (const ImageImpl& impl)
-  : name (impl.name)
+  : reference_counter (impl)
+  , name (impl.name)
 {
 }
 

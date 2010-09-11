@@ -2,9 +2,12 @@
 #define COMMONLIB_PLATFORM_WIN32_SHARED_HEADER
 
 #include <windows.h>
+#include <shlobj.h>
 
 #include <xtl/common_exceptions.h>
 
+#include <common/component.h>
+#include <common/file.h>
 #include <common/strlib.h>
 
 #include <platform/platform.h>

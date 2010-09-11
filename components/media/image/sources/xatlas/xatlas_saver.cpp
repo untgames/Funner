@@ -31,37 +31,40 @@ class XmlAtlasSaver
     void SaveAtlas ()
     {
       XmlWriter::Scope scope (writer, "Atlas");
-      
-      writer.WriteAttribute ("Image", atlas.Image ());
 
-      SaveTiles ();
+      for (size_t image_index=0, images_count=atlas.ImagesCount (); image_index<images_count; image_index++)
+      {
+        XmlWriter::Scope scope (writer, "Image");
+        
+        const math::vec2ui& size = atlas.ImageSize (image_index);
+
+        writer.WriteAttribute ("Name",   atlas.ImageName (image_index));        
+        writer.WriteAttribute ("Width",  size.x);
+        writer.WriteAttribute ("Height", size.y);
+
+        for (size_t tile_index=0, tiles_count=atlas.ImageTilesCount (image_index); tile_index<tiles_count; tile_index++)
+          SaveTile (atlas.ImageTile (image_index, tile_index));
+      }
     }
 
     /*
         Сохранение тайлов
     */
 
-    void SaveTiles ()
-    {
-      for (size_t i = 0; i < atlas.TilesCount (); i++)
-        SaveTile (i);
-    }
-
-    void SaveTile (size_t index)
+    void SaveTile (const Tile& tile)
     {
       XmlWriter::Scope scope (writer, "Tile");
-      const Tile& tile = atlas.Tile (index);
 
-      writer.WriteAttribute ("Id",        tile.name);
-      writer.WriteAttribute ("XPosition", tile.origin.x);
-      writer.WriteAttribute ("YPosition", tile.origin.y);
-      writer.WriteAttribute ("Width",     tile.size.x);
-      writer.WriteAttribute ("Height",    tile.size.y);
+      writer.WriteAttribute ("Name",   tile.name);
+      writer.WriteAttribute ("Left",   tile.origin.x);
+      writer.WriteAttribute ("Bottom", tile.origin.y);
+      writer.WriteAttribute ("Width",  tile.size.x);
+      writer.WriteAttribute ("Height", tile.size.y);
     }
     
   private:
     XmlWriter    writer;  //сериализатор XML
-    const Atlas& atlas;   //карта картинок    
+    const Atlas& atlas;   //карта картинок
 };
 
 /*

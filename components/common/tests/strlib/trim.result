@@ -1,0 +1,10 @@
+Results of trim_test:
+strip(' hello world',' 	')=' hello world' trim(' hello world',' 	')='hello world'
+strip('hello world ',' 	')='hello world' trim('hello world ',' 	')='hello world'
+strip(' hello world ',' 	')=' hello world' trim(' hello world ',' 	')='hello world'
+strip('	hello world',' 	')='	hello world' trim('	hello world',' 	')='hello world'
+strip('hello world	',' 	')='hello world' trim('hello world	',' 	')='hello world'
+strip('	 hello world 	',' 	')='	 hello world' trim('	 hello world 	',' 	')='hello world'
+strip('','')='' trim('','')=''
+strip(' ','')=' ' trim(' ','')=' '
+strip('','	 ')='' trim('','	 ')=''

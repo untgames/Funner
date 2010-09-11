@@ -35,38 +35,28 @@ template <class Char> class BasicStringArray
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество строк / проверка на пустоту / зарезервированное число строк / размер буфера символов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Size           () const;
-    bool   IsEmpty        () const;
-    size_t Capacity       () const;
-    size_t BufferSize     () const;
-    size_t BufferCapacity () const;
+    size_t Size       () const;
+    bool   IsEmpty    () const;
+    size_t Capacity   () const;
+    size_t BufferSize () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение строк
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const value_type*  Buffer () const;
-    const value_type** Data   () const;
+    const value_type** Data () const;
     const value_type*  operator [] (size_t index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление строк
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Add    (const value_type* string);
-    size_t Add    (size_t string_count, const value_type** string_array);
-    size_t Add    (const BasicStringArray&);
-    void   Insert (size_t index, const value_type* string);
-    void   Insert (size_t index, size_t string_count, const value_type** string_array);
-    void   Insert (size_t index, const BasicStringArray&);
+    size_t Add (const value_type* string);
+    size_t Add (size_t string_count, const value_type** string_array);
+    size_t Add (const BasicStringArray&);
     
     BasicStringArray& operator += (const value_type*);
     BasicStringArray& operator += (const BasicStringArray&);
     BasicStringArray  operator +  (const value_type*) const;
     BasicStringArray  operator +  (const BasicStringArray&) const;
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обновление строк
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Set (size_t index, const value_type* string);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление строк

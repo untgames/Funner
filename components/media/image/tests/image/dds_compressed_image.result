@@ -1,0 +1,9 @@
+Results of dds_compressed_image_test:
+width:        2048
+height:       2048
+layers_count: 1
+mips_count:   1
+format:       'DXT1'
+layers:
+  layer0:
+    mip0: size=8, crc32=ba63c577

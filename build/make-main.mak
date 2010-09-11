@@ -233,6 +233,8 @@ endif
 
 include $(TOOLSET_FILE)
 
+PROFILES := $(sort $(PROFILES))
+
 ###################################################################################################
 #Константы, зависящие от утилит сборки
 ###################################################################################################
@@ -406,6 +408,8 @@ define process_source_dir
   $$(MODULE_NAME).TMP_DIR    := $$($1.TMP_DIR)/$$(MODULE_PATH)
   $$(MODULE_NAME).BASE_DIR   := $1/$$(MODULE_PATH)
   $1.TMP_DIRS                := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)
+  
+  $$(foreach macros,$(SOURCE_PROCESS_MACROSES),$$(eval $$(call $$(macros),$1,$$(MODULE_NAME))))  
 
   ifneq (,$$($$(MODULE_NAME).SOURCE_FILES))
     $$(MODULE_NAME).OBJECT_FILES := $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%$(OBJ_SUFFIX),$$(notdir $$(basename $$($$(MODULE_NAME).SOURCE_FILES))))
@@ -517,7 +521,7 @@ define process_target.static-lib
 
   $$(eval $$(call process_target_with_sources,$1))  
 
-  $$($1.LIB_FILE): $$($1.FLAG_FILES)
+  $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.OBJECT_FILES)
 		@echo Create library $$(notdir $$@)...
 		@$$(call $(LIB_TOOL),$$@,$$($1.OBJECT_FILES))
 endef
@@ -532,6 +536,7 @@ define process_target.dynamic-lib
   
   $1.DLL_FILE                      := $(DIST_BIN_DIR)/$(DLL_PREFIX)$$($1.NAME)$(DLL_SUFFIX)
   $1.LIB_FILE                      := $(DIST_LIB_DIR)/$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(DLL_LIB_SUFFIX)
+  $1.DEF_FILE                      := $$(call specialize_paths,$$($1.DEF_FILE))
   $1.LIB_TMP_FILE                  := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(DLL_LIB_SUFFIX)
   TARGET_FILES                     := $$(TARGET_FILES) $$($1.DLL_FILE) $$($1.LIB_FILE)
   $1.TARGET_DLLS                   := $$($1.DLLS:%=$(DIST_BIN_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
@@ -545,9 +550,9 @@ define process_target.dynamic-lib
   
   $$($1.LIB_FILE): $$($1.DLL_FILE)
 
-  $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
+  $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES) $$($1.DEF_FILE)
 		@echo Create dynamic library $$(notdir $$($1.DLL_FILE))...
-		@$$(call $(LINK_TOOL),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+		@$$(call $(LINK_TOOL),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS),$$($1.DEF_FILE))
 		@$(RM) $$(basename $$($1.DLL_FILE)).exp
 		@if [ -e $$($1.LIB_TMP_FILE) ]; then mv -f $$($1.LIB_TMP_FILE) $(DIST_LIB_DIR); fi
 endef
@@ -576,7 +581,7 @@ define process_target.application
     $1.EXECUTION_DIR := $$($1.OUT_DIR)
   endif
   
-  $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
+  $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES)
 		@echo Linking $$(notdir $$@)...
 		@$$(call $(LINK_TOOL),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
@@ -844,6 +849,7 @@ define import_variables
 
   $2.INCLUDE_DIRS         := $$($2.INCLUDE_DIRS) $$($1.INCLUDE_DIRS:%=$3%)
   $2.INCLUDE_FILES        := $$($2.INCLUDE_FILES) $$($1.INCLUDE_FILES)
+  $2.SOURCE_DIRS          := $$($2.SOURCE_DIRS) $$($1.SOURCE_DIRS:%=$3%)
   $2.LIB_DIRS             := $$($2.LIB_DIRS) $$($1.LIB_DIRS:%=$3%)
   $2.DLL_DIRS             := $$($2.DLL_DIRS) $$($1.DLL_DIRS:%=$3%)
   $2.DLLS                 := $$($2.DLLS) $$($1.DLLS)
@@ -859,10 +865,11 @@ endef
 
 #Предварительный импорт настроек - построение списка импорта (имя зависимости, имя цели, имя переменной со списком)
 define prepare_to_import_settings
-
 # Проверка циклического импорта
 ifneq (,$$(filter $1,$$($3)))
-  $3 := $$(foreach imp,$$($3),$$(if $$(filter $1,$$(imp)),,$$(imp)))
+  ifneq (1,$$(strip $$($(EXPORT_VAR_PREFIX).$1.MULTI_IMPORTS)))
+    $3 := $$(foreach imp,$$($3),$$(if $$(filter $1,$$(imp)),,$$(imp)))
+  endif
 endif
 
   $3 := $$($3) $1
@@ -905,6 +912,9 @@ define process_target_common
 
 #  $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
   $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call prepare_to_import_settings,$$(imp),$1,$1.PROCESSED_IMPORTS)))
+  
+  $$(foreach exclude_import,$$($1.EXCLUDE_IMPORTS),$$(eval $1.PROCESSED_IMPORTS := $$(subst $$(exclude_import),,$$($1.PROCESSED_IMPORTS))))
+
   $$(foreach imp,$$($1.PROCESSED_IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
 
     #Добавление toolset-настроек к общему списку настроек
@@ -912,7 +922,7 @@ define process_target_common
 
   DUMP.$1:
 		@echo Dump target \'$1\' settings
-		@$$(foreach var,$$(sort $$(filter $1.%,$(.VARIABLES))),echo '    $$(var:$1.%=%) = $$($$(var))' && ) true
+		@$$(foreach var,$$(sort $$(filter $1.%,$(.VARIABLES) $1.PROCESSED_IMPORTS)),echo '    $$(var:$1.%=%) = $$($$(var))' && ) true
 
   dump: DUMP.$1
 

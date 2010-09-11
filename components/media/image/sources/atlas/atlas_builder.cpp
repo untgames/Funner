@@ -68,7 +68,7 @@ struct AtlasBuilder::Impl
         {
           try
           {
-            images.push_back (GetImageDesc (ImagePtr (new Image (image))));
+            images.push_back (GetImageDesc (ImageHolderPtr (new ImageHolder (new Image (image)), false)));
           }
           catch (xtl::exception& exception)
           {
@@ -82,11 +82,25 @@ struct AtlasBuilder::Impl
         {
           try
           {
-            ImagePtr new_image (new Image ());
+            ImageHolderPtr new_image (new ImageHolder (new Image ()), false);
 
-            new_image->Swap (image);
+            new_image->image->Swap (image);
 
             images.push_back (GetImageDesc (new_image));
+          }
+          catch (xtl::exception& exception)
+          {
+            exception.touch ("media::AtlasBuilder::Insert");
+            throw;
+          }
+
+          break;
+        }
+        case AtlasBuilderInsertMode_Reference:
+        {
+          try
+          {
+            images.push_back (GetImageDesc (ImageHolderPtr (new ImageHolder (&image))));
           }
           catch (xtl::exception& exception)
           {
@@ -105,7 +119,7 @@ struct AtlasBuilder::Impl
     {
       try
       {
-        images.push_back (GetImageDesc (ImagePtr (new Image (image_name))));
+        images.push_back (GetImageDesc (ImageHolderPtr (new ImageHolder (new Image (image_name)), false)));
       }
       catch (xtl::exception& exception)
       {
@@ -117,7 +131,48 @@ struct AtlasBuilder::Impl
 /*
    Построение карты
 */
-    void Build (Atlas& out_atlas, Image& out_atlas_image, size_t pack_flags)
+    void CalculatePackResults (size_t margin, size_t pack_flags, xtl::uninitialized_storage<math::vec2ui>& sizes,
+                               xtl::uninitialized_storage<math::vec2ui>& origins,
+                               size_t& result_image_width, size_t& result_image_height)
+    {
+      size_t unique_images_count = images_hash_map.size ();
+
+      sizes.resize (unique_images_count);
+      origins.resize (unique_images_count);
+
+      math::vec2ui *current_size = sizes.data ();
+
+      for (size_t i = 0; i < images.size (); i++)
+      {
+        ImageDescPtr current_image_desc = images [i];
+
+        if (current_image_desc->duplicate_of_index != i)
+          continue;
+
+        current_size->x = current_image_desc->image_holder->image->Width ();
+        current_size->y = current_image_desc->image_holder->image->Height ();
+
+        current_size++;
+      }
+
+      pack_handler (sizes.size (), sizes.data (), origins.data (), margin, pack_flags & ~AtlasPackFlag_InvertTilesX & ~AtlasPackFlag_InvertTilesY);
+
+      for (size_t i = 0; i < origins.size (); i++)
+      {
+        math::vec2ui& origin = origins.data ()[i];
+
+        if (result_image_width < (origin.x + sizes.data ()[i].x))  result_image_width = origin.x + sizes.data ()[i].x;
+        if (result_image_height < (origin.y + sizes.data ()[i].y)) result_image_height = origin.y + sizes.data ()[i].y;
+      }
+
+      if (pack_flags & AtlasPackFlag_PowerOfTwoEdges)
+      {
+        result_image_width  = get_next_higher_power_of_two (result_image_width);
+        result_image_height = get_next_higher_power_of_two (result_image_height);
+      }
+    }
+
+    void Build (Atlas& out_atlas, Image& out_atlas_image, size_t margin, size_t pack_flags)
     {
       if (images.empty ())
       {
@@ -130,49 +185,15 @@ struct AtlasBuilder::Impl
       try
       {
           //упаковка
-        size_t unique_images_count = images_hash_map.size ();
-        
-        xtl::uninitialized_storage<math::vec2ui> sizes (unique_images_count);
-        xtl::uninitialized_storage<math::vec2ui> origins (unique_images_count);
+        xtl::uninitialized_storage<math::vec2ui> sizes, origins;
 
-        math::vec2ui *current_size = sizes.data ();
-
-        for (size_t i = 0; i < images.size (); i++)
-        {
-          ImageDescPtr current_image_desc = images [i];
-
-          if (current_image_desc->duplicate_of_index != i)
-            continue;
-
-          current_size->x = current_image_desc->image->Width ();
-          current_size->y = current_image_desc->image->Height ();
-
-          current_size++;
-        }
-
-        pack_handler (sizes.size (), sizes.data (), origins.data (), pack_flags & ~AtlasPackFlag_InvertTilesX & ~AtlasPackFlag_InvertTilesY);
-        
           //заполнение атласа
           
         Atlas  result_atlas;
         size_t result_image_width = 0;
         size_t result_image_height = 0;                                  
 
-        result_atlas.SetImage (atlas_image_name.c_str ());          
-        
-        for (size_t i = 0; i < origins.size (); i++)
-        {
-          math::vec2ui& origin = origins.data ()[i];          
-          
-          if (result_image_width < (origin.x + sizes.data ()[i].x))  result_image_width = origin.x + sizes.data ()[i].x;
-          if (result_image_height < (origin.y + sizes.data ()[i].y)) result_image_height = origin.y + sizes.data ()[i].y;
-        }
-        
-        if (pack_flags & AtlasPackFlag_PowerOfTwoEdges)
-        {
-          result_image_width  = get_next_higher_power_of_two (result_image_width);
-          result_image_height = get_next_higher_power_of_two (result_image_height);
-        }
+        CalculatePackResults (margin, pack_flags, sizes, origins, result_image_width, result_image_height);
         
         for (size_t i = 0; i < images.size (); i++)
         {
@@ -185,7 +206,8 @@ struct AtlasBuilder::Impl
           if (pack_flags & AtlasPackFlag_InvertTilesX) origin.x = result_image_width  - origin.x - size.x;
           if (pack_flags & AtlasPackFlag_InvertTilesY) origin.y = result_image_height - origin.y - size.y;          
 
-          new_tile.name   = current_image_desc->image->Name ();
+          new_tile.name   = current_image_desc->image_holder->image->Name ();
+          new_tile.image  = atlas_image_name.c_str ();
           new_tile.origin = origin;
           new_tile.size   = size;
 
@@ -193,8 +215,13 @@ struct AtlasBuilder::Impl
         }
 
           //создание изображения атласа
+          
+        if (pack_flags & AtlasPackFlag_SquareAxises)
+        {
+          result_image_width = result_image_height = stl::max (result_image_width, result_image_height);
+        }
 
-        Image result_image (result_image_width, result_image_height, 1, (*images.begin ())->image->Format ());
+        Image result_image (result_image_width, result_image_height, 1, (*images.begin ())->image_holder->image->Format ());
 
         memset (result_image.Bitmap (), 0, result_image_width * result_image_height * get_bytes_per_pixel (result_image.Format ()));
 
@@ -209,8 +236,10 @@ struct AtlasBuilder::Impl
 
           result_image.PutImage (origins.data ()[unique_index].x, origins.data ()[unique_index].y, 0,
                                  sizes.data ()[unique_index].x, sizes.data ()[unique_index].y, 1,
-                                 current_image_desc->image->Format (), current_image_desc->image->Bitmap ());
+                                 current_image_desc->image_holder->image->Format (), current_image_desc->image_holder->image->Bitmap ());
         }
+
+        result_atlas.SetImageSize (atlas_image_name.c_str (), result_image_width, result_image_height);
 
         result_atlas.Swap (out_atlas);
         result_image.Swap (out_atlas_image);
@@ -222,14 +251,48 @@ struct AtlasBuilder::Impl
       }
     }
 
+    void GetBuildResults (size_t& image_width, size_t& image_height, size_t margin, size_t pack_flags)
+    {
+      xtl::uninitialized_storage<math::vec2ui> sizes, origins;
+
+      CalculatePackResults (margin, pack_flags, sizes, origins, image_width, image_height);
+    }
+
   private:
-    typedef xtl::shared_ptr<Image> ImagePtr;
+    struct ImageHolder : public xtl::reference_counter
+    {
+      public:
+        Image* image;
+
+        ImageHolder (Image* in_image) : image (in_image) {}
+
+        ~ImageHolder ()
+        {
+          delete image;
+        }
+
+        void AddRef ()
+        {
+          addref (this);
+        }
+
+        void Release ()
+        {
+          release (this);
+        }
+
+      private:
+        ImageHolder (const ImageHolder&); //no impl
+        ImageHolder& operator = (const ImageHolder&); //no impl
+    };
+
+    typedef xtl::com_ptr<ImageHolder> ImageHolderPtr;
 
     struct ImageDesc
     {
-      ImagePtr image;
-      size_t   duplicate_of_index;   //индекс картинки в массиве images, дубликатом которой является эта картинка
-      size_t   unique_index;         //размер карты уникальных картинок в момент добавления этой картинки
+      ImageHolderPtr image_holder;
+      size_t         duplicate_of_index;   //индекс картинки в массиве images, дубликатом которой является эта картинка
+      size_t         unique_index;         //размер карты уникальных картинок в момент добавления этой картинки
     };
 
     typedef xtl::shared_ptr<ImageDesc>    ImageDescPtr;
@@ -237,11 +300,12 @@ struct AtlasBuilder::Impl
     typedef stl::hash_map<size_t, size_t> BitmapHashMap;
 
   private:
-    ImageDescPtr GetImageDesc (ImagePtr image)
+    ImageDescPtr GetImageDesc (ImageHolderPtr image_holder)
     {
       ImageDescPtr image_desc (new ImageDesc);
+      Image*       image = image_holder->image;
 
-      image_desc->image = image;
+      image_desc->image_holder = image_holder;
 
       size_t bitmap_hash = common::crc32 (image->Bitmap (), image->Width () * image->Height () * get_bytes_per_pixel (image->Format ()));
 
@@ -339,12 +403,17 @@ void AtlasBuilder::Reset ()
 }
 
 /*
-   Построение карты
+   Построение карты/получение размеров результирующей картинки без формирования
 */
 
-void AtlasBuilder::Build (Atlas& out_atlas, Image& out_atlas_image, size_t pack_flags)
+void AtlasBuilder::Build (Atlas& out_atlas, Image& out_atlas_image, size_t margin, size_t pack_flags)
 {
-  impl->Build (out_atlas, out_atlas_image, pack_flags);
+  impl->Build (out_atlas, out_atlas_image, margin, pack_flags);
+}
+
+void AtlasBuilder::GetBuildResults (size_t& image_width, size_t& image_height, size_t margin, size_t pack_flags)
+{
+  impl->GetBuildResults (image_width, image_height, margin, pack_flags);
 }
 
 /*

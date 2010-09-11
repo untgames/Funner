@@ -6,6 +6,7 @@ using namespace math;
 void print (const Tile& tile)
 {
   printf ("Tile name is '%s'\n", tile.name);
+  printf ("Tile image is '%s'\n", tile.image);
   printf ("Tile origin is %ux%u\n", tile.origin.x, tile.origin.y);
   printf ("Tile size is %ux%u\n", tile.size.x, tile.size.y);
 }
@@ -18,22 +19,17 @@ int main ()
 
     Atlas atlas;
 
-    printf ("Atlas image is '%s'\n", atlas.Image ());
-
-    atlas.SetImage ("atlas_image.tga");
-
-    printf ("Atlas image is '%s'\n", atlas.Image ());
-
     printf ("Tiles count is %u\n", atlas.TilesCount ());
 
     Tile new_tile;
 
     new_tile.name   = "tile1";
+    new_tile.image  = "atlas_image.tga";
     new_tile.origin = vec2ui (16, 8);
     new_tile.size   = vec2ui (8, 8);
 
     atlas.Insert (new_tile);
-    atlas.Insert ("tile2", vec2ui (8, 8), vec2ui (16, 16));
+    atlas.Insert ("tile2", "atlas_image2.tga", vec2ui (8, 8), vec2ui (16, 16));
 
     printf ("Tiles count is %u\n", atlas.TilesCount ());
 
@@ -53,7 +49,7 @@ int main ()
     new_tile.size   = vec2ui (4, 4);
 
     atlas.Set (0, new_tile);
-    atlas.Set (1, "tilexx", vec2ui (18, 18), vec2ui (6, 6));
+    atlas.Set (1, "tilexx", "atlas_imagexx.tga", vec2ui (18, 18), vec2ui (6, 6));
 
     printf ("Tiles count is %u\n", atlas.TilesCount ());
 

@@ -1,4 +1,5 @@
 #include <common/component.h>
+#include <common/license_manager.h>
 #include <common/log.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
@@ -95,7 +96,7 @@ class ComponentManagerImpl
     {
       if (!wc_component_mask)
         return;
-        
+
       Log log (COMPONENT_MANAGER_DEFAULT_LOG);      
       
       if (load_indent)
@@ -121,6 +122,12 @@ class ComponentManagerImpl
           if (!wcimatch (node.name, wc_component_mask))
             continue;
 
+          if (!LicenseManager::IsComponentAllowed (node.name))
+          {
+            log.Printf ("Can't load component '%s', not allowed by license", node.name);
+            continue;
+          }
+
           node.is_locked = true;
 
           try
@@ -129,7 +136,7 @@ class ComponentManagerImpl
 
             node.component->Load ();
 
-            LogPrintf (log_handler, "Component '%s' loaded successull", node.name);
+            LogPrintf (log_handler, "Component '%s' loaded successfully", node.name);
             
             node.is_loaded = true;
           }
@@ -155,7 +162,7 @@ class ComponentManagerImpl
       load_indent--;
 
       if (!load_indent)
-        log.Printf ("...components loaded successull");
+        log.Printf ("...components loaded successfully");
     }
     
       //выгрузка компонента
@@ -207,7 +214,7 @@ class ComponentManagerImpl
       load_indent--;
       
       if (!load_indent)      
-        log.Printf ("...components unloaded successull");
+        log.Printf ("...components unloaded successfully");
     }
     
       //создание итератора

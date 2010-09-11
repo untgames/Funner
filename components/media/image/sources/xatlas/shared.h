@@ -1,6 +1,8 @@
 #ifndef MEDIA_IMAGE_XATLAS_SHARED_HEADER
 #define MEDIA_IMAGE_XATLAS_SHARED_HEADER
 
+#include <stl/hash_map>
+#include <stl/list>
 #include <stl/string>
 
 #include <xtl/common_exceptions.h>

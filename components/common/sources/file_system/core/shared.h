@@ -362,6 +362,21 @@ class MountPointFileSystem: public ICustomFileSystem
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Смонтированная файловая система
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct MountFileSystem
+{
+  size_t                hash;                    //хэш префикса точки монтирования
+  stl::string           prefix;                  //префикс точки монтирования
+  ICustomFileSystemPtr  file_system;             //интерфейс файловой системы
+  FileInfo              mount_point_info;        //информация о точке монтирования
+  MountPointFileSystem  mount_point_file_system; //фиктивная файловая система
+
+  MountFileSystem (const char* prefix,size_t hash,ICustomFileSystemPtr file_system);
+  MountFileSystem (const MountFileSystem&);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Фиктивная файловая система для хранения списка анонимных файлов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class AnonymousFileSystem: public ICustomFileSystem, public xtl::reference_counter
@@ -423,18 +438,14 @@ class AnonymousFileSystem: public ICustomFileSystem, public xtl::reference_count
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Смонтированная файловая система
+///Символическая ссылка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-struct MountFileSystem
+struct SymbolicLink
 {
-  size_t                hash;                    //хэш префикса точки монтирования
-  stl::string           prefix;                  //префикс точки монтирования
-  ICustomFileSystemPtr  file_system;             //интерфейс файловой системы
-  FileInfo              mount_point_info;        //информация о точке монтирования
-  MountPointFileSystem  mount_point_file_system; //фиктивная файловая система
-
-  MountFileSystem (const char* prefix,size_t hash,ICustomFileSystemPtr file_system);
-  MountFileSystem (const MountFileSystem&);
+  stl::string prefix;      //заменяемый префикс
+  stl::string link;        //ссылка на файл
+  
+  SymbolicLink (const char* prefix, const char* link);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -548,6 +559,11 @@ class FileSystemImpl
 ///Поиск в смонтированных файловых системах
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void MountSearch (FileListBuilder& builder,const char* wc_mask,const char* prefix,size_t flags);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Загрузка файловых систем
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void LoadFileSystems ();
    
   private:
     typedef stl::list<SearchPath>                                           SearchPathList;
@@ -556,14 +572,16 @@ class FileSystemImpl
     typedef stl::list<MountFileSystem>                                      MountList;
     typedef stl::hash_map<stl::hash_key<const char*>, FileCryptoParameters> CryptoMap;
     typedef xtl::intrusive_ptr<AnonymousFileSystem>                         AnonymousFileSystemPtr;
+    typedef stl::list<SymbolicLink>                                         SymbolicLinkList;
 
   private:    
     PackFileTypeList       pack_types;               //список типов пак-файлов
     PackFileList           pack_files;               //список пак-файлов и пользовательских файловых систем
     MountList              mounts;                   //список смонтированных файловых систем
-    SearchPathList         search_paths;             //список путей поиска
+    SymbolicLinkList       symbolic_links;           //список символических ссылок
+    SearchPathList         search_paths;             //список путей поиска    
     FileImplPtr            closed_file;              //закрытый файл
-    AnonymousFileSystemPtr anonymous_file_system;    //система анонимных файлов
+    AnonymousFileSystemPtr anonymous_file_system;    //система анонимных файлов    
     CryptoMap              crypto_parameters;        //параметры шифрования файлов
     stl::string            default_path;             //путь по умолчанию (аналог текущего каталога)
     stl::string            compress_path;            //буфер для формирования сокращённого пути

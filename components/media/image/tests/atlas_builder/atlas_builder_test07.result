@@ -1,0 +1,37 @@
+Results of atlas_builder_test07:
+Build atlas 231x128
+Save atlas 'results/invert-x.png'
+Save layout 'results/invert-x.xatlas'
+Build successfull!
+Build atlas 231x128
+Save atlas 'results/invert-y.png'
+Save layout 'results/invert-y.xatlas'
+Build successfull!
+Build atlas 231x128
+Save atlas 'results/invert-xy.png'
+Save layout 'results/invert-xy.xatlas'
+Build successfull!
+results/invert-x.xatlas
+<?xml version="1.0" encoding="utf-8"?>
+<Atlas>
+  <Image Name="results/invert-x.png" Width="231" Height="128">
+    <Tile Name="data/1.bmp" Left="171" Bottom="0" Width="60" Height="60"/>
+    <Tile Name="data/2.tga" Left="0" Bottom="0" Width="171" Height="128"/>
+  </Image>
+</Atlas>
+results/invert-y.xatlas
+<?xml version="1.0" encoding="utf-8"?>
+<Atlas>
+  <Image Name="results/invert-y.png" Width="231" Height="128">
+    <Tile Name="data/1.bmp" Left="0" Bottom="68" Width="60" Height="60"/>
+    <Tile Name="data/2.tga" Left="60" Bottom="0" Width="171" Height="128"/>
+  </Image>
+</Atlas>
+results/invert-xy.xatlas
+<?xml version="1.0" encoding="utf-8"?>
+<Atlas>
+  <Image Name="results/invert-xy.png" Width="231" Height="128">
+    <Tile Name="data/1.bmp" Left="171" Bottom="68" Width="60" Height="60"/>
+    <Tile Name="data/2.tga" Left="0" Bottom="0" Width="171" Height="128"/>
+  </Image>
+</Atlas>

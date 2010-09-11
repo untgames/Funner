@@ -4,7 +4,9 @@
 #include <stl/set>
 #include <stl/vector>
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/function.h>
 
 #include <common/component.h>
 
@@ -19,6 +21,21 @@ using namespace bound_volumes;
 
 namespace
 {
+
+const size_t RANDOM_ARRAY_SIZE = 1000;
+
+struct MyRand
+{
+  const int* random_array;
+  int        rand_index;
+
+  MyRand (const int* in_random_array) : random_array (in_random_array), rand_index (0) {}
+
+  int operator () (int max_rand)
+  {
+    return random_array [rand_index++ % RANDOM_ARRAY_SIZE] % max_rand;
+  }
+};
 
 //получение ближайшей сверху степени двойки
 size_t get_next_higher_power_of_two (size_t k)
@@ -51,6 +68,10 @@ class TileImageBuilder
     typedef stl::vector<size_t> IndexArray;
 
   public:
+    TileImageBuilder (const int* in_random_array)
+      : random_array (in_random_array)
+      {}
+
     void AddImages (size_t images_count, const math::vec2ui* in_sizes)
     {
       images.resize (images_count);
@@ -59,7 +80,7 @@ class TileImageBuilder
         images[i] = in_sizes[i];
     }
 
-    void BuildTileImage (math::vec2ui* out_origins, size_t pack_flags)
+    void BuildTileImage (math::vec2ui* out_origins, size_t margin, size_t pack_flags)
     {
       size_t minimum_area = 0;
       size_t result_image_horisontal_side, result_image_vertical_side;
@@ -82,6 +103,8 @@ class TileImageBuilder
 
       bool pack_result = false;
 
+      MyRand my_rand (random_array);
+
       while (!pack_result)
       {
         if (result_image_horisontal_side > result_image_vertical_side) result_image_vertical_side   *= 2;
@@ -94,11 +117,11 @@ class TileImageBuilder
 
         do
         {
-          pack_result = PackImages ((pack_flags & AtlasPackFlag_SwapAxises) != 0, result_image_horisontal_side, result_image_vertical_side, out_origins, indices);
+          pack_result = PackImages (margin, (pack_flags & AtlasPackFlag_SwapAxises) != 0, result_image_horisontal_side, result_image_vertical_side, out_origins, indices);
 
           if (pack_result) break;
 
-          random_shuffle (indices.begin (), indices.end ());
+          random_shuffle (indices.begin (), indices.end (), my_rand);
         }
         while (try_count++ < 10);
       }
@@ -144,7 +167,7 @@ class TileImageBuilder
       }
     };
 
-    bool PackImages (bool swap_axises, size_t result_image_horizontal_side, size_t result_image_vertical_side, math::vec2ui* out_origins, const IndexArray& indices)
+    bool PackImages (size_t margin, bool swap_axises, size_t result_image_horizontal_side, size_t result_image_vertical_side, math::vec2ui* out_origins, const IndexArray& indices)
     {
       typedef set<FreeSpace, less<FreeSpace> > FreeSpacesSet;
 
@@ -163,6 +186,16 @@ class TileImageBuilder
         {
           if ((iter->width < image_size.x) || (iter->height < image_size.y))
             continue;
+
+          //проверяем можно ли вставить картинку с отступом в это место
+          if ((iter->x_pos + iter->width != result_image_horizontal_side) && (iter->width < image_size.x + margin))
+            continue;
+
+          if ((iter->y_pos + iter->height != result_image_vertical_side) && (iter->height < image_size.y + margin))
+            continue;
+
+          image_size.x = stl::min (image_size.x + margin, iter->width);
+          image_size.y = stl::min (image_size.y + margin, iter->height);
 
           out_origin.x = iter->x_pos;
           out_origin.y = iter->y_pos;
@@ -226,9 +259,10 @@ class TileImageBuilder
 
   private:
     ImagesArray images;
+    const int*  random_array;
 };
 
-void left_bottom_pack (size_t images_count, const math::vec2ui* in_sizes, math::vec2ui* out_origins, size_t pack_flags)
+void left_bottom_pack (const int* random_array, size_t images_count, const math::vec2ui* in_sizes, math::vec2ui* out_origins, size_t margin, size_t pack_flags)
 {
   static const char* METHOD_NAME = "media::LeftBottomPacker";
 
@@ -238,10 +272,10 @@ void left_bottom_pack (size_t images_count, const math::vec2ui* in_sizes, math::
   if (!out_origins)
     throw xtl::make_null_argument_exception (METHOD_NAME, "out_origins");
 
-  TileImageBuilder tile_image_builder;
+  TileImageBuilder tile_image_builder (random_array);
 
   tile_image_builder.AddImages (images_count, in_sizes);
-  tile_image_builder.BuildTileImage (out_origins, pack_flags);
+  tile_image_builder.BuildTileImage (out_origins, margin, pack_flags);
 }
 
 /*
@@ -254,9 +288,17 @@ class LeftBottomPackerComponent
     //загрузка компонента
     LeftBottomPackerComponent ()
     {
-      AtlasBuilderManager::RegisterPacker ("default", &left_bottom_pack);
-      AtlasBuilderManager::RegisterPacker ("left_bottom", &left_bottom_pack);
+      for (size_t i = 0; i < RANDOM_ARRAY_SIZE; i++)
+        random_array [i] = rand ();
+
+      AtlasBuilderManager::PackHandler pack_handler = xtl::bind (&left_bottom_pack, random_array, _1, _2, _3, _4, _5);
+
+      AtlasBuilderManager::RegisterPacker ("default", pack_handler);
+      AtlasBuilderManager::RegisterPacker ("left_bottom", pack_handler);
     }
+
+  private:
+    int random_array [RANDOM_ARRAY_SIZE];
 };
 
 extern "C"

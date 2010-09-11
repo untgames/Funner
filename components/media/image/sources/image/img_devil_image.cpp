@@ -16,7 +16,7 @@ class DevILImageImpl: public ImageImpl
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     DevILImageImpl  ();
-    DevILImageImpl  (DevILImageImpl&);
+    DevILImageImpl  (const DevILImageImpl&);
     DevILImageImpl  (const char* file_name);
     DevILImageImpl  (size_t width, size_t height, size_t depth, PixelFormat format, const void* data);
     ~DevILImageImpl ();
@@ -168,8 +168,12 @@ DevILImageImpl::DevILImageImpl ()
   check_devil_errors ("media::DevILImageImpl::DevILImageImpl()", "ilGenImages");
 }
 
-DevILImageImpl::DevILImageImpl (DevILImageImpl& source)
-  : ImageImpl (source), width (source.width), height (source.height), depth (source.depth), format (source.format)
+DevILImageImpl::DevILImageImpl (const DevILImageImpl& source)
+  : ImageImpl (source)
+  , width (source.width)
+  , height (source.height)
+  , depth (source.depth)
+  , format (source.format)
 {
   LoadComponent ();
 
@@ -186,7 +190,7 @@ DevILImageImpl::DevILImageImpl (DevILImageImpl& source)
 
     if (error != IL_NO_ERROR)
       raise_devil_exception ("media::DevILImageImpl::DevILImageImpl(const DevILImageImpl&)", "Can't copy image '%s'. %s.",
-                             source.Name (), iluErrorString (error));
+                             const_cast<DevILImageImpl&> (source).Name (), iluErrorString (error));                             
   }
   catch (...)
   {
@@ -282,7 +286,14 @@ DevILImageImpl::DevILImageImpl (size_t in_width, size_t in_height, size_t in_dep
 {
   LoadComponent ();
 
-  ilGenImages        (1, &il_image);
+  ilGenImages (1, &il_image);
+  
+  if (!il_image) //workaround for il_image = 0
+  {
+    ilDeleteImages (1, &il_image);
+    ilGenImages    (1, &il_image);    
+  }
+  
   check_devil_errors ("media::DevILImageImpl::DevILImageImpl(size_t,size_t,size_t,PixelFormat,const void*)", "ilGenImages");
 
   try

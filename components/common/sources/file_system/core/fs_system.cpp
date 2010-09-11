@@ -7,8 +7,9 @@ using namespace xtl;
 namespace
 {
 
-const char* FILE_SYSTEM_ADDONS_MASK = "common.file_systems.*"; //маска имён компонентов, пользовательских файловых систем
-const char* ANONYMOUS_FILES_PREFIX  = "/anonymous";            //префикс имён анонимных файлов
+const char*  FILE_SYSTEM_ADDONS_MASK              = "common.file_systems.*"; //маска имён компонентов, пользовательских файловых систем
+const char*  ANONYMOUS_FILES_PREFIX               = "/anonymous";            //префикс имён анонимных файлов
+const size_t MAX_SYMBOLIC_LINKS_REPLACEMENT_COUNT = 64;                      //максимальное количество подстановок символьных ссылок
 
 }
 
@@ -46,6 +47,12 @@ inline MountFileSystem::MountFileSystem (const MountFileSystem& fs)
   : hash (fs.hash), prefix (fs.prefix), file_system (fs.file_system), mount_point_info (fs.mount_point_info),
     mount_point_file_system (*this)
   { }
+  
+inline SymbolicLink::SymbolicLink (const char* in_prefix, const char* in_link)
+  : prefix (in_prefix)
+  , link (in_link)  
+{  
+}
 
 /*
     Инициализация / завершение
@@ -69,6 +76,22 @@ FileSystemImpl::~FileSystemImpl ()
 {  
   RemoveAllSearchPaths ();
   UnmountAll ();
+}
+
+/*
+    Загрузка файловых систем
+*/
+
+void FileSystemImpl::LoadFileSystems ()
+{
+  static bool initialized = false;
+  
+  if (initialized)
+    return;
+    
+  initialized = true;
+
+  static ComponentLoader custom_file_systems_loader (FILE_SYSTEM_ADDONS_MASK);
 }
 
 /*
@@ -209,7 +232,7 @@ void FileSystemImpl::UnregisterPackFile (const char* extension)
 
 void FileSystemImpl::AddPackFile (const char* _path,size_t search_path_hash,const FileSystem::LogHandler& log_handler)
 {
-  static ComponentLoader custom_file_systems_loader (FILE_SYSTEM_ADDONS_MASK);
+  LoadFileSystems ();
 
   string path = FileSystem::GetNormalizedFileName (_path), type = suffix (path);
 
@@ -377,52 +400,76 @@ void FileSystemImpl::Mount (const char* path_prefix,const char* _path,const char
   if (!_path)
     throw xtl::make_null_argument_exception (METHOD_NAME,"path");
 
-  static ComponentLoader custom_file_systems_loader (FILE_SYSTEM_ADDONS_MASK);
+  LoadFileSystems ();    
 
-  string path = FileSystem::GetNormalizedFileName (_path), type;
-  
-  if (force_extension)
+  string path = FileSystem::GetNormalizedFileName (_path);
+
+  FileInfo info;
+
+  if (GetFileInfo (_path,info) && info.is_dir)
   {
-    type = force_extension;
+    if (!*path_prefix)
+      throw xtl::make_argument_exception (METHOD_NAME, "path_prefix", path_prefix, "Path prefix must be non empty");
+
+      //добавление символьной ссылки
+
+    stl::string prefix = path_prefix;
+
+    prefix += "/";
+
+    for (SymbolicLinkList::iterator iter=symbolic_links.begin (), end=symbolic_links.end (); iter!=end; ++iter)
+      if (!xstrncmp (prefix.c_str (), iter->prefix.c_str (), iter->prefix.size ()))
+        throw xtl::format_operation_exception (METHOD_NAME, "Path '%s' has already linked to '%s'", path_prefix, iter->link.c_str ());
+
+    symbolic_links.push_back (SymbolicLink (prefix.c_str (), path.c_str ()));
   }
   else
   {
-    type = suffix (path);
+    string type;
     
-    if (!type.empty ())
-      type.erase (type.begin ());    
-  }
-  
-  size_t path_hash = strhash (path.c_str ()), type_hash = strhash (type.c_str ());
-
-  for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();++i)
-    if (i->file_name_hash == path_hash)
+    if (force_extension)
     {
-      Mount (path_prefix, i->file_system.get ());
-      return;
+      type = force_extension;
     }
-
-  for (PackFileTypeList::iterator i=pack_types.begin ();i!=pack_types.end ();++i)
-    if (i->extension_hash == type_hash)
+    else
     {
-      ICustomFileSystemPtr pack_file_system (i->creater (path.c_str ()),false);
-
-      pack_files.push_front (PackFile (strihash (path.c_str ()),0,pack_file_system));                  
-
-      try
-      {
-        Mount (path_prefix, pack_file_system.get ());          
-      }
-      catch (...)
-      {
-        pack_files.pop_front ();
-        throw;
-      }
+      type = suffix (path);
       
-      return;
+      if (!type.empty ())
+        type.erase (type.begin ());    
     }
+    
+    size_t path_hash = strhash (path.c_str ()), type_hash = strhash (type.c_str ());
 
-  throw xtl::format_operation_exception (METHOD_NAME, "Fail to open pack-file '%s'. Undefined type '%s'",_path,type.c_str ());
+    for (PackFileList::iterator i=pack_files.begin ();i!=pack_files.end ();++i)
+      if (i->file_name_hash == path_hash)
+      {
+        Mount (path_prefix, i->file_system.get ());
+        return;
+      }
+
+    for (PackFileTypeList::iterator i=pack_types.begin ();i!=pack_types.end ();++i)
+      if (i->extension_hash == type_hash)
+      {
+        ICustomFileSystemPtr pack_file_system (i->creater (path.c_str ()),false);
+
+        pack_files.push_front (PackFile (strihash (path.c_str ()),0,pack_file_system));                  
+
+        try
+        {
+          Mount (path_prefix, pack_file_system.get ());          
+        }
+        catch (...)
+        {
+          pack_files.pop_front ();
+          throw;
+        }
+        
+        return;
+      }
+
+    throw xtl::format_operation_exception (METHOD_NAME, "Fail to open pack-file '%s'. Undefined type '%s'",_path,type.c_str ());
+  }
 }
 
 void FileSystemImpl::Unmount (const char* _path_prefix)
@@ -437,6 +484,16 @@ void FileSystemImpl::Unmount (const char* _path_prefix)
     if (i->hash == hash && !strncmp (prefix.c_str (),i->prefix.c_str (),i->prefix.size ()-1))
     {
       mounts.erase (i);
+      return;
+    }
+    
+  prefix  = _path_prefix;  
+  prefix += "/";
+    
+  for (SymbolicLinkList::iterator i=symbolic_links.begin (), end=symbolic_links.end (); i!=end; ++i)
+    if (!xstrncmp (prefix.c_str (), i->prefix.c_str (), i->prefix.size ()))
+    {
+      symbolic_links.erase (i);
       return;
     }
 }
@@ -463,6 +520,7 @@ void FileSystemImpl::Unmount (ICustomFileSystemPtr file_system)
 void FileSystemImpl::UnmountAll ()
 {
   mounts.clear ();
+  symbolic_links.clear ();
 }
 
 bool FileSystemImpl::IsPathMount (const char* path) const
@@ -551,11 +609,11 @@ void FileSystemImpl::RemoveAllCryptoParameters ()
 
 ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,string& result_file_name)
 {
-  static ComponentLoader custom_file_systems_loader (FILE_SYSTEM_ADDONS_MASK);
+  LoadFileSystems ();
 
   for (MountList::iterator i=mounts.begin ();i!=mounts.end ();++i)
   {
-    if (!xtl::xstrnicmp (i->prefix.c_str (),file_name,i->prefix.size ()-1))
+    if (!xtl::xstrncmp (i->prefix.c_str (),file_name,i->prefix.size ()-1))
     {
       switch (file_name [i->prefix.size ()-1])
       {
@@ -576,10 +634,38 @@ ICustomFileSystemPtr FileSystemImpl::FindMountFileSystem (const char* file_name,
 
 ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,string& result_file_name)
 {
-  static const char* METHOD_NAME = "common::FileSystemImpl::FindFileSystem";
+  static const char* METHOD_NAME = "common::FileSystemImpl::FindFileSystem";  
+  
+  LoadFileSystems ();  
 
   string file_name = FileSystem::GetNormalizedFileName (src_file_name);
+  
+    //обработка символьных ссылок
 
+  size_t replacement_count = 0;
+
+  for (SymbolicLinkList::iterator iter=symbolic_links.begin (), end=symbolic_links.end (); iter!=end;)
+    if (!xstrncmp (file_name.c_str (), iter->prefix.c_str (), iter->prefix.size () - 1))    
+    {
+      if (file_name.size () > iter->prefix.size () && file_name [iter->prefix.size () - 1] == '/')
+      {
+        file_name.replace (0, iter->prefix.size () - 1, iter->link);
+      }
+      else if (file_name.size () == iter->prefix.size () - 1)
+      {
+        file_name = iter->link;
+      }
+      else continue;
+      
+      file_name = FileSystem::GetNormalizedFileName (file_name.c_str ());
+
+      replacement_count++;
+      
+      if (replacement_count < MAX_SYMBOLIC_LINKS_REPLACEMENT_COUNT)
+        iter = symbolic_links.begin ();
+    }    
+    else ++iter;
+  
     //пытаемся найти файл не используя путей поиска
 
   if (file_name [0] == '/')
@@ -596,7 +682,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
 
   string               full_name         = format ("%s/%s",default_path.c_str (),file_name.c_str ()), mount_name;
   ICustomFileSystemPtr owner_file_system = FindMountFileSystem (full_name.c_str (),mount_name);
-
+  
   if (owner_file_system && owner_file_system->IsFileExist (mount_name.c_str ()))
   {
     swap (result_file_name,mount_name);
@@ -775,6 +861,25 @@ void FileSystemImpl::Rename (const char* src_file_name,const char* new_name)
   }
 }
 
+namespace
+{
+
+void MkdirRecursive (ICustomFileSystem& fs, const char* dir_name)
+{
+  stl::string parent_dir_name = dir (dir_name);
+  
+  parent_dir_name.pop_back ();
+  
+  FileInfo info;
+  
+  if (parent_dir_name != "." && !(fs.GetFileInfo (parent_dir_name.c_str (), info) && info.is_dir))
+    MkdirRecursive (fs, parent_dir_name.c_str ());
+
+  fs.Mkdir (dir_name);
+}
+
+}
+
 void FileSystemImpl::Mkdir (const char* src_dir_name)
 {
   if (!src_dir_name)
@@ -785,8 +890,8 @@ void FileSystemImpl::Mkdir (const char* src_dir_name)
   try
   {
     ICustomFileSystemPtr file_system = FindFileSystem (src_dir_name,dir_name);
-
-    file_system->Mkdir (dir_name.c_str ());
+    
+    MkdirRecursive (*file_system, dir_name.c_str ());
   }
   catch (xtl::exception& exception)
   {
@@ -1102,7 +1207,7 @@ string FileSystem::GetNormalizedFileName (const char* file_name)
           switch (*i)
           {
             case '\\': *i = '/'; break;
-            default:   /**i = tolower (*i); */  break; //Закомментировано для работы на iPhone с файлами, содержащими большие буквы
+            default: break;
           }
 
         --i;
@@ -1110,7 +1215,6 @@ string FileSystem::GetNormalizedFileName (const char* file_name)
         break;
       }
       default:
-//        *i = tolower (*i);        //Закомментировано для работы на iPhone с файлами, содержащими большие буквы
         break;
     }
 
@@ -1206,6 +1310,54 @@ void FileSystem::GetFileCryptoKey (const char* file_name, filecryptokey_t key)
   catch (xtl::exception& exception)
   {
     exception.touch ("common::FileSystem::GetFileCryptoKey");
+    throw;
+  }
+}
+
+/*
+    Копирование файла
+*/
+
+void FileSystem::CopyFile (const char* source_file_name, const char* destination_file_name, size_t buffer_size)
+{
+  try
+  {
+    if (!source_file_name)
+      throw xtl::make_null_argument_exception ("", "source_file_name");
+
+    if (!destination_file_name)
+      throw xtl::make_null_argument_exception ("", "destination_file_name");
+      
+    if (!buffer_size)
+      buffer_size = GetDefaultFileBufferSize ();
+      
+    if (!buffer_size)
+      buffer_size = 4096;
+
+    InputFile input_file (source_file_name);
+    OutputFile output_file (destination_file_name);
+
+    if (output_file.Size ())
+      output_file.Resize (0);
+
+    xtl::uninitialized_storage<char> buffer (buffer_size);
+
+    while (!input_file.Eof ())
+    {
+      size_t read_size = input_file.Read (buffer.data (), buffer.size ());
+
+      if (!read_size)
+        break;
+
+      output_file.Write (buffer.data (), read_size);
+    }
+
+    if (!input_file.Eof ())
+      throw xtl::format_operation_exception ("", "Internal error: can't read input file");
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::FileSystem::CopyFile");
     throw;
   }
 }

@@ -1,0 +1,14 @@
+Results of command_line_test:
+Command line params count = 0
+Exception: 'Wrong option '-h'
+    at common::CommandLine::Process'
+Switch '--help' occured with arg ''
+Switch '--help' occured with arg ''
+Switch '--switch' occured with arg ''
+Switch '--batch' occured with arg 'b_arg'
+Switch '--batch' occured with arg 'b_arg2 b_arg3'
+Switch '--batch' occured with arg 'equal_arg1 equal_arg2'
+Command line params count = 3
+Param 0 is 'param1'
+Param 1 is 'param2'
+Param 2 is 'param3'

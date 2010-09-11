@@ -8,6 +8,7 @@
 
 #include <common/action_queue.h>
 #include <common/async.h>
+#include <common/lockable.h>
 
 using namespace common;
 
@@ -21,7 +22,7 @@ using namespace common;
     Описание реализации асинхронного результата
 */
 
-struct AsyncResult::Impl: public xtl::reference_counter
+struct AsyncResult::Impl: public xtl::reference_counter, public Lockable
 {
   Action                              action;       //операция
   stl::auto_ptr<detail::IAsyncAction> async_action; //реализация операции
@@ -62,6 +63,8 @@ struct AsyncResult::Impl: public xtl::reference_counter
   {
     try
     {
+      Lock ();
+      
       if (result)
         result->Release ();
       
@@ -79,30 +82,42 @@ struct AsyncResult::Impl: public xtl::reference_counter
   
   void Perform ()
   {
+    detail::IAsyncResult* tmp_result     = 0;
+    bool                  tmp_completed  = false;
+    
     try
-    {
-      result    = async_action->Perform ();
-      completed = result && result->IsValid ();
+    {            
+      tmp_result    = async_action->Perform ();      
+      tmp_completed = tmp_result && tmp_result->IsValid ();
     }
     catch (...)
     {
     }
     
-    async_action.reset ();
+    CallbackHandler tmp_callback;
     
-    if (callback)
+    {
+      common::Lock lock (*this);
+      
+      tmp_callback = callback;
+      result       = tmp_result;
+      completed    = tmp_completed;
+      
+      async_action.reset ();
+      callback.clear ();      
+    }        
+
+    if (tmp_callback)
     {
       try
       {
         AsyncResult async_result (this);
 
-        callback (async_result);
+        tmp_callback (async_result);
       }
       catch (...)
       {
       }
-
-      callback.clear ();
     }
   }
 };
@@ -155,6 +170,8 @@ AsyncResult& AsyncResult::operator = (const AsyncResult& result)
 
 bool AsyncResult::IsCompleted () const
 {
+  common::Lock lock (*impl);
+
   return impl->completed;
 }
 
@@ -162,6 +179,8 @@ void AsyncResult::WaitCompleted ()
 {
   try
   {
+    common::Lock lock (*impl);
+    
     impl->action.Wait (~0u);
   }
   catch (xtl::exception& e)
@@ -175,6 +194,8 @@ detail::IAsyncResult* AsyncResult::Result ()
 {
   try
   {
+    common::Lock lock (*impl);
+    
     if (!impl->action.IsCompleted ())
       WaitCompleted ();
 

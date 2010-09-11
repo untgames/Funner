@@ -1,0 +1,9 @@
+Results of single_layer_image_test:
+image data/pic3.bmp format - BGR8
+image4 name - 'data/pic1.jpg'
+image4 new name - 'new_name'
+image new_name format - RGB8
+image new_name format - RGBA16
+image4 width - 171, height - 128, depth - 1
+new image4 width - 1000, height - 1000, depth - 1
+File 'results/image1with5 (PutImage test).bmp' hash: {ff,59,86,29,9c,fa,8c,11,5b,85,1b,c6,63,b5,3e,8f}

@@ -1,0 +1,24 @@
+Results of atlas_builder_test09:
+Build atlas 231x128
+Save atlas 'results/complex0.png'
+Build atlas 231x128
+Save atlas 'results/complex1.png'
+Build atlas 171x128
+Save atlas 'results/complex2.png'
+Save layout 'results/complex.xatlas'
+Build successfull!
+results/complex.xatlas
+<?xml version="1.0" encoding="utf-8"?>
+<Atlas>
+  <Image Name="results/complex0.png" Width="231" Height="128">
+    <Tile Name="data/1.bmp" Left="0" Bottom="0" Width="60" Height="60"/>
+    <Tile Name="data/2.tga" Left="60" Bottom="0" Width="171" Height="128"/>
+  </Image>
+  <Image Name="results/complex1.png" Width="231" Height="128">
+    <Tile Name="data/4.png" Left="0" Bottom="0" Width="231" Height="128"/>
+    <Tile Name="data/4.png" Left="0" Bottom="0" Width="231" Height="128"/>
+  </Image>
+  <Image Name="results/complex2.png" Width="171" Height="128">
+    <Tile Name="data/3.jpg" Left="0" Bottom="0" Width="171" Height="128"/>
+  </Image>
+</Atlas>

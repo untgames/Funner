@@ -59,8 +59,7 @@ int main (int argc, char* argv [])
     StdFile    out_bin_file (dst_file_name, FileMode_ReadWrite);
     CryptoFile out_file (out_bin_file, read_method, write_method, key, sizeof (key) * CHAR_BIT);
     
-    size_t file_size      = in_file.Size (),
-           processed_size = 0;
+    size_t processed_size = 0;
            
     xtl::uninitialized_storage<char> buffer (BUFFER_SIZE);
 
@@ -89,8 +88,6 @@ int main (int argc, char* argv [])
       }
       
       processed_size += size;
-      
-      printf ("\rProgress %.1f%%", 100.0f * float (processed_size)/float (file_size));
     }
   }
   catch (std::exception& exception)

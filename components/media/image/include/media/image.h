@@ -73,7 +73,8 @@ class Image
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
              Image  ();
-             Image  (const Image& source, PixelFormat format = PixelFormat_Default);
+             Image  (const Image& source);
+             Image  (const Image& source, PixelFormat format);
              Image  (size_t width, size_t height, size_t depth, PixelFormat format, const void* data = 0);
              Image  (size_t layers_count, Image* layers, LayersCloneMode clone_mode = LayersCloneMode_Default);
     explicit Image  (const char* file_name, PixelFormat format = PixelFormat_Default);
@@ -83,12 +84,17 @@ class Image
 ///Присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Image& operator = (const Image&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Клонирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Image Clone () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка / сохранение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Load (const char* file_name);
-    void Save (const char* file_name, PixelFormat format = PixelFormat_Default);
+    void Save (const char* file_name, PixelFormat format = PixelFormat_Default, const char* format_specific_flags = "");
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработчики загрузки/сохранения по умолчанию (в будущем убрать вообще!!!)
@@ -96,7 +102,7 @@ class Image
     static void DefaultLoader (const char* file_name, Image& image);
     static void CubemapLoader (const char* file_name, Image& image);
     static void SkyBoxLoader  (const char* file_name, Image& image);
-    static void DefaultSaver  (const char* file_name, const Image& image);
+    static void DefaultSaver  (const char* file_name, const Image& image, const char* format_specific_flags);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя картинки
@@ -142,9 +148,12 @@ class Image
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Swap (Image&);
+    
+  private:
+    Image (ImageImpl*);
 
   private:
-    stl::auto_ptr<ImageImpl> impl;
+    ImageImpl* impl;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,10 +161,18 @@ class Image
 //////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (Image&, Image&);
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск границ непрозрачных пикселей внутри картинки
+//////////////////////////////////////////////////////////////////////////////////////////////////
+void crop_by_alpha (const Image& image, size_t crop_alpha, size_t& crop_x, size_t& crop_y, size_t& crop_width, size_t& crop_height);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Система управления картинками
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef common::ResourceSerializerManager<void (const char* file_name, Image& image), void (const char* file_name, const Image& image)> ImageManager;
+typedef common::ResourceSerializerManager<
+  void (const char* file_name, Image& image),
+  void (const char* file_name, const Image& image, const char* format_specific_flags)>
+ImageManager;
 
 }
 

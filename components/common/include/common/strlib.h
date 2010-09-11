@@ -50,10 +50,15 @@ stl::string compress   (const char*);
 stl::string decompress (const char* str,const char* exception = NULL);
 
 /*
-    Разбиение строки
+    Отсечение пробелов
 */
 
-//strip/trim/...
+stl::string strip (const char* str, const char* spaces=" \t");
+stl::string trim  (const char* str, const char* spaces=" \t");
+
+/*
+    Разбиение строки
+*/
 
 stl::string word (const char* str, size_t word_index, const char* delimiters=" ", const char* spaces=" \t", const char* brackets="");
 stl::string word (const stl::string& str, size_t word_index, const char* delimiters=" ", const char* spaces=" \t", const char* brackets="");

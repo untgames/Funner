@@ -7,6 +7,7 @@
 
 #include <common/file.h>
 #include <common/hash.h>
+#include <common/log.h>
 #include <common/utf_converter.h>
 
 #include <media/font_converter.h>
@@ -16,7 +17,7 @@ using namespace media;
 using namespace common;
 
 const char* FONT_FILE_NAME         = "data/a_damn_mess.ttf";
-const char* RESULT_FONT_FILE_NAME  = "data/a_damn_mess.xfont";
+const char* RESULT_FONT_FILE_NAME  = "/io/stdout/a_damn_mess.xfont";
 const char* RESULT_IMAGE_FILE_NAME = "data/a_damn_mess.tga";
 
 const size_t FIRST_GLYPH_CODE = 32;
@@ -51,9 +52,16 @@ void dump_hash (media::Image& image)
   printf ("%02x}\n", hash [15]);
 }
 
+void log_handler (const char* log, const char* message)
+{
+  printf ("'%s': '%s'\n", log, message);
+}
+
 int main ()
 {
   printf ("Results of font_converter_test:\n");
+
+  common::LogFilter log_filter ("media.font.font_converter", log_handler);
 
   try
   {
@@ -86,7 +94,6 @@ int main ()
     font.Save  (RESULT_FONT_FILE_NAME);
     image.Save (RESULT_IMAGE_FILE_NAME);
 
-    dump_hash (RESULT_FONT_FILE_NAME);
     dump_hash (image);
   }
   catch (std::exception& exception)
