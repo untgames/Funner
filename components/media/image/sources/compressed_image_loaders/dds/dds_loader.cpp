@@ -419,11 +419,11 @@ class DdsCompressedImage: public ICustomCompressedImage
                 CompressedImageBlockDesc element;
                 
                 element.offset = data_offset;
-                element.size   = bytesPerElement;
+                element.size   = size;
 
                 blocks.push_back (element);
                 
-                data_offset += bytesPerElement;
+                data_offset += size;
 
                 //if (layers_count != 6)
                 //    flipSurface( data, w, h, d);
