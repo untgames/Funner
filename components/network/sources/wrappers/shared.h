@@ -11,6 +11,7 @@
 #include <xtl/reference_counter.h>
 
 #include <common/component.h>
+#include <common/file.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 

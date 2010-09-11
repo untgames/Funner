@@ -7,6 +7,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 
+#include <common/file.h>
 #include <common/log.h>
 
 #include <network/inet_address.h>

@@ -6,5 +6,5 @@ export.compile.network.IMPORTS      := compile.xtl
 export.link.network.LIBS                := funner.network
 export.link.network.win32.LIBS          := wsock32
 export.link.network.IMPORTS             := link.common link.system
-export.link.network.win32.LINK_INCLUDES := CurlStreamManager
+export.link.network.win32.LINK_INCLUDES := CurlStreamManager UrlFileSystem
 export.link.network.win32.IMPORTS       := link.extern.curl
