@@ -17,7 +17,7 @@ SDKS.FUNNER3D.IMPORTS       := compile.system compile.render.low_level compile.m
                                link.common link.system link.render.low_level.opengl_driver \
                                link.media.geometry.xmesh link.media.geometry.binmesh link.media.geometry link.media.rfx \
                                link.media.rfx.default_serializers link.media.animation.xanim link.media.animation.binanim \
-                               link.media.image link.media.sound.default_decoders link.media.sound.snddecl \
+                               link.media.image link.media.image.dds link.media.sound.default_decoders link.media.sound.snddecl \
                                link.media.video.theora link.media.font.xfont \
                                link.scene_graph.core link.sound.scene_player link.sound.low_level.openal_driver \
                                link.physics.low_level.bullet_driver link.input.manager link.input.window_driver \
