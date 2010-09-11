@@ -79,6 +79,7 @@ struct Params
   StringArray   source_search_paths;         //пути к каталогам поиск ресурсов
   stl::string   output_textures_dir_name;    //имя каталога с сохранёнными текстурами
   stl::string   output_textures_format;      //формат текстур
+  stl::string   material_textures_format;    //формат текстур сохраняемых в материале
   stl::string   output_materials_file_name;  //файл материалов
   stl::string   output_scene_file_name;      //файл сцены
   stl::string   output_animations_file_name; //файл анимаций
@@ -177,6 +178,12 @@ void command_line_output_textures_format (const char* format, Params& params)
   params.output_textures_format = format;
 }
 
+//установка формата сохранения текстур в материале
+void command_line_material_textures_format (const char* format, Params& params)
+{
+  params.material_textures_format = format;
+}
+
 //установка максимального размера текстуры
 void command_line_output_max_texture_size (const char* value, Params& params)
 {
@@ -253,22 +260,23 @@ void command_line_set_resources_namespace (const char* prefix, Params& params)
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
-    {command_line_source_search_path,          "include",               'I', "dir",       "add path to resources search paths"},
-    {command_line_output_textures_dir_name,    "out-textures-dir",        0, "dir",       "set output textures directory"},
-    {command_line_output_textures_format,      "out-textures-format",     0, "string",    "set output textures format string"},
-    {command_line_output_max_texture_size,     "max-texture-size",        0, "value",     "set maximum output textures size"},
-    {command_line_pot,                         "pot",                     0, 0,           "rescale textures to power of two"},
-    {command_line_output_materials_file_name,  "out-materials",           0, "file",      "set output materials file"},
-    {command_line_output_meshes_file_name,     "out-meshes",              0, "file",      "set output meshes file name"},
-    {command_line_output_scene_file_name,      "out-scene",               0, "file",      "set output scene file"},
-    {command_line_output_animations_file_name, "out-animations",          0, "file",      "set output animations file"},
-    {command_line_set_remove_file_prefix,      "remove-file-prefix",      0, "string",    "remove file prefix from all file links"},
-    {command_line_set_resources_namespace,     "resources-namespace",     0, "string",    "set resources namespace"},
-    {command_line_exclude_nodes,               "exclude-nodes",           0, "wildcards", "exclude selected nodes from export"},
-    {command_line_merge_animation,             "merge-animation",         0, "string",    "merge all animations in one with given name"},
-    {command_line_remove_unused_resources,     "remove-unused",           0, 0,           "remove unused resources from export"},
-    {command_line_silent,                      "silent",                's', 0,           "quiet mode"},
-    {command_line_help,                        "help",                  '?', 0,           "print help message"},
+    {command_line_source_search_path,          "include",                'I', "dir",       "add path to resources search paths"},
+    {command_line_output_textures_dir_name,    "out-textures-dir",         0, "dir",       "set output textures directory"},
+    {command_line_output_textures_format,      "out-textures-format",      0, "string",    "set output textures format string"},
+    {command_line_material_textures_format,    "material-textures-format", 0, "string",    "set material textures format string"},
+    {command_line_output_max_texture_size,     "max-texture-size",         0, "value",     "set maximum output textures size"},
+    {command_line_pot,                         "pot",                      0, 0,           "rescale textures to power of two"},
+    {command_line_output_materials_file_name,  "out-materials",            0, "file",      "set output materials file"},
+    {command_line_output_meshes_file_name,     "out-meshes",               0, "file",      "set output meshes file name"},
+    {command_line_output_scene_file_name,      "out-scene",                0, "file",      "set output scene file"},
+    {command_line_output_animations_file_name, "out-animations",           0, "file",      "set output animations file"},
+    {command_line_set_remove_file_prefix,      "remove-file-prefix",       0, "string",    "remove file prefix from all file links"},
+    {command_line_set_resources_namespace,     "resources-namespace",      0, "string",    "set resources namespace"},
+    {command_line_exclude_nodes,               "exclude-nodes",            0, "wildcards", "exclude selected nodes from export"},
+    {command_line_merge_animation,             "merge-animation",          0, "string",    "merge all animations in one with given name"},
+    {command_line_remove_unused_resources,     "remove-unused",            0, 0,           "remove unused resources from export"},
+    {command_line_silent,                      "silent",                 's', 0,           "quiet mode"},
+    {command_line_help,                        "help",                   '?', 0,           "print help message"},
   };
 
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -647,6 +655,32 @@ TexturePtr load_texture (const Params& params, const char* path)
   return TexturePtr ();
 }
 
+stl::string get_texture_name (const char* texture_format, const char* dir_name, const char* image_path, size_t texture_id)
+{
+  if (!xtl::xstrlen (texture_format))
+  {
+    if (xtl::xstrlen (dir_name))
+      return common::format ("%s/%s", dir_name, image_path);
+    else
+      return image_path;
+  }
+  else
+  {
+    stl::string format;
+
+    if (xtl::xstrlen (dir_name))
+    {
+      format = common::format ("%s/%s", dir_name, texture_format);
+    }
+    else
+    {
+      format = texture_format;
+    }
+
+    return common::format (format.c_str (), texture_id);
+  }
+}
+
 //сохранение изображений
 void save_images (const Params& params, const Model& model, ImagesMap& images_map)
 {
@@ -680,38 +714,17 @@ void save_images (const Params& params, const Model& model, ImagesMap& images_ma
       throw xtl::format_operation_exception ("::save_images", "Image '%s' not found", image_path.c_str ());
     }
       
-    stl::string output_texture_name;
+    stl::string output_texture_name   = get_texture_name (params.output_textures_format.c_str (), params.output_textures_dir_name.c_str (), image_path.c_str (), texture_id),
+                material_texture_name;
 
-    if (params.output_textures_format.empty ())
-    {
-      if (!params.output_textures_dir_name.empty ())
-      {
-        output_texture_name = common::format ("%s/%s", params.output_textures_dir_name.c_str (), image_path.c_str ());
-      }
-      else
-      {
-        output_texture_name = image_path;
-      }
-    }
+    if (params.material_textures_format.empty ())
+      material_texture_name = output_texture_name;
     else
-    {
-      stl::string format;
-      
-      if (!params.output_textures_dir_name.empty ())
-      {
-        format = common::format ("%s/%s", params.output_textures_dir_name.c_str (), params.output_textures_format.c_str ());
-      }
-      else
-      {
-        format = params.output_textures_format;
-      }
-      
-      output_texture_name = common::format (format.c_str (), texture_id);
-    }
+      material_texture_name = get_texture_name (params.material_textures_format.c_str (), params.output_textures_dir_name.c_str (), image_path.c_str (), texture_id);
 
     texture->Save (output_texture_name.c_str ());
 
-    images_map.insert_pair (image.Id (), output_texture_name.c_str ());
+    images_map.insert_pair (image.Id (), material_texture_name.c_str ());
 
     ++texture_id;
 
