@@ -5,7 +5,7 @@ TARGETS := FUNNER_EXTERN_LIBS
 
 #Цель - external libraries
 FUNNER_EXTERN_LIBS.TYPE       := package
-FUNNER_EXTERN_LIBS.COMPONENTS := zlib zzip pcre jpeg tiff libpng devil ogg vorbis vorbisfile lua freetype libpsd bullet theora
+FUNNER_EXTERN_LIBS.COMPONENTS := zlib zzip pcre jpeg tiff libpng devil ogg vorbis vorbisfile lua freetype libpsd bullet theora mongoose
 
 ifeq (,$(filter iphone,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += curl
