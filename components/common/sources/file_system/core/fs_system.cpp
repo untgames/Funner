@@ -284,12 +284,9 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
 
   string path = FileSystem::GetNormalizedFileName (_path), mount_path;
 
-  if (path [0] != '/')
-    path = format ("%s/%s",default_path.c_str (),path.c_str ());
-
-  ICustomFileSystemPtr owner_file_system = FindMountFileSystem (path.c_str (),mount_path);
+  ICustomFileSystemPtr owner_file_system = FindFileSystem (path.c_str (),mount_path);
   FileInfo           file_info;
-
+  
   if (!owner_file_system || !owner_file_system->GetFileInfo (mount_path.c_str (),file_info))
   {
     path = FileSystem::GetNormalizedFileName (_path);
@@ -300,6 +297,9 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
     
     return;
   }
+  
+  if (path [0] != '/')
+    path = format ("%s/%s",default_path.c_str (),path.c_str ());
 
   size_t path_hash = strhash (path.c_str ());
 
