@@ -23,12 +23,12 @@ namespace
 
 /*
     Описание формата PVR
-*/
+ */
 
 #if !defined(MAKEFOURCC)
 # define MAKEFOURCC(ch0, ch1, ch2, ch3) \
     (uint32(uint8(ch0)) | (uint32(uint8(ch1)) << 8) | \
-    (uint32(uint8(ch2)) << 16) | (uint32(uint8(ch3)) << 24 ))
+        (uint32(uint8(ch2)) << 16) | (uint32(uint8(ch3)) << 24 ))
 #endif
 
 typedef unsigned int  uint32;
@@ -228,7 +228,7 @@ struct DdsHeaderDx10
 
 /*
     Утилиты
-*/
+ */
 
 template <class T>
 void read (File& file, const char* file_name, T& value)
@@ -239,84 +239,77 @@ void read (File& file, const char* file_name, T& value)
 
 /*
     Изображение, сжатое в формате DDS
-*/
+ */
 
 class DdsCompressedImage: public ICustomCompressedImage
 {
   public:
-///Загрузка изображения
+    ///Загрузка изображения
     DdsCompressedImage (const char* file_name)
+      : bytes_per_block (0)
     {
+      static const char* METHOD_NAME = "media::DdsCompressedImage::DdsCompressedImage";
+
+      if (!file_name)
+        throw xtl::make_null_argument_exception ("", "file_name");
+
       try
       {
-        if (!file_name)
-          throw xtl::make_null_argument_exception ("", "file_name");
-
         InputFile file (file_name);
 
-          //чтение заголовков
+        //чтение заголовков
 
         char id [4];
-        
+
         read (file, file_name, id);
-        
+
         if (memcmp (id, DDS_MAGIC_ID, sizeof (DDS_MAGIC_ID)))
           throw xtl::format_operation_exception ("", "Invalid DDS file. Wrong magic id");
-          
+
         DdsHeader     header;
         DdsHeaderDx10 header_dx10;        
         bool          has_dx10_header = false;
 
         read (file, file_name, header);
-        
+
         if ((header.ddpf.dwFlags & DDPF_FOURCC) && (header.ddpf.dwFourCC == FOURCC_DX10))
         {
-            //чтение дополнительного заголовка для поддержки DX10                    
-            
+          //чтение дополнительного заголовка для поддержки DX10
+
           read (file, file_name, header_dx10);
 
           has_dx10_header = true;
         }
-        
-          //проверка корректности
-          
+
+        //проверка корректности
+
         CheckSupported (header, &header_dx10);
-        
-          //чтение данных
 
-        size_t data_size = file.Size () - file.Tell ();
-
-        data.resize (data_size, false);
-        
-        size_t read_size = file.Read (data.data (), data.size ());
-
-        if (read_size != data.size ())
-          throw xtl::format_operation_exception ("", "Invalid DDS file '%s'. Error at read %u bytes from file (read_size=%u)", file_name, data.size (), read_size);
-
-          //варианты загрузки
-/*          
-        if (has_dx10_header)
-        {
-          //пока не поддерживаем
-        }
-*/
+        //варианты загрузки
+        /*
+          if (has_dx10_header)
+          {
+            //пока не поддерживаем
+          }
+         */
         // check if image is a volume texture
         if ((header.dwCaps2 & DDSF_VOLUME) && (header.dwDepth > 0))
-            depth = header.dwDepth;
+          depth = header.dwDepth;
         else
-            depth = 0;
-            
+          depth = 0;
+
         // There are flags that are supposed to mark these fields as valid, but some dds files don't set them properly
         width  = header.dwWidth;
         height = header.dwHeight;
 
         if (header.dwFlags & DDSF_MIPMAPCOUNT)
-            mips_count = header.dwMipMapCount;
+          mips_count = header.dwMipMapCount;
         else
-            mips_count = 1;
-            
+          mips_count = 1;
+
         //check cube-map faces
-        if (header.dwCaps2 & DDSF_CUBEMAP) {
+        if (header.dwCaps2 & DDSF_CUBEMAP)
+        {
           //this is a cubemap, count the faces
           layers_count = 0;
           layers_count += (header.dwCaps2 & DDSF_CUBEMAP_POSITIVEX) ? 1 : 0;
@@ -330,151 +323,179 @@ class DdsCompressedImage: public ICustomCompressedImage
           if ( (layers_count != 6) || (width != height) )
             throw xtl::format_operation_exception ("", "Invalid DDS file '%s'. Cube-map not complete.", file_name);
         }
-        else {
+        else
+        {
           //not a cubemap
           layers_count = 1;
         }
 
-        size_t bytesPerElement = 0;
-        
         // figure out what the image format is
         if (header.ddpf.dwFlags & DDSF_FOURCC) 
         {
-            format = header.ddpf.dwFourCC;
+          format = header.ddpf.dwFourCC;
 
-            switch (header.ddpf.dwFourCC)
-            {
-                case FOURCC_DXT1:
-                  bytesPerElement = 8;
-                  break;
-
-                case FOURCC_DXT2:
-                case FOURCC_DXT3:
-                  bytesPerElement = 16;
-                  break;
-
-                case FOURCC_DXT4:
-                case FOURCC_DXT5:
-                  bytesPerElement = 16;
-                  break;
-
-                case FOURCC_ATI1:
-                  bytesPerElement = 8;
-                  break;
-
-                case FOURCC_ATI2:
-                  bytesPerElement = 16;
-                  break;
-                    
-                //these are unsupported for now
-                case FOURCC_R8G8B8:
-                case FOURCC_A8R8G8B8:
-                case FOURCC_X8R8G8B8:
-                case FOURCC_R5G6B5:
-                case FOURCC_A8:
-                case FOURCC_A2B10G10R10:
-                case FOURCC_A8B8G8R8:
-                case FOURCC_X8B8G8R8:
-                case FOURCC_A2R10G10B10:
-                case FOURCC_A16B16G16R16:
-                case FOURCC_L8:
-                case FOURCC_A8L8:
-                case FOURCC_L16:
-                case FOURCC_R16F:
-                case FOURCC_A16B16G16R16F:
-                case FOURCC_R32F:
-                case FOURCC_A32B32G32R32F:
-                case FOURCC_UNKNOWN:
-                case FOURCC_X1R5G5B5:
-                case FOURCC_A1R5G5B5:
-                case FOURCC_A4R4G4B4:
-                case FOURCC_R3G3B2:
-                case FOURCC_A8R3G3B2:
-                case FOURCC_X4R4G4B4:
-                case FOURCC_A4L4:
-                case FOURCC_D16_LOCKABLE:
-                case FOURCC_D32:
-                case FOURCC_D24X8:
-                case FOURCC_D16:
-                case FOURCC_D32F_LOCKABLE:
-                case FOURCC_G16R16:
-                case FOURCC_G16R16F:
-                case FOURCC_G32R32F:
-                default:
-                  throw xtl::format_operation_exception ("", "Invalid DDS file '%s'. Unsupported image format.", file_name);
-            }
+          switch (format)
+          {
+            case FOURCC_DXT1:
+              bytes_per_block = 8;
+              break;
+            case FOURCC_DXT3:
+              bytes_per_block = 16;
+              break;
+            case FOURCC_DXT5:
+              bytes_per_block = 16;
+              break;
+              //these are unsupported for now
+            case FOURCC_ATI1:
+            case FOURCC_ATI2:
+            case FOURCC_DXT2:
+            case FOURCC_DXT4:
+            case FOURCC_R8G8B8:
+            case FOURCC_A8R8G8B8:
+            case FOURCC_X8R8G8B8:
+            case FOURCC_R5G6B5:
+            case FOURCC_A8:
+            case FOURCC_A2B10G10R10:
+            case FOURCC_A8B8G8R8:
+            case FOURCC_X8B8G8R8:
+            case FOURCC_A2R10G10B10:
+            case FOURCC_A16B16G16R16:
+            case FOURCC_L8:
+            case FOURCC_A8L8:
+            case FOURCC_L16:
+            case FOURCC_R16F:
+            case FOURCC_A16B16G16R16F:
+            case FOURCC_R32F:
+            case FOURCC_A32B32G32R32F:
+            case FOURCC_UNKNOWN:
+            case FOURCC_X1R5G5B5:
+            case FOURCC_A1R5G5B5:
+            case FOURCC_A4R4G4B4:
+            case FOURCC_R3G3B2:
+            case FOURCC_A8R3G3B2:
+            case FOURCC_X4R4G4B4:
+            case FOURCC_A4L4:
+            case FOURCC_D16_LOCKABLE:
+            case FOURCC_D32:
+            case FOURCC_D24X8:
+            case FOURCC_D16:
+            case FOURCC_D32F_LOCKABLE:
+            case FOURCC_G16R16:
+            case FOURCC_G16R16F:
+            case FOURCC_G32R32F:
+            default:
+              throw xtl::format_operation_exception ("", "Invalid DDS file '%s'. Unsupported image format.", file_name);
+          }
         }
-        
+
+        //чтение данных
+
+        size_t data_size = 0;
+
+        for (size_t level = 0; level < mips_count; level++)
+          data_size += GetMipLevelSize (level) * layers_count;
+
+        if (data_size != file.Size () - file.Tell ())
+          throw xtl::format_operation_exception ("", "Invalid DDS file, file contains %u bytes of data, but computeddata size is %u", file.Size () - file.Tell (), data_size);
+
+        data.resize (data_size, false);
+
         blocks.reserve (layers_count * mips_count);
-        
+
+        xtl::uninitialized_storage<unsigned char> read_buffer (GetMipLevelSize (0));
+
         size_t data_offset = 0;
 
-        for (size_t layer = 0; layer < layers_count; layer++) {
-            int w = width, h = height, d = depth ? depth : 1;
-            for (size_t level = 0; level < mips_count; level++) {
-                int bw = (w+3)/4;
-                int bh = (h+3)/4;
-                int size = bw*bh*d*bytesPerElement;
-                
-                CompressedImageBlockDesc element;
-                
-                element.offset = data_offset;
-                element.size   = size;
+        for (size_t layer = 0; layer < layers_count; layer++)
+        {
+          size_t w = width, h = height, d = depth ? depth : 1;
 
-                blocks.push_back (element);
-                
-                data_offset += size;
+          for (size_t level = 0; level < mips_count; level++)
+          {
+            size_t mip_level_size = GetMipLevelSize (level);
 
-                //if (layers_count != 6)
-                //    flipSurface( data, w, h, d);
+            if (file.Read (read_buffer.data (), mip_level_size) != mip_level_size)
+              throw xtl::format_operation_exception ("", "Can't read data from file");
 
-                //reduce mip sizes
-                w = ( w > 1) ? w >> 1 : 1;
-                h = ( h > 1) ? h >> 1 : 1;
-                d = ( d > 1) ? d >> 1 : 1;
+            CompressedImageBlockDesc element;
+
+            element.offset = data_offset;
+            element.size   = mip_level_size;
+
+            blocks.push_back (element);
+
+            // Flip & copy to actual pixel buffer
+            size_t        row_size           = ((w + 3) / 4) * bytes_per_block;
+            unsigned char *current_block     = read_buffer.data (),
+                          *destination_block = (unsigned char*)data.data () + data_offset + ((h + 3) / 4 - 1) * row_size;
+
+            for (size_t i = 0; i < (h + 3) / 4; i++)
+            {
+              memcpy (destination_block, current_block, row_size);
+
+              switch (format)
+              {
+                case FOURCC_DXT1:
+                  for (size_t j = 0; j < row_size / bytes_per_block; j++)
+                    FlipDXT1BlockFull (destination_block + j * bytes_per_block);
+                  break;
+                case FOURCC_DXT3:
+                  for (size_t j = 0; j < row_size / bytes_per_block; j++)
+                    FlipDXT3BlockFull (destination_block + j * bytes_per_block);
+                  break;
+                case FOURCC_DXT5:
+                  for (size_t j = 0; j < row_size / bytes_per_block; j++)
+                    FlipDXT5BlockFull (destination_block + j * bytes_per_block);
+                  break;
+                default:
+                  throw xtl::format_operation_exception ("", "Don't know how to flip data for format %d", format);
+              }
+
+              current_block     += row_size;
+              destination_block -= row_size;
             }
-        }
 
+            //reduce mip sizes
+            w = ( w > 1) ? w >> 1 : 1;
+            h = ( h > 1) ? h >> 1 : 1;
+            d = ( d > 1) ? d >> 1 : 1;
+
+            data_offset += mip_level_size;
+          }
+        }
       }
       catch (xtl::exception& e)
       {
-        if (file_name)
-        {
-          e.touch ("media::DdsCompressedImage::DdsCompressedImage('%s')", file_name);
-        }
-        else
-        {
-          e.touch ("media::DdsCompressedImage::DdsCompressedImage");
-        }
+        e.touch ("%s ('%s')", METHOD_NAME, file_name);
         throw;
       }
     }
 
-///Ширина изображения
+    ///Ширина изображения
     size_t Width ()
     {
       return width;
     }
 
-///Высота изображения
+    ///Высота изображения
     size_t Height ()
     {
       return height;
     }
 
-///Количество слоёв
+    ///Количество слоёв
     size_t LayersCount ()
     {
       return layers_count;
     }
 
-///Количество мип-уровней
+    ///Количество мип-уровней
     size_t MipsCount ()
     {
       return mips_count;
     }
-    
-///Формат изображения
+
+    ///Формат изображения
     const char* Format ()
     {
       switch (format)
@@ -491,20 +512,114 @@ class DdsCompressedImage: public ICustomCompressedImage
       }
     }
 
-///Возвращение буфера данных
+    ///Возвращение буфера данных
     const void* Data ()
     {
       return data.data ();
     }
 
-///Возвращение блоков
+    ///Возвращение блоков
     const CompressedImageBlockDesc* Blocks ()
     {
       return &blocks [0];
     }
-    
+
   private:
-    static stl::string GetFourCCString (size_t code)
+    //Разворот по вертикали
+    void FlipDXT1BlockFull(unsigned char *data)
+    // A DXT1 block layout is:
+    // [0-1] color0.
+    // [2-3] color1.
+    // [4-7] color bitmap, 2 bits per pixel.
+    // So each of the 4-7 bytes represents one line, flipping a block is just
+    // flipping those bytes.
+    // Note that http://src.chromium.org/viewvc/chrome/trunk/src/o3d/core/cross/bitmap_dds.cc?view=markup&pathrev=21227
+    // contains an error in the last line: data[6]=data[5] is a bug!
+    {
+       unsigned char tmp;
+
+       tmp=data[4];
+       data[4]=data[7];
+       data[7]=tmp;
+
+       tmp=data[5];
+       data[5]=data[6];
+       data[6]=tmp;
+    }
+
+    void FlipDXT3BlockFull(unsigned char *block)
+    // Flips a full DXT3 block in the y direction.
+    {
+      // A DXT3 block layout is:
+      // [0-7]  alpha bitmap, 4 bits per pixel.
+      // [8-15] a DXT1 block.
+
+      // We can flip the alpha bits at the byte level (2 bytes per line).
+      unsigned char tmp = block[0];
+      block[0] = block[6];
+      block[6] = tmp;
+      tmp = block[1];
+      block[1] = block[7];
+      block[7] = tmp;
+      tmp = block[2];
+       block[2] = block[4];
+      block[4] = tmp;
+      tmp = block[3];
+      block[3] = block[5];
+      block[5] = tmp;
+      // And flip the DXT1 block using the above function.
+      FlipDXT1BlockFull(block + 8);
+    }
+
+    void FlipDXT5BlockFull(unsigned char *block)
+    // From http://src.chromium.org/viewvc/chrome/trunk/src/o3d/core/cross/bitmap_dds.cc?view=markup&pathrev=21227
+    // Original source contained bugs; fixed here.
+    {
+      // A DXT5 block layout is:
+      // [0]    alpha0.
+      // [1]    alpha1.
+      // [2-7]  alpha bitmap, 3 bits per pixel.
+      // [8-15] a DXT1 block.
+
+      // The alpha bitmap doesn't easily map lines to bytes, so we have to
+      // interpret it correctly.  Extracted from
+      // http://www.opengl.org/registry/specs/EXT/texture_compression_s3tc.txt :
+      //
+      //   The 6 "bits" bytes of the block are decoded into one 48-bit integer:
+      //
+      //     bits = bits_0 + 256 * (bits_1 + 256 * (bits_2 + 256 * (bits_3 +
+      //                   256 * (bits_4 + 256 * bits_5))))
+      //
+      //   bits is a 48-bit unsigned integer, from which a three-bit control code
+      //   is extracted for a texel at location (x,y) in the block using:
+      //
+      //       code(x,y) = bits[3*(4*y+x)+1..3*(4*y+x)+0]
+      //
+      //   where bit 47 is the most significant and bit 0 is the least
+      //   significant bit.
+      //QBitDump(block+2,6);
+
+      // From Chromium (source was buggy)
+      unsigned int line_0_1 = block[2] + 256 * (block[3] + 256 * block[4]);
+      unsigned int line_2_3 = block[5] + 256 * (block[6] + 256 * block[7]);
+      // swap lines 0 and 1 in line_0_1.
+      unsigned int line_1_0 = ((line_0_1 & 0x000fff) << 12) |
+      ((line_0_1 & 0xfff000) >> 12);
+      // swap lines 2 and 3 in line_2_3.
+      unsigned int line_3_2 = ((line_2_3 & 0x000fff) << 12) |
+      ((line_2_3 & 0xfff000) >> 12);
+      block[2] = line_3_2 & 0xff;
+      block[3] = (line_3_2 & 0xff00) >> 8;
+      block[4] = (line_3_2 & 0xff0000) >> 16;
+      block[5] = line_1_0 & 0xff;
+      block[6] = (line_1_0 & 0xff00) >> 8;
+      block[7] = (line_1_0 & 0xff0000) >> 16;
+
+      // And flip the DXT1 block using the above function.
+      FlipDXT1BlockFull(block+8);
+    }
+    
+    stl::string GetFourCCString (size_t code)
     {
       stl::string result;
 
@@ -518,29 +633,29 @@ class DdsCompressedImage: public ICustomCompressedImage
       return result;
     }
   
-    static void CheckValid (const DdsHeader& header)
+    void CheckValid (const DdsHeader& header)
     {
       if (header.dwSize != sizeof (header))
         throw xtl::format_operation_exception ("", "Invalid DDS file. Invalid header dwSize %u (must be %u)", 
-          header.dwSize, sizeof (header));
-          
+                                               header.dwSize, sizeof (header));
+
       static const uint32 required = DDSD_WIDTH | DDSD_HEIGHT /* | DDSD_CAPS | DDSD_PIXELFORMAT */;
-      
+
       if (!(header.dwFlags & DDSD_HEIGHT))
         throw xtl::format_operation_exception ("", "Invalid DDS file. No DDSD_HEIGHT flag set");
 
       if (!(header.dwFlags & DDSD_WIDTH))
         throw xtl::format_operation_exception ("", "Invalid DDS file. No DDSD_WIDTH flag set");
-            
+
       if (header.ddpf.dwSize != sizeof (DdsPixelFormat))
         throw xtl::format_operation_exception ("", "Invalid DDS file. Invalid pixel format dwSize %u (must be %u)", 
-          header.ddpf.dwSize, sizeof (DdsPixelFormat));
+                                               header.ddpf.dwSize, sizeof (DdsPixelFormat));
 
       if (!(header.dwCaps & DDSCAPS_TEXTURE))
         throw xtl::format_operation_exception ("", "Invalid DDS file. No DDSCAPS_TEXTURE");
     }
-    
-    static void CheckSupported (const DdsHeader& header, const DdsHeaderDx10* header_dx10)
+
+    void CheckSupported (const DdsHeader& header, const DdsHeaderDx10* header_dx10)
     {
       CheckValid (header);
 
@@ -564,7 +679,7 @@ class DdsCompressedImage: public ICustomCompressedImage
               break;
             default:
               throw xtl::format_not_supported_exception ("", "Unsupported DDS file. Unknown fourcc '%s'",
-                GetFourCCString (header.ddpf.dwFourCC).c_str ());
+                                                         GetFourCCString (header.ddpf.dwFourCC).c_str ());
           }
         }
         else if (header.ddpf.dwFlags & DDPF_RGB)
@@ -585,13 +700,13 @@ class DdsCompressedImage: public ICustomCompressedImage
         }
       }      
     }
-    
-    static bool IsTextureCube (const DdsHeader& header)
+
+    bool IsTextureCube (const DdsHeader& header)
     {
       return (header.dwCaps2 & DDSCAPS2_CUBEMAP) != 0;
     }
-      
-    static bool IsTexture3D (const DdsHeader& header, const DdsHeaderDx10* header_dx10)
+
+    bool IsTexture3D (const DdsHeader& header, const DdsHeaderDx10* header_dx10)
     {
       if (header_dx10)
       {
@@ -603,39 +718,46 @@ class DdsCompressedImage: public ICustomCompressedImage
       }
     }
 
-    static bool IsUncompressedTexture2D (const DdsHeader& header)
+    size_t GetMipLevelSize (size_t mip)
     {
-      return (header.ddpf.dwFlags & DDPF_RGB) != 0;
+      static const char* METHOD_NAME = "media::DdsCompressedImage::GetMipLevelSize";
+
+      if (!bytes_per_block)
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't calculate mip level size, data block size unknown");
+
+      if (mip >= mips_count)
+        throw xtl::make_range_exception (METHOD_NAME, "mip", mip, 0u, mips_count);
+
+      size_t w = width, h = height, d = depth ? depth : 1;
+
+      for (size_t level = 0; level < mip; level++)
+      {
+        //reduce mip sizes
+        w = (w > 1) ? w >> 1 : 1;
+        h = (h > 1) ? h >> 1 : 1;
+        d = (d > 1) ? d >> 1 : 1;
+      }
+
+      int block_width  = (w + 3) / 4;
+      int block_height = (h + 3) / 4;
+
+      return block_width * block_height * d * bytes_per_block;
     }
-    
-    static bool IsCompressedTexture2D (const DdsHeader& header)
-    {
-      return (header.ddpf.dwFlags & DDPF_FOURCC) != 0;
-    }    
-    
-    static bool IsMipmappedTexture (const DdsHeader& header)
-    {
-      return header.dwFlags & DDSD_MIPMAPCOUNT && header.dwCaps & DDSCAPS_MIPMAP && header.dwCaps & DDSCAPS_COMPLEX;
-    }
-    
-    static size_t GetMipLevelSize (const DdsHeader& header, size_t width, size_t height)
-    {
-      size_t factor = 1;
-    }
-    
+
   private:
     typedef xtl::uninitialized_storage<char>      Buffer;        
     typedef stl::vector<CompressedImageBlockDesc> BlockDescArray;
 
   private:
-    uint32         format;       //формат изображения
-    size_t         width;        //ширина изображения
-    size_t         height;       //высота изображения
-    size_t         depth;        //глубина изображения
-    size_t         layers_count; //количество слоёв
-    size_t         mips_count;   //количество mip-уровней
-    Buffer         data;         //данные изображения
-    BlockDescArray blocks;       //дескрипторы блоков
+    size_t         bytes_per_block; //размер блока данных
+    uint32         format;          //формат изображения
+    size_t         width;           //ширина изображения
+    size_t         height;          //высота изображения
+    size_t         depth;           //глубина изображения
+    size_t         layers_count;    //количество слоёв
+    size_t         mips_count;      //количество mip-уровней
+    Buffer         data;            //данные изображения
+    BlockDescArray blocks;          //дескрипторы блоков
 };
 
 /*

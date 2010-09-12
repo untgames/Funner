@@ -6,14 +6,14 @@ mips_count:   11
 format:       'DXT1'
 layers:
   layer0:
-    mip0: size=524288, crc32=a533c8b7
-    mip1: size=131072, crc32=a749cacf
-    mip2: size=32768, crc32=4343a65c
-    mip3: size=8192, crc32=bdb6e4fc
-    mip4: size=2048, crc32=633534be
-    mip5: size=512, crc32=6f3bff2c
-    mip6: size=128, crc32=f7c1c9cf
-    mip7: size=32, crc32=b466fd64
-    mip8: size=8, crc32=41963e5e
-    mip9: size=8, crc32=7587754c
+    mip0: size=524288, crc32=2959d1b0
+    mip1: size=131072, crc32=0ec9fd11
+    mip2: size=32768, crc32=1cfce970
+    mip3: size=8192, crc32=9655e213
+    mip4: size=2048, crc32=af5248a8
+    mip5: size=512, crc32=78563da6
+    mip6: size=128, crc32=e7ffa5c1
+    mip7: size=32, crc32=30002e0d
+    mip8: size=8, crc32=2d77a44b
+    mip9: size=8, crc32=6714aff0
     mip10: size=8, crc32=044cb9e0
