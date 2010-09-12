@@ -969,9 +969,30 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
         check_window_manager_error (SetUserFocusWindow (state ? wnd : kUserFocusAuto), "::SetUserFocusWindow", "Can't set focus window");
         break;
       case WindowFlag_Maximized:
+      {
+        WindowClass window_class;
+
+        check_window_manager_error (GetWindowClass (wnd, &window_class), "::GetWindowClass", "Can't get window class");
+
         ShowWindow (wnd);
-        ZoomWindow (wnd, inZoomOut, true);
+
+        if (window_class == kSheetWindowClass)
+        {
+          CGRect display_bounds = CGDisplayBounds (CGMainDisplayID ());
+          Rect   window_bounds;
+
+          window_bounds.left   = display_bounds.origin.x;
+          window_bounds.top    = display_bounds.origin.y;
+          window_bounds.right  = display_bounds.origin.x + display_bounds.size.width;
+          window_bounds.bottom = display_bounds.origin.y + display_bounds.size.height;
+
+          SetClientRect (handle, window_bounds);
+        }
+        else
+          ZoomWindow (wnd, inZoomOut, true);
+
         break;
+      }
       case WindowFlag_Minimized:
         check_window_manager_error (CollapseWindow (wnd, state), "::CollapseWindow", "Can't minimize window");
         break;
