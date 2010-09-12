@@ -162,7 +162,7 @@ class CurlStream: public IUrlStream
           
         try
         {
-          check_code (curl_easy_setopt (stream, CURLOPT_URL, url), "::curl_easy_setopt(CURLOPT_URL)");
+          check_code (curl_easy_setopt (stream, CURLOPT_URL, url.c_str ()), "::curl_easy_setopt(CURLOPT_URL)");
           check_code (curl_easy_setopt (stream, CURLOPT_WRITEFUNCTION, &WriteDataCallback), "::curl_easy_setopt(CURLOPT_WRITEFUNCTION)");
           check_code (curl_easy_setopt (stream, CURLOPT_WRITEDATA, this), "::curl_easy_setopt(CURLOPT_WRITEDATA)");
           check_code (curl_easy_setopt (stream, CURLOPT_READFUNCTION, &ReadDataCallback), "::curl_easy_setopt(CURLOPT_READFUNCTION)");
