@@ -16,4 +16,4 @@ NETWORK.SOURCES.IMPORTS            := compile.network compile.system compile.com
 #Öåëü ¹2 - System library tests
 NETWORK.TESTS.TYPE        := test-suite
 NETWORK.TESTS.SOURCE_DIRS := tests/wrappers
-NETWORK.TESTS.IMPORTS     := compile.network link.network compile.common
+NETWORK.TESTS.IMPORTS     := compile.network link.network compile.common link.common.zip_file_system compile.extern.mongoose link.extern.mongoose

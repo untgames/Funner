@@ -10,7 +10,8 @@ namespace
     Константы
 */
 
-const size_t DOWNLOAD_BUFFER_SIZE = 4096;
+const size_t DOWNLOAD_BUFFER_SIZE = 32784;
+const char*  LOG_NAME             = "network.url_file_system";
 
 /*
     URL файловая система
@@ -20,13 +21,20 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
 {
   public:
 ///Конструктор
-    UrlCustomFileSystem (const char* in_prefix) : prefix (in_prefix) {}
+    UrlCustomFileSystem (const char* in_prefix)
+      : prefix (in_prefix)
+      , log (LOG_NAME)
+    {
+    }
   
 ///Работа с файлом
     file_t FileOpen (const char* name, filemode_t mode_flags, size_t buffer_size)
     {
       try
       {
+        if (mode_flags & (FileMode_Write | FileMode_Resize))
+          throw xtl::format_not_supported_exception ("", "No write access inf URL files");
+        
         stl::auto_ptr<File> file (new File (OpenUrlFile (name)));
         
         return reinterpret_cast<file_t> (file.release ());
@@ -304,9 +312,9 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         
         xtl::uninitialized_storage<char> buffer (DOWNLOAD_BUFFER_SIZE);
         
-        TempFile file ("/system/inetcache/funner_url_file%06u");
+        TempFile file ("/system/inetcache/funner_url_file%06u"); //suffix (Url.File ())!!!
         
-        Log ("network.url_file_system").Printf ("Attempt to download URL '%s' to file '%s'", connection.Url ().ToString (), file.Path ());
+        log.Printf ("Attempt to download URL '%s'", connection.Url ().ToString ());
 
         size_t size;
         
@@ -319,6 +327,8 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         }
 
         file.Rewind ();
+        
+        log.Printf ("URL resource '%s' downloaded", connection.Url ().ToString ());
 
         return file;
       }
@@ -331,6 +341,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     
   private:
     stl::string prefix;
+    Log         log;
 };
 
 /*

@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <exception>
 
+#include <mongoose.h>
+
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 
@@ -20,5 +22,36 @@ void print_log (const char* stream, const char* message)
   printf ("%s: %s\n", stream, message);
   fflush (stdout);
 }
+
+///Тестовый HTTP сервер
+class TestHttpServer
+{
+  public:
+    TestHttpServer ()
+    {
+       static const char *options[] = {
+         "document_root", "./www",
+         "listening_ports", "8080",
+         0
+       };
+    
+      context = mg_start (0, options);
+      
+      if (!context)
+        throw xtl::format_operation_exception ("network::TestHttpServer::TestHttpServer", "Can't create mongoose context");
+    }
+    
+    ~TestHttpServer ()
+    {
+      mg_stop (context);
+    }
+  
+  private:
+    TestHttpServer (const TestHttpServer&); //no impl
+    TestHttpServer& operator = (const TestHttpServer&); //no impl
+  
+  private:
+    mg_context* context;
+};
 
 #endif

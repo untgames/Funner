@@ -59,7 +59,10 @@ class Buffer
     void FinishPut ()
     {
       syslib::Lock lock (mutex);
+      
       put_finished = true;
+      
+      condition.NotifyAll ();
     }
     
 ///Помещение данных в буфер
@@ -77,8 +80,7 @@ class Buffer
         
       while (size)
       {
-        size_t available_size       = total_size - offset,
-               block_offset         = available_size % BLOCK_SIZE,
+        size_t block_offset         = total_size % BLOCK_SIZE, //?????
                available_block_size = BLOCK_SIZE - block_offset,
                write_size           = size < available_block_size ? size : available_block_size;
                

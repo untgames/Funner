@@ -174,6 +174,8 @@ class CurlStream: public IUrlStream
           check_code (curl_easy_setopt (stream, CURLOPT_VERBOSE, 1L), "::curl_easy_setopt(CURLOPT_VERBOSE)");
           check_code (curl_easy_perform (stream), "::curl_perform");
           
+          log.Printf ("URL '%s' received", url.c_str ());
+          
           listener.FinishReceiveData ();
           
           return 0;
@@ -372,7 +374,7 @@ class CurlStream: public IUrlStream
 //            log.Printf ("Receive header '%s' (URL='%s')", GetDebugMessage (data, size).c_str (), url.c_str ());
             break;
           case CURLINFO_DATA_IN:
-            log.Printf ("Receive data (URL='%s')", url.c_str ());
+//            log.Printf ("Receive data (URL='%s')", url.c_str ());
             break;
           case CURLINFO_SSL_DATA_IN:
 //            log.Printf ("Receive SSL data (URL='%s')", url.c_str ());

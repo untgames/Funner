@@ -6,9 +6,11 @@ int main ()
 
   try
   {
-//    common::LogFilter filter ("*", &print_log);
+//    common::LogFilter filter ("network.*", &print_log);
     
-    common::FileSystem::CopyFile ("http://www.google.com", "/io/stdout");
+    TestHttpServer http_server;
+    
+    common::FileSystem::CopyFile ("http://localhost:8080/test.txt", "/io/stdout");
   }
   catch (std::exception& e)
   {
