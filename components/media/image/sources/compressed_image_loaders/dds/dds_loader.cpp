@@ -639,8 +639,6 @@ class DdsCompressedImage: public ICustomCompressedImage
         throw xtl::format_operation_exception ("", "Invalid DDS file. Invalid header dwSize %u (must be %u)", 
                                                header.dwSize, sizeof (header));
 
-      static const uint32 required = DDSD_WIDTH | DDSD_HEIGHT /* | DDSD_CAPS | DDSD_PIXELFORMAT */;
-
       if (!(header.dwFlags & DDSD_HEIGHT))
         throw xtl::format_operation_exception ("", "Invalid DDS file. No DDSD_HEIGHT flag set");
 
