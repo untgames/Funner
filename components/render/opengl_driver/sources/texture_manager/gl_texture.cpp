@@ -50,6 +50,8 @@ Texture::Texture
 
         //проверка корректности начальных размеров
 
+      mips_count = get_mips_count (desc.width < desc.height ? desc.width : desc.height);  //необходимо разобраться как задаются мип-уровни для уровней с размером стороны меньше 4 пикселов
+
       if (mips_count < 3)
       {
         if (desc.width % 4)  throw xtl::make_argument_exception (METHOD_NAME, "desc.width", desc.width, "Reason: width is not multiple of 4");
@@ -107,11 +109,14 @@ Texture::Texture
   
     //включение автоматической генерации    
 
-  if (mips_count > 1 && desc.generate_mips_enable && GetCaps ().has_sgis_generate_mipmap)
+  if (mips_count > 1)
   {
     Bind ();
 
-    glTexParameteri (target, GL_GENERATE_MIPMAP, GL_TRUE);
+    glTexParameteri (target, GL_TEXTURE_MAX_LEVEL, mips_count - 1);
+
+    if (desc.generate_mips_enable && GetCaps ().has_sgis_generate_mipmap)
+      glTexParameteri (target, GL_GENERATE_MIPMAP, GL_TRUE);
   }
 
     //проверка ошибок
