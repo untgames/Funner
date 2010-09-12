@@ -51,6 +51,10 @@
 
 #if defined(macintosh) && defined(__MRC__)
 #  include "config-mac.h"
+#elif defined (__IPHONE__)
+#  include "config-iphone.h"
+#elif defined(__APPLE__)
+#  include "config-macosx.h"
 #endif
 
 #ifdef __AMIGA__

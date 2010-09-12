@@ -11,6 +11,6 @@ ifeq (,$(filter iphone,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += curl
 endif
 
-ifneq (,$(filter x86,$(PROFILES)))
+ifneq (,$(filter win32,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += luajit
 endif
