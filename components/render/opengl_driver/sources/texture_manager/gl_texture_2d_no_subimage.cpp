@@ -92,7 +92,7 @@ Texture2DNoSubimage::Texture2DNoSubimage  (const ContextManager& manager, const 
 
       if (data_selector.GetLevelData (level_desc.width, level_desc.height, 1, level_data) && is_compressed_data)
       {
-        glCompressedTexImage2D_fn (GL_TEXTURE_2D, i, gl_internal_format, level_desc.width, level_desc.height, gl_format, level_data.size, level_data.data);
+        glCompressedTexImage2D_fn (GL_TEXTURE_2D, i, gl_internal_format, level_desc.width, level_desc.height, 0, level_data.size, level_data.data);
       }
       else
       {
