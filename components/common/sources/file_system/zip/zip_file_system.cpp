@@ -598,6 +598,7 @@ class ZipFileSystemComponent
       FileSystem::RegisterPackFile ("zip", &Create);
       FileSystem::RegisterPackFile ("jar", &Create);
       FileSystem::RegisterPackFile ("pk3", &Create);
+      FileSystem::RegisterPackFile ("pak", &Create);
     }
 
   private:
