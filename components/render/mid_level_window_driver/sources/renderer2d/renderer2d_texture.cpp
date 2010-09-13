@@ -52,6 +52,9 @@ render::low_level::PixelFormat get_pixel_format (const char* name)
   else if (!strcmp (name, "rgb_pvrtc4"))  return PixelFormat_RGB_PVRTC4;
   else if (!strcmp (name, "rgba_pvrtc2")) return PixelFormat_RGBA_PVRTC2;
   else if (!strcmp (name, "rgba_pvrtc4")) return PixelFormat_RGBA_PVRTC4;
+  else if (!strcmp (name, "dxt1"))        return PixelFormat_DXT1;
+  else if (!strcmp (name, "dxt3"))        return PixelFormat_DXT3;
+  else if (!strcmp (name, "dxt5"))        return PixelFormat_DXT5;
 
   throw xtl::format_not_supported_exception ("render::mid_level::window_driver::renderer2d::get_pixel_format", "Unsupported compression format '%s'", name);
 }
