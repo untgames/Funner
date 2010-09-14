@@ -46,7 +46,7 @@ int main (int argc, const char* argv [])
         return 1;
       }
 
-      Boolean get_string_result = CFStringGetCString (filesystem_path, buf, 16 * 1024, kCFStringEncodingASCII);
+      Boolean get_string_result = CFStringGetCString (filesystem_path, buf, 16 * 1024, kCFStringEncodingUTF8);
 
       CFRelease (filesystem_path);
 
