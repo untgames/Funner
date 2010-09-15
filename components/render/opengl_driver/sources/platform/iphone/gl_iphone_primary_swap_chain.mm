@@ -46,13 +46,7 @@ struct PrimarySwapChain::Impl
     desc.frame_buffer.color_bits   = 24;
     desc.frame_buffer.alpha_bits   = 8;
     desc.frame_buffer.depth_bits   = in_desc.frame_buffer.depth_bits ? 16 : 0;
-
-#ifdef __IPHONE_3_0
     desc.frame_buffer.stencil_bits = in_desc.frame_buffer.stencil_bits ? 8 : 0;
-#else
-    desc.frame_buffer.stencil_bits = 0;
-#endif
-
     desc.samples_count             = 0;
     desc.buffers_count             = 2;
     desc.swap_method               = SwapMethod_Discard;
@@ -134,8 +128,6 @@ struct PrimarySwapChain::Impl
         glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, depth_buffer);
       }
 
-#ifdef __IPHONE_3_0
-
       if (desc.frame_buffer.stencil_bits)
       {
         glGenRenderbuffersOES (1, &stencil_buffer);
@@ -143,8 +135,6 @@ struct PrimarySwapChain::Impl
         glRenderbufferStorageOES (GL_RENDERBUFFER_OES, GL_STENCIL_INDEX8_OES, desc.frame_buffer.width, desc.frame_buffer.height);
         glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_STENCIL_ATTACHMENT_OES, GL_RENDERBUFFER_OES, stencil_buffer);
       }
-
-#endif
 
       GLenum status = glCheckFramebufferStatusOES (GL_FRAMEBUFFER_OES);
 

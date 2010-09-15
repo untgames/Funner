@@ -77,16 +77,34 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
 @end
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Класс, обрабатывающий события ввода и отвечающий за отрисовку
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+   Класс, обрабатывающий события ввода и отвечающий за отрисовку
+*/
+
 @interface UIViewWrapper : UIView
 {
+  @private
+    Color   background_color;       //цвет фона
+    UIColor *ui_background_color;   //цвет фона
+    bool    background_state;       //состояние включения цвета фона
 }
+
+@property (nonatomic, assign) Color    background_color;
+@property (nonatomic, retain) UIColor* ui_background_color;
+@property (nonatomic, assign) bool     background_state;
 
 @end
 
 @implementation UIViewWrapper
+
+@synthesize background_color, ui_background_color, background_state;
+
+-(void)dealloc
+{
+  self.ui_background_color = nil;
+
+  [super dealloc];
+}
 
 +(Class)layerClass
 {
@@ -108,11 +126,6 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
   self.layer.delegate = self;
 
   return self;
-}
-
--(void) drawRect:(CGRect)rect
-{
-  [(UIWindowWrapper*)self.window onPaint];
 }
 
 -(void) displayLayer:(CALayer*)layer
@@ -179,6 +192,9 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 {
   self.view = [[UIViewWrapper alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
   [self.view release];
+
+  if ([[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending)
+    self.view.contentScaleFactor = [UIScreen mainScreen].scale;
 }
 
 -(void)viewDidUnload
@@ -201,6 +217,14 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
   delete event_context;
 
   [super dealloc];
+}
+
+-(CGFloat)contentScaleFactor
+{
+  if ([[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending)
+    return super.contentScaleFactor;
+
+  return 1;
 }
 
 -(UIViewController*)rootViewController
@@ -375,6 +399,9 @@ Platform::window_t Platform::CreateWindow (WindowStyle window_style, WindowMessa
   if (!new_window)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't create window.");
 
+  if ([[[UIDevice currentDevice] systemVersion] compare:@"4.0" options:NSNumericSearch] != NSOrderedAscending)
+    new_window.contentScaleFactor = [UIScreen mainScreen].scale;
+
   new_window.rootViewController.view.clearsContextBeforeDrawing = NO;
   new_window.rootViewController.view.multipleTouchEnabled       = YES;
 
@@ -433,23 +460,30 @@ void Platform::GetWindowTitle (window_t, size_t size, wchar_t* buffer)
     Область окна / клиентская область
 */
 
-void Platform::SetWindowRect (window_t handle, const Rect& rect)
+void Platform::SetWindowRect (window_t window, const Rect& rect)
 {
+  if (!window)
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::SetWindowRect", "window");
+
+  UIWindowWrapper* wnd = (UIWindowWrapper*)window;
+
+  float scale_factor = wnd.contentScaleFactor;
+
   CGRect frame;
 
-  frame.size.width  = rect.right - rect.left;
-  frame.size.height = rect.bottom - rect.top;
-  frame.origin.x    = rect.left;
-  frame.origin.y    = rect.top;
+  frame.size.width  = (rect.right - rect.left) / scale_factor;
+  frame.size.height = (rect.bottom - rect.top) / scale_factor;
+  frame.origin.x    = rect.left / scale_factor;
+  frame.origin.y    = rect.top / scale_factor;
 
-  ((UIView*)handle).frame = frame;
+  wnd.frame = frame;
 
-  WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
+  WindowImpl* window_impl = wnd.window_impl;
 
-  WindowEventContext& dummy_context = [(UIWindowWrapper*)handle getEventContext];
+  WindowEventContext& dummy_context = [wnd getEventContext];
 
-  window->Notify (WindowEvent_OnMove, dummy_context);
-  window->Notify (WindowEvent_OnSize, dummy_context);
+  window_impl->Notify (WindowEvent_OnMove, dummy_context);
+  window_impl->Notify (WindowEvent_OnSize, dummy_context);
 }
 
 void Platform::SetClientRect (window_t handle, const Rect& rect)
@@ -457,14 +491,21 @@ void Platform::SetClientRect (window_t handle, const Rect& rect)
   SetWindowRect (handle, rect);
 }
 
-void Platform::GetWindowRect (window_t handle, Rect& rect)
+void Platform::GetWindowRect (window_t window, Rect& rect)
 {
-  CGRect frame = ((UIView*)handle).frame;
+  if (!window)
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::GetWindowRect", "window");
 
-  rect.bottom = frame.origin.y + frame.size.height;
-  rect.right  = frame.origin.x + frame.size.width;
-  rect.top    = frame.origin.y;
-  rect.left   = frame.origin.x;
+  UIWindow* wnd = (UIWindow*)window;
+
+  float scale_factor = wnd.contentScaleFactor;
+
+  CGRect frame = wnd.frame;
+
+  rect.bottom = (frame.origin.y + frame.size.height) * scale_factor;
+  rect.right  = (frame.origin.x + frame.size.width) * scale_factor;
+  rect.top    = frame.origin.y * scale_factor;
+  rect.left   = frame.origin.x * scale_factor;
 }
 
 void Platform::GetClientRect (window_t handle, Rect& target_rect)
@@ -533,6 +574,11 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
         }
 
         break;
+      case WindowFlag_Maximized:
+        wnd.frame = [UIScreen mainScreen].applicationFrame;
+        break;
+      case WindowFlag_Minimized:
+        throw xtl::format_operation_exception ("", "Can't minimize window");
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
     }
@@ -558,6 +604,10 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
         return wnd == [UIApplication sharedApplication].keyWindow;
       case WindowFlag_Focus:
         return wnd.rootViewController.view.userInteractionEnabled == YES;
+      case WindowFlag_Maximized:
+        return CGRectEqualToRect (wnd.frame, [UIScreen mainScreen].applicationFrame);
+      case WindowFlag_Minimized:
+        throw xtl::format_operation_exception ("", "Can't get window flag %d value", flag);
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
     }
@@ -648,6 +698,61 @@ void Platform::DestroyCursor (cursor_t)
 void Platform::SetCursor (window_t, cursor_t)
 {
   throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::CreateCursor", "No cursor for iPhone platform");
+}
+
+/*
+   Цвет фона
+*/
+
+void Platform::SetBackgroundColor (window_t window, const Color& color)
+{
+  if (!window)
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::SetBackgroundColor", "window");
+
+  UIWindow*      wnd  = (UIWindow*)window;
+  UIViewWrapper* view = (UIViewWrapper*)wnd.rootViewController.view;
+
+  UIColor *background_color = [[UIColor alloc] initWithRed:color.red / 255.f green:color.green / 255.f blue:color.blue / 255.f alpha:1];
+
+  view.background_color    = color;
+  view.ui_background_color = background_color;
+
+  if (view.background_state)
+    view.backgroundColor = background_color;
+
+  [background_color release];
+}
+
+void Platform::SetBackgroundState (window_t window, bool state)
+{
+  if (!window)
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::SetBackgroundState", "window");
+
+  UIWindow*      wnd  = (UIWindow*)window;
+  UIViewWrapper* view = (UIViewWrapper*)wnd.rootViewController.view;
+
+  view.clearsContextBeforeDrawing = state;
+  view.backgroundColor            = state ? view.ui_background_color : nil;
+  view.background_state           = state;
+}
+
+Color Platform::GetBackgroundColor (window_t window)
+{
+  if (!window)
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::GetBackgroundColor", "window");
+
+  UIWindow*      wnd  = (UIWindow*)window;
+  UIViewWrapper *view = (UIViewWrapper*)wnd.rootViewController.view;
+
+  return view.ui_background_color ? view.background_color : Color ();
+}
+
+bool Platform::GetBackgroundState (window_t window)
+{
+  if (!window)
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::GetBackgroundState", "window");
+
+  return ((UIViewWrapper*)((UIWindow*)window).rootViewController.view).background_state;
 }
 
 namespace syslib
