@@ -15,8 +15,8 @@
 
 #include <engine/subsystem_manager.h>
 
-#import <AudioServices.h>
-#import <MPMoviePlayerController.h>
+#import <AudioToolbox/AudioServices.h>
+#import <MediaPlayer/MPMoviePlayerController.h>
 
 using namespace engine;
 

@@ -17,6 +17,7 @@ COMMON.SOURCES.IMPORTS                    := compile.math.vecmath
 COMMON.SOURCES.unistd.SOURCE_DIRS         := sources/platform/unistd
 COMMON.SOURCES.cocoa.SOURCE_DIRS          := sources/platform/cocoa
 COMMON.SOURCES.cocoa_desktop.SOURCE_DIRS  := sources/platform/cocoa_desktop
+COMMON.SOURCES.iphone.SOURCE_DIRS         := sources/platform/cocoa_iphone
 COMMON.SOURCES.win32.SOURCE_DIRS          := sources/platform/win32
 COMMON.SOURCES.bada_simulator.SOURCE_DIRS := sources/platform/win32
 

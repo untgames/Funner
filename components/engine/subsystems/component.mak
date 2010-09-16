@@ -13,8 +13,6 @@ ENGINE.SUBSYSTEMS.SOURCES.IMPORTS                 := compile.engine.core compile
 ENGINE.SUBSYSTEMS.SOURCES.has_windows.IMPORTS     := compile.input.window_driver compile.render.mid_level.window_driver
 ENGINE.SUBSYSTEMS.SOURCES.has_windows.SOURCE_DIRS := sources/window_manager
 ENGINE.SUBSYSTEMS.SOURCES.iphone.SOURCE_DIRS      := sources/iphone
-ENGINE.SUBSYSTEMS.SOURCES.iphone.COMPILER_CFLAGS  := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/AudioToolbox.framework/Headers \
-                                                     -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/MediaPlayer.framework/Headers/
 
 #Цель - tests
 ENGINE.SUBSYSTEMS.TESTS.TYPE                := test-suite

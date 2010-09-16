@@ -66,14 +66,14 @@ struct Device::Impl : public IWindowListener, public IApplicationListener
       throw;
     }
 
-    attach_window_listener      (*window, this);
-    attach_application_listener (this);
+    WindowManager::AttachWindowListener           (*window, this);
+    ApplicationManager::AttachApplicationListener (this);
   }
 
   ~Impl ()
   {
-    detach_application_listener (this);
-    detach_window_listener      (*window, this);
+    ApplicationManager::DetachApplicationListener (this);
+    WindowManager::DetachWindowListener (*window, this);
   }
 
   ///События касания
@@ -114,6 +114,21 @@ struct Device::Impl : public IWindowListener, public IApplicationListener
     }
   }
 
+  ///События разворота
+  void OnInterfaceOrientationWillChange (InterfaceOrientation old_orientation, InterfaceOrientation new_orientation, float duration)
+  {
+    xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "OrientationChange began %s %s %f", OrientationName (old_orientation),
+                    OrientationName (new_orientation), duration);
+    signals (message);
+  }
+
+  void OnInterfaceOrientationChanged (InterfaceOrientation old_orientation, InterfaceOrientation new_orientation)
+  {
+    xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "OrientationChange ended %s %s",
+                    OrientationName (old_orientation), OrientationName (new_orientation));
+    signals (message);
+  }
+
   ///События движения
   void OnShakeMotionBegan ()
   {
@@ -127,7 +142,7 @@ struct Device::Impl : public IWindowListener, public IApplicationListener
 
   void OnWindowDestroy ()
   {
-    detach_window_listener (*window, this);
+    WindowManager::DetachWindowListener (*window, this);
   }
 
   ///События приложения
@@ -154,6 +169,18 @@ struct Device::Impl : public IWindowListener, public IApplicationListener
       return true;
     else
       throw xtl::format_operation_exception ("input::low_level::window::Device::SetProperty", "Set only 0 or 1 for property '%s'", property_name);
+  }
+
+  const char* OrientationName (InterfaceOrientation orientation)
+  {
+    switch (orientation)
+    {
+      case InterfaceOrientation_Portrait:           return "Portrait";
+      case InterfaceOrientation_PortraitUpsideDown: return "PortraitUpsideDown";
+      case InterfaceOrientation_LandscapeLeft:      return "LandscapeLeft";
+      case InterfaceOrientation_LandscapeRight:     return "LandscapeRight";
+      default:                                      return "Unknown";
+    }
   }
 };
 
@@ -205,7 +232,7 @@ void Device::SetProperty (const char* name, float value)
   static const char* METHOD_NAME = "input::low_level::window::Device::SetProperty";
 
   if (!xtl::xstrcmp (MULTITOUCH_ENABLED, name))
-    set_multitouch_enabled (*impl->window, impl->GetBinaryPropertyValue (name, value));
+    WindowManager::SetMultitouchEnabled (*impl->window, impl->GetBinaryPropertyValue (name, value));
   else
     throw xtl::make_argument_exception (METHOD_NAME, "name", name);
 }
@@ -213,7 +240,7 @@ void Device::SetProperty (const char* name, float value)
 float Device::GetProperty (const char* name)
 {
   if (!xtl::xstrcmp (MULTITOUCH_ENABLED, name))
-    return get_multitouch_enabled (*impl->window) ? 1.f : 0.f;
+    return WindowManager::GetMultitouchEnabled (*impl->window) ? 1.f : 0.f;
   else
     throw xtl::make_argument_exception ("input::low_level::window::Device::GetProperty", "name", name);
 }

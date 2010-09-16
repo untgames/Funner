@@ -18,6 +18,18 @@ namespace
 
 const size_t DEFAULT_TOUCH_BUFFER_SIZE = 4;  //размер буфера для хранения информации о касаниях
 
+InterfaceOrientation get_interface_orientation (UIInterfaceOrientation interface_orientation)
+{
+  switch (interface_orientation)
+  {
+    case UIInterfaceOrientationPortrait:           return InterfaceOrientation_Portrait;
+    case UIInterfaceOrientationPortraitUpsideDown: return InterfaceOrientation_PortraitUpsideDown;
+    case UIInterfaceOrientationLandscapeLeft:      return InterfaceOrientation_LandscapeLeft;
+    case UIInterfaceOrientationLandscapeRight:     return InterfaceOrientation_LandscapeRight;
+    default:                                       return InterfaceOrientation_Unknown;
+  }
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Описание реализации окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,13 +79,18 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
     TouchDescriptionArray *touch_descriptions;   //массив для хранения описаний текущего события
     WindowEventContext    *event_context;        //контекст, передаваемый обработчикам событий
     UIViewController      *root_view_controller; //корневой контроллер
+    int                   allowed_orientations;  //разрешенные ориентации окна
 }
 
-@property (nonatomic) WindowImpl* window_impl;
+@property (nonatomic, assign) WindowImpl* window_impl;
+@property (nonatomic)         int         allowed_orientations;
 
 -(void)onPaint;
 
 -(WindowEventContext&)getEventContext;
+
+-(void)onInterfaceOrientationWillChangeFrom:(InterfaceOrientation)from_orientation to:(InterfaceOrientation)to_orientation duration:(float)duration;
+-(void)onInterfaceOrientationChangedFrom:(InterfaceOrientation)from_orientation to:(InterfaceOrientation)to_orientation;
 
 @end
 
@@ -170,9 +187,9 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
 @end
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Класс, отвечающий за управление ориентацией окна
-///////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+   Класс, отвечающий за управление ориентацией окна
+*/
 @interface UIViewControllerWrapper : UIViewController
 {
 }
@@ -204,11 +221,28 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
   self.view = nil;
 }
 
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interface_orientation
+{
+  InterfaceOrientation desired_orientation = get_interface_orientation (interface_orientation);
+
+  return ((UIWindowWrapper*)self.view.window).allowed_orientations & desired_orientation;
+}
+
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)from_orientation
+{
+  [((UIWindowWrapper*)self.view.window) onInterfaceOrientationChangedFrom:get_interface_orientation (from_orientation) to:get_interface_orientation (self.interfaceOrientation)];
+}
+
+-(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)to_orientation duration:(NSTimeInterval)duration
+{
+  [((UIWindowWrapper*)self.view.window) onInterfaceOrientationWillChangeFrom:get_interface_orientation (self.interfaceOrientation) to:get_interface_orientation (to_orientation) duration:duration];
+}
+
 @end
 
 @implementation UIWindowWrapper
 
-@synthesize window_impl;
+@synthesize window_impl, allowed_orientations;
 
 -(void) dealloc
 {
@@ -292,21 +326,36 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
 -(void) fillTouchDescriptionsBuffer:(NSSet*)touches
 {
-  CGSize window_size = self.frame.size;
-
   if ([touches count] > touch_descriptions->size ())
     touch_descriptions->resize ([touches count], false);
 
-  NSEnumerator     *enumerator        = [touches objectEnumerator];
-  TouchDescription *touch_description = touch_descriptions->data ();
+  UIView                 *view              = self.rootViewController.view;
+  NSEnumerator           *enumerator        = [touches objectEnumerator];
+  TouchDescription       *touch_description = touch_descriptions->data ();
+  CGSize                 view_size          = view.frame.size;
+  UIInterfaceOrientation ui_orientation     = self.rootViewController.interfaceOrientation;
 
   for (UITouch *iter = [enumerator nextObject]; iter; iter = [enumerator nextObject], touch_description++)
   {
-    CGPoint current_location  = [iter locationInView:self];
+    CGPoint current_location = [iter locationInView:view];
+
+    switch (ui_orientation)
+    {
+      case UIInterfaceOrientationLandscapeLeft:
+      case UIInterfaceOrientationLandscapeRight:
+      {
+        current_location.x = current_location.x / view_size.height * view_size.width;
+        current_location.y = current_location.y / view_size.width * view_size.height;
+
+        break;
+      }
+      default:
+        break;
+    }
 
     touch_description->touch     = (touch_t)iter;
-    touch_description->x         = current_location.x / window_size.width;
-    touch_description->y         = current_location.y / window_size.height;
+    touch_description->x         = current_location.x / view_size.width;
+    touch_description->y         = current_location.y / view_size.height;
     touch_description->tap_count = iter.tapCount;
   }
 }
@@ -361,6 +410,18 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 -(void) motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent*)event
 {
   [self motionEnded:motion withEvent:event];
+}
+
+-(void)onInterfaceOrientationWillChangeFrom:(InterfaceOrientation)from_orientation to:(InterfaceOrientation)to_orientation duration:(float)duration
+{
+  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+    (*iter)->OnInterfaceOrientationWillChange (from_orientation, to_orientation, duration);
+}
+
+-(void)onInterfaceOrientationChangedFrom:(InterfaceOrientation)from_orientation to:(InterfaceOrientation)to_orientation
+{
+  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
+    (*iter)->OnInterfaceOrientationChanged (from_orientation, to_orientation);
 }
 
 /*
@@ -755,17 +816,15 @@ bool Platform::GetBackgroundState (window_t window)
   return ((UIViewWrapper*)((UIWindow*)window).rootViewController.view).background_state;
 }
 
-namespace syslib
-{
-
-namespace iphone
-{
+/*
+   Менеджер окон
+*/
 
 /*
    Добавление/удаление подписчиков
 */
 
-void attach_window_listener (const Window& window, IWindowListener* listener)
+void WindowManager::AttachWindowListener (const Window& window, IWindowListener* listener)
 {
   if  (!listener)
     return;
@@ -776,7 +835,7 @@ void attach_window_listener (const Window& window, IWindowListener* listener)
   [(UIWindowWrapper*)(window.Handle ()) attachListener:listener];
 }
 
-void detach_window_listener (const Window& window, IWindowListener* listener)
+void WindowManager::DetachWindowListener (const Window& window, IWindowListener* listener)
 {
   if (!is_in_run_loop ())
     return;
@@ -788,16 +847,26 @@ void detach_window_listener (const Window& window, IWindowListener* listener)
    Установка multitouch режима для окна
 */
 
-void set_multitouch_enabled (const Window& window, bool enabled)
+void WindowManager::SetMultitouchEnabled (const Window& window, bool enabled)
 {
   ((UIWindowWrapper*)window.Handle ()).rootViewController.view.multipleTouchEnabled = enabled;
 }
 
-bool get_multitouch_enabled (const Window& window)
+bool WindowManager::GetMultitouchEnabled (const Window& window)
 {
   return ((UIWindowWrapper*)window.Handle ()).rootViewController.view.multipleTouchEnabled;
 }
 
+/*
+   Установка/получение разрешенных ориентаций окна
+*/
+
+void WindowManager::SetAllowedOrientations (const Window& window, int orientations)
+{
+  ((UIWindowWrapper*)window.Handle ()).allowed_orientations = orientations;
 }
 
+int WindowManager::GetAllowedOrientations (const Window& window)
+{
+  return ((UIWindowWrapper*)window.Handle ()).allowed_orientations;
 }

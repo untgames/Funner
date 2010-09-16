@@ -40,6 +40,10 @@ export.link.engine.subsystems.iphone_audio_session.LINK_INCLUDES := IPhoneAudioS
 export.link.engine.subsystems.iphone_audio_session.IMPORTS       := link.engine.subsystems link.script.core
 export.link.engine.subsystems.iphone_audio_session.LINK_FLAGS    := -framework AudioToolbox -framework MediaPlayer
 
+# Link iPhone configuration exports
+export.link.engine.subsystems.iphone_configuration.LINK_INCLUDES := IPhoneConfigurationSubsystem
+export.link.engine.subsystems.iphone_configuration.IMPORTS       := link.engine.subsystems
+
 # Link window input driver exports
 export.link.engine.subsystems.window_input_driver.LINK_INCLUDES := WindowInputDriverSubsystem
 export.link.engine.subsystems.window_input_driver.IMPORTS       := link.engine.subsystems link.input.window_driver

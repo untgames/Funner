@@ -5,7 +5,7 @@ export.link.engine.launcher_shared.has_windows.IMPORTS := link.render.low_level.
                                              link.engine.subsystems.window_manager link.engine.subsystems.window_renderer
 export.link.engine.launcher_shared.win32.IMPORTS       := link.input.direct_input_driver
 export.link.engine.launcher_shared.iphone.IMPORTS      := link.media.image.pvr link.input.iphone_driver link.media.players.iphone \
-                                             link.engine.subsystems.iphone_audio_session
+                                             link.engine.subsystems.iphone_audio_session link.engine.subsystems.iphone_configuration
 export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handler link.common.zip_file_system link.common.aes \
                                 link.media.rms link.media.rfx.xmtl link.media.sound.snddecl link.media.sound.default_decoders \
                                 link.media.font.xfont link.media.players.null \

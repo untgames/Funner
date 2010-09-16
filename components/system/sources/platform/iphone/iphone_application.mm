@@ -226,14 +226,17 @@ bool is_in_run_loop () //запущен ли главный цикл
   return application_launched;
 }
 
-namespace iphone
-{
+}
+
+/*
+   Менеджер приложения
+*/
 
 /*
    Добавление/удаление подписчиков на события приложения
 */
 
-void attach_application_listener (syslib::iphone::IApplicationListener* listener)
+void ApplicationManager::AttachApplicationListener (syslib::iphone::IApplicationListener* listener)
 {
   if  (!listener)
     return;
@@ -244,16 +247,12 @@ void attach_application_listener (syslib::iphone::IApplicationListener* listener
   [(ApplicationDelegate*)([UIApplication sharedApplication].delegate) attachListener:listener];
 }
 
-void detach_application_listener (syslib::iphone::IApplicationListener* listener)
+void ApplicationManager::DetachApplicationListener (syslib::iphone::IApplicationListener* listener)
 {
   if (!is_in_run_loop ())
     return;
 
   [(ApplicationDelegate*)([UIApplication sharedApplication].delegate) detachListener:listener];
-}
-
-}
-
 }
 
 /*
