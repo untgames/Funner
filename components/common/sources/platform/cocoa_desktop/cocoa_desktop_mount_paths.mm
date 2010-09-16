@@ -8,7 +8,7 @@
 
 using namespace common;
 
-void CarbonPlatform::MountSystemPaths ()
+void CocoaDesktopPlatform::MountSystemPaths ()
 {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 

@@ -40,8 +40,8 @@ ENGINE.LAUNCHER.SOURCES.TYPE                   := application
 ENGINE.LAUNCHER.SOURCES.NAME                   := launcher
 ENGINE.LAUNCHER.SOURCES.INCLUDE_DIRS           := include
 ENGINE.LAUNCHER.SOURCES.EXECUTION_DIR          := sources
-ENGINE.LAUNCHER.SOURCES.macosx.LINK_FLAGS      := -framework CoreFoundation
-ENGINE.LAUNCHER.SOURCES.iphone.LINK_FLAGS      := -framework CoreFoundation -framework OpenAL -framework UIKit -framework Foundation \
+ENGINE.LAUNCHER.SOURCES.macosx.LINK_FLAGS      := -framework Foundation -framework AppKit
+ENGINE.LAUNCHER.SOURCES.iphone.LINK_FLAGS      := -framework OpenAL -framework UIKit -framework Foundation \
                                                   -framework OpenGLES -framework MediaPlayer -framework AVFoundation \
                                                   -framework AudioToolbox -framework QuartzCore -framework CoreGraphics
 ENGINE.LAUNCHER.SOURCES.msvc.LINK_FLAGS        := -subsystem:windows -entry:mainCRTStartup

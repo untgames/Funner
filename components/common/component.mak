@@ -5,22 +5,20 @@ TARGETS := COMMON.SOURCES COMMON.WXF_PARSER COMMON.XML_PARSER COMMON.ZIP_FILE_SY
   COMMON.AUTO_LICENSE_GENERATOR COMMON.TESTS COMMON.UTILS.FILE_CRYPTER COMMON.UTILS.LICENSE_GENERATOR COMMON.INFO
 
 #Цель - CommonLib sources
-COMMON.SOURCES.TYPE                              := static-lib
-COMMON.SOURCES.NAME                              := funner.common
-COMMON.SOURCES.INCLUDE_DIRS                      := include ../xtl/include ../../extern/pcre/include sources
-COMMON.SOURCES.SOURCE_DIRS                       := sources/file_system/core sources/streams sources/hash sources/crypto/core sources/memory \
-                                                    sources/parselib/tree sources/parselib/manager sources/parselib/utils sources/strlib \
-                                                    sources/utils sources/log sources/licensing/core sources/platform/default
-COMMON.SOURCES.DOCUMENTATION_DIRS                := include
-COMMON.SOURCES.COMPILER_DEFINES                  := PCRE_STATIC
-COMMON.SOURCES.IMPORTS                           := compile.math.vecmath
-COMMON.SOURCES.iphone.COMPILER_DEFINES           := __IPHONE__
-COMMON.SOURCES.unistd.SOURCE_DIRS                := sources/platform/unistd
-COMMON.SOURCES.carbon.SOURCE_DIRS                := sources/platform/carbon
-COMMON.SOURCES.iphone.SOURCE_DIRS                := sources/platform/iphone
-COMMON.SOURCES.iphone.COMPILER_CFLAGS            := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreFoundation.framework/Headers
-COMMON.SOURCES.win32.SOURCE_DIRS                 := sources/platform/win32
-COMMON.SOURCES.bada_simulator.SOURCE_DIRS        := sources/platform/win32
+COMMON.SOURCES.TYPE                       := static-lib
+COMMON.SOURCES.NAME                       := funner.common
+COMMON.SOURCES.INCLUDE_DIRS               := include ../xtl/include ../../extern/pcre/include sources
+COMMON.SOURCES.SOURCE_DIRS                := sources/file_system/core sources/streams sources/hash sources/crypto/core sources/memory \
+                                             sources/parselib/tree sources/parselib/manager sources/parselib/utils sources/strlib \
+                                             sources/utils sources/log sources/licensing/core sources/platform/default
+COMMON.SOURCES.DOCUMENTATION_DIRS         := include
+COMMON.SOURCES.COMPILER_DEFINES           := PCRE_STATIC
+COMMON.SOURCES.IMPORTS                    := compile.math.vecmath
+COMMON.SOURCES.unistd.SOURCE_DIRS         := sources/platform/unistd
+COMMON.SOURCES.cocoa.SOURCE_DIRS          := sources/platform/cocoa
+COMMON.SOURCES.cocoa_desktop.SOURCE_DIRS  := sources/platform/cocoa_desktop
+COMMON.SOURCES.win32.SOURCE_DIRS          := sources/platform/win32
+COMMON.SOURCES.bada_simulator.SOURCE_DIRS := sources/platform/win32
 
 #Цель - WxfParser
 COMMON.WXF_PARSER.TYPE             := static-lib

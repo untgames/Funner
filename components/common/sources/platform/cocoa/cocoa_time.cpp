@@ -1,4 +1,4 @@
-#include <CFDate.h>
+#include <CoreFoundation/CFDate.h>
 
 #include <platform/platform.h>
 
@@ -11,9 +11,9 @@ double launch_time = 0;
 
 }
 
-size_t IPhonePlatform::GetMilliseconds ()
+size_t CocoaPlatform::GetMilliseconds ()
 {
-  if (launch_time < 1)
+  if (!launch_time)
     launch_time = CFAbsoluteTimeGetCurrent ();
 
   return (CFAbsoluteTimeGetCurrent () - launch_time) * 1000;
