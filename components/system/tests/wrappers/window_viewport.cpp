@@ -13,6 +13,11 @@ void update_viewport (Window&, Rect& vp)
   vp.bottom = 20;
 }
 
+void on_change_viewport (Window&, WindowEvent, const WindowEventContext&)
+{
+  printf ("viewport changed\n");
+}
+
 int main ()
 {
   printf ("Results of window_viewport_test:\n");
@@ -23,7 +28,8 @@ int main ()
 
     window.SetClientSize (300, 400);
 
-    auto_connection connection = window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
+    auto_connection connection1 = window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
+    auto_connection connection2 = window.RegisterEventHandler (WindowEvent_OnChangeViewport, &on_change_viewport); 
     
     Rect viewport = window.Viewport ();
     

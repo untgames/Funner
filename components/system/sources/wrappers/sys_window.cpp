@@ -190,9 +190,18 @@ struct Window::Impl
       }
     }
     
-    void InvalidateViewport ()
+    void InvalidateViewport (WindowEventContext* context = 0)
     {
-      need_update_viewport = true;
+      need_update_viewport = true;      
+      
+      if (context)
+      {      
+        Notify (WindowEvent_OnChangeViewport, *context);
+      }
+      else
+      {
+        Notify (WindowEvent_OnChangeViewport);
+      }      
     }
     
     void SetViewportHandler (const ViewportUpdateHandler& handler)

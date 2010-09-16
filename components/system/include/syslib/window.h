@@ -38,6 +38,7 @@ enum WindowEvent
   WindowEvent_OnLostFocus,               //окно потеряло фокус ввода
   WindowEvent_OnPaint,                   //необходима перерисовка
   WindowEvent_OnSize,                    //изменились размеры окна
+  WindowEvent_OnChangeViewport,          //изменилась область вывода окна
   WindowEvent_OnMove,                    //изменилось положение окна
   WindowEvent_OnMouseMove,               //курсор мыши переместился над областью окна
   WindowEvent_OnMouseLeave,              //курсор мыши покинул область окна
