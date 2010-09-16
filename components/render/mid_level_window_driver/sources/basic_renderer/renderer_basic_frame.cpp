@@ -84,9 +84,22 @@ void BasicFrame::GetViewport (render::mid_level::Viewport& out_viewport)
     Установка области вывода
 */
 
-void BasicFrame::BindViewport (render::low_level::IDevice* device)
+void BasicFrame::BindViewport (render::low_level::IDevice* device, int& viewport_offset_x, int& viewport_offset_y)
 {
-  device->RSSetViewport (viewport);
+  if (render_target && depth_stencil_target && (render_target->ViewportX () != depth_stencil_target->ViewportX () ||
+    render_target->ViewportY () != depth_stencil_target->ViewportY ()))
+  {
+    throw xtl::format_operation_exception ("render::mid_level::window_driver::BasicFrame::BindViewport", "Different viewport offsets for render target and depth-stencil target");
+  }
+  
+  render::low_level::Viewport fixed_viewport = viewport;  
+
+  viewport_offset_x = render_target->ViewportX ();
+  viewport_offset_y = render_target->ViewportY ();
+  fixed_viewport.x += viewport_offset_x;
+  fixed_viewport.y += viewport_offset_y; 
+
+  device->RSSetViewport (fixed_viewport);
 }
 
 /*

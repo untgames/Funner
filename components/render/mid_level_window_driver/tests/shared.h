@@ -105,7 +105,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
         //инициализация окна
 
       window.SetTitle (title);
-      window.Show ();
+      window.Show ();      
 
       WindowDriver::RegisterWindow ("MyRenderer", window, cfg_root);
 
@@ -122,15 +122,16 @@ class RenderWindow : public IRendererListener, public xtl::trackable
 
         //регистрация обработчиков событий окна
 
+      window.SetViewportHandler (xtl::bind (&RenderWindow::ViewportUpdater, this, _2));        
       window.RegisterEventHandler (syslib::WindowEvent_OnPaint, xtl::bind (&RenderWindow::OnRedraw, this));
-      window.RegisterEventHandler (syslib::WindowEvent_OnSize,  xtl::bind (&RenderWindow::OnResize, this));
+      window.RegisterEventHandler (syslib::WindowEvent_OnChangeViewport, xtl::bind (&RenderWindow::OnChangeViewport, this));      
 //      window.RegisterEventHandler (syslib::WindowEvent_OnChangeHandle, xtl::bind (&RenderWindow::OnChangeHandle, this));
       window.RegisterEventHandler (syslib::WindowEvent_OnDestroy, xtl::bind (&RenderWindow::OnDestroy, this));
       window.RegisterEventHandler (syslib::WindowEvent_OnLeftButtonDown, xtl::bind (&RenderWindow::ChangeWindowStyle, this));
 
         //установка размеров области вывода
 
-      OnResize ();
+      OnChangeViewport ();
     }
 
     ~RenderWindow ()
@@ -176,7 +177,7 @@ class RenderWindow : public IRendererListener, public xtl::trackable
     void OnFrameBufferResize (IFrameBuffer* resized_frame_buffer, size_t width, size_t height)
     {
       if (frame_buffer.get () == resized_frame_buffer)
-        OnResize ();
+        OnChangeViewport ();
     }
 
     renderer2d::IRenderer* Renderer ()
@@ -210,6 +211,37 @@ class RenderWindow : public IRendererListener, public xtl::trackable
     {
       window.SetStyle ((syslib::WindowStyle)(style++ % 2));
     }
+    
+    void ViewportUpdater (syslib::Rect& viewport)
+    {
+        //for testing viewport support in render
+    
+      viewport.left = 100;
+      viewport.top  = 100;
+    }
+    
+    void OnChangeViewport ()
+    {
+      try
+      {
+        syslib::Rect src_viewport = window.Viewport ();
+
+        render::mid_level::Viewport viewport;
+
+        viewport.x      = 0;
+        viewport.y      = 0;
+        viewport.width  = src_viewport.right - src_viewport.left;
+        viewport.height = src_viewport.bottom - src_viewport.top;
+
+        frame->SetViewport (viewport);
+
+        window.Invalidate ();
+      }
+      catch (std::exception& e)
+      {
+        printf ("resize exception: %s\n", e.what ());
+      }    
+    }
 
 ///Перерисовка
     void Redraw ()
@@ -224,30 +256,6 @@ class RenderWindow : public IRendererListener, public xtl::trackable
       catch (std::exception& e)
       {
         printf ("redraw exception: %s\n", e.what ());
-      }
-    }
-
-///Обработчик события изменения размеров окна
-    void OnResize ()
-    {
-      try
-      {
-        syslib::Rect client_rect = window.ClientRect ();
-
-        render::mid_level::Viewport viewport;
-
-        viewport.x      = client_rect.left;
-        viewport.y      = client_rect.top;
-        viewport.width  = client_rect.right - client_rect.left;
-        viewport.height = client_rect.bottom - client_rect.top;
-
-        frame->SetViewport (viewport);
-
-        window.Invalidate ();
-      }
-      catch (std::exception& e)
-      {
-        printf ("resize exception: %s\n", e.what ());
       }
     }
 

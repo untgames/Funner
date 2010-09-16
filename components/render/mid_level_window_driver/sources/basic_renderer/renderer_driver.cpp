@@ -121,7 +121,7 @@ class Driver::RendererEntry: public xtl::reference_counter
         window_entry->connect_tracker (window.RegisterEventHandler (WindowEvent_OnPaint, xtl::bind (&RendererEntry::OnUpdateWindow,
           this, xtl::ref (*window_entry))));
 
-        window_entry->connect_tracker (window.RegisterEventHandler (WindowEvent_OnSize, xtl::bind (&RendererEntry::OnResizeWindow,
+        window_entry->connect_tracker (window.RegisterEventHandler (WindowEvent_OnChangeViewport, xtl::bind (&RendererEntry::OnChangeViewport,
           this, xtl::ref (*window_entry))));
           
         window_entry->connect_tracker (window.RegisterEventHandler (WindowEvent_OnChangeHandle, xtl::bind (&RendererEntry::OnChangeWindowHandle,
@@ -290,18 +290,19 @@ class Driver::RendererEntry: public xtl::reference_counter
         renderer->AddFrameBuffer (window_entry.frame_buffer.get ());
     }
 
-///Обработчик события изменения размеров окна
-    void OnResizeWindow (WindowEntry& window_entry)
+///Обработчик события изменения области вывода
+    void OnChangeViewport (WindowEntry& window_entry)
     {
       if (!renderer || !window_entry.frame_buffer)
         return;
       
-      syslib::Rect client_rect = window_entry.window.ClientRect ();
+      syslib::Rect viewport = window_entry.window.Viewport ();      
 
-      size_t width  = client_rect.right - client_rect.left,
-             height = client_rect.bottom - client_rect.top;
+      size_t width  = viewport.right - viewport.left,
+             height = viewport.bottom - viewport.top;
 
       window_entry.frame_buffer->SetSize (width, height);
+      window_entry.frame_buffer->SetViewportOffset (viewport.left, viewport.top);
 
       renderer->FrameBufferResizeNotify (window_entry.frame_buffer.get (), width, height);
     }

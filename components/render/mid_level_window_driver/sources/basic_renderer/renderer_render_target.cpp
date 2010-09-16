@@ -8,7 +8,10 @@ using namespace render::mid_level::window_driver;
 */
 
 RenderTarget::RenderTarget (render::low_level::IView* in_render_target_view, RenderTargetType in_type)
-  : render_target_view (in_render_target_view), type (in_type)
+  : render_target_view (in_render_target_view)
+  , type (in_type)
+  , viewport_x (0)
+  , viewport_y (0)
 {
   switch (type)
   {
@@ -76,4 +79,14 @@ void RenderTarget::SetSize (size_t in_width, size_t in_height)
 {
   width  = in_width;
   height = in_height;
+}
+
+/*
+    Смещение для области вывода
+*/
+
+void RenderTarget::SetViewportOffset (int x, int y)
+{
+  viewport_x = x;
+  viewport_y = y;
 }

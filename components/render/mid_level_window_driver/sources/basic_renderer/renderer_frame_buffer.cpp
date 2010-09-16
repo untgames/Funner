@@ -74,11 +74,17 @@ render::mid_level::IRenderTarget* FrameBuffer::GetDepthStencilBuffer ()
 }
 
 /*
-   Установка размера
+   Установка размера / смещения области вывода
 */
 
 void FrameBuffer::SetSize (size_t width, size_t height)
 {
   color_buffer->SetSize (width, height);
   depth_stencil_buffer->SetSize (width, height);
+}
+
+void FrameBuffer::SetViewportOffset (int x, int y)
+{
+  color_buffer->SetViewportOffset (x, y);
+  depth_stencil_buffer->SetViewportOffset (x, y);
 }

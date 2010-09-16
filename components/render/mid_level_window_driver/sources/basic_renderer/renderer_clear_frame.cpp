@@ -69,7 +69,9 @@ void ClearFrame::DrawCore (render::low_level::IDevice* device)
     
   if (clear_flags & render::mid_level::ClearFlag_ViewportOnly)
   {
-    BasicFrame::BindViewport (device);
+    int viewport_offset_x = 0, viewport_offset_y = 0;
+       
+    BasicFrame::BindViewport (device, viewport_offset_x, viewport_offset_y);
 
     device_clear_flags |= render::low_level::ClearFlag_ViewportOnly;
   }

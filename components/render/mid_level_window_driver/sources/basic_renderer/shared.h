@@ -160,9 +160,10 @@ class FrameBuffer: virtual public IFrameBuffer, public Object, public xtl::track
     void Present () { swap_chain->Present (); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка размера
+///Установка размера / смещения области вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetSize (size_t width, size_t height);
+    void SetSize           (size_t width, size_t height);
+    void SetViewportOffset (int x, int y);
 
   private:
     typedef xtl::intrusive_ptr<RenderTarget>    RenderTargetPtr;

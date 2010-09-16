@@ -30,6 +30,8 @@ struct RenderContext
   render::low_level::IBuffer*     common_constant_buffer;     //буфер констант
   render::low_level::IBuffer*     dynamic_constant_buffer;    //буфер констант
   DynamicProgramParameters        dynamic_program_parameters; //динамические параметры программы рендеринга
+  int                             viewport_offset_x;          //смещение области вывода по горизонтали
+  int                             viewport_offset_y;          //смещение области вывода по вертикали
 };
 
 /*
@@ -264,7 +266,12 @@ void draw_solid_sprites (RenderContext& context, const RenderableSprite** sprite
     {
       if (scissor)
       {
-        context.device->RSSetScissor (*scissor);
+        render::low_level::Rect fixed_scissor = *scissor;
+        
+        fixed_scissor.x += context.viewport_offset_x;
+        fixed_scissor.y += context.viewport_offset_y;
+        
+        context.device->RSSetScissor (fixed_scissor);
         context.device->RSSetState   (context.resources->GetRasterizerState (true));
       }
       else
@@ -309,7 +316,12 @@ void draw_blend_sprites (RenderContext& context, const RenderableSprite** sprite
     {
       if (scissor)
       {
-        context.device->RSSetScissor (*scissor);
+        render::low_level::Rect fixed_scissor = *scissor;
+        
+        fixed_scissor.x += context.viewport_offset_x;
+        fixed_scissor.y += context.viewport_offset_y;        
+        
+        context.device->RSSetScissor (fixed_scissor);
         context.device->RSSetState   (context.resources->GetRasterizerState (true));
       }
       else
@@ -373,8 +385,10 @@ void draw_blend_sprites (RenderContext& context, const RenderableSprite** sprite
 void Frame::DrawCore (IDevice* device)
 {
     //установка области вывода
+    
+  int viewport_offset_x = 0, viewport_offset_y = 0;
 
-  BasicFrame::BindViewport (device);     
+  BasicFrame::BindViewport (device, viewport_offset_x, viewport_offset_y);
 
     //обновление парметров шейдинга
 
@@ -415,6 +429,8 @@ void Frame::DrawCore (IDevice* device)
   context.common_constant_buffer                     = &*common_constant_buffer;
   context.dynamic_constant_buffer                    = &*dynamic_constant_buffer;
   context.dynamic_program_parameters.alpha_reference = 0.0f;
+  context.viewport_offset_x                          = viewport_offset_x;
+  context.viewport_offset_y                          = viewport_offset_y;
   
   device->SSSetProgram (common_resources->GetDefaultProgram ());
   

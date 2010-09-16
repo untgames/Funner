@@ -40,7 +40,7 @@ class Test: public BasicTest
         primitive->AddSprites (1, &sprite);
       }
       
-      Viewport scissor = {100, 100, 600, 600};
+      Viewport scissor = {0, 0, 100, 100};
       
       primitive->SetScissor (scissor);
       primitive->SetScissorState (true);

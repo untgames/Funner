@@ -36,8 +36,10 @@ void LowLevelFrame::DrawCore (render::low_level::IDevice* device)
     return; //виузализация не требуется
 
     //установка области вывода
+    
+  int viewport_offset_x = 0, viewport_offset_y = 0;
 
-  BasicFrame::BindViewport (device);
+  BasicFrame::BindViewport (device, viewport_offset_x, viewport_offset_y);
 
     //визуализация
 
