@@ -24,10 +24,10 @@ typedef xtl::com_ptr<FrameBuffer> FrameBufferPtr;
 struct WindowEntry: public xtl::trackable, public xtl::reference_counter
 {
   Window&        window;          //окно
-  FrameBufferPtr frame_buffer;    //буфера кадров  
+  FrameBufferPtr frame_buffer;    //буфера кадров
   SwapChainDesc  swap_chain_desc; //дескриптор цепочки обмена
 
-///Конструктор  
+///Конструктор
     WindowEntry (syslib::Window& in_window, const ParseNode& cfg_node)
       : window (in_window)
     {
@@ -249,12 +249,13 @@ class Driver::RendererEntry: public xtl::reference_counter
 
           //обновление размеров буфера кадра
 
-        syslib::Rect client_rect = window_entry.window.ClientRect ();
+        syslib::Rect viewport = window_entry.window.Viewport ();
 
-        size_t width  = client_rect.right - client_rect.left,
-               height = client_rect.bottom - client_rect.top;      
+        size_t width  = viewport.right - viewport.left,
+               height = viewport.bottom - viewport.top;
 
-        new_frame_buffer->SetSize (width, height);        
+        new_frame_buffer->SetSize (width, height);
+        new_frame_buffer->SetViewportOffset (viewport.left, viewport.top);
 
           //сохранение состояния
 
@@ -325,7 +326,7 @@ class Driver::RendererEntry: public xtl::reference_counter
     Driver&             driver;                       //ссылка на драйвер, хранящий систему рендеринга
     stl::string         renderer_name;                //имя системы рендеринга
     stl::string         low_level_driver_mask;        //маска имени драйвера
-    stl::string         low_level_adapter_mask;       //маска имени драйвера    
+    stl::string         low_level_adapter_mask;       //маска имени драйвера
     stl::string         low_level_device_init_string; //строка инициализации устройства отрисовки
     WindowEntryArray    windows;                      //окна системы рендеринга
     DevicePtr           device;                       //устройство отрисовки
@@ -415,7 +416,7 @@ void Driver::RegisterRenderer (const char* renderer_name, const common::ParseNod
       throw xtl::make_argument_exception (METHOD_NAME, "renderer_name", renderer_name, "Renderer has already registered");
   }
   
-    //добавление системы рендеринга    
+    //добавление системы рендеринга
   
   RendererEntryPtr renderer_entry (new RendererEntry (renderer_name, *this), false);
 
