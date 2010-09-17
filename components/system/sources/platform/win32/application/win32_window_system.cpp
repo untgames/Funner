@@ -1120,7 +1120,7 @@ Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x,
     if (hotspot_y != -1)
       throw xtl::format_not_supported_exception ("", "Custom hotspot_y=%d not supported", hotspot_y);
       
-    TempFile cursor_file (file_name);
+    common::TempFile cursor_file (file_name);
       
     HANDLE cursor = LoadImageA (0, cursor_file.Path (), IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE);
     
