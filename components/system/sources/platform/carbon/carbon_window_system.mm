@@ -45,6 +45,7 @@ struct WindowImpl
   bool                           background_state;                        //включен ли задний фон
   Color                          background_color;                        //цвет заднего фона
   WindowGroupRef                 window_group;
+  bool                           is_maximized;                            //окно находится в полноэкранном режиме
 
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data)
@@ -58,6 +59,7 @@ struct WindowImpl
     , cursor ([[NSCursor arrowCursor] retain])
     , background_state (false)
     , window_group (0)
+    , is_maximized (false)
     {}
 
   ~WindowImpl ()
@@ -79,6 +81,9 @@ struct WindowImpl
 
     if (window_group)
       ReleaseWindowGroup (window_group);
+
+    if (is_maximized)
+      SetSystemUIMode (kUIModeNormal, 0);
 
     [cursor release];
   }
@@ -978,18 +983,38 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 
         if (window_class == kSheetWindowClass)
         {
-          CGRect display_bounds = CGDisplayBounds (CGMainDisplayID ());
-          Rect   window_bounds;
+          WindowImpl *impl;
 
-          window_bounds.left   = display_bounds.origin.x;
-          window_bounds.top    = display_bounds.origin.y;
-          window_bounds.right  = display_bounds.origin.x + display_bounds.size.width;
-          window_bounds.bottom = display_bounds.origin.y + display_bounds.size.height;
+          check_window_manager_error (GetWindowProperty (wnd, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+                                      sizeof (impl), 0, &impl), "::GetWindowProperty", "Can't get window property");
 
-          SetClientRect (handle, window_bounds);
+          if (state)
+          {
+            SetSystemUIMode (kUIModeAllHidden, 0);
+
+            impl->is_maximized = true;
+
+            CGRect display_bounds = CGDisplayBounds (CGMainDisplayID ());
+            Rect   window_bounds;
+
+            window_bounds.left   = display_bounds.origin.x;
+            window_bounds.top    = display_bounds.origin.y;
+            window_bounds.right  = display_bounds.origin.x + display_bounds.size.width;
+            window_bounds.bottom = display_bounds.origin.y + display_bounds.size.height;
+
+            SetClientRect (handle, window_bounds);
+          }
+          else
+          {
+            if (impl->is_maximized)
+            {
+              SetSystemUIMode (kUIModeNormal, 0);
+              impl->is_maximized = false;
+            }
+          }
         }
         else
-          ZoomWindow (wnd, inZoomOut, true);
+          ZoomWindow (wnd, state ? inZoomOut : inZoomIn, true);
 
         break;
       }
