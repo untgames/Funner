@@ -283,7 +283,6 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         manager (in_manager),
         window (get_window_style (node)),
         cursor (0),
-        parent_auto_size (false),
         aspect_ratio (0)
     {
         //создание окна
@@ -326,7 +325,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       
         //соотношение сторон
         
-      const char* aspect_ratio_string = get<const char*> (node, "ChildAspectRatio", "");
+      const char* aspect_ratio_string = get<const char*> (node, "ViewportAspectRatio", "");
       
       if (*aspect_ratio_string)
       {
@@ -338,8 +337,10 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
                  ky = xtl::io::get<double> (aspect_ratio_tokens [1]);
                  
           aspect_ratio = kx / ky;
+          
+          window.SetViewportHandler (xtl::bind (&Window::UpdateViewport, this, _2));
         }
-      }
+      }      
       
         //размеры и положение окна
         
@@ -375,22 +376,7 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       }
       else if (maximized)
       {
-        if (parent_window)
-        {
-          if (aspect_ratio != 0.0)
-            parent_auto_size = true;
-          
-          connect_tracker (parent_window->RegisterEventHandler (syslib::WindowEvent_OnSize, xtl::bind (&Window::OnParentSize, this, _1)));
-          
-          OnParentSize (*parent_window);
-          
-          window.Show ();
-        }
-        else
-        {
-          window.Maximize ();          
-        }
-        
+        window.Maximize ();          
         window.SetActive (true);        
       }
       else if (minimized)
@@ -566,43 +552,35 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
       SetCursorPosition (context.cursor_position, window.ClientRect ());
     }
     
-    void OnParentSize (syslib::Window& parent_window)
+///Обновление области вывода окна
+    void UpdateViewport (syslib::Rect& viewport)
     {
-      if (!parent_auto_size)
-        return;
-        
-      size_t parent_width  = parent_window.ClientWidth (),
-             parent_height = parent_window.ClientHeight ();             
+      size_t window_width  = window.ClientWidth (),
+             window_height = window.ClientHeight ();             
                    
-      double parent_aspect_ratio = double (parent_width) / double (parent_height);
-      
-      size_t window_width = 0, window_height = 0;
-      
-      if (parent_aspect_ratio / aspect_ratio < 1.0)
+      double window_aspect_ratio = double (window_width) / double (window_height);
+
+      size_t viewport_width = 0, viewport_height = 0;
+
+      if (window_aspect_ratio / aspect_ratio < 1.0)
       {
           //полосы по вертикали
-          
-        window_width  = parent_width;
-        window_height = size_t (window_width / aspect_ratio);
 
-        window.SetSize (window_width, window_height);       
+        viewport_width  = window_width;
+        viewport_height = size_t (viewport_width / aspect_ratio);
       }
       else
       {
           //полосы по горизонтали
           
-        window_height = parent_height;
-        window_width  = size_t (window_height * aspect_ratio);
-               
-        window.SetSize (window_width, window_height);
+        viewport_height = window_height;
+        viewport_width  = size_t (viewport_height * aspect_ratio);
       }
-      
-      size_t center_x = (parent_width - window_width) / 2,
-             center_y = (parent_height - window_height) / 2;
 
-      window.SetPosition (center_x, center_y);      
-      
-//      parent_window.Invalidate ();
+      viewport.left   = (window_width - viewport_width) / 2;
+      viewport.top    = (window_height - viewport_height) / 2;      
+      viewport.right  = viewport.left + viewport_width;
+      viewport.bottom = viewport.top + viewport_height;      
     }
 
   private:
@@ -614,7 +592,6 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
     stl::string             parent_window_name;
     stl::string             cursor_attachment_name;
     math::vec2f             cached_cursor_position;
-    bool                    parent_auto_size;
     double                  aspect_ratio;
 };
 
