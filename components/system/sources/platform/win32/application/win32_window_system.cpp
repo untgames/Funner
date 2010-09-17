@@ -21,10 +21,10 @@ HINSTANCE GetApplicationInstance ()
     Копирование файла в папку temp
 */
 
-class TempFile
+class SysTempFile
 {
   public:
-    TempFile (const char* source_file_name)
+    SysTempFile (const char* source_file_name)
     {
       if (!source_file_name)
         throw xtl::make_null_argument_exception ("syslib::TempFile::TempFile", "source_file_name");
@@ -52,7 +52,7 @@ class TempFile
       FileSystem::CopyFile (source_file_name, file_name.c_str ());
     }
     
-    ~TempFile ()
+    ~SysTempFile ()
     {
       FileSystem::Remove (file_name.c_str ());
     }
@@ -1120,7 +1120,7 @@ Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x,
     if (hotspot_y != -1)
       throw xtl::format_not_supported_exception ("", "Custom hotspot_y=%d not supported", hotspot_y);
       
-    common::TempFile cursor_file (file_name);
+    SysTempFile cursor_file (file_name);
       
     HANDLE cursor = LoadImageA (0, cursor_file.Path (), IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE);
     
