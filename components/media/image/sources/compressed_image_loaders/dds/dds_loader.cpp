@@ -500,13 +500,13 @@ class DdsCompressedImage: public ICustomCompressedImage
     {
       switch (format)
       {
-        case FOURCC_DXT1: return "DXT1";
-        case FOURCC_DXT2: return "DXT2";
-        case FOURCC_DXT3: return "DXT3";
-        case FOURCC_DXT4: return "DXT4";
-        case FOURCC_DXT5: return "DXT5";
-        case FOURCC_ATI1: return "ATI1";
-        case FOURCC_ATI2: return "ATI2";
+        case FOURCC_DXT1: return "dxt1";
+        case FOURCC_DXT2: return "dxt2";
+        case FOURCC_DXT3: return "dxt3";
+        case FOURCC_DXT4: return "dxt4";
+        case FOURCC_DXT5: return "dxt5";
+        case FOURCC_ATI1: return "ati1";
+        case FOURCC_ATI2: return "ati2";
         default:
           return "Unknown";
       }
