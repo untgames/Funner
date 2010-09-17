@@ -403,6 +403,10 @@ class Window: public IAttachmentRegistryListener<syslib::Window>, public IAttach
         //подписка на события окна
 
       connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnMouseMove, xtl::bind (&Window::OnMouseMove, this, _1, _3)));
+      
+        //обновление области вывода
+        
+      window.InvalidateViewport ();
 
         //регистрация окна
 
