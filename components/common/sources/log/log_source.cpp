@@ -13,38 +13,54 @@ using namespace common;
 */
 
 LogImpl::LogImpl (const char* log_name)
-  : name (log_name ? log_name : "")
+  : log_system (LogSystemImpl::Instance ()),
+    name (log_name ? log_name : "")
 {
   if (!log_name)
     throw xtl::make_null_argument_exception ("common::LogImpl::LogImpl", "log_name");
+    
+  common::Lock lock (*log_system);
 
-  LogSystemImpl& log_system = LogSystemImpl::Lock ();
-
-  try
-  {
-    log_system.Register (this);
-  }
-  catch (...)
-  {
-    throw;
-  }
+  log_system->Register (this);
 }
 
 LogImpl::~LogImpl ()
 {
-  for (FilterList::iterator iter=filters.begin (), end=filters.end (); iter!=end;)
+  try
   {
-    FilterList::iterator next = iter;
+    Lock ();
+    
+    for (FilterList::iterator iter=filters.begin (), end=filters.end (); iter!=end;)
+    {
+      FilterList::iterator next = iter;
 
-    ++next;
+      ++next;
 
-    (*iter)->RemoveSource (this);
+      (*iter)->RemoveSource (this);
 
-    iter = next;
+      iter = next;
+    }
+    
+    {
+      common::Lock lock (*log_system);
+
+      log_system->Unregister (this);
+    }
   }
+  catch (...)
+  {
+  }
+}
 
-  LogSystemImpl::Instance ().Unregister (this);
-  LogSystemImpl::Unlock ();
+/*
+    Имя протокола
+*/
+
+const char* LogImpl::Name ()
+{
+  common::Lock lock (*this);
+
+  return name.c_str ();
 }
 
 /*
@@ -53,6 +69,8 @@ LogImpl::~LogImpl ()
 
 void LogImpl::AddFilter (LogFilterImpl* filter)
 {  
+  common::Lock lock (*this);
+
   filters.push_back (filter);
 
   try
@@ -68,6 +86,8 @@ void LogImpl::AddFilter (LogFilterImpl* filter)
 
 void LogImpl::RemoveFilter (LogFilterImpl* filter)
 {
+  common::Lock lock (*this);
+
   filter->RemoveSource (this);
   filters.remove (filter);
 }
@@ -78,6 +98,8 @@ void LogImpl::RemoveFilter (LogFilterImpl* filter)
 
 void LogImpl::Print (const char* message)
 {
+  common::Lock lock (*this);
+
   xtl::intrusive_ptr<LogImpl> self_lock (this);
 
   for (FilterList::iterator iter=filters.begin (), end=filters.end (); iter!=end; ++iter)

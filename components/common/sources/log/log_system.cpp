@@ -11,8 +11,8 @@ using namespace common;
 namespace
 {
 
-LogSystemImpl* instance           = 0; //экземпл€р системы протоколировани€
-size_t         instance_ref_count = 0; //количество ссылок на систему протоколировани€
+Lockable       instance_lock;
+LogSystemImpl* instance = 0; //экземпл€р системы протоколировани€
 
 }
 
@@ -26,8 +26,15 @@ LogSystemImpl::LogSystemImpl ()
 
 LogSystemImpl::~LogSystemImpl ()
 {
-  instance           = 0;
-  instance_ref_count = 0;
+  try
+  {
+    common::Lock lock1 (instance_lock);
+    
+    instance = 0;
+  }
+  catch (...)
+  {
+  }
 }
 
 /*
@@ -36,6 +43,8 @@ LogSystemImpl::~LogSystemImpl ()
 
 void LogSystemImpl::Register (LogImpl* source)
 {
+  common::Lock lock (*this);
+
   sources.push_back (source);
   
   try
@@ -53,6 +62,8 @@ void LogSystemImpl::Register (LogImpl* source)
 
 void LogSystemImpl::Unregister (LogImpl* source)
 {
+  common::Lock lock (*this);
+
   sources.remove (source);
 }
 
@@ -62,6 +73,8 @@ void LogSystemImpl::Unregister (LogImpl* source)
 
 void LogSystemImpl::Register (LogFilterImpl* filter)
 {
+  common::Lock lock (*this);
+
   filters.push_back (filter);
 
   try
@@ -79,6 +92,8 @@ void LogSystemImpl::Register (LogFilterImpl* filter)
 
 void LogSystemImpl::Unregister (LogFilterImpl* filter)
 {
+  common::Lock lock (*this);
+
   filters.remove (filter);
 }
 
@@ -86,33 +101,16 @@ void LogSystemImpl::Unregister (LogFilterImpl* filter)
     ѕолучение и освобождение экземпл€ра системы протоколировани€
 */
 
-LogSystemImpl& LogSystemImpl::Instance ()
+LogSystemPtr LogSystemImpl::Instance ()
 {
-  return *instance;
-}
-
-LogSystemImpl& LogSystemImpl::Lock ()
-{
+  common::Lock lock (instance_lock);
+  
   if (!instance)
   {
-    instance           = new LogSystemImpl;
-    instance_ref_count = 1;
+    instance = new LogSystemImpl;
+    
+    return LogSystemPtr (instance, false);
   }
-  else ++instance_ref_count;
-  
-  return *instance;
-}
 
-void LogSystemImpl::Unlock ()
-{
-  if (!instance || !instance_ref_count)
-    return;
-    
-  if (!--instance_ref_count)
-  {
-    delete instance;
-    
-    instance           = 0;
-    instance_ref_count = 0;
-  }
+  return instance;
 }
