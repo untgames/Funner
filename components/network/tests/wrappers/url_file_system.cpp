@@ -10,7 +10,7 @@ int main ()
     
     TestHttpServer http_server;
     
-    common::FileSystem::CopyFile ("http://localhost:8080/test.txt", "/io/stdout");
+    common::FileSystem::CopyFile ("http://localhost:81/test.txt", "/io/stdout");
   }
   catch (std::exception& e)
   {

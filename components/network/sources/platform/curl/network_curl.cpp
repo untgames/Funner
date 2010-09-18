@@ -8,6 +8,7 @@
 
 #include <common/component.h>
 #include <common/log.h>
+#include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
@@ -18,7 +19,6 @@
 #include <network/url_connection.h>
 
 //TODO: custom управление памятью
-//TODO: отсылка данных: POST, GET, PUT
 
 using namespace network;
 
@@ -79,11 +79,12 @@ class CurlStream: public IUrlStream
 {
   public:
 ///Конструктор
-    CurlStream (const char* in_url, const char* params, IListener& in_listener)
+    CurlStream (const char* in_url, const char* in_params, IListener& in_listener)
       : log (LOG_NAME)
       , listener (in_listener)
       , stream (0)
       , url (in_url)
+      , params (in_params)
       , content_type ("text/plain")
       , content_encoding ("UTF-8")
       , content_length (0)
@@ -155,6 +156,8 @@ class CurlStream: public IUrlStream
       {
         CurlLibrarySingleton::Instance ();
         
+        common::PropertyMap properties = common::parse_init_string (params.c_str ());
+        
         stream = curl_easy_init ();
         
         if (!stream)
@@ -162,6 +165,8 @@ class CurlStream: public IUrlStream
           
         try
         {
+            //общая часть конфигурации соединения
+          
           check_code (curl_easy_setopt (stream, CURLOPT_URL, url.c_str ()), "::curl_easy_setopt(CURLOPT_URL)");
           check_code (curl_easy_setopt (stream, CURLOPT_WRITEFUNCTION, &WriteDataCallback), "::curl_easy_setopt(CURLOPT_WRITEFUNCTION)");
           check_code (curl_easy_setopt (stream, CURLOPT_WRITEDATA, this), "::curl_easy_setopt(CURLOPT_WRITEDATA)");
@@ -172,7 +177,41 @@ class CurlStream: public IUrlStream
           check_code (curl_easy_setopt (stream, CURLOPT_DEBUGFUNCTION, &DebugCallback), "::curl_easy_setopt(CURLOPT_DEBUGFUNCTION)");
           check_code (curl_easy_setopt (stream, CURLOPT_DEBUGDATA, this), "::curl_easy_setopt(CURLOPT_DEBUGDATA)");
           check_code (curl_easy_setopt (stream, CURLOPT_VERBOSE, 1L), "::curl_easy_setopt(CURLOPT_VERBOSE)");
+          
+            //конфигурация соединения, зависящая от параметров
+            
+          curl_slist* post_chunk = 0;
+            
+          if (properties.IsPresent ("method"))
+          {
+            stl::string method = properties.GetString ("method");
+            
+            if (method == "post")
+            {
+              check_code (curl_easy_setopt (stream, CURLOPT_POST, 1L), "::curl_easy_setopt(CURLOPT_HTTPPOST)");
+              
+              if (properties.IsPresent ("send_size"))
+              {
+                check_code (curl_easy_setopt (stream, CURLOPT_POSTFIELDSIZE_LARGE, static_cast<size_t> (properties.GetInteger ("send_size"))), "::curl_easy_setopt(CURLOPT_POSTFIELDSIZE_LARGE)");
+              }
+              else
+              {
+                post_chunk = curl_slist_append (post_chunk, "Transfer-Encoding: chunked");
+                
+                if (!post_chunk)
+                  throw xtl::format_operation_exception ("", "::curl_slist_append failed");
+
+                curl_easy_setopt (stream, CURLOPT_HTTPHEADER, post_chunk);
+              }
+            }
+          }
+
+            //запуск соединения
+          
           check_code (curl_easy_perform (stream), "::curl_perform");
+
+          if (post_chunk)
+            curl_slist_free_all (post_chunk);
           
           log.Printf ("URL '%s' received", url.c_str ());
           
@@ -258,7 +297,7 @@ class CurlStream: public IUrlStream
     {
       if (!userdata)
         return 0;
-      
+        
       return reinterpret_cast<CurlStream*> (userdata)->WriteReceivedData (ptr, size * nmemb);
     }
     
@@ -297,7 +336,7 @@ class CurlStream: public IUrlStream
     {
       if (!userdata)
         return 0;
-      
+        
       return reinterpret_cast<CurlStream*> (userdata)->ReadSendData (ptr, size * nmemb);
     }
     
@@ -395,6 +434,7 @@ class CurlStream: public IUrlStream
     IListener&                    listener;          //слушатель событий потока
     CURL*                         stream;            //поток CURL
     stl::string                   url;               //URL
+    stl::string                   params;            //параметры
     stl::auto_ptr<syslib::Thread> thread;            //нить
     stl::string                   content_type;      //тип контента
     stl::string                   content_encoding;  //тип кодировки контента

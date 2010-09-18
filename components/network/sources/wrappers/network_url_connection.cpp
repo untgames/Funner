@@ -195,6 +195,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
   Buffer                    recv_buffer;      //буфер передачи
   bool                      send_closed;      //канал отправки данных закрыт
   bool                      recv_closed;      //канал приёма данных закрыт
+  bool                      recv_headers;     //заголовки потока получены
 
 ///Конструкторы
   Impl ()
@@ -206,6 +207,7 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
     , recv_buffer (mutex)
     , send_closed (false)
     , recv_closed (false)
+    , recv_headers (false)
   {
   }
   
@@ -216,21 +218,32 @@ struct UrlConnection::Impl: public xtl::reference_counter, public IUrlStream::IL
     , recv_buffer (mutex)
     , send_closed (false)
     , recv_closed (false)
+    , recv_headers (false)    
   {
     stream = stl::auto_ptr<IUrlStream> (UrlStreamManagerSingleton::Instance ()->CreateStream (url.ToString (), params, *this));
     
     if (!&*stream)
       throw xtl::format_operation_exception ("", "Internal error: Null stream returned by stream manager");
-    
-    content_type     = stream->GetContentType ();
-    content_encoding = stream->GetContentEncoding ();
-    content_length   = stream->GetContentLength ();
   }
   
 ///Деструктор
   ~Impl ()
   {
     mutex.Lock (); //без вызова Unlock, поскольку Mutex будет удалён
+  }
+  
+///Получение заголовков
+  void ReceiveHeaders ()
+  {
+    syslib::Lock lock (mutex);
+    
+    if (recv_headers)
+      return;
+    
+    content_type     = stream->GetContentType ();
+    content_encoding = stream->GetContentEncoding ();
+    content_length   = stream->GetContentLength ();
+    recv_headers     = true;
   }
   
 ///Обработка события получения данных
@@ -431,16 +444,22 @@ void UrlConnection::CloseSend ()
 
 size_t UrlConnection::ContentLength () const
 {
+  impl->ReceiveHeaders ();
+
   return impl->content_length;
 }
 
 const char* UrlConnection::ContentEncoding () const
 {
+  impl->ReceiveHeaders ();
+
   return impl->content_encoding.c_str ();
 }
 
 const char* UrlConnection::ContentType () const
 {
+  impl->ReceiveHeaders ();
+
   return impl->content_type.c_str ();
 }
 
@@ -522,4 +541,13 @@ void swap (UrlConnection& connection1, UrlConnection& connection2)
   connection1.Swap (connection2);
 }
 
+}
+
+/*
+    HttpPostConnection
+*/
+
+HttpPostConnection::HttpPostConnection (const network::Url& url, size_t send_data_size)
+  : UrlConnection (url, common::format ("method=post send_size=%u", send_data_size).c_str ())
+{
 }

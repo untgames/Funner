@@ -14,6 +14,25 @@ const size_t DOWNLOAD_BUFFER_SIZE = 32784;
 const char*  LOG_NAME             = "network.url_file_system";
 
 /*
+    URL файл
+*/
+
+struct UrlFile: public Lockable
+{
+  UrlConnection connection;     //соединение
+  File          response_file;  //файл чтения данных ответа
+  bool          end_of_request; //флаг - запрос отправлен
+  size_t        buffer_size;    //размер кеша буфера чтения
+  
+  UrlFile (const char* url, bool is_post, size_t in_buffer_size)
+    : connection (url, is_post ? "method=post" : "")
+    , end_of_request (false)
+    , buffer_size (in_buffer_size)
+  {
+  }
+};
+
+/*
     URL файловая система
 */
 
@@ -32,10 +51,14 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     {
       try
       {
-        if (mode_flags & (FileMode_Write | FileMode_Resize))
-          throw xtl::format_not_supported_exception ("", "No write access inf URL files");
+        if (!name)
+          throw xtl::make_null_argument_exception ("", "name");
+          
+        stl::string url = (prefix + name).c_str ();
+          
+        log.Printf ("Open url file '%s' (file_mode=%s)", url.c_str (), common::strfilemode (mode_flags).c_str ());
         
-        stl::auto_ptr<File> file (new File (OpenUrlFile (name)));
+        stl::auto_ptr<UrlFile> file (new UrlFile (url.c_str (), (mode_flags & FileMode_Write) != 0, buffer_size));
         
         return reinterpret_cast<file_t> (file.release ());
       }
@@ -50,10 +73,14 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     {
       try
       {
-        File* file = reinterpret_cast<File*> (handle);
+        UrlFile* file = reinterpret_cast<UrlFile*> (handle);
         
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");
+          
+        Lock lock (*file);
+          
+        FinishSend (*file);
           
         delete file;
       }
@@ -68,12 +95,14 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     {
       try
       {
-        File* file = reinterpret_cast<File*> (handle);
+        UrlFile* file = reinterpret_cast<UrlFile*> (handle);
         
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");        
           
-        return file->BufferSize ();
+        Lock lock (*file);          
+          
+        return file->buffer_size;
       }
       catch (xtl::exception& e)
       {
@@ -86,12 +115,16 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     {
       try
       {
-        File* file = reinterpret_cast<File*> (handle);
+        UrlFile* file = reinterpret_cast<UrlFile*> (handle);
         
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");
+
+        Lock lock (*file);          
           
-        return file->Read (buf, size);
+        FinishSend (*file);
+          
+        return file->response_file.Read (buf, size);
       }
       catch (xtl::exception& e)
       {
@@ -104,12 +137,21 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     {
       try
       {
-        File* file = reinterpret_cast<File*> (handle);
+        UrlFile* file = reinterpret_cast<UrlFile*> (handle);
         
         if (!file)
-          throw xtl::make_null_argument_exception ("", "file");        
+          throw xtl::make_null_argument_exception ("", "file");
           
-        return file->Write (buf, size);
+        Lock lock (*file);          
+          
+        if (file->end_of_request)
+        {
+          return file->response_file.Write (buf, size);
+        }
+        else
+        {          
+          return file->connection.Send (buf, size);
+        }
       }
       catch (xtl::exception& e)
       {
@@ -122,12 +164,16 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     {
       try      
       {
-        File* file = reinterpret_cast<File*> (handle);
+        UrlFile* file = reinterpret_cast<UrlFile*> (handle);
         
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");
+
+        Lock lock (*file);          
           
-        file->Rewind ();
+        FinishSend (*file);
+          
+        file->response_file.Rewind ();
       }
       catch (xtl::exception& e)
       {
@@ -140,12 +186,16 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     {
       try
       {
-        File* file = reinterpret_cast<File*> (handle);
+        UrlFile* file = reinterpret_cast<UrlFile*> (handle);
         
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");
+
+        Lock lock (*file);          
           
-        return file->Seek (pos);
+        FinishSend (*file);
+          
+        return file->response_file.Seek (pos);
       }
       catch (xtl::exception& e)
       {
@@ -158,12 +208,21 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     {
       try
       {
-        File* file = reinterpret_cast<File*> (handle);
+        UrlFile* file = reinterpret_cast<UrlFile*> (handle);
         
         if (!file)
-          throw xtl::make_null_argument_exception ("", "file");        
+          throw xtl::make_null_argument_exception ("", "file");
+
+        Lock lock (*file);          
           
-        return file->Tell ();
+        if (file->end_of_request)
+        {
+          return file->response_file.Tell ();
+        }
+        else
+        {
+          return 0;
+        }
       }
       catch (xtl::exception& e)
       {
@@ -176,12 +235,16 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     {
       try
       {
-        File* file = reinterpret_cast<File*> (handle);
+        UrlFile* file = reinterpret_cast<UrlFile*> (handle);
         
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");
+
+        Lock lock (*file);          
           
-        return file->Size ();        
+        FinishSend (*file);
+          
+        return file->response_file.Size ();        
       }
       catch (xtl::exception& e)
       {
@@ -194,12 +257,16 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     {
       try
       {
-        File* file = reinterpret_cast<File*> (handle);
+        UrlFile* file = reinterpret_cast<UrlFile*> (handle);
         
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");        
+
+        Lock lock (*file);          
           
-        file->Resize (new_size);
+        FinishSend (*file);
+          
+        file->response_file.Resize (new_size);
       }
       catch (xtl::exception& e)
       {
@@ -212,12 +279,17 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     {
       try
       {
-        File* file = reinterpret_cast<File*> (handle);
+        UrlFile* file = reinterpret_cast<UrlFile*> (handle);
         
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");        
+
+        Lock lock (*file);          
           
-        return file->Eof ();        
+        if (!file->end_of_request)
+          return false;
+          
+        return file->response_file.Eof ();        
       }
       catch (xtl::exception& e)
       {
@@ -230,12 +302,17 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     {
       try
       {
-        File* file = reinterpret_cast<File*> (handle);
+        UrlFile* file = reinterpret_cast<UrlFile*> (handle);
         
         if (!file)
           throw xtl::make_null_argument_exception ("", "file");        
+
+        Lock lock (*file);          
+          
+        if (!file->end_of_request)
+          return;
         
-        file->Flush ();
+        file->response_file.Flush ();
       }
       catch (xtl::exception& e)
       {
@@ -289,52 +366,41 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
     }
 
   private:  
-    File CreateTempFile ()
+    void FinishSend (UrlFile& file)
     {
       try
       {
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("network::UrlConnection::CreateTempFile");
-        throw;
-      }
-    }
-  
-    File OpenUrlFile (const char* url)
-    {
-      try
-      {
-        if (!url)
-          throw xtl::make_null_argument_exception ("", "url");
+        if (file.end_of_request)
+          return;
           
-        UrlConnection connection ((prefix + url).c_str ());
+        file.connection.CloseSend ();
         
         xtl::uninitialized_storage<char> buffer (DOWNLOAD_BUFFER_SIZE);
         
-        TempFile file ("/system/inetcache/funner_url_file%06u"); //suffix (Url.File ())!!!
+        TempFile temp_file ("/system/inetcache/funner_url_file%06u", file.buffer_size);
         
-        log.Printf ("Attempt to download URL '%s'", connection.Url ().ToString ());
+        log.Printf ("Attempt to download URL '%s'", file.connection.Url ().ToString ());
 
         size_t size;
         
-        while ((size = connection.Receive (buffer.data (), buffer.size ())) != 0)
+        while ((size = file.connection.Receive (buffer.data (), buffer.size ())) != 0)
         {
-          size_t write_size = file.Write (buffer.data (), size);
+          size_t write_size = temp_file.Write (buffer.data (), size);
           
           if (write_size != size)
-            throw xtl::format_operation_exception ("", "Can't write to file '%s' %u bytes", file.Path (), size);
+            throw xtl::format_operation_exception ("", "Can't write to file '%s' %u bytes", temp_file.Path (), size);
         }
 
-        file.Rewind ();
+        temp_file.Rewind ();
         
-        log.Printf ("URL resource '%s' downloaded", connection.Url ().ToString ());
-
-        return file;
+        log.Printf ("URL resource '%s' downloaded (file_size=%u)", file.connection.Url ().ToString (), temp_file.Size ());
+        
+        file.response_file  = temp_file;
+        file.end_of_request = true;
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UrlCustomFileSystem::OpenUrlFile");
+        e.touch ("network::UrlCustomFileSystem::FinishSend");
         throw;
       }
     }

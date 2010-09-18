@@ -8,9 +8,11 @@
 
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
+#include <xtl/uninitialized_storage.h>
 
 #include <common/file.h>
 #include <common/log.h>
+#include <common/time.h>
 
 #include <network/inet_address.h>
 #include <network/url_connection.h>
@@ -31,7 +33,7 @@ class TestHttpServer
     {
        static const char *options[] = {
          "document_root", "./www",
-         "listening_ports", "8080",
+         "listening_ports", "81",
          0
        };
     
