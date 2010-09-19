@@ -25,7 +25,7 @@ void CocoaIPhonePlatform::MountSystemPaths ()
     FileSystem::Mount ("/system/profile", personal_path.c_str ());
   }
 
-  paths = NSSearchPathForDirectoriesInDomains (NSCachesDirectory, NSSystemDomainMask, YES);
+  paths = NSSearchPathForDirectoriesInDomains (NSCachesDirectory, NSUserDomainMask, YES);
 
   if ([paths count])
   {

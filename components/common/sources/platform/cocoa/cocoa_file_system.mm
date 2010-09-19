@@ -105,45 +105,6 @@ class CocoaFileSystem: public StdioFileSystem
       [pool release];
     }
 
-#if TARGET_IPHONE_SIMULATOR
-    filesize_t FileSize (file_t file)
-    {
-      NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
-      stl::string error_string;
-
-      filesize_t return_value = 0;
-
-      @try
-      {
-        NSFileHandle* file_handle = [[NSFileHandle alloc] initWithFileDescriptor:fileno ((FILE*)file)];
-
-        unsigned long long current_file_offset = [file_handle offsetInFile];
-
-        return_value = [file_handle seekToEndOfFile];
-
-        [file_handle seekToFileOffset:current_file_offset];
-
-        [file_handle release];
-      }
-      @catch (NSException *e)
-      {
-        error_string = [[e reason] UTF8String];
-      }
-      @catch (...)
-      {
-        error_string = "Unknown exception";
-      }
-
-      [pool release];
-
-      if (!error_string.empty ())
-        throw xtl::format_operation_exception ("common::CocoaFileSystem::FileSize", "Can't determine file size, exception '%s'", error_string.c_str ());
-
-      return return_value;
-    }
-#endif
-
     void FileResize (file_t file,filesize_t new_size)
     {
       static const char* METHOD_NAME = "common::CocoaFileSystem::FileResize";
