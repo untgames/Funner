@@ -33,7 +33,8 @@ class TestHttpServer
     {
        static const char *options[] = {
          "document_root", "./www",
-         "listening_ports", "81",
+         "listening_ports", "90",
+         "cgi_interpreter", "d:/studio/dev/msys/bin/cat",
          0
        };
     

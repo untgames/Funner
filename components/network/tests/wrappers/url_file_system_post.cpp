@@ -13,7 +13,7 @@ int main ()
     TestHttpServer http_server;
     
     common::InputFile input_file ("data/post.txt");
-    common::StdFile output_file ("http://localhost:81/test.cgi", common::FileMode_ReadWrite);
+    common::StdFile output_file ("http://localhost:90/test.cgi", common::FileMode_ReadWrite);
 
     xtl::uninitialized_storage<char> buffer (BUFFER_SIZE);
 

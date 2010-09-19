@@ -19,16 +19,21 @@ const char*  LOG_NAME             = "network.url_file_system";
 
 struct UrlFile: public Lockable
 {
-  UrlConnection connection;     //соединение
-  File          response_file;  //файл чтения данных ответа
-  bool          end_of_request; //флаг - запрос отправлен
-  size_t        buffer_size;    //размер кеша буфера чтения
+  stl::string url;            //URL ресурса
+  File        request_file;   //файла записи данных запроса
+  File        response_file;  //файл чтения данных ответа
+  bool        is_post;        //является ли соедиенние POST запросом
+  bool        end_of_request; //флаг - запрос отправлен
+  size_t      buffer_size;    //размер кеша буфера чтения
   
-  UrlFile (const char* url, bool is_post, size_t in_buffer_size)
-    : connection (url, is_post ? "method=post" : "")
+  UrlFile (const char* in_url, bool in_is_post, size_t in_buffer_size)
+    : url (in_url)
     , end_of_request (false)
+    , is_post (in_is_post)
     , buffer_size (in_buffer_size)
   {
+    if (is_post)
+      request_file = TempFile ("/system/inetcache/funner_url_file%06u");
   }
 };
 
@@ -81,6 +86,15 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         Lock lock (*file);
           
         FinishSend (*file);
+        
+        if (!file->response_file.IsClosed ())
+        {
+          stl::string response_file_path = file->response_file.Path ();
+          
+          file->response_file.Close ();
+          
+          common::FileSystem::Remove (response_file_path.c_str ());
+        }
           
         delete file;
       }
@@ -145,13 +159,9 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         Lock lock (*file);          
           
         if (file->end_of_request)
-        {
-          return file->response_file.Write (buf, size);
-        }
-        else
-        {          
-          return file->connection.Send (buf, size);
-        }
+          throw xtl::format_operation_exception ("", "Can't send data after finish of send request");
+          
+        return file->request_file.Write (buf, size);
       }
       catch (xtl::exception& e)
       {
@@ -373,17 +383,37 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         if (file.end_of_request)
           return;
           
-        file.connection.CloseSend ();
+        stl::string params = file.is_post ? common::format ("method=post send_size=%u", file.request_file.Size ()).c_str () : "";
+          
+        log.Printf (params.empty () ? "Starting URL query '%s'" : "Starting URL query '%s' (params='%s')", file.url.c_str (), params.c_str ());
+          
+        UrlConnection connection (file.url.c_str (), params.c_str ());
         
         xtl::uninitialized_storage<char> buffer (DOWNLOAD_BUFFER_SIZE);
         
+        if (file.is_post)
+        {        
+          for (;;)
+          {
+            size_t size = file.request_file.Read (buffer.data (), buffer.size ());
+            
+            if (!size)
+              break;
+              
+            size_t send_size = connection.Send (buffer.data (), buffer.size ());
+            
+            if (send_size != size)
+              throw xtl::format_operation_exception ("", "Can't send data %u bytes for URL query '%s'", size, file.url.c_str ());
+          }
+          
+          connection.CloseSend ();
+        }
+
         TempFile temp_file ("/system/inetcache/funner_url_file%06u", file.buffer_size);
         
-        log.Printf ("Attempt to download URL '%s'", file.connection.Url ().ToString ());
-
         size_t size;
         
-        while ((size = file.connection.Receive (buffer.data (), buffer.size ())) != 0)
+        while ((size = connection.Receive (buffer.data (), buffer.size ())) != 0)
         {
           size_t write_size = temp_file.Write (buffer.data (), size);
           
@@ -393,10 +423,16 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
 
         temp_file.Rewind ();
         
-        log.Printf ("URL resource '%s' downloaded (file_size=%u)", file.connection.Url ().ToString (), temp_file.Size ());
+        log.Printf ("URL query '%s' processed (response_size=%u)", file.url.c_str (), temp_file.Size ());
         
         file.response_file  = temp_file;
         file.end_of_request = true;
+        
+        stl::string request_file_path = file.request_file.Path ();
+        
+        file.request_file.Close ();        
+        
+        common::FileSystem::Remove (request_file_path.c_str ());
       }
       catch (xtl::exception& e)
       {

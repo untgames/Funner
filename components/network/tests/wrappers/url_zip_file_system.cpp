@@ -15,7 +15,7 @@ int main ()
     
     TestHttpServer http_server;
     
-    common::FileSystem::AddSearchPath ("http://localhost:81/test.zip", &print_search_log);
+    common::FileSystem::AddSearchPath ("http://localhost:82/test.zip", &print_search_log);
     
     common::FileSystem::CopyFile ("test.txt", "/io/stdout");
   }

@@ -192,7 +192,12 @@ class CurlStream: public IUrlStream
               
               if (properties.IsPresent ("send_size"))
               {
-                check_code (curl_easy_setopt (stream, CURLOPT_POSTFIELDSIZE_LARGE, static_cast<size_t> (properties.GetInteger ("send_size"))), "::curl_easy_setopt(CURLOPT_POSTFIELDSIZE_LARGE)");
+                check_code (curl_easy_setopt (stream, CURLOPT_POSTFIELDSIZE, static_cast<size_t> (properties.GetInteger ("send_size"))), "::curl_easy_setopt(CURLOPT_POSTFIELDSIZE_LARGE)");
+                
+                post_chunk = curl_slist_append (post_chunk, "Expect:");
+                
+                if (!post_chunk)
+                  throw xtl::format_operation_exception ("", "::curl_slist_append failed");                
               }
               else
               {
@@ -200,9 +205,10 @@ class CurlStream: public IUrlStream
                 
                 if (!post_chunk)
                   throw xtl::format_operation_exception ("", "::curl_slist_append failed");
-
-                curl_easy_setopt (stream, CURLOPT_HTTPHEADER, post_chunk);
               }
+              
+              if (post_chunk)
+                check_code (curl_easy_setopt (stream, CURLOPT_HTTPHEADER, post_chunk), "curl_easy_setopt(CURLOPT_HTTPHEADER");
             }
           }
 
@@ -401,19 +407,19 @@ class CurlStream: public IUrlStream
             log.Printf ("%s", GetDebugMessage (data, size).c_str ());
             break;
           case CURLINFO_HEADER_OUT:
-//            log.Printf ("Send header '%s' (URL='%s')", GetDebugMessage (data, size).c_str (), url.c_str ());
+            log.Printf ("Send header '%s' (URL='%s')", GetDebugMessage (data, size).c_str (), url.c_str ());
             break;
           case CURLINFO_DATA_OUT:
-//            log.Printf ("Send data (URL='%s')", url.c_str ());
+            log.Printf ("Send data (URL='%s')", url.c_str ());
             break;
           case CURLINFO_SSL_DATA_OUT:
 //            log.Printf ("Send SSL data (URL='%s')", url.c_str ());
             break;
           case CURLINFO_HEADER_IN:
-//            log.Printf ("Receive header '%s' (URL='%s')", GetDebugMessage (data, size).c_str (), url.c_str ());
+            log.Printf ("Receive header '%s' (URL='%s')", GetDebugMessage (data, size).c_str (), url.c_str ());
             break;
           case CURLINFO_DATA_IN:
-//            log.Printf ("Receive data (URL='%s')", url.c_str ());
+            log.Printf ("Receive data (URL='%s')", url.c_str ());
             break;
           case CURLINFO_SSL_DATA_IN:
 //            log.Printf ("Receive SSL data (URL='%s')", url.c_str ());
