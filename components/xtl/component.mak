@@ -31,7 +31,7 @@ XTL.TR1.TESTS.pthread_static_library.LIBS := pthread
 #Öåëü ¹3 - XTL tests
 XTL.XTL.TESTS.TYPE                 := test-suite
 XTL.XTL.TESTS.INCLUDE_DIRS         := include
-XTL.XTL.TESTS.SOURCE_DIRS          := tests/xtl/signals tests/xtl/utils tests/xtl/visitor tests/xtl/range tests/xtl/smart_ptr tests/xtl/any tests/xtl/exception
+XTL.XTL.TESTS.SOURCE_DIRS          := tests/xtl/signals tests/xtl/utils tests/xtl/visitor tests/xtl/range tests/xtl/smart_ptr tests/xtl/any tests/xtl/exception tests/xtl/types
 XTL.XTL.TESTS.LIB_DIRS             :=
 XTL.XTL.TESTS.EXECTUTION_DIR       :=
 XTL.XTL.TESTS.LIBS                 :=

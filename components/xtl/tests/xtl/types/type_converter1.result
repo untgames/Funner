@@ -1,0 +1,22 @@
+Results of type_converter1_test:
+check convertion float -> int: true
+check convertion int -> float: false
+check convertion double -> int: true
+check convertion int -> double: false
+check convertion float -> double: false
+check convertion double -> float: false
+check convertion char -> long double: false
+check convertion long double -> char: false
+check convertion B& -> A&: true
+check convertion B -> A: true
+check convertion B* -> A*: true
+check convertion A -> B: false
+check convertion A& -> B&: false
+check convertion A* -> B*: false
+check convertion A -> A: true
+check convertion const A -> A: false
+check convertion volatile A -> A: false
+check convertion const volatile A -> A: false
+check convertion A -> const A: true
+check convertion A -> volatile A: true
+check convertion A -> const volatile A: true
