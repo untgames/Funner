@@ -351,7 +351,6 @@ template <class FunctionalTraits, size_t I, size_t Last> struct stack_argument_d
   static void dump (stl::string& buffer)
   {
     if (I) buffer += ", ";
-    else   buffer += "(";
   
     typedef typename functional_argument_traits<FunctionalTraits, I>::argument_type argument_type;
 
@@ -373,6 +372,10 @@ inline void to_string (stl::string& buffer, const invoker_impl<FnTraits, Fn, Ret
   enum { arguments_count = FnTraits::arguments_count + FnTraits::is_memfun };
   
   buffer.clear ();
+  
+  dump_type<typename FnTraits::result_type> (buffer);
+  
+  buffer += " (";
   
   stack_argument_dumper<FnTraits, 0, arguments_count>::dump (buffer);
 }
