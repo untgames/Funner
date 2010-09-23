@@ -1,8 +1,4 @@
-#include <netdb.h>
-
-#include <xtl/common_exceptions.h>
-
-#include <platform/platform.h>
+#include "shared.h"
 
 using namespace network;
 
@@ -20,16 +16,7 @@ void UnistdPlatform::GetAddressByHostName (const char* host_name, size_t& addres
   hostent *entry = gethostbyname (host_name);
 
   if (!entry)
-  {
-    switch (h_errno)
-    {
-      case HOST_NOT_FOUND: throw xtl::format_operation_exception (METHOD_NAME, "Can't resolve host name '%s'. No such host is known.", host_name);
-      case NO_DATA:        throw xtl::format_operation_exception (METHOD_NAME, "Can't resolve host name '%s'. The server recognized the request and the name, but no address is available.", host_name);
-      case NO_RECOVERY:    throw xtl::format_operation_exception (METHOD_NAME, "Can't resolve host name '%s'. An unexpected server failure occurred which cannot be recovered.", host_name);
-      case TRY_AGAIN:      throw xtl::format_operation_exception (METHOD_NAME, "Can't resolve host name '%s'. A temporary and possibly transient error occurred.", host_name);
-      default:             throw xtl::format_operation_exception (METHOD_NAME, "Can't resolve host name '%s'. Reason unknown", host_name);
-    }
-  }
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't resolve host name '%s'. Error '%s' while calling ::gethostbyname", host_name, hstrerror (h_errno));
 
   if ((size_t)entry->h_length > sizeof (address))
     throw xtl::format_operation_exception (METHOD_NAME, "Host name '%s' resolved, but host address is too long.", host_name);

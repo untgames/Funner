@@ -14,8 +14,12 @@
 #include <common/log.h>
 #include <common/time.h>
 
+#include <syslib/application.h>
+#include <syslib/thread.h>
+
 #include <network/inet_address.h>
 #include <network/url_connection.h>
+#include <network/socket.h>
 
 using namespace network;
 

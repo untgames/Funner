@@ -2,8 +2,22 @@
 
 using namespace network;
 
+typedef xtl::com_ptr<SocketImpl> SocketImplPtr;
+
 struct Socket::Impl: public xtl::reference_counter
 {
+  SocketImplPtr socket;
+
+  Impl () {}
+  Impl (SocketImplPtr in_socket) : socket (in_socket) {}
+
+  SocketImpl* CheckedHandle () const
+  {
+    if (!socket)
+      throw xtl::format_operation_exception ("network::Socket::Impl::CheckedHandle", "Socket not opened");
+
+    return socket.get ();
+  }
 };
 
 /*
@@ -11,19 +25,20 @@ struct Socket::Impl: public xtl::reference_counter
 */
 
 Socket::Socket ()
+  : impl (new Impl)
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::Socket()");
 }
 
-Socket::Socket (const InetAddress& inet_address, unsigned short port, SocketProtocol protocol)
+Socket::Socket (SocketDomain socket_domain, SocketProtocol protocol)
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::Socket(const SocketAddress&, unsigned short, SocketProtocol)");
+  SocketImplPtr socket = SocketImplPtr (Platform::CreateSocket (socket_domain, protocol), false);
+
+  impl = new Impl (socket);
 }
 
-Socket::Socket (const SocketAddress& socket_address, SocketProtocol protocol)
-{
-  throw xtl::make_not_implemented_exception ("network::Socket::Socket(const SocketAddress&, SocketProtocol)");
-}
+Socket::Socket (SocketImpl* socket_impl)
+  : impl (new Impl (socket_impl))
+  {}
 
 Socket::Socket (const Socket& socket)
   : impl (socket.impl)
@@ -49,7 +64,7 @@ Socket& Socket::operator = (const Socket& socket)
 
 void Socket::Close ()
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::Close");
+  Socket ().Swap (*this);
 }
 
 /*
@@ -58,12 +73,12 @@ void Socket::Close ()
 
 const SocketAddress& Socket::LocalAddress () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::LocalAddress");
+  return impl->CheckedHandle ()->LocalAddress ();
 }
 
 const SocketAddress& Socket::RemoteAddress () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::RemoteAddress");
+  return impl->CheckedHandle ()->RemoteAddress ();
 }
 
 /*
@@ -72,7 +87,7 @@ const SocketAddress& Socket::RemoteAddress () const
 
 SocketProtocol Socket::Protocol () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::Protocol");
+  return impl->CheckedHandle ()->Protocol ();
 }
 
 /*
@@ -81,22 +96,22 @@ SocketProtocol Socket::Protocol () const
 
 bool Socket::IsReceiveClosed () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::IsReceiveClosed");
+  return impl->CheckedHandle ()->IsReceiveClosed ();
 }
 
 bool Socket::IsSendClosed () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::IsSendClosed");
+  return impl->CheckedHandle ()->IsSendClosed ();
 }
 
 void Socket::CloseReceive ()
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::CloseReceive");
+  impl->CheckedHandle ()->CloseReceive ();
 }
 
 void Socket::CloseSend ()
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::CloseSend");
+  impl->CheckedHandle ()->CloseSend ();
 }
 
 /*
@@ -105,21 +120,40 @@ void Socket::CloseSend ()
 
 void Socket::Bind (const SocketAddress& address)
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::Bind");
+  impl->CheckedHandle ()->Bind (address);
 }
 
 void Socket::Connect (const SocketAddress& address, size_t timeout)
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::Connect");
+  impl->CheckedHandle ()->Connect (address, timeout);
 }
 
 /*
     Приём соединений
 */
 
+void Socket::Listen ()
+{
+  impl->CheckedHandle ()->Listen ();
+}
+
 Socket Socket::Accept ()
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::Accept");
+  return Socket (impl->CheckedHandle ()->Accept ());
+}
+
+bool Socket::TryAccept (Socket& target_socket)
+{
+  SocketImpl* socket_impl = impl->CheckedHandle ()->TryAccept ();
+
+  if (!impl)
+    return false;
+
+  Socket accepted_socket (socket_impl);
+
+  target_socket.Swap (accepted_socket);
+
+  return true;
 }
 
 /*
@@ -128,57 +162,57 @@ Socket Socket::Accept ()
 
 bool Socket::IsClosed () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::IsClosed");
+  return !impl->socket;
 }
 
 bool Socket::IsConnected () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::IsConnected");
+  return impl->CheckedHandle ()->IsConnected ();
 }
 
 bool Socket::IsBound () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::IsBound");
+  return impl->CheckedHandle ()->IsBound ();
 }
 
 bool Socket::IsKeepAlive () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::IsKeepAlive");
+  return impl->CheckedHandle ()->IsKeepAlive ();
 }
 
 bool Socket::IsOobInline () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::IsOobInline");
+  return impl->CheckedHandle ()->IsOobInline ();
 }
 
 bool Socket::IsReuseAddress () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::IsReuseAddress");
+  return impl->CheckedHandle ()->IsReuseAddress ();
 }
 
 bool Socket::IsTcpNoDelay () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::IsTcpNoDelay");
+  return impl->CheckedHandle ()->IsTcpNoDelay ();
 }
 
 void Socket::SetKeepAlive (bool state)
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::SetKeepAlive");
+  impl->CheckedHandle ()->SetKeepAlive (state);
 }
 
 void Socket::SetOobInline (bool state)
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::SetOobInline");
+  impl->CheckedHandle ()->SetOobInline (state);
 }
 
 void Socket::SetReuseAddress (bool state)
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::SetReuseAddress");
+  impl->CheckedHandle ()->SetReuseAddress (state);
 }
 
 void Socket::SetTcpNoDelay (bool state)
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::SetTcpNoDelay");
+  impl->CheckedHandle ()->SetTcpNoDelay (state);
 }
 
 /*
@@ -187,22 +221,22 @@ void Socket::SetTcpNoDelay (bool state)
 
 void Socket::SetReceiveBufferSize (size_t size)
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::SetReceiveBufferSize");
+  impl->CheckedHandle ()->SetReceiveBufferSize (size);
 }
 
 void Socket::SetSendBufferSize (size_t size)
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::SetSendBufferSize");
+  impl->CheckedHandle ()->SetSendBufferSize (size);
 }
 
 size_t Socket::ReceiveBufferSize () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::ReceiveBufferSize");
+  return impl->CheckedHandle ()->ReceiveBufferSize ();
 }
 
 size_t Socket::SendBufferSize () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::SendBufferSize");
+  return impl->CheckedHandle ()->SendBufferSize ();
 }
 
 /*
@@ -211,12 +245,12 @@ size_t Socket::SendBufferSize () const
 
 size_t Socket::Receive (void* buffer, size_t size, size_t timeout_in_milliseconds)
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::Receive");
+  return impl->CheckedHandle ()->Receive (buffer, size, timeout_in_milliseconds);
 }
 
 size_t Socket::Send (const void* buffer, size_t size, size_t timeout_in_milliseconds)
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::Send");
+  return impl->CheckedHandle ()->Send (buffer, size, timeout_in_milliseconds);
 }
 
 /*
@@ -225,7 +259,7 @@ size_t Socket::Send (const void* buffer, size_t size, size_t timeout_in_millisec
 
 size_t Socket::ReceiveAvailable () const
 {
-  throw xtl::make_not_implemented_exception ("network::Socket::ReceiveAvailable");
+  return impl->CheckedHandle ()->ReceiveAvailable ();
 }
 
 /*

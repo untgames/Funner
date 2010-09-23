@@ -18,4 +18,4 @@ NETWORK.SOURCES.macosx.IMPORTS     := compile.extern.curl
 #Öåëü ¹2 - System library tests
 NETWORK.TESTS.TYPE        := test-suite
 NETWORK.TESTS.SOURCE_DIRS := tests/wrappers
-NETWORK.TESTS.IMPORTS     := compile.network link.network compile.common link.common.zip_file_system compile.extern.mongoose link.extern.mongoose
+NETWORK.TESTS.IMPORTS     := compile.system compile.network link.network compile.common link.common.zip_file_system compile.extern.mongoose link.extern.mongoose
