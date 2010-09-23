@@ -9,20 +9,15 @@ const char* LOG_NAME = "network.socket";
 
 const int LISTEN_QUEUE_SIZE = 4;
 
-void raise_error (const char* source, const char* failed_function)
-{
-  throw xtl::format_operation_exception (source, "::%s failed, error '%s'", failed_function, strerror (errno));
-}
-
 /*
    Сокет
 */
 
-class UnistdSocket : public SocketImpl, public xtl::reference_counter
+class WinSocket : public SocketImpl, public xtl::reference_counter
 {
   public:
 ///Конструктор/деструктор
-    UnistdSocket (int in_socket, const SocketAddress& in_remote_address)
+    WinSocket (int in_socket, const SocketAddress& in_remote_address)
     : socket (in_socket)
     , local_address_getted (false)
     , remote_address (in_remote_address)
@@ -33,7 +28,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
     , bound (false)
     {}
 
-    UnistdSocket (SocketDomain socket_domain, SocketProtocol protocol)
+    WinSocket (SocketDomain socket_domain, SocketProtocol protocol)
       : local_address_getted (false)
       , remote_address_getted (false)
       , receive_closed (false)
@@ -73,25 +68,25 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
 
         socket = ::socket (domain, type, socket_protocol);
 
-        if (socket < 0)
-          throw xtl::format_operation_exception ("", "Can't create socket, error '%s'", strerror (errno));
+        if (socket == INVALID_SOCKET)
+          raise_error ("::socket");
 
         SetBlockingMode (true);
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::UnistdSocket");
+        e.touch ("network::WinSocket::WinSocket");
         throw;
       }
     }
 
-    ~UnistdSocket ()
+    ~WinSocket ()
     {
-      if (!close (socket))
+      if (closesocket (socket) == SOCKET_ERROR)
       {
         common::Log log (LOG_NAME);
 
-        log.Printf ("Can't close socket, error '%s'\n", strerror (errno));
+        log.Printf ("Can't close socket, error '%s'\n", get_error_message (WSAGetLastError ()));
       }
     }
 
@@ -101,13 +96,13 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       if (local_address_getted)
         return local_address;
 
-      sockaddr_storage address_storage;
-      socklen_t        address_storage_size = sizeof (address_storage);
+      sockaddr_storage address_storage;   //!!!!!!!!!!!WIN32 define min OS
+      int              address_storage_size = sizeof (address_storage);
 
       try
       {
         if (getsockname (socket, (sockaddr*)&address_storage, &address_storage_size))
-          raise_error ("", "getsockname");
+          raise_error ("::getsockname");
 
         SocketAddress local_address_value = GetSocketAddress (address_storage, address_storage_size);
 
@@ -115,7 +110,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::LoaclAddress");
+        e.touch ("network::WinSocket::LoaclAddress");
         throw;
       }
 
@@ -127,7 +122,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       if (remote_address_getted)
         return remote_address;
 
-      throw xtl::format_operation_exception ("network::UnistdSocket::RemoteAddress", "Can't get remote address, there was no accepted connection");
+      throw xtl::format_operation_exception ("network::WinSocket::RemoteAddress", "Can't get remote address, there was no accepted connection");
     }
 
 ///Протокол
@@ -147,7 +142,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::Protocol");
+        e.touch ("network::WinSocket::Protocol");
         throw;
       }
     }
@@ -168,8 +163,16 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       if (receive_closed)
         return;
 
-      if (shutdown (socket, SHUT_RD))
-        raise_error ("network::UnistdSocket::CloseReceive", "shutdown");
+      try
+      {
+        if (shutdown (socket, SD_RECEIVE))
+          raise_error ("::shutdown");
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("network::WinSocket::CloseReceive");
+        throw;
+      }
 
       receive_closed = true;
     }
@@ -179,8 +182,16 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       if (send_closed)
         return;
 
-      if (shutdown (socket, SHUT_WR))
-        raise_error ("network::UnistdSocket::CloseSend", "shutdown");
+      try
+      {
+        if (shutdown (socket, SD_SEND))
+          raise_error ("::shutdown");
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("network::WinSocket::CloseSend");
+        throw;
+      }
 
       send_closed = true;
     }
@@ -196,11 +207,11 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
         FillSockaddrStorage (address, address_storage, address_storage_size);
 
         if (bind (socket, (sockaddr*)&address_storage, address_storage_size))
-          raise_error ("", "bind");
+          raise_error ("::bind");
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::Bind");
+        e.touch ("network::WinSocket::Bind");
         throw;
       }
 
@@ -219,11 +230,11 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
         FillSockaddrStorage (address, address_storage, address_storage_size);
 
         if (connect (socket, (sockaddr*)&address_storage, address_storage_size))
-          raise_error ("", "connect");
+          raise_error ("::connect");
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::Connect");
+        e.touch ("network::WinSocket::Connect");
         throw;
       }
 
@@ -233,14 +244,22 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
 ///Приём соединений
     void Listen ()
     {
-      if (listen (socket, LISTEN_QUEUE_SIZE))
-        raise_error ("network::UnistdSocket::Listen", "listen");
+      try
+      {
+        if (listen (socket, LISTEN_QUEUE_SIZE))
+          raise_error ("::listen");
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("network::WinSocket::Listen");
+        throw;
+      }
     }
 
     SocketImpl* Accept ()
     {
       sockaddr_storage address_storage;
-      socklen_t        address_storage_size = sizeof (address_storage);
+      int              address_storage_size = sizeof (address_storage);
 
       int new_socket = accept (socket, (sockaddr*)&address_storage, &address_storage_size);
 
@@ -249,17 +268,17 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       try
       {
         if (new_socket < 0)
-          raise_error ("", "accept");
+          raise_error ("::accept");
 
         new_socket_remote_address = GetSocketAddress (address_storage, address_storage_size);
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::Accept");
+        e.touch ("network::WinSocket::Accept");
         throw;
       }
 
-      return new UnistdSocket (new_socket, new_socket_remote_address);
+      return new WinSocket (new_socket, new_socket_remote_address);
     }
 
     SocketImpl* TryAccept ()
@@ -284,7 +303,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::TryAccept");
+        e.touch ("network::WinSocket::TryAccept");
         throw;
       }
     }
@@ -308,7 +327,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::IsKeepAlive");
+        e.touch ("network::WinSocket::IsKeepAlive");
         throw;
       }
     }
@@ -321,7 +340,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::IsOobInline");
+        e.touch ("network::WinSocket::IsOobInline");
         throw;
       }
     }
@@ -334,7 +353,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::IsReuseAddress");
+        e.touch ("network::WinSocket::IsReuseAddress");
         throw;
       }
     }
@@ -347,7 +366,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::IsTcpNoDelay");
+        e.touch ("network::WinSocket::IsTcpNoDelay");
         throw;
       }
     }
@@ -360,7 +379,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::SetKeepAlive");
+        e.touch ("network::WinSocket::SetKeepAlive");
         throw;
       }
     }
@@ -373,7 +392,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::SetOobInline");
+        e.touch ("network::WinSocket::SetOobInline");
         throw;
       }
     }
@@ -386,7 +405,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::SetReuseAddress");
+        e.touch ("network::WinSocket::SetReuseAddress");
         throw;
       }
     }
@@ -399,7 +418,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::SetTcpNoDelay");
+        e.touch ("network::WinSocket::SetTcpNoDelay");
         throw;
       }
     }
@@ -413,7 +432,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::SetReceiveBufferSize");
+        e.touch ("network::WinSocket::SetReceiveBufferSize");
         throw;
       }
     }
@@ -426,7 +445,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::SetSendBufferSize");
+        e.touch ("network::WinSocket::SetSendBufferSize");
         throw;
       }
     }
@@ -439,7 +458,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::ReceiveBufferSize");
+        e.touch ("network::WinSocket::ReceiveBufferSize");
         throw;
       }
     }
@@ -452,7 +471,7 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::SendBufferSize");
+        e.touch ("network::WinSocket::SendBufferSize");
         throw;
       }
     }
@@ -469,21 +488,21 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
 
         SetSocketOption<timeval> (SO_RCVTIMEO, timeout);
 
-        int received_bytes = recv (socket, buffer, size, 0);
+        int received_bytes = recv (socket, (char*)buffer, size, 0);
 
         if (received_bytes < 0)
         {
-          if (errno == EAGAIN || errno == EWOULDBLOCK)
+          if (WSAGetLastError () == WSAEWOULDBLOCK)
             return 0;
           else
-            raise_error ("", "recv");
+            raise_error ("::recv");
         }
 
         return received_bytes;
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::Receive");
+        e.touch ("network::WinSocket::Receive");
         throw;
       }
     }
@@ -499,21 +518,21 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
 
         SetSocketOption<timeval> (SO_SNDTIMEO, timeout);
 
-        int sent_bytes = send (socket, buffer, size, 0);
+        int sent_bytes = send (socket, (const char*)buffer, size, 0);
 
         if (sent_bytes < 0)
         {
-          if (errno == EAGAIN || errno == EWOULDBLOCK)
+          if (WSAGetLastError () == WSAEWOULDBLOCK)
             return 0;
           else
-            raise_error ("", "send");
+            raise_error ("::send");
         }
 
         return sent_bytes;
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::Send");
+        e.touch ("network::WinSocket::Send");
         throw;
       }
     }
@@ -521,37 +540,18 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
 ///Количество байт доступных для чтения без блокировки
     size_t ReceiveAvailable ()
     {
-      //Попробовать ioctl!!!!!!!!
-
       try
       {
-        size_t receive_buffer_size = ReceiveBufferSize ();
+        u_long return_value;
 
-        if (receive_buffer_size > receive_available_buffer.size ())
-          receive_available_buffer.resize (receive_buffer_size);
-
-        SetBlockingMode (true);
-
-        int return_value = recv (socket, receive_available_buffer.data (), receive_available_buffer.size (), MSG_PEEK);
-
-        if (return_value < 0)
-        {
-          if (errno == EAGAIN || errno == EWOULDBLOCK)
-            return_value = 0;
-          else
-          {
-            SetBlockingMode (false);
-            raise_error ("", "::recv");
-          }
-        }
-
-        SetBlockingMode (false);
+        if (ioctlsocket (socket, FIONREAD, &return_value))
+          raise_error ("::ioctlsocket");
 
         return return_value;
       }
       catch (xtl::exception& e)
       {
-        e.touch ("network::UnistdSocket::ReceiveAvailable");
+        e.touch ("network::WinSocket::ReceiveAvailable");
         throw;
       }
     }
@@ -567,8 +567,16 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
       T         option_value;
       socklen_t option_length = sizeof (option_value);
 
-      if (getsockopt (socket, level, option, &option_value, &option_length))
-        raise_error ("network::UnistdSocket::GetSocketOption", "getsockopt");
+      try
+      {
+        if (getsockopt (socket, level, option, (char*)&option_value, &option_length))
+          raise_error ("::getsockopt");
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("network::WinSocket::GetSocketOption");
+        throw;
+      }
 
       return option_value;
     }
@@ -576,8 +584,16 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
     template <class T>
     void SetSocketOption (int option, const T& value, int level = SOL_SOCKET)
     {
-      if (setsockopt (socket, level, option, &value, sizeof (T)))
-        raise_error ("network::UnistdSocket::SetSocketOption", "setsockopt");
+      try
+      {
+        if (setsockopt (socket, level, option, (const char*)&value, sizeof (T)))
+          raise_error ("::setsockopt");
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("network::WinSocket::SetSocketOption");
+        throw;
+      }
     }
 
     void FillSockaddrStorage (const SocketAddress& address, sockaddr_storage& address_storage, size_t& address_storage_size)
@@ -617,13 +633,13 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
           break;
         }
         default:
-          throw xtl::format_operation_exception ("network::UnistdSocket::FillSockaddrStorage", "Unsupported internet address size %u", address.InetAddress ().Size ());
+          throw xtl::format_operation_exception ("network::WinSocket::FillSockaddrStorage", "Unsupported internet address size %u", address.InetAddress ().Size ());
       }
     }
 
-    SocketAddress GetSocketAddress (const sockaddr_storage& address_storage, socklen_t address_storage_size)
+    SocketAddress GetSocketAddress (const sockaddr_storage& address_storage, int address_storage_size)
     {
-      static const char* METHOD_NAME = "network::UnistdSocket::GetSocketAddress";
+      static const char* METHOD_NAME = "network::WinSocket::GetSocketAddress";
 
       size_t         address_size;
       unsigned char  address [16];
@@ -668,27 +684,33 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
 
     void SetBlockingMode (bool state)
     {
-      static const char* METHOD_NAME = "network::UnistdSocket::SetBlockingMode";
+      try
+      {
+        if (state)
+        {
+          WSAEVENT dummy_event = WSACreateEvent ();
 
-      int flags = fcntl (socket, F_GETFL, 0);
+          if (dummy_event == WSA_INVALID_EVENT)
+            raise_error ("::WSACreateEvent");
 
-      if (flags < 0)
-        raise_error (METHOD_NAME, "::fcntl");
+          if (WSAEventSelect (socket, dummy_event, 0) == SOCKET_ERROR)
+            raise_error ("::WSAEventSelect");
+        }
 
-      if (state)
-        flags &= ~O_NONBLOCK;
-      else
-        flags |= O_NONBLOCK;
+        u_long state_value = state ? 0 : 1;
 
-      if (fcntl (socket, F_SETFL, flags) == -1)
-        raise_error (METHOD_NAME, "::fcntl");
+        if (ioctlsocket (socket, FIONBIO, &state_value) == SOCKET_ERROR)
+          raise_error ("::ioctlsocket");
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("network::WinSocket::SetBlockingMode");
+        throw;
+      }
     }
 
   private:
-    typedef xtl::uninitialized_storage<char> Buffer;
-
-  private:
-    int           socket;                   //дескриптор сокета
+    SOCKET        socket;                   //дескриптор сокета
     SocketAddress local_address;            //локальный адресс сокета
     bool          local_address_getted;     //был ли получен локальный адресс
     SocketAddress remote_address;           //удаленный адресс сокета
@@ -697,7 +719,6 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
     bool          send_closed;              //закрыта ли передача
     bool          connected;                //соединен ли сокет
     bool          bound;                    //привязан ли сокет
-    Buffer        receive_available_buffer; //буфер для определения размера данных в буфере сокета
 };
 
 }
@@ -706,7 +727,9 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
    Создание сокета
 */
 
-SocketImpl* UnistdPlatform::CreateSocket (SocketDomain socket_domain, SocketProtocol protocol)
+SocketImpl* Win32Platform::CreateSocket (SocketDomain socket_domain, SocketProtocol protocol)
 {
-  return new UnistdSocket (socket_domain, protocol);
+  init_networking ();
+
+  return new WinSocket (socket_domain, protocol);
 }

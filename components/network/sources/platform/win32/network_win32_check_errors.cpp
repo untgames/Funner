@@ -3,9 +3,6 @@
 namespace network
 {
 
-namespace
-{
-
 //получение строки с сообщением об ошибке
 stl::string get_error_message (DWORD error_code)
 {
@@ -51,8 +48,6 @@ stl::string get_error_message (DWORD error_code)
 
     return message;
   }
-}
-
 }
 
 //проверка ошибок использования WinAPI и генерация исключения в случае их наличия
