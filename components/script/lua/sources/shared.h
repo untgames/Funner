@@ -178,7 +178,7 @@ class Library: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Library  (Interpreter& interpreter, const char* name, InvokerRegistry& registry);
+    Library  (Interpreter& interpreter, const char* name, const InvokerRegistry& registry);
     ~Library ();
 
   private:
@@ -200,7 +200,7 @@ class Library: public xtl::reference_counter
   private:
     lua_State*           state;                            //состояние Lua
     Interpreter&         interpreter;                      //интерпретатор
-    InvokerRegistry&     registry;                         //реестр шлюзов
+    InvokerRegistry      registry;                         //реестр шлюзов
     stl::string          table_name;                       //имя таблицы
     bool                 is_global;                        //является ли библиотека глобальной
     xtl::auto_connection on_register_invoker_connection;   //соединение регистрации шлюза

@@ -191,7 +191,7 @@ int variant_set_field (lua_State* state)
     Конструкторы / деструктор
 */
 
-Library::Library (Interpreter& in_interpreter, const char* name, InvokerRegistry& in_registry)
+Library::Library (Interpreter& in_interpreter, const char* name, const InvokerRegistry& in_registry)
   : state (in_interpreter.State ()),
     interpreter (in_interpreter),
     registry (in_registry),

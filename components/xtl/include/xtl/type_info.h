@@ -7,6 +7,7 @@
 #include <xtl/any_cast_exception.h>
 #include <xtl/singleton_default.h>
 #include <xtl/type.h>
+#include <xtl/type_info_decl.h>
 #include <xtl/type_traits>
 #include <xtl/type_list.h>
 
@@ -24,110 +25,11 @@ template <class To, class From> To custom_cast (From);
 template <class To, class From> bool has_custom_cast ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Динамическая информация о типе
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class type_info
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Стандартная информация о типе
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const std::type_info& std_type () const = 0;
-    virtual const char*           name     () const = 0;
-    virtual bool                  before   (const type_info&) const = 0;
-    virtual bool                  before   (const std::type_info&) const = 0;
-  
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка принадлежности типа к базовым категориям типов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual bool is_void () const = 0;                     //T является типом void
-    virtual bool is_integral () const = 0;                 //T является целочисленным типом
-    virtual bool is_floating_point () const = 0;           //T является вещественным типом
-    virtual bool is_array () const = 0;                    //T является массивом
-    virtual bool is_pointer () const = 0;                  //T является указателем
-    virtual bool is_reference () const = 0;                //T является ссылкой
-    virtual bool is_member_object_pointer () const = 0;    //T является указателем на член класса
-    virtual bool is_member_function_pointer () const = 0;  //T является указателем на функцию
-    virtual bool is_enum () const = 0;                     //T является перечислением
-    virtual bool is_union () const = 0;                    //T является объединением
-    virtual bool is_class () const = 0;                    //T является классом
-    virtual bool is_function () const = 0;                 //T является функцией
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка принадлежности типа к объединённым категориям типов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual bool is_arithmetic () const = 0;      //T является арифметическим типом 
-    virtual bool is_fundamental () const = 0;     //T является фундаментальным типом 
-    virtual bool is_object () const = 0;          //T является объектным типом (не ссылка, void или функция)
-    virtual bool is_scalar () const = 0;          //T является скалярным типом данных (is_arithmetic, enum, pointer, member_pointer)
-    virtual bool is_compound () const = 0;        //T является не фундаментальным типом
-    virtual bool is_member_pointer () const = 0;  //T является указателем на функцию или член класса
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Проверка свойств типа
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual bool is_const () const = 0;                 //T имеет квалификатор const
-    virtual bool is_volatile () const = 0;              //T имеет квалификатор volatile
-    virtual bool is_pod () const = 0;                   //T является POD-типом
-    virtual bool is_empty () const = 0;                 //T является пустым классом
-    virtual bool is_polymorphic () const = 0;           //T является полиморфным типом (содержит виртуальные функции)
-    virtual bool is_abstract () const = 0;              //T является абстрактным типом (содержит хотя бы одну чисто виртуальную функцию)
-    virtual bool has_trivial_constructor () const = 0;  //T имеет тривиальный конструктор по умолчанию
-    virtual bool has_trivial_copy () const = 0;         //T имеет тривиальный конструктор копирования
-    virtual bool has_trivial_assign () const = 0;       //T имеет тривиальный оператор присваивания
-    virtual bool has_trivial_destructor () const = 0;   //T имеет тривиальный деструктор
-    virtual bool has_nothrow_constructor () const = 0;  //T имеет бессбойный конструктор по умолчанию (не выбрасывает исключений)
-    virtual bool has_nothrow_copy () const = 0;         //T имеет бессбойный конструктор копирования (не выбрасывает исключений)
-    virtual bool has_nothrow_assign () const = 0;       //T имеет бессбойный оператор присваивания (не выбрасывает исключений)
-    virtual bool has_virtual_destructor () const = 0;   //T имеет виртуальный деструктор
-    virtual bool is_signed () const = 0;                //T является знаковым типом
-    virtual bool is_unsigned () const = 0;              //T является беззнаковым типом
-    virtual unsigned int alignment_of () const = 0;     //определение выравнивание типа данных
-    virtual unsigned int rank () const = 0;             //определение ранга массива (массив a [4][5][6] имеет ранг 3)
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования константности типов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const type_info& remove_const () const = 0;    //удаление квалификатора const
-    virtual const type_info& remove_volatile () const = 0; //удаление квалификатора volatile
-    virtual const type_info& remove_cv () const = 0;       //удаление квалификатора const volatile
-    virtual const type_info& add_const () const = 0;       //добавление квалификатора const
-    virtual const type_info& add_volatile () const = 0;    //добавление квалификатора volatile
-    virtual const type_info& add_cv () const = 0;          //добавление квалификатора const volatile
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования ссылочных типов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const type_info& remove_reference () const = 0; //удаление ссылки
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Удаление размерностей массива
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const type_info& remove_extent () const = 0;      //удаление крайней справа размерности массива
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Преобразования указателей
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const type_info& remove_pointer () const = 0;  //удаление указателя
-  
-  protected:
-    virtual ~type_info () {}
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение информации о типе
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> const type_info& get_type ();
 template <class T> const type_info& get_type (const T&);
 template <class T> const type_info& get_type (T&);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение ядра преобразований типов
-/// - для классов вызывается get_castable_kernel (T* value), где value = 0
-/// - иначе вызывается get_castable_kernel (T), где value = 0
-///Обе функции должны возвращать type_list со списком приводимых типов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 #include <xtl/detail/type_info.inl>
 

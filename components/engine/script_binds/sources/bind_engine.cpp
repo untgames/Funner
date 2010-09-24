@@ -98,7 +98,12 @@ template <class T> void bind_attachment_methods (Environment& environment, const
   lib.Register ("Unregister", make_invoker (&unregister_attachment<T>));
   lib.Register ("IsPresent",  make_invoker (&is_attachment_present<T>));
   lib.Register ("Get",        make_invoker (&get_attachment<T>));
-  lib.Register ("Find",       &find_attachment<T>);
+  
+  typedef size_t (*find_attachment_fn)(IStack&);
+  
+  find_attachment_fn fn = &find_attachment<T>;
+  
+  lib.Register ("Find", fn);
 }
 
 void bind_attachment_registry_library (Environment& environment)

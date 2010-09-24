@@ -3,9 +3,8 @@
 
 #include <xtl/any.h>
 #include <xtl/common_exceptions.h>
-#include <xtl/function.h>
-#include <xtl/type_list.h>
-#include <xtl/type_traits>
+#include <xtl/functional_traits.h>
+#include <xtl/type_info.h>
 #include <xtl/trackable_ptr.h>
 
 #include <script/invoker.h>
@@ -19,22 +18,6 @@ namespace script
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Signature, class Fn> Invoker make_invoker (Fn fn);
 template <class Fn>                  Invoker make_invoker (Fn fn);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание перегруженного шлюза
-///////////////////////////////////////////////////////////////////////////////////////////////////
-Invoker make_invoker (const Invoker& invoker1, const Invoker& invoker2);
-Invoker make_invoker (const Invoker& invoker1, const Invoker& invoker2, const Invoker& invoker3);
-Invoker make_invoker (const Invoker& invoker1, const Invoker& invoker2, const Invoker& invoker3, const Invoker& invoker4);
-Invoker make_invoker (const Invoker& invoker1, const Invoker& invoker2, const Invoker& invoker3, const Invoker& invoker4,
-                      const Invoker& invoker5);
-Invoker make_invoker (const Invoker& invoker1, const Invoker& invoker2, const Invoker& invoker3, const Invoker& invoker4,
-                      const Invoker& invoker5, const Invoker& invoker6);
-Invoker make_invoker (const Invoker& invoker1, const Invoker& invoker2, const Invoker& invoker3, const Invoker& invoker4,
-                      const Invoker& invoker5, const Invoker& invoker6, const Invoker& invoker7);
-Invoker make_invoker (const Invoker& invoker1, const Invoker& invoker2, const Invoker& invoker3, const Invoker& invoker4,
-                      const Invoker& invoker5, const Invoker& invoker6, const Invoker& invoker7, const Invoker& invoker8);
-Invoker make_invoker (size_t invokers_count, const Invoker* invokers);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание функции, возвращающей константу

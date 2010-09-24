@@ -1,0 +1,2 @@
+Results of signature_test:
+signature: const char* (float, const char*, int, uint)

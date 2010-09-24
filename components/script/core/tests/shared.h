@@ -6,6 +6,7 @@
 #include <stl/vector>
 #include <stl/memory>
 
+#include <xtl/function.h>
 #include <xtl/shared_ptr.h>
 #include <xtl/ref.h>
 #include <xtl/iterator.h>

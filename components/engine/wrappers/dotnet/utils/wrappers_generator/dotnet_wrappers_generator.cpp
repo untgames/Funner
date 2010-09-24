@@ -8,16 +8,42 @@
 
 using namespace script;
 
+// поиск имени типа
+const char* get_type_name (Environment& env, const xtl::type_info& type)
+{
+  const char* result = env.FindLibraryId (type.std_type ());
+  
+  if (result)
+    return result;
+    
+  return type.name ();
+}
+
 // обработка библиотеки
-void process_library (const char* name, InvokerRegistry& lib)
+void process_library (const char* name, InvokerRegistry& lib, Environment& env)
 {
   printf ("library '%s':\n", name);
   
   for (InvokerRegistry::Iterator iter=lib.CreateIterator (); iter; ++iter)
   {
-    stl::string signature = to_string (*iter);
+    Invoker invoker = *iter;
     
-    printf ("  %s%s\n", lib.InvokerId (iter), signature.c_str ());
+    for (size_t i=0; i<invoker.OverloadsCount (); i++)
+    {
+      InvokerSignature s = invoker.OverloadSignature (i);
+      
+      printf ("  %s %s (", get_type_name (env, s.ResultType ()), lib.InvokerId (iter));
+      
+      for (size_t j=0; j<s.ParametersCount (); j++)
+      {
+        if (j)
+          printf (", ");
+          
+        printf ("%s", get_type_name (env, s.ParameterType (j)));
+      }
+      
+      printf (")\n");
+    }
   }
 }
 
@@ -26,7 +52,7 @@ void process_libraries (Environment& env)
 {
   for (Environment::Iterator iter=env.CreateIterator (); iter; ++iter)
   {
-    process_library (env.LibraryId (iter), *iter);   
+    process_library (env.LibraryId (iter), *iter, env);   
   }
 }
 

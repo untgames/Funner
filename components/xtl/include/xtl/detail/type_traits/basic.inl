@@ -89,6 +89,12 @@ template <class T> struct is_union: public detail::type_traits_intrinsics::is_un
 namespace detail
 {
 
+#ifdef _MSC_VER
+  #pragma warning (push)
+  #pragma warning (disable : 4197) //'volatile type' : top-level volatile in cast is ignored
+  #pragma warning (disable : 4804) //unsafe use of type bool in operation
+#endif
+
 template <class T, bool is_a_integral=is_integral<T>::value || is_enum<T>::value>
 struct is_signed_helper: public bool_constant<static_cast<T> (-1) < 0> {};
 
@@ -98,6 +104,10 @@ template <class T, bool is_a_integral=is_integral<T>::value || is_enum<T>::value
 struct is_unsigned_helper: public bool_constant<(static_cast<T> (-1) > 0)> {};
 
 template <class T> struct is_unsigned_helper<T, false>: public false_type {};
+
+#ifdef _MSC_VER
+  #pragma warning (pop)
+#endif
 
 }
 

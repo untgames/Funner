@@ -38,7 +38,7 @@ class ShellCallbackHandler
 
 struct ShellCallbackInvoker
 {
-  size_t operator () (IStack& stack) const
+  size_t operator () (IStack& stack)
   { 
     xtl::function<void (const char*)> result = ShellCallbackHandler (&stack.Interpreter ());
 
@@ -59,7 +59,7 @@ namespace script
 
 Invoker make_shell_callback_invoker ()
 {
-  return Invoker (ShellCallbackInvoker ());
+  return ShellCallbackInvoker ();
 }
 
 }

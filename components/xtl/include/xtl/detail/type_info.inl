@@ -202,7 +202,7 @@ const type_converter_item* find_converter ()
     Преобразование скалярных типов
 */
 
-mpl::list<signed char, unsigned char, short, unsigned short, int, unsigned int, long, unsigned long, 
+inline mpl::list<signed char, unsigned char, short, unsigned short, int, unsigned int, long, unsigned long, 
   mpl::list<float, double, long double>::type>::type
  get_cast_types (long double)
 {
