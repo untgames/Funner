@@ -11,7 +11,7 @@ stl::string GetFolderPath (int csidl)
   
   result.fast_resize (MAX_PATH);
   
-  if (!SHGetSpecialFolderPath (0, &result [0], csidl, FALSE))
+  if (!SHGetSpecialFolderPathA (0, &result [0], csidl, FALSE))
     raise_error ("::SHGetSpecialFolderPath");
 
   return result;      

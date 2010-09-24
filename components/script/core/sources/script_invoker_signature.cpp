@@ -160,7 +160,7 @@ stl::string get_type_string (const xtl::type_info& t)
     return get_type_string (t.remove_reference ()) + stl::string ("&");
     
   if (&t == &xtl::get_type<unsigned char> ())  return "uchar";
-  if (&t == &xtl::get_type<signed char> ())    return "char";
+  if (&t == &xtl::get_type<char> ())           return "char";
   if (&t == &xtl::get_type<unsigned short> ()) return "ushort";
   if (&t == &xtl::get_type<signed short> ())   return "short";
   if (&t == &xtl::get_type<unsigned int> ())   return "uint";
@@ -170,6 +170,7 @@ stl::string get_type_string (const xtl::type_info& t)
   if (&t == &xtl::get_type<float> ())          return "float";  
   if (&t == &xtl::get_type<double> ())         return "double";
   if (&t == &xtl::get_type<long double> ())    return "long double";
+  if (&t == &xtl::get_type<wchar_t> ())        return "wchar_t";
   
   return t.std_type ().name ();
 }

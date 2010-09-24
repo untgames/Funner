@@ -195,7 +195,7 @@ size_t Invoker::operator () (IStack& stack) const
         return (*impl->overloads.front ()->invoker)(stack);
       default:
       {
-        for (OverloadArray::iterator iter=impl->overloads.begin (), end=impl->overloads.end (); iter!=end; ++iter)
+        for (volatile OverloadArray::iterator iter=impl->overloads.begin (), end=impl->overloads.end (); iter!=end; ++iter)
         {
           Overload& overload = **iter;
 

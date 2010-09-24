@@ -109,3 +109,8 @@ template <class T> struct is_abstract_helper<T, false> { enum { value = false };
 }
 
 template <class T> struct is_abstract: public bool_constant<detail::is_abstract_helper<T>::value> {};
+
+template <> struct is_abstract<void>:                public bool_constant<true> {};
+template <> struct is_abstract<const void>:          public bool_constant<true> {};
+template <> struct is_abstract<volatile void>:       public bool_constant<true> {};
+template <> struct is_abstract<const volatile void>: public bool_constant<true> {};

@@ -672,7 +672,7 @@ inline Invoker make_invoker (Fn fn)
 {
   typedef detail::invoker_impl<typename detail::signature_helper<Signature>::type, Fn> invoker_type;
   
-  invoker_type* overload = new invoker_type (fn);
+  invoker_type* volatile overload = new invoker_type (fn);
   
   try
   {
@@ -1039,7 +1039,7 @@ template <class Signature> struct callback_invoker: public SimpleInvoker
 template <class Signature>
 inline Invoker make_callback_invoker ()
 {
-  detail::callback_invoker<Signature>* overload = new detail::callback_invoker<Signature> ();
+  detail::callback_invoker<Signature>* volatile overload = new detail::callback_invoker<Signature> ();
   
   try
   {

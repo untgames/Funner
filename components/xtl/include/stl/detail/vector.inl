@@ -600,9 +600,9 @@ void vector<T,Allocator>::_insert_range (iterator position,Iter first,Iter last,
   }
   else 
   {
-    const size_type len        = next_size (count);
-    iterator        new_start  = allocator_type::allocate (len,start),
-                    new_finish = new_start;
+    const size_type   len        = next_size (count);
+    volatile iterator new_start  = allocator_type::allocate (len,start),
+                      new_finish = new_start;
                     
     try
     {

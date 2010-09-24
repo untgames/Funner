@@ -1,6 +1,8 @@
 #ifndef COMMONLIB_PLATFORM_WIN32_SHARED_HEADER
 #define COMMONLIB_PLATFORM_WIN32_SHARED_HEADER
 
+#define _WIN32_WINNT 0x0600
+#define _WIN32_IE 0x0400
 #include <windows.h>
 #include <shlobj.h>
 
