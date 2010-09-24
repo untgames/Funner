@@ -2,12 +2,18 @@
 
 using namespace script;
 
+namespace
+{
+
+/*
+    Константы
+*/
+
+const bool DEFAULT_AUTO_OVERLOADS_MODE = false; //по умолчанию автоматические перегрузки отключены
+
 /*
     Именованный шлюз
 */
-
-namespace
-{
 
 struct NamedInvoker
 {
@@ -30,9 +36,10 @@ struct InvokerRegistry::Impl: public xtl::reference_counter
 {
   InvokerMap     invokers;                            //карта шлюзов
   RegistrySignal handlers [InvokerRegistryEvent_Num]; //обработчики событий
+  bool           auto_overloads_mode;                 //режим автоматических перегрузок
   
-  Impl () {}
-  Impl (const Impl& impl) : invokers (impl.invokers) {}
+  Impl () : auto_overloads_mode (DEFAULT_AUTO_OVERLOADS_MODE) {}
+  Impl (const Impl& impl) : invokers (impl.invokers), auto_overloads_mode (impl.auto_overloads_mode) {}
   
   ~Impl ()
   {
@@ -51,7 +58,6 @@ struct InvokerRegistry::Impl: public xtl::reference_counter
     invokers.clear ();
   }
 
-  
   void Notify (InvokerRegistryEvent event_id, const char* invoker_name, Invoker& invoker)
   {
     if (!handlers [event_id])
@@ -131,6 +137,20 @@ InvokerRegistry& InvokerRegistry::operator = (const InvokerRegistry& registry)
 }
 
 /*
+    Режим автоматических перегрузок
+*/
+
+void InvokerRegistry::SetAutoOverloadsMode (bool state)
+{
+  impl->auto_overloads_mode = state;
+}
+
+bool InvokerRegistry::AutoOverloadsMode () const
+{
+  return impl->auto_overloads_mode;
+}
+
+/*
     Поиск шлюза по имени
 */
 
@@ -201,10 +221,21 @@ void InvokerRegistry::Register (const char* name, const Invoker& invoker)
   }
   else
   {
-    iter->second.invoker.AddOverloads (invoker);
+    if (impl->auto_overloads_mode)
+    {    
+      iter->second.invoker.AddOverloads (invoker);
     
-    impl->Notify (InvokerRegistryEvent_OnUnregisterInvoker, name, iter->second.invoker);
-    impl->Notify (InvokerRegistryEvent_OnRegisterInvoker, name, iter->second.invoker);
+      impl->Notify (InvokerRegistryEvent_OnUnregisterInvoker, name, iter->second.invoker);
+      impl->Notify (InvokerRegistryEvent_OnRegisterInvoker, name, iter->second.invoker);          
+    }
+    else
+    {
+      Unregister (name);
+      
+      stl::pair<InvokerMap::iterator, bool> insert_result = impl->invokers.insert_pair (name, NamedInvoker (name, invoker));
+  
+      impl->Notify (InvokerRegistryEvent_OnRegisterInvoker, name, insert_result.first->second.invoker);      
+    }
   }
 }
 

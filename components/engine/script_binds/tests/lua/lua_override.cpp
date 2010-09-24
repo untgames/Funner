@@ -2,16 +2,16 @@
 
 const char* SCRIPT_FILE_NAME = "data/lua_override.lua";
 
-void console_handler (const char* message)
+void console_handler (const char*, const char* message)
 {
   printf ("%s\n", message);
 }
 
 int main ()
 {
-  common::Console::RegisterEventHandler (common::ConsoleEvent_OnPrintLine, &console_handler);
-
   printf ("Results of lua_override_test:\n");
+  
+  common::LogFilter filter ("engine.lua", &console_handler);  
 
   try
   {

@@ -106,8 +106,23 @@ int unsafe_variant_get_field (lua_State* state)
   if (lua_isnil (state, -1)) //свойство с указанным именем не найдено  
   {
     lua_pop (state, 1); //удаление результата поиска
+    
+      //получение имени библиотеки
+      
+    stl::string library_name = "unknown";
 
-    throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found", lua_tostring (state, 2));
+    lua_getmetatable (state, 1);
+    lua_pushstring   (state, "__library_name");
+    lua_rawget       (state, -2);
+
+    if (!lua_isnil (state, -1))
+      library_name = lua_tostring (state, -1);
+      
+    lua_pop (state, 2);
+    
+      //генерация исключения
+    
+    throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found (library='%s')", lua_tostring (state, 2), library_name.c_str ());
   }
 
   bool is_static_call = lua_isuserdata (state, 1) == 0;
@@ -150,7 +165,24 @@ int unsafe_variant_set_field (lua_State* state)
     lua_pop (state, 2); //удаление результата и метатаблицы
     
     if (!lua_istable (state, 3))
-      throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found (or read-only)", lua_tostring (state, 2));
+    {
+        //получение имени библиотеки
+        
+      stl::string library_name = "unknown";
+
+      lua_getmetatable (state, 1);
+      lua_pushstring   (state, "__library_name");
+      lua_rawget       (state, -2);
+
+      if (!lua_isnil (state, -1))
+        library_name = lua_tostring (state, -1);
+        
+      lua_pop (state, 2);
+      
+        //генерация исключения      
+      
+      throw xtl::format_exception<UndefinedFunctionCallException> (METHOD_NAME, "Field '%s' not found or read-only (library='%s')", lua_tostring (state, 2), library_name.c_str ());
+    }
       
       //добавление вложенной таблицы
 

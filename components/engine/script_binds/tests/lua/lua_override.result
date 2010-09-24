@@ -4,6 +4,7 @@ in dofile.lua
 Dofile override = return from dofile.lua
 Assert override
 exception: [string "data/lua_override.lua"]:10: error: assertion failed
+    at script::Invoker::operator()(IStack&)
     at script::lua::invoke_dispatch("global.assert", false)
     at [string "data/lua_override.lua"](10): function="indent_test"
     at [string "data/lua_override.lua"](15)
