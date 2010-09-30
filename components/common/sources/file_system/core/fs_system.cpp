@@ -284,17 +284,22 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
 
   string path = FileSystem::GetNormalizedFileName (_path), mount_path;
 
-  if (path [0] != '/')
-    path = format ("%s/%s",default_path.c_str (),path.c_str ());
-
-  ICustomFileSystemPtr owner_file_system = FindMountFileSystem (path.c_str (),mount_path);
+  ICustomFileSystemPtr owner_file_system = FindFileSystem (path.c_str (),mount_path);
   FileInfo           file_info;
-
+  
   if (!owner_file_system || !owner_file_system->GetFileInfo (mount_path.c_str (),file_info))
   {
-    log_handler (format ("Search path '%s' doesn't exist",path.c_str ()).c_str ());
+    path = FileSystem::GetNormalizedFileName (_path);
+    
+    log_handler (format ("Search path '%s' doesn't exist (try to create)",path.c_str ()).c_str ());
+    
+    AddPackFile (path.c_str (),0,log_handler);
+    
     return;
   }
+  
+  if (path [0] != '/')
+    path = format ("%s/%s",default_path.c_str (),path.c_str ());
 
   size_t path_hash = strhash (path.c_str ());
 
@@ -390,7 +395,7 @@ void FileSystemImpl::Mount (const char* _path_prefix,ICustomFileSystemPtr file_s
   mounts.push_front (MountFileSystem (prefix.c_str (),hash,file_system));
 }
 
-void FileSystemImpl::Mount (const char* path_prefix,const char* _path,const char* force_extension)
+void FileSystemImpl::Mount (const char* path_prefix,const char* _path,bool link,const char* force_extension)
 {
   static const char* METHOD_NAME = "common::FileSystem::Mount";
 
@@ -406,7 +411,7 @@ void FileSystemImpl::Mount (const char* path_prefix,const char* _path,const char
 
   FileInfo info;
 
-  if (GetFileInfo (_path,info) && info.is_dir)
+  if (GetFileInfo (_path,info) && info.is_dir || link)
   {
     if (!*path_prefix)
       throw xtl::make_argument_exception (METHOD_NAME, "path_prefix", path_prefix, "Path prefix must be non empty");
@@ -415,7 +420,8 @@ void FileSystemImpl::Mount (const char* path_prefix,const char* _path,const char
 
     stl::string prefix = path_prefix;
 
-    prefix += "/";
+    if (!prefix.empty () && prefix [prefix.size ()-1] != '/')
+      prefix += "/";
 
     for (SymbolicLinkList::iterator iter=symbolic_links.begin (), end=symbolic_links.end (); iter!=end; ++iter)
       if (!xstrncmp (prefix.c_str (), iter->prefix.c_str (), iter->prefix.size ()))
@@ -642,7 +648,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
   
     //обработка символьных ссылок
 
-  size_t replacement_count = 0;
+  size_t replacement_count = 0;  
 
   for (SymbolicLinkList::iterator iter=symbolic_links.begin (), end=symbolic_links.end (); iter!=end;)
     if (!xstrncmp (file_name.c_str (), iter->prefix.c_str (), iter->prefix.size () - 1))    
@@ -655,7 +661,11 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
       {
         file_name = iter->link;
       }
-      else continue;
+      else
+      {
+        ++iter;
+        continue;
+      }
       
       file_name = FileSystem::GetNormalizedFileName (file_name.c_str ());
 
@@ -1000,7 +1010,12 @@ void FileSystem::Mount (const char* path_prefix,ICustomFileSystemPtr file_system
 
 void FileSystem::Mount (const char* path_prefix,const char* path,const char* force_extension)
 {
-  FileSystemSingleton::Instance ()->Mount (path_prefix,path,force_extension);
+  FileSystemSingleton::Instance ()->Mount (path_prefix,path,false,force_extension);
+}
+
+void FileSystem::MountLink (const char* path_prefix, const char* path)
+{
+  FileSystemSingleton::Instance ()->Mount (path_prefix,path,true,0);
 }
 
 void FileSystem::Unmount (const char* path_prefix)

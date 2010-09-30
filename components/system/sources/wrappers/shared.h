@@ -22,12 +22,14 @@
 #include <common/utf_converter.h>
 
 #include <syslib/application.h>
+#include <syslib/condition.h>
 #include <syslib/dll.h>
 #include <syslib/keydefs.h>
 #include <syslib/mutex.h>
 #include <syslib/semaphore.h>
 #include <syslib/timer.h>
 #include <syslib/thread.h>
+#include <syslib/tls.h>
 #include <syslib/window.h>
 
 #include <platform/platform.h>

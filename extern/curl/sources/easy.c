@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2009, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2010, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,6 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: easy.c,v 1.141 2009-05-18 00:25:48 yangtse Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -85,6 +84,7 @@
 #include "http_ntlm.h"
 #include "connect.h" /* for Curl_getconnectinfo */
 #include "slist.h"
+#include "curl_rand.h"
 
 #define _MPRINTF_REPLACE /* use our functions only */
 #include <curl/mprintf.h>
@@ -205,7 +205,7 @@ static long          init_flags;
 #define system_strdup strdup
 #endif
 
-#if defined(_MSC_VER) && defined(_DLL)
+#if defined(_MSC_VER) && defined(_DLL) && !defined(__POCC__)
 #  pragma warning(disable:4232) /* MSVC extension, dllimport identity */
 #endif
 
@@ -231,7 +231,7 @@ curl_strdup_callback Curl_cstrdup;
 curl_calloc_callback Curl_ccalloc;
 #endif
 
-#if defined(_MSC_VER) && defined(_DLL)
+#if defined(_MSC_VER) && defined(_DLL) && !defined(__POCC__)
 #  pragma warning(default:4232) /* MSVC extension, dllimport identity */
 #endif
 
@@ -287,7 +287,18 @@ CURLcode curl_global_init(long flags)
   }
 #endif
 
+#if defined(USE_LIBSSH2) && defined(HAVE_LIBSSH2_INIT)
+  if(libssh2_init(0)) {
+    DEBUGF(fprintf(stderr, "Error: libssh2_init failed\n"));
+    return CURLE_FAILED_INIT;
+  }
+#endif
+
   init_flags  = flags;
+
+  /* Preset pseudo-random number sequence. */
+
+  Curl_srand();
 
   return CURLE_OK;
 }
@@ -349,6 +360,10 @@ void curl_global_cleanup(void)
 
 #ifdef __AMIGA__
   amiga_cleanup();
+#endif
+
+#if defined(USE_LIBSSH2) && defined(HAVE_LIBSSH2_EXIT)
+  (void)libssh2_exit();
 #endif
 
   init_flags  = 0;
@@ -544,7 +559,7 @@ CURLcode curl_easy_perform(CURL *curl)
 
   if(!data->state.connc) {
     /* oops, no connection cache, make one up */
-    data->state.connc = Curl_mk_connc(CONNCACHE_PRIVATE, -1);
+    data->state.connc = Curl_mk_connc(CONNCACHE_PRIVATE, -1L);
     if(!data->state.connc)
       return CURLE_OUT_OF_MEMORY;
   }
@@ -614,7 +629,7 @@ CURL *curl_easy_duphandle(CURL *incurl)
   bool fail = TRUE;
   struct SessionHandle *data=(struct SessionHandle *)incurl;
 
-  struct SessionHandle *outcurl = calloc(sizeof(struct SessionHandle), 1);
+  struct SessionHandle *outcurl = calloc(1, sizeof(struct SessionHandle));
 
   if(NULL == outcurl)
     return NULL; /* failure */
@@ -877,11 +892,12 @@ CURLcode Curl_convert_to_network(struct SessionHandle *data,
     rc = data->set.convtonetwork(buffer, length);
     if(rc != CURLE_OK) {
       failf(data,
-            "CURLOPT_CONV_TO_NETWORK_FUNCTION callback returned %i: %s",
-            rc, curl_easy_strerror(rc));
+            "CURLOPT_CONV_TO_NETWORK_FUNCTION callback returned %d: %s",
+            (int)rc, curl_easy_strerror(rc));
     }
     return(rc);
-  } else {
+  }
+  else {
 #ifdef HAVE_ICONV
     /* do the translation ourselves */
     char *input_ptr, *output_ptr;
@@ -937,8 +953,8 @@ CURLcode Curl_convert_from_network(struct SessionHandle *data,
     rc = data->set.convfromnetwork(buffer, length);
     if(rc != CURLE_OK) {
       failf(data,
-            "CURLOPT_CONV_FROM_NETWORK_FUNCTION callback returned %i: %s",
-            rc, curl_easy_strerror(rc));
+            "CURLOPT_CONV_FROM_NETWORK_FUNCTION callback returned %d: %s",
+            (int)rc, curl_easy_strerror(rc));
     }
     return(rc);
   }
@@ -998,11 +1014,12 @@ CURLcode Curl_convert_from_utf8(struct SessionHandle *data,
     rc = data->set.convfromutf8(buffer, length);
     if(rc != CURLE_OK) {
       failf(data,
-            "CURLOPT_CONV_FROM_UTF8_FUNCTION callback returned %i: %s",
-            rc, curl_easy_strerror(rc));
+            "CURLOPT_CONV_FROM_UTF8_FUNCTION callback returned %d: %s",
+            (int)rc, curl_easy_strerror(rc));
     }
     return(rc);
-  } else {
+  }
+  else {
 #ifdef HAVE_ICONV
     /* do the translation ourselves */
     const char *input_ptr;
@@ -1091,7 +1108,6 @@ CURLcode curl_easy_recv(CURL *curl, void *buffer, size_t buflen, size_t *n)
 {
   curl_socket_t sfd;
   CURLcode ret;
-  int ret1;
   ssize_t n1;
   struct connectdata *c;
   struct SessionHandle *data = (struct SessionHandle *)curl;
@@ -1101,13 +1117,10 @@ CURLcode curl_easy_recv(CURL *curl, void *buffer, size_t buflen, size_t *n)
     return ret;
 
   *n = 0;
-  ret1 = Curl_read(c, sfd, buffer, buflen, &n1);
+  ret = Curl_read(c, sfd, buffer, buflen, &n1);
 
-  if(ret1 == -1)
-    return CURLE_AGAIN;
-
-  if(ret1 != CURLE_OK)
-    return (CURLcode)ret1;
+  if(ret != CURLE_OK)
+    return ret;
 
   *n = (size_t)n1;
 

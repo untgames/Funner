@@ -16,6 +16,11 @@
 namespace syslib
 {
 
+struct Platform::mutex_handle
+{
+  pthread_mutex_t mutex;
+};
+
 //генерация исключения с кодом ошибки
 void pthread_raise_error (const char* source, int status);
 

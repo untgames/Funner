@@ -13,9 +13,11 @@ namespace syslib
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum WindowFlag
 {
-  WindowFlag_Visible, //видимость окна
-  WindowFlag_Active,  //активность окна
-  WindowFlag_Focus    //фокус ввода окна
+  WindowFlag_Visible,   //видимость окна
+  WindowFlag_Active,    //активность окна
+  WindowFlag_Focus,     //фокус ввода окна
+  WindowFlag_Maximized, //максимальный размер окна
+  WindowFlag_Minimized, //минимальный размер окна
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,16 +63,20 @@ class Platform
 {
   public:
     struct window_handle;
+    struct cursor_handle;
     struct thread_handle;
     struct tls_handle;
     struct mutex_handle;
     struct semaphore_handle;
+    struct condition_handle;
 
     typedef window_handle*    window_t;
+    typedef cursor_handle*    cursor_t;
     typedef thread_handle*    thread_t;
     typedef tls_handle*       tls_t;
     typedef mutex_handle*     mutex_t;
     typedef semaphore_handle* semaphore_t;
+    typedef condition_handle* condition_t;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///—оздание/закрытие/уничтожение окна
@@ -130,6 +136,21 @@ class Platform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static void SetCursorVisible (window_t, bool state);
     static bool GetCursorVisible (window_t);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///»зображение курсора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static cursor_t CreateCursor  (const char* name, int hotspot_x, int hotspot_y); //hotspot_x/hotspot_y = -1 - default value
+    static void     DestroyCursor (cursor_t);
+    static void     SetCursor     (window_t window, cursor_t cursor);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///÷вет фона
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static void  SetBackgroundColor (window_t window, const Color& color);
+    static void  SetBackgroundState (window_t window, bool state);
+    static Color GetBackgroundColor (window_t window);
+    static bool  GetBackgroundState (window_t window);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ѕолучение имени клавиши
@@ -190,11 +211,6 @@ class Platform
     static size_t GetCurrentThreadId ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ѕолучение имени текущей нити
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//    static const char* GetCurrentThreadName () = 0;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–абота с локальными данными нити
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static tls_t CreateTls  (IThreadCleanupCallback* cleanup);
@@ -221,6 +237,15 @@ class Platform
     static void        WaitSemaphore     (semaphore_t, size_t wait_in_milliseconds);
     static bool        TryWaitSemaphore  (semaphore_t);
     static void        PostSemaphore     (semaphore_t);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///–абота с услови€ми
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static condition_t CreateCondition    ();
+    static void        DestroyCondition   (condition_t);
+    static void        WaitCondition      (condition_t, mutex_t);
+    static void        WaitCondition      (condition_t, mutex_t, size_t wait_in_milliseconds);
+    static void        NotifyCondition    (condition_t, bool broadcast);
 };
 
 }

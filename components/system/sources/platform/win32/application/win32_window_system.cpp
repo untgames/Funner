@@ -18,6 +18,52 @@ HINSTANCE GetApplicationInstance ()
 }
 
 /*
+    Копирование файла в папку temp
+*/
+
+class SysTempFile
+{
+  public:
+    SysTempFile (const char* source_file_name)
+    {
+      if (!source_file_name)
+        throw xtl::make_null_argument_exception ("syslib::TempFile::TempFile", "source_file_name");
+        
+        //генерация имени нового файла
+        
+      stl::string dir_name;
+      
+      dir_name.fast_resize (MAX_PATH);
+      
+      DWORD dir_len = GetTempPath (dir_name.size (), &dir_name [0]);
+      
+      if (!dir_len || dir_len > MAX_PATH)
+        raise_error ("::GetTempPath");
+        
+      file_name.fast_resize (MAX_PATH);
+        
+      if (!GetTempFileName (dir_name.c_str (), TEXT("TEMP"), 0, &file_name [0]))
+        raise_error ("::GetTempFileName");
+        
+        //копирование содержимого
+        
+      #undef CopyFile
+        
+      FileSystem::CopyFile (source_file_name, file_name.c_str ());
+    }
+    
+    ~SysTempFile ()
+    {
+      FileSystem::Remove (file_name.c_str ());
+    }
+    
+    const char* Path () const { return file_name.c_str (); }
+  
+  private:
+    stl::string file_name; //имя файла
+};
+
+/*
     Описание реализации окна
 */
 
@@ -27,15 +73,24 @@ struct WindowImpl
   Platform::WindowMessageHandler message_handler;     //функция обработки сообщений окна
   bool                           is_cursor_visible;   //видим ли курсор
   bool                           is_cursor_in_window; //находится ли курсор в окне
-  HCURSOR                        cursor;              //изображение курсора
+  HCURSOR                        default_cursor;      //курсор по умолчанию
+  HCURSOR                        preferred_cursor;    //предпочитаемый курсор для данного окна
+  HBRUSH                         background_brush;    //кисть для очистки заднего фона
+  Color                          background_color;    //цвет заднего фона
+  bool                           background_state;    //включен ли задний фон
 
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data)
     , message_handler (handler)
     , is_cursor_visible (true)
     , is_cursor_in_window (false)
-    , cursor (LoadCursor (GetApplicationInstance (), IDC_ARROW))    
+    , default_cursor (LoadCursor (0, IDC_ARROW))
+    , preferred_cursor (0)
+    , background_brush (CreateSolidBrush (RGB (0, 0, 0)))
+    , background_state (false)
   {
+    if (!background_brush)
+      raise_error ("::CreateSolidBrush");
   }
 
   void TrackCursor (HWND wnd)
@@ -74,10 +129,8 @@ struct WindowImpl
     Получение контекста события
 */
 
-void GetEventContext (HWND wnd, WindowEventContext& context)
+void GetEventContext (HWND wnd, WindowEventContext& context, RECT& client_rect)
 {
-  RECT client_rect;
-
   memset (&context, 0, sizeof (context));
 
   context.handle = wnd;
@@ -209,8 +262,9 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     //получение контекста события
 
   WindowEventContext context;
+  RECT               client_rect;
 
-  GetEventContext (wnd, context);
+  GetEventContext (wnd, context, client_rect);
 
     //обработка сообщений
 
@@ -252,19 +306,13 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     case WM_SETCURSOR: //изменение положения курсора
       if (LOWORD(lparam) == HTCLIENT) //наша клиентная область
       {
-        if (impl->is_cursor_visible && impl->cursor)
+        if (impl->is_cursor_visible)
         {
-          SetCursor (impl->cursor);
-
-          impl->cursor = 0;
+          SetCursor (impl->preferred_cursor ? impl->preferred_cursor : impl->default_cursor);
         }
-        else if (!impl->is_cursor_visible && !impl->cursor)
+        else if (!impl->is_cursor_visible)
         {
-            //сохранение текущего курсора
-
-          impl->cursor = (HCURSOR)GetClassLong (wnd, GCL_HCURSOR);
-
-          SetCursor (0); //отключение курсора для окна
+          SetCursor (0);
         }
 
         return 1;
@@ -277,7 +325,13 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
     {
       PAINTSTRUCT ps;
 
-      BeginPaint (wnd, &ps);
+      HDC dc = BeginPaint (wnd, &ps);
+      
+      if (impl->background_state && impl->background_brush)
+      {
+        SelectObject (dc, impl->background_brush);
+        Rectangle (dc, client_rect.left, client_rect.top, client_rect.right, client_rect.bottom);
+      }
 
       impl->Notify (window_handle, WindowEvent_OnPaint, context);
 
@@ -779,6 +833,27 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
         if (!SetFocus (state ? wnd : HWND_TOP))
           raise_error ("::SetFocus");
         break;
+      case WindowFlag_Maximized:
+        if (state)
+        {
+          ShowWindow (wnd, SW_MAXIMIZE);
+        }
+        else
+        {
+          ShowWindow (wnd, SW_SHOW);
+        }
+
+        break;
+      case WindowFlag_Minimized:
+        if (state)
+        {
+          ShowWindow (wnd, SW_MINIMIZE);
+        }
+        else
+        {
+          ShowWindow (wnd, SW_SHOW);
+        }
+        break;
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
         break;
@@ -823,9 +898,11 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
 
         return focus_wnd == wnd;
       }
+      case WindowFlag_Minimized:
+      case WindowFlag_Maximized:
+        throw xtl::format_operation_exception ("", "Can't get window flag %d value", flag);
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
-        break;
     }
   }
   catch (xtl::exception& exception)
@@ -990,7 +1067,7 @@ void Platform::SetCursorVisible (window_t handle, bool state)
 
     impl->is_cursor_visible = state;
 
-      //послыка WM_SETCURSOR
+      //посылка WM_SETCURSOR
 
     POINT position;
 
@@ -1026,3 +1103,181 @@ bool Platform::GetCursorVisible (window_t handle)
   }
 }
 
+/*
+    Изображение курсора
+*/
+
+Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x, int hotspot_y)
+{
+  try
+  {
+    if (!file_name)
+      throw xtl::make_null_argument_exception ("", "file_name");
+    
+    if (hotspot_x != -1)
+      throw xtl::format_not_supported_exception ("", "Custom hotspot_x=%d not supported", hotspot_x);
+      
+    if (hotspot_y != -1)
+      throw xtl::format_not_supported_exception ("", "Custom hotspot_y=%d not supported", hotspot_y);
+      
+    SysTempFile cursor_file (file_name);
+      
+    HANDLE cursor = LoadImageA (0, cursor_file.Path (), IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE);
+    
+    if (!cursor)
+      raise_error ("::LoadImageA");
+
+    return reinterpret_cast<Platform::cursor_t> (cursor);      
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Win32Platform::CreateCursor");
+    throw;
+  }
+}
+
+void Platform::DestroyCursor (cursor_t cursor)
+{
+  try
+  {
+    if (GetCursor () == reinterpret_cast<HCURSOR> (cursor))
+      ::SetCursor (LoadCursor (0, IDC_ARROW));
+//      throw xtl::format_operation_exception ("", "Can't destroy active cursor");
+
+    if (!::DestroyCursor (reinterpret_cast<HCURSOR> (cursor)))
+      raise_error ("::DestroyCursor");
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Win32Platform::DestroyCursor");
+    throw;
+  }
+}
+
+void Platform::SetCursor (window_t window, cursor_t cursor)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    HWND        wnd  = (HWND)window;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");    
+    
+    impl->preferred_cursor = reinterpret_cast<HCURSOR> (cursor);
+
+    if (impl->is_cursor_visible)
+      ::SetCursor (impl->preferred_cursor ? impl->preferred_cursor : impl->default_cursor);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Win32Platform::SetCursor");
+    throw;
+  }
+}
+
+/*
+    Цвет фона
+*/
+
+void Platform::SetBackgroundColor (window_t window, const Color& color)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+      
+    HWND        wnd  = (HWND)window;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
+      
+    if (impl->background_brush)
+    {
+      DeleteObject (impl->background_brush);
+      impl->background_brush = 0;
+    }
+    
+    impl->background_brush = CreateSolidBrush (RGB (color.red, color.green, color.blue));
+    
+    if (!impl->background_brush)
+      raise_error ("::CreateSolidBrush");
+      
+    impl->background_color = color; 
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Win32Platform::SetBackgroundColor");
+    throw;
+  }
+}
+
+void Platform::SetBackgroundState (window_t window, bool state)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+      
+    HWND        wnd  = (HWND)window;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
+      
+    impl->background_state = state;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Win32Platform::SetBackgroundState");
+    throw;
+  }
+}
+
+Color Platform::GetBackgroundColor (window_t window)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+      
+    HWND        wnd  = (HWND)window;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
+      
+    return impl->background_color;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Win32Platform::GetBackgroundColor");
+    throw;
+  }
+}
+
+bool Platform::GetBackgroundState (window_t window)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+      
+    HWND        wnd  = (HWND)window;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+    
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
+      
+    return impl->background_state;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Win32Platform::GetBackgroundState");
+    throw;
+  }
+}

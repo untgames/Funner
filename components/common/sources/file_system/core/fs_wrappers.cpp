@@ -25,6 +25,47 @@ OutputFile::OutputFile (const char* file_name)
 OutputFile::OutputFile (const char* file_name,size_t buffer_size)
   : StdFile (file_name,FileMode_WriteOnly,buffer_size)
   { }
+  
+namespace
+{
+
+StdFile create_temp_file (const char* file_name_pattern, size_t buffer_size)
+{
+  try
+  {
+    static size_t PROBES_COUNT = 10000;    
+    
+    if (!file_name_pattern)
+      throw xtl::make_null_argument_exception ("", "file_name_pattern");
+
+    for (size_t i=0; i<PROBES_COUNT; i++)
+    {
+      stl::string name = format (file_name_pattern, rand ());
+      
+      if (FileSystem::IsFileExist (name.c_str ()))
+        continue;
+
+      return buffer_size ? StdFile (name.c_str (), FileMode_ReadWrite) : StdFile (name.c_str (), FileMode_ReadWrite, buffer_size);
+    }
+
+    throw xtl::format_operation_exception ("", "Can't create temp file after %u probes", PROBES_COUNT);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::create_temp_file");
+    throw;
+  }
+}
+
+}
+  
+TempFile::TempFile (const char* file_name_pattern)
+  : StdFile (create_temp_file (file_name_pattern, 0))
+  { }
+
+TempFile::TempFile (const char* file_name_pattern, size_t buffer_size)
+  : StdFile (create_temp_file (file_name_pattern, buffer_size))
+  { }
 
 AppendFile::AppendFile (const char* file_name)
   : StdFile (file_name,FileMode_ReadWrite|FileMode_Create)

@@ -13,9 +13,11 @@
 #include <common/time.h>
 
 #include <syslib/application.h>
+#include <syslib/condition.h>
 #include <syslib/mutex.h>
 #include <syslib/semaphore.h>
 #include <syslib/thread.h>
+#include <syslib/tls.h>
 
 using namespace syslib;
 using namespace common;

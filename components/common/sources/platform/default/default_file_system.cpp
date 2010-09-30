@@ -141,18 +141,30 @@ filepos_t StdioFileSystem::FileTell (file_t file)
 
 filesize_t StdioFileSystem::FileSize (file_t file)
 {
-  struct stat s;
-
-  if (fstat (fileno ((FILE*)file),&s))
+  try
   {
-    switch (errno)
+    filepos_t cur_pos = StdioFileSystem::FileTell (file);
+    
+    if (fseek ((FILE*)file, 0, SEEK_END))
     {
-      case EBADF: throw xtl::make_argument_exception ("common::StdioFileSystem::FileSize","file"); break;
-      default:    throw xtl::format_operation_exception ("common::StdioFileSystem::FileSize","Unknown error"); break;
+      switch (errno)
+      {
+        case EBADF:  throw xtl::make_argument_exception ("","file");
+        default:     throw xtl::format_operation_exception ("","Unknown error");
+      }    
     }
+    
+    filepos_t size = StdioFileSystem::FileTell (file);
+    
+    StdioFileSystem::FileSeek (file, cur_pos);
+    
+    return size;
   }
-
-  return s.st_size;
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::StdioFileSystem::FileSeek");
+    throw;
+  }
 }
 
 void StdioFileSystem::FileResize (file_t file,filesize_t new_size)

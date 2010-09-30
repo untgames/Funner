@@ -1,11 +1,6 @@
-#include "../shared.h"
+#include "shared.h"
 
 using namespace syslib;
-
-struct Platform::mutex_handle
-{
-  HANDLE mutex;
-};
 
 #ifdef CreateMutex
   #undef CreateMutex

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2009, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2010, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,6 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: getinfo.c,v 1.68 2009-04-21 11:46:16 yangtse Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -67,6 +66,12 @@ CURLcode Curl_initinfo(struct SessionHandle *data)
   info->header_size = 0;
   info->request_size = 0;
   info->numconnects = 0;
+
+  info->ip[0] = 0;
+  info->port = 0;
+  info->localip[0] = 0;
+  info->localport = 0;
+
   return CURLE_OK;
 }
 
@@ -225,6 +230,19 @@ CURLcode Curl_getinfo(struct SessionHandle *data, CURLINFO info, ...)
     /* Return the ip address of the most recent (primary) connection */
     *param_charp = data->info.ip;
     break;
+  case CURLINFO_PRIMARY_PORT:
+    /* Return the (remote) port of the most recent (primary) connection */
+    *param_longp = data->info.port;
+    break;
+  case CURLINFO_LOCAL_IP:
+    /* Return the source/local ip address of the most recent (primary)
+       connection */
+    *param_charp = data->info.localip;
+    break;
+  case CURLINFO_LOCAL_PORT:
+    /* Return the local port of the most recent (primary) connection */
+    *param_longp = data->info.localport;
+    break;
   case CURLINFO_CERTINFO:
     /* Return the a pointer to the certinfo struct. Not really an slist
        pointer but we can pretend it is here */
@@ -235,6 +253,19 @@ CURLcode Curl_getinfo(struct SessionHandle *data, CURLINFO info, ...)
     /* return if the condition prevented the document to get transfered */
     *param_longp = data->info.timecond;
     break;
+  case CURLINFO_RTSP_SESSION_ID:
+    *param_charp = data->set.str[STRING_RTSP_SESSION_ID];
+    break;
+  case CURLINFO_RTSP_CLIENT_CSEQ:
+    *param_longp = data->state.rtsp_next_client_CSeq;
+    break;
+  case CURLINFO_RTSP_SERVER_CSEQ:
+    *param_longp = data->state.rtsp_next_server_CSeq;
+    break;
+  case CURLINFO_RTSP_CSEQ_RECV:
+    *param_longp = data->state.rtsp_CSeq_recv;
+    break;
+
   default:
     return CURLE_BAD_FUNCTION_ARGUMENT;
   }

@@ -11,10 +11,15 @@ int main ()
   
   try
   {
+    common::FileSystem::AddSearchPath ("data");
+    
     Window window1 (WindowStyle_Overlapped, 400, 300),
            window2 (WindowStyle_Overlapped, 400, 300);    
+           
+    window2.SetCursor ("aero_busy.ani");
 
-    window1.HideCursor ();
+//    window1.HideCursor ();
+    window1.SetCursorVisible (true);
     window1.Show ();    
     window2.Show ();
     

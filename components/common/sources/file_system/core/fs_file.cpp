@@ -208,6 +208,11 @@ void File::Flush ()
   impl->Flush ();
 }
 
+size_t File::BufferSize () const
+{
+  return impl->GetBufferSize ();
+}
+
 /*
     Закрытие файла
 */

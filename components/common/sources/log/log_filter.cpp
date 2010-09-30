@@ -13,39 +13,55 @@ using namespace common;
 */
 
 LogFilterImpl::LogFilterImpl (const char* in_mask, const LogHandler& handler)
-  : mask (in_mask ? in_mask : ""),
+  : log_system (LogSystemImpl::Instance ()),
+    mask (in_mask ? in_mask : ""),
     log_handler (handler)
 {
   if (!in_mask)
     throw xtl::make_null_argument_exception ("common::LogFilterImpl::LogFilterImpl", "mask");
 
-  LogSystemImpl& log_system = LogSystemImpl::Lock ();
+  common::Lock lock (*log_system);
 
-  try
-  {
-    log_system.Register (this);
-  }
-  catch (...)
-  {
-    throw;
-  }
+  log_system->Register (this);
 }
 
 LogFilterImpl::~LogFilterImpl ()
 {
-  for (LogList::iterator iter=sources.begin (), end=sources.end (); iter!=end;)
+  try
   {
-    LogList::iterator next = iter;
+    Lock ();
+    
+    for (LogList::iterator iter=sources.begin (), end=sources.end (); iter!=end;)
+    {
+      LogList::iterator next = iter;
 
-    ++next;
+      ++next;
 
-    (*iter)->RemoveFilter (this);
+      (*iter)->RemoveFilter (this);
 
-    iter = next;
+      iter = next;
+    }
+    
+    {
+      common::Lock lock (*log_system);
+
+      log_system->Unregister (this);
+    }
   }
+  catch (...)
+  {
+  }
+}
 
-  LogSystemImpl::Instance ().Unregister (this);
-  LogSystemImpl::Unlock ();
+/*
+    ћаска имени источников протоколировани€
+*/
+
+const char* LogFilterImpl::Mask ()
+{
+  common::Lock lock (*this);
+
+  return mask.c_str ();
 }
 
 /*
@@ -56,6 +72,8 @@ void LogFilterImpl::Print (const char* log_name, const char* log_message)
 {
   try
   {
+    common::Lock lock (*this);
+    
     log_handler (log_name, log_message);
   }
   catch (...)
@@ -70,11 +88,15 @@ void LogFilterImpl::Print (const char* log_name, const char* log_message)
 
 void LogFilterImpl::AddSource (LogImpl* source)
 {
+  common::Lock lock (*this);
+
   sources.push_back (source);
 }
 
 void LogFilterImpl::RemoveSource (LogImpl* source)
 {
+  common::Lock lock (*this);
+
   sources.remove (source);
 }
 

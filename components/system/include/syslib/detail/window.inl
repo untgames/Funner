@@ -1,4 +1,16 @@
 /*
+    Color
+*/
+
+inline Color::Color ()
+  : red (0), green (0), blue (0)
+  {}
+  
+inline Color::Color (unsigned char in_red, unsigned char in_green, unsigned char in_blue)
+  : red (in_red), green (in_green), blue (in_blue)
+  {}
+
+/*
     Point
 */
 

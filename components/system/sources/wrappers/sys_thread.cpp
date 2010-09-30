@@ -182,7 +182,7 @@ Thread::Thread (const char* name, const Function& thread_function)
 
 Thread::~Thread ()
 {
-  Lock lock (*impl);
+  common::Lock lock (*impl);
 
   ThreadManagerSingleton::Instance manager = ThreadManagerSingleton::Instance ();
 

@@ -14,7 +14,12 @@ struct Window::Impl
 {
   public:
 ///Конструктор
-    Impl (Window* in_window) : window (in_window), handle (0), parent_handle (0), style (WindowStyle_Default)
+    Impl (Window* in_window)
+      : window (in_window)
+      , handle (0)
+      , parent_handle (0)
+      , style (WindowStyle_Default)
+      , need_update_viewport (true)
     {
       memset (title, 0, sizeof title);
       memset (title_unicode, 0, sizeof title_unicode);
@@ -91,7 +96,10 @@ struct Window::Impl
         throw xtl::message_exception<ClosedWindowException> ("syslib::Window::Impl::CheckedHandle", "Closed window exception");
 
       return handle;
-    }    
+    }
+    
+///Курсор окна
+    WindowCursor& Cursor () { return cursor; }
 
 ///Установка низкоуровневого дескриптора окна
     void SetHandle (Platform::window_t new_handle)
@@ -142,6 +150,68 @@ struct Window::Impl
 
       return title_unicode;
     }
+    
+///Область вывода
+    const Rect& Viewport ()
+    {
+      if (!need_update_viewport)
+        return viewport;
+
+      try
+      {  
+          //инициализация области вывода
+
+        Rect client_rect  = window->ClientRect (),
+             new_viewport (0, 0, client_rect.right - client_rect.left, client_rect.bottom - client_rect.top);
+             
+          //запуск обработчика
+         
+        try
+        {
+          if (viewport_handler)
+            viewport_handler (*window, new_viewport);                        
+        }
+        catch (...)
+        {
+          new_viewport = Rect (0, 0, client_rect.right - client_rect.left, client_rect.bottom - client_rect.top);
+        }
+
+          //обновление кэша                  
+        
+        need_update_viewport = false;
+        viewport             = new_viewport;
+
+        return viewport;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::Window::Impl::Viewport");
+        throw;
+      }
+    }
+    
+    void InvalidateViewport (WindowEventContext* context = 0)
+    {
+      need_update_viewport = true;      
+      
+      if (context)
+      {      
+        Notify (WindowEvent_OnChangeViewport, *context);
+      }
+      else
+      {
+        Notify (WindowEvent_OnChangeViewport);
+      }      
+    }
+    
+    void SetViewportHandler (const ViewportUpdateHandler& handler)
+    {
+      viewport_handler = handler;
+      
+      InvalidateViewport ();
+    }
+    
+    const ViewportUpdateHandler& ViewportHandler () { return viewport_handler; }
     
 ///Установка пользовательской функции отладочного протоколирования
     void SetDebugLog (const LogHandler& handler)
@@ -237,7 +307,6 @@ struct Window::Impl
           case WindowEvent_OnSetFocus:                //окно получило фокус ввода
           case WindowEvent_OnLostFocus:               //окно потеряло фокус ввода
           case WindowEvent_OnPaint:                   //необходима перерисовка
-          case WindowEvent_OnSize:                    //изменились размеры окна
           case WindowEvent_OnMove:                    //изменилось положение окна
           case WindowEvent_OnMouseMove:               //курсор мыши переместился над областью окна
           case WindowEvent_OnMouseLeave:              //курсор мыши вышел за пределы области окна
@@ -263,7 +332,11 @@ struct Window::Impl
           case WindowEvent_OnChar:                    //в буфере ввода окна появился символ
             impl->Notify (event, context);
             break;
-          default:
+          case WindowEvent_OnSize:                    //изменились размеры окна          
+            impl->InvalidateViewport ();
+            impl->Notify (event, context);
+            break;          
+          default:          
             break;
         }
       }
@@ -277,15 +350,19 @@ struct Window::Impl
     typedef xtl::signal<void (Window&, WindowEvent, const WindowEventContext&)> WindowSignal;
 
   private:
-    Window*            window;                             //указатель на владельца
-    Platform::window_t handle;                             //низкоуровневый дескриптор окна
-    Platform::window_t parent_handle;                      //низкоуровневый дескриптор родительского окна
-    WindowStyle        style;                              //стиль окна
-    WindowSignal       signals [WindowEvent_Num];          //сигналы окна
-    bool               close_cancel_flag;                  //флаг отмены закрытия окна
-    char               title [MAX_TITLE_LENGTH+1];         //заголовок окна
-    wchar_t            title_unicode [MAX_TITLE_LENGTH+1]; //заголовок окна в Unicode
-    LogHandler         debug_log;                          //функция отладочного протоколирования
+    Window*               window;                             //указатель на владельца
+    Platform::window_t    handle;                             //низкоуровневый дескриптор окна
+    Platform::window_t    parent_handle;                      //низкоуровневый дескриптор родительского окна
+    WindowStyle           style;                              //стиль окна
+    WindowSignal          signals [WindowEvent_Num];          //сигналы окна
+    bool                  close_cancel_flag;                  //флаг отмены закрытия окна
+    char                  title [MAX_TITLE_LENGTH+1];         //заголовок окна
+    wchar_t               title_unicode [MAX_TITLE_LENGTH+1]; //заголовок окна в Unicode
+    WindowCursor          cursor;                             //курсор окна
+    Rect                  viewport;                           //область вывода
+    bool                  need_update_viewport;               //флаг необходимости обновления области вывода
+    ViewportUpdateHandler viewport_handler;                   //обработчик изменения области вывода
+    LogHandler            debug_log;                          //функция отладочного протоколирования
 };
 
 /*
@@ -708,6 +785,40 @@ void Window::SetClientSize (size_t width, size_t height)
 }
 
 /*
+    Область вывода
+*/
+
+//возвращение области вывода
+Rect Window::Viewport () const
+{
+  try
+  {    
+    return impl->Viewport ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Window::Viewport");
+    throw;
+  }
+}
+
+//принудительное обновление области вывода
+void Window::InvalidateViewport ()
+{
+  impl->InvalidateViewport ();
+}
+
+void Window::SetViewportHandler (const ViewportUpdateHandler& handler)
+{
+  impl->SetViewportHandler (handler);
+}
+
+const Window::ViewportUpdateHandler& Window::ViewportHandler () const
+{
+  return impl->ViewportHandler ();
+}
+
+/*
     Положение окна
 */
 
@@ -824,6 +935,30 @@ void Window::SetCursorVisible (bool state)
 }
 
 /*
+    Установка изображения курсора
+*/
+
+void Window::SetCursor (const WindowCursor& cursor)
+{
+  try
+  {
+    Platform::SetCursor (impl->CheckedHandle (), (Platform::cursor_t)cursor.Handle ());
+    
+    impl->Cursor () = cursor;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Window::SetCursor");
+    throw;
+  }
+}
+
+WindowCursor Window::Cursor () const
+{
+  return impl->Cursor ();
+}
+
+/*
     Активность окна
 */
 
@@ -884,6 +1019,36 @@ void Window::SetVisible (bool state)
 }
 
 /*
+    Максимизация и минимизация окна
+*/
+
+void Window::Maximize ()
+{
+  try
+  {
+    Platform::SetWindowFlag (impl->CheckedHandle (), WindowFlag_Maximized, true);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::Maximize");
+    throw;
+  }
+}
+
+void Window::Minimize ()
+{
+  try
+  {
+    Platform::SetWindowFlag (impl->CheckedHandle (), WindowFlag_Minimized, true);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::Minimize");
+    throw;
+  }
+}
+
+/*
     Работа с фокусом ввода
 */
 
@@ -909,6 +1074,62 @@ void Window::SetFocus (bool state)
   catch (xtl::exception& exception)
   {
     exception.touch ("syslib::Window::SetFocus");
+    throw;
+  }
+}
+
+/*
+    Цвет фона
+*/
+
+void Window::SetBackgroundColor (const Color& color)
+{
+  try
+  {
+    Platform::SetBackgroundColor (impl->CheckedHandle (), color);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::SetBackgroundColor");
+    throw;
+  }
+}
+
+void Window::SetBackgroundState (bool state)
+{
+  try
+  {
+    Platform::SetBackgroundState (impl->CheckedHandle (), state);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::SetBackgroundState");
+    throw;
+  }
+}
+
+Color Window::BackgroundColor () const
+{
+  try
+  {
+    return Platform::GetBackgroundColor (impl->CheckedHandle ());
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::GetBackgroundColor");
+    throw;
+  }
+}
+
+bool Window::IsBackgroundEnabled () const
+{
+  try
+  {
+    return Platform::GetBackgroundState (impl->CheckedHandle ());
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::IsBackgroundEnabled");
     throw;
   }
 }

@@ -20,12 +20,12 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: config-amigaos.h,v 1.18 2009-05-02 02:37:34 yangtse Exp $
  ***************************************************************************/
 
 #ifdef __AMIGA__ /* Any AmigaOS flavour */
 
 #define HAVE_ARPA_INET_H 1
+#define HAVE_CLOSESOCKET_CAMEL 1
 #define HAVE_GETHOSTBYADDR 1
 #define HAVE_INET_ADDR 1
 #define HAVE_INTTYPES_H 1
@@ -83,6 +83,9 @@
 #define HAVE_SYS_IOCTL_H 1
 
 #define NEED_MALLOC_H 1
+
+#define SIZEOF_INT 4
+#define SIZEOF_SHORT 2
 
 #define USE_OPENSSL 1
 #define USE_SSLEAY 1

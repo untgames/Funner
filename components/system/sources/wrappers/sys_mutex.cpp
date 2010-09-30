@@ -106,3 +106,8 @@ void Mutex::Unlock ()
     throw;
   }
 }
+
+void* Mutex::Handle ()
+{
+  return impl->handle;
+}

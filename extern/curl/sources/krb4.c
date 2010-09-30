@@ -37,7 +37,6 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $Id: krb4.c,v 1.52 2009-04-21 11:46:17 yangtse Exp $
  */
 
 #include "setup.h"

@@ -13,7 +13,7 @@ const size_t DEFAULT_FILTER_POOL_SIZE = 64;
    Описание реализации класса LogFile
 */
 
-struct LogFile::Impl
+struct LogFile::Impl: public Lockable
 {
   public:
     Impl ()
@@ -30,11 +30,15 @@ struct LogFile::Impl
 */
     void SetFile (const common::File& in_file)
     {
+      common::Lock lock (*this);
+      
       file = in_file;
     }
 
-    const common::File& File () const
+    common::File File ()
     {
+      common::Lock lock (*this);      
+      
       return file;
     }
 
@@ -43,6 +47,8 @@ struct LogFile::Impl
 */
     void Print (const char* log_name, const char* message)
     {
+      common::Lock lock (*this);      
+      
       if (!file.CanWrite ())
         return;
 
@@ -157,6 +163,8 @@ struct LogFile::Impl
 */
     size_t AddFilter (const char* replace_mask, const char* replacement, size_t sort_order)
     {
+      common::Lock lock (*this);      
+      
       size_t filter_index;
 
       if (filter_pool.empty ())
@@ -185,6 +193,8 @@ struct LogFile::Impl
 
     void SetFilter (size_t filter_index, const char* replace_mask, const char* replacement, size_t sort_order)
     {
+      common::Lock lock (*this);      
+      
       LogFiltersSet::iterator filter = FindFilter (filter_index);
 
       if (filter == log_filters.end ())
@@ -201,6 +211,8 @@ struct LogFile::Impl
 
     void RemoveFilter (size_t filter_index)
     {
+      common::Lock lock (*this);      
+      
       LogFiltersSet::iterator filter = FindFilter (filter_index);
 
       if (filter == log_filters.end ())
@@ -213,6 +225,8 @@ struct LogFile::Impl
 
     void RemoveAllFilters ()
     {
+      common::Lock lock (*this);      
+      
       filter_pool.clear ();
       current_filter_pool_capacity = DEFAULT_FILTER_POOL_SIZE;
 
@@ -227,6 +241,8 @@ struct LogFile::Impl
 */
     void Flush ()
     {
+      common::Lock lock (*this);      
+      
       file.Flush ();
     }
 
@@ -266,11 +282,15 @@ struct LogFile::Impl
   private:
     void ProcessReplacementTag (const char* prefix, const char* replacement_tag)
     {
+      common::Lock lock (*this);      
+      
       current_replacement_array->push_back (ReplacementComponent (prefix, replacement_tag));
     }
 
     LogFiltersSet::iterator FindFilter (size_t index)
     {
+      common::Lock lock (*this);      
+      
       find_index = index;
 
       return stl::find_if (log_filters.begin (), log_filters.end (), xtl::bind(&LogFile::Impl::FindPredicate, this, _1));
@@ -278,6 +298,8 @@ struct LogFile::Impl
 
     bool FindPredicate (const LogFilter& value)
     {
+      common::Lock lock (*this);      
+      
       return value.index == find_index;
     }
 
@@ -311,6 +333,8 @@ LogFile::LogFile (const common::File& file)
 
 LogFile::~LogFile ()
 {
+  impl->Lock ();
+
   delete impl;
 }
 
@@ -323,7 +347,7 @@ void LogFile::SetFile (const common::File& file)
   impl->SetFile (file);
 }
 
-const common::File& LogFile::File () const
+common::File LogFile::File () const
 {
   return impl->File ();
 }

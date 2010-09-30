@@ -4,16 +4,15 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 
+#include <common/file.h>
 #include <common/log.h>
 
 #include <platform/platform.h>
 
 #include <syslib/application.h>
 
-#include <CarbonEvents.h>
-#include <CarbonEventsCore.h>
-#include <MacWindows.h>
-#include <Resources.h>
+#include <Carbon/Carbon.h>
+#include <CoreServices/CoreServices.h>
 
 namespace syslib
 {
