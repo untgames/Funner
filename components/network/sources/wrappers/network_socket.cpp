@@ -37,7 +37,7 @@ Socket::Socket (SocketDomain socket_domain, SocketProtocol protocol)
 }
 
 Socket::Socket (SocketImpl* socket_impl)
-  : impl (new Impl (socket_impl))
+  : impl (new Impl (SocketImplPtr (socket_impl, false)))
   {}
 
 Socket::Socket (const Socket& socket)
@@ -146,7 +146,7 @@ bool Socket::TryAccept (Socket& target_socket)
 {
   SocketImpl* socket_impl = impl->CheckedHandle ()->TryAccept ();
 
-  if (!impl)
+  if (!socket_impl)
     return false;
 
   Socket accepted_socket (socket_impl);

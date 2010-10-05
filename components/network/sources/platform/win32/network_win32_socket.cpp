@@ -607,7 +607,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
 
           sockaddr_in* address_desc = (sockaddr_in*)&address_storage;
 
-          address_desc->sin_port = address.Port ();
+          address_desc->sin_port = htons (address.Port ());
 
           address_desc->sin_addr.s_addr = 0;
 
@@ -625,7 +625,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
 
           sockaddr_in6* address_desc = (sockaddr_in6*)&address_storage;
 
-          address_desc->sin6_port = address.Port ();
+          address_desc->sin6_port = htons (address.Port ());
 
           for (size_t i = 0; i < 16; i++)
             address_desc->sin6_addr.s6_addr [i] = address.InetAddress () [i];
