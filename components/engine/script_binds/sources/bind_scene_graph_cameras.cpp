@@ -26,7 +26,7 @@ OrthoCamera::Pointer create_ortho_camera ()
 
 void bind_perspective_camera_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_PERSPECTIVE_CAMERA_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_PERSPECTIVE_CAMERA_LIBRARY);
 
     //наследование
 
@@ -54,7 +54,7 @@ void bind_perspective_camera_library (Environment& environment)
 
 void bind_ortho_camera_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_ORTHO_CAMERA_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_ORTHO_CAMERA_LIBRARY);
 
     //наследование
 

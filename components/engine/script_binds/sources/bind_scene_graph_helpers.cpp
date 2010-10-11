@@ -26,7 +26,7 @@ void set_bound_box (helpers::Box& entity, const bound_volumes::aaboxf& box)
 
 void bind_box_helper_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_BOX_HELPER_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_BOX_HELPER_LIBRARY);
 
     //наследование
 

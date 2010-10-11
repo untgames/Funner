@@ -52,7 +52,7 @@ Rect create_rect (int left, int top, size_t width, size_t height)
 ///Регистрация библиотеки работы с прямоугольными областями
 void bind_rect_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (RENDER_RECT_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (RENDER_RECT_LIBRARY);
   
     //регистрация функции создания
     
@@ -83,7 +83,7 @@ Viewport create_viewport ()
 ///Регистрация библиотеки работы с вьюпортами
 void bind_viewport_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (RENDER_VIEWPORT_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (RENDER_VIEWPORT_LIBRARY);
 
     //регистрация функций создания
 
@@ -136,7 +136,7 @@ Screen create_screen ()
 ///Регистрация библиотеки работы с рабочими столами
 void bind_screen_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (RENDER_SCREEN_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (RENDER_SCREEN_LIBRARY);
 
     //регистрация функций создания
 

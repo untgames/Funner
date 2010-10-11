@@ -44,7 +44,7 @@ int error_handler (lua_State* state)
      онструктор / деструктор
 */
 
-Interpreter::Interpreter (const EnvironmentPointer& in_environment)
+Interpreter::Interpreter (const script::Environment& in_environment)
   : environment (in_environment),
     symbol_registry (State ()),
     stack (state, *this)
@@ -82,16 +82,16 @@ Interpreter::Interpreter (const EnvironmentPointer& in_environment)
 
     //регистраци€ обработчиков событий создани€/удалени€ библиотек
 
-  on_create_library_connection = environment->RegisterEventHandler (EnvironmentLibraryEvent_OnCreate,
+  on_create_library_connection = environment.RegisterEventHandler (EnvironmentLibraryEvent_OnCreate,
     xtl::bind (&Interpreter::RegisterLibrary, this, _2, _3));
 
-  on_remove_library_connection = environment->RegisterEventHandler (EnvironmentLibraryEvent_OnRemove,
+  on_remove_library_connection = environment.RegisterEventHandler (EnvironmentLibraryEvent_OnRemove,
     xtl::bind (&Interpreter::UnregisterLibrary, this, _2));
 
     //регистраци€ библиотек
 
-  for (Environment::Iterator i=environment->CreateIterator (); i; ++i)
-    RegisterLibrary (environment->LibraryId (i), *i);
+  for (Environment::LibraryIterator i=environment.CreateLibraryIterator (); i; ++i)
+    RegisterLibrary (environment.LibraryId (i), *i);
 
     //очистка стека
 
@@ -117,7 +117,7 @@ const char* Interpreter::Name ()
 
 Environment& Interpreter::Environment ()
 {
-  return *environment;
+  return environment;
 }
 
 lua::SymbolRegistry& Interpreter::SymbolRegistry ()
@@ -214,11 +214,8 @@ namespace
     —оздание интерпретатора lua
 */
 
-IInterpreter* create_lua_interpreter (const xtl::shared_ptr<Environment>& environment)
+IInterpreter* create_lua_interpreter (const Environment& environment)
 {
-  if (!environment)
-    throw xtl::make_null_argument_exception ("script::create_lua_interpreter", "environment");
-
   return new Interpreter (environment);
 }
 

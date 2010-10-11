@@ -213,12 +213,10 @@ class Library: public xtl::reference_counter
 class Interpreter: public IInterpreter, public StateHolder, public xtl::reference_counter, public xtl::trackable
 {
   public:
-    typedef xtl::shared_ptr<script::Environment> EnvironmentPointer;
-  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Interpreter  (const EnvironmentPointer&);
+    Interpreter  (const Environment&);
     ~Interpreter ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -271,7 +269,7 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
     typedef stl::hash_map<stl::hash_key<const char*>, LibraryPtr> LibraryMap;
 
   private:
-    EnvironmentPointer    environment;                  //скриптовое окружение
+    script::Environment   environment;                  //скриптовое окружение
     lua::SymbolRegistry   symbol_registry;              //реестр символов
     lua::Stack            stack;                        //стек аргументов
     LibraryMap            libraries;                    //карта библиотек

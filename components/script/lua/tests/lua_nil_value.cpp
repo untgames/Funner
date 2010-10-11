@@ -31,9 +31,9 @@ int main ()
   {
     printf ("Results of lua_nil_value_test:\n");
     
-    xtl::shared_ptr<Environment> env (new Environment);
+    Environment env;
 
-    InvokerRegistry& registry = env->CreateLibrary ("global");
+    InvokerRegistry& registry = env.CreateLibrary ("global");
 
     Shell shell ("lua", env);
     

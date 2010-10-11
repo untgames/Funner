@@ -26,7 +26,7 @@ SpriteList::Pointer create_sprite_list ()
 
 void bind_sprite_model_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_SPRITE_MODEL_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_SPRITE_MODEL_LIBRARY);
 
     //наследование
 
@@ -50,7 +50,7 @@ void bind_sprite_model_library (Environment& environment)
 
 void bind_sprite_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_SPRITE_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_SPRITE_LIBRARY);
 
     //наследование
 
@@ -92,7 +92,7 @@ TextLine::Pointer create_text_line ()
 
 void bind_static_text_line_library (Environment& environment)
 {
-  InvokerRegistry& text_line_alignment_lib = environment.CreateLibrary (SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY);
+  InvokerRegistry text_line_alignment_lib = environment.CreateLibrary (SCENE_STATIC_TEXT_LINE_ALIGNMENT_LIBRARY);
 
   text_line_alignment_lib.Register ("get_Center",   make_const (TextLineAlignment_Center));
   text_line_alignment_lib.Register ("get_Left",     make_const (TextLineAlignment_Left));
@@ -104,7 +104,7 @@ void bind_static_text_line_library (Environment& environment)
 
 void bind_text_line_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_TEXT_LINE_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_TEXT_LINE_LIBRARY);
 
     //наследование
 
@@ -159,7 +159,7 @@ VisualModel::Pointer create_visual_model ()
 
 void bind_visual_model_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_VISUAL_MODEL_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_VISUAL_MODEL_LIBRARY);
 
     //наследование
 
@@ -222,7 +222,7 @@ math::vec4f& get_height_map_cell_color (HeightMap& map, size_t row, size_t colum
 
 void bind_height_map_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_HEIGHT_MAP_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_HEIGHT_MAP_LIBRARY);
 
     //наследование
 

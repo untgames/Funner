@@ -29,7 +29,6 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
   public:
 /// Конструктор/деструктор
     ShellSubsystem (common::ParseNode& node, SubsystemManager& manager)
-      : environment (new Environment)
     {
         //чтение конфигурации
 
@@ -56,12 +55,12 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
         //загрузка библиотек
 
       for (size_t i=0; i<lib_list.Size (); i++)
-        environment->BindLibraries (lib_list [i]);
+        environment.BindLibraries (lib_list [i]);
 
         //регистрация менеджера подсистем
 
-      InvokerRegistry& engine_lib = environment->Library ("Engine");
-      InvokerRegistry& global_lib = environment->Library ("global");
+      InvokerRegistry engine_lib = environment.Library ("Engine");
+      InvokerRegistry global_lib = environment.Library ("global");
 
       engine_lib.Register ("get_SubsystemManager", make_const (xtl::ref (manager)));
       global_lib.Register ("searchpaths", make_const (search_paths));
@@ -115,11 +114,8 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
     void Release () { release (this); }
 
   private:
-    typedef Shell::EnvironmentPtr EnvironmentPtr;
-
-  private:
-    EnvironmentPtr environment; //скриптовое окружение
-    Shell          shell;       //скриптовый интерпретатор
+    Environment environment; //скриптовое окружение
+    Shell       shell;       //скриптовый интерпретатор
 };
 
 /*

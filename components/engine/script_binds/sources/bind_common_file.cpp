@@ -42,7 +42,7 @@ namespace engine
 
 void bind_common_file_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (COMMON_FILE_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (COMMON_FILE_LIBRARY);
 
   lib.Register ("LoadString",          make_invoker (implicit_cast<stl::string (*)(const char*)> (&FileSystem::LoadTextFile)));
   lib.Register ("LoadStringFilterOut", make_invoker (&load_string_filter_out));

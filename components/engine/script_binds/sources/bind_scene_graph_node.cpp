@@ -21,14 +21,14 @@ Node::Pointer create_node ()
 
 void bind_static_node_library (Environment& environment)
 {
-  InvokerRegistry& node_bind_mode_lib       = environment.CreateLibrary (SCENE_STATIC_NODE_BIND_MODE_LIBRARY);
-  InvokerRegistry& node_transform_space_lib = environment.CreateLibrary (SCENE_STATIC_NODE_TRANSFORM_SPACE_LIBRARY);
-  InvokerRegistry& node_traverse_mode_lib   = environment.CreateLibrary (SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY);
-  InvokerRegistry& node_search_mode_lib     = environment.CreateLibrary (SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY);
-  InvokerRegistry& node_ort_lib             = environment.CreateLibrary (SCENE_STATIC_NODE_ORT_LIBRARY);
-  InvokerRegistry& node_event_lib           = environment.CreateLibrary (SCENE_STATIC_NODE_EVENT_LIBRARY);
-  InvokerRegistry& node_subtree_event_lib   = environment.CreateLibrary (SCENE_STATIC_NODE_SUBTREE_EVENT_LIBRARY);
-  InvokerRegistry& node_property_type_lib   = environment.CreateLibrary (SCENE_STATIC_NODE_PROPERTY_TYPE_LIBRARY);
+  InvokerRegistry node_bind_mode_lib       = environment.CreateLibrary (SCENE_STATIC_NODE_BIND_MODE_LIBRARY);
+  InvokerRegistry node_transform_space_lib = environment.CreateLibrary (SCENE_STATIC_NODE_TRANSFORM_SPACE_LIBRARY);
+  InvokerRegistry node_traverse_mode_lib   = environment.CreateLibrary (SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY);
+  InvokerRegistry node_search_mode_lib     = environment.CreateLibrary (SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY);
+  InvokerRegistry node_ort_lib             = environment.CreateLibrary (SCENE_STATIC_NODE_ORT_LIBRARY);
+  InvokerRegistry node_event_lib           = environment.CreateLibrary (SCENE_STATIC_NODE_EVENT_LIBRARY);
+  InvokerRegistry node_subtree_event_lib   = environment.CreateLibrary (SCENE_STATIC_NODE_SUBTREE_EVENT_LIBRARY);
+  InvokerRegistry node_property_type_lib   = environment.CreateLibrary (SCENE_STATIC_NODE_PROPERTY_TYPE_LIBRARY);
 
   node_bind_mode_lib.Register       ("get_AddRef",            make_const (NodeBindMode_AddRef));
   node_bind_mode_lib.Register       ("get_WeakRef",           make_const (NodeBindMode_WeakRef));
@@ -60,6 +60,15 @@ void bind_static_node_library (Environment& environment)
   node_property_type_lib.Register   ("get_Float",             make_const (NodePropertyType_Float));
   node_property_type_lib.Register   ("get_Vector",            make_const (NodePropertyType_Vector));
   node_property_type_lib.Register   ("get_Matrix",            make_const (NodePropertyType_Matrix));
+  
+  environment.RegisterType<NodeBindMode> (SCENE_STATIC_NODE_BIND_MODE_LIBRARY);
+  environment.RegisterType<NodeTransformSpace> (SCENE_STATIC_NODE_TRANSFORM_SPACE_LIBRARY);
+  environment.RegisterType<NodeTraverseMode> (SCENE_STATIC_NODE_TRAVERSE_MODE_LIBRARY);
+  environment.RegisterType<NodeSearchMode> (SCENE_STATIC_NODE_SEARCH_MODE_LIBRARY);
+  environment.RegisterType<NodeOrt> (SCENE_STATIC_NODE_ORT_LIBRARY);
+  environment.RegisterType<NodeEvent> (SCENE_STATIC_NODE_EVENT_LIBRARY);
+  environment.RegisterType<NodeSubTreeEvent> (SCENE_STATIC_NODE_SUBTREE_EVENT_LIBRARY);
+  environment.RegisterType<NodePropertyType> (SCENE_STATIC_NODE_PROPERTY_TYPE_LIBRARY);
 }
 
 //получение уникального идентификатора узла
@@ -70,7 +79,7 @@ void* get_node_id (Node& node)
 
 void bind_node_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_NODE_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_NODE_LIBRARY);
 
     //регистрация функций создания
 
@@ -228,7 +237,7 @@ template <class Ret> Ret get_node_property (NodeProperties& properties, const ch
 
 void bind_node_properties_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_NODE_PROPERTIES_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_NODE_PROPERTIES_LIBRARY);
 
     //регистрация функций создания
 
@@ -270,7 +279,7 @@ void bind_node_properties_library (Environment& environment)
 
 void bind_node_array_link_mode_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_STATIC_NODE_ARRAY_LINK_MODE_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_STATIC_NODE_ARRAY_LINK_MODE_LIBRARY);
 
     //регистрация операций
 
@@ -290,7 +299,7 @@ Node::Pointer get_node_array_item (NodeArray& array, size_t index)
 
 void bind_node_array_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_NODE_ARRAY_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_NODE_ARRAY_LIBRARY);
 
     //регистрация статических библиотек
 
@@ -325,7 +334,7 @@ void bind_node_array_library (Environment& environment)
 
 void bind_controller_owner_mode_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_CONTROLLER_OWNER_MODE_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_OWNER_MODE_LIBRARY);
 
   lib.Register ("get_None",               make_const (ControllerOwnerMode_None));
   lib.Register ("get_ControllerOwnsNode", make_const (ControllerOwnerMode_ControllerOwnsNode));  
@@ -334,7 +343,7 @@ void bind_controller_owner_mode_library (Environment& environment)
 
 void bind_controller_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_CONTROLLER_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_LIBRARY);
 
     //регистрация операций
 

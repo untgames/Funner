@@ -11,7 +11,6 @@ namespace xtl
 {
 
 //forward declaration
-template <class T> class shared_ptr;
 class trackable;
 
 }
@@ -92,7 +91,7 @@ xtl::trackable& get_trackable (IInterpreter&);
 class InterpreterManager
 {
   public:
-    typedef xtl::function<IInterpreter* (const xtl::shared_ptr<Environment>& environment)> InterpreterCreater;
+    typedef xtl::function<IInterpreter* (const Environment& environment)> InterpreterCreater;
   
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация функторов создания

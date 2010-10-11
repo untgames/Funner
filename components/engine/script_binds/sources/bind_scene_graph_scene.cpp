@@ -26,7 +26,7 @@ Node::Pointer get_scene_root (Scene& scene)
 
 void bind_scene_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_SCENE_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_SCENE_LIBRARY);
 
     //регистрация функций создания
 
@@ -50,7 +50,7 @@ void bind_scene_library (Environment& environment)
 
 void bind_entity_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_ENTITY_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_ENTITY_LIBRARY);
 
     //наследование
 

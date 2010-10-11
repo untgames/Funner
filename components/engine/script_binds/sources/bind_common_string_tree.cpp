@@ -552,7 +552,7 @@ namespace engine
 
 void bind_common_string_tree (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (COMMON_STRING_TREE_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (COMMON_STRING_TREE_LIBRARY);
 
     //регистрация функций создания
 

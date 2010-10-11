@@ -8,15 +8,15 @@ int main ()
   
   try
   {
-    xtl::shared_ptr<Environment> env    (new Environment);
+    Environment env;
     
     Shell shell ("lua", env);
 
     xtl::com_ptr<IInterpreter> script (shell.Interpreter ());                
     
-    env->BindLibraries ("BoundVolumes");
-    env->BindLibraries ("Math");
-    env->BindLibraries ("SceneGraph");
+    env.BindLibraries ("BoundVolumes");
+    env.BindLibraries ("Math");
+    env.BindLibraries ("SceneGraph");
   
     load_script (*script, SCRIPT_FILE_NAME);
     

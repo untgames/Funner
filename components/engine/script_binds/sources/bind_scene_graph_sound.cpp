@@ -21,7 +21,7 @@ Listener::Pointer create_listener ()
 
 void bind_listener_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_LISTENER_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_LISTENER_LIBRARY);
 
     //наследование
 
@@ -56,7 +56,7 @@ SoundEmitter::Pointer create_sound_emitter (const char* sound_declaration_name)
 
 void bind_sound_emitter_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_SOUND_EMITTER_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_SOUND_EMITTER_LIBRARY);
 
     //наследование
 

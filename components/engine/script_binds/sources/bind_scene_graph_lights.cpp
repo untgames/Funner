@@ -31,7 +31,7 @@ PointLight::Pointer create_point_light ()
 
 void bind_direct_light_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_DIRECT_LIGHT_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_DIRECT_LIGHT_LIBRARY);
 
     //наследование
 
@@ -53,7 +53,7 @@ void bind_direct_light_library (Environment& environment)
 
 void bind_spot_light_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_SPOT_LIGHT_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_SPOT_LIGHT_LIBRARY);
 
     //наследование
 
@@ -77,7 +77,7 @@ void bind_spot_light_library (Environment& environment)
 
 void bind_point_light_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_POINT_LIGHT_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_POINT_LIGHT_LIBRARY);
 
     //наследование
 
@@ -94,7 +94,7 @@ void bind_point_light_library (Environment& environment)
 
 void bind_light_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_LIGHT_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_LIGHT_LIBRARY);
 
     //наследование
 

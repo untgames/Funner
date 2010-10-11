@@ -28,7 +28,7 @@ Cursor create_cursor ()
 
 void bind_cursor_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (CURSOR_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (CURSOR_LIBRARY);
 
   lib.Register ("Create",       make_invoker (&create_cursor));
   lib.Register ("get_Position", make_invoker (&Cursor::Position));
@@ -46,7 +46,7 @@ void bind_cursor_library (Environment& environment)
 
 void bind_input_globals (Environment& environment)
 {
-  InvokerRegistry& lib = environment.Library (INPUT_LIBRARY);
+  InvokerRegistry lib = environment.Library (INPUT_LIBRARY);
 
   lib.Register ("CreateEventHandler", make_invoker (make_callback_invoker<void (const char*)> (),
                                                     make_shell_callback_invoker ()));

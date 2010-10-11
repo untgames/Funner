@@ -12,7 +12,7 @@ namespace scene_graph_script_binds
 
 void bind_controller_water_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (SCENE_CONTROLLER_WATER_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_WATER_LIBRARY);
 
     //наследование
 

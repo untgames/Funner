@@ -48,14 +48,14 @@ int main ()
   {
     printf ("Results of lua_global_vars_test:\n");
     
-    xtl::shared_ptr<Environment> env (new Environment);
+    Environment env;
 
-    env->CreateLibrary ("A");
+    env.CreateLibrary ("A");
 
-    InvokerRegistry& enum_registry = env->CreateLibrary ("A.B.C.MyEnum");
-    InvokerRegistry& var_registry  = env->CreateLibrary ("A.B.C.MyVar");
+    InvokerRegistry& enum_registry = env.CreateLibrary ("A.B.C.MyEnum");
+    InvokerRegistry& var_registry  = env.CreateLibrary ("A.B.C.MyVar");
 
-    env->RegisterType<A> ("A");    
+    env.RegisterType<A> ("A");    
 
     Shell shell ("lua", env);
     

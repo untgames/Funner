@@ -35,11 +35,11 @@ int main ()
   {
     printf ("Results of lua_methods_test:\n");
     
-    xtl::shared_ptr<Environment> env (new Environment);
+    Environment env;
     
-    InvokerRegistry& registry = env->CreateLibrary ("A.B.my_library");
+    InvokerRegistry& registry = env.CreateLibrary ("A.B.my_library");
 
-    env->RegisterType<A> ("A.B.my_library");
+    env.RegisterType<A> ("A.B.my_library");
 
     Shell shell ("lua", env);
     

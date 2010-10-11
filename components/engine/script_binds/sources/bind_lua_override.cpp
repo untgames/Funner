@@ -157,7 +157,7 @@ class Component
   private:
     static void Bind (Environment& environment)
     {
-      InvokerRegistry& lib = environment.Library ("global");
+      InvokerRegistry lib = environment.Library ("global");
 
         //регистрация операций
 

@@ -28,7 +28,7 @@ const char* COMPONENT_NAME                    = "script.binds.ResourceManager";
 
 void bind_static_libraries (Environment& environment)
 {
-  InvokerRegistry& progress_state_lib = environment.CreateLibrary (RMS_STATIC_PROGRESS_STATE_LIBRARY);
+  InvokerRegistry progress_state_lib = environment.CreateLibrary (RMS_STATIC_PROGRESS_STATE_LIBRARY);
 
   progress_state_lib.Register ("get_Processing", make_const (ProgressState_Processing));
   progress_state_lib.Register ("get_Processed",  make_const (ProgressState_Processed));
@@ -50,7 +50,7 @@ Binding create_file_group_binding (const char* resources)
 ///Регистрация библиотеки работы с ресурсными менеджерами
 void bind_resource_manager_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (RMS_RESOURCE_MANAGER_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (RMS_RESOURCE_MANAGER_LIBRARY);
 
     //регистрация операций
 
@@ -65,7 +65,7 @@ void bind_resource_manager_library (Environment& environment)
 ///Регистрация библиотеки работы с состоянием выполнения операций
 void bind_progress_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (RMS_PROGRESS_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (RMS_PROGRESS_LIBRARY);
 
   lib.Register ("get_State",    make_invoker (&Progress::State));
   lib.Register ("set_State",    make_invoker (&Progress::SetState));
@@ -79,7 +79,7 @@ void bind_progress_library (Environment& environment)
 ///Регистрация библиотеки работы со связываниями
 void bind_binding_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (RMS_BINDING_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (RMS_BINDING_LIBRARY);
 
     //регистрация операций
 
@@ -114,7 +114,7 @@ void add_file_group_wrapper (Group& group, const char* file_group)
 ///Регистрация библиотеки работы с группами ресурсов
 void bind_group_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (RMS_GROUP_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (RMS_GROUP_LIBRARY);
 
     //регистрация функций создания
 

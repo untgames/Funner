@@ -25,7 +25,7 @@ namespace engine
 
 void bind_common_signals (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (COMMON_CONNECTION_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (COMMON_CONNECTION_LIBRARY);
 
     //регистрация операций
   

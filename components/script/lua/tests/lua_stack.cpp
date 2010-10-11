@@ -47,7 +47,7 @@ int main ()
   {
     printf ("Results of lua_stack_test:\n");
     
-    xtl::shared_ptr<Environment> env (new Environment);
+    Environment env;
     
     Shell shell ("lua", env);
     

@@ -18,20 +18,62 @@ struct LibraryImpl
   LibraryImpl (const char* in_id) : id (in_id) {}    
 };
 
+struct TypeImpl: public Environment::Type, public xtl::reference_counter
+{
+  LibraryImpl*          library;   //ссылка на библиотеку
+  const std::type_info* std_type;  //стандартный тип
+  const xtl::type_info* ext_type;  //динамический тип  
+  
+  TypeImpl (LibraryImpl* in_library, const std::type_info* in_std_type, const xtl::type_info* in_ext_type)
+    : library (in_library), std_type (in_std_type), ext_type (in_ext_type) {}
+    
+///Информация о типе
+  bool HasExtendedType ()
+  {
+    return ext_type != 0;
+  }
+  
+  const xtl::type_info& ExtendedType ()
+  {
+    if (!ext_type)
+      throw xtl::format_operation_exception ("script::Environment::Type::ExtendedType", "No extended type information for type '%s'",
+        std_type->name ());
+    
+    return *ext_type;
+  }
+  
+  const std::type_info& StdType ()
+  {
+    return *std_type;
+  }
+
+///Библиотека шлюзов
+  InvokerRegistry& Library ()
+  {
+    return library->registry;
+  }
+  
+///Имя библиотеки типа
+  const char* Name ()
+  {
+    return library->id.c_str ();
+  }
+};
+
 typedef stl::hash_map<stl::hash_key<const char*>, LibraryImpl*>                    LibraryMap;
-typedef stl::hash_map<const std::type_info*, LibraryImpl*>                         LinkMap;
+typedef xtl::intrusive_ptr<TypeImpl>                                               TypePtr;
+typedef stl::hash_map<const std::type_info*, TypePtr>                              TypeMap;
 typedef xtl::signal<void (EnvironmentLibraryEvent, const char*, InvokerRegistry&)> EnvironmentSignal;
 
 }
 
-struct Environment::Impl
+struct Environment::Impl: public xtl::reference_counter
 {
   LibraryMap        libraries;                               //библиотеки
-  LinkMap           links;                                   //ссылки
+  TypeMap           types;                                   //типы
   EnvironmentSignal handlers [EnvironmentLibraryEvent_Num];  //сигналы
 
   Impl () {}
-  Impl (const Impl& impl) : libraries (impl.libraries), links (impl.links) {}
 
   void Notify (EnvironmentLibraryEvent event_id, const char* id, InvokerRegistry& registry)
   {
@@ -50,19 +92,35 @@ struct Environment::Impl
   
   void RemoveLinks (LibraryImpl* library)
   {
-    for (LinkMap::iterator i=links.begin (), end=links.end (); i!=end;)
-      if (i->second == library)
+    for (TypeMap::iterator i=types.begin (), end=types.end (); i!=end;)
+      if (i->second->library == library)
       {
-        LinkMap::iterator tmp = i;
+        TypeMap::iterator tmp = i;
 
         ++tmp;
 
-        links.erase (i);
+        types.erase (i);
 
         i = tmp;
       }
       else ++i;
   }
+  
+  void RegisterType (const char* library_id, const std::type_info* std_type, const xtl::type_info* ext_type)
+  {
+    if (!library_id)
+      throw xtl::make_null_argument_exception ("script::Environment::RegisterType", "library_id");
+      
+    LibraryMap::iterator iter = libraries.find (library_id);
+    
+    if (iter == libraries.end ())
+      throw xtl::make_argument_exception ("script::Environment::RegisterType", "library_id", library_id, "No library with this id");
+
+    types.insert_pair (std_type, TypePtr (new TypeImpl (iter->second, std_type, ext_type), false));
+  }
+  
+  private:
+    Impl (const Impl&);
 };
 
 /*
@@ -74,12 +132,18 @@ Environment::Environment ()
   {}
 
 Environment::Environment (const Environment& environment)
-  : impl (new Impl (*environment.impl))
-  {}
+  : impl (environment.impl)
+{
+  addref (impl);
+}
 
 Environment::~Environment ()
 {
-  Clear ();
+  if (impl->decrement ())
+  {
+    Clear ();
+    delete impl;
+  }
 }
 
 /*
@@ -97,7 +161,7 @@ Environment& Environment::operator = (const Environment& environment)
     Создание / удаление / поиск библиотек
 */
 
-InvokerRegistry& Environment::CreateLibrary (const char* id)
+InvokerRegistry Environment::CreateLibrary (const char* id)
 {
   if (!id)
     throw xtl::make_null_argument_exception ("script::Environment::CreateLibrary", "id");
@@ -155,7 +219,7 @@ void Environment::RemoveAllLibraries ()
     delete iter->second;
 
   impl->libraries.clear ();
-  impl->links.clear ();
+  impl->types.clear ();
 }
 
 /*
@@ -164,25 +228,27 @@ void Environment::RemoveAllLibraries ()
 
 void Environment::RegisterType (const std::type_info& type, const char* library_id)
 {
-  if (!library_id)
-    throw xtl::make_null_argument_exception ("script::Environment::RegisterType", "library_id");
-    
-  LibraryMap::iterator iter = impl->libraries.find (library_id);
-  
-  if (iter == impl->libraries.end ())
-    throw xtl::make_argument_exception ("script::Environment::RegisterType", "library_id", library_id, "No library with this id");
+  impl->RegisterType (library_id, &type, 0);
+}
 
-  impl->links [&type] = iter->second;
+void Environment::RegisterType (const xtl::type_info& type, const char* library_id)
+{
+  impl->RegisterType (library_id, &type.std_type (), &type);
 }
 
 void Environment::UnregisterType (const std::type_info& type)
 {   
-  impl->links.erase (&type);
+  impl->types.erase (&type);
+}
+
+void Environment::UnregisterType (const xtl::type_info& type)
+{   
+  UnregisterType (type.std_type ());
 }
 
 void Environment::UnregisterAllTypes ()
 {
-  impl->links.clear ();
+  impl->types.clear ();
 }
 
 /*
@@ -202,7 +268,7 @@ InvokerRegistry* Environment::FindLibrary (const char* id) const
   return &iter->second->registry;
 }
 
-InvokerRegistry& Environment::Library (const char* id)
+InvokerRegistry Environment::Library (const char* id)
 {
   InvokerRegistry* registry = FindLibrary (id);
   
@@ -214,17 +280,31 @@ InvokerRegistry& Environment::Library (const char* id)
 
 const char* Environment::FindLibraryId (const std::type_info& type) const
 {
-  LinkMap::const_iterator iter = impl->links.find (&type);
+  TypeMap::const_iterator iter = impl->types.find (&type);
   
-  if (iter == impl->links.end ())
+  if (iter == impl->types.end ())
     return 0;
     
-  return iter->second->id.c_str ();
+  return iter->second->library->id.c_str ();
 }
 
 InvokerRegistry* Environment::FindLibrary (const std::type_info& type) const
 {
   return FindLibrary (FindLibraryId (type));
+}
+
+/*
+    Поиск типа
+*/
+
+Environment::Type* Environment::FindType (const std::type_info& type) const
+{
+  TypeMap::const_iterator iter = impl->types.find (&type);
+  
+  if (iter == impl->types.end ())
+    return 0;
+    
+  return &*iter->second;
 }
 
 /*
@@ -249,23 +329,38 @@ struct RegistrySelector
   template <class T> InvokerRegistry& operator () (T& value) const { return value.second->registry; }
 };
 
+struct TypeSelector
+{
+  template <class T> Environment::Type& operator () (T& value) const { return *value.second; }
+};
+
 }
 
-Environment::Iterator Environment::CreateIterator ()
+Environment::LibraryIterator Environment::CreateLibraryIterator ()
 {
-  return Iterator (impl->libraries.begin (), impl->libraries.begin (), impl->libraries.end (), RegistrySelector ());
+  return LibraryIterator (impl->libraries.begin (), impl->libraries.begin (), impl->libraries.end (), RegistrySelector ());
 }
 
-Environment::ConstIterator Environment::CreateIterator () const
+Environment::ConstLibraryIterator Environment::CreateLibraryIterator () const
 {
-  return ConstIterator (impl->libraries.begin (), impl->libraries.begin (), impl->libraries.end (), RegistrySelector ());
+  return ConstLibraryIterator (impl->libraries.begin (), impl->libraries.begin (), impl->libraries.end (), RegistrySelector ());
+}
+
+Environment::TypeIterator Environment::CreateTypeIterator ()
+{
+  return TypeIterator (impl->types.begin (), impl->types.begin (), impl->types.end (), TypeSelector ());
+}
+
+Environment::ConstTypeIterator Environment::CreateTypeIterator () const
+{
+  return ConstTypeIterator (impl->types.begin (), impl->types.begin (), impl->types.end (), TypeSelector ());
 }
 
 /*
     Получение имени библиотеки по итератору
 */
 
-const char* Environment::LibraryId (const ConstIterator& i) const
+const char* Environment::LibraryId (const ConstLibraryIterator& i) const
 {
   const LibraryMap::iterator* iter = i.target<LibraryMap::iterator> ();
 
@@ -310,7 +405,7 @@ xtl::connection Environment::RegisterEventHandler (EnvironmentLibraryEvent event
 
 void Environment::Swap (Environment& environment)
 {
-  impl.swap (environment.impl);
+  stl::swap (impl, environment.impl);
 }
 
 namespace script

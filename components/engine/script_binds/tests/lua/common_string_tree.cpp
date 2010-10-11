@@ -21,9 +21,9 @@ int main ()
   {
     common::LogFilter filter ("script.binds.*", &log_handler);
 
-    xtl::shared_ptr<Environment> env (new Environment);
+    Environment env;
     
-    InvokerRegistry& lib = env->CreateLibrary ("Utils");
+    InvokerRegistry& lib = env.CreateLibrary ("Utils");
 
     lib.Register ("PrintIndent", make_invoker (&print_indent));
 
@@ -31,7 +31,7 @@ int main ()
 
     xtl::com_ptr<IInterpreter> script (shell.Interpreter ());                
 
-    env->BindLibraries ("Common");
+    env.BindLibraries ("Common");
 
     load_script (*script, SCRIPT_FILE_NAME);
     

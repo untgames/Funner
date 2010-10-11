@@ -55,7 +55,7 @@ int main (int, char** argv)
     
     printf ("Traverse libraries:\n");
     
-    for (Environment::Iterator i=env.CreateIterator (); i; ++i)
+    for (Environment::LibraryIterator i=env.CreateLibraryIterator (); i; ++i)
       printf ("  library '%s'\n", env.LibraryId (i));
               
     printf ("Search 'f1', 'f2':\n");

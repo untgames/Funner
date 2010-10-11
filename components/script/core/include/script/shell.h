@@ -32,7 +32,7 @@ class Shell
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Shell  ();
-    Shell  (const char* interpreter_name, const EnvironmentPtr& environment);
+    Shell  (const char* interpreter_name, const Environment& environment);
     Shell  (const InterpeterPtr&);
     Shell  (const Shell&);
     ~Shell ();
@@ -48,7 +48,7 @@ class Shell
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Изменение интерпретатора
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetInterpreter (const char* interpreter_name, const EnvironmentPtr& environment);
+    void SetInterpreter (const char* interpreter_name, const Environment& environment);
     void SetInterpreter (const InterpeterPtr&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

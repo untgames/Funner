@@ -22,9 +22,9 @@ int main ()
     
     typedef xtl::function<const char* (int)> my_fn;
 
-    xtl::shared_ptr<Environment> env (new Environment);
+    Environment env;
 
-    InvokerRegistry& registry = env->CreateLibrary ("global");
+    InvokerRegistry& registry = env.CreateLibrary ("global");
 
     Shell shell ("lua", env);
 

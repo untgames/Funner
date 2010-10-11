@@ -33,7 +33,7 @@ namespace engine
 
 void bind_common_timer (script::Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (COMMON_TIMER_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (COMMON_TIMER_LIBRARY);
 
     //регистрация функций создания
 

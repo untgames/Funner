@@ -23,7 +23,7 @@ const char* BINDER_NAME               = "System";
 
 void bind_application_events_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.Library (APPLICATION_EVENT_LIBRARY);
+  InvokerRegistry lib = environment.Library (APPLICATION_EVENT_LIBRARY);
 
   lib.Register ("get_OnExit", make_const (ApplicationEvent_OnExit));
   lib.Register ("get_OnIdle", make_const (ApplicationEvent_OnIdle));
@@ -31,7 +31,7 @@ void bind_application_events_library (Environment& environment)
 
 void bind_application_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.Library (APPLICATION_LIBRARY);
+  InvokerRegistry lib = environment.Library (APPLICATION_LIBRARY);
 
     //регистрация операций
 

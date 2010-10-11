@@ -15,11 +15,11 @@ int main ()
   {
     printf ("Results of lua_interpreter_info_test:\n");
     
-    xtl::shared_ptr<Environment> env (new Environment);
+    Environment env;
     
     Invoker invoker = make_invoker (hello_func);
     
-    InvokerRegistry& registry = env->CreateLibrary ("global");
+    InvokerRegistry& registry = env.CreateLibrary ("global");
 
     registry.Register ("f1", invoker);
 
