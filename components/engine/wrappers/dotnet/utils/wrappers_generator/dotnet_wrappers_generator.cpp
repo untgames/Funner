@@ -63,6 +63,20 @@ stl::string get_type_name (Environment& env, const xtl::type_info& type, TypeNam
   return type.name ();
 }
 
+// Проверка сигнатуры на
+bool is_property (const char* name, const InvokerSignature& signature)
+{
+  return !strncmp (name, "get_", 4) || !strncmp (name, "set_", 4);
+}
+
+struct Property
+{
+  InvokerSignature getter, setter;
+  bool             has_setter, has_getter;
+  
+  Property () : has_setter (false), has_getter (false) {}
+};
+
 // обработка библиотеки
 void process_library (Environment::Type& type, size_t prefix_size, Environment& env, TypeNameMap& type_names)
 {
@@ -109,7 +123,57 @@ void process_library (Environment::Type& type, size_t prefix_size, Environment& 
   printf ("public ref class ");  
   
   printf ("%s\n{\n  public:\n", name);
+
+  // Генерация списка всех свойств  
+  typedef stl::map<stl::string, Property> PropertyMap;
   
+  PropertyMap properties;
+  
+  for (InvokerRegistry::Iterator iter=lib.CreateIterator (); iter; ++iter)
+  {
+    Invoker invoker = *iter;
+    
+    const char* property_name = lib.InvokerId (iter);
+    
+    for (size_t i=0; i<invoker.OverloadsCount (); i++)
+    {
+      InvokerSignature s = invoker.OverloadSignature (i);
+      
+      if (!is_property (property_name, s))
+        continue;
+        
+      if (!strncmp (property_name, "set_", 4))
+      {
+        properties [property_name+4].setter     = s;
+        properties [property_name+4].has_setter = true; 
+      }
+      else
+      {
+        properties [property_name+4].getter     = s;
+        properties [property_name+4].has_getter = true;         
+      }
+    }
+  }
+  
+  for (PropertyMap::iterator iter=properties.begin (); iter !=properties.end (); ++iter)
+  {
+    const char* property_name = iter->first.c_str ();
+    const Property& p = iter->second;
+
+    const xtl::type_info* result_type = p.has_setter ? &p.setter.ResultType () : &p.getter.ResultType ();
+   
+    stl::string result_type_name = get_type_name (env, *result_type, type_names);
+    
+    if (result_type->is_class ())
+      result_type_name += "^";
+
+    printf ("    property %s %s\n    {\n", result_type_name.c_str (), property_name);
+    printf ("      %s get ()\n      {\n      }\n\n", result_type_name.c_str ());
+    printf ("      void set (%s value)\n      {\n      }\n", result_type_name.c_str ());
+    printf ("    }\n\n");
+  }
+  
+  // Генерация всех методов
   for (InvokerRegistry::Iterator iter=lib.CreateIterator (); iter; ++iter)
   {
     Invoker invoker = *iter;
@@ -117,6 +181,9 @@ void process_library (Environment::Type& type, size_t prefix_size, Environment& 
     for (size_t i=0; i<invoker.OverloadsCount (); i++)
     {
       InvokerSignature s = invoker.OverloadSignature (i);
+      
+      if (is_property (lib.InvokerId (iter), s))
+        continue;
       
       bool ignore_first_parameter = false;
       
