@@ -24,7 +24,7 @@ int main ()
 
     Environment env;
 
-    InvokerRegistry& registry = env.CreateLibrary ("global");
+    InvokerRegistry registry = env.CreateLibrary ("global");
 
     Shell shell ("lua", env);
 

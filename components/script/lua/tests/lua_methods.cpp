@@ -37,7 +37,7 @@ int main ()
     
     Environment env;
     
-    InvokerRegistry& registry = env.CreateLibrary ("A.B.my_library");
+    InvokerRegistry registry = env.CreateLibrary ("A.B.my_library");
 
     env.RegisterType<A> ("A.B.my_library");
 

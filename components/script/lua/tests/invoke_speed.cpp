@@ -31,7 +31,7 @@ int main ()
 
     Environment env;
 
-    InvokerRegistry& registry = env.CreateLibrary ("my_library");
+    InvokerRegistry registry = env.CreateLibrary ("my_library");
 
     Shell shell ("lua", env);
 

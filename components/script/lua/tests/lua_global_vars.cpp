@@ -52,8 +52,8 @@ int main ()
 
     env.CreateLibrary ("A");
 
-    InvokerRegistry& enum_registry = env.CreateLibrary ("A.B.C.MyEnum");
-    InvokerRegistry& var_registry  = env.CreateLibrary ("A.B.C.MyVar");
+    InvokerRegistry enum_registry = env.CreateLibrary ("A.B.C.MyEnum");
+    InvokerRegistry var_registry  = env.CreateLibrary ("A.B.C.MyVar");
 
     env.RegisterType<A> ("A");    
 
