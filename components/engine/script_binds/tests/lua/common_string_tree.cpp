@@ -23,7 +23,7 @@ int main ()
 
     Environment env;
     
-    InvokerRegistry& lib = env.CreateLibrary ("Utils");
+    InvokerRegistry lib = env.CreateLibrary ("Utils");
 
     lib.Register ("PrintIndent", make_invoker (&print_indent));
 
