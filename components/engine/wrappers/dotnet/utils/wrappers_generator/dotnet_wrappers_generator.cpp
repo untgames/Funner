@@ -161,6 +161,8 @@ void process_library (Environment::Type& type, size_t prefix_size, Environment& 
     const Property& p = iter->second;
 
     const xtl::type_info* result_type = p.has_setter ? &p.setter.ResultType () : &p.getter.ResultType ();
+    
+    result_type = &result_type->remove_reference ().remove_pointer ();
    
     stl::string result_type_name = get_type_name (env, *result_type, type_names);
     
@@ -187,7 +189,9 @@ void process_library (Environment::Type& type, size_t prefix_size, Environment& 
       
       bool ignore_first_parameter = false;
       
-      if (&s.ResultType () == &ext_type && stl::string (lib.InvokerId (iter)) == "Create") //конструктор
+      const xtl::type_info& result_type = s.ResultType ().remove_reference ().remove_pointer ();
+      
+      if (&result_type == &ext_type && stl::string (lib.InvokerId (iter)) == "Create") //конструктор
       {
         printf ("    %s (", name);
       }
@@ -195,18 +199,21 @@ void process_library (Environment::Type& type, size_t prefix_size, Environment& 
       {
         const char* direction = "";
         
-        if (s.ResultType ().is_class ())
+        if (result_type.is_class ())
           direction = "^";
           
         printf ("    ");
           
         if (s.ParametersCount ())
         {
-          if (&s.ParameterType (0).std_type () != &ext_type.std_type ()) printf ("static ");
-          else                                                           ignore_first_parameter = true;
+          if (&s.ParameterType (0).remove_reference ().remove_pointer ().std_type () != &ext_type.std_type ())
+          {
+            printf ("static ");
+          }
+          else ignore_first_parameter = true;
         }
         
-        printf ("%s%s %s (", get_type_name (env, s.ResultType (), type_names).c_str (), direction, lib.InvokerId (iter));
+        printf ("%s%s %s (", get_type_name (env, result_type, type_names).c_str (), direction, lib.InvokerId (iter));
       }
       
       bool is_first = true;
@@ -215,10 +222,12 @@ void process_library (Environment::Type& type, size_t prefix_size, Environment& 
       {
         if (is_first) is_first = false;
         else          printf (", ");
-          
-        printf ("%s", get_type_name (env, s.ParameterType (j), type_names).c_str ());
         
-        if (s.ParameterType (j).remove_reference ().remove_pointer ().is_class ())
+        const xtl::type_info& parameter_type = s.ParameterType (j).remove_reference ().remove_pointer ();
+          
+        printf ("%s", get_type_name (env, parameter_type, type_names).c_str ());
+        
+        if (parameter_type.is_class ())
           printf ("^");
       }
       
