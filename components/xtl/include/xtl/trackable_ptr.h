@@ -104,6 +104,20 @@ trackable& get_trackable (trackable&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> T* get_pointer (trackable_ptr<T>&);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕереопределение таблиц типов дл€ указател€
+///////////////////////////////////////////////////////////////////////////////////////////////////
+namespace type_traits
+{
+
+template <class T> struct is_pointer;
+template <class T> struct remove_pointer;
+
+template <class T> struct is_pointer<trackable_ptr<T> >     { enum { value = true }; };
+template <class T> struct remove_pointer<trackable_ptr<T> > { typedef T type; };
+
+}
+
 #include <xtl/detail/trackable_ptr.inl>
 
 }

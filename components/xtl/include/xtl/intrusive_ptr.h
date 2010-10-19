@@ -161,6 +161,22 @@ com_ptr<T1> const_pointer_cast (const com_ptr<T2>&);
 template <class T1, class T2>
 com_ptr<T1> dynamic_pointer_cast (const com_ptr<T2>&);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕереопределение таблиц типов дл€ указател€
+///////////////////////////////////////////////////////////////////////////////////////////////////
+namespace type_traits
+{
+
+template <class T> struct is_pointer;
+template <class T> struct remove_pointer;
+
+template <class T> struct is_pointer<intrusive_ptr<T> >     { enum { value = true }; };
+template <class T> struct is_pointer<com_ptr<T> >           { enum { value = true }; };
+template <class T> struct remove_pointer<intrusive_ptr<T> > { typedef T type; };
+template <class T> struct remove_pointer<com_ptr<T> >       { typedef T type; };
+
+}
+
 #include <xtl/detail/intrusive_ptr.inl>
 
 }

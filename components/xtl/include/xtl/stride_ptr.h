@@ -100,6 +100,20 @@ template <class T1, class T2> bool operator >= (const T1*, const stride_ptr<T2>&
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> T* get_pointer (const stride_ptr<T>&);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕереопределение таблиц типов дл€ указател€
+///////////////////////////////////////////////////////////////////////////////////////////////////
+namespace type_traits
+{
+
+template <class T> struct is_pointer;
+template <class T> struct remove_pointer;
+
+template <class T> struct is_pointer<stride_ptr<T> >     { enum { value = true }; };
+template <class T> struct remove_pointer<stride_ptr<T> > { typedef T type; };
+
+}
+
 #include <xtl/detail/stride_ptr.inl>
 
 }
