@@ -162,7 +162,7 @@ bool Socket::TryAccept (Socket& target_socket)
 
 bool Socket::IsClosed () const
 {
-  return !impl->socket;
+  return !impl->socket || (IsSendClosed () && IsReceiveClosed ());
 }
 
 bool Socket::IsConnected () const
