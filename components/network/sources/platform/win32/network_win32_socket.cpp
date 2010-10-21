@@ -492,10 +492,22 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
 
         if (received_bytes < 0)
         {
-          if (WSAGetLastError () == WSAEWOULDBLOCK)
-            return 0;
-          else
-            raise_error ("::recv");
+          switch (WSAGetLastError ())
+          {
+            case WSAEWOULDBLOCK:
+              return 0;
+            case WSAECONNABORTED:
+            case WSAECONNRESET:
+              receive_closed = true;
+              send_closed = true;
+            default:
+              raise_error ("::recv");
+          }
+        }
+        else if (!received_bytes)
+        {
+          receive_closed = true;
+          send_closed = true;
         }
 
         return received_bytes;
@@ -522,10 +534,16 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
 
         if (sent_bytes < 0)
         {
-          if (WSAGetLastError () == WSAEWOULDBLOCK)
-            return 0;
-          else
-            raise_error ("::send");
+          switch (WSAGetLastError ())
+          {
+            case WSAEWOULDBLOCK:
+              return 0;
+            case WSAECONNRESET:
+              receive_closed = true;
+              send_closed = true;
+            default:
+              raise_error ("::send");
+          }
         }
 
         return sent_bytes;
