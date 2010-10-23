@@ -10,6 +10,7 @@
 #include <xtl/type_info_decl.h>
 #include <xtl/type_traits>
 #include <xtl/type_list.h>
+#include <xtl/type_info_decl.h>
 
 namespace xtl
 {
