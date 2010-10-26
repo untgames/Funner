@@ -24,14 +24,14 @@ PROFILES          += unistd beagle-board
 REMOTE_DEBUG_DIR  ?= //work/funner
 EXE_SUFFIX        :=
 DLL_SUFFIX        := .so
-DLL_PREFIX        :=
+DLL_PREFIX        := lib
 BEAGLEBOARD_SDK   := $(subst \,/,$(BEAGLEBOARD_SDK))
 COMPILER_GCC      := $(BEAGLEBOARD_SDK)/bin/arm-none-linux-gnueabi-gcc
 LINKER_GCC        := $(BEAGLEBOARD_SDK)/bin/arm-none-linux-gnueabi-g++
 LIB_GCC           := $(BEAGLEBOARD_SDK)/bin/arm-none-linux-gnueabi-ar
 COMMON_CPPFLAGS   += -fexceptions -frtti
 COMMON_CFLAGS     += -DBEAGLEBOARD -DARM -DARM7 -Wno-uninitialized -Wno-psabi
-COMMON_LINK_FLAGS += -lm -pthread
+COMMON_LINK_FLAGS += -lm -pthread -Wl,-L,$(DIST_BIN_DIR)
 
 include $(TOOLSETS_DIR)/g++.mak
 
@@ -43,7 +43,7 @@ export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.c++compile,$1,$2,$3,$4,$5,
 endef
 
 define tools.link
-export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,,$4,$5 $(foreach dir,$3,-Wl,-L,$(dir)),$6,$7,$8,$9)
+export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,$3,,$5 $(foreach link,$4,-Wl,-u,$(link)),$6,$7,$8,$9)
 endef
 
 define tools.lib
@@ -62,12 +62,16 @@ endef
 define tools.install
 export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
 plink $(BEAGLE_BOARD_USER)@$(BEAGLE_BOARD_HOST) -pw $(BEAGLE_BOARD_PASSWORD) "mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)" && \
-pscp -scp -r -batch -pw $(BEAGLE_BOARD_PASSWORD) $1 $(BEAGLE_BOARD_USER)@$(BEAGLE_BOARD_HOST):$(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)
+pscp -scp -r -batch -pw $(BEAGLE_BOARD_PASSWORD) $1 $(BEAGLE_BOARD_USER)@$(BEAGLE_BOARD_HOST):$(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT) && \
+plink $(BEAGLE_BOARD_USER)@$(BEAGLE_BOARD_HOST) -pw $(BEAGLE_BOARD_PASSWORD) "chmod -R +x $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)"
 endef
 
-#Выполнение команды (команда, каталог запуска, базовый каталог, дополнительные пути поиска библиотек и приложений)
+#Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
 define tools.run
-export SUBST_DIR_STRING=$$(cd $2 && pwd) SUBST_DIR_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$SUBST_DIR_SUBSTRING/} && \
-export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) SUBST_CMD_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$SUBST_CMD_SUBSTRING/} && \
-plink $(BEAGLE_BOARD_USER)@$(BEAGLE_BOARD_HOST) -pw $(BEAGLE_BOARD_PASSWORD) "chmod 755 $$(echo $$SUBST_COMMAND) && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo	$$SUBST_COMMAND) $(subst $(firstword $1),,$1)"
+export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
+export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \
+export PATH_SEARCH="$(foreach path,$3,$$(export SUBST_PATH_STRING=$$(cd $(path) && pwd) && echo $(REMOTE_DEBUG_DIR)/$${SUBST_PATH_STRING/#$$ROOT_SUBSTRING/}))" && \
+export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
+export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
+plink $(BEAGLE_BOARD_USER)@$(BEAGLE_BOARD_HOST) -pw $(BEAGLE_BOARD_PASSWORD) "export PATH=\$\$$PATH:\.:$$PATH_SEARCH LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo $$SUBST_COMMAND) $(subst $(firstword $1),,$1)"
 endef

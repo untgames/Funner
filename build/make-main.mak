@@ -460,7 +460,6 @@ define process_target_with_sources
 
   $1.TMP_DIR             := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
   $1.TMP_DIRS            := $$($1.TMP_DIR)
-  $1.BASE_DIR            := $1
   $1.INCLUDE_DIRS        := $$(call specialize_paths,$$($1.INCLUDE_DIRS))
   $1.SOURCE_DIRS         := $$(call specialize_paths,$$($1.SOURCE_DIRS))
   $1.OBJECT_FILES        := $$(call specialize_paths,$$($1.OBJECT_FILES))
@@ -473,6 +472,7 @@ define process_target_with_sources
   $1.LIB_DEPS            := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(wildcard $$($1.LIB_DIRS:%=%/*)))  
   $1.LINK_INCLUDES_COMMA := $$(subst $$(SPACE),$$(COMMA),$$(strip $$($1.LINK_INCLUDES)))  
   $1.INSTALLATION_FLAG   := $$($1.TMP_DIR)/installation-flag
+  $1.INSTALLATION_FILES  := $$(DIST_BIN_DIR)
 
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
 
@@ -484,8 +484,8 @@ define process_target_with_sources
   $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))  
   
 #Инсталляция 
-  $1.INSTALLATION_FILES := $$($1.INSTALLATION_FILES) $$(foreach file,$(DEFAULT_INSTALLATION_FILES),$$(wildcard $$(COMPONENT_DIR)$$(file))) $$($1.TARGET_DLLS)
-  
+  $1.INSTALLATION_FILES := $$($1.INSTALLATION_FILES) $$(foreach file,$(DEFAULT_INSTALLATION_FILES),$$(wildcard $$(COMPONENT_DIR)$$(file))) $$($1.TARGET_DLLS)  
+ 
 ifneq (,$$($$(INSTALL_TOOL)))
   .PHONY: INSTALL.$1 UNINSTALL.$1
 
@@ -495,7 +495,7 @@ ifneq (,$$($$(INSTALL_TOOL)))
   INSTALL.$1: $$($1.INSTALLATION_FLAG)  
 
   UNINSTALL.$1:
-		@$(RM) -f $$($1.INSTALLATION_FLAG)
+		@$(RM) -f $$($1.INSTALLATION_FLAG)		
     
   $$($1.INSTALLATION_FLAG): $$($1.INSTALLATION_FILES)
 		@echo Install $$(if $$($1.NAME),$$($1.NAME),$1)...
@@ -588,7 +588,7 @@ define process_target.application
 
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
-		@$$(call prepare_to_execute,$$($1.EXECUTION_DIR),$$(dir $$($1.EXE_FILE)) $$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args)
+		@$$(call $(RUN_TOOL),$$(patsubst %,"$(CURDIR)/%",$$<) $(args),$$($1.EXECUTION_DIR),$$(dir $$($1.EXE_FILE)) $$($1.DLL_DIRS)) > $$@		
 
   ifneq (,$$(filter $$(files:%=$$($1.OUT_DIR)/%$(EXE_SUFFIX)),$$($1.EXE_FILE)))
     ifeq (,$$($1.DISABLE_RUN))
@@ -600,7 +600,7 @@ endef
 #Вызов теста (имя цели, имя модуля, имя теста)
 define process_tests_source_dir_run_test
   TEST_MODULE.$2::
-		@$$(call $(RUN_TOOL),$3 $(args),$$($2.EXECUTION_DIR),$$($1.BASE_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS))
+		@$$(call $(RUN_TOOL),$3 $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS))
 
 endef
 
@@ -635,14 +635,14 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TARGET_DIR)/%$(EXE_SUFFIX)
 		@echo Running $$(notdir $$<)...
-		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($1.BASE_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $$@
+		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $$@
 		
 #Правило получения файла-результата тестирования по shell-файлу
   $$($2.SOURCE_DIR)/%.sh: $$($2.TEST_EXE_FILES)
 
   $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh $$($1.USED_APPLICATIONS)
 		@echo Running $$(notdir $$<)...
-		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($1.BASE_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $$@
+		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $$@
 
 #Правило запуска тестов
   $$(foreach file,$$($2.RUN_FILES),$$(eval $$(call process_tests_source_dir_run_test,$1,$2,$$(file))))
