@@ -299,7 +299,7 @@ void FileSystemImpl::AddSearchPath (const char* _path,const LogHandler& log_hand
   }
   
   if (path [0] != '/')
-    path = format ("%s/%s",default_path.c_str (),path.c_str ());
+    path = format ("%s/%s",default_path.c_str (),path.c_str ());    
 
   size_t path_hash = strhash (path.c_str ());
 
@@ -411,7 +411,7 @@ void FileSystemImpl::Mount (const char* path_prefix,const char* _path,bool link,
 
   FileInfo info;
 
-  if (GetFileInfo (_path,info) && info.is_dir || link)
+  if ((GetFileInfo (_path,info) && info.is_dir) || link)
   {
     if (!*path_prefix)
       throw xtl::make_argument_exception (METHOD_NAME, "path_prefix", path_prefix, "Path prefix must be non empty");
@@ -648,9 +648,10 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
   
     //обработка символьных ссылок
 
-  size_t replacement_count = 0;  
+  size_t replacement_count = 0;      
 
   for (SymbolicLinkList::iterator iter=symbolic_links.begin (), end=symbolic_links.end (); iter!=end;)
+  {
     if (!xstrncmp (file_name.c_str (), iter->prefix.c_str (), iter->prefix.size () - 1))    
     {
       if (file_name.size () > iter->prefix.size () && file_name [iter->prefix.size () - 1] == '/')
@@ -675,6 +676,7 @@ ICustomFileSystemPtr FileSystemImpl::FindFileSystem (const char* src_file_name,s
         iter = symbolic_links.begin ();
     }    
     else ++iter;
+  }
   
     //пытаемс€ найти файл не использу€ путей поиска
 

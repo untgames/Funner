@@ -1,6 +1,6 @@
 #include "test.h"
 
-const char* EXIST_FILE_NAME     = "makefile";
+const char* EXIST_FILE_NAME     = "data/test.txt";
 const char* NON_EXIST_FILE_NAME = "no-file";
 
 void check_file (const char* file_name)

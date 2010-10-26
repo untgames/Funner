@@ -113,9 +113,11 @@ class StdioIOSystem: public StdioFileSystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с файлом
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    file_t FileOpen       (const char* name,filemode_t mode_flags,size_t buffer_size);
-    void   FileClose      (file_t);
-    size_t FileBufferSize (file_t) { return (size_t)-1; } //кэширование не нужно
+    file_t     FileOpen       (const char* name,filemode_t mode_flags,size_t buffer_size);
+    void       FileClose      (file_t);
+    size_t     FileBufferSize (file_t) { return (size_t)-1; } //кэширование не нужно
+    filepos_t  FileTell       (file_t);    
+    filesize_t FileSize       (file_t);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление расположением файлов

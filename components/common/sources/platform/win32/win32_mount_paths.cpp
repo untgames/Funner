@@ -30,7 +30,7 @@ stl::string GetTempDirPath ()
 
 }
 
-void Win32Platform::MountSystemPaths ()
+void Win32Platform::MountSystemSpecificPaths ()
 {
   FileSystem::Mount ("/system/appdata",   GetFolderPath (CSIDL_APPDATA).c_str ());
   FileSystem::Mount ("/system/personal",  GetFolderPath (CSIDL_PERSONAL).c_str ());  

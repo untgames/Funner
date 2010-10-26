@@ -2,7 +2,7 @@
 
 using namespace common;
 
-void DefaultPlatform::MountSystemPaths ()
+void DefaultPlatform::MountSystemSpecificPaths ()
 {
 }
 
@@ -18,7 +18,7 @@ class Component
   public:
     Component ()
     {            
-      Platform::MountSystemPaths ();
+      Platform::MountSystemSpecificPaths ();
     }
 };
 

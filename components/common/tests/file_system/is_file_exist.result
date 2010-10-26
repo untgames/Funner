@@ -1,3 +1,3 @@
 Results of is_file_exist:
-File 'makefile' found
+File 'data/test.txt' found
 File 'no-file' not found

@@ -144,7 +144,7 @@ filesize_t StdioFileSystem::FileSize (file_t file)
   try
   {
     filepos_t cur_pos = StdioFileSystem::FileTell (file);
-    
+
     if (fseek ((FILE*)file, 0, SEEK_END))
     {
       switch (errno)
@@ -153,16 +153,16 @@ filesize_t StdioFileSystem::FileSize (file_t file)
         default:     throw xtl::format_operation_exception ("","Unknown error");
       }    
     }
-    
+
     filepos_t size = StdioFileSystem::FileTell (file);
-    
+
     StdioFileSystem::FileSeek (file, cur_pos);
-    
+
     return size;
   }
   catch (xtl::exception& e)
   {
-    e.touch ("common::StdioFileSystem::FileSeek");
+    e.touch ("common::StdioFileSystem::FileSize");
     throw;
   }
 }

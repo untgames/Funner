@@ -8,7 +8,7 @@
 
 using namespace common;
 
-void CocoaDesktopPlatform::MountSystemPaths ()
+void CocoaDesktopPlatform::MountSystemSpecificPaths ()
 {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 

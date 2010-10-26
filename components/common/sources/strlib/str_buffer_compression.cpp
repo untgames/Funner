@@ -25,7 +25,7 @@ void decompress_buffer (size_t buffer_size, const void* src_buffer, char* dst_bu
 
   for (size_t i=0; i<buffer_size; i++, src++, dst += 2)
   {    
-    xtl::xsnprintf (dst, 3, "%02x", *src);
+    xtl::xsnprintf (dst, 3, "%02x", (unsigned char)*src);
   }
 }
 

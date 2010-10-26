@@ -30,7 +30,7 @@ int main ()
     printf ("dst_encrypt_buffer:  ");
     
     for (size_t i=0; i<BUFFER_SIZE; i++)
-      printf ("%02x", dst_encrypt_buffer [i]);
+      printf ("%02x", (unsigned char)dst_encrypt_buffer [i]);
       
     printf ("\n");
 

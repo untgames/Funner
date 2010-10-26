@@ -80,6 +80,16 @@ bool StdioIOSystem::IsFileExist (const char* file_name)
   return false;
 }
 
+filepos_t StdioIOSystem::FileTell (file_t file)
+{
+  return 0;
+}
+
+filesize_t StdioIOSystem::FileSize (file_t file)
+{
+  return 0;
+}
+
 void StdioIOSystem::Search (const char* wc_mask,const FileSearchHandler& handler)
 {
   FileInfo info;
