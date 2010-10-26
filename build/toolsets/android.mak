@@ -80,7 +80,7 @@ define tools.install
  echo -n "Install $(notdir $1): " &&  $(ADB) push $1 $(REMOTE_DEBUG_DIR)/$2
 endef
 
-#Выполнение команды (команда, каталог запуска, базовый каталог, дополнительные пути поиска библиотек и приложений, файл результатов)
-define tools.run
-$(ADB) shell "chmod 775 $(REMOTE_DEBUG_DIR)/$3/$(notdir $(firstword $1)) && cd $(REMOTE_DEBUG_DIR)/$3/ && $(REMOTE_DEBUG_DIR)/$3/$(notdir $(firstword $1)) $(subst $(firstword $1),,$1) $(if $5, > $(REMOTE_DEBUG_DIR)/$3/$(notdir $5))" $(if $5, && $(ADB) pull $(REMOTE_DEBUG_DIR)/$3/$(notdir $5) "$(CURDIR)/$5")
-endef
+#Выполнение команды (команда, каталог запуска, базовый каталог, дополнительные пути поиска библиотек и приложений)
+#define tools.run
+#$(ADB) shell "chmod 775 $(REMOTE_DEBUG_DIR)/$3/$(notdir $(firstword $1)) && cd $(REMOTE_DEBUG_DIR)/$3/ && $(REMOTE_DEBUG_DIR)/$3/$(notdir $(firstword $1)) $(subst $(firstword $1),,$1)"
+#endef
