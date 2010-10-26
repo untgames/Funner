@@ -1,0 +1,5 @@
+Results of interlocked_test:
+Results of 'xtl::atomic_conditional_increment (value)'=1, value=2
+Results of 'xtl::atomic_conditional_decrement (value)'=2, value=1
+Results of 'xtl::atomic_conditional_decrement (value)'=1, value=0
+Results of 'xtl::atomic_conditional_decrement (value)'=0, value=0

@@ -17,7 +17,6 @@ type 'remove_const(remove_reference('A'))
   is_polymorphic
   has_nothrow_constructor
   has_nothrow_copy
-  has_nothrow_assign
   has_virtual_destructor
   alignment_of: 4
   rank: 0

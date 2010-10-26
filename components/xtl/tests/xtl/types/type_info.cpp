@@ -45,7 +45,7 @@ void dump1 (const xtl::type_info& t)
   DUMP_FIELD (has_trivial_destructor);
   DUMP_FIELD (has_nothrow_constructor);
   DUMP_FIELD (has_nothrow_copy);
-  DUMP_FIELD (has_nothrow_assign);
+//  DUMP_FIELD (has_nothrow_assign);
   DUMP_FIELD (has_virtual_destructor);
   DUMP_FIELD (is_signed);
   DUMP_FIELD (is_unsigned);  
@@ -71,10 +71,14 @@ void dump (const char* name, const xtl::type_info& t)
 int main ()
 {
   printf ("Results of type_info_test:\n");
+
+//  const xtl::type_info& int_type = get_type<int> ();    
   
-  const xtl::type_info& type = get_type<const A&> ();
+//  dump ("int", int_type);  
   
-  dump ("A", type);
+  const xtl::type_info& a_type = get_type<const A&> ();
+  
+  dump ("A", a_type);
 
   return 0;
 }

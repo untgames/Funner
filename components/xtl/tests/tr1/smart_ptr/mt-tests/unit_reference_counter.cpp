@@ -33,6 +33,6 @@ int main()
     {
         pthread_join(a[j], 0);
     }
-
+    
     return 0;
 }

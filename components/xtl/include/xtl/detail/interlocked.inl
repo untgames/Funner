@@ -148,42 +148,44 @@
       return rv;
   }
   
-#elif defined (IPHONE)
+#elif defined (ARM)
 
 inline int atomic_increment (volatile int& rc)
 {
-  int r = rc;
-
-  ++rc;
-
-  return r;
+  return __sync_fetch_and_add (&rc, 1);
 }
 
 inline int atomic_decrement (volatile int& rc)
 {
-  int r = rc;
-  
-  --rc;
-  
-  return r;
+  return __sync_fetch_and_sub (&rc, 1);
 }
 
 inline int atomic_conditional_increment (volatile int& rc)
 {
-  int r = rc;
-  
-  if (r) ++rc;
-  
-  return r;  
+  for (;;)
+  {
+    long tmp = *(const volatile long*)&rc;
+    
+    if (tmp == 0)
+      return tmp;
+
+    if (__sync_val_compare_and_swap ((volatile long*)&rc, tmp, tmp + 1) == tmp)
+      return tmp;
+  }
 }
 
 inline int atomic_conditional_decrement (volatile int& rc)
 {
-  int r = rc;
-  
-  if (r) --rc;
-  
-  return r;
+  for (;;)
+  {
+    long tmp = *(const volatile long*)&rc;
+    
+    if (tmp == 0)
+      return tmp;
+
+    if (__sync_val_compare_and_swap ((volatile long*)&rc, tmp, tmp - 1) == tmp)
+      return tmp;
+  }
 }
 
 #endif
