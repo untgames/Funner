@@ -9,6 +9,7 @@
 
 #include <common/file.h>
 #include <common/strlib.h>
+#include <common/utf_converter.h>
 #include <common/xml_writer.h>
 
 #include <media/image.h>
@@ -833,6 +834,24 @@ size_t get_next_higher_power_of_two (size_t k)
   return k + 1;
 }
 
+//получение имени слоя
+stl::string get_layer_name (const Params& params, const psd_layer_record& layer)
+{
+  xtl::uninitialized_storage<char> ascii_layer_name (layer.unicode_name_length + 1);
+
+  memset (ascii_layer_name.data (), 0, ascii_layer_name.size ());
+
+  const void* layer_name_start       = layer.unicode_name;
+  size_t      source_size            = layer.unicode_name_length * 2;
+  void*       ascii_layer_name_start = ascii_layer_name.data ();
+  size_t      destination_size       = ascii_layer_name.size () - 1;
+
+  while (source_size && destination_size)
+    convert_encoding (common::Encoding_UTF16BE, layer_name_start, source_size, common::Encoding_ASCII7, ascii_layer_name_start, destination_size);
+
+  return params.need_trim_name_spaces ? common::trim (ascii_layer_name.data ()) : ascii_layer_name.data ();
+}
+
 //экспорт
 void export_data (Params& params)
 {
@@ -857,7 +876,7 @@ void export_data (Params& params)
   for (int i=0; i<context->layer_count; i++)
   {
     psd_layer_record& layer = context->layer_records [i];
-    stl::string       name = params.need_trim_name_spaces ? common::trim ((char*)layer.layer_name) : stl::string ((char*)layer.layer_name);
+    stl::string       name  = get_layer_name (params, layer);
 
     if (!strncmp (name.c_str (), "</", 2))
       continue;
@@ -870,6 +889,15 @@ void export_data (Params& params)
         continue;
     }
     
+    //проверка корректности имени слоя
+    for (const char* symbol = name.c_str (); *symbol; symbol++)
+    {
+      static const char* allowed_symbols = "_.- ";
+
+      if (!isalnum (*symbol) && !strchr (allowed_symbols, *symbol))
+        throw xtl::format_operation_exception ("export_data", "Unallowed symbol '%c' in layer '%s'", *symbol, name.c_str ());
+    }
+
     Rect rect = {0, 0, 0, 0};           
     
     bool need_crop_alpha = params.need_crop_alpha;
@@ -929,7 +957,7 @@ void export_data (Params& params)
     for (int i=0; i<context->layer_count; i++)
     {
       psd_layer_record& layer = context->layer_records [i];
-      stl::string       name  = params.need_trim_name_spaces ? common::trim ((char*)layer.layer_name) : stl::string ((char*)layer.layer_name);
+      stl::string       name  = get_layer_name (params, layer);
 
       if (!strncmp (name.c_str (), "</", 2))
         continue;
@@ -983,7 +1011,7 @@ void export_data (Params& params)
     for (int i=0; i<context->layer_count; i++)
     {
       psd_layer_record& layer = context->layer_records [i];
-      stl::string       name  = params.need_trim_name_spaces ? common::trim ((char*)layer.layer_name) : stl::string ((char*)layer.layer_name);
+      stl::string       name  = get_layer_name (params, layer);
 
       if (!strncmp (name.c_str (), "</", 2))
         continue;
