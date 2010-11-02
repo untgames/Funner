@@ -23,9 +23,9 @@ include $(TOOLSETS_DIR)/iphone.mak
 # опирование файла на устройство (им€ локальных файлов, им€ удалЄнного каталога)
 define tools.install
 export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
-plink $(IPHONE_USER)@$(IPHONE_HOST) -pw $(IPHONE_PASSWORD) "mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)" && \
-pscp -scp -r -batch -pw $(IPHONE_PASSWORD) $1 $(IPHONE_USER)@$(IPHONE_HOST):$(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT) && \
-plink $(IPHONE_USER)@$(IPHONE_HOST) -pw $(IPHONE_PASSWORD) "chmod -R +x $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)"
+$(call ssh_run,"mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)",$(IPHONE_USER)@$(IPHONE_HOST),$(IPHONE_PASSWORD)) && \
+$(call ssh_copy,$1,$(IPHONE_USER)@$(IPHONE_HOST):$(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT),$(IPHONE_PASSWORD)) && \
+$(call ssh_run,"chmod -R +x $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)",$(IPHONE_USER)@$(IPHONE_HOST),$(IPHONE_PASSWORD))
 endef
 
 #¬ыполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
@@ -35,5 +35,5 @@ export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEB
 export PATH_SEARCH="$(foreach path,$3,$$(export SUBST_PATH_STRING=$$(cd $(path) && pwd) && echo $(REMOTE_DEBUG_DIR)/$${SUBST_PATH_STRING/#$$ROOT_SUBSTRING/}))" && \
 export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
 export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
-plink $(IPHONE_USER)@$(IPHONE_HOST) -pw $(IPHONE_PASSWORD) "export PATH=\$\$$PATH:\.:$$PATH_SEARCH LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo $$SUBST_COMMAND) $(subst $(firstword $1),,$1)"
+$(call ssh_run,"export PATH=\$\$$PATH:\.:$$PATH_SEARCH LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo $$SUBST_COMMAND) $(subst $(firstword $1),,$1)",$(IPHONE_USER)@$(IPHONE_HOST),$(IPHONE_PASSWORD))
 endef
