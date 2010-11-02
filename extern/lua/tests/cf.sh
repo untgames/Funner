@@ -1,4 +1,4 @@
-#!lua
+#!./run-lua.sh
 -- temperature conversion table (celsius to farenheit)
 
 for c0=-20,50-1,10 do

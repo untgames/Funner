@@ -1,4 +1,4 @@
-#!lua
+#!./run-lua.sh
 -- an implementation of printf
 
 function printf(...)

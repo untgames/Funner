@@ -1,4 +1,4 @@
-#!lua
+#!./run-lua.sh
 -- trace calls
 -- example: lua -ltrace-calls bisect.lua
 

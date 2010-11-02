@@ -1,4 +1,4 @@
-#!lua
+#!./run-lua.sh
 -- example of for with generator functions
 
 function generatefib (n)
