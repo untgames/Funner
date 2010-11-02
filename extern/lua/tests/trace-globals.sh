@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!lua
 -- trace assigments to global variables
 
 do

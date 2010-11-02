@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!lua
 -- trace calls
 -- example: lua -ltrace-calls bisect.lua
 

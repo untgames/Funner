@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!lua
 -- function closures are powerful
 
 -- traditional fixed-point operator from functional programming

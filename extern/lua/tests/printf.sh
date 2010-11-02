@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!lua
 -- an implementation of printf
 
 function printf(...)

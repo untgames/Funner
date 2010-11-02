@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!lua
 -- make global variables readonly
 
 local f=function (t,i) error("cannot redefine global variable `"..i.."'",2) end
