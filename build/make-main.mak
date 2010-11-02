@@ -483,7 +483,7 @@ endef
 
 #Построение команды инсталляции (список файлов)
 define build_installation_command
-$(foreach dir,$(sort $(dir $(call get_file_list_with_dirs,$1))),$(call $(INSTALL_TOOL),$(call select_files_for_dir,$?,$(dir)),$(dir)) && ) true
+$(foreach dir,$(sort $(dir $(call get_file_list_with_dirs,$1))),$(call $(INSTALL_TOOL),$(call select_files_for_dir,$1,$(dir)),$(dir)) && ) true
 endef
 
 #Общее для целей с исходными файлами (имя цели, список макросов применяемых для обработки каталогов с исходными файлами)
