@@ -29,7 +29,6 @@ COMPILE_TOOL                            := tools.c++compile     #Имя макроса ути
 LINK_TOOL                               := tools.link           #Имя макроса утилиты редактора связей
 LIB_TOOL                                := tools.lib            #Имя макроса утилиты архивирования объектных файлов
 INSTALL_TOOL                            := tools.install        #Имя макроса утилиты установки файлов на устройство
-UNINSTALL_TOOL                          := tools.uninstall      #Имя макроса утилиты деинсталляции файлов с устройства
 RUN_TOOL                                := tools.run            #Имя макроса утилиты запуска приложения
 DLL_PATH                                := PATH                 #Имя переменной среды для указания путей к длл-файлам
 AUTO_COMPILER_DEFINES                   := NAME TYPE LINK_INCLUDES_COMMA COMPILER_CFLAGS EXECUTION_DIR
@@ -74,13 +73,11 @@ BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := $(strip $(BATCH_COMPILE_FLAG_FILE_SHO
 ROOT_TMP_DIR                            := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)
 TMP_DIRS                                := $(ROOT_TMP_DIR)
 DIST_DIRS                               := $(DIST_LIB_DIR) $(DIST_BIN_DIR) $(DIST_INFO_DIR)
-INSTALLATION_DIRS                       :=
-DIRS                                     = $(TMP_DIRS) $(DIST_DIRS) $(INSTALLATION_DIRS)
+DIRS                                     = $(TMP_DIRS) $(DIST_DIRS)
 COMPILE_TOOL                            := $(strip $(COMPILE_TOOL))
 LINK_TOOL                               := $(strip $(LINK_TOOL))
 LIB_TOOL                                := $(strip $(LIB_TOOL))
 INSTALL_TOOL                            := $(strip $(INSTALL_TOOL))
-UNINSTALL_TOOL                          := $(strip $(UNINSTALL_TOOL))
 RUN_TOOL                                := $(strip $(RUN_TOOL))
 EMPTY                                   := 
 SPACE                                   := $(EMPTY) $(EMPTY)
@@ -96,6 +93,8 @@ EXPORT_LIB_DIR                          := lib
 EXPORT_INCLUDE_DIR                      := include
 EXPORT_DLL_DIR                          := bin
 EXPORT_BIN_DIR                          := bin
+INSTALLATION_FILES                       = $(wildcard $(DIST_BIN_DIR)/*)
+INSTALLATION_FLAG                       := $(ROOT_TMP_DIR)/$(INSTALLATION_FLAG_SUFFIX)-root
 
 ###################################################################################################
 #Если не указан фильтры - обрабатываем все доступные
@@ -482,6 +481,11 @@ define select_files_for_dir
 $(foreach file,$(call get_file_list_with_dirs,$1),$(if $(filter $2,$(dir $(file))),$(file) ))
 endef
 
+#Построение команды инсталляции (список файлов)
+define build_installation_command
+$(foreach dir,$(sort $(dir $(call get_file_list_with_dirs,$1))),$(call $(INSTALL_TOOL),$(call select_files_for_dir,$?,$(dir)),$(dir)) && ) true
+endef
+
 #Общее для целей с исходными файлами (имя цели, список макросов применяемых для обработки каталогов с исходными файлами)
 define process_target_with_sources
 #Исключение библиотек по умолчанию
@@ -501,7 +505,6 @@ define process_target_with_sources
   $1.LIB_DEPS            := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(wildcard $$($1.LIB_DIRS:%=%/*)))  
   $1.LINK_INCLUDES_COMMA := $$(subst $$(SPACE),$$(COMMA),$$(strip $$($1.LINK_INCLUDES)))  
   $1.INSTALLATION_FLAG   := $$($1.TMP_DIR)/installation-flag
-  $1.INSTALLATION_FILES  := $$(DIST_BIN_DIR)
 
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
 
@@ -514,24 +517,7 @@ define process_target_with_sources
   
 #Инсталляция 
   $1.INSTALLATION_FILES := $$($1.INSTALLATION_FILES) $$(foreach file,$(DEFAULT_INSTALLATION_FILES),$$(wildcard $$(COMPONENT_DIR)$$(file))) $$($1.TARGET_DLLS)  
- 
-ifneq (,$$($$(INSTALL_TOOL)))
-  .PHONY: INSTALL.$1 UNINSTALL.$1
-
-  install: INSTALL.$1
-  uninstall: UNINSTALL.$1  
-
-  INSTALL.$1: $$($1.INSTALLATION_FLAG)  
-
-  UNINSTALL.$1:
-		@$(RM) -f $$($1.INSTALLATION_FLAG)		
-    
-  $$($1.INSTALLATION_FLAG): $$($1.INSTALLATION_FILES)
-		@echo Install $$(if $$($1.NAME),$$($1.NAME),$1)...
-		@$$(foreach dir,$$(sort $$(dir $$(call get_file_list_with_dirs,$$?))),$$(call $(INSTALL_TOOL),$$(call select_files_for_dir,$$?,$$(dir)),$$(dir)) && ) true
-		@touch $$@
-endif
-
+  INSTALLATION_FILES    := $$(INSTALLATION_FILES) $$($1.INSTALLATION_FILES)
 endef
 
 #Обработка цели static-lib (имя цели)
@@ -1013,10 +999,20 @@ clean:
 
 fullyclean: clean
 	@$(RM) -r $(DIRS)
+	
+ifneq (,$($(INSTALL_TOOL)))
 
-#Деинсталляция	
+install: $(INSTALLATION_FLAG)
+
 uninstall:
-	@$(foreach dir,$(sort $(INSTALLATION_DIRS)),$(call $(UNINSTALL_TOOL),$(dir)) && ) true
+	@$(RM) -f $(INSTALLATION_FLAG)	
+    
+$(INSTALLATION_FLAG): $(sort $(INSTALLATION_FILES))
+	@echo Install files...
+	@$(call build_installation_command,$?)
+	@touch $@
+
+endif
 
 #Создание архива с дистрибутивом
 tar-dist: dist
