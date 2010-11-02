@@ -1,4 +1,4 @@
-#!./run-lua.sh
+#!/bin/sh ./run-lua.sh
 -- hex dump
 -- usage: lua xd.lua < file
 

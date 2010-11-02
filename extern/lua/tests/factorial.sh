@@ -1,4 +1,4 @@
-#!./run-lua.sh
+#!/bin/sh ./run-lua.sh
 -- function closures are powerful
 
 -- traditional fixed-point operator from functional programming

@@ -1,4 +1,4 @@
-#!./run-lua.sh
+#!/bin/sh ./run-lua.sh
 -- read environment variables as if they were global variables
 
 local f=function (t,i) return os.getenv(i) end

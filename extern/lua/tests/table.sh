@@ -1,4 +1,4 @@
-#!./run-lua.sh
+#!/bin/sh ./run-lua.sh
 -- make table, grouping all data for the same item
 -- input is 2 columns (item, data)
 
