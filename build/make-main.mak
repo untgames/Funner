@@ -233,7 +233,7 @@ endef
 
 #Копирование файла на удаленную машину (источник, приёмник, пароль)
 define ssh_copy
-pscp -scp -r -batch -pw $3 $1 $2
+pscp -scp -rv -batch -pw $3 $1 $2
 endef
 
 else
@@ -353,6 +353,7 @@ endif
 define prepare_to_execute
 export PATH="$(subst ;,:,$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$(foreach dir,$(ADDITIONAL_PATHS),$(dir);)$$PATH))" \
 $(DLL_PATH)="$(subst ;,:,$(call convert_path,$(foreach dir,$2,$(CURDIR)/$(dir);)$$$(DLL_PATH)))" \
+BIN_DIR=$(DIST_BIN_DIR) \
  && cd "$1"
 endef
 
