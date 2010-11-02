@@ -655,7 +655,7 @@ define process_tests_source_dir
   
 #Инсталляция
   $1.INSTALLATION_FILES := $$($1.INSTALLATION_FILES) $$($2.TEST_EXE_FILES)
-
+  
 #Правило сборки теста
   $$($2.TARGET_DIR)/%$(EXE_SUFFIX): $$($2.TMP_DIR)/%$(OBJ_SUFFIX) $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
@@ -668,8 +668,8 @@ define process_tests_source_dir
 		
 #Правило получения файла-результата тестирования по shell-файлу
   $$($2.SOURCE_DIR)/%.sh: $$($2.TEST_EXE_FILES)
-
-  $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh $$($1.USED_APPLICATIONS)
+  
+  $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh $$($2.USED_APPLICATIONS)
 		@echo Running $$(notdir $$<)...
 		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $(CURDIR)/$$@
 
