@@ -12,7 +12,7 @@ COMPONENT_CONFIGURATION_FILE_SHORT_NAME ?= component.mak #Базовое имя файла конф
 EXPORT_FILE_SHORT_NAME                  ?= export.mak    #Базовое имя файла экспорта
 PROCESS_DIR_CONFIG_FILE_SHORT_NAME      ?= config.mak    #Базовое имя файла конфигурации обработки директории
 TMP_DIR_SHORT_NAME                      ?= tmp           #Базовое имя каталога с временными файлами
-DEFAULT_INSTALLATION_FILES              ?= data *.sh     #Список файлов, папок и файловых масок, инсталлируемых по умолчанию
+DEFAULT_INSTALLATION_FILES              ?= data/* *.sh   #Список файлов, папок и файловых масок, инсталлируемых по умолчанию
 DIST_DIR_SHORT_NAME                     ?= dist          #Базовое имя каталога с результатами сборки
 PCH_SHORT_NAME                          ?= pch.h         #Базовое имя PCH файла
 SOURCE_FILES_SUFFIXES                   := c cpp         #Расширения исходных файлов
@@ -93,7 +93,7 @@ EXPORT_LIB_DIR                          := lib
 EXPORT_INCLUDE_DIR                      := include
 EXPORT_DLL_DIR                          := bin
 EXPORT_BIN_DIR                          := bin
-INSTALLATION_FILES                       = $(wildcard $(DIST_BIN_DIR)/*)
+INSTALLATION_FILES                      := 
 INSTALLATION_FLAG                       := $(ROOT_TMP_DIR)/$(INSTALLATION_FLAG_SUFFIX)-root
 
 ###################################################################################################
@@ -245,7 +245,7 @@ endef
 
 #Копирование файла на удаленную машину (источник, приёмник, пароль)
 define ssh_copy
-sshpass -p $3 scp $1 $2
+sshpass -p $3 scp -r $1 $2
 endef
 
 endif
@@ -505,7 +505,6 @@ define process_target_with_sources
   $1.LIBS                := $$($1.LIBS:%=$(LIB_PREFIX)%$(LIB_SUFFIX))
   $1.LIB_DEPS            := $$(filter $$(addprefix %/,$$($1.LIBS)),$$(wildcard $$($1.LIB_DIRS:%=%/*)))  
   $1.LINK_INCLUDES_COMMA := $$(subst $$(SPACE),$$(COMMA),$$(strip $$($1.LINK_INCLUDES)))  
-  $1.INSTALLATION_FLAG   := $$($1.TMP_DIR)/installation-flag
 
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_source_dir,$1,$$(dir),$2)))
 
@@ -1008,7 +1007,7 @@ install: $(INSTALLATION_FLAG)
 uninstall:
 	@$(RM) -f $(INSTALLATION_FLAG)	
     
-$(INSTALLATION_FLAG): $(sort $(INSTALLATION_FILES))
+$(INSTALLATION_FLAG): $(sort $(INSTALLATION_FILES) $(wildcard $(DIST_BIN_DIR)/*))
 	@echo Install files...
 	@$(call build_installation_command,$?)
 	@touch $@
