@@ -215,7 +215,7 @@ inline mpl::list<signed char, unsigned char, short, unsigned short, int, unsigne
 */
 
 template <class T>
-class type_info_impl: public type_info
+class type_info_impl: virtual public type_info
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -301,6 +301,93 @@ class type_info_impl: public type_info
     const type_info& remove_pointer () const  { return get_type<typename xtl::type_traits::remove_pointer<T>::type> (); }
 };
 
+#ifdef _MSC_VER
+  #pragma warning (push)
+  #pragma warning (disable : 4250) //'xtl::detail::functional_type_info_impl<T>' : inherits 'xtl::detail::type_info_impl<T>::xtl::detail::type_info_impl<T>::std_type' via dominance
+#endif
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Динамическая информация о типе функционале
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <unsigned int ArgsCount> struct functional_type_info_arguments_holder
+{
+  const xtl::type_info* argument_types [ArgsCount];
+};
+
+template <> struct functional_type_info_arguments_holder<0>
+{
+  const xtl::type_info* argument_types [1];
+};
+
+template <class Traits, unsigned int I, unsigned int N> struct argument_types_initializer
+{
+  static void init (const xtl::type_info** types)
+  {
+    types [I] = &get_type<typename Traits::template argument<I+1>::type> ();
+    
+    argument_types_initializer<Traits, I+1, N>::init (types);
+  }
+};    
+
+template <class Traits, unsigned int I> struct argument_types_initializer<Traits, I, I>
+{
+  static void init (const xtl::type_info**) {}
+};
+
+template <class T>
+class functional_type_info_impl: virtual public functional_type_info, virtual public type_info_impl<T>,
+  private functional_type_info_arguments_holder<functional_traits<T>::arguments_count>
+{
+  typedef functional_traits<T> traits_type;
+  using functional_type_info_arguments_holder<traits_type::arguments_count>::argument_types;
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    functional_type_info_impl ()
+    {
+      argument_types_initializer<traits_type, 0, traits_type::arguments_count>::init (argument_types);
+    }  
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Тип возвращаемого значения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual const type_info& result_type () const { return get_type<typename traits_type::result_type> (); }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Количество аргументов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual unsigned int arguments_count () const { return traits_type::arguments_count; }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение типа аргумента (индексация с нуля)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual const xtl::type_info& argument_type (unsigned int index) const
+    {
+      if (index < traits_type::arguments_count)
+        return *argument_types [index];
+        
+      return get_type<void> ();
+    }
+};
+
+#ifdef _MSC_VER
+  #pragma warning (pop)
+#endif
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Подстановка реализации при получении типа
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T, bool IsFn = type_traits::is_function<T>::value> struct type_info_impl_selector
+{
+  typedef type_info_impl<T> type;
+};
+
+template <class T> struct type_info_impl_selector<T, true>
+{
+  typedef functional_type_info_impl<T> type;
+};
+
 }
 
 /*
@@ -337,7 +424,7 @@ bool has_custom_cast ()
 template <class T>
 const type_info& get_type ()
 {
-  return singleton_default<detail::type_info_impl<T>, false>::instance ();
+  return singleton_default<typename detail::type_info_impl_selector<T>::type, false>::instance ();
 }
 
 template <class T>

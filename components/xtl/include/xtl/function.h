@@ -155,6 +155,30 @@ void swap (function<Signature>&, function<Signature>&);
 template <class Signature>
 void to_string (stl::string& buffer, const function<Signature>& fn);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Переопределение информации о типе
+///////////////////////////////////////////////////////////////////////////////////////////////////
+namespace type_traits
+{
+
+template <class T> struct is_function;
+
+template <class Signature> struct is_function<function<Signature> > { enum { value = true }; };
+
+}
+
+namespace detail
+{
+
+template <class T> struct functional_traits;
+
+template <class Signature> struct functional_traits<function<Signature> >: public functional_traits<Signature>
+{
+  enum { is_function = false }; 
+};
+
+}
+
 #include <xtl/detail/function.inl>
 
 }
