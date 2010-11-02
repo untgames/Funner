@@ -223,6 +223,35 @@ define process_copy_files
 endef
 
 ###################################################################################################
+#Выполнение удаленной команды / копирование файла
+###################################################################################################
+ifneq (,$(filter Win%,$(OS)))
+
+#Выполнение удаленной команды (команда, хост@пользователь, пароль)
+define ssh_run
+plink $2 -pw $3 $1
+endef
+
+#Копирование файла на удаленную машину (источник, приёмник, пароль)
+define ssh_copy
+pscp -scp -r -batch -pw $3 $1 $2
+endef
+
+else
+
+#Выполнение удаленной команды (команда, хост@пользователь, пароль)
+define ssh_run
+sshpass -p $3 ssh $3@$2 $1
+endef
+
+#Копирование файла на удаленную машину (источник, приёмник, пароль)
+define ssh_copy
+sshpass -p $3 scp $1 $2
+endef
+
+endif
+
+###################################################################################################
 #Подключение файла конфигурации утилит сборки
 ###################################################################################################
 ifeq (,$(filter $(CURRENT_TOOLSET),$(TOOLSETS)))
@@ -616,7 +645,7 @@ define process_tests_source_dir
   $2.TEST_RESULT_FILES  := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
   $2.EXECUTION_DIR      := $$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR))
   $1.TARGET_DLLS        := $$($1.TARGET_DLLS) $$($1.DLLS:%=$$($2.TARGET_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
-  $1.USED_APPLICATIONS  := $$($1.USED_APPLICATIONS:%=$$(DIST_BIN_DIR)/%$(EXE_SUFFIX))
+  $2.USED_APPLICATIONS  := $$($1.USED_APPLICATIONS:%=$$(DIST_BIN_DIR)/%$(EXE_SUFFIX))
   $2.RUN_FILES          := $$(filter $$(files:%=$$($2.SOURCE_DIR)/%.sh),$$(wildcard $$($2.SOURCE_DIR)/*.sh)) $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$($2.TEST_EXE_FILES))
 
   build: $$($2.TEST_EXE_FILES)
@@ -635,17 +664,17 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TARGET_DIR)/%$(EXE_SUFFIX)
 		@echo Running $$(notdir $$<)...
-		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $$@
+		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $(CURDIR)/$$@
 		
 #Правило получения файла-результата тестирования по shell-файлу
   $$($2.SOURCE_DIR)/%.sh: $$($2.TEST_EXE_FILES)
 
   $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh $$($1.USED_APPLICATIONS)
 		@echo Running $$(notdir $$<)...
-		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $$@
+		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $(CURDIR)/$$@
 
 #Правило запуска тестов
-  $$(foreach file,$$($2.RUN_FILES),$$(eval $$(call process_tests_source_dir_run_test,$1,$2,$$(file))))
+  $$(foreach file,$$($2.RUN_FILES),$$(eval $$(call process_tests_source_dir_run_test,$1,$2,$$(file))))      
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
