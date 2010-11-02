@@ -25,6 +25,7 @@ EXTERN.LUA_UTILS.LIBS                 := funner.extern.lua       #Список использ
 EXTERN.LUA_UTILS.msvc.COMPILER_CFLAGS := -TP              #Флаги сборки (зависят от конфигурации)
 EXTERN.LUA_UTILS.g++.COMPILER_CFLAGS  := -x c++
 EXTERN.LUA_UTILS.TARGET_DIR            = $(DIST_BIN_DIR)
+EXTERN.LUA_UTILS.USED_APPLICATIONS    := lua
 
 #Цель №3 - LUA_TESTS
 EXTERN.LUA_TESTS.TYPE         := test-suite
