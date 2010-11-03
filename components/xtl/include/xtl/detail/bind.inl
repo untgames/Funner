@@ -191,6 +191,11 @@ template <class T> struct bind_is_ref      { enum { value = 0 }; };
 template <class T> struct bind_is_ref<T&>  { enum { value = 1 }; };
 template <class T> struct bind_is_ref<T*>  { enum { value = 1 }; };
 
+template <class T> struct bind_remove_cref              { typedef T type; };
+template <class T> struct bind_remove_cref<T&>          { typedef typename bind_remove_cref<T>::type type; };
+template <class T> struct bind_remove_cref<const T>     { typedef typename bind_remove_cref<T>::type type; };
+template <class T> struct bind_remove_cref<volatile T>  { typedef typename bind_remove_cref<T>::type type; };
+
 template <class Fn, class Arg, bool IsMemPtr = !(functional_traits<Fn>::is_function || functional_traits<Fn>::is_memfun || functional_traits<Fn>::is_ptrfun)>
 struct bind_result_of_dispatch
 {
@@ -205,7 +210,7 @@ template <class M, class T, class Arg> struct bind_result_of_dispatch<M T::*, Ar
 template <class M, class T, class Ret, class Fn, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9>
 struct bind_result_of_dispatch<M T::*, binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9>, true>
 {
-  typedef typename binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9>::result_type nested_result_type;
+  typedef typename binder<Ret, Fn, T1, T2, T3, T4, T5, T6, T7, T8, T9>::result_type      nested_result_type;
   typedef typename bind_add_cref<M T::*, bind_is_ref<nested_result_type>::value>::type   type;
 };
 
@@ -219,7 +224,7 @@ template <class Ret, class Fn, class A1> struct bind_result_of
 
 template <class Fn, class A1> struct bind_result_of<unspecified_result, Fn, A1>
 {
-  typedef typename bind_result_of_dispatch<Fn, A1>::type type;
+  typedef typename bind_result_of_dispatch<Fn, typename bind_remove_cref<A1>::type>::type type;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
