@@ -62,9 +62,9 @@ class LicenseManagerImpl
 
           //чтение периода действия лицензии
 
-        const char *since_date_string       = common::get<const char*> (root, "SinceDate"),
-                   *till_date_string        = common::get<const char*> (root, "TillDate"),
-                   *license_hash            = common::get<const char*> (root, "LicenseHash");
+        const char *since_date_string = common::get<const char*> (root, "SinceDate"),
+                   *till_date_string  = common::get<const char*> (root, "TillDate"),
+                   *license_hash      = common::get<const char*> (root, "LicenseHash");
 
         time_t since_time;
 
@@ -73,8 +73,8 @@ class LicenseManagerImpl
 
         time_t current_time;
 
-        time (&current_time);
-
+        gmtime (&current_time);
+        
         if (difftime (current_time, since_time) < 0)
           throw xtl::format_operation_exception ("", "License '%s' is not valid yet", license_path);
 
@@ -160,7 +160,7 @@ class LicenseManagerImpl
       for (size_t i = 0, count = allowed_components.Size (); i < count; i++)
         if (common::wcmatch (component_name, allowed_components [i]))
           return true;
-
+          
       return false;
     }
 
