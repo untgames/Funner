@@ -271,7 +271,7 @@ class LicenseManagerImpl
       tm_date.tm_mon  = atoi (date_string + 5) - 1;
       tm_date.tm_year = atoi (date_string) - 1900;
 
-      time_t date = mktime (&tm_date);
+      time_t date = timegm (&tm_date);
 
       if (date == -1)
         throw xtl::format_operation_exception (METHOD_NAME, "Can't convert date string '%s'", date_string);
