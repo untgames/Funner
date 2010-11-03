@@ -267,11 +267,17 @@ class CocoaFileSystem: public StdioFileSystem
 ///Поиск файла
     void Search (const char* wc_mask, const FileSearchHandler& handler)
     {
-      stl::string dir_name = dir (wc_mask), mask = wc_mask + dir_name.size (), file_name;
+      stl::string dir_name = dir (wc_mask), mask = wc_mask + dir_name.size (), file_name;            
 
       NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-      
+
       NSString* path = [file_manager stringWithFileSystemRepresentation:dir_name.c_str () length:dir_name.size ()];
+
+      if (![file_manager fileExistsAtPath:path])
+      {
+        [pool release];
+        return;
+      }
 
 #if defined __IPHONE_3_0 || defined __MAC_10_5
       NSError* error = nil;
