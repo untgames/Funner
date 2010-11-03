@@ -233,7 +233,7 @@ endef
 
 #Копирование файла на удаленную машину (источник, приёмник, пароль)
 define ssh_copy
-pscp -scp -rv -batch -pw $3 $1 $2
+pscp -scp -r -batch -pw $3 $1 $2
 endef
 
 else
@@ -1008,7 +1008,7 @@ uninstall:
 	@$(RM) -f $(INSTALLATION_FLAG)	
     
 $(INSTALLATION_FLAG): $(sort $(INSTALLATION_FILES) $(wildcard $(DIST_BIN_DIR)/*))
-	@echo Install files...
+	@echo Install $(words $?) files...
 	@$(call build_installation_command,$?)
 	@touch $@
 
