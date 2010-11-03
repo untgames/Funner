@@ -72,9 +72,9 @@ class LicenseManagerImpl
         ParseDate (till_date_string, till_time);
 
         time_t current_time;
-
-        gmtime (&current_time);
         
+        time (&current_time);
+
         if (difftime (current_time, since_time) < 0)
           throw xtl::format_operation_exception ("", "License '%s' is not valid yet", license_path);
 
