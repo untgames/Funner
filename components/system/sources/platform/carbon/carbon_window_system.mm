@@ -639,7 +639,7 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
     Создание/закрытие/уничтожение окна
 */
 
-Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, window_t parent, void* user_data)
+Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, window_t parent, const char* init_string, void* user_data)
 {
   static const char* METHOD_NAME = "syslib::CarbonPlatform::CreateWindow";
 

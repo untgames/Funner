@@ -14,13 +14,16 @@ struct Window::Impl
 {
   public:
 ///Конструктор
-    Impl (Window* in_window)
+    Impl (Window* in_window, const char* in_init_string)
       : window (in_window)
       , handle (0)
       , parent_handle (0)
       , style (WindowStyle_Default)
       , need_update_viewport (true)
     {
+      if (!in_init_string)
+        throw xtl::make_null_argument_exception ("syslib::Window::Window::Impl", "init_string");
+           
       memset (title, 0, sizeof title);
       memset (title_unicode, 0, sizeof title_unicode);
     }
@@ -47,7 +50,7 @@ struct Window::Impl
         style         = in_style;
         parent_handle = parent;
         
-        Platform::window_t new_handle = Platform::CreateWindow (style, &MessageHandler, parent, this);        
+        Platform::window_t new_handle = Platform::CreateWindow (style, &MessageHandler, parent, init_string.c_str (), this);
 
         SetHandle (new_handle);
 
@@ -354,6 +357,7 @@ struct Window::Impl
     Platform::window_t    handle;                             //низкоуровневый дескриптор окна
     Platform::window_t    parent_handle;                      //низкоуровневый дескриптор родительского окна
     WindowStyle           style;                              //стиль окна
+    stl::string           init_string;                        //строка инициализации окна
     WindowSignal          signals [WindowEvent_Num];          //сигналы окна
     bool                  close_cancel_flag;                  //флаг отмены закрытия окна
     char                  title [MAX_TITLE_LENGTH+1];         //заголовок окна
@@ -369,15 +373,25 @@ struct Window::Impl
     Конструктор и деструктор
 */
 
-Window::Window ()
-  : impl (new Impl (this))
-  {}
-
-Window::Window (WindowStyle style)
-  : impl (new Impl (this))
+Window::Window (const char* init_string)
 {
   try
   {
+    impl = stl::auto_ptr<Impl> (new Impl (this, init_string));
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::Window()");
+    throw;
+  }
+}
+
+Window::Window (WindowStyle style, const char* init_string)
+{
+  try
+  {
+    impl = stl::auto_ptr<Impl> (new Impl (this, init_string));        
+    
     Init (style);
   }
   catch (xtl::exception& exception)
@@ -387,11 +401,12 @@ Window::Window (WindowStyle style)
   }
 }
 
-Window::Window (WindowStyle style, size_t width, size_t height)
-  : impl (new Impl (this))
+Window::Window (WindowStyle style, size_t width, size_t height, const char* init_string)
 {
   try
   {
+    impl = stl::auto_ptr<Impl> (new Impl (this, init_string));
+    
     Init (style, width, height);
   }
   catch (xtl::exception& exception)

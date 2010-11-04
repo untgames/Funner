@@ -20,7 +20,7 @@ void raise (const char* method_name)
     Создание/закрытие/уничтожение окна
 */
 
-Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler, window_t, void*)
+Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler, window_t, const char* init_string, void*)
 {
   raise ("syslib::DefaultPlatform::CreateWindow");
 

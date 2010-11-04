@@ -530,7 +530,7 @@ void RegisterWindowClass ()
 
 #undef CreateWindow
 
-Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, window_t parent, void* user_data)
+Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, window_t parent, const char* init_string, void* user_data)
 {
     //определене стиля окна
 

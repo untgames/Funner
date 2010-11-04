@@ -82,7 +82,7 @@ class Platform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef void (*WindowMessageHandler)(window_t, WindowEvent, const WindowEventContext&, void* user_data);
 
-    static window_t CreateWindow  (WindowStyle, WindowMessageHandler, window_t parent, void* user_data);
+    static window_t CreateWindow  (WindowStyle, WindowMessageHandler, window_t parent, const char* init_string, void* user_data);
     static void     CloseWindow   (window_t);
     static void     DestroyWindow (window_t);
     

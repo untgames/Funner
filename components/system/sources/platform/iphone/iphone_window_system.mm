@@ -444,7 +444,7 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
     Создание/закрытие/уничтожение окна
 */
 
-Platform::window_t Platform::CreateWindow (WindowStyle window_style, WindowMessageHandler handler, window_t parent, void* user_data)
+Platform::window_t Platform::CreateWindow (WindowStyle window_style, WindowMessageHandler handler, window_t parent, const char* init_string, void* user_data)
 {
   static const char* METHOD_NAME = "syslib::iPhonePlatform::CreateWindow";
 
