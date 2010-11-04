@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const char* f (float x, const char* y, int z, size_t w)
+const char* f (float x, const char* y, int z, unsigned int w)
 {
   printf ("f(%g,%s,%d,%u)\n", x, y, z, w);
 
