@@ -32,7 +32,7 @@ INSTALL_TOOL                            := tools.install        #Имя макроса ути
 RUN_TOOL                                := tools.run            #Имя макроса утилиты запуска приложения
 DLL_PATH                                := PATH                 #Имя переменной среды для указания путей к длл-файлам
 AUTO_COMPILER_DEFINES                   := NAME TYPE LINK_INCLUDES_COMMA COMPILER_CFLAGS EXECUTION_DIR
-INSTALLATION_FLAG_SUFFIX                := .installation-flag   #Суффикс инсталляционных флагов
+INSTALLATION_FLAG_SUFFIX                := .installation-flag #Суффикс флага инсталляции
 
 ###################################################################################################
 #Подключение настроек пользователя
@@ -94,7 +94,7 @@ EXPORT_INCLUDE_DIR                      := include
 EXPORT_DLL_DIR                          := bin
 EXPORT_BIN_DIR                          := bin
 INSTALLATION_FILES                      := 
-INSTALLATION_FLAG                       := $(ROOT_TMP_DIR)/$(INSTALLATION_FLAG_SUFFIX)-root
+INSTALLATION_FLAG                       := $(ROOT_TMP_DIR)/.installation-flag
 
 ###################################################################################################
 #Если не указан фильтры - обрабатываем все доступные
@@ -517,7 +517,12 @@ define process_target_with_sources
   
 #Инсталляция 
   $1.INSTALLATION_FILES := $$($1.INSTALLATION_FILES) $$(foreach file,$(DEFAULT_INSTALLATION_FILES),$$(wildcard $$(COMPONENT_DIR)$$(file))) $$($1.TARGET_DLLS)  
+  $1.INSTALLATION_FLAG  := $$($1.TMP_DIR)/$(INSTALLATION_FLAG_SUFFIX)
   INSTALLATION_FILES    := $$(INSTALLATION_FILES) $$($1.INSTALLATION_FILES)
+  INSTALLATION_FLAGS    := $$(INSTALLATION_FLAGS) $$($1.INSTALLATION_FLAG)
+  
+  $$($1.INSTALLATION_FLAG): $$($1.INSTALLATION_FILES)
+		@touch $$@
 endef
 
 #Обработка цели static-lib (имя цели)
@@ -978,7 +983,7 @@ check: install
 export: build
 force:
 
-.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export
+.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export tar-dist
 
 #Специализация списка целей (в зависимости от профиля)
 $(foreach profile,$(PROFILES),$(eval TARGETS := $$(TARGETS) $$(TARGETS.$$(profile))))  
@@ -999,18 +1004,39 @@ clean:
 
 fullyclean: clean
 	@$(RM) -r $(DIRS)
-	
+
+#Инсталляция	
 ifneq (,$($(INSTALL_TOOL)))
 
 install: $(INSTALLATION_FLAG)
 
 uninstall:
-	@$(RM) -f $(INSTALLATION_FLAG)	
-    
-$(INSTALLATION_FLAG): $(sort $(INSTALLATION_FILES) $(wildcard $(DIST_BIN_DIR)/*))
-	@echo Install $(words $?) files...
-	@$(call build_installation_command,$?)
-	@touch $@
+	@$(RM) -f $(INSTALLATION_FLAG)
+
+#Получение путей к файлам относительно корня проекта (список относительных путей)
+define get_absolute_paths
+export ROOT_ABS_PATH=`cd $(ROOT) && pwd`/ && for file in $1; do export ABS_PATH=`cd \`dirname $$file\`; pwd`/`basename $$file` && echo $${ABS_PATH/#$$ROOT_ABS_PATH/}; done
+endef
+
+#Инсталляция (список обновленных файлов, список новых файлов, флаг-файл)
+define do_installation
+echo Install $(words $(sort $1 $2)) files... && \
+$(call build_installation_command,$(sort $1 $2)) && \
+echo Update installation registry... && \
+echo >> $@ && echo $(patsubst $(ROOT)/%,%,$2) >> $3
+endef
+
+#Получение списка новый файлов для инсталляции (список инсталлируемых файлов, список проинсталиированных файлов)
+define get_new_installation_files
+$(strip $(foreach file,$1,$(if $(filter $(file),$2),,$(ROOT)/$(file))))
+endef
+
+INSTALLATION_FILES := $(sort $(INSTALLATION_FILES) $(wildcard $(DIST_BIN_DIR)/*))
+
+$(INSTALLATION_FLAG): NEW_INSTALLATION_FILES = $(call get_new_installation_files,$(shell $(call get_absolute_paths,$(INSTALLATION_FILES))),$(if $(wildcard $(INSTALLATION_FLAG)),$(sort $(shell cat $(INSTALLATION_FLAG)))))
+
+$(INSTALLATION_FLAG): $(INSTALLATION_FILES) $(INSTALLATION_FLAGS)
+	@$(call do_installation,$(filter-out %.$(INSTALLATION_FLAG_SUFFIX),$?),$(NEW_INSTALLATION_FILES),$@)
 
 endif
 

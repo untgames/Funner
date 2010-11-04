@@ -31,7 +31,7 @@ LINKER_GCC        := $(BEAGLEBOARD_SDK)/bin/arm-none-linux-gnueabi-g++
 LIB_GCC           := $(BEAGLEBOARD_SDK)/bin/arm-none-linux-gnueabi-ar
 COMMON_CPPFLAGS   += -fexceptions -frtti
 COMMON_CFLAGS     += -DBEAGLEBOARD -DARM -DARM7 -Wno-uninitialized -Wno-psabi
-COMMON_LINK_FLAGS += -lm -pthread -Wl,-L,$(DIST_BIN_DIR)
+COMMON_LINK_FLAGS += -lm -lpthread -Wl,-L,$(DIST_BIN_DIR)
 
 include $(TOOLSETS_DIR)/g++.mak
 
