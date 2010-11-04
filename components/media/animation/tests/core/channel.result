@@ -2,8 +2,6 @@ Results of channel_test:
 Channel parameter name is ''
 Channel track type is 'void'
 Channel value type is 'void'
-Exception: Type mismatch, requested type 'float', but channel type is 'void'
-    at media::animation::Channel::Evaluator
 Channel parameter name is 'position'
 Channel track type is 'class TestSpline'
 Channel value type is 'float'
