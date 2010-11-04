@@ -174,9 +174,9 @@ class Window
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор и деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Window  (); //создаётся закрытое окно
-    Window  (WindowStyle style);
-    Window  (WindowStyle style, size_t width, size_t height);
+    Window  (const char* init_string = ""); //создаётся закрытое окно
+    Window  (WindowStyle style, const char* init_string = "");
+    Window  (WindowStyle style, size_t width, size_t height, const char* init_string = "");
     ~Window ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
