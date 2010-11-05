@@ -532,7 +532,7 @@ void RegisterWindowClass ()
 
 Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, window_t parent, const char* init_string, void* user_data)
 {
-    //определене стиля окна
+    //определение стиля окна
 
   UINT win_style;
 
@@ -549,7 +549,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       win_style = parent ? WS_CHILD  | WS_CLIPSIBLINGS : WS_POPUP;
       break;
     default:
-      throw xtl::make_argument_exception ("syslib::Win32Platform::CreateWindow", "style", style);
+      throw xtl::make_argument_exception ("", "style", style);
   }
 
   try
@@ -856,7 +856,6 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
         break;
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
-        break;
     }
   }
   catch (xtl::exception& exception)

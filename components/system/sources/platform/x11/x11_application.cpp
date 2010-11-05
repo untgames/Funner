@@ -6,19 +6,78 @@ using namespace syslib;
     Работа с очередью сообщений
 */
 
-bool Platform::IsMessageQueueEmpty ()
+namespace
 {
-  return true;
+
+class X11ApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter
+{
+  public:
+///Конструктор
+    X11ApplicationDelegate ()
+    {
+      idle_enabled = false;
+      is_exited    = false;
+      listener     = 0;
+    }
+
+///Запуск цикла обработки сообщений
+    void Run ()
+    {
+      if (listener)
+        listener->OnInitialized ();
+      
+      while (!is_exited)
+      {
+        if (idle_enabled && listener)
+          listener->OnIdle ();
+      }
+    }
+
+///Выход из приложения
+    void Exit (int code)
+    {
+      is_exited = true;
+
+      if (listener)
+        listener->OnExit (code);
+    }
+
+///Установка необходимости вызова событий idle
+    void SetIdleState (bool state)
+    {
+      idle_enabled = state;
+    }
+
+///Установка слушателя событий приложения
+    void SetListener (IApplicationListener* in_listener)
+    {
+      listener = in_listener;
+    }
+    
+///Подсчёт ссылок
+    void AddRef ()
+    {
+      addref (this);
+    }
+    
+    void Release ()
+    {
+      release (this);
+    }    
+
+  private:
+    bool                  idle_enabled;
+    bool                  is_exited;
+    IApplicationListener* listener;
+};
+
 }
 
-void Platform::DoNextEvent ()
-{
-}
+/*
+    Создание делегата приложения
+*/
 
-void Platform::WaitMessage ()
+IApplicationDelegate* Platform::CreateDefaultApplicationDelegate ()
 {
-}
-
-void Platform::UpdateMessageQueue ()
-{
+  return new X11ApplicationDelegate;
 }

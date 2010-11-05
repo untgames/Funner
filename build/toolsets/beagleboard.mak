@@ -20,7 +20,7 @@ endif
 ###################################################################################################
 #Константы
 ###################################################################################################
-PROFILES          += unistd beagle-board x11
+PROFILES          += unistd beagleboard x11
 REMOTE_DEBUG_DIR  ?= //work/funner
 EXE_SUFFIX        :=
 DLL_SUFFIX        := .so
@@ -73,5 +73,5 @@ export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEB
 export PATH_SEARCH="$(foreach path,$3,$$(export SUBST_PATH_STRING=$$(cd $(path) && pwd) && echo $(REMOTE_DEBUG_DIR)/$${SUBST_PATH_STRING/#$$ROOT_SUBSTRING/}))" && \
 export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
 export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
-$(call ssh_run,"export PATH=\$\$$PATH:\.:$$PATH_SEARCH LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo $$SUBST_COMMAND) $(subst $(firstword $1),,$1)",$(BEAGLE_BOARD_USER)@$(BEAGLE_BOARD_HOST),$(BEAGLE_BOARD_PASSWORD))
+$(call ssh_run,"export DISPLAY=$(BEAGLE_BOARD_DISPLAY) PATH=\$\$$PATH:\.:$$PATH_SEARCH LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo $$SUBST_COMMAND) $(subst $(firstword $1),,$1)",$(BEAGLE_BOARD_USER)@$(BEAGLE_BOARD_HOST),$(BEAGLE_BOARD_PASSWORD))
 endef

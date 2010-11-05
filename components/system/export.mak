@@ -14,3 +14,4 @@ export.link.system.bada.LIBS           := FApp FBase FUiControls FUi FGraphics
 export.link.system.bada.LINK_FLAGS     := -shared 
 export.link.system.bada.LINK_INCLUDES  := OspMain
 export.link.system.beagleboard.IMPORTS := link.extern.beagleboard
+export.link.system.x11.LIBS            := X11 Xau xcb Xdmcp
