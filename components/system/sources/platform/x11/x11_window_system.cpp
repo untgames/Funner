@@ -87,11 +87,13 @@ struct Platform::window_handle
         {
           case GraphicsExpose:
             printf ("expose\n");
+            fflush (stdout);
             break;
         }
       }
     }
-    
+
+    return 0; 
   }
 };
 
@@ -161,7 +163,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       
     Lock lock (impl->display_mutex); 
     
-    impl->thread = stl::auto_ptr<Thread> (new Thread (xtl::bind (&window_handle::EventsThreadRoutine, this)));
+    impl->events_thread = stl::auto_ptr<Thread> (new Thread (xtl::bind (&window_handle::EventsThreadRoutine, &*impl)));
 
     return impl.release (); 
   }  
@@ -508,11 +510,6 @@ void Platform::SetCursorPosition (const Point& position)
 {
   try
   {
-    if (!handle)
-      throw xtl::make_null_argument_exception ("", "handle");
-      
-    Lock lock (handle->display_mutex);          
-    
     throw xtl::make_not_implemented_exception ("");
   }  
   catch (xtl::exception& e)
@@ -526,11 +523,6 @@ syslib::Point Platform::GetCursorPosition ()
 {
   try
   {
-    if (!handle)
-      throw xtl::make_null_argument_exception ("", "handle");
-      
-    Lock lock (handle->display_mutex);          
-    
     throw xtl::make_not_implemented_exception ("");
   }  
   catch (xtl::exception& e)
