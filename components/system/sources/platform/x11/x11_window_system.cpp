@@ -9,10 +9,11 @@ namespace
     Константы
 */
 
-const size_t DEFAULT_WINDOW_X      = 0;
-const size_t DEFAULT_WINDOW_Y      = 0;
-const size_t DEFAULT_WINDOW_WIDTH  = 100;
-const size_t DEFAULT_WINDOW_HEIGHT = 100;
+const size_t DEFAULT_WINDOW_X       = 0;    //координата X по умолчанию при создании окна
+const size_t DEFAULT_WINDOW_Y       = 0;    //координата Y по умолчанию при создании окна
+const size_t DEFAULT_WINDOW_WIDTH   = 100;  //ширина по умолчанию при создании окна
+const size_t DEFAULT_WINDOW_HEIGHT  = 100;  //высота по умолчанию при создании окна
+const size_t EVENT_WAIT_TIMEOUT_SEC = 1;    //тайм-аут при ожидании сообщения
 
 }
 
@@ -24,15 +25,73 @@ typedef ::Window XWindow;
 
 struct Platform::window_handle
 {
-  Display*  display;          //display for this window
-  XWindow   window;           //window handle
-  bool      background_state; //background state of this window (fake property)
+  Mutex                 display_mutex;    //мьютекс доступа к соединению
+  Display*              display;          //дисплей для данного окна
+  XWindow               window;           //дескриптор окна
+  bool                  background_state; //ложное свойство - состояние фона
+  stl::auto_ptr<Thread> events_thread;    //нить обработки событий окна
   
+///Конструктор
   window_handle ()
     : display (0)
     , window (0)
     , background_state (true)
   {
+  }
+  
+///Функция нити обработки событий окна
+  int EventsThreadRoutine ()
+  {
+      //получение файлового дескриптора соединения с дисплеем
+      
+    int display_connection_fd = 0;
+    
+    {
+      Lock lock (display_mutex);
+      
+      display_connection_fd = ConnectionNumber (display);
+    }
+    
+      //настройка тайм-аута
+    
+    timeval timeout;
+    
+    timeout.tv_usec = 0;
+    timeout.tv_sec  = EVENT_WAIT_TIMEOUT_SEC;
+
+      //цикл обработки событий
+      
+    XEvent event;
+      
+    for (;;)
+    {
+        //ожидание появления события
+      
+      fd_set in_fds;
+      
+      FD_ZERO (&in_fds);
+      FD_SET  (display_connection_fd, &in_fds);
+
+      if (!select (display_connection_fd + 1, &in_fds, 0, 0, &timeout))
+        continue; //событие не пришло
+
+        //обработка поступивших событий
+        
+      Lock lock (display_mutex);
+        
+      while (XPending (display))
+      {
+        XNextEvent (display, &event);
+        
+        switch (event.type)
+        {
+          case GraphicsExpose:
+            printf ("expose\n");
+            break;
+        }
+      }
+    }
+    
   }
 };
 
@@ -59,7 +118,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
 
     stl::auto_ptr<window_handle> impl (new window_handle);
 
-      //открытие дисплея
+      //открытие соединения
 
     common::PropertyMap properties = common::parse_init_string (init_string);
 
@@ -69,11 +128,15 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
 
     if (!impl->display)
       throw xtl::format_operation_exception ("", "Can't open display '%s'", XDisplayName (display_name));
+      
+      //настройка соединения
 
     bool synchronize = properties.IsPresent ("synchronize") && properties.GetInteger ("synchronize") != 0;
     
     if (synchronize)
       XSynchronize (impl->display, true);          
+      
+      //создание окна
 
     int blackColor = BlackPixel (impl->display, DefaultScreen (impl->display));
     
@@ -87,13 +150,19 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
 
     if (!impl->window)
       throw xtl::format_operation_exception ("", "Can't create window for display '%s'", XDisplayName (display_name));
+      
+      //настройка получения событий
 
     XSelectInput (impl->display, impl->window, StructureNotifyMask | ExposureMask | ButtonPressMask | KeyPressMask | KeyReleaseMask);  
     
-    XFlush (impl->display);    
+    XFlush (impl->display);
     
-      //event processing!!!!
+      //запуск нити обработки событий
+      
+    Lock lock (impl->display_mutex); 
     
+    impl->thread = stl::auto_ptr<Thread> (new Thread (xtl::bind (&window_handle::EventsThreadRoutine, this)));
+
     return impl.release (); 
   }  
   catch (xtl::exception& e)
@@ -109,6 +178,8 @@ void Platform::CloseWindow (window_t handle)
   {
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);
     
     XEvent e;
      
@@ -135,11 +206,22 @@ void Platform::DestroyWindow (window_t handle)
 {
   try
   {
-    if (!XDestroyWindow (handle->display, handle->window))
-      throw xtl::format_operation_exception ("", "XDestroyWindow failed");
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+
+    {
+      Lock lock (handle->display_mutex);        
+    
+      if (!XDestroyWindow (handle->display, handle->window))
+        throw xtl::format_operation_exception ("", "XDestroyWindow failed");
       
-    if (!XCloseDisplay (handle->display))
-      throw xtl::format_operation_exception ("", "XCloseDisplay failed");
+      if (!XCloseDisplay (handle->display))
+        throw xtl::format_operation_exception ("", "XCloseDisplay failed");
+    }
+      
+    handle->events_thread->Join ();
+    
+    delete handle;
   }  
   catch (xtl::exception& e)
   {
@@ -167,6 +249,8 @@ void Platform::SetWindowTitle (window_t handle, const wchar_t* title)
   {
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);      
     
     XStoreName (handle->display, handle->window, common::tostring (title).c_str ());
   }  
@@ -183,6 +267,8 @@ void Platform::GetWindowTitle (window_t handle, size_t buffer_size_in_chars, wch
   {
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);      
     
     char* window_name = 0;
     
@@ -210,6 +296,8 @@ void Platform::SetWindowRect (window_t handle, const Rect& rect)
   {
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);      
     
     XWindowChanges changes;
     
@@ -234,6 +322,11 @@ void Platform::SetClientRect (window_t handle, const Rect& rect)
 {
   try
   {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);    
+    
     throw xtl::make_not_implemented_exception ("");
   }  
   catch (xtl::exception& e)
@@ -249,6 +342,8 @@ void Platform::GetWindowRect (window_t handle, Rect& rect)
   {
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);          
       
     XWindow root_return = 0;
     int x_return = 0, y_return = 0;
@@ -273,6 +368,11 @@ void Platform::GetClientRect (window_t handle, Rect& rect)
 {
   try
   {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);
+    
     throw xtl::make_not_implemented_exception ("");    
   }  
   catch (xtl::exception& e)
@@ -292,6 +392,8 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
   {
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);          
     
     switch (flag)
     {
@@ -327,6 +429,11 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
 {
   try
   {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);          
+    
     return false;    
   }  
   catch (xtl::exception& e)
@@ -401,6 +508,11 @@ void Platform::SetCursorPosition (const Point& position)
 {
   try
   {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);          
+    
     throw xtl::make_not_implemented_exception ("");
   }  
   catch (xtl::exception& e)
@@ -414,6 +526,11 @@ syslib::Point Platform::GetCursorPosition ()
 {
   try
   {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);          
+    
     throw xtl::make_not_implemented_exception ("");
   }  
   catch (xtl::exception& e)
@@ -427,6 +544,11 @@ void Platform::SetCursorPosition (window_t handle, const Point& client_position)
 {
   try
   {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);          
+    
     throw xtl::make_not_implemented_exception ("");
   }  
   catch (xtl::exception& e)
@@ -440,6 +562,11 @@ syslib::Point Platform::GetCursorPosition (window_t handle)
 {
   try
   {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);          
+    
     throw xtl::make_not_implemented_exception ("");
   }    
   catch (xtl::exception& e)
@@ -453,10 +580,15 @@ syslib::Point Platform::GetCursorPosition (window_t handle)
     Видимость курсора
 */
 
-void Platform::SetCursorVisible (window_t, bool state)
+void Platform::SetCursorVisible (window_t handle, bool state)
 {
   try
   {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);          
+    
     throw xtl::make_not_implemented_exception ("");
   }    
   catch (xtl::exception& e)
@@ -466,10 +598,15 @@ void Platform::SetCursorVisible (window_t, bool state)
   }
 }
 
-bool Platform::GetCursorVisible (window_t)
+bool Platform::GetCursorVisible (window_t handle)
 {
   try
   {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);          
+    
     throw xtl::make_not_implemented_exception (""); 
   }    
   catch (xtl::exception& e)
@@ -486,7 +623,7 @@ bool Platform::GetCursorVisible (window_t)
 Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x, int hotspot_y)
 {
   try
-  {
+  {    
     throw xtl::make_not_implemented_exception ("");    
   }
   catch (xtl::exception& exception)
@@ -499,7 +636,7 @@ Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x,
 void Platform::DestroyCursor (cursor_t cursor)
 {
   try
-  {
+  {    
   }
   catch (xtl::exception& exception)
   {
@@ -508,10 +645,15 @@ void Platform::DestroyCursor (cursor_t cursor)
   }
 }
 
-void Platform::SetCursor (window_t window, cursor_t cursor)
+void Platform::SetCursor (window_t handle, cursor_t cursor)
 {
   try
   {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);    
+    
     throw xtl::make_not_implemented_exception ("");    
   }
   catch (xtl::exception& e)
@@ -529,6 +671,11 @@ void Platform::SetBackgroundColor (window_t handle, const Color& color)
 {
   try
   {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+      
+    Lock lock (handle->display_mutex);
+    
     throw xtl::make_not_implemented_exception ("");
   }
   catch (xtl::exception& e)
@@ -544,7 +691,7 @@ void Platform::SetBackgroundState (window_t handle, bool state)
   {
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");    
-
+      
     handle->background_state = state;
   }  
   catch (xtl::exception& e)
@@ -558,6 +705,11 @@ Color Platform::GetBackgroundColor (window_t handle)
 {
   try
   {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");    
+      
+    Lock lock (handle->display_mutex); 
+    
     return Color (0, 0, 0);
   }
   catch (xtl::exception& e)
@@ -573,7 +725,7 @@ bool Platform::GetBackgroundState (window_t handle)
   {
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");    
-    
+      
     return handle->background_state;
   }
   catch (xtl::exception& e)

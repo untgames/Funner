@@ -21,8 +21,9 @@
 #include <common/strlib.h>
 #include <common/utf_converter.h>
 
-#include <syslib/mutex.h>
 #include <syslib/condition.h>
+#include <syslib/mutex.h>
+#include <syslib/thread.h>
 
 #include <platform/platform.h>
 
