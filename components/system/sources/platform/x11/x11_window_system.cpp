@@ -199,8 +199,8 @@ struct Platform::window_handle
     context.keyboard_control_pressed    = (state & ControlMask) != 0;
     context.keyboard_shift_pressed      = (state & ShiftMask) != 0;
     context.mouse_left_button_pressed   = (state & Button1Mask) != 0;
-    context.mouse_right_button_pressed  = (state & Button2Mask) != 0;
-    context.mouse_middle_button_pressed = (state & Button3Mask) != 0;
+    context.mouse_right_button_pressed  = (state & Button3Mask) != 0;
+    context.mouse_middle_button_pressed = (state & Button2Mask) != 0;
   }
   
 ///Отложенное сообщение
@@ -306,8 +306,8 @@ struct Platform::window_handle
             switch (event.xbutton.button)
             {
               case Button1: Notify (WindowEvent_OnLeftButtonDown, message); break;
-              case Button2: Notify (WindowEvent_OnRightButtonDown, message); break;
-              case Button3: Notify (WindowEvent_OnMiddleButtonDown, message); break;
+              case Button2: Notify (WindowEvent_OnMiddleButtonDown, message); break;
+              case Button3: Notify (WindowEvent_OnRightButtonDown, message); break;
               case Button4: Notify (WindowEvent_OnXButton1Down, message); break;
               case Button5: Notify (WindowEvent_OnXButton2Down, message); break;
               default: break;
@@ -324,8 +324,8 @@ struct Platform::window_handle
             switch (event.xbutton.button)
             {
               case Button1: Notify (WindowEvent_OnLeftButtonUp, message); break;
-              case Button2: Notify (WindowEvent_OnRightButtonUp, message); break;
-              case Button3: Notify (WindowEvent_OnMiddleButtonUp, message); break;
+              case Button2: Notify (WindowEvent_OnMiddleButtonUp, message); break;
+              case Button3: Notify (WindowEvent_OnRightButtonUp, message); break;
               case Button4: Notify (WindowEvent_OnXButton1Up, message); break;
               case Button5: Notify (WindowEvent_OnXButton2Up, message); break;
               default: break;
