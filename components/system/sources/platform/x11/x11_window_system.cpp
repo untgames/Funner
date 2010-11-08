@@ -262,7 +262,7 @@ struct Platform::window_handle
       {
         XNextEvent (display, &event);
         
-        xtl::intrusive_ptr<Message> message (new Message (*this));
+        xtl::intrusive_ptr<Message> message (new Message (*this), false);
         
         WindowEventContext& context = message->context;
         
