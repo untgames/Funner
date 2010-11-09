@@ -8,6 +8,11 @@
 #undef DestroyAll
 #endif
 
+#ifdef DisplayString
+#undef DisplayString
+#endif
+
+#include <stl/hash_map>
 #include <stl/hash_set>
 #include <stl/queue>
 
@@ -18,6 +23,7 @@
 #include <xtl/reference_counter.h>
 #include <xtl/string.h>
 
+#include <common/log.h>
 #include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
@@ -26,6 +32,7 @@
 #include <syslib/condition.h>
 #include <syslib/mutex.h>
 #include <syslib/thread.h>
+#include <syslib/platform/x11.h>
 
 #include <platform/platform.h>
 

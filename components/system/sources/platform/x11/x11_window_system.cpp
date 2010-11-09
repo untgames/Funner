@@ -10,11 +10,35 @@ namespace
     Константы
 */
 
-const size_t DEFAULT_WINDOW_X       = 0;    //координата X по умолчанию при создании окна
-const size_t DEFAULT_WINDOW_Y       = 0;    //координата Y по умолчанию при создании окна
-const size_t DEFAULT_WINDOW_WIDTH   = 100;  //ширина по умолчанию при создании окна
-const size_t DEFAULT_WINDOW_HEIGHT  = 100;  //высота по умолчанию при создании окна
-const size_t EVENT_WAIT_TIMEOUT_SEC = 1;    //тайм-аут при ожидании сообщения
+const size_t DEFAULT_WINDOW_X       = 0;            //координата X по умолчанию при создании окна
+const size_t DEFAULT_WINDOW_Y       = 0;            //координата Y по умолчанию при создании окна
+const size_t DEFAULT_WINDOW_WIDTH   = 100;          //ширина по умолчанию при создании окна
+const size_t DEFAULT_WINDOW_HEIGHT  = 100;          //высота по умолчанию при создании окна
+const size_t EVENT_WAIT_TIMEOUT_SEC = 1;            //тайм-аут при ожидании сообщения
+const char*  LOG_NAME               = "system.x11"; //имя канала протоколирования
+
+typedef ::Window XWindow;
+
+/*
+    Блокировка соединения X11
+*/
+
+class DisplayLock
+{
+  public:
+    DisplayLock (Display* in_display) : display (in_display)
+    {
+      XLockDisplay (display);
+    }
+
+    ~DisplayLock ()
+    {
+      XUnlockDisplay (display);
+    }
+
+  private:
+    Display* display;
+};
 
 /*
     Преобразование виртуальных кодов клавиш в syslib::Key
@@ -125,28 +149,285 @@ Key VirtualKey2SystemKey (KeySym vkey)
   }
 }
 
+/*
+    Интерфейс диспетчеризации оконных сообщений
+*/
+
+class IWindowMessageHandler
+{
+  public:
+    virtual void ProcessEvent (const XEvent& event) = 0;
+  
+  protected:
+    virtual ~IWindowMessageHandler () {}
+};
+
+/*
+    Менеджер соединения с дисплеем
+*/
+
+class DisplayManagerImpl
+{
+  public:
+///Конструктор
+    DisplayManagerImpl ()
+      : log (LOG_NAME)
+      , display (0)
+      , sync_mode (false)
+      , event_loop (true)
+    {
+    }
+    
+///Деструктор
+    ~DisplayManagerImpl ()
+    {       
+      try
+      {      
+        if (display)
+        {
+          log.Printf ("Stopping X11 event processing thread...");
+          
+          event_loop = false;
+
+          if (events_thread)
+            events_thread->Join ();
+
+          {
+            log.Printf ("Close X11 display connection");            
+            
+            DisplayLock lock (display);                                              
+          
+            XCloseDisplay (display);
+          }            
+        }
+      }            
+      catch (...)
+      {
+      }
+    }
+    
+///Ссылка на дисплей
+    void SetDisplayString (const char* in_display_string)
+    {
+      static const char* METHOD_NAME = "syslib::x11::DisplayManagerImpl::SetDisplay";
+
+      if (!in_display_string)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "display_string");
+
+      if (display)
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't change display string after display has created");
+
+      display_string = in_display_string;
+    }
+
+    const char* DisplayString ()
+    {
+      return display_string.c_str ();
+    }
+    
+///Необходимость синхронизации
+    void SetSyncMode (bool state)
+    {
+      if (sync_mode == state)
+        return;
+      
+      if (display)
+      {
+        log.Printf (state ? "Switch X11 display connection to synchronous state" : "Switch X11 display connection to asynchronous state");
+        
+        XSynchronize (display, state);
+      }
+
+      sync_mode = state;
+    }
+
+    bool IsSyncMode ()
+    {
+      return sync_mode;
+    }
+    
+///Получение дисплея
+    ::Display* Display ()
+    {
+      try
+      {
+        if (display)
+          return display;
+
+        const char* display_name = display_string.empty () ? (const char*)0 : display_string.c_str ();
+        
+        log.Printf ("Open X11 display connection with '%s'", XDisplayName (display_name));
+        
+        log.Printf ("...initialize X11 for using with threads");
+        
+        if (!XInitThreads ())
+        {
+          log.Printf ("...XInitThreads failed!");
+          
+          throw xtl::format_operation_exception ("", "Can't initialize threads for display '%s'", XDisplayName (display_name));
+        }        
+
+        display = XOpenDisplay (display_name);
+
+        if (!display)
+          throw xtl::format_operation_exception ("", "Can't open display '%s'", XDisplayName (display_name));          
+          
+        log.Printf ("...X11 display connection opened (display-string='%s', server='%s' release %d)",
+          XDisplayString (display), XServerVendor (display), XVendorRelease (display));
+
+        if (sync_mode)
+        {
+          log.Printf ("...switch X11 display connection to synchronous state");
+          
+          XSynchronize (display, sync_mode);
+        }
+                  
+          //запуск нити обработки событий
+          
+        log.Printf ("...starting X11 events processing thread");
+
+        events_thread = stl::auto_ptr<Thread> (new Thread (xtl::bind (&DisplayManagerImpl::EventsThreadRoutine, this)));
+        
+        return display;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::x11::DisplayManagerImpl::Display");
+        throw;
+      }
+    }
+    
+///Регистрация окна
+    void RegisterWindow (XWindow window, IWindowMessageHandler* handler)
+    {
+      handlers [window] = handler;
+    }
+    
+    void UnregisterWindow (XWindow window)
+    {
+      handlers.erase (window);
+    }
+    
+  private:
+///Функция нити обработки событий окна
+    int EventsThreadRoutine ()
+    {
+      log.Printf ("X11 events thread started");      
+      
+        //получение файлового дескриптора соединения с дисплеем
+        
+      int display_connection_fd = 0;
+      
+      {
+        DisplayLock lock (display);
+        
+        display_connection_fd = ConnectionNumber (display);
+      }
+      
+        //настройка тайм-аута
+      
+      timeval timeout;
+      
+      timeout.tv_usec = 0;
+      timeout.tv_sec  = EVENT_WAIT_TIMEOUT_SEC;
+
+        //цикл обработки событий
+        
+      XEvent event;
+        
+      while (event_loop)
+      {
+          //ожидание появления события
+        
+        fd_set in_fds;
+        
+        FD_ZERO (&in_fds);
+        FD_SET  (display_connection_fd, &in_fds);
+
+        if (!select (display_connection_fd + 1, &in_fds, 0, 0, &timeout))
+          continue; //событие не пришло
+
+          //обработка поступивших событий
+          
+        DisplayLock lock (display);
+          
+        while (XPending (display))
+        {
+            //извлечение события из очереди
+          
+          XNextEvent (display, &event);
+          
+            //поиск соответствующего обработчика
+            
+          WindowHandlerMap::iterator iter = handlers.find (reinterpret_cast<XAnyEvent&> (event).window);
+          
+          if (iter == handlers.end ())
+            continue;
+            
+            //диспетчеризация сообщения
+
+          try
+          {
+            iter->second->ProcessEvent (event);
+          }
+          catch (std::exception& e)
+          {
+            log.Printf ("%s\n    at syslib::x11::IWindowMessageHandler::Dispatch\n    at syslib::x11::DisplayManagerImpl::EventsThreadRoutine", e.what ());
+          }
+          catch (...)
+          {
+            log.Printf ("unknown exception\n    at syslib::x11::IWindowMessageHandler::Dispatch\n    at syslib::x11::DisplayManagerImpl::EventsThreadRoutine");
+          }
+        }   
+      }     
+      
+      log.Printf ("Exit from X11 events thread");
+      
+      return 0; 
+    }  
+
+  private:
+    DisplayManagerImpl (const DisplayManagerImpl&); //no impl
+    DisplayManagerImpl& operator = (const DisplayManagerImpl&); //no impl
+    
+    typedef stl::hash_map<XWindow, IWindowMessageHandler*> WindowHandlerMap;
+
+  private:
+    common::Log           log;            //канал протоколирования
+    stl::string           display_string; //строка инициализации дисплея
+    ::Display*            display;        //ссылка на дисплей
+    bool                  sync_mode;      //находится ли соединение в режиме синхронизации
+    stl::auto_ptr<Thread> events_thread;  //нить обработки событий окна    
+    bool                  event_loop;     //класс находится в состоянии обработки событий
+    WindowHandlerMap      handlers;       //отображение системных окон на внутренние структуры обработки сообщений
+};
+
+typedef common::Singleton<DisplayManagerImpl> DisplayManagerSingleton;
+
 }
+
+/*
+===================================================================================================
+    Window
+===================================================================================================
+*/
 
 /*
     Описание реализации окна
 */
 
-typedef ::Window XWindow;
-
-struct Platform::window_handle
+struct Platform::window_handle: public IWindowMessageHandler
 {
-  Mutex                          display_mutex;    //мьютекс доступа к соединению
   Display*                       display;          //дисплей для данного окна
   XWindow                        window;           //дескриптор окна
   bool                           background_state; //ложное свойство - состояние фона
-  stl::auto_ptr<Thread>          events_thread;    //нить обработки событий окна
   MessageQueue&                  message_queue;    //очередь событий
   Platform::WindowMessageHandler message_handler;  //функция обработки сообщений окна
   void*                          user_data;        //пользовательские данные для функции обратного вызова
   
 ///Конструктор
   window_handle (Platform::WindowMessageHandler in_message_handler, void* in_user_data)
-    : display (0)
+    : display (DisplayManagerSingleton::Instance ()->Display ())
     , window (0)
     , background_state (true)
     , message_queue (*MessageQueueSingleton::Instance ())
@@ -161,6 +442,7 @@ struct Platform::window_handle
   {
     try
     {
+      DisplayManagerSingleton::Instance ()->UnregisterWindow (window);
       message_queue.UnregisterHandler (this);
     }
     catch (...)
@@ -195,7 +477,7 @@ struct Platform::window_handle
 ///Установка состояния клавиш
   void GetKeysState (unsigned int state, WindowEventContext& context)
   {
-    context.keyboard_alt_pressed        = (state & LockMask) != 0;
+    context.keyboard_alt_pressed        = false;
     context.keyboard_control_pressed    = (state & ControlMask) != 0;
     context.keyboard_shift_pressed      = (state & ShiftMask) != 0;
     context.mouse_left_button_pressed   = (state & Button1Mask) != 0;
@@ -218,167 +500,122 @@ struct Platform::window_handle
     }
   };
   
-///Функция нити обработки событий окна
-  int EventsThreadRoutine ()
+///Обработчик события
+  void ProcessEvent (const XEvent& event)
   {
-      //получение файлового дескриптора соединения с дисплеем
-      
-    int display_connection_fd = 0;
+    xtl::intrusive_ptr<Message> message (new Message (*this), false);
     
+    WindowEventContext& context = message->context;
+    
+    GetEventContext (context);
+    
+    switch (event.type)
     {
-      Lock lock (display_mutex);
-      
-      display_connection_fd = ConnectionNumber (display);
-    }
-    
-      //настройка тайм-аута
-    
-    timeval timeout;
-    
-    timeout.tv_usec = 0;
-    timeout.tv_sec  = EVENT_WAIT_TIMEOUT_SEC;
-
-      //цикл обработки событий
-      
-    XEvent event;
-      
-    for (;;)
-    {
-        //ожидание появления события
-      
-      fd_set in_fds;
-      
-      FD_ZERO (&in_fds);
-      FD_SET  (display_connection_fd, &in_fds);
-
-      if (!select (display_connection_fd + 1, &in_fds, 0, 0, &timeout))
-        continue; //событие не пришло
-
-        //обработка поступивших событий
-        
-      Lock lock (display_mutex);
-        
-      while (XPending (display))
+      case Expose:
+        Notify (WindowEvent_OnPaint, message);
+        break;
+      case KeyPress:
       {
-        XNextEvent (display, &event);
+        GetKeysState (event.xkey.state, context);
         
-        xtl::intrusive_ptr<Message> message (new Message (*this), false);
+        context.cursor_position = Point (event.xkey.x, event.xkey.y);
+        context.key_scan_code   = (ScanCode)event.xkey.keycode;
+        context.key             = VirtualKey2SystemKey (XKeycodeToKeysym (display, event.xkey.keycode, 0));
         
-        WindowEventContext& context = message->context;
+        Notify (WindowEvent_OnKeyDown, message);
         
-        GetEventContext (context);
+        break;
+      }
+      case KeyRelease:
+      {
+        GetKeysState (event.xkey.state, context);
         
-        switch (event.type)
+        context.cursor_position = Point (event.xkey.x, event.xkey.y);
+        context.key_scan_code   = (ScanCode)event.xkey.keycode;
+        context.key             = VirtualKey2SystemKey (XKeycodeToKeysym (display, event.xkey.keycode, 0));
+        
+        Notify (WindowEvent_OnKeyUp, message);
+        
+        break;
+      }
+      case ButtonPress:
+      {
+        context.cursor_position = Point (event.xbutton.x, event.xbutton.y);            
+        
+        GetKeysState (event.xbutton.state, context);
+        
+        switch (event.xbutton.button)
         {
-          case Expose:
-            Notify (WindowEvent_OnPaint, message);
-            break;
-          case KeyPress:
-          {
-            GetKeysState (event.xkey.state, context);
-            
-            context.cursor_position = Point (event.xkey.x, event.xkey.y);
-            context.key_scan_code   = (ScanCode)event.xkey.keycode;
-            context.key             = VirtualKey2SystemKey (XKeycodeToKeysym (display, event.xkey.keycode, 0));
-            
-            Notify (WindowEvent_OnKeyDown, message);
-            
-            break;
-          }
-          case KeyRelease:
-          {
-            GetKeysState (event.xkey.state, context);
-            
-            context.cursor_position = Point (event.xkey.x, event.xkey.y);
-            context.key_scan_code   = (ScanCode)event.xkey.keycode;
-            context.key             = VirtualKey2SystemKey (XKeycodeToKeysym (display, event.xkey.keycode, 0));
-            
-            Notify (WindowEvent_OnKeyUp, message);
-            
-            break;
-          }
-          case ButtonPress:
-          {
-            context.cursor_position = Point (event.xbutton.x, event.xbutton.y);            
-            
-            GetKeysState (event.xbutton.state, context);
-            
-            switch (event.xbutton.button)
-            {
-              case Button1: Notify (WindowEvent_OnLeftButtonDown, message); break;
-              case Button2: Notify (WindowEvent_OnMiddleButtonDown, message); break;
-              case Button3: Notify (WindowEvent_OnRightButtonDown, message); break;
-              case Button4: Notify (WindowEvent_OnXButton1Down, message); break;
-              case Button5: Notify (WindowEvent_OnXButton2Down, message); break;
-              default: break;
-            }
-                        
-            break;          
-          }
-          case ButtonRelease:
-          {
-            context.cursor_position = Point (event.xbutton.x, event.xbutton.y);            
-            
-            GetKeysState (event.xbutton.state, context);
-            
-            switch (event.xbutton.button)
-            {
-              case Button1: Notify (WindowEvent_OnLeftButtonUp, message); break;
-              case Button2: Notify (WindowEvent_OnMiddleButtonUp, message); break;
-              case Button3: Notify (WindowEvent_OnRightButtonUp, message); break;
-              case Button4: Notify (WindowEvent_OnXButton1Up, message); break;
-              case Button5: Notify (WindowEvent_OnXButton2Up, message); break;
-              default: break;
-            }
+          case Button1: Notify (WindowEvent_OnLeftButtonDown, message); break;
+          case Button2: Notify (WindowEvent_OnMiddleButtonDown, message); break;
+          case Button3: Notify (WindowEvent_OnRightButtonDown, message); break;
+          case Button4: Notify (WindowEvent_OnXButton1Down, message); break;
+          case Button5: Notify (WindowEvent_OnXButton2Down, message); break;
+          default: break;
+        }
+                    
+        break;          
+      }
+      case ButtonRelease:
+      {
+        context.cursor_position = Point (event.xbutton.x, event.xbutton.y);            
+        
+        GetKeysState (event.xbutton.state, context);
+        
+        switch (event.xbutton.button)
+        {
+          case Button1: Notify (WindowEvent_OnLeftButtonUp, message); break;
+          case Button2: Notify (WindowEvent_OnMiddleButtonUp, message); break;
+          case Button3: Notify (WindowEvent_OnRightButtonUp, message); break;
+          case Button4: Notify (WindowEvent_OnXButton1Up, message); break;
+          case Button5: Notify (WindowEvent_OnXButton2Up, message); break;
+          default: break;
+        }
 
-            break;          
-          }
-          case MotionNotify:
-          {
-            context.cursor_position = Point (event.xmotion.x, event.xmotion.y);
-            
-            GetKeysState (event.xmotion.state, context);
-            
-            Notify (WindowEvent_OnMouseMove, message);
-            
-            break;
-          }
-          case EnterNotify:
+        break;          
+      }
+      case MotionNotify:
+      {
+        context.cursor_position = Point (event.xmotion.x, event.xmotion.y);
+        
+        GetKeysState (event.xmotion.state, context);
+        
+        Notify (WindowEvent_OnMouseMove, message);
+        
+        break;
+      }
+      case EnterNotify:
 //            Notify (WindowEvent_OnMouseEnter, message);
-            break;          
-          case LeaveNotify:
-            Notify (WindowEvent_OnMouseLeave, message);          
-            break;          
-          case FocusIn:
-            Notify (WindowEvent_OnSetFocus, message);
-            break;          
-          case FocusOut:
-            Notify (WindowEvent_OnLostFocus, message);
-            break;          
-          case CreateNotify:
-            Notify (WindowEvent_OnChangeHandle, message);
-            break;          
-          case DestroyNotify:
-            Notify (WindowEvent_OnDestroy, message);
-            break;          
-          case UnmapNotify:
-            Notify (WindowEvent_OnHide, message);          
-            break;          
-          case MapNotify:
-            Notify (WindowEvent_OnShow, message);          
-            break;          
-          case ReparentNotify:
-            break;          
-          case ConfigureNotify:
-            break;          
-          case ResizeRequest:
-            Notify (WindowEvent_OnSize, message);          
-            break;          
-        } 
-      }   
-    }     
-
-    return 0; 
+        break;          
+      case LeaveNotify:
+        Notify (WindowEvent_OnMouseLeave, message);          
+        break;          
+      case FocusIn:
+        Notify (WindowEvent_OnSetFocus, message);
+        break;          
+      case FocusOut:
+        Notify (WindowEvent_OnLostFocus, message);
+        break;          
+      case CreateNotify:
+        Notify (WindowEvent_OnChangeHandle, message);
+        break;          
+      case DestroyNotify:
+        Notify (WindowEvent_OnDestroy, message);
+        break;          
+      case UnmapNotify:
+        Notify (WindowEvent_OnHide, message);          
+        break;          
+      case MapNotify:
+        Notify (WindowEvent_OnShow, message);          
+        break;          
+      case ReparentNotify:
+        break;          
+      case ConfigureNotify:
+        break;          
+      case ResizeRequest:
+        Notify (WindowEvent_OnSize, message);          
+        break;          
+    }
   }
   
 ///Оповещение о возникновении события  
@@ -406,7 +643,7 @@ struct Platform::window_handle
     Создание/закрытие/уничтожение окна
 */
 
-Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, window_t parent, const char* init_string, void* user_data)
+Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
   try
   {
@@ -421,27 +658,13 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
         throw xtl::make_argument_exception ("", "style", style);
     }
     
+      //блокировка соединения с дисплеем
+      
+    DisplayLock lock (DisplayManagerSingleton::Instance ()->Display ());
+    
       //создание дескриптора окна
 
     stl::auto_ptr<window_handle> impl (new window_handle (handler, user_data));
-
-      //открытие соединения
-
-    common::PropertyMap properties = common::parse_init_string (init_string);
-
-    const char* display_name = properties.IsPresent ("display") ? properties.GetString ("display") : 0;
-
-    impl->display = XOpenDisplay (display_name);
-
-    if (!impl->display)
-      throw xtl::format_operation_exception ("", "Can't open display '%s'", XDisplayName (display_name));
-      
-      //настройка соединения
-
-    bool synchronize = properties.IsPresent ("synchronize") && properties.GetInteger ("synchronize") != 0;
-    
-    if (synchronize)
-      XSynchronize (impl->display, true);          
       
       //создание окна
 
@@ -449,25 +672,23 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
     
     XWindow parent_window = 0;
     
-    if (parent) parent_window = parent->window;
-    else        parent_window = DefaultRootWindow (impl->display);
+    if (parent_handle) parent_window = (XWindow)parent_handle;
+    else               parent_window = DefaultRootWindow (impl->display);
     
     impl->window = XCreateSimpleWindow (impl->display, parent_window, DEFAULT_WINDOW_X, DEFAULT_WINDOW_Y,
       DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, 0, blackColor, blackColor);
 
     if (!impl->window)
-      throw xtl::format_operation_exception ("", "Can't create window for display '%s'", XDisplayName (display_name));
+      throw xtl::format_operation_exception ("", "Can't create window for display '%s'", XDisplayString (impl->display));
+      
+      //регистрация окна в менеджере соединения с дисплеем
+      
+    DisplayManagerSingleton::Instance ()->RegisterWindow (impl->window, &*impl);
       
       //настройка получения событий
 
     XSelectInput (impl->display, impl->window, StructureNotifyMask | ExposureMask | ButtonPressMask | KeyPressMask | KeyReleaseMask);  
-    
-      //запуск нити обработки событий
-      
-    Lock lock (impl->display_mutex); 
-    
-    impl->events_thread = stl::auto_ptr<Thread> (new Thread (xtl::bind (&window_handle::EventsThreadRoutine, &*impl)));
-    
+        
     XFlush (impl->display);    
 
     return impl.release (); 
@@ -486,7 +707,7 @@ void Platform::CloseWindow (window_t handle)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);
+    DisplayLock lock (handle->display);
     
     XEvent e;
      
@@ -517,16 +738,11 @@ void Platform::DestroyWindow (window_t handle)
       throw xtl::make_null_argument_exception ("", "handle");
 
     {
-      Lock lock (handle->display_mutex);        
+      DisplayLock lock (handle->display);        
     
       if (!XDestroyWindow (handle->display, handle->window))
         throw xtl::format_operation_exception ("", "XDestroyWindow failed");
-      
-      if (!XCloseDisplay (handle->display))
-        throw xtl::format_operation_exception ("", "XCloseDisplay failed");
-    }
-      
-    handle->events_thread->Join ();
+    }      
     
     delete handle;
   }  
@@ -557,7 +773,7 @@ void Platform::SetWindowTitle (window_t handle, const wchar_t* title)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);      
+    DisplayLock lock (handle->display);      
     
     XStoreName (handle->display, handle->window, common::tostring (title).c_str ());
   }  
@@ -575,7 +791,7 @@ void Platform::GetWindowTitle (window_t handle, size_t buffer_size_in_chars, wch
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);      
+    DisplayLock lock (handle->display);      
     
     char* window_name = 0;
     
@@ -604,7 +820,7 @@ void Platform::SetWindowRect (window_t handle, const Rect& rect)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);      
+    DisplayLock lock (handle->display);      
     
     XWindowChanges changes;
     
@@ -632,7 +848,7 @@ void Platform::SetClientRect (window_t handle, const Rect& rect)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);    
+    DisplayLock lock (handle->display);    
     
     throw xtl::make_not_implemented_exception ("");
   }  
@@ -650,7 +866,7 @@ void Platform::GetWindowRect (window_t handle, Rect& rect)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);          
+    DisplayLock lock (handle->display);          
       
     XWindow root_return = 0;
     int x_return = 0, y_return = 0;
@@ -678,7 +894,7 @@ void Platform::GetClientRect (window_t handle, Rect& rect)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);
+    DisplayLock lock (handle->display);
     
     throw xtl::make_not_implemented_exception ("");    
   }  
@@ -700,7 +916,7 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);          
+    DisplayLock lock (handle->display);          
     
     switch (flag)
     {
@@ -739,7 +955,7 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);          
+    DisplayLock lock (handle->display);          
     
     return false;    
   }  
@@ -754,10 +970,11 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
     Установка родительского окна
 */
 
-void Platform::SetParentWindow (window_t child, window_t parent)
+void Platform::SetParentWindowHandle (window_t child, const void* parent_handle)
 {
   try
   {
+    throw xtl::make_not_implemented_exception ("");
   }  
   catch (xtl::exception& e)
   {
@@ -766,7 +983,7 @@ void Platform::SetParentWindow (window_t child, window_t parent)
   }
 }
 
-Platform::window_t Platform::GetParentWindow (window_t child)
+const void* Platform::GetParentWindowHandle (window_t child)
 {
   try
   {
@@ -781,7 +998,7 @@ Platform::window_t Platform::GetParentWindow (window_t child)
     if (!XQueryTree (child->display, child->window, &root_return, &parent_return, &children_return, &nchildren_return))
       throw xtl::format_operation_exception ("", "XQueryTree failed");
     
-//    return ????; 
+    return reinterpret_cast<const void*> (parent_return);
   }  
   catch (xtl::exception& e)
   {
@@ -844,7 +1061,7 @@ void Platform::SetCursorPosition (window_t handle, const Point& client_position)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);          
+    DisplayLock lock (handle->display);          
     
     throw xtl::make_not_implemented_exception ("");
   }  
@@ -862,7 +1079,7 @@ syslib::Point Platform::GetCursorPosition (window_t handle)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);          
+    DisplayLock lock (handle->display);          
     
     throw xtl::make_not_implemented_exception ("");
   }    
@@ -884,7 +1101,7 @@ void Platform::SetCursorVisible (window_t handle, bool state)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);          
+    DisplayLock lock (handle->display);          
     
     throw xtl::make_not_implemented_exception ("");
   }    
@@ -902,7 +1119,7 @@ bool Platform::GetCursorVisible (window_t handle)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);          
+    DisplayLock lock (handle->display);          
     
     throw xtl::make_not_implemented_exception (""); 
   }    
@@ -949,7 +1166,7 @@ void Platform::SetCursor (window_t handle, cursor_t cursor)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);    
+    DisplayLock lock (handle->display);    
     
     throw xtl::make_not_implemented_exception ("");    
   }
@@ -971,7 +1188,7 @@ void Platform::SetBackgroundColor (window_t handle, const Color& color)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    Lock lock (handle->display_mutex);
+    DisplayLock lock (handle->display);
     
     throw xtl::make_not_implemented_exception ("");
   }
@@ -1005,7 +1222,7 @@ Color Platform::GetBackgroundColor (window_t handle)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");    
       
-    Lock lock (handle->display_mutex); 
+    DisplayLock lock (handle->display); 
     
     return Color (0, 0, 0);
   }
@@ -1030,4 +1247,30 @@ bool Platform::GetBackgroundState (window_t handle)
     e.touch ("syslib::X11Platform::GetBackgroundState");
     throw;
   }
+}
+
+/*
+===================================================================================================
+    DisplayManager
+===================================================================================================
+*/
+
+void DisplayManager::SetDisplay (const char* display_string)
+{
+  DisplayManagerSingleton::Instance ()->SetDisplayString (display_string);
+}
+
+const char* DisplayManager::Display ()
+{
+  return DisplayManagerSingleton::Instance ()->DisplayString ();
+}
+
+void DisplayManager::SetSyncMode (bool state)
+{
+  DisplayManagerSingleton::Instance ()->SetSyncMode (state);
+}
+
+bool DisplayManager::IsSyncMode ()
+{
+  return DisplayManagerSingleton::Instance ()->IsSyncMode ();
 }

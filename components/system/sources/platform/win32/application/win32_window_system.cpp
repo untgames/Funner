@@ -530,7 +530,7 @@ void RegisterWindowClass ()
 
 #undef CreateWindow
 
-Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, window_t parent, const char* init_string, void* user_data)
+Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
     //определение стиля окна
 
@@ -575,7 +575,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
     try
     {
       HWND wnd = CreateWindowA (WINDOW_CLASS_NAME, "", win_style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                                (HWND)parent, 0, GetApplicationInstance (), window_impl);
+                                (HWND)parent_handle, 0, GetApplicationInstance (), window_impl);
 
       if (!wnd)
         raise_error ("::CreateWindow");
@@ -917,11 +917,11 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
     Установка родительского окна
 */
 
-void Platform::SetParentWindow (window_t child, window_t parent)
+void Platform::SetParentWindowHandle (window_t child, const void* parent_handle)
 {
   try
   {
-    if (!SetParent ((HWND)child, (HWND)parent))
+    if (!SetParent ((HWND)child, (HWND)parent_handle))
       raise_error ("::SetParent");
   }
   catch (xtl::exception& exception)
@@ -931,7 +931,7 @@ void Platform::SetParentWindow (window_t child, window_t parent)
   }
 }
 
-Platform::window_t Platform::GetParentWindow (window_t child)
+const void* Platform::GetParentWindowHandle (window_t child)
 {
   try
   {
@@ -939,7 +939,7 @@ Platform::window_t Platform::GetParentWindow (window_t child)
 
     check_errors ("::GetParent");
 
-    return (window_t)parent;
+    return parent;
   }
   catch (xtl::exception& exception)
   {

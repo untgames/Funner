@@ -29,7 +29,7 @@ struct Window::Impl
     }
     
 ///Инциализация окна
-    void Init (WindowStyle in_style, Platform::window_t parent, bool is_visible, const Rect* window_rect = 0)
+    void Init (WindowStyle in_style, const void* parent, bool is_visible, const Rect* window_rect = 0)
     {
       try
       {
@@ -116,10 +116,10 @@ struct Window::Impl
     }
     
 ///Низкоуровневый дескриптор родительского окна
-    Platform::window_t ParentHandle () const { return parent_handle; }
+    const void* ParentHandle () const { return parent_handle; }
 
 ///Установка низкоуровневого дескриптора родительского окна
-    void SetParentHandle (Platform::window_t new_parent_handle)
+    void SetParentHandle (const void* new_parent_handle)
     {
 //      bool need_window_recreate = !new_parent_handle && parent_handle || new_parent_handle && !parent_handle; //нужно пересоздавать окно
       bool need_window_recreate = false;
@@ -134,7 +134,7 @@ struct Window::Impl
       {
         parent_handle = new_parent_handle;
 
-        Platform::SetParentWindow (CheckedHandle (), parent_handle);
+        Platform::SetParentWindowHandle (CheckedHandle (), parent_handle);
       }
     }
 
@@ -355,7 +355,7 @@ struct Window::Impl
   private:
     Window*               window;                             //указатель на владельца
     Platform::window_t    handle;                             //низкоуровневый дескриптор окна
-    Platform::window_t    parent_handle;                      //низкоуровневый дескриптор родительского окна
+    const void*           parent_handle;                      //низкоуровневый дескриптор родительского окна
     WindowStyle           style;                              //стиль окна
     stl::string           init_string;                        //строка инициализации окна
     WindowSignal          signals [WindowEvent_Num];          //сигналы окна
@@ -1157,7 +1157,7 @@ void Window::SetParentHandle (const void* handle)
 {
   try
   {
-    impl->SetParentHandle ((Platform::window_t)handle);
+    impl->SetParentHandle (handle);
   }
   catch (xtl::exception& exception)
   {
@@ -1170,7 +1170,7 @@ const void* Window::ParentHandle () const
 {
   try
   {
-    return Platform::GetParentWindow (impl->CheckedHandle ());
+    return Platform::GetParentWindowHandle (impl->CheckedHandle ());
   }
   catch (xtl::exception& exception)
   {
