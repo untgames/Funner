@@ -421,7 +421,8 @@ struct Platform::window_handle: public IWindowMessageHandler
   Display*                       display;          //дисплей для данного окна
   XWindow                        window;           //дескриптор окна
   bool                           background_state; //ложное свойство - состояние фона
-  Rect                           window_rect;      //область окна
+  Rect                           window_rect;      //область окна ???????????
+  bool                           window_rect_init; //инициализирована ли область окна
   MessageQueue&                  message_queue;    //очередь событий
   Platform::WindowMessageHandler message_handler;  //функция обработки сообщений окна
   void*                          user_data;        //пользовательские данные для функции обратного вызова
@@ -431,6 +432,7 @@ struct Platform::window_handle: public IWindowMessageHandler
     : display (DisplayManagerSingleton::Instance ()->Display ())
     , window (0)
     , background_state (true)
+    , window_rect_init (false)
     , message_queue (*MessageQueueSingleton::Instance ())
     , message_handler (in_message_handler)
     , user_data (in_user_data)
@@ -692,13 +694,13 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       throw xtl::format_operation_exception ("", "Can't create window for display '%s'", XDisplayString (impl->display));
       
       //регистрация окна в менеджере соединения с дисплеем
-      
+
     DisplayManagerSingleton::Instance ()->RegisterWindow (impl->window, &*impl);
-      
+
       //настройка получения событий
 
     XSelectInput (impl->display, impl->window, StructureNotifyMask | ExposureMask | ButtonPressMask | KeyPressMask | KeyReleaseMask);  
-        
+
     XFlush (impl->display);    
 
     return impl.release (); 
