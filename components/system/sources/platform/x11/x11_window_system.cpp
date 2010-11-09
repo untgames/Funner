@@ -421,6 +421,7 @@ struct Platform::window_handle: public IWindowMessageHandler
   Display*                       display;          //дисплей для данного окна
   XWindow                        window;           //дескриптор окна
   bool                           background_state; //ложное свойство - состояние фона
+  Rect                           window_rect;      //область окна
   MessageQueue&                  message_queue;    //очередь событий
   Platform::WindowMessageHandler message_handler;  //функция обработки сообщений окна
   void*                          user_data;        //пользовательские данные для функции обратного вызова
@@ -606,12 +607,21 @@ struct Platform::window_handle: public IWindowMessageHandler
         Notify (WindowEvent_OnHide, message);          
         break;          
       case MapNotify:
-        Notify (WindowEvent_OnShow, message);          
+        Notify (WindowEvent_OnShow, message);
         break;          
       case ReparentNotify:
         break;          
       case ConfigureNotify:
+      {
+        window_rect.left   = (size_t)event.xconfigure.x;
+        window_rect.top    = (size_t)event.xconfigure.y;
+        window_rect.right  = (size_t)event.xconfigure.x + event.xconfigure.width;
+        window_rect.bottom = (size_t)event.xconfigure.y + event.xconfigure.height;
+        
+        Notify (WindowEvent_OnSize, message);        
+        
         break;          
+      }
       case ResizeRequest:
         Notify (WindowEvent_OnSize, message);          
         break;          
@@ -833,6 +843,8 @@ void Platform::SetWindowRect (window_t handle, const Rect& rect)
     
     if (!XConfigureWindow (handle->display, handle->window, CWX | CWY | CWWidth | CWHeight, &changes))
       throw xtl::format_operation_exception ("", "XConfigureWindow failed");
+      
+    handle->window_rect = rect;
   }  
   catch (xtl::exception& e)
   {
@@ -879,6 +891,8 @@ void Platform::GetWindowRect (window_t handle, Rect& rect)
     rect.top    = (size_t)y_return;
     rect.right  = rect.left + width_return;
     rect.bottom = rect.top + height_return;
+    
+    handle->window_rect = rect;
   }  
   catch (xtl::exception& e)
   {
