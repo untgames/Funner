@@ -1310,28 +1310,42 @@ Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x,
     
     DisplayLock lock (cursor->display);
     
-    media::Image image (file_name, media::PixelFormat_RGBA8), mask_image (image, media::PixelFormat_L8);
+    media::Image image (file_name, media::PixelFormat_RGBA8);
+    xtl::uninitialized_storage<unsigned char> mask_bitmap (image.Width () * image.Height () / 8 + 1);
     
-//    image.Convert (media::PixelFormat_RGB8);
-    image.Convert (media::PixelFormat_L8);
-      
-    Pixmap pixmap = XCreatePixmapFromBitmapData (cursor->display, DefaultRootWindow (cursor->display), (char*)image.Bitmap (0), image.Width (), image.Height (), 0, 0, get_bits_per_pixel (image.Format ()));
+    unsigned char*       dst    = mask_bitmap.data ();
+    const unsigned char* src    = (const unsigned char*)image.Bitmap ();    
+    size_t               offset = 0;
     
-    if (pixmap == None)
-      throw xtl::format_operation_exception ("", "XCreatePixmapFromBitmapData failed");
-      
-    Pixmap mask_pixmap = XCreatePixmapFromBitmapData (cursor->display, DefaultRootWindow (cursor->display), (char*)mask_image.Bitmap (0), mask_image.Width (), mask_image.Height (), 0, 0, get_bits_per_pixel (mask_image.Format ()));
+    for (size_t i=0, height=image.Height (); i<height; i++)
+    {
+      for (size_t j=0, width=image.Width (); j<width; j++, src+=4, offset++)
+      {
+        if (offset == 8)
+        {
+          *++dst = 0;          
+          offset = 0;
+        }
+        
+        if (src [3] > 128) *dst = *dst | (1 << offset);
+      }
+    }
     
-    printf ("%d %d\n", get_bits_per_pixel (image.Format ()), get_bits_per_pixel (mask_image.Format ()));
+    Pixmap mask_pixmap = XCreateBitmapFromData (cursor->display, DefaultRootWindow (cursor->display), (char*)mask_bitmap.data (), image.Width (), image.Height ());
     
     if (mask_pixmap == None)
       throw xtl::format_operation_exception ("", "XCreatePixmapFromBitmapData failed");
 
-    XColor dummy;
-
-    cursor->cursor = XCreatePixmapCursor (cursor->display, pixmap, mask_pixmap, &dummy, &dummy, 0, 0);//hotspot_x == -1 ? 0 : hotspot_x, hotspot_y == -1 ? hotspot_y : 0);
+    XColor color;
+        
+    memset (&color, 0, sizeof (XColor));
     
-    XFreePixmap (cursor->display, pixmap);
+    color.red   = 65535;
+    color.green = 65535;
+    color.blue  = 65535;
+
+    cursor->cursor = XCreatePixmapCursor (cursor->display, mask_pixmap, mask_pixmap, &color, &color, 0, 0);//hotspot_x == -1 ? 0 : hotspot_x, hotspot_y == -1 ? hotspot_y : 0);
+    
     XFreePixmap (cursor->display, mask_pixmap);
     
     if (!cursor->cursor)
@@ -1376,11 +1390,13 @@ void Platform::SetCursor (window_t handle, cursor_t cursor)
       
     DisplayLock lock (handle->display);    
     
-    handle->active_cursor = cursor;    
+    handle->active_cursor = cursor; 
+    
+    Cursor cursor = handle->is_cursor_visible ? handle->active_cursor ? handle->active_cursor->cursor : (Cursor)0 : handle->invisible_cursor;    
       
-    if (cursor->cursor)
+    if (cursor)
     {
-      if (!XDefineCursor (handle->display, handle->window, cursor->cursor))
+      if (!XDefineCursor (handle->display, handle->window, cursor))
         throw xtl::format_operation_exception ("", "XDefineCursor failed");
     }
     else
