@@ -19,7 +19,6 @@ int main ()
     window.RegisterEventHandler (WindowEvent_OnClose, &destroy);
 
     window.Maximize ();
-    window.Minimize ();
 
     Application::Run ();
 
