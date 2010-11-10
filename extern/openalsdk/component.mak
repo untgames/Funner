@@ -10,6 +10,8 @@ EXTERN.OPENALLIB.INCLUDE_DIRS         := include sources
 EXTERN.OPENALLIB.SOURCE_DIRS          := sources/openal32 sources/alc
 EXTERN.OPENALLIB.LIB_DIRS             :=
 EXTERN.OPENALLIB.LIBS                 := 
+EXTERN.OPENALLIB.linux.COMPILER_DEFINES := _GNU_SOURCE=1
+EXTERN.OPENALLIB.linux.COMPILER_FLAGS := -pthread
 
 #Öåëü ¹2 - OPENAL_TESTS
 EXTERN.OPENAL_TESTS.TYPE         := test-suite
