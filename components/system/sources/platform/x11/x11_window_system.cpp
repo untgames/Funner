@@ -935,37 +935,22 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 
         if (!XGetWindowAttributes (handle->display, DefaultRootWindow (handle->display), &xwa))
           throw xtl::format_operation_exception ("", "XGetWindowAttributes failed");
-          
-        if (!XMoveResizeWindow (handle->display, handle->window, 0, 0, xwa.width, xwa.height))
-          throw xtl::format_operation_exception ("", "XMoveResizeWindow failed");
-          
-          //дополнительный код для _NET_WM
-          
-        XEvent xev;
-        
-        Atom wm_state   = XInternAtom (handle->display, "_NET_WM_STATE", False);
-        Atom fullscreen = XInternAtom (handle->display, "_NET_WM_STATE_FULLSCREEN", False);
 
-        memset (&xev, 0, sizeof (xev));
-        
-        xev.type                 = ClientMessage;
-        xev.xclient.window       = handle->window;
-        xev.xclient.message_type = wm_state;
-        xev.xclient.format       = 32;
-        xev.xclient.data.l [0]   = 1;
-        xev.xclient.data.l [1]   = fullscreen;
-        xev.xclient.data.l [2]   = 0;
-        
-        if (!XSendEvent (handle->display, DefaultRootWindow (handle->display), False, SubstructureNotifyMask, &xev))
-          throw xtl::format_operation_exception ("", "XSendEvent failed");
-          
+        if (!XMoveResizeWindow (handle->display, handle->window, 0, 0, xwa.width, xwa.height))
+          throw xtl::format_operation_exception ("", "XMoveResizeWindow failed");          
+
         if (!XMapWindow (handle->display, handle->window))
           throw xtl::format_operation_exception ("", "XMapWindow failed");
 
         break;
       }
-      case WindowFlag_Minimized:            
+      case WindowFlag_Minimized:
+      {
+        if (!XMoveResizeWindow (handle->display, handle->window, 0, 0, 0, 0))
+          throw xtl::format_operation_exception ("", "XMoveResizeWindow failed");                  
+        
         break;
+      }
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
     }    
