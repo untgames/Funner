@@ -29,6 +29,8 @@
 #include <common/strlib.h>
 #include <common/utf_converter.h>
 
+#include <media/image.h>
+
 #include <syslib/condition.h>
 #include <syslib/mutex.h>
 #include <syslib/thread.h>

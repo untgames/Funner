@@ -413,19 +413,37 @@ typedef common::Singleton<DisplayManagerImpl> DisplayManagerSingleton;
 */
 
 /*
+    Описание реализации курсора
+*/
+
+struct Platform::cursor_handle
+{
+  Display* display; //ссылка на соединение с дисплеем
+  Cursor   cursor;  //ссылка на X11 курсор
+
+  cursor_handle (Display* in_display)
+    : display (in_display)
+    , cursor (0)
+  { }
+};
+
+/*
     Описание реализации окна
 */
 
 struct Platform::window_handle: public IWindowMessageHandler
 {
-  Display*                       display;          //дисплей для данного окна
-  XWindow                        window;           //дескриптор окна
-  bool                           background_state; //ложное свойство - состояние фона
-  Rect                           window_rect;      //область окна
-  bool                           window_rect_init; //инициализирована ли область окна
-  MessageQueue&                  message_queue;    //очередь событий
-  Platform::WindowMessageHandler message_handler;  //функция обработки сообщений окна
-  void*                          user_data;        //пользовательские данные для функции обратного вызова
+  Display*                       display;           //дисплей для данного окна
+  XWindow                        window;            //дескриптор окна
+  bool                           background_state;  //ложное свойство - состояние фона
+  Rect                           window_rect;       //область окна
+  bool                           window_rect_init;  //инициализирована ли область окна
+  Cursor                         invisible_cursor;  //невидимый курсор
+  bool                           is_cursor_visible; //видим ли курсор
+  cursor_t                       active_cursor;     //активный курсор окна
+  MessageQueue&                  message_queue;     //очередь событий
+  Platform::WindowMessageHandler message_handler;   //функция обработки сообщений окна
+  void*                          user_data;         //пользовательские данные для функции обратного вызова
   
 ///Конструктор
   window_handle (Platform::WindowMessageHandler in_message_handler, void* in_user_data)
@@ -433,6 +451,9 @@ struct Platform::window_handle: public IWindowMessageHandler
     , window (0)
     , background_state (true)
     , window_rect_init (false)
+    , invisible_cursor (0)
+    , is_cursor_visible (true)
+    , active_cursor (0)
     , message_queue (*MessageQueueSingleton::Instance ())
     , message_handler (in_message_handler)
     , user_data (in_user_data)
@@ -687,16 +708,46 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
     if (!impl->window)
       throw xtl::format_operation_exception ("", "Can't create window for display '%s'", XDisplayString (impl->display));
       
-      //регистрация окна в менеджере соединения с дисплеем
+    try
+    {      
+        //создание невидимого курсора
+        
+      char data [1] = {0};
 
-    DisplayManagerSingleton::Instance ()->RegisterWindow (impl->window, &*impl);
+      Pixmap blank = XCreateBitmapFromData (impl->display, impl->window, data, 1, 1);
+      
+      if (blank == None)
+        throw xtl::format_operation_exception ("", "XCreateBitmapFromData failed");
+        
+      XColor dummy;        
+        
+      impl->invisible_cursor = XCreatePixmapCursor (impl->display, blank, blank, &dummy, &dummy, 0, 0);
+      
+      XFreePixmap (impl->display, blank);              
+      
+      if (!impl->invisible_cursor)
+        throw xtl::format_operation_exception ("", "XCreatePixmapCursor failed");
+      
+        //регистрация окна в менеджере соединения с дисплеем
 
-      //настройка получения событий
+      DisplayManagerSingleton::Instance ()->RegisterWindow (impl->window, &*impl);
+      
+        //настройка получения событий
 
-    XSelectInput (impl->display, impl->window, StructureNotifyMask | ExposureMask | ButtonPressMask | KeyPressMask | KeyReleaseMask);  
+      XSelectInput (impl->display, impl->window, StructureNotifyMask | ExposureMask | ButtonPressMask | KeyPressMask | KeyReleaseMask);  
 
-    XFlush (impl->display);    
+      XFlush (impl->display);    
+    }
+    catch (...)
+    {
+      if (impl->invisible_cursor)
+        XFreeCursor (impl->display, impl->invisible_cursor);
 
+      XDestroyWindow (impl->display, impl->window);
+
+      throw;
+    }
+    
     return impl.release (); 
   }  
   catch (xtl::exception& e)
@@ -745,6 +796,9 @@ void Platform::DestroyWindow (window_t handle)
 
     {
       DisplayLock lock (handle->display);        
+      
+      if (!XFreeCursor (handle->display, handle->invisible_cursor))
+        throw xtl::format_operation_exception ("", "XFreeCursor failed");
     
       if (!XDestroyWindow (handle->display, handle->window))
         throw xtl::format_operation_exception ("", "XDestroyWindow failed");
@@ -924,9 +978,14 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
         break;
       }
       case WindowFlag_Active: //активность окна
-        break;
+        break; //TODO
       case WindowFlag_Focus: //фокус ввода
+      {
+        if (!XSetInputFocus (handle->display, handle->window, RevertToNone, CurrentTime))
+          throw xtl::format_operation_exception ("", "XSetInputFocus failed");
+
         break;
+      }
       case WindowFlag_Maximized:
       {
         XWindowAttributes xwa;
@@ -971,7 +1030,44 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
       
     DisplayLock lock (handle->display);          
     
-    return false;    
+    switch (flag)
+    {
+      case WindowFlag_Visible: //видимость окна
+      {
+        XWindowAttributes window_attributes_return;
+
+        if (!XGetWindowAttributes (handle->display, handle->window, &window_attributes_return))
+          throw xtl::format_operation_exception ("", "XGetWindowAttributes failed");
+          
+        return window_attributes_return.map_state == IsViewable;
+      }
+      case WindowFlag_Active: //активность окна
+        return false; //TODO
+//        break;
+      case WindowFlag_Focus: //фокус ввода
+      {
+        XWindow focused_window = 0;
+        int revert_to_return = 0;
+        
+        if (!XGetInputFocus (handle->display, &focused_window, &revert_to_return))
+          throw xtl::format_operation_exception ("", "XGetInputFocus failed");
+          
+        return focused_window == handle->window;
+      }
+      case WindowFlag_Maximized:
+      {
+        return false; //TODO
+        
+//        break;
+      }
+      case WindowFlag_Minimized:
+      {
+        return false; //TODO
+//        break;
+      }
+      default:
+        throw xtl::make_argument_exception ("", "flag", flag);
+    }
   }  
   catch (xtl::exception& e)
   {
@@ -1160,7 +1256,21 @@ void Platform::SetCursorVisible (window_t handle, bool state)
       
     DisplayLock lock (handle->display);          
     
-    throw xtl::make_not_implemented_exception ("");
+    if (handle->is_cursor_visible == state)
+      return;                
+      
+    Cursor cursor = state ? handle->active_cursor ? handle->active_cursor->cursor : (Cursor)0 : handle->invisible_cursor;
+      
+    if (cursor)
+    {
+      if (!XDefineCursor (handle->display, handle->window, cursor))
+        throw xtl::format_operation_exception ("", "XDefineCursor failed");
+    }
+    else
+    {
+      if (!XUndefineCursor (handle->display, handle->window))
+        throw xtl::format_operation_exception ("", "XUndefineCursor failed");
+    }
   }    
   catch (xtl::exception& e)
   {
@@ -1176,9 +1286,7 @@ bool Platform::GetCursorVisible (window_t handle)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
       
-    DisplayLock lock (handle->display);          
-    
-    throw xtl::make_not_implemented_exception (""); 
+    return handle->is_cursor_visible;
   }    
   catch (xtl::exception& e)
   {
@@ -1195,7 +1303,30 @@ Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x,
 {
   try
   {    
-    throw xtl::make_not_implemented_exception ("");    
+    if (!file_name)
+      throw xtl::make_null_argument_exception ("", "file_name");
+      
+    stl::auto_ptr<cursor_handle> cursor (new cursor_handle (DisplayManagerSingleton::Instance ()->Display ()));
+    
+    DisplayLock lock (cursor->display);
+    
+    media::Image image (file_name, media::PixelFormat_RGB8);
+      
+    Pixmap pixmap = XCreatePixmapFromBitmapData (cursor->display, DefaultRootWindow (cursor->display), (char*)image.Bitmap (0), image.Width (), image.Height (), 0, 0, get_bytes_per_pixel (image.Format ()));
+    
+    if (pixmap == None)
+      throw xtl::format_operation_exception ("", "XCreatePixmapFromBitmapData failed");
+
+    XColor dummy;
+
+    cursor->cursor = XCreatePixmapCursor (cursor->display, pixmap, pixmap, &dummy, &dummy, 0, 0);
+    
+    XFreePixmap (cursor->display, pixmap);
+    
+    if (!cursor->cursor)
+      throw xtl::format_operation_exception ("", "XCreatePixmapCursor failed");
+
+    return cursor.release ();
   }
   catch (xtl::exception& exception)
   {
@@ -1207,7 +1338,16 @@ Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x,
 void Platform::DestroyCursor (cursor_t cursor)
 {
   try
-  {    
+  {
+    if (!cursor)
+      throw xtl::make_null_argument_exception ("", "cursor");
+      
+    DisplayLock lock (cursor->display);
+      
+    if (!XFreeCursor (cursor->display, cursor->cursor))
+      throw xtl::format_operation_exception ("", "XFreeCursor failed");
+      
+    delete cursor;
   }
   catch (xtl::exception& exception)
   {
@@ -1221,11 +1361,22 @@ void Platform::SetCursor (window_t handle, cursor_t cursor)
   try
   {
     if (!handle)
-      throw xtl::make_null_argument_exception ("", "handle");
+      throw xtl::make_null_argument_exception ("", "handle");      
       
     DisplayLock lock (handle->display);    
     
-    throw xtl::make_not_implemented_exception ("");    
+    handle->active_cursor = cursor;    
+      
+    if (cursor->cursor)
+    {
+      if (!XDefineCursor (handle->display, handle->window, cursor->cursor))
+        throw xtl::format_operation_exception ("", "XDefineCursor failed");
+    }
+    else
+    {
+      if (!XUndefineCursor (handle->display, handle->window))
+        throw xtl::format_operation_exception ("", "XUndefineCursor failed");
+    }
   }
   catch (xtl::exception& e)
   {
