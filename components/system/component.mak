@@ -30,3 +30,4 @@ SYSTEMLIB.SOURCES.beagleboard.IMPORTS               := compile.extern.beagleboar
 SYSTEMLIB.TESTS.TYPE             := test-suite
 SYSTEMLIB.TESTS.SOURCE_DIRS      := tests/wrappers tests/thread
 SYSTEMLIB.TESTS.IMPORTS          := compile.system link.system #link.common.zip_file_system
+SYSTEMLIB.TESTS.x11.IMPORTS      := link.media.image.ani_cursor_loader
