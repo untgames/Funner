@@ -938,6 +938,9 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
           
         if (!XMoveResizeWindow (handle->display, handle->window, 0, 0, xwa.width, xwa.height))
           throw xtl::format_operation_exception ("", "XMoveResizeWindow failed");
+          
+        if (!XMapWindow (handle->display, handle->window))
+          throw xtl::format_operation_exception ("", "XMapWindow failed");
 
         break;
       }
@@ -1239,7 +1242,7 @@ void Platform::SetBackgroundColor (window_t handle, const Color& color)
       
     DisplayLock lock (handle->display);
     
-    throw xtl::make_not_implemented_exception ("");
+//    throw xtl::make_not_implemented_exception ("");
   }
   catch (xtl::exception& e)
   {
