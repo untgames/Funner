@@ -27,6 +27,7 @@
 #include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
+#include <common/time.h>
 #include <common/utf_converter.h>
 
 #include <media/image.h>

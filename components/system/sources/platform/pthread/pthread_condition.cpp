@@ -67,14 +67,40 @@ void Platform::WaitCondition (condition_t handle, mutex_t mutex_handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadsPlatform::WaitCondition(condition_t)");
+    exception.touch ("syslib::PThreadsPlatform::WaitCondition(condition_t,mutex_t)");
     throw;
   }
 }
 
-void Platform::WaitCondition (condition_t, mutex_t, size_t wait_in_milliseconds)
+void Platform::WaitCondition (condition_t handle, mutex_t mutex_handle, size_t wait_in_milliseconds)
 {
-  throw xtl::make_not_implemented_exception ("syslib::PThreadsPlatform::WaitCondition(condition_t,size_t)");
+  try
+  {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "condition");
+
+    if (!mutex_handle)
+      throw xtl::make_null_argument_exception ("", "mutex");
+      
+    timespec end_time;
+    
+    clock_gettime (CLOCK_REALTIME, &end_time);
+    
+    unsigned long long nsec = (wait_in_milliseconds % 1000) * 1000000 + end_time.tv_nsec;
+    
+    end_time.tv_nsec += nsec % 1000000000;
+    end_time.tv_sec  += wait_in_milliseconds / 1000 + nsec / 1000000000;
+      
+    int status = pthread_cond_timedwait (&handle->condition, &mutex_handle->mutex, &end_time);
+
+    if (status)
+      pthread_raise_error ("::pthread_cond_timedwait", status);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::PThreadsPlatform::WaitCondition(condition_t,mutex_t,size_t)");
+    throw;
+  }
 }
 
 void Platform::NotifyCondition (condition_t handle, bool broadcast)

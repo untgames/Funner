@@ -165,7 +165,7 @@ class Platform
 ///Создание / уничтожение таймера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     struct timer_handle;
-    typedef const timer_handle* timer_t;
+    typedef timer_handle* timer_t;
     typedef void (*TimerHandler)(void* user_data);
 
     static timer_t CreateTimer (size_t period_in_milliseconds, TimerHandler, void* user_data);
