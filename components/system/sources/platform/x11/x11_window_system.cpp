@@ -994,8 +994,8 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
           throw xtl::format_operation_exception ("", "XGetWindowAttributes failed");
 
         if (!XMoveResizeWindow (handle->display, handle->window, 0, 0, xwa.width, xwa.height))
-          throw xtl::format_operation_exception ("", "XMoveResizeWindow failed");          
-
+          throw xtl::format_operation_exception ("", "XMoveResizeWindow failed");
+          
         if (!XMapWindow (handle->display, handle->window))
           throw xtl::format_operation_exception ("", "XMapWindow failed");
 
