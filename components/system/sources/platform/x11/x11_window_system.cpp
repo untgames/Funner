@@ -1427,6 +1427,8 @@ void Platform::SetBackgroundColor (window_t handle, const Color& color)
     
     XColor color;
     
+    memset (&color, 0, sizeof (XColor));
+    
     if (!XParseColor (handle->display, DefaultColormap (handle->display, DefaultScreen (handle->display)), common::format ("rgb:%02x/%02x/%02x", color.red, color.green, color.blue).c_str (), &color))
       throw xtl::format_operation_exception ("", "XParseColor failed");
 
