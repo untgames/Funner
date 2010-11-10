@@ -1310,18 +1310,29 @@ Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x,
     
     DisplayLock lock (cursor->display);
     
-    media::Image image (file_name, media::PixelFormat_RGB8);
+    media::Image image (file_name, media::PixelFormat_RGBA8), mask_image (image, media::PixelFormat_L8);
+    
+//    image.Convert (media::PixelFormat_RGB8);
+    image.Convert (media::PixelFormat_L8);
       
-    Pixmap pixmap = XCreatePixmapFromBitmapData (cursor->display, DefaultRootWindow (cursor->display), (char*)image.Bitmap (0), image.Width (), image.Height (), 0, 0, get_bytes_per_pixel (image.Format ()));
+    Pixmap pixmap = XCreatePixmapFromBitmapData (cursor->display, DefaultRootWindow (cursor->display), (char*)image.Bitmap (0), image.Width (), image.Height (), 0, 0, get_bits_per_pixel (image.Format ()));
     
     if (pixmap == None)
+      throw xtl::format_operation_exception ("", "XCreatePixmapFromBitmapData failed");
+      
+    Pixmap mask_pixmap = XCreatePixmapFromBitmapData (cursor->display, DefaultRootWindow (cursor->display), (char*)mask_image.Bitmap (0), mask_image.Width (), mask_image.Height (), 0, 0, get_bits_per_pixel (mask_image.Format ()));
+    
+    printf ("%d %d\n", get_bits_per_pixel (image.Format ()), get_bits_per_pixel (mask_image.Format ()));
+    
+    if (mask_pixmap == None)
       throw xtl::format_operation_exception ("", "XCreatePixmapFromBitmapData failed");
 
     XColor dummy;
 
-    cursor->cursor = XCreatePixmapCursor (cursor->display, pixmap, pixmap, &dummy, &dummy, 0, 0);
+    cursor->cursor = XCreatePixmapCursor (cursor->display, pixmap, mask_pixmap, &dummy, &dummy, 0, 0);//hotspot_x == -1 ? 0 : hotspot_x, hotspot_y == -1 ? hotspot_y : 0);
     
     XFreePixmap (cursor->display, pixmap);
+    XFreePixmap (cursor->display, mask_pixmap);
     
     if (!cursor->cursor)
       throw xtl::format_operation_exception ("", "XCreatePixmapCursor failed");
