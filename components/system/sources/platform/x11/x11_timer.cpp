@@ -4,6 +4,13 @@
 
 using namespace syslib;
 
+namespace
+{
+
+
+
+}
+
 /*
     Создание / уничтожение таймера
 */
