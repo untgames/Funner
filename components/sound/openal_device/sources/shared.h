@@ -2,8 +2,8 @@
 #define SOUND_SYSTEM_OPENAL_DEVICE_SHARED_HEADER
 
 #include <stdarg.h>
-#include <al.h>
-#include <alc.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 //#include <efx.h>
 
 #include <stl/string>
