@@ -655,9 +655,13 @@ struct Platform::window_handle: public IWindowMessageHandler
 ///Оповещение о возникновении события  
   void Notify (WindowEvent event, const xtl::intrusive_ptr<Message>& message)
   {
+    XUnlockDisplay (display);
+    
     message->event = event;
     
     message_queue.PushMessage (this, message);
+    
+    XLockDisplay (display);
   }
 
   void NotifyCore (WindowEvent event, const WindowEventContext& context)
