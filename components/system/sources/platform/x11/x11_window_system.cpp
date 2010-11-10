@@ -1522,7 +1522,7 @@ size_t Platform::GetKeyName (ScanCode scan_code, size_t buffer_size, char* buffe
   char* name = XKeysymToString (XKeycodeToKeysym (display, scan_code, 0));  
 
   if (!name)
-    name = "Unknown";
+    return 0;
 
   strncpy (buffer, name, buffer_size);
 
