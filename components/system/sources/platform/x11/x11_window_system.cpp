@@ -344,18 +344,12 @@ class DisplayManagerImpl
         FD_ZERO (&in_fds);
         FD_SET  (display_connection_fd, &in_fds);
         
-        printf ("select event\n");
-
         if (!select (display_connection_fd + 1, &in_fds, 0, 0, &timeout))                
           continue; //событие не пришло
           
-        printf ("event selected\n");          
-
           //обработка поступивших событий
           
         DisplayLock lock (display);
-        
-        printf ("display locked %d\n", XPending (display));          
           
         while (XPending (display))
         {
@@ -660,7 +654,7 @@ struct Platform::window_handle: public IWindowMessageHandler
     message->event = event;
     
     message_queue.PushMessage (this, message);
-    
+
     XLockDisplay (display);
   }
 
