@@ -1519,10 +1519,8 @@ size_t Platform::GetKeyName (ScanCode scan_code, size_t buffer_size, char* buffe
   
   DisplayLock lock (display);
     
-  char* name = XKeysymToString (XKeycodeToKeysym (display, scan_code, 0));
-  
-  printf ("test!!! %d\n", XKeycodeToKeysym (display, scan_code, 0));
-  
+  char* name = XKeysymToString (XKeycodeToKeysym (display, scan_code, 0));  
+
   if (!name)
     name = "Unknown";
 
