@@ -541,12 +541,12 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
     case WindowStyle_Overlapped:
       win_style = WS_OVERLAPPEDWINDOW;
 
-      if (parent)
+      if (parent_handle)
         win_style |= WS_CHILD | WS_CLIPSIBLINGS;
 
       break;
     case WindowStyle_PopUp:
-      win_style = parent ? WS_CHILD  | WS_CLIPSIBLINGS : WS_POPUP;
+      win_style = parent_handle ? WS_CHILD  | WS_CLIPSIBLINGS : WS_POPUP;
       break;
     default:
       throw xtl::make_argument_exception ("", "style", style);

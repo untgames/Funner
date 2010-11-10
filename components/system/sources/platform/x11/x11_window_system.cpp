@@ -421,7 +421,7 @@ struct Platform::window_handle: public IWindowMessageHandler
   Display*                       display;          //дисплей для данного окна
   XWindow                        window;           //дескриптор окна
   bool                           background_state; //ложное свойство - состояние фона
-  Rect                           window_rect;      //область окна ???????????
+  Rect                           window_rect;      //область окна
   bool                           window_rect_init; //инициализирована ли область окна
   MessageQueue&                  message_queue;    //очередь событий
   Platform::WindowMessageHandler message_handler;  //функция обработки сообщений окна
@@ -615,18 +615,28 @@ struct Platform::window_handle: public IWindowMessageHandler
         break;          
       case ConfigureNotify:
       {
+        bool is_moved   = window_rect.left != (size_t)event.xconfigure.x || window_rect.top != (size_t)event.xconfigure.y,
+             is_resized = window_rect.right - window_rect.left != (size_t)event.xconfigure.width || window_rect.bottom - window_rect.top != (size_t)event.xconfigure.height;
+        
         window_rect.left   = (size_t)event.xconfigure.x;
         window_rect.top    = (size_t)event.xconfigure.y;
         window_rect.right  = (size_t)event.xconfigure.x + event.xconfigure.width;
         window_rect.bottom = (size_t)event.xconfigure.y + event.xconfigure.height;
         
-        Notify (WindowEvent_OnSize, message);        
+        if (window_rect_init)
+        {
+          if (is_moved)   Notify (WindowEvent_OnMove, message);
+          if (is_resized) Notify (WindowEvent_OnSize, message);
+        }
+        else
+        {        
+          window_rect_init = true;
+        }
         
         break;          
       }
-      case ResizeRequest:
-        Notify (WindowEvent_OnSize, message);          
-        break;          
+      default:
+        break;
     }
   }
   
@@ -845,8 +855,6 @@ void Platform::SetWindowRect (window_t handle, const Rect& rect)
     
     if (!XConfigureWindow (handle->display, handle->window, CWX | CWY | CWWidth | CWHeight, &changes))
       throw xtl::format_operation_exception ("", "XConfigureWindow failed");
-      
-    handle->window_rect = rect;
   }  
   catch (xtl::exception& e)
   {
@@ -893,8 +901,6 @@ void Platform::GetWindowRect (window_t handle, Rect& rect)
     rect.top    = (size_t)y_return;
     rect.right  = rect.left + width_return;
     rect.bottom = rect.top + height_return;
-    
-    handle->window_rect = rect;
   }  
   catch (xtl::exception& e)
   {
@@ -990,7 +996,22 @@ void Platform::SetParentWindowHandle (window_t child, const void* parent_handle)
 {
   try
   {
-    throw xtl::make_not_implemented_exception ("");
+    if (!child)
+      throw xtl::make_null_argument_exception ("", "child");
+    
+    DisplayLock lock (child->display);
+    
+    XWindow parent = parent_handle ? (XWindow)parent_handle : DefaultRootWindow (child->display);
+    
+    XWindow root_return = 0;
+    int x_return = 0, y_return = 0;
+    unsigned int width_return = 0, height_return = 0, border_width_return = 0, depth_return = 0;
+    
+    if (!XGetGeometry (child->display, child->window, &root_return, &x_return, &y_return, &width_return, &height_return, &border_width_return, &depth_return))
+      throw xtl::format_operation_exception ("", "XGetGeometry failed");    
+    
+    if (!XReparentWindow (child->display, child->window, parent, x_return, y_return))
+      throw xtl::format_operation_exception ("", "XReparentWindow failed");
   }  
   catch (xtl::exception& e)
   {
@@ -1003,10 +1024,10 @@ const void* Platform::GetParentWindowHandle (window_t child)
 {
   try
   {
-    throw xtl::make_not_implemented_exception ("");
-    
     if (!child)
       throw xtl::make_null_argument_exception ("", "child");
+      
+    DisplayLock lock (child->display);
       
     XWindow root_return = 0, parent_return = 0, *children_return = 0;
     unsigned int nchildren_return = 0;
@@ -1031,7 +1052,11 @@ void Platform::InvalidateWindow (window_t handle)
 {
   try
   {    
-    //????
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "handle");
+   
+    if (!XClearArea (handle->display, handle->window, 0, 0, 0, 0, True))
+      throw xtl::format_operation_exception ("", "XClearArea failed");
   }  
   catch (xtl::exception& e)
   {
@@ -1048,8 +1073,13 @@ void Platform::SetCursorPosition (const Point& position)
 {
   try
   {
-    throw xtl::make_not_implemented_exception ("");
-  }  
+    Display* display = DisplayManagerSingleton::Instance ()->Display ();
+    
+    DisplayLock lock (display);
+    
+    if (!XWarpPointer (display, None, XDefaultRootWindow (display), 0, 0, 0, 0, position.x, position.y))
+      throw xtl::format_operation_exception ("", "XWarpPointer failed");
+  }
   catch (xtl::exception& e)
   {
     e.touch ("syslib::X11Platform::SetCursorPosition(const Point&)");
@@ -1061,7 +1091,18 @@ syslib::Point Platform::GetCursorPosition ()
 {
   try
   {
-    throw xtl::make_not_implemented_exception ("");
+    Display* display = DisplayManagerSingleton::Instance ()->Display ();
+    
+    DisplayLock lock (display);    
+    
+    XWindow ret_root, ret_child;
+    int root_x, root_y, win_x, win_y;
+    unsigned int mask;
+
+    if (!XQueryPointer (display, DefaultRootWindow (display), &ret_root, &ret_child, &root_x, &root_y, &win_x, &win_y, &mask))
+      throw xtl::format_operation_exception ("", "XQueryPointer failed");
+      
+    return Point (root_x, root_y);    
   }  
   catch (xtl::exception& e)
   {
@@ -1079,7 +1120,8 @@ void Platform::SetCursorPosition (window_t handle, const Point& client_position)
       
     DisplayLock lock (handle->display);          
     
-    throw xtl::make_not_implemented_exception ("");
+    if (!XWarpPointer (handle->display, None, handle->window, 0, 0, 0, 0, client_position.x, client_position.y))
+      throw xtl::format_operation_exception ("", "XWarpPointer failed");
   }  
   catch (xtl::exception& e)
   {
@@ -1097,7 +1139,14 @@ syslib::Point Platform::GetCursorPosition (window_t handle)
       
     DisplayLock lock (handle->display);          
     
-    throw xtl::make_not_implemented_exception ("");
+    XWindow ret_root, ret_child;
+    int root_x, root_y, win_x, win_y;
+    unsigned int mask;
+
+    if (!XQueryPointer (handle->display, handle->window, &ret_root, &ret_child, &root_x, &root_y, &win_x, &win_y, &mask))
+      throw xtl::format_operation_exception ("", "XQueryPointer failed");
+      
+    return Point (root_x, root_y);
   }    
   catch (xtl::exception& e)
   {

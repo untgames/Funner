@@ -122,12 +122,20 @@ void print (const char* message)
   fflush (stdout);  
 }
 
+void log_print (const char* stream, const char* message)
+{
+  printf ("%s: %s\n", stream, message);
+  fflush (stdout);
+}
+
 int main ()
 {
   printf ("Results of window1_test:\n");
 
   try
   {
+    common::LogFilter log_filter ("*", &log_print);
+    
     Window window (WindowStyle_Overlapped, 400, 300);
 
     window.SetTitle ("Test window");
