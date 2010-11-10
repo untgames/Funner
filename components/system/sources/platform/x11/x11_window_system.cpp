@@ -919,9 +919,7 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
       case WindowFlag_Visible: //видимость окна
       {
         if (!XMapWindow (handle->display, handle->window))
-          throw xtl::format_operation_exception ("", "XMapWindow failed");
-          
-        XFlush (handle->display);
+          throw xtl::format_operation_exception ("", "XMapWindow failed");          
 
         break;
       }
@@ -946,14 +944,16 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
       }
       case WindowFlag_Minimized:
       {
-        if (!XMoveResizeWindow (handle->display, handle->window, 0, 0, 0, 0))
-          throw xtl::format_operation_exception ("", "XMoveResizeWindow failed");                  
+        if (!XUnmapWindow (handle->display, handle->window))
+          throw xtl::format_operation_exception ("", "XUnmapWindow failed");        
         
         break;
       }
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
-    }    
+    }
+    
+    XFlush (handle->display);    
   }  
   catch (xtl::exception& e)
   {
