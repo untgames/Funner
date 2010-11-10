@@ -1425,23 +1425,22 @@ void Platform::SetBackgroundColor (window_t handle, const Color& color)
       
     DisplayLock lock (handle->display);
     
-    XColor color;
+    XColor exact_color, screen_color;
     
-    memset (&color, 0, sizeof (XColor));
+    memset (&exact_color, 0, sizeof (XColor));
+    memset (&screen_color, 0, sizeof (XColor));    
     
-    if (!XParseColor (handle->display, DefaultColormap (handle->display, DefaultScreen (handle->display)), common::format ("rgb:%02x/%02x/%02x", color.red, color.green, color.blue).c_str (), &color))
-      throw xtl::format_operation_exception ("", "XParseColor failed");
+    if (!XAllocNamedColor (handle->display, DefaultColormap (handle->display, DefaultScreen (handle->display)), common::format ("rgb:%02x/%02x/%02x", color.red, color.green, color.blue).c_str (), &screen_color, &exact_color))
+      throw xtl::format_operation_exception ("", "XAllocNamedColor failed");
 
     XSetWindowAttributes attr;
 
-    attr.background_pixel = color.pixel;
+    attr.background_pixel = screen_color.pixel;
     
     if (!XChangeWindowAttributes (handle->display, handle->window, CWBackPixel, &attr))
       throw xtl::format_operation_exception ("", "XChangeWindowAttributes failed");
       
-    handle->background_color.red   = color.red;
-    handle->background_color.green = color.green; 
-    handle->background_color.blue  = color.blue;
+    handle->background_color = color;
   }
   catch (xtl::exception& e)
   {
