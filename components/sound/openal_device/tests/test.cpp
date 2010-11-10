@@ -168,8 +168,6 @@ int main ()
 //    sound_system->Play (0, true);
     sound_system->Play (1, true);
     
-    printf ("!!! %f\n", SOURCE_UPDATE_TIME / 1000.0f);
-
     Action timer1 = ActionQueue::PushAction (bind (&TimerHandler, get_pointer (sound_system)), ActionThread_Current, 0, SOURCE_UPDATE_TIME / 1000.0f),
            timer2 = ActionQueue::PushAction (bind (&Application::Exit, 0), ActionThread_Current, TEST_WORK_TIME / 1000.0f);
 
