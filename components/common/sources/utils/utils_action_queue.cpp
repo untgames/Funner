@@ -138,7 +138,7 @@ class ThreadActionQueue: public xtl::reference_counter
     {
       for (ActionList::iterator iter=actions.begin (); iter!=actions.end ();)
       {
-        ActionLock action (actions.front ().get ());
+        ActionLock action (iter->get ());
         
         if (action->is_canceled || action->is_completed)
         {
@@ -154,16 +154,19 @@ class ThreadActionQueue: public xtl::reference_counter
 
           continue;
         }
-        
+
         if (action->next_time > action->timer.Time ())
         {
           ++iter;
           continue;
-        }
+        }                
 
         if (action->is_periodic)
         {
+          actions.splice (actions.end (), actions, iter);          
+          
           action->next_time += action->period;
+
           return action.get ();
         }
           

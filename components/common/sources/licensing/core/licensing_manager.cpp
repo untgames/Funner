@@ -271,7 +271,11 @@ class LicenseManagerImpl
       tm_date.tm_mon  = atoi (date_string + 5) - 1;
       tm_date.tm_year = atoi (date_string) - 1900;
 
+#ifdef _MSC_VER
+      time_t date = _mkgmtime32 (&tm_date);
+#else
       time_t date = timegm (&tm_date);
+#endif
 
       if (date == -1)
         throw xtl::format_operation_exception (METHOD_NAME, "Can't convert date string '%s'", date_string);
