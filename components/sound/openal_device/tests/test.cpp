@@ -8,10 +8,10 @@
 #include <xtl/connection.h>
 #include <xtl/common_exceptions.h>
 
+#include <common/action_queue.h>
 #include <common/log.h>
 
 #include <syslib/application.h>
-#include <syslib/timer.h>
 
 #include <sound/device.h>
 #include <sound/driver.h>
@@ -19,6 +19,7 @@
 #include <media/sound.h>
 
 using namespace math;
+using namespace common;
 using namespace syslib;
 using namespace sound::low_level;
 using namespace sound;
@@ -93,7 +94,7 @@ void dump (Source& source)
   printf ("\n");
 }
 
-void TimerHandler (IDevice* sound_system, Timer&)
+void TimerHandler (IDevice* sound_system)
 {
   source.position = vec3f (sin (degree (source_angle)), 0, cos (degree (source_angle)));
   source_angle++;
@@ -166,9 +167,11 @@ int main ()
     sound_system->Seek (1, 40.f, SeekMode_Clamp);
 //    sound_system->Play (0, true);
     sound_system->Play (1, true);
+    
+    printf ("!!! %f\n", SOURCE_UPDATE_TIME / 1000.0f);
 
-    Timer timer1 (bind (&TimerHandler, get_pointer (sound_system), _1), SOURCE_UPDATE_TIME),
-          timer2 (bind (&Application::Exit, 0), TEST_WORK_TIME);
+    Action timer1 = ActionQueue::PushAction (bind (&TimerHandler, get_pointer (sound_system)), ActionThread_Current, 0, SOURCE_UPDATE_TIME / 1000.0f),
+           timer2 = ActionQueue::PushAction (bind (&Application::Exit, 0), ActionThread_Current, TEST_WORK_TIME / 1000.0f);
 
 //    xtl::auto_connection c = Application::RegisterEventHandler (ApplicationEvent_OnIdle, &idle);
 
