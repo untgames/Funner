@@ -18,8 +18,7 @@ int main ()
            
     window2.SetCursor ("aero_busy.ani");
 
-//    window1.HideCursor ();
-    window1.SetCursorVisible (true);
+    window1.HideCursor ();
     window1.Show ();    
     window2.Show ();
     
