@@ -1521,8 +1521,10 @@ size_t Platform::GetKeyName (ScanCode scan_code, size_t buffer_size, char* buffe
     
   char* name = XKeysymToString (XKeycodeToKeysym (display, scan_code, 0));
   
+  printf ("test!!! %d\n", XKeycodeToKeysym (display, scan_code, 0));
+  
   if (!name)
-    throw xtl::format_operation_exception (METHOD_NAME, "XKeysymToString failed");
+    name = "Unknown";
 
   strncpy (buffer, name, buffer_size);
 
