@@ -441,6 +441,7 @@ struct Platform::window_handle: public IWindowMessageHandler
   Cursor                         invisible_cursor;  //невидимый курсор
   bool                           is_cursor_visible; //видим ли курсор
   cursor_t                       active_cursor;     //активный курсор окна
+  syslib::Color                  background_color;  //цвет заднего фона
   MessageQueue&                  message_queue;     //очередь событий
   Platform::WindowMessageHandler message_handler;   //функция обработки сообщений окна
   void*                          user_data;         //пользовательские данные для функции обратного вызова
@@ -1392,8 +1393,7 @@ void Platform::SetCursor (window_t handle, cursor_t cursor)
     
     handle->active_cursor = cursor; 
     
-    Cursor cursor = handle->is_cursor_visible ? handle->active_cursor ? handle->active_cursor->cursor : (Cursor)0 : handle->invisible_cursor;    
-      
+    Cursor cursor = handle->is_cursor_visible ? handle->active_cursor ? handle->active_cursor->cursor : (Cursor)0 : handle->invisible_cursor;      
     if (cursor)
     {
       if (!XDefineCursor (handle->display, handle->window, cursor))
@@ -1425,7 +1425,21 @@ void Platform::SetBackgroundColor (window_t handle, const Color& color)
       
     DisplayLock lock (handle->display);
     
-//    throw xtl::make_not_implemented_exception ("");
+    XColor color;
+    
+    if (!XParseColor (handle->display, DefaultColormap (handle->display, DefaultScreen (handle->display)), common::format ("rgb:%02x/%02x/%02x", color.red, color.green, color.blue).c_str (), &color))
+      throw xtl::format_operation_exception ("", "XParseColor failed");
+
+    XSetWindowAttributes attr;
+
+    attr.background_pixel = color.pixel;
+    
+    if (!XChangeWindowAttributes (handle->display, handle->window, CWBackPixel, &attr))
+      throw xtl::format_operation_exception ("", "XChangeWindowAttributes failed");
+      
+    handle->background_color.red   = color.red;
+    handle->background_color.green = color.green; 
+    handle->background_color.blue  = color.blue;
   }
   catch (xtl::exception& e)
   {
@@ -1457,9 +1471,7 @@ Color Platform::GetBackgroundColor (window_t handle)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");    
       
-    DisplayLock lock (handle->display); 
-    
-    return Color (0, 0, 0);
+    return handle->background_color;
   }
   catch (xtl::exception& e)
   {
