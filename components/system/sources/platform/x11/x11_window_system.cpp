@@ -459,22 +459,6 @@ struct Platform::window_handle: public IWindowMessageHandler
     memset (&context, 0, sizeof (context));
 
     context.handle = this;
-
-/*    GetClientRect (wnd, &client_rect);
-   
-    POINT cursor_position;
-
-    GetCursorPos (&cursor_position);
-    ScreenToClient (wnd, &cursor_position);
-
-    if (cursor_position.x < client_rect.left)   cursor_position.x = client_rect.left;
-    if (cursor_position.y < client_rect.top)    cursor_position.y = client_rect.top;
-    if (cursor_position.x > client_rect.right)  cursor_position.x = client_rect.right;
-    if (cursor_position.y > client_rect.bottom) cursor_position.y = client_rect.bottom;
-
-    context.cursor_position.x = cursor_position.x;
-    context.cursor_position.y = cursor_position.y;
-*/
   }
   
 ///Установка состояния клавиш
@@ -867,12 +851,7 @@ void Platform::SetClientRect (window_t handle, const Rect& rect)
 {
   try
   {
-    if (!handle)
-      throw xtl::make_null_argument_exception ("", "handle");
-      
-    DisplayLock lock (handle->display);    
-    
-    throw xtl::make_not_implemented_exception ("");
+    SetWindowRect (handle, rect);
   }  
   catch (xtl::exception& e)
   {
@@ -913,12 +892,7 @@ void Platform::GetClientRect (window_t handle, Rect& rect)
 {
   try
   {
-    if (!handle)
-      throw xtl::make_null_argument_exception ("", "handle");
-      
-    DisplayLock lock (handle->display);
-    
-    throw xtl::make_not_implemented_exception ("");    
+    GetWindowRect (handle, rect);
   }  
   catch (xtl::exception& e)
   {
@@ -956,7 +930,17 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
       case WindowFlag_Focus: //фокус ввода
         break;
       case WindowFlag_Maximized:
+      {
+        XWindowAttributes xwa;
+
+        if (!XGetWindowAttributes (handle->display, DefaultRootWindow (handle->display), &xwa))
+          throw xtl::format_operation_exception ("", "XGetWindowAttributes failed");
+          
+        if (!XMoveResizeWindow (handle->display, handle->window, 0, 0, xwa.width, xwa.height))
+          throw xtl::format_operation_exception ("", "XMoveResizeWindow failed");
+
         break;
+      }
       case WindowFlag_Minimized:            
         break;
       default:
