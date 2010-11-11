@@ -60,7 +60,7 @@ void Platform::WaitCondition (condition_t handle, mutex_t mutex_handle)
     if (!mutex_handle)
       throw xtl::make_null_argument_exception ("", "mutex");
       
-    int status = pthread_cond_wait (&handle->condition, &mutex_handle->mutex);
+    int status = pthread_cond_wait (&handle->condition, &mutex_handle->mutex);    
 
     if (status)
       pthread_raise_error ("::pthread_cond_wait", status);
@@ -72,7 +72,7 @@ void Platform::WaitCondition (condition_t handle, mutex_t mutex_handle)
   }
 }
 
-void Platform::WaitCondition (condition_t handle, mutex_t mutex_handle, size_t wait_in_milliseconds)
+bool Platform::WaitCondition (condition_t handle, mutex_t mutex_handle, size_t wait_in_milliseconds)
 {
   try
   {
@@ -94,10 +94,12 @@ void Platform::WaitCondition (condition_t handle, mutex_t mutex_handle, size_t w
     int status = pthread_cond_timedwait (&handle->condition, &mutex_handle->mutex, &end_time);
     
     if (status == ETIMEDOUT)
-      return; //???????????????
+      return false;
 
     if (status)
       pthread_raise_error ("::pthread_cond_timedwait", status);
+      
+    return true;
   }
   catch (xtl::exception& exception)
   {

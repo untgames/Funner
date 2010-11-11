@@ -27,6 +27,7 @@ class Mutex
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool TryLock ();
     void Lock    ();
+    bool TryLock (size_t wait_in_milliseconds);
     void Lock    (size_t wait_in_milliseconds);
     void Unlock  ();
 

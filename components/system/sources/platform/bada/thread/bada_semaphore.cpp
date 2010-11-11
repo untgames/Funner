@@ -48,7 +48,7 @@ void Platform::WaitSemaphore (semaphore_t handle)
 }
 
 //ожидание следующей задачи с таймаутом
-void Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
+bool Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
   try
   {
@@ -59,6 +59,8 @@ void Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 
     if (IsFailed (r))
       raise ("Osp::Base::Runtime::Semaphore::Acquire", r);
+      
+    return true;
   }
   catch (xtl::exception& exception)
   {

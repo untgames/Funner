@@ -22,9 +22,10 @@ void Platform::WaitSemaphore (semaphore_t handle)
 }
 
 //ожидание следующей задачи с таймаутом
-void Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
+bool Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
   raise ("syslib::DefaultPlatform::WaitSemaphore");
+  return false;
 }
 
 //попытка ожидани¤ следующей задачи

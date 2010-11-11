@@ -45,7 +45,7 @@ void Platform::LockMutex (mutex_t handle)
 }
 
 //захват исключающего семафора с указанием максимального времени ожидания
-void Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
+bool Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
 {
   try
   {
@@ -56,6 +56,8 @@ void Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
 
     if (IsFailed (r))
       raise ("Osp::Base::Runtime::Mutex::Acquire", r);
+      
+    return true;
   }
   catch (xtl::exception& exception)
   {

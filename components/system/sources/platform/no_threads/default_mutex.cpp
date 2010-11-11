@@ -22,9 +22,10 @@ void Platform::LockMutex (mutex_t handle)
 }
 
 //захват исключающего семафора с указанием максимального времени ожидани¤
-void Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
+bool Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
 {
   raise ("syslib::DefaultPlatform::LockMutex");
+  return false;
 }
 
 //попытка захвата исключающего семафора

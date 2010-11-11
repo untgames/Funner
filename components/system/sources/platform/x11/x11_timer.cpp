@@ -255,7 +255,7 @@ class TimerManager
             
           wait_time = size_t (wait_time * WAIT_DELAY_FACTOR);
           
-          condition.Wait (mutex, wait_time);
+          condition.TryWait (mutex, wait_time);
         }
         
           //вызов обработчиков таймеров

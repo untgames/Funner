@@ -37,15 +37,20 @@ void check_multiprocessing_services_error (OSStatus error_code, const char* sour
                                            get_multiprocessing_services_error_name (error_code), error_code);
 }
 
-void wait_semaphore (Platform::semaphore_t handle, Duration duration)
+bool wait_semaphore (Platform::semaphore_t handle, Duration duration, bool waitable = false)
 {
   if (!handle)
     throw xtl::make_null_argument_exception ("", "handle");
 
   OSStatus status = MPWaitOnSemaphore (handle->semaphore, duration);
+  
+  if (status == kMPTimeoutErr)
+    return false;
 
   if (status != kMPDeletedErr && status != kMPTimeoutErr)
     check_multiprocessing_services_error (status, "::MPWaitOnSemaphore", "Wait semaphore failed");
+    
+  return true;
 }
 
 }
@@ -95,11 +100,11 @@ void Platform::WaitSemaphore (semaphore_t handle)
 }
 
 //ожидание следующей задачи с таймаутом
-void Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
+bool Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
   try
   {
-    wait_semaphore (handle, kDurationMillisecond * wait_in_milliseconds);
+    return wait_semaphore (handle, kDurationMillisecond * wait_in_milliseconds, true);
   }
   catch (xtl::exception& exception)
   {

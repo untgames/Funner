@@ -9,6 +9,8 @@
 
 #include <syslib/application.h>
 
+#include <syslib/application.h>
+
 using namespace common;
 
 template <int I> void action_handler (Action& action)

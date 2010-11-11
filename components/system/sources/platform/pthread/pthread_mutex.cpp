@@ -78,7 +78,7 @@ void Platform::LockMutex (mutex_t handle)
 }
 
 //захват исключающего семафора с указанием максимального времени ожидания
-void Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
+bool Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
 {
   throw xtl::make_not_implemented_exception ("syslib::PThreadsPlatform::LockMutex(mutex_t, size_t)");
 }

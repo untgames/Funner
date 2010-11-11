@@ -63,7 +63,7 @@ bool Mutex::TryLock ()
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Mutex::TryLock");
+    exception.touch ("syslib::Mutex::TryLock()");
     throw;
   }
 }
@@ -85,11 +85,25 @@ void Mutex::Lock (size_t wait_in_milliseconds)
 {
   try
   {
-    Platform::LockMutex (impl->handle, wait_in_milliseconds);
+    if (!Platform::LockMutex (impl->handle, wait_in_milliseconds))
+      throw xtl::format_operation_exception ("", "Mutex lock timeout");
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("syslib::Mutex::Lock(size_t)");
+    throw;
+  }
+}
+
+bool Mutex::TryLock (size_t wait_in_milliseconds)
+{
+  try
+  {
+    return Platform::LockMutex (impl->handle, wait_in_milliseconds);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Mutex::TryLock(size_t)");
     throw;
   }
 }
