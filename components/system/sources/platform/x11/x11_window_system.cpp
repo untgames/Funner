@@ -918,7 +918,14 @@ void Platform::SetClientRect (window_t handle, const Rect& rect)
 {
   try
   {
-    SetWindowRect (handle, rect);
+    Rect window_rect;
+    
+    GetWindowRect (handle, window_rect);
+    
+    window_rect.right  = window_rect.left + rect.right - rect.left;
+    window_rect.bottom = window_rect.top + rect.bottom - rect.top;
+    
+    SetWindowRect (handle, window_rect);
   }  
   catch (xtl::exception& e)
   {
@@ -958,8 +965,13 @@ void Platform::GetWindowRect (window_t handle, Rect& rect)
 void Platform::GetClientRect (window_t handle, Rect& rect)
 {
   try
-  {
+  {        
     GetWindowRect (handle, rect);
+    
+    rect.right  -= rect.left;
+    rect.bottom -= rect.top;
+    rect.left    = 0;
+    rect.top     = 0;
   }  
   catch (xtl::exception& e)
   {
