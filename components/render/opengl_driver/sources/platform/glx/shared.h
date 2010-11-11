@@ -1,5 +1,5 @@
-#ifndef RENDER_GL_DRIVER_EGL_SHARED_HEADER
-#define RENDER_GL_DRIVER_EGL_SHARED_HEADER
+#ifndef RENDER_GL_DRIVER_GLX_SHARED_HEADER
+#define RENDER_GL_DRIVER_GLX_SHARED_HEADER
 
 #include <stl/algorithm>
 #include <stl/auto_ptr.h>
@@ -11,61 +11,15 @@
 
 #include <common/singleton.h>
 
-#ifdef BEAGLEBOARD
-  #include <X11/Xlib.h>
-
-  #include <syslib/platform/x11.h>
-#endif
+#include <syslib/platform/x11.h>
 
 #include <shared/log.h>
 #include <shared/object.h>
 #include <shared/platform.h>
 #include <shared/property_list.h>
 
-#ifdef BADA
-  #include <stl/string>
-  #include <common/utf_converter.h>
-#endif
-
-#ifdef BADA
-  #include <FUiControl.h>
-
-  namespace Osp { namespace Graphics { namespace Opengl {
-
-  #include <egl.h>
-  
-  }}}
-  
-  using Osp::Graphics::Opengl::NativeWindowType;
-  using Osp::Graphics::Opengl::NativeDisplayType;
-  using Osp::Graphics::Opengl::EGLNativeDisplayType;
-  using Osp::Graphics::Opengl::EGLint;
-  using Osp::Graphics::Opengl::EGLConfig;
-  using Osp::Graphics::Opengl::EGLDisplay;
-  using Osp::Graphics::Opengl::EGLSurface;
-  using Osp::Graphics::Opengl::EGLContext;
-  using Osp::Graphics::Opengl::eglInitialize;
-  using Osp::Graphics::Opengl::eglTerminate;
-  using Osp::Graphics::Opengl::eglGetDisplay;
-  using Osp::Graphics::Opengl::eglCreateWindowSurface;
-  using Osp::Graphics::Opengl::eglDestroySurface;
-  using Osp::Graphics::Opengl::eglChooseConfig;
-  using Osp::Graphics::Opengl::eglGetConfigAttrib;
-  using Osp::Graphics::Opengl::eglQuerySurface;
-  using Osp::Graphics::Opengl::eglQueryString;
-  using Osp::Graphics::Opengl::eglSwapBuffers;
-  using Osp::Graphics::Opengl::eglCreateContext;
-  using Osp::Graphics::Opengl::eglDestroyContext;
-  using Osp::Graphics::Opengl::eglMakeCurrent;
-  using Osp::Graphics::Opengl::eglSwapInterval;
-  using Osp::Graphics::Opengl::eglGetProcAddress;
-  using Osp::Graphics::Opengl::eglGetError;
-    
-#else
-  #include <EGL/egl.h>
-#endif
-
-#include <GLES/gl.h>
+#include <GL/gl.h>
+#include <GL/glx.h>
 
 namespace render
 {
@@ -76,7 +30,7 @@ namespace low_level
 namespace opengl
 {
 
-namespace egl
+namespace glx
 {
 
 //forward declarations
@@ -122,9 +76,8 @@ class Output: virtual public IOutput, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение параметров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    EGLDisplay        GetEglDisplay   ();
-    NativeDisplayType GetDisplay      ();
-    const void*       GetWindowHandle ();
+    Display GetEglDisplay ();
+    Window  GetWindow     ();
 
   private:
     Output (const Output&); //no impl
@@ -144,7 +97,7 @@ class Library: public ILibrary, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Library  ();
+    Library ();
     ~Library ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -258,10 +211,9 @@ class PrimarySwapChain: virtual public ISwapChain, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение EGL параметров цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    EGLDisplay        GetEglDisplay ();
-    EGLConfig         GetEglConfig  ();
-    EGLSurface        GetEglSurface ();
-    NativeDisplayType GetDisplay    ();
+//    EGLDisplay GetEglDisplay ();
+//    EGLConfig  GetEglConfig  ();
+//    EGLSurface GetEglSurface ();
 
   private:
     struct Impl;
@@ -315,49 +267,6 @@ class Context: virtual public IContext, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void check_errors (const char* source);
 void raise_error  (const char* source);
-
-#ifdef BEAGLEBOARD
-
-using syslib::x11::DisplayManager;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Блокировка соединения X11
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class DisplayLock
-{
-  public:
-    DisplayLock () : display ((Display*)DisplayManager::DisplayHandle ())
-    {
-      XLockDisplay (display);    
-    }
-  
-    DisplayLock (NativeDisplayType in_display) : display ((Display*)in_display)
-    {
-      XLockDisplay (display);
-    }
-
-    ~DisplayLock ()
-    {
-      XUnlockDisplay (display);
-    }
-
-  private:
-    Display* display;
-};
-
-#else
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Блокировка соединения
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class DisplayLock
-{
-  public:
-    DisplayLock () {}
-    DisplayLock (NativeDisplayType) {}
-};
-
-#endif
 
 }
 

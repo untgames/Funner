@@ -6,6 +6,8 @@ export.link.render.low_level.opengl_driver.win32.LIBS        := gdi32
 export.link.render.low_level.opengl_driver.macosx.LINK_FLAGS := -framework IOKit -framework AGL
 export.link.render.low_level.opengl_driver.iphone.LINK_FLAGS := -framework OpenGLES
 export.link.render.low_level.opengl_driver.bada.LIBS         := FGraphicsEgl FGraphicsOpengl
+export.link.render.low_level.opengl_driver.beagleboard.IMPORTS := link.extern.beagleboard
+export.link.render.low_level.opengl_driver.beagleboard.LIBS  := EGL GLES_CM srv_um IMGegl
 
 #Run exports (don't remove - used for common imports at run target)
 export.run.render.low_level.opengl_driver.IMPORTS :=

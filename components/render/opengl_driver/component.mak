@@ -33,7 +33,9 @@ RENDER.OPENGL_DRIVER.SOURCES.IMPORTS                := compile.render.low_level 
 RENDER.OPENGL_DRIVER.SOURCES.msvc.COMPILER_CFLAGS   := -wd4355
 RENDER.OPENGL_DRIVER.SOURCES.gles.COMPILER_DEFINES  := OPENGL_ES_SUPPORT
 RENDER.OPENGL_DRIVER.SOURCES.iphone.SOURCE_DIRS     := sources/platform/iphone
+RENDER.OPENGL_DRIVER.SOURCES.beagleboard.IMPORTS    := compile.extern.beagleboard
 RENDER.OPENGL_DRIVER.SOURCES.egl.SOURCE_DIRS        := sources/platform/egl
+RENDER.OPENGL_DRIVER.SOURCES.glx.SOURCE_DIRS        := sources/platform/glx
 
 ifeq (,$(filter gles,$(PROFILES)))
 
