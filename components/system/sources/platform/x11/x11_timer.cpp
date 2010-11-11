@@ -63,6 +63,16 @@ class TimerManager
         
         throw xtl::format_operation_exception ("syslib::TimerManager::TimerManager", "TimerManager can't be constructed more than one time");
       }
+      
+      try
+      {        
+        message_queue.RegisterHandler (this);
+      }
+      catch (...)
+      {
+        CloseTimersThread ();
+        throw;
+      }
     }
     
 ///Деструктор
@@ -73,6 +83,8 @@ class TimerManager
         CloseTimersThread ();
         
         UnregisterAllTimers ();
+        
+        message_queue.UnregisterHandler (this);
       }
       catch (...)
       {
@@ -90,19 +102,9 @@ class TimerManager
         {
           Lock lock (mutex);
 
-          timer = new Platform::timer_handle (period_in_milliseconds, handler, user_data); 
+          timer = new Platform::timer_handle (period_in_milliseconds, handler, user_data);           
           
-          message_queue.RegisterHandler (timer.get ());
-          
-          try
-          {
-            timers.push_back (timer.get ());
-          }
-          catch (...)
-          {
-            message_queue.UnregisterHandler (timer.get ());
-            throw;
-          }
+          timers.push_back (timer.get ());
         }
         
         condition.NotifyOne ();
@@ -130,9 +132,7 @@ class TimerManager
         {
           timer->need_delete = true;
           return;
-        }
-        
-        message_queue.UnregisterHandler (timer);
+        }        
         
         timers.erase (stl::remove (timers.begin (), timers.end (), timer), timers.end ());
       }
@@ -170,18 +170,35 @@ class TimerManager
 ///Сообщение таймера
     struct Message: public MessageQueue::Message
     {
+      TimerManager&     manager;
       Platform::timer_t timer;
       
-      Message (Platform::timer_t in_timer) : timer (in_timer) {}
+      Message (TimerManager& in_manager, Platform::timer_t in_timer)
+        : manager (in_manager)
+        , timer (in_timer) {}
       
       void Dispatch ()
       {
-        if (timer->need_delete)
-          return;
-        
-        timer->handler (timer->user_data);
+        manager.DispatchTimer (timer);
       }
-    };    
+    };
+    
+///Диспетчеризация вызова таймера
+    void DispatchTimer (Platform::timer_t timer)
+    {
+      Lock lock (mutex);
+      
+      for (TimerList::iterator iter=timers.begin (), end=timers.end (); iter!=end; ++iter)
+        if ((*iter) == timer)
+        {
+          if (timer->need_delete)
+            return;
+            
+          timer->handler (timer->user_data);
+          
+          return;
+        }
+    }
   
 ///Нить обработки таймеров
     int TimersRoutine ()
@@ -212,11 +229,14 @@ class TimerManager
               delay = wait_time;
           }
           
-          if (raised)
+          if (raised || !loop)
             break;
-          
-          if (loop)
-            condition.Wait (mutex, wait_time);
+            
+          static const float WAIT_DELAY_FACTOR = 0.9f;
+            
+          wait_time = size_t (wait_time * WAIT_DELAY_FACTOR);
+
+          condition.Wait (mutex, wait_time);
         }
         
           //вызов обработчиков таймеров
@@ -234,7 +254,7 @@ class TimerManager
             
           try
           {
-            message_queue.PushMessage (&timer, xtl::intrusive_ptr<Message> (new Message (&timer), false));
+            message_queue.PushMessage (this, xtl::intrusive_ptr<Message> (new Message (*this, &timer), false));
           }
           catch (std::exception& e)
           {
