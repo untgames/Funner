@@ -52,7 +52,7 @@ bool Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "mutex");
       
-    int status = WaitForSingleObject (handle->mutex, wait_in_milliseconds)
+    int status = WaitForSingleObject (handle->mutex, wait_in_milliseconds);
     
     if (status == WAIT_TIMEOUT)
       return false;
