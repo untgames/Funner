@@ -36,19 +36,21 @@ ENGINE.FUNNER_LIBRARY_LIPO.LIBS     := funner
 ENGINE.FUNNER_LIBRARY_LIPO.PROFILES := iphone-device-armv6 iphone-device-armv7 iphone-simulator
 
 #Цель - application
-ENGINE.LAUNCHER.SOURCES.TYPE                   := application
-ENGINE.LAUNCHER.SOURCES.NAME                   := launcher
-ENGINE.LAUNCHER.SOURCES.INCLUDE_DIRS           := include
-ENGINE.LAUNCHER.SOURCES.EXECUTION_DIR          := sources
-ENGINE.LAUNCHER.SOURCES.macosx.LINK_FLAGS      := -framework Foundation -framework AppKit
-ENGINE.LAUNCHER.SOURCES.iphone.LINK_FLAGS      := -framework OpenAL -framework UIKit -framework Foundation \
-                                                  -framework OpenGLES -framework MediaPlayer -framework AVFoundation \
-                                                  -framework AudioToolbox -framework QuartzCore -framework CoreGraphics
-ENGINE.LAUNCHER.SOURCES.msvc.LINK_FLAGS        := -subsystem:windows -entry:mainCRTStartup
-ENGINE.LAUNCHER.SOURCES.win32.SOURCE_DIRS      := sources/platform/win32
-ENGINE.LAUNCHER.SOURCES.macosx.SOURCE_DIRS     := sources/platform/macosx
-ENGINE.LAUNCHER.SOURCES.iphone.SOURCE_DIRS     := sources/platform/iphone
-ENGINE.LAUNCHER.SOURCES.iphone.LIBS            := funner
+ENGINE.LAUNCHER.SOURCES.TYPE                    := application
+ENGINE.LAUNCHER.SOURCES.NAME                    := launcher
+ENGINE.LAUNCHER.SOURCES.INCLUDE_DIRS            := include
+ENGINE.LAUNCHER.SOURCES.EXECUTION_DIR           := sources
+ENGINE.LAUNCHER.SOURCES.macosx.LINK_FLAGS       := -framework Foundation -framework AppKit
+ENGINE.LAUNCHER.SOURCES.iphone.LINK_FLAGS       := -framework OpenAL -framework UIKit -framework Foundation \
+                                                   -framework OpenGLES -framework MediaPlayer -framework AVFoundation \
+                                                   -framework AudioToolbox -framework QuartzCore -framework CoreGraphics
+ENGINE.LAUNCHER.SOURCES.msvc.LINK_FLAGS         := -subsystem:windows -entry:mainCRTStartup
+ENGINE.LAUNCHER.SOURCES.win32.SOURCE_DIRS       := sources/platform/win32
+ENGINE.LAUNCHER.SOURCES.macosx.SOURCE_DIRS      := sources/platform/macosx
+ENGINE.LAUNCHER.SOURCES.iphone.SOURCE_DIRS      := sources/platform/iphone
+ENGINE.LAUNCHER.SOURCES.iphone.LIBS             := funner
+ENGINE.LAUNCHER.SOURCES.linux.SOURCE_DIRS       := sources/platform/linux
+ENGINE.LAUNCHER.SOURCES.linux.LIBS              := dl
 
 #Цель - console application
 ENGINE.CLAUNCHER.SOURCES.TYPE                := application
