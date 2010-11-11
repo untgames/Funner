@@ -640,6 +640,11 @@ const void* Platform::GetNativeWindowHandle (window_t handle)
   return reinterpret_cast<const void*> (handle);
 }
 
+const void* Platform::GetNativeDisplayHandle (window_t)
+{
+  return 0;
+}
+
 /*
     Заголовок окна
 */

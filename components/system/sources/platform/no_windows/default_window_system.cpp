@@ -46,6 +46,11 @@ const void* Platform::GetNativeWindowHandle (window_t)
   raise ("syslib::DefaultPlatform::GetNativeWindowHandle");
 }
 
+const void* Platform::GetNativeDisplayHandle (window_t)
+{
+  raise ("syslib::DefaultPlatform::GetNativeDisplayHandle");
+}
+
 /*
     Заголовок окна
 */

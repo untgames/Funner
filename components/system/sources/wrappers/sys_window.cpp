@@ -523,6 +523,19 @@ const void* Window::Handle () const
   }
 }
 
+const void* Window::DisplayHandle () const
+{
+  try
+  {
+    return Platform::GetNativeDisplayHandle (impl->Handle ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Window::DisplayHandle");
+    throw;
+  }
+}
+
 /*
     Стиль окна
 */

@@ -827,6 +827,14 @@ const void* Platform::GetNativeWindowHandle (window_t handle)
   return reinterpret_cast<const void*> (handle->window);
 }
 
+const void* Platform::GetNativeDisplayHandle (window_t handle)
+{
+  if (!handle)
+    throw xtl::make_null_argument_exception ("syslib::X11Platform::GetNativeDisplayHandle", "handle");
+    
+  return handle->display;
+}
+
 /*
     Заголовок окна
 */
@@ -1558,4 +1566,9 @@ void DisplayManager::SetSyncMode (bool state)
 bool DisplayManager::IsSyncMode ()
 {
   return DisplayManagerSingleton::Instance ()->IsSyncMode ();
+}
+
+const void* DisplayManager::DisplayHandle ()
+{
+  return DisplayManagerSingleton::Instance ()->Display ();
 }

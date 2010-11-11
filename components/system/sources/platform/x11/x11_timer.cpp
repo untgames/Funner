@@ -112,6 +112,8 @@ class TimerManager
         
         condition.NotifyOne ();
         
+        printf ("timer created\n"); fflush (stdout);
+        
         return timer.release ();
       }
       catch (xtl::exception& e)
@@ -255,8 +257,10 @@ class TimerManager
             
           wait_time = size_t (wait_time * WAIT_DELAY_FACTOR);
           
+//          printf ("[%08u // %08u]: wait in %u\n", int (clock () * 1000.0 / CLOCKS_PER_SEC), int (common::milliseconds ()), wait_time); fflush (stdout);          
+          
           condition.TryWait (mutex, wait_time);
-        }
+        }                
         
           //вызов обработчиков таймеров
           

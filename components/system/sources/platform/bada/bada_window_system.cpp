@@ -155,6 +155,11 @@ const void* Platform::GetNativeWindowHandle (window_t handle)
   return handle->window.get ();
 }
 
+const void* Platform::GetNativeDisplayHandle (window_t handle)
+{
+  return 0;
+}
+
 /*
     Заголовок окна
 */
