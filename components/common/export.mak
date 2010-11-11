@@ -11,6 +11,7 @@ export.link.common.LIBS                        := funner.common funner.extern.pc
 export.link.common.IMPORTS                     := link.common.auto_license_generator
 export.link.common.LINK_INCLUDES               := StandardFilePathsMount
 export.link.common.win32.LIBS                  := shell32
+export.link.common.linux                       := rt
 export.link.common.cocoa.LINK_FLAGS            := -framework CoreFoundation -framework Foundation
 export.link.common.cocoa_desktop.LINK_FLAGS    := -framework AppKit
 export.link.common.pthread_static_library.LIBS := pthread
