@@ -11,6 +11,12 @@
 
 #include <common/singleton.h>
 
+#ifdef BEAGLEBOARD
+  #include <X11/Xlib.h>
+
+  #include <syslib/platform/x11.h>
+#endif
+
 #include <shared/log.h>
 #include <shared/object.h>
 #include <shared/platform.h>
@@ -56,10 +62,10 @@
   using Osp::Graphics::Opengl::eglGetError;
     
 #else
-  #include <egl/egl.h>
+  #include <EGL/egl.h>
 #endif
 
-#include <shared/gl.h>
+#include <GLES/gl.h>  
 
 namespace render
 {
@@ -116,8 +122,9 @@ class Output: virtual public IOutput, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение параметров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    EGLDisplay  GetEglDisplay   ();
-    const void* GetWindowHandle ();
+    EGLDisplay        GetEglDisplay   ();
+    NativeDisplayType GetDisplay      ();
+    const void*       GetWindowHandle ();
 
   private:
     Output (const Output&); //no impl
@@ -251,9 +258,10 @@ class PrimarySwapChain: virtual public ISwapChain, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение EGL параметров цепочки обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    EGLDisplay GetEglDisplay ();
-    EGLConfig  GetEglConfig  ();
-    EGLSurface GetEglSurface ();
+    EGLDisplay        GetEglDisplay ();
+    EGLConfig         GetEglConfig  ();
+    EGLSurface        GetEglSurface ();
+    NativeDisplayType GetDisplay    ();
 
   private:
     struct Impl;
@@ -307,6 +315,49 @@ class Context: virtual public IContext, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void check_errors (const char* source);
 void raise_error  (const char* source);
+
+#ifdef BEAGLEBOARD
+
+using syslib::x11::DisplayManager;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Блокировка соединения X11
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class DisplayLock
+{
+  public:
+    DisplayLock () : display ((Display*)DisplayManager::DisplayHandle ())
+    {
+      XLockDisplay (display);    
+    }
+  
+    DisplayLock (NativeDisplayType in_display) : display ((Display*)in_display)
+    {
+      XLockDisplay (display);
+    }
+
+    ~DisplayLock ()
+    {
+      XUnlockDisplay (display);
+    }
+
+  private:
+    Display* display;
+};
+
+#else
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Блокировка соединения
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class DisplayLock
+{
+  public:
+    DisplayLock () {}
+    DisplayLock (NativeDisplayType) {}
+};
+
+#endif
 
 }
 

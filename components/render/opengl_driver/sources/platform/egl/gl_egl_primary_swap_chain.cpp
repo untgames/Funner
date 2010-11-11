@@ -43,6 +43,8 @@ struct PrimarySwapChain::Impl
   {
     try
     {
+      DisplayLock lock (output->GetDisplay ());
+      
         //выбор конфигурации
 
       EGLint config_attributes [CONFIG_MAX_ATTRIBUTES], *attr = config_attributes;
@@ -57,6 +59,10 @@ struct PrimarySwapChain::Impl
 //      *attr++ = in_desc.frame_buffer.stencil_bits;
       *attr++ = EGL_SAMPLES;
       *attr++ = in_desc.samples_count;
+      *attr++ = EGL_SURFACE_TYPE;
+      *attr++ = EGL_WINDOW_BIT;
+      *attr++ = EGL_RENDERABLE_TYPE;
+      *attr++ = EGL_OPENGL_ES_BIT;
       
       switch (in_desc.swap_method)
       {
@@ -136,7 +142,15 @@ struct PrimarySwapChain::Impl
 ///Деструктор
   ~Impl ()
   {
-    eglDestroySurface (egl_display, egl_surface);
+    try
+    {    
+      DisplayLock lock (output->GetDisplay ());
+      
+      eglDestroySurface (egl_display, egl_surface);
+    }
+    catch (...)
+    {
+    }
   }
   
 ///Получение атрибута
@@ -248,6 +262,8 @@ void PrimarySwapChain::Present ()
 {
   try
   {
+    DisplayLock lock (impl->output->GetDisplay ());        
+    
     if (!eglSwapBuffers (impl->egl_display, impl->egl_surface))
       raise_error ("::eglSwapBuffers");
   }
@@ -284,4 +300,9 @@ EGLConfig PrimarySwapChain::GetEglConfig ()
 EGLSurface PrimarySwapChain::GetEglSurface ()
 {
   return impl->egl_surface;
+}
+
+NativeDisplayType PrimarySwapChain::GetDisplay ()
+{
+  return impl->output->GetDisplay ();
 }

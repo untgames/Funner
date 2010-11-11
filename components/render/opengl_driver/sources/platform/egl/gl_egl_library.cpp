@@ -177,10 +177,12 @@ typedef stl::hash_map<stl::hash_key<const char*>, const void*> EntryMap;
 
 struct Library::Impl
 {
+  Display* display; //соединение с дисплеем
   EntryMap entries; //карта стандартных точек входа
 
 ///Конструктор
   Impl ()
+    : display ((Display*)DisplayManager::DisplayHandle ())
   {
     for (size_t i=0; i<DEFAULT_ENTRIES_COUNT; i++)
       entries [default_entries [i].name] = default_entries [i].pointer;
@@ -223,6 +225,8 @@ const void* Library::GetProcAddress (const char* name, size_t search_flags)
 
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
   }
+  
+  DisplayLock lock (impl->display);
 
   const void* address = 0;
 
