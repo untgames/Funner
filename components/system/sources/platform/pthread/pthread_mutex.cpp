@@ -8,8 +8,20 @@ Platform::mutex_t Platform::CreateMutex ()
   try
   {
     stl::auto_ptr<mutex_handle> handle (new mutex_handle);
+    
+    pthread_mutexattr_t attr;
 
-    int status = pthread_mutex_init (&handle->mutex, 0);
+    int status = pthread_mutexattr_init (&attr);
+    
+    if (status)
+      pthread_raise_error ("::pthread_mutexattr_init", status);           
+    
+    status = pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+    
+    if (status)
+      pthread_raise_error ("::pthread_mutexattr_settype", status);
+
+    status = pthread_mutex_init (&handle->mutex, &attr);
 
     if (status)
       pthread_raise_error ("::pthread_mutex_init", status);

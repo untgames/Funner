@@ -7,6 +7,8 @@
 
 #include <common/action_queue.h>
 
+#include <syslib/application.h>
+
 using namespace common;
 
 template <int I> void action_handler (Action& action)
@@ -59,7 +61,7 @@ int main ()
     ActionQueue::PushAction (&action_handler<3>, ActionThread_Current, 2.0, 3.0);
     ActionQueue::PushAction (&action_handler<4>, ActionThread_Current, 0.5, 1.5); 
 
-    Application::Run ();
+    syslib::Application::Run ();
   }
   catch (std::exception& e)
   {

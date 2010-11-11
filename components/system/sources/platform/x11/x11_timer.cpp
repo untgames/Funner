@@ -48,7 +48,8 @@ class TimerManager
       : message_queue (*MessageQueueSingleton::Instance ())
       , log (LOG_NAME)
       , loop (true)
-      , kill_lock (false)      
+      , kill_lock (false)
+      , new_timers_count (0)
       , thread (xtl::bind (&TimerManager::TimersRoutine, this))
     {
       static bool initialized = false;
@@ -105,6 +106,8 @@ class TimerManager
           timer = new Platform::timer_handle (period_in_milliseconds, handler, user_data);           
           
           timers.push_back (timer.get ());
+          
+          new_timers_count++;
         }
         
         condition.NotifyOne ();
@@ -125,16 +128,22 @@ class TimerManager
       {
         if (!timer)
           throw xtl::make_null_argument_exception ("", "timer");
-          
-        Lock lock (mutex);
         
-        if (kill_lock)
         {
-          timer->need_delete = true;
-          return;
-        }        
+          Lock lock (mutex);
         
-        timers.erase (stl::remove (timers.begin (), timers.end (), timer), timers.end ());
+          if (kill_lock)
+          {
+            timer->need_delete = true;
+            return;
+          }        
+        
+          timers.erase (stl::remove (timers.begin (), timers.end (), timer), timers.end ());
+        
+          delete timer;
+        }
+        
+        condition.NotifyOne ();
       }
       catch (xtl::exception& e)
       {
@@ -161,10 +170,14 @@ class TimerManager
 ///Удаление всех таймеров
     void UnregisterAllTimers ()
     {
-      Lock lock (mutex);
+      {
+        Lock lock (mutex);
       
-      for (TimerList::iterator iter=timers.begin (), end=timers.end (); iter!=end; ++iter)
-        message_queue.UnregisterHandler (*iter);
+        for (TimerList::iterator iter=timers.begin (), end=timers.end (); iter!=end; ++iter)
+          message_queue.UnregisterHandler (*iter);
+      }
+      
+      condition.NotifyOne ();
     }
     
 ///Сообщение таймера
@@ -209,7 +222,7 @@ class TimerManager
         
           //ожидание срабатывания таймеров
         
-        for (;;)
+        while (loop)
         {
           size_t time      = common::milliseconds ();
           bool   raised    = false;
@@ -226,16 +239,22 @@ class TimerManager
             size_t delay = (*iter)->next_raise_time - time;
             
             if (delay < wait_time)
-              delay = wait_time;
+              wait_time = delay;
           }
           
           if (raised || !loop)
             break;
-            
-          static const float WAIT_DELAY_FACTOR = 0.9f;
+         
+          if (new_timers_count)
+          {
+            new_timers_count--;
+            continue;
+          }
+          
+          static const float WAIT_DELAY_FACTOR = 0.8f;
             
           wait_time = size_t (wait_time * WAIT_DELAY_FACTOR);
-
+          
           condition.Wait (mutex, wait_time);
         }
         
@@ -292,6 +311,7 @@ class TimerManager
     bool          kill_lock;       //таймеры заблокированы от удаления    
     Mutex         mutex;           //мьютекс работы с менеджером таймеров
     Condition     condition;       //событие появления нового таймера
+    size_t        new_timers_count;
     Thread        thread;          //нить обработки таймеров
     TimerList     timers;          //список зарегистрированных таймеров
 };
