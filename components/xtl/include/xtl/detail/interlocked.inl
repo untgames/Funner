@@ -150,6 +150,55 @@
   
 #elif defined (ARM)
 
+#ifdef BEAGLEBOARD
+
+inline int __sync_fetch_and_add (volatile int *ptr, volatile int val)
+{
+  unsigned long tmp;
+  int result;
+
+  __asm__ __volatile__("@ atomic_add\n"
+  "1: ldrex %0, [%3]\n"
+  " add %0, %0, %4\n"
+  " strex %1, %0, [%3]\n"
+  " teq %1, #0\n"
+  " bne 1b"
+  : "=&r" (result), "=&r" (tmp), "+Qo" (*ptr)
+  : "r" (ptr), "Ir" (val)
+  : "cc");
+  
+  return result;
+}
+  
+inline int __sync_fetch_and_sub (volatile int *ptr, volatile int val)
+{
+  return __sync_fetch_and_add (ptr, -val);
+}
+  
+inline int __sync_val_compare_and_swap (volatile int *ptr, volatile int _old, volatile int _new)
+{
+  unsigned long oldval, res;
+
+  __asm__ __volatile__ ("dmb" : : : "memory");
+
+  do {
+    __asm__ __volatile__("@ atomic_cmpxchg\n"
+    "ldrex  %1, [%3]\n"
+    "mov  %0, #0\n"
+    "teq  %1, %4\n"
+    "strexeq %0, %5, [%3]\n"
+        : "=&r" (res), "=&r" (oldval), "+Qo" (*ptr)
+        : "r" (ptr), "Ir" (_old), "r" (_new)
+        : "cc");
+  } while (res);
+
+  __asm__ __volatile__ ("dmb" : : : "memory");  
+
+  return oldval;
+}
+
+#endif
+
 inline int atomic_increment (volatile int& rc)
 {
   return __sync_fetch_and_add (&rc, 1);
@@ -164,12 +213,12 @@ inline int atomic_conditional_increment (volatile int& rc)
 {
   for (;;)
   {
-    long tmp = *(const volatile long*)&rc;
+    int tmp = rc;
     
     if (tmp == 0)
       return tmp;
 
-    if (__sync_val_compare_and_swap ((volatile long*)&rc, tmp, tmp + 1) == tmp)
+    if (__sync_val_compare_and_swap (&rc, tmp, tmp + 1) == tmp)
       return tmp;
   }
 }
@@ -178,12 +227,12 @@ inline int atomic_conditional_decrement (volatile int& rc)
 {
   for (;;)
   {
-    long tmp = *(const volatile long*)&rc;
+    int tmp = rc;
     
     if (tmp == 0)
       return tmp;
 
-    if (__sync_val_compare_and_swap ((volatile long*)&rc, tmp, tmp - 1) == tmp)
+    if (__sync_val_compare_and_swap (&rc, tmp, tmp - 1) == tmp)
       return tmp;
   }
 }
