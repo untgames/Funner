@@ -92,7 +92,7 @@ class TileImageBuilder
          minimum_area += iter->x * iter->y;
 
       if (pack_flags & AtlasPackFlag_PowerOfTwoEdges)
-        result_image_horisontal_side = result_image_vertical_side = get_next_higher_power_of_two ((size_t)sqrt ((float)minimum_area)) / 2;
+        result_image_horisontal_side = result_image_vertical_side = stl::max ((size_t)1, get_next_higher_power_of_two ((size_t)sqrt ((float)minimum_area)) / 2);
       else
         result_image_horisontal_side = result_image_vertical_side = (size_t)sqrt ((float)minimum_area) + 1;
 

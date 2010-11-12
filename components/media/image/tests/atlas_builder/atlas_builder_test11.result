@@ -1,0 +1,12 @@
+Results of atlas_builder_test11:
+Build atlas 1x1
+Save atlas 'results/one_pixel.png'
+Save layout 'results/one_pixel.xatlas'
+Build successfull!
+results/one_pixel.xatlas
+<?xml version="1.0" encoding="utf-8"?>
+<Atlas>
+  <Image Name="results/one_pixel.png" Width="1" Height="1">
+    <Tile Name="data/one_pixel.bmp" Left="0" Bottom="0" Width="1" Height="1"/>
+  </Image>
+</Atlas>
