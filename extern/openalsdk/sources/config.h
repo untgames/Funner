@@ -95,8 +95,11 @@
 
 #elif defined (BEAGLEBOARD)
 
+/* Define to the library version */
+#define ALSOFT_VERSION "1.12.854"
+
 /* Define if we have the ALSA backend */
-//#define HAVE_ALSA
+/* #undef HAVE_ALSA */
 
 /* Define if we have the OSS backend */
 #define HAVE_OSS

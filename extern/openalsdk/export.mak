@@ -7,8 +7,8 @@ export.compile.extern.openal.iphone.COMPILER_CFLAGS := -I$(IPHONE_SDK_PATH)/Syst
 export.link.extern.openal.LIBS              :=
 export.link.extern.openal.win32.LIBS        := openal32
 export.link.extern.openal.win32.LIB_DIRS    := lib/win32
-export.link.extern.openal.linux.LIBS        := funner.extern.openal32 pthread dl rt
-export.link.extern.openal.beagleboard.LIBS  := funner.extern.openal32 rt
+export.link.extern.openal.linux.LIBS        := funner.extern.openal32
+export.link.extern.openal.beagleboard.LIBS  := funner.extern.openal32
 export.link.extern.openal.macosx.LINK_FLAGS := -framework OpenAL
 export.link.extern.openal.iphone.LINK_FLAGS := -framework OpenAL
 
