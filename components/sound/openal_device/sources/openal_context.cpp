@@ -66,29 +66,27 @@ OpenALContext::OpenALContext (const char* device_name, const char* init_string)
 {
   try
   {
-    printf ("X1\n"); fflush (stdout);
     if (!device_name)
       throw xtl::make_null_argument_exception ("", "device_name");
 
     if (!xstrcmp (device_name, "default"))
       device_name = 0;
-    printf ("X2\n"); fflush (stdout);
+
     if (!init_string)
       throw xtl::make_null_argument_exception ("", "init_string");
-    printf ("X3\n"); fflush (stdout);
+
     ContextInitProperties properties;
 
     common::parse_init_string (init_string, xtl::bind (&process_init_string, _1, _2, ref (properties)));
-    printf ("X4\n"); fflush (stdout);
+
     device = alcOpenDevice (device_name);
     
     if (!device_name)
       device_name = "default";
     
-    printf ("X5 '%s'\n", device_name); fflush (stdout);
     if (!device)
       throw xtl::format_exception<OpenALException> ("", "Can't open device '%s'", device_name);
-    printf ("X6\n"); fflush (stdout);
+
     efx_present = alcIsExtensionPresent ("ALC_EXT_EFX") == ALC_TRUE;
 
     ALint attribs[4] = {0};
