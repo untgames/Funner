@@ -272,10 +272,7 @@ template <class T> struct remove_pointer<shared_ptr<T> > { typedef T type; };
 #ifdef XTL_HAS_INTERLOCKED
   #include <xtl/detail/shared_counter_interlocked.inl>  
 #else
-//#elif defined (ARM9)
   #include <xtl/detail/shared_counter_nothreads.inl>
-//#else
-//  #error Unknown platform
 #endif
 
 #include <xtl/detail/shared_counter.inl>

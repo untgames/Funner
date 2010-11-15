@@ -12,6 +12,11 @@ int main ()
   TEST (xtl::atomic_conditional_decrement (value));  
   TEST (xtl::atomic_conditional_decrement (value));    
   TEST (xtl::atomic_conditional_decrement (value));    
+  
+  value = 0;
+  
+  TEST (xtl::atomic_increment (value));
+  TEST (xtl::atomic_decrement (value));  
 
   return 0;
 }

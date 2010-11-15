@@ -167,12 +167,25 @@ inline int __sync_fetch_and_add (volatile int *ptr, volatile int val)
   : "r" (ptr), "Ir" (val)
   : "cc");
   
-  return result;
+  return result - 1;
 }
   
 inline int __sync_fetch_and_sub (volatile int *ptr, volatile int val)
 {
-  return __sync_fetch_and_add (ptr, -val);
+  unsigned long tmp;
+  int result;
+
+  __asm__ __volatile__("@ atomic_add\n"
+  "1: ldrex %0, [%3]\n"
+  " add %0, %0, %4\n"
+  " strex %1, %0, [%3]\n"
+  " teq %1, #0\n"
+  " bne 1b"
+  : "=&r" (result), "=&r" (tmp), "+Qo" (*ptr)
+  : "r" (ptr), "Ir" (-val)
+  : "cc");
+  
+  return result + 1;
 }
   
 inline int __sync_val_compare_and_swap (volatile int *ptr, volatile int _old, volatile int _new)
