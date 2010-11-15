@@ -308,8 +308,6 @@ inline void add_argument_type (InvokerSignature& signature, xtl::type<xtl::detai
 {
 }
 
-template <class T, class F = typename T::XXX> struct A{};
-
 template <class Signature, class Fn>
 struct invoker_impl: public invoker_impl_base<Signature, Fn>
 {
