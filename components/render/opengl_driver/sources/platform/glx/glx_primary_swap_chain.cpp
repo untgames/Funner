@@ -33,10 +33,21 @@ struct PrimarySwapChain::Impl
 ///Конструктор
   Impl (Adapter* in_adapter, const SwapChainDesc& in_desc)
     : adapter (in_adapter)
-    , glx_display (DisplayManager::)
+    , display (DisplayManager::DisplayHandle ())
   {
     try
     {
+        //проверка возможности работы GLX
+        
+      int error_base, event_base;        
+        
+      if (!glXQueryExtension (display, &error_base, &event_base ) )
+      {
+          fprintf(stderr, "glxsimple: %s\n", "X server has no OpenGL GLX extension");
+          exit(1);
+      }
+        
+      
         //выбор конфигурации
 
       glxint config_attributes [CONFIG_MAX_ATTRIBUTES], *attr = config_attributes;

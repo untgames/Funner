@@ -155,8 +155,11 @@ struct Output::Impl
     
     char* window_name = 0;
 
-    if (!XFetchName ((Display*)native_display, (Window)native_window, &window_name) || !window_name)
-      throw xtl::format_operation_exception ("", "XFetchName failed");    
+    if (!XFetchName ((Display*)native_display, (Window)native_window, &window_name))
+      window_name = (char*)"default";
+      
+    if (!window_name)
+      window_name = (char*)"default";
 
     strncpy (name, window_name, sizeof (name));
   }
