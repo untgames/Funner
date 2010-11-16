@@ -74,11 +74,9 @@ typedef enum {
     OUTPUTCHANNELS
 } Channel;
 
-#define BUFFERSIZE 16384
+#define BUFFERSIZE 8192
 
-extern ALboolean DuplicateStereo;
-
-/* NOTE: The AL_FORMAT_REAR* enums aren't handled here be cause they're
+/* NOTE: The AL_FORMAT_REAR* enums aren't handled here because they're
  *       converted to AL_FORMAT_QUAD* when loaded */
 static __inline ALuint aluBytesFromFormat(ALenum format)
 {
@@ -160,6 +158,10 @@ static __inline ALuint aluChannelsFromFormat(ALenum format)
             return 0;
     }
 }
+static __inline ALuint aluFrameSizeFromFormat(ALenum format)
+{
+    return aluBytesFromFormat(format) * aluChannelsFromFormat(format);
+}
 
 static __inline ALint aluCart2LUTpos(ALfloat re, ALfloat im)
 {
@@ -175,7 +177,7 @@ static __inline ALint aluCart2LUTpos(ALfloat re, ALfloat im)
     return pos%LUT_NUM;
 }
 
-ALvoid aluInitPanning(ALCcontext *Context);
+ALvoid aluInitPanning(ALCdevice *Device);
 ALvoid aluMixData(ALCdevice *device, ALvoid *buffer, ALsizei size);
 ALvoid aluHandleDisconnect(ALCdevice *device);
 

@@ -47,8 +47,7 @@
 #define SOUND_MIXER_WRITE MIXER_WRITE
 #endif
 
-static const ALCchar oss_device[] = "OSS Software";
-static const ALCchar oss_device_capture[] = "OSS Capture";
+static const ALCchar oss_device[] = "OSS Default";
 
 typedef struct {
     int fd;
@@ -82,10 +81,9 @@ static ALuint OSSProc(ALvoid *ptr)
     ALint frameSize;
     ssize_t wrote;
 
-    EnableRTPrio(RTPrioLevel);
+    SetRTPriority();
 
-    frameSize = aluChannelsFromFormat(pDevice->Format) *
-                aluBytesFromFormat(pDevice->Format);
+    frameSize = aluFrameSizeFromFormat(pDevice->Format);
 
     while(!data->killNow && pDevice->Connected)
     {
@@ -124,10 +122,9 @@ static ALuint OSSCaptureProc(ALvoid *ptr)
     int frameSize;
     int amt;
 
-    EnableRTPrio(RTPrioLevel);
+    SetRTPriority();
 
-    frameSize  = aluBytesFromFormat(pDevice->Format);
-    frameSize *= aluChannelsFromFormat(pDevice->Format);
+    frameSize = aluFrameSizeFromFormat(pDevice->Format);
 
     while(!data->killNow)
     {
@@ -326,8 +323,8 @@ static ALCboolean oss_open_capture(ALCdevice *device, const ALCchar *deviceName)
     strncpy(driver, GetConfigValue("oss", "capture", "/dev/dsp"), sizeof(driver)-1);
     driver[sizeof(driver)-1] = 0;
     if(!deviceName)
-        deviceName = oss_device_capture;
-    else if(strcmp(deviceName, oss_device_capture) != 0)
+        deviceName = oss_device;
+    else if(strcmp(deviceName, oss_device) != 0)
         return ALC_FALSE;
 
     data = (oss_data*)calloc(1, sizeof(oss_data));
@@ -515,6 +512,6 @@ void alc_oss_probe(int type)
         struct stat buf;
         if(stat(GetConfigValue("oss", "capture", "/dev/dsp"), &buf) == 0)
 #endif
-            AppendCaptureDeviceList(oss_device_capture);
+            AppendCaptureDeviceList(oss_device);
     }
 }

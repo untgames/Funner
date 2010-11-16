@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <limits.h>
+
 #include "alMain.h"
 #include "AL/al.h"
 #include "AL/alc.h"
@@ -32,14 +34,14 @@
 #include "alThunk.h"
 
 
-static ALenum LoadData(ALbuffer *ALBuf, const ALubyte *data, ALsizei size, ALuint freq, ALenum OrigFormat, ALenum NewFormat);
+static ALenum LoadData(ALbuffer *ALBuf, const ALvoid *data, ALsizei size, ALuint freq, ALenum OrigFormat, ALenum NewFormat);
 static void ConvertData(ALfloat *dst, const ALvoid *src, ALint origBytes, ALsizei len);
 static void ConvertDataRear(ALfloat *dst, const ALvoid *src, ALint origBytes, ALsizei len);
 static void ConvertDataIMA4(ALfloat *dst, const ALvoid *src, ALint origChans, ALsizei len);
 static void ConvertDataMULaw(ALfloat *dst, const ALvoid *src, ALsizei len);
 static void ConvertDataMULawRear(ALfloat *dst, const ALvoid *src, ALsizei len);
 
-DECL_VERIFIER(Buffer, ALbuffer, buffer)
+#define LookupBuffer(m, k) ((ALbuffer*)LookupUIntMapKey(&(m), (k)))
 
 /*
 * Global Variables
@@ -104,7 +106,7 @@ static const ALshort muLawDecompressionTable[256] = {
 *
 *    Generates n AL Buffers, and stores the Buffers Names in the array pointed to by puiBuffers
 */
-AL_API ALvoid AL_APIENTRY alGenBuffers(ALsizei n,ALuint *puiBuffers)
+AL_API ALvoid AL_APIENTRY alGenBuffers(ALsizei n, ALuint *buffers)
 {
     ALCcontext *Context;
     ALsizei i=0;
@@ -113,51 +115,42 @@ AL_API ALvoid AL_APIENTRY alGenBuffers(ALsizei n,ALuint *puiBuffers)
     if(!Context) return;
 
     // Check that we are actually generation some Buffers
-    if (n > 0)
+    if(n > 0)
     {
         ALCdevice *device = Context->Device;
+        ALenum err;
 
         // Check the pointer is valid (and points to enough memory to store Buffer Names)
-        if (!IsBadWritePtr((void*)puiBuffers, n * sizeof(ALuint)))
+        if(IsBadWritePtr((void*)buffers, n * sizeof(ALuint)))
+            alSetError(Context, AL_INVALID_VALUE);
+        else
         {
-            ALbuffer *end;
-            ALbuffer **list = &device->BufferList;
-            while(*list)
-                list = &(*list)->next;
-
             // Create all the new Buffers
-            end = *list;
             while(i < n)
             {
-                *list = calloc(1, sizeof(ALbuffer));
-                if(!(*list))
+                ALbuffer *buffer = calloc(1, sizeof(ALbuffer));
+                if(!buffer)
                 {
-                    while(end->next)
-                    {
-                        ALbuffer *temp = end->next;
-                        end->next = temp->next;
-
-                        ALTHUNK_REMOVEENTRY(temp->buffer);
-                        device->BufferCount--;
-                        free(temp);
-                    }
                     alSetError(Context, AL_OUT_OF_MEMORY);
+                    alDeleteBuffers(i, buffers);
                     break;
                 }
 
-                puiBuffers[i] = (ALuint)ALTHUNK_ADDENTRY(*list);
-                (*list)->buffer = puiBuffers[i];
+                buffer->buffer = (ALuint)ALTHUNK_ADDENTRY(buffer);
+                err = InsertUIntMapEntry(&device->BufferMap, buffer->buffer,
+                                         buffer);
+                if(err != AL_NO_ERROR)
+                {
+                    ALTHUNK_REMOVEENTRY(buffer->buffer);
+                    memset(buffer, 0, sizeof(ALbuffer));
+                    free(buffer);
 
-                device->BufferCount++;
-                i++;
-
-                list = &(*list)->next;
+                    alSetError(Context, err);
+                    alDeleteBuffers(i, buffers);
+                    break;
+                }
+                buffers[i++] = buffer->buffer;
             }
-        }
-        else
-        {
-            // Pointer does not point to enough memory to write Buffer names
-            alSetError(Context, AL_INVALID_VALUE);
         }
     }
 
@@ -174,15 +167,17 @@ AL_API ALvoid AL_APIENTRY alDeleteBuffers(ALsizei n, const ALuint *puiBuffers)
     ALCcontext *Context;
     ALbuffer *ALBuf;
     ALsizei i;
-    ALboolean bFailed = AL_FALSE;
 
     Context = GetContextSuspended();
     if(!Context) return;
 
     // Check we are actually Deleting some Buffers
-    if (n >= 0)
+    if(n < 0)
+        alSetError(Context, AL_INVALID_VALUE);
+    else
     {
         ALCdevice *device = Context->Device;
+        ALboolean bFailed = AL_FALSE;
 
         // Check that all the buffers are valid and can actually be deleted
         for (i = 0; i < n; i++)
@@ -191,7 +186,7 @@ AL_API ALvoid AL_APIENTRY alDeleteBuffers(ALsizei n, const ALuint *puiBuffers)
                 continue;
 
             // Check for valid Buffer ID (can be NULL buffer)
-            if((ALBuf=VerifyBuffer(device->BufferList, puiBuffers[i])) != NULL)
+            if((ALBuf=LookupBuffer(device->BufferMap, puiBuffers[i])) != NULL)
             {
                 if(ALBuf->refcount != 0)
                 {
@@ -215,30 +210,21 @@ AL_API ALvoid AL_APIENTRY alDeleteBuffers(ALsizei n, const ALuint *puiBuffers)
         {
             for (i = 0; i < n; i++)
             {
-                if((ALBuf=VerifyBuffer(device->BufferList, puiBuffers[i])) != NULL)
+                if((ALBuf=LookupBuffer(device->BufferMap, puiBuffers[i])) != NULL)
                 {
-                    ALbuffer **list = &device->BufferList;
-
-                    while(*list && *list != ALBuf)
-                        list = &(*list)->next;
-
-                    if(*list)
-                        *list = (*list)->next;
-
                     // Release the memory used to store audio data
                     free(ALBuf->data);
 
                     // Release buffer structure
-                    ALTHUNK_REMOVEENTRY(puiBuffers[i]);
+                    RemoveUIntMapKey(&device->BufferMap, ALBuf->buffer);
+                    ALTHUNK_REMOVEENTRY(ALBuf->buffer);
+
                     memset(ALBuf, 0, sizeof(ALbuffer));
-                    device->BufferCount--;
                     free(ALBuf);
                 }
             }
         }
     }
-    else
-        alSetError(Context, AL_INVALID_VALUE);
 
     ProcessContext(Context);
 }
@@ -248,17 +234,16 @@ AL_API ALvoid AL_APIENTRY alDeleteBuffers(ALsizei n, const ALuint *puiBuffers)
 *
 *    Checks if ulBuffer is a valid Buffer Name
 */
-AL_API ALboolean AL_APIENTRY alIsBuffer(ALuint uiBuffer)
+AL_API ALboolean AL_APIENTRY alIsBuffer(ALuint buffer)
 {
     ALCcontext *Context;
-    ALboolean  result = AL_TRUE;
+    ALboolean  result;
 
     Context = GetContextSuspended();
     if(!Context) return AL_FALSE;
 
-    if(uiBuffer)
-        result = (VerifyBuffer(Context->Device->BufferList, uiBuffer) ?
-                  AL_TRUE : AL_FALSE);
+    result = ((!buffer || LookupBuffer(Context->Device->BufferMap, buffer)) ?
+              AL_TRUE : AL_FALSE);
 
     ProcessContext(Context);
 
@@ -282,7 +267,9 @@ AL_API ALvoid AL_APIENTRY alBufferData(ALuint buffer,ALenum format,const ALvoid 
     if(!Context) return;
 
     device = Context->Device;
-    if((ALBuf=VerifyBuffer(device->BufferList, buffer)) != NULL)
+    if((ALBuf=LookupBuffer(device->BufferMap, buffer)) == NULL)
+        alSetError(Context, AL_INVALID_NAME); /* Invalid Buffer Name */
+    else
     {
         if(Context->SampleSource)
         {
@@ -299,7 +286,11 @@ AL_API ALvoid AL_APIENTRY alBufferData(ALuint buffer,ALenum format,const ALvoid 
             data = Context->SampleSource->data + offset;
         }
 
-        if ((ALBuf->refcount==0)&&(data))
+        if(size < 0)
+            alSetError(Context, AL_INVALID_VALUE);
+        else if(ALBuf->refcount != 0)
+            alSetError(Context, AL_INVALID_VALUE);
+        else
         {
             switch(format)
             {
@@ -330,6 +321,7 @@ AL_API ALvoid AL_APIENTRY alBufferData(ALuint buffer,ALenum format,const ALvoid 
                     ALuint OrigBytes = ((format==AL_FORMAT_REAR8) ? 1 :
                                         ((format==AL_FORMAT_REAR16) ? 2 :
                                          4));
+                    ALuint64 newsize, allocsize;
 
                     if((size%(OrigBytes*2)) != 0)
                     {
@@ -337,20 +329,31 @@ AL_API ALvoid AL_APIENTRY alBufferData(ALuint buffer,ALenum format,const ALvoid 
                         break;
                     }
 
-                    size /= OrigBytes;
-                    size *= 2;
+                    newsize = size / OrigBytes;
+                    newsize *= 2;
 
-                    // Samples are converted here
-                    temp = realloc(ALBuf->data, (BUFFER_PADDING*NewChannels + size) * NewBytes);
+                    allocsize = (BUFFER_PADDING*NewChannels + newsize)*NewBytes;
+                    if(allocsize > INT_MAX)
+                    {
+                        alSetError(Context, AL_OUT_OF_MEMORY);
+                        break;
+                    }
+                    temp = realloc(ALBuf->data, allocsize);
                     if(temp)
                     {
                         ALBuf->data = temp;
-                        ConvertDataRear(ALBuf->data, data, OrigBytes, size);
+                        ConvertDataRear(ALBuf->data, data, OrigBytes, newsize);
 
                         ALBuf->format = NewFormat;
                         ALBuf->eOriginalFormat = format;
-                        ALBuf->size = size*NewBytes;
+                        ALBuf->size = newsize*NewBytes;
                         ALBuf->frequency = freq;
+
+                        ALBuf->LoopStart = 0;
+                        ALBuf->LoopEnd = newsize / NewChannels;
+
+                        ALBuf->OriginalSize = size;
+                        ALBuf->OriginalAlign = OrigBytes * 2;
                     }
                     else
                         alSetError(Context, AL_OUT_OF_MEMORY);
@@ -392,34 +395,46 @@ AL_API ALvoid AL_APIENTRY alBufferData(ALuint buffer,ALenum format,const ALvoid 
 
                 case AL_FORMAT_MONO_IMA4:
                 case AL_FORMAT_STEREO_IMA4: {
-                    int OrigChans = ((format==AL_FORMAT_MONO_IMA4) ? 1 : 2);
-                    ALenum NewFormat = ((OrigChans==1) ? AL_FORMAT_MONO_FLOAT32 :
-                                                         AL_FORMAT_STEREO_FLOAT32);
+                    int Channels = ((format==AL_FORMAT_MONO_IMA4) ? 1 : 2);
+                    ALenum NewFormat = ((Channels==1) ? AL_FORMAT_MONO_FLOAT32 :
+                                                        AL_FORMAT_STEREO_FLOAT32);
                     ALuint NewBytes = aluBytesFromFormat(NewFormat);
+                    ALuint64 newsize, allocsize;
 
                     // Here is where things vary:
                     // nVidia and Apple use 64+1 samples per channel per block => block_size=36*chans bytes
                     // Most PC sound software uses 2040+1 samples per channel per block -> block_size=1024*chans bytes
-                    if((size%(36*OrigChans)) != 0)
+                    if((size%(36*Channels)) != 0)
                     {
                         alSetError(Context, AL_INVALID_VALUE);
                         break;
                     }
 
-                    size /= 36;
-                    size *= 65;
+                    newsize = size / 36;
+                    newsize *= 65;
 
-                    // Allocate extra padding samples
-                    temp = realloc(ALBuf->data, (BUFFER_PADDING*OrigChans + size)*NewBytes);
+                    allocsize = (BUFFER_PADDING*Channels + newsize)*NewBytes;
+                    if(allocsize > INT_MAX)
+                    {
+                        alSetError(Context, AL_OUT_OF_MEMORY);
+                        break;
+                    }
+                    temp = realloc(ALBuf->data, allocsize);
                     if(temp)
                     {
                         ALBuf->data = temp;
-                        ConvertDataIMA4(ALBuf->data, data, OrigChans, size/65);
+                        ConvertDataIMA4(ALBuf->data, data, Channels, newsize/(65*Channels));
 
                         ALBuf->format = NewFormat;
                         ALBuf->eOriginalFormat = format;
-                        ALBuf->size = size*NewBytes;
+                        ALBuf->size = newsize*NewBytes;
                         ALBuf->frequency = freq;
+
+                        ALBuf->LoopStart = 0;
+                        ALBuf->LoopEnd = newsize / Channels;
+
+                        ALBuf->OriginalSize = size;
+                        ALBuf->OriginalAlign = 36 * Channels;
                     }
                     else
                         alSetError(Context, AL_OUT_OF_MEMORY);
@@ -443,6 +458,7 @@ AL_API ALvoid AL_APIENTRY alBufferData(ALuint buffer,ALenum format,const ALvoid 
                                            ((Channels==7) ? AL_FORMAT_61CHN32 :
                                                             AL_FORMAT_71CHN32)))));
                     ALuint NewBytes = aluBytesFromFormat(NewFormat);
+                    ALuint64 allocsize;
 
                     if((size%(1*Channels)) != 0)
                     {
@@ -450,8 +466,13 @@ AL_API ALvoid AL_APIENTRY alBufferData(ALuint buffer,ALenum format,const ALvoid 
                         break;
                     }
 
-                    // Allocate extra padding samples
-                    temp = realloc(ALBuf->data, (BUFFER_PADDING*Channels + size)*NewBytes);
+                    allocsize = (BUFFER_PADDING*Channels + size)*NewBytes;
+                    if(allocsize > INT_MAX)
+                    {
+                        alSetError(Context, AL_OUT_OF_MEMORY);
+                        break;
+                    }
+                    temp = realloc(ALBuf->data, allocsize);
                     if(temp)
                     {
                         ALBuf->data = temp;
@@ -461,36 +482,53 @@ AL_API ALvoid AL_APIENTRY alBufferData(ALuint buffer,ALenum format,const ALvoid 
                         ALBuf->eOriginalFormat = format;
                         ALBuf->size = size*NewBytes;
                         ALBuf->frequency = freq;
+
+                        ALBuf->LoopStart = 0;
+                        ALBuf->LoopEnd = size / Channels;
+
+                        ALBuf->OriginalSize = size;
+                        ALBuf->OriginalAlign = 1 * Channels;
                     }
                     else
                         alSetError(Context, AL_OUT_OF_MEMORY);
                 }   break;
 
                 case AL_FORMAT_REAR_MULAW: {
-                    int OrigChans = 2;
                     ALenum NewFormat = AL_FORMAT_QUAD32;
-                    ALuint NewBytes = aluBytesFromFormat(NewFormat);
                     ALuint NewChannels = aluChannelsFromFormat(NewFormat);
+                    ALuint NewBytes = aluBytesFromFormat(NewFormat);
+                    ALuint64 newsize, allocsize;
 
-                    if((size%(1*OrigChans)) != 0)
+                    if((size%(1*2)) != 0)
                     {
                         alSetError(Context, AL_INVALID_VALUE);
                         break;
                     }
 
-                    size *= 2;
+                    newsize = size * 2;
 
-                    // Allocate extra padding samples
-                    temp = realloc(ALBuf->data, (BUFFER_PADDING*NewChannels + size)*NewBytes);
+                    allocsize = (BUFFER_PADDING*NewChannels + newsize)*NewBytes;
+                    if(allocsize > INT_MAX)
+                    {
+                        alSetError(Context, AL_OUT_OF_MEMORY);
+                        break;
+                    }
+                    temp = realloc(ALBuf->data, allocsize);
                     if(temp)
                     {
                         ALBuf->data = temp;
-                        ConvertDataMULawRear(ALBuf->data, data, size);
+                        ConvertDataMULawRear(ALBuf->data, data, newsize);
 
                         ALBuf->format = NewFormat;
                         ALBuf->eOriginalFormat = format;
-                        ALBuf->size = size*NewBytes;
+                        ALBuf->size = newsize*NewBytes;
                         ALBuf->frequency = freq;
+
+                        ALBuf->LoopStart = 0;
+                        ALBuf->LoopEnd = newsize / NewChannels;
+
+                        ALBuf->OriginalSize = size;
+                        ALBuf->OriginalAlign = 1 * 2;
                     }
                     else
                         alSetError(Context, AL_OUT_OF_MEMORY);
@@ -501,16 +539,6 @@ AL_API ALvoid AL_APIENTRY alBufferData(ALuint buffer,ALenum format,const ALvoid 
                     break;
             }
         }
-        else
-        {
-            // Buffer is in use, or data is a NULL pointer
-            alSetError(Context, AL_INVALID_VALUE);
-        }
-    }
-    else
-    {
-        // Invalid Buffer Name
-        alSetError(Context, AL_INVALID_NAME);
     }
 
     ProcessContext(Context);
@@ -531,7 +559,9 @@ AL_API ALvoid AL_APIENTRY alBufferSubDataEXT(ALuint buffer,ALenum format,const A
     if(!Context) return;
 
     device = Context->Device;
-    if((ALBuf=VerifyBuffer(device->BufferList, buffer)) != NULL)
+    if((ALBuf=LookupBuffer(device->BufferMap, buffer)) == NULL)
+        alSetError(Context, AL_INVALID_NAME);
+    else
     {
         if(Context->SampleSource)
         {
@@ -548,120 +578,96 @@ AL_API ALvoid AL_APIENTRY alBufferSubDataEXT(ALuint buffer,ALenum format,const A
             data = Context->SampleSource->data + offset;
         }
 
-        if(ALBuf->data == NULL)
-        {
-            // buffer does not have any data
-            alSetError(Context, AL_INVALID_NAME);
-        }
-        else if(length < 0 || offset < 0 || (length > 0 && data == NULL))
-        {
-            // data is NULL or offset/length is negative
+        if(length < 0 || offset < 0 || (length > 0 && data == NULL))
             alSetError(Context, AL_INVALID_VALUE);
-        }
+        else if(ALBuf->eOriginalFormat != format)
+            alSetError(Context, AL_INVALID_ENUM);
+        else if(offset+length < offset ||
+                offset+length > ALBuf->OriginalSize ||
+                (offset%ALBuf->OriginalAlign) != 0 ||
+                (length%ALBuf->OriginalAlign) != 0)
+            alSetError(Context, AL_INVALID_VALUE);
         else
         {
             switch(format)
             {
+                case AL_FORMAT_MONO8:
+                case AL_FORMAT_MONO16:
+                case AL_FORMAT_MONO_FLOAT32:
+                case AL_FORMAT_MONO_DOUBLE_EXT:
+                case AL_FORMAT_STEREO8:
+                case AL_FORMAT_STEREO16:
+                case AL_FORMAT_STEREO_FLOAT32:
+                case AL_FORMAT_STEREO_DOUBLE_EXT:
+                case AL_FORMAT_QUAD8_LOKI:
+                case AL_FORMAT_QUAD16_LOKI:
+                case AL_FORMAT_QUAD8:
+                case AL_FORMAT_QUAD16:
+                case AL_FORMAT_QUAD32:
+                case AL_FORMAT_51CHN8:
+                case AL_FORMAT_51CHN16:
+                case AL_FORMAT_51CHN32:
+                case AL_FORMAT_61CHN8:
+                case AL_FORMAT_61CHN16:
+                case AL_FORMAT_61CHN32:
+                case AL_FORMAT_71CHN8:
+                case AL_FORMAT_71CHN16:
+                case AL_FORMAT_71CHN32: {
+                    ALuint Bytes = aluBytesFromFormat(format);
+
+                    offset /= Bytes;
+                    length /= Bytes;
+
+                    ConvertData(&ALBuf->data[offset], data, Bytes, length);
+                }   break;
+
                 case AL_FORMAT_REAR8:
                 case AL_FORMAT_REAR16:
                 case AL_FORMAT_REAR32: {
-                    ALuint OrigBytes = ((format==AL_FORMAT_REAR8) ? 1 :
-                                        ((format==AL_FORMAT_REAR16) ? 2 :
-                                         4));
-                    ALuint NewBytes = aluBytesFromFormat(ALBuf->format);
+                    ALuint Bytes = ((format==AL_FORMAT_REAR8) ? 1 :
+                                    ((format==AL_FORMAT_REAR16) ? 2 :
+                                     4));
 
-                    if(ALBuf->eOriginalFormat != AL_FORMAT_REAR8 &&
-                       ALBuf->eOriginalFormat != AL_FORMAT_REAR16 &&
-                       ALBuf->eOriginalFormat != AL_FORMAT_REAR32)
-                    {
-                        alSetError(Context, AL_INVALID_ENUM);
-                        break;
-                    }
+                    offset /= Bytes;
+                    offset *= 2;
+                    length /= Bytes;
+                    length *= 2;
 
-                    if(ALBuf->size/4/NewBytes < (ALuint)offset+length)
-                    {
-                        alSetError(Context, AL_INVALID_VALUE);
-                        break;
-                    }
-
-                    ConvertDataRear(&ALBuf->data[offset*4], data, OrigBytes, length*2);
+                    ConvertDataRear(&ALBuf->data[offset], data, Bytes, length);
                 }   break;
 
                 case AL_FORMAT_MONO_IMA4:
                 case AL_FORMAT_STEREO_IMA4: {
                     int Channels = aluChannelsFromFormat(ALBuf->format);
-                    ALuint Bytes = aluBytesFromFormat(ALBuf->format);
 
-                    if(ALBuf->eOriginalFormat != format)
-                    {
-                        alSetError(Context, AL_INVALID_ENUM);
-                        break;
-                    }
+                    // offset -> sample*channel offset, length -> block count
+                    offset /= 36;
+                    offset *= 65;
+                    length /= ALBuf->OriginalAlign;
 
-                    if((offset%65) != 0 || (length%65) != 0 ||
-                       ALBuf->size/Channels/Bytes < (ALuint)offset+length)
-                    {
-                        alSetError(Context, AL_INVALID_VALUE);
-                        break;
-                    }
-
-                    ConvertDataIMA4(&ALBuf->data[offset*Channels], data, Channels, length/65*Channels);
+                    ConvertDataIMA4(&ALBuf->data[offset], data, Channels, length);
                 }   break;
 
                 case AL_FORMAT_MONO_MULAW:
                 case AL_FORMAT_STEREO_MULAW:
                 case AL_FORMAT_QUAD_MULAW:
-                case AL_FORMAT_REAR_MULAW:
                 case AL_FORMAT_51CHN_MULAW:
                 case AL_FORMAT_61CHN_MULAW:
-                case AL_FORMAT_71CHN_MULAW: {
-                    int Channels = aluChannelsFromFormat(ALBuf->format);
-                    ALuint Bytes = aluBytesFromFormat(ALBuf->format);
+                case AL_FORMAT_71CHN_MULAW:
+                    ConvertDataMULaw(&ALBuf->data[offset], data, length);
+                    break;
 
-                    if(ALBuf->eOriginalFormat != format)
-                    {
-                        alSetError(Context, AL_INVALID_ENUM);
-                        break;
-                    }
+                case AL_FORMAT_REAR_MULAW:
+                    offset *= 2;
+                    length *= 2;
+                    ConvertDataMULawRear(&ALBuf->data[offset], data, length);
+                    break;
 
-                    if(ALBuf->size/Channels/Bytes < (ALuint)offset+length)
-                    {
-                        alSetError(Context, AL_INVALID_VALUE);
-                        break;
-                    }
-
-                    if(ALBuf->eOriginalFormat == AL_FORMAT_REAR_MULAW)
-                        ConvertDataMULawRear(&ALBuf->data[offset*Channels], data, length*2);
-                    else
-                        ConvertDataMULaw(&ALBuf->data[offset*Channels], data, length*Channels);
-                }   break;
-
-                default: {
-                    ALuint Channels = aluChannelsFromFormat(format);
-                    ALuint Bytes = aluBytesFromFormat(format);
-                    ALuint NewBytes = aluBytesFromFormat(ALBuf->format);
-
-                    if(Channels != aluChannelsFromFormat(ALBuf->format))
-                    {
-                        alSetError(Context, AL_INVALID_ENUM);
-                        break;
-                    }
-
-                    if(ALBuf->size/Channels/NewBytes < (ALuint)offset+length)
-                    {
-                        alSetError(Context, AL_INVALID_VALUE);
-                        break;
-                    }
-
-                    ConvertData(&ALBuf->data[offset*Channels], data, Bytes, length*Channels);
-                }   break;
+                default:
+                    alSetError(Context, AL_INVALID_ENUM);
+                    break;
             }
         }
-    }
-    else
-    {
-        // Invalid Buffer Name
-        alSetError(Context, AL_INVALID_NAME);
     }
 
     ProcessContext(Context);
@@ -679,7 +685,8 @@ AL_API void AL_APIENTRY alBufferf(ALuint buffer, ALenum eParam, ALfloat flValue)
     if(!pContext) return;
 
     device = pContext->Device;
-    if(VerifyBuffer(device->BufferList, buffer) != NULL)
+    if(LookupBuffer(device->BufferMap, buffer) == NULL)
+        alSetError(pContext, AL_INVALID_NAME);
     {
         switch(eParam)
         {
@@ -687,10 +694,6 @@ AL_API void AL_APIENTRY alBufferf(ALuint buffer, ALenum eParam, ALfloat flValue)
             alSetError(pContext, AL_INVALID_ENUM);
             break;
         }
-    }
-    else
-    {
-        alSetError(pContext, AL_INVALID_NAME);
     }
 
     ProcessContext(pContext);
@@ -710,7 +713,9 @@ AL_API void AL_APIENTRY alBuffer3f(ALuint buffer, ALenum eParam, ALfloat flValue
     if(!pContext) return;
 
     device = pContext->Device;
-    if(VerifyBuffer(device->BufferList, buffer) != NULL)
+    if(LookupBuffer(device->BufferMap, buffer) == NULL)
+        alSetError(pContext, AL_INVALID_NAME);
+    else
     {
         switch(eParam)
         {
@@ -718,10 +723,6 @@ AL_API void AL_APIENTRY alBuffer3f(ALuint buffer, ALenum eParam, ALfloat flValue
             alSetError(pContext, AL_INVALID_ENUM);
             break;
         }
-    }
-    else
-    {
-        alSetError(pContext, AL_INVALID_NAME);
     }
 
     ProcessContext(pContext);
@@ -733,13 +734,15 @@ AL_API void AL_APIENTRY alBufferfv(ALuint buffer, ALenum eParam, const ALfloat* 
     ALCcontext    *pContext;
     ALCdevice     *device;
 
-    (void)flValues;
-
     pContext = GetContextSuspended();
     if(!pContext) return;
 
     device = pContext->Device;
-    if(VerifyBuffer(device->BufferList, buffer) != NULL)
+    if(!flValues)
+        alSetError(pContext, AL_INVALID_VALUE);
+    else if(LookupBuffer(device->BufferMap, buffer) == NULL)
+        alSetError(pContext, AL_INVALID_NAME);
+    else
     {
         switch(eParam)
         {
@@ -747,10 +750,6 @@ AL_API void AL_APIENTRY alBufferfv(ALuint buffer, ALenum eParam, const ALfloat* 
             alSetError(pContext, AL_INVALID_ENUM);
             break;
         }
-    }
-    else
-    {
-        alSetError(pContext, AL_INVALID_NAME);
     }
 
     ProcessContext(pContext);
@@ -768,7 +767,9 @@ AL_API void AL_APIENTRY alBufferi(ALuint buffer, ALenum eParam, ALint lValue)
     if(!pContext) return;
 
     device = pContext->Device;
-    if(VerifyBuffer(device->BufferList, buffer) != NULL)
+    if(LookupBuffer(device->BufferMap, buffer) == NULL)
+        alSetError(pContext, AL_INVALID_NAME);
+    else
     {
         switch(eParam)
         {
@@ -776,10 +777,6 @@ AL_API void AL_APIENTRY alBufferi(ALuint buffer, ALenum eParam, ALint lValue)
             alSetError(pContext, AL_INVALID_ENUM);
             break;
         }
-    }
-    else
-    {
-        alSetError(pContext, AL_INVALID_NAME);
     }
 
     ProcessContext(pContext);
@@ -799,7 +796,9 @@ AL_API void AL_APIENTRY alBuffer3i( ALuint buffer, ALenum eParam, ALint lValue1,
     if(!pContext) return;
 
     device = pContext->Device;
-    if(VerifyBuffer(device->BufferList, buffer) != NULL)
+    if(LookupBuffer(device->BufferMap, buffer) == NULL)
+        alSetError(pContext, AL_INVALID_NAME);
+    else
     {
         switch(eParam)
         {
@@ -807,10 +806,6 @@ AL_API void AL_APIENTRY alBuffer3i( ALuint buffer, ALenum eParam, ALint lValue1,
             alSetError(pContext, AL_INVALID_ENUM);
             break;
         }
-    }
-    else
-    {
-        alSetError(pContext, AL_INVALID_NAME);
     }
 
     ProcessContext(pContext);
@@ -821,25 +816,43 @@ AL_API void AL_APIENTRY alBufferiv(ALuint buffer, ALenum eParam, const ALint* pl
 {
     ALCcontext    *pContext;
     ALCdevice     *device;
-
-    (void)plValues;
+    ALbuffer      *ALBuf;
 
     pContext = GetContextSuspended();
     if(!pContext) return;
 
     device = pContext->Device;
-    if(VerifyBuffer(device->BufferList, buffer) != NULL)
+    if(!plValues)
+        alSetError(pContext, AL_INVALID_VALUE);
+    else if((ALBuf=LookupBuffer(device->BufferMap, buffer)) == NULL)
+        alSetError(pContext, AL_INVALID_NAME);
+    else
     {
         switch(eParam)
         {
+        case AL_LOOP_POINTS:
+            if(ALBuf->refcount > 0)
+                alSetError(pContext, AL_INVALID_OPERATION);
+            else if(plValues[0] < 0 || plValues[1] < 0 ||
+                    plValues[0] >= plValues[1] || ALBuf->size == 0)
+                alSetError(pContext, AL_INVALID_VALUE);
+            else
+            {
+                ALint maxlen = ALBuf->size / aluFrameSizeFromFormat(ALBuf->format);
+                if(plValues[0] > maxlen || plValues[1] > maxlen)
+                    alSetError(pContext, AL_INVALID_VALUE);
+                else
+                {
+                    ALBuf->LoopStart = plValues[0];
+                    ALBuf->LoopEnd = plValues[1];
+                }
+            }
+            break;
+
         default:
             alSetError(pContext, AL_INVALID_ENUM);
             break;
         }
-    }
-    else
-    {
-        alSetError(pContext, AL_INVALID_NAME);
     }
 
     ProcessContext(pContext);
@@ -854,26 +867,19 @@ AL_API ALvoid AL_APIENTRY alGetBufferf(ALuint buffer, ALenum eParam, ALfloat *pf
     pContext = GetContextSuspended();
     if(!pContext) return;
 
-    if (pflValue)
-    {
-        device = pContext->Device;
-        if(VerifyBuffer(device->BufferList, buffer) != NULL)
-        {
-            switch(eParam)
-            {
-            default:
-                alSetError(pContext, AL_INVALID_ENUM);
-                break;
-            }
-        }
-        else
-        {
-            alSetError(pContext, AL_INVALID_NAME);
-        }
-    }
+    device = pContext->Device;
+    if(!pflValue)
+        alSetError(pContext, AL_INVALID_VALUE);
+    else if(LookupBuffer(device->BufferMap, buffer) == NULL)
+        alSetError(pContext, AL_INVALID_NAME);
     else
     {
-        alSetError(pContext, AL_INVALID_VALUE);
+        switch(eParam)
+        {
+        default:
+            alSetError(pContext, AL_INVALID_ENUM);
+            break;
+        }
     }
 
     ProcessContext(pContext);
@@ -888,26 +894,19 @@ AL_API void AL_APIENTRY alGetBuffer3f(ALuint buffer, ALenum eParam, ALfloat* pfl
     pContext = GetContextSuspended();
     if(!pContext) return;
 
-    if ((pflValue1) && (pflValue2) && (pflValue3))
-    {
-        device = pContext->Device;
-        if(VerifyBuffer(device->BufferList, buffer) != NULL)
-        {
-            switch(eParam)
-            {
-            default:
-                alSetError(pContext, AL_INVALID_ENUM);
-                break;
-            }
-        }
-        else
-        {
-            alSetError(pContext, AL_INVALID_NAME);
-        }
-    }
+    device = pContext->Device;
+    if(!pflValue1 || !pflValue2 || !pflValue3)
+        alSetError(pContext, AL_INVALID_VALUE);
+    else if(LookupBuffer(device->BufferMap, buffer) == NULL)
+        alSetError(pContext, AL_INVALID_NAME);
     else
     {
-        alSetError(pContext, AL_INVALID_VALUE);
+        switch(eParam)
+        {
+        default:
+            alSetError(pContext, AL_INVALID_ENUM);
+            break;
+        }
     }
 
     ProcessContext(pContext);
@@ -922,26 +921,19 @@ AL_API void AL_APIENTRY alGetBufferfv(ALuint buffer, ALenum eParam, ALfloat* pfl
     pContext = GetContextSuspended();
     if(!pContext) return;
 
-    if (pflValues)
-    {
-        device = pContext->Device;
-        if(VerifyBuffer(device->BufferList, buffer) != NULL)
-        {
-            switch(eParam)
-            {
-            default:
-                alSetError(pContext, AL_INVALID_ENUM);
-                break;
-            }
-        }
-        else
-        {
-            alSetError(pContext, AL_INVALID_NAME);
-        }
-    }
+    device = pContext->Device;
+    if(!pflValues)
+        alSetError(pContext, AL_INVALID_VALUE);
+    else if(LookupBuffer(device->BufferMap, buffer) == NULL)
+        alSetError(pContext, AL_INVALID_NAME);
     else
     {
-        alSetError(pContext, AL_INVALID_VALUE);
+        switch(eParam)
+        {
+        default:
+            alSetError(pContext, AL_INVALID_ENUM);
+            break;
+        }
     }
 
     ProcessContext(pContext);
@@ -957,42 +949,35 @@ AL_API ALvoid AL_APIENTRY alGetBufferi(ALuint buffer, ALenum eParam, ALint *plVa
     pContext = GetContextSuspended();
     if(!pContext) return;
 
-    if (plValue)
-    {
-        device = pContext->Device;
-        if((pBuffer=VerifyBuffer(device->BufferList, buffer)) != NULL)
-        {
-            switch (eParam)
-            {
-            case AL_FREQUENCY:
-                *plValue = pBuffer->frequency;
-                break;
-
-            case AL_BITS:
-                *plValue = aluBytesFromFormat(pBuffer->format) * 8;
-                break;
-
-            case AL_CHANNELS:
-                *plValue = aluChannelsFromFormat(pBuffer->format);
-                break;
-
-            case AL_SIZE:
-                *plValue = pBuffer->size;
-                break;
-
-            default:
-                alSetError(pContext, AL_INVALID_ENUM);
-                break;
-            }
-        }
-        else
-        {
-            alSetError(pContext, AL_INVALID_NAME);
-        }
-    }
+    device = pContext->Device;
+    if(!plValue)
+        alSetError(pContext, AL_INVALID_VALUE);
+    else if((pBuffer=LookupBuffer(device->BufferMap, buffer)) == NULL)
+        alSetError(pContext, AL_INVALID_NAME);
     else
     {
-        alSetError(pContext, AL_INVALID_VALUE);
+        switch(eParam)
+        {
+        case AL_FREQUENCY:
+            *plValue = pBuffer->frequency;
+            break;
+
+        case AL_BITS:
+            *plValue = aluBytesFromFormat(pBuffer->format) * 8;
+            break;
+
+        case AL_CHANNELS:
+            *plValue = aluChannelsFromFormat(pBuffer->format);
+            break;
+
+        case AL_SIZE:
+            *plValue = pBuffer->size;
+            break;
+
+        default:
+            alSetError(pContext, AL_INVALID_ENUM);
+            break;
+        }
     }
 
     ProcessContext(pContext);
@@ -1007,26 +992,19 @@ AL_API void AL_APIENTRY alGetBuffer3i(ALuint buffer, ALenum eParam, ALint* plVal
     pContext = GetContextSuspended();
     if(!pContext) return;
 
-    if ((plValue1) && (plValue2) && (plValue3))
-    {
-        device = pContext->Device;
-        if(VerifyBuffer(device->BufferList, buffer) != NULL)
-        {
-            switch(eParam)
-            {
-            default:
-                alSetError(pContext, AL_INVALID_ENUM);
-                break;
-            }
-        }
-        else
-        {
-            alSetError(pContext, AL_INVALID_NAME);
-        }
-    }
+    device = pContext->Device;
+    if(!plValue1 || !plValue2 || !plValue3)
+        alSetError(pContext, AL_INVALID_VALUE);
+    else if(LookupBuffer(device->BufferMap, buffer) == NULL)
+        alSetError(pContext, AL_INVALID_NAME);
     else
     {
-        alSetError(pContext, AL_INVALID_VALUE);
+        switch(eParam)
+        {
+        default:
+            alSetError(pContext, AL_INVALID_ENUM);
+            break;
+        }
     }
 
     ProcessContext(pContext);
@@ -1037,37 +1015,36 @@ AL_API void AL_APIENTRY alGetBufferiv(ALuint buffer, ALenum eParam, ALint* plVal
 {
     ALCcontext    *pContext;
     ALCdevice     *device;
+    ALbuffer      *ALBuf;
 
     pContext = GetContextSuspended();
     if(!pContext) return;
 
-    if (plValues)
-    {
-        device = pContext->Device;
-        if(VerifyBuffer(device->BufferList, buffer) != NULL)
-        {
-            switch (eParam)
-            {
-            case AL_FREQUENCY:
-            case AL_BITS:
-            case AL_CHANNELS:
-            case AL_SIZE:
-                alGetBufferi(buffer, eParam, plValues);
-                break;
-
-            default:
-                alSetError(pContext, AL_INVALID_ENUM);
-                break;
-            }
-        }
-        else
-        {
-            alSetError(pContext, AL_INVALID_NAME);
-        }
-    }
+    device = pContext->Device;
+    if(!plValues)
+        alSetError(pContext, AL_INVALID_VALUE);
+    else if((ALBuf=LookupBuffer(device->BufferMap, buffer)) == NULL)
+        alSetError(pContext, AL_INVALID_NAME);
     else
     {
-        alSetError(pContext, AL_INVALID_VALUE);
+        switch(eParam)
+        {
+        case AL_FREQUENCY:
+        case AL_BITS:
+        case AL_CHANNELS:
+        case AL_SIZE:
+            alGetBufferi(buffer, eParam, plValues);
+            break;
+
+        case AL_LOOP_POINTS:
+            plValues[0] = ALBuf->LoopStart;
+            plValues[1] = ALBuf->LoopEnd;
+            break;
+
+        default:
+            alSetError(pContext, AL_INVALID_ENUM);
+            break;
+        }
     }
 
     ProcessContext(pContext);
@@ -1081,12 +1058,13 @@ AL_API void AL_APIENTRY alGetBufferiv(ALuint buffer, ALenum eParam, ALint* plVal
  * channel configuration as the original format. This does NOT handle
  * compressed formats (eg. IMA4).
  */
-static ALenum LoadData(ALbuffer *ALBuf, const ALubyte *data, ALsizei size, ALuint freq, ALenum OrigFormat, ALenum NewFormat)
+static ALenum LoadData(ALbuffer *ALBuf, const ALvoid *data, ALsizei size, ALuint freq, ALenum OrigFormat, ALenum NewFormat)
 {
     ALuint NewBytes = aluBytesFromFormat(NewFormat);
     ALuint NewChannels = aluChannelsFromFormat(NewFormat);
     ALuint OrigBytes = aluBytesFromFormat(OrigFormat);
     ALuint OrigChannels = aluChannelsFromFormat(OrigFormat);
+    ALuint64 newsize, allocsize;
     ALvoid *temp;
 
     assert(NewBytes == 4);
@@ -1095,17 +1073,29 @@ static ALenum LoadData(ALbuffer *ALBuf, const ALubyte *data, ALsizei size, ALuin
     if ((size%(OrigBytes*OrigChannels)) != 0)
         return AL_INVALID_VALUE;
 
-    // Samples are converted here
-    size /= OrigBytes;
-    temp = realloc(ALBuf->data, (BUFFER_PADDING*NewChannels + size) * NewBytes);
+    // Allocate extra padding samples
+    newsize = size / OrigBytes;
+    allocsize = (BUFFER_PADDING*NewChannels + newsize)*NewBytes;
+    if(allocsize > INT_MAX)
+        return AL_OUT_OF_MEMORY;
+
+    temp = realloc(ALBuf->data, allocsize);
     if(!temp) return AL_OUT_OF_MEMORY;
     ALBuf->data = temp;
-    ConvertData(ALBuf->data, data, OrigBytes, size);
+
+    // Samples are converted here
+    ConvertData(ALBuf->data, data, OrigBytes, newsize);
 
     ALBuf->format = NewFormat;
     ALBuf->eOriginalFormat = OrigFormat;
-    ALBuf->size = size*NewBytes;
+    ALBuf->size = newsize*NewBytes;
     ALBuf->frequency = freq;
+
+    ALBuf->LoopStart = 0;
+    ALBuf->LoopEnd = newsize / NewChannels;
+
+    ALBuf->OriginalSize = size;
+    ALBuf->OriginalAlign = OrigBytes * OrigChannels;
 
     return AL_NO_ERROR;
 }
@@ -1114,6 +1104,8 @@ static void ConvertData(ALfloat *dst, const ALvoid *src, ALint origBytes, ALsize
 {
     ALsizei i;
     ALint smp;
+    if(src == NULL)
+        return;
     switch(origBytes)
     {
         case 1:
@@ -1151,6 +1143,8 @@ static void ConvertDataRear(ALfloat *dst, const ALvoid *src, ALint origBytes, AL
 {
     ALsizei i;
     ALint smp;
+    if(src == NULL)
+        return;
     switch(origBytes)
     {
         case 1:
@@ -1192,37 +1186,47 @@ static void ConvertDataRear(ALfloat *dst, const ALvoid *src, ALint origBytes, AL
     }
 }
 
-static void ConvertDataIMA4(ALfloat *dst, const ALvoid *src, ALint origChans, ALsizei len)
+static void ConvertDataIMA4(ALfloat *dst, const ALvoid *src, ALint chans, ALsizei len)
 {
-    const ALuint *IMAData;
+    const ALubyte *IMAData;
     ALint Sample[2],Index[2];
     ALuint IMACode[2];
     ALsizei i,j,k,c;
 
+    if(src == NULL)
+        return;
+
     IMAData = src;
-    for(i = 0;i < len/origChans;i++)
+    for(i = 0;i < len;i++)
     {
-        for(c = 0;c < origChans;c++)
+        for(c = 0;c < chans;c++)
         {
-            Sample[c] = ((ALshort*)IMAData)[0];
-            Index[c] = ((ALshort*)IMAData)[1];
+            Sample[c]  = *(IMAData++);
+            Sample[c] |= *(IMAData++) << 8;
+            Sample[c]  = (Sample[c]^0x8000) - 32768;
+            Index[c]  = *(IMAData++);
+            Index[c] |= *(IMAData++) << 8;
+            Index[c]  = (Index[c]^0x8000) - 32768;
 
             Index[c] = ((Index[c]<0) ? 0 : Index[c]);
             Index[c] = ((Index[c]>88) ? 88 : Index[c]);
 
-            dst[i*65*origChans + c] = ((Sample[c] < 0) ? (Sample[c]/32768.0f) : (Sample[c]/32767.0f));
-
-            IMAData++;
+            dst[i*65*chans + c] = ((Sample[c] < 0) ? (Sample[c]/32768.0f) : (Sample[c]/32767.0f));
         }
 
         for(j = 1;j < 65;j += 8)
         {
-            for(c = 0;c < origChans;c++)
-                IMACode[c] = *(IMAData++);
+            for(c = 0;c < chans;c++)
+            {
+                IMACode[c]  = *(IMAData++);
+                IMACode[c] |= *(IMAData++) << 8;
+                IMACode[c] |= *(IMAData++) << 16;
+                IMACode[c] |= *(IMAData++) << 24;
+            }
 
             for(k = 0;k < 8;k++)
             {
-                for(c = 0;c < origChans;c++)
+                for(c = 0;c < chans;c++)
                 {
                     Sample[c] += ((g_IMAStep_size[Index[c]]*g_IMACodeword_4[IMACode[c]&15])/8);
                     Index[c] += g_IMAIndex_adjust_4[IMACode[c]&15];
@@ -1233,7 +1237,7 @@ static void ConvertDataIMA4(ALfloat *dst, const ALvoid *src, ALint origChans, AL
                     if(Index[c]<0) Index[c] = 0;
                     else if(Index[c]>88) Index[c] = 88;
 
-                    dst[(i*65+j+k)*origChans + c] = ((Sample[c] < 0) ? (Sample[c]/32768.0f) : (Sample[c]/32767.0f));
+                    dst[(i*65+j+k)*chans + c] = ((Sample[c] < 0) ? (Sample[c]/32768.0f) : (Sample[c]/32767.0f));
                     IMACode[c] >>= 4;
                 }
             }
@@ -1245,6 +1249,8 @@ static void ConvertDataMULaw(ALfloat *dst, const ALvoid *src, ALsizei len)
 {
     ALsizei i;
     ALint smp;
+    if(src == NULL)
+        return;
     for(i = 0;i < len;i++)
     {
         smp = muLawDecompressionTable[((ALubyte*)src)[i]];
@@ -1256,6 +1262,8 @@ static void ConvertDataMULawRear(ALfloat *dst, const ALvoid *src, ALsizei len)
 {
     ALsizei i;
     ALint smp;
+    if(src == NULL)
+        return;
     for(i = 0;i < len;i+=4)
     {
         dst[i+0] = 0;
@@ -1274,10 +1282,11 @@ static void ConvertDataMULawRear(ALfloat *dst, const ALvoid *src, ALsizei len)
 */
 ALvoid ReleaseALBuffers(ALCdevice *device)
 {
-    while(device->BufferList)
+    ALsizei i;
+    for(i = 0;i < device->BufferMap.size;i++)
     {
-        ALbuffer *temp = device->BufferList;
-        device->BufferList = temp->next;
+        ALbuffer *temp = device->BufferMap.array[i].value;
+        device->BufferMap.array[i].value = NULL;
 
         // Release sample data
         free(temp->data);
@@ -1287,5 +1296,4 @@ ALvoid ReleaseALBuffers(ALCdevice *device)
         memset(temp, 0, sizeof(ALbuffer));
         free(temp);
     }
-    device->BufferCount = 0;
 }

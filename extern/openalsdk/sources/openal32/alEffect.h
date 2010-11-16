@@ -13,6 +13,7 @@ enum {
     EAXREVERB = 0,
     REVERB,
     ECHO,
+    MODULATOR,
 
     MAX_EFFECTS
 };
@@ -62,10 +63,14 @@ typedef struct ALeffect
         ALfloat Spread;
     } Echo;
 
+    struct {
+        ALfloat Frequency;
+        ALfloat HighPassCutoff;
+        ALint Waveform;
+    } Modulator;
+
     // Index to itself
     ALuint effect;
-
-    struct ALeffect *next;
 } ALeffect;
 
 

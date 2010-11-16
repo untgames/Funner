@@ -46,14 +46,12 @@ MAKE_FUNC(Pa_GetStreamInfo);
 #undef MAKE_FUNC
 
 
-static const ALCchar pa_device[] = "PortAudio Software";
-static const ALCchar pa_capture[] = "PortAudio Capture";
-static volatile ALuint load_count;
+static const ALCchar pa_device[] = "PortAudio Default";
 
 
 void *pa_load(void)
 {
-    if(load_count == 0)
+    if(!pa_handle)
     {
         PaError err;
 
@@ -92,7 +90,6 @@ void *pa_load(void)
 } while(0)
 
 #else
-        str = NULL;
         pa_handle = (void*)0xDEADBEEF;
 #define LOAD_FUNC(f) p##f = f
 #endif
@@ -124,23 +121,7 @@ LOAD_FUNC(Pa_GetStreamInfo);
             return NULL;
         }
     }
-    ++load_count;
-
     return pa_handle;
-}
-
-void pa_unload(void)
-{
-    if(load_count == 0 || --load_count > 0)
-        return;
-
-    pPa_Terminate();
-#ifdef _WIN32
-    FreeLibrary(pa_handle);
-#elif defined(HAVE_DLFCN_H)
-    dlclose(pa_handle);
-#endif
-    pa_handle = NULL;
 }
 
 
@@ -224,7 +205,6 @@ static ALCboolean pa_open_playback(ALCdevice *device, const ALCchar *deviceName)
             AL_PRINT("Unknown format: 0x%x\n", device->Format);
             device->ExtraData = NULL;
             free(data);
-            pa_unload();
             return ALC_FALSE;
     }
     outParams.channelCount = aluChannelsFromFormat(device->Format);
@@ -238,7 +218,6 @@ static ALCboolean pa_open_playback(ALCdevice *device, const ALCchar *deviceName)
         AL_PRINT("Pa_OpenStream() returned an error: %s\n", pPa_GetErrorText(err));
         device->ExtraData = NULL;
         free(data);
-        pa_unload();
         return ALC_FALSE;
     }
     streamInfo = pPa_GetStreamInfo(data->stream);
@@ -260,8 +239,6 @@ static void pa_close_playback(ALCdevice *device)
 
     free(data);
     device->ExtraData = NULL;
-
-    pa_unload();
 }
 
 static ALCboolean pa_reset_playback(ALCdevice *device)
@@ -303,8 +280,8 @@ static ALCboolean pa_open_capture(ALCdevice *device, const ALCchar *deviceName)
     PaError err;
 
     if(!deviceName)
-        deviceName = pa_capture;
-    else if(strcmp(deviceName, pa_capture) != 0)
+        deviceName = pa_device;
+    else if(strcmp(deviceName, pa_device) != 0)
         return ALC_FALSE;
 
     if(!pa_load())
@@ -317,8 +294,7 @@ static ALCboolean pa_open_capture(ALCdevice *device, const ALCchar *deviceName)
         return ALC_FALSE;
     }
 
-    frame_size = aluChannelsFromFormat(device->Format) *
-                 aluBytesFromFormat(device->Format);
+    frame_size = aluFrameSizeFromFormat(device->Format);
     data->ring = CreateRingBuffer(frame_size, device->UpdateSize*device->NumUpdates);
     if(data->ring == NULL)
     {
@@ -365,7 +341,6 @@ static ALCboolean pa_open_capture(ALCdevice *device, const ALCchar *deviceName)
 error:
     DestroyRingBuffer(data->ring);
     free(data);
-    pa_unload();
     return ALC_FALSE;
 }
 
@@ -380,8 +355,6 @@ static void pa_close_capture(ALCdevice *device)
 
     free(data);
     device->ExtraData = NULL;
-
-    pa_unload();
 }
 
 static void pa_start_capture(ALCdevice *device)
@@ -440,6 +413,16 @@ void alc_pa_init(BackendFuncs *func_list)
 
 void alc_pa_deinit(void)
 {
+    if(pa_handle)
+    {
+        pPa_Terminate();
+#ifdef _WIN32
+        FreeLibrary(pa_handle);
+#elif defined(HAVE_DLFCN_H)
+        dlclose(pa_handle);
+#endif
+        pa_handle = NULL;
+    }
 }
 
 void alc_pa_probe(int type)
@@ -451,7 +434,5 @@ void alc_pa_probe(int type)
     else if(type == ALL_DEVICE_PROBE)
         AppendAllDeviceList(pa_device);
     else if(type == CAPTURE_DEVICE_PROBE)
-        AppendCaptureDeviceList(pa_capture);
-
-    pa_unload();
+        AppendCaptureDeviceList(pa_device);
 }

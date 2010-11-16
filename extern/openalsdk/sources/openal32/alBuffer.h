@@ -18,12 +18,16 @@ typedef struct ALbuffer
     ALenum   eOriginalFormat;
     ALsizei  frequency;
 
+    ALsizei  OriginalSize;
+    ALsizei  OriginalAlign;
+
+    ALsizei  LoopStart;
+    ALsizei  LoopEnd;
+
     ALuint   refcount; // Number of sources using this buffer (deletion can only occur when this is 0)
 
     // Index to itself
     ALuint buffer;
-
-    struct ALbuffer *next;
 } ALbuffer;
 
 ALvoid ReleaseALBuffers(ALCdevice *device);

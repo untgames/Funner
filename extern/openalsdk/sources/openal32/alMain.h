@@ -13,6 +13,77 @@
 #include "AL/alc.h"
 #include "AL/alext.h"
 
+#ifndef AL_EXT_buffer_sub_data
+#define AL_EXT_buffer_sub_data 1
+#define AL_BYTE_RW_OFFSETS_EXT                   0x1031
+#define AL_SAMPLE_RW_OFFSETS_EXT                 0x1032
+typedef ALvoid (AL_APIENTRY*PFNALBUFFERSUBDATAEXTPROC)(ALuint,ALenum,const ALvoid*,ALsizei,ALsizei);
+#ifdef AL_ALEXT_PROTOTYPES
+AL_API ALvoid AL_APIENTRY alBufferSubDataEXT(ALuint buffer,ALenum format,const ALvoid *data,ALsizei offset,ALsizei length);
+#endif
+#endif
+
+#ifndef AL_EXT_sample_buffer_object
+#define AL_EXT_sample_buffer_object 1
+typedef ptrdiff_t ALintptrEXT;
+typedef ptrdiff_t ALsizeiptrEXT;
+#define AL_SAMPLE_SOURCE_EXT                     0x1040
+#define AL_SAMPLE_SINK_EXT                       0x1041
+#define AL_READ_ONLY_EXT                         0x1042
+#define AL_WRITE_ONLY_EXT                        0x1043
+#define AL_READ_WRITE_EXT                        0x1044
+#define AL_STREAM_WRITE_EXT                      0x1045
+#define AL_STREAM_READ_EXT                       0x1046
+#define AL_STREAM_COPY_EXT                       0x1047
+#define AL_STATIC_WRITE_EXT                      0x1048
+#define AL_STATIC_READ_EXT                       0x1049
+#define AL_STATIC_COPY_EXT                       0x104A
+#define AL_DYNAMIC_WRITE_EXT                     0x104B
+#define AL_DYNAMIC_READ_EXT                      0x104C
+#define AL_DYNAMIC_COPY_EXT                      0x104D
+typedef ALvoid (AL_APIENTRY*PFNALGENDATABUFFERSEXTPROC)(ALsizei n,ALuint *puiBuffers);
+typedef ALvoid (AL_APIENTRY*PFNALDELETEDATABUFFERSEXTPROC)(ALsizei n, const ALuint *puiBuffers);
+typedef ALboolean (AL_APIENTRY*PFNALISDATABUFFEREXTPROC)(ALuint uiBuffer);
+typedef ALvoid (AL_APIENTRY*PFNALDATABUFFERDATAEXTPROC)(ALuint buffer,const ALvoid *data,ALsizeiptrEXT size,ALenum usage);
+typedef ALvoid (AL_APIENTRY*PFNALDATABUFFERSUBDATAEXTPROC)(ALuint buffer, ALintptrEXT start, ALsizeiptrEXT length, const ALvoid *);
+typedef ALvoid (AL_APIENTRY*PFNALGETDATABUFFERSUBDATAEXTPROC)(ALuint buffer, ALintptrEXT start, ALsizeiptrEXT length, ALvoid *);
+typedef ALvoid (AL_APIENTRY*PFNALDATABUFFERFEXTPROC)(ALuint buffer, ALenum eParam, ALfloat flValue);
+typedef ALvoid (AL_APIENTRY*PFNALDATABUFFERFVEXTPROC)(ALuint buffer, ALenum eParam, const ALfloat* flValues);
+typedef ALvoid (AL_APIENTRY*PFNALDATABUFFERIEXTPROC)(ALuint buffer, ALenum eParam, ALint lValue);
+typedef ALvoid (AL_APIENTRY*PFNALDATABUFFERIVEXTPROC)(ALuint buffer, ALenum eParam, const ALint* plValues);
+typedef ALvoid (AL_APIENTRY*PFNALGETDATABUFFERFEXTPROC)(ALuint buffer, ALenum eParam, ALfloat *pflValue);
+typedef ALvoid (AL_APIENTRY*PFNALGETDATABUFFERFVEXTPROC)(ALuint buffer, ALenum eParam, ALfloat* pflValues);
+typedef ALvoid (AL_APIENTRY*PFNALGETDATABUFFERIEXTPROC)(ALuint buffer, ALenum eParam, ALint *plValue);
+typedef ALvoid (AL_APIENTRY*PFNALGETDATABUFFERIVEXTPROC)(ALuint buffer, ALenum eParam, ALint* plValues);
+typedef ALvoid (AL_APIENTRY*PFNALSELECTDATABUFFEREXTPROC)(ALenum target, ALuint uiBuffer);
+typedef ALvoid* (AL_APIENTRY*PFNALMAPDATABUFFEREXTPROC)(ALuint uiBuffer, ALintptrEXT start, ALsizeiptrEXT length, ALenum access);
+typedef ALvoid (AL_APIENTRY*PFNALUNMAPDATABUFFEREXTPROC)(ALuint uiBuffer);
+#ifdef AL_ALEXT_PROTOTYPES
+AL_API ALvoid AL_APIENTRY alGenDatabuffersEXT(ALsizei n,ALuint *puiBuffers);
+AL_API ALvoid AL_APIENTRY alDeleteDatabuffersEXT(ALsizei n, const ALuint *puiBuffers);
+AL_API ALboolean AL_APIENTRY alIsDatabufferEXT(ALuint uiBuffer);
+AL_API ALvoid AL_APIENTRY alDatabufferDataEXT(ALuint buffer,const ALvoid *data,ALsizeiptrEXT size,ALenum usage);
+AL_API ALvoid AL_APIENTRY alDatabufferSubDataEXT(ALuint buffer, ALintptrEXT start, ALsizeiptrEXT length, const ALvoid *data);
+AL_API ALvoid AL_APIENTRY alGetDatabufferSubDataEXT(ALuint buffer, ALintptrEXT start, ALsizeiptrEXT length, ALvoid *data);
+AL_API ALvoid AL_APIENTRY alDatabufferfEXT(ALuint buffer, ALenum eParam, ALfloat flValue);
+AL_API ALvoid AL_APIENTRY alDatabufferfvEXT(ALuint buffer, ALenum eParam, const ALfloat* flValues);
+AL_API ALvoid AL_APIENTRY alDatabufferiEXT(ALuint buffer, ALenum eParam, ALint lValue);
+AL_API ALvoid AL_APIENTRY alDatabufferivEXT(ALuint buffer, ALenum eParam, const ALint* plValues);
+AL_API ALvoid AL_APIENTRY alGetDatabufferfEXT(ALuint buffer, ALenum eParam, ALfloat *pflValue);
+AL_API ALvoid AL_APIENTRY alGetDatabufferfvEXT(ALuint buffer, ALenum eParam, ALfloat* pflValues);
+AL_API ALvoid AL_APIENTRY alGetDatabufferiEXT(ALuint buffer, ALenum eParam, ALint *plValue);
+AL_API ALvoid AL_APIENTRY alGetDatabufferivEXT(ALuint buffer, ALenum eParam, ALint* plValues);
+AL_API ALvoid AL_APIENTRY alSelectDatabufferEXT(ALenum target, ALuint uiBuffer);
+AL_API ALvoid* AL_APIENTRY alMapDatabufferEXT(ALuint uiBuffer, ALintptrEXT start, ALsizeiptrEXT length, ALenum access);
+AL_API ALvoid AL_APIENTRY alUnmapDatabufferEXT(ALuint uiBuffer);
+#endif
+#endif
+
+#ifndef AL_EXT_loop_points
+#define AL_EXT_loop_points 1
+#define AL_LOOP_POINTS                           0x2015
+#endif
+
 #if defined(HAVE_STDINT_H)
 #include <stdint.h>
 typedef int64_t ALint64;
@@ -59,6 +130,10 @@ typedef DWORD tls_type;
 #include <time.h>
 #include <errno.h>
 
+#ifdef ANDROID
+#include <android/log.h>
+#endif
+
 #define IsBadWritePtr(a,b) ((a) == NULL && (b) != 0)
 
 typedef pthread_key_t tls_type;
@@ -68,19 +143,19 @@ typedef pthread_key_t tls_type;
 #define tls_set(x, a) pthread_setspecific((x), (a))
 
 typedef pthread_mutex_t CRITICAL_SECTION;
-static inline void EnterCriticalSection(CRITICAL_SECTION *cs)
+static __inline void EnterCriticalSection(CRITICAL_SECTION *cs)
 {
     int ret;
     ret = pthread_mutex_lock(cs);
     assert(ret == 0);
 }
-static inline void LeaveCriticalSection(CRITICAL_SECTION *cs)
+static __inline void LeaveCriticalSection(CRITICAL_SECTION *cs)
 {
     int ret;
     ret = pthread_mutex_unlock(cs);
     assert(ret == 0);
 }
-static inline void InitializeCriticalSection(CRITICAL_SECTION *cs)
+static __inline void InitializeCriticalSection(CRITICAL_SECTION *cs)
 {
     pthread_mutexattr_t attrib;
     int ret;
@@ -100,7 +175,7 @@ static inline void InitializeCriticalSection(CRITICAL_SECTION *cs)
     pthread_mutexattr_destroy(&attrib);
 }
 
-static inline void DeleteCriticalSection(CRITICAL_SECTION *cs)
+static __inline void DeleteCriticalSection(CRITICAL_SECTION *cs)
 {
     int ret;
     ret = pthread_mutex_destroy(cs);
@@ -111,7 +186,7 @@ static inline void DeleteCriticalSection(CRITICAL_SECTION *cs)
  * to the expected DWORD. Both are defined as unsigned 32-bit types, however.
  * Additionally, Win32 is supposed to measure the time since Windows started,
  * as opposed to the actual time. */
-static inline ALuint timeGetTime(void)
+static __inline ALuint timeGetTime(void)
 {
     int ret;
 #if _POSIX_TIMERS > 0
@@ -131,7 +206,7 @@ static inline ALuint timeGetTime(void)
 #endif
 }
 
-static inline void Sleep(ALuint t)
+static __inline void Sleep(ALuint t)
 {
     struct timespec tv, rem;
     tv.tv_nsec = (t*1000000)%1000000000;
@@ -224,6 +299,47 @@ void alc_wave_probe(int type);
 void alc_pulse_init(BackendFuncs *func_list);
 void alc_pulse_deinit(void);
 void alc_pulse_probe(int type);
+void alc_android_init(BackendFuncs *func_list);
+void alc_android_deinit(void);
+void alc_android_probe(int type);
+void alc_null_init(BackendFuncs *func_list);
+void alc_null_deinit(void);
+void alc_null_probe(int type);
+
+
+typedef struct UIntMap {
+    struct {
+        ALuint key;
+        ALvoid *value;
+    } *array;
+    ALsizei size;
+    ALsizei maxsize;
+} UIntMap;
+
+void InitUIntMap(UIntMap *map);
+void ResetUIntMap(UIntMap *map);
+ALenum InsertUIntMapEntry(UIntMap *map, ALuint key, ALvoid *value);
+void RemoveUIntMapKey(UIntMap *map, ALuint key);
+
+static __inline ALvoid *LookupUIntMapKey(UIntMap *map, ALuint key)
+{
+    if(map->size > 0)
+    {
+        ALsizei low = 0;
+        ALsizei high = map->size - 1;
+        while(low < high)
+        {
+            ALsizei mid = low + (high-low)/2;
+            if(map->array[mid].key < key)
+                low = mid + 1;
+            else
+                high = mid;
+        }
+        if(map->array[low].key == key)
+            return map->array[low].value;
+    }
+    return NULL;
+}
 
 
 struct ALCdevice_struct
@@ -249,21 +365,17 @@ struct ALCdevice_struct
     ALCuint      NumStereoSources;
     ALuint       NumAuxSends;
 
-    // Linked List of Buffers for this device
-    struct ALbuffer *BufferList;
-    ALuint           BufferCount;
+    // Map of Buffers for this device
+    UIntMap BufferMap;
 
-    // Linked List of Effects for this device
-    struct ALeffect *EffectList;
-    ALuint           EffectCount;
+    // Map of Effects for this device
+    UIntMap EffectMap;
 
-    // Linked List of Filters for this device
-    struct ALfilter *FilterList;
-    ALuint           FilterCount;
+    // Map of Filters for this device
+    UIntMap FilterMap;
 
-    // Linked List of Databuffers for this device
-    struct ALdatabuffer *DatabufferList;
-    ALuint               DatabufferCount;
+    // Map of Databuffers for this device
+    UIntMap DatabufferMap;
 
     // Stereo-to-binaural filter
     struct bs2b *Bs2b;
@@ -272,10 +384,19 @@ struct ALCdevice_struct
     // Simulated dampening from head occlusion
     ALfloat      HeadDampen;
 
+    // Duplicate stereo sources on the side/rear channels
+    ALboolean    DuplicateStereo;
+
     // Dry path buffer mix
     float DryBuffer[BUFFERSIZE][OUTPUTCHANNELS];
 
-    Channel DevChannels[OUTPUTCHANNELS];
+    ALuint DevChannels[OUTPUTCHANNELS];
+
+    ALfloat ChannelMatrix[OUTPUTCHANNELS][OUTPUTCHANNELS];
+
+    Channel Speaker2Chan[OUTPUTCHANNELS];
+    ALfloat PanningLUT[OUTPUTCHANNELS * LUT_NUM];
+    ALuint  NumChan;
 
     // Contexts created on this device
     ALCcontext  **Contexts;
@@ -302,11 +423,8 @@ struct ALCcontext_struct
 {
     ALlistener  Listener;
 
-    struct ALsource *SourceList;
-    ALuint           SourceCount;
-
-    struct ALeffectslot *EffectSlotList;
-    ALuint               EffectSlotCount;
+    UIntMap SourceMap;
+    UIntMap EffectSlotMap;
 
     struct ALdatabuffer *SampleSource;
     struct ALdatabuffer *SampleSink;
@@ -322,18 +440,15 @@ struct ALCcontext_struct
     ALfloat     DopplerVelocity;
     ALfloat     flSpeedOfSound;
 
-    ALfloat     PanningLUT[OUTPUTCHANNELS * LUT_NUM];
-    ALint       NumChan;
-
-    ALfloat     ChannelMatrix[OUTPUTCHANNELS][OUTPUTCHANNELS];
+    struct ALsource **ActiveSources;
+    ALsizei           ActiveSourceCount;
+    ALsizei           MaxActiveSources;
 
     ALCdevice  *Device;
     const ALCchar *ExtensionList;
 
     ALCcontext *next;
 };
-
-extern ALint RTPrioLevel;
 
 ALCvoid ReleaseALC(ALCvoid);
 
@@ -366,7 +481,7 @@ int GetConfigValueInt(const char *blockName, const char *keyName, int def);
 float GetConfigValueFloat(const char *blockName, const char *keyName, float def);
 int GetConfigValueBool(const char *blockName, const char *keyName, int def);
 
-void EnableRTPrio(ALint level);
+void SetRTPriority(void);
 
 void SetDefaultChannelOrder(ALCdevice *device);
 void SetDefaultWFXChannelOrder(ALCdevice *device);
@@ -374,14 +489,6 @@ void SetDefaultWFXChannelOrder(ALCdevice *device);
 void al_print(const char *fname, unsigned int line, const char *fmt, ...)
              PRINTF_STYLE(3,4);
 #define AL_PRINT(...) al_print(__FILE__, __LINE__, __VA_ARGS__)
-
-#define DECL_VERIFIER(name, type, field)                                      \
-static type* Verify##name(type *list, ALuint id)                              \
-{                                                                             \
-    while(list && list->field != id)                                          \
-        list = list->next;                                                    \
-    return list;                                                              \
-}
 
 #ifdef __cplusplus
 }

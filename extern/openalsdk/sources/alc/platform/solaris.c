@@ -37,7 +37,7 @@
 #include <sys/audioio.h>
 
 
-static const ALCchar solaris_device[] = "Solaris Software";
+static const ALCchar solaris_device[] = "Solaris Default";
 
 typedef struct {
     int fd;
@@ -57,10 +57,9 @@ static ALuint SolarisProc(ALvoid *ptr)
     ALint frameSize;
     int wrote;
 
-    EnableRTPrio(RTPrioLevel);
+    SetRTPriority();
 
-    frameSize = aluChannelsFromFormat(pDevice->Format) *
-                aluBytesFromFormat(pDevice->Format);
+    frameSize = aluFrameSizeFromFormat(pDevice->Format);
 
     while(!data->killNow && pDevice->Connected)
     {

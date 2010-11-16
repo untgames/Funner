@@ -71,12 +71,11 @@ typedef struct {
 static const ALCchar dsDevice[] = "DirectSound Software";
 static DevMap *DeviceList;
 static ALuint NumDevices;
-static volatile ALuint load_count;
 
 
 void *DSoundLoad(void)
 {
-    if(load_count == 0)
+    if(!ds_handle)
     {
 #ifdef _WIN32
         ds_handle = LoadLibraryA("dsound.dll");
@@ -105,20 +104,7 @@ LOAD_FUNC(DirectSoundCreate);
 LOAD_FUNC(DirectSoundEnumerateA);
 #undef LOAD_FUNC
     }
-    ++load_count;
-
     return ds_handle;
-}
-
-void DSoundUnload(void)
-{
-    if(load_count == 0 || --load_count > 0)
-        return;
-
-#ifdef _WIN32
-    FreeLibrary(ds_handle);
-#endif
-    ds_handle = NULL;
 }
 
 
@@ -129,7 +115,7 @@ static BOOL CALLBACK DSoundEnumDevices(LPGUID guid, LPCSTR desc, LPCSTR drvname,
 
     if(guid)
     {
-        char str[128];
+        char str[1024];
         void *temp;
 
         temp = realloc(DeviceList, sizeof(DevMap) * (NumDevices+1));
@@ -137,7 +123,7 @@ static BOOL CALLBACK DSoundEnumDevices(LPGUID guid, LPCSTR desc, LPCSTR drvname,
         {
             DeviceList = temp;
 
-            snprintf(str, sizeof(str), "DirectSound Software on %s", desc);
+            snprintf(str, sizeof(str), "%s via DirectSound", desc);
 
             DeviceList[NumDevices].name = strdup(str);
             DeviceList[NumDevices].guid = *guid;
@@ -163,7 +149,7 @@ static ALuint DSoundProc(ALvoid *ptr)
     DWORD avail;
     HRESULT err;
 
-    EnableRTPrio(RTPrioLevel);
+    SetRTPriority();
 
     memset(&DSBCaps, 0, sizeof(DSBCaps));
     DSBCaps.dwSize = sizeof(DSBCaps);
@@ -175,8 +161,7 @@ static ALuint DSoundProc(ALvoid *ptr)
         return 1;
     }
 
-    FrameSize = aluChannelsFromFormat(pDevice->Format) *
-                aluBytesFromFormat(pDevice->Format);
+    FrameSize = aluFrameSizeFromFormat(pDevice->Format);
     FragSize = pDevice->UpdateSize * FrameSize;
 
     IDirectSoundBuffer_GetCurrentPosition(pData->DSsbuffer, &LastCursor, NULL);
@@ -260,10 +245,7 @@ static ALCboolean DSoundOpenPlayback(ALCdevice *device, const ALCchar *deviceNam
             }
         }
         if(i == NumDevices)
-        {
-            DSoundUnload();
             return ALC_FALSE;
-        }
     }
 
     //Initialise requested device
@@ -271,7 +253,6 @@ static ALCboolean DSoundOpenPlayback(ALCdevice *device, const ALCchar *deviceNam
     if(!pData)
     {
         alcSetError(device, ALC_OUT_OF_MEMORY);
-        DSoundUnload();
         return ALC_FALSE;
     }
 
@@ -284,7 +265,6 @@ static ALCboolean DSoundOpenPlayback(ALCdevice *device, const ALCchar *deviceNam
         if(pData->lpDS)
             IDirectSound_Release(pData->lpDS);
         free(pData);
-        DSoundUnload();
         return ALC_FALSE;
     }
 
@@ -300,8 +280,6 @@ static void DSoundClosePlayback(ALCdevice *device)
     IDirectSound_Release(pData->lpDS);
     free(pData);
     device->ExtraData = NULL;
-
-    DSoundUnload();
 }
 
 static ALCboolean DSoundResetPlayback(ALCdevice *device)
@@ -346,6 +324,7 @@ static ALCboolean DSoundResetPlayback(ALCdevice *device)
                 format = AL_FORMAT_MONO16;
             else if(aluBytesFromFormat(device->Format) == 4)
                 format = AL_FORMAT_MONO_FLOAT32;
+            OutputType.dwChannelMask = SPEAKER_FRONT_CENTER;
         }
         else if(speakers == DSSPEAKER_STEREO)
         {
@@ -355,6 +334,8 @@ static ALCboolean DSoundResetPlayback(ALCdevice *device)
                 format = AL_FORMAT_STEREO16;
             else if(aluBytesFromFormat(device->Format) == 4)
                 format = AL_FORMAT_STEREO_FLOAT32;
+            OutputType.dwChannelMask = SPEAKER_FRONT_LEFT |
+                                       SPEAKER_FRONT_RIGHT;
         }
         else if(speakers == DSSPEAKER_QUAD)
         {
@@ -403,7 +384,7 @@ static ALCboolean DSoundResetPlayback(ALCdevice *device)
         }
         else
             format = device->Format;
-        frameSize = aluBytesFromFormat(format) * aluChannelsFromFormat(format);
+        frameSize = aluFrameSizeFromFormat(format);
 
         OutputType.Format.wFormatTag = WAVE_FORMAT_PCM;
         OutputType.Format.nChannels = aluChannelsFromFormat(format);
@@ -558,6 +539,14 @@ void alcDSoundDeinit(void)
     free(DeviceList);
     DeviceList = NULL;
     NumDevices = 0;
+
+    if(ds_handle)
+    {
+#ifdef _WIN32
+        FreeLibrary(ds_handle);
+#endif
+        ds_handle = NULL;
+    }
 }
 
 void alcDSoundProbe(int type)
@@ -586,6 +575,4 @@ void alcDSoundProbe(int type)
                 AppendAllDeviceList(DeviceList[i].name);
         }
     }
-
-    DSoundUnload();
 }

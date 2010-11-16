@@ -49,11 +49,13 @@ typedef struct ALechoState {
 
     ALfloat FeedGain;
 
+    ALfloat Scale;
+
     FILTER iirFilter;
     ALfloat history[2];
 } ALechoState;
 
-ALvoid EchoDestroy(ALeffectState *effect)
+static ALvoid EchoDestroy(ALeffectState *effect)
 {
     ALechoState *state = (ALechoState*)effect;
     if(state)
@@ -64,7 +66,7 @@ ALvoid EchoDestroy(ALeffectState *effect)
     }
 }
 
-ALboolean EchoDeviceUpdate(ALeffectState *effect, ALCdevice *Device)
+static ALboolean EchoDeviceUpdate(ALeffectState *effect, ALCdevice *Device)
 {
     ALechoState *state = (ALechoState*)effect;
     ALuint maxlen, i;
@@ -88,10 +90,13 @@ ALboolean EchoDeviceUpdate(ALeffectState *effect, ALCdevice *Device)
     for(i = 0;i < state->BufferLength;i++)
         state->SampleBuffer[i] = 0.0f;
 
+    state->Scale = aluSqrt(Device->NumChan / 6.0f);
+    state->Scale = __min(state->Scale, 1.0f);
+
     return AL_TRUE;
 }
 
-ALvoid EchoUpdate(ALeffectState *effect, ALCcontext *Context, const ALeffect *Effect)
+static ALvoid EchoUpdate(ALeffectState *effect, ALCcontext *Context, const ALeffect *Effect)
 {
     ALechoState *state = (ALechoState*)effect;
     ALuint frequency = Context->Device->Frequency;
@@ -115,14 +120,14 @@ ALvoid EchoUpdate(ALeffectState *effect, ALCcontext *Context, const ALeffect *Ef
     state->iirFilter.coeff = a;
 }
 
-ALvoid EchoProcess(ALeffectState *effect, const ALeffectslot *Slot, ALuint SamplesToDo, const ALfloat *SamplesIn, ALfloat (*SamplesOut)[OUTPUTCHANNELS])
+static ALvoid EchoProcess(ALeffectState *effect, const ALeffectslot *Slot, ALuint SamplesToDo, const ALfloat *SamplesIn, ALfloat (*SamplesOut)[OUTPUTCHANNELS])
 {
     ALechoState *state = (ALechoState*)effect;
     const ALuint mask = state->BufferLength-1;
     const ALuint tap1 = state->Tap[0].delay;
     const ALuint tap2 = state->Tap[1].delay;
     ALuint offset = state->Offset;
-    const ALfloat gain = Slot->Gain;
+    const ALfloat gain = Slot->Gain * state->Scale;
     ALfloat samp[2], smp;
     ALuint i;
 
@@ -177,6 +182,8 @@ ALeffectState *EchoCreate(void)
     state->Offset = 0;
     state->GainL = 0.0f;
     state->GainR = 0.0f;
+
+    state->Scale = 1.0f;
 
     state->iirFilter.coeff = 0.0f;
     state->iirFilter.history[0] = 0.0f;

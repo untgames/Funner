@@ -69,8 +69,8 @@ static void ProbeDevices(void)
         CaptureDeviceList[i] = NULL;
         if(waveInGetDevCaps(i, &WaveInCaps, sizeof(WAVEINCAPS)) == MMSYSERR_NOERROR)
         {
-            char name[128];
-            snprintf(name, sizeof(name), "WaveIn on %s", WaveInCaps.szPname);
+            char name[1024];
+            snprintf(name, sizeof(name), "%s via WaveIn", WaveInCaps.szPname);
             CaptureDeviceList[i] = strdup(name);
         }
     }
@@ -402,8 +402,7 @@ static void WinMMCaptureSamples(ALCdevice *pDevice, ALCvoid *pBuffer, ALCuint lS
     ALuint ulBytes, ulBytesToCopy;
     ALuint ulCapturedSamples;
     ALuint ulReadOffset;
-    ALuint frameSize = aluBytesFromFormat(pDevice->Format) *
-                       aluChannelsFromFormat(pDevice->Format);
+    ALuint frameSize = aluFrameSizeFromFormat(pDevice->Format);
 
     // Check that we have the requested numbers of Samples
     ulCapturedSamples = (pData->ulWriteCapturedDataPos -
@@ -444,8 +443,7 @@ static ALCuint WinMMAvailableSamples(ALCdevice *pDevice)
 {
     WinMMData *pData = (WinMMData*)pDevice->ExtraData;
     ALCuint lCapturedBytes = (pData->ulWriteCapturedDataPos - pData->ulReadCapturedDataPos);
-    return lCapturedBytes / (aluBytesFromFormat(pDevice->Format) *
-                             aluChannelsFromFormat(pDevice->Format));
+    return lCapturedBytes / aluFrameSizeFromFormat(pDevice->Format);
 }
 
 

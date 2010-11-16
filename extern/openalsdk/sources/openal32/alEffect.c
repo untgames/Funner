@@ -36,7 +36,7 @@ ALboolean DisabledEffects[MAX_EFFECTS];
 
 static void InitEffectParams(ALeffect *effect, ALenum type);
 
-DECL_VERIFIER(Effect, ALeffect, effect)
+#define LookupEffect(m, k) ((ALeffect*)LookupUIntMapKey(&(m), (k)))
 
 AL_API ALvoid AL_APIENTRY alGenEffects(ALsizei n, ALuint *effects)
 {
@@ -53,38 +53,34 @@ AL_API ALvoid AL_APIENTRY alGenEffects(ALsizei n, ALuint *effects)
         // Check that enough memory has been allocted in the 'effects' array for n Effects
         if (!IsBadWritePtr((void*)effects, n * sizeof(ALuint)))
         {
-            ALeffect *end;
-            ALeffect **list = &device->EffectList;
-            while(*list)
-                list = &(*list)->next;
+            ALenum err;
 
-            end = *list;
             while(i < n)
             {
-                *list = calloc(1, sizeof(ALeffect));
-                if(!(*list))
+                ALeffect *effect = calloc(1, sizeof(ALeffect));
+                if(!effect)
                 {
-                    while(end->next)
-                    {
-                        ALeffect *temp = end->next;
-                        end->next = temp->next;
-
-                        ALTHUNK_REMOVEENTRY(temp->effect);
-                        device->EffectCount--;
-                        free(temp);
-                    }
                     alSetError(Context, AL_OUT_OF_MEMORY);
+                    alDeleteEffects(i, effects);
                     break;
                 }
 
-                effects[i] = (ALuint)ALTHUNK_ADDENTRY(*list);
-                (*list)->effect = effects[i];
+                effect->effect = ALTHUNK_ADDENTRY(effect);
+                err = InsertUIntMapEntry(&device->EffectMap, effect->effect,
+                                         effect);
+                if(err != AL_NO_ERROR)
+                {
+                    ALTHUNK_REMOVEENTRY(effect->effect);
+                    memset(effect, 0, sizeof(ALeffect));
+                    free(effect);
 
-                InitEffectParams(*list, AL_EFFECT_NULL);
-                device->EffectCount++;
-                i++;
+                    alSetError(Context, err);
+                    alDeleteEffects(i, effects);
+                    break;
+                }
 
-                list = &(*list)->next;
+                effects[i++] = effect->effect;
+                InitEffectParams(effect, AL_EFFECT_NULL);
             }
         }
     }
@@ -111,7 +107,7 @@ AL_API ALvoid AL_APIENTRY alDeleteEffects(ALsizei n, ALuint *effects)
             if(!effects[i])
                 continue;
 
-            if(!VerifyEffect(device->EffectList, effects[i]))
+            if(!LookupEffect(device->EffectMap, effects[i]))
             {
                 alSetError(Context, AL_INVALID_NAME);
                 break;
@@ -124,23 +120,13 @@ AL_API ALvoid AL_APIENTRY alDeleteEffects(ALsizei n, ALuint *effects)
             for (i = 0; i < n; i++)
             {
                 // Recheck that the effect is valid, because there could be duplicated names
-                if((ALEffect=VerifyEffect(device->EffectList, effects[i])) != NULL)
+                if((ALEffect=LookupEffect(device->EffectMap, effects[i])) != NULL)
                 {
-                    ALeffect **list;
-
-                    // Remove Effect from list of effects
-                    list = &device->EffectList;
-                    while(*list && *list != ALEffect)
-                         list = &(*list)->next;
-
-                    if(*list)
-                        *list = (*list)->next;
+                    RemoveUIntMapKey(&device->EffectMap, ALEffect->effect);
                     ALTHUNK_REMOVEENTRY(ALEffect->effect);
 
                     memset(ALEffect, 0, sizeof(ALeffect));
                     free(ALEffect);
-
-                    device->EffectCount--;
                 }
             }
         }
@@ -154,14 +140,13 @@ AL_API ALvoid AL_APIENTRY alDeleteEffects(ALsizei n, ALuint *effects)
 AL_API ALboolean AL_APIENTRY alIsEffect(ALuint effect)
 {
     ALCcontext *Context;
-    ALboolean  result = AL_TRUE;
+    ALboolean  result;
 
     Context = GetContextSuspended();
     if(!Context) return AL_FALSE;
 
-    if(effect)
-        result = (VerifyEffect(Context->Device->EffectList, effect) ?
-                  AL_TRUE : AL_FALSE);
+    result = ((!effect || LookupEffect(Context->Device->EffectMap, effect)) ?
+              AL_TRUE : AL_FALSE);
 
     ProcessContext(Context);
 
@@ -178,14 +163,15 @@ AL_API ALvoid AL_APIENTRY alEffecti(ALuint effect, ALenum param, ALint iValue)
     if(!Context) return;
 
     Device = Context->Device;
-    if((ALEffect=VerifyEffect(Device->EffectList, effect)) != NULL)
+    if((ALEffect=LookupEffect(Device->EffectMap, effect)) != NULL)
     {
         if(param == AL_EFFECT_TYPE)
         {
             ALboolean isOk = (iValue == AL_EFFECT_NULL ||
                 (iValue == AL_EFFECT_EAXREVERB && !DisabledEffects[EAXREVERB]) ||
                 (iValue == AL_EFFECT_REVERB && !DisabledEffects[REVERB]) ||
-                (iValue == AL_EFFECT_ECHO && !DisabledEffects[ECHO]));
+                (iValue == AL_EFFECT_ECHO && !DisabledEffects[ECHO]) ||
+                (iValue == AL_EFFECT_RING_MODULATOR && !DisabledEffects[MODULATOR]));
 
             if(isOk)
                 InitEffectParams(ALEffect, iValue);
@@ -235,6 +221,28 @@ AL_API ALvoid AL_APIENTRY alEffecti(ALuint effect, ALenum param, ALint iValue)
                 break;
             }
         }
+        else if(ALEffect->type == AL_EFFECT_RING_MODULATOR)
+        {
+            switch(param)
+            {
+            case AL_RING_MODULATOR_FREQUENCY:
+            case AL_RING_MODULATOR_HIGHPASS_CUTOFF:
+                alEffectf(effect, param, (ALfloat)iValue);
+                break;
+
+            case AL_RING_MODULATOR_WAVEFORM:
+                if(iValue >= AL_RING_MODULATOR_MIN_WAVEFORM &&
+                   iValue <= AL_RING_MODULATOR_MAX_WAVEFORM)
+                    ALEffect->Modulator.Waveform = iValue;
+                else
+                    alSetError(Context, AL_INVALID_VALUE);
+                break;
+
+            default:
+                alSetError(Context, AL_INVALID_ENUM);
+                break;
+            }
+        }
         else
             alSetError(Context, AL_INVALID_ENUM);
     }
@@ -254,7 +262,7 @@ AL_API ALvoid AL_APIENTRY alEffectiv(ALuint effect, ALenum param, ALint *piValue
     if(!Context) return;
 
     Device = Context->Device;
-    if((ALEffect=VerifyEffect(Device->EffectList, effect)) != NULL)
+    if((ALEffect=LookupEffect(Device->EffectMap, effect)) != NULL)
     {
         if(param == AL_EFFECT_TYPE)
         {
@@ -295,6 +303,21 @@ AL_API ALvoid AL_APIENTRY alEffectiv(ALuint effect, ALenum param, ALint *piValue
                 break;
             }
         }
+        else if(ALEffect->type == AL_EFFECT_RING_MODULATOR)
+        {
+            switch(param)
+            {
+            case AL_RING_MODULATOR_FREQUENCY:
+            case AL_RING_MODULATOR_HIGHPASS_CUTOFF:
+            case AL_RING_MODULATOR_WAVEFORM:
+                alEffecti(effect, param, piValues[0]);
+                break;
+
+            default:
+                alSetError(Context, AL_INVALID_ENUM);
+                break;
+            }
+        }
         else
             alSetError(Context, AL_INVALID_ENUM);
     }
@@ -314,7 +337,7 @@ AL_API ALvoid AL_APIENTRY alEffectf(ALuint effect, ALenum param, ALfloat flValue
     if(!Context) return;
 
     Device = Context->Device;
-    if((ALEffect=VerifyEffect(Device->EffectList, effect)) != NULL)
+    if((ALEffect=LookupEffect(Device->EffectMap, effect)) != NULL)
     {
         if(ALEffect->type == AL_EFFECT_EAXREVERB)
         {
@@ -633,6 +656,31 @@ AL_API ALvoid AL_APIENTRY alEffectf(ALuint effect, ALenum param, ALfloat flValue
                 break;
             }
         }
+        else if(ALEffect->type == AL_EFFECT_RING_MODULATOR)
+        {
+            switch(param)
+            {
+            case AL_RING_MODULATOR_FREQUENCY:
+                if(flValue >= AL_RING_MODULATOR_MIN_FREQUENCY &&
+                   flValue <= AL_RING_MODULATOR_MAX_FREQUENCY)
+                    ALEffect->Modulator.Frequency = flValue;
+                else
+                    alSetError(Context, AL_INVALID_VALUE);
+                break;
+
+            case AL_RING_MODULATOR_HIGHPASS_CUTOFF:
+                if(flValue >= AL_RING_MODULATOR_MIN_HIGHPASS_CUTOFF &&
+                   flValue <= AL_RING_MODULATOR_MAX_HIGHPASS_CUTOFF)
+                    ALEffect->Modulator.HighPassCutoff = flValue;
+                else
+                    alSetError(Context, AL_INVALID_VALUE);
+                break;
+
+            default:
+                alSetError(Context, AL_INVALID_ENUM);
+                break;
+            }
+        }
         else
             alSetError(Context, AL_INVALID_ENUM);
     }
@@ -652,7 +700,7 @@ AL_API ALvoid AL_APIENTRY alEffectfv(ALuint effect, ALenum param, ALfloat *pflVa
     if(!Context) return;
 
     Device = Context->Device;
-    if((ALEffect=VerifyEffect(Device->EffectList, effect)) != NULL)
+    if((ALEffect=LookupEffect(Device->EffectMap, effect)) != NULL)
     {
         if(ALEffect->type == AL_EFFECT_EAXREVERB)
         {
@@ -748,6 +796,20 @@ AL_API ALvoid AL_APIENTRY alEffectfv(ALuint effect, ALenum param, ALfloat *pflVa
                 break;
             }
         }
+        else if(ALEffect->type == AL_EFFECT_RING_MODULATOR)
+        {
+            switch(param)
+            {
+            case AL_RING_MODULATOR_FREQUENCY:
+            case AL_RING_MODULATOR_HIGHPASS_CUTOFF:
+                alEffectf(effect, param, pflValues[0]);
+                break;
+
+            default:
+                alSetError(Context, AL_INVALID_ENUM);
+                break;
+            }
+        }
         else
             alSetError(Context, AL_INVALID_ENUM);
     }
@@ -767,7 +829,7 @@ AL_API ALvoid AL_APIENTRY alGetEffecti(ALuint effect, ALenum param, ALint *piVal
     if(!Context) return;
 
     Device = Context->Device;
-    if((ALEffect=VerifyEffect(Device->EffectList, effect)) != NULL)
+    if((ALEffect=LookupEffect(Device->EffectMap, effect)) != NULL)
     {
         if(param == AL_EFFECT_TYPE)
         {
@@ -808,6 +870,25 @@ AL_API ALvoid AL_APIENTRY alGetEffecti(ALuint effect, ALenum param, ALint *piVal
                 break;
             }
         }
+        else if(ALEffect->type == AL_EFFECT_RING_MODULATOR)
+        {
+            switch(param)
+            {
+            case AL_RING_MODULATOR_FREQUENCY:
+                *piValue = (ALint)ALEffect->Modulator.Frequency;
+                break;
+            case AL_RING_MODULATOR_HIGHPASS_CUTOFF:
+                *piValue = (ALint)ALEffect->Modulator.HighPassCutoff;
+                break;
+            case AL_RING_MODULATOR_WAVEFORM:
+                *piValue = ALEffect->Modulator.Waveform;
+                break;
+
+            default:
+                alSetError(Context, AL_INVALID_ENUM);
+                break;
+            }
+        }
         else
             alSetError(Context, AL_INVALID_ENUM);
     }
@@ -827,7 +908,7 @@ AL_API ALvoid AL_APIENTRY alGetEffectiv(ALuint effect, ALenum param, ALint *piVa
     if(!Context) return;
 
     Device = Context->Device;
-    if((ALEffect=VerifyEffect(Device->EffectList, effect)) != NULL)
+    if((ALEffect=LookupEffect(Device->EffectMap, effect)) != NULL)
     {
         if(param == AL_EFFECT_TYPE)
         {
@@ -868,6 +949,21 @@ AL_API ALvoid AL_APIENTRY alGetEffectiv(ALuint effect, ALenum param, ALint *piVa
                 break;
             }
         }
+        else if(ALEffect->type == AL_EFFECT_RING_MODULATOR)
+        {
+            switch(param)
+            {
+            case AL_RING_MODULATOR_FREQUENCY:
+            case AL_RING_MODULATOR_HIGHPASS_CUTOFF:
+            case AL_RING_MODULATOR_WAVEFORM:
+                alGetEffecti(effect, param, piValues);
+                break;
+
+            default:
+                alSetError(Context, AL_INVALID_ENUM);
+                break;
+            }
+        }
         else
             alSetError(Context, AL_INVALID_ENUM);
     }
@@ -887,7 +983,7 @@ AL_API ALvoid AL_APIENTRY alGetEffectf(ALuint effect, ALenum param, ALfloat *pfl
     if(!Context) return;
 
     Device = Context->Device;
-    if((ALEffect=VerifyEffect(Device->EffectList, effect)) != NULL)
+    if((ALEffect=LookupEffect(Device->EffectMap, effect)) != NULL)
     {
         if(ALEffect->type == AL_EFFECT_EAXREVERB)
         {
@@ -1064,6 +1160,22 @@ AL_API ALvoid AL_APIENTRY alGetEffectf(ALuint effect, ALenum param, ALfloat *pfl
                 break;
             }
         }
+        else if(ALEffect->type == AL_EFFECT_RING_MODULATOR)
+        {
+            switch(param)
+            {
+            case AL_RING_MODULATOR_FREQUENCY:
+                *pflValue = ALEffect->Modulator.Frequency;
+                break;
+            case AL_RING_MODULATOR_HIGHPASS_CUTOFF:
+                *pflValue = ALEffect->Modulator.HighPassCutoff;
+                break;
+
+            default:
+                alSetError(Context, AL_INVALID_ENUM);
+                break;
+            }
+        }
         else
             alSetError(Context, AL_INVALID_ENUM);
     }
@@ -1083,7 +1195,7 @@ AL_API ALvoid AL_APIENTRY alGetEffectfv(ALuint effect, ALenum param, ALfloat *pf
     if(!Context) return;
 
     Device = Context->Device;
-    if((ALEffect=VerifyEffect(Device->EffectList, effect)) != NULL)
+    if((ALEffect=LookupEffect(Device->EffectMap, effect)) != NULL)
     {
         if(ALEffect->type == AL_EFFECT_EAXREVERB)
         {
@@ -1169,6 +1281,20 @@ AL_API ALvoid AL_APIENTRY alGetEffectfv(ALuint effect, ALenum param, ALfloat *pf
                 break;
             }
         }
+        else if(ALEffect->type == AL_EFFECT_RING_MODULATOR)
+        {
+            switch(param)
+            {
+            case AL_RING_MODULATOR_FREQUENCY:
+            case AL_RING_MODULATOR_HIGHPASS_CUTOFF:
+                alGetEffectf(effect, param, pflValues);
+                break;
+
+            default:
+                alSetError(Context, AL_INVALID_ENUM);
+                break;
+            }
+        }
         else
             alSetError(Context, AL_INVALID_ENUM);
     }
@@ -1181,17 +1307,17 @@ AL_API ALvoid AL_APIENTRY alGetEffectfv(ALuint effect, ALenum param, ALfloat *pf
 
 ALvoid ReleaseALEffects(ALCdevice *device)
 {
-    while(device->EffectList)
+    ALsizei i;
+    for(i = 0;i < device->EffectMap.size;i++)
     {
-        ALeffect *temp = device->EffectList;
-        device->EffectList = temp->next;
+        ALeffect *temp = device->EffectMap.array[i].value;
+        device->EffectMap.array[i].value = NULL;
 
         // Release effect structure
         ALTHUNK_REMOVEENTRY(temp->effect);
         memset(temp, 0, sizeof(ALeffect));
         free(temp);
     }
-    device->EffectCount = 0;
 }
 
 
@@ -1240,6 +1366,11 @@ static void InitEffectParams(ALeffect *effect, ALenum type)
         effect->Echo.Damping = AL_ECHO_DEFAULT_DAMPING;
         effect->Echo.Feedback = AL_ECHO_DEFAULT_FEEDBACK;
         effect->Echo.Spread = AL_ECHO_DEFAULT_SPREAD;
+        break;
+    case AL_EFFECT_RING_MODULATOR:
+        effect->Modulator.Frequency = AL_RING_MODULATOR_DEFAULT_FREQUENCY;
+        effect->Modulator.HighPassCutoff = AL_RING_MODULATOR_DEFAULT_HIGHPASS_CUTOFF;
+        effect->Modulator.Waveform = AL_RING_MODULATOR_DEFAULT_WAVEFORM;
         break;
     }
 }
