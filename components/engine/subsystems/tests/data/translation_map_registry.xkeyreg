@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding = "windows-1251"?>
 <TranslationMapRegistry>
-  <Translation Profile="game1.window.Device1" TranslationMap="data/game1 mouse.xkeymap"/>
-  <Translation Profile="game1.Joystick" TranslationMap="data/game1 joystick.xkeymap"/>
-  <Translation Profile="game1.Joystick.USB,4-Axis,12-Button with POV" TranslationMap="data/game1 joystick.xkeymap"/>
+  <Translation Profile="game1.window.Device1" TranslationMap="data/game1_mouse.xkeymap"/>
+  <Translation Profile="game1.Joystick" TranslationMap="data/game1_joystick.xkeymap"/>
+  <Translation Profile="game1.Joystick.USB,4-Axis,12-Button with POV" TranslationMap="data/game1_joystick.xkeymap"/>
 </TranslationMapRegistry>

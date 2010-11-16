@@ -17,6 +17,7 @@ ENGINE.SUBSYSTEMS.SOURCES.iphone.SOURCE_DIRS      := sources/iphone
 #Цель - tests
 ENGINE.SUBSYSTEMS.TESTS.TYPE                := test-suite
 ENGINE.SUBSYSTEMS.TESTS.SOURCE_DIRS         := tests
+ENGINE.SUBSYSTEMS.TESTS.INSTALLATION_FILES  := tests/config_window_manager_shell.xml tests/config_window_manager.xml tests/config_shell.xml tests/config_cursor.xml
 ENGINE.SUBSYSTEMS.TESTS.IMPORTS             := compile.engine.core compile.common compile.system compile.render.scene_render compile.input.manager \
                                                link.engine.subsystems.scene_render link.engine.subsystems.scene_player \
                                                link.engine.subsystems.input_manager link.engine.subsystems.shell link.engine.subsystems.log \
