@@ -5,12 +5,13 @@
 ###################################################################################################
 #Константы
 ###################################################################################################
-EXE_SUFFIX :=
-DLL_SUFFIX := .so
-DLL_PREFIX := lib
-DLL_PATH   := LD_LIBRARY_PATH
+EXE_SUFFIX      :=
+DLL_SUFFIX      := .so
+DLL_PREFIX      := lib
+DLL_PATH        := LD_LIBRARY_PATH
+COMPILER_CFLAGS += -DLINUX
 
-PROFILES += linux unistd x11 haswchar pthread_static_library
+PROFILES += linux unistd x11 glx haswchar pthread_static_library
 
 include $(TOOLSETS_DIR)/g++.mak
 

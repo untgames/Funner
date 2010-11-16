@@ -20,7 +20,7 @@ endif
 ###################################################################################################
 #Константы
 ###################################################################################################
-PROFILES          += unistd beagleboard x11
+PROFILES          += unistd beagleboard x11 linux egl gles has_windows
 REMOTE_DEBUG_DIR  ?= //work/funner
 EXE_SUFFIX        :=
 DLL_SUFFIX        := .so
@@ -30,8 +30,8 @@ COMPILER_GCC      := $(BEAGLEBOARD_SDK)/bin/arm-none-linux-gnueabi-gcc
 LINKER_GCC        := $(BEAGLEBOARD_SDK)/bin/arm-none-linux-gnueabi-g++
 LIB_GCC           := $(BEAGLEBOARD_SDK)/bin/arm-none-linux-gnueabi-ar
 COMMON_CPPFLAGS   += -fexceptions -frtti
-COMMON_CFLAGS     += -DBEAGLEBOARD -DARM -DARM7 -Wno-uninitialized -Wno-psabi
-COMMON_LINK_FLAGS += -lm -lpthread -Wl,-L,$(DIST_BIN_DIR)
+COMMON_CFLAGS     += -DBEAGLEBOARD -DARM -DARM7 -Wno-uninitialized -Wno-psabi -fPIC -O2 -funroll-loops -march=armv7-a
+COMMON_LINK_FLAGS += -fPIC -O2 -lm -lpthread -lstdc++ -lrt -Wl,-L,$(DIST_BIN_DIR) -funroll-loops -Wl,--no-undefined -march=armv7-a -rdynamic
 
 include $(TOOLSETS_DIR)/g++.mak
 
