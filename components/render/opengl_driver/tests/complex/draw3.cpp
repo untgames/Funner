@@ -87,7 +87,7 @@ int main ()
 
   try
   {
-    Test test (L"OpenGL device test window (draw3)", &redraw);
+    Test test (L"OpenGL device test window (draw3)", &redraw, "*", "ffp=0");
 
     test.window.Show ();
 

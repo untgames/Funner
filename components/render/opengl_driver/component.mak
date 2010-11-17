@@ -17,10 +17,6 @@ RENDER.OPENGL_DRIVER.SOURCES.INCLUDE_DIRS           := sources
 RENDER.OPENGL_DRIVER.SOURCES.macosx.COMPILER_CFLAGS := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/ApplicationServices.framework/Frameworks/CoreGraphics.framework/Headers/ \
                                                        -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/IOKit.framework/Headers/graphics/ \
                                                        -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/AGL.framework/Headers/
-RENDER.OPENGL_DRIVER.SOURCES.iphone.COMPILER_CFLAGS := -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/OpenGLES.framework/Headers/ \
-                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/CoreGraphics.framework/Headers/ \
-                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/UIKit.framework/Headers/ \
-                                                       -I$(IPHONE_SDK_PATH)/System/Library/Frameworks/QuartzCore.framework/Headers/
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            := sources/common \
                                                        sources/driver \
                                                        sources/render_target_manager \
@@ -37,14 +33,19 @@ RENDER.OPENGL_DRIVER.SOURCES.IMPORTS                := compile.render.low_level 
 RENDER.OPENGL_DRIVER.SOURCES.msvc.COMPILER_CFLAGS   := -wd4355
 RENDER.OPENGL_DRIVER.SOURCES.gles.COMPILER_DEFINES  := OPENGL_ES_SUPPORT
 RENDER.OPENGL_DRIVER.SOURCES.iphone.SOURCE_DIRS     := sources/platform/iphone
+RENDER.OPENGL_DRIVER.SOURCES.beagleboard.IMPORTS    := compile.extern.beagleboard
 RENDER.OPENGL_DRIVER.SOURCES.egl.SOURCE_DIRS        := sources/platform/egl
-RENDER.OPENGL_DRIVER.SOURCES.egl.IMPORTS            := compile.extern.gles_win32
+RENDER.OPENGL_DRIVER.SOURCES.glx.SOURCE_DIRS        := sources/platform/glx
 
 ifeq (,$(filter gles,$(PROFILES)))
 
 RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS        += sources/shader_stage/glsl
 RENDER.OPENGL_DRIVER.SOURCES.win32.SOURCE_DIRS  := sources/platform/win32
 RENDER.OPENGL_DRIVER.SOURCES.macosx.SOURCE_DIRS := sources/platform/macosx
+
+else
+
+RENDER.OPENGL_DRIVER.SOURCES.win32.IMPORTS  := compile.extern.gles_win32
 
 endif
 

@@ -43,12 +43,12 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
 
           //выбор активного контекста          
         
-        context->MakeCurrent (swap_chain);        
+        context->MakeCurrent (swap_chain);
         
           //инициализация таблицы точек входа OpenGL 1.1
-          
+
         gl_entries.Init (context->GetLibrary ());
-        
+
           //отключение буферов отрисовки          
           
 #ifndef OPENGL_ES_SUPPORT
@@ -64,7 +64,7 @@ class ContextImpl: public xtl::reference_counter, private IContextListener
         version_string    = reinterpret_cast<const char*> (glGetString (GL_VERSION));
         vendor_string     = reinterpret_cast<const char*> (glGetString (GL_VENDOR));
         renderer_string   = reinterpret_cast<const char*> (glGetString (GL_RENDERER));        
-        
+
           //добавление непереносимых расширений 
 
         IPropertyList* swap_chain_properties = swap_chain->GetProperties ();        
@@ -366,7 +366,7 @@ struct ContextManager::Impl: public xtl::reference_counter
 //Проверка ошибок OpenGL
     void CheckErrors (const char* source)
     {
-      if (!GetValidationState ())
+      if (!GetValidationState ())      
         return;
 
       if (!source)

@@ -61,7 +61,7 @@ struct Output::Impl
       EGLint major_version = 0, minor_version = 0;
 
       if (!eglInitialize (egl_display, &major_version, &minor_version))
-        raise_error ("::eglInitialize");        
+        raise_error ("::eglInitialize");
 
       log.Printf ("...EGL intialized successfull (version %d.%d)", major_version, minor_version);      
     }
@@ -135,38 +135,13 @@ struct Output::Impl
     native_display = EGL_DEFAULT_DISPLAY;
 
     log.Printf ("...get control name");
-        
+    
     strncpy (name, common::tostring (reinterpret_cast<Osp::Ui::Control*> (native_window)->GetName ().GetPointer ()).c_str (), sizeof (name));
   }
   
 ///Платформо-зависимое освобождение ресурсов
   void PlatformDone ()
   {    
-  }
-  
-#elif defined BEAGLEBOARD
-
-///Платформо-зависимая инициализация
-  void PlatformInitialize ()
-  {
-    native_display = (NativeDisplayType)syslib::x11::DisplayManager::DisplayHandle ();
-
-    log.Printf ("...get window name");
-    
-    char* window_name = 0;
-
-    if (!XFetchName ((Display*)native_display, (Window)native_window, &window_name))
-      window_name = (char*)"default";
-      
-    if (!window_name)
-      window_name = (char*)"default";
-
-    strncpy (name, window_name, sizeof (name));
-  }
-  
-///Платформо-зависимое освобождение ресурсов
-  void PlatformDone ()
-  {
   }
 
 #else
@@ -267,9 +242,4 @@ EGLDisplay Output::GetEglDisplay ()
 const void* Output::GetWindowHandle ()
 {
   return impl->native_window;
-}
-
-NativeDisplayType Output::GetDisplay ()
-{
-  return impl->native_display;
 }

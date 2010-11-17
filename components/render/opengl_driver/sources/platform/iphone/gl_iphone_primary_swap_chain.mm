@@ -1,5 +1,5 @@
-#include <ES1/gl.h>
-#include <ES1/glext.h>
+#include <OpenGLES/ES1/gl.h>
+#include <OpenGLES/ES1/glext.h>
 
 #include "shared.h"
 
@@ -39,26 +39,20 @@ struct PrimarySwapChain::Impl
 
     memset (&desc, 0, sizeof (desc));
 
-    CGRect window_frame = ((UIView*)in_desc.window_handle).frame;
+    CGRect window_frame = ((UIWindow*)in_desc.window_handle).rootViewController.view.frame;
 
     desc.frame_buffer.width        = window_frame.size.width;
     desc.frame_buffer.height       = window_frame.size.height;
     desc.frame_buffer.color_bits   = 24;
     desc.frame_buffer.alpha_bits   = 8;
     desc.frame_buffer.depth_bits   = in_desc.frame_buffer.depth_bits ? 16 : 0;
-
-#ifdef __IPHONE_3_0
     desc.frame_buffer.stencil_bits = in_desc.frame_buffer.stencil_bits ? 8 : 0;
-#else
-    desc.frame_buffer.stencil_bits = 0;
-#endif
-
     desc.samples_count             = 0;
     desc.buffers_count             = 2;
     desc.swap_method               = SwapMethod_Discard;
     desc.vsync                     = true;
     desc.fullscreen                = false;
-    desc.window_handle             = in_desc.window_handle;    //?????????необходимо подписываться на изменение размеров окна
+    desc.window_handle             = in_desc.window_handle;
 
     log.Printf ("...choose pixel format (RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
       desc.frame_buffer.color_bits, desc.frame_buffer.alpha_bits, desc.frame_buffer.depth_bits,
@@ -104,7 +98,7 @@ struct PrimarySwapChain::Impl
 
       log.Printf ("...binding to drawable");
 
-      CAEAGLLayer* eagl_layer = (CAEAGLLayer*)[(UIView*)(desc.window_handle) layer];
+      CAEAGLLayer* eagl_layer = (CAEAGLLayer*)[((UIWindow*)desc.window_handle).rootViewController.view layer];
 
       eagl_layer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:NO],
                                        kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
@@ -116,6 +110,14 @@ struct PrimarySwapChain::Impl
 
       glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES, GL_RENDERBUFFER_OES, render_buffer);
 
+      GLint renderbuffer_width, renderbuffer_height;
+
+      glGetRenderbufferParameterivOES (GL_RENDERBUFFER_OES, GL_RENDERBUFFER_WIDTH_OES, &renderbuffer_width);
+      glGetRenderbufferParameterivOES (GL_RENDERBUFFER_OES, GL_RENDERBUFFER_HEIGHT_OES, &renderbuffer_height);
+
+      desc.frame_buffer.width  = renderbuffer_width;
+      desc.frame_buffer.height = renderbuffer_height;
+
       log.Printf ("...creating additional renderbuffers");
 
       if (desc.frame_buffer.depth_bits)
@@ -126,8 +128,6 @@ struct PrimarySwapChain::Impl
         glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, depth_buffer);
       }
 
-#ifdef __IPHONE_3_0
-
       if (desc.frame_buffer.stencil_bits)
       {
         glGenRenderbuffersOES (1, &stencil_buffer);
@@ -135,8 +135,6 @@ struct PrimarySwapChain::Impl
         glRenderbufferStorageOES (GL_RENDERBUFFER_OES, GL_STENCIL_INDEX8_OES, desc.frame_buffer.width, desc.frame_buffer.height);
         glFramebufferRenderbufferOES (GL_FRAMEBUFFER_OES, GL_STENCIL_ATTACHMENT_OES, GL_RENDERBUFFER_OES, stencil_buffer);
       }
-
-#endif
 
       GLenum status = glCheckFramebufferStatusOES (GL_FRAMEBUFFER_OES);
 

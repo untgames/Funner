@@ -1,7 +1,7 @@
 #ifndef RENDER_GL_DRIVER_INPUT_STAGE_SHARED_HEADER
 #define RENDER_GL_DRIVER_INPUT_STAGE_SHARED_HEADER
 
-#include <memory.h>
+#include <string.h>
 
 #include <stl/vector>
 #include <stl/algorithm>

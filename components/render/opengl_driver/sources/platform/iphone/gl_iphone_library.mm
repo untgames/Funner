@@ -8,9 +8,15 @@ namespace
 {
 
 #if TARGET_IPHONE_SIMULATOR
-  const char* OPENGL_DYLIB_PATH = "/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator3.0.sdk/System/Library/Frameworks/OpenGLES.framework/OpenGLES";
+const char* OPENGL_DYLIB_PATH [] = {
+  "/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.1.sdk/System/Library/Frameworks/OpenGLES.framework/OpenGLES",
+  "/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.0.sdk/System/Library/Frameworks/OpenGLES.framework/OpenGLES",
+  "/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator3.2.sdk/System/Library/Frameworks/OpenGLES.framework/OpenGLES",
+  "/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator3.1.sdk/System/Library/Frameworks/OpenGLES.framework/OpenGLES",
+  "/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator3.0.sdk/System/Library/Frameworks/OpenGLES.framework/OpenGLES"
+};
 #else
-  const char* OPENGL_DYLIB_PATH = "/System/Library/Frameworks/OpenGLES.framework/OpenGLES";
+const char* OPENGL_DYLIB_PATH [] = { "/System/Library/Frameworks/OpenGLES.framework/OpenGLES" };
 #endif
 
 }
@@ -24,8 +30,21 @@ struct Library::Impl
   syslib::DynamicLibrary opengl_dylib; //библиотека OpenGL
 
   Impl ()
-    : opengl_dylib (OPENGL_DYLIB_PATH)
-    {}
+  {
+    for (size_t i = 0, count = sizeof (OPENGL_DYLIB_PATH) / sizeof (*OPENGL_DYLIB_PATH); i < count; i++)
+    {
+      try
+      {
+        opengl_dylib.Load (OPENGL_DYLIB_PATH [i]);
+        return;
+      }
+      catch (...)
+      {
+      }
+    }
+
+    throw xtl::format_operation_exception ("render::low_level::opengl::iphone::Library::Library", "Can't load 'OpenGLES' library");
+  }
 };
 
 /*

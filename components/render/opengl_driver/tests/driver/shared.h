@@ -2,7 +2,7 @@
 #define RENDER_GL_DRIVER_DRIVER_TESTS_SHARED_HEADER
 
 #include <stdio.h>
-#include <memory.h>
+#include <string.h>
 
 #include <exception>
 

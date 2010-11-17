@@ -46,8 +46,6 @@ const char* get_error_message (EGLint status)
 
 void check_errors (const char* source)
 {
-  DisplayLock lock;    
-
   EGLint status = eglGetError ();
   
   switch (status)

@@ -27,17 +27,17 @@ enum GlVersion
     Таблица множеств расширений, вошедших в версии стандарта OpenGL
 */
 
-class StandartExtensionSet
+class StandardExtensionSet
 {
   public:
     ExtensionSet versions [GlVersion_Num];
 
-    static const StandartExtensionSet& Instance ()
+    static const StandardExtensionSet& Instance ()
     {
-      return *common::Singleton<StandartExtensionSet>::Instance ();
+      return *common::Singleton<StandardExtensionSet>::Instance ();
     }
 
-    StandartExtensionSet ()
+    StandardExtensionSet ()
     {
       versions [GlVersion_1_2].SetGroup ("GL_EXT_texture3D GL_EXT_bgra GL_EXT_packed_pixels GL_EXT_rescale_normal GL_EXT_separate_specular_color "
                        "GL_SGIS_texture_edge_clamp GL_SGIS_texture_lod GL_EXT_draw_range_elements GL_EXT_color_table "
@@ -135,7 +135,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
 
   ExtensionSet ext = available_extension_set;
 
-  const StandartExtensionSet& std_extension_set = StandartExtensionSet::Instance ();
+  const StandardExtensionSet& std_extension_set = StandardExtensionSet::Instance ();
 
   for (size_t version_id = GlVersion_1_2; version_id != GlVersion_Num; version_id++)
   {
@@ -174,6 +174,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ext_texture_filter_anisotropic = ext.Get (EXT_texture_filter_anisotropic);
   has_ext_texture_lod_bias           = ext.Get (EXT_texture_lod_bias);
   has_ext_texture3d                  = ext.Get (EXT_texture3D);
+  has_ffp                            = settings.IsFfpAllowed ();
   has_img_texture_compression_pvrtc  = false;
   has_sgis_generate_mipmap           = ext.Get (SGIS_generate_mipmap);
   has_sgis_texture_lod               = ext.Get (SGIS_texture_lod);
@@ -306,8 +307,25 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   if (has_ext_texture_filter_anisotropic) glGetIntegerv (GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, (GLint*)&max_anisotropy);
   else                                    max_anisotropy = 1;
 
-  if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
-  else                      texture_units_count = 1;
+  if (has_ffp)
+  {
+    if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
+    else                      texture_units_count = 1;
+  }
+  else
+  {
+    if (has_arb_vertex_shader)
+    {
+      int vertex_shader_texture_units_count, pixel_shader_texture_units_count;
+
+      glGetIntegerv (GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&vertex_shader_texture_units_count);
+      glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&pixel_shader_texture_units_count);
+
+      texture_units_count = stl::min (vertex_shader_texture_units_count, pixel_shader_texture_units_count);
+    }
+    else
+      texture_units_count = 1;
+  }
   
   size_t settings_max_texture_size    = settings.GetInteger (ContextSettingsInteger_MaxTextureSize),
          settings_max_anisotropy      = settings.GetInteger (ContextSettingsInteger_MaxAnisotropy),

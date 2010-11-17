@@ -58,6 +58,7 @@ struct ContextCaps
   bool has_ext_texture_filter_anisotropic; //GL_EXT_texture_filter_anisotropic
   bool has_ext_texture_lod_bias;           //GL_EXT_texture_lod_bias
   bool has_ext_texture3d;                  //GL_EXT_texture3D
+  bool has_ffp;                            //Разрешено ли использование ffp
   bool has_img_texture_compression_pvrtc;  //GL_IMG_texture_compression_pvrtc
   bool has_sgis_generate_mipmap;           //GL_SGIS_generate_mipmap
   bool has_sgis_texture_lod;               //GL_SGIS_texture_lod

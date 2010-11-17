@@ -16,7 +16,6 @@ struct Context::Impl
   Log                       log;                   //протокол драйвера отрисовки
   Output::Pointer           output;                //целевое устройство вывода
   AdapterPtr                adapter;               //целевой адаптер отрисовки  
-  NativeDisplayType         display;               //соединение с дисплеем
   EGLDisplay                egl_display;           //целевой дисплей отрисовки
   EGLSurface                egl_surface;           //целевая поверхность отрисовки
   EGLContext                egl_context;           //целевой контекст отрисовки
@@ -28,8 +27,7 @@ struct Context::Impl
   
 ///Конструктор
   Impl ()
-    : display (0)
-    , egl_display (0)
+    : egl_display (0)
     , egl_surface (0) 
     , egl_context (0)
     , vsync (false)
@@ -45,8 +43,6 @@ struct Context::Impl
       return;
 
     LostCurrentNotify ();
-    
-    DisplayLock lock (display);
       
     eglMakeCurrent (egl_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 
@@ -116,17 +112,12 @@ Context::Context (ISwapChain* in_swap_chain)
 
     impl->output  = cast_object<Output> (swap_chain->GetContainingOutput (), "", "output");
     impl->adapter = cast_object<Adapter> (swap_chain->GetAdapter (), "", "adapter");
-    impl->display = swap_chain->GetDisplay ();
-    
-    DisplayLock lock (impl->display);
 
-      //создание контекста            
+      //создание контекста
 
     impl->log.Printf ("Create context (id=%d)...", GetId ());
-    
-    EGLint context_attribs [] = {EGL_CONTEXT_CLIENT_VERSION, 1, EGL_NONE};
 
-    impl->egl_context = eglCreateContext (swap_chain->GetEglDisplay (), swap_chain->GetEglConfig (), 0, context_attribs);
+    impl->egl_context = eglCreateContext (swap_chain->GetEglDisplay (), swap_chain->GetEglConfig (), 0, 0);        
     
     if (!impl->egl_context)
       raise_error ("::eglCreateContext");          
@@ -154,8 +145,6 @@ Context::~Context ()
       impl->ResetContext ();
 
       //удаление контекста
-      
-    DisplayLock lock (impl->display);
 
     impl->log.Printf ("...delete context (handle=%08X)", impl->egl_context);
 
@@ -209,17 +198,15 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
       
       impl->current_context = 0;
     }
-    
-    DisplayLock lock (impl->display);
-    
-      //установка текущего контекста                
+
+      //установка текущего контекста    
       
     if (!eglMakeCurrent (impl->egl_display, impl->egl_surface, impl->egl_surface, impl->egl_context))
       raise_error ("::eglMakeCurrent");
-      
+
     if (!eglSwapInterval (impl->egl_display, impl->vsync))
       raise_error ("::eglSwapInterval");
-      
+
     Impl::current_context = impl.get ();
 
       //оповещение об установке текущего контекста

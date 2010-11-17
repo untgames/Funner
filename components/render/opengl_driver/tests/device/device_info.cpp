@@ -11,7 +11,7 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (device_info)");
+    Test test (L"OpenGL device test window (device_info)", "ffp=0");
 
     printf ("Device: '%s'\n", test.device->GetName ());
 

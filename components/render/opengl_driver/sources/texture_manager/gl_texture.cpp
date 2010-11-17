@@ -107,13 +107,15 @@ Texture::Texture
   MakeContextCurrent ();
   glGenTextures      (1, &texture_id);
   
-    //включение автоматической генерации    
+    //включение автоматической генерации
 
   if (mips_count > 1)
   {
     Bind ();
 
+#ifndef OPENGL_ES_SUPPORT
     glTexParameteri (target, GL_TEXTURE_MAX_LEVEL, mips_count - 1);
+#endif
 
     if (desc.generate_mips_enable && GetCaps ().has_sgis_generate_mipmap)
       glTexParameteri (target, GL_GENERATE_MIPMAP, GL_TRUE);
@@ -345,7 +347,7 @@ void Texture::BuildMipmaps
 }
 
 /*
-    Установка данных 
+    Установка данных
 */
 
 void Texture::SetUncompressedData (size_t, size_t, size_t, size_t, size_t, size_t, GLenum, GLenum, const void*)
@@ -650,7 +652,7 @@ void Texture::GetData
       get_name (target_format));
   }
   
-    //установка текстуры в контекст OpenGL  
+    //установка текстуры в контекст OpenGL
 
   Bind ();
   
@@ -661,7 +663,7 @@ void Texture::GetData
   glPixelStorei (GL_PACK_ROW_LENGTH,  0); //размер строки в пикселях
   glPixelStorei (GL_PACK_ALIGNMENT,   1); //выравнивание начала строк
   glPixelStorei (GL_PACK_SKIP_ROWS,   0); //количество пропускаемых строк
-  glPixelStorei (GL_PACK_SKIP_PIXELS, 0); //количество пропускаемых пикселей  
+  glPixelStorei (GL_PACK_SKIP_PIXELS, 0); //количество пропускаемых пикселей
 
   if (caps.has_ext_texture3d)
   {
@@ -727,7 +729,7 @@ void Texture::GetData
 
           caps.glGetCompressedTexImage_fn (layer_desc.target, mip_level, temp_buffer.data ());
 
-            //копирование части образа в пользовательский буфер        
+            //копирование части образа в пользовательский буфер
 
           size_t src_line_size    = level_desc.width / DXT_EDGE_SIZE * quad_size,
                  src_start_offset = layer_desc.new_index * layer_size + y * src_line_size + x * quad_size,

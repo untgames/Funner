@@ -82,16 +82,18 @@ class DummyContext
 
 struct Adapter::Impl
 {
-  Log               log;            //протокол
-  OutputManager     output_manager; //менеджер устройств вывода
-  AdapterLibraryPtr library;        //библиотека адаптера
-  stl::string       name;           //имя адаптера
-  PropertyList      properties;     //свойства адаптера
+  Log               log;               //протокол
+  OutputManager     output_manager;    //менеджер устройств вывода
+  AdapterLibraryPtr library;           //библиотека адаптера
+  stl::string       name;              //имя адаптера
+  PropertyList      properties;        //свойства адаптера
+  Acceleration      max_acceleration; //максимальное значение ускорения
 
 ///Разбор строки инициализации
   Impl (const char* in_name, const char* in_dll_path, const char* init_string)
-    : library (LibraryManager::LoadLibrary (in_dll_path)),
-      name (in_name)
+    : library (LibraryManager::LoadLibrary (in_dll_path))
+    , name (in_name)
+    , max_acceleration (Acceleration_ICD)
   {
       //разбор строки инициализации
 
@@ -124,6 +126,25 @@ struct Adapter::Impl
 
           bugs_string += bug_name;
         }
+      }
+    }
+    else if (!xtl::xstrcmp (name, "acceleration"))
+    {
+      if (!xtl::xstricmp (value, "no") || !xtl::xstricmp (value, "sw"))
+      {
+        max_acceleration = Acceleration_No;
+      }
+      else if (!xtl::xstricmp (value, "mcd"))
+      {
+        max_acceleration = Acceleration_MCD;
+      }
+      else if (!xtl::xstricmp (value, "icd"))
+      {
+        max_acceleration = Acceleration_ICD;
+      }
+      else
+      {
+        throw xtl::make_argument_exception ("render::low_level::opengl::windows::Adapter::Impl::SetProperty", "value", value, "Bad acceleration");
       }
     }
   }
@@ -388,6 +409,9 @@ void Adapter::EnumPixelFormats
           out_desc.acceleration = Acceleration_ICD;
           break;
       }
+      
+      if (out_desc.acceleration > impl->max_acceleration)
+        out_desc.acceleration = impl->max_acceleration;
 
       int name, value;
 
@@ -465,7 +489,10 @@ void Adapter::EnumPixelFormats
     else
     {
       out_desc.acceleration = (pfd.dwFlags & PFD_GENERIC_ACCELERATED) ? Acceleration_MCD : Acceleration_ICD;
-    }      
+    }
+    
+    if (out_desc.acceleration > impl->max_acceleration)
+      out_desc.acceleration = impl->max_acceleration;
 
       //добавление дескриптора в массив
 
