@@ -5,11 +5,11 @@
 ###################################################################################################
 #Константы
 ###################################################################################################
-EXE_SUFFIX      :=
-DLL_SUFFIX      := .so
-DLL_PREFIX      := lib
-DLL_PATH        := LD_LIBRARY_PATH
-COMPILER_CFLAGS += -DLINUX
+EXE_SUFFIX    :=
+DLL_SUFFIX    := .so
+DLL_PREFIX    := lib
+DLL_PATH      := LD_LIBRARY_PATH
+COMMON_CFLAGS += -DLINUX
 
 PROFILES += linux unistd x11 glx haswchar pthread_static_library
 
