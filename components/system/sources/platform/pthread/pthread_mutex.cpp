@@ -16,7 +16,8 @@ Platform::mutex_t Platform::CreateMutex ()
     if (status)
       pthread_raise_error ("::pthread_mutexattr_init", status);           
     
-    status = pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+    status = pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE);
+//    status = pthread_mutexattr_settype (&attr, PTHREAD_MUTEX_RECURSIVE_NP);
     
     if (status)
       pthread_raise_error ("::pthread_mutexattr_settype", status);

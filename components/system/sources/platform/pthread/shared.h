@@ -1,3 +1,7 @@
+#ifdef __APPLE__
+  #include <sys/time.h>
+#endif
+
 #include <errno.h>
 #include <pthread.h>
 #include <semaphore.h>
