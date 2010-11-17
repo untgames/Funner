@@ -138,6 +138,7 @@ void idn_free (void *ptr); /* prototype from idn-free.h, not provided by
 #include "socks.h"
 #include "rtsp.h"
 #include "curl_rtmp.h"
+#include "gopher.h"
 
 #define _MPRINTF_REPLACE /* use our functions only */
 #include <curl/mprintf.h>
@@ -225,6 +226,10 @@ static const struct Curl_handler * const protocols[] = {
 
 #ifndef CURL_DISABLE_RTSP
   &Curl_handler_rtsp,
+#endif
+
+#ifndef CURL_DISABLE_GOPHER
+  &Curl_handler_gopher,
 #endif
 
 #ifdef USE_LIBRTMP
@@ -476,10 +481,20 @@ CURLcode Curl_close(struct SessionHandle *data)
   }
 #endif
 
+  Curl_expire(data, 0); /* shut off timers */
+
   if(m)
     /* This handle is still part of a multi handle, take care of this first
        and detach this handle from there. */
-    Curl_multi_rmeasy(data->multi, data);
+    curl_multi_remove_handle(data->multi, data);
+
+  /* Destroy the timeout list that is held in the easy handle. It is
+     /normally/ done by curl_multi_remove_handle() but this is "just in
+     case" */
+  if(data->state.timeoutlist) {
+    Curl_llist_destroy(data->state.timeoutlist, NULL);
+    data->state.timeoutlist = NULL;
+  }
 
   data->magic = 0; /* force a clear AFTER the possibly enforced removal from
                       the multi handle, since that function uses the magic
@@ -2566,7 +2581,6 @@ CURLcode Curl_disconnect(struct connectdata *conn)
                   NULL, Curl_scan_cache_used);
 #endif
 
-  Curl_expire(data, 0); /* shut off timers */
   Curl_hostcache_prune(data); /* kill old DNS cache entries */
 
   {
@@ -2685,11 +2699,10 @@ static bool RTSPConnIsDead(struct connectdata *check)
   }
   else if (sval & CURL_CSELECT_IN) {
     /* readable with no error. could be closed or could be alive */
-    long connectinfo = 0;
-    Curl_getconnectinfo(check->data, &connectinfo, &check);
-    if(connectinfo != -1) {
+    curl_socket_t connectinfo =
+      Curl_getconnectinfo(check->data, &check);
+    if(connectinfo != CURL_SOCKET_BAD)
       ret_val = FALSE;
-    }
   }
 
   return ret_val;
@@ -4307,6 +4320,11 @@ static CURLcode parse_remote_port(struct SessionHandle *data,
       *portptr = '\0'; /* cut off the name there */
       conn->remote_port = curlx_ultous(port);
     }
+    else if(!port)
+      /* Browser behavior adaptation. If there's a colon with no digits after,
+         just cut off the name there which makes us ignore the colon and just
+         use the default port. Firefox and Chrome both do that. */
+      *portptr = '\0';
   }
   return CURLE_OK;
 }
@@ -4387,30 +4405,7 @@ static CURLcode resolve_server(struct SessionHandle *data,
                                bool *async)
 {
   CURLcode result=CURLE_OK;
-  long shortest = 0; /* default to no timeout */
-
-  /*************************************************************
-   * Set timeout if that is being used
-   *************************************************************/
-  if(data->set.timeout || data->set.connecttimeout) {
-
-    /* We set the timeout on the name resolving phase first, separately from
-     * the download/upload part to allow a maximum time on everything. This is
-     * a signal-based timeout, why it won't work and shouldn't be used in
-     * multi-threaded environments. */
-
-    shortest = data->set.timeout; /* default to this timeout value */
-    if(shortest && data->set.connecttimeout &&
-       (data->set.connecttimeout < shortest))
-      /* if both are set, pick the shortest */
-      shortest = data->set.connecttimeout;
-    else if(!shortest)
-      /* if timeout is not set, use the connect timeout */
-      shortest = data->set.connecttimeout;
-  /* We can expect the conn->created time to be "now", as that was just
-     recently set in the beginning of this function and nothing slow
-     has been done since then until now. */
-  }
+  long timeout_ms = Curl_timeleft(conn, NULL, TRUE);
 
   /*************************************************************
    * Resolve the name of the server or proxy
@@ -4437,7 +4432,7 @@ static CURLcode resolve_server(struct SessionHandle *data,
 
       /* Resolve target host right on */
       rc = Curl_resolv_timeout(conn, conn->host.name, (int)conn->port,
-                               &hostaddr, shortest);
+                               &hostaddr, timeout_ms);
       if(rc == CURLRESOLV_PENDING)
         *async = TRUE;
 
@@ -4458,7 +4453,7 @@ static CURLcode resolve_server(struct SessionHandle *data,
 
       /* resolve proxy */
       rc = Curl_resolv_timeout(conn, conn->proxy.name, (int)conn->port,
-                               &hostaddr, shortest);
+                               &hostaddr, timeout_ms);
 
       if(rc == CURLRESOLV_PENDING)
         *async = TRUE;
@@ -5137,8 +5132,6 @@ CURLcode Curl_done(struct connectdata **connp,
   conn = *connp;
   data = conn->data;
 
-  Curl_expire(data, 0); /* stop timer */
-
   if(conn->bits.done)
     /* Stop if Curl_done() has already been called */
     return CURLE_OK;
@@ -5292,10 +5285,8 @@ static CURLcode do_init(struct connectdata *conn)
 static void do_complete(struct connectdata *conn)
 {
   conn->data->req.chunk=FALSE;
-  conn->data->req.trailerhdrpresent=FALSE;
-
   conn->data->req.maxfd = (conn->sockfd>conn->writesockfd?
-                               conn->sockfd:conn->writesockfd)+1;
+                           conn->sockfd:conn->writesockfd)+1;
 }
 
 CURLcode Curl_do(struct connectdata **connp, bool *done)

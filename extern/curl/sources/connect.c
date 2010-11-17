@@ -174,6 +174,9 @@ long Curl_timeleft(struct connectdata *conn,
 
   /* substract elapsed time */
   timeout_ms -= Curl_tvdiff(*nowp, data->progress.t_startsingle);
+  if(!timeout_ms)
+    /* avoid returning 0 as that means no timeout! */
+    return -1;
 
   return timeout_ms;
 }
@@ -627,6 +630,7 @@ CURLcode Curl_is_connected(struct connectdata *conn,
   CURLcode code = CURLE_OK;
   curl_socket_t sockfd = conn->sock[sockindex];
   long allow = DEFAULT_CONNECT_TIMEOUT;
+  int error = 0;
 
   DEBUGASSERT(sockindex >= FIRSTSOCKET && sockindex <= SECONDARYSOCKET);
 
@@ -634,13 +638,6 @@ CURLcode Curl_is_connected(struct connectdata *conn,
 
   if(conn->bits.tcpconnect) {
     /* we are connected already! */
-    long allow_total = 0;
-
-    /* subtract the most strict timeout of the ones */
-    if(data->set.timeout)
-      allow_total = data->set.timeout;
-
-    Curl_expire(data, allow_total);
     *connected = TRUE;
     return CURLE_OK;
   }
@@ -654,13 +651,13 @@ CURLcode Curl_is_connected(struct connectdata *conn,
     return CURLE_OPERATION_TIMEDOUT;
   }
 
-  Curl_expire(data, allow);
-
   /* check for connect without timeout as we want to return immediately */
   rc = waitconnect(conn, sockfd, 0);
+  if(WAITCONN_TIMEOUT == rc)
+    /* not an error, but also no connection yet */
+    return code;
 
   if(WAITCONN_CONNECTED == rc) {
-    int error;
     if(verifyconnect(sockfd, &error)) {
       /* we are connected, awesome! */
       conn->bits.tcpconnect = TRUE;
@@ -672,38 +669,34 @@ CURLcode Curl_is_connected(struct connectdata *conn,
       return CURLE_OK;
     }
     /* nope, not connected for real */
-    data->state.os_errno = error;
-    infof(data, "Connection failed\n");
-    code = trynextip(conn, sockindex, connected);
-    if(code)
-      failf(data, "Failed connect to %s:%ld; %s",
-            conn->host.name, conn->port, Curl_strerror(conn, error));
   }
-  else if(WAITCONN_TIMEOUT != rc) {
-    int error = 0;
-
+  else {
     /* nope, not connected  */
     if(WAITCONN_FDSET_ERROR == rc) {
       (void)verifyconnect(sockfd, &error);
-      data->state.os_errno = error;
-      infof(data, "%s\n",Curl_strerror(conn,error));
+      infof(data, "%s\n",Curl_strerror(conn, error));
     }
     else
       infof(data, "Connection failed\n");
-
-    code = trynextip(conn, sockindex, connected);
-
-    if(code) {
-      error = SOCKERRNO;
-      data->state.os_errno = error;
-      failf(data, "Failed connect to %s:%ld; %s",
-            conn->host.name, conn->port, Curl_strerror(conn, error));
-    }
   }
+
   /*
-   * If the connection failed here, we should attempt to connect to the "next
-   * address" for the given host.
+   * The connection failed here, we should attempt to connect to the "next
+   * address" for the given host. But first remember the latest error.
    */
+  if(error) {
+    data->state.os_errno = error;
+    SET_SOCKERRNO(error);
+  }
+
+  code = trynextip(conn, sockindex, connected);
+
+  if(code) {
+    error = SOCKERRNO;
+    data->state.os_errno = error;
+    failf(data, "Failed connect to %s:%ld; %s",
+          conn->host.name, conn->port, Curl_strerror(conn, error));
+  }
 
   return code;
 }
@@ -1029,7 +1022,6 @@ CURLcode Curl_connecthost(struct connectdata *conn,  /* context */
     failf(data, "Connection time-out");
     return CURLE_OPERATION_TIMEDOUT;
   }
-  Curl_expire(data, timeout_ms);
 
   /* Max time for each address */
   num_addr = Curl_num_addresses(remotehost->addr);
@@ -1094,12 +1086,12 @@ CURLcode Curl_connecthost(struct connectdata *conn,  /* context */
  * Used to extract socket and connectdata struct for the most recent
  * transfer on the given SessionHandle.
  *
- * The socket 'long' will be -1 in case of failure!
+ * The returned socket will be CURL_SOCKET_BAD in case of failure!
  */
-CURLcode Curl_getconnectinfo(struct SessionHandle *data,
-                             long *param_longp,
-                             struct connectdata **connp)
+curl_socket_t Curl_getconnectinfo(struct SessionHandle *data,
+                                  struct connectdata **connp)
 {
+  curl_socket_t sockfd;
   if((data->state.lastconnect != -1) &&
      (data->state.connc->connects[data->state.lastconnect] != NULL)) {
     struct connectdata *c =
@@ -1107,13 +1099,13 @@ CURLcode Curl_getconnectinfo(struct SessionHandle *data,
     if(connp)
       /* only store this if the caller cares for it */
       *connp = c;
-    *param_longp = c->sock[FIRSTSOCKET];
+    sockfd = c->sock[FIRSTSOCKET];
     /* we have a socket connected, let's determine if the server shut down */
     /* determine if ssl */
     if(c->ssl[FIRSTSOCKET].use) {
       /* use the SSL context */
       if(!Curl_ssl_check_cxn(c))
-        *param_longp = -1;   /* FIN received */
+        return CURL_SOCKET_BAD;   /* FIN received */
     }
 /* Minix 3.1 doesn't support any flags on recv; just assume socket is OK */
 #ifdef MSG_PEEK
@@ -1122,13 +1114,13 @@ CURLcode Curl_getconnectinfo(struct SessionHandle *data,
       char buf;
       if(recv((RECV_TYPE_ARG1)c->sock[FIRSTSOCKET], (RECV_TYPE_ARG2)&buf,
               (RECV_TYPE_ARG3)1, (RECV_TYPE_ARG4)MSG_PEEK) == 0) {
-        *param_longp = -1;   /* FIN received */
+        return CURL_SOCKET_BAD;   /* FIN received */
       }
     }
 #endif
   }
   else
-    *param_longp = -1;
+    return CURL_SOCKET_BAD;
 
-  return CURLE_OK;
+  return sockfd;
 }

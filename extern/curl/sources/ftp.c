@@ -324,7 +324,7 @@ static CURLcode AllowServerConnect(struct connectdata *conn)
   for(;;) {
     timeout_ms = Curl_timeleft(conn, NULL, TRUE);
 
-    if(timeout_ms <= 0) {
+    if(timeout_ms < 0) {
       /* if a timeout was already reached, bail out */
       failf(data, "Timeout while waiting for server connect");
       return CURLE_OPERATION_TIMEDOUT;
@@ -2424,7 +2424,7 @@ static CURLcode ftp_statemach_act(struct connectdata *conn)
            set a valid level */
         Curl_sec_request_prot(conn, data->set.str[STRING_KRB_LEVEL]);
 
-        if(Curl_sec_login(conn) != 0)
+        if(Curl_sec_login(conn) != CURLE_OK)
           infof(data, "Logging in with password in cleartext!\n");
         else
           infof(data, "Authentication successful\n");
@@ -3075,10 +3075,6 @@ static CURLcode ftp_done(struct connectdata *conn, CURLcode status,
   }
   /* free the dir tree and file parts */
   freedirs(ftpc);
-
-#if defined(HAVE_KRB4) || defined(HAVE_GSSAPI)
-  Curl_sec_fflush_fd(conn, conn->sock[SECONDARYSOCKET]);
-#endif
 
   /* shut down the socket to inform the server we're done */
 
@@ -3863,6 +3859,10 @@ static CURLcode ftp_disconnect(struct connectdata *conn)
   }
 
   Curl_pp_disconnect(pp);
+
+#if defined(HAVE_KRB4) || defined(HAVE_GSSAPI)
+  Curl_sec_end(conn);
+#endif
 
   return CURLE_OK;
 }
