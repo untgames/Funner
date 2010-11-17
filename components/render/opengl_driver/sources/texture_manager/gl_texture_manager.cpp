@@ -187,7 +187,7 @@ struct TextureManager::Impl: public ContextObject
       const ContextCaps& caps     = GetCaps ();
       SamplerSlot*       samplers = state.GetSlots ();
 
-      for (size_t i = 0; i < caps.texture_units_count; i++)
+      for (size_t i = 0, count = stl::min (caps.texture_units_count, DEVICE_SAMPLER_SLOTS_COUNT); i < count; i++)
       {
         BindableTexture* texture        = samplers [i].texture.get ();
         SamplerState*    sampler_state  = samplers [i].sampler_state.get ();

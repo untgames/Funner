@@ -14,9 +14,11 @@ struct ContextSettings::Impl
   Version      max_version;                               //максимальная необходимая версия OpenGL
   bool         need_check_errors;                         //нужно ли проверять ошибки
   size_t       int_settings [ContextSettingsInteger_Num]; //целочисленные настройки контекста
+  bool         is_ffp_allowed;                          //поддерживается ли ffp
   
 ///Конструктор
   Impl (const char* init_string)
+    : need_check_errors (true), is_ffp_allowed (true)
   {
       //проверка корректности аргументов
     
@@ -26,8 +28,6 @@ struct ContextSettings::Impl
       //инициализация параметров
       
     enabled_extensions.Set (true);
-
-    need_check_errors = true;
 
     memset (int_settings, 0, sizeof (int_settings));
 
@@ -48,6 +48,14 @@ struct ContextSettings::Impl
     if (!xtl::xstricmp (name, "disable"))
     {     
       enabled_extensions.SetGroup (value, false);
+      return;
+    }
+
+    if (!xtl::xstricmp (name, "ffp"))
+    {
+      if (!xtl::xstrcmp (value, "0"))
+        is_ffp_allowed = false;
+
       return;
     }
 
@@ -188,4 +196,13 @@ size_t ContextSettings::GetInteger (ContextSettingsInteger tag) const
     throw xtl::make_argument_exception ("render::low_level::opengl::ContextSettings::GetInteger", "tag", tag);
 
   return impl->int_settings [tag];
+}
+
+/*
+   Поддерживается ли ffp
+*/
+
+bool ContextSettings::IsFfpAllowed () const
+{
+  return impl->is_ffp_allowed;
 }

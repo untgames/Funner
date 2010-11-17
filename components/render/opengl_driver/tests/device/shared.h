@@ -97,7 +97,7 @@ struct Test
     desc.fullscreen                = false;
     desc.window_handle             = window.Handle ();
 
-    DriverManager::CreateSwapChainAndDevice ("OpenGL", "ms*", desc, init_string, swap_chain, device);    
+    DriverManager::CreateSwapChainAndDevice ("OpenGL", "*", desc, init_string, swap_chain, device);
 
     log_mode = OutputMode_Default;
 

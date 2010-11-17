@@ -179,20 +179,45 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 
 #endif
 
-        RegisterManager (ShaderManagerPtr (create_ffp_shader_manager (context_manager), false));
-        
-          //регистрация программы "по умолчанию"
+        if (GetCaps ().has_ffp)
+        {
+          RegisterManager (ShaderManagerPtr (create_ffp_shader_manager (context_manager), false));
+
+            //регистрация программы "по умолчанию"
+
+          ShaderDesc shader_desc;
+
+          memset (&shader_desc, 0, sizeof (shader_desc));
+
+          shader_desc.name             = "Default shader-stage program";
+          shader_desc.source_code_size = ~0;
+          shader_desc.source_code      = "";
+          shader_desc.profile          = "ffp";
           
-        ShaderDesc shader_desc;
+          default_program = ProgramPtr (CreateProgram (1, &shader_desc, xtl::bind (&Impl::LogShaderMessage, this, _1)), false);
+        }
 
-        memset (&shader_desc, 0, sizeof (shader_desc));
+#ifndef OPENGL_ES_SUPPORT
 
-        shader_desc.name             = "Default shader-stage program";
-        shader_desc.source_code_size = ~0;
-        shader_desc.source_code      = "";
-        shader_desc.profile          = "ffp";
-        
-        default_program = ProgramPtr (CreateProgram (1, &shader_desc, xtl::bind (&Impl::LogShaderMessage, this, _1)), false);                
+        if (!default_program && GetCaps ().has_arb_shading_language_100)
+        {
+            //регистрация программы "по умолчанию"
+
+            const char* PIXEL_SHADER  = "void main (void) {gl_FragColor = vec4 (0.0, 0.0, 0.0, 1.0);}";
+            const char* VERTEX_SHADER = "void main (void) {gl_Position = gl_Vertex;}";
+
+            ShaderDesc shader_descs [] = {
+              {"Default shader-stage pixel shader", strlen (PIXEL_SHADER), PIXEL_SHADER, "glsl.ps", ""},
+              {"Default shader-stage vertex shader", strlen (VERTEX_SHADER), VERTEX_SHADER, "glsl.vs", ""}
+            };
+
+            default_program = ProgramPtr (CreateProgram (sizeof shader_descs / sizeof *shader_descs, shader_descs, xtl::bind (&Impl::LogShaderMessage, this, _1)), false);
+        }
+
+#endif
+
+        if (!default_program)
+          throw ("", "Can't create default program, no supported profiles");
       }
       catch (xtl::exception& exception)
       {

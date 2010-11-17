@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cfloat>
 
+#include <stl/algorithm>
 #include <stl/auto_ptr.h>
 
 #include <xtl/array>
@@ -21,6 +22,9 @@
 #include <shared/texture_manager.h>
 
 #include "nv_dxt/blockdxt.h"
+
+#undef min
+#undef max
 
 namespace render
 {
