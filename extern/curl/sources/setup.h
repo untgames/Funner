@@ -57,7 +57,7 @@
 #  include "config-macosx.h"
 #endif
 
-#ifdef BEAGLEBOARD
+#if defined(LINUX) || defined(BEAGLEBOARD)
 # include "config-linux.h"
 #endif
 
