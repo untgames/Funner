@@ -52,13 +52,12 @@ Texture2DNoSubimage::Texture2DNoSubimage  (const ContextManager& manager, const 
   
   if (data)
   {
-      //создание mip-уровней    
+      //создание mip-уровней
 
     TextureDataSelector data_selector (tex_desc, data);
     
     bool   is_compressed_data     = is_compressed (tex_desc.format);    
-    GLenum gl_format              = get_gl_format (tex_desc.format),
-           gl_uncompressed_format = get_uncompressed_gl_format (tex_desc.format),
+    GLenum gl_uncompressed_format = get_uncompressed_gl_format (tex_desc.format),
            gl_uncompressed_type   = get_uncompressed_gl_type (tex_desc.format);
 
     switch (tex_desc.format)
