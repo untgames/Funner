@@ -12,8 +12,10 @@ int main ()
     
     TestHttpServer http_server;
     
+    stl::string output_file_path = common::format ("http://localhost:%u/test.cgi", SERVER_PORT);
+
     common::InputFile input_file ("data/post.txt");
-    common::StdFile output_file ("http://localhost:90/test.cgi", common::FileMode_ReadWrite);
+    common::StdFile output_file (output_file_path.c_str (), common::FileMode_ReadWrite);
 
     xtl::uninitialized_storage<char> buffer (BUFFER_SIZE);
 

@@ -12,6 +12,7 @@
 
 #include <common/file.h>
 #include <common/log.h>
+#include <common/strlib.h>
 #include <common/time.h>
 
 #include <syslib/application.h>
@@ -23,24 +24,28 @@
 
 using namespace network;
 
+const size_t SERVER_PORT = 9000;
+
 void print_log (const char* stream, const char* message)
 {
   printf ("%s: %s\n", stream, message);
   fflush (stdout);
 }
 
-///Тестовый HTTP сервер
+///╥хёЄют√щ HTTP ёхЁтхЁ
 class TestHttpServer
 {
   public:
     TestHttpServer ()
     {
-       static const char *options[] = {
-         "document_root", "./www",
-         "listening_ports", "90",
-         "cgi_interpreter", "d:/studio/dev/msys/bin/cat",
-         0
-       };
+      stl::string port_string = common::format ("%u", SERVER_PORT);
+
+      const char *options[] = {
+        "document_root", "./www",
+        "listening_ports", port_string.c_str (),
+        "cgi_interpreter", "/bin/cat",
+        0
+      };
     
       context = mg_start (0, options);
       

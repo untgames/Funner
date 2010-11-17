@@ -6,7 +6,7 @@ using namespace common;
 
 size_t UnistdPlatform::GetMilliseconds ()
 {
-#ifdef BEAGLEBOARD
+#if defined (BEAGLEBOARD) || defined (__APPLE__)
   return DefaultPlatform::GetMilliseconds ();  
 
 #else

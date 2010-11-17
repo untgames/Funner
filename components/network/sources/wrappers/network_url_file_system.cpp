@@ -28,8 +28,8 @@ struct UrlFile: public Lockable
   
   UrlFile (const char* in_url, bool in_is_post, size_t in_buffer_size)
     : url (in_url)
-    , end_of_request (false)
     , is_post (in_is_post)
+    , end_of_request (false)
     , buffer_size (in_buffer_size)
   {
     if (is_post)
@@ -427,12 +427,15 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         
         file.response_file  = temp_file;
         file.end_of_request = true;
-        
-        stl::string request_file_path = file.request_file.Path ();
-        
-        file.request_file.Close ();        
-        
-        common::FileSystem::Remove (request_file_path.c_str ());
+
+        if (!file.request_file.IsClosed ())
+        {
+          stl::string request_file_path = file.request_file.Path ();
+
+          file.request_file.Close ();
+
+          common::FileSystem::Remove (request_file_path.c_str ());
+        }
       }
       catch (xtl::exception& e)
       {
