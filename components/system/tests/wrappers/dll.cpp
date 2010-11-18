@@ -12,6 +12,9 @@
 #elif defined (BADA)
   const char* LIBRARY_NAME = "libdl.so";
   const char* SYMBOL_NAME  = "dlopen";
+#elif defined (ANDROID)
+  const char* LIBRARY_NAME = "libdl.so";
+  const char* SYMBOL_NAME  = "dlopen";  
 #else
   #error Unknown platform
 #endif
