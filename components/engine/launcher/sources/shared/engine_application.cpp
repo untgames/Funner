@@ -159,14 +159,11 @@ class Application: public IEngine
       try
       {
           //загрузка лицензии
-        printf ("HEYE! 1\n"); fflush (stdout);
         common::Parser p (configuration_name.c_str ());
-        printf ("HEYE! 2\n"); fflush (stdout);
         if (p.Root ().First ("Configuration.LicenseFile"))
           common::LicenseManager::Load (common::get<const char*> (p.Root ().First ("Configuration"), "LicenseFile"));
         else
           printf ("There is no license information in configuration\n");
-        printf ("HEYE! 3\n"); fflush (stdout);
           //регистрация обработчика старта приложения
 
         syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this, p.Root ().First ("Configuration")));        
