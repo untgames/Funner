@@ -131,7 +131,7 @@ Output::Pointer Adapter::GetOutput (const void* window_handle)
       //поиск устройства вывода среди уже созданных
       
     for (OutputArray::iterator iter=impl->outputs.begin (), end=impl->outputs.end (); iter!=end; ++iter)
-      if ((*iter)->GetWindowHandle () == window_handle)
+      if ((*iter)->GetWindow ().Handle () == window_handle)
         return *iter;
 
       //создание нового устройства вывода

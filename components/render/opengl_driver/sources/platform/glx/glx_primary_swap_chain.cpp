@@ -2,7 +2,7 @@
 
 using namespace render::low_level;
 using namespace render::low_level::opengl;
-using namespace render::low_level::opengl::egl;
+using namespace render::low_level::opengl::glx;
 
 namespace
 {
@@ -33,7 +33,7 @@ struct PrimarySwapChain::Impl
 ///Конструктор
   Impl (Adapter* in_adapter, const SwapChainDesc& in_desc)
     : adapter (in_adapter)
-    , display (DisplayManager::DisplayHandle ())
+    , display ((Display*)syslib::x11::DisplayManager::DisplayHandle ())
   {
     try
     {
@@ -50,17 +50,17 @@ struct PrimarySwapChain::Impl
       
         //выбор конфигурации
 
-      glxint config_attributes [CONFIG_MAX_ATTRIBUTES], *attr = config_attributes;
+      GLint config_attributes [CONFIG_MAX_ATTRIBUTES], *attr = config_attributes;
       
-      *attr++ = glx_BUFFER_SIZE;
+      *attr++ = GL_BUFFER_SIZE;
       *attr++ = in_desc.frame_buffer.color_bits;
-      *attr++ = glx_ALPHA_SIZE;
+      *attr++ = GLX_ALPHA_SIZE;
       *attr++ = in_desc.frame_buffer.alpha_bits;      
-      *attr++ = glx_DEPTH_SIZE;
+      *attr++ = GLX_DEPTH_SIZE;
       *attr++ = in_desc.frame_buffer.depth_bits;
-//      *attr++ = glx_STENCIL_SIZE; //for tests only!!!!!!!
+//      *attr++ = GL_STENCIL_SIZE; //for tests only!!!!!!!
 //      *attr++ = in_desc.frame_buffer.stencil_bits;
-      *attr++ = glx_SAMPLES;
+      *attr++ = GL_SAMPLES;
       *attr++ = in_desc.samples_count;
       
       switch (in_desc.swap_method)
@@ -73,13 +73,13 @@ struct PrimarySwapChain::Impl
           throw xtl::make_argument_exception ("", "desc.swap_method", desc.swap_method);
       }            
       
-      *attr++ = glx_SURFACE_TYPE;
-      *attr++ = glx_WINDOW_BIT;
-      *attr++ = glx_NONE;      
+/*      *attr++ = GLX_SURFACE_TYPE;
+      *attr++ = GLX_WINDOW_BIT;
+      *attr++ = GL_NONE;
 
-      glxint configs_count = 0;
+      GLint configs_count = 0;
 
-      if (!glxChooseConfig (glx_display, config_attributes, &glx_config, 1, &configs_count))
+      if (!glxChooseFBConfig (display, config_attributes, &glx_config, 1, &configs_count))
         raise_error ("::glxChooseConfig");
 
       if (!configs_count)
@@ -100,39 +100,31 @@ struct PrimarySwapChain::Impl
       if (!glx_surface)
         raise_error ("::glxCreateWindowSurface");
 
-        //сохранение дескриптора устройства        
+        //сохранение дескриптора устройства
 
       desc = in_desc;
 
-      desc.frame_buffer.width        = GetSurfaceAttribute (glx_WIDTH);
-      desc.frame_buffer.height       = GetSurfaceAttribute (glx_HEIGHT);
-      desc.frame_buffer.color_bits   = GetConfigAttribute (glx_BUFFER_SIZE);
-      desc.frame_buffer.alpha_bits   = GetConfigAttribute (glx_ALPHA_SIZE);
-      desc.frame_buffer.depth_bits   = GetConfigAttribute (glx_DEPTH_SIZE);
-      desc.frame_buffer.stencil_bits = GetConfigAttribute (glx_STENCIL_SIZE);
-      desc.samples_count             = GetConfigAttribute (glx_SAMPLES);
+      desc.frame_buffer.width        = GetSurfaceAttribute (GL_WIDTH);
+      desc.frame_buffer.height       = GetSurfaceAttribute (GL_HEIGHT);
+      desc.frame_buffer.color_bits   = GetConfigAttribute (GL_BUFFER_SIZE);
+      desc.frame_buffer.alpha_bits   = GetConfigAttribute (GL_ALPHA_SIZE);
+      desc.frame_buffer.depth_bits   = GetConfigAttribute (GL_DEPTH_SIZE);
+      desc.frame_buffer.stencil_bits = GetConfigAttribute (GL_STENCIL_SIZE);
+      desc.samples_count             = GetConfigAttribute (GL_SAMPLES);
       desc.buffers_count             = 1;
       desc.fullscreen                = false;
       
         //установка свойств цепочки обмена
         
-      try
-      {
-        properties.AddProperty ("glx_vendor",      GetglxString (glx_VENDOR));
-        properties.AddProperty ("glx_version",     GetglxString (glx_VERSION));
-        properties.AddProperty ("glx_extensions",  GetglxString (glx_EXTENSIONS));
-        properties.AddProperty ("glx_client_apis", GetglxString (glx_CLIENT_APIS));
-      }
-      catch (...)
-      {
-        //исключения при взятии свойств glx не являются критичными для работы
-        //(обход бага glx для bada)
-      }
+      properties.AddProperty ("GL_vendor",      GetGLString (GL_VENDOR));
+      properties.AddProperty ("GL_version",     GetGLString (GL_VERSION));
+      properties.AddProperty ("GL_extensions",  GetGLString (GL_EXTENSIONS));
+      properties.AddProperty ("GL_client_apis", GetGLString (GL_CLIENT_APIS));*/
     }
     catch (...)
     {
-      if (glx_surface)
-        glxDestroySurface (glx_display, glx_surface);
+/*      if (glx_surface)
+        glxDestroySurface (glx_display, glx_surface);*/
 
       throw;
     }
@@ -141,40 +133,41 @@ struct PrimarySwapChain::Impl
 ///Деструктор
   ~Impl ()
   {
-    glxDestroySurface (glx_display, glx_surface);
+//    glxDestroySurface (glx_display, glx_surface);
   }
   
 ///Получение атрибута
-  glxint GetConfigAttribute (glxint attribute)
+  GLint GetConfigAttribute (GLint attribute)
   {
-    glxint value = 0;
+    GLint value = 0;
     
-    if (!glxGetConfigAttrib (glx_display, glx_config, attribute, &value))
-      raise_error ("::glxGetConfigAttrib");
+//    if (!glxGetConfigAttrib (glx_display, glx_config, attribute, &value))
+ //     raise_error ("::glxGetConfigAttrib");
       
     return value;
   }
   
 ///Получение значения атрибута поверхности отрисовки
-  glxint GetSurfaceAttribute (glxint attribute)
+  GLint GetSurfaceAttribute (GLint attribute)
   {
-    glxint value = 0;
+    GLint value = 0;
     
-    if (!glxQuerySurface (glx_display, glx_surface, attribute, &value))
-      raise_error ("::glxQuerySurface");
+//    if (!glxQuerySurface (glx_display, glx_surface, attribute, &value))
+//      raise_error ("::glxQuerySurface");
       
     return value;
   }
   
 ///Получение строкового свойства glx
-  const char* GetglxString (glxint name)
+  const char* GetGLString (GLint name)
   {
-    const char* value = glxQueryString (glx_display, name);
+/*    const char* value = glxQueryString (glx_display, name);
     
     if (!value)
       raise_error ("::glxQueryString");
       
-    return value;
+    return value;*/
+    return "";
   }
 };
 
@@ -228,7 +221,8 @@ void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
 
 IOutput* PrimarySwapChain::GetContainingOutput ()
 {
-  return impl->output.get ();
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::GetContainingOutput");
+//  return impl->output.get ();
 }
 
 /*
@@ -251,7 +245,8 @@ bool PrimarySwapChain::GetFullscreenState ()
 
 void PrimarySwapChain::Present ()
 {
-  try
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::Present");
+/*  try
   {
     if (!glxSwapBuffers (impl->glx_display, impl->glx_surface))
       raise_error ("::glxSwapBuffers");
@@ -260,7 +255,7 @@ void PrimarySwapChain::Present ()
   {
     exception.touch ("render::low_level::opengl::glx::PrimarySwapChain::Present");
     throw;
-  }
+  }*/
 }
 
 /*
@@ -270,23 +265,4 @@ void PrimarySwapChain::Present ()
 IPropertyList* PrimarySwapChain::GetProperties ()
 {
   return &impl->properties;
-}
-
-/*
-    Получение glx параметров цепочки обмена
-*/
-
-glxDisplay PrimarySwapChain::GetglxDisplay ()
-{
-  return impl->output->GetglxDisplay ();
-}
-
-glxConfig PrimarySwapChain::GetglxConfig ()
-{
-  return impl->glx_config;
-}
-
-glxSurface PrimarySwapChain::GetglxSurface ()
-{
-  return impl->glx_surface;
 }

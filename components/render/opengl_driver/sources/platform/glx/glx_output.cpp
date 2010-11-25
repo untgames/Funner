@@ -2,7 +2,7 @@
 
 using namespace render::low_level;
 using namespace render::low_level::opengl;
-using namespace render::low_level::opengl::egl;
+using namespace render::low_level::opengl::glx;
 
 namespace
 {
@@ -25,17 +25,11 @@ struct Output::Impl
 {
   Log               log;                         //протокол графического драйвера
   AdapterPtr        adapter;                     //адаптер отрисовки
-  NativeWindowType  native_window;               //окно
-  NativeDisplayType native_display;              //целевое платформо-зависимое устройство вывода
-  EGLDisplay        egl_display;                 //целевое устройство вывода
-  char              name [OUTPUT_MAX_NAME_SIZE]; //имя цепочки обмена  
+  char              name [OUTPUT_MAX_NAME_SIZE]; //имя цепочки обмена
   
 ///Конструктор
   Impl (Adapter* in_adapter, const void* window_handle)
     : adapter (in_adapter)
-    , native_window ((NativeWindowType)window_handle)
-    , native_display (0)
-    , egl_display (0)  
   {
     *name = 0;
 
@@ -48,22 +42,6 @@ struct Output::Impl
         //создание дисплея
 
       log.Printf ("...create display");
-
-      egl_display = eglGetDisplay (native_display);
-
-      if (!egl_display)
-        log.Printf ("...using default display");
-
-        //инициализация EGL
-
-      log.Printf ("...initialize EGL");            
-
-      EGLint major_version = 0, minor_version = 0;
-
-      if (!eglInitialize (egl_display, &major_version, &minor_version))
-        raise_error ("::eglInitialize");
-
-      log.Printf ("...EGL intialized successfull (version %d.%d)", major_version, minor_version);      
     }
     catch (...)
     {
@@ -77,10 +55,6 @@ struct Output::Impl
   {
     try
     {
-        //закрытие сессии с целевым устройством вывода
-      
-      eglTerminate (egl_display);
-      
         //платформо-зависимое освобождение ресурсов
       
       PlatformDone ();
@@ -90,63 +64,15 @@ struct Output::Impl
     }
   }
   
-#if defined ( _WIN32 ) && !defined ( BADA )
-
 ///Платформо-зависимая инициализация
   void PlatformInitialize ()
   {
-    try
-    {
-      log.Printf ("...get device context");
-
-      native_display = ::GetDC (native_window);      
-
-      if (!native_display)
-        throw xtl::format_operation_exception ("::GetDC", "Operation failed"); //сделать через raise_error!!!
-
-      log.Printf ("...get window name");
-
-      if (!GetWindowTextA (native_window, name, sizeof (name)))
-        throw xtl::format_operation_exception ("::GetWindowTextA", "Operation failed"); //сделать через raise_error!!!
-    }
-    catch (xtl::exception& exception)
-    {
-      exception.touch ("render::low_level::opengl::egl::Adapter::Impl::PlatformInitializeWin32");
-      throw;
-    }
-  }
-  
-///Платформо-зависимое освобождение ресурсов
-  void PlatformDone ()
-  {    
-    if (native_display && native_window)
-    {
-      log.Printf ("...release device context");
-      
-      ::ReleaseDC (native_window, native_display);
-    }
-  }
-
-#elif defined BADA
-
-///Платформо-зависимая инициализация
-  void PlatformInitialize ()
-  {
-    native_display = EGL_DEFAULT_DISPLAY;
-
-    log.Printf ("...get control name");
-    
-    strncpy (name, common::tostring (reinterpret_cast<Osp::Ui::Control*> (native_window)->GetName ().GetPointer ()).c_str (), sizeof (name));
   }
   
 ///Платформо-зависимое освобождение ресурсов
   void PlatformDone ()
   {    
   }
-
-#else
-  #error Unknown platform!
-#endif  
 };
 
 /*
@@ -169,7 +95,7 @@ Output::Output (Adapter* adapter, const void* window_handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::low_level::opengl::egl::Output::Output");
+    exception.touch ("render::low_level::opengl::glx::Output::Output");
     throw;
   }
 }
@@ -194,12 +120,12 @@ const char* Output::GetName ()
 
 size_t Output::GetModesCount ()
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::egl::Output::GetModesCount");
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Output::GetModesCount");
 }
 
 void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::egl::Output::GetModeDesc");
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Output::GetModeDesc");
 }
 
 /*
@@ -208,12 +134,12 @@ void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 
 void Output::SetCurrentMode (const OutputModeDesc&)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::egl::Output::SetCurrentMode");
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Output::SetCurrentMode");
 }
 
 void Output::GetCurrentMode (OutputModeDesc&)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::egl::Output::GetCurrentMode");
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Output::GetCurrentMode");
 }
 
 /*
@@ -222,24 +148,19 @@ void Output::GetCurrentMode (OutputModeDesc&)
 
 void Output::SetGammaRamp (const Color3f [256])
 {
-  throw xtl::format_not_supported_exception ("render::low_level::opengl::egl::Output::SetGammaRamp", "Gamma ramp not supported in EGL");
+  throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::SetGammaRamp", "Gamma ramp not supported in EGL");
 }
 
 void Output::GetGammaRamp (Color3f [256])
 {
-  throw xtl::format_not_supported_exception ("render::low_level::opengl::egl::Output::GetGammaRamp", "Gamma ramp not supported in EGL");
+  throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::GetGammaRamp", "Gamma ramp not supported in EGL");
 }
 
 /*
-    Получение параметров EGL
+    Получение параметров
 */
 
-EGLDisplay Output::GetEglDisplay ()
+syslib::Window Output::GetWindow ()
 {
-  return impl->egl_display;
-}
-
-const void* Output::GetWindowHandle ()
-{
-  return impl->native_window;
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Output::GetWindow");
 }
