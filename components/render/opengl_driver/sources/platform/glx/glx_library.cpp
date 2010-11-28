@@ -64,5 +64,5 @@ const void* Library::GetProcAddress (const char* name, size_t search_flags)
   if (search_flags & EntrySearch_NoThrow)
     return 0;
 
-  throw xtl::format_operation_exception (METHOD_NAME, "OpenGL entry '%s' not found in EGL", name);
+  throw xtl::format_operation_exception (METHOD_NAME, "OpenGL entry '%s' not found in GLX", name);
 }
