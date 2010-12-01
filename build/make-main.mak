@@ -12,7 +12,7 @@ COMPONENT_CONFIGURATION_FILE_SHORT_NAME ?= component.mak #Базовое имя файла конф
 EXPORT_FILE_SHORT_NAME                  ?= export.mak    #Базовое имя файла экспорта
 PROCESS_DIR_CONFIG_FILE_SHORT_NAME      ?= config.mak    #Базовое имя файла конфигурации обработки директории
 TMP_DIR_SHORT_NAME                      ?= tmp           #Базовое имя каталога с временными файлами
-DEFAULT_INSTALLATION_FILES              ?= data                 #Список файлов, папок и файловых масок, инсталлируемых по умолчанию
+DEFAULT_INSTALLATION_FILES              ?= data/* *.sh   #Список файлов, папок и файловых масок, инсталлируемых по умолчанию
 DIST_DIR_SHORT_NAME                     ?= dist          #Базовое имя каталога с результатами сборки
 PCH_SHORT_NAME                          ?= pch.h         #Базовое имя PCH файла
 SOURCE_FILES_SUFFIXES                   := c cpp         #Расширения исходных файлов
@@ -29,12 +29,10 @@ COMPILE_TOOL                            := tools.c++compile     #Имя макроса ути
 LINK_TOOL                               := tools.link           #Имя макроса утилиты редактора связей
 LIB_TOOL                                := tools.lib            #Имя макроса утилиты архивирования объектных файлов
 INSTALL_TOOL                            := tools.install        #Имя макроса утилиты установки файлов на устройство
-UNINSTALL_TOOL                          := tools.uninstall      #Имя макроса утилиты деинсталляции файлов с устройства
 RUN_TOOL                                := tools.run            #Имя макроса утилиты запуска приложения
 DLL_PATH                                := PATH                 #Имя переменной среды для указания путей к длл-файлам
 AUTO_COMPILER_DEFINES                   := NAME TYPE LINK_INCLUDES_COMMA COMPILER_CFLAGS EXECUTION_DIR
-DEFAULT_INSTALLATION_FILES              := data                 #Список файлов, папок и файловых масок, инсталлируемых по умолчанию
-INSTALLATION_FLAG_SUFFIX                := .installation-flag   #Суффикс инсталляционных флагов
+INSTALLATION_FLAG_SUFFIX                := .installation-flag #Суффикс флага инсталляции
 
 ###################################################################################################
 #Подключение настроек пользователя
@@ -75,13 +73,11 @@ BATCH_COMPILE_FLAG_FILE_SHORT_NAME      := $(strip $(BATCH_COMPILE_FLAG_FILE_SHO
 ROOT_TMP_DIR                            := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)
 TMP_DIRS                                := $(ROOT_TMP_DIR)
 DIST_DIRS                               := $(DIST_LIB_DIR) $(DIST_BIN_DIR) $(DIST_INFO_DIR)
-INSTALLATION_DIRS                       :=
-DIRS                                     = $(TMP_DIRS) $(DIST_DIRS) $(INSTALLATION_DIRS)
+DIRS                                     = $(TMP_DIRS) $(DIST_DIRS)
 COMPILE_TOOL                            := $(strip $(COMPILE_TOOL))
 LINK_TOOL                               := $(strip $(LINK_TOOL))
 LIB_TOOL                                := $(strip $(LIB_TOOL))
 INSTALL_TOOL                            := $(strip $(INSTALL_TOOL))
-UNINSTALL_TOOL                          := $(strip $(UNINSTALL_TOOL))
 RUN_TOOL                                := $(strip $(RUN_TOOL))
 EMPTY                                   := 
 SPACE                                   := $(EMPTY) $(EMPTY)
@@ -98,6 +94,8 @@ EXPORT_INCLUDE_DIR                      := include
 EXPORT_DLL_DIR                          := bin
 EXPORT_BIN_DIR                          := bin
 EXPORT_INFO_DIR                         := doc
+INSTALLATION_FILES                      := 
+INSTALLATION_FLAG                       := $(ROOT_TMP_DIR)/.installation-flag
 
 ###################################################################################################
 #Если не указан фильтры - обрабатываем все доступные
@@ -225,6 +223,35 @@ define process_copy_files
 endef
 
 ###################################################################################################
+#Выполнение удаленной команды / копирование файла
+###################################################################################################
+ifneq (,$(filter Win%,$(OS)))
+
+#Выполнение удаленной команды (команда, хост@пользователь, пароль)
+define ssh_run
+plink $2 -pw $3 $1
+endef
+
+#Копирование файла на удаленную машину (источник, приёмник, пароль)
+define ssh_copy
+pscp -scp -r -batch -pw $3 $1 $2
+endef
+
+else
+
+#Выполнение удаленной команды (команда, хост@пользователь, пароль)
+define ssh_run
+sshpass -p $3 ssh $2 $1
+endef
+
+#Копирование файла на удаленную машину (источник, приёмник, пароль)
+define ssh_copy
+sshpass -p $3 scp -r $1 $2
+endef
+
+endif
+
+###################################################################################################
 #Подключение файла конфигурации утилит сборки
 ###################################################################################################
 ifeq (,$(filter $(CURRENT_TOOLSET),$(TOOLSETS)))
@@ -232,6 +259,8 @@ ifeq (,$(filter $(CURRENT_TOOLSET),$(TOOLSETS)))
 endif
 
 include $(TOOLSET_FILE)
+
+PROFILES := $(sort $(PROFILES))
 
 ###################################################################################################
 #Константы, зависящие от утилит сборки
@@ -325,6 +354,7 @@ endif
 define prepare_to_execute
 export PATH="$(subst ;,:,$(call convert_path,$(CURDIR)/$(DIST_BIN_DIR);$(foreach dir,$(ADDITIONAL_PATHS),$(dir);)$$PATH))" \
 $(DLL_PATH)="$(subst ;,:,$(call convert_path,$(foreach dir,$2,$(CURDIR)/$(dir);)$$$(DLL_PATH)))" \
+BIN_DIR=$(DIST_BIN_DIR) \
  && cd "$1"
 endef
 
@@ -404,8 +434,12 @@ define process_source_dir
   $1.SOURCE_FILES            := $$($1.SOURCE_FILES) $$($$(MODULE_NAME).SOURCE_FILES)
   $$(MODULE_NAME).SOURCE_DIR := $2
   $$(MODULE_NAME).TMP_DIR    := $$($1.TMP_DIR)/$$(MODULE_PATH)
-  $$(MODULE_NAME).BASE_DIR   := $1/$$(MODULE_PATH)
-  $1.TMP_DIRS                := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)
+  $1.TMP_DIRS                := $$($$(MODULE_NAME).TMP_DIR) $$($1.TMP_DIRS)  
+  $1.INSTALLATION_FILES      := $$($1.INSTALLATION_FILES) $$(foreach file,$(DEFAULT_INSTALLATION_FILES),$$(wildcard $2/$$(file)))
+  
+#Компиляция  
+ 
+  $$(foreach macros,$(SOURCE_PROCESS_MACROSES),$$(eval $$(call $$(macros),$1,$$(MODULE_NAME))))  
 
   ifneq (,$$($$(MODULE_NAME).SOURCE_FILES))
     $$(MODULE_NAME).OBJECT_FILES := $$(patsubst %,$$($$(MODULE_NAME).TMP_DIR)/%$(OBJ_SUFFIX),$$(notdir $$(basename $$($$(MODULE_NAME).SOURCE_FILES))))
@@ -415,7 +449,7 @@ define process_source_dir
     $$(eval $$(call batch-compile,$1,$$(MODULE_NAME)))
   endif
 
-  $$(foreach macros,$3,$$(eval $$(call $$(macros),$1,$$(MODULE_NAME))))
+  $$(foreach macros,$3,$$(eval $$(call $$(macros),$1,$$(MODULE_NAME))))    
 endef
 
 #Создание зависимости для копирования внешних файлов (имя внешнего файла, каталоги поиска)
@@ -437,6 +471,21 @@ define create_extern_file_dependency
     
     EXTERNAL_FILES := $$(EXTERNAL_FILES) $1
   endif  
+endef
+
+#Получение списка файлов с каталогами (список файлов)
+define get_file_list_with_dirs
+$(foreach file,$1,$(if $(filter ./,$(dir $(file))),./$(file),$(file)))
+endef
+
+#Получение списка файлов для указанного каталога (список файлов, каталог)
+define select_files_for_dir
+$(foreach file,$(call get_file_list_with_dirs,$1),$(if $(filter $2,$(dir $(file))),$(file) ))
+endef
+
+#Построение команды инсталляции (список файлов)
+define build_installation_command
+$(foreach dir,$(sort $(dir $(call get_file_list_with_dirs,$1))),$(call $(INSTALL_TOOL),$(call select_files_for_dir,$1,$(dir)),$(dir)) && ) true
 endef
 
 #Общее для целей с исходными файлами (имя цели, список макросов применяемых для обработки каталогов с исходными файлами)
@@ -466,39 +515,15 @@ define process_target_with_sources
   build: $$($1.TARGET_DLLS)  
 
   $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))  
-endef
-
-#Копирование файла на устройство (имя локального файла, имя удалённого файла, имя файла-флага инсталляции)
-define install_target_file
-#  $$(warning install src='$1' dst='$2' flag='$3')
-
-ifeq (,$$(filter $3,$$(INSTALLATION_TARGETS)))
   
-  $3: $1
-		@$$(call $(INSTALL_TOOL),$1,$2)
-		@echo successfull > $$@
-		
-  INSTALLATION_TARGETS := $$(INSTALLATION_TARGETS) $3
-		
-endif
-
-endef
-
-#Инсталляция списка файлов на целевое устройство (имя модуля, имена локальных файлов, удалённый каталог)
-define process_target_file_list_installation_impl
-  ifneq (,$(filter $(INSTALL_TOOL),$(.VARIABLES)))  
-
-    $1.INSTALLATION_FLAGS_DIR := $$($1.TMP_DIR)/installation_flags/$$(patsubst $$($1.BASE_DIR)/%,%,$3)
-    $1.INSTALLATION_FLAGS     := $$($1.INSTALLATION_FLAGS) $$(foreach file,$2,$$($1.INSTALLATION_FLAGS_DIR)/$$(notdir $$(file))$(INSTALLATION_FLAG_SUFFIX))
-    INSTALLATION_DIRS         := $$(INSTALLATION_DIRS) $$($1.INSTALLATION_FLAGS_DIR)    
-    
-    $$(foreach file,$2,$$(eval $$(call install_target_file,$$(file),$3/$$(notdir $$(file)),$$($1.INSTALLATION_FLAGS_DIR)/$$(notdir $$(file))$(INSTALLATION_FLAG_SUFFIX))))
-  endif
-endef
-
-#Инсталляция списка файлов на целевое устройство (имя модуля, имя исходной директории, список исходных файлов)
-define process_target_file_list_installation
-  $$(eval $$(call process_files,$1,$2,$3,$$($1.BASE_DIR),process_target_file_list_installation_impl))
+#Инсталляция 
+  $1.INSTALLATION_FILES := $$($1.INSTALLATION_FILES) $$(foreach file,$(DEFAULT_INSTALLATION_FILES),$$(wildcard $$(COMPONENT_DIR)$$(file))) $$($1.TARGET_DLLS)  
+  $1.INSTALLATION_FLAG  := $$($1.TMP_DIR)/$(INSTALLATION_FLAG_SUFFIX)
+  INSTALLATION_FILES    := $$(INSTALLATION_FILES) $$($1.INSTALLATION_FILES)
+  INSTALLATION_FLAGS    := $$(INSTALLATION_FLAGS) $$($1.INSTALLATION_FLAG)
+  
+  $$($1.INSTALLATION_FLAG): $$($1.INSTALLATION_FILES)
+		@touch $$@
 endef
 
 #Обработка цели static-lib (имя цели)
@@ -517,7 +542,7 @@ define process_target.static-lib
 
   $$(eval $$(call process_target_with_sources,$1))  
 
-  $$($1.LIB_FILE): $$($1.FLAG_FILES)
+  $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.OBJECT_FILES)
 		@echo Create library $$(notdir $$@)...
 		@$$(call $(LIB_TOOL),$$@,$$($1.OBJECT_FILES))
 endef
@@ -532,6 +557,7 @@ define process_target.dynamic-lib
   
   $1.DLL_FILE                      := $(DIST_BIN_DIR)/$(DLL_PREFIX)$$($1.NAME)$(DLL_SUFFIX)
   $1.LIB_FILE                      := $(DIST_LIB_DIR)/$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(DLL_LIB_SUFFIX)
+  $1.DEF_FILE                      := $$(call specialize_paths,$$($1.DEF_FILE))
   $1.LIB_TMP_FILE                  := $$(dir $$($1.DLL_FILE))$(LIB_PREFIX)$$(notdir $$(basename $$($1.DLL_FILE)))$(DLL_LIB_SUFFIX)
   TARGET_FILES                     := $$(TARGET_FILES) $$($1.DLL_FILE) $$($1.LIB_FILE)
   $1.TARGET_DLLS                   := $$($1.DLLS:%=$(DIST_BIN_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
@@ -545,9 +571,9 @@ define process_target.dynamic-lib
   
   $$($1.LIB_FILE): $$($1.DLL_FILE)
 
-  $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
+  $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES) $$($1.DEF_FILE)
 		@echo Create dynamic library $$(notdir $$($1.DLL_FILE))...
-		@$$(call $(LINK_TOOL),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+		@$$(call $(LINK_TOOL),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS),$$($1.DEF_FILE))
 		@$(RM) $$(basename $$($1.DLL_FILE)).exp
 		@if [ -e $$($1.LIB_TMP_FILE) ]; then mv -f $$($1.LIB_TMP_FILE) $(DIST_LIB_DIR); fi
 endef
@@ -567,6 +593,7 @@ define process_target.application
   DIST_DIRS                        := $$(DIST_DIRS) $$(dir $$($1.EXE_FILE))
   $1.SOURCE_INSTALLATION_DLL_FILES := $$($1.TARGET_DLLS)
   $1.SOURCE_INSTALLATION_EXE_FILES := $$($1.EXE_FILE)
+  $1.INSTALLATION_FILES            := $$($1.INSTALLATION_FILES) $$($1.EXE_FILE) 
 
   build: $$($1.EXE_FILE)
 
@@ -576,13 +603,13 @@ define process_target.application
     $1.EXECUTION_DIR := $$($1.OUT_DIR)
   endif
   
-  $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS)
+  $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES)
 		@echo Linking $$(notdir $$@)...
 		@$$(call $(LINK_TOOL),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
-		@$$(call prepare_to_execute,$$($1.EXECUTION_DIR),$$(dir $$($1.EXE_FILE)) $$($1.DLL_DIRS)) && $$(patsubst %,"$(CURDIR)/%",$$<) $(args)
+		@$$(call $(RUN_TOOL),$$(patsubst %,"$(CURDIR)/%",$$<) $(args),$$($1.EXECUTION_DIR),$$(dir $$($1.EXE_FILE)) $$($1.DLL_DIRS)) > $$@		
 
   ifneq (,$$(filter $$(files:%=$$($1.OUT_DIR)/%$(EXE_SUFFIX)),$$($1.EXE_FILE)))
     ifeq (,$$($1.DISABLE_RUN))
@@ -593,8 +620,8 @@ endef
 
 #Вызов теста (имя цели, имя модуля, имя теста)
 define process_tests_source_dir_run_test
-  TEST_MODULE.$2:: INSTALL_MODULE.$2
-		@$$(call $(RUN_TOOL),$3 $(args),$$($2.EXECUTION_DIR),$$($2.BASE_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS))
+  TEST_MODULE.$2::
+		@$$(call $(RUN_TOOL),$3 $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS))
 
 endef
 
@@ -610,30 +637,16 @@ define process_tests_source_dir
   $2.TEST_RESULT_FILES  := $$(patsubst $$($2.SOURCE_DIR)/%,$$($2.TMP_DIR)/%,$$(wildcard $$($2.SOURCE_DIR)/*.result))
   $2.EXECUTION_DIR      := $$(if $$($1.EXECUTION_DIR),$$($1.EXECUTION_DIR),$$($2.SOURCE_DIR))
   $1.TARGET_DLLS        := $$($1.TARGET_DLLS) $$($1.DLLS:%=$$($2.TARGET_DIR)/$(DLL_PREFIX)%$(DLL_SUFFIX))
-  $1.USED_APPLICATIONS  := $$($1.USED_APPLICATIONS:%=$$(DIST_BIN_DIR)/%$(EXE_SUFFIX))
+  $2.USED_APPLICATIONS  := $$($1.USED_APPLICATIONS:%=$$(DIST_BIN_DIR)/%$(EXE_SUFFIX))
   $2.RUN_FILES          := $$(filter $$(files:%=$$($2.SOURCE_DIR)/%.sh),$$(wildcard $$($2.SOURCE_DIR)/*.sh)) $$(filter $$(files:%=$$($2.TARGET_DIR)/%$(EXE_SUFFIX)),$$($2.TEST_EXE_FILES))
 
   build: $$($2.TEST_EXE_FILES)
   test: TEST_MODULE.$2
   check: CHECK_MODULE.$2
-  install: INSTALL_MODULE.$2
-  uninstall: UNINSTALL_MODULE.$2
-  .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2 INSTALL_MODULE.$2 UNINSTALL_MODULE.$2
+  .PHONY: TEST_MODULE.$2 CHECK_MODULE.$2
   
 #Инсталляция
-  ifeq (,$$(filter $1.INSTALLATION_FILES,$$(.VARIABLES)))
-    $2.INSTALLATION_FILES := $$(foreach file,$(DEFAULT_INSTALLATION_FILES),$$(wildcard $$($2.EXECUTION_DIR)/$$(file)))
-  else
-    $2.INSTALLATION_FILES := $$($1.INSTALLATION_FILES)
-  endif
-
-  $$(eval $$(call process_target_file_list_installation,$2,$$($2.TARGET_DIR),$$($2.TEST_EXE_FILES:$$($2.TARGET_DIR)/%=%) $$(notdir $$($1.TARGET_DLLS))))
-  $$(eval $$(call process_target_file_list_installation,$2,$$($2.EXECUTION_DIR),$$($2.INSTALLATION_FILES)))
-
-  INSTALL_MODULE.$2: $$($2.INSTALLATION_FLAGS)
-  
-  UNINSTALL_MODULE.$2:
-		@$(RM) -f $$($2.INSTALLATION_FLAGS)
+  $1.INSTALLATION_FILES := $$($1.INSTALLATION_FILES) $$($2.TEST_EXE_FILES)
   
 #Правило сборки теста
   $$($2.TARGET_DIR)/%$(EXE_SUFFIX): $$($2.TMP_DIR)/%$(OBJ_SUFFIX) $$($1.LIB_DEPS)
@@ -643,17 +656,17 @@ define process_tests_source_dir
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TARGET_DIR)/%$(EXE_SUFFIX)
 		@echo Running $$(notdir $$<)...
-		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($2.BASE_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS),$$@)
+		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $(CURDIR)/$$@
 		
 #Правило получения файла-результата тестирования по shell-файлу
   $$($2.SOURCE_DIR)/%.sh: $$($2.TEST_EXE_FILES)
-
-  $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh $$($1.USED_APPLICATIONS) #INSTALL_MODULE.$2???
+  
+  $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh $$($2.USED_APPLICATIONS)
 		@echo Running $$(notdir $$<)...
-		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($2.BASE_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS),$$@)
+		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $(CURDIR)/$$@
 
 #Правило запуска тестов
-  $$(foreach file,$$($2.RUN_FILES),$$(eval $$(call process_tests_source_dir_run_test,$1,$2,$$(file))))
+  $$(foreach file,$$($2.RUN_FILES),$$(eval $$(call process_tests_source_dir_run_test,$1,$2,$$(file))))      
 
 #Правило проверки результатов тестирования
   CHECK_MODULE.$2: $$($2.TEST_RESULT_FILES)
@@ -844,6 +857,7 @@ define import_variables
 
   $2.INCLUDE_DIRS         := $$($2.INCLUDE_DIRS) $$($1.INCLUDE_DIRS:%=$3%)
   $2.INCLUDE_FILES        := $$($2.INCLUDE_FILES) $$($1.INCLUDE_FILES)
+  $2.SOURCE_DIRS          := $$($2.SOURCE_DIRS) $$($1.SOURCE_DIRS:%=$3%)
   $2.LIB_DIRS             := $$($2.LIB_DIRS) $$($1.LIB_DIRS:%=$3%)
   $2.DLL_DIRS             := $$($2.DLL_DIRS) $$($1.DLL_DIRS:%=$3%)
   $2.DLLS                 := $$($2.DLLS) $$($1.DLLS)
@@ -859,10 +873,11 @@ endef
 
 #Предварительный импорт настроек - построение списка импорта (имя зависимости, имя цели, имя переменной со списком)
 define prepare_to_import_settings
-
 # Проверка циклического импорта
 ifneq (,$$(filter $1,$$($3)))
-  $3 := $$(foreach imp,$$($3),$$(if $$(filter $1,$$(imp)),,$$(imp)))
+  ifneq (1,$$(strip $$($(EXPORT_VAR_PREFIX).$1.MULTI_IMPORTS)))
+    $3 := $$(foreach imp,$$($3),$$(if $$(filter $1,$$(imp)),,$$(imp)))
+  endif
 endif
 
   $3 := $$($3) $1
@@ -905,6 +920,9 @@ define process_target_common
 
 #  $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
   $$(foreach imp,$$($1.IMPORTS),$$(eval $$(call prepare_to_import_settings,$$(imp),$1,$1.PROCESSED_IMPORTS)))
+  
+  $$(foreach exclude_import,$$($1.EXCLUDE_IMPORTS),$$(eval $1.PROCESSED_IMPORTS := $$(subst $$(exclude_import),,$$($1.PROCESSED_IMPORTS))))
+
   $$(foreach imp,$$($1.PROCESSED_IMPORTS),$$(eval $$(call import_settings,$$(imp),$1)))
 
     #Добавление toolset-настроек к общему списку настроек
@@ -912,7 +930,7 @@ define process_target_common
 
   DUMP.$1:
 		@echo Dump target \'$1\' settings
-		@$$(foreach var,$$(sort $$(filter $1.%,$(.VARIABLES))),echo '    $$(var:$1.%=%) = $$($$(var))' && ) true
+		@$$(foreach var,$$(sort $$(filter $1.%,$(.VARIABLES) $1.PROCESSED_IMPORTS)),echo '    $$(var:$1.%=%) = $$($$(var))' && ) true
 
   dump: DUMP.$1
 
@@ -966,11 +984,11 @@ rebuild: clean build
 reinstall: uninstall install
 install: build
 test: install
-check: build
+check: install
 export: build
 force:
 
-.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export
+.PHONY: build rebuild clean fullyclean run test check help create-dirs force dump info install uninstall reinstall export tar-dist
 
 #Специализация списка целей (в зависимости от профиля)
 $(foreach profile,$(PROFILES),$(eval TARGETS := $$(TARGETS) $$(TARGETS.$$(profile))))  
@@ -992,9 +1010,40 @@ clean:
 fullyclean: clean
 	@$(RM) -r $(DIRS)
 
-#Деинсталляция	
+#Инсталляция	
+ifneq (,$($(INSTALL_TOOL)))
+
+install: $(INSTALLATION_FLAG)
+
 uninstall:
-	@$(foreach dir,$(sort $(INSTALLATION_DIRS)),$(call $(UNINSTALL_TOOL),$(dir)) && ) true
+	@$(RM) -f $(INSTALLATION_FLAG)
+
+#Получение путей к файлам относительно корня проекта (список относительных путей)
+define get_absolute_paths
+export ROOT_ABS_PATH=`cd $(ROOT) && pwd`/ && for file in $1; do export ABS_PATH=`cd \`dirname $$file\`; pwd`/`basename $$file` && echo $${ABS_PATH/#$$ROOT_ABS_PATH/}; done
+endef
+
+#Инсталляция (список обновленных файлов, список новых файлов, флаг-файл)
+define do_installation
+echo Install $(words $(sort $1 $2)) files... && \
+$(call build_installation_command,$(sort $1 $2)) && \
+echo Update installation registry... && \
+echo >> $@ && echo $(patsubst $(ROOT)/%,%,$2) >> $3
+endef
+
+#Получение списка новый файлов для инсталляции (список инсталлируемых файлов, список проинсталиированных файлов)
+define get_new_installation_files
+$(strip $(foreach file,$1,$(if $(filter $(file),$2),,$(ROOT)/$(file))))
+endef
+
+INSTALLATION_FILES := $(sort $(INSTALLATION_FILES) $(wildcard $(DIST_BIN_DIR)/*))
+
+$(INSTALLATION_FLAG): NEW_INSTALLATION_FILES = $(call get_new_installation_files,$(shell $(call get_absolute_paths,$(INSTALLATION_FILES))),$(if $(wildcard $(INSTALLATION_FLAG)),$(sort $(shell cat $(INSTALLATION_FLAG)))))
+
+$(INSTALLATION_FLAG): $(INSTALLATION_FILES) $(INSTALLATION_FLAGS)
+	@$(call do_installation,$(filter-out %.$(INSTALLATION_FLAG_SUFFIX),$?),$(NEW_INSTALLATION_FILES),$@)
+
+endif
 
 #Создание архива с дистрибутивом
 tar-dist: dist

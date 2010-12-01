@@ -5,12 +5,13 @@
 ###################################################################################################
 #Константы
 ###################################################################################################
-EXE_SUFFIX :=
-DLL_SUFFIX := .so
-DLL_PREFIX := lib
-DLL_PATH   := LD_LIBRARY_PATH
+EXE_SUFFIX    :=
+DLL_SUFFIX    := .so
+DLL_PREFIX    := lib
+DLL_PATH      := LD_LIBRARY_PATH
+COMMON_CFLAGS += -DLINUX
 
-PROFILES += linux unistd x11 haswchar pthread_static_library
+PROFILES += linux unistd x11 glx haswchar pthread_static_library
 
 include $(TOOLSETS_DIR)/g++.mak
 
@@ -23,5 +24,5 @@ define tools.link.dll
 endef
 
 define tools.link
-$(call tools.g++.link,$1,$2,$3,$4,$5,$6,$7,$8,$9) $(if $(filter %$(DLL_SUFFIX),$1), && cp $1 $(DIST_LIB_DIR))
+$(call tools.g++.link,$1,$2,$3,,$5 $(foreach link,$4,-Wl,-u,$(link)),$6,$7,$8,$9) $(if $(filter %$(DLL_SUFFIX),$1), && cp $1 $(DIST_LIB_DIR))
 endef

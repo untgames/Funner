@@ -17,7 +17,7 @@ EXE_SUFFIX     :=
 DLL_SUFFIX     := .dylib
 DLL_LIB_SUFFIX := .dylib
 
-PROFILES += macosx unistd carbon has_windows haswchar pthread_static_library x86
+PROFILES += macosx unistd carbon cocoa cocoa_desktop has_windows haswchar pthread_static_library x86 g++x86
 DLL_PATH := DYLD_LIBRARY_PATH
 
 MACOSX_DEPLOYMENT_TARGET := $(MACOSX_VERSION)
@@ -28,6 +28,8 @@ COMMON_CFLAGS     += -msse3 -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(
 COMMON_LINK_FLAGS += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386
 
 include $(TOOLSETS_DIR)/g++.mak
+
+SOURCE_FILES_SUFFIXES += mm         #Расширения исходных файлов
 
 ###################################################################################################
 #Линковка shared-library (имя выходного файла)

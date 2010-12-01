@@ -119,8 +119,7 @@ template <class Char> class BasicStringArray<Char>::Impl: public xtl::reference_
         
       need_update_pointers = true;
         
-      size_t old_buffer_size    = string_buffer.size (),
-             current_string_len = xtl::xstrlen (string_buffer.c_str () + offsets [index]) + 1,
+      size_t current_string_len = xtl::xstrlen (string_buffer.c_str () + offsets [index]) + 1,
              new_string_len     = xtl::xstrlen (string) + 1;
 
       string_buffer.reserve (string_buffer.size () + new_string_len - current_string_len);
