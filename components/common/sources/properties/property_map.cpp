@@ -880,31 +880,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
       e.touch (method_name);
       throw;
     }
-  }
-  
-  template <>
-  const char* GetData (const char* method_name, size_t property_index)
-  {
-    try
-    {
-      if (property_index >= layout.Size ())
-        throw xtl::make_range_exception ("", "property_index", property_index, layout.Size ());        
-
-      const PropertyDesc& desc = layout.Properties ()[property_index];
-
-      if (desc.type != PropertyType_String)
-        throw xtl::format_operation_exception ("", "Could not convert property '%s' from %s to %s", desc.name, get_name (desc.type), get_name (PropertyType_String));
-
-      size_t string_index = *reinterpret_cast<size_t*> (buffer.data () + desc.offset);
-
-      return strings [string_index];
-    }
-    catch (xtl::exception& e)
-    {
-      e.touch (method_name);
-      throw;
-    }    
-  }
+  }  
   
 ///Удаление свойства
   void RemoveProperty (size_t index)
@@ -1114,6 +1090,35 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     }
   }
 };
+
+namespace common
+{
+
+template <>
+const char* PropertyMap::Impl::GetData (const char* method_name, size_t property_index)
+{
+  try
+  {
+    if (property_index >= layout.Size ())
+      throw xtl::make_range_exception ("", "property_index", property_index, layout.Size ());        
+
+    const PropertyDesc& desc = layout.Properties ()[property_index];
+
+    if (desc.type != PropertyType_String)
+      throw xtl::format_operation_exception ("", "Could not convert property '%s' from %s to %s", desc.name, get_name (desc.type), get_name (PropertyType_String));
+
+    size_t string_index = *reinterpret_cast<size_t*> (buffer.data () + desc.offset);
+
+    return strings [string_index];
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch (method_name);
+    throw;
+  }    
+}
+
+}
 
 /*
     Конструкторы / деструктор / присваивание
