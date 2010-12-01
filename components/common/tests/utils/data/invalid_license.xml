@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<License SinceDate="2010-08-18" TillDate="2011-12-18" LicenseHash="ffaa12aac8431361f4795e98d8445393">
-  <AllowedComponents>
-    <Component Wildcard="common.zip*"/>
-    <Component Wildcard="media.image.loaders*"/>
-    <Component Wildcard="media.video.*"/>
-  </AllowedComponents>
-</License>
