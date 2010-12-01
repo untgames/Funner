@@ -1,9 +1,0 @@
-Results of parse_resolve2_test:
-Parse successfull
-root (source='', line=0): {}
- A (source='', line=1): {}
-  B (source='data/test5.wxf', line=3): {Hello world }
-  C (source='data/test5.wxf', line=4): {Hello world}
-data/test5.wxf(3): error: node 'B': No child with name 'A.D' for node 'root' (''(0))
-    at common::ParseNodeResolver::operator ()
-    at common::ParseResolver::Resolve

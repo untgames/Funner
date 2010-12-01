@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<test>
-  <numeric attr="&#60;aa" attr2="&#x3c;">&#60;aa &#x3c;</numeric>
-  <cdata_numeric><![CDATA[&#60; &#x3c;]]></cdata_numeric>
-  <symbolic attr="&lt;">&lt;start frame=&quot;111&quot;&gt;</symbolic>
-  <cdata_symbolic><![CDATA[&lt;start frame=&quot;111&quot;&gt;]]></cdata_symbolic>
-</test>

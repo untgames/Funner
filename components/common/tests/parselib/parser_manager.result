@@ -1,8 +1,0 @@
-Results of parser_manager_test:
-check: buffer_size=2 buffer='A'
-parse: name='text1' buffer_size=2 buffer='A'
-Parse log:
-text1(12): error: syntax error
-Parse result:
-root (source='', line=0): {}
- A (source='text1', line=11): {B}
