@@ -10,7 +10,7 @@ COMMON.SOURCES.NAME                       := funner.common
 COMMON.SOURCES.INCLUDE_DIRS               := include ../xtl/include ../../extern/pcre/include sources
 COMMON.SOURCES.SOURCE_DIRS                := sources/file_system/core sources/streams sources/hash sources/crypto/core sources/memory \
                                              sources/parselib/tree sources/parselib/manager sources/parselib/utils sources/strlib \
-                                             sources/utils sources/log sources/licensing/core sources/platform/default
+                                             sources/utils sources/log sources/properties sources/licensing/core sources/platform/default
 COMMON.SOURCES.DOCUMENTATION_DIRS         := include
 COMMON.SOURCES.COMPILER_DEFINES           := PCRE_STATIC
 COMMON.SOURCES.IMPORTS                    := compile.math.vecmath
@@ -56,7 +56,7 @@ COMMON.AUTO_LICENSE_GENERATOR.IMPORTS     := compile.common
 #Цель - CommonLib tests
 COMMON.TESTS.TYPE                 := test-suite
 COMMON.TESTS.SOURCE_DIRS          := tests/file_system tests/streams tests/hash tests/strlib tests/utils \
-                                     tests/memory tests/log tests/parselib tests/crypto
+                                     tests/memory tests/log tests/parselib tests/crypto tests/properties
 COMMON.TESTS.haswchar.SOURCE_DIRS := tests/strlib/wchar
 COMMON.TESTS.IMPORTS              := compile.math.vecmath compile.common link.common.aes link.common.xml link.common.wxf \
                                      link.common.zip_file_system link.common.default_console_handler

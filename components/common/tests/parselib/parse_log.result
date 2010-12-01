@@ -1,0 +1,23 @@
+Results of parse_log_test:
+Parse log:
+filename(0): error: Hello world!
+filename(0): warning: Hello world!
+filename(1): error: Hello world!
+filename(1): warning: Hello world!
+filename(2): error: Hello world!
+filename(2): warning: Hello world!
+filename(3): error: Hello world!
+filename(3): warning: Hello world!
+filename(4): error: Hello world!
+filename(4): warning: Hello world!
+filename(5): error: Hello world!
+filename(5): warning: Hello world!
+filename(6): error: Hello world!
+filename(6): warning: Hello world!
+filename(7): error: Hello world!
+filename(7): warning: Hello world!
+filename(8): error: Hello world!
+filename(8): warning: Hello world!
+filename(9): error: Hello world!
+filename(9): warning: Hello world!
+fatal error: Hello world!

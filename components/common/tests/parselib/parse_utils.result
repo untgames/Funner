@@ -1,0 +1,10 @@
+Results of parse_utils_test:
+A=1
+B=2.2
+C=3.1
+D=1 2 3 
+E {a}
+E {b, c}
+exception: source1(3): node 'C': Bad value
+    at common::raise_parser_exception
+source1(3): error: node 'C': Bad value

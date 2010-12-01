@@ -1,0 +1,8 @@
+Results of system_paths_test:
+IsFileExist(/system/personal): true
+IsFileExist(/system/profile): true
+IsFileExist(/system/appdata): true
+IsFileExist(/system/inetcache): true
+IsFileExist(/system/baddir): false
+IsFileExist(/my/link): true
+IsFileExist(/system/temp): true

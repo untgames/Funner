@@ -1,0 +1,314 @@
+Results of properties_conversion2_test:
+SetProperty ('String', ""): 
+SetProperty ('String', "hello world"): hello world
+SetProperty ('String', "3.14"): 3.14
+SetProperty ('String', "1 2.5 3 4"): 1 2.5 3 4
+SetProperty ('String', "1 2.5 4"): 1 2.5 4
+SetProperty ('String', "1 2 3 4 5"): 1 2 3 4 5
+SetProperty ('String', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+SetProperty ('String', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+SetProperty ('String', 13): 13
+SetProperty ('String', 1.5f): 1.5
+SetProperty ('String', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): 1 2 3 4
+SetProperty ('String', math::mat4f (3.0f)): 3 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3
+SetProperty ('String', {21, 22, 23, 24}): 21 22 23 24
+SetProperty ('String', {121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136}): 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136
+SetProperty ('String', {1 1 1 1, 2 2 2 2, 3 3 3 3, 4 4 4 4}): 1 1 1 1 2 2 2 2 3 3 3 3 4 4 4 4
+SetProperty ('String', {1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1, 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 2}): 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 2
+SetProperty ('Integer', ""): exception: Could not convert property 'Integer' from string='' to integer
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Integer', "hello world"): exception: Could not convert property 'Integer' from string='hello world' to integer
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Integer', "3.14"): 3
+SetProperty ('Integer', "1 2.5 3 4"): exception: Could not convert property 'Integer' from string='1 2.5 3 4' to integer
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Integer', "1 2.5 4"): exception: Could not convert property 'Integer' from string='1 2.5 4' to integer
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Integer', "1 2 3 4 5"): exception: Could not convert property 'Integer' from string='1 2 3 4 5' to integer
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Integer', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'Integer' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to integer
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Integer', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'Integer' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to integer
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Integer', 13): 13
+SetProperty ('Integer', 1.5f): 1
+SetProperty ('Integer', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): exception: Could not convert property 'Integer' from vector[1] to integer[1]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::vec4f*)
+SetProperty ('Integer', math::mat4f (3.0f)): exception: Could not convert property 'Integer' from matrix[1] to integer[1]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::mat4f*)
+SetProperty ('Integer', {21, 22, 23, 24}): exception: Could not convert property 'Integer' from integer[4] to integer[1]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const int*)
+SetProperty ('Integer', {121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136}): exception: Could not convert property 'Integer' from float[16] to integer[1]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const float*)
+SetProperty ('Integer', {1 1 1 1, 2 2 2 2, 3 3 3 3, 4 4 4 4}): exception: Could not convert property 'Integer' from vector[4] to integer[1]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::vec4f*)
+SetProperty ('Integer', {1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1, 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 2}): exception: Could not convert property 'Integer' from matrix[2] to integer[1]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::mat4f*)
+SetProperty ('Float', ""): exception: Could not convert property 'Float' from string='' to float
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Float', "hello world"): exception: Could not convert property 'Float' from string='hello world' to float
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Float', "3.14"): 3.14
+SetProperty ('Float', "1 2.5 3 4"): exception: Could not convert property 'Float' from string='1 2.5 3 4' to float
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Float', "1 2.5 4"): exception: Could not convert property 'Float' from string='1 2.5 4' to float
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Float', "1 2 3 4 5"): exception: Could not convert property 'Float' from string='1 2 3 4 5' to float
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Float', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'Float' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to float
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Float', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'Float' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to float
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Float', 13): 13
+SetProperty ('Float', 1.5f): 1.5
+SetProperty ('Float', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): exception: Could not convert property 'Float' from vector[1] to float[1]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::vec4f*)
+SetProperty ('Float', math::mat4f (3.0f)): exception: Could not convert property 'Float' from matrix[1] to float[1]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::mat4f*)
+SetProperty ('Float', {21, 22, 23, 24}): exception: Could not convert property 'Float' from integer[4] to float[1]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const int*)
+SetProperty ('Float', {121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136}): exception: Could not convert property 'Float' from float[16] to float[1]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const float*)
+SetProperty ('Float', {1 1 1 1, 2 2 2 2, 3 3 3 3, 4 4 4 4}): exception: Could not convert property 'Float' from vector[4] to float[1]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::vec4f*)
+SetProperty ('Float', {1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1, 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 2}): exception: Could not convert property 'Float' from matrix[2] to float[1]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::mat4f*)
+SetProperty ('Vector', ""): exception: Could not convert property 'Vector' from string='' to vector
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Vector', "hello world"): exception: Could not convert property 'Vector' from string='hello world' to vector
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Vector', "3.14"): 3.14 3.14 3.14 3.14
+SetProperty ('Vector', "1 2.5 3 4"): 1 2.5 3 4
+SetProperty ('Vector', "1 2.5 4"): 1 2.5 4 0
+SetProperty ('Vector', "1 2 3 4 5"): exception: Could not convert property 'Vector' from string='1 2 3 4 5' to vector
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Vector', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'Vector' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to vector
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Vector', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'Vector' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to vector
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Vector', 13): 13 13 13 13
+SetProperty ('Vector', 1.5f): 1.5 1.5 1.5 1.5
+SetProperty ('Vector', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): 1 2 3 4
+SetProperty ('Vector', math::mat4f (3.0f)): exception: Could not convert property 'Vector' from matrix[1] to vector[1]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::mat4f*)
+SetProperty ('Vector', {21, 22, 23, 24}): 21 22 23 24
+SetProperty ('Vector', {121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136}): exception: Could not convert property 'Vector' from float[16] to vector[1]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const float*)
+SetProperty ('Vector', {1 1 1 1, 2 2 2 2, 3 3 3 3, 4 4 4 4}): exception: Could not convert property 'Vector' from vector[4] to vector[1]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::vec4f*)
+SetProperty ('Vector', {1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1, 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 2}): exception: Could not convert property 'Vector' from matrix[2] to vector[1]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::mat4f*)
+SetProperty ('Matrix', ""): exception: Could not convert property 'Matrix' from string='' to matrix
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Matrix', "hello world"): exception: Could not convert property 'Matrix' from string='hello world' to matrix
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Matrix', "3.14"): 3.14 0 0 0 0 3.14 0 0 0 0 3.14 0 0 0 0 3.14
+SetProperty ('Matrix', "1 2.5 3 4"): exception: Could not convert property 'Matrix' from string='1 2.5 3 4' to matrix
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Matrix', "1 2.5 4"): exception: Could not convert property 'Matrix' from string='1 2.5 4' to matrix
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Matrix', "1 2 3 4 5"): exception: Could not convert property 'Matrix' from string='1 2 3 4 5' to matrix
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Matrix', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+SetProperty ('Matrix', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'Matrix' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to matrix
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('Matrix', 13): 13 0 0 0 0 13 0 0 0 0 13 0 0 0 0 13
+SetProperty ('Matrix', 1.5f): 1.5 0 0 0 0 1.5 0 0 0 0 1.5 0 0 0 0 1.5
+SetProperty ('Matrix', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): exception: Could not convert property 'Matrix' from vector[1] to matrix[1]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::vec4f*)
+SetProperty ('Matrix', math::mat4f (3.0f)): 3 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3
+SetProperty ('Matrix', {21, 22, 23, 24}): exception: Could not convert property 'Matrix' from integer[4] to matrix[1]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const int*)
+SetProperty ('Matrix', {121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136}): 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136
+SetProperty ('Matrix', {1 1 1 1, 2 2 2 2, 3 3 3 3, 4 4 4 4}): 1 1 1 1 2 2 2 2 3 3 3 3 4 4 4 4
+SetProperty ('Matrix', {1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1, 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 2}): exception: Could not convert property 'Matrix' from matrix[2] to matrix[1]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::mat4f*)
+SetProperty ('IntArray', ""): exception: Could not convert property 'IntArray' from string='' to integer [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('IntArray', "hello world"): exception: Could not convert property 'IntArray' from string='hello world' to integer [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('IntArray', "3.14"): exception: Could not convert property 'IntArray' from string='3.14' to integer [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('IntArray', "1 2.5 3 4"): 1 2 3 4
+SetProperty ('IntArray', "1 2.5 4"): exception: Could not convert property 'IntArray' from string='1 2.5 4' to integer [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('IntArray', "1 2 3 4 5"): exception: Could not convert property 'IntArray' from string='1 2 3 4 5' to integer [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('IntArray', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'IntArray' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to integer [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('IntArray', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'IntArray' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to integer [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('IntArray', 13): exception: Could not convert property 'IntArray' from integer[1] to integer[4]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const int*)
+SetProperty ('IntArray', 1.5f): exception: Could not convert property 'IntArray' from float[1] to integer[4]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const float*)
+SetProperty ('IntArray', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): 1 2 3 4
+SetProperty ('IntArray', math::mat4f (3.0f)): exception: Could not convert property 'IntArray' from matrix[1] to integer[4]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::mat4f*)
+SetProperty ('IntArray', {21, 22, 23, 24}): 21 22 23 24
+SetProperty ('IntArray', {121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136}): exception: Could not convert property 'IntArray' from float[16] to integer[4]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const float*)
+SetProperty ('IntArray', {1 1 1 1, 2 2 2 2, 3 3 3 3, 4 4 4 4}): exception: Could not convert property 'IntArray' from vector[4] to integer[4]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::vec4f*)
+SetProperty ('IntArray', {1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1, 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 2}): exception: Could not convert property 'IntArray' from matrix[2] to integer[4]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::mat4f*)
+SetProperty ('FloatArray', ""): exception: Could not convert property 'FloatArray' from string='' to float [16]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('FloatArray', "hello world"): exception: Could not convert property 'FloatArray' from string='hello world' to float [16]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('FloatArray', "3.14"): exception: Could not convert property 'FloatArray' from string='3.14' to float [16]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('FloatArray', "1 2.5 3 4"): exception: Could not convert property 'FloatArray' from string='1 2.5 3 4' to float [16]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('FloatArray', "1 2.5 4"): exception: Could not convert property 'FloatArray' from string='1 2.5 4' to float [16]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('FloatArray', "1 2 3 4 5"): exception: Could not convert property 'FloatArray' from string='1 2 3 4 5' to float [16]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('FloatArray', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+SetProperty ('FloatArray', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'FloatArray' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to float [16]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('FloatArray', 13): exception: Could not convert property 'FloatArray' from integer[1] to float[16]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const int*)
+SetProperty ('FloatArray', 1.5f): exception: Could not convert property 'FloatArray' from float[1] to float[16]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const float*)
+SetProperty ('FloatArray', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): exception: Could not convert property 'FloatArray' from vector[1] to float[16]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::vec4f*)
+SetProperty ('FloatArray', math::mat4f (3.0f)): 3 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3
+SetProperty ('FloatArray', {21, 22, 23, 24}): exception: Could not convert property 'FloatArray' from integer[4] to float[16]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const int*)
+SetProperty ('FloatArray', {121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136}): 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136
+SetProperty ('FloatArray', {1 1 1 1, 2 2 2 2, 3 3 3 3, 4 4 4 4}): 1 1 1 1 2 2 2 2 3 3 3 3 4 4 4 4
+SetProperty ('FloatArray', {1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1, 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 2}): exception: Could not convert property 'FloatArray' from matrix[2] to float[16]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::mat4f*)
+SetProperty ('VectorArray', ""): exception: Could not convert property 'VectorArray' from string='' to vector [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('VectorArray', "hello world"): exception: Could not convert property 'VectorArray' from string='hello world' to vector [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('VectorArray', "3.14"): exception: Could not convert property 'VectorArray' from string='3.14' to vector [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('VectorArray', "1 2.5 3 4"): exception: Could not convert property 'VectorArray' from string='1 2.5 3 4' to vector [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('VectorArray', "1 2.5 4"): exception: Could not convert property 'VectorArray' from string='1 2.5 4' to vector [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('VectorArray', "1 2 3 4 5"): exception: Could not convert property 'VectorArray' from string='1 2 3 4 5' to vector [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('VectorArray', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+SetProperty ('VectorArray', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'VectorArray' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to vector [4]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('VectorArray', 13): exception: Could not convert property 'VectorArray' from integer[1] to vector[4]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const int*)
+SetProperty ('VectorArray', 1.5f): exception: Could not convert property 'VectorArray' from float[1] to vector[4]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const float*)
+SetProperty ('VectorArray', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): exception: Could not convert property 'VectorArray' from vector[1] to vector[4]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::vec4f*)
+SetProperty ('VectorArray', math::mat4f (3.0f)): 3 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3
+SetProperty ('VectorArray', {21, 22, 23, 24}): 21 21 21 21 22 22 22 22 23 23 23 23 24 24 24 24
+SetProperty ('VectorArray', {121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136}): 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136
+SetProperty ('VectorArray', {1 1 1 1, 2 2 2 2, 3 3 3 3, 4 4 4 4}): 1 1 1 1 2 2 2 2 3 3 3 3 4 4 4 4
+SetProperty ('VectorArray', {1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1, 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 2}): exception: Could not convert property 'VectorArray' from matrix[2] to vector[4]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::mat4f*)
+SetProperty ('MatrixArray', ""): exception: Could not convert property 'MatrixArray' from string='' to matrix [2]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('MatrixArray', "hello world"): exception: Could not convert property 'MatrixArray' from string='hello world' to matrix [2]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('MatrixArray', "3.14"): exception: Could not convert property 'MatrixArray' from string='3.14' to matrix [2]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('MatrixArray', "1 2.5 3 4"): exception: Could not convert property 'MatrixArray' from string='1 2.5 3 4' to matrix [2]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('MatrixArray', "1 2.5 4"): exception: Could not convert property 'MatrixArray' from string='1 2.5 4' to matrix [2]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('MatrixArray', "1 2 3 4 5"): exception: Could not convert property 'MatrixArray' from string='1 2 3 4 5' to matrix [2]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('MatrixArray', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): exception: Could not convert property 'MatrixArray' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to matrix [2]
+    at common::PropertyMap::Impl::ReadValueToProperty(const char*,PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,const char*)
+SetProperty ('MatrixArray', "1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16"): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+SetProperty ('MatrixArray', 13): exception: Could not convert property 'MatrixArray' from integer[1] to matrix[2]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const int*)
+SetProperty ('MatrixArray', 1.5f): exception: Could not convert property 'MatrixArray' from float[1] to matrix[2]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const float*)
+SetProperty ('MatrixArray', math::vec4f (1.0f, 2.0f, 3.0f, 4.0f)): exception: Could not convert property 'MatrixArray' from vector[1] to matrix[2]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::vec4f*)
+SetProperty ('MatrixArray', math::mat4f (3.0f)): exception: Could not convert property 'MatrixArray' from matrix[1] to matrix[2]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::mat4f*)
+SetProperty ('MatrixArray', {21, 22, 23, 24}): exception: Could not convert property 'MatrixArray' from integer[4] to matrix[2]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const int*)
+SetProperty ('MatrixArray', {121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136}): exception: Could not convert property 'MatrixArray' from float[16] to matrix[2]
+    at common::PropertyMap::Impl::ReadValueToProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::SetProperty(const char*,size_t,const float*)
+SetProperty ('MatrixArray', {1 1 1 1, 2 2 2 2, 3 3 3 3, 4 4 4 4}): exception: Could not convert property 'MatrixArray' from vector[4] to matrix[2]
+    at common::PropertyMap::SetProperty(const char*,size_t,const math::vec4f*)
+SetProperty ('MatrixArray', {1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1, 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 2}): 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2 0 0 0 0 2 0 0 0 0 2 0 0 0 0 2

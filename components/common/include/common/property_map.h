@@ -2,8 +2,7 @@
 #define COMMON_PROPERTY_MAP_HEADER
 
 #include <stl/string_fwd>
-
-#include <xtl/intrusive_ptr.h>
+#include <xtl/functional_fwd>
 
 namespace math
 {
@@ -20,6 +19,9 @@ typedef matrix<float, 4> mat4f;
 namespace common
 {
 
+//forward declarations
+class PropertyMap;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Тип свойств узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,9 +37,120 @@ enum PropertyType
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение имени типа
+///Получение имени типа / получение размера свойства в буфере
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 const char* get_name (PropertyType);
+size_t      get_size (PropertyType);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Дескриптор свойства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct PropertyDesc
+{
+  const char*  name;            //имя свойства
+  size_t       name_hash;       //хэш имени свойства
+  PropertyType type;            //тип свойства
+  size_t       elements_count;  //количество элементов
+  size_t       offset;          //смещение в буфере
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Расположение свойств
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class PropertyLayout
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы / деструктор / присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    PropertyLayout  ();
+    PropertyLayout  (const PropertyLayout&);
+    ~PropertyLayout ();
+
+    PropertyLayout& operator = (const PropertyLayout&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Копирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    PropertyLayout Clone () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение числа ссылок на данный объект
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t UseCount () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Хэш структуры / размер буфера
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t Hash       () const;
+    size_t BufferSize () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Количество свойств
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t Size () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение свойств
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const PropertyDesc*   Properties            () const;
+    const char*           PropertyName          (size_t property_index) const;
+    common::PropertyType  PropertyType          (size_t property_index) const;
+    common::PropertyType  PropertyType          (const char* property_name) const;
+    size_t                PropertyElementsCount (size_t property_index) const;
+    size_t                PropertyElementsCount (const char* property_name) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Добавление и удаление свойств
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t AddProperty    (const char* name, common::PropertyType type, size_t elements_count = 1);
+    void   RemoveProperty (size_t property_index); //may throw for shared layouts
+    void   Clear          (); //may throw for shared layouts
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Модификация свойств
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void SetPropertyName          (const char* old_name, const char* new_name);
+    void SetPropertyType          (const char* property_name, common::PropertyType type);
+    void SetPropertyElementsCount (const char* property_name, size_t elements_count);    
+    void SetPropertyName          (size_t property_index, const char* name);
+    void SetPropertyType          (size_t property_index, common::PropertyType type);
+    void SetPropertyElementsCount (size_t property_index, size_t elements_count);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск индекса свойства
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    int  IndexOf   (const char* name) const;
+    bool IsPresent (const char* name) const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Объект оповещения об удалении
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    xtl::trackable& Trackable () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Swap (PropertyLayout&);
+    
+  private:
+    struct Impl;
+    
+    PropertyLayout (Impl*);
+
+  private:
+    Impl* impl;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void swap (PropertyLayout&, PropertyLayout&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение объекта оповещения об удалении
+///////////////////////////////////////////////////////////////////////////////////////////////////
+xtl::trackable& get_trackable (const PropertyLayout&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Свойства узла
@@ -49,8 +162,9 @@ class PropertyMap
 ///Конструкторы / деструктор / присваивание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     PropertyMap  ();
-    ~PropertyMap ();
+    PropertyMap  (const PropertyLayout&);
     PropertyMap  (const PropertyMap&);
+    ~PropertyMap ();
     
     PropertyMap& operator = (const PropertyMap&);
     
@@ -67,9 +181,8 @@ class PropertyMap
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Хэш параметров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Hash          () const; //композиция DataHash и StructureHash
-    size_t DataHash      () const; //хэш данных
-    size_t StructureHash () const; //хэш структуры параметров
+    size_t Hash       () const; //хэш данных
+    size_t LayoutHash () const; //хэш структуры параметров
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя свойства
@@ -79,16 +192,20 @@ class PropertyMap
     void        SetPropertyName (const char* old_name, const char* new_name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Тип свойства
+///Тип свойства / количество элементов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    common::PropertyType PropertyType (size_t index) const;
-    common::PropertyType PropertyType (const char* name) const;
+    common::PropertyType PropertyType          (size_t index) const;
+    common::PropertyType PropertyType          (const char* name) const;
+    size_t               PropertyElementsCount (size_t index) const;
+    size_t               PropertyElementsCount (const char* name) const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Смена типа
+///Смена типа / количества элементов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void SetPropertyType (size_t index, common::PropertyType type);
-    void SetPropertyType (const char* name, common::PropertyType type);
+    void SetPropertyType          (size_t index, common::PropertyType type);
+    void SetPropertyType          (const char* name, common::PropertyType type);
+    void SetPropertyElementsCount (size_t index, size_t count);
+    void SetPropertyElementsCount (const char* name, size_t count);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск индекса свойства
@@ -105,6 +222,10 @@ class PropertyMap
     void SetProperty (const char* name, float value);    
     void SetProperty (const char* name, const math::vec4f& value);   
     void SetProperty (const char* name, const math::mat4f& value);
+    void SetProperty (const char* name, size_t count, const int* values);
+    void SetProperty (const char* name, size_t count, const float* values);
+    void SetProperty (const char* name, size_t count, const math::vec4f* values);
+    void SetProperty (const char* name, size_t count, const math::mat4f* values);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка свойства по индексу
@@ -115,7 +236,11 @@ class PropertyMap
     void SetProperty (size_t property_index, float value);
     void SetProperty (size_t property_index, const math::vec4f& value);    
     void SetProperty (size_t property_index, const math::mat4f& value);
-    
+    void SetProperty (size_t property_index, size_t count, const int* values);
+    void SetProperty (size_t property_index, size_t count, const float* values);
+    void SetProperty (size_t property_index, size_t count, const math::vec4f* values);
+    void SetProperty (size_t property_index, size_t count, const math::mat4f* values);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение свойства по имени
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,13 +249,21 @@ class PropertyMap
     void GetProperty (const char* name, float& result) const;
     void GetProperty (const char* name, math::vec4f& result) const;
     void GetProperty (const char* name, math::mat4f& result) const;
+    void GetProperty (const char* name, size_t count, int* values) const;
+    void GetProperty (const char* name, size_t count, float* values) const;
+    void GetProperty (const char* name, size_t count, math::vec4f* values) const;
+    void GetProperty (const char* name, size_t count, math::mat4f* values) const;
 
-    const char*        GetString  (const char* name) const;
-    int                GetInteger (const char* name) const;
-    float              GetFloat   (const char* name) const;
-    const math::vec4f& GetVector  (const char* name) const;
-    const math::mat4f& GetMatrix  (const char* name) const;
-    
+    const char*        GetString       (const char* name) const;
+    int                GetInteger      (const char* name) const;
+    float              GetFloat        (const char* name) const;
+    const math::vec4f& GetVector       (const char* name) const;
+    const math::mat4f& GetMatrix       (const char* name) const;
+    const int*         GetIntegerArray (const char* name) const;
+    const float*       GetFloatArray   (const char* name) const;
+    const math::vec4f* GetVectorArray  (const char* name) const;
+    const math::mat4f* GetMatrixArray  (const char* name) const;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение свойства по индексу
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -139,12 +272,20 @@ class PropertyMap
     void GetProperty (size_t property_index, float& result) const;
     void GetProperty (size_t property_index, math::vec4f& result) const;
     void GetProperty (size_t property_index, math::mat4f& result) const;
+    void GetProperty (size_t property_index, size_t count, int* values) const;
+    void GetProperty (size_t property_index, size_t count, float* values) const;
+    void GetProperty (size_t property_index, size_t count, math::vec4f* values) const;
+    void GetProperty (size_t property_index, size_t count, math::mat4f* values) const;
 
-    const char*        GetString  (size_t property_index) const;
-    int                GetInteger (size_t property_index) const;
-    float              GetFloat   (size_t property_index) const;
-    const math::vec4f& GetVector  (size_t property_index) const;
-    const math::mat4f& GetMatrix  (size_t property_index) const;
+    const char*        GetString       (size_t property_index) const;
+    int                GetInteger      (size_t property_index) const;
+    float              GetFloat        (size_t property_index) const;
+    const math::vec4f& GetVector       (size_t property_index) const;
+    const math::mat4f& GetMatrix       (size_t property_index) const;
+    const int*         GetIntegerArray (size_t property_index) const;
+    const float*       GetFloatArray   (size_t property_index) const;
+    const math::vec4f* GetVectorArray  (size_t property_index) const;
+    const math::mat4f* GetMatrixArray  (size_t property_index) const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление свойств
@@ -152,6 +293,22 @@ class PropertyMap
     void RemoveProperty (const char* name);
     void RemoveProperty (size_t index);
     void Clear          ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение расположения параметров
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const PropertyDesc* Layout () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Работа с буфером
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const void* BufferData () const;
+    size_t      BufferSize () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Объект оповещения об удалении
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    xtl::trackable& Trackable () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -171,6 +328,11 @@ class PropertyMap
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (PropertyMap&, PropertyMap&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение объекта оповещения об удалении
+///////////////////////////////////////////////////////////////////////////////////////////////////
+xtl::trackable& get_trackable (const PropertyMap&);
 
 }
 
