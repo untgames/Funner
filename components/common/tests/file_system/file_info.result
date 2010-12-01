@@ -1,6 +1,0 @@
-Results of file_info_test:
-File info 'data':
-Directory:   true
-File info 'data/test.txt':
-Directory:   false
-Size:        12
