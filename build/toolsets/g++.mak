@@ -1,0 +1,78 @@
+###################################################################################################
+#Сборка под g++
+###################################################################################################
+
+###################################################################################################
+#Константы
+###################################################################################################
+LIB_SUFFIX            ?= .a
+OBJ_SUFFIX            ?= .o
+EXE_SUFFIX            ?= .exe
+DLL_SUFFIX            ?= .dll
+DLL_PREFIX            ?=
+DLL_LIB_SUFFIX        ?= .a
+LIB_PREFIX            ?= lib
+COMPILER_GCC          ?= gcc
+LINKER_GCC            ?= g++
+LIB_GCC               ?= ar
+PROFILES              += g++
+DEFAULT_LIBS          +=
+COMMON_CFLAGS         := -Os -Wall -Wno-format $(COMMON_CFLAGS)
+DISABLE_CPP_WARNINGS  += -Wno-invalid-offsetof
+SOURCE_FILES_SUFFIXES += s
+
+###################################################################################################
+#Компиляция исходников (исходный файл, список подключаемых каталогов, список подключаемых файлов, каталог с объектными файлами,
+#список дефайнов, флаги компиляции, pch файл, список каталогов с dll)
+###################################################################################################
+define tools.gcc.compile
+echo $1 && $(COMPILER_GCC) -c -o "$4/$$(basename $$src $${src##*.})o" $(patsubst %,-I "%",$2) $(patsubst %,-include "%",$3) $6 $(foreach def,$5,-D $(subst %,$(SPACE),$(def))) $1
+endef
+
+define tools.g++.c++compile
+$(call for_each_file,src,$(if $(filter -x c++,$6),,$(filter %.c,$1)),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $6,$7,$8)) && \
+$(call for_each_file,src,$(filter %.cpp,$1)$(if $(filter -x c++,$6), $(filter %.c,$1)),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $(COMMON_CPPFLAGS) $(DISABLE_CPP_WARNINGS) $6,$7,$8)) && \
+$(call for_each_file,src,$(filter %.mm,$1),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $(COMMON_CPPFLAGS) $(COMMON_MMFLAGS) $(DISABLE_CPP_WARNINGS) $6,$7,$8)) && \
+$(call for_each_file,src,$(filter %.s,$1),$(call tools.gcc.compile,$$src,$2,$3,$4,$5,$(COMMON_CFLAGS) $6,$7,$8)) 
+endef
+
+###################################################################################################
+#Линковка shared-library (имя выходного файла)
+###################################################################################################
+define tools.link.dll
+-shared -Wl,--out-implib,$(dir $1)$(LIB_PREFIX)$(notdir $(basename $1))$(LIB_SUFFIX)
+endef
+
+###################################################################################################
+#Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
+#список подключаемых символов линковки, флаги линковки)
+###################################################################################################
+define tools.g++.link
+$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(patsubst lib%.a,-l%,$(filter lib%.a,$2) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) && chmod u+x "$1"
+endef
+
+###################################################################################################
+#Выполнение команды (команда, каталог запуска, базовый каталог, дополнительные пути поиска библиотек и приложений, файл результатов)
+###################################################################################################
+define tools.run
+$(call prepare_to_execute,$2,$4) && chmod u+x "$(CURDIR)/$(firstword $1)" && "$(CURDIR)/$(firstword $1)" $(if $5, > "$(CURDIR)/$5")
+endef
+
+###################################################################################################
+#Сборка библиотеки (имя выходного файла, список файлов)
+###################################################################################################
+define tools.g++.lib
+$(LIB_GCC) rcus $1 $2
+endef
+
+define tools.c++compile
+$(call tools.g++.c++compile,$1,$2,$3,$4,$5,$6,$7,$8,$9)
+endef
+
+define tools.link
+$(call tools.g++.link,$1,$2,$3,$4,$5,$6,$7,$8,$9)
+endef
+
+define tools.lib
+$(call tools.g++.lib,$1,$2,$3,$4,$5,$6,$7,$8,$9)
+endef
