@@ -52,6 +52,8 @@ struct BufferedFileImpl::Impl
 
       data_dirty_start_pos = 0;
       data_dirty_end_pos   = 0;
+
+      buffer.resize (0);
     }
     catch (xtl::exception& exception)
     {
@@ -76,21 +78,28 @@ struct BufferedFileImpl::Impl
       {
         data_start_pos = pos;
         
-          //изменение размеров буферов
+        if (base_file->Mode () & FileMode_Read)
+        {
+            //изменение размеров буферов
 
-        size_t available_size = base_file->Size () - data_start_pos;     
+          size_t available_size = base_file->Size () - data_start_pos;
 
-        buffer.resize (available_size < buffer.capacity () ? available_size : buffer.capacity (), false);
+          buffer.resize (available_size < buffer.capacity () ? available_size : buffer.capacity (), false);
 
-          //чтение данных
+            //чтение данных
 
-        if (base_file->Seek (data_start_pos) != data_start_pos)
-          throw xtl::format_operation_exception ("", "Can't seek file");
+          if (base_file->Seek (data_start_pos) != data_start_pos)
+            throw xtl::format_operation_exception ("", "Can't seek file");
 
-        size_t result = base_file->Read (buffer.data (), buffer.size ());
+          size_t result = base_file->Read (buffer.data (), buffer.size ());
 
-        if (result != buffer.size ())
-          throw xtl::format_operation_exception ("", "Can't read data from file");
+          if (result != buffer.size ())
+            throw xtl::format_operation_exception ("", "Can't read data from file");
+        }
+        else
+        {
+          buffer.resize (0);
+        }
       }
       catch (...)
       {
@@ -217,8 +226,8 @@ size_t BufferedFileImpl::Read (void* buf, size_t size)
 
     if (impl->file_size - impl->file_pos < size)
       size = impl->file_size - impl->file_pos;
-      
-    if (size > impl->buffer.size ())
+
+    if (size > impl->buffer.capacity ())
     {      
         //чтение в обход кэша
         
@@ -297,9 +306,9 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
     if (!size)
       return 0;
 
-    if (size > impl->buffer.size ())
+    if (size > impl->buffer.capacity ())
     {
-        //запись в обход кэша
+      //запись в обход кэша
 
       impl->FlushBuffer ();
 
@@ -331,16 +340,29 @@ size_t BufferedFileImpl::Write (const void* buf,size_t size)
 
       size_t offset         = pos - impl->data_start_pos;
       size_t available_size = impl->buffer.size () - offset;
-      size_t write_size     = size < available_size ? size : available_size;
-      char*  dst            = impl->buffer.data () + offset;
-      
-      if (!available_size)
-        break;
 
+      if (!available_size)  //файл только на запись, данные не могут быть прочитаны
+      {
+        available_size = impl->buffer.capacity () < size ? impl->buffer.capacity () : size;
+
+        impl->buffer.resize (available_size, false);
+      }
+
+      size_t write_size = size < available_size ? size : available_size;
+      char*  dst        = impl->buffer.data () + offset;
+      
       memcpy (dst, src, write_size);
       
-      if (pos < impl->data_dirty_start_pos)                         impl->data_dirty_start_pos = pos;
-      if ((filepos_t)(pos + write_size) > impl->data_dirty_end_pos) impl->data_dirty_end_pos   = pos + write_size;
+      if (impl->data_dirty_start_pos == impl->data_dirty_end_pos)
+      {
+        impl->data_dirty_start_pos = pos;
+        impl->data_dirty_end_pos   = pos + write_size;
+      }
+      else
+      {
+        if (pos < impl->data_dirty_start_pos)                         impl->data_dirty_start_pos = pos;
+        if ((filepos_t)(pos + write_size) > impl->data_dirty_end_pos) impl->data_dirty_end_pos   = pos + write_size;
+      }
 
         //переход к следующему блоку
 
