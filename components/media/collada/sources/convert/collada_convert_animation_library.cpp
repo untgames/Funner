@@ -5,6 +5,8 @@ using namespace media::collada;
 namespace
 {
 
+const float TRANSFORM_EQUAL_EPSILON = 0.001f;
+
 /*
     Преобразователь данных коллады
 */
@@ -23,10 +25,23 @@ class Converter
         case AnimationChannelSemantic_Transform:
         {
           math::linear_spline_mat4f      spline;
-          const AnimationSampleTransform *current_sample = collada_channel.Samples<AnimationSampleTransform> ();
+          const AnimationSampleTransform *current_sample = collada_channel.Samples<AnimationSampleTransform> (),
+                                         *previous_sample = 0;
+
+          spline.reserve (collada_channel.SamplesCount ());
 
           for (size_t i = 0, samples_count = collada_channel.SamplesCount (); i < samples_count; i++, current_sample++)
+          {
+            const AnimationSampleTransform *next_sample = i < samples_count - 1 ? current_sample + 1 : 0;
+
+            if (previous_sample && next_sample && math::equal (previous_sample->value, current_sample->value, TRANSFORM_EQUAL_EPSILON) &&
+                math::equal (next_sample->value, current_sample->value, TRANSFORM_EQUAL_EPSILON))
+              continue;
+
             spline.add_key (current_sample->time, current_sample->value);
+
+            previous_sample = current_sample;
+          }
 
           channel.SetTrack (spline);
           break;
