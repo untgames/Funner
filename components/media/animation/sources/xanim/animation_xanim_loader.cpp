@@ -108,6 +108,12 @@ class XmlAnimationLibraryLoader
     {
         T spline;
 
+        size_t keys_count = 0;
+
+        for (Parser::NamesakeIterator key_iter = spline_iter->First ("key"); key_iter; ++key_iter, keys_count++);
+
+        spline.reserve (keys_count);
+
         for_each_child (*spline_iter, "key",
                         xtl::bind (&XmlAnimationLibraryLoader::ParseSplineKey<T>, this, _1, xtl::ref (spline)));
 

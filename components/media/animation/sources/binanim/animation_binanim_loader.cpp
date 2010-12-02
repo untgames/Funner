@@ -111,16 +111,18 @@ class BinAnimationLibraryLoader
 
     template <class T> void ReadSpline (Channel& parent)
     {
-        T spline;
+      T spline;
 
-        unsigned int keys_count;
+      unsigned int keys_count;
 
-        file_read (input_file, &keys_count, sizeof (keys_count));
+      file_read (input_file, &keys_count, sizeof (keys_count));
 
-        for (size_t i = 0; i < keys_count; i++)
-          ReadSplineKey<T> (spline);
+      spline.reserve (keys_count);
 
-        parent.SetTrack (spline);
+      for (size_t i = 0; i < keys_count; i++)
+        ReadSplineKey<T> (spline);
+
+      parent.SetTrack (spline);
     }
 
     void ReadAnimationChannel (Animation& parent)
