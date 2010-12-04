@@ -1,6 +1,7 @@
 # Compile exports
 export.compile.extern.devil.INCLUDE_DIRS            := include
 export.compile.extern.devil.iphone.COMPILER_DEFINES := IL_STATIC_LIB
+export.compile.extern.devil.unistd.COMPILER_DEFINES := HAVE_UNISTD_H
 
 # Link exports
 export.link.extern.devil.LIBS    := funner.extern.devil funner.extern.ilu
