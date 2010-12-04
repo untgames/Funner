@@ -20,6 +20,7 @@ EXTERN.OPENALLIB.linux.COMPILER_DEFINES     :=
 EXTERN.OPENALLIB.linux.COMPILER_FLAGS       := -pthread
 EXTERN.OPENALLIB.linux.LIBS                 := pthread dl rt
 EXTERN.OPENALLIB.linux.LINK_FLAGS           := -pthread
+EXTERN.OPENALLIB.beagleboard.LINK_FLAGS := -rdynamic
 
 #Цель №2 - OPENAL_TESTS
 EXTERN.OPENAL_TESTS.TYPE         := test-suite
