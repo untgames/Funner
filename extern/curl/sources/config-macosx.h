@@ -1,5 +1,5 @@
-/* src/config.h.  Generated from config.h.in by configure.  */
-/* lib/config.h.in.  Generated from configure.ac by autoheader.  */
+/* src/curl_config.h.  Generated from curl_config.h.in by configure.  */
+/* lib/curl_config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* when building libcurl itself */
 /* #undef BUILDING_LIBCURL */
@@ -25,17 +25,32 @@
 /* to disable FTP */
 /* #undef CURL_DISABLE_FTP */
 
+/* to disable Gopher */
+/* #undef CURL_DISABLE_GOPHER */
+
 /* to disable HTTP */
 /* #undef CURL_DISABLE_HTTP */
+
+/* to disable IMAP */
+/* #undef CURL_DISABLE_IMAP */
 
 /* to disable LDAP */
 /* #undef CURL_DISABLE_LDAP */
 
 /* to disable LDAPS */
-#define CURL_DISABLE_LDAPS 1
+/* #undef CURL_DISABLE_LDAPS */
+
+/* to disable POP3 */
+/* #undef CURL_DISABLE_POP3 */
 
 /* to disable proxies */
 /* #undef CURL_DISABLE_PROXY */
+
+/* to disable RTSP */
+/* #undef CURL_DISABLE_RTSP */
+
+/* to disable SMTP */
+/* #undef CURL_DISABLE_SMTP */
 
 /* to disable TELNET */
 /* #undef CURL_DISABLE_TELNET */
@@ -52,17 +67,11 @@
 /* to enable hidden symbols */
 /* #undef CURL_HIDDEN_SYMBOLS */
 
-/* W$ LDAP with non-W$ compiler */
-/* #undef CURL_LDAP_HYBRID */
-
-/* Use W$ LDAP implementation */
+/* Use Windows LDAP implementation */
 /* #undef CURL_LDAP_WIN */
 
 /* when not building a shared library */
 /* #undef CURL_STATICLIB */
-
-/* Set to explicitly specify we don't want to use thread-safe functions */
-/* #undef DISABLED_THREADSAFE */
 
 /* your Entropy Gathering Daemon socket pathname */
 /* #undef EGD_SOCKET */
@@ -106,7 +115,7 @@
 /* Define to 1 if you have the <assert.h> header file. */
 #define HAVE_ASSERT_H 1
 
-/* Define to 1 if you have the `basename' function. */
+/* Define to 1 if you have the basename function. */
 #define HAVE_BASENAME 1
 
 /* Define to 1 if bool is an available type. */
@@ -115,8 +124,14 @@
 /* Define to 1 if you have the clock_gettime function and monotonic timer. */
 /* #undef HAVE_CLOCK_GETTIME_MONOTONIC */
 
-/* Define to 1 if you have the `closesocket' function. */
+/* Define to 1 if you have the closesocket function. */
 /* #undef HAVE_CLOSESOCKET */
+
+/* Define to 1 if you have the CloseSocket camel case function. */
+/* #undef HAVE_CLOSESOCKET_CAMEL */
+
+/* Define to 1 if you have the connect function. */
+#define HAVE_CONNECT 1
 
 /* Define to 1 if you have the `CRYPTO_cleanup_all_ex_data' function. */
 #define HAVE_CRYPTO_CLEANUP_ALL_EX_DATA 1
@@ -129,6 +144,9 @@
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
+
+/* Define to 1 if you have the `ENGINE_cleanup' function. */
+#define HAVE_ENGINE_CLEANUP 1
 
 /* Define to 1 if you have the `ENGINE_load_builtin_engines' function. */
 #define HAVE_ENGINE_LOAD_BUILTIN_ENGINES 1
@@ -165,6 +183,9 @@
 
 /* Define to 1 if you have a working getaddrinfo function. */
 #define HAVE_GETADDRINFO 1
+
+/* Define to 1 if the getaddrinfo function is threadsafe. */
+#define HAVE_GETADDRINFO_THREADSAFE 1
 
 /* Define to 1 if you have the `geteuid' function. */
 #define HAVE_GETEUID 1
@@ -257,13 +278,13 @@
 /* #undef HAVE_GSSMIT */
 
 /* Define to 1 if you have the `idna_strerror' function. */
-/* #undef HAVE_IDNA_STRERROR */
+//#define HAVE_IDNA_STRERROR 1
 
 /* Define to 1 if you have the `idn_free' function. */
-/* #undef HAVE_IDN_FREE */
+#define HAVE_IDN_FREE 1
 
 /* Define to 1 if you have the <idn-free.h> header file. */
-/* #undef HAVE_IDN_FREE_H */
+#define HAVE_IDN_FREE_H 1
 
 /* Define to 1 if you have the <ifaddrs.h> header file. */
 #define HAVE_IFADDRS_H 1
@@ -332,8 +353,11 @@
 /* Define to 1 if you have the ldap.h header file. */
 #define HAVE_LDAP_H 1
 
+/* Define to 1 if you have the `ldap_init_fd' function. */
+/* #undef HAVE_LDAP_INIT_FD */
+
 /* Use LDAPS implementation */
-/* #undef HAVE_LDAP_SSL */
+#define HAVE_LDAP_SSL 1
 
 /* Define to 1 if you have the ldap_ssl.h header file. */
 /* #undef HAVE_LDAP_SSL_H */
@@ -341,11 +365,14 @@
 /* Define to 1 if you have the `ldap_url_parse' function. */
 #define HAVE_LDAP_URL_PARSE 1
 
+/* Define to 1 if you have the `gcrypt' library (-lgcrypt). */
+/* #undef HAVE_LIBGCRYPT */
+
 /* Define to 1 if you have the <libgen.h> header file. */
 #define HAVE_LIBGEN_H 1
 
 /* Define to 1 if you have the `idn' library (-lidn). */
-/* #undef HAVE_LIBIDN */
+//#define HAVE_LIBIDN 1
 
 /* Define to 1 if you have the `resolv' library (-lresolv). */
 /* #undef HAVE_LIBRESOLV */
@@ -353,14 +380,23 @@
 /* Define to 1 if you have the `resolve' library (-lresolve). */
 /* #undef HAVE_LIBRESOLVE */
 
-/* Define to 1 if you have the `socket' library (-lsocket). */
-/* #undef HAVE_LIBSOCKET */
+/* Define to 1 if you have the <librtmp/rtmp.h> header file. */
+/* #undef HAVE_LIBRTMP_RTMP_H */
 
 /* Define to 1 if you have the `ssh2' library (-lssh2). */
 /* #undef HAVE_LIBSSH2 */
 
+/* Define to 1 if you have the `libssh2_exit' function. */
+/* #undef HAVE_LIBSSH2_EXIT */
+
 /* Define to 1 if you have the <libssh2.h> header file. */
 /* #undef HAVE_LIBSSH2_H */
+
+/* Define to 1 if you have the `libssh2_init' function. */
+/* #undef HAVE_LIBSSH2_INIT */
+
+/* Define to 1 if you have the `libssh2_scp_send64' function. */
+/* #undef HAVE_LIBSSH2_SCP_SEND64 */
 
 /* Define to 1 if you have the `libssh2_version' function. */
 /* #undef HAVE_LIBSSH2_VERSION */
@@ -391,6 +427,9 @@
 
 /* Define to 1 if you have the memory.h header file. */
 #define HAVE_MEMORY_H 1
+
+/* Define to 1 if you have the memrchr function or macro. */
+/* #undef HAVE_MEMRCHR */
 
 /* Define to 1 if you have the MSG_NOSIGNAL flag. */
 /* #undef HAVE_MSG_NOSIGNAL */
@@ -461,6 +500,9 @@
 
 /* Define to 1 if you have a working POSIX-style strerror_r function. */
 #define HAVE_POSIX_STRERROR_R 1
+
+/* if you have <pthread.h> */
+/* #undef HAVE_PTHREAD_H */
 
 /* Define to 1 if you have the <pwd.h> header file. */
 #define HAVE_PWD_H 1
@@ -534,8 +576,11 @@
 /* Define to 1 if struct sockaddr_in6 has the sin6_scope_id member */
 #define HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID 1
 
-/* Define to 1 if you have the `socket' function. */
+/* Define to 1 if you have the socket function. */
 #define HAVE_SOCKET 1
+
+/* Define to 1 if you have the <socket.h> header file. */
+/* #undef HAVE_SOCKET_H */
 
 /* Define this if you have the SPNEGO library fbopenssl */
 /* #undef HAVE_SPNEGO */
@@ -667,10 +712,10 @@
 #define HAVE_TIME_H 1
 
 /* Define to 1 if you have the <tld.h> header file. */
-/* #undef HAVE_TLD_H */
+#define HAVE_TLD_H 1
 
 /* Define to 1 if you have the `tld_strerror' function. */
-/* #undef HAVE_TLD_STRERROR */
+#define HAVE_TLD_STRERROR 1
 
 /* Define to 1 if you have the `uname' function. */
 #define HAVE_UNAME 1
@@ -727,9 +772,6 @@
 /* Define to 1 if you are building a native Windows target. */
 /* #undef NATIVE_WINDOWS */
 
-/* If you lack a fine basename() prototype */
-/* #undef NEED_BASENAME_PROTO */
-
 /* Define to 1 if you need the lber.h header file even with ldap.h */
 /* #undef NEED_LBER_H */
 
@@ -742,14 +784,17 @@
 /* Define to 1 if _REENTRANT preprocessor symbol must be defined. */
 /* #undef NEED_REENTRANT */
 
+/* Define to 1 if _THREAD_SAFE preprocessor symbol must be defined. */
+/* #undef NEED_THREAD_SAFE */
+
 /* cpu-machine-OS */
-#define OS "i386-apple-darwin9.5.0"
+#define OS "x86_64-apple-darwin10.5.0"
 
 /* Name of package */
 #define PACKAGE "curl"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "a suitable curl mailing list => http://curl.haxx.se/mail/"
+#define PACKAGE_BUGREPORT "a suitable curl mailing list: http://curl.haxx.se/mail/"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "curl"
@@ -759,6 +804,9 @@
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "curl"
+
+/* Define to the home page for this package. */
+#define PACKAGE_URL ""
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "-"
@@ -856,6 +904,9 @@
 /* The size of `off_t', as computed by sizeof. */
 #define SIZEOF_OFF_T 8
 
+/* The size of `short', as computed by sizeof. */
+#define SIZEOF_SHORT 2
+
 /* The size of `size_t', as computed by sizeof. */
 #define SIZEOF_SIZE_T 4
 
@@ -874,7 +925,7 @@
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #define TIME_WITH_SYS_TIME 1
 
-/* Define if you want to enable c-ares support */
+/* Define to enable c-ares support */
 /* #undef USE_ARES */
 
 /* Define to disable non-blocking sockets. */
@@ -882,6 +933,9 @@
 
 /* if GnuTLS is enabled */
 /* #undef USE_GNUTLS */
+
+/* if librtmp is in use */
+/* #undef USE_LIBRTMP */
 
 /* if libSSH2 is in use */
 /* #undef USE_LIBSSH2 */
@@ -892,11 +946,20 @@
 /* if NSS is enabled */
 /* #undef USE_NSS */
 
+/* Use OpenLDAP-specific code */
+/* #undef USE_OPENLDAP */
+
 /* if OpenSSL is in use */
 #define USE_OPENSSL 1
 
+/* if PolarSSL is enabled */
+/* #undef USE_POLARSSL */
+
 /* if SSL is enabled */
 #define USE_SSLEAY 1
+
+/* if you want POSIX threaded DNS lookup */
+/* #undef USE_THREADS_POSIX */
 
 /* Define to 1 if you are building a Windows target without large file
    support. */
@@ -909,7 +972,7 @@
 /* #undef USE_YASSLEMUL */
 
 /* Version number of package */
-#define VERSION "7.19.5"
+#define VERSION "7.21.2"
 
 /* Define to avoid automatic inclusion of winsock.h */
 /* #undef WIN32_LEAN_AND_MEAN */
@@ -924,9 +987,6 @@
 
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */
-
-/* define this if you need it to compile thread-safe code */
-/* #undef _THREAD_SAFE */
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

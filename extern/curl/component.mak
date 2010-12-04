@@ -5,14 +5,15 @@ EXTERN.CURL.SOURCES.NAME                    := funner.extern.curl
 EXTERN.CURL.SOURCES.INCLUDE_DIRS            := include
 EXTERN.CURL.SOURCES.SOURCE_DIRS             := sources
 EXTERN.CURL.SOURCES.COMPILER_DEFINES        := CURL_STATICLIB BUILDING_LIBCURL
-EXTERN.CURL.SOURCES.macosx.COMPILER_CFLAGS  := -Wno-uninitialized
+EXTERN.CURL.SOURCES.msvc.COMPILER_CFLAGS    := -wd4005 -wd4244
 EXTERN.CURL.SOURCES.iphone.COMPILER_CFLAGS  := -Wno-uninitialized
 EXTERN.CURL.SOURCES.iphone.COMPILER_DEFINES := __IPHONE__
+EXTERN.CURL.SOURCES.IMPORTS                 := compile.extern.zlib
 
 EXTERN.CURL.TESTS.TYPE                 := test-suite
 EXTERN.CURL.TESTS.SOURCE_DIRS          := tests
 EXTERN.CURL.TESTS.INCLUDE_DIRS         := sources
 EXTERN.CURL.TESTS.INCLUDE_FILES        := first.c testutil.c
 EXTERN.CURL.TESTS.IMPORTS              := compile.extern.curl link.extern.curl
-EXTERN.CURL.TESTS.msvc.COMPILER_CFLAGS := -wd4700
+EXTERN.CURL.TESTS.msvc.COMPILER_CFLAGS := -wd4700 -wd4005
 EXTERN.CURL.TESTS.g++.COMPILER_CFLAGS  := --no-warn

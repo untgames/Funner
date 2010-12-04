@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2009, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2010, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,7 +18,6 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * $Id: version.c,v 1.60 2009-03-13 09:58:15 bagder Exp $
  ***************************************************************************/
 
 #include "setup.h"
@@ -43,6 +42,10 @@
 
 #if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
 #include <iconv.h>
+#endif
+
+#ifdef USE_LIBRTMP
+#include <librtmp/rtmp.h>
 #endif
 
 #ifdef USE_LIBSSH2
@@ -112,50 +115,100 @@ char *curl_version(void)
   left -= len;
   ptr += len;
 #endif
+#ifdef USE_LIBRTMP
+  {
+    char suff[2];
+    if (RTMP_LIB_VERSION & 0xff) {
+      suff[0] = (RTMP_LIB_VERSION & 0xff) + 'a' - 1;
+      suff[1] = '\0';
+    } else {
+      suff[0] = '\0';
+    }
+    len = snprintf(ptr, left, " librtmp/%d.%d%s",
+      RTMP_LIB_VERSION >> 16, (RTMP_LIB_VERSION >> 8) & 0xff, suff);
+/*
+  If another lib version is added below this one, this code would
+  also have to do:
+
+    left -= len;
+    ptr += len;
+*/
+  }
+#endif
 
   return version;
 }
 
-/* data for curl_version_info */
+/* data for curl_version_info
+
+   Keep the list sorted alphabetically. It is also written so that each
+   protocol line has its own #if line to make things easier on the eye.
+ */
 
 static const char * const protocols[] = {
-#ifndef CURL_DISABLE_TFTP
-  "tftp",
-#endif
-#ifndef CURL_DISABLE_FTP
-  "ftp",
-#endif
-#ifndef CURL_DISABLE_TELNET
-  "telnet",
-#endif
 #ifndef CURL_DISABLE_DICT
   "dict",
-#endif
-#ifndef CURL_DISABLE_LDAP
-  "ldap",
-#ifdef HAVE_LDAP_SSL
-  "ldaps",
-#endif
-#endif
-#ifndef CURL_DISABLE_HTTP
-  "http",
 #endif
 #ifndef CURL_DISABLE_FILE
   "file",
 #endif
-
-#ifdef USE_SSL
-#ifndef CURL_DISABLE_HTTP
-  "https",
-#endif
 #ifndef CURL_DISABLE_FTP
+  "ftp",
+#endif
+#if defined(USE_SSL) && !defined(CURL_DISABLE_FTP)
   "ftps",
 #endif
+#ifndef CURL_DISABLE_GOPHER
+  "gopher",
 #endif
-
+#ifndef CURL_DISABLE_HTTP
+  "http",
+#endif
+#if defined(USE_SSL) && !defined(CURL_DISABLE_HTTP)
+  "https",
+#endif
+#ifndef CURL_DISABLE_IMAP
+  "imap",
+#endif
+#if defined(USE_SSL) && !defined(CURL_DISABLE_IMAP)
+  "imaps",
+#endif
+#ifndef CURL_DISABLE_LDAP
+  "ldap",
+#if (defined(USE_OPENLDAP) && defined(USE_SSL)) || \
+   (!defined(USE_OPENLDAP) && defined(HAVE_LDAP_SSL))
+  "ldaps",
+#endif
+#endif
+#ifndef CURL_DISABLE_POP3
+  "pop3",
+#endif
+#if defined(USE_SSL) && !defined(CURL_DISABLE_POP3)
+  "pop3s",
+#endif
+#ifdef USE_LIBRTMP
+  "rtmp",
+#endif
+#ifndef CURL_DISABLE_RTSP
+  "rtsp",
+#endif
 #ifdef USE_LIBSSH2
   "scp",
+#endif
+#ifdef USE_LIBSSH2
   "sftp",
+#endif
+#ifndef CURL_DISABLE_SMTP
+  "smtp",
+#endif
+#if defined(USE_SSL) && !defined(CURL_DISABLE_SMTP)
+  "smtps",
+#endif
+#ifndef CURL_DISABLE_TELNET
+  "telnet",
+#endif
+#ifndef CURL_DISABLE_TFTP
+  "tftp",
 #endif
 
   NULL
@@ -188,10 +241,13 @@ static curl_version_info_data version_info = {
 #ifdef HAVE_GSSAPI
   | CURL_VERSION_GSSNEGOTIATE
 #endif
-#ifdef CURLDEBUG
+#ifdef DEBUGBUILD
   | CURL_VERSION_DEBUG
 #endif
-#ifdef USE_ARES
+#ifdef CURLDEBUG
+  | CURL_VERSION_CURLDEBUG
+#endif
+#ifdef CURLRES_ASYNCH
   | CURL_VERSION_ASYNCHDNS
 #endif
 #ifdef HAVE_SPNEGO
