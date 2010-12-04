@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!/bin/sh ./run-lua.sh
 -- two implementations of a sort function
 -- this is an example only. Lua has now a built-in function "sort"
 

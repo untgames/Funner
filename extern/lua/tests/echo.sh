@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!/bin/sh ./run-lua.sh
 -- echo command line arguments
 
 for i=0,table.getn(arg) do

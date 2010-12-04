@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!/bin/sh ./run-lua.sh
 -- fibonacci function with cache
 
 -- very inefficient fibonacci function

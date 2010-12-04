@@ -1,4 +1,4 @@
-#!/usr/bin/env lua
+#!/bin/sh ./run-lua.sh
 -- life.lua
 -- original by Dave Bollinger <DBollinger@compuserve.com> posted to lua-l
 -- modified to use ANSI terminal escape sequences
