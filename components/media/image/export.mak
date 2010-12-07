@@ -31,3 +31,5 @@ export.link.media.image.dds.IMPORTS       := link.media.image
 export.link.media.image.ani_cursor_loader.LIBS          := funner.media.image.ani_cursors
 export.link.media.image.ani_cursor_loader.LINK_INCLUDES := AniCursorLoader
 export.link.media.image.ani_cursor_loader.IMPORTS       := link.media.image
+
+export.info.media.image.CHMS := funner.media.image
