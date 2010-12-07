@@ -16,3 +16,5 @@ export.link.media.sound.snddecl.IMPORTS       := link.media.sound link.common.xm
 export.link.media.sound.default_decoders.LIBS          := funner.media.sound.default_decoders funner.extern.vorbisfile_static funner.extern.vorbis_static funner.extern.ogg
 export.link.media.sound.default_decoders.LINK_INCLUDES := WavLoader OggLoader
 export.link.media.sound.default_decoders.IMPORTS       := link.media.sound
+
+export.info.media.sound.CHMS := funner.media.sound
