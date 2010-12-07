@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-#include <memory.h>
+#include <string.h>
 #include <float.h>
 
 #include <stl/string>

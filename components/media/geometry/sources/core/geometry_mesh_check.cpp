@@ -100,7 +100,7 @@ inline void check_attribute (Log& log, CheckContext& context, const math::vector
     #ifdef _MSC_VER
       #define isfinite _finite
     #else
-      #define isfinite std::isfinite
+      using namespace std;
     #endif
     
     if (!isfinite (attribute [i]))
