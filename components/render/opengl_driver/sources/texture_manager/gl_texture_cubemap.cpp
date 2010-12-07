@@ -30,8 +30,7 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
 
      //преобразование формата пикселей
 
-  GLenum gl_format              = get_gl_format (tex_desc.format),
-         gl_uncompressed_format = get_uncompressed_gl_format (tex_desc.format),
+  GLenum gl_uncompressed_format = get_uncompressed_gl_format (tex_desc.format),
          gl_uncompressed_type   = get_uncompressed_gl_type (tex_desc.format),
          gl_internal_format;
          

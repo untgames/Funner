@@ -217,7 +217,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 #endif
 
         if (!default_program)
-          throw ("", "Can't create default program, no supported profiles");
+          throw xtl::format_operation_exception ("", "Can't create default program, no supported profiles");
       }
       catch (xtl::exception& exception)
       {
@@ -251,7 +251,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
     {
       try
       {
-          //проверка корректности аргументов        
+          //проверка корректности аргументов
 
         if (!shader_descs)
           throw xtl::make_null_argument_exception ("", "shader_descs");
@@ -293,7 +293,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 
         StageRebindNotify (Stage_Shading);        
 
-          //компил€ци€ шейдеров        
+          //компил€ци€ шейдеров
 
         stl::vector<ShaderPtr> program_shaders;
 
@@ -472,7 +472,7 @@ struct ShaderStage::Impl: public ContextObject, public ShaderStageState
 
         BindableProgramPtr bindable_program (program->CreateBindableProgram (layout), false);
         
-          //регистраци€ в карте          
+          //регистраци€ в карте
 
         iter = bindable_programs.insert_pair (parametrized_program, bindable_program).first;
         

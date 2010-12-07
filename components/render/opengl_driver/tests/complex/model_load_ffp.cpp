@@ -451,7 +451,8 @@ void idle (Test& test)
 
   cb->SetData (0, sizeof my_shader_parameters, &my_shader_parameters);
 
-  test.window.Invalidate ();
+//  test.window.Invalidate ();
+  test.OnRedraw ();
 }
 
 //получение ортографической матрицы проекции
