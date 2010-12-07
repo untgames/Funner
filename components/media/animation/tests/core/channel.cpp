@@ -13,11 +13,26 @@ class TestSpline
     }
 };
 
+const char* get_type_name (const std::type_info& type)
+{
+  if (type == typeid (void))
+    return "void";
+  else if (type == typeid (float))
+    return "float";
+  else if (type == typeid (TestSpline))
+    return "class TestSpline";
+  else
+    return type.name ();
+}
+
 void print (const Channel& channel)
 {
   printf ("Channel parameter name is '%s'\n", channel.ParameterName ());
-  printf ("Channel track type is '%s'\n", channel.TrackType ().name ());
-  printf ("Channel value type is '%s'\n", channel.ValueType ().name ());
+  printf ("Channel track type is '%s'\n", get_type_name (channel.TrackType ()));
+  printf ("Channel value type is '%s'\n", get_type_name (channel.ValueType ()));
+
+  if (channel.ValueType () != typeid (float))
+    return;
 
   try
   {
