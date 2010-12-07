@@ -3,20 +3,20 @@
 namespace
 {
 
-struct PropertyDesc : public xtl::reference_counter
+struct LicensePropertyDesc : public xtl::reference_counter
 {
   stl::string name;
   stl::string value;
 
-  PropertyDesc (const char* in_name, const char* in_value)
+  LicensePropertyDesc (const char* in_name, const char* in_value)
     : name (in_name), value (in_value)
     {}
 };
 
-typedef xtl::intrusive_ptr<PropertyDesc> PropertyDescPtr;
-typedef stl::vector<PropertyDescPtr>     PropertiesArray;
+typedef xtl::intrusive_ptr<LicensePropertyDesc> LicensePropertyDescPtr;
+typedef stl::vector<LicensePropertyDescPtr>     PropertiesArray;
 
-bool property_desc_compare (PropertyDescPtr property1, PropertyDescPtr property2)
+bool property_desc_compare (LicensePropertyDescPtr property1, LicensePropertyDescPtr property2)
 {
   return property1->name > property2->name;
 }
@@ -49,7 +49,7 @@ void calculate_license_hash (const StringArray& check_files_list, const Property
     properties_array.reserve (properties.Size ());
 
     for (size_t i = 0, count = properties.Size (); i < count; i++)
-      properties_array.push_back (PropertyDescPtr (new PropertyDesc (properties.PropertyName (i), properties.GetString (i)), false));
+      properties_array.push_back (LicensePropertyDescPtr (new LicensePropertyDesc (properties.PropertyName (i), properties.GetString (i)), false));
 
     stl::sort (properties_array.begin (), properties_array.end (), property_desc_compare);
 

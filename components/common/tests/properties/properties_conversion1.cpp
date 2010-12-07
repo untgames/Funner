@@ -1,14 +1,4 @@
-#include <cstdio>
-#include <exception>
-
-#include <stl/string>
-
-#include <math/vector.h>
-#include <math/matrix.h>
-
-#include <common/property_map.h>
-
-using namespace common;
+#include "shared.h"
 
 #define TEST(X) try { X; }catch (std::exception& e) { printf ("exception: %s\n", e.what ()); }
 
@@ -134,5 +124,6 @@ int main ()
   catch (std::exception& e)
   {
     printf ("exception: %s\n", e.what ());
+    throw;
   }
 }

@@ -1,0 +1,18 @@
+Results of properties_layout_test:
+add properties
+layout: size=3, buffer_size=76, hash=7c4ed737:
+  #0: name='A', type=integer, elements_count=1
+  #1: name='B', type=float, elements_count=2
+  #2: name='C', type=matrix, elements_count=1
+remove property
+layout: size=2, buffer_size=68, hash=28823746:
+  #0: name='A', type=integer, elements_count=1
+  #1: name='C', type=matrix, elements_count=1
+change type/elements_count
+layout: size=2, buffer_size=80, hash=cf3cfa9b:
+  #0: name='A', type=vector, elements_count=1
+  #1: name='C', type=matrix, elements_count=1
+layout: size=2, buffer_size=80, hash=cf3cfa9b:
+  #0: name='A', type=vector, elements_count=1
+  #1: name='C', type=matrix, elements_count=1
+IsPresent('A'): true

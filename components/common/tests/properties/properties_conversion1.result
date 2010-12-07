@@ -1,0 +1,235 @@
+Results of properties_conversion1_test:
+GetString('String'): hello world
+GetInteger('String'): exception: Could not convert property 'String' from string='hello world' to integer
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetFloat('String'): exception: Could not convert property 'String' from string='hello world' to float
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetVector('String'): exception: Could not convert property 'String' from string to vector
+    at common::PropertyMap::GetVectorArray(size_t)
+    at common::PropertyMap::GetVectorArray(const char*)
+GetMatrix('String'): exception: Could not convert property 'String' from string to matrix
+    at common::PropertyMap::GetMatrixArray(size_t)
+    at common::PropertyMap::GetMatrixArray(const char*)
+GetProperty('String', stl::string&): hello world
+GetProperty('String', int&): exception: Could not convert property 'String' from string='hello world' to integer
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetProperty('String', float&): exception: Could not convert property 'String' from string='hello world' to float
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetProperty('String', vec4f&): exception: Could not convert property 'String' from string='hello world' to vector
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,math::vec4f*)
+GetProperty('String', matf&): exception: Could not convert property 'String' from string='hello world' to matrix
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,math::mat4f*)
+GetString('EmptyString'): 
+GetInteger('EmptyString'): exception: Could not convert property 'EmptyString' from string='' to integer
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetFloat('EmptyString'): exception: Could not convert property 'EmptyString' from string='' to float
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetVector('EmptyString'): exception: Could not convert property 'EmptyString' from string to vector
+    at common::PropertyMap::GetVectorArray(size_t)
+    at common::PropertyMap::GetVectorArray(const char*)
+GetMatrix('EmptyString'): exception: Could not convert property 'EmptyString' from string to matrix
+    at common::PropertyMap::GetMatrixArray(size_t)
+    at common::PropertyMap::GetMatrixArray(const char*)
+GetProperty('EmptyString', stl::string&): 
+GetProperty('EmptyString', int&): exception: Could not convert property 'EmptyString' from string='' to integer
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetProperty('EmptyString', float&): exception: Could not convert property 'EmptyString' from string='' to float
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetProperty('EmptyString', vec4f&): exception: Could not convert property 'EmptyString' from string='' to vector
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,math::vec4f*)
+GetProperty('EmptyString', matf&): exception: Could not convert property 'EmptyString' from string='' to matrix
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,math::mat4f*)
+GetString('StringWithFloat'): 3.14
+GetInteger('StringWithFloat'): 3
+GetFloat('StringWithFloat'): 3.140
+GetVector('StringWithFloat'): exception: Could not convert property 'StringWithFloat' from string to vector
+    at common::PropertyMap::GetVectorArray(size_t)
+    at common::PropertyMap::GetVectorArray(const char*)
+GetMatrix('StringWithFloat'): exception: Could not convert property 'StringWithFloat' from string to matrix
+    at common::PropertyMap::GetMatrixArray(size_t)
+    at common::PropertyMap::GetMatrixArray(const char*)
+GetProperty('StringWithFloat', stl::string&): 3.14
+GetProperty('StringWithFloat', int&): 3
+GetProperty('StringWithFloat', float&): 3.140
+GetProperty('StringWithFloat', vec4f&): 3.140 3.140 3.140 3.140
+GetProperty('StringWithFloat', matf&): [3.140 0.000 0.000 0.000] [0.000 3.140 0.000 0.000] [0.000 0.000 3.140 0.000] [0.000 0.000 0.000 3.140]
+GetString('StringWithVector'): 1 2.5 3 4
+GetInteger('StringWithVector'): exception: Could not convert property 'StringWithVector' from string='1 2.5 3 4' to integer
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetFloat('StringWithVector'): exception: Could not convert property 'StringWithVector' from string='1 2.5 3 4' to float
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetVector('StringWithVector'): exception: Could not convert property 'StringWithVector' from string to vector
+    at common::PropertyMap::GetVectorArray(size_t)
+    at common::PropertyMap::GetVectorArray(const char*)
+GetMatrix('StringWithVector'): exception: Could not convert property 'StringWithVector' from string to matrix
+    at common::PropertyMap::GetMatrixArray(size_t)
+    at common::PropertyMap::GetMatrixArray(const char*)
+GetProperty('StringWithVector', stl::string&): 1 2.5 3 4
+GetProperty('StringWithVector', int&): exception: Could not convert property 'StringWithVector' from string='1 2.5 3 4' to integer
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetProperty('StringWithVector', float&): exception: Could not convert property 'StringWithVector' from string='1 2.5 3 4' to float
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetProperty('StringWithVector', vec4f&): 1.000 2.500 3.000 4.000
+GetProperty('StringWithVector', matf&): exception: Could not convert property 'StringWithVector' from string='1 2.5 3 4' to matrix
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,math::mat4f*)
+GetString('StringWithSmallVector'): 1 2.5 4
+GetInteger('StringWithSmallVector'): exception: Could not convert property 'StringWithSmallVector' from string='1 2.5 4' to integer
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetFloat('StringWithSmallVector'): exception: Could not convert property 'StringWithSmallVector' from string='1 2.5 4' to float
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetVector('StringWithSmallVector'): exception: Could not convert property 'StringWithSmallVector' from string to vector
+    at common::PropertyMap::GetVectorArray(size_t)
+    at common::PropertyMap::GetVectorArray(const char*)
+GetMatrix('StringWithSmallVector'): exception: Could not convert property 'StringWithSmallVector' from string to matrix
+    at common::PropertyMap::GetMatrixArray(size_t)
+    at common::PropertyMap::GetMatrixArray(const char*)
+GetProperty('StringWithSmallVector', stl::string&): 1 2.5 4
+GetProperty('StringWithSmallVector', int&): exception: Could not convert property 'StringWithSmallVector' from string='1 2.5 4' to integer
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetProperty('StringWithSmallVector', float&): exception: Could not convert property 'StringWithSmallVector' from string='1 2.5 4' to float
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetProperty('StringWithSmallVector', vec4f&): 1.000 2.500 4.000 0.000
+GetProperty('StringWithSmallVector', matf&): exception: Could not convert property 'StringWithSmallVector' from string='1 2.5 4' to matrix
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,math::mat4f*)
+GetString('StringWithBigVector'): 1 2 3 4 5
+GetInteger('StringWithBigVector'): exception: Could not convert property 'StringWithBigVector' from string='1 2 3 4 5' to integer
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetFloat('StringWithBigVector'): exception: Could not convert property 'StringWithBigVector' from string='1 2 3 4 5' to float
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetVector('StringWithBigVector'): exception: Could not convert property 'StringWithBigVector' from string to vector
+    at common::PropertyMap::GetVectorArray(size_t)
+    at common::PropertyMap::GetVectorArray(const char*)
+GetMatrix('StringWithBigVector'): exception: Could not convert property 'StringWithBigVector' from string to matrix
+    at common::PropertyMap::GetMatrixArray(size_t)
+    at common::PropertyMap::GetMatrixArray(const char*)
+GetProperty('StringWithBigVector', stl::string&): 1 2 3 4 5
+GetProperty('StringWithBigVector', int&): exception: Could not convert property 'StringWithBigVector' from string='1 2 3 4 5' to integer
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetProperty('StringWithBigVector', float&): exception: Could not convert property 'StringWithBigVector' from string='1 2 3 4 5' to float
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetProperty('StringWithBigVector', vec4f&): exception: Could not convert property 'StringWithBigVector' from string='1 2 3 4 5' to vector
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,math::vec4f*)
+GetProperty('StringWithBigVector', matf&): exception: Could not convert property 'StringWithBigVector' from string='1 2 3 4 5' to matrix
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,math::mat4f*)
+GetString('StringWithMatrix'): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+GetInteger('StringWithMatrix'): exception: Could not convert property 'StringWithMatrix' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to integer
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetFloat('StringWithMatrix'): exception: Could not convert property 'StringWithMatrix' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to float
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetVector('StringWithMatrix'): exception: Could not convert property 'StringWithMatrix' from string to vector
+    at common::PropertyMap::GetVectorArray(size_t)
+    at common::PropertyMap::GetVectorArray(const char*)
+GetMatrix('StringWithMatrix'): exception: Could not convert property 'StringWithMatrix' from string to matrix
+    at common::PropertyMap::GetMatrixArray(size_t)
+    at common::PropertyMap::GetMatrixArray(const char*)
+GetProperty('StringWithMatrix', stl::string&): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+GetProperty('StringWithMatrix', int&): exception: Could not convert property 'StringWithMatrix' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to integer
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetProperty('StringWithMatrix', float&): exception: Could not convert property 'StringWithMatrix' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to float
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetProperty('StringWithMatrix', vec4f&): exception: Could not convert property 'StringWithMatrix' from string='1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16' to vector
+    at common::PropertyMap::Impl::ReadValueFromProperty(size_t,const T*,const PropertyDesc&)
+    at common::PropertyMap::GetProperty(const char*,size_t,math::vec4f*)
+GetProperty('StringWithMatrix', matf&): [1.000 2.000 3.000 4.000] [5.000 6.000 7.000 8.000] [9.000 10.000 11.000 12.000] [13.000 14.000 15.000 16.000]
+GetString('Integer'): exception: Could not convert property 'Integer' from integer to string
+    at common::PropertyMap::GetString(size_t)
+    at common::PropertyMap::GetString(const char*)
+GetInteger('Integer'): 13
+GetFloat('Integer'): 13.000
+GetVector('Integer'): exception: Could not convert property 'Integer' from integer to vector
+    at common::PropertyMap::GetVectorArray(size_t)
+    at common::PropertyMap::GetVectorArray(const char*)
+GetMatrix('Integer'): exception: Could not convert property 'Integer' from integer to matrix
+    at common::PropertyMap::GetMatrixArray(size_t)
+    at common::PropertyMap::GetMatrixArray(const char*)
+GetProperty('Integer', stl::string&): 13
+GetProperty('Integer', int&): 13
+GetProperty('Integer', float&): 13.000
+GetProperty('Integer', vec4f&): 13.000 13.000 13.000 13.000
+GetProperty('Integer', matf&): [13.000 0.000 0.000 0.000] [0.000 13.000 0.000 0.000] [0.000 0.000 13.000 0.000] [0.000 0.000 0.000 13.000]
+GetString('Float'): exception: Could not convert property 'Float' from float to string
+    at common::PropertyMap::GetString(size_t)
+    at common::PropertyMap::GetString(const char*)
+GetInteger('Float'): 1
+GetFloat('Float'): 1.500
+GetVector('Float'): exception: Could not convert property 'Float' from float to vector
+    at common::PropertyMap::GetVectorArray(size_t)
+    at common::PropertyMap::GetVectorArray(const char*)
+GetMatrix('Float'): exception: Could not convert property 'Float' from float to matrix
+    at common::PropertyMap::GetMatrixArray(size_t)
+    at common::PropertyMap::GetMatrixArray(const char*)
+GetProperty('Float', stl::string&): 1.5
+GetProperty('Float', int&): 1
+GetProperty('Float', float&): 1.500
+GetProperty('Float', vec4f&): 1.500 1.500 1.500 1.500
+GetProperty('Float', matf&): [1.500 0.000 0.000 0.000] [0.000 1.500 0.000 0.000] [0.000 0.000 1.500 0.000] [0.000 0.000 0.000 1.500]
+GetString('Vector'): exception: Could not convert property 'Vector' from vector to string
+    at common::PropertyMap::GetString(size_t)
+    at common::PropertyMap::GetString(const char*)
+GetInteger('Vector'): exception: Could not convert property 'Vector' from vector[1] to integer[1]
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetFloat('Vector'): exception: Could not convert property 'Vector' from vector[1] to float[1]
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetVector('Vector'): 1.000 2.000 3.000 4.000
+GetMatrix('Vector'): exception: Could not convert property 'Vector' from vector to matrix
+    at common::PropertyMap::GetMatrixArray(size_t)
+    at common::PropertyMap::GetMatrixArray(const char*)
+GetProperty('Vector', stl::string&): 1 2 3 4
+GetProperty('Vector', int&): exception: Could not convert property 'Vector' from vector[1] to integer[1]
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetProperty('Vector', float&): exception: Could not convert property 'Vector' from vector[1] to float[1]
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetProperty('Vector', vec4f&): 1.000 2.000 3.000 4.000
+GetProperty('Vector', matf&): exception: Could not convert property 'Vector' from vector[1] to matrix[1]
+    at common::PropertyMap::GetProperty(const char*,size_t,math::mat4f*)
+GetString('Matrix'): exception: Could not convert property 'Matrix' from matrix to string
+    at common::PropertyMap::GetString(size_t)
+    at common::PropertyMap::GetString(const char*)
+GetInteger('Matrix'): exception: Could not convert property 'Matrix' from matrix[1] to integer[1]
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetFloat('Matrix'): exception: Could not convert property 'Matrix' from matrix[1] to float[1]
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetVector('Matrix'): exception: Could not convert property 'Matrix' from matrix to vector
+    at common::PropertyMap::GetVectorArray(size_t)
+    at common::PropertyMap::GetVectorArray(const char*)
+GetMatrix('Matrix'): [3.000 0.000 0.000 0.000] [0.000 3.000 0.000 0.000] [0.000 0.000 3.000 0.000] [0.000 0.000 0.000 3.000]
+GetProperty('Matrix', stl::string&): 3 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3
+GetProperty('Matrix', int&): exception: Could not convert property 'Matrix' from matrix[1] to integer[1]
+    at common::PropertyMap::GetProperty(const char*,size_t,int*)
+GetProperty('Matrix', float&): exception: Could not convert property 'Matrix' from matrix[1] to float[1]
+    at common::PropertyMap::GetProperty(const char*,size_t,float*)
+GetProperty('Matrix', vec4f&): exception: Could not convert property 'Matrix' from matrix[1] to vector[1]
+    at common::PropertyMap::GetProperty(const char*,size_t,math::vec4f*)
+GetProperty('Matrix', matf&): [3.000 0.000 0.000 0.000] [0.000 3.000 0.000 0.000] [0.000 0.000 3.000 0.000] [0.000 0.000 0.000 3.000]
