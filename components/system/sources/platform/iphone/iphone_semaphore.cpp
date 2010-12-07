@@ -21,7 +21,7 @@ void Platform::WaitSemaphore (semaphore_t handle)
 }
 
 //ожидание следующей задачи с таймаутом
-void Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
+bool Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
   throw xtl::make_not_implemented_exception ("syslib::iPhonePlatform::WaitSemaphore (semaphore_t, size_t)");
 }

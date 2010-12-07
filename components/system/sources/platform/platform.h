@@ -83,14 +83,15 @@ class Platform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef void (*WindowMessageHandler)(window_t, WindowEvent, const WindowEventContext&, void* user_data);
 
-    static window_t CreateWindow  (WindowStyle, WindowMessageHandler, window_t parent, void* user_data);
+    static window_t CreateWindow  (WindowStyle, WindowMessageHandler, const void* parent_handle, const char* init_string, void* user_data);
     static void     CloseWindow   (window_t);
     static void     DestroyWindow (window_t);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение платформо-зависимого дескриптора окна
+///Получение платформо-зависимого дескриптора окна и дисплея
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static const void* GetNativeWindowHandle (window_t);
+    static const void* GetNativeWindowHandle  (window_t);
+    static const void* GetNativeDisplayHandle (window_t);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Заголовок окна
@@ -115,8 +116,8 @@ class Platform
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка родительского окна
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static void     SetParentWindow (window_t child, window_t parent);
-    static window_t GetParentWindow (window_t child);
+    static void        SetParentWindowHandle (window_t child, const void* parent_handle);
+    static const void* GetParentWindowHandle (window_t child);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление окна
@@ -166,7 +167,7 @@ class Platform
 ///Создание / уничтожение таймера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     struct timer_handle;
-    typedef const timer_handle* timer_t;
+    typedef timer_handle* timer_t;
     typedef void (*TimerHandler)(void* user_data);
 
     static timer_t CreateTimer (size_t period_in_milliseconds, TimerHandler, void* user_data);
@@ -224,7 +225,7 @@ class Platform
     static mutex_t CreateMutex  ();
     static void    DestroyMutex (mutex_t);
     static void    LockMutex    (mutex_t);
-    static void    LockMutex    (mutex_t, size_t wait_in_milliseconds);
+    static bool    LockMutex    (mutex_t, size_t wait_in_milliseconds);
     static bool    TryLockMutex (mutex_t);
     static void    UnlockMutex  (mutex_t);
 
@@ -234,17 +235,17 @@ class Platform
     static semaphore_t CreateSemaphore   (size_t initial_count);
     static void        DestroySemaphore  (semaphore_t);
     static void        WaitSemaphore     (semaphore_t);
-    static void        WaitSemaphore     (semaphore_t, size_t wait_in_milliseconds);
+    static bool        WaitSemaphore     (semaphore_t, size_t wait_in_milliseconds);
     static bool        TryWaitSemaphore  (semaphore_t);
     static void        PostSemaphore     (semaphore_t);
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с условиями
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static condition_t CreateCondition    ();
     static void        DestroyCondition   (condition_t);
     static void        WaitCondition      (condition_t, mutex_t);
-    static void        WaitCondition      (condition_t, mutex_t, size_t wait_in_milliseconds);
+    static bool        WaitCondition      (condition_t, mutex_t, size_t wait_in_milliseconds);
     static void        NotifyCondition    (condition_t, bool broadcast);
 };
 

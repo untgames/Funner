@@ -24,6 +24,7 @@ class Semaphore
     void Wait    ();
     void Wait    (size_t wait_in_milliseconds);
     bool TryWait ();
+    bool TryWait (size_t wait_in_milliseconds);
     void Post    ();
 
   private:

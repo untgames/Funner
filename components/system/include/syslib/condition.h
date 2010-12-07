@@ -29,10 +29,13 @@ class Condition
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ожидание изменения условия
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-                          void Wait (Mutex& lock);
-                          void Wait (Mutex& lock, size_t wait_in_milliseconds);
-    template <class Pred> void Wait (Mutex& lock, Pred pred);
-    template <class Pred> void Wait (Mutex& lock, Pred pred, size_t wait_in_milliseconds); 
+                          void Wait    (Mutex& lock);
+                          void Wait    (Mutex& lock, size_t wait_in_milliseconds);
+    template <class Pred> void Wait    (Mutex& lock, Pred pred);
+    template <class Pred> void Wait    (Mutex& lock, Pred pred, size_t wait_in_milliseconds); 
+                          bool TryWait (Mutex& lock);
+                          bool TryWait (Mutex& lock, size_t wait_in_milliseconds);
+    template <class Pred> bool TryWait (Mutex& lock, Pred pred, size_t wait_in_milliseconds);     
 
   private:
     Condition  (const Condition&); //no impl

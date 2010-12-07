@@ -45,15 +45,22 @@ void Platform::LockMutex (mutex_t handle)
 }
 
 //захват исключающего семафора с указанием максимального времени ожидания
-void Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
+bool Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
 {
   try
   {
     if (!handle)
       throw xtl::make_null_argument_exception ("", "mutex");
+      
+    int status = WaitForSingleObject (handle->mutex, wait_in_milliseconds);
+    
+    if (status == WAIT_TIMEOUT)
+      return false;
 
-    if (WaitForSingleObject (handle->mutex, wait_in_milliseconds) == WAIT_FAILED)
+    if (status == WAIT_FAILED)
       raise_error ("::WaitForSingleObject");
+      
+    return true;
   }
   catch (xtl::exception& exception)
   {

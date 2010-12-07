@@ -69,16 +69,20 @@ void keys (Window& window, WindowEvent event, const WindowEventContext& context)
     default:
       break;
   }
+  
+  fflush (stdout);  
 }
 
 void mousemove (Window& window, WindowEvent, const WindowEventContext& context)
 {
   printf ("window '%s': mouse move x=%lu y=%lu\n", window.Title (), context.cursor_position.x, context.cursor_position.y);
+  fflush (stdout);  
 }
 
 void destroy (Window& window, WindowEvent, const WindowEventContext&)
 {
   printf ("window '%s': destroyed\n", window.Title ());
+  fflush (stdout);  
 
   Application::Exit (0);
 
@@ -102,16 +106,26 @@ void print_event (Window& window, WindowEvent event, const WindowEventContext& c
     case WindowEvent_OnSize:         printf ("Window size event\n");           break;
     default: return;
   }
+  
+  fflush (stdout);
 }
 
 void app_exit ()
 {
   printf ("application exit\n");
+  fflush (stdout);  
 }
 
 void print (const char* message)
 {
   printf ("window debug: %s\n", message);
+  fflush (stdout);  
+}
+
+void log_print (const char* stream, const char* message)
+{
+  printf ("%s: %s\n", stream, message);
+  fflush (stdout);
 }
 
 int main ()
@@ -120,6 +134,8 @@ int main ()
 
   try
   {
+    common::LogFilter log_filter ("*", &log_print);
+    
     Window window (WindowStyle_Overlapped, 400, 300);
 
     window.SetTitle ("Test window");
@@ -161,6 +177,8 @@ int main ()
                     connection34 = window.RegisterEventHandler (WindowEvent_OnChangeHandle, &print_event);
 
     window.SetDebugLog (&print);
+    
+    fflush (stdout);    
 
     Application::Run ();
 

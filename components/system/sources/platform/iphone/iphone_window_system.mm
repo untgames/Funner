@@ -444,14 +444,14 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
     Создание/закрытие/уничтожение окна
 */
 
-Platform::window_t Platform::CreateWindow (WindowStyle window_style, WindowMessageHandler handler, window_t parent, void* user_data)
+Platform::window_t Platform::CreateWindow (WindowStyle window_style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
   static const char* METHOD_NAME = "syslib::iPhonePlatform::CreateWindow";
 
   if (!is_in_run_loop ())
     throw xtl::format_operation_exception (METHOD_NAME, "Can't create window before entering run loop");
 
-  if (parent)
+  if (parent_handle)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Parent windows not supported for iPhonePlatform");
 
     //Создание окна
@@ -684,12 +684,12 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
     Установка родительского окна
 */
 
-void Platform::SetParentWindow (window_t, window_t)
+void Platform::SetParentWindowHandle (window_t, const void*)
 {
   throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetParentWindow", "Parent windows not supported for iPhone platform");
 }
 
-Platform::window_t Platform::GetParentWindow (window_t child)
+const void* Platform::GetParentWindow (window_t child)
 {
   throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::GetParentWindow", "Parent windows not supported for iPhone platform");
 }

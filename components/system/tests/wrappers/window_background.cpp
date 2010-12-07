@@ -11,8 +11,6 @@ int main ()
   
   try
   {
-    common::FileSystem::AddSearchPath ("data");
-    
     Window window (WindowStyle_Overlapped, 400, 300);
     
     window.SetBackgroundState (true);

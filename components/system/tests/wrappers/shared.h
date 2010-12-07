@@ -7,6 +7,7 @@
 
 #include <common/action_queue.h>
 #include <common/file.h>
+#include <common/log.h>
 #include <common/time.h>
 
 #include <syslib/window.h>

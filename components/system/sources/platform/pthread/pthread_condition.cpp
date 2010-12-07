@@ -60,21 +60,61 @@ void Platform::WaitCondition (condition_t handle, mutex_t mutex_handle)
     if (!mutex_handle)
       throw xtl::make_null_argument_exception ("", "mutex");
       
-    int status = pthread_cond_wait (&handle->condition, &mutex_handle->mutex);
+    int status = pthread_cond_wait (&handle->condition, &mutex_handle->mutex);    
 
     if (status)
       pthread_raise_error ("::pthread_cond_wait", status);
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadsPlatform::WaitCondition(condition_t)");
+    exception.touch ("syslib::PThreadsPlatform::WaitCondition(condition_t,mutex_t)");
     throw;
   }
 }
 
-void Platform::WaitCondition (condition_t, mutex_t, size_t wait_in_milliseconds)
+bool Platform::WaitCondition (condition_t handle, mutex_t mutex_handle, size_t wait_in_milliseconds)
 {
-  throw xtl::make_not_implemented_exception ("syslib::PThreadsPlatform::WaitCondition(condition_t,size_t)");
+  try
+  {
+    if (!handle)
+      throw xtl::make_null_argument_exception ("", "condition");
+
+    if (!mutex_handle)
+      throw xtl::make_null_argument_exception ("", "mutex");
+      
+    timespec end_time;
+    
+#ifdef __APPLE__
+    struct timeval current_time;
+
+    gettimeofday (&current_time, 0);
+
+    end_time.tv_sec  = current_time.tv_sec;
+    end_time.tv_nsec = 0;
+#else
+    clock_gettime (CLOCK_REALTIME, &end_time);
+#endif
+    
+    unsigned long long nsec = (wait_in_milliseconds % 1000) * 1000000 + (unsigned long long)end_time.tv_nsec;
+    
+    end_time.tv_nsec  = nsec % 1000000000;
+    end_time.tv_sec  += wait_in_milliseconds / 1000 + nsec / 1000000000;
+    
+    int status = pthread_cond_timedwait (&handle->condition, &mutex_handle->mutex, &end_time);
+    
+    if (status == ETIMEDOUT)
+      return false;
+
+    if (status)
+      pthread_raise_error ("::pthread_cond_timedwait", status);
+      
+    return true;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::PThreadsPlatform::WaitCondition(condition_t,mutex_t,size_t)");
+    throw;
+  }
 }
 
 void Platform::NotifyCondition (condition_t handle, bool broadcast)

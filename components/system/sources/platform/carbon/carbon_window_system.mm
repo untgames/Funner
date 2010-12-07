@@ -639,7 +639,7 @@ OSStatus application_message_handler (EventHandlerCallRef event_handler_call_ref
     Создание/закрытие/уничтожение окна
 */
 
-Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, window_t parent, void* user_data)
+Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
   static const char* METHOD_NAME = "syslib::CarbonPlatform::CreateWindow";
 
@@ -768,7 +768,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
 
       check_window_manager_error (SetWindowGroup (new_window, window_impl->window_group), "::SetWindowGroup", "Can't set window group");
 
-      SetParentWindow ((window_t)new_window, parent);
+      SetParentWindowHandle ((window_t)new_window, parent_handle);
 
       return (window_t)new_window;
     }
@@ -846,6 +846,11 @@ void Platform::DestroyWindow (window_t handle)
 const void* Platform::GetNativeWindowHandle (window_t handle)
 {
   return reinterpret_cast<const void*> (handle);
+}
+
+const void* Platform::GetNativeDisplayHandle (window_t)
+{
+  return 0;
 }
 
 /*
@@ -1067,7 +1072,7 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
     Установка родительского окна
 */
 
-void Platform::SetParentWindow (window_t child, window_t parent)
+void Platform::SetParentWindowHandle (window_t child, const void* parent)
 {
   try
   {
@@ -1100,7 +1105,7 @@ void Platform::SetParentWindow (window_t child, window_t parent)
   }
 }
 
-Platform::window_t Platform::GetParentWindow (window_t child)
+const void* Platform::GetParentWindowHandle (window_t child)
 {
   throw xtl::make_not_implemented_exception ("syslib::CarbonPlatform::GetParentWindow");
 }

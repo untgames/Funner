@@ -84,7 +84,7 @@ struct Platform::window_handle
     Создание/закрытие/уничтожение окна
 */
 
-Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, window_t parent, void* user_data)
+Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
   try
   {
@@ -153,6 +153,11 @@ void Platform::DestroyWindow (window_t handle)
 const void* Platform::GetNativeWindowHandle (window_t handle)
 {
   return handle->window.get ();
+}
+
+const void* Platform::GetNativeDisplayHandle (window_t handle)
+{
+  return 0;
 }
 
 /*
@@ -352,12 +357,12 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
     Установка родительского окна
 */
 
-void Platform::SetParentWindow (window_t child, window_t parent)
+void Platform::SetParentWindowHandle (window_t child, const void* parent_handle)
 {
   throw xtl::make_not_implemented_exception ("syslib::BadaPlatform::SetParentWindow");
 }
 
-Platform::window_t Platform::GetParentWindow (window_t child)
+const void* Platform::GetParentWindowHandle (window_t child)
 {
   throw xtl::make_not_implemented_exception ("syslib::BadaPlatform::GetParentWindow");
 }

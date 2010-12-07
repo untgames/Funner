@@ -69,11 +69,25 @@ void Semaphore::Wait (size_t wait_in_milliseconds)
 {
   try
   {
-    Platform::WaitSemaphore (impl->handle, wait_in_milliseconds);
+    if (!Platform::WaitSemaphore (impl->handle, wait_in_milliseconds))
+      throw xtl::format_operation_exception ("", "Semaphore wait timeout");
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("syslib::Semaphore::Wait(size_t)");
+    throw;
+  }
+}
+
+bool Semaphore::TryWait (size_t wait_in_milliseconds)
+{
+  try
+  {
+    return Platform::WaitSemaphore (impl->handle, wait_in_milliseconds);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Semaphore::TryWait(size_t)");
     throw;
   }
 }
@@ -86,7 +100,7 @@ bool Semaphore::TryWait ()
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Semaphore::TryWait");
+    exception.touch ("syslib::Semaphore::TryWait()");
     throw;
   }
 }

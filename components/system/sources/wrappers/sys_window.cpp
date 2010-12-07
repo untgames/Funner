@@ -14,19 +14,22 @@ struct Window::Impl
 {
   public:
 ///Конструктор
-    Impl (Window* in_window)
+    Impl (Window* in_window, const char* in_init_string)
       : window (in_window)
       , handle (0)
       , parent_handle (0)
       , style (WindowStyle_Default)
       , need_update_viewport (true)
     {
+      if (!in_init_string)
+        throw xtl::make_null_argument_exception ("syslib::Window::Window::Impl", "init_string");
+           
       memset (title, 0, sizeof title);
       memset (title_unicode, 0, sizeof title_unicode);
     }
     
 ///Инциализация окна
-    void Init (WindowStyle in_style, Platform::window_t parent, bool is_visible, const Rect* window_rect = 0)
+    void Init (WindowStyle in_style, const void* parent, bool is_visible, const Rect* window_rect = 0)
     {
       try
       {
@@ -47,7 +50,7 @@ struct Window::Impl
         style         = in_style;
         parent_handle = parent;
         
-        Platform::window_t new_handle = Platform::CreateWindow (style, &MessageHandler, parent, this);        
+        Platform::window_t new_handle = Platform::CreateWindow (style, &MessageHandler, parent, init_string.c_str (), this);
 
         SetHandle (new_handle);
 
@@ -113,10 +116,10 @@ struct Window::Impl
     }
     
 ///Низкоуровневый дескриптор родительского окна
-    Platform::window_t ParentHandle () const { return parent_handle; }
+    const void* ParentHandle () const { return parent_handle; }
 
 ///Установка низкоуровневого дескриптора родительского окна
-    void SetParentHandle (Platform::window_t new_parent_handle)
+    void SetParentHandle (const void* new_parent_handle)
     {
 //      bool need_window_recreate = !new_parent_handle && parent_handle || new_parent_handle && !parent_handle; //нужно пересоздавать окно
       bool need_window_recreate = false;
@@ -131,7 +134,7 @@ struct Window::Impl
       {
         parent_handle = new_parent_handle;
 
-        Platform::SetParentWindow (CheckedHandle (), parent_handle);
+        Platform::SetParentWindowHandle (CheckedHandle (), parent_handle);
       }
     }
 
@@ -352,8 +355,9 @@ struct Window::Impl
   private:
     Window*               window;                             //указатель на владельца
     Platform::window_t    handle;                             //низкоуровневый дескриптор окна
-    Platform::window_t    parent_handle;                      //низкоуровневый дескриптор родительского окна
+    const void*           parent_handle;                      //низкоуровневый дескриптор родительского окна
     WindowStyle           style;                              //стиль окна
+    stl::string           init_string;                        //строка инициализации окна
     WindowSignal          signals [WindowEvent_Num];          //сигналы окна
     bool                  close_cancel_flag;                  //флаг отмены закрытия окна
     char                  title [MAX_TITLE_LENGTH+1];         //заголовок окна
@@ -369,15 +373,25 @@ struct Window::Impl
     Конструктор и деструктор
 */
 
-Window::Window ()
-  : impl (new Impl (this))
-  {}
-
-Window::Window (WindowStyle style)
-  : impl (new Impl (this))
+Window::Window (const char* init_string)
 {
   try
   {
+    impl = stl::auto_ptr<Impl> (new Impl (this, init_string));
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Window::Window()");
+    throw;
+  }
+}
+
+Window::Window (WindowStyle style, const char* init_string)
+{
+  try
+  {
+    impl = stl::auto_ptr<Impl> (new Impl (this, init_string));        
+    
     Init (style);
   }
   catch (xtl::exception& exception)
@@ -387,11 +401,12 @@ Window::Window (WindowStyle style)
   }
 }
 
-Window::Window (WindowStyle style, size_t width, size_t height)
-  : impl (new Impl (this))
+Window::Window (WindowStyle style, size_t width, size_t height, const char* init_string)
 {
   try
   {
+    impl = stl::auto_ptr<Impl> (new Impl (this, init_string));
+    
     Init (style, width, height);
   }
   catch (xtl::exception& exception)
@@ -504,6 +519,19 @@ const void* Window::Handle () const
   catch (xtl::exception& e)
   {
     e.touch ("syslib::Window::Handle");
+    throw;
+  }
+}
+
+const void* Window::DisplayHandle () const
+{
+  try
+  {
+    return Platform::GetNativeDisplayHandle (impl->Handle ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Window::DisplayHandle");
     throw;
   }
 }
@@ -1142,7 +1170,7 @@ void Window::SetParentHandle (const void* handle)
 {
   try
   {
-    impl->SetParentHandle ((Platform::window_t)handle);
+    impl->SetParentHandle (handle);
   }
   catch (xtl::exception& exception)
   {
@@ -1155,7 +1183,7 @@ const void* Window::ParentHandle () const
 {
   try
   {
-    return Platform::GetParentWindow (impl->CheckedHandle ());
+    return Platform::GetParentWindowHandle (impl->CheckedHandle ());
   }
   catch (xtl::exception& exception)
   {

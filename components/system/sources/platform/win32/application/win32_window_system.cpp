@@ -530,9 +530,9 @@ void RegisterWindowClass ()
 
 #undef CreateWindow
 
-Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, window_t parent, void* user_data)
+Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
-    //определене стиля окна
+    //определение стиля окна
 
   UINT win_style;
 
@@ -541,15 +541,15 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
     case WindowStyle_Overlapped:
       win_style = WS_OVERLAPPEDWINDOW;
 
-      if (parent)
+      if (parent_handle)
         win_style |= WS_CHILD | WS_CLIPSIBLINGS;
 
       break;
     case WindowStyle_PopUp:
-      win_style = parent ? WS_CHILD  | WS_CLIPSIBLINGS : WS_POPUP;
+      win_style = parent_handle ? WS_CHILD  | WS_CLIPSIBLINGS : WS_POPUP;
       break;
     default:
-      throw xtl::make_argument_exception ("syslib::Win32Platform::CreateWindow", "style", style);
+      throw xtl::make_argument_exception ("", "style", style);
   }
 
   try
@@ -575,7 +575,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
     try
     {
       HWND wnd = CreateWindowA (WINDOW_CLASS_NAME, "", win_style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                                (HWND)parent, 0, GetApplicationInstance (), window_impl);
+                                (HWND)parent_handle, 0, GetApplicationInstance (), window_impl);
 
       if (!wnd)
         raise_error ("::CreateWindow");
@@ -638,6 +638,11 @@ void Platform::DestroyWindow (window_t handle)
 const void* Platform::GetNativeWindowHandle (window_t handle)
 {
   return reinterpret_cast<const void*> (handle);
+}
+
+const void* Platform::GetNativeDisplayHandle (window_t)
+{
+  return 0;
 }
 
 /*
@@ -856,7 +861,6 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
         break;
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
-        break;
     }
   }
   catch (xtl::exception& exception)
@@ -918,11 +922,11 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
     Установка родительского окна
 */
 
-void Platform::SetParentWindow (window_t child, window_t parent)
+void Platform::SetParentWindowHandle (window_t child, const void* parent_handle)
 {
   try
   {
-    if (!SetParent ((HWND)child, (HWND)parent))
+    if (!SetParent ((HWND)child, (HWND)parent_handle))
       raise_error ("::SetParent");
   }
   catch (xtl::exception& exception)
@@ -932,7 +936,7 @@ void Platform::SetParentWindow (window_t child, window_t parent)
   }
 }
 
-Platform::window_t Platform::GetParentWindow (window_t child)
+const void* Platform::GetParentWindowHandle (window_t child)
 {
   try
   {
@@ -940,7 +944,7 @@ Platform::window_t Platform::GetParentWindow (window_t child)
 
     check_errors ("::GetParent");
 
-    return (window_t)parent;
+    return parent;
   }
   catch (xtl::exception& exception)
   {

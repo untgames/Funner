@@ -81,7 +81,7 @@ void Platform::DestroyThread (thread_t thread)
     return;
 
   CloseHandle ((HANDLE)thread->thread);
-  
+
   delete thread;
 }
 

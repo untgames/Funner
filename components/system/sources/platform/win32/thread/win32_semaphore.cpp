@@ -50,15 +50,22 @@ void Platform::WaitSemaphore (semaphore_t handle)
 }
 
 //ожидание следующей задачи с таймаутом
-void Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
+bool Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
   try
   {
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
+      
+    int status = WaitForSingleObject (handle->semaphore, wait_in_milliseconds);
+    
+    if (status == WAIT_TIMEOUT)
+      return false;
 
-    if (WaitForSingleObject (handle->semaphore, wait_in_milliseconds) == WAIT_FAILED)
+    if (status == WAIT_FAILED)
       raise_error ("::WaitForSingleObject");
+      
+    return true;
   }
   catch (xtl::exception& exception)
   {
