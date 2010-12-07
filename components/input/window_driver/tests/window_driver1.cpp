@@ -22,6 +22,14 @@ void input_event_handler (const char* event)
     Application::Exit (0);
 }
 
+void viewport_handler (Window& window, Rect& viewport)
+{
+  viewport.left   = window.Width () / 4;
+  viewport.top    = window.Height () / 4;
+  viewport.right  = window.Width () / 4 * 3;
+  viewport.bottom = window.Height () / 4 * 3;
+}
+
 int main ()
 {
   printf ("Results of window_driver1_test:\n");
@@ -51,6 +59,9 @@ int main ()
     printf ("Property 'Cursor.sensitivity' = %f\n", device->GetProperty ("Cursor.sensitivity"));
 
     window.Show ();
+
+    window.SetViewportHandler (viewport_handler);
+    window.InvalidateViewport ();
 
     Application::Run ();
 

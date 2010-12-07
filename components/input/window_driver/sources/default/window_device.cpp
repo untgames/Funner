@@ -85,7 +85,13 @@ struct Device::Impl : private xtl::trackable
                                       WindowEvent_OnKeyDown,
                                       WindowEvent_OnKeyUp,
                                       WindowEvent_OnChar,
-                                      WindowEvent_OnClose
+                                      WindowEvent_OnClose,
+                                      WindowEvent_OnActivate,
+                                      WindowEvent_OnDeactivate,
+                                      WindowEvent_OnShow,
+                                      WindowEvent_OnHide,
+                                      WindowEvent_OnSetFocus,
+                                      WindowEvent_OnLostFocus
       };
 
       static size_t events_num = sizeof (events) / sizeof (*events);
@@ -112,15 +118,29 @@ struct Device::Impl : private xtl::trackable
   ///Обработчик сообщений окна
   void WindowEventHandler (syslib::Window& window, syslib::WindowEvent event, const syslib::WindowEventContext& window_event_context)
   {
-    static char message[MESSAGE_BUFFER_SIZE];
+    static char message [MESSAGE_BUFFER_SIZE];
     float       axis_pos;
 
     switch (event)
     {
       case WindowEvent_OnMouseMove:
       {
-        if (x_cursor_pos == window_event_context.cursor_position.x && y_cursor_pos == window_event_context.cursor_position.y)
+        Rect viewport_rect = window.Viewport ();
+
+        size_t viewport_width  = viewport_rect.right - viewport_rect.left;
+        size_t viewport_height = viewport_rect.bottom - viewport_rect.top;
+
+        Point cursor_position_in_viewport = window_event_context.cursor_position;
+
+        cursor_position_in_viewport.x = cursor_position_in_viewport.x > viewport_rect.left ? cursor_position_in_viewport.x - viewport_rect.left : 0;
+        cursor_position_in_viewport.y = cursor_position_in_viewport.y > viewport_rect.top ? cursor_position_in_viewport.y - viewport_rect.top : 0;
+
+        if (window_event_context.cursor_position.x < viewport_rect.left || window_event_context.cursor_position.y < viewport_rect.top ||
+            cursor_position_in_viewport.x > viewport_width || cursor_position_in_viewport.y > viewport_height)
+        {
+          OnLeave ();
           break;
+        }
 
         if (!mouse_in_window)
         {
@@ -130,21 +150,19 @@ struct Device::Impl : private xtl::trackable
           mouse_in_window = true;
         }
 
-        xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s at %u %u", CURSOR_AXIS_NAME, window_event_context.cursor_position.x, window_event_context.cursor_position.y);
+        if (x_cursor_pos == cursor_position_in_viewport.x && y_cursor_pos == cursor_position_in_viewport.y)
+          break;
+
+        xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s at %u %u", CURSOR_AXIS_NAME, cursor_position_in_viewport.x, cursor_position_in_viewport.y);
         signals (message);
 
-        Rect client_rect = window.ClientRect ();
-
-        size_t client_rect_width  = client_rect.right - client_rect.left;
-        size_t client_rect_height = client_rect.bottom - client_rect.top;
-
-        if (x_cursor_pos != window_event_context.cursor_position.x)
+        if (x_cursor_pos != cursor_position_in_viewport.x)
         {
           if (window.Width ())
           {
             if (!autocenter_cursor)
             {
-              axis_pos = (float)window_event_context.cursor_position.x * 2.f / client_rect_width - 1.f;
+              axis_pos = (float)cursor_position_in_viewport.x * 2.f / viewport_width - 1.f;
 
               xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX axis %f", CURSOR_AXIS_NAME, axis_pos);
               signals (message);
@@ -154,16 +172,16 @@ struct Device::Impl : private xtl::trackable
             signals (message);
           }
 
-          x_cursor_pos = window_event_context.cursor_position.x;
+          x_cursor_pos = cursor_position_in_viewport.x;
         }
 
-        if (y_cursor_pos != window_event_context.cursor_position.y)
+        if (y_cursor_pos != cursor_position_in_viewport.y)
         {
           if (window.Height ())
           {
             if (!autocenter_cursor)
             {
-              axis_pos = -(float)window_event_context.cursor_position.y * 2.f / client_rect_height + 1.f;
+              axis_pos = -(float)cursor_position_in_viewport.y * 2.f / viewport_height + 1.f;
 
               xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY axis %f", CURSOR_AXIS_NAME, axis_pos);
               signals (message);
@@ -173,7 +191,7 @@ struct Device::Impl : private xtl::trackable
             signals (message);
           }
 
-          y_cursor_pos = window_event_context.cursor_position.y;
+          y_cursor_pos = cursor_position_in_viewport.y;
         }
 
         if (autocenter_cursor)
@@ -186,14 +204,7 @@ struct Device::Impl : private xtl::trackable
         break;
       }
       case WindowEvent_OnMouseLeave:
-        if (mouse_in_window)
-        {
-          xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s leave", CURSOR_AXIS_NAME);
-          signals (message);
-
-          mouse_in_window = false;
-        }
-
+        OnLeave ();
         break;
       case WindowEvent_OnMouseVerticalWheel:
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY delta %f", WHEEL_AXIS_NAME, window_event_context.mouse_vertical_wheel_delta * vertical_wheel_sensitivity);
@@ -311,9 +322,40 @@ struct Device::Impl : private xtl::trackable
       case WindowEvent_OnClose:
         signals ("Window closed");
         break;
+      case WindowEvent_OnActivate:
+        signals ("Window activated");
+        break;
+      case WindowEvent_OnDeactivate:
+        signals ("Window deactivated");
+        break;
+      case WindowEvent_OnShow:
+        signals ("Window shown");
+        break;
+      case WindowEvent_OnHide:
+        signals ("Window hidden");
+        break;
+      case WindowEvent_OnSetFocus:
+        signals ("Window set_focus");
+        break;
+      case WindowEvent_OnLostFocus:
+        signals ("Window lost_focus");
+        break;
       default:
         break;
     }
+  }
+
+  void OnLeave ()
+  {
+    if (!mouse_in_window)
+      return;
+
+    static char message [MESSAGE_BUFFER_SIZE];
+
+    xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s leave", CURSOR_AXIS_NAME);
+    signals (message);
+
+    mouse_in_window = false;
   }
 };
 

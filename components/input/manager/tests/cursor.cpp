@@ -22,6 +22,11 @@ class MyListener: public ICursorListener
     {
       printf ("MyListener::OnChangeVisible(%s)\n", state ? "true" : "false");
     }
+    
+    void OnChangeImage (const char* name)
+    {
+      printf ("MyListener::OnChangeImage(%s)\n", name);
+    }
 };
 
 int main ()
@@ -38,6 +43,8 @@ int main ()
     cursor.SetPosition (2.1f, 3.2f);
     cursor.SetPosition (2.1f, 3.2f);
     cursor.SetPosition (3.2f, 2.1f);
+    
+    cursor.SetImage ("image1.png");
 
     cursor.Show ();
     cursor.Hide ();

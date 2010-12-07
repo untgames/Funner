@@ -17,6 +17,7 @@ class ICursorListener
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void OnChangePosition (const math::vec2f& position) {}
     virtual void OnChangeVisible  (bool state) {}
+    virtual void OnChangeImage    (const char* image_name) {}
     virtual void OnDestroy        () {}
 
   protected:
@@ -53,7 +54,13 @@ class Cursor
     bool IsVisible  () const;
     void SetVisible (bool state);
     void Show       () { SetVisible (true); }
-    void Hide       () { SetVisible (false); }    
+    void Hide       () { SetVisible (false); }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка изображения курсора
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        SetImage (const char* image_name);
+    const char* Image    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление слушателей событий курсора

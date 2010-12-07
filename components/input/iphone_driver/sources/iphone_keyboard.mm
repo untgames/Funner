@@ -1,9 +1,9 @@
 #include "shared.h"
 
-#import <UIApplication.h>
-#import <UIGeometry.h>
-#import <UITextField.h>
-#import <UIWindow.h>
+#import <UIKit/UIApplication.h>
+#import <UIKit/UIGeometry.h>
+#import <UIKit/UITextField.h>
+#import <UIKit/UIWindow.h>
 
 using namespace input::low_level::iphone_driver;
 
@@ -15,46 +15,9 @@ NSString* EMPTY_STRING_REPLACE = @" ";
 const size_t MESSAGE_BUFFER_SIZE = 16;
 const float  EPSILON             = 0.01f;
 
-const char* ORIENTATION_PROPERTY = "Orientation";
-
-const char* PROPERTIES [] = {
-  ORIENTATION_PROPERTY
-};
-
-const size_t PROPERTIES_COUNT = sizeof (PROPERTIES) / sizeof (*PROPERTIES);
-
-enum Orientation
-{
-  Orientation_Portrait,
-  Orientation_LandscapeLeft,
-  Orientation_LandscapeRight
-};
-
 bool float_compare (float value1, float value2)
 {
   return (value1 > (value2 - EPSILON)) && (value1 < (value2 + EPSILON));
-}
-
-UIInterfaceOrientation get_uikit_orientation (Orientation orientation)
-{
-  switch (orientation)
-  {
-    case Orientation_Portrait:       return UIInterfaceOrientationPortrait;
-    case Orientation_LandscapeLeft:  return UIInterfaceOrientationLandscapeLeft;
-    case Orientation_LandscapeRight: return UIInterfaceOrientationLandscapeRight;
-    default: throw xtl::make_argument_exception ("input::low_level::iphone_driver::get_iukit_orientation", "orientation", orientation);
-  }
-}
-
-Orientation get_orientation (UIInterfaceOrientation orientation)
-{
-  switch (orientation)
-  {
-    case UIInterfaceOrientationPortrait:       return Orientation_Portrait;
-    case UIInterfaceOrientationLandscapeLeft:  return Orientation_LandscapeLeft;
-    case UIInterfaceOrientationLandscapeRight: return Orientation_LandscapeRight;
-    default: throw xtl::make_argument_exception ("input::low_level::iphone_driver::get_orientation", "orientation", orientation);
-  }
 }
 
 //Класс, подписывающийся на обновление текста
@@ -188,7 +151,6 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
 
   stl::string       name;                  //имя устройства
   stl::string       full_name;             //полное имя устройства
-  stl::string       properties;            //настройки
   DeviceSignal      signals;               //обработчики событий
   stl::wstring      control_name;          //имя контрола
   UITextField       *text_field;           //вид, с помощью которого реализуется работа с клавиатурой
@@ -200,15 +162,6 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
   {
     try
     {
-      for (size_t i = 0; i < PROPERTIES_COUNT; i++)
-      {
-        properties.append (PROPERTIES[i]);
-        properties.append (" ");
-      }
-
-      if (!properties.empty ())
-        properties.pop_back ();
-
       CGRect frame_rect;
 
       frame_rect.origin.x    = 1000;
@@ -339,43 +292,15 @@ xtl::connection IPhoneKeyboard::RegisterEventHandler (const input::low_level::ID
 
 const char* IPhoneKeyboard::GetProperties ()
 {
-  return impl->properties.c_str ();
+  return "";
 }
 
 void IPhoneKeyboard::SetProperty (const char* name, float value)
 {
-  static const char* METHOD_NAME = "input::low_level::iphone_driver::IPhoneKeyboard::SetProperty";
-
-  if (!xtl::xstrcmp (ORIENTATION_PROPERTY, name))
-  {
-    if (float_compare (get_orientation ([UIApplication sharedApplication].statusBarOrientation), value))
-      return;
-
-    Orientation new_orientation;
-
-    if (float_compare (Orientation_Portrait, value))
-      new_orientation = Orientation_Portrait;
-    else if (float_compare (Orientation_LandscapeLeft, value))
-      new_orientation = Orientation_LandscapeLeft;
-    else if (float_compare (Orientation_LandscapeRight, value))
-      new_orientation = Orientation_LandscapeRight;
-    else
-      throw xtl::make_argument_exception (METHOD_NAME, "value", value);
-
-    impl->HideKeyboard ();
-
-    [UIApplication sharedApplication].statusBarOrientation = get_uikit_orientation (new_orientation);
-
-    impl->ShowKeyboard ();
-  }
-  else
-    throw xtl::make_argument_exception (METHOD_NAME, "name", name);
+  throw xtl::make_argument_exception ("input::low_level::iphone_driver::IPhoneKeyboard::SetProperty", "name", name);
 }
 
 float IPhoneKeyboard::GetProperty (const char* name)
 {
-  if (!xtl::xstrcmp (ORIENTATION_PROPERTY, name))
-    return get_orientation ([UIApplication sharedApplication].statusBarOrientation);
-  else
-    throw xtl::make_argument_exception ("input::low_level::iphone_driver::IPhoneKeyboard::GetProperty", "name", name);
+  throw xtl::make_argument_exception ("input::low_level::iphone_driver::IPhoneKeyboard::GetProperty", "name", name);
 }

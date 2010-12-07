@@ -1,5 +1,6 @@
 Results of cursor_test:
 MyListener::OnChangePosition(2.1,3.2)
 MyListener::OnChangePosition(3.2,2.1)
+MyListener::OnChangeImage(image1.png)
 MyListener::OnChangeVisible(false)
 MyListener::OnDestroy
