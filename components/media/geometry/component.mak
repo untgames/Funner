@@ -2,7 +2,7 @@
 #Определения и константы
 ###################################################################################################
 TARGETS := MEDIA.GEOMETRY.SOURCES MEDIA.GEOMETRY.XMESH MEDIA.GEOMETRY.BINMESH MEDIA.GEOMETRY.TESTS \
-           MEDIA.GEOMETRY.XMESH.TESTS MEDIA.GEOMETRY.BINMESH.TESTS MEDIA.GEOMETRY.UTILS
+           MEDIA.GEOMETRY.XMESH.TESTS MEDIA.GEOMETRY.BINMESH.TESTS MEDIA.GEOMETRY.UTILS MEDIA.GEOMETRY.INFO
 
 #Цель - sources
 MEDIA.GEOMETRY.SOURCES.TYPE             := static-lib
@@ -72,3 +72,9 @@ MEDIA.GEOMETRY.UTILS.LIBS             :=
 MEDIA.GEOMETRY.UTILS.COMPILER_CFLAGS  :=
 MEDIA.GEOMETRY.UTILS.COMPILER_DEFINES :=
 MEDIA.GEOMETRY.UTILS.IMPORTS          := compile.media.geometry link.media.geometry.xmesh link.media.geometry.binmesh
+
+#Цель - сборка документации
+MEDIA.GEOMETRY.INFO.TYPE        := doxygen-info
+MEDIA.GEOMETRY.INFO.CHM_NAME    := funner.media.geometry
+MEDIA.GEOMETRY.INFO.SOURCE_DIRS := include
+MEDIA.GEOMETRY.INFO.IMPORTS     := compile.media.geometry
