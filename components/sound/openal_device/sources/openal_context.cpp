@@ -80,7 +80,10 @@ OpenALContext::OpenALContext (const char* device_name, const char* init_string)
     common::parse_init_string (init_string, xtl::bind (&process_init_string, _1, _2, ref (properties)));
 
     device = alcOpenDevice (device_name);
-
+    
+    if (!device_name)
+      device_name = "default";
+    
     if (!device)
       throw xtl::format_exception<OpenALException> ("", "Can't open device '%s'", device_name);
 

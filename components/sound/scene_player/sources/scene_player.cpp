@@ -191,7 +191,7 @@ class ScenePlayerEmitter: public xtl::trackable
 class ScenePlayerListener: public xtl::trackable
 {
   public:
-///Конструктор  
+///Конструктор
     ScenePlayerListener (scene_graph::Listener& in_scene_listener)
       : sound_manager (0)
       , scene_listener (in_scene_listener)
@@ -298,7 +298,7 @@ struct ScenePlayer::Impl
 ///Установка слушателя
     void SetListener (scene_graph::Listener* in_listener, bool need_destroy_listener = true)
     {
-      if (!listener && !in_listener || listener && &listener->GetSceneListener () == in_listener)
+      if ((!listener && !in_listener) || (listener && &listener->GetSceneListener () == in_listener))
         return;        
         
       on_destroy_listener.disconnect ();
@@ -459,7 +459,7 @@ struct ScenePlayer::Impl
     sound::SoundManager*               sound_manager;                 //менеджер звуков
     EmitterSet                         emitters;                      //эмиттеры
     Scene*                             scene;                         //текущая сцена
-    xtl::auto_connection               on_manager_destroy_connection; //соединение события удаления менеджера    
+    xtl::auto_connection               on_manager_destroy_connection; //соединение события удаления менеджера
     xtl::auto_connection               on_bind_node_connection;       //соединение события появления нового узла в сцене
     xtl::auto_connection               on_destroy_listener;           //соединение события удаления слушателя
     xtl::auto_connection               on_change_listener_scene;      //соединение события изменения сцены слушателя

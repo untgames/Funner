@@ -2,8 +2,8 @@
 #define SOUND_SYSTEM_OPENAL_DEVICE_SHARED_HEADER
 
 #include <stdarg.h>
-#include <al.h>
-#include <alc.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 //#include <efx.h>
 
 #include <stl/string>
@@ -17,14 +17,13 @@
 #include <xtl/string.h>
 #include <xtl/common_exceptions.h>
 
+#include <common/action_queue.h>
 #include <common/component.h>
 #include <common/log.h>
 #include <common/strlib.h>
 #include <common/time.h>
 
 #include <media/sound.h>
-
-#include <syslib/timer.h>
 
 #include <sound/device.h>
 #include <sound/driver.h>
@@ -306,9 +305,9 @@ class OpenALDevice : public sound::low_level::IDevice, public xtl::reference_cou
   private:
     stl::string    name;                                       //имя устройства
     OpenALContext  context;                                    //контекст
-    syslib::Timer  buffer_timer;                               //таймер обновления буфера
-    syslib::Timer  listener_timer;                             //таймер обновления слушателя
-    syslib::Timer  source_timer;                               //таймер обновления источников
+    common::Action buffer_action;                              //таймер обновления буфера
+    common::Action listener_action;                            //таймер обновления слушателя
+    common::Action source_action;                              //таймер обновления источников
     Capabilities   info;                                       //информация о устройстве
     Listener       listener;                                   //слушатель
     bool           listener_need_update;                       //слушатель требует обновления
