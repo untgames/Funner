@@ -261,6 +261,11 @@ template <class T> struct any_content: public any_holder
     Реализации вариативной переменной
 */
 
+#ifdef _MSC_VER
+  #pragma warning (push)
+  #pragma warning (disable : 4624)  //'xtl::detail::referenced_any_impl<T>' : destructor could not be generated because a base class destructor is inaccessible
+#endif
+
 template <class T> struct copyable_any_impl: public any_content<T>
 {
   copyable_any_impl (const T& in_value) : any_content<T> (in_value) {}
@@ -285,6 +290,10 @@ template <class T> class referenced_any_impl: public any_content<T>
   private:
     size_t ref_count;
 };
+
+#ifdef _MSC_VER
+  #pragma warning (pop)
+#endif
 
 }
 

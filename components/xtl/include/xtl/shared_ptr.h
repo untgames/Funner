@@ -255,13 +255,24 @@ template <class Deleter, class T> Deleter* get_deleter (const shared_ptr<T>&);
 template <class T>                T*       get_pointer (T*);
 template <class T>                T*       get_pointer (const shared_ptr<T>&);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕереопределение таблиц типов дл€ указател€
+///////////////////////////////////////////////////////////////////////////////////////////////////
+namespace type_traits
+{
+
+template <class T> struct is_pointer;
+template <class T> struct remove_pointer;
+
+template <class T> struct is_pointer<shared_ptr<T> >     { enum { value = true }; };
+template <class T> struct remove_pointer<shared_ptr<T> > { typedef T type; };
+
+}
+
 #ifdef XTL_HAS_INTERLOCKED
   #include <xtl/detail/shared_counter_interlocked.inl>  
 #else
-//#elif defined (ARM9)
   #include <xtl/detail/shared_counter_nothreads.inl>
-//#else
-//  #error Unknown platform
 #endif
 
 #include <xtl/detail/shared_counter.inl>

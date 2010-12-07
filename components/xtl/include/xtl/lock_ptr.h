@@ -97,6 +97,20 @@ template <class T1, class T2, class Ptr2> bool operator != (const T1*, const loc
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T, class Ptr> T* get_pointer (lock_ptr<T, Ptr>&);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕереопределение таблиц типов дл€ указател€
+///////////////////////////////////////////////////////////////////////////////////////////////////
+namespace type_traits
+{
+
+template <class T> struct is_pointer;
+template <class T> struct remove_pointer;
+
+template <class T> struct is_pointer<lock_ptr<T> >     { enum { value = true }; };
+template <class T> struct remove_pointer<lock_ptr<T> > { typedef T type; };
+
+}
+
 #include <xtl/detail/lock_ptr.inl>
 
 }

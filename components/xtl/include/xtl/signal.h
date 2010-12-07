@@ -195,6 +195,30 @@ class signal
     slot_impl* first;
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Переопределение информации о типе
+///////////////////////////////////////////////////////////////////////////////////////////////////
+namespace type_traits
+{
+
+template <class T> struct is_function;
+
+template <class Signature, class Accumulator> struct is_function<signal<Signature, Accumulator> > { enum { value = true }; };
+
+}
+
+namespace detail
+{
+
+template <class T> struct functional_traits;
+
+template <class Signature, class Accumulator> struct functional_traits<signal<Signature, Accumulator> >: public functional_traits<Signature>
+{
+  enum { is_function = false }; 
+};
+
+}
+
 #include <xtl/detail/slot.inl>
 #include <xtl/detail/signal.inl>
 

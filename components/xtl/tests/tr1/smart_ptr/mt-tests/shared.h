@@ -72,6 +72,7 @@ int pthread_join(pthread_t thread, void ** /*value_ptr*/)
 char const * title = "Using POSIX threads";
 
 #include <pthread.h>
+#include <unistd.h>
 
 extern "C" void * common_thread_routine(void * pv)
 {

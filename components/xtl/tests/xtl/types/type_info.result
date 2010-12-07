@@ -1,0 +1,19 @@
+Results of type_info_test:
+type 'A'
+  is_reference
+  is_compound
+  alignment_of: 4
+  rank: 0
+type remove_const('A')
+  is_reference
+  is_compound
+  alignment_of: 4
+  rank: 0
+type 'remove_const(remove_reference('A'))
+  is_class
+  is_object
+  is_compound
+  is_const
+  is_polymorphic
+  alignment_of: 4
+  rank: 0

@@ -34,10 +34,30 @@ template <class T> struct singleton_default_instance<T, false>
 {
   static T& get ()
   {
-    static char buffer [sizeof (T)];
-    static T*   instance = new (buffer) T;
+    union max_align
+    {
+      char        field1;
+      short       field2;
+      int         field3;
+      long        field4;
+      float       field5;
+      double      field6;
+      long double field7;
+      void*       field8;
+      char        value_buffer [sizeof (T)];
+    };
+    
+    struct initializer
+    {
+      max_align buffer;
+      T*        instance;
+      
+      initializer () : instance (new (&buffer) T) {}
+    };
 
-    return *instance;
+    static initializer instance_holder;
+
+    return *instance_holder.instance;
   }
 };
 
