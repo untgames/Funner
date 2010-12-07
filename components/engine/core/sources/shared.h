@@ -18,8 +18,10 @@
 #include <xtl/signal.h>
 
 #include <common/component.h>
+#include <common/file.h>
 #include <common/log.h>
 #include <common/parser.h>
+#include <common/property_map.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
 
@@ -54,7 +56,7 @@ class StartupManagerImpl
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запуск подсистем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Start (common::ParseNode& node, const char* wc_mask, SubsystemManager& manager);
+    void Start (const common::ParseNode& node, const char* subsystems_name_masks, SubsystemManager& manager);
 
   private:
     struct Impl;

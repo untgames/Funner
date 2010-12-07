@@ -21,6 +21,11 @@ class ISubsystem
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual void AddRef  () = 0;
     virtual void Release () = 0;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Выполнение команды
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void Execute (const char* command) {}
 
   protected:
     virtual ~ISubsystem () {}
@@ -62,14 +67,14 @@ class SubsystemManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Запуск подсистем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Start (const common::ParseNode& configuration_root, const char* subsystem_name_mask = "*");
-    void Start (const char* configuration_file_name, const char* subsystem_name_mask = "*");
+    void Start (const common::ParseNode& configuration_root, const char* subsystems_name_mask = "*");
+    void Start (const char* configuration_file_name, const char* subsystems_name_mask = "*");
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перезапуск подсистем
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Restart (const common::ParseNode& configuration_root, const char* subsystem_name_mask);
-    void Restart (const char* configuration_file_name, const char* subsystem_name_mask);
+    void Restart (const common::ParseNode& configuration_root, const char* subsystems_name_masks);
+    void Restart (const char* configuration_file_name, const char* subsystems_name_masks);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Перебор подсистем
@@ -83,8 +88,13 @@ class SubsystemManager
     void Add       (const char* name, ISubsystem* subsystem);
     void Add       (ISubsystem* subsystem);
     void Remove    (ISubsystem* subsystem);
-    void Remove    (const char* wc_mask);
+    void Remove    (const char* subsystems_name_masks);
     void RemoveAll ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Посылка команды подсистемам
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Execute (const char* command);
 
   private:
     SubsystemManager (const SubsystemManager&);

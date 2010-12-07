@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration>
+  <Subsystem12 Value = "2"/>  
+  <Properties>
+    <Property Name="A" Value="3"/>
+  </Properties>
+  <Subsystem21 Value = "{A}"/>
+</Configuration>
