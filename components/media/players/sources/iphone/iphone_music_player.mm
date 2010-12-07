@@ -1,11 +1,11 @@
 #include "shared.h"
 
-#import <NSDate.h>
-#import <NSError.h>
-#import <NSString.h>
-#import <NSURL.h>
+#import <Foundation/NSDate.h>
+#import <Foundation/NSError.h>
+#import <Foundation/NSString.h>
+#import <Foundation/NSURL.h>
 
-#import <AVAudioPlayer.h>
+#import <AVFoundation/AVAudioPlayer.h>
 
 using namespace media::players;
 
