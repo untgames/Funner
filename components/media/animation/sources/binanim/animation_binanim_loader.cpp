@@ -93,6 +93,10 @@ class BinAnimationLibraryLoader
     {
     }
 
+    template <class T> void ReadSpecificKeyInfo (math::spline_linear_key<T>& key)
+    {
+    }
+
     template <class T> void ReadSplineKey (T& spline)
     {
         typename T::key_type key;
@@ -107,16 +111,18 @@ class BinAnimationLibraryLoader
 
     template <class T> void ReadSpline (Channel& parent)
     {
-        T spline;
+      T spline;
 
-        unsigned int keys_count;
+      unsigned int keys_count;
 
-        file_read (input_file, &keys_count, sizeof (keys_count));
+      file_read (input_file, &keys_count, sizeof (keys_count));
 
-        for (size_t i = 0; i < keys_count; i++)
-          ReadSplineKey<T> (spline);
+      spline.reserve (keys_count);
 
-        parent.SetTrack (spline);
+      for (size_t i = 0; i < keys_count; i++)
+        ReadSplineKey<T> (spline);
+
+      parent.SetTrack (spline);
     }
 
     void ReadAnimationChannel (Animation& parent)
@@ -147,6 +153,16 @@ class BinAnimationLibraryLoader
         ReadSpline<math::bezier_spline3f> (channel);
       else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_bezier_key<vec4f>>"))
         ReadSpline<math::bezier_spline4f> (channel);
+      else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_linear_key<float>>"))
+        ReadSpline<math::linear_splinef> (channel);
+      else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_linear_key<vec2f>>"))
+        ReadSpline<math::linear_spline2f> (channel);
+      else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_linear_key<vec3f>>"))
+        ReadSpline<math::linear_spline3f> (channel);
+      else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_linear_key<vec4f>>"))
+        ReadSpline<math::linear_spline4f> (channel);
+      else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_linear_key<mat4f>>"))
+        ReadSpline<math::linear_spline_mat4f> (channel);
       else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_step_key<float>>"))
         ReadSpline<math::step_splinef> (channel);
       else if (!xtl::xstrcmp (track_type.data (), "basic_spline<spline_step_key<vec2f>>"))

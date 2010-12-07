@@ -95,6 +95,10 @@ class BinAnimationLibrarySaver
     {
     }
 
+    template <class T> void SaveSpecificKeyInfo (const math::spline_linear_key<T>& key)
+    {
+    }
+
     template <class T> void SaveSpline (const char* spline_id, const T* spline)
     {
       if (!spline)
@@ -143,6 +147,16 @@ class BinAnimationLibrarySaver
         SaveSpline ("basic_spline<spline_bezier_key<vec3f>>", channel.Track<math::bezier_spline3f> ());
       else if (track_type == typeid (math::bezier_spline4f))
         SaveSpline ("basic_spline<spline_bezier_key<vec4f>>", channel.Track<math::bezier_spline4f> ());
+      else if (track_type == typeid (math::linear_splinef))
+        SaveSpline ("basic_spline<spline_linear_key<float>>", channel.Track<math::linear_splinef> ());
+      else if (track_type == typeid (math::linear_spline2f))
+        SaveSpline ("basic_spline<spline_linear_key<vec2f>>", channel.Track<math::linear_spline2f> ());
+      else if (track_type == typeid (math::linear_spline3f))
+        SaveSpline ("basic_spline<spline_linear_key<vec3f>>", channel.Track<math::linear_spline3f> ());
+      else if (track_type == typeid (math::linear_spline4f))
+        SaveSpline ("basic_spline<spline_linear_key<vec4f>>", channel.Track<math::linear_spline4f> ());
+      else if (track_type == typeid (math::linear_spline_mat4f))
+        SaveSpline ("basic_spline<spline_linear_key<mat4f>>", channel.Track<math::linear_spline_mat4f> ());
       else if (track_type == typeid (math::step_splinef))
         SaveSpline ("basic_spline<spline_step_key<float>>", channel.Track<math::step_splinef> ());
       else if (track_type == typeid (math::step_spline2f))

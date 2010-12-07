@@ -15,3 +15,5 @@ export.link.media.animation.xanim.IMPORTS       := link.media.animation link.com
 export.link.media.animation.binanim.LIBS          := funner.media.animation.binanim
 export.link.media.animation.binanim.LINK_INCLUDES := BinAnimLoader BinAnimSaver
 export.link.media.animation.binanim.IMPORTS       := link.media.animation
+
+export.info.media.animation.CHMS := funner.media.animation
