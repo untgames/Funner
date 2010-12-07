@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include <xtl/bind.h>
+#include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/signal.h>
 #include <xtl/string.h>
@@ -13,6 +14,7 @@
 #include <stl/string>
 
 #include <common/hash.h>
+#include <common/log.h>
 
 #include <sg/camera.h>
 #include <sg/controller.h>

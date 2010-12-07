@@ -72,5 +72,10 @@ int main ()
 
   dump_bounds (*camera);
 
+  camera->SetFovX (degree (32.0f));
+  printf ("Projection matrix:\n");
+  dump_matrix (camera->ProjectionMatrix ());
+  printf ("\n");
+
   return 0;
 }

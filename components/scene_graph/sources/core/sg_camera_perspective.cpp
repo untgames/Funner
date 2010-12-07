@@ -54,6 +54,7 @@ void PerspectiveCamera::SetFovX (const math::anglef& fov_x)
 {
   impl->fov_x = fov_x;
   UpdateBoundsNotify ();
+  UpdateNotify ();
 }
 
 const math::anglef& PerspectiveCamera::FovX () const
@@ -65,6 +66,7 @@ void PerspectiveCamera::SetFovY (const math::anglef& fov_y)
 {
   impl->fov_y = fov_y;
   UpdateBoundsNotify ();
+  UpdateNotify ();
 }
 
 const math::anglef& PerspectiveCamera::FovY () const
@@ -76,6 +78,7 @@ void PerspectiveCamera::SetZNear (float z_near)
 {
   impl->z_near = z_near;
   UpdateBoundsNotify ();
+  UpdateNotify ();
 }
 
 float PerspectiveCamera::ZNear () const
@@ -87,6 +90,7 @@ void PerspectiveCamera::SetZFar  (float z_far)
 {
   impl->z_far = z_far;
   UpdateBoundsNotify ();
+  UpdateNotify ();
 }
 
 float PerspectiveCamera::ZFar () const
@@ -96,8 +100,8 @@ float PerspectiveCamera::ZFar () const
 
 void PerspectiveCamera::ComputeProjectionMatrix (math::mat4f& proj_matrix)
 {
-  float width  = tan (impl->fov_x * 0.5f) * impl->z_near, 
-        height = tan (impl->fov_y * 0.5f) * impl->z_near,
+  float width  = 2.f * tan (impl->fov_x * 0.5f) * impl->z_near,
+        height = 2.f * tan (impl->fov_y * 0.5f) * impl->z_near,
         depth  = impl->z_far - impl->z_near;
 
   if (fabs (width)  < EPS) throw xtl::format_operation_exception ("scene_graph::PerspectiveCamera::ComputeProjectionMatrix", "Zero camera width");
@@ -124,7 +128,7 @@ void PerspectiveCamera::UpdateBoundsCore ()
 }
 
 /*
-    Динамическая диспетчеризация    
+    Динамическая диспетчеризация
 */
 
 void PerspectiveCamera::AcceptCore (Visitor& visitor)
