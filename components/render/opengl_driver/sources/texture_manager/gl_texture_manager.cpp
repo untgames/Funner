@@ -410,16 +410,11 @@ struct TextureManager::Impl: public ContextObject
       {
         LogPrintf ("Can't create cubemap texture with width %u and height %u (maximum texture size is %u). Creating scaled texture.",
           desc.width, desc.height, caps.max_cube_map_texture_size);
-
-        if ((desc.width <= caps.max_texture_size || desc.height <= caps.max_texture_size) && (is_pot || caps.has_arb_texture_non_power_of_two))  //можно масштабировать только по одной оси
-        {
-          if (desc.width > caps.max_texture_size)
-            return new ScaledTexture (GetContextManager (), texture_manager, desc, data, caps.max_cube_map_texture_size, desc.height);
-          else
-            return new ScaledTexture (GetContextManager (), texture_manager, desc, data, desc.width, caps.max_cube_map_texture_size);
-        }
-        else
-          return new ScaledTexture (GetContextManager (), texture_manager, desc, data);
+          
+        #undef min
+          
+        return new ScaledTexture (GetContextManager (), texture_manager, desc, data, stl::min (desc.width, caps.max_cube_map_texture_size),
+          stl::min (desc.height, caps.max_cube_map_texture_size));
       }
 
         //диспетчеризация создания текстуры в зависимости от поддерживаемых расширений
