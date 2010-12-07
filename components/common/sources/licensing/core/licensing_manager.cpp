@@ -273,6 +273,8 @@ class LicenseManagerImpl
 
 #ifdef _MSC_VER
       time_t date = _mkgmtime32 (&tm_date);
+#elif defined (ANDROID)
+      time_t date = mktime (&tm_date);
 #else
       time_t date = timegm (&tm_date);
 #endif
