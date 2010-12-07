@@ -679,7 +679,7 @@ stl::wstring towstring (const char* string, int length)
 
   result.fast_resize (length);
 
-  int result_size = mbstowcs (&result [0], string, length);
+  int result_size = mbsrtowcs (&result [0], &string, length, 0);
 
   if (result_size < 0)
     return L"(common::towstring error)";
@@ -717,7 +717,7 @@ stl::string tostring (const wchar_t* string, int length)
 
   result.fast_resize (length * 4);
 
-  int result_size = wcstombs (&result [0], string, length);
+  int result_size = wcsrtombs (&result [0], &string, length, 0);
 
   if (result_size < 0)
     return "(common::tostring error)";

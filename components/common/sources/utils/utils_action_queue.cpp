@@ -154,12 +154,6 @@ class ThreadActionQueue: public xtl::reference_counter
 
           continue;
         }
-        
-        if (action->next_time > action->timer.Time ())
-        {
-          ++iter;
-          continue;
-        }
 
         if (action->next_time > action->timer.Time ())
         {
