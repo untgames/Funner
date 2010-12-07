@@ -603,7 +603,7 @@ void vector<T,Allocator>::_insert_range (iterator position,Iter first,Iter last,
     const size_type   len        = next_size (count);
     volatile iterator new_start  = allocator_type::allocate (len,start),
                       new_finish = new_start;
-                    
+
     try
     {
       new_finish = uninitialized_copy (start,position,new_start);
