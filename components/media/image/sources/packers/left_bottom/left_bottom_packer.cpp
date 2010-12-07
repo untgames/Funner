@@ -22,18 +22,19 @@ using namespace bound_volumes;
 namespace
 {
 
-const size_t RANDOM_ARRAY_SIZE = 1000;
+const size_t PACK_TRY_COUNT = 10;
 
 struct MyRand
 {
-  const int* random_array;
-  int        rand_index;
+  size_t next;
 
-  MyRand (const int* in_random_array) : random_array (in_random_array), rand_index (0) {}
+  MyRand () : next (0) {}
 
-  int operator () (int max_rand)
+  size_t operator () (int max_rand)
   {
-    return random_array [rand_index++ % RANDOM_ARRAY_SIZE] % max_rand;
+    next = next * 1103515245 + 12345;
+
+    return (size_t)(next / 65536) % max_rand;
   }
 };
 
@@ -68,10 +69,6 @@ class TileImageBuilder
     typedef stl::vector<size_t> IndexArray;
 
   public:
-    TileImageBuilder (const int* in_random_array)
-      : random_array (in_random_array)
-      {}
-
     void AddImages (size_t images_count, const math::vec2ui* in_sizes)
     {
       images.resize (images_count);
@@ -95,7 +92,7 @@ class TileImageBuilder
          minimum_area += iter->x * iter->y;
 
       if (pack_flags & AtlasPackFlag_PowerOfTwoEdges)
-        result_image_horisontal_side = result_image_vertical_side = get_next_higher_power_of_two ((size_t)sqrt ((float)minimum_area)) / 2;
+        result_image_horisontal_side = result_image_vertical_side = stl::max ((size_t)1, get_next_higher_power_of_two ((size_t)sqrt ((float)minimum_area)) / 2);
       else
         result_image_horisontal_side = result_image_vertical_side = (size_t)sqrt ((float)minimum_area) + 1;
 
@@ -103,7 +100,7 @@ class TileImageBuilder
 
       bool pack_result = false;
 
-      MyRand my_rand (random_array);
+      MyRand my_rand;
 
       while (!pack_result)
       {
@@ -123,7 +120,7 @@ class TileImageBuilder
 
           random_shuffle (indices.begin (), indices.end (), my_rand);
         }
-        while (try_count++ < 10);
+        while (try_count++ < PACK_TRY_COUNT);
       }
     }
 
@@ -259,10 +256,9 @@ class TileImageBuilder
 
   private:
     ImagesArray images;
-    const int*  random_array;
 };
 
-void left_bottom_pack (const int* random_array, size_t images_count, const math::vec2ui* in_sizes, math::vec2ui* out_origins, size_t margin, size_t pack_flags)
+void left_bottom_pack (size_t images_count, const math::vec2ui* in_sizes, math::vec2ui* out_origins, size_t margin, size_t pack_flags)
 {
   static const char* METHOD_NAME = "media::LeftBottomPacker";
 
@@ -272,7 +268,7 @@ void left_bottom_pack (const int* random_array, size_t images_count, const math:
   if (!out_origins)
     throw xtl::make_null_argument_exception (METHOD_NAME, "out_origins");
 
-  TileImageBuilder tile_image_builder (random_array);
+  TileImageBuilder tile_image_builder;
 
   tile_image_builder.AddImages (images_count, in_sizes);
   tile_image_builder.BuildTileImage (out_origins, margin, pack_flags);
@@ -288,17 +284,11 @@ class LeftBottomPackerComponent
     //загрузка компонента
     LeftBottomPackerComponent ()
     {
-      for (size_t i = 0; i < RANDOM_ARRAY_SIZE; i++)
-        random_array [i] = rand ();
-
-      AtlasBuilderManager::PackHandler pack_handler = xtl::bind (&left_bottom_pack, random_array, _1, _2, _3, _4, _5);
+      AtlasBuilderManager::PackHandler pack_handler = xtl::bind (&left_bottom_pack, _1, _2, _3, _4, _5);
 
       AtlasBuilderManager::RegisterPacker ("default", pack_handler);
       AtlasBuilderManager::RegisterPacker ("left_bottom", pack_handler);
     }
-
-  private:
-    int random_array [RANDOM_ARRAY_SIZE];
 };
 
 extern "C"

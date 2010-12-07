@@ -3,7 +3,7 @@ width:        1024
 height:       1024
 layers_count: 1
 mips_count:   11
-format:       'DXT1'
+format:       'dxt1'
 layers:
   layer0:
     mip0: size=524288, crc32=2959d1b0
