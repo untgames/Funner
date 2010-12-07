@@ -12,7 +12,11 @@ void test(xtl::intrusive_ptr<B> const & pi)
     }
 }
 
+#ifdef ANDROID
+int const m = 4; // threads
+#else
 int const m = 16; // threads
+#endif
 
 int main()
 {

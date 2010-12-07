@@ -150,7 +150,7 @@
   
 #elif defined (ARM)
 
-#ifdef BEAGLEBOARD
+#if defined (BEAGLEBOARD)
 
 inline int __sync_fetch_and_add (volatile int *ptr, volatile int val)
 {
@@ -167,7 +167,7 @@ inline int __sync_fetch_and_add (volatile int *ptr, volatile int val)
   : "r" (ptr), "Ir" (val)
   : "cc");
   
-  return result - 1;
+  return result - val;
 }
   
 inline int __sync_fetch_and_sub (volatile int *ptr, volatile int val)
@@ -185,7 +185,7 @@ inline int __sync_fetch_and_sub (volatile int *ptr, volatile int val)
   : "r" (ptr), "Ir" (-val)
   : "cc");
   
-  return result + 1;
+  return result + val;
 }
   
 inline int __sync_val_compare_and_swap (volatile int *ptr, volatile int _old, volatile int _new)
@@ -209,6 +209,57 @@ inline int __sync_val_compare_and_swap (volatile int *ptr, volatile int _old, vo
 
   return oldval;
 }
+
+#elif defined (ANDROID)
+
+//from http://gcc.gnu.org/ml/gcc-patches/2008-07/msg00025.html
+
+namespace detail
+{
+
+typedef int (__kernel_cmpxchg_t) (volatile int oldval, volatile int newval, volatile int *ptr);
+
+#define __kernel_cmpxchg (*(detail::__kernel_cmpxchg_t *) 0xffff0fc0)
+
+}
+
+inline int __sync_fetch_and_add (volatile int *ptr, volatile int val)
+{
+  volatile int failure, tmp;
+
+  do
+  {
+    tmp     = *ptr;
+    failure = __kernel_cmpxchg (tmp, tmp + val, ptr);
+  } while (failure);
+
+  return tmp;
+}
+  
+inline int __sync_fetch_and_sub (volatile int *ptr, volatile int val)
+{
+  return __sync_fetch_and_add (ptr, -val);
+}
+  
+inline int __sync_val_compare_and_swap (volatile int *ptr, volatile int oldval, volatile int newval)
+{
+  volatile int actual_oldval, fail;
+    
+  for (;;)
+  {
+    actual_oldval = *ptr;
+
+    if (oldval != actual_oldval)
+      return actual_oldval;
+
+    fail = __kernel_cmpxchg (actual_oldval, newval, ptr);
+
+    if (!fail)
+      return oldval;
+  }
+}
+
+#undef __kernel_cmpxchg
 
 #endif
 
