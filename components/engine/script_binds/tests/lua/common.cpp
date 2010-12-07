@@ -8,15 +8,15 @@ int main ()
   
   try
   {
-    xtl::shared_ptr<Environment> env    (new Environment);
+    Environment env;
     
     Shell shell ("lua", env);
 
     xtl::com_ptr<IInterpreter> script (shell.Interpreter ());        
     
-    env->Library ("global").Register ("typename", make_invoker (&get_typename));
+    env.Library ("global").Register ("typename", make_invoker (&get_typename));
   
-    env->BindLibraries ("Common");    
+    env.BindLibraries ("Common");    
     load_script        (*script, SCRIPT_FILE_NAME);
 
     printf ("Test library:\n");

@@ -55,7 +55,7 @@ axis_aligned_box<T> create_axis_aligned_box
 
 void bind_static_axis_aligned_box_library (Environment& environment)
 {
-  InvokerRegistry& aabox_box_corner_lib = environment.CreateLibrary (BV_STATIC_AXIS_ALIGNED_BOX_CORNER_LIBRARY);
+  InvokerRegistry aabox_box_corner_lib = environment.CreateLibrary (BV_STATIC_AXIS_ALIGNED_BOX_CORNER_LIBRARY);
 
   aabox_box_corner_lib.Register ("get_nxnynz", make_const (box_corner_nxnynz));
   aabox_box_corner_lib.Register ("get_pxnynz", make_const (box_corner_pxnynz));
@@ -73,8 +73,8 @@ void bind_axis_aligned_box_library (Environment& environment)
   typedef axis_aligned_box<T>         box_type;
   typedef typename box_type::vec_type vec_type;  
 
-  InvokerRegistry& lib        = environment.CreateLibrary (BV_AXIS_ALIGNED_BOX_LIBRARY);
-  InvokerRegistry& global_lib = environment.Library ("global");
+  InvokerRegistry lib        = environment.CreateLibrary (BV_AXIS_ALIGNED_BOX_LIBRARY);
+  InvokerRegistry global_lib = environment.Library ("global");
   
     //регистрация функций создания
 

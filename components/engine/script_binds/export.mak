@@ -1,6 +1,7 @@
 # Link script_binds exports
 export.link.engine.script_binds.LIBS    := funner.engine.script_binds
 export.link.engine.script_binds.IMPORTS := link.script.core
+export.link.engine.script_binds.MULTI_IMPORTS := 1
 
 # Link bv exports
 export.link.engine.script_binds.bv.LINK_INCLUDES := BoundVolumesScriptBind
@@ -13,7 +14,7 @@ export.link.engine.script_binds.common.IMPORTS       := link.engine.script_binds
 # Link engine exports
 export.link.engine.script_binds.engine.LINK_INCLUDES := EngineScriptBind
 export.link.engine.script_binds.engine.IMPORTS       := link.engine.script_binds link.engine.core link.scene_graph.core link.render.scene_render \
-                                                        link.input.manager
+                                                        link.input.manager link.render.scene_render
 
 # Link input exports
 export.link.engine.script_binds.input.LINK_INCLUDES := InputScriptBind

@@ -10,15 +10,25 @@ namespace
 */
 
 const char* COMPONENT_NAME = "script.binds.LuaOverride";
+const char* LOG_NAME       = "engine.lua";
 const char* BINDER_NAME    = "LuaOverride";
 
 /*
     Функции
 */
 
+struct LuaLogHolder
+{
+  LuaLogHolder () : log (LOG_NAME) {} 
+
+  common::Log log;
+};
+
+typedef common::Singleton<LuaLogHolder> LuaLogSingleton;
+
 void print_override (const char* message)
 {
-  common::Console::Printf ("%s\n", message);
+  LuaLogSingleton::Instance ()->log.Printf ("%s", message);
 }
 
 void error_override (const char* message)
@@ -147,7 +157,7 @@ class Component
   private:
     static void Bind (Environment& environment)
     {
-      InvokerRegistry& lib = environment.Library ("global");
+      InvokerRegistry lib = environment.Library ("global");
 
         //регистрация операций
 

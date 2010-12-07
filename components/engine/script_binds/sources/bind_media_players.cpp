@@ -34,7 +34,7 @@ Playlist create_playlist ()
 //Регистрация библиотеки работы с плейлистами
 void bind_playlist_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (MEDIA_PLAYLIST_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (MEDIA_PLAYLIST_LIBRARY);
 
     //регистрация функций создания
 
@@ -61,9 +61,9 @@ void bind_playlist_library (Environment& environment)
 //Регистрация статических переменных
 void bind_static_media_player_library (Environment& environment)
 {
-  InvokerRegistry& player_state_lib       = environment.CreateLibrary (MEDIA_STATIC_PLAYER_STATE_LIBRARY);
-  InvokerRegistry& player_repeat_mode_lib = environment.CreateLibrary (MEDIA_STATIC_PLAYER_REPEAT_MODE_LIBRARY);
-  InvokerRegistry& player_event_lib       = environment.CreateLibrary (MEDIA_STATIC_PLAYER_EVENT_LIBRARY);
+  InvokerRegistry player_state_lib       = environment.CreateLibrary (MEDIA_STATIC_PLAYER_STATE_LIBRARY);
+  InvokerRegistry player_repeat_mode_lib = environment.CreateLibrary (MEDIA_STATIC_PLAYER_REPEAT_MODE_LIBRARY);
+  InvokerRegistry player_event_lib       = environment.CreateLibrary (MEDIA_STATIC_PLAYER_EVENT_LIBRARY);
 
   player_state_lib.Register       ("get_Stopped",            make_const (MediaPlayerState_Stopped));
   player_state_lib.Register       ("get_Playing",            make_const (MediaPlayerState_Playing));
@@ -109,7 +109,7 @@ xtl::connection player_register_event_handler (MediaPlayer& player, MediaPlayerE
 //Регистрация библиотеки работы с проигрывателями
 void bind_media_player_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (MEDIA_PLAYER_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (MEDIA_PLAYER_LIBRARY);
 
     //регистрация статических переменных
   bind_static_media_player_library (environment);

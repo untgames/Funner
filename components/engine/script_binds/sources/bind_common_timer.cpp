@@ -33,12 +33,12 @@ namespace engine
 
 void bind_common_timer (script::Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (COMMON_TIMER_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (COMMON_TIMER_LIBRARY);
 
     //регистрация функций создания
 
-  lib.Register ("Create", make_invoker (make_invoker (xtl::implicit_cast<Timer (*)()> (&create_timer)),
-                                        make_invoker (xtl::implicit_cast<Timer (*)(const Timer&)> (&create_timer))
+  lib.Register ("Create", make_invoker (make_invoker (xtl::implicit_cast<Timer (*)(const Timer&)> (&create_timer)),
+                                        make_invoker (xtl::implicit_cast<Timer (*)()> (&create_timer))
                ));
 
     //регистрация операций

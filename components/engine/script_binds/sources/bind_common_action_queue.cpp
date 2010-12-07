@@ -206,7 +206,7 @@ namespace engine
 
 void bind_common_action_queue (script::Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (COMMON_ACTION_QUEUE_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (COMMON_ACTION_QUEUE_LIBRARY);
 
     //регистрация функций создания
 

@@ -92,13 +92,18 @@ template <class T> size_t find_attachment (IStack& stack)
 
 template <class T> void bind_attachment_methods (Environment& environment, const char* suffix)
 {
-  InvokerRegistry& lib = environment.Library (common::format ("%s.%s", ATTACHMENT_REGISTRY_PREFIX, suffix).c_str ());
+  InvokerRegistry lib = environment.Library (common::format ("%s.%s", ATTACHMENT_REGISTRY_PREFIX, suffix).c_str ());
 
   lib.Register ("Register",   make_invoker (&register_attachment<T>));
   lib.Register ("Unregister", make_invoker (&unregister_attachment<T>));
   lib.Register ("IsPresent",  make_invoker (&is_attachment_present<T>));
   lib.Register ("Get",        make_invoker (&get_attachment<T>));
-  lib.Register ("Find",       &find_attachment<T>);
+  
+  typedef size_t (*find_attachment_fn)(IStack&);
+  
+  find_attachment_fn fn = &find_attachment<T>;
+  
+  lib.Register ("Find", fn);
 }
 
 void bind_attachment_registry_library (Environment& environment)
@@ -114,7 +119,7 @@ void bind_attachment_registry_library (Environment& environment)
 
 void bind_subsystem_manager_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.Library (SUBSYSTEM_MANAGER_LIBRARY);
+  InvokerRegistry lib = environment.Library (SUBSYSTEM_MANAGER_LIBRARY);
 
   lib.Register ("Start",   make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Start)));
   lib.Register ("Restart", make_invoker (xtl::implicit_cast<void (SubsystemManager::*) (const char*, const char*)> (&SubsystemManager::Restart)));

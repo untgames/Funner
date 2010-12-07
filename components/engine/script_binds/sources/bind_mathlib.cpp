@@ -549,13 +549,13 @@ void bind_math_library (Environment& environment)
 {
     //создание библиотек
     
-  InvokerRegistry& global_lib = environment.Library ("global");
-  InvokerRegistry& math_lib   = environment.CreateLibrary (MATHLIB_LIBRARY);
-  InvokerRegistry& vec2_lib   = environment.CreateLibrary (MATHLIB_VEC2_LIBRARY);
-  InvokerRegistry& vec3_lib   = environment.CreateLibrary (MATHLIB_VEC3_LIBRARY);
-  InvokerRegistry& vec4_lib   = environment.CreateLibrary (MATHLIB_VEC4_LIBRARY);
-  InvokerRegistry& mat4_lib   = environment.CreateLibrary (MATHLIB_MAT4_LIBRARY);
-  InvokerRegistry& quat_lib   = environment.CreateLibrary (MATHLIB_QUAT_LIBRARY);
+  InvokerRegistry global_lib = environment.Library ("global");
+  InvokerRegistry math_lib   = environment.CreateLibrary (MATHLIB_LIBRARY);
+  InvokerRegistry vec2_lib   = environment.CreateLibrary (MATHLIB_VEC2_LIBRARY);
+  InvokerRegistry vec3_lib   = environment.CreateLibrary (MATHLIB_VEC3_LIBRARY);
+  InvokerRegistry vec4_lib   = environment.CreateLibrary (MATHLIB_VEC4_LIBRARY);
+  InvokerRegistry mat4_lib   = environment.CreateLibrary (MATHLIB_MAT4_LIBRARY);
+  InvokerRegistry quat_lib   = environment.CreateLibrary (MATHLIB_QUAT_LIBRARY);
   
     //регистрация библиотек
   

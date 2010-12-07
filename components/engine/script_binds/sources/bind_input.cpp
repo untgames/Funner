@@ -28,7 +28,7 @@ Cursor create_cursor ()
 
 void bind_cursor_library (Environment& environment)
 {
-  InvokerRegistry& lib = environment.CreateLibrary (CURSOR_LIBRARY);
+  InvokerRegistry lib = environment.CreateLibrary (CURSOR_LIBRARY);
 
   lib.Register ("Create",       make_invoker (&create_cursor));
   lib.Register ("get_Position", make_invoker (&Cursor::Position));
@@ -36,6 +36,8 @@ void bind_cursor_library (Environment& environment)
   lib.Register ("SetPosition",  make_invoker (xtl::implicit_cast<void (Cursor::*)(float, float)> (&Cursor::SetPosition)));
   lib.Register ("get_Visible",  make_invoker (&Cursor::IsVisible));
   lib.Register ("set_Visible",  make_invoker (&Cursor::SetVisible));
+  lib.Register ("get_Image",    make_invoker (&Cursor::Image));
+  lib.Register ("set_Image",    make_invoker (&Cursor::SetImage));
   lib.Register ("Show",         make_invoker (&Cursor::Show));
   lib.Register ("Hide",         make_invoker (&Cursor::Hide));
 
@@ -44,7 +46,7 @@ void bind_cursor_library (Environment& environment)
 
 void bind_input_globals (Environment& environment)
 {
-  InvokerRegistry& lib = environment.Library (INPUT_LIBRARY);
+  InvokerRegistry lib = environment.Library (INPUT_LIBRARY);
 
   lib.Register ("CreateEventHandler", make_invoker (make_callback_invoker<void (const char*)> (),
                                                     make_shell_callback_invoker ()));

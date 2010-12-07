@@ -15,13 +15,13 @@ int main ()
 
   try
   {
-    xtl::shared_ptr<Environment> env (new Environment);
+    Environment env;
 
     Shell shell ("lua", env);
 
     xtl::com_ptr<IInterpreter> script (shell.Interpreter ());
 
-    env->BindLibraries ("ResourceManager");
+    env.BindLibraries ("ResourceManager");
 
     load_script (*script, SCRIPT_FILE_NAME);
 
