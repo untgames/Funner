@@ -1,0 +1,602 @@
+Results of xfl_converter_test2
+Processing textures...
+  crop layer '/mount_points/animation.xfl/LIBRARY/piece_09-hall.psd/1.png' 63x97: (0, 0)-(63, 97)
+  crop layer '/mount_points/animation.xfl/LIBRARY/piece_08-hall.psd/1.png' 72x55: (1, 0)-(71, 55)
+  crop layer '/mount_points/animation.xfl/LIBRARY/piece_07-hall.psd/1.png' 59x73: (0, 1)-(59, 73)
+  crop layer '/mount_points/animation.xfl/LIBRARY/piece_06-hall.psd/1.png' 15x51: (0, 0)-(15, 50)
+  crop layer '/mount_points/animation.xfl/LIBRARY/piece_05-hall.psd/1.png' 86x172: (0, 0)-(86, 172)
+  crop layer '/mount_points/animation.xfl/LIBRARY/piece_04-hall.psd/1.png' 61x66: (0, 1)-(60, 66)
+  crop layer '/mount_points/animation.xfl/LIBRARY/piece_03-hall.psd/1.png' 75x92: (0, 0)-(75, 92)
+  crop layer '/mount_points/animation.xfl/LIBRARY/piece_02-hall.psd/1.png' 99x109: (0, 0)-(81, 95)
+  crop layer '/mount_points/animation.xfl/LIBRARY/piece_01-hall.psd/1.png' 105x63: (0, 8)-(103, 63)
+Processing scene...
+<?xml version="1.0" encoding="utf-8"?>
+<AnimationScreenPart>
+  <Sprite Name="vase_pieces.piece_09.Layer 1" Material="piece_09-hall.psd/1.png" Parent="vase_pieces.piece_09" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="piece_09-hall.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="63; 97"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="31.500; 48.500"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_09" Material="transparent" Active="false" Z="0" PivotPosition="31.500;48.500" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="283.000; 217.000"/>
+      <Key Time="0.04" Value="280.267; 214.735"/>
+      <Key Time="0.08" Value="277.826; 218.172"/>
+      <Key Time="0.12" Value="276.000; 222.000"/>
+      <Key Time="0.16" Value="268.445; 226.404"/>
+      <Key Time="0.2" Value="260.392; 230.142"/>
+      <Key Time="0.24" Value="254.300; 236.375"/>
+      <Key Time="0.28" Value="250.104; 242.620"/>
+      <Key Time="0.32" Value="245.270; 248.428"/>
+      <Key Time="0.36" Value="242.319; 255.296"/>
+      <Key Time="0.4" Value="241.305; 262.756"/>
+      <Key Time="0.44" Value="240.488; 270.240"/>
+      <Key Time="0.48" Value="240.850; 277.740"/>
+      <Key Time="0.52" Value="242.794; 285.201"/>
+      <Key Time="0.56" Value="245.340; 292.483"/>
+      <Key Time="0.6" Value="246.500; 300.000"/>
+      <Key Time="0.64" Value="242.558; 306.528"/>
+      <Key Time="0.68" Value="237.937; 312.615"/>
+      <Key Time="0.72" Value="233.725; 318.987"/>
+      <Key Time="0.76" Value="231.136; 324.590"/>
+      <Key Time="0.8" Value="229.177; 330.440"/>
+      <Key Time="0.84" Value="228.000; 336.500"/>
+      <Key Time="0.88" Value="227.237; 336.868"/>
+      <Key Time="0.92" Value="226.313; 336.816"/>
+      <Key Time="0.96" Value="225.409; 336.679"/>
+      <Key Time="1" Value="224.500; 336.500"/>
+      <Key Time="1.04" Value="224.333; 336.500"/>
+      <Key Time="1.08" Value="224.166; 336.500"/>
+      <Key Time="1.12" Value="224.000; 336.500"/>
+      <Key Time="1.16" Value="223.834; 336.500"/>
+      <Key Time="1.2" Value="223.667; 336.500"/>
+      <Key Time="1.24" Value="223.500; 336.500"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+      <Key Time="0.04" Value="4.69553"/>
+      <Key Time="0.08" Value="9.39107"/>
+      <Key Time="0.12" Value="14.0866"/>
+      <Key Time="0.16" Value="23.8366"/>
+      <Key Time="0.2" Value="33.5866"/>
+      <Key Time="0.24" Value="43.3366"/>
+      <Key Time="0.28" Value="53.0866"/>
+      <Key Time="0.32" Value="62.8366"/>
+      <Key Time="0.36" Value="72.5866"/>
+      <Key Time="0.4" Value="82.3366"/>
+      <Key Time="0.44" Value="92.0866"/>
+      <Key Time="0.48" Value="101.837"/>
+      <Key Time="0.52" Value="111.587"/>
+      <Key Time="0.56" Value="121.337"/>
+      <Key Time="0.6" Value="131.087"/>
+      <Key Time="0.64" Value="134.253"/>
+      <Key Time="0.68" Value="137.42"/>
+      <Key Time="0.72" Value="140.587"/>
+      <Key Time="0.76" Value="143.753"/>
+      <Key Time="0.8" Value="146.92"/>
+      <Key Time="0.84" Value="150.087"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_09.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_08.Layer 1" Material="piece_08-hall.psd/1.png" Parent="vase_pieces.piece_08" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="piece_08-hall.psd/1.png" Active="false" PivotPosition="-0.014;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="70; 55"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="36.000; 27.500"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_08" Material="transparent" Active="false" Z="0" PivotPosition="36.000;27.500" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="267.000; 189.000"/>
+      <Key Time="0.04" Value="264.073; 190.991"/>
+      <Key Time="0.08" Value="260.919; 192.584"/>
+      <Key Time="0.12" Value="257.500; 193.500"/>
+      <Key Time="0.16" Value="247.551; 186.344"/>
+      <Key Time="0.2" Value="236.650; 183.420"/>
+      <Key Time="0.24" Value="232.500; 195.000"/>
+      <Key Time="0.28" Value="231.466; 206.298"/>
+      <Key Time="0.32" Value="230.988; 217.618"/>
+      <Key Time="0.36" Value="230.751; 228.962"/>
+      <Key Time="0.4" Value="230.657; 240.291"/>
+      <Key Time="0.44" Value="230.660; 251.632"/>
+      <Key Time="0.48" Value="230.732; 262.968"/>
+      <Key Time="0.52" Value="230.857; 274.306"/>
+      <Key Time="0.56" Value="231.023; 285.643"/>
+      <Key Time="0.6" Value="231.221; 296.980"/>
+      <Key Time="0.64" Value="231.442; 308.314"/>
+      <Key Time="0.68" Value="231.680; 319.652"/>
+      <Key Time="0.72" Value="231.924; 330.982"/>
+      <Key Time="0.76" Value="232.165; 342.322"/>
+      <Key Time="0.8" Value="232.380; 353.654"/>
+      <Key Time="0.84" Value="232.500; 365.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+      <Key Time="0.04" Value="1.33333"/>
+      <Key Time="0.08" Value="2.66667"/>
+      <Key Time="0.12" Value="4"/>
+      <Key Time="0.16" Value="-6.66667"/>
+      <Key Time="0.2" Value="-17.3333"/>
+      <Key Time="0.24" Value="-28"/>
+      <Key Time="0.28" Value="-37.6"/>
+      <Key Time="0.32" Value="-47.2"/>
+      <Key Time="0.36" Value="-56.8"/>
+      <Key Time="0.4" Value="-66.4"/>
+      <Key Time="0.44" Value="-76"/>
+      <Key Time="0.48" Value="-85.6"/>
+      <Key Time="0.52" Value="-95.2"/>
+      <Key Time="0.56" Value="-104.8"/>
+      <Key Time="0.6" Value="-114.4"/>
+      <Key Time="0.64" Value="-124"/>
+      <Key Time="0.68" Value="-133.6"/>
+      <Key Time="0.72" Value="-143.2"/>
+      <Key Time="0.76" Value="-152.8"/>
+      <Key Time="0.8" Value="-162.4"/>
+      <Key Time="0.84" Value="-172"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_08.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_07.Layer 1" Material="piece_07-hall.psd/1.png" Parent="vase_pieces.piece_07" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="piece_07-hall.psd/1.png" Active="false" PivotPosition="0.000;-0.014">
+    <Track Name="size">
+      <Key Time="0" Value="59; 72"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="29.500; 37.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_07" Material="transparent" Active="false" Z="0" PivotPosition="29.500;36.500" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="313.000; 227.000"/>
+      <Key Time="0.04" Value="313.835; 219.847"/>
+      <Key Time="0.08" Value="314.837; 221.781"/>
+      <Key Time="0.12" Value="315.000; 229.000"/>
+      <Key Time="0.16" Value="315.105; 244.003"/>
+      <Key Time="0.2" Value="315.140; 259.008"/>
+      <Key Time="0.24" Value="315.148; 274.001"/>
+      <Key Time="0.28" Value="315.141; 289.000"/>
+      <Key Time="0.32" Value="315.125; 304.000"/>
+      <Key Time="0.36" Value="315.102; 319.000"/>
+      <Key Time="0.4" Value="315.075; 333.997"/>
+      <Key Time="0.44" Value="315.046; 348.994"/>
+      <Key Time="0.48" Value="315.018; 363.999"/>
+      <Key Time="0.52" Value="315.000; 379.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+      <Key Time="0.04" Value="-1"/>
+      <Key Time="0.08" Value="-2"/>
+      <Key Time="0.12" Value="-3"/>
+      <Key Time="0.16" Value="-6.7"/>
+      <Key Time="0.2" Value="-10.4"/>
+      <Key Time="0.24" Value="-14.1"/>
+      <Key Time="0.28" Value="-17.8"/>
+      <Key Time="0.32" Value="-21.5"/>
+      <Key Time="0.36" Value="-25.2"/>
+      <Key Time="0.4" Value="-28.9"/>
+      <Key Time="0.44" Value="-32.6"/>
+      <Key Time="0.48" Value="-36.3"/>
+      <Key Time="0.52" Value="-40"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_07.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_06.Layer 1" Material="piece_06-hall.psd/1.png" Parent="vase_pieces.piece_06" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="piece_06-hall.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="15; 50"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="7.500; 25.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_06" Material="transparent" Active="false" Z="0" PivotPosition="7.500;25.500" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="366.000; 226.000"/>
+      <Key Time="0.04" Value="370.818; 223.772"/>
+      <Key Time="0.08" Value="373.311; 228.482"/>
+      <Key Time="0.12" Value="374.000; 234.000"/>
+      <Key Time="0.16" Value="374.418; 245.050"/>
+      <Key Time="0.2" Value="374.509; 256.111"/>
+      <Key Time="0.24" Value="374.478; 267.163"/>
+      <Key Time="0.28" Value="374.384; 278.224"/>
+      <Key Time="0.32" Value="374.260; 289.273"/>
+      <Key Time="0.36" Value="374.127; 300.328"/>
+      <Key Time="0.4" Value="374.008; 311.384"/>
+      <Key Time="0.44" Value="373.937; 322.442"/>
+      <Key Time="0.48" Value="374.000; 333.500"/>
+      <Key Time="0.52" Value="374.257; 342.525"/>
+      <Key Time="0.56" Value="374.741; 351.541"/>
+      <Key Time="0.6" Value="375.537; 360.527"/>
+      <Key Time="0.64" Value="376.500; 369.500"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+      <Key Time="0.04" Value="-3.33333"/>
+      <Key Time="0.08" Value="-6.66667"/>
+      <Key Time="0.12" Value="-10"/>
+      <Key Time="0.16" Value="-17.6667"/>
+      <Key Time="0.2" Value="-25.3333"/>
+      <Key Time="0.24" Value="-33"/>
+      <Key Time="0.28" Value="-40.6667"/>
+      <Key Time="0.32" Value="-48.3333"/>
+      <Key Time="0.36" Value="-56"/>
+      <Key Time="0.4" Value="-63.6667"/>
+      <Key Time="0.44" Value="-71.3333"/>
+      <Key Time="0.48" Value="-79"/>
+      <Key Time="0.52" Value="-99"/>
+      <Key Time="0.56" Value="-119"/>
+      <Key Time="0.6" Value="-139"/>
+      <Key Time="0.64" Value="-159"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_06.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_05.Layer 1" Material="piece_05-hall.psd/1.png" Parent="vase_pieces.piece_05" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="piece_05-hall.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="86; 172"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="43.000; 86.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_05" Material="transparent" Active="false" Z="0" PivotPosition="43.000;86.000" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="291.000; 255.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_05.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_04.Layer 1" Material="piece_04-hall.psd/1.png" Parent="vase_pieces.piece_04" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="piece_04-hall.psd/1.png" Active="false" PivotPosition="0.000;-0.015">
+    <Track Name="size">
+      <Key Time="0" Value="60; 65"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="30.000; 33.500"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_04" Material="transparent" Active="false" Z="0" PivotPosition="30.500;33.000" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="333.000; 178.000"/>
+      <Key Time="0.04" Value="334.668; 177.992"/>
+      <Key Time="0.08" Value="336.332; 177.982"/>
+      <Key Time="0.12" Value="338.000; 178.000"/>
+      <Key Time="0.16" Value="339.600; 190.705"/>
+      <Key Time="0.2" Value="341.044; 203.411"/>
+      <Key Time="0.24" Value="342.430; 216.136"/>
+      <Key Time="0.28" Value="343.785; 228.851"/>
+      <Key Time="0.32" Value="345.126; 241.576"/>
+      <Key Time="0.36" Value="346.458; 254.300"/>
+      <Key Time="0.4" Value="347.791; 267.025"/>
+      <Key Time="0.44" Value="349.128; 279.750"/>
+      <Key Time="0.48" Value="350.477; 292.472"/>
+      <Key Time="0.52" Value="351.846; 305.193"/>
+      <Key Time="0.56" Value="353.246; 317.909"/>
+      <Key Time="0.6" Value="354.695; 330.620"/>
+      <Key Time="0.64" Value="356.234; 343.320"/>
+      <Key Time="0.68" Value="358.000; 356.000"/>
+      <Key Time="0.72" Value="359.629; 355.996"/>
+      <Key Time="0.76" Value="361.251; 355.995"/>
+      <Key Time="0.8" Value="362.879; 355.998"/>
+      <Key Time="0.84" Value="364.500; 356.000"/>
+      <Key Time="0.88" Value="365.100; 356.000"/>
+      <Key Time="0.92" Value="365.699; 356.000"/>
+      <Key Time="0.96" Value="366.299; 356.000"/>
+      <Key Time="1" Value="366.900; 356.000"/>
+      <Key Time="1.04" Value="367.500; 356.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+      <Key Time="0.04" Value="-2.78953"/>
+      <Key Time="0.08" Value="-5.57905"/>
+      <Key Time="0.12" Value="-8.36858"/>
+      <Key Time="0.16" Value="-9.36858"/>
+      <Key Time="0.2" Value="-10.3686"/>
+      <Key Time="0.24" Value="-11.3686"/>
+      <Key Time="0.28" Value="-12.3686"/>
+      <Key Time="0.32" Value="-13.3686"/>
+      <Key Time="0.36" Value="-14.3686"/>
+      <Key Time="0.4" Value="-15.3686"/>
+      <Key Time="0.44" Value="-16.3686"/>
+      <Key Time="0.48" Value="-17.3686"/>
+      <Key Time="0.52" Value="-18.3686"/>
+      <Key Time="0.56" Value="-19.3686"/>
+      <Key Time="0.6" Value="-20.3686"/>
+      <Key Time="0.64" Value="-21.3686"/>
+      <Key Time="0.68" Value="-22.3686"/>
+      <Key Time="0.72" Value="-23.3686"/>
+      <Key Time="0.76" Value="-24.3686"/>
+      <Key Time="0.8" Value="-25.3686"/>
+      <Key Time="0.84" Value="-26.3686"/>
+      <Key Time="0.88" Value="-26.1686"/>
+      <Key Time="0.92" Value="-25.9686"/>
+      <Key Time="0.96" Value="-25.7686"/>
+      <Key Time="1" Value="-25.5686"/>
+      <Key Time="1.04" Value="-25.3686"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_04.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_03.Layer 1" Material="piece_03-hall.psd/1.png" Parent="vase_pieces.piece_03" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="piece_03-hall.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="75; 92"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="37.500; 46.000"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_03" Material="transparent" Active="false" Z="0" PivotPosition="37.500;46.000" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="263.000; 132.000"/>
+      <Key Time="0.04" Value="261.861; 127.082"/>
+      <Key Time="0.08" Value="259.847; 127.983"/>
+      <Key Time="0.12" Value="259.000; 133.000"/>
+      <Key Time="0.16" Value="257.387; 141.335"/>
+      <Key Time="0.2" Value="255.500; 149.616"/>
+      <Key Time="0.24" Value="253.597; 157.884"/>
+      <Key Time="0.28" Value="251.757; 166.176"/>
+      <Key Time="0.32" Value="250.037; 174.485"/>
+      <Key Time="0.36" Value="248.486; 182.833"/>
+      <Key Time="0.4" Value="247.168; 191.223"/>
+      <Key Time="0.44" Value="246.170; 199.648"/>
+      <Key Time="0.48" Value="236.991; 208.034"/>
+      <Key Time="0.52" Value="226.688; 217.934"/>
+      <Key Time="0.56" Value="218.620; 229.925"/>
+      <Key Time="0.6" Value="218.000; 238.000"/>
+      <Key Time="0.64" Value="214.009; 253.151"/>
+      <Key Time="0.68" Value="208.682; 267.910"/>
+      <Key Time="0.72" Value="202.949; 282.509"/>
+      <Key Time="0.76" Value="197.005; 297.017"/>
+      <Key Time="0.8" Value="190.937; 311.485"/>
+      <Key Time="0.84" Value="185.000; 326.000"/>
+      <Key Time="0.88" Value="182.359; 327.785"/>
+      <Key Time="0.92" Value="179.318; 328.999"/>
+      <Key Time="0.96" Value="176.243; 330.074"/>
+      <Key Time="1" Value="173.141; 331.073"/>
+      <Key Time="1.04" Value="170.000; 332.000"/>
+      <Key Time="1.08" Value="168.998; 332.000"/>
+      <Key Time="1.12" Value="168.001; 332.000"/>
+      <Key Time="1.16" Value="167.000; 332.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+      <Key Time="0.04" Value="-0.333333"/>
+      <Key Time="0.08" Value="-0.666667"/>
+      <Key Time="0.12" Value="-1"/>
+      <Key Time="0.16" Value="-1.33333"/>
+      <Key Time="0.2" Value="-1.66667"/>
+      <Key Time="0.24" Value="-2"/>
+      <Key Time="0.28" Value="-2.33333"/>
+      <Key Time="0.32" Value="-2.66667"/>
+      <Key Time="0.36" Value="-3"/>
+      <Key Time="0.4" Value="-3.33333"/>
+      <Key Time="0.44" Value="-3.66667"/>
+      <Key Time="0.48" Value="-4"/>
+      <Key Time="0.52" Value="-10"/>
+      <Key Time="0.56" Value="-19"/>
+      <Key Time="0.6" Value="-24"/>
+      <Key Time="0.64" Value="-27.6667"/>
+      <Key Time="0.68" Value="-31.3333"/>
+      <Key Time="0.72" Value="-35"/>
+      <Key Time="0.76" Value="-38.6667"/>
+      <Key Time="0.8" Value="-42.3333"/>
+      <Key Time="0.84" Value="-46"/>
+      <Key Time="0.88" Value="-42.6"/>
+      <Key Time="0.92" Value="-39.2"/>
+      <Key Time="0.96" Value="-35.8"/>
+      <Key Time="1" Value="-32.4"/>
+      <Key Time="1.04" Value="-29"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_03.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_02.Layer 1" Material="piece_02-hall.psd/1.png" Parent="vase_pieces.piece_02" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="piece_02-hall.psd/1.png" Active="false" PivotPosition="0.000;0.000">
+    <Track Name="size">
+      <Key Time="0" Value="81; 95"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="40.500; 47.500"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_02" Material="transparent" Active="false" Z="0" PivotPosition="49.500;54.500" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="317.000; 100.000"/>
+      <Key Time="0.04" Value="318.230; 96.871"/>
+      <Key Time="0.08" Value="319.930; 97.650"/>
+      <Key Time="0.12" Value="320.500; 101.000"/>
+      <Key Time="0.16" Value="322.432; 111.794"/>
+      <Key Time="0.2" Value="324.444; 122.574"/>
+      <Key Time="0.24" Value="326.157; 133.406"/>
+      <Key Time="0.28" Value="327.321; 144.306"/>
+      <Key Time="0.32" Value="327.499; 155.261"/>
+      <Key Time="0.36" Value="325.500; 166.000"/>
+      <Key Time="0.4" Value="318.585; 176.257"/>
+      <Key Time="0.44" Value="310.876; 185.953"/>
+      <Key Time="0.48" Value="302.956; 195.462"/>
+      <Key Time="0.52" Value="294.867; 204.866"/>
+      <Key Time="0.56" Value="286.500; 214.000"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+      <Key Time="0.04" Value="0.666667"/>
+      <Key Time="0.08" Value="1.33333"/>
+      <Key Time="0.12" Value="2"/>
+      <Key Time="0.16" Value="1.5"/>
+      <Key Time="0.2" Value="1"/>
+      <Key Time="0.24" Value="0.5"/>
+      <Key Time="0.28" Value="-0"/>
+      <Key Time="0.32" Value="-0.5"/>
+      <Key Time="0.36" Value="-1"/>
+      <Key Time="0.4" Value="3.6"/>
+      <Key Time="0.44" Value="8.2"/>
+      <Key Time="0.48" Value="12.8"/>
+      <Key Time="0.52" Value="17.4"/>
+      <Key Time="0.56" Value="22"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_02.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_01.Layer 1" Material="piece_01-hall.psd/1.png" Parent="vase_pieces.piece_01" ScaleInherit="true" OrientationInherit="true" PositionSpace="local" ScaleSpace="local" OrientationSpace="local" BindSpace="parent" ScalePivotEnabled="false" OrientationPivotEnabled="true" Layout="piece_01-hall.psd/1.png" Active="false" PivotPosition="0.000;-0.145">
+    <Track Name="size">
+      <Key Time="0" Value="103; 55"/>
+    </Track>
+    <Track Name="position">
+      <Key Time="0" Value="51.500; 35.500"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces.piece_01" Material="transparent" Active="false" Z="0" PivotPosition="52.500;31.500" ScalePivotEnabled="true" OrientationPivotEnabled="true">
+    <Track Name="position">
+      <Key Time="0" Value="263.000; 81.000"/>
+      <Key Time="0.04" Value="262.420; 81.792"/>
+      <Key Time="0.08" Value="261.906; 82.618"/>
+      <Key Time="0.12" Value="261.500; 83.500"/>
+      <Key Time="0.16" Value="261.440; 99.562"/>
+      <Key Time="0.2" Value="261.412; 115.625"/>
+      <Key Time="0.24" Value="261.397; 131.687"/>
+      <Key Time="0.28" Value="261.390; 147.750"/>
+      <Key Time="0.32" Value="261.389; 163.815"/>
+      <Key Time="0.36" Value="261.392; 179.876"/>
+      <Key Time="0.4" Value="261.398; 195.938"/>
+      <Key Time="0.44" Value="261.406; 212.000"/>
+      <Key Time="0.48" Value="261.416; 228.062"/>
+      <Key Time="0.52" Value="261.428; 244.124"/>
+      <Key Time="0.56" Value="261.441; 260.183"/>
+      <Key Time="0.6" Value="261.454; 276.250"/>
+      <Key Time="0.64" Value="261.468; 292.300"/>
+      <Key Time="0.68" Value="261.482; 308.373"/>
+      <Key Time="0.72" Value="261.493; 324.426"/>
+      <Key Time="0.76" Value="261.500; 340.500"/>
+    </Track>
+    <Track Name="scale">
+      <Key Time="0" Value="1.000; 1.000"/>
+    </Track>
+    <Track Name="angle">
+      <Key Time="0" Value="-0"/>
+      <Key Time="0.04" Value="-1.50522"/>
+      <Key Time="0.08" Value="-3.01044"/>
+      <Key Time="0.12" Value="-4.51566"/>
+    </Track>
+    <Track Name="alpha">
+      <Key Time="0" Value="1"/>
+    </Track>
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_01.Layer 1')"/>
+    </Track>
+  </Sprite>
+  <Sprite Name="vase_pieces" Material="transparent" Active="false" Z="0">
+    <Track Name="size">
+      <Key Time="0" Value="1; 1"/>
+    </Track>
+    <Track Name="events">
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_09')"/>
+      <Key Time="2" Event="DeactivateSprite ('vase_pieces.piece_09')"/>
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_08')"/>
+      <Key Time="2" Event="DeactivateSprite ('vase_pieces.piece_08')"/>
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_07')"/>
+      <Key Time="2" Event="DeactivateSprite ('vase_pieces.piece_07')"/>
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_06')"/>
+      <Key Time="2" Event="DeactivateSprite ('vase_pieces.piece_06')"/>
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_05')"/>
+      <Key Time="2" Event="DeactivateSprite ('vase_pieces.piece_05')"/>
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_04')"/>
+      <Key Time="2" Event="DeactivateSprite ('vase_pieces.piece_04')"/>
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_03')"/>
+      <Key Time="2" Event="DeactivateSprite ('vase_pieces.piece_03')"/>
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_02')"/>
+      <Key Time="2" Event="DeactivateSprite ('vase_pieces.piece_02')"/>
+      <Key Time="0" Event="ActivateSprite ('vase_pieces.piece_01')"/>
+      <Key Time="2" Event="DeactivateSprite ('vase_pieces.piece_01')"/>
+      <Key Time="2" Event="DeactivateSprite (sprite)"/>
+    </Track>
+  </Sprite>
+</AnimationScreenPart>
