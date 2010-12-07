@@ -10,6 +10,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.util.*;
+import java.io.*;
 
 /**
  * This class provides a basic demonstration of how to write an Android
@@ -24,8 +25,24 @@ public class SkeletonActivity extends Activity {
     private EditText mEditor;
     
     public SkeletonActivity() {
-      Log.v("SkeletonActivity", "Hello world!");
+        System.out.println ("Hello world");
+        Process.killProcess (Process.myPid ());
     }
+    
+    @Override  
+        protected void onStop() {  
+            // TODO Auto-generated method stub  
+            super.onStop();  
+            this.finish();  
+        }      
+        
+        protected void onPause() {  
+            // TODO Auto-generated method stub  
+            super.onPause();  
+            
+            this.finish();  
+        }      
+        
 
     /** Called with the activity is first created. */
     @Override
