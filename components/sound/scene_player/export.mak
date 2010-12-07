@@ -5,3 +5,5 @@ export.compile.sound.scene_player.IMPORTS      := compile.scene_graph.core compi
 # Link exports
 export.link.sound.scene_player.LIBS    := funner.sound.scene_player
 export.link.sound.scene_player.IMPORTS := link.sound.manager link.system link.scene_graph.core
+
+export.info.sound.scene_player.CHMS := funner.sound.scene_player

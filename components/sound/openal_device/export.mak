@@ -6,4 +6,3 @@ export.link.sound.low_level.openal_driver.IMPORTS        := link.sound.low_level
 # Run exports
 export.run.sound.low_level.openal_driver.DLLS :=
 export.run.sound.low_level.openal_driver.IMPORTS := run.extern.openal
-
