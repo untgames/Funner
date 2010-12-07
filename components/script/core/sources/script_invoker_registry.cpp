@@ -2,12 +2,18 @@
 
 using namespace script;
 
+namespace
+{
+
+/*
+    Константы
+*/
+
+const bool DEFAULT_AUTO_OVERLOADS_MODE = false; //по умолчанию автоматические перегрузки отключены
+
 /*
     Именованный шлюз
 */
-
-namespace
-{
 
 struct NamedInvoker
 {
@@ -26,14 +32,32 @@ struct NamedInvoker
 typedef stl::hash_map<stl::hash_key<const char*>, NamedInvoker>         InvokerMap;
 typedef xtl::signal<void (InvokerRegistryEvent, const char*, Invoker&)> RegistrySignal;
 
-struct InvokerRegistry::Impl
+struct InvokerRegistry::Impl: public xtl::reference_counter
 {
   InvokerMap     invokers;                            //карта шлюзов
   RegistrySignal handlers [InvokerRegistryEvent_Num]; //обработчики событий
+  bool           auto_overloads_mode;                 //режим автоматических перегрузок
   
-  Impl () {}
-  Impl (const Impl& impl) : invokers (impl.invokers) {}
+  Impl () : auto_overloads_mode (DEFAULT_AUTO_OVERLOADS_MODE) {}
+  Impl (const Impl& impl) : invokers (impl.invokers), auto_overloads_mode (impl.auto_overloads_mode) {}
   
+  ~Impl ()
+  {
+    Clear ();
+  }
+  
+  void Clear ()
+  {
+      //оповещение об удалении шлюзов
+      
+    for (InvokerMap::iterator iter = invokers.begin (), end = invokers.end (); iter != end; ++iter)
+      Notify (InvokerRegistryEvent_OnUnregisterInvoker, iter->second.name.c_str (), iter->second.invoker);
+      
+      //удаление шлюзов
+      
+    invokers.clear ();
+  }
+
   void Notify (InvokerRegistryEvent event_id, const char* invoker_name, Invoker& invoker)
   {
     if (!handlers [event_id])
@@ -59,13 +83,46 @@ InvokerRegistry::InvokerRegistry ()
 {  
 }
 
+InvokerRegistry::InvokerRegistry (Impl* in_impl)
+  : impl (in_impl)
+{
+}
+
 InvokerRegistry::InvokerRegistry  (const InvokerRegistry& registry)
-  : impl (new Impl (*registry.impl))
-  {}
+  : impl (registry.impl)
+{
+  addref (impl);
+}
 
 InvokerRegistry::~InvokerRegistry ()
 {
-  Clear ();  
+  release (impl);
+}
+
+/*
+    Клонирование
+*/
+
+InvokerRegistry InvokerRegistry::Clone () const
+{
+  try
+  {
+    return InvokerRegistry (new Impl (*impl));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("script::InvokerRegistry::Clone");
+    throw;
+  }
+}
+
+/*
+    Идентификатор
+*/
+
+size_t InvokerRegistry::Id () const
+{
+  return reinterpret_cast<size_t> (impl);
 }
 
 /*
@@ -77,6 +134,20 @@ InvokerRegistry& InvokerRegistry::operator = (const InvokerRegistry& registry)
   InvokerMap (registry.impl->invokers).swap (impl->invokers);
 
   return *this;
+}
+
+/*
+    Режим автоматических перегрузок
+*/
+
+void InvokerRegistry::SetAutoOverloadsMode (bool state)
+{
+  impl->auto_overloads_mode = state;
+}
+
+bool InvokerRegistry::AutoOverloadsMode () const
+{
+  return impl->auto_overloads_mode;
 }
 
 /*
@@ -140,11 +211,32 @@ void InvokerRegistry::Register (const char* name, const Invoker& invoker)
   if (!name)
     throw xtl::make_null_argument_exception ("script::InvokerRegistry::Register", "name");
     
-  Unregister (name);
-
-  stl::pair<InvokerMap::iterator, bool> insert_result = impl->invokers.insert_pair (name, NamedInvoker (name, invoker));
+  InvokerMap::iterator iter = impl->invokers.find (name);
   
-  impl->Notify (InvokerRegistryEvent_OnRegisterInvoker, name, insert_result.first->second.invoker);
+  if (iter == impl->invokers.end ())
+  {
+    stl::pair<InvokerMap::iterator, bool> insert_result = impl->invokers.insert_pair (name, NamedInvoker (name, invoker));
+  
+    impl->Notify (InvokerRegistryEvent_OnRegisterInvoker, name, insert_result.first->second.invoker);
+  }
+  else
+  {
+    if (impl->auto_overloads_mode)
+    {    
+      iter->second.invoker.AddOverloads (invoker);
+    
+      impl->Notify (InvokerRegistryEvent_OnUnregisterInvoker, name, iter->second.invoker);
+      impl->Notify (InvokerRegistryEvent_OnRegisterInvoker, name, iter->second.invoker);          
+    }
+    else
+    {
+      Unregister (name);
+      
+      stl::pair<InvokerMap::iterator, bool> insert_result = impl->invokers.insert_pair (name, NamedInvoker (name, invoker));
+  
+      impl->Notify (InvokerRegistryEvent_OnRegisterInvoker, name, insert_result.first->second.invoker);      
+    }
+  }
 }
 
 void InvokerRegistry::Register (const char* name, const InvokerRegistry& source_registry, const char* source_name)
@@ -215,14 +307,7 @@ void InvokerRegistry::Unregister (const char* name)
 
 void InvokerRegistry::Clear ()
 {
-    //оповещение об удалении шлюзов
-    
-  for (InvokerMap::iterator iter = impl->invokers.begin (), end = impl->invokers.end (); iter != end; ++iter)
-    impl->Notify (InvokerRegistryEvent_OnUnregisterInvoker, iter->second.name.c_str (), iter->second.invoker);
-    
-    //удаление шлюзов
-    
-  impl->invokers.clear ();
+  impl->Clear ();
 }
 
 /*
@@ -243,7 +328,7 @@ xtl::connection InvokerRegistry::RegisterEventHandler (InvokerRegistryEvent even
 
 void InvokerRegistry::Swap (InvokerRegistry& registry)
 {
-  impl.swap (registry.impl);
+  stl::swap (impl, registry.impl);
 }
 
 namespace script

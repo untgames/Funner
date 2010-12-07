@@ -60,7 +60,7 @@ int main (int, char** argv)
     
     printf ("Copy registry:\n");
     
-    registry1 = registry;    
+    registry1 = registry.Clone (); 
     
     printf ("Unregister invoker 'f1' from registry1:\n");
 

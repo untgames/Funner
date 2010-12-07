@@ -44,7 +44,7 @@ int error_handler (lua_State* state)
      онструктор / деструктор
 */
 
-Interpreter::Interpreter (const EnvironmentPointer& in_environment)
+Interpreter::Interpreter (const script::Environment& in_environment)
   : environment (in_environment),
     symbol_registry (State ()),
     stack (state, *this)
@@ -69,20 +69,29 @@ Interpreter::Interpreter (const EnvironmentPointer& in_environment)
   };
 
   luaL_newmetatable (state, VARIANT_DEFAULT_TYPE_NAME);
-  luaI_openlib      (state, 0, user_data_meta_table, 0);
+
+#ifdef LUAJIT    
+    //restore default float precision for luajit
+
+  _clearfp   ();
+  _control87 (_RC_NEAR + _PC_53 + _EM_INVALID + _EM_ZERODIVIDE + _EM_OVERFLOW + _EM_UNDERFLOW + _EM_INEXACT + _EM_DENORMAL, 0xfffff);
+  
+#endif
+
+  luaL_openlib (state, 0, user_data_meta_table, 0);
 
     //регистраци€ обработчиков событий создани€/удалени€ библиотек
 
-  on_create_library_connection = environment->RegisterEventHandler (EnvironmentLibraryEvent_OnCreate,
+  on_create_library_connection = environment.RegisterEventHandler (EnvironmentLibraryEvent_OnCreate,
     xtl::bind (&Interpreter::RegisterLibrary, this, _2, _3));
 
-  on_remove_library_connection = environment->RegisterEventHandler (EnvironmentLibraryEvent_OnRemove,
+  on_remove_library_connection = environment.RegisterEventHandler (EnvironmentLibraryEvent_OnRemove,
     xtl::bind (&Interpreter::UnregisterLibrary, this, _2));
 
     //регистраци€ библиотек
 
-  for (Environment::Iterator i=environment->CreateIterator (); i; ++i)
-    RegisterLibrary (environment->LibraryId (i), *i);
+  for (Environment::LibraryIterator i=environment.CreateLibraryIterator (); i; ++i)
+    RegisterLibrary (environment.LibraryId (i), *i);
 
     //очистка стека
 
@@ -108,7 +117,7 @@ const char* Interpreter::Name ()
 
 Environment& Interpreter::Environment ()
 {
-  return *environment;
+  return environment;
 }
 
 lua::SymbolRegistry& Interpreter::SymbolRegistry ()
@@ -160,8 +169,6 @@ void Interpreter::DoCommands (const char* buffer_name, const void* buffer, size_
 
 void Interpreter::Invoke (size_t arguments_count, size_t results_count)
 {
-    //возможно проще использовать call???
-
   if (lua_pcall (state, arguments_count, results_count, 0))
     raise_error (state, "script::lua::Interpreter::Invoke");
 }
@@ -207,11 +214,8 @@ namespace
     —оздание интерпретатора lua
 */
 
-IInterpreter* create_lua_interpreter (const xtl::shared_ptr<Environment>& environment)
+IInterpreter* create_lua_interpreter (const Environment& environment)
 {
-  if (!environment)
-    throw xtl::make_null_argument_exception ("script::create_lua_interpreter", "environment");
-
   return new Interpreter (environment);
 }
 

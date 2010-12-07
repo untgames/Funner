@@ -17,7 +17,7 @@ int main ()
   {
     printf ("Results of shell1_test:\n");
     
-    xtl::shared_ptr<Environment> env (new Environment);
+    Environment env;
     
     Shell shell, lua_shell ("lua", env);
 

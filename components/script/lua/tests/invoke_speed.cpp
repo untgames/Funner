@@ -1,6 +1,6 @@
 #include "shared.h"
 
-const size_t TOTAL = 100000;
+const size_t TOTAL = 1000000;
 
 using namespace script;
 
@@ -29,9 +29,9 @@ int main ()
   {
     printf ("Results of invoke_speed_test:\n");
 
-    xtl::shared_ptr<Environment> env (new Environment);
+    Environment env;
 
-    InvokerRegistry& registry = env->CreateLibrary ("my_library");
+    InvokerRegistry registry = env.CreateLibrary ("my_library");
 
     Shell shell ("lua", env);
 
@@ -39,7 +39,7 @@ int main ()
 
     registry.Register ("f", make_invoker (&f));
     registry.Register ("__add", make_invoker (&my_add));
-    env->RegisterType (typeid (A), "my_library");
+    env.RegisterType (typeid (A), "my_library");
 
     interpreter->DoCommands ("lua_f", lua_f, strlen (lua_f));
 
@@ -52,7 +52,7 @@ int main ()
 
     size_t end = common::milliseconds ();
 
-    printf ("Invokations per second: %.2fk\n", float (TOTAL)/float (end-start)/1000.0f);
+    printf ("Invokations per second: %.2fk\n", float (TOTAL)/float (end-start)*1000.0f);
   }
   catch (std::exception& exception)
   {

@@ -3,6 +3,7 @@ invoke result: 8
 after invoke: A(2)
 exception: Invalid argument <id>=12
     at set_id(A)
+    at script::Invoker::operator()(IStack&)
     at script::lua::invoke_dispatch("my_library.set_id", [A(2)], 12.0000)
     at [string "lua_f"](5)
     at [string "lua_f"](5)

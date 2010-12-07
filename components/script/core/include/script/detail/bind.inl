@@ -5,63 +5,6 @@
 namespace detail
 {
 
-template <class T, bool is_enum=xtl::type_traits::is_enum<T>::value>
-struct make_invoker_argument_helper
-{
-    //все не скалярные типы данных приводятся к xtl::any
-
-  typedef xtl::any result_type;
-  
-  static result_type get (T& value) { return xtl::make_ref_any (value); }
-};
-
-template <class T>
-struct make_invoker_argument_helper<T, true>
-{
-    //enum-типы приводятся к int
-
-  typedef int result_type;
-  
-  static result_type get (const T& value) { return static_cast<result_type> (value); }
-};
-
-template <class T>
-inline typename make_invoker_argument_helper<T>::result_type make_invoker_argument (T& value)
-{
-  return make_invoker_argument_helper<T>::get (value);
-}
-
-inline xtl::any    make_invoker_argument (const xtl::any& value)    { return value; }
-inline bool        make_invoker_argument (bool value)               { return value; }
-inline int         make_invoker_argument (char value)               { return value; }
-inline int         make_invoker_argument (signed char value)        { return value; }
-inline int         make_invoker_argument (unsigned char value)      { return value; }
-inline int         make_invoker_argument (short value)              { return value; }
-inline int         make_invoker_argument (unsigned short value)     { return value; }
-inline int         make_invoker_argument (int value)                { return value; }
-inline int         make_invoker_argument (unsigned int value)       { return value; }
-inline int         make_invoker_argument (long value)               { return value; }
-inline int         make_invoker_argument (unsigned long value)      { return value; }
-inline float       make_invoker_argument (float value)              { return value; }
-inline float       make_invoker_argument (double value)             { return static_cast<float> (value); }
-inline float       make_invoker_argument (long double value)        { return static_cast<float> (value); }
-inline void*       make_invoker_argument (void* value)              { return value; }
-inline void*       make_invoker_argument (const void* value)        { return (void*)value; }
-inline const char* make_invoker_argument (const char* string)       { return string; }
-inline const char* make_invoker_argument (char* string)             { return string; }
-
-template <class Traits, class Allocator>
-inline const char* make_invoker_argument (const stl::basic_string<char, Traits, Allocator>& s)
-{
-  return s.c_str ();
-}
-
-template <class Traits, class Allocator>
-inline const char* make_invoker_argument (stl::basic_string<char, Traits, Allocator>& s)
-{
-  return s.c_str ();
-}
-
 /*
     Извлечение аргументов из стека
 */
@@ -69,56 +12,42 @@ inline const char* make_invoker_argument (stl::basic_string<char, Traits, Alloca
 //общая версия
 template <class T, bool is_enum=xtl::type_traits::is_enum<T>::value> struct common_argument_selector
 {
-  typedef T dump_type;
-
-  static T get (IStack& stack, size_t index) { return xtl::any_multicast<T> (stack.GetVariant (index)); }
+  static T get (IStack& stack, size_t index) { return xtl::any_multicast<T> (stack.GetVariant (index)); }  
 };
 
 //извлечение enum-типов
 template <class T> struct common_argument_selector<T, true>
 {
-  typedef int dump_type;
-
   static T get (IStack& stack, size_t index) { return static_cast<T> (stack.GetInteger (index)); }  
 };
 
 //извлечение целочисленного аргумента
 template <class T> struct int_argument_selector
 {
-  typedef int dump_type;
-
   static T get (IStack& stack, size_t index) { return static_cast<T> (stack.GetInteger (index)); }
 };
 
 //извлечение вещественного аргумента
 template <class T> struct float_argument_selector
 {
-  typedef float dump_type;
-
   static T get (IStack& stack, size_t index) { return static_cast<T> (stack.GetFloat (index)); }
 };
 
 //извлечение void-указателей
 struct raw_pointer_argument_selector
 {
-  typedef void* dump_type;
-
   static void* get (IStack& stack, size_t index) { return stack.GetPointer (index); }
 };
 
 //извлечение строк
 struct string_argument_selector
 {
-  typedef const char* dump_type;
-
   static const char* get (IStack& stack, size_t index) { return stack.GetString (index); }
 };
 
 //извлечение вариантных типов данных
 struct any_argument_selector
 {
-  typedef xtl::any& dump_type;
-
   static xtl::any& get (IStack& stack, size_t index) { return stack.GetVariant (index); }
 };
 
@@ -153,13 +82,78 @@ template <> struct argument_selector<const volatile char*>:     public string_ar
 
 template <> struct argument_selector<bool>
 {
-  typedef bool dump_type;
-
   static bool get (IStack& stack, size_t index) { return stack.GetBoolean (index); }
 };
 
 template <class Traits, class Allocator>
 struct argument_selector<stl::basic_string<char, Traits, Allocator> > : public string_argument_selector {};
+
+/*
+    Помещение аргумента в стек
+*/
+
+template <class T>
+struct argument_invoker
+{
+  typedef xtl::any type;
+
+  static type make (const T& value) { return xtl::make_ref_any (value); }  
+};
+
+template <class T, bool is_enum=xtl::type_traits::is_enum<T>::value>
+struct argument_invoker_helper: public argument_invoker<T> {};
+
+template <class T>
+struct argument_invoker_helper<T, true>
+{
+    //enum-типы приводятся к int
+
+  typedef int type;
+
+  static int make (const T& value) { return static_cast<int> (value); }
+};
+
+template <class T>
+inline typename argument_invoker_helper<T>::type make_invoker_argument (const T& value)
+{
+  return argument_invoker_helper<T>::make (value);
+}
+
+inline xtl::any    make_invoker_argument (const xtl::any& value)    { return value; }
+inline bool        make_invoker_argument (bool value)               { return value; }
+inline int         make_invoker_argument (char value)               { return value; }
+inline int         make_invoker_argument (signed char value)        { return value; }
+inline int         make_invoker_argument (unsigned char value)      { return value; }
+inline int         make_invoker_argument (short value)              { return value; }
+inline int         make_invoker_argument (unsigned short value)     { return value; }
+inline int         make_invoker_argument (int value)                { return value; }
+inline int         make_invoker_argument (unsigned int value)       { return value; }
+inline int         make_invoker_argument (long value)               { return value; }
+inline int         make_invoker_argument (unsigned long value)      { return value; }
+inline float       make_invoker_argument (float value)              { return value; }
+inline float       make_invoker_argument (double value)             { return static_cast<float> (value); }
+inline float       make_invoker_argument (long double value)        { return static_cast<float> (value); }
+inline void*       make_invoker_argument (void* value)              { return value; }
+inline void*       make_invoker_argument (const void* value)        { return (void*)value; }
+inline const char* make_invoker_argument (const char* string)       { return string; }
+inline const char* make_invoker_argument (char* string)             { return string; }
+
+template <unsigned int N> inline const char* make_invoker_argument (const char string [N]) { return &string [0]; }
+template <unsigned int N> inline const char* make_invoker_argument (char string [N])       { return &string [0]; }
+template <unsigned int N> inline const char* make_invoker_argument (const unsigned char string [N]) { return (const char*)&string [0]; }
+template <unsigned int N> inline const char* make_invoker_argument (unsigned char string [N])       { return (const char*)&string [0]; }
+
+template <class Traits, class Allocator>
+inline const char* make_invoker_argument (const stl::basic_string<char, Traits, Allocator>& s)
+{
+  return s.c_str ();
+}
+
+template <class Traits, class Allocator>
+inline const char* make_invoker_argument (stl::basic_string<char, Traits, Allocator>& s)
+{
+  return s.c_str ();
+}
 
 //взятие аргумента из стека
 template <class T>
@@ -253,14 +247,16 @@ template <class FunctionalTraits> struct stack_argument_selector
     Функтор шлюза
 */
 
-template <class FnTraits, class Fn, class Ret=typename FnTraits::result_type>
-struct invoker_impl
+template <class Signature, class Fn, class Ret=typename xtl::functional_traits<Signature>::result_type>
+struct invoker_impl_base: public ISignatureInvoker<Signature>
 { 
-  invoker_impl (const Fn& in_fn) : fn (in_fn) {}    
+  typedef xtl::functional_traits<Signature> func_traits;
 
-  size_t operator () (IStack& stack) const
+  invoker_impl_base (const Fn& in_fn) : fn (in_fn) {}    
+
+  size_t operator () (IStack& stack)
   {
-    enum { arguments_count = FnTraits::arguments_count + FnTraits::is_memfun };
+    enum { arguments_count = func_traits::arguments_count + func_traits::is_memfun };
 
       //проверка наличия достаточного числа аргументов в стеке    
 
@@ -268,24 +264,26 @@ struct invoker_impl
 
       //вызов шлюза и помещение его результата в стек
       
-    typename FnTraits::result_type result = xtl::apply<typename FnTraits::result_type, arguments_count> (fn, stack, xtl::make_const_ref (stack_argument_selector<FnTraits> ()));
+    typename func_traits::result_type result = xtl::apply<typename func_traits::result_type, arguments_count> (fn, stack, xtl::make_const_ref (stack_argument_selector<func_traits> ()));
 
     push_argument (stack, result);
 
     return 1; //results_count = 1
   }
-
+  
   Fn fn;
 };
 
-template <class FnTraits, class Fn>
-struct invoker_impl<FnTraits, Fn, void>
+template <class Signature, class Fn>
+struct invoker_impl_base<Signature, Fn, void>: public ISignatureInvoker<Signature>
 {
-  invoker_impl (const Fn& in_fn) : fn (in_fn) {}
+  typedef xtl::functional_traits<Signature> func_traits;
 
-  size_t operator () (IStack& stack) const
+  invoker_impl_base (const Fn& in_fn) : fn (in_fn) {}
+
+  size_t operator () (IStack& stack)
   {
-    enum { arguments_count = FnTraits::arguments_count + FnTraits::is_memfun };
+    enum { arguments_count = func_traits::arguments_count + func_traits::is_memfun };
 
       //проверка наличия достаточного числа аргументов в стеке    
 
@@ -293,7 +291,7 @@ struct invoker_impl<FnTraits, Fn, void>
 
       //вызов шлюза
 
-    xtl::apply<void, arguments_count> (fn, stack, xtl::make_const_ref (stack_argument_selector<FnTraits> ()));
+    xtl::apply<void, arguments_count> (fn, stack, xtl::make_const_ref (stack_argument_selector<func_traits> ()));
 
     return 0; //results_count = 0
   }
@@ -301,71 +299,293 @@ struct invoker_impl<FnTraits, Fn, void>
   Fn fn;
 };
 
-/*
-    Дамп функции
-*/
-
-template <class T>
-inline void dump_type (stl::string& buffer)
+template <class T> void add_argument_type (InvokerSignature& signature, xtl::type<T>)
 {
-  buffer += typeid (T).name ();  
+  signature.AddParameterType (xtl::get_type<T> ());
 }
 
-template <> inline void dump_type<int> (stl::string& buffer)
+inline void add_argument_type (InvokerSignature& signature, xtl::type<xtl::detail::void_argument>)
 {
-  buffer += "int";  
 }
 
-template <> inline void dump_type<bool> (stl::string& buffer)
+template <class Signature, class Fn>
+struct invoker_impl: public invoker_impl_base<Signature, Fn>
 {
-  buffer += "bool";
-}
+  typedef invoker_impl_base<Signature, Fn>    base;
+  typedef xtl::functional_traits<Signature>   traits;
 
-template <> inline void dump_type<float> (stl::string& buffer)
-{
-  buffer += "float";
-}
-
-template <> inline void dump_type<const char*> (stl::string& buffer)
-{
-  buffer += "string";
-}
-
-template <> inline void dump_type<void*> (stl::string& buffer)
-{
-  buffer += "float";
-}
-
-template <class FunctionalTraits, size_t I, size_t Last> struct stack_argument_dumper
-{
-  static void dump (stl::string& buffer)
-  {
-    if (I) buffer += ", ";
-    else   buffer += "(";
+  invoker_impl (const Fn& fn) : base (fn) {}
   
-    typedef typename functional_argument_traits<FunctionalTraits, I>::argument_type argument_type;
-
-    dump_type<typename argument_selector<argument_type>::dump_type> (buffer);
+  using base::operator ();
+  
+  typedef typename traits::result_type                result_type;
+  typedef typename traits::template argument<1>::type arg1_type;
+  typedef typename traits::template argument<2>::type arg2_type;
+  typedef typename traits::template argument<3>::type arg3_type;
+  typedef typename traits::template argument<4>::type arg4_type;
+  typedef typename traits::template argument<5>::type arg5_type;
+  typedef typename traits::template argument<6>::type arg6_type;
+  typedef typename traits::template argument<7>::type arg7_type;
+  typedef typename traits::template argument<8>::type arg8_type;
+  typedef typename traits::template argument<9>::type arg9_type;
+  
+  result_type operator () ()
+  {
+    return xtl::funcall<result_type> (base::fn);
+  }
+  
+  result_type operator () (arg1_type a1)
+  {
+    return xtl::funcall<result_type> (base::fn, a1);
+  }
+  
+  result_type operator () (arg1_type a1, arg2_type a2)
+  {
+    return xtl::funcall<result_type> (base::fn, a1, a2);
+  }
+  
+  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3)
+  {
+    return xtl::funcall<result_type> (base::fn, a1, a2, a3);
+  }
+  
+  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4)
+  {
+    return xtl::funcall<result_type> (base::fn, a1, a2, a3, a4);
+  }
+  
+  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5)
+  {
+    return xtl::funcall<result_type> (base::fn, a1, a2, a3, a4, a5);
+  }
+  
+  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, arg6_type a6)
+  {
+    return xtl::funcall<result_type> (base::fn, a1, a2, a3, a4, a5, a6);
+  }
+  
+  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, arg6_type a6, arg7_type a7)
+  {
+    return xtl::funcall<result_type> (base::fn, a1, a2, a3, a4, a5, a6, a7);
+  }
+  
+  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, arg6_type a6, arg7_type a7, arg8_type a8)
+  {
+    return xtl::funcall<result_type> (base::fn, a1, a2, a3, a4, a5, a6, a7, a8);
+  }
+  
+  result_type operator () (arg1_type a1, arg2_type a2, arg3_type a3, arg4_type a4, arg5_type a5, arg6_type a6, arg7_type a7, arg8_type a8, arg9_type a9)
+  {
+    return xtl::funcall<result_type> (base::fn, a1, a2, a3, a4, a5, a6, a7, a8, a9);
+  }
+  
+  InvokerSignature GetSignature ()
+  {
+    InvokerSignature signature;
     
-    stack_argument_dumper<FunctionalTraits, I+1, Last>::dump (buffer);
+    signature.SetResultType (xtl::get_type<result_type> ());
+    
+    add_argument_type (signature, xtl::type<arg1_type> ());
+    add_argument_type (signature, xtl::type<arg2_type> ());
+    add_argument_type (signature, xtl::type<arg3_type> ());
+    add_argument_type (signature, xtl::type<arg4_type> ());
+    add_argument_type (signature, xtl::type<arg5_type> ());
+    add_argument_type (signature, xtl::type<arg6_type> ());
+    add_argument_type (signature, xtl::type<arg7_type> ());
+    add_argument_type (signature, xtl::type<arg8_type> ());
+    add_argument_type (signature, xtl::type<arg9_type> ());
+    
+    return signature;
   }
 };
 
-template <class FunctionalTraits, size_t I> struct stack_argument_dumper<FunctionalTraits, I, I>
+template <class Signature, bool MemFn=xtl::functional_traits<Signature>::is_memfun != 0, unsigned int ArgsCount=xtl::functional_traits<Signature>::arguments_count> struct signature_helper;
+
+template <class Signature> struct signature_helper<Signature, false, 0>
 {
-  static void dump (stl::string& buffer) { buffer += ")"; }
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type ();
 };
 
-//дамп функтора
-template <class FnTraits, class Fn, class Ret>
-inline void to_string (stl::string& buffer, const invoker_impl<FnTraits, Fn, Ret>& invoker)
+template <class Signature> struct signature_helper<Signature, false, 1>
 {
-  enum { arguments_count = FnTraits::arguments_count + FnTraits::is_memfun };
-  
-  buffer.clear ();
-  
-  stack_argument_dumper<FnTraits, 0, arguments_count>::dump (buffer);
-}
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::template argument<1>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, false, 2>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, false, 3>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type,
+                                             typename traits::template argument<3>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, false, 4>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type,
+                                             typename traits::template argument<3>::type,
+                                             typename traits::template argument<4>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, false, 5>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type,
+                                             typename traits::template argument<3>::type,
+                                             typename traits::template argument<4>::type,
+                                             typename traits::template argument<5>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, false, 6>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type,
+                                             typename traits::template argument<3>::type,
+                                             typename traits::template argument<4>::type,
+                                             typename traits::template argument<5>::type,
+                                             typename traits::template argument<6>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, false, 7>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type,
+                                             typename traits::template argument<3>::type,
+                                             typename traits::template argument<4>::type,
+                                             typename traits::template argument<5>::type,
+                                             typename traits::template argument<6>::type,
+                                             typename traits::template argument<7>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, false, 8>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type,
+                                             typename traits::template argument<3>::type,
+                                             typename traits::template argument<4>::type,
+                                             typename traits::template argument<5>::type,
+                                             typename traits::template argument<6>::type,
+                                             typename traits::template argument<7>::type,
+                                             typename traits::template argument<8>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, false, 9>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type,
+                                             typename traits::template argument<3>::type,
+                                             typename traits::template argument<4>::type,
+                                             typename traits::template argument<5>::type,
+                                             typename traits::template argument<6>::type,
+                                             typename traits::template argument<7>::type,
+                                             typename traits::template argument<8>::type,
+                                             typename traits::template argument<9>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, true, 0>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::object_type&);
+};
+
+template <class Signature> struct signature_helper<Signature, true, 1>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::object_type&,
+                                             typename traits::template argument<1>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, true, 2>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::object_type&,
+                                             typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, true, 3>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::object_type&,
+                                             typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type,
+                                             typename traits::template argument<3>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, true, 4>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::object_type&,
+                                             typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type,
+                                             typename traits::template argument<3>::type,
+                                             typename traits::template argument<4>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, true, 5>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::object_type&,
+                                             typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type,
+                                             typename traits::template argument<3>::type,
+                                             typename traits::template argument<4>::type,
+                                             typename traits::template argument<5>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, true, 6>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::object_type&,
+                                             typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type,
+                                             typename traits::template argument<3>::type,
+                                             typename traits::template argument<4>::type,
+                                             typename traits::template argument<5>::type,
+                                             typename traits::template argument<6>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, true, 7>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::object_type&,
+                                             typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type,
+                                             typename traits::template argument<3>::type,
+                                             typename traits::template argument<4>::type,
+                                             typename traits::template argument<5>::type,
+                                             typename traits::template argument<6>::type,
+                                             typename traits::template argument<7>::type);
+};
+
+template <class Signature> struct signature_helper<Signature, true, 8>
+{
+  typedef xtl::functional_traits<Signature> traits;
+  typedef typename traits::result_type type (typename traits::object_type&,
+                                             typename traits::template argument<1>::type,
+                                             typename traits::template argument<2>::type,
+                                             typename traits::template argument<3>::type,
+                                             typename traits::template argument<4>::type,
+                                             typename traits::template argument<5>::type,
+                                             typename traits::template argument<6>::type,
+                                             typename traits::template argument<7>::type,
+                                             typename traits::template argument<8>::type);
+};
 
 /*
     Функция-диспетчер вызова шлюза
@@ -448,9 +668,23 @@ Ret invoke_dispatch
 template <class Signature, class Fn>
 inline Invoker make_invoker (Fn fn)
 {
-  typedef detail::invoker_impl<xtl::functional_traits<Signature>, Fn> invoker_type;
-
-  return Invoker (invoker_type (fn));
+  typedef detail::invoker_impl<typename detail::signature_helper<Signature>::type, Fn> invoker_type;
+  
+  invoker_type* volatile overload = new invoker_type (fn);
+  
+  try
+  {
+    Invoker invoker;
+    
+    invoker.AddOverload (overload);
+    
+    return invoker;
+  }
+  catch (...)
+  {
+    delete overload;
+    throw;
+  }
 }
 
 template <class Fn>
@@ -773,9 +1007,9 @@ template <class Ret> class callback_dispatcher
 
 template <class Ret> detail::ignore callback_dispatcher<Ret>::dummy;
 
-template <class Signature> struct callback_invoker
+template <class Signature> struct callback_invoker: public SimpleInvoker
 {
-  size_t operator () (IStack& stack) const
+  size_t operator () (IStack& stack)
   {
       //проверка наличия достаточного числа аргументов в стеке    
 
@@ -803,5 +1037,19 @@ template <class Signature> struct callback_invoker
 template <class Signature>
 inline Invoker make_callback_invoker ()
 {
-  return Invoker (detail::callback_invoker<Signature> ());
+  detail::callback_invoker<Signature>* volatile overload = new detail::callback_invoker<Signature> ();
+  
+  try
+  {
+    Invoker invoker;
+    
+    invoker.AddOverload (overload);
+    
+    return invoker;
+  }
+  catch (...)
+  {
+    delete overload;
+    throw;
+  }
 }

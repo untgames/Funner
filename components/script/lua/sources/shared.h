@@ -1,9 +1,6 @@
 #ifndef SCRIPTLIB_LUA_SHARED_HEADER
 #define SCRIPTLIB_LUA_SHARED_HEADER
 
-#include <script/interpreter.h>
-#include <script/environment.h>
-
 #include <stl/hash_map>
 
 #include <xtl/any.h>
@@ -21,9 +18,24 @@
 #include <common/heap.h>
 #include <common/strlib.h>
 
+#include <script/interpreter.h>
+#include <script/environment.h>
+
+#ifdef LUAJIT
+
+#include <float.h>
+
+extern "C" {
+#include <luajit.h>
+#endif
+
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
+
+#ifdef LUAJIT
+}
+#endif
 
 namespace script
 {
@@ -166,7 +178,7 @@ class Library: public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Library  (Interpreter& interpreter, const char* name, InvokerRegistry& registry);
+    Library  (Interpreter& interpreter, const char* name, const InvokerRegistry& registry);
     ~Library ();
 
   private:
@@ -188,7 +200,7 @@ class Library: public xtl::reference_counter
   private:
     lua_State*           state;                            //состояние Lua
     Interpreter&         interpreter;                      //интерпретатор
-    InvokerRegistry&     registry;                         //реестр шлюзов
+    InvokerRegistry      registry;                         //реестр шлюзов
     stl::string          table_name;                       //имя таблицы
     bool                 is_global;                        //является ли библиотека глобальной
     xtl::auto_connection on_register_invoker_connection;   //соединение регистрации шлюза
@@ -201,12 +213,10 @@ class Library: public xtl::reference_counter
 class Interpreter: public IInterpreter, public StateHolder, public xtl::reference_counter, public xtl::trackable
 {
   public:
-    typedef xtl::shared_ptr<script::Environment> EnvironmentPointer;
-  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Interpreter  (const EnvironmentPointer&);
+    Interpreter  (const script::Environment&);
     ~Interpreter ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,7 +269,7 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
     typedef stl::hash_map<stl::hash_key<const char*>, LibraryPtr> LibraryMap;
 
   private:
-    EnvironmentPointer    environment;                  //скриптовое окружение
+    script::Environment   environment;                  //скриптовое окружение
     lua::SymbolRegistry   symbol_registry;              //реестр символов
     lua::Stack            stack;                        //стек аргументов
     LibraryMap            libraries;                    //карта библиотек

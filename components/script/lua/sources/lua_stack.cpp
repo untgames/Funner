@@ -252,7 +252,7 @@ void Stack::Push (const xtl::any& value)
     throw xtl::format_exception<StackException> ("script::lua::Stack::Push(const xtl::any&)", "Fail to allocate %u bytes from stack", BUFFER_SIZE);
     
   const char* library_id = interpreter.Environment ().FindLibraryId (value.castable_type ());
-  
+    
   if (!library_id)
     library_id = VARIANT_DEFAULT_TYPE_NAME;    
 

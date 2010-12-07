@@ -19,7 +19,6 @@ class InterpreterManagerImpl
 {
   public:
     typedef InterpreterManager::InterpreterCreater InterpreterCreater;
-    typedef Shell::EnvironmentPtr                  EnvironmentPtr;
     
       //регистрация интерпретатора
     void Register (const char* name, const InterpreterCreater& creater)
@@ -56,16 +55,13 @@ class InterpreterManagerImpl
     }
     
       //получение интерпретатора
-    IInterpreter* CreateInterpreter (const char* name, const EnvironmentPtr& environment)
+    IInterpreter* CreateInterpreter (const char* name, const Environment& environment)
     {
       static const char* METHOD_NAME = "script::InterpreterManagerImpl::CreateInterpreter";
 
       if (!name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "name");
         
-      if (!environment)
-        throw xtl::make_null_argument_exception (METHOD_NAME, "environment");
-
       InterpreterCreaterMap::iterator iter = creaters.find (name);
       
       if (iter == creaters.end ())
@@ -125,7 +121,7 @@ Shell::Shell ()
 {
 }
 
-Shell::Shell (const char* interpreter_name, const EnvironmentPtr& environment)
+Shell::Shell (const char* interpreter_name, const Environment& environment)
 {     
   try
   {
@@ -179,7 +175,7 @@ Shell::InterpeterPtr Shell::Interpreter () const
     Изменение интерпретатора
 */
 
-void Shell::SetInterpreter (const char* interpreter_name, const EnvironmentPtr& environment)
+void Shell::SetInterpreter (const char* interpreter_name, const Environment& environment)
 {
   Shell (interpreter_name, environment).Swap (*this);  
 }
