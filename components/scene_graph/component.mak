@@ -1,7 +1,7 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := SCENE_GRAPH.CORE.SOURCES SCENE_GRAPH.CORE.TESTS
+TARGETS := SCENE_GRAPH.CORE.SOURCES SCENE_GRAPH.CORE.TESTS SCENE_GRAPH.CORE.INFO
 
 #Цель №1 - SG components sources
 SCENE_GRAPH.CORE.SOURCES.TYPE             := static-lib
@@ -23,3 +23,9 @@ SCENE_GRAPH.CORE.TESTS.LIBS             :=
 SCENE_GRAPH.CORE.TESTS.COMPILER_CFLAGS  :=
 SCENE_GRAPH.CORE.TESTS.COMPILER_DEFINES := 
 SCENE_GRAPH.CORE.TESTS.IMPORTS          := link.scene_graph.core compile.scene_graph.core compile.common
+
+#Цель - сборка документации
+SCENE_GRAPH.CORE.INFO.TYPE        := doxygen-info
+SCENE_GRAPH.CORE.INFO.CHM_NAME    := funner.scene_graph.core
+SCENE_GRAPH.CORE.INFO.SOURCE_DIRS := include
+SCENE_GRAPH.CORE.INFO.IMPORTS     := compile.scene_graph.core
