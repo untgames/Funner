@@ -1,56 +1,56 @@
 Results of shell_test:
 engine.SubsystemManager1: Add subsystem 'Log'
-included_fn
-Node test
-Name = 
-Position = 0 0 0
-WorldPosition = 0 0 0
-Orientation = 0 0 0 1
-WorldOrientation = 0 0 0 1
-Scale = 1 1 1
-WorldScale = 1 1 1
-OrientationInherit = true
-ScaleInherit = true
-LocalTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
-WorldTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
-ParentTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
-LocalOrtX = 1 0 0
-LocalOrtY = 0 1 0
-LocalOrtZ = 0 0 1
-WorldOrtX = 1 0 0
-WorldOrtY = 0 1 0
-WorldOrtZ = 0 0 1
-ParentOrtX = 1 0 0
-ParentOrtY = 0 1 0
-ParentOrtZ = 0 0 1
-Name = node1
-Position = 10 10 10
-WorldPosition = 10 10 10
-Orientation = 34 10 15 0
-WorldOrientation = 34 10 15 0
-Scale = 100 0 0
-WorldScale = 100 0 0
-OrientationInherit = false
-ScaleInherit = false
-LocalTM = 56.1107 0 0 10 45.9149 0 0 10 68.8724 0 0 10 0 0 0 1
-WorldTM = 56.1107 0 0 10 45.9149 0 0 10 68.8724 0 0 10 0 0 0 1
-ParentTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
-Position = 1.4 5 6.779
-Reset position = 0 0 0
-Translate position = 4 5 6
-Orientation = 0.0886976 0.27646 0.195826 0.936672
-Orientation = 0.40061 0.107611 0.207484 0.885936
-Reset orientation = 0 0 0 1
-Roatate orientation = 0.018283 0.28532 0.33527 0.897693
-Scale = 15 16.4 17
-Rescale = 150 16.4 17
-ObjectTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
-Scale = 1 1 1
-WorldOrtX = 1 0 0
-WorldOrtY = 0 0 -1
-WorldOrtZ = 0 1 0
+engine.lua: included_fn
+engine.lua: Node test
+engine.lua: Name = 
+engine.lua: Position = 0 0 0
+engine.lua: WorldPosition = 0 0 0
+engine.lua: Orientation = 0 0 0 1
+engine.lua: WorldOrientation = 0 0 0 1
+engine.lua: Scale = 1 1 1
+engine.lua: WorldScale = 1 1 1
+engine.lua: OrientationInherit = true
+engine.lua: ScaleInherit = true
+engine.lua: LocalTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+engine.lua: WorldTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+engine.lua: ParentTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+engine.lua: LocalOrtX = 1 0 0
+engine.lua: LocalOrtY = 0 1 0
+engine.lua: LocalOrtZ = 0 0 1
+engine.lua: WorldOrtX = 1 0 0
+engine.lua: WorldOrtY = 0 1 0
+engine.lua: WorldOrtZ = 0 0 1
+engine.lua: ParentOrtX = 1 0 0
+engine.lua: ParentOrtY = 0 1 0
+engine.lua: ParentOrtZ = 0 0 1
+engine.lua: Name = node1
+engine.lua: Position = 10 10 10
+engine.lua: WorldPosition = 10 10 10
+engine.lua: Orientation = 34 10 15 0
+engine.lua: WorldOrientation = 34 10 15 0
+engine.lua: Scale = 100 0 0
+engine.lua: WorldScale = 100 0 0
+engine.lua: OrientationInherit = false
+engine.lua: ScaleInherit = false
+engine.lua: LocalTM = 56.1107 0 0 10 45.9149 0 0 10 68.8724 0 0 10 0 0 0 1
+engine.lua: WorldTM = 56.1107 0 0 10 45.9149 0 0 10 68.8724 0 0 10 0 0 0 1
+engine.lua: ParentTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+engine.lua: Position = 1.4 5 6.779
+engine.lua: Reset position = 0 0 0
+engine.lua: Translate position = 4 5 6
+engine.lua: Orientation = 0.0886976 0.27646 0.195826 0.936672
+engine.lua: Orientation = 0.40061 0.107611 0.207484 0.885936
+engine.lua: Reset orientation = 0 0 0 1
+engine.lua: Roatate orientation = 0.018283 0.28532 0.33527 0.897693
+engine.lua: Scale = 15 16.4 17
+engine.lua: Rescale = 150 16.4 17
+engine.lua: ObjectTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+engine.lua: Scale = 1 1 1
+engine.lua: WorldOrtX = 1 0 0
+engine.lua: WorldOrtY = 0 0 -1
+engine.lua: WorldOrtZ = 0 1 0
 engine.SubsystemManager1: Add subsystem 'Shell'
 engine.SubsystemManager1: Subsystems successfully started
-Hello world
+engine.lua: Hello world
 engine.SubsystemManager1: Remove subsystem 'Shell'
 engine.SubsystemManager1: Remove subsystem 'Log'
