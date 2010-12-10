@@ -12,6 +12,7 @@
 #include <math/matrix.h>
 
 #include <common/property_map.h>
+#include <common/strlib.h>
 
 using namespace common;
 
