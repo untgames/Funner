@@ -1,6 +1,6 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include "ColorBlock.h"
+#include "colorblock.h"
 
 using namespace nv;
 
