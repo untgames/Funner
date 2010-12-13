@@ -19,8 +19,8 @@
 #include <shared/platform.h>
 #include <shared/property_list.h>
 
-#include <gl/gl.h>
-#include <gl/glx.h>
+#include <GL/gl.h>
+#include <GL/glx.h>
 
 namespace render
 {
