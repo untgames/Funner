@@ -1,0 +1,2 @@
+Results of str_array2_test:
+result (size=2, empty=false, capacity=16, buffer_size=256): {AA, 0}
