@@ -1,11 +1,2 @@
 Results of material1_test:
-MultiPassMaterial 'material1' (4 passes, sort_group=234)
-  [X] pass #0: shader='common_material1'
-  [X] pass #1: shader='test_material2'
-  [X] pass #2: shader='test_material2'
-  [ ] pass #3: shader='common_material2'
-  visit passes:
-CommonMaterial 'common_material1' (sort_group=0)
-TestMaterial 'test_material2' (sort_group=0)
-TestMaterial 'test_material2' (sort_group=0)
-search 'common_material2': found (pass=3)
+Material 'Material1'

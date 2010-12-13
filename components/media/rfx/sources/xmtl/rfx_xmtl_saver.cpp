@@ -13,7 +13,7 @@ namespace
 typedef stl::hash_multimap<const Material*, stl::string> MaterialIdMap;
 typedef stl::vector<MaterialIdMap::iterator>             MaterialSaveList;
 
-class XmlMaterialLibraryPreSaver: public xtl::visitor<void, MultiPassMaterial>
+class XmlMaterialLibraryPreSaver: public xtl::visitor<void>
 {
   private:
     typedef stl::hash_set<stl::hash_key<const char*> > IdSet;
@@ -57,32 +57,8 @@ class XmlMaterialLibraryPreSaver: public xtl::visitor<void, MultiPassMaterial>
     {
       save_list.push_back (iter);
     }
-  
-      //посещение многопроходного материала
-    void visit (MultiPassMaterial& material)
-    {
-        //сохранение проходов
-        
-      for (size_t i=0, count=material.PassesCount (); i<count; ++i)
-      {
-        Material&               sub_material = *material.Material (i);
-        MaterialIdMap::iterator iter         = material_map.find (&sub_material);
-        
-        if (iter != material_map.end ())
-          continue;
-
-          //регистрация нового материала
-          
-        iter = RegisterNewMaterial (sub_material);
-        
-        sub_material.Accept (*this);
-        
-        InsertToSaveList (iter);
-      }      
-    }    
-    
+      
   public:
-    
       //конструктор
     XmlMaterialLibraryPreSaver (const MaterialLibrary& material_library, MaterialIdMap& in_material_map, MaterialSaveList& in_save_list) 
       : material_map (in_material_map), save_list (in_save_list)
@@ -96,14 +72,12 @@ class XmlMaterialLibraryPreSaver: public xtl::visitor<void, MultiPassMaterial>
         if (iter == material_map.end ())
           continue;
         
-        material.Accept (*this);
-        
         InsertToSaveList (iter);
       }
     }
 };
 
-class XmlMaterialLibrarySaver: public xtl::visitor<void, CommonMaterial, MultiPassMaterial, SpriteMaterial>
+class XmlMaterialLibrarySaver: public xtl::visitor<void, SpriteMaterial>
 {
   private: 
     typedef stl::hash_set<const Material*> MaterialSet;
@@ -116,32 +90,6 @@ class XmlMaterialLibrarySaver: public xtl::visitor<void, CommonMaterial, MultiPa
     MaterialSaveList       save_list;        //список сохранения
 
   private:
-    /*
-        Сохранение многопроходного материала
-    */
-    
-    void visit (MultiPassMaterial& material)
-    {
-      XmlWriter::Scope scope (writer, "multipass_profile");
-
-        //сохранение проходов
-
-      writer.WriteAttribute ("passes_count", material.PassesCount ());
-
-      for (size_t i=0, count=material.PassesCount (); i<count; ++i)
-      {
-        MaterialIdMap::const_iterator iter = material_map.find (&*material.Material (i));
-        
-        if (iter == material_map.end ())
-          continue;
-          
-        XmlWriter::Scope scope (writer, "pass");
-        
-        writer.WriteAttribute ("material", iter->second);
-        writer.WriteAttribute ("enable", material.IsPassEnabled (i));
-      }
-    }
-    
     /*
         Сохранение SpriteMaterial
     */
@@ -167,100 +115,6 @@ class XmlMaterialLibrarySaver: public xtl::visitor<void, CommonMaterial, MultiPa
         writer.WriteAttribute ("tile_height", material.TileHeight ());        
     }
     
-    /*
-        Сохранение CommonMaterial
-    */
-
-    void visit (CommonMaterial& material)
-    {
-      XmlWriter::Scope scope (writer, "common_profile");
-      
-      writer.WriteAttribute ("shader_type", get_name (material.ShaderType ()));      
-
-      for (size_t i=0; i<CommonMaterialPin_Num; i++)
-        writer.WriteAttribute (get_name ((CommonMaterialPin)i), material.IsEnabled ((CommonMaterialPin)i));      
-      
-      writer.WriteAttribute ("shininess", material.Shininess ());
-      writer.WriteAttribute ("transparency", material.Transparency ());
-      
-      const BlendFunction& blend_function = material.Blend ();
-      
-      writer.WriteAttribute ("blend_equation", get_name (blend_function.equation));
-      writer.WriteAttribute ("blend_arg1", get_name (blend_function.argument [0]));
-      writer.WriteAttribute ("blend_arg2", get_name (blend_function.argument [1]));
-      
-      writer.WriteAttribute ("alpha_test_mode", get_name (material.AlphaTestMode ()));
-      writer.WriteAttribute ("alpha_test_ref", material.AlphaTestReference ());
-      
-        //сохранение цветов
-        
-      struct MtlColor
-      {
-        const char*         name;
-        CommonMaterialColor color;
-      };
-        
-      static const MtlColor color_map [] = {
-        {"emission", CommonMaterialColor_Emission},
-        {"ambient",  CommonMaterialColor_Ambient},
-        {"diffuse",  CommonMaterialColor_Diffuse},
-        {"specular", CommonMaterialColor_Specular},
-      };
-      
-      static const size_t color_map_size = sizeof (color_map) / sizeof (*color_map);
-      
-      for (size_t i=0; i<color_map_size; i++)
-      {
-        XmlWriter::Scope scope (writer, color_map [i].name);
-        
-        writer.WriteData (material.Color (color_map [i].color));
-      }
-      
-        //сохранение карт
-      
-      for (size_t i=0; i<CommonMaterialMap_Num; i++)
-      {
-        const Texmap& texmap = material.Map ((CommonMaterialMap)i);
-        
-        if (!*texmap.Image ())
-          continue;
-        
-        XmlWriter::Scope scope (writer, "map");
-
-        writer.WriteAttribute ("type", get_name ((CommonMaterialMap)i));
-        writer.WriteAttribute ("enable", material.IsMapEnabled ((CommonMaterialMap)i));
-        writer.WriteAttribute ("weight", material.MapWeight ((CommonMaterialMap)i));
-
-        writer.WriteAttribute ("image", texmap.Image ());
-        writer.WriteAttribute ("min_filter", get_name (texmap.FilterType (TexmapFilter_Min)));
-        writer.WriteAttribute ("mag_filter", get_name (texmap.FilterType (TexmapFilter_Mag)));
-        writer.WriteAttribute ("mip_filter", get_name (texmap.FilterType (TexmapFilter_Mip)));
-        
-        for (size_t i=0; i<Texcoord_Num; i++)
-        {
-          XmlWriter::Scope scope (writer, "texcoord");         
-          
-          Texcoord tc     = (Texcoord)i;          
-          int      source = texmap.Source (tc);
-          
-          writer.WriteAttribute ("id", get_name (tc));
-          
-          switch (source)
-          {
-            case TexcoordSource_SphereMap: 
-            case TexcoordSource_ReflectionMap:
-              writer.WriteAttribute ("source", get_name ((TexcoordSource)texmap.Source (tc)));
-              break;
-            default:
-              writer.WriteAttribute ("source", source);
-              break;
-          }
-
-          writer.WriteAttribute ("wrap", get_name (texmap.Wrap (tc)));
-        }
-      }
-    }
-
     /*
         Сохранение материала
     */

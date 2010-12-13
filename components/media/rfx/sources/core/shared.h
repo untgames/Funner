@@ -9,8 +9,6 @@
 
 #include <common/component.h>
 
-#include <media/rfx/common_material.h>
-#include <media/rfx/multipass_material.h>
 #include <media/rfx/sprite_material.h>
 #include <media/rfx/material_library.h>
 
@@ -33,20 +31,6 @@ inline float clamp (float value, float min_value, float max_value)
   if (value > max_value) return max_value;
   
   return value;
-}
-
-template <class T, unsigned int Size>
-inline math::vector<T, Size> clamp
- (const math::vector<T, Size>& value,
-  const math::vector<T, Size>& min_value,
-  const math::vector<T, Size>& max_value)
-{
-  math::vector<T, Size> result;
-
-  for (size_t i=0; i<Size; i++)
-    result [i] = clamp (value [i], min_value [i], max_value [i]);
-
-  return result;    
 }
 
 }
