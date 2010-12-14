@@ -128,7 +128,7 @@ template <class Char> class BasicStringArray<Char>::Impl: public xtl::reference_
       int diff = int (new_string_len - current_string_len);
       
       for (size_t i=index+1; i<offsets.size (); i++)
-        offsets [index] += diff;
+        offsets [i] += diff;
     }
     
 ///Удаление строк
