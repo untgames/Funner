@@ -118,13 +118,14 @@ template <class Char> class BasicStringArray<Char>::Impl: public xtl::reference_
         throw xtl::make_range_exception (METHOD_NAME, "index", index, offsets.size ());
         
       need_update_pointers = true;
-        
+      
       size_t current_string_len = xtl::xstrlen (string_buffer.c_str () + offsets [index]) + 1,
              new_string_len     = xtl::xstrlen (string) + 1;
-
+             
       string_buffer.reserve (string_buffer.size () + new_string_len - current_string_len);
+
       string_buffer.replace (offsets [index], current_string_len, string, new_string_len); //nothrow (reserve called, scalar types)
-      
+
       int diff = int (new_string_len - current_string_len);
       
       for (size_t i=index+1; i<offsets.size (); i++)
