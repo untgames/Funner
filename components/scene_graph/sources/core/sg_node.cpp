@@ -434,6 +434,16 @@ struct Node::Impl
         //установка текущей сцены
 
       SetScene (0);
+
+        //оповещения об изменениях
+
+      this_node->BeginUpdate ();
+
+        //родительские преобразования требуют пересчёта
+
+      UpdateWorldTransformNotify ();
+
+      this_node->EndUpdate ();      
     }
 
       //преобразование системы координат
