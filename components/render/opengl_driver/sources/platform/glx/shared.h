@@ -10,6 +10,7 @@
 #include <xtl/intrusive_ptr.h>
 
 #include <common/singleton.h>
+#include <common/strlib.h>
 
 #include <syslib/window.h>
 #include <syslib/platform/x11.h>

@@ -11,8 +11,6 @@ namespace
      онстанты
 */
 
-const size_t OUTPUT_MAX_NAME_SIZE = 128; //максимальный размер имени устройства вывода
-
 }
 
 /*
@@ -28,7 +26,6 @@ struct Output::Impl
   OutputModeArray   modes;                       //режимы работы устройства
   Display*          display;                     //соединение с дисплеем
   int               screen_number;               //номер экрана диспле€
-  char              name [OUTPUT_MAX_NAME_SIZE]; //им€ цепочки обмена
   
 /// онструктор
   Impl (Display* in_display, size_t in_screen_number)
@@ -42,8 +39,6 @@ struct Output::Impl
     if (!XRRQueryExtension (display, &event_base, &error_base))
       throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::Impl::Impl", "RandR extension missing");
 
-    *name = 0;
-    
     int sizes_count = 0;
     XRRScreenSize *sizes = XRRSizes (display, screen_number, &sizes_count);
     
@@ -113,7 +108,8 @@ Output::~Output ()
 
 const char* Output::GetName ()
 {
-  return impl->name;
+  stl::string name = common::format ("Screen#%02u", impl->screen_number);
+  return name.c_str ();
 }
 
 /*
