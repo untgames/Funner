@@ -19,7 +19,7 @@ const size_t OUTPUT_ARRAY_RESERVE = 8; //резервируемое количество устройств выво
     Описание реализации адаптера
 */
 
-typedef stl::vector<Output*> OutputArray;
+typedef stl::vector<Output::Pointer> OutputArray;
 
 struct Adapter::Impl
 {
