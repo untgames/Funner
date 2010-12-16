@@ -26,11 +26,13 @@ struct Output::Impl
   OutputModeArray   modes;                       //режимы работы устройства
   Display*          display;                     //соединение с дисплеем
   int               screen_number;               //номер экрана диспле€
+  stl::string       name;
   
 /// онструктор
   Impl (Display* in_display, size_t in_screen_number)
     : display (in_display)
     , screen_number (in_screen_number)
+    , name(common::format ("screen%u", in_screen_number))
   {
     DisplayLock lock (display);
     
@@ -47,15 +49,6 @@ struct Output::Impl
       int rates_count = 0;
       short *rates = XRRRates (display, screen_number, sizeID, &rates_count);
       
-      int depths_count = 0;
-      XVisualInfo *depths = XGetVisualInfo (display, VisualDepthMask, 0, &depths_count);
-      
-      for (int i=0; i<depths_count; i++)
-        printf ("depth = %d", depths[i].depth);
-        
-      XFree (depths);
-      
-     
       for (int rateID=0; rateID < rates_count; rateID++)
       {
         OutputModeDesc mode_desc;
@@ -117,8 +110,7 @@ Output::~Output ()
 
 const char* Output::GetName ()
 {
-  stl::string name = common::format ("Screen#%02u", impl->screen_number);
-  return name.c_str ();
+  return impl->name.c_str ();
 }
 
 /*
