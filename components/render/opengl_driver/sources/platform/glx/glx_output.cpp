@@ -88,9 +88,9 @@ Output::Output (Display* display, size_t screen_number)
       throw xtl::make_null_argument_exception ("", "display");
       
     if (screen_number < 0)
-      throw xtl::make_null_argument_exception ("", "output_number");
+      throw xtl::make_null_argument_exception ("", "screen_number");
 
-    impl = new Impl (display, output_number);
+    impl = new Impl (display, screen_number);
   }
   catch (xtl::exception& exception)
   {
