@@ -47,7 +47,7 @@ ADDITIONAL_PATHS   += $(CYGWIN_BIN)
 BUILD_PATHS        := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-eabi/4.4.0
 COMMON_JAVA_FLAGS  += -g
 COMMON_CPPFLAGS    += -fexceptions -frtti
-COMMON_CFLAGS      += -mandroid -ffunction-sections -fdata-sections -Os -Wno-psabi \
+COMMON_CFLAGS      += -mandroid -ffunction-sections -fdata-sections -Os -g -Wno-psabi \
                      --sysroot=$(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm \
                      -fPIC -fvisibility=hidden -D__NEW__ -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ \
                      -D__ARM_ARCH_5TE__ -DANDROID -DARM -DSK_RELEASE -DNDEBUG \
@@ -68,6 +68,8 @@ ANDROID_KEY_STORE  := $(BUILD_DIR)platforms/android/my-release-key.keystore
 ANDROID_KEY_PASS   := android
 ANDROID_JAR        := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/android.jar
 DEFAULT_PACKAGE_PREFIX := com.untgames.android.
+GDB_SERVER_FLAG_FILE   := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/gdb-installed
+GDB_SERVER_FILE        := $(ANDROID_NDK)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.4.0/bin/gdbserver
 
 export CYGWIN
 
@@ -190,6 +192,7 @@ endif
   
   $$($1.INSTALLATION_FLAG): $$($1.TARGET)
 		@echo Install $$(notdir $$<)...
+		@$(ADB) uninstall $$<
 		@$(ADB) install -r $$<
 		@touch $$@
 		
@@ -202,5 +205,20 @@ endif
   .PHONY: RUN.$1
   
   RUN.$1: INSTALL.$1
-		@$(ADB) shell 'run-as $$($1.PACKAGE_NAME)'
+		@$(ADB) shell logcat -c		
+		@$(ADB) shell am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME)/.SkeletonActivity -e "test" "value"
+		@sleep 1
+#		@$(ADB) shell "\\/data/busybox/sh -c 'while ! ps | \\/data/busybox/grep $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME); do sleep 1; done'" > nul
+		@$(ADB) shell "\\/data/busybox/sh -c 'while ps | \\/data/busybox/grep $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME); do sleep 1; done'" > nul
+		@$(ADB) logcat -s -d -v raw System.out:I
+#		@$(ADB) shell setprop log.redirect-stdio true
+
 endef
+
+install: $(GDB_SERVER_FLAG_FILE)
+
+$(GDB_SERVER_FLAG_FILE): $(GDB_SERVER_FILE)
+	@echo Install gdbserver...
+	@$(ADB) push $(GDB_SERVER_FILE) $(REMOTE_DEBUG_DIR)
+	@$(ADB) shell chmod 777 $(REMOTE_DEBUG_DIR)/$(notdir $(GDB_SERVER_FILE))
+	@touch $@
