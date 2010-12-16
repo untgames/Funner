@@ -47,6 +47,15 @@ struct Output::Impl
       int rates_count = 0;
       short *rates = XRRRates (display, screen_number, sizeID, &rates_count);
       
+      int depths_count = 0;
+      XVisualInfo *depths = XGetVisualInfo (display, VisualDepthMask, 0, &depths_count);
+      
+      for (int i=0; i<depths_count; i++)
+        printf ("depth = %d", depths[i].depth);
+        
+      XFree (depths);
+      
+     
       for (int rateID=0; rateID < rates_count; rateID++)
       {
         OutputModeDesc mode_desc;
