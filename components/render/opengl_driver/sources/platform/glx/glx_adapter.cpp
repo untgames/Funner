@@ -98,7 +98,7 @@ IOutput* Adapter::GetOutput (size_t index)
   if (index >= impl->outputs.size ())
     throw xtl::make_range_exception ("render::low_level::opengl::glx::Adapter::GetOutput", "index", index, impl->outputs.size ());
 
-  return impl->outputs [index];
+  return get_pointer (impl->outputs [index]);
 }
 
 /*
