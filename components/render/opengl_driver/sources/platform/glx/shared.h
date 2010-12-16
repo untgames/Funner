@@ -48,6 +48,7 @@ class Output: virtual public IOutput, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
+//    Output  (Display* display, size_t screen_index);
     Output  (Adapter*, const void* window_handle);
     ~Output ();    
 
@@ -147,13 +148,7 @@ class Adapter: virtual public IAdapter, public Object
 
   private:
     Adapter (const Adapter&); //no impl
-    Adapter& operator = (const Adapter&); //no impl
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Регистрация устройства вывода
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RegisterOutput   (Output*);
-    void UnregisterOutput (Output*);
+    Adapter& operator = (const Adapter&); //no impl    
 
   private:
     struct Impl;

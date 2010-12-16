@@ -31,19 +31,9 @@ struct Output::Impl
   Impl (Adapter* in_adapter, const void* window_handle)
     : adapter (in_adapter)
   {
+//    DisplayLock lock (display);
+
     *name = 0;
-
-    try
-    {
-
-        //создание дисплея
-
-      log.Printf ("...create display");
-    }
-    catch (...)
-    {
-      throw;
-    }
   }
   
 ///Деструктор
@@ -74,8 +64,6 @@ Output::Output (Adapter* adapter, const void* window_handle)
       throw xtl::make_null_argument_exception ("", "adapter");
 
     impl = new Impl (adapter, window_handle);
-    
-    impl->adapter->RegisterOutput (this);
   }
   catch (xtl::exception& exception)
   {
@@ -86,7 +74,7 @@ Output::Output (Adapter* adapter, const void* window_handle)
 
 Output::~Output ()
 {
-  impl->adapter->UnregisterOutput (this);
+
 }
 
 /*

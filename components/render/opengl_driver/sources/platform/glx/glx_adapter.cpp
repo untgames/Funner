@@ -28,8 +28,19 @@ struct Adapter::Impl
   Library     library; //библиотека точек входа OpenGL
   
 ///Конструктор
-  Impl ()
+  Impl ()  
   {
+    size_t screens_count = 0;
+    
+//    {
+//      DisplayLock lock (display);
+      
+//      screens_count = ????;
+//    }
+
+//    for (size_t i=0; i<screens_count; i++)
+//      outputs.push_back (OutputPtr (new Output (display, i), false));
+
     outputs.reserve (OUTPUT_ARRAY_RESERVE);
   }  
 };
@@ -92,38 +103,12 @@ IOutput* Adapter::GetOutput (size_t index)
 }
 
 /*
-    Регистрация устройств вывода
-*/
-
-void Adapter::RegisterOutput (Output* output)
-{
-  if (!output)
-    return;
-
-  impl->outputs.push_back (output);
-}
-
-void Adapter::UnregisterOutput (Output* output)
-{
-  if (!output)
-    return;
-    
-  for (OutputArray::iterator iter=impl->outputs.begin (), end=impl->outputs.end (); iter!=end; ++iter)
-    if (*iter == output)
-    {
-      impl->outputs.erase (iter);
-
-      return;
-    }
-}
-
-/*
     Запрос устройства вывода
 */
 
 Output::Pointer Adapter::GetOutput (const void* window_handle)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Adapter::GetOutput");
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Adapter::GetOutput(const void*)");
 }
 
 /*
