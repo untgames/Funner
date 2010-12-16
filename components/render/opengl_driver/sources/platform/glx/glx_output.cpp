@@ -31,7 +31,7 @@ struct Output::Impl
   char              name [OUTPUT_MAX_NAME_SIZE]; //имя цепочки обмена
   
 ///Конструктор
-  Impl (Display* in_display, const int in_screen_number)
+  Impl (Display* in_display, size_t in_screen_number)
     : display (in_display)
     , screen_number (in_screen_number)
   {
@@ -79,14 +79,14 @@ struct Output::Impl
     Конструктор / деструктор
 */
 
-Output::Output (Display* display, const int output_number)
+Output::Output (Display* display, size_t screen_number)
 {
   try
   {
     if (!display)
       throw xtl::make_null_argument_exception ("", "display");
       
-    if (output_number < 0)
+    if (screen_number < 0)
       throw xtl::make_null_argument_exception ("", "output_number");
 
     impl = new Impl (display, output_number);
