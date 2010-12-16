@@ -123,26 +123,7 @@ void Adapter::UnregisterOutput (Output* output)
 
 Output::Pointer Adapter::GetOutput (const void* window_handle)
 {
-  try
-  {
-    if (!window_handle)
-      throw xtl::make_null_argument_exception ("", "window_handle");
-      
-      //поиск устройства вывода среди уже созданных
-      
-    for (OutputArray::iterator iter=impl->outputs.begin (), end=impl->outputs.end (); iter!=end; ++iter)
-      if ((*iter)->GetWindow ().Handle () == window_handle)
-        return *iter;
-
-      //создание нового устройства вывода
-
-    return Output::Pointer (new Output (this, window_handle), false);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::low_level::opengl::glx::Adapter::GetOutput");
-    throw;
-  }  
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Adapter::GetOutput");
 }
 
 /*

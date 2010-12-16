@@ -74,11 +74,6 @@ class Output: virtual public IOutput, public Object
     void SetGammaRamp (const Color3f table [256]);
     void GetGammaRamp (Color3f table [256]);
     
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение параметров
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    syslib::Window GetWindow ();
-
   private:
     Output (const Output&); //no impl
     Output& operator = (const Output&); //no impl

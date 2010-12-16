@@ -35,9 +35,6 @@ struct Output::Impl
 
     try
     {
-        //платформо-зависимая инициализация
-
-      PlatformInitialize ();
 
         //создание дисплея
 
@@ -45,7 +42,6 @@ struct Output::Impl
     }
     catch (...)
     {
-      PlatformDone ();
       throw;
     }
   }
@@ -55,24 +51,12 @@ struct Output::Impl
   {
     try
     {
-        //платформо-зависимое освобождение ресурсов
-      
-      PlatformDone ();
+
     }
     catch (...)
     {
     }
-  }
-  
-///Платформо-зависимая инициализация
-  void PlatformInitialize ()
-  {
-  }
-  
-///Платформо-зависимое освобождение ресурсов
-  void PlatformDone ()
-  {    
-  }
+  }  
 };
 
 /*
@@ -154,13 +138,4 @@ void Output::SetGammaRamp (const Color3f [256])
 void Output::GetGammaRamp (Color3f [256])
 {
   throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::GetGammaRamp", "Gamma ramp not supported in EGL");
-}
-
-/*
-    Получение параметров
-*/
-
-syslib::Window Output::GetWindow ()
-{
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Output::GetWindow");
 }
