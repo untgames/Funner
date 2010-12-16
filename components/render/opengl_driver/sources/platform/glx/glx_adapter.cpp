@@ -4,17 +4,6 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::glx;
 
-namespace
-{
-
-/*
-    Константы
-*/
-
-const size_t OUTPUT_ARRAY_RESERVE = 8; //резервируемое количество устройств вывода
-
-}
-
 /*
     Описание реализации адаптера
 */
@@ -35,12 +24,12 @@ struct Adapter::Impl
     
     DisplayLock lock (display);
 
-    outputs.reserve (OUTPUT_ARRAY_RESERVE);
-    
     size_t screens_count = XScreenCount (display);
     
-    for (size_t i=0; i<screens_count; i++)
-      outputs.push_back (Output::Pointer (new Output (display, i), false));
+    outputs.reserve (screens_count);
+    
+    for (size_t screen_number=0; screen_number < screens_count; screen_number++)
+      outputs.push_back (Output::Pointer (new Output (display, screen_number), false));
   }  
 };
 

@@ -36,18 +36,25 @@ struct Output::Impl
     , screen_number (in_screen_number)
   {
     DisplayLock lock (display);
+    
+    int event_base, 
+        error_base;
+    
+    if (!XRRQueryExtension (display, &event_base, &error_base))
+    {
+      fprintf (stderr, "RandR extension missing\n");
+      exit (1);
+    }
 
     *name = 0;
     
     int sizes_count = 0;
-    int rates_count = 0;
-    
     XRRScreenSize *sizes = XRRSizes (display, screen_number, &sizes_count);
-    short         *rates = 0;
     
     for (int sizeID=0; sizeID < sizes_count; sizeID++)
     {
-      rates = XRRRates (display, screen_number, sizeID, &rates_count);
+      int rates_count = 0;
+      short *rates = XRRRates (display, screen_number, sizeID, &rates_count);
       
       for (int rateID=0; rateID < rates_count; rateID++)
       {
