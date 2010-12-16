@@ -22,6 +22,9 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 
+#include <X11/Xlib.h>
+#include <X11/extensions/Xrandr.h>
+
 namespace render
 {
 
@@ -250,6 +253,34 @@ class Context: virtual public IContext, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void check_errors (const char* source);
 void raise_error  (const char* source);
+
+using syslib::x11::DisplayManager;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Блокировка соединения X11
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class DisplayLock
+{
+  public:
+    DisplayLock () : display ((Display*)DisplayManager::DisplayHandle ())
+    {
+      XLockDisplay (display);    
+    }
+  
+    DisplayLock (NativeDisplayType in_display) : display ((Display*)in_display)
+    {
+      XLockDisplay (display);
+    }
+
+    ~DisplayLock ()
+    {
+      XUnlockDisplay (display);
+    }
+
+  private:
+    Display* display;
+};
+
 
 }
 

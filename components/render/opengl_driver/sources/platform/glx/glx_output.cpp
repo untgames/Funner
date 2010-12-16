@@ -20,20 +20,47 @@ const size_t OUTPUT_MAX_NAME_SIZE = 128; //максимальный размер имени устройства 
 */
 
 typedef xtl::com_ptr<Adapter> AdapterPtr;
+typedef stl::vector<OutputModeDesc> OutputModeArray;
 
 struct Output::Impl
 {
   Log               log;                         //протокол графического драйвера
-  AdapterPtr        adapter;                     //адаптер отрисовки
+  OutputModeArray   modes;                       //режимы работы устройства
+  Display*          display;                     //соединение с дисплеем
+  int               screen_number;               //номер экрана дисплея
   char              name [OUTPUT_MAX_NAME_SIZE]; //имя цепочки обмена
   
 ///Конструктор
-  Impl (Adapter* in_adapter, const void* window_handle)
-    : adapter (in_adapter)
+  Impl (Display* in_display, const int in_screen_number)
+    : display (in_display)
+    , screen_number (in_screen_number)
   {
-//    DisplayLock lock (display);
+    DisplayLock lock (display);
 
     *name = 0;
+    
+    int sizes_count = 0;
+    int rates_count = 0;
+    
+    XRRScreenSize *sizes = XRRSizes (display, screen_number, &sizes_count);
+    short         *rates = 0;
+    
+    for (int sizeID=0; sizeID < sizes_count; sizeID++)
+    {
+      rates = XRRRates (display, screen_number, sizeID, &rates_count);
+      
+      for (int rateID=0; rateID < rates_count; rateID++)
+      {
+        OutputModeDesc mode_desc;
+        
+        mode_desc.width        = sizes [sizeID].width;
+        mode_desc.height       = sizes [sizeID].height;
+        mode_desc.color_bits   = 0;
+        mode_desc.refresh_rate = rates [rateID];
+        
+        modes.push_back (mode_desc);
+      }
+    }
   }
   
 ///Деструктор
@@ -46,24 +73,23 @@ struct Output::Impl
     catch (...)
     {
     }
-  }  
-};
+  }
 
 /*
     Конструктор / деструктор
 */
 
-Output::Output (Adapter* adapter, const void* window_handle)
+Output::Output (Display* display, const int output_number)
 {
   try
   {
-    if (!window_handle)
-      throw xtl::make_null_argument_exception ("", "window_handle");
+    if (!display)
+      throw xtl::make_null_argument_exception ("", "display");
       
-    if (!adapter)
-      throw xtl::make_null_argument_exception ("", "adapter");
+    if (output_number < 0)
+      throw xtl::make_null_argument_exception ("", "output_number");
 
-    impl = new Impl (adapter, window_handle);
+    impl = new Impl (display, output_number);
   }
   catch (xtl::exception& exception)
   {
@@ -92,12 +118,15 @@ const char* Output::GetName ()
 
 size_t Output::GetModesCount ()
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Output::GetModesCount");
+  return impl->modes.size ();
 }
 
 void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Output::GetModeDesc");
+  if (mode_index >= impl->modes.size ())
+    throw xtl::make_range_exception ("render::low_level::opengl::glx::Output::GetModeDesc", "mode_index", mode_index, impl->modes.size ());
+    
+  mode_desc = impl->modes [mode_index];
 }
 
 /*

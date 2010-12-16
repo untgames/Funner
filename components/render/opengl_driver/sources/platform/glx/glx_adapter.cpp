@@ -23,25 +23,24 @@ typedef stl::vector<Output*> OutputArray;
 
 struct Adapter::Impl
 {
-  Log         log;     //протокол работы OpenGL
-  OutputArray outputs; //зарегистрированные устройства вывода
-  Library     library; //библиотека точек входа OpenGL
+  Log           log;     //протокол работы OpenGL
+  OutputArray   outputs; //зарегистрированные устройства вывода
+  Library       library; //библиотека точек входа OpenGL
   
 ///Конструктор
   Impl ()  
   {
-    size_t screens_count = 0;
+    //соединение с дисплеем
+    Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
     
-//    {
-//      DisplayLock lock (display);
-      
-//      screens_count = ????;
-//    }
-
-//    for (size_t i=0; i<screens_count; i++)
-//      outputs.push_back (OutputPtr (new Output (display, i), false));
+    DisplayLock lock (display);
 
     outputs.reserve (OUTPUT_ARRAY_RESERVE);
+    
+    size_t screens_count = XScreenCount (display);
+    
+    for (size_t i=0; i<screens_count; i++)
+      outputs.push_back (OutputPtr (new Output (display, i), false));
   }  
 };
 
