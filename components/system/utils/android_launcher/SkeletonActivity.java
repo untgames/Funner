@@ -24,12 +24,11 @@ public class SkeletonActivity extends Activity {
 
     private EditText mEditor;
     
-    public SkeletonActivity() {
+    public SkeletonActivity() {                
         System.out.println ("Hello world");
-        Process.killProcess (Process.myPid ());
     }
     
-    @Override  
+/*    @Override  
         protected void onStop() {  
             // TODO Auto-generated method stub  
             super.onStop();  
@@ -41,12 +40,27 @@ public class SkeletonActivity extends Activity {
             super.onPause();  
             
             this.finish();  
-        }      
+        }      */
         
 
     /** Called with the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Bundle extras = getIntent().getExtras();
+        
+        if(extras !=null)
+        {
+            String value = extras.getString("test");
+
+            if (value != null)  System.out.println(value);            
+            else                System.out.println("NO VALUE!");
+        }
+        else
+        {
+            System.out.println("No extras");
+        }
+        
+        
         super.onCreate(savedInstanceState);
 
         // Inflate our UI from its XML layout description.
@@ -61,6 +75,9 @@ public class SkeletonActivity extends Activity {
         ((Button) findViewById(R.id.clear)).setOnClickListener(mClearListener);
         
         mEditor.setText(getText(R.string.main_label));
+        
+        System.exit(0);
+//        throw new RuntimeException();
     }
 
     /**
