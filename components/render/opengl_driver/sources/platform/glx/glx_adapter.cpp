@@ -40,7 +40,7 @@ struct Adapter::Impl
     size_t screens_count = XScreenCount (display);
     
     for (size_t i=0; i<screens_count; i++)
-      outputs.push_back (OutputPtr (new Output (display, i), false));
+      outputs.push_back (Output::Pointer (new Output (display, i), false));
   }  
 };
 
