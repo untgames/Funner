@@ -22,9 +22,13 @@ struct Adapter::Impl
     //соединение с дисплеем
     Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
     
-    DisplayLock lock (display);
+    size_t screens_count = 0;
+    
+    {
+      DisplayLock lock (display);
 
-    size_t screens_count = XScreenCount (display);
+      screens_count = XScreenCount (display);
+    }
     
     outputs.reserve (screens_count);
     

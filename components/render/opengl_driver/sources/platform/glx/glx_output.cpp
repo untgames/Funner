@@ -37,14 +37,10 @@ struct Output::Impl
   {
     DisplayLock lock (display);
     
-    int event_base, 
-        error_base;
-    
+    int event_base = 0, error_base = 0;
+
     if (!XRRQueryExtension (display, &event_base, &error_base))
-    {
-      fprintf (stderr, "RandR extension missing\n");
-      exit (1);
-    }
+      throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::Impl::Impl", "RandR extension missing");
 
     *name = 0;
     
