@@ -267,7 +267,7 @@ class DisplayLock
       XLockDisplay (display);    
     }
   
-    DisplayLock (NativeDisplayType in_display) : display ((Display*)in_display)
+    DisplayLock (Display* in_display) : display (in_display)
     {
       XLockDisplay (display);
     }
