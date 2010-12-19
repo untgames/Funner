@@ -71,9 +71,9 @@ inline bool read (const char* string, wchar_t& value)
   if (!string || !*string)
     return false;
 
-  wchar_t tmp;
+  wchar_t tmp = 0;
   
-  int length = strlen (string), result_length = mbtowc (&tmp, string, length);
+  int length = strlen (string), result_length = mbrtowc (&tmp, string, length, 0);
   
   if (length != result_length)
     return false;
@@ -151,7 +151,7 @@ struct wchar_string_converter
       if (string_length > MAX_LENGTH)
         string_length = MAX_LENGTH;
 
-      int length = wcstombs (buffer, string, string_length);
+      int length = wcsrtombs (buffer, &string, string_length, 0);
 
       if (length >= 0 && length < BUFFER_SIZE) buffer [length]        = '\0';
       else                                     buffer [BUFFER_SIZE-1] = '\0';

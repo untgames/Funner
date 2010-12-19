@@ -224,7 +224,9 @@ inline void to_value (const stl::string& buffer, stl::wstring& value)
 
   value.fast_resize (buffer.size ());
 
-  int result_size = (int)mbstowcs (&value [0], buffer.c_str (), buffer.size ());
+  const char* s = buffer.c_str ();
+  
+  int result_size = (int)mbsrtowcs (&value [0], &s, buffer.size (), 0);
 
   if (result_size <= 0)
     throw bad_lexical_cast (typeid (stl::string), typeid (stl::wstring));
