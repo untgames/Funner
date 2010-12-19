@@ -388,7 +388,7 @@ define batch-compile
 
     $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
 			@echo build-start > $$@.incomplete-build
-			@$$(call $(COMPILE_TOOL),$$(sort $$(filter-out force,$$?)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($1.INCLUDE_FILES),$$($2.TMP_DIR),$$($2.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH),$$($1.DLL_DIRS))
+			@$$(call $$(if $$($1.COMPILE_TOOL),$$($1.COMPILE_TOOL),$(COMPILE_TOOL)),$$(sort $$(filter-out force,$$?)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($1.INCLUDE_FILES),$$($2.TMP_DIR),$$($2.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH),$$($1.DLL_DIRS))
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
@@ -397,7 +397,7 @@ define batch-compile
     $$($2.FLAG_FILE): $2.UPDATED_SOURCE_FILES := $$(shell $$(call test_source_and_object_files,$$($2.SOURCE_FILES),$$($2.TMP_DIR)))
   
     $$($2.FLAG_FILE): $$($2.SOURCE_FILES)
-			@$$(if $$($2.UPDATED_SOURCE_FILES),$$(call $(COMPILE_TOOL),$$(sort $$($2.UPDATED_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($1.INCLUDE_FILES),$$($2.TMP_DIR),$$($2.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH),$$($1.DLL_DIRS)))
+			@$$(if $$($2.UPDATED_SOURCE_FILES),$$(call $$(if $$($1.COMPILE_TOOL),$$($1.COMPILE_TOOL),$(COMPILE_TOOL)),$$(sort $$($2.UPDATED_SOURCE_FILES)),$$($2.SOURCE_DIR) $$($1.INCLUDE_DIRS),$$($1.INCLUDE_FILES),$$($2.TMP_DIR),$$($2.COMPILER_DEFINES),$$($1.COMPILER_CFLAGS),$$($2.PCH),$$($1.DLL_DIRS)))
 			@echo batch-flag-file > $$@
 			@$(RM) $$@.incomplete-build
 
@@ -543,7 +543,7 @@ define process_target.static-lib
 
   $$($1.LIB_FILE): $$($1.FLAG_FILES) $$($1.OBJECT_FILES)
 		@echo Create library $$(notdir $$@)...
-		@$$(call $(LIB_TOOL),$$@,$$($1.OBJECT_FILES))
+		@$$(call $$(if $$($1.LIB_TOOL),$$($1.LIB_TOOL),$(LIB_TOOL)),$$@,$$($1.OBJECT_FILES))
 endef
 
 #Обработка цели dynamic-lib (имя цели)
@@ -572,7 +572,7 @@ define process_target.dynamic-lib
 
   $$($1.DLL_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES) $$($1.DEF_FILE)
 		@echo Create dynamic library $$(notdir $$($1.DLL_FILE))...
-		@$$(call $(LINK_TOOL),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS),$$($1.DEF_FILE))
+		@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$($1.DLL_FILE),$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS),$$($1.DEF_FILE))
 		@$(RM) $$(basename $$($1.DLL_FILE)).exp
 		@if [ -e $$($1.LIB_TMP_FILE) ]; then mv -f $$($1.LIB_TMP_FILE) $(DIST_LIB_DIR); fi
 endef
@@ -604,11 +604,11 @@ define process_target.application
   
   $$($1.EXE_FILE): $$($1.FLAG_FILES) $$($1.LIB_DEPS) $$($1.OBJECT_FILES)
 		@echo Linking $$(notdir $$@)...
-		@$$(call $(LINK_TOOL),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+		@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$@,$$($1.OBJECT_FILES) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
-		@$$(call $(RUN_TOOL),$$(patsubst %,"$(CURDIR)/%",$$<) $(args),$$($1.EXECUTION_DIR),$$(dir $$($1.EXE_FILE)) $$($1.DLL_DIRS)) > $$@		
+		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$$(patsubst %,"$(CURDIR)/%",$$<) $(args),$$($1.EXECUTION_DIR),$$(dir $$($1.EXE_FILE)) $$($1.DLL_DIRS)) > $$@		
 
   ifneq (,$$(filter $$(files:%=$$($1.OUT_DIR)/%$(EXE_SUFFIX)),$$($1.EXE_FILE)))
     ifeq (,$$($1.DISABLE_RUN))
@@ -620,7 +620,7 @@ endef
 #Вызов теста (имя цели, имя модуля, имя теста)
 define process_tests_source_dir_run_test
   TEST_MODULE.$2::
-		@$$(call $(RUN_TOOL),$3 $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS))
+		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$3 $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS))
 
 endef
 
@@ -650,19 +650,19 @@ define process_tests_source_dir
 #Правило сборки теста
   $$($2.TARGET_DIR)/%$(EXE_SUFFIX): $$($2.TMP_DIR)/%$(OBJ_SUFFIX) $$($1.LIB_DEPS)
 		@echo Linking $$(notdir $$@)...
-		@$$(call $(LINK_TOOL),$$@,$$(filter %$(OBJ_SUFFIX),$$<) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
+		@$$(call $$(if $$($1.LINK_TOOL),$$($1.LINK_TOOL),$(LINK_TOOL)),$$@,$$(filter %$(OBJ_SUFFIX),$$<) $$($1.LIBS),$$($1.LIB_DIRS),$$($1.LINK_INCLUDES),$$($1.LINK_FLAGS))
 
 #Правило получения файла-результата тестирования
   $$($2.TMP_DIR)/%.result: $$($2.TARGET_DIR)/%$(EXE_SUFFIX)
 		@echo Running $$(notdir $$<)...
-		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $(CURDIR)/$$@
+		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $(CURDIR)/$$@
 		
 #Правило получения файла-результата тестирования по shell-файлу
   $$($2.SOURCE_DIR)/%.sh: $$($2.TEST_EXE_FILES)
   
   $$($2.TMP_DIR)/%.result: $$($2.SOURCE_DIR)/%.sh $$($2.USED_APPLICATIONS)
 		@echo Running $$(notdir $$<)...
-		@$$(call $(RUN_TOOL),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $(CURDIR)/$$@
+		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$$< $(args),$$($2.EXECUTION_DIR),$$($2.TARGET_DIR) $$($1.DLL_DIRS)) > $(CURDIR)/$$@
 
 #Правило запуска тестов
   $$(foreach file,$$($2.RUN_FILES),$$(eval $$(call process_tests_source_dir_run_test,$1,$2,$$(file))))      
@@ -865,7 +865,11 @@ define import_variables
   $2.COMPILER_DEFINES     := $$($2.COMPILER_DEFINES) $$($1.COMPILER_DEFINES)
   $2.LINK_INCLUDES        := $$(strip $$($2.LINK_INCLUDES)) $$(strip $$($1.LINK_INCLUDES))
   $2.LINK_FLAGS           := $$($2.LINK_FLAGS) $$($1.LINK_FLAGS)
-  $2.COMPONENTS           := $$($2.COMPONENTS) $$($1.COMPONENTS)  
+  $2.COMPONENTS           := $$($2.COMPONENTS) $$($1.COMPONENTS)
+  $2.LINK_TOOL            := $$(if $$($2.LINK_TOOL),$$($2.LINK_TOOL),$$($1.LINK_TOOL))
+  $2.LIB_TOOL             := $$(if $$($2.LIB_TOOL),$$($2.LIB_TOOL),$$($1.LIB_TOOL))
+  $2.COMPILE_TOOL         := $$(if $$($2.COMPILE_TOOL),$$($2.COMPILE_TOOL),$$($1.COMPILE_TOOL))
+  $2.RUN_TOOL             := $$(if $$($2.RUN_TOOL),$$($2.RUN_TOOL),$$($1.RUN_TOOL))
 endef
 
 #Предварительный импорт настроек - построение списка импорта (имя зависимости, имя цели, имя переменной со списком)

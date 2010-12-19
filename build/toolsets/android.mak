@@ -20,56 +20,62 @@ endif
 ###################################################################################################
 #Константы
 ###################################################################################################
-PROFILES           += android no_dll unistd haswchar
-REMOTE_DEBUG_DIR   ?= //sdcard/funner
-EXE_SUFFIX         :=
-DLL_SUFFIX         := so #no suffix, this is for dll correct dll dispatch at link
-DLL_PREFIX         :=
-NDK_HOST           := windows
-ANDROID_PLATFORM   := android-8
-NDK_ROOT           := /$(subst :,,$(call convert_path,$(ANDROID_NDK)))
-SDK_ROOT           := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
-JAVA_SDK           := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
-ARM_EABI_DIR       := $(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.4.0
-CYGWIN_BIN         := /$(subst :,,$(call convert_path,$(CYGHOME)))/bin
-GCC_TOOLS_DIR      := $(ARM_EABI_DIR)/bin
-COMPILER_GCC       := $(GCC_TOOLS_DIR)/arm-eabi-gcc.exe
-LINKER_GCC         := $(GCC_TOOLS_DIR)/arm-eabi-gcc.exe
-LIB_GCC            := $(GCC_TOOLS_DIR)/arm-eabi-ar
-ANDROID_TOOLS_DIR  := $(SDK_ROOT)/tools
-ADB                := $(ANDROID_TOOLS_DIR)/adb
-APK_BUILDER        := $(ANDROID_SDK)/tools/apkbuilder.bat
-DX_TOOL            := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/tools/dx.bat
-JAVA_CC            := "$(JAVA_SDK)/bin/javac"
-JAVA_AAPT          := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/tools/aapt
-JAVA_JAR_SIGNER    := "$(JAVA_SDK)/bin/jarsigner"
-ADDITIONAL_PATHS   += $(CYGWIN_BIN)
-BUILD_PATHS        := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-eabi/4.4.0
-COMMON_JAVA_FLAGS  += -g
-COMMON_CPPFLAGS    += -fexceptions -frtti
-COMMON_CFLAGS      += -mandroid -ffunction-sections -fdata-sections -Os -g -Wno-psabi \
-                     --sysroot=$(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm \
-                     -fPIC -fvisibility=hidden -D__NEW__ -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ \
-                     -D__ARM_ARCH_5TE__ -DANDROID -DARM -DSK_RELEASE -DNDEBUG \
-                     -UDEBUG -march=armv5te -mtune=xscale -msoft-float -mthumb-interwork -fpic -ffunction-sections \
-                     -funwind-tables -fstack-protector -fmessage-length=0 -Bdynamic -fno-strict-aliasing
-COMMON_LINK_FLAGS  += -Wl,-L,$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.4.0/lib/gcc/arm-eabi/4.4.0
-COMMON_LINK_FLAGS  += -Wl,-L,$(NDK_ROOT)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.4.0/arm-eabi/lib/thumb
-COMMON_LINK_FLAGS  += --sysroot=$(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm
-COMMON_LINK_FLAGS  += -Bdynamic -Wl,-dynamic-linker,//system/bin/linker
-COMMON_LINK_FLAGS  += -Wl,--gc-sections -Wl,-z,nocopyreloc
-COMMON_LINK_FLAGS  += -Wl,-L,$(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib
-COMMON_LINK_FLAGS  += -Wl,-rpath-link=$(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib
-COMMON_LINK_FLAGS  += -nostdlib -lc -lm -lstdc++ -lgcc \
-                      --no-undefined -z $(NDK_ROOT)/build/platforms/$(ANDROID_PLATFORM)/arch-arm/usr/lib/crtbegin_dynamic.o
-CYGWIN             := nodosfilewarning
-VALID_TARGET_TYPES += android-pak
-ANDROID_KEY_STORE  := $(BUILD_DIR)platforms/android/my-release-key.keystore
-ANDROID_KEY_PASS   := android
-ANDROID_JAR        := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/android.jar
+PROFILES               += android no_dll unistd
+REMOTE_DEBUG_DIR       ?= //sdcard/funner
+EXE_SUFFIX             :=
+DLL_SUFFIX             := .so
+DLL_PREFIX             := lib
+NDK_HOST               := windows
+ANDROID_PLATFORM       := android-9
+NDK_ROOT               := /$(subst :,,$(call convert_path,$(ANDROID_NDK)))
+SDK_ROOT               := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
+JAVA_SDK               := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
+PLATFORM_DIR           := $(NDK_ROOT)/platforms/$(ANDROID_PLATFORM)
+ARM_EABI_DIR           := $(NDK_ROOT)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(NDK_HOST)
+CYGWIN_BIN             := /$(subst :,,$(call convert_path,$(CYGHOME)))/bin
+GCC_TOOLS_DIR          := $(ARM_EABI_DIR)/bin
+COMPILER_GCC           := $(GCC_TOOLS_DIR)/arm-linux-androideabi-gcc.exe
+LINKER_GCC             := $(GCC_TOOLS_DIR)/arm-linux-androideabi-gcc.exe
+LIB_GCC                := $(GCC_TOOLS_DIR)/arm-linux-androideabi-ar
+ANDROID_TOOLS_DIR      := $(SDK_ROOT)/tools
+ADB                    := $(ANDROID_TOOLS_DIR)/adb
+APK_BUILDER            := $(ANDROID_SDK)/tools/apkbuilder.bat
+DX_TOOL                := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/tools/dx.bat
+JAVA_CC                := "$(JAVA_SDK)/bin/javac"
+JAVA_AAPT              := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/tools/aapt
+JAVA_JAR_SIGNER        := "$(JAVA_SDK)/bin/jarsigner"
+ZIP_ALIGNER            := $(ANDROID_SDK)/tools/zipalign
+ADDITIONAL_PATHS       += $(CYGWIN_BIN)
+BUILD_PATHS            := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-linux-androideabi/4.4.3
+COMMON_JAVA_FLAGS      += -g
+COMMON_CPPFLAGS        += -fexceptions -frtti
+COMMON_CFLAGS          += -mandroid -ffunction-sections -fdata-sections -Os -g -Wno-psabi
+COMMON_CFLAGS          += --sysroot=$(PLATFORM_DIR)/arch-arm
+COMMON_CFLAGS          += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
+COMMON_CFLAGS          += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include
+COMMON_CFLAGS          += -fPIC -fvisibility=hidden -D__NEW__ -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__
+COMMON_CFLAGS          += -D__ARM_ARCH_5TE__ -DANDROID -DARM -DSK_RELEASE -DNDEBUG
+COMMON_CFLAGS          += -UDEBUG -march=armv5te -mtune=xscale -msoft-float -mthumb-interwork -fpic -ffunction-sections
+COMMON_CFLAGS          += -funwind-tables -fstack-protector -fmessage-length=0 -Bdynamic -fno-strict-aliasing
+COMMON_LINK_FLAGS      += -Wl,-L,$(ARM_EABI_DIR)/lib/gcc/arm-linux-androideabi/4.4.3
+COMMON_LINK_FLAGS      += -Wl,-L,$(ARM_EABI_DIR)/lib/thumb
+COMMON_LINK_FLAGS      += --sysroot=$(PLATFORM_DIR)/arch-arm
+COMMON_LINK_FLAGS      += -Bdynamic -Wl,-dynamic-linker,//system/bin/linker
+COMMON_LINK_FLAGS      += -Wl,--gc-sections -Wl,-z,nocopyreloc
+COMMON_LINK_FLAGS      += -Wl,-L,$(PLATFORM_DIR)/arch-arm/usr/lib
+COMMON_LINK_FLAGS      += -Wl,-rpath-link=$(PLATFORM_DIR)/arch-arm/usr/lib
+COMMON_LINK_FLAGS      += -nostdlib -lc -lm -lstdc++ -lgcc -lsupc++ #-lmissing
+COMMON_LINK_FLAGS      += --no-undefined
+ANDROID_EXE_LINK_FLAGS += -z $(PLATFORM_DIR)/arch-arm/usr/lib/crtbegin_dynamic.o
+ANDROID_SO_LINK_FLAGS  += -Wl,-soname,$(notdir $1) -Wl,-shared,-Bsymbolic -Wl,--no-undefined -Wl,-z,noexecstack
+CYGWIN                 := nodosfilewarning
+VALID_TARGET_TYPES     += android-pak
+ANDROID_KEY_STORE      := $(BUILD_DIR)platforms/android/my-release-key.keystore
+ANDROID_KEY_PASS       := android
+ANDROID_JAR            := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/android.jar
 DEFAULT_PACKAGE_PREFIX := com.untgames.android.
 GDB_SERVER_FLAG_FILE   := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/gdb-installed
-GDB_SERVER_FILE        := $(ANDROID_NDK)/build/prebuilt/$(NDK_HOST)/arm-eabi-4.4.0/bin/gdbserver
+GDB_SERVER_FILE        := $(ARM_EABI_DIR)/../gdbserver
 
 export CYGWIN
 
@@ -82,8 +88,16 @@ define tools.c++compile
 export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.c++compile,$1,$2,$3,$4,$5,$6,$7,$8,$9)
 endef
 
+define tools.link.shared-lib
+export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,,,$5 $(foreach dir,$3,-Wl,-L,$(dir)) $(ANDROID_SO_LINK_FLAGS) $(foreach link,$4,-Wl,-u,$(link)),$6,$7,$8,$9)
+endef
+
+define tools.link.dll
+$(ANDROID_SO_LINK_FLAGS)
+endef
+
 define tools.link
-export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,,,$5 $(foreach dir,$3,-Wl,-L,$(dir)) $(foreach link,$4,-Wl,-u,$(link)),$6,$7,$8,$9)
+export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,,,$5 $(foreach dir,$3,-Wl,-L,$(dir)) $(if $(filter %$(DLL_SUFFIX),$1),,$(ANDROID_EXE_LINK_FLAGS)) $(foreach link,$4,-Wl,-u,$(link)),$6,$7,$8,$9)
 endef
 
 define tools.lib
@@ -138,6 +152,7 @@ define process_target.android-pak
   $1.TARGET            := $(DIST_BIN_DIR)/$$($1.NAME).apk
   $1.TMP_DIR           := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
   $1.UNSIGNED_TARGET   := $$($1.TMP_DIR)/$$($1.NAME).unsigned.apk
+  $1.SIGNED_TARGET     := $$($1.TMP_DIR)/$$($1.NAME).signed.apk
   $1.PACKAGED_RES_FILE := $$($1.TMP_DIR)/resource.pak
   $1.DEX_FILE          := $$($1.TMP_DIR)/code.dex
   $1.JARS              := $$(call specialize_paths,$$($1.JARS))
@@ -147,8 +162,13 @@ define process_target.android-pak
   $1.MANIFEST_FILE     := $$(call specialize_paths,$$($1.MANIFEST_FILE))
   $1.R_DIR             := $$($1.TMP_DIR)/r_files
   $1.RES_DIR           := $$(call specialize_paths,$$($1.RES_DIR))
+  $1.DLL_DIRS          := $$(call specialize_paths,$$($1.DLL_DIRS)) $(DIST_BIN_DIR)
+  $1.DLLS              := $$($1.DLLS:%=$(DLL_PREFIX)%$(DLL_SUFFIX))
+  $1.TARGET_DLLS       := $$($1.DLLS:%=$$($1.TMP_DIR)/bin/lib/armeabi/%)
   $1.INSTALLATION_FLAG := $$($1.TMP_DIR)/installation-flag
-  TMP_DIRS             := $$(TMP_DIRS) $$($1.TMP_DIR) $$($1.CLASSES_DIR) $$($1.R_DIR)
+  TMP_DIRS             := $$(TMP_DIRS) $$($1.TMP_DIR) $$($1.CLASSES_DIR) $$($1.R_DIR) $$($1.TMP_DIR)/bin/lib/armeabi
+  
+  $$(foreach file,$$($1.TARGET_DLLS),$$(eval $$(call create_extern_file_dependency,$$(file),$$($1.DLL_DIRS))))    
   
 ifeq (,$$(wildcard $$($1.MANIFEST_FILE)))
   $$(error Manifest file '$$($1.MANIFEST_FILE)' not found)
@@ -163,24 +183,31 @@ endif
 
   $$($1.PACKAGED_RES_FILE): $$($1.MANIFEST_FILE) 
 		@echo Compile resources for $$(notdir $$($1.TARGET))...
-		@export MANIFEST_DIR_PREFIX=$$$$($$(call get_system_dir,$$(dir $$($1.MANIFEST_FILE)))) && cmd //C '$(subst /,\,$(JAVA_AAPT)) package -f -M %MANIFEST_DIR_PREFIX%\$$(notdir $$($1.MANIFEST_FILE)) -F $$@ -I $(ANDROID_JAR) -S $$($1.RES_DIR) -m -J $$($1.R_DIR)'
+		@export MANIFEST_DIR_PREFIX=$$$$($$(call get_system_dir,$$(dir $$($1.MANIFEST_FILE)))) && cmd //C '$(subst /,\,$(JAVA_AAPT)) package -f -M %MANIFEST_DIR_PREFIX%\$$(notdir $$($1.MANIFEST_FILE)) -F $$@ -I $(ANDROID_JAR) -S $$($1.RES_DIR) -m -J $$($1.R_DIR)' 
+		
+  .PHONY: create-dirs
   
-  $$($1.CLASSES_FLAG): $$($1.TMP_DIR) $$($1.SOURCE_FILES) $$($1.PACKAGED_RES_FILE)
+  $$($1.CLASSES_FLAG): $$($1.SOURCE_FILES) $$($1.PACKAGED_RES_FILE)
 		@echo Compile sources for $$(notdir $$($1.TARGET))...
 		@export R_FILES=$$$$(/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath /$(subst :,,$(call convert_path,$(ANDROID_JAR)))
 		@touch $$@
   
   $$($1.DEX_FILE): $$($1.CLASSES_FLAG)
 		@echo Convert $$(notdir $$@) to Dalvik bytecodes...
-		@export TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && cmd //C '$(DX_TOOL) --dex --output=%TMP_DIR_PREFIX%\$$(notdir $$@) %TMP_DIR_PREFIX%\$$(notdir $$($1.CLASSES_DIR))'		
-  
-  $$($1.UNSIGNED_TARGET): $$($1.DEX_FILE) $$($1.PACKAGED_RES_FILE)
-		@echo Create unsigned APK $$(notdir $$@)...
-		@export TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && cmd //C '$(APK_BUILDER) %TMP_DIR_PREFIX%\$$(notdir $$@) -u -z %TMP_DIR_PREFIX%\$$(notdir $$($1.PACKAGED_RES_FILE)) -f %TMP_DIR_PREFIX%\$$(notdir $$($1.DEX_FILE))' # -rf ${source.dir}  -rj  ${libraries.dir}
+		@export TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && cmd //C '$(DX_TOOL) --dex --output=%TMP_DIR_PREFIX%\$$(notdir $$@) %TMP_DIR_PREFIX%\$$(notdir $$($1.CLASSES_DIR))'
 
-  $$($1.TARGET): $$($1.UNSIGNED_TARGET)
+  $$($1.UNSIGNED_TARGET): $$($1.DEX_FILE) $$($1.PACKAGED_RES_FILE) $$($1.TARGET_DLLS)
+		@echo Create unsigned APK $$(notdir $$@)...
+		@export TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && if ! cmd //C '$(APK_BUILDER) %TMP_DIR_PREFIX%\$$(notdir $$@) -u -z %TMP_DIR_PREFIX%\$$(notdir $$($1.PACKAGED_RES_FILE)) -f %TMP_DIR_PREFIX%\$$(notdir $$($1.DEX_FILE)) -rf %TMP_DIR_PREFIX%\\bin'; then $(RM) $$@; exit 1; fi #-rj  ${libraries.dir} 
+
+  $$($1.SIGNED_TARGET): $$($1.UNSIGNED_TARGET)
 		@echo Sign $$(notdir $$@)...
 		@$(JAVA_JAR_SIGNER) -keystore $(ANDROID_KEY_STORE) -storepass $(ANDROID_KEY_PASS) -keypass $(ANDROID_KEY_PASS) -signedjar $$@ $$< alias_name
+		
+  $$($1.TARGET): $$($1.SIGNED_TARGET)
+		@echo Align $$(notdir $$@)...
+		@$(RM) $$@
+		@$(ZIP_ALIGNER) 4 $$< $$@
 		
 #Install package
   install: INSTALL.$1
@@ -208,7 +235,6 @@ endif
 		@$(ADB) shell logcat -c		
 		@$(ADB) shell am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME)/.SkeletonActivity -e "test" "value"
 		@sleep 1
-#		@$(ADB) shell "\\/data/busybox/sh -c 'while ! ps | \\/data/busybox/grep $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME); do sleep 1; done'" > nul
 		@$(ADB) shell "\\/data/busybox/sh -c 'while ps | \\/data/busybox/grep $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME); do sleep 1; done'" > nul
 		@$(ADB) logcat -s -d -v raw System.out:I
 #		@$(ADB) shell setprop log.redirect-stdio true
