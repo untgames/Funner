@@ -41,22 +41,23 @@ struct Output::Impl
     if (!XRRQueryExtension (display, &event_base, &error_base))
       throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::Impl::Impl", "RandR extension missing");      
 
-    int            sizes_count = 0, depths_count = 0;
-    XRRScreenSize* sizes       = XRRSizes (display, screen_number, &sizes_count);
-    int*           depths      = XListDepths (display, screen_number, &depths_count);    
+    int sizes_count = 0, depths_count = 0;
     
+    XRRScreenSize  *sizes  = XRRSizes (display, screen_number, &sizes_count);
+    int            *depths = XListDepths (display, screen_number, &depths_count);
+
     if (!depths_count)
     {
-      static int default_depths = 0;    
+      static int default_depths = 0;
     
       depths       = &default_depths;
       depths_count = 1;
     }
     
-    for (int sizeID=0; sizeID < sizes_count; sizeID++)
+    for (int size_id=0; size_id < sizes_count; size_id++)
     {
       int    rates_count = 0;
-      short* rates       = XRRRates (display, screen_number, sizeID, &rates_count);
+      short  *rates      = XRRRates (display, screen_number, size_id, &rates_count);
 
       if (!rates_count)
       {
@@ -66,16 +67,16 @@ struct Output::Impl
         rates       = &default_rate;
       }
       
-      for (int rateID=0; rateID < rates_count; rateID++)
+      for (int rate_id=0; rate_id < rates_count; rate_id++)
       {
-        for (int depthID=0; depthID < depths_count; depthID++)
+        for (int depth_id=0; depth_id < depths_count; depth_id++)
         {
           OutputModeDesc mode_desc;
           
-          mode_desc.width        = sizes [sizeID].width;
-          mode_desc.height       = sizes [sizeID].height;
-          mode_desc.color_bits   = depths [depthID];
-          mode_desc.refresh_rate = rates [rateID];
+          mode_desc.width        = sizes [size_id].width;
+          mode_desc.height       = sizes [size_id].height;
+          mode_desc.color_bits   = depths [depth_id];
+          mode_desc.refresh_rate = rates [rate_id];
           
           modes.push_back (mode_desc);
         }
@@ -156,24 +157,44 @@ void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 
 void Output::SetCurrentMode (const OutputModeDesc&)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Output::SetCurrentMode");
+  DisplayLock lock (display);
+
 }
 
-void Output::GetCurrentMode (OutputModeDesc&)
+void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Output::GetCurrentMode");
+  DisplayLock lock (display);
+  
+  static Window root = RootWindow (impl->display, impl->screen_number);
+  
+  XRRScreenConfiguration *conf = XRRGetScreenInfo (impl->display, root);
+  
+  XVisualInfo *visual_list;
+  XVisualInfo  visual_template;
+  int          visuals_count;
+    
+  visual_count = 0;
+  visual_template.screen = impl->screen_number;
+  visual_list = XGetVisualInfo (impl->display, VisualScreenMask, &visual_template, &visual_count);
+  
+  mode_desc.width        = DisplayWidth  (impl->display, impl->screen_number);
+  mode_desc.height       = DisplayHeight (impl->display, impl->screen_number);
+  mode_desc.color_bits   = visual_count ? visual_list [0].depth : DefaultDepth  (impl->display, impl->screen_number);
+//  mode_desc.color_bits   = DefaultDepth  (impl->display, impl->screen_number);
+  mode_desc.refresh_rate = XRRConfigCurrentRate (conf);
 }
 
 /*
     Управление гамма-коррекцией
 */
 
-void Output::SetGammaRamp (const Color3f [256])
+void Output::SetGammaRamp (const Color3f table [256])
 {
-  throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::SetGammaRamp", "Gamma ramp not supported in EGL");
+//  throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::GetGammaRamp", "Gamma ramp not supported in EGL");
 }
 
-void Output::GetGammaRamp (Color3f [256])
+void Output::GetGammaRamp (Color3f table [256])
 {
-  throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::GetGammaRamp", "Gamma ramp not supported in EGL");
+//  throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::GetGammaRamp", "Gamma ramp not supported in EGL");
+
 }
