@@ -181,13 +181,14 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
   // get original size_id and rotation
   Rotation original_rotation = 0;
   SizeID original_size_id = XRRConfigCurrentConfiguration (conf, &original_rotation);
+  short original_rate = XRRConfigCurrentRate (conf);
 
   // get all supported resolutions
   int sizes_count = 0, size_id = 0;
   XRRScreenSize *sizes = XRRSizes (impl->display, impl->screen_number, &sizes_count);
 
   // search resolution id
-  for (size_id=0; size_id<sizes_count; i++)
+  for (size_id=0; size_id<sizes_count; size_id++)
   {
     if (sizes[size_id].width == mode_desc.width && sizes[size_id].height == mode_desc.height)
       break;
@@ -206,9 +207,9 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
     raise_format_not_supported_exception (mode_desc);
     
   // search rate id
-  for (rate_id=0; i<rates_count; i++)
+  for (rate_id=0; rate_id<rates_count; rate_id++)
   {
-    if (rates[rate_id].width == mode_desc.refresh_rate)
+    if (rates[rate_id] == mode_desc.refresh_rate)
       break;
   }
   
@@ -217,9 +218,10 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
     raise_format_not_supported_exception (mode_desc);
     
   // the depth and visual of window are assigned at creation and cannot be changed.
-
-  // set screen configuration
-  XRRSetScreenConfigAndRate (impl->display, conf, root, size_id, original_rotation, mode_desc.refresh_rate, CurrentTime);
+  
+  // set screen configuration if current resolution or rate different from the parameter
+  if (original_size_id != size_id || original_rate != rates[rate_id])
+    XRRSetScreenConfigAndRate (impl->display, conf, root, size_id, original_rotation, mode_desc.refresh_rate, CurrentTime);
 }
 
 void Output::GetCurrentMode (OutputModeDesc& mode_desc)
