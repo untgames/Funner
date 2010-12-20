@@ -184,13 +184,14 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
   short original_rate = XRRConfigCurrentRate (conf);
 
   // get all supported resolutions
-  int sizes_count = 0, size_id = 0;
+  int sizes_count = 0;
+  SizeID size_id = 0;
   XRRScreenSize *sizes = XRRSizes (impl->display, impl->screen_number, &sizes_count);
 
   // search resolution id
   for (size_id=0; size_id<sizes_count; size_id++)
   {
-    if (sizes[size_id].width == mode_desc.width && sizes[size_id].height == mode_desc.height)
+    if (sizes[size_id].width == (int)mode_desc.width && sizes[size_id].height == (int)mode_desc.height)
       break;
   }
 
