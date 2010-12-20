@@ -171,7 +171,7 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
   
   XVisualInfo *visual_list;
   XVisualInfo  visual_template;
-  int          visuals_count;
+  int          visual_count;
     
   visual_count = 0;
   visual_template.screen = impl->screen_number;
