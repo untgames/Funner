@@ -40,11 +40,10 @@ public class SkeletonActivity extends Activity
     
     try
     {
-//      System.loadLibrary ("funner_launcher");
-//      System.load ("/sdcard/funner/tmp/android/SYSTEMLIB.TEST_DLL/sources/test-dll/test_dll");
       System.load (programName);
-//      System.loadLibrary (programName);      
-      startApplication (programName, programArgs != null ? programArgs : "");
+
+      if (startApplication (programName, programArgs != null ? programArgs : "") == 0)
+        System.exit (0);
     }
     catch (Throwable e)
     {
@@ -55,12 +54,8 @@ public class SkeletonActivity extends Activity
     }       
     
     super.onCreate (savedInstanceState);
-    
-      //выход из приложения
-    
-    System.exit (0);
   }
   
 /// Точка входа в native код
-  public native void startApplication (String programName, String programArgs);
+  public native int startApplication (String programName, String programArgs);
 }

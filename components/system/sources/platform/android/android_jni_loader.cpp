@@ -9,6 +9,9 @@ namespace
 const char* SKELETON_ACTIVITY_CLASS_NAME                    = "com/untgames/android/funner_launcher/SkeletonActivity";
 const char* SKELETON_ACTIVITY_START_APPLICATION_METHOD_NAME = "startApplication";
 
+/// Виртуальная машина
+JavaVM* java_vm = 0;
+
 /// Обёртка для работы со строками
 class jni_string
 {
@@ -37,18 +40,18 @@ class jni_string
     const char* string;
 };
 
-void JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name, jstring jprogram_args)
+jint JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name, jstring jprogram_args)
 {
   if (!env)
   {  
     printf ("Bad JNIEnv passed to SkeletonActivity::startApplication\n");
-    return;
+    return 0;
   }
   
   if (!jprogram_name || !jprogram_args)
   {
     printf ("Bad arguments passed to SkeletonActivity::startApplication\n");
-    return;    
+    return 0; 
   }
   
   jni_string program_name (env, jprogram_name), program_args (env, jprogram_args);
@@ -58,15 +61,23 @@ void JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name,
   
   try
   {   
-    start_application (env, program_name.get (), program_args.get ());
+    start_application (java_vm, program_name.get (), program_args.get ());
+    
+    return 1;
   }
   catch (std::exception& e)
   {
-    printf ("%s\n", e.what ());
+    printf ("%s\n  at syslib::android::startApplication\n", e.what ());
+    fflush (stdout);
+    
+    return 0;
   }
   catch (...)
   {
-    printf ("unknown exception appears\n");
+    printf ("unknown exception appears\n  at syslib::android::startApplication\n");
+    fflush (stdout);
+    
+    return 0;
   }
 }
 
@@ -84,6 +95,8 @@ extern JNIEXPORT jint JNICALL JNI_OnLoad (JavaVM* vm, void* reserved)
 
     return -1; 
   }
+  
+  java_vm = vm;
   
   JNIEnv* env;
   
@@ -110,7 +123,7 @@ extern JNIEXPORT jint JNICALL JNI_OnLoad (JavaVM* vm, void* reserved)
   memset (&method, 0, sizeof (JNINativeMethod));
   
   method.name      = SKELETON_ACTIVITY_START_APPLICATION_METHOD_NAME;
-  method.signature = "(Ljava/lang/String;Ljava/lang/String;)V";
+  method.signature = "(Ljava/lang/String;Ljava/lang/String;)I";
   method.fnPtr     = (void*)&startApplication;
 
   jint status = env->RegisterNatives (skeletonActivityClass, &method, 1);

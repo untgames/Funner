@@ -5,6 +5,7 @@ using namespace syslib;
 namespace
 {
 
+/// Делегат приложения
 class DefaultApplicationDelegate: public IApplicationDelegate, public xtl::reference_counter
 {
   public:
@@ -76,19 +77,4 @@ class DefaultApplicationDelegate: public IApplicationDelegate, public xtl::refer
 IApplicationDelegate* Platform::CreateDefaultApplicationDelegate ()
 {
   return new DefaultApplicationDelegate;
-}
-
-namespace syslib
-{
-
-namespace android
-{
-
-void start_application (JNIEnv* env, const char* program_name, const char* args)
-{
-  printf ("env=%d program_name='%s' args='%s'\n", env->GetVersion (), program_name, args); 
-}
-
-}
-
 }
