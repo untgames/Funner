@@ -183,7 +183,7 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
   Rotation original_rotation = 0;
   SizeID   original_size_id  = XRRConfigCurrentConfiguration (conf, &original_rotation);
   short    original_rate     = XRRConfigCurrentRate (conf);
-
+  
   // get all supported resolutions
 
   int            sizes_count = 0;
@@ -233,7 +233,10 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
   if (original_size_id == size_id && original_rate == rates [rate_id])
     return;
 
-  XRRSetScreenConfigAndRate (impl->display, conf, root, size_id, original_rotation, mode_desc.refresh_rate, CurrentTime);
+  Status status = XRRSetScreenConfigAndRate (impl->display, conf, root, size_id, original_rotation, mode_desc.refresh_rate, CurrentTime);
+
+  if (status < Success)
+    throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::SetModeDesc", "XRRSetScreenConfigAndRate failed");
 }
 
 void Output::GetCurrentMode (OutputModeDesc& mode_desc)
