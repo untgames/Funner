@@ -47,18 +47,23 @@ struct Output::Impl
     for (int sizeID=0; sizeID < sizes_count; sizeID++)
     {
       int rates_count = 0;
-      short *rates = XRRRates (display, screen_number, sizeID, &rates_count);
+      int depths_count = 0;
+      short *rates  = XRRRates (display, screen_number, sizeID, &rates_count);
+      int   *depths = XListDepths (display, screen_number, &depths_count);
       
       for (int rateID=0; rateID < rates_count; rateID++)
       {
-        OutputModeDesc mode_desc;
-        
-        mode_desc.width        = sizes [sizeID].width;
-        mode_desc.height       = sizes [sizeID].height;
-        mode_desc.color_bits   = 0;
-        mode_desc.refresh_rate = rates [rateID];
-        
-        modes.push_back (mode_desc);
+        for (int depthID=0; depthID < depths_count; depthID++)
+        {
+          OutputModeDesc mode_desc;
+          
+          mode_desc.width        = sizes [sizeID].width;
+          mode_desc.height       = sizes [sizeID].height;
+          mode_desc.color_bits   = depths [depthID];
+          mode_desc.refresh_rate = rates [rateID];
+          
+          modes.push_back (mode_desc);
+        }
       }
     }
   }
