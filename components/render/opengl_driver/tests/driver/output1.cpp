@@ -58,14 +58,6 @@ int main ()
           printf ("         color bits:   %u\n", mode_desc.color_bits);
           printf ("         refresh rate: %u\n", mode_desc.refresh_rate);
         }
-        
-        output->GetCurrentMode (mode_desc);
-        
-        printf ("       !!!CurrentMode:\n");
-        printf ("         width:        %u\n", mode_desc.width);
-        printf ("         height:       %u\n", mode_desc.height);
-        printf ("         color bits:   %u\n", mode_desc.color_bits);
-        printf ("         refresh rate: %u\n", mode_desc.refresh_rate);
       }
     }
   }

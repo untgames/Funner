@@ -169,18 +169,9 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
   
   XRRScreenConfiguration *conf = XRRGetScreenInfo (impl->display, root);
   
-  XVisualInfo *visual_list;
-  XVisualInfo  visual_template;
-  int          visual_count;
-    
-  visual_count = 0;
-  visual_template.screen = impl->screen_number;
-  visual_list = XGetVisualInfo (impl->display, VisualScreenMask, &visual_template, &visual_count);
-  
   mode_desc.width        = DisplayWidth  (impl->display, impl->screen_number);
   mode_desc.height       = DisplayHeight (impl->display, impl->screen_number);
-//  mode_desc.color_bits   = visual_count ? visual_list [0].depth : DefaultDepth (impl->display, impl->screen_number);
-  mode_desc.color_bits   = DefaultDepth (impl->display, impl->screen_number);
+  mode_desc.color_bits   = DefaultDepth  (impl->display, impl->screen_number);
   mode_desc.refresh_rate = XRRConfigCurrentRate (conf);
 }
 
