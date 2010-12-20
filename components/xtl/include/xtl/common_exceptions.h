@@ -54,12 +54,12 @@ message_exception<operation_exception> vformat_operation_exception (const char* 
 ///функция не реализована
 message_exception<not_implemented_exception> make_not_implemented_exception (const char* source);
 
-///aункция не поддерживается
+///функция не поддерживается
 message_exception<not_supported_exception> format_not_supported_exception  (const char* source);
 message_exception<not_supported_exception> format_not_supported_exception  (const char* source, const char* format, ...);
 message_exception<not_supported_exception> vformat_not_supported_exception (const char* source, const char* format, va_list list);
 
-///gлатформа не поддерживается
+///платформа не поддерживается
 message_exception<bad_platform> make_unsupported_platform_exception (const char* source, const char* platform=0);
 
 #include <xtl/detail/common_exceptions.inl>
