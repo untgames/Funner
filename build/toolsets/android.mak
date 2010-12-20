@@ -49,25 +49,24 @@ ADDITIONAL_PATHS       += $(CYGWIN_BIN)
 BUILD_PATHS            := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-linux-androideabi/4.4.3
 COMMON_JAVA_FLAGS      += -g
 COMMON_CPPFLAGS        += -fexceptions -frtti
-COMMON_CFLAGS          += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -Os -g -O0
+COMMON_CFLAGS          += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -g -O0
 COMMON_CFLAGS          += -march=armv5te -mtune=xscale -msoft-float -mthumb
 COMMON_CFLAGS          += -Wno-psabi -Wa,--noexecstack
 COMMON_CFLAGS          += -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__ -DANDROID -DARM -UDEBUG
 COMMON_CFLAGS          += --sysroot=$(PLATFORM_DIR)/arch-arm
 COMMON_CFLAGS          += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
 COMMON_CFLAGS          += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include
-
+COMMON_LINK_FLAGS      += --sysroot=$(PLATFORM_DIR)/arch-arm
 COMMON_LINK_FLAGS      += -Wl,-L,$(ARM_EABI_DIR)/lib/gcc/arm-linux-androideabi/4.4.3
 COMMON_LINK_FLAGS      += -Wl,-L,$(ARM_EABI_DIR)/lib/thumb
-COMMON_LINK_FLAGS      += --sysroot=$(PLATFORM_DIR)/arch-arm
-COMMON_LINK_FLAGS      += -Bdynamic -Wl,-dynamic-linker,//system/bin/linker
-COMMON_LINK_FLAGS      += -Wl,--gc-sections -Wl,-z,nocopyreloc
 COMMON_LINK_FLAGS      += -Wl,-L,$(PLATFORM_DIR)/arch-arm/usr/lib
 COMMON_LINK_FLAGS      += -Wl,-rpath-link=$(PLATFORM_DIR)/arch-arm/usr/lib
-COMMON_LINK_FLAGS      += -nostdlib -lc -lm -lstdc++ -lgcc -lsupc++ #-lmissing
-COMMON_LINK_FLAGS      += --no-undefined
+COMMON_LINK_FLAGS      += -lc -lm -lstdc++ -lgcc -lsupc++
+COMMON_LINK_FLAGS      += -Wl,--no-undefined
 ANDROID_EXE_LINK_FLAGS += -z $(PLATFORM_DIR)/arch-arm/usr/lib/crtbegin_dynamic.o
 ANDROID_SO_LINK_FLAGS   = -Wl,-soname,$(notdir $1) -shared -Wl,--no-undefined -Wl,-z,noexecstack
+
+
 CYGWIN                 := nodosfilewarning
 VALID_TARGET_TYPES     += android-pak
 ANDROID_KEY_STORE      := $(BUILD_DIR)platforms/android/my-release-key.keystore
@@ -136,10 +135,9 @@ define tools.run.android_package
  $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=//data/busybox:\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)funner_launcher/.SkeletonActivity -e 'program' '$$(echo $$SUBST_COMMAND)' -e 'args' '$(subst $(firstword $1),,$1)'" | sed "s/.$$//" && \
  sleep 1 && \
  $(ADB) shell "\\/data/busybox/sh -c 'while ps | \\/data/busybox/grep $(DEFAULT_PACKAGE_PREFIX)funner_launcher; do sleep 1; done'" > nul && \
- $(ADB) logcat  
+ $(ADB) logcat -s -d -v raw System.out:I -v raw stdout:I
 endef
 # $(ADB) logcat 
-# $(ADB) logcat -s -d -v raw System.out:I -v raw stdout:I 
 
 ###################################################################################################
 #—борка пакетов
