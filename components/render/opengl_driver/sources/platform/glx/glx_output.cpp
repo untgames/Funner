@@ -157,13 +157,13 @@ void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
 
 void Output::SetCurrentMode (const OutputModeDesc&)
 {
-  DisplayLock lock (display);
+  DisplayLock lock (impl->display);
 
 }
 
 void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 {
-  DisplayLock lock (display);
+  DisplayLock lock (impl->display);
   
   static Window root = RootWindow (impl->display, impl->screen_number);
   
