@@ -26,8 +26,8 @@ struct Output::Impl
   OutputModeArray   modes;                       //режимы работы устройства
   Display*          display;                     //соединение с дисплеем
   int               screen_number;               //номер экрана диспле€
-  stl::string       name;
-  
+  stl::string       name;                        //им€
+
 /// онструктор
   Impl (Display* in_display, size_t in_screen_number)
     : display (in_display)
@@ -54,7 +54,7 @@ struct Output::Impl
       depths_count = 1;
     }
     
-    for (int size_id=0; size_id < sizes_count; size_id++)
+    for (int size_id=0; size_id<sizes_count; size_id++)
     {
       int    rates_count = 0;
       short *rates       = XRRRates (display, screen_number, size_id, &rates_count);
@@ -67,9 +67,9 @@ struct Output::Impl
         rates       = &default_rate;
       }
       
-      for (int rate_id=0; rate_id < rates_count; rate_id++)
+      for (int rate_id=0; rate_id<rates_count; rate_id++)
       {
-        for (int depth_id=0; depth_id < depths_count; depth_id++)
+        for (int depth_id=0; depth_id<depths_count; depth_id++)
         {
           OutputModeDesc mode_desc;
           
@@ -155,15 +155,76 @@ void Output::GetModeDesc (size_t mode_index, OutputModeDesc& mode_desc)
     ”становка текущего видео-режима
 */
 
-void Output::SetCurrentMode (const OutputModeDesc&)
+namespace
+{
+
+void raise_format_not_supported_exception (const OutputModeDesc& mode_desc)
+{
+  throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::SetModeDesc", 
+                                             "Screen mode '%dx%dx%d@%d' not supported", 
+                                             mode_desc.width, mode_desc.height, 
+                                             mode_desc.color_bits, mode_desc.refresh_rate);  
+}
+
+}
+
+void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
 {
   DisplayLock lock (impl->display);
 
+  // get root window  
+  static Window root = RootWindow (impl->display, impl->screen_number);
+  
+  // get screen configuration 
+  XRRScreenConfiguration *conf = XRRGetScreenInfo (impl->display, root);
+  
+  // get original size_id and rotation
+  Rotation original_rotation = 0;
+  SizeID original_size_id = XRRConfigCurrentConfiguration (conf, &original_rotation);
+
+  // get all supported resolutions
+  int sizes_count = 0, size_id = 0;
+  XRRScreenSize *sizes = XRRSizes (impl->display, impl->screen_number, &sizes_count);
+
+  // search resolution id
+  for (size_id=0; i<sizes_count; i++)
+  {
+    if (sizes[size_id].width == mode_desc.width && sizes[size_id].height == mode_desc.height)
+      break;
+  }
+
+  // raise exception if needed resolution not found  
+  if (size_id == sizes_count)
+    raise_format_not_supported_exception (mode_desc);
+    
+  // get all supported rates
+  int    rates_count = 0, rate_id = 0;
+  short *rates       = XRRRates (impl->display, impl->screen_number, size_id, &rates_count);
+
+  // raise exception if rates not found
+  if (!rates_count)
+    raise_format_not_supported_exception (mode_desc);
+    
+  // search rate id
+  for (rate_id=0; i<rates_count; i++)
+  {
+    if (rates[rate_id].width == mode_desc.refresh_rate)
+      break;
+  }
+  
+  // raise exception if needed rate not found  
+  if (rate_id == rates_count)
+    raise_format_not_supported_exception (mode_desc);
+    
+  // the depth and visual of window are assigned at creation and cannot be changed.
+
+  // set screen configuration
+  XRRSetScreenConfigAndRate (impl->display, conf, root, size_id, original_rotation, mode_desc.refresh_rate, CurrentTime);
 }
 
 void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 {
-  DisplayLock lock (impl->display);
+  DisplayLock lock (impl->display);                                               
   
   static Window root = RootWindow (impl->display, impl->screen_number);
   
