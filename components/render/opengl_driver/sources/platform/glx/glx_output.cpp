@@ -57,7 +57,7 @@ struct Output::Impl
     for (int size_id=0; size_id < sizes_count; size_id++)
     {
       int    rates_count = 0;
-      short  *rates      = XRRRates (display, screen_number, size_id, &rates_count);
+      short *rates       = XRRRates (display, screen_number, size_id, &rates_count);
 
       if (!rates_count)
       {
@@ -179,8 +179,8 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
   
   mode_desc.width        = DisplayWidth  (impl->display, impl->screen_number);
   mode_desc.height       = DisplayHeight (impl->display, impl->screen_number);
-  mode_desc.color_bits   = visual_count ? visual_list [0].depth : DefaultDepth  (impl->display, impl->screen_number);
-//  mode_desc.color_bits   = DefaultDepth  (impl->display, impl->screen_number);
+//  mode_desc.color_bits   = visual_count ? visual_list [0].depth : DefaultDepth (impl->display, impl->screen_number);
+  mode_desc.color_bits   = DefaultDepth (impl->display, impl->screen_number);
   mode_desc.refresh_rate = XRRConfigCurrentRate (conf);
 }
 
