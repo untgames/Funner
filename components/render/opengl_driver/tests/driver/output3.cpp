@@ -27,9 +27,10 @@ int main ()
     IAdapter*      adapter    = driver->GetAdapter (0);
     IPropertyList* properties = adapter->GetProperties ();
 
-    printf ("Adapter [name: '%s'\t", adapter->GetName ());
-    printf ("path: '%s'\t", adapter->GetPath ());
-    printf ("description: '%s']\n", adapter->GetDescription ());
+    printf ("  adapter #0:\n");
+    printf ("    name:        '%s'\n", adapter->GetName ());
+    printf ("    path:        '%s'\n", adapter->GetPath ());
+    printf ("    description: '%s'\n", adapter->GetDescription ());
     
     for (size_t i=0; i<properties->GetSize (); i++)
       printf ("    %s: '%s'\n", properties->GetKey (i), properties->GetValue (i));
@@ -41,8 +42,8 @@ int main ()
       IOutput*       output     = adapter->GetOutput (j);
       IPropertyList* properties = output->GetProperties ();
 
-      printf ("    output #%u:", j);
-      printf (" name: '%s'\t", output->GetName ());
+      printf ("    output #%u:\n", j);
+      printf ("      name: '%s'\n", output->GetName ());
 
       for (size_t j=0; j<properties->GetSize (); j++)
         printf ("      %s: '%s'\n", properties->GetKey (j), properties->GetValue (j));
