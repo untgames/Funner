@@ -39,17 +39,32 @@ struct Output::Impl
     int event_base = 0, error_base = 0;
 
     if (!XRRQueryExtension (display, &event_base, &error_base))
-      throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::Impl::Impl", "RandR extension missing");
+      throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::Impl::Impl", "RandR extension missing");      
 
-    int sizes_count = 0;
-    XRRScreenSize *sizes = XRRSizes (display, screen_number, &sizes_count);
+    int            sizes_count = 0, depths_count = 0;
+    XRRScreenSize* sizes       = XRRSizes (display, screen_number, &sizes_count);
+    int*           depths      = XListDepths (display, screen_number, &depths_count);    
+    
+    if (!depths_count)
+    {
+      static int default_depths = 0;    
+    
+      depths       = &default_depths;
+      depths_count = 1;
+    }
     
     for (int sizeID=0; sizeID < sizes_count; sizeID++)
     {
-      int rates_count = 0;
-      int depths_count = 0;
-      short *rates  = XRRRates (display, screen_number, sizeID, &rates_count);
-      int   *depths = XListDepths (display, screen_number, &depths_count);
+      int    rates_count = 0;
+      short* rates       = XRRRates (display, screen_number, sizeID, &rates_count);
+
+      if (!rates_count)
+      {
+        static short default_rate = 0;      
+      
+        rates_count = 1;
+        rates       = &default_rate;
+      }
       
       for (int rateID=0; rateID < rates_count; rateID++)
       {
