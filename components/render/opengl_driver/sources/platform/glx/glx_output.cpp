@@ -210,7 +210,7 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
   // search rate id
   for (rate_id=0; rate_id<rates_count; rate_id++)
   {
-    if (rates[rate_id] == mode_desc.refresh_rate)
+    if (rates[rate_id] == (int)mode_desc.refresh_rate)
       break;
   }
   
