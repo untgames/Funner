@@ -11,7 +11,7 @@ namespace
      онстанты
 */
 
-const size_t GAMMA_RAMP_SIZE = 256; //резервируемое количество видео-режимов
+const int GAMMA_RAMP_SIZE = 256; //базовый размер гаммы
 
 }
 
