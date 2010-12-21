@@ -276,7 +276,31 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 
 void Output::SetGammaRamp (const Color3f table [GAMMA_RAMP_SIZE])
 {
-//  throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::GetGammaRamp", "Gamma ramp not supported in EGL");
+  int event_base;
+  int error_base;
+  
+  // запрос расширения XF86VidMode
+  
+  if (XF86VidModeQueryExtension (impl->display, &event_base, &error_base) == 0)
+    throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::GetGammaRamp",
+      "XF86VidModeQueryExtension missing");
+      
+  stl::vector<unsigned short> red   (size);
+  stl::vector<unsigned short> green (size);
+  stl::vector<unsigned short> blue  (size);
+  
+  // преобразование гаммы
+  
+  for (int i=0; i<GAMMA_RAMP_SIZE; i++)
+  {
+    red   [i] = (unsigned short)(table [i].red   * 65535.f);
+    green [i] = (unsigned short)(table [i].green * 65535.f);
+    blue  [i] = (unsigned short)(table [i].blue  * 65535.f);
+  }
+  
+  // установка гаммы
+
+  XF86VidModeSetGammaRamp (impl->display, impl->screen_number, GAMMA_RAMP_SIZE, &red[0], &green[0], &blue[0]);
 }
 
 void Output::GetGammaRamp (Color3f table [GAMMA_RAMP_SIZE])
