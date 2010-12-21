@@ -343,8 +343,10 @@ void Output::GetGammaRamp (Color3f table [GAMMA_RAMP_SIZE])
   
   for (int i=0; i<size; i++)
   {
-    table [i].red   = (float) red   [i] / 65535.f;
-    table [i].green = (float) green [i] / 65535.f;
-    table [i].blue  = (float) blue  [i] / 65535.f;
+    table [i].red   = red   [i] / 65535.f;
+    table [i].green = green [i] / 65535.f;
+    table [i].blue  = blue  [i] / 65535.f;
+    
+    printf (" %u %u %u\n", red [i], green [i], blue [i]);
   }
 }
