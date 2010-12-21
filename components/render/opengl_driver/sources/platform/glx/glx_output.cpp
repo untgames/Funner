@@ -124,7 +124,6 @@ Output::Output (Display* display, size_t screen_number)
 
 Output::~Output ()
 {
-
 }
 
 /*

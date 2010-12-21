@@ -34,7 +34,7 @@ Adapter::Adapter ()
   {
     //создание реализации
     
-    impl = new Impl;
+    impl = new Impl ();
     
     impl->log.Printf ("...adapter successfully created");
   }
@@ -49,11 +49,7 @@ Adapter::Adapter ()
 Adapter::~Adapter ()
 {
   Log log = impl->log;
-
   log.Printf ("Destroy adapter '%s' (path='%s')", impl->name.c_str (), impl->library->GetName ());
-
-  impl = 0;
-
   log.Printf ("...adapter successfully destroyed");
 }
 

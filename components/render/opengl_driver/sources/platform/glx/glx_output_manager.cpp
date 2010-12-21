@@ -51,32 +51,24 @@ struct OutputManager::Impl: public xtl::reference_counter
     
     for (size_t screen_number=0; screen_number<screens_count; screen_number++)
       outputs.push_back (Output::Pointer (new Output (display, screen_number), false));
-
-    instance = this;
   }
   
   ~Impl ()
   {
-    instance = 0;
   }
 };
-
-OutputManager::Impl* OutputManager::Impl::instance = 0;
 
 /*
     Конструктор / деструктор
 */
 
 OutputManager::OutputManager ()
-  : impl (OutputManager::Impl::instance)
 {
-  if (!impl) impl = new Impl;
-  else       addref (impl);
+  impl = new Impl ();
 }
 
 OutputManager::~OutputManager ()
 {
-  release (impl);
 }
 
 /*
