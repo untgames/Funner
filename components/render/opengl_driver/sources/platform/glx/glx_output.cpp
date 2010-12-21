@@ -287,28 +287,38 @@ void Output::GetGammaRamp (Color3f table [256])
   int event_base;
   int error_base;
   
-  unsigned short *red, *green, *blue;
+  // запрос расширения XF86VidMode
   
   if (XF86VidModeQueryExtension (impl->display, &event_base, &error_base) == 0)
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::GetGammaRamp",
-      "XF86VidModeQueryExtension missing");      
+      "XF86VidModeQueryExtension missing");
+      
+  // получение размера гаммы
     
   if (!XF86VidModeGetGammaRampSize(impl->display, impl->screen_number, &size))
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::GetGammaRamp",
       "failed to get XF86VidModeGetGammaRampSize");
       
-  red = new unsigned short[size];
-  green = new unsigned  short[size];
-  blue = new unsigned  short[size];
+  // проверка корректности размера гаммы
+      
+  if (size != 256)
+    throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::GetGammaRamp",
+      "bad gamma ramp size: %d", size);
 
-  XF86VidModeGetGammaRamp (impl->display, impl->screen_number, size, red, green, blue);
+  // получение гаммы
   
-  printf ("GammaRamp size = %d", size);
+  stl::vector red   (size);
+  stl::vector green (size);
+  stl::vector blue  (size);
+
+  XF86VidModeGetGammaRamp (impl->display, impl->screen_number, size, &red[0], &green[0], &blue[0]);
   
-  for (int i=0; i<size; i++)
-    printf ("r:%d g:%d b:%d\n", red[i], green[i], blue[i]);
+  // преобразование гаммы
   
-  delete[] red;
-  delete[] green;
-  delete[] blue;
+  for (size_t i=0; i<size; i++)
+  {
+    table [i].red   = (float) red   [i] / 65535.f;
+    table [i].green = (float) green [i] / 65535.f;
+    table [i].blue  = (float) blue  [i] / 65535.f;
+  }
 }
