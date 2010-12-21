@@ -285,9 +285,9 @@ void Output::SetGammaRamp (const Color3f table [GAMMA_RAMP_SIZE])
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::GetGammaRamp",
       "XF86VidModeQueryExtension missing");
       
-  stl::vector<unsigned short> red   (size);
-  stl::vector<unsigned short> green (size);
-  stl::vector<unsigned short> blue  (size);
+  stl::vector<unsigned short> red   (GAMMA_RAMP_SIZE);
+  stl::vector<unsigned short> green (GAMMA_RAMP_SIZE);
+  stl::vector<unsigned short> blue  (GAMMA_RAMP_SIZE);
   
   // преобразование гаммы
   
