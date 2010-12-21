@@ -12,28 +12,13 @@ typedef stl::vector<Output::Pointer> OutputArray;
 
 struct Adapter::Impl
 {
-  Log           log;     //протокол работы OpenGL
-  OutputArray   outputs; //зарегистрированные устройства вывода
-  Library       library; //библиотека точек входа OpenGL
+  Log           log;               //протокол работы OpenGL
+  OutputManager output_manager;    //менеджер устройств вывода
+  Library       library;           //библиотека точек входа OpenGL
   
 /// онструктор
   Impl ()  
   {
-    //соединение с дисплеем
-    Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
-    
-    size_t screens_count = 0;
-    
-    {
-      DisplayLock lock (display);
-
-      screens_count = XScreenCount (display);
-    }
-    
-    outputs.reserve (screens_count);
-    
-    for (size_t screen_number=0; screen_number < screens_count; screen_number++)
-      outputs.push_back (Output::Pointer (new Output (display, screen_number), false));
   }  
 };
 
@@ -45,17 +30,29 @@ Adapter::Adapter ()
 {
   try
   {
+    //создание реализации
+    
     impl = new Impl;
+    
+    impl->log.Printf ("...adapter successfully created");
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("render::low_level::opengl::glx::Adapter::Adapter");
+    
     throw;
   }
 }
 
 Adapter::~Adapter ()
 {
+  Log log = impl->log;
+
+  log.Printf ("Destroy adapter '%s' (path='%s')", impl->name.c_str (), impl->library->GetName ());
+
+  impl = 0;
+
+  log.Printf ("...adapter successfully destroyed");
 }
 
 /*
@@ -74,7 +71,7 @@ const char* Adapter::GetPath ()
 
 const char* Adapter::GetDescription ()
 {
-  return "render::low_level::opengl::glx::Adapter";
+  return "render::low_level::opengl::glx::Adapter::Adapter";
 }
 
 /*
@@ -83,24 +80,21 @@ const char* Adapter::GetDescription ()
 
 size_t Adapter::GetOutputsCount ()
 {
-  return impl->outputs.size ();
+  return impl->output_manager.GetOutputsCount ();
 }
 
 IOutput* Adapter::GetOutput (size_t index)
 {
-  if (index >= impl->outputs.size ())
-    throw xtl::make_range_exception ("render::low_level::opengl::glx::Adapter::GetOutput", "index", index, impl->outputs.size ());
-
-  return get_pointer (impl->outputs [index]);
+  return impl->output_manager.GetOutput (index);
 }
 
 /*
     «апрос устройства вывода
 */
 
-Output::Pointer Adapter::GetOutput (const void* window_handle)
+Output::Pointer Adapter::GetOutput (Window window)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::Adapter::GetOutput(const void*)");
+  return impl->output_manager.FindContainingOutput (window);
 }
 
 /*
