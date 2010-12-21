@@ -307,9 +307,9 @@ void Output::GetGammaRamp (Color3f table [256])
 
   // получение гаммы
   
-  stl::vector red   (size);
-  stl::vector green (size);
-  stl::vector blue  (size);
+  stl::vector<unsigned short> red   (size);
+  stl::vector<unsigned short> green (size);
+  stl::vector<unsigned short> blue  (size);
 
   XF86VidModeGetGammaRamp (impl->display, impl->screen_number, size, &red[0], &green[0], &blue[0]);
   
