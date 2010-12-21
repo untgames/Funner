@@ -168,29 +168,31 @@ void raise_format_not_supported_exception (const OutputModeDesc& mode_desc)
 
 void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
 {
+  // блокировка дисплея
+
   DisplayLock lock (impl->display);
 
-  // get root window  
+  // получение корневого окна
   
   Window root = RootWindow (impl->display, impl->screen_number);
   
-  // get screen configuration 
+  // получение конфигурации экрана
   
   XRRScreenConfiguration *conf = XRRGetScreenInfo (impl->display, root);
   
-  // get original size_id and rotation
+  // получение текущего разрешения и ориентации экрана
   
   Rotation original_rotation = 0;
   SizeID   original_size_id  = XRRConfigCurrentConfiguration (conf, &original_rotation);
   short    original_rate     = XRRConfigCurrentRate (conf);
   
-  // get all supported resolutions
+  // получение всех доступных расрешений
 
   int            sizes_count = 0;
   SizeID         size_id     = 0;
   XRRScreenSize* sizes       = XRRSizes (impl->display, impl->screen_number, &sizes_count);
 
-  // search resolution id
+  // поиск запрашиваемого разрешения в списке доступных
   
   for (size_id=0; size_id<sizes_count; size_id++)
   {
@@ -198,22 +200,22 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
       break;
   }
 
-  // raise exception if needed resolution not found  
+  // если не нашли, то выбрасываем исключение
   
   if (size_id == sizes_count)
     raise_format_not_supported_exception (mode_desc);
     
-  // get all supported rates
+  // получение всех доступных частот для запрашиваемого разрешения
   
   int    rates_count = 0, rate_id = 0;
   short *rates       = XRRRates (impl->display, impl->screen_number, size_id, &rates_count);
 
-  // raise exception if rates not found
+  // если доступных частот нет, то выбрасываем исключение
   
   if (!rates_count)
     raise_format_not_supported_exception (mode_desc);
  
-  // search rate id
+  // поиск запрашиваемой частоты
 
   for (rate_id=0; rate_id<rates_count; rate_id++)
   {
@@ -221,19 +223,24 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
       break;
   }
   
-  // raise exception if needed rate not found  
+  // если частота не найдена, то выбрасываем исключение
   
   if (rate_id == rates_count)
     raise_format_not_supported_exception (mode_desc);
     
-  // the depth and visual of window are assigned at creation and cannot be changed.
+  // глубина цвета окна указывается при его создании и не может быть изменена
+  // возможный вариант установки глубины цвета - пересоздание корневого или клиентского окна
   
-  // set screen configuration if current resolution or rate different from the parameter
+  // если текущие разрешение и частота совпадают с запрашиваемыми, то ничего не делаем
   
   if (original_size_id == size_id && original_rate == rates [rate_id])
     return;
+    
+  // установка конфигурации экрана
 
   Status status = XRRSetScreenConfigAndRate (impl->display, conf, root, size_id, original_rotation, mode_desc.refresh_rate, CurrentTime);
+  
+  // если установка завершилась с ошибкой, то выбрасываем исключение
 
   if (status < Success)
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::SetModeDesc", "XRRSetScreenConfigAndRate failed");
@@ -241,11 +248,19 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
 
 void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 {
+  // блокировка дисплея
+
   DisplayLock lock (impl->display);                                               
+
+  // получение корневого окна
+    
+  Window root = RootWindow (impl->display, impl->screen_number);
   
-  static Window root = RootWindow (impl->display, impl->screen_number);
+  // получение конфигурации экрана
   
   XRRScreenConfiguration *conf = XRRGetScreenInfo (impl->display, root);
+  
+  // заполнение декриптора
   
   mode_desc.width        = DisplayWidth  (impl->display, impl->screen_number);
   mode_desc.height       = DisplayHeight (impl->display, impl->screen_number);
@@ -264,6 +279,36 @@ void Output::SetGammaRamp (const Color3f table [256])
 
 void Output::GetGammaRamp (Color3f table [256])
 {
-//  throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::GetGammaRamp", "Gamma ramp not supported in EGL");
+  // блокировка дисплея
 
+  DisplayLock lock (impl->display);                                               
+
+  int size = 0;
+  int event_base;
+  int error_base;
+  
+  unsigned short *red, *green, *blue;
+  
+  if (XF86VidModeQueryExtension (impl->display, &event_base, &error_base) == 0)
+    throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::GetGammaRamp",
+      "XF86VidModeQueryExtension missing");      
+    
+  if (!XF86VidModeGetGammaRampSize(impl->display, impl->screen_number, &size))
+    throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::GetGammaRamp",
+      "failed to get XF86VidModeGetGammaRampSize");
+      
+  red = new unsigned short[size];
+  green = new unsigned  short[size];
+  blue = new unsigned  short[size];
+
+  XF86VidModeGetGammaRamp (impl->display, impl->screen_number, size, red, green, blue);
+  
+  printf ("GammaRamp size = %d", size);
+  
+  for (int i=0; i<size; i++)
+    printf ("r:%d g:%d b:%d\n", red[i], green[i], blue[i]);
+  
+  delete[] red;
+  delete[] green;
+  delete[] blue;
 }
