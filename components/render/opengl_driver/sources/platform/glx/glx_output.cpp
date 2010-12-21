@@ -11,6 +11,8 @@ namespace
     Константы
 */
 
+const size_t GAMMA_RAMP_SIZE = 256; //резервируемое количество видео-режимов
+
 }
 
 /*
@@ -272,12 +274,12 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
     Управление гамма-коррекцией
 */
 
-void Output::SetGammaRamp (const Color3f table [256])
+void Output::SetGammaRamp (const Color3f table [GAMMA_RAMP_SIZE])
 {
 //  throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::GetGammaRamp", "Gamma ramp not supported in EGL");
 }
 
-void Output::GetGammaRamp (Color3f table [256])
+void Output::GetGammaRamp (Color3f table [GAMMA_RAMP_SIZE])
 {
   // блокировка дисплея
 
@@ -301,7 +303,7 @@ void Output::GetGammaRamp (Color3f table [256])
       
   // проверка корректности размера гаммы
       
-  if (size != 256)
+  if (size != GAMMA_RAMP_SIZE)
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::GetGammaRamp",
       "bad gamma ramp size: %d", size);
 
