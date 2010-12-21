@@ -49,7 +49,7 @@ Adapter::Adapter ()
 Adapter::~Adapter ()
 {
   Log log = impl->log;
-  log.Printf ("Destroy adapter '%s' (path='%s')", impl->name.c_str (), impl->library.GetName ());
+  log.Printf ("Destroy adapter '%s'", impl->name.c_str ());
   log.Printf ("...adapter successfully destroyed");
 }
 
