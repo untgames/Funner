@@ -94,5 +94,30 @@ Output* OutputManager::GetOutput (size_t index) const
 
 Output* OutputManager::FindContainingOutput (Window window) const
 {
-  return 0;
+  if (window < 0)
+    return 0;
+
+  //соединение с дисплеем
+  
+  Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
+  
+  {
+    DisplayLock lock (display);
+
+    XWindowAttributes xwa;
+    
+    if (XGetWindowAttributes (display, window, &xwa) < Success);
+    
+    int screen_number = XScreenNumberOfScreen (xwa.screen);
+    
+    for (OutputArray::iterator iter=impl->outputs.begin (), end=impl->outputs.end (); iter != end; ++iter)
+    {
+      OutputPtr output = *iter;
+      
+      if (screen_number == output->GetScreenNumber ())
+        return output;
+    }
+    
+    return 0;
+  }
 }

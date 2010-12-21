@@ -31,7 +31,7 @@ struct Output::Impl
   stl::string       name;                        //имя
 
 ///Конструктор
-  Impl (Display* in_display, size_t in_screen_number)
+  Impl (Display* in_display, int in_screen_number)
     : display (in_display)
     , screen_number (in_screen_number)
     , name(common::format ("screen%u", in_screen_number))
@@ -103,7 +103,7 @@ struct Output::Impl
     Конструктор / деструктор
 */
 
-Output::Output (Display* display, size_t screen_number)
+Output::Output (Display* display, int screen_number)
 {
   try
   {
@@ -133,6 +133,15 @@ Output::~Output ()
 const char* Output::GetName ()
 {
   return impl->name.c_str ();
+}
+
+/*
+    Получение номера экрана
+*/
+
+int Output::GetScreenNumber ()
+{
+  return impl->screen_number;
 }
 
 /*
