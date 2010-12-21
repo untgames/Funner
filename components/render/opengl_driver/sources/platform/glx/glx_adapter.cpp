@@ -15,9 +15,11 @@ struct Adapter::Impl
   Log           log;               //протокол работы OpenGL
   OutputManager output_manager;    //менеджер устройств вывода
   Library       library;           //библиотека точек входа OpenGL
+  stl::string   name;              //имя адаптера
   
 ///Конструктор
   Impl ()  
+    : name ("GLX")
   {
   }  
 };
@@ -61,7 +63,7 @@ Adapter::~Adapter ()
 
 const char* Adapter::GetName ()
 {
-  return "GLX";
+  return impl->name.c_str ();
 }
 
 const char* Adapter::GetPath ()
