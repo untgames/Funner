@@ -49,7 +49,11 @@ Adapter::Adapter ()
 Adapter::~Adapter ()
 {
   Log log = impl->log;
+  
   log.Printf ("Destroy adapter '%s'", impl->name.c_str ());
+  
+  impl = 0;
+  
   log.Printf ("...adapter successfully destroyed");
 }
 
