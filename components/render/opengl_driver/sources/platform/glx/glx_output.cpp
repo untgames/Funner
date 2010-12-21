@@ -317,7 +317,7 @@ void Output::GetGammaRamp (Color3f table [GAMMA_RAMP_SIZE])
   
   // преобразование гаммы
   
-  for (size_t i=0; i<size; i++)
+  for (int i=0; i<size; i++)
   {
     table [i].red   = (float) red   [i] / 65535.f;
     table [i].green = (float) green [i] / 65535.f;
