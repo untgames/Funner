@@ -115,7 +115,7 @@ Output* OutputManager::FindContainingOutput (Window window) const
       OutputPtr output = *iter;
       
       if (screen_number == output->GetScreenNumber ())
-        return output;
+        return get_pointer (output);
     }
     
     return 0;
