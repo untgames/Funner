@@ -68,11 +68,10 @@ OutputManager::Impl* OutputManager::Impl::instance = 0;
 */
 
 OutputManager::OutputManager ()
+  : impl (OutputManager::Impl::instance)
 {
-  printf ("in=%p\n", impl);
   if (!impl) impl = new Impl ();
   else       addref (impl);
-  printf ("out=%p\n", impl);
 }
 
 OutputManager::~OutputManager ()
