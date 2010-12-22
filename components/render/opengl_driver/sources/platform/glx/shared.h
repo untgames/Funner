@@ -27,6 +27,8 @@
 #include <X11/extensions/Xrandr.h>
 #include <X11/extensions/xf86vmode.h>
 
+#include <dlfcn.h>
+
 namespace render
 {
 
