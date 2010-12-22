@@ -144,7 +144,7 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
       }
     }
     
-    ~GlxAdapterLibrary
+    ~GlxAdapterLibrary ()
     {
       log.Printf ("...unload dll '%s'", GetName ());
       
