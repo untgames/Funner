@@ -1,6 +1,8 @@
 #ifndef RENDER_GL_DRIVER_GLX_SHARED_HEADER
 #define RENDER_GL_DRIVER_GLX_SHARED_HEADER
 
+#include <dlfcn.h>
+
 #include <stl/algorithm>
 #include <stl/auto_ptr.h>
 #include <stl/hash_map>
@@ -26,8 +28,6 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 #include <X11/extensions/xf86vmode.h>
-
-#include <dlfcn.h>
 
 namespace render
 {
@@ -318,7 +318,7 @@ class Context: virtual public IContext, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение интерфейса библиотеки OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ILibrary& GetLibrary ();
+    IAdapterLibrary& GetLibrary ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Подписка на события контекста

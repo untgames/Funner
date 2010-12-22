@@ -133,9 +133,9 @@ bool Context::IsCompatible (ISwapChain* in_swap_chain)
     Получение интерфейса библиотеки OpenGL
 */
 
-ILibrary& Context::GetLibrary ()
+IAdapterLibrary& Context::GetLibrary ()
 {
-  return impl->adapter->GetLibrary ();
+  return *impl->adapter->GetLibrary ();
 }
 
 /*
