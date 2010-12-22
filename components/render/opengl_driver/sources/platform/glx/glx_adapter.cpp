@@ -12,10 +12,10 @@ typedef stl::vector<Output::Pointer> OutputArray;
 
 struct Adapter::Impl
 {
-  Log           log;               //протокол работы OpenGL
-  OutputManager output_manager;    //менеджер устройств вывода
-  AdapterLibraryPtr library;       //библиотека адаптера
-  stl::string   name;              //имя адаптера
+  Log               log;               //протокол работы OpenGL
+  OutputManager     output_manager;    //менеджер устройств вывода
+  AdapterLibraryPtr library;           //библиотека адаптера
+  stl::string       name;              //имя адаптера
   
 ///Конструктор
   Impl (const char* in_name, const char* in_dll_path)  
@@ -112,7 +112,7 @@ Output::Pointer Adapter::GetOutput (Window window)
     Библиотека
 */
 
-ILibrary& Adapter::GetLibrary ()
+IAdapterLibrary& Adapter::GetLibrary ()
 {
   return impl->library;
 }
