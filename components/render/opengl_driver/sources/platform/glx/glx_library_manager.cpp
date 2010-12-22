@@ -79,7 +79,7 @@ class DynamicLibrary
     {
       static const char* METHOD_NAME = "render::low_level::opengl::glx::DynamicLibrary::GetSymbol";
       
-      if (!name)
+      if (!symbol_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "symbol_name");
 
       void* address = dlsym (library, symbol_name);
