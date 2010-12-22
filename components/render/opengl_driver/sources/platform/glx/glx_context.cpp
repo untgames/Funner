@@ -135,7 +135,7 @@ bool Context::IsCompatible (ISwapChain* in_swap_chain)
 
 IAdapterLibrary& Context::GetLibrary ()
 {
-  return *impl->adapter->GetLibrary ();
+  return impl->adapter->GetLibrary ();
 }
 
 /*
