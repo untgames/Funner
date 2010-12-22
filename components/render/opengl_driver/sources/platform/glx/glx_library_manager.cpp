@@ -290,7 +290,7 @@ GlxAdapterLibrary* GlxAdapterLibrary::first = 0;
     Загрузка библиотеки
 */
 
-static AdapterLibraryPtr LibraryManager::LoadLibrary (const char* name)
+AdapterLibraryPtr render::low_level::opengl::glx::LibraryManager::LoadLibrary (const char* name)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::glx::LibraryManager::LoadLibrary";
   
