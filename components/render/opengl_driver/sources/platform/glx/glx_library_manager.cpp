@@ -52,7 +52,7 @@ class DynamicLibrary
       void* library = dlopen (in_path, dlopen_flags);
 
       if (!library)
-        raise_error (common::format ("::dlopen('%S', %lu)", name, dlopen_flags).c_str ());
+        raise_error (common::format ("::dlopen('%S', %lu)", in_path, dlopen_flags).c_str ());
     }
     
 ///Деструктор
