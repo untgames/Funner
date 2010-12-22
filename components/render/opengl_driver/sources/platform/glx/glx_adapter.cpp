@@ -114,5 +114,5 @@ Output::Pointer Adapter::GetOutput (Window window)
 
 IAdapterLibrary& Adapter::GetLibrary ()
 {
-  return impl->library;
+  return *impl->library;
 }
