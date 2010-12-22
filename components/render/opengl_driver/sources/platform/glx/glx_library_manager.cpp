@@ -238,6 +238,12 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
       return 0;
     }
 
+///Получение адреса точки входа
+    const void* GetProcAddress (const char* name, size_t search_flags)
+    {
+      throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::GetProcAddress");
+    }
+    
   protected:
 ///Определение адреса точки входа с приведением типов и проверкой корректности аргументов
     template <class Fn> void GetSymbol (const char* symbol, Fn& fn, bool check = true)
