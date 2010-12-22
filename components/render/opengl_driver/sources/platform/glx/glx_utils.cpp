@@ -16,6 +16,11 @@ namespace glx
     Проверка ошибок
 */
 
+int glxErrorHandler (Display *display, XErrorEvent *error_event)
+{
+  return 0;
+}
+
 void check_errors (const char* source)
 {
 /*  EGLint status = eglGetError ();

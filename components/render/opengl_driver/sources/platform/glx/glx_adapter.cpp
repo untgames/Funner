@@ -14,12 +14,13 @@ struct Adapter::Impl
 {
   Log           log;               //протокол работы OpenGL
   OutputManager output_manager;    //менеджер устройств вывода
-  Library       library;           //библиотека точек входа OpenGL
+  AdapterLibraryPtr library;       //библиотека адаптера
   stl::string   name;              //имя адаптера
   
 ///Конструктор
-  Impl ()  
-    : name ("GLX")
+  Impl (const char* in_name, const char* in_dll_path)  
+    : name (in_name)
+    , library (LibraryManager::LoadLibrary (in_dll_path))
   {
   }  
 };
@@ -28,13 +29,21 @@ struct Adapter::Impl
     Конструктор / деструктор
 */
 
-Adapter::Adapter ()
+Adapter::Adapter (const char* name, const char* dll_path)
 {
   try
   {
-    //создание реализации
+      //проверка корректности аргументов    
     
-    impl = new Impl ();
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+    
+    if (!dll_path)
+      throw xtl::make_null_argument_exception ("", "dll_path");
+
+      //создание реализации
+    
+    impl = new Impl (name, dll_path);
     
     impl->log.Printf ("...adapter successfully created");
   }
