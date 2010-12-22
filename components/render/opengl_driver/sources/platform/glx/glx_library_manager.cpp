@@ -321,3 +321,5 @@ AdapterLibraryPtr LibraryManager::LoadLibrary (const char* name)
     throw;
   }
 }
+
+}
