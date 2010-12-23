@@ -362,7 +362,7 @@ void AdapterLibrary::MakeCurrent (Display *dpy, GLXDrawable draw, GLXDrawable re
   {
     try
     {
-      listener->OnLostCurrent ();
+      impl->listener->OnLostCurrent ();
     }
     catch (...)
     {
