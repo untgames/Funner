@@ -119,7 +119,6 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
         if (first) first->prev = this;
 
         first = this;
-
         
         log.Printf ("...get default GLX-entries");
         
@@ -136,6 +135,24 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
         GetSymbol ("glXGetCurrentReadDrawable", fglXGetCurrentReadDrawable);
 
         log.Printf ("...GLX library successfully loaded");
+        
+          //вывод общей информации
+        
+        Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
+        
+        DisplayLock lock (display);
+
+        int major = 0, minor = 0;
+
+        if (!glXQueryVersion (display, &major, &minor))
+        {
+          printf ("version = %d.%d\n", major, minor);
+          
+          log.Printf ("Client information:\n");
+          log.Printf ("  vendor: '%s'\n",     glXGetClientString (display, GLX_VENDOR));
+          log.Printf ("  version: '%s'\n",    glXGetClientString (display, GLX_VERSION));
+          log.Printf ("  extensions: '%s'\n", glXGetClientString (display, GLX_EXTENSIONS));
+        }
       }
       catch (xtl::exception& exception)
       {
