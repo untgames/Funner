@@ -4,9 +4,6 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::glx;
 
-namespace
-{
-
 /*
 ===================================================================================================
     Точки входа GLX драйвера
@@ -100,8 +97,6 @@ class DynamicLibrary
 };
 
 typedef stl::auto_ptr<DynamicLibrary> DynamicLibraryPtr;
-
-}
 
 /*
 ===================================================================================================
