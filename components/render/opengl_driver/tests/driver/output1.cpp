@@ -1,11 +1,18 @@
 #include "shared.h"
 
+void print_log (const char* stream, const char* message)
+{
+  printf ("%s:%s\n", stream, message);
+}
+
 int main ()
 {
   printf ("Results of output1_test:\n");
 
   try
   {
+    common::LogFilter filter ("*", &print_log);
+  
     xtl::com_ptr<IDriver> driver = DriverManager::FindDriver ("OpenGL");
 
     if (!driver)
