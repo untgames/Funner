@@ -151,11 +151,6 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
         log.Printf ("     vendor: '%s'", glXGetClientString (display, GLX_VENDOR));
         log.Printf ("     version: '%s'", glXGetClientString (display, GLX_VERSION));
         log.Printf ("     extensions: '%s'", glXGetClientString (display, GLX_EXTENSIONS));
-        
-        log.Printf ("...server information:");
-        log.Printf ("     vendor: '%s'", glXQueryServerString (display, GLX_VENDOR));
-        log.Printf ("     version: '%s'", glXQueryServerString (display, GLX_VERSION));
-        log.Printf ("     extensions: '%s'", glXQueryServerString (display, GLX_EXTENSIONS));
       }
       catch (xtl::exception& exception)
       {
