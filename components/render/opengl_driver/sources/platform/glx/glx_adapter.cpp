@@ -115,7 +115,7 @@ Output::Pointer Adapter::GetOutput (Window window)
     Библиотека
 */
 
-IAdapterLibrary& Adapter::GetLibrary ()
+AdapterLibrary& Adapter::GetLibrary ()
 {
   return *impl->library;
 }
