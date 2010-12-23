@@ -37,7 +37,7 @@ class PlatformManagerImpl
     }
 
 ///Создание адаптера
-    IAdapter* CreateAdapter (const char* name, const char* path, const char* init_string)
+    Adapter* CreateAdapter (const char* name, const char* path, const char* init_string)
     {
       try
       {
