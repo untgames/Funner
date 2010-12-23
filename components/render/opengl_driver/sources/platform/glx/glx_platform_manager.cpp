@@ -8,6 +8,12 @@ namespace
 {
 
 /*
+    Константы
+*/
+
+const char* OPENGL_LIB_PATH = "libGL";
+
+/*
     Реализация менеджера платформы glx
 */
 
@@ -16,20 +22,73 @@ class PlatformManagerImpl
   public:
 ///Конструктор
     PlatformManagerImpl ()
-      : adapter (new Adapter, false)
     {
+      try
+      {
+          //загрузка адаптера "по умолчанию"
+
+        LoadDefaultAdapter ("GLX", OPENGL_LIB_PATH);
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("render::low_level::opengl::glx::PlatformManagerImpl::PlatformManagerImpl");
+        throw;
+      }      
     }
 
 ///Создание адаптера
     IAdapter* CreateAdapter (const char* name, const char* path, const char* init_string)
     {
-      throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::PlatformManagerImpl::CreateAdapter", "Custom adapters not supported");
+      try
+      {
+        if (!name)
+          throw xtl::make_null_argument_exception ("", "name");
+
+        if (!path)
+          throw xtl::make_null_argument_exception ("", "path");
+          
+        if (!init_string)
+          init_string = "";
+
+        log.Printf ("Create adapter '%s' (path='%s', init_string='%s')...", name, path, init_string);
+
+        return new Adapter (name, path, init_string);
+      }
+      catch (xtl::exception& exception)
+      {
+        exception.touch ("render::low_level::opengl::glx::PlatformManagerImpl::CreateAdapter");
+        throw;
+      }
+    }
+    
+///Попытка загрузки адаптера "по умолчанию"
+    void LoadDefaultAdapter (const char* name, const char* path, const char* init_string = "")
+    {
+      try
+      {
+          //создание адаптера
+
+        AdapterPtr adapter (CreateAdapter (name, path, init_string), false);
+
+          //регистрация адаптера
+
+        default_adapters.push_front (adapter);
+      }
+      catch (std::exception& exception)
+      {        
+        log.Printf ("%s\n    at render::low_level::opengl::glx::PlatformManager::LoadDefaultAdapter('%s', '%s')", exception.what (), name, path);
+      }
+      catch (...)
+      {
+        log.Printf ("Unknown exception\n    at render::low_level::opengl::glx::PlatformManager::LoadDefaultAdapter('%s', '%s')", name, path);
+      }
     }
 
 ///Перечисление адаптеров по умолчанию
     void EnumDefaultAdapters (const xtl::function<void (IAdapter*)>& handler)
     {
-      handler (&*adapter);
+      for (AdapterList::iterator iter=default_adapters.begin (), end=default_adapters.end (); iter!=end; ++iter)
+        handler (get_pointer (*iter));
     }
 
 ///Создание цепочки обмена
@@ -84,11 +143,12 @@ class PlatformManagerImpl
     }
 
   private:
-    typedef xtl::com_ptr<Adapter> AdapterPtr;
-    
+    typedef xtl::com_ptr<Adapter>  AdapterPtr;
+    typedef stl::list<AdapterPtr> AdapterList;
+
   private:
-    Log        log;      //протокол драйвера отрисовки
-    AdapterPtr adapter;  //адаптер по умолчанию
+    Log         log;              //протокол
+    AdapterList default_adapters; //адаптеры "по умолчанию"
 };
 
 typedef common::Singleton<PlatformManagerImpl> PlatformManagerSingleton;

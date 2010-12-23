@@ -18,7 +18,7 @@ struct Adapter::Impl
   stl::string       name;              //имя адаптера
   
 ///Конструктор
-  Impl (const char* in_name, const char* in_dll_path)  
+  Impl (const char* in_name, const char* in_dll_path, const char* init_string)  
     : library (LibraryManager::LoadLibrary (in_dll_path))
     , name (in_name)
   {
@@ -29,7 +29,7 @@ struct Adapter::Impl
     Конструктор / деструктор
 */
 
-Adapter::Adapter (const char* name, const char* dll_path)
+Adapter::Adapter (const char* name, const char* dll_path, const char* init_string)
 {
   try
   {
@@ -40,10 +40,13 @@ Adapter::Adapter (const char* name, const char* dll_path)
     
     if (!dll_path)
       throw xtl::make_null_argument_exception ("", "dll_path");
+      
+    if (!init_string)
+      throw xtl::make_null_argument_exception ("", "init_string");
 
       //создание реализации
     
-    impl = new Impl (name, dll_path);
+    impl = new Impl (name, dll_path, init_string);
     
     impl->log.Printf ("...adapter successfully created");
   }
