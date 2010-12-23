@@ -42,7 +42,7 @@ Adapter::Adapter (const char* name, const char* dll_path, const char* init_strin
       throw xtl::make_null_argument_exception ("", "dll_path");
       
     if (!init_string)
-      throw xtl::make_null_argument_exception ("", "init_string");
+      init_string = "";
 
       //создание реализации
     

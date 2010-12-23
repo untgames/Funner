@@ -35,6 +35,7 @@ class DynamicLibrary
   public:
 ///Конструктор
     DynamicLibrary (const char* in_path)
+      : library (0)
     {
       static const char* METHOD_NAME = "render::low_level::opengl::glx::DynamicLibrary::DynamicLibrary";
 
@@ -49,7 +50,7 @@ class DynamicLibrary
         
       size_t dlopen_flags = RTLD_NOW | RTLD_GLOBAL;
 
-      void* library = dlopen (in_path, dlopen_flags);
+      library = dlopen (in_path, dlopen_flags);
 
       if (!library)
         raise_error (common::format ("::dlopen('%S', %lu)", in_path, dlopen_flags).c_str ());

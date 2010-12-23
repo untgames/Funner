@@ -11,7 +11,7 @@ namespace
     Константы
 */
 
-const char* OPENGL_LIB_PATH = "libGL";
+const char* OPENGL_LIB_PATH = "libGL.so";
 
 /*
     Реализация менеджера платформы glx
@@ -46,7 +46,7 @@ class PlatformManagerImpl
 
         if (!path)
           throw xtl::make_null_argument_exception ("", "path");
-          
+
         if (!init_string)
           init_string = "";
 
@@ -71,7 +71,7 @@ class PlatformManagerImpl
         AdapterPtr adapter (CreateAdapter (name, path, init_string), false);
 
           //регистрация адаптера
-          
+
         default_adapters.push_front (adapter);
       }
       catch (std::exception& exception)
