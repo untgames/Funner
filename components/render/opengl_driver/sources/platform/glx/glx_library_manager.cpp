@@ -370,7 +370,7 @@ void AdapterLibrary::MakeCurrent (Display *dpy, GLXDrawable draw, GLXDrawable re
     }
   }
 
-  impl->fglXMakeCurrent (dpy, draw, read, ctx);
+  impl->fglXMakeContextCurrent (dpy, draw, read, ctx);
   
   impl->listener = new_listener;
 }
