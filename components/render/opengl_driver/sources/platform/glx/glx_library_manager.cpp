@@ -24,6 +24,7 @@ typedef Display*    (*glXGetCurrentDisplayFn)      (void);
 typedef GLXDrawable (*glXGetCurrentDrawableFn)     (void);
 typedef GLXDrawable (*glXGetCurrentReadDrawableFn) (void);
 typedef const char* (*glXGetClientStringFn)        (Display *dpy, int name);
+typedef Bool        (*glXQueryVersionFn)           (Display *dpy, int *major, int *minor);
 typedef const char* (*glXQueryServerStringFn)      (Display *dpy, int screen, int name);
 
 /*
@@ -136,6 +137,7 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
         GetSymbol ("glXGetCurrentDrawable",     fglXGetCurrentDrawable);
         GetSymbol ("glXGetCurrentReadDrawable", fglXGetCurrentReadDrawable);
         GetSymbol ("glXGetClientString",        fglXGetClientString);
+        GetSymbol ("glXQueryVersion",           fglXQueryVersion);
         GetSymbol ("glXQueryServerString",      fglXQueryServerString);
 
           //вывод общей информации
@@ -295,6 +297,7 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
     glXGetCurrentDrawableFn     fglXGetCurrentDrawable;
     glXGetCurrentReadDrawableFn fglXGetCurrentReadDrawable;
     glXGetClientStringFn        fglXGetClientString;
+    glXQueryVersionFn           fglXQueryVersion;
     glXQueryServerStringFn      fglXQueryServerString;
 };
 
