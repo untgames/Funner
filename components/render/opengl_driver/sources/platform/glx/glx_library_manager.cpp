@@ -280,6 +280,8 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
 
 GlxAdapterLibrary* GlxAdapterLibrary::first = 0;
 
+}
+
 /*
 ===================================================================================================
     Менеджер загружаемых библиотеки
@@ -289,8 +291,6 @@ GlxAdapterLibrary* GlxAdapterLibrary::first = 0;
 /*
     Загрузка библиотеки
 */
-
-using render::low_level::opengl::glx::LibraryManager;
 
 AdapterLibraryPtr LibraryManager::LoadLibrary (const char* name)
 {
@@ -328,6 +328,4 @@ AdapterLibraryPtr LibraryManager::LoadLibrary (const char* name)
     exception.touch ("%s('%s')", METHOD_NAME, name);
     throw;
   }
-}
-
 }
