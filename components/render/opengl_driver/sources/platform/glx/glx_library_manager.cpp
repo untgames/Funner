@@ -130,7 +130,7 @@ struct AdapterLibrary::Impl
   glXQueryServerStringFn      fglXQueryServerString;
 
 ///Конструктор
-  Impl (AdapterLibrary* owner, DynamicLibraryPtr& in_dll)
+  Impl (DynamicLibraryPtr& in_dll)
     : dll (in_dll)
     , listener (0)
   {
@@ -208,7 +208,7 @@ struct AdapterLibrary::Impl
   }
 };
 
-AdapterLibrary* AdapterLibrary::first = 0;
+AdapterLibrary* AdapterLibrary::Impl::first = 0;
 
 /*
     Конструктор / деструктор
@@ -217,22 +217,22 @@ AdapterLibrary* AdapterLibrary::first = 0;
 AdapterLibrary::AdapterLibrary (DynamicLibraryPtr& in_dll)
   : impl (new Impl (in_dll))
 {
-  next = first;
-  prev = 0;
+  impl->next = impl->first;
+  impl->prev = 0;
 
-  if (first) first->prev = this;
+  if (impl->first) impl->first->prev = this;
 
-  first = this;
+  impl->first = this;
 }
 
 ~AdapterLibrary::AdapterLibrary ()
 { 
     //отмена регистрации библиотеки
     
-  if (prev) prev->next = next;
-  else      first      = next;
+  if (impl->prev) impl->prev->next = impl->next;
+  else            impl->first      = impl->next;
   
-  if (next) next->prev = prev;
+  if (impl->next) impl->next->prev = impl->prev;
 }
 
 /*
@@ -258,7 +258,7 @@ AdapterLibraryPtr AdapterLibrary::LoadLibrary (const char* path)
     
       //попытка найти уже загруженную библиотеку
 
-    AdapterLibrary* library = AdapterLibrary::FindLibrary (dll);
+    AdapterLibrary* library = AdapterLibrary::Impl::FindLibrary (dll);
 
     if (library)
     {
