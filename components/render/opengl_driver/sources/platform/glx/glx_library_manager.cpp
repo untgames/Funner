@@ -227,7 +227,7 @@ AdapterLibrary::AdapterLibrary (DynamicLibraryPtr& in_dll)
   impl->first = this;
 }
 
-~AdapterLibrary::AdapterLibrary ()
+AdapterLibrary::~AdapterLibrary ()
 { 
     //отмена регистрации библиотеки
     
