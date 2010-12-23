@@ -80,7 +80,7 @@ const char* Adapter::GetName ()
 
 const char* Adapter::GetPath ()
 {
-  return "";
+  return impl->library->GetName ();
 }
 
 const char* Adapter::GetDescription ()
