@@ -23,6 +23,7 @@ typedef GLXContext  (*glXGetCurrentContextFn)      (void);
 typedef Display*    (*glXGetCurrentDisplayFn)      (void);
 typedef GLXDrawable (*glXGetCurrentDrawableFn)     (void);
 typedef GLXDrawable (*glXGetCurrentReadDrawableFn) (void);
+typedef const char* (*glXGetClientStringFn)        (Display *dpy, int name);
 typedef const char* (*glXQueryServerStringFn)      (Display *dpy, int screen, int name);
 
 /*
@@ -134,6 +135,7 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
         GetSymbol ("glXGetCurrentDisplay",      fglXGetCurrentDisplay);
         GetSymbol ("glXGetCurrentDrawable",     fglXGetCurrentDrawable);
         GetSymbol ("glXGetCurrentReadDrawable", fglXGetCurrentReadDrawable);
+        GetSymbol ("glXGetClientString",        fglXGetClientString);
         GetSymbol ("glXQueryServerString",      fglXQueryServerString);
 
           //вывод общей информации
@@ -148,8 +150,8 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
           return;
 
         log.Printf ("...GLX %d.%d library successfully loaded", major, minor);
-        log.Printf ("...client vendor: '%s'", fglXGetClientString (display, GLX_VENDOR));
-        log.Printf ("...client version: '%s'", fglXGetClientString (display, GLX_VERSION));
+        log.Printf ("...client vendor: '%s'",     fglXGetClientString (display, GLX_VENDOR));
+        log.Printf ("...client version: '%s'",    fglXGetClientString (display, GLX_VERSION));
         log.Printf ("...client extensions: '%s'", fglXGetClientString (display, GLX_EXTENSIONS));
       }
       catch (xtl::exception& exception)
@@ -292,6 +294,7 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
     glXGetCurrentDisplayFn      fglXGetCurrentDisplay;
     glXGetCurrentDrawableFn     fglXGetCurrentDrawable;
     glXGetCurrentReadDrawableFn fglXGetCurrentReadDrawable;
+    glXGetClientStringFn        fglXGetClientString;
     glXQueryServerStringFn      fglXQueryServerString;
 };
 
