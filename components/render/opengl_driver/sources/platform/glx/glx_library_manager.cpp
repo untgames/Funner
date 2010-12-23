@@ -23,6 +23,7 @@ typedef GLXContext  (*glXGetCurrentContextFn)      (void);
 typedef Display*    (*glXGetCurrentDisplayFn)      (void);
 typedef GLXDrawable (*glXGetCurrentDrawableFn)     (void);
 typedef GLXDrawable (*glXGetCurrentReadDrawableFn) (void);
+typedef const char* (*glXQueryServerStringFn)      (Display *dpy, int screen, int name);
 
 /*
 ===================================================================================================
@@ -133,6 +134,7 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
         GetSymbol ("glXGetCurrentDisplay",      fglXGetCurrentDisplay);
         GetSymbol ("glXGetCurrentDrawable",     fglXGetCurrentDrawable);
         GetSymbol ("glXGetCurrentReadDrawable", fglXGetCurrentReadDrawable);
+        GetSymbol ("glXQueryServerString",      fglXQueryServerString);
 
           //вывод общей информации
         
@@ -146,11 +148,9 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
           return;
 
         log.Printf ("...GLX %d.%d library successfully loaded", major, minor);
-         
-        log.Printf ("...client information:");
-        log.Printf ("     vendor: '%s'", glXGetClientString (display, GLX_VENDOR));
-        log.Printf ("     version: '%s'", glXGetClientString (display, GLX_VERSION));
-        log.Printf ("     extensions: '%s'", glXGetClientString (display, GLX_EXTENSIONS));
+        log.Printf ("...vendor: '%s'", glXGetClientString (display, GLX_VENDOR));
+        log.Printf ("...version: '%s'", glXGetClientString (display, GLX_VERSION));
+        log.Printf ("...extensions: '%s'", glXGetClientString (display, GLX_EXTENSIONS));
       }
       catch (xtl::exception& exception)
       {
@@ -292,6 +292,7 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
     glXGetCurrentDisplayFn      fglXGetCurrentDisplay;
     glXGetCurrentDrawableFn     fglXGetCurrentDrawable;
     glXGetCurrentReadDrawableFn fglXGetCurrentReadDrawable;
+    glXQueryServerStringFn      fglXQueryServerString;
 };
 
 GlxAdapterLibrary* GlxAdapterLibrary::first = 0;
