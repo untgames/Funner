@@ -202,7 +202,7 @@ struct AdapterLibrary::Impl
   {
     void *library = dll->GetLibrary ();
 
-    for (AdapterLibrary* i=first; i; i=i->next)
+    for (AdapterLibrary* i=first; i; i=i->impl->next)
       if (i->dll->GetLibrary () == library)
         return i;
 
