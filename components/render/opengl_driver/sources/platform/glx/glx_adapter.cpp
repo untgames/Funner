@@ -19,7 +19,7 @@ struct Adapter::Impl
   
 ///Конструктор
   Impl (const char* in_name, const char* in_dll_path, const char* init_string)  
-    : library (LibraryManager::LoadLibrary (in_dll_path))
+    : library (AdapterLibrary::LoadLibrary (in_dll_path))
     , name (in_name)
   {
   }  
