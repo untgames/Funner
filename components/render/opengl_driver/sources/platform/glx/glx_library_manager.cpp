@@ -270,7 +270,7 @@ AdapterLibraryPtr AdapterLibrary::LoadLibrary (const char* path)
 
       //создание новой библиотеки
       
-    return AdapterLibraryPtr (new GlxAdapterLibrary (dll), false);
+    return AdapterLibraryPtr (new AdapterLibrary (dll), false);
   }
   catch (xtl::exception& exception)
   {
