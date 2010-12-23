@@ -38,7 +38,7 @@ struct PrimarySwapChain::Impl
     try
     {
         //проверка возможности работы GLX
-        
+/*        
       int error_base, event_base;        
         
       if (!glXQueryExtension (display, &error_base, &event_base ) )
@@ -73,7 +73,7 @@ struct PrimarySwapChain::Impl
           throw xtl::make_argument_exception ("", "desc.swap_method", desc.swap_method);
       }            
       
-/*      *attr++ = GLX_SURFACE_TYPE;
+      *attr++ = GLX_SURFACE_TYPE;
       *attr++ = GLX_WINDOW_BIT;
       *attr++ = GL_NONE;
 
