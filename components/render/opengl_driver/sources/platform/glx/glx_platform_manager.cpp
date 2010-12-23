@@ -89,7 +89,7 @@ class PlatformManagerImpl
     {
       for (AdapterList::iterator iter=default_adapters.begin (), end=default_adapters.end (); iter!=end; ++iter)
       {
-        printf ("%s\n", iter->GetName ());
+        printf ("%s\n", *iter->GetName ());
         handler (get_pointer (*iter));
       }
     }
