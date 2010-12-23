@@ -28,7 +28,7 @@ typedef const char* (*glXGetClientStringFn)        (Display *dpy, int name);
 typedef Bool        (*glXQueryVersionFn)           (Display *dpy, int *major, int *minor);
 typedef const char* (*glXQueryServerStringFn)      (Display *dpy, int screen, int name);
 
-}
+
 
 /*
 ===================================================================================================
@@ -100,6 +100,8 @@ class DynamicLibrary
 };
 
 typedef stl::auto_ptr<DynamicLibrary> DynamicLibraryPtr;
+
+}
 
 /*
 ===================================================================================================
