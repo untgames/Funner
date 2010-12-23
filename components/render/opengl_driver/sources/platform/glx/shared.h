@@ -139,7 +139,7 @@ class IContextLostListener
     virtual ~IContextLostListener () {}
 };
 
-class DynamicLibraryPtr;
+class DynamicLibrary;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загружаемая библиотека OpenGL
@@ -148,10 +148,14 @@ class AdapterLibrary: virtual public ILibrary, public xtl::reference_counter
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Загрузка библиотеки / деструктор
+///Загрузка библиотеки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static AdapterLibraryPtr LoadLibrary (const char* path);
-    ~AdapterLibrary (); 
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ~AdapterLibrary ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Путь к библиотеке
@@ -199,7 +203,9 @@ class AdapterLibrary: virtual public ILibrary, public xtl::reference_counter
     const void* GetProcAddress (const char* name, size_t search_flags);
 
   private:
-    AdapterLibrary (DynamicLibraryPtr&);                //for internal use
+    AdapterLibrary (stl::auto_ptr<DynamicLibrary>&);
+    
+  private:
     AdapterLibrary (const AdapterLibrary&);             //no impl
     AdapterLibrary& operator = (const AdapterLibrary&); //no impl
 

@@ -107,110 +107,132 @@ typedef stl::auto_ptr<DynamicLibrary> DynamicLibraryPtr;
 
 struct AdapterLibrary::Impl
 {
-    Log                    log;             //протокол
-    DynamicLibraryPtr      dll;             //динамическа€ библиотека
-    IContextLostListener  *listener;        //слушатель событи€ потери контекста
-    AdapterLibrary        *prev;            //предыдуща€ библиотека
-    AdapterLibrary        *next;            //следующа€ библиотека
-    static AdapterLibrary *first;           //перва€ библиотека
-    
-    glXCreateNewContextFn       fglXCreateNewContext;
-    glXDestroyContextFn         fglXDestroyContext;
-    glXMakeContextCurrentFn     fglXMakeContextCurrent;
-    glXCreatePbufferFn          fglXCreatePbuffer;
-    glXDestroyPbufferFn         fglXDestroyPbuffer;
-    glXSwapBuffersFn            fglXSwapBuffers;
-    glXGetCurrentContextFn      fglXGetCurrentContext;
-    glXGetCurrentDisplayFn      fglXGetCurrentDisplay;
-    glXGetCurrentDrawableFn     fglXGetCurrentDrawable;
-    glXGetCurrentReadDrawableFn fglXGetCurrentReadDrawable;
-    glXIsDirectFn               fglXIsDirect;
-    glXGetClientStringFn        fglXGetClientString;
-    glXQueryVersionFn           fglXQueryVersion;
-    glXQueryServerStringFn      fglXQueryServerString;
+  Log                    log;             //протокол
+  DynamicLibraryPtr      dll;             //динамическа€ библиотека
+  IContextLostListener  *listener;        //слушатель событи€ потери контекста
+  AdapterLibrary        *prev;            //предыдуща€ библиотека
+  AdapterLibrary        *next;            //следующа€ библиотека
+  static AdapterLibrary *first;           //перва€ библиотека
+  
+  glXCreateNewContextFn       fglXCreateNewContext;
+  glXDestroyContextFn         fglXDestroyContext;
+  glXMakeContextCurrentFn     fglXMakeContextCurrent;
+  glXCreatePbufferFn          fglXCreatePbuffer;
+  glXDestroyPbufferFn         fglXDestroyPbuffer;
+  glXSwapBuffersFn            fglXSwapBuffers;
+  glXGetCurrentContextFn      fglXGetCurrentContext;
+  glXGetCurrentDisplayFn      fglXGetCurrentDisplay;
+  glXGetCurrentDrawableFn     fglXGetCurrentDrawable;
+  glXGetCurrentReadDrawableFn fglXGetCurrentReadDrawable;
+  glXIsDirectFn               fglXIsDirect;
+  glXGetClientStringFn        fglXGetClientString;
+  glXQueryVersionFn           fglXQueryVersion;
+  glXQueryServerStringFn      fglXQueryServerString;
 
 /// онструктор
-    Impl (DynamicLibraryPtr& in_dll)
-      : dll (in_dll)
-      , listener (0)
+  Impl (AdapterLibrary* owner, DynamicLibraryPtr& in_dll)
+    : dll (in_dll)
+    , listener (0)
+  {
+    try
     {
-      try
-      {
-          //регистраци€ библиотеки
+        //регистраци€ библиотеки
+      
+      log.Printf ("...get default GLX-entries");
+      
+        //инициализаци€ точек входа
         
-        log.Printf ("...get default GLX-entries");
-        
-          //инициализаци€ точек входа
-          
-        GetSymbol ("glXCreateNewContext",       fglXCreateNewContext);
-        GetSymbol ("glXDestroyContext",         fglXDestroyContext);
-        GetSymbol ("glXMakeContextCurrent",     fglXMakeContextCurrent);
-        GetSymbol ("glXCreatePbuffer",          fglXCreatePbuffer);
-        GetSymbol ("glXDestroyPbuffer",         fglXDestroyPbuffer);
-        GetSymbol ("glXSwapBuffers",            fglXSwapBuffers);
-        GetSymbol ("glXGetCurrentDisplay",      fglXGetCurrentDisplay);
-        GetSymbol ("glXGetCurrentDrawable",     fglXGetCurrentDrawable);
-        GetSymbol ("glXGetCurrentReadDrawable", fglXGetCurrentReadDrawable);
-        GetSymbol ("glXIsDirect",               fglXIsDirect);
-        GetSymbol ("glXGetClientString",        fglXGetClientString);
-        GetSymbol ("glXQueryVersion",           fglXQueryVersion);
-        GetSymbol ("glXQueryServerString",      fglXQueryServerString);
+      GetSymbol ("glXCreateNewContext",       fglXCreateNewContext);
+      GetSymbol ("glXDestroyContext",         fglXDestroyContext);
+      GetSymbol ("glXMakeContextCurrent",     fglXMakeContextCurrent);
+      GetSymbol ("glXCreatePbuffer",          fglXCreatePbuffer);
+      GetSymbol ("glXDestroyPbuffer",         fglXDestroyPbuffer);
+      GetSymbol ("glXSwapBuffers",            fglXSwapBuffers);
+      GetSymbol ("glXGetCurrentDisplay",      fglXGetCurrentDisplay);
+      GetSymbol ("glXGetCurrentDrawable",     fglXGetCurrentDrawable);
+      GetSymbol ("glXGetCurrentReadDrawable", fglXGetCurrentReadDrawable);
+      GetSymbol ("glXIsDirect",               fglXIsDirect);
+      GetSymbol ("glXGetClientString",        fglXGetClientString);
+      GetSymbol ("glXQueryVersion",           fglXQueryVersion);
+      GetSymbol ("glXQueryServerString",      fglXQueryServerString);
 
-          //вывод общей информации
-        
-        Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
-        
-        DisplayLock lock (display);
+        //вывод общей информации
+      
+      Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
+      
+      DisplayLock lock (display);
 
-        int major = 0, minor = 0;
+      int major = 0, minor = 0;
 
-        if (!fglXQueryVersion (display, &major, &minor))
-          return;
+      if (!fglXQueryVersion (display, &major, &minor))
+        return;
 
-        log.Printf ("...GLX %d.%d library successfully loaded", major, minor);
-        log.Printf ("...client vendor: '%s'",     fglXGetClientString (display, GLX_VENDOR));
-        log.Printf ("...client version: '%s'",    fglXGetClientString (display, GLX_VERSION));
-        log.Printf ("...client extensions: '%s'", fglXGetClientString (display, GLX_EXTENSIONS));
-      }
-      catch (xtl::exception& exception)
-      {
-        log.Printf ("...GLX library load failed");
-        exception.touch ("render::low_level::opengl::glx::AdapterLibrary::Impl::Impl");
-        throw;
-      }
+      log.Printf ("...GLX %d.%d library successfully loaded", major, minor);
+      log.Printf ("...client vendor: '%s'",     fglXGetClientString (display, GLX_VENDOR));
+      log.Printf ("...client version: '%s'",    fglXGetClientString (display, GLX_VERSION));
+      log.Printf ("...client extensions: '%s'", fglXGetClientString (display, GLX_EXTENSIONS));
     }
-    
-    ~Impl ()
+    catch (xtl::exception& exception)
     {
-
+      log.Printf ("...GLX library load failed");
+      exception.touch ("render::low_level::opengl::glx::AdapterLibrary::Impl::Impl");
+      throw;
     }
+  }
+  
+  ~Impl ()
+  {
+
+  }
     
 ///ќпределение адреса точки входа с приведением типов и проверкой корректности аргументов
-    template <class Fn> void GetSymbol (const char* symbol, Fn& fn, bool check = true)
-    {
-      fn = (Fn)dll->GetSymbol (symbol);
+  template <class Fn> void GetSymbol (const char* symbol, Fn& fn, bool check = true)
+  {
+    fn = (Fn)dll->GetSymbol (symbol);
 
-      if (!fn && check)
-        throw xtl::format_operation_exception ("render::low_level::opengl::glx::AdapterLibrary::Impl::GetSymbol",
-          "Symbol '%s' not found in library '%s'", symbol, dll->GetPath ());
-    }        
+    if (!fn && check)
+      throw xtl::format_operation_exception ("render::low_level::opengl::glx::AdapterLibrary::Impl::GetSymbol",
+        "Symbol '%s' not found in library '%s'", symbol, dll->GetPath ());
+  }        
+    
+///ѕоиск библиотеки
+  static AdapterLibrary* FindLibrary (const DynamicLibraryPtr& dll)
+  {
+    void *library = dll->GetLibrary ();
+
+    for (AdapterLibrary* i=first; i; i=i->next)
+      if (i->dll->GetLibrary () == library)
+        return i;
+
+    return 0;
+  }
 };
 
 AdapterLibrary* AdapterLibrary::first = 0;
 
 /*
-    ѕоиск библиотеки
+     онструктор / деструктор
 */
 
-static AdapterLibrary* FindLibrary (const DynamicLibraryPtr& dll)
+AdapterLibrary::AdapterLibrary (DynamicLibraryPtr& in_dll)
+  : impl (new Impl (in_dll))
 {
-  void *library = dll->GetLibrary ();
+  next = first;
+  prev = 0;
 
-  for (AdapterLibrary* i=first; i; i=i->next)
-    if (i->dll->GetLibrary () == library)
-      return i;
+  if (first) first->prev = this;
 
-  return 0;
+  first = this;
+}
+
+~AdapterLibrary::AdapterLibrary ()
+{ 
+    //отмена регистрации библиотеки
+    
+  if (prev) prev->next = next;
+  else      first      = next;
+  
+  if (next) next->prev = prev;
 }
 
 /*
@@ -253,33 +275,6 @@ AdapterLibraryPtr AdapterLibrary::LoadLibrary (const char* path)
     exception.touch ("%s('%s')", METHOD_NAME, path);
     throw;
   }
-}
-
-/*
-     онструктор / деструктор
-*/
-
-AdapterLibrary::AdapterLibrary (DynamicLibraryPtr& in_dll)
-  : impl (new Impl (in_dll))
-{
-  next = first;
-  prev = 0;
-
-  if (first) first->prev = this;
-
-  first = this;
-}
-
-~AdapterLibrary::AdapterLibrary ()
-{
-  log.Printf ("...unload dll '%s'", GetName ());
-  
-    //отмена регистрации библиотеки
-    
-  if (prev) prev->next = next;
-  else      first      = next;
-  
-  if (next) next->prev = prev;
 }
 
 /*
@@ -422,7 +417,3 @@ const void* GetProcAddress (const char* name, size_t search_flags)
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::GetProcAddress");
 }
-    
-  protected:
-    
-};
