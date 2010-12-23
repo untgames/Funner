@@ -23,6 +23,7 @@ typedef GLXContext  (*glXGetCurrentContextFn)      (void);
 typedef Display*    (*glXGetCurrentDisplayFn)      (void);
 typedef GLXDrawable (*glXGetCurrentDrawableFn)     (void);
 typedef GLXDrawable (*glXGetCurrentReadDrawableFn) (void);
+typedef Bool        (*glXIsDirectFn)               (Display *dpy, GLXContext ctx);
 typedef const char* (*glXGetClientStringFn)        (Display *dpy, int name);
 typedef Bool        (*glXQueryVersionFn)           (Display *dpy, int *major, int *minor);
 typedef const char* (*glXQueryServerStringFn)      (Display *dpy, int screen, int name);
@@ -104,24 +105,38 @@ typedef stl::auto_ptr<DynamicLibrary> DynamicLibraryPtr;
 ===================================================================================================
 */
 
-class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
+struct AdapterLibrary::Impl
 {
-  public:
+    Log                    log;             //протокол
+    DynamicLibraryPtr      dll;             //динамическая библиотека
+    IContextLostListener  *listener;        //слушатель события потери контекста
+    AdapterLibrary        *prev;            //предыдущая библиотека
+    AdapterLibrary        *next;            //следующая библиотека
+    static AdapterLibrary *first;           //первая библиотека
+    
+    glXCreateNewContextFn       fglXCreateNewContext;
+    glXDestroyContextFn         fglXDestroyContext;
+    glXMakeContextCurrentFn     fglXMakeContextCurrent;
+    glXCreatePbufferFn          fglXCreatePbuffer;
+    glXDestroyPbufferFn         fglXDestroyPbuffer;
+    glXSwapBuffersFn            fglXSwapBuffers;
+    glXGetCurrentContextFn      fglXGetCurrentContext;
+    glXGetCurrentDisplayFn      fglXGetCurrentDisplay;
+    glXGetCurrentDrawableFn     fglXGetCurrentDrawable;
+    glXGetCurrentReadDrawableFn fglXGetCurrentReadDrawable;
+    glXIsDirectFn               fglXIsDirect;
+    glXGetClientStringFn        fglXGetClientString;
+    glXQueryVersionFn           fglXQueryVersion;
+    glXQueryServerStringFn      fglXQueryServerString;
+
 ///Конструктор
-    GlxAdapterLibrary (DynamicLibraryPtr& in_dll)
+    Impl (DynamicLibraryPtr& in_dll)
       : dll (in_dll)
       , listener (0)
     {
       try
       {
           //регистрация библиотеки
-
-        next = first;
-        prev = 0;
-
-        if (first) first->prev = this;
-
-        first = this;
         
         log.Printf ("...get default GLX-entries");
         
@@ -136,6 +151,7 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
         GetSymbol ("glXGetCurrentDisplay",      fglXGetCurrentDisplay);
         GetSymbol ("glXGetCurrentDrawable",     fglXGetCurrentDrawable);
         GetSymbol ("glXGetCurrentReadDrawable", fglXGetCurrentReadDrawable);
+        GetSymbol ("glXIsDirect",               fglXIsDirect);
         GetSymbol ("glXGetClientString",        fglXGetClientString);
         GetSymbol ("glXQueryVersion",           fglXQueryVersion);
         GetSymbol ("glXQueryServerString",      fglXQueryServerString);
@@ -159,168 +175,54 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
       catch (xtl::exception& exception)
       {
         log.Printf ("...GLX library load failed");
-        exception.touch ("render::low_level::opengl::glx::GlxAdapterLibrary::GlxAdapterLibrary");
+        exception.touch ("render::low_level::opengl::glx::AdapterLibrary::Impl::Impl");
         throw;
       }
     }
     
-    ~GlxAdapterLibrary ()
+    ~Impl ()
     {
-      log.Printf ("...unload dll '%s'", GetName ());
-      
-        //отмена регистрации библиотеки
-        
-      if (prev) prev->next = next;
-      else      first      = next;
-      
-      if (next) next->prev = prev;
-    }
-    
-///Получение имени библиотеки
-    const char* GetName ()
-    {
-      return dll->GetPath ();
-    }
-    
-//создание внеэкранной области рендеринга
-    GLXPbuffer CreatePbuffer (Display *dpy, GLXFBConfig config, const int *attrib_list)
-    {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::CreatePbuffer");
-    }
-    
-//уничтожение внеэкранной области рендеринга
-    void DestroyPbuffer (Display *dpy, GLXPbuffer pbuf)
-    {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::DestroyPbuffer");
-    }
 
-//создание нового контекста GLX-рендеринга
-    GLXContext CreateContext (Display *dpy, GLXFBConfig config, int render_type, GLXContext share_list, Bool direct)
-    {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::CreateContext");
     }
     
-//создание контекста GLX
-    void DeleteContext (Display *dpy, GLXContext ctx)
-    {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::DeleteContext");
-    }
-
-//установка текущего контекста
-    void MakeCurrent (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx, IContextLostListener* listener)
-    {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::MakeCurrent");
-    }
-    
-//получение текущего контекста
-    GLXContext GetCurrentContext ()
-    {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::GetCurrentContext");
-    }
-    
-//получение текущего устройства отображения
-    Display* GetCurrentDisplay ()
-    {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::GetCurrentDisplay");
-    }
-    
-//получение текущей области drawable
-    GLXDrawable GetCurrentDrawable ()
-    {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::GetCurrentDrawable");
-    }
-    
-//получение текущей области drawable для чтения
-    GLXDrawable GetCurrentReadDrawable ()
-    {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::GetCurrentReadDrawable");
-    }
-
-//обменивает содержимое рабочего и фонового буферов
-    void SwapBuffers (Display *dpy, GLXDrawable drawable)
-    {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::SwapBuffers");
-    }
-    
-///Подсчёт ссылок
-    void AddRef  () { addref (this); }
-    void Release () { release (this); }
-    
-///Поиск библиотеки
-    static GlxAdapterLibrary* FindLibrary (const DynamicLibraryPtr& dll)
-    {
-      void *library = dll->GetLibrary ();
-
-      for (GlxAdapterLibrary* i=first; i; i=i->next)
-        if (i->dll->GetLibrary () == library)
-          return i;
-
-      return 0;
-    }
-
-///Получение адреса точки входа
-    const void* GetProcAddress (const char* name, size_t search_flags)
-    {
-      throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::GetProcAddress");
-    }
-    
-  protected:
 ///Определение адреса точки входа с приведением типов и проверкой корректности аргументов
     template <class Fn> void GetSymbol (const char* symbol, Fn& fn, bool check = true)
     {
       fn = (Fn)dll->GetSymbol (symbol);
 
       if (!fn && check)
-        throw xtl::format_operation_exception ("render::low_level::opengl::glx::AdapterLibrary::GetSymbol",
+        throw xtl::format_operation_exception ("render::low_level::opengl::glx::AdapterLibrary::Impl::GetSymbol",
           "Symbol '%s' not found in library '%s'", symbol, dll->GetPath ());
     }        
-    
-  protected:
-    Log log; //протокол
-    
-  private:
-    DynamicLibraryPtr         dll;             //динамическая библиотека
-    IContextLostListener     *listener;        //слушатель события потери контекста
-    GlxAdapterLibrary        *prev;            //предыдущая библиотека
-    GlxAdapterLibrary        *next;            //следующая библиотека
-    static GlxAdapterLibrary *first;           //первая библиотека
-
-  private:
-    glXCreateNewContextFn       fglXCreateNewContext;
-    glXDestroyContextFn         fglXDestroyContext;
-    glXMakeContextCurrentFn     fglXMakeContextCurrent;
-    glXCreatePbufferFn          fglXCreatePbuffer;
-    glXDestroyPbufferFn         fglXDestroyPbuffer;
-    glXSwapBuffersFn            fglXSwapBuffers;
-    glXGetCurrentContextFn      fglXGetCurrentContext;
-    glXGetCurrentDisplayFn      fglXGetCurrentDisplay;
-    glXGetCurrentDrawableFn     fglXGetCurrentDrawable;
-    glXGetCurrentReadDrawableFn fglXGetCurrentReadDrawable;
-    glXGetClientStringFn        fglXGetClientString;
-    glXQueryVersionFn           fglXQueryVersion;
-    glXQueryServerStringFn      fglXQueryServerString;
 };
 
-GlxAdapterLibrary* GlxAdapterLibrary::first = 0;
-
-}
+AdapterLibrary* AdapterLibrary::first = 0;
 
 /*
-===================================================================================================
-    Менеджер загружаемых библиотеки
-===================================================================================================
+    Поиск библиотеки
 */
+
+static AdapterLibrary* FindLibrary (const DynamicLibraryPtr& dll)
+{
+  void *library = dll->GetLibrary ();
+
+  for (AdapterLibrary* i=first; i; i=i->next)
+    if (i->dll->GetLibrary () == library)
+      return i;
+
+  return 0;
+}
 
 /*
     Загрузка библиотеки
 */
 
-AdapterLibraryPtr LibraryManager::LoadLibrary (const char* name)
+AdapterLibraryPtr AdapterLibrary::LoadLibrary (const char* path)
 {
   static const char* METHOD_NAME = "render::low_level::opengl::glx::LibraryManager::LoadLibrary";
   
-  if (!name)
-    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+  if (!path)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "path");
 
   try
   {
@@ -328,17 +230,17 @@ AdapterLibraryPtr LibraryManager::LoadLibrary (const char* name)
     
       //загрузка динамической библиотеки    
       
-    log.Printf ("...load library '%s'", name);
+    log.Printf ("...load library '%s'", path);
       
-    DynamicLibraryPtr dll (new DynamicLibrary (name));
+    DynamicLibraryPtr dll (new DynamicLibrary (path));
     
       //попытка найти уже загруженную библиотеку
 
-    GlxAdapterLibrary* library = GlxAdapterLibrary::FindLibrary (dll);
+    AdapterLibrary* library = AdapterLibrary::FindLibrary (dll);
 
     if (library)
-    {    
-      log.Printf ("...library '%s' already loaded", name);
+    {
+      log.Printf ("...library '%s' already loaded", path);
       return library;
     }
 
@@ -348,7 +250,179 @@ AdapterLibraryPtr LibraryManager::LoadLibrary (const char* name)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("%s('%s')", METHOD_NAME, name);
+    exception.touch ("%s('%s')", METHOD_NAME, path);
     throw;
   }
 }
+
+/*
+    Конструктор / деструктор
+*/
+
+AdapterLibrary::AdapterLibrary (DynamicLibraryPtr& in_dll)
+  : impl (new Impl (in_dll))
+{
+  next = first;
+  prev = 0;
+
+  if (first) first->prev = this;
+
+  first = this;
+}
+
+~AdapterLibrary::AdapterLibrary ()
+{
+  log.Printf ("...unload dll '%s'", GetName ());
+  
+    //отмена регистрации библиотеки
+    
+  if (prev) prev->next = next;
+  else      first      = next;
+  
+  if (next) next->prev = prev;
+}
+
+/*
+    Получение имени библиотеки
+*/
+    
+const char* AdapterLibrary::GetName ()
+{
+  return impl->dll->GetPath ();
+}
+
+/*
+    Создание внеэкранной области рендеринга
+*/
+
+GLXPbuffer AdapterLibrary::CreatePbuffer (Display *dpy, GLXFBConfig config, const int *attrib_list)
+{
+  try
+  {
+    GLXPbuffer buf = impl->fglXCreatePbuffer (dpy, config, attrib_list);
+    
+    if (!buf)
+      raise_error ("glXCreatePbuffer failed");
+      
+    return buf;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::glx::GlxAdapterLibrary::CreatePbuffer");
+    throw;
+  }
+}
+
+/*
+    Уничтожение внеэкранной области рендеринга
+*/
+    
+void AdapterLibrary::DestroyPbuffer (Display *dpy, GLXPbuffer pbuf)
+{
+  impl->fglXDestroyPbuffer (dpy, pbuf);
+}
+
+/*
+    Создание нового контекста GLX-рендеринга
+*/
+
+GLXContext AdapterLibrary::CreateContext (Display *dpy, GLXFBConfig config, int render_type, GLXContext share_list, Bool direct)
+{
+  try
+  {
+    GLXContext ctx = impl->fglXCreateNewContext (dpy, config, render_type, share_list, direct);
+    
+    if (!ctx)
+      raise_error ("glXCreateNewContext failed");
+      
+    return ctx;
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::glx::GlxAdapterLibrary::CreateContext");
+    throw;
+  }
+}
+
+/*
+    Создание контекста GLX
+*/
+
+void AdapterLibrary::DestroyContext (Display *dpy, GLXContext ctx)
+{
+  impl->fglXDestroyContext (dpy, ctx);
+}
+
+/*
+    Установка текущего контекста
+*/
+
+void AdapterLibrary::MakeCurrent (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx, IContextLostListener* listener)
+{
+    //сброс текущего контекста
+
+  if (impl->listener)
+  {
+    try
+    {
+      listener->OnLostCurrent ();
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
+  }
+
+  impl->fglXMakeCurrent (dpy, draw, read, ctx);
+  
+  impl->listener = new_listener;
+}
+
+/*
+    Получение текущего контекста
+*/
+    
+GLXContext AdapterLibrary::GetCurrentContext ()
+{
+  return impl->fglXGetCurrentContext ();
+}
+
+/*
+    Получение текущей области drawable
+*/
+    
+GLXDrawable AdapterLibrary::GetCurrentDrawable ()
+{
+  return impl->fglXGetCurrentDrawable ();
+}
+
+/*
+    Получение текущей области drawable для чтения
+*/
+    
+GLXDrawable AdapterLibrary::GetCurrentReadDrawable ()
+{
+  return impl->fglXGetCurrentReadDrawable ();
+}
+
+/*
+    Обменивает содержимое рабочего и фонового буферов
+*/
+
+void AdapterLibrary::SwapBuffers (Display *dpy, GLXDrawable drawable)
+{
+  impl->fglXSwapBuffers (dpy, drawable);
+}
+    
+/*
+    Получение адреса точки входа
+*/
+
+const void* GetProcAddress (const char* name, size_t search_flags)
+{
+  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::GetProcAddress");
+}
+    
+  protected:
+    
+};

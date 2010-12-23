@@ -139,66 +139,76 @@ class IContextLostListener
     virtual ~IContextLostListener () {}
 };
 
+class DynamicLibraryPtr;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загружаемая библиотека OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class IAdapterLibrary: virtual public ILibrary
+class AdapterLibrary: virtual public ILibrary, public xtl::reference_counter
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Загрузка библиотеки / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static AdapterLibraryPtr LoadLibrary (const char* path);
+    ~AdapterLibrary (); 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Путь к библиотеке
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual const char* GetName () = 0;
+    const char* GetName ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с областью рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual GLXPbuffer CreatePbuffer (Display *dpy, GLXFBConfig config, 
-                                      const int *attrib_list) = 0;         //создание внеэкранной области рендеринга
-    virtual void       DestroyPbuffer (Display *dpy, GLXPbuffer pbuf) = 0; //уничтожение внеэкранной области рендеринга
+    GLXPbuffer CreatePbuffer  (Display *dpy, GLXFBConfig config, const int *attrib_list); //создание внеэкранной области рендеринга
+    void       DestroyPbuffer (Display *dpy, GLXPbuffer pbuf);                            //уничтожение внеэкранной области рендеринга
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание и удаление контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual GLXContext CreateContext (Display *dpy, GLXFBConfig config, int render_type, 
-                                      GLXContext share_list, Bool direct) = 0; //создание нового контекста GLX-рендеринга
-    virtual void       DeleteContext (Display *dpy, GLXContext ctx) = 0;       //создание контекста GLX
+    GLXContext CreateContext (Display *dpy, GLXFBConfig config, int render_type, GLXContext share_list, Bool direct); //создание нового контекста GLX-рендеринга
+    void       DestroyContext (Display *dpy, GLXContext ctx); //удаление контекста GLX-рендеринга
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущего контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void MakeCurrent (Display *dpy, GLXDrawable draw, GLXDrawable read, 
-                              GLXContext ctx, IContextLostListener* = 0) = 0; //установка текущего контекста
-    virtual GLXContext  GetCurrentContext      () = 0; //получение текущего контекста
-    virtual Display*    GetCurrentDisplay      () = 0; //получение текущего устройства отображения
-    virtual GLXDrawable GetCurrentDrawable     () = 0; //получение текущей области drawable
-    virtual GLXDrawable GetCurrentReadDrawable () = 0; //получение текущей области drawable для чтения
+    void MakeCurrent (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx, IContextLostListener* = 0);
+                              
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение текущего контекста и drawable
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    GLXContext  GetCurrentContext      (); //получение текущего контекста
+    GLXDrawable GetCurrentDrawable     (); //получение текущей области drawable
+    GLXDrawable GetCurrentReadDrawable (); //получение текущей области drawable для чтения
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конфигурация буфера кадра
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    int          GetFBConfigAttrib (Display *dpy, GLXFBConfig config, int attribute, int *value); //возвращает список конфигураций GLX-буфера кадра, соответствующих заданным атрибутам
+    GLXFBConfig* GetFBConfigs      (Display *dpy, int screen, int *nelements) = 0;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Обмен буферов
+///Обмен содержимого рабочего и фонового буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SwapBuffers (Display *dpy, GLXDrawable drawable) = 0; //обменивает содержимое рабочего и фонового буферов
+    virtual void SwapBuffers (Display *dpy, GLXDrawable drawable) = 0;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение адреса точки входа
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const void* GetProcAddress (const char* name, size_t search_flags);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Подсчёт ссылок
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void AddRef  () = 0;
-    virtual void Release () = 0;
+  private:
+    AdapterLibrary (DynamicLibraryPtr&);                //for internal use
+    AdapterLibrary (const AdapterLibrary&);             //no impl
+    AdapterLibrary& operator = (const AdapterLibrary&); //no impl
+
+  private:
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
 };
 
-typedef xtl::com_ptr<IAdapterLibrary> AdapterLibraryPtr;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Менеджер загружаемых библиотеки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-class LibraryManager
-{
-  public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Загрузка библиотеки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    static AdapterLibraryPtr LoadLibrary (const char* name);
-};
+typedef xtl::intrusive_ptr<AdapterLibrary> AdapterLibraryPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Адаптер
