@@ -144,13 +144,13 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
 
         int major = 0, minor = 0;
 
-        if (!glXQueryVersion (display, &major, &minor))
+        if (!fglXQueryVersion (display, &major, &minor))
           return;
 
         log.Printf ("...GLX %d.%d library successfully loaded", major, minor);
-        log.Printf ("...vendor: '%s'", glXGetClientString (display, GLX_VENDOR));
-        log.Printf ("...version: '%s'", glXGetClientString (display, GLX_VERSION));
-        log.Printf ("...extensions: '%s'", glXGetClientString (display, GLX_EXTENSIONS));
+        log.Printf ("...client vendor: '%s'", fglXGetClientString (display, GLX_VENDOR));
+        log.Printf ("...client version: '%s'", fglXGetClientString (display, GLX_VERSION));
+        log.Printf ("...client extensions: '%s'", fglXGetClientString (display, GLX_EXTENSIONS));
       }
       catch (xtl::exception& exception)
       {
