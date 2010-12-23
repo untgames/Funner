@@ -72,8 +72,6 @@ class PlatformManagerImpl
 
           //регистрация адаптера
           
-        printf ("%s\n", adapter.GetName ());
-
         default_adapters.push_front (adapter);
       }
       catch (std::exception& exception)
