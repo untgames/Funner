@@ -71,6 +71,8 @@ class PlatformManagerImpl
         AdapterPtr adapter (CreateAdapter (name, path, init_string), false);
 
           //регистрация адаптера
+          
+        printf ("%s\n", adapter.GetName ());
 
         default_adapters.push_front (adapter);
       }
@@ -88,9 +90,7 @@ class PlatformManagerImpl
     void EnumDefaultAdapters (const xtl::function<void (IAdapter*)>& handler)
     {
       for (AdapterList::iterator iter=default_adapters.begin (), end=default_adapters.end (); iter!=end; ++iter)
-      {
         handler (get_pointer (*iter));
-      }
     }
 
 ///Создание цепочки обмена
