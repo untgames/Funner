@@ -190,12 +190,12 @@ class AdapterLibrary: virtual public ILibrary, public xtl::reference_counter
 ///Конфигурация буфера кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     int          GetFBConfigAttrib (Display *dpy, GLXFBConfig config, int attribute, int *value); //возвращает список конфигураций GLX-буфера кадра, соответствующих заданным атрибутам
-    GLXFBConfig* GetFBConfigs      (Display *dpy, int screen, int *nelements) = 0;
+    GLXFBConfig* GetFBConfigs      (Display *dpy, int screen, int *nelements);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен содержимого рабочего и фонового буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SwapBuffers (Display *dpy, GLXDrawable drawable) = 0;
+    virtual void SwapBuffers (Display *dpy, GLXDrawable drawable);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение адреса точки входа
