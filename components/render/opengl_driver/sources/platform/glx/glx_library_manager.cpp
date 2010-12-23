@@ -222,7 +222,7 @@ AdapterLibrary::AdapterLibrary (DynamicLibraryPtr& in_dll)
   impl->next = impl->first;
   impl->prev = 0;
 
-  if (impl->first) impl->first->prev = this;
+  if (impl->first) impl->first->impl->prev = this;
 
   impl->first = this;
 }
@@ -231,10 +231,10 @@ AdapterLibrary::~AdapterLibrary ()
 { 
     //отмена регистрации библиотеки
     
-  if (impl->prev) impl->prev->next = impl->next;
-  else            impl->first      = impl->next;
+  if (impl->prev) impl->prev->impl->next = impl->next;
+  else            impl->first            = impl->next;
   
-  if (impl->next) impl->next->prev = impl->prev;
+  if (impl->next) impl->next->impl->prev = impl->prev;
 }
 
 /*
