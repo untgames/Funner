@@ -134,8 +134,6 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
         GetSymbol ("glXGetCurrentDrawable",     fglXGetCurrentDrawable);
         GetSymbol ("glXGetCurrentReadDrawable", fglXGetCurrentReadDrawable);
 
-        log.Printf ("...GLX library successfully loaded");
-        
           //вывод общей информации
         
         Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
@@ -147,12 +145,17 @@ class GlxAdapterLibrary: public IAdapterLibrary, public xtl::reference_counter
         if (!glXQueryVersion (display, &major, &minor))
           return;
 
-        printf ("version = %d.%d\n", major, minor);
+        log.Printf ("...GLX %d.%d library successfully loaded", major, minor);
+         
+        log.Printf ("...client information:");
+        log.Printf ("     vendor: '%s'", glXGetClientString (display, GLX_VENDOR));
+        log.Printf ("     version: '%s'", glXGetClientString (display, GLX_VERSION));
+        log.Printf ("     extensions: '%s'", glXGetClientString (display, GLX_EXTENSIONS));
         
-        log.Printf ("Client information:\n");
-        log.Printf ("  vendor: '%s'\n",     glXGetClientString (display, GLX_VENDOR));
-        log.Printf ("  version: '%s'\n",    glXGetClientString (display, GLX_VERSION));
-        log.Printf ("  extensions: '%s'\n", glXGetClientString (display, GLX_EXTENSIONS));
+        log.Printf ("...server information:");
+        log.Printf ("     vendor: '%s'", glXQueryServerString (display, GLX_VENDOR));
+        log.Printf ("     version: '%s'", glXQueryServerString (display, GLX_VERSION));
+        log.Printf ("     extensions: '%s'", glXQueryServerString (display, GLX_EXTENSIONS));
       }
       catch (xtl::exception& exception)
       {
