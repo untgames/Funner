@@ -113,17 +113,16 @@ bool PrimarySwapChain::GetFullscreenState ()
 
 void PrimarySwapChain::Present ()
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::Present");
-/*  try
+  try
   {
-    if (!glxSwapBuffers (impl->glx_display, impl->glx_surface))
-      raise_error ("::glxSwapBuffers");
+//    if (!glxSwapBuffers (impl->glx_display, impl->glx_surface))
+//      raise_error ("::glxSwapBuffers");
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("render::low_level::opengl::glx::PrimarySwapChain::Present");
     throw;
-  }*/
+  }
 }
 
 /*

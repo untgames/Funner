@@ -10,21 +10,23 @@ using namespace render::low_level::opengl::glx;
 ===================================================================================================
 */
 
-typedef GLXContext  (*glXCreateNewContextFn)       (Display *dpy, GLXFBConfig config, int render_type, GLXContext share_list, Bool direct);
-typedef void        (*glXDestroyContextFn)         (Display *dpy, GLXContext ctx);
-typedef Bool        (*glXMakeContextCurrentFn)     (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx);
-typedef GLXPbuffer  (*glXCreatePbufferFn)          (Display *dpy, GLXFBConfig config, const int *attrib_list);
-typedef void        (*glXDestroyPbufferFn)         (Display *dpy, GLXPbuffer pbuf);
-typedef void        (*glXSwapBuffersFn)            (Display *dpy, GLXDrawable drawable);
-typedef GLXContext  (*glXGetCurrentContextFn)      (void);
-typedef Display*    (*glXGetCurrentDisplayFn)      (void);
-typedef GLXDrawable (*glXGetCurrentDrawableFn)     (void);
-typedef GLXDrawable (*glXGetCurrentReadDrawableFn) (void);
-typedef Bool        (*glXIsDirectFn)               (Display *dpy, GLXContext ctx);
-typedef const char* (*glXGetClientStringFn)        (Display *dpy, int name);
-typedef Bool        (*glXQueryVersionFn)           (Display *dpy, int *major, int *minor);
-typedef const char* (*glXQueryServerStringFn)      (Display *dpy, int screen, int name);
-typedef void*       (*glXGetProcAddressFn)         (const char *procName);
+typedef GLXContext   (*glXCreateNewContextFn)       (Display *dpy, GLXFBConfig config, int render_type, GLXContext share_list, Bool direct);
+typedef void         (*glXDestroyContextFn)         (Display *dpy, GLXContext ctx);
+typedef Bool         (*glXMakeContextCurrentFn)     (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx);
+typedef GLXPbuffer   (*glXCreatePbufferFn)          (Display *dpy, GLXFBConfig config, const int *attrib_list);
+typedef void         (*glXDestroyPbufferFn)         (Display *dpy, GLXPbuffer pbuf);
+typedef void         (*glXSwapBuffersFn)            (Display *dpy, GLXDrawable drawable);
+typedef Bool         (*glXIsDirectFn)               (Display *dpy, GLXContext ctx);
+typedef const char*  (*glXGetClientStringFn)        (Display *dpy, int name);
+typedef Bool         (*glXQueryVersionFn)           (Display *dpy, int *major, int *minor);
+typedef const char*  (*glXQueryServerStringFn)      (Display *dpy, int screen, int name);
+typedef int          (*glXGetFBConfigAttribFn)      (Display *dpy, GLXFBConfig config, int attribute, int *value);
+typedef GLXFBConfig* (*glXGetFBConfigsFn)           (Display *dpy, int screen, int *nelements);
+typedef void*        (*glXGetProcAddressFn)         (const char *procName);
+typedef GLXContext   (*glXGetCurrentContextFn)      (void);
+typedef Display*     (*glXGetCurrentDisplayFn)      (void);
+typedef GLXDrawable  (*glXGetCurrentDrawableFn)     (void);
+typedef GLXDrawable  (*glXGetCurrentReadDrawableFn) (void);
 
 /*
 ===================================================================================================
@@ -147,6 +149,8 @@ struct AdapterLibrary::Impl
   glXQueryVersionFn           fglXQueryVersion;
   glXQueryServerStringFn      fglXQueryServerString;
   glXGetProcAddressFn         fglXGetProcAddress;
+  glXGetFBConfigAttribFn      fglXGetFBConfigAttrib;
+  glXGetFBConfigsFn           fglXGetFBConfigs;
 
 ///Конструктор
   Impl (DynamicLibraryPtr& in_dll)
@@ -175,6 +179,8 @@ struct AdapterLibrary::Impl
       GetSymbol ("glXQueryVersion",           fglXQueryVersion);
       GetSymbol ("glXQueryServerString",      fglXQueryServerString);
       GetSymbol ("glXGetProcAddress",         fglXGetProcAddress);
+      GetSymbol ("glXGetFBConfigAttrib",      fglXGetFBConfigAttrib);
+      GetSymbol ("glXGetFBConfigs",           fglXGetFBConfigs);
 
         //вывод общей информации
       
@@ -418,6 +424,24 @@ GLXDrawable AdapterLibrary::GetCurrentDrawable ()
 GLXDrawable AdapterLibrary::GetCurrentReadDrawable ()
 {
   return impl->fglXGetCurrentReadDrawable ();
+}
+
+/*
+    возвращает информацию о конфигурации GLX-буфера кадра
+*/
+
+int GetFBConfigAttrib (Display *dpy, GLXFBConfig config, int attribute, int *value)
+{
+  fglXGetFBConfigAttrib (dpy, config, attribute, value);
+}
+
+/*
+    Возвращает список конфигураций GLX-буфера кадра, соответствующих заданным атрибутам
+*/
+
+GLXFBConfig* GetFBConfigs (Display *dpy, int screen, int *nelements)
+{
+  fglXGetFBConfigs (dpy, screen, nelements);
 }
 
 /*
