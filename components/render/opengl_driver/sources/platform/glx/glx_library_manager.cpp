@@ -63,8 +63,8 @@ class DynamicLibrary
 ///Деструктор
     ~DynamicLibrary ()
     {
-      if (dlclose (library))
-        raise_error ("::dlclose");
+      //if (dlclose (library))
+      //  raise_error ("::dlclose");
     }
     
 ///Получение дескриптора библиотеки
