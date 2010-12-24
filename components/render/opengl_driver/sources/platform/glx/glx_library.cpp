@@ -430,7 +430,7 @@ GLXDrawable AdapterLibrary::GetCurrentReadDrawable ()
     возвращает информацию о конфигурации GLX-буфера кадра
 */
 
-int GetFBConfigAttrib (Display *dpy, GLXFBConfig config, int attribute, int *value)
+int AdapterLibrary::GetFBConfigAttrib (Display *dpy, GLXFBConfig config, int attribute, int *value)
 {
   impl->fglXGetFBConfigAttrib (dpy, config, attribute, value);
 }
@@ -439,7 +439,7 @@ int GetFBConfigAttrib (Display *dpy, GLXFBConfig config, int attribute, int *val
     Возвращает список конфигураций GLX-буфера кадра, соответствующих заданным атрибутам
 */
 
-GLXFBConfig* GetFBConfigs (Display *dpy, int screen, int *nelements)
+GLXFBConfig* AdapterLibrary::GetFBConfigs (Display *dpy, int screen, int *nelements)
 {
   impl->fglXGetFBConfigs (dpy, screen, nelements);
 }
