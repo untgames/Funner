@@ -454,7 +454,7 @@ const void* AdapterLibrary::GetProcAddress (const char* name, size_t search_flag
     return address;
     
   if (search_flags & EntrySearch_Library)
-    impl->dll->GetSymbol (name, address);
+    address = impl->dll->GetSymbol (name);
 
   if (address)
     return address;
