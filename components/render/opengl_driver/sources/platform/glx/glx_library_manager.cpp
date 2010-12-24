@@ -24,6 +24,7 @@ typedef Bool        (*glXIsDirectFn)               (Display *dpy, GLXContext ctx
 typedef const char* (*glXGetClientStringFn)        (Display *dpy, int name);
 typedef Bool        (*glXQueryVersionFn)           (Display *dpy, int *major, int *minor);
 typedef const char* (*glXQueryServerStringFn)      (Display *dpy, int screen, int name);
+typedef void(*)()   (*glXGetProcAddressFn)         (const GLubyte *procName);
 
 /*
 ===================================================================================================
@@ -145,6 +146,7 @@ struct AdapterLibrary::Impl
   glXGetClientStringFn        fglXGetClientString;
   glXQueryVersionFn           fglXQueryVersion;
   glXQueryServerStringFn      fglXQueryServerString;
+  glXGetProcAddressFn         fglXGetProcAddress;
 
 ///Конструктор
   Impl (DynamicLibraryPtr& in_dll)
@@ -172,6 +174,7 @@ struct AdapterLibrary::Impl
       GetSymbol ("glXGetClientString",        fglXGetClientString);
       GetSymbol ("glXQueryVersion",           fglXQueryVersion);
       GetSymbol ("glXQueryServerString",      fglXQueryServerString);
+      GetSymbol ("glXGetProcAddress",         fglXGetProcAddress);
 
         //вывод общей информации
       
@@ -432,5 +435,23 @@ void AdapterLibrary::SwapBuffers (Display *dpy, GLXDrawable drawable)
 
 const void* AdapterLibrary::GetProcAddress (const char* name, size_t search_flags)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::GetProcAddress");
+  static const char* METHOD_NAME = "render::low_level::opengl::glx::AdapterLibrary::GetProcAddress";
+
+  if (!name)
+  {
+    if (search_flags & EntrySearch_NoThrow)
+      return 0;
+
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+  }
+
+  const void* address = 0;
+
+  if (!address && (search_flags & EntrySearch_Context))
+    address = (void*)fglXGetProcAddress (name);
+    
+  if (address)
+    return address;
+
+  throw xtl::format_operation_exception (METHOD_NAME, "OpenGL entry '%s' not found in GL library '%s'", name, GetName ());
 }
