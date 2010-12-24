@@ -3,7 +3,7 @@
 ###################################################################################################
 TARGETS := SYSTEMLIB.SOURCES SYSTEMLIB.TESTS
 
-TARGETS.android := SYSTEMLIB.UTILS.ANDROID_LAUNCHER
+TARGETS.android += SYSTEMLIB.UTILS.ANDROID_LAUNCHER
 
 #Цель №1 - System library sources
 SYSTEMLIB.SOURCES.TYPE                              := static-lib
@@ -35,9 +35,9 @@ SYSTEMLIB.TESTS.SOURCE_DIRS      := tests/wrappers tests/thread
 SYSTEMLIB.TESTS.IMPORTS          := compile.system link.system link.common.zip_file_system
 SYSTEMLIB.TESTS.x11.IMPORTS      := link.media.image.ani_cursor_loader
 
-#Цель №3 - Android launcher
+#Цель №4 - Android launcher
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.TYPE          := android-pak
-SYSTEMLIB.UTILS.ANDROID_LAUNCHER.NAME          := funner_launcher
+SYSTEMLIB.UTILS.ANDROID_LAUNCHER.NAME          := funner.application
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.SOURCE_DIRS   := utils/android_launcher
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.MANIFEST_FILE := utils/android_launcher/AndroidManifest.xml
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.RES_DIR       := utils/android_launcher/res

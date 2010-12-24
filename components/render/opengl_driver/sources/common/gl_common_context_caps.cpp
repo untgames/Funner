@@ -312,12 +312,13 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
     else                      texture_units_count = 1;
   }
+#ifndef OPENGL_ES_SUPPORT  
   else
   {
     if (has_arb_vertex_shader)
     {
       int vertex_shader_texture_units_count, pixel_shader_texture_units_count;
-
+      
       glGetIntegerv (GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&vertex_shader_texture_units_count);
       glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&pixel_shader_texture_units_count);
 
@@ -326,6 +327,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     else
       texture_units_count = 1;
   }
+#endif
   
   size_t settings_max_texture_size    = settings.GetInteger (ContextSettingsInteger_MaxTextureSize),
          settings_max_anisotropy      = settings.GetInteger (ContextSettingsInteger_MaxAnisotropy),

@@ -730,9 +730,9 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
   private:
     SOCKET        socket;                   //дескриптор сокета
     SocketAddress local_address;            //локальный адресс сокета
-    bool          local_address_getted;     //был ли получен локальный адресс
-    SocketAddress remote_address;           //удаленный адресс сокета
-    bool          remote_address_getted;    //был ли получен удаленный адресс
+    bool          local_address_getted;     //был ли получен локальный адрес
+    SocketAddress remote_address;           //удаленный адрес сокета
+    bool          remote_address_getted;    //был ли получен удаленный адрес
     bool          receive_closed;           //закрыт ли прием
     bool          send_closed;              //закрыта ли передача
     bool          connected;                //соединен ли сокет

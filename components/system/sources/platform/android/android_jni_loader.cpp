@@ -6,8 +6,9 @@ namespace
 {
 
 /// Константы
-const char* SKELETON_ACTIVITY_CLASS_NAME                    = "com/untgames/android/funner_launcher/SkeletonActivity";
-const char* SKELETON_ACTIVITY_START_APPLICATION_METHOD_NAME = "startApplication";
+const char* ENGINE_ACTIVITY_CLASS_NAME                    = "com/untgames/funner/application/EngineActivity";
+const char* ENGINE_WINDOW_CLASS_NAME                      = "com/untgames/funner/application/EngineView";
+const char* ENGINE_ACTIVITY_START_APPLICATION_METHOD_NAME = "startApplication";
 
 /// Виртуальная машина
 JavaVM* java_vm = 0;
@@ -44,13 +45,13 @@ jint JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name,
 {
   if (!env)
   {  
-    printf ("Bad JNIEnv passed to SkeletonActivity::startApplication\n");
+    printf ("Bad JNIEnv passed to EngineActivity::startApplication\n");
     return 0;
   }
   
   if (!jprogram_name || !jprogram_args)
   {
-    printf ("Bad arguments passed to SkeletonActivity::startApplication\n");
+    printf ("Bad arguments passed to EngineActivity::startApplication\n");
     return 0; 
   }
   
@@ -61,7 +62,16 @@ jint JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name,
   
   try
   {   
-    start_application (java_vm, program_name.get (), program_args.get ());
+    ApplicationContext context;
+    
+    memset (&context, 0, sizeof (context));
+    
+    jclass window_class = env->FindClass (ENGINE_WINDOW_CLASS_NAME);
+    
+    if (!window_class)
+      throw xtl::format_operation_exception ("", "Window class '%s' not found", ENGINE_WINDOW_CLASS_NAME);    
+    
+    start_application (java_vm, thiz, program_name.get (), program_args.get ());
     
     return 1;
   }
@@ -108,11 +118,11 @@ extern JNIEXPORT jint JNICALL JNI_OnLoad (JavaVM* vm, void* reserved)
     return -1;
   }
   
-  jclass skeletonActivityClass = env->FindClass (SKELETON_ACTIVITY_CLASS_NAME);  
+  jclass skeletonActivityClass = env->FindClass (ENGINE_ACTIVITY_CLASS_NAME); 
   
   if (!skeletonActivityClass)
   {
-    printf ("Can't find SkeletonActivity class\n");
+    printf ("Can't find EngineActivity class\n");
     fflush (stdout);
     
     return -1;
@@ -122,7 +132,7 @@ extern JNIEXPORT jint JNICALL JNI_OnLoad (JavaVM* vm, void* reserved)
   
   memset (&method, 0, sizeof (JNINativeMethod));
   
-  method.name      = SKELETON_ACTIVITY_START_APPLICATION_METHOD_NAME;
+  method.name      = ENGINE_ACTIVITY_START_APPLICATION_METHOD_NAME;
   method.signature = "(Ljava/lang/String;Ljava/lang/String;)I";
   method.fnPtr     = (void*)&startApplication;
 

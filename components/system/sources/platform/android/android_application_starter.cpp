@@ -1,5 +1,7 @@
 #include "shared.h"
 
+using namespace syslib::android;
+
 extern "C"
 {
 
@@ -10,22 +12,14 @@ int main (...);
 namespace
 {
 
-struct A
-{
-  A () { printf ("A::A\n"); fflush (stdout); }
-  ~A () { printf ("A::~A\n"); fflush (stdout); }
-};
-
-A a;
-
 /*
     Константы
 */
 
 const char* THREAD_NAME = "system.android.launcher"; //имя нити приложения
 
-/// Объект виртуальной машины
-JavaVM* java_vm = 0;
+/// Контекст запуска приложения
+ApplicationContext application_context;
 
 /// Нить приложения
 class ApplicationThread
@@ -58,7 +52,26 @@ class ApplicationThread
     {
       try
       {
-        int exit_code = main (args.Size (), args.Data ());
+        JNIEnv* env = 0;
+        
+        jint status = get_context ().vm->AttachCurrentThread (&env, 0);
+        
+        if (status)
+          throw xtl::format_operation_exception ("", "JavaVM::AttachCurrentThread failed (status=%d)", status);
+          
+        int exit_code = 0;
+        
+        try
+        {
+          exit_code = main (args.Size (), args.Data ());
+          
+//          get_vm ()->DetachCurrentThread ();
+        }
+        catch (...)
+        {
+//          get_vm ()->DetachCurrentThread ();          
+          throw;
+        }
         
         Exit (exit_code);
       }
@@ -73,14 +86,14 @@ class ApplicationThread
         fflush (stdout);        
       }
       
+      Exit (0);
+      
       return 0;
     }
     
 /// Посылка сообщения JavaVM о необходимости остановки приложения
     void Exit (int code)
     {
-//      if (!java_vm)
-//        throw xtl::format_operation_exception ("syslib::android::ApplicationThread::Exit", "Null JavaVM");        
       exit (code);
     }
   
@@ -98,7 +111,7 @@ namespace android
 {
 
 /// точка входа в приложение
-void start_application (JavaVM* vm, const char* program_name, const char* args)
+void start_application (JavaVM* vm, jobject activity, const char* program_name, const char* args)
 {
   static const char* METHOD_NAME = "syslib::android::start_application";
   
@@ -107,25 +120,48 @@ void start_application (JavaVM* vm, const char* program_name, const char* args)
   if (!vm)
     throw xtl::make_null_argument_exception (METHOD_NAME, "vm");
     
+  if (!activity)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "activity");    
+    
   if (!program_name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "program_name");
     
   if (!args)
     throw xtl::make_null_argument_exception (METHOD_NAME, "args");
     
-    //сохранение объекта виртуальной машины    
+    //сохранение контекста запуска приложения
 
-  java_vm = vm;
+  application_context.vm       = vm;
+  application_context.activity = activity;
   
     //запуск нити приложения
     
   ApplicationThread::Start (program_name, args);
 }
 
-/// получение объекта виртуальной машины
+/// получение контекста запуска приложения
+const ApplicationContext& get_context ()
+{
+  return application_context;
+}
+
+/// получение виртуальной машины
 JavaVM* get_vm ()
 {
-  return java_vm;
+  return application_context.vm;
+}
+
+/// получение окружения текущей нити
+JNIEnv& get_env ()
+{
+  JNIEnv* env = 0;
+
+  jint status = application_context.vm->GetEnv ((void**)&env, JNI_VERSION_1_4);
+  
+  if (status || !env)
+    throw xtl::format_operation_exception ("syslib::android::get_env", "JavaVM::GetEnv failed (status=%d)", status);
+    
+  return *env;
 }
 
 }

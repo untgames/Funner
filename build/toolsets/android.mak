@@ -41,6 +41,7 @@ ANDROID_TOOLS_DIR      := $(SDK_ROOT)/tools
 ADB                    := $(ANDROID_TOOLS_DIR)/adb
 APK_BUILDER            := $(ANDROID_SDK)/tools/apkbuilder.bat
 DX_TOOL                := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/tools/dx.bat
+JAVA_JAR               := "$(JAVA_SDK)/bin/jar"
 JAVA_CC                := "$(JAVA_SDK)/bin/javac"
 JAVA_AAPT              := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/tools/aapt
 JAVA_JAR_SIGNER        := "$(JAVA_SDK)/bin/jarsigner"
@@ -66,13 +67,12 @@ COMMON_LINK_FLAGS      += -Wl,--no-undefined
 ANDROID_EXE_LINK_FLAGS += -z $(PLATFORM_DIR)/arch-arm/usr/lib/crtbegin_dynamic.o
 ANDROID_SO_LINK_FLAGS   = -Wl,-soname,$(notdir $1) -shared -Wl,--no-undefined -Wl,-z,noexecstack
 
-
 CYGWIN                 := nodosfilewarning
-VALID_TARGET_TYPES     += android-pak
+VALID_TARGET_TYPES     += android-pak android-jar
 ANDROID_KEY_STORE      := $(BUILD_DIR)platforms/android/my-release-key.keystore
 ANDROID_KEY_PASS       := android
 ANDROID_JAR            := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/android.jar
-DEFAULT_PACKAGE_PREFIX := com.untgames.android.
+DEFAULT_PACKAGE_PREFIX := com.untgames.
 GDB_SERVER_FLAG_FILE   := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/gdb-installed
 GDB_SERVER_FILE        := $(ARM_EABI_DIR)/../gdbserver
 
@@ -132,9 +132,9 @@ define tools.run.android_package
  export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
  export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
  $(ADB) shell logcat -c && \
- $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=//data/busybox:\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)funner_launcher/.SkeletonActivity -e 'program' '$$(echo $$SUBST_COMMAND)' -e 'args' '$(subst $(firstword $1),,$1)'" | sed "s/.$$//" && \
+ $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=//data/busybox:\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)funner.application/.EngineActivity -e 'program' '$$(echo $$SUBST_COMMAND)' -e 'args' '$(subst $(firstword $1),,$1)'" | sed "s/.$$//" && \
  sleep 1 && \
- $(ADB) shell "\\/data/busybox/sh -c 'while ps | \\/data/busybox/grep $(DEFAULT_PACKAGE_PREFIX)funner_launcher; do sleep 1; done'" > nul && \
+ $(ADB) shell "\\/data/busybox/sh -c 'while ps | \\/data/busybox/grep $(DEFAULT_PACKAGE_PREFIX)funner.application; do sleep 1; done'" > nul && \
  $(ADB) logcat -s -d -v raw System.out:I -v raw stdout:I
 endef
 # $(ADB) logcat 
@@ -163,13 +163,16 @@ define process_target.android-pak
   $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_android_java_source_dir,$1,$$(dir))))
 
   $1.PACKAGE_NAME      := $$(if $$($1.PACKAGE_NAME),$$($1.PACKAGE_NAME),$(DEFAULT_PACKAGE_PREFIX)$$($1.NAME))
-  $1.TARGET            := $(DIST_BIN_DIR)/$$($1.NAME).apk
+  $1.TARGET            := $(DIST_LIB_DIR)/$$($1.NAME).apk
   $1.TMP_DIR           := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
   $1.UNSIGNED_TARGET   := $$($1.TMP_DIR)/$$($1.NAME).unsigned.apk
   $1.SIGNED_TARGET     := $$($1.TMP_DIR)/$$($1.NAME).signed.apk
   $1.PACKAGED_RES_FILE := $$($1.TMP_DIR)/resource.pak
   $1.DEX_FILE          := $$($1.TMP_DIR)/code.dex
-  $1.JARS              := $$(call specialize_paths,$$($1.JARS))
+  $1.JARS              := $$($1.JARS:%=%.jar)
+  $1.JAR_DIRS          := $$(call specialize_paths,$$($1.JAR_DIRS)) $(DIST_LIB_DIR)
+  $1.JARS              := $$(foreach jar,$$($1.JARS),$$(if $$(wildcard $$($1.JAR_DIRS:%=%/$$(jar))),$$(wildcard $$($1.JAR_DIRS:%=%/$$(jar))),$$(jar)))
+  $1.JARS              := $$($1.JARS)
   $1.CLASSES_DIR       := $$($1.TMP_DIR)/classes
   $1.CLASSES_FLAG      := $$($1.TMP_DIR)/compilation-flag
   $1.COMPILER_FLAGS    := $(COMMON_JAVA_FLAGS) $$($1.COMPILER_FLAGS)
@@ -201,9 +204,9 @@ endif
 		
   .PHONY: create-dirs
   
-  $$($1.CLASSES_FLAG): $$($1.SOURCE_FILES) $$($1.PACKAGED_RES_FILE)
+  $$($1.CLASSES_FLAG): $$($1.SOURCE_FILES) $$($1.JARS) $$($1.PACKAGED_RES_FILE)
 		@echo Compile sources for $$(notdir $$($1.TARGET))...
-		@export R_FILES=$$$$(/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath /$(subst :,,$(call convert_path,$(ANDROID_JAR)))
+		@export R_FILES=$$$$(/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR);$$(subst ; ,;,$$($1.JARS:%=%;))'
 		@touch $$@
   
   $$($1.DEX_FILE): $$($1.CLASSES_FLAG)
@@ -212,7 +215,7 @@ endif
 
   $$($1.UNSIGNED_TARGET): $$($1.DEX_FILE) $$($1.PACKAGED_RES_FILE) $$($1.TARGET_DLLS)
 		@echo Create unsigned APK $$(notdir $$@)...
-		@export TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && if ! cmd //C '$(APK_BUILDER) %TMP_DIR_PREFIX%\$$(notdir $$@) -u -z %TMP_DIR_PREFIX%\$$(notdir $$($1.PACKAGED_RES_FILE)) -f %TMP_DIR_PREFIX%\$$(notdir $$($1.DEX_FILE)) -rf %TMP_DIR_PREFIX%\\bin'; then $(RM) $$@; exit 1; fi #-rj  ${libraries.dir} 
+		@export LIB_DIR_PREFIX=$$$$($$(call get_system_dir,$$(DIST_LIB_DIR))) TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && if ! cmd //C '$(APK_BUILDER) %TMP_DIR_PREFIX%\$$(notdir $$@) -u -z %TMP_DIR_PREFIX%\$$(notdir $$($1.PACKAGED_RES_FILE)) -f %TMP_DIR_PREFIX%\$$(notdir $$($1.DEX_FILE)) -rf %TMP_DIR_PREFIX%\\bin $$(foreach jar,$$($1.JARS),-rj %LIB_DIR_PREFIX%\\$$(notdir $$(jar)))'; then $(RM) $$@; exit 1; fi
 
   $$($1.SIGNED_TARGET): $$($1.UNSIGNED_TARGET)
 		@echo Sign $$(notdir $$@)...
@@ -247,12 +250,48 @@ endif
   
   RUN.$1: INSTALL.$1
 		@$(ADB) shell logcat -c		
-		@$(ADB) shell am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME)/.SkeletonActivity -e "program" "value"
+		@$(ADB) shell am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME)/.EngineActivity -e "program" "value"
 		@sleep 1
 		@$(ADB) shell "\\/data/busybox/sh -c 'while ps | \\/data/busybox/grep $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME); do sleep 1; done'" > nul
 		@$(ADB) logcat -s -d -v raw System.out:I -v raw stdout:I
 #		@$(ADB) shell setprop log.redirect-stdio true
 
+endef
+
+#Обработка цели android-jar (имя цели)
+define process_target.android-jar
+  $1.SOURCE_DIRS := $$($1.SOURCE_DIRS:%=$(COMPONENT_DIR)%)
+
+  $$(foreach dir,$$($1.SOURCE_DIRS),$$(eval $$(call process_android_java_source_dir,$1,$$(dir))))
+
+  $1.PACKAGE_NAME      := $$(if $$($1.PACKAGE_NAME),$$($1.PACKAGE_NAME),$(DEFAULT_PACKAGE_PREFIX)$$($1.NAME))
+  $1.TARGET            := $(DIST_LIB_DIR)/$$($1.NAME).jar
+  $1.TMP_DIR           := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/$1
+  $1.JARS              := $$(call specialize_paths,$$($1.JARS))
+  $1.CLASSES_DIR       := $$($1.TMP_DIR)/classes
+  $1.CLASSES_FLAG      := $$($1.TMP_DIR)/compilation-flag
+  $1.COMPILER_FLAGS    := $(COMMON_JAVA_FLAGS) $$($1.COMPILER_FLAGS)
+  TMP_DIRS             := $$(TMP_DIRS) $$($1.TMP_DIR) $$($1.CLASSES_DIR)
+  
+#Build package
+  build: BUILD.$1
+  
+  .PHONY: BUILD.$1
+  
+  BUILD.$1: $$($1.TARGET)
+
+  $$($1.CLASSES_FLAG): $$($1.SOURCE_FILES)
+		@echo Compile sources for $$(notdir $$($1.TARGET))...
+		@$(RM) -r $$($1.CLASSES_DIR)
+		@mkdir -p $$($1.CLASSES_DIR)
+		@$(JAVA_CC) $$($1.SOURCE_FILES) $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath /$(subst :,,$(call convert_path,$(ANDROID_JAR)))
+		@touch $$@
+
+  $$($1.TARGET): $$($1.CLASSES_FLAG)
+		@echo Jar $$(notdir $$@)...
+		@$(RM) $$@
+		@$(JAVA_JAR) cf $$@ -C $$($1.CLASSES_DIR) .
+		
 endef
 
 install: $(GDB_SERVER_FLAG_FILE)

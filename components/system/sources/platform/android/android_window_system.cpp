@@ -1,13 +1,105 @@
 #include "shared.h"
 
 using namespace syslib;
+using namespace syslib::android;
+
+/*
+    Окно
+*/
+
+struct Platform::window_handle
+{
+  global_ref<jobject>  android_window;   //android окно
+  WindowMessageHandler message_handler;  //обработчик сообщений
+  void*                user_data;        //пользовательские данные окна
+  
+  window_handle ()
+    : message_handler (0)
+    , user_data (0)
+  {
+  }
+};
+
+namespace
+{
+
+///обработка java исключений
+void check_errors ()
+{
+}
+
+///Поддержка класса окна
+class JniWindowClass
+{
+  public:
+///Конструктор
+    JniWindowClass ()
+    {
+      try
+      {          
+          //получение класса Activity          
+
+        activity_class = get_env ().GetObjectClass (get_context ().activity.get ());
+        
+        if (!activity_class)
+          throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
+
+         //получение методов
+
+//        GetMethod ("CreateView", "(Ljava/lang/String;)Landroid/view/View;", create_window_method);
+        GetMethod ("CreateView", "()Landroid/view/View;", create_window_method);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::android::JniWindowMetaClass::JniWindowMetaClass");
+        throw;
+      }
+    }
+    
+///Создание окна
+    local_ref<jobject> CreateWindow ()
+    {
+      const ApplicationContext& context = get_context ();     
+      
+      local_ref<jobject> window = get_env ().CallObjectMethod (get_context ().activity.get (), create_window_method);   
+      
+      if (!window)
+        throw xtl::format_operation_exception ("", "EngineActivity::CreateView failed");
+      
+      //check exceptions!!!
+      
+      return window;
+    }
+    
+  private:
+///Запрос метода
+    void GetMethod (const char* name, const char* signature, jmethodID& method)
+    {
+      try
+      {
+        if (!activity_class)
+          throw xtl::format_operation_exception ("", "Null activity class");
+          
+        method = find_method (&get_env (), activity_class.get (), name, signature);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("syslib::android::JniWindowClass::GetMethod");
+        throw;
+      }
+    }
+    
+  private:
+    global_ref<jclass> activity_class;
+    jmethodID          create_window_method;
+};
+
+typedef common::Singleton<JniWindowClass> JniWindowClassSingleton;
 
 /*
     Генерация исключения: работа с окнами невозможна для платформы по умолчанию
 */
 
-namespace
-{
 
 void raise (const char* method_name)
 {
@@ -20,11 +112,23 @@ void raise (const char* method_name)
     Создание/закрытие/уничтожение окна
 */
 
-Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler, const void*, const char* init_string, void*)
+Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler handler, const void* parent_handle, const char*, void* user_data)
 {
-  raise ("syslib::DefaultPlatform::CreateWindow");
-
-  return 0;
+  try
+  {
+    stl::auto_ptr<window_handle> window (new window_handle);
+    
+    window->android_window  = JniWindowClassSingleton::Instance ()->CreateWindow ();
+    window->message_handler = handler;
+    window->user_data       = user_data;
+    
+    return window.release ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidPlatform::CreateWindow");
+    throw;
+  }
 }
 
 void Platform::CloseWindow (window_t)

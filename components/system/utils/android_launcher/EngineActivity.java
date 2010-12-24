@@ -1,12 +1,14 @@
-package com.untgames.android.funner_launcher;
+package com.untgames.funner.application;
 
 import android.app.Activity;
+import android.view.View;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.*;
 import java.io.*;
 
 /// Данный класс используется для запуска внешних shared-library
-public class SkeletonActivity extends Activity
+public class EngineActivity extends Activity
 {
 ///Загрузчик
   @Override
@@ -58,4 +60,14 @@ public class SkeletonActivity extends Activity
   
 /// Точка входа в native код
   public native int startApplication (String programName, String programArgs);
+  
+/// Создание окна
+//  public View CreateView (String initString)
+  public View CreateView ()
+  {
+    Looper.prepare ();
+    System.out.println ("Create view called");
+//    return null;
+    return new EngineView (this);
+  }
 }
