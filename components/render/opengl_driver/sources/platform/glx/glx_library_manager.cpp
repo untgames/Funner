@@ -4,9 +4,6 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::glx;
 
-namespace
-{
-
 /*
 ===================================================================================================
     Точки входа GLX драйвера
@@ -33,6 +30,18 @@ typedef const char* (*glXQueryServerStringFn)      (Display *dpy, int screen, in
     Динамическая библиотека
 ===================================================================================================
 */
+
+namespace render
+{
+
+namespace low_level
+{
+
+namespace opengl
+{
+
+namespace glx
+{
 
 class DynamicLibrary
 {
@@ -98,6 +107,12 @@ class DynamicLibrary
 };
 
 typedef stl::auto_ptr<DynamicLibrary> DynamicLibraryPtr;
+
+}
+
+}
+
+}
 
 }
 
