@@ -432,7 +432,7 @@ GLXDrawable AdapterLibrary::GetCurrentReadDrawable ()
 
 int AdapterLibrary::GetFBConfigAttrib (Display *dpy, GLXFBConfig config, int attribute, int *value)
 {
-  impl->fglXGetFBConfigAttrib (dpy, config, attribute, value);
+  return impl->fglXGetFBConfigAttrib (dpy, config, attribute, value);
 }
 
 /*
@@ -441,7 +441,7 @@ int AdapterLibrary::GetFBConfigAttrib (Display *dpy, GLXFBConfig config, int att
 
 GLXFBConfig* AdapterLibrary::GetFBConfigs (Display *dpy, int screen, int *nelements)
 {
-  impl->fglXGetFBConfigs (dpy, screen, nelements);
+  return impl->fglXGetFBConfigs (dpy, screen, nelements);
 }
 
 /*
