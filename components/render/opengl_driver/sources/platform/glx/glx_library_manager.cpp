@@ -430,7 +430,7 @@ void AdapterLibrary::SwapBuffers (Display *dpy, GLXDrawable drawable)
     Получение адреса точки входа
 */
 
-const void* GetProcAddress (const char* name, size_t search_flags)
+const void* AdapterLibrary::GetProcAddress (const char* name, size_t search_flags)
 {
   throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::GlxAdapterLibrary::GetProcAddress");
 }
