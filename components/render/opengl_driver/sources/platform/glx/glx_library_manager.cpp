@@ -24,7 +24,7 @@ typedef Bool        (*glXIsDirectFn)               (Display *dpy, GLXContext ctx
 typedef const char* (*glXGetClientStringFn)        (Display *dpy, int name);
 typedef Bool        (*glXQueryVersionFn)           (Display *dpy, int *major, int *minor);
 typedef const char* (*glXQueryServerStringFn)      (Display *dpy, int screen, int name);
-typedef void(*)()   (*glXGetProcAddressFn)         (const char *procName);
+typedef void*       (*glXGetProcAddressFn)         (const char *procName);
 
 /*
 ===================================================================================================
@@ -448,7 +448,7 @@ const void* AdapterLibrary::GetProcAddress (const char* name, size_t search_flag
   const void* address = 0;
 
   if (!address && (search_flags & EntrySearch_Context))
-    address = (void*)fglXGetProcAddress (name);
+    address = (void*)impl->fglXGetProcAddress (name);
     
   if (address)
     return address;
