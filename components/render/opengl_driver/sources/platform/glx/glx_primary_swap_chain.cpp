@@ -24,7 +24,7 @@ struct PrimarySwapChain::Impl
 ///Конструктор
   Impl (Adapter* in_adapter, const SwapChainDesc& in_desc)
     : adapter (in_adapter)
-    , library (in_adapter->GetLibrary ())
+    , library (&in_adapter->GetLibrary ())
     , display ((Display*)syslib::x11::DisplayManager::DisplayHandle ())
     , window ((Window) in_desc.window_handle)
     , desc (in_desc)
