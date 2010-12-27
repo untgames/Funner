@@ -128,7 +128,7 @@ int get_fb_config_attrib (AdapterLibrary& library, Display *display, GLXFBConfig
 {
   int value = 0;
   
-  Status result = library->GetFBConfigAttrib (display, config, attribute, &value);
+  Status result = library.GetFBConfigAttrib (display, config, attribute, &value);
   
   if (result < Success)
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::Adapter::EnumPixelFormats",
