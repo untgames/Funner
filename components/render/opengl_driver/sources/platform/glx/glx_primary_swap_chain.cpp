@@ -120,7 +120,7 @@ void PrimarySwapChain::Present ()
 {
   try
   {
-    library->SwapBuffers (impl->display, impl->window);
+    impl->library->SwapBuffers (impl->display, impl->window);
   }
   catch (xtl::exception& exception)
   {
