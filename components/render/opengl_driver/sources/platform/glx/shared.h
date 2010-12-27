@@ -454,7 +454,6 @@ class DisplayLock
     Display* display;
 };
 
-
 }
 
 }
