@@ -124,7 +124,7 @@ AdapterLibrary& Adapter::GetLibrary ()
     ѕеречисление доступных форматов пикселей
 */
 
-int get_fb_config_attrib (Display *display, GLXFBConfig config, int attribute)
+int get_fb_config_attrib (Adapter::Impl& impl, Display *display, GLXFBConfig config, int attribute)
 {
   int value = 0;
   
@@ -173,33 +173,33 @@ void EnumPixelFormats (Display *display, int screen, PixelFormatArray& pixel_for
 
     desc.adapter                 = this;
     desc.glx_extension_entries   = 0;
-    desc.pixel_format_index      = get_fb_config_attrib (display, configs[i], GLX_FBCONFIG_ID);
-    desc.color_bits              = get_fb_config_attrib (display, configs[i], GLX_BUFFER_SIZE);
-    desc.alpha_bits              = get_fb_config_attrib (display, configs[i], GLX_ALPHA_SIZE);
-    desc.depth_bits              = get_fb_config_attrib (display, configs[i], GLX_DEPTH_SIZE);
-    desc.stencil_bits            = get_fb_config_attrib (display, configs[i], GLX_STENCIL_SIZE);
+    desc.pixel_format_index      = get_fb_config_attrib (impl, display, configs[i], GLX_FBCONFIG_ID);
+    desc.color_bits              = get_fb_config_attrib (impl, display, configs[i], GLX_BUFFER_SIZE);
+    desc.alpha_bits              = get_fb_config_attrib (impl, display, configs[i], GLX_ALPHA_SIZE);
+    desc.depth_bits              = get_fb_config_attrib (impl, display, configs[i], GLX_DEPTH_SIZE);
+    desc.stencil_bits            = get_fb_config_attrib (impl, display, configs[i], GLX_STENCIL_SIZE);
     
     if (ext_ARB_multisample_supported)
-      desc.samples_count = get_fb_config_attrib (display, configs[i], GLX_SAMPLE_BUFFERS_ARB);
+      desc.samples_count = get_fb_config_attrib (impl, display, configs[i], GLX_SAMPLE_BUFFERS_ARB);
     else
       desc.samples_count = 0;
       
-    if (get_fb_config_attrib (display, configs[i], GLX_DOUBLEBUFFER))
+    if (get_fb_config_attrib (impl, display, configs[i], GLX_DOUBLEBUFFER))
       desc.buffers_count = 2;
     else
       desc.buffers_count = 1;
 
-    desc.aux_buffers             = get_fb_config_attrib (display, configs[i], GLX_AUX_BUFFERS);
-    desc.max_pbuffer_width       = get_fb_config_attrib (display, configs[i], GLX_MAX_PBUFFER_WIDTH);
-    desc.max_pbuffer_height      = get_fb_config_attrib (display, configs[i], GLX_MAX_PBUFFER_HEIGHT);
-    desc.max_pbuffer_pixels      = get_fb_config_attrib (display, configs[i], GLX_MAX_PBUFFER_PIXELS);
-    desc.support_stereo          = get_fb_config_attrib (display, configs[i], GLX_STEREO);
-    desc.support_draw_to_window  = get_fb_config_attrib (display, configs[i], GLX_DRAWABLE_TYPE) && GLX_WINDOW_BIT;
-    desc.support_draw_to_pbuffer = get_fb_config_attrib (display, configs[i], GLX_DRAWABLE_TYPE) && GLX_PBUFFER_BIT;
+    desc.aux_buffers             = get_fb_config_attrib (impl, display, configs[i], GLX_AUX_BUFFERS);
+    desc.max_pbuffer_width       = get_fb_config_attrib (impl, display, configs[i], GLX_MAX_PBUFFER_WIDTH);
+    desc.max_pbuffer_height      = get_fb_config_attrib (impl, display, configs[i], GLX_MAX_PBUFFER_HEIGHT);
+    desc.max_pbuffer_pixels      = get_fb_config_attrib (impl, display, configs[i], GLX_MAX_PBUFFER_PIXELS);
+    desc.support_stereo          = get_fb_config_attrib (impl, display, configs[i], GLX_STEREO);
+    desc.support_draw_to_window  = get_fb_config_attrib (impl, display, configs[i], GLX_DRAWABLE_TYPE) && GLX_WINDOW_BIT;
+    desc.support_draw_to_pbuffer = get_fb_config_attrib (impl, display, configs[i], GLX_DRAWABLE_TYPE) && GLX_PBUFFER_BIT;
 
     if (ext_swap_method_supported)
     {
-      int swap_method = get_fb_config_attrib (display, configs[i], GLX_SWAP_METHOD_OML);
+      int swap_method = get_fb_config_attrib (impl, display, configs[i], GLX_SWAP_METHOD_OML);
       
       switch (swap_method)
       {
