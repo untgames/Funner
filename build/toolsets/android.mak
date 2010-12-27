@@ -20,61 +20,62 @@ endif
 ###################################################################################################
 # онстанты
 ###################################################################################################
-PROFILES               += android no_dll unistd
-REMOTE_DEBUG_DIR       ?= //sdcard/funner
-EXE_SUFFIX             :=
-DLL_SUFFIX             := .so
-DLL_PREFIX             := lib
-NDK_HOST               := windows
-ANDROID_PLATFORM       := android-9
-NDK_ROOT               := /$(subst :,,$(call convert_path,$(ANDROID_NDK)))
-SDK_ROOT               := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
-JAVA_SDK               := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
-PLATFORM_DIR           := $(NDK_ROOT)/platforms/$(ANDROID_PLATFORM)
-ARM_EABI_DIR           := $(NDK_ROOT)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(NDK_HOST)
-CYGWIN_BIN             := /$(subst :,,$(call convert_path,$(CYGHOME)))/bin
-GCC_TOOLS_DIR          := $(ARM_EABI_DIR)/bin
-COMPILER_GCC           := $(GCC_TOOLS_DIR)/arm-linux-androideabi-g++.exe
-LINKER_GCC             := $(GCC_TOOLS_DIR)/arm-linux-androideabi-g++.exe
-LIB_GCC                := $(GCC_TOOLS_DIR)/arm-linux-androideabi-ar
-ANDROID_TOOLS_DIR      := $(SDK_ROOT)/tools
-ADB                    := $(ANDROID_TOOLS_DIR)/adb
-APK_BUILDER            := $(ANDROID_SDK)/tools/apkbuilder.bat
-DX_TOOL                := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/tools/dx.bat
-JAVA_JAR               := "$(JAVA_SDK)/bin/jar"
-JAVA_CC                := "$(JAVA_SDK)/bin/javac"
-JAVA_AAPT              := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/tools/aapt
-JAVA_JAR_SIGNER        := "$(JAVA_SDK)/bin/jarsigner"
-ZIP_ALIGNER            := $(ANDROID_SDK)/tools/zipalign
-ADDITIONAL_PATHS       += $(CYGWIN_BIN)
-BUILD_PATHS            := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-linux-androideabi/4.4.3
-COMMON_JAVA_FLAGS      += -g
-COMMON_CPPFLAGS        += -fexceptions -frtti
-COMMON_CFLAGS          += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -g -O0
-COMMON_CFLAGS          += -march=armv5te -mtune=xscale -msoft-float -mthumb
-COMMON_CFLAGS          += -Wno-psabi -Wa,--noexecstack
-COMMON_CFLAGS          += -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__ -DANDROID -DARM -UDEBUG
-COMMON_CFLAGS          += --sysroot=$(PLATFORM_DIR)/arch-arm
-COMMON_CFLAGS          += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
-COMMON_CFLAGS          += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include
-COMMON_LINK_FLAGS      += --sysroot=$(PLATFORM_DIR)/arch-arm
-COMMON_LINK_FLAGS      += -Wl,-L,$(ARM_EABI_DIR)/lib/gcc/arm-linux-androideabi/4.4.3
-COMMON_LINK_FLAGS      += -Wl,-L,$(ARM_EABI_DIR)/lib/thumb
-COMMON_LINK_FLAGS      += -Wl,-L,$(PLATFORM_DIR)/arch-arm/usr/lib
-COMMON_LINK_FLAGS      += -Wl,-rpath-link=$(PLATFORM_DIR)/arch-arm/usr/lib
-COMMON_LINK_FLAGS      += -lc -lm -lstdc++ -lgcc -lsupc++
-COMMON_LINK_FLAGS      += -Wl,--no-undefined
-ANDROID_EXE_LINK_FLAGS += -z $(PLATFORM_DIR)/arch-arm/usr/lib/crtbegin_dynamic.o
-ANDROID_SO_LINK_FLAGS   = -Wl,-soname,$(notdir $1) -shared -Wl,--no-undefined -Wl,-z,noexecstack
+PROFILES                   += android no_dll unistd
+REMOTE_DEBUG_DIR           ?= //sdcard/funner
+EXE_SUFFIX                 :=
+DLL_SUFFIX                 := .so
+DLL_PREFIX                 := lib
+NDK_HOST                   := windows
+ANDROID_PLATFORM           := android-9
+NDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_NDK)))
+SDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
+JAVA_SDK                   := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
+PLATFORM_DIR               := $(NDK_ROOT)/platforms/$(ANDROID_PLATFORM)
+ANDROID_PLATFORM_TOOLS_DIR := $(ANDROID_SDK)/platform-tools
+ARM_EABI_DIR               := $(NDK_ROOT)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(NDK_HOST)
+CYGWIN_BIN                 := /$(subst :,,$(call convert_path,$(CYGHOME)))/bin
+GCC_TOOLS_DIR              := $(ARM_EABI_DIR)/bin
+COMPILER_GCC               := $(GCC_TOOLS_DIR)/arm-linux-androideabi-gcc.exe
+LINKER_GCC                 := $(GCC_TOOLS_DIR)/arm-linux-androideabi-g++.exe
+LIB_GCC                    := $(GCC_TOOLS_DIR)/arm-linux-androideabi-ar
+ANDROID_TOOLS_DIR          := $(SDK_ROOT)/tools
+ADB                        := $(ANDROID_PLATFORM_TOOLS_DIR)/adb
+APK_BUILDER                := $(ANDROID_SDK)/tools/apkbuilder.bat
+DX_TOOL                    := $(ANDROID_PLATFORM_TOOLS_DIR)/dx.bat
+JAVA_JAR                   := "$(JAVA_SDK)/bin/jar"
+JAVA_CC                    := "$(JAVA_SDK)/bin/javac"
+JAVA_AAPT                  := $(ANDROID_PLATFORM_TOOLS_DIR)/aapt
+JAVA_JAR_SIGNER            := "$(JAVA_SDK)/bin/jarsigner"
+ZIP_ALIGNER                := $(ANDROID_SDK)/tools/zipalign
+ADDITIONAL_PATHS           += $(CYGWIN_BIN)
+BUILD_PATHS                := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-linux-androideabi/4.4.3
+COMMON_JAVA_FLAGS          += -g
+COMMON_CPPFLAGS            += -fexceptions -frtti
+COMMON_CFLAGS              += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -g -O0
+COMMON_CFLAGS              += -march=armv5te -mtune=xscale -msoft-float -mthumb
+COMMON_CFLAGS              += -Wno-psabi -Wa,--noexecstack
+COMMON_CFLAGS              += -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__ -DANDROID -DARM -UDEBUG
+COMMON_CFLAGS              += --sysroot=$(PLATFORM_DIR)/arch-arm
+COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
+COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/libs/armeabi/include
+COMMON_LINK_FLAGS          += --sysroot=$(PLATFORM_DIR)/arch-arm
+COMMON_LINK_FLAGS          += -Wl,-L,$(ARM_EABI_DIR)/lib/gcc/arm-linux-androideabi/4.4.3
+COMMON_LINK_FLAGS          += -Wl,-L,$(ARM_EABI_DIR)/lib/thumb
+COMMON_LINK_FLAGS          += -Wl,-L,$(PLATFORM_DIR)/arch-arm/usr/lib
+COMMON_LINK_FLAGS          += -Wl,-rpath-link=$(PLATFORM_DIR)/arch-arm/usr/lib
+COMMON_LINK_FLAGS          += -lc -lm -lstdc++ -lgcc -lsupc++
+COMMON_LINK_FLAGS          += -Wl,--no-undefined
+ANDROID_EXE_LINK_FLAGS     += -z $(PLATFORM_DIR)/arch-arm/usr/lib/crtbegin_dynamic.o
+ANDROID_SO_LINK_FLAGS       = -Wl,-soname,$(notdir $1) -shared -Wl,--no-undefined -Wl,-z,noexecstack
 
-CYGWIN                 := nodosfilewarning
-VALID_TARGET_TYPES     += android-pak android-jar
-ANDROID_KEY_STORE      := $(BUILD_DIR)platforms/android/my-release-key.keystore
-ANDROID_KEY_PASS       := android
-ANDROID_JAR            := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/android.jar
-DEFAULT_PACKAGE_PREFIX := com.untgames.
-GDB_SERVER_FLAG_FILE   := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/gdb-installed
-GDB_SERVER_FILE        := $(ARM_EABI_DIR)/../gdbserver
+CYGWIN                     := nodosfilewarning
+VALID_TARGET_TYPES         += android-pak android-jar
+ANDROID_KEY_STORE          := $(BUILD_DIR)platforms/android/my-release-key.keystore
+ANDROID_KEY_PASS           := android
+ANDROID_JAR                := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/android.jar
+DEFAULT_PACKAGE_PREFIX     := com.untgames.
+GDB_SERVER_FLAG_FILE       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/gdb-installed
+GDB_SERVER_FILE            := $(ARM_EABI_DIR)/../gdbserver
 
 export CYGWIN
 
@@ -110,8 +111,8 @@ endef
 # опирование файла на устройство (им€ локальных файлов, им€ удалЄнного каталога)
 define tools.install
  export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
- $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && export PATH=/data/busybox:\$\$$PATH && mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)" && \
- $(foreach file,$1, echo -n "Install $(notdir $(file)): " && $(ADB) push $(file) $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT) && $(ADB) shell "export PATH=/data/busybox:\$\$$PATH && chmod -R 777 $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)" && ) true
+ $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && export PATH=/sdcard/busybox:\$\$$PATH && mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)" && \
+ $(foreach file,$1, echo -n "Install $(notdir $(file)): " && $(ADB) push $(file) $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT) && $(ADB) shell "export PATH=/sdcard/busybox:\$\$$PATH && chmod -R 777 $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)" && ) true
 endef
 
 #¬ыполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
@@ -121,7 +122,7 @@ define tools.run
  export PATH_SEARCH="$(foreach path,$3,$$(export SUBST_PATH_STRING=$$(cd $(path) && pwd) && echo $(REMOTE_DEBUG_DIR)/$${SUBST_PATH_STRING/#$$ROOT_SUBSTRING/}))" && \
  export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
  export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
- $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=//data/busybox:\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo $$SUBST_COMMAND) $(subst $(firstword $1),,$1)" | sed "s/.$$//"
+ $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=//sdcard/busybox:\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo $$SUBST_COMMAND) $(subst $(firstword $1),,$1)" | sed "s/.$$//"
 endef
 
 #¬ыполнение команды из пакета (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
@@ -132,9 +133,9 @@ define tools.run.android_package
  export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
  export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
  $(ADB) shell logcat -c && \
- $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=//data/busybox:\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)funner.application/.EngineActivity -e 'program' '$$(echo $$SUBST_COMMAND)' -e 'args' '$(subst $(firstword $1),,$1)'" | sed "s/.$$//" && \
+ $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=//sdcard/busybox:\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)funner.application/.EngineActivity -e 'program' '$$(echo $$SUBST_COMMAND)' -e 'args' '$(subst $(firstword $1),,$1)'" | sed "s/.$$//" && \
  sleep 1 && \
- $(ADB) shell "\\/data/busybox/sh -c 'while ps | \\/data/busybox/grep $(DEFAULT_PACKAGE_PREFIX)funner.application; do sleep 1; done'" > nul && \
+ $(ADB) shell "\\/sdcard/busybox/sh -c 'while ps | \\/sdcard/busybox/grep $(DEFAULT_PACKAGE_PREFIX)funner.application; do sleep 1; done'" > nul && \
  $(ADB) logcat -s -d -v raw System.out:I -v raw stdout:I
 endef
 # $(ADB) logcat 
@@ -200,7 +201,7 @@ endif
 
   $$($1.PACKAGED_RES_FILE): $$($1.MANIFEST_FILE) 
 		@echo Compile resources for $$(notdir $$($1.TARGET))...
-		@export MANIFEST_DIR_PREFIX=$$$$($$(call get_system_dir,$$(dir $$($1.MANIFEST_FILE)))) && cmd //C '$(subst /,\,$(JAVA_AAPT)) package -f -M %MANIFEST_DIR_PREFIX%\$$(notdir $$($1.MANIFEST_FILE)) -F $$@ -I $(ANDROID_JAR) -S $$($1.RES_DIR) -m -J $$($1.R_DIR)' 
+		@$(JAVA_AAPT) package -f -M $$($1.MANIFEST_FILE) -F $$@ -I $(ANDROID_JAR) -S $$($1.RES_DIR) -m -J $$($1.R_DIR)
 		
   .PHONY: create-dirs
   
@@ -252,7 +253,7 @@ endif
 		@$(ADB) shell logcat -c		
 		@$(ADB) shell am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME)/.EngineActivity -e "program" "value"
 		@sleep 1
-		@$(ADB) shell "\\/data/busybox/sh -c 'while ps | \\/data/busybox/grep $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME); do sleep 1; done'" > nul
+		@$(ADB) shell "\\/sdcard/busybox/sh -c 'while ps | \\/sdcard/busybox/grep $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME); do sleep 1; done'" > nul
 		@$(ADB) logcat -s -d -v raw System.out:I -v raw stdout:I
 #		@$(ADB) shell setprop log.redirect-stdio true
 
