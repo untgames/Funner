@@ -1040,7 +1040,7 @@ INSTALLATION_FILES := $(sort $(INSTALLATION_FILES) $(wildcard $(DIST_BIN_DIR)/*)
 $(INSTALLATION_FLAG): NEW_INSTALLATION_FILES = $(call get_new_installation_files,$(shell $(call get_absolute_paths,$(INSTALLATION_FILES))),$(if $(wildcard $(INSTALLATION_FLAG)),$(sort $(shell cat $(INSTALLATION_FLAG)))))
 
 $(INSTALLATION_FLAG): $(INSTALLATION_FILES) $(INSTALLATION_FLAGS)
-	@$(call do_installation,$(filter-out %.$(INSTALLATION_FLAG_SUFFIX),$?),$(NEW_INSTALLATION_FILES),$@)
+	$(call do_installation,$(filter-out %.$(INSTALLATION_FLAG_SUFFIX),$?),$(NEW_INSTALLATION_FILES),$@)
 
 endif
 
