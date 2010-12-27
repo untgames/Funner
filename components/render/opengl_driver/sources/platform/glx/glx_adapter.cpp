@@ -223,8 +223,6 @@ void Adapter::EnumPixelFormats (Display *display, int screen, PixelFormatArray& 
       desc.swap_method = SwapMethod_Copy;
     }
     
-    pixel_format.push_back (desc);
+    pixel_formats.push_back (desc);
   }
-    
-  
 }
