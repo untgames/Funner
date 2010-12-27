@@ -460,7 +460,7 @@ void AdapterLibrary::SwapBuffers (Display *dpy, GLXDrawable drawable)
     Получение списка поддерживаемых расширений
 */
 
-const char* GetExtensionsString (Display *dpy, int screen)
+const char* AdapterLibrary::GetExtensionsString (Display *dpy, int screen)
 {
   return impl->fglXQueryExtensionsString (dpy, screen);
 }
