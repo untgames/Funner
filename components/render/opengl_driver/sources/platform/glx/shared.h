@@ -43,6 +43,48 @@ namespace glx
 
 //forward declarations
 class Adapter;
+class DynamicLibrary;
+
+struct GlxExtensionEntries
+{
+  Init (ILibrary&);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Предостережения конфигурации буфера кадра
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum Caveat
+{
+  Caveat_None,                  //конфигурация буфера кадра не имеет предупреждение
+  Caveat_Slow_Config,           //какой-либо аспект конфигурации буфера кадра запускается медленнее, чем другие конфигурации
+  Caveat_Non_Conformant_COnfig, //какой-либо аспект конфигурации буфера кадра несовместим
+  
+  Caveat_Num
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Дексриптор формата пикселей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct PixelFormatDesc
+{
+  Adapter*                   adapter;                 //адаптер, поддерживающий указанный формат
+  const GlxExtensionEntries* glx_extension_entries;   //таблица GLX-расширений (должна быть скопирована в методе, получившем PixelFormatDesc, может быть 0)
+  int                        pixel_format_index;      //индекс формата пикселей в таблице форматов адаптера
+  size_t                     color_bits;              //количество бит на цвет
+  size_t                     alpha_bits;              //количество бит на альфу
+  size_t                     depth_bits;              //количество бит на глубину
+  size_t                     stencil_bits;            //количество бит на трафарет
+  size_t                     samples_count;           //количество sample'ов (0=multisample off)
+  size_t                     buffers_count;           //количество буферов в цепочке обмена (0=default 2 buffers)
+  SwapMethod                 swap_method;             //метод обмена заднего и переднего буферов
+  size_t                     aux_buffers;             //количество вспомогательных буферов отрисовки
+  size_t                     max_pbuffer_width;       //максимальная ширина PBuffer
+  size_t                     max_pbuffer_height;      //максимальная высота PBuffer
+  size_t                     max_pbuffer_pixels;      //максимальное количество пикселей для PBuffer
+  bool                       support_stereo;          //поддержка стерео-рендеринга  
+  bool                       support_draw_to_window;  //поддержка рисования в Window
+  bool                       support_draw_to_pbuffer; //поддержка рисования в PBuffer
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Устройство вывода
@@ -139,8 +181,6 @@ class IContextLostListener
     virtual ~IContextLostListener () {}
 };
 
-class DynamicLibrary;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загружаемая библиотека OpenGL
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +237,12 @@ class AdapterLibrary: virtual public ILibrary, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен содержимого рабочего и фонового буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void SwapBuffers (Display *dpy, GLXDrawable drawable);
+    void SwapBuffers (Display *dpy, GLXDrawable drawable);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение списка поддерживаемых расширений
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const char* GetExtensionsString (Display *dpy, int screen);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение адреса точки входа
@@ -253,6 +298,14 @@ class Adapter: virtual public IAdapter, public Object
 ///Запрос устройства вывода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Output::Pointer GetOutput (Window window);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перечисление доступных форматов пикселей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef stl::vector<PixelFormatDesc>     PixelFormatArray;
+    typedef stl::vector<GlxExtensionEntries> GlxExtensionEntriesArray;
+
+    void EnumPixelFormats (Display *display, int screen, PixelFormatArray& pixel_formats, GlxExtensionEntriesArray& entries);
 
   private:
     Adapter (const Adapter&); //no impl
@@ -261,6 +314,21 @@ class Adapter: virtual public IAdapter, public Object
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Контекст устройства отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class ISwapChainImpl: virtual public ISwapChain
+{
+  public:
+    virtual Adapter*                   GetAdapterImpl         () = 0; //получение реализации адаптера
+    virtual Display*                   GetDisplay             () = 0; //устройство отображения для текущего контекста
+    virtual Window                     GetWindow              () = 0; //окно отрисовки
+    virtual const GlxExtensionEntries& GetGlxExtensionEntries () = 0; //получение таблицы GLX-расширений
+
+  protected:
+    virtual ~ISwapChainImpl () {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

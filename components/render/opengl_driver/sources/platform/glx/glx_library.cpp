@@ -22,6 +22,7 @@ typedef Bool         (*glXQueryVersionFn)           (Display *dpy, int *major, i
 typedef const char*  (*glXQueryServerStringFn)      (Display *dpy, int screen, int name);
 typedef int          (*glXGetFBConfigAttribFn)      (Display *dpy, GLXFBConfig config, int attribute, int *value);
 typedef GLXFBConfig* (*glXGetFBConfigsFn)           (Display *dpy, int screen, int *nelements);
+typedef const char*  (*glXQueryExtensionsStringFn)  (Display *dpy, int screen);
 typedef void*        (*glXGetProcAddressFn)         (const char *procName);
 typedef GLXContext   (*glXGetCurrentContextFn)      (void);
 typedef Display*     (*glXGetCurrentDisplayFn)      (void);
@@ -151,6 +152,7 @@ struct AdapterLibrary::Impl
   glXGetProcAddressFn         fglXGetProcAddress;
   glXGetFBConfigAttribFn      fglXGetFBConfigAttrib;
   glXGetFBConfigsFn           fglXGetFBConfigs;
+  glXQueryExtensionsStringFn  fglXQueryExtensionsString;
 
 ///Конструктор
   Impl (DynamicLibraryPtr& in_dll)
@@ -181,6 +183,7 @@ struct AdapterLibrary::Impl
       GetSymbol ("glXGetProcAddress",         fglXGetProcAddress);
       GetSymbol ("glXGetFBConfigAttrib",      fglXGetFBConfigAttrib);
       GetSymbol ("glXGetFBConfigs",           fglXGetFBConfigs);
+      GetSymbol ("glXQueryExtensionsString",  fglXQueryExtensionsString);
 
         //вывод общей информации
       
@@ -451,6 +454,15 @@ GLXFBConfig* AdapterLibrary::GetFBConfigs (Display *dpy, int screen, int *neleme
 void AdapterLibrary::SwapBuffers (Display *dpy, GLXDrawable drawable)
 {
   impl->fglXSwapBuffers (dpy, drawable);
+}
+
+/*
+    Получение списка поддерживаемых расширений
+*/
+
+const char* GetExtensionsString (Display *dpy, int screen)
+{
+  return impl->fglXQueryExtensionsString (dpy, screen);
 }
     
 /*
