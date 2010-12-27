@@ -13,16 +13,18 @@ typedef Output::Pointer       OutputPtr;
 
 struct PrimarySwapChain::Impl
 {
-  Log           log;         //протокол
-  AdapterPtr    adapter;     //адаптер, которому принадлежит устройство
-  Display*      display;     //соединение с дисплеем
-  Window        window;      //окно
-  SwapChainDesc desc;        //дескриптор цепочки обмена
-  PropertyList  properties;  //свойства цепочки обмена
+  Log               log;         //протокол
+  AdapterPtr        adapter;     //адаптер, которому принадлежит устройство
+  AdapterLibraryPtr library;     //библиотека адаптера
+  Display*          display;     //соединение с дисплеем
+  Window            window;      //окно
+  SwapChainDesc     desc;        //дескриптор цепочки обмена
+  PropertyList      properties;  //свойства цепочки обмена
 
 ///Конструктор
   Impl (Adapter* in_adapter, const SwapChainDesc& in_desc)
     : adapter (in_adapter)
+    , library (in_adapter->GetLibrary ())
     , display ((Display*)syslib::x11::DisplayManager::DisplayHandle ())
     , window ((Window) in_desc.window_handle)
     , desc (in_desc)
@@ -118,7 +120,7 @@ void PrimarySwapChain::Present ()
 {
   try
   {
-    glXSwapBuffers (impl->display, impl->window);
+    library->SwapBuffers (impl->display, impl->window);
   }
   catch (xtl::exception& exception)
   {
