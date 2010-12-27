@@ -118,7 +118,7 @@ void PrimarySwapChain::Present ()
 {
   try
   {
-    if (!glxSwapBuffers (impl->display, impl->window))
+    if (!adapter->library->SwapBuffers (impl->display, impl->window))
       raise_error ("::glxSwapBuffers");
   }
   catch (xtl::exception& exception)
