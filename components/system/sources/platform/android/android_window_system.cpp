@@ -46,8 +46,7 @@ class JniWindowClass
 
          //получение методов
 
-//        GetMethod ("CreateView", "(Ljava/lang/String;)Landroid/view/View;", create_window_method);
-        GetMethod ("CreateView", "()Landroid/view/View;", create_window_method);
+        GetMethod ("CreateView", "(Ljava/lang/String;)Landroid/view/View;", create_window_method);
       }
       catch (xtl::exception& e)
       {
@@ -57,18 +56,20 @@ class JniWindowClass
     }
     
 ///Создание окна
-    local_ref<jobject> CreateWindow ()
+    local_ref<jobject> CreateWindow (const char* init_string)
     {
       const ApplicationContext& context = get_context ();     
       
-      local_ref<jobject> window = get_env ().CallObjectMethod (get_context ().activity.get (), create_window_method);   
-      
-      if (!window)
-        throw xtl::format_operation_exception ("", "EngineActivity::CreateView failed");
+      //local_ref<jobject> window = 
+      get_env ().CallObjectMethod (get_context ().activity.get (), create_window_method, tojstring (init_string));
+      printf ("!!!1\n"); fflush (stdout);
+//      if (!window)
+//        throw xtl::format_operation_exception ("", "EngineActivity::CreateView failed");
       
       //check exceptions!!!
-      
-      return window;
+
+      return 0;    
+//      return window;
     }
     
   private:
@@ -96,32 +97,22 @@ class JniWindowClass
 
 typedef common::Singleton<JniWindowClass> JniWindowClassSingleton;
 
-/*
-    Генерация исключения: работа с окнами невозможна для платформы по умолчанию
-*/
-
-
-void raise (const char* method_name)
-{
-  throw xtl::format_not_supported_exception (method_name, "No window support for default platform");
-}
-
 }
 
 /*
     Создание/закрытие/уничтожение окна
 */
 
-Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler handler, const void* parent_handle, const char*, void* user_data)
+Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
   try
   {
     stl::auto_ptr<window_handle> window (new window_handle);
     
-    window->android_window  = JniWindowClassSingleton::Instance ()->CreateWindow ();
+    window->android_window  = JniWindowClassSingleton::Instance ()->CreateWindow (init_string);
     window->message_handler = handler;
     window->user_data       = user_data;
-    
+printf ("HEYE\n"); fflush (stdout);    
     return window.release ();
   }
   catch (xtl::exception& e)
@@ -133,12 +124,12 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
 
 void Platform::CloseWindow (window_t)
 {
-  raise ("syslib::DefaultPlatform::CloseWindow");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::CloseWindow");
 }
 
 void Platform::DestroyWindow (window_t)
 {
-  raise ("syslib::DefaultPlatform::DestroyWindow");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::DestroyWindow");
 }
 
 /*
@@ -147,12 +138,12 @@ void Platform::DestroyWindow (window_t)
 
 const void* Platform::GetNativeWindowHandle (window_t)
 {
-  raise ("syslib::DefaultPlatform::GetNativeWindowHandle");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetNativeWindowHandle");
 }
 
 const void* Platform::GetNativeDisplayHandle (window_t)
 {
-  raise ("syslib::DefaultPlatform::GetNativeDisplayHandle");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetNativeDisplayHandle");
 }
 
 /*
@@ -161,12 +152,12 @@ const void* Platform::GetNativeDisplayHandle (window_t)
 
 void Platform::SetWindowTitle (window_t, const wchar_t*)
 {
-  raise ("syslib::DefaultPlatform::SetWindowTitle");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetWindowTitle");
 }
 
 void Platform::GetWindowTitle (window_t, size_t, wchar_t*)
 {
-  raise ("syslib::DefaultPlatform::GetWindowTitle");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetWindowTitle");
 }
 
 /*
@@ -175,22 +166,22 @@ void Platform::GetWindowTitle (window_t, size_t, wchar_t*)
 
 void Platform::SetWindowRect (window_t, const Rect&)
 {
-  raise ("syslib::DefaultPlatform::SetWindowRect");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetWindowRect");
 }
 
 void Platform::SetClientRect (window_t, const Rect&)
 {
-  raise ("syslib::DefaultPlatform::SetClientRect");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetClientRect");
 }
 
 void Platform::GetWindowRect (window_t, Rect&)
 {
-  raise ("syslib::DefaultPlatform::GetWindowRect");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetWindowRect");
 }
 
 void Platform::GetClientRect (window_t, Rect&)
 {
-  raise ("syslib::DefaultPlatform::GetClientRect");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetClientRect");
 }
 
 /*
@@ -199,12 +190,12 @@ void Platform::GetClientRect (window_t, Rect&)
 
 void Platform::SetWindowFlag (window_t, WindowFlag, bool)
 {
-  raise ("syslib::DefaultPlatform::SetWindowFlag");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetWindowFlag");
 }
 
 bool Platform::GetWindowFlag (window_t, WindowFlag)
 {
-  raise ("syslib::DefaultPlatform::GetWindowFlag");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetWindowFlag");
 
   return false;
 }
@@ -215,12 +206,12 @@ bool Platform::GetWindowFlag (window_t, WindowFlag)
 
 void Platform::SetParentWindowHandle (window_t child, const void* parent_handle)
 {
-  raise ("syslib::DefaultPlatform::SetParentWindow");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetParentWindow");
 }
 
 const void* Platform::GetParentWindowHandle (window_t child)
 {
-  raise ("syslib::DefaultPlatform::GetParentWindow");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetParentWindow");
 
   return 0;
 }
@@ -231,7 +222,7 @@ const void* Platform::GetParentWindowHandle (window_t child)
 
 void Platform::InvalidateWindow (window_t)
 {
-  raise ("syslib::DefaultPlatform::InvalidateWindow");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::InvalidateWindow");
 }
 
 /*
@@ -240,12 +231,12 @@ void Platform::InvalidateWindow (window_t)
 
 void Platform::SetCursorPosition (const Point&)
 {
-  raise ("syslib::DefaultPlatform::SetCursorPosition");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetCursorPosition");
 }
 
 Point Platform::GetCursorPosition ()
 {
-  raise ("syslib::DefaultPlatform::GetCursorPosition");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetCursorPosition");
 
   return Point ();
 }
@@ -266,12 +257,12 @@ Point Platform::GetCursorPosition (window_t)
 
 void Platform::SetCursorVisible (window_t, bool state)
 {
-  raise ("syslib::DefaultPlatform::SetCursorVisible");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetCursorVisible");
 }
 
 bool Platform::GetCursorVisible (window_t)
 {
-  raise ("syslib::DefaultPlatform::GetCursorVisible");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetCursorVisible");
 
   return false;
 }
@@ -282,17 +273,17 @@ bool Platform::GetCursorVisible (window_t)
 
 Platform::cursor_t Platform::CreateCursor (const char*, int, int)
 {
-  raise ("syslib::DefaultPlatform::CreateCursor");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::CreateCursor");
 }
 
 void Platform::DestroyCursor (cursor_t)
 {
-  raise ("syslib::DefaultPlatform::DestroyCursor");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::DestroyCursor");
 }
 
 void Platform::SetCursor (window_t, cursor_t)
 {
-  raise ("syslib::DefaultPlatform::SetCursor");
+  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetCursor");
 }
 
 /*
@@ -301,24 +292,24 @@ void Platform::SetCursor (window_t, cursor_t)
 
 void Platform::SetBackgroundColor (window_t window, const Color& color)
 {
-  raise ("syslib::SetBackgroundColor");
+  throw xtl::make_not_implemented_exception ("syslib::SetBackgroundColor");
 }
 
 void Platform::SetBackgroundState (window_t window, bool state)
 {
-  raise ("syslib::SetBackgroundState");
+  throw xtl::make_not_implemented_exception ("syslib::SetBackgroundState");
 }
 
 Color Platform::GetBackgroundColor (window_t window)
 {
-  raise ("syslib::GetBackgroundColor");
+  throw xtl::make_not_implemented_exception ("syslib::GetBackgroundColor");
 
   return Color (0, 0, 0);
 }
 
 bool Platform::GetBackgroundState (window_t window)
 {
-  raise ("syslib::GetBackgroundState");
+  throw xtl::make_not_implemented_exception ("syslib::GetBackgroundState");
   
   return false;
 }

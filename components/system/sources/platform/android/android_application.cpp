@@ -19,7 +19,7 @@ class DefaultApplicationDelegate: public IApplicationDelegate, public xtl::refer
 
 ///Запуск цикла обработки сообщений
     void Run ()
-    {
+    {            
       if (listener)
         listener->OnInitialized ();
       

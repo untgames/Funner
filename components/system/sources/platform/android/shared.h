@@ -2,6 +2,7 @@
 #include <cstdio>
 
 #include <jni.h>
+#include <android/looper.h>
 
 #include <stl/auto_ptr.h>
 
@@ -106,6 +107,18 @@ inline jmethodID find_method (JNIEnv* env, jclass class_, const char* name, cons
 }
 
 /*
+    Формированеи строки
+*/
+
+inline jstring tojstring (const char* s)
+{
+  if (!s)
+    return 0;
+
+  return get_env ().NewStringUTF (s);
+}
+
+/*
     Управление запуском
 */
 
@@ -114,6 +127,7 @@ struct ApplicationContext
 {
   JavaVM*             vm;       //виртуальная машина
   global_ref<jobject> activity; //activity, запустившее приложение
+  ALooper*            looper;   //очередь обработки системных сообщений
 };
 
 /// точка входа в приложение

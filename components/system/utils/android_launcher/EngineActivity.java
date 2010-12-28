@@ -62,12 +62,23 @@ public class EngineActivity extends Activity
   public native int startApplication (String programName, String programArgs);
   
 /// Создание окна
-//  public View CreateView (String initString)
-  public View CreateView ()
+  public View CreateView (String initString)
   {
-    Looper.prepare ();
-    System.out.println ("Create view called");
-//    return null;
-    return new EngineView (this);
+    try
+    {
+      Looper.prepare ();
+
+      new EngineView (this);
+      
+      System.out.println ("!!!");
+      
+//      Looper.loop ();
+    }
+    catch (Exception e)
+    {
+      System.out.println (e.getMessage ());      
+    }
+    
+    return null;    
   }
 }
