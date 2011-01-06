@@ -39,7 +39,6 @@ struct Params
   const Option* options;            //массив опций
   size_t        options_count;      //количество опций
   stl::string   result_license;     //файл генерируемой лицензии
-  stl::string   source_xml;         //исходный xml, который будет преобразован в файл лицензии
   time_t        since_date;         //дата начала действия лицензии
   time_t        till_date;          //дата окончания действия лицензии
   StringArray   allowed_components; //список разрешенных компонентов
@@ -227,6 +226,33 @@ void validate (Params& params)
   }
 }
 
+//добавление свойств на основе дерева разбора
+void add_node_properties (Params& params, ParseNode node, const char* base_name)
+{
+  stl::string node_full_name = base_name;
+
+  if (!node_full_name.empty ())
+    node_full_name.append (".");
+
+  node_full_name.append (node.Name ());
+
+  if (node.AttributesCount ())
+  {
+    if (params.properties.IsPresent (node_full_name.c_str ()))
+      throw xtl::format_operation_exception ("add_node_property", "Duplicate property '%s'", node_full_name.c_str ());
+
+    stl::string property_value;
+
+    for (size_t i = 0, count = node.AttributesCount (); i < count; i++)
+      property_value += node.Attribute (i);
+
+    params.properties.SetProperty (node_full_name.c_str (), property_value.c_str ());
+  }
+
+  for (ParseNode child = node.First (); child; child = child.Next ())
+    add_node_properties (params, child, node_full_name.c_str ());
+}
+
 typedef xtl::shared_ptr<XmlWriter::Scope> ScopePtr;
 typedef stl::stack<ScopePtr>              ScopeStack;
 
@@ -249,21 +275,21 @@ void generate_license (Params& params)
 
   XmlWriter::Scope license_scope (writer, "License");
 
+  writer.WriteAttribute ("LicenseHash", hex_hash_string.c_str ());
+
   for (size_t i = 0, count = params.properties.Size (); i < count; i++)
   {
     StringArray property_name_components = split (params.properties.PropertyName (i), ".");
     ScopeStack  scope_stack;
 
     for (size_t j = 0, components_count = property_name_components.Size (); j < components_count - 1; j++)
-      scope_stack.push (ScopePtr (new XmlWriter::Scope (writer, property_name_components [i])));
+      scope_stack.push (ScopePtr (new XmlWriter::Scope (writer, property_name_components [j])));
 
     writer.WriteAttribute (property_name_components [property_name_components.Size () - 1], params.properties.GetString (i));
 
     while (!scope_stack.empty ())
       scope_stack.pop ();
   }
-
-  writer.WriteAttribute ("LicenseHash", hex_hash_string.c_str ());
 
   if (!params.check_files.IsEmpty ())
   {
@@ -334,9 +360,6 @@ int main (int argc, const char *argv[])
     if (command_line.ParamsCount () > 1)
       throw xtl::format_operation_exception ("", "No more than one input file allowed");
 
-    if (command_line.ParamsCount ())
-      params.source_xml = command_line.Param (0);
-
       //проверка корректности ввода
     validate (params);
 
@@ -351,6 +374,31 @@ int main (int argc, const char *argv[])
     params.properties.SetProperty ("SinceDate",         since_date_string.c_str ());
     params.properties.SetProperty ("TillDate",          till_date_string.c_str ());
     params.properties.SetProperty ("AllowedComponents", allowed_components_string.c_str ());
+
+    if (command_line.ParamsCount ())
+    {
+      const char* source_xml = command_line.Param (0);
+
+      Parser    p (source_xml, "xml");
+      ParseLog  log = p.Log ();
+      ParseNode root = p.Root ().First ("License");
+
+      if (!root)
+        log.Error (p.Root (), "No root 'License' tag");
+
+      for (size_t i = 0; i < log.MessagesCount (); i++)
+        switch (log.MessageType (i))
+        {
+          case ParseLogMessageType_Error:
+          case ParseLogMessageType_FatalError:
+            throw xtl::format_operation_exception ("", log.Message (i));
+          default:
+            break;
+        }
+
+      for (ParseNode node = root.First (); node; node = node.Next ())
+        add_node_properties (params, node, "");
+    }
 
       //Генерация лицензии
     generate_license (params);
