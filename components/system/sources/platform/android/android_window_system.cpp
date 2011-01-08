@@ -23,11 +23,6 @@ struct Platform::window_handle
 namespace
 {
 
-///обработка java исключений
-void check_errors ()
-{
-}
-
 ///Поддержка класса окна
 class JniWindowClass
 {
@@ -73,13 +68,11 @@ class JniWindowClass
     {
       const ApplicationContext& context = get_context ();     
       
-      local_ref<jobject> window = get_env ().CallObjectMethod (context.activity.get (), create_window_method, tojstring (init_string));
+      local_ref<jobject> window = check_errors (get_env ().CallObjectMethod (context.activity.get (), create_window_method, tojstring (init_string)));
       
       if (!window)
         throw xtl::format_operation_exception ("", "EngineActivity::CreateView failed");
       
-      //check exceptions!!!
-
       return window;
     }
     
@@ -90,12 +83,10 @@ class JniWindowClass
       
       JNIEnv& env = get_env ();
       
-      result.left   = env.CallIntMethod (window.get (), get_left_method);
-      result.top    = env.CallIntMethod (window.get (), get_top_method);
-      result.right  = result.left + env.CallIntMethod (window.get (), get_width_method);
-      result.bottom = result.top + env.CallIntMethod (window.get (), get_height_method);
-      
-      //check exceptions!!!
+      result.left   = check_errors (env.CallIntMethod (window.get (), get_left_method));
+      result.top    = check_errors (env.CallIntMethod (window.get (), get_top_method));
+      result.right  = result.left + check_errors (env.CallIntMethod (window.get (), get_width_method));
+      result.bottom = result.top + check_errors (env.CallIntMethod (window.get (), get_height_method));
       
       return result;
     }
@@ -107,7 +98,7 @@ class JniWindowClass
       
       env.CallVoidMethod (window.get (), layout_method, rect.left, rect.top, rect.right, rect.bottom);
       
-      //check exceptions!!!            
+      check_errors ();
     }
     
 ///Установка видимости окна
@@ -117,7 +108,7 @@ class JniWindowClass
       
       env.CallVoidMethod (window.get (), set_visibility_method, state);
       
-      //check exceptions!!!                  
+      check_errors ();
     }
 
   private:

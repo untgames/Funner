@@ -64,17 +64,6 @@ public class EngineActivity extends Activity
 /// Создание окна
   public View createCustomView (String initString)
   {
-    try
-    {
-//      Looper.prepare ();  
-        
-      return new EngineView (this);
-    }
-    catch (Exception e)
-    {
-      System.out.println (e.getMessage ());      
-    }
-    
-    return null;    
+    return new EngineView (this);
   }
 }

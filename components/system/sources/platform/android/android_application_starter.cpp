@@ -16,7 +16,8 @@ namespace
     Константы
 */
 
-const char* THREAD_NAME = "system.android.launcher"; //имя нити приложения
+const char* THREAD_NAME             = "system.android.launcher";                     //имя нити приложения
+const char* ENGINE_UTILS_CLASS_NAME = "com/untgames/funner/application/EngineUtils"; //имя класса java утилит
 
 /// Контекст запуска приложения
 ApplicationContext application_context;
@@ -159,6 +160,11 @@ void start_application (JavaVM* vm, jobject activity, const char* program_name, 
 
   application_context.vm       = vm;
   application_context.activity = activity;
+  
+  application_context.utils_class = get_env ().FindClass (ENGINE_UTILS_CLASS_NAME);
+  
+  if (!application_context.utils_class)
+    throw xtl::format_operation_exception ("", "EngineUtils class '%s' not found", ENGINE_UTILS_CLASS_NAME);    
   
     //запуск нити приложения
     

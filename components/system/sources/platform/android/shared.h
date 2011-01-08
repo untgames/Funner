@@ -107,15 +107,48 @@ inline jmethodID find_method (JNIEnv* env, jclass class_, const char* name, cons
 }
 
 /*
-    Формированеи строки
+    Обёртка для работы со строками
 */
 
-inline jstring tojstring (const char* s)
+class jni_string
 {
-  if (!s)
-    return 0;
+  public:
+    jni_string (JNIEnv* inEnv, jstring inJavaString)
+      : env (inEnv)
+      , javaString (inJavaString)
+      , string (0)
+    {
+      string = env->GetStringUTFChars (javaString, 0);            
+    }
+    
+    ~jni_string ()
+    {
+      if (!string || !env || !javaString)
+        return;
+        
+      env->ReleaseStringUTFChars (javaString, string);
+    }
+    
+    const char* get () const { return string; } 
+  
+  private:
+    JNIEnv*     env;
+    jstring     javaString;
+    const char* string;
+};
 
-  return get_env ().NewStringUTF (s);
+/*
+    Утилиты
+*/
+
+jstring tojstring    (const char* s);
+void    check_errors ();
+
+template <class T> T check_errors (T result)
+{
+  check_errors ();
+  
+  return result;
 }
 
 /*
@@ -125,8 +158,11 @@ inline jstring tojstring (const char* s)
 ///Контекст запуска приложения
 struct ApplicationContext
 {
-  JavaVM*             vm;       //виртуальная машина
-  global_ref<jobject> activity; //activity, запустившее приложение
+  JavaVM*             vm;          //виртуальная машина
+  global_ref<jobject> activity;    //activity, запустившее приложение
+  global_ref<jclass>  utils_class; //EngineUtils class
+  
+  ApplicationContext () : vm (0) {}
 };
 
 /// точка входа в приложение
