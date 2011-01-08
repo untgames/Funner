@@ -21,8 +21,22 @@ const char* THREAD_NAME = "system.android.launcher"; //имя нити приложения
 /// Контекст запуска приложения
 ApplicationContext application_context;
 
+/// Параметры запуска приложения
+struct ApplicationStartArgs
+{
+  common::StringArray args;
+  
+  ApplicationStartArgs (const char* program_name, const char* in_args)
+  {
+      //разбор параметров запуска
+      
+    args.Add (program_name);
+    args.Add (common::split (in_args));    
+  }
+};
+
 /// Нить приложения
-class ApplicationThread
+class ApplicationThread: private ApplicationStartArgs
 {
   public:
 /// Метод запуска нити приложения
@@ -39,12 +53,9 @@ class ApplicationThread
   private:
 /// Конструктор
     ApplicationThread (const char* program_name, const char* in_args)
-      : thread (THREAD_NAME, syslib::Thread::Function (xtl::bind (&ApplicationThread::ThreadRoutine, this)))
+      : ApplicationStartArgs (program_name, in_args)
+      , thread (THREAD_NAME, syslib::Thread::Function (xtl::bind (&ApplicationThread::ThreadRoutine, this)))
     {
-        //разбор параметров запуска
-        
-      args.Add (program_name);
-      args.Add (common::split (in_args));   
     }
     
 /// Функция нити
@@ -52,19 +63,34 @@ class ApplicationThread
     {
       try
       {
+          //получение окружения
+        
         JNIEnv* env = 0;
         
         jint status = get_context ().vm->AttachCurrentThread (&env, 0);
         
         if (status)
-          throw xtl::format_operation_exception ("", "JavaVM::AttachCurrentThread failed (status=%d)", status);
+          throw xtl::format_operation_exception ("", "JavaVM::AttachCurrentThread failed (status=%d)", status);          
           
+          //подготовка работы очереди сообщений
+          
+        jclass looper_class = env->FindClass ("android/os/Looper"); 
+        
+        if (!looper_class)
+          throw xtl::format_operation_exception ("", "Can't find Looper class");
+          
+        jmethodID looper_prepare_method = find_static_method (env, looper_class, "prepare", "()V");
+        
+        env->CallStaticVoidMethod (looper_class, looper_prepare_method);
+        
+          //передача управления программе
+        
         int exit_code = 0;
         
         try
         {
-          exit_code = main (args.Size (), args.Data ());
-          
+          exit_code = main (args.Size (), args.Data ());          
+
 //          get_vm ()->DetachCurrentThread ();
         }
         catch (...)

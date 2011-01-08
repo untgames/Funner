@@ -43,10 +43,23 @@ class JniWindowClass
         
         if (!activity_class)
           throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
+          
+         //получение класса view
+         
+       view_class = get_env ().FindClass ("android/view/View");
+       
+       if (!view_class)
+         throw xtl::format_operation_exception ("", "android.view.View class not found");
 
          //получение методов
 
-        GetMethod ("CreateView", "(Ljava/lang/String;)Landroid/view/View;", create_window_method);
+        GetMethod (activity_class, "createCustomView", "(Ljava/lang/String;)Landroid/view/View;", create_window_method);
+        GetMethod (view_class, "getLeft", "()I", get_left_method);
+        GetMethod (view_class, "getTop", "()I", get_top_method);
+        GetMethod (view_class, "getWidth", "()I", get_width_method);
+        GetMethod (view_class, "getHeight", "()I", get_height_method);         
+        GetMethod (view_class, "layout", "(IIII)V", layout_method);
+        GetMethod (view_class, "setVisibility", "(I)V", set_visibility_method);
       }
       catch (xtl::exception& e)
       {
@@ -60,28 +73,63 @@ class JniWindowClass
     {
       const ApplicationContext& context = get_context ();     
       
-      //local_ref<jobject> window = 
-      get_env ().CallObjectMethod (get_context ().activity.get (), create_window_method, tojstring (init_string));
-      printf ("!!!1\n"); fflush (stdout);
-//      if (!window)
-//        throw xtl::format_operation_exception ("", "EngineActivity::CreateView failed");
+      local_ref<jobject> window = get_env ().CallObjectMethod (context.activity.get (), create_window_method, tojstring (init_string));
+      
+      if (!window)
+        throw xtl::format_operation_exception ("", "EngineActivity::CreateView failed");
       
       //check exceptions!!!
 
-      return 0;    
-//      return window;
+      return window;
     }
     
+///Получение размеров окна
+    Rect GetWindowRect (const local_ref<jobject>& window)
+    {
+      Rect result;
+      
+      JNIEnv& env = get_env ();
+      
+      result.left   = env.CallIntMethod (window.get (), get_left_method);
+      result.top    = env.CallIntMethod (window.get (), get_top_method);
+      result.right  = result.left + env.CallIntMethod (window.get (), get_width_method);
+      result.bottom = result.top + env.CallIntMethod (window.get (), get_height_method);
+      
+      //check exceptions!!!
+      
+      return result;
+    }
+    
+///Установка размеров окна
+    void SetWindowRect (const local_ref<jobject>& window, const Rect& rect)
+    {
+      JNIEnv& env = get_env ();
+      
+      env.CallVoidMethod (window.get (), layout_method, rect.left, rect.top, rect.right, rect.bottom);
+      
+      //check exceptions!!!            
+    }
+    
+///Установка видимости окна
+    void SetVisibility (const local_ref<jobject>& window, bool state)
+    {
+      JNIEnv& env = get_env ();
+      
+      env.CallVoidMethod (window.get (), set_visibility_method, state);
+      
+      //check exceptions!!!                  
+    }
+
   private:
 ///Запрос метода
-    void GetMethod (const char* name, const char* signature, jmethodID& method)
+    void GetMethod (const global_ref<jclass>& class_, const char* name, const char* signature, jmethodID& method)
     {
       try
       {
-        if (!activity_class)
-          throw xtl::format_operation_exception ("", "Null activity class");
+        if (!class_)
+          throw xtl::make_null_argument_exception ("", "class_");
           
-        method = find_method (&get_env (), activity_class.get (), name, signature);
+        method = find_method (&get_env (), class_.get (), name, signature);
       }
       catch (xtl::exception& e)
       {
@@ -92,7 +140,14 @@ class JniWindowClass
     
   private:
     global_ref<jclass> activity_class;
+    global_ref<jclass> view_class;
     jmethodID          create_window_method;
+    jmethodID          get_top_method;
+    jmethodID          get_left_method;
+    jmethodID          get_width_method;
+    jmethodID          get_height_method;
+    jmethodID          layout_method;
+    jmethodID          set_visibility_method;
 };
 
 typedef common::Singleton<JniWindowClass> JniWindowClassSingleton;
@@ -112,7 +167,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
     window->android_window  = JniWindowClassSingleton::Instance ()->CreateWindow (init_string);
     window->message_handler = handler;
     window->user_data       = user_data;
-printf ("HEYE\n"); fflush (stdout);    
+
     return window.release ();
   }
   catch (xtl::exception& e)
@@ -152,21 +207,34 @@ const void* Platform::GetNativeDisplayHandle (window_t)
 
 void Platform::SetWindowTitle (window_t, const wchar_t*)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetWindowTitle");
 }
 
-void Platform::GetWindowTitle (window_t, size_t, wchar_t*)
+void Platform::GetWindowTitle (window_t, size_t size, wchar_t* buffer)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetWindowTitle");
+  if (!size)
+    return;
+
+  if (!buffer)
+    throw xtl::make_null_argument_exception ("syslib::AndroidPlatform::GetWindowTitle", "buffer");
+
+  *buffer = L'\0';
 }
 
 /*
     Область окна / клиентская область
 */
 
-void Platform::SetWindowRect (window_t, const Rect&)
+void Platform::SetWindowRect (window_t window, const Rect& rect)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetWindowRect");
+  try
+  {
+    JniWindowClassSingleton::Instance ()->SetWindowRect (window->android_window, rect);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::DefaultPlatform::SetWindowRect");
+    throw;
+  }
 }
 
 void Platform::SetClientRect (window_t, const Rect&)
@@ -174,9 +242,17 @@ void Platform::SetClientRect (window_t, const Rect&)
   throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetClientRect");
 }
 
-void Platform::GetWindowRect (window_t, Rect&)
+void Platform::GetWindowRect (window_t window, Rect& result)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetWindowRect");
+  try
+  {
+    result = JniWindowClassSingleton::Instance ()->GetWindowRect (window->android_window);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::DefaultPlatform::GetWindowRect");
+    throw;
+  }
 }
 
 void Platform::GetClientRect (window_t, Rect&)
@@ -188,9 +264,29 @@ void Platform::GetClientRect (window_t, Rect&)
     Установка флагов окна
 */
 
-void Platform::SetWindowFlag (window_t, WindowFlag, bool)
+void Platform::SetWindowFlag (window_t window, WindowFlag flag, bool state)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetWindowFlag");
+  try
+  {
+    switch (flag)
+    {
+      case WindowFlag_Visible: //видимость окна
+        JniWindowClassSingleton::Instance ()->SetVisibility (window->android_window, state);
+        break;
+      case WindowFlag_Active: //активность окна
+      case WindowFlag_Focus:
+      case WindowFlag_Maximized:
+      case WindowFlag_Minimized:
+        throw xtl::make_not_implemented_exception ("SetWindowFlag");
+      default:
+        throw xtl::make_argument_exception ("", "flag", flag);
+    }    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::DefaultPlatform::SetWindowFlag");
+    throw;
+  }
 }
 
 bool Platform::GetWindowFlag (window_t, WindowFlag)

@@ -127,7 +127,6 @@ struct ApplicationContext
 {
   JavaVM*             vm;       //виртуальная машина
   global_ref<jobject> activity; //activity, запустившее приложение
-  ALooper*            looper;   //очередь обработки системных сообщений
 };
 
 /// точка входа в приложение
