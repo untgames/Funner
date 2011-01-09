@@ -2,6 +2,7 @@ package com.untgames.funner.application;
 
 import android.app.Activity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.*;
@@ -62,8 +63,19 @@ public class EngineActivity extends Activity
   public native int startApplication (String programName, String programArgs);
   
 /// Создание окна
-  public View createCustomView (String initString)
+  public View createEngineView (String initString)
   {
-    return new EngineView (this);
+    final Activity activity = this;
+    
+    return (View)UiDispatch.run (this, new UiRunnable () {
+      public Object run ()
+      {
+        View view = new EngineView (activity);
+        
+        getWindow ().addContentView (view, new ViewGroup.LayoutParams (ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));        
+        
+        return view;
+      }
+    });
   }
 }

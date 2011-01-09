@@ -9,13 +9,26 @@ using namespace syslib::android;
 
 struct Platform::window_handle
 {
-  global_ref<jobject>  android_window;   //android окно
-  WindowMessageHandler message_handler;  //обработчик сообщений
-  void*                user_data;        //пользовательские данные окна
+  global_ref<jobject>  view;                           //android окно
+  WindowMessageHandler message_handler;                //обработчик сообщений
+  void*                user_data;                      //пользовательские данные окна
+  unsigned int         background_color;               //цвет заднего плана
+  unsigned int         background_state;               //наличие заднего фона
+  jmethodID            get_top_method;                 //метод получения верхнего угла окна
+  jmethodID            get_left_method;                //метод получения левого угла окна
+  jmethodID            get_width_method;               //метод получения ширины окна
+  jmethodID            get_height_method;              //метод получения высоты окна
+  jmethodID            layout_method;                  //метод установки размеров и положения окна
+  jmethodID            set_visibility_method;          //метод установки видимости окна
+  jmethodID            get_visibility_method;          //метод получения видимости окна
+  jmethodID            set_background_color_method;    //метод установки цвета заднего плана окна
+  jmethodID            maximize_method;                //метод максимизации окна
   
   window_handle ()
     : message_handler (0)
     , user_data (0)
+    , background_color (0)
+    , background_state (0)
   {
   }
 };
@@ -39,106 +52,31 @@ class JniWindowClass
         if (!activity_class)
           throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
           
-         //получение класса view
-         
-       view_class = get_env ().FindClass ("android/view/View");
-       
-       if (!view_class)
-         throw xtl::format_operation_exception ("", "android.view.View class not found");
-
-         //получение методов
-
-        GetMethod (activity_class, "createCustomView", "(Ljava/lang/String;)Landroid/view/View;", create_window_method);
-        GetMethod (view_class, "getLeft", "()I", get_left_method);
-        GetMethod (view_class, "getTop", "()I", get_top_method);
-        GetMethod (view_class, "getWidth", "()I", get_width_method);
-        GetMethod (view_class, "getHeight", "()I", get_height_method);         
-        GetMethod (view_class, "layout", "(IIII)V", layout_method);
-        GetMethod (view_class, "setVisibility", "(I)V", set_visibility_method);
+        create_view_method = find_method (&get_env (), activity_class.get (), "createEngineView", "(Ljava/lang/String;)Landroid/view/View;");
       }
       catch (xtl::exception& e)
       {
-        e.touch ("syslib::android::JniWindowMetaClass::JniWindowMetaClass");
+        e.touch ("syslib::android::JniWindowClass::JniWindowClass");
         throw;
       }
     }
     
 ///Создание окна
-    local_ref<jobject> CreateWindow (const char* init_string)
+    local_ref<jobject> CreateView (const char* init_string)
     {
       const ApplicationContext& context = get_context ();     
       
-      local_ref<jobject> window = check_errors (get_env ().CallObjectMethod (context.activity.get (), create_window_method, tojstring (init_string)));
+      local_ref<jobject> view = check_errors (get_env ().CallObjectMethod (context.activity.get (), create_view_method, tojstring (init_string)));
       
-      if (!window)
-        throw xtl::format_operation_exception ("", "EngineActivity::CreateView failed");
-      
-      return window;
-    }
-    
-///Получение размеров окна
-    Rect GetWindowRect (const local_ref<jobject>& window)
-    {
-      Rect result;
-      
-      JNIEnv& env = get_env ();
-      
-      result.left   = check_errors (env.CallIntMethod (window.get (), get_left_method));
-      result.top    = check_errors (env.CallIntMethod (window.get (), get_top_method));
-      result.right  = result.left + check_errors (env.CallIntMethod (window.get (), get_width_method));
-      result.bottom = result.top + check_errors (env.CallIntMethod (window.get (), get_height_method));
-      
-      return result;
-    }
-    
-///Установка размеров окна
-    void SetWindowRect (const local_ref<jobject>& window, const Rect& rect)
-    {
-      JNIEnv& env = get_env ();
-      
-      env.CallVoidMethod (window.get (), layout_method, rect.left, rect.top, rect.right, rect.bottom);
-      
-      check_errors ();
-    }
-    
-///Установка видимости окна
-    void SetVisibility (const local_ref<jobject>& window, bool state)
-    {
-      JNIEnv& env = get_env ();
-      
-      env.CallVoidMethod (window.get (), set_visibility_method, state);
-      
-      check_errors ();
+      if (!view)
+        throw xtl::format_operation_exception ("", "EngineActivity::createEngineView failed");
+        
+      return view;
     }
 
   private:
-///Запрос метода
-    void GetMethod (const global_ref<jclass>& class_, const char* name, const char* signature, jmethodID& method)
-    {
-      try
-      {
-        if (!class_)
-          throw xtl::make_null_argument_exception ("", "class_");
-          
-        method = find_method (&get_env (), class_.get (), name, signature);
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("syslib::android::JniWindowClass::GetMethod");
-        throw;
-      }
-    }
-    
-  private:
     global_ref<jclass> activity_class;
-    global_ref<jclass> view_class;
-    jmethodID          create_window_method;
-    jmethodID          get_top_method;
-    jmethodID          get_left_method;
-    jmethodID          get_width_method;
-    jmethodID          get_height_method;
-    jmethodID          layout_method;
-    jmethodID          set_visibility_method;
+    jmethodID          create_view_method;
 };
 
 typedef common::Singleton<JniWindowClass> JniWindowClassSingleton;
@@ -155,9 +93,26 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
   {
     stl::auto_ptr<window_handle> window (new window_handle);
     
-    window->android_window  = JniWindowClassSingleton::Instance ()->CreateWindow (init_string);
+    window->view            = JniWindowClassSingleton::Instance ()->CreateView (init_string);
     window->message_handler = handler;
     window->user_data       = user_data;
+    
+    JNIEnv& env = get_env ();
+    
+    local_ref<jclass> view_class = env.GetObjectClass (window->view.get ());
+        
+    if (!view_class)
+      throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
+      
+    window->get_left_method             = find_method (&env, view_class.get (), "getLeftThreadSafe", "()I");
+    window->get_top_method              = find_method (&env, view_class.get (), "getTopThreadSafe", "()I");
+    window->get_width_method            = find_method (&env, view_class.get (), "getWidthThreadSafe", "()I");
+    window->get_height_method           = find_method (&env, view_class.get (), "getHeightThreadSafe", "()I");
+    window->layout_method               = find_method (&env, view_class.get (), "layoutThreadSafe", "(IIII)V");
+    window->set_visibility_method       = find_method (&env, view_class.get (), "setVisibilityThreadSafe", "(I)V");
+    window->get_visibility_method       = find_method (&env, view_class.get (), "getVisibilityThreadSafe", "()I");
+    window->set_background_color_method = find_method (&env, view_class.get (), "setBackgroundColorThreadSafe", "(I)V");
+    window->maximize_method             = find_method (&env, view_class.get (), "maximizeThreadSafe", "()V");
 
     return window.release ();
   }
@@ -170,12 +125,12 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
 
 void Platform::CloseWindow (window_t)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::CloseWindow");
+  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::CloseWindow");
 }
 
 void Platform::DestroyWindow (window_t)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::DestroyWindow");
+  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::DestroyWindow");
 }
 
 /*
@@ -184,12 +139,12 @@ void Platform::DestroyWindow (window_t)
 
 const void* Platform::GetNativeWindowHandle (window_t)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetNativeWindowHandle");
+  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::GetNativeWindowHandle");
 }
 
 const void* Platform::GetNativeDisplayHandle (window_t)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetNativeDisplayHandle");
+  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::GetNativeDisplayHandle");
 }
 
 /*
@@ -219,36 +174,65 @@ void Platform::SetWindowRect (window_t window, const Rect& rect)
 {
   try
   {
-    JniWindowClassSingleton::Instance ()->SetWindowRect (window->android_window, rect);
+    JNIEnv& env = get_env ();
+    
+    env.CallVoidMethod (window->view.get (), window->layout_method, rect.left, rect.top, rect.right, rect.bottom);
+    
+    check_errors ();
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::DefaultPlatform::SetWindowRect");
+    e.touch ("syslib::AndroidPlatform::SetWindowRect");
     throw;
   }
 }
 
-void Platform::SetClientRect (window_t, const Rect&)
-{
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetClientRect");
-}
-
-void Platform::GetWindowRect (window_t window, Rect& result)
+void Platform::SetClientRect (window_t window, const Rect& rect)
 {
   try
   {
-    result = JniWindowClassSingleton::Instance ()->GetWindowRect (window->android_window);
+    SetWindowRect (window, rect);
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::DefaultPlatform::GetWindowRect");
+    e.touch ("syslib::AndroidPlatform::SetClientRect");
     throw;
   }
 }
 
-void Platform::GetClientRect (window_t, Rect&)
+void Platform::GetWindowRect (window_t window, Rect& out_result)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetClientRect");
+  try
+  {
+    Rect result;
+    
+    JNIEnv& env = get_env ();
+    
+    result.left   = check_errors (env.CallIntMethod (window->view.get (), window->get_left_method));
+    result.top    = check_errors (env.CallIntMethod (window->view.get (), window->get_top_method));
+    result.right  = result.left + check_errors (env.CallIntMethod (window->view.get (), window->get_width_method));
+    result.bottom = result.top + check_errors (env.CallIntMethod (window->view.get (), window->get_height_method));
+    
+    out_result = result;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidPlatform::GetWindowRect");
+    throw;
+  }
+}
+
+void Platform::GetClientRect (window_t window, Rect& rect)
+{
+  try
+  {
+    GetWindowRect (window, rect);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidPlatform::GetClientRect");
+    throw;
+  }
 }
 
 /*
@@ -259,14 +243,20 @@ void Platform::SetWindowFlag (window_t window, WindowFlag flag, bool state)
 {
   try
   {
+    JNIEnv& env = get_env ();    
+    
     switch (flag)
     {
-      case WindowFlag_Visible: //видимость окна
-        JniWindowClassSingleton::Instance ()->SetVisibility (window->android_window, state);
+      case WindowFlag_Visible:
+        env.CallVoidMethod (window->view.get (), window->set_visibility_method, state);        
+        check_errors ();
         break;
-      case WindowFlag_Active: //активность окна
-      case WindowFlag_Focus:
       case WindowFlag_Maximized:
+        env.CallVoidMethod (window->view.get (), window->maximize_method);        
+        check_errors ();
+        break;      
+      case WindowFlag_Active:
+      case WindowFlag_Focus:
       case WindowFlag_Minimized:
         throw xtl::make_not_implemented_exception ("SetWindowFlag");
       default:
@@ -275,16 +265,36 @@ void Platform::SetWindowFlag (window_t window, WindowFlag flag, bool state)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::DefaultPlatform::SetWindowFlag");
+    e.touch ("syslib::AndroidPlatform::SetWindowFlag");
     throw;
   }
 }
 
-bool Platform::GetWindowFlag (window_t, WindowFlag)
+bool Platform::GetWindowFlag (window_t window, WindowFlag flag)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetWindowFlag");
-
-  return false;
+  try
+  {
+    JNIEnv& env = get_env ();    
+    
+    switch (flag)
+    {
+      case WindowFlag_Visible:
+        return check_errors (env.CallIntMethod (window->view.get (), window->get_visibility_method)) != 0;
+      case WindowFlag_Maximized:
+      case WindowFlag_Active:
+      case WindowFlag_Focus:
+      case WindowFlag_Minimized:
+        throw xtl::make_not_implemented_exception ("GetWindowFlag");
+      default:
+        throw xtl::make_argument_exception ("", "flag", flag);
+    }    
+    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidPlatform::GetWindowFlag");
+    throw;
+  }
 }
 
 /*
@@ -293,12 +303,12 @@ bool Platform::GetWindowFlag (window_t, WindowFlag)
 
 void Platform::SetParentWindowHandle (window_t child, const void* parent_handle)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetParentWindow");
+  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::SetParentWindow");
 }
 
 const void* Platform::GetParentWindowHandle (window_t child)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetParentWindow");
+  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::GetParentWindow");
 
   return 0;
 }
@@ -309,7 +319,7 @@ const void* Platform::GetParentWindowHandle (window_t child)
 
 void Platform::InvalidateWindow (window_t)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::InvalidateWindow");
+  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::InvalidateWindow");
 }
 
 /*
@@ -318,24 +328,22 @@ void Platform::InvalidateWindow (window_t)
 
 void Platform::SetCursorPosition (const Point&)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetCursorPosition");
+  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::SetCursorPosition(const Point&)", "No cursor for Android platform");
 }
 
 Point Platform::GetCursorPosition ()
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetCursorPosition");
-
-  return Point ();
+  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::GetCursorPosition()", "No cursor for Android platform");
 }
 
 void Platform::SetCursorPosition (window_t, const Point& client_position)
 {
-  throw xtl::make_not_implemented_exception ("syslib::Platform::SetCursorPosition (window_t, const Point&)");
+  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::SetCursorPosition(window_t,const Point&)", "No cursor for Android platform");
 }
 
 Point Platform::GetCursorPosition (window_t)
 {
-  throw xtl::make_not_implemented_exception ("syslib::Platform::GetCursorPosition (window_t)");
+  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::GetCursorPosition(window_t)", "No cursor for Android platform");
 }
 
 /*
@@ -344,13 +352,12 @@ Point Platform::GetCursorPosition (window_t)
 
 void Platform::SetCursorVisible (window_t, bool state)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetCursorVisible");
+  if (state)
+    throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::SetCursorVisible", "No cursor for Android platform");
 }
 
 bool Platform::GetCursorVisible (window_t)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::GetCursorVisible");
-
   return false;
 }
 
@@ -360,17 +367,17 @@ bool Platform::GetCursorVisible (window_t)
 
 Platform::cursor_t Platform::CreateCursor (const char*, int, int)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::CreateCursor");
+  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::CreateCursor", "No cursor for Android platform");
 }
 
 void Platform::DestroyCursor (cursor_t)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::DestroyCursor");
+  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::DestroyCursor", "No cursor for Android platform");
 }
 
 void Platform::SetCursor (window_t, cursor_t)
 {
-  throw xtl::make_not_implemented_exception ("syslib::DefaultPlatform::SetCursor");
+  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::SetCursor", "No cursor for Android platform");
 }
 
 /*
@@ -379,24 +386,71 @@ void Platform::SetCursor (window_t, cursor_t)
 
 void Platform::SetBackgroundColor (window_t window, const Color& color)
 {
-  throw xtl::make_not_implemented_exception ("syslib::SetBackgroundColor");
+  try
+  {
+    unsigned int int_color = window->background_state + (unsigned int)color.red * 0x10000 + (unsigned int)color.green * 0x100 +
+      color.blue;
+                             
+    get_env ().CallVoidMethod (window->view.get (), window->set_background_color_method, int_color);
+    
+    check_errors ();
+    
+    window->background_color = int_color & 0xffffffu;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidPlatform::SetBackgroundColor");
+    throw;
+  }
 }
 
 void Platform::SetBackgroundState (window_t window, bool state)
 {
-  throw xtl::make_not_implemented_exception ("syslib::SetBackgroundState");
+  try
+  {
+    window->background_state = state ? 0xff000000u : 0u;
+    
+    get_env ().CallVoidMethod (window->view.get (), window->set_background_color_method, window->background_color | window->background_state);
+    
+    check_errors ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidPlatform::SetBackgroundState");
+    throw;
+  }
 }
 
 Color Platform::GetBackgroundColor (window_t window)
 {
-  throw xtl::make_not_implemented_exception ("syslib::GetBackgroundColor");
-
-  return Color (0, 0, 0);
+  try
+  {
+    unsigned int int_color = window->background_color;
+    
+    Color result;
+    
+    result.blue  = int_color % 0x100;
+    result.green = int_color / 0x100 % 0x100;
+    result.red   = int_color / 0x10000 % 0x100;
+    
+    return result;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidPlatform::GetBackgroundColor");
+    throw;
+  }
 }
 
 bool Platform::GetBackgroundState (window_t window)
 {
-  throw xtl::make_not_implemented_exception ("syslib::GetBackgroundState");
-  
-  return false;
+  try
+  {
+    return window->background_state != 0;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidPlatform::GetBackgroundState");
+    throw;
+  }
 }
