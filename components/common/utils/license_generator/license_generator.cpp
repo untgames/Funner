@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include <stl/stack>
+#include <stl/vector>
 
 #include <xtl/bind.h>
 #include <xtl/function.h>
@@ -33,20 +34,22 @@ struct Option
   const char*                tip;           //подсказка
 };
 
+typedef stl::vector<CheckFile> CheckFileArray;
+
 //параметры запуска
 struct Params
 {
-  const Option* options;            //массив опций
-  size_t        options_count;      //количество опций
-  stl::string   result_license;     //файл генерируемой лицензии
-  time_t        since_date;         //дата начала действия лицензии
-  time_t        till_date;          //дата окончания действия лицензии
-  StringArray   allowed_components; //список разрешенных компонентов
-  StringArray   check_files;        //список файлов для хеширования
-  PropertyMap   properties;         //свойства
-  bool          force;              //игнорирование ошибок неправильного указания времени
-  bool          silent;             //отключение предупреждений
-  bool          print_help;         //печатать ли справку
+  const Option*  options;            //массив опций
+  size_t         options_count;      //количество опций
+  stl::string    result_license;     //файл генерируемой лицензии
+  time_t         since_date;         //дата начала действия лицензии
+  time_t         till_date;          //дата окончания действия лицензии
+  StringArray    allowed_components; //список разрешенных компонентов
+  CheckFileArray check_files;        //список файлов для хеширования
+  PropertyMap    properties;         //свойства
+  bool           force;              //игнорирование ошибок неправильного указания времени
+  bool           silent;             //отключение предупреждений
+  bool           print_help;         //печатать ли справку
 };
 
 void parse_date (const char* date_string, time_t& result_date)
@@ -173,7 +176,10 @@ void command_line_allowed_components (const char* components_list, Params& param
 //установка списка файлов для хеширования
 void command_line_check_files (const char* check_files_list, Params& params)
 {
-  params.check_files += split (check_files_list);
+  common::StringArray strings = split (check_files_list);
+  
+  for (size_t i=0; i<strings.Size (); i++)
+    params.check_files.push_back (CheckFile (strings [i]));
 }
 
 //установка режима игнорирования ошибок
@@ -203,16 +209,20 @@ void validate (Params& params)
 
   if (params.result_license.empty ())
     throw xtl::format_operation_exception (METHOD_NAME, "Result license path not setted");
+
   if (!params.since_date)
     time (&params.since_date);
+
   if (!params.till_date)
     throw xtl::format_operation_exception (METHOD_NAME, "Incomplete license validity period specification, till date not setted");
+
   if (!params.force && difftime (params.till_date, params.since_date) < 0)
     throw xtl::format_operation_exception (METHOD_NAME, "Till date is earlier than since date");
 
   if (!params.silent && params.allowed_components.IsEmpty ())
     printf ("Warning: allowed components list is empty\n");
-  if (!params.silent && params.check_files.IsEmpty ())
+    
+  if (!params.silent && params.check_files.empty ())
     printf ("Warning: check files list is empty\n");
 
   if (!params.force)
@@ -291,15 +301,15 @@ void generate_license (Params& params)
       scope_stack.pop ();
   }
 
-  if (!params.check_files.IsEmpty ())
+  if (!params.check_files.empty ())
   {
     XmlWriter::Scope check_files_scope (writer, "CheckFiles");
 
-    for (size_t i = 0, count = params.check_files.Size (); i < count; i++)
+    for (size_t i = 0, count = params.check_files.size (); i < count; i++)
     {
       XmlWriter::Scope file_scope (writer, "File");
 
-      writer.WriteAttribute ("Path", params.check_files [i]);
+      writer.WriteAttribute ("Path", params.check_files [i].name);
     }
   }
 
@@ -370,7 +380,7 @@ int main (int argc, const char *argv[])
 
     for (size_t i = 0, count = params.allowed_components.Size (); i < count; i++)
       allowed_components_string += params.allowed_components [i];
-
+      
     params.properties.SetProperty ("SinceDate",         since_date_string.c_str ());
     params.properties.SetProperty ("TillDate",          till_date_string.c_str ());
     params.properties.SetProperty ("AllowedComponents", allowed_components_string.c_str ());

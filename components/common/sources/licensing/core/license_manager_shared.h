@@ -19,7 +19,18 @@
 namespace common
 {
 
-void calculate_license_hash (const StringArray& check_files_list, const PropertyMap& properties, unsigned char hash [16]);
+struct CheckFile
+{
+  stl::string name;
+  size_t      max_hash_size;
+  
+  CheckFile (const char* in_name, size_t in_max_hash_size = 0)
+    : name (in_name)
+    , max_hash_size (in_max_hash_size)
+  { }
+};
+
+void calculate_license_hash (const stl::vector<CheckFile>& check_files_list, const PropertyMap& properties, unsigned char hash [16]);
 
 }
 

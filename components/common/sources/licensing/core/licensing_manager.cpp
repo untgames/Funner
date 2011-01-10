@@ -100,10 +100,10 @@ class LicenseManagerImpl
 
           //проверка корректности содержимого лицензии
 
-        StringArray check_files_list;
+        stl::vector<CheckFile> check_files_list;
 
         for (Parser::NamesakeIterator check_file_iter = root.First ("CheckFiles.File"); check_file_iter; ++check_file_iter)
-          check_files_list.Add (common::get<const char*> (*check_file_iter, "Path"));
+          check_files_list.push_back (common::get<const char*> (*check_file_iter, "Path"));
 
         unsigned char check_string_hash [16];
 
