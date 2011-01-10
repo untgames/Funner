@@ -13,24 +13,62 @@ typedef Output::Pointer       OutputPtr;
 
 struct PrimarySwapChain::Impl
 {
-  Log               log;         //протокол
-  AdapterPtr        adapter;     //адаптер, которому принадлежит устройство
-  AdapterLibraryPtr library;     //библиотека адаптера
-  Display*          display;     //соединение с дисплеем
-  Window            window;      //окно
-  SwapChainDesc     desc;        //дескриптор цепочки обмена
-  PropertyList      properties;  //свойства цепочки обмена
+  Log                 log;                     //протокол
+  AdapterPtr          adapter;                 //адаптер, которому принадлежит устройство
+  AdapterLibraryPtr   library;                 //библиотека адаптера
+  GlxExtensionEntries glx_extension_entries;   //таблица WGL-расширений
+  int                 pixel_format_index;      //индекс формата пикселей устройства вывода
+  SwapChainDesc       desc;                    //дескриптор цепочки обмена
+  Display*            display;                 //соединение с дисплеем
+  Window              window;                  //окно
+  PropertyList        properties;              //свойства цепочки обмена
 
 ///Конструктор
-  Impl (Adapter* in_adapter, const SwapChainDesc& in_desc)
-    : adapter (in_adapter)
-    , library (&in_adapter->GetLibrary ())
+  Impl (const SwapChainDesc& in_desc, const PixelFormatDesc& pixel_format)
+    : adapter (pixel_format.adapter)
+    , library (&adapter->GetLibrary ())
+    , pixel_format_index (pixel_format.pixel_format_index)
     , display ((Display*)syslib::x11::DisplayManager::DisplayHandle ())
-    , window ((Window) in_desc.window_handle)
-    , desc (in_desc)
+    , window  ((Window)in_desc.window_handle)
   {
     try
     {
+        //инициализация таблицы расширений
+
+      if (pixel_format.glx_extension_entries)
+      {
+        glx_extension_entries = *pixel_format.glx_extension_entries;
+      }
+      else
+      {
+        memset (&glx_extension_entries, 0, sizeof glx_extension_entries);
+      }
+
+        //установка состояния FullScreen
+
+      if (in_desc.fullscreen)
+      {
+        log.Printf ("...set fullscreen mode");
+        
+        SetFullscreenState (true);
+      }
+      
+        //инициализация дескриптора цепочки обмена
+        
+      int screen = get_screen_number (window);
+
+      desc.frame_buffer.width        = XWidthOfScreen  (screen);
+      desc.frame_buffer.height       = XHeightOfScreen (screen);
+      desc.frame_buffer.color_bits   = pixel_format.color_bits;
+      desc.frame_buffer.alpha_bits   = pixel_format.alpha_bits;
+      desc.frame_buffer.depth_bits   = pixel_format.depth_bits;
+      desc.frame_buffer.stencil_bits = pixel_format.stencil_bits;
+      desc.samples_count             = pixel_format.samples_count;
+      desc.buffers_count             = pixel_format.buffers_count;
+      desc.swap_method               = pixel_format.swap_method;
+      desc.fullscreen                = in_desc.fullscreen;
+      desc.vsync                     = in_desc.vsync;
+      desc.window_handle             = in_desc.window_handle;
     }
     catch (...)
     {
@@ -41,6 +79,7 @@ struct PrimarySwapChain::Impl
 ///Деструктор
   ~Impl ()
   {
+    log.Printf ("...release resources");
   }
   
   void SetFullscreenState (bool state)
@@ -57,22 +96,32 @@ struct PrimarySwapChain::Impl
   {
     throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::GetContainingOutput");
   }
+
+  void Present ();
+  {  
+    try
+    {
+      library->SwapBuffers (display, window);
+    }
+    catch (xtl::exception& exception)
+    {
+      exception.touch ("render::low_level::opengl::glx::PrimarySwapChain::impl::Present");
+      throw;
+    }
+  }
 };
 
 /*
     Конструктор / деструктор
 */
 
-PrimarySwapChain::PrimarySwapChain (Adapter* adapter, const SwapChainDesc& desc)
+PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& sc_desc, const PixelFormatDesc& pf_desc);
 {
   try
   {
-    if (!adapter)
-      throw xtl::make_null_argument_exception ("", "adapter");
-    
-    impl = new Impl (adapter, desc);        
+    impl = new Impl (sc_desc, pf_desc);
 
-    impl->log.Printf ("...swap chain successfully created");
+    impl->log.Printf ("...primary swap chain (id=%u) successfully created", GetId ());
   }
   catch (xtl::exception& exception)
   {
@@ -92,6 +141,38 @@ PrimarySwapChain::~PrimarySwapChain ()
 IAdapter* PrimarySwapChain::GetAdapter ()
 {
   return impl->adapter.get ();
+}
+
+Adapter* PrimarySwapChain::GetAdapterImpl ()
+{
+  return &*impl->adapter;
+}
+
+/*
+    Устройство отображения для текущего контекста
+*/
+
+Display* GetDisplay ()
+{
+  return impl->display;
+}
+
+/*
+    Окно отрисовки
+*/
+
+Window GetWindow ()
+{
+  return impl->window;
+}
+
+/*
+    Получение таблицы GLX-расширений
+*/
+
+const GlxExtensionEntries& GetGlxExtensionEntries ()
+{
+  return impl->glx_extension_entries;
 }
 
 /*
@@ -132,15 +213,7 @@ bool PrimarySwapChain::GetFullscreenState ()
 
 void PrimarySwapChain::Present ()
 {
-  try
-  {
-    impl->library->SwapBuffers (impl->display, impl->window);
-  }
-  catch (xtl::exception& exception)
-  {
-    exception.touch ("render::low_level::opengl::glx::PrimarySwapChain::Present");
-    throw;
-  }
+  impl->Present ();
 }
 
 /*

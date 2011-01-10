@@ -119,7 +119,7 @@ class PlatformManagerImpl
 
         pixel_formats.reserve (PIXEL_FORMAT_ARRAY_RESERVE_SIZE);
         glx_extension_entries.reserve (adapters_count);
-
+        
         for (size_t i=0; i<adapters_count; i++)
         {
           IAdapter* in_adapter = adapters [i];
@@ -188,7 +188,7 @@ class PlatformManagerImpl
 
           //создание цепочки обмена
 
-        return new PrimarySwapChain (adapter, desc);
+        return new PrimarySwapChain (desc, pixel_format);
       }
       catch (xtl::exception& exception)
       {

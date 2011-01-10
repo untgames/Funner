@@ -124,19 +124,6 @@ AdapterLibrary& Adapter::GetLibrary ()
     Перечисление доступных форматов пикселей
 */
 
-int get_fb_config_attrib (AdapterLibrary& library, Display *display, GLXFBConfig config, int attribute)
-{
-  int value = 0;
-  
-  Status result = library.GetFBConfigAttrib (display, config, attribute, &value);
-  
-  if (result < Success)
-    throw xtl::format_operation_exception ("render::low_level::opengl::glx::Adapter::EnumPixelFormats",
-      "glXGetFBConfigAttrib failed");
-  
-  return value;
-}
-
 void Adapter::EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, GlxExtensionEntriesArray& entries)
 {
     // блокировка дисплея
