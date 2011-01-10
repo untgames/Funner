@@ -454,7 +454,7 @@ GLXFBConfig* AdapterLibrary::GetFBConfigs (Display *dpy, int screen, int *neleme
     Возвращает список конфигураций GLX-буфера кадра, соответствующих заданным атрибутам
 */
 
-GLXFBConfig* ChooseFBConfig (Display *dpy, int screen, int *attrib_list, int *nelements)
+GLXFBConfig* AdapterLibrary::ChooseFBConfig (Display *dpy, int screen, int *attrib_list, int *nelements)
 {
   return impl->fglXChooseFBConfig (dpy, screen, attrib_list, nelements);
 }
