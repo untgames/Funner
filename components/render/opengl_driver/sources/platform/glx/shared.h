@@ -233,8 +233,14 @@ class AdapterLibrary: virtual public ILibrary, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конфигурация буфера кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    int          GetFBConfigAttrib (Display *dpy, GLXFBConfig config, int attribute, int *value); //возвращает информацию о конфигурации GLX-буфера кадра
-    GLXFBConfig* GetFBConfigs      (Display *dpy, int screen, int *nelements); //возвращает список конфигураций GLX-буфера кадра, соответствующих заданным атрибутам
+    //возвращает информацию о конфигурации GLX-буфера кадра
+    int GetFBConfigAttrib (Display *dpy, GLXFBConfig config, int attribute, int *value); 
+    
+    //возвращает список всех конфигураций GLX-буфера кадра для данного экрана
+    GLXFBConfig* GetFBConfigs (Display *dpy, int screen, int *nelements);
+    
+    //возвращает список конфигураций GLX-буфера кадра, соответствующих заданным атрибутам
+    GLXFBConfig* ChooseFBConfig (Display *dpy, int screen, int *attrib_list, int *nelements);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен содержимого рабочего и фонового буферов
@@ -328,7 +334,7 @@ class ISwapChainImpl: virtual public ISwapChain
     virtual Display*                   GetDisplay             () = 0; //устройство отображения для текущего контекста
     virtual Window                     GetWindow              () = 0; //окно отрисовки
     virtual const GlxExtensionEntries& GetGlxExtensionEntries () = 0; //получение таблицы GLX-расширений
-    virtual GLXFBConfig                GetFBConfig            () = 0;
+    virtual GLXFBConfig                GetFBConfig            () = 0; //конфигурация буфера кадра
 
   protected:
     virtual ~ISwapChainImpl () {}
@@ -366,6 +372,11 @@ class PrimarySwapChain: virtual public ISwapChainImpl, public Object
 ///Получение таблицы GLX-расширений
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const GlxExtensionEntries& GetGlxExtensionEntries ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конфигурация буфера кадра
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    GLXFBConfig GetFBConfig ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение дескриптора

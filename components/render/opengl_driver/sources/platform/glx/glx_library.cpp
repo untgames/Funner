@@ -22,6 +22,7 @@ typedef Bool         (*glXQueryVersionFn)           (Display *dpy, int *major, i
 typedef const char*  (*glXQueryServerStringFn)      (Display *dpy, int screen, int name);
 typedef int          (*glXGetFBConfigAttribFn)      (Display *dpy, GLXFBConfig config, int attribute, int *value);
 typedef GLXFBConfig* (*glXGetFBConfigsFn)           (Display *dpy, int screen, int *nelements);
+typedef GLXFBConfig* (*glXChooseFBConfigFn)         (Display *dpy, int screen, int *attrib_list, int *nelements);
 typedef const char*  (*glXQueryExtensionsStringFn)  (Display *dpy, int screen);
 typedef void*        (*glXGetProcAddressFn)         (const char *procName);
 typedef GLXContext   (*glXGetCurrentContextFn)      (void);
@@ -152,6 +153,7 @@ struct AdapterLibrary::Impl
   glXGetProcAddressFn         fglXGetProcAddress;
   glXGetFBConfigAttribFn      fglXGetFBConfigAttrib;
   glXGetFBConfigsFn           fglXGetFBConfigs;
+  glXChooseFBConfigFn         fglXChooseFBConfig;
   glXQueryExtensionsStringFn  fglXQueryExtensionsString;
 
 ///Конструктор
@@ -183,6 +185,7 @@ struct AdapterLibrary::Impl
       GetSymbol ("glXGetProcAddress",         fglXGetProcAddress);
       GetSymbol ("glXGetFBConfigAttrib",      fglXGetFBConfigAttrib);
       GetSymbol ("glXGetFBConfigs",           fglXGetFBConfigs);
+      GetSymbol ("glXChooseFBConfig",         fglXChooseFBConfig);
       GetSymbol ("glXQueryExtensionsString",  fglXQueryExtensionsString);
 
         //вывод общей информации
@@ -439,12 +442,21 @@ int AdapterLibrary::GetFBConfigAttrib (Display *dpy, GLXFBConfig config, int att
 }
 
 /*
-    Возвращает список конфигураций GLX-буфера кадра, соответствующих заданным атрибутам
+    Возвращает список всех конфигураций GLX-буфера кадра для данного экрана
 */
 
 GLXFBConfig* AdapterLibrary::GetFBConfigs (Display *dpy, int screen, int *nelements)
 {
   return impl->fglXGetFBConfigs (dpy, screen, nelements);
+}
+
+/*
+    Возвращает список конфигураций GLX-буфера кадра, соответствующих заданным атрибутам
+*/
+
+GLXFBConfig* ChooseFBConfig (Display *dpy, int screen, int *attrib_list, int *nelements)
+{
+  return impl->fglXChooseFBConfig (dpy, screen, attrib_list, nelements);
 }
 
 /*

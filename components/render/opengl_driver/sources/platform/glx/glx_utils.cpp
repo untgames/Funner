@@ -13,7 +13,7 @@ namespace glx
 {
 
 /*
-    Получние номера экрана
+    Получние экрана и номера экрана
 */
 
 Screen* get_screen (Window window)
