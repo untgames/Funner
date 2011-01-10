@@ -5,6 +5,23 @@ using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::glx;
 
 /*
+    Получение информации о конфигурации буфера кадра
+*/
+
+int get_fb_config_attrib (AdapterLibrary& library, Display *display, GLXFBConfig config, int attribute)
+{
+  int value = 0;
+  
+  Status result = library.GetFBConfigAttrib (display, config, attribute, &value);
+  
+  if (result < Success)
+    throw xtl::format_operation_exception ("render::low_level::opengl::glx::Adapter::EnumPixelFormats",
+      "glXGetFBConfigAttrib failed");
+  
+  return value;
+}
+
+/*
     Описание реализации адаптера
 */
 
