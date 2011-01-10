@@ -42,6 +42,10 @@ Screen* get_screen (Window window)
 
 int get_screen_number (Window window)
 {
+  Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
+
+  DisplayLock lock (display);
+
   return XScreenNumberOfScreen (get_screen (window));
 }
 
