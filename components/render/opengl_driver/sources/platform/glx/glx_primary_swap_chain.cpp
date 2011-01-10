@@ -41,8 +41,22 @@ struct PrimarySwapChain::Impl
 ///Деструктор
   ~Impl ()
   {
-
-  }  
+  }
+  
+  void SetFullscreenState (bool state)
+  {
+    throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::SetFullscreenState");
+  }
+  
+  bool GetFullscreenState ()
+  {
+    throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::GetFullscreenState");
+  }
+  
+  IOutput* GetContainingOutput ()
+  {
+    throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::GetContainingOutput");
+  }
 };
 
 /*
@@ -95,7 +109,7 @@ void PrimarySwapChain::GetDesc (SwapChainDesc& out_desc)
 
 IOutput* PrimarySwapChain::GetContainingOutput ()
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::GetContainingOutput");
+  return impl->GetContainingOutput ();
 }
 
 /*
@@ -104,12 +118,12 @@ IOutput* PrimarySwapChain::GetContainingOutput ()
 
 void PrimarySwapChain::SetFullscreenState (bool state)
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::SetFullscreenState");
+  impl->SetFullscreenState (state);
 }
 
 bool PrimarySwapChain::GetFullscreenState ()
 {
-  throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::GetFullscreenState");
+  return impl->GetFullscreenState ();
 }
 
 /*

@@ -305,7 +305,7 @@ class Adapter: virtual public IAdapter, public Object
     typedef stl::vector<PixelFormatDesc>     PixelFormatArray;
     typedef stl::vector<GlxExtensionEntries> GlxExtensionEntriesArray;
 
-    void EnumPixelFormats (Display *display, int screen, PixelFormatArray& pixel_formats, GlxExtensionEntriesArray& entries);
+    void EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, GlxExtensionEntriesArray& entries);
 
   private:
     Adapter (const Adapter&); //no impl
@@ -420,6 +420,11 @@ class Context: virtual public IContext, public Object
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получние номера экрана
+///////////////////////////////////////////////////////////////////////////////////////////////////
+int get_screen_number (Window window);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка ошибок

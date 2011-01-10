@@ -137,12 +137,14 @@ int get_fb_config_attrib (AdapterLibrary& library, Display *display, GLXFBConfig
   return value;
 }
 
-void Adapter::EnumPixelFormats (Display *display, int screen, PixelFormatArray& pixel_formats, GlxExtensionEntriesArray& entries)
+void Adapter::EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, GlxExtensionEntriesArray& entries)
 {
     // блокировка дисплея
+    
+  Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
 
   DisplayLock lock (display);
-  
+ 
   int nelems = 0;
   
   GLXFBConfig *configs = impl->library->GetFBConfigs (display, screen, &nelems);

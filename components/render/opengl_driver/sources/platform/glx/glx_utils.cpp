@@ -13,6 +13,34 @@ namespace glx
 {
 
 /*
+    Получние номера экрана
+*/
+
+int get_screen_number (Window window)
+{
+  Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
+
+  DisplayLock lock (display);
+
+  XWindowAttributes window_attributes_return;
+  
+  Status result = XGetWindowAttributes (display, window, &window_attributes_return);
+  
+  if (result < Success)
+    throw xtl::format_operation_exception ("render::low_level::opengl::glx::GetScreenNumber",
+      "XGetWindowAttributes failed");
+      
+  // back pointer to correct screen
+  Screen *screen = window_attributes_return.screen;
+  
+  if (!screen)
+    throw xtl::format_operation_exception ("render::low_level::opengl::glx::GetScreenNumber",
+      "incorrect screen pointer");
+      
+  return XScreenNumberOfScreen (screen);
+}
+
+/*
     Проверка ошибок
 */
 
