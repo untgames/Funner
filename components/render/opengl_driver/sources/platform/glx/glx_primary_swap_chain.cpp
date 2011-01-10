@@ -90,7 +90,7 @@ struct PrimarySwapChain::Impl
       
         //инициализация конфигурации буфера кадра
         
-      glx_fb_config = get_fb_config (library, display, get_screen_number (window), pixel_format_index);
+      glx_fb_config = get_fb_config (*library, display, get_screen_number (window), pixel_format_index);
             
         //инициализация дескриптора цепочки обмена
         
