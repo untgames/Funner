@@ -238,6 +238,8 @@ struct SoundManager::Impl : public xtl::trackable
 
       manager_emitter->cur_position = offset;
 
+      UpdateEmitterProperties (emitter, EmitterEvent_OnUpdateProperties);
+
       if (manager_emitter->channel_number != -1)
       {
         device->Stop (manager_emitter->channel_number);
