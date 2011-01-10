@@ -97,7 +97,7 @@ struct PrimarySwapChain::Impl
     throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::GetContainingOutput");
   }
 
-  void Present ();
+  void Present ()
   {  
     try
     {
