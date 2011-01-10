@@ -328,6 +328,7 @@ class ISwapChainImpl: virtual public ISwapChain
     virtual Display*                   GetDisplay             () = 0; //устройство отображения для текущего контекста
     virtual Window                     GetWindow              () = 0; //окно отрисовки
     virtual const GlxExtensionEntries& GetGlxExtensionEntries () = 0; //получение таблицы GLX-расширений
+    virtual GLXFBConfig                GetFBConfig            () = 0;
 
   protected:
     virtual ~ISwapChainImpl () {}
