@@ -11,7 +11,8 @@ export.compile.extern.zzip.COMPILER_DEFINES            := ZZIP_DLL
 endif
 
 # Dynamic library link exports
-export.link.extern.zzip.LIBS := funner.extern.zzip
+export.link.extern.zzip.LIBS    := funner.extern.zzip
+export.link.extern.zzip.IMPORTS := link.extern.zlib
 
 # Run exports
 ifeq (,$(filter no_dll,$(PROFILES)))
