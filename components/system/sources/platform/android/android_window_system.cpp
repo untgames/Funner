@@ -3,6 +3,9 @@
 using namespace syslib;
 using namespace syslib::android;
 
+//TODO: обработка исключений в CreateWindow и удаление окна
+//TODO: wait for surface created
+
 /*
     Окно
 */
@@ -29,6 +32,7 @@ struct Platform::window_handle
   jmethodID            post_invalidate_method;         //метод оповещения о необходимости перерисовки окна
   jmethodID            bring_to_front_method;          //метод перемещения окна на передний план
   
+///Конструктор
   window_handle ()
     : native_handle (0)
     , message_handler (0)
@@ -36,13 +40,71 @@ struct Platform::window_handle
     , background_color (0)
     , background_state (0)
   {
-  }
-  
+    MessageQueueSingleton::Instance ()->RegisterHandler (this);
+  }  
+
+///Деструктор
   ~window_handle ()
   {
+    MessageQueueSingleton::Instance ()->UnregisterHandler (this);
+    
     if (native_handle)
       ANativeWindow_release (native_handle);
   }
+  
+  void OnLayoutCallback (int left, int top, int right, int bottom)
+  {
+    printf ("on_layout_callback(%d, %d, %d, %d)\n", left, top, right, bottom);
+    fflush (stdout);    
+  }
+
+  void OnDisplayHintCallback (int hint)
+  {
+    printf ("on_display_hint_callback(%d)\n", hint);
+    fflush (stdout);
+  }
+
+  void OnDrawCallback ()
+  {
+    printf ("on_draw_callback()\n");
+    fflush (stdout);
+  }
+
+  void OnTouchCallback (int pointer_id, int action, float x, float y)
+  {
+    printf ("on_touch_callback(%d, %d, %g, %g)\n", pointer_id, action, x, y);
+    fflush (stdout);
+  }
+
+  void OnTrackballCallback (int pointer_id, int action, float x, float y)
+  {
+    printf ("on_trackball_callback(%d, %d, %g, %g)\n", pointer_id, action, x, y);
+    fflush (stdout);
+  }
+
+  void OnKeyCallback (int key, int action, bool is_alt_pressed, bool is_shift_pressed, bool is_sym_pressed)
+  {
+    printf ("on_key_callback(%d, %d, %d, %d, %d)\n", key, action, is_alt_pressed, is_shift_pressed, is_sym_pressed);
+    fflush (stdout);
+  }
+
+  void OnFocusCallback (jboolean gained)
+  {
+    printf ("on_focus_callback(%d)\n", gained);
+    fflush (stdout);
+  }
+
+  void OnSurfaceCreatedCallback ()
+  {
+    printf ("on_surface_created_callback()\n");
+    fflush (stdout);
+  }
+
+  void OnSurfaceDestroyedCallback ()
+  {
+    printf ("on_surface_destroyed_callback()\n");
+    fflush (stdout);
+  }  
 };
 
 namespace
@@ -54,11 +116,11 @@ const int VIEW_INVISIBLE = 4; //окно невидимо
 const int VIEW_GONE      = 8; //окно невидимо и исключено из расчёта лэйаута
 
 ///Поддержка класса окна
-class JniWindowClass
+class JniWindowManager
 {
   public:
 ///Конструктор
-    JniWindowClass ()
+    JniWindowManager ()
     {
       try
       {          
@@ -73,7 +135,7 @@ class JniWindowClass
       }
       catch (xtl::exception& e)
       {
-        e.touch ("syslib::android::JniWindowClass::JniWindowClass");
+        e.touch ("syslib::android::JniWindowManager::JniWindowManager");
         throw;
       }
     }
@@ -90,70 +152,151 @@ class JniWindowClass
         
       return view;
     }
+    
+///Регистрация дескриптора окна
+    void RegisterWindow (jobject view, Platform::window_t window)
+    {
+      if (FindWindow (view))
+        throw xtl::format_operation_exception ("syslib::android::JniWindowManager::RegisterWindow", "Window have already registered");
+        
+      windows.push_back (WindowEntry (view, window));
+    }
+    
+    void UnregisterWindow (jobject view)
+    {
+      if (!view)
+        return;
+      
+      JNIEnv& env = get_env ();
+      
+      for (WindowEntryList::iterator iter=windows.begin (), end=windows.end (); iter!=end; ++iter)
+        if (env.IsSameObject (view, iter->view.get ()))
+        {
+          windows.erase (iter);
+          
+          return;
+        }
+    }
+    
+///Поиск дескриптора окна
+    Platform::window_t FindWindow (jobject view) const
+    {
+      if (!view)
+        return 0;
+      
+      JNIEnv& env = get_env ();
+      
+      for (WindowEntryList::const_iterator iter=windows.begin (), end=windows.end (); iter!=end; ++iter)
+        if (env.IsSameObject (view, iter->view.get ()))
+          return iter->window;
+          
+      return 0;
+    }
+    
+  private:
+    struct WindowEntry
+    {
+      global_ref<jobject> view;
+      Platform::window_t  window;
+      
+      WindowEntry (jobject in_view, Platform::window_t in_window)
+        : view (in_view)
+        , window (in_window)
+      {
+      }
+    };
+  
+    typedef stl::list<WindowEntry> WindowEntryList;
 
   private:
     global_ref<jclass> activity_class;
     jmethodID          create_view_method;
+    WindowEntryList    windows;
 };
 
-typedef common::Singleton<JniWindowClass> JniWindowClassSingleton;
+typedef common::Singleton<JniWindowManager> JniWindowManagerSingleton;
 
 /*
     Функции обратного вызова
 */
 
+template <class Fn> class WindowMessage: public MessageQueue::Message
+{
+  public:
+    WindowMessage (Platform::window_t in_window, const Fn& in_fn)
+      : window (in_window)
+      , fn (in_fn) {}
+
+    void Dispatch ()
+    {
+      fn (window);
+    }
+
+  private:
+    Platform::window_t window;
+    Fn                 fn;
+};
+
+template <class Fn> void push_message (jobject view, const Fn& fn)
+{
+  try
+  {
+    Platform::window_t window = JniWindowManagerSingleton::Instance ()->FindWindow (view);
+    
+    if (!window)
+      return;
+    
+    MessageQueueSingleton::Instance ()->PushMessage (window, MessageQueue::MessagePtr (new WindowMessage<Fn> (window, fn), false));
+  }
+  catch (...)
+  {
+    //подавление всех исключений
+  }
+}
+
 void on_layout_callback (JNIEnv& env, jobject view, int left, int top, int right, int bottom)
 {
-  printf ("on_layout_callback(%d, %d, %d, %d)\n", left, top, right, bottom);
-  fflush (stdout);
+  push_message (view, xtl::bind (&Platform::window_handle::OnLayoutCallback, _1, left, top, right, bottom));
 }
 
 void on_display_hint_callback (JNIEnv& env, jobject view, int hint)
 {
-  printf ("on_display_hint_callback(%d)\n", hint);
-  fflush (stdout);
+  push_message (view, xtl::bind (&Platform::window_handle::OnDisplayHintCallback, _1, hint));
 }
 
 void on_draw_callback (JNIEnv& env, jobject view)
 {
-  printf ("on_draw_callback()\n");
-  fflush (stdout);
+  push_message (view, xtl::bind (&Platform::window_handle::OnDrawCallback, _1));
 }
 
 void on_touch_callback (JNIEnv& env, jobject view, int pointer_id, int action, float x, float y)
 {
-  printf ("on_touch_callback(%d, %d, %g, %g)\n", pointer_id, action, x, y);
-  fflush (stdout);
+  push_message (view, xtl::bind (&Platform::window_handle::OnTouchCallback, _1, pointer_id, action, x, y));
 }
 
 void on_trackball_callback (JNIEnv& env, jobject view, int pointer_id, int action, float x, float y)
 {
-  printf ("on_trackball_callback(%d, %d, %g, %g)\n", pointer_id, action, x, y);
-  fflush (stdout);
+  push_message (view, xtl::bind (&Platform::window_handle::OnTrackballCallback, _1, pointer_id, action, x, y));
 }
 
 void on_key_callback (JNIEnv& env, jobject view, int key, int action, jboolean is_alt_pressed, jboolean is_shift_pressed, jboolean is_sym_pressed)
 {
-  printf ("on_key_callback(%d, %d, %d, %d, %d)\n", key, action, is_alt_pressed, is_shift_pressed, is_sym_pressed);
-  fflush (stdout);
+  push_message (view, xtl::bind (&Platform::window_handle::OnKeyCallback, _1, key, action, is_alt_pressed != 0, is_shift_pressed != 0, is_sym_pressed != 0));
 }
 
 void on_focus_callback (JNIEnv& env, jobject view, jboolean gained)
 {
-  printf ("on_focus_callback(%d)\n", gained);
-  fflush (stdout);
+  push_message (view, xtl::bind (&Platform::window_handle::OnFocusCallback, _1, gained != 0));
 }
 
 void on_surface_created_callback (JNIEnv& env, jobject view)
 {
-  printf ("on_surface_created_callback()\n");
-  fflush (stdout);
+  push_message (view, xtl::bind (&Platform::window_handle::OnSurfaceCreatedCallback, _1));
 }
 
 void on_surface_destroyed_callback (JNIEnv& env, jobject view)
 {
-  printf ("on_surface_destroyed_callback()\n");
-  fflush (stdout);
+  push_message (view, xtl::bind (&Platform::window_handle::OnSurfaceDestroyedCallback, _1));
 }
 
 }
@@ -168,7 +311,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
   {
     stl::auto_ptr<window_handle> window (new window_handle);
     
-    window->view            = JniWindowClassSingleton::Instance ()->CreateView (init_string);
+    window->view            = JniWindowManagerSingleton::Instance ()->CreateView (init_string);
     window->message_handler = handler;
     window->user_data       = user_data;
     
@@ -203,6 +346,8 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
       throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");
 
     window->native_handle = ANativeWindow_fromSurface (&env, surface.get ());
+    
+    JniWindowManagerSingleton::Instance ()->RegisterWindow (window->view.get (), window.get ());
 
 //    if (!window->native_handle) //callback processing
 //      throw xtl::format_operation_exception ("", "ANativeWindow_fromSurface failed");

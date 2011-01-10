@@ -21,6 +21,7 @@
 #include <syslib/platform/android.h>
 
 #include <platform/platform.h>
+#include <platform/message_queue.h>
 
 namespace syslib
 {

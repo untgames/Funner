@@ -539,7 +539,8 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
   switch (style)
   {
     case WindowStyle_Overlapped:
-      win_style = WS_OVERLAPPEDWINDOW;
+//      win_style = WS_OVERLAPPEDWINDOW;
+      win_style = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 
       if (parent_handle)
         win_style |= WS_CHILD | WS_CLIPSIBLINGS;

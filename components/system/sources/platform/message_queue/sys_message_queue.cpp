@@ -1,7 +1,6 @@
-#include "shared.h"
+#include <platform/message_queue.h>
 
 using namespace syslib;
-using namespace syslib::x11;
 
 /*
     Конструктор / деструктор
@@ -36,7 +35,7 @@ void MessageQueue::RegisterHandler (handler_t handler)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::x11::MessageQueue::RegisterHandler");
+    e.touch ("syslib::MessageQueue::RegisterHandler");
     throw;
   }
 }
@@ -51,7 +50,7 @@ void MessageQueue::UnregisterHandler (handler_t handler)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::x11::MessageQueue::UnregisterHandler");
+    e.touch ("syslib::MessageQueue::UnregisterHandler");
     throw;
   }
 }
@@ -77,7 +76,7 @@ void MessageQueue::PushMessage (handler_t handler, const MessagePtr& message)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::x11::MessageQueue::PushMessage");
+    e.touch ("syslib::MessageQueue::PushMessage");
     throw;
   }
 }
@@ -94,7 +93,7 @@ void MessageQueue::PushEmptyMessage ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::x11::MessageQueue::PushEmptyMessage");
+    e.touch ("syslib::MessageQueue::PushEmptyMessage");
     throw;
   }
 }
@@ -123,7 +122,7 @@ void MessageQueue::DispatchFirstMessage ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::x11::MessageQueue::DispatchFirstMessage");
+    e.touch ("syslib::MessageQueue::DispatchFirstMessage");
     throw;
   }
 }
@@ -142,7 +141,7 @@ bool MessageQueue::IsEmpty () const
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::x11::MessageQueue::IsEmpty");
+    e.touch ("syslib::MessageQueue::IsEmpty");
     throw;
   }
 }
@@ -158,7 +157,7 @@ void MessageQueue::WaitMessage ()
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::x11::MessageQueue::IsEmpty");
+    e.touch ("syslib::MessageQueue::IsEmpty");
     throw;
   }
 }

@@ -177,7 +177,7 @@ public class EngineView extends SurfaceView implements SurfaceHolder.Callback, S
   private native void onKeyCallback              (int keycode, int action, boolean alt_pressed, boolean shift_pressed, boolean is_sym_pressed);
   private native void onFocusCallback            (boolean focusGained);
   private native void onSurfaceCreatedCallback   ();
-  private native void onSurfaceDestroyedCallback ();  
+  private native void onSurfaceDestroyedCallback ();
   
   @Override
   protected void onLayout (boolean changed, int left, int top, int right, int bottom)
