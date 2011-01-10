@@ -39,17 +39,18 @@ typedef stl::vector<CheckFile> CheckFileArray;
 //параметры запуска
 struct Params
 {
-  const Option*  options;            //массив опций
-  size_t         options_count;      //количество опций
-  stl::string    result_license;     //файл генерируемой лицензии
-  time_t         since_date;         //дата начала действия лицензии
-  time_t         till_date;          //дата окончания действия лицензии
-  StringArray    allowed_components; //список разрешенных компонентов
+  const Option* options;            //массив опций
+  size_t        options_count;      //количество опций
+  stl::string   result_license;     //файл генерируемой лицензии
+  time_t        since_date;         //дата начала действия лицензии
+  time_t        till_date;          //дата окончания действия лицензии
+  StringArray   allowed_components; //список разрешенных компонентов
   CheckFileArray check_files;        //список файлов для хеширования
-  PropertyMap    properties;         //свойства
-  bool           force;              //игнорирование ошибок неправильного указания времени
-  bool           silent;             //отключение предупреждений
-  bool           print_help;         //печатать ли справку
+  PropertyMap   properties;         //свойства
+  bool          force;              //игнорирование ошибок неправильного указания времени
+  bool          silent;             //отключение предупреждений
+  bool          unlimited;          //лицензия не ограничена по времени
+  bool          print_help;         //печатать ли справку
 };
 
 void parse_date (const char* date_string, time_t& result_date)
@@ -194,6 +195,12 @@ void command_line_silent (const char*, Params& params)
   params.silent = true;
 }
 
+//установка неограниченной лицензии
+void command_line_unlimited (const char*, Params& params)
+{
+  params.unlimited = true;
+}
+
 //формирование строки из даты
 stl::string date_to_string (time_t date)
 {
@@ -213,10 +220,10 @@ void validate (Params& params)
   if (!params.since_date)
     time (&params.since_date);
 
-  if (!params.till_date)
+  if (!params.till_date && !params.unlimited)
     throw xtl::format_operation_exception (METHOD_NAME, "Incomplete license validity period specification, till date not setted");
 
-  if (!params.force && difftime (params.till_date, params.since_date) < 0)
+  if (!params.force && difftime (params.till_date, params.since_date) < 0 && !params.unlimited)
     throw xtl::format_operation_exception (METHOD_NAME, "Till date is earlier than since date");
 
   if (!params.silent && params.allowed_components.IsEmpty ())
@@ -231,7 +238,7 @@ void validate (Params& params)
 
     time (&current_time);
 
-    if (difftime (params.till_date, current_time) < 0)
+    if (!params.unlimited && difftime (params.till_date, current_time) < 0)
       throw xtl::format_operation_exception (METHOD_NAME, "Till date already passed");
   }
 }
@@ -342,6 +349,7 @@ int main (int argc, const char *argv[])
       {xtl::bind (&command_line_till_date,          _1, xtl::ref (params)), "till-date",   't', "date",           "till date"},
       {xtl::bind (&command_line_force,              _1, xtl::ref (params)), "force",       0,   0,                "force (ignore errors)"},
       {xtl::bind (&command_line_silent,             _1, xtl::ref (params)), "silent",      0,   0,                "silent mode"},
+      {xtl::bind (&command_line_unlimited,          _1, xtl::ref (params)), "unlimited",   0,   0,                "unlimited license"},
       {xtl::bind (&command_line_help,               _1, xtl::ref (params)), "help",        '?', 0,                "print help message"},
     };
 
@@ -351,6 +359,7 @@ int main (int argc, const char *argv[])
     params.options_count = options_count;
     params.force         = false;
     params.silent        = false;
+    params.unlimited     = false;
     params.print_help    = false;
     params.since_date    = 0;
     params.till_date     = 0;
@@ -374,15 +383,20 @@ int main (int argc, const char *argv[])
     validate (params);
 
       //Добавление данных периода действия и набора компонентов в свойства
-    stl::string since_date_string = date_to_string (params.since_date),
-                till_date_string  = date_to_string (params.till_date),
-                allowed_components_string;
+    if (!params.unlimited)
+    {
+      stl::string since_date_string = date_to_string (params.since_date),
+                  till_date_string  = date_to_string (params.till_date);
+
+      params.properties.SetProperty ("SinceDate", since_date_string.c_str ());
+      params.properties.SetProperty ("TillDate",  till_date_string.c_str ());
+    }
+
+    stl::string allowed_components_string;
 
     for (size_t i = 0, count = params.allowed_components.Size (); i < count; i++)
       allowed_components_string += params.allowed_components [i];
       
-    params.properties.SetProperty ("SinceDate",         since_date_string.c_str ());
-    params.properties.SetProperty ("TillDate",          till_date_string.c_str ());
     params.properties.SetProperty ("AllowedComponents", allowed_components_string.c_str ());
 
     if (command_line.ParamsCount ())

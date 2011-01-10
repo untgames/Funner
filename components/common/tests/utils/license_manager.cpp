@@ -10,7 +10,8 @@ const char*  COMPONENTS_TO_CHECK []    = { "common.zip_file_system", "media.vide
 const size_t COMPONENTS_TO_CHECK_COUNT = sizeof (COMPONENTS_TO_CHECK) / sizeof (*COMPONENTS_TO_CHECK);
 const char*  LICENSES_PATHS []         = { "data/expired_license.xml", "data/future_license.xml",
                                            "data/invalid_date_license.xml", "data/invalid_license.xml",
-                                           "data/valid_license.xml", "data/check_files_license.xml" };
+                                           "data/valid_license.xml", "data/check_files_license.xml",
+                                           "data/unlimited_license.xml" };
 
 int main ()
 {
