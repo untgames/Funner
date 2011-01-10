@@ -122,6 +122,8 @@ class ScenePlayerEmitter: public xtl::trackable
       if (is_playing)
         OnStop ();
             
+      OnUpdate ();
+
       emitter.SetSampleIndex (rand ());
 
       is_playing        = true;
@@ -245,11 +247,9 @@ class ScenePlayerListener: public xtl::trackable
 
       sound::Listener sound_listener;
 
-      math::mat4f listener_world_tm = scene_listener.WorldTM ();
-
-      sound_listener.position  = listener_world_tm * math::vec3f (0.f);
-      sound_listener.direction = listener_world_tm * math::vec4f (0.f, 0.f, -1.f, 0.f);
-      sound_listener.up        = listener_world_tm * math::vec4f (0.f, 1.f, 0.f, 0.f);
+      sound_listener.position  = scene_listener.WorldPosition ();
+      sound_listener.direction = scene_listener.WorldOrtZ ();
+      sound_listener.up        = scene_listener.WorldOrtY ();
 
       sound_manager->SetListener (sound_listener);
       sound_manager->SetVolume   (scene_listener.Gain ());
