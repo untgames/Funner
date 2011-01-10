@@ -150,7 +150,7 @@ Adapter* PrimarySwapChain::GetAdapterImpl ()
     Устройство отображения для текущего контекста
 */
 
-Display* GetDisplay ()
+Display* PrimarySwapChain::GetDisplay ()
 {
   return impl->display;
 }
@@ -159,7 +159,7 @@ Display* GetDisplay ()
     Окно отрисовки
 */
 
-Window GetWindow ()
+Window PrimarySwapChain::GetWindow ()
 {
   return impl->window;
 }
@@ -168,7 +168,7 @@ Window GetWindow ()
     Получение таблицы GLX-расширений
 */
 
-const GlxExtensionEntries& GetGlxExtensionEntries ()
+const GlxExtensionEntries& PrimarySwapChain::GetGlxExtensionEntries ()
 {
   return impl->glx_extension_entries;
 }
