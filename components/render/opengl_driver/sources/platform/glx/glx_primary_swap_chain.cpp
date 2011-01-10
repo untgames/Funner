@@ -23,7 +23,7 @@ GLXFBConfig get_fb_config (AdapterLibrary& library, Display *display, int screen
 
   int nelements = 0;
         
-  GLXFBConfig* config = library->ChooseFBConfig (display, screen, attrib_list, &nelements);
+  GLXFBConfig* config = library.ChooseFBConfig (display, screen, attrib_list, &nelements);
   
   if (!config)
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::get_fb_config",
