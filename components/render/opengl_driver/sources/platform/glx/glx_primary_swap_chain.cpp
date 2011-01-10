@@ -113,7 +113,7 @@ struct PrimarySwapChain::Impl
     Конструктор / деструктор
 */
 
-PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& sc_desc, const PixelFormatDesc& pf_desc);
+PrimarySwapChain::PrimarySwapChain (const SwapChainDesc& sc_desc, const PixelFormatDesc& pf_desc)
 {
   try
   {
