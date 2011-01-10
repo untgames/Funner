@@ -17,6 +17,8 @@
 #include <syslib/window.h>
 #include <syslib/platform/x11.h>
 
+#include <render/low_level/utils.h>
+
 #include <shared/log.h>
 #include <shared/object.h>
 #include <shared/platform.h>
