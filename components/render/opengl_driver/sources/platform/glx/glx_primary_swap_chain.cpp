@@ -55,10 +55,8 @@ struct PrimarySwapChain::Impl
       
         //инициализация дескриптора цепочки обмена
         
-      int screen = get_screen_number (window);
-
-      desc.frame_buffer.width        = XWidthOfScreen  (screen);
-      desc.frame_buffer.height       = XHeightOfScreen (screen);
+      desc.frame_buffer.width        = XWidthOfScreen (get_screen (window));
+      desc.frame_buffer.height       = XHeightOfScreen (get_screen (window));
       desc.frame_buffer.color_bits   = pixel_format.color_bits;
       desc.frame_buffer.alpha_bits   = pixel_format.alpha_bits;
       desc.frame_buffer.depth_bits   = pixel_format.depth_bits;

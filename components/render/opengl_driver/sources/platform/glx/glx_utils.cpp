@@ -16,7 +16,7 @@ namespace glx
     Получние номера экрана
 */
 
-int get_screen_number (Window window)
+Screen* get_screen (Window window)
 {
   Display* display = (Display*) syslib::x11::DisplayManager::DisplayHandle ();
 
@@ -37,7 +37,12 @@ int get_screen_number (Window window)
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::GetScreenNumber",
       "incorrect screen pointer");
       
-  return XScreenNumberOfScreen (screen);
+  return screen;
+}
+
+int get_screen_number (Window window)
+{
+  return XScreenNumberOfScreen (get_screen (window));
 }
 
 /*
