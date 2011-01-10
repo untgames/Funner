@@ -110,7 +110,7 @@ class LicenseManagerImpl
         stl::vector<CheckFile> check_files_list;
 
         for (Parser::NamesakeIterator check_file_iter = root.First ("CheckFiles.File"); check_file_iter; ++check_file_iter)
-          check_files_list.push_back (common::get<const char*> (*check_file_iter, "Path"));
+          check_files_list.push_back (CheckFile (common::get<const char*> (*check_file_iter, "Path"), common::get<size_t> (*check_file_iter, "HashSize", 0)));
 
         unsigned char check_string_hash [16];
 

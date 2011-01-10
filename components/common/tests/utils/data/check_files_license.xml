@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<License LicenseHash="5f3118c8e6c3a6d20f663643dbacc70f" SinceDate="2011-01-10" TillDate="2020-07-16">
+<License LicenseHash="011626693bb88a4244e6b56b218e3983" SinceDate="2010-08-16" TillDate="2020-07-16">
   <CheckFiles>
-    <File Path="data/valid_license.xml"/>
+    <File Path="data/valid_license.xml" HashSize="64"/>
     <File Path="data/invalid_license.xml"/>
   </CheckFiles>
   <AllowedComponents>
-    <Component Wildcard="common.zip.*"/>
-    <Component Wildcard="media.image.loaders.*"/>
+    <Component Wildcard="common.zip*"/>
+    <Component Wildcard="media.image.loaders*"/>
     <Component Wildcard="media.video.*"/>
   </AllowedComponents>
 </License>
