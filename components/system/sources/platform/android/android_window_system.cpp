@@ -51,11 +51,27 @@ struct Platform::window_handle
     if (native_handle)
       ANativeWindow_release (native_handle);
   }
+ 
+  void Notify (WindowEvent event, const WindowEventContext& context)
+  {
+    try
+    {
+      message_handler (this, event, context, user_data);
+    }
+    catch (...)
+    {
+      //подавление всех исключений
+    }
+  }
   
   void OnLayoutCallback (int left, int top, int right, int bottom)
   {
-    printf ("on_layout_callback(%d, %d, %d, %d)\n", left, top, right, bottom);
-    fflush (stdout);    
+    WindowEventContext context;
+
+    memset (&context, 0, sizeof (context));
+
+    Notify (WindowEvent_OnMove, context);
+    Notify (WindowEvent_OnSize, context);
   }
 
   void OnDisplayHintCallback (int hint)
@@ -66,32 +82,60 @@ struct Platform::window_handle
 
   void OnDrawCallback ()
   {
-    printf ("on_draw_callback()\n");
-    fflush (stdout);
+    WindowEventContext context;
+
+    memset (&context, 0, sizeof (context));
+
+    Notify (WindowEvent_OnPaint, context);
   }
 
   void OnTouchCallback (int pointer_id, int action, float x, float y)
   {
-    printf ("on_touch_callback(%d, %d, %g, %g)\n", pointer_id, action, x, y);
-    fflush (stdout);
+//    printf ("on_touch_callback(%d, %d, %g, %g)\n", pointer_id, action, x, y);
+//    fflush (stdout);
   }
 
   void OnTrackballCallback (int pointer_id, int action, float x, float y)
   {
-    printf ("on_trackball_callback(%d, %d, %g, %g)\n", pointer_id, action, x, y);
-    fflush (stdout);
+//    printf ("on_trackball_callback(%d, %d, %g, %g)\n", pointer_id, action, x, y);
+//    fflush (stdout);
   }
 
   void OnKeyCallback (int key, int action, bool is_alt_pressed, bool is_shift_pressed, bool is_sym_pressed)
   {
-    printf ("on_key_callback(%d, %d, %d, %d, %d)\n", key, action, is_alt_pressed, is_shift_pressed, is_sym_pressed);
-    fflush (stdout);
+    WindowEventContext context;
+
+    memset (&context, 0, sizeof (context));
+
+    context.keyboard_alt_pressed     = is_alt_pressed;
+    context.keyboard_shift_pressed   = is_shift_pressed;
+    context.keyboard_control_pressed = is_sym_pressed;
+    context.key_scan_code            = (ScanCode)key;
+    context.key                      = Key_Unknown; ///!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    static const int ACTION_DOWN = 0, ACTION_UP = 1;
+    
+    switch (action)
+    {
+      case ACTION_DOWN:
+        Notify (WindowEvent_OnKeyDown, context);
+        break;
+      case ACTION_UP:
+        Notify (WindowEvent_OnKeyUp, context);
+        break;
+      default:
+        break;
+    }
   }
 
-  void OnFocusCallback (jboolean gained)
+  void OnFocusCallback (bool gained)
   {
-    printf ("on_focus_callback(%d)\n", gained);
-    fflush (stdout);
+    WindowEventContext context;
+
+    memset (&context, 0, sizeof (context));
+        
+    if (gained) Notify (WindowEvent_OnSetFocus, context);
+    else        Notify (WindowEvent_OnLostFocus, context);
   }
 
   void OnSurfaceCreatedCallback ()
@@ -309,6 +353,9 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
 {
   try
   {
+    if (!handler)
+      throw xtl::make_null_argument_exception ("", "handler");
+      
     stl::auto_ptr<window_handle> window (new window_handle);
     
     window->view            = JniWindowManagerSingleton::Instance ()->CreateView (init_string);

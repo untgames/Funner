@@ -17,6 +17,7 @@
 #include <common/singleton.h>
 #include <common/strlib.h>
 
+#include <syslib/keydefs.h>
 #include <syslib/thread.h>
 #include <syslib/platform/android.h>
 
