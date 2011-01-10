@@ -140,6 +140,7 @@ int main ()
 
     window.SetTitle ("Test window");
     window.Show ();
+    window.SetFocus ();
 
     auto_connection connection1  = window.RegisterEventHandler (WindowEvent_OnKeyDown, &keys),
                     connection2  = window.RegisterEventHandler (WindowEvent_OnKeyUp, &keys),

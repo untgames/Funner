@@ -72,18 +72,7 @@ class ApplicationThread: private ApplicationStartArgs
         
         if (status)
           throw xtl::format_operation_exception ("", "JavaVM::AttachCurrentThread failed (status=%d)", status);          
-          
-          //подготовка работы очереди сообщений
-          
-        jclass looper_class = env->FindClass ("android/os/Looper"); 
-        
-        if (!looper_class)
-          throw xtl::format_operation_exception ("", "Can't find Looper class");
-          
-        jmethodID looper_prepare_method = find_static_method (env, looper_class, "prepare", "()V");
-        
-        env->CallStaticVoidMethod (looper_class, looper_prepare_method);
-        
+
           //передача управления программе
         
         int exit_code = 0;

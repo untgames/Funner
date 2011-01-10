@@ -1,17 +1,40 @@
 package com.untgames.funner.application;
 
 import android.view.SurfaceView;
+import android.view.Surface;
+import android.view.SurfaceHolder;
 import android.view.View;
+import android.view.MotionEvent;
+import android.view.KeyEvent;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.widget.FrameLayout;
 import android.content.Context;
 import android.util.*;
 import java.io.*;
 
-public class EngineView extends SurfaceView
+public class EngineView extends SurfaceView implements SurfaceHolder.Callback, SurfaceHolder.Callback2
 {
   public EngineView (Context context)
   {    
     super (context);
+    
+    setFocusable (true);
+    setFocusableInTouchMode (true);
+    
+    getHolder ().addCallback (this);
+  }
+  
+  public Surface getSurfaceThreadSafe ()
+  {
+    Surface result = (Surface)UiDispatch.run (this, new UiRunnable () {
+      public Object run ()
+      {
+        return getHolder ().getSurface ();
+      }
+    });
+    
+    return result;
   }
   
   public void maximizeThreadSafe ()
@@ -28,12 +51,10 @@ public class EngineView extends SurfaceView
   
   public int getTopThreadSafe ()
   {
-    final View view = this;
-    
     Integer result = (Integer)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        return new Integer (view.getTop ());
+        return new Integer (getTop ());
       }
     });
     
@@ -42,12 +63,10 @@ public class EngineView extends SurfaceView
     
   public int getLeftThreadSafe ()
   {
-    final View view = this;
-    
     Integer result = (Integer)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        return new Integer (view.getLeft ());
+        return new Integer (getLeft ());
       }
     });
     
@@ -56,12 +75,10 @@ public class EngineView extends SurfaceView
   
   public int getWidthThreadSafe ()
   {
-    final View view = this;
-    
     Integer result = (Integer)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        return new Integer (view.getWidth ());
+        return new Integer (getWidth ());
       }
     });
     
@@ -70,12 +87,10 @@ public class EngineView extends SurfaceView
   
   public int getHeightThreadSafe ()
   {
-    final View view = this;
-    
     Integer result = (Integer)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        return new Integer (view.getHeight ());
+        return new Integer (getHeight ());
       }
     });
     
@@ -84,12 +99,10 @@ public class EngineView extends SurfaceView
   
   public void layoutThreadSafe (final int left, final int top, final int right, final int bottom)
   {
-    final View view = this;
-    
     UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        view.layout (left, top, right, bottom);
+        layout (left, top, right, bottom);
         
         return null;
       }
@@ -98,12 +111,10 @@ public class EngineView extends SurfaceView
   
   public int getVisibilityThreadSafe ()
   {
-    final View view = this;
-    
     Integer result = (Integer)UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        return new Integer (view.getVisibility ());
+        return new Integer (getVisibility ());
       }
     });
     
@@ -112,12 +123,10 @@ public class EngineView extends SurfaceView
   
   public void setVisibilityThreadSafe (final int visibility)
   {
-    final View view = this;
-    
     UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        view.setVisibility (visibility);
+        setVisibility (visibility);
         
         return null;
       }
@@ -126,15 +135,147 @@ public class EngineView extends SurfaceView
 
   public void setBackgroundColorThreadSafe (final int color)
   {
-    final View view = this;
-    
     UiDispatch.run (this, new UiRunnable () {
       public Object run ()
       {
-        view.setBackgroundColor (color);
+        setBackgroundColor (color);
         
         return null;
       }
     });
-  }     
+  }
+  
+  public void bringToFrontThreadSafe ()
+  {
+    UiDispatch.run (this, new UiRunnable () {
+      public Object run ()
+      {
+        bringToFront ();
+        
+        return null;
+      }
+    });
+  }
+  
+  public boolean requestFocusThreadSafe ()
+  {
+    Boolean result = (Boolean)UiDispatch.run (this, new UiRunnable () {
+      public Object run ()
+      {
+        return new Boolean (requestFocus ());
+      }
+    });
+    
+    return result.booleanValue ();
+  }
+  
+  private native void onLayoutCallback           (int left, int top, int right, int bottom);
+  private native void onDisplayHintCallback      (int hint);
+  private native void onDrawCallback             ();
+  private native void onTouchCallback            (int pointerId, int action, float x, float y);
+  private native void onTrackballCallback        (int pointerId, int action, float x, float y);
+  private native void onKeyCallback              (int keycode, int action, boolean alt_pressed, boolean shift_pressed, boolean is_sym_pressed);
+  private native void onFocusCallback            (boolean focusGained);
+  private native void onSurfaceCreatedCallback   ();
+  private native void onSurfaceDestroyedCallback ();  
+  
+  @Override
+  protected void onLayout (boolean changed, int left, int top, int right, int bottom)
+  {
+    onLayoutCallback (left, top, right, bottom);
+  }
+
+  @Override  
+  protected void onDisplayHint (int hint)
+  {
+    onDisplayHintCallback (hint);
+  }
+  
+  @Override
+  protected void onDraw (Canvas c)
+  {
+    onDrawCallback ();
+  }
+  
+  @Override
+  public boolean onTouchEvent (MotionEvent event)
+  {
+    int pointers_count = event.getPointerCount (),
+        action         = event.getAction ();
+    
+    for (int i=0; i<pointers_count; i++)
+    {    
+      int pointer_id = event.getPointerId (i);  
+      
+      onTouchCallback (pointer_id, action, event.getX (i), event.getY (i)); 
+    }
+    
+    return true;
+  }
+  
+  @Override
+  public boolean onTrackballEvent (MotionEvent event)
+  {
+    int pointers_count = event.getPointerCount (),
+        action         = event.getAction ();
+    
+    for (int i=0; i<pointers_count; i++)
+    {    
+      int pointer_id = event.getPointerId (i);  
+      
+      onTrackballCallback (pointer_id, action, event.getX (i), event.getY (i)); 
+    }
+    
+    return true;
+  }  
+  
+  @Override
+  public boolean onKeyDown (int keyCode, KeyEvent event)
+  {
+    int     action           = event.getAction ();
+    boolean is_alt_pressed   = event.isAltPressed (),
+            is_shift_pressed = event.isShiftPressed (),
+            is_sym_pressed   = event.isSymPressed ();
+            
+    onKeyCallback (keyCode, action, is_alt_pressed, is_shift_pressed, is_sym_pressed);
+
+    return super.onKeyDown (keyCode, event);
+  }
+  
+  @Override
+  public boolean onKeyUp (int keyCode, KeyEvent event)
+  {
+    int     action           = event.getAction ();
+    boolean is_alt_pressed   = event.isAltPressed (),
+            is_shift_pressed = event.isShiftPressed (),
+            is_sym_pressed   = event.isSymPressed ();
+            
+    onKeyCallback (keyCode, action, is_alt_pressed, is_shift_pressed, is_sym_pressed);
+
+    return super.onKeyUp (keyCode, event);
+  }
+  
+  @Override protected void onFocusChanged (boolean gainFocus, int direction, Rect previouslyFocusedRect)
+  {
+    onFocusCallback (gainFocus);
+  }
+  
+  public void surfaceChanged (SurfaceHolder holder, int format, int width, int height)
+  {
+  }
+
+  public void surfaceCreated (SurfaceHolder holder)
+  {
+    onSurfaceCreatedCallback ();
+  }
+  
+  public void surfaceDestroyed (SurfaceHolder holder)
+  {
+    onSurfaceDestroyedCallback ();
+  }
+  
+  public void surfaceRedrawNeeded (SurfaceHolder holder)
+  {
+    onDrawCallback ();
+  }
 }

@@ -10,6 +10,7 @@ using namespace syslib::android;
 struct Platform::window_handle
 {
   global_ref<jobject>  view;                           //android окно
+  ANativeWindow*       native_handle;                  //native android window hanle
   WindowMessageHandler message_handler;                //обработчик сообщений
   void*                user_data;                      //пользовательские данные окна
   unsigned int         background_color;               //цвет заднего плана
@@ -21,20 +22,36 @@ struct Platform::window_handle
   jmethodID            layout_method;                  //метод установки размеров и положения окна
   jmethodID            set_visibility_method;          //метод установки видимости окна
   jmethodID            get_visibility_method;          //метод получения видимости окна
+  jmethodID            request_focus_method;           //метод запроса фокуса ввода  
   jmethodID            set_background_color_method;    //метод установки цвета заднего плана окна
   jmethodID            maximize_method;                //метод максимизации окна
+  jmethodID            get_surface_method;             //метод получения поверхности
+  jmethodID            post_invalidate_method;         //метод оповещения о необходимости перерисовки окна
+  jmethodID            bring_to_front_method;          //метод перемещения окна на передний план
   
   window_handle ()
-    : message_handler (0)
+    : native_handle (0)
+    , message_handler (0)
     , user_data (0)
     , background_color (0)
     , background_state (0)
   {
   }
+  
+  ~window_handle ()
+  {
+    if (native_handle)
+      ANativeWindow_release (native_handle);
+  }
 };
 
 namespace
 {
+
+///Константы
+const int VIEW_VISIBLE   = 0; //окно видимо
+const int VIEW_INVISIBLE = 4; //окно невидимо
+const int VIEW_GONE      = 8; //окно невидимо и исключено из расчёта лэйаута
 
 ///Поддержка класса окна
 class JniWindowClass
@@ -81,6 +98,64 @@ class JniWindowClass
 
 typedef common::Singleton<JniWindowClass> JniWindowClassSingleton;
 
+/*
+    Функции обратного вызова
+*/
+
+void on_layout_callback (JNIEnv& env, jobject view, int left, int top, int right, int bottom)
+{
+  printf ("on_layout_callback(%d, %d, %d, %d)\n", left, top, right, bottom);
+  fflush (stdout);
+}
+
+void on_display_hint_callback (JNIEnv& env, jobject view, int hint)
+{
+  printf ("on_display_hint_callback(%d)\n", hint);
+  fflush (stdout);
+}
+
+void on_draw_callback (JNIEnv& env, jobject view)
+{
+  printf ("on_draw_callback()\n");
+  fflush (stdout);
+}
+
+void on_touch_callback (JNIEnv& env, jobject view, int pointer_id, int action, float x, float y)
+{
+  printf ("on_touch_callback(%d, %d, %g, %g)\n", pointer_id, action, x, y);
+  fflush (stdout);
+}
+
+void on_trackball_callback (JNIEnv& env, jobject view, int pointer_id, int action, float x, float y)
+{
+  printf ("on_trackball_callback(%d, %d, %g, %g)\n", pointer_id, action, x, y);
+  fflush (stdout);
+}
+
+void on_key_callback (JNIEnv& env, jobject view, int key, int action, jboolean is_alt_pressed, jboolean is_shift_pressed, jboolean is_sym_pressed)
+{
+  printf ("on_key_callback(%d, %d, %d, %d, %d)\n", key, action, is_alt_pressed, is_shift_pressed, is_sym_pressed);
+  fflush (stdout);
+}
+
+void on_focus_callback (JNIEnv& env, jobject view, jboolean gained)
+{
+  printf ("on_focus_callback(%d)\n", gained);
+  fflush (stdout);
+}
+
+void on_surface_created_callback (JNIEnv& env, jobject view)
+{
+  printf ("on_surface_created_callback()\n");
+  fflush (stdout);
+}
+
+void on_surface_destroyed_callback (JNIEnv& env, jobject view)
+{
+  printf ("on_surface_destroyed_callback()\n");
+  fflush (stdout);
+}
+
 }
 
 /*
@@ -97,6 +172,8 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
     window->message_handler = handler;
     window->user_data       = user_data;
     
+      //получение методов
+    
     JNIEnv& env = get_env ();
     
     local_ref<jclass> view_class = env.GetObjectClass (window->view.get ());
@@ -111,8 +188,24 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
     window->layout_method               = find_method (&env, view_class.get (), "layoutThreadSafe", "(IIII)V");
     window->set_visibility_method       = find_method (&env, view_class.get (), "setVisibilityThreadSafe", "(I)V");
     window->get_visibility_method       = find_method (&env, view_class.get (), "getVisibilityThreadSafe", "()I");
+    window->request_focus_method        = find_method (&env, view_class.get (), "requestFocusThreadSafe", "()Z");
+    window->bring_to_front_method       = find_method (&env, view_class.get (), "bringToFrontThreadSafe", "()V");
     window->set_background_color_method = find_method (&env, view_class.get (), "setBackgroundColorThreadSafe", "(I)V");
     window->maximize_method             = find_method (&env, view_class.get (), "maximizeThreadSafe", "()V");
+    window->get_surface_method          = find_method (&env, view_class.get (), "getSurfaceThreadSafe", "()Landroid/view/Surface;");
+    window->post_invalidate_method      = find_method (&env, view_class.get (), "postInvalidate", "()V");
+    
+      //получение нативного дескриптора окна
+      
+    local_ref<jobject> surface = check_errors (env.CallObjectMethod (window->view.get (), window->get_surface_method));
+    
+    if (!surface)
+      throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");
+
+    window->native_handle = ANativeWindow_fromSurface (&env, surface.get ());
+
+//    if (!window->native_handle) //callback processing
+//      throw xtl::format_operation_exception ("", "ANativeWindow_fromSurface failed");
 
     return window.release ();
   }
@@ -137,14 +230,25 @@ void Platform::DestroyWindow (window_t)
     Получение платформо-зависимого дескриптора окна
 */
 
-const void* Platform::GetNativeWindowHandle (window_t)
+const void* Platform::GetNativeWindowHandle (window_t window)
 {
-  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::GetNativeWindowHandle");
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+    
+    return window->native_handle;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidPlatform::GetNativeWindowHandle");
+    throw;
+  }
 }
 
 const void* Platform::GetNativeDisplayHandle (window_t)
 {
-  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::GetNativeDisplayHandle");
+  return 0;
 }
 
 /*
@@ -174,6 +278,9 @@ void Platform::SetWindowRect (window_t window, const Rect& rect)
 {
   try
   {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");    
+    
     JNIEnv& env = get_env ();
     
     env.CallVoidMethod (window->view.get (), window->layout_method, rect.left, rect.top, rect.right, rect.bottom);
@@ -204,6 +311,9 @@ void Platform::GetWindowRect (window_t window, Rect& out_result)
 {
   try
   {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");    
+    
     Rect result;
     
     JNIEnv& env = get_env ();
@@ -243,22 +353,39 @@ void Platform::SetWindowFlag (window_t window, WindowFlag flag, bool state)
 {
   try
   {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");    
+    
     JNIEnv& env = get_env ();    
     
     switch (flag)
     {
       case WindowFlag_Visible:
-        env.CallVoidMethod (window->view.get (), window->set_visibility_method, state);        
+      {
+        env.CallVoidMethod (window->view.get (), window->set_visibility_method, state ? VIEW_VISIBLE : VIEW_INVISIBLE);
         check_errors ();
+        break;
+      }
+      case WindowFlag_Active:
+        env.CallVoidMethod (window->view.get (), window->bring_to_front_method);
+        check_errors ();
+        break;
+      case WindowFlag_Focus:
+        if (!check_errors (env.CallBooleanMethod (window->view.get (), window->request_focus_method)))
+          throw xtl::format_operation_exception ("", "EngineView::requestFocusThreadSafe failed");
+
         break;
       case WindowFlag_Maximized:
         env.CallVoidMethod (window->view.get (), window->maximize_method);        
         check_errors ();
-        break;      
-      case WindowFlag_Active:
-      case WindowFlag_Focus:
+        break;        
       case WindowFlag_Minimized:
-        throw xtl::make_not_implemented_exception ("SetWindowFlag");
+      {
+        env.CallVoidMethod (window->view.get (), window->set_visibility_method, VIEW_GONE);  
+        check_errors ();      
+        
+        break;
+      }
       default:
         throw xtl::make_argument_exception ("", "flag", flag);
     }    
@@ -274,6 +401,9 @@ bool Platform::GetWindowFlag (window_t window, WindowFlag flag)
 {
   try
   {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");    
+    
     JNIEnv& env = get_env ();    
     
     switch (flag)
@@ -303,23 +433,34 @@ bool Platform::GetWindowFlag (window_t window, WindowFlag flag)
 
 void Platform::SetParentWindowHandle (window_t child, const void* parent_handle)
 {
-  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::SetParentWindow");
+  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::SetParentWindowHandle", "Parent windows not supported for Android platform");
 }
 
 const void* Platform::GetParentWindowHandle (window_t child)
 {
-  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::GetParentWindow");
-
-  return 0;
+  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::GetParentWindowHandle", "Parent windows not supported for Android platform");
 }
 
 /*
     Обновление окна
 */
 
-void Platform::InvalidateWindow (window_t)
+void Platform::InvalidateWindow (window_t window)
 {
-  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::InvalidateWindow");
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+      
+    get_env ().CallVoidMethod (window->view.get (), window->post_invalidate_method);
+
+    check_errors ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidPlatform::InvalidateWindow");
+    throw;
+  }
 }
 
 /*
@@ -350,8 +491,11 @@ Point Platform::GetCursorPosition (window_t)
     Видимость курсора
 */
 
-void Platform::SetCursorVisible (window_t, bool state)
+void Platform::SetCursorVisible (window_t window, bool state)
 {
+  if (!window)
+    throw xtl::make_null_argument_exception ("syslib::AndroidPlatform::SetCursorVisible", "window");
+
   if (state)
     throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::SetCursorVisible", "No cursor for Android platform");
 }
@@ -388,6 +532,9 @@ void Platform::SetBackgroundColor (window_t window, const Color& color)
 {
   try
   {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");    
+        
     unsigned int int_color = window->background_state + (unsigned int)color.red * 0x10000 + (unsigned int)color.green * 0x100 +
       color.blue;
                              
@@ -408,6 +555,9 @@ void Platform::SetBackgroundState (window_t window, bool state)
 {
   try
   {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");    
+        
     window->background_state = state ? 0xff000000u : 0u;
     
     get_env ().CallVoidMethod (window->view.get (), window->set_background_color_method, window->background_color | window->background_state);
@@ -425,6 +575,9 @@ Color Platform::GetBackgroundColor (window_t window)
 {
   try
   {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");        
+    
     unsigned int int_color = window->background_color;
     
     Color result;
@@ -446,6 +599,9 @@ bool Platform::GetBackgroundState (window_t window)
 {
   try
   {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");        
+    
     return window->background_state != 0;
   }
   catch (xtl::exception& e)
@@ -453,4 +609,53 @@ bool Platform::GetBackgroundState (window_t window)
     e.touch ("syslib::AndroidPlatform::GetBackgroundState");
     throw;
   }
+}
+
+namespace syslib
+{
+
+namespace android
+{
+
+/// регистрация методов обратного вызова окна
+void register_window_callbacks (JNIEnv* env)
+{
+  try
+  {
+    if (!env)
+      throw xtl::make_null_argument_exception ("", "env");
+      
+    jclass view_class = env->FindClass ("com/untgames/funner/application/EngineView");
+    
+    if (!view_class)
+      throw xtl::format_operation_exception ("", "Can't find EngineView class\n");
+    
+    static const JNINativeMethod methods [] = {
+      {"onLayoutCallback", "(IIII)V", (void*)&on_layout_callback},
+      {"onDisplayHintCallback", "(I)V", (void*)&on_display_hint_callback},
+      {"onDrawCallback", "()V", (void*)&on_draw_callback},
+      {"onTouchCallback", "(IIFF)V", (void*)&on_touch_callback},
+      {"onTrackballCallback", "(IIFF)V", (void*)&on_trackball_callback},
+      {"onKeyCallback", "(IIZZZ)V", (void*)&on_key_callback},
+      {"onFocusCallback", "(Z)V", (void*)&on_focus_callback},
+      {"onSurfaceCreatedCallback", "()V", (void*)&on_surface_created_callback},
+      {"onSurfaceDestroyedCallback", "()V", (void*)&on_surface_destroyed_callback},
+    };
+    
+    static const size_t methods_count = sizeof (methods) / sizeof (*methods);
+
+    jint status = env->RegisterNatives (view_class, methods, methods_count);
+
+    if (status)
+      throw xtl::format_operation_exception ("", "Can't register natives (staus=%d)", status);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::android::register_window_callbacks");
+    throw;
+  }
+}
+
+}
+
 }

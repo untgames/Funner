@@ -107,6 +107,25 @@ extern JNIEXPORT jint JNICALL JNI_OnLoad (JavaVM* vm, void* reserved)
     
     return -1;
   }
+  
+  try
+  {
+    register_window_callbacks (env);
+  }
+  catch (std::exception& e)
+  {
+    printf ("Can't register window callbacks: %s\n", e.what ());
+    fflush (stdout);
+
+    return -1;    
+  }
+  catch (...)
+  {
+    printf ("Can't register window callbacks: unknown exception\n");
+    fflush (stdout);
+
+    return -1;    
+  }
 
   return JNI_VERSION_1_4;
 }

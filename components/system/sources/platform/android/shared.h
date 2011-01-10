@@ -3,6 +3,7 @@
 
 #include <jni.h>
 #include <android/looper.h>
+#include <android/native_window_jni.h>
 
 #include <stl/auto_ptr.h>
 
@@ -17,6 +18,7 @@
 #include <common/strlib.h>
 
 #include <syslib/thread.h>
+#include <syslib/platform/android.h>
 
 #include <platform/platform.h>
 
@@ -167,6 +169,9 @@ struct ApplicationContext
 
 /// точка входа в приложение
 void start_application (JavaVM* vm, jobject activity, const char* program_name, const char* args);
+
+/// регистрация методов обратного вызова окна
+void register_window_callbacks (JNIEnv* env);
 
 /// получение контекста запуска приложения
 const ApplicationContext& get_context ();
