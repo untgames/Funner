@@ -38,6 +38,8 @@ const size_t TEST_WORK_TIME     = 8000;  //время работы теста (в милисекундах)
 float        source_angle = 0;
 Source       source;
 
+typedef xtl::com_ptr<ISample> SamplePointer;
+
 void log_print (const char* log_name, const char* message)
 {
   printf ("Log '%s': '%s'\n", log_name, message);
@@ -159,11 +161,10 @@ int main ()
 //    source.gain         = 0.3f;
     sound_system->SetSource (1, source);
 
-    SoundSample sample1 (file_name), sample2 (file_name2);
+    SamplePointer sample1 (sound_system->CreateSample (file_name2), false);
 
-    sound_system->SetSample (1, sample2);
+    sound_system->SetSample (1, sample1.get ());
 
-//    sound_system->SetSample (0, sample1);
     sound_system->Seek (1, 40.f, SeekMode_Clamp);
 //    sound_system->Play (0, true);
     sound_system->Play (1, true);

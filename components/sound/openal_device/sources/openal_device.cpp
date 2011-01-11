@@ -301,18 +301,58 @@ void OpenALDevice::GetListener (Listener& target_listener)
 }
 
 /*
+   Создание сэмпла для проигрывания
+*/
+
+ISample* OpenALDevice::CreateSample (const char* name)
+{
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+
+    return new OpenALSample (name);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("sound::low_level::OpenALDevice::CreateSample (const char*)");
+    throw;
+  }
+}
+
+ISample* OpenALDevice::CreateSample (const SampleDesc& desc, const SampleReadFunction& fn)
+{
+  try
+  {
+    return new OpenALSample (desc, fn);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("sound::low_level::OpenALDevice::CreateSample (const SampleDesc&, const SampleReadFunction&)");
+    throw;
+  }
+}
+
+/*
     Установка текущего проигрываемого звука
 */
 
-void OpenALDevice::SetSample (size_t channel, const media::SoundSample& sample)
+void OpenALDevice::SetSample (size_t channel, ISample* sample)
 {
-  if (channel >= channels.size ())
-    throw xtl::make_range_exception ("sound::low_level::OpenALDevice::SetSample", "channel", channel, channels.size ());
+  static const char* METHOD_NAME = "sound::low_level::OpenALDevice::SetSample";
 
-  channels [channel]->SetSample (sample);
+  if (channel >= channels.size ())
+    throw xtl::make_range_exception (METHOD_NAME, "channel", channel, channels.size ());
+
+  OpenALSample* openal_sample = dynamic_cast<OpenALSample*> (sample);
+
+  if (sample && !openal_sample)
+    throw xtl::make_argument_exception (METHOD_NAME, "sample", "Incompatible sample type, must be 'OpenALSoundSample'");
+
+  channels [channel]->SetSample (openal_sample);
 }
 
-const media::SoundSample& OpenALDevice::GetSample (size_t channel)
+ISample* OpenALDevice::GetSample (size_t channel)
 {
   if (channel >= channels.size ())
     throw xtl::make_range_exception ("sound::low_level::OpenALDevice::GetSample", "channel", channel, channels.size ());
