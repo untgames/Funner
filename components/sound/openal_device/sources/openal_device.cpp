@@ -59,6 +59,8 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
  : context        (device_name, init_string),
    sample_buffer  (MAX_SOUND_SAMPLE_RATE * MAX_SOUND_CHANNELS * MAX_SOUND_BYTES_PER_SAMPLE / SOURCE_BUFFERS_UPDATE_FREQUENCY / (SOURCE_BUFFERS_COUNT - 2))
 {
+  common::Lock lock (*this);
+
   listener_need_update                 = false;
   gain                                 = 1.f;
   is_muted                             = false;
@@ -70,46 +72,12 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
   
   try
   {
-    buffer_action   = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::BufferUpdate, this), common::ActionThread_Current, 0, SOURCE_BUFFERS_UPDATE_MILLISECONDS / 1000.0f);
+    buffer_action   = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::BufferUpdate, this), common::ActionThread_Background, 0, SOURCE_BUFFERS_UPDATE_MILLISECONDS / 1000.0f);
     listener_action = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::ListenerUpdate, this), common::ActionThread_Current, 0, DEFAULT_LISTENER_PROPERTIES_UPDATE_PERIOD);
     source_action   = common::ActionQueue::PushAction (xtl::bind (&OpenALDevice::SourceUpdate, this), common::ActionThread_Current, 0, DEFAULT_SOURCE_PROPERTIES_UPDATE_PERIOD);
   
     context.MakeCurrent ();
     
-  /*
-    char *extensions = (char*)context.alGetString (AL_EXTENSIONS);
-    size_t  compare_value;
-
-    info.eax_major_version = 0;
-    info.eax_minor_version = 0;
-
-    do
-    {
-      extensions = strstr (extensions, "EAX");
-      if (extensions)
-      {
-        extensions += 3;
-        if (isdigit (*extensions))
-        {
-          compare_value = atoi (extensions);
-          if (compare_value > info.eax_major_version)
-          {
-            info.eax_major_version = compare_value;
-            extensions = strstr (extensions, ".");
-            info.eax_minor_version = atoi (++extensions);
-          }
-          else if (compare_value == info.eax_major_version)
-          {
-            info.eax_major_version = compare_value;
-            extensions = strstr (extensions, ".");
-            compare_value = atoi (++extensions);
-            if (compare_value > info.eax_minor_version)
-              info.eax_minor_version = compare_value;
-          }
-        }
-      }
-    } while (extensions);*/
-
       //формирование имени устройства
 
     name = format ("%s::%s", driver_name ? driver_name : "", device_name ? device_name : "");
@@ -149,15 +117,6 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
     }
 
     info.channels_count = channels.size ();
-
-  /*  ALCint temp_veriable;
-
-    context.alcGetIntegerv (ALC_EFX_MAJOR_VERSION, 1, &temp_veriable);
-    info.efx_major_version = temp_veriable;
-    context.alcGetIntegerv (ALC_EFX_MINOR_VERSION, 1, &temp_veriable);
-    info.efx_minor_version = temp_veriable;
-    context.alcGetIntegerv (ALC_MAX_AUXILIARY_SENDS, 1, &temp_veriable);
-    info.max_aux_sends = temp_veriable;*/
   }
   catch (...)
   {
@@ -171,6 +130,8 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
 
 OpenALDevice::~OpenALDevice ()
 {
+  common::Lock lock (*this);
+
   try
   {
     ClearALData ();
@@ -190,6 +151,8 @@ OpenALDevice::~OpenALDevice ()
 
 void OpenALDevice::ClearALData ()
 {
+  common::Lock lock (*this);
+
     //удаление каналов
 
   for (size_t i = 0; i < channels.size (); i++)
@@ -225,6 +188,8 @@ void OpenALDevice::Release ()
 
 const char* OpenALDevice::Name ()
 {
+  common::Lock lock (*this);
+
   return name.c_str ();
 }
 
@@ -234,7 +199,20 @@ const char* OpenALDevice::Name ()
 
 void OpenALDevice::GetCapabilities (Capabilities& target_info)
 {
+  common::Lock lock (*this);
+
   target_info = info;
+}
+
+/*
+   Количество микшируемых каналов
+*/
+
+size_t OpenALDevice::ChannelsCount ()
+{
+  common::Lock lock (*this);
+
+  return channels.size ();
 }
 
 /*
@@ -243,6 +221,8 @@ void OpenALDevice::GetCapabilities (Capabilities& target_info)
 
 void OpenALDevice::UpdateListenerNotify ()
 {
+  common::Lock lock (*this);
+
   listener_need_update = true;
 
   ListenerUpdate ();
@@ -254,6 +234,8 @@ void OpenALDevice::UpdateListenerNotify ()
 
 void OpenALDevice::SetVolume (float in_gain)
 {
+  common::Lock lock (*this);
+
   if (in_gain < 0.0f) in_gain = 0.0f;
   if (in_gain > 1.0f) in_gain = 1.0f;
 
@@ -265,6 +247,8 @@ void OpenALDevice::SetVolume (float in_gain)
 
 float OpenALDevice::GetVolume ()
 {
+  common::Lock lock (*this);
+
   return gain;
 }
 
@@ -274,6 +258,8 @@ float OpenALDevice::GetVolume ()
 
 void OpenALDevice::SetMute (bool state)
 {
+  common::Lock lock (*this);
+
   is_muted = state;
 
   UpdateListenerNotify ();
@@ -281,6 +267,8 @@ void OpenALDevice::SetMute (bool state)
 
 bool OpenALDevice::IsMuted ()
 {
+  common::Lock lock (*this);
+
   return is_muted;
 }
 
@@ -290,6 +278,8 @@ bool OpenALDevice::IsMuted ()
 
 void OpenALDevice::SetListener (const Listener& in_listener)
 {
+  common::Lock lock (*this);
+
   listener = in_listener;
 
   UpdateListenerNotify ();
@@ -297,7 +287,56 @@ void OpenALDevice::SetListener (const Listener& in_listener)
 
 void OpenALDevice::GetListener (Listener& target_listener)
 {
+  common::Lock lock (*this);
+
   target_listener = listener;
+}
+
+/*
+   Работа со списком активных источников
+*/
+
+void OpenALDevice::SetFirstActiveSource (OpenALSource* source)
+{
+  common::Lock lock (*this);
+
+  first_active_source = source;
+}
+
+OpenALSource* OpenALDevice::GetFirstActiveSource ()
+{
+  common::Lock lock (*this);
+
+  return first_active_source;
+}
+
+/*
+   OpenAL контекст
+*/
+
+OpenALContext& OpenALDevice::Context ()
+{
+  common::Lock lock (*this);
+
+  return context;
+}
+
+/*
+   Буфер сэмплирования
+*/
+
+void* OpenALDevice::GetSampleBuffer ()
+{
+  common::Lock lock (*this);
+
+  return sample_buffer.data ();
+}
+
+size_t OpenALDevice::GetSampleBufferSize ()
+{
+  common::Lock lock (*this);
+
+  return sample_buffer.size ();
 }
 
 /*
@@ -306,6 +345,8 @@ void OpenALDevice::GetListener (Listener& target_listener)
 
 ISample* OpenALDevice::CreateSample (const char* name)
 {
+  common::Lock lock (*this);
+
   try
   {
     if (!name)
@@ -322,6 +363,8 @@ ISample* OpenALDevice::CreateSample (const char* name)
 
 ISample* OpenALDevice::CreateSample (const SampleDesc& desc, const SampleReadFunction& fn)
 {
+  common::Lock lock (*this);
+
   try
   {
     return new OpenALSample (desc, fn);
@@ -341,6 +384,8 @@ void OpenALDevice::SetSample (size_t channel, ISample* sample)
 {
   static const char* METHOD_NAME = "sound::low_level::OpenALDevice::SetSample";
 
+  common::Lock lock (*this);
+
   if (channel >= channels.size ())
     throw xtl::make_range_exception (METHOD_NAME, "channel", channel, channels.size ());
 
@@ -354,6 +399,8 @@ void OpenALDevice::SetSample (size_t channel, ISample* sample)
 
 ISample* OpenALDevice::GetSample (size_t channel)
 {
+  common::Lock lock (*this);
+
   if (channel >= channels.size ())
     throw xtl::make_range_exception ("sound::low_level::OpenALDevice::GetSample", "channel", channel, channels.size ());
 
@@ -366,6 +413,8 @@ ISample* OpenALDevice::GetSample (size_t channel)
 
 bool OpenALDevice::IsLooped (size_t channel)
 {
+  common::Lock lock (*this);
+
   if (channel >= channels.size ())
     throw xtl::make_range_exception ("sound::low_level::OpenALDevice::IsLooped", "channel", channel, channels.size ());
 
@@ -378,6 +427,8 @@ bool OpenALDevice::IsLooped (size_t channel)
 
 void OpenALDevice::SetSource (size_t channel, const Source& source)
 {
+  common::Lock lock (*this);
+
   if (channel >= channels.size ())
     throw xtl::make_range_exception ("sound::low_level::OpenALDevice::SetSource", "channel", channel, channels.size ());
 
@@ -386,6 +437,8 @@ void OpenALDevice::SetSource (size_t channel, const Source& source)
 
 void OpenALDevice::GetSource (size_t channel, Source& source)
 {
+  common::Lock lock (*this);
+
   if (channel >= channels.size ())
     throw xtl::make_range_exception ("sound::low_level::OpenALDevice::GetSource", "channel", channel, channels.size ());
 
@@ -398,6 +451,8 @@ void OpenALDevice::GetSource (size_t channel, Source& source)
 
 void OpenALDevice::Play (size_t channel, bool looping)
 {
+  common::Lock lock (*this);
+
   if (channel >= channels.size ())
     throw xtl::make_range_exception ("sound::low_level::OpenALDevice::Play", "channel", channel, channels.size ());
 
@@ -406,6 +461,8 @@ void OpenALDevice::Play (size_t channel, bool looping)
 
 void OpenALDevice::Pause (size_t channel)
 {
+  common::Lock lock (*this);
+
   if (channel >= channels.size ())
     throw xtl::make_range_exception ("sound::low_level::OpenALDevice::Pause", "channel", channel, channels.size ());
 
@@ -414,6 +471,8 @@ void OpenALDevice::Pause (size_t channel)
 
 void OpenALDevice::Stop (size_t channel)
 {
+  common::Lock lock (*this);
+
   if (channel >= channels.size ())
     throw xtl::make_range_exception ("sound::low_level::OpenALDevice::Stop", "channel", channel, channels.size ());
 
@@ -422,6 +481,8 @@ void OpenALDevice::Stop (size_t channel)
 
 void OpenALDevice::Seek (size_t channel, float time_in_seconds, SeekMode seek_mode)
 {
+  common::Lock lock (*this);
+
   if (channel >= channels.size ())
     throw xtl::make_range_exception ("sound::low_level::OpenALDevice::Seek", "channel", channel, channels.size ());
 
@@ -430,6 +491,8 @@ void OpenALDevice::Seek (size_t channel, float time_in_seconds, SeekMode seek_mo
 
 float OpenALDevice::Tell (size_t channel)
 {
+  common::Lock lock (*this);
+
   if (channel >= channels.size ())
     throw xtl::make_range_exception ("sound::low_level::OpenALDevice::Tell", "channel", channel, channels.size ());
 
@@ -438,6 +501,8 @@ float OpenALDevice::Tell (size_t channel)
 
 bool OpenALDevice::IsPlaying (size_t channel)
 {
+  common::Lock lock (*this);
+
   if (channel >= channels.size ())
     throw xtl::make_range_exception ("sound::low_level::OpenALDevice::IsPlaying", "channel", channel, channels.size ());
 
@@ -450,6 +515,8 @@ bool OpenALDevice::IsPlaying (size_t channel)
 
 void OpenALDevice::BufferUpdate ()
 {
+  common::Lock lock (*this);
+
     //если нет активных источников нет необходимости что-либо обновлять
 
   if (!first_active_source)
@@ -463,6 +530,8 @@ void OpenALDevice::BufferUpdate ()
 
 void OpenALDevice::SourceUpdate ()
 {
+  common::Lock lock (*this);
+
     //если нет активных источников нет необходимости что-либо обновлять
 
   if (!first_active_source)
@@ -476,6 +545,8 @@ void OpenALDevice::SourceUpdate ()
 
 void OpenALDevice::ListenerUpdate ()
 {
+  common::Lock lock (*this);
+
     //если нет активных источников нет необходимости что-либо обновлять
 
   if (!first_active_source)
@@ -505,11 +576,15 @@ void OpenALDevice::ListenerUpdate ()
 
 const char* OpenALDevice::GetParamsNames ()
 {
+  common::Lock lock (*this);
+
   return DEVICE_PARAMS_NAMES;
 }
 
 bool OpenALDevice::IsIntegerParam  (const char* name)
 {
+  common::Lock lock (*this);
+
   if (!name)
     return false;
 
@@ -518,6 +593,8 @@ bool OpenALDevice::IsIntegerParam  (const char* name)
 
 bool OpenALDevice::IsStringParam (const char* name)
 {
+  common::Lock lock (*this);
+
   if (!name)
     return false;
 
@@ -526,6 +603,8 @@ bool OpenALDevice::IsStringParam (const char* name)
 
 void OpenALDevice::SetIntegerParam (const char* name, int value)
 {
+  common::Lock lock (*this);
+
   if (!name)
     throw xtl::make_null_argument_exception ("sound::low_level::OpenALDevice::SetIntegerParam", "name");
 
@@ -557,6 +636,8 @@ void OpenALDevice::SetIntegerParam (const char* name, int value)
 
 int OpenALDevice::GetIntegerParam (const char* name)
 {
+  common::Lock lock (*this);
+
   if (!name)
     throw xtl::make_null_argument_exception ("sound::low_level::OpenALDevice::GetIntegerParam", "name");
 
@@ -574,6 +655,8 @@ int OpenALDevice::GetIntegerParam (const char* name)
 void OpenALDevice::SetStringParam (const char* name, const char* value)
 {
   static const char* METHOD_NAME = "sound::low_level::OpenALDevice::SetStringParam";
+
+  common::Lock lock (*this);
 
   if (!name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
@@ -605,6 +688,8 @@ void OpenALDevice::SetStringParam (const char* name, const char* value)
 
 const char* OpenALDevice::GetStringParam (const char* name)
 {
+  common::Lock lock (*this);
+
   if (!name)
     throw xtl::make_null_argument_exception ("sound::low_level::OpenALDevice::GetStringParam", "name");
 
@@ -636,6 +721,8 @@ const char* OpenALDevice::GetStringParam (const char* name)
 
 ALuint OpenALDevice::AllocateSourceBuffer ()
 {
+  common::Lock lock (*this);
+
   if (al_buffers_pool_size)
     return al_buffers_pool [--al_buffers_pool_size];
 
@@ -655,6 +742,8 @@ ALuint OpenALDevice::AllocateSourceBuffer ()
 
 void OpenALDevice::DeallocateSourceBuffer (ALuint buffer)
 {
+  common::Lock lock (*this);
+
   if (al_buffers_pool_size == DEVICE_BUFFERS_POOL_SIZE)
   {
     size_t flush_size = DEVICE_BUFFERS_POOL_SIZE / 2 + 1;
