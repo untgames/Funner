@@ -20,7 +20,9 @@ class Lockable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///¬ход / выход в критическую секцию кода
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Lock   () const;
     void Lock   ();
+    void Unlock () const;
     void Unlock ();
 
   private:
@@ -40,7 +42,7 @@ class Lockable
 class Lock
 {
   public:
-    Lock  (Lockable& in_lockable);
+    Lock  (const Lockable& in_lockable);
     ~Lock ();
 
   private:
@@ -48,7 +50,7 @@ class Lock
     Lock& operator = (const Lock&); //no impl
     
   private:
-    Lockable& lockable;
+    const Lockable& lockable;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

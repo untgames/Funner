@@ -60,6 +60,11 @@ void Lockable::Lock ()
   }
 }
 
+void Lockable::Lock () const
+{
+  const_cast<Lockable*> (this)->Lock ();
+}
+
 void Lockable::Unlock ()
 {
   if (!handle)
@@ -73,4 +78,9 @@ void Lockable::Unlock ()
   {
     //подавление всех исключений
   }
+}
+
+void Lockable::Unlock () const
+{
+  const_cast<Lockable*> (this)->Unlock ();
 }

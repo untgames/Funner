@@ -303,7 +303,7 @@ void OpenALDevice::SetFirstActiveSource (OpenALSource* source)
   first_active_source = source;
 }
 
-OpenALSource* OpenALDevice::GetFirstActiveSource ()
+OpenALSource* OpenALDevice::GetFirstActiveSource () const
 {
   common::Lock lock (*this);
 
@@ -313,6 +313,11 @@ OpenALSource* OpenALDevice::GetFirstActiveSource ()
 /*
    OpenAL контекст
 */
+
+const OpenALContext& OpenALDevice::Context () const
+{
+  return const_cast<OpenALDevice*> (this)->Context ();
+}
 
 OpenALContext& OpenALDevice::Context ()
 {
@@ -325,6 +330,11 @@ OpenALContext& OpenALDevice::Context ()
    Буфер сэмплирования
 */
 
+const void* OpenALDevice::GetSampleBuffer () const
+{
+  return const_cast<OpenALDevice*> (this)->GetSampleBuffer ();
+}
+
 void* OpenALDevice::GetSampleBuffer ()
 {
   common::Lock lock (*this);
@@ -332,7 +342,7 @@ void* OpenALDevice::GetSampleBuffer ()
   return sample_buffer.data ();
 }
 
-size_t OpenALDevice::GetSampleBufferSize ()
+size_t OpenALDevice::GetSampleBufferSize () const
 {
   common::Lock lock (*this);
 
