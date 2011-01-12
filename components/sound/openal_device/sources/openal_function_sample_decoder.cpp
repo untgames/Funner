@@ -1,5 +1,6 @@
 #include "shared.h"
 
+using namespace sound::low_level;
 using namespace sound::low_level::openal;
 
 /*
