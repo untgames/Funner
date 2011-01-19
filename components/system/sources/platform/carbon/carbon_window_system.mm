@@ -332,6 +332,15 @@ OSStatus window_message_handler (EventHandlerCallRef event_handler_call_ref, Eve
             window_impl->Notify (window_handle, WindowEvent_OnPaint, context);
             break;
           case kEventWindowActivated: //окно стало активным
+            if (is_cursor_in_client_region (wnd))
+            {
+              Platform::SetCursorVisible (window_handle, Platform::GetCursorVisible (window_handle));
+
+              [window_impl->cursor set];
+
+              window_impl->is_cursor_in_window = true;
+            }
+
             window_impl->Notify (window_handle, WindowEvent_OnActivate, context);
             break;
           case kEventWindowDeactivated: //окно стало неактивным
@@ -1225,7 +1234,7 @@ void Platform::SetCursorVisible (window_t handle, bool state)
 {
   try
   {
-    if (is_cursor_in_client_region ((WindowRef)handle))
+    if (GetWindowFlag (handle, WindowFlag_Active) && is_cursor_in_client_region ((WindowRef)handle))
     {
       if (state)
       {
