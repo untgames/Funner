@@ -130,15 +130,15 @@ OpenALDevice::OpenALDevice (const char* driver_name, const char* device_name, co
 
 OpenALDevice::~OpenALDevice ()
 {
-  common::Lock lock (*this);
+  Lock ();
 
   try
   {
-    ClearALData ();
-    
     buffer_action.Cancel ();
     listener_action.Cancel ();
     source_action.Cancel ();    
+
+    ClearALData ();
   }
   catch (...)
   {
