@@ -183,7 +183,7 @@ void OpenALSource::SetSample (OpenALSample* sample)
           break;
       }
 
-      sound_sample_decoder = sample->CreateDecoder ();
+      sound_sample_decoder = SampleDecoderPtr (sample->CreateDecoder (), false);
       sound_sample         = sample;
 
       UpdateSampleNotify ();
