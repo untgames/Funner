@@ -59,6 +59,12 @@ static int _wopen (const void* name, int mode, ...)
 
 #endif
 
-#ifdef _WIN32
+#if defined (_WIN32)
   #define lfind _lfind
+#endif
+
+#ifdef ANDROID
+
+void * lfind (const void *key, const void *base, unsigned int *num, unsigned int width, int (*compare)(const void *, const void *));
+
 #endif
