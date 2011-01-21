@@ -111,7 +111,70 @@ struct Platform::window_handle
     context.keyboard_shift_pressed   = is_shift_pressed;
     context.keyboard_control_pressed = is_sym_pressed;
     context.key_scan_code            = (ScanCode)key;
-    context.key                      = Key_Unknown; ///!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    Key syslib_key = Key_Unknown;
+
+    switch (key)
+    {
+      case AKEYCODE_0:             syslib_key = Key_0;            break;
+      case AKEYCODE_1:             syslib_key = Key_1;            break;
+      case AKEYCODE_2:             syslib_key = Key_2;            break;
+      case AKEYCODE_3:             syslib_key = Key_3;            break;
+      case AKEYCODE_4:             syslib_key = Key_4;            break;
+      case AKEYCODE_5:             syslib_key = Key_5;            break;
+      case AKEYCODE_6:             syslib_key = Key_6;            break;
+      case AKEYCODE_7:             syslib_key = Key_7;            break;
+      case AKEYCODE_8:             syslib_key = Key_8;            break;
+      case AKEYCODE_9:             syslib_key = Key_9;            break;
+      case AKEYCODE_A:             syslib_key = Key_A;            break;
+      case AKEYCODE_B:             syslib_key = Key_B;            break;
+      case AKEYCODE_C:             syslib_key = Key_C;            break;
+      case AKEYCODE_D:             syslib_key = Key_D;            break;
+      case AKEYCODE_E:             syslib_key = Key_E;            break;
+      case AKEYCODE_F:             syslib_key = Key_F;            break;
+      case AKEYCODE_G:             syslib_key = Key_G;            break;
+      case AKEYCODE_H:             syslib_key = Key_H;            break;
+      case AKEYCODE_I:             syslib_key = Key_I;            break;
+      case AKEYCODE_J:             syslib_key = Key_J;            break;
+      case AKEYCODE_K:             syslib_key = Key_K;            break;
+      case AKEYCODE_L:             syslib_key = Key_L;            break;
+      case AKEYCODE_M:             syslib_key = Key_M;            break;
+      case AKEYCODE_N:             syslib_key = Key_N;            break;
+      case AKEYCODE_O:             syslib_key = Key_O;            break;
+      case AKEYCODE_P:             syslib_key = Key_P;            break;
+      case AKEYCODE_Q:             syslib_key = Key_Q;            break;
+      case AKEYCODE_R:             syslib_key = Key_R;            break;
+      case AKEYCODE_S:             syslib_key = Key_S;            break;
+      case AKEYCODE_T:             syslib_key = Key_T;            break;
+      case AKEYCODE_U:             syslib_key = Key_U;            break;
+      case AKEYCODE_V:             syslib_key = Key_V;            break;
+      case AKEYCODE_W:             syslib_key = Key_W;            break;
+      case AKEYCODE_X:             syslib_key = Key_X;            break;
+      case AKEYCODE_Y:             syslib_key = Key_Y;            break;
+      case AKEYCODE_Z:             syslib_key = Key_Z;            break;
+      case AKEYCODE_COMMA:         syslib_key = Key_Comma;        break;
+      case AKEYCODE_PERIOD:        syslib_key = Key_Dot;          break;
+      case AKEYCODE_ALT_LEFT:
+      case AKEYCODE_ALT_RIGHT:     syslib_key = Key_Alt;          break;
+      case AKEYCODE_SHIFT_LEFT:
+      case AKEYCODE_SHIFT_RIGHT:   syslib_key = Key_Shift;        break;
+      case AKEYCODE_TAB:           syslib_key = Key_Tab;          break;
+      case AKEYCODE_SPACE:         syslib_key = Key_Space;        break;
+      case AKEYCODE_ENTER:         syslib_key = Key_Enter;        break;
+      case AKEYCODE_DEL:           syslib_key = Key_Delete;       break;
+      case AKEYCODE_MINUS:         syslib_key = Key_Minus;        break;
+      case AKEYCODE_LEFT_BRACKET:  syslib_key = Key_LeftBracket;  break;
+      case AKEYCODE_RIGHT_BRACKET: syslib_key = Key_RightBracket; break;
+      case AKEYCODE_BACKSLASH:     syslib_key = Key_BackSlash;    break;
+      case AKEYCODE_SEMICOLON:     syslib_key = Key_Semicolon;    break;
+      case AKEYCODE_APOSTROPHE:    syslib_key = Key_Apostrophe;   break;
+      case AKEYCODE_SLASH:         syslib_key = Key_Slash;        break;
+      case AKEYCODE_PLUS:          syslib_key = Key_Plus;         break;
+      case AKEYCODE_PAGE_UP:       syslib_key = Key_PageUp;       break;
+      case AKEYCODE_PAGE_DOWN:     syslib_key = Key_PageDown;     break;
+    }
+
+    context.key = syslib_key;
     
     static const int ACTION_DOWN = 0, ACTION_UP = 1;
     
