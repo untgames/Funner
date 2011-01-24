@@ -23,8 +23,8 @@ namespace
     Константы
 */
 
-const int HEADER  = 'BANM';
-const int VERSION = 1;
+const char HEADER [4] = {'B', 'A', 'N', 'M'};
+const int  VERSION    = 1;
 
 void file_write (OutputFile& file, const void* data, size_t size)
 {

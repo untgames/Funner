@@ -23,8 +23,8 @@ namespace
     Константы
 */
 
-const int HEADER  = 'BANM';
-const int VERSION = 1;
+const char HEADER [4] = {'B', 'A', 'N', 'M'};
+const int  VERSION    = 1;
 
 void file_read (InputFile& file, void* data, size_t size)
 {
@@ -216,14 +216,13 @@ class BinAnimationLibraryLoader
 
         //проверка заголовка файла
 
-      int header;
+      char header [4] = {0, 0, 0, 0};
 
-      file_read (input_file, &header, sizeof (header));
+      file_read (input_file, header, sizeof (header));
 
-      if (header != HEADER)
+      if (memcmp (&header, HEADER, 4))
         throw xtl::format_operation_exception (METHOD_NAME, "File '%s' has invalid header '%c%c%c%c', must be '%c%c%c%c'", file_name,
-                                               ((char*)(&header))[3], ((char*)(&header))[2], ((char*)(&header))[1], ((char*)(&header))[0],
-                                               ((char*)(&HEADER))[3], ((char*)(&HEADER))[2], ((char*)(&HEADER))[1], ((char*)(&HEADER))[0]);
+          header [0], header [1], header [2], header [3], HEADER [0], HEADER [1], HEADER [2], HEADER [3]);
 
       int version;
 
