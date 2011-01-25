@@ -215,13 +215,19 @@ endif
   
   $$($1.DEX_FILE): $$($1.CLASSES_FLAG)
 		@echo Convert $$(notdir $$@) to Dalvik bytecodes...
-#		@export TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && '$(DX_TOOL) --dex --output=$$$$TMP_DIR_PREFIX\$$(notdir $$@) $$$$TMP_DIR_PREFIX\$$(notdir $$($1.CLASSES_DIR))'
+ifeq ($(ANDROID_NDK_HOST),windows)
+		@export TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && cmd //C "$(DX_TOOL).bat --dex --output=$$$$TMP_DIR_PREFIX\$$(notdir $$@) $$$$TMP_DIR_PREFIX\$$(notdir $$($1.CLASSES_DIR))"
+else
 		@$(DX_TOOL) --dex --output=$$@ $$($1.CLASSES_DIR)
+endif
 
   $$($1.UNSIGNED_TARGET): $$($1.DEX_FILE) $$($1.PACKAGED_RES_FILE) $$($1.TARGET_DLLS)
 		@echo Create unsigned APK $$(notdir $$@)...
-#		@export LIB_DIR_PREFIX=$$$$($$(call get_system_dir,$$(DIST_LIB_DIR))) TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && if ! '$(APK_BUILDER) %TMP_DIR_PREFIX%\$$(notdir $$@) -u -z %TMP_DIR_PREFIX%\$$(notdir $$($1.PACKAGED_RES_FILE)) -f %TMP_DIR_PREFIX%\$$(notdir $$($1.DEX_FILE)) -rf %TMP_DIR_PREFIX%\\bin $$(foreach jar,$$($1.JARS),-rj %LIB_DIR_PREFIX%\\$$(notdir $$(jar)))'; then $(RM) $$@; exit 1; fi
+ifeq ($(ANDROID_NDK_HOST),windows)		
+		@export LIB_DIR_PREFIX=$$$$($$(call get_system_dir,$$(DIST_LIB_DIR))) TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && if ! cmd //C "$(APK_BUILDER) %TMP_DIR_PREFIX%\$$(notdir $$@) -u -z %TMP_DIR_PREFIX%\$$(notdir $$($1.PACKAGED_RES_FILE)) -f %TMP_DIR_PREFIX%\$$(notdir $$($1.DEX_FILE)) -rf %TMP_DIR_PREFIX%\\bin $$(foreach jar,$$($1.JARS),-rj %LIB_DIR_PREFIX%\\$$(notdir $$(jar)))"; then $(RM) $$@; exit 1; fi
+else
 		@if ! $$$$($(APK_BUILDER) $$@ -u -z $$($1.PACKAGED_RES_FILE) -f $$($1.DEX_FILE) -rf $$($1.TMP_DIR)/bin $$(foreach jar,$$($1.JARS),-rj $$(jar))); then $(RM) $$@; exit 1; fi
+endif
 
   $$($1.SIGNED_TARGET): $$($1.UNSIGNED_TARGET)
 		@echo Sign $$(notdir $$@)...
