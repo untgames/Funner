@@ -5,6 +5,10 @@ ifeq ($(strip $(ANDROID_NDK)),)
   $(error "Please set ANDROID_NDK variable in your environment")
 endif
 
+ifeq ($(strip $(ANDROID_NDK_HOST)),)
+  $(error "Please set ANDROID_NDK_HOST variable in your environment")
+endif
+
 ifeq ($(strip $(ANDROID_SDK)),)
   $(error "Please set ANDROID_SDK variable in your environment")
 endif
@@ -25,23 +29,22 @@ REMOTE_DEBUG_DIR           ?= //sdcard/funner
 EXE_SUFFIX                 :=
 DLL_SUFFIX                 := .so
 DLL_PREFIX                 := lib
-NDK_HOST                   := windows
 ANDROID_PLATFORM           := android-9
 NDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_NDK)))
 SDK_ROOT                   := /$(subst :,,$(call convert_path,$(ANDROID_SDK)))
 JAVA_SDK                   := /$(subst :,,$(call convert_path,$(JAVA_SDK)))
 PLATFORM_DIR               := $(NDK_ROOT)/platforms/$(ANDROID_PLATFORM)
 ANDROID_PLATFORM_TOOLS_DIR := $(call convert_path,$(ANDROID_SDK))/platform-tools
-ARM_EABI_DIR               := $(NDK_ROOT)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(NDK_HOST)
+ARM_EABI_DIR               := $(NDK_ROOT)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(ANDROID_NDK_HOST)
 CYGWIN_BIN                 := /$(subst :,,$(call convert_path,$(CYGHOME)))/bin
 GCC_TOOLS_DIR              := $(ARM_EABI_DIR)/bin
-COMPILER_GCC               := $(GCC_TOOLS_DIR)/arm-linux-androideabi-gcc.exe
-LINKER_GCC                 := $(GCC_TOOLS_DIR)/arm-linux-androideabi-g++.exe
+COMPILER_GCC               := $(GCC_TOOLS_DIR)/arm-linux-androideabi-gcc
+LINKER_GCC                 := $(GCC_TOOLS_DIR)/arm-linux-androideabi-g++
 LIB_GCC                    := $(GCC_TOOLS_DIR)/arm-linux-androideabi-ar
 ANDROID_TOOLS_DIR          := $(SDK_ROOT)/tools
 ADB                        := $(ANDROID_PLATFORM_TOOLS_DIR)/adb
-APK_BUILDER                := $(ANDROID_SDK)/tools/apkbuilder.bat
-DX_TOOL                    := $(ANDROID_PLATFORM_TOOLS_DIR)/dx.bat
+APK_BUILDER                := $(ANDROID_SDK)/tools/apkbuilder
+DX_TOOL                    := $(ANDROID_PLATFORM_TOOLS_DIR)/dx
 JAVA_JAR                   := "$(JAVA_SDK)/bin/jar"
 JAVA_CC                    := "$(JAVA_SDK)/bin/javac"
 JAVA_AAPT                  := $(ANDROID_PLATFORM_TOOLS_DIR)/aapt
@@ -207,16 +210,18 @@ endif
   
   $$($1.CLASSES_FLAG): $$($1.SOURCE_FILES) $$($1.JARS) $$($1.PACKAGED_RES_FILE)
 		@echo Compile sources for $$(notdir $$($1.TARGET))...
-		@export R_FILES=$$$$(/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR);$$(subst ; ,;,$$($1.JARS:%=%;))'
+		@export R_FILES=$$$$(find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),;$$(subst ; ,;,$$($1.JARS:%=%;)))'
 		@touch $$@
   
   $$($1.DEX_FILE): $$($1.CLASSES_FLAG)
 		@echo Convert $$(notdir $$@) to Dalvik bytecodes...
-		@export TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && cmd //C '$(DX_TOOL) --dex --output=%TMP_DIR_PREFIX%\$$(notdir $$@) %TMP_DIR_PREFIX%\$$(notdir $$($1.CLASSES_DIR))'
+#		@export TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && '$(DX_TOOL) --dex --output=$$$$TMP_DIR_PREFIX\$$(notdir $$@) $$$$TMP_DIR_PREFIX\$$(notdir $$($1.CLASSES_DIR))'
+		@$(DX_TOOL) --dex --output=$$@ $$($1.CLASSES_DIR)
 
   $$($1.UNSIGNED_TARGET): $$($1.DEX_FILE) $$($1.PACKAGED_RES_FILE) $$($1.TARGET_DLLS)
 		@echo Create unsigned APK $$(notdir $$@)...
-		@export LIB_DIR_PREFIX=$$$$($$(call get_system_dir,$$(DIST_LIB_DIR))) TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && if ! cmd //C '$(APK_BUILDER) %TMP_DIR_PREFIX%\$$(notdir $$@) -u -z %TMP_DIR_PREFIX%\$$(notdir $$($1.PACKAGED_RES_FILE)) -f %TMP_DIR_PREFIX%\$$(notdir $$($1.DEX_FILE)) -rf %TMP_DIR_PREFIX%\\bin $$(foreach jar,$$($1.JARS),-rj %LIB_DIR_PREFIX%\\$$(notdir $$(jar)))'; then $(RM) $$@; exit 1; fi
+#		@export LIB_DIR_PREFIX=$$$$($$(call get_system_dir,$$(DIST_LIB_DIR))) TMP_DIR_PREFIX=$$$$($$(call get_system_dir,$$($1.TMP_DIR))) && if ! '$(APK_BUILDER) %TMP_DIR_PREFIX%\$$(notdir $$@) -u -z %TMP_DIR_PREFIX%\$$(notdir $$($1.PACKAGED_RES_FILE)) -f %TMP_DIR_PREFIX%\$$(notdir $$($1.DEX_FILE)) -rf %TMP_DIR_PREFIX%\\bin $$(foreach jar,$$($1.JARS),-rj %LIB_DIR_PREFIX%\\$$(notdir $$(jar)))'; then $(RM) $$@; exit 1; fi
+		@if ! $$$$($(APK_BUILDER) $$@ -u -z $$($1.PACKAGED_RES_FILE) -f $$($1.DEX_FILE) -rf $$($1.TMP_DIR)/bin $$(foreach jar,$$($1.JARS),-rj $$(jar))); then $(RM) $$@; exit 1; fi
 
   $$($1.SIGNED_TARGET): $$($1.UNSIGNED_TARGET)
 		@echo Sign $$(notdir $$@)...
