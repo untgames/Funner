@@ -210,7 +210,7 @@ endif
   
   $$($1.CLASSES_FLAG): $$($1.SOURCE_FILES) $$($1.JARS) $$($1.PACKAGED_RES_FILE)
 		@echo Compile sources for $$(notdir $$($1.TARGET))...
-		@export R_FILES=$$$$(/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),;$$(subst ; ,;,$$($1.JARS:%=%;)))'
+		@export R_FILES=$$$$(/usr/bin/find $$($1.R_DIR) -name '*.java') && $(JAVA_CC) $$($1.SOURCE_FILES) $$$$R_FILES $$($1.COMPILER_FLAGS) -d $$($1.CLASSES_DIR) -classpath '$(ANDROID_JAR)$$(if $$($1.JARS),;$$(subst ; ,;,$$($1.JARS:%=%;)))'
 		@touch $$@
   
   $$($1.DEX_FILE): $$($1.CLASSES_FLAG)
