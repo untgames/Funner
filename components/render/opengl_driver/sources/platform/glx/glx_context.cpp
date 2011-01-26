@@ -190,8 +190,9 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
     
       //установка текущего контекста                
       
-    if (!impl->adapter->GetLibrary ().MakeCurrent (impl->display, impl->window, impl->window, impl->glx_context))
-      raise_error ("::eglMakeCurrent");
+    impl->adapter->GetLibrary ().MakeCurrent (impl->display, impl->window, impl->window, impl->glx_context);
+
+      // TODO: проверить результат      
       
     Impl::current_context = impl.get ();
 
