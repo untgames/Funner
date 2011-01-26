@@ -138,12 +138,12 @@ struct PrimarySwapChain::Impl
       
       OutputModeDesc mode_desc;
       
-      output->GetCurrentMode (mode_desc);
+//      output->GetCurrentMode (mode_desc);
 
       mode_desc.width  = modes [best_mode]->hdisplay;
       mode_desc.height = modes [best_mode]->vdisplay;
 
-      output->SetCurrentMode (mode_desc);
+//      output->SetCurrentMode (mode_desc);
     }
     else
     {
