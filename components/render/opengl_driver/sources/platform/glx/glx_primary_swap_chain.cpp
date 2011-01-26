@@ -90,7 +90,7 @@ struct PrimarySwapChain::Impl
     if (GetFullscreenState () == state)
       return;
       
-    Output* output = adapter->FindContainingOutput (window);
+    Output* output = adapter->GetOutput (window);
     
     if (!output)
       return;      
@@ -153,7 +153,7 @@ struct PrimarySwapChain::Impl
   
   bool GetFullscreenState ()
   {
-    Output* output = adapter->FindContainingOutput (window);
+    Output* output = adapter->GetOutput (window);
 
     if (!output)
       return false;
