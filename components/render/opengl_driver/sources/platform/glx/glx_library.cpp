@@ -12,7 +12,7 @@ using namespace render::low_level::opengl::glx;
 
 typedef GLXContext   (*glXCreateNewContextFn)       (Display *dpy, GLXFBConfig config, int render_type, GLXContext share_list, Bool direct);
 typedef void         (*glXDestroyContextFn)         (Display *dpy, GLXContext ctx);
-typedef Bool         (*glXMakeContextCurrentFn)     (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx);
+typedef Bool         (*glXMakeCurrentFn)            (Display *dpy, GLXDrawable drawable, GLXContext ctx);
 typedef GLXPbuffer   (*glXCreatePbufferFn)          (Display *dpy, GLXFBConfig config, const int *attrib_list);
 typedef void         (*glXDestroyPbufferFn)         (Display *dpy, GLXPbuffer pbuf);
 typedef void         (*glXSwapBuffersFn)            (Display *dpy, GLXDrawable drawable);
@@ -138,7 +138,7 @@ struct AdapterLibrary::Impl
   
   glXCreateNewContextFn       fglXCreateNewContext;
   glXDestroyContextFn         fglXDestroyContext;
-  glXMakeContextCurrentFn     fglXMakeContextCurrent;
+  glXMakeCurrentFn            fglXMakeCurrent;
   glXCreatePbufferFn          fglXCreatePbuffer;
   glXDestroyPbufferFn         fglXDestroyPbuffer;
   glXSwapBuffersFn            fglXSwapBuffers;
@@ -171,7 +171,7 @@ struct AdapterLibrary::Impl
         
       GetSymbol ("glXCreateNewContext",       fglXCreateNewContext);
       GetSymbol ("glXDestroyContext",         fglXDestroyContext);
-      GetSymbol ("glXMakeContextCurrent",     fglXMakeContextCurrent);
+      GetSymbol ("glXMakeCurrent",            fglXMakeCurrent);
       GetSymbol ("glXCreatePbuffer",          fglXCreatePbuffer);
       GetSymbol ("glXDestroyPbuffer",         fglXDestroyPbuffer);
       GetSymbol ("glXSwapBuffers",            fglXSwapBuffers);
@@ -384,7 +384,7 @@ void AdapterLibrary::DestroyContext (Display *dpy, GLXContext ctx)
     Установка текущего контекста
 */
 
-bool AdapterLibrary::MakeCurrent (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx, IContextLostListener* new_listener)
+bool AdapterLibrary::MakeCurrent (Display *dpy, GLXDrawable drawable, GLXContext ctx, IContextLostListener* new_listener)
 {
     //сброс текущего контекста
 
@@ -402,7 +402,7 @@ bool AdapterLibrary::MakeCurrent (Display *dpy, GLXDrawable draw, GLXDrawable re
 
   impl->listener = new_listener;
   
-  return impl->fglXMakeContextCurrent (dpy, draw, read, ctx);
+  return impl->fglXMakeCurrent (dpy, drawable, ctx);
 }
 
 /*
@@ -506,6 +506,9 @@ const void* AdapterLibrary::GetProcAddress (const char* name, size_t search_flag
 
   if (address)
     return address;
+    
+  if (search_flags & EntrySearch_NoThrow)
+    return 0;    
 
   throw xtl::format_operation_exception (METHOD_NAME, "OpenGL entry '%s' not found in GL library '%s'", name, GetName ());
 }

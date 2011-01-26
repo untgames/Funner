@@ -167,7 +167,7 @@ void Adapter::EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, Glx
   if (strstr (extensions, "GLX_ARB_multisample")) ext_ARB_multisample_supported = true;
 
   AdapterLibrary& lib = GetLibrary ();
-
+  
   for (int i=0; i<nelems; i++)
   {
     GLXFBConfig config = configs [i];
@@ -176,11 +176,27 @@ void Adapter::EnumPixelFormats (int screen, PixelFormatArray& pixel_formats, Glx
     
     if (!(get_fb_config_attrib (lib, display, config, GLX_RENDER_TYPE) & GLX_RGBA_BIT))
       continue;
+      
+    if (get_fb_config_attrib (lib, display, config, GLX_LEVEL))
+      continue;
+      
+    if (!get_fb_config_attrib (lib, display, config, GLX_X_RENDERABLE))
+      continue;
+      
+    int visual_id = get_fb_config_attrib (lib, display, config, GLX_VISUAL_ID);
+      
+    if (!visual_id)
+      continue;
+      
+    if (get_fb_config_attrib (lib, display, config, GLX_CONFIG_CAVEAT) == GLX_NON_CONFORMANT_CONFIG)
+      continue;
     
     PixelFormatDesc desc;
 
     desc.adapter                 = this;
     desc.glx_extension_entries   = 0;
+    desc.config                  = config;
+    desc.visual_id               = visual_id;
     desc.pixel_format_index      = get_fb_config_attrib (lib, display, config, GLX_FBCONFIG_ID);
     desc.color_bits              = get_fb_config_attrib (lib, display, config, GLX_BUFFER_SIZE);
     desc.alpha_bits              = get_fb_config_attrib (lib, display, config, GLX_ALPHA_SIZE);

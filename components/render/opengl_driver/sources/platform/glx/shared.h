@@ -81,7 +81,9 @@ struct PixelFormatDesc
 {
   Adapter*                   adapter;                 //адаптер, поддерживающий указанный формат
   const GlxExtensionEntries* glx_extension_entries;   //таблица GLX-расширений (должна быть скопирована в методе, получившем PixelFormatDesc, может быть 0)
-  int                        pixel_format_index;      //индекс формата пикселей в таблице форматов адаптера
+  GLXFBConfig                config;
+  int                        pixel_format_index;
+  int                        visual_id;
   size_t                     color_bits;              //количество бит на цвет
   size_t                     alpha_bits;              //количество бит на альфу
   size_t                     depth_bits;              //количество бит на глубину
@@ -231,7 +233,7 @@ class AdapterLibrary: virtual public ILibrary, public xtl::reference_counter
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текущего контекста
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    bool MakeCurrent (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx, IContextLostListener* = 0);
+    bool MakeCurrent (Display *dpy, GLXDrawable drawable, GLXContext ctx, IContextLostListener* = 0);
                               
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение текущего контекста и drawable

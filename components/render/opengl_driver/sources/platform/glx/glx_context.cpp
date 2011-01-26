@@ -40,7 +40,7 @@ struct Context::Impl
     
     DisplayLock lock (display);
       
-    adapter->GetLibrary ().MakeCurrent (display, None, None, NULL);
+    adapter->GetLibrary ().MakeCurrent (display, None, NULL);
 
     current_context = 0;
   }
@@ -117,8 +117,8 @@ Context::Context (ISwapChain* in_swap_chain)
     
     impl->glx_context = impl->adapter->GetLibrary ().CreateContext (swap_chain->GetDisplay (), 
                                                                     swap_chain->GetFBConfig (),
-                                                                    GLX_RGBA_TYPE, NULL, True);
-    
+                                                                    GLX_RGBA_TYPE, 0, True);
+                                                                    
     if (!impl->glx_context)
       raise_error ("::glxCreateContext");
       
@@ -196,10 +196,10 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
     DisplayLock lock (impl->display);
     
       //установка текущего контекста
-
-    if (!impl->adapter->GetLibrary ().MakeCurrent (impl->display, impl->window, impl->window, impl->glx_context))
+      
+    if (!impl->adapter->GetLibrary ().MakeCurrent (impl->display, impl->window, impl->glx_context))
       raise_error ("::glxMakeContextCurrent");
-
+      
     Impl::current_context = impl.get ();
 
       //оповещение об установке текущего контекста
@@ -208,7 +208,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("render::low_level::opengl::egl::Context::MakeCurrent");
+    exception.touch ("render::low_level::opengl::egl::Context::OQMakeCurrent");
     throw;
   }
 

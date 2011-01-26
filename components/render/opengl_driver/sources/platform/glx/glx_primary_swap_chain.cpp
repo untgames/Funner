@@ -5,40 +5,6 @@ using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::glx;
 
 /*
-    Получение конигурации буфера кадра по заданному id
-*/
-
-namespace
-{
-
-GLXFBConfig get_fb_config (AdapterLibrary& library, Display *display, int screen, int fbconfig_id)
-{
-  DisplayLock lock (display);
-  
-  int attrib_list[] =
-  {
-    GLX_FBCONFIG_ID, fbconfig_id,
-    None
-  };
-
-  int nelements = 0;
-        
-  GLXFBConfig* config = library.ChooseFBConfig (display, screen, attrib_list, &nelements);
-  
-  if (!config)
-    throw xtl::format_operation_exception ("render::low_level::opengl::glx::get_fb_config",
-      "glXChooseFBConfig failed");
-      
-  GLXFBConfig fb_config = config [0];
-
-  XFree (config);
-  
-  return fb_config;
-}
-
-}
-
-/*
     Описание реализации первичной цепочки обмена
 */
 
@@ -90,7 +56,7 @@ struct PrimarySwapChain::Impl
       
         //инициализация конфигурации буфера кадра
         
-      glx_fb_config = get_fb_config (*library, display, get_screen_number (window), pixel_format_index);
+      glx_fb_config = pixel_format.config;
             
         //инициализация дескриптора цепочки обмена
         

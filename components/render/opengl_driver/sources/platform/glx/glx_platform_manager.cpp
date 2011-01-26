@@ -120,6 +120,9 @@ class PlatformManagerImpl
         pixel_formats.reserve (PIXEL_FORMAT_ARRAY_RESERVE_SIZE);
         glx_extension_entries.reserve (adapters_count);
         
+        int screen    = get_screen_number ((Window)desc.window_handle);
+        int visual_id = XVisualIDFromVisual (DefaultVisual ((Display*)syslib::x11::DisplayManager::DisplayHandle (), screen));        
+        
         for (size_t i=0; i<adapters_count; i++)
         {
           IAdapter* in_adapter = adapters [i];
@@ -132,12 +135,10 @@ class PlatformManagerImpl
           if (!adapter)
             throw xtl::format_exception<xtl::argument_exception> ("", "Invalid argument 'adapters[%u]'. Wrong type '%s'",
               i, typeid (*in_adapter).name ());
-
+              
           try
           {
             log.Printf ("...enumerate pixel formats on adapter '%s'", adapter->GetName ());
-            
-            int screen = get_screen_number ((Window)desc.window_handle);
             
             adapter->EnumPixelFormats (screen, pixel_formats, glx_extension_entries);
           }
@@ -153,7 +154,7 @@ class PlatformManagerImpl
 
           //выбор наиболее подходящего формата          
 
-        const PixelFormatDesc& pixel_format = ChoosePixelFormat (pixel_formats, desc);
+        const PixelFormatDesc& pixel_format = ChoosePixelFormat (pixel_formats, desc, visual_id);
         
           //протоколирование выбранного формата
           
@@ -182,9 +183,9 @@ class PlatformManagerImpl
           flags += "STEREO";
         }
 
-        log.Printf ("...choose pixel format #%u on adapter '%s' (RGB/A: %u/%u, D/S: %u/%u, Samples: %u%s)",
+        log.Printf ("...choose pixel format #%u on adapter '%s' (RGB/A: %u/%u, D/S: %u/%u, VisualID: %u, Samples: %u%s)",
           pixel_format.pixel_format_index, pixel_format.adapter->GetName (), pixel_format.color_bits,
-          pixel_format.alpha_bits, pixel_format.depth_bits, pixel_format.stencil_bits, pixel_format.samples_count, flags.c_str ());
+          pixel_format.alpha_bits, pixel_format.depth_bits, pixel_format.stencil_bits, pixel_format.visual_id, pixel_format.samples_count, flags.c_str ());
 
           //создание цепочки обмена
 
@@ -308,6 +309,9 @@ class PlatformManagerImpl
         
       if (fmt0.support_draw_to_pbuffer != fmt1.support_draw_to_pbuffer)
         return fmt1.support_draw_to_pbuffer;
+        
+      if (fmt0.support_draw_to_window != fmt1.support_draw_to_window)
+        return fmt1.support_draw_to_window;
 
         //упорядочивание по наличию стерео-режима
         
@@ -320,7 +324,7 @@ class PlatformManagerImpl
     }
     
 ///Выбор формата пикселей
-    const PixelFormatDesc& ChoosePixelFormat (const Adapter::PixelFormatArray& pixel_formats, const SwapChainDesc& swap_chain_desc)
+    const PixelFormatDesc& ChoosePixelFormat (const Adapter::PixelFormatArray& pixel_formats, const SwapChainDesc& swap_chain_desc, int visual_id)
     {
         //если не найдено ни одного подходящего формата - создание цепочки обмена невозможно                  
 
@@ -332,8 +336,16 @@ class PlatformManagerImpl
       const PixelFormatDesc* best = &pixel_formats [0];
       
       for (Adapter::PixelFormatArray::const_iterator iter=pixel_formats.begin ()+1, end=pixel_formats.end (); iter!=end; ++iter)
+      {
+        if (visual_id != iter->visual_id)
+          continue;
+      
         if (CompareFormats (*best, *iter, swap_chain_desc))
-          best = &*iter;
+          best = &*iter;          
+      }
+
+      if (visual_id != best->visual_id)
+        throw xtl::format_operation_exception ("render::low_level::opengl::glx::PlatformManagerImpl::ChoostPixelFormat", "No pixel format for visual ID %d", visual_id);      
 
       return *best;
     }
