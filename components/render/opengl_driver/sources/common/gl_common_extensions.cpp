@@ -557,7 +557,7 @@ void ExtensionSet::SetGroup (const char* extension_names, bool state)
     const char* first    = pos;
     bool        wildcard = false;
 
-    for (bool loop=true; loop; ++pos)
+    for (bool loop=true; loop;)
       switch (*pos)
       {
         case '\0':
@@ -567,13 +567,15 @@ void ExtensionSet::SetGroup (const char* extension_names, bool state)
         case '?':
         case '*':
           wildcard = true;
+          ++pos;
         default:
+          ++pos;
           break;
       }
 
     if (!wildcard)
     {
-      size_t extension_id = get_extension_id (first, size_t (pos-first-1));
+      size_t extension_id = get_extension_id (first, size_t (pos-first));
 
       if (extension_id >= EXTENSIONS_COUNT)
         continue;
@@ -582,7 +584,7 @@ void ExtensionSet::SetGroup (const char* extension_names, bool state)
     }
     else
     {
-      mask.assign (first, size_t (pos - first - 1));
+      mask.assign (first, size_t (pos - first));
 
       if (!strcmp (mask.c_str (), "*")) //обработка специального случая очистки / установки всех флагов
       {
