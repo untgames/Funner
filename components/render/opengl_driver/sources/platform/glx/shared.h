@@ -24,12 +24,22 @@
 #include <shared/platform.h>
 #include <shared/property_list.h>
 
+/* Xlib.h is the default header that is included and has the core functionallity */
+#include <X11/Xlib.h>
+
+/* X RandR is used to configure which display ports are enabled (e.g. LCD, VGA and DVI), 
+ * and to configure display modes and properties such as orientation, reflection and DPI.
+ */
+#include <X11/extensions/Xrandr.h>
+
+/* The XF86 Video Mode extension allows us to change the displaymode of the server
+ * this allows us to set the display to fullscreen and also read videomodes and   
+ * other information.                                                             
+ */  
+#include <X11/extensions/xf86vmode.h>
+
 #include <GL/gl.h>
 #include <GL/glx.h>
-
-#include <X11/Xlib.h>
-#include <X11/extensions/Xrandr.h>
-#include <X11/extensions/xf86vmode.h>
 
 namespace render
 {
@@ -325,7 +335,7 @@ class Adapter: virtual public IAdapter, public Object
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Контекст устройства отрисовки
+///Цепочка обмена
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class ISwapChainImpl: virtual public ISwapChain
 {
@@ -333,8 +343,8 @@ class ISwapChainImpl: virtual public ISwapChain
     virtual Adapter*                   GetAdapterImpl         () = 0; //получение реализации адаптера
     virtual Display*                   GetDisplay             () = 0; //устройство отображения для текущего контекста
     virtual Window                     GetWindow              () = 0; //окно отрисовки
-    virtual const GlxExtensionEntries& GetGlxExtensionEntries () = 0; //получение таблицы GLX-расширений
     virtual GLXFBConfig                GetFBConfig            () = 0; //конфигурация буфера кадра
+    virtual const GlxExtensionEntries& GetGlxExtensionEntries () = 0; //получение таблицы GLX-расширений
 
   protected:
     virtual ~ISwapChainImpl () {}
