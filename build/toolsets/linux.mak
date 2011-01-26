@@ -11,7 +11,7 @@ DLL_PREFIX    := lib
 DLL_PATH      := LD_LIBRARY_PATH
 COMMON_CFLAGS += -DLINUX
 
-PROFILES += linux unistd x11 glx haswchar pthread_static_library
+PROFILES += linux unistd x11 glx haswchar pthread_static_library has_windows
 
 include $(TOOLSETS_DIR)/g++.mak
 

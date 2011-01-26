@@ -60,6 +60,8 @@ void DefaultPlatform::Unlock (lockable_t& lockable)
     
 size_t DefaultPlatform::GetMilliseconds ()
 {
+  printf ("??? %lu %u\n", clock (), sizeof (clock_t));
+
   return size_t (clock () * 1000.0f / CLOCKS_PER_SEC);
 }
 

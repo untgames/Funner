@@ -232,7 +232,7 @@ void swap (Timer& timer1, Timer& timer2)
 size_t milliseconds ()
 {
   static size_t start = Platform::GetMilliseconds ();
-
+  
   return Platform::GetMilliseconds () - start;
 }
 

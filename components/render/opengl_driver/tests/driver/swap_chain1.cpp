@@ -6,6 +6,12 @@ typedef xtl::com_ptr<ISwapChain> SwapChainPtr;
 
 const bool FAIL_TEST = false;
 
+void log_print (const char* stream, const char* message)
+{
+  printf ("%s: %s\n", stream, message);
+  fflush (stdout);
+}
+
 void dump (ISwapChain& swap_chain)
 {
   SwapChainDesc desc;
@@ -41,6 +47,8 @@ int main ()
   
   try
   {
+    common::LogFilter filter ("*", &log_print);
+  
     Window window (WindowStyle_Overlapped, 800, 600);
     
     window.SetTitle ("OpenGL driver test window");

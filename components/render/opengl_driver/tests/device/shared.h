@@ -33,6 +33,7 @@
 
 #include <common/hash.h>
 #include <common/file.h>
+#include <common/log.h>
 
 using namespace render::low_level;
 

@@ -5,13 +5,20 @@ const char* tostring (bool value)
   return value ? "true" : "false";
 }
 
+void log_print (const char* stream, const char* message)
+{
+  printf ("%s: %s\n", stream, message);
+}
+
 int main ()
 {
   printf ("Results of device_info_test:\n");
   
   try
   {
-    Test test (L"OpenGL device test window (device_info)", "ffp=0");
+    common::LogFilter filter ("*", &log_print);
+  
+    Test test (L"OpenGL device test window (device_info)");
 
     printf ("Device: '%s'\n", test.device->GetName ());
 

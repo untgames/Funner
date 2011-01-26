@@ -1,4 +1,5 @@
 #include <time.h>
+#include <stdio.h>
 
 #include <platform/platform.h>
 
