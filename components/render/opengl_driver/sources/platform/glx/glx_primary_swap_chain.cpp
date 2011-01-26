@@ -90,7 +90,7 @@ struct PrimarySwapChain::Impl
     if (GetFullscreenState () == state)
       return;
       
-    Output* output = adapter->GetOutput (window);
+    Output* output = adapter->GetOutput (window).get ();
     
     if (!output)
       return;      
@@ -128,9 +128,9 @@ struct PrimarySwapChain::Impl
 
       // переключаемся в режим fullscreen      
 
-      XF86VidModeSwitchToMode (display, screen, modes [best_mode]);
+      XF86VidModeSwitchToMode (display, screen_number, modes [best_mode]);
 
-      XF86VidModeSetViewPort (display, screen, 0, 0);            
+      XF86VidModeSetViewPort (display, screen_number, 0, 0);            
 
       XFree (modes);
       
@@ -153,7 +153,7 @@ struct PrimarySwapChain::Impl
   
   bool GetFullscreenState ()
   {
-    Output* output = adapter->GetOutput (window);
+    Output* output = adapter->GetOutput (window).get ();
 
     if (!output)
       return false;
