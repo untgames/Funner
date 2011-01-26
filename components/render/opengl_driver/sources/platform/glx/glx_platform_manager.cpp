@@ -329,7 +329,7 @@ class PlatformManagerImpl
         //если не найдено ни одного подходящего формата - создание цепочки обмена невозможно                  
 
       if (pixel_formats.empty ())
-        throw xtl::format_operation_exception ("render::low_level::opengl::windows::PlatformManagerImpl::ChoosePixelFormat", "No pixel formats found");
+        throw xtl::format_operation_exception ("render::low_level::opengl::glx::PlatformManagerImpl::ChoosePixelFormat", "No pixel formats found");
 
         //поиск формата
 

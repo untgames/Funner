@@ -87,17 +87,88 @@ struct PrimarySwapChain::Impl
   
   void SetFullscreenState (bool state)
   {
-    throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::SetFullscreenState");
+    if (GetFullscreenState () == state)
+      return;
+      
+    Output* output = adapter->FindContainingOutput (window);
+    
+    if (!output)
+      return;      
+      
+    if (state)
+    {
+      DisplayLock lock (display);
+      
+      int event_base;
+      int error_base;
+      
+      // запрос расширения XF86VidMode
+      
+      if (XF86VidModeQueryExtension (display, &event_base, &error_base) == 0)
+        throw xtl::format_operation_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::SetFullscreenState",
+          "XF86VidModeQueryExtension missing");
+          
+      // запрашиваем список всех режимов
+      
+      int best_mode     = 0;
+      int mode_num      = 0;
+      int screen_number = get_screen_number (window);
+      
+      XF86VidModeModeInfo **modes;
+      
+      XF86VidModeGetAllModeLines (display, screen, &mode_num, &modes);
+      
+      // ищем режим с нужным разрешением
+      
+      for (int i=0; i<mode_num; i++)
+      {                                                                    
+        if ((modes [i]->hdisplay == desc.frame_buffer.width) && (modes [i]->vdisplay == desc.frame_buffer.height))
+           best_mode = i;
+      } 
+
+      // переключаемся в режим fullscreen      
+
+      XF86VidModeSwitchToMode (display, screen, modes [best_mode]);
+
+      XF86VidModeSetViewPort (display, screen, 0, 0);            
+
+      XFree (modes);
+      
+      // изменяем размеры области вывода
+      
+      OutputModeDesc mode_desc;
+      
+      output->GetCurrentMode (mode_desc);
+
+      mode_desc.width  = modes [best_mode]->hdisplay;
+      mode_desc.height = modes [best_mode]->vdisplay;
+
+      output->SetCurrentMode (mode_desc);
+    }
+    else
+    {
+      /// TODO: переход в режим окна
+    }
   }
   
   bool GetFullscreenState ()
   {
-    throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::GetFullscreenState");
+    Output* output = adapter->FindContainingOutput (window);
+
+    if (!output)
+      return false;
+
+    OutputModeDesc mode_desc;
+    
+    output->GetCurrentMode (mode_desc);
+
+    return false;
+
   }
   
   IOutput* GetContainingOutput ()
   {
-    throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::GetContainingOutput");
+    return adapter->GetOutput (window).get ();
   }
 
   void Present ()
