@@ -194,10 +194,14 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
     
     DisplayLock lock (impl->display);
     
-      //установка текущего контекста                
+      //установка текущего контекста
+
+    impl->log.Printf ("...before make current");
       
     if (!impl->adapter->GetLibrary ().MakeCurrent (impl->display, impl->window, impl->window, impl->glx_context))
       raise_error ("::glxMakeContextCurrent");
+      
+    impl->log.Printf ("...after make current");
 
     Impl::current_context = impl.get ();
 
