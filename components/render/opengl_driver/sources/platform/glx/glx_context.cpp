@@ -37,6 +37,10 @@ struct Context::Impl
       return;
 
     LostCurrentNotify ();
+    
+    DisplayLock lock (display);
+      
+    adapter->GetLibrary ().MakeCurrent (display, None, None, NULL);
 
     current_context = 0;
   }
@@ -47,7 +51,8 @@ struct Context::Impl
     if (current_context == this)
       ResetContext ();
     
-    swap_chain  = 0;
+    swap_chain = 0;
+    display    = 0;
   }
 
 ///Оповещение о потере контекста
@@ -102,6 +107,7 @@ Context::Context (ISwapChain* in_swap_chain)
 
     impl->adapter = cast_object<Adapter> (swap_chain->GetAdapter (), "", "adapter");
     impl->display = swap_chain->GetDisplay ();
+    impl->window  = swap_chain->GetWindow ();
     
     DisplayLock lock (impl->display);
 
@@ -190,10 +196,9 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
     
       //установка текущего контекста                
       
-    impl->adapter->GetLibrary ().MakeCurrent (impl->display, impl->window, impl->window, impl->glx_context);
+    if (!impl->adapter->GetLibrary ().MakeCurrent (impl->display, impl->window, impl->window, impl->glx_context))
+      raise_error ("::glxMakeContextCurrent");
 
-      // TODO: проверить результат      
-      
     Impl::current_context = impl.get ();
 
       //оповещение об установке текущего контекста

@@ -384,7 +384,7 @@ void AdapterLibrary::DestroyContext (Display *dpy, GLXContext ctx)
     Установка текущего контекста
 */
 
-void AdapterLibrary::MakeCurrent (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx, IContextLostListener* new_listener)
+bool AdapterLibrary::MakeCurrent (Display *dpy, GLXDrawable draw, GLXDrawable read, GLXContext ctx, IContextLostListener* new_listener)
 {
     //сброс текущего контекста
 
@@ -400,9 +400,9 @@ void AdapterLibrary::MakeCurrent (Display *dpy, GLXDrawable draw, GLXDrawable re
     }
   }
 
-  impl->fglXMakeContextCurrent (dpy, draw, read, ctx);
-  
   impl->listener = new_listener;
+  
+  return impl->fglXMakeContextCurrent (dpy, draw, read, ctx);
 }
 
 /*
