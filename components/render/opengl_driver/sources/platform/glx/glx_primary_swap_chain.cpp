@@ -116,7 +116,7 @@ struct PrimarySwapChain::Impl
       
       XF86VidModeModeInfo **modes;
       
-      XF86VidModeGetAllModeLines (display, screen, &mode_num, &modes);
+      XF86VidModeGetAllModeLines (display, screen_number, &mode_num, &modes);
       
       // ищем режим с нужным разрешением
       
