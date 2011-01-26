@@ -181,6 +181,7 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
 
       impl->swap_chain = casted_swap_chain;
       impl->display    = impl->swap_chain->GetDisplay ();
+      impl->window     = impl->swap_chain->GetWindow ();
     }
     
       //оповещение о потере текущего контекста
@@ -196,12 +197,8 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
     
       //установка текущего контекста
 
-    impl->log.Printf ("...before make current");
-      
     if (!impl->adapter->GetLibrary ().MakeCurrent (impl->display, impl->window, impl->window, impl->glx_context))
       raise_error ("::glxMakeContextCurrent");
-      
-    impl->log.Printf ("...after make current");
 
     Impl::current_context = impl.get ();
 
