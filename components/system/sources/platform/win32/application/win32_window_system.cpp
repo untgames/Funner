@@ -1212,7 +1212,7 @@ void Platform::SetMultitouchEnabled (window_t window, bool state)
   }
 }
 
-bool Platform::IsMultitouchEnabled (window_t handle)
+bool Platform::IsMultitouchEnabled (window_t window)
 {
   try
   {
