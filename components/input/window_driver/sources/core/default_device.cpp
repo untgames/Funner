@@ -1,4 +1,4 @@
-#include <shared/shared.h>
+#include "shared.h"
 
 using namespace xtl;
 using namespace common;
@@ -8,8 +8,9 @@ using namespace syslib;
 namespace
 {
 
-const size_t MESSAGE_BUFFER_SIZE = 32;
+const size_t MESSAGE_BUFFER_SIZE = 64;
 const char*  CURSOR_AXIS_NAME    = "Cursor";
+const char*  TOUCH_NAME          = "Touch";
 const char*  WHEEL_AXIS_NAME     = "Wheel";
 
 const char* AUTOCENTER_CURSOR            = "Cursor.auto_center";
@@ -28,7 +29,7 @@ const size_t PROPERTIES_COUNT = sizeof (PROPERTIES) / sizeof (*PROPERTIES);
 
 }
 
-struct Device::Impl : private xtl::trackable
+struct DefaultDevice::Impl : private xtl::trackable
 {
   typedef xtl::signal<void (const char*)> DeviceSignal;
 
@@ -60,7 +61,7 @@ struct Device::Impl : private xtl::trackable
   {
     try
     {
-      Window::EventHandler handler (xtl::bind (&Device::Impl::WindowEventHandler, this, _1, _2, _3));
+      Window::EventHandler handler (xtl::bind (&DefaultDevice::Impl::WindowEventHandler, this, _1, _2, _3));
 
       static WindowEvent events [] = {
                                       WindowEvent_OnMouseMove,
@@ -82,6 +83,9 @@ struct Device::Impl : private xtl::trackable
                                       WindowEvent_OnXButton2Down,
                                       WindowEvent_OnXButton2Up,
                                       WindowEvent_OnXButton2DoubleClick,
+                                      WindowEvent_OnTouchesBegan,
+                                      WindowEvent_OnTouchesMoved,
+                                      WindowEvent_OnTouchesEnded,
                                       WindowEvent_OnKeyDown,
                                       WindowEvent_OnKeyUp,
                                       WindowEvent_OnChar,
@@ -110,9 +114,23 @@ struct Device::Impl : private xtl::trackable
     }
     catch (xtl::exception& exception)
     {
-      exception.touch ("input::low_level::window::Device::Device");
+      exception.touch ("input::low_level::window::DefaultDevice::DefaultDevice");
       throw;
     }
+  }
+
+  //Преобразование систем координат
+  void TransformWindowPointToViewportPoint (const Rect& viewport_rect, Point& point)
+  {
+    point.x = point.x > viewport_rect.right ? viewport_rect.right : point.x;
+    point.y = point.y > viewport_rect.bottom ? viewport_rect.bottom : point.y;
+    point.x = point.x > viewport_rect.left ? point.x - viewport_rect.left : 0;
+    point.y = point.y > viewport_rect.top ? point.y - viewport_rect.top : 0;
+  }
+
+  bool IsPointInsideRect (const Rect& rect, const Point& point)
+  {
+    return point.x > rect.left && point.y > rect.top && point.x < rect.right && point.y < rect.bottom;
   }
 
   ///Обработчик сообщений окна
@@ -127,25 +145,23 @@ struct Device::Impl : private xtl::trackable
       {
         Rect viewport_rect = window.Viewport ();
 
-        size_t viewport_width  = viewport_rect.right - viewport_rect.left;
-        size_t viewport_height = viewport_rect.bottom - viewport_rect.top;
+        size_t viewport_width  = viewport_rect.right - viewport_rect.left,
+               viewport_height = viewport_rect.bottom - viewport_rect.top;
 
         Point cursor_position_in_viewport = window_event_context.cursor_position;
 
-        cursor_position_in_viewport.x = cursor_position_in_viewport.x > viewport_rect.left ? cursor_position_in_viewport.x - viewport_rect.left : 0;
-        cursor_position_in_viewport.y = cursor_position_in_viewport.y > viewport_rect.top ? cursor_position_in_viewport.y - viewport_rect.top : 0;
-
-        if (window_event_context.cursor_position.x < viewport_rect.left || window_event_context.cursor_position.y < viewport_rect.top ||
-            cursor_position_in_viewport.x > viewport_width || cursor_position_in_viewport.y > viewport_height)
+        if (!IsPointInsideRect (viewport_rect, cursor_position_in_viewport))
         {
           OnLeave ();
           break;
         }
 
+        TransformWindowPointToViewportPoint (viewport_rect, cursor_position_in_viewport);
+
         if (!mouse_in_window)
         {
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s enter", CURSOR_AXIS_NAME);
-          signals (message);
+          Notify (message);
 
           mouse_in_window = true;
         }
@@ -154,7 +170,7 @@ struct Device::Impl : private xtl::trackable
           break;
 
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s at %u %u", CURSOR_AXIS_NAME, cursor_position_in_viewport.x, cursor_position_in_viewport.y);
-        signals (message);
+        Notify (message);
 
         if (x_cursor_pos != cursor_position_in_viewport.x)
         {
@@ -165,11 +181,11 @@ struct Device::Impl : private xtl::trackable
               axis_pos = (float)cursor_position_in_viewport.x * 2.f / viewport_width - 1.f;
 
               xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX axis %f", CURSOR_AXIS_NAME, axis_pos);
-              signals (message);
+              Notify (message);
             }
 
-            xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX delta %f", CURSOR_AXIS_NAME, ((float)((float)window_event_context.cursor_position.x - (float)x_cursor_pos)) * cursor_sensitivity);
-            signals (message);
+            xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX delta %f", CURSOR_AXIS_NAME, ((float)((float)cursor_position_in_viewport.x - (float)x_cursor_pos)) * cursor_sensitivity);
+            Notify (message);
           }
 
           x_cursor_pos = cursor_position_in_viewport.x;
@@ -184,11 +200,11 @@ struct Device::Impl : private xtl::trackable
               axis_pos = -(float)cursor_position_in_viewport.y * 2.f / viewport_height + 1.f;
 
               xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY axis %f", CURSOR_AXIS_NAME, axis_pos);
-              signals (message);
+              Notify (message);
             }
 
-            xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY delta %f", CURSOR_AXIS_NAME, ((float)((float)window_event_context.cursor_position.y - (float)y_cursor_pos)) * cursor_sensitivity);
-            signals (message);
+            xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY delta %f", CURSOR_AXIS_NAME, ((float)((float)cursor_position_in_viewport.y - (float)y_cursor_pos)) * cursor_sensitivity);
+            Notify (message);
           }
 
           y_cursor_pos = cursor_position_in_viewport.y;
@@ -208,95 +224,135 @@ struct Device::Impl : private xtl::trackable
         break;
       case WindowEvent_OnMouseVerticalWheel:
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sY delta %f", WHEEL_AXIS_NAME, window_event_context.mouse_vertical_wheel_delta * vertical_wheel_sensitivity);
-        signals (message);
+        Notify (message);
 
         if (window_event_context.mouse_vertical_wheel_delta > 0)
         {
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sYUp down", WHEEL_AXIS_NAME);
-          signals (message);
+          Notify (message);
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sYUp up", WHEEL_AXIS_NAME);
-          signals (message);
+          Notify (message);
         }
 
         if (window_event_context.mouse_vertical_wheel_delta < 0)
         {
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sYDown down", WHEEL_AXIS_NAME);
-          signals (message);
+          Notify (message);
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sYDown up", WHEEL_AXIS_NAME);
-          signals (message);
+          Notify (message);
         }
 
         break;
       case WindowEvent_OnMouseHorisontalWheel:
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sX delta %f", WHEEL_AXIS_NAME, window_event_context.mouse_horisontal_wheel_delta * horisontal_wheel_sensitivity);
-        signals (message);
+        Notify (message);
 
         if (window_event_context.mouse_horisontal_wheel_delta > 0)
         {
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sXRight down", WHEEL_AXIS_NAME);
-          signals (message);
+          Notify (message);
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sXRight up", WHEEL_AXIS_NAME);
-          signals (message);
+          Notify (message);
         }
 
         if (window_event_context.mouse_horisontal_wheel_delta < 0)
         {
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sXLeft down", WHEEL_AXIS_NAME);
-          signals (message);
+          Notify (message);
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "%sXLeft up", WHEEL_AXIS_NAME);
-          signals (message);
+          Notify (message);
         }
 
         break;
       case WindowEvent_OnLeftButtonDoubleClick:
-        signals ("Mouse0 dblclk");
-        signals ("Mouse0 down");
+        Notify ("Mouse0 dblclk");
+        Notify ("Mouse0 down");
         break;
       case WindowEvent_OnLeftButtonDown:
-        signals ("Mouse0 down");
+        Notify ("Mouse0 down");
         break;
       case WindowEvent_OnLeftButtonUp:
-        signals ("Mouse0 up");
+        Notify ("Mouse0 up");
         break;
       case WindowEvent_OnRightButtonDoubleClick:
-        signals ("Mouse1 dblclk");
-        signals ("Mouse1 down");
+        Notify ("Mouse1 dblclk");
+        Notify ("Mouse1 down");
         break;
       case WindowEvent_OnRightButtonDown:
-        signals ("Mouse1 down");
+        Notify ("Mouse1 down");
         break;
       case WindowEvent_OnRightButtonUp:
-        signals ("Mouse1 up");
+        Notify ("Mouse1 up");
         break;
       case WindowEvent_OnMiddleButtonDoubleClick:
-        signals ("Mouse2 dblclk");
-        signals ("Mouse2 down");
+        Notify ("Mouse2 dblclk");
+        Notify ("Mouse2 down");
         break;
       case WindowEvent_OnMiddleButtonDown:
-        signals ("Mouse2 down");
+        Notify ("Mouse2 down");
         break;
       case WindowEvent_OnMiddleButtonUp:
-        signals ("Mouse2 up");
+        Notify ("Mouse2 up");
         break;
       case WindowEvent_OnXButton1DoubleClick:
-        signals ("MouseX1 dblclk");
-        signals ("MouseX1 down");
+        Notify ("MouseX1 dblclk");
+        Notify ("MouseX1 down");
         break;
       case WindowEvent_OnXButton1Down:
-        signals ("MouseX1 down");
+        Notify ("MouseX1 down");
         break;
       case WindowEvent_OnXButton1Up:
-        signals ("MouseX1 up");
+        Notify ("MouseX1 up");
         break;
       case WindowEvent_OnXButton2DoubleClick:
-        signals ("MouseX2 dblclk");
-        signals ("MouseX2 down");
+        Notify ("MouseX2 dblclk");
+        Notify ("MouseX2 down");
         break;
       case WindowEvent_OnXButton2Down:
-        signals ("MouseX2 down");
+        Notify ("MouseX2 down");
         break;
       case WindowEvent_OnXButton2Up:
-        signals ("MouseX2 up");
+        Notify ("MouseX2 up");
+        break;
+      case WindowEvent_OnTouchesBegan:
+      {
+        Rect viewport_rect = window.Viewport ();
+
+        OnTouchesEvent (window_event_context, "began", viewport_rect);
+
+        float viewport_width  = viewport_rect.right - viewport_rect.left,
+              viewport_height = viewport_rect.bottom - viewport_rect.top;
+
+        const Touch* current_touch = window_event_context.touches;
+
+        for (size_t i = 0; i < window_event_context.touches_count; i++, current_touch++)
+        {
+          if (current_touch->tap_count % 2)
+            continue;
+
+          Point touch_position_in_viewport = current_touch->position;
+
+          TransformWindowPointToViewportPoint (viewport_rect, touch_position_in_viewport);
+
+          xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s doubletap absolute %p %u %u", TOUCH_NAME, current_touch->touch_id,
+                          touch_position_in_viewport.x, touch_position_in_viewport.y);
+          Notify (message);
+
+          float relative_x = touch_position_in_viewport.x / viewport_width,
+                relative_y = touch_position_in_viewport.y / viewport_height;
+
+          xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s doubletap relative %p %f %f", TOUCH_NAME, current_touch->touch_id,
+                          relative_x, relative_y);
+          Notify (message);
+        }
+
+        break;
+      }
+      case WindowEvent_OnTouchesMoved:
+        OnTouchesEvent (window_event_context, "moved", window.Viewport ());
+        break;
+      case WindowEvent_OnTouchesEnded:
+        OnTouchesEvent (window_event_context, "ended", window.Viewport ());
         break;
       case WindowEvent_OnKeyDown:
         if (pressed_keys[window_event_context.key])
@@ -306,39 +362,39 @@ struct Device::Impl : private xtl::trackable
           xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' down", get_key_name (window_event_context.key));
           pressed_keys.set (window_event_context.key);
         }
-        signals (message);
+        Notify (message);
         break;
       case WindowEvent_OnKeyUp:
         pressed_keys.reset (window_event_context.key);
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "'%s' up", get_key_name (window_event_context.key));
-        signals (message);
+        Notify (message);
         break;
       case WindowEvent_OnChar:
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "Char '%C'", window_event_context.char_code);
-        signals (message);
+        Notify (message);
         xsnprintf (message, MESSAGE_BUFFER_SIZE, "CharCode %u", window_event_context.char_code);
-        signals (message);
+        Notify (message);
         break;
       case WindowEvent_OnClose:
-        signals ("Window closed");
+        Notify ("Window closed");
         break;
       case WindowEvent_OnActivate:
-        signals ("Window activated");
+        Notify ("Window activated");
         break;
       case WindowEvent_OnDeactivate:
-        signals ("Window deactivated");
+        Notify ("Window deactivated");
         break;
       case WindowEvent_OnShow:
-        signals ("Window shown");
+        Notify ("Window shown");
         break;
       case WindowEvent_OnHide:
-        signals ("Window hidden");
+        Notify ("Window hidden");
         break;
       case WindowEvent_OnSetFocus:
-        signals ("Window set_focus");
+        Notify ("Window set_focus");
         break;
       case WindowEvent_OnLostFocus:
-        signals ("Window lost_focus");
+        Notify ("Window lost_focus");
         break;
       default:
         break;
@@ -353,9 +409,43 @@ struct Device::Impl : private xtl::trackable
     static char message [MESSAGE_BUFFER_SIZE];
 
     xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s leave", CURSOR_AXIS_NAME);
-    signals (message);
+    Notify (message);
 
     mouse_in_window = false;
+  }
+
+  void OnTouchesEvent (const WindowEventContext& context, const char* event, const Rect& viewport_rect)
+  {
+    static char message [MESSAGE_BUFFER_SIZE];
+
+    float viewport_width  = viewport_rect.right - viewport_rect.left,
+          viewport_height = viewport_rect.bottom - viewport_rect.top;
+
+    const Touch* current_touch = context.touches;
+
+    for (size_t i = 0; i < context.touches_count; i++, current_touch++)
+    {
+      Point touch_position_in_viewport = current_touch->position;
+
+      TransformWindowPointToViewportPoint (viewport_rect, touch_position_in_viewport);
+
+      xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s %s absolute %u %u %u", TOUCH_NAME, event, current_touch->touch_id,
+                      touch_position_in_viewport.x, touch_position_in_viewport.y);
+      Notify (message);
+
+      float relative_x = touch_position_in_viewport.x / viewport_width,
+            relative_y = touch_position_in_viewport.y / viewport_height;
+
+      xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s %s relative %u %f %f", TOUCH_NAME, event, current_touch->touch_id,
+                      relative_x, relative_y);
+      Notify (message);
+    }
+  }
+
+  ///Оповещение о событии
+  void Notify (const char* message)
+  {
+    signals (message);
   }
 };
 
@@ -363,12 +453,12 @@ struct Device::Impl : private xtl::trackable
    Конструктор/деструктор
 */
 
-Device::Device (Window* window, const char* name, const char* full_name)
+DefaultDevice::DefaultDevice (Window* window, const char* name, const char* full_name)
   : impl (new Impl (window, name, full_name))
 {
 }
 
-Device::~Device ()
+DefaultDevice::~DefaultDevice ()
 {
   delete impl;
 }
@@ -377,7 +467,7 @@ Device::~Device ()
    Получение имени контрола
 */
 
-const wchar_t* Device::GetControlName (const char* control_id)
+const wchar_t* DefaultDevice::GetControlName (const char* control_id)
 {
   impl->control_name = common::towstring (control_id);
 
@@ -388,7 +478,7 @@ const wchar_t* Device::GetControlName (const char* control_id)
    Подписка на события устройства
 */
 
-xtl::connection Device::RegisterEventHandler (const input::low_level::IDevice::EventHandler& handler)
+xtl::connection DefaultDevice::RegisterEventHandler (const input::low_level::IDevice::EventHandler& handler)
 {
   return impl->signals.connect (handler);
 }
@@ -397,12 +487,12 @@ xtl::connection Device::RegisterEventHandler (const input::low_level::IDevice::E
    Настройки устройства
 */
 
-const char* Device::GetProperties ()
+const char* DefaultDevice::GetProperties ()
 {
   return impl->properties.c_str ();
 }
 
-void Device::SetProperty (const char* name, float value)
+void DefaultDevice::SetProperty (const char* name, float value)
 {
   if (!xstrcmp (AUTOCENTER_CURSOR, name))
   {
@@ -428,10 +518,10 @@ void Device::SetProperty (const char* name, float value)
     return;
   }
 
-  throw xtl::make_argument_exception ("input::low_level::window::Device::SetProperty", "name", name);
+  throw xtl::make_argument_exception ("input::low_level::window::DefaultDevice::SetProperty", "name", name);
 }
 
-float Device::GetProperty (const char* name)
+float DefaultDevice::GetProperty (const char* name)
 {
   if (!xstrcmp (AUTOCENTER_CURSOR, name))
   {
@@ -449,14 +539,14 @@ float Device::GetProperty (const char* name)
   if (!xstrcmp (HORISONTAL_WHEEL_SENSITIVITY, name))
     return impl->horisontal_wheel_sensitivity;
 
-  throw xtl::make_argument_exception ("input::low_level::window::Device::GetProperty", "name", name);
+  throw xtl::make_argument_exception ("input::low_level::window::DefaultDevice::GetProperty", "name", name);
 }
 
 /*
    Получение имени устройства
 */
 
-const char* Device::GetName ()
+const char* DefaultDevice::GetName ()
 {
   return impl->name.c_str ();
 }
@@ -465,7 +555,16 @@ const char* Device::GetName ()
    Полное имя устройства (тип.имя.идентификатор)
 */
 
-const char* Device::GetFullName ()
+const char* DefaultDevice::GetFullName ()
 {
   return impl->full_name.c_str ();
+}
+
+/*
+   Оповещение о событии
+*/
+
+void DefaultDevice::Notify (const char* message)
+{
+  impl->Notify (message);
 }

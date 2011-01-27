@@ -16,8 +16,6 @@ using namespace syslib::iphone;
 namespace
 {
 
-const size_t DEFAULT_TOUCH_BUFFER_SIZE = 4;  //размер буфера дл€ хранени€ информации о касани€х
-
 InterfaceOrientation get_interface_orientation (UIInterfaceOrientation interface_orientation)
 {
   switch (interface_orientation)
@@ -65,8 +63,7 @@ struct WindowImpl
 
 }
 
-typedef stl::vector <IWindowListener*>                ListenerArray;
-typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
+typedef stl::vector <IWindowListener*> ListenerArray;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–аспределитель событий окна
@@ -74,12 +71,11 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 @interface UIWindowWrapper : UIWindow
 {
   @private
-    WindowImpl            *window_impl;          //окно
-    ListenerArray         *listeners;            //подписчика на событи€
-    TouchDescriptionArray *touch_descriptions;   //массив дл€ хранени€ описаний текущего событи€
-    WindowEventContext    *event_context;        //контекст, передаваемый обработчикам событий
-    UIViewController      *root_view_controller; //корневой контроллер
-    int                   allowed_orientations;  //разрешенные ориентации окна
+    WindowImpl         *window_impl;          //окно
+    ListenerArray      *listeners;            //подписчика на событи€
+    WindowEventContext *event_context;        //контекст, передаваемый обработчикам событий
+    UIViewController   *root_view_controller; //корневой контроллер
+    int                allowed_orientations;  //разрешенные ориентации окна
 }
 
 @property (nonatomic, assign) WindowImpl* window_impl;
@@ -246,7 +242,6 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
 -(void) dealloc
 {
-  delete touch_descriptions;
   delete listeners;
   delete event_context;
 
@@ -294,14 +289,12 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
 
     event_context->handle = self;
 
-    listeners          = new ListenerArray;
-    touch_descriptions = new TouchDescriptionArray (DEFAULT_TOUCH_BUFFER_SIZE);
+    listeners = new ListenerArray;
   }
   catch (...)
   {
     delete event_context;
     delete listeners;
-    delete touch_descriptions;
 
     [self release];
 
@@ -314,24 +307,30 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
   return self;
 }
 
--(WindowEventContext&) getEventContext
-{
-  return *event_context;
-}
-
 -(void) onPaint
 {
   window_impl->Notify (WindowEvent_OnPaint, [self getEventContext]);
 }
 
--(void) fillTouchDescriptionsBuffer:(NSSet*)touches
+-(WindowEventContext&) getEventContext
 {
-  if ([touches count] > touch_descriptions->size ())
-    touch_descriptions->resize ([touches count], false);
+  event_context->touches_count = 0;
+
+  return *event_context;
+}
+
+-(WindowEventContext&) getEventContextWithTouches:(NSSet*)touches
+{
+  if ([touches count] > MAX_TOUCHES_COUNT)
+    @throw [NSException exceptionWithName:@"Invalid operation" reason:@"Touches event occured with touches count more than maximum" userInfo:nil];
+
+  WindowEventContext& return_value = [self getEventContext];
+
+  return_value.touches_count = [touches count];
 
   UIView                 *view              = self.rootViewController.view;
   NSEnumerator           *enumerator        = [touches objectEnumerator];
-  TouchDescription       *touch_description = touch_descriptions->data ();
+  Touch                  *touch_description = return_value.touches;
   CGSize                 view_size          = view.frame.size;
   UIInterfaceOrientation ui_orientation     = self.rootViewController.interfaceOrientation;
 
@@ -353,35 +352,28 @@ typedef xtl::uninitialized_storage <TouchDescription> TouchDescriptionArray;
         break;
     }
 
-    touch_description->touch     = (touch_t)iter;
-    touch_description->x         = current_location.x / view_size.width;
-    touch_description->y         = current_location.y / view_size.height;
-    touch_description->tap_count = iter.tapCount;
+    touch_description->touch_id   = (size_t)iter;
+    touch_description->position.x = current_location.x * [self contentScaleFactor];
+    touch_description->position.y = current_location.y * [self contentScaleFactor];
+    touch_description->tap_count  = iter.tapCount;
   }
+
+  return return_value;
 }
 
 -(void) touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
 {
-  [self fillTouchDescriptionsBuffer:touches];
-
-  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
-    (*iter)->OnTouchesBegan ([touches count], touch_descriptions->data ());
+  window_impl->Notify (WindowEvent_OnTouchesBegan, [self getEventContextWithTouches:touches]);
 }
 
 -(void) touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
 {
-  [self fillTouchDescriptionsBuffer:touches];
-
-  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
-    (*iter)->OnTouchesEnded ([touches count], touch_descriptions->data ());
+  window_impl->Notify (WindowEvent_OnTouchesEnded, [self getEventContextWithTouches:touches]);
 }
 
 -(void) touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
 {
-  [self fillTouchDescriptionsBuffer:touches];
-
-  for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
-    (*iter)->OnTouchesMoved ([touches count], touch_descriptions->data ());
+  window_impl->Notify (WindowEvent_OnTouchesMoved, [self getEventContextWithTouches:touches]);
 }
 
 -(void) touchesCancelled:(NSSet*)touches withEvent:(UIEvent*)event
@@ -691,12 +683,12 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
 
 void Platform::SetParentWindowHandle (window_t, const void*)
 {
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetParentWindow", "Parent windows not supported for iPhone platform");
+  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetParentWindowHandle", "Parent windows not supported for iPhone platform");
 }
 
-const void* Platform::GetParentWindow (window_t child)
+const void* Platform::GetParentWindowHandle (window_t child)
 {
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::GetParentWindow", "Parent windows not supported for iPhone platform");
+  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::GetParentWindowHandle", "Parent windows not supported for iPhone platform");
 }
 
 /*
@@ -714,22 +706,22 @@ void Platform::InvalidateWindow (window_t handle)
 
 void Platform::SetCursorPosition (const Point&)
 {
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetCursorPosition", "No cursor for iPhone platform");
+  //ignore
 }
 
 syslib::Point Platform::GetCursorPosition ()
 {
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::GetCursorPosition", "No cursor for iPhone platform");
+  return syslib::Point ();
 }
 
 void Platform::SetCursorPosition (window_t, const Point& client_position)
 {
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetCursorPosition", "No cursor for iPhone platform");
+  //ignore
 }
 
 syslib::Point Platform::GetCursorPosition (window_t)
 {
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::GetCursorPosition", "No cursor for iPhone platform");
+  return syslib::Point ();
 }
 
 /*
@@ -764,6 +756,26 @@ void Platform::DestroyCursor (cursor_t)
 void Platform::SetCursor (window_t, cursor_t)
 {
   throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::CreateCursor", "No cursor for iPhone platform");
+}
+
+/*
+   ”становка multitouch режима дл€ окна
+*/
+
+void Platform::SetMultitouchEnabled (window_t window, bool enabled)
+{
+  if (!window)
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::SetMultitouchEnabled", "window");
+
+  ((UIWindowWrapper*)window).rootViewController.view.multipleTouchEnabled = enabled;
+}
+
+bool Platform::IsMultitouchEnabled (window_t window)
+{
+  if (!window)
+    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::IsMultitouchEnabled", "window");
+
+  return ((UIWindowWrapper*)window).rootViewController.view.multipleTouchEnabled;
 }
 
 /*
@@ -846,20 +858,6 @@ void WindowManager::DetachWindowListener (const Window& window, IWindowListener*
     return;
 
   [(UIWindowWrapper*)(window.Handle ()) detachListener:listener];
-}
-
-/*
-   ”становка multitouch режима дл€ окна
-*/
-
-void WindowManager::SetMultitouchEnabled (const Window& window, bool enabled)
-{
-  ((UIWindowWrapper*)window.Handle ()).rootViewController.view.multipleTouchEnabled = enabled;
-}
-
-bool WindowManager::GetMultitouchEnabled (const Window& window)
-{
-  return ((UIWindowWrapper*)window.Handle ()).rootViewController.view.multipleTouchEnabled;
 }
 
 /*

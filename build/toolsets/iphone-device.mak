@@ -11,7 +11,7 @@ COMMON_CFLAGS     += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET) -DARM 
 COMMON_LINK_FLAGS += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 COMPILER_GCC      := /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/gcc-4.2
 LINKER_GCC        := /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/g++-4.2
-IPHONE_SDK_PATH   := /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.1.sdk
+IPHONE_SDK_PATH   := /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.2.sdk
 
 include $(TOOLSETS_DIR)/iphone.mak
 

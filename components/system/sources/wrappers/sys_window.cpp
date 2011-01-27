@@ -179,7 +179,7 @@ struct Window::Impl
           new_viewport = Rect (0, 0, client_rect.right - client_rect.left, client_rect.bottom - client_rect.top);
         }
 
-          //обновление кэша                  
+          //обновление кэша
         
         need_update_viewport = false;
         viewport             = new_viewport;
@@ -303,43 +303,12 @@ struct Window::Impl
           case WindowEvent_OnDestroy: //окно уничтожено
             impl->SetHandle (0);
             break;
-          case WindowEvent_OnActivate:                //окно стало активным
-          case WindowEvent_OnDeactivate:              //окно перестало быть активным
-          case WindowEvent_OnShow:                    //окно стало видимым
-          case WindowEvent_OnHide:                    //окно стало не видимым
-          case WindowEvent_OnSetFocus:                //окно получило фокус ввода
-          case WindowEvent_OnLostFocus:               //окно потеряло фокус ввода
-          case WindowEvent_OnPaint:                   //необходима перерисовка
-          case WindowEvent_OnMove:                    //изменилось положение окна
-          case WindowEvent_OnMouseMove:               //курсор мыши переместился над областью окна
-          case WindowEvent_OnMouseLeave:              //курсор мыши вышел за пределы области окна
-          case WindowEvent_OnMouseVerticalWheel:      //изменилось положение вертикального колеса мыши
-          case WindowEvent_OnMouseHorisontalWheel:    //изменилось положение горизонтального колеса мыши
-          case WindowEvent_OnLeftButtonDown:          //нажата левая кнопка мыши
-          case WindowEvent_OnLeftButtonUp:            //отпущена левая кнопка мыши
-          case WindowEvent_OnLeftButtonDoubleClick:   //двойной щелчок левой кнопкой мыши
-          case WindowEvent_OnRightButtonDown:         //нажата правая кнопка мыши
-          case WindowEvent_OnRightButtonUp:           //отпущена правая кнопка мыши
-          case WindowEvent_OnRightButtonDoubleClick:  //двойной щелчок правой кнопкой мыши
-          case WindowEvent_OnMiddleButtonDown:        //нажата средняя кнопка мыши
-          case WindowEvent_OnMiddleButtonUp:          //отпущена средняя кнопка мыши
-          case WindowEvent_OnMiddleButtonDoubleClick: //двойной щелчок средней кнопкой мыши
-          case WindowEvent_OnXButton1Down:            //нажата первая Х кнопка мыши
-          case WindowEvent_OnXButton1Up:              //отпущена первая Х кнопка мыши
-          case WindowEvent_OnXButton1DoubleClick:     //двойной щелчок первой Х кнопкой мыши
-          case WindowEvent_OnXButton2Down:            //нажата вторая Х кнопка мыши
-          case WindowEvent_OnXButton2Up:              //отпущена вторая Х кнопка мыши
-          case WindowEvent_OnXButton2DoubleClick:     //двойной щелчок второй Х кнопкой мыши
-          case WindowEvent_OnKeyDown:                 //нажата клавиша клавиатуры
-          case WindowEvent_OnKeyUp:                   //отпущена клавиша клавиатуры
-          case WindowEvent_OnChar:                    //в буфере ввода окна появился символ
-            impl->Notify (event, context);
-            break;
-          case WindowEvent_OnSize:                    //изменились размеры окна          
+          case WindowEvent_OnSize:    //изменились размеры окна
             impl->InvalidateViewport ();
             impl->Notify (event, context);
             break;          
           default:          
+            impl->Notify (event, context);
             break;
         }
       }
@@ -984,6 +953,36 @@ void Window::SetCursor (const WindowCursor& cursor)
 WindowCursor Window::Cursor () const
 {
   return impl->Cursor ();
+}
+
+/*
+   Установка/получение multitouch режима для окна
+*/
+
+void Window::SetMultitouchEnabled (bool state)
+{
+  try
+  {
+    Platform::SetMultitouchEnabled (impl->CheckedHandle (), state);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Window::SetMultitouchEnabled");
+    throw;
+  }
+}
+
+bool Window::IsMultitouchEnabled () const
+{
+  try
+  {
+    return Platform::IsMultitouchEnabled (impl->CheckedHandle ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Window::SetMultitouchEnabled");
+    throw;
+  }
 }
 
 /*

@@ -178,6 +178,7 @@ int main ()
                     connection34 = window.RegisterEventHandler (WindowEvent_OnChangeHandle, &print_event);
 
     window.SetDebugLog (&print);
+    window.SetMultitouchEnabled (true);
     
     fflush (stdout);    
 

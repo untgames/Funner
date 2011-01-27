@@ -25,7 +25,7 @@ struct Platform::window_handle
   jmethodID            layout_method;                  //метод установки размеров и положения окна
   jmethodID            set_visibility_method;          //метод установки видимости окна
   jmethodID            get_visibility_method;          //метод получения видимости окна
-  jmethodID            request_focus_method;           //метод запроса фокуса ввода  
+  jmethodID            request_focus_method;           //метод запроса фокуса ввода
   jmethodID            set_background_color_method;    //метод установки цвета заднего плана окна
   jmethodID            maximize_method;                //метод максимизации окна
   jmethodID            get_surface_method;             //метод получения поверхности
@@ -231,7 +231,7 @@ class JniWindowManager
     {
       try
       {          
-          //получение класса Activity          
+          //получение класса Activity
 
         activity_class = get_env ().GetObjectClass (get_context ().activity.get ());
         
@@ -777,6 +777,20 @@ void Platform::DestroyCursor (cursor_t)
 void Platform::SetCursor (window_t, cursor_t)
 {
   throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::SetCursor", "No cursor for Android platform");
+}
+
+/*
+   Установка multitouch режима для окна
+*/
+
+void Platform::SetMultitouchEnabled (window_t window, bool enabled)
+{
+  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::SetMultitouchEnabled");
+}
+
+bool Platform::IsMultitouchEnabled (window_t window)
+{
+  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::IsMultitouchEnabled");
 }
 
 /*

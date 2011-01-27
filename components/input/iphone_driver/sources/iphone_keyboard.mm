@@ -164,8 +164,8 @@ struct IPhoneKeyboard::Impl : public KeyboardListener
     {
       CGRect frame_rect;
 
-      frame_rect.origin.x    = 1000;
-      frame_rect.origin.y    = 1000;
+      frame_rect.origin.x    = -2;
+      frame_rect.origin.y    = -2;
       frame_rect.size.width  = 1;
       frame_rect.size.height = 1;
 

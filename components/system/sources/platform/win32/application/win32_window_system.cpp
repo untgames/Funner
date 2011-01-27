@@ -69,15 +69,16 @@ class SysTempFile
 
 struct WindowImpl
 {
-  void*                          user_data;           //указатель на пользовательские данные
-  Platform::WindowMessageHandler message_handler;     //функция обработки сообщений окна
-  bool                           is_cursor_visible;   //видим ли курсор
-  bool                           is_cursor_in_window; //находится ли курсор в окне
-  HCURSOR                        default_cursor;      //курсор по умолчанию
-  HCURSOR                        preferred_cursor;    //предпочитаемый курсор для данного окна
-  HBRUSH                         background_brush;    //кисть для очистки заднего фона
-  Color                          background_color;    //цвет заднего фона
-  bool                           background_state;    //включен ли задний фон
+  void*                          user_data;             //указатель на пользовательские данные
+  Platform::WindowMessageHandler message_handler;       //функция обработки сообщений окна
+  bool                           is_cursor_visible;     //видим ли курсор
+  bool                           is_cursor_in_window;   //находится ли курсор в окне
+  HCURSOR                        default_cursor;        //курсор по умолчанию
+  HCURSOR                        preferred_cursor;      //предпочитаемый курсор для данного окна
+  HBRUSH                         background_brush;      //кисть для очистки заднего фона
+  Color                          background_color;      //цвет заднего фона
+  bool                           background_state;      //включен ли задний фон
+  bool                           is_multitouch_enabled; //включен ли multitouch
 
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data)
@@ -88,6 +89,7 @@ struct WindowImpl
     , preferred_cursor (0)
     , background_brush (CreateSolidBrush (RGB (0, 0, 0)))
     , background_state (false)
+    , is_multitouch_enabled (false)
   {
     if (!background_brush)
       raise_error ("::CreateSolidBrush");
@@ -1180,6 +1182,54 @@ void Platform::SetCursor (window_t window, cursor_t cursor)
   catch (xtl::exception& e)
   {
     e.touch ("syslib::Win32Platform::SetCursor");
+    throw;
+  }
+}
+
+/*
+   Установка/получение multitouch режима
+*/
+
+void Platform::SetMultitouchEnabled (window_t window, bool state)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    HWND        wnd  = (HWND)window;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
+
+    impl->is_multitouch_enabled = state;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Win32Platform::SetMultitouchEnabled");
+    throw;
+  }
+}
+
+bool Platform::IsMultitouchEnabled (window_t handle)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    HWND        wnd  = (HWND)window;
+    WindowImpl* impl = reinterpret_cast<WindowImpl*> (GetWindowLong (wnd, GWL_USERDATA));
+
+    if (!impl)
+      throw xtl::format_operation_exception ("", "Null GWL_USERDATA");
+
+    return impl->is_multitouch_enabled;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::Win32Platform::IsMultitouchEnabled");
     throw;
   }
 }

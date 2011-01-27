@@ -174,7 +174,6 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_ext_texture_filter_anisotropic = ext.Get (EXT_texture_filter_anisotropic);
   has_ext_texture_lod_bias           = ext.Get (EXT_texture_lod_bias);
   has_ext_texture3d                  = ext.Get (EXT_texture3D);
-  has_ffp                            = settings.IsFfpAllowed ();
   has_img_texture_compression_pvrtc  = false;
   has_sgis_generate_mipmap           = ext.Get (SGIS_generate_mipmap);
   has_sgis_texture_lod               = ext.Get (SGIS_texture_lod);
@@ -301,6 +300,8 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   }
 
 #endif
+
+  has_ffp = settings.IsFfpAllowed ();
 
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, (GLint*)&max_texture_size);
 

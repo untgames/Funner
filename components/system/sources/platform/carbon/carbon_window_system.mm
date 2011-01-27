@@ -46,6 +46,7 @@ struct WindowImpl
   Color                          background_color;                        //цвет заднего фона
   WindowGroupRef                 window_group;
   bool                           is_maximized;                            //окно находится в полноэкранном режиме
+  bool                           is_multitouch_enabled;                   //включен ли multitouch
 
   WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data)
     : user_data (in_user_data)
@@ -60,6 +61,7 @@ struct WindowImpl
     , background_state (false)
     , window_group (0)
     , is_maximized (false)
+    , is_multitouch_enabled (false)
     {}
 
   ~WindowImpl ()
@@ -1363,6 +1365,36 @@ void Platform::SetCursor (window_t handle, cursor_t cursor)
     exception.touch ("syslib::CarbonPlatform::SetCursor");
     throw;
   }
+}
+
+/*
+   Установка/получение multitouch режима
+*/
+
+void Platform::SetMultitouchEnabled (window_t handle, bool state)
+{
+  if (!handle)
+    throw xtl::make_null_argument_exception ("", "handle");
+
+  WindowImpl *impl;
+
+  check_window_manager_error (GetWindowProperty ((WindowRef)handle, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+                              sizeof (impl), 0, &impl), "::GetWindowProperty", "Can't get window property");
+
+  impl->is_multitouch_enabled = state;
+}
+
+bool Platform::IsMultitouchEnabled (window_t handle)
+{
+  if (!handle)
+    throw xtl::make_null_argument_exception ("", "handle");
+
+  WindowImpl *impl;
+
+  check_window_manager_error (GetWindowProperty ((WindowRef)handle, WINDOW_PROPERTY_CREATOR, WINDOW_IMPL_PROPERTY,
+                              sizeof (impl), 0, &impl), "::GetWindowProperty", "Can't get window property");
+
+  return impl->is_multitouch_enabled;
 }
 
 /*

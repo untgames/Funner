@@ -35,16 +35,25 @@ class ApplicationDelegateImpl: public IApplicationDelegate, public xtl::referenc
 ///Запуск цикла обработки сообщений
     void Run ()
     {
+      static const char* METHOD_NAME = "syslib::iPhonePlatform::ApplicationDelegateImpl::ApplicationDelegateImpl::Run";
+
       if (application_delegate)
-        throw xtl::format_operation_exception ("syslib::iPhonePlatform::ApplicationDelegateImpl::ApplicationDelegateImpl::Run", "Loop already runned");
+        throw xtl::format_operation_exception (METHOD_NAME, "Loop already runned");
 
-      NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+      @try
+      {
+        NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
-      application_delegate = this;
+        application_delegate = this;
 
-      UIApplicationMain (0, 0, nil, @"ApplicationDelegate");
+        UIApplicationMain (0, 0, nil, @"ApplicationDelegate");
 
-      [pool release];
+        [pool release];
+      }
+      @catch (NSException* e)
+      {
+        throw xtl::format_operation_exception (METHOD_NAME, "%s", [[e reason] cStringUsingEncoding:NSASCIIStringEncoding]);
+      }
     }
 
 ///Выход из приложения
