@@ -62,6 +62,7 @@ enum WindowEvent
   WindowEvent_OnXButton2Up,              //отпущена вторая Х кнопка мыши
   WindowEvent_OnXButton2DoubleClick,     //двойной щелчок второй Х клавишей мыши
   WindowEvent_OnTouchesBegan,            //один или несколько пальцев дотронулись до окна
+  WindowEvent_OnTouchesDoubletap,        //один или несколько пальцев сделали двойной тап
   WindowEvent_OnTouchesMoved,            //один или несколько пальцев двигаются в окне
   WindowEvent_OnTouchesEnded,            //один или несколько пальцев поднялись с окна
   WindowEvent_OnKeyDown,                 //нажата клавиша клавиатуры
@@ -109,9 +110,8 @@ struct Color
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct Touch
 {
-  size_t touch_id;  //идентификатор касания
-  Point  position;  //координаты
-  size_t tap_count; //количество касаний
+  size_t touch_id; //идентификатор касания
+  Point  position; //координаты
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

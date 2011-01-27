@@ -38,6 +38,8 @@ SYSTEMLIB.TESTS.x11.IMPORTS      := link.media.image.ani_cursor_loader
 #Öåëü ¹4 - Android launcher
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.TYPE          := android-pak
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.NAME          := funner.application
+SYSTEMLIB.UTILS.ANDROID_LAUNCHER.DLL_DIRS       = $(PLATFORM_DIR)/arch-arm/usr/lib
+SYSTEMLIB.UTILS.ANDROID_LAUNCHER.DLLS          := android
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.SOURCE_DIRS   := utils/android_launcher
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.MANIFEST_FILE := utils/android_launcher/AndroidManifest.xml
 SYSTEMLIB.UTILS.ANDROID_LAUNCHER.RES_DIR       := utils/android_launcher/res

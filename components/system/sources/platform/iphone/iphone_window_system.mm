@@ -355,7 +355,6 @@ typedef stl::vector <IWindowListener*> ListenerArray;
     touch_description->touch_id   = (size_t)iter;
     touch_description->position.x = current_location.x * [self contentScaleFactor];
     touch_description->position.y = current_location.y * [self contentScaleFactor];
-    touch_description->tap_count  = iter.tapCount;
   }
 
   return return_value;
@@ -364,6 +363,18 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 -(void) touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
 {
   window_impl->Notify (WindowEvent_OnTouchesBegan, [self getEventContextWithTouches:touches]);
+
+  NSMutableSet* doubletap_touches = [[NSMutableSet alloc] initWithCapacity:[touches count]];
+
+  for (UITouch* touch in touches)
+  {
+    if (!touch.tapCount % 2)
+      [doubletap_touches addObject:touch];
+  }
+
+  window_impl->Notify (WindowEvent_OnTouchesDoubletap, [self getEventContextWithTouches:doubletap_touches]);
+
+  [doubletap_touches release];
 }
 
 -(void) touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event

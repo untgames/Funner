@@ -31,6 +31,7 @@ struct Platform::window_handle
   jmethodID            get_surface_method;             //метод получения поверхности
   jmethodID            post_invalidate_method;         //метод оповещения о необходимости перерисовки окна
   jmethodID            bring_to_front_method;          //метод перемещения окна на передний план
+  bool                 is_multitouch_enabled;          //включен ли multitouch
   
 ///Конструктор
   window_handle ()
@@ -39,6 +40,7 @@ struct Platform::window_handle
     , user_data (0)
     , background_color (0)
     , background_state (0)
+    , is_multitouch_enabled (false)
   {
     MessageQueueSingleton::Instance ()->RegisterHandler (this);
   }  
@@ -91,8 +93,33 @@ struct Platform::window_handle
 
   void OnTouchCallback (int pointer_id, int action, float x, float y)
   {
-//    printf ("on_touch_callback(%d, %d, %g, %g)\n", pointer_id, action, x, y);
-//    fflush (stdout);
+    WindowEventContext context;
+
+    memset (&context, 0, sizeof (context));
+
+    context.touches_count = 1;
+
+    Touch& touch = context.touches [0];
+
+    touch.touch_id   = pointer_id;
+    touch.position.x = x;
+    touch.position.y = y;
+
+    switch (action)
+    {
+      case AMOTION_EVENT_ACTION_DOWN:
+        Notify (WindowEvent_OnTouchesBegan, context);
+        break;
+      case AMOTION_EVENT_ACTION_MOVE:
+        Notify (WindowEvent_OnTouchesMoved, context);
+        break;
+      case AMOTION_EVENT_ACTION_UP:
+      case AMOTION_EVENT_ACTION_CANCEL:
+        Notify (WindowEvent_OnTouchesEnded, context);
+        break;
+      default:
+        printf ("Unhandled touch action %d received\n", action);
+    }
   }
 
   void OnTrackballCallback (int pointer_id, int action, float x, float y)
@@ -785,12 +812,34 @@ void Platform::SetCursor (window_t, cursor_t)
 
 void Platform::SetMultitouchEnabled (window_t window, bool enabled)
 {
-  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::SetMultitouchEnabled");
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    window->is_multitouch_enabled = enabled;    //??????? filter touch events to keep only one touch if multitouch disabled
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidPlatform::SetMultitouchEnabled");
+    throw;
+  }
 }
 
 bool Platform::IsMultitouchEnabled (window_t window)
 {
-  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::IsMultitouchEnabled");
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    return window->is_multitouch_enabled;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::AndroidPlatform::IsMultitouchEnabled");
+    throw;
+  }
 }
 
 /*
@@ -826,11 +875,11 @@ void Platform::SetBackgroundState (window_t window, bool state)
   {
     if (!window)
       throw xtl::make_null_argument_exception ("", "window");    
-        
+
     window->background_state = state ? 0xff000000u : 0u;
-    
+
     get_env ().CallVoidMethod (window->view.get (), window->set_background_color_method, window->background_color | window->background_state);
-    
+
     check_errors ();
   }
   catch (xtl::exception& e)

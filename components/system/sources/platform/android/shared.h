@@ -2,6 +2,7 @@
 #include <cstdio>
 
 #include <jni.h>
+#include <android/input.h>
 #include <android/keycodes.h>
 #include <android/looper.h>
 #include <android/native_window_jni.h>

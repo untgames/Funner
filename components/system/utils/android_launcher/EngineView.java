@@ -13,7 +13,7 @@ import android.content.Context;
 import android.util.*;
 import java.io.*;
 
-public class EngineView extends SurfaceView implements SurfaceHolder.Callback, SurfaceHolder.Callback2
+public class EngineView extends SurfaceView implements SurfaceHolder.Callback
 {
   public EngineView (Context context)
   {    

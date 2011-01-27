@@ -84,6 +84,7 @@ struct DefaultDevice::Impl : private xtl::trackable
                                       WindowEvent_OnXButton2Up,
                                       WindowEvent_OnXButton2DoubleClick,
                                       WindowEvent_OnTouchesBegan,
+                                      WindowEvent_OnTouchesDoubletap,
                                       WindowEvent_OnTouchesMoved,
                                       WindowEvent_OnTouchesEnded,
                                       WindowEvent_OnKeyDown,
@@ -315,39 +316,11 @@ struct DefaultDevice::Impl : private xtl::trackable
         Notify ("MouseX2 up");
         break;
       case WindowEvent_OnTouchesBegan:
-      {
-        Rect viewport_rect = window.Viewport ();
-
-        OnTouchesEvent (window_event_context, "began", viewport_rect);
-
-        float viewport_width  = viewport_rect.right - viewport_rect.left,
-              viewport_height = viewport_rect.bottom - viewport_rect.top;
-
-        const Touch* current_touch = window_event_context.touches;
-
-        for (size_t i = 0; i < window_event_context.touches_count; i++, current_touch++)
-        {
-          if (current_touch->tap_count % 2)
-            continue;
-
-          Point touch_position_in_viewport = current_touch->position;
-
-          TransformWindowPointToViewportPoint (viewport_rect, touch_position_in_viewport);
-
-          xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s doubletap absolute %p %u %u", TOUCH_NAME, current_touch->touch_id,
-                          touch_position_in_viewport.x, touch_position_in_viewport.y);
-          Notify (message);
-
-          float relative_x = touch_position_in_viewport.x / viewport_width,
-                relative_y = touch_position_in_viewport.y / viewport_height;
-
-          xtl::xsnprintf (message, MESSAGE_BUFFER_SIZE, "%s doubletap relative %p %f %f", TOUCH_NAME, current_touch->touch_id,
-                          relative_x, relative_y);
-          Notify (message);
-        }
-
+        OnTouchesEvent (window_event_context, "began", window.Viewport ());
         break;
-      }
+      case WindowEvent_OnTouchesDoubletap:
+        OnTouchesEvent (window_event_context, "doubletap", window.Viewport ());
+        break;
       case WindowEvent_OnTouchesMoved:
         OnTouchesEvent (window_event_context, "moved", window.Viewport ());
         break;

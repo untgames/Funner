@@ -327,7 +327,7 @@ $(foreach file,$(EXPORT_FILES),$(eval $(call load_exports,$(file))))
 #Специализация пути
 ###################################################################################################
 define specialize_paths
-$(foreach dir,$(strip $1),$(COMPONENT_DIR)$(dir))
+$(foreach dir,$(strip $1),$(if $(filter /%,$(dir)),$(dir),$(COMPONENT_DIR)$(dir)))
 endef
 
 ###################################################################################################

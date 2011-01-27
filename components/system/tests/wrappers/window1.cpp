@@ -79,6 +79,41 @@ void mousemove (Window& window, WindowEvent, const WindowEventContext& context)
   fflush (stdout);  
 }
 
+void touch_event (Window& window, WindowEvent event, const WindowEventContext& context)
+{
+  printf ("window '%s': touch event ", window.Title ());
+
+  switch (event)
+  {
+    case WindowEvent_OnTouchesBegan:
+      printf ("TouchesBegan");
+      break;
+    case WindowEvent_OnTouchesMoved:
+      printf ("TouchesMoved");
+      break;
+    case WindowEvent_OnTouchesDoubletap:
+      printf ("TouchesDoubletap");
+      break;
+    case WindowEvent_OnTouchesEnded:
+      printf ("TouchesEnded");
+      break;
+    default:
+      printf ("Unknown");
+      break;
+  }
+
+  printf (". %u touches in event:\n", context.touches_count);
+
+  for (size_t i = 0; i < context.touches_count; i++)
+  {
+    const Touch& touch = context.touches [i];
+
+    printf ("  touch %u position %u %u\n", touch.touch_id, touch.position.x, touch.position.y);
+  }
+
+  fflush (stdout);
+}
+
 void destroy (Window& window, WindowEvent, const WindowEventContext&)
 {
   printf ("window '%s': destroyed\n", window.Title ());
@@ -175,7 +210,11 @@ int main ()
                     connection31 = window.RegisterEventHandler (WindowEvent_OnPaint, &print_event),
                     connection32 = window.RegisterEventHandler (WindowEvent_OnMove, &print_event),
                     connection33 = window.RegisterEventHandler (WindowEvent_OnSize, &print_event),
-                    connection34 = window.RegisterEventHandler (WindowEvent_OnChangeHandle, &print_event);
+                    connection34 = window.RegisterEventHandler (WindowEvent_OnChangeHandle, &print_event),
+                    connection35 = window.RegisterEventHandler (WindowEvent_OnTouchesBegan, &touch_event),
+                    connection36 = window.RegisterEventHandler (WindowEvent_OnTouchesDoubletap, &touch_event),
+                    connection37 = window.RegisterEventHandler (WindowEvent_OnTouchesMoved, &touch_event),
+                    connection38 = window.RegisterEventHandler (WindowEvent_OnTouchesEnded, &touch_event);
 
     window.SetDebugLog (&print);
     window.SetMultitouchEnabled (true);
