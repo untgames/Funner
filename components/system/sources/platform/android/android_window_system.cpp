@@ -91,10 +91,8 @@ struct Platform::window_handle
     Notify (WindowEvent_OnPaint, context);
   }
 
-  void OnTouchCallback (int pointer_id, int action, float x, float y)
+  void FillTouchEventContext (int pointer_id, float x, float y, WindowEventContext& context)
   {
-    WindowEventContext context;
-
     memset (&context, 0, sizeof (context));
 
     context.touches_count = 1;
@@ -104,6 +102,13 @@ struct Platform::window_handle
     touch.touch_id   = pointer_id;
     touch.position.x = x;
     touch.position.y = y;
+  }
+
+  void OnTouchCallback (int pointer_id, int action, float x, float y)
+  {
+    WindowEventContext context;
+
+    FillTouchEventContext (pointer_id, x, y, context);
 
     switch (action)
     {
@@ -120,6 +125,15 @@ struct Platform::window_handle
       default:
         printf ("Unhandled touch action %d received\n", action);
     }
+  }
+
+  void OnDoubletapCallback (int pointer_id, float x, float y)
+  {
+    WindowEventContext context;
+
+    FillTouchEventContext (pointer_id, x, y, context);
+
+    Notify (WindowEvent_OnTouchesDoubletap, context);
   }
 
   void OnTrackballCallback (int pointer_id, int action, float x, float y)
@@ -406,6 +420,11 @@ void on_draw_callback (JNIEnv& env, jobject view)
 void on_touch_callback (JNIEnv& env, jobject view, int pointer_id, int action, float x, float y)
 {
   push_message (view, xtl::bind (&Platform::window_handle::OnTouchCallback, _1, pointer_id, action, x, y));
+}
+
+void on_doubletap_callback (JNIEnv& env, jobject view, int pointer_id, float x, float y)
+{
+  push_message (view, xtl::bind (&Platform::window_handle::OnDoubletapCallback, _1, pointer_id, x, y));
 }
 
 void on_trackball_callback (JNIEnv& env, jobject view, int pointer_id, int action, float x, float y)
@@ -953,6 +972,7 @@ void register_window_callbacks (JNIEnv* env)
       {"onDisplayHintCallback", "(I)V", (void*)&on_display_hint_callback},
       {"onDrawCallback", "()V", (void*)&on_draw_callback},
       {"onTouchCallback", "(IIFF)V", (void*)&on_touch_callback},
+      {"onDoubletapCallback", "(IFF)V", (void*)&on_doubletap_callback},
       {"onTrackballCallback", "(IIFF)V", (void*)&on_trackball_callback},
       {"onKeyCallback", "(IIZZZ)V", (void*)&on_key_callback},
       {"onFocusCallback", "(Z)V", (void*)&on_focus_callback},

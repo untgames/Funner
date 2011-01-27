@@ -1,5 +1,6 @@
 package com.untgames.funner.application;
 
+import android.view.GestureDetector;
 import android.view.SurfaceView;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -13,11 +14,33 @@ import android.content.Context;
 import android.util.*;
 import java.io.*;
 
-public class EngineView extends SurfaceView implements SurfaceHolder.Callback
+public class EngineView extends SurfaceView implements SurfaceHolder.Callback 
 {
+  private GestureDetector gesture_detector;
+	
+  class DoubletapListener extends GestureDetector.SimpleOnGestureListener
+  {
+    private EngineView engine_view;
+    
+    public DoubletapListener (EngineView in_engine_view)
+    {
+      engine_view = in_engine_view;
+    }
+    
+  	@Override
+  	public boolean onDoubleTap (MotionEvent event)
+  	{
+  	  engine_view.onDoubletapCallback (event.getPointerId (0), event.getX (), event.getY ()); 
+  	    
+  	  return true;
+  	}
+  }
+  
   public EngineView (Context context)
   {    
     super (context);
+
+    gesture_detector = new GestureDetector (context, new DoubletapListener (this)); 
     
     setFocusable (true);
     setFocusableInTouchMode (true);
@@ -173,6 +196,7 @@ public class EngineView extends SurfaceView implements SurfaceHolder.Callback
   private native void onDisplayHintCallback      (int hint);
   private native void onDrawCallback             ();
   private native void onTouchCallback            (int pointerId, int action, float x, float y);
+  private native void onDoubletapCallback        (int pointerId, float x, float y);
   private native void onTrackballCallback        (int pointerId, int action, float x, float y);
   private native void onKeyCallback              (int keycode, int action, boolean alt_pressed, boolean shift_pressed, boolean is_sym_pressed);
   private native void onFocusCallback            (boolean focusGained);
@@ -209,6 +233,8 @@ public class EngineView extends SurfaceView implements SurfaceHolder.Callback
       
       onTouchCallback (pointer_id, action, event.getX (i), event.getY (i)); 
     }
+    
+    gesture_detector.onTouchEvent (event);
     
     return true;
   }
