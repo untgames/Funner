@@ -87,6 +87,8 @@ struct PrimarySwapChain::Impl
   
   void SetFullscreenState (bool state)
   {
+    throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::SetFullscreenState");
+    /*
     if (GetFullscreenState () == state)
       return;
       
@@ -149,10 +151,13 @@ struct PrimarySwapChain::Impl
     {
       /// TODO: переход в режим окна
     }
+    */
   }
   
   bool GetFullscreenState ()
   {
+    throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::GetFullscreenState");
+    /*
     Output* output = adapter->GetOutput (window).get ();
 
     if (!output)
@@ -163,7 +168,7 @@ struct PrimarySwapChain::Impl
     output->GetCurrentMode (mode_desc);
 
     return false;
-
+    */
   }
   
   IOutput* GetContainingOutput ()
