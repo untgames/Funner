@@ -12,7 +12,7 @@
 
 using namespace media;
 
-const char* APPLICATION_NAME    = "animation_screen_builder";
+const char* APPLICATION_NAME    = "theora_unpack";
 const char* DEFAULT_RESULTS_DIR = "results";
 
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;

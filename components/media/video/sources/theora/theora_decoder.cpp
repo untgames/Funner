@@ -193,6 +193,8 @@ class TheoraDecoderImpl : public IVideoDecoder
         decoded_frame_number = -1;
       }
 
+      bool is_frame_dropped = false;
+
       for (; decoded_frame_number < (int)frame;)
       {
         try
@@ -200,8 +202,18 @@ class TheoraDecoderImpl : public IVideoDecoder
           if (decoded_frame_number >= 0)  //первый пакет прочитан во время инициализации
             GetOggPacket ();
 
-          if (th_decode_packetin (th_decoding_context, &ogg_data_packet, 0))
-            throw xtl::format_operation_exception (METHOD_NAME, "Can't decode video frame");
+          int decode_result = th_decode_packetin (th_decoding_context, &ogg_data_packet, 0);
+
+          switch (decode_result)
+          {
+            case 0:
+              break;
+            case TH_DUPFRAME:
+              is_frame_dropped = true;
+              break;
+            default:
+              throw xtl::format_operation_exception (METHOD_NAME, "Can't decode video frame, error '%s' code %d", GetTheoraErrorName (decode_result), decode_result);
+          }
         }
         catch (xtl::exception& e) //подавление исключений декодирования связанных с некорректными данными
         {
@@ -212,11 +224,16 @@ class TheoraDecoderImpl : public IVideoDecoder
           log.Printf ("Unknown exception while decoding frame %d\n", decoded_frame_number + 1);
         }
 
-        decoded_frame_number = (int)th_granule_frame (th_decoding_context, ogg_data_packet.granulepos);
+        int packet_frame = (int)th_granule_frame (th_decoding_context, ogg_data_packet.granulepos);
+
+        decoded_frame_number = packet_frame == -1 ? decoded_frame_number + 1 : packet_frame;
+
+        if (is_frame_dropped)
+          buffer_frame_number = decoded_frame_number;
 
         try
         {
-          if (decoded_frame_number <= (int)frame || buffer_frame_number < 0)
+          if (decoded_frame_number <= (int)frame || buffer_frame_number < 0 && buffer_frame_number != decoded_frame_number)
           {
             if (th_decode_ycbcr_out (th_decoding_context, th_decoded_buffer))
               throw xtl::format_operation_exception (METHOD_NAME, "Can't get decoded video frame");
@@ -476,6 +493,18 @@ class TheoraDecoderImpl : public IVideoDecoder
         }
 
         break;
+      }
+    }
+
+    const char* GetTheoraErrorName (int error_code)
+    {
+      switch (error_code)
+      {
+        case TH_DUPFRAME:   return "Dropped frame";
+        case TH_EFAULT:     return "Null argument";
+        case TH_EBADPACKET: return "Packet does not contain encoded video data";
+        case TH_EIMPL:      return "The video data uses bitstream features which this library does not support.";
+        default:            return "Unknown error";
       }
     }
 
