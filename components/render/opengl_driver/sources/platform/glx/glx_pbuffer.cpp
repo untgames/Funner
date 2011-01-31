@@ -34,7 +34,7 @@ struct PBuffer::Impl
       
     primary_swap_chain = swap_chain;
     
-    library = swap_chain->GetAdapter ()->GetLibrary ();
+    library = &swap_chain->GetAdapterImpl ()->GetLibrary ();
 
     display = swap_chain->GetDisplay ();
     
@@ -269,8 +269,14 @@ Display* PBuffer::GetDisplay ()
   return impl->display;
 }
 
+//
+Window PBuffer::GetWindow ()
+{
+  return impl->primary_swap_chain->GetWindow ();
+}
+
 //получение формата пикселей цепочки обмена
-GLXFBConfig PBuffer::GetPixelFormat ()
+GLXFBConfig PBuffer::GetFBConfig ()
 {
   return impl->fbconfig;
 }
