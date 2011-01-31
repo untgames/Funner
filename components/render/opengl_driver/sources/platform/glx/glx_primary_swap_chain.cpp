@@ -175,7 +175,7 @@ struct PrimarySwapChain::Impl
     unsigned int screen_width  = WidthOfScreen  (get_screen (window));
     unsigned int screen_height = HeightOfScreen (get_screen (window));
     
-    return mode_desc.width == screen_width && mode_desc.height = screen_height;
+    return mode_desc.width == screen_width && mode_desc.height == screen_height;
   }
   
   void Present ()
