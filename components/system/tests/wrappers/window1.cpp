@@ -119,8 +119,6 @@ void destroy (Window& window, WindowEvent, const WindowEventContext&)
   printf ("window '%s': destroyed\n", window.Title ());
   fflush (stdout);  
 
-  Application::Exit (0);
-
   throw std::bad_alloc (); //тестирование распространения исключений в обработчиках событий
 }
 
@@ -128,7 +126,10 @@ void print_event (Window& window, WindowEvent event, const WindowEventContext& c
 {
   switch (event)
   {
-    case WindowEvent_OnClose:        printf ("Window close event\n");          break;
+    case WindowEvent_OnClose:
+      printf ("Window close event\n");
+      Application::Exit (0);      
+      break;
     case WindowEvent_OnChangeHandle: printf ("Window changed handle to %p event\n", context.handle); break;
     case WindowEvent_OnActivate:     printf ("Window activate event\n");       break;
     case WindowEvent_OnDeactivate:   printf ("Window deactivate event\n");     break;

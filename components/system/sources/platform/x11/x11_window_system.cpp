@@ -435,11 +435,12 @@ struct Platform::window_handle: public IWindowMessageHandler
 {
   Display*                       display;               //дисплей для данного окна
   XWindow                        window;                //дескриптор окна
+  bool                           is_destroyed;
   bool                           background_state;      //ложное свойство - состояние фона
   Rect                           window_rect;           //область окна
   bool                           window_rect_init;      //инициализирована ли область окна
   Cursor                         invisible_cursor;      //невидимый курсор
-  bool                           is_cursor_visible;     //видим ли курсор
+  bool                           is_cursor_visible;     //видим ли курсор  
   cursor_t                       active_cursor;         //активный курсор окна
   syslib::Color                  background_color;      //цвет заднего фона
   MessageQueue&                  message_queue;         //очередь событий
@@ -452,6 +453,7 @@ struct Platform::window_handle: public IWindowMessageHandler
   window_handle (Platform::WindowMessageHandler in_message_handler, void* in_user_data)
     : display (DisplayManagerSingleton::Instance ()->Display ())
     , window (0)
+    , is_destroyed (false)
     , background_state (true)
     , window_rect_init (false)
     , invisible_cursor (0)
@@ -512,6 +514,20 @@ struct Platform::window_handle: public IWindowMessageHandler
       sender.NotifyCore (event, context);
     }
   };
+  
+  struct DestroyMessage: public Message
+  {
+    DestroyMessage (window_handle& in_sender) : Message (in_sender) {}
+    
+    void Dispatch ()
+    {
+    printf ("!!!!\n"); fflush (stdout);
+      Message::Dispatch ();
+
+      delete &sender;
+    }
+  };
+  
   
 ///Обработчик события
   void ProcessEvent (const XEvent& event)
@@ -613,13 +629,13 @@ struct Platform::window_handle: public IWindowMessageHandler
         Notify (WindowEvent_OnChangeHandle, message);
         break;          
       case DestroyNotify:
-        Notify (WindowEvent_OnDestroy, message);
-        break;          
+        Notify (WindowEvent_OnDestroy, xtl::intrusive_ptr<DestroyMessage> (new DestroyMessage (*this), false));
+        return;
       case ClientMessage:
       {
         if ((Atom)event.xclient.data.l [0] == wm_delete)
         {
-          Notify (WindowEvent_OnClose);
+          Notify (WindowEvent_OnClose, message);
         }
         
         break;
@@ -837,7 +853,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       if (!impl->wm_delete)
         throw xtl::format_operation_exception ("", "WM_DELETE_WINDOW atom not found");
 
-      if (!XSetWMProtocols (impl->display, impl->window, &wm_delete, 1))
+      if (!XSetWMProtocols (impl->display, impl->window, &impl->wm_delete, 1))
         throw xtl::format_operation_exception ("", "XSetWMProtocols failed");
 
         //удаление заголовка окна
@@ -911,6 +927,9 @@ void Platform::DestroyWindow (window_t handle)
     if (!handle)
       throw xtl::make_null_argument_exception ("", "handle");
 
+    if (handle->is_destroyed)
+      return;
+
     {
       DisplayLock lock (handle->display);        
       
@@ -920,8 +939,8 @@ void Platform::DestroyWindow (window_t handle)
       if (!XDestroyWindow (handle->display, handle->window))
         throw xtl::format_operation_exception ("", "XDestroyWindow failed");
     }      
-    
-    delete handle;
+        
+    handle->is_destroyed = true;
   }  
   catch (xtl::exception& e)
   {
