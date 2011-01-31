@@ -433,19 +433,20 @@ struct Platform::cursor_handle
 
 struct Platform::window_handle: public IWindowMessageHandler
 {
-  Display*                       display;           //дисплей для данного окна
-  XWindow                        window;            //дескриптор окна
-  bool                           background_state;  //ложное свойство - состояние фона
-  Rect                           window_rect;       //область окна
-  bool                           window_rect_init;  //инициализирована ли область окна
-  Cursor                         invisible_cursor;  //невидимый курсор
-  bool                           is_cursor_visible; //видим ли курсор
-  cursor_t                       active_cursor;     //активный курсор окна
-  syslib::Color                  background_color;  //цвет заднего фона
-  MessageQueue&                  message_queue;     //очередь событий
-  Platform::WindowMessageHandler message_handler;   //функция обработки сообщений окна
-  void*                          user_data;         //пользовательские данные для функции обратного вызова
+  Display*                       display;               //дисплей для данного окна
+  XWindow                        window;                //дескриптор окна
+  bool                           background_state;      //ложное свойство - состояние фона
+  Rect                           window_rect;           //область окна
+  bool                           window_rect_init;      //инициализирована ли область окна
+  Cursor                         invisible_cursor;      //невидимый курсор
+  bool                           is_cursor_visible;     //видим ли курсор
+  cursor_t                       active_cursor;         //активный курсор окна
+  syslib::Color                  background_color;      //цвет заднего фона
+  MessageQueue&                  message_queue;         //очередь событий
+  Platform::WindowMessageHandler message_handler;       //функция обработки сообщений окна
+  void*                          user_data;             //пользовательские данные для функции обратного вызова
   bool                           is_multitouch_enabled; //включен ли multi touch
+  Atom                           wm_delete;             //атом свойства WM_DELETE_WINDOW
   
 ///Конструктор
   window_handle (Platform::WindowMessageHandler in_message_handler, void* in_user_data)
@@ -460,6 +461,7 @@ struct Platform::window_handle: public IWindowMessageHandler
     , message_handler (in_message_handler)
     , user_data (in_user_data)
     , is_multitouch_enabled (false)
+    , wm_delete (0)
   {
     message_queue.RegisterHandler (this);
   }
@@ -613,6 +615,15 @@ struct Platform::window_handle: public IWindowMessageHandler
       case DestroyNotify:
         Notify (WindowEvent_OnDestroy, message);
         break;          
+      case ClientMessage:
+      {
+        if ((Atom)event.xclient.data.l [0] == wm_delete)
+        {
+          Notify (WindowEvent_OnClose);
+        }
+        
+        break;
+      }
       case UnmapNotify:
         Notify (WindowEvent_OnHide, message);          
         break;          
@@ -814,10 +825,22 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
         
       impl->invisible_cursor = XCreatePixmapCursor (impl->display, blank, blank, &dummy, &dummy, 0, 0);
       
-      XFreePixmap (impl->display, blank);              
+      XFreePixmap (impl->display, blank);                            
       
       if (!impl->invisible_cursor)
         throw xtl::format_operation_exception ("", "XCreatePixmapCursor failed");
+        
+        //замена обработчика закрытия окна
+      
+      impl->wm_delete = XInternAtom (impl->display, "WM_DELETE_WINDOW", True);
+
+      if (!impl->wm_delete)
+        throw xtl::format_operation_exception ("", "WM_DELETE_WINDOW atom not found");
+
+      if (!XSetWMProtocols (impl->display, impl->window, &wm_delete, 1))
+        throw xtl::format_operation_exception ("", "XSetWMProtocols failed");
+
+        //удаление заголовка окна
         
       if (style == WindowStyle_PopUp)
         WmNoDecorations (impl->display, impl->window, DefaultRootWindow (impl->display));
