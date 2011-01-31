@@ -680,74 +680,83 @@ struct Platform::window_handle: public IWindowMessageHandler
 namespace
 {
 
- #define MWM_DECOR_NONE          0
-  #define MWM_DECOR_ALL           (1L << 0)
-   #define MWM_DECOR_BORDER        (1L << 1)
-    #define MWM_DECOR_RESIZEH       (1L << 2)
-     #define MWM_DECOR_TITLE         (1L << 3)
-      #define MWM_DECOR_MENU          (1L << 4)
-       #define MWM_DECOR_MINIMIZE      (1L << 5)
-        #define MWM_DECOR_MAXIMIZE      (1L << 6)
-        
-         /* KDE decoration values */
-          enum {
-            KDE_noDecoration = 0,
-              KDE_normalDecoration = 1,
-                KDE_tinyDecoration = 2,
-                  KDE_noFocus = 256,
-                    KDE_standaloneMenuBar = 512,
-                      KDE_desktopIcon = 1024 ,
-                        KDE_staysOnTop = 2048
-                         };
-                         
+void WmNoDecorations (Display* display, XWindow window, XWindow parent_window)
+{
+    //TODO: check errors
 
-void wm_nodecorations(Display* dpy, XWindow window) {
-    Atom WM_HINTS;
-    int set;
+  //KDE decoration values
+  enum
+  {
+    KDE_noDecoration      = 0,
+    KDE_normalDecoration  = 1,
+    KDE_tinyDecoration    = 2,
+    KDE_noFocus           = 256,
+    KDE_standaloneMenuBar = 512,
+    KDE_desktopIcon       = 1024,
+    KDE_staysOnTop        = 2048,
+  };
+  
+  enum
+  {    
+    MWM_DECOR_NONE      = 0,
+    MWM_DECOR_ALL       = (1L << 0),
+    MWM_DECOR_BORDER    = (1L << 1),
+    MWM_DECOR_RESIZEH   = (1L << 2),
+    MWM_DECOR_TITLE     = (1L << 3),
+    MWM_DECOR_MENU      = (1L << 4),
+    MWM_DECOR_MINIMIZE  = (1L << 5),
+    MWM_DECOR_MAXIMIZE  = (1L << 6),
+  };
 
-    WM_HINTS = XInternAtom(dpy, "_MOTIF_WM_HINTS", True);
-    if ( WM_HINTS != None ) {
-        #define MWM_HINTS_DECORATIONS   (1L << 1)
-        struct {
-          unsigned long flags;
-          unsigned long functions;
-          unsigned long decorations;
-                   long input_mode;
-          unsigned long status;
-        } MWMHints = { MWM_HINTS_DECORATIONS, 0,
-            MWM_DECOR_NONE, 0, 0 };
-        XChangeProperty(dpy, window, WM_HINTS, WM_HINTS, 32,
-                        PropModeReplace, (unsigned char *)&MWMHints,
-                        sizeof(MWMHints)/4);
-    }
-    WM_HINTS = XInternAtom(dpy, "KWM_WIN_DECORATION", True);
-    if ( WM_HINTS != None ) {
-        long KWMHints = KDE_tinyDecoration;
-        XChangeProperty(dpy, window, WM_HINTS, WM_HINTS, 32,
-                        PropModeReplace, (unsigned char *)&KWMHints,
-                        sizeof(KWMHints)/4);
-    }
+  Atom WM_HINTS = XInternAtom (display, "_MOTIF_WM_HINTS", True);
 
-    WM_HINTS = XInternAtom(dpy, "_WIN_HINTS", True);
-    if ( WM_HINTS != None ) {
-        long GNOMEHints = 0;
-        XChangeProperty(dpy, window, WM_HINTS, WM_HINTS, 32,
-                        PropModeReplace, (unsigned char *)&GNOMEHints,
-                        sizeof(GNOMEHints)/4);
-    }
-    WM_HINTS = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", True);
-    if ( WM_HINTS != None ) {
-        Atom NET_WMHints[2];
-        NET_WMHints[0] = XInternAtom(dpy,
-            "_KDE_NET_WM_WINDOW_TYPE_OVERRIDE", True);
-        NET_WMHints[1] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_NORMAL", True);
-        XChangeProperty(dpy, window,
-                        WM_HINTS, XA_ATOM, 32, PropModeReplace,
-                        (unsigned char *)&NET_WMHints, 2);
-    }
-    XSetTransientForHint(dpy, window, DefaultRootWindow (dpy)); //root window???
-//    XUnmapWindow(dpy, window);
-//    XMapWindow(dpy, window);
+  if (WM_HINTS != None)
+  {
+    static const int MWM_HINTS_DECORATIONS = (1L << 1);
+    
+    struct
+    {
+      unsigned long flags;
+      unsigned long functions;
+      unsigned long decorations;
+               long input_mode;
+      unsigned long status;
+    } MWMHints = { MWM_HINTS_DECORATIONS, 0, MWM_DECOR_NONE, 0, 0 };
+
+    XChangeProperty (display, window, WM_HINTS, WM_HINTS, 32, PropModeReplace, (unsigned char*)&MWMHints, sizeof (MWMHints) / 4);
+  }
+
+  WM_HINTS = XInternAtom (display, "KWM_WIN_DECORATION", True);
+  
+  if (WM_HINTS != None)
+  {
+    long KWMHints = KDE_tinyDecoration;
+
+    XChangeProperty (display, window, WM_HINTS, WM_HINTS, 32, PropModeReplace,  (unsigned char *)&KWMHints, sizeof (KWMHints)/4);
+  }
+
+  WM_HINTS = XInternAtom (display, "_WIN_HINTS", True);
+  
+  if (WM_HINTS != None)
+  {
+    long GNOMEHints = 0;
+    
+    XChangeProperty (display, window, WM_HINTS, WM_HINTS, 32, PropModeReplace, (unsigned char *)&GNOMEHints, sizeof (GNOMEHints) / 4);
+  }
+
+  WM_HINTS = XInternAtom (display, "_NET_WM_WINDOW_TYPE", True);
+
+  if (WM_HINTS != None)
+  {
+    Atom NET_WMHints [2];
+    
+    NET_WMHints [0] = XInternAtom (display, "_KDE_NET_WM_WINDOW_TYPE_OVERRIDE", True);
+    NET_WMHints [1] = XInternAtom (display, "_NET_WM_WINDOW_TYPE_NORMAL", True);
+
+    XChangeProperty (display, window, WM_HINTS, XA_ATOM, 32, PropModeReplace, (unsigned char *)&NET_WMHints, 2);
+  }
+
+  XSetTransientForHint (display, window, parent_window);
 }
 
 }
@@ -810,7 +819,8 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       if (!impl->invisible_cursor)
         throw xtl::format_operation_exception ("", "XCreatePixmapCursor failed");
         
-      wm_nodecorations (impl->display, impl->window); //!!!!        
+      if (style == WindowStyle_PopUp)
+        WmNoDecorations (impl->display, impl->window, DefaultRootWindow (impl->display));
       
         //регистрация окна в менеджере соединения с дисплеем
 
