@@ -445,6 +445,7 @@ struct Platform::window_handle: public IWindowMessageHandler
   MessageQueue&                  message_queue;     //очередь событий
   Platform::WindowMessageHandler message_handler;   //функция обработки сообщений окна
   void*                          user_data;         //пользовательские данные для функции обратного вызова
+  bool                           is_multitouch_enabled; //включен ли multi touch
   
 ///Конструктор
   window_handle (Platform::WindowMessageHandler in_message_handler, void* in_user_data)
@@ -458,6 +459,7 @@ struct Platform::window_handle: public IWindowMessageHandler
     , message_queue (*MessageQueueSingleton::Instance ())
     , message_handler (in_message_handler)
     , user_data (in_user_data)
+    , is_multitouch_enabled (false)
   {
     message_queue.RegisterHandler (this);
   }
@@ -1607,6 +1609,42 @@ size_t Platform::GetKeyName (ScanCode scan_code, size_t buffer_size, char* buffe
   strncpy (buffer, name, buffer_size);
 
   return strlen (buffer);
+}
+
+/*
+   Установка/получение multitouch режима
+*/
+
+void Platform::SetMultitouchEnabled (window_t window, bool state)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    window->is_multitouch_enabled = state;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::X11Platform::SetMultitouchEnabled");
+    throw;
+  }
+}
+
+bool Platform::IsMultitouchEnabled (window_t window)
+{
+  try
+  {
+    if (!window)
+      throw xtl::make_null_argument_exception ("", "window");
+
+    return window->is_multitouch_enabled;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::X11Platform::IsMultitouchEnabled");
+    throw;
+  }
 }
 
 
