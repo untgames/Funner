@@ -85,6 +85,12 @@ struct PrimarySwapChain::Impl
     log.Printf ("...release resources");
   }
   
+///Получение устройства вывода с максимальным размером области перекрытия
+  IOutput* GetContainingOutput ()
+  {
+    return adapter->GetOutput (window).get ();
+  }
+  
   void SetFullscreenState (bool state)
   {
 //    throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::SetFullscreenState");
@@ -172,11 +178,6 @@ struct PrimarySwapChain::Impl
     return mode_desc.width == screen_width && mode_desc.height = screen_height;
   }
   
-  IOutput* GetContainingOutput ()
-  {
-    return adapter->GetOutput (window).get ();
-  }
-
   void Present ()
   {  
     try
