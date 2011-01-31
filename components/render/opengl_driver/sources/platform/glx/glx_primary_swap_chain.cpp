@@ -133,8 +133,10 @@ struct PrimarySwapChain::Impl
         if ((modes [i]->hdisplay == desc.frame_buffer.width) && (modes [i]->vdisplay == desc.frame_buffer.height))
            best_mode = i;
       } 
+      
+      log.Printf ("Best mode: %dx%d", modes [i]->hdisplay, modes [i]->vdisplay);
 
-      // переключаемся в режим fullscreen      
+      // переключаемся в режим fullscreen
 
       XF86VidModeSwitchToMode (display, screen_number, modes [best_mode]);
 
