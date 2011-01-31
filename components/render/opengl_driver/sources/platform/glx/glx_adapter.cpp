@@ -4,6 +4,9 @@ using namespace render::low_level;
 using namespace render::low_level::opengl;
 using namespace render::low_level::opengl::glx;
 
+namespace
+{
+
 /*
     Получение информации о конфигурации буфера кадра
 */
@@ -19,6 +22,8 @@ int get_fb_config_attrib (AdapterLibrary& library, Display *display, GLXFBConfig
       "glXGetFBConfigAttrib failed");
   
   return value;
+}
+
 }
 
 /*
