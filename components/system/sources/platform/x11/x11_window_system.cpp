@@ -680,7 +680,28 @@ struct Platform::window_handle: public IWindowMessageHandler
 namespace
 {
 
-void wm_nodecorations(Window window) {
+ #define MWM_DECOR_NONE          0
+  #define MWM_DECOR_ALL           (1L << 0)
+   #define MWM_DECOR_BORDER        (1L << 1)
+    #define MWM_DECOR_RESIZEH       (1L << 2)
+     #define MWM_DECOR_TITLE         (1L << 3)
+      #define MWM_DECOR_MENU          (1L << 4)
+       #define MWM_DECOR_MINIMIZE      (1L << 5)
+        #define MWM_DECOR_MAXIMIZE      (1L << 6)
+        
+         /* KDE decoration values */
+          enum {
+            KDE_noDecoration = 0,
+              KDE_normalDecoration = 1,
+                KDE_tinyDecoration = 2,
+                  KDE_noFocus = 256,
+                    KDE_standaloneMenuBar = 512,
+                      KDE_desktopIcon = 1024 ,
+                        KDE_staysOnTop = 2048
+                         };
+                         
+
+void wm_nodecorations(Display* dpy, XWindow window) {
     Atom WM_HINTS;
     int set;
 
@@ -724,7 +745,7 @@ void wm_nodecorations(Window window) {
                         WM_HINTS, XA_ATOM, 32, PropModeReplace,
                         (unsigned char *)&NET_WMHints, 2);
     }
-    XSetTransientForHint(dpy, window, rootw);
+    XSetTransientForHint(dpy, window, DefaultRootWindow (dpy)); //root window???
 //    XUnmapWindow(dpy, window);
 //    XMapWindow(dpy, window);
 }
@@ -789,7 +810,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       if (!impl->invisible_cursor)
         throw xtl::format_operation_exception ("", "XCreatePixmapCursor failed");
         
-      wm_nodecorations (impl->window); //!!!!        
+      wm_nodecorations (impl->display, impl->window); //!!!!        
       
         //регистрация окна в менеджере соединения с дисплеем
 
