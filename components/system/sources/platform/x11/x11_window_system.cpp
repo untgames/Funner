@@ -675,6 +675,60 @@ struct Platform::window_handle: public IWindowMessageHandler
     Создание/закрытие/уничтожение окна
 */
 
+namespace
+{
+
+void wm_nodecorations(Window window) {
+    Atom WM_HINTS;
+    int set;
+
+    WM_HINTS = XInternAtom(dpy, "_MOTIF_WM_HINTS", True);
+    if ( WM_HINTS != None ) {
+        #define MWM_HINTS_DECORATIONS   (1L << 1)
+        struct {
+          unsigned long flags;
+          unsigned long functions;
+          unsigned long decorations;
+                   long input_mode;
+          unsigned long status;
+        } MWMHints = { MWM_HINTS_DECORATIONS, 0,
+            MWM_DECOR_NONE, 0, 0 };
+        XChangeProperty(dpy, window, WM_HINTS, WM_HINTS, 32,
+                        PropModeReplace, (unsigned char *)&MWMHints,
+                        sizeof(MWMHints)/4);
+    }
+    WM_HINTS = XInternAtom(dpy, "KWM_WIN_DECORATION", True);
+    if ( WM_HINTS != None ) {
+        long KWMHints = KDE_tinyDecoration;
+        XChangeProperty(dpy, window, WM_HINTS, WM_HINTS, 32,
+                        PropModeReplace, (unsigned char *)&KWMHints,
+                        sizeof(KWMHints)/4);
+    }
+
+    WM_HINTS = XInternAtom(dpy, "_WIN_HINTS", True);
+    if ( WM_HINTS != None ) {
+        long GNOMEHints = 0;
+        XChangeProperty(dpy, window, WM_HINTS, WM_HINTS, 32,
+                        PropModeReplace, (unsigned char *)&GNOMEHints,
+                        sizeof(GNOMEHints)/4);
+    }
+    WM_HINTS = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", True);
+    if ( WM_HINTS != None ) {
+        Atom NET_WMHints[2];
+        NET_WMHints[0] = XInternAtom(dpy,
+            "_KDE_NET_WM_WINDOW_TYPE_OVERRIDE", True);
+        NET_WMHints[1] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_NORMAL", True);
+        XChangeProperty(dpy, window,
+                        WM_HINTS, XA_ATOM, 32, PropModeReplace,
+                        (unsigned char *)&NET_WMHints, 2);
+    }
+    XSetTransientForHint(dpy, window, rootw);
+//    XUnmapWindow(dpy, window);
+//    XMapWindow(dpy, window);
+}
+
+}
+
 Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
   try
@@ -732,6 +786,8 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
       
       if (!impl->invisible_cursor)
         throw xtl::format_operation_exception ("", "XCreatePixmapCursor failed");
+        
+      wm_nodecorations (impl->window); //!!!!        
       
         //регистрация окна в менеджере соединения с дисплеем
 
