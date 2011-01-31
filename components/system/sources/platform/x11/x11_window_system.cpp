@@ -435,12 +435,12 @@ struct Platform::window_handle: public IWindowMessageHandler
 {
   Display*                       display;               //дисплей для данного окна
   XWindow                        window;                //дескриптор окна
-  bool                           is_destroyed;
+  bool                           is_destroyed;          //удалено ли окно
   bool                           background_state;      //ложное свойство - состояние фона
   Rect                           window_rect;           //область окна
   bool                           window_rect_init;      //инициализирована ли область окна
   Cursor                         invisible_cursor;      //невидимый курсор
-  bool                           is_cursor_visible;     //видим ли курсор  
+  bool                           is_cursor_visible;     //видим ли курсор  
   cursor_t                       active_cursor;         //активный курсор окна
   syslib::Color                  background_color;      //цвет заднего фона
   MessageQueue&                  message_queue;         //очередь событий
@@ -521,7 +521,6 @@ struct Platform::window_handle: public IWindowMessageHandler
     
     void Dispatch ()
     {
-    printf ("!!!!\n"); fflush (stdout);
       Message::Dispatch ();
 
       delete &sender;
