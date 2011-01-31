@@ -98,7 +98,7 @@ struct PrimarySwapChain::Impl
     if (GetFullscreenState () == state)
       return;
       
-    Output* output = GetContainingOutput ();
+    Output* output = adapter->GetOutput (window).get ();
     
     if (!output)
       return;      
@@ -163,7 +163,7 @@ struct PrimarySwapChain::Impl
   {
 //    throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::GetFullscreenState");
 
-    Output* output = GetContainingOutput ();
+    Output* output = adapter->GetOutput (window).get ();
 
     if (!output)
       return false;
@@ -172,8 +172,8 @@ struct PrimarySwapChain::Impl
     
     output->GetCurrentMode (mode_desc);
     
-    int screen_width  = WidthOfScreen  (get_screen (window));
-    int screen_height = HeightOfScreen (get_screen (window));
+    unsigned int screen_width  = WidthOfScreen  (get_screen (window));
+    unsigned int screen_height = HeightOfScreen (get_screen (window));
     
     return mode_desc.width == screen_width && mode_desc.height = screen_height;
   }
