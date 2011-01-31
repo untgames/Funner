@@ -93,79 +93,47 @@ struct PrimarySwapChain::Impl
   
   void SetFullscreenState (bool state)
   {
-//    throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::SetFullscreenState");
+    static const char* METHOD_NAME = "render::low_level::opengl::glx::PrimarySwapChain::impl::SetFullscreenState";
 
     if (GetFullscreenState () == state)
       return;
       
-    Output* output = adapter->GetOutput (window).get ();
+    OutputPtr output = adapter->GetOutput (window);
     
     if (!output)
-      return;      
+      return;
       
     if (state)
     {
       DisplayLock lock (display);
       
-      int event_base;
-      int error_base;
-      
-      // запрос расширения XF86VidMode
-      
-      if (XF86VidModeQueryExtension (display, &event_base, &error_base) == 0)
-        throw xtl::format_operation_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::SetFullscreenState",
-          "XF86VidModeQueryExtension missing");
-          
-      // запрашиваем список всех режимов
-      
-      int best_mode     = 0;
-      int mode_num      = 0;
-      int screen_number = get_screen_number (window);
-      
-      XF86VidModeModeInfo **modes;
-      
-      XF86VidModeGetAllModeLines (display, screen_number, &mode_num, &modes);
-      
-      // ищем режим с нужным разрешением
-      
-      for (int i=0; i<mode_num; i++)
-      {                                                                    
-        if ((modes [i]->hdisplay == desc.frame_buffer.width) && (modes [i]->vdisplay == desc.frame_buffer.height))
-           best_mode = i;
-      } 
-      
-      log.Printf ("Best mode: %dx%d", modes [i]->hdisplay, modes [i]->vdisplay);
-
-      // переключаемся в режим fullscreen
-
-      XF86VidModeSwitchToMode (display, screen_number, modes [best_mode]);
-
-      XF86VidModeSetViewPort (display, screen_number, 0, 0);            
-
-      XFree (modes);
-      
-      // изменяем размеры области вывода
-      
+      Window root_return = 0;
+      int x_return = 0, y_return = 0;
+      unsigned int width_return = 0, height_return = 0, border_width_return = 0, depth_return = 0;
+                
+      if (!XGetGeometry (display, window, &root_return, &x_return, &y_return, &width_return, &height_return, &border_width_return, &depth_return))
+        throw xtl::format_operation_exception (METHOD_NAME, "XGetGeometry failed");
+                                
       OutputModeDesc mode_desc;
       
-//      output->GetCurrentMode (mode_desc);
-
-      mode_desc.width  = modes [best_mode]->hdisplay;
-      mode_desc.height = modes [best_mode]->vdisplay;
-
-//      output->SetCurrentMode (mode_desc);
+      output->GetCurrentMode (mode_desc);
+      
+      mode_desc.width  = width_return;
+      mode_desc.height = height_return;
+      
+      output->SetCurrentMode (mode_desc);
     }
     else
-    {
-      /// TODO: переход в режим окна
+    {    
+      output->RestoreDefaultMode ();      
     }
   }
   
   bool GetFullscreenState ()
   {
-//    throw xtl::make_not_implemented_exception ("render::low_level::opengl::glx::PrimarySwapChain::impl::GetFullscreenState");
-
-    Output* output = adapter->GetOutput (window).get ();
+    static const char* METHOD_NAME = "render::low_level::opengl::glx::PrimarySwapChain::impl::GetFullscreenState";
+    
+    OutputPtr output = adapter->GetOutput (window);
 
     if (!output)
       return false;
@@ -174,10 +142,14 @@ struct PrimarySwapChain::Impl
     
     output->GetCurrentMode (mode_desc);
     
-    unsigned int screen_width  = WidthOfScreen  (get_screen (window));
-    unsigned int screen_height = HeightOfScreen (get_screen (window));
-    
-    return mode_desc.width == screen_width && mode_desc.height == screen_height;
+    Window root_return = 0;
+    int x_return = 0, y_return = 0;
+    unsigned int width_return = 0, height_return = 0, border_width_return = 0, depth_return = 0;
+                
+    if (!XGetGeometry (display, window, &root_return, &x_return, &y_return, &width_return, &height_return, &border_width_return, &depth_return))
+      throw xtl::format_operation_exception (METHOD_NAME, "XGetGeometry failed");    
+      
+    return x_return == 0 && y_return == 0 && width_return == mode_desc.width && height_return == mode_desc.height;
   }
   
   void Present ()

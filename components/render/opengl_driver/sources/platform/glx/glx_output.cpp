@@ -29,6 +29,7 @@ struct Output::Impl
   Display*          display;                     //соединение с дисплеем
   int               screen_number;               //номер экрана дисплея
   stl::string       name;                        //имя
+  OutputModeDesc    default_mode_desc;
 
 ///Конструктор
   Impl (Display* in_display, int in_screen_number)
@@ -114,6 +115,8 @@ Output::Output (Display* display, int screen_number)
       throw xtl::make_null_argument_exception ("", "screen_number");
 
     impl = new Impl (display, screen_number);
+    
+    GetCurrentMode (impl->default_mode_desc);
   }
   catch (xtl::exception& exception)
   {
@@ -124,6 +127,13 @@ Output::Output (Display* display, int screen_number)
 
 Output::~Output ()
 {
+  try
+  {
+    SetCurrentMode (impl->default_mode_desc);
+  }
+  catch (...)
+  {
+  }
 }
 
 /*
@@ -254,6 +264,19 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
 
   if (status < Success)
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::SetModeDesc", "XRRSetScreenConfigAndRate failed");
+}
+
+void Output::RestoreDefaultMode ()
+{
+  try
+  {
+    SetCurrentMode (impl->default_mode_desc);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::low_level::opengl::glx::Output::RestoreDefaultMode");
+    throw;
+  }
 }
 
 void Output::GetCurrentMode (OutputModeDesc& mode_desc)
