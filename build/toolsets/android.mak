@@ -24,7 +24,7 @@ endif
 ###################################################################################################
 #Константы
 ###################################################################################################
-PROFILES                   += android no_dll unistd
+PROFILES                   += android no_dll unistd egl gles
 REMOTE_DEBUG_DIR           ?= //sdcard/funner
 EXE_SUFFIX                 :=
 DLL_SUFFIX                 := .so
