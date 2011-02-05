@@ -58,7 +58,7 @@ jint JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name,
 extern "C"
 {
 
-extern JNIEXPORT jint JNICALL JNI_OnLoad (JavaVM* vm, void* reserved)
+__attribute__ ((visibility("default"))) extern JNIEXPORT jint JNICALL JNI_OnLoad (JavaVM* vm, void* reserved)
 {
   if (!vm)
   {
