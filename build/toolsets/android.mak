@@ -54,9 +54,10 @@ ADDITIONAL_PATHS           += $(CYGWIN_BIN)
 BUILD_PATHS                := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-linux-androideabi/4.4.3
 COMMON_JAVA_FLAGS          += -g
 COMMON_CPPFLAGS            += -fexceptions -frtti
-COMMON_CFLAGS              += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -g -O0
+COMMON_CFLAGS              += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -O1
 COMMON_CFLAGS              += -march=armv5te -mtune=xscale -msoft-float -mthumb
 COMMON_CFLAGS              += -Wno-psabi -Wa,--noexecstack
+COMMON_CFLAGS              += -fvisibility=hidden -fvisibility-inlines-hidden
 COMMON_CFLAGS              += -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__ -DANDROID -DARM -UDEBUG
 COMMON_CFLAGS              += --sysroot=$(PLATFORM_DIR)/arch-arm
 COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
