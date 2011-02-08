@@ -304,7 +304,35 @@ struct TextureManager::Impl: public ContextObject
     {
       return state.GetSampler (sampler_slot);
     }
-    
+
+    ///Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)
+    void GenerateMips (ITexture* texture)
+    {
+      static const char* METHOD_NAME = "render::low_level::opengl::TextureManager::Impl::GenerateMips";
+
+      if (!texture)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "texture");
+
+      const ContextCaps& caps = GetCaps ();
+
+      if (!caps.has_ext_framebuffer_object)
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Can't generate mipmaps, GL_EXT_framebuffer_object extension not supported");
+
+      BindableTexture *bindable_texture = cast_object<BindableTexture> (*this, texture, METHOD_NAME, "texture");
+
+      bindable_texture->Bind ();
+
+      BindableTextureDesc texture_desc;
+
+      bindable_texture->GetDesc (texture_desc);
+
+      glGenerateMipmapEXT (texture_desc.target);
+
+        //проверка ошибок
+
+      CheckErrors (METHOD_NAME);
+    }
+
   private:
       //проверка номера слота сэмплирования
     size_t CheckSamplerSlot (size_t sampler_slot)
@@ -647,6 +675,23 @@ ISamplerState* TextureManager::GetSampler (size_t sampler_slot) const
   catch (xtl::exception& exception)
   {
     exception.touch ("render::low_level::opengl::TextureManager::GetSampler");
+    throw;
+  }
+}
+
+/*
+   Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)
+*/
+
+void TextureManager::GenerateMips (ITexture* texture)
+{
+  try
+  {
+    impl->GenerateMips (texture);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::TextureManager::GenerateMips");
     throw;
   }
 }

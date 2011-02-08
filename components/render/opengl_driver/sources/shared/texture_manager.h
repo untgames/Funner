@@ -90,6 +90,11 @@ class TextureManager
     ITexture*      GetTexture (size_t sampler_slot) const;
     ISamplerState* GetSampler (size_t sampler_slot) const;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void GenerateMips (ITexture* texture);
+
   private:
     TextureManager (const TextureManager&);             //no impl
     TextureManager& operator = (const TextureManager&); //no impl

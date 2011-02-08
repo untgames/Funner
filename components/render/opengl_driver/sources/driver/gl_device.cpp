@@ -501,6 +501,23 @@ void Device::ClearViews (size_t clear_flags, const Color4f& color, float depth, 
 }
 
 /*
+   Генерация мип-уровней текстуры (необходимо для текстур в которые ведется рендеринг)
+*/
+
+void Device::GenerateMips (ITexture* texture)
+{
+  try
+  {
+    texture_manager.GenerateMips (texture);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("render::low_level::opengl::Device::GenerateMips");
+    throw;
+  }
+}
+
+/*
     Управление предикатами отрисовки
 */
 
