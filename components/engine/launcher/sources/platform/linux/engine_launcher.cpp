@@ -1,28 +1,29 @@
 #include <cstdio>
+#include <dlfcn.h>
 
-#include <windows.h>
+#include <engine/engine.h>
 
-#include <engine/launcher.h>
+using namespace engine;
 
 namespace
 {
 
-const char* ENGINE_LIBRARY_NAME = "funner.dll";
+const char* ENGINE_LIBRARY_NAME = "libfunner.so";
 
 }
 
 //точка входа
 int main (int argc, const char* argv [])
 {
-  HMODULE library = LoadLibrary (ENGINE_LIBRARY_NAME);
+  void* library = dlopen (ENGINE_LIBRARY_NAME, RTLD_NOW | RTLD_GLOBAL);
   
   if (!library)
   {
     printf ("Can't load engine library\n");
     return 1;
   }
-  
-  FunnerInitProc FunnerInit = (FunnerInitProc)GetProcAddress (library, "FunnerInit");  
+    
+  FunnerInitProc FunnerInit = (FunnerInitProc)dlsym (library, "FunnerInit");  
   
   if (!FunnerInit)
   {
@@ -30,7 +31,7 @@ int main (int argc, const char* argv [])
     return 1;
   }
 
-  IFunnerApi* funner = FunnerInit ();
+  IEngine* funner = FunnerInit ();
 
   if (!funner)
   {
@@ -47,5 +48,5 @@ int main (int argc, const char* argv [])
 
   delete funner;
 
-  //FreeLibrary (library); //библиотека не выгружается, из-за необходимости срабатываний atexit, вызванных в funner.dll
+  //dlclose (library); //библиотека не выгружается, из-за необходимости срабатываний atexit, вызванных в libfunner.so
 }

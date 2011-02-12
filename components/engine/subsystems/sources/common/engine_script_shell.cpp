@@ -29,30 +29,41 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
   public:
 /// Конструктор/деструктор
     ShellSubsystem (common::ParseNode& node, SubsystemManager& manager)
-      : environment (new Environment)
     {
         //чтение конфигурации
 
-      const char *interpreter = get<const char*> (node, "Interpreter"),
-                 *libraries   = get<const char*> (node, "Libraries", ""),
-                 *sources     = get<const char*> (node, "Sources"),
-                 *command     = get<const char*> (node, "Execute", "");
+      const char *interpreter         = get<const char*> (node, "Interpreter"),
+                 *libraries           = get<const char*> (node, "Libraries", ""),
+                 *sources             = get<const char*> (node, "Sources", ""),
+                 *command             = get<const char*> (node, "Execute", ""),
+                 *config_search_paths = get<const char*> (node, "SearchPaths", ""),
+                 *shell_search_paths  = getenv ("LUA_SEARCH_PATHS");
+
+      stl::string search_paths = config_search_paths;
+
+      if (shell_search_paths)
+      {
+        if (!search_paths.empty ())
+          search_paths.push_back (';');
+
+        search_paths += shell_search_paths;
+      }
 
       StringArray lib_list = split (libraries),
-                  src_list = split (sources);
-
-        //установка потока протоколирования
+                  src_list = split (sources);                  
 
         //загрузка библиотек
 
       for (size_t i=0; i<lib_list.Size (); i++)
-        environment->BindLibraries (lib_list [i]);
+        environment.BindLibraries (lib_list [i]);
 
         //регистрация менеджера подсистем
 
-      InvokerRegistry& engine_lib = environment->Library ("Engine");
+      InvokerRegistry engine_lib = environment.Library ("Engine");
+      InvokerRegistry global_lib = environment.Library ("global");
 
       engine_lib.Register ("get_SubsystemManager", make_const (xtl::ref (manager)));
+      global_lib.Register ("searchpaths", make_const (search_paths));
 
         //создание интерпретатора
 
@@ -68,17 +79,43 @@ class ShellSubsystem : public ISubsystem, public xtl::reference_counter
       if (*command)
         shell.Execute (command);
     }
+    
+///Выполнение команды
+    void Execute (const char* command)
+    {
+      if (!wcimatch (command, "*.lua") && !wcimatch (command, "*.luac") && !wcimatch (command, "lua:*"))
+        return;                
+        
+      try
+      {
+        if (wcimatch (command, "lua:*"))
+        {
+          static const char* PREFIX_STRING = "lua:";
+          static size_t      PREFIX_LENGTH = strlen (PREFIX_STRING);
+
+          command += PREFIX_LENGTH;
+          
+          shell.Execute (command);
+        }
+        else
+        {
+          shell.ExecuteFile (command);          
+        }
+      }
+      catch (xtl::exception& e)
+      { 
+        e.touch ("engine::ShellSubsystem::Execute");
+        throw;
+      }
+    }
 
 /// Подсчёт ссылок
     void AddRef ()  { addref (this); }
     void Release () { release (this); }
 
   private:
-    typedef Shell::EnvironmentPtr EnvironmentPtr;
-
-  private:
-    EnvironmentPtr environment; //скриптовое окружение
-    Shell          shell;       //скриптовый интерпретатор
+    Environment environment; //скриптовое окружение
+    Shell       shell;       //скриптовый интерпретатор
 };
 
 /*

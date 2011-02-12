@@ -63,6 +63,8 @@ class ScenePlayerSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
     ~ScenePlayerSubsystem ()
     {
+      resource_server.reset ();
+      
       AttachmentRegistry::Detach<scene_graph::Listener> (this, AttachmentRegistryAttachMode_ForceNotify);
     }
 

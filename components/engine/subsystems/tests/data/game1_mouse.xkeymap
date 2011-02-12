@@ -3,4 +3,5 @@
   <Translation Event="'CursorX' delta *" Replacement="Mouse {0} {1} {2}"/>
   <Translation Event="'CursorY' delta *" Replacement="Mouse {0} {1} {2}"/>
   <Translation Event="'Mouse1' down" Replacement="exit"/>
+  <Translation Event="Window close" Replacement="exit"/>
 </TranslationTable>

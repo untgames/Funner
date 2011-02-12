@@ -20,6 +20,8 @@ int main ()
     SubsystemManager manager;
 
     manager.Start (CONFIGURATION_FILE_NAME);
+    
+    manager.Execute ("data/test.lua");
   }
   catch (std::exception& e)
   {

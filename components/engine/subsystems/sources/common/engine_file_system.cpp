@@ -46,6 +46,25 @@ class FileSystem : public ISubsystem, public xtl::reference_counter
           common::FileSystem::SetCryptoParameters (file_name, crypto_parameters);
         }
       }
+        
+        //монтирование путей
+        
+      ParseNode mount_node = node.First ("Mount");
+      
+      if (mount_node)
+      {        
+        for (Parser::NamesakeIterator iter=mount_node.First ("File"); iter; ++iter)
+        {
+          const char* link_name       = get<const char*> (*iter, "Name");
+          const char* path            = get<const char*> (*iter, "Path");
+          const char* force_extension = get<const char*> (*iter, "ForceExtension", (const char*)0);
+          
+          if (!common::FileSystem::IsDir (path) && !common::FileSystem::IsFileExist (path))
+            common::FileSystem::Mkdir (path);
+
+          common::FileSystem::Mount (link_name, path, force_extension);
+        }
+      }
 
         //добавление путей поиска
 

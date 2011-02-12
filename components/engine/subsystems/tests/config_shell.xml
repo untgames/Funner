@@ -3,14 +3,6 @@
   <FileSystem Paths="data"/>
   <Log>
     <Console Filters="engine.*"/>
-    <File FileName="/io/stdout" Filters="engine.*" Flush="1">
-      <OutputFormat 
-        Replacement="{log}: {message}" 
-        SortOrder="1"
-      >
-        Filter="*" 
-      </OutputFormat>
-    </File>
   </Log>
-  <Shell Interpreter="lua" Sources="shell_scripts/*" Libraries="Math SceneGraph" Execute="main ()"/>
+  <Shell Interpreter="lua" Sources="shell_scripts/*" Libraries="Math SceneGraph LuaOverride" Execute="main ()" SearchPaths="data/shell_scripts/include/?.lua"/>
 </Configuration>

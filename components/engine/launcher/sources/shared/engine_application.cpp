@@ -1,21 +1,4 @@
-#include <cstdio>
-#include <exception>
-
-#include <stl/auto_ptr.h>
-#include <stl/string>
-
-#include <xtl/bind.h>
-#include <xtl/connection.h>
-#include <xtl/function.h>
-#include <xtl/string.h>
-
-#include <common/console.h>
-
-#include <syslib/application.h>
-
-#include <engine/subsystem_manager.h>
-
-#include <engine/launcher.h>
+#include "shared.h"
 
 using namespace engine;
 
@@ -35,6 +18,7 @@ const char* DEFAULT_CONFIGURATION_FILE_NAME = "config.xml";       //им€ конфигур
 const bool  DEFAULT_HAS_MAIN_LOOP           = true;               //наличие главного цикла приложени€ по умолчанию
 
 const char* KEY_CONFIGURATION = "--config=";      //им€ ключа конфигурационного файла
+const char* KEY_SEARCH_PATH   = "--search-path="; //путь к каталогу поиска файлов
 const char* KEY_NO_MAIN_LOOP  = "--no-main-loop"; //отключение главного цикла приложени€
 const char* KEY_MAIN_LOOP     = "--main-loop";    //включение главного цикла приложени€
 const char* KEY_VERSION       = "--version";      //вывод справки в стандартный поток вывода
@@ -42,23 +26,21 @@ const char* KEY_VERSION_SHORT = "-v";             //вывод справки в стандартный 
 const char* KEY_HELP          = "--help";         //вывод справки в стандартный поток вывода
 
 const char* HELP [] = {
-  "Usage: app_name [args]\n",
-  "  args:\n",
+  "Usage: app_name [flags] [source] ...\n",
+  "  flags:\n",
   "    --config=config_file_name - launch with specified config file\n",
-  "    --version (-v)            - print version\n",
+  "    --search-path=dir_name    - add dir_name to search paths\n",
+  "    --version (-v)            - print version\n",  
   "    --no-main-loop            - app exits after starting subsystems\n",
   "    --main-loop               - app runs main loop after starting subsystems\n",
   "    --help                    - print this help\n",
 };
 
-const size_t STARTUP_MAIN_LOOP_DELAY = 10; //задержка перед запуском главной нити приложени€ (в милисекундах) - необходимо дл€ работы на iPhone
-
-
 /*
     ѕриложение
 */
 
-class Application: public IFunnerApi
+class Application: public IEngine
 {
   public:
 /// онструктор
@@ -69,13 +51,43 @@ class Application: public IFunnerApi
       need_print_version = false;
       need_print_help    = false;
     }
+    
+    ///”становка базовой директории
+    void SetBaseDir (const char* dir_name)
+    {
+      try
+      {
+        common::FileSystem::SetCurrentDir (dir_name);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::Application::SetBaseDir");
+        throw;
+      }      
+    }
+    
+    ///ѕолучение базовой директории
+    const char* GetBaseDir ()
+    {
+      try
+      {
+        return common::FileSystem::GetCurrentDir ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::Application::GetBaseDir");
+        throw;
+      }      
+    }
         
 ///–азбор параметров командой строки
     bool ParseCommandLine (unsigned int args_count, const char** args)
     {
       try
       {
-        for (size_t i=0; i<args_count; i++)
+        commands.Reserve (args_count);
+        
+        for (size_t i=1; i<args_count; i++)
         {
           const char* argument = args [i];
 
@@ -85,6 +97,10 @@ class Application: public IFunnerApi
           if (!xtl::xstrncmp (argument, KEY_CONFIGURATION, xtl::xstrlen (KEY_CONFIGURATION)))
           {
             configuration_name = argument + xtl::xstrlen (KEY_CONFIGURATION);
+          }
+          else if (!xtl::xstrcmp (argument, KEY_SEARCH_PATH))
+          {
+            search_paths.Add (argument);
           }
           else if (!xtl::xstrcmp (argument, KEY_MAIN_LOOP))
           {
@@ -101,6 +117,11 @@ class Application: public IFunnerApi
           else if (!xtl::xstrcmp (argument, KEY_HELP))
           {
             need_print_help = true;
+            has_main_loop   = false;
+          }
+          else
+          {
+            commands.Add (argument);
           }
         }
         
@@ -117,15 +138,35 @@ class Application: public IFunnerApi
       
       return false;
     }
+    
+///—оздание окна
+    IWindow* CreateWindow (const char* name)
+    {
+      try
+      {
+        return create_window (name);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("engine::Application::CreateWindow");
+        throw;
+      }
+    }
 
 ///¬ыполнение приложени€
     void Run ()
     {
       try
       {
+          //загрузка лицензии
+        common::Parser p (configuration_name.c_str ());
+        if (p.Root ().First ("Configuration.LicenseFile"))
+          common::LicenseManager::Load (common::get<const char*> (p.Root ().First ("Configuration"), "LicenseFile"));
+        else
+          printf ("There is no license information in configuration\n");
           //регистраци€ обработчика старта приложени€
 
-        syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnEnterRunLoop, xtl::bind (&Application::StartupHandler, this));
+        syslib::Application::RegisterEventHandler (syslib::ApplicationEvent_OnInitialized, xtl::bind (&Application::StartupHandler, this, p.Root ().First ("Configuration")));        
 
           //запуск основного цикла
   
@@ -143,13 +184,11 @@ class Application: public IFunnerApi
 
   private:
 ///ќбработчик старта приложени€
-    void StartupHandler ()
+    void StartupHandler (common::ParseNode config_node)
     {
       try
       {      
           //запуск подсистем
-
-        manager.Start (configuration_name.c_str ());
 
         if (need_print_version)
           common::Console::Printf ("Application version: %s\n", VERSION);
@@ -161,7 +200,38 @@ class Application: public IFunnerApi
           //если основного цикла нет - выход из приложени€
 
         if (!has_main_loop)
-          syslib::Application::Exit (0);
+          syslib::Application::Exit (0);            
+
+        if (!need_print_help && !need_print_version)
+        {
+          try
+          {
+            common::Log log ("launcher");
+
+            common::FileSystem::LogHandler log_handler (xtl::bind (&common::Log::Print, &log, _1));
+
+            for (size_t i=0; i<search_paths.Size (); i++)
+            {
+              const char* path = search_paths [i];
+
+              common::FileSystem::AddSearchPath (path, log_handler);
+            }            
+
+            manager.Start (config_node);            
+
+            for (size_t i=0, count=commands.Size (); i<count; i++)
+            {
+              const char* command = commands [i];
+
+              manager.Execute (command);
+            }
+          }
+          catch (...)
+          {
+            syslib::Application::Exit (-1);
+            throw;
+          }
+        }
       }
       catch (std::exception& exception)
       {
@@ -174,12 +244,14 @@ class Application: public IFunnerApi
     }
 
   private:
-    SubsystemManager manager;                    //менеджер подсистем
-    bool             has_main_loop;              //есть ли главный цикл приложени€
-    bool             has_explicit_configuration; //конфигураци€ приложени€ указана €вно
-    stl::string      configuration_name;         //им€ конфигурации
-    bool             need_print_version;         //нужно распечатать строку версии
-    bool             need_print_help;            //нужно распечатать помощь по запуску приложени€
+    SubsystemManager    manager;                    //менеджер подсистем
+    bool                has_main_loop;              //есть ли главный цикл приложени€
+    bool                has_explicit_configuration; //конфигураци€ приложени€ указана €вно
+    stl::string         configuration_name;         //им€ конфигурации
+    bool                need_print_version;         //нужно распечатать строку версии
+    bool                need_print_help;            //нужно распечатать помощь по запуску приложени€
+    common::StringArray commands;                   //команды на выполнение подсистемами
+    common::StringArray search_paths;               //пути поиска
 };
 
 }
@@ -192,7 +264,7 @@ extern "C" int MAKE_TARGET_LINK_INCLUDES_COMMA;
 
 static int touch [] = {MAKE_TARGET_LINK_INCLUDES_COMMA};
 
-FUNNER_C_API IFunnerApi* FunnerInit ()
+FUNNER_C_API IEngine* FunnerInit ()
 {
   try
   {    
@@ -209,3 +281,4 @@ FUNNER_C_API IFunnerApi* FunnerInit ()
 
   return 0;
 }
+
