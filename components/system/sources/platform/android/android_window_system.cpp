@@ -4,7 +4,6 @@ using namespace syslib;
 using namespace syslib::android;
 
 //TODO: обработка исключений в CreateWindow и удаление окна
-//TODO: wait for surface created
 
 /*
     Окно
@@ -244,14 +243,47 @@ struct Platform::window_handle
 
   void OnSurfaceCreatedCallback ()
   {
-    printf ("on_surface_created_callback()\n");
-    fflush (stdout);
+    if (native_handle)
+      return; //блокировка повторной инициализации поверхности
+      
+      //получение поверхности
+      
+    local_ref<jobject> surface = check_errors (get_env ().CallObjectMethod (view.get (), get_surface_method));
+    
+    if (!surface)
+      throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");      
+
+      //получение дескриптора окна
+
+    native_handle = ANativeWindow_fromSurface (&get_env (), surface.get ());
+    
+      //оповещение об изменении дескриптора
+    
+    WindowEventContext context;
+
+    memset (&context, 0, sizeof (context));    
+    
+    context.handle = native_handle;
+    
+    Notify (WindowEvent_OnChangeHandle, context);    
   }
 
   void OnSurfaceDestroyedCallback ()
   {
-    printf ("on_surface_destroyed_callback()\n");
-    fflush (stdout);
+    if (!native_handle)
+      return;
+    
+    ANativeWindow_release (native_handle);
+    
+    native_handle = 0;
+    
+      //оповещение об изменении дескриптора
+    
+    WindowEventContext context;
+
+    memset (&context, 0, sizeof (context));    
+    
+    Notify (WindowEvent_OnChangeHandle, context);    
   }  
 };
 
@@ -445,6 +477,7 @@ void on_focus_callback (JNIEnv& env, jobject view, jboolean gained)
 void on_surface_created_callback (JNIEnv& env, jobject view)
 {
   push_message (view, xtl::bind (&Platform::window_handle::OnSurfaceCreatedCallback, _1));
+  push_message (view, xtl::bind (&Platform::window_handle::OnDrawCallback, _1));
 }
 
 void on_surface_destroyed_callback (JNIEnv& env, jobject view)
@@ -492,23 +525,42 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
     window->set_background_color_method = find_method (&env, view_class.get (), "setBackgroundColorThreadSafe", "(I)V");
     window->maximize_method             = find_method (&env, view_class.get (), "maximizeThreadSafe", "()V");
     window->get_surface_method          = find_method (&env, view_class.get (), "getSurfaceThreadSafe", "()Landroid/view/Surface;");
-    window->post_invalidate_method      = find_method (&env, view_class.get (), "postInvalidate", "()V");
+    window->post_invalidate_method      = find_method (&env, view_class.get (), "postInvalidate", "()V");        
     
-      //получение нативного дескриптора окна
-      
+      //получение дескриптора поверхности
+    
     local_ref<jobject> surface = check_errors (env.CallObjectMethod (window->view.get (), window->get_surface_method));
     
     if (!surface)
       throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");
-
-    window->native_handle = ANativeWindow_fromSurface (&env, surface.get ());
+      
+      //регистрация обработчика окна
     
     JniWindowManagerSingleton::Instance ()->RegisterWindow (window->view.get (), window.get ());
 
-//    if (!window->native_handle) //callback processing
-//      throw xtl::format_operation_exception ("", "ANativeWindow_fromSurface failed");
-
-    return window.release ();
+    try
+    {
+        //ожидание создания поверхности
+      
+      for (;;)
+      {
+        window->native_handle = ANativeWindow_fromSurface (&env, surface.get ());
+        
+        if (window->native_handle)
+          break;
+        
+        static const size_t WAIT_TIME_IN_MICROSECONDS = 100*1000; //100 milliseconds
+        
+        usleep (WAIT_TIME_IN_MICROSECONDS);
+      }
+    
+      return window.release ();
+    }
+    catch (...)
+    {
+      JniWindowManagerSingleton::Instance ()->UnregisterWindow (window->view.get ());  
+      throw;
+    }
   }
   catch (xtl::exception& e)
   {
@@ -524,6 +576,8 @@ void Platform::CloseWindow (window_t)
 
 void Platform::DestroyWindow (window_t)
 {
+  //TODO: release window handle
+
   throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::DestroyWindow");
 }
 
@@ -537,7 +591,7 @@ const void* Platform::GetNativeWindowHandle (window_t window)
   {
     if (!window)
       throw xtl::make_null_argument_exception ("", "window");
-    
+      
     return window->native_handle;
   }
   catch (xtl::exception& e)

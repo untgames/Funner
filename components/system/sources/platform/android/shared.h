@@ -1,6 +1,8 @@
 #include <ctime>
 #include <cstdio>
 
+#include <unistd.h>
+
 #include <jni.h>
 #include <android/input.h>
 #include <android/keycodes.h>
