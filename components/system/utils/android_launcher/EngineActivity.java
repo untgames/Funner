@@ -36,6 +36,16 @@ public class EngineActivity extends Activity
       
       return;
     }
+    
+    String workDir = extras.getString ("workdir");
+    
+    if (workDir == null)
+    {
+      System.out.println ("No 'workdir' command line argument found");
+      System.exit (0);
+      
+      return;
+    }    
 
     String programArgs = extras.getString ("args");
     
@@ -45,10 +55,10 @@ public class EngineActivity extends Activity
     {
       if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.GINGERBREAD)
         System.loadLibrary ("android");
-    	
+        
       System.load (programName);
 
-      if (startApplication (programName, programArgs != null ? programArgs : "") == 0)
+      if (startApplication (programName, workDir, programArgs != null ? programArgs : "") == 0)
         System.exit (0);
     }
     catch (Throwable e)
@@ -63,7 +73,7 @@ public class EngineActivity extends Activity
   }
   
 /// Точка входа в native код
-  public native int startApplication (String programName, String programArgs);
+  public native int startApplication (String programName, String workDir, String programArgs);
   
 /// Создание окна
   public View createEngineView (String initString)

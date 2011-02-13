@@ -12,7 +12,7 @@ const char* ENGINE_ACTIVITY_START_APPLICATION_METHOD_NAME = "startApplication";
 /// Виртуальная машина
 JavaVM* java_vm = 0;
 
-jint JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name, jstring jprogram_args)
+jint JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name, jstring jwork_dir, jstring jprogram_args)
 {
   if (!env)
   {  
@@ -20,19 +20,27 @@ jint JNICALL startApplication (JNIEnv* env, jobject thiz, jstring jprogram_name,
     return 0;
   }
   
-  if (!jprogram_name || !jprogram_args)
+  if (!jprogram_name || !jprogram_args || !jwork_dir)
   {
     printf ("Bad arguments passed to EngineActivity::startApplication\n");
     return 0; 
   }
   
-  jni_string program_name (env, jprogram_name), program_args (env, jprogram_args);
+  jni_string program_name (env, jprogram_name), program_args (env, jprogram_args), work_dir (env, jwork_dir);
  
-  printf ("Starting program '%s' (args='%s')\n", program_name.get (), program_args.get ());
+  printf ("Starting program '%s' (args='%s', workdir='%s')\n", program_name.get (), program_args.get (), work_dir.get ());
   fflush (stdout);
   
   try
   {   
+    if (chdir (work_dir.get ()))
+    {
+      printf ("Can't set current working dir to '%s'. %s\n", work_dir.get (), strerror (errno));
+      fflush (stdout);
+      
+      return 0;
+    }
+    
     start_application (java_vm, thiz, program_name.get (), program_args.get ());
     
     return 1;
@@ -95,7 +103,7 @@ __attribute__ ((visibility("default"))) extern JNIEXPORT jint JNICALL JNI_OnLoad
   memset (&method, 0, sizeof (JNINativeMethod));
   
   method.name      = ENGINE_ACTIVITY_START_APPLICATION_METHOD_NAME;
-  method.signature = "(Ljava/lang/String;Ljava/lang/String;)I";
+  method.signature = "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I";
   method.fnPtr     = (void*)&startApplication;
 
   jint status = env->RegisterNatives (skeletonActivityClass, &method, 1);

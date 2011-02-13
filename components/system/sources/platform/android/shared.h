@@ -2,6 +2,7 @@
 #include <cstdio>
 
 #include <unistd.h>
+#include <errno.h>
 
 #include <jni.h>
 #include <android/input.h>
