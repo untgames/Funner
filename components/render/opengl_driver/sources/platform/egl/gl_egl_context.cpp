@@ -217,8 +217,8 @@ void Context::MakeCurrent (ISwapChain* swap_chain)
     if (!eglMakeCurrent (impl->egl_display, impl->egl_surface, impl->egl_surface, impl->egl_context))
       raise_error ("::eglMakeCurrent");
       
-    if (!eglSwapInterval (impl->egl_display, impl->vsync))
-      raise_error ("::eglSwapInterval");
+//    if (!eglSwapInterval (impl->egl_display, impl->vsync))
+//      raise_error ("::eglSwapInterval");
       
     Impl::current_context = impl.get ();
 

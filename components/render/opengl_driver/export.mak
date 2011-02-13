@@ -9,6 +9,7 @@ export.link.render.low_level.opengl_driver.iphone.LINK_FLAGS := -framework OpenG
 export.link.render.low_level.opengl_driver.bada.LIBS         := FGraphicsEgl FGraphicsOpengl
 export.link.render.low_level.opengl_driver.beagleboard.IMPORTS := link.extern.beagleboard
 export.link.render.low_level.opengl_driver.beagleboard.LIBS  := EGL GLES_CM srv_um IMGegl
+export.link.render.low_level.opengl_driver.android.LIBS      := EGL GLESv1_CM
 
 #Run exports (don't remove - used for common imports at run target)
 export.run.render.low_level.opengl_driver.IMPORTS :=
