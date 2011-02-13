@@ -54,7 +54,7 @@ ADDITIONAL_PATHS           += $(CYGWIN_BIN)
 BUILD_PATHS                := $(CYGWIN_BIN):$(GCC_TOOLS_DIR):$(ARM_EABI_DIR)/libexec/gcc/arm-linux-androideabi/4.4.3
 COMMON_JAVA_FLAGS          += -g
 COMMON_CPPFLAGS            += -fexceptions -frtti
-COMMON_CFLAGS              += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -O1
+COMMON_CFLAGS              += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64
 COMMON_CFLAGS              += -march=armv5te -mtune=xscale -msoft-float -mthumb
 COMMON_CFLAGS              += -Wno-psabi -Wa,--noexecstack
 COMMON_CFLAGS              += -fvisibility=hidden -fvisibility-inlines-hidden
@@ -137,7 +137,7 @@ define tools.run.android_package
  export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
  export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
  $(ADB) shell logcat -c && \
- $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=//sdcard/busybox:\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && /sdcard/busybox mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)funner.application/.EngineActivity -e 'program' '$$(echo $$SUBST_COMMAND)' -e 'args' '$(subst $(firstword $1),,$1)'" | sed "s/.$$//" && \
+ $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=//sdcard/busybox:\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && /sdcard/busybox mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)funner.application/.EngineActivity -e 'program' '$$(echo $$SUBST_COMMAND)' -e 'workdir' '$$SUBST_DIR_RESULT' -e 'args' '$(subst $(firstword $1),,$1)'" | sed "s/.$$//" && \
  sleep 1 && \
  $(ADB) shell "\\/sdcard/busybox/sh -c 'while ps | \\/sdcard/busybox/grep $(DEFAULT_PACKAGE_PREFIX)funner.application; do sleep 1; done'" > nul && \
  $(ADB) logcat -s -d -v raw System.out:I -v raw stdout:I
