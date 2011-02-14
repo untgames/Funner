@@ -60,7 +60,10 @@ public class EngineActivity extends Activity
         String libraries [] = librariesString.split (" ");
         
         for (String library : libraries)
-          System.load (library);
+        {
+          if (library != "")
+            System.load (library);
+        }
       }
         
       System.load (programName);
