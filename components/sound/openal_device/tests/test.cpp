@@ -114,7 +114,8 @@ int main ()
   {
     common::LogFilter log_filter (LOG_FILTER_MASK, &log_print);
 
-    xtl::com_ptr<IDevice> sound_system (DriverManager::CreateDevice ("OpenAL", "*", "frequency=192000 min_channels_count=32 max_channels_count=192"), false);
+//    xtl::com_ptr<IDevice> sound_system (DriverManager::CreateDevice ("OpenAL", "*", "frequency=192000 min_channels_count=32 max_channels_count=192"), false);
+    xtl::com_ptr<IDevice> sound_system (DriverManager::CreateDevice ("OpenAL", "*", "frequency=44000 min_channels_count=32 max_channels_count=192"), false);
 
     Capabilities   info;
     Listener       listener;
