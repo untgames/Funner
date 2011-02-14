@@ -47,14 +47,21 @@ public class EngineActivity extends Activity
       return;
     }    
 
-    String programArgs = extras.getString ("args");
-    
-      //передача управления native коду
-    
+    String programArgs     = extras.getString ("args");
+    String librariesString = extras.getString ("libraries");
+
     try
     {
       if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.GINGERBREAD)
         System.loadLibrary ("android");
+        
+      if (librariesString != null)
+      {
+        String libraries [] = librariesString.split (" ");
+        
+        for (String library : libraries)
+          System.load (library);
+      }
         
       System.load (programName);
 
