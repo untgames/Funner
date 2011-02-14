@@ -66,7 +66,7 @@ $(call ssh_copy,$1,$(BEAGLE_BOARD_USER)@$(BEAGLE_BOARD_HOST):$(REMOTE_DEBUG_DIR)
 $(call ssh_run,"chmod -R +x $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)",$(BEAGLE_BOARD_USER)@$(BEAGLE_BOARD_HOST),$(BEAGLE_BOARD_PASSWORD))
 endef
 
-#Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
+#Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
 define tools.run
 export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
 export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \

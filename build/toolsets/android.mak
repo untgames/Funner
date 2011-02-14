@@ -57,7 +57,7 @@ COMMON_CPPFLAGS            += -fexceptions -frtti
 COMMON_CFLAGS              += -ffunction-sections -funwind-tables -fstack-protector -fpic -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64
 COMMON_CFLAGS              += -march=armv5te -mtune=xscale -msoft-float -mthumb
 COMMON_CFLAGS              += -Wno-psabi -Wa,--noexecstack
-COMMON_CFLAGS              += -fvisibility=hidden -fvisibility-inlines-hidden
+COMMON_CFLAGS              += -fvisibility=hidden
 COMMON_CFLAGS              += -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__ -DANDROID -DARM -UDEBUG
 COMMON_CFLAGS              += --sysroot=$(PLATFORM_DIR)/arch-arm
 COMMON_CFLAGS              += -I$(NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/include
@@ -66,6 +66,7 @@ COMMON_LINK_FLAGS          += --sysroot=$(PLATFORM_DIR)/arch-arm
 COMMON_LINK_FLAGS          += -Wl,-L,$(ARM_EABI_DIR)/lib/gcc/arm-linux-androideabi/4.4.3
 COMMON_LINK_FLAGS          += -Wl,-L,$(ARM_EABI_DIR)/lib/thumb
 COMMON_LINK_FLAGS          += -Wl,-L,$(PLATFORM_DIR)/arch-arm/usr/lib
+COMMON_LINK_FLAGS          += -Wl,-L,$(DIST_BIN_DIR)
 COMMON_LINK_FLAGS          += -Wl,-rpath-link=$(PLATFORM_DIR)/arch-arm/usr/lib
 COMMON_LINK_FLAGS          += -lc -lm -lstdc++ -lgcc -lsupc++
 COMMON_LINK_FLAGS          += -Wl,--no-undefined
@@ -119,7 +120,7 @@ define tools.install
  $(foreach file,$1, echo -n "Install $(notdir $(file)): " && $(ADB) push $(file) $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT) && $(ADB) shell "export PATH=/sdcard/busybox:\$\$$PATH && /sdcard/busybox chmod -R 777 $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)" && ) true
 endef
 
-#Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
+#Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
 define tools.run
  export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
  export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \
@@ -129,15 +130,15 @@ define tools.run
  $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=//sdcard/busybox:\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && /sdcard/busybox mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && $$(echo $$SUBST_COMMAND) $(subst $(firstword $1),,$1)" | sed "s/.$$//"
 endef
 
-#Выполнение команды из пакета (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
+#Выполнение команды из пакета (команда, каталог запуска, дополнительные пути поиска библиотек и приложений, список динамических библиотек)
 define tools.run.android_package
  export ROOT_SUBSTRING=$$(cd $(ROOT) && pwd)/ && \
  export SUBST_DIR_STRING=$$(cd $2 && pwd) && export SUBST_DIR_RESULT=$(REMOTE_DEBUG_DIR)/$${SUBST_DIR_STRING/#$$ROOT_SUBSTRING/} && \
- export PATH_SEARCH="$(foreach path,$3,$$(export SUBST_PATH_STRING=$$(cd $(path) && pwd) && echo $(REMOTE_DEBUG_DIR)/$${SUBST_PATH_STRING/#$$ROOT_SUBSTRING/}))" && \
- export PATH_SEARCH=$${PATH_SEARCH/\ /:} && \
+ export DLLS="$(foreach path,$4,$$(export SUBST_DLLS=$$(cd $(dir $(path)) && pwd)/$(notdir $(path)) && echo $(REMOTE_DEBUG_DIR)/$${SUBST_DLLS/#$$ROOT_SUBSTRING/}))" && \
+ export DLLS=$${DLLS/\ /:} && \
  export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
  $(ADB) shell logcat -c && \
- $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && export OLDPATH=\$\$$PATH:\.:$$PATH_SEARCH && export PATH=//sdcard/busybox:\$\$$PATH && export LD_LIBRARY_PATH=\$\$$LD_LIBRARY_PATH:\.:$$PATH_SEARCH && /sdcard/busybox mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)funner.application/.EngineActivity -e 'program' '$$(echo $$SUBST_COMMAND)' -e 'workdir' '$$SUBST_DIR_RESULT' -e 'args' '$(subst $(firstword $1),,$1)'" | sed "s/.$$//" && \
+ $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /sdcard && /sdcard/busybox mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)funner.application/.EngineActivity -e 'program' '$$(echo $$SUBST_COMMAND)' -e 'workdir' '$$SUBST_DIR_RESULT' -e 'libraries' '$$DLLS' -e 'args' '$(subst $(firstword $1),,$1)'" | sed "s/.$$//" && \
  sleep 1 && \
  $(ADB) shell "\\/sdcard/busybox/sh -c 'while ps | \\/sdcard/busybox/grep $(DEFAULT_PACKAGE_PREFIX)funner.application; do sleep 1; done'" > nul && \
  $(ADB) logcat -s -d -v raw System.out:I -v raw stdout:I
@@ -314,3 +315,4 @@ $(GDB_SERVER_FLAG_FILE): $(GDB_SERVER_FILE)
 	@$(ADB) push $(GDB_SERVER_FILE) $(REMOTE_DEBUG_DIR)
 	@$(ADB) shell /sdcard/busybox  chmod 777 $(REMOTE_DEBUG_DIR)/$(notdir $(GDB_SERVER_FILE))
 	@touch $@
+
