@@ -10,7 +10,6 @@ EXTERN.LUALIB.INCLUDE_DIRS         := include				   #Относительные пути к катало
 EXTERN.LUALIB.SOURCE_DIRS          := sources           #Относительные пути к каталогам c исходными файлами
 EXTERN.LUALIB.LIB_DIRS             :=                   #Относительные пути к каталогам с библиотеками
 EXTERN.LUALIB.LIBS                 :=                   #Список используемых при линковке библиотек
-#EXTERN.LUALIB.COMPILER_DEFINES     := __STRICT_ANSI__   #Определения сборки
 EXTERN.LUALIB.msvc.COMPILER_CFLAGS := -TP               #Флаги сборки (зависят от конфигурации)
 EXTERN.LUALIB.g++.COMPILER_CFLAGS  := -x c++
 EXTERN.LUALIB.android.COMPILER_CFLAGS := -include android_lconv_wrapper.h
