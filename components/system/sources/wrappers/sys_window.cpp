@@ -10,7 +10,7 @@ const size_t MAX_TITLE_LENGTH = 256;
     Описание реализации Window
 */
 
-struct Window::Impl
+struct Window::Impl: public xtl::trackable
 {
   public:
 ///Конструктор
@@ -1245,4 +1245,23 @@ void Window::SetDebugLog (const LogHandler& debug_log)
 const Window::LogHandler& Window::DebugLog () const
 {
   return impl->DebugLog ();
+}
+
+/*
+    Получение объекта оповещения об удалении окна
+*/
+
+xtl::trackable& Window::Trackable () const
+{
+  return *impl;
+}
+
+namespace syslib
+{
+
+xtl::trackable& get_trackable (const Window& window)
+{
+  return window.Trackable ();
+}
+
 }

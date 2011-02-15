@@ -11,6 +11,7 @@
 #include <xtl/lock_ptr.h>
 #include <xtl/reference_counter.h>
 #include <xtl/signal.h>
+#include <xtl/trackable.h>
 
 #include <common/action_queue.h>
 #include <common/component.h>
