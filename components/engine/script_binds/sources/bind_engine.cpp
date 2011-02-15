@@ -10,6 +10,8 @@
 
 #include <input/cursor.h>
 
+#include <syslib/window.h>
+
 #include <engine/attachments.h>
 #include <engine/subsystem_manager.h>
 
@@ -44,6 +46,13 @@ template <> void register_attachment<scene_graph::Listener> (const char* name, s
   AttachmentRegistry::Register (name, listener_pointer);
 }
 
+template <> void register_attachment<syslib::Window> (const char* name, syslib::Window& window)
+{
+  xtl::trackable_ptr<syslib::Window> window_pointer (&window);
+
+  AttachmentRegistry::Register (name, window_pointer);
+}
+
 template <class T> void unregister_attachment (const char* name)
 {
   AttachmentRegistry::Unregister<T> (name);
@@ -66,6 +75,13 @@ template <> struct selector_result_type<scene_graph::Listener>
   typedef scene_graph::Listener::Pointer type;
 
   static type get (scene_graph::Listener& value) { return &value; }
+};
+
+template <> struct selector_result_type<syslib::Window>
+{
+  typedef xtl::trackable_ptr<syslib::Window> type;
+
+  static type get (syslib::Window& value) { return &value; }
 };
 
 template <class T> typename selector_result_type<T>::type get_attachment (const char* name)
@@ -113,8 +129,9 @@ void bind_attachment_registry_library (Environment& environment)
 
   typedef xtl::function<void (const char*)> InputHandler;
 
-  bind_attachment_methods<InputHandler>  (environment, "InputEventHandlers");
-  bind_attachment_methods<input::Cursor> (environment, "Cursors");
+  bind_attachment_methods<InputHandler>   (environment, "InputEventHandlers");
+  bind_attachment_methods<input::Cursor>  (environment, "Cursors");
+  bind_attachment_methods<syslib::Window> (environment, "Windows");
 }
 
 void bind_subsystem_manager_library (Environment& environment)
