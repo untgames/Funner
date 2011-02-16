@@ -764,3 +764,9 @@ inline T& get_castable_value (reference_wrapper<T>& ref)
 {
   return ref.get ();
 }
+
+template <class T>
+inline T& get_castable_value (trackable_ptr<T>& ptr)
+{
+  return *ptr;
+}

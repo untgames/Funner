@@ -73,6 +73,21 @@ inline trackable& get_trackable (trackable& t)
   return t;
 }
 
+inline trackable& get_trackable (const trackable& t)
+{
+  return const_cast<trackable&> (t);
+}
+
+inline trackable& get_trackable (const volatile trackable& t)
+{
+  return const_cast<trackable&> (t);
+}
+
+inline trackable& get_trackable (volatile trackable& t)
+{
+  return const_cast<trackable&> (t);
+}
+
 inline int& get_trackable (const default_cast_type&)
 {
   static int dummy = 0;
@@ -183,12 +198,18 @@ inline T* trackable_ptr<T>::get () const
 template <class T>
 inline T& trackable_ptr<T>::operator * () const
 {
+  if (!ptr)
+    throw bad_trackable_ptr ();
+
   return *ptr;
 }
 
 template <class T>
 inline T* trackable_ptr<T>::operator -> () const
 {
+  if (!ptr)
+    throw bad_trackable_ptr ();
+
   return ptr;
 }
 

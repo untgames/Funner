@@ -2,6 +2,7 @@
 #include <xtl/any.h>
 #include <xtl/any_reference.h>
 #include <xtl/ref.h>
+#include <xtl/trackable_ptr.h>
 #include <stl/string>
 #include <stl/utility>
 #include <stl/memory>

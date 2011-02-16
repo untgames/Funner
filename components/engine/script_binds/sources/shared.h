@@ -9,6 +9,7 @@
 #include <xtl/implicit_cast.h>
 #include <xtl/lexical_cast.h>
 #include <xtl/shared_ptr.h>
+#include <xtl/trackable_ptr.h>
 
 #include <bv/axis_aligned_box.h>
 

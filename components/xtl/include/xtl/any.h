@@ -31,6 +31,7 @@ struct any_holder;
 //forward declaration
 template <class T> class shared_ptr;
 template <class T> class com_ptr;
+template <class T> class trackable_ptr;
 
 template <class T, template <class > class Strategy>  class intrusive_ptr;
 
@@ -130,6 +131,7 @@ template <class T> T& get_castable_value (stl::auto_ptr<T>&);
 template <class T> T& get_castable_value (shared_ptr<T>&);
 template <class T> T& get_castable_value (com_ptr<T>&);
 template <class T> T& get_castable_value (reference_wrapper<T>&);
+template <class T> T& get_castable_value (trackable_ptr<T>&);
 
 template <class T, template <class > class Strategy>
 T& get_castable_value (intrusive_ptr<T, Strategy>&);

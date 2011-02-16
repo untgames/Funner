@@ -47,6 +47,25 @@ cast to 'class Y': static-type='class Y' value=123
 cast to 'const class Y': static-type='class Y' value=123
 cast to 'class X': static-type='class X' value=123
 cast to 'class X&': fail: xtl::bad_any_cast; reason: no way for convert return value to reference after lexical cast
+check trackable_ptr
+cast to 'class A': static-type='class A' dynamic-type='class D'
+cast to 'class B': fail: xtl::bad_any_cast; reason: error at dynamic_cast
+cast to 'class C': static-type='class C' dynamic-type='class D'
+cast to 'class C': static-type='class C' dynamic-type='class D'
+cast to 'const class A': static-type='class A' dynamic-type='class D'
+cast to 'const class B': fail: xtl::bad_any_cast; reason: error at dynamic_cast
+cast to 'const class C': static-type='class C' dynamic-type='class D'
+cast to 'const class D': static-type='class C' dynamic-type='class D'
+cast to 'volatile class A': static-type='class A' dynamic-type='class D'
+cast to 'volatile class B': fail: xtl::bad_any_cast; reason: error at dynamic_cast
+cast to 'volatile class C': static-type='class C' dynamic-type='class D'
+cast to 'volatile class C': static-type='class C' dynamic-type='class D'
+cast to 'const volatile class A': static-type='class A' dynamic-type='class D'
+cast to 'const volatile class B': fail: xtl::bad_any_cast; reason: error at dynamic_cast
+cast to 'const volatile class C': static-type='class C' dynamic-type='class D'
+cast to 'const volatile class C': static-type='class C' dynamic-type='class D'
+D::~D
+cast to 'const class D': fail: xtl::bad_trackable_ptr
 check set_content
 y.value=321
 exception: xtl::bad_any_cast; reason: lost cv-qualifiers
