@@ -4,51 +4,12 @@ using namespace render::mid_level;
 using namespace render::low_level;
 
 /*
-    Менеджер геометрии
-*/
-
-class GeometryManager: public xtl::reference_counter
-{
-  public:
-///Конструктор
-    GeometryManager (const DeviceManagerPtr& in_device_manager)
-      : device_manager (in_device_manager)
-    {
-      try
-      {
-        if (device_manager.GeometryManager ())
-          throw xtl::format_operation_exception ("", "DeviceManager already has GeometryManager");
-          
-        device_manager.SetGeometryManager (this);
-      }
-      catch (xtl::exception& e)
-      {
-        e.touch ("render::mid_level::GeometryManager::GeometryManager");
-        throw;
-      }
-    }
-
-///Деструктор
-    ~GeometryManager ()
-    {
-      if (device_manager.GeometryManager () == this)
-        device_manager.SetGeometryManager (0);
-    }
-
-  private:
-    DeviceManagerPtr device_manager; //менеджер устройства отрисовки
-};
-
-typedef xtl::intrusive_ptr<GeometryManager> GeometryManagerPtr;
-
-/*
     Описание реализации примитива
 */
 
 struct PrimitiveImpl::Impl
 {
   DeviceManagerPtr   device_manager;   //менеджер устройства
-  GeometryManagerPtr geometry_manager; //менеджер геометрии
   
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager)
@@ -57,10 +18,6 @@ struct PrimitiveImpl::Impl
     if (!device_manager)
       throw xtl::format_operation_exception ("render::mid_level::PrimitiveImpl::Impl::Impl", "No DeviceManager binded");
       
-    geometry_manager = device_manager->GeometryManager ();
-    
-    if (!geometry_manager)
-      geometry_manager = GeometryManagerPtr (new GeometryManager (device_manager), false);
   }
 };
 

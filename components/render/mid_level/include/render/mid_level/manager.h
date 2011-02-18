@@ -92,15 +92,17 @@ class RenderManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Primitive CreatePrimitive      ();
-    Primitive CreatePrimitive      (const char* name, ResourceInstanceMode mode = ResourceInstanceMode_Default);
-    Frame     CreateFrame          ();
-    Texture   CreateTexture        (const media::Image& image, bool generate_mipmaps = true);
-    Texture   CreateTexture        (const media::Image& image, TextureDimension dimension, bool generate_mipmaps = true);
-    Texture   CreateTexture2D      (size_t width, size_t height, PixelFormat format, bool generate_mipmaps = true);
-    Texture   CreateTexture3D      (size_t width, size_t height, size_t depth, PixelFormat format, bool generate_mipmaps = true);
-    Texture   CreateTextureCubemap (size_t size, PixelFormat format, bool generate_mipmaps = true);
-    Material  CreateMaterial       ();
+    Primitive        CreatePrimitive        ();
+    Primitive        CreatePrimitive        (const PrimitiveBuffers&);    
+    Primitive        CreatePrimitive        (const char* name, ResourceInstanceMode mode = ResourceInstanceMode_Default);
+    PrimitiveBuffers CreatePrimitiveBuffers ();
+    Frame            CreateFrame            ();
+    Texture          CreateTexture          (const media::Image& image, bool generate_mipmaps = true);
+    Texture          CreateTexture          (const media::Image& image, TextureDimension dimension, bool generate_mipmaps = true);
+    Texture          CreateTexture2D        (size_t width, size_t height, PixelFormat format, bool generate_mipmaps = true);
+    Texture          CreateTexture3D        (size_t width, size_t height, size_t depth, PixelFormat format, bool generate_mipmaps = true);
+    Texture          CreateTextureCubemap   (size_t size, PixelFormat format, bool generate_mipmaps = true);
+    Material         CreateMaterial         ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка ресурсов

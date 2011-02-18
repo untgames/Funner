@@ -11,13 +11,11 @@ struct DeviceManager::Impl
   LowLevelDevicePtr device;           //устройство визуализации
   stl::string       driver_name;      //имя драйвера
   stl::string       adapter_name;     //имя адаптера
-  GeometryManager*  geometry_manager; //менеджер геометрии
   
   Impl (const LowLevelDevicePtr& in_device, const char* in_driver_name, const char* in_adapter_name)
     : device (in_device)
     , driver_name (in_driver_name)
     , adapter_name (in_adapter_name)
-    , geometry_manager (0)
   {
   }
 };
@@ -73,18 +71,4 @@ const char* DeviceManager::DriverName ()
 const char* DeviceManager::AdapterName ()
 {
   return impl->adapter_name.c_str ();
-}
-
-/*
-    Установка и чтение ссылки на менеджер геометрии
-*/
-
-render::mid_level::GeometryManager* DeviceManager::GeometryManager ()
-{
-  return impl->geometry_manager;
-}
-
-void DeviceManager::SetGeometryManager (GeometryManager* geometry_manager)
-{
-  impl->geometry_manager = geometry_manager;
 }

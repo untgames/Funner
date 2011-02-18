@@ -225,6 +225,27 @@ struct WindowImpl::Impl: public xtl::trackable
     Конструктор / деструктор
 */
 
+namespace
+{
+
+size_t get_uint_property (const common::PropertyMap& properties, const char* name, size_t default_value)
+{
+  if (!properties.IsPresent (name))
+    return default_value;
+    
+  return (size_t)properties.GetInteger (name);
+}
+
+const char* get_string_property (const common::PropertyMap& properties, const char* name, const char* default_value)
+{
+  if (!properties.IsPresent (name))
+    return default_value;
+    
+  return properties.GetString (name);
+}
+
+}
+
 WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& window, const common::PropertyMap& properties)
 {
   try
@@ -235,17 +256,17 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& 
     
     memset (&swap_chain_desc, 0, sizeof swap_chain_desc);
     
-    swap_chain_desc.frame_buffer.color_bits   = (size_t)properties.GetInteger ("ColorBits", 0);
-    swap_chain_desc.frame_buffer.alpha_bits   = (size_t)properties.GetInteger ("AlphaBits", 0);
-    swap_chain_desc.frame_buffer.depth_bits   = (size_t)properties.GetInteger ("DepthBits", 0);
-    swap_chain_desc.frame_buffer.stencil_bits = (size_t)properties.GetInteger ("StencilBits", 0);
-    swap_chain_desc.samples_count             = (size_t)properties.GetInteger ("SamplesCount", 0);
-    swap_chain_desc.buffers_count             = (size_t)properties.GetInteger ("BuffersCount", 2);
+    swap_chain_desc.frame_buffer.color_bits   = get_uint_property (properties, "ColorBits", 0);
+    swap_chain_desc.frame_buffer.alpha_bits   = get_uint_property (properties, "AlphaBits", 0);
+    swap_chain_desc.frame_buffer.depth_bits   = get_uint_property (properties, "DepthBits", 0);
+    swap_chain_desc.frame_buffer.stencil_bits = get_uint_property (properties, "StencilBits", 0);
+    swap_chain_desc.samples_count             = get_uint_property (properties, "SamplesCount", 0);
+    swap_chain_desc.buffers_count             = get_uint_property (properties, "BuffersCount", 2);
     swap_chain_desc.swap_method               = SwapMethod_Discard;
-    swap_chain_desc.vsync                     = properties.GetInteger ("VSync", 0) != 0;
-    swap_chain_desc.fullscreen                = properties.GetInteger ("FullScreen", 0) != 0;
+    swap_chain_desc.vsync                     = get_uint_property (properties, "VSync", 0) != 0;
+    swap_chain_desc.fullscreen                = get_uint_property (properties, "FullScreen", 0) != 0;
 
-    const char* swap_method_name = properties.GetString ("SwapMethod", (const char*)0);
+    const char* swap_method_name = get_string_property (properties, "SwapMethod", (const char*)0);
 
     if (swap_method_name)
     {
@@ -266,9 +287,9 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& 
     
     if (!device_manager)
     {
-      const char *driver_mask  = properties.GetString ("DriverMask", "*"),
-                 *adapter_mask = properties.GetString ("AdapterMask", "*"),
-                 *init_string  = properties.GetString ("InitString", "");
+      const char *driver_mask  = get_string_property (properties, "DriverMask", "*"),
+                 *adapter_mask = get_string_property (properties, "AdapterMask", "*"),
+                 *init_string  = get_string_property (properties, "InitString", "");
                  
       LowLevelDevicePtr device;
       
