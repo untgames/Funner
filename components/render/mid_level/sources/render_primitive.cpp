@@ -72,60 +72,6 @@ void PrimitiveImpl::RemoveAllMeshes ()
 }
 
 /*
-    Работа с динамическими буферами меша
-*/
-
-void PrimitiveImpl::AddMeshBuffer (const media::geometry::VertexStream& buffer, MeshBufferUsage usage)
-{
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::AddMeshBuffer(const media::geometry::VertexStream&,MeshBufferUsage)");
-}
-
-void PrimitiveImpl::AddMeshBuffer (const media::geometry::VertexBuffer& buffer, MeshBufferUsage usage)
-{
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::AddMeshBuffer(const media::geometry::VertexBuffer&,MeshBufferUsage)");
-}
-
-void PrimitiveImpl::AddMeshBuffer (const media::geometry::IndexBuffer& buffer, MeshBufferUsage usage)
-{
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::AddMeshBuffer(const media::geometry::IndexBuffer&,MeshBufferUsage)");
-}
-
-void PrimitiveImpl::UpdateMeshBuffer (const media::geometry::VertexStream& buffer)
-{
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::UpdateMeshBuffer(const media::geometry::VertexStream&)");
-}
-
-void PrimitiveImpl::UpdateMeshBuffer (const media::geometry::VertexBuffer& buffer)
-{
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::UpdateMeshBuffer(const media::geometry::VertexBuffer&)");
-}
-
-void PrimitiveImpl::UpdateMeshBuffer (const media::geometry::IndexBuffer& buffer)
-{
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::UpdateMeshBuffer(const media::geometry::IndexBuffer&)");
-}
-
-void PrimitiveImpl::RemoveMeshBuffer (const media::geometry::VertexStream& buffer)
-{
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::RemoveMeshBuffer(const media::geometry::VertexStream&)");
-}
-
-void PrimitiveImpl::RemoveMeshBuffer (const media::geometry::VertexBuffer& buffer)
-{
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::RemoveMeshBuffer(const media::geometry::VertexBuffer&)");
-}
-
-void PrimitiveImpl::RemoveMeshBuffer (const media::geometry::IndexBuffer& buffer)
-{
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::RemoveMeshBuffer(const media::geometry::IndexBuffer&)");
-}
-
-void PrimitiveImpl::RemoveAllMeshBuffers ()
-{
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::RemoveAllMeshBuffers");
-}
-
-/*
     Работа с линиями
 */
 

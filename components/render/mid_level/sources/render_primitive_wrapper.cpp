@@ -50,56 +50,6 @@ void Primitive::RemoveAllMeshes ()
   impl->RemoveAllMeshes ();
 }
 
-void Primitive::AddMeshBuffer (const media::geometry::VertexStream& buffer, MeshBufferUsage usage)
-{
-  impl->AddMeshBuffer (buffer, usage);
-}
-
-void Primitive::AddMeshBuffer (const media::geometry::VertexBuffer& buffer, MeshBufferUsage usage)
-{
-  impl->AddMeshBuffer (buffer, usage);
-}
-
-void Primitive::AddMeshBuffer (const media::geometry::IndexBuffer& buffer, MeshBufferUsage usage)
-{
-  impl->AddMeshBuffer (buffer, usage);
-}
-
-void Primitive::UpdateMeshBuffer (const media::geometry::VertexStream& buffer)
-{
-  impl->UpdateMeshBuffer (buffer);
-}
-
-void Primitive::UpdateMeshBuffer (const media::geometry::VertexBuffer& buffer)
-{
-  impl->UpdateMeshBuffer (buffer);
-}
-
-void Primitive::UpdateMeshBuffer (const media::geometry::IndexBuffer& buffer)
-{
-  impl->UpdateMeshBuffer (buffer);
-}
-
-void Primitive::RemoveMeshBuffer (const media::geometry::VertexStream& buffer)
-{
-  impl->RemoveMeshBuffer (buffer);
-}
-
-void Primitive::RemoveMeshBuffer (const media::geometry::VertexBuffer& buffer)
-{
-  impl->RemoveMeshBuffer (buffer);
-}
-
-void Primitive::RemoveMeshBuffer (const media::geometry::IndexBuffer& buffer)
-{
-  impl->RemoveMeshBuffer (buffer);
-}
-
-void Primitive::RemoveAllMeshBuffers ()
-{
-  impl->RemoveAllMeshBuffers ();
-}
-
 size_t Primitive::LinesCount () const
 {
   return impl->LinesCount ();

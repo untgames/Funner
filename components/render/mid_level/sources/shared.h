@@ -103,6 +103,7 @@ class Wrappers
 #include "frame.h"
 #include "manager.h"
 #include "material.h"
+#include "primitive_buffers.h"
 #include "primitive.h"
 #include "render_target.h"
 #include "resource_library.h"

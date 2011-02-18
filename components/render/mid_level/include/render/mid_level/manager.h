@@ -95,7 +95,7 @@ class RenderManager
     Primitive        CreatePrimitive        ();
     Primitive        CreatePrimitive        (const PrimitiveBuffers&);    
     Primitive        CreatePrimitive        (const char* name, ResourceInstanceMode mode = ResourceInstanceMode_Default);
-    PrimitiveBuffers CreatePrimitiveBuffers ();
+    PrimitiveBuffers CreatePrimitiveBuffers (MeshBufferUsage lines_usage = MeshBufferUsage_Stream, MeshBufferUsage sprites_usage = MeshBufferUsage_Stream);
     Frame            CreateFrame            ();
     Texture          CreateTexture          (const media::Image& image, bool generate_mipmaps = true);
     Texture          CreateTexture          (const media::Image& image, TextureDimension dimension, bool generate_mipmaps = true);
