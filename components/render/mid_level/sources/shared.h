@@ -2,6 +2,7 @@
 #define RENDER_MID_LEVEL_SHARED_HEADER
 
 #include <stl/auto_ptr.h>
+#include <stl/hash_map>
 #include <stl/string>
 #include <stl/vector>
 
@@ -103,6 +104,7 @@ class Wrappers
 #include "frame.h"
 #include "manager.h"
 #include "material.h"
+#include "input_layout_manager.h"
 #include "primitive_buffers.h"
 #include "primitive.h"
 #include "render_target.h"

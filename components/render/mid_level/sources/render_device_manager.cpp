@@ -8,14 +8,16 @@ using namespace render::mid_level;
 
 struct DeviceManager::Impl
 {
-  LowLevelDevicePtr device;           //устройство визуализации
-  stl::string       driver_name;      //имя драйвера
-  stl::string       adapter_name;     //имя адаптера
+  LowLevelDevicePtr                     device;               //устройство визуализации
+  stl::string                           driver_name;          //имя драйвера
+  stl::string                           adapter_name;         //имя адаптера
+  render::mid_level::InputLayoutManager input_layout_manager; //менеджер лэйаутов геометрии
   
   Impl (const LowLevelDevicePtr& in_device, const char* in_driver_name, const char* in_adapter_name)
     : device (in_device)
     , driver_name (in_driver_name)
     , adapter_name (in_adapter_name)
+    , input_layout_manager (in_device)
   {
   }
 };
@@ -71,4 +73,13 @@ const char* DeviceManager::DriverName ()
 const char* DeviceManager::AdapterName ()
 {
   return impl->adapter_name.c_str ();
+}
+
+/*
+    Менеджер лэйаутов геометрии
+*/
+
+InputLayoutManager& DeviceManager::InputLayoutManager ()
+{
+  return impl->input_layout_manager;
 }
