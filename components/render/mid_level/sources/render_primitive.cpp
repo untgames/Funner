@@ -1,7 +1,6 @@
 #include "shared.h"
 
 //TODO: add material
-//TODO: add local cache
 
 using namespace render::mid_level;
 using namespace render::low_level;

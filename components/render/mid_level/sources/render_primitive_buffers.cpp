@@ -65,22 +65,29 @@ struct VertexBufferHolder
 typedef stl::hash_map<size_t, VertexStreamHolder> VertexStreamMap;
 typedef stl::hash_map<size_t, VertexBufferHolder> VertexBufferMap;
 typedef stl::hash_map<size_t, IndexBufferHolder>  IndexBufferMap;
+typedef stl::hash_map<size_t, LowLevelBufferPtr>  CacheBufferMap;
+typedef stl::hash_map<size_t, VertexBufferPtr>    CacheVertexBufferMap;
 
 }
 
 struct PrimitiveBuffersImpl::Impl
 {
-  DeviceManagerPtr device_manager; //менеджер устройства отрисовки
-  MeshBufferUsage  lines_usage;    //режим использования буферов для линий
-  MeshBufferUsage  sprites_usage;  //режим использования буферов для спрайтов
-  VertexStreamMap  vertex_streams; //кэш вершинных потоков
-  VertexBufferMap  vertex_buffers; //кэш вершинных буферов
-  IndexBufferMap   index_buffers;  //кэш индексных буферов
+  DeviceManagerPtr     device_manager;       //менеджер устройства отрисовки
+  MeshBufferUsage      lines_usage;          //режим использования буферов для линий
+  MeshBufferUsage      sprites_usage;        //режим использования буферов для спрайтов
+  VertexStreamMap      vertex_streams;       //вершинные потоки
+  VertexBufferMap      vertex_buffers;       //вершинные буферы
+  IndexBufferMap       index_buffers;        //индексные буферы
+  CacheBufferMap       vertex_streams_cache; //кэш вершинных потоков
+  CacheBufferMap       index_buffers_cache;  //кэш индексных буферов
+  CacheVertexBufferMap vertex_buffers_cache; //кэш вершинных буферов
+  bool                 cache_state;          //состояние кэша
   
   Impl (const DeviceManagerPtr& in_device_manager, MeshBufferUsage in_lines_usage, MeshBufferUsage in_sprites_usage)
     : device_manager (in_device_manager)
     , lines_usage (in_lines_usage)
     , sprites_usage (in_sprites_usage)
+    , cache_state (false)
   {
     switch (lines_usage)
     {
@@ -130,6 +137,14 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateVertexStream (const media::geometr
     if (iter != impl->vertex_streams.end ())
       return iter->second.buffer;
       
+    if (impl->cache_state)
+    {
+      CacheBufferMap::iterator iter = impl->vertex_streams_cache.find (vs.Id ());
+      
+      if (iter != impl->vertex_streams_cache.end ())
+        return iter->second;
+    }
+      
     BufferDesc desc;
 
     memset (&desc, 0, sizeof desc);
@@ -157,6 +172,9 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateVertexStream (const media::geometr
 
     buffer->SetData (0, desc.size, vs.Data ());
     
+    if (impl->cache_state)
+      impl->vertex_streams_cache.insert_pair (vs.Id (), buffer);
+    
     return buffer;
   }
   catch (xtl::exception& e)
@@ -175,7 +193,18 @@ VertexBufferPtr PrimitiveBuffersImpl::CreateVertexBuffer (const media::geometry:
     if (iter != impl->vertex_buffers.end ())
       return iter->second.buffer;
       
+    if (impl->cache_state)
+    {
+      CacheVertexBufferMap::iterator iter = impl->vertex_buffers_cache.find (vb.Id ());
+      
+      if (iter != impl->vertex_buffers_cache.end ())
+        return iter->second;
+    }      
+      
     VertexBufferPtr buffer (new VertexBuffer (vb, *this, usage), false);
+    
+    if (impl->cache_state)
+      impl->vertex_buffers_cache.insert_pair (vb.Id (), buffer);
     
     return buffer;      
   }
@@ -193,7 +222,15 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateIndexBuffer (const media::geometry
     IndexBufferMap::iterator iter = impl->index_buffers.find (ib.Id ());
 
     if (iter != impl->index_buffers.end ())
-      return iter->second.buffer;
+      return iter->second.buffer;      
+      
+    if (impl->cache_state)
+    {
+      CacheBufferMap::iterator iter = impl->index_buffers_cache.find (ib.Id ());
+      
+      if (iter != impl->index_buffers_cache.end ())
+        return iter->second;
+    }
       
     BufferDesc desc;
 
@@ -222,6 +259,9 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateIndexBuffer (const media::geometry
 
     buffer->SetData (0, desc.size, ib.Data ());
     
+    if (impl->cache_state)
+      impl->index_buffers_cache.insert_pair (ib.Id (), buffer);
+        
     return buffer;
   }
   catch (xtl::exception& e)
@@ -410,4 +450,31 @@ MeshBufferUsage PrimitiveBuffersImpl::LinesBufferUsage ()
 MeshBufferUsage PrimitiveBuffersImpl::SpritesBufferUsage ()
 {
   return impl->sprites_usage;
+}
+
+/*
+    Управление кэшем
+*/
+
+void PrimitiveBuffersImpl::SetCacheState (bool state)
+{
+  if (state == impl->cache_state)
+    return;
+    
+  if (impl->cache_state)
+    FlushCache ();
+    
+  impl->cache_state = state;
+}
+
+bool PrimitiveBuffersImpl::CacheState ()
+{
+  return impl->cache_state;
+}
+
+void PrimitiveBuffersImpl::FlushCache ()
+{
+  impl->vertex_streams_cache.clear ();
+  impl->vertex_buffers_cache.clear ();
+  impl->index_buffers_cache.clear ();
 }
