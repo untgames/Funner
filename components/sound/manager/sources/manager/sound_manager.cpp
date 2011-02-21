@@ -239,7 +239,10 @@ struct SoundManager::Impl : public xtl::trackable
           manager_emitter->channel_number = channel_to_use;
         }
         else
+        {
+          log.Printf ("Can't play sound %s, no free channels", manager_emitter->sound_sample->GetName ());
           manager_emitter->channel_number = -1;
+        }
       }
 
       manager_emitter->play_start_time = milliseconds ();
