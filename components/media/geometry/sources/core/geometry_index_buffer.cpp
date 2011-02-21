@@ -72,14 +72,14 @@ size_t IndexBuffer::Id () const
     Данные
 */
 
-const size_t* IndexBuffer::Data () const
+const unsigned int* IndexBuffer::Data () const
 {
-  return (const size_t*)impl->indices.Data ();
+  return (const unsigned int*)impl->indices.Data ();
 }
 
-size_t* IndexBuffer::Data ()
+unsigned int* IndexBuffer::Data ()
 {
-  return (size_t*)impl->indices.Data ();
+  return (unsigned int*)impl->indices.Data ();
 }
 
 /*
@@ -88,12 +88,12 @@ size_t* IndexBuffer::Data ()
 
 size_t IndexBuffer::Size () const
 {
-  return impl->indices.Size () / sizeof (size_t);
+  return impl->indices.Size () / sizeof (unsigned int);
 }
 
 void IndexBuffer::Resize (size_t indices_count)
 {
-  impl->indices.Resize (indices_count * sizeof (size_t));
+  impl->indices.Resize (indices_count * sizeof (unsigned int));
 }
 
 /*
@@ -111,12 +111,12 @@ void IndexBuffer::Clear ()
 
 size_t IndexBuffer::Capacity () const
 {
-  return impl->indices.Capacity () / sizeof (size_t);
+  return impl->indices.Capacity () / sizeof (unsigned int);
 }
 
 void IndexBuffer::Reserve (size_t indices_count)
 {
-  impl->indices.Reserve (indices_count * sizeof (size_t));
+  impl->indices.Reserve (indices_count * sizeof (unsigned int));
 }
 
 /*

@@ -16,7 +16,7 @@ using namespace media::geometry;
  *
  * vertex_buffer_desc format: array<size_t> vertex_weigth_stream_id (0-1); array<size_t> vertex_stream_id;
  *
- * index_buffer format: array<size_t> indices
+ * index_buffer format: array<unsigned int> indices
  *
  * mesh format: array<char> name; array<size_t> index_buffer (0-1); array<size_t> vertex_buffers; array<primitive> primitives;
  *
@@ -183,7 +183,7 @@ class BinMeshLibrarySaver
 
         //сохранение индексов
 
-      file_write (result_file, ib.Data (), sizeof (size_t) * indices_count);
+      file_write (result_file, ib.Data (), sizeof (unsigned int) * indices_count);
 
         //добавление потока в список сохранённых
 
