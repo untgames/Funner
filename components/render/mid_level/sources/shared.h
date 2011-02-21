@@ -100,6 +100,7 @@ class Wrappers
 #include "device_manager.h"
 #include "log.h"
 
+#include "effect_loader_library.h"
 #include "entity.h"
 #include "frame.h"
 #include "input_layout_manager.h"

@@ -1,3 +1,4 @@
+class InputLayoutManager;
 class PrimitiveBuffersImpl;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,7 +21,7 @@ class VertexBuffer: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение лэйаута
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    LowLevelInputLayoutPtr CreateInputLayout (low_level::IDevice& device, low_level::InputDataType type);
+    LowLevelInputLayoutPtr CreateInputLayout (InputLayoutManager& layout_manager, low_level::InputDataType type);
     
   private:
     typedef stl::vector<LowLevelBufferPtr>           BufferArray;

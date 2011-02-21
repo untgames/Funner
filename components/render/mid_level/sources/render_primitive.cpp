@@ -163,7 +163,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
 
       dst_primitive.vertex_buffer = vertex_buffers [src_primitive.vertex_buffer];
       dst_primitive.first         = src_primitive.first;
-      dst_primitive.layout        = dst_primitive.vertex_buffer->CreateInputLayout (impl->device_manager->Device (), InputDataType_UInt);
+      dst_primitive.layout        = dst_primitive.vertex_buffer->CreateInputLayout (impl->device_manager->InputLayoutManager (), InputDataType_UInt);
       
       mesh->primitives.push_back (dst_primitive);
     }

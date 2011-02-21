@@ -137,7 +137,7 @@ const LowLevelBufferPtr* VertexBuffer::Streams ()
     Получение лэйаута
 */
 
-LowLevelInputLayoutPtr VertexBuffer::CreateInputLayout (render::low_level::IDevice& device, InputDataType type)
+LowLevelInputLayoutPtr VertexBuffer::CreateInputLayout (InputLayoutManager& layout_manager, InputDataType type)
 {
   try
   {
@@ -162,7 +162,7 @@ LowLevelInputLayoutPtr VertexBuffer::CreateInputLayout (render::low_level::IDevi
     layout_desc.index_type              = type;
     layout_desc.index_buffer_offset     = 0;
 
-    layout = LowLevelInputLayoutPtr (device.CreateInputLayout (layout_desc), false);
+    layout = layout_manager.CreateInputLayout (layout_desc);
       
     return layout;
   }
