@@ -391,8 +391,8 @@ struct DefaultDevice::Impl : private xtl::trackable
   {
     static char message [MESSAGE_BUFFER_SIZE];
 
-    float viewport_width  = viewport_rect.right - viewport_rect.left,
-          viewport_height = viewport_rect.bottom - viewport_rect.top;
+    float viewport_width  = (float)(viewport_rect.right - viewport_rect.left),
+          viewport_height = (float)(viewport_rect.bottom - viewport_rect.top);
 
     const Touch* current_touch = context.touches;
 
