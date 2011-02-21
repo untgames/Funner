@@ -11,26 +11,29 @@ class PrimitiveBuffersImpl: public Object
     ~PrimitiveBuffersImpl ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание отображений буферов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    LowLevelBufferPtr CreateVertexBuffer (const media::geometry::VertexStream&, MeshBufferUsage usage);
+    LowLevelBufferPtr CreateIndexBuffer  (const media::geometry::IndexBuffer&, MeshBufferUsage usage);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Add (const media::geometry::VertexStream& buffer, MeshBufferUsage usage = MeshBufferUsage_Default);
-    void Add (const media::geometry::VertexBuffer& buffer, MeshBufferUsage usage = MeshBufferUsage_Default);
     void Add (const media::geometry::IndexBuffer& buffer, MeshBufferUsage usage = MeshBufferUsage_Default);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обновление буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     void Update (const media::geometry::VertexStream& buffer);
-    void Update (const media::geometry::VertexBuffer& buffer);
     void Update (const media::geometry::IndexBuffer& buffer);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////        
-    void Remove (const media::geometry::VertexStream& buffer);
-    void Remove (const media::geometry::VertexBuffer& buffer);
-    void Remove (const media::geometry::IndexBuffer& buffer);
-    void Clear  ();
+    void Remove    (const media::geometry::VertexStream& buffer);
+    void Remove    (const media::geometry::IndexBuffer& buffer);
+    void RemoveAll ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Резервирование вспомогательных примитивов

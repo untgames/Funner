@@ -1,5 +1,7 @@
 #include "shared.h"
 
+//TODO: check no index buffer
+
 using namespace render::mid_level;
 using namespace render::low_level;
 
