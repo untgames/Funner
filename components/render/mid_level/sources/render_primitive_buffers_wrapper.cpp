@@ -39,6 +39,11 @@ void PrimitiveBuffers::Add (const media::geometry::VertexStream& buffer, MeshBuf
   impl->Add (buffer, usage);
 }
 
+void PrimitiveBuffers::Add (const media::geometry::VertexBuffer& buffer, MeshBufferUsage usage)
+{
+  impl->Add (buffer, usage);
+}
+
 void PrimitiveBuffers::Add (const media::geometry::IndexBuffer& buffer, MeshBufferUsage usage)
 {
   impl->Add (buffer, usage);
@@ -63,6 +68,11 @@ void PrimitiveBuffers::Update (const media::geometry::IndexBuffer& buffer)
 */
 
 void PrimitiveBuffers::Remove (const media::geometry::VertexStream& buffer)
+{
+  impl->Remove (buffer);
+}
+
+void PrimitiveBuffers::Remove (const media::geometry::VertexBuffer& buffer)
 {
   impl->Remove (buffer);
 }
@@ -113,4 +123,28 @@ MeshBufferUsage PrimitiveBuffers::LinesBufferUsage () const
 MeshBufferUsage PrimitiveBuffers::SpritesBufferUsage () const
 {
   return impl->SpritesBufferUsage ();
+}
+
+/*
+    Ξαμεν
+*/
+
+void PrimitiveBuffers::Swap (PrimitiveBuffers& buffers)
+{
+  stl::swap (impl, buffers.impl);
+}
+
+namespace render
+{
+
+namespace mid_level
+{
+
+void swap (PrimitiveBuffers& buffers1, PrimitiveBuffers& buffers2)
+{
+  buffers1.Swap (buffers2);
+}
+
+}
+
 }

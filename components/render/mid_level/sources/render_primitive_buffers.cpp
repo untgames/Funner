@@ -26,12 +26,12 @@ template <class T> struct BufferHolder
   }
 };
 
-struct VertexBufferHolder: public BufferHolder<media::geometry::VertexStream>
+struct VertexStreamHolder: public BufferHolder<media::geometry::VertexStream>
 {
   size_t vertex_size;
   size_t vertices_count;
 
-  VertexBufferHolder (const media::geometry::VertexStream& vs, const LowLevelBufferPtr& buffer, MeshBufferUsage usage)
+  VertexStreamHolder (const media::geometry::VertexStream& vs, const LowLevelBufferPtr& buffer, MeshBufferUsage usage)
     : BufferHolder<media::geometry::VertexStream> (vs, buffer, usage)
     , vertex_size (vs.VertexSize ())
     , vertices_count (vs.Size ())
@@ -50,6 +50,19 @@ struct IndexBufferHolder: public BufferHolder<media::geometry::IndexBuffer>
   }
 };
 
+struct VertexBufferHolder
+{
+  media::geometry::VertexBuffer source;
+  VertexBufferPtr               buffer;
+  
+  VertexBufferHolder (const media::geometry::VertexBuffer& in_source, const VertexBufferPtr& in_buffer)
+    : source (in_source)
+    , buffer (in_buffer)
+  {
+  }
+};
+
+typedef stl::hash_map<size_t, VertexStreamHolder> VertexStreamMap;
 typedef stl::hash_map<size_t, VertexBufferHolder> VertexBufferMap;
 typedef stl::hash_map<size_t, IndexBufferHolder>  IndexBufferMap;
 
@@ -60,6 +73,7 @@ struct PrimitiveBuffersImpl::Impl
   DeviceManagerPtr device_manager; //менеджер устройства отрисовки
   MeshBufferUsage  lines_usage;    //режим использования буферов для линий
   MeshBufferUsage  sprites_usage;  //режим использования буферов для спрайтов
+  VertexStreamMap  vertex_streams; //кэш вершинных потоков
   VertexBufferMap  vertex_buffers; //кэш вершинных буферов
   IndexBufferMap   index_buffers;  //кэш индексных буферов
   
@@ -107,13 +121,13 @@ PrimitiveBuffersImpl::~PrimitiveBuffersImpl ()
     Создание отображений буферов
 */
 
-LowLevelBufferPtr PrimitiveBuffersImpl::CreateVertexBuffer (const media::geometry::VertexStream& vs, MeshBufferUsage usage)
+LowLevelBufferPtr PrimitiveBuffersImpl::CreateVertexStream (const media::geometry::VertexStream& vs, MeshBufferUsage usage)
 {
   try
   {
-    VertexBufferMap::iterator iter = impl->vertex_buffers.find (vs.Id ());
+    VertexStreamMap::iterator iter = impl->vertex_streams.find (vs.Id ());
     
-    if (iter != impl->vertex_buffers.end ())
+    if (iter != impl->vertex_streams.end ())
       return iter->second.buffer;
       
     BufferDesc desc;
@@ -144,6 +158,26 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateVertexBuffer (const media::geometr
     buffer->SetData (0, desc.size, vs.Data ());
     
     return buffer;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::mid_level::PrimitiveBuffersImpl::CreateVertexStream");
+    throw;
+  }
+}
+
+VertexBufferPtr PrimitiveBuffersImpl::CreateVertexBuffer (const media::geometry::VertexBuffer& vb, MeshBufferUsage usage)
+{
+  try
+  {
+    VertexBufferMap::iterator iter = impl->vertex_buffers.find (vb.Id ());
+    
+    if (iter != impl->vertex_buffers.end ())
+      return iter->second.buffer;
+      
+    VertexBufferPtr buffer (new VertexBuffer (vb, *this, usage), false);
+    
+    return buffer;      
   }
   catch (xtl::exception& e)
   {
@@ -205,18 +239,38 @@ void PrimitiveBuffersImpl::Add (const media::geometry::VertexStream& vs, MeshBuf
 {
   try
   {
-    VertexBufferMap::iterator iter = impl->vertex_buffers.find (vs.Id ());
+    VertexStreamMap::iterator iter = impl->vertex_streams.find (vs.Id ());
     
-    if (iter != impl->vertex_buffers.end ())
+    if (iter != impl->vertex_streams.end ())
       return;    
     
-    LowLevelBufferPtr buffer = CreateVertexBuffer (vs, usage);
+    LowLevelBufferPtr buffer = CreateVertexStream (vs, usage);
     
-    impl->vertex_buffers.insert_pair (vs.Id (), VertexBufferHolder (vs, buffer, usage));
+    impl->vertex_streams.insert_pair (vs.Id (), VertexStreamHolder (vs, buffer, usage));
   }
   catch (xtl::exception& e)
   {
     e.touch ("render::mid_level::PrimitiveBuffersImpl::Add(const VertexStream&,MeshBufferUsage)");
+    throw;
+  }
+}
+
+void PrimitiveBuffersImpl::Add (const media::geometry::VertexBuffer& vb, MeshBufferUsage usage)
+{
+  try
+  {
+    VertexBufferMap::iterator iter = impl->vertex_buffers.find (vb.Id ());
+    
+    if (iter != impl->vertex_buffers.end ())
+      return;    
+    
+    VertexBufferPtr buffer = CreateVertexBuffer (vb, usage);
+    
+    impl->vertex_buffers.insert_pair (vb.Id (), VertexBufferHolder (vb, buffer));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::mid_level::PrimitiveBuffersImpl::Add(const VertexBuffer&,MeshBufferUsage)");
     throw;
   }
 }
@@ -249,12 +303,12 @@ void PrimitiveBuffersImpl::Update (const media::geometry::VertexStream& vs)
 {
   try
   {
-    VertexBufferMap::iterator iter = impl->vertex_buffers.find (vs.Id ());
+    VertexStreamMap::iterator iter = impl->vertex_streams.find (vs.Id ());
     
-    if (iter == impl->vertex_buffers.end ())
+    if (iter == impl->vertex_streams.end ())
       throw xtl::make_argument_exception ("", "buffer.Id()", vs.Id (), "Vertex stream not added to primitive buffers");
       
-    VertexBufferHolder& holder = iter->second;
+    VertexStreamHolder& holder = iter->second;
     
     if (holder.vertex_size != vs.VertexSize ())
       throw xtl::format_operation_exception ("", "Vertex size %u differes from source vertex stream size %u", vs.VertexSize (), holder.vertex_size);
@@ -300,7 +354,12 @@ void PrimitiveBuffersImpl::Update (const media::geometry::IndexBuffer& ib)
 
 void PrimitiveBuffersImpl::Remove (const media::geometry::VertexStream& vs)
 {
-  impl->vertex_buffers.erase (vs.Id ());
+  impl->vertex_streams.erase (vs.Id ());
+}
+
+void PrimitiveBuffersImpl::Remove (const media::geometry::VertexBuffer& vb)
+{
+  impl->vertex_buffers.erase (vb.Id ());
 }
 
 void PrimitiveBuffersImpl::Remove (const media::geometry::IndexBuffer& ib)
@@ -310,7 +369,8 @@ void PrimitiveBuffersImpl::Remove (const media::geometry::IndexBuffer& ib)
 
 void PrimitiveBuffersImpl::RemoveAll ()
 {
-  impl->vertex_buffers.clear ();
+  impl->vertex_streams.clear ();
+  impl->vertex_buffers.clear ();  
   impl->index_buffers.clear ();
 }
 

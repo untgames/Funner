@@ -25,6 +25,11 @@ Primitive& Primitive::operator = (const Primitive& primitive)
   return *this;
 }
 
+PrimitiveBuffers Primitive::Buffers () const
+{
+  return Wrappers::Wrap<PrimitiveBuffers> (impl->Buffers ());
+}
+
 size_t Primitive::MeshesCount () const
 {
   return impl->MeshesCount ();
@@ -33,11 +38,6 @@ size_t Primitive::MeshesCount () const
 size_t Primitive::AddMesh (const media::geometry::Mesh& mesh, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
   return impl->AddMesh (mesh, vb_usage, ib_usage);
-}
-
-void Primitive::UpdateMesh (size_t mesh_index, const media::geometry::Mesh& mesh)
-{
-  impl->UpdateMesh (mesh_index, mesh);
 }
 
 void Primitive::RemoveMeshes (size_t first_mesh, size_t meshes_count)

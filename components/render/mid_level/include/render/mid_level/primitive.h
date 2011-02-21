@@ -95,6 +95,7 @@ class PrimitiveBuffers
 ///Добавление буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Add (const media::geometry::VertexStream& buffer, MeshBufferUsage usage = MeshBufferUsage_Default);
+    void Add (const media::geometry::VertexBuffer& buffer, MeshBufferUsage usage = MeshBufferUsage_Default);    
     void Add (const media::geometry::IndexBuffer& buffer, MeshBufferUsage usage = MeshBufferUsage_Default);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,11 +103,12 @@ class PrimitiveBuffers
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     void Update (const media::geometry::VertexStream& buffer);
     void Update (const media::geometry::IndexBuffer& buffer);
-    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление буферов
 ///////////////////////////////////////////////////////////////////////////////////////////////////        
     void Remove    (const media::geometry::VertexStream& buffer);
+    void Remove    (const media::geometry::VertexBuffer& buffer);    
     void Remove    (const media::geometry::IndexBuffer& buffer);
     void RemoveAll ();
     
@@ -161,16 +163,13 @@ class Primitive
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Буферы примитива
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          PrimitiveBuffers& Buffers    ();
-    const PrimitiveBuffers& Buffers    () const;
-          void              SetBuffers (const PrimitiveBuffers&);
+    PrimitiveBuffers Buffers () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с мешами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t MeshesCount     () const;
     size_t AddMesh         (const media::geometry::Mesh&, MeshBufferUsage vb_usage = MeshBufferUsage_Default, MeshBufferUsage ib_usage = MeshBufferUsage_Default);
-    void   UpdateMesh      (size_t mesh_index, const media::geometry::Mesh& mesh);
     void   RemoveMeshes    (size_t first_mesh, size_t meshes_count);
     void   RemoveAllMeshes ();
         

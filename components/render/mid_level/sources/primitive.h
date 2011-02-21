@@ -4,34 +4,26 @@
 class PrimitiveImpl: public Object
 {
   public:
+    typedef xtl::intrusive_ptr<PrimitiveBuffersImpl> BuffersPtr;
+  
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    PrimitiveImpl  (const DeviceManagerPtr&);
+    PrimitiveImpl  (const DeviceManagerPtr&, const BuffersPtr& buffers);
     ~PrimitiveImpl ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Буферы примитива
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const BuffersPtr& Buffers ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с мешами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t MeshesCount     ();
     size_t AddMesh         (const media::geometry::Mesh&, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage);
-    void   UpdateMesh      (size_t mesh_index, const media::geometry::Mesh& mesh);
     void   RemoveMeshes    (size_t first_mesh, size_t meshes_count);
     void   RemoveAllMeshes ();
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Работа с динамическими буферами меша
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddMeshBuffer        (const media::geometry::VertexStream& buffer, MeshBufferUsage usage);
-    void AddMeshBuffer        (const media::geometry::VertexBuffer& buffer, MeshBufferUsage usage);
-    void AddMeshBuffer        (const media::geometry::IndexBuffer& buffer, MeshBufferUsage usage);
-    void UpdateMeshBuffer     (const media::geometry::VertexStream& buffer);
-    void UpdateMeshBuffer     (const media::geometry::VertexBuffer& buffer);
-    void UpdateMeshBuffer     (const media::geometry::IndexBuffer& buffer);
-    void RemoveMeshBuffer     (const media::geometry::VertexStream& buffer);
-    void RemoveMeshBuffer     (const media::geometry::VertexBuffer& buffer);
-    void RemoveMeshBuffer     (const media::geometry::IndexBuffer& buffer);
-    void RemoveAllMeshBuffers ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с линиями

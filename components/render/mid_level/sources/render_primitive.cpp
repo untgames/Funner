@@ -1,6 +1,7 @@
 #include "shared.h"
 
 //TODO: check no index buffer
+//TODO: add material
 
 using namespace render::mid_level;
 using namespace render::low_level;
@@ -9,17 +10,37 @@ using namespace render::low_level;
     Описание реализации примитива
 */
 
+namespace
+{
+
+/*struct MeshPrimitive
+{
+  //TODO: add material
+  render::low_level::PrimitiveType type;          //тип примитива
+  VertexBufferPtr                  vertex_buffer; //вершинный буфер
+  size_t                           first;         //индекс первой вершины/индекса
+  size_t                           count;         //количество примитивов  
+};*/
+
+}
+
 struct PrimitiveImpl::Impl
 {
-  DeviceManagerPtr   device_manager;   //менеджер устройства
+  DeviceManagerPtr device_manager;   //менеджер устройства
+  BuffersPtr       buffers;          //буферы примитива
   
 ///Конструктор
-  Impl (const DeviceManagerPtr& in_device_manager)
+  Impl (const DeviceManagerPtr& in_device_manager, const BuffersPtr& in_buffers)
     : device_manager (in_device_manager)
+    , buffers (in_buffers)
   {
+    static const char* METHOD_NAME = "render::mid_level::PrimitiveImpl::Impl::Impl";
+    
     if (!device_manager)
-      throw xtl::format_operation_exception ("render::mid_level::PrimitiveImpl::Impl::Impl", "No DeviceManager binded");
-      
+      throw xtl::format_operation_exception (METHOD_NAME, "No DeviceManager binded");
+
+    if (!buffers)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "buffers");
   }
 };
 
@@ -27,11 +48,11 @@ struct PrimitiveImpl::Impl
     Конструктор / деструктор
 */
 
-PrimitiveImpl::PrimitiveImpl (const DeviceManagerPtr& device_manager)
+PrimitiveImpl::PrimitiveImpl (const DeviceManagerPtr& device_manager, const BuffersPtr& buffers)
 {
   try
   {
-    impl = new Impl (device_manager);
+    impl = new Impl (device_manager, buffers);
   }
   catch (xtl::exception& e)
   {
@@ -42,6 +63,15 @@ PrimitiveImpl::PrimitiveImpl (const DeviceManagerPtr& device_manager)
 
 PrimitiveImpl::~PrimitiveImpl ()
 {
+}
+
+/*
+    Буферы примитива
+*/
+
+const PrimitiveImpl::BuffersPtr& PrimitiveImpl::Buffers ()
+{
+  return impl->buffers;
 }
 
 /*
@@ -56,11 +86,6 @@ size_t PrimitiveImpl::MeshesCount ()
 size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh&, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
   throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::AddMesh");
-}
-
-void PrimitiveImpl::UpdateMesh (size_t mesh_index, const media::geometry::Mesh& mesh)
-{
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::UpdateMesh");
 }
 
 void PrimitiveImpl::RemoveMeshes (size_t first_mesh, size_t meshes_count)

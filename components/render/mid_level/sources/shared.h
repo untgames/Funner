@@ -102,9 +102,10 @@ class Wrappers
 
 #include "entity.h"
 #include "frame.h"
+#include "input_layout_manager.h"
 #include "manager.h"
 #include "material.h"
-#include "input_layout_manager.h"
+#include "vertex_buffer.h"
 #include "primitive_buffers.h"
 #include "primitive.h"
 #include "render_target.h"
