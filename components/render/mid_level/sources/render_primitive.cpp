@@ -1,7 +1,7 @@
 #include "shared.h"
 
-//TODO: check no index buffer
 //TODO: add material
+//TODO: add local cache
 
 using namespace render::mid_level;
 using namespace render::low_level;
@@ -13,14 +13,33 @@ using namespace render::low_level;
 namespace
 {
 
-/*struct MeshPrimitive
+struct MeshPrimitive
 {
   //TODO: add material
   render::low_level::PrimitiveType type;          //тип примитива
   VertexBufferPtr                  vertex_buffer; //вершинный буфер
+  LowLevelInputLayoutPtr           layout;        //лэйаут примитива
   size_t                           first;         //индекс первой вершины/индекса
-  size_t                           count;         //количество примитивов  
-};*/
+  size_t                           count;         //количество примитивов
+  
+  MeshPrimitive ()
+    : type (PrimitiveType_PointList)
+    , first (0)
+    , count (0)
+  {
+  }
+};
+
+typedef stl::vector<MeshPrimitive> MeshPrimitiveArray;
+
+struct Mesh: public xtl::reference_counter
+{
+  LowLevelBufferPtr  index_buffer;
+  MeshPrimitiveArray primitives;
+};
+
+typedef xtl::intrusive_ptr<Mesh> MeshPtr;
+typedef stl::vector<MeshPtr>     MeshArray;
 
 }
 
@@ -28,6 +47,7 @@ struct PrimitiveImpl::Impl
 {
   DeviceManagerPtr device_manager;   //менеджер устройства
   BuffersPtr       buffers;          //буферы примитива
+  MeshArray        meshes;           //меши
   
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const BuffersPtr& in_buffers)
@@ -80,22 +100,102 @@ const PrimitiveImpl::BuffersPtr& PrimitiveImpl::Buffers ()
 
 size_t PrimitiveImpl::MeshesCount ()
 {
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::MeshesCount");
+  return impl->meshes.size ();
 }
 
-size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh&, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
+size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUsage vb_usage, MeshBufferUsage ib_usage)
 {
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::AddMesh");
+  try
+  {
+    MeshPtr mesh (new Mesh, false);
+    
+      //конвертация вершинных буферов
+             
+    stl::vector<VertexBufferPtr> vertex_buffers;
+    
+    vertex_buffers.reserve (source.VertexBuffersCount ());
+    
+    for (size_t i=0, count=source.VertexBuffersCount (); i<count; i++)
+      vertex_buffers.push_back (impl->buffers->CreateVertexBuffer (source.VertexBuffer (i), vb_usage));
+
+      //конвертация индексного буфера (если он есть)
+    
+    if (source.IndexBuffer ().Size ())
+      mesh->index_buffer = impl->buffers->CreateIndexBuffer (source.IndexBuffer (), ib_usage);
+    
+      //конвертация примитивов
+    
+    mesh->primitives.reserve (source.PrimitivesCount ());    
+    
+    for (size_t i=0, count=source.PrimitivesCount (); i<count; i++)
+    {
+      const media::geometry::Primitive& src_primitive = source.Primitive (i);
+      MeshPrimitive                     dst_primitive;
+
+      switch (src_primitive.type)
+      {
+        case media::geometry::PrimitiveType_LineList:
+          dst_primitive.type  = PrimitiveType_LineList;
+          dst_primitive.count = src_primitive.count * 2;
+          break;
+        case media::geometry::PrimitiveType_LineStrip:
+          dst_primitive.type  = PrimitiveType_LineStrip;
+          dst_primitive.count = src_primitive.count + 1;
+          break;
+        case media::geometry::PrimitiveType_TriangleList:
+          dst_primitive.type  = PrimitiveType_TriangleList;
+          dst_primitive.count = src_primitive.count * 3;
+          break;
+        case media::geometry::PrimitiveType_TriangleStrip:
+          dst_primitive.type  = PrimitiveType_TriangleStrip;
+          dst_primitive.count = src_primitive.count + 2;
+          break;
+        case media::geometry::PrimitiveType_TriangleFan:
+          dst_primitive.type  = PrimitiveType_TriangleFan;
+          dst_primitive.count = src_primitive.count + 2;
+          break;
+        default:
+          throw xtl::format_operation_exception ("", "Bad primitive #%u type %s", i, get_type_name (src_primitive.type));
+      }
+
+      if (src_primitive.vertex_buffer >= vertex_buffers.size ())
+        throw xtl::format_operation_exception ("", "Bad primitive #%u vertex buffer index %u (vertex buffers count is %u)", i, src_primitive.vertex_buffer,
+          vertex_buffers.size ());
+
+      dst_primitive.vertex_buffer = vertex_buffers [src_primitive.vertex_buffer];
+      dst_primitive.first         = src_primitive.first;
+      dst_primitive.layout        = dst_primitive.vertex_buffer->CreateInputLayout (impl->device_manager->Device (), InputDataType_UInt);
+      
+      mesh->primitives.push_back (dst_primitive);
+    }
+    
+      //добавление меша
+      
+    impl->meshes.push_back (mesh);
+    
+    return impl->meshes.size () - 1;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::mid_level::PrimitiveImpl::AddMesh");
+    throw;
+  }
 }
 
 void PrimitiveImpl::RemoveMeshes (size_t first_mesh, size_t meshes_count)
 {
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::RemoveMeshes");
+  if (first_mesh >= impl->meshes.size ())
+    return;
+    
+  if (first_mesh + meshes_count > impl->meshes.size ())
+    meshes_count = impl->meshes.size () - first_mesh;
+    
+  impl->meshes.erase (impl->meshes.begin () + first_mesh, impl->meshes.begin () + first_mesh + meshes_count);
 }
 
 void PrimitiveImpl::RemoveAllMeshes ()
 {
-  throw xtl::make_not_implemented_exception ("render::mid_level::PrimitiveImpl::RemoveAllMeshes");
+  impl->meshes.clear ();
 }
 
 /*

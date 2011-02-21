@@ -20,7 +20,7 @@ class VertexBuffer: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение лэйаута
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    LowLevelInputLayoutPtr CreateLayout (low_level::IDevice& device, low_level::InputDataType type);
+    LowLevelInputLayoutPtr CreateInputLayout (low_level::IDevice& device, low_level::InputDataType type);
     
   private:
     typedef stl::vector<LowLevelBufferPtr>           BufferArray;

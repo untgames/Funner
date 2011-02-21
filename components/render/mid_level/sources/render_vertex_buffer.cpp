@@ -137,7 +137,7 @@ const LowLevelBufferPtr* VertexBuffer::Streams ()
     Получение лэйаута
 */
 
-LowLevelInputLayoutPtr VertexBuffer::CreateLayout (render::low_level::IDevice& device, InputDataType type)
+LowLevelInputLayoutPtr VertexBuffer::CreateInputLayout (render::low_level::IDevice& device, InputDataType type)
 {
   try
   {
@@ -168,7 +168,7 @@ LowLevelInputLayoutPtr VertexBuffer::CreateLayout (render::low_level::IDevice& d
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::mid_level::VertexBuffer::CreateLayout");
+    e.touch ("render::mid_level::VertexBuffer::CreateInputLayout");
     throw;
   }
 }
