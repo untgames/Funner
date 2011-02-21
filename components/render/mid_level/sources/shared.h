@@ -13,6 +13,7 @@
 #include <xtl/trackable.h>
 
 #include <common/log.h>
+#include <common/parser.h>
 
 #include <media/image.h>
 #include <media/geometry/mesh_library.h>
