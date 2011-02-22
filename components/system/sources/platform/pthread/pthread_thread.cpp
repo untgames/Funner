@@ -102,29 +102,33 @@ void Platform::SetThreadPriority (thread_t thread, ThreadPriority thread_priorit
       thread->default_scheduling_getted = true;
     }
 
-    int min_priority = sched_get_priority_min (thread->scheduling_policy);
-
-    if (min_priority == -1)
-      pthread_raise_error ("::sched_get_priority_min", errno);
-
-    int max_priority = sched_get_priority_max (thread->scheduling_policy);
-
-    if (max_priority == -1)
-      pthread_raise_error ("::sched_get_priority_max", errno);
-
     sched_param scheduling_param;
 
     switch (thread_priority)
     {
       case ThreadPriority_Low:
+      {
+        int min_priority = sched_get_priority_min (thread->scheduling_policy);
+
+        if (min_priority == -1)
+          pthread_raise_error ("::sched_get_priority_min", errno);
+
         scheduling_param.sched_priority = min_priority;
         break;
+      }
       case ThreadPriority_Normal:
         scheduling_param.sched_priority = thread->normal_priority;
         break;
       case ThreadPriority_High:
+      {
+        int max_priority = sched_get_priority_max (thread->scheduling_policy);
+
+        if (max_priority == -1)
+          pthread_raise_error ("::sched_get_priority_max", errno);
+
         scheduling_param.sched_priority = max_priority;
         break;
+      }
       default:
         throw xtl::make_argument_exception ("", "thread_priority", thread_priority);
     }
