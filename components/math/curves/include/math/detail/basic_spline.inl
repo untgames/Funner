@@ -560,7 +560,9 @@ template <class Key>
 basic_spline<Key>::basic_spline (const basic_spline& s)
   : impl (s.impl)
 {
-  addref (impl);
+  xtl::reference_counter* ref_count = impl;  //Обход бага компиляции gcc 4.0 на мак
+
+  addref (ref_count);
 }
 
 template <class Key>
