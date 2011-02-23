@@ -33,16 +33,21 @@ int main ()
 {
   printf ("Results of vec11_test:\n");
 
-  stl::vector<A> array;
-
-  for (size_t i = 0; i < 64; i++)
   {
-    B b (0.f, 1.f);
+    stl::vector<A> array;
 
-    array.insert (array.end (), &b, &b + 1);
+    for (size_t i = 0; i < 64; i++)
+    {
+      B b (0.f, 1.f);
+
+      array.insert (array.end (), &b, &b + 1);
+    }
+
+    stl::sort (array.begin (), array.end (), a_less ());
   }
-
-  stl::sort (array.begin (), array.end (), a_less ());
+  
+  printf ("sort complete\n");
+  fflush (stdout);
 
   return 0;
 }
