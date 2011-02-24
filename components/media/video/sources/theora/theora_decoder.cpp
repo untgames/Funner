@@ -256,7 +256,7 @@ class TheoraDecoderImpl : public IVideoDecoder
       if (buffer_frame_number < 0)
         throw xtl::format_operation_exception (METHOD_NAME, "Can't get first video frame");
 
-      if (buffer_frame_number != frame)
+      if (buffer_frame_number != (int)frame)
         log.Printf ("Can't decode frame %u, returning data of frame %d instead", frame, buffer_frame_number);
 
       size_t *ycbcr_data = ycbcr_buffer.data ();

@@ -52,7 +52,7 @@ int main ()
 
     IndexBuffer ib (5);
 
-    size_t* indices = ib.Data ();
+    unsigned int* indices = ib.Data ();
 
     for (size_t i=0; i<ib.Size (); i++)
       indices [i] = i % 3;

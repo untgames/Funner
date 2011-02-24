@@ -286,8 +286,8 @@ bool check (const Mesh& mesh, size_t joints_count, const xtl::function<void (con
       
         //проверка корректности индексов
       
-      const size_t* index       = index_buffer.Data ();
-      size_t        verts_count = vertex_buffer.VerticesCount ();
+      const unsigned int* index       = index_buffer.Data ();
+      size_t              verts_count = vertex_buffer.VerticesCount ();
       
       for (size_t j=0, count=index_buffer.Size (); j<count; j++, index++)
         if (*index >= verts_count)
