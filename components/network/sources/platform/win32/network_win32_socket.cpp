@@ -541,6 +541,7 @@ class WinSocket : public SocketImpl, public xtl::reference_counter
             case WSAECONNRESET:
               receive_closed = true;
               send_closed = true;
+              return 0;
             default:
               raise_error ("::send");
           }

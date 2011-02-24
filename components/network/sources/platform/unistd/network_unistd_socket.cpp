@@ -478,6 +478,11 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
           else
             raise_error ("", "recv");
         }
+        else if (!received_bytes)
+        {
+          receive_closed = true;
+          send_closed = true;
+        }
 
         return received_bytes;
       }
@@ -505,6 +510,12 @@ class UnistdSocket : public SocketImpl, public xtl::reference_counter
         {
           if (errno == EAGAIN || errno == EWOULDBLOCK)
             return 0;
+          else if (errno == ECONNRESET)
+          {
+            receive_closed = true;
+            send_closed = true;
+            return 0;
+          }
           else
             raise_error ("", "send");
         }
