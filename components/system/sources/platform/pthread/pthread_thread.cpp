@@ -102,13 +102,19 @@ void Platform::SetThreadPriority (thread_t thread, ThreadPriority thread_priorit
       thread->default_scheduling_getted = true;
     }
 
+#ifdef __APPLE__
+    int scheduling_policy = SCHED_RR;
+#else
+    int scheduling_policy = thread->scheduling_policy;
+#endif
+
     sched_param scheduling_param;
 
     switch (thread_priority)
     {
       case ThreadPriority_Low:
       {
-        int min_priority = sched_get_priority_min (thread->scheduling_policy);
+        int min_priority = sched_get_priority_min (scheduling_policy);
 
         if (min_priority == -1)
           pthread_raise_error ("::sched_get_priority_min", errno);
@@ -121,7 +127,7 @@ void Platform::SetThreadPriority (thread_t thread, ThreadPriority thread_priorit
         break;
       case ThreadPriority_High:
       {
-        int max_priority = sched_get_priority_max (thread->scheduling_policy);
+        int max_priority = sched_get_priority_max (scheduling_policy);
 
         if (max_priority == -1)
           pthread_raise_error ("::sched_get_priority_max", errno);
@@ -133,7 +139,7 @@ void Platform::SetThreadPriority (thread_t thread, ThreadPriority thread_priorit
         throw xtl::make_argument_exception ("", "thread_priority", thread_priority);
     }
 
-    int status = pthread_setschedparam ((pthread_t)thread->thread, thread->scheduling_policy, &scheduling_param);
+    int status = pthread_setschedparam ((pthread_t)thread->thread, scheduling_policy, &scheduling_param);
 
     if (status)
       pthread_raise_error ("::pthread_setshedparam", status);
