@@ -47,7 +47,6 @@ int main ()
   }
   
   printf ("sort complete\n");
-  fflush (stdout);
 
   return 0;
 }
