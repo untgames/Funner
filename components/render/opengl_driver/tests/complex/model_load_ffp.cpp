@@ -113,8 +113,8 @@ struct Model
           
           stl::vector<unsigned short> index_data (ib.Size ());
           
-          const size_t*   src_index = ib.Data ();
-          unsigned short* dst_index = &index_data [0];
+          const unsigned int* src_index = ib.Data ();
+          unsigned short*     dst_index = &index_data [0];
           
           for (size_t i=0; i<ib.Size (); i++, src_index++, dst_index++)
             *dst_index = static_cast<unsigned short> (*src_index);
