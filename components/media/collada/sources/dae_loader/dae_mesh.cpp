@@ -12,6 +12,43 @@ namespace media
 namespace collada
 {
 
+/*
+    Класс для безопасного чтения NaN
+*/
+
+#ifdef _MSC_VER
+  #pragma pack (push)
+  #pragma pack (1)
+#else
+  #pragma pack (1)
+#endif
+
+struct safe_float { float value; };
+
+#ifdef _MSC_VER
+  #pragma pack (pop)
+#endif
+
+bool read (xtl::io::token_iterator<const char*>& iter, safe_float& result_value)
+{
+  if (read (iter, result_value.value))
+    return true;
+
+  if (!iter)
+    return false;    
+
+  if (!xtl::xstricmp (*iter, "NAN"))
+  {
+    ++iter;
+
+    result_value.value = 0.0;
+
+    return true;
+  }
+
+  return false;
+}
+
 typedef stl::vector<float> FloatBuffer;
 
 /*
@@ -453,8 +490,8 @@ void DaeParser::ParseMeshSource (Parser::Iterator iter, MeshSourceMap& sources)
 
       source->data.resize (data_count);    
 
-      read (*iter, "float_array.#text", source->data.begin (), data_count);
-      
+      read (*iter, "float_array.#text", reinterpret_cast<safe_float*> (&source->data [0]), data_count);
+
       for (Parser::NamesakeIterator param_iter=accessor_iter->First ("param"); param_iter; ++param_iter)
         source->params += get<const char*> (*param_iter, "name");
     }

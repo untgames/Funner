@@ -75,7 +75,7 @@ int main ()
     IndexBuffer ib (5);
 
     for (size_t i=0; i<ib.Size (); i++)
-      ib.Data () [i] = i;
+      ib.Data<unsigned int> () [i] = i;
 
     Mesh mesh1;
 

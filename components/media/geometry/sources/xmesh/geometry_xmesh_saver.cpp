@@ -200,10 +200,26 @@ class XmlMeshLibrarySaver
       
       writer.WriteAttribute ("id", format ("ib#%u", index_buffers.size () + 1));
       writer.WriteAttribute ("indices_count", ib.Size ());
-
-        //сохранение индексов
-
-      writer.WriteData (xtl::make_iterator_range (ib.Size (), ib.Data ()));
+      
+        //сохранение индексов      
+      
+      switch (ib.DataType ())
+      {
+        case IndexType_UInt32:
+          writer.WriteAttribute ("type", "uint32");
+          writer.WriteData (xtl::make_iterator_range (ib.Size (), ib.Data<const unsigned int> ()));
+          break;
+        case IndexType_UInt16:
+          writer.WriteAttribute ("type", "uint16");
+          writer.WriteData (xtl::make_iterator_range (ib.Size (), ib.Data<const unsigned short> ()));
+          break;
+        case IndexType_UInt8:
+          writer.WriteAttribute ("type", "uint8");
+          writer.WriteData (xtl::make_iterator_range (ib.Size (), ib.Data<const unsigned char> ()));
+          break;
+        default:
+          return;
+      }
 
         //добавление потока в список сохранённых
 

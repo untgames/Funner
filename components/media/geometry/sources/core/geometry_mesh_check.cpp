@@ -214,6 +214,14 @@ void check_stream (Log& log, CheckContext& context)
   }
 }
 
+template <class T>
+void check_indices (size_t count, const T* index, size_t verts_count, size_t primitive_index, Log& log)
+{
+  for (size_t j=0; j<count; j++, index++)
+    if (*index >= verts_count)
+      log.Error ("index[%u]=%u >= vertices_count=%u (at primitive #%u)", j, *index, verts_count, primitive_index);
+}
+
 }
 
 /*
@@ -285,13 +293,24 @@ bool check (const Mesh& mesh, size_t joints_count, const xtl::function<void (con
       }
       
         //проверка корректности индексов
+        
+      size_t verts_count = vertex_buffer.VerticesCount ();        
       
-      const unsigned int* index       = index_buffer.Data ();
-      size_t              verts_count = vertex_buffer.VerticesCount ();
-      
-      for (size_t j=0, count=index_buffer.Size (); j<count; j++, index++)
-        if (*index >= verts_count)
-          log.Error ("index[%u]=%u >= vertices_count=%u (at primitive #%u)", j, *index, verts_count, i);
+      switch (index_buffer.DataType ())
+      {
+        case IndexType_UInt32:
+          check_indices (index_buffer.Size (), index_buffer.Data<const unsigned int> (), verts_count, i, log);
+          break;
+        case IndexType_UInt16:
+          check_indices (index_buffer.Size (), index_buffer.Data<const unsigned short> (), verts_count, i, log);
+          break;
+        case IndexType_UInt8:
+          check_indices (index_buffer.Size (), index_buffer.Data<const unsigned char> (), verts_count, i, log);
+          break;
+        default:
+          log.Error ("Bad index type %s", get_index_type_name (index_buffer.DataType ()));
+          break;
+      }
     }
         
       //проверка вершинных буферов

@@ -210,10 +210,14 @@ class BinMeshLibraryLoader
       size_t indices_count;
 
       file_read (input_file, &indices_count, sizeof (indices_count));
+      
+      IndexType data_type = IndexType_Default;
+      
+      file_read (input_file, (int*)&data_type, sizeof (data_type));
 
         //создание буфера
 
-      IndexBuffer ib (indices_count);
+      IndexBuffer ib (indices_count, data_type);
 
         //чтение индексов
 

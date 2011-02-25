@@ -4,8 +4,21 @@ void dump (const IndexBuffer& ib)
 {
   printf ("Index buffer (%u indices):\n", ib.Size ());
   
-  for (size_t i=0; i<ib.Size (); i++)
-    printf ("  %u\n", ib.Data ()[i]);
+  switch (ib.DataType ())
+  {
+    case IndexType_UInt32:
+      for (size_t i=0; i<ib.Size (); i++)
+        printf ("  %u\n", ib.Data<const unsigned int> ()[i]);    
+      break;
+    case IndexType_UInt16:
+      for (size_t i=0; i<ib.Size (); i++)
+        printf ("  %u\n", ib.Data<const unsigned short> ()[i]);
+      break;
+    case IndexType_UInt8:
+      for (size_t i=0; i<ib.Size (); i++)
+        printf ("  %u\n", ib.Data<const unsigned char> ()[i]);
+      break;      
+  }  
 }
 
 int main ()
@@ -17,8 +30,8 @@ int main ()
     IndexBuffer ib1 (12), ib2;  
     
     for (size_t i=0; i<ib1.Size (); i++)
-      ib1.Data ()[i] = i;
-    
+      ib1.Data<unsigned int> ()[i] = i;
+
     printf ("Dump ib1\n");
     dump (ib1);
     

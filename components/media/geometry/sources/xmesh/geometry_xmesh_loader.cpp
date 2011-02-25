@@ -244,21 +244,39 @@ class XmlMeshLibraryLoader
     {
         //чтение идентификатора буфера
 
-      const char* id = get<const char*> (*ib_iter, "id");
+      const char* id   = get<const char*> (*ib_iter, "id");
+      const char* type = get<const char*> (*ib_iter, "type", "uint32");
 
       size_t indices_count = get<size_t> (*ib_iter, "indices_count");
+      
+      if (!strcmp (type, "uint32"))
+      {
+        IndexBuffer ib (indices_count, IndexType_UInt32);
+        
+        read (*ib_iter, "#text", ib.Data<unsigned int> (), indices_count);        
+        
+        index_buffers.insert_pair (id, ib);
+      }
+      else if (!strcmp (type, "uint16"))
+      {
+        IndexBuffer ib (indices_count, IndexType_UInt16);
+        
+        read (*ib_iter, "#text", ib.Data<unsigned short> (), indices_count);        
+        
+        index_buffers.insert_pair (id, ib);        
+      }
+      else if (!strcmp (type, "uint8"))
+      {
+        IndexBuffer ib (indices_count, IndexType_UInt8);
 
-        //создание буфера
+        read (*ib_iter, "#text", ib.Data<unsigned char> (), indices_count);
 
-      IndexBuffer ib (indices_count);
-
-        //чтение индексов
-
-      read (*ib_iter, "#text", ib.Data (), indices_count);
-
-        //регистрация потока
-
-      index_buffers.insert_pair (id, ib);
+        index_buffers.insert_pair (id, ib);
+      }
+      else
+      {
+        raise_parser_exception (*ib_iter, "Bad type='%s'. Use one of following: uint8, uint16, uint32", type);
+      }
     }
     
       //разбор примитива

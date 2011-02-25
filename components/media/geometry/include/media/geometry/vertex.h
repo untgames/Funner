@@ -52,6 +52,8 @@ template <class T> struct Color<T, 4> { math::vector<T, 4> color; };
 ///Текстурные координаты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <size_t Index, class T, size_t Size=2> struct TexCoord;
+template <size_t Index, class T>                struct TexTangent;
+template <size_t Index, class T>                struct TexBinormal;
 
 template <class T> struct TexCoord<0, T, 2> { math::vector<T, 2> texcoord0; };
 template <class T> struct TexCoord<0, T, 3> { math::vector<T, 3> texcoord0; };
@@ -69,6 +71,24 @@ template <class T> struct TexCoord<6, T, 2> { math::vector<T, 2> texcoord6; };
 template <class T> struct TexCoord<6, T, 3> { math::vector<T, 3> texcoord6; };
 template <class T> struct TexCoord<7, T, 2> { math::vector<T, 2> texcoord7; };
 template <class T> struct TexCoord<7, T, 3> { math::vector<T, 3> texcoord7; };
+
+template <class T> struct TexTangent<0, T> { math::vector<T, 3> textangent0; };
+template <class T> struct TexTangent<1, T> { math::vector<T, 3> textangent1; };
+template <class T> struct TexTangent<2, T> { math::vector<T, 3> textangent2; };
+template <class T> struct TexTangent<3, T> { math::vector<T, 3> textangent3; };
+template <class T> struct TexTangent<4, T> { math::vector<T, 3> textangent4; };
+template <class T> struct TexTangent<5, T> { math::vector<T, 3> textangent5; };
+template <class T> struct TexTangent<6, T> { math::vector<T, 3> textangent6; };
+template <class T> struct TexTangent<7, T> { math::vector<T, 3> textangent7; };
+
+template <class T> struct TexBinormal<0, T> { math::vector<T, 3> texbinormal0; };
+template <class T> struct TexBinormal<1, T> { math::vector<T, 3> texbinormal1; };
+template <class T> struct TexBinormal<2, T> { math::vector<T, 3> texbinormal2; };
+template <class T> struct TexBinormal<3, T> { math::vector<T, 3> texbinormal3; };
+template <class T> struct TexBinormal<4, T> { math::vector<T, 3> texbinormal4; };
+template <class T> struct TexBinormal<5, T> { math::vector<T, 3> texbinormal5; };
+template <class T> struct TexBinormal<6, T> { math::vector<T, 3> texbinormal6; };
+template <class T> struct TexBinormal<7, T> { math::vector<T, 3> texbinormal7; };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Пустой атрибут
@@ -108,10 +128,14 @@ typedef Color<float, 4>            Color4f;
 
 template <size_t Index> struct TexChannel
 {
-  typedef TexCoord<Index, short, 2> Coord2s;
-  typedef TexCoord<Index, short, 3> Coord3s;
-  typedef TexCoord<Index, float, 2> Coord2f;
-  typedef TexCoord<Index, float, 3> Coord3f;
+  typedef TexCoord<Index, short, 2>  Coord2s;
+  typedef TexCoord<Index, short, 3>  Coord3s;
+  typedef TexCoord<Index, float, 2>  Coord2f;
+  typedef TexCoord<Index, float, 3>  Coord3f;
+  typedef TexTangent<Index, float>   Tangentf;
+  typedef TexTangent<Index, short>   Tangents;
+  typedef TexBinormal<Index, float>  Binormalf;
+  typedef TexBinormal<Index, short>  Binormals;  
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

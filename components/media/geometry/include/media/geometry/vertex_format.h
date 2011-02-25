@@ -28,6 +28,22 @@ enum VertexAttributeSemantic
   VertexAttributeSemantic_TexCoord5,
   VertexAttributeSemantic_TexCoord6,  
   VertexAttributeSemantic_TexCoord7,
+  VertexAttributeSemantic_TexTangent0, //каналы текстурных касательных
+  VertexAttributeSemantic_TexTangent1,
+  VertexAttributeSemantic_TexTangent2,
+  VertexAttributeSemantic_TexTangent3,
+  VertexAttributeSemantic_TexTangent4,
+  VertexAttributeSemantic_TexTangent5,
+  VertexAttributeSemantic_TexTangent6,  
+  VertexAttributeSemantic_TexTangent7,  
+  VertexAttributeSemantic_TexBinormal0, //каналы текстурных бинормалей
+  VertexAttributeSemantic_TexBinormal1,
+  VertexAttributeSemantic_TexBinormal2,
+  VertexAttributeSemantic_TexBinormal3,
+  VertexAttributeSemantic_TexBinormal4,
+  VertexAttributeSemantic_TexBinormal5,
+  VertexAttributeSemantic_TexBinormal6,  
+  VertexAttributeSemantic_TexBinormal7,    
   VertexAttributeSemantic_Influence, //индексы отрезка индексных весов
   
   VertexAttributeSemantic_Num

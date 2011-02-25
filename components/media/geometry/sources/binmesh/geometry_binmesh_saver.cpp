@@ -180,6 +180,10 @@ class BinMeshLibrarySaver
       size_t indices_count = ib.Size ();
 
       file_write (result_file, &indices_count, sizeof (indices_count));
+      
+      IndexType data_type = ib.DataType ();
+      
+      file_write (result_file, &data_type, sizeof (data_type));
 
         //сохранение индексов
 
