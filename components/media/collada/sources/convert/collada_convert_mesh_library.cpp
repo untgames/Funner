@@ -135,6 +135,26 @@ class Converter
       dst_vertex.texcoord3 = src_vertex.coord;
     }
 
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<4>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord4 = src_vertex.coord;
+    }
+
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<5>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord5 = src_vertex.coord;
+    }
+
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<6>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord6 = src_vertex.coord;
+    }
+
+    void SetVertexTexCoord (const media::collada::TexVertex& src_vertex, media::geometry::Vertex<media::geometry::TexChannel<7>::Coord3f, media::geometry::Tangentf, media::geometry::Binormalf>& dst_vertex)
+    {
+      dst_vertex.texcoord7 = src_vertex.coord;
+    }
+
     template<size_t channel_index>
     media::geometry::VertexStream CreateTexVertices (const media::collada::Surface& src_surface)
     {
@@ -232,6 +252,18 @@ class Converter
               break;
             case 3:
               vs = CreateTexVertices<3> (src_surface);
+              break;
+            case 4:
+              vs = CreateTexVertices<4> (src_surface);
+              break;
+            case 5:
+              vs = CreateTexVertices<5> (src_surface);
+              break;
+            case 6:
+              vs = CreateTexVertices<6> (src_surface);
+              break;
+            case 7:
+              vs = CreateTexVertices<7> (src_surface);
               break;
             default:
               throw xtl::format_operation_exception ("media::collada::Converter::ConvertSurfaceTexVertexChannels", "Unsupported texture channel");

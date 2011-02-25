@@ -615,8 +615,7 @@ TexturePtr load_texture (const Params& params, const char* path)
   {
     const char* dir = search_paths [i];
     
-    stl::string texture_short_path = common::notdir (path),
-                texture_path       = common::format ("%s/%s", dir, texture_short_path.c_str ());                
+    stl::string texture_path = common::format ("%s/%s", dir, path);
 
     if (!FileSystem::IsFileExist (texture_path.c_str ()))
       continue; //файл не найден
@@ -699,8 +698,30 @@ void save_images (const Params& params, const Model& model, ImagesMap& images_ma
     if (!image.Path ())
       continue;
       
-    stl::string image_path = common::notdir (image.Path ());      
+    stl::string image_path;
+
+      //проверка есть ли картинка по указанному пути
+
+    const char** search_paths = params.source_search_paths.Data ();
+
+    for (size_t i=0, count=params.source_search_paths.Size (); i<count; i++)
+    {
+      const char* dir = search_paths [i];
       
+      stl::string texture_path = common::format ("%s/%s", dir, image.Path ());
+
+      if (FileSystem::IsFileExist (texture_path.c_str ()))
+      {
+        image_path = image.Path ();
+        break;
+      }
+    }
+
+      //если по указанному пути картинка не найдена, обрезание пути
+
+    if (image_path.empty ())
+      image_path = common::notdir (image.Path ());
+
     if (!params.silent)
       printf ("  process texture '%s'...", image_path.c_str ());
 
@@ -909,7 +930,7 @@ void print (const char* message)
 void export_data (Params& params)
 {
   if (!params.silent)
-    printf ("Load model '%s'...", params.source_name.c_str ());
+    printf ("Load model '%s'...\n", params.source_name.c_str ());
 
   Model model (params.source_name.c_str (), &print);
 

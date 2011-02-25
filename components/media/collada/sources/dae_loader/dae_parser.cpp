@@ -98,6 +98,21 @@ void DaeParser::ParseRoot (Parser::Iterator iter)
     iter->Log ().Warning (*iter, "Currently supported Collada version - %s, document uses other version (%s), "
       "some features may be not fully supported or unsupported", SUPPORTED_VERSION, version);
 
+    //чтение имени инструмента создания файла
+
+  common::ParseNode authoring_tool_node = iter->First ("asset.contributor.authoring_tool.#text");
+
+  if (authoring_tool_node)
+  {
+    for (size_t i = 0, count = authoring_tool_node.AttributesCount (); i < count; i++)
+    {
+      authoring_tool += authoring_tool_node.Attribute (i);
+
+      if (i < count - 1)
+        authoring_tool += " ";
+    }
+  }
+
     //разбор библиотек
 
   ParseLibraries (iter);

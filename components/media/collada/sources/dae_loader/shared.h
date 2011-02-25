@@ -150,6 +150,7 @@ class DaeParser
   private:
     Model&                model;               //загружаемая модель
     Parser                parser;              //парсер
+    stl::string           authoring_tool;      //инструмент с помощью которого создавался COLLADA-файл
     VertexIndexMaps       vertex_index_maps;   //карты вершинных индексов
     AnimationSemanticsMap animation_semantics; //найденные возможные семантики анимаций
 };

@@ -669,8 +669,14 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
       TexVertex* tex_vertices = surface.TexVertexChannels ().Data (channel);      
 
       stream_reader.Read ("TEXCOORD", set, "STP", tex_vertices, &TexVertex::coord);
-      stream_reader.Read ("TEXTANGENT", set, "XYZ", tex_vertices, &TexVertex::tangent);
-      stream_reader.Read ("TEXBINORMAL", set, "XYZ", tex_vertices, &TexVertex::binormal);
+
+      const char* tex_attributes_set = set;
+
+      if (common::wcmatch (authoring_tool.c_str (), "OpenCOLLADA for 3ds Max*"))
+        tex_attributes_set = surface_info.inputs.GetSetName (i + 1);
+
+      stream_reader.Read ("TEXTANGENT", tex_attributes_set, "XYZ", tex_vertices, &TexVertex::tangent);
+      stream_reader.Read ("TEXBINORMAL", tex_attributes_set, "XYZ", tex_vertices, &TexVertex::binormal);
     }
 
     if (surface_info.inputs.FindChannel ("COLOR", set))

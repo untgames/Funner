@@ -2,6 +2,13 @@
 
 using namespace math;
 
+namespace
+{
+
+const char* UNNAMED_NODE_FORMAT = "__unnamed_node_%u__";
+
+}
+
 /*
     Разбор библиотеки визуальных сцен
 */
@@ -48,19 +55,29 @@ void DaeParser::ParseVisualScene (Parser::Iterator iter)
 
 void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
 {
-  const char *id   = get<const char*> (*iter, "id"),
-             *sid  = get<const char*> (*iter, "sid", ""),
+  const char *sid  = get<const char*> (*iter, "sid", ""),
              *name = get<const char*> (*iter, "name", "");
   
+  stl::string id;
+
+  if (iter->First ("id"))
+    id = get<const char*> (*iter, "id");
+  else
+  {
+    static size_t unnamed_node_index = 0;
+
+    id = common::format (UNNAMED_NODE_FORMAT, unnamed_node_index++);
+  }
+
     //создание узла
   
   Node node;
   
-  node.SetId (id);
+  node.SetId (id.c_str ());
 
     //разбор преобразований узла
 
-  ParseTransform (iter, id, node);
+  ParseTransform (iter, id.c_str (), node);
   
     //биндинг к родительскому узлу
     
@@ -78,7 +95,7 @@ void DaeParser::ParseNode (Parser::Iterator iter, Node& parent)
   
     //добавление узла в библиотеку
     
-  model.Nodes ().Insert (id, node);  
+  model.Nodes ().Insert (id.c_str (), node);
   
     //разбор инстанцированной геометрии
     
