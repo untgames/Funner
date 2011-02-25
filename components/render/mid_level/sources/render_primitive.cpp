@@ -118,13 +118,32 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
       vertex_buffers.push_back (impl->buffers->CreateVertexBuffer (source.VertexBuffer (i), vb_usage));
 
       //конвертация индексного буфера (если он есть)
+      
+    InputDataType index_type = (InputDataType)0;
     
     if (source.IndexBuffer ().Size ())
+    {
       mesh->index_buffer = impl->buffers->CreateIndexBuffer (source.IndexBuffer (), ib_usage);
-    
+      
+      switch (source.IndexBuffer ().DataType ())
+      {
+        case media::geometry::IndexType_UInt32:
+          index_type = InputDataType_UInt;
+          break;
+        case media::geometry::IndexType_UInt16:
+          index_type = InputDataType_UShort;
+          break;
+        case media::geometry::IndexType_UInt8:
+          index_type = InputDataType_UByte;
+          break;          
+        default:
+          throw xtl::format_operation_exception ("", "Unexpected index buffer data type %s", get_index_type_name (source.IndexBuffer ().DataType ()));
+      }
+    }
+
       //конвертация примитивов
     
-    mesh->primitives.reserve (source.PrimitivesCount ());    
+    mesh->primitives.reserve (source.PrimitivesCount ());
     
     for (size_t i=0, count=source.PrimitivesCount (); i<count; i++)
     {
@@ -159,11 +178,11 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
 
       if (src_primitive.vertex_buffer >= vertex_buffers.size ())
         throw xtl::format_operation_exception ("", "Bad primitive #%u vertex buffer index %u (vertex buffers count is %u)", i, src_primitive.vertex_buffer,
-          vertex_buffers.size ());
+          vertex_buffers.size ());          
 
       dst_primitive.vertex_buffer = vertex_buffers [src_primitive.vertex_buffer];
       dst_primitive.first         = src_primitive.first;
-      dst_primitive.layout        = dst_primitive.vertex_buffer->CreateInputLayout (impl->device_manager->InputLayoutManager (), InputDataType_UInt);
+      dst_primitive.layout        = dst_primitive.vertex_buffer->CreateInputLayout (impl->device_manager->InputLayoutManager (), index_type);
       
       mesh->primitives.push_back (dst_primitive);
     }

@@ -148,6 +148,54 @@ class EffectLoader
 ///Разбор состояния уровня отсечения
     void ParseDepthStencilState (Parser::Iterator iter)
     {
+/*      const char* id = get<const char*> (*iter, "");
+      
+      DepthStencilStateDesc desc;
+      
+      memset (&desc, 0, sizeof (desc));
+      
+      desc.depth_test_enable   = true;
+      desc.depth_write_enable  = true;
+      desc.stencil_test_enable = false;
+      desc.depth_compare_mode  = CompareMode_Less;
+      
+      if (!xtl::xstricmp (get<const char*> (*iter, "depthtest",   "true"), "false")) desc.depth_test_enable   = false;
+      if (!xtl::xstricmp (get<const char*> (*iter, "depthwrite",  "true"), "false")) desc.depth_write_enable  = false;
+      if (!xtl::xstricmp (get<const char*> (*iter, "stenciltest", "false"), "true")) desc.stencil_test_enable = true;
+            
+      CompareMode   depth_compare_mode;     //режим сравнения в тесте глубины
+      unsigned char stencil_read_mask;      //маска, накладываемая на значения буфера трафарета при чтении
+      unsigned char stencil_write_mask;     //маска, накладываемая на значения буфера трафарета при записи
+      StencilDesc   stencil_desc [FaceMode_Num]; //дескрипторы буфера трафарета для различных видов граней
+
+  CompareMode      stencil_compare_mode;   //режим сравнения значений в stencil-test
+  StencilOperation stencil_fail_operation; //операция, выполняемая над элементом буфера трафарета в случае провала stencil-test
+  StencilOperation depth_fail_operation;   //операция, выполняемая над элементом буфера трафарета в случае провала depth-test
+  StencilOperation stencil_pass_operation; //операция, выполняемая над элементом буфера трафарета в случае прохождения stencil-test
+  
+depthstencil "solid"
+{
+  depthtest     true
+  depthwrite    true
+  depthcompare  less
+  stenciltest   true
+  stencilread   0xf
+  stencilwrite  0xf  
+  
+  front
+  {
+    compare     less
+    stencilfail keep
+    depthfail   keep
+    stencilpass keep
+  }
+  
+  back
+  {
+  }
+}
+  */
+       
     }
     
 ///Разбор состояния уровня растеризации

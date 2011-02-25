@@ -3,8 +3,6 @@
 using namespace render::mid_level;
 using namespace render::low_level;
 
-//TODO: index types
-
 /*
     Описание реализации PrimitiveBuffers
 */
@@ -236,7 +234,7 @@ LowLevelBufferPtr PrimitiveBuffersImpl::CreateIndexBuffer (const media::geometry
 
     memset (&desc, 0, sizeof desc);
 
-    desc.size         = ib.Size () * sizeof (unsigned int);
+    desc.size         = ib.Size () * get_index_type_size (ib.DataType ());
     desc.bind_flags   = BindFlag_IndexBuffer;
     desc.access_flags = AccessFlag_ReadWrite;
     
@@ -379,7 +377,7 @@ void PrimitiveBuffersImpl::Update (const media::geometry::IndexBuffer& ib)
     if (holder.indices_count != ib.Size ())
       throw xtl::format_operation_exception ("", "Indices count %u differes from source indices count %u", ib.Size (), holder.indices_count);
           
-    holder.buffer->SetData (0, ib.Size () * sizeof (unsigned int), ib.Data ());    
+    holder.buffer->SetData (0, ib.Size () * get_index_type_size (ib.DataType ()), ib.Data ());    
   }
   catch (xtl::exception& e)
   {
