@@ -129,12 +129,9 @@ class MeshInputBuilder
     }
     
 ///Добавление канала данных меша
-    bool AddChannel (const char* semantic, const char* set, const ParseNode& node, MeshSource* source, size_t offset)
+    bool AddChannel (const char* semantic, size_t set, const ParseNode& node, MeshSource* source, size_t offset)
     {
-      if (!set)
-        set = "";
-
-      size_t                 hash = strhash (semantic, common::strhash (set));
+      size_t                 hash = strhash (semantic, set);
       MeshInputMap::iterator iter = input_map.find (hash);
 
       if (iter != input_map.end ())
@@ -149,16 +146,9 @@ class MeshInputBuilder
       {       
         input_map [hash] = inputs.size () - 1;
         
-        try
-        {
-          RegisterSet (set);          
+        RegisterSet (set);
           
-          return true;          
-        }
-        catch (...)
-        {
-          throw;
-        }
+        return true;
       }
       catch (...)
       {
@@ -168,12 +158,9 @@ class MeshInputBuilder
     }
     
 ///Поиск канала
-    const MeshInput* FindChannel (const char* semantic, const char* set=0)
+    const MeshInput* FindChannel (const char* semantic, size_t set=0)
     {
-      if (!set)
-        set = "";
-
-      size_t                 hash = strhash (semantic, common::strhash (set));
+      size_t                 hash = strhash (semantic, set);
       MeshInputMap::iterator iter = input_map.find (hash);
 
       return iter != input_map.end () ? &inputs [iter->second] : 0;
@@ -188,17 +175,14 @@ class MeshInputBuilder
 ///Максимальное смещение канала
     size_t GetMaxOffset () const { return max_offset; }
 
-///Получение имени подмножества
-    const char* GetSetName (size_t index) const { return sets [index]; }
+///Получение значения подмножества
+    size_t GetSetValue (size_t index) const { return sets [index]; }
 
   private:
-    void RegisterSet (const char* set)
+    void RegisterSet (size_t set)
     {
-      if (!set || !*set)
-        return;
-        
       for (SetArray::iterator i=sets.begin (), end=sets.end (); i!=end; ++i)
-        if (!::strcmp (*i, set))
+        if (*i == set)
           return;
           
       sets.push_back (set);
@@ -207,7 +191,7 @@ class MeshInputBuilder
   private:
     typedef stl::hash_map<size_t, size_t> MeshInputMap;
     typedef stl::vector<MeshInput>        MeshInputArray;
-    typedef stl::vector<const char*>      SetArray;
+    typedef stl::vector<size_t>           SetArray;
     
   private:
     MeshInputArray inputs;
@@ -316,14 +300,14 @@ class VertexStreamReader
 
 ///Чтение канала данных в поле, определеяемое указателем на член-класса
     template <class T, class Field>
-    void Read (const char* semantic, const char* set, const char* params, T* buffer, Field T::* field)
+    void Read (const char* semantic, size_t set, const char* params, T* buffer, Field T::* field)
     {
       ReadCore (semantic, set, params, buffer, field_selector<T, Field> (field));
     }
 
 ///Непосредственное чтение канала данных
     template <class T>
-    void Read (const char* semantic, const char* set, const char* params, T* buffer)
+    void Read (const char* semantic, size_t set, const char* params, T* buffer)
     {
       ReadCore (semantic, set, params, buffer, identity_selector ());
     }    
@@ -331,7 +315,7 @@ class VertexStreamReader
 ///Чтение массива индексов вершин
     void ReadVertexIndices (size_t* buffer)
     {
-      const MeshInput* input = inputs.FindChannel ("VERTEX", "");
+      const MeshInput* input = inputs.FindChannel ("VERTEX");
 
       if (!input)
         raise_parser_exception (surface_node, "No input channel with semantic='VERTEX'");
@@ -375,15 +359,12 @@ class VertexStreamReader
   
       //чтение канала данных
     template <class T, class Fn>  
-    void ReadCore (const char* semantic, const char* set, const char* params, T* buffer, Fn fn)
+    void ReadCore (const char* semantic, size_t set, const char* params, T* buffer, Fn fn)
     {
       const MeshInput* input = inputs.FindChannel (semantic, set);
       
       if (!input)
-      {
-        if (set && *set) raise_parser_exception (surface_node, "No input channel with semantic='%s' and set='%s'", semantic, set);
-        else             raise_parser_exception (surface_node, "No input channel with semantic='%s'", semantic);
-      }
+        raise_parser_exception (surface_node, "No input channel with semantic='%s' and set='%u'", semantic, set);
       
       if (input->source->params != params)
         if (xtl::xstrcmp (params, "STP") || input->source->params != "ST")
@@ -597,13 +578,10 @@ void DaeParser::ParseSurfaceInput
   
     //регистрация канала данных
 
-  const char* set = get<const char*> (*iter, "set", "");
+  size_t set = get<size_t> (*iter, "set", 0);
     
   if (!inputs.AddChannel (semantic, set, *iter, source, offset))
-  {
-    if (*set) raise_parser_exception (*iter, "Input channel '%s' from set '%s' already registered. Will be ignored", semantic, set);
-    else      raise_parser_exception (*iter, "Input channel '%s' already registered. Will be ignored", semantic);
-  }
+    raise_parser_exception (*iter, "Input channel '%s' from set '%u' already registered. Will be ignored", semantic, set);
 }
 
 /*
@@ -690,30 +668,29 @@ void DaeParser::ParseSurfaceBuffers (Parser::Iterator p_iter, Parser::Iterator s
     
   Vertex* vertices = surface.Vertices ();
   
-  stream_reader.Read ("VERTEX", "", "XYZ", vertices, &Vertex::coord);
-  stream_reader.Read ("NORMAL", "", "XYZ", vertices, &Vertex::normal);
+  stream_reader.Read ("VERTEX", 0, "XYZ", vertices, &Vertex::coord);
+  stream_reader.Read ("NORMAL", 0, "XYZ", vertices, &Vertex::normal);
 
     //построение каналов текстурных координат
     
   for (size_t i=0; i<surface_info.inputs.GetSetsCount (); i++)
   {
-    const char* set = surface_info.inputs.GetSetName (i);
+    size_t set = surface_info.inputs.GetSetValue (i);
     
     if (surface_info.inputs.FindChannel ("TEXCOORD", set))
     {    
-      size_t channel = surface.TexVertexChannels ().Create (set);
+      size_t channel_set = set;
+
+      if (common::wcmatch (authoring_tool.c_str (), "OpenCOLLADA for 3ds Max*"))
+        channel_set++;
+
+      size_t channel = surface.TexVertexChannels ().Create (channel_set);
 
       TexVertex* tex_vertices = surface.TexVertexChannels ().Data (channel);      
 
       stream_reader.Read ("TEXCOORD", set, "STP", tex_vertices, &TexVertex::coord);
-
-      const char* tex_attributes_set = set;
-
-      if (common::wcmatch (authoring_tool.c_str (), "OpenCOLLADA for 3ds Max*"))
-        tex_attributes_set = surface_info.inputs.GetSetName (i + 1);
-
-      stream_reader.Read ("TEXTANGENT", tex_attributes_set, "XYZ", tex_vertices, &TexVertex::tangent);
-      stream_reader.Read ("TEXBINORMAL", tex_attributes_set, "XYZ", tex_vertices, &TexVertex::binormal);
+      stream_reader.Read ("TEXTANGENT", channel_set, "XYZ", tex_vertices, &TexVertex::tangent);
+      stream_reader.Read ("TEXBINORMAL", channel_set, "XYZ", tex_vertices, &TexVertex::binormal);
     }
 
     if (surface_info.inputs.FindChannel ("COLOR", set))

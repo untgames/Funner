@@ -89,8 +89,6 @@ class Converter
       //преобразование положений и нормалей
     void ConvertSurfaceVertices (const media::collada::Surface& src_surface, Surface& dst_surface)
     {
-//      typedef media::geometry::Vertex<media::geometry::Position3f, media::geometry::Normalf,
-//        media::geometry::Tangentf, media::geometry::Binormalf> ColladaVertex;
       typedef media::geometry::Vertex<media::geometry::Position3f, media::geometry::Normalf> ColladaVertex;
 
       size_t vertices_count = src_surface.VerticesCount ();
@@ -285,7 +283,7 @@ class Converter
 
           //регистрация вершинного потока в поверхности
 
-        dst_surface.vertex_streams.insert_pair (common::format ("texchannels.%s", tex_channels.Name (i)).c_str (), vs);
+        dst_surface.vertex_streams.insert_pair (common::format ("texchannels.%u", tex_channels.Name (i)).c_str (), vs);
       }
     }
     

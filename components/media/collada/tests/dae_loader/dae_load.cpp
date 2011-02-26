@@ -207,7 +207,7 @@ void dump (Surface& surface, int level, Model& model)
   for (size_t i=0; i<surface.TexVertexChannels ().Size (); i++)
   {
     print_space (level);
-    printf      ("texture_channel '%s'\n", surface.TexVertexChannels ().Name (i));
+    printf      ("texture_channel '%u'\n", surface.TexVertexChannels ().Name (i));
     
     const TexVertex* tv = surface.TexVertexChannels ().Data (i);
     
@@ -222,7 +222,7 @@ void dump (Surface& surface, int level, Model& model)
   for (size_t i=0; i<surface.ColorChannels ().Size (); i++)
   {
     print_space (level);
-    printf      ("color_channel '%s'\n", surface.ColorChannels ().Name (i));
+    printf      ("color_channel '%u'\n", surface.ColorChannels ().Name (i));
     
     const math::vec3f* color = surface.ColorChannels ().Data (i);
     
@@ -234,10 +234,13 @@ void dump (Surface& surface, int level, Model& model)
     }
   }  
   
+  printf ("z\n");
   for (size_t i = 0; i < surface.InfluenceChannels ().Size (); i++)
   {
     print_space (level);
+    printf ("1\n");
     printf ("influence_channel: '%s'\n", surface.InfluenceChannels ().Name (i));
+    printf ("2\n");
     
     const VertexInfluence* influence = surface.InfluenceChannels ().Data (i);
     

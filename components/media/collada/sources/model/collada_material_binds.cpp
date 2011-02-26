@@ -12,8 +12,8 @@ typedef stl::hash_map<stl::hash_key<const char*>, stl::string> MaterialMap;
 
 struct MaterialBinds::Impl: public xtl::reference_counter
 {
-  ChannelMap  channels;  //карта каналов    
-  MaterialMap materials; //карта материалов  
+  ChannelMap  channels;  //карта каналов
+  MaterialMap materials; //карта материалов
 };
 
 /*
@@ -159,7 +159,12 @@ int MaterialBinds::FindTexcoordChannel (const Surface& surface, const Texture& t
   if (!*surface_channel_name)
     return -1;
     
-  return surface.TexVertexChannels ().Find (surface_channel_name);
+  if (strstr (surface_channel_name, "CHANNEL") == surface_channel_name)
+    surface_channel_name += strlen ("CHANNEL");
+  else if (strstr (surface_channel_name, "TEX") == surface_channel_name)
+    surface_channel_name += strlen ("TEX");
+
+  return surface.TexVertexChannels ().Find (atoi (surface_channel_name));
 }
 
 /*

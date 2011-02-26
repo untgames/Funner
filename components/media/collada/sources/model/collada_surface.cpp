@@ -6,10 +6,42 @@ using namespace common;
 namespace
 {
 
+template <class T, class ChannelKey>
+struct Channel
+{
+  typedef stl::vector<T> Array;
+
+  Array      data;
+  ChannelKey name;
+
+  Channel (size_t verts_count, ChannelKey in_name) : data (verts_count), name (in_name) {}
+
+  ChannelKey GetName ()
+  {
+    return name;
+  }
+};
+
+template <class T>
+struct Channel<T, const char*>
+{
+  typedef stl::vector<T> Array;
+
+  Array       data;
+  stl::string name;
+
+  Channel (size_t verts_count, const char* in_name) : data (verts_count), name (in_name) {}
+
+  const char* GetName ()
+  {
+    return name.c_str ();
+  }
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Список каналов поверхности
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-template <class T> class ChannelListImpl: public Surface::IChannelList<T>
+template <class T, class Key> class ChannelListImpl: public Surface::IChannelList<T, Key>
 {
   enum { DEFAULT_CHANNELS_RESERVE = 8 };
   public:
@@ -24,7 +56,7 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
       
       for (typename ChannelArray::const_iterator i=impl.channels.begin (), end=impl.channels.end (); i!=end; ++i)
       {
-        Channel* channel = new Channel (**i);
+        Channel<T, Key>* channel = new Channel<T, Key> (**i);
         
         try
         {
@@ -52,22 +84,29 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание / удаление канала
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Create (const char* name)
+    size_t Create (Key name)
     {
-      if (!name)
-        throw xtl::make_null_argument_exception ("media::collada::Surface::IChannelList::Create", "name");
-        
-      Channel* channel = new Channel (vertices_count, name);
-      
       try
-      {    
-        channels.push_back (channel);
-      
-        return channels.size () - 1;
-      }
-      catch (...)
       {
-        delete channel;
+        CheckKeyName (name);
+
+        Channel<T, Key>* channel = new Channel<T, Key> (vertices_count, name);
+
+        try
+        {
+          channels.push_back (channel);
+
+          return channels.size () - 1;
+        }
+        catch (...)
+        {
+          delete channel;
+          throw;
+        }
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("media::collada::Surface::IChannelList::Create");
         throw;
       }
     }
@@ -93,29 +132,36 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Имя канала
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const char* Name (size_t channel) const
+    Key Name (size_t channel) const
     {
       if (channel >= channels.size ())
         throw xtl::make_range_exception ("media::collada::Surface::IChannelList::Name", "channel", channel, channels.size ());
         
-      return channels [channel]->name.c_str ();
+      return channels [channel]->GetName ();
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск канала по имени. Возвращает номер канала, или -1 в случае неудачи
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    int Find (const char* name) const
+    int Find (Key name) const
     {
-      if (!name)
-        throw xtl::make_null_argument_exception ("media::collada::Surface::IChannelList::Find", "name");
-        
-      for (typename ChannelArray::const_iterator i=channels.begin (), end=channels.end (); i!=end; ++i)
-        if ((*i)->name == name)
-          return i - channels.begin ();
+      try
+      {
+        CheckKeyName (name);
 
-      return -1;
+        for (typename ChannelArray::const_iterator i=channels.begin (), end=channels.end (); i!=end; ++i)
+          if ((*i)->name == name)
+            return i - channels.begin ();
+
+        return -1;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("media::collada::Surface::IChannelList::Find");
+        throw;
+      }
     }
-                
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Данные
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,28 +177,31 @@ template <class T> class ChannelListImpl: public Surface::IChannelList<T>
     {
       return const_cast<T*> (const_cast<const ChannelListImpl&> (*this).Data (channel));
     }
+
+  private:
+    template <class KeyType>
+    static void CheckKeyName (KeyType name)
+    {
+    }
+
+    template <typename KeyType>
+    static void CheckKeyName (KeyType* name)
+    {
+      if (!name)
+        throw xtl::make_null_argument_exception ("media::collada::Surface::IChannelList::CheckKeyName", "name");
+    }
   
   private:
-    struct Channel
-    {
-      typedef stl::vector<T> Array;
-      
-      Array       data;
-      stl::string name;
-
-      Channel  (size_t verts_count, const char* in_name) : data (verts_count), name (in_name) {}
-    };
-    
-    typedef stl::vector<Channel*> ChannelArray;
+    typedef stl::vector<Channel<T, Key>*> ChannelArray;
     
    private:     
      ChannelArray channels;
      size_t       vertices_count;
 };
 
-typedef ChannelListImpl<TexVertex>       TexVertexChannelListImpl;
-typedef ChannelListImpl<math::vec3f>     ColorChannelListImpl;
-typedef ChannelListImpl<VertexInfluence> InfluenceChannelListImpl;
+typedef ChannelListImpl<TexVertex, size_t>            TexVertexChannelListImpl;
+typedef ChannelListImpl<math::vec3f, size_t>          ColorChannelListImpl;
+typedef ChannelListImpl<VertexInfluence, const char*> InfluenceChannelListImpl;
 
 }
 
