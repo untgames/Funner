@@ -105,6 +105,15 @@ PropertyLayout& PropertyLayout::operator = (const PropertyLayout& layout)
 }
 
 /*
+    Идентификатор
+*/
+
+size_t PropertyLayout::Id () const
+{
+  return reinterpret_cast<size_t> (impl);
+}
+
+/*
     Получение объекта оповещения об удалении
 */
 

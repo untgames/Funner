@@ -1157,6 +1157,15 @@ PropertyMap& PropertyMap::operator = (const PropertyMap& map)
 }
 
 /*
+    Идентификатор
+*/
+
+size_t PropertyMap::Id () const
+{
+  return reinterpret_cast<size_t> (impl);
+}
+
+/*
     Получение объекта оповещения об удалении
 */
 
@@ -1767,9 +1776,9 @@ void PropertyMap::Clear ()
     Получение расположения параметров
 */
 
-const PropertyDesc* PropertyMap::Layout () const
+PropertyLayout PropertyMap::Layout () const
 {
-  return impl->layout.Properties ();
+  return impl->layout;
 }
 
 /*
