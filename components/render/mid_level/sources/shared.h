@@ -12,8 +12,10 @@
 #include <xtl/signal.h>
 #include <xtl/trackable.h>
 
+#include <common/hash.h>
 #include <common/log.h>
 #include <common/parser.h>
+#include <common/strlib.h>
 
 #include <media/image.h>
 #include <media/geometry/mesh_library.h>
@@ -105,6 +107,7 @@ class Wrappers
 #include "entity.h"
 #include "frame.h"
 #include "input_layout_manager.h"
+#include "program_parameters_manager.h"
 #include "manager.h"
 #include "material.h"
 #include "vertex_buffer.h"
