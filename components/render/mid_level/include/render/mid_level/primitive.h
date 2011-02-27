@@ -2,6 +2,7 @@
 #define RENDER_MID_LEVEL_PRIMITIVE_HEADER
 
 //добавить генерацию стандартных примитивов!!!
+//TODO: fonts & text
 
 #include <render/mid_level/material.h>
 

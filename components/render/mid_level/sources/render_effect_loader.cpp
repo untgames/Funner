@@ -5,6 +5,7 @@ using namespace render::low_level;
 using namespace render::mid_level;
 
 //TODO: регистр: высокий или низкий?
+//TODO: template programs
 
 namespace
 {
@@ -46,9 +47,11 @@ class EffectLoader
     {
       for_each_child (*iter, "BlendState",        xtl::bind (&EffectLoader::ParseBlendState, this, _1));
       for_each_child (*iter, "DepthStencilState", xtl::bind (&EffectLoader::ParseDepthStencilState, this, _1));
-      for_each_child (*iter, "RasterizerState",   xtl::bind (&EffectLoader::ParseRasterizerState, this, _1));
+      for_each_child (*iter, "RasterizerState",   xtl::bind (&EffectLoader::ParseRasterizerState, this, _1));      
       for_each_child (*iter, "SamplerState",      xtl::bind (&EffectLoader::ParseSamplerState, this, _1));
+      for_each_child (*iter, "ShaderLibrary",     xtl::bind (&EffectLoader::ParseShaderLibrary, this, _1));
       for_each_child (*iter, "Program",           xtl::bind (&EffectLoader::ParseProgram, this, _1));
+      for_each_child (*iter, "Template",          xtl::bind (&EffectLoader::ParseTemplateProgram, this, _1));
     }
     
 ///Разбор аргумента операции смешивания цветов
@@ -432,13 +435,106 @@ class EffectLoader
       {
         parser.Log ().Error (*iter, "%s", e.what ());
         throw;
-      }      
+      }
+    }
+    
+///Лог-функтор загрузки шейдеров
+    struct ShaderLoaderLog
+    {
+      ShaderLoaderLog (ParseNode& in_node, ParseLog& in_log) : node (in_node), log (in_log), node_printed (false) {}
+      
+      void operator () (const char* message)
+      {
+        if (!node_printed)
+        {
+          log.Error (node, "Shader library load failed:");
+          
+          node_printed = true;
+        }
+        
+        log.Printf (ParseLogMessageType_Error, message);
+      }
+      
+      ParseNode& node;
+      ParseLog&  log;
+      bool       node_printed;
+    };
+    
+///Разбор библиотеки шейдеров
+    void ParseShaderLibrary (Parser::Iterator iter)
+    {
+      const char* file_mask = get<const char*> (*iter, "");
+      
+      library.ShaderLibrary ().Load (file_mask, ShaderLoaderLog (*iter, parser.Log ()));
     }
     
 ///Разбор программы
     void ParseProgram (Parser::Iterator iter)
     {
+      const char* id      = get<const char*> (*iter, "");
+      const char* options = get<const char*> (*iter, "Options", "");
+      
+      static const size_t SHADERS_RESERVE_COUNT = 4;
+      
+      stl::vector<ShaderDesc> shaders;
+      
+      shaders.reserve (SHADERS_RESERVE_COUNT);
+      
+      for (Parser::NamesakeIterator shader_iter=iter->First ("Shader"); shader_iter; ++shader_iter)
+      {
+        ShaderDesc desc;
+        
+        memset (&desc, 0, sizeof (desc));
+        
+        Parser::AttributeIterator params_iter = make_attribute_iterator (*shader_iter);
+        
+        desc.name    = get<const char*> (params_iter);
+        desc.profile = get<const char*> (params_iter);
+        
+        media::rfx::Shader* shader = library.ShaderLibrary ().Find (desc.name, desc.profile);
+        
+        if (!shader)
+          raise_parser_exception (*shader_iter, "Shader '%s' for profile '%s' not found", desc.name, desc.profile);
+          
+        desc.source_code_size = shader->SourceCodeSize ();
+        desc.source_code      = shader->SourceCode ();
+        desc.options          = options;
+        
+        shaders.push_back (desc);
+      }
+      
+      if (shaders.empty ())
+        raise_parser_exception (*iter, "No shaders found for program");
+      
+      try
+      {
+        LowLevelProgramPtr program (device_manager->Device ().CreateProgram (shaders.size (), &shaders [0], ShaderLoaderLog (*iter, parser.Log ())), false);
+      
+        library.Programs ().Add (id, program);
+      }
+      catch (std::exception& e)
+      {
+        parser.Log ().Error (*iter, "%s", e.what ());
+        throw;
+      }            
     }    
+    
+///Разбор шаблонной программы
+    void ParseTemplateProgram (Parser::Iterator iter)
+    {
+      /*
+        template
+        {
+          option ".bump" "#define HAS_BUMP"
+          
+          program "my"
+          {
+            shader "my.vert" "glsl.vs"
+            shader "my.frag" "glsl.ps"
+          }
+        }
+      */
+    }
   
   private:
     common::Parser         parser;         //парсер файла эффектов

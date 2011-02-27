@@ -104,11 +104,12 @@ typename EffectLoaderLibrary::Library<Ptr>::Item EffectLoaderLibrary::Library<Pt
 
 struct EffectLoaderLibrary::Impl
 {
-  RasterizerStateLibrary   rasterizer_states;     //библиотека состояний растеризатора
-  BlendStateLibrary        blend_states;          //библиотека состояний уровня смешивания цветов
-  DepthStencilStateLibrary depth_stencil_states;  //библиотека состояний уровня отсечения
-  SamplerStateLibrary      sampler_states;        //библиотека состояний текстурных сэмплеров
-  ProgramLibrary           programs;              //библиотека программ
+  RasterizerStateLibrary     rasterizer_states;     //библиотека состояний растеризатора
+  BlendStateLibrary          blend_states;          //библиотека состояний уровня смешивания цветов
+  DepthStencilStateLibrary   depth_stencil_states;  //библиотека состояний уровня отсечения
+  SamplerStateLibrary        sampler_states;        //библиотека состояний текстурных сэмплеров
+  ProgramLibrary             programs;              //библиотека программ
+  media::rfx::ShaderLibrary  shader_library;        //библиотека шейдеров
 };
 
 /*
@@ -151,4 +152,9 @@ EffectLoaderLibrary::SamplerStateLibrary& EffectLoaderLibrary::SamplerStates ()
 EffectLoaderLibrary::ProgramLibrary& EffectLoaderLibrary::Programs ()
 {
   return impl->programs;
+}
+
+media::rfx::ShaderLibrary& EffectLoaderLibrary::ShaderLibrary ()
+{
+  return impl->shader_library;
 }
