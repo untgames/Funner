@@ -30,7 +30,7 @@ float Shape::Margin ()
   return collision_shape->getMargin ();
 }
 
-void Shape::GetMargin (float value)
+void Shape::SetMargin (float value)
 {
   collision_shape->setMargin (value);
 }
