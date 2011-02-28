@@ -3,15 +3,15 @@
 
 #include <math/vector.h>
 
-#include <media/physics/triangle_mesh_shape_data.h>
-#include <media/physics/compound_shape_data.h>
-
 namespace media
 {
 
 namespace physics
 {
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Тип геометрического тела
+///////////////////////////////////////////////////////////////////////////////////////////////////
 enum ShapeType
 {
   ShapeType_Box,
@@ -22,42 +22,20 @@ enum ShapeType
   ShapeType_Compound
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание тела в виде параллелепипеда
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct BoxShapeData
-{
-  math::vec3f half_dimensions; //половины длин сторон
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание тела в виде сферы
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct SphereShapeData
-{
-  float radius;  //радиус
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание тела в виде капсулы
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct CapsuleShapeData
-{
-  float radius;  //радиус полусфер
-  float height;  //высота тела
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Описание тела в виде плоскости
-///////////////////////////////////////////////////////////////////////////////////////////////////
-struct PlaneShapeData
-{
-  math::vec3f normal;  //нормаль
-  float       d;       //смещение
-};
-
 template <class T> struct ShapeDataType     { typedef T& Type; };
 template <class T> struct ShapeDataType<T*> { typedef T* Type; };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Сопоставление типов геометрических тел
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> struct ShapeTypeId;
+
+template <> struct ShapeTypeId<shapes::Box>           { enum { Type = ShapeType_Box }; };
+template <> struct ShapeTypeId<shapes::Sphere>        { enum { Type = ShapeType_Sphere }; };
+template <> struct ShapeTypeId<shapes::Capsule>       { enum { Type = ShapeType_Capsule }; };
+template <> struct ShapeTypeId<shapes::Plane>         { enum { Type = ShapeType_Plane }; };
+template <> struct ShapeTypeId<shapes::TriangleMesh>  { enum { Type = ShapeType_TriangleMesh }; };
+template <> struct ShapeTypeId<shapes::Compount>      { enum { Type = ShapeType_TriangleMesh }; };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Геометрическое тело
@@ -103,7 +81,7 @@ class Shape
 
     template <class T> const typename ShapeDataType<T>::Type Data    () const;
     template <class T>       typename ShapeDataType<T>::Type Data    ();
-    template <class T> void                                  SetData (const T& data);
+    template <class T>       void                            SetData (const T& data);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -112,16 +90,27 @@ class Shape
 
   private:
     struct Impl;
-    Impl* impl;
+    struct IShapeData;
 
-  private:
+    template <class T> struct ShapeData;
+
     Shape (Impl* impl);
+    
+    void        SetDataCore (IShapeData*);
+    IShapeData* DataCore    ();
+    
+    static void RaiseWrongType (ShapeType source_type, ShapeType required_type);
+
+  private:    
+    Impl* impl;    
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void swap (Shape&, Shape&);
+
+#include <media/physics/detail/shape.inl>
 
 }
 

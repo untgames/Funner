@@ -19,8 +19,10 @@ namespace media
 namespace physics
 {
 
-template <class T>
-class Collection
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Коллекция физической библиотеки 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T> class PhysicsLibraryCollection
 {
   public:
     typedef T                         Item;
@@ -30,11 +32,11 @@ class Collection
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор/деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Collection ();
-    Collection (const Collection&);
-    ~Collection ();
+    PhysicsLibraryCollection ();
+    PhysicsLibraryCollection (const PhysicsLibraryCollection&);
+    ~PhysicsLibraryCollection ();
 
-    Collection& operator = (const Collection&);
+    PhysicsLibraryCollection& operator = (const PhysicsLibraryCollection&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Количество элементов в библиотеке / проверка на пустоту
@@ -69,7 +71,7 @@ class Collection
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Swap (Collection&);
+    void Swap (PhysicsLibraryCollection&);
 
   private:
     struct Impl;
@@ -82,9 +84,9 @@ class Collection
 class PhysicsLibrary
 {
   public:
-    typedef Collection<RigidBody> RigidBodyCollection;
-    typedef Collection<Material>  MaterialCollection;
-    typedef Collection<Shape>     ShapeCollection;
+    typedef PhysicsLibraryCollection<RigidBody> RigidBodyCollection;
+    typedef PhysicsLibraryCollection<Material>  MaterialCollection;
+    typedef PhysicsLibraryCollection<Shape>     ShapeCollection;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
