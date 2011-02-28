@@ -22,6 +22,14 @@ enum ShapeType
   ShapeType_Compound
 };
 
+namespace shapes
+{
+
+class TriangleMesh;
+class Compound;
+
+}
+
 template <class T> struct ShapeDataType     { typedef T& Type; };
 template <class T> struct ShapeDataType<T*> { typedef T* Type; };
 
@@ -35,7 +43,7 @@ template <> struct ShapeTypeId<shapes::Sphere>        { enum { Type = ShapeType_
 template <> struct ShapeTypeId<shapes::Capsule>       { enum { Type = ShapeType_Capsule }; };
 template <> struct ShapeTypeId<shapes::Plane>         { enum { Type = ShapeType_Plane }; };
 template <> struct ShapeTypeId<shapes::TriangleMesh>  { enum { Type = ShapeType_TriangleMesh }; };
-template <> struct ShapeTypeId<shapes::Compount>      { enum { Type = ShapeType_TriangleMesh }; };
+template <> struct ShapeTypeId<shapes::Compound>      { enum { Type = ShapeType_Compound }; };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Геометрическое тело

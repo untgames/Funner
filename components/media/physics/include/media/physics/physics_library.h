@@ -3,7 +3,10 @@
 
 #include <common/serializer_manager.h>
 
+#include <media/physics/material.h>
 #include <media/physics/rigid_body.h>
+#include <media/physics/shape.h>
+#include <media/physics/triangle_mesh.h>
 
 namespace xtl
 {
@@ -84,9 +87,10 @@ template <class T> class PhysicsLibraryCollection
 class PhysicsLibrary
 {
   public:
-    typedef PhysicsLibraryCollection<RigidBody> RigidBodyCollection;
-    typedef PhysicsLibraryCollection<Material>  MaterialCollection;
-    typedef PhysicsLibraryCollection<Shape>     ShapeCollection;
+    typedef PhysicsLibraryCollection<RigidBody>    RigidBodyCollection;
+    typedef PhysicsLibraryCollection<Material>     MaterialCollection;
+    typedef PhysicsLibraryCollection<Shape>        ShapeCollection;
+    typedef PhysicsLibraryCollection<TriangleMesh> TriangleMeshCollection;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
@@ -101,12 +105,14 @@ class PhysicsLibrary
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение коллекций
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const RigidBodyCollection& RigidBodies () const;
-          RigidBodyCollection& RigidBodies ();
-    const MaterialCollection&  Materials   () const;
-          MaterialCollection&  Materials   ();
-    const ShapeCollection&     Shapes      () const;
-          ShapeCollection&     Shapes      ();
+    const RigidBodyCollection&    RigidBodies    () const;
+          RigidBodyCollection&    RigidBodies    ();
+    const MaterialCollection&     Materials      () const;
+          MaterialCollection&     Materials      ();
+    const ShapeCollection&        Shapes         () const;
+          ShapeCollection&        Shapes         ();
+    const TriangleMeshCollection& TriangleMeshes () const;
+          TriangleMeshCollection& TriangleMeshes ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка / сохранение

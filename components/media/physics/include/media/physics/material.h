@@ -2,6 +2,7 @@
 #define MEDIALIB_PHYSICS_MATERIAL_HEADER
 
 #include <cstddef>
+
 #include <math/vector.h>
 
 namespace media
