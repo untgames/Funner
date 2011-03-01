@@ -8,7 +8,6 @@
 
 #include <math/matrix.h>
 
-#include <media/rfx/effect.h>
 #include <media/rfx/material.h>
 #include <media/rfx/shader.h>
 
@@ -83,58 +82,6 @@ void dump (const Material& material)
   dump (material.Properties ());
   
   printf (")");
-}
-
-void dump (const TechniquePass& pass)
-{
-  printf ("pass (properties=");
-  dump (pass.Properties ());
-  printf (")");
-}
-
-void dump (const Technique& technique)
-{
-  printf ("technique (name='%s', passes=[", technique.Name ());
-  
-  for (size_t i=0; i<technique.PassesCount (); i++)
-  {
-    if (i)
-      printf (", ");
-  
-    dump (technique.Pass (i));
-  }
-    
-  printf ("])");
-}
-
-void dump (const EffectParameter& param)
-{
-  printf ("param (name='%s', type=%s, count=%u)", param.Name (), get_name (param.Type ()), param.ElementsCount ());
-}
-
-void dump (const Effect& effect)
-{
-  printf ("effect (name='%s', parameters=[", effect.Name ());
-  
-  for (size_t i=0; i<effect.ParametersCount (); i++)
-  {
-    if (i)
-      printf (", ");
-  
-    dump (effect.Parameter (i));
-  }
-  
-  printf ("], techniques=[");
-  
-  for (size_t i=0; i<effect.TechniquesCount (); i++)
-  {
-    if (i)
-      printf (", ");
-  
-    dump (effect.Technique (i));
-  }
-  
-  printf ("])");
 }
 
 template <class T>

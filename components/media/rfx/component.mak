@@ -1,7 +1,11 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.RFX.SOURCES MEDIA.RFX.DEFAULT_SERIALIZERS.SOURCES MEDIA.RFX.TESTS MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS MEDIA.RFX.INFO
+TARGETS += MEDIA.RFX.SOURCES
+#TARGETS += MEDIA.RFX.DEFAULT_SERIALIZERS.SOURCES
+#TARGETS += MEDIA.RFX.TESTS
+#TARGETS += MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS
+#TARGETS += MEDIA.RFX.INFO
 
 #Цель №1 - sources
 MEDIA.RFX.SOURCES.TYPE             := static-lib

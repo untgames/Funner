@@ -1,8 +1,11 @@
 #ifndef MEDIALIB_RFX_MATERIAL_LIBRARY_HEADER
 #define MEDIALIB_RFX_MATERIAL_LIBRARY_HEADER
 
-#include <media/rfx/material.h>
+#include <stl/auto_ptr.h>
+
 #include <common/serializer_manager.h>
+
+#include <media/rfx/material.h>
 
 namespace xtl
 {

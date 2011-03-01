@@ -1,9 +1,0 @@
-Results of effect_test:
-default constructor: effect (name='', parameters=[], techniques=[])
-add parameter: 0
-add parameter: 1
-add technique: 0
-add technique: 1
-after initialize: effect (name='effect1', parameters=[param (name='param1', type=float4, count=3), param (name='param2', type=int, count=1)], techniques=[technique (name='technique1', passes=[pass (properties=[A='hello']), pass (properties=[B='world'])]), technique (name='technique2', passes=[pass (properties=[B='world']), pass (properties=[C='!'])])])
-after remove: effect (name='effect1', parameters=[param (name='param2', type=int, count=1)], techniques=[technique (name='technique1', passes=[pass (properties=[B='world'])])])
-clone: effect (name='effect1', parameters=[param (name='param2', type=int, count=1)], techniques=[technique (name='technique1', passes=[pass (properties=[B='world'])])])

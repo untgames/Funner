@@ -1,7 +1,10 @@
 #ifndef MEDIALIB_RFX_MATERIAL_HEADER
 #define MEDIALIB_RFX_MATERIAL_HEADER
 
+#include <common/string.h>
 #include <common/property_map.h>
+
+#include <media/rfx/texmap.h>
 
 namespace media
 {
@@ -41,10 +44,21 @@ class Material
     void        SetName  (const char* name);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Имя эффекта
+///Имя программы шейдинга (отсутствие имени - применять программу по умолчанию)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetEffect (const char* name);
-    const char* Effect    () const;
+    void        SetProgram (const char* name);
+    const char* Program    () const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Тэги
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void          SetTags   (const char* tags);
+    void          SetTags   (const common::StringArray& tags);
+    size_t        TagsCount () const;
+    const char*   Tag       (size_t index) const;
+    size_t        TagHash   (size_t index) const;
+    const char**  Tags      () const;
+    const size_t* TagHashes () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Свойства материала
@@ -52,6 +66,14 @@ class Material
           common::PropertyMap& Properties ();
     const common::PropertyMap& Properties () const;
     
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Текстурные карты
+///////////////////////////////////////////////////////////////////////////////////////////////////
+          void                SetTexmapCount (size_t count);
+          size_t              TexmapCount    () const;
+          media::rfx::Texmap& Texmap         (size_t index);
+    const media::rfx::Texmap& Texmap         (size_t index) const;    
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////

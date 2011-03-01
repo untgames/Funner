@@ -10,7 +10,6 @@
 #include <common/log.h>
 #include <common/strlib.h>
 
-#include <media/rfx/effect_library.h>
 #include <media/rfx/material_library.h>
 #include <media/rfx/shader_library.h>
 
