@@ -28,7 +28,6 @@ struct Material::Impl: public xtl::reference_counter
     , tags (impl.tags.Clone ())
     , tag_hashes (impl.tag_hashes)
     , properties (impl.properties.Clone ())
-    , texmaps (impl.texmaps)
   {
     texmaps.reserve (impl.texmaps.size ());
     

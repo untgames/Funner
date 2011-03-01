@@ -10,13 +10,19 @@ int main ()
     
     dump ("default constructor", material);
     
+    float float_array [] = {2.34f, 4.56f};
+    
     material.Properties ().SetProperty ("String", "Hello world");
     material.Properties ().SetProperty ("Integer", 1);
-    material.Properties ().SetProperty ("Float", 2.34f);
+    material.Properties ().SetProperty ("Float", sizeof (float_array) / sizeof (*float_array), float_array);
     material.Properties ().SetProperty ("Vector", vec4f (1.0f, 2.0f, 3.0f, 4.0f));
     
-    material.SetEffect ("my_effect");
+    material.SetProgram ("my_effect");
     material.SetName ("material1");
+    
+    material.SetTexmapCount (1);
+    
+    material.Texmap (0).SetImage ("image.png");
     
     dump ("after change properties", material);
     

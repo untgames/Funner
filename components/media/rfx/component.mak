@@ -3,7 +3,7 @@
 ###################################################################################################
 TARGETS += MEDIA.RFX.SOURCES
 #TARGETS += MEDIA.RFX.DEFAULT_SERIALIZERS.SOURCES
-#TARGETS += MEDIA.RFX.TESTS
+TARGETS += MEDIA.RFX.TESTS
 #TARGETS += MEDIA.RFX.DEFAULT_SERIALIZERS.TESTS
 #TARGETS += MEDIA.RFX.INFO
 
