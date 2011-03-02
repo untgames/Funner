@@ -82,15 +82,21 @@ template <class T> class PhysicsLibraryCollection
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+template <class T>
+void swap (PhysicsLibraryCollection<T>&, PhysicsLibraryCollection<T>&);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Физическая библиотека
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class PhysicsLibrary
 {
   public:
-    typedef PhysicsLibraryCollection<RigidBody>    RigidBodyCollection;
-    typedef PhysicsLibraryCollection<Material>     MaterialCollection;
-    typedef PhysicsLibraryCollection<Shape>        ShapeCollection;
-    typedef PhysicsLibraryCollection<TriangleMesh> TriangleMeshCollection;
+    typedef PhysicsLibraryCollection<RigidBody>            RigidBodyCollection;
+    typedef PhysicsLibraryCollection<Material>             MaterialCollection;
+    typedef PhysicsLibraryCollection<Shape>                ShapeCollection;
+    typedef PhysicsLibraryCollection<shapes::TriangleMesh> TriangleMeshCollection;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструкторы / деструктор / присваивание
@@ -117,8 +123,16 @@ class PhysicsLibrary
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка / сохранение
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    struct SaveOptions
+    {
+      bool        separate_meshes_file;   //сохранять ли меши в отдельном файле
+      const char* meshes_file_name;       //если separate_meshes_file == true - имя файла для сохранения мешей
+
+      SaveOptions ();
+    };
+
     void Load (const char* file_name);
-    void Save (const char* file_name);
+    void Save (const char* file_name, const SaveOptions& options) const ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -141,7 +155,7 @@ void swap (PhysicsLibrary&, PhysicsLibrary&);
 typedef common::ResourceSerializerManager
 <
   void (const char* file_name, PhysicsLibrary& library),
-  void (const char* file_name, const PhysicsLibrary& library)
+  void (const char* file_name, const PhysicsLibrary::SaveOptions& options, const PhysicsLibrary& library)
 > PhysicsLibraryManager;
 
 }

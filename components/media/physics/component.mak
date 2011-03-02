@@ -1,18 +1,18 @@
 ###################################################################################################
 #Определения и константы
 ###################################################################################################
-TARGETS := MEDIA.PHYSICS.SOURCES MEDIA.PHYSICS.TESTS MEDIA.PHYSICS.INFO
+TARGETS := MEDIA.PHYSICS.CORE.SOURCES MEDIA.PHYSICS.CORE.TESTS MEDIA.PHYSICS.INFO
 
-#Цель - Sound sources
-MEDIA.PHYSICS.SOURCES.TYPE        := static-lib
-MEDIA.PHYSICS.SOURCES.NAME        := funner.media.physics
-MEDIA.PHYSICS.SOURCES.SOURCE_DIRS := sources/core
-MEDIA.PHYSICS.SOURCES.IMPORTS     := compile.media.physics
+#Цель - core sources
+MEDIA.PHYSICS.CORE.SOURCES.TYPE        := static-lib
+MEDIA.PHYSICS.CORE.SOURCES.NAME        := funner.media.physics
+MEDIA.PHYSICS.CORE.SOURCES.SOURCE_DIRS := sources/core
+MEDIA.PHYSICS.CORE.SOURCES.IMPORTS     := compile.media.physics compile.media.shared
 
-#Цель - Sound tests
-MEDIA.PHYSICS.TESTS.TYPE        := test-suite
-MEDIA.PHYSICS.TESTS.SOURCE_DIRS := tests
-MEDIA.PHYSICS.TESTS.IMPORTS     := compile.media.physics link.media.physics
+#Цель - core tests
+MEDIA.PHYSICS.CORE.TESTS.TYPE        := test-suite
+MEDIA.PHYSICS.CORE.TESTS.SOURCE_DIRS := tests/core
+MEDIA.PHYSICS.CORE.TESTS.IMPORTS     := compile.media.physics link.media.physics
 
 #Цель - сборка документации
 MEDIA.PHYSICS.INFO.TYPE        := doxygen-info

@@ -1,6 +1,9 @@
 #ifndef MEDIALIB_PHYSICS_RIGID_BODY_HEADER
 #define MEDIALIB_PHYSICS_RIGID_BODY_HEADER
 
+#include <math/quat.h>
+#include <math/vector.h>
+
 #include <media/physics/material.h>
 #include <media/physics/shape.h>
 
@@ -66,8 +69,10 @@ class RigidBody
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление центром масс
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const math::vec3f&  CenterOfMass    () const;
-    void                SetCenterOfMass (const math::vec3f& center);
+    const math::vec3f&  CenterOfMassPosition       () const;
+    void                SetCenterOfMassPosition    (const math::vec3f& center);
+    const math::quatf&  CenterOfMassOrientation    () const;
+    void                SetCenterOfMassOrientation (const math::quatf& orientation);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///”правление тензором

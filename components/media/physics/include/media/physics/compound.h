@@ -3,6 +3,9 @@
 
 #include <cstddef>
 
+#include <math/quat.h>
+#include <math/vector.h>
+
 namespace media
 {
 
@@ -40,21 +43,37 @@ class Compound
     Compound Clone () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Описание положения объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    struct ShapeTransform
+    {
+      math::vec3f position;
+      math::quatf orientation;
+
+      ShapeTransform ();
+      ShapeTransform (math::vec3f position, math::quatf orientation);
+    };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление / удаление тел
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t Size     () const;
     size_t Capacity () const;
     void   Reserve  (size_t size);
 
-    void Attach    (const Shape& shape);
-    void Detach    (const Shape& shape);
+    void Attach    (const media::physics::Shape& shape, const math::vec3f& position, const math::quatf& orientation);
+    void Attach    (const media::physics::Shape& shape, const ShapeTransform& transform);
+    void Detach    (const media::physics::Shape& shape);
+    void Detach    (size_t index);
     void DetachAll ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение тел
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const media::physics::Shape& Shape (size_t index) const;
-          media::physics::Shape& Shape (size_t index);
+    const media::physics::Shape& Shape     (size_t index) const;
+          media::physics::Shape& Shape     (size_t index);
+    const ShapeTransform&        Transform (size_t index) const;
+          ShapeTransform&        Transform (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
@@ -63,6 +82,10 @@ class Compound
 
   private:
     struct Impl;
+
+    Compound (Impl* impl);
+
+  private:
     Impl* impl;
 };
 

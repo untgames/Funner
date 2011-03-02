@@ -20,7 +20,7 @@ struct Box
   math::vec3f half_dimensions; //половины длин сторон
   
   Box ();
-  Box (const math::vec3f& dimensions);
+  Box (const math::vec3f& half_dimensions);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -25,8 +25,12 @@ enum ShapeType
 namespace shapes
 {
 
-class TriangleMesh;
-class Compound;
+struct Box;
+struct Sphere;
+struct Capsule;
+struct Plane;
+class  TriangleMesh;
+class  Compound;
 
 }
 
@@ -107,6 +111,7 @@ class Shape
     void        SetDataCore (IShapeData*);
     IShapeData* DataCore    ();
     
+    static void RaiseNullArgument (const char* source, const char* argument_name);
     static void RaiseWrongType (ShapeType source_type, ShapeType required_type);
 
   private:    
