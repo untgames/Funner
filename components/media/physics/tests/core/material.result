@@ -1,0 +1,19 @@
+Results of material_test:
+Material 'default material':
+  linear damping       0.00
+  angular damping      0.00
+  friction             0.50
+  anisotropic friction [1.00 1.00 1.00]
+  restitution          0.00
+Material 'modified material':
+  linear damping       0.10
+  angular damping      0.10
+  friction             0.10
+  anisotropic friction [0.10 0.20 0.30]
+  restitution          0.10
+Material 'modified material':
+  linear damping       0.10
+  angular damping      0.10
+  friction             0.10
+  anisotropic friction [0.10 0.20 0.30]
+  restitution          0.10

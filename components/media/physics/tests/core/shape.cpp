@@ -17,16 +17,6 @@ const char* get_type_name (ShapeType type)
   }
 }
 
-void dump (const math::vec3f& v)
-{
-  printf ("[%.2f %.2f %.2f]", v.x, v.y, v.z);
-}
-
-void dump (const math::quatf& q)
-{
-  printf ("[%.2f %.2f %.2f %.2f]", q.x, q.y, q.z, q.w);
-}
-
 void dump (const Box& box)
 {
   printf ("  half dimensions ");
