@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<physics_library>
+  <materials>
+    <material name="Ship" linear_damping="0.5" angular_damping="0.9" anisotropic_friction="0.1 0.2 0.3" friction="5" restitution="0.7"/>
+    <material name="Default"/>
+  </materials>
+  <triangle_meshes>
+    <triangle_mesh name="ConvexMesh" is_convex="1">
+      <vertices count="4">
+        0 0 0 1 2 3 2 4 6 3 6 9
+      </vertices>
+    </triangle_mesh>
+    <triangle_mesh name="TriangleMesh" is_convex="0">
+      <vertices count="4">
+        0 0 0 1 2 3 2 4 6 3 6 9
+      </vertices>
+      <triangle_indices count="2">
+         0 1 2 2 3 4
+      </triangle_indices>
+    </triangle_mesh>
+  </triangle_meshes>
+  <shapes>
+    <shape name="BigShipShape" type="box" half_dimensions="150 100.5 800"/>
+    <shape name="MeteoritesShape" type="sphere" radius="10.1" margin="5.1"/>
+    <shape name="Meteorites2Shape" type="capsule" radius="2.1" height="1.1"/>
+    <shape name="PlaneShape" type="plane" normal="0 1 0" d="7.5"/>
+    <shape name="ConvexShape" type="triangle_mesh" mesh_name="ConvexMesh" margin="2"/>
+    <shape name="TriangleMeshShape" type="triangle_mesh" mesh_name="TriangleMesh"/>
+    <shape name="CompoundShape" type="compound">
+      <shape_instance name="BigShipShape"/>
+      <shape_instance name="MeteoritesShape" position="100 10 20"/>
+      <shape_instance name="Meteorites2Shape" position="-100 10 20" orientation="0.5 10 15 5"/>
+      <shape_instance name="ConvexShape" position="10 100.5 30" rotation="0 90.5 0"/>
+    </shape>
+  </shapes>
+  <rigid_bodies>
+    <rigid_body name="BigShip" shape="BigShipShape" Material="Ship" frozen_position_x="1" frozen_position_y="1" frozen_rotation="1"/>
+    <rigid_body name="CompoundBody" shape="CompoundShape" mass="0.01" center_of_mass_position="1.1 1.2 1.3" center_of_mass_orientation="0.1 0.2 0.3 0.4"/>
+    <rigid_body name="TriangleMeshBody" shape="TriangleMeshShape" center_of_mass_rotation="0 80.65 0" mass_space_inertia_tensor="0.1 0.2 0.3" Material="Default"/>
+    <rigid_body name="BigShip2" shape="BigShipShape" frozen_position="1" frozen_rotation_x="1" frozen_rotation_y="1"/>
+    <rigid_body name="KinematicBody" shape="ConvexShape" kinematic="1"/>
+  </rigid_bodies>
+</physics_library>

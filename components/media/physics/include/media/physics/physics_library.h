@@ -67,7 +67,7 @@ template <class T> class PhysicsLibraryCollection
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление / удаление элементов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Attach    (const char* id, Item&);
+    void Attach    (const char* id, const Item&);
     void Detach    (const char* id);
     void DetachAll ();
 
@@ -138,7 +138,7 @@ class PhysicsLibrary
     };
 
     void Load (const char* file_name);
-    void Save (const char* file_name, const SaveOptions& options) const ;
+    void Save (const char* file_name, const SaveOptions& options) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

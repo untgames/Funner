@@ -109,7 +109,7 @@ const typename PhysicsLibraryCollection<T>::Item* PhysicsLibraryCollection<T>::F
 */
 
 template <class T>
-void PhysicsLibraryCollection<T>::Attach (const char* id, Item& item)
+void PhysicsLibraryCollection<T>::Attach (const char* id, const Item& item)
 {
   impl->library.Insert (id, item);
 }
