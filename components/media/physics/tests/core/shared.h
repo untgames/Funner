@@ -2,6 +2,7 @@
 #define MEDIALIB_PHYSICS_TESTS_HEADER
 
 #include <xtl/exception.h>
+#include <xtl/iterator.h>
 
 #include <media/physics/basic_shapes.h>
 #include <media/physics/compound.h>

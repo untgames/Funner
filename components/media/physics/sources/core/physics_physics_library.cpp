@@ -12,10 +12,11 @@ PhysicsLibrary::SaveOptions::SaveOptions ()
 
 struct PhysicsLibrary::Impl : public xtl::reference_counter
 {
-  RigidBodyCollection    rigid_bodies;
-  MaterialCollection     materials;
-  ShapeCollection        shapes;
-  TriangleMeshCollection triangle_meshes;
+  stl::string            name;            //имя библиотеки
+  RigidBodyCollection    rigid_bodies;    //коллекция твердых тел
+  MaterialCollection     materials;       //коллекция материалов
+  ShapeCollection        shapes;          //коллекция геометрических тел
+  TriangleMeshCollection triangle_meshes; //коллекция сеток
 };
 
 /*
@@ -65,6 +66,23 @@ PhysicsLibrary& PhysicsLibrary::operator = (const PhysicsLibrary& source)
   return *this;
 }
     
+/*
+   Имя модели
+*/
+
+const char* PhysicsLibrary::Name () const
+{
+  return impl->name.c_str ();
+}
+
+void PhysicsLibrary::Rename (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("media::physics::PhysicsLibrary::Rename", name);
+
+  impl->name = name;
+}
+
 /*
    Получение коллекций
 */
