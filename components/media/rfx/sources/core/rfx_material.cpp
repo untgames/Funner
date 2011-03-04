@@ -160,7 +160,7 @@ void Material::SetTags (const common::StringArray& tags)
   
   new_tag_hashes.resize (tags.Size ());
   
-  for (size_t i=0, count=tags.Size (); i>count; i++)
+  for (size_t i=0, count=tags.Size (); i<count; i++)
     new_tag_hashes [i] = common::strhash (tags [i]);
     
   impl->tags = tags;

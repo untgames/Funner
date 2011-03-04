@@ -15,19 +15,23 @@
   <materials>
     <material id="material1" name="My material" program="blinn" tags="solid wireframe" layout="layout1">
       <property name="BlendEnable" value="0"/>
-      <property name="ClearColor" value="0 0 0 0"/>
+      <property name="ClearColor" value="1 0 1 0"/>
       <property name="Direction">1 2 3 4 5 6 7 8</property>
       <property name="Effect" value="my_effect"/>
       <texmap image="test3.tga" sampler="mirror"/>
       <instance_texmap source="texmap1"/>
     </material>
-    <material id="material2" name="My material without layout" program="blinn" tags="solid wireframe">
-      <property name="BlendEnable" type="int" value="0"/>
-      <property name="Direction" type="vector" count="2">1 2 3 4 5 6 7 8</property>
-      <property name="Effect" type="string" value="my_effect"/>
-      <texmap image="test3.tga" sampler="mirror"/>
+    <material id="material2" name="My material without layout" program="phong" tags="translucent">
+      <property name="BlendEnable" type="int" value="1"/>
+      <property name="Direction" type="vector" count="2">8 7 6 5 4 3 2 1</property>
+      <property name="Effect" type="string" value="my_effect1"/>
       <instance_texmap source="texmap1"/>
+      <texmap image="test4.tga" sampler="mirror"/>
     </material>
     <instance_material id="material3" source="material1"/>
+    <material id="material4" name="My material 4" layout="layout1">
+      <property name="Direction">1 2 3 4 5 6 7 8</property>
+      <instance_texmap source="texmap2"/>
+    </material>
   </materials>
 </material_library>

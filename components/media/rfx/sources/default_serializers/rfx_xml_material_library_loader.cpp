@@ -81,7 +81,7 @@ class XmtlLoader
     {
       for_each_child (*parse_iter, "layouts", xtl::bind (&XmtlLoader::LoadLayouts, this, _1));
       for_each_child (*parse_iter, "texmaps", xtl::bind (&XmtlLoader::LoadTexmaps, this, _1));
-      for_each_child (*parse_iter, "materials", xtl::bind (&XmtlLoader::LoadMaterial, this, _1));
+      for_each_child (*parse_iter, "materials", xtl::bind (&XmtlLoader::LoadMaterials, this, _1));
     }
     
 ///Загрузка шаблонов
@@ -184,9 +184,14 @@ class XmtlLoader
         
       common::StringArray tokens = common::split (value);
       
-      xtl::io::token_iterator<const char*> iter = xtl::io::make_token_iterator (tokens.Data (), tokens.Data () + tokens.Size ());
+      size_t read_count = 0;
       
-      size_t read_count = xtl::io::read_range (iter, destination, count);
+      if (tokens.Size ())
+      {
+        xtl::io::token_iterator<const char*> iter = xtl::io::make_token_iterator (tokens.Data (), tokens.Data () + tokens.Size ());
+      
+        read_count = xtl::io::read_range (iter, destination, count);
+      }
       
       if (read_count != count)
         log.Error (*parse_iter, "Bad value (%u elements readed, required is %u)", read_count, count);
@@ -223,8 +228,9 @@ class XmtlLoader
 ///Загрузка свойства материала
     void LoadMaterialProperty (Parser::Iterator parse_iter, common::PropertyMap& properties, const char* layout)
     {
-      const char* name           = get<const char*> (*parse_iter, "name");      
-      size_t      property_index = 0;
+      const char* name = get<const char*> (*parse_iter, "name");      
+      
+      size_t property_index = 0;
       
       if (*layout)
       {
@@ -235,10 +241,16 @@ class XmtlLoader
           log.Error (*parse_iter, "Property '%s' has not been declared in layout '%s'", name, layout);
           return;
         }
+        
+        if (parse_iter->First ("type") || parse_iter->First ("count"))
+          log.Warning (*parse_iter, "Property of fixed layout material can't have 'type' or 'count' attributes");
       }
       else
       {
-        property_index = LoadLayoutProperty (parse_iter, properties.Layout ());
+        common::PropertyType type  = GetPropertyType (get<const char*> (*parse_iter, "type"), *parse_iter);
+        size_t               count = get<size_t> (*parse_iter, "count", 1);
+        
+        property_index = properties.AddProperty (name, type, count);
       }
       
       common::PropertyType type = properties.PropertyType (property_index);
@@ -266,7 +278,7 @@ class XmtlLoader
           LoadPropertyValue (parse_iter, properties, property_index, matrix_cache);
           break;
         default:
-          log.Error (*parse_iter, "Unexpected proeprty type '%s'", get_name (type));
+          log.Error (*parse_iter, "Unexpected property type '%s'", get_name (type));
           return;
       }
     }

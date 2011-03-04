@@ -20,9 +20,6 @@ void dump (const PropertyMap& properties, const char* indent)
 {
   for (size_t i=0; i<properties.Size (); i++)
   {
-    if (i)
-      printf ("\n");
-      
     printf ("%s%s=", indent, properties.PropertyName (i));
   
     PropertyType type = properties.PropertyType (i);
@@ -74,6 +71,8 @@ void dump (const PropertyMap& properties, const char* indent)
     
     if (properties.PropertyElementsCount (i) > 1)
       printf (")");    
+      
+    printf ("\n");      
   }
 }
 
@@ -89,9 +88,16 @@ void dump (const Material& material, const char* id)
     tags += material.Tag (i);
   }  
 
-  printf ("material:\n  id='%s'\n  name='%s'\n  program='%s'\n  tags='%s' properties:\n", id, material.Name (), material.Program (), tags.c_str ());
+  printf ("material:\n  id='%s'\n  name='%s'\n  program='%s'\n  tags='%s'\n  properties:\n", id, material.Name (), material.Program (), tags.c_str ());
   
   dump (material.Properties (), "    ");
+  
+  printf ("  texmaps:\n");
+  
+  for (size_t i=0; i<material.TexmapCount (); i++)
+  {
+    printf ("    image='%s', sampler='%s'\n", material.Texmap (i).Image (), material.Texmap (i).Sampler ());
+  }  
 }
 
 void dump (const Shader& shader, const char* id)

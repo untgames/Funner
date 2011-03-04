@@ -1,13 +1,50 @@
 Results of xmtl_saver_test:
 <?xml version="1.0" encoding="utf-8"?>
-<MaterialLibrary>
-  <Materials>
-    <Material Name="material1" Effect="my_effect">
-      <Property Name="A" Type="string" Value="B"/>
-      <Property Name="C" Type="float" Value="3.14"/>
-      <Property Name="BlendEnable" Type="int" Value="0"/>
-      <Property Name="ClearColor" Type="vector" Value="1 0 1 0"/>
-    </Material>
-    <InstanceMaterial Name="material2" Source="material1"/>
-  </Materials>
-</MaterialLibrary>
+<material_library>
+  <layouts>
+    <layout id="layout#1">
+      <property name="BlendEnable" type="int"/>
+      <property name="ClearColor" type="float" count="4"/>
+      <property name="Direction" type="vector" count="2"/>
+      <property name="Effect" type="string"/>
+    </layout>
+  </layouts>
+  <texmaps>
+    <texmap id="texmap#1" image="test1.tga" sampler="repeated_mirror"/>
+  </texmaps>
+  <materials>
+    <material id="material1" name="My material" program="blinn" tags="solid wireframe" layout="layout#1">
+      <property name="BlendEnable" value="0"/>
+      <property name="ClearColor">
+        1 0 1 0
+      </property>
+      <property name="Direction">
+        1 2 3 4 5 6 7 8
+      </property>
+      <property name="Effect" value="my_effect"/>
+      <texmap image="test3.tga" sampler="mirror"/>
+      <instance_texmap source="texmap#1"/>
+    </material>
+    <material id="material2" name="My material without layout" program="phong" tags="translucent">
+      <property name="BlendEnable" type="int" value="1"/>
+      <property name="Direction" type="vector" count="2">
+        8 7 6 5 4 3 2 1
+      </property>
+      <property name="Effect" type="string" value="my_effect1"/>
+      <instance_texmap source="texmap#1"/>
+      <texmap image="test4.tga" sampler="mirror"/>
+    </material>
+    <material id="material4" name="My material 4" layout="layout#1">
+      <property name="BlendEnable" value="0"/>
+      <property name="ClearColor">
+        0 0 0 0
+      </property>
+      <property name="Direction">
+        1 2 3 4 5 6 7 8
+      </property>
+      <property name="Effect" value=""/>
+      <texmap image="test2.tga"/>
+    </material>
+    <instance_material id="material3" source="material1"/>
+  </materials>
+</material_library>

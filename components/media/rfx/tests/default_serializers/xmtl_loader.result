@@ -1,19 +1,51 @@
 Results of xmtl_loader_test:
 material:
   id='material1'
-  name='material1'
-  effect='my_effect'
-  parameters:
-    A='B'
-    C=3.140
+  name='My material'
+  program='blinn'
+  tags='solid wireframe'
+  properties:
     BlendEnable=0
-    ClearColor=[1.000 0.000 1.000 0.000]
+    ClearColor=(1.000, 0.000, 1.000, 0.000)
+    Direction=([1.000 2.000 3.000 4.000], [5.000 6.000 7.000 8.000])
+    Effect='my_effect'
+  texmaps:
+    image='test3.tga', sampler='mirror'
+    image='test1.tga', sampler='repeated_mirror'
 material:
   id='material2'
-  name='material1'
-  effect='my_effect'
-  parameters:
-    A='B'
-    C=3.140
+  name='My material without layout'
+  program='phong'
+  tags='translucent'
+  properties:
+    BlendEnable=1
+    Direction=([8.000 7.000 6.000 5.000], [4.000 3.000 2.000 1.000])
+    Effect='my_effect1'
+  texmaps:
+    image='test1.tga', sampler='repeated_mirror'
+    image='test4.tga', sampler='mirror'
+material:
+  id='material4'
+  name='My material 4'
+  program=''
+  tags=''
+  properties:
     BlendEnable=0
-    ClearColor=[1.000 0.000 1.000 0.000]
+    ClearColor=(0.000, 0.000, 0.000, 0.000)
+    Direction=([1.000 2.000 3.000 4.000], [5.000 6.000 7.000 8.000])
+    Effect=''
+  texmaps:
+    image='test2.tga', sampler=''
+material:
+  id='material3'
+  name='My material'
+  program='blinn'
+  tags='solid wireframe'
+  properties:
+    BlendEnable=0
+    ClearColor=(1.000, 0.000, 1.000, 0.000)
+    Direction=([1.000 2.000 3.000 4.000], [5.000 6.000 7.000 8.000])
+    Effect='my_effect'
+  texmaps:
+    image='test3.tga', sampler='mirror'
+    image='test1.tga', sampler='repeated_mirror'

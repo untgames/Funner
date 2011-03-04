@@ -196,7 +196,7 @@ class XmtlSaver
       
       for (MaterialMap::iterator iter=materials.begin (), end=materials.end (); iter!=end; ++iter)
         if (iter->second.shared_count > 1)
-          SaveMaterial (iter->second.object, iter->second.id.c_str ());
+          SaveMaterialContent (iter->second.object, iter->second.id.c_str ());
 
       for (MaterialLibrary::ConstIterator iter=library.CreateIterator (); iter; ++iter)
         SaveMaterial (*iter, library.ItemId (iter));
@@ -207,9 +207,15 @@ class XmtlSaver
     {
       MaterialMap::iterator iter = materials.find (material.Id ());
 
-      if (iter != materials.end ())
+      if (iter == materials.end ())
+        return;
+        
+      if (iter->second.shared_count > 1)
       {
         const stl::string& source = iter->second.id;
+        
+        if (source == id)
+          return;
         
         XmlWriter::Scope scope (writer, "instance_material");
         
@@ -219,6 +225,11 @@ class XmtlSaver
         return;
       }
       
+      SaveMaterialContent (material, id);      
+    }
+    
+    void SaveMaterialContent (const Material& material, const char* id)
+    {
       XmlWriter::Scope scope (writer, "material");
       
       writer.WriteAttribute ("id", id);
@@ -255,7 +266,7 @@ class XmtlSaver
         writer.WriteAttribute ("layout", layout_iter->second.id);
       
       SaveMaterialProperties (material.Properties (), layout_iter->second.shared_count <= 1);
-      SaveMaterialTexmaps (material);      
+      SaveMaterialTexmaps (material);            
     }
     
 ///Сохранение свойств
@@ -279,8 +290,12 @@ class XmtlSaver
         switch (desc.type)
         {
           case PropertyType_String:
-            SavePropertyValue (1, properties.GetString (i));
+          {
+            const char* value = properties.GetString (i);
+            
+            SavePropertyValue (1, &value);
             break;
+          }
           case PropertyType_Integer:
             SavePropertyValue (desc.elements_count, properties.GetIntegerArray (i));
             break;
