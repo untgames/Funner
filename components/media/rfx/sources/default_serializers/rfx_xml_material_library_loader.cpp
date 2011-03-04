@@ -150,7 +150,7 @@ class XmtlLoader
     
     Texmap LoadTexmap (Parser::Iterator parse_iter)
     {
-      const char* image   = get<const char*> (*parse_iter, "name");
+      const char* image   = get<const char*> (*parse_iter, "image");
       const char* sampler = get<const char*> (*parse_iter, "sampler", "");
       
       Texmap texmap;
