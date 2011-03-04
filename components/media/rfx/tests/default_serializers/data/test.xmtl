@@ -1,21 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<MaterialLibrary>
-  <Templates>
-    <Properties Name="OutputStageState">
-      <Property Name="BlendEnable" Type="int"/>
-      <Property Name="ClearColor" Type="vector"/>
-      <Property Name="Effect" Type="string" Value="my_effect"/>
-    </Properties>
-  </Templates>
-  <Materials>
-    <Material Name="material1">
-      <Property Name="A" Value="B"/>
-      <Property Name="C" Value="3.14" Type="float"/>
-      <OutputStageState
-        BlendEnable="0"
-        ClearColor="1 0 1 0"
-      />
-    </Material>
-    <InstanceMaterial Name="material2" Source="material1"/>
-  </Materials>
-</MaterialLibrary>
+<material_library>
+  <layouts>
+    <layout id="layout1">
+      <property name="BlendEnable" type="int"/>
+      <property name="ClearColor" type="float" count="4"/>
+      <property name="Direction" type="vector" count="2"/>
+      <property name="Effect" type="string"/>
+    </layout>
+  </layouts>
+  <texmaps>
+    <texmap id="texmap1" image="test1.tga" sampler="repeated_mirror"/>
+    <texmap id="texmap2" image="test2.tga"/>
+  </texmaps>
+  <materials>
+    <material id="material1" name="My material" program="blinn" tags="solid wireframe" layout="layout1">
+      <property name="BlendEnable" value="0"/>
+      <property name="ClearColor" value="0 0 0 0"/>
+      <property name="Direction">1 2 3 4 5 6 7 8</property>
+      <property name="Effect" value="my_effect"/>
+      <texmap image="test3.tga" sampler="mirror"/>
+      <instance_texmap source="texmap1"/>
+    </material>
+    <material id="material2" name="My material without layout" program="blinn" tags="solid wireframe">
+      <property name="BlendEnable" type="int" value="0"/>
+      <property name="Direction" type="vector" count="2">1 2 3 4 5 6 7 8</property>
+      <property name="Effect" type="string" value="my_effect"/>
+      <texmap image="test3.tga" sampler="mirror"/>
+      <instance_texmap source="texmap1"/>
+    </material>
+    <instance_material id="material3" source="material1"/>
+  </materials>
+</material_library>
