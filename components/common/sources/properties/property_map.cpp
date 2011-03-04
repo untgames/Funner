@@ -1383,6 +1383,23 @@ bool PropertyMap::IsPresent (const char* name) const
 }
 
 /*
+    Добавление свойства
+*/
+
+size_t PropertyMap::AddProperty (const char* name, common::PropertyType type, size_t elements_count)
+{
+  try
+  {
+    return impl->InsertProperty (name, type, elements_count);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::PropertyMap::AddProperty");
+    throw;
+  }
+}
+
+/*
     Установка свойства по имени
 */
 
