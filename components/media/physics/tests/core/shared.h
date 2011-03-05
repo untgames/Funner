@@ -1,6 +1,8 @@
 #ifndef MEDIALIB_PHYSICS_TESTS_HEADER
 #define MEDIALIB_PHYSICS_TESTS_HEADER
 
+#include <cstdio>
+
 #include <xtl/exception.h>
 #include <xtl/iterator.h>
 

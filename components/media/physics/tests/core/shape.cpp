@@ -194,7 +194,7 @@ int main ()
       mesh.SetTrianglesCount (2);
 
       for (size_t i = 0; i < 4; i++)
-        mesh.Vertices () [i] = i;
+        mesh.Vertices () [i] = (float)i;
 
       TriangleIndices* indices = mesh.Triangles ();
 

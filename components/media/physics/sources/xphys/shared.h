@@ -12,6 +12,8 @@
 #include <common/strlib.h>
 #include <common/xml_writer.h>
 
+#include <math/utility.h>
+
 #include <media/physics/basic_shapes.h>
 #include <media/physics/compound.h>
 #include <media/physics/physics_library.h>
