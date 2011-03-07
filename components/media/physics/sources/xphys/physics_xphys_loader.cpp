@@ -44,27 +44,19 @@ class XmlPhysicsLibraryLoader
 {
   private:
       //слияние библиотек
+    template <class T>
+    void MergeCollections (const media::physics::PhysicsLibraryCollection<T>& source, media::physics::PhysicsLibraryCollection<T>& destination)
+    {
+      for (typename media::physics::PhysicsLibraryCollection<T>::ConstIterator iter = source.CreateIterator (); iter; ++iter)
+        destination.Attach (source.ItemId (iter), *iter);
+    }
+
     void MergeLibraries (const PhysicsLibrary& source_library, PhysicsLibrary& target_library)
     {
-      const PhysicsLibrary::RigidBodyCollection& rigid_bodies = source_library.RigidBodies ();
-
-      for (PhysicsLibrary::RigidBodyCollection::ConstIterator iter = rigid_bodies.CreateIterator (); iter; ++iter)
-        target_library.RigidBodies ().Attach (rigid_bodies.ItemId (iter), *iter);
-
-      const PhysicsLibrary::MaterialCollection& materials = source_library.Materials ();
-
-      for (PhysicsLibrary::MaterialCollection::ConstIterator iter = materials.CreateIterator (); iter; ++iter)
-        target_library.Materials ().Attach (materials.ItemId (iter), *iter);
-
-      const PhysicsLibrary::ShapeCollection& shapes = source_library.Shapes ();
-
-      for (PhysicsLibrary::ShapeCollection::ConstIterator iter = shapes.CreateIterator (); iter; ++iter)
-        target_library.Shapes ().Attach (shapes.ItemId (iter), *iter);
-
-      const PhysicsLibrary::TriangleMeshCollection& triangle_meshes = source_library.TriangleMeshes ();
-
-      for (PhysicsLibrary::TriangleMeshCollection::ConstIterator iter = triangle_meshes.CreateIterator (); iter; ++iter)
-        target_library.TriangleMeshes ().Attach (triangle_meshes.ItemId (iter), *iter);
+      MergeCollections (source_library.RigidBodies (),    target_library.RigidBodies ());
+      MergeCollections (source_library.Materials (),      target_library.Materials ());
+      MergeCollections (source_library.Shapes (),         target_library.Shapes ());
+      MergeCollections (source_library.TriangleMeshes (), target_library.TriangleMeshes ());
     }
 
       //разбор подключаемых файлов
