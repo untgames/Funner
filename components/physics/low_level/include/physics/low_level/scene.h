@@ -8,6 +8,19 @@
 
 #include <physics/low_level/joints.h>
 
+namespace render
+{
+
+namespace debug
+{
+
+///forward declaration
+class IPrimitiveRender;
+
+}
+
+}
+
 namespace physics
 {
 
@@ -15,7 +28,6 @@ namespace low_level
 {
 
 //forward declarations
-class IDebugRenderable;
 class IRigidBody;
 class IShape;
 
@@ -47,11 +59,6 @@ struct CollisionEvent
 class IScene : virtual public IObject
 {
   public:
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Получение данных для отладочной отрисовки
-///////////////////////////////////////////////////////////////////////////////////////////////////
-//    virtual IDebugRenderable* DebugRenderable () = 0;
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление гравитацией
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,6 +101,11 @@ class IScene : virtual public IObject
     typedef xtl::function<void (const CollisionEvent& event)> CollisionCallback;
 
     virtual xtl::connection RegisterCollisionCallback (CollisionEventType event_type, const CollisionCallback& callback_handler) = 0;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Отладочная отрисовка
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    virtual void Draw (render::debug::IPrimitiveRender&) = 0;    
 };
 
 }
