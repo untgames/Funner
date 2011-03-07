@@ -12,6 +12,9 @@ struct Transform
   math::vec3f position;
   math::quatf orientation;
   
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы
+///////////////////////////////////////////////////////////////////////////////////////////////////
   Transform ();
   Transform (const math::vec3f& position, const math::quatf& orientation = math::quatf ());
   Transform (const math::quatf& orientation);
@@ -28,6 +31,8 @@ enum CollisionEventType
 
   CollisionEventType_Num
 };
+
+#include <physics/detail/common.inl>
 
 }
 
