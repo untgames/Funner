@@ -13,6 +13,29 @@ namespace
 
 const char* LOG_NAME = "media.physics.XmlPhysicsLibraryLoader"; //им€ потока протоколировани€
 
+template <unsigned int Size>
+void read (Parser::Iterator iter, const char* str, math::vector <float, Size>& value)
+{
+  StringArray components = common::split (str);
+
+  if (components.Size () != Size)
+    raise_parser_exception (*iter, "Invalid vector format");
+
+  for (size_t i = 0; i < Size; i++)
+    value [i] = (float)atof (components [i]);
+}
+
+void read (Parser::Iterator iter, const char* str, math::quatf& value)
+{
+  StringArray components = common::split (str);
+
+  if (components.Size () != 4)
+    raise_parser_exception (*iter, "Invalid quaternion format");
+
+  for (size_t i = 0; i < 4; i++)
+    value [i] = (float)atof (components [i]);
+}
+
 /*
     «агрузчик физической библиотеки в формате Xml
 */
@@ -75,7 +98,13 @@ class XmlPhysicsLibraryLoader
         material.SetFriction (get<float> (*material_iter, "friction"));
 
       if (material_iter->First ("anisotropic_friction"))
-        material.SetAnisotropicFriction (get<math::vec3f> (*material_iter, "anisotropic_friction"));
+      {
+        math::vec3f value;
+
+        read (material_iter, get<const char*> (*material_iter, "anisotropic_friction"), value);
+
+        material.SetAnisotropicFriction (value);
+      }
 
       if (material_iter->First ("restitution"))
         material.SetRestitution (get<float> (*material_iter, "restitution"));
@@ -138,13 +167,25 @@ class XmlPhysicsLibraryLoader
       const char* type = get<const char*> (*shape_iter, "type");
 
       if (!xtl::xstrcmp (type, "box"))
-        shape.SetData (Box (get<math::vec3f> (*shape_iter, "half_dimensions")));
+      {
+        math::vec3f value;
+
+        read (shape_iter, get<const char*> (*shape_iter, "half_dimensions"), value);
+
+        shape.SetData (Box (value));
+      }
       else if (!xtl::xstrcmp (type, "sphere"))
         shape.SetData (Sphere (get<float> (*shape_iter, "radius")));
       else if (!xtl::xstrcmp (type, "capsule"))
         shape.SetData (Capsule (get<float> (*shape_iter, "radius"), get<float> (*shape_iter, "height")));
       else if (!xtl::xstrcmp (type, "plane"))
-        shape.SetData (Plane (get<math::vec3f> (*shape_iter, "normal"), get<float> (*shape_iter, "d")));
+      {
+        math::vec3f value;
+
+        read (shape_iter, get<const char*> (*shape_iter, "normal"), value);
+
+        shape.SetData (Plane (value, get<float> (*shape_iter, "d")));
+      }
       else if (!xtl::xstrcmp (type, "triangle_mesh"))
       {
         const char* mesh_name = get<const char*> (*shape_iter, "mesh_name");
@@ -169,15 +210,19 @@ class XmlPhysicsLibraryLoader
           if (!shape_instance)
             throw xtl::format_operation_exception (METHOD_NAME, "Can't find shape '%s' referenced in compound shape '%s'", shape_name, shape.Name ());
 
-          math::vec3f shape_position = common::get<math::vec3f> (*iter, "position", 0.f);
+          math::vec3f shape_position;
+
+          read (iter, get<const char*> (*iter, "position", "0 0 0"), shape_position);
 
           math::quatf shape_orientation;
 
           if (iter->First ("orientation"))
-            shape_orientation = get<math::quatf> (*iter, "orientation");
+            read (iter, get<const char*> (*iter, "orientation"), shape_orientation);
           else if (iter->First ("rotation"))
           {
-            math::vec3f rotation = get<math::vec3f> (*iter, "rotation");
+            math::vec3f rotation;
+
+            read (iter, get<const char*> (*iter, "rotation", "0 0 0"), rotation);
 
             shape_orientation = math::to_quat (math::degree (rotation.x), math::degree (rotation.y), math::degree (rotation.z));
           }
@@ -206,19 +251,39 @@ class XmlPhysicsLibraryLoader
         body.SetMass (get<float> (*body_iter, "mass"));
 
       if (body_iter->First ("center_of_mass_position"))
-        body.SetCenterOfMassPosition (get<math::vec3f> (*body_iter, "center_of_mass_position"));
+      {
+        math::vec3f value;
+
+        read (body_iter, get<const char*> (*body_iter, "center_of_mass_position"), value);
+
+        body.SetCenterOfMassPosition (value);
+      }
 
       if (body_iter->First ("center_of_mass_orientation"))
-        body.SetCenterOfMassOrientation (get<math::quatf> (*body_iter, "center_of_mass_orientation"));
+      {
+        math::quatf value;
+
+        read (body_iter, get<const char*> (*body_iter, "center_of_mass_orientation"), value);
+
+        body.SetCenterOfMassOrientation (value);
+      }
       else if (body_iter->First ("center_of_mass_rotation"))
       {
-        math::vec3f rotation = get<math::vec3f> (*body_iter, "center_of_mass_rotation");
+        math::vec3f rotation;
+
+        read (body_iter, get<const char*> (*body_iter, "center_of_mass_rotation"), rotation);
 
         body.SetCenterOfMassOrientation (math::to_quat (math::degree (rotation.x), math::degree (rotation.y), math::degree (rotation.z)));
       }
 
       if (body_iter->First ("mass_space_inertia_tensor"))
-        body.SetMassSpaceInertiaTensor (get<math::vec3f> (*body_iter, "mass_space_inertia_tensor"));
+      {
+        math::vec3f value;
+
+        read (body_iter, get<const char*> (*body_iter, "mass_space_inertia_tensor"), value);
+
+        body.SetMassSpaceInertiaTensor (value);
+      }
 
       if (body_iter->First ("material"))
       {

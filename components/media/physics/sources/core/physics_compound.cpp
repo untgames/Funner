@@ -134,19 +134,12 @@ void Compound::Attach (const media::physics::Shape& shape, const ShapeTransform&
 
 void Compound::Detach (const media::physics::Shape& shape)
 {
-  for (ShapesArray::iterator iter = impl->shapes.begin (); iter < impl->shapes.end ();)
+  for (size_t i = 0; i < impl->shapes.size ();)
   {
-    if ((*iter)->shape.Id () == shape.Id ())
-    {
-      ShapesArray::iterator next = iter;
-
-      ++next;
-
-      impl->shapes.erase (iter);
-
-      iter = next;
-    }
-    else ++iter;
+    if (impl->shapes [i]->shape.Id () == shape.Id ())
+      impl->shapes.erase (impl->shapes.begin () + i);
+    else
+      i++;
   }
 }
 

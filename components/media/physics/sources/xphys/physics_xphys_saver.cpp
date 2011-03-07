@@ -165,7 +165,7 @@ class XmlPhysicsLibrarySaver
 
       size_t body_flags = body.Flags ();
 
-      if (body_flags & RigidBodyFlag_FrozenPosition)
+      if ((body_flags & RigidBodyFlag_FrozenPosition) == RigidBodyFlag_FrozenPosition)
         writer.WriteAttribute ("frozen_position", "1");
       else
       {
@@ -177,7 +177,7 @@ class XmlPhysicsLibrarySaver
           writer.WriteAttribute ("frozen_position_z", "1");
       }
 
-      if (body_flags & RigidBodyFlag_FrozenRotation)
+      if ((body_flags & RigidBodyFlag_FrozenRotation) == RigidBodyFlag_FrozenRotation)
         writer.WriteAttribute ("frozen_rotation", "1");
       else
       {
