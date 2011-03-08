@@ -6,7 +6,6 @@
 #include <render/entity.h>
 #include <render/dynamic_resource.h>
 #include <render/material.h>
-#include <render/resource_library.h>
 #include <render/texture.h>
 #include <render/window.h>
 
@@ -104,13 +103,13 @@ class RenderManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///продумать имя результата???
-    ResourceLibrary Load (const char* resource_name);
-    ResourceLibrary Load (const media::rfx::MaterialLibrary&);
-    ResourceLibrary Load (const media::rfx::EffectLibrary&);
-    ResourceLibrary Load (const media::geometry::MeshLibrary&);
-    ResourceLibrary Load (const media::rfx::ShaderLibrary&);
-    
+    void LoadResource   (const char* resource_name);
+    void LoadResource   (const media::rfx::MaterialLibrary&);
+    void LoadResource   (const media::geometry::MeshLibrary&);
+    void UnloadResource (const char* resource_name);
+    void UnloadResource (const media::rfx::MaterialLibrary&);
+    void UnloadResource (const media::geometry::MeshLibrary&);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация на события
 ///////////////////////////////////////////////////////////////////////////////////////////////////

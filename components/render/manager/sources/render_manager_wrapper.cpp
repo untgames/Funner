@@ -134,29 +134,34 @@ Material RenderManager::CreateMaterial ()
   return Wrappers::Wrap<Material> (impl->CreateMaterial ());
 }
 
-ResourceLibrary RenderManager::Load (const char* resource_name)
+void RenderManager::LoadResource (const char* resource_name)
 {
-  return Wrappers::Wrap<ResourceLibrary> (impl->Load (resource_name));
+  impl->LoadResource (resource_name);
 }
 
-ResourceLibrary RenderManager::Load (const media::rfx::MaterialLibrary& library)
+void RenderManager::UnloadResource (const char* resource_name)
 {
-  return Wrappers::Wrap<ResourceLibrary> (impl->Load (library));
+  impl->UnloadResource (resource_name);
 }
 
-ResourceLibrary RenderManager::Load (const media::rfx::EffectLibrary& library)
+void RenderManager::LoadResource (const media::rfx::MaterialLibrary& library)
 {
-  return Wrappers::Wrap<ResourceLibrary> (impl->Load (library));
+  impl->LoadResource (library);
 }
 
-ResourceLibrary RenderManager::Load (const media::geometry::MeshLibrary& library)
+void RenderManager::UnloadResource (const media::rfx::MaterialLibrary& library)
 {
-  return Wrappers::Wrap<ResourceLibrary> (impl->Load (library));
+  impl->UnloadResource (library);
 }
 
-ResourceLibrary RenderManager::Load (const media::rfx::ShaderLibrary& library)
+void RenderManager::LoadResource (const media::geometry::MeshLibrary& library)
 {
-  return Wrappers::Wrap<ResourceLibrary> (impl->Load (library));
+  impl->LoadResource (library);
+}
+
+void RenderManager::UnloadResource (const media::geometry::MeshLibrary& library)
+{
+  impl->UnloadResource (library);
 }
 
 xtl::connection RenderManager::RegisterWindowEventHandler (RenderManagerWindowEvent event, const WindowEventHandler& handler) const

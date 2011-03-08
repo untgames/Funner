@@ -46,11 +46,12 @@ class RenderManagerImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    ResourceLibraryPtr Load (const char* resource_name);
-    ResourceLibraryPtr Load (const media::rfx::MaterialLibrary&);
-    ResourceLibraryPtr Load (const media::rfx::EffectLibrary&);
-    ResourceLibraryPtr Load (const media::geometry::MeshLibrary&);
-    ResourceLibraryPtr Load (const media::rfx::ShaderLibrary&);
+    void LoadResource   (const char* resource_name);
+    void LoadResource   (const media::rfx::MaterialLibrary&);
+    void LoadResource   (const media::geometry::MeshLibrary&);
+    void UnloadResource (const char* resource_name);
+    void UnloadResource (const media::rfx::MaterialLibrary&);
+    void UnloadResource (const media::geometry::MeshLibrary&);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация на события

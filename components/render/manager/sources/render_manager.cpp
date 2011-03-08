@@ -3,11 +3,22 @@
 using namespace render;
 using namespace render::low_level;
 
+namespace
+{
+
 /*
     Константы
 */
 
 const size_t WINDOW_ARRAY_RESERVE_SIZE = 8; //резервируемое число окон
+
+/*
+    Библиотека ресурсов
+*/
+
+//template <class T> class ManagerResourceLibrary
+
+}
 
 /*
     Описание реализации менеджера рендеринга
@@ -347,29 +358,34 @@ MaterialPtr RenderManagerImpl::CreateMaterial ()
     Загрузка ресурсов
 */
 
-ResourceLibraryPtr RenderManagerImpl::Load (const char* resource_name)
+void RenderManagerImpl::LoadResource (const char* resource_name)
 {
   throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Load(const char*)");
 }
 
-ResourceLibraryPtr RenderManagerImpl::Load (const media::rfx::MaterialLibrary& library)
+void RenderManagerImpl::UnloadResource (const char* resource_name)
+{
+  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Unload(const char*)");
+}
+
+void RenderManagerImpl::LoadResource (const media::rfx::MaterialLibrary& library)
 {
   throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Load(const media::rfx::MaterialLibrary&)");
 }
 
-ResourceLibraryPtr RenderManagerImpl::Load (const media::rfx::EffectLibrary& library)
+void RenderManagerImpl::UnloadResource (const media::rfx::MaterialLibrary& library)
 {
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Load(const media::rfx::EffectLibrary&)");
+  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Unload(const media::rfx::MaterialLibrary&)");
 }
 
-ResourceLibraryPtr RenderManagerImpl::Load (const media::geometry::MeshLibrary& library)
+void RenderManagerImpl::LoadResource (const media::geometry::MeshLibrary& library)
 {
   throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Load(const media::geometry::MeshLibrary&)");
 }
 
-ResourceLibraryPtr RenderManagerImpl::Load (const media::rfx::ShaderLibrary& library)
+void RenderManagerImpl::UnloadResource (const media::geometry::MeshLibrary& library)
 {
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Load(const media::rfx::ShaderLibrary&)");
+  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Unload(const media::geometry::MeshLibrary&)");
 }
 
 /*
