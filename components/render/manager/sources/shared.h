@@ -99,6 +99,7 @@ class Wrappers
 #include "device_manager.h"
 #include "log.h"
 
+#include "cache.h"
 #include "effect_loader_library.h"
 #include "entity.h"
 #include "frame.h"

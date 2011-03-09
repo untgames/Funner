@@ -29,19 +29,26 @@ template <class Ptr> struct ResourceProxyManagerImpl
 ===================================================================================================
 */
 
-template <class Ptr> struct ResourceProxy<Ptr>::Impl: public xtl::reference_counter
+template <class Ptr> struct ResourceProxy<Ptr>::Impl: public xtl::reference_counter, public CacheHolder
 {
   typedef typename ManagerImpl::ProxyMap ProxyMap;
   typedef typename ProxyMap::iterator    ProxyMapIterator;
 
-  Pointer          object;         //хранимый объект  
-  ManagerImpl&     manager;        //ссылка на менеджер 
-  stl::string      name;           //имя ресурса
-  ProxyMapIterator proxy_position; //позиция в карте прокси объектов
+  Pointer      object;         //хранимый объект
+  ManagerImpl& manager;        //ссылка на менеджер
+  stl::string  name;           //имя ресурса
+  bool         is_default;     //является ли ресурс дэфолтным
   
+///Конструктор
   Impl (ManagerImpl& in_manager, const char* in_name)
     : manager (in_manager)
     , name (in_name ? in_name : "")
+    , is_default (false)
+  {
+  }
+  
+///Кэшируемый источник требует обновления кэша.
+  void UpdateCacheCore ()
   {
   }
 };
@@ -57,11 +64,11 @@ ResourceProxy<Ptr>::ResourceProxy (ManagerImpl& manager, const char* name)
   try
   {
     stl::pair<typename Impl::ProxyMapIterator, bool> result = impl->manager.proxies.insert_pair (impl->name.c_str (), *this);
-    
+
     if (!result.second)
       throw xtl::format_operation_exception ("render::ResourceProxy<Ptr>::ResourceProxy", "Internal error: resource with name '%s' already exists", impl->name.c_str ());
       
-    impl->proxy_position = result.first;
+    SetDefaultData (manager.default_object);
   }
   catch (...)
   {
@@ -94,6 +101,16 @@ ResourceProxy<Ptr>& ResourceProxy<Ptr>::operator = (const ResourceProxy& proxy)
 }
 
 /*
+    Проверка корректности связанных данных
+*/
+
+template <class Ptr>
+bool ResourceProxy<Ptr>::IsDefaultData ()
+{
+  return impl->is_default;
+}
+
+/*
     Получение данных
 */
 
@@ -103,16 +120,79 @@ typename ResourceProxy<Ptr>::Pointer ResourceProxy<Ptr>::Data ()
   if (impl->object)
     return impl->object;
     
-  if (impl->manager.default_object)
-    return impl->manager.default_object;
-    
   throw xtl::format_operation_exception ("render::ResourceProxy<Ptr>::Data", "Resource '%s' not found. Default object hasn't set", impl->name.c_str ());
+}
+
+namespace
+{
+
+template <class T, T t> struct SfinaeHelper {};
+
+template <class T>
+void detach_cache_holder (T& object, CacheHolder& child, SfinaeHelper<void (T::*)(CacheHolder&), &T::Detach>* = 0)
+{
+  object.Detach (child);
+}
+
+template <class T>
+void detach_cache_holder (T& object, CacheHolder& child, ...)
+{
+}
+
+template <class T>
+void attach_cache_holder (T& object, CacheHolder& child, SfinaeHelper<void (T::*)(CacheHolder&), &T::Attach>* = 0)
+{
+  object.Attach (child);
+}
+
+template <class T>
+void attach_cache_holder (T& object, CacheHolder& child, ...)
+{
+}
+
+}
+
+template <class Ptr>
+void ResourceProxy<Ptr>::SetData (const Pointer& ptr)
+{
+  if (ptr)
+    attach_cache_holder (*ptr, *impl);
+
+  if (impl->object)
+    detach_cache_holder (*impl->object, *impl);
+
+  impl->object     = ptr;
+  impl->is_default = false;    
 }
 
 template <class Ptr>
 const char* ResourceProxy<Ptr>::Name ()
 {
   return impl->name.c_str ();
+}
+
+template <class Ptr>
+void ResourceProxy<Ptr>::SetDefaultData (const Pointer& ptr)
+{
+  SetData (ptr);
+
+  impl->is_default = true;
+}
+
+/*
+    Связывание со списком обновления кэша
+*/
+
+template <class Ptr>
+void ResourceProxy<Ptr>::Attach (CacheHolder& holder)
+{
+  impl->Attach (holder);
+}
+
+template <class Ptr>
+void ResourceProxy<Ptr>::Detach (CacheHolder& holder)
+{
+  impl->Detach (holder);
 }
 
 /*
@@ -141,10 +221,10 @@ ResourceProxyManager<Ptr>::~ResourceProxyManager ()
 */
 
 template <class Ptr>
-typename ResourceProxyManager<Ptr>::Proxy ResourceProxyManager<Ptr>::CreateProxy (const char* name)
+typename ResourceProxyManager<Ptr>::Proxy ResourceProxyManager<Ptr>::GetProxy (const char* name)
 {
   if (!name)
-    throw xtl::make_null_argument_exception ("render::ResourceProxyManager::CreateProxy", "name");
+    throw xtl::make_null_argument_exception ("render::ResourceProxyManager::GetProxy", "name");
     
     //поиск прокси в кэше
     
@@ -168,6 +248,12 @@ template <class Ptr>
 void ResourceProxyManager<Ptr>::SetDefault (const Pointer& ptr)
 {
   impl->default_object = ptr;
+  
+  for (ProxyMapIterator iter=impl->proxies.begin (); iter!=impl->proxies.end (); ++iter)
+  {
+    if (iter->second->IsDefaultData ())
+      iter->second->SetDefaultData (ptr);
+  }
 }
 
 template <class Ptr>
