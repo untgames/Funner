@@ -4,6 +4,6 @@ export.compile.physics.manager.IMPORTS      := compile.xtl compile.math.vecmath
 
 # Link exports
 export.link.physics.manager.LIBS    := funner.physics.manager
-export.link.physics.manager.IMPORTS := link.physics.low_level
+export.link.physics.manager.IMPORTS := link.physics.low_level link.media.physics
 
 export.info.physics.manager.CHMS := funner.physics.manager

@@ -1,6 +1,10 @@
 #ifndef PHYSICS_RIGID_BODY_HEADER
 #define PHYSICS_RIGID_BODY_HEADER
 
+#include <xtl/functional_fwd>
+
+#include <physics/shape.h>
+
 namespace physics
 {
 

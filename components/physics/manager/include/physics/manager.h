@@ -1,6 +1,12 @@
 #ifndef PHYSICS_MANAGER_HEADER
 #define PHYSICS_MANAGER_HEADER
 
+#include <stl/auto_ptr.h>
+
+#include <physics/material.h>
+#include <physics/scene.h>
+#include <physics/shape.h>
+
 namespace media
 {
 
@@ -45,7 +51,7 @@ class PhysicsManager
     Shape    CreateCapsuleShape  (float radius, float height);
     Shape    CreatePlaneShape    (const math::vec3f& normal, float d);
     Shape    CreateCompoundShape (const ShapeList&);
-    Shape    CreateShape         (const media::Shape&);
+    Shape    CreateShape         (const media::physics::Shape&);
     Shape    CreateShape         (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

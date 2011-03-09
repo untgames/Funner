@@ -1,6 +1,8 @@
 #ifndef PHYSICS_MANAGER_JOINT_HEADER
 #define PHYSICS_MANAGER_JOINT_HEADER
 
+#include <physics/rigid_body.h>
+
 namespace physics
 {
 

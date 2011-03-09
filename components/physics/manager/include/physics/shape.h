@@ -1,6 +1,8 @@
 #ifndef PHYSICS_MANAGER_SHAPE_HEADER
 #define PHYSICS_MANAGER_SHAPE_HEADER
 
+#include <physics/common.h>
+
 namespace physics
 {
 
@@ -59,7 +61,7 @@ class ShapeList
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление/удаление тел
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Add       (const Shape&, const Transform&);
+    size_t Add       (const Shape&, const physics::Transform&);
     size_t Add       (const Shape&, const math::vec3f& position = math::vec3f (), const math::quatf& orientation = math::quatf ());
     size_t Add       (const Shape&, const math::quatf& orientation);
     void   Remove    (size_t index);
@@ -70,10 +72,11 @@ class ShapeList
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t Size () const;
     
-          Shape&     operator [] (size_t index);
-    const Shape&     operator [] (size_t index) const;
-          Transform& operator [] (size_t index);
-    const Transform& operator [] (size_t index) const;
+          Shape& operator [] (size_t index);
+    const Shape& operator [] (size_t index) const;
+
+          physics::Transform& Transform (size_t index);
+    const physics::Transform& Transform (size_t index) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

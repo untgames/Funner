@@ -1,20 +1,20 @@
 ###################################################################################################
-#Оѓа•§•Ђ•≠®п ® ™Ѓ≠бв†≠вл
+#ќпределени€ и константы
 ###################################################################################################
 TARGETS := PHYSICS.MANAGER.SOURCES PHYSICS.MANAGER.TESTS PHYSICS.MANAGER.INFO
 
-#Ц•Ђм Physics system sources
+#÷ель Physics system sources
 PHYSICS.MANAGER.SOURCES.TYPE        := static-lib
 PHYSICS.MANAGER.SOURCES.NAME        := funner.physics.manager
 PHYSICS.MANAGER.SOURCES.SOURCE_DIRS := sources
-PHYSICS.MANAGER.SOURCES.IMPORTS     := compile.physics.manager compile.common
+PHYSICS.MANAGER.SOURCES.IMPORTS     := compile.physics.manager compile.physics.low_level compile.media.physics
 
-#Ц•Ђм Physics system tests
+#÷ель Physics system tests
 PHYSICS.MANAGER.TESTS.TYPE        := test-suite
 PHYSICS.MANAGER.TESTS.SOURCE_DIRS := tests
 PHYSICS.MANAGER.TESTS.IMPORTS     := compile.physics.manager link.physics.manager
 
-#Ц•Ђм - б°Ѓа™† §Ѓ™гђ•≠в†ж®®
+#÷ель - сборка документации
 PHYSICS.MANAGER.INFO.TYPE        := doxygen-info
 PHYSICS.MANAGER.INFO.CHM_NAME    := funner.physics.manager
 PHYSICS.MANAGER.INFO.SOURCE_DIRS := include

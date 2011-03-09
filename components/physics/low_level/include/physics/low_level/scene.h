@@ -15,7 +15,7 @@ namespace debug
 {
 
 ///forward declaration
-class IPrimitiveRender;
+class PrimitiveRender;
 
 }
 
@@ -105,7 +105,7 @@ class IScene : virtual public IObject
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отладочная отрисовка
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    virtual void Draw (render::debug::IPrimitiveRender&) = 0;    
+    virtual void Draw (render::debug::PrimitiveRender&) = 0;
 };
 
 }

@@ -6,8 +6,10 @@ using namespace physics::low_level::bullet;
 namespace
 {
 
+const char*       DEBUG_DRAWER_LOG_NAME = "physics.low_level.bullet.debug_drawer";
 const math::vec3f DEFAULT_GRAVITY (0, -9.8f, 0);
 const float       DEFAULT_SIMULATION_STEP = 1.f / 60.f;
+const math::vec4f DRAW_TEXT_COLOR (0.f, 0.f, 0.f, 1.f);
 const size_t      MAX_SIMULATION_SUBSTEPS = 120;
 
 //Информация о точке касания (необходимо для обработчика удаления касания)
@@ -106,6 +108,109 @@ struct CollisionFilterDesc
   CollisionFilterDesc (const IScene::BroadphaseCollisionFilter& in_filter, bool in_collides)
     : filter (in_filter), collides (in_collides)
     {}
+};
+
+class DebugDrawer : public btIDebugDraw
+{
+  public:
+    DebugDrawer (render::debug::PrimitiveRender& in_render)
+      : log (DEBUG_DRAWER_LOG_NAME), render (in_render), debug_mode (0)
+      {}
+
+    void drawLine (const btVector3& from, const btVector3& to, const btVector3& from_color, const btVector3& to_color)
+    {
+      render::debug::RenderablePoint vertices [2];
+
+      vector_from_bullet_vector (from, vertices [0].position);
+      vector_from_bullet_vector (to, vertices [1].position);
+
+      vertices [0].color = math::vec4f (from_color.x (), from_color.y (), from_color.z (), 1.f);
+      vertices [1].color = math::vec4f (to_color.x (), to_color.y (), to_color.z (), 1.f);
+
+      render.DrawLine (vertices [0], vertices [1]);
+    }
+
+    void drawBox (const btVector3& box_min, const btVector3& box_max, const btVector3& bt_color, btScalar alpha)
+    {
+      math::vec3f min, max;
+
+      vector_from_bullet_vector (box_min, min);
+      vector_from_bullet_vector (box_max, max);
+
+      render.DrawWireBox (min, max, math::vec4f (bt_color.x (), bt_color.y (), bt_color.z (), alpha));
+    }
+
+    void drawSphere (const btVector3& p, btScalar radius, const btVector3& bt_color)
+    {
+      math::vec3f position;
+
+      vector_from_bullet_vector (p, position);
+
+      math::vec4f color (bt_color.x (), bt_color.y (), bt_color.z (), 1.f);
+
+      render.DrawWireSphere (position, radius, color);
+    }
+
+    void drawLine (const btVector3& from, const btVector3& to, const btVector3& color)
+    {
+      drawLine (from, to, color, color);
+    }
+
+    void drawTriangle (const btVector3& v0, const btVector3& v1, const btVector3& v2, const btVector3& /*n0*/, const btVector3& /*n1*/, const btVector3& /*n2*/, const btVector3& color, btScalar alpha)
+    {
+      drawTriangle (v0, v1, v2, color, alpha);
+    }
+
+    void drawTriangle (const btVector3& v0, const btVector3& v1, const btVector3& v2, const btVector3& bt_color, btScalar alpha)
+    {
+      render::debug::RenderablePoint vertices [3];
+
+      math::vec4f color (bt_color.x (), bt_color.y (), bt_color.z (), alpha);
+
+      vector_from_bullet_vector (v0, vertices [0].position);
+      vector_from_bullet_vector (v1, vertices [1].position);
+      vector_from_bullet_vector (v2, vertices [2].position);
+
+      vertices [0].color = color;
+      vertices [1].color = color;
+      vertices [2].color = color;
+
+      render.DrawTriangle (vertices);
+    }
+
+    void drawContactPoint (const btVector3& point_on_b, const btVector3& normal_on_b, btScalar distance, int life_time, const btVector3& color)
+    {
+      drawLine (point_on_b, point_on_b + normal_on_b.normalized () * distance, color);
+    }
+
+    void reportErrorWarning (const char* warning)
+    {
+      log.Print (warning);
+    }
+
+    void draw3dText (const btVector3& location, const char* text)
+    {
+      math::vec3f position;
+
+      vector_from_bullet_vector (location, position);
+
+      render.DrawText (text, position, DRAW_TEXT_COLOR);
+    }
+
+    void setDebugMode (int in_debug_mode)
+    {
+      debug_mode = in_debug_mode;
+    }
+
+    int getDebugMode() const
+    {
+      return debug_mode;
+    }
+
+  private:
+    common::Log                     log;
+    render::debug::PrimitiveRender& render;
+    int                             debug_mode;
 };
 
 }
@@ -384,6 +489,21 @@ xtl::connection Scene::RegisterCollisionCallback (CollisionEventType event_type,
     throw xtl::make_argument_exception ("physics::low_level::bullet_driver::Scene::RegisterCollisionCallback", "event_type", event_type);
 
   return impl->collision_signals [event_type].connect (callback_handler);
+}
+
+/*
+   Отладочная отрисовка
+*/
+
+void Scene::Draw (render::debug::PrimitiveRender& render)
+{
+  DebugDrawer drawer (render);
+
+  impl->dynamics_world->setDebugDrawer (&drawer);
+
+  impl->dynamics_world->debugDrawWorld ();
+
+  impl->dynamics_world->setDebugDrawer (0);
 }
 
 /*

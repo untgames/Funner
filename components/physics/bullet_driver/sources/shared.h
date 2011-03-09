@@ -13,6 +13,9 @@
 #include <xtl/signal.h>
 
 #include <common/component.h>
+#include <common/log.h>
+
+#include <render/debug_render.h>
 
 #include <physics/low_level/common.h>
 #include <physics/low_level/driver.h>
@@ -43,6 +46,7 @@
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <LinearMath/btDefaultMotionState.h>
+#include <LinearMath/btIDebugDraw.h>
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4250) //'class1' : inherits 'class2::member' via dominance
@@ -349,6 +353,11 @@ class Scene : public IScene, public Object
 ///Обработка столкновений объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::connection RegisterCollisionCallback (CollisionEventType event_type, const CollisionCallback& callback_handler);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Отладочная отрисовка
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Draw (render::debug::PrimitiveRender&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение о коллизии

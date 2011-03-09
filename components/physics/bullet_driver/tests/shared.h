@@ -10,7 +10,6 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 
-#include <physics/low_level/debug_renderable.h>
 #include <physics/low_level/driver.h>
 #include <physics/low_level/joints.h>
 #include <physics/low_level/material.h>

@@ -1,6 +1,9 @@
 #ifndef PHYSICS_MANAGER_COMMON_HEADER
 #define PHYSICS_MANAGER_COMMON_HEADER
 
+#include <math/quat.h>
+#include <math/vector.h>
+
 namespace physics
 {
 
@@ -31,6 +34,10 @@ enum CollisionEventType
 
   CollisionEventType_Num
 };
+
+class RigidBody;
+
+typedef xtl::function<void (CollisionEventType event, RigidBody& first_body, RigidBody& second_body, const math::vec3f& collision_point)> CollisionCallback;
 
 #include <physics/detail/common.inl>
 

@@ -1,6 +1,9 @@
 #ifndef PHYSICS_MANAGER_SCENE_HEADER
 #define PHYSICS_MANAGER_SCENE_HEADER
 
+#include <physics/common.h>
+#include <physics/joint.h>
+
 namespace render
 {
 
@@ -19,8 +22,6 @@ namespace physics
 
 ///implementation forwards
 class SceneImpl;
-
-typedef xtl::function<void (CollisionEventType event, RigidBody& first_body, RigidBody& second_body, const math::vec3f& collision_point)> CollisionCallback;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Физическая сцена

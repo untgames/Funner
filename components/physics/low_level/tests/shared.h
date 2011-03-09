@@ -89,7 +89,7 @@ class TestScene : public IScene, public Object
     }
 
     ///Отладочная отрисовка
-    void Draw (render::debug::IPrimitiveRender&)
+    void Draw (render::debug::PrimitiveRender&)
     {
       throw xtl::make_not_implemented_exception ("TestScene::Draw");
     }
