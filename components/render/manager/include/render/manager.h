@@ -36,17 +36,6 @@ enum RenderManagerWindowEvent
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Режим использования создаваемых ресурсов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-enum ResourceInstanceMode
-{
-  ResourceInstanceMode_Shared, //ресурс используется совместно
-  ResourceInstanceMode_Copy,   //ресурс копируется при создании
-
-  ResourceInstanceMode_Default = ResourceInstanceMode_Shared
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Менеджер рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class RenderManager
@@ -90,7 +79,6 @@ class RenderManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Primitive        CreatePrimitive        ();
     Primitive        CreatePrimitive        (const PrimitiveBuffers&);    
-    Primitive        CreatePrimitive        (const char* name, ResourceInstanceMode mode = ResourceInstanceMode_Default);
     PrimitiveBuffers CreatePrimitiveBuffers (MeshBufferUsage lines_usage = MeshBufferUsage_Stream, MeshBufferUsage sprites_usage = MeshBufferUsage_Stream);
     Frame            CreateFrame            ();
     Texture          CreateTexture          (const media::Image& image, bool generate_mipmaps = true);
@@ -99,6 +87,13 @@ class RenderManager
     Texture          CreateTexture3D        (size_t width, size_t height, size_t depth, PixelFormat format, bool generate_mipmaps = true);
     Texture          CreateTextureCubemap   (size_t size, PixelFormat format, bool generate_mipmaps = true);
     Material         CreateMaterial         ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск загруженных примитивов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Texture   FindTexture   (const char* name) const;
+    Material  FindMaterial  (const char* name) const;
+    Primitive FindPrimitive (const char* name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка ресурсов

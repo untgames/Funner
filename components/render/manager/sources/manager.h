@@ -36,12 +36,18 @@ class RenderManagerImpl: public Object
 ///Создание примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     PrimitivePtr CreatePrimitive ();
-    PrimitivePtr CreatePrimitive (const char* name, ResourceInstanceMode mode);
     FramePtr     CreateFrame     ();
     TexturePtr   CreateTexture   (const media::Image& image, bool generate_mipmaps);
     TexturePtr   CreateTexture   (const media::Image& image, TextureDimension dimension, bool generate_mipmaps);
     TexturePtr   CreateTexture   (TextureDimension dimension, size_t width, size_t height, size_t depth, PixelFormat format, bool generate_mipmaps);
     MaterialPtr  CreateMaterial  ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Поиск загруженных примитивов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    TexturePtr   FindTexture   (const char* name);
+    MaterialPtr  FindMaterial  (const char* name);
+    PrimitivePtr FindPrimitive (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка ресурсов

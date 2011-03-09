@@ -98,8 +98,9 @@ class Wrappers
 #include "object.h"
 #include "device_manager.h"
 #include "log.h"
-
 #include "cache.h"
+#include "resource_proxy.h"
+
 #include "effect_loader_library.h"
 #include "entity.h"
 #include "frame.h"
@@ -111,7 +112,7 @@ class Wrappers
 #include "primitive_buffers.h"
 #include "primitive.h"
 #include "render_target.h"
-#include "resource_proxy.h"
+#include "texture_library.h"
 #include "texture.h"
 #include "window.h"
 

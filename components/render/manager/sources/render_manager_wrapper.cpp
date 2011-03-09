@@ -70,11 +70,6 @@ Primitive RenderManager::CreatePrimitive ()
   return Wrappers::Wrap<Primitive> (impl->CreatePrimitive ());
 }
 
-Primitive RenderManager::CreatePrimitive (const char* name, ResourceInstanceMode mode)
-{
-  return Wrappers::Wrap<Primitive> (impl->CreatePrimitive (name, mode));
-}
-
 Frame RenderManager::CreateFrame ()
 {
   return Wrappers::Wrap<Frame> (impl->CreateFrame ());
@@ -132,6 +127,21 @@ Texture RenderManager::CreateTextureCubemap (size_t size, PixelFormat format, bo
 Material RenderManager::CreateMaterial ()
 {
   return Wrappers::Wrap<Material> (impl->CreateMaterial ());
+}
+
+Texture RenderManager::FindTexture (const char* name) const
+{
+  return Wrappers::Wrap<Texture> (impl->FindTexture (name));
+}
+
+Material RenderManager::FindMaterial (const char* name) const
+{
+  return Wrappers::Wrap<Material> (impl->FindMaterial (name));
+}
+
+Primitive RenderManager::FindPrimitive (const char* name) const
+{
+  return Wrappers::Wrap<Primitive> (impl->FindPrimitive (name));
 }
 
 void RenderManager::LoadResource (const char* resource_name)

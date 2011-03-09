@@ -11,17 +11,16 @@ namespace render
 ===================================================================================================
 */
 
-template <class Ptr> struct ResourceProxyManagerImpl
+template <class Ptr> struct ResourceProxyManagerImpl: public xtl::reference_counter
 {
-  typedef Ptr                                              Pointer;
-  typedef ResourceProxy<Pointer>                           Proxy;
-  typedef stl::hash_map<stl::hash_key<const char*>, Proxy> ProxyMap;
-  
-  ProxyMap proxies;        //прокси объекты
-  Pointer  default_object; //ресурс по умолчанию
-};
+  typedef Ptr                                                   Pointer;
+  typedef ResourceProxyImpl<Pointer>                            ProxyImpl;
+  typedef stl::hash_map<stl::hash_key<const char*>, ProxyImpl*> ProxyMap;
+  typedef typename ProxyMap::iterator                           ProxyMapIterator;
 
-}
+  ProxyMap proxies;          //прокси объекты
+  Pointer  default_resource; //ресурс по умолчанию
+};
 
 /*
 ===================================================================================================
@@ -29,22 +28,34 @@ template <class Ptr> struct ResourceProxyManagerImpl
 ===================================================================================================
 */
 
-template <class Ptr> struct ResourceProxy<Ptr>::Impl: public xtl::reference_counter, public CacheHolder
+template <class Ptr> struct ResourceProxyImpl: public xtl::reference_counter, public CacheHolder
 {
-  typedef typename ManagerImpl::ProxyMap ProxyMap;
-  typedef typename ProxyMap::iterator    ProxyMapIterator;
+  typedef Ptr                             Pointer;
+  typedef ResourceProxyManagerImpl<Ptr>   ManagerImpl;
+  typedef typename ManagerImpl::ProxyMap  ProxyMap;
+  typedef typename ProxyMap::iterator     ProxyMapIterator;
+  typedef xtl::intrusive_ptr<ManagerImpl> ResourceProxyManagerPtr;
 
-  Pointer      object;         //хранимый объект
-  ManagerImpl& manager;        //ссылка на менеджер
-  stl::string  name;           //имя ресурса
-  bool         is_default;     //является ли ресурс дэфолтным
+  Pointer                 resource;       //хранимый объект
+  ResourceProxyManagerPtr manager;        //ссылка на менеджер
+  stl::string             name;           //имя ресурса
+  bool                    is_default;     //является ли ресурс дэфолтным
+  ProxyMapIterator        proxy_position; //положение прокси объекта в списке менеджера
   
 ///Конструктор
-  Impl (ManagerImpl& in_manager, const char* in_name)
-    : manager (in_manager)
+  ResourceProxyImpl (ManagerImpl& in_manager, const char* in_name)
+    : manager (&in_manager)
     , name (in_name ? in_name : "")
     , is_default (false)
+    , proxy_position (manager->proxies.end ())
   {
+  }
+  
+///Деструктор
+  ~ResourceProxyImpl ()
+  {
+    if (proxy_position != manager->proxies.end ())
+      manager->proxies.erase (proxy_position);
   }
   
 ///Кэшируемый источник требует обновления кэша.
@@ -52,6 +63,8 @@ template <class Ptr> struct ResourceProxy<Ptr>::Impl: public xtl::reference_coun
   {
   }
 };
+
+}
 
 /*
     Конструкторы / деструктор / присваивание
@@ -63,18 +76,27 @@ ResourceProxy<Ptr>::ResourceProxy (ManagerImpl& manager, const char* name)
 {
   try
   {
-    stl::pair<typename Impl::ProxyMapIterator, bool> result = impl->manager.proxies.insert_pair (impl->name.c_str (), *this);
+    stl::pair<typename Impl::ProxyMapIterator, bool> result = impl->manager->proxies.insert_pair (impl->name.c_str (), impl);
 
     if (!result.second)
       throw xtl::format_operation_exception ("render::ResourceProxy<Ptr>::ResourceProxy", "Internal error: resource with name '%s' already exists", impl->name.c_str ());
       
-    SetDefaultData (manager.default_object);
+    impl->proxy_position = result.first;
+      
+    SetDefaultResource (manager.default_resource);
   }
   catch (...)
   {
     release (impl);
     throw;
   }
+}
+
+template <class Ptr>
+ResourceProxy<Ptr>::ResourceProxy (Impl* in_impl)
+  : impl (in_impl)
+{
+  addref (impl);
 }
 
 template <class Ptr>
@@ -105,7 +127,7 @@ ResourceProxy<Ptr>& ResourceProxy<Ptr>::operator = (const ResourceProxy& proxy)
 */
 
 template <class Ptr>
-bool ResourceProxy<Ptr>::IsDefaultData ()
+bool ResourceProxy<Ptr>::IsDefaultResource ()
 {
   return impl->is_default;
 }
@@ -115,12 +137,12 @@ bool ResourceProxy<Ptr>::IsDefaultData ()
 */
 
 template <class Ptr>
-typename ResourceProxy<Ptr>::Pointer ResourceProxy<Ptr>::Data ()
+typename ResourceProxy<Ptr>::Pointer ResourceProxy<Ptr>::Resource ()
 {
-  if (impl->object)
-    return impl->object;
+  if (impl->resource)
+    return impl->resource;
     
-  throw xtl::format_operation_exception ("render::ResourceProxy<Ptr>::Data", "Resource '%s' not found. Default object hasn't set", impl->name.c_str ());
+  throw xtl::format_operation_exception ("render::ResourceProxy<Ptr>::Resource", "Resource '%s' not found. Default resource hasn't set", impl->name.c_str ());
 }
 
 namespace
@@ -129,39 +151,39 @@ namespace
 template <class T, T t> struct SfinaeHelper {};
 
 template <class T>
-void detach_cache_holder (T& object, CacheHolder& child, SfinaeHelper<void (T::*)(CacheHolder&), &T::Detach>* = 0)
+void detach_cache_holder (T& resource, CacheHolder& child, SfinaeHelper<void (T::*)(CacheHolder&), &T::Detach>* = 0)
 {
-  object.Detach (child);
+  resource.Detach (child);
 }
 
 template <class T>
-void detach_cache_holder (T& object, CacheHolder& child, ...)
+void detach_cache_holder (T& resource, CacheHolder& child, ...)
 {
 }
 
 template <class T>
-void attach_cache_holder (T& object, CacheHolder& child, SfinaeHelper<void (T::*)(CacheHolder&), &T::Attach>* = 0)
+void attach_cache_holder (T& resource, CacheHolder& child, SfinaeHelper<void (T::*)(CacheHolder&), &T::Attach>* = 0)
 {
-  object.Attach (child);
+  resource.Attach (child);
 }
 
 template <class T>
-void attach_cache_holder (T& object, CacheHolder& child, ...)
+void attach_cache_holder (T& resource, CacheHolder& child, ...)
 {
 }
 
 }
 
 template <class Ptr>
-void ResourceProxy<Ptr>::SetData (const Pointer& ptr)
+void ResourceProxy<Ptr>::SetResource (const Pointer& ptr)
 {
   if (ptr)
     attach_cache_holder (*ptr, *impl);
 
-  if (impl->object)
-    detach_cache_holder (*impl->object, *impl);
+  if (impl->resource)
+    detach_cache_holder (*impl->resource, *impl);
 
-  impl->object     = ptr;
+  impl->resource     = ptr;
   impl->is_default = false;    
 }
 
@@ -172,9 +194,9 @@ const char* ResourceProxy<Ptr>::Name ()
 }
 
 template <class Ptr>
-void ResourceProxy<Ptr>::SetDefaultData (const Pointer& ptr)
+void ResourceProxy<Ptr>::SetDefaultResource (const Pointer& ptr)
 {
-  SetData (ptr);
+  SetResource (ptr);
 
   impl->is_default = true;
 }
@@ -214,10 +236,11 @@ ResourceProxyManager<Ptr>::ResourceProxyManager ()
 template <class Ptr>
 ResourceProxyManager<Ptr>::~ResourceProxyManager ()
 {
+  release (impl);
 }
 
 /*
-    Создание прокси
+    Получение прокси
 */
 
 template <class Ptr>
@@ -241,25 +264,54 @@ typename ResourceProxyManager<Ptr>::Proxy ResourceProxyManager<Ptr>::GetProxy (c
 }
 
 /*
+    Поиск ресурса
+*/
+
+template <class Ptr>
+typename ResourceProxyManager<Ptr>::Pointer ResourceProxyManager<Ptr>::FindResource (const char* name)
+{
+  if (!name)
+    return Pointer ();
+    
+    //поиск прокси в кэше
+    
+  typedef typename Impl::ProxyMapIterator ProxyMapIterator;
+  
+  ProxyMapIterator iter = impl->proxies.find (name);
+  
+  if (iter != impl->proxies.end ())
+  {
+    if (iter->second->is_default)
+      return Pointer ();
+    
+    return iter->second->resource;
+  }
+    
+  return Pointer ();
+}
+
+/*
     Установка объекта по умолчанию
 */
 
 template <class Ptr>
-void ResourceProxyManager<Ptr>::SetDefault (const Pointer& ptr)
+void ResourceProxyManager<Ptr>::SetDefaultResource (const Pointer& ptr)
 {
-  impl->default_object = ptr;
+  impl->default_resource = ptr;
+
+  typedef typename Impl::ProxyMapIterator ProxyMapIterator;
   
   for (ProxyMapIterator iter=impl->proxies.begin (); iter!=impl->proxies.end (); ++iter)
   {
-    if (iter->second->IsDefaultData ())
-      iter->second->SetDefaultData (ptr);
+    if (iter->second->is_default)
+      Proxy (iter->second).SetDefaultResource (ptr);
   }
 }
 
 template <class Ptr>
-typename ResourceProxyManager<Ptr>::Pointer ResourceProxyManager<Ptr>::Default ()
+typename ResourceProxyManager<Ptr>::Pointer ResourceProxyManager<Ptr>::DefaultResource ()
 {
-  return impl->default_object;
+  return impl->default_resource;
 }
 
 /*
@@ -269,3 +321,6 @@ typename ResourceProxyManager<Ptr>::Pointer ResourceProxyManager<Ptr>::Default (
 template class ResourceProxy<TexturePtr>;
 template class ResourceProxy<MaterialPtr>;
 template class ResourceProxy<PrimitivePtr>;
+template class ResourceProxyManager<TexturePtr>;
+template class ResourceProxyManager<MaterialPtr>;
+template class ResourceProxyManager<PrimitivePtr>;

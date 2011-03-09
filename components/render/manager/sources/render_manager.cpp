@@ -34,10 +34,12 @@ struct RenderManagerImpl::Impl: public xtl::trackable
   DeviceManagerPtr   device_manager;                                //менеджер устройства отрисовки
   WindowSignal       window_signals [RenderManagerWindowEvent_Num]; //оконные сигналы
   WindowArray        windows;                                       //окна
+  TextureLibrary     textures;                                      //текстуры
 
 ///Конструктор
   Impl (RenderManagerImpl* in_owner)
     : owner (in_owner)
+    , textures (*owner)
   {
     windows.reserve (WINDOW_ARRAY_RESERVE_SIZE);
   }
@@ -246,11 +248,6 @@ PrimitivePtr RenderManagerImpl::CreatePrimitive ()
   throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::CreatePrimitive()");
 }
 
-PrimitivePtr RenderManagerImpl::CreatePrimitive (const char* name, ResourceInstanceMode mode)
-{
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::CreatePrimitive(const char*,ResourceInstanceMode)");
-}
-
 FramePtr RenderManagerImpl::CreateFrame ()
 {
   throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::CreateFrame");
@@ -355,17 +352,68 @@ MaterialPtr RenderManagerImpl::CreateMaterial ()
 }
 
 /*
+    Поиск загруженных ресурсов
+*/
+
+TexturePtr RenderManagerImpl::FindTexture (const char* name)
+{
+  return impl->textures.FindTexture (name);
+}
+
+MaterialPtr RenderManagerImpl::FindMaterial (const char* name)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+PrimitivePtr RenderManagerImpl::FindPrimitive (const char* name)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+/*
     Загрузка ресурсов
 */
 
 void RenderManagerImpl::LoadResource (const char* resource_name)
 {
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Load(const char*)");
+  try
+  {
+    if (!resource_name)
+      throw xtl::make_null_argument_exception ("", "resource_name");
+    
+    if (TextureLibrary::IsTextureResource (resource_name))
+    {
+      impl->textures.LoadTexture (resource_name);
+      return;
+    }
+      
+    throw xtl::format_operation_exception ("", "Type of resource '%s' is unknown", resource_name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::LoadResource(const char*)");
+    throw;
+  }
 }
 
 void RenderManagerImpl::UnloadResource (const char* resource_name)
 {
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Unload(const char*)");
+  try
+  {
+    if (!resource_name)
+      return;
+    
+    if (TextureLibrary::IsTextureResource (resource_name))
+    {
+      impl->textures.UnloadTexture (resource_name);
+      return;
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::UnloadResource(const char*)");
+    throw;
+  } 
 }
 
 void RenderManagerImpl::LoadResource (const media::rfx::MaterialLibrary& library)
