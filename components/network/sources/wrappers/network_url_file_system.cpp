@@ -28,8 +28,8 @@ struct UrlFile: public Lockable
   
   UrlFile (const char* in_url, bool in_is_post, size_t in_buffer_size)
     : url (in_url)
-    , end_of_request (false)
     , is_post (in_is_post)
+    , end_of_request (false)
     , buffer_size (in_buffer_size)
   {
     if (is_post)
