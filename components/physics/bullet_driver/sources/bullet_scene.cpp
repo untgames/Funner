@@ -114,7 +114,7 @@ class DebugDrawer : public btIDebugDraw
 {
   public:
     DebugDrawer (render::debug::PrimitiveRender& in_render)
-      : log (DEBUG_DRAWER_LOG_NAME), render (in_render), debug_mode (0)
+      : log (DEBUG_DRAWER_LOG_NAME), render (in_render), debug_mode (btIDebugDraw::DBG_MAX_DEBUG_DRAW_MODE)
       {}
 
     void drawLine (const btVector3& from, const btVector3& to, const btVector3& from_color, const btVector3& to_color)

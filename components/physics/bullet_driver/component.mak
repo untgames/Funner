@@ -13,4 +13,4 @@ PHYSICS.BULLET_DRIVER.SOURCES.IMPORTS      := compile.physics.low_level compile.
 #OpenGL render system tests
 PHYSICS.BULLET_DRIVER.TESTS.TYPE        := test-suite
 PHYSICS.BULLET_DRIVER.TESTS.SOURCE_DIRS := tests
-PHYSICS.BULLET_DRIVER.TESTS.IMPORTS     := link.physics.low_level.bullet_driver compile.physics.low_level
+PHYSICS.BULLET_DRIVER.TESTS.IMPORTS     := link.physics.low_level.bullet_driver compile.physics.low_level compile.render.debug_render

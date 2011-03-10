@@ -17,6 +17,8 @@
 #include <physics/low_level/scene.h>
 #include <physics/low_level/shape.h>
 
+#include <render/debug_render.h>
+
 using namespace physics::low_level;
 
 const char* DRIVER_NAME = "Bullet";
@@ -26,17 +28,31 @@ typedef xtl::com_ptr<IRigidBody> RigidBodyPtr;
 typedef xtl::com_ptr<IScene>     ScenePtr;
 typedef xtl::com_ptr<IShape>     ShapePtr;
 
+const float EPS = 0.001;
+
 void dump_body_position (IRigidBody* body)
 {
   const Transform& body_transform = body->WorldTransform ();
 
   printf ("Body world transform:\n");
 
-  const math::vec3f& world_position = body_transform.position;
+  math::vec3f world_position = body_transform.position;
+
+  for (size_t i = 0; i < 3; i++)
+  {
+    if (fabs (world_position [i]) < EPS)
+      world_position [i] = 0.f;
+  }
 
   printf ("  position = %.2f; %.2f; %.2f\n", world_position.x, world_position.y, world_position.z);
 
-  const math::quatf& world_orientation = body_transform.orientation;
+  math::quatf world_orientation = body_transform.orientation;
+
+  for (size_t i = 0; i < 4; i++)
+  {
+    if (fabs (world_orientation [i]) < EPS)
+      world_orientation [i] = 0.f;
+  }
 
   printf ("  orientation = %.2f; %.2f; %.2f; %.2f\n", world_orientation.x, world_orientation.y, world_orientation.z, world_orientation.w);
 }
