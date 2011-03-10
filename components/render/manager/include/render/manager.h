@@ -89,11 +89,11 @@ class RenderManager
     Material         CreateMaterial         ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск загруженных примитивов
+///Создание совместно используемых ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Texture   FindTexture   (const char* name) const;
-    Material  FindMaterial  (const char* name) const;
-    Primitive FindPrimitive (const char* name) const;
+    Texture   CreateSharedTexture   (const char* name);
+    Material  CreateSharedMaterial  (const char* name);
+    Primitive CreateSharedPrimitive (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка ресурсов

@@ -139,19 +139,49 @@ Material RenderManager::CreateMaterial ()
   return Wrappers::Wrap<Material> (impl->CreateMaterial ());
 }
 
-Texture RenderManager::FindTexture (const char* name) const
+Texture RenderManager::CreateSharedTexture (const char* name)
 {
-  return Wrappers::Wrap<Texture> (impl->FindTexture (name));
+  static const char* METHOD_NAME = "render::RenderManager::CreateSharedTexture";
+
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+
+  TexturePtr texture = impl->FindTexture (name);
+  
+  if (!texture)
+    throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Texture not found");
+
+  return Wrappers::Wrap<Texture> (texture);
 }
 
-Material RenderManager::FindMaterial (const char* name) const
+Material RenderManager::CreateSharedMaterial (const char* name)
 {
-  return Wrappers::Wrap<Material> (impl->FindMaterial (name));
+  static const char* METHOD_NAME = "render::RenderManager::CreateSharedMaterial";
+
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+    
+  MaterialPtr material = impl->FindMaterial (name);
+  
+  if (!material)
+    throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Material not found");
+
+  return Wrappers::Wrap<Material> (material);
 }
 
-Primitive RenderManager::FindPrimitive (const char* name) const
+Primitive RenderManager::CreateSharedPrimitive (const char* name)
 {
-  return Wrappers::Wrap<Primitive> (impl->FindPrimitive (name));
+  static const char* METHOD_NAME = "render::RenderManager::CreateSharedMaterial";
+
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+
+  PrimitivePtr primitive = impl->FindPrimitive (name);
+
+  if (!primitive)
+    throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Primitive not found");
+
+  return Wrappers::Wrap<Primitive> (primitive);
 }
 
 void RenderManager::LoadResource (const char* resource_name)
