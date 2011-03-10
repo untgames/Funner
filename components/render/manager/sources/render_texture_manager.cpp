@@ -8,7 +8,7 @@ using namespace render;
 
 typedef stl::hash_map<stl::hash_key<const char*>, TextureProxy> ProxyMap;
 
-struct TextureLibrary::Impl
+struct TextureManager::Impl
 {
   RenderManagerImpl&  manager;          //ссылка на владельца
   TextureProxyManager proxy_manager;    //менеджер прокси объектов
@@ -24,12 +24,12 @@ struct TextureLibrary::Impl
     Конструктор / деструктор
 */
 
-TextureLibrary::TextureLibrary (RenderManagerImpl& owner)
+TextureManager::TextureManager (RenderManagerImpl& owner)
   : impl (new Impl (owner))
 {
 }
 
-TextureLibrary::~TextureLibrary ()
+TextureManager::~TextureManager ()
 {
 }
 
@@ -37,7 +37,7 @@ TextureLibrary::~TextureLibrary ()
     Проверка: является ли ресурс текстурой
 */
 
-bool TextureLibrary::IsTextureResource (const char* name)
+bool TextureManager::IsTextureResource (const char* name)
 {
   return name && media::ImageManager::FindLoader (name, common::SerializerFindMode_ByName) != 0;
 }
@@ -46,7 +46,7 @@ bool TextureLibrary::IsTextureResource (const char* name)
     Загрузка / выгрузка текстур
 */
 
-void TextureLibrary::LoadTexture (const char* name)
+void TextureManager::LoadTexture (const char* name)
 {
   try
   {
@@ -67,12 +67,12 @@ void TextureLibrary::LoadTexture (const char* name)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureLibrary::LoadTexture");
+    e.touch ("render::TextureManager::LoadTexture");
     throw;
   }
 }
 
-void TextureLibrary::UnloadTexture (const char* name)
+void TextureManager::UnloadTexture (const char* name)
 {
   if (!name)
     return;
@@ -84,7 +84,7 @@ void TextureLibrary::UnloadTexture (const char* name)
     Получение прокси
 */
 
-TextureProxy TextureLibrary::GetTextureProxy (const char* name)
+TextureProxy TextureManager::GetTextureProxy (const char* name)
 {
   return impl->proxy_manager.GetProxy (name);
 }
@@ -93,7 +93,7 @@ TextureProxy TextureLibrary::GetTextureProxy (const char* name)
     Поиск загруженной текстуры
 */
 
-TexturePtr TextureLibrary::FindTexture (const char* name)
+TexturePtr TextureManager::FindTexture (const char* name)
 {
   return impl->proxy_manager.FindResource (name);
 }
@@ -102,12 +102,12 @@ TexturePtr TextureLibrary::FindTexture (const char* name)
     Установка текстуры по умолчанию
 */
 
-void TextureLibrary::SetDefaultTexture (const TexturePtr& texture)
+void TextureManager::SetDefaultTexture (const TexturePtr& texture)
 {
   impl->proxy_manager.SetDefaultResource (texture);
 }
 
-TexturePtr TextureLibrary::DefaultTexture ()
+TexturePtr TextureManager::DefaultTexture ()
 {
   return impl->proxy_manager.DefaultResource ();
 }

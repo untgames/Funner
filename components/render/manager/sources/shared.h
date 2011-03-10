@@ -9,6 +9,7 @@
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
+#include <xtl/iterator.h>
 #include <xtl/signal.h>
 #include <xtl/trackable.h>
 
@@ -39,15 +40,16 @@ class DeviceManager;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef xtl::intrusive_ptr<DeviceManager>       DeviceManagerPtr;
-typedef xtl::intrusive_ptr<EntityImpl>          EntityPtr;
-typedef xtl::intrusive_ptr<FrameImpl>           FramePtr;
-typedef xtl::intrusive_ptr<MaterialImpl>        MaterialPtr;
-typedef xtl::intrusive_ptr<PrimitiveImpl>       PrimitivePtr;
-typedef xtl::intrusive_ptr<RenderManagerImpl>   RenderManagerPtr;
-typedef xtl::intrusive_ptr<RenderTargetImpl>    RenderTargetPtr;
-typedef xtl::intrusive_ptr<TextureImpl>         TexturePtr;
-typedef xtl::intrusive_ptr<WindowImpl>          WindowPtr;
+typedef xtl::intrusive_ptr<DeviceManager>        DeviceManagerPtr;
+typedef xtl::intrusive_ptr<EntityImpl>           EntityPtr;
+typedef xtl::intrusive_ptr<FrameImpl>            FramePtr;
+typedef xtl::intrusive_ptr<MaterialImpl>         MaterialPtr;
+typedef xtl::intrusive_ptr<PrimitiveImpl>        PrimitivePtr;
+typedef xtl::intrusive_ptr<PrimitiveBuffersImpl> PrimitiveBuffersPtr;
+typedef xtl::intrusive_ptr<RenderManagerImpl>    RenderManagerPtr;
+typedef xtl::intrusive_ptr<RenderTargetImpl>     RenderTargetPtr;
+typedef xtl::intrusive_ptr<TextureImpl>          TexturePtr;
+typedef xtl::intrusive_ptr<WindowImpl>           WindowPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера низкого уровня
@@ -109,11 +111,12 @@ class Wrappers
 #include "manager.h"
 #include "material.h"
 #include "vertex_buffer.h"
-#include "primitive_buffers.h"
 #include "primitive.h"
+#include "primitive_buffers.h"
+#include "primitive_manager.h"
 #include "render_target.h"
-#include "texture_library.h"
 #include "texture.h"
+#include "texture_manager.h"
 #include "window.h"
 
 }

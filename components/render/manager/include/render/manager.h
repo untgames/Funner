@@ -78,7 +78,7 @@ class RenderManager
 ///Создание примитивов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Primitive        CreatePrimitive        ();
-    Primitive        CreatePrimitive        (const PrimitiveBuffers&);    
+    Primitive        CreatePrimitive        (const PrimitiveBuffers&);
     PrimitiveBuffers CreatePrimitiveBuffers (MeshBufferUsage lines_usage = MeshBufferUsage_Stream, MeshBufferUsage sprites_usage = MeshBufferUsage_Stream);
     Frame            CreateFrame            ();
     Texture          CreateTexture          (const media::Image& image, bool generate_mipmaps = true);

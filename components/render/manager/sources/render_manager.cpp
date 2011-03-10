@@ -34,12 +34,14 @@ struct RenderManagerImpl::Impl: public xtl::trackable
   DeviceManagerPtr   device_manager;                                //менеджер устройства отрисовки
   WindowSignal       window_signals [RenderManagerWindowEvent_Num]; //оконные сигналы
   WindowArray        windows;                                       //окна
-  TextureLibrary     textures;                                      //текстуры
+  TextureManager     textures;                                      //текстуры
+  PrimitiveManager   primitives;                                    //примитивы
 
 ///Конструктор
   Impl (RenderManagerImpl* in_owner)
     : owner (in_owner)
     , textures (*owner)
+    , primitives (*owner)
   {
     windows.reserve (WINDOW_ARRAY_RESERVE_SIZE);
   }
@@ -245,7 +247,41 @@ RenderTargetPtr RenderManagerImpl::CreateDepthStencilBuffer (size_t width, size_
 
 PrimitivePtr RenderManagerImpl::CreatePrimitive ()
 {
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::CreatePrimitive()");
+  try
+  {
+    return CreatePrimitive (CreatePrimitiveBuffers ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::CreatePrimitive()");
+    throw;
+  }
+}
+
+PrimitivePtr RenderManagerImpl::CreatePrimitive (const PrimitiveBuffersPtr& buffer)
+{
+  try
+  {
+    return PrimitivePtr (new PrimitiveImpl (impl->device_manager, buffer), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::CreatePrimitive(const PrimitiveBuffersPtr&)");
+    throw;
+  }
+}
+
+PrimitiveBuffersPtr RenderManagerImpl::CreatePrimitiveBuffers (MeshBufferUsage lines_usage, MeshBufferUsage sprites_usage)
+{
+  try
+  {
+    return PrimitiveBuffersPtr (new PrimitiveBuffersImpl (impl->device_manager, lines_usage, sprites_usage), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::CreatePrimitiveBuffers");
+    throw;
+  }
 }
 
 FramePtr RenderManagerImpl::CreateFrame ()
@@ -367,7 +403,7 @@ MaterialPtr RenderManagerImpl::FindMaterial (const char* name)
 
 PrimitivePtr RenderManagerImpl::FindPrimitive (const char* name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->primitives.FindPrimitive (name);
 }
 
 /*
@@ -381,9 +417,15 @@ void RenderManagerImpl::LoadResource (const char* resource_name)
     if (!resource_name)
       throw xtl::make_null_argument_exception ("", "resource_name");
     
-    if (TextureLibrary::IsTextureResource (resource_name))
+    if (TextureManager::IsTextureResource (resource_name))
     {
       impl->textures.LoadTexture (resource_name);
+      return;
+    }
+    
+    if (PrimitiveManager::IsMeshLibraryResource (resource_name))
+    {
+      impl->primitives.LoadMeshLibrary (resource_name);
       return;
     }
       
@@ -403,9 +445,15 @@ void RenderManagerImpl::UnloadResource (const char* resource_name)
     if (!resource_name)
       return;
     
-    if (TextureLibrary::IsTextureResource (resource_name))
+    if (TextureManager::IsTextureResource (resource_name))
     {
       impl->textures.UnloadTexture (resource_name);
+      return;
+    }
+    
+    if (PrimitiveManager::IsMeshLibraryResource (resource_name))
+    {
+      impl->primitives.UnloadMeshLibrary (resource_name);
       return;
     }
   }
@@ -428,12 +476,28 @@ void RenderManagerImpl::UnloadResource (const media::rfx::MaterialLibrary& libra
 
 void RenderManagerImpl::LoadResource (const media::geometry::MeshLibrary& library)
 {
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Load(const media::geometry::MeshLibrary&)");
+  try
+  {
+    impl->primitives.LoadMeshLibrary (library);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::LoadResource(const media::geometry::MeshLibrary&)");
+    throw;
+  }
 }
 
 void RenderManagerImpl::UnloadResource (const media::geometry::MeshLibrary& library)
 {
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Unload(const media::geometry::MeshLibrary&)");
+  try
+  {
+    impl->primitives.UnloadMeshLibrary (library);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::UnloadResource(const media::geometry::MeshLibrary&)");
+    throw;
+  }
 }
 
 /*

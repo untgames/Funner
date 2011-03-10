@@ -70,6 +70,16 @@ Primitive RenderManager::CreatePrimitive ()
   return Wrappers::Wrap<Primitive> (impl->CreatePrimitive ());
 }
 
+Primitive RenderManager::CreatePrimitive (const PrimitiveBuffers& buffers)
+{
+  return Wrappers::Wrap<Primitive> (impl->CreatePrimitive (Wrappers::Unwrap<PrimitiveBuffersImpl> (buffers)));
+}
+
+PrimitiveBuffers RenderManager::CreatePrimitiveBuffers (MeshBufferUsage lines_usage, MeshBufferUsage sprites_usage)
+{
+  return Wrappers::Wrap<PrimitiveBuffers> (impl->CreatePrimitiveBuffers (lines_usage, sprites_usage));
+}
+
 Frame RenderManager::CreateFrame ()
 {
   return Wrappers::Wrap<Frame> (impl->CreateFrame ());
