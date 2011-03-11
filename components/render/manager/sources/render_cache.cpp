@@ -2,6 +2,8 @@
 
 using namespace render;
 
+//TODO: Attach/Detach with refcount - for multiple attachment
+
 /*
 ===================================================================================================
     CacheHolder

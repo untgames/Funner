@@ -188,9 +188,26 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
       mesh->primitives.push_back (dst_primitive);
     }
     
+      //подписка на события кэша
+      
+    try
+    {
+      for (MeshPrimitiveArray::iterator iter=mesh->primitives.begin (), end=mesh->primitives.end (); iter!=end; ++iter)
+        iter->material.Attach (*this);
+    }
+    catch (...)
+    {
+      for (MeshPrimitiveArray::iterator iter=mesh->primitives.begin (), end=mesh->primitives.end (); iter!=end; ++iter)
+        iter->material.Detach (*this);
+      
+      throw;
+    }
+    
       //добавление меша
       
     impl->meshes.push_back (mesh);
+    
+    Invalidate ();
     
     return impl->meshes.size () - 1;
   }
@@ -207,14 +224,34 @@ void PrimitiveImpl::RemoveMeshes (size_t first_mesh, size_t meshes_count)
     return;
     
   if (first_mesh + meshes_count > impl->meshes.size ())
-    meshes_count = impl->meshes.size () - first_mesh;
+    meshes_count = impl->meshes.size () - first_mesh;        
+
+  for (MeshArray::iterator iter=impl->meshes.begin ()+first_mesh, end=impl->meshes.end ()+first_mesh+meshes_count; iter!=end; ++iter)
+  {
+    Mesh& mesh = **iter;
+    
+    for (MeshPrimitiveArray::iterator iter1=mesh.primitives.begin (), end1=mesh.primitives.end (); iter1!=end1; ++iter1)
+      iter1->material.Detach (*this);    
+  }
     
   impl->meshes.erase (impl->meshes.begin () + first_mesh, impl->meshes.begin () + first_mesh + meshes_count);
+
+  Invalidate ();  
 }
 
 void PrimitiveImpl::RemoveAllMeshes ()
 {
+  for (MeshArray::iterator iter=impl->meshes.begin (), end=impl->meshes.end (); iter!=end; ++iter)
+  {
+    Mesh& mesh = **iter;
+    
+    for (MeshPrimitiveArray::iterator iter1=mesh.primitives.begin (), end1=mesh.primitives.end (); iter1!=end1; ++iter1)
+      iter1->material.Detach (*this);    
+  }
+
   impl->meshes.clear ();
+  
+  Invalidate ();  
 }
 
 /*

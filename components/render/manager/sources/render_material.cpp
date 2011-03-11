@@ -86,6 +86,7 @@ MaterialImpl::MaterialImpl (const TextureManagerPtr& texture_manager)
 
 MaterialImpl::~MaterialImpl ()
 {
+  impl->DetachCache (*this);
 }
 
 /*
