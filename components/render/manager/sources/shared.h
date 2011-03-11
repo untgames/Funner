@@ -37,8 +37,9 @@ namespace render
 //implementation forwards
 class DeviceManager;
 class DynamicTextureImpl;
-class TextureManager;
+class MaterialManager;
 class PrimitiveManager;
+class TextureManager;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
@@ -48,6 +49,7 @@ typedef xtl::intrusive_ptr<DynamicTextureImpl>   DynamicTexturePtr;
 typedef xtl::intrusive_ptr<EntityImpl>           EntityPtr;
 typedef xtl::intrusive_ptr<FrameImpl>            FramePtr;
 typedef xtl::intrusive_ptr<MaterialImpl>         MaterialPtr;
+typedef xtl::intrusive_ptr<MaterialManager>      MaterialManagerPtr;
 typedef xtl::intrusive_ptr<PrimitiveImpl>        PrimitivePtr;
 typedef xtl::intrusive_ptr<PrimitiveBuffersImpl> PrimitiveBuffersPtr;
 typedef xtl::intrusive_ptr<PrimitiveManager>     PrimitiveManagerPtr;
@@ -117,6 +119,7 @@ class Wrappers
 #include "program_parameters_manager.h"
 #include "manager.h"
 #include "material.h"
+#include "material_manager.h"
 #include "vertex_buffer.h"
 #include "primitive.h"
 #include "primitive_buffers.h"

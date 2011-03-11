@@ -15,7 +15,7 @@ struct MeshLibraryEntry: public xtl::reference_counter
 {
   const media::geometry::MeshLibrary* source_library; //ссылка на исходную библиотеку мешей (может быть недействительна на момент обращения)
   stl::string                         resource_name;  //имя ресурса
-  PrimitiveProxyList                  primitives;
+  PrimitiveProxyList                  primitives;     //примтитивы библиотеки
   
   MeshLibraryEntry () : source_library (0) {}
   
@@ -112,7 +112,6 @@ struct PrimitiveManager::Impl
       
       if (entry.source_library == source_library || entry.resource_name == name)
       {
-        
         loaded_libraries.erase (iter);
         return;
       }

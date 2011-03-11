@@ -30,6 +30,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable
   WindowArray         windows;                                       //окна
   TextureManagerPtr   textures;                                      //текстуры
   PrimitiveManagerPtr primitives;                                    //примитивы
+  MaterialManagerPtr  materials;                                     //материалы
 
 ///Конструктор
   Impl (RenderManagerImpl* in_owner)
@@ -124,6 +125,22 @@ TextureManager& RenderManagerImpl::TextureManager ()
   catch (xtl::exception& e)
   {
     e.touch ("render::RenderManagerImpl::TextureManager");
+    throw;
+  }
+}
+
+MaterialManager& RenderManagerImpl::MaterialManager ()
+{
+  try
+  {
+    if (!impl->materials)
+      impl->materials = MaterialManagerPtr (new render::MaterialManager (&impl->DeviceManager (), &TextureManager ()), false);
+
+    return *impl->materials;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::MaterialManager");
     throw;
   }
 }
@@ -270,17 +287,12 @@ RenderTargetPtr RenderManagerImpl::CreateDepthStencilBuffer (size_t width, size_
 }
 
 /*
-    Создание объектов
+    Создание фреймов
 */
 
 FramePtr RenderManagerImpl::CreateFrame ()
 {
   throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::CreateFrame");
-}
-
-MaterialPtr RenderManagerImpl::CreateMaterial ()
-{
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::CreateMaterial");
 }
 
 /*
@@ -305,6 +317,12 @@ void RenderManagerImpl::LoadResource (const char* resource_name)
       PrimitiveManager ().LoadMeshLibrary (resource_name);
       return;
     }
+    
+    if (render::MaterialManager::IsMaterialLibraryResource (resource_name))
+    {
+      MaterialManager ().LoadMaterialLibrary (resource_name);
+      return;
+    }    
       
     throw xtl::format_operation_exception ("", "Type of resource '%s' is unknown", resource_name);
   }
@@ -333,6 +351,12 @@ void RenderManagerImpl::UnloadResource (const char* resource_name)
       PrimitiveManager ().UnloadMeshLibrary (resource_name);
       return;
     }
+    
+    if (render::MaterialManager::IsMaterialLibraryResource (resource_name))
+    {
+      MaterialManager ().UnloadMaterialLibrary (resource_name);
+      return;
+    }
   }
   catch (xtl::exception& e)
   {
@@ -343,12 +367,28 @@ void RenderManagerImpl::UnloadResource (const char* resource_name)
 
 void RenderManagerImpl::LoadResource (const media::rfx::MaterialLibrary& library)
 {
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Load(const media::rfx::MaterialLibrary&)");
+  try
+  {
+    MaterialManager ().LoadMaterialLibrary (library);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::LoadResource(const media::rfx::MaterialLibrary&)");
+    throw;
+  }
 }
 
 void RenderManagerImpl::UnloadResource (const media::rfx::MaterialLibrary& library)
 {
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::Unload(const media::rfx::MaterialLibrary&)");
+  try
+  {
+    MaterialManager ().UnloadMaterialLibrary (library);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::UnloadResource(const media::rfx::MaterialLibrary&)");
+    throw;
+  }
 }
 
 void RenderManagerImpl::LoadResource (const media::geometry::MeshLibrary& library)

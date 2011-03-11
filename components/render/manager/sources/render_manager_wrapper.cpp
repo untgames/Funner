@@ -136,7 +136,7 @@ Texture RenderManager::CreateTextureCubemap (size_t size, PixelFormat format, bo
 
 Material RenderManager::CreateMaterial ()
 {
-  return Wrappers::Wrap<Material> (impl->CreateMaterial ());
+  return Wrappers::Wrap<Material> (impl->MaterialManager ().CreateMaterial ());
 }
 
 Texture RenderManager::CreateSharedTexture (const char* name)
