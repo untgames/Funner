@@ -614,7 +614,7 @@ size_t get_max_size (size_t a, size_t b)
 
 size_t get_mips_count (size_t size)
 {
-  return (size_t)(log ((float)size) / log (2.f)) + 1;
+  return (size_t)(log ((double)size) / log (2.0)) + 1;
 }
 
 size_t get_mips_count (size_t width, size_t height)
