@@ -80,8 +80,9 @@ class RenderManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Primitive        CreatePrimitive        ();
     Primitive        CreatePrimitive        (const PrimitiveBuffers&);
-    PrimitiveBuffers CreatePrimitiveBuffers (MeshBufferUsage lines_usage = MeshBufferUsage_Stream, MeshBufferUsage sprites_usage = MeshBufferUsage_Stream);
+    PrimitiveBuffers CreatePrimitiveBuffers (MeshBufferUsage lines_usage = MeshBufferUsage_Stream, MeshBufferUsage sprites_usage = MeshBufferUsage_Stream);    
     Frame            CreateFrame            ();
+    Entity           CreateEntity           ();
     Texture          CreateTexture          (const media::Image& image, bool generate_mipmaps = true);
     Texture          CreateTexture          (const media::Image& image, TextureDimension dimension, bool generate_mipmaps = true);
     Texture          CreateTexture2D        (size_t width, size_t height, PixelFormat format, bool generate_mipmaps = true);
