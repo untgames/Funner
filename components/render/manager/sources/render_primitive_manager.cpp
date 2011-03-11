@@ -18,6 +18,15 @@ struct MeshLibraryEntry: public xtl::reference_counter
   PrimitiveProxyList                  primitives;
   
   MeshLibraryEntry () : source_library (0) {}
+  
+  ~MeshLibraryEntry ()
+  {
+    while (!primitives.empty ())
+    {
+      primitives.back ().SetResource (PrimitivePtr ());
+      primitives.pop_back ();
+    }
+  }
 };
 
 typedef xtl::intrusive_ptr<MeshLibraryEntry> MeshLibraryEntryPtr;
@@ -103,6 +112,7 @@ struct PrimitiveManager::Impl
       
       if (entry.source_library == source_library || entry.resource_name == name)
       {
+        
         loaded_libraries.erase (iter);
         return;
       }
