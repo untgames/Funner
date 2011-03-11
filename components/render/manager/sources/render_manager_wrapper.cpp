@@ -67,17 +67,17 @@ RenderTarget RenderManager::CreateDepthStencilBuffer (size_t width, size_t heigh
                                        
 Primitive RenderManager::CreatePrimitive ()
 {
-  return Wrappers::Wrap<Primitive> (impl->CreatePrimitive ());
+  return Wrappers::Wrap<Primitive> (impl->PrimitiveManager ().CreatePrimitive ());
 }
 
 Primitive RenderManager::CreatePrimitive (const PrimitiveBuffers& buffers)
 {
-  return Wrappers::Wrap<Primitive> (impl->CreatePrimitive (Wrappers::Unwrap<PrimitiveBuffersImpl> (buffers)));
+  return Wrappers::Wrap<Primitive> (impl->PrimitiveManager ().CreatePrimitive (Wrappers::Unwrap<PrimitiveBuffersImpl> (buffers)));
 }
 
 PrimitiveBuffers RenderManager::CreatePrimitiveBuffers (MeshBufferUsage lines_usage, MeshBufferUsage sprites_usage)
 {
-  return Wrappers::Wrap<PrimitiveBuffers> (impl->CreatePrimitiveBuffers (lines_usage, sprites_usage));
+  return Wrappers::Wrap<PrimitiveBuffers> (impl->PrimitiveManager ().CreatePrimitiveBuffers (lines_usage, sprites_usage));
 }
 
 Frame RenderManager::CreateFrame ()
@@ -87,19 +87,19 @@ Frame RenderManager::CreateFrame ()
 
 Texture RenderManager::CreateTexture (const media::Image& image, bool generate_mips_enable)
 {
-  return Wrappers::Wrap<Texture> (impl->CreateTexture (image, generate_mips_enable));
+  return Wrappers::Wrap<Texture> (impl->TextureManager ().CreateTexture (image, generate_mips_enable));
 }
 
 Texture RenderManager::CreateTexture (const media::Image& image, TextureDimension dimension, bool generate_mips_enable)
 {
-  return Wrappers::Wrap<Texture> (impl->CreateTexture (image, dimension, generate_mips_enable));
+  return Wrappers::Wrap<Texture> (impl->TextureManager ().CreateTexture (image, dimension, generate_mips_enable));
 }
 
 Texture RenderManager::CreateTexture2D (size_t width, size_t height, PixelFormat format, bool generate_mips_enable)
 {
   try
   {
-    return Wrappers::Wrap<Texture> (impl->CreateTexture (TextureDimension_2D, width, height, 1, format, generate_mips_enable));
+    return Wrappers::Wrap<Texture> (impl->TextureManager ().CreateTexture (TextureDimension_2D, width, height, 1, format, generate_mips_enable));
   }
   catch (xtl::exception& e)
   {
@@ -112,7 +112,7 @@ Texture RenderManager::CreateTexture3D (size_t width, size_t height, size_t dept
 {
   try
   {
-    return Wrappers::Wrap<Texture> (impl->CreateTexture (TextureDimension_3D, width, height, depth, format, generate_mips_enable));
+    return Wrappers::Wrap<Texture> (impl->TextureManager ().CreateTexture (TextureDimension_3D, width, height, depth, format, generate_mips_enable));
   }
   catch (xtl::exception& e)
   {
@@ -125,7 +125,7 @@ Texture RenderManager::CreateTextureCubemap (size_t size, PixelFormat format, bo
 {
   try
   {
-    return Wrappers::Wrap<Texture> (impl->CreateTexture (TextureDimension_Cubemap, size, size, 6, format, generate_mips_enable));
+    return Wrappers::Wrap<Texture> (impl->TextureManager ().CreateTexture (TextureDimension_Cubemap, size, size, 6, format, generate_mips_enable));
   }
   catch (xtl::exception& e)
   {
@@ -146,7 +146,7 @@ Texture RenderManager::CreateSharedTexture (const char* name)
   if (!name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
-  TexturePtr texture = impl->FindTexture (name);
+  TexturePtr texture = impl->TextureManager ().FindTexture (name);
   
   if (!texture)
     throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Texture not found");
@@ -154,7 +154,7 @@ Texture RenderManager::CreateSharedTexture (const char* name)
   return Wrappers::Wrap<Texture> (texture);
 }
 
-Material RenderManager::CreateSharedMaterial (const char* name)
+/*Material RenderManager::CreateSharedMaterial (const char* name)
 {
   static const char* METHOD_NAME = "render::RenderManager::CreateSharedMaterial";
 
@@ -167,7 +167,7 @@ Material RenderManager::CreateSharedMaterial (const char* name)
     throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Material not found");
 
   return Wrappers::Wrap<Material> (material);
-}
+} */
 
 Primitive RenderManager::CreateSharedPrimitive (const char* name)
 {
@@ -176,7 +176,7 @@ Primitive RenderManager::CreateSharedPrimitive (const char* name)
   if (!name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
-  PrimitivePtr primitive = impl->FindPrimitive (name);
+  PrimitivePtr primitive = impl->PrimitiveManager ().FindPrimitive (name);
 
   if (!primitive)
     throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Primitive not found");

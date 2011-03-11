@@ -22,7 +22,7 @@ template <class Ptr> class ResourceProxy
     ResourceProxy& operator = (const ResourceProxy&);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///ѕроверка корректности св€занных данных
+///явл€етс€ ли данный ресурс ресурсом по умолчанию
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     bool IsDefaultResource ();
 
@@ -91,9 +91,11 @@ template <class Ptr> class ResourceProxyManager: public xtl::noncopyable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///¬озможные прокси ресурсы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef ResourceProxy<TexturePtr>   TextureProxy;
-typedef ResourceProxy<PrimitivePtr> PrimitiveProxy;
-typedef ResourceProxy<MaterialPtr>  MaterialProxy;
-typedef TextureProxy::Manager       TextureProxyManager;
-typedef PrimitiveProxy::Manager     PrimitiveProxyManager;
-typedef MaterialProxy::Manager      MaterialProxyManager;
+typedef ResourceProxy<TexturePtr>              TextureProxy;
+typedef ResourceProxy<LowLevelSamplerStatePtr> SamplerProxy;
+typedef ResourceProxy<PrimitivePtr>            PrimitiveProxy;
+typedef ResourceProxy<MaterialPtr>             MaterialProxy;
+typedef TextureProxy::Manager                  TextureProxyManager;
+typedef SamplerProxy::Manager                  SamplerProxyManager;
+typedef PrimitiveProxy::Manager                PrimitiveProxyManager;
+typedef MaterialProxy::Manager                 MaterialProxyManager;

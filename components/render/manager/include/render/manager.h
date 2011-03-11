@@ -3,8 +3,9 @@
 
 ///???экспортируемые свойства рендеринга из материалов через entity
 
+#include <render/dynamic_texture.h>
 #include <render/entity.h>
-#include <render/dynamic_resource.h>
+#include <render/frame.h>
 #include <render/material.h>
 #include <render/texture.h>
 #include <render/window.h>
@@ -104,6 +105,18 @@ class RenderManager
     void UnloadResource (const char* resource_name);
     void UnloadResource (const media::rfx::MaterialLibrary&);
     void UnloadResource (const media::geometry::MeshLibrary&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///–егистраци€ динамических текстур
+///  ѕримечание: передаваемый при создании текстуры параметр Entity нужно хранить по ссылке и не
+///  захватывать, это может привести к циклической ссылке и к утечке ресурсов. “екстура всегда 
+/// освобождаетс€ при удалении объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<IDynamicTexture* (size_t args_count, const char** args, Entity& entity)> DynamicTextureCreator;
+
+    void RegisterDynamicTexture       (const char* name_mask, const DynamicTextureCreator& creator);
+    void UnregisterDynamicTexture     (const char* name_mask);
+    void UnregisterAllDynamicTextures ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///–егистраци€ на событи€

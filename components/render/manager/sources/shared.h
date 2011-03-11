@@ -36,19 +36,25 @@ namespace render
 
 //implementation forwards
 class DeviceManager;
+class DynamicTextureImpl;
+class TextureManager;
+class PrimitiveManager;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef xtl::intrusive_ptr<DeviceManager>        DeviceManagerPtr;
+typedef xtl::intrusive_ptr<DynamicTextureImpl>   DynamicTexturePtr;
 typedef xtl::intrusive_ptr<EntityImpl>           EntityPtr;
 typedef xtl::intrusive_ptr<FrameImpl>            FramePtr;
 typedef xtl::intrusive_ptr<MaterialImpl>         MaterialPtr;
 typedef xtl::intrusive_ptr<PrimitiveImpl>        PrimitivePtr;
 typedef xtl::intrusive_ptr<PrimitiveBuffersImpl> PrimitiveBuffersPtr;
+typedef xtl::intrusive_ptr<PrimitiveManager>     PrimitiveManagerPtr;
 typedef xtl::intrusive_ptr<RenderManagerImpl>    RenderManagerPtr;
 typedef xtl::intrusive_ptr<RenderTargetImpl>     RenderTargetPtr;
 typedef xtl::intrusive_ptr<TextureImpl>          TexturePtr;
+typedef xtl::intrusive_ptr<TextureManager>       TextureManagerPtr;
 typedef xtl::intrusive_ptr<WindowImpl>           WindowPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,6 +109,7 @@ class Wrappers
 #include "cache.h"
 #include "resource_proxy.h"
 
+#include "dynamic_texture.h"
 #include "effect_loader_library.h"
 #include "entity.h"
 #include "frame.h"

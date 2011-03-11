@@ -27,13 +27,13 @@ typedef stl::list<MeshLibraryEntryPtr>       MeshLibraryList;
 
 struct PrimitiveManager::Impl
 {
-  RenderManagerImpl&    manager;          //ссылка на владельца
+  DeviceManagerPtr      device_manager;   //менеджер устройства отрисовки
   PrimitiveProxyManager proxy_manager;    //менеджер прокси объектов
   MeshLibraryList       loaded_libraries; //список загруженных библиотек
   
 ///Конструктор
-  Impl (RenderManagerImpl& in_manager)
-    : manager (in_manager)
+  Impl (const DeviceManagerPtr& in_device_manager)
+    : device_manager (in_device_manager)
   {
   }
   
@@ -54,7 +54,7 @@ struct PrimitiveManager::Impl
       
         //создание буферов примитивов библиотеки мэшей
         
-      PrimitiveBuffersPtr primitive_buffers = manager.CreatePrimitiveBuffers (MeshBufferUsage_Default, MeshBufferUsage_Default);
+      PrimitiveBuffersPtr primitive_buffers (new PrimitiveBuffersImpl (device_manager, MeshBufferUsage_Default, MeshBufferUsage_Default), false);
       
         //создание новой библиотеки
         
@@ -69,7 +69,7 @@ struct PrimitiveManager::Impl
       
       for (media::geometry::MeshLibrary::ConstIterator iter=library.CreateIterator (); iter; ++iter)
       {
-        PrimitivePtr primitive = manager.CreatePrimitive (primitive_buffers);
+        PrimitivePtr primitive (new PrimitiveImpl (device_manager, primitive_buffers), false);
         
         PrimitiveProxy proxy = proxy_manager.GetProxy (library.ItemId (iter));
         
@@ -114,13 +114,56 @@ struct PrimitiveManager::Impl
     Конструктор / деструктор
 */
 
-PrimitiveManager::PrimitiveManager (RenderManagerImpl& owner)
-  : impl (new Impl (owner))
+PrimitiveManager::PrimitiveManager (const DeviceManagerPtr& device_manager)
+  : impl (new Impl (device_manager))
 {
 }
 
 PrimitiveManager::~PrimitiveManager ()
 {
+}
+
+/*
+    Создание примитивов
+*/
+
+PrimitivePtr PrimitiveManager::CreatePrimitive ()
+{
+  try
+  {
+    return CreatePrimitive (CreatePrimitiveBuffers ());
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::PrimitiveManager::CreatePrimitive()");
+    throw;
+  }
+}
+
+PrimitivePtr PrimitiveManager::CreatePrimitive (const PrimitiveBuffersPtr& buffer)
+{
+  try
+  {
+    return PrimitivePtr (new PrimitiveImpl (impl->device_manager, buffer), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::PrimitiveManager::CreatePrimitive(const PrimitiveBuffersPtr&)");
+    throw;
+  }
+}
+
+PrimitiveBuffersPtr PrimitiveManager::CreatePrimitiveBuffers (MeshBufferUsage lines_usage, MeshBufferUsage sprites_usage)
+{
+  try
+  {
+    return PrimitiveBuffersPtr (new PrimitiveBuffersImpl (impl->device_manager, lines_usage, sprites_usage), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::PrimitiveManager::CreatePrimitiveBuffers");
+    throw;
+  }
 }
 
 /*

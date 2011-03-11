@@ -183,8 +183,8 @@ void ResourceProxy<Ptr>::SetResource (const Pointer& ptr)
   if (impl->resource)
     detach_cache_holder (*impl->resource, *impl);
 
-  impl->resource     = ptr;
-  impl->is_default = false;    
+  impl->resource   = ptr;
+  impl->is_default = !ptr;
 }
 
 template <class Ptr>
@@ -319,8 +319,10 @@ typename ResourceProxyManager<Ptr>::Pointer ResourceProxyManager<Ptr>::DefaultRe
 */
 
 template class ResourceProxy<TexturePtr>;
+template class ResourceProxy<LowLevelSamplerStatePtr>;
 template class ResourceProxy<MaterialPtr>;
 template class ResourceProxy<PrimitivePtr>;
 template class ResourceProxyManager<TexturePtr>;
+template class ResourceProxyManager<LowLevelSamplerStatePtr>;
 template class ResourceProxyManager<MaterialPtr>;
 template class ResourceProxyManager<PrimitivePtr>;

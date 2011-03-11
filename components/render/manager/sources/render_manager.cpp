@@ -12,12 +12,6 @@ namespace
 
 const size_t WINDOW_ARRAY_RESERVE_SIZE = 8; //резервируемое число окон
 
-/*
-    Библиотека ресурсов
-*/
-
-//template <class T> class ManagerResourceLibrary
-
 }
 
 /*
@@ -29,19 +23,17 @@ typedef stl::vector<WindowImpl*>                    WindowArray;
 
 struct RenderManagerImpl::Impl: public xtl::trackable
 {
-  RenderManagerImpl* owner;                                         //владелец
-  Log                log;                                           //протокол сообщений
-  DeviceManagerPtr   device_manager;                                //менеджер устройства отрисовки
-  WindowSignal       window_signals [RenderManagerWindowEvent_Num]; //оконные сигналы
-  WindowArray        windows;                                       //окна
-  TextureManager     textures;                                      //текстуры
-  PrimitiveManager   primitives;                                    //примитивы
+  RenderManagerImpl*  owner;                                         //владелец
+  Log                 log;                                           //протокол сообщений
+  DeviceManagerPtr    device_manager;                                //менеджер устройства отрисовки
+  WindowSignal        window_signals [RenderManagerWindowEvent_Num]; //оконные сигналы
+  WindowArray         windows;                                       //окна
+  TextureManagerPtr   textures;                                      //текстуры
+  PrimitiveManagerPtr primitives;                                    //примитивы
 
 ///Конструктор
   Impl (RenderManagerImpl* in_owner)
     : owner (in_owner)
-    , textures (*owner)
-    , primitives (*owner)
   {
     windows.reserve (WINDOW_ARRAY_RESERVE_SIZE);
   }
@@ -114,6 +106,42 @@ RenderManagerImpl::~RenderManagerImpl ()
 const char* RenderManagerImpl::Description ()
 {
   return impl->DeviceManager ().Device ().GetName ();
+}
+
+/*
+    Менеджеры ресурсов
+*/
+
+TextureManager& RenderManagerImpl::TextureManager ()
+{
+  try
+  {
+    if (!impl->textures)
+      impl->textures = TextureManagerPtr (new render::TextureManager (&impl->DeviceManager ()), false);    
+
+    return *impl->textures;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::TextureManager");
+    throw;
+  }
+}
+
+PrimitiveManager& RenderManagerImpl::PrimitiveManager ()
+{
+  try
+  {
+    if (!impl->primitives)
+      impl->primitives = PrimitiveManagerPtr (new render::PrimitiveManager (&impl->DeviceManager ()), false);    
+
+    return *impl->primitives;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::PrimitiveManager");
+    throw;
+  }
 }
 
 /*
@@ -242,168 +270,17 @@ RenderTargetPtr RenderManagerImpl::CreateDepthStencilBuffer (size_t width, size_
 }
 
 /*
-    Создание примитивов
+    Создание объектов
 */
-
-PrimitivePtr RenderManagerImpl::CreatePrimitive ()
-{
-  try
-  {
-    return CreatePrimitive (CreatePrimitiveBuffers ());
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::RenderManagerImpl::CreatePrimitive()");
-    throw;
-  }
-}
-
-PrimitivePtr RenderManagerImpl::CreatePrimitive (const PrimitiveBuffersPtr& buffer)
-{
-  try
-  {
-    return PrimitivePtr (new PrimitiveImpl (impl->device_manager, buffer), false);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::RenderManagerImpl::CreatePrimitive(const PrimitiveBuffersPtr&)");
-    throw;
-  }
-}
-
-PrimitiveBuffersPtr RenderManagerImpl::CreatePrimitiveBuffers (MeshBufferUsage lines_usage, MeshBufferUsage sprites_usage)
-{
-  try
-  {
-    return PrimitiveBuffersPtr (new PrimitiveBuffersImpl (impl->device_manager, lines_usage, sprites_usage), false);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::RenderManagerImpl::CreatePrimitiveBuffers");
-    throw;
-  }
-}
 
 FramePtr RenderManagerImpl::CreateFrame ()
 {
   throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::CreateFrame");
 }
 
-TexturePtr RenderManagerImpl::CreateTexture (const media::Image& image, bool generate_mips_enable)
-{
-  try
-  {
-    TextureDimension dimension;
-    
-    switch (image.Depth ())
-    {
-      case 1:
-        dimension = TextureDimension_2D;
-        break;
-      case 6:
-        dimension = TextureDimension_Cubemap;
-        break;
-      default:
-        dimension = TextureDimension_3D;
-        break;
-    }
-
-    return CreateTexture (image, dimension, generate_mips_enable);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::RenderManagerImpl::CreateTexture(const media::Image&,bool)");
-    throw;
-  }
-}
-
-TexturePtr RenderManagerImpl::CreateTexture (const media::Image& image, render::TextureDimension dimension, bool generate_mips_enable)
-{
-  try
-  {
-    PixelFormat format;
-    
-    switch (image.Format ())
-    {
-      case media::PixelFormat_BGR8:
-      case media::PixelFormat_RGB16:
-        impl->log.Printf ("Convert image '%s' from '%s' to '%s'", image.Name (), media::get_format_name (image.Format ()), get_name (PixelFormat_RGB8));
-      case media::PixelFormat_RGB8:
-        format = PixelFormat_RGB8;
-        break;
-      case media::PixelFormat_BGRA8:
-      case media::PixelFormat_RGBA16:
-        impl->log.Printf ("Convert image '%s' from '%s' to '%s'", image.Name (), media::get_format_name (image.Format ()), get_name (PixelFormat_RGBA8));
-      case media::PixelFormat_RGBA8:
-        format = PixelFormat_RGBA8;
-        break;
-      case media::PixelFormat_L8:
-        format = PixelFormat_L8;
-        break;
-      case media::PixelFormat_A8:
-        format = PixelFormat_A8;
-        break;
-      case media::PixelFormat_LA8:
-        format = PixelFormat_LA8;
-        break;
-      default:
-        throw xtl::format_not_supported_exception ("", "Unsupported image '%s' format '%s'", image.Name (), media::get_format_name (image.Format ()));
-    }
-
-    TexturePtr texture = CreateTexture (dimension, image.Width (), image.Height (), image.Depth (), format, generate_mips_enable);
-
-    texture->Update (image);
-
-    return texture;
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::RenderManagerImpl::CreateTexture(const media::Image&,TextureDimension,bool)");
-    throw;
-  }
-}
-
-TexturePtr RenderManagerImpl::CreateTexture
- (render::TextureDimension dimension,
-  size_t                   width,
-  size_t                   height,
-  size_t                   depth,
-  render::PixelFormat      format,
-  bool                     generate_mips_enable)
-{
-  try
-  {
-    return TexturePtr (new TextureImpl (&impl->DeviceManager (), dimension, width, height, depth, format, generate_mips_enable), false);
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::RenderManagerImpl::CreateTexture(TextureDimension,size_t,size_t,size_t,PixelFormat,bool)");
-    throw;
-  }
-}
-
 MaterialPtr RenderManagerImpl::CreateMaterial ()
 {
   throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::CreateMaterial");
-}
-
-/*
-    Поиск загруженных ресурсов
-*/
-
-TexturePtr RenderManagerImpl::FindTexture (const char* name)
-{
-  return impl->textures.FindTexture (name);
-}
-
-MaterialPtr RenderManagerImpl::FindMaterial (const char* name)
-{
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
-}
-
-PrimitivePtr RenderManagerImpl::FindPrimitive (const char* name)
-{
-  return impl->primitives.FindPrimitive (name);
 }
 
 /*
@@ -417,15 +294,15 @@ void RenderManagerImpl::LoadResource (const char* resource_name)
     if (!resource_name)
       throw xtl::make_null_argument_exception ("", "resource_name");
     
-    if (TextureManager::IsTextureResource (resource_name))
+    if (render::TextureManager::IsTextureResource (resource_name))
     {
-      impl->textures.LoadTexture (resource_name);
+      TextureManager ().LoadTexture (resource_name);
       return;
     }
     
-    if (PrimitiveManager::IsMeshLibraryResource (resource_name))
+    if (render::PrimitiveManager::IsMeshLibraryResource (resource_name))
     {
-      impl->primitives.LoadMeshLibrary (resource_name);
+      PrimitiveManager ().LoadMeshLibrary (resource_name);
       return;
     }
       
@@ -445,15 +322,15 @@ void RenderManagerImpl::UnloadResource (const char* resource_name)
     if (!resource_name)
       return;
     
-    if (TextureManager::IsTextureResource (resource_name))
+    if (render::TextureManager::IsTextureResource (resource_name))
     {
-      impl->textures.UnloadTexture (resource_name);
+      TextureManager ().UnloadTexture (resource_name);
       return;
     }
     
-    if (PrimitiveManager::IsMeshLibraryResource (resource_name))
+    if (render::PrimitiveManager::IsMeshLibraryResource (resource_name))
     {
-      impl->primitives.UnloadMeshLibrary (resource_name);
+      PrimitiveManager ().UnloadMeshLibrary (resource_name);
       return;
     }
   }
@@ -478,7 +355,7 @@ void RenderManagerImpl::LoadResource (const media::geometry::MeshLibrary& librar
 {
   try
   {
-    impl->primitives.LoadMeshLibrary (library);
+    PrimitiveManager ().LoadMeshLibrary (library);
   }
   catch (xtl::exception& e)
   {
@@ -491,7 +368,7 @@ void RenderManagerImpl::UnloadResource (const media::geometry::MeshLibrary& libr
 {
   try
   {
-    impl->primitives.UnloadMeshLibrary (library);
+    PrimitiveManager ().UnloadMeshLibrary (library);
   }
   catch (xtl::exception& e)
   {
@@ -512,6 +389,6 @@ xtl::connection RenderManagerImpl::RegisterWindowEventHandler (RenderManagerWind
     case RenderManagerWindowEvent_OnRemoved:
       return impl->window_signals [event].connect (handler);
     default:
-        throw xtl::make_argument_exception ("render::RenderManagerImpl::RegisterWindowEventHandler", "event", event);
+      throw xtl::make_argument_exception ("render::RenderManagerImpl::RegisterWindowEventHandler", "event", event);
   }
 }

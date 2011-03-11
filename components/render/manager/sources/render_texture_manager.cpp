@@ -10,12 +10,14 @@ typedef stl::hash_map<stl::hash_key<const char*>, TextureProxy> ProxyMap;
 
 struct TextureManager::Impl
 {
-  RenderManagerImpl&  manager;          //ссылка на владельца
-  TextureProxyManager proxy_manager;    //менеджер прокси объектов
-  ProxyMap            loaded_textures;  //загруженные текстуры
+  DeviceManagerPtr    device_manager;        //менеджер устройства отрисовки
+  TextureProxyManager texture_proxy_manager; //менеджер прокси текстур
+  SamplerProxyManager sampler_proxy_manager; //менеджер прокси сэмплеров
+  ProxyMap            loaded_textures;       //загруженные текстуры
+  Log                 log;                   //протокол сообщений  
   
-  Impl (RenderManagerImpl& in_manager)
-    : manager (in_manager)
+  Impl (const DeviceManagerPtr& in_device_manager)
+    : device_manager (in_device_manager)
   {
   }
 };
@@ -24,13 +26,110 @@ struct TextureManager::Impl
     Конструктор / деструктор
 */
 
-TextureManager::TextureManager (RenderManagerImpl& owner)
-  : impl (new Impl (owner))
+TextureManager::TextureManager (const DeviceManagerPtr& device_manager)
+  : impl (new Impl (device_manager))
 {
 }
 
 TextureManager::~TextureManager ()
 {
+}
+
+/*
+    Создание текстур
+*/
+
+TexturePtr TextureManager::CreateTexture (const media::Image& image, bool generate_mips_enable)
+{
+  try
+  {
+    TextureDimension dimension;
+    
+    switch (image.Depth ())
+    {
+      case 1:
+        dimension = TextureDimension_2D;
+        break;
+      case 6:
+        dimension = TextureDimension_Cubemap;
+        break;
+      default:
+        dimension = TextureDimension_3D;
+        break;
+    }
+
+    return CreateTexture (image, dimension, generate_mips_enable);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::TextureManager::CreateTexture(const media::Image&,bool)");
+    throw;
+  }
+}
+
+TexturePtr TextureManager::CreateTexture (const media::Image& image, render::TextureDimension dimension, bool generate_mips_enable)
+{
+  try
+  {
+    PixelFormat format;
+    
+    switch (image.Format ())
+    {
+      case media::PixelFormat_BGR8:
+      case media::PixelFormat_RGB16:
+        impl->log.Printf ("Convert image '%s' from '%s' to '%s'", image.Name (), media::get_format_name (image.Format ()), get_name (PixelFormat_RGB8));
+      case media::PixelFormat_RGB8:
+        format = PixelFormat_RGB8;
+        break;
+      case media::PixelFormat_BGRA8:
+      case media::PixelFormat_RGBA16:
+        impl->log.Printf ("Convert image '%s' from '%s' to '%s'", image.Name (), media::get_format_name (image.Format ()), get_name (PixelFormat_RGBA8));
+      case media::PixelFormat_RGBA8:
+        format = PixelFormat_RGBA8;
+        break;
+      case media::PixelFormat_L8:
+        format = PixelFormat_L8;
+        break;
+      case media::PixelFormat_A8:
+        format = PixelFormat_A8;
+        break;
+      case media::PixelFormat_LA8:
+        format = PixelFormat_LA8;
+        break;
+      default:
+        throw xtl::format_not_supported_exception ("", "Unsupported image '%s' format '%s'", image.Name (), media::get_format_name (image.Format ()));
+    }
+
+    TexturePtr texture = CreateTexture (dimension, image.Width (), image.Height (), image.Depth (), format, generate_mips_enable);
+
+    texture->Update (image);
+
+    return texture;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::TextureManager::CreateTexture(const media::Image&,TextureDimension,bool)");
+    throw;
+  }
+}
+
+TexturePtr TextureManager::CreateTexture
+ (render::TextureDimension dimension,
+  size_t                   width,
+  size_t                   height,
+  size_t                   depth,
+  render::PixelFormat      format,
+  bool                     generate_mips_enable)
+{
+  try
+  {
+    return TexturePtr (new TextureImpl (impl->device_manager, dimension, width, height, depth, format, generate_mips_enable), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::TextureManager::CreateTexture(TextureDimension,size_t,size_t,size_t,PixelFormat,bool)");
+    throw;
+  }
 }
 
 /*
@@ -58,8 +157,8 @@ void TextureManager::LoadTexture (const char* name)
     
     media::Image image (name);
     
-    TexturePtr   texture = impl->manager.CreateTexture (image, true);    
-    TextureProxy proxy   = impl->proxy_manager.GetProxy (name);
+    TexturePtr   texture = CreateTexture (image, true);    
+    TextureProxy proxy   = impl->texture_proxy_manager.GetProxy (name);
     
     proxy.SetResource (texture);
     
@@ -77,7 +176,14 @@ void TextureManager::UnloadTexture (const char* name)
   if (!name)
     return;
     
-  impl->loaded_textures.erase (name);
+  ProxyMap::iterator iter = impl->loaded_textures.find (name);
+  
+  if (iter == impl->loaded_textures.end ())
+    return;
+    
+  iter->second.SetResource (TexturePtr ());
+    
+  impl->loaded_textures.erase (iter);
 }
 
 /*
@@ -86,28 +192,48 @@ void TextureManager::UnloadTexture (const char* name)
 
 TextureProxy TextureManager::GetTextureProxy (const char* name)
 {
-  return impl->proxy_manager.GetProxy (name);
+  return impl->texture_proxy_manager.GetProxy (name);
+}
+
+SamplerProxy TextureManager::GetSamplerProxy (const char* name)
+{
+  return impl->sampler_proxy_manager.GetProxy (name);
 }
 
 /*
-    Поиск загруженной текстуры
+    Поиск загруженной текстуры / сэмплера
 */
 
 TexturePtr TextureManager::FindTexture (const char* name)
 {
-  return impl->proxy_manager.FindResource (name);
+  return impl->texture_proxy_manager.FindResource (name);
+}
+
+LowLevelSamplerStatePtr TextureManager::FindSampler (const char* name)
+{
+  return impl->sampler_proxy_manager.FindResource (name);
 }
 
 /*
-    Установка текстуры по умолчанию
+    Установка текстуры по умолчанию / сэмплера по умолчанию
 */
 
 void TextureManager::SetDefaultTexture (const TexturePtr& texture)
 {
-  impl->proxy_manager.SetDefaultResource (texture);
+  impl->texture_proxy_manager.SetDefaultResource (texture);
 }
 
 TexturePtr TextureManager::DefaultTexture ()
 {
-  return impl->proxy_manager.DefaultResource ();
+  return impl->texture_proxy_manager.DefaultResource ();
+}
+
+void TextureManager::SetDefaultSampler (const LowLevelSamplerStatePtr& sampler)
+{
+  impl->sampler_proxy_manager.SetDefaultResource (sampler);
+}
+
+LowLevelSamplerStatePtr TextureManager::DefaultSampler ()
+{
+  return impl->sampler_proxy_manager.DefaultResource ();
 }

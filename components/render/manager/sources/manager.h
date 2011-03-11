@@ -31,26 +31,19 @@ class RenderManagerImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     RenderTargetPtr CreateRenderBuffer       (size_t width, size_t height, PixelFormat format);
     RenderTargetPtr CreateDepthStencilBuffer (size_t width, size_t height);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание примитивов
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    PrimitivePtr        CreatePrimitive        ();
-    PrimitivePtr        CreatePrimitive        (const PrimitiveBuffersPtr&);
-    PrimitiveBuffersPtr CreatePrimitiveBuffers (MeshBufferUsage lines_usage = MeshBufferUsage_Stream, MeshBufferUsage sprites_usage = MeshBufferUsage_Stream);
-    FramePtr            CreateFrame            ();
-    TexturePtr          CreateTexture          (const media::Image& image, bool generate_mipmaps);
-    TexturePtr          CreateTexture          (const media::Image& image, TextureDimension dimension, bool generate_mipmaps);
-    TexturePtr          CreateTexture          (TextureDimension dimension, size_t width, size_t height, size_t depth, PixelFormat format, bool generate_mipmaps);
-    MaterialPtr         CreateMaterial         ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Поиск загруженных примитивов
+///Менеджеры ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    TexturePtr   FindTexture   (const char* name);
-    MaterialPtr  FindMaterial  (const char* name);
-    PrimitivePtr FindPrimitive (const char* name);
+    render::TextureManager&   TextureManager   ();
+    render::PrimitiveManager& PrimitiveManager ();
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание объектов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    FramePtr    CreateFrame    ();
+    MaterialPtr CreateMaterial ();
+    
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка ресурсов
 ///////////////////////////////////////////////////////////////////////////////////////////////////

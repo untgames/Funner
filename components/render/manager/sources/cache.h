@@ -41,6 +41,7 @@ class CacheHolder: public xtl::noncopyable
 ///Кэшируемый источник требует обновления кэша.
 ///////////////////////////////////////////////////////////////////////////////////////////////////  
     virtual void UpdateCacheCore () = 0;
+    //TODO: ResetCacheCore
 
   private:
     typedef stl::list<CacheHolder*> HolderList;
