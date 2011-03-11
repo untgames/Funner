@@ -114,7 +114,7 @@ class IPhoneDevice : public DefaultDevice
     Impl *impl;
 };
 
-#ifdef __IPHONE_3_0
+#ifdef IPHONE
   typedef IPhoneDevice Device;
 #else
   typedef DefaultDevice Device;

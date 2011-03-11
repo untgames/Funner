@@ -2,10 +2,6 @@
 #—борка под MacOS X g++
 ###################################################################################################
 
-ifndef MACOSX_SDK_PATH
-  $(error "Environment variable 'MACOSX_SDK_PATH' not found (use macosx-version.g++ toolset)")
-endif
-
 ifndef MACOSX_VERSION
   $(error "Environment variable 'MACOSX_VERSION' not found (use macosx-version.g++ toolset)")
 endif
@@ -23,6 +19,8 @@ DLL_PATH := DYLD_LIBRARY_PATH
 MACOSX_DEPLOYMENT_TARGET := $(MACOSX_VERSION)
 
 export MACOSX_DEPLOYMENT_TARGET
+
+MACOSX_SDK_PATH := /Developer/SDKs/MacOSX10.6.sdk
 
 COMMON_CFLAGS     += -msse3 -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386
 COMMON_LINK_FLAGS += -isysroot $(MACOSX_SDK_PATH) -mmacosx-version-min=$(MACOSX_VERSION) -arch i386

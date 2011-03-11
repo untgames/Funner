@@ -7,7 +7,7 @@
 #import <Foundation/NSFileManager.h>
 #import <Foundation/NSString.h>
 
-#ifndef __IPHONE_3_0
+#ifndef IPHONE
 
 #import <AppKit/NSApplication.h>
 #import <CoreServices/CoreServices.h>
@@ -30,7 +30,7 @@ using namespace common;
 namespace
 {
 
-#ifndef __IPHONE_3_0
+#ifndef IPHONE
 
 const char* get_gestalt_manager_error_name (OSErr error)
 {
@@ -66,7 +66,7 @@ class CocoaFileSystem: public StdioFileSystem
     {
       NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-#ifdef __IPHONE_3_0
+#ifdef IPHONE
       file_manager = [[NSFileManager alloc] init];
 #else
       SInt32 os_version_major, os_version_minor;
@@ -132,7 +132,7 @@ class CocoaFileSystem: public StdioFileSystem
 
       NSError* error = nil;
 
-#if defined __IPHONE_3_0 || defined __MAC_10_5
+#if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
       if (![file_manager removeItemAtPath:path error:&error])
 #else
       BOOL result;
@@ -174,7 +174,7 @@ class CocoaFileSystem: public StdioFileSystem
 
       NSError* error = nil;
 
-#if defined __IPHONE_3_0 || defined __MAC_10_5
+#if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
       if (![file_manager moveItemAtPath:src_path toPath:dst_path error:&error])
 #else
       if (![file_manager movePath:src_path toPath:dst_path handler:nil])
@@ -201,7 +201,7 @@ class CocoaFileSystem: public StdioFileSystem
 
       NSError* error = nil;
 
-#if defined __IPHONE_3_0 || defined __MAC_10_5
+#if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
       if (![file_manager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:&error])
 #else
       if (![file_manager createDirectoryAtPath:path attributes:nil])
@@ -238,7 +238,7 @@ class CocoaFileSystem: public StdioFileSystem
 
       NSString* path = [file_manager stringWithFileSystemRepresentation:file_name length:xtl::xstrlen (file_name)];
 
-#if defined __IPHONE_3_0 || defined __MAC_10_5
+#if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
       NSDictionary* file_attributes = [file_manager attributesOfItemAtPath:path error:nil];
 #else
       NSDictionary* file_attributes = [file_manager fileAttributesAtPath:path traverseLink:NO];
@@ -279,7 +279,7 @@ class CocoaFileSystem: public StdioFileSystem
         return;
       }
 
-#if defined __IPHONE_3_0 || defined __MAC_10_5
+#if defined IPHONE || __MAC_OS_X_VERSION_MIN_REQUIRED >= 1050
       NSError* error = nil;
 
       NSArray* subpathes = [file_manager contentsOfDirectoryAtPath:path error:&error];
