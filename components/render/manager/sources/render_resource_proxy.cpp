@@ -185,6 +185,8 @@ void ResourceProxy<Ptr>::SetResource (const Pointer& ptr)
 
   impl->resource   = ptr;
   impl->is_default = !ptr;
+  
+  impl->Invalidate ();
 }
 
 template <class Ptr>

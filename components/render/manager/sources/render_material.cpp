@@ -45,6 +45,34 @@ struct MaterialImpl::Impl
     : texture_manager (in_texture_manager)
   {
   }
+  
+///Отсоединение от кэша
+  void DetachCache (CacheHolder& holder)
+  {
+    for (TexmapArray::iterator iter=texmaps.begin (), end=texmaps.end (); iter!=end; ++iter)
+    {
+      iter->texture.Detach (holder);
+      iter->sampler.Detach (holder);
+    }
+  }
+  
+///Присоединение к кэшу
+  void AttachCache (CacheHolder& holder)
+  {
+    try
+    {
+      for (TexmapArray::iterator iter=texmaps.begin (), end=texmaps.end (); iter!=end; ++iter)
+      {
+        iter->texture.Attach (holder);
+        iter->sampler.Attach (holder);
+      }      
+    }
+    catch (...)
+    {
+      DetachCache (holder);
+      throw;
+    }
+  }
 };
 
 /*
@@ -142,11 +170,17 @@ void MaterialImpl::Update (const media::rfx::Material& material)
       Texmap new_texmap (impl->texture_manager->GetTextureProxy (texmap.Image ()), impl->texture_manager->GetSamplerProxy (texmap.Sampler ()));
       
       new_texmaps.push_back (new_texmap);
-    }
+    }    
     
     impl->properties = new_properties;
+    
+    impl->DetachCache (*this);    
 
     impl->texmaps.swap (new_texmaps);
+    
+    impl->AttachCache (*this);
+    
+    Invalidate ();
   }
   catch (xtl::exception& e)
   {
