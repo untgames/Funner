@@ -37,12 +37,14 @@ typedef stl::list<MeshLibraryEntryPtr>       MeshLibraryList;
 struct PrimitiveManager::Impl
 {
   DeviceManagerPtr      device_manager;   //менеджер устройства отрисовки
+  MaterialManagerPtr    material_manager; //менеджер материалов
   PrimitiveProxyManager proxy_manager;    //менеджер прокси объектов
   MeshLibraryList       loaded_libraries; //список загруженных библиотек
   
 ///Конструктор
-  Impl (const DeviceManagerPtr& in_device_manager)
+  Impl (const DeviceManagerPtr& in_device_manager, const MaterialManagerPtr& in_material_manager)
     : device_manager (in_device_manager)
+    , material_manager (in_material_manager)
   {
   }
   
@@ -78,7 +80,7 @@ struct PrimitiveManager::Impl
       
       for (media::geometry::MeshLibrary::ConstIterator iter=library.CreateIterator (); iter; ++iter)
       {
-        PrimitivePtr primitive (new PrimitiveImpl (device_manager, primitive_buffers), false);
+        PrimitivePtr primitive (new PrimitiveImpl (device_manager, material_manager, primitive_buffers), false);
         
         PrimitiveProxy proxy = proxy_manager.GetProxy (library.ItemId (iter));
         
@@ -123,8 +125,8 @@ struct PrimitiveManager::Impl
     Конструктор / деструктор
 */
 
-PrimitiveManager::PrimitiveManager (const DeviceManagerPtr& device_manager)
-  : impl (new Impl (device_manager))
+PrimitiveManager::PrimitiveManager (const DeviceManagerPtr& device_manager, const MaterialManagerPtr& material_manager)
+  : impl (new Impl (device_manager, material_manager))
 {
 }
 
@@ -153,7 +155,7 @@ PrimitivePtr PrimitiveManager::CreatePrimitive (const PrimitiveBuffersPtr& buffe
 {
   try
   {
-    return PrimitivePtr (new PrimitiveImpl (impl->device_manager, buffer), false);
+    return PrimitivePtr (new PrimitiveImpl (impl->device_manager, impl->material_manager, buffer), false);
   }
   catch (xtl::exception& e)
   {

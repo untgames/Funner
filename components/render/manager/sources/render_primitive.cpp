@@ -1,7 +1,5 @@
 #include "shared.h"
 
-//TODO: add material
-
 using namespace render;
 using namespace render::low_level;
 
@@ -14,17 +12,18 @@ namespace
 
 struct MeshPrimitive
 {
-  //TODO: add material
   render::low_level::PrimitiveType type;          //тип примитива
   VertexBufferPtr                  vertex_buffer; //вершинный буфер
   LowLevelInputLayoutPtr           layout;        //лэйаут примитива
   size_t                           first;         //индекс первой вершины/индекса
   size_t                           count;         //количество примитивов
+  MaterialProxy                    material;      //материал
   
-  MeshPrimitive ()
+  MeshPrimitive (const MaterialProxy& in_material)
     : type (PrimitiveType_PointList)
     , first (0)
     , count (0)
+    , material (in_material)
   {
   }
 };
@@ -44,13 +43,15 @@ typedef stl::vector<MeshPtr>     MeshArray;
 
 struct PrimitiveImpl::Impl
 {
-  DeviceManagerPtr device_manager;   //менеджер устройства
-  BuffersPtr       buffers;          //буферы примитива
-  MeshArray        meshes;           //меши
+  DeviceManagerPtr   device_manager;   //менеджер устройства
+  MaterialManagerPtr material_manager; //менеджер материалов
+  BuffersPtr         buffers;          //буферы примитива
+  MeshArray          meshes;           //меши
   
 ///Конструктор
-  Impl (const DeviceManagerPtr& in_device_manager, const BuffersPtr& in_buffers)
+  Impl (const DeviceManagerPtr& in_device_manager, const MaterialManagerPtr& in_material_manager, const BuffersPtr& in_buffers)
     : device_manager (in_device_manager)
+    , material_manager (in_material_manager)
     , buffers (in_buffers)
   {
     static const char* METHOD_NAME = "render::PrimitiveImpl::Impl::Impl";
@@ -67,11 +68,11 @@ struct PrimitiveImpl::Impl
     Конструктор / деструктор
 */
 
-PrimitiveImpl::PrimitiveImpl (const DeviceManagerPtr& device_manager, const BuffersPtr& buffers)
+PrimitiveImpl::PrimitiveImpl (const DeviceManagerPtr& device_manager, const MaterialManagerPtr& material_manager, const BuffersPtr& buffers)
 {
   try
   {
-    impl = new Impl (device_manager, buffers);
+    impl = new Impl (device_manager, material_manager, buffers);
   }
   catch (xtl::exception& e)
   {
@@ -148,7 +149,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
     for (size_t i=0, count=source.PrimitivesCount (); i<count; i++)
     {
       const media::geometry::Primitive& src_primitive = source.Primitive (i);
-      MeshPrimitive                     dst_primitive;
+      MeshPrimitive                     dst_primitive (impl->material_manager->GetMaterialProxy (src_primitive.material));
 
       switch (src_primitive.type)
       {

@@ -150,7 +150,7 @@ PrimitiveManager& RenderManagerImpl::PrimitiveManager ()
   try
   {
     if (!impl->primitives)
-      impl->primitives = PrimitiveManagerPtr (new render::PrimitiveManager (&impl->DeviceManager ()), false);    
+      impl->primitives = PrimitiveManagerPtr (new render::PrimitiveManager (&impl->DeviceManager (), &MaterialManager ()), false);    
 
     return *impl->primitives;
   }
