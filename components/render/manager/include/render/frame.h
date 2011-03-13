@@ -7,13 +7,12 @@
 #include <render/entity.h>
 #include <render/render_target.h>
 
-///???продумать тэги объектов и материалов и их связь с эффектом, устанавливаемым во фрейм. возможно, эффект - не часть материала, а часть фрейма, определяющая порядок ренедринга объектов на основании их тегов
-
 namespace render
 {
 
 //implementation forwards
 class FrameImpl;
+class RectAreaImpl;
 class Wrappers;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,16 +30,48 @@ enum ClearFlag
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Порядок кадров
+///Прямоугольная область (для совместного доступа нескольких областей вывода)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-enum FrameOrder
+class RectArea
 {
-  FrameOrder_PreRender,  //кадр рисуется до основного и до всех его дочерних кадров
-  FrameOrder_Child,      //дочерний кадр
-  FrameOrder_PostRender, //кадр рисуется после основного и всех его дочерних кадров
+  friend class Wrappers;
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструкторы / деструктор / присваивание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    RectArea  ();
+    RectArea  (const render::Rect&);
+    ~RectArea ();
+    
+    RectArea& operator = (const RectArea&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Размеры области
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                SetRect (const render::Rect& rect);
+    void                SetRect (int x, int y, size_t width, size_t height);
+    const render::Rect& Rect    () const;
+    int                 X       () const;
+    int                 Y       () const;
+    size_t              Width   () const;
+    size_t              Height  () const;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Swap (RectArea&);
   
-  FrameOrder_Num
+  private:
+    RectArea (RectAreaImpl*);
+    
+  private:
+    RectAreaImpl* impl;
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Обмен
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void swap (RectArea&, RectArea&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Визуализируемый кадр
@@ -58,28 +89,27 @@ class Frame
     Frame& operator = (const Frame&);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Целевые буферы отрисовки
+///Регистрация целевых буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-//добавить интерфейсную возможность MRT!!!
-    void                       SetRenderTargets   (const render::RenderTarget& render_target, const render::RenderTarget& depth_stencil_target);
-          render::RenderTarget RenderTarget       ();
-          render::RenderTarget DepthStencilTarget ();
-    const render::RenderTarget RenderTarget       () const;
-    const render::RenderTarget DepthStencilTarget () const;
+    void SetRenderTarget        (const char* name, const render::RenderTarget& target);
+    void SetRenderTarget        (const char* name, const render::RenderTarget& target, const RectArea& viewport);
+    void SetRenderTarget        (const char* name, const render::RenderTarget& target, const RectArea& viewport, const RectArea& scissor);
+    void RemoveRenderTarget     (const char* name);
+    void RemoveAllRenderTargets ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Область вывода
+///Получение целевых буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetViewport (const Rect&);
-    const Rect& Viewport    () const;
+    bool                  HasRenderTarget (const char* name) const;
+    render::RenderTarget  RenderTarget    (const char* name) const;
+    RectArea              Viewport        (const char* name) const;
+    RectArea              Scissor         (const char* name) const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Область отсечения
+///Управление отсечением
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetScissor      (const Rect&);
-    const Rect& Scissor         () const;
-    void        SetScissorState (bool state);
-    bool        ScissorState    () const;
+    void SetScissorState (bool state);
+    bool ScissorState    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Флаги очистки кадра
@@ -98,22 +128,27 @@ class Frame
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void          SetClearDepthValue   (float depth_value);
     void          SetClearStencilIndex (unsigned char stencil_index);
-    float         ClearDepthValue   ();
-    unsigned char ClearStencilIndex ();
+    float         ClearDepthValue      () const;
+    unsigned char ClearStencilIndex    () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Матрица вида / матрица преобразования
+///Локальные текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void               SetViewMatrix       (const math::mat4f&);
-    void               SetProjectionMatrix (const math::mat4f&);
-    const math::mat4f& ViewMatrix          () const;
-    const math::mat4f& ProjectionMatrix    () const;
+    void SetLocalTexture        (const char* name, const Texture& texture);
+    void RemoveLocalTexture     (const char* name);
+    void RemoveAllLocalTextures ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Установка техники рендеринга
+///Получение локальной текстуры
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void        SetTechnique (const char* name);
-    const char* Technique    () const;
+    bool    HasLocalTexture (const char* name) const;
+    Texture LocalTexture    (const char* name) const;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Установка эффекта рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        SetEffect (const char* name);
+    const char* Effect    () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Свойства рендеринга
@@ -129,22 +164,16 @@ class Frame
     void   RemoveAllEntities ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Добавление пре-рендеринга и пост-рендеринга
+///Добавление кадра (порядок отрисовки определяется по тэгам при описании эффекта)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddFrame        (FrameOrder order, const Frame& frame);
-    void RemoveAllFrames ();
-    
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание кадров и добавление их к данному
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    Frame AddPreRenderFrame  ();
-    Frame AddChildFrame      ();
-    Frame AddPostRenderFrame ();
+    size_t FramesCount     () const;
+    void   AddFrame        (const Frame& frame);
+    void   RemoveAllFrames ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Удаление всех объектов из кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void RemoveAll ();
+    void RemoveAllFramesAndEntities ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование кадра

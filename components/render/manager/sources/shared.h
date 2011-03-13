@@ -53,6 +53,7 @@ typedef xtl::intrusive_ptr<MaterialManager>      MaterialManagerPtr;
 typedef xtl::intrusive_ptr<PrimitiveImpl>        PrimitivePtr;
 typedef xtl::intrusive_ptr<PrimitiveBuffersImpl> PrimitiveBuffersPtr;
 typedef xtl::intrusive_ptr<PrimitiveManager>     PrimitiveManagerPtr;
+typedef xtl::intrusive_ptr<RectAreaImpl>         RectAreaPtr;
 typedef xtl::intrusive_ptr<RenderManagerImpl>    RenderManagerPtr;
 typedef xtl::intrusive_ptr<RenderTargetImpl>     RenderTargetPtr;
 typedef xtl::intrusive_ptr<TextureImpl>          TexturePtr;
@@ -124,6 +125,7 @@ class Wrappers
 #include "primitive.h"
 #include "primitive_buffers.h"
 #include "primitive_manager.h"
+#include "rect_area.h"
 #include "render_target.h"
 #include "texture.h"
 #include "texture_manager.h"

@@ -25,49 +25,50 @@ Frame& Frame::operator = (const Frame& frame)
   return *this;
 }
 
-void Frame::SetRenderTargets (const render::RenderTarget& render_target, const render::RenderTarget& depth_stencil_target)
+void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target)
 {
-  impl->SetRenderTargets (Wrappers::Unwrap<RenderTargetImpl> (render_target), Wrappers::Unwrap<RenderTargetImpl> (depth_stencil_target));
+  impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target));
 }
 
-RenderTarget Frame::RenderTarget ()
+void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target, const RectArea& viewport)
 {
-  return Wrappers::Wrap<render::RenderTarget> (impl->RenderTarget ());
+  impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<RectAreaImpl> (viewport));
 }
 
-RenderTarget Frame::DepthStencilTarget ()
+void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target, const RectArea& viewport, const RectArea& scissor)
 {
-  return Wrappers::Wrap<render::RenderTarget> (impl->DepthStencilTarget ());
+  impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target), Wrappers::Unwrap<RectAreaImpl> (viewport), 
+    Wrappers::Unwrap<RectAreaImpl> (scissor));
 }
 
-const RenderTarget Frame::RenderTarget () const
+void Frame::RemoveRenderTarget (const char* name)
 {
-  return Wrappers::Wrap<render::RenderTarget> (impl->RenderTarget ());
+  impl->RemoveRenderTarget (name);
 }
 
-const RenderTarget Frame::DepthStencilTarget () const
+void Frame::RemoveAllRenderTargets ()
 {
-  return Wrappers::Wrap<render::RenderTarget> (impl->DepthStencilTarget ());
+  impl->RemoveAllRenderTargets ();
 }
 
-void Frame::SetViewport (const Rect& rect)
+bool Frame::HasRenderTarget (const char* name) const
 {
-  impl->SetViewport (rect);
+  return impl->FindRenderTarget (name) != RenderTargetPtr ();
 }
 
-const Rect& Frame::Viewport () const
+RenderTarget Frame::RenderTarget (const char* name) const
 {
-  return impl->Viewport ();
+  return Wrappers::Wrap<render::RenderTarget> (impl->RenderTarget (name));
 }
 
-void Frame::SetScissor (const Rect& rect)
+RectArea Frame::Viewport (const char* name) const
 {
-  impl->SetScissor (rect);
+  return Wrappers::Wrap<RectArea> (impl->Viewport (name));
 }
 
-const Rect& Frame::Scissor () const
+RectArea Frame::Scissor (const char* name) const
 {
-  return impl->Scissor ();
+  return Wrappers::Wrap<RectArea> (impl->Scissor (name));
 }
 
 void Frame::SetScissorState (bool state)
@@ -110,44 +111,49 @@ void Frame::SetClearStencilIndex (unsigned char stencil_index)
   impl->SetClearStencilIndex (stencil_index);
 }
 
-float Frame::ClearDepthValue ()
+float Frame::ClearDepthValue () const
 {
   return impl->ClearDepthValue ();
 }
 
-unsigned char Frame::ClearStencilIndex ()
+unsigned char Frame::ClearStencilIndex () const
 {
   return impl->ClearStencilIndex ();
 }
 
-void Frame::SetViewMatrix (const math::mat4f& tm)
+void Frame::SetLocalTexture (const char* name, const render::Texture& texture)
 {
-  impl->SetViewMatrix (tm);
+  impl->SetLocalTexture (name, Wrappers::Unwrap<TextureImpl> (texture));
 }
 
-void Frame::SetProjectionMatrix (const math::mat4f& tm)
+void Frame::RemoveLocalTexture (const char* name)
 {
-  impl->SetProjectionMatrix (tm);
+  impl->RemoveLocalTexture (name);
 }
 
-const math::mat4f& Frame::ViewMatrix () const
+void Frame::RemoveAllLocalTextures ()
 {
-  return impl->ViewMatrix ();
+  impl->RemoveAllLocalTextures ();
 }
 
-const math::mat4f& Frame::ProjectionMatrix () const
+bool Frame::HasLocalTexture (const char* name) const
 {
-  return impl->ProjectionMatrix ();
+  return impl->FindLocalTexture (name) != TexturePtr ();
 }
 
-void Frame::SetTechnique (const char* name)
+Texture Frame::LocalTexture (const char* name) const
 {
-  impl->SetTechnique (name);
+  return Wrappers::Wrap<Texture> (impl->LocalTexture (name));
 }
 
-const char* Frame::Technique () const
+void Frame::SetEffect (const char* name)
 {
-  return impl->Technique ();
+  impl->SetEffect (name);
+}
+
+const char* Frame::Effect () const
+{
+  return impl->Effect ();
 }
 
 void Frame::SetProperties (const common::PropertyMap& properties)
@@ -175,9 +181,14 @@ void Frame::RemoveAllEntities ()
   impl->RemoveAllEntities ();
 }
 
-void Frame::AddFrame (FrameOrder order, const Frame& frame)
+size_t Frame::FramesCount () const
 {
-  impl->AddFrame (order, Wrappers::Unwrap<FrameImpl> (frame));
+  return impl->FramesCount ();
+}
+
+void Frame::AddFrame (const Frame& frame)
+{
+  impl->AddFrame (Wrappers::Unwrap<FrameImpl> (frame));
 }
 
 void Frame::RemoveAllFrames ()
@@ -185,24 +196,10 @@ void Frame::RemoveAllFrames ()
   impl->RemoveAllFrames ();
 }
 
-Frame Frame::AddPreRenderFrame ()
+void Frame::RemoveAllFramesAndEntities ()
 {
-  return Wrappers::Wrap<Frame> (impl->AddPreRenderFrame ());
-}
-
-Frame Frame::AddChildFrame ()
-{
-  return Wrappers::Wrap<Frame> (impl->AddChildFrame ());
-}
-
-Frame Frame::AddPostRenderFrame ()
-{
-  return Wrappers::Wrap<Frame> (impl->AddPostRenderFrame ());
-}
-
-void Frame::RemoveAll ()
-{
-  impl->RemoveAll ();
+  impl->RemoveAllFrames ();
+  impl->RemoveAllEntities ();
 }
 
 void Frame::Draw ()

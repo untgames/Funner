@@ -26,51 +26,101 @@ FrameImpl::~FrameImpl ()
 }
 
 /*
-    Целевые буферы отрисовки
+    Регистрация целевых буферов отрисовки
 */
 
-void FrameImpl::SetRenderTargets (const RenderTargetPtr& render_target, const RenderTargetPtr& depth_stencil_target)
+void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetRenderTargets");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-const RenderTargetPtr& FrameImpl::RenderTarget ()
+void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target, const RectAreaPtr& viewport)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::RenderTarget");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-const RenderTargetPtr& FrameImpl::DepthStencilTarget ()
+void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target, const RectAreaPtr& viewport, const RectAreaPtr& scissor)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::DepthStencilTarget");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+void FrameImpl::RemoveRenderTarget (const char* name)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+void FrameImpl::RemoveAllRenderTargets ()
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
 /*
-    Область вывода
+    Получение целевых буферов отрисовки
 */
 
-void FrameImpl::SetViewport (const render::Rect&)
+RenderTargetPtr FrameImpl::FindRenderTarget (const char* name)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetViewport");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-const render::Rect& FrameImpl::Viewport ()
+RectAreaPtr FrameImpl::FindViewport (const char* name)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::Viewport");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+RectAreaPtr FrameImpl::FindScissor (const char* name)
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+RenderTargetPtr FrameImpl::RenderTarget (const char* name)
+{
+  static const char* METHOD_NAME = "render::FrameImpl::RenderTarget";
+  
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+    
+  RenderTargetPtr target = FindRenderTarget (name);
+  
+  if (target)
+    return target;
+    
+  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Render target not found");
+}
+
+RectAreaPtr FrameImpl::Viewport (const char* name)
+{
+  static const char* METHOD_NAME = "render::FrameImpl::Viewport";
+  
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+    
+  RectAreaPtr area = FindViewport (name);
+  
+  if (area)
+    return area;
+    
+  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Viewport not found");
+}
+
+RectAreaPtr FrameImpl::Scissor (const char* name)
+{
+  static const char* METHOD_NAME = "render::FrameImpl::Scissor";
+  
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+    
+  RectAreaPtr area = FindScissor (name);
+  
+  if (area)
+    return area;
+    
+  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Scissor not found");
 }
 
 /*
     Область отсечения
 */
-
-void FrameImpl::SetScissor (const render::Rect&)
-{
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetScissor");
-}
-
-const render::Rect& FrameImpl::Scissor ()
-{
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::Scissor");
-}
 
 void FrameImpl::SetScissorState (bool state)
 {
@@ -135,41 +185,61 @@ unsigned char FrameImpl::ClearStencilIndex ()
 }
 
 /*
-    Матрица вида / матрица преобразования
+    Локальные текстуры
 */
 
-void FrameImpl::SetViewMatrix (const math::mat4f& tm)
+void FrameImpl::SetLocalTexture (const char* name, const TexturePtr& texture)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetViewMatrix");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-void FrameImpl::SetProjectionMatrix (const math::mat4f& tm)
+void FrameImpl::RemoveLocalTexture (const char* name)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetProjectionMatrix");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-const math::mat4f& FrameImpl::ViewMatrix ()
+void FrameImpl::RemoveAllLocalTextures ()
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::ViewMatrix");
-}
-
-const math::mat4f& FrameImpl::ProjectionMatrix ()
-{
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::ProjectionMatrix");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
 /*
-    Установка техники рендеринга
+    Получение локальной текстуры
 */
 
-void FrameImpl::SetTechnique (const char* name)
+TexturePtr FrameImpl::FindLocalTexture (const char* name)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetTechnique");
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
 }
 
-const char* FrameImpl::Technique ()
+TexturePtr FrameImpl::LocalTexture (const char* name)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::Technique");
+  static const char* METHOD_NAME = "render::FrameImpl::LocalTexture";
+  
+  if (!name)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+    
+  TexturePtr texture = FindLocalTexture (name);
+  
+  if (texture)
+    return texture;
+    
+  throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Local texture not found");
+
+}
+
+/*
+    Установка эффекта рендеринга
+*/
+
+void FrameImpl::SetEffect (const char* name)
+{
+  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetEffect");
+}
+
+const char* FrameImpl::Effect ()
+{
+  throw xtl::make_not_implemented_exception ("render::FrameImpl::Effect");
 }
 
 /*
@@ -209,7 +279,12 @@ void FrameImpl::RemoveAllEntities ()
     Добавление пре-рендеринга и пост-рендеринга
 */
 
-void FrameImpl::AddFrame (FrameOrder order, const FramePtr& frame)
+size_t FrameImpl::FramesCount ()
+{
+  throw xtl::make_not_implemented_exception (__FUNCTION__);
+}
+
+void FrameImpl::AddFrame (const FramePtr& frame)
 {
   throw xtl::make_not_implemented_exception ("render::FrameImpl::AddFrame");
 }
@@ -217,34 +292,6 @@ void FrameImpl::AddFrame (FrameOrder order, const FramePtr& frame)
 void FrameImpl::RemoveAllFrames ()
 {
   throw xtl::make_not_implemented_exception ("render::FrameImpl::RemoveAllFrames");
-}
-
-/*
-    Создание кадров и добавление их к данному
-*/
-
-FramePtr FrameImpl::AddPreRenderFrame ()
-{
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::AddPreRenderFrame");
-}
-
-FramePtr FrameImpl::AddChildFrame ()
-{
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::AddChildFrame");
-}
-
-FramePtr FrameImpl::AddPostRenderFrame ()
-{
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::AddPostRenderFrame");  
-}
-
-/*
-    Удаление всех объектов из кадра
-*/
-
-void FrameImpl::RemoveAll ()
-{
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::RemoveAll");
 }
 
 /*

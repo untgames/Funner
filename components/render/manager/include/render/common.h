@@ -37,7 +37,6 @@ struct Rect
   Rect (int x, int y, size_t width, size_t height);
 };
 
-
 }
 
 #endif
