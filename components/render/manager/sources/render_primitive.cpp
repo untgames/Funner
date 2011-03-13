@@ -10,7 +10,7 @@ using namespace render::low_level;
 namespace
 {
 
-struct MeshPrimitive: public xtl::reference_counter, public xtl::noncopyable
+struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
 {
   PrimitiveImpl&                   primitive;     //обратная ссылка на владельца
   render::low_level::PrimitiveType type;          //тип примитива
@@ -27,13 +27,28 @@ struct MeshPrimitive: public xtl::reference_counter, public xtl::noncopyable
     , count (0)
     , material (in_material)
   {
-    material.Attach (primitive);
+    primitive.AttachCacheSource (*this);
+    
+    material.AttachCacheHolder (*this);
   }
   
-  ~MeshPrimitive ()
+  void ResetCacheCore ()
   {
-    material.Detach (primitive);  
   }
+  
+  void UpdateCacheCore ()
+  {
+    try
+    {
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::MeshPrimitive::UpdateCacheCore");
+      throw;
+    }
+  }
+  
+  using CacheHolder::UpdateCache;  
 };
 
 typedef xtl::intrusive_ptr<MeshPrimitive> MeshPrimitivePtr;

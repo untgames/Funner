@@ -2,8 +2,6 @@
 
 using namespace render;
 
-//TODO: Attach/Detach with refcount - for multiple attachment
-
 /*
 ===================================================================================================
     CacheHolder
@@ -21,26 +19,26 @@ CacheHolder::CacheHolder ()
 
 CacheHolder::~CacheHolder ()
 {
-  DetachAll ();
+  DetachAllCacheSources ();
 }
 
 /*
     Построение списка связанных хранителей кэша
 */
 
-void CacheHolder::Attach (CacheHolder& child)
+void CacheHolder::AttachCacheSource (CacheHolder& source)
 {
-  if (IsParentOf (child))
-    throw xtl::format_operation_exception ("render::CacheHolder::Attach", "child", "Child cache holder has been already attached (to this holder or it's children)");
+  if (IsParentOf (source))
+    throw xtl::format_operation_exception ("render::CacheHolder::AttachCacheSource", "source", "Cache source has been already attached (to this holder or it's children)");
     
-  if (child.IsParentOf (*this))
-    throw xtl::format_operation_exception ("render::CacheHolder::Attach", "child", "Child cache holder is a parent of this cache holder");  
+  if (source.IsParentOf (*this))
+    throw xtl::format_operation_exception ("render::CacheHolder::AttachCacheSource", "source", "Cache source is a parent of this cache holder");  
 
-  child_holders.push_back (&child);
+  child_holders.push_back (&source);
   
   try
   {
-    child.parent_holders.push_back (this);
+    source.parent_holders.push_back (this);
 
     Invalidate ();
   }
@@ -51,19 +49,19 @@ void CacheHolder::Attach (CacheHolder& child)
   }
 }
 
-void CacheHolder::Detach (CacheHolder& child)
+void CacheHolder::DetachCacheSource (CacheHolder& source)
 {
-  stl::remove (child_holders.begin (), child_holders.end (), &child);
-  stl::remove (child.parent_holders.begin (), child.parent_holders.end (), this);
+  stl::remove (child_holders.begin (), child_holders.end (), &source);
+  stl::remove (source.parent_holders.begin (), source.parent_holders.end (), this);
 }
 
-void CacheHolder::DetachAll ()
+void CacheHolder::DetachAllCacheSources ()
 {
   while (!child_holders.empty ())
-    Detach (*child_holders.back ());
+    DetachCacheSource (*child_holders.back ());
 
   while (!parent_holders.empty ())
-    parent_holders.back ()->Detach (*this);
+    parent_holders.back ()->DetachCacheSource (*this);
 }
 
 /*

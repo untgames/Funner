@@ -157,24 +157,24 @@ namespace
 template <class T, T t> struct SfinaeHelper {};
 
 template <class T>
-void detach_cache_holder (T& resource, CacheHolder& child, SfinaeHelper<void (T::*)(CacheHolder&), &T::Detach>* = 0)
+void detach_cache_holder (T& resource, CacheHolder& proxy, SfinaeHelper<void (T::*)(CacheHolder&), &T::Detach>* = 0)
 {
-  resource.Detach (child);
+  proxy.DetachCacheSource (resource);
 }
 
 template <class T>
-void detach_cache_holder (T& resource, CacheHolder& child, ...)
+void detach_cache_holder (T& resource, CacheHolder& proxy, ...)
 {
 }
 
 template <class T>
-void attach_cache_holder (T& resource, CacheHolder& child, SfinaeHelper<void (T::*)(CacheHolder&), &T::Attach>* = 0)
+void attach_cache_holder (T& resource, CacheHolder& proxy, SfinaeHelper<void (T::*)(CacheHolder&), &T::Attach>* = 0)
 {
-  resource.Attach (child);
+  proxy.AttachCacheSource (resource);
 }
 
 template <class T>
-void attach_cache_holder (T& resource, CacheHolder& child, ...)
+void attach_cache_holder (T& resource, CacheHolder& proxy, ...)
 {
 }
 
@@ -214,15 +214,15 @@ void ResourceProxy<Ptr>::SetDefaultResource (const Pointer& ptr)
 */
 
 template <class Ptr>
-void ResourceProxy<Ptr>::Attach (CacheHolder& holder)
+void ResourceProxy<Ptr>::AttachCacheHolder (CacheHolder& holder)
 {
-  impl->Attach (holder);
+  holder.AttachCacheSource (*impl);
 }
 
 template <class Ptr>
-void ResourceProxy<Ptr>::Detach (CacheHolder& holder)
+void ResourceProxy<Ptr>::DetachCacheHolder (CacheHolder& holder)
 {
-  impl->Detach (holder);
+  holder.DetachCacheSource (*impl);
 }
 
 /*

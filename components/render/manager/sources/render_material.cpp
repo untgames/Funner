@@ -27,19 +27,10 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
     , texture (in_texture_proxy)
     , sampler (in_sampler_proxy)
   {
-    Attach (material);
+    material.AttachCacheSource (*this);
     
-    texture.Attach (*this);
-    
-    try
-    {
-      sampler.Attach (*this);
-    }
-    catch (...)
-    {
-      texture.Detach (*this);
-      throw;
-    }
+    texture.AttachCacheHolder (*this);
+    sampler.AttachCacheHolder (*this);
   }
   
   void ResetCacheCore ()
