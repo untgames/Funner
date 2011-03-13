@@ -156,7 +156,7 @@ TextureImpl::TextureImpl
     impl->height  = height;
     impl->depth   = depth;
     impl->format  = format;
-    impl->texture = device_manager->Device ().CreateTexture (desc);
+    impl->texture = LowLevelTexturePtr (device_manager->Device ().CreateTexture (desc), false);
   }
   catch (xtl::exception& e)
   {
@@ -167,6 +167,15 @@ TextureImpl::TextureImpl
 
 TextureImpl::~TextureImpl ()
 {
+}
+
+/*
+    Низкоуровневый объект текстуры
+*/
+
+LowLevelTexturePtr TextureImpl::DeviceTexture ()
+{
+  return impl->texture;
 }
 
 /*

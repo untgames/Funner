@@ -120,34 +120,14 @@ void CacheHolder::UpdateCache ()
 */
 
 /*
-    Построение списка связанных хранителей кэша
-*/
-
-void CacheSource::Attach (CacheHolder& holder)
-{
-  CacheHolder::Attach (holder);
-}
-
-void CacheSource::Detach (CacheHolder& holder)
-{
-  CacheHolder::Detach (holder);
-}
-
-/*
-    Отметка о необходимости обновления кэша
-*/
-
-void CacheSource::Invalidate ()
-{
-  CacheHolder::Invalidate ();
-  
-  UpdateCache ();
-}
-
-/*
     Кэшируемый источник требует обновления кэша.
 */
 
 void CacheSource::UpdateCacheCore ()
 {
+}
+
+void CacheSource::ResetCacheCore ()
+{
+  UpdateCache ();
 }

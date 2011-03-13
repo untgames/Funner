@@ -26,6 +26,7 @@ class MaterialImpl: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t                   TexturesCount ();
     TexturePtr               Texture       (size_t index); //может вернуть 0 в случае отсутствия статической текстуры
+    LowLevelTexturePtr       DeviceTexture (size_t index); //может вернуть 0 в случае отсутствия статической текстуры
     const char*              TextureName   (size_t index);
     LowLevelSamplerStatePtr  Sampler       (size_t index);
 

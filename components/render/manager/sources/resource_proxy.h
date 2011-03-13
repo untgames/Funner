@@ -37,7 +37,7 @@ template <class Ptr> class ResourceProxy
 ///Связывание со списком обновления кэша
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void Attach (CacheHolder&);
-    void Detach (CacheHolder&);
+    void Detach (CacheHolder&);    
 
   private:
     typedef ResourceProxyManagerImpl<Ptr> ManagerImpl;

@@ -10,8 +10,9 @@ using namespace render::low_level;
 namespace
 {
 
-struct MeshPrimitive
+struct MeshPrimitive: public xtl::reference_counter, public xtl::noncopyable
 {
+  PrimitiveImpl&                   primitive;     //обратная ссылка на владельца
   render::low_level::PrimitiveType type;          //тип примитива
   VertexBufferPtr                  vertex_buffer; //вершинный буфер
   LowLevelInputLayoutPtr           layout;        //лэйаут примитива
@@ -19,16 +20,24 @@ struct MeshPrimitive
   size_t                           count;         //количество примитивов
   MaterialProxy                    material;      //материал
   
-  MeshPrimitive (const MaterialProxy& in_material)
-    : type (PrimitiveType_PointList)
+  MeshPrimitive (PrimitiveImpl& in_primitive, const MaterialProxy& in_material)
+    : primitive (in_primitive)
+    , type (PrimitiveType_PointList)
     , first (0)
     , count (0)
     , material (in_material)
   {
+    material.Attach (primitive);
+  }
+  
+  ~MeshPrimitive ()
+  {
+    material.Detach (primitive);  
   }
 };
 
-typedef stl::vector<MeshPrimitive> MeshPrimitiveArray;
+typedef xtl::intrusive_ptr<MeshPrimitive> MeshPrimitivePtr;
+typedef stl::vector<MeshPrimitivePtr>     MeshPrimitiveArray;
 
 struct Mesh: public xtl::reference_counter
 {
@@ -149,29 +158,30 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
     for (size_t i=0, count=source.PrimitivesCount (); i<count; i++)
     {
       const media::geometry::Primitive& src_primitive = source.Primitive (i);
-      MeshPrimitive                     dst_primitive (impl->material_manager->GetMaterialProxy (src_primitive.material));
+      
+      MeshPrimitivePtr dst_primitive (new MeshPrimitive (*this, impl->material_manager->GetMaterialProxy (src_primitive.material)), false);
 
       switch (src_primitive.type)
       {
         case media::geometry::PrimitiveType_LineList:
-          dst_primitive.type  = PrimitiveType_LineList;
-          dst_primitive.count = src_primitive.count * 2;
+          dst_primitive->type  = PrimitiveType_LineList;
+          dst_primitive->count = src_primitive.count * 2;
           break;
         case media::geometry::PrimitiveType_LineStrip:
-          dst_primitive.type  = PrimitiveType_LineStrip;
-          dst_primitive.count = src_primitive.count + 1;
+          dst_primitive->type  = PrimitiveType_LineStrip;
+          dst_primitive->count = src_primitive.count + 1;
           break;
         case media::geometry::PrimitiveType_TriangleList:
-          dst_primitive.type  = PrimitiveType_TriangleList;
-          dst_primitive.count = src_primitive.count * 3;
+          dst_primitive->type  = PrimitiveType_TriangleList;
+          dst_primitive->count = src_primitive.count * 3;
           break;
         case media::geometry::PrimitiveType_TriangleStrip:
-          dst_primitive.type  = PrimitiveType_TriangleStrip;
-          dst_primitive.count = src_primitive.count + 2;
+          dst_primitive->type  = PrimitiveType_TriangleStrip;
+          dst_primitive->count = src_primitive.count + 2;
           break;
         case media::geometry::PrimitiveType_TriangleFan:
-          dst_primitive.type  = PrimitiveType_TriangleFan;
-          dst_primitive.count = src_primitive.count + 2;
+          dst_primitive->type  = PrimitiveType_TriangleFan;
+          dst_primitive->count = src_primitive.count + 2;
           break;
         default:
           throw xtl::format_operation_exception ("", "Bad primitive #%u type %s", i, get_type_name (src_primitive.type));
@@ -181,26 +191,11 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
         throw xtl::format_operation_exception ("", "Bad primitive #%u vertex buffer index %u (vertex buffers count is %u)", i, src_primitive.vertex_buffer,
           vertex_buffers.size ());          
 
-      dst_primitive.vertex_buffer = vertex_buffers [src_primitive.vertex_buffer];
-      dst_primitive.first         = src_primitive.first;
-      dst_primitive.layout        = dst_primitive.vertex_buffer->CreateInputLayout (impl->device_manager->InputLayoutManager (), index_type);
+      dst_primitive->vertex_buffer = vertex_buffers [src_primitive.vertex_buffer];
+      dst_primitive->first         = src_primitive.first;
+      dst_primitive->layout        = dst_primitive->vertex_buffer->CreateInputLayout (impl->device_manager->InputLayoutManager (), index_type);
       
       mesh->primitives.push_back (dst_primitive);
-    }
-    
-      //подписка на события кэша
-      
-    try
-    {
-      for (MeshPrimitiveArray::iterator iter=mesh->primitives.begin (), end=mesh->primitives.end (); iter!=end; ++iter)
-        iter->material.Attach (*this);
-    }
-    catch (...)
-    {
-      for (MeshPrimitiveArray::iterator iter=mesh->primitives.begin (), end=mesh->primitives.end (); iter!=end; ++iter)
-        iter->material.Detach (*this);
-      
-      throw;
     }
     
       //добавление меша
@@ -226,14 +221,6 @@ void PrimitiveImpl::RemoveMeshes (size_t first_mesh, size_t meshes_count)
   if (first_mesh + meshes_count > impl->meshes.size ())
     meshes_count = impl->meshes.size () - first_mesh;        
 
-  for (MeshArray::iterator iter=impl->meshes.begin ()+first_mesh, end=impl->meshes.end ()+first_mesh+meshes_count; iter!=end; ++iter)
-  {
-    Mesh& mesh = **iter;
-    
-    for (MeshPrimitiveArray::iterator iter1=mesh.primitives.begin (), end1=mesh.primitives.end (); iter1!=end1; ++iter1)
-      iter1->material.Detach (*this);    
-  }
-    
   impl->meshes.erase (impl->meshes.begin () + first_mesh, impl->meshes.begin () + first_mesh + meshes_count);
 
   Invalidate ();  
@@ -241,14 +228,6 @@ void PrimitiveImpl::RemoveMeshes (size_t first_mesh, size_t meshes_count)
 
 void PrimitiveImpl::RemoveAllMeshes ()
 {
-  for (MeshArray::iterator iter=impl->meshes.begin (), end=impl->meshes.end (); iter!=end; ++iter)
-  {
-    Mesh& mesh = **iter;
-    
-    for (MeshPrimitiveArray::iterator iter1=mesh.primitives.begin (), end1=mesh.primitives.end (); iter1!=end1; ++iter1)
-      iter1->material.Detach (*this);    
-  }
-
   impl->meshes.clear ();
   
   Invalidate ();  

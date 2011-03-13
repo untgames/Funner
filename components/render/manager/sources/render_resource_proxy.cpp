@@ -58,10 +58,16 @@ template <class Ptr> struct ResourceProxyImpl: public xtl::reference_counter, pu
       manager->proxies.erase (proxy_position);
   }
   
-///Кэшируемый источник требует обновления кэша.
+///Переопределение методов кэша
   void UpdateCacheCore ()
   {
   }
+  
+  void ResetCacheCore ()
+  {
+  }
+  
+  using CacheHolder::Invalidate;
 };
 
 }

@@ -9,6 +9,8 @@ using namespace render::low_level;
 
 struct EntityImpl::Impl
 {
+  common::PropertyMap properties; //свойства рендеринга
+  
 };
 
 /*

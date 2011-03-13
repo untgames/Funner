@@ -1,8 +1,6 @@
 #ifndef RENDER_MANAGER_MANAGER_HEADER
 #define RENDER_MANAGER_MANAGER_HEADER
 
-///???экспортируемые свойства рендеринга из материалов через entity
-
 #include <render/dynamic_texture.h>
 #include <render/entity.h>
 #include <render/frame.h>

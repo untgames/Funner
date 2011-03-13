@@ -13,16 +13,60 @@ namespace
     Текстурная карта
 */
 
-struct Texmap
+struct Texmap: public xtl::reference_counter, public CacheHolder
 {
-  TextureProxy texture; //прокси текстуры
-  SamplerProxy sampler; //сэмплер текстуры
+  MaterialImpl&           material;              //обратная ссылка на материал
+  TextureProxy            texture;               //прокси текстуры
+  SamplerProxy            sampler;               //сэмплер текстуры
+  TexturePtr              cached_texture;        //закэшированная текстура
+  LowLevelSamplerStatePtr cached_sampler;        //закэшированный сэмплер
+  LowLevelTexturePtr      cached_device_texture; //закэшированная текстура
   
-  Texmap (const TextureProxy& in_texture_proxy, const SamplerProxy& in_sampler_proxy)
-    : texture (in_texture_proxy)
+  Texmap (MaterialImpl& in_material, const TextureProxy& in_texture_proxy, const SamplerProxy& in_sampler_proxy)
+    : material (in_material)
+    , texture (in_texture_proxy)
     , sampler (in_sampler_proxy)
   {
+    Attach (material);
+    
+    texture.Attach (*this);
+    
+    try
+    {
+      sampler.Attach (*this);
+    }
+    catch (...)
+    {
+      texture.Detach (*this);
+      throw;
+    }
   }
+  
+  void ResetCacheCore ()
+  {
+    cached_sampler        = LowLevelSamplerStatePtr ();
+    cached_device_texture = LowLevelTexturePtr ();
+    cached_texture        = TexturePtr ();
+  }
+  
+  void UpdateCacheCore ()
+  {
+    try
+    {
+      //TODO: dynamic texture
+      
+      cached_texture        = texture.Resource ();
+      cached_device_texture = cached_texture ? cached_texture->DeviceTexture () : LowLevelTexturePtr (); 
+      cached_sampler        = sampler.Resource ();
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::Texmap::UpdateCacheCore");
+      throw;
+    }
+  }
+  
+  using CacheHolder::UpdateCache;
 };
 
 }
@@ -31,7 +75,8 @@ struct Texmap
     Описание реализации материала
 */
 
-typedef stl::vector<Texmap> TexmapArray;
+typedef xtl::intrusive_ptr<Texmap> TexmapPtr;
+typedef stl::vector<TexmapPtr>     TexmapArray;
 
 struct MaterialImpl::Impl
 {
@@ -44,34 +89,6 @@ struct MaterialImpl::Impl
   Impl (const TextureManagerPtr& in_texture_manager)
     : texture_manager (in_texture_manager)
   {
-  }
-  
-///Отсоединение от кэша
-  void DetachCache (CacheHolder& holder)
-  {
-    for (TexmapArray::iterator iter=texmaps.begin (), end=texmaps.end (); iter!=end; ++iter)
-    {
-      iter->texture.Detach (holder);
-      iter->sampler.Detach (holder);
-    }
-  }
-  
-///Присоединение к кэшу
-  void AttachCache (CacheHolder& holder)
-  {
-    try
-    {
-      for (TexmapArray::iterator iter=texmaps.begin (), end=texmaps.end (); iter!=end; ++iter)
-      {
-        iter->texture.Attach (holder);
-        iter->sampler.Attach (holder);
-      }      
-    }
-    catch (...)
-    {
-      DetachCache (holder);
-      throw;
-    }
   }
 };
 
@@ -86,7 +103,6 @@ MaterialImpl::MaterialImpl (const TextureManagerPtr& texture_manager)
 
 MaterialImpl::~MaterialImpl ()
 {
-  impl->DetachCache (*this);
 }
 
 /*
@@ -129,17 +145,31 @@ TexturePtr MaterialImpl::Texture (size_t index)
   if (index >= impl->texmaps.size ())
     throw xtl::make_range_exception ("render::MaterialImpl::Texture", "index", index, impl->texmaps.size ());
     
-    //TODO: dynamic texture?????
+  Texmap& texmap = *impl->texmaps [index];  
+  
+  texmap.UpdateCache ();
     
-  return impl->texmaps [index].texture.Resource ();
+  return texmap.cached_texture;
+}
+
+LowLevelTexturePtr MaterialImpl::DeviceTexture (size_t index)
+{
+  if (index >= impl->texmaps.size ())
+    throw xtl::make_range_exception ("render::MaterialImpl::DeviceTexture", "index", index, impl->texmaps.size ());
+    
+  Texmap& texmap = *impl->texmaps [index];
+  
+  texmap.UpdateCache ();
+  
+  return texmap.cached_device_texture;
 }
 
 const char* MaterialImpl::TextureName (size_t index)
 {
   if (index >= impl->texmaps.size ())
     throw xtl::make_range_exception ("render::MaterialImpl::TextureName", "index", index, impl->texmaps.size ());
-
-  return impl->texmaps [index].texture.Name ();
+    
+  return impl->texmaps [index]->texture.Name ();
 }
 
 LowLevelSamplerStatePtr MaterialImpl::Sampler (size_t index)
@@ -147,7 +177,11 @@ LowLevelSamplerStatePtr MaterialImpl::Sampler (size_t index)
   if (index >= impl->texmaps.size ())
     throw xtl::make_range_exception ("render::MaterialImpl::Sampler", "index", index, impl->texmaps.size ());
     
-  return impl->texmaps [index].sampler.Resource ();
+  Texmap& texmap = *impl->texmaps [index];    
+  
+  texmap.UpdateCache ();
+    
+  return texmap.cached_sampler;
 }
 
 /*
@@ -168,18 +202,14 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     {
       const media::rfx::Texmap& texmap = material.Texmap (i);
       
-      Texmap new_texmap (impl->texture_manager->GetTextureProxy (texmap.Image ()), impl->texture_manager->GetSamplerProxy (texmap.Sampler ()));
+      TexmapPtr new_texmap (new Texmap (*this, impl->texture_manager->GetTextureProxy (texmap.Image ()), impl->texture_manager->GetSamplerProxy (texmap.Sampler ())), false);
       
       new_texmaps.push_back (new_texmap);
     }    
     
     impl->properties = new_properties;
     
-    impl->DetachCache (*this);    
-
     impl->texmaps.swap (new_texmaps);
-    
-    impl->AttachCache (*this);
     
     Invalidate ();
   }
