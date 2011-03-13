@@ -28,7 +28,7 @@ typedef xtl::com_ptr<IRigidBody> RigidBodyPtr;
 typedef xtl::com_ptr<IScene>     ScenePtr;
 typedef xtl::com_ptr<IShape>     ShapePtr;
 
-const float EPS = 0.001;
+const float EPS = 0.001f;
 
 void dump_body_position (IRigidBody* body)
 {
