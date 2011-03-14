@@ -40,7 +40,7 @@ void Entity::SetTransformation (const math::mat4f& tm)
   impl->SetTransformation (tm);
 }
 
-const math::vec4f& Entity::Transformation () const
+const math::mat4f& Entity::Transformation () const
 {
   return impl->Transformation ();
 }
@@ -75,9 +75,19 @@ Primitive Entity::Primitive (size_t level_of_detail) const
   return Wrappers::Wrap<render::Primitive> (impl->Primitive (level_of_detail));
 }
 
+const char* Entity::PrimitiveName (size_t level_of_detail) const
+{
+  return impl->PrimitiveName (level_of_detail);
+}
+
 void Entity::SetPrimitive (const render::Primitive& primitive, size_t level_of_detail)
 {
   impl->SetPrimitive (Wrappers::Unwrap<PrimitiveImpl> (primitive), level_of_detail);
+}
+
+void Entity::SetPrimitive (const char* name, size_t level_of_detail)
+{
+  impl->SetPrimitive (name, level_of_detail);
 }
 
 void Entity::ResetPrimitive (size_t level_of_detail)

@@ -82,13 +82,16 @@ ResourceProxy<Ptr>::ResourceProxy (ManagerImpl& manager, const char* name)
 {
   try
   {
-    stl::pair<typename Impl::ProxyMapIterator, bool> result = impl->manager->proxies.insert_pair (impl->name.c_str (), impl);
+    if (!impl->name.empty ())
+    {
+      stl::pair<typename Impl::ProxyMapIterator, bool> result = impl->manager->proxies.insert_pair (impl->name.c_str (), impl);
 
-    if (!result.second)
-      throw xtl::format_operation_exception ("render::ResourceProxy<Ptr>::ResourceProxy", "Internal error: resource with name '%s' already exists", impl->name.c_str ());
-      
-    impl->proxy_position = result.first;
-      
+      if (!result.second)
+        throw xtl::format_operation_exception ("render::ResourceProxy<Ptr>::ResourceProxy", "Internal error: resource with name '%s' already exists", impl->name.c_str ());
+              
+      impl->proxy_position = result.first;      
+    }      
+    
     SetDefaultResource (manager.default_resource);
   }
   catch (...)

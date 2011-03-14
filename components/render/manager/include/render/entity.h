@@ -39,7 +39,7 @@ class Entity
 ///Матрица преобразований
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void               SetTransformation (const math::mat4f&);
-    const math::vec4f& Transformation    () const;
+    const math::mat4f& Transformation    () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с костями (для скиннинга)
@@ -59,7 +59,9 @@ class Entity
 ///Работа с примитивом
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     render::Primitive Primitive           (size_t level_of_detail = 0) const;
+    const char*       PrimitiveName       (size_t level_of_detail = 0) const;
     void              SetPrimitive        (const render::Primitive&, size_t level_of_detail = 0);
+    void              SetPrimitive        (const char* name, size_t level_of_detail = 0);
     void              ResetPrimitive      (size_t level_of_detail = 0);
     bool              HasPrimitive        (size_t level_of_detail = 0) const;
     void              ResetAllPrimitives  ();

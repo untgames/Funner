@@ -7,7 +7,7 @@ class EntityImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    EntityImpl  ();
+    EntityImpl  (const PrimitiveManagerPtr&);
     ~EntityImpl ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,7 +20,7 @@ class EntityImpl: public Object
 ///Матрица преобразований
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void               SetTransformation (const math::mat4f&);
-    const math::vec4f& Transformation    ();
+    const math::mat4f& Transformation    ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с костями (для скиннинга)
@@ -39,11 +39,13 @@ class EntityImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Работа с примитивом
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const PrimitivePtr& Primitive           (size_t level_of_detail);
-    void                SetPrimitive        (const PrimitivePtr&, size_t level_of_detail);
-    void                ResetPrimitive      (size_t level_of_detail);
-    bool                HasPrimitive        (size_t level_of_detail);
-    void                ResetAllPrimitives  ();
+    PrimitivePtr Primitive           (size_t level_of_detail);
+    const char*  PrimitiveName       (size_t level_of_detail);  
+    void         SetPrimitive        (const PrimitivePtr&, size_t level_of_detail);
+    void         SetPrimitive        (const char* name, size_t level_of_detail);
+    void         ResetPrimitive      (size_t level_of_detail);
+    bool         HasPrimitive        (size_t level_of_detail);
+    void         ResetAllPrimitives  ();
 
   private:
     struct Impl;

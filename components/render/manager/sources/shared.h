@@ -93,12 +93,18 @@ class Wrappers
     template <class Ret, class T>
     static Ret Wrap (T* ptr)
     {
+      if (!ptr)
+        throw xtl::format_operation_exception ("render::Wrappers::Wrap", "Attempt to wrap null internal object for of type '%s'", typeid (T).name ());
+    
       return Ret (ptr);
     }
   
     template <class Ret, class T>
     static Ret Wrap (const xtl::intrusive_ptr<T>& ptr)
     {
+      if (!ptr)
+        throw xtl::format_operation_exception ("render::Wrappers::Wrap", "Attempt to wrap null internal object for of type '%s'", typeid (T).name ());
+    
       return Ret (ptr.get ());
     }
 };

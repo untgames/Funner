@@ -80,6 +80,11 @@ PrimitiveBuffers RenderManager::CreatePrimitiveBuffers (MeshBufferUsage lines_us
   return Wrappers::Wrap<PrimitiveBuffers> (impl->PrimitiveManager ().CreatePrimitiveBuffers (lines_usage, sprites_usage));
 }
 
+Entity RenderManager::CreateEntity ()
+{
+  return Wrappers::Wrap<Entity> (impl->CreateEntity ());
+}
+
 Frame RenderManager::CreateFrame ()
 {
   return Wrappers::Wrap<Frame> (impl->CreateFrame ());
@@ -154,20 +159,20 @@ Texture RenderManager::CreateSharedTexture (const char* name)
   return Wrappers::Wrap<Texture> (texture);
 }
 
-/*Material RenderManager::CreateSharedMaterial (const char* name)
+Material RenderManager::CreateSharedMaterial (const char* name)
 {
   static const char* METHOD_NAME = "render::RenderManager::CreateSharedMaterial";
 
   if (!name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
     
-  MaterialPtr material = impl->FindMaterial (name);
+  MaterialPtr material = impl->MaterialManager ().FindMaterial (name);
   
   if (!material)
     throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Material not found");
 
   return Wrappers::Wrap<Material> (material);
-} */
+}
 
 Primitive RenderManager::CreateSharedPrimitive (const char* name)
 {
