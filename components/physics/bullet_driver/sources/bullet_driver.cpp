@@ -47,7 +47,16 @@ const char* Driver::GetDescription ()
 
 Scene* Driver::CreateScene ()
 {
-  return new Scene ();
+  return new Scene;
+}
+
+/*
+   Создание материала
+*/
+
+Material* Driver::CreateMaterial ()
+{
+  return new Material;
 }
 
 /*

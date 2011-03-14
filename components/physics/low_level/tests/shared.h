@@ -114,6 +114,12 @@ class TestDriver: public IDriver, public Object
       return new TestScene ();
     }
 
+    ///Создание материала
+    IMaterial* CreateMaterial ()
+    {
+      throw xtl::make_not_implemented_exception ("TestDriver::CreateMaterial");
+    }
+
     ///Создание геометрических тел
     IShape* CreateBoxShape (const math::vec3f& half_dimensions)
     {
