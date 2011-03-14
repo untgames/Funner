@@ -2,35 +2,35 @@ Results of body_flags_test:
 Simulating one second
 position_x_frozen_body state:
 Body world transform:
-  position = 0.00; -49.68; -15.69
-  orientation = 0.05; 0.05; -0.15; 0.99
+  position = 0.00; -49.68; -15.68
+  orientation = 0.05; 0.04; -0.14; 0.98
 position_y_frozen_body state:
 Body world transform:
-  position = -33.59; 0.00; -17.38
-  orientation = -0.02; -0.07; 0.11; 0.99
+  position = -33.58; 0.00; -17.38
+  orientation = -0.01; -0.06; 0.11; 0.99
 position_z_frozen_body state:
 Body world transform:
-  position = -37.31; 37.84; 0.00
-  orientation = 0.14; 0.57; 0.75; -0.32
+  position = -37.31; 37.85; 0.00
+  orientation = 0.13; 0.56; 0.74; -0.31
 position_frozen_body state:
 Body world transform:
   position = 0.00; 0.00; 0.00
-  orientation = 0.30; 0.84; 0.46; -0.03
+  orientation = 0.29; 0.83; 0.45; -0.02
 rotation_x_frozen_body state:
 Body world transform:
-  position = -33.89; 5.51; 11.75
-  orientation = 0.01; 0.30; -0.23; 0.93
+  position = -33.88; 5.48; 11.73
+  orientation = 0.00; 0.28; -0.21; 0.93
 rotation_y_frozen_body state:
 Body world transform:
-  position = -41.48; -11.78; -1.79
-  orientation = 0.19; 0.00; 0.97; 0.16
+  position = -41.49; -11.71; -1.86
+  orientation = 0.19; 0.00; 0.96; 0.16
 rotation_z_frozen_body state:
 Body world transform:
-  position = -78.68; -2.28; 3.29
-  orientation = -0.10; 0.82; -0.00; 0.57
+  position = -78.68; -2.30; 3.31
+  orientation = -0.09; 0.81; 0.00; 0.57
 rotation_frozen_body state:
 Body world transform:
-  position = -63.48; -3.70; 0.08
+  position = -63.48; -3.72; 0.13
   orientation = 0.00; 0.00; 0.00; 1.00
 kinematic_body state:
 Body world transform:

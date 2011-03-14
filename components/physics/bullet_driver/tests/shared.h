@@ -28,7 +28,10 @@ typedef xtl::com_ptr<IRigidBody> RigidBodyPtr;
 typedef xtl::com_ptr<IScene>     ScenePtr;
 typedef xtl::com_ptr<IShape>     ShapePtr;
 
-const float EPS = 0.001f;
+void convert_float (float& value)
+{
+  value = ceil ((int)(value * 100)) / 100.f;
+}
 
 void dump_body_position (IRigidBody* body)
 {
@@ -39,20 +42,14 @@ void dump_body_position (IRigidBody* body)
   math::vec3f world_position = body_transform.position;
 
   for (size_t i = 0; i < 3; i++)
-  {
-    if (fabs (world_position [i]) < EPS)
-      world_position [i] = 0.f;
-  }
+    convert_float (world_position [i]);
 
   printf ("  position = %.2f; %.2f; %.2f\n", world_position.x, world_position.y, world_position.z);
 
   math::quatf world_orientation = body_transform.orientation;
 
   for (size_t i = 0; i < 4; i++)
-  {
-    if (fabs (world_orientation [i]) < EPS)
-      world_orientation [i] = 0.f;
-  }
+    convert_float (world_orientation [i]);
 
   printf ("  orientation = %.2f; %.2f; %.2f; %.2f\n", world_orientation.x, world_orientation.y, world_orientation.z, world_orientation.w);
 }

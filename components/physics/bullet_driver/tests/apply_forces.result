@@ -39,10 +39,10 @@ Body world transform:
 Simulating one second
 falling body state:
 Body world transform:
-  position = 0.00; -1.00; 0.00
+  position = 0.00; -0.99; 0.00
   orientation = 0.00; 0.00; 0.00; 1.00
 Simulating one second after apply light torque
 falling body state:
 Body world transform:
-  position = 0.00; -1.00; 0.00
-  orientation = 0.00; 0.96; 0.00; 0.30
+  position = 0.00; -0.99; 0.00
+  orientation = 0.00; 0.95; 0.00; 0.29

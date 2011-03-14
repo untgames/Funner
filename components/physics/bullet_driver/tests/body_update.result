@@ -9,7 +9,11 @@ Body world transform:
   orientation = 0.00; 0.00; 0.00; 1.00
 falling_body body updated
 Body world transform:
-  position = 0.00; -0.00; 0.00
+  position = 0.00; 0.00; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
+falling_body body updated
+Body world transform:
+  position = 0.00; 0.00; 0.00
   orientation = 0.00; 0.00; 0.00; 1.00
 falling_body body updated
 Body world transform:
@@ -21,23 +25,19 @@ Body world transform:
   orientation = 0.00; 0.00; 0.00; 1.00
 falling_body body updated
 Body world transform:
-  position = 0.00; -0.03; 0.00
-  orientation = 0.00; 0.00; 0.00; 1.00
-falling_body body updated
-Body world transform:
   position = 0.00; -0.04; 0.00
   orientation = 0.00; 0.00; 0.00; 1.00
 falling_body body updated
 Body world transform:
-  position = 0.00; -0.06; 0.00
+  position = 0.00; -0.05; 0.00
   orientation = 0.00; 0.00; 0.00; 1.00
 falling_body body updated
 Body world transform:
-  position = 0.00; -0.08; 0.00
+  position = 0.00; -0.07; 0.00
   orientation = 0.00; 0.00; 0.00; 1.00
 falling_body body updated
 Body world transform:
-  position = 0.00; -0.10; 0.00
+  position = 0.00; -0.09; 0.00
   orientation = 0.00; 0.00; 0.00; 1.00
 falling_body body updated
 Body world transform:
@@ -45,9 +45,13 @@ Body world transform:
   orientation = 0.00; 0.00; 0.00; 1.00
 falling_body body updated
 Body world transform:
-  position = 0.00; -0.15; 0.00
+  position = 0.00; -0.14; 0.00
   orientation = 0.00; 0.00; 0.00; 1.00
 falling_body body updated
 Body world transform:
-  position = 0.00; -0.18; 0.00
+  position = 0.00; -0.17; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
+falling_body body updated
+Body world transform:
+  position = 0.00; -0.21; 0.00
   orientation = 0.00; 0.00; 0.00; 1.00
