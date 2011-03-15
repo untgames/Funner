@@ -61,11 +61,11 @@ class ShapeList
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление/удаление тел
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t Add       (const Shape&, const physics::Transform&);
-    size_t Add       (const Shape&, const math::vec3f& position = math::vec3f (), const math::quatf& orientation = math::quatf ());
-    size_t Add       (const Shape&, const math::quatf& orientation);
-    void   Remove    (size_t index);
-    void   Clear ();
+    void Add    (const Shape&, const physics::Transform&);
+    void Add    (const Shape&, const math::vec3f& position = math::vec3f (), const math::quatf& orientation = math::quatf ());
+    void Add    (const Shape&, const math::quatf& orientation);
+    void Remove (size_t index);
+    void Clear  ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение тел
