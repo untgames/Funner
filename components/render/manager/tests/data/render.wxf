@@ -37,7 +37,7 @@ depthstencil "solid"
 }
 
 //depth stencil stage state for rendering
-depthstencil "ztest_with_no_write"
+depthstencil "ztest_without_write"
 {
   depth_test   true    //z-test is enabled
   depth_write  false   //write to z-buffer is disabled
@@ -180,7 +180,7 @@ frame "main"
       color_targets         "main_color_target"           //render to frame color buffer
       depth_stencil_target  "main_depth_stencil_target"   //render to frame depth stencil buffer
       blend_state           "transparent"                 //use blend stage settings for transaparent geometry
-      depth_stencil_state   "ztest_with_no_write"         //use depth stencil stage settings for transaparent geometry
+      depth_stencil_state   "ztest_without_write"         //use depth stencil stage settings for transaparent geometry
       rasterizer_state      "default"                     //use default rasterizer
       shading_state         "phong"                       //??????????????
     }
@@ -195,7 +195,7 @@ frame "main"
     color_targets         "main_color_target"           //render to frame color buffer
     depth_stencil_target  "main_depth_stencil_target"   //render to frame depth stencil buffer
     blend_state           "solid"                       //use blend stage settings for solid geometry
-    depth_stencil_state   "ztest_with_no_write"         //use depth stencil stage settings for solid geometry
+    depth_stencil_state   "ztest_without_write"         //use depth stencil stage settings for solid geometry
     rasterizer_state      "wireframe"                   //use rasterizer for helpers
     shading_state         "helper"                      //?????????????  
   }
