@@ -1,3 +1,7 @@
+//TODO: techniques / condition passes/subframes
+//TODO: render targets
+//TODO: shading states
+
 //blend stage state for rendering solid (non transaparent) geometry
 blend "solid"
 {
