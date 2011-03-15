@@ -70,16 +70,28 @@ depthstencil "stencil-test"
 //default rasterizer stage settings
 rasterizer "default"
 {
-  fill_mode         solid //draw geometry as solid (filled) triangles
-  front_clock_wise  true  //front faces is described as clockwise
-  cull_mode         back  //cull back faces
-  depth_bias        0     //depth bias (offset for each depth value on rendering)
-  multisample       false //multisampling is disabled
-  line_antialiasing true  //antialiasing for lines is enabled
+  fill_mode         solid  //draw geometry as solid (filled) triangles
+  front_clock_wise  true   //front faces is described as clockwise
+  cull_mode         back   //cull back faces
+  depth_bias        0      //depth bias (offset for each depth value on rendering)
+  multisample       true   //multisampling is enabled
+  line_antialiasing false  //antialiasing for lines is disabled
     //scissor settings are described in frame
 }
 
-//shading instance, specified by (material, entity, frame)
+//default rasterizer stage settings
+rasterizer "wireframe"
+{
+  fill_mode         wireframe //draw geometry as wireframe triangles (only edges)
+  front_clock_wise  true      //front faces is described as clockwise
+  cull_mode         none      //no face culling
+  depth_bias        0         //depth bias (offset for each depth value on rendering)
+  multisample       false     //multisampling is disabled
+  line_antialiasing true      //antialiasing for lines is enabled
+    //scissor settings are described in frame
+}
+
+//shading instance for phong shading, specified by (material, entity, frame)
 shading "phong"
 {
   profile "glsl"       //shading profile
@@ -93,6 +105,22 @@ shading "phong"
   texmap  "reflect"    //from entity (dynamic, cached in entity)
 }
 
+//shading instance for rendering shadow maps
+shading "shadow_map"
+{
+  profile "glsl"        //shading profile
+  shader  "shadow.vert" //reference to shader source. TODO: add compile options
+  shader  "shadow.frag" //reference to shader source
+}
+
+//shading instance for rendering helper geometry
+shading "helper"
+{
+  profile "glsl"        //shading profile
+  shader  "helper.vert" //reference to shader source. TODO: add compile options
+  shader  "helper.frag" //reference to shader source
+}
+
 //description of frames rendering
 frame "main"
 {
@@ -101,57 +129,70 @@ frame "main"
   //description of child frames rendering: rendering shadow maps
   subframes
   {
-    tags                 "light_shadow"  //list of frame tags which will be added to this subframes loop
-    depth_stencil_target "shadow_map"
-    color_target         null
+    tags "light_shadow"  //list of frame tags which will be added to this subframes loop
 
     pass
     {
-      tags                  "solid"
-      color_targets         null
-      depth_stencil_target  "frame_depth_stencil_target"
-      depth_stencil_state   "solid"
-      rasterizer_state      "default"
-      program               "shadow_map"
+      tags                  "solid"       //tags for material of each primitive
+      color_targets         null          //render target for color buffer - not needed for rendering of shadow maps
+      depth_stencil_target  "shadow_map"  //render target for depth stencil buffer
+      depth_stencil_state   "solid"       //depth stencil stage settings
+      rasterizer_state      "default"     //rasterizer stage settings
+      shading_stage         "shadow_map"  //????????????
     }
   }
   
+  //rendering of geometry without lighting (for early z-test)
   pass
   {
-    tags                  "solid"
-    color_targets         null
-    depth_stencil_target  "main_depth_stencil_target"
-    depth_stencil_state   "solid"
-    rasterizer_state      "default"  
+    tags                  "solid"                     //render only non-transaparent geometry
+    color_targets         null                        //no color rendering needed
+    depth_stencil_target  "main_depth_stencil_target" //render to z-buffer only
+    depth_stencil_state   "solid"                     //use z-test and write to z-buffer
+    rasterizer_state      "default"                   //use default rasterizer settings
   }
 
+  //child frames for rendering geometry in selected light
   subframes
   {
-    tags "lighting"
+    tags "lighting" //use only frames with tag 'lighting'
   
+    //render solid (non-transaparent) geometry
     pass
     {
-      tags                  "solid"
-      color_targets         "main_color_target"
-      depth_stencil_target  "main_depth_stencil_target"
-      blend_state           "solid"
-      depth_stencil_state   "solid"
-      rasterizer_state      "default"
-//      shading_state         "phong"
+      tags                  "solid"                       //render only non-transparent geometry
+      color_targets         "main_color_target"           //render to frame color buffer
+      depth_stencil_target  "main_depth_stencil_target"   //render to frame depth stencil buffer
+      blend_state           "solid"                       //use blend stage settings for solid geometry
+      depth_stencil_state   "solid"                       //use depth stencil stage settings for solid geometry
+      rasterizer_state      "default"                     //use default rasterizer
+      shading_state         "phong"                       //?????????????
     }
+    
+    //render transparent geometry
     pass
     {
-      tags                  "transparent"
-      color_targets         "main_color_target"
-      depth_stencil_target  "main_depth_stencil_target"
-      blend_state           "translucent"
-      depth_stencil_state   "ztest_with_no_write"
-      rasterizer_state      "default"
-      //textures???
+      tags                  "transparent"                 //render only transparent geometry
+      color_targets         "main_color_target"           //render to frame color buffer
+      depth_stencil_target  "main_depth_stencil_target"   //render to frame depth stencil buffer
+      blend_state           "transparent"                 //use blend stage settings for transaparent geometry
+      depth_stencil_state   "ztest_with_no_write"         //use depth stencil stage settings for transaparent geometry
+      rasterizer_state      "default"                     //use default rasterizer
+      shading_state         "phong"                       //??????????????
     }
   }
   
-  pass "dof"
+  pass "dof" //???
 
-  pass "helpers"  
+  //render helper geometry
+  pass
+  {
+    tags                  "helper"                      //render only geometry with 'helper' material tag
+    color_targets         "main_color_target"           //render to frame color buffer
+    depth_stencil_target  "main_depth_stencil_target"   //render to frame depth stencil buffer
+    blend_state           "solid"                       //use blend stage settings for solid geometry
+    depth_stencil_state   "ztest_with_no_write"         //use depth stencil stage settings for solid geometry
+    rasterizer_state      "wireframe"                   //use rasterizer for helpers
+    shading_state         "helper"                      //?????????????  
+  }
 }
