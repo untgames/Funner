@@ -1,27 +1,49 @@
-blend "no_blend"
+blend "solid"
 {
-  disabled  
+  blend_enable     false
+  color_write_mask rgba
 }
 
 blend "translucent"
 {
-  alpha_to_coverage
-  
-  color add src_alpha src_one_minus_alpha
-  alpha mul src_alpha src_one_minus_alpha
-  mask  rgba //default 'rgba'
+  blend_enable      true
+  alpha_to_coverage false
+  blend_color       add src_alpha inv_src_alpha
+  blend_alpha       add src_alpha inv_src_alpha
+  color_write_mask  rgba
+}
+
+blend "additive"
+{
+  blend_enable     true
+  blend_color      add one one
+  blend_alpha      add one one
+  color_write_mask rgba
 }
 
 depthstencil "solid"
 {
-  depthtest     true
-  depthwrite    true
-  depthcompare  less
-  stenciltest   true
-  stencilread   0xf
-  stencilwrite  0xf  
+  depth_test   true
+  depth_write  true
+  stencil_test false
+}
+
+depthstencil "ztest_with_no_write"
+{
+  depth_test   true
+  depth_write  false
+}
+
+depthstencil "stencil-test"
+{
+  depth_test         true
+  depth_write        true
+  depth_compare_mode less
+  stencil_test       true
+  stencil_read       0xf
+  stencil_write      0xf  
   
-  front
+  stencil front
   {
     compare     less
     stencilfail keep
@@ -29,27 +51,73 @@ depthstencil "solid"
     stencilpass keep
   }
   
-  back
+  stencil back
   {
   }
 }
 
 rasterizer "default"
 {
-  frontclockwise
-  
-  fill solid
-  cull back
-  depthbias 0
-  scissor false
-  multisample false
-  lineantialiasing true
+  front_clock_wise  true  
+  fill_mode         solid
+  cull_mode         back
+  depth_bias        0
+  scissor           false //????
+  multisample       false
+  line_antialiasing true
 }
 
 program "phong" "glsl"
 {
   shader "phong.vert" //add compile options
-  shader  "phong.frag"
+  shader "phong.frag"
+}
+
+frame "light"
+{
+  tags "lighting"
+
+  pass
+  {
+    tags                  "solid"
+    color_targets         "main_color_target"
+    depth_stencil_target  "main_depth_stencil_target"
+    blend_state           "solid"
+    depth_stencil_state   "solid"
+    rasterizer_state      "default"
+    //textures???
+  }
+  pass
+  {
+    tags                  "translucent"
+    color_targets         "main_color_target"
+    depth_stencil_target  "main_depth_stencil_target"
+    blend_state           "translucent"
+    depth_stencil_state   "ztest_with_no_write"
+    rasterizer_state      "default"
+    //textures???
+  }
+}
+
+frame "main"
+{
+  subframes "prerender"
+  
+  pass
+  {
+    tags                  "solid"
+    color_targets         null
+    depth_stencil_target  "main_depth_stencil_target"
+    depth_stencil_state   "solid"
+    rasterizer_state      "default"  
+  }
+  
+  subframes "light"
+
+  pass
+  {
+    
+  }
 }
 
 pass "solids"
@@ -75,23 +143,12 @@ pass "transparents"
 
 frame "light_shadow"
 {
-  depthstenciltarget "shadow_map"
-  colortarget        null
+  depth_stencil_target "shadow_map"
+  color_target         null
 
   tags "shadow"
 
   pass "z-only"
-}
-
-frame "light"
-{
-  depthstenciltarget "main_depth_stencil1"
-  colortarget        "main_color" 
-
-  tags "light"
-  
-  pass "solids"
-  pass "transparents"  
 }
 
 frame "default"
@@ -100,17 +157,17 @@ frame "default"
   
   rendertargets
   {
-    depthstencil "main_depth_stencil"
-    color        null
+    depth_stencil "main_depth_stencil"
+    color         null
   }
 
   pass "z-only"
 
   rendertargets
   {
-    depthstencil "main_depth_stencil" 
-    color        "main_color1"
-    color        "main_color2"
+    depth_stencil "main_depth_stencil" 
+    color         "main_color1"
+    color         "main_color2"
   }
     
   subpasses "light"
