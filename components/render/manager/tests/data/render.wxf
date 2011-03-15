@@ -73,35 +73,23 @@ program "phong" "glsl"
   shader "phong.frag"
 }
 
-frame "light"
-{
-  tags "lighting"
-
-  pass
-  {
-    tags                  "solid"
-    color_targets         "main_color_target"
-    depth_stencil_target  "main_depth_stencil_target"
-    blend_state           "solid"
-    depth_stencil_state   "solid"
-    rasterizer_state      "default"
-    //textures???
-  }
-  pass
-  {
-    tags                  "translucent"
-    color_targets         "main_color_target"
-    depth_stencil_target  "main_depth_stencil_target"
-    blend_state           "translucent"
-    depth_stencil_state   "ztest_with_no_write"
-    rasterizer_state      "default"
-    //textures???
-  }
-}
-
 frame "main"
 {
-  subframes "prerender"
+  subframes "light_shadow"
+  {
+    depth_stencil_target "shadow_map"
+    color_target         null
+
+    pass
+    {
+      tags                  "solid"
+      color_targets         null
+      depth_stencil_target  "frame_depth_stencil_target"
+      depth_stencil_state   "solid"
+      rasterizer_state      "default"
+      program               "shadow_map"
+    }
+  }
   
   pass
   {
@@ -111,67 +99,32 @@ frame "main"
     depth_stencil_state   "solid"
     rasterizer_state      "default"  
   }
-  
-  subframes "light"
 
-  pass
+  subframes "lighting"
   {
-    
+    pass
+    {
+      tags                  "solid"
+      color_targets         "main_color_target"
+      depth_stencil_target  "main_depth_stencil_target"
+      blend_state           "solid"
+      depth_stencil_state   "solid"
+      rasterizer_state      "default"
+      program               "phong"
+      //textures???
+    }
+    pass
+    {
+      tags                  "translucent"
+      color_targets         "main_color_target"
+      depth_stencil_target  "main_depth_stencil_target"
+      blend_state           "translucent"
+      depth_stencil_state   "ztest_with_no_write"
+      rasterizer_state      "default"
+      //textures???
+    }
   }
-}
-
-pass "solids"
-{  
-  tags         solid
-  clear        rendertarget depth stencil
-  rasterizer   "default"
-  blend        "no_blend"
-  depthstencil "solid"
-  program      "phong"
   
-  params "lighting" //????
-  params "material" //??????
-  params "transformations"
-  params "fog"
-}
-
-pass "transparents"
-{
-  tags blend
-    //...
-}
-
-frame "light_shadow"
-{
-  depth_stencil_target "shadow_map"
-  color_target         null
-
-  tags "shadow"
-
-  pass "z-only"
-}
-
-frame "default"
-{
-  subpasses "shadow"
-  
-  rendertargets
-  {
-    depth_stencil "main_depth_stencil"
-    color         null
-  }
-
-  pass "z-only"
-
-  rendertargets
-  {
-    depth_stencil "main_depth_stencil" 
-    color         "main_color1"
-    color         "main_color2"
-  }
-    
-  subpasses "light"
-
   pass "dof"
 
   pass "helpers"  
