@@ -1,82 +1,107 @@
+//blend stage state for rendering solid (non transaparent) geometry
 blend "solid"
 {
-  blend_enable     false
-  color_write_mask rgba
+  blend_enable     false //blending is disabled
+  color_write_mask rgba  //write color to all color planes
 }
 
-blend "translucent"
+//blend stage state for rendering tranparent geometry
+blend "transparent"
 {
-  blend_enable      true
-  alpha_to_coverage false
-  blend_color       add src_alpha inv_src_alpha
-  blend_alpha       add src_alpha inv_src_alpha
-  color_write_mask  rgba
+  blend_enable      true                        //blending is enabled
+  alpha_to_coverage false                       //alpha to coverage is enabled
+  blend_color       add src_alpha inv_src_alpha //blend mode for alpha-blending
+  blend_alpha       add src_alpha inv_src_alpha //blend mode for alpha-blending
+  color_write_mask  rgba                        //write color to all color planes
 }
 
+//blend stage state for additive rendering of transparent geometry (effects, particles, etc.)
 blend "additive"
 {
-  blend_enable     true
-  blend_color      add one one
-  blend_alpha      add one one
-  color_write_mask rgba
+  blend_enable     true          //blending is enabled
+  blend_color      add one one   //blend mode for additive blending
+  blend_alpha      add one one   //blend mode for additive blending
+  color_write_mask rgba          //write color to all color planes
 }
 
+//depth stencil stage state for rendering solid (non transparent) geometry
 depthstencil "solid"
 {
-  depth_test   true
-  depth_write  true
-  stencil_test false
+  depth_test   true     //z-test is enabled
+  depth_write  true     //write to z-buffer is enabled
+  stencil_test false    //stencil test is disabled
 }
 
+//depth stencil stage state for rendering
 depthstencil "ztest_with_no_write"
 {
-  depth_test   true
-  depth_write  false
+  depth_test   true    //z-test is enabled
+  depth_write  false   //write to z-buffer is disabled
 }
 
+//depth stencil stage state (only for testing)
 depthstencil "stencil-test"
 {
-  depth_test         true
-  depth_write        true
-  depth_compare_mode less
-  stencil_test       true
-  stencil_read       0xf
-  stencil_write      0xf  
+  depth_test         true //z-test is enabled
+  depth_write        true //write to z-buffer is enabled
+  depth_compare_mode less //comparision mode for z-buffer
+  stencil_test       true //stencil test is enabled
+  stencil_read       0xf  //stencil mask for each stencil reading
+  stencil_write      0xf  //stencil mask for each stencil writing
   
+  //stencil settings for front faces (possible head attributes: front, back, front_and_back - default)
   stencil front
   {
-    compare     less
-    stencilfail keep
-    depthfail   keep
-    stencilpass keep
+    stencil_compare_mode   less  //comparision mode for stencil values
+    depth_fail_operation   keep  //operation that performed if depth test is failed    
+    stencil_fail_operation keep  //operation that performed if stencil test is failed
+    stencil_pass_opertion  keep  //operation that performed if stencil test is passed
   }
   
   stencil back
   {
+    stencil_compare_mode   greater  //comparision mode for stencil values
+    depth_fail_operation   keep     //operation that performed if depth test is failed    
+    stencil_fail_operation keep     //operation that performed if stencil test is failed
+    stencil_pass_opertion  invert   //operation that performed if stencil test is passed  
   }
 }
 
+//default rasterizer stage settings
 rasterizer "default"
 {
-  front_clock_wise  true  
-  fill_mode         solid
-  cull_mode         back
-  depth_bias        0
-  scissor           false //????
-  multisample       false
-  line_antialiasing true
+  fill_mode         solid //draw geometry as solid (filled) triangles
+  front_clock_wise  true  //front faces is described as clockwise
+  cull_mode         back  //cull back faces
+  depth_bias        0     //depth bias (offset for each depth value on rendering)
+  multisample       false //multisampling is disabled
+  line_antialiasing true  //antialiasing for lines is enabled
+    //scissor settings are described in frame
 }
 
-program "phong" "glsl"
+//shading instance, specified by (material, entity, frame)
+shading "phong"
 {
-  shader "phong.vert" //add compile options
-  shader "phong.frag"
+  profile "glsl"       //shading profile
+  shader  "phong.vert" //reference to shader source. TODO: add compile options
+  shader  "phong.frag" //reference to shader source
+  texmap  "diffuse"    //from material (static)
+  texmap  "normal"     //from material (static)
+  texmap  "specular"   //from material (static)
+  texmap  "ambient"    //from material (static)
+  texmap  "shadow"     //from frame (dynamic)
+  texmap  "reflect"    //from entity (dynamic, cached in entity)
 }
 
+//description of frames rendering
 frame "main"
 {
-  subframes "light_shadow"
+  subframes "main" //recursive possibility to render child frames with same structure
+
+  //description of child frames rendering: rendering shadow maps
+  subframes
   {
+    tags                 "light_shadow"  //list of frame tags which will be added to this subframes loop
     depth_stencil_target "shadow_map"
     color_target         null
 
@@ -100,8 +125,10 @@ frame "main"
     rasterizer_state      "default"  
   }
 
-  subframes "lighting"
+  subframes
   {
+    tags "lighting"
+  
     pass
     {
       tags                  "solid"
@@ -110,12 +137,11 @@ frame "main"
       blend_state           "solid"
       depth_stencil_state   "solid"
       rasterizer_state      "default"
-      program               "phong"
-      //textures???
+//      shading_state         "phong"
     }
     pass
     {
-      tags                  "translucent"
+      tags                  "transparent"
       color_targets         "main_color_target"
       depth_stencil_target  "main_depth_stencil_target"
       blend_state           "translucent"
