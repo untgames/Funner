@@ -30,6 +30,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable
   WindowArray         windows;                                       //окна
   TextureManagerPtr   textures;                                      //текстуры
   PrimitiveManagerPtr primitives;                                    //примитивы
+  ShadingManagerPtr   shading;                                       //менеджер шэйдина
   MaterialManagerPtr  materials;                                     //материалы
 
 ///Конструктор
@@ -129,12 +130,28 @@ TextureManager& RenderManagerImpl::TextureManager ()
   }
 }
 
+ShadingManager& RenderManagerImpl::ShadingManager ()
+{
+  try
+  {
+    if (!impl->shading)
+      impl->shading = ShadingManagerPtr (new render::ShadingManager (), false);
+
+    return *impl->shading;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::ShadingManager");
+    throw;
+  }
+}
+
 MaterialManager& RenderManagerImpl::MaterialManager ()
 {
   try
   {
     if (!impl->materials)
-      impl->materials = MaterialManagerPtr (new render::MaterialManager (&impl->DeviceManager (), &TextureManager ()), false);
+      impl->materials = MaterialManagerPtr (new render::MaterialManager (&impl->DeviceManager (), &TextureManager (), &ShadingManager ()), false);
 
     return *impl->materials;
   }

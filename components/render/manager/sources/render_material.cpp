@@ -10,6 +10,12 @@ namespace
 {
 
 /*
+    Константы
+*/
+
+const char* DEFAULT_PROGRAM_NAME = ""; //имя программы по умолчанию
+
+/*
     Текстурная карта
 */
 
@@ -69,27 +75,54 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
 typedef xtl::intrusive_ptr<Texmap> TexmapPtr;
 typedef stl::vector<TexmapPtr>     TexmapArray;
 
-struct MaterialImpl::Impl
+struct MaterialImpl::Impl: public CacheHolder
 {
   TextureManagerPtr   texture_manager; //менеджер текстур
+  ShadingManagerPtr   shading_manager; //менеджер шэйдинга
   stl::string         id;              //идентификатор материала
+  ProgramProxy        program;         //прокси программы
   common::PropertyMap properties;      //свойства материала
-  TexmapArray         texmaps;         //текстурные карты
+  TexmapArray         texmaps;         //текстурные карты  
+  LowLevelProgramPtr  cached_program;  //закэшированная программа
   
 ///Конструктор
-  Impl (const TextureManagerPtr& in_texture_manager)
+  Impl (const TextureManagerPtr& in_texture_manager, const ShadingManagerPtr& in_shading_manager)
     : texture_manager (in_texture_manager)
+    , shading_manager (in_shading_manager)
+    , program (shading_manager->GetProgramProxy (DEFAULT_PROGRAM_NAME))
   {
   }
+  
+///Работа с кэшем
+  void ResetCacheCore ()
+  {
+    cached_program = LowLevelProgramPtr ();
+  }
+  
+  void UpdateCacheCore ()
+  {
+    try
+    {
+      cached_program = program.Resource ();
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::MaterialImpl::Impl::UpdateCacheCore");
+      throw;
+    }
+  }
+  
+  using CacheHolder::UpdateCache;  
 };
 
 /*
     Конструктор / деструктор
 */
 
-MaterialImpl::MaterialImpl (const TextureManagerPtr& texture_manager)
-  : impl (new Impl (texture_manager))
+MaterialImpl::MaterialImpl (const TextureManagerPtr& texture_manager, const ShadingManagerPtr& shading_manager)
+  : impl (new Impl (texture_manager, shading_manager))
 {
+  AttachCacheSource (*impl);
 }
 
 MaterialImpl::~MaterialImpl ()
@@ -111,6 +144,17 @@ void MaterialImpl::SetId (const char* id)
     throw xtl::make_null_argument_exception ("render::MaterialImpl::SetId", "id");
     
   impl->id = id;
+}
+
+/*
+    Программа
+*/
+
+LowLevelProgramPtr MaterialImpl::Program ()
+{
+  impl->UpdateCache ();
+  
+  return impl->cached_program;
 }
 
 /*
@@ -197,6 +241,8 @@ void MaterialImpl::Update (const media::rfx::Material& material)
       
       new_texmaps.push_back (new_texmap);
     }    
+    
+    impl->program = impl->shading_manager->GetProgramProxy (material.Program ());
     
     impl->properties = new_properties;
     

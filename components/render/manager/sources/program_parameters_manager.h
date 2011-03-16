@@ -4,7 +4,6 @@
 enum ProgramParametersSlot
 {
   ProgramParametersSlot_Frame,
-  ProgramParametersSlot_Environment,
   ProgramParametersSlot_Transformations,
   ProgramParametersSlot_Entity,
   ProgramParametersSlot_Material,

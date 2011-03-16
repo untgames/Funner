@@ -37,6 +37,7 @@ namespace render
 //implementation forwards
 class DeviceManager;
 class DynamicTextureImpl;
+class ShadingManager;
 class MaterialManager;
 class PrimitiveManager;
 class TextureManager;
@@ -56,6 +57,7 @@ typedef xtl::intrusive_ptr<PrimitiveManager>     PrimitiveManagerPtr;
 typedef xtl::intrusive_ptr<RectAreaImpl>         RectAreaPtr;
 typedef xtl::intrusive_ptr<RenderManagerImpl>    RenderManagerPtr;
 typedef xtl::intrusive_ptr<RenderTargetImpl>     RenderTargetPtr;
+typedef xtl::intrusive_ptr<ShadingManager>       ShadingManagerPtr;
 typedef xtl::intrusive_ptr<TextureImpl>          TexturePtr;
 typedef xtl::intrusive_ptr<TextureManager>       TextureManagerPtr;
 typedef xtl::intrusive_ptr<WindowImpl>           WindowPtr;
@@ -133,6 +135,7 @@ class Wrappers
 #include "primitive_manager.h"
 #include "rect_area.h"
 #include "render_target.h"
+#include "shading_manager.h"
 #include "texture.h"
 #include "texture_manager.h"
 #include "window.h"
