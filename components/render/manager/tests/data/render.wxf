@@ -145,6 +145,8 @@ shading "phong"
   profile "glsl"       //shading profile
   shader  "phong.vert" //reference to shader source. TODO: add compile options
   shader  "phong.frag" //reference to shader source
+  
+    //TODO: sampler channel ID
   texmap  "diffuse"    //from material (static)
   texmap  "normal"     //from material (static)
   texmap  "specular"   //from material (static)
@@ -194,6 +196,7 @@ frame "main"
   pass
   {
     tags                  "solid"                     //render only non-transaparent geometry
+    sort                  front_to_back               //sort geometry in front-to-back order
     color_targets         null                        //no color rendering needed
     depth_stencil_target  "main_depth_stencil_target" //render to z-buffer only
     depth_stencil_state   "solid"                     //use z-test and write to z-buffer
@@ -209,6 +212,7 @@ frame "main"
     pass
     {
       tags                  "solid"                       //render only non-transparent geometry
+      sort                  states                        //sort geometry for decrease state switches
       color_targets         "main_color_target"           //render to frame color buffer
       depth_stencil_target  "main_depth_stencil_target"   //render to frame depth stencil buffer
       blend_state           "solid"                       //use blend stage settings for solid geometry
@@ -221,6 +225,7 @@ frame "main"
     pass
     {
       tags                  "transparent"                 //render only transparent geometry
+      sort                  back_to_front                 //sort geometry in back-to-front order for correct transaparent rendering
       color_targets         "main_color_target"           //render to frame color buffer
       depth_stencil_target  "main_depth_stencil_target"   //render to frame depth stencil buffer
       blend_state           "transparent"                 //use blend stage settings for transaparent geometry
