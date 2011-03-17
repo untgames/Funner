@@ -282,3 +282,28 @@ FUNNER_C_API IEngine* FunnerInit ()
   return 0;
 }
 
+/*
+    Эмуляция запуска main функции
+*/
+
+FUNNER_C_API int FunnerMain (int argc, const char** argv)
+{
+  IEngine* funner = FunnerInit ();
+
+  if (!funner)
+  {
+    printf ("Funner startup failed!");
+    return 1;
+  }
+  
+  if (!funner->ParseCommandLine (argc, argv))
+  {
+    return 1;
+  }
+
+  funner->Run ();
+
+  delete funner;
+  
+  return 0;
+}

@@ -25,4 +25,4 @@ export.link.engine.launcher_shared.IMPORTS := link.common.default_console_handle
                                 link.media.video.theora link.network
 
 export.link.engine.launcher.IMPORTS := link.engine.launcher_shared
-export.link.engine.launcher.LINK_INCLUDES := FunnerInit
+export.link.engine.launcher.LINK_INCLUDES := FunnerInit FunnerMain
