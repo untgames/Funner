@@ -68,22 +68,28 @@ template <> struct PropertyTypeMap<PropertyType_Matrix>
     Описание реализации карты свойств
 */
 
-typedef xtl::uninitialized_storage<char> Buffer;
+typedef xtl::uninitialized_storage<char>           Buffer;
+typedef xtl::signal<void (PropertyMapEvent event)> Signal;
 
 struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
 {
-  PropertyLayout layout;      //расположение свойств
-  Buffer         buffer;      //буфер с данными карты свойств
-  StringArray    strings;     //массив строк карты свойств
-  size_t         hash;        //хэш карты
-  bool           need_update; //необходимо обновление вспомогательных данных
+  PropertyLayout layout;                          //расположение свойств
+  Buffer         buffer;                          //буфер с данными карты свойств
+  StringArray    strings;                         //массив строк карты свойств
+  size_t         hash;                            //хэш карты
+  bool           need_update;                     //необходимо обновление вспомогательных данных
+  Signal         signals [PropertyMapEvent_Num];  //сигналы карты свойств  
 
 ///Конструктор по умолчанию
   Impl ()
     : hash (0)
     , need_update (true)
   {
+    layout.Capture ();
+    
     buffer.reserve (DEFAULT_RESERVED_BUFFER_SIZE);
+    
+    Update ();
   }
   
 ///Конструктор для совместно используемого расположения свойств
@@ -93,6 +99,8 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     , hash (0)
     , need_update (true)
   {
+    layout.Capture ();
+    
     memset (buffer.data (), 0, buffer.size ());
     
     const PropertyDesc* desc = layout.Properties ();
@@ -102,6 +110,8 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
       if (desc->type == PropertyType_String)
         *reinterpret_cast<size_t*> (buffer.data () + desc->offset) = strings.Add ("");
     }
+    
+    Update ();
   }
   
 ///Конструктор копирования
@@ -112,6 +122,25 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     , hash (0)
     , need_update (true)
   {
+    Update ();
+  }
+  
+///Оповещение об изменении данных
+  void UpdateNotify ()
+  {
+    need_update = true;      
+    
+    if (!signals [PropertyMapEvent_OnUpdate].empty ())
+    {
+      try
+      {      
+        signals [PropertyMapEvent_OnUpdate] (PropertyMapEvent_OnUpdate);
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }
+    }    
   }
 
 ///Обновление данных
@@ -127,8 +156,9 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     if (layout.UseCount () == 1)
       return;
 
-    layout      = layout.Clone ();
-    need_update = true;
+    layout = layout.Clone ();
+    
+    layout.Capture ();    
   }
   
 ///Вставка нового свойства
@@ -288,6 +318,8 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
     need_update = true;
     
     ReadValueToPropertyDispatch (elements_count, values, desc, PropertyTypeMap<source_type> ());
+    
+    UpdateNotify ();    
   }
   
   template <class T>
@@ -940,7 +972,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
 
       layout.RemoveProperty (index);
       
-      need_update = true;
+      UpdateNotify ();
     }
     catch (xtl::exception& e)
     {
@@ -988,7 +1020,7 @@ struct PropertyMap::Impl: public xtl::reference_counter, public xtl::trackable
 
     CaptureLayout ();
 
-    need_update = true;    
+    need_update = true;
     
       //сохранение параметров
     
@@ -1185,6 +1217,21 @@ xtl::trackable& get_trackable (const PropertyMap& map)
 }
 
 /*
+    Подписка на события карты свойств
+*/
+
+xtl::connection PropertyMap::RegisterEventHandler (PropertyMapEvent event, const EventHandler& handler) const
+{
+  switch (event)
+  {
+    case PropertyMapEvent_OnUpdate:
+      return impl->signals [event].connect (handler);
+    default:
+      throw xtl::make_argument_exception ("common::PropertyMap::RegisterEventHandler", "event", event);
+  }
+}
+
+/*
     Копирование
 */
 
@@ -1246,7 +1293,7 @@ void PropertyMap::SetPropertyName (size_t index, const char* name)
     
     impl->layout.SetPropertyName (index, name);
     
-    impl->need_update = true;
+    impl->UpdateNotify ();
   }
   catch (xtl::exception& e)
   {
@@ -1263,7 +1310,7 @@ void PropertyMap::SetPropertyName (const char* old_name, const char* new_name)
     
     impl->layout.SetPropertyName (old_name, new_name);
 
-    impl->need_update = true;
+    impl->UpdateNotify ();
   }
   catch (xtl::exception& e)
   {
@@ -1390,7 +1437,11 @@ size_t PropertyMap::AddProperty (const char* name, common::PropertyType type, si
 {
   try
   {
-    return impl->InsertProperty (name, type, elements_count);
+    size_t index = impl->InsertProperty (name, type, elements_count);
+    
+    impl->UpdateNotify ();
+    
+    return index;
   }
   catch (xtl::exception& e)
   {
@@ -1774,13 +1825,12 @@ void PropertyMap::Clear ()
 {
   try
   {
-    if (impl->layout.UseCount () != 1) impl->layout = PropertyLayout ();
-    else                               impl->layout.Clear ();
+    impl->layout.Clear ();
 
     impl->buffer.resize (0);
     impl->strings.Clear ();
 
-    impl->need_update = true;    
+    impl->UpdateNotify ();
   }
   catch (xtl::exception& e)
   {

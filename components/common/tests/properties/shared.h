@@ -6,7 +6,10 @@
 
 #include <stl/string>
 
+#include <xtl/bind.h>
 #include <xtl/lexical_cast.h>
+#include <xtl/ref.h>
+#include <xtl/signal.h>
 
 #include <math/vector.h>
 #include <math/matrix.h>
