@@ -76,7 +76,7 @@ struct MaterialManager::Impl
       
       for (media::rfx::MaterialLibrary::ConstIterator iter=library.CreateIterator (); iter; ++iter)
       {
-        MaterialPtr material (new MaterialImpl (texture_manager, shading_manager), false);
+        MaterialPtr material (new MaterialImpl (device_manager, texture_manager, shading_manager), false);
         
         material->Update (*iter);
         
@@ -138,7 +138,7 @@ MaterialPtr MaterialManager::CreateMaterial ()
 {
   try
   {
-    return MaterialPtr (new MaterialImpl (impl->texture_manager, impl->shading_manager), false);
+    return MaterialPtr (new MaterialImpl (impl->device_manager, impl->texture_manager, impl->shading_manager), false);
   }
   catch (xtl::exception& e)
   {

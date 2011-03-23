@@ -133,6 +133,7 @@ class Wrappers
 #include "primitive.h"
 #include "primitive_buffers.h"
 #include "primitive_manager.h"
+#include "property_buffer.h"
 #include "rect_area.h"
 #include "render_target.h"
 #include "shading_manager.h"

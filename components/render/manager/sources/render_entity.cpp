@@ -3,6 +3,8 @@
 using namespace render;
 using namespace render::low_level;
 
+//TODO: use UpdateCache
+
 namespace
 {
 
@@ -13,19 +15,39 @@ namespace
 const size_t LODS_RESERVE = 4; //резервируемое количество уровней детализации
 
 /*
+    Описание данных объекта
+*/
+
+struct EntityLodCommonData: public CacheHolder
+{
+  PropertyBuffer properties; //свойства рендеринга
+  
+///Конструктор
+  EntityLodCommonData (const DeviceManagerPtr& device_manager)
+    : properties (device_manager)
+  {
+    AttachCacheSource (properties);
+  }
+};
+
+/*
     Описание уровня детализации
 */
 
 struct EntityLod: public xtl::reference_counter, public CacheHolder
 {
-  size_t         level_of_detail;  //номер уровня детализации
-  PrimitiveProxy primitive;        //примитив
+  EntityLodCommonData& common_data;      //общие данные для всех уровней детализации
+  size_t               level_of_detail;  //номер уровня детализации
+  PrimitiveProxy       primitive;        //примитив
 
 ///Конструктор
-  EntityLod (size_t in_level_of_detail, const PrimitiveProxy& in_primitive)
-    : level_of_detail (in_level_of_detail)
+  EntityLod (EntityLodCommonData& in_common_data, size_t in_level_of_detail, const PrimitiveProxy& in_primitive)
+    : common_data (in_common_data)
+    , level_of_detail (in_level_of_detail)
     , primitive (in_primitive)
   {
+    AttachCacheSource (common_data);
+    
     primitive.AttachCacheHolder (*this);
   }
   
@@ -70,9 +92,8 @@ struct EntityLodLess
     Описание реализации объекта рендеринга
 */
 
-struct EntityImpl::Impl
+struct EntityImpl::Impl: public EntityLodCommonData
 {
-  common::PropertyMap   properties;        //свойства рендеринга
   math::mat4f           transformation;    //матрица преобразований
   EntityLodArray        lods;              //уровни детализации
   bool                  need_resort;       //уровни детализации требуют пересортировки
@@ -80,8 +101,9 @@ struct EntityImpl::Impl
   EntityTextureStorage  textures;          //хранилище текстур объекта рендеринга
   
 ///Конструктор
-  Impl (EntityImpl& owner, const PrimitiveManagerPtr& in_primitive_manager)
-    : need_resort (false)
+  Impl (EntityImpl& owner, const DeviceManagerPtr& device_manager, const PrimitiveManagerPtr& in_primitive_manager)
+    : EntityLodCommonData (device_manager)
+    , need_resort (false)
     , primitive_manager (in_primitive_manager)
     , textures (owner)
   {
@@ -114,17 +136,36 @@ struct EntityImpl::Impl
     
     return index != -1 ? lods [index] : EntityLodPtr ();
   }
+  
+///Работа с кэшем
+  void ResetCacheCore ()
+  {
+  }
+  
+  void UpdateCacheCore ()
+  {
+    try
+    {
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::EntityImpl::Impl::UpdateCacheCore");
+      throw;
+    }
+  }
+  
+  using CacheHolder::UpdateCache;
 };
 
 /*
     Конструктор / деструктор
 */
 
-EntityImpl::EntityImpl (const PrimitiveManagerPtr& primitive_manager)
+EntityImpl::EntityImpl (const DeviceManagerPtr& device_manager, const PrimitiveManagerPtr& primitive_manager)
 {
   try
   {
-    impl = new Impl (*this, primitive_manager);
+    impl = new Impl (*this, device_manager, primitive_manager);
   }
   catch (xtl::exception& e)
   {
@@ -143,12 +184,12 @@ EntityImpl::~EntityImpl ()
 
 void EntityImpl::SetProperties (const common::PropertyMap& properties)
 {
-  impl->properties = properties;
+  impl->properties.SetProperties (properties);
 }
 
 const common::PropertyMap& EntityImpl::Properties ()
 {
-  return impl->properties;
+  return impl->properties.Properties ();
 }
 
 /*
@@ -253,7 +294,7 @@ void EntityImpl::SetPrimitive (const PrimitivePtr& primitive, size_t level_of_de
     
     proxy.SetResource (primitive);
     
-    EntityLodPtr lod (new EntityLod (level_of_detail, proxy), false);  
+    EntityLodPtr lod (new EntityLod (*impl, level_of_detail, proxy), false);  
     
     int lod_index = impl->FindLodIndex (level_of_detail);
     
@@ -281,7 +322,7 @@ void EntityImpl::SetPrimitive (const char* name, size_t level_of_detail)
     if (!*name)
       throw xtl::make_argument_exception ("", "name", name, "Empty primitive name is not allowed as entity level of detail");
     
-    EntityLodPtr lod (new EntityLod (level_of_detail, impl->primitive_manager->GetPrimitiveProxy (name)), false);
+    EntityLodPtr lod (new EntityLod (*impl, level_of_detail, impl->primitive_manager->GetPrimitiveProxy (name)), false);
       
     int lod_index = impl->FindLodIndex (level_of_detail);
     

@@ -314,7 +314,7 @@ FramePtr RenderManagerImpl::CreateFrame ()
 
 EntityPtr RenderManagerImpl::CreateEntity ()
 {
-  return EntityPtr (new EntityImpl (impl->primitives), false);
+  return EntityPtr (new EntityImpl (impl->device_manager, impl->primitives), false);
 }
 
 /*

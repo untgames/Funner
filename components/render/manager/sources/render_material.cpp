@@ -77,33 +77,38 @@ typedef stl::vector<TexmapPtr>     TexmapArray;
 
 struct MaterialImpl::Impl: public CacheHolder
 {
-  TextureManagerPtr   texture_manager; //менеджер текстур
-  ShadingManagerPtr   shading_manager; //менеджер шэйдинга
-  stl::string         id;              //идентификатор материала
-  ProgramProxy        program;         //прокси программы
-  common::PropertyMap properties;      //свойства материала
-  TexmapArray         texmaps;         //текстурные карты  
-  LowLevelProgramPtr  cached_program;  //закэшированная программа
+  TextureManagerPtr   texture_manager;   //менеджер текстур
+  ShadingManagerPtr   shading_manager;   //менеджер шэйдинга
+  stl::string         id;                //идентификатор материала
+  ProgramProxy        program;           //прокси программы
+  PropertyBuffer      properties;        //свойства материала
+  TexmapArray         texmaps;           //текстурные карты  
+  LowLevelProgramPtr  cached_program;    //закэшированная программа
+  LowLevelBufferPtr   cached_properties; //закэшированный буфер констант
   
 ///Конструктор
-  Impl (const TextureManagerPtr& in_texture_manager, const ShadingManagerPtr& in_shading_manager)
+  Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ShadingManagerPtr& in_shading_manager)
     : texture_manager (in_texture_manager)
     , shading_manager (in_shading_manager)
     , program (shading_manager->GetProgramProxy (DEFAULT_PROGRAM_NAME))
+    , properties (in_device_manager)
   {
+    AttachCacheSource (properties);
   }
   
 ///Работа с кэшем
   void ResetCacheCore ()
   {
-    cached_program = LowLevelProgramPtr ();
+    cached_program    = LowLevelProgramPtr ();
+    cached_properties = LowLevelBufferPtr ();
   }
   
   void UpdateCacheCore ()
   {
     try
     {
-      cached_program = program.Resource ();
+      cached_program    = program.Resource ();
+      cached_properties = properties.Buffer ();
     }
     catch (xtl::exception& e)
     {
@@ -119,8 +124,8 @@ struct MaterialImpl::Impl: public CacheHolder
     Конструктор / деструктор
 */
 
-MaterialImpl::MaterialImpl (const TextureManagerPtr& texture_manager, const ShadingManagerPtr& shading_manager)
-  : impl (new Impl (texture_manager, shading_manager))
+MaterialImpl::MaterialImpl (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ShadingManagerPtr& shading_manager)
+  : impl (new Impl (device_manager, texture_manager, shading_manager))
 {
   AttachCacheSource (*impl);
 }
@@ -158,12 +163,12 @@ LowLevelProgramPtr MaterialImpl::Program ()
 }
 
 /*
-    Свойства материала
+    Константный буфер материала
 */
 
-const common::PropertyMap& MaterialImpl::Properties ()
+LowLevelBufferPtr MaterialImpl::ConstantBuffer ()
 {
-  return impl->properties;
+  return impl->properties.Buffer ();
 }
 
 /*
@@ -242,9 +247,15 @@ void MaterialImpl::Update (const media::rfx::Material& material)
       new_texmaps.push_back (new_texmap);
     }    
     
-    impl->program = impl->shading_manager->GetProgramProxy (material.Program ());
+    ProgramProxy new_program = impl->shading_manager->GetProgramProxy (material.Program ());
     
-    impl->properties = new_properties;
+    new_program.AttachCacheHolder (*impl);
+    
+    impl->program.DetachCacheHolder (*impl);
+    
+    impl->program = new_program;
+    
+    impl->properties.SetProperties (new_properties);
     
     impl->texmaps.swap (new_texmaps);
     

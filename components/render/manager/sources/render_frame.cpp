@@ -3,12 +3,36 @@
 using namespace render;
 using namespace render::low_level;
 
+namespace
+{
+
+/*
+    Константы
+*/
+
+const size_t RESERVED_ENTITIES_COUNT = 512; //резервируемое количество отображаемых объектов
+const size_t RESERVED_FRAMES_COUNT   = 32;  //резервируемое количество отображаемых фреймов
+
+}
+
 /*
     Описание реализации кадра
 */
 
+typedef stl::vector<FramePtr>  FrameArray;
+typedef stl::vector<EntityPtr> EntityArray;
+
 struct FrameImpl::Impl
 {
+  EntityArray entities;  //список объектов, отображаемых в кадре
+  FrameArray  frames;    //список вложенных кадров
+
+///Конструктор
+  Impl ()
+  {
+    entities.reserve (RESERVED_ENTITIES_COUNT);
+    frames.reserve (RESERVED_FRAMES_COUNT);
+  }
 };
 
 /*
@@ -18,7 +42,6 @@ struct FrameImpl::Impl
 FrameImpl::FrameImpl ()
   : impl (new Impl)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::FrameImpl");
 }
 
 FrameImpl::~FrameImpl ()
@@ -262,17 +285,17 @@ const common::PropertyMap& FrameImpl::Properties ()
 
 size_t FrameImpl::EntitiesCount ()
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::EntitiesCount");
+  return impl->entities.size ();
 }
 
 void FrameImpl::AddEntity (const EntityPtr& entity)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::AddEntity");
+  impl->entities.push_back (entity);
 }
 
 void FrameImpl::RemoveAllEntities ()
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::RemoveAllEntities");
+  impl->entities.clear ();
 }
 
 /*
@@ -281,17 +304,17 @@ void FrameImpl::RemoveAllEntities ()
 
 size_t FrameImpl::FramesCount ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->frames.size ();
 }
 
 void FrameImpl::AddFrame (const FramePtr& frame)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::AddFrame");
+  impl->frames.push_back (frame);
 }
 
 void FrameImpl::RemoveAllFrames ()
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::RemoveAllFrames");
+  impl->frames.clear ();
 }
 
 /*
