@@ -41,12 +41,16 @@ class ShadingManager;
 class MaterialManager;
 class PrimitiveManager;
 class TextureManager;
+class EffectPass;
+class EffectFrame;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef xtl::intrusive_ptr<DeviceManager>        DeviceManagerPtr;
 typedef xtl::intrusive_ptr<DynamicTextureImpl>   DynamicTexturePtr;
+typedef xtl::intrusive_ptr<EffectPass>           EffectPassPtr;
+typedef xtl::intrusive_ptr<EffectFrame>          EffectFramePtr;
 typedef xtl::intrusive_ptr<EntityImpl>           EntityPtr;
 typedef xtl::intrusive_ptr<FrameImpl>            FramePtr;
 typedef xtl::intrusive_ptr<MaterialImpl>         MaterialPtr;
@@ -123,6 +127,7 @@ class Wrappers
 #include "dynamic_texture.h"
 #include "effect_loader_library.h"
 #include "entity.h"
+#include "effect.h"
 #include "frame.h"
 #include "input_layout_manager.h"
 #include "program_parameters_manager.h"

@@ -1,10 +1,12 @@
 //TODO: techniques / condition passes/subframes
-//TODO: shading templates
-//TODO: shading states
+//TODO: templates for all states/program/frames/passes (general implementation)
+//TODO: program states
 //TODO: add viewport depth range
 //TODO: add frame demultiplexor
-//TODO: constant params (constant buffers description)
+//TODO: constant params requirements (constant buffers description)
 //TODO: temporary render targets
+
+import "shaders/*"
 
 //blend stage state for rendering solid (non transaparent) geometry
 blend "solid"
@@ -33,7 +35,7 @@ blend "additive"
 }
 
 //depth stencil stage state for rendering solid (non transparent) geometry
-depthstencil "solid"
+depth_stencil "solid"
 {
   depth_test   true     //z-test is enabled
   depth_write  true     //write to z-buffer is enabled
@@ -41,14 +43,14 @@ depthstencil "solid"
 }
 
 //depth stencil stage state for rendering
-depthstencil "ztest_without_write"
+depth_stencil "ztest_without_write"
 {
   depth_test   true    //z-test is enabled
   depth_write  false   //write to z-buffer is disabled
 }
 
 //depth stencil stage state (only for testing)
-depthstencil "stencil-test"
+depth_stencil "stencil-test"
 {
   depth_test         true //z-test is enabled
   depth_write        true //write to z-buffer is enabled
@@ -139,7 +141,7 @@ sampler "repeat"
   border_color    0 0 0 0           //color of texture's border
 }
 
-//shading instance for phong shading, specified by (material, entity, frame)
+//program instance for phong program, specified by (material, entity, frame)
 shading "phong"
 {
   profile "glsl"       //shading profile

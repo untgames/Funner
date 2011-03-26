@@ -4,8 +4,7 @@ using namespace common;
 using namespace render::low_level;
 using namespace render;
 
-//TODO: регистр: высокий или низкий?
-//TODO: template programs
+//TODO: templates for all blocks: shading, blend, depth_stencil, etc.
 
 namespace
 {
@@ -45,13 +44,12 @@ class EffectLoader
 ///Разбор корня
     void ParseRoot (Parser::Iterator iter)
     {
-      for_each_child (*iter, "BlendState",        xtl::bind (&EffectLoader::ParseBlendState, this, _1));
-      for_each_child (*iter, "DepthStencilState", xtl::bind (&EffectLoader::ParseDepthStencilState, this, _1));
-      for_each_child (*iter, "RasterizerState",   xtl::bind (&EffectLoader::ParseRasterizerState, this, _1));      
-      for_each_child (*iter, "SamplerState",      xtl::bind (&EffectLoader::ParseSamplerState, this, _1));
-      for_each_child (*iter, "ShaderLibrary",     xtl::bind (&EffectLoader::ParseShaderLibrary, this, _1));
-      for_each_child (*iter, "Program",           xtl::bind (&EffectLoader::ParseProgram, this, _1));
-      for_each_child (*iter, "Template",          xtl::bind (&EffectLoader::ParseTemplateProgram, this, _1));
+      for_each_child (*iter, "blend",         xtl::bind (&EffectLoader::ParseBlendState, this, _1));
+      for_each_child (*iter, "depth_stencil", xtl::bind (&EffectLoader::ParseDepthStencilState, this, _1));
+      for_each_child (*iter, "rasterizer",    xtl::bind (&EffectLoader::ParseRasterizerState, this, _1));
+      for_each_child (*iter, "sampler",       xtl::bind (&EffectLoader::ParseSamplerState, this, _1));
+      for_each_child (*iter, "import",        xtl::bind (&EffectLoader::ParseShaderLibrary, this, _1));
+      for_each_child (*iter, "shading",       xtl::bind (&EffectLoader::ParseShading, this, _1));
     }
     
 ///Разбор аргумента операции смешивания цветов
@@ -64,16 +62,18 @@ class EffectLoader
       };
       
       static Tag2Value values [] = {
-        {"Zero",                    BlendArgument_Zero},
-        {"One",                     BlendArgument_One},
-        {"SourceColor",             BlendArgument_SourceColor},
-        {"SourceAlpha",             BlendArgument_SourceAlpha},
-        {"InverseSourceColor",      BlendArgument_InverseSourceColor},
-        {"InverseSourceAlpha",      BlendArgument_InverseSourceAlpha},
-        {"DestinationColor",        BlendArgument_DestinationColor},
-        {"DestinationAlpha",        BlendArgument_DestinationAlpha},
-        {"InverseDestinationColor", BlendArgument_InverseDestinationColor},
-        {"InverseDestinationAlpha", BlendArgument_InverseDestinationAlpha},        
+        {"zero",           BlendArgument_Zero},
+        {"0",              BlendArgument_Zero},        
+        {"one",            BlendArgument_One},
+        {"1",              BlendArgument_One},
+        {"src_color",      BlendArgument_SourceColor},
+        {"src_alpha",      BlendArgument_SourceAlpha},
+        {"inv_src_color",  BlendArgument_InverseSourceColor},
+        {"inv_src_alpha",  BlendArgument_InverseSourceAlpha},
+        {"dst_color",      BlendArgument_DestinationColor},
+        {"dst_alpha",      BlendArgument_DestinationAlpha},
+        {"inv_dst_color",  BlendArgument_InverseDestinationColor},
+        {"inv_dst_alpha",  BlendArgument_InverseDestinationAlpha},        
       };
       
       static const size_t values_count = sizeof (values) / sizeof (*values);
@@ -94,11 +94,11 @@ class EffectLoader
       const char* src_arg_tag   = get<const char*> (iter);
       const char* dst_arg_tag   = get<const char*> (iter);
       
-      if      (!xtl::xstricmp (operation_tag, "Add"))                operation = BlendOperation_Add;
-      else if (!xtl::xstricmp (operation_tag, "Subtraction"))        operation = BlendOperation_Subtraction;
-      else if (!xtl::xstricmp (operation_tag, "ReverseSubtraction")) operation = BlendOperation_ReverseSubtraction;
-      else if (!xtl::xstricmp (operation_tag, "Min"))                operation = BlendOperation_Min;
-      else if (!xtl::xstricmp (operation_tag, "Max"))                operation = BlendOperation_Max;
+      if      (!xtl::xstricmp (operation_tag, "add"))    operation = BlendOperation_Add;
+      else if (!xtl::xstricmp (operation_tag, "sub"))    operation = BlendOperation_Subtraction;
+      else if (!xtl::xstricmp (operation_tag, "invsub")) operation = BlendOperation_ReverseSubtraction;
+      else if (!xtl::xstricmp (operation_tag, "min"))    operation = BlendOperation_Min;
+      else if (!xtl::xstricmp (operation_tag, "max"))    operation = BlendOperation_Max;
       else
       {
         raise_parser_exception (node, "Bad blend operation '%s'", operation_tag);      
@@ -117,8 +117,8 @@ class EffectLoader
       
       memset (&desc, 0, sizeof (desc));
       
-      desc.blend_enable                     = xtl::xstrcmp (get<const char*> (*iter, "Enable",                 "true"), "true") == 0;
-      desc.sample_alpha_to_coverage         = xtl::xstrcmp (get<const char*> (*iter, "SampleAlphaToCoverage",  "false"), "true") == 0;
+      desc.blend_enable                     = xtl::xstrcmp (get<const char*> (*iter, "blend_enable"               "true"), "true") == 0;
+      desc.sample_alpha_to_coverage         = xtl::xstrcmp (get<const char*> (*iter, "sample_alpha_to_coverage",  "false"), "true") == 0;
       desc.blend_color_operation            = BlendOperation_Add;
       desc.blend_color_source_argument      = BlendArgument_One;
       desc.blend_color_destination_argument = BlendArgument_Zero;
@@ -127,21 +127,21 @@ class EffectLoader
       desc.blend_alpha_destination_argument = BlendArgument_Zero;
       desc.color_write_mask                 = 0;
       
-      const char* color_mask = get<const char*> (*iter, "ColorWriteMask", "rgba");
+      const char* color_mask = get<const char*> (*iter, "color_write_mask", "rgba");
       
-      if (strchr (color_mask, 'R')) desc.color_write_mask |= ColorWriteFlag_Red;
-      if (strchr (color_mask, 'G')) desc.color_write_mask |= ColorWriteFlag_Green;
-      if (strchr (color_mask, 'B')) desc.color_write_mask |= ColorWriteFlag_Blue;
-      if (strchr (color_mask, 'A')) desc.color_write_mask |= ColorWriteFlag_Alpha;
+      if (strchr (color_mask, 'r')) desc.color_write_mask |= ColorWriteFlag_Red;
+      if (strchr (color_mask, 'g')) desc.color_write_mask |= ColorWriteFlag_Green;
+      if (strchr (color_mask, 'b')) desc.color_write_mask |= ColorWriteFlag_Blue;
+      if (strchr (color_mask, 'a')) desc.color_write_mask |= ColorWriteFlag_Alpha;
       
-      if (ParseNode color_node = iter->First ("BlendColor"))
+      if (ParseNode color_node = iter->First ("blend_color"))
       {
         Parser::AttributeIterator attr_iter = make_attribute_iterator (color_node);
         
         ParseBlendOperation (*iter, attr_iter, desc.blend_color_operation, desc.blend_color_source_argument, desc.blend_color_destination_argument);
       }
       
-      if (ParseNode alpha_node = iter->First ("BlendAlpha"))
+      if (ParseNode alpha_node = iter->First ("blend_alpha"))
       {
         Parser::AttributeIterator attr_iter = make_attribute_iterator (alpha_node);
         
@@ -173,14 +173,14 @@ class EffectLoader
       };
       
       static Tag2Value values [] = {
-        {"AlwaysFail",   CompareMode_AlwaysFail},
-        {"AlwaysPass",   CompareMode_AlwaysPass},
-        {"Equal",        CompareMode_Equal},
-        {"NotEqual",     CompareMode_NotEqual},
-        {"Less",         CompareMode_Less},
-        {"LessEqual",    CompareMode_LessEqual},
-        {"Greater",      CompareMode_Greater},
-        {"GreaterEqual", CompareMode_GreaterEqual},        
+        {"always_fail",   CompareMode_AlwaysFail},
+        {"always_pass",   CompareMode_AlwaysPass},
+        {"equal",         CompareMode_Equal},
+        {"not_equal",     CompareMode_NotEqual},
+        {"less",          CompareMode_Less},
+        {"less_equal",    CompareMode_LessEqual},
+        {"greater",       CompareMode_Greater},
+        {"great_erequal", CompareMode_GreaterEqual},        
       };
       
       static const size_t values_count = sizeof (values) / sizeof (*values);
@@ -211,12 +211,15 @@ class EffectLoader
       };
       
       static Tag2Value values [] = {
-        {"Keep",      StencilOperation_Keep},
-        {"Zero",      StencilOperation_Zero},
-        {"Replace",   StencilOperation_Replace},
-        {"Increment", StencilOperation_Increment},
-        {"Decrement", StencilOperation_Decrement},
-        {"Invert",    StencilOperation_Invert},
+        {"keep",      StencilOperation_Keep},
+        {"zero",      StencilOperation_Zero},
+        {"0",         StencilOperation_Zero},        
+        {"replace",   StencilOperation_Replace},
+        {"increment", StencilOperation_Increment},
+        {"inc",       StencilOperation_Increment},        
+        {"decrement", StencilOperation_Decrement},
+        {"dec",       StencilOperation_Decrement},        
+        {"invert",    StencilOperation_Invert},
       };
       
       static const size_t values_count = sizeof (values) / sizeof (*values);
@@ -239,33 +242,33 @@ class EffectLoader
       
       memset (&desc, 0, sizeof (desc));
       
-      desc.depth_test_enable   = xtl::xstrcmp (get<const char*> (*iter, "DepthTest",   "true"), "true") == 0;
-      desc.depth_write_enable  = xtl::xstrcmp (get<const char*> (*iter, "DepthWrite",  "true"), "true") == 0;
-      desc.stencil_test_enable = xtl::xstrcmp (get<const char*> (*iter, "StencilTest", "false"), "true") == 0;
-      desc.depth_compare_mode  = iter->First ("DepthCompareMode") ? ParseCompareMode (iter->First ("DepthCompareMode")) : CompareMode_Less;
-      desc.stencil_read_mask   = get<size_t> (*iter, "StencilReadMask", 0u);
-      desc.stencil_write_mask  = get<size_t> (*iter, "StencilWriteMask", 0u);
+      desc.depth_test_enable   = xtl::xstrcmp (get<const char*> (*iter, "depth_test",   "true"), "true") == 0;
+      desc.depth_write_enable  = xtl::xstrcmp (get<const char*> (*iter, "depth_write",  "true"), "true") == 0;
+      desc.stencil_test_enable = xtl::xstrcmp (get<const char*> (*iter, "stencil_test", "false"), "true") == 0;
+      desc.depth_compare_mode  = iter->First ("depth_compare_mode") ? ParseCompareMode (iter->First ("depth_compare_mode")) : CompareMode_Less;
+      desc.stencil_read_mask   = get<size_t> (*iter, "stencil_read_mask", 0u);
+      desc.stencil_write_mask  = get<size_t> (*iter, "stencil_write_mask", 0u);
       
       for (Parser::NamesakeIterator stencil_iter=iter->First ("Stencil"); stencil_iter; ++stencil_iter)
       {
         const char* face       = get<const char*> (*stencil_iter, "");        
         size_t      face_index = 0;
         
-        if      (!xtl::xstrcmp (face, "Front") || !xtl::xstrcmp (face, "FrontAndBack")) face_index = FaceMode_Front;
-        else if (!xtl::xstrcmp (face, "Back"))                                          face_index = FaceMode_Back;
+        if      (!xtl::xstrcmp (face, "front") || !xtl::xstrcmp (face, "front_and_back")) face_index = FaceMode_Front;
+        else if (!xtl::xstrcmp (face, "back"))                                            face_index = FaceMode_Back;
         
         StencilDesc& stencil_desc = desc.stencil_desc [face_index];
         
           //разбор параметров стенсила
           
-        stencil_desc.stencil_compare_mode   = stencil_iter->First ("StencilCompareMode") ? ParseCompareMode (stencil_iter->First ("StencilCompareMode")) : CompareMode_AlwaysPass;
-        stencil_desc.stencil_fail_operation = ParseStencilOperation (*stencil_iter, "StencilFailOperation");
-        stencil_desc.depth_fail_operation   = ParseStencilOperation (*stencil_iter, "DepthFailOperation");
-        stencil_desc.stencil_pass_operation = ParseStencilOperation (*stencil_iter, "StencilPassOperation");        
+        stencil_desc.stencil_compare_mode   = stencil_iter->First ("stencil_compare_mode") ? ParseCompareMode (stencil_iter->First ("StencilCompareMode")) : CompareMode_AlwaysPass;
+        stencil_desc.stencil_fail_operation = ParseStencilOperation (*stencil_iter, "stencil_fail_operation");
+        stencil_desc.depth_fail_operation   = ParseStencilOperation (*stencil_iter, "depth_fail_operation");
+        stencil_desc.stencil_pass_operation = ParseStencilOperation (*stencil_iter, "stencil_pass_operation");        
           
           //дублирование данных
           
-        if (!xtl::xstrcmp (face, "FrontAndBack"))
+        if (!xtl::xstrcmp (face, "front_and_back"))
           desc.stencil_desc [FaceMode_Back] = desc.stencil_desc [FaceMode_Front];
       }
       
@@ -285,10 +288,10 @@ class EffectLoader
 ///Разбор режима отображения граней
     static FillMode ParseFillMode (const ParseNode& node)
     {
-      const char* value = get<const char*> (node, "", "Solid");
+      const char* value = get<const char*> (node, "", "solid");
       
-      if (!xtl::xstrcmp (value, "Solid"))     return FillMode_Solid;
-      if (!xtl::xstrcmp (value, "Wireframe")) return FillMode_Wireframe;
+      if (!xtl::xstrcmp (value, "solid"))     return FillMode_Solid;
+      if (!xtl::xstrcmp (value, "wireframe")) return FillMode_Wireframe;
       
       raise_parser_exception (node, "Unexpected fill mode '%s'", value);
       
@@ -298,11 +301,11 @@ class EffectLoader
 ///Разбор режима отсечения граней
     static CullMode ParseCullMode (const ParseNode& node)
     {
-      const char* value = get<const char*> (node, "", "None");
+      const char* value = get<const char*> (node, "", "none");
       
-      if (!xtl::xstrcmp (value, "None"))  return CullMode_None;
-      if (!xtl::xstrcmp (value, "Back"))  return CullMode_Back;
-      if (!xtl::xstrcmp (value, "Front")) return CullMode_Front;
+      if (!xtl::xstrcmp (value, "none"))  return CullMode_None;
+      if (!xtl::xstrcmp (value, "back"))  return CullMode_Back;
+      if (!xtl::xstrcmp (value, "front")) return CullMode_Front;
       
       raise_parser_exception (node, "Unexpected cull mode '%s'", value);
       
@@ -318,13 +321,13 @@ class EffectLoader
       
       memset (&desc, 0, sizeof (desc));
       
-      desc.fill_mode               = ParseFillMode (iter->First ("FillMode"));
-      desc.cull_mode               = ParseCullMode (iter->First ("CullMode"));
-      desc.front_counter_clockwise = xtl::xstrcmp (get<const char*> (*iter, "FrontCounterClockwise", "true"), "true") == 0;
-      desc.depth_bias              = get<int> (*iter, "DepthBias", 0);
-      desc.scissor_enable          = xtl::xstrcmp (get<const char*> (*iter, "ScissorEnable", "false"), "true") == 0;
-      desc.multisample_enable      = xtl::xstrcmp (get<const char*> (*iter, "MultisampleEnable", "false"), "true") == 0;
-      desc.antialiased_line_enable = xtl::xstrcmp (get<const char*> (*iter, "AntialiasedLineEnable", "false"), "true") == 0;      
+      desc.fill_mode               = ParseFillMode (iter->First ("fill_mode"));
+      desc.cull_mode               = ParseCullMode (iter->First ("cull_mode"));
+      desc.front_counter_clockwise = xtl::xstrcmp (get<const char*> (*iter, "front_counter_clockwise", "true"), "true") == 0;
+      desc.depth_bias              = get<int> (*iter, "depth_bias", 0);
+      desc.scissor_enable          = false;
+      desc.multisample_enable      = xtl::xstrcmp (get<const char*> (*iter, "multisample_enable", "false"), "true") == 0;
+      desc.antialiased_line_enable = xtl::xstrcmp (get<const char*> (*iter, "antialiased_line_enable", "false"), "true") == 0;      
 
       try
       {
@@ -338,7 +341,7 @@ class EffectLoader
         throw;
       }
     }
-    
+
 ///Разбор фильтра минимизации текстур
     static TexMinFilter ParseTexMinFilter (const ParseNode& node)
     {
@@ -351,13 +354,13 @@ class EffectLoader
       };
       
       static Tag2Value values [] = {
-        {"Default",          TexMinFilter_Default},
-        {"Point",            TexMinFilter_Point},
-        {"Linear",           TexMinFilter_Linear},
-        {"PointMipPoint",    TexMinFilter_PointMipPoint},
-        {"LinearMipPoint",   TexMinFilter_LinearMipPoint},
-        {"PointMipLinear",   TexMinFilter_PointMipLinear},
-        {"LinearMipLinear",  TexMinFilter_LinearMipLinear}
+        {"default",            TexMinFilter_Default},
+        {"point",              TexMinFilter_Point},
+        {"linear",             TexMinFilter_Linear},
+        {"point_mip_point",    TexMinFilter_PointMipPoint},
+        {"linear_mip_point",   TexMinFilter_LinearMipPoint},
+        {"point_mip_linear",   TexMinFilter_PointMipLinear},
+        {"linear_mip_linear",  TexMinFilter_LinearMipLinear}
       };
 
       static const size_t values_count = sizeof (values) / sizeof (*values);
@@ -374,11 +377,11 @@ class EffectLoader
 ///Разбор фильтра максимизации текстур
     static TexMagFilter ParseTexMagFilter (const ParseNode& node)
     {
-      const char* value = get<const char*> (node, "", "Default");
+      const char* value = get<const char*> (node, "", "default");
 
-      if (!xtl::xstrcmp (value, "Default")) return TexMagFilter_Default;
-      if (!xtl::xstrcmp (value, "Point"))   return TexMagFilter_Point;
-      if (!xtl::xstrcmp (value, "Linear"))  return TexMagFilter_Linear;
+      if (!xtl::xstrcmp (value, "default")) return TexMagFilter_Default;
+      if (!xtl::xstrcmp (value, "point"))   return TexMagFilter_Point;
+      if (!xtl::xstrcmp (value, "linear"))  return TexMagFilter_Linear;
 
       raise_parser_exception (node, "Unexpected texture mag filter '%s'", value);
 
@@ -388,12 +391,12 @@ class EffectLoader
 ///Разбор свёртки текстурных координат
     static TexcoordWrap ParseTexcoordWrap (const ParseNode& node)
     {
-      const char* value = get<const char*> (node, "", "Repeat");
+      const char* value = get<const char*> (node, "", "repeat");
       
-      if (!xtl::xstrcmp (value, "Repeat"))        return TexcoordWrap_Repeat;
-      if (!xtl::xstrcmp (value, "Mirror"))        return TexcoordWrap_Mirror;
-      if (!xtl::xstrcmp (value, "Clamp"))         return TexcoordWrap_Clamp;
-      if (!xtl::xstrcmp (value, "ClampToBorder")) return TexcoordWrap_ClampToBorder;
+      if (!xtl::xstrcmp (value, "repeat"))          return TexcoordWrap_Repeat;
+      if (!xtl::xstrcmp (value, "mirror"))          return TexcoordWrap_Mirror;
+      if (!xtl::xstrcmp (value, "clamp"))           return TexcoordWrap_Clamp;
+      if (!xtl::xstrcmp (value, "clamp_to_border")) return TexcoordWrap_ClampToBorder;
       
       raise_parser_exception (node, "Unexpected texcoord wrap mode '%s'", value);
       
@@ -409,18 +412,18 @@ class EffectLoader
       
       memset (&desc, 0, sizeof (desc));
       
-      desc.min_filter           = ParseTexMinFilter (iter->First ("MinFilter"));
-      desc.mag_filter           = ParseTexMagFilter (iter->First ("MagFilter"));
-      desc.wrap_u               = ParseTexcoordWrap (iter->First ("WrapU"));
-      desc.wrap_v               = ParseTexcoordWrap (iter->First ("WrapV"));
-      desc.wrap_w               = ParseTexcoordWrap (iter->First ("WrapW"));
-      desc.comparision_function = iter->First ("ComparisionFunction") ? ParseCompareMode (iter->First ("ComparisionFunction")) : CompareMode_AlwaysPass;
-      desc.mip_lod_bias         = get<float> (*iter, "MipLodBias", 0.0f);
-      desc.min_lod              = get<float> (*iter, "MinLod", 0.0f);
-      desc.max_lod              = get<float> (*iter, "MaxLod", 0.0f);
-      desc.max_anisotropy       = get<size_t> (*iter, "MaxAnisotropy", 1u);
+      desc.min_filter           = ParseTexMinFilter (iter->First ("min_filter"));
+      desc.mag_filter           = ParseTexMagFilter (iter->First ("mag_filter"));
+      desc.wrap_u               = ParseTexcoordWrap (iter->First ("wrap_u"));
+      desc.wrap_v               = ParseTexcoordWrap (iter->First ("wrap_v"));
+      desc.wrap_w               = ParseTexcoordWrap (iter->First ("wrap_w"));
+      desc.comparision_function = iter->First ("comparision_function") ? ParseCompareMode (iter->First ("comparision_function")) : CompareMode_AlwaysPass;
+      desc.mip_lod_bias         = get<float> (*iter, "mip_lod_bias", 0.0f);
+      desc.min_lod              = get<float> (*iter, "min_lod", 0.0f);
+      desc.max_lod              = get<float> (*iter, "max_lod", 0.0f);
+      desc.max_anisotropy       = get<size_t> (*iter, "max_anisotropy", 1u);
       
-      math::vec4f border_color = get<math::vec4f> (*iter, "BorderColor", math::vec4f (0.0f));
+      math::vec4f border_color = get<math::vec4f> (*iter, "border_color", math::vec4f (0.0f));
       
       for (size_t i=0; i<4; i++)
         desc.border_color [i] = border_color [i];
@@ -468,11 +471,11 @@ class EffectLoader
       library.ShaderLibrary ().Load (file_mask, ShaderLoaderLog (*iter, parser.Log ()));
     }
     
-///Разбор программы
-    void ParseProgram (Parser::Iterator iter)
+///Разбор настроек шэйдинга
+    void ParseShading (Parser::Iterator iter)
     {
       const char* id      = get<const char*> (*iter, "");
-      const char* options = get<const char*> (*iter, "Options", "");
+      const char* options = get<const char*> (*iter, "options", "");
       
       static const size_t SHADERS_RESERVE_COUNT = 4;
       
@@ -480,7 +483,7 @@ class EffectLoader
       
       shaders.reserve (SHADERS_RESERVE_COUNT);
       
-      for (Parser::NamesakeIterator shader_iter=iter->First ("Shader"); shader_iter; ++shader_iter)
+      for (Parser::NamesakeIterator shader_iter=iter->First ("shader"); shader_iter; ++shader_iter)
       {
         ShaderDesc desc;
         
@@ -504,7 +507,7 @@ class EffectLoader
       }
       
       if (shaders.empty ())
-        raise_parser_exception (*iter, "No shaders found for program");
+        raise_parser_exception (*iter, "No shaders found for shading");
       
       try
       {
@@ -517,24 +520,7 @@ class EffectLoader
         parser.Log ().Error (*iter, "%s", e.what ());
         throw;
       }            
-    }    
-    
-///Разбор шаблонной программы
-    void ParseTemplateProgram (Parser::Iterator iter)
-    {
-      /*
-        template
-        {
-          option ".bump" "#define HAS_BUMP"
-          
-          program "my"
-          {
-            shader "my.vert" "glsl.vs"
-            shader "my.frag" "glsl.ps"
-          }
-        }
-      */
-    }
+    }        
   
   private:
     common::Parser       parser;         //парсер файла эффектов
