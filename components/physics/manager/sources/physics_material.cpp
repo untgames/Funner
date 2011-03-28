@@ -6,13 +6,40 @@ using namespace physics;
    Материал
 */
 
+typedef xtl::com_ptr<physics::low_level::IDriver>   DriverPtr;
+typedef xtl::com_ptr<physics::low_level::IMaterial> MaterialPtr;
+
+struct Material::Impl : public xtl::reference_counter
+{
+  DriverPtr   driver;
+  MaterialPtr material;
+
+  Impl (physics::low_level::IDriver* in_driver)
+  {
+    if (!driver)
+      throw xtl::make_null_argument_exception ("physics::MaterialImpl::MaterialImpl", "driver");
+
+    driver = in_driver;
+
+    material = MaterialPtr (driver->CreateMaterial (), false);
+  }
+
+  Impl (const Impl& source)
+    : driver (source.driver)
+  {
+    material = MaterialPtr (driver->CreateMaterial (), false);
+
+    material->SetLinearDamping       (source.material->LinearDamping ());
+    material->SetAngularDamping      (source.material->AngularDamping ());
+    material->SetFriction            (source.material->Friction ());
+    material->SetAnisotropicFriction (source.material->AnisotropicFriction ());
+    material->SetRestitution         (source.material->Restitution ());
+  }
+};
+
 /*
    Конструктор / деструктор / копирование
 */
-
-MaterialInternal::MaterialInternal (MaterialImpl* impl)
-  : Material (impl)
-  {}
 
 Material::Material (const Material& source)
   : impl (source.impl)
@@ -20,7 +47,7 @@ Material::Material (const Material& source)
   addref (impl);
 }
 
-Material::Material (MaterialImpl* source_impl)
+Material::Material (Impl* source_impl)
   : impl (source_impl)
   {}
 
@@ -42,13 +69,7 @@ Material& Material::operator = (const Material& source)
 
 Material Material::Clone () const
 {
-  stl::auto_ptr<MaterialImpl> material_impl (new MaterialImpl (*impl));
-
-  MaterialInternal return_value (material_impl.get ());
-
-  material_impl.release ();
-
-  return return_value;
+  return Material (new Impl (*impl));
 }
     
 /*
@@ -57,22 +78,22 @@ Material Material::Clone () const
 
 float Material::LinearDamping () const
 {
-  return impl->LinearDamping ();
+  return impl->material->LinearDamping ();
 }
 
 float Material::AngularDamping () const
 {
-  return impl->AngularDamping ();
+  return impl->material->AngularDamping ();
 }
 
 void Material::SetLinearDamping (float value)
 {
-  impl->SetLinearDamping (value);
+  impl->material->SetLinearDamping (value);
 }
 
 void Material::SetAngularDamping (float value)
 {
-  impl->SetAngularDamping (value);
+  impl->material->SetAngularDamping (value);
 }
 
 /*
@@ -81,22 +102,22 @@ void Material::SetAngularDamping (float value)
 
 float Material::Friction () const
 {
-  return impl->Friction ();
+  return impl->material->Friction ();
 }
 
 const math::vec3f& Material::AnisotropicFriction () const
 {
-  return impl->AnisotropicFriction ();
+  return impl->material->AnisotropicFriction ();
 }
 
 void Material::SetFriction (float value)
 {
-  impl->SetFriction (value);
+  impl->material->SetFriction (value);
 }
 
 void Material::SetAnisotropicFriction (const math::vec3f& value)
 {
-  impl->SetAnisotropicFriction (value);
+  impl->material->SetAnisotropicFriction (value);
 }
 
 /*
@@ -105,12 +126,12 @@ void Material::SetAnisotropicFriction (const math::vec3f& value)
 
 float Material::Restitution () const
 {
-  return impl->Restitution ();
+  return impl->material->Restitution ();
 }
 
 void Material::SetRestitution (float value)
 {
-  impl->SetRestitution (value);
+  impl->material->SetRestitution (value);
 }
 
 /*
@@ -130,4 +151,13 @@ void swap (Material& material1, Material& material2)
   material1.Swap (material2);
 }
 
+}
+
+/*
+   Создание
+*/
+
+Material MaterialImplProvider::CreateMaterial (physics::low_level::IDriver* driver)
+{
+  return Material (new Material::Impl (driver));
 }

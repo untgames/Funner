@@ -92,24 +92,12 @@ const char* PhysicsManager::Description () const
 
 Scene PhysicsManager::CreateScene ()
 {
-  stl::auto_ptr<SceneImpl> scene_impl (new SceneImpl (impl->driver->CreateScene ()));
-
-  SceneInternal return_value (scene_impl.get ());
-
-  scene_impl.release ();
-
-  return return_value;
+  return SceneImplProvider::CreateScene (ScenePtr (impl->driver->CreateScene (), false));
 }
 
 Material PhysicsManager::CreateMaterial ()
 {
-  stl::auto_ptr<MaterialImpl> material_impl (new MaterialImpl (impl->driver.get ()));
-
-  MaterialInternal return_value (material_impl.get ());
-
-  material_impl.release ();
-
-  return return_value;
+  return MaterialImplProvider::CreateMaterial (impl->driver.get ());
 }
 
 Material PhysicsManager::CreateMaterial (const char* name)
@@ -121,17 +109,13 @@ Material PhysicsManager::CreateMaterial (const char* name)
     if (!media_material)
       throw xtl::format_operation_exception ("", "Material '%s' was not loaded", name);
 
-    stl::auto_ptr<MaterialImpl> material_impl (new MaterialImpl (impl->driver.get ()));
-
-    MaterialInternal return_value (material_impl.get ());
+    Material return_value (CreateMaterial ());
 
     return_value.SetLinearDamping       (media_material->LinearDamping ());
     return_value.SetAngularDamping      (media_material->AngularDamping ());
     return_value.SetFriction            (media_material->Friction ());
     return_value.SetAnisotropicFriction (media_material->AnisotropicFriction ());
     return_value.SetRestitution         (media_material->Restitution ());
-
-    material_impl.release ();
 
     return return_value;
   }
@@ -142,29 +126,41 @@ Material PhysicsManager::CreateMaterial (const char* name)
   }
 }
 
-Shape CreateBoxShape (const math::vec3f& half_dimensions)
+Shape PhysicsManager::CreateBoxShape (const math::vec3f& half_dimensions)
 {
-  throw xtl::make_not_implemented_exception ("physics::PhysicsManager::CreateBoxShape");
+  return ShapeImplProvider::CreateShape (ShapePtr (impl->driver->CreateBoxShape (half_dimensions), false));
 }
 
 Shape PhysicsManager::CreateSphereShape (float radius)
 {
-  throw xtl::make_not_implemented_exception ("physics::PhysicsManager::CreateSphereShape");
+  return ShapeImplProvider::CreateShape (ShapePtr (impl->driver->CreateSphereShape (radius), false));
 }
 
 Shape PhysicsManager::CreateCapsuleShape (float radius, float height)
 {
-  throw xtl::make_not_implemented_exception ("physics::PhysicsManager::CreateCapsuleShape");
+  return ShapeImplProvider::CreateShape (ShapePtr (impl->driver->CreateCapsuleShape (radius, height), false));
 }
 
 Shape PhysicsManager::CreatePlaneShape (const math::vec3f& normal, float d)
 {
-  throw xtl::make_not_implemented_exception ("physics::PhysicsManager::CreatePlaneShape");
+  return ShapeImplProvider::CreateShape (ShapePtr (impl->driver->CreatePlaneShape (normal, d), false));
 }
 
 Shape PhysicsManager::CreateCompoundShape (const ShapeList& shape_list)
 {
-  throw xtl::make_not_implemented_exception ("physics::PhysicsManager::CreateCompound");
+  stl::vector<physics::low_level::IShape*>   shapes;
+  stl::vector<physics::low_level::Transform> transforms;
+
+  for (size_t i = 0, count = shape_list.Size (); i < count; i++)
+  {
+    const physics::Transform&     transform           = shape_list.Transform (i);
+    physics::low_level::Transform low_level_transform = { transform.position, transform.orientation };
+
+    shapes [i]     = ShapeImplProvider::LowLevelShape (shape_list [i]);
+    transforms [i] = low_level_transform;
+  }
+
+  return ShapeImplProvider::CreateShape (ShapePtr (impl->driver->CreateCompoundShape (shape_list.Size (), shapes.begin (), transforms.begin ()), false));
 }
 
 Shape PhysicsManager::CreateShape (const media::physics::Shape& shape)
@@ -174,7 +170,20 @@ Shape PhysicsManager::CreateShape (const media::physics::Shape& shape)
 
 Shape PhysicsManager::CreateShape (const char* name)
 {
-  throw xtl::make_not_implemented_exception ("physics::PhysicsManager::CreateShape");
+  try
+  {
+    media::physics::Shape* media_shape = impl->library.Shapes ().Find (name);
+
+    if (!media_shape)
+      throw xtl::format_operation_exception ("", "Shape '%s' was not loaded", name);
+
+    return CreateShape (*media_shape);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("physics::PhysicsManager::CreateShape (const char*)");
+    throw;
+  }
 }
 
 /*

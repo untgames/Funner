@@ -6,15 +6,86 @@ using namespace physics;
    Физическая сцена
 */
 
+struct Scene::Impl : public xtl::reference_counter
+{
+  ScenePtr scene;
+
+  Impl (ScenePtr in_scene)
+    : scene (in_scene)
+    {}
+
+  ///Создание тел
+  RigidBody CreateBody (const char* name)
+  {
+    throw xtl::make_not_implemented_exception ("physics::SceneImpl::CreateBody");
+  }
+
+  RigidBody CreateBody (const Shape& shape, float mass)
+  {
+    throw xtl::make_not_implemented_exception ("physics::SceneImpl::CreateBody");
+  }
+
+  ///Создание связей между телами
+  Joint CreateSphericalJoint (const JointBind& bind1, const JointBind& bind2)
+  {
+    throw xtl::make_not_implemented_exception ("SceneImpl::CreateSphericalJoint");
+  }
+
+  Joint CreateConeTwistJoint (const JointBind& bind1, const JointBind& bind2, float swing_limit_in_degrees, float twist_limit)
+  {
+    throw xtl::make_not_implemented_exception ("SceneImpl::CreateConeTwistJoint");
+  }
+
+  Joint CreateHingeJoint (const JointBind& bind1, const JointBind& bind2)
+  {
+    throw xtl::make_not_implemented_exception ("SceneImpl::CreateHingeJoint");
+  }
+
+  Joint CreatePrismaticJoint (const JointBind& bind1, const JointBind& bind2)
+  {
+    throw xtl::make_not_implemented_exception ("SceneImpl::CreatePrismaticJoint");
+  }
+
+  /*
+    Фильтрация столкновений объектов. Объекты сталкиваются, если:
+     - не задан фильтр;
+     - задан дефолтный фильтр и collides = true;
+     - заданный фильтр возвращает true и collides = true;
+     - заданный фильтр возвращает false и collides = false.
+    Приоритет фильтрации: чем позже добавлен фильтр, тем выше его приоритет
+  */
+
+  size_t AddCollisionFilter (const char* group1_mask, const char* group2_mask, bool collides, const Scene::BroadphaseCollisionFilter& filter)
+  {
+    throw xtl::make_not_implemented_exception ("physics::SceneImpl::AddCollisionFilter");
+  }
+
+  void RemoveCollisionFilter (size_t id)
+  {
+    throw xtl::make_not_implemented_exception ("physics::SceneImpl::RemoveCollisionFilter");
+  }
+
+  void RemoveAllCollisionFilters ()
+  {
+    throw xtl::make_not_implemented_exception ("physics::SceneImpl::RemoveAllCollisionFilters");
+  }
+
+  /*
+     Обработка столкновений объектов
+  */
+
+  xtl::connection RegisterCollisionCallback (const char* group1_mask, const char* group2_mask, CollisionEventType event_type, const CollisionCallback& callback_handler)
+  {
+    throw xtl::make_not_implemented_exception ("physics::SceneImpl::RegisterCollisionCallback");
+  }
+
+};
+
 /*
    Конструктор / деструктор / копирование
 */
 
-SceneInternal::SceneInternal (SceneImpl* impl)
-  : Scene (impl)
-  {}
-
-Scene::Scene (SceneImpl* source_impl)
+Scene::Scene (Impl* source_impl)
   : impl (source_impl)
   {}
 
@@ -80,12 +151,12 @@ Joint Scene::CreatePrismaticJoint (const JointBind& bind1, const JointBind& bind
 
 const math::vec3f& Scene::Gravity () const
 {
-  return impl->Gravity ();
+  return impl->scene->Gravity ();
 }
 
 void Scene::SetGravity (const math::vec3f& value)
 {
-  impl->SetGravity (value);
+  impl->scene->SetGravity (value);
 }
 
 /*
@@ -94,12 +165,12 @@ void Scene::SetGravity (const math::vec3f& value)
 
 float Scene::SimulationStep () const
 {
-  return impl->SimulationStep ();
+  return impl->scene->SimulationStep ();
 }
 
 void Scene::SetSimulationStep (float step)
 {
-  impl->SetSimulationStep (step);
+  impl->scene->SetSimulationStep (step);
 }
 
 /*
@@ -107,7 +178,7 @@ void Scene::SetSimulationStep (float step)
 */
 void Scene::PerformSimulation (float dt)
 {
-  impl->PerformSimulation (dt);
+  impl->scene->PerformSimulation (dt);
 }
 
 /*
@@ -149,7 +220,7 @@ xtl::connection Scene::RegisterCollisionCallback (const char* group1_mask, const
 
 void Scene::Draw (render::debug::PrimitiveRender& render)
 {
-  impl->Draw (render);
+  impl->scene->Draw (render);
 }
 
 /*
@@ -173,4 +244,13 @@ void swap (Scene& scene1, Scene& scene2)
   scene1.Swap (scene2);
 }
 
+}
+
+/*
+   Создание
+*/
+
+Scene SceneImplProvider::CreateScene (ScenePtr scene)
+{
+  return Scene (new Scene::Impl (scene));
 }

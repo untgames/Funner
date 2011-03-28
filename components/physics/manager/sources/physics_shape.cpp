@@ -6,16 +6,20 @@ using namespace physics;
    Геометрическое тело
 */
 
+struct Shape::Impl : public xtl::reference_counter
+{
+  ShapePtr shape;
+
+  Impl (ShapePtr in_shape)
+    : shape (in_shape)
+    {}
+};
+
 /*
    Конструктор / деструктор / копирование
 */
 
-ShapeInternal::ShapeInternal (ShapeImpl* impl)
-  : Shape (impl)
-  {}
-
-
-Shape::Shape (ShapeImpl* source_impl)
+Shape::Shape (Impl* source_impl)
   : impl (source_impl)
   {}
 
@@ -43,12 +47,12 @@ Shape& Shape::operator = (const Shape& source)
 
 void Shape::SetMargin (float value)
 {
-  impl->SetMargin (value);
+  impl->shape->SetMargin (value);
 }
 
 float Shape::Margin () const
 {
-  return impl->Margin ();
+  return impl->shape->Margin ();
 }
 
 /*
@@ -72,4 +76,22 @@ void swap (Shape& shape1, Shape& shape2)
   shape1.Swap (shape2);
 }
 
+}
+
+/*
+   Создание
+*/
+
+Shape ShapeImplProvider::CreateShape (ShapePtr shape)
+{
+  return Shape (new Shape::Impl (shape));
+}
+
+/*
+   Получение низкоуровневого тела
+*/
+
+physics::low_level::IShape* ShapeImplProvider::LowLevelShape (const Shape& shape)
+{
+  return shape.impl->shape.get ();
 }

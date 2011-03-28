@@ -19,14 +19,24 @@ JointBind::JointBind (const RigidBody& in_body, const math::vec3f& in_axis)
 */
 
 /*
+   Соединение тел
+*/
+
+struct Joint::Impl : public xtl::reference_counter
+{
+  JointPtr       joint;
+  RigidBodyArray bodies;
+
+  Impl (JointPtr in_joint, const RigidBodyArray& in_bodies)
+    : joint (in_joint), bodies (in_bodies)
+    {}
+};
+
+/*
    Конструктор / деструктор / копирование
 */
 
-JointInternal::JointInternal (JointImpl* impl)
-  : Joint (impl)
-  {}
-
-Joint::Joint (JointImpl* source_impl)
+Joint::Joint (Impl* source_impl)
   : impl (source_impl)
   {}
 
@@ -54,7 +64,7 @@ Joint& Joint::operator = (const Joint& source)
 
 size_t Joint::BodiesCount () const
 {
-  return impl->BodiesCount ();
+  return impl->bodies.size ();
 }
 
 const RigidBody& Joint::Body (size_t index) const
@@ -64,7 +74,10 @@ const RigidBody& Joint::Body (size_t index) const
 
 RigidBody& Joint::Body (size_t index)
 {
-  return impl->Body (index);
+  if (index >= impl->bodies.size ())
+    throw xtl::make_range_exception ("physics::Joint::Body", "index", index, 0u, impl->bodies.size ());
+
+  return impl->bodies [index];
 }
 
 /*
@@ -88,4 +101,13 @@ void swap (Joint& joint1, Joint& joint2)
   joint1.Swap (joint2);
 }
 
+}
+
+/*
+   Создание
+*/
+
+Joint JointImplProvider::CreateJoint (JointPtr joint, const RigidBodyArray& bodies)
+{
+  return Joint (new Joint::Impl (joint, bodies));
 }
