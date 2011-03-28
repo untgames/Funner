@@ -8,10 +8,15 @@ using namespace physics;
 
 struct Shape::Impl : public xtl::reference_counter
 {
-  ShapePtr shape;
+  ShapePtr  shape;
+  ShapeList subshapes;
 
   Impl (ShapePtr in_shape)
     : shape (in_shape)
+    {}
+
+  Impl (ShapePtr in_shape, const ShapeList& in_subshapes)
+    : shape (in_shape), subshapes (in_subshapes)
     {}
 };
 
@@ -85,6 +90,11 @@ void swap (Shape& shape1, Shape& shape2)
 Shape ShapeImplProvider::CreateShape (ShapePtr shape)
 {
   return Shape (new Shape::Impl (shape));
+}
+
+Shape ShapeImplProvider::CreateShape (ShapePtr shape, const ShapeList& shape_list)
+{
+  return Shape (new Shape::Impl (shape, shape_list));
 }
 
 /*

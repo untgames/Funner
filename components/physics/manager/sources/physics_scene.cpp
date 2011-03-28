@@ -28,22 +28,76 @@ struct Scene::Impl : public xtl::reference_counter
   ///Создание связей между телами
   Joint CreateSphericalJoint (const JointBind& bind1, const JointBind& bind2)
   {
-    throw xtl::make_not_implemented_exception ("SceneImpl::CreateSphericalJoint");
+    RigidBodyArray bodies_array;
+
+    bodies_array.push_back (bind1.body);
+    bodies_array.push_back (bind2.body);
+
+    physics::low_level::SphericalJointDesc joint_desc;
+
+    joint_desc.anchor [0] = bind1.anchor;
+    joint_desc.anchor [1] = bind2.anchor;
+
+    JointPtr low_level_joint (scene->CreateSphericalJoint (RigidBodyImplProvider::LowLevelBody (bind1.body), RigidBodyImplProvider::LowLevelBody (bind2.body), joint_desc), false);
+
+    return JointImplProvider::CreateJoint (low_level_joint, bodies_array);
   }
 
   Joint CreateConeTwistJoint (const JointBind& bind1, const JointBind& bind2, float swing_limit_in_degrees, float twist_limit)
   {
-    throw xtl::make_not_implemented_exception ("SceneImpl::CreateConeTwistJoint");
+    RigidBodyArray bodies_array;
+
+    bodies_array.push_back (bind1.body);
+    bodies_array.push_back (bind2.body);
+
+    physics::low_level::ConeTwistJointDesc joint_desc;
+
+    joint_desc.anchor [0]  = bind1.anchor;
+    joint_desc.anchor [1]  = bind2.anchor;
+    joint_desc.swing_limit = swing_limit_in_degrees;
+    joint_desc.twist_limit = twist_limit;
+
+    JointPtr low_level_joint (scene->CreateConeTwistJoint (RigidBodyImplProvider::LowLevelBody (bind1.body), RigidBodyImplProvider::LowLevelBody (bind2.body), joint_desc), false);
+
+    return JointImplProvider::CreateJoint (low_level_joint, bodies_array);
   }
 
   Joint CreateHingeJoint (const JointBind& bind1, const JointBind& bind2)
   {
-    throw xtl::make_not_implemented_exception ("SceneImpl::CreateHingeJoint");
+    RigidBodyArray bodies_array;
+
+    bodies_array.push_back (bind1.body);
+    bodies_array.push_back (bind2.body);
+
+    physics::low_level::HingeJointDesc joint_desc;
+
+    joint_desc.anchor [0]  = bind1.anchor;
+    joint_desc.anchor [1]  = bind2.anchor;
+    joint_desc.axis [0]    = bind1.axis;
+    joint_desc.axis [1]    = bind2.axis;
+
+    JointPtr low_level_joint (scene->CreateHingeJoint (RigidBodyImplProvider::LowLevelBody (bind1.body), RigidBodyImplProvider::LowLevelBody (bind2.body), joint_desc), false);
+
+    return JointImplProvider::CreateJoint (low_level_joint, bodies_array);
   }
 
   Joint CreatePrismaticJoint (const JointBind& bind1, const JointBind& bind2)
   {
-    throw xtl::make_not_implemented_exception ("SceneImpl::CreatePrismaticJoint");
+    RigidBodyArray bodies_array;
+
+    bodies_array.push_back (bind1.body);
+    bodies_array.push_back (bind2.body);
+
+    physics::low_level::PrismaticJointDesc joint_desc;
+
+    joint_desc.anchor [0]  = bind1.anchor;
+    joint_desc.anchor [1]  = bind2.anchor;
+    joint_desc.axis [0]    = bind1.axis;
+    joint_desc.axis [1]    = bind2.axis;
+
+    JointPtr low_level_joint (scene->CreatePrismaticJoint (RigidBodyImplProvider::LowLevelBody (bind1.body), RigidBodyImplProvider::LowLevelBody (bind2.body), joint_desc), false);
+
+    return JointImplProvider::CreateJoint (low_level_joint, bodies_array);
   }
 
   /*

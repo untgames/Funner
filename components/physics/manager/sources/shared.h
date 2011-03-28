@@ -1,6 +1,7 @@
 #ifndef PHYSICS_MANAGER_SHARED_HEADER
 #define PHYSICS_MANAGER_SHARED_HEADER
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/connection.h>
 #include <xtl/intrusive_ptr.h>
@@ -9,11 +10,14 @@
 
 #include <stl/vector>
 
+#include <media/physics/basic_shapes.h>
+#include <media/physics/compound.h>
 #include <media/physics/physics_library.h>
 
 #include <physics/low_level/driver.h>
 #include <physics/low_level/joints.h>
 #include <physics/low_level/material.h>
+#include <physics/low_level/rigid_body.h>
 #include <physics/low_level/scene.h>
 #include <physics/low_level/shape.h>
 
@@ -22,10 +26,11 @@
 namespace physics
 {
 
-typedef xtl::com_ptr<physics::low_level::IJoint> JointPtr;
-typedef xtl::com_ptr<physics::low_level::IScene> ScenePtr;
-typedef xtl::com_ptr<physics::low_level::IShape> ShapePtr;
-typedef stl::vector<RigidBody>                   RigidBodyArray;
+typedef xtl::com_ptr<physics::low_level::IJoint>     JointPtr;
+typedef xtl::com_ptr<physics::low_level::IRigidBody> RigidBodyPtr;
+typedef xtl::com_ptr<physics::low_level::IScene>     ScenePtr;
+typedef xtl::com_ptr<physics::low_level::IShape>     ShapePtr;
+typedef stl::vector<RigidBody>                       RigidBodyArray;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Доступ к внутренним данным материала
@@ -73,11 +78,29 @@ class ShapeImplProvider
 ///Создание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static Shape CreateShape (ShapePtr shape);
+    static Shape CreateShape (ShapePtr shape, const ShapeList& shape_list);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение низкоуровневого тела
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static physics::low_level::IShape* LowLevelShape (const Shape& shape);
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Доступ к внутренним данным твердого тела
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class RigidBodyImplProvider
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static RigidBody CreateRigidBody (RigidBodyPtr body);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение низкоуровневого тела
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static physics::low_level::IRigidBody* LowLevelBody (const RigidBody& body);
 };
 
 }

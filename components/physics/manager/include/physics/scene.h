@@ -48,7 +48,7 @@ class Scene
 ///Создание связей между телами
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Joint CreateSphericalJoint (const JointBind& bind1, const JointBind& bind2);
-    Joint CreateConeTwistJoint (const JointBind& bind1, const JointBind& bind2, float swing_limit_in_degrees = 360.0f, float twist_limit = 360.0f);
+    Joint CreateConeTwistJoint (const JointBind& bind1, const JointBind& bind2, float swing_limit_in_degrees = 360.0f, float twist_limit_in_degrees = 360.0f);
     Joint CreateHingeJoint     (const JointBind& bind1, const JointBind& bind2);
     Joint CreatePrismaticJoint (const JointBind& bind1, const JointBind& bind2);
 
