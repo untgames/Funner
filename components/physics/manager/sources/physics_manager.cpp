@@ -50,82 +50,6 @@ struct PhysicsManager::Impl
     SubtractCollections (unload_library.Shapes (),         library.Shapes ());
     SubtractCollections (unload_library.TriangleMeshes (), library.TriangleMeshes ());
   }
-
-  ///Создание геометрического тела
-  Shape CreateCompoundShape (const ShapeList& shape_list)
-  {
-    stl::vector<physics::low_level::IShape*>   shapes;
-    stl::vector<physics::low_level::Transform> transforms;
-
-    for (size_t i = 0, count = shape_list.Size (); i < count; i++)
-    {
-      const physics::Transform&     transform           = shape_list.Transform (i);
-      physics::low_level::Transform low_level_transform = { transform.position, transform.orientation };
-
-      shapes [i]     = ShapeImplProvider::LowLevelShape (shape_list [i]);
-      transforms [i] = low_level_transform;
-    }
-
-    return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateCompoundShape (shape_list.Size (), shapes.begin (), transforms.begin ()), false), shape_list);
-  }
-
-  Shape CreateShapeCore (const media::physics::Shape& shape)
-  {
-    static const char* METHOD_NAME = "physics::PhysicsManager::Impl::CreateLowLevelShape";
-
-    switch (shape.Type ())
-    {
-      case media::physics::ShapeType_Box:
-        return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateBoxShape (shape.Data<media::physics::shapes::Box> ().half_dimensions), false));
-      case media::physics::ShapeType_Sphere:
-        return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateSphereShape (shape.Data<media::physics::shapes::Sphere> ().radius), false));
-      case media::physics::ShapeType_Capsule:
-      {
-        media::physics::shapes::Capsule shape_data = shape.Data<media::physics::shapes::Capsule> ();
-
-        return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateCapsuleShape (shape_data.radius, shape_data.height), false));
-      }
-      case media::physics::ShapeType_Plane:
-      {
-        media::physics::shapes::Plane shape_data = shape.Data<media::physics::shapes::Plane> ();
-
-        return ShapeImplProvider::CreateShape (ShapePtr (driver->CreatePlaneShape (shape_data.normal, shape_data.d), false));
-      }
-      case media::physics::ShapeType_TriangleMesh:
-      {
-        media::physics::shapes::TriangleMesh shape_data = shape.Data<media::physics::shapes::TriangleMesh> ();
-
-        return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateTriangleMeshShape (shape_data.VerticesCount (), shape_data.Vertices (),
-                                                                                          shape_data.TrianglesCount (), shape_data.Triangles () [0]), false));
-      }
-      case media::physics::ShapeType_Compound:
-      {
-        media::physics::shapes::Compound shape_data = shape.Data<media::physics::shapes::Compound> ();
-
-        ShapeList shape_list;
-
-        for (size_t i = 0, count = shape_data.Size (); i < count; i++)
-        {
-          const media::physics::shapes::Compound::ShapeTransform& transform           = shape_data.Transform (i);
-
-          shape_list.Add (CreateShape (shape_data.Shape (i)), transform.position, transform.orientation);
-        }
-
-        return CreateCompoundShape (shape_list);
-      }
-      default:
-        throw xtl::format_operation_exception (METHOD_NAME, "Unsupported media shape type %d", shape.Type ());
-    }
-  }
-
-  Shape CreateShape (const media::physics::Shape& shape)
-  {
-    Shape return_value = CreateShapeCore (shape);
-
-    return_value.SetMargin (shape.Margin ());
-
-    return return_value;
-  }
 };
 
 /*
@@ -168,7 +92,7 @@ const char* PhysicsManager::Description () const
 
 Scene PhysicsManager::CreateScene ()
 {
-  return SceneImplProvider::CreateScene (ScenePtr (impl->driver->CreateScene (), false));
+  return SceneImplProvider::CreateScene (impl->driver.get (), ScenePtr (impl->driver->CreateScene (), false), impl->library.RigidBodies ());
 }
 
 Material PhysicsManager::CreateMaterial ()
@@ -185,15 +109,7 @@ Material PhysicsManager::CreateMaterial (const char* name)
     if (!media_material)
       throw xtl::format_operation_exception ("", "Material '%s' was not loaded", name);
 
-    Material return_value (CreateMaterial ());
-
-    return_value.SetLinearDamping       (media_material->LinearDamping ());
-    return_value.SetAngularDamping      (media_material->AngularDamping ());
-    return_value.SetFriction            (media_material->Friction ());
-    return_value.SetAnisotropicFriction (media_material->AnisotropicFriction ());
-    return_value.SetRestitution         (media_material->Restitution ());
-
-    return return_value;
+    return MaterialImplProvider::CreateMaterial (impl->driver.get (), *media_material);
   }
   catch (xtl::exception& e)
   {
@@ -224,18 +140,22 @@ Shape PhysicsManager::CreatePlaneShape (const math::vec3f& normal, float d)
 
 Shape PhysicsManager::CreateCompoundShape (const ShapeList& shape_list)
 {
-  return impl->CreateCompoundShape (shape_list);
+  try
+  {
+    return ShapeImplProvider::CreateShape (impl->driver.get (), shape_list);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("physics::PhysicsManager::CreateCompoundShape");
+    throw;
+  }
 }
 
 Shape PhysicsManager::CreateShape (const media::physics::Shape& shape)
 {
   try
   {
-    Shape return_value (impl->CreateShape (shape));
-
-    return_value.SetMargin (shape.Margin ());
-
-    return return_value;
+    return ShapeImplProvider::CreateShape (impl->driver.get (), shape);
   }
   catch (xtl::exception& e)
   {

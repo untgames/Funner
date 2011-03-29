@@ -157,8 +157,6 @@ class XmlPhysicsLibrarySaver
 
       writer.WriteAttribute ("name", body.Name ());
       writer.WriteAttribute ("mass", body.Mass (), FLOAT_FORMAT);
-      writer.WriteAttribute ("center_of_mass_position", body.CenterOfMassPosition (), FLOAT_FORMAT);
-      writer.WriteAttribute ("center_of_mass_orientation", body.CenterOfMassOrientation (), FLOAT_FORMAT);
       writer.WriteAttribute ("mass_space_inertia_tensor", body.MassSpaceInertiaTensor (), FLOAT_FORMAT);
       writer.WriteAttribute ("shape", body.Shape ().Name ());
       writer.WriteAttribute ("material", body.Material ().Name ());

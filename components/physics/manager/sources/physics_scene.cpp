@@ -6,23 +6,74 @@ using namespace physics;
    Физическая сцена
 */
 
+typedef xtl::com_ptr<physics::low_level::IDriver> DriverPtr;
+
 struct Scene::Impl : public xtl::reference_counter
 {
-  ScenePtr scene;
+  DriverPtr                                           driver;
+  ScenePtr                                            scene;
+  media::physics::PhysicsLibrary::RigidBodyCollection body_collection;
 
-  Impl (ScenePtr in_scene)
-    : scene (in_scene)
-    {}
+  Impl (physics::low_level::IDriver* in_driver, ScenePtr in_scene, const media::physics::PhysicsLibrary::RigidBodyCollection& in_body_collection)
+    : scene (in_scene), body_collection (in_body_collection)
+  {
+    if (!driver)
+      throw xtl::make_null_argument_exception ("physics::Scene::Impl::Impl", "driver");
+
+    driver = in_driver;
+  }
 
   ///Создание тел
   RigidBody CreateBody (const char* name)
   {
-    throw xtl::make_not_implemented_exception ("physics::SceneImpl::CreateBody");
+    try
+    {
+      media::physics::RigidBody *media_body = body_collection.Find (name);
+
+      if (!media_body)
+        throw xtl::format_operation_exception ("", "Body '%s' was not loaded", name);
+
+      Shape        shape        (ShapeImplProvider::CreateShape (driver.get (), media_body->Shape ()));
+      RigidBodyPtr body         (scene->CreateRigidBody (ShapeImplProvider::LowLevelShape (shape), media_body->Mass ()));
+      Material     material     (MaterialImplProvider::CreateMaterial (driver.get (), media_body->Material ()));
+      RigidBody    return_value (RigidBodyImplProvider::CreateRigidBody (body, shape, material));
+
+      return_value.SetMassSpaceInertiaTensor (media_body->MassSpaceInertiaTensor ());
+
+      size_t flags = 0, media_flags = media_body->Flags ();
+
+      if (media_flags && media::physics::RigidBodyFlag_FrozenPositionX)
+        flags |= physics::RigidBodyFlag_FrozenPositionX;
+      if (media_flags && media::physics::RigidBodyFlag_FrozenPositionY)
+        flags |= physics::RigidBodyFlag_FrozenPositionY;
+      if (media_flags && media::physics::RigidBodyFlag_FrozenPositionZ)
+        flags |= physics::RigidBodyFlag_FrozenPositionZ;
+      if (media_flags && media::physics::RigidBodyFlag_FrozenRotationX)
+        flags |= physics::RigidBodyFlag_FrozenRotationX;
+      if (media_flags && media::physics::RigidBodyFlag_FrozenRotationY)
+        flags |= physics::RigidBodyFlag_FrozenRotationY;
+      if (media_flags && media::physics::RigidBodyFlag_FrozenRotationZ)
+        flags |= physics::RigidBodyFlag_FrozenRotationZ;
+      if (media_flags && media::physics::RigidBodyFlag_Kinematic)
+        flags |= physics::RigidBodyFlag_Kinematic;
+
+      return_value.SetFlags (flags);
+
+      return return_value;
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("physics::PhysicsManager::CreateMaterial (const char*)");
+      throw;
+    }
   }
 
   RigidBody CreateBody (const Shape& shape, float mass)
   {
-    throw xtl::make_not_implemented_exception ("physics::SceneImpl::CreateBody");
+    RigidBodyPtr body (scene->CreateRigidBody (ShapeImplProvider::LowLevelShape (shape), mass));
+    Material     material (MaterialImplProvider::CreateMaterial (driver.get ()));
+
+    return RigidBodyImplProvider::CreateRigidBody (body, shape, material);
   }
 
   ///Создание связей между телами
@@ -304,7 +355,7 @@ void swap (Scene& scene1, Scene& scene2)
    Создание
 */
 
-Scene SceneImplProvider::CreateScene (ScenePtr scene)
+Scene SceneImplProvider::CreateScene (physics::low_level::IDriver* driver, ScenePtr scene, const media::physics::PhysicsLibrary::RigidBodyCollection& body_collection)
 {
-  return Scene (new Scene::Impl (scene));
+  return Scene (new Scene::Impl (driver, scene, body_collection));
 }

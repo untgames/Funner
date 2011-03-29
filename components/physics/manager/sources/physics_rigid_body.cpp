@@ -9,12 +9,16 @@ using namespace physics;
 struct RigidBody::Impl : public xtl::reference_counter
 {
   RigidBodyPtr         body;
+  physics::Shape       shape;
+  physics::Material    material;
   Transform            current_transform;
   xtl::auto_connection transform_update_connection;
 
-  Impl (RigidBodyPtr in_body)
-    : body (in_body)
+  Impl (RigidBodyPtr in_body, const physics::Shape& in_shape, const physics::Material& in_material)
+    : body (in_body), shape (in_shape), material (in_material)
   {
+    body->SetMaterial (MaterialImplProvider::LowLevelMaterial (material));
+
     transform_update_connection = body->RegisterTransformUpdateCallback (xtl::bind (&RigidBody::Impl::OnTransformUpdate, this));
 
     OnTransformUpdate ();
@@ -67,30 +71,6 @@ float RigidBody::Mass () const
 void RigidBody::SetMass (float mass)
 {
   impl->body->SetMass (mass);
-}
-
-/*
-   ”правление центром масс
-*/
-
-const math::vec3f& RigidBody::CenterOfMassPosition () const
-{
-  throw xtl::make_not_implemented_exception ("physics::RigidBody::CenterOfMassPosition");
-}
-
-void RigidBody::SetCenterOfMassPosition (const math::vec3f& center)
-{
-  throw xtl::make_not_implemented_exception ("physics::RigidBody::SetCenterOfMassPosition");
-}
-
-const math::quatf& RigidBody::CenterOfMassOrientation () const
-{
-  throw xtl::make_not_implemented_exception ("physics::RigidBody::CenterOfMassOrientation");
-}
-
-void RigidBody::SetCenterOfMassOrientation (const math::quatf& orientation)
-{
-  throw xtl::make_not_implemented_exception ("physics::RigidBody::SetCenterOfMassOrientation");
 }
 
 /*
@@ -175,7 +155,7 @@ const physics::Shape& RigidBody::Shape () const
 
 physics::Shape& RigidBody::Shape ()
 {
-  throw xtl::make_not_implemented_exception ("physics::RigidBody::Shape");
+  return impl->shape;
 }
 
 /*
@@ -189,12 +169,14 @@ const physics::Material& RigidBody::Material () const
 
 physics::Material& RigidBody::Material ()
 {
-  throw xtl::make_not_implemented_exception ("physics::RigidBody::Material");
+  return impl->material;
 }
 
 void RigidBody::SetMaterial (const physics::Material& material)
 {
-  throw xtl::make_not_implemented_exception ("physics::RigidBody::SetMaterial");
+  impl->material = material;
+
+  impl->body->SetMaterial (MaterialImplProvider::LowLevelMaterial (material));
 }
 
 /*
@@ -349,9 +331,9 @@ void swap (RigidBody& material1, RigidBody& material2)
    —оздание
 */
 
-RigidBody RigidBodyImplProvider::CreateRigidBody (RigidBodyPtr body)
+RigidBody RigidBodyImplProvider::CreateRigidBody (RigidBodyPtr body, const Shape& shape, const Material& material)
 {
-  return RigidBody (new RigidBody::Impl (body));
+  return RigidBody (new RigidBody::Impl (body, shape, material));
 }
 
 /*

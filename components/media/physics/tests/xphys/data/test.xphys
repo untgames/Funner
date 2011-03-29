@@ -35,8 +35,8 @@
   </shapes>
   <rigid_bodies>
     <rigid_body name="BigShip" shape="BigShipShape" material="Ship" frozen_position_x="1" frozen_position_y="1" frozen_rotation="1"/>
-    <rigid_body name="CompoundBody" shape="CompoundShape" mass="0.01" center_of_mass_position="1.1 1.2 1.3" center_of_mass_orientation="0.1 0.2 0.3 0.4"/>
-    <rigid_body name="TriangleMeshBody" shape="TriangleMeshShape" center_of_mass_rotation="0 80.65 0" mass_space_inertia_tensor="0.1 0.2 0.3" material="Default"/>
+    <rigid_body name="CompoundBody" shape="CompoundShape" mass="0.01"/>
+    <rigid_body name="TriangleMeshBody" shape="TriangleMeshShape" mass_space_inertia_tensor="0.1 0.2 0.3" material="Default"/>
     <rigid_body name="BigShip2" shape="BigShipShape" frozen_position="1" frozen_rotation_x="1" frozen_rotation_y="1"/>
     <rigid_body name="KinematicBody" shape="ConvexShape" kinematic="1"/>
   </rigid_bodies>

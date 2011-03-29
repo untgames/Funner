@@ -161,3 +161,25 @@ Material MaterialImplProvider::CreateMaterial (physics::low_level::IDriver* driv
 {
   return Material (new Material::Impl (driver));
 }
+
+Material MaterialImplProvider::CreateMaterial (physics::low_level::IDriver* driver, const media::physics::Material& media_material)
+{
+  Material return_value (new Material::Impl (driver));
+
+  return_value.SetLinearDamping       (media_material.LinearDamping ());
+  return_value.SetAngularDamping      (media_material.AngularDamping ());
+  return_value.SetFriction            (media_material.Friction ());
+  return_value.SetAnisotropicFriction (media_material.AnisotropicFriction ());
+  return_value.SetRestitution         (media_material.Restitution ());
+
+  return return_value;
+}
+
+/*
+   Получение низкоуровневого материала
+*/
+
+physics::low_level::IMaterial* MaterialImplProvider::LowLevelMaterial (const Material& material)
+{
+  return material.impl->material.get ();
+}

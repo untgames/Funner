@@ -6,8 +6,6 @@ void dump (const RigidBody& body)
 {
   printf ("Body '%s':\n", body.Name ());
   printf ("  mass                       %.2f\n", body.Mass ());
-  printf ("  center of mass position    "); dump (body.CenterOfMassPosition ());    printf ("\n");
-  printf ("  center of mass orientation "); dump (body.CenterOfMassOrientation ()); printf ("\n");
   printf ("  mass space inertia tensor  "); dump (body.MassSpaceInertiaTensor ());  printf ("\n");
   printf ("  flags                      %08x\n", body.Flags ());
   printf ("  shape                      '%s'\n", body.Shape ().Name ());
@@ -36,8 +34,6 @@ int main ()
     shape.Rename ("body shape");
 
     body.SetMass (10.f);
-    body.SetCenterOfMassPosition (math::vec3f (1.f, 2.f, 3.f));
-    body.SetCenterOfMassOrientation (math::quatf (1.f, 2.f, 3.f, 4.f));
     body.SetMassSpaceInertiaTensor (math::vec3f (5.f, 6.f, 7.f));
     body.SetShape (shape);
     body.SetMaterial (material);

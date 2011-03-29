@@ -242,32 +242,6 @@ class XmlPhysicsLibraryLoader
       if (body_iter->First ("mass"))
         body.SetMass (get<float> (*body_iter, "mass"));
 
-      if (body_iter->First ("center_of_mass_position"))
-      {
-        math::vec3f value;
-
-        read (body_iter, get<const char*> (*body_iter, "center_of_mass_position"), value);
-
-        body.SetCenterOfMassPosition (value);
-      }
-
-      if (body_iter->First ("center_of_mass_orientation"))
-      {
-        math::quatf value;
-
-        read (body_iter, get<const char*> (*body_iter, "center_of_mass_orientation"), value);
-
-        body.SetCenterOfMassOrientation (value);
-      }
-      else if (body_iter->First ("center_of_mass_rotation"))
-      {
-        math::vec3f rotation;
-
-        read (body_iter, get<const char*> (*body_iter, "center_of_mass_rotation"), rotation);
-
-        body.SetCenterOfMassOrientation (math::to_quat (math::degree (rotation.x), math::degree (rotation.y), math::degree (rotation.z)));
-      }
-
       if (body_iter->First ("mass_space_inertia_tensor"))
       {
         math::vec3f value;

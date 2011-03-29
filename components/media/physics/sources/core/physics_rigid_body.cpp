@@ -116,30 +116,6 @@ void RigidBody::SetMass (float mass)
 }
 
 /*
-   ”правление центром масс
-*/
-
-const math::vec3f& RigidBody::CenterOfMassPosition () const
-{
-  return impl->center_of_mass_position;
-}
-
-void RigidBody::SetCenterOfMassPosition (const math::vec3f& center)
-{
-  impl->center_of_mass_position = center;
-}
-
-const math::quatf& RigidBody::CenterOfMassOrientation () const
-{
-  return impl->center_of_mass_orientation;
-}
-
-void RigidBody::SetCenterOfMassOrientation (const math::quatf& orientation)
-{
-  impl->center_of_mass_orientation = orientation;
-}
-
-/*
    ”правление тензором
 */
 
