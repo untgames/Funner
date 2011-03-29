@@ -82,6 +82,11 @@ class TestScene : public IScene, public Object
       throw xtl::make_not_implemented_exception ("TestScene::SetCollisionFilter");
     }
 
+    void SetDefaultCollisionFilter (const BroadphaseCollisionFilter& filter)
+    {
+      throw xtl::make_not_implemented_exception ("TestScene::SetDefaultCollisionFilter");
+    }
+
     ///Обработка столкновений объектов
     xtl::connection RegisterCollisionCallback (CollisionEventType event_type, const CollisionCallback& callback_handler)
     {

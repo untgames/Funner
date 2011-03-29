@@ -227,6 +227,7 @@ typedef xtl::signal<void (const CollisionEvent&)>              CollisionSignal;
 
 struct Scene::Impl : public btOverlapFilterCallback
 {
+  BroadphaseCollisionFilter           default_collision_filter;   //фильтр коллизий по умолчанию
   btDefaultCollisionConfiguration     *collision_configuration;   //конфигурация обработчика коллизий
   btCollisionDispatcher               *collision_dispatcher;      //обработчик коллизий
   btBroadphaseInterface               *broadphase_interface;      //обработчик фазы broadphase
@@ -306,7 +307,12 @@ struct Scene::Impl : public btOverlapFilterCallback
     CollisionFiltersMap::const_iterator iter = collision_filters_map.find (CollisionGroupPair (group0, group1));
 
     if (iter == collision_filters_map.end ())
-      return true;
+    {
+      if (!default_collision_filter)
+        return true;
+      else
+        return default_collision_filter (body0, body1);
+    }
 
     if (!iter->second.filter)
       return iter->second.collides;
@@ -477,6 +483,11 @@ void Scene::SetCollisionFilter (size_t group1, size_t group2, bool collides, con
   }
 
   impl->collision_filters_map [CollisionGroupPair (group1, group2)] = CollisionFilterDesc (filter, collides);
+}
+
+void Scene::SetDefaultCollisionFilter (const BroadphaseCollisionFilter& filter)
+{
+  impl->default_collision_filter = filter;
 }
 
 /*

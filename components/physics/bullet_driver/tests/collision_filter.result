@@ -9,6 +9,12 @@ false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
+false filter called for bodies from group 0 and 0
+false filter called for bodies from group 0 and 0
+false filter called for bodies from group 0 and 0
+false filter called for bodies from group 0 and 0
+false filter called for bodies from group 0 and 0
+default filter called for bodies from group 5 and 0
 true filter called for bodies from group 4 and 0
 true filter called for bodies from group 3 and 0
 false filter called for bodies from group 2 and 0
@@ -19,17 +25,22 @@ false filter called for bodies from group 0 and 1
 false filter called for bodies from group 0 and 2
 true filter called for bodies from group 0 and 3
 true filter called for bodies from group 0 and 4
+default filter called for bodies from group 0 and 5
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
 false filter called for bodies from group 0 and 2
 true filter called for bodies from group 0 and 3
 true filter called for bodies from group 0 and 4
+default filter called for bodies from group 0 and 5
 new collision event detected: 
   type is ColisionEventType_Begin
   position is -24.00 0.93 -0.00
 new collision event detected: 
   type is ColisionEventType_Begin
   position is -21.00 0.93 -0.00
+new collision event detected: 
+  type is ColisionEventType_Begin
+  position is -15.00 0.93 0.00
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
@@ -39,6 +50,9 @@ new collision event detected:
 new collision event detected: 
   type is ColisionEventType_Process
   position is -21.00 0.94 -0.00
+new collision event detected: 
+  type is ColisionEventType_Process
+  position is -15.00 0.94 0.00
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
@@ -48,6 +62,9 @@ new collision event detected:
 new collision event detected: 
   type is ColisionEventType_Process
   position is -21.00 0.95 -0.00
+new collision event detected: 
+  type is ColisionEventType_Process
+  position is -15.00 0.95 0.00
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
@@ -57,6 +74,9 @@ new collision event detected:
 new collision event detected: 
   type is ColisionEventType_Process
   position is -21.00 0.96 -0.00
+new collision event detected: 
+  type is ColisionEventType_Process
+  position is -15.00 0.96 0.00
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
@@ -66,6 +86,9 @@ new collision event detected:
 new collision event detected: 
   type is ColisionEventType_Process
   position is -21.00 0.97 0.00
+new collision event detected: 
+  type is ColisionEventType_Process
+  position is -15.00 0.97 0.00
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
@@ -75,17 +98,24 @@ new collision event detected:
 new collision event detected: 
   type is ColisionEventType_Process
   position is -21.00 0.98 0.00
+new collision event detected: 
+  type is ColisionEventType_Process
+  position is -15.00 0.98 0.00
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
 false filter called for bodies from group 0 and 2
 true filter called for bodies from group 0 and 3
 true filter called for bodies from group 0 and 4
+default filter called for bodies from group 0 and 5
 new collision event detected: 
   type is ColisionEventType_Process
   position is -24.00 0.98 0.00
 new collision event detected: 
   type is ColisionEventType_Process
   position is -21.00 0.98 0.00
+new collision event detected: 
+  type is ColisionEventType_Process
+  position is -15.00 0.98 0.00
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
@@ -95,6 +125,9 @@ new collision event detected:
 new collision event detected: 
   type is ColisionEventType_Process
   position is -21.00 0.99 0.00
+new collision event detected: 
+  type is ColisionEventType_Process
+  position is -15.00 0.99 0.00
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
@@ -104,6 +137,9 @@ new collision event detected:
 new collision event detected: 
   type is ColisionEventType_Process
   position is -21.00 0.99 0.00
+new collision event detected: 
+  type is ColisionEventType_Process
+  position is -15.00 0.99 0.00
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
@@ -113,6 +149,9 @@ new collision event detected:
 new collision event detected: 
   type is ColisionEventType_Process
   position is -21.00 0.99 0.00
+new collision event detected: 
+  type is ColisionEventType_Process
+  position is -15.00 0.99 0.00
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
@@ -122,6 +161,9 @@ new collision event detected:
 new collision event detected: 
   type is ColisionEventType_Process
   position is -21.00 0.99 0.00
+new collision event detected: 
+  type is ColisionEventType_Process
+  position is -15.00 0.99 0.00
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
@@ -131,6 +173,9 @@ new collision event detected:
 new collision event detected: 
   type is ColisionEventType_Process
   position is -21.00 0.99 0.00
+new collision event detected: 
+  type is ColisionEventType_Process
+  position is -15.00 0.99 0.00
 Simulating one seconds
 ground plane state:
 Body world transform:
@@ -156,20 +201,30 @@ falling body 4 state:
 Body world transform:
   position = -18.00; 0.18; 0.00
   orientation = 0.00; 0.00; 0.00; 1.00
+falling body 5 state:
+Body world transform:
+  position = -15.00; 1.99; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
 new collision event detected: 
   type is ColisionEventType_End
   position is -24.00 0.99 0.00
 new collision event detected: 
   type is ColisionEventType_End
+  position is -15.00 0.99 0.00
+new collision event detected: 
+  type is ColisionEventType_End
   position is -21.00 0.99 0.00
 false filter called for bodies from group 0 and 0
+default filter called for bodies from group 0 and 5
+false filter called for bodies from group 0 and 0
+default filter called for bodies from group 0 and 5
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
-false filter called for bodies from group 0 and 0
+default filter called for bodies from group 0 and 5
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
 false filter called for bodies from group 0 and 0
@@ -201,9 +256,16 @@ falling body 4 state:
 Body world transform:
   position = -18.00; 0.01; 0.00
   orientation = 0.00; 0.00; 0.00; 1.00
+falling body 5 state:
+Body world transform:
+  position = -15.00; 1.99; 0.00
+  orientation = 0.00; 0.00; 0.00; 1.00
 new collision event detected: 
   type is ColisionEventType_End
   position is -27.00 1.00 0.00
 new collision event detected: 
   type is ColisionEventType_End
   position is -24.00 1.00 0.00
+new collision event detected: 
+  type is ColisionEventType_End
+  position is -15.00 1.00 -0.00

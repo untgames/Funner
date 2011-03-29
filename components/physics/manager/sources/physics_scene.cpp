@@ -6,13 +6,15 @@ using namespace physics;
    Физическая сцена
 */
 
-typedef xtl::com_ptr<physics::low_level::IDriver> DriverPtr;
+typedef xtl::com_ptr<physics::low_level::IDriver>                      DriverPtr;
+typedef stl::hash_map<physics::low_level::IRigidBody*, RigidBodyImpl*> RigidBodyMap;
 
-struct Scene::Impl : public xtl::reference_counter
+struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
 {
   DriverPtr                                           driver;
   ScenePtr                                            scene;
   media::physics::PhysicsLibrary::RigidBodyCollection body_collection;
+  RigidBodyMap                                        rigid_body_map;
 
   Impl (physics::low_level::IDriver* in_driver, ScenePtr in_scene, const media::physics::PhysicsLibrary::RigidBodyCollection& in_body_collection)
     : scene (in_scene), body_collection (in_body_collection)
@@ -21,9 +23,29 @@ struct Scene::Impl : public xtl::reference_counter
       throw xtl::make_null_argument_exception ("physics::Scene::Impl::Impl", "driver");
 
     driver = in_driver;
+
+    scene->SetDefaultCollisionFilter (xtl::bind (&Scene::Impl::CollisionHandler, this, _1, _2));
+  }
+
+  ///Обработка удаления тела
+  void OnBodyDestroy (RigidBodyImpl* body_impl)
+  {
+    rigid_body_map.erase (body_impl->LowLevelBody ());
   }
 
   ///Создание тел
+  RigidBody CreateBody (RigidBodyPtr body, const Shape& shape, const Material& material)
+  {
+    RigidBody     return_value = RigidBodyImplProvider::CreateRigidBody (body, shape, material);
+    RigidBodyImpl *body_impl   = RigidBodyImplProvider::Impl (return_value);
+
+    body_impl->connect_tracker (xtl::bind (&Scene::Impl::OnBodyDestroy, this, body_impl), *this);
+
+    rigid_body_map.insert_pair (body.get (), body_impl);
+
+    return return_value;
+  }
+
   RigidBody CreateBody (const char* name)
   {
     try
@@ -36,7 +58,7 @@ struct Scene::Impl : public xtl::reference_counter
       Shape        shape        (ShapeImplProvider::CreateShape (driver.get (), media_body->Shape ()));
       RigidBodyPtr body         (scene->CreateRigidBody (ShapeImplProvider::LowLevelShape (shape), media_body->Mass ()));
       Material     material     (MaterialImplProvider::CreateMaterial (driver.get (), media_body->Material ()));
-      RigidBody    return_value (RigidBodyImplProvider::CreateRigidBody (body, shape, material));
+      RigidBody    return_value (CreateBody (body, shape, material));
 
       return_value.SetMassSpaceInertiaTensor (media_body->MassSpaceInertiaTensor ());
 
@@ -73,7 +95,7 @@ struct Scene::Impl : public xtl::reference_counter
     RigidBodyPtr body (scene->CreateRigidBody (ShapeImplProvider::LowLevelShape (shape), mass));
     Material     material (MaterialImplProvider::CreateMaterial (driver.get ()));
 
-    return RigidBodyImplProvider::CreateRigidBody (body, shape, material);
+    return CreateBody (body, shape, material);
   }
 
   ///Создание связей между телами
@@ -160,6 +182,11 @@ struct Scene::Impl : public xtl::reference_counter
     Приоритет фильтрации: чем позже добавлен фильтр, тем выше его приоритет
   */
 
+  bool CollisionFilter (IRigidBody* body1, IRigidBody* body2)
+  {
+
+  }
+
   size_t AddCollisionFilter (const char* group1_mask, const char* group2_mask, bool collides, const Scene::BroadphaseCollisionFilter& filter)
   {
     throw xtl::make_not_implemented_exception ("physics::SceneImpl::AddCollisionFilter");
@@ -179,11 +206,45 @@ struct Scene::Impl : public xtl::reference_counter
      Обработка столкновений объектов
   */
 
-  xtl::connection RegisterCollisionCallback (const char* group1_mask, const char* group2_mask, CollisionEventType event_type, const CollisionCallback& callback_handler)
+  physics::low_level::CollisionEventType ConvertCollisionEventType (physics::CollisionEventType type)
   {
-    throw xtl::make_not_implemented_exception ("physics::SceneImpl::RegisterCollisionCallback");
+    switch (type)
+    {
+      case physics::CollisionEventType_Begin:   return physics::low_level::CollisionEventType_Begin;
+      case physics::CollisionEventType_Process: return physics::low_level::CollisionEventType_Process;
+      case physics::CollisionEventType_End:     return physics::low_level::CollisionEventType_End;
+      default:
+        throw xtl::make_argument_exception ("physics::Scene::Impl::ConvertCollisionEventType", "type", type);
+    }
   }
 
+  xtl::connection RegisterCollisionCallback (const char* group1_mask, const char* group2_mask, physics::CollisionEventType event_type, const CollisionCallback& callback_handler)
+  {
+    return scene->RegisterCollisionCallback (ConvertCollisionEventType (event_type),
+                                             xtl::bind (&Scene::Impl::CollisionHandler, this, _1, stl::string (group1_mask), stl::string (group2_mask), event_type, callback_handler));
+  }
+
+  void CollisionHandler (const physics::low_level::CollisionEvent& event, const stl::string& group1_mask,
+                         const stl::string& group2_mask, CollisionEventType wanted_event, const CollisionCallback& callback_handler)
+  {
+    if (event.type != ConvertCollisionEventType (wanted_event))
+      return;
+
+    RigidBodyMap::iterator body1_iter = rigid_body_map.find (event.body [0]),
+                           body2_iter = rigid_body_map.find (event.body [1]);
+
+    if (body1_iter == rigid_body_map.end () || body2_iter == rigid_body_map.end ())
+      throw xtl::format_operation_exception ("physics::Scene::Impl::CollisionHandler", "Can't find all collided bodies");
+
+    RigidBody body1 = RigidBodyImplProvider::CreateRigidBody (body1_iter->second),
+              body2 = RigidBodyImplProvider::CreateRigidBody (body2_iter->second);
+
+    if (!common::wcmatch (body1.CollisionGroup (), group1_mask.c_str ()) && !common::wcmatch (body1.CollisionGroup (), group2_mask.c_str ()) ||
+        !common::wcmatch (body2.CollisionGroup (), group1_mask.c_str ()) && !common::wcmatch (body2.CollisionGroup (), group2_mask.c_str ()))
+      return;
+
+    callback_handler (wanted_event, body1, body2, event.point);
+  }
 };
 
 /*

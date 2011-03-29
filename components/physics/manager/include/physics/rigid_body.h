@@ -9,6 +9,7 @@ namespace physics
 {
 
 //implementation forwards
+class RigidBodyImpl;
 class RigidBodyImplProvider;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,13 +135,10 @@ class RigidBody
     void Swap (RigidBody&);
 
   private:
-    struct Impl;
+    RigidBody (RigidBodyImpl* impl);
 
   private:
-    RigidBody (Impl* impl);
-
-  private:
-    Impl* impl;
+    RigidBodyImpl* impl;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

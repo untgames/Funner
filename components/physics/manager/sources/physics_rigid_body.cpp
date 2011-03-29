@@ -6,32 +6,59 @@ using namespace physics;
    Твердое тело
 */
 
-struct RigidBody::Impl : public xtl::reference_counter
+RigidBodyImpl::RigidBodyImpl (RigidBodyPtr in_body, const physics::Shape& in_shape, const physics::Material& in_material)
+  : body (in_body), shape (in_shape), material (in_material)
 {
-  RigidBodyPtr         body;
-  physics::Shape       shape;
-  physics::Material    material;
-  Transform            current_transform;
-  xtl::auto_connection transform_update_connection;
+  body->SetMaterial (MaterialImplProvider::LowLevelMaterial (material));
 
-  Impl (RigidBodyPtr in_body, const physics::Shape& in_shape, const physics::Material& in_material)
-    : body (in_body), shape (in_shape), material (in_material)
-  {
-    body->SetMaterial (MaterialImplProvider::LowLevelMaterial (material));
+  transform_update_connection = body->RegisterTransformUpdateCallback (xtl::bind (&RigidBodyImpl::OnTransformUpdate, this));
 
-    transform_update_connection = body->RegisterTransformUpdateCallback (xtl::bind (&RigidBody::Impl::OnTransformUpdate, this));
+  OnTransformUpdate ();
+}
 
-    OnTransformUpdate ();
-  }
+/*
+   Обработка изменения позиции
+*/
 
-  void OnTransformUpdate ()
-  {
-    const physics::low_level::Transform& body_transform = body->WorldTransform ();
+void RigidBodyImpl::OnTransformUpdate ()
+{
+  const physics::low_level::Transform& body_transform = body->WorldTransform ();
 
-    current_transform.position    = body_transform.position;
-    current_transform.orientation = body_transform.orientation;
-  }
-};
+  current_transform.position    = body_transform.position;
+  current_transform.orientation = body_transform.orientation;
+}
+
+/*
+   Геометрическое тело
+*/
+
+physics::Shape& RigidBodyImpl::Shape ()
+{
+  return shape;
+}
+
+/*
+   Материал
+*/
+
+physics::Material& RigidBodyImpl::Material ()
+{
+  return material;
+}
+
+void RigidBodyImpl::SetMaterial (const physics::Material& material)
+{
+  body->SetMaterial (MaterialImplProvider::LowLevelMaterial (material));
+}
+
+/*
+   Получение низкоуровневого тела
+*/
+
+physics::low_level::IRigidBody* RigidBodyImpl::LowLevelBody ()
+{
+  return body.get ();
+}
 
 /*
    Конструктор / деструктор / копирование
@@ -43,7 +70,7 @@ RigidBody::RigidBody (const RigidBody& source)
   addref (impl);
 }
 
-RigidBody::RigidBody (Impl* source_impl)
+RigidBody::RigidBody (RigidBodyImpl* source_impl)
   : impl (source_impl)
   {}
 
@@ -65,12 +92,12 @@ RigidBody& RigidBody::operator = (const RigidBody& source)
 
 float RigidBody::Mass () const
 {
-  return impl->body->Mass ();
+  return impl->LowLevelBody ()->Mass ();
 }
 
 void RigidBody::SetMass (float mass)
 {
-  impl->body->SetMass (mass);
+  impl->LowLevelBody ()->SetMass (mass);
 }
 
 /*
@@ -79,12 +106,12 @@ void RigidBody::SetMass (float mass)
 
 const math::vec3f& RigidBody::MassSpaceInertiaTensor () const
 {
-  return impl->body->MassSpaceInertiaTensor ();
+  return impl->LowLevelBody ()->MassSpaceInertiaTensor ();
 }
 
 void RigidBody::SetMassSpaceInertiaTensor (const math::vec3f& tensor)
 {
-  impl->body->SetMassSpaceInertiaTensor (tensor);
+  impl->LowLevelBody ()->SetMassSpaceInertiaTensor (tensor);
 }
 
 /*
@@ -93,7 +120,7 @@ void RigidBody::SetMassSpaceInertiaTensor (const math::vec3f& tensor)
 
 const Transform& RigidBody::WorldTransform () const
 {
-  return impl->current_transform;
+  return impl->CurrentTransform ();
 }
 
 void RigidBody::SetWorldTransform (const Transform& transform)
@@ -103,7 +130,7 @@ void RigidBody::SetWorldTransform (const Transform& transform)
   body_transform.position    = transform.position;
   body_transform.orientation = transform.orientation;
 
-  impl->body->SetWorldTransform (body_transform);
+  impl->LowLevelBody ()->SetWorldTransform (body_transform);
 }
 
 /*
@@ -112,22 +139,22 @@ void RigidBody::SetWorldTransform (const Transform& transform)
 
 float RigidBody::SleepLinearVelocity () const
 {
-  return impl->body->SleepLinearVelocity ();
+  return impl->LowLevelBody ()->SleepLinearVelocity ();
 }
 
 float RigidBody::SleepAngularVelocity () const
 {
-  return impl->body->SleepAngularVelocity ();
+  return impl->LowLevelBody ()->SleepAngularVelocity ();
 }
 
 void RigidBody::SetSleepLinearVelocity (float value)
 {
-  impl->body->SetSleepLinearVelocity (value);
+  impl->LowLevelBody ()->SetSleepLinearVelocity (value);
 }
 
 void RigidBody::SetSleepAngularVelocity (float value)
 {
-  impl->body->SetSleepAngularVelocity (value);
+  impl->LowLevelBody ()->SetSleepAngularVelocity (value);
 }
 
 /*
@@ -136,12 +163,12 @@ void RigidBody::SetSleepAngularVelocity (float value)
 
 float RigidBody::CcdMotionThreshold () const
 {
-  return impl->body->CcdMotionThreshold ();
+  return impl->LowLevelBody ()->CcdMotionThreshold ();
 }
 
 void RigidBody::SetCcdMotionThreshold (float value)
 {
-  impl->body->SetCcdMotionThreshold (value);
+  impl->LowLevelBody ()->SetCcdMotionThreshold (value);
 }
 
 /*
@@ -155,7 +182,7 @@ const physics::Shape& RigidBody::Shape () const
 
 physics::Shape& RigidBody::Shape ()
 {
-  return impl->shape;
+  return impl->Shape ();
 }
 
 /*
@@ -169,14 +196,12 @@ const physics::Material& RigidBody::Material () const
 
 physics::Material& RigidBody::Material ()
 {
-  return impl->material;
+  return impl->Material ();
 }
 
 void RigidBody::SetMaterial (const physics::Material& material)
 {
-  impl->material = material;
-
-  impl->body->SetMaterial (MaterialImplProvider::LowLevelMaterial (material));
+  impl->SetMaterial (material);
 }
 
 /*
@@ -185,7 +210,7 @@ void RigidBody::SetMaterial (const physics::Material& material)
 
 size_t RigidBody::Flags () const
 {
-  size_t return_value = 0, body_flags = impl->body->Flags ();
+  size_t return_value = 0, body_flags = impl->LowLevelBody ()->Flags ();
 
   if (body_flags & physics::low_level::RigidBodyFlag_FrozenPositionX)
     return_value |= physics::RigidBodyFlag_FrozenPositionX;
@@ -229,7 +254,7 @@ void RigidBody::ChangeFlags (size_t flags, bool state)
   if (flags & physics::RigidBodyFlag_Kinematic)
     flags_to_change |= physics::low_level::RigidBodyFlag_Kinematic;
 
-  impl->body->SetFlags (state ? impl->body->Flags () | flags_to_change : impl->body->Flags () & ~flags_to_change);
+  impl->LowLevelBody ()->SetFlags (state ? impl->LowLevelBody ()->Flags () | flags_to_change : impl->LowLevelBody ()->Flags () & ~flags_to_change);
 }
 
 /*
@@ -252,17 +277,17 @@ void RigidBody::SetCollisionGroup (const char*)
 
 void RigidBody::AddForce (const math::vec3f& force, const math::vec3f& relative_position)
 {
-  impl->body->AddForce (force, relative_position);
+  impl->LowLevelBody ()->AddForce (force, relative_position);
 }
 
 void RigidBody::AddImpulse (const math::vec3f& impulse, const math::vec3f& relative_position)
 {
-  impl->body->AddImpulse (impulse, relative_position);
+  impl->LowLevelBody ()->AddImpulse (impulse, relative_position);
 }
 
 void RigidBody::AddTorque (const math::vec3f& torque)
 {
-  impl->body->AddTorque (torque);
+  impl->LowLevelBody ()->AddTorque (torque);
 }
 
 /*
@@ -271,22 +296,22 @@ void RigidBody::AddTorque (const math::vec3f& torque)
 
 const math::vec3f& RigidBody::LinearVelocity () const
 {
-  return impl->body->LinearVelocity ();
+  return impl->LowLevelBody ()->LinearVelocity ();
 }
 
 const math::vec3f& RigidBody::AngularVelocity () const
 {
-  return impl->body->AngularVelocity ();
+  return impl->LowLevelBody ()->AngularVelocity ();
 }
 
 void RigidBody::SetLinearVelocity (const math::vec3f& velocity)
 {
-  impl->body->SetLinearVelocity (velocity);
+  impl->LowLevelBody ()->SetLinearVelocity (velocity);
 }
 
 void RigidBody::SetAngularVelocity (const math::vec3f& velocity)
 {
-  impl->body->SetAngularVelocity (velocity);
+  impl->LowLevelBody ()->SetAngularVelocity (velocity);
 }
 
 /*
@@ -333,7 +358,21 @@ void swap (RigidBody& material1, RigidBody& material2)
 
 RigidBody RigidBodyImplProvider::CreateRigidBody (RigidBodyPtr body, const Shape& shape, const Material& material)
 {
-  return RigidBody (new RigidBody::Impl (body, shape, material));
+  return RigidBody (new RigidBodyImpl (body, shape, material));
+}
+
+RigidBody RigidBodyImplProvider::CreateRigidBody (RigidBodyImpl* impl)
+{
+  return RigidBody (impl);
+}
+
+/*
+   Получение реализации
+*/
+
+RigidBodyImpl* RigidBodyImplProvider::Impl (const RigidBody& body)
+{
+  return body.impl;
 }
 
 /*
@@ -342,5 +381,5 @@ RigidBody RigidBodyImplProvider::CreateRigidBody (RigidBodyPtr body, const Shape
 
 physics::low_level::IRigidBody* RigidBodyImplProvider::LowLevelBody (const RigidBody& body)
 {
-  return body.impl->body.get ();
+  return body.impl->LowLevelBody ();
 }

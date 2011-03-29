@@ -348,6 +348,7 @@ class Scene : public IScene, public Object
 ///Фильтрация столкновений объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetCollisionFilter (size_t group1, size_t group2, bool collides, const BroadphaseCollisionFilter& filter);
+    void SetDefaultCollisionFilter (const BroadphaseCollisionFilter& filter);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка столкновений объектов
