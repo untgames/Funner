@@ -10,8 +10,8 @@ namespace render
 namespace debug
 {
 
-///forward declarations
-class IPrimitiveRender;
+///forward declaration
+class PrimitiveRender;
 
 }
 
@@ -41,8 +41,8 @@ class Scene
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание тел
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RigidBody CreateBody (const char* name);
-    RigidBody CreateBody (const Shape& shape, float mass);
+    RigidBody CreateRigidBody (const char* name);
+    RigidBody CreateRigidBody (const Shape& shape, float mass);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание связей между телами

@@ -6,14 +6,56 @@ using namespace physics;
    Твердое тело
 */
 
-RigidBodyImpl::RigidBodyImpl (RigidBodyPtr in_body, const physics::Shape& in_shape, const physics::Material& in_material)
-  : body (in_body), shape (in_shape), material (in_material)
+RigidBodyImpl::RigidBodyImpl (RigidBodyPtr in_body, const physics::Shape& in_shape, const physics::Material& in_material, const Scene& in_scene)
+  : scene (in_scene), body (in_body), shape (in_shape), material (in_material)
 {
   body->SetMaterial (MaterialImplProvider::LowLevelMaterial (material));
 
   transform_update_connection = body->RegisterTransformUpdateCallback (xtl::bind (&RigidBodyImpl::OnTransformUpdate, this));
 
   OnTransformUpdate ();
+
+  SetCollisionGroup ("");
+}
+
+/*
+   Согласование объекта с группой
+*/
+
+const char* RigidBodyImpl::CollisionGroup ()
+{
+  return collision_group.c_str ();
+}
+
+void RigidBodyImpl::SetCollisionGroup (const char* new_group)
+{
+  if (!new_group)
+    throw xtl::make_null_argument_exception ("physics::RigidBodyImpl::SetCollisionGroup", "new_group");
+
+  body->SetCollisionGroup (SceneImplProvider::CollisionGroupForName (scene, new_group));
+
+  collision_group = new_group;
+}
+
+/*
+   Получение текущей позиции
+*/
+
+const Transform& RigidBodyImpl::CurrentTransform ()
+{
+  return current_transform;
+}
+
+void RigidBodyImpl::SetWorldTransform (const Transform& transform)
+{
+  physics::low_level::Transform body_transform;
+
+  body_transform.position    = transform.position;
+  body_transform.orientation = transform.orientation;
+
+  current_transform = transform;
+
+  body->SetWorldTransform (body_transform);
 }
 
 /*
@@ -26,6 +68,8 @@ void RigidBodyImpl::OnTransformUpdate ()
 
   current_transform.position    = body_transform.position;
   current_transform.orientation = body_transform.orientation;
+
+  transform_update_signal (RigidBodyImplProvider::CreateRigidBody (this));
 }
 
 /*
@@ -46,9 +90,11 @@ physics::Material& RigidBodyImpl::Material ()
   return material;
 }
 
-void RigidBodyImpl::SetMaterial (const physics::Material& material)
+void RigidBodyImpl::SetMaterial (const physics::Material& in_material)
 {
-  body->SetMaterial (MaterialImplProvider::LowLevelMaterial (material));
+  body->SetMaterial (MaterialImplProvider::LowLevelMaterial (in_material));
+
+  material = in_material;
 }
 
 /*
@@ -58,6 +104,60 @@ void RigidBodyImpl::SetMaterial (const physics::Material& material)
 physics::low_level::IRigidBody* RigidBodyImpl::LowLevelBody ()
 {
   return body.get ();
+}
+
+/*
+   Подписка на обновление положения тела
+*/
+
+xtl::connection RigidBodyImpl::RegisterTransformUpdateCallback (const RigidBody::TransformUpdateCallback& callback_handler)
+{
+  return transform_update_signal.connect (callback_handler);
+}
+
+/*
+   Подписка на столкновения тела
+*/
+
+xtl::connection RigidBodyImpl::RegisterCollisionCallback (const char* group_mask, CollisionEventType event_type, const CollisionCallback& callback_handler)
+{
+  static const char* METHOD_NAME = "physics::RigidBodyImpl::RegisterCollisionCallback";
+
+  if (!group_mask)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "group_mask");
+
+  if (event_type >= CollisionEventType_Num)
+    throw xtl::make_argument_exception (METHOD_NAME, "event_type", event_type);
+
+  return collision_signal [event_type].connect (xtl::bind (&RigidBodyImpl::ProcessCollision, this, _1, _2, _3, _4, stl::string (group_mask), callback_handler));
+}
+
+/*
+   Оповещение о столкновения тела
+*/
+
+void RigidBodyImpl::OnCollision (CollisionEventType event_type, RigidBody& second_body, const math::vec3f& collision_point)
+{
+  if (event_type >= CollisionEventType_Num)
+    throw xtl::make_argument_exception ("physics::RigidBodyImpl::OnCollision", "event_type", event_type);
+
+  RigidBody this_body (RigidBodyImplProvider::CreateRigidBody (this));
+
+  collision_signal [event_type] (event_type, this_body, second_body, collision_point);
+}
+
+/*
+   Обработка события о столкновения тела
+*/
+
+void RigidBodyImpl::ProcessCollision (CollisionEventType event_type, RigidBody& this_body, RigidBody& second_body,
+                                      const math::vec3f& collision_point, const stl::string& wanted_group_mask,
+                                      const CollisionCallback& callback_handler)
+{
+  if (!common::wcmatch (second_body.CollisionGroup (), wanted_group_mask.c_str ()))
+    return;
+
+  callback_handler (event_type, this_body, second_body, collision_point);
 }
 
 /*
@@ -125,12 +225,7 @@ const Transform& RigidBody::WorldTransform () const
 
 void RigidBody::SetWorldTransform (const Transform& transform)
 {
-  physics::low_level::Transform body_transform;
-
-  body_transform.position    = transform.position;
-  body_transform.orientation = transform.orientation;
-
-  impl->LowLevelBody ()->SetWorldTransform (body_transform);
+  impl->SetWorldTransform (transform);
 }
 
 /*
@@ -263,12 +358,12 @@ void RigidBody::ChangeFlags (size_t flags, bool state)
 
 const char* RigidBody::CollisionGroup () const
 {
-  throw xtl::make_not_implemented_exception ("physics::RigidBody::CollisionGroup");
+  return impl->CollisionGroup ();
 }
 
-void RigidBody::SetCollisionGroup (const char*)
+void RigidBody::SetCollisionGroup (const char* new_group)
 {
-  throw xtl::make_not_implemented_exception ("physics::RigidBody::SetCollisionGroup");
+  impl->SetCollisionGroup (new_group);
 }
 
 /*
@@ -320,7 +415,7 @@ void RigidBody::SetAngularVelocity (const math::vec3f& velocity)
 
 xtl::connection RigidBody::RegisterTransformUpdateCallback (const TransformUpdateCallback& callback_handler)
 {
-  throw xtl::make_not_implemented_exception ("physics::RigidBody::RegisterTransformUpdateCallback");
+  return impl->RegisterTransformUpdateCallback (callback_handler);
 }
 
 /*
@@ -329,9 +424,8 @@ xtl::connection RigidBody::RegisterTransformUpdateCallback (const TransformUpdat
 
 xtl::connection RigidBody::RegisterCollisionCallback (const char* group_mask, CollisionEventType event_type, const CollisionCallback& callback_handler)
 {
-  throw xtl::make_not_implemented_exception ("physics::RigidBody::RegisterCollisionCallback");
+  return impl->RegisterCollisionCallback (group_mask, event_type, callback_handler);
 }
-
 
 /*
    Обмен
@@ -356,14 +450,24 @@ void swap (RigidBody& material1, RigidBody& material2)
    Создание
 */
 
-RigidBody RigidBodyImplProvider::CreateRigidBody (RigidBodyPtr body, const Shape& shape, const Material& material)
+RigidBody RigidBodyImplProvider::CreateRigidBody (RigidBodyPtr body, const Shape& shape, const Material& material, const Scene& scene)
 {
-  return RigidBody (new RigidBodyImpl (body, shape, material));
+  return RigidBody (new RigidBodyImpl (body, shape, material, scene));
 }
 
 RigidBody RigidBodyImplProvider::CreateRigidBody (RigidBodyImpl* impl)
 {
-  return RigidBody (impl);
+  addref (impl);
+
+  try
+  {
+    return RigidBody (impl);
+  }
+  catch (...)
+  {
+    release (impl);
+    throw;
+  }
 }
 
 /*

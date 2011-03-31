@@ -1,6 +1,8 @@
 #ifndef PHYSICS_MANAGER_COMMON_HEADER
 #define PHYSICS_MANAGER_COMMON_HEADER
 
+#include <xtl/functional_fwd>
+
 #include <math/quat.h>
 #include <math/vector.h>
 

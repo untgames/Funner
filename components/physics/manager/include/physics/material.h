@@ -1,6 +1,8 @@
 #ifndef PHYSICS_MANAGER_MATERIAL_HEADER
 #define PHYSICS_MANAGER_MATERIAL_HEADER
 
+#include <math/vector.h>
+
 namespace physics
 {
 

@@ -15,11 +15,10 @@ struct Material::Impl : public xtl::reference_counter
   MaterialPtr material;
 
   Impl (physics::low_level::IDriver* in_driver)
+    : driver (in_driver)
   {
     if (!driver)
       throw xtl::make_null_argument_exception ("physics::MaterialImpl::MaterialImpl", "driver");
-
-    driver = in_driver;
 
     material = MaterialPtr (driver->CreateMaterial (), false);
   }

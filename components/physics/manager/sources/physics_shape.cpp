@@ -114,19 +114,21 @@ Shape ShapeImplProvider::CreateShape (physics::low_level::IDriver* driver, const
   if (!driver)
     throw xtl::make_null_argument_exception ("physics::ShapeImplProvider::CreateShape (physics::low_level::IDriver*, const ShapeList&)", "driver");
 
-  stl::vector<physics::low_level::IShape*>   shapes;
-  stl::vector<physics::low_level::Transform> transforms;
+  size_t shapes_count = shape_list.Size ();
 
-  for (size_t i = 0, count = shape_list.Size (); i < count; i++)
+  xtl::uninitialized_storage<physics::low_level::IShape*>   shapes (shapes_count);
+  xtl::uninitialized_storage<physics::low_level::Transform> transforms (shapes_count);
+
+  for (size_t i = 0; i < shapes_count; i++)
   {
     const physics::Transform&     transform           = shape_list.Transform (i);
     physics::low_level::Transform low_level_transform = { transform.position, transform.orientation };
 
-    shapes [i]     = ShapeImplProvider::LowLevelShape (shape_list [i]);
-    transforms [i] = low_level_transform;
+    shapes.data () [i]     = ShapeImplProvider::LowLevelShape (shape_list [i]);
+    transforms.data () [i] = low_level_transform;
   }
 
-  return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateCompoundShape (shape_list.Size (), shapes.begin (), transforms.begin ()), false), shape_list);
+  return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateCompoundShape (shapes_count, shapes.data (), transforms.data ()), false), shape_list);
 }
 
 Shape ShapeImplProvider::CreateShapeCore (physics::low_level::IDriver* driver, const media::physics::Shape& shape)
@@ -155,8 +157,11 @@ Shape ShapeImplProvider::CreateShapeCore (physics::low_level::IDriver* driver, c
     {
       media::physics::shapes::TriangleMesh shape_data = shape.Data<media::physics::shapes::TriangleMesh> ();
 
-      return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateTriangleMeshShape (shape_data.VerticesCount (), shape_data.Vertices (),
-                                                                                        shape_data.TrianglesCount (), shape_data.Triangles () [0]), false));
+      if (shape_data.IsConvex ())
+        return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateConvexShape (shape_data.VerticesCount (), shape_data.Vertices ()), false));
+      else
+        return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateTriangleMeshShape (shape_data.VerticesCount (), shape_data.Vertices (),
+                                                                                          shape_data.TrianglesCount (), shape_data.Triangles () [0]), false));
     }
     case media::physics::ShapeType_Compound:
     {

@@ -65,6 +65,9 @@ PhysicsManager::PhysicsManager (const char* driver_name)
       throw xtl::make_null_argument_exception ("", "driver_name");
 
     impl->driver = DriverManager::FindDriver (driver_name);
+
+    if (!impl->driver)
+      throw xtl::format_operation_exception ("", "Driver '%s' not found", driver_name);
   }
   catch (xtl::exception& e)
   {

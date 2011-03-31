@@ -12,7 +12,7 @@ PHYSICS.MANAGER.SOURCES.IMPORTS     := compile.physics.manager compile.physics.l
 #Цель Physics system tests
 PHYSICS.MANAGER.TESTS.TYPE        := test-suite
 PHYSICS.MANAGER.TESTS.SOURCE_DIRS := tests
-PHYSICS.MANAGER.TESTS.IMPORTS     := compile.physics.manager link.physics.manager
+PHYSICS.MANAGER.TESTS.IMPORTS     := compile.physics.manager link.physics.manager link.physics.low_level.bullet_driver compile.render.debug_render compile.media.physics
 
 #Цель - сборка документации
 PHYSICS.MANAGER.INFO.TYPE        := doxygen-info
