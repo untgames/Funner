@@ -1,0 +1,5 @@
+Results of manager_test:
+Creating objects from library
+Unloading library
+exception: Material 'Default' was not loaded
+    at physics::PhysicsManager::CreateMaterial (const char*)

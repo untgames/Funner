@@ -52,11 +52,12 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
 {
   DriverPtr                                           driver;
   RigidBodyMap                                        rigid_body_map;
-  CollisionGroupsMap                                  collision_groups;
-  CollisionFilterDescArray                            collision_filters;
-  CollisionFiltersMap                                 registered_filters;
+  CollisionGroupsMap                                  collision_groups;           //Зарегистрированные группы коллизий
+  CollisionFilterDescArray                            collision_filters;          //Зарегистрированные в низкоуровневой сцене фильтры
+  CollisionFiltersMap                                 registered_filters;         //Зарегистрированные фильтры
+  xtl::auto_connection                                collision_connections [physics::low_level::CollisionEventType_Num];  //Соединения обработки коллизий для оповещения тел
   ScenePtr                                            scene;
-  media::physics::PhysicsLibrary::RigidBodyCollection body_collection;
+  media::physics::PhysicsLibrary::RigidBodyCollection body_collection;            //Тела сцены
   size_t                                              next_collision_filter_id;
   size_t                                              next_collision_group_id;
 
@@ -71,6 +72,9 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
       throw xtl::make_null_argument_exception ("physics::Scene::Impl::Impl", "driver");
 
     collision_filters.reserve (FILTERS_RESERVE_SIZE);
+
+    for (size_t i = 0; i < physics::low_level::CollisionEventType_Num; i++)
+      collision_connections [i] = scene->RegisterCollisionCallback ((physics::low_level::CollisionEventType)i, xtl::bind (&Scene::Impl::BodyCollisionHandler, this, _1));
   }
 
   //Получение номера группы коллизий по имени.
@@ -241,6 +245,13 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     return JointImplProvider::CreateJoint (low_level_joint, bodies_array);
   }
 
+  RigidBodyImpl* FindRigidBodyImpl (physics::low_level::IRigidBody* body)
+  {
+    RigidBodyMap::iterator body_iter = rigid_body_map.find (body);
+
+    return body_iter == rigid_body_map.end () ? 0 : body_iter->second;
+  }
+
   /*
     Фильтрация столкновений объектов. Объекты сталкиваются, если:
      - не задан фильтр;
@@ -252,14 +263,14 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
 
   bool CollisionFilter (physics::low_level::IRigidBody* low_level_body1, physics::low_level::IRigidBody* low_level_body2, const Scene::BroadphaseCollisionFilter& filter)
   {
-    RigidBodyMap::iterator body1_iter = rigid_body_map.find (low_level_body1),
-                           body2_iter = rigid_body_map.find (low_level_body2);
+    RigidBodyImpl *body1_impl = FindRigidBodyImpl (low_level_body1),
+                  *body2_impl = FindRigidBodyImpl (low_level_body2);
 
-    if (body1_iter == rigid_body_map.end () || body2_iter == rigid_body_map.end ())
+    if (!body1_impl || !body2_impl)
       return true;
 
-    RigidBody body1 = RigidBodyImplProvider::CreateRigidBody (body1_iter->second),
-              body2 = RigidBodyImplProvider::CreateRigidBody (body2_iter->second);
+    RigidBody body1 = RigidBodyImplProvider::CreateRigidBody (body1_impl),
+              body2 = RigidBodyImplProvider::CreateRigidBody (body2_impl);
 
     return filter (body1, body2);
   }
@@ -412,27 +423,65 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     }
   }
 
+  void BodyCollisionHandler (const physics::low_level::CollisionEvent& event)
+  {
+    static const char* METHOD_NAME = "physics::Scene::Impl::BodyCollisionHandler";
+
+    RigidBodyImpl *body1_impl = FindRigidBodyImpl (event.body [0]),
+                  *body2_impl = FindRigidBodyImpl (event.body [1]);
+
+    if (!body1_impl || !body2_impl)
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't find all collided bodies");
+
+    RigidBody body1 = RigidBodyImplProvider::CreateRigidBody (body1_impl),
+              body2 = RigidBodyImplProvider::CreateRigidBody (body2_impl);
+
+    CollisionEventType event_type;
+
+    switch (event.type)
+    {
+      case physics::low_level::CollisionEventType_Begin:
+        event_type = physics::CollisionEventType_Begin;
+        break;
+      case physics::low_level::CollisionEventType_Process:
+        event_type = physics::CollisionEventType_Process;
+        break;
+      case physics::low_level::CollisionEventType_End:
+        event_type = physics::CollisionEventType_End;
+        break;
+      default:
+        throw xtl::format_operation_exception (METHOD_NAME, "Unsupported event type %d", event.type);
+    }
+
+    body1_impl->OnCollision (event_type, body2, event.point);
+    body2_impl->OnCollision (event_type, body1, event.point);
+  }
+
   void CollisionHandler (const physics::low_level::CollisionEvent& event, const stl::string& group1_mask,
-                         const stl::string& group2_mask, CollisionEventType wanted_event, const CollisionCallback& callback_handler)
+                         const stl::string& group2_mask, CollisionEventType wanted_event,
+                         const CollisionCallback& callback_handler)
   {
     if (event.type != ConvertCollisionEventType (wanted_event))
       return;
 
-    RigidBodyMap::iterator body1_iter = rigid_body_map.find (event.body [0]),
-                           body2_iter = rigid_body_map.find (event.body [1]);
+    RigidBodyImpl *body1_impl = FindRigidBodyImpl (event.body [0]),
+                  *body2_impl = FindRigidBodyImpl (event.body [1]);
 
-    if (body1_iter == rigid_body_map.end () || body2_iter == rigid_body_map.end ())
+    if (!body1_impl || !body2_impl)
       throw xtl::format_operation_exception ("physics::Scene::Impl::CollisionHandler", "Can't find all collided bodies");
 
-    RigidBody body1 = RigidBodyImplProvider::CreateRigidBody (body1_iter->second),
-              body2 = RigidBodyImplProvider::CreateRigidBody (body2_iter->second);
+    RigidBody body1 = RigidBodyImplProvider::CreateRigidBody (body1_impl),
+              body2 = RigidBodyImplProvider::CreateRigidBody (body2_impl);
 
-    if (!common::wcmatch (body1.CollisionGroup (), group1_mask.c_str ()) && !common::wcmatch (body1.CollisionGroup (), group2_mask.c_str ()) ||
-        !common::wcmatch (body2.CollisionGroup (), group1_mask.c_str ()) && !common::wcmatch (body2.CollisionGroup (), group2_mask.c_str ()))
+    bool group1_name_first = false;
+
+    if (common::wcmatch (body1.CollisionGroup (), group1_mask.c_str ()))
+      group1_name_first = true;
+    else if (!common::wcmatch (body1.CollisionGroup (), group2_mask.c_str ()))
       return;
 
-    body1_iter->second->OnCollision (wanted_event, body2, event.point);
-    body2_iter->second->OnCollision (wanted_event, body1, event.point);
+    if (!common::wcmatch (body2.CollisionGroup (), group1_name_first ? group2_mask.c_str () : group1_mask.c_str ()))
+      return;
 
     callback_handler (wanted_event, body1, body2, event.point);
   }
