@@ -10,6 +10,7 @@
 #include <xtl/trackable.h>
 
 #include <stl/hash_map>
+#include <stl/hash_set>
 #include <stl/string>
 #include <stl/vector>
 

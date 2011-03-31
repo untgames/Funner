@@ -46,18 +46,96 @@ typedef stl::hash_map<stl::hash_key<const char*>, CollisionGroupDesc>  Collision
 typedef stl::pair<size_t, size_t>                                      IndexPair;
 typedef stl::hash_map<IndexPair, CollisionFilterDescPtr>               CollisionFiltersMap;
 
+class CollisionHandler : public xtl::reference_counter, public xtl::trackable
+{
+  public:
+    CollisionHandler (const char* in_group1_mask, const char* in_group2_mask, physics::CollisionEventType in_event_type,
+                      const CollisionCallback& in_callback_handler)
+      : group1_mask (in_group1_mask)
+      , group2_mask (in_group2_mask)
+      , event_type (in_event_type)
+      , callback_handler (in_callback_handler)
+      {}
+
+    void OnNewGroupRegistered (const CollisionGroupsMap& groups, const CollisionGroupDesc& new_group)
+    {
+      bool mask1_matched = false, mask2_matched = false;
+
+      if (common::wcmatch (new_group.name.c_str (), group1_mask.c_str ()))
+        mask1_matched = true;
+      if (common::wcmatch (new_group.name.c_str (), group2_mask.c_str ()))
+        mask2_matched = true;
+
+      if (!mask1_matched && !mask2_matched)
+        return;
+
+      for (CollisionGroupsMap::const_iterator iter = groups.begin (), end = groups.end (); iter != end; ++iter)
+      {
+        const CollisionGroupDesc& iter_group = iter->second;
+
+        if (!((mask1_matched && common::wcmatch (iter_group.name.c_str (), group2_mask.c_str ())) ||
+             (mask2_matched && common::wcmatch (iter_group.name.c_str (), group1_mask.c_str ()))))
+          continue;
+
+        size_t group1 = new_group.id, group2 = iter_group.id;
+
+        if (group1 > group2)
+        {
+          size_t temp = group1;
+
+          group1 = group2;
+          group2 = temp;
+        }
+
+        valid_groups.insert (IndexPair (group1, group2));
+      }
+    }
+
+    void OnCollision (const physics::low_level::CollisionEvent& event, RigidBody& body1, RigidBody& body2)
+    {
+      size_t group1 = event.body [0]->CollisionGroup (), group2 = event.body [1]->CollisionGroup ();
+
+      if (group1 > group2)
+      {
+        size_t temp = group1;
+
+        group1 = group2;
+        group2 = temp;
+      }
+
+      if (valid_groups.find (IndexPair (group1, group2)) == valid_groups.end ())
+        return;
+
+      callback_handler (event_type, body1, body2, event.point);
+    }
+
+  private:
+    typedef stl::hash_set<IndexPair> IndexPairSet;
+
+  private:
+    stl::string                 group1_mask;
+    stl::string                 group2_mask;
+    physics::CollisionEventType event_type;
+    CollisionCallback           callback_handler;
+    IndexPairSet                valid_groups;
+};
+
+typedef xtl::intrusive_ptr<CollisionHandler> CollisionHandlerPtr;
+typedef stl::hash_set<CollisionHandler*>     CollisionHandlersSet;
+
 }
 
 struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
 {
   DriverPtr                                           driver;
   RigidBodyMap                                        rigid_body_map;
-  CollisionGroupsMap                                  collision_groups;           //Зарегистрированные группы коллизий
-  CollisionFilterDescArray                            collision_filters;          //Зарегистрированные в низкоуровневой сцене фильтры
-  CollisionFiltersMap                                 registered_filters;         //Зарегистрированные фильтры
+  CollisionGroupsMap                                  collision_groups;              //Зарегистрированные группы коллизий
+  CollisionFilterDescArray                            collision_filters;             //Зарегистрированные в низкоуровневой сцене фильтры
+  CollisionFiltersMap                                 registered_filters;            //Зарегистрированные фильтры
   xtl::auto_connection                                collision_connections [physics::low_level::CollisionEventType_Num];  //Соединения обработки коллизий для оповещения тел
+  CollisionHandlersSet                                registered_collision_handlers; //Зарегестрированные обработчики коллизий
   ScenePtr                                            scene;
-  media::physics::PhysicsLibrary::RigidBodyCollection body_collection;            //Тела сцены
+  media::physics::PhysicsLibrary::RigidBodyCollection body_collection;               //Тела сцены
   size_t                                              next_collision_filter_id;
   size_t                                              next_collision_group_id;
 
@@ -91,10 +169,15 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     if (next_collision_group_id == (size_t)-1)
       throw xtl::format_operation_exception ("physics::Scene::Impl::CollisionGroupForName", "All groups ids used");
 
-    collision_groups.insert_pair (name, CollisionGroupDesc (name, next_collision_group_id));
+    CollisionGroupDesc new_group_desc (name, next_collision_group_id);
+
+    collision_groups.insert_pair (name, new_group_desc);
 
     for (CollisionFilterDescArray::iterator iter = collision_filters.begin (), end = collision_filters.end (); iter != end; ++iter)
       RegisterCollisionFilter (*iter);
+
+    for (CollisionHandlersSet::iterator iter = registered_collision_handlers.begin (), end = registered_collision_handlers.end (); iter != end; ++iter)
+      (*iter)->OnNewGroupRegistered (collision_groups, new_group_desc);
 
     return next_collision_group_id++;
   }
@@ -103,6 +186,12 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
   void OnBodyDestroy (RigidBodyImpl* body_impl)
   {
     rigid_body_map.erase (body_impl->LowLevelBody ());
+  }
+
+  ///Обработка удаления обработчика коллизий
+  void OnCollisionHandlerDestroy (CollisionHandler* handler)
+  {
+    registered_collision_handlers.erase (handler);
   }
 
   ///Создание тел
@@ -281,11 +370,14 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     {
       const CollisionGroupDesc& group1 = group1_iter->second;
 
-      bool group1_name_first = false;
+      bool mask1_matched = false, mask2_matched = false;
 
       if (common::wcmatch (group1.name.c_str (), filter->group1_mask.c_str ()))
-        group1_name_first = true;
-      else if (!common::wcmatch (group1.name.c_str (), filter->group2_mask.c_str ()))
+        mask1_matched = true;
+      if (common::wcmatch (group1.name.c_str (), filter->group2_mask.c_str ()))
+        mask2_matched = true;
+
+      if (!mask1_matched && !mask2_matched)
         continue;
 
       for (CollisionGroupsMap::iterator group2_iter = group1_iter; group2_iter != group_end_iter; ++group2_iter)
@@ -310,7 +402,8 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
         if (registered_filters.find (group_pair) != registered_filters.end ())
           continue;
 
-        if (!common::wcmatch (group2.name.c_str (), group1_name_first ? filter->group2_mask.c_str () : filter->group1_mask.c_str ()))
+        if (!((mask1_matched && common::wcmatch (group2.name.c_str (), filter->group2_mask.c_str ())) ||
+             (mask2_matched && common::wcmatch (group2.name.c_str (), filter->group1_mask.c_str ()))))
           continue;
 
         scene->SetCollisionFilter (first_group_id, second_group_id, filter->collides,
@@ -413,8 +506,20 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
   {
     try
     {
+      if (!group1_mask)
+        throw xtl::make_null_argument_exception ("", "group1_mask");
+
+      if (!group2_mask)
+        throw xtl::make_null_argument_exception ("", "group2_mask");
+
+      CollisionHandlerPtr handler (new ::CollisionHandler (group1_mask, group2_mask, event_type, callback_handler), false);
+
+      registered_collision_handlers.insert (handler.get ());
+
+      handler->connect_tracker (xtl::bind (&Scene::Impl::OnCollisionHandlerDestroy, this, handler.get ()), *this);
+
       return scene->RegisterCollisionCallback (ConvertCollisionEventType (event_type),
-                                               xtl::bind (&Scene::Impl::CollisionHandler, this, _1, stl::string (group1_mask), stl::string (group2_mask), event_type, callback_handler));
+                                               xtl::bind (&Scene::Impl::CollisionHandler, this, _1, handler));
     }
     catch (xtl::exception& e)
     {
@@ -457,13 +562,8 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     body2_impl->OnCollision (event_type, body1, event.point);
   }
 
-  void CollisionHandler (const physics::low_level::CollisionEvent& event, const stl::string& group1_mask,
-                         const stl::string& group2_mask, CollisionEventType wanted_event,
-                         const CollisionCallback& callback_handler)
+  void CollisionHandler (const physics::low_level::CollisionEvent& event, CollisionHandlerPtr handler)
   {
-    if (event.type != ConvertCollisionEventType (wanted_event))
-      return;
-
     RigidBodyImpl *body1_impl = FindRigidBodyImpl (event.body [0]),
                   *body2_impl = FindRigidBodyImpl (event.body [1]);
 
@@ -473,17 +573,7 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     RigidBody body1 = RigidBodyImplProvider::CreateRigidBody (body1_impl),
               body2 = RigidBodyImplProvider::CreateRigidBody (body2_impl);
 
-    bool group1_name_first = false;
-
-    if (common::wcmatch (body1.CollisionGroup (), group1_mask.c_str ()))
-      group1_name_first = true;
-    else if (!common::wcmatch (body1.CollisionGroup (), group2_mask.c_str ()))
-      return;
-
-    if (!common::wcmatch (body2.CollisionGroup (), group1_name_first ? group2_mask.c_str () : group1_mask.c_str ()))
-      return;
-
-    callback_handler (wanted_event, body1, body2, event.point);
+    handler->OnCollision (event, body1, body2);
   }
 };
 
