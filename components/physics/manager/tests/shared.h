@@ -23,7 +23,7 @@ const char* DRIVER_NAME = "Bullet";
 
 void convert_float (float& value)
 {
-  value = ceil ((int)(value * 100)) / 100.f;
+  value = ceil ((float)(int)(value * 100)) / 100.f;
 }
 
 void dump_body_position (const RigidBody& body)

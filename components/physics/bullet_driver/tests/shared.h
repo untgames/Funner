@@ -31,7 +31,7 @@ typedef xtl::com_ptr<IShape>     ShapePtr;
 
 void convert_float (float& value)
 {
-  value = ceil ((int)(value * 100)) / 100.f;
+  value = ceil ((float)(int)(value * 100)) / 100.f;
 }
 
 void dump_body_position (IRigidBody* body)
