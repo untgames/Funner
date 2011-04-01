@@ -2,45 +2,45 @@ Results of material_test:
 Simulating one second
 body1 state:
 Body world transform:
-  position = -10.00; -3.85; 0.00
-  orientation = 0.00; 0.00; 0.00; 1.00
+  position = -10; -3; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
 body2 state:
 Body world transform:
-  position = 10.00; -4.81; 0.00
-  orientation = 0.00; 0.00; 0.00; 1.00
+  position = 10; -4; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
 Simulating one second
 body1 state:
 Body world transform:
-  position = -10.00; -8.99; 0.00
-  orientation = 0.00; 0.00; 0.00; 1.00
+  position = -10; -8; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
 body2 state:
 Body world transform:
-  position = 10.00; -8.52; 0.00
-  orientation = 0.00; 0.00; 0.00; 1.00
+  position = 10; -8; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
 Simulating one second
 body1 state:
 Body world transform:
-  position = -10.00; -8.99; 0.00
-  orientation = 0.00; 0.00; 0.00; 1.00
+  position = -10; -8; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
 body2 state:
 Body world transform:
-  position = 10.00; -8.99; 0.00
-  orientation = 0.00; 0.00; 0.00; 1.00
+  position = 10; -8; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
 Simulating one second
 body1 state:
 Body world transform:
-  position = -10.00; -8.99; 1.29
-  orientation = 0.00; 0.00; 0.00; 1.00
+  position = -10; -8; 1
+  orientation = 0.0; 0.0; 0.0; 1.0
 body2 state:
 Body world transform:
-  position = 10.00; -8.99; 0.05
-  orientation = 0.00; 0.00; 0.00; 1.00
+  position = 10; -8; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
 Simulating one second
 body1 state:
 Body world transform:
-  position = -10.00; -8.99; 3.84
-  orientation = 0.00; 0.00; 0.95; 0.29
+  position = -10; -8; 3
+  orientation = 0.0; 0.0; 0.9; 0.2
 body2 state:
 Body world transform:
-  position = 10.00; -8.99; 0.15
-  orientation = 0.00; 0.00; 0.95; 0.29
+  position = 10; -8; 0
+  orientation = 0.0; 0.0; 0.9; 0.2

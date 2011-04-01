@@ -38,7 +38,7 @@ int main ()
     printf ("Initial static body state:\n");
     dump_body_position (static_body.get ());
 
-    scene->PerformSimulation (0.2f);
+    scene->PerformSimulation (1.f);
   }
   catch (std::exception& exception)
   {
