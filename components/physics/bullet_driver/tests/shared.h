@@ -32,6 +32,9 @@ typedef xtl::com_ptr<IShape>     ShapePtr;
 void convert_float (float& value, int rounding)
 {
   value = ceil ((float)(int)(value * rounding)) / (float)rounding;
+
+  if (fabs (value) < 0.01f)
+    value = 0.f;
 }
 
 void dump_body_position (IRigidBody* body)

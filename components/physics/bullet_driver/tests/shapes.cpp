@@ -28,6 +28,8 @@ int main ()
              convex_shape        (bullet_driver->CreateConvexShape       (mesh_vertices_count, mesh_vertices), false),
              triangle_mesh_shape (bullet_driver->CreateTriangleMeshShape (mesh_vertices_count, mesh_vertices, triangles_indices_count / 3, triangles_indices), false);
 
+    triangle_mesh_shape->SetMargin (1.5f);
+
     IShape* compounding_shapes [] = { box_shape.get (), sphere_shape.get () };
     size_t  compounding_shapes_count = sizeof (compounding_shapes) / sizeof (*compounding_shapes);
 

@@ -34,25 +34,25 @@ Body world transform:
   orientation = 0.0; 0.0; 0.0; 1.0
 box body state:
 Body world transform:
-  position = -9; -13; 0
+  position = -10; -13; 0
   orientation = 0.0; 0.0; 0.0; 1.0
 sphere body state:
 Body world transform:
-  position = -6; -13; 0
-  orientation = 0.0; 0.0; 0.0; 1.0
+  position = -8; -13; 0
+  orientation = 0.0; 0.0; 0.2; 0.9
 capsule body state:
 Body world transform:
-  position = -4; -13; 0
-  orientation = 0.0; 0.0; 0.0; 0.9
+  position = -6; -13; 0
+  orientation = 0.0; 0.0; 0.2; 0.9
 convex body state:
 Body world transform:
-  position = 0; -12; 0
-  orientation = 0.0; 0.0; 0.0; 0.9
+  position = -4; -14; 0
+  orientation = 0.1; 0.0; 0.5; 0.8
 triangle mesh body state:
 Body world transform:
-  position = 1; -12; 0
-  orientation = 0.0; 0.0; 0.0; 0.9
+  position = 5; -12; 0
+  orientation = 0.0; 0.0; -0.5; 0.8
 compound body state:
 Body world transform:
-  position = 4; -9; 0
-  orientation = 0.0; 0.0; 0.0; 0.9
+  position = 8; -13; 0
+  orientation = 0.0; 0.0; 0.7; 0.7

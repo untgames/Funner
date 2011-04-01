@@ -519,7 +519,7 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
       handler->connect_tracker (xtl::bind (&Scene::Impl::OnCollisionHandlerDestroy, this, handler.get ()), *this);
 
       return scene->RegisterCollisionCallback (ConvertCollisionEventType (event_type),
-                                               xtl::bind (&Scene::Impl::CollisionHandler, this, _1, handler));
+                                               xtl::bind (&Scene::Impl::SceneCollisionHandler, this, _1, handler));
     }
     catch (xtl::exception& e)
     {
@@ -562,7 +562,7 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     body2_impl->OnCollision (event_type, body1, event.point);
   }
 
-  void CollisionHandler (const physics::low_level::CollisionEvent& event, CollisionHandlerPtr handler)
+  void SceneCollisionHandler (const physics::low_level::CollisionEvent& event, CollisionHandlerPtr handler)
   {
     RigidBodyImpl *body1_impl = FindRigidBodyImpl (event.body [0]),
                   *body2_impl = FindRigidBodyImpl (event.body [1]);
