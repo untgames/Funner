@@ -129,7 +129,12 @@ xtl::connection RigidBodyImpl::RegisterCollisionCallback (const char* group_mask
   if (event_type >= CollisionEventType_Num)
     throw xtl::make_argument_exception (METHOD_NAME, "event_type", event_type);
 
-  return collision_signal [event_type].connect (xtl::bind (&RigidBodyImpl::ProcessCollision, this, _1, _2, _3, _4, stl::string (group_mask), callback_handler));
+  if (!xtl::xstrcmp ("*", group_mask))
+    return collision_signal [event_type].connect (xtl::bind (callback_handler, _1, _2, _3, _4));
+  else if (!strstr (group_mask, "*") && !strstr (group_mask, "?"))
+    return collision_signal [event_type].connect (xtl::bind (&RigidBodyImpl::ProcessCollisionWithHash, this, _1, _2, _3, _4, common::strhash (group_mask), callback_handler));
+  else
+    return collision_signal [event_type].connect (xtl::bind (&RigidBodyImpl::ProcessCollisionWithMask, this, _1, _2, _3, _4, stl::string (group_mask), callback_handler));
 }
 
 /*
@@ -150,11 +155,21 @@ void RigidBodyImpl::OnCollision (CollisionEventType event_type, RigidBody& secon
    Обработка события о столкновения тела
 */
 
-void RigidBodyImpl::ProcessCollision (CollisionEventType event_type, RigidBody& this_body, RigidBody& second_body,
-                                      const math::vec3f& collision_point, const stl::string& wanted_group_mask,
-                                      const CollisionCallback& callback_handler)
+void RigidBodyImpl::ProcessCollisionWithMask (CollisionEventType event_type, RigidBody& this_body, RigidBody& second_body,
+                                              const math::vec3f& collision_point, const stl::string& wanted_group_mask,
+                                              const CollisionCallback& callback_handler)
 {
   if (!common::wcmatch (second_body.CollisionGroup (), wanted_group_mask.c_str ()))
+    return;
+
+  callback_handler (event_type, this_body, second_body, collision_point);
+}
+
+void RigidBodyImpl::ProcessCollisionWithHash (CollisionEventType event_type, RigidBody& this_body, RigidBody& second_body,
+                                              const math::vec3f& collision_point, size_t wanted_group_hash,
+                                              const CollisionCallback& callback_handler)
+{
+  if (common::strhash (second_body.CollisionGroup ()) != wanted_group_hash)
     return;
 
   callback_handler (event_type, this_body, second_body, collision_point);

@@ -37,7 +37,7 @@ int main ()
       scene.RegisterCollisionCallback (handlers [i], handlers [i + 1], CollisionEventType_Process, xtl::bind (collision_event_handler, _2, _3, handlers [i], handlers [i + 1]));
 
     const char* groups [] = { "ground", "animal", "animal.cat", "animal.dog", "plant", "plant.tree", "plant.tree.oak", "plant.tree.apple", "plant.flower" };
-    const char* body_handlers [] = { "animal*", 0, "plant.flower", "plant.tree*" };
+    const char* body_handlers [] = { "animal*", 0, "plant.flower", "plant.tree*", "*" };
 
     Shape sphere_shape (manager.CreateSphereShape (1.f));
 

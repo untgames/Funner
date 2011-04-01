@@ -175,9 +175,12 @@ class RigidBodyImpl : public xtl::reference_counter, public xtl::trackable
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка события о столкновения тела
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void ProcessCollision (CollisionEventType event_type, RigidBody& this_body, RigidBody& second_body,
-                           const math::vec3f& collision_point, const stl::string& wanted_group_mask,
-                           const CollisionCallback& callback_handler);
+    void ProcessCollisionWithMask (CollisionEventType event_type, RigidBody& this_body, RigidBody& second_body,
+                                   const math::vec3f& collision_point, const stl::string& wanted_group_mask,
+                                   const CollisionCallback& callback_handler);
+    void ProcessCollisionWithHash (CollisionEventType event_type, RigidBody& this_body, RigidBody& second_body,
+                                   const math::vec3f& collision_point, size_t wanted_group_hash,
+                                   const CollisionCallback& callback_handler);
 
   private:
     typedef xtl::signal<void (const RigidBody& body)> TransformUpdateSignal;
