@@ -138,6 +138,10 @@ struct MaterialImpl::Impl: public CacheHolder
             
             mask.ss_textures [i] = true;
           }
+          
+          device.SSSetSampler (i, texmap.cached_sampler.get ());
+          
+          mask.ss_samplers [i] = true;
         }
           
         cached_state_block = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
