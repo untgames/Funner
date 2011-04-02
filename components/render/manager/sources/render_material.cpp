@@ -77,23 +77,33 @@ typedef stl::vector<TexmapPtr>     TexmapArray;
 
 struct MaterialImpl::Impl: public CacheHolder
 {
-  TextureManagerPtr   texture_manager;   //менеджер текстур
-  ShadingManagerPtr   shading_manager;   //менеджер шэйдинга
-  stl::string         id;                //идентификатор материала
-  ProgramProxy        program;           //прокси программы
-  PropertyBuffer      properties;        //свойства материала
-  TexmapArray         texmaps;           //текстурные карты  
-  LowLevelProgramPtr  cached_program;    //закэшированная программа
-  LowLevelBufferPtr   cached_properties; //закэшированный буфер констант
+  DeviceManagerPtr      device_manager;     //менеджер устройства отрисовки
+  TextureManagerPtr     texture_manager;    //менеджер текстур
+  ShadingManagerPtr     shading_manager;    //менеджер шэйдинга
+  stl::string           id;                 //идентификатор материала
+  ProgramProxy          program;            //прокси программы
+  PropertyBuffer        properties;         //свойства материала
+  TexmapArray           texmaps;            //текстурные карты
+  LowLevelProgramPtr    cached_program;     //закэшированная программа
+  LowLevelBufferPtr     cached_properties;  //закэшированный буфер констант
+  LowLevelStateBlockPtr cached_state_block; //закэшированный блок состояний
   
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ShadingManagerPtr& in_shading_manager)
-    : texture_manager (in_texture_manager)
+    : device_manager (in_device_manager)
+    , texture_manager (in_texture_manager)
     , shading_manager (in_shading_manager)
     , program (shading_manager->GetProgramProxy (DEFAULT_PROGRAM_NAME))
     , properties (in_device_manager)
   {
     AttachCacheSource (properties);
+    
+    StateBlockMask mask;
+    
+    mask.ss_program                                           = true;
+    mask.ss_constant_buffers [ProgramParametersSlot_Material] = true;
+    
+    cached_state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);
   }
   
 ///Работа с кэшем
@@ -109,6 +119,11 @@ struct MaterialImpl::Impl: public CacheHolder
     {
       cached_program    = program.Resource ();
       cached_properties = properties.Buffer ();
+      
+      device_manager->Device ().SSSetProgram (cached_program.get ());
+      device_manager->Device ().SSSetConstantBuffer (ProgramParametersSlot_Material, cached_properties.get ());
+      
+      cached_state_block->Capture ();
     }
     catch (xtl::exception& e)
     {
@@ -160,6 +175,17 @@ LowLevelProgramPtr MaterialImpl::Program ()
   impl->UpdateCache ();
   
   return impl->cached_program;
+}
+
+/*
+    Блок состояний материала
+*/
+
+LowLevelStateBlockPtr MaterialImpl::StateBlock ()
+{
+  impl->UpdateCache ();
+  
+  return impl->cached_state_block;
 }
 
 /*

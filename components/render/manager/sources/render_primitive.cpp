@@ -12,34 +12,42 @@ namespace
 
 struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
 {
-  PrimitiveImpl&                   primitive;     //обратная ссылка на владельца
-  render::low_level::PrimitiveType type;          //тип примитива
-  VertexBufferPtr                  vertex_buffer; //вершинный буфер
-  LowLevelInputLayoutPtr           layout;        //лэйаут примитива
-  size_t                           first;         //индекс первой вершины/индекса
-  size_t                           count;         //количество примитивов
-  MaterialProxy                    material;      //материал
+  render::low_level::PrimitiveType type;             //тип примитива
+  VertexBufferPtr                  vertex_buffer;    //вершинный буфер
+  LowLevelInputLayoutPtr           layout;           //лэйаут примитива
+  size_t                           first;            //индекс первой вершины/индекса
+  size_t                           count;            //количество примитивов
+  MaterialProxy                    material;         //материал
+  bool                             indexed;          //индексирован ли примитив
+  RendererPrimitive                cached_primitive; //примитив закэшированный для рендеринга  
   
-  MeshPrimitive (PrimitiveImpl& in_primitive, const MaterialProxy& in_material)
-    : primitive (in_primitive)
-    , type (PrimitiveType_PointList)
+  MeshPrimitive (CacheHolder& parent_holder, const MaterialProxy& in_material, bool in_indexed)
+    : type (PrimitiveType_PointList)
     , first (0)
-    , count (0)
+    , count (0)    
     , material (in_material)
+    , indexed (in_indexed)
   {
-    primitive.AttachCacheSource (*this);
+    parent_holder.AttachCacheSource (*this);
     
     material.AttachCacheHolder (*this);
   }
   
   void ResetCacheCore ()
-  {
+  {   
   }
   
   void UpdateCacheCore ()
   {
     try
     {
+      memset (&cached_primitive, 0, sizeof (cached_primitive));
+      
+      cached_primitive.material_state_block = material.Resource ()->StateBlock ().get ();
+      cached_primitive.indexed              = indexed;      
+      cached_primitive.type                 = type;
+      cached_primitive.first                = first;
+      cached_primitive.count                = count;
     }
     catch (xtl::exception& e)
     {
@@ -53,25 +61,71 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
 
 typedef xtl::intrusive_ptr<MeshPrimitive> MeshPrimitivePtr;
 typedef stl::vector<MeshPrimitivePtr>     MeshPrimitiveArray;
+typedef stl::vector<RendererPrimitive>    RendererPrimitiveArray;
 
-struct Mesh: public xtl::reference_counter
+struct Mesh: public xtl::reference_counter, public CacheHolder
 {
-  LowLevelBufferPtr  index_buffer;
-  MeshPrimitiveArray primitives;
+  LowLevelBufferPtr      index_buffer;
+  MeshPrimitiveArray     primitives;
+  RendererPrimitiveArray cached_primitives;
+  RendererPrimitiveGroup cached_group;
+  
+  Mesh (CacheHolder& parent_holder)
+  {
+    parent_holder.AttachCacheSource (*this);
+  }
+  
+  void ResetCacheCore ()
+  {
+    cached_primitives.clear ();   
+  }
+  
+  void UpdateCacheCore ()
+  {
+    try
+    {
+      cached_primitives.reserve (primitives.size ());
+      
+      for (MeshPrimitiveArray::iterator iter=primitives.begin (), end=primitives.end (); iter!=end; ++iter)
+      {
+        MeshPrimitive& src_primitive = **iter;
+        
+        src_primitive.UpdateCache ();
+        
+        cached_primitives.push_back (src_primitive.cached_primitive);
+      }
+      
+      memset (&cached_group, 0, sizeof (cached_group));
+      
+      cached_group.primitives_count = cached_primitives.size ();
+      
+      if (!cached_primitives.empty ())
+        cached_group.primitives = &cached_primitives [0];
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::Mesh::UpdateCacheCore");
+      throw;
+    }
+  }  
+  
+  using CacheHolder::UpdateCache;    
 };
 
-typedef xtl::intrusive_ptr<Mesh> MeshPtr;
-typedef stl::vector<MeshPtr>     MeshArray;
+typedef xtl::intrusive_ptr<Mesh>            MeshPtr;
+typedef stl::vector<MeshPtr>                MeshArray;
+typedef stl::vector<RendererPrimitiveGroup> RenderPrimitiveGroupsArray;
 
 }
 
 struct PrimitiveImpl::Impl
 {
-  DeviceManagerPtr   device_manager;   //менеджер устройства
-  MaterialManagerPtr material_manager; //менеджер материалов
-  BuffersPtr         buffers;          //буферы примитива
-  MeshArray          meshes;           //меши
-  
+  DeviceManagerPtr           device_manager;   //менеджер устройства
+  MaterialManagerPtr         material_manager; //менеджер материалов
+  BuffersPtr                 buffers;          //буферы примитива
+  MeshArray                  meshes;           //меши
+  RenderPrimitiveGroupsArray render_groups;    //группы
+
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const MaterialManagerPtr& in_material_manager, const BuffersPtr& in_buffers)
     : device_manager (in_device_manager)
@@ -131,7 +185,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
 {
   try
   {
-    MeshPtr mesh (new Mesh, false);
+    MeshPtr mesh (new Mesh (*this), false);
     
       //конвертация вершинных буферов
              
@@ -173,8 +227,9 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
     for (size_t i=0, count=source.PrimitivesCount (); i<count; i++)
     {
       const media::geometry::Primitive& src_primitive = source.Primitive (i);
+      bool                              is_indexed    = mesh->index_buffer;
       
-      MeshPrimitivePtr dst_primitive (new MeshPrimitive (*this, impl->material_manager->GetMaterialProxy (src_primitive.material)), false);
+      MeshPrimitivePtr dst_primitive (new MeshPrimitive (*mesh, impl->material_manager->GetMaterialProxy (src_primitive.material), is_indexed), false);
 
       switch (src_primitive.type)
       {
@@ -213,7 +268,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
       mesh->primitives.push_back (dst_primitive);
     }
     
-      //добавление меша
+      //добавление меша      
       
     impl->meshes.push_back (mesh);
     
@@ -324,4 +379,56 @@ void PrimitiveImpl::RemoveAllSprites ()
 void PrimitiveImpl::ReserveSprites (size_t sprites_count)
 {
   throw xtl::make_not_implemented_exception ("render::PrimitiveImpl::ReserveSprites");
+}
+
+/*
+    Обновление кэша примитива
+*/
+
+void PrimitiveImpl::UpdateCacheCore ()
+{
+  try
+  {
+    impl->render_groups.reserve (impl->meshes.size ());
+    
+    for (MeshArray::iterator iter=impl->meshes.begin (), end=impl->meshes.end (); iter!=end; ++iter)
+    {
+      Mesh& mesh = **iter;
+      
+      mesh.UpdateCache ();
+      
+      impl->render_groups.push_back (mesh.cached_group);
+    }
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::PrimitiveImpl::UpdateCacheCore");
+    throw;
+  }
+}
+
+void PrimitiveImpl::ResetCacheCore ()
+{
+  impl->render_groups.clear ();
+}
+
+/*
+    Группы римитивов рендеринга
+*/
+
+size_t PrimitiveImpl::RendererPrimitiveGroupsCount ()
+{
+  UpdateCache ();
+  
+  return impl->render_groups.size ();
+}
+
+RendererPrimitiveGroup* PrimitiveImpl::RendererPrimitiveGroups ()
+{
+  UpdateCache ();
+  
+  if (impl->render_groups.empty ())
+    return 0;
+  
+  return &impl->render_groups [0];
 }

@@ -80,6 +80,7 @@ typedef xtl::com_ptr<low_level::IDepthStencilState>       LowLevelDepthStencilSt
 typedef xtl::com_ptr<low_level::IInputLayout>             LowLevelInputLayoutPtr;
 typedef xtl::com_ptr<low_level::IBuffer>                  LowLevelBufferPtr;
 typedef xtl::com_ptr<low_level::IRasterizerState>         LowLevelRasterizerStatePtr;
+typedef xtl::com_ptr<low_level::IStateBlock>              LowLevelStateBlockPtr;
 typedef xtl::com_ptr<low_level::IProgram>                 LowLevelProgramPtr;
 typedef xtl::com_ptr<low_level::IProgramParametersLayout> LowLevelProgramParametersLayoutPtr;
 typedef xtl::com_ptr<low_level::IPredicate>               LowLevelPredicatePtr;

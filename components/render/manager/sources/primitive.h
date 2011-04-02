@@ -2,6 +2,27 @@
 class PrimitiveBuffersImpl;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Описание примитива рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct RendererPrimitive
+{
+  render::low_level::IStateBlock*  material_state_block; //блок состояний материала примитива
+  bool                             indexed;              //является ли данный примитив индексированным или состоящим только из вершин без индексов
+  render::low_level::PrimitiveType type;                 //тип примитива
+  size_t                           first;                //индекс первой вершины/индекса
+  size_t                           count;                //количество примитивов
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Описание группы примитивов рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct RendererPrimitiveGroup
+{
+  size_t                   primitives_count; //количество примитивов в группе
+  const RendererPrimitive* primitives;       //примитивы
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Меш
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class PrimitiveImpl: public Object, public CacheSource
@@ -49,6 +70,16 @@ class PrimitiveImpl: public Object, public CacheSource
     void   RemoveSprites      (size_t first_sprite, size_t sprites_count);
     void   RemoveAllSprites   ();
     void   ReserveSprites     (size_t sprites_count);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Группы примитивов рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    size_t                  RendererPrimitiveGroupsCount ();
+    RendererPrimitiveGroup* RendererPrimitiveGroups      ();
+    
+  private:
+    void UpdateCacheCore ();
+    void ResetCacheCore  ();
     
   private:
     struct Impl;
