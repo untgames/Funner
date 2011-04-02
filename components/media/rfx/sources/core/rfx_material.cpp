@@ -2,6 +2,8 @@
 
 using namespace media::rfx;
 
+const size_t TEXMAP_RESERVE_SIZE = 8; //резервируемое количество текстурных карт
+
 /*
     Описание реализации Material
 */
@@ -20,6 +22,7 @@ struct Material::Impl: public xtl::reference_counter
   
   Impl ()
   {
+    texmaps.reserve (TEXMAP_RESERVE_SIZE);
   }
 
   Impl (const Impl& impl)
@@ -209,11 +212,6 @@ const size_t* Material::TagHashes () const
     Текстурные карты
 */
 
-void Material::SetTexmapCount (size_t count)
-{
-  impl->texmaps.resize (count);
-}
-
 size_t Material::TexmapCount () const
 {
   return impl->texmaps.size ();
@@ -230,6 +228,34 @@ media::rfx::Texmap& Material::Texmap (size_t index)
 const media::rfx::Texmap& Material::Texmap (size_t index) const
 {
   return const_cast<Material&> (*this).Texmap (index);
+}
+
+void Material::SetTexmap (size_t index, const media::rfx::Texmap& texmap)
+{
+  if (index >= impl->texmaps.size ())
+    throw xtl::make_range_exception ("media::rfx::Material::SetTexmap", "index", index, impl->texmaps.size ());
+  
+  impl->texmaps [index] = texmap;
+}
+
+size_t Material::AddTexmap (const media::rfx::Texmap& texmap)
+{
+  impl->texmaps.push_back (texmap);
+  
+  return impl->texmaps.size () - 1;
+}
+
+void Material::RemoveTexmap (size_t index)
+{
+  if (index >= impl->texmaps.size ())
+    return;
+    
+  impl->texmaps.erase (impl->texmaps.begin () + index);
+}
+
+void Material::RemoveAllTexmaps ()
+{
+  impl->texmaps.clear ();
 }
 
 /*

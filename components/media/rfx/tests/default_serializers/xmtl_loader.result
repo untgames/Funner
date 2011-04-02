@@ -10,8 +10,8 @@ material:
     Direction=([1.000 2.000 3.000 4.000], [5.000 6.000 7.000 8.000])
     Effect='my_effect'
   texmaps:
-    image='test3.tga', sampler='mirror'
-    image='test1.tga', sampler='repeated_mirror'
+    semantic='diffuse', image='test3.tga', sampler='mirror'
+    semantic='diffuse', image='test1.tga', sampler='repeated_mirror'
 material:
   id='material2'
   name='My material without layout'
@@ -22,8 +22,8 @@ material:
     Direction=([8.000 7.000 6.000 5.000], [4.000 3.000 2.000 1.000])
     Effect='my_effect1'
   texmaps:
-    image='test1.tga', sampler='repeated_mirror'
-    image='test4.tga', sampler='mirror'
+    semantic='diffuse', image='test1.tga', sampler='repeated_mirror'
+    semantic='diffuse', image='test4.tga', sampler='mirror'
 material:
   id='material4'
   name='My material 4'
@@ -35,7 +35,7 @@ material:
     Direction=([1.000 2.000 3.000 4.000], [5.000 6.000 7.000 8.000])
     Effect=''
   texmaps:
-    image='test2.tga', sampler=''
+    semantic='specular', image='test2.tga', sampler=''
 material:
   id='material3'
   name='My material'
@@ -47,5 +47,5 @@ material:
     Direction=([1.000 2.000 3.000 4.000], [5.000 6.000 7.000 8.000])
     Effect='my_effect'
   texmaps:
-    image='test3.tga', sampler='mirror'
-    image='test1.tga', sampler='repeated_mirror'
+    semantic='diffuse', image='test3.tga', sampler='mirror'
+    semantic='diffuse', image='test1.tga', sampler='repeated_mirror'

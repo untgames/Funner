@@ -9,8 +9,8 @@
     </layout>
   </layouts>
   <texmaps>
-    <texmap id="texmap1" image="test1.tga" sampler="repeated_mirror"/>
-    <texmap id="texmap2" image="test2.tga"/>
+    <texmap id="texmap1" image="test1.tga" sampler="repeated_mirror" semantic="diffuse"/>
+    <texmap id="texmap2" image="test2.tga" semantic="specular"/>
   </texmaps>
   <materials>
     <material id="material1" name="My material" program="blinn" tags="solid wireframe" layout="layout1">
@@ -18,7 +18,7 @@
       <property name="ClearColor" value="1 0 1 0"/>
       <property name="Direction">1 2 3 4 5 6 7 8</property>
       <property name="Effect" value="my_effect"/>
-      <texmap image="test3.tga" sampler="mirror"/>
+      <texmap image="test3.tga" sampler="mirror" semantic="diffuse"/>
       <instance_texmap source="texmap1"/>
     </material>
     <material id="material2" name="My material without layout" program="phong" tags="translucent">
@@ -26,7 +26,7 @@
       <property name="Direction" type="vector" count="2">8 7 6 5 4 3 2 1</property>
       <property name="Effect" type="string" value="my_effect1"/>
       <instance_texmap source="texmap1"/>
-      <texmap image="test4.tga" sampler="mirror"/>
+      <texmap image="test4.tga" sampler="mirror" semantic="diffuse"/>
     </material>
     <instance_material id="material3" source="material1"/>
     <material id="material4" name="My material 4" layout="layout1">

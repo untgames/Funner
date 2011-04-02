@@ -10,7 +10,7 @@ Results of xmtl_saver_test:
     </layout>
   </layouts>
   <texmaps>
-    <texmap id="texmap#1" image="test1.tga" sampler="repeated_mirror"/>
+    <texmap id="texmap#1" semantic="diffuse" image="test1.tga" sampler="repeated_mirror"/>
   </texmaps>
   <materials>
     <material id="material1" name="My material" program="blinn" tags="solid wireframe" layout="layout#1">
@@ -22,7 +22,7 @@ Results of xmtl_saver_test:
         1 2 3 4 5 6 7 8
       </property>
       <property name="Effect" value="my_effect"/>
-      <texmap image="test3.tga" sampler="mirror"/>
+      <texmap semantic="diffuse" image="test3.tga" sampler="mirror"/>
       <instance_texmap source="texmap#1"/>
     </material>
     <material id="material2" name="My material without layout" program="phong" tags="translucent">
@@ -32,7 +32,7 @@ Results of xmtl_saver_test:
       </property>
       <property name="Effect" type="string" value="my_effect1"/>
       <instance_texmap source="texmap#1"/>
-      <texmap image="test4.tga" sampler="mirror"/>
+      <texmap semantic="diffuse" image="test4.tga" sampler="mirror"/>
     </material>
     <material id="material4" name="My material 4" layout="layout#1">
       <property name="BlendEnable" value="0"/>
@@ -43,7 +43,7 @@ Results of xmtl_saver_test:
         1 2 3 4 5 6 7 8
       </property>
       <property name="Effect" value=""/>
-      <texmap image="test2.tga"/>
+      <texmap semantic="specular" image="test2.tga"/>
     </material>
     <instance_material id="material3" source="material1"/>
   </materials>

@@ -150,13 +150,15 @@ class XmtlLoader
     
     Texmap LoadTexmap (Parser::Iterator parse_iter)
     {
-      const char* image   = get<const char*> (*parse_iter, "image");
-      const char* sampler = get<const char*> (*parse_iter, "sampler", "");
-      
+      const char* image    = get<const char*> (*parse_iter, "image");
+      const char* semantic = get<const char*> (*parse_iter, "semantic");
+      const char* sampler  = get<const char*> (*parse_iter, "sampler", "");
+
       Texmap texmap;
-      
+
       texmap.SetImage (image);
       texmap.SetSampler (sampler);
+      texmap.SetSemantic (semantic);
       
       return texmap;
     }
@@ -344,10 +346,8 @@ class XmtlLoader
         else if (!xtl::xstrcmp (iter->Name (), "instance_texmap")) LoadMaterialInstanceTexmap (iter, texmap_cache);
       }
       
-      material.SetTexmapCount (texmap_cache.size ());
-      
       for (size_t i=0; i<texmap_cache.size (); i++)
-        material.Texmap (i) = texmap_cache [i];
+        material.AddTexmap (texmap_cache [i]);
 
       library.Attach (id, material);
     }

@@ -4,10 +4,10 @@ default constructor: material (name='', program='', , tags='')
   texmaps: 
 after change properties: material (name='material1', program='my_effect', , tags='')
   properties: String='Hello world', Integer=1, Float=(2.340, 4.560), Vector=[1.000 2.000 3.000 4.000]
-  texmaps: (image='image.png', sampler='')
+  texmaps: (semantic='diffuse', image='image.png', sampler='')
 clone affects: material (name='material1', program='my_effect', , tags='')
   properties: String='Hello world', Integer=1, Float=(2.340, 4.560), Vector=[1.000 2.000 3.000 4.000]
-  texmaps: (image='image.png', sampler='')
+  texmaps: (semantic='diffuse', image='image.png', sampler='')
 clone: material (name='material1', program='my_effect', , tags='')
   properties: String='Hello world', Integer=1, Float=(2.340, 4.560), Vector=[1.000 2.000 3.000 4.000], Matrix=[[3.000 0.000 0.000 0.000] [0.000 3.000 0.000 0.000] [0.000 0.000 3.000 0.000] [0.000 0.000 0.000 3.000]]
-  texmaps: (image='image.png', sampler='')
+  texmaps: (semantic='diffuse', image='image.png', sampler='')

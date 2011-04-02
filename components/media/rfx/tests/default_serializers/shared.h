@@ -96,7 +96,7 @@ void dump (const Material& material, const char* id)
   
   for (size_t i=0; i<material.TexmapCount (); i++)
   {
-    printf ("    image='%s', sampler='%s'\n", material.Texmap (i).Image (), material.Texmap (i).Sampler ());
+    printf ("    semantic='%s', image='%s', sampler='%s'\n", material.Texmap (i).Semantic (), material.Texmap (i).Image (), material.Texmap (i).Sampler ());
   }  
 }
 

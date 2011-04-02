@@ -20,10 +20,13 @@ int main ()
     material.SetProgram ("my_effect");
     material.SetName ("material1");
     
-    material.SetTexmapCount (1);
+    Texmap texmap;
     
-    material.Texmap (0).SetImage ("image.png");
+    texmap.SetImage ("image.png");
+    texmap.SetSemantic ("diffuse");
     
+    material.AddTexmap (texmap);
+
     dump ("after change properties", material);
     
     Material clone_material = material.Clone ();

@@ -108,7 +108,7 @@ void dump (const Material& material)
     if (i)
       printf (", ");
       
-    printf ("(image='%s', sampler='%s')", material.Texmap (i).Image (), material.Texmap (i).Sampler ());
+    printf ("(semantic='%s', image='%s', sampler='%s')", material.Texmap (i).Semantic (), material.Texmap (i).Image (), material.Texmap (i).Sampler ());
   }
 }
 

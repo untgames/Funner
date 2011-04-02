@@ -69,10 +69,13 @@ class Material
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Текстурные карты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-          void                SetTexmapCount (size_t count);
-          size_t              TexmapCount    () const;
-          media::rfx::Texmap& Texmap         (size_t index);
-    const media::rfx::Texmap& Texmap         (size_t index) const;    
+          size_t              TexmapCount      () const;
+          media::rfx::Texmap& Texmap           (size_t index);
+    const media::rfx::Texmap& Texmap           (size_t index) const;
+          void                SetTexmap        (size_t index, const media::rfx::Texmap& texmap);
+          size_t              AddTexmap        (const media::rfx::Texmap& texmap);
+          void                RemoveTexmap     (size_t index);
+          void                RemoveAllTexmaps ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен

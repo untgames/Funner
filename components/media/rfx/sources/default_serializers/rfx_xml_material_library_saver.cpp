@@ -183,6 +183,7 @@ class XmtlSaver
 ///Сохранение текстурной карты
     void SaveTexmap (const Texmap& texmap)
     {
+      writer.WriteAttribute ("semantic", texmap.Semantic ());
       writer.WriteAttribute ("image", texmap.Image ());
       
       if (*texmap.Sampler ())
