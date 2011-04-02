@@ -111,7 +111,7 @@ class RenderManager
 ///  захватывать, это может привести к циклической ссылке и к утечке ресурсов. “екстура всегда 
 /// освобождаетс€ при удалении объекта
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<IDynamicTexture* (size_t args_count, const char** args, Entity& entity)> DynamicTextureCreator;
+    typedef xtl::function<IDynamicTexture* (const char* name, Entity& entity)> DynamicTextureCreator;
 
     void RegisterDynamicTexture       (const char* name_mask, const DynamicTextureCreator& creator);
     void UnregisterDynamicTexture     (const char* name_mask);

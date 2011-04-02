@@ -4,7 +4,6 @@ using namespace render;
 using namespace render::low_level;
 
 //TODO: SetId - register as named material
-//TODO: dynamic texture
 
 namespace
 {
@@ -24,14 +23,16 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
   MaterialImpl&           material;              //обратная ссылка на материал
   TextureProxy            texture;               //прокси текстуры
   SamplerProxy            sampler;               //сэмплер текстуры
+  bool                    is_dynamic;            //является ли текстура динамической  
   TexturePtr              cached_texture;        //закэшированная текстура
   LowLevelSamplerStatePtr cached_sampler;        //закэшированный сэмплер
   LowLevelTexturePtr      cached_device_texture; //закэшированная текстура
   
-  Texmap (MaterialImpl& in_material, const TextureProxy& in_texture_proxy, const SamplerProxy& in_sampler_proxy)
+  Texmap (MaterialImpl& in_material, const TextureProxy& in_texture_proxy, const SamplerProxy& in_sampler_proxy, bool in_is_dynamic)
     : material (in_material)
     , texture (in_texture_proxy)
     , sampler (in_sampler_proxy)
+    , is_dynamic (in_is_dynamic)
   {
     material.AttachCacheSource (*this);
     
@@ -50,9 +51,7 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
   {
     try
     {
-      //TODO: dynamic texture
-      
-      cached_texture        = texture.Resource ();
+      cached_texture        = is_dynamic ? TexturePtr () : texture.Resource ();
       cached_device_texture = cached_texture ? cached_texture->DeviceTexture () : LowLevelTexturePtr (); 
       cached_sampler        = sampler.Resource ();
     }
@@ -96,14 +95,7 @@ struct MaterialImpl::Impl: public CacheHolder
     , program (shading_manager->GetProgramProxy (DEFAULT_PROGRAM_NAME))
     , properties (in_device_manager)
   {
-    AttachCacheSource (properties);
-    
-    StateBlockMask mask;
-    
-    mask.ss_program                                           = true;
-    mask.ss_constant_buffers [ProgramParametersSlot_Material] = true;
-    
-    cached_state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);
+    AttachCacheSource (properties);    
   }
   
 ///Работа с кэшем
@@ -120,8 +112,36 @@ struct MaterialImpl::Impl: public CacheHolder
       cached_program    = program.Resource ();
       cached_properties = properties.Buffer ();
       
-      device_manager->Device ().SSSetProgram (cached_program.get ());
-      device_manager->Device ().SSSetConstantBuffer (ProgramParametersSlot_Material, cached_properties.get ());
+      render::low_level::IDevice& device = device_manager->Device ();
+      
+      device.SSSetProgram (cached_program.get ());
+      device.SSSetConstantBuffer (ProgramParametersSlot_Material, cached_properties.get ());
+      
+      if (!cached_state_block)
+      {
+        StateBlockMask mask;
+        
+        mask.ss_program                                           = true;
+        mask.ss_constant_buffers [ProgramParametersSlot_Material] = true;
+        
+        cached_state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);        
+        
+        for (size_t i=0, count=stl::min (texmaps.size (), DEVICE_SAMPLER_SLOTS_COUNT); i<count; i++)
+        {
+          Texmap& texmap = *texmaps [i];
+            
+          texmap.UpdateCache ();
+
+          if (texmap.cached_device_texture)
+          {
+            device.SSSetTexture (i, texmap.cached_device_texture.get ());
+            
+            mask.ss_textures [i] = true;
+          }
+        }
+          
+        cached_state_block = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
+      }
       
       cached_state_block->Capture ();
     }
@@ -167,17 +187,6 @@ void MaterialImpl::SetId (const char* id)
 }
 
 /*
-    Программа
-*/
-
-LowLevelProgramPtr MaterialImpl::Program ()
-{
-  impl->UpdateCache ();
-  
-  return impl->cached_program;
-}
-
-/*
     Блок состояний материала
 */
 
@@ -186,15 +195,6 @@ LowLevelStateBlockPtr MaterialImpl::StateBlock ()
   impl->UpdateCache ();
   
   return impl->cached_state_block;
-}
-
-/*
-    Константный буфер материала
-*/
-
-LowLevelBufferPtr MaterialImpl::ConstantBuffer ()
-{
-  return impl->properties.Buffer ();
 }
 
 /*
@@ -224,7 +224,7 @@ LowLevelTexturePtr MaterialImpl::DeviceTexture (size_t index)
     throw xtl::make_range_exception ("render::MaterialImpl::DeviceTexture", "index", index, impl->texmaps.size ());
     
   Texmap& texmap = *impl->texmaps [index];
-  
+    
   texmap.UpdateCache ();
   
   return texmap.cached_device_texture;
@@ -261,15 +261,16 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     common::PropertyMap new_properties = material.Properties ().Clone ();
     
     TexmapArray new_texmaps;
-    
+
     new_texmaps.reserve (material.TexmapCount ());
     
     for (size_t i=0, count=material.TexmapCount (); i<count; i++)
     {
       const media::rfx::Texmap& texmap = material.Texmap (i);
-      
-      TexmapPtr new_texmap (new Texmap (*this, impl->texture_manager->GetTextureProxy (texmap.Image ()), impl->texture_manager->GetSamplerProxy (texmap.Sampler ())), false);
-      
+
+      TexmapPtr new_texmap (new Texmap (*this, impl->texture_manager->GetTextureProxy (texmap.Image ()),
+        impl->texture_manager->GetSamplerProxy (texmap.Sampler ()), impl->texture_manager->IsDynamicTexture (texmap.Image ())), false);
+
       new_texmaps.push_back (new_texmap);
     }    
     
@@ -284,6 +285,8 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     impl->properties.SetProperties (new_properties);
     
     impl->texmaps.swap (new_texmaps);
+    
+    impl->cached_state_block = LowLevelStateBlockPtr ();
     
     Invalidate ();
   }

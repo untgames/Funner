@@ -53,6 +53,7 @@ class TextureManager: public Object
     void RegisterDynamicTexture       (const char* name_mask, const DynamicTextureCreator& creator);
     void UnregisterDynamicTexture     (const char* name_mask);
     void UnregisterAllDynamicTextures ();
+    bool IsDynamicTexture             (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка текстуры по умолчанию / сэмплера по умолчанию

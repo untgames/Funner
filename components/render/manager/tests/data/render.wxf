@@ -142,23 +142,15 @@ sampler "repeat"
 }
 
 //program instance for phong program, specified by (material, entity, frame)
-shading "phong"
+program "phong"
 {
   profile "glsl"       //shading profile
   shader  "phong.vert" //reference to shader source. TODO: add compile options
   shader  "phong.frag" //reference to shader source
-  
-    //TODO: sampler channel ID
-  texmap  "diffuse"    //from material (static)
-  texmap  "normal"     //from material (static)
-  texmap  "specular"   //from material (static)
-  texmap  "ambient"    //from material (static)
-  texmap  "shadow"     //from frame (dynamic)
-  texmap  "reflect"    //from entity (dynamic, cached in entity)
 }
 
 //shading instance for rendering shadow maps
-shading "shadow_map"
+program "shadow_map"
 {
   profile "glsl"        //shading profile
   shader  "shadow.vert" //reference to shader source. TODO: add compile options
@@ -166,7 +158,7 @@ shading "shadow_map"
 }
 
 //shading instance for rendering helper geometry
-shading "helper"
+program "helper"
 {
   profile "glsl"        //shading profile
   shader  "helper.vert" //reference to shader source. TODO: add compile options
@@ -190,7 +182,7 @@ frame "main"
       depth_stencil_target  "shadow_map"  //render target for depth stencil buffer
       depth_stencil_state   "solid"       //depth stencil stage settings
       rasterizer_state      "default"     //rasterizer stage settings
-      shading_stage         "shadow_map"  //????????????
+      program               "shadow_map"  //this program overrides material programs
     }
   }
   
@@ -220,7 +212,6 @@ frame "main"
       blend_state           "solid"                       //use blend stage settings for solid geometry
       depth_stencil_state   "solid"                       //use depth stencil stage settings for solid geometry
       rasterizer_state      "default"                     //use default rasterizer
-      shading_state         "phong"                       //?????????????
     }
     
     //render transparent geometry
@@ -233,7 +224,6 @@ frame "main"
       blend_state           "transparent"                 //use blend stage settings for transaparent geometry
       depth_stencil_state   "ztest_without_write"         //use depth stencil stage settings for transaparent geometry
       rasterizer_state      "default"                     //use default rasterizer
-      shading_state         "phong"                       //??????????????
     }
   }
   
@@ -270,6 +260,6 @@ frame "main"
     blend_state           "solid"                       //use blend stage settings for solid geometry
     depth_stencil_state   "solid"                       //use depth stencil stage settings for solid geometry
     rasterizer_state      "wireframe"                   //use rasterizer for helpers
-    shading_state         "helper"                      //?????????????  
+    program               "helper"                      //this program overrides material programs
   }
 }

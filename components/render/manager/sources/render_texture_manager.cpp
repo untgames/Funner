@@ -2,6 +2,37 @@
 
 using namespace render;
 
+namespace
+{
+
+/*
+    Константы
+*/
+
+const char*  DYNAMIC_TEXTURE_NAME_PREFIX        = "dynamic:";
+const size_t DYNAMIC_TEXTURE_NAME_PREFIX_LENGTH = strlen (DYNAMIC_TEXTURE_NAME_PREFIX);
+
+/*
+    Описание динамической текстуры
+*/
+
+struct DynamicTextureDesc: public xtl::reference_counter
+{
+  stl::string                           name_mask; //маска имени
+  TextureManager::DynamicTextureCreator creator;   //функтор создания текстуры
+  
+  DynamicTextureDesc (const char* in_name_mask, const TextureManager::DynamicTextureCreator& in_creator)
+    : name_mask (in_name_mask)
+    , creator (in_creator)
+  {
+  }
+};
+
+typedef xtl::intrusive_ptr<DynamicTextureDesc> DynamicTextureDescPtr;
+typedef stl::list<DynamicTextureDescPtr>       DynamicTextureDescList;
+
+}
+
 /*
     Описание реализации менеджера текстур
 */
@@ -10,11 +41,12 @@ typedef stl::hash_map<stl::hash_key<const char*>, TextureProxy> ProxyMap;
 
 struct TextureManager::Impl
 {
-  DeviceManagerPtr    device_manager;        //менеджер устройства отрисовки
-  TextureProxyManager texture_proxy_manager; //менеджер прокси текстур
-  SamplerProxyManager sampler_proxy_manager; //менеджер прокси сэмплеров
-  ProxyMap            loaded_textures;       //загруженные текстуры
-  Log                 log;                   //протокол сообщений  
+  DeviceManagerPtr       device_manager;        //менеджер устройства отрисовки
+  TextureProxyManager    texture_proxy_manager; //менеджер прокси текстур
+  SamplerProxyManager    sampler_proxy_manager; //менеджер прокси сэмплеров
+  ProxyMap               loaded_textures;       //загруженные текстуры
+  DynamicTextureDescList dynamic_texture_descs; //реестр дескрипторов динамических текстур  
+  Log                    log;                   //протокол сообщений  
   
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
@@ -212,6 +244,79 @@ TexturePtr TextureManager::FindTexture (const char* name)
 LowLevelSamplerStatePtr TextureManager::FindSampler (const char* name)
 {
   return impl->sampler_proxy_manager.FindResource (name);
+}
+
+/*
+    Создание динамической текстуры
+*/
+
+DynamicTexturePtr TextureManager::CreateDynamicTexture (const char* name, const EntityPtr& entity)
+{
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+
+    if (!entity)
+      throw xtl::make_null_argument_exception ("", "entity");
+    
+    for (DynamicTextureDescList::iterator iter=impl->dynamic_texture_descs.begin (), end=impl->dynamic_texture_descs.end (); iter!=end; ++iter)
+      if (common::wcmatch (name, (*iter)->name_mask.c_str ()))        
+        return DynamicTexturePtr (new DynamicTextureImpl (name, entity, (*iter)->creator), false);
+
+    throw xtl::make_argument_exception ("", "Dynamic texture creator for '%s' not registered", name);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch (name ? "render::TextureManager::CreateDynamicTexture('%s')" : "render::TextureManager::CreateDynamicTexture", name);
+    throw;
+  }
+}
+
+/*
+    Регистрация динамических текстур
+*/
+
+void TextureManager::RegisterDynamicTexture (const char* name_mask, const DynamicTextureCreator& creator)
+{
+  static const char* METHOD_NAME = "render::TextureManager::RegisterDynamicTexture";
+
+  if (!name_mask)
+    throw xtl::make_argument_exception (METHOD_NAME, "name_mask");
+    
+  impl->dynamic_texture_descs.push_back (DynamicTextureDescPtr (new DynamicTextureDesc (name_mask, creator), false));  
+}
+
+void TextureManager::UnregisterDynamicTexture (const char* name_mask)
+{
+  if (!name_mask)
+    return;
+    
+  for (DynamicTextureDescList::iterator iter=impl->dynamic_texture_descs.begin (), end=impl->dynamic_texture_descs.end (); iter!=end;)
+    if (name_mask == (*iter)->name_mask)
+    {
+      DynamicTextureDescList::iterator next = iter;
+      
+      ++next;
+      
+      impl->dynamic_texture_descs.erase (iter);
+      
+      iter = next;
+    }
+    else ++iter;
+}
+
+void TextureManager::UnregisterAllDynamicTextures ()
+{
+  impl->dynamic_texture_descs.clear ();
+}
+
+bool TextureManager::IsDynamicTexture (const char* name)
+{
+  if (!name)
+    return false;
+  
+  return strncmp (name, DYNAMIC_TEXTURE_NAME_PREFIX, DYNAMIC_TEXTURE_NAME_PREFIX_LENGTH) == 0;
 }
 
 /*
