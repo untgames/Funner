@@ -43,6 +43,7 @@ class PrimitiveManager;
 class TextureManager;
 class EffectPass;
 class EffectFrame;
+class EffectRenderer;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
@@ -51,6 +52,7 @@ typedef xtl::intrusive_ptr<DeviceManager>        DeviceManagerPtr;
 typedef xtl::intrusive_ptr<DynamicTextureImpl>   DynamicTexturePtr;
 typedef xtl::intrusive_ptr<EffectPass>           EffectPassPtr;
 typedef xtl::intrusive_ptr<EffectFrame>          EffectFramePtr;
+typedef xtl::intrusive_ptr<EffectRenderer>       EffectRendererPtr;
 typedef xtl::intrusive_ptr<EntityImpl>           EntityPtr;
 typedef xtl::intrusive_ptr<FrameImpl>            FramePtr;
 typedef xtl::intrusive_ptr<MaterialImpl>         MaterialPtr;
