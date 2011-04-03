@@ -76,16 +76,17 @@ typedef stl::vector<TexmapPtr>     TexmapArray;
 
 struct MaterialImpl::Impl: public CacheHolder
 {
-  DeviceManagerPtr      device_manager;     //менеджер устройства отрисовки
-  TextureManagerPtr     texture_manager;    //менеджер текстур
-  ShadingManagerPtr     shading_manager;    //менеджер шэйдинга
-  stl::string           id;                 //идентификатор материала
-  ProgramProxy          program;            //прокси программы
-  PropertyBuffer        properties;         //свойства материала
-  TexmapArray           texmaps;            //текстурные карты
-  LowLevelProgramPtr    cached_program;     //закэшированная программа
-  LowLevelBufferPtr     cached_properties;  //закэшированный буфер констант
-  LowLevelStateBlockPtr cached_state_block; //закэшированный блок состояний
+  DeviceManagerPtr      device_manager;       //менеджер устройства отрисовки
+  TextureManagerPtr     texture_manager;      //менеджер текстур
+  ShadingManagerPtr     shading_manager;      //менеджер шэйдинга
+  stl::string           id;                   //идентификатор материала
+  ProgramProxy          program;              //прокси программы
+  PropertyBuffer        properties;           //свойства материала
+  TexmapArray           texmaps;              //текстурные карты
+  bool                  has_dynamic_textures; //есть ли в материале динамические текстуры
+  LowLevelProgramPtr    cached_program;       //закэшированная программа
+  LowLevelBufferPtr     cached_properties;    //закэшированный буфер констант
+  LowLevelStateBlockPtr cached_state_block;   //закэшированный блок состояний
   
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ShadingManagerPtr& in_shading_manager)
@@ -94,6 +95,7 @@ struct MaterialImpl::Impl: public CacheHolder
     , shading_manager (in_shading_manager)
     , program (shading_manager->GetProgramProxy (DEFAULT_PROGRAM_NAME))
     , properties (in_device_manager)
+    , has_dynamic_textures (false)
   {
     AttachCacheSource (properties);    
   }
@@ -255,6 +257,15 @@ LowLevelSamplerStatePtr MaterialImpl::Sampler (size_t index)
 }
 
 /*
+    Есть ли в материале динамические текстуры
+*/
+
+bool MaterialImpl::HasDynamicTextures ()
+{
+  return impl->has_dynamic_textures;
+}
+
+/*
     Обновление материала
 */
 
@@ -268,12 +279,19 @@ void MaterialImpl::Update (const media::rfx::Material& material)
 
     new_texmaps.reserve (material.TexmapCount ());
     
+    bool new_has_dynamic_textures = false;
+    
     for (size_t i=0, count=material.TexmapCount (); i<count; i++)
     {
       const media::rfx::Texmap& texmap = material.Texmap (i);
+      
+      bool is_dynamic_image = impl->texture_manager->IsDynamicTexture (texmap.Image ());
 
+      if (is_dynamic_image)
+        new_has_dynamic_textures = true;
+      
       TexmapPtr new_texmap (new Texmap (*this, impl->texture_manager->GetTextureProxy (texmap.Image ()),
-        impl->texture_manager->GetSamplerProxy (texmap.Sampler ()), impl->texture_manager->IsDynamicTexture (texmap.Image ())), false);
+        impl->texture_manager->GetSamplerProxy (texmap.Sampler ()), is_dynamic_image), false);
 
       new_texmaps.push_back (new_texmap);
     }    
@@ -290,7 +308,8 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     
     impl->texmaps.swap (new_texmaps);
     
-    impl->cached_state_block = LowLevelStateBlockPtr ();
+    impl->cached_state_block   = LowLevelStateBlockPtr ();
+    impl->has_dynamic_textures = new_has_dynamic_textures;
     
     Invalidate ();
   }

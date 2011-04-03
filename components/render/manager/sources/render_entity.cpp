@@ -28,6 +28,11 @@ class EntityLodCommonData: public CacheHolder
       , texture_manager (in_texture_manager)
       , properties (in_device_manager)
     {
+      StateBlockMask mask;
+      
+      mask.ss_constant_buffers [ProgramParametersSlot_Entity] = true;
+      
+      default_state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);
     }
     
 ///Обратная ссылка на объекта
@@ -41,6 +46,9 @@ class EntityLodCommonData: public CacheHolder
     
 ///Свойства объекта
     PropertyBuffer& Properties () { return properties; }
+    
+///Динамические текстуры
+    DynamicTextureEntityStorage& DynamicTextures () { return dynamic_textures; }
     
 ///Поиск состояния
     LowLevelStateBlockPtr FindStateBlock (MaterialImpl* material)
@@ -59,12 +67,21 @@ class EntityLodCommonData: public CacheHolder
     
     LowLevelStateBlockPtr GetStateBlock (MaterialImpl* material)
     {
-        //TODO: optimized path for static materials !!!
+      if (!material)
+        return LowLevelStateBlockPtr ();
       
       LowLevelStateBlockPtr result = FindStateBlock (material);
       
       if (result)
         return result;
+        
+      if (!material->HasDynamicTextures ())
+      {
+        if (properties.Properties ().Size () == 0)
+          return LowLevelStateBlockPtr ();
+          
+        return default_state_block;
+      }
         
       StatePtr state (new MaterialState (*this, material), false);
       
@@ -91,6 +108,30 @@ class EntityLodCommonData: public CacheHolder
         }
         else ++iter;
     }
+    
+///Работа с кэшем
+    void ResetCacheCore ()
+    {
+    }
+    
+    void UpdateCacheCore ()
+    {
+      try
+      {
+        FlushUnusedMaterials ();
+
+        dynamic_textures.FlushUnusedTextures ();
+        
+        device_manager->Device ().SSSetConstantBuffer (ProgramParametersSlot_Entity, properties.Buffer ().get ());
+        
+        default_state_block->Capture ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("render::EntityLodCommonData::Impl::UpdateCacheCore");
+        throw;
+      }
+    }    
     
   private:
     struct MaterialState: public xtl::reference_counter, public CacheHolder
@@ -162,11 +203,13 @@ class EntityLodCommonData: public CacheHolder
     typedef stl::hash_map<MaterialImpl*, StatePtr> StateMap;
 
   private:  
-    EntityImpl&       entity;          //обратная ссылка на объект
-    DeviceManagerPtr  device_manager;  //менеджер устройства отрисовки
-    TextureManagerPtr texture_manager; //менеджер текстур
-    PropertyBuffer    properties;      //свойства рендеринга  
-    StateMap          states;          //карта состояний
+    EntityImpl&                 entity;              //обратная ссылка на объект
+    DeviceManagerPtr            device_manager;      //менеджер устройства отрисовки
+    TextureManagerPtr           texture_manager;     //менеджер текстур
+    PropertyBuffer              properties;          //свойства рендеринга
+    StateMap                    states;              //карта состояний
+    DynamicTextureEntityStorage dynamic_textures;    //хранилище динамических текстур объекта рендеринга    
+    LowLevelStateBlockPtr       default_state_block; //блок состояний по умолчанию
 };
 
 /*
@@ -302,11 +345,10 @@ struct EntityLodLess
 
 struct EntityImpl::Impl: public EntityLodCommonData
 {
-  math::mat4f                 transformation;    //матрица преобразований
-  EntityLodArray              lods;              //уровни детализации
-  bool                        need_resort;       //уровни детализации требуют пересортировки
-  PrimitiveManagerPtr         primitive_manager; //менеджер примитивов
-  DynamicTextureEntityStorage dynamic_textures;  //хранилище динамических текстур объекта рендеринга
+  math::mat4f         transformation;    //матрица преобразований
+  EntityLodArray      lods;              //уровни детализации
+  bool                need_resort;       //уровни детализации требуют пересортировки
+  PrimitiveManagerPtr primitive_manager; //менеджер примитивов
 
 ///Конструктор
   Impl (EntityImpl& owner, const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const PrimitiveManagerPtr& in_primitive_manager)
@@ -342,26 +384,7 @@ struct EntityImpl::Impl: public EntityLodCommonData
     int index = FindLodIndex (level_of_detail, find_nearest);
     
     return index != -1 ? lods [index] : EntityLodPtr ();
-  }
-  
-///Работа с кэшем
-  void ResetCacheCore ()
-  {
-  }
-  
-  void UpdateCacheCore ()
-  {
-    try
-    {
-      FlushUnusedMaterials ();
-      dynamic_textures.FlushUnusedTextures ();
-    }
-    catch (xtl::exception& e)
-    {
-      e.touch ("render::EntityImpl::Impl::UpdateCacheCore");
-      throw;
-    }
-  }
+  }  
   
   using CacheHolder::UpdateCache;
 };
@@ -402,7 +425,7 @@ EntityImpl::~EntityImpl ()
 
 DynamicTextureEntityStorage& EntityImpl::DynamicTextureStorage ()
 {
-  return impl->dynamic_textures;
+  return impl->DynamicTextures ();
 }
 
 /*
