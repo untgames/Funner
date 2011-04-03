@@ -97,7 +97,7 @@ class ShapeImplProvider
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static Shape CreateShape (ShapePtr shape);
     static Shape CreateShape (ShapePtr shape, const ShapeList& shape_list);
-    static Shape CreateShape (physics::low_level::IDriver* driver, const media::physics::Shape& shape);
+    static Shape CreateShape (physics::low_level::IDriver* driver, const media::physics::Shape& shape, const math::vec3f& scale);
     static Shape CreateShape (physics::low_level::IDriver* driver, const ShapeList& shape_list);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ class ShapeImplProvider
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    static Shape CreateShapeCore     (physics::low_level::IDriver* driver, const media::physics::Shape& shape);
+    static Shape CreateShapeCore (physics::low_level::IDriver* driver, const media::physics::Shape& shape, const math::vec3f& scale);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

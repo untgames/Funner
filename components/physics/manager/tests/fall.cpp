@@ -17,19 +17,25 @@ int main ()
     printf ("Default scene gravity = %.2f; %.2f; %.2f \n", default_gravity.x, default_gravity.y, default_gravity.z);
     printf ("Default scene simulation step = %.3f\n", scene->SimulationStep ());
 
-    Shape sphere_shape (manager.CreateSphereShape (1.f));
+    media::physics::Shape          media_shape;
+    media::physics::shapes::Sphere media_shape_data (1.f);
 
-    RigidBody static_body        (scene->CreateRigidBody (sphere_shape, 0)),
-              light_falling_body (scene->CreateRigidBody (sphere_shape, 1)),
-              heavy_falling_body (scene->CreateRigidBody (sphere_shape, 5));
+    media_shape.SetData (media_shape_data);
+
+    Shape sphere_shape (manager.CreateSphereShape (1.f)), scaled_sphere_shape (manager.CreateShape (media_shape, 2.f));
+
+    RigidBody static_body         (scene->CreateRigidBody (sphere_shape, 0)),
+              light_falling_body  (scene->CreateRigidBody (sphere_shape, 1)),
+              scaled_falling_body (scene->CreateRigidBody (scaled_sphere_shape, 1)),
+              heavy_falling_body  (scene->CreateRigidBody (sphere_shape, 5));
 
     Transform body_transform;
 
-    body_transform.position.x = -10;
+    body_transform.position.x = -5;
 
     light_falling_body.SetWorldTransform (body_transform);
 
-    body_transform.position.x = 10;
+    body_transform.position.x = 5;
 
     heavy_falling_body.SetWorldTransform (body_transform);
 
@@ -87,6 +93,8 @@ int main ()
       dump_body_position (ground_plane);
       printf ("light falling body state:\n");
       dump_body_position (light_falling_body);
+      printf ("scaled falling body state:\n");
+      dump_body_position (scaled_falling_body);
       printf ("heavy falling body state:\n");
       dump_body_position (heavy_falling_body);
     }
@@ -97,6 +105,8 @@ int main ()
 
     printf ("light falling body state:\n");
     dump_body_position (light_falling_body);
+    printf ("scaled falling body state:\n");
+    dump_body_position (scaled_falling_body);
     printf ("heavy falling body state:\n");
     dump_body_position (heavy_falling_body);
 

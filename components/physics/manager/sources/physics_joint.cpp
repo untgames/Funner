@@ -59,6 +59,15 @@ Joint& Joint::operator = (const Joint& source)
 }
 
 /*
+   Идентификатор
+*/
+
+size_t Joint::Id () const
+{
+  return (size_t)impl;
+}
+
+/*
    Получение соединенных тел
 */
 

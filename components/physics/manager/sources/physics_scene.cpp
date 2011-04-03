@@ -207,7 +207,7 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     return return_value;
   }
 
-  RigidBody CreateRigidBody (const char* name)
+  RigidBody CreateRigidBody (const char* name, const math::vec3f& scale)
   {
     try
     {
@@ -216,7 +216,7 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
       if (!media_body)
         throw xtl::format_operation_exception ("", "Body '%s' was not loaded", name);
 
-      Shape        shape        (ShapeImplProvider::CreateShape (driver.get (), media_body->Shape ()));
+      Shape        shape        (ShapeImplProvider::CreateShape (driver.get (), media_body->Shape (), scale));
       RigidBodyPtr body         (scene->CreateRigidBody (ShapeImplProvider::LowLevelShape (shape), media_body->Mass ()), false);
       Material     material     (MaterialImplProvider::CreateMaterial (driver.get (), media_body->Material ()));
       RigidBody    return_value (CreateRigidBody (body, shape, material));
@@ -604,12 +604,21 @@ Scene& Scene::operator = (const Scene& source)
 }
 
 /*
+   Идентификатор
+*/
+
+size_t Scene::Id () const
+{
+  return (size_t)impl;
+}
+
+/*
    Создание тел
 */
 
-RigidBody Scene::CreateRigidBody (const char* name)
+RigidBody Scene::CreateRigidBody (const char* name, const math::vec3f& scale)
 {
-  return impl->CreateRigidBody (name);
+  return impl->CreateRigidBody (name, scale);
 }
 
 RigidBody Scene::CreateRigidBody (const Shape& shape, float mass)

@@ -51,8 +51,8 @@ class PhysicsManager
     Shape    CreateCapsuleShape  (float radius, float height);
     Shape    CreatePlaneShape    (const math::vec3f& normal, float d);
     Shape    CreateCompoundShape (const ShapeList&);
-    Shape    CreateShape         (const media::physics::Shape&);
-    Shape    CreateShape         (const char* name);
+    Shape    CreateShape         (const media::physics::Shape&, const math::vec3f& scale = 1.f);
+    Shape    CreateShape         (const char* name, const math::vec3f& scale = 1.f);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Загрузка / выгрузка ресурсов

@@ -17,12 +17,12 @@ Initial light falling body state:
   angular sleeping threshold = 1.00
   ccd motion threshold = 0.00
 Body world transform:
-  position = -10; 0; 0
+  position = -5; 0; 0
   orientation = 0.0; 0.0; 0.0; 1.0
 Initial heavy falling body state:
   mass = 5.00
 Body world transform:
-  position = 10; 0; 0
+  position = 5; 0; 0
   orientation = 0.0; 0.0; 0.0; 1.0
 Simulating one second
 static body state:
@@ -33,12 +33,12 @@ Body world transform:
 light falling body state:
   mass = 1.00
 Body world transform:
-  position = -10; -4; 0
-  orientation = 0.0; 0.0; 0.0; 1.0
+  position = -23; -4; 0
+  orientation = 0.0; 0.0; 0.0; 0.9
 heavy falling body state:
   mass = 5.00
 Body world transform:
-  position = 10; -4; 0
+  position = 5; -4; 0
   orientation = 0.0; 0.0; 0.0; 1.0
 ground plane state:
   mass = 0.00
@@ -52,18 +52,26 @@ Body world transform:
   orientation = 0.0; 0.0; 0.0; 1.0
 light falling body state:
 Body world transform:
-  position = -10; -14; 0
-  orientation = 0.0; 0.0; 0.0; 1.0
+  position = -42; -14; 0
+  orientation = 0.0; 0.0; 0.6; 0.7
+scaled falling body state:
+Body world transform:
+  position = -31; -13; 0
+  orientation = 0.0; 0.0; 0.9; 0.4
 heavy falling body state:
 Body world transform:
-  position = 10; -14; 0
+  position = 5; -14; 0
   orientation = 0.0; 0.0; 0.0; 1.0
 Simulating one second after deleting ground
 light falling body state:
 Body world transform:
-  position = -10; -18; 0
-  orientation = 0.0; 0.0; 0.0; 1.0
+  position = -58; -18; 0
+  orientation = 0.0; 0.0; 0.0; 0.9
+scaled falling body state:
+Body world transform:
+  position = -43; -17; 0
+  orientation = 0.0; 0.0; 0.8; 0.4
 heavy falling body state:
 Body world transform:
-  position = 10; -18; 0
+  position = 5; -18; 0
   orientation = 0.0; 0.0; 0.0; 1.0

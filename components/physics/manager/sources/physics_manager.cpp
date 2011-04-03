@@ -154,11 +154,11 @@ Shape PhysicsManager::CreateCompoundShape (const ShapeList& shape_list)
   }
 }
 
-Shape PhysicsManager::CreateShape (const media::physics::Shape& shape)
+Shape PhysicsManager::CreateShape (const media::physics::Shape& shape, const math::vec3f& scale)
 {
   try
   {
-    return ShapeImplProvider::CreateShape (impl->driver.get (), shape);
+    return ShapeImplProvider::CreateShape (impl->driver.get (), shape, scale);
   }
   catch (xtl::exception& e)
   {
@@ -167,7 +167,7 @@ Shape PhysicsManager::CreateShape (const media::physics::Shape& shape)
   }
 }
 
-Shape PhysicsManager::CreateShape (const char* name)
+Shape PhysicsManager::CreateShape (const char* name, const math::vec3f& scale)
 {
   try
   {
@@ -176,7 +176,7 @@ Shape PhysicsManager::CreateShape (const char* name)
     if (!media_shape)
       throw xtl::format_operation_exception ("", "Shape '%s' was not loaded", name);
 
-    return CreateShape (*media_shape);
+    return CreateShape (*media_shape, scale);
   }
   catch (xtl::exception& e)
   {

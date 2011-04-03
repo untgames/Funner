@@ -10,6 +10,7 @@
 #include <xtl/connection.h>
 #include <xtl/function.h>
 
+#include <media/physics/basic_shapes.h>
 #include <media/physics/shape.h>
 #include <media/physics/triangle_mesh.h>
 

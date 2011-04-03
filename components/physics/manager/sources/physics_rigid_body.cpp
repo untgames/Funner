@@ -200,7 +200,16 @@ RigidBody& RigidBody::operator = (const RigidBody& source)
 
   return *this;
 }
-    
+
+/*
+   Идентификатор
+*/
+
+size_t RigidBody::Id () const
+{
+  return (size_t)impl;
+}
+
 /*
    Масса
 */

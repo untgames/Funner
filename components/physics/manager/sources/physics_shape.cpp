@@ -47,6 +47,15 @@ Shape& Shape::operator = (const Shape& source)
 }
 
 /*
+   Идентификатор
+*/
+
+size_t Shape::Id () const
+{
+  return (size_t)impl;
+}
+
+/*
    Толщина полей
 */
 
@@ -97,12 +106,12 @@ Shape ShapeImplProvider::CreateShape (ShapePtr shape, const ShapeList& shape_lis
   return Shape (new Shape::Impl (shape, shape_list));
 }
 
-Shape ShapeImplProvider::CreateShape (physics::low_level::IDriver* driver, const media::physics::Shape& shape)
+Shape ShapeImplProvider::CreateShape (physics::low_level::IDriver* driver, const media::physics::Shape& shape, const math::vec3f& scale)
 {
   if (!driver)
     throw xtl::make_null_argument_exception ("physics::low_level::IDriver*, const media::physics::Shape&", "driver");
 
-  Shape return_value (CreateShapeCore (driver, shape));
+  Shape return_value (CreateShapeCore (driver, shape, scale));
 
   return_value.SetMargin (shape.Margin ());
 
@@ -131,30 +140,44 @@ Shape ShapeImplProvider::CreateShape (physics::low_level::IDriver* driver, const
   return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateCompoundShape (shapes_count, shapes.data (), transforms.data ()), false), shape_list);
 }
 
-Shape ShapeImplProvider::CreateShapeCore (physics::low_level::IDriver* driver, const media::physics::Shape& shape)
+Shape ShapeImplProvider::CreateShapeCore (physics::low_level::IDriver* driver, const media::physics::Shape& shape, const math::vec3f& scale)
 {
   static const char* METHOD_NAME = "physics::ShapeImplProvider::CreateShapeCore";
 
   switch (shape.Type ())
   {
     case media::physics::ShapeType_Box:
-      return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateBoxShape (shape.Data<media::physics::shapes::Box> ().half_dimensions), false));
+      return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateBoxShape (shape.Data<media::physics::shapes::Box> ().half_dimensions * scale), false));
     case media::physics::ShapeType_Sphere:
-      return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateSphereShape (shape.Data<media::physics::shapes::Sphere> ().radius), false));
+    {
+      if (scale.x != scale.y || scale.x != scale.z || scale.y != scale.z)
+        throw xtl::format_operation_exception (METHOD_NAME, "Scaled sphere shape can be created only with equal scale on all axises");
+
+      return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateSphereShape (shape.Data<media::physics::shapes::Sphere> ().radius * scale.x), false));
+    }
     case media::physics::ShapeType_Capsule:
     {
+      if (scale.x != scale.y || scale.x != scale.z || scale.y != scale.z)
+        throw xtl::format_operation_exception (METHOD_NAME, "Scaled capsule shape can be created only with equal scale on all axises");
+
       media::physics::shapes::Capsule shape_data = shape.Data<media::physics::shapes::Capsule> ();
 
-      return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateCapsuleShape (shape_data.radius, shape_data.height), false));
+      return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateCapsuleShape (shape_data.radius * scale.x, shape_data.height * scale.y), false));
     }
     case media::physics::ShapeType_Plane:
     {
+      if (!math::equal (scale, math::vec3f (1.f), 0.f))
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't create scaled plane shape");
+
       media::physics::shapes::Plane shape_data = shape.Data<media::physics::shapes::Plane> ();
 
       return ShapeImplProvider::CreateShape (ShapePtr (driver->CreatePlaneShape (shape_data.normal, shape_data.d), false));
     }
     case media::physics::ShapeType_TriangleMesh:
     {
+      if (!math::equal (scale, math::vec3f (1.f), 0.f))
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't create scaled mesh shape");
+
       media::physics::shapes::TriangleMesh shape_data = shape.Data<media::physics::shapes::TriangleMesh> ();
 
       if (shape_data.IsConvex ())
@@ -165,6 +188,9 @@ Shape ShapeImplProvider::CreateShapeCore (physics::low_level::IDriver* driver, c
     }
     case media::physics::ShapeType_Compound:
     {
+      if (!math::equal (scale, math::vec3f (1.f), 0.f))
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't create scaled compound shape");
+
       media::physics::shapes::Compound shape_data = shape.Data<media::physics::shapes::Compound> ();
 
       ShapeList shape_list;
@@ -173,7 +199,7 @@ Shape ShapeImplProvider::CreateShapeCore (physics::low_level::IDriver* driver, c
       {
         const media::physics::shapes::Compound::ShapeTransform& transform = shape_data.Transform (i);
 
-        shape_list.Add (CreateShapeCore (driver, shape_data.Shape (i)), transform.position, transform.orientation);
+        shape_list.Add (CreateShapeCore (driver, shape_data.Shape (i), 1.f), transform.position, transform.orientation);
       }
 
       return CreateShape (driver, shape_list);

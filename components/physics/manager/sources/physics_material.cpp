@@ -70,7 +70,16 @@ Material Material::Clone () const
 {
   return Material (new Impl (*impl));
 }
-    
+
+/*
+   Идентификатор
+*/
+
+size_t Material::Id () const
+{
+  return (size_t)impl;
+}
+
 /*
    Управление линейной/угловой аммортизацией
 */
