@@ -314,7 +314,15 @@ FramePtr RenderManagerImpl::CreateFrame ()
 
 EntityPtr RenderManagerImpl::CreateEntity ()
 {
-  return EntityPtr (new EntityImpl (impl->device_manager, impl->primitives), false);
+  try
+  {
+    return EntityPtr (new EntityImpl (impl->device_manager, impl->textures, impl->primitives), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::CreateEntity");
+    throw;
+  }
 }
 
 /*

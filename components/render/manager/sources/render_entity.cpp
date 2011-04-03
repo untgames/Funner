@@ -3,8 +3,6 @@
 using namespace render;
 using namespace render::low_level;
 
-//TODO: use UpdateCache
-
 namespace
 {
 
@@ -24,68 +22,151 @@ class EntityLodCommonData: public CacheHolder
 {
   public:
 ///Конструктор
-  EntityLodCommonData (EntityImpl& owner, const DeviceManagerPtr& device_manager)
-    : entity (owner)
-    , properties (device_manager)
-  {
-  }
-  
-///Обратная ссылка на объекта
-  EntityImpl& Entity () { return entity; }
-  
-///Свойства объекта
-  PropertyBuffer& Properties () { return properties; }
-  
-///Поиск состояния
-  LowLevelStateBlockPtr FindStateBlock (MaterialImpl* material)
-  {
-    StateMap::iterator iter = states.find (material);
-    
-    if (iter == states.end ())
-      return LowLevelStateBlockPtr ();
-      
-    return iter->second->state_block;
-  }
-    
-  private:
-    //TODO: cache processing
-    
-  private:
-    struct PrimitiveState: public xtl::reference_counter, public CacheHolder
+    EntityLodCommonData (EntityImpl& owner, const TextureManagerPtr& in_texture_manager, const DeviceManagerPtr& in_device_manager)
+      : entity (owner)
+      , device_manager (in_device_manager)
+      , texture_manager (in_texture_manager)
+      , properties (in_device_manager)
     {
-      EntityLodCommonData&  common_data;
-      MaterialPtr           material;      
-      LowLevelStateBlockPtr state_block;
+    }
+    
+///Обратная ссылка на объекта
+    EntityImpl& Entity () { return entity; }
+    
+///Менеджер устройства отрисовки
+    DeviceManagerPtr DeviceManager () { return device_manager; }
+    
+///Менеджер текстур
+    TextureManagerPtr& TextureManager () { return texture_manager; }
+    
+///Свойства объекта
+    PropertyBuffer& Properties () { return properties; }
+    
+///Поиск состояния
+    LowLevelStateBlockPtr FindStateBlock (MaterialImpl* material)
+    {
+      StateMap::iterator iter = states.find (material);
       
-      PrimitiveState (EntityLodCommonData& in_common_data, MaterialImpl* in_material)
+      if (iter == states.end ())
+        return LowLevelStateBlockPtr ();
+        
+      MaterialState& state = *iter->second;
+        
+      state.UpdateCache ();
+        
+      return state.state_block;
+    }
+    
+    LowLevelStateBlockPtr GetStateBlock (MaterialImpl* material)
+    {
+        //TODO: optimized path for static materials !!!
+      
+      LowLevelStateBlockPtr result = FindStateBlock (material);
+      
+      if (result)
+        return result;
+        
+      StatePtr state (new MaterialState (*this, material), false);
+      
+      states.insert_pair (material, state);
+      
+      state->UpdateCache ();
+      
+      return state->state_block;
+    }
+    
+  protected:
+    void FlushUnusedMaterials ()
+    {
+      for (StateMap::iterator iter=states.begin (), end=states.end (); iter!=end; ++iter)
+        if (iter->second->use_count () == 1)
+        {
+          StateMap::iterator next = iter;
+          
+          ++next;
+          
+          states.erase (iter);
+          
+          iter = next;
+        }
+        else ++iter;
+    }
+    
+  private:
+    struct MaterialState: public xtl::reference_counter, public CacheHolder
+    {
+      EntityLodCommonData&          common_data;
+      MaterialPtr                   material;
+      StateBlockMask                state_block_mask;
+      LowLevelStateBlockPtr         state_block;
+      DynamicTextureMaterialStorage dynamic_textures;
+      
+      MaterialState (EntityLodCommonData& in_common_data, MaterialImpl* in_material)
         : common_data (in_common_data)
         , material (in_material)
+        , dynamic_textures (common_data.TextureManager (), in_material, common_data.Entity ())
       {
         if (!material)
-          throw xtl::make_null_argument_exception ("render::EntityLodCommonData::PrimitiveState::PrimitiveState", "material");
+          throw xtl::make_null_argument_exception ("render::EntityLodCommonData::MaterialState::MaterialState", "material");
+          
+        common_data.AttachCacheSource (*this);
         
         AttachCacheSource (common_data.properties);
-        AttachCacheSource (*material);
+        AttachCacheSource (dynamic_textures);
       }
+      
+      using CacheHolder::UpdateCache;
       
       void ResetCacheCore ()
       {
-        //TODO: implement
       }
       
       void UpdateCacheCore ()
       {
-        //TODO: implement
+        try
+        {
+          StateBlockMask mask;
+          
+          mask.ss_constant_buffers [ProgramParametersSlot_Entity] = true;
+          
+          dynamic_textures.UpdateMask (mask);
+          
+          render::low_level::IDevice& device = common_data.DeviceManager ()->Device ();
+          
+          if (!state_block || state_block_mask != mask)
+            state_block = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
+            
+          dynamic_textures.Apply (device);
+          
+          device.SSSetConstantBuffer (ProgramParametersSlot_Entity, common_data.Properties ().Buffer ().get ());
+          
+          state_block->Capture ();
+            
+          state_block_mask = mask;
+        }
+        catch (xtl::exception& e)
+        {
+          state_block = LowLevelStateBlockPtr ();
+          e.touch ("render::EntityLodCommonData::MaterialState::UpdateCacheCore");
+          throw;
+        }
+        catch (...)
+        {
+          state_block = LowLevelStateBlockPtr ();          
+          throw;
+        }
       }
     };
     
-    typedef xtl::intrusive_ptr<PrimitiveState>     StatePtr;
+    typedef xtl::intrusive_ptr<MaterialState>      StatePtr;
     typedef stl::hash_map<MaterialImpl*, StatePtr> StateMap;
 
   private:  
-    EntityImpl&    entity;     //обратная ссылка на объект
-    PropertyBuffer properties; //свойства рендеринга  
-    StateMap       states;     //карта состояний
+    EntityImpl&       entity;          //обратная ссылка на объект
+    DeviceManagerPtr  device_manager;  //менеджер устройства отрисовки
+    TextureManagerPtr texture_manager; //менеджер текстур
+    PropertyBuffer    properties;      //свойства рендеринга  
+    StateMap          states;          //карта состояний
 };
 
 /*
@@ -169,7 +250,7 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder
           
           MaterialImpl* material = renderer_primitive.material;
           
-          operation.entity_state_block = common_data.FindStateBlock (material).get ();
+          operation.entity_state_block = common_data.GetStateBlock (material).get ();
 
           cached_operations.push_back (operation);
         }
@@ -228,8 +309,8 @@ struct EntityImpl::Impl: public EntityLodCommonData
   DynamicTextureEntityStorage dynamic_textures;  //хранилище динамических текстур объекта рендеринга
 
 ///Конструктор
-  Impl (EntityImpl& owner, const DeviceManagerPtr& device_manager, const PrimitiveManagerPtr& in_primitive_manager)
-    : EntityLodCommonData (owner, device_manager)
+  Impl (EntityImpl& owner, const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const PrimitiveManagerPtr& in_primitive_manager)
+    : EntityLodCommonData (owner, texture_manager, device_manager)
     , need_resort (false)
     , primitive_manager (in_primitive_manager)
   {
@@ -272,7 +353,8 @@ struct EntityImpl::Impl: public EntityLodCommonData
   {
     try
     {
-      //TODO: flush unused dynamic textures
+      FlushUnusedMaterials ();
+      dynamic_textures.FlushUnusedTextures ();
     }
     catch (xtl::exception& e)
     {
@@ -288,11 +370,20 @@ struct EntityImpl::Impl: public EntityLodCommonData
     Конструктор / деструктор
 */
 
-EntityImpl::EntityImpl (const DeviceManagerPtr& device_manager, const PrimitiveManagerPtr& primitive_manager)
+EntityImpl::EntityImpl (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const PrimitiveManagerPtr& primitive_manager)
 {
   try
   {
-    impl = new Impl (*this, device_manager, primitive_manager);
+    if (!device_manager)
+      throw xtl::make_null_argument_exception ("", "device_manager");
+      
+    if (!texture_manager)
+      throw xtl::make_null_argument_exception ("", "texture_manager");
+      
+    if (!primitive_manager)
+      throw xtl::make_null_argument_exception ("", "primitive_manager");
+    
+    impl = new Impl (*this, device_manager, texture_manager, primitive_manager);
   }
   catch (xtl::exception& e)
   {
