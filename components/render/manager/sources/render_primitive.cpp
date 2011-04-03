@@ -19,6 +19,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
   size_t                           count;            //количество примитивов
   MaterialProxy                    material;         //материал
   bool                             indexed;          //индексирован ли примитив
+  MaterialPtr                      cached_material;  //закэшированный материал
   RendererPrimitive                cached_primitive; //примитив закэшированный для рендеринга  
   
   MeshPrimitive (CacheHolder& parent_holder, const MaterialProxy& in_material, bool in_indexed)
@@ -31,10 +32,13 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
     parent_holder.AttachCacheSource (*this);
     
     material.AttachCacheHolder (*this);
+    
+    memset (&cached_primitive, 0, sizeof (cached_primitive));    
   }
   
   void ResetCacheCore ()
-  {   
+  {
+    cached_material = MaterialPtr ();   
   }
   
   void UpdateCacheCore ()
@@ -43,7 +47,10 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
     {
       memset (&cached_primitive, 0, sizeof (cached_primitive));
       
-      cached_primitive.material_state_block = material.Resource ()->StateBlock ().get ();
+      cached_material = material.Resource ();
+      
+      cached_primitive.material             = cached_material.get ();
+      cached_primitive.material_state_block = cached_material ? cached_material->StateBlock ().get () : (render::low_level::IStateBlock*)0;
       cached_primitive.indexed              = indexed;      
       cached_primitive.type                 = type;
       cached_primitive.first                = first;

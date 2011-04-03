@@ -18,27 +18,90 @@ const size_t LODS_RESERVE = 4; //резервируемое количество уровней детализации
     Описание данных объекта
 */
 
-struct EntityLodCommonData: public CacheHolder
+class EntityPrimitiveStateMap;
+
+class EntityLodCommonData: public CacheHolder
 {
-  PropertyBuffer properties; //свойства рендеринга
-  
+  public:
 ///Конструктор
-  EntityLodCommonData (const DeviceManagerPtr& device_manager)
-    : properties (device_manager)
+  EntityLodCommonData (EntityImpl& owner, const DeviceManagerPtr& device_manager)
+    : entity (owner)
+    , properties (device_manager)
   {
-    AttachCacheSource (properties);
   }
+  
+///Обратная ссылка на объекта
+  EntityImpl& Entity () { return entity; }
+  
+///Свойства объекта
+  PropertyBuffer& Properties () { return properties; }
+  
+///Поиск состояния
+  LowLevelStateBlockPtr FindStateBlock (MaterialImpl* material)
+  {
+    StateMap::iterator iter = states.find (material);
+    
+    if (iter == states.end ())
+      return LowLevelStateBlockPtr ();
+      
+    return iter->second->state_block;
+  }
+    
+  private:
+    //TODO: cache processing
+    
+  private:
+    struct PrimitiveState: public xtl::reference_counter, public CacheHolder
+    {
+      EntityLodCommonData&  common_data;
+      MaterialPtr           material;      
+      LowLevelStateBlockPtr state_block;
+      
+      PrimitiveState (EntityLodCommonData& in_common_data, MaterialImpl* in_material)
+        : common_data (in_common_data)
+        , material (in_material)
+      {
+        if (!material)
+          throw xtl::make_null_argument_exception ("render::EntityLodCommonData::PrimitiveState::PrimitiveState", "material");
+        
+        AttachCacheSource (common_data.properties);
+        AttachCacheSource (*material);
+      }
+      
+      void ResetCacheCore ()
+      {
+        //TODO: implement
+      }
+      
+      void UpdateCacheCore ()
+      {
+        //TODO: implement
+      }
+    };
+    
+    typedef xtl::intrusive_ptr<PrimitiveState>     StatePtr;
+    typedef stl::hash_map<MaterialImpl*, StatePtr> StateMap;
+
+  private:  
+    EntityImpl&    entity;     //обратная ссылка на объект
+    PropertyBuffer properties; //свойства рендеринга  
+    StateMap       states;     //карта состояний
 };
 
 /*
     Описание уровня детализации
 */
 
+typedef stl::vector<RendererOperation> RendererOperationArray;
+
 struct EntityLod: public xtl::reference_counter, public CacheHolder
 {
-  EntityLodCommonData& common_data;      //общие данные для всех уровней детализации
-  size_t               level_of_detail;  //номер уровня детализации
-  PrimitiveProxy       primitive;        //примитив
+  EntityLodCommonData&   common_data;           //общие данные для всех уровней детализации
+  size_t                 level_of_detail;       //номер уровня детализации
+  PrimitiveProxy         primitive;             //примитив
+  PrimitivePtr           cached_primitive;      //закэшированный примитив
+  RendererOperationArray cached_operations;     //закэшированные операции рендеринга
+  RendererOperationList  cached_operation_list; //закэшированные операции рендеринга
 
 ///Конструктор
   EntityLod (EntityLodCommonData& in_common_data, size_t in_level_of_detail, const PrimitiveProxy& in_primitive)
@@ -49,16 +112,80 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder
     AttachCacheSource (common_data);
     
     primitive.AttachCacheHolder (*this);
+    
+    memset (&cached_operation_list, 0, sizeof (cached_operation_list));
   }
   
 ///Обработчики событий кэша
-  void UpdateCacheCore ()
-  {
-  }
-  
   void ResetCacheCore ()
   {
+    cached_primitive = PrimitivePtr ();
+    
+    cached_operations.clear ();
+    
+    memset (&cached_operation_list, 0, sizeof (cached_operation_list));
   }  
+
+  void UpdateCacheCore ()
+  {
+    try
+    {
+      cached_primitive = primitive.Resource ();
+
+      if (!cached_primitive)
+        throw xtl::format_operation_exception ("", "Primitive '%s' not found", primitive.Name ());
+        
+        //получение групп
+
+      size_t groups_count = cached_primitive->RendererPrimitiveGroupsCount (), operations_count = 0;
+      
+      const RendererPrimitiveGroup* groups = cached_primitive->RendererPrimitiveGroups ();
+      
+        //резервирование операций рендеринга
+
+      for (size_t i=0; i<groups_count; i++)
+        operations_count += groups [i].primitives_count;
+        
+      cached_operations.reserve (operations_count);
+      
+        //построение списка операций
+        
+      for (size_t i=0; i<groups_count; i++)
+      {
+        const RendererPrimitiveGroup& group            = groups [i];
+        const RendererPrimitive*      primitives       = group.primitives;        
+        size_t                        primitives_count = group.primitives_count;
+        
+        for (size_t j=0; j<primitives_count; j++)
+        {
+          const RendererPrimitive& renderer_primitive = primitives [j];
+          
+          RendererOperation operation;
+          
+          memset (&operation, 0, sizeof (operation));
+          
+          operation.primitive = &renderer_primitive;
+          operation.entity    = &common_data.Entity ();
+          
+          MaterialImpl* material = renderer_primitive.material;
+          
+          operation.entity_state_block = common_data.FindStateBlock (material).get ();
+
+          cached_operations.push_back (operation);
+        }
+      }
+        
+      cached_operation_list.operations_count = cached_operations.size ();
+      cached_operation_list.operations       = cached_operations.empty () ? (RendererOperation*)0 : &cached_operations [0];
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::EntityLod::UpdateCacheCore");
+      throw;
+    }
+  }  
+  
+  using CacheHolder::UpdateCache;
 };
 
 typedef xtl::intrusive_ptr<EntityLod> EntityLodPtr;
@@ -102,7 +229,7 @@ struct EntityImpl::Impl: public EntityLodCommonData
   
 ///Конструктор
   Impl (EntityImpl& owner, const DeviceManagerPtr& device_manager, const PrimitiveManagerPtr& in_primitive_manager)
-    : EntityLodCommonData (device_manager)
+    : EntityLodCommonData (owner, device_manager)
     , need_resort (false)
     , primitive_manager (in_primitive_manager)
     , textures (owner)
@@ -184,12 +311,12 @@ EntityImpl::~EntityImpl ()
 
 void EntityImpl::SetProperties (const common::PropertyMap& properties)
 {
-  impl->properties.SetProperties (properties);
+  impl->Properties ().SetProperties (properties);
 }
 
 const common::PropertyMap& EntityImpl::Properties ()
 {
-  return impl->properties.Properties ();
+  return impl->Properties ().Properties ();
 }
 
 /*
@@ -350,4 +477,28 @@ void EntityImpl::ResetAllPrimitives ()
   impl->lods.clear ();
 
   impl->need_resort = false;
+}
+
+/*
+    Получение операций рендеринга
+*/
+
+const RendererOperationList& EntityImpl::RendererOperations (size_t level_of_detail)
+{
+  try
+  {    
+    EntityLodPtr lod = impl->FindLod (level_of_detail);
+
+    if (!lod)
+      throw xtl::make_argument_exception ("", "level_of_detail", level_of_detail, "Lod primitive is not set");
+      
+    lod->UpdateCache ();
+
+    return lod->cached_operation_list;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::EntityImpl::RendererOperations");
+    throw;
+  }
 }
