@@ -12,6 +12,7 @@
 #include <common/xml_writer.h>
 
 #include <media/animation/animation_library.h>
+#include <media/physics/physics_library.h>
 
 #include <media/collada.h>
 #include <media/image.h>
@@ -73,26 +74,28 @@ struct Option
 //параметры запуска
 struct Params
 {
-  const Option* options;                     //массив опций
-  size_t        options_count;               //количество опций
-  stl::string   source_name;                 //имя исходного файла
-  StringArray   source_search_paths;         //пути к каталогам поиск ресурсов
-  stl::string   output_textures_dir_name;    //имя каталога с сохранёнными текстурами
-  stl::string   output_textures_format;      //формат текстур
-  stl::string   material_textures_format;    //формат текстур сохраняемых в материале
-  stl::string   output_materials_file_name;  //файл материалов
-  stl::string   output_scene_file_name;      //файл сцены
-  stl::string   output_animations_file_name; //файл анимаций
-  stl::string   output_meshes_file_name;     //имя файла с сохранёнными мешами
-  stl::string   output_remove_file_prefix;   //отбрасываемый префикс имён файлов
-  stl::string   output_resources_namespace;  //пространство имён, применяемое при сохранении ресурсов
-  stl::string   exclude_nodes;               //неэкспортируемые узлы сцены
-  stl::string   merge_animation;             //имя анимации в которую должны быть вклеены все остальные анимации
-  size_t        max_texture_size;            //максимальный размер текстуры
-  bool          pot;                         //нужно ли масштабировать текстуры до ближайшей степени двойки
-  bool          silent;                      //минимальное число сообщений
-  bool          remove_unused_resources;     //нужно ли выбрасывать неиспользуемые ресурсы
-  bool          print_help;                  //нужно ли печатать сообщение помощи
+  const Option* options;                      //массив опций
+  size_t        options_count;                //количество опций
+  stl::string   source_name;                  //имя исходного файла
+  StringArray   source_search_paths;          //пути к каталогам поиск ресурсов
+  stl::string   output_textures_dir_name;     //имя каталога с сохранёнными текстурами
+  stl::string   output_textures_format;       //формат текстур
+  stl::string   material_textures_format;     //формат текстур сохраняемых в материале
+  stl::string   output_materials_file_name;   //файл материалов
+  stl::string   output_scene_file_name;       //файл сцены
+  stl::string   output_animations_file_name;  //файл анимаций
+  stl::string   output_meshes_file_name;      //имя файла с сохранёнными мешами
+  stl::string   output_phys_meshes_file_name; //имя файла с сохранёнными мешами для физики
+  stl::string   convex_phys_meshes;           //список масок имен физических мешей, являющихся конвексами
+  stl::string   output_remove_file_prefix;    //отбрасываемый префикс имён файлов
+  stl::string   output_resources_namespace;   //пространство имён, применяемое при сохранении ресурсов
+  stl::string   exclude_nodes;                //неэкспортируемые узлы сцены
+  stl::string   merge_animation;              //имя анимации в которую должны быть вклеены все остальные анимации
+  size_t        max_texture_size;             //максимальный размер текстуры
+  bool          pot;                          //нужно ли масштабировать текстуры до ближайшей степени двойки
+  bool          silent;                       //минимальное число сообщений
+  bool          remove_unused_resources;      //нужно ли выбрасывать неиспользуемые ресурсы
+  bool          print_help;                   //нужно ли печатать сообщение помощи
 };
 
 typedef xtl::shared_ptr<media::Image> TexturePtr;
@@ -214,6 +217,18 @@ void command_line_output_meshes_file_name (const char* file_name, Params& params
   params.output_meshes_file_name = file_name;
 }
 
+//установка пути физических мешей
+void command_line_output_phys_meshes_file_name (const char* file_name, Params& params)
+{
+  params.output_phys_meshes_file_name = file_name;
+}
+
+//установка списка конвексных физических мешей
+void command_line_convex_phys_meshes (const char* wildcard_list, Params& params)
+{
+  params.convex_phys_meshes = wildcard_list;
+}
+
 //установка неэкспортируемых узлов сцены
 void command_line_exclude_nodes (const char* string, Params& params)
 {
@@ -260,23 +275,25 @@ void command_line_set_resources_namespace (const char* prefix, Params& params)
 void command_line_parse (int argc, const char* argv [], Params& params)
 {
   static Option options [] = {
-    {command_line_source_search_path,          "include",                'I', "dir",       "add path to resources search paths"},
-    {command_line_output_textures_dir_name,    "out-textures-dir",         0, "dir",       "set output textures directory"},
-    {command_line_output_textures_format,      "out-textures-format",      0, "string",    "set output textures format string"},
-    {command_line_material_textures_format,    "material-textures-format", 0, "string",    "set material textures format string"},
-    {command_line_output_max_texture_size,     "max-texture-size",         0, "value",     "set maximum output textures size"},
-    {command_line_pot,                         "pot",                      0, 0,           "rescale textures to power of two"},
-    {command_line_output_materials_file_name,  "out-materials",            0, "file",      "set output materials file"},
-    {command_line_output_meshes_file_name,     "out-meshes",               0, "file",      "set output meshes file name"},
-    {command_line_output_scene_file_name,      "out-scene",                0, "file",      "set output scene file"},
-    {command_line_output_animations_file_name, "out-animations",           0, "file",      "set output animations file"},
-    {command_line_set_remove_file_prefix,      "remove-file-prefix",       0, "string",    "remove file prefix from all file links"},
-    {command_line_set_resources_namespace,     "resources-namespace",      0, "string",    "set resources namespace"},
-    {command_line_exclude_nodes,               "exclude-nodes",            0, "wildcards", "exclude selected nodes from export"},
-    {command_line_merge_animation,             "merge-animation",          0, "string",    "merge all animations in one with given name"},
-    {command_line_remove_unused_resources,     "remove-unused",            0, 0,           "remove unused resources from export"},
-    {command_line_silent,                      "silent",                 's', 0,           "quiet mode"},
-    {command_line_help,                        "help",                   '?', 0,           "print help message"},
+    {command_line_source_search_path,           "include",                'I', "dir",       "add path to resources search paths"},
+    {command_line_output_textures_dir_name,     "out-textures-dir",         0, "dir",       "set output textures directory"},
+    {command_line_output_textures_format,       "out-textures-format",      0, "string",    "set output textures format string"},
+    {command_line_material_textures_format,     "material-textures-format", 0, "string",    "set material textures format string"},
+    {command_line_output_max_texture_size,      "max-texture-size",         0, "value",     "set maximum output textures size"},
+    {command_line_pot,                          "pot",                      0, 0,           "rescale textures to power of two"},
+    {command_line_output_materials_file_name,   "out-materials",            0, "file",      "set output materials file"},
+    {command_line_output_meshes_file_name,      "out-meshes",               0, "file",      "set output meshes file name"},
+    {command_line_output_phys_meshes_file_name, "out-phys-meshes",          0, "file",      "set output physics meshes file name"},
+    {command_line_convex_phys_meshes,           "convex-meshes",            0, "wldcards",  "set selected physics meshes as convex"},
+    {command_line_output_scene_file_name,       "out-scene",                0, "file",      "set output scene file"},
+    {command_line_output_animations_file_name,  "out-animations",           0, "file",      "set output animations file"},
+    {command_line_set_remove_file_prefix,       "remove-file-prefix",       0, "string",    "remove file prefix from all file links"},
+    {command_line_set_resources_namespace,      "resources-namespace",      0, "string",    "set resources namespace"},
+    {command_line_exclude_nodes,                "exclude-nodes",            0, "wildcards", "exclude selected nodes from export"},
+    {command_line_merge_animation,              "merge-animation",          0, "string",    "merge all animations in one with given name"},
+    {command_line_remove_unused_resources,      "remove-unused",            0, 0,           "remove unused resources from export"},
+    {command_line_silent,                       "silent",                 's', 0,           "quiet mode"},
+    {command_line_help,                         "help",                   '?', 0,           "print help message"},
   };
 
   static const size_t options_count = sizeof (options) / sizeof (*options);
@@ -509,6 +526,79 @@ void save_meshes (const Params& params, const Model& model)
 
   mesh_library.Save (params.output_meshes_file_name.c_str ());
   
+  if (!params.silent)
+    printf ("Ok\n");
+}
+
+//сохранение физических мешей
+void save_physics_meshes (const Params& params, const Model& model)
+{
+  if (!params.silent)
+    printf ("Convert physics meshes...");
+
+  media::physics::PhysicsLibrary library;
+
+  convert_triangle_meshes (model, library);
+
+  if (!params.output_resources_namespace.empty ())
+  {
+    media::physics::PhysicsLibrary new_library;
+
+    new_library.Rename (library.Name ());
+
+    const media::physics::PhysicsLibrary::TriangleMeshCollection& meshes     = library.TriangleMeshes ();
+    media::physics::PhysicsLibrary::TriangleMeshCollection&       new_meshes = new_library.TriangleMeshes ();
+
+    for (media::physics::PhysicsLibrary::TriangleMeshCollection::ConstIterator iter = meshes.CreateIterator (); iter; ++iter)
+    {
+      media::physics::shapes::TriangleMesh mesh  = *iter;
+      const char*                          id     = meshes.ItemId (iter);
+      stl::string                          new_id = common::format ("%s.%s", params.output_resources_namespace.c_str (), id);
+
+      new_meshes.Attach (new_id.c_str (), mesh);
+    }
+
+    new_library.Swap (library);
+  }
+
+  common::StringArray convex_meshes_list = common::split (params.convex_phys_meshes.c_str ());
+
+  for (media::physics::PhysicsLibrary::TriangleMeshCollection::Iterator iter = library.TriangleMeshes ().CreateIterator (); iter; ++iter)
+  {
+    media::physics::shapes::TriangleMesh mesh  = *iter;
+    const char*                          id     = library.TriangleMeshes ().ItemId (iter);
+
+    mesh.SetConvex (false);
+
+    for (size_t i = 0, count = convex_meshes_list.Size (); i < count; i++)
+    {
+      const char* mask = convex_meshes_list [i];
+
+      if (common::wcmatch (id, mask))
+      {
+        mesh.SetConvex (true);
+        break;
+      }
+    }
+  }
+
+  if (!params.silent)
+    printf ("Ok\n");
+
+  if (!params.silent)
+    printf ("Save physics meshes to '%s'...", params.output_phys_meshes_file_name.c_str ());
+
+  stl::string dir_name = common::dir (params.output_phys_meshes_file_name);
+
+  if (!FileSystem::IsFileExist (dir_name.c_str ()))
+    FileSystem::Mkdir (dir_name.c_str ());
+
+  media::physics::PhysicsLibrary::SaveOptions save_options;
+
+  save_options.separate_meshes_file = false;
+
+  library.Save (params.output_phys_meshes_file_name.c_str (), save_options);
+
   if (!params.silent)
     printf ("Ok\n");
 }
@@ -960,6 +1050,9 @@ void export_data (Params& params)
 
   if (!params.output_meshes_file_name.empty ())
     save_meshes (params, model);
+
+  if (!params.output_phys_meshes_file_name.empty ())
+    save_physics_meshes (params, model);
 
   if (!params.output_scene_file_name.empty ())
     save_scene (params, model);

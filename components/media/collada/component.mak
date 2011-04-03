@@ -17,10 +17,11 @@ MEDIA.COLLADA.DAE.SOURCES.SOURCE_DIRS      := sources/dae_loader
 MEDIA.COLLADA.DAE.SOURCES.IMPORTS          := compile.media.collada link.media.collada
 
 #Цель - collada convert sources
-MEDIA.COLLADA.CONVERT.SOURCES.TYPE             := static-lib
-MEDIA.COLLADA.CONVERT.SOURCES.NAME             := funner.media.collada.convert
-MEDIA.COLLADA.CONVERT.SOURCES.SOURCE_DIRS      := sources/convert
-MEDIA.COLLADA.CONVERT.SOURCES.IMPORTS          := compile.media.collada compile.media.geometry compile.media.animation compile.math.curves
+MEDIA.COLLADA.CONVERT.SOURCES.TYPE        := static-lib
+MEDIA.COLLADA.CONVERT.SOURCES.NAME        := funner.media.collada.convert
+MEDIA.COLLADA.CONVERT.SOURCES.SOURCE_DIRS := sources/convert
+MEDIA.COLLADA.CONVERT.SOURCES.IMPORTS     := compile.media.collada compile.media.geometry compile.media.animation \
+                                             compile.math.curves compile.media.physics
 
 #Цель - DAE loader tests
 MEDIA.COLLADA.DAE.TESTS.TYPE             := test-suite
@@ -39,8 +40,9 @@ MEDIA.COLLADA.CONVERTER.TYPE        := application
 MEDIA.COLLADA.CONVERTER.NAME        := collada-converter
 MEDIA.COLLADA.CONVERTER.SOURCE_DIRS := utils/collada_converter
 MEDIA.COLLADA.CONVERTER.IMPORTS     := compile.media.collada compile.media.image compile.media.geometry compile.media.animation \
-                                       link.media.collada.dae link.media.collada.convert link.media.image link.media.geometry.xmesh \
-                                       link.media.geometry.binmesh link.media.animation.xanim link.media.animation.binanim
+                                       compile.media.physics link.media.collada.dae link.media.collada.convert link.media.image \
+                                       link.media.geometry.xmesh link.media.geometry.binmesh link.media.animation.xanim \
+                                       link.media.animation.binanim link.media.physics.xphys
 
 #Цель - collada convert tests
 MEDIA.COLLADA.CONVERTER.TESTS.TYPE               := test-suite

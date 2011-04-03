@@ -11,10 +11,10 @@ true filter called for bodies from group 0 and 3
 true filter called for bodies from group 0 and 4
 new collision event detected: 
   type is ColisionEventType_Begin
-  position is -24.00 0.93 -0.00
+  position is -24.00 0.93 0.00
 new collision event detected: 
   type is ColisionEventType_Begin
-  position is -21.00 0.93 -0.00
+  position is -21.00 0.93 0.00
 new collision event detected: 
   type is ColisionEventType_Begin
   position is -15.00 0.93 0.00
@@ -23,10 +23,10 @@ false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
 new collision event detected: 
   type is ColisionEventType_Process
-  position is -24.00 0.94 -0.00
+  position is -24.00 0.94 0.00
 new collision event detected: 
   type is ColisionEventType_Process
-  position is -21.00 0.94 -0.00
+  position is -21.00 0.94 0.00
 new collision event detected: 
   type is ColisionEventType_Process
   position is -15.00 0.94 0.00
@@ -35,10 +35,10 @@ false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
 new collision event detected: 
   type is ColisionEventType_Process
-  position is -24.00 0.95 -0.00
+  position is -24.00 0.95 0.00
 new collision event detected: 
   type is ColisionEventType_Process
-  position is -21.00 0.95 -0.00
+  position is -21.00 0.95 0.00
 new collision event detected: 
   type is ColisionEventType_Process
   position is -15.00 0.95 0.00
@@ -47,10 +47,10 @@ false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
 new collision event detected: 
   type is ColisionEventType_Process
-  position is -24.00 0.96 -0.00
+  position is -24.00 0.96 0.00
 new collision event detected: 
   type is ColisionEventType_Process
-  position is -21.00 0.96 -0.00
+  position is -21.00 0.96 0.00
 new collision event detected: 
   type is ColisionEventType_Process
   position is -15.00 0.96 0.00
@@ -59,7 +59,7 @@ false filter called for bodies from group 0 and 1
 true filter called for bodies from group 0 and 4
 new collision event detected: 
   type is ColisionEventType_Process
-  position is -24.00 0.97 -0.00
+  position is -24.00 0.97 0.00
 new collision event detected: 
   type is ColisionEventType_Process
   position is -21.00 0.97 0.00
@@ -241,4 +241,4 @@ new collision event detected:
   position is -24.00 1.00 0.00
 new collision event detected: 
   type is ColisionEventType_End
-  position is -15.00 1.00 -0.00
+  position is -15.00 1.00 0.00

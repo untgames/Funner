@@ -16,14 +16,14 @@ int main ()
 
     ScenePtr scene (bullet_driver->CreateScene (), false);
 
-    math::vec3f mesh_vertices []        = { math::vec3f (0, -2, 0), math::vec3f (1, 0, 0), math::vec3f (0, 0, 1), math::vec3f (-1, 0, 0) };
+    math::vec3f mesh_vertices []        = { math::vec3f (0, -2, 0), math::vec3f (0.5, 0, 0), math::vec3f (0, 0, 1), math::vec3f (-1, 0, 0) };
     size_t      triangles_indices []    = { 0, 1, 2, 0, 3, 1, 0, 2, 3, 3, 2, 1};
     size_t      mesh_vertices_count     = sizeof (mesh_vertices) / sizeof (*mesh_vertices);
     size_t      triangles_indices_count = sizeof (triangles_indices) / sizeof (*triangles_indices);
 
     ShapePtr box_shape           (bullet_driver->CreateBoxShape          (1.f), false),
              sphere_shape        (bullet_driver->CreateSphereShape       (1.f), false),
-             capsule_shape       (bullet_driver->CreateCapsuleShape      (1.f, 1.f), false),
+             capsule_shape       (bullet_driver->CreateCapsuleShape      (1.f, 0.5f), false),
              plane_shape         (bullet_driver->CreateBoxShape          (math::vec3f (50.f, 0.01f, 50.f)), false),
              convex_shape        (bullet_driver->CreateConvexShape       (mesh_vertices_count, mesh_vertices), false),
              triangle_mesh_shape (bullet_driver->CreateTriangleMeshShape (mesh_vertices_count, mesh_vertices, triangles_indices_count / 3, triangles_indices), false);

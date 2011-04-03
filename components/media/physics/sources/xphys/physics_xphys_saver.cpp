@@ -46,7 +46,7 @@ class XmlPhysicsLibrarySaver
         XmlWriter::Scope library_scope (writer, "vertices");
 
         writer.WriteAttribute ("count", mesh.VerticesCount ());
-        writer.WriteData (xtl::make_iterator_range (mesh.VerticesCount (), mesh.Vertices ()));
+        writer.WriteData (xtl::make_iterator_range (mesh.VerticesCount (), mesh.Vertices ()), FLOAT_FORMAT);
       }
 
       if (mesh.TrianglesCount ())
@@ -54,6 +54,7 @@ class XmlPhysicsLibrarySaver
         XmlWriter::Scope library_scope (writer, "triangle_indices");
 
         writer.WriteAttribute ("count", mesh.TrianglesCount ());
+
         writer.WriteData (xtl::make_iterator_range (mesh.TrianglesCount () * 3, (size_t*)mesh.Triangles ()));
       }
     }

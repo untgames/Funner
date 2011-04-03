@@ -13,7 +13,7 @@ int main ()
 
     Scene scene (manager.CreateScene ());
 
-    math::vec3f mesh_vertices []        = { math::vec3f (0, -2, 0), math::vec3f (1, 0, 0), math::vec3f (0, 0, 1), math::vec3f (-1, 0, 0) };
+    math::vec3f mesh_vertices []        = { math::vec3f (0, -2, 0), math::vec3f (0.5, 0, 0), math::vec3f (0, 0, 1), math::vec3f (-1, 0, 0) };
     size_t      triangles_indices []    = { 0, 1, 2, 0, 3, 1, 0, 2, 3, 3, 2, 1};
     size_t      mesh_vertices_count     = sizeof (mesh_vertices) / sizeof (*mesh_vertices);
     size_t      triangles_indices_count = sizeof (triangles_indices) / sizeof (*triangles_indices);
@@ -39,7 +39,7 @@ int main ()
 
     Shape box_shape           (manager.CreateBoxShape     (1.f)),
           sphere_shape        (manager.CreateSphereShape  (1.f)),
-          capsule_shape       (manager.CreateCapsuleShape (1.f, 1.f)),
+          capsule_shape       (manager.CreateCapsuleShape (1.f, 0.5f)),
           plane_shape         (manager.CreateBoxShape     (math::vec3f (50.f, 0.01f, 50.f))),
           convex_shape        (manager.CreateShape        (media_shape));
 

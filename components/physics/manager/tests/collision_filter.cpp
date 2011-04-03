@@ -33,7 +33,12 @@ void collision_event_handler (CollisionEventType event, RigidBody& first_body, R
       printf ("Unknown\n");
   }
 
-  printf ("  position is %.2f %.2f %.2f\n", point.x, point.y, point.z);
+  math::vec3f converted_point = point;
+
+  for (size_t i = 0; i < 3; i++)
+    convert_float (converted_point [i], 1000);
+
+  printf ("  position is %.2f %.2f %.2f\n", converted_point.x, converted_point.y, converted_point.z);
 }
 
 int main ()

@@ -5,7 +5,7 @@ TARGETS := SDKS.FUNNER3D SDKS.FUNNER3D.BUILD
                                        
 SDKS.FUNNER3D.TYPE               := sdk
 SDKS.FUNNER3D.NAME               := funner3d
-SDKS.FUNNER3D.LIB_EXCLUDE_FILTER := gdi32 ole32 uuid user32 shell32 wsock32 ws2_32 wldap32
+SDKS.FUNNER3D.LIB_EXCLUDE_FILTER := gdi32 ole32 uuid user32 shell32 wsock32 ws2_32 wldap32 openal32
 SDKS.FUNNER3D.macosx.LIB_EXCLUDE_FILTER := funner.extern.devil funner.extern.ilu pthread ldap ssl crypto
 SDKS.FUNNER3D.LIBS          :=
 SDKS.FUNNER3D.DLLS          :=
@@ -19,7 +19,7 @@ SDKS.FUNNER3D.IMPORTS       := compile.system compile.render.low_level compile.m
                                link.media.geometry.xmesh link.media.geometry.binmesh link.media.geometry link.media.rfx \
                                link.media.rfx.default_serializers link.media.animation.xanim link.media.animation.binanim \
                                link.media.image link.media.image.dds link.media.sound.default_decoders link.media.sound.snddecl \
-                               link.media.video.theora link.media.font.xfont \
+                               link.media.video.theora link.media.font.xfont link.media.physics.xphys \
                                link.scene_graph.core link.sound.scene_player link.sound.low_level.openal_driver \
                                link.physics.low_level.bullet_driver link.physics.manager link.input.manager link.input.window_driver \
                                link.input.manager.xkeymap link.input.manager.xkeyreg link.script.lua \

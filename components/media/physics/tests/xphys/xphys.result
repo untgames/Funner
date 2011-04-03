@@ -8,12 +8,12 @@ Results of xphys_loader_test:
   <triangle_meshes>
     <triangle_mesh name="ConvexMesh" is_convex="1">
       <vertices count="4">
-        0 0 0 1 2 3 2 4 6 3 6 9
+        0.000 0.000 0.000 1.000 2.000 3.000 2.000 4.000 6.000 3.000 6.000 9.000
       </vertices>
     </triangle_mesh>
     <triangle_mesh name="TriangleMesh" is_convex="0">
       <vertices count="4">
-        0 0 0 1 2 3 2 4 6 3 6 9
+        0.000 0.000 0.000 1.000 2.000 3.000 2.000 4.000 6.000 3.000 6.000 9.000
       </vertices>
       <triangle_indices count="2">
         0 1 2 2 3 4

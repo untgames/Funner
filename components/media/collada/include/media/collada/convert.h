@@ -20,6 +20,13 @@ class AnimationLibrary;
 
 }
 
+namespace physics
+{
+
+class PhysicsLibrary;
+
+}
+
 namespace collada
 {
 
@@ -33,6 +40,11 @@ void convert (const collada::Model& source, geometry::MeshLibrary& destination);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 void convert (const collada::Model& source, animation::AnimationLibrary& destination);
 void convert (const collada::Model& source, animation::AnimationLibrary& destination, const char* merge_animation);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Преобразование коллада-модели в библиотеку мешей
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void convert_triangle_meshes (const collada::Model& source, physics::PhysicsLibrary& destination);
 
 }
 

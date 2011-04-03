@@ -225,19 +225,19 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
 
       size_t flags = 0, media_flags = media_body->Flags ();
 
-      if (media_flags && media::physics::RigidBodyFlag_FrozenPositionX)
+      if (media_flags & media::physics::RigidBodyFlag_FrozenPositionX)
         flags |= physics::RigidBodyFlag_FrozenPositionX;
-      if (media_flags && media::physics::RigidBodyFlag_FrozenPositionY)
+      if (media_flags & media::physics::RigidBodyFlag_FrozenPositionY)
         flags |= physics::RigidBodyFlag_FrozenPositionY;
-      if (media_flags && media::physics::RigidBodyFlag_FrozenPositionZ)
+      if (media_flags & media::physics::RigidBodyFlag_FrozenPositionZ)
         flags |= physics::RigidBodyFlag_FrozenPositionZ;
-      if (media_flags && media::physics::RigidBodyFlag_FrozenRotationX)
+      if (media_flags & media::physics::RigidBodyFlag_FrozenRotationX)
         flags |= physics::RigidBodyFlag_FrozenRotationX;
-      if (media_flags && media::physics::RigidBodyFlag_FrozenRotationY)
+      if (media_flags & media::physics::RigidBodyFlag_FrozenRotationY)
         flags |= physics::RigidBodyFlag_FrozenRotationY;
-      if (media_flags && media::physics::RigidBodyFlag_FrozenRotationZ)
+      if (media_flags & media::physics::RigidBodyFlag_FrozenRotationZ)
         flags |= physics::RigidBodyFlag_FrozenRotationZ;
-      if (media_flags && media::physics::RigidBodyFlag_Kinematic)
+      if (media_flags & media::physics::RigidBodyFlag_Kinematic)
         flags |= physics::RigidBodyFlag_Kinematic;
 
       return_value.SetFlags (flags);
