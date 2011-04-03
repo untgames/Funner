@@ -250,7 +250,7 @@ LowLevelSamplerStatePtr TextureManager::FindSampler (const char* name)
     Создание динамической текстуры
 */
 
-DynamicTexturePtr TextureManager::CreateDynamicTexture (const char* name, const EntityPtr& entity)
+DynamicTexturePtr TextureManager::CreateDynamicTexture (const char* name, EntityImpl& entity)
 {
   try
   {

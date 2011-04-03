@@ -12,7 +12,7 @@ struct DynamicTextureImpl::Impl
   IDynamicTexture* dynamic_texture; //ссылка на динамическую текстуру
   TexturePtr       texture;         //текстура
 
-  Impl (const char* in_name, const EntityPtr& entity, const RenderManager::DynamicTextureCreator& creator)
+  Impl (const char* in_name, EntityImpl& entity, const RenderManager::DynamicTextureCreator& creator)
     : name (in_name ? in_name : "")
     , dynamic_texture (0)
   {
@@ -21,7 +21,7 @@ struct DynamicTextureImpl::Impl
       if (!in_name)
         throw xtl::make_null_argument_exception ("", "name");
         
-      Entity entity_wrapper = Wrappers::Wrap<Entity> (entity);
+      Entity entity_wrapper = Wrappers::Wrap<Entity> (&entity);
         
       dynamic_texture = creator (name.c_str (), entity_wrapper);
       
@@ -58,13 +58,22 @@ struct DynamicTextureImpl::Impl
     Конструкторы / деструктор
 */
 
-DynamicTextureImpl::DynamicTextureImpl (const char* name, const EntityPtr& entity, const RenderManager::DynamicTextureCreator& creator)
+DynamicTextureImpl::DynamicTextureImpl (const char* name, EntityImpl& entity, const RenderManager::DynamicTextureCreator& creator)
   : impl (new Impl (name, entity, creator))
 {
 }
 
 DynamicTextureImpl::~DynamicTextureImpl ()
 {
+}
+
+/*
+    Имя
+*/
+
+const char* DynamicTextureImpl::Name ()
+{
+  return impl->name.c_str ();
 }
 
 /*

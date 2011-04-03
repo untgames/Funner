@@ -221,18 +221,17 @@ struct EntityLodLess
 
 struct EntityImpl::Impl: public EntityLodCommonData
 {
-  math::mat4f           transformation;    //матрица преобразований
-  EntityLodArray        lods;              //уровни детализации
-  bool                  need_resort;       //уровни детализации требуют пересортировки
-  PrimitiveManagerPtr   primitive_manager; //менеджер примитивов
-  EntityTextureStorage  textures;          //хранилище текстур объекта рендеринга
-  
+  math::mat4f                 transformation;    //матрица преобразований
+  EntityLodArray              lods;              //уровни детализации
+  bool                        need_resort;       //уровни детализации требуют пересортировки
+  PrimitiveManagerPtr         primitive_manager; //менеджер примитивов
+  DynamicTextureEntityStorage dynamic_textures;  //хранилище динамических текстур объекта рендеринга
+
 ///Конструктор
   Impl (EntityImpl& owner, const DeviceManagerPtr& device_manager, const PrimitiveManagerPtr& in_primitive_manager)
     : EntityLodCommonData (owner, device_manager)
     , need_resort (false)
     , primitive_manager (in_primitive_manager)
-    , textures (owner)
   {
     lods.reserve (LODS_RESERVE);
   }
@@ -273,6 +272,7 @@ struct EntityImpl::Impl: public EntityLodCommonData
   {
     try
     {
+      //TODO: flush unused dynamic textures
     }
     catch (xtl::exception& e)
     {
@@ -303,6 +303,15 @@ EntityImpl::EntityImpl (const DeviceManagerPtr& device_manager, const PrimitiveM
 
 EntityImpl::~EntityImpl ()
 {
+}
+
+/*
+    Хранилище динамических текстур
+*/
+
+DynamicTextureEntityStorage& EntityImpl::DynamicTextureStorage ()
+{
+  return impl->dynamic_textures;
 }
 
 /*
