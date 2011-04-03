@@ -2,6 +2,13 @@
 
 using namespace physics;
 
+namespace
+{
+
+const float SCALE_EQUAL_EPS = 0.001f;
+
+}
+
 /*
    Геометрическое тело
 */
@@ -150,14 +157,14 @@ Shape ShapeImplProvider::CreateShapeCore (physics::low_level::IDriver* driver, c
       return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateBoxShape (shape.Data<media::physics::shapes::Box> ().half_dimensions * scale), false));
     case media::physics::ShapeType_Sphere:
     {
-      if (scale.x != scale.y || scale.x != scale.z || scale.y != scale.z)
+      if (!math::equal (scale, math::vec3f (scale.x), SCALE_EQUAL_EPS))
         throw xtl::format_operation_exception (METHOD_NAME, "Scaled sphere shape can be created only with equal scale on all axises");
 
       return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateSphereShape (shape.Data<media::physics::shapes::Sphere> ().radius * scale.x), false));
     }
     case media::physics::ShapeType_Capsule:
     {
-      if (scale.x != scale.y || scale.x != scale.z || scale.y != scale.z)
+      if (!math::equal (scale, math::vec3f (scale.x), SCALE_EQUAL_EPS))
         throw xtl::format_operation_exception (METHOD_NAME, "Scaled capsule shape can be created only with equal scale on all axises");
 
       media::physics::shapes::Capsule shape_data = shape.Data<media::physics::shapes::Capsule> ();
@@ -166,7 +173,7 @@ Shape ShapeImplProvider::CreateShapeCore (physics::low_level::IDriver* driver, c
     }
     case media::physics::ShapeType_Plane:
     {
-      if (!math::equal (scale, math::vec3f (1.f), 0.f))
+      if (!math::equal (scale, math::vec3f (1.f), SCALE_EQUAL_EPS))
         throw xtl::format_operation_exception (METHOD_NAME, "Can't create scaled plane shape");
 
       media::physics::shapes::Plane shape_data = shape.Data<media::physics::shapes::Plane> ();
@@ -175,7 +182,7 @@ Shape ShapeImplProvider::CreateShapeCore (physics::low_level::IDriver* driver, c
     }
     case media::physics::ShapeType_TriangleMesh:
     {
-      if (!math::equal (scale, math::vec3f (1.f), 0.f))
+      if (!math::equal (scale, math::vec3f (1.f), SCALE_EQUAL_EPS))
         throw xtl::format_operation_exception (METHOD_NAME, "Can't create scaled mesh shape");
 
       media::physics::shapes::TriangleMesh shape_data = shape.Data<media::physics::shapes::TriangleMesh> ();
@@ -188,7 +195,7 @@ Shape ShapeImplProvider::CreateShapeCore (physics::low_level::IDriver* driver, c
     }
     case media::physics::ShapeType_Compound:
     {
-      if (!math::equal (scale, math::vec3f (1.f), 0.f))
+      if (!math::equal (scale, math::vec3f (1.f), SCALE_EQUAL_EPS))
         throw xtl::format_operation_exception (METHOD_NAME, "Can't create scaled compound shape");
 
       media::physics::shapes::Compound shape_data = shape.Data<media::physics::shapes::Compound> ();
