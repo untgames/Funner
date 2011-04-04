@@ -138,13 +138,14 @@ class EntityLodCommonData: public CacheHolder
     {
       EntityLodCommonData&          common_data;
       MaterialPtr                   material;
-      StateBlockMask                state_block_mask;
+      size_t                        state_block_mask_hash;
       LowLevelStateBlockPtr         state_block;
       DynamicTextureMaterialStorage dynamic_textures;
       
       MaterialState (EntityLodCommonData& in_common_data, MaterialImpl* in_material)
         : common_data (in_common_data)
         , material (in_material)
+        , state_block_mask_hash (0)
         , dynamic_textures (common_data.TextureManager (), in_material, common_data.Entity ())
       {
         if (!material)
@@ -174,16 +175,19 @@ class EntityLodCommonData: public CacheHolder
           
           render::low_level::IDevice& device = common_data.DeviceManager ()->Device ();
           
-          if (!state_block || state_block_mask != mask)
-            state_block = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
+          size_t mask_hash = mask.Hash ();
+          
+          if (!state_block || state_block_mask_hash != mask_hash)
+          {
+            state_block           = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
+            state_block_mask_hash = mask_hash;
+          }
             
           dynamic_textures.Apply (device);
           
           device.SSSetConstantBuffer (ProgramParametersSlot_Entity, common_data.Properties ().Buffer ().get ());
           
           state_block->Capture ();
-            
-          state_block_mask = mask;
         }
         catch (xtl::exception& e)
         {
