@@ -57,9 +57,11 @@ int main ()
 
     body_transform.position.x = -4;
     capsule_body->SetWorldTransform (body_transform);
+    capsule_body->AddTorque (2.f);
 
     body_transform.position.x = -1;
     convex_body->SetWorldTransform (body_transform);
+    convex_body->AddTorque (2.f);
 
     body_transform.position.x = 2;
     triangle_mesh_body->SetWorldTransform (body_transform);

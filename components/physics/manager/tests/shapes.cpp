@@ -79,6 +79,7 @@ int main ()
 
     body_transform.position.x = -7;
     sphere_body.SetWorldTransform (body_transform);
+    sphere_body.AddTorque (2.f);
 
     body_transform.position.x = -4;
     capsule_body.SetWorldTransform (body_transform);
