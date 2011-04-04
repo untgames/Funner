@@ -97,6 +97,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
                    ARB_multisample                = "GL_ARB_multisample",
                    ARB_multitexture               = "GL_ARB_multitexture",
                    ARB_occlusion_query            = "GL_ARB_occlusion_query",
+                   ARB_seamless_cube_map          = "GL_ARB_seamless_cube_map",
                    ARB_shader_objects             = "GL_ARB_shader_objects",
                    ARB_shading_language_100       = "GL_ARB_shading_language_100",
                    ARB_shadow                     = "GL_ARB_shadow",
@@ -148,6 +149,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   has_arb_multisample                = ext.Get (ARB_multisample);
   has_arb_multitexture               = ext.Get (ARB_multitexture);  
   has_arb_occlusion_query            = ext.Get (ARB_occlusion_query);
+  has_arb_seamless_cube_map          = ext.Get (ARB_seamless_cube_map);
   has_arb_shader_objects             = ext.Get (ARB_shader_objects);
   has_arb_shading_language_100       = has_arb_shader_objects && ext.Get (ARB_shading_language_100);
   has_arb_shadow                     = ext.Get (ARB_shadow);

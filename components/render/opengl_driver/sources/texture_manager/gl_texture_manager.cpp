@@ -158,7 +158,21 @@ struct TextureManager::Impl: public ContextObject
     Impl (const ContextManager& context_manager, TextureManager& in_texture_manager) :
       ContextObject (context_manager),
       texture_manager (in_texture_manager),
-      state (this) {}
+      state (this)
+    {
+      //выбор текущего контекста
+
+      MakeContextCurrent ();
+
+      const ContextCaps& caps = GetCaps ();
+
+      if (caps.has_arb_seamless_cube_map)
+        glEnable (GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+      //проверка ошибок
+
+      CheckErrors ("render::low_level::opengl::TextureManager::Impl::Impl");
+    }
 
       //получение основного состояния
     TextureManagerState& GetState () { return state; }
