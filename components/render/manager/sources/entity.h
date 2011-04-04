@@ -5,9 +5,9 @@ struct RendererPrimitive;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RendererOperation
 {
-  EntityImpl*                     entity;             //объект
-  render::low_level::IStateBlock* entity_state_block; //блок состояний объекта
-  const RendererPrimitive*        primitive;          //примитив
+  EntityImpl*                     entity;      //объект
+  render::low_level::IStateBlock* state_block; //блок состояний объекта
+  const RendererPrimitive*        primitive;   //примитив
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

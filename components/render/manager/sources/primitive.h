@@ -6,13 +6,13 @@ class PrimitiveBuffersImpl;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RendererPrimitive
 {
-  MaterialImpl*                    material;             //материал
-  render::low_level::IStateBlock*  material_state_block; //блок состояний материала примитива
-  bool                             indexed;              //является ли данный примитив индексированным или состоящим только из вершин без индексов
-  render::low_level::PrimitiveType type;                 //тип примитива
-  size_t                           first;                //индекс первой вершины/индекса
-  size_t                           count;                //количество примитивов
-  
+  MaterialImpl*                    material;    //материал
+  render::low_level::IStateBlock*  state_block; //блок состояний примитива
+  bool                             indexed;     //является ли данный примитив индексированным или состоящим только из вершин без индексов
+  render::low_level::PrimitiveType type;        //тип примитива
+  size_t                           first;       //индекс первой вершины/индекса
+  size_t                           count;       //количество примитивов
+
   //TODO: +tags list
 };
 

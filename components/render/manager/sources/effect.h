@@ -55,14 +55,20 @@ class EffectPass: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Эффект рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class EffectFrame: public Object
+class Effect: public Object
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    EffectFrame  (const DeviceManager& device_manager);
-    ~EffectFrame ();
+    Effect  (const DeviceManager& device_manager);
+    ~Effect ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Тэги фрейма: используются для рекурсивного рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        SetTags (const char* tags);
+    const char* Tags    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проходы рендеринга / вложенные эффекты
@@ -70,7 +76,7 @@ class EffectFrame: public Object
     size_t PassesCount         ();
     size_t ChildrenCount       ();
     size_t AddOperation        (const EffectPassPtr&); //returns order number of operation in rendering sequence
-    size_t AddOperation        (const EffectFramePtr&); //returns order number of operation in rendering sequence
+    size_t AddOperation        (const EffectPtr&);    //returns order number of operation in rendering sequence
     void   RemoveOperation     (size_t order_number);
     void   RemoveAllOperations ();
 
@@ -111,4 +117,3 @@ class EffectRenderer: public Object
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
-

@@ -42,7 +42,7 @@ class MaterialManager;
 class PrimitiveManager;
 class TextureManager;
 class EffectPass;
-class EffectFrame;
+class Effect;
 class EffectRenderer;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ class EffectRenderer;
 typedef xtl::intrusive_ptr<DeviceManager>        DeviceManagerPtr;
 typedef xtl::intrusive_ptr<DynamicTextureImpl>   DynamicTexturePtr;
 typedef xtl::intrusive_ptr<EffectPass>           EffectPassPtr;
-typedef xtl::intrusive_ptr<EffectFrame>          EffectFramePtr;
+typedef xtl::intrusive_ptr<Effect>               EffectPtr;
 typedef xtl::intrusive_ptr<EffectRenderer>       EffectRendererPtr;
 typedef xtl::intrusive_ptr<EntityImpl>           EntityPtr;
 typedef xtl::intrusive_ptr<FrameImpl>            FramePtr;

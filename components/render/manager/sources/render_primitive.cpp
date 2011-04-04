@@ -10,24 +10,40 @@ using namespace render::low_level;
 namespace
 {
 
+struct MeshCommonData
+{
+  DeviceManagerPtr   device_manager; //менеджер устройства отрисовки
+  LowLevelBufferPtr  index_buffer;   //индексный буфер
+  
+  MeshCommonData (const DeviceManagerPtr& in_device_manager)
+    : device_manager (in_device_manager)
+  {
+    if (!device_manager)
+      throw xtl::make_null_argument_exception ("render::MeshCommonData::MeshCommonData", "device_manager");
+  }
+};
+
 struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
 {
-  render::low_level::PrimitiveType type;             //тип примитива
-  VertexBufferPtr                  vertex_buffer;    //вершинный буфер
-  LowLevelInputLayoutPtr           layout;           //лэйаут примитива
-  size_t                           first;            //индекс первой вершины/индекса
-  size_t                           count;            //количество примитивов
-  MaterialProxy                    material;         //материал
-  bool                             indexed;          //индексирован ли примитив
-  MaterialPtr                      cached_material;  //закэшированный материал
-  RendererPrimitive                cached_primitive; //примитив закэшированный для рендеринга  
+  MeshCommonData&                  common_data;                  //общие данные для примитива
+  render::low_level::PrimitiveType type;                         //тип примитива
+  VertexBufferPtr                  vertex_buffer;                //вершинный буфер
+  LowLevelInputLayoutPtr           layout;                       //лэйаут примитива
+  size_t                           first;                        //индекс первой вершины/индекса
+  size_t                           count;                        //количество примитивов
+  MaterialProxy                    material;                     //материал
+  MaterialPtr                      cached_material;              //закэшированный материал
+  RendererPrimitive                cached_primitive;             //примитив закэшированный для рендеринга
+  size_t                           cached_state_block_mask_hash; //хэш маски закэшированного блока состояний
+  LowLevelStateBlockPtr            cached_state_block;           //закэшированный блок состояний  
   
-  MeshPrimitive (CacheHolder& parent_holder, const MaterialProxy& in_material, bool in_indexed)
-    : type (PrimitiveType_PointList)
+  MeshPrimitive (CacheHolder& parent_holder, const MaterialProxy& in_material, MeshCommonData& in_common_data)
+    : common_data (in_common_data)
+    , type (PrimitiveType_PointList)
     , first (0)
     , count (0)    
     , material (in_material)
-    , indexed (in_indexed)
+    , cached_state_block_mask_hash (0)
   {
     parent_holder.AttachCacheSource (*this);
     
@@ -49,12 +65,49 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
       
       cached_material = material.Resource ();
       
-      cached_primitive.material             = cached_material.get ();
-      cached_primitive.material_state_block = cached_material ? cached_material->StateBlock ().get () : (render::low_level::IStateBlock*)0;
-      cached_primitive.indexed              = indexed;      
-      cached_primitive.type                 = type;
-      cached_primitive.first                = first;
-      cached_primitive.count                = count;
+      LowLevelStateBlockPtr material_state_block = cached_material ? cached_material->StateBlock ().get () : (render::low_level::IStateBlock*)0;
+      
+      render::low_level::IDevice& device = common_data.device_manager->Device ();
+        
+      render::low_level::StateBlockMask mask;      
+
+      if (material_state_block)
+      {
+        material_state_block->Apply ();                
+        material_state_block->GetMask (mask);
+      }
+        
+      mask.is_index_buffer = true; //0 index buffer is need to be set
+      mask.is_layout       = true;
+      
+      const LowLevelBufferPtr* streams = vertex_buffer->Streams ();
+
+      for (size_t i=0, streams_count=vertex_buffer->StreamsCount (); i<streams_count; i++)
+      {        
+        device.ISSetVertexBuffer (i, streams [i].get ());
+        
+        mask.is_vertex_buffers [i] = true;
+      }
+
+      device.ISSetInputLayout  (layout.get ());
+      device.ISSetIndexBuffer  (common_data.index_buffer.get ());
+      
+      size_t mask_hash = mask.Hash ();
+      
+      if (cached_state_block_mask_hash != mask_hash)
+      {
+        cached_state_block           = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
+        cached_state_block_mask_hash = mask_hash;
+      }
+      
+      cached_state_block->Capture ();
+      
+      cached_primitive.material    = cached_material.get ();
+      cached_primitive.state_block = cached_state_block.get ();
+      cached_primitive.indexed     = common_data.index_buffer != LowLevelBufferPtr (); 
+      cached_primitive.type        = type;
+      cached_primitive.first       = first;
+      cached_primitive.count       = count;
     }
     catch (xtl::exception& e)
     {
@@ -70,14 +123,14 @@ typedef xtl::intrusive_ptr<MeshPrimitive> MeshPrimitivePtr;
 typedef stl::vector<MeshPrimitivePtr>     MeshPrimitiveArray;
 typedef stl::vector<RendererPrimitive>    RendererPrimitiveArray;
 
-struct Mesh: public xtl::reference_counter, public CacheHolder
+struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheHolder
 {
-  LowLevelBufferPtr      index_buffer;
   MeshPrimitiveArray     primitives;
   RendererPrimitiveArray cached_primitives;
   RendererPrimitiveGroup cached_group;
   
-  Mesh (CacheHolder& parent_holder)
+  Mesh (CacheHolder& parent_holder, const DeviceManagerPtr& device_manager)
+    : MeshCommonData (device_manager)
   {
     parent_holder.AttachCacheSource (*this);
   }
@@ -192,7 +245,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
 {
   try
   {
-    MeshPtr mesh (new Mesh (*this), false);
+    MeshPtr mesh (new Mesh (*this, impl->device_manager), false);
     
       //конвертация вершинных буферов
              
@@ -236,7 +289,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
       const media::geometry::Primitive& src_primitive = source.Primitive (i);
       bool                              is_indexed    = mesh->index_buffer;
       
-      MeshPrimitivePtr dst_primitive (new MeshPrimitive (*mesh, impl->material_manager->GetMaterialProxy (src_primitive.material), is_indexed), false);
+      MeshPrimitivePtr dst_primitive (new MeshPrimitive (*mesh, impl->material_manager->GetMaterialProxy (src_primitive.material), *mesh), false);
 
       switch (src_primitive.type)
       {
