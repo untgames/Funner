@@ -2,7 +2,7 @@
 
 void dump (const char* name, const StateBlockMask& mask)
 {
-  printf ("Mask '%s':\n", name);
+  printf ("Mask '%s' (hash=%08x):\n", name, mask.Hash ());
   printf ("ISInpoutLayout: %d\n", mask.is_layout);
   
   for (size_t i=0; i<DEVICE_VERTEX_BUFFER_SLOTS_COUNT; i++)

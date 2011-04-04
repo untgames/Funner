@@ -4,6 +4,8 @@
 
 #include <xtl/common_exceptions.h>
 
+#include <common/hash.h>
+
 #include <render/low_level/state_block.h>
 
 using namespace render::low_level;
@@ -83,6 +85,15 @@ void StateBlockMask::Set ()
 void StateBlockMask::Clear ()
 {
   memset (this, 0, sizeof *this);
+}
+
+/*
+    •νθ
+*/
+
+size_t StateBlockMask::Hash () const
+{
+  return common::crc32 (this, sizeof *this);
 }
 
 /*
