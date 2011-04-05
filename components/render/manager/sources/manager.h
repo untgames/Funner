@@ -39,6 +39,7 @@ class RenderManagerImpl: public Object
     render::PrimitiveManager& PrimitiveManager ();
     render::ShadingManager&   ShadingManager   ();
     render::MaterialManager&  MaterialManager  ();
+    render::EffectManager&    EffectManager    ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание объектов

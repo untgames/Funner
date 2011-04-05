@@ -23,8 +23,9 @@ class EffectLoader
 {
   public:
 ///Конструктор  
-    EffectLoader (const DeviceManagerPtr& in_device_manager, const char* file_name)
+    EffectLoader (const DeviceManagerPtr& in_device_manager, const char* file_name, EffectLoaderLibrary& in_library)
       : parser (file_name, "wxf")
+      , library (in_library)
       , device_manager (in_device_manager)
     {
       try
@@ -689,7 +690,7 @@ class EffectLoader
   
   private:
     common::Parser       parser;         //парсер файла эффектов
-    EffectLoaderLibrary  library;        //библиотека загрузки эффектов
+    EffectLoaderLibrary& library;        //библиотека загрузки эффектов
     render::Log          log;            //протокол рендера
     DeviceManagerPtr     device_manager; //менеджер устройства отрисовки
 };
@@ -699,9 +700,9 @@ class EffectLoader
 namespace render
 {
 
-void parse_effect_library (const DeviceManagerPtr& device_manager, const char* file_name)
+void parse_effect_library (const DeviceManagerPtr& device_manager, const char* file_name, EffectLoaderLibrary& library)
 {
-  EffectLoader loader (device_manager, file_name);
+  EffectLoader loader (device_manager, file_name, library);
 }
 
 bool is_effect_library_file (const char* file_name)

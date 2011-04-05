@@ -32,6 +32,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable
   PrimitiveManagerPtr primitives;                                    //примитивы
   ShadingManagerPtr   shading;                                       //менеджер шэйдина
   MaterialManagerPtr  materials;                                     //материалы
+  EffectManagerPtr    effects;                                       //эффекты
 
 ///Конструктор
   Impl (RenderManagerImpl* in_owner)
@@ -174,6 +175,22 @@ PrimitiveManager& RenderManagerImpl::PrimitiveManager ()
   catch (xtl::exception& e)
   {
     e.touch ("render::RenderManagerImpl::PrimitiveManager");
+    throw;
+  }
+}
+
+EffectManager& RenderManagerImpl::EffectManager ()
+{
+  try
+  {
+    if (!impl->effects)
+      impl->effects = EffectManagerPtr (new render::EffectManager (&impl->DeviceManager (), &TextureManager (), &ShadingManager ()), false);
+
+    return *impl->effects;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::EffectManager");
     throw;
   }
 }
@@ -353,6 +370,12 @@ void RenderManagerImpl::LoadResource (const char* resource_name)
       MaterialManager ().LoadMaterialLibrary (resource_name);
       return;
     }    
+    
+    if (render::EffectManager::IsEffectLibraryResource (resource_name))
+    {
+      EffectManager ().LoadEffectLibrary (resource_name);
+      return;
+    }
       
     throw xtl::format_operation_exception ("", "Type of resource '%s' is unknown", resource_name);
   }
@@ -388,9 +411,9 @@ void RenderManagerImpl::UnloadResource (const char* resource_name)
       return;
     }
     
-    if (is_effect_library_file (resource_name))
+    if (render::EffectManager::IsEffectLibraryResource (resource_name))
     {
-      parse_effect_library (impl->device_manager, resource_name);
+      EffectManager ().UnloadEffectLibrary (resource_name);
       return;
     }
   }

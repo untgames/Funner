@@ -10,6 +10,7 @@
 #include <xtl/common_exceptions.h>
 #include <xtl/intrusive_ptr.h>
 #include <xtl/iterator.h>
+#include <xtl/ref.h>
 #include <xtl/signal.h>
 #include <xtl/trackable.h>
 
@@ -40,11 +41,14 @@ class DynamicTextureImpl;
 class ShadingManager;
 class MaterialManager;
 class PrimitiveManager;
+class EffectManager;
 class TextureManager;
 class EffectPass;
 class Effect;
 class EffectRenderer;
+class EffectLoaderLibrary;
 class InstantiatedEffect;
+struct RendererOperationList;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
@@ -53,6 +57,7 @@ typedef xtl::intrusive_ptr<DeviceManager>        DeviceManagerPtr;
 typedef xtl::intrusive_ptr<DynamicTextureImpl>   DynamicTexturePtr;
 typedef xtl::intrusive_ptr<EffectPass>           EffectPassPtr;
 typedef xtl::intrusive_ptr<Effect>               EffectPtr;
+typedef xtl::intrusive_ptr<EffectManager>        EffectManagerPtr;
 typedef xtl::intrusive_ptr<EffectRenderer>       EffectRendererPtr;
 typedef xtl::intrusive_ptr<EntityImpl>           EntityPtr;
 typedef xtl::intrusive_ptr<FrameImpl>            FramePtr;
@@ -130,10 +135,11 @@ class Wrappers
 #include "resource_proxy.h"
 
 #include "dynamic_texture.h"
+#include "effect.h"
 #include "effect_loader.h"
 #include "effect_loader_library.h"
+#include "effect_manager.h"
 #include "entity.h"
-#include "effect.h"
 #include "frame.h"
 #include "input_layout_manager.h"
 #include "program_parameters_manager.h"
