@@ -266,6 +266,15 @@ const char* FrameImpl::Effect ()
 }
 
 /*
+    Рендер эффекта
+*/
+
+EffectRendererPtr FrameImpl::EffectRenderer ()
+{
+  throw xtl::make_not_implemented_exception ("render::FrameImpl::EffectRenderer");
+}
+
+/*
     Свойства рендеринга
 */
 

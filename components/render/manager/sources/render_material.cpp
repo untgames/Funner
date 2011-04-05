@@ -73,13 +73,15 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
 
 typedef xtl::intrusive_ptr<Texmap> TexmapPtr;
 typedef stl::vector<TexmapPtr>     TexmapArray;
+typedef stl::vector<size_t>        TagHashArray;
 
 struct MaterialImpl::Impl: public CacheHolder
 {
   DeviceManagerPtr      device_manager;       //менеджер устройства отрисовки
   TextureManagerPtr     texture_manager;      //менеджер текстур
-  ShadingManagerPtr     shading_manager;      //менеджер шэйдинга
+  ShadingManagerPtr     shading_manager;      //менеджер шэйдинга  
   stl::string           id;                   //идентификатор материала
+  TagHashArray          tags;                 //тэги материала
   ProgramProxy          program;              //прокси программы
   PropertyBuffer        properties;           //свойства материала
   TexmapArray           texmaps;              //текстурные карты
@@ -190,6 +192,27 @@ void MaterialImpl::SetId (const char* id)
     throw xtl::make_null_argument_exception ("render::MaterialImpl::SetId", "id");
     
   impl->id = id;
+}
+
+/*
+    Тэги
+*/
+
+size_t MaterialImpl::TagsCount ()
+{
+  impl->UpdateCache ();
+  
+  return impl->tags.size ();
+}
+
+const size_t* MaterialImpl::Tags ()
+{
+  impl->UpdateCache ();
+  
+  if (impl->tags.empty ())
+    return 0;
+    
+  return &impl->tags [0];
 }
 
 /*

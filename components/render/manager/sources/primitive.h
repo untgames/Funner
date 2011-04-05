@@ -12,8 +12,8 @@ struct RendererPrimitive
   render::low_level::PrimitiveType type;        //тип примитива
   size_t                           first;       //индекс первой вершины/индекса
   size_t                           count;       //количество примитивов
-
-  //TODO: +tags list
+  size_t                           tags_count;  //количество тэгов материала
+  const size_t*                    tags;        //тэги материала
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

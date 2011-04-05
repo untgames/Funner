@@ -108,6 +108,8 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
       cached_primitive.type        = type;
       cached_primitive.first       = first;
       cached_primitive.count       = count;
+      cached_primitive.tags_count  = cached_material ? cached_material->TagsCount () : 0;
+      cached_primitive.tags        = cached_material ? cached_material->Tags () : (const size_t*)0;
     }
     catch (xtl::exception& e)
     {
