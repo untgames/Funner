@@ -61,7 +61,7 @@ int main ()
 
     body_transform.position.x = -1;
     convex_body->SetWorldTransform (body_transform);
-    convex_body->AddTorque (1.5f);
+    convex_body->AddImpulse (0.5f);
 
     body_transform.position.x = 2;
     triangle_mesh_body->SetWorldTransform (body_transform);

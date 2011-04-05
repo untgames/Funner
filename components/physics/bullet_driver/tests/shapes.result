@@ -46,13 +46,13 @@ Body world transform:
   orientation = 0.4; 0.8; 0.0; 0.1
 convex body state:
 Body world transform:
-  position = -1; -14; 0
-  orientation = 0.0; 0.6; 0.7; 0.0
+  position = 0; -14; 1
+  orientation = -0.2; 0.5; 0.7; 0.2
 triangle mesh body state:
 Body world transform:
-  position = 0; -13; -6
-  orientation = 0.9; 0.0; -0.2; 0.0
+  position = 6; -13; 0
+  orientation = -0.5; 0.3; 0.7; 0.2
 compound body state:
 Body world transform:
-  position = 3; -13; 0
-  orientation = -0.3; 0.0; 0.9; 0.0
+  position = 7; -13; 0
+  orientation = 0.3; 0.0; 0.6; 0.6
