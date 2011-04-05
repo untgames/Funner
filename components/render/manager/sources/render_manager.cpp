@@ -326,7 +326,15 @@ RenderTargetPtr RenderManagerImpl::CreateDepthStencilBuffer (size_t width, size_
 
 FramePtr RenderManagerImpl::CreateFrame ()
 {
-  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::CreateFrame");
+  try
+  {
+    return FramePtr (new FrameImpl (&EffectManager ()), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::RenderManagerImpl::CreateFrame");
+    throw;
+  }
 }
 
 EntityPtr RenderManagerImpl::CreateEntity ()

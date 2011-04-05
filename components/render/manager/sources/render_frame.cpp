@@ -22,26 +22,73 @@ const size_t RESERVED_FRAMES_COUNT   = 32;  //резервируемое количество отображае
 typedef stl::vector<FramePtr>  FrameArray;
 typedef stl::vector<EntityPtr> EntityArray;
 
-struct FrameImpl::Impl
+struct FrameImpl::Impl: public CacheHolder
 {
-  EntityArray entities;  //список объектов, отображаемых в кадре
-  FrameArray  frames;    //список вложенных кадров
+  EffectManagerPtr  effect_manager;  //ссылка на менеджер эффектов
+  EffectProxy       effect;          //эффект кадра
+  EffectRendererPtr effect_renderer; //рендер эффекта
+  EntityArray       entities;        //список объектов, отображаемых в кадре
+  FrameArray        frames;          //список вложенных кадров
+  EffectPtr         cached_effect;   //закэшированный эффект
 
 ///Конструктор
-  Impl ()
+  Impl (const EffectManagerPtr& in_effect_manager)
+    : effect_manager (in_effect_manager)
+    , effect (effect_manager->GetEffectProxy (""))
   {
     entities.reserve (RESERVED_ENTITIES_COUNT);
     frames.reserve (RESERVED_FRAMES_COUNT);
   }
+  
+///Работа с кэшем
+  void ResetCacheCore ()
+  {
+    cached_effect   = EffectPtr ();
+    effect_renderer = EffectRendererPtr ();
+  }
+
+  void UpdateCacheCore ()
+  {
+    try
+    {
+      cached_effect = effect.Resource ();
+      
+      if (!cached_effect)
+        return;
+        
+      effect_renderer = EffectRendererPtr (new render::EffectRenderer (cached_effect), false);
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::FrameImpl::Impl::UpdateCacheCore");
+      throw;
+    }
+  }
+    
+  using CacheHolder::UpdateCache;
+  using CacheHolder::Invalidate;
 };
 
 /*
    Конструктор / деструктор
 */
 
-FrameImpl::FrameImpl ()
-  : impl (new Impl)
+FrameImpl::FrameImpl (const EffectManagerPtr& effect_manager)
 {
+  try
+  {
+    if (!effect_manager)
+      throw xtl::make_null_argument_exception ("", "effect_manager");
+    
+    impl = new Impl (effect_manager);
+    
+    impl->effect.AttachCacheHolder (*impl);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::FrameImpl");
+    throw;
+  }
 }
 
 FrameImpl::~FrameImpl ()
@@ -257,12 +304,25 @@ TexturePtr FrameImpl::LocalTexture (const char* name)
 
 void FrameImpl::SetEffect (const char* name)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetEffect");
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+    
+    impl->effect = impl->effect_manager->GetEffectProxy (name);
+    
+    impl->Invalidate ();
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::SetEffect");
+    throw;
+  }
 }
 
 const char* FrameImpl::Effect ()
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::Effect");
+  return impl->effect.Name ();
 }
 
 /*
@@ -271,7 +331,17 @@ const char* FrameImpl::Effect ()
 
 EffectRendererPtr FrameImpl::EffectRenderer ()
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::EffectRenderer");
+  try
+  {
+    impl->UpdateCache ();
+    
+    return impl->effect_renderer;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::EffectRenderer");
+    throw;
+  }
 }
 
 /*
