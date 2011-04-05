@@ -2,6 +2,34 @@
 
 using namespace render;
 
+namespace
+{
+
+/*
+    Константы
+*/
+
+const size_t RESERVE_OPERATIONS_COUNT = 16;
+
+/*
+    Операция эффекта
+*/
+
+struct EffectOperation: public xtl::reference_counter
+{
+  EffectPassPtr         pass;   //проход, осуществляемый при выполнении операции
+  InstantiatedEffectPtr effect; //эффект, осуществляемый при выполнении операции
+
+  EffectOperation (const EffectPassPtr& in_pass) : pass (in_pass) {}
+
+  EffectOperation (const InstantiatedEffectPtr& in_effect) : effect (in_effect) {}
+};
+
+typedef xtl::intrusive_ptr<EffectOperation> EffectOperationPtr;
+typedef stl::vector<EffectOperationPtr>     EffectOperationArray;
+
+}
+
 /*
     Описание реализации эффекта
 */
@@ -10,8 +38,14 @@ typedef stl::vector<size_t> TagHashArray;
 
 struct Effect::Impl
 {
-  common::StringArray tags;       //тэги прохода
-  TagHashArray        tag_hashes; //хэши тэгов  
+  common::StringArray  tags;       //тэги прохода
+  TagHashArray         tag_hashes; //хэши тэгов  
+  EffectOperationArray operations; //операции рендеринга
+  
+  Impl ()
+  {
+    operations.reserve (RESERVE_OPERATIONS_COUNT);
+  }
 };
 
 /*
@@ -93,41 +127,60 @@ const size_t* Effect::TagHashes ()
     Проходы рендеринга / вложенные эффекты
 */
 
-size_t Effect::PassesCount ()
+size_t Effect::OperationsCount ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  return impl->operations.size ();
 }
 
-size_t Effect::ChildrenCount ()
+EffectPassPtr Effect::OperationPass (size_t order_number)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  if (order_number >= impl->operations.size ())
+    throw xtl::make_range_exception ("render::Effect::OperationPass", "order_number", order_number, impl->operations.size ());
+    
+  EffectOperationPtr operation = impl->operations [order_number];
+  
+  if (!operation || !operation->pass)
+    return EffectPassPtr ();
+
+  return operation->pass;
 }
 
-size_t Effect::AddOperation (const EffectPassPtr&)
+InstantiatedEffectPtr Effect::OperationEffect (size_t order_number)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  if (order_number >= impl->operations.size ())
+    throw xtl::make_range_exception ("render::Effect::OperationEffect", "order_number", order_number, impl->operations.size ());
+    
+  EffectOperationPtr operation = impl->operations [order_number];
+  
+  if (!operation || !operation->effect)
+    return InstantiatedEffectPtr ();
+
+  return operation->effect;
 }
 
-size_t Effect::AddOperation (const EffectPtr&)
+size_t Effect::AddOperation (const EffectPassPtr& pass)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  impl->operations.push_back (EffectOperationPtr (new EffectOperation (pass), false));
+  
+  return impl->operations.size () - 1;
+}
+
+size_t Effect::AddOperation (const InstantiatedEffectPtr& effect)
+{
+  impl->operations.push_back (EffectOperationPtr (new EffectOperation (effect), false));
+
+  return impl->operations.size () - 1;
 }
 
 void Effect::RemoveOperation (size_t order_number)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  if (order_number >= impl->operations.size ())
+    return;
+
+  impl->operations.erase (impl->operations.begin () + order_number);
 }
 
 void Effect::RemoveAllOperations ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
-}
-
-/*
-    Создание рендера эффекта
-*/
-
-EffectRendererPtr Effect::CreateRenderer ()
-{
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  impl->operations.clear ();
 }

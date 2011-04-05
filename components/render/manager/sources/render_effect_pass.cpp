@@ -11,6 +11,8 @@ typedef stl::vector<size_t> TagHashArray;
 struct EffectPass::Impl
 {
   DeviceManagerPtr             device_manager;          //менеджер устройства отрисовки
+  common::StringArray          color_targets;           //целевые буферы цвета
+  stl::string                  depth_stencil_target;    //целевой буфер глубины
   render::SortMode             sort_mode;               //режим сортировки
   LowLevelDepthStencilStatePtr depth_stencil_state;     //состояние уровня отсечения
   LowLevelBlendStatePtr        blend_state;             //состояние уровня смешивания цветов
@@ -58,6 +60,33 @@ EffectPass::EffectPass (const DeviceManagerPtr& device_manager)
 
 EffectPass::~EffectPass ()
 {
+}
+
+/*
+    Целевые буферы отрисовки
+*/
+
+void EffectPass::SetColorTargets (const common::StringArray& targets)
+{
+  impl->color_targets = targets.Clone ();
+}
+
+void EffectPass::SetDepthStencilTarget (const char* name)
+{
+  if (!name)
+    throw xtl::make_null_argument_exception ("render::EffectPass::SetDepthStencilTarget", "name");
+    
+  impl->depth_stencil_target = name;
+}
+
+const common::StringArray& EffectPass::ColorTargets ()
+{
+  return impl->color_targets;
+}
+
+const char* EffectPass::DepthStencilTarget ()
+{
+  return impl->depth_stencil_target.c_str ();
 }
 
 /*

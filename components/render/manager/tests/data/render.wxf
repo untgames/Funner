@@ -6,7 +6,7 @@
 //TODO: constant params requirements (constant buffers description)
 //TODO: temporary render targets
 
-import "shaders/*"
+library "shaders/*"
 
 //blend stage state for rendering solid (non transaparent) geometry
 blend "solid"
@@ -165,27 +165,16 @@ program "helper"
   shader  "helper.frag" //reference to shader source
 }
 
-//description of frames rendering
-frame "main"
+//description of effects rendering
+effect "main"
 {
-  subframes "main" //recursive possibility to render child frames with same structure
+  tags "main_effect_tag" //list of tags for this effect (used in effect_group)
 
-  //description of child frames rendering: rendering shadow maps
-  subframes
-  {
-    tags "shadow"  //list of frame tags which will be added to this subframes loop
+  effect_group "main_effect_tag" //recursive possibility to render child effects with same structure  
 
-    pass
-    {
-      tags                  "solid"       //tags for material of each primitive
-      color_targets         null          //render target for color buffer - not needed for rendering of shadow maps
-      depth_stencil_target  "shadow_map"  //render target for depth stencil buffer
-      depth_stencil_state   "solid"       //depth stencil stage settings
-      rasterizer_state      "default"     //rasterizer stage settings
-      program               "shadow_map"  //this program overrides material programs
-    }
-  }
-  
+  //description of child effects rendering: rendering shadow maps
+  effect_group "shadow" //list of effect tags which will be added to this subeffects loop
+
   //rendering of geometry without lighting (for early z-test)
   pass
   {
@@ -197,42 +186,15 @@ frame "main"
     rasterizer_state      "default"                   //use default rasterizer settings
   }
 
-  //child frames for rendering geometry in selected light
-  subframes
-  {
-    tags "lighting" //use only frames with tag 'lighting'
-  
-    //render solid (non-transaparent) geometry
-    pass
-    {
-      tags                  "solid"                       //render only non-transparent geometry
-      sort                  states                        //sort geometry for decrease state switches
-      color_targets         "main_color_target"           //render to frame color buffer
-      depth_stencil_target  "main_depth_stencil_target"   //render to frame depth stencil buffer
-      blend_state           "solid"                       //use blend stage settings for solid geometry
-      depth_stencil_state   "solid"                       //use depth stencil stage settings for solid geometry
-      rasterizer_state      "default"                     //use default rasterizer
-    }
-    
-    //render transparent geometry
-    pass
-    {
-      tags                  "transparent"                 //render only transparent geometry
-      sort                  back_to_front                 //sort geometry in back-to-front order for correct transaparent rendering
-      color_targets         "main_color_target"           //render to frame color buffer
-      depth_stencil_target  "main_depth_stencil_target"   //render to frame depth stencil buffer
-      blend_state           "transparent"                 //use blend stage settings for transaparent geometry
-      depth_stencil_state   "ztest_without_write"         //use depth stencil stage settings for transaparent geometry
-      rasterizer_state      "default"                     //use default rasterizer
-    }
-  }
+  //child effects for rendering geometry in selected light
+  effect_group "lighting" //use only effects with tag 'lighting'
   
   //render overlays
   pass
   {
     tags                  "overlay"                     //render only overlays: monitors, UI
-    color_targets         "main_color_target"           //render to frame color buffer
-    depth_stencil_target  "main_depth_stencil_target"   //render to frame depth stencil buffer
+    color_targets         "main_color_target"           //render to effect color buffer
+    depth_stencil_target  "main_depth_stencil_target"   //render to effect depth stencil buffer
     blend_state           "transparent"                 //use blend stage settings for transaparent geometry
     depth_stencil_state   "ztest_without_write"         //use depth stencil stage settings for transaparent geometry
     rasterizer_state      "overlays"                    //use rasterizer stage settings for overlays
@@ -242,8 +204,8 @@ frame "main"
   pass
   {
     tags                  "decal"                       //render only decals: blood, watermatks, etc.
-    color_targets         "main_color_target"           //render to frame color buffer
-    depth_stencil_target  "main_depth_stencil_target"   //render to frame depth stencil buffer
+    color_targets         "main_color_target"           //render to effect color buffer
+    depth_stencil_target  "main_depth_stencil_target"   //render to effect depth stencil buffer
     blend_state           "additive"                    //use additive blend state settings
     depth_stencil_state   "ztest_without_write"         //use depth stencil stage settings for transaparent geometry
     rasterizer_state      "overlays"                    //use rasterizer stage settings for overlays
@@ -255,11 +217,55 @@ frame "main"
   pass
   {
     tags                  "helper"                      //render only geometry with 'helper' material tag
-    color_targets         "main_color_target"           //render to frame color buffer
-    depth_stencil_target  "main_depth_stencil_target"   //render to frame depth stencil buffer
+    color_targets         "main_color_target"           //render to effect color buffer
+    depth_stencil_target  "main_depth_stencil_target"   //render to effect depth stencil buffer
     blend_state           "solid"                       //use blend stage settings for solid geometry
     depth_stencil_state   "solid"                       //use depth stencil stage settings for solid geometry
-    rasterizer_state      "wireframe"                   //use rasterizer for helpers
+    rasterizer_state      "wireeffect"                   //use rasterizer for helpers
     program               "helper"                      //this program overrides material programs
+  }
+}
+
+effect "shadow"
+{
+  tags "shadow_map"
+
+  pass
+  {
+    tags                  "solid"       //tags for material of each primitive
+    color_targets         null          //render target for color buffer - not needed for rendering of shadow maps
+    depth_stencil_target  "shadow_map"  //render target for depth stencil buffer
+    depth_stencil_state   "solid"       //depth stencil stage settings
+    rasterizer_state      "default"     //rasterizer stage settings
+    program               "shadow_map"  //this program overrides material programs
+  }
+}
+
+effect "lighting"
+{
+  tags "lighting"
+
+  //render solid (non-transaparent) geometry
+  pass
+  {
+    tags                  "solid"                       //render only non-transparent geometry
+    sort                  states                        //sort geometry for decrease state switches
+    color_targets         "main_color_target"           //render to effect color buffer
+    depth_stencil_target  "main_depth_stencil_target"   //render to effect depth stencil buffer
+    blend_state           "solid"                       //use blend stage settings for solid geometry
+    depth_stencil_state   "solid"                       //use depth stencil stage settings for solid geometry
+    rasterizer_state      "default"                     //use default rasterizer
+  }
+  
+  //render transparent geometry
+  pass
+  {
+    tags                  "transparent"                 //render only transparent geometry
+    sort                  back_to_front                 //sort geometry in back-to-front order for correct transaparent rendering
+    color_targets         "main_color_target"           //render to effect color buffer
+    depth_stencil_target  "main_depth_stencil_target"   //render to effect depth stencil buffer
+    blend_state           "transparent"                 //use blend stage settings for transaparent geometry
+    depth_stencil_state   "ztest_without_write"         //use depth stencil stage settings for transaparent geometry
+    rasterizer_state      "default"                     //use default rasterizer
   }
 }

@@ -23,6 +23,14 @@ class EffectPass: public Object
     ~EffectPass ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Целевые буферы отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void                       SetColorTargets       (const common::StringArray& targets);
+    void                       SetDepthStencilTarget (const char* name);
+    const common::StringArray& ColorTargets          ();
+    const char*                DepthStencilTarget    ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Состояния уровней устройства отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                                SetBlendState        (const LowLevelBlendStatePtr&);
@@ -60,6 +68,34 @@ class EffectPass: public Object
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Инстанцирование эффекта рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+class InstantiatedEffect: public Object
+{
+  public:
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Конструктор / деструктор
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    InstantiatedEffect  ();
+    ~InstantiatedEffect ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Тэги включенных эффектов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void          SetTags   (const char* tags);
+    void          SetTags   (const common::StringArray& tags);
+    size_t        TagsCount ();
+    const char*   Tag       (size_t index);
+    size_t        TagHash   (size_t index);
+    const char**  Tags      ();
+    const size_t* TagHashes ();
+
+  private:
+    struct Impl;
+    stl::auto_ptr<Impl> impl;
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Эффект рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class Effect: public Object
@@ -75,7 +111,7 @@ class Effect: public Object
 ///Тэги фрейма: используются для рекурсивного рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void          SetTags   (const char* tags);
-    void          SetTags   (const common::StringArray& tags);    
+    void          SetTags   (const common::StringArray& tags);
     size_t        TagsCount ();
     const char*   Tag       (size_t index);
     size_t        TagHash   (size_t index);
@@ -85,17 +121,13 @@ class Effect: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проходы рендеринга / вложенные эффекты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t PassesCount         ();
-    size_t ChildrenCount       ();
-    size_t AddOperation        (const EffectPassPtr&); //returns order number of operation in rendering sequence
-    size_t AddOperation        (const EffectPtr&);    //returns order number of operation in rendering sequence
-    void   RemoveOperation     (size_t order_number);
-    void   RemoveAllOperations ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-///Создание рендера эффекта
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    EffectRendererPtr CreateRenderer ();
+    size_t                OperationsCount     ();
+    size_t                AddOperation        (const EffectPassPtr&); //returns order number of operation in rendering sequence
+    size_t                AddOperation        (const InstantiatedEffectPtr&);    //returns order number of operation in rendering sequence
+    EffectPassPtr         OperationPass       (size_t order_number);
+    InstantiatedEffectPtr OperationEffect     (size_t order_number);
+    void                  RemoveOperation     (size_t order_number);
+    void                  RemoveAllOperations ();
 
   private:
     struct Impl;

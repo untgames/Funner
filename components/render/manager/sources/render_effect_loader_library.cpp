@@ -88,6 +88,7 @@ typename EffectLoaderLibrary::Library<Ptr>::Item EffectLoaderLibrary::Library<Pt
   if (!id)
     return Item ();
     
+  typedef typename Impl::ItemMap ItemMap;
   typename ItemMap::iterator iter = impl->items.find (id);
   
   if (iter == impl->items.end ())
@@ -95,6 +96,14 @@ typename EffectLoaderLibrary::Library<Ptr>::Item EffectLoaderLibrary::Library<Pt
     
   return iter->second;
 }
+
+template class EffectLoaderLibrary::Library<LowLevelRasterizerStatePtr>;
+template class EffectLoaderLibrary::Library<LowLevelBlendStatePtr>;
+template class EffectLoaderLibrary::Library<LowLevelDepthStencilStatePtr>;
+template class EffectLoaderLibrary::Library<LowLevelSamplerStatePtr>;
+template class EffectLoaderLibrary::Library<LowLevelProgramPtr>;
+template class EffectLoaderLibrary::Library<EffectPassPtr>;
+template class EffectLoaderLibrary::Library<EffectPtr>;
 
 /*
 ===================================================================================================
@@ -109,7 +118,9 @@ struct EffectLoaderLibrary::Impl
   DepthStencilStateLibrary   depth_stencil_states;  //библиотека состояний уровня отсечения
   SamplerStateLibrary        sampler_states;        //библиотека состояний текстурных сэмплеров
   ProgramLibrary             programs;              //библиотека программ
-  media::rfx::ShaderLibrary  shader_library;        //библиотека шейдеров
+  media::rfx::ShaderLibrary  shaders;               //библиотека шейдеров
+  EffectPassLibrary          effect_passes;         //библиотека проходов эффекта
+  EffectLibrary              effects;
 };
 
 /*
@@ -154,7 +165,17 @@ EffectLoaderLibrary::ProgramLibrary& EffectLoaderLibrary::Programs ()
   return impl->programs;
 }
 
-media::rfx::ShaderLibrary& EffectLoaderLibrary::ShaderLibrary ()
+media::rfx::ShaderLibrary& EffectLoaderLibrary::Shaders ()
 {
-  return impl->shader_library;
+  return impl->shaders;
+}
+
+EffectLoaderLibrary::EffectPassLibrary& EffectLoaderLibrary::EffectPasses ()
+{
+  return impl->effect_passes;
+}
+
+EffectLoaderLibrary::EffectLibrary& EffectLoaderLibrary::Effects ()
+{
+  return impl->effects;
 }

@@ -44,6 +44,7 @@ class TextureManager;
 class EffectPass;
 class Effect;
 class EffectRenderer;
+class InstantiatedEffect;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
@@ -55,6 +56,7 @@ typedef xtl::intrusive_ptr<Effect>               EffectPtr;
 typedef xtl::intrusive_ptr<EffectRenderer>       EffectRendererPtr;
 typedef xtl::intrusive_ptr<EntityImpl>           EntityPtr;
 typedef xtl::intrusive_ptr<FrameImpl>            FramePtr;
+typedef xtl::intrusive_ptr<InstantiatedEffect>   InstantiatedEffectPtr;
 typedef xtl::intrusive_ptr<MaterialImpl>         MaterialPtr;
 typedef xtl::intrusive_ptr<MaterialManager>      MaterialManagerPtr;
 typedef xtl::intrusive_ptr<PrimitiveImpl>        PrimitivePtr;
@@ -128,6 +130,7 @@ class Wrappers
 #include "resource_proxy.h"
 
 #include "dynamic_texture.h"
+#include "effect_loader.h"
 #include "effect_loader_library.h"
 #include "entity.h"
 #include "effect.h"

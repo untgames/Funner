@@ -387,6 +387,12 @@ void RenderManagerImpl::UnloadResource (const char* resource_name)
       MaterialManager ().UnloadMaterialLibrary (resource_name);
       return;
     }
+    
+    if (is_effect_library_file (resource_name))
+    {
+      parse_effect_library (impl->device_manager, resource_name);
+      return;
+    }
   }
   catch (xtl::exception& e)
   {

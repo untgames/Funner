@@ -9,7 +9,16 @@ using namespace render;
 namespace
 {
 
-///Загрузчик эффектов
+/*
+    Константы
+*/
+
+const char* RFX_FILE_SUFFIX = ".rfx"; //суффикс имени файла описания библиотеки эффектов
+
+/*
+    Загрузчик эффектов
+*/
+
 class EffectLoader
 {
   public:
@@ -48,8 +57,10 @@ class EffectLoader
       for_each_child (*iter, "depth_stencil", xtl::bind (&EffectLoader::ParseDepthStencilState, this, _1));
       for_each_child (*iter, "rasterizer",    xtl::bind (&EffectLoader::ParseRasterizerState, this, _1));
       for_each_child (*iter, "sampler",       xtl::bind (&EffectLoader::ParseSamplerState, this, _1));
-      for_each_child (*iter, "import",        xtl::bind (&EffectLoader::ParseShaderLibrary, this, _1));
-      for_each_child (*iter, "shading",       xtl::bind (&EffectLoader::ParseShading, this, _1));
+      for_each_child (*iter, "library",       xtl::bind (&EffectLoader::ParseShaderLibrary, this, _1));
+      for_each_child (*iter, "program",       xtl::bind (&EffectLoader::ParseProgram, this, _1));
+      for_each_child (*iter, "pass",          xtl::bind (&EffectLoader::ParseNamedPass, this, _1));
+      for_each_child (*iter, "effect",        xtl::bind (&EffectLoader::ParseNamedEffect, this, _1));
     }
     
 ///Разбор аргумента операции смешивания цветов
@@ -468,11 +479,11 @@ class EffectLoader
     {
       const char* file_mask = get<const char*> (*iter, "");
       
-      library.ShaderLibrary ().Load (file_mask, ShaderLoaderLog (*iter, parser.Log ()));
+      library.Shaders ().Load (file_mask, ShaderLoaderLog (*iter, parser.Log ()));
     }
     
 ///Разбор настроек шэйдинга
-    void ParseShading (Parser::Iterator iter)
+    void ParseProgram (Parser::Iterator iter)
     {
       const char* id      = get<const char*> (*iter, "");
       const char* options = get<const char*> (*iter, "options", "");
@@ -494,7 +505,7 @@ class EffectLoader
         desc.name    = get<const char*> (params_iter);
         desc.profile = get<const char*> (params_iter);
         
-        media::rfx::Shader* shader = library.ShaderLibrary ().Find (desc.name, desc.profile);
+        media::rfx::Shader* shader = library.Shaders ().Find (desc.name, desc.profile);
         
         if (!shader)
           raise_parser_exception (*shader_iter, "Shader '%s' for profile '%s' not found", desc.name, desc.profile);
@@ -520,7 +531,161 @@ class EffectLoader
         parser.Log ().Error (*iter, "%s", e.what ());
         throw;
       }            
-    }        
+    }
+    
+///Разбор списка тэгов
+    common::StringArray ParseTags (const ParseNode& node, const char* node_name, bool non_empty_requirement = true)
+    {
+      Parser::Iterator tags_node = node.First (node_name);
+
+      if (!tags_node && non_empty_requirement)
+        raise_parser_exception (node, "Node 'tags' not found in description");
+
+      Parser::AttributeIterator tags_attr_iter = make_attribute_iterator (*tags_node);
+
+      common::StringArray tags;
+
+      for (;tags_attr_iter; ++tags_attr_iter)
+      {
+        const char* tag = *tags_attr_iter;
+
+        if (strchr (tag, ' ')) tags.Add (common::split (tag, " "));
+        else                   tags.Add (tag);
+      }
+      
+      return tags;
+    }
+    
+///Разбор прохода рендеринга
+    static SortMode ParseSortMode (const ParseNode& node)
+    {
+      const char* value = get<const char*> (node, "", "default");
+
+      if (!xtl::xstrcmp (value, "default"))       return SortMode_Default;
+      if (!xtl::xstrcmp (value, "states"))        return SortMode_StateSwitch;
+      if (!xtl::xstrcmp (value, "back_to_front")) return SortMode_BackToFront;
+      if (!xtl::xstrcmp (value, "front_to_back")) return SortMode_FrontToBack;
+      
+      raise_parser_exception (node, "Unexpected sort mode '%s'", value);
+      
+      return SortMode_Default;      
+    }
+
+    void ParseNamedPass (Parser::Iterator iter)
+    {
+      const char* id = get<const char*> (*iter, "");
+      
+      EffectPassPtr pass = ParsePass (iter);
+      
+      library.EffectPasses ().Add (id, pass);
+    }
+    
+    EffectPassPtr ParsePass (Parser::Iterator iter)
+    {
+      try
+      {
+        common::StringArray tags                     = ParseTags (*iter, "tags");
+        common::StringArray color_targets            = ParseTags (*iter, "color_targets", false);
+        SortMode            sort_mode                = ParseSortMode (*iter);
+        const char*         depth_stencil_target     = get<const char*> (*iter, "depth_stencil_target", "null");
+        const char*         depth_stencil_state_name = get<const char*> (*iter, "depth_stencil_state", "");
+        const char*         blend_state_name         = get<const char*> (*iter, "blend_state", "");
+        const char*         rasterizer_state_name    = get<const char*> (*iter, "rasterizer_state", "");
+
+        LowLevelBlendStatePtr        blend_state         = *blend_state_name ? library.BlendStates ().Find (blend_state_name) : LowLevelBlendStatePtr ();
+        LowLevelDepthStencilStatePtr depth_stencil_state = *depth_stencil_state_name ? library.DepthStencilStates ().Find (depth_stencil_state_name) : LowLevelDepthStencilStatePtr ();
+        LowLevelRasterizerStatePtr   rasterizer_state    = *rasterizer_state_name ? library.RasterizerStates ().Find (rasterizer_state_name) : LowLevelRasterizerStatePtr ();
+
+        EffectPassPtr pass (new EffectPass (device_manager), false);
+
+        pass->SetColorTargets       (color_targets);
+        pass->SetDepthStencilTarget (depth_stencil_target);
+        pass->SetTags               (tags);
+        pass->SetSortMode           (sort_mode);
+        pass->SetBlendState         (blend_state);
+        pass->SetDepthStencilState  (depth_stencil_state);
+        pass->SetRasterizerState    (rasterizer_state);
+
+        return pass;
+      }
+      catch (std::exception& e)
+      {
+        parser.Log ().Error (*iter, "%s", e.what ());
+        throw;
+      }
+    }
+    
+///Разбор эффекта рендеринга
+    void ParseNamedEffect (Parser::Iterator iter)
+    {
+      const char* id = get<const char*> (*iter, "");
+      
+      EffectPtr effect = ParseEffect (iter);
+      
+      library.Effects ().Add (id, effect);
+    }
+    
+    EffectPassPtr ParseEffectPass (Parser::Iterator iter)
+    {
+      const char* id = get<const char*> (*iter, "", "");
+      
+      if (iter->First () && *id)
+        raise_parser_exception (*iter, "Can't use named pass with content inside effect definition");
+        
+      EffectPassPtr pass;
+        
+      if (*id)
+      {
+        pass = library.EffectPasses ().Find (id);
+        
+        if (!pass)
+          raise_parser_exception (*iter, "Pass '%s' not found", id);
+      }
+      else
+      {
+        pass = ParsePass (iter);
+      }
+
+      return pass;
+    }
+    
+    InstantiatedEffectPtr ParseEffectGroup (Parser::Iterator iter)
+    {
+      common::StringArray tags = ParseTags (*iter, "");
+      
+      InstantiatedEffectPtr effect (new InstantiatedEffect, false);
+      
+      effect->SetTags (tags);
+      
+      return effect;
+    }
+    
+    EffectPtr ParseEffect (Parser::Iterator iter)
+    {
+      try
+      {
+        common::StringArray tags = ParseTags (*iter, "tags", false);
+        
+        EffectPtr effect (new Effect, false);
+        
+        effect->SetTags (tags);
+        
+        for (Parser::Iterator node_iter=iter->First (); node_iter; ++node_iter)
+        {
+          const char* id = node_iter->Name ();
+          
+          if      (!xtl::xstrcmp (id, "pass"))         effect->AddOperation (ParseEffectPass (node_iter));
+          else if (!xtl::xstrcmp (id, "effect_group")) effect->AddOperation (ParseEffectGroup (node_iter));
+        }
+
+        return effect;
+      }
+      catch (std::exception& e)
+      {
+        parser.Log ().Error (*iter, "%s", e.what ());
+        throw;
+      }
+    }    
   
   private:
     common::Parser       parser;         //парсер файла эффектов
@@ -537,6 +702,14 @@ namespace render
 void parse_effect_library (const DeviceManagerPtr& device_manager, const char* file_name)
 {
   EffectLoader loader (device_manager, file_name);
+}
+
+bool is_effect_library_file (const char* file_name)
+{
+  if (!file_name)
+    return false;
+    
+  return xtl::xstricmp (common::suffix (file_name).c_str (), RFX_FILE_SUFFIX) == 0;
 }
 
 }
