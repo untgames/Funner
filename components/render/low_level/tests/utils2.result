@@ -14,4 +14,5 @@ PixelFormat_RGBA_PVRTC4: is_compressed=1 is_uncompressed=0 is_depth_stencil=0 is
 PixelFormat_D16: is_compressed=0 is_uncompressed=1 is_depth_stencil=1 is_color=0
 PixelFormat_D24X8: is_compressed=0 is_uncompressed=1 is_depth_stencil=1 is_color=0
 PixelFormat_D24S8: is_compressed=0 is_uncompressed=1 is_depth_stencil=1 is_color=0
+PixelFormat_D32: is_compressed=0 is_uncompressed=1 is_depth_stencil=1 is_color=0
 PixelFormat_S8: is_compressed=0 is_uncompressed=1 is_depth_stencil=1 is_color=0

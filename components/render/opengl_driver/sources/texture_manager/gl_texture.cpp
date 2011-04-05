@@ -79,6 +79,7 @@ Texture::Texture
 
     case PixelFormat_D16:
     case PixelFormat_D24X8:
+    case PixelFormat_D32:
       if (!GetCaps ().has_arb_depth_texture)
         throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create depth texture (GL_ARB_depth_texture and GL_VERSION_1_4 not supported)");
 

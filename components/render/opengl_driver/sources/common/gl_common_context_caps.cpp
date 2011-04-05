@@ -220,6 +220,7 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glFramebufferTexture2D_fn                = glFramebufferTexture2DEXT;
     glFramebufferTexture3D_fn                = glFramebufferTexture3DEXT;
     glGetFramebufferAttachmentParameteriv_fn = glGetFramebufferAttachmentParameterivEXT;
+    glGenerateMipmap_fn                      = glGenerateMipmapEXT;
   }
   
   if (has_arb_transpose_matrix)
@@ -244,6 +245,26 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glUniformMatrix3fv_fn        = glUniformMatrix3fv ? glUniformMatrix3fv : glUniformMatrix3fvARB;
     glUniformMatrix4fv_fn        = glUniformMatrix4fv ? glUniformMatrix4fv : glUniformMatrix4fvARB;
     glUseProgram_fn              = glUseProgram ? glUseProgram : (PFNGLUSEPROGRAMPROC)glUseProgramObjectARB;
+  }
+
+  if (has_ffp)
+  {
+    if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
+    else                      texture_units_count = 1;
+  }
+  else
+  {
+    if (has_arb_vertex_shader)
+    {
+      int vertex_shader_texture_units_count, pixel_shader_texture_units_count;
+
+      glGetIntegerv (GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&vertex_shader_texture_units_count);
+      glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&pixel_shader_texture_units_count);
+
+      texture_units_count = stl::min (vertex_shader_texture_units_count, pixel_shader_texture_units_count);
+    }
+    else
+      texture_units_count = 1;
   }
   
 #else
@@ -300,7 +321,10 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
     glFramebufferRenderbuffer_fn             = glFramebufferRenderbufferOES;
     glFramebufferTexture2D_fn                = glFramebufferTexture2DOES;
     glGetFramebufferAttachmentParameteriv_fn = glGetFramebufferAttachmentParameterivOES;
+    glGenerateMipmap_fn                      = glGenerateMipmapOES;
   }
+
+  glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);  //has_arb_multitexture always true
 
 #endif
 
@@ -309,26 +333,6 @@ void ContextCaps::Init (const ExtensionSet& available_extension_set, const Exten
   if (has_ext_texture_filter_anisotropic) glGetIntegerv (GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, (GLint*)&max_anisotropy);
   else                                    max_anisotropy = 1;
 
-  if (has_ffp)
-  {
-    if (has_arb_multitexture) glGetIntegerv (GL_MAX_TEXTURE_UNITS, (GLint*)&texture_units_count);
-    else                      texture_units_count = 1;
-  }
-  else
-  {
-    if (has_arb_vertex_shader)
-    {
-      int vertex_shader_texture_units_count, pixel_shader_texture_units_count;
-
-      glGetIntegerv (GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&vertex_shader_texture_units_count);
-      glGetIntegerv (GL_MAX_TEXTURE_IMAGE_UNITS_ARB, (GLint*)&pixel_shader_texture_units_count);
-
-      texture_units_count = stl::min (vertex_shader_texture_units_count, pixel_shader_texture_units_count);
-    }
-    else
-      texture_units_count = 1;
-  }
-  
   size_t settings_max_texture_size    = settings.GetInteger (ContextSettingsInteger_MaxTextureSize),
          settings_max_anisotropy      = settings.GetInteger (ContextSettingsInteger_MaxAnisotropy),
          settings_texture_units_count = settings.GetInteger (ContextSettingsInteger_TextureUnitsCount);         

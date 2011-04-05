@@ -160,6 +160,7 @@ struct TextureManager::Impl: public ContextObject
       texture_manager (in_texture_manager),
       state (this)
     {
+#ifndef OPENGL_ES_SUPPORT
       //выбор текущего контекста
 
       MakeContextCurrent ();
@@ -172,6 +173,7 @@ struct TextureManager::Impl: public ContextObject
       //проверка ошибок
 
       CheckErrors ("render::low_level::opengl::TextureManager::Impl::Impl");
+#endif
     }
 
       //получение основного состояния
@@ -340,7 +342,7 @@ struct TextureManager::Impl: public ContextObject
 
       bindable_texture->GetDesc (texture_desc);
 
-      glGenerateMipmapEXT (texture_desc.target);
+      caps.glGenerateMipmap_fn (texture_desc.target);
 
         //проверка ошибок
 

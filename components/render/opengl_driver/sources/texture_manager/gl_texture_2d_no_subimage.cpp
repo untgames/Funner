@@ -40,6 +40,7 @@ Texture2DNoSubimage::Texture2DNoSubimage  (const ContextManager& manager, const 
     case PixelFormat_D16:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:
+    case PixelFormat_D32:
     case PixelFormat_S8:    
       throw xtl::format_not_supported_exception (METHOD_NAME, "Depth-stencil 2D textures not supported (desc.format=%s)", get_name (GetFormat ()));
     default:

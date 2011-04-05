@@ -26,6 +26,7 @@ GLenum get_render_buffer_format (PixelFormat format, const char* source, const c
     case PixelFormat_D16:     return GL_DEPTH_COMPONENT16;
     case PixelFormat_D24X8:   return GL_DEPTH_COMPONENT24;
     case PixelFormat_D24S8:   return GL_DEPTH24_STENCIL8_EXT;
+    case PixelFormat_D32:     return GL_DEPTH_COMPONENT32;
     case PixelFormat_S8:      return GL_STENCIL_INDEX8_EXT;
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:
@@ -55,6 +56,7 @@ GLenum get_render_buffer_format (PixelFormat format, const char* source, const c
     case PixelFormat_D16:     return GL_DEPTH_COMPONENT16_OES;
     case PixelFormat_D24X8:   return GL_DEPTH_COMPONENT24_OES;
     case PixelFormat_D24S8:   return GL_DEPTH24_STENCIL8_OES;
+    case PixelFormat_D32:     return GL_DEPTH_COMPONENT32_OES;
     case PixelFormat_S8:      return GL_STENCIL_INDEX8_OES;
     case PixelFormat_DXT1:
     case PixelFormat_DXT3:

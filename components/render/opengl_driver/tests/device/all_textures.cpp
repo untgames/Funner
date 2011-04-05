@@ -39,6 +39,7 @@ const char* get_short_name (PixelFormat param)
     case PixelFormat_D16:   return "D16  ";
     case PixelFormat_D24X8: return "D24X8";
     case PixelFormat_D24S8: return "D24S8";
+    case PixelFormat_D32:   return "D32  ";
     case PixelFormat_S8:    return "S8   ";
     default:                return "?????";
   }
@@ -180,7 +181,8 @@ TestStatus test_texture (const TextureDesc& tex_desc, IDevice* device)
             case PixelFormat_RGB8:  data_size *= 3; break;
             case PixelFormat_RGBA8:
             case PixelFormat_D24X8:
-            case PixelFormat_D24S8: data_size *= 4; break;
+            case PixelFormat_D24S8:
+            case PixelFormat_D32:   data_size *= 4; break;
             default: return status; 
           }          
           

@@ -104,6 +104,7 @@ struct ContextCaps
   PFNGLFRAMEBUFFERRENDERBUFFERPROC             glFramebufferRenderbuffer_fn;
   PFNGLFRAMEBUFFERTEXTURE2DPROC                glFramebufferTexture2D_fn;
   PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC glGetFramebufferAttachmentParameteriv_fn;
+  PFNGLGENERATEMIPMAPPROC                      glGenerateMipmap_fn;
 
 #ifndef OPENGL_ES_SUPPORT
   PFNGLGETBUFFERSUBDATAPROC        glGetBufferSubData_fn;
