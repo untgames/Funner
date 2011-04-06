@@ -2,7 +2,7 @@ const int _ISORT_MAX = 32; //???name???
 const int __stl_chunk_size = 7; //????
 
 /*
-    Сортировка методом Шелла    
+    Сортировка методом Шелла
 */
 
 template <class Iter,class Compare>
@@ -60,7 +60,7 @@ inline void __median (Iter first,Iter mid,Iter last,Compare less)
     // sort median element to middle
   if (last-first > 40) //медиана из 9-ти элементов
   { 
-    int step = (last-first+1) / 8;
+    volatile int step = (last-first+1) / 8;  //volatile для обхода бага компилятора gcc 4.0 под MacOS
     
     __med3 (first,first+step,first+2*step,less);
     __med3 (mid-step,mid,mid+step,less);
@@ -89,7 +89,7 @@ pair<Iter,Iter> __unguarded_partition (Iter first,Iter last,Compare less)
   
   __median (first,mid,last-1,less); // mid - указывает на середину диапозона
 
-    //определение эквивалентного диапозона    
+    //определение эквивалентного диапозона
   while (pfirst != first && __order_equal (pfirst-1,pfirst,less)) --pfirst;
   while (plast  != last  && __order_equal (plast,pfirst,less))    ++plast;
 
