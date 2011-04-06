@@ -26,12 +26,14 @@ struct PropertyLayout::Impl: public xtl::reference_counter, public xtl::trackabl
   size_t        buffer_size; //размер буфера
   size_t        hash;        //хэш
   bool          need_update; //необходимо обновить хэш
+  bool          captured;    //объект захвачен для эксклюзивной записи
   
 ///Конструктор
   Impl ()
     : buffer_size (0)
     , hash (0)
     , need_update (true)
+    , captured (false)
   {
     properties.reserve (PROPERTY_ARRAY_RESERVE_SIZE);
   }
@@ -43,8 +45,15 @@ struct PropertyLayout::Impl: public xtl::reference_counter, public xtl::trackabl
     , buffer_size (impl.buffer_size)
     , hash (0)
     , need_update (true)
+    , captured (false)
   {
     Update ();
+  }
+    
+///Оповещение об обновлении
+  void UpdateNotify ()
+  {
+    need_update = true;    
   }
   
 ///Обновление
@@ -70,6 +79,13 @@ struct PropertyLayout::Impl: public xtl::reference_counter, public xtl::trackabl
 
     need_update = false;    
   }  
+  
+///Захват расположения свойств
+  static void Capture (PropertyLayout& layout)
+  {
+    if (layout.impl->captured && layout.impl->use_count () > 1)
+      layout = layout.Clone ();
+  }
 };
 
 /*
@@ -102,6 +118,15 @@ PropertyLayout& PropertyLayout::operator = (const PropertyLayout& layout)
   PropertyLayout (layout).Swap (*this);
   
   return *this;
+}
+
+/*
+    Идентификатор
+*/
+
+size_t PropertyLayout::Id () const
+{
+  return reinterpret_cast<size_t> (impl);
 }
 
 /*
@@ -147,6 +172,15 @@ PropertyLayout PropertyLayout::Clone () const
     e.touch ("common::PropertyLayout::Clone");
     throw;
   }
+}
+
+/*
+    Захват расположения свойств (изменения копий данного объекта не влияют на его состояние)
+*/
+
+void PropertyLayout::Capture ()
+{
+  impl->captured = true;
 }
 
 /*
@@ -272,6 +306,8 @@ size_t PropertyLayout::AddProperty (const char* name, common::PropertyType type,
       default:
         throw xtl::make_argument_exception ("", "type", type);
     }
+    
+    Impl::Capture (*this);
 
     impl->need_update = true;
 
@@ -287,6 +323,8 @@ size_t PropertyLayout::AddProperty (const char* name, common::PropertyType type,
       desc.elements_count = elements_count;
 
       impl->properties.push_back (desc);
+      
+      impl->UpdateNotify ();
 
       return impl->properties.size () - 1;
     }
@@ -308,19 +346,23 @@ void PropertyLayout::RemoveProperty (size_t property_index)
   if (property_index >= impl->properties.size ())
     return;
     
+  Impl::Capture (*this);
+    
   impl->properties.erase (impl->properties.begin () + property_index);
   
-  impl->names.Remove (property_index);
+  impl->UpdateNotify ();
   
-  impl->need_update = true;
+  impl->names.Remove (property_index);  
 }
 
 void PropertyLayout::Clear ()
 {
+  Impl::Capture (*this);
+
   impl->properties.clear ();
   impl->names.Clear ();
 
-  impl->need_update = true;
+  impl->UpdateNotify ();
 }
 
 /*
@@ -337,7 +379,7 @@ void PropertyLayout::SetPropertyName (const char* property_name, const char* new
   int index = IndexOf (property_name);
   
   if (index < 0)
-    throw xtl::make_argument_exception (METHOD_NAME, "property_name", property_name, "There is no property with this name");
+    throw xtl::make_argument_exception (METHOD_NAME, "property_name", property_name, "There is no property with this name");        
   
   SetPropertyName (static_cast<size_t> (index), new_name);
 }
@@ -381,12 +423,14 @@ void PropertyLayout::SetPropertyName (size_t property_index, const char* name)
 
   if (!name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
+    
+  Impl::Capture (*this);
   
   impl->names.Set (property_index, name);
 
   impl->properties [property_index].name_hash = strhash (name);
 
-  impl->need_update = true;
+  impl->UpdateNotify ();
 }
 
 void PropertyLayout::SetPropertyType (size_t property_index, common::PropertyType type)
@@ -408,9 +452,11 @@ void PropertyLayout::SetPropertyType (size_t property_index, common::PropertyTyp
       throw xtl::make_argument_exception ("", "type", type);
   }
   
+  Impl::Capture (*this);  
+  
   impl->properties [property_index].type = type;
   
-  impl->need_update = true;
+  impl->UpdateNotify ();
 }
 
 void PropertyLayout::SetPropertyElementsCount (size_t property_index, size_t elements_count)
@@ -422,10 +468,12 @@ void PropertyLayout::SetPropertyElementsCount (size_t property_index, size_t ele
 
   if (!elements_count)
     throw xtl::make_null_argument_exception (METHOD_NAME, "elements_count");
+    
+  Impl::Capture (*this);
 
   impl->properties [property_index].elements_count = elements_count;
 
-  impl->need_update = true;
+  impl->UpdateNotify ();
 }
 
 /*
