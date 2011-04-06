@@ -13,6 +13,28 @@ namespace
 const size_t RESERVED_ENTITIES_COUNT = 512; //резервируемое количество отображаемых объектов
 const size_t RESERVED_FRAMES_COUNT   = 32;  //резервируемое количество отображаемых фреймов
 
+/*
+    Вспомогательные структуры
+*/
+
+struct RenderTargetDesc: public xtl::reference_counter
+{
+  RenderTargetPtr render_target; //целевой буфер отрисовки
+  RectAreaPtr     viewport;      //область вывода
+  RectAreaPtr     scissor;       //область отсечения
+  
+  RenderTargetDesc (const RenderTargetPtr& in_render_target, const RectAreaPtr& in_viewport, const RectAreaPtr& in_scissor)
+    : render_target (in_render_target)
+    , viewport (in_viewport)
+    , scissor (in_scissor)
+  {
+  }
+};
+
+typedef xtl::intrusive_ptr<RenderTargetDesc>                           RenderTargetDescPtr;
+typedef stl::hash_map<stl::hash_key<const char*>, RenderTargetDescPtr> RenderTargetDescMap;
+typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr>          TextureMap;
+
 }
 
 /*
@@ -24,17 +46,28 @@ typedef stl::vector<EntityPtr> EntityArray;
 
 struct FrameImpl::Impl: public CacheHolder
 {
-  EffectManagerPtr  effect_manager;  //ссылка на менеджер эффектов
-  EffectProxy       effect;          //эффект кадра
-  EffectRendererPtr effect_renderer; //рендер эффекта
-  EntityArray       entities;        //список объектов, отображаемых в кадре
-  FrameArray        frames;          //список вложенных кадров
-  EffectPtr         cached_effect;   //закэшированный эффект
+  EffectManagerPtr    effect_manager;      //ссылка на менеджер эффектов
+  EffectProxy         effect;              //эффект кадра
+  EffectRendererPtr   effect_renderer;     //рендер эффекта
+  EntityArray         entities;            //список объектов, отображаемых в кадре
+  FrameArray          frames;              //список вложенных кадров
+  RenderTargetDescMap render_targets;      //целевые буферы отрисовки
+  TextureMap          textures;            //локальные текстуры фрейма
+  bool                scissor_state;       //включено ли отсечение
+  size_t              clear_flags;         //флаги очистки
+  math::vec4f         clear_color;         //цвет очистки фона
+  float               clear_depth_value;   //значение буфера глубины после очистки
+  unsigned char       clear_stencil_index; //значение буфера трафарета после очистки
+  EffectPtr           cached_effect;       //закэшированный эффект
 
 ///Конструктор
   Impl (const EffectManagerPtr& in_effect_manager)
     : effect_manager (in_effect_manager)
     , effect (effect_manager->GetEffectProxy (""))
+    , scissor_state (false)
+    , clear_flags (ClearFlag_All)
+    , clear_depth_value (1.0f)
+    , clear_stencil_index (0)
   {
     entities.reserve (RESERVED_ENTITIES_COUNT);
     frames.reserve (RESERVED_FRAMES_COUNT);
@@ -101,27 +134,49 @@ FrameImpl::~FrameImpl ()
 
 void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  SetRenderTarget (name, target, RectAreaPtr (), RectAreaPtr ());
 }
 
 void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target, const RectAreaPtr& viewport)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  SetRenderTarget (name, target, viewport, RectAreaPtr ());
 }
 
 void FrameImpl::SetRenderTarget (const char* name, const RenderTargetPtr& target, const RectAreaPtr& viewport, const RectAreaPtr& scissor)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+      
+    if (!target)
+      throw xtl::make_null_argument_exception ("", "target");
+      
+    RenderTargetDescMap::iterator iter = impl->render_targets.find (name);
+    
+    if (iter != impl->render_targets.end ())
+      throw xtl::make_argument_exception ("", "name", name, "Render target has already registered");
+      
+    impl->render_targets.insert_pair (name, RenderTargetDescPtr (new RenderTargetDesc (target, viewport, scissor), false));
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::SetRenderTarget(const char*,const RenderTargetPtr&,const RectAreaPtr&,const RectAreaPtr&)");
+    throw;
+  }
 }
 
 void FrameImpl::RemoveRenderTarget (const char* name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  if (!name)
+    return;
+    
+  impl->render_targets.erase (name);
 }
 
 void FrameImpl::RemoveAllRenderTargets ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  impl->render_targets.clear ();
 }
 
 /*
@@ -130,17 +185,41 @@ void FrameImpl::RemoveAllRenderTargets ()
 
 RenderTargetPtr FrameImpl::FindRenderTarget (const char* name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  if (!name)
+    return RenderTargetPtr ();
+
+  RenderTargetDescMap::iterator iter = impl->render_targets.find (name);
+
+  if (iter == impl->render_targets.end ())
+    return RenderTargetPtr ();
+    
+  return iter->second->render_target;
 }
 
 RectAreaPtr FrameImpl::FindViewport (const char* name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  if (!name)
+    return RectAreaPtr ();
+
+  RenderTargetDescMap::iterator iter = impl->render_targets.find (name);
+
+  if (iter == impl->render_targets.end ())
+    return RectAreaPtr ();
+    
+  return iter->second->viewport;
 }
 
 RectAreaPtr FrameImpl::FindScissor (const char* name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  if (!name)
+    return RectAreaPtr ();
+
+  RenderTargetDescMap::iterator iter = impl->render_targets.find (name);
+
+  if (iter == impl->render_targets.end ())
+    return RectAreaPtr ();
+    
+  return iter->second->scissor;
 }
 
 RenderTargetPtr FrameImpl::RenderTarget (const char* name)
@@ -194,12 +273,12 @@ RectAreaPtr FrameImpl::Scissor (const char* name)
 
 void FrameImpl::SetScissorState (bool state)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetScissorState");
+  impl->scissor_state = state;
 }
 
 bool FrameImpl::ScissorState ()
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::ScissorState");
+  return impl->scissor_state;
 }
 
 /*
@@ -208,12 +287,12 @@ bool FrameImpl::ScissorState ()
 
 void FrameImpl::SetClearFlags (size_t clear_flags)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetClearFlags");
+  impl->clear_flags = clear_flags;
 }
 
 size_t FrameImpl::ClearFlags ()
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::ClearFlags");
+  return impl->clear_flags;
 }
 
 /*
@@ -222,12 +301,12 @@ size_t FrameImpl::ClearFlags ()
 
 void FrameImpl::SetClearColor (const math::vec4f& color)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetClearColor");
+  impl->clear_color = color;
 }
 
 const math::vec4f& FrameImpl::ClearColor ()
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::ClearColor");
+  return impl->clear_color;
 }
 
 /*
@@ -236,22 +315,22 @@ const math::vec4f& FrameImpl::ClearColor ()
 
 void FrameImpl::SetClearDepthValue (float depth_value)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetClearDepthValue");
+  impl->clear_depth_value = depth_value;
 }
 
 void FrameImpl::SetClearStencilIndex (unsigned char stencil_index)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetClearStencilIndex");
+  impl->clear_stencil_index = stencil_index;
 }
 
 float FrameImpl::ClearDepthValue ()
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::ClearDepthValue");
+  return impl->clear_depth_value;
 }
 
 unsigned char FrameImpl::ClearStencilIndex ()
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::ClearStencilIndex");
+  return impl->clear_stencil_index;
 }
 
 /*
@@ -260,17 +339,39 @@ unsigned char FrameImpl::ClearStencilIndex ()
 
 void FrameImpl::SetLocalTexture (const char* name, const TexturePtr& texture)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+      
+    if (!texture)
+      throw xtl::make_null_argument_exception ("", "texture");
+      
+    TextureMap::iterator iter = impl->textures.find (name);
+    
+    if (iter != impl->textures.end ())
+      throw xtl::make_argument_exception ("", "name", name, "Frame local texture has already registered");
+      
+    impl->textures.insert_pair (name, texture);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::SetLocalTexture");
+    throw;
+  }
 }
 
 void FrameImpl::RemoveLocalTexture (const char* name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  if (!name)
+    return;
+    
+  impl->textures.erase (name);
 }
 
 void FrameImpl::RemoveAllLocalTextures ()
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  impl->textures.clear ();
 }
 
 /*
@@ -279,7 +380,15 @@ void FrameImpl::RemoveAllLocalTextures ()
 
 TexturePtr FrameImpl::FindLocalTexture (const char* name)
 {
-  throw xtl::make_not_implemented_exception (__FUNCTION__);
+  if (!name)
+    return TexturePtr ();
+    
+  TextureMap::iterator iter = impl->textures.find (name);
+  
+  if (iter == impl->textures.end ())
+    return TexturePtr ();
+    
+  return iter->second;
 }
 
 TexturePtr FrameImpl::LocalTexture (const char* name)
