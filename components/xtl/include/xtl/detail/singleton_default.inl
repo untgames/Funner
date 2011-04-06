@@ -53,7 +53,11 @@ template <class T> struct singleton_default_instance<T, false>
       T*        instance;
       
       initializer () : instance (new (&buffer) T) {}
-    };
+    }
+#ifdef ARM
+    __attribute__ ((aligned (8)))
+#endif
+    ;
 
     static initializer instance_holder;
 

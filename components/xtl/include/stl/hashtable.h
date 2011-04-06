@@ -9,12 +9,21 @@ namespace stl
 {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+///Обертка над хэширующим функционалом
+////////////////////////////////////////////////////////////////////////////////////////////////////
+template <class HashFn> struct hasher_wrapper: public HashFn
+{
+  hasher_wrapper (const HashFn& fn) : HashFn (fn) {}
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 ///Хэш-таблица
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 template <class Value,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
-class hashtable 
+class hashtable: private EqualKey, private hasher_wrapper<HashFn>
 {
-  typedef stl::list<Value,Allocator> list_type;
+  typedef stl::list<Value,Allocator>  list_type;
+  typedef stl::hasher_wrapper<HashFn> hasher_wrapper;
   public:
     typedef size_t        size_type;
     typedef ptrdiff_t     difference_type;  
@@ -146,11 +155,9 @@ class hashtable
   private:
     typedef vector<Bucket,typename allocator_type::template rebind<Bucket>::other> vector_type;
   
-    list_type     list;
-    vector_type   table;
-    hasher        hash;
-    key_equal     equals;
-    size_type     num_elements;
+    list_type   list;
+    vector_type table;
+    size_type   num_elements;
 };
 
 template <class Value,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>

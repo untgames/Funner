@@ -51,14 +51,20 @@ inline hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::hashtable
  const hasher&         _hash_fn,
  const key_equal&      _equals,
  const allocator_type& _allocator)
-  : list (_allocator), table (_elements_count,Bucket (end (),0),_allocator), hash (_hash_fn),
-    equals (_equals), num_elements (0)
+  : hasher_wrapper (_hash_fn)
+  , EqualKey (_equals)
+  , list (_allocator)
+  , table (_elements_count,Bucket (end (),0),_allocator)
+  , num_elements (0)
 { }
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
 inline hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::hashtable (const hashtable& ht)
-  : list (ht.get_allocator ()), table (ht.get_allocator ()), hash (ht.hash),
-    equals (ht.equals), num_elements (0)
+  : hasher_wrapper (static_cast<const hasher_wrapper&> (ht))
+  , EqualKey (static_cast<const EqualKey&> (ht))
+  , list (ht.get_allocator ())
+  , table (ht.get_allocator ())
+  , num_elements (0)
 {
   _copy (ht);
 }
@@ -102,14 +108,14 @@ template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allo
 inline typename hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::hasher
 hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::hash_func () const
 {
-  return hash;
+  return *this;
 }
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
 inline typename hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::key_equal
 hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::key_eq () const
 {
-  return equals;
+  return *this;
 }
 
 /*
@@ -215,7 +221,7 @@ template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allo
 inline typename hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::size_type
 hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::bkt_num_key (const key_type& key) const
 {
-  return hash (key) % table.size ();
+  return static_cast<const hasher_wrapper&> (*this) (key) % table.size ();
 }
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
@@ -269,9 +275,9 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::operator = (const hashtable&
     return *this;
 
   clear ();
-
-  hash    = ht.hash;
-  equals  = ht.equals;
+  
+  hasher_wrapper::operator = (static_cast<const hasher_wrapper&> (ht));
+  EqualKey::operator = (static_cast<const EqualKey&> (ht));
 
   _copy (ht);
 
@@ -308,6 +314,8 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::insert_unique_noresize (cons
 
   if (bucket.count)
   {
+    const key_equal& equals = static_cast<const EqualKey&> (*this);
+  
     for (size_type count=bucket.count;count--;++i)
       if (equals (keyof (*i),keyof (obj)))
         return pair<iterator,bool> (i,false); //объект уже присутствует
@@ -332,6 +340,8 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::insert_equal_noresize (const
 
   if (bucket.count)
   {
+    const key_equal& equals = static_cast<const EqualKey&> (*this);  
+  
     size_type count = bucket.count;
 
     for (;count && !equals (keyof (*i),keyof (obj));++i,count--);
@@ -461,6 +471,8 @@ void hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::resize (size_type new_s
 
   try
   {
+    const hasher_wrapper& hash = static_cast<const hasher_wrapper&> (*this);
+  
     while (!list.empty ())
     {
       iterator i = --list.end ();
@@ -503,6 +515,8 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::find (const key_type& key)
   const Bucket& bucket = table [bkt_num_key (key)];
   iterator      i      = bucket.first;
   size_type     count  = bucket.count;
+  
+  const key_equal& equals = static_cast<const EqualKey&> (*this);  
 
   for (;count && !equals (keyof (*i),key);++i,--count);
 
@@ -519,6 +533,8 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::find (const key_type& key) c
   const Bucket&  bucket = table [bkt_num_key (key)];
   const_iterator i      = bucket.first;
   size_type      count  = bucket.count;
+  
+  const key_equal& equals = static_cast<const EqualKey&> (*this);  
 
   for (;count && !equals (keyof (*i),key);++i,--count);
 
@@ -548,6 +564,8 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::equal_range (const key_type&
   const Bucket& bucket = table [bkt_num_key (key)];
   iterator  i          = bucket.first, first;
   size_type count      = bucket.count;
+  
+  const key_equal& equals = static_cast<const EqualKey&> (*this);  
 
   for (;count && !equals (keyof (*i),key);++i,--count);
 
@@ -568,6 +586,8 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::equal_range (const key_type&
   const Bucket& bucket = table [bkt_num_key (key)];
   iterator  i          = bucket.first, first;
   size_type count      = bucket.count;
+  
+  const key_equal& equals = static_cast<const EqualKey&> (*this);  
 
   for (;count && !equals (keyof (*i),key);++i,--count);
 
@@ -586,6 +606,8 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::find_or_insert (const value_
 
   Bucket*  bucket = &table [bkt_num (obj)];
   iterator pos    = bucket->first;
+  
+  const key_equal& equals = static_cast<const EqualKey&> (*this);  
 
   for (size_type count=bucket->count;count--;++pos)
     if (equals (keyof (*pos),keyof (obj)))
@@ -616,8 +638,8 @@ hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::find_or_insert (const value_
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
 void hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::swap (hashtable& ht)
 {
-  stl::swap (hash,ht.hash);
-  stl::swap (equals,ht.equals);
+  stl::swap (static_cast<hasher_wrapper&> (*this),static_cast<hasher_wrapper&> (ht));
+  stl::swap (static_cast<EqualKey&> (*this),static_cast<EqualKey&> (ht));
   stl::swap (table,ht.table);
   stl::swap (list,ht.list);
   stl::swap (num_elements,ht.num_elements);

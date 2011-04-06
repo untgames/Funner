@@ -15,6 +15,13 @@ struct C : A
   virtual const char* name () const { return "class C"; }
 };
 
+struct D : C, public xtl::trackable
+{
+  ~D () { printf ("D::~D\n"); }
+
+  virtual const char* name () const { return "class D"; }
+};
+
 void print (double x)
 {
   printf ("%g", x);
@@ -138,7 +145,7 @@ int main ()
   using namespace test_namespace;
 
   printf ("Results of any_cast_test:\n");
-  
+
   try
   {
     any a1 (1);
@@ -148,7 +155,7 @@ int main ()
     test<float>  ("float", a1);
     test<double> ("double", a1);
     test<long double> ("long double", a1);
-    
+
     B b;
     C c;    
     
@@ -207,7 +214,7 @@ int main ()
     test<const volatile A*> ("const volatile class A", a5);
     test<const volatile B*> ("const volatile class B", a5);
     test<const volatile C*> ("const volatile class C", a5);    
-    
+        
     printf ("check complex-lexical_cast\n");
     
     Y y (123);
@@ -219,6 +226,41 @@ int main ()
     test<X> ("class X", a6);
     test<X&> ("class X&", a6);
     
+    printf ("check trackable_ptr\n");
+    
+    stl::auto_ptr<const D> a7_auto_ptr (new D);
+    trackable_ptr<const D> a7_ptr (a7_auto_ptr.get ());
+
+    const any a7 (a7_ptr);
+
+    test<A*> ("class A", a7);
+    test<B*> ("class B", a7);    
+    test<C*> ("class C", a7);
+    test<D*> ("class C", a7);    
+    test<const A*> ("const class A", a7);
+    test<const B*> ("const class B", a7);    
+    test<const C*> ("const class C", a7);
+    test<const D*> ("const class D", a7);    
+    test<volatile A*> ("volatile class A", a7);
+    test<volatile B*> ("volatile class B", a7);    
+    test<volatile C*> ("volatile class C", a7);
+    test<volatile D*> ("volatile class C", a7);    
+    test<const volatile A*> ("const volatile class A", a7);
+    test<const volatile B*> ("const volatile class B", a7);
+    test<const volatile C*> ("const volatile class C", a7);
+    test<const volatile D*> ("const volatile class C", a7);
+    
+    try
+    {      
+      a7_auto_ptr.reset (); 
+      
+      test<const D*> ("const class D", a7);
+    }
+    catch (std::exception& e)
+    {
+      printf ("%s\n", e.what ());
+    }
+    
     printf ("check set_content\n");    
 
     to_value ("321", a6);
@@ -229,11 +271,12 @@ int main ()
     
     to_value ("4321", a6);
     
-    printf ("y.value=%d\n", y.value); //must be unreachable
+    printf ("y.value=%d\n", y.value); //must be unreachable    
   }
   catch (std::exception& exception)
   {
     printf ("exception: %s\n", exception.what ());
+    fflush (stdout);
   }
 
   return 0;

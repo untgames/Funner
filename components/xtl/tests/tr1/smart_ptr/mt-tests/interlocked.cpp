@@ -1,6 +1,6 @@
 #include "shared.h"
 
-#define TEST(X) printf ("Results of '%s'=%d, value=%d\n", #X, X, value)
+#define TEST(X) printf ("Results of '%s'=%d, ", #X, X); printf ("value=%d\n", value)
 
 int main ()
 {
