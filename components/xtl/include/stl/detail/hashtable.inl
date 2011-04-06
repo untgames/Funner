@@ -51,8 +51,8 @@ inline hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::hashtable
  const hasher&         _hash_fn,
  const key_equal&      _equals,
  const allocator_type& _allocator)
-  : hasher_wrapper (_hash_fn)
-  , EqualKey (_equals)
+  : EqualKey (_equals)
+  , hasher_wrapper (_hash_fn)
   , list (_allocator)
   , table (_elements_count,Bucket (end (),0),_allocator)
   , num_elements (0)
@@ -60,8 +60,8 @@ inline hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::hashtable
 
 template <class Val,class Key,class HashFn,class KeyOf,class EqualKey,class Allocator>
 inline hashtable<Val,Key,HashFn,KeyOf,EqualKey,Allocator>::hashtable (const hashtable& ht)
-  : hasher_wrapper (static_cast<const hasher_wrapper&> (ht))
-  , EqualKey (static_cast<const EqualKey&> (ht))
+  : EqualKey (static_cast<const EqualKey&> (ht))
+  , hasher_wrapper (static_cast<const hasher_wrapper&> (ht))
   , list (ht.get_allocator ())
   , table (ht.get_allocator ())
   , num_elements (0)
