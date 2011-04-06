@@ -328,7 +328,7 @@ FramePtr RenderManagerImpl::CreateFrame ()
 {
   try
   {
-    return FramePtr (new FrameImpl (&EffectManager ()), false);
+    return FramePtr (new FrameImpl (impl->device_manager, &EffectManager ()), false);
   }
   catch (xtl::exception& e)
   {

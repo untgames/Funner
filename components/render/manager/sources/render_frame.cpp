@@ -35,42 +35,23 @@ typedef xtl::intrusive_ptr<RenderTargetDesc>                           RenderTar
 typedef stl::hash_map<stl::hash_key<const char*>, RenderTargetDescPtr> RenderTargetDescMap;
 typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr>          TextureMap;
 
-}
-
 /*
-    Описание реализации кадра
+    Хранилище для эффекта
 */
 
-typedef stl::vector<FramePtr>  FrameArray;
-typedef stl::vector<EntityPtr> EntityArray;
-
-struct FrameImpl::Impl: public CacheHolder
+struct EffectHolder: public CacheSource
 {
-  EffectManagerPtr    effect_manager;      //ссылка на менеджер эффектов
-  EffectProxy         effect;              //эффект кадра
-  EffectRendererPtr   effect_renderer;     //рендер эффекта
-  EntityArray         entities;            //список объектов, отображаемых в кадре
-  FrameArray          frames;              //список вложенных кадров
-  RenderTargetDescMap render_targets;      //целевые буферы отрисовки
-  TextureMap          textures;            //локальные текстуры фрейма
-  bool                scissor_state;       //включено ли отсечение
-  size_t              clear_flags;         //флаги очистки
-  math::vec4f         clear_color;         //цвет очистки фона
-  float               clear_depth_value;   //значение буфера глубины после очистки
-  unsigned char       clear_stencil_index; //значение буфера трафарета после очистки
-  EffectPtr           cached_effect;       //закэшированный эффект
-
+  EffectManagerPtr  effect_manager;  //ссылка на менеджер эффектов
+  EffectProxy       effect;          //эффект кадра
+  EffectRendererPtr effect_renderer; //рендер эффекта
+  EffectPtr         cached_effect;   //закэшированный эффект
+  
 ///Конструктор
-  Impl (const EffectManagerPtr& in_effect_manager)
+  EffectHolder (const EffectManagerPtr& in_effect_manager)
     : effect_manager (in_effect_manager)
-    , effect (effect_manager->GetEffectProxy (""))
-    , scissor_state (false)
-    , clear_flags (ClearFlag_All)
-    , clear_depth_value (1.0f)
-    , clear_stencil_index (0)
+    , effect (effect_manager->GetEffectProxy (""))    
   {
-    entities.reserve (RESERVED_ENTITIES_COUNT);
-    frames.reserve (RESERVED_FRAMES_COUNT);
+    effect.AttachCacheHolder (*this);
   }
   
 ///Работа с кэшем
@@ -93,7 +74,7 @@ struct FrameImpl::Impl: public CacheHolder
     }
     catch (xtl::exception& e)
     {
-      e.touch ("render::FrameImpl::Impl::UpdateCacheCore");
+      e.touch ("render::EffectHolder::UpdateCacheCore");
       throw;
     }
   }
@@ -102,20 +83,83 @@ struct FrameImpl::Impl: public CacheHolder
   using CacheHolder::Invalidate;
 };
 
+}
+
+/*
+    Описание реализации кадра
+*/
+
+typedef stl::vector<FramePtr>  FrameArray;
+typedef stl::vector<EntityPtr> EntityArray;
+
+struct FrameImpl::Impl: public CacheHolder
+{
+  stl::auto_ptr<EffectHolder> effect_holder;       //хранилище эффекта
+  EntityArray                 entities;            //список объектов, отображаемых в кадре
+  FrameArray                  frames;              //список вложенных кадров
+  PropertyBuffer              properties;          //свойства кадра
+  RenderTargetDescMap         render_targets;      //целевые буферы отрисовки
+  TextureMap                  textures;            //локальные текстуры фрейма
+  bool                        scissor_state;       //включено ли отсечение
+  size_t                      clear_flags;         //флаги очистки
+  math::vec4f                 clear_color;         //цвет очистки фона
+  float                       clear_depth_value;   //значение буфера глубины после очистки
+  unsigned char               clear_stencil_index; //значение буфера трафарета после очистки
+  LowLevelBufferPtr           cached_properties;   //закэшированные свойства
+
+///Конструктор
+  Impl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager)
+    : effect_holder (new EffectHolder (effect_manager))
+    , properties (device_manager)
+    , scissor_state (false)
+    , clear_flags (ClearFlag_All)
+    , clear_depth_value (1.0f)
+    , clear_stencil_index (0)
+  {
+    AttachCacheSource (*effect_holder);
+    AttachCacheSource (properties);
+    
+    entities.reserve (RESERVED_ENTITIES_COUNT);
+    frames.reserve (RESERVED_FRAMES_COUNT);
+  }
+  
+///Работа с кэшем
+  void ResetCacheCore ()
+  {
+    cached_properties = LowLevelBufferPtr ();
+  }
+
+  void UpdateCacheCore ()
+  {
+    try
+    {
+      cached_properties = properties.Buffer ();
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::FrameImpl::Impl::UpdateCacheCore");
+      throw;
+    }
+  }
+    
+  using CacheHolder::UpdateCache;
+};
+
 /*
    Конструктор / деструктор
 */
 
-FrameImpl::FrameImpl (const EffectManagerPtr& effect_manager)
+FrameImpl::FrameImpl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager)
 {
   try
   {
     if (!effect_manager)
       throw xtl::make_null_argument_exception ("", "effect_manager");
     
-    impl = new Impl (effect_manager);
+    if (!device_manager)
+      throw xtl::make_null_argument_exception ("", "device_manager");
     
-    impl->effect.AttachCacheHolder (*impl);
+    impl = new Impl (device_manager, effect_manager);    
   }
   catch (xtl::exception& e)
   {
@@ -418,9 +462,9 @@ void FrameImpl::SetEffect (const char* name)
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
     
-    impl->effect = impl->effect_manager->GetEffectProxy (name);
+    impl->effect_holder->effect = impl->effect_holder->effect_manager->GetEffectProxy (name);
     
-    impl->Invalidate ();
+    impl->effect_holder->Invalidate ();
   }
   catch (xtl::exception& e)
   {
@@ -431,7 +475,7 @@ void FrameImpl::SetEffect (const char* name)
 
 const char* FrameImpl::Effect ()
 {
-  return impl->effect.Name ();
+  return impl->effect_holder->effect.Name ();
 }
 
 /*
@@ -444,7 +488,7 @@ EffectRendererPtr FrameImpl::EffectRenderer ()
   {
     impl->UpdateCache ();
     
-    return impl->effect_renderer;
+    return impl->effect_holder->effect_renderer;
   }
   catch (xtl::exception& e)
   {
@@ -459,12 +503,20 @@ EffectRendererPtr FrameImpl::EffectRenderer ()
 
 void FrameImpl::SetProperties (const common::PropertyMap& properties)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetProperties");
+  try
+  {
+    impl->properties.SetProperties (properties);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::SetProperties");
+    throw;
+  }
 }
 
 const common::PropertyMap& FrameImpl::Properties ()
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::Properties");
+  return impl->properties.Properties ();
 }
 
 /*
