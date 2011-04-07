@@ -167,7 +167,7 @@ class CocoaIPhonePlatform: public CocoaPlatform
   typedef UnistdPlatform Platform;
 #elif defined _WIN32
   typedef Win32Platform Platform;
-#elif defined __IPHONE_3_0
+#elif defined IPHONE
   typedef CocoaIPhonePlatform Platform;
 #elif defined __APPLE__
   typedef CocoaDesktopPlatform Platform;
