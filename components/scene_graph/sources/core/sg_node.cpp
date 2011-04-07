@@ -1679,7 +1679,7 @@ namespace
 //композиция преобразований
 void affine_compose (const vec3f& position, const quatf& orientation, const vec3f& scale, mat4f& tm)
 {
-  tm = math::translate (position) * to_matrix (orientation) * math::scale (scale);
+  tm = math::translate (position) * math::scale (scale) * to_matrix (orientation);
 }
 
 }
