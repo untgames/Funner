@@ -10,7 +10,8 @@ ENGINE.SCRIPT_BINDS.SOURCES.INCLUDE_DIRS := include
 ENGINE.SCRIPT_BINDS.SOURCES.SOURCE_DIRS  := sources
 ENGINE.SCRIPT_BINDS.SOURCES.IMPORTS      := compile.script.core compile.scene_graph.core compile.common \
                                             compile.render.scene_render compile.system compile.input.manager \
-                                            compile.engine.core compile.media.rms compile.media.players
+                                            compile.engine.core compile.media.rms compile.media.players \
+                                            compile.math.curves
 
 #Öåëü ¹2 - SCRIPT_BINDS tests
 ENGINE.SCRIPT_BINDS.TESTS.TYPE        := test-suite

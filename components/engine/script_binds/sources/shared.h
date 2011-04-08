@@ -2,6 +2,7 @@
 #define SCRIPTBINDS_SHARED_HEADER
 
 #include <stl/hash_set>
+#include <stl/numeric>
 
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
@@ -20,6 +21,11 @@
 #include <common/singleton.h>
 #include <common/strlib.h>
 
+#include <math/basic_spline.h>
+#include <math/matrix.h>
+#include <math/quat.h>
+#include <math/vector.h>
+
 #include <script/bind.h>
 #include <script/environment.h>
 #include <script/library_manager.h>
@@ -32,6 +38,8 @@ void bind_common_string_tree  (script::Environment&);
 void bind_common_signals      (script::Environment&);
 void bind_common_action_queue (script::Environment&);
 void bind_common_timer        (script::Environment&);
+
+void bind_math_splines_library (script::Environment&);
 
 }
 

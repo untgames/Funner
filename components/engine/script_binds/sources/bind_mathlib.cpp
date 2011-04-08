@@ -1,15 +1,10 @@
 #include "shared.h"
 
-#include <stl/numeric>
-
-#include <math/vector.h>
-#include <math/matrix.h>
-#include <math/quat.h>
-
 using namespace script;
 using namespace math;
 using namespace stl;
 using namespace common;
+using namespace engine;
 
 namespace
 {
@@ -610,7 +605,8 @@ class Component
   private:
     static void Bind (Environment& environment)
     {
-      bind_math_library (environment);
+      bind_math_library         (environment);
+      bind_math_splines_library (environment);
     }
 };
 
