@@ -481,31 +481,26 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
   {
     return static_cast<time_type> (fmod (static_cast<float> (time - min_time), coef * static_cast<float> (max_time - min_time))) + min_time;    
   }
-    
-///Поиск ключевого кадра
-  frame_type& get_frame (time_type time)
+
+///Получение отсеченного согласно настройкам сплайна времени
+  time_type get_wrapped_time (time_type time)
   {
       //перерасчёт
-      
+    
     if (need_recompute)    
       recompute ();
-  
-      //отсечение времени
-    
+
     if (time < min_time)
     {
       switch (begin_wrap)
       {
         case spline_wrap_clamp:
-          time = min_time;
-          break;
+          return min_time;
         case spline_wrap_repeat:
-          time = clamp (time, 1.0f);
-          break;
+          return clamp (time, 1.0f);
         case spline_wrap_mirror:
           time = clamp (time, 2.0f);
-          time = time < max_time ? time : max_time - time + min_time;
-          break;
+          return time < max_time ? time : max_time - time + min_time;
       }
     }
     
@@ -514,18 +509,26 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
       switch (end_wrap)
       {
         case spline_wrap_clamp:
-          time = max_time;
-          break;
+          return max_time;
         case spline_wrap_repeat:
-          time = clamp (time, 1.0f);
-          break;
+          return clamp (time, 1.0f);
         case spline_wrap_mirror:
           time = clamp (time, 2.0f);
-          time = time < max_time ? time : max_time - time + min_time;
-          break;
+          return time < max_time ? time : max_time - time + min_time;
       }
     }
-    
+
+    return time;
+  }
+
+///Поиск ключевого кадра
+  frame_type& get_frame (time_type time)
+  {
+      //перерасчёт
+
+    if (need_recompute)
+      recompute ();
+
       //поиск кадра
 
     typename frame_list::iterator iter = stl::lower_bound (frames.begin (), frames.end (), time, detail::spline_key_frame_less<frame_type> ());
@@ -786,9 +789,11 @@ void basic_spline<Key>::sort ()
 template <class Key>
 void basic_spline<Key>::eval (const time_type& time, value_type& out_value) const
 {
-  typename implementation::frame_type& frame = impl->get_frame (time);
+  time_type wrapped_time = impl->get_wrapped_time (time);
+
+  typename implementation::frame_type& frame = impl->get_frame (wrapped_time);
   
-  detail::spline_eval (time, frame, out_value);
+  detail::spline_eval (wrapped_time, frame, out_value);
 }
 
 template <class Key>
