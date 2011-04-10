@@ -479,7 +479,7 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
 ///Отсечение времени
   time_type clamp (const time_type& time, float coef)
   {
-    return static_cast<time_type> (fmod (static_cast<float> (time - min_time), coef * static_cast<float> (max_time - min_time))) + min_time;    
+    return static_cast<time_type> (fmod (static_cast<float> (time - min_time), coef * static_cast<float> (max_time - min_time))) + min_time;
   }
 
 ///Получение отсеченного согласно настройкам сплайна времени
@@ -497,10 +497,10 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
         case spline_wrap_clamp:
           return min_time;
         case spline_wrap_repeat:
-          return clamp (time, 1.0f);
+          return max_time - fmod (static_cast<float> (min_time - time), max_time - min_time);
         case spline_wrap_mirror:
-          time = clamp (time, 2.0f);
-          return time < max_time ? time : max_time - time + min_time;
+          time = min_time + fmod (static_cast<float> (min_time - time), 2 * (max_time - min_time));
+          return time < max_time ? time : 2 * max_time - time;
       }
     }
     
@@ -514,7 +514,7 @@ template <class Key> struct basic_spline<Key>::implementation: public xtl::refer
           return clamp (time, 1.0f);
         case spline_wrap_mirror:
           time = clamp (time, 2.0f);
-          return time < max_time ? time : max_time - time + min_time;
+          return time < max_time ? time : 2 * max_time - time;
       }
     }
 
@@ -711,6 +711,7 @@ void basic_spline<Key>::set_key (size_t index, const key_type& key)
   impl->frames [index].key = key;
   
   impl->need_recompute = true;
+  impl->need_sort      = true;
 }
 
 /*

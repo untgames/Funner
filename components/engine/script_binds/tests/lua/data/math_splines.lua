@@ -37,8 +37,8 @@ function test_spline (spline, create_value, spline_name)
   
   spline:Reserve (10)
   spline:Wrap (Math.SplineWrap.Repeat, Math.SplineWrap.Mirror)
-  spline:AddKey (0, create_value (0))
-  spline:AddKey (1, create_value (2))
+  spline:AddKey (1, create_value (0))
+  spline:AddKey (2, create_value (2))
   spline:Sort ()
 
   print ("Spline default begin wrap is " .. wrap_name (spline.BeginWrap))
@@ -51,10 +51,12 @@ function test_spline (spline, create_value, spline_name)
   print ("Spline min_time is " .. spline.MinTime)
   print ("Spline max_time is " .. spline.MaxTime)
   
+  print ("key 0 time is " .. spline:GetKeyTime (0))
+  print ("key 0 value is '" .. tostring (spline:GetKeyValue (0)) .. "'")
   print ("key 1 time is " .. spline:GetKeyTime (1))
   print ("key 1 value is '" .. tostring (spline:GetKeyValue (1)) .. "'")
   
-  spline:SetKey (1, 2, create_value (3))
+  spline:SetKey (1, 3, create_value (3))
   
   print ("key 1 time is " .. spline:GetKeyTime (1))
   print ("key 1 value is '" .. tostring (spline:GetKeyValue (1)) .. "'")
