@@ -1,5 +1,5 @@
 Results of node_transform_pivot_inherit_test:
 parent position: local=[+0.00 +0.00 +0.00] world=[+0.00 +0.00 +0.00]
-node position: local=[+2.00 +0.00 +0.00] world=[+0.00 +4.00 +0.00]
-test point (no scale inherit): [-1.00 +5.00 +0.00]
-test point (no orientation inherit): [+1.00 +5.00 +0.00]
+node position: local=[+2.00 +0.00 +0.00] world=[+1.00 +5.00 +0.00]
+test point (no scale inherit): [+0.00 +6.00 +0.00]
+test point (no orientation inherit): [+2.00 +8.00 +0.00]
