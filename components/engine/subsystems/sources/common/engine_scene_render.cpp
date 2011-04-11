@@ -70,8 +70,12 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
 
           screen_map.insert_pair (attachment, render_target_index);
 
-          if (get<bool> (node, "IdleRender", true))
-            idle_render_targets.push_back (render.RenderTarget (render_target_index));
+          if (get<bool> (*iter, "IdleRender", true))
+          {
+            size_t update_frequency = get<size_t> (*iter, "RenderFrequency", 0);
+
+            idle_render_targets.push_back (RenderTargetDesc (render.RenderTarget (render_target_index), update_frequency));
+          }
         }
 
         AttachmentRegistry::Attach<render::Screen> (this, AttachmentRegistryAttachMode_ForceNotify);
@@ -177,18 +181,30 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
   private:
     void OnIdle ()
     {
+      size_t current_time = common::milliseconds ();
+      
       for (RenderTargetArray::iterator iter=idle_render_targets.begin (); iter!=idle_render_targets.end ();)
       {
-        if (!iter->IsBindedToRender ()) //если цель рендеринга удалена - удаляем её из списка отрисовки
+        if (!iter->target.IsBindedToRender ()) //если цель рендеринга удалена - удаляем её из списка отрисовки
         {
           idle_render_targets.erase (iter);
 
           continue;
         }
+        
+          //проверка синхронизации с частотой обновления кадров
+          
+        if (current_time - iter->last_update_time < iter->update_delay)
+        {
+          ++iter;
+          continue;
+        }
 
           //обновление цели рендеринга
 
-        iter->Update ();
+        iter->target.Update ();
+        
+        iter->last_update_time = current_time;
 
         ++iter;
       }
@@ -204,8 +220,22 @@ class SceneRenderSubsystem : public ISubsystem, public IAttachmentRegistryListen
     SceneRenderSubsystem& operator = (const SceneRenderSubsystem&); //no impl
 
   private:
+    struct RenderTargetDesc
+    {
+      render::RenderTarget target;
+      size_t               update_delay;
+      size_t               last_update_time;
+      
+      RenderTargetDesc (const render::RenderTarget& in_target, size_t in_update_frequency)
+        : target (in_target)
+        , update_delay (in_update_frequency ? 1000 / in_update_frequency : 0)
+        , last_update_time (0)
+      {
+      }
+    };
+  
     typedef stl::hash_map<stl::hash_key<const char*>, size_t> ScreenMap;
-    typedef stl::vector<render::RenderTarget>                 RenderTargetArray;
+    typedef stl::vector<RenderTargetDesc>                     RenderTargetArray;
 
   private:
     Log                                              log;                 //лог

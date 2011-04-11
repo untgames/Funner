@@ -18,6 +18,7 @@
 #include <common/log.h>
 #include <common/parser.h>
 #include <common/strlib.h>
+#include <common/time.h>
 
 #include <engine/attachments.h>
 #include <engine/subsystem_manager.h>
