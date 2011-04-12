@@ -314,9 +314,6 @@ struct Node::Impl
       for (size_t i = 0; i < 3; i++)
         world_position [i] = world_tm [i][3];
         
-      if (pivot)
-        pivot->world_position_after_pivot = world_position;
-        
       need_world_position_update = false;        
     }    
   }
@@ -348,38 +345,36 @@ struct Node::Impl
   
   void UpdateWorldTransform ()
   {
+    if (!need_world_transform_update)
+      return;
+    
     bool pivot_enabled = pivot && pivot->pivot_enabled && (pivot->orientation_pivot_enabled || pivot->scale_pivot_enabled);
     
     if (parent)
     {
       world_tm = parent->WorldTM () * this_node->LocalTM ();
       
-      if (!orientation_inherit || !scale_inherit || pivot_enabled)
+      if (!orientation_inherit || !scale_inherit || pivot)
       {
-        affine_decompose (world_tm, pivot ? pivot->world_position_after_pivot : world_position, world_orientation, world_scale);
-        
-        if (!orientation_inherit) world_orientation = local_orientation;
-        if (!scale_inherit)       world_scale       = local_scale;
+        affine_decompose (world_tm, pivot ? pivot->world_position_after_pivot : world_position, world_orientation, world_scale);        
         
         if (pivot)
         {
-          if (pivot_enabled)
-          {
-            static vec3f default_scale (1.0f);
-            static quatf default_orientation;
+          world_position = parent->WorldTM () * local_position;
+        }
 
-            
-            
-            const vec3f& pivot_scale       = pivot->scale_pivot_enabled ? scale_inherit ? parent->WorldScale () : default_scale : world_scale;
-            const quatf& pivot_orientation = pivot->orientation_pivot_enabled ? orientation_inherit ? parent->WorldOrientation () : default_orientation : world_orientation;
-            
-            world_position = pivot->world_position_after_pivot - pivot_orientation * (pivot_scale * pivot->pivot_position) + 
-                             world_orientation * (world_scale * pivot->pivot_position);
-          }
-          else
-          {
-            world_position = pivot->world_position_after_pivot;
-          }
+        if (!orientation_inherit) world_orientation = local_orientation;
+        if (!scale_inherit)       world_scale       = local_scale;
+
+        if (pivot_enabled)
+        {
+          static vec3f default_scale (1.0f);
+          static quatf default_orientation;
+
+          const vec3f& pivot_scale       = pivot->scale_pivot_enabled ? scale_inherit ? parent->WorldScale () : default_scale : world_scale;
+          const quatf& pivot_orientation = pivot->orientation_pivot_enabled ? orientation_inherit ? parent->WorldOrientation () : default_orientation : world_orientation;
+
+          pivot->world_position_after_pivot = world_position + pivot_orientation * (pivot_scale * pivot->pivot_position) - world_orientation * (world_scale * pivot->pivot_position);
         }
         
         need_world_tm_update       = true;
@@ -391,7 +386,7 @@ struct Node::Impl
         need_world_tm_update       = false;
         need_world_position_update = true;
         need_world_axises_update   = true;
-      }      
+      }
     }
     else
     {
@@ -404,7 +399,7 @@ struct Node::Impl
 
       if (pivot)
       {
-        pivot->world_position_after_pivot = PositionAfterPivot ();
+        pivot->world_position_after_pivot = PositionAfterPivot ();                
       }
     }
 
@@ -421,7 +416,8 @@ struct Node::Impl
       //определяем инвариантное пространство преобразований
       
     bool  need_transform_in_world_space = false;
-    mat4f old_world_tm;
+    vec3f old_world_position_after_pivot, old_world_scale;
+    quatf old_world_orientation;
 
     switch (invariant_space)
     {
@@ -430,7 +426,9 @@ struct Node::Impl
         break;
       case NodeTransformSpace_World:
         need_transform_in_world_space  = true;
-        old_world_tm                   = this_node->WorldTM ();
+        old_world_position_after_pivot = WorldPositionAfterPivot ();
+        old_world_scale                = this_node->WorldScale ();
+        old_world_orientation          = this_node->WorldOrientation ();
         break;
       default:
         throw xtl::make_argument_exception ("scene_graph::Node::BindToParent", "invariant_space", invariant_space);
@@ -550,6 +548,16 @@ struct Node::Impl
         //установка текущей сцены
 
       SetScene (0);
+
+        //оповещения об изменениях
+
+      this_node->BeginUpdate ();
+
+        //родительские преобразования требуют пересчёта
+
+      UpdateWorldTransformNotify ();
+
+      this_node->EndUpdate ();      
     }
 
       //преобразование системы координат
@@ -558,11 +566,18 @@ struct Node::Impl
     {           
       this_node->BeginUpdate ();
       
-      world_tm                    = old_world_tm;
-      need_world_transform_update = false;
-      need_world_position_update  = false;
-      need_world_axises_update    = false;
-      need_world_tm_update        = true;
+      if (parent)
+      {
+        this_node->SetWorldOrientation (old_world_orientation);
+        this_node->SetWorldScale       (old_world_scale);
+        this_node->Translate           (old_world_position_after_pivot - WorldPositionAfterPivot (), NodeTransformSpace_World);
+      }
+      else
+      {
+        this_node->SetOrientation (old_world_orientation);
+        this_node->SetScale       (old_world_scale);
+        this_node->Translate      (old_world_position_after_pivot - WorldPositionAfterPivot (), NodeTransformSpace_World);
+      }
       
       this_node->EndUpdate ();
     }

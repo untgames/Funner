@@ -4,10 +4,10 @@ before
   orientation: local=[+0.7 +0.7 +0.0 +0.0] world=[+0.5 +0.5 +0.5 +0.5]
   scale:       local=[-1.00 +2.00 +3.00] world=[-2.00 +2.00 +9.00]
 after rebind
-  position:    local=[+1.00 +2.00 +3.00] world=[+2.00 +4.00 +6.00]
-  orientation: local=[+0.7 +0.7 +0.0 +0.0] world=[+0.5 +0.5 +0.5 +0.5]
-  scale:       local=[-1.00 +2.00 +3.00] world=[-2.00 +2.00 +9.00]
+  position:    local=[+2.00 +4.00 +6.00] world=[+2.00 +4.00 +6.00]
+  orientation: local=[+0.5 +0.5 +0.5 +0.5] world=[+0.5 +0.5 +0.5 +0.5]
+  scale:       local=[-2.00 +2.00 +9.00] world=[-2.00 +2.00 +9.00]
 after unbind
-  position:    local=[+1.00 +2.00 +3.00] world=[+2.00 +4.00 +6.00]
-  orientation: local=[+0.7 +0.7 +0.0 +0.0] world=[+0.5 +0.5 +0.5 +0.5]
-  scale:       local=[-1.00 +2.00 +3.00] world=[-2.00 +2.00 +9.00]
+  position:    local=[+2.00 +4.00 +6.00] world=[+2.00 +4.00 +6.00]
+  orientation: local=[+0.5 +0.5 +0.5 +0.5] world=[+0.5 +0.5 +0.5 +0.5]
+  scale:       local=[-2.00 +2.00 +9.00] world=[-2.00 +2.00 +9.00]
