@@ -41,6 +41,66 @@ typedef xtl::signal<void (Node& sender, NodeEvent event)>                     No
 typedef xtl::signal<void (Node& sender, Node& child, NodeSubTreeEvent event)> SubTreeNodeSignal;
 typedef xtl::signal<void (float dt)>                                          UpdateSignal;
 
+/*
+    Композиция аффинных преобразований
+*/
+
+//композиция преобразований
+void affine_compose (const vec3f& position, const quatf& orientation, const vec3f& scale, mat4f& tm)
+{
+  tm = math::translate (position) * to_matrix (orientation) * math::scale (scale);
+}
+
+//декомпозиция аффинных преобразований из матрицы преобразований
+void affine_decompose (const math::mat4f& matrix, math::vec3f& position, math::quatf& rotation, math::vec3f& scale)
+{
+  math::mat4f local_matrix (transpose (matrix)); //копия матрицы преобразований
+
+  //выделение преобразования переноса  
+  for (size_t i = 0; i < 3; i++)
+  {
+    position [i] = local_matrix [3][i];
+    local_matrix [3][i] = 0;
+  }
+
+  //выделение преобразования масштабирования
+  for (size_t i = 0; i < 3; i++)
+  {
+    //определение длины вектора-столбца преобразований
+    float square_length = 0;
+
+    for (size_t j = 0; j < 3; j++)
+      square_length += local_matrix [i][j] * local_matrix [i][j];
+
+    scale [i] = sqrt (square_length);
+
+    //нормирование
+    for (size_t j = 0; j < 3; j++)
+      local_matrix [i][j] /= scale [i];
+  }
+ 
+  math::vec3f temp_z = math::cross (math::vec3f (local_matrix [0][0], local_matrix [0][1], local_matrix [0][2]),
+      math::vec3f (local_matrix [1][0], local_matrix [1][1], local_matrix [1][2]));
+
+  if (math::dot (temp_z, math::vec3f (local_matrix [2][0], local_matrix [2][1], local_matrix [2][2])) < 0)
+  {
+    scale.x = -scale.x;
+    
+    for (size_t j=0; j<3; j++)
+      local_matrix [0][j] = -local_matrix [0][j];
+  }
+
+//  rotation = to_quat (transpose (local_matrix));
+  math::mat4f m = transpose (local_matrix);
+  
+  m [0] = normalize (m [0]);
+  m [2] = normalize (cross (m [0], m [1]));
+  m [1] = normalize (cross (m [2], m [0]));
+  
+  rotation = normalize (to_quat (m));
+}
+
+
 }
 
 /*
@@ -79,6 +139,8 @@ struct Node::Impl
   bool                    need_world_transform_update;      //флаг, сигнализирующий о необходимости пересчёта мировых преобразований
   bool                    need_world_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы мировых преобразований
   bool                    need_local_tm_update;             //флаг, сигнализирующий о необходимости пересчёта матрицы локальных преобразований
+  bool                    need_world_position_update;       //флаг, сигнализирующий о необходимости пересчёта мировой позиции
+  bool                    need_world_axises_update;         //флаг, сигнализирующий о необходимости пересчёта мировых осей и масштаба
   size_t                  update_lock;                      //счётчик открытых транзакций обновления
   bool                    update_notify;                    //флаг, сигнализирующий о необходимости оповещения об обновлениях по завершении транзакции обновления
   Node*                   first_updatable_child;            //первый обновляемый потомок
@@ -118,6 +180,8 @@ struct Node::Impl
     need_world_transform_update = false;
     need_local_tm_update        = false;
     need_world_tm_update        = false;
+    need_world_position_update  = false;
+    need_world_axises_update    = false;
     
       //очистка массива флагов обработки сигналов
       
@@ -175,8 +239,8 @@ struct Node::Impl
   
   const vec3f& WorldPositionAfterPivot ()
   {
-    if (need_world_transform_update)
-      UpdateWorldTransform ();
+    if (need_world_position_update)
+      UpdateWorldPosition ();
       
     return pivot ? pivot->world_position_after_pivot : world_position;
   }
@@ -207,6 +271,8 @@ struct Node::Impl
 
     need_world_transform_update = true;
     need_world_tm_update        = true;
+    need_world_position_update  = true;
+    need_world_axises_update    = true;
     
       //оповещение производных классов об изменении положения объекта
 
@@ -238,54 +304,102 @@ struct Node::Impl
     
     UpdateWorldTransformNotify ();
   }
+  
+  void UpdateWorldPosition ()
+  {
+    UpdateWorldTransform ();    
 
+    if (need_world_position_update)
+    {
+      for (size_t i = 0; i < 3; i++)
+        world_position [i] = world_tm [i][3];
+        
+      need_world_position_update = false;        
+    }    
+  }
+  
+  void UpdateWorldAxises ()
+  {
+    UpdateWorldTransform ();    
+    
+    if (need_world_axises_update)
+    {
+      math::vec3f position;
+    
+      affine_decompose (world_tm, position, world_orientation, world_scale);
+      
+      need_world_axises_update = false;      
+    }
+  }
+  
+  void UpdateWorldMatrix ()
+  {
+    UpdateWorldTransform ();
+    
+    if (need_world_tm_update)
+    {
+      affine_compose (pivot ? pivot->world_position_after_pivot : world_position, world_orientation, world_scale, world_tm);
+      need_world_tm_update = false;    
+    }
+  }
+  
   void UpdateWorldTransform ()
   {
+    if (!need_world_transform_update)
+      return;
+    
     bool pivot_enabled = pivot && pivot->pivot_enabled && (pivot->orientation_pivot_enabled || pivot->scale_pivot_enabled);
     
     if (parent)
     {
-      const quatf& parent_orientation = parent->WorldOrientation ();
+      world_tm = parent->WorldTM () * this_node->LocalTM ();
       
-      if (orientation_inherit) world_orientation = parent_orientation * local_orientation;
-      else                     world_orientation = local_orientation;
-
-      const vec3f& parent_scale = parent->WorldScale ();
-
-      if (scale_inherit) world_scale = parent_scale * local_scale;
-      else               world_scale = local_scale;
-
-      world_position = parent_orientation * (parent_scale * local_position) + parent->impl->WorldPositionAfterPivot ();
-      
-      if (pivot)
+      if (!orientation_inherit || !scale_inherit || pivot)
       {
+        affine_decompose (world_tm, pivot ? pivot->world_position_after_pivot : world_position, world_orientation, world_scale);        
+        
+        if (pivot)
+        {
+          world_position = parent->WorldTM () * local_position;
+        }
+
+        if (!orientation_inherit) world_orientation = local_orientation;
+        if (!scale_inherit)       world_scale       = local_scale;
+
         if (pivot_enabled)
         {
           static vec3f default_scale (1.0f);
           static quatf default_orientation;
 
-          const vec3f& pivot_scale       = pivot->scale_pivot_enabled ? scale_inherit ? parent_scale : default_scale : world_scale;
-          const quatf& pivot_orientation = pivot->orientation_pivot_enabled ? orientation_inherit ? parent_orientation : default_orientation : world_orientation;
-          
-          pivot->world_position_after_pivot = world_position
-            + pivot_orientation * (pivot_scale * pivot->pivot_position)
-            - world_orientation * (world_scale * pivot->pivot_position);
+          const vec3f& pivot_scale       = pivot->scale_pivot_enabled ? scale_inherit ? parent->WorldScale () : default_scale : world_scale;
+          const quatf& pivot_orientation = pivot->orientation_pivot_enabled ? orientation_inherit ? parent->WorldOrientation () : default_orientation : world_orientation;
+
+          pivot->world_position_after_pivot = world_position + pivot_orientation * (pivot_scale * pivot->pivot_position) - world_orientation * (world_scale * pivot->pivot_position);
         }
-        else
-        {
-          pivot->world_position_after_pivot = world_position;
-        }
+        
+        need_world_tm_update       = true;
+        need_world_position_update = false;
+        need_world_axises_update   = false;
+      }
+      else
+      {
+        need_world_tm_update       = false;
+        need_world_position_update = true;
+        need_world_axises_update   = true;
       }
     }
     else
     {
-      world_orientation = local_orientation;
-      world_scale       = local_scale;      
-      world_position    = local_position;      
+      world_orientation          = local_orientation;
+      world_scale                = local_scale;      
+      world_position             = local_position;
+      need_world_tm_update       = true;
+      need_world_axises_update   = false;
+      need_world_position_update = false;
 
       if (pivot)
       {
-        pivot->world_position_after_pivot = PositionAfterPivot ();
+        pivot->world_position_after_pivot = PositionAfterPivot ();                
       }
     }
 
@@ -1162,8 +1276,8 @@ const vec3f& Node::Position () const
 
 const vec3f& Node::WorldPosition () const
 {
-  if (impl->need_world_transform_update)
-    impl->UpdateWorldTransform ();
+  if (impl->need_world_position_update)
+    impl->UpdateWorldPosition ();
     
   return impl->world_position;
 }
@@ -1314,8 +1428,8 @@ const quatf& Node::Orientation () const
 
 const quatf& Node::WorldOrientation () const
 {
-  if (impl->need_world_transform_update)
-    impl->UpdateWorldTransform ();
+  if (impl->need_world_axises_update)
+    impl->UpdateWorldAxises ();
     
   return impl->world_orientation;
 }
@@ -1557,8 +1671,8 @@ const vec3f& Node::Scale () const
 
 const vec3f& Node::WorldScale () const
 {
-  if (impl->need_world_transform_update)
-    impl->UpdateWorldTransform ();
+  if (impl->need_world_axises_update)
+    impl->UpdateWorldAxises ();
     
   return impl->world_scale;
 }
@@ -1683,17 +1797,6 @@ void Node::Scale (float sx, float sy, float sz)
     Получение матриц преобразования узла
 */
 
-namespace
-{
-
-//композиция преобразований
-void affine_compose (const vec3f& position, const quatf& orientation, const vec3f& scale, mat4f& tm)
-{
-  tm = math::translate (position) * to_matrix (orientation) * math::scale (scale);
-}
-
-}
-
 const mat4f& Node::TransformationMatrix (NodeTransformSpace space) const
 {
   static mat4f idNode;
@@ -1713,11 +1816,7 @@ const mat4f& Node::TransformationMatrix (NodeTransformSpace space) const
       return impl->parent ? impl->parent->TransformationMatrix (NodeTransformSpace_World) : idNode;
     case NodeTransformSpace_World:
       if (impl->need_world_tm_update)
-      {
-        affine_compose (impl->WorldPositionAfterPivot (), WorldOrientation (), WorldScale (), impl->world_tm);
-
-        impl->need_world_tm_update = false;
-      }
+        impl->UpdateWorldMatrix ();
 
       return impl->world_tm;
     default:
