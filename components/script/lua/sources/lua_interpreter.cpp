@@ -28,6 +28,8 @@ const char* VARIANT_DEFAULT_TYPE_NAME = "__lua_variant_type";
 namespace
 {
 
+const char* PROFILER_LIBRARY = "Profiler";
+
 /*
     Утилиты
 */
@@ -36,6 +38,20 @@ namespace
 int error_handler (lua_State* state)
 {
   throw xtl::format_exception<RuntimeException> ("script::lua::error_handler", "%s", lua_tostring (state, -1));
+}
+
+stl::string shiny_tree_string (size_t max_length = -1)
+{
+  std::string tree_string (PROFILE_GET_TREE_STRING ());
+
+  return stl::string (tree_string.c_str (), stl::min ((size_t)tree_string.size (), max_length));
+}
+
+stl::string shiny_flat_string (size_t max_length = -1)
+{
+  std::string flat_string (PROFILE_GET_FLAT_STRING ());
+
+  return stl::string (flat_string.c_str (), stl::min ((size_t)flat_string.size (), max_length));
 }
 
 }
@@ -96,6 +112,18 @@ Interpreter::Interpreter (const script::Environment& in_environment)
     //очистка стека
 
   lua_settop (state, 0);
+
+    //Регистрация функций профилирования
+
+  InvokerRegistry profiler_lib = environment.CreateLibrary (PROFILER_LIBRARY);
+
+  profiler_lib.Register ("Start", make_invoker<void ()> (xtl::bind (&ShinyLua_start, state)));
+  profiler_lib.Register ("Stop", make_invoker<void ()> (xtl::bind (&ShinyLua_stop, state)));
+  profiler_lib.Register ("Update", make_invoker<void ()> (xtl::bind (&ShinyLua_update, state)));
+  profiler_lib.Register ("TreeString", make_invoker (make_invoker<void ()> (&shiny_tree_string),
+                                                     make_invoker<void (size_t)> (&shiny_tree_string)));
+  profiler_lib.Register ("FlatString", make_invoker (make_invoker<void ()> (&shiny_flat_string),
+                                                     make_invoker<void (size_t)> (&shiny_flat_string)));
 }
 
 Interpreter::~Interpreter ()

@@ -18,6 +18,7 @@
 #include <common/heap.h>
 #include <common/strlib.h>
 
+#include <script/bind.h>
 #include <script/interpreter.h>
 #include <script/environment.h>
 
@@ -36,6 +37,8 @@ extern "C" {
 #ifdef LUAJIT
 }
 #endif
+
+#include <ShinyLua.h>
 
 namespace script
 {

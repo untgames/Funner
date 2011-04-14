@@ -8,7 +8,7 @@ SCRIPT.LUA.SOURCES.TYPE             := static-lib
 SCRIPT.LUA.SOURCES.NAME             := funner.script.lua
 SCRIPT.LUA.SOURCES.SOURCE_DIRS      := sources
 #SCRIPT.LUA.SOURCES.COMPILER_DEFINES := __STRICT_ANSI__
-SCRIPT.LUA.SOURCES.IMPORTS				  := compile.script.core compile.common 
+SCRIPT.LUA.SOURCES.IMPORTS				  := compile.script.core compile.common compile.extern.shinylua
 
 #ifeq (,$(filter msvc,$(PROFILES)))
 SCRIPT.LUA.SOURCES.IMPORTS += compile.extern.lua
