@@ -36,7 +36,7 @@ THE SOFTWARE.
 /*---------------------------------------------------------------------------*/
 
 const ShinyTimeUnit* ShinyGetTimeUnit(float ticks) {
-	static ShinyTimeUnit units[4] = { 0 };
+	static ShinyTimeUnit units[4] = { {0} };
 
 	if (units[0].tickFreq == 0) { /* auto initialize first time */
 		units[0].tickFreq = ShinyGetTickFreq() / 1.0f;
@@ -89,13 +89,13 @@ float ShinyGetTickInvFreq(void) {
 #elif SHINY_PLATFORM == SHINY_PLATFORM_POSIX
 
 void ShinyGetTicks(shinytick_t *p) {
-	timeval time;
+	struct timeval time;
 	gettimeofday(&time, NULL);
 
 	*p = time.tv_sec * 1000000 + time.tv_usec;
 }
 
-const shinytick_t& ShinyGetTickFreq(void) {
+shinytick_t ShinyGetTickFreq(void) {
 	return 1000000;
 }
 

@@ -39,6 +39,20 @@ THE SOFTWARE.
 #if (SHINY_COMPILER == SHINY_COMPILER_GNUC) && !defined(STLPORT)
 #   include <ext/hash_map>
 #   include <ext/hash_set>
+
+namespace __gnu_cxx
+{
+
+template<> struct hash<const void*>
+{
+  size_t operator () (const void* x) const
+  {
+    return hash<size_t> () ((size_t)x);
+  }
+};
+
+}
+
 #else
 #   include <hash_set>
 #   include <hash_map>

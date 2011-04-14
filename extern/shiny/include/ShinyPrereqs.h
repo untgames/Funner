@@ -51,7 +51,7 @@ THE SOFTWARE.
 #if defined (_MSC_VER)
 #   define SHINY_COMPILER	SHINY_COMPILER_MSVC
 
-#elif defined (__GNUG__)
+#elif defined (__GNUC__)
 #   define SHINY_COMPILER	SHINY_COMPILER_GNUC
 
 #else
