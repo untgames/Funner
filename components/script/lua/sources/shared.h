@@ -38,7 +38,9 @@ extern "C" {
 }
 #endif
 
-#include <ShinyLua.h>
+extern "C" {
+#include <ShinyManager.h>
+}
 
 namespace script
 {
@@ -260,6 +262,11 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::trackable& GetTrackable () { return *this; }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Профилирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void LuaHook (lua_Debug* ar);
+
   private:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация/удаление библиотек
@@ -267,15 +274,38 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
     void RegisterLibrary   (const char* name, InvokerRegistry& registry);
     void UnregisterLibrary (const char* name);
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Профилирование
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void        StartProfiling    ();
+    void        StopProfiling     ();
+    void        UpdateProfileInfo ();
+    const char* ProfileTreeState  (size_t max_lines);
+    const char* ProfileFlatState  (size_t max_lines);
+
+  private:
+    //Информация для профилирования lua-функций
+    struct LuaHookProfile
+    {
+      ShinyZone      zone;
+      ShinyNodeCache cache;
+      stl::string    name;
+
+      LuaHookProfile ();
+    };
+
   private:
     typedef xtl::intrusive_ptr<Library>                           LibraryPtr;
     typedef stl::hash_map<stl::hash_key<const char*>, LibraryPtr> LibraryMap;
+    typedef stl::hash_map<const void*, LuaHookProfile>            HookProfileMap;
 
   private:
     script::Environment   environment;                  //скриптовое окружение
     lua::SymbolRegistry   symbol_registry;              //реестр символов
     lua::Stack            stack;                        //стек аргументов
     LibraryMap            libraries;                    //карта библиотек
+    HookProfileMap        hook_profiles;                //карта профилей луа-функций
+    stl::string           profile_info_string;          //строка для возврата информации о профилировании
     xtl::auto_connection  on_create_library_connection; //соединение на событие создания библиотеки
     xtl::auto_connection  on_remove_library_connection; //соединение на событие удаления библиотеки
 };

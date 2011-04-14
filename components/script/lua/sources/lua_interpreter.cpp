@@ -15,11 +15,7 @@ namespace script
 namespace lua
 {
 
-/*
-    Имя вариантного типа данных по умолчанию
-*/
-
-const char* VARIANT_DEFAULT_TYPE_NAME = "__lua_variant_type";
+const char* VARIANT_DEFAULT_TYPE_NAME = "__lua_variant_type";   //Имя вариантного типа данных по умолчанию
 
 }
 
@@ -28,7 +24,8 @@ const char* VARIANT_DEFAULT_TYPE_NAME = "__lua_variant_type";
 namespace
 {
 
-const char* PROFILER_LIBRARY = "Profiler";
+const char* INTERPRETER_LUA_NAME = "__funner_interpreter"; //Имя поля, хранящего указатель на интерпретатор
+const char* PROFILER_LIBRARY     = "Profiler";
 
 /*
     Утилиты
@@ -40,20 +37,23 @@ int error_handler (lua_State* state)
   throw xtl::format_exception<RuntimeException> ("script::lua::error_handler", "%s", lua_tostring (state, -1));
 }
 
-stl::string shiny_tree_string (size_t max_length = -1)
+void lua_hook (lua_State *lua_state, lua_Debug *ar)
 {
-  std::string tree_string (PROFILE_GET_TREE_STRING ());
+  lua_getglobal (lua_state, INTERPRETER_LUA_NAME);
 
-  return stl::string (tree_string.c_str (), stl::min ((size_t)tree_string.size (), max_length));
+  Interpreter* interpreter = (Interpreter*)lua_touserdata (lua_state, -1);
+
+  lua_pop (lua_state, 1);
+
+  interpreter->LuaHook (ar);
 }
 
-stl::string shiny_flat_string (size_t max_length = -1)
-{
-  std::string flat_string (PROFILE_GET_FLAT_STRING ());
-
-  return stl::string (flat_string.c_str (), stl::min ((size_t)flat_string.size (), max_length));
 }
 
+Interpreter::LuaHookProfile::LuaHookProfile ()
+{
+  ShinyZone_clear (&zone);
+  cache = &_ShinyNode_dummy;
 }
 
 /*
@@ -115,19 +115,25 @@ Interpreter::Interpreter (const script::Environment& in_environment)
 
     //Регистрация функций профилирования
 
+  stack.Push (this);
+  lua_setglobal (state, INTERPRETER_LUA_NAME);
+
+  environment.RemoveLibrary (PROFILER_LIBRARY);
+
   InvokerRegistry profiler_lib = environment.CreateLibrary (PROFILER_LIBRARY);
 
-  profiler_lib.Register ("Start", make_invoker<void ()> (xtl::bind (&ShinyLua_start, state)));
-  profiler_lib.Register ("Stop", make_invoker<void ()> (xtl::bind (&ShinyLua_stop, state)));
-  profiler_lib.Register ("Update", make_invoker<void ()> (xtl::bind (&ShinyLua_update, state)));
-  profiler_lib.Register ("TreeString", make_invoker (make_invoker<void ()> (&shiny_tree_string),
-                                                     make_invoker<void (size_t)> (&shiny_tree_string)));
-  profiler_lib.Register ("FlatString", make_invoker (make_invoker<void ()> (&shiny_flat_string),
-                                                     make_invoker<void (size_t)> (&shiny_flat_string)));
+  profiler_lib.Register ("Start", make_invoker<void ()> (xtl::bind (&Interpreter::StartProfiling, this)));
+  profiler_lib.Register ("Stop", make_invoker<void ()> (xtl::bind (&Interpreter::StopProfiling, this)));
+  profiler_lib.Register ("Update", make_invoker<void ()> (xtl::bind (&Interpreter::UpdateProfileInfo, this)));
+  profiler_lib.Register ("TreeString", make_invoker (make_invoker<const char* (size_t)> (xtl::bind (&Interpreter::ProfileTreeState, this, _1)),
+                                                     make_invoker<const char* ()> (xtl::bind (&Interpreter::ProfileTreeState, this, -1))));
+  profiler_lib.Register ("FlatString", make_invoker (make_invoker<const char* (size_t)> (xtl::bind (&Interpreter::ProfileFlatState, this, _1)),
+                                                     make_invoker<const char* ()> (xtl::bind (&Interpreter::ProfileFlatState, this, -1))));
 }
 
 Interpreter::~Interpreter ()
 {
+  StopProfiling ();
 }
 
 /*
@@ -233,6 +239,111 @@ void Interpreter::UnregisterLibrary (const char* name)
     return;
 
   libraries.erase (name);
+}
+
+/*
+   Профилирование
+*/
+
+void Interpreter::LuaHook (lua_Debug* ar)
+{
+  // ignore tail call
+  if (ar->i_ci == 0 || ar->event == LUA_HOOKTAILRET)
+    return;
+
+  // ignore nameless function
+  lua_getinfo (state, "n", ar);
+
+  if (!ar->name)
+    return;
+
+  if (ar->event == LUA_HOOKCALL)
+  {
+    lua_getinfo (state, "f", ar);
+
+    const void* func = lua_topointer (state, -1);
+
+    lua_pop (state, 1);
+
+    LuaHookProfile& profile = hook_profiles [func];
+
+    if (!profile.zone.name)
+    {
+      lua_getinfo (state, "S", ar);
+
+      switch (ar->what [0])
+      {
+        case 'L': // "Lua"
+          profile.name = common::format ("%s(%d):%s", ar->source, ar->linedefined, ar->name);
+          break;
+        case 'C': // "C"
+          profile.name = "C:";
+          profile.name += ar->name;
+          break;
+        default:
+          profile.name = "<unknown>";
+      }
+
+      profile.zone.name = profile.name.c_str ();
+    }
+
+    ShinyManager_lookupAndBeginNode (&Shiny_instance, &profile.cache, &profile.zone);
+  }
+  else
+    ShinyManager_endCurNode (&Shiny_instance);
+}
+
+void Interpreter::StartProfiling ()
+{
+  lua_sethook (state, lua_hook, LUA_MASKCALL | LUA_MASKRET, 0);
+}
+
+void Interpreter::StopProfiling ()
+{
+  lua_sethook (state, lua_hook, 0, 0);
+}
+
+void Interpreter::UpdateProfileInfo ()
+{
+  ShinyManager_update (&Shiny_instance);
+}
+
+const char* Interpreter::ProfileTreeState (size_t max_lines)
+{
+  const char* error = ShinyManager_getOutputErrorString (&Shiny_instance);
+
+  if (error)
+    return error;
+
+  size_t nodes_count = stl::min (max_lines, Shiny_instance.nodeCount);
+
+  profile_info_string.resize (ShinyPrintNodesSize (Shiny_instance.nodeCount) - 1);
+
+  ShinyPrintNodes (&profile_info_string[0], &Shiny_instance.rootNode);
+
+  profile_info_string.resize (ShinyPrintNodesSize (nodes_count) - 1);
+
+  return profile_info_string.c_str ();
+}
+
+const char* Interpreter::ProfileFlatState (size_t max_lines)
+{
+  const char* error = ShinyManager_getOutputErrorString (&Shiny_instance);
+
+  if (error)
+    return error;
+
+  ShinyManager_sortZones (&Shiny_instance);
+
+  size_t zones_count = stl::min (max_lines, Shiny_instance.zoneCount);
+
+  profile_info_string.resize (ShinyPrintZonesSize (Shiny_instance.zoneCount) - 1);
+
+  ShinyPrintZones (&profile_info_string[0], &Shiny_instance.rootZone);
+
+  profile_info_string.resize (ShinyPrintZonesSize (zones_count) - 1);
+
+  return profile_info_string.c_str ();
 }
 
 namespace
