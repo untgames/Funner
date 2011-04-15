@@ -146,46 +146,12 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   [(UIWindowWrapper*)self.window onPaint];
 }
 
--(void) touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
-{
-  [(UIWindowWrapper*)self.window touchesBegan:touches withEvent:event];
-}
-
--(void) touchesEnded:(NSSet*)touches withEvent:(UIEvent*)event
-{
-  [(UIWindowWrapper*)self.window touchesEnded:touches withEvent:event];
-}
-
--(void) touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event
-{
-  [(UIWindowWrapper*)self.window touchesMoved:touches withEvent:event];
-}
-
--(void) touchesCancelled:(NSSet*)touches withEvent:(UIEvent*)event
-{
-  [(UIWindowWrapper*)self.window touchesCancelled:touches withEvent:event];
-}
-
--(void) motionBegan:(UIEventSubtype)motion withEvent:(UIEvent*)event
-{
-  [(UIWindowWrapper*)self.window motionBegan:motion withEvent:event];
-}
-
--(void) motionEnded:(UIEventSubtype)motion withEvent:(UIEvent*)event
-{
-  [(UIWindowWrapper*)self.window motionEnded:motion withEvent:event];
-}
-
--(void) motionCancelled:(UIEventSubtype)motion withEvent:(UIEvent*)event
-{
-  [(UIWindowWrapper*)self.window motionCancelled:motion withEvent:event];
-}
-
 @end
 
 /*
     ласс, отвечающий за управление ориентацией окна
 */
+
 @interface UIViewControllerWrapper : UIViewController
 {
 }
@@ -283,6 +249,8 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   if (!self)
     return nil;
 
+  allowed_orientations = InterfaceOrientation_Portrait;
+
   try
   {
     event_context = new WindowEventContext;
@@ -319,7 +287,7 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   return *event_context;
 }
 
--(WindowEventContext&) getEventContextWithTouches:(NSSet*)touches
+-(WindowEventContext&)getEventContextWithTouches:(NSSet*)touches
 {
   if ([touches count] > MAX_TOUCHES_COUNT)
     @throw [NSException exceptionWithName:@"Invalid operation" reason:@"Touches event occured with touches count more than maximum" userInfo:nil];
@@ -332,25 +300,10 @@ typedef stl::vector <IWindowListener*> ListenerArray;
   NSEnumerator           *enumerator        = [touches objectEnumerator];
   Touch                  *touch_description = return_value.touches;
   CGSize                 view_size          = view.frame.size;
-  UIInterfaceOrientation ui_orientation     = self.rootViewController.interfaceOrientation;
 
   for (UITouch *iter = [enumerator nextObject]; iter; iter = [enumerator nextObject], touch_description++)
   {
     CGPoint current_location = [iter locationInView:view];
-
-    switch (ui_orientation)
-    {
-      case UIInterfaceOrientationLandscapeLeft:
-      case UIInterfaceOrientationLandscapeRight:
-      {
-        current_location.x = current_location.x / view_size.height * view_size.width;
-        current_location.y = current_location.y / view_size.width * view_size.height;
-
-        break;
-      }
-      default:
-        break;
-    }
 
     touch_description->touch_id   = (size_t)iter;
     touch_description->position.x = current_location.x * [self contentScaleFactor];
@@ -368,11 +321,12 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 
   for (UITouch* touch in touches)
   {
-    if (!touch.tapCount % 2)
+    if (!(touch.tapCount % 2))
       [doubletap_touches addObject:touch];
   }
 
-  window_impl->Notify (WindowEvent_OnTouchesDoubletap, [self getEventContextWithTouches:doubletap_touches]);
+  if ([doubletap_touches count])
+    window_impl->Notify (WindowEvent_OnTouchesDoubletap, [self getEventContextWithTouches:doubletap_touches]);
 
   [doubletap_touches release];
 }
@@ -425,6 +379,8 @@ typedef stl::vector <IWindowListener*> ListenerArray;
 {
   for (ListenerArray::iterator iter = listeners->begin (), end = listeners->end (); iter != end; ++iter)
     (*iter)->OnInterfaceOrientationChanged (from_orientation, to_orientation);
+
+  window_impl->Notify (WindowEvent_OnSize, [self getEventContext]);
 }
 
 /*
@@ -545,6 +501,29 @@ void Platform::SetWindowRect (window_t window, const Rect& rect)
   frame.origin.x    = rect.left / scale_factor;
   frame.origin.y    = rect.top / scale_factor;
 
+  UIInterfaceOrientation ui_orientation = wnd.rootViewController.interfaceOrientation;
+
+  switch (ui_orientation)
+  {
+    case UIInterfaceOrientationLandscapeLeft:
+    case UIInterfaceOrientationLandscapeRight:
+    {
+      float temp = frame.size.width;
+
+      frame.size.width  = frame.size.height;
+      frame.size.height = temp;
+
+      temp = frame.origin.x;
+
+      frame.origin.x = frame.origin.y;
+      frame.origin.y = temp;
+
+      break;
+    }
+    default:
+      break;
+  }
+
   wnd.frame = frame;
 
   WindowImpl* window_impl = wnd.window_impl;
@@ -565,7 +544,8 @@ void Platform::GetWindowRect (window_t window, Rect& rect)
   if (!window)
     throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::GetWindowRect", "window");
 
-  UIWindow* wnd = (UIWindow*)window;
+  UIWindow               *wnd           = (UIWindow*)window;
+  UIInterfaceOrientation ui_orientation = wnd.rootViewController.interfaceOrientation;
 
   float scale_factor = wnd.contentScaleFactor;
 
@@ -575,6 +555,27 @@ void Platform::GetWindowRect (window_t window, Rect& rect)
   rect.right  = (frame.origin.x + frame.size.width) * scale_factor;
   rect.top    = frame.origin.y * scale_factor;
   rect.left   = frame.origin.x * scale_factor;
+
+  switch (ui_orientation)
+  {
+    case UIInterfaceOrientationLandscapeLeft:
+    case UIInterfaceOrientationLandscapeRight:
+    {
+      float temp = rect.bottom;
+
+      rect.bottom = rect.right;
+      rect.right  = temp;
+
+      temp = rect.top;
+
+      rect.top  = rect.left;
+      rect.left = rect.top;
+
+      break;
+    }
+    default:
+      break;
+  }
 }
 
 void Platform::GetClientRect (window_t handle, Rect& target_rect)
