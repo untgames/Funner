@@ -315,7 +315,7 @@ const char* Interpreter::ProfileTreeState (size_t max_lines)
   if (error)
     return error;
 
-  size_t nodes_count = stl::min (max_lines, Shiny_instance.nodeCount);
+  size_t nodes_count = stl::min (max_lines, (size_t)Shiny_instance.nodeCount);
 
   profile_info_string.resize (ShinyPrintNodesSize (Shiny_instance.nodeCount) - 1);
 
@@ -335,7 +335,7 @@ const char* Interpreter::ProfileFlatState (size_t max_lines)
 
   ShinyManager_sortZones (&Shiny_instance);
 
-  size_t zones_count = stl::min (max_lines, Shiny_instance.zoneCount);
+  size_t zones_count = stl::min (max_lines, (size_t)Shiny_instance.zoneCount);
 
   profile_info_string.resize (ShinyPrintZonesSize (Shiny_instance.zoneCount) - 1);
 
