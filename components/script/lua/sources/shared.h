@@ -280,6 +280,7 @@ class Interpreter: public IInterpreter, public StateHolder, public xtl::referenc
     void        StartProfiling    ();
     void        StopProfiling     ();
     void        UpdateProfileInfo ();
+    void        CleanProfileInfo ();
     const char* ProfileTreeState  (size_t max_lines);
     const char* ProfileFlatState  (size_t max_lines);
 

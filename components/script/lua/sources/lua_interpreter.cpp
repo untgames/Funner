@@ -125,6 +125,7 @@ Interpreter::Interpreter (const script::Environment& in_environment)
   profiler_lib.Register ("Start", make_invoker<void ()> (xtl::bind (&Interpreter::StartProfiling, this)));
   profiler_lib.Register ("Stop", make_invoker<void ()> (xtl::bind (&Interpreter::StopProfiling, this)));
   profiler_lib.Register ("Update", make_invoker<void ()> (xtl::bind (&Interpreter::UpdateProfileInfo, this)));
+  profiler_lib.Register ("Clean", make_invoker<void ()> (xtl::bind (&Interpreter::CleanProfileInfo, this)));
   profiler_lib.Register ("TreeString", make_invoker (make_invoker<const char* (size_t)> (xtl::bind (&Interpreter::ProfileTreeState, this, _1)),
                                                      make_invoker<const char* ()> (xtl::bind (&Interpreter::ProfileTreeState, this, -1))));
   profiler_lib.Register ("FlatString", make_invoker (make_invoker<const char* (size_t)> (xtl::bind (&Interpreter::ProfileFlatState, this, _1)),
@@ -306,6 +307,11 @@ void Interpreter::StopProfiling ()
 void Interpreter::UpdateProfileInfo ()
 {
   ShinyManager_update (&Shiny_instance);
+}
+
+void Interpreter::CleanProfileInfo ()
+{
+  ShinyManager_updateClean (&Shiny_instance);
 }
 
 const char* Interpreter::ProfileTreeState (size_t max_lines)
