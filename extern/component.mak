@@ -20,10 +20,10 @@ ifneq (,$(filter linux,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += openalsdk
 endif
 
-ifeq (,$(filter android,$(PROFILES)))
+ifneq (,$(filter android,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += openalsdk
 endif
 
-ifeq (,$(filter psp,$(PROFILES)))
+ifneq (,$(filter psp,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS := psp_addons $(FUNNER_EXTERN_LIBS.COMPONENTS)
 endif
