@@ -135,8 +135,11 @@ class ApplicationImpl: private IApplicationListener
           case ApplicationEvent_OnInitialized:
             return signals [event].connect (handler);
           case ApplicationEvent_OnIdle:
+          {
+            connection return_value = signals [ApplicationEvent_OnIdle].connect (handler);
             UpdateIdleState ();
-            return signals [ApplicationEvent_OnIdle].connect (handler);
+            return return_value;
+          }
           default:
             throw xtl::make_argument_exception ("", "event", event);
         }
