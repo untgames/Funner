@@ -13,6 +13,7 @@
 
 #include <media/animation/animation_library.h>
 #include <media/physics/physics_library.h>
+#include <media/rfx/material_library.h>
 
 #include <media/collada.h>
 #include <media/image.h>
@@ -26,26 +27,6 @@ using namespace media::collada;
 */
 
 const char* APPLICATION_NAME = "collada_converter";
-
-const char* SHADER_TYPE_ATTRIBUTE              = "Effect";
-const char* REFLECTIVITY_ATTRIBUTE             = "Reflectivity";
-const char* TRANSPARENCY_ATTRIBUTE             = "Transparency";
-const char* SHININESS_ATTRIBUTE                = "Shininess";
-const char* DIFFUSE_ATTRIBUTE                  = "Diffuse";
-const char* DIFFUSE_TEXTURE_ATTRIBUTE          = "DiffuseTexture";
-const char* DIFFUSE_TEXTURE_CHANNEL_ATTRIBUTE  = "DiffuseTextureChannel";
-const char* AMBIENT_ATTRIBUTE                  = "Ambient";
-const char* AMBIENT_TEXTURE_ATTRIBUTE          = "AmbientTexture";
-const char* AMBIENT_TEXTURE_CHANNEL_ATTRIBUTE  = "AmbientTextureChannel";
-const char* SPECULAR_ATTRIBUTE                 = "Specular";
-const char* SPECULAR_TEXTURE_ATTRIBUTE         = "SpecularTexture";
-const char* SPECULAR_TEXTURE_CHANNEL_ATTRIBUTE = "SpecularTextureChannel";
-const char* EMISSION_ATTRIBUTE                 = "Emission";
-const char* EMISSION_TEXTURE_ATTRIBUTE         = "EmissionTexture";
-const char* EMISSION_TEXTURE_CHANNEL_ATTRIBUTE = "EmissionTextureChannel";
-const char* BUMP_AMOUNT_ATTRIBUTE              = "BumpAmount";
-const char* BUMP_TEXTURE_ATTRIBUTE             = "BumpTexture";
-const char* BUMP_TEXTURE_CHANNEL_ATTRIBUTE     = "BumpTextureChannel";
 
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
 
@@ -866,90 +847,55 @@ stl::string get_texture_path (const Params& params, ImagesMap& images_map, const
 }
 
 //сохранение материалов
-void save_material (const Params& params, const Effect& effect, ImagesMap& images_map, XmlWriter& writer)
+void add_texmap (const Params& params, const Effect& effect, TextureMap map, ImagesMap& images_map, media::rfx::Material& material)
 {
-  XmlWriter::Scope material_scope (writer, "Material");
-  
-  stl::string id = params.output_resources_namespace.empty () ? effect.Id () : common::format ("%s.%s", params.output_resources_namespace.c_str (), effect.Id ());
+  if (!effect.HasTexture (map))
+    return;
 
-  writer.WriteAttribute ("Name", id.c_str ());
+  const Texture&     texture = effect.Texture (map);
+  media::rfx::Texmap texmap;
+  const char         *semantic, *texture_channel_property;
 
-  XmlWriter::Scope shader_parameters_scope (writer, "ShaderParameters");
-
-  switch (effect.ShaderType ())
+  switch (map)
   {
-    case ShaderType_Constant:
-      writer.WriteAttribute (SHADER_TYPE_ATTRIBUTE, "constant");
+    case TextureMap_Diffuse:
+      semantic                 = "diffuse";
+      texture_channel_property = "DiffuseTextureChannel";
       break;
-    case ShaderType_Lambert:
-      writer.WriteAttribute (SHADER_TYPE_ATTRIBUTE, "lambert");
+    case TextureMap_Ambient:
+      semantic                 = "ambient";
+      texture_channel_property = "AmbientTextureChannel";
       break;
-    case ShaderType_Phong:
-      writer.WriteAttribute (SHADER_TYPE_ATTRIBUTE, "phong");
+    case TextureMap_Specular:
+      semantic                 = "specular";
+      texture_channel_property = "SpecularTextureChannel";
       break;
-    case ShaderType_Blinn:
-      writer.WriteAttribute (SHADER_TYPE_ATTRIBUTE, "blinn");
+    case TextureMap_Transparent:
+      semantic                 = "transparent";
+      texture_channel_property = "TransparentTextureChannel";
+      break;
+    case TextureMap_Emission:
+      semantic                 = "emission";
+      texture_channel_property = "EmissionTextureChannel";
+      break;
+    case TextureMap_Reflective:
+      semantic                 = "reflective";
+      texture_channel_property = "ReflectiveTextureChannel";
+      break;
+    case TextureMap_Bump:
+      semantic                 = "bump";
+      texture_channel_property = "BumpTextureChannel";
       break;
     default:
-      throw xtl::format_operation_exception ("save_material", "Effect '%s' has unknown shader type", effect.Id ());
+      throw xtl::format_operation_exception ("add_texmap", "Unknown map %d", map);
   }
 
-  writer.WriteAttribute (REFLECTIVITY_ATTRIBUTE, effect.Param (EffectParam_Reflectivity));
-  writer.WriteAttribute (TRANSPARENCY_ATTRIBUTE, effect.Param (EffectParam_Transparency));
-  writer.WriteAttribute (SHININESS_ATTRIBUTE,    effect.Param (EffectParam_Shininess));
-  writer.WriteAttribute (DIFFUSE_ATTRIBUTE,      effect.MapColor (TextureMap_Diffuse));
-  writer.WriteAttribute (AMBIENT_ATTRIBUTE,      effect.MapColor (TextureMap_Ambient));
-  writer.WriteAttribute (SPECULAR_ATTRIBUTE,     effect.MapColor (TextureMap_Specular));
-  writer.WriteAttribute (EMISSION_ATTRIBUTE,     effect.MapColor (TextureMap_Emission));
+  texmap.SetSemantic (semantic);
+  texmap.SetImage    (get_texture_path (params, images_map, texture).c_str ());
 
-  if (effect.HasTexture (TextureMap_Bump))
-  {
-    const Texture& texture = effect.Texture (TextureMap_Bump);
+  material.AddTexmap (texmap);
 
-    writer.WriteAttribute (BUMP_TEXTURE_ATTRIBUTE, get_texture_path (params, images_map, texture).c_str ());
-    writer.WriteAttribute (BUMP_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
-    writer.WriteAttribute (BUMP_AMOUNT_ATTRIBUTE, texture.Amount ());
-  }
-
-  if (effect.HasTexture (TextureMap_Diffuse))
-  {
-    const Texture& texture = effect.Texture (TextureMap_Diffuse);
-
-    writer.WriteAttribute (DIFFUSE_TEXTURE_ATTRIBUTE, get_texture_path (params, images_map, texture).c_str ());
-    writer.WriteAttribute (DIFFUSE_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
-  }
-
-  if (effect.HasTexture (TextureMap_Ambient))
-  {
-    const Texture& texture = effect.Texture (TextureMap_Ambient);
-
-    writer.WriteAttribute (AMBIENT_TEXTURE_ATTRIBUTE, get_texture_path (params, images_map, texture).c_str ());
-    writer.WriteAttribute (AMBIENT_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
-  }
-
-  if (effect.HasTexture (TextureMap_Specular))
-  {
-    const Texture& texture = effect.Texture (TextureMap_Specular);
-
-    writer.WriteAttribute (SPECULAR_TEXTURE_ATTRIBUTE, get_texture_path (params, images_map, texture).c_str ());
-    writer.WriteAttribute (SPECULAR_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
-  }
-
-  if (effect.HasTexture (TextureMap_Emission))
-  {
-    const Texture& texture = effect.Texture (TextureMap_Emission);
-
-    writer.WriteAttribute (EMISSION_TEXTURE_ATTRIBUTE, get_texture_path (params, images_map, texture).c_str ());
-    writer.WriteAttribute (EMISSION_TEXTURE_CHANNEL_ATTRIBUTE, get_texture_channel_number (texture.TexcoordChannel ()));
-  }
-}
-
-void save_property_declaration (const char* name, const char* type, XmlWriter& writer)
-{
-  XmlWriter::Scope scope (writer, "Property");
-
-  writer.WriteAttribute ("Name", name);
-  writer.WriteAttribute ("Type", type);
+  material.Properties ().SetProperty (texture_channel_property, get_texture_channel_number (texture.TexcoordChannel ()));
 }
 
 void save_materials (const Params& params, const Model& model, ImagesMap& images_map)
@@ -962,49 +908,58 @@ void save_materials (const Params& params, const Model& model, ImagesMap& images
   if (!FileSystem::IsFileExist (dir_name.c_str ()))
     FileSystem::Mkdir (dir_name.c_str ());
 
-  XmlWriter writer (params.output_materials_file_name.c_str ());
-
-  XmlWriter::Scope library_scope (writer, "MaterialLibrary");
-
-  {
-    XmlWriter::Scope templates_scope  (writer, "Templates");
-    XmlWriter::Scope properties_scope (writer, "Properties");
-    writer.WriteAttribute ("Name", "ShaderParameters");
-
-    {
-      XmlWriter::Scope scope (writer, "Property");
-
-      writer.WriteAttribute ("Name", "Effect");
-      writer.WriteAttribute ("Type", "string");
-      writer.WriteAttribute ("Value", "default");
-    }
-
-//    save_property_declaration (SHADER_TYPE_ATTRIBUTE, "string", writer);
-    save_property_declaration (REFLECTIVITY_ATTRIBUTE, "float", writer);
-    save_property_declaration (TRANSPARENCY_ATTRIBUTE, "float", writer);
-    //?????Refraction??????
-    save_property_declaration (SHININESS_ATTRIBUTE,                "float",  writer);
-    save_property_declaration (BUMP_AMOUNT_ATTRIBUTE,              "float",  writer);
-    save_property_declaration (BUMP_TEXTURE_ATTRIBUTE,             "string", writer);
-    save_property_declaration (BUMP_TEXTURE_CHANNEL_ATTRIBUTE,     "int",    writer);
-    save_property_declaration (DIFFUSE_ATTRIBUTE,                  "vector", writer);
-    save_property_declaration (DIFFUSE_TEXTURE_ATTRIBUTE,          "string", writer);
-    save_property_declaration (DIFFUSE_TEXTURE_CHANNEL_ATTRIBUTE,  "int",    writer);
-    save_property_declaration (AMBIENT_ATTRIBUTE,                  "vector", writer);
-    save_property_declaration (AMBIENT_TEXTURE_ATTRIBUTE,          "string", writer);
-    save_property_declaration (AMBIENT_TEXTURE_CHANNEL_ATTRIBUTE,  "int",    writer);
-    save_property_declaration (SPECULAR_ATTRIBUTE,                 "vector", writer);
-    save_property_declaration (SPECULAR_TEXTURE_ATTRIBUTE,         "string", writer);
-    save_property_declaration (SPECULAR_TEXTURE_CHANNEL_ATTRIBUTE, "int",    writer);
-    save_property_declaration (EMISSION_ATTRIBUTE,                 "vector", writer);
-    save_property_declaration (EMISSION_TEXTURE_ATTRIBUTE,         "string", writer);
-    save_property_declaration (EMISSION_TEXTURE_CHANNEL_ATTRIBUTE, "int",    writer);
-  }
-
-  XmlWriter::Scope scope (writer, "Materials");
+  media::rfx::MaterialLibrary material_library;
 
   for (EffectLibrary::ConstIterator i = model.Effects ().CreateIterator (); i; ++i)
-    save_material (params, *i, images_map, writer);
+  {
+    media::rfx::Material material;
+
+    stl::string id = params.output_resources_namespace.empty () ? i->Id () : common::format ("%s.%s", params.output_resources_namespace.c_str (), i->Id ());
+
+    material.SetName (i->Id ());
+
+    switch (i->ShaderType ())
+    {
+      case ShaderType_Constant:
+        material.SetProgram ("constant");
+        break;
+      case ShaderType_Lambert:
+        material.SetProgram ("lambert");
+        break;
+      case ShaderType_Phong:
+        material.SetProgram ("phong");
+        break;
+      case ShaderType_Blinn:
+        material.SetProgram ("blinn");
+        break;
+      default:
+        throw xtl::format_operation_exception ("save_materials", "Effect '%s' has unknown shader type", i->Id ());
+    }
+
+    common::PropertyMap& properties = material.Properties ();
+
+    properties.SetProperty ("Reflectivity", i->Param (EffectParam_Reflectivity));
+    properties.SetProperty ("Transparency", i->Param (EffectParam_Transparency));
+    properties.SetProperty ("Shininess",    i->Param (EffectParam_Shininess));
+    properties.SetProperty ("Diffuse",      i->MapColor (TextureMap_Diffuse));
+    properties.SetProperty ("Ambient",      i->MapColor (TextureMap_Ambient));
+    properties.SetProperty ("Specular",     i->MapColor (TextureMap_Specular));
+    properties.SetProperty ("Emission",     i->MapColor (TextureMap_Emission));
+
+    if (i->HasTexture (TextureMap_Bump))
+    {
+      const Texture& texture = i->Texture (TextureMap_Bump);
+
+      properties.SetProperty ("BumpAmount", texture.Amount ());
+    }
+
+    for (size_t j = 0; j < TextureMap_Num; j++)
+      add_texmap (params, *i, (TextureMap)j, images_map, material);
+
+    material_library.Attach (id.c_str (), material);
+  }
+
+  material_library.Save (params.output_materials_file_name.c_str ());
     
   if (!params.silent)
     printf ("Ok\n");
