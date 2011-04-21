@@ -58,11 +58,11 @@ class XmtlSaver
         
         const PropertyLayout& layout = material.Properties ().Layout ();
         
-        LayoutMap::iterator layout_iter = layouts.find (layout.Id ());
+        LayoutMap::iterator layout_iter = layouts.find (layout.Hash ());
         
         if (layout_iter == layouts.end ())
         {
-          layouts.insert_pair (layout.Id (), SharedEntry<PropertyLayout> (layout));
+          layouts.insert_pair (layout.Hash (), SharedEntry<PropertyLayout> (layout));
         }
         else
         {
@@ -258,7 +258,7 @@ class XmtlSaver
         
       const PropertyLayout& layout = material.Properties ().Layout ();
       
-      LayoutMap::iterator layout_iter = layouts.find (layout.Id ());
+      LayoutMap::iterator layout_iter = layouts.find (layout.Hash ());
       
       if (layout_iter == layouts.end ())
         throw xtl::format_operation_exception ("media::rfx::XmlSaver::SaveMaterial", "Internal error: unexpected layout");
