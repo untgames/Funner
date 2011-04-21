@@ -381,3 +381,19 @@ void Application::Sleep (size_t milliseconds)
 {
   Platform::Sleep (milliseconds);
 }
+
+void Application::OpenUrl (const char* url)
+{
+  try
+  {
+    if (!url)
+      throw xtl::make_null_argument_exception ("", "url");
+
+    Platform::OpenUrl (url);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Application::OpenUrl");
+    throw;
+  }
+}

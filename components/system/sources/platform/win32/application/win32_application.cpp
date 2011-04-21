@@ -169,3 +169,64 @@ IApplicationDelegate* Platform::CreateDefaultApplicationDelegate ()
 {
   return new Win32ApplicationDelegate;
 }
+
+/*
+   Открытие URL во внешнем браузере
+*/
+
+void Platform::OpenUrl (const char* url)
+{
+  int result = (int)ShellExecuteA (0, "open", url, 0, 0, SW_SHOWNORMAL);
+
+  if (result > 32)
+    return;
+
+  const char* error;
+
+  switch (result)
+  {
+    case 0:
+      error = "The operating system is out of memory or resources.";
+      break;
+    case ERROR_FILE_NOT_FOUND:
+      error = "The specified file was not found.";
+      break;
+    case ERROR_PATH_NOT_FOUND:
+      error = "The specified path was not found.";
+      break;
+    case ERROR_BAD_FORMAT:
+      error = "The .exe file is invalid (non-Win32 .exe or error in .exe image).";
+      break;
+    case SE_ERR_ACCESSDENIED:
+      error = "The operating system denied access to the specified file.";
+      break;
+    case SE_ERR_ASSOCINCOMPLETE:
+      error = "The file name association is incomplete or invalid.";
+      break;
+    case SE_ERR_DDEBUSY:
+      error = "The DDE transaction could not be completed because other DDE transactions were being processed.";
+      break;
+    case SE_ERR_DDEFAIL:
+      error = "The DDE transaction failed.";
+      break;
+    case SE_ERR_DDETIMEOUT:
+      error = "The DDE transaction could not be completed because the request timed out.";
+      break;
+    case SE_ERR_DLLNOTFOUND:
+      error = "The specified DLL was not found.";
+      break;
+    case SE_ERR_NOASSOC:
+      error = "There is no application associated with the given file name extension. This error will also be returned if you attempt to print a file that is not printable.";
+      break;
+    case SE_ERR_OOM:
+      error = "There was not enough memory to complete the operation.";
+      break;
+    case SE_ERR_SHARE:
+      error = "A sharing violation occurred.";
+      break;
+    default:
+      error = "Unknown error";
+  }
+
+  throw xtl::format_operation_exception ("::ShellExecute", error);
+}
