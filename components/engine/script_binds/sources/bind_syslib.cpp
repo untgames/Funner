@@ -39,6 +39,7 @@ void bind_application_library (Environment& environment)
 
   lib.Register ("Exit",                 make_invoker (&syslib::Application::Exit));
   lib.Register ("Sleep",                make_invoker (&syslib::Application::Sleep));
+  lib.Register ("OpenUrl",              make_invoker (&syslib::Application::OpenUrl));
   lib.Register ("CreateEventHandler",   make_callback_invoker<syslib::Application::EventHandler::signature_type> ());
   lib.Register ("RegisterEventHandler", make_invoker (&syslib::Application::RegisterEventHandler));
 }
