@@ -870,10 +870,8 @@ void add_texmap (const Params& params, const Effect& effect, TextureMap map, Ima
       semantic                 = "specular";
       texture_channel_property = "SpecularTextureChannel";
       break;
-    case TextureMap_Transparent:
-      semantic                 = "transparent";
-      texture_channel_property = "TransparentTextureChannel";
-      break;
+    case TextureMap_Transparent:  //ignore transparency textures
+      return;
     case TextureMap_Emission:
       semantic                 = "emission";
       texture_channel_property = "EmissionTextureChannel";
@@ -952,6 +950,9 @@ void save_materials (const Params& params, const Model& model, ImagesMap& images
 
       properties.SetProperty ("BumpAmount", texture.Amount ());
     }
+
+    if (i->HasTexture (TextureMap_Transparent))
+      properties.SetProperty ("BlendMode", "translucent");
 
     for (size_t j = 0; j < TextureMap_Num; j++)
       add_texmap (params, *i, (TextureMap)j, images_map, material);
