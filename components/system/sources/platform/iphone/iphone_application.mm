@@ -272,3 +272,21 @@ IApplicationDelegate* Platform::CreateDefaultApplicationDelegate ()
 {
   return new ApplicationDelegateImpl;
 }
+
+/*
+   Открытие URL во внешнем браузере
+*/
+
+void Platform::OpenUrl (const char* url)
+{
+  NSAutoreleasePool *pool          = [[NSAutoreleasePool alloc] init];
+  NSString          *ns_url_string = [NSString stringWithUTF8String:url];
+  NSURL             *ns_url        = [NSURL URLWithString:[ns_url_string stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+
+  BOOL result = [[UIApplication sharedApplication] openURL:ns_url];
+
+  [pool release];
+
+  if (!result)
+    throw xtl::format_operation_exception ("::UIApplication::openURL", "Can't open URL '%s'", url);
+}
