@@ -45,10 +45,10 @@ endef
 
 ###################################################################################################
 #Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
-#список подключаемых символов линковки, флаги линковки)
+#список подключаемых символов линковки, флаги линковки, файл ошибок)
 ###################################################################################################
 define tools.g++.link
-$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(patsubst lib%.a,-l%,$(filter lib%.a,$(filter-out $(EXCLUDE_LIBS:%=lib%.a),$2)) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) && chmod u+x "$1"
+$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(patsubst lib%.a,-l%,$(filter lib%.a,$(filter-out $(EXCLUDE_LIBS:%=lib%.a),$2)) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) $(if $6, 2> $6) && chmod u+x "$1"
 endef
 
 ###################################################################################################

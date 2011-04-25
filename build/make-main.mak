@@ -228,12 +228,12 @@ ifneq (,$(filter Win%,$(OS)))
 
 #¬ыполнение удаленной команды (команда, хост@пользователь, пароль, порт)
 define ssh_run
-plink $(if $4,-P $4) $2 -pw $3 $1
+plink $(if $4,-P $4) $2 $(if $3,-pw $3,-pw "") $1
 endef
 
 # опирование файла на удаленную машину (источник, приЄмник, пароль, порт)
 define ssh_copy
-pscp -scp -r -batch $(if $4,-P $4) -pw $3 $1 $2
+pscp -scp -batch $(if $4,-P $4) $(if $3,-pw $3,-pw "") $1 $2
 endef
 
 else
@@ -1040,7 +1040,7 @@ INSTALLATION_FILES := $(sort $(INSTALLATION_FILES) $(wildcard $(DIST_BIN_DIR)/*)
 $(INSTALLATION_FLAG): NEW_INSTALLATION_FILES = $(call get_new_installation_files,$(shell $(call get_absolute_paths,$(INSTALLATION_FILES))),$(if $(wildcard $(INSTALLATION_FLAG)),$(sort $(shell cat $(INSTALLATION_FLAG)))))
 
 $(INSTALLATION_FLAG): $(INSTALLATION_FILES) $(INSTALLATION_FLAGS)
-	@$(call do_installation,$(filter-out %.$(INSTALLATION_FLAG_SUFFIX),$?),$(NEW_INSTALLATION_FILES),$@)
+	$(call do_installation,$(filter-out %.$(INSTALLATION_FLAG_SUFFIX),$?),$(NEW_INSTALLATION_FILES),$@)
 
 endif
 

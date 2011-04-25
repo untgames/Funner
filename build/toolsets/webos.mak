@@ -28,7 +28,7 @@ LINKER_GCC        := $(WEBOS_GCC)/bin/arm-none-linux-gnueabi-gcc
 LIB_GCC           := $(WEBOS_GCC)/bin/arm-none-linux-gnueabi-ar
 COMMON_CPPFLAGS   += -fexceptions -frtti
 COMMON_CFLAGS     += -DWEBOS -DARM "-I$(PALMPDK)/include" "-I$(PALMPDK)/include/SDK" -O2 -funroll-loops -mcpu=arm1136jf-s -mfpu=vfp -mfloat-abi=softfp
-COMMON_LINK_FLAGS += "-L$(PALMPDK)/device/lib" -Wl,--allow-shlib-undefined -Wl,--no-undefined -O2 -lm -lpdl -lpthread -lstdc++ -Wl,-L,$(DIST_BIN_DIR)
+COMMON_LINK_FLAGS += "-L$(PALMPDK)/device/lib" -Wl,--allow-shlib-undefined  -O2 -lm -lpdl -lpthread -lstdc++ -lrt -Wl,-L,$(DIST_BIN_DIR)
 
 include $(TOOLSETS_DIR)/g++.mak
 
@@ -40,7 +40,7 @@ export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.c++compile,$1,$2,$3,$4,$5,
 endef
 
 define tools.link
-export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,$3,,$5 $(foreach link,$4,-Wl,-u,$(link)),$6,$7,$8,$9)
+export PATH=$(BUILD_PATHS):$$PATH && $(call tools.g++.link,$1,$2,$3,,$5 $(foreach link,$4,-Wl,-u,$(link)),$1.stderr) && sed "/^.*warning.*lib.*needed by.*libpdl\.so.*not found.*$$/d" $1.stderr && $(RM) $1.stderr
 endef
 
 define tools.lib
@@ -57,7 +57,7 @@ endef
 
 #Копирование файла на устройство (имя локальных файлов, имя удалённого каталога)
 define tools.install
-export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && 
+export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
 $(call ssh_run,"mkdir -p $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)",$(WEBOS_USER)@$(WEBOS_HOST),$(WEBOS_PASSWORD),$(WEBOS_PORT)) && \
 $(call ssh_copy,$1,$(WEBOS_USER)@$(WEBOS_HOST):$(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT),$(WEBOS_PASSWORD),$(WEBOS_PORT)) && \
 $(call ssh_run,"chmod -R +x $(REMOTE_DEBUG_DIR)/$$(echo $$SUBST_RESULT)",$(WEBOS_USER)@$(WEBOS_HOST),$(WEBOS_PASSWORD),$(WEBOS_PORT))
