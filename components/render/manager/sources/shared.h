@@ -38,42 +38,44 @@ namespace render
 //implementation forwards
 class DeviceManager;
 class DynamicTextureImpl;
-class ShadingManager;
+class Effect;
+class EffectLoaderLibrary;
+class EffectManager;
+class EffectPass;
+class EffectRenderer;
 class MaterialManager;
 class PrimitiveManager;
-class EffectManager;
+class ProgramParametersLayout;
+class ShadingManager;
 class TextureManager;
-class EffectPass;
-class Effect;
-class EffectRenderer;
-class EffectLoaderLibrary;
 class InstantiatedEffect;
 struct RendererOperationList;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-typedef xtl::intrusive_ptr<DeviceManager>        DeviceManagerPtr;
-typedef xtl::intrusive_ptr<DynamicTextureImpl>   DynamicTexturePtr;
-typedef xtl::intrusive_ptr<EffectPass>           EffectPassPtr;
-typedef xtl::intrusive_ptr<Effect>               EffectPtr;
-typedef xtl::intrusive_ptr<EffectManager>        EffectManagerPtr;
-typedef xtl::intrusive_ptr<EffectRenderer>       EffectRendererPtr;
-typedef xtl::intrusive_ptr<EntityImpl>           EntityPtr;
-typedef xtl::intrusive_ptr<FrameImpl>            FramePtr;
-typedef xtl::intrusive_ptr<InstantiatedEffect>   InstantiatedEffectPtr;
-typedef xtl::intrusive_ptr<MaterialImpl>         MaterialPtr;
-typedef xtl::intrusive_ptr<MaterialManager>      MaterialManagerPtr;
-typedef xtl::intrusive_ptr<PrimitiveImpl>        PrimitivePtr;
-typedef xtl::intrusive_ptr<PrimitiveBuffersImpl> PrimitiveBuffersPtr;
-typedef xtl::intrusive_ptr<PrimitiveManager>     PrimitiveManagerPtr;
-typedef xtl::intrusive_ptr<RectAreaImpl>         RectAreaPtr;
-typedef xtl::intrusive_ptr<RenderManagerImpl>    RenderManagerPtr;
-typedef xtl::intrusive_ptr<RenderTargetImpl>     RenderTargetPtr;
-typedef xtl::intrusive_ptr<ShadingManager>       ShadingManagerPtr;
-typedef xtl::intrusive_ptr<TextureImpl>          TexturePtr;
-typedef xtl::intrusive_ptr<TextureManager>       TextureManagerPtr;
-typedef xtl::intrusive_ptr<WindowImpl>           WindowPtr;
+typedef xtl::intrusive_ptr<DeviceManager>           DeviceManagerPtr;
+typedef xtl::intrusive_ptr<DynamicTextureImpl>      DynamicTexturePtr;
+typedef xtl::intrusive_ptr<EffectPass>              EffectPassPtr;
+typedef xtl::intrusive_ptr<Effect>                  EffectPtr;
+typedef xtl::intrusive_ptr<EffectManager>           EffectManagerPtr;
+typedef xtl::intrusive_ptr<EffectRenderer>          EffectRendererPtr;
+typedef xtl::intrusive_ptr<EntityImpl>              EntityPtr;
+typedef xtl::intrusive_ptr<FrameImpl>               FramePtr;
+typedef xtl::intrusive_ptr<InstantiatedEffect>      InstantiatedEffectPtr;
+typedef xtl::intrusive_ptr<MaterialImpl>            MaterialPtr;
+typedef xtl::intrusive_ptr<MaterialManager>         MaterialManagerPtr;
+typedef xtl::intrusive_ptr<PrimitiveImpl>           PrimitivePtr;
+typedef xtl::intrusive_ptr<PrimitiveBuffersImpl>    PrimitiveBuffersPtr;
+typedef xtl::intrusive_ptr<PrimitiveManager>        PrimitiveManagerPtr;
+typedef xtl::intrusive_ptr<ProgramParametersLayout> ProgramParametersLayoutPtr;
+typedef xtl::intrusive_ptr<RectAreaImpl>            RectAreaPtr;
+typedef xtl::intrusive_ptr<RenderManagerImpl>       RenderManagerPtr;
+typedef xtl::intrusive_ptr<RenderTargetImpl>        RenderTargetPtr;
+typedef xtl::intrusive_ptr<ShadingManager>          ShadingManagerPtr;
+typedef xtl::intrusive_ptr<TextureImpl>             TexturePtr;
+typedef xtl::intrusive_ptr<TextureManager>          TextureManagerPtr;
+typedef xtl::intrusive_ptr<WindowImpl>              WindowPtr;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера низкого уровня

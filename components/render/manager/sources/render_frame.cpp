@@ -539,7 +539,7 @@ void FrameImpl::RemoveAllEntities ()
 }
 
 /*
-    ƒобавление пре-рендеринга и пост-рендеринга
+    ƒобавление вложенных кадров
 */
 
 size_t FrameImpl::FramesCount ()
