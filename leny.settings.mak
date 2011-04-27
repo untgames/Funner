@@ -13,7 +13,7 @@ IPHONE_PASSWORD := alpine
 
 WEBOS_HOST      := 10.1.0.31
 WEBOS_USER      := root
-WEBOS_PASSWORD  :=
+WEBOS_PASSWORD  := 123456
 WEBOS_PORT      := 22
 
 MEEGO_HOST      := 10.1.0.33 
