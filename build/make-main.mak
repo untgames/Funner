@@ -233,7 +233,7 @@ endef
 
 #Копирование файла на удаленную машину (источник, приёмник, пароль, порт)
 define ssh_copy
-pscp -scp -batch $(if $4,-P $4) $(if $3,-pw $3,-pw "") $1 $2
+pscp -r -scp -batch $(if $4,-P $4) $(if $3,-pw $3,-pw "") $1 $2
 endef
 
 else
@@ -608,7 +608,7 @@ define process_target.application
 
   RUN.$1: $$($1.EXE_FILE)
 		@echo Running $$(notdir $$<)...
-		@$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$$(patsubst %,"$(CURDIR)/%",$$<) $(args),$$($1.EXECUTION_DIR),$$(dir $$($1.EXE_FILE)) $$($1.DLL_DIRS),$$($1.TARGET_DLLS)) > $$@
+		$$(call $$(if $$($1.RUN_TOOL),$$($1.RUN_TOOL),$(RUN_TOOL)),$$(patsubst %,"$(CURDIR)/%",$$<) $(args),$$($1.EXECUTION_DIR),$$(dir $$($1.EXE_FILE)) $$($1.DLL_DIRS),$$($1.TARGET_DLLS)) > $$@
 
   ifneq (,$$(filter $$(files:%=$$($1.OUT_DIR)/%$(EXE_SUFFIX)),$$($1.EXE_FILE)))
     ifeq (,$$($1.DISABLE_RUN))
@@ -1040,7 +1040,7 @@ INSTALLATION_FILES := $(sort $(INSTALLATION_FILES) $(wildcard $(DIST_BIN_DIR)/*)
 $(INSTALLATION_FLAG): NEW_INSTALLATION_FILES = $(call get_new_installation_files,$(shell $(call get_absolute_paths,$(INSTALLATION_FILES))),$(if $(wildcard $(INSTALLATION_FLAG)),$(sort $(shell cat $(INSTALLATION_FLAG)))))
 
 $(INSTALLATION_FLAG): $(INSTALLATION_FILES) $(INSTALLATION_FLAGS)
-	$(call do_installation,$(filter-out %.$(INSTALLATION_FLAG_SUFFIX),$?),$(NEW_INSTALLATION_FILES),$@)
+	@$(call do_installation,$(filter-out %.$(INSTALLATION_FLAG_SUFFIX),$?),$(NEW_INSTALLATION_FILES),$@)
 
 endif
 

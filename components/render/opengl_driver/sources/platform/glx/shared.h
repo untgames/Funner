@@ -24,19 +24,31 @@
 #include <shared/platform.h>
 #include <shared/property_list.h>
 
+#ifndef NO_XRAND
+#define HAS_XRANDR
+#endif
+
+#ifndef NO_X86VMODE
+#define HAS_X86VMODE
+#endif
+
 /* Xlib.h is the default header that is included and has the core functionallity */
 #include <X11/Xlib.h>
 
 /* X RandR is used to configure which display ports are enabled (e.g. LCD, VGA and DVI), 
  * and to configure display modes and properties such as orientation, reflection and DPI.
  */
+#ifdef HAS_XRANDR
 #include <X11/extensions/Xrandr.h>
+#endif
 
 /* The XF86 Video Mode extension allows us to change the displaymode of the server
  * this allows us to set the display to fullscreen and also read videomodes and   
  * other information.                                                             
  */  
+#ifdef HAS_X86VMODE
 #include <X11/extensions/xf86vmode.h>
+#endif
 
 #include <GL/gl.h>
 #include <GL/glx.h>

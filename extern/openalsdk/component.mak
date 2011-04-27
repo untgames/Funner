@@ -25,6 +25,7 @@ EXTERN.OPENALLIB.linux.COMPILER_FLAGS       := -pthread
 EXTERN.OPENALLIB.linux.LIBS                 := pthread dl rt
 EXTERN.OPENALLIB.linux.LINK_FLAGS           := -pthread
 EXTERN.OPENALLIB.beagleboard.LINK_FLAGS     := -rdynamic
+EXTERN.OPENALLIB.meego.LINK_FLAGS           := -rdynamic
 EXTERN.OPENALLIB.android.LIBS               := log
 
 #Цель №2 - OPENAL_TESTS

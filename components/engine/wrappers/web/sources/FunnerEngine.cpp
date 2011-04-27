@@ -24,6 +24,22 @@
 namespace
 {
 
+void log (const char* s, ...)
+{
+  FILE* f = fopen ("d:\\log.txt", "a");
+  
+  if (!f)
+    return;
+    
+  va_list l;
+  
+  va_start (l, s);
+    
+  vfprintf (f, s, l);
+    
+  fclose (f);
+}
+
 /*
     Константы
 */
@@ -62,7 +78,7 @@ class EngineHolder
       
       if (!::GetModuleFileNameW (gInstance, module_path, sizeof (module_path)))
       {
-//        log ("Can't get module path");
+        log ("Can't get module path");
         abort ();
       }
       
@@ -74,7 +90,7 @@ class EngineHolder
       
       if (!SetDllDirectory (module_path))
       {
-//        log ("Can't set DLL search directory\n");
+        log ("Can't set DLL search directory\n");
         abort ();
       }
 
@@ -86,7 +102,7 @@ class EngineHolder
       
       if (!library)
       {
-//        log ("Can't load engine library '%S'\n", module_path);
+        log ("Can't load engine library '%S'\n", module_path);
         abort ();
       }
       
@@ -94,7 +110,7 @@ class EngineHolder
       
       if (!FunnerInit)
       {
-//        log ("Bad library (entries not found)\n");
+        log ("Bad library (entries not found)\n");
         abort ();
       }
 
@@ -102,9 +118,11 @@ class EngineHolder
 
       if (!&*instance)
       {
-//        log ("Engine startup failed!");
+        log ("Engine startup failed!");
         abort ();
       }
+      
+      log ("Engine loaded");      
     }
 
 #else

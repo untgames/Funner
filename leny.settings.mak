@@ -15,3 +15,9 @@ WEBOS_HOST      := 10.1.0.31
 WEBOS_USER      := root
 WEBOS_PASSWORD  :=
 WEBOS_PORT      := 22
+
+MEEGO_HOST      := 10.1.0.33 
+MEEGO_USER      := leny
+MEEGO_PASSWORD  := 123456
+MEEGO_PORT      := 22
+MEEGO_DISPLAY   := :0.0

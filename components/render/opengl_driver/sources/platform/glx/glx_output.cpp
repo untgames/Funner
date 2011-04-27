@@ -36,7 +36,8 @@ struct Output::Impl
     : display (in_display)
     , screen_number (in_screen_number)
     , name(common::format ("screen%u", in_screen_number))
-  {
+  {    
+#ifdef HAS_XRANDR
     DisplayLock lock (display);
     
     int event_base = 0, error_base = 0;
@@ -85,18 +86,12 @@ struct Output::Impl
         }
       }
     }
+#endif    
   }
   
 ///Деструктор
   ~Impl ()
   {
-    try
-    {
-
-    }
-    catch (...)
-    {
-    }
   }
 };
 
@@ -188,6 +183,7 @@ void raise_format_not_supported_exception (const OutputModeDesc& mode_desc)
 
 void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
 {
+#ifdef HAS_XRANDR
   // блокировка дисплея
 
   DisplayLock lock (impl->display);
@@ -264,6 +260,9 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
 
   if (status < Success)
     throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::SetModeDesc", "XRRSetScreenConfigAndRate failed");
+#else
+  throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::SetModeDesc", "Mode changes not supported (no Xrandr)");
+#endif
 }
 
 void Output::RestoreDefaultMode ()
@@ -284,21 +283,21 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
   // блокировка дисплея
 
   DisplayLock lock (impl->display);                                               
+  
+  // получение конфигурации экрана  
 
-  // получение корневого окна
-    
-  Window root = RootWindow (impl->display, impl->screen_number);
+  mode_desc.width       = DisplayWidth  (impl->display, impl->screen_number);
+  mode_desc.height      = DisplayHeight (impl->display, impl->screen_number);
+  mode_desc.color_bits  = DefaultDepth  (impl->display, impl->screen_number);
+
+#ifdef HAS_XRANDR      
+  Window                  root = RootWindow (impl->display, impl->screen_number);
+  XRRScreenConfiguration* conf = XRRGetScreenInfo (impl->display, root);
   
-  // получение конфигурации экрана
-  
-  XRRScreenConfiguration *conf = XRRGetScreenInfo (impl->display, root);
-  
-  // заполнение декриптора
-  
-  mode_desc.width        = DisplayWidth  (impl->display, impl->screen_number);
-  mode_desc.height       = DisplayHeight (impl->display, impl->screen_number);
-  mode_desc.color_bits   = DefaultDepth  (impl->display, impl->screen_number);
   mode_desc.refresh_rate = XRRConfigCurrentRate (conf);
+#else
+  mode_desc.refresh_rate = 0;
+#endif
 }
 
 /*
@@ -307,6 +306,7 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 
 void Output::SetGammaRamp (const Color3f table [GAMMA_RAMP_SIZE])
 {
+#ifdef HAS_X86VMODE
   int event_base;
   int error_base;
   
@@ -332,10 +332,14 @@ void Output::SetGammaRamp (const Color3f table [GAMMA_RAMP_SIZE])
   // установка гаммы
 
   XF86VidModeSetGammaRamp (impl->display, impl->screen_number, GAMMA_RAMP_SIZE, &red[0], &green[0], &blue[0]);
+#else
+  throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::SetGammaRamp", "Gamma ramp not supported (X86VMode not supported)");
+#endif
 }
 
 void Output::GetGammaRamp (Color3f table [GAMMA_RAMP_SIZE])
 {
+#ifdef HAS_X86VMODE
   // блокировка дисплея
 
   DisplayLock lock (impl->display);                                               
@@ -378,4 +382,7 @@ void Output::GetGammaRamp (Color3f table [GAMMA_RAMP_SIZE])
     table [i].green = green [i] / 65535.f;
     table [i].blue  = blue  [i] / 65535.f;
   }
+#else
+  throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::GetGammaRamp", "Gamma ramp not supported (X86VMode not supported)");
+#endif
 }

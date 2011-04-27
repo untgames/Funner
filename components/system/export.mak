@@ -17,6 +17,7 @@ export.link.system.bada.LINK_FLAGS       := -shared
 export.link.system.bada.LINK_INCLUDES    := OspMain
 export.link.system.beagleboard.LIBS      := Xau xcb Xdmcp
 export.link.system.beagleboard.IMPORTS   := link.extern.beagleboard
+export.link.system.meego_ia32.IMPORTS    := link.extern.meego_ia32
 export.link.system.android.LIBS          := dl android
 export.link.system.android.LINK_INCLUDES := JNI_OnLoad
 export.link.system.android.LINK_TOOL     := tools.link.shared-lib

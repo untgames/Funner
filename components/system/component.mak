@@ -28,6 +28,7 @@ SYSTEMLIB.SOURCES.bada_simulator.COMPILER_DEFINES   := #SHP USE_FBASE_ALLOCATOR 
 SYSTEMLIB.SOURCES.bada.SOURCE_DIRS                  := sources/platform/bada
 SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/no_threads
 SYSTEMLIB.SOURCES.beagleboard.IMPORTS               := compile.extern.beagleboard
+SYSTEMLIB.SOURCES.meego.IMPORTS                     := compile.extern.meego
 
 #Öåëü ¹2 - System library tests
 SYSTEMLIB.TESTS.TYPE             := test-suite
