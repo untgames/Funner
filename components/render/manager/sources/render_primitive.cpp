@@ -289,7 +289,6 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
     for (size_t i=0, count=source.PrimitivesCount (); i<count; i++)
     {
       const media::geometry::Primitive& src_primitive = source.Primitive (i);
-      bool                              is_indexed    = mesh->index_buffer;
       
       MeshPrimitivePtr dst_primitive (new MeshPrimitive (*mesh, impl->material_manager->GetMaterialProxy (src_primitive.material), *mesh), false);
 

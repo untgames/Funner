@@ -112,13 +112,13 @@ template <class Ptr>
 ResourceProxy<Ptr>::ResourceProxy (const ResourceProxy& proxy)
   : impl (proxy.impl)
 {
-  addref (impl);
+  addref (static_cast<xtl::reference_counter*> (impl));
 }
 
 template <class Ptr>
 ResourceProxy<Ptr>::~ResourceProxy ()
 {
-  release (impl);
+  release (static_cast<xtl::reference_counter*> (impl));
 }
 
 template <class Ptr>

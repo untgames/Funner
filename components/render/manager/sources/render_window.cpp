@@ -141,7 +141,9 @@ struct WindowImpl::Impl: public xtl::trackable
       if (signals [WindowEvent_OnUpdate].empty () || !swap_chain)
         return;
         
-      signals [WindowEvent_OnUpdate] (Wrappers::Wrap<Window> (owner));
+      Window window = Wrappers::Wrap<Window> (owner);
+        
+      signals [WindowEvent_OnUpdate] (window);
     }
     catch (std::exception& e)
     {
@@ -171,8 +173,10 @@ struct WindowImpl::Impl: public xtl::trackable
         color_buffer->Resize (width, height);
         depth_stencil_buffer->Resize (width, height);
       }
+      
+      Window window = Wrappers::Wrap<Window> (owner);
         
-      signals [WindowEvent_OnResize] (Wrappers::Wrap<Window> (owner));
+      signals [WindowEvent_OnResize] (window);
     }
     catch (std::exception& e)
     {

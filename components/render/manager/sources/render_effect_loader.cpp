@@ -102,9 +102,9 @@ class EffectLoader
 ///Разбор операции смешивания
     void ParseBlendOperation (const ParseNode& node, Parser::AttributeIterator iter, BlendOperation& operation, BlendArgument& src_arg, BlendArgument& dst_arg)
     {
-      const char* operation_tag = get<const char*> (iter);
-      const char* src_arg_tag   = get<const char*> (iter);
-      const char* dst_arg_tag   = get<const char*> (iter);
+      const char* operation_tag = xtl::io::get<const char*> (iter);
+      const char* src_arg_tag   = xtl::io::get<const char*> (iter);
+      const char* dst_arg_tag   = xtl::io::get<const char*> (iter);
       
       if      (!xtl::xstricmp (operation_tag, "add"))    operation = BlendOperation_Add;
       else if (!xtl::xstricmp (operation_tag, "sub"))    operation = BlendOperation_Subtraction;
@@ -503,8 +503,8 @@ class EffectLoader
         
         Parser::AttributeIterator params_iter = make_attribute_iterator (*shader_iter);
         
-        desc.name    = get<const char*> (params_iter);
-        desc.profile = get<const char*> (params_iter);
+        desc.name    = xtl::io::get<const char*> (params_iter);
+        desc.profile = xtl::io::get<const char*> (params_iter);
         
         media::rfx::Shader* shader = library.Shaders ().Find (desc.name, desc.profile);
         

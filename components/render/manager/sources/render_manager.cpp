@@ -58,7 +58,9 @@ struct RenderManagerImpl::Impl: public xtl::trackable
       {
         windows.erase (iter);
         
-        WindowEventNotify (RenderManagerWindowEvent_OnRemoved, Wrappers::Wrap<render::Window> (window));
+        render::Window wrapped_window = Wrappers::Wrap<render::Window> (window);
+        
+        WindowEventNotify (RenderManagerWindowEvent_OnRemoved, wrapped_window);
         
         return;
       }
@@ -72,7 +74,9 @@ struct RenderManagerImpl::Impl: public xtl::trackable
       
     try
     {
-      window_signals [event](Wrappers::Wrap<RenderManager> (owner), window);
+      RenderManager manager = Wrappers::Wrap<RenderManager> (owner);
+      
+      window_signals [event](manager, window);
     }
     catch (...)
     {
@@ -211,8 +215,10 @@ WindowPtr RenderManagerImpl::CreateWindow (syslib::Window& sys_window, common::P
     
     if (!impl->device_manager)
       impl->device_manager = window->DeviceManager ();
+      
+    render::Window wrapped_window = Wrappers::Wrap<render::Window> (window);
     
-    impl->WindowEventNotify (RenderManagerWindowEvent_OnAdded, Wrappers::Wrap<render::Window> (window));
+    impl->WindowEventNotify (RenderManagerWindowEvent_OnAdded, wrapped_window);
     
     return window;
   }

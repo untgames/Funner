@@ -38,8 +38,8 @@ struct DynamicTextureMaterialStorage::Impl
 ///Конструктор
   Impl (const TextureManagerPtr& in_texture_manager, const MaterialPtr& in_material, EntityImpl& in_owner)
     : texture_manager (in_texture_manager)
-    , material (in_material)
     , owner (in_owner)
+    , material (in_material)    
   {
     static const char* METHOD_NAME = "render::DynamicTextureMaterialStorage::Impl::Impl";
     
