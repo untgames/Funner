@@ -10,13 +10,13 @@ namespace
     Цель рендеринга
 */
 
-struct RenderTargetDesc
+struct RenderTargetViewDesc
 {
   size_t          layer;         //номер слоя
   size_t          mip_level;     //номер мип-уровня
   RenderTargetPtr render_target; //цель рендеринга 
   
-  RenderTargetDesc (size_t in_layer, size_t in_mip_level, const RenderTargetPtr& in_render_target)
+  RenderTargetViewDesc (size_t in_layer, size_t in_mip_level, const RenderTargetPtr& in_render_target)
     : layer (in_layer)
     , mip_level (in_mip_level)
     , render_target (in_render_target)
@@ -24,7 +24,7 @@ struct RenderTargetDesc
   }
 };
 
-typedef stl::vector<RenderTargetDesc> RenderTargetArray;
+typedef stl::vector<RenderTargetViewDesc> RenderTargetArray;
 
 }
 
@@ -69,7 +69,7 @@ struct TextureImpl::Impl
      
    RenderTargetPtr render_target (new RenderTargetImpl (device_manager, &*texture, layer, mip_level), false);
    
-   render_targets.push_back (RenderTargetDesc (layer, mip_level, render_target));
+   render_targets.push_back (RenderTargetViewDesc (layer, mip_level, render_target));
    
    return render_target;
   }
