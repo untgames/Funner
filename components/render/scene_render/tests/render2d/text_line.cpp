@@ -23,7 +23,7 @@ int main ()
     text_line->SetName ("TextLine1");
     camera->SetName ("Camera1");
     text_line->SetColor (0.1f, 0.2f, 0.3f, 0.4f);
-    text_line->SetText ("Text");
+    text_line->SetText ("Sample");
     text_line->SetFont ("data/times_new_roman.xfont");
     text_line->SetAlignment (TextLineAlignment_Center, TextLineAlignment_Center);
 

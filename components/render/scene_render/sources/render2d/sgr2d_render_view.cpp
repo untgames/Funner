@@ -7,6 +7,17 @@ using namespace scene_graph;
 namespace
 {
 
+const float MINIMAL_NODE_SCALE = 0.00000001f;
+
+bool has_zero_component (const math::vec3f& v, float eps)
+{
+  for (size_t i=0; i < 3; i++)
+    if (fabs (v [i]) <= eps)
+      return true;
+
+  return false;
+}
+
 /*
     Посетитель объектов сцены
 */
@@ -22,6 +33,9 @@ struct RenderViewVisitor: public xtl::visitor<void, SpriteModel, TextLine, Heigh
 
   void visit (SpriteModel& model)
   {
+    if (has_zero_component (model.WorldScale (), MINIMAL_NODE_SCALE))
+      return;
+
     Renderable* renderable = render->GetRenderable (&model);
     
     if (renderable)
@@ -30,6 +44,9 @@ struct RenderViewVisitor: public xtl::visitor<void, SpriteModel, TextLine, Heigh
 
   void visit (HeightMap& height_map)
   {
+    if (has_zero_component (height_map.WorldScale (), MINIMAL_NODE_SCALE))
+      return;
+
     Renderable* renderable = render->GetRenderable (&height_map);
     
     if (renderable)
@@ -38,6 +55,9 @@ struct RenderViewVisitor: public xtl::visitor<void, SpriteModel, TextLine, Heigh
   
   void visit (TextLine& text_line)
   {
+    if (has_zero_component (text_line.WorldScale (), MINIMAL_NODE_SCALE))
+      return;
+
     Renderable* renderable = render->GetRenderable (&text_line);
     
     if (renderable)
