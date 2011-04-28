@@ -2,6 +2,9 @@
 
 using namespace render;
 
+//TODO: check scissor enabled???
+//TODO: set local textures
+
 namespace
 {
 
@@ -13,7 +16,7 @@ const size_t RESERVE_OPERATION_ARRAY = 512; //резервируемое число операций в мас
 const size_t RESERVE_FRAME_ARRAY     = 32;  //резервируемое число вложенных фреймов в эффекте
 
 /*
-    Вспомогательны структуры
+    Вспомогательные структуры
 */
 
 typedef stl::vector<const RendererOperation*> OperationArray;
@@ -25,12 +28,16 @@ struct RenderPass: public xtl::reference_counter
   stl::string              depth_stencil_target;  //имя целевого буфера отсечения
   SortMode                 sort_mode;             //режим сортировки
   LowLevelStateBlockPtr    state_block;           //блок состояний прохода
+  float                    viewport_min_depth;    //минимальное значение глубины области вывода
+  float                    viewport_max_depth;    //максимальное значение глубины области вывода
   OperationArray           operations;            //операции рендеринга
   const RendererOperation* last_operation;        //последняя добавленная операция
 
 ///Конструктор
   RenderPass ()
     : sort_mode (SortMode_Default)
+    , viewport_min_depth (0.0f)
+    , viewport_max_depth (1.0f)
     , last_operation (0)
   {
     operations.reserve (RESERVE_OPERATION_ARRAY);
@@ -83,23 +90,29 @@ typedef stl::vector<size_t>                                   TagHashArray;
 
 struct EffectRenderer::Impl
 {
-  TagHashArray                effect_tags; //тэги эффекта
-  RenderPassMap               passes;      //проходы рендеринга
-  RenderInstantiatedEffectMap effects;     //инстанцированные эффекты
-  RenderEffectOperationArray  operations;  //операции рендеринга
+  DeviceManagerPtr            device_manager; //менеджер устройства отрисовки
+  TagHashArray                effect_tags;    //тэги эффекта
+  RenderPassMap               passes;         //проходы рендеринга
+  RenderInstantiatedEffectMap effects;        //инстанцированные эффекты
+  RenderEffectOperationArray  operations;     //операции рендеринга
+  
+  Impl (const DeviceManagerPtr& in_device_manager) : device_manager (in_device_manager) {}
 };
 
 /*
     Конструктор / деструктор
 */
 
-EffectRenderer::EffectRenderer (const EffectPtr& effect)
-  : impl (new Impl)
+EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr& device_manager)
+  : impl (new Impl (device_manager))
 {
   try
   {
     if (!effect)
       throw xtl::make_null_argument_exception ("", "effect");
+      
+    if (!device_manager)
+      throw xtl::make_null_argument_exception ("", "device_manager");
       
     if (effect->TagsCount ())
       impl->effect_tags.assign (effect->TagHashes (), effect->TagHashes () + effect->TagsCount ());
@@ -127,6 +140,8 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect)
         pass->depth_stencil_target = src_pass->DepthStencilTarget ();
         pass->sort_mode            = src_pass->SortMode ();
         pass->state_block          = src_pass->StateBlock ();
+        pass->viewport_min_depth   = src_pass->ViewportMinDepth ();
+        pass->viewport_max_depth   = src_pass->ViewportMaxDepth ();
 
         operation = RenderEffectOperationPtr (new RenderEffectOperation (pass), false);
       }
@@ -264,7 +279,170 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
 {
   try
   {
-    
+    render::low_level::IDevice& device                     = impl->device_manager->Device ();
+    ProgramParametersManager&   program_parameters_manager = impl->device_manager->ProgramParametersManager ();
+
+    for (RenderEffectOperationArray::iterator iter=impl->operations.begin (), end=impl->operations.end (); iter!=end; ++iter)
+    {
+      RenderEffectOperation& operation = **iter;
+      
+      if (operation.pass)
+      {        
+        RenderPass& pass = *operation.pass;
+        
+          //применение состояния прохода
+        
+        if (pass.state_block)
+          pass.state_block->Apply ();
+          
+          //сортировка операций
+
+//  SortMode                 sort_mode;             //режим сортировки          
+
+          //установка целевых буферов отрисовки
+          
+        if (pass.color_targets.Size () > 1)
+          throw xtl::format_not_supported_exception ("", "MRT not supported");
+          
+        render::low_level::IView *render_target_view = 0, *depth_stencil_view = 0;
+        RectAreaPtr              viewport, scissor;
+        int                      target_width = 0, target_height = 0;
+
+        if (!pass.color_targets.IsEmpty ())        
+        {
+          RenderTargetDescPtr desc = context.FindRenderTarget (pass.color_targets [0]);
+
+          if (desc && desc->render_target)
+          {
+            render_target_view = &desc->render_target->View ();
+            viewport           = desc->viewport;
+            scissor            = desc->scissor;
+            target_width       = desc->render_target->Width ();
+            target_height      = desc->render_target->Height ();
+          }
+        }
+        
+        if (!pass.depth_stencil_target.empty ())
+        {
+          RenderTargetDescPtr desc = context.FindRenderTarget (pass.depth_stencil_target.c_str ());
+          
+          if (desc && desc->render_target)
+          {
+            depth_stencil_view = &desc->render_target->View ();
+            
+            if (desc->viewport && viewport && viewport->Rect () != desc->viewport->Rect ())
+              throw xtl::format_operation_exception ("", "Different viewport rect areas for color target and depth-stencil target");
+              
+            if (!viewport && desc->viewport)
+              viewport = desc->viewport;
+
+            if (desc->scissor && scissor && scissor->Rect () != desc->scissor->Rect ())
+              throw xtl::format_operation_exception ("", "Different scissor rect areas for color target and depth-stencil target");              
+              
+            if (!scissor && desc->scissor)
+              scissor = desc->scissor;
+              
+            if (render_target_view)
+            {
+              if (desc->render_target->Width () != target_width || desc->render_target->Height () != target_height)
+                throw xtl::format_operation_exception ("", "Different render target sizes: render target sizes (%u, %u) mismatch depth-stencil sizes (%u, %u)",
+                  target_width, target_height, desc->render_target->Width (), desc->render_target->Height ());
+            }
+          }                    
+        }
+
+        device.OSSetRenderTargets (render_target_view, depth_stencil_view);
+
+          //настройка области вывода                
+
+        if (viewport)
+        {
+          render::low_level::Viewport viewport_desc;
+          const Rect&                 rect = viewport->Rect ();
+          
+          memset (&viewport_desc, 0, sizeof (viewport_desc));
+          
+          viewport_desc.x         = rect.x;
+          viewport_desc.y         = rect.y;
+          viewport_desc.width     = rect.width;
+          viewport_desc.height    = rect.height;
+          viewport_desc.min_depth = pass.viewport_min_depth;
+          viewport_desc.max_depth = pass.viewport_max_depth;
+
+          device.RSSetViewport (viewport_desc);
+        }
+        else
+        {
+          render::low_level::Viewport viewport_desc;
+          
+          memset (&viewport_desc, 0, sizeof (viewport_desc));
+          
+          viewport_desc.x         = 0;
+          viewport_desc.y         = 0;
+          viewport_desc.width     = target_width;
+          viewport_desc.height    = target_height;
+          viewport_desc.min_depth = pass.viewport_min_depth;
+          viewport_desc.max_depth = pass.viewport_max_depth;
+          
+          device.RSSetViewport (viewport_desc);
+        }
+
+          //настройка области отсечения
+          
+        if (scissor)
+        {
+          render::low_level::Rect dst_rect;
+          const Rect&             src_rect = scissor->Rect ();
+          
+          memset (&dst_rect, 0, sizeof (dst_rect));
+          
+          dst_rect.x      = src_rect.x;
+          dst_rect.y      = src_rect.y;
+          dst_rect.width  = src_rect.width;
+          dst_rect.height = src_rect.height;
+          
+          device.RSSetScissor (dst_rect);
+        }
+        
+        //TODO: check scissor enabled???
+        
+          //установка локальных текстур
+          
+        ///???
+                
+          //выполнение операций
+
+        for (OperationArray::iterator iter=pass.operations.begin (), end=pass.operations.end (); iter!=end; ++iter)
+        {
+          const RendererOperation& operation = **iter;
+          const RendererPrimitive& primitive = *operation.primitive;
+          
+            //применение состояния операции
+
+          operation.state_block->Apply ();
+          
+            //установка расположения параметров
+            //TODO: кэшировать по entity
+
+//          ProgramParametersLayoutPtr program_parameters_layout = program_parameters_manager.GetParameters (???, *operation.parameters_layout);
+
+//          device.SSSetProgramParametersLayout (&*program_parameters_layout->DeviceLayout ());
+
+            //рисование
+
+          if (primitive.indexed) device.DrawIndexed (primitive.type, primitive.first, primitive.count, 0);
+          else                   device.Draw        (primitive.type, primitive.first, primitive.count);
+        }
+      }
+
+      if (operation.effect)
+      {
+          //рисование вложенных кадров
+        
+        for (FrameArray::iterator iter=operation.effect->frames.begin (), end=operation.effect->frames.end (); iter!=end; ++iter)
+          (*iter)->Draw (&context);
+      }
+    }
   }
   catch (xtl::exception& e)
   {

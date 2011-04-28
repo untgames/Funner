@@ -3,6 +3,7 @@
 using namespace render;
 using namespace render::low_level;
 
+//TODO: work with properties
 //TODO: update entity dynamic textures
 //TODO: detect LOD
 
@@ -29,6 +30,7 @@ typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr>          TextureMa
 
 struct EffectHolder: public CacheSource
 {
+  DeviceManagerPtr  device_manager;         //менеджер устройства отрисовки
   EffectManagerPtr  effect_manager;         //ссылка на менеджер эффектов
   EffectProxy       effect;                 //эффект кадра
   EffectRendererPtr effect_renderer;        //рендер эффекта
@@ -36,11 +38,15 @@ struct EffectHolder: public CacheSource
   bool              need_operations_update; //нужно ли обновлять список операций рендеринга  
   
 ///Конструктор
-  EffectHolder (const EffectManagerPtr& in_effect_manager)
-    : effect_manager (in_effect_manager)
+  EffectHolder (const EffectManagerPtr& in_effect_manager, const DeviceManagerPtr& in_device_manager)
+    : device_manager (in_device_manager)
+    , effect_manager (in_effect_manager)
     , effect (effect_manager->GetEffectProxy (""))
     , need_operations_update (true)
   {
+    if (!device_manager)
+      throw xtl::make_null_argument_exception ("render::EffectHolder::EffectHolder", "device_manager");
+
     effect.AttachCacheHolder (*this);
   }
   
@@ -62,7 +68,7 @@ struct EffectHolder: public CacheSource
       if (!cached_effect)
         return;
         
-      effect_renderer = EffectRendererPtr (new render::EffectRenderer (cached_effect), false);
+      effect_renderer = EffectRendererPtr (new render::EffectRenderer (cached_effect, device_manager), false);
       
       need_operations_update = true;
     }
@@ -103,7 +109,7 @@ struct FrameImpl::Impl: public CacheHolder
 
 ///Конструктор
   Impl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager)
-    : effect_holder (new EffectHolder (effect_manager))
+    : effect_holder (new EffectHolder (effect_manager, device_manager))
     , properties (device_manager)
     , scissor_state (false)
     , clear_flags (ClearFlag_All)

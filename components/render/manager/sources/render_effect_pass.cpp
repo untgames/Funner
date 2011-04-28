@@ -16,9 +16,11 @@ struct EffectPass::Impl
   render::SortMode             sort_mode;               //режим сортировки
   LowLevelDepthStencilStatePtr depth_stencil_state;     //состояние уровня отсечения
   LowLevelBlendStatePtr        blend_state;             //состояние уровня смешивания цветов
-  LowLevelRasterizerStatePtr   rasterizer_state;        //состояние уровня растеризации
+  LowLevelRasterizerStatePtr   rasterizer_state;        //состояние уровня растеризации  
   LowLevelStateBlockPtr        state_block;             //блок состояний
   bool                         state_block_need_update; //блок состояний требует обновления
+  float                        viewport_min_depth;      //минимальное значение глубины области вывода
+  float                        viewport_max_depth;      //максимальное значение глубины области вывода
   common::StringArray          tags;                    //тэги прохода
   TagHashArray                 tag_hashes;              //хэши тэгов  
   
@@ -27,6 +29,8 @@ struct EffectPass::Impl
     : device_manager (in_device_manager)
     , sort_mode (SortMode_Default)
     , state_block_need_update (true)
+    , viewport_min_depth (0.0f)
+    , viewport_max_depth (1.0f)
   {
     try
     {
@@ -239,4 +243,28 @@ void EffectPass::SetSortMode (render::SortMode mode)
 SortMode EffectPass::SortMode ()
 {
   return impl->sort_mode;
+}
+
+/*
+    Диапазон глубины для области вывода
+*/
+
+float EffectPass::ViewportMinDepth ()
+{
+  return impl->viewport_min_depth;
+}
+
+float EffectPass::ViewportMaxDepth ()
+{
+  return impl->viewport_max_depth;
+}
+
+void EffectPass::SetViewportMinDepth (float value)
+{
+  impl->viewport_min_depth = value;
+}
+
+void EffectPass::SetViewportMaxDepth (float value)
+{
+  impl->viewport_max_depth = value;
 }

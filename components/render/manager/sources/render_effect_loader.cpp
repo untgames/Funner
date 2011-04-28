@@ -596,7 +596,7 @@ class EffectLoader
         LowLevelBlendStatePtr        blend_state         = *blend_state_name ? library.BlendStates ().Find (blend_state_name) : LowLevelBlendStatePtr ();
         LowLevelDepthStencilStatePtr depth_stencil_state = *depth_stencil_state_name ? library.DepthStencilStates ().Find (depth_stencil_state_name) : LowLevelDepthStencilStatePtr ();
         LowLevelRasterizerStatePtr   rasterizer_state    = *rasterizer_state_name ? library.RasterizerStates ().Find (rasterizer_state_name) : LowLevelRasterizerStatePtr ();
-
+        
         EffectPassPtr pass (new EffectPass (device_manager), false);
 
         pass->SetColorTargets       (color_targets);
@@ -606,6 +606,16 @@ class EffectLoader
         pass->SetBlendState         (blend_state);
         pass->SetDepthStencilState  (depth_stencil_state);
         pass->SetRasterizerState    (rasterizer_state);
+        
+        if (ParseNode depth_range_node = iter->First ("depth_range"))
+        {
+          Parser::AttributeIterator attr_iter = make_attribute_iterator (depth_range_node);
+          
+          float min_depth = get<float> (attr_iter), max_depth = get<float> (attr_iter);
+          
+          pass->SetViewportMinDepth (min_depth);
+          pass->SetViewportMaxDepth (max_depth);
+        }
 
         return pass;
       }

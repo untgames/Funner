@@ -14,7 +14,7 @@ class RectAreaImpl: public Object
 ///Размеры области
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                SetRect (const render::Rect& rect);
-    const render::Rect& Rect    () { return rect; }
+    const render::Rect& Rect    () { return rect; }        
         
   private:
     render::Rect rect;
