@@ -634,11 +634,11 @@ void EntityImpl::ResetAllPrimitives ()
     Получение операций рендеринга
 */
 
-const RendererOperationList& EntityImpl::RendererOperations (size_t level_of_detail)
+const RendererOperationList& EntityImpl::RendererOperations (size_t level_of_detail, bool find_nearest)
 {
   try
   {    
-    EntityLodPtr lod = impl->FindLod (level_of_detail);
+    EntityLodPtr lod = impl->FindLod (level_of_detail, find_nearest);
 
     if (!lod)
       throw xtl::make_argument_exception ("", "level_of_detail", level_of_detail, "Lod primitive is not set");

@@ -77,7 +77,7 @@ class EntityImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение операций рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    const RendererOperationList& RendererOperations (size_t level_of_detail);
+    const RendererOperationList& RendererOperations (size_t level_of_detail, bool find_nearest = false);
 
   private:
     struct Impl;

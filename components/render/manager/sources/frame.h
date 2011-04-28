@@ -1,4 +1,21 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Контекст цели отрисовки
+///////////////////////////////////////////////////////////////////////////////////////////////////
+struct RenderTargetDesc: public xtl::reference_counter
+{
+  RenderTargetPtr render_target; //цель отрисовки
+  RectAreaPtr     viewport;      //область вывода
+  RectAreaPtr     scissor;       //область отсечения
+  
+  RenderTargetDesc (const RenderTargetPtr& in_render_target, const RectAreaPtr& in_viewport, const RectAreaPtr& in_scissor)
+    : render_target (in_render_target)
+    , viewport (in_viewport)
+    , scissor (in_scissor)
+  {
+  }  
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Визуализируемый кадр
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class FrameImpl: public Object
@@ -22,12 +39,14 @@ class FrameImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение целевых буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    RenderTargetPtr FindRenderTarget (const char* name);
-    RectAreaPtr     FindViewport     (const char* name);
-    RectAreaPtr     FindScissor      (const char* name);
-    RenderTargetPtr RenderTarget     (const char* name);
-    RectAreaPtr     Viewport         (const char* name);
-    RectAreaPtr     Scissor          (const char* name);    
+    RenderTargetPtr     FindRenderTarget     (const char* name);
+    RectAreaPtr         FindViewport         (const char* name);
+    RectAreaPtr         FindScissor          (const char* name);
+    RenderTargetDescPtr FindRenderTargetDesc (const char* name);
+    RenderTargetPtr     RenderTarget         (const char* name);
+    RectAreaPtr         Viewport             (const char* name);
+    RectAreaPtr         Scissor              (const char* name);
+    RenderTargetDescPtr RenderTargetDesc     (const char* name);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление отсечением
@@ -102,7 +121,7 @@ class FrameImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Draw ();
+    void Draw (RenderingContext* previous = 0);
 
   private:
     struct Impl;

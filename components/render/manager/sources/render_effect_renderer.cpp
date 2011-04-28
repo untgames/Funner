@@ -229,9 +229,46 @@ void EffectRenderer::AddOperations (FrameImpl& frame)
 }
 
 /*
+    Очистка
+*/
+
+void EffectRenderer::RemoveAllOperations ()
+{
+  for (RenderEffectOperationArray::iterator iter=impl->operations.begin (), end=impl->operations.end (); iter!=end; ++iter)
+  {
+    RenderEffectOperation& operation = **iter;
+    
+    if (operation.pass)
+    {
+      operation.pass->operations.clear ();
+
+      operation.pass->last_operation = 0;
+    }
+
+    if (operation.effect)
+    {
+      operation.effect->frames.clear ();
+
+      operation.effect->last_frame = 0;
+    }
+  }
+
+  impl->operations.clear ();
+}
+
+/*
     Выполнение операций
 */
 
-void EffectRenderer::ExecuteOperations ()
+void EffectRenderer::ExecuteOperations (RenderingContext& context)
 {
+  try
+  {
+    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::EffectRenderer::ExecuteOperations");
+    throw;
+  }
 }
