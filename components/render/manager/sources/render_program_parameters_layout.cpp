@@ -2,8 +2,6 @@
 
 using namespace render;
 
-//TODO: CacheHolder & linked layouts
-
 namespace
 {
 
@@ -51,6 +49,10 @@ struct ProgramParametersLayout::Impl: public CacheHolder
     
     if (!need_rebuild)
       return;          
+      
+      //обновление кэша
+      
+    UpdateCache ();
       
       //резервирование памяти для хранения параметров
     
@@ -149,18 +151,12 @@ struct ProgramParametersLayout::Impl: public CacheHolder
 ///Работа с кэшем
   void ResetCacheCore ()
   {
+    need_rebuild  = true;
+    device_layout = LowLevelProgramParametersLayoutPtr ();
   }
-  
+
   void UpdateCacheCore ()
   {
-    try
-    {
-    }
-    catch (xtl::exception& e)
-    {
-      e.touch ("render::ProgramParametersLayout::Impl::UpdateCacheCore");
-      throw;
-    }
   }  
 };
 
@@ -241,20 +237,38 @@ void ProgramParametersLayout::ResetAllSlots ()
 
 void ProgramParametersLayout::Attach (const ProgramParametersLayout& layout)
 {
-  impl->layouts.push_back (&const_cast<ProgramParametersLayout&> (layout));
+  impl->AttachCacheSource (*layout.impl);
+
+  try
+  {
+    impl->layouts.push_back (&const_cast<ProgramParametersLayout&> (layout));
+  }
+  catch (...)
+  {
+    impl->DetachCacheSource (*layout.impl);
+    throw;
+  }
   
   impl->need_rebuild = true;
 }
 
 void ProgramParametersLayout::Detach (const ProgramParametersLayout& layout)
 {
-  impl->layouts.erase (stl::remove (impl->layouts.begin (), impl->layouts.end (), &const_cast<ProgramParametersLayout&> (layout)), impl->layouts.end ());
+  LayoutArray::iterator first = stl::remove (impl->layouts.begin (), impl->layouts.end (), &const_cast<ProgramParametersLayout&> (layout));
+  
+  for (LayoutArray::iterator iter=first; iter!=impl->layouts.end (); ++iter)
+    impl->DetachCacheSource (*(*iter)->impl);
+
+  impl->layouts.erase (first, impl->layouts.end ());
 
   impl->need_rebuild = true;
 }
 
 void ProgramParametersLayout::DetachAll ()
 {
+  for (LayoutArray::iterator iter=impl->layouts.begin (); iter!=impl->layouts.end (); ++iter)
+    impl->DetachCacheSource (*(*iter)->impl);
+
   impl->layouts.clear ();
   
   impl->need_rebuild = true;
