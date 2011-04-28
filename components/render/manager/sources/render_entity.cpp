@@ -92,6 +92,23 @@ class EntityLodCommonData: public CacheHolder
       return state->state_block;
     }
     
+    ProgramParametersLayoutPtr GetProgramParametersLayout (MaterialImpl* material)
+    {
+      if (!material)
+        return ProgramParametersLayoutPtr ();
+        
+      StateMap::iterator iter = states.find (material);
+      
+      if (iter == states.end ())
+        return ProgramParametersLayoutPtr ();
+        
+      MaterialState& state = *iter->second;
+
+      state.UpdateCache ();      
+
+      return state.parameters_layout;
+    }
+
   protected:
     void FlushUnusedMaterials ()
     {
@@ -138,6 +155,7 @@ class EntityLodCommonData: public CacheHolder
     {
       EntityLodCommonData&          common_data;
       MaterialPtr                   material;
+      ProgramParametersLayoutPtr    parameters_layout;
       size_t                        state_block_mask_hash;
       LowLevelStateBlockPtr         state_block;
       DynamicTextureMaterialStorage dynamic_textures;
@@ -145,6 +163,7 @@ class EntityLodCommonData: public CacheHolder
       MaterialState (EntityLodCommonData& in_common_data, MaterialImpl* in_material)
         : common_data (in_common_data)
         , material (in_material)
+        , parameters_layout (new ProgramParametersLayout (&common_data.DeviceManager ()->Device ()), false)
         , state_block_mask_hash (0)
         , dynamic_textures (common_data.TextureManager (), in_material, common_data.Entity ())
       {
@@ -154,7 +173,7 @@ class EntityLodCommonData: public CacheHolder
         common_data.AttachCacheSource (*this);
         
         AttachCacheSource (common_data.properties);
-        AttachCacheSource (dynamic_textures);
+        AttachCacheSource (dynamic_textures);        
       }
       
       using CacheHolder::UpdateCache;
@@ -166,7 +185,7 @@ class EntityLodCommonData: public CacheHolder
       void UpdateCacheCore ()
       {
         try
-        {
+        {         
           StateBlockMask mask;
           
           mask.ss_constant_buffers [ProgramParametersSlot_Entity] = true;
@@ -188,6 +207,10 @@ class EntityLodCommonData: public CacheHolder
           device.SSSetConstantBuffer (ProgramParametersSlot_Entity, common_data.Properties ().Buffer ().get ());
           
           state_block->Capture ();
+          
+          parameters_layout->DetachAll ();
+          parameters_layout->Attach (*material->ParametersLayout ());
+          parameters_layout->SetSlot (ProgramParametersSlot_Entity, common_data.Properties ().Properties ().Layout ());
         }
         catch (xtl::exception& e)
         {
@@ -294,10 +317,11 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder
           
           operation.primitive = &renderer_primitive;
           operation.entity    = &common_data.Entity ();
-          
+
           MaterialImpl* material = renderer_primitive.material;
-          
-          operation.state_block = common_data.GetStateBlock (material).get ();
+
+          operation.state_block       = common_data.GetStateBlock (material).get ();
+          operation.parameters_layout = common_data.GetProgramParametersLayout (material).get ();
 
           cached_operations.push_back (operation);
         }

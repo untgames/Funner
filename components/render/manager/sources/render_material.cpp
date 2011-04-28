@@ -77,18 +77,19 @@ typedef stl::vector<size_t>        TagHashArray;
 
 struct MaterialImpl::Impl: public CacheHolder
 {
-  DeviceManagerPtr      device_manager;       //менеджер устройства отрисовки
-  TextureManagerPtr     texture_manager;      //менеджер текстур
-  ShadingManagerPtr     shading_manager;      //менеджер шэйдинга  
-  stl::string           id;                   //идентификатор материала
-  TagHashArray          tags;                 //тэги материала
-  ProgramProxy          program;              //прокси программы
-  PropertyBuffer        properties;           //свойства материала
-  TexmapArray           texmaps;              //текстурные карты
-  bool                  has_dynamic_textures; //есть ли в материале динамические текстуры
-  LowLevelProgramPtr    cached_program;       //закэшированная программа
-  LowLevelBufferPtr     cached_properties;    //закэшированный буфер констант
-  LowLevelStateBlockPtr cached_state_block;   //закэшированный блок состояний
+  DeviceManagerPtr           device_manager;       //менеджер устройства отрисовки
+  TextureManagerPtr          texture_manager;      //менеджер текстур
+  ShadingManagerPtr          shading_manager;      //менеджер шэйдинга
+  stl::string                id;                   //идентификатор материала
+  TagHashArray               tags;                 //тэги материала
+  ProgramProxy               program;              //прокси программы
+  PropertyBuffer             properties;           //свойства материала
+  ProgramParametersLayoutPtr properties_layout;    //расположение свойств материала
+  TexmapArray                texmaps;              //текстурные карты
+  bool                       has_dynamic_textures; //есть ли в материале динамические текстуры
+  LowLevelProgramPtr         cached_program;       //закэшированная программа
+  LowLevelBufferPtr          cached_properties;    //закэшированный буфер констант
+  LowLevelStateBlockPtr      cached_state_block;   //закэшированный блок состояний
   
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ShadingManagerPtr& in_shading_manager)
@@ -317,20 +318,24 @@ void MaterialImpl::Update (const media::rfx::Material& material)
         impl->texture_manager->GetSamplerProxy (texmap.Sampler ()), is_dynamic_image), false);
 
       new_texmaps.push_back (new_texmap);
-    }    
-    
-    ProgramProxy new_program = impl->shading_manager->GetProgramProxy (material.Program ());
-    
+
+      new_properties.SetProperty (texmap.Semantic (), (int)i); //установка номера канала текстурирования
+    }
+
+    ProgramProxy               new_program = impl->shading_manager->GetProgramProxy (material.Program ());
+    ProgramParametersLayoutPtr new_layout  = impl->device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_Material, new_properties.Layout ());
+
     new_program.AttachCacheHolder (*impl);
-    
+
     impl->program.DetachCacheHolder (*impl);
-    
+
     impl->program = new_program;
-    
+
     impl->properties.SetProperties (new_properties);
-    
+
     impl->texmaps.swap (new_texmaps);
-    
+
+    impl->properties_layout    = new_layout;
     impl->cached_state_block   = LowLevelStateBlockPtr ();
     impl->has_dynamic_textures = new_has_dynamic_textures;
     
@@ -341,4 +346,13 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     e.touch ("render::MaterialImpl::Update");
     throw;
   }
+}
+
+/*
+    Получение объекта расположения параметров программы шейдинга
+*/
+
+ProgramParametersLayoutPtr MaterialImpl::ParametersLayout ()
+{
+  return impl->properties_layout;
 }
