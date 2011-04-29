@@ -5,8 +5,11 @@
 
 #include <xtl/bind.h>
 #include <xtl/connection.h>
+#include <xtl/common_exceptions.h>
 #include <xtl/function.h>
 
+#include <sg/controllers/acceleration_evaluators.h>
+#include <sg/controllers/move_to_node_point.h>
 #include <sg/controllers/water.h>
 
 #endif
