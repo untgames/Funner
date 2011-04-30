@@ -160,7 +160,8 @@ class Frame
 ///Список отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t EntitiesCount     () const;
-    void   AddEntity         (const Entity&);
+    void   AddEntity         (const Entity& entity);
+    void   AddEntity         (const Entity& entity, const common::PropertyMap& properties);
     void   RemoveAllEntities ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -3,6 +3,7 @@
 
 #include <stl/auto_ptr.h>
 #include <stl/hash_map>
+#include <stl/map>
 #include <stl/string>
 #include <stl/vector>
 
@@ -147,7 +148,7 @@ class Wrappers
 #include "entity.h"
 #include "frame.h"
 #include "input_layout_manager.h"
-#include "program_parameters_manager.h"
+#include "program_parameters.h"
 #include "manager.h"
 #include "material.h"
 #include "material_manager.h"
@@ -156,6 +157,7 @@ class Wrappers
 #include "primitive_buffers.h"
 #include "primitive_manager.h"
 #include "property_buffer.h"
+#include "property_cache.h"
 #include "rect_area.h"
 #include "render_target.h"
 #include "rendering_context.h"

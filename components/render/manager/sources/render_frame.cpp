@@ -3,9 +3,9 @@
 using namespace render;
 using namespace render::low_level;
 
-//TODO: work with properties
+//TODO: work with entity properties
 //TODO: update entity dynamic textures
-//TODO: detect LOD
+//TODO: detect entity LOD
 
 namespace
 {
@@ -83,14 +83,32 @@ struct EffectHolder: public CacheSource
   using CacheHolder::Invalidate;
 };
 
+/*
+    Описание объекта рендеринга
+*/
+
+struct EntityDesc
+{
+  EntityPtr                  entity;          //объект
+  LowLevelBufferPtr          property_buffer; //буфер динамических свойств объекта
+  ProgramParametersLayoutPtr layout;          //расположение динамических свойств объекта
+  
+  EntityDesc (const EntityPtr& in_entity, const LowLevelBufferPtr& in_buffer = LowLevelBufferPtr (), ProgramParametersLayoutPtr in_layout = ProgramParametersLayoutPtr ())
+    : entity (in_entity)
+    , property_buffer (in_buffer)
+    , layout (in_layout)
+  {
+  }
+};
+
 }
 
 /*
     Описание реализации кадра
 */
 
-typedef stl::vector<FramePtr>  FrameArray;
-typedef stl::vector<EntityPtr> EntityArray;
+typedef stl::vector<FramePtr>   FrameArray;
+typedef stl::vector<EntityDesc> EntityArray;
 
 struct FrameImpl::Impl: public CacheHolder
 {
@@ -98,6 +116,7 @@ struct FrameImpl::Impl: public CacheHolder
   EntityArray                 entities;               //список объектов, отображаемых в кадре
   FrameArray                  frames;                 //список вложенных кадров
   PropertyBuffer              properties;             //свойства кадра
+  PropertyCache               entities_properties;    //динамические свойства объектов
   RenderTargetDescMap         render_targets;         //целевые буферы отрисовки
   TextureMap                  textures;               //локальные текстуры фрейма
   bool                        scissor_state;          //включено ли отсечение
@@ -111,6 +130,7 @@ struct FrameImpl::Impl: public CacheHolder
   Impl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager)
     : effect_holder (new EffectHolder (effect_manager, device_manager))
     , properties (device_manager)
+    , entities_properties (device_manager)
     , scissor_state (false)
     , clear_flags (ClearFlag_All)
     , clear_depth_value (1.0f)
@@ -551,14 +571,35 @@ size_t FrameImpl::EntitiesCount ()
 
 void FrameImpl::AddEntity (const EntityPtr& entity)
 {
-  impl->entities.push_back (entity);
+  impl->entities.push_back (EntityDesc (entity));
   
   impl->effect_holder->need_operations_update = true;
+}
+
+void FrameImpl::AddEntity (const EntityPtr& entity, const common::PropertyMap& properties)
+{
+  try
+  {
+    LowLevelBufferPtr          properties_buffer = 0;
+    ProgramParametersLayoutPtr properties_layout = 0;
+    
+    impl->entities_properties.Convert (properties, properties_buffer, properties_layout);
+    
+    impl->entities.push_back (EntityDesc (entity, properties_buffer, properties_layout));
+  
+    impl->effect_holder->need_operations_update = true;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::FrameImpl::AddEntity(const EntityPtr&,const common::PropertyMap&)");
+    throw;
+  }
 }
 
 void FrameImpl::RemoveAllEntities ()
 {
   impl->entities.clear ();
+  impl->entities_properties.Flush ();
   
   impl->effect_holder->need_operations_update = true;
 }
@@ -609,12 +650,16 @@ void FrameImpl::Draw (RenderingContext* previous_context)
       
       for (EntityArray::iterator iter=impl->entities.begin (), end=impl->entities.end (); iter!=end; ++iter)
       {
-        if (!(*iter)->LodsCount ())
+        EntityDesc& desc = *iter;
+        
+        if (!desc.entity->LodsCount ())
           continue;
-        
+          
+          //TODO: work with entity properties
+
         size_t lod = 0;
-        
-        renderer.AddOperations ((*iter)->RendererOperations (lod, true));
+
+        renderer.AddOperations (desc.entity->RendererOperations (lod, true));
       }
       
       for (FrameArray::iterator iter=impl->frames.begin (), end=impl->frames.end (); iter!=end; ++iter)

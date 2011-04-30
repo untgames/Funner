@@ -108,7 +108,8 @@ class FrameImpl: public Object
 ///Список отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t EntitiesCount     ();
-    void   AddEntity         (const EntityPtr&);
+    void   AddEntity         (const EntityPtr& entity);
+    void   AddEntity         (const EntityPtr& entity, const common::PropertyMap& properties);
     void   RemoveAllEntities ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

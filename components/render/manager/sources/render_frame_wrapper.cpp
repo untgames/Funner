@@ -176,6 +176,11 @@ void Frame::AddEntity (const Entity& entity)
   impl->AddEntity (Wrappers::Unwrap<EntityImpl> (entity));
 }
 
+void Frame::AddEntity (const Entity& entity, const common::PropertyMap& properties)
+{
+  impl->AddEntity (Wrappers::Unwrap<EntityImpl> (entity), properties);
+}
+
 void Frame::RemoveAllEntities ()
 {
   impl->RemoveAllEntities ();
