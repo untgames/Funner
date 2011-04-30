@@ -3,7 +3,6 @@
 using namespace render;
 using namespace render::low_level;
 
-//TODO: work with entity properties
 //TODO: update entity dynamic textures
 //TODO: detect entity LOD
 
@@ -655,11 +654,9 @@ void FrameImpl::Draw (RenderingContext* previous_context)
         if (!desc.entity->LodsCount ())
           continue;
           
-          //TODO: work with entity properties
-
         size_t lod = 0;
 
-        renderer.AddOperations (desc.entity->RendererOperations (lod, true));
+        renderer.AddOperations (desc.entity->RendererOperations (lod, true), desc.property_buffer.get (), desc.layout.get ());
       }
       
       for (FrameArray::iterator iter=impl->frames.begin (), end=impl->frames.end (); iter!=end; ++iter)

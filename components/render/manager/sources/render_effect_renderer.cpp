@@ -2,6 +2,7 @@
 
 using namespace render;
 
+//TODO: work with properties
 //TODO: check scissor enabled???
 //TODO: set local textures
 
@@ -178,8 +179,13 @@ EffectRenderer::~EffectRenderer ()
     ƒобавление операций в список отрисовки
 */
 
-void EffectRenderer::AddOperations (const RendererOperationList& operations_desc)
+void EffectRenderer::AddOperations
+ (const RendererOperationList& operations_desc,
+  render::low_level::IBuffer*  property_buffer,
+  ProgramParametersLayout*     property_layou)
 {
+    //TODO: work with properties
+
   static const char* METHOD_NAME = "render::EffectRenderer::AddOperations(const RendererOperationList&)";
 
   if (!operations_desc.operations && operations_desc.operations_count)

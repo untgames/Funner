@@ -157,8 +157,10 @@ class EffectRenderer: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Добавление операций в список отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddOperations (const RendererOperationList&);
-    void AddOperations (FrameImpl&);
+    void AddOperations (const RendererOperationList& operations,
+                        render::low_level::IBuffer*  property_buffer = 0,
+                        ProgramParametersLayout*     property_layou = 0);
+    void AddOperations (FrameImpl& frame);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Очистка
