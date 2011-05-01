@@ -118,9 +118,9 @@ Interpreter::Interpreter (const script::Environment& in_environment)
   stack.Push (this);
   lua_setglobal (state, INTERPRETER_LUA_NAME);
 
-  environment.RemoveLibrary (PROFILER_LIBRARY);
+  InvokerRegistry profiler_lib;
 
-  InvokerRegistry profiler_lib = environment.CreateLibrary (PROFILER_LIBRARY);
+  RegisterLibrary (PROFILER_LIBRARY, profiler_lib);
 
   profiler_lib.Register ("Start", make_invoker<void ()> (xtl::bind (&Interpreter::StartProfiling, this)));
   profiler_lib.Register ("Stop", make_invoker<void ()> (xtl::bind (&Interpreter::StopProfiling, this)));
