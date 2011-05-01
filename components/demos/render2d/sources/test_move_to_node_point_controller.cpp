@@ -2,7 +2,7 @@
 
 const char*  SPRITE_MATERIAL = "sprite_material";
 
-const float ROTATION_SPEED = M_PI / 4;
+const float ROTATION_SPEED = 3.14f / 4.f;
 
 struct Test
 {
