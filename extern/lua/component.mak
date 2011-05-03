@@ -20,10 +20,10 @@ EXTERN.LUA_UTILS.INCLUDE_DIRS         := include	sources  #Относительные пути к 
 EXTERN.LUA_UTILS.SOURCE_DIRS          := utils          	 #Относительные пути к каталогам c исходными файлами
 EXTERN.LUA_UTILS.LIB_DIRS             :=                  #Относительные пути к каталогам с библиотеками
 EXTERN.LUA_UTILS.LIBS                 := funner.extern.lua       #Список используемых при линковке библиотек
-#EXTERN.LUA_UTILS.COMPILER_DEFINES     := __STRICT_ANSI__  #Определения сборки
+EXTERN.LUA_UTILS.TARGET_DIR            = $(DIST_BIN_DIR)
 EXTERN.LUA_UTILS.msvc.COMPILER_CFLAGS := -TP              #Флаги сборки (зависят от конфигурации)
 EXTERN.LUA_UTILS.g++.COMPILER_CFLAGS  := -x c++
-EXTERN.LUA_UTILS.TARGET_DIR            = $(DIST_BIN_DIR)
+EXTERN.LUA_UTILS.bada_simulator.IMPORTS := link.extern.bada_addons
 
 #Цель №3 - LUA_TESTS
 EXTERN.LUA_TESTS.TYPE              := test-suite

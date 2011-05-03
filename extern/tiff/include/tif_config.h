@@ -68,3 +68,7 @@ static int _wopen (const void* name, int mode, ...)
 void * lfind (const void *key, const void *base, unsigned int *num, unsigned int width, int (*compare)(const void *, const void *));
 
 #endif
+
+#ifdef BADA_SIMULATOR
+  #undef __WIN32__
+#endif

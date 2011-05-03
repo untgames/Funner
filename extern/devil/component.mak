@@ -20,6 +20,7 @@ EXTERN.DEVIL.msvc.COMPILER_CFLAGS       := -wd4101
 EXTERN.DEVIL.g++.COMPILER_CFLAGS        := --no-warn
 EXTERN.DEVIL.mingw.COMPILER_DEFINES     := XMD_H
 EXTERN.DEVIL.bada_simulator.COMPILER_DEFINES := XMD_H
+EXTERN.DEVIL.bada_simulator.IMPORTS          := link.extern.bada_addons
 
 #Цель - ILUDLL sources
 ifeq (,$(filter no_dll,$(PROFILES)))

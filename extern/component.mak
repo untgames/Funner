@@ -27,3 +27,7 @@ endif
 ifneq (,$(filter psp,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS := psp_addons $(FUNNER_EXTERN_LIBS.COMPONENTS)
 endif
+
+ifneq (,$(filter bada,$(PROFILES)))
+  FUNNER_EXTERN_LIBS.COMPONENT_DIRS := bada $(FUNNER_EXTERN_LIBS.COMPONENT_DIRS)
+endif
