@@ -5,6 +5,8 @@
   #define XTL_HAS_INTERLOCKED
 #elif defined (ARM)
   #define XTL_HAS_INTERLOCKED
+#elif defined (BADA)
+  #define XTL_HAS_INTERLOCKED
 #endif
 
 /*
