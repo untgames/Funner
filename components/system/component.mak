@@ -23,10 +23,9 @@ SYSTEMLIB.SOURCES.iphone.COMPILER_DEFINES           := NO_PTHREAD_SEMAPHORES
 SYSTEMLIB.SOURCES.x11.SOURCE_DIRS                   := sources/platform/x11 sources/platform/message_queue
 SYSTEMLIB.SOURCES.x11.IMPORTS                       := compile.media.image
 SYSTEMLIB.SOURCES.bada_simulator.SOURCE_DIRS        := sources/platform/win32 sources/platform/win32/thread sources/platform/win32/non_unistd sources/platform/bada/startup_simulator
-SYSTEMLIB.SOURCES.bada_simulator.COMPILER_DEFINES   := #SHP USE_FBASE_ALLOCATOR BUILD_DLL WIN32
 #SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/pthread
 SYSTEMLIB.SOURCES.bada.SOURCE_DIRS                  := sources/platform/bada
-SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/no_threads
+SYSTEMLIB.SOURCES.bada_device.SOURCE_DIRS           := sources/platform/no_threads sources/platform/bada/startup_device
 SYSTEMLIB.SOURCES.beagleboard.IMPORTS               := compile.extern.beagleboard
 SYSTEMLIB.SOURCES.meego.IMPORTS                     := compile.extern.meego
 
