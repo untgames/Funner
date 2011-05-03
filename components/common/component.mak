@@ -19,7 +19,8 @@ COMMON.SOURCES.cocoa.SOURCE_DIRS          := sources/platform/cocoa
 COMMON.SOURCES.cocoa_desktop.SOURCE_DIRS  := sources/platform/cocoa_desktop
 COMMON.SOURCES.iphone.SOURCE_DIRS         := sources/platform/cocoa_iphone
 COMMON.SOURCES.win32.SOURCE_DIRS          := sources/platform/win32
-COMMON.SOURCES.bada_simulator.SOURCE_DIRS := sources/platform/win32
+COMMON.SOURCES.bada.SOURCE_DIRS           := sources/platform/bada
+COMMON.SOURCES.bada.IMPORTS               := compile.extern.bada
 
 #Цель - WxfParser
 COMMON.WXF_PARSER.TYPE             := static-lib
@@ -60,12 +61,14 @@ COMMON.TESTS.SOURCE_DIRS          := tests/file_system tests/streams tests/hash 
 COMMON.TESTS.haswchar.SOURCE_DIRS := tests/strlib/wchar
 COMMON.TESTS.IMPORTS              := compile.math.vecmath compile.common link.common.aes link.common.xml link.common.wxf \
                                      link.common.zip_file_system link.common.default_console_handler
+COMMON.TESTS.bada_simulator.IMPORTS := link.extern.bada_addons
 
 #Цель - CommonLib crypter
 COMMON.UTILS.FILE_CRYPTER.TYPE        := application
 COMMON.UTILS.FILE_CRYPTER.NAME        := file-crypter
 COMMON.UTILS.FILE_CRYPTER.SOURCE_DIRS := utils/file_crypter
 COMMON.UTILS.FILE_CRYPTER.IMPORTS     := compile.common link.common link.common.aes
+COMMON.UTILS.FILE_CRYPTER.bada_simulator.IMPORTS := link.extern.bada_addons
 
 #Цель - License generator
 COMMON.UTILS.LICENSE_GENERATOR.TYPE         := application

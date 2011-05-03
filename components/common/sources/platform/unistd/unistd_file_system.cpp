@@ -19,7 +19,7 @@ using namespace common;
 using namespace stl;
 
 /*
-    Работа с unistd файловой системой
+    ╨рсюЄр ё unistd Їрщыютющ ёшёЄхьющ
 */
 
 namespace
@@ -93,7 +93,7 @@ class UnistdFileSystem: public StdioFileSystem
 }
 
 /*
-    Получение файловой системы
+    ╧юыєўхэшх Їрщыютющ ёшёЄхь√
 */
 
 ICustomFileSystem* UnistdPlatform::GetFileSystem ()
