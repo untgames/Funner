@@ -1,6 +1,7 @@
 PROFILES                         += bada_simulator g++x86
 BADA_TOOLCHAIN                   := Win32
 BADA_TOOLCHAIN_PREFIX            := i686-mingw32-
+BADA_LANGUAGE_PACK               := Wave_LP1
 DLL_LIB_SUFFIX                   := .a
 DLL_PREFIX                       :=
 EXE_SUFFIX                       := .exe
@@ -8,14 +9,14 @@ SIMULATOR_APP_NAME               := FunnerTestApplication
 SIMULATOR_APP_ID                 := 93bt1p123e
 SIMULATOR_APP_SECRET             := 9C645DDBA19C71BAD1204DA4DAA7A0B9
 SIMULATOR_PROFILE                := S8000_Generic.dbi
-SIMULATOR_SHELL                  := $(call convert_path,$(BADA_SDK_HOME))/Lib/WinSgpp/PhoneShell.dll
+SIMULATOR_SHELL                   = $(call convert_path,$(BADA_SDK_HOME))/Model/$(BADA_LANGUAGE_PACK)/Simulator/PhoneShell.dll
 SIMULATOR_APP_DIR                := $(call convert_path,$(BADA_SDK_HOME))/Rsrc/bada_WVGA/Win32FS/Osp/Applications/$(SIMULATOR_APP_ID)
 SIMULATOR_TEMPLATE_PROJECT_DIR   := $(BUILD_DIR)platforms/bada/simulator_project
 SIMULATOR_TEMPLATE_PROJECT_FILES := $(patsubst $(SIMULATOR_TEMPLATE_PROJECT_DIR)/%,%,$(wildcard $(SIMULATOR_TEMPLATE_PROJECT_DIR)/*))
-SIMULATOR                        := $(call convert_path,$(BADA_SDK_HOME))/Lib/WinSgpp/Simulator
+SIMULATOR                        := $(call convert_path,$(BADA_SDK_HOME))/Model/$(BADA_LANGUAGE_PACK)/Simulator/Simulator
 SIMULATOR_WATCHER                := $(BUILD_DIR)platforms/bada/watch_simulator.sh
-COMMON_CFLAGS                    += -DBADA_SIMULATOR -DDEFAULT_APP_ID='L"$(SIMULATOR_APP_ID)"' -DDEFAULT_APP_SECRET='L"$(SIMULATOR_APP_SECRET)"' -DDEFAULT_APP_NAME='L"$(SIMULATOR_APP_NAME)"'
-COMMON_LINK_FLAGS                += -L$(BADA_SDK_HOME)/Model/S8500/Simulator
+COMMON_CFLAGS                    += -U_WIN32 -UWIN32 -DBADA_SIMULATOR -DDEFAULT_APP_ID='L"$(SIMULATOR_APP_ID)"' -DDEFAULT_APP_SECRET='L"$(SIMULATOR_APP_SECRET)"' -DDEFAULT_APP_NAME='L"$(SIMULATOR_APP_NAME)"'
+COMMON_LINK_FLAGS                += -L$(BADA_SDK_HOME)/Model/$(BADA_LANGUAGE_PACK)/Simulator -llibc-newlib -Wl,--enable-auto-import
 
 include $(TOOLSETS_DIR)/bada.mak
 
