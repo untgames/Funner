@@ -27,6 +27,7 @@ class EntityLodCommonData: public CacheHolder
       , device_manager (in_device_manager)
       , texture_manager (in_texture_manager)
       , properties (in_device_manager)
+      , entity_parameters_layout (&in_device_manager->Device ())
     {
       StateBlockMask mask;
       
@@ -47,6 +48,9 @@ class EntityLodCommonData: public CacheHolder
 ///Свойства объекта
     PropertyBuffer& Properties () { return properties; }
     
+///Расположение свойств
+    ProgramParametersLayout& ParametersLayout () { return entity_parameters_layout; }
+
 ///Динамические текстуры
     DynamicTextureEntityStorage& DynamicTextures () { return dynamic_textures; }
     
@@ -210,7 +214,7 @@ class EntityLodCommonData: public CacheHolder
           
           parameters_layout->DetachAll ();
           parameters_layout->Attach (*material->ParametersLayout ());
-          parameters_layout->SetSlot (ProgramParametersSlot_Entity, common_data.Properties ().Properties ().Layout ());
+          parameters_layout->Attach (common_data.entity_parameters_layout);
         }
         catch (xtl::exception& e)
         {
@@ -230,13 +234,14 @@ class EntityLodCommonData: public CacheHolder
     typedef stl::hash_map<MaterialImpl*, StatePtr> StateMap;
 
   private:  
-    EntityImpl&                 entity;              //обратная ссылка на объект
-    DeviceManagerPtr            device_manager;      //менеджер устройства отрисовки
-    TextureManagerPtr           texture_manager;     //менеджер текстур
-    PropertyBuffer              properties;          //свойства рендеринга
-    StateMap                    states;              //карта состояний
-    DynamicTextureEntityStorage dynamic_textures;    //хранилище динамических текстур объекта рендеринга    
-    LowLevelStateBlockPtr       default_state_block; //блок состояний по умолчанию
+    EntityImpl&                 entity;                   //обратная ссылка на объект
+    DeviceManagerPtr            device_manager;           //менеджер устройства отрисовки
+    TextureManagerPtr           texture_manager;          //менеджер текстур
+    PropertyBuffer              properties;               //свойства рендеринга
+    ProgramParametersLayout     entity_parameters_layout; //объект расположения свойств
+    StateMap                    states;                   //карта состояний
+    DynamicTextureEntityStorage dynamic_textures;         //хранилище динамических текстур объекта рендеринга
+    LowLevelStateBlockPtr       default_state_block;      //блок состояний по умолчанию
 };
 
 /*
@@ -463,6 +468,8 @@ DynamicTextureEntityStorage& EntityImpl::DynamicTextureStorage ()
 void EntityImpl::SetProperties (const common::PropertyMap& properties)
 {
   impl->Properties ().SetProperties (properties);
+
+  impl->ParametersLayout ().AttachSlot (ProgramParametersSlot_Entity, properties);
 }
 
 const common::PropertyMap& EntityImpl::Properties ()

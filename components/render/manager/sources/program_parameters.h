@@ -42,6 +42,7 @@ class ProgramParametersLayout: public Object, public xtl::trackable
 ///”становка параметров в соответствующие слоты
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetSlot       (ProgramParametersSlot slot, const common::PropertyLayout& layout);
+    void AttachSlot    (ProgramParametersSlot slot, const common::PropertyMap& map);
     void ResetSlot     (ProgramParametersSlot slot);
     void ResetAllSlots ();
 

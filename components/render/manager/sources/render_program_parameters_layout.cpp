@@ -11,6 +11,19 @@ namespace
 
 const size_t RESERVED_LAYOUTS_COUNT = 4; //резервируемое количество связанных лэйаутов
 
+/*
+     Слот параметров
+*/
+
+struct Slot
+{
+  common::PropertyLayout layout;            //расположение параметров
+  xtl::auto_connection   update_connection; //соединение с сигналом, вызываемым при изменении параметров
+  size_t                 layout_hash;       //хэш свойств
+
+  Slot () : layout_hash (0) {}
+};
+
 }
 
 /*
@@ -24,7 +37,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder
 {
   render::low_level::ProgramParametersLayoutDesc  desc;                              //описание параметров
   ParameterArray                                  parameters;                        //параметры
-  common::PropertyLayout                          slots [ProgramParametersSlot_Num]; //слоты параметров
+  Slot                                            slots [ProgramParametersSlot_Num]; //слоты параметров
   LayoutArray                                     layouts;                           //связанные расположения свойств
   size_t                                          hash;                              //хэш блока параметров
   bool                                            need_rebuild;                      //необходимо ли обновление возвращаемых структур
@@ -62,7 +75,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder
       parameters_count += (*iter)->Parameters ().parameters_count;
       
     for (int i=0; i<ProgramParametersSlot_Num; i++)
-      parameters_count += slots [i].Size ();
+      parameters_count += slots [i].layout.Size ();
       
     ParameterArray new_parameters;
 
@@ -81,7 +94,9 @@ struct ProgramParametersLayout::Impl: public CacheHolder
 
       for (int i=0; i<ProgramParametersSlot_Num; i++)
       {
-        const common::PropertyLayout& layout = slots [i];
+        const common::PropertyLayout& layout = slots [i].layout;
+
+        slots [i].layout_hash = layout.Hash ();
 
         if (!layout.Size ())
           continue;
@@ -158,6 +173,17 @@ struct ProgramParametersLayout::Impl: public CacheHolder
   void UpdateCacheCore ()
   {
   }  
+
+///Оповещение об обновлении свойств
+  void OnPropertiesUpdated (ProgramParametersSlot slot)
+  {
+    if (slots [slot].layout_hash == slots [slot].layout.Hash ())
+      return;
+
+    slots [slot].layout_hash = slots [slot].layout.Hash ();
+
+    ResetCacheCore ();
+  }
 };
 
 /*
@@ -204,12 +230,28 @@ size_t ProgramParametersLayout::Hash () const
 void ProgramParametersLayout::SetSlot (ProgramParametersSlot slot, const common::PropertyLayout& layout)
 {
   if (slot < 0 || slot >= ProgramParametersSlot_Num)
-    throw xtl::make_range_exception ("render::ProgramParametersLayout::ResetSlot", "slot", slot, 0, ProgramParametersSlot_Num);
+    throw xtl::make_range_exception ("render::ProgramParametersLayout::SetSlot", "slot", slot, 0, ProgramParametersSlot_Num);
     
-  impl->slots [slot] = layout;
+  impl->slots [slot].layout      = layout;
+  impl->slots [slot].layout_hash = layout.Hash ();
+
+  impl->slots [slot].update_connection.disconnect ();
   
-  impl->slots [slot].Capture ();
+  impl->slots [slot].layout.Capture ();
   
+  impl->need_rebuild = true;
+}
+
+void ProgramParametersLayout::AttachSlot (ProgramParametersSlot slot, const common::PropertyMap& map)
+{
+  if (slot < 0 || slot >= ProgramParametersSlot_Num)
+    throw xtl::make_range_exception ("render::ProgramParametersLayout::AttachSlot", "slot", slot, 0, ProgramParametersSlot_Num);
+
+  impl->slots [slot].layout      = map.Layout ();
+  impl->slots [slot].layout_hash = map.Layout ().Hash ();
+
+  impl->slots [slot].update_connection = map.RegisterEventHandler (common::PropertyMapEvent_OnUpdate, xtl::bind (&Impl::OnPropertiesUpdated, &*impl, slot));
+
   impl->need_rebuild = true;
 }
 
@@ -218,7 +260,11 @@ void ProgramParametersLayout::ResetSlot (ProgramParametersSlot slot)
   if (slot < 0 || slot >= ProgramParametersSlot_Num)
     throw xtl::make_range_exception ("render::ProgramParametersLayout::ResetSlot", "slot", slot, 0, ProgramParametersSlot_Num);
     
-  impl->slots [slot].Clear ();
+  impl->slots [slot].layout_hash = 0;
+
+  impl->slots [slot].layout.Clear ();
+
+  impl->slots [slot].update_connection.disconnect ();
   
   impl->need_rebuild = true;
 }
@@ -226,7 +272,13 @@ void ProgramParametersLayout::ResetSlot (ProgramParametersSlot slot)
 void ProgramParametersLayout::ResetAllSlots ()
 {
   for (int i=0; i<ProgramParametersSlot_Num; i++)
-    impl->slots [i].Clear ();
+  {
+    impl->slots [i].layout_hash = 0;
+
+    impl->slots [i].layout.Clear ();
+
+    impl->slots [i].update_connection.disconnect ();
+  }
 
   impl->need_rebuild = true;
 }
