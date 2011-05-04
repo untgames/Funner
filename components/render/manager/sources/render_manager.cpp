@@ -94,6 +94,13 @@ RenderManagerImpl::RenderManagerImpl ()
   try
   {
     impl = new Impl (this);
+    
+      //загрузка компонентов
+    
+    media::Image::RegisterDefaultLoaders ();
+    media::CompressedImage::RegisterDefaultLoaders ();    
+    media::rfx::MaterialLibrary::RegisterDefaultLoaders ();    
+    media::geometry::MeshLibrary::RegisterDefaultLoaders ();    
   }
   catch (xtl::exception& e)
   {

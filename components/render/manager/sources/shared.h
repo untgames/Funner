@@ -21,6 +21,7 @@
 #include <common/strlib.h>
 
 #include <media/image.h>
+#include <media/compressed_image.h>
 #include <media/geometry/mesh_library.h>
 #include <media/rfx/material_library.h>
 #include <media/rfx/shader_library.h>
