@@ -29,14 +29,16 @@ struct RenderPass: public xtl::reference_counter
   stl::string              depth_stencil_target;  //имя целевого буфера отсечения
   SortMode                 sort_mode;             //режим сортировки
   LowLevelStateBlockPtr    state_block;           //блок состояний прохода
+  ProgramParametersLayout  parameters_layout;     //расположение параметров
   float                    viewport_min_depth;    //минимальное значение глубины области вывода
   float                    viewport_max_depth;    //максимальное значение глубины области вывода
   OperationArray           operations;            //операции рендеринга
   const RendererOperation* last_operation;        //последняя добавленная операция
 
 ///Конструктор
-  RenderPass ()
+  RenderPass (const LowLevelDevicePtr& device)
     : sort_mode (SortMode_Default)
+    , parameters_layout (device)
     , viewport_min_depth (0.0f)
     , viewport_max_depth (1.0f)
     , last_operation (0)
@@ -104,7 +106,7 @@ struct EffectRenderer::Impl
     Конструктор / деструктор
 */
 
-EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr& device_manager)
+EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr& device_manager, ProgramParametersLayout* parent_layout)
   : impl (new Impl (device_manager))
 {
   try
@@ -128,7 +130,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
       
       if (src_pass)
       {
-        RenderPassPtr pass (new RenderPass, false);
+        RenderPassPtr pass (new RenderPass (&device_manager->Device ()), false);
         
         for (size_t j=0, count=src_pass->TagsCount (); j<count; j++)
         {
@@ -143,6 +145,9 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
         pass->state_block          = src_pass->StateBlock ();
         pass->viewport_min_depth   = src_pass->ViewportMinDepth ();
         pass->viewport_max_depth   = src_pass->ViewportMaxDepth ();
+
+        if (parent_layout)
+          pass->parameters_layout.Attach (*parent_layout);
 
         operation = RenderEffectOperationPtr (new RenderEffectOperation (pass), false);
       }

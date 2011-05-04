@@ -29,23 +29,22 @@ typedef stl::hash_map<stl::hash_key<const char*>, TexturePtr>          TextureMa
 
 struct EffectHolder: public CacheSource
 {
-  DeviceManagerPtr  device_manager;         //менеджер устройства отрисовки
-  EffectManagerPtr  effect_manager;         //ссылка на менеджер эффектов
-  EffectProxy       effect;                 //эффект кадра
-  EffectRendererPtr effect_renderer;        //рендер эффекта
-  EffectPtr         cached_effect;          //закэшированный эффект
-  bool              need_operations_update; //нужно ли обновлять список операций рендеринга  
+  DeviceManagerPtr         device_manager;         //менеджер устройства отрисовки
+  EffectManagerPtr         effect_manager;         //ссылка на менеджер эффектов
+  EffectProxy              effect;                 //эффект кадра
+  EffectRendererPtr        effect_renderer;        //рендер эффекта
+  EffectPtr                cached_effect;          //закэшированный эффект
+  ProgramParametersLayout  properties_layout;      //расположение свойств
+  bool                     need_operations_update; //нужно ли обновлять список операций рендеринга
   
 ///Конструктор
   EffectHolder (const EffectManagerPtr& in_effect_manager, const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
     , effect_manager (in_effect_manager)
     , effect (effect_manager->GetEffectProxy (""))
+    , properties_layout (&device_manager->Device ())
     , need_operations_update (true)
   {
-    if (!device_manager)
-      throw xtl::make_null_argument_exception ("render::EffectHolder::EffectHolder", "device_manager");
-
     effect.AttachCacheHolder (*this);
   }
   
@@ -67,7 +66,7 @@ struct EffectHolder: public CacheSource
       if (!cached_effect)
         return;
         
-      effect_renderer = EffectRendererPtr (new render::EffectRenderer (cached_effect, device_manager), false);
+      effect_renderer = EffectRendererPtr (new render::EffectRenderer (cached_effect, device_manager, &properties_layout), false);
       
       need_operations_update = true;
     }
@@ -546,6 +545,9 @@ void FrameImpl::SetProperties (const common::PropertyMap& properties)
   try
   {
     impl->properties.SetProperties (properties);
+
+    if (impl->effect_holder)
+      impl->effect_holder->properties_layout.AttachSlot (ProgramParametersSlot_Frame, properties);
   }
   catch (xtl::exception& e)
   {
