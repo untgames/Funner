@@ -280,3 +280,17 @@ void swap (MaterialLibrary& material1, MaterialLibrary& material2)
 }
 
 }
+
+/*
+    Регистрация сериализаторов по умолчанию
+*/
+
+void MaterialLibrary::RegisterDefaultSavers ()
+{
+  static ComponentLoader loader ("media.rfx.material.savers.*");
+}
+
+void MaterialLibrary::RegisterDefaultLoaders ()
+{
+  static ComponentLoader loader ("media.rfx.material.loaders.*");
+}
