@@ -118,7 +118,7 @@ ResourceProxy<Ptr>::ResourceProxy (const ResourceProxy& proxy)
 template <class Ptr>
 ResourceProxy<Ptr>::~ResourceProxy ()
 {
-  release (static_cast<xtl::reference_counter*> (impl));
+  release (impl);
 }
 
 template <class Ptr>
@@ -268,9 +268,9 @@ typename ResourceProxyManager<Ptr>::Proxy ResourceProxyManager<Ptr>::GetProxy (c
   
   if (iter != impl->proxies.end ())
     return iter->second;
-    
+
     //создание нового прокси
-    
+
   return Proxy (*impl, name);
 }
 

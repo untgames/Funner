@@ -8,7 +8,7 @@ int main ()
   
   try
   {
-    Test test (L"Texture1 test");
+    Test test (L"Texture1 test", false);
     
     RenderManager render_manager = test.RenderManager ();
     

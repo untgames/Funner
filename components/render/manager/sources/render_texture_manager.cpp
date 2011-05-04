@@ -186,14 +186,14 @@ void TextureManager::LoadTexture (const char* name)
       
     if (impl->loaded_textures.find (name) != impl->loaded_textures.end ())
       throw xtl::format_operation_exception ("", "Texture '%s' has been already loaded", name);
-    
+
     media::Image image (name);
-    
-    TexturePtr   texture = CreateTexture (image, true);    
+
+    TexturePtr   texture = CreateTexture (image, true);
     TextureProxy proxy   = impl->texture_proxy_manager.GetProxy (name);
-    
+
     proxy.SetResource (texture);
-    
+
     impl->loaded_textures.insert_pair (name, proxy);
   }
   catch (xtl::exception& e)

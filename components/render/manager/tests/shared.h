@@ -27,9 +27,13 @@ const size_t WINDOW_HEIGHT = 600;
 //протокол теста
 struct TestLogFilter
 {
-  common::LogFilter log_filter;
+  stl::auto_ptr<common::LogFilter> log_filter;
 
-  TestLogFilter () : log_filter ("*", &LogPrint) {}
+  TestLogFilter (bool logging)
+  {
+    if (logging)
+      log_filter = stl::auto_ptr<common::LogFilter> (new common::LogFilter ("*", &LogPrint));
+  }
 
   static void LogPrint (const char* log_name, const char* message)
   {
@@ -43,8 +47,9 @@ class Test: private xtl::trackable, private TestLogFilter
 {
   public:
 ///Конструктор
-    Test (const wchar_t* title)
-      : window (syslib::WindowStyle_Overlapped, WINDOW_WIDTH, WINDOW_HEIGHT)
+    Test (const wchar_t* title, bool logging = true)
+      : TestLogFilter (logging)
+      , window (syslib::WindowStyle_Overlapped, WINDOW_WIDTH, WINDOW_HEIGHT)
       , render_window (CreateRenderWindow ())
     {    
       window.SetTitle (title);

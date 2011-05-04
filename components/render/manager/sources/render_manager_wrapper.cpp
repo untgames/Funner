@@ -152,7 +152,7 @@ Texture RenderManager::CreateSharedTexture (const char* name)
     throw xtl::make_null_argument_exception (METHOD_NAME, "name");
 
   TexturePtr texture = impl->TextureManager ().FindTexture (name);
-  
+
   if (!texture)
     throw xtl::make_argument_exception (METHOD_NAME, "name", name, "Texture not found");
 
