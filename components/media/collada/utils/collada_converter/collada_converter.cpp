@@ -73,6 +73,7 @@ struct Params
   stl::string   exclude_nodes;                //неэкспортируемые узлы сцены
   stl::string   merge_animation;              //имя анимации в которую должны быть вклеены все остальные анимации
   size_t        max_texture_size;             //максимальный размер текстуры
+  bool          fix_zero_tangents;            //нужно ли генерировать вместо нулевых касательных произвольные
   bool          pot;                          //нужно ли масштабировать текстуры до ближайшей степени двойки
   bool          silent;                       //минимальное число сообщений
   bool          remove_unused_resources;      //нужно ли выбрасывать неиспользуемые ресурсы
@@ -223,6 +224,12 @@ void command_line_merge_animation (const char* string, Params& params)
 }
 
 //установка необходимости масштабировать текстуры до ближайшей степени двойки
+void command_line_fix_zero_tangents (const char*, Params& params)
+{
+  params.fix_zero_tangents = true;
+}
+
+//установка необходимости масштабировать текстуры до ближайшей степени двойки
 void command_line_pot (const char*, Params& params)
 {
   params.pot = true;
@@ -261,6 +268,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_output_textures_format,       "out-textures-format",      0, "string",    "set output textures format string"},
     {command_line_material_textures_format,     "material-textures-format", 0, "string",    "set material textures format string"},
     {command_line_output_max_texture_size,      "max-texture-size",         0, "value",     "set maximum output textures size"},
+    {command_line_fix_zero_tangents,            "fix-zero-tangents",        0, 0,           "generate tangents for zero-values"},
     {command_line_pot,                          "pot",                      0, 0,           "rescale textures to power of two"},
     {command_line_output_materials_file_name,   "out-materials",            0, "file",      "set output materials file"},
     {command_line_output_meshes_file_name,      "out-meshes",               0, "file",      "set output meshes file name"},
@@ -461,7 +469,7 @@ void save_meshes (const Params& params, const Model& model)
 
   media::geometry::MeshLibrary mesh_library;
 
-  convert (model, mesh_library);
+  convert (model, mesh_library, params.fix_zero_tangents);
   
   if (!params.output_resources_namespace.empty ())
   {
@@ -597,6 +605,20 @@ void save_animations (const Params& params, const Model& model)
   animation_library.Save (params.output_animations_file_name.c_str ());
 }
 
+//имя параметра источника света
+const char* light_param_name (LightParam param)
+{
+  switch (param)
+  {
+    case LightParam_AttenuationConstant:  return "attenuation_constant";
+    case LightParam_AttenuationLinear:    return "attenuation_linear";
+    case LightParam_AttenuationQuadratic: return "attenuation_quadratic";
+    case LightParam_FalloffAngle:         return "falloff_angle";
+    case LightParam_FalloffExponent:      return "falloff_exponent";
+    default:                              throw xtl::make_argument_exception ("::light_param_name", "param", param);
+  }
+}
+
 //сохранение узла
 void save_node (const Params& params, const Node& node, XmlWriter& writer)
 {
@@ -649,6 +671,41 @@ void save_node (const Params& params, const Node& node, XmlWriter& writer)
     XmlWriter::Scope scope (writer, "mesh");
 
     writer.WriteAttribute ("name", mesh_name.c_str ());
+  }
+
+  size_t light_index = 0;
+
+  for (Node::LightList::ConstIterator iter = node.Lights ().CreateIterator (); iter; ++iter)
+  {
+    stl::string light_name = common::format ("%s.light#%u", node.Id (), light_index++);
+
+    const char* light_type;
+
+    switch (iter->Type ())
+    {
+      case LightType_Ambient:
+        light_type = "ambient_light";
+        break;
+      case LightType_Point:
+        light_type = "point_light";
+        break;
+      case LightType_Spot:
+        light_type = "spot_light";
+        break;
+      case LightType_Direct:
+        light_type = "direct_light";
+        break;
+      default:
+        throw xtl::format_operation_exception ("::save_node", "Can't save node '%s', unknown light type %d", node.Id (), iter->Type ());
+    }
+
+    XmlWriter::Scope scope (writer, light_type);
+
+    writer.WriteAttribute ("name", light_name.c_str ());
+    writer.WriteAttribute ("color", iter->Color ());
+
+    for (size_t i = 0; i < LightParam_Num; i++)
+      writer.WriteAttribute (light_param_name ((LightParam)i), iter->Param ((LightParam)i));
   }
 
   for (Node::NodeList::ConstIterator iter = node.Nodes ().CreateIterator (); iter; ++iter)
@@ -1040,6 +1097,7 @@ int main (int argc, const char *argv[])
     params.silent                  = false;
     params.remove_unused_resources = false;
     params.print_help              = false;
+    params.fix_zero_tangents       = false;
     params.pot                     = false;
     params.max_texture_size        = 0;
     
