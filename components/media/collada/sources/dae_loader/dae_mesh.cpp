@@ -32,10 +32,15 @@ struct safe_float { float value; };
 bool read (xtl::io::token_iterator<const char*>& iter, safe_float& result_value)
 {
   if (read (iter, result_value.value))
+  {
+    if (result_value.value != result_value.value)
+      result_value.value = 0.f;
+
     return true;
+  }
 
   if (!iter)
-    return false;    
+    return false;
 
   if (!xtl::xstricmp (*iter, "NAN"))
   {
