@@ -204,6 +204,13 @@ class DriverManager
     static void RegisterDriver       (const char* name, IDriver* driver);
     static void UnregisterDriver     (const char* name);
     static void UnregisterAllDrivers ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Перечисление драйверов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    static size_t      DriversCount ();
+    static const char* DriverName   (size_t index);
+    static IDriver*    Driver       (size_t index);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Поиск драйвера по имени
@@ -237,6 +244,13 @@ class DriverManager
                                           const char*               init_string,     //строка инициализации
                                           xtl::com_ptr<ISwapChain>& out_swap_chain,  //результирующая цепочка обмена
                                           xtl::com_ptr<IDevice>&    out_device);     //результирующее устройство отрисовки
+    static void CreateSwapChainAndDevice (const char*               driver_mask,     //маска имени драйвера
+                                          const char*               adapter_mask,    //маска имени адаптера
+                                          const SwapChainDesc&      swap_chain_desc, //дескриптор цепочки обмена
+                                          const char*               init_string,     //строка инициализации
+                                          xtl::com_ptr<ISwapChain>& out_swap_chain,  //результирующая цепочка обмена
+                                          xtl::com_ptr<IDevice>&    out_device,      //результирующее устройство отрисовки
+                                          xtl::com_ptr<IDriver>&    out_driver);     //результирующий драйвер
 };
 
 }

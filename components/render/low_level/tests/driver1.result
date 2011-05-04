@@ -1,2 +1,4 @@
 Results of driver1_test:
+drivers (count=1):
+  driver: name='test_drv', description='TestDriver'
 exception: Method 'TestDriver::CreateSwapChain' doesn't implemented
