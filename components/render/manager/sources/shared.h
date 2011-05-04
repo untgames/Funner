@@ -85,6 +85,7 @@ typedef xtl::intrusive_ptr<WindowImpl>              WindowPtr;
 ///Указатели на объекты рендера низкого уровня
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 typedef xtl::com_ptr<low_level::IDriver>                  LowLevelDriverPtr;
+typedef xtl::com_ptr<low_level::IAdapter>                 LowLevelAdapterPtr;
 typedef xtl::com_ptr<low_level::ISwapChain>               LowLevelSwapChainPtr;
 typedef xtl::com_ptr<low_level::IDevice>                  LowLevelDevicePtr;
 typedef xtl::com_ptr<low_level::ITexture>                 LowLevelTexturePtr;

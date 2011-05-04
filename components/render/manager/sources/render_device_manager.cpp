@@ -9,15 +9,13 @@ using namespace render;
 struct DeviceManager::Impl
 {
   LowLevelDevicePtr                device;                     //устройство визуализации
-  stl::string                      driver_name;                //имя драйвера
-  stl::string                      adapter_name;               //имя адаптера
+  LowLevelDriverPtr                driver;                     //драйвер устройства визуализации
   render::InputLayoutManager       input_layout_manager;       //менеджер лэйаутов геометрии
   render::ProgramParametersManager program_parameters_manager; //менеджер параметров программ шэйдинга
   
-  Impl (const LowLevelDevicePtr& in_device, const char* in_driver_name, const char* in_adapter_name)
+  Impl (const LowLevelDevicePtr& in_device, const LowLevelDriverPtr& in_driver)
     : device (in_device)
-    , driver_name (in_driver_name)
-    , adapter_name (in_adapter_name)
+    , driver (in_driver)
     , input_layout_manager (in_device)
     , program_parameters_manager (in_device)
   {
@@ -28,20 +26,17 @@ struct DeviceManager::Impl
     Конструктор / деструктор
 */
 
-DeviceManager::DeviceManager (const LowLevelDevicePtr& device, const char* driver_name, const char* adapter_name)
+DeviceManager::DeviceManager (const LowLevelDevicePtr& device, const LowLevelDriverPtr& driver)
 {
   try
   {
     if (!device)
       throw xtl::make_null_argument_exception ("", "device");
 
-    if (!driver_name)
-      throw xtl::make_null_argument_exception ("", "driver_name");
+    if (!driver)
+      throw xtl::make_null_argument_exception ("", "driver");
 
-    if (!adapter_name)
-      throw xtl::make_null_argument_exception ("", "adapter_name");
-
-    impl = new Impl (device, driver_name, adapter_name);
+    impl = new Impl (device, driver);
   }
   catch (xtl::exception& e)
   {
@@ -55,7 +50,7 @@ DeviceManager::~DeviceManager ()
 }
 
 /*
-    Получение устройства
+    Получение устройства / драйвера
 */
 
 render::low_level::IDevice& DeviceManager::Device ()
@@ -63,18 +58,9 @@ render::low_level::IDevice& DeviceManager::Device ()
   return *impl->device;
 }
 
-/*
-    Имя драйвера и адаптера
-*/
-
-const char* DeviceManager::DriverName ()
+render::low_level::IDriver& DeviceManager::Driver ()
 {
-  return impl->driver_name.c_str ();
-}
-
-const char* DeviceManager::AdapterName ()
-{
-  return impl->adapter_name.c_str ();
+  return *impl->driver;
 }
 
 /*

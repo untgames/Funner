@@ -13,9 +13,10 @@ struct WindowImpl::Impl: public xtl::trackable
 {
   WindowImpl*              owner;                     //окно-владелец
   stl::string              name;                      //имя окна
-  DeviceManagerPtr         device_manager;            //менеджер устройства отрисовки
+  DeviceManagerPtr         device_manager;            //менеджер устройства отрисовки  
   low_level::SwapChainDesc swap_chain_desc;           //параметры цепочки обмена
   LowLevelSwapChainPtr     swap_chain;                //цепочка обмена
+  LowLevelAdapterPtr       adapter;                   //адаптер отрисовки
   RenderTargetPtr          color_buffer;              //буфер цвета окна
   RenderTargetPtr          depth_stencil_buffer;      //буфер глубины окна
   size_t                   width;                     //ширина окна
@@ -29,7 +30,7 @@ struct WindowImpl::Impl: public xtl::trackable
     , width (0)
     , height (0)
   {
-    memset (&swap_chain_desc, 0, sizeof swap_chain_desc);
+    memset (&swap_chain_desc, 0, sizeof swap_chain_desc);    
   }
   
 ///Создание цепочки обмена
@@ -41,30 +42,15 @@ struct WindowImpl::Impl: public xtl::trackable
       
       if (!device_manager)
         throw xtl::format_operation_exception ("", "Null device manager");
+
+      swap_chain_desc.window_handle = window.Handle ();
       
-      low_level::IDriver* driver = low_level::DriverManager::FindDriver (device_manager->DriverName ());
-      
-      if (!driver)
-        throw xtl::format_operation_exception ("", "Rendering driver '%s' not found", device_manager->DriverName ());
-        
-      const char* adapter_name = device_manager->AdapterName ();
-        
-      for (size_t i=0, count=driver->GetAdaptersCount (); i<count; i++)
-      {
-        low_level::IAdapter* adapter = driver->GetAdapter (i);
-        
-        if (strcmp (adapter->GetName (), adapter_name))
-          continue;
+      low_level::IAdapter* adapter_ptr = &*adapter;
           
-        swap_chain_desc.window_handle = window.Handle ();
-          
-        swap_chain = driver->CreateSwapChain (1, &adapter, swap_chain_desc);
-        
-        break;
-      }
-      
+      swap_chain = device_manager->Driver ().CreateSwapChain (1, &adapter_ptr, swap_chain_desc);
+
       if (!swap_chain)
-        throw xtl::format_operation_exception ("", "Rendering adapter '%s' not found in driver '%s'", adapter_name, device_manager->DriverName ());
+        throw xtl::format_operation_exception ("", "Null swap chain after render::low_level::IDriver::CreateSwapChain");
     }
     catch (xtl::exception& e)
     {
@@ -80,6 +66,8 @@ struct WindowImpl::Impl: public xtl::trackable
     {
       if (!swap_chain)
         throw xtl::format_operation_exception ("", "Null swap chain");
+        
+      log.Printf ("Initialize render targets for swap chain");
       
       LowLevelTexturePtr color_texture (device_manager->Device ().CreateRenderTargetTexture (&*swap_chain, swap_chain_desc.buffers_count - 1), false),
                          depth_stencil_texture (device_manager->Device ().CreateDepthStencilTexture (&*swap_chain), false);
@@ -110,6 +98,8 @@ struct WindowImpl::Impl: public xtl::trackable
       
       color_buffer->Resize (width, height);
       depth_stencil_buffer->Resize (width, height);
+      
+      log.Printf ("...render targets for swap chain created");
     }
     catch (xtl::exception& e)
     {
@@ -193,6 +183,8 @@ struct WindowImpl::Impl: public xtl::trackable
   {
     try
     {
+      log.Printf ("Swap chain handle changed (handle=%p)", window.Handle ());
+      
       swap_chain = 0;
       
       if (!window.Handle ())
@@ -254,6 +246,10 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& 
 {
   try
   {
+    Log log;
+    
+    log.Printf ("Creating render window");
+    
       //заполнение параметров цепочки обмена
       
     low_level::SwapChainDesc swap_chain_desc;
@@ -295,17 +291,39 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& 
                  *adapter_mask = get_string_property (properties, "AdapterMask", "*"),
                  *init_string  = get_string_property (properties, "InitString", "");
                  
+      log.Printf ("Create device manager (driver='%s', adapter='%s', init_string='%s')", driver_mask, adapter_mask, init_string);                 
+                 
       LowLevelDevicePtr device;
+      LowLevelDriverPtr driver;
       
       swap_chain_desc.window_handle = window.Handle ();
 
-      low_level::DriverManager::CreateSwapChainAndDevice (driver_mask, adapter_mask, swap_chain_desc, init_string, impl->swap_chain, device);
+      low_level::DriverManager::CreateSwapChainAndDevice (driver_mask, adapter_mask, swap_chain_desc, init_string, impl->swap_chain, device, driver);
       
-      impl->device_manager = DeviceManagerPtr (new render::DeviceManager (device, driver_mask, adapter_mask), false);
+      if (!device)
+        throw xtl::format_operation_exception ("", "Null device after render::low_level::DriverManager::CreateSwapChainAndDevice");
+        
+      if (!driver)
+        throw xtl::format_operation_exception ("", "Null driver after render::low_level::DriverManager::CreateSwapChainAndDevice");
+        
+      if (!impl->swap_chain)
+        throw xtl::format_operation_exception ("", "Null swap chain after render::low_level::DriverManager::CreateSwapChainAndDevice");      
+        
+      LowLevelAdapterPtr adapter = impl->swap_chain->GetAdapter ();
+        
+      if (!adapter)
+        throw xtl::format_operation_exception ("", "Null adapter after render::low_level::DriverManager::CreateSwapChainAndDevice");
+
+      impl->device_manager = DeviceManagerPtr (new render::DeviceManager (device, driver), false);
+      impl->adapter        = impl->swap_chain->GetAdapter ();
+      
+      log.Printf ("...device manager and swap chain have been successfully created");
     }
     else
     {
       impl->device_manager = device_manager;
+      
+      log.Printf ("Creating swap chain");
       
       impl->CreateSwapChain (window);
     }

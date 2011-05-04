@@ -8,6 +8,8 @@
 #include <xtl/function.h>
 #include <xtl/trackable.h>
 
+#include <common/log.h>
+
 #include <render/manager.h>
 
 #include <media/image.h>
@@ -22,15 +24,29 @@ using namespace render;
 const size_t WINDOW_WIDTH  = 800;
 const size_t WINDOW_HEIGHT = 600;
 
+//протокол теста
+struct TestLogFilter
+{
+  common::LogFilter log_filter;
+
+  TestLogFilter () : log_filter ("*", &LogPrint) {}
+
+  static void LogPrint (const char* log_name, const char* message)
+  {
+    printf ("%s: %s\n", log_name, message);
+    fflush (stdout);
+  }
+};
+
 ///Тестовое приложение
-class Test: private xtl::trackable
+class Test: private xtl::trackable, private TestLogFilter
 {
   public:
 ///Конструктор
     Test (const wchar_t* title)
       : window (syslib::WindowStyle_Overlapped, WINDOW_WIDTH, WINDOW_HEIGHT)
       , render_window (CreateRenderWindow ())
-    {
+    {    
       window.SetTitle (title);
       window.Show ();
       
