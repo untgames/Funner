@@ -325,8 +325,8 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder
 
           MaterialImpl* material = renderer_primitive.material;
 
-          operation.state_block       = common_data.GetStateBlock (material).get ();
-          operation.parameters_layout = common_data.GetProgramParametersLayout (material).get ();
+          operation.state_block              = common_data.GetStateBlock (material).get ();
+          operation.entity_parameters_layout = common_data.GetProgramParametersLayout (material).get ();
 
           cached_operations.push_back (operation);
         }

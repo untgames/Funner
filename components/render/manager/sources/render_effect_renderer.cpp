@@ -2,7 +2,6 @@
 
 using namespace render;
 
-//TODO: work with properties
 //TODO: check scissor enabled???
 //TODO: set local textures
 
@@ -20,7 +19,8 @@ const size_t RESERVE_FRAME_ARRAY     = 32;  //резервируемое число вложенных фрей
     Вспомогательные структуры
 */
 
-typedef stl::vector<const RendererOperation*> OperationArray;
+typedef stl::vector<RendererOperation*> OperationPtrArray;
+typedef stl::vector<RendererOperation>  OperationArray;
 
 ///Проход рендеринга
 struct RenderPass: public xtl::reference_counter
@@ -33,6 +33,7 @@ struct RenderPass: public xtl::reference_counter
   float                    viewport_min_depth;    //минимальное значение глубины области вывода
   float                    viewport_max_depth;    //максимальное значение глубины области вывода
   OperationArray           operations;            //операции рендеринга
+  OperationPtrArray        operation_ptrs;        //указатели на операции
   const RendererOperation* last_operation;        //последняя добавленная операция
 
 ///Конструктор
@@ -44,6 +45,7 @@ struct RenderPass: public xtl::reference_counter
     , last_operation (0)
   {
     operations.reserve (RESERVE_OPERATION_ARRAY);
+    operation_ptrs.reserve (operations.size ());
   }
 };
 
@@ -187,7 +189,7 @@ EffectRenderer::~EffectRenderer ()
 void EffectRenderer::AddOperations
  (const RendererOperationList& operations_desc,
   render::low_level::IBuffer*  property_buffer,
-  ProgramParametersLayout*     property_layou)
+  ProgramParametersLayout*     property_layout)
 {
     //TODO: work with properties
 
@@ -216,7 +218,13 @@ void EffectRenderer::AddOperations
         if (pass.last_operation == operation)
           continue;
 
-        pass.operations.push_back (operation);
+        pass.operations.push_back (*operation);
+
+        RendererOperation& result_operation = pass.operations.back ();
+
+        result_operation.frame_entity_parameters_layout = property_layout;
+
+        pass.operation_ptrs.push_back (&result_operation);
 
         pass.last_operation = operation;
       }
@@ -267,6 +275,7 @@ void EffectRenderer::RemoveAllOperations ()
     if (operation.pass)
     {
       operation.pass->operations.clear ();
+      operation.pass->operation_ptrs.clear ();
 
       operation.pass->last_operation = 0;
     }
@@ -423,7 +432,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
                 
           //выполнение операций
 
-        for (OperationArray::iterator iter=pass.operations.begin (), end=pass.operations.end (); iter!=end; ++iter)
+        for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end; ++iter)
         {
           const RendererOperation& operation = **iter;
           const RendererPrimitive& primitive = *operation.primitive;
@@ -435,13 +444,13 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
             //установка расположения параметров
             //TODO: кэшировать по entity
 
-//          ProgramParametersLayoutPtr program_parameters_layout = program_parameters_manager.GetParameters (???, *operation.parameters_layout);
+          ProgramParametersLayoutPtr program_parameters_layout = program_parameters_manager.GetParameters (&pass.parameters_layout, operation.entity_parameters_layout, operation.frame_entity_parameters_layout);
 
-//          device.SSSetProgramParametersLayout (&*program_parameters_layout->DeviceLayout ());
+          device.SSSetProgramParametersLayout (&*program_parameters_layout->DeviceLayout ());
 
             //рисование
 
-          if (primitive.indexed) device.DrawIndexed (primitive.type, primitive.first, primitive.count, 0);
+          if (primitive.indexed) device.DrawIndexed (primitive.type, primitive.first, primitive.count, 0); //TODO: media::geometry::Primitive::base_vertex
           else                   device.Draw        (primitive.type, primitive.first, primitive.count);
         }
       }

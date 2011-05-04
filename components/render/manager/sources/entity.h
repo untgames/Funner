@@ -5,10 +5,11 @@ struct RendererPrimitive;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct RendererOperation
 {
-  EntityImpl*                     entity;            //объект
-  render::low_level::IStateBlock* state_block;       //блок состояний объекта
-  ProgramParametersLayout*        parameters_layout; //расположение параметров операции
-  const RendererPrimitive*        primitive;         //примитив
+  EntityImpl*                     entity;                         //объект
+  render::low_level::IStateBlock* state_block;                    //блок состояний объекта
+  ProgramParametersLayout*        entity_parameters_layout;       //расположение параметров объекта
+  ProgramParametersLayout*        frame_entity_parameters_layout; //расположение параметров пары фрейм-объект
+  const RendererPrimitive*        primitive;                      //примитив
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

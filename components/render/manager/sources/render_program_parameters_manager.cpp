@@ -3,18 +3,20 @@
 using namespace render;
 using namespace render::low_level;
 
+//TODO: flush cache of composite layouts after N frames
+
 /*
     Описание реализации менеджера параметров программ шэйдинга
 */
 
 typedef stl::hash_multimap<size_t, ProgramParametersLayout*> LayoutMap;
-typedef stl::hash_map<size_t, ProgramParametersLayout*>      PairLayoutMap;
+typedef stl::hash_map<size_t, ProgramParametersLayout*>      CompositeLayoutMap;
 
 struct ProgramParametersManager::Impl: public xtl::trackable
 {
-  LowLevelDevicePtr device;       //устройство визуализации
-  LayoutMap         layouts;      //лэйауты параметров различной конфигурации
-  PairLayoutMap     pair_layouts; //парные лэйауты параметров различной конфигурации  
+  LowLevelDevicePtr   device;            //устройство визуализации
+  LayoutMap           layouts;           //лэйауты параметров различной конфигурации
+  CompositeLayoutMap  composite_layouts; //составные лэйауты параметров различной конфигурации
 
 ///Конструктор
   Impl (const LowLevelDevicePtr& in_device) : device (in_device) {}
@@ -23,7 +25,7 @@ struct ProgramParametersManager::Impl: public xtl::trackable
   ~Impl ()
   {
     layouts.clear ();
-    pair_layouts.clear ();
+    composite_layouts.clear ();
   }
 
 ///Удаление лэйаута
@@ -40,9 +42,9 @@ struct ProgramParametersManager::Impl: public xtl::trackable
       }
   }  
   
-  void RemovePairLayout (size_t hash)
+  void RemoveCompositeLayout (size_t hash)
   {
-    pair_layouts.erase (hash);
+    composite_layouts.erase (hash);
   }
 };
 
@@ -90,33 +92,39 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters (ProgramParam
   }
 }
 
-ProgramParametersLayoutPtr ProgramParametersManager::GetParameters (const ProgramParametersLayout& layout1, const ProgramParametersLayout& layout2)
+ProgramParametersLayoutPtr ProgramParametersManager::GetParameters
+ (const ProgramParametersLayout* layout1,
+  const ProgramParametersLayout* layout2,
+  const ProgramParametersLayout* layout3)
 {
   try
   {
-    const ProgramParametersLayout *layout1_ptr = &layout1, *layout2_ptr = &layout2;
+    size_t hash = 0xffffffff;
 
-    size_t hash = common::crc32 (&layout1_ptr, sizeof (layout1_ptr), common::crc32 (&layout2_ptr, sizeof (layout2_ptr)));
+    if (layout3) hash = common::crc32 (&layout3, sizeof (layout3), hash);
+    if (layout2) hash = common::crc32 (&layout2, sizeof (layout2), hash);
+    if (layout1) hash = common::crc32 (&layout1, sizeof (layout1), hash);
+
+    CompositeLayoutMap::iterator iter = impl->composite_layouts.find (hash);
     
-    PairLayoutMap::iterator iter = impl->pair_layouts.find (hash);
-    
-    if (iter != impl->pair_layouts.end ())
+    if (iter != impl->composite_layouts.end ())
       return iter->second;
-    
+
     ProgramParametersLayoutPtr result_layout (new ProgramParametersLayout (impl->device), false);
 
-    result_layout->Attach (layout1);
-    result_layout->Attach (layout2);
+    if (layout1) result_layout->Attach (*layout1);
+    if (layout2) result_layout->Attach (*layout2);
+    if (layout3) result_layout->Attach (*layout3);
 
-    result_layout->connect_tracker (xtl::bind (&Impl::RemovePairLayout, &*impl, hash), *impl);
-    
-    impl->pair_layouts.insert_pair (hash, result_layout.get ());
+    result_layout->connect_tracker (xtl::bind (&Impl::RemoveCompositeLayout, &*impl, hash), *impl);
+
+    impl->composite_layouts.insert_pair (hash, result_layout.get ());
 
     return result_layout;    
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::ProgramParametersManager::GetParameters(const common::ProgramParametersLayout&,const ProgramParametersLayout&)");
+    e.touch ("render::ProgramParametersManager::GetParameters(const common::ProgramParametersLayout*,const ProgramParametersLayout*,const ProgramParametersLayout*)");
     throw;
   }
 }

@@ -74,7 +74,7 @@ class ProgramParametersManager: public xtl::noncopyable
 ///Получение объекта параметров
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     ProgramParametersLayoutPtr GetParameters (ProgramParametersSlot slot, const common::PropertyLayout& layout);
-    ProgramParametersLayoutPtr GetParameters (const ProgramParametersLayout& layout1, const ProgramParametersLayout& layout2);
+    ProgramParametersLayoutPtr GetParameters (const ProgramParametersLayout* layout1, const ProgramParametersLayout* layout2, const ProgramParametersLayout* layout3);
 
   private:
     struct Impl;
