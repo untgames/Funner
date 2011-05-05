@@ -29,7 +29,7 @@ class DefaultShaderLoader
       
         shader.SetName       (name);
         shader.SetProfile    (profile);
-        shader.SetSourceCode (content.c_str (), content.size ());
+        shader.SetSourceCode (content.c_str (), content.size ());        
       }
       catch (xtl::exception& e)
       {

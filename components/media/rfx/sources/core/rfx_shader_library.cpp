@@ -148,10 +148,10 @@ const Shader* ShaderLibrary::Find (const char* name, const char* profile) const
     return 0;
     
   stl::pair<ShaderMap::const_iterator, ShaderMap::const_iterator> p = impl->shaders.equal_range (name);
-  
+
   if (p.first == p.second)
     return 0;
-    
+
   for (ShaderMap::const_iterator iter=p.first; iter!=p.second; ++iter)
     if (!strcmp (iter->second.shader.Profile (), profile))
       return &iter->second.shader;
@@ -180,7 +180,7 @@ void ShaderLibrary::Attach (const char* id, const Shader& shader)
         iter->second.shader = shader;
         return;
       }
-  }
+  }  
 
   impl->shaders.insert_pair (id, ShaderDesc (id, shader));
 }
@@ -250,7 +250,7 @@ void ShaderLibrary::Load (const char* file_mask, const LogHandler& log_handler)
         
         ShaderManager::GetLoader (file_item.name, common::SerializerFindMode_ByName)(file_item.name, shader);
         
-        shader.SetName (file_item.name);
+        shader.SetName (common::basename (common::notdir (file_item.name)).c_str ());
    
         Attach (shader.Name (), shader);
       }
