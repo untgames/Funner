@@ -211,7 +211,7 @@ TexturePtr TextureManager::CreateTexture
 
 bool TextureManager::IsTextureResource (const char* name)
 {
-  return name && media::ImageManager::FindLoader (name, common::SerializerFindMode_ByName) != 0;
+  return name && (media::ImageManager::FindLoader (name, common::SerializerFindMode_ByName) != 0 || media::CompressedImageManager::FindLoader (name, common::SerializerFindMode_ByName) != 0);
 }
 
 /*
@@ -227,11 +227,23 @@ void TextureManager::LoadTexture (const char* name)
       
     if (impl->loaded_textures.find (name) != impl->loaded_textures.end ())
       throw xtl::format_operation_exception ("", "Texture '%s' has been already loaded", name);
+      
+    TexturePtr texture;
 
-    media::Image image (name);
+    if (media::CompressedImageManager::FindLoader (name, common::SerializerFindMode_ByName))
+    {
+      media::CompressedImage image (name);
+      
+      texture = CreateTexture (image);
+    }
+    else
+    {
+      media::Image image (name);
 
-    TexturePtr   texture = CreateTexture (image, true);
-    TextureProxy proxy   = impl->texture_proxy_manager.GetProxy (name);
+      texture = CreateTexture (image, true);
+    }
+
+    TextureProxy proxy = impl->texture_proxy_manager.GetProxy (name);
 
     proxy.SetResource (texture);
 

@@ -14,4 +14,5 @@ RENDER.MANAGER.SOURCES.IMPORTS          := compile.render.manager compile.media.
 RENDER.MANAGER.TESTS.TYPE             := test-suite
 RENDER.MANAGER.TESTS.INCLUDE_DIRS     := ../../xtl/include
 RENDER.MANAGER.TESTS.SOURCE_DIRS      := tests
-RENDER.MANAGER.TESTS.IMPORTS          := compile.render.manager link.render.manager compile.system link.render.low_level.opengl_driver run.render.low_level.opengl_driver compile.media.image
+RENDER.MANAGER.TESTS.IMPORTS          := compile.render.manager link.render.manager compile.system link.render.low_level.opengl_driver \
+                                         run.render.low_level.opengl_driver compile.media.image link.media.image.dds

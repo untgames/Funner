@@ -8,6 +8,7 @@ namespace media
 
 //forward declarations
 class Image;
+class CompressedImage;
 
 }
 

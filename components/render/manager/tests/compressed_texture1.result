@@ -1,0 +1,9 @@
+Results of compressed_texture1_test:
+window 784x562 added
+window resize 784x562
+Texture:
+  width:  1024
+  height: 1024
+  depth:  1
+  format: dxt1
+window 784x562 removed

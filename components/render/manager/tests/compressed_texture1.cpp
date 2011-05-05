@@ -1,14 +1,14 @@
 #include "shared.h"
 
-const char* IMAGE_NAME = "data/bottom.jpg";
+const char* IMAGE_NAME = "data/pic1.dds";
 
 int main ()
 {
-  printf ("Results of texture2_test:\n");
+  printf ("Results of compressed_texture1_test:\n");
   
   try
   {
-    Test test (L"Texture2 test", false);
+    Test test (L"Compressed texture test", false);
 
     RenderManager render_manager = test.RenderManager ();
 
