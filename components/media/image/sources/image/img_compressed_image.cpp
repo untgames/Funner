@@ -322,5 +322,5 @@ void swap (CompressedImage& image1, CompressedImage& image2)
 
 void CompressedImage::RegisterDefaultLoaders ()
 {
-  static ComponentLoader loader ("media.compressed_image.loaders.*");
+  static ComponentLoader loader ("media.compressed_image.*");
 }
