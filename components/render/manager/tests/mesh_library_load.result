@@ -1,0 +1,5 @@
+Results of mesh_library_load_test:
+window 784x562 added
+window resize 784x562
+Mesh library loaded (1 meshes in primitive 'mesh2')
+window 784x562 removed
