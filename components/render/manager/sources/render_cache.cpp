@@ -34,7 +34,7 @@ void CacheHolder::AttachCacheSource (CacheHolder& source)
   if (source.IsParentOf (*this))
     throw xtl::format_operation_exception ("render::CacheHolder::AttachCacheSource", "source", "Cache source is a parent of this cache holder");  
 
-  child_holders.push_back (&source);
+  sources.push_back (&source);
   
   try
   {
@@ -44,21 +44,21 @@ void CacheHolder::AttachCacheSource (CacheHolder& source)
   }
   catch (...)
   {
-    child_holders.pop_back ();
+    sources.pop_back ();
     throw;
   }
 }
 
 void CacheHolder::DetachCacheSource (CacheHolder& source)
 {
-  stl::remove (child_holders.begin (), child_holders.end (), &source);
-  stl::remove (source.parent_holders.begin (), source.parent_holders.end (), this);
+  sources.remove (&source);
+  source.parent_holders.remove (this);
 }
 
 void CacheHolder::DetachAllCacheSources ()
 {
-  while (!child_holders.empty ())
-    DetachCacheSource (*child_holders.back ());
+  while (!sources.empty ())
+    DetachCacheSource (*sources.back ());
 
   while (!parent_holders.empty ())
     parent_holders.back ()->DetachCacheSource (*this);
@@ -70,7 +70,7 @@ void CacheHolder::DetachAllCacheSources ()
 
 bool CacheHolder::IsParentOf (CacheHolder& child)
 {
-  for (HolderList::iterator iter=child_holders.begin (), end=child_holders.end (); iter!=end; ++iter)
+  for (HolderList::iterator iter=sources.begin (), end=sources.end (); iter!=end; ++iter)
   {
     if (*iter == &child)
       return true;

@@ -2,6 +2,8 @@
 
 using namespace render;
 
+//TODO: createshared resource: if not resouce - create proxy
+
 RenderManager::RenderManager ()
   : impl (new RenderManagerImpl)
 {

@@ -13,6 +13,7 @@
 #include <render/manager.h>
 
 #include <media/image.h>
+#include <media/rfx/material_library.h>
 
 #include <syslib/application.h>
 #include <syslib/window.h>

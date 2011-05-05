@@ -19,11 +19,12 @@ struct MaterialLibraryEntry: public xtl::reference_counter
   
   MaterialLibraryEntry () : source_library (0) {}
   
-  ~MaterialLibraryEntry ()
+  ~MaterialLibraryEntry ()  
   {
     while (!materials.empty ())
     {
       materials.back ().SetResource (MaterialPtr ());
+
       materials.pop_back ();
     }
   }
@@ -77,19 +78,19 @@ struct MaterialManager::Impl
       for (media::rfx::MaterialLibrary::ConstIterator iter=library.CreateIterator (); iter; ++iter)
       {
         MaterialPtr material (new MaterialImpl (device_manager, texture_manager, shading_manager), false);
-        
+
         material->Update (*iter);
-        
+
         MaterialProxy proxy = proxy_manager.GetProxy (library.ItemId (iter));
-        
+
         proxy.SetResource (material);
-        
+
         entry->materials.push_back (proxy);
       }
-      
+
         //регистрация библиотеки
         
-      loaded_libraries.push_back (entry);
+      loaded_libraries.push_back (entry);      
     }
     catch (xtl::exception& e)
     {
@@ -169,7 +170,7 @@ void MaterialManager::LoadMaterialLibrary (const char* name)
       
     media::rfx::MaterialLibrary library (name);
 
-    impl->LoadMaterialLibrary (library, name);    
+    impl->LoadMaterialLibrary (library, name);        
   }
   catch (xtl::exception& e)
   {
@@ -182,7 +183,7 @@ void MaterialManager::LoadMaterialLibrary (const media::rfx::MaterialLibrary& li
 {
   try
   {
-    impl->LoadMaterialLibrary (library, ""); 
+    impl->LoadMaterialLibrary (library, "");     
   }
   catch (xtl::exception& e)
   {

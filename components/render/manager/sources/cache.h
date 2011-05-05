@@ -49,7 +49,7 @@ class CacheHolder: public xtl::noncopyable
 
   private:
     HolderList parent_holders;
-    HolderList child_holders;
+    HolderList sources;
     bool       need_update;
 };
 

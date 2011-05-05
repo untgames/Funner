@@ -100,7 +100,7 @@ struct MaterialImpl::Impl: public CacheHolder
     , properties (in_device_manager)
     , has_dynamic_textures (false)
   {
-    AttachCacheSource (properties);    
+    AttachCacheSource (properties);
   }
   
 ///Работа с кэшем
