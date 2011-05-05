@@ -82,6 +82,8 @@ struct PrimitiveManager::Impl
       {
         PrimitivePtr primitive (new PrimitiveImpl (device_manager, material_manager, primitive_buffers), false);
         
+        primitive->AddMesh (*iter, MeshBufferUsage_Default, MeshBufferUsage_Default);
+        
         PrimitiveProxy proxy = proxy_manager.GetProxy (library.ItemId (iter));
         
         proxy.SetResource (primitive);

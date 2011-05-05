@@ -260,7 +260,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
 
       //конвертация индексного буфера (если он есть)
       
-    InputDataType index_type = (InputDataType)0;
+    InputDataType index_type = InputDataType_UShort;
     
     if (source.IndexBuffer ().Size ())
     {
