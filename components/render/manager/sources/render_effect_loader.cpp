@@ -31,26 +31,36 @@ class EffectLoader
       try
       {
         ParseRoot (parser.Root ());
+        
+        if (parser.Log ().HasErrors ())
+          throw xtl::format_operation_exception ("render::EffectLoader::EffectLoader", "Error at parsing effect file '%s'", file_name);
       }
       catch (...)
       {
-        const common::ParseLog& parse_log = parser.Log ();
-
-        try
-        {  
-          for (size_t i=0; i<parse_log.MessagesCount (); ++i)
-            log.Print (parse_log.Message (i));
-        }
-        catch (...)
-        {
-          //подавление всех исключений
-        }
-        
+        PrintLog ();
         throw;
       }
+
+      PrintLog ();      
     }
     
   private:
+///Печать лога
+    void PrintLog ()
+    {
+      const common::ParseLog& parse_log = parser.Log ();
+
+      try
+      {  
+        for (size_t i=0; i<parse_log.MessagesCount (); ++i)
+          log.Print (parse_log.Message (i));
+      }
+      catch (...)
+      {
+        //подавление всех исключений
+      }      
+    }
+  
 ///Разбор корня
     void ParseRoot (Parser::Iterator iter)
     {
@@ -129,7 +139,7 @@ class EffectLoader
       
       memset (&desc, 0, sizeof (desc));
       
-      desc.blend_enable                     = xtl::xstrcmp (get<const char*> (*iter, "blend_enable"               "true"), "true") == 0;
+      desc.blend_enable                     = xtl::xstrcmp (get<const char*> (*iter, "blend_enable",              "true"), "true") == 0;
       desc.sample_alpha_to_coverage         = xtl::xstrcmp (get<const char*> (*iter, "sample_alpha_to_coverage",  "false"), "true") == 0;
       desc.blend_color_operation            = BlendOperation_Add;
       desc.blend_color_source_argument      = BlendArgument_One;
@@ -165,6 +175,8 @@ class EffectLoader
         LowLevelBlendStatePtr state (device_manager->Device ().CreateBlendState (desc), false);
       
         library.BlendStates ().Add (id, state);
+
+        log.Printf ("Effect blend state '%s' loaded", id);                
       }
       catch (std::exception& e)
       {
@@ -289,6 +301,8 @@ class EffectLoader
         LowLevelDepthStencilStatePtr state (device_manager->Device ().CreateDepthStencilState (desc), false);
       
         library.DepthStencilStates ().Add (id, state);
+        
+        log.Printf ("Effect depth-stencil state '%s' loaded", id);        
       }
       catch (std::exception& e)
       {
@@ -346,6 +360,8 @@ class EffectLoader
         LowLevelRasterizerStatePtr state (device_manager->Device ().CreateRasterizerState (desc), false);
       
         library.RasterizerStates ().Add (id, state);
+        
+        log.Printf ("Effect rasterizer '%s' loaded", id);        
       }
       catch (std::exception& e)
       {
@@ -445,6 +461,8 @@ class EffectLoader
         LowLevelSamplerStatePtr state (device_manager->Device ().CreateSamplerState (desc), false);
       
         library.SamplerStates ().Add (id, state);
+        
+        log.Printf ("Effect texture sampler '%s' loaded", id);        
       }
       catch (std::exception& e)
       {
@@ -465,7 +483,7 @@ class EffectLoader
           log.Error (node, "Shader library load failed:");
           
           node_printed = true;
-        }
+        }        
         
         log.Printf (ParseLogMessageType_Error, message);
       }
@@ -475,12 +493,27 @@ class EffectLoader
       bool       node_printed;
     };
     
+    struct ShaderCompilerLog
+    {
+      ShaderCompilerLog (ParseNode& in_node, ParseLog& in_log) : node (in_node), log (in_log) {}
+      
+      void operator () (const char* message)
+      {
+        log.Printf (ParseLogMessageType_Warning, message);
+      }
+      
+      ParseNode& node;
+      ParseLog&  log;
+    };    
+    
 ///Разбор библиотеки шейдеров
     void ParseShaderLibrary (Parser::Iterator iter)
     {
       const char* file_mask = get<const char*> (*iter, "");
-      
+
       library.Shaders ().Load (file_mask, ShaderLoaderLog (*iter, parser.Log ()));
+
+      log.Printf ("Effect shaders library '%s' loaded (%u shaders loaded)", file_mask, library.Shaders ().Size ());
     }
     
 ///Разбор настроек шэйдинга
@@ -490,11 +523,11 @@ class EffectLoader
       const char* options = get<const char*> (*iter, "options", "");
       
       static const size_t SHADERS_RESERVE_COUNT = 4;
-      
+
       stl::vector<ShaderDesc> shaders;
       
       shaders.reserve (SHADERS_RESERVE_COUNT);
-      
+
       for (Parser::NamesakeIterator shader_iter=iter->First ("shader"); shader_iter; ++shader_iter)
       {
         ShaderDesc desc;
@@ -503,8 +536,8 @@ class EffectLoader
         
         Parser::AttributeIterator params_iter = make_attribute_iterator (*shader_iter);
         
-        desc.name    = xtl::io::get<const char*> (params_iter);
-        desc.profile = xtl::io::get<const char*> (params_iter);
+        desc.name    = *params_iter; ++params_iter;
+        desc.profile = *params_iter; ++params_iter;
         
         media::rfx::Shader* shader = library.Shaders ().Find (desc.name, desc.profile);
         
@@ -517,15 +550,17 @@ class EffectLoader
         
         shaders.push_back (desc);
       }
-      
+
       if (shaders.empty ())
         raise_parser_exception (*iter, "No shaders found for shading");
-      
+
       try
       {
-        LowLevelProgramPtr program (device_manager->Device ().CreateProgram (shaders.size (), &shaders [0], ShaderLoaderLog (*iter, parser.Log ())), false);
+        LowLevelProgramPtr program (device_manager->Device ().CreateProgram (shaders.size (), &shaders [0], ShaderCompilerLog (*iter, parser.Log ())), false);
       
         library.Programs ().Add (id, program);
+        
+        log.Printf ("Effect program '%s' loaded", id);        
       }
       catch (std::exception& e)
       {
@@ -579,6 +614,8 @@ class EffectLoader
       EffectPassPtr pass = ParsePass (iter);
       
       library.EffectPasses ().Add (id, pass);
+      
+      log.Printf ("Effect pass '%s' loaded", id);      
     }
     
     EffectPassPtr ParsePass (Parser::Iterator iter)
@@ -634,6 +671,8 @@ class EffectLoader
       EffectPtr effect = ParseEffect (iter);
       
       library.Effects ().Add (id, effect);
+      
+      log.Printf ("Effect '%s' loaded", id);
     }
     
     EffectPassPtr ParseEffectPass (Parser::Iterator iter)

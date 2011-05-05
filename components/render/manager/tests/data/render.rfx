@@ -6,7 +6,7 @@
 //TODO: constant params requirements (constant buffers description)
 //TODO: temporary render targets
 
-library "shaders/*"
+library "data/shaders/*"
 
 //blend stage state for rendering solid (non transaparent) geometry
 blend "solid"
@@ -144,25 +144,25 @@ sampler "repeat"
 //program instance for phong program, specified by (material, entity, frame)
 program "phong"
 {
-  profile "glsl"       //shading profile
-  shader  "phong.vert" //reference to shader source. TODO: add compile options
-  shader  "phong.frag" //reference to shader source
+  profile "glsl"            //shading profile
+  shader  "phong" "glsl.vs" //reference to shader source. TODO: add compile options
+  shader  "phong" "glsl.ps" //reference to shader source
 }
 
 //shading instance for rendering shadow maps
 program "shadow_map"
 {
-  profile "glsl"        //shading profile
-  shader  "shadow.vert" //reference to shader source. TODO: add compile options
-  shader  "shadow.frag" //reference to shader source
+  profile "glsl"             //shading profile
+  shader  "shadow" "glsl.vs" //reference to shader source. TODO: add compile options
+  shader  "shadow" "glsl.ps" //reference to shader source
 }
 
 //shading instance for rendering helper geometry
 program "helper"
 {
-  profile "glsl"        //shading profile
-  shader  "helper.vert" //reference to shader source. TODO: add compile options
-  shader  "helper.frag" //reference to shader source
+  profile "glsl"            //shading profile
+  shader  "debug" "glsl.vs" //reference to shader source. TODO: add compile options
+  shader  "debug" "glsl.ps" //reference to shader source
 }
 
 //description of effects rendering
@@ -211,7 +211,7 @@ effect "main"
     rasterizer_state      "overlays"                    //use rasterizer stage settings for overlays
   }
   
-  pass "dof" //???
+//  pass "dof" //???
 
   //render helper geometry
   pass
