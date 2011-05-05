@@ -167,7 +167,7 @@ InputLayout::~InputLayout ()
 
 void InputLayout::SetDesc (const InputLayoutDesc& desc)
 { 
-  static const char* METHOD_NAME = "render::low_level::InputLayout::SetDesc";
+  static const char* METHOD_NAME = "render::low_level::opengl::InputLayout::SetDesc";
   
     //преобразование конфигурации индексного буфера
     
@@ -194,7 +194,7 @@ void InputLayout::SetDesc (const InputLayoutDesc& desc)
     case InputDataType_Short:
     case InputDataType_Int:
     case InputDataType_Float:
-      throw xtl::format_not_supported_exception (METHOD_NAME, "desc.index_type", get_name (desc.index_type));
+      throw xtl::format_not_supported_exception (METHOD_NAME, "desc.index_type=%s unsupported", get_name (desc.index_type));
     default:
       throw xtl::make_argument_exception (METHOD_NAME, "desc.index_type", desc.index_type);
   }
