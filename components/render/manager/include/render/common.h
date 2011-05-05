@@ -14,6 +14,13 @@ enum PixelFormat
   PixelFormat_L8,
   PixelFormat_A8,
   PixelFormat_LA8,
+  PixelFormat_DXT1,
+  PixelFormat_DXT3,
+  PixelFormat_DXT5,
+  PixelFormat_RGB_PVRTC2,
+  PixelFormat_RGB_PVRTC4,
+  PixelFormat_RGBA_PVRTC2,
+  PixelFormat_RGBA_PVRTC4,
 
   PixelFormat_Num
 };

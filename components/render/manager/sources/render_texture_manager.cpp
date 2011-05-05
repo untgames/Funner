@@ -145,6 +145,47 @@ TexturePtr TextureManager::CreateTexture (const media::Image& image, render::Tex
   }
 }
 
+TexturePtr TextureManager::CreateTexture (const media::CompressedImage& image)
+{
+  try
+  {
+    TextureDimension dimension;
+    
+    switch (image.LayersCount ())
+    {
+      case 1:
+        dimension = TextureDimension_2D;
+        break;
+      case 6:
+        dimension = TextureDimension_Cubemap;
+        break;
+      default:
+        dimension = TextureDimension_3D;
+        break;
+    }
+
+    return CreateTexture (image, dimension);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::TextureManager::CreateTexture(const media::CompressedImage&)");
+    throw;
+  }
+}
+
+TexturePtr TextureManager::CreateTexture (const media::CompressedImage& image, render::TextureDimension dimension)
+{
+  try
+  {
+    return TexturePtr (new TextureImpl (impl->device_manager, dimension, image), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::TextureManager::CreateTexture(const media::CompressedImage&,TextureDimension)");
+    throw;
+  }
+}
+
 TexturePtr TextureManager::CreateTexture
  (render::TextureDimension dimension,
   size_t                   width,

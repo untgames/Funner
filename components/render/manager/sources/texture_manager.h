@@ -15,6 +15,8 @@ class TextureManager: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////    
     TexturePtr CreateTexture (const media::Image& image, bool generate_mipmaps);
     TexturePtr CreateTexture (const media::Image& image, TextureDimension dimension, bool generate_mipmaps);
+    TexturePtr CreateTexture (const media::CompressedImage& image);
+    TexturePtr CreateTexture (const media::CompressedImage& image, TextureDimension dimension);
     TexturePtr CreateTexture (TextureDimension dimension, size_t width, size_t height, size_t depth, PixelFormat format, bool generate_mipmaps);
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////

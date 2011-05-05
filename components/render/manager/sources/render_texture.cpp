@@ -26,6 +26,19 @@ struct RenderTargetViewDesc
 
 typedef stl::vector<RenderTargetViewDesc> RenderTargetArray;
 
+render::low_level::PixelFormat get_compressed_pixel_format (const char* name)
+{
+  if      (!strcmp (name, "rgb_pvrtc2"))  return render::low_level::PixelFormat_RGB_PVRTC2;
+  else if (!strcmp (name, "rgb_pvrtc4"))  return render::low_level::PixelFormat_RGB_PVRTC4;
+  else if (!strcmp (name, "rgba_pvrtc2")) return render::low_level::PixelFormat_RGBA_PVRTC2;
+  else if (!strcmp (name, "rgba_pvrtc4")) return render::low_level::PixelFormat_RGBA_PVRTC4;
+  else if (!strcmp (name, "dxt1"))        return render::low_level::PixelFormat_DXT1;
+  else if (!strcmp (name, "dxt3"))        return render::low_level::PixelFormat_DXT3;
+  else if (!strcmp (name, "dxt5"))        return render::low_level::PixelFormat_DXT5;
+
+  throw xtl::format_not_supported_exception ("render::get_pixel_format", "Unsupported compression format '%s'", name);
+}
+
 }
 
 /*
@@ -155,12 +168,96 @@ TextureImpl::TextureImpl
     impl->width   = width;
     impl->height  = height;
     impl->depth   = depth;
-    impl->format  = format;
     impl->texture = LowLevelTexturePtr (device_manager->Device ().CreateTexture (desc), false);
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::TextureImpl::TextureImpl");
+    e.touch ("render::TextureImpl::TextureImpl(const DeviceManagerPtr&,render::TextureDimension,size_t,size_t,size_t,render::PixelFormat,bool)");
+    throw;
+  }
+}
+
+TextureImpl::TextureImpl (const DeviceManagerPtr& device_manager, render::TextureDimension dimension, const media::CompressedImage& image)
+{
+  try
+  {
+      //преобразование аргументов
+      
+    if (!device_manager)
+      throw xtl::make_null_argument_exception ("", "device_manager");
+    
+    low_level::PixelFormat      target_format = get_compressed_pixel_format (image.Format ());
+    low_level::TextureDimension target_dimension;
+
+    switch (dimension)
+    {
+      case TextureDimension_2D:
+        target_dimension = low_level::TextureDimension_2D;
+        break;
+      case TextureDimension_3D:
+        target_dimension = low_level::TextureDimension_3D;
+        break;
+      case TextureDimension_Cubemap:
+        target_dimension = low_level::TextureDimension_Cubemap;
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "dimension", dimension);
+    }
+
+      //создание текстуры
+      
+    low_level::TextureDesc desc;
+    
+    memset (&desc, 0, sizeof desc);
+    
+    desc.dimension            = target_dimension;
+    desc.width                = image.Width ();
+    desc.height               = image.Height ();
+    desc.layers               = image.LayersCount ();
+    desc.format               = target_format;
+    desc.generate_mips_enable = false;
+    desc.access_flags         = low_level::AccessFlag_ReadWrite;
+    desc.bind_flags           = BindFlag_Texture | BindFlag_RenderTarget;
+    desc.usage_mode           = UsageMode_Static;
+    
+    stl::vector<size_t> sizes (image.BlocksCount ());
+    const media::CompressedImageBlockDesc* blocks = image.Blocks ();
+
+    for (size_t i=0, count=sizes.size (); i<count; i++)
+      sizes [i] = blocks [i].size;
+
+    TextureData data;
+
+    memset (&data, 0, sizeof (TextureData));
+
+    data.data  = image.Data ();
+    data.sizes = &sizes [0];    
+    
+    PixelFormat format;
+    
+    switch (target_format)
+    {
+      case render::low_level::PixelFormat_DXT1:        format = PixelFormat_DXT1; break;
+      case render::low_level::PixelFormat_DXT3:        format = PixelFormat_DXT3; break;
+      case render::low_level::PixelFormat_DXT5:        format = PixelFormat_DXT5; break;
+      case render::low_level::PixelFormat_RGB_PVRTC2:  format = PixelFormat_RGB_PVRTC2; break;
+      case render::low_level::PixelFormat_RGB_PVRTC4:  format = PixelFormat_RGB_PVRTC4; break;
+      case render::low_level::PixelFormat_RGBA_PVRTC2: format = PixelFormat_RGBA_PVRTC2; break;
+      case render::low_level::PixelFormat_RGBA_PVRTC4: format = PixelFormat_RGBA_PVRTC4; break;
+      default:
+        throw xtl::format_operation_exception ("", "Wrong compressed image pixel format %s", get_name (target_format));
+    }    
+
+    impl = new Impl (device_manager, dimension, format, target_format);
+        
+    impl->width   = desc.width;
+    impl->height  = desc.height;
+    impl->depth   = desc.layers;
+    impl->texture = LowLevelTexturePtr (device_manager->Device ().CreateTexture (desc, data), false);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::TextureImpl::TextureImpl(const DeviceManagerPtr&,render::TextureDimension,const media::CompressedImage&)");
     throw;
   }
 }

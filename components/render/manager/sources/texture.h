@@ -14,6 +14,9 @@ class TextureImpl: public Object
                   size_t                  depth,
                   PixelFormat             format,
                   bool                    generate_mipmaps);
+    TextureImpl  (const DeviceManagerPtr&       manager,
+                  TextureDimension              dimension,
+                  const media::CompressedImage& image);
     ~TextureImpl ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////

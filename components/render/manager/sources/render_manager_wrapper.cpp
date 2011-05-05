@@ -100,6 +100,16 @@ Texture RenderManager::CreateTexture (const media::Image& image, TextureDimensio
   return Wrappers::Wrap<Texture> (impl->TextureManager ().CreateTexture (image, dimension, generate_mips_enable));
 }
 
+Texture RenderManager::CreateTexture (const media::CompressedImage& image)
+{
+  return Wrappers::Wrap<Texture> (impl->TextureManager ().CreateTexture (image));
+}
+
+Texture RenderManager::CreateTexture (const media::CompressedImage& image, TextureDimension dimension)
+{
+  return Wrappers::Wrap<Texture> (impl->TextureManager ().CreateTexture (image, dimension));
+}
+
 Texture RenderManager::CreateTexture2D (size_t width, size_t height, PixelFormat format, bool generate_mips_enable)
 {
   try

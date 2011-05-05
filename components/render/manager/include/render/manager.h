@@ -83,6 +83,8 @@ class RenderManager
     Entity           CreateEntity           ();
     Texture          CreateTexture          (const media::Image& image, bool generate_mipmaps = true);
     Texture          CreateTexture          (const media::Image& image, TextureDimension dimension, bool generate_mipmaps = true);
+    Texture          CreateTexture          (const media::CompressedImage& image);
+    Texture          CreateTexture          (const media::CompressedImage& image, TextureDimension dimension);
     Texture          CreateTexture2D        (size_t width, size_t height, PixelFormat format, bool generate_mipmaps = true);
     Texture          CreateTexture3D        (size_t width, size_t height, size_t depth, PixelFormat format, bool generate_mipmaps = true);
     Texture          CreateTextureCubemap   (size_t size, PixelFormat format, bool generate_mipmaps = true);
