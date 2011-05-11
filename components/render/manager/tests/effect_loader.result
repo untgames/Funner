@@ -1,0 +1,28 @@
+Results of effect_loader_test:
+render.manager: Creating render window
+render.manager: Create device manager (driver='*', adapter='*', init_string='')
+render.manager: ...device manager and swap chain have been successfully created
+render.manager: Initialize render targets for swap chain
+render.manager: ...render targets for swap chain created
+window 784x562 added
+window resize 784x562
+render.manager: Effect blend state 'solid' loaded
+render.manager: Effect blend state 'transparent' loaded
+render.manager: Effect blend state 'additive' loaded
+render.manager: Effect depth-stencil state 'solid' loaded
+render.manager: Effect depth-stencil state 'ztest_without_write' loaded
+render.manager: Effect depth-stencil state 'stencil-test' loaded
+render.manager: Effect rasterizer 'default' loaded
+render.manager: Effect rasterizer 'wireframe' loaded
+render.manager: Effect rasterizer 'overlays' loaded
+render.manager: Effect texture sampler 'default' loaded
+render.manager: Effect texture sampler 'repeat' loaded
+render.manager: Effect shaders library 'data/shaders/*' loaded (6 shaders loaded)
+render.manager: Effect program 'phong' loaded
+render.manager: Effect program 'shadow_map' loaded
+render.manager: Effect program 'helper' loaded
+render.manager: Effect 'main' loaded
+render.manager: Effect 'shadow' loaded
+render.manager: Effect 'lighting' loaded
+Effects loaded
+window 784x562 removed

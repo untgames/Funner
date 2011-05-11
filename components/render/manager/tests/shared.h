@@ -25,6 +25,12 @@ using namespace render;
 const size_t WINDOW_WIDTH  = 800;
 const size_t WINDOW_HEIGHT = 600;
 
+static void log_print (const char* log_name, const char* message)
+{
+  printf ("%s: %s\n", log_name, message);
+  fflush (stdout);
+}
+
 //протокол теста
 struct TestLogFilter
 {
@@ -33,13 +39,7 @@ struct TestLogFilter
   TestLogFilter (bool logging)
   {
     if (logging)
-      log_filter = stl::auto_ptr<common::LogFilter> (new common::LogFilter ("*", &LogPrint));
-  }
-
-  static void LogPrint (const char* log_name, const char* message)
-  {
-    printf ("%s: %s\n", log_name, message);
-    fflush (stdout);
+      log_filter = stl::auto_ptr<common::LogFilter> (new common::LogFilter ("*", &log_print));
   }
 };
 

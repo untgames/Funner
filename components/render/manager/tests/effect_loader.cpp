@@ -8,8 +8,9 @@ int main ()
   
   try
   {
-//    Test test (L"Effect loader test", false);
-    Test test (L"Effect loader test", true);
+    common::LogFilter log_filter ("render.manager*", &log_print);        
+    
+    Test test (L"Effect loader test", false);   
 
     RenderManager render_manager = test.RenderManager ();
 

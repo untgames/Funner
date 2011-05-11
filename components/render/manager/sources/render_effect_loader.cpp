@@ -495,15 +495,42 @@ class EffectLoader
     
     struct ShaderCompilerLog
     {
-      ShaderCompilerLog (ParseNode& in_node, ParseLog& in_log) : node (in_node), log (in_log) {}
+      ShaderCompilerLog (const char* in_program_name, ParseNode& in_node, ParseLog& in_log)
+        : program_name (in_program_name)
+        , node (in_node)
+        , log (in_log) {}
       
       void operator () (const char* message)
       {
-        log.Printf (ParseLogMessageType_Warning, message);
+          //отсечение стандартных сообщений об отсутствии ошибок
+          
+        static const char* IGNORE_MESSAGES [] = {
+          "*: No errors."
+        };
+        
+        static const size_t IGNORE_MESSAGES_COUNT = sizeof (IGNORE_MESSAGES) / sizeof (*IGNORE_MESSAGES);
+        
+        for (size_t i=0; i<IGNORE_MESSAGES_COUNT; i++)
+          if (common::wcimatch (message, IGNORE_MESSAGES [i]))
+            return;
+          
+          //вывод сообщения
+        
+        static const char* LINKER_PREFIX        = "linker: ";
+        static size_t      LINKER_PREFIX_LENGTH = strlen (LINKER_PREFIX);
+        
+        if (wcimatch (message, "linker:*"))
+        {
+          log.Printf (ParseLogMessageType_Warning, "%s: %s", program_name, message + LINKER_PREFIX_LENGTH);
+          return;
+        }
+        
+        log.Printf (ParseLogMessageType_Warning, "%s", message);
       }
       
-      ParseNode& node;
-      ParseLog&  log;
+      const char* program_name;
+      ParseNode&  node;
+      ParseLog&   log;
     };    
     
 ///Разбор библиотеки шейдеров
@@ -521,6 +548,7 @@ class EffectLoader
     {
       const char* id      = get<const char*> (*iter, "");
       const char* options = get<const char*> (*iter, "options", "");
+      const char* profile = get<const char*> (*iter, "profile");
       
       static const size_t SHADERS_RESERVE_COUNT = 4;
 
@@ -536,14 +564,16 @@ class EffectLoader
         
         Parser::AttributeIterator params_iter = make_attribute_iterator (*shader_iter);
         
-        desc.name    = *params_iter; ++params_iter;
+        const char* shader_name = *params_iter; ++params_iter;
+        
         desc.profile = *params_iter; ++params_iter;
         
-        media::rfx::Shader* shader = library.Shaders ().Find (desc.name, desc.profile);
+        media::rfx::Shader* shader = library.Shaders ().Find (shader_name, desc.profile);
         
         if (!shader)
-          raise_parser_exception (*shader_iter, "Shader '%s' for profile '%s' not found", desc.name, desc.profile);
-          
+          raise_parser_exception (*shader_iter, "Shader '%s' for profile '%s' not found", shader_name, desc.profile);
+
+        desc.name             = shader->Name ();  
         desc.source_code_size = shader->SourceCodeSize ();
         desc.source_code      = shader->SourceCode ();
         desc.options          = options;
@@ -556,7 +586,8 @@ class EffectLoader
 
       try
       {
-        LowLevelProgramPtr program (device_manager->Device ().CreateProgram (shaders.size (), &shaders [0], ShaderCompilerLog (*iter, parser.Log ())), false);
+        LowLevelProgramPtr program (device_manager->Device ().CreateProgram (shaders.size (), &shaders [0], ShaderCompilerLog (common::format ("%s.%s", profile, id).c_str (),
+          *iter, parser.Log ())), false);
       
         library.Programs ().Add (id, program);
         
