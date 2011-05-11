@@ -318,12 +318,13 @@ void MaterialImpl::Update (const media::rfx::Material& material)
         impl->texture_manager->GetSamplerProxy (texmap.Sampler ()), is_dynamic_image), false);
 
       new_texmaps.push_back (new_texmap);
-
+      
       new_properties.SetProperty (texmap.Semantic (), (int)i); //установка номера канала текстурирования
     }
 
     ProgramProxy               new_program = impl->shading_manager->GetProgramProxy (material.Program ());
     ProgramParametersLayoutPtr new_layout  = impl->device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_Material, new_properties.Layout ());
+    printf ("??? hash=%08x\n", new_properties.Layout ().Hash ());
 
     new_program.AttachCacheHolder (*impl);
 

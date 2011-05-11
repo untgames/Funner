@@ -8,7 +8,7 @@ int main ()
   
   try
   {
-    common::LogFilter log_filter ("render.manager*", &log_print);        
+    common::LogFilter log_filter ("render.manager*", &log_print);
     
     Test test (L"Effect loader test", false);   
 

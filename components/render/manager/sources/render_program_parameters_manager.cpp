@@ -10,7 +10,7 @@ using namespace render::low_level;
 */
 
 typedef stl::hash_multimap<size_t, ProgramParametersLayout*> LayoutMap;
-typedef stl::hash_map<size_t, ProgramParametersLayout*>      CompositeLayoutMap;
+typedef stl::hash_map<size_t, ProgramParametersLayoutPtr>    CompositeLayoutMap;
 
 struct ProgramParametersManager::Impl: public xtl::trackable
 {
@@ -36,16 +36,11 @@ struct ProgramParametersManager::Impl: public xtl::trackable
     for (; range.first!=range.second; ++range.first)
       if (range.first->second == layout)
       {
-        layouts.erase (range.first);
+        layouts.erase (range.first);        
 
         return;        
       }
   }  
-  
-  void RemoveCompositeLayout (size_t hash)
-  {
-    composite_layouts.erase (hash);
-  }
 };
 
 /*
@@ -116,9 +111,7 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters
     if (layout2) result_layout->Attach (*layout2);
     if (layout3) result_layout->Attach (*layout3);
 
-    result_layout->connect_tracker (xtl::bind (&Impl::RemoveCompositeLayout, &*impl, hash), *impl);
-
-    impl->composite_layouts.insert_pair (hash, result_layout.get ());
+    impl->composite_layouts.insert_pair (hash, result_layout);
 
     return result_layout;    
   }

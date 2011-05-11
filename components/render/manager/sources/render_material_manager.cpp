@@ -42,6 +42,8 @@ struct MaterialManager::Impl
   ShadingManagerPtr     shading_manager;  //менеджер шэйдинга
   MaterialProxyManager  proxy_manager;    //менеджер прокси объектов
   MaterialLibraryList   loaded_libraries; //список загруженных библиотек
+  Log                   log;              //протокол сообщений
+  DebugLog              debug_log;        //протокол отладочных сообщений
   
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ShadingManagerPtr& in_shading_manager)
@@ -56,6 +58,8 @@ struct MaterialManager::Impl
   {        
     try
     {
+      log.Printf ("Loading material library '%s' with %u materials", name && *name ? name : library.Name (), library.Size ());
+      
         //проверка повторной загрузки
       
       for (MaterialLibraryList::iterator iter=loaded_libraries.begin (), end=loaded_libraries.end (); iter!=end; ++iter)
@@ -77,11 +81,15 @@ struct MaterialManager::Impl
       
       for (media::rfx::MaterialLibrary::ConstIterator iter=library.CreateIterator (); iter; ++iter)
       {
+        const char* id = library.ItemId (iter);
+        
+        log.Printf ("...loading material '%s'", id);
+        
         MaterialPtr material (new MaterialImpl (device_manager, texture_manager, shading_manager), false);
 
         material->Update (*iter);
 
-        MaterialProxy proxy = proxy_manager.GetProxy (library.ItemId (iter));
+        MaterialProxy proxy = proxy_manager.GetProxy (id);
 
         proxy.SetResource (material);
 
@@ -104,6 +112,8 @@ struct MaterialManager::Impl
   {
     if (!name)
       name = "";
+      
+    log.Printf ("Unloading material library '%s'", name && *name ? name : source_library ? source_library->Name () : "");  
     
     for (MaterialLibraryList::iterator iter=loaded_libraries.begin (), end=loaded_libraries.end (); iter!=end; ++iter)
     {

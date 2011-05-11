@@ -8,6 +8,8 @@ int main ()
   
   try
   {
+    common::LogFilter log_filter ("render.manager*", &log_print);    
+    
     Test test (L"Mesh library test", false);
 
     RenderManager render_manager = test.RenderManager ();

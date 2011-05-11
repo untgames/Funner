@@ -43,6 +43,8 @@ struct ProgramParametersLayout::Impl: public CacheHolder
   bool                                            need_rebuild;                      //необходимо ли обновление возвращаемых структур
   LowLevelDevicePtr                               device;                            //устройство отрисовки
   LowLevelProgramParametersLayoutPtr              device_layout;                     //объект расположения параметров устройства отрисовки
+  size_t                                          debug_id;                          //отладочный идентификатор
+  DebugLog                                        debug_log;                         //лог отладочных сообщений  
   
 ///Конструктор
   Impl (const LowLevelDevicePtr& in_device)
@@ -51,6 +53,12 @@ struct ProgramParametersLayout::Impl: public CacheHolder
   {
     if (!device)
       throw xtl::make_null_argument_exception ("render::ProgramParametersLayout::Impl::Impl", "device");
+      
+    static size_t curret_debug_id = 0;
+    
+    debug_id = ++curret_debug_id;
+    
+    debug_log.Printf ("Program parameters layout created (layout_id=%u)", debug_id);
 
     layouts.reserve (RESERVED_LAYOUTS_COUNT);
   }
@@ -61,7 +69,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder
     static render::low_level::ProgramParameter default_parameter;
     
     if (!need_rebuild)
-      return;          
+      return;                 
       
       //обновление кэша
       
@@ -76,6 +84,8 @@ struct ProgramParametersLayout::Impl: public CacheHolder
       
     for (int i=0; i<ProgramParametersSlot_Num; i++)
       parameters_count += slots [i].layout.Size ();
+      
+    debug_log.Printf ("Updating program parameters layout %u with %u parameters:", debug_id, parameters_count);  
       
     ParameterArray new_parameters;
 
@@ -96,10 +106,12 @@ struct ProgramParametersLayout::Impl: public CacheHolder
       {
         const common::PropertyLayout& layout = slots [i].layout;
 
-        slots [i].layout_hash = layout.Hash ();
+        slots [i].layout_hash = layout.Hash ();        
 
         if (!layout.Size ())
           continue;
+          
+        debug_log.Printf ("...slot[%u]: hash=%08x, parameters_count=%u", i, slots [i].layout_hash, layout.Size ());          
 
         const common::PropertyDesc* property = layout.Properties ();
         size_t                      count    = layout.Size ();
@@ -132,8 +144,11 @@ struct ProgramParametersLayout::Impl: public CacheHolder
               parameter.type = render::low_level::ProgramParameterType_Float4x4;
               break;            
             default:
-              throw xtl::format_operation_exception ("render::ProgramParametersLayout", "Unexpected property[%u] type %s at parsing", j, get_name (property->type));
+              throw xtl::format_operation_exception ("render::ProgramParametersLayout", "Unexpected property[%u] '%s' type %s at parsing", j, parameter.name, get_name (property->type));
           }
+          
+          if (parameter.count != 1) debug_log.Printf ("......name='%s', type=%sx%u, offset=%u", parameter.name, get_name (property->type), parameter.count, parameter.offset);
+          else                      debug_log.Printf ("......name='%s', type=%s, offset=%u", parameter.name, get_name (property->type), parameter.offset);
 
           new_parameters.push_back (parameter);          
         }
@@ -146,7 +161,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder
 
         //расчёт хэша
 
-      hash = common::crc32 (&parameters [0], new_parameters.size () * sizeof (render::low_level::ProgramParameter));
+      hash = common::crc32 (&new_parameters [0], new_parameters.size () * sizeof (render::low_level::ProgramParameter));
     }
     else
     {
@@ -156,6 +171,8 @@ struct ProgramParametersLayout::Impl: public CacheHolder
       desc.parameters       = &default_parameter;
       hash                  = 0xffffffff;
     }
+    
+    debug_log.Printf ("...program parameters layout updated (hash=%08x)", hash);
     
     parameters.swap (new_parameters);
         
@@ -339,6 +356,8 @@ LowLevelProgramParametersLayoutPtr& ProgramParametersLayout::DeviceLayout ()
     
     if (impl->device_layout)
       return impl->device_layout;
+      
+    impl->debug_log.Printf ("Creating low-level layout for program parameters layout %u", impl->debug_id);
 
     impl->device_layout = LowLevelProgramParametersLayoutPtr (impl->device->CreateProgramParametersLayout (impl->desc), false);                    
       
