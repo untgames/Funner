@@ -4,6 +4,7 @@
 #include <common/component.h>
 #include <common/file.h>
 #include <common/hash.h>
+#include <common/lockable.h>
 #include <common/log.h>
 #include <common/singleton.h>
 #include <common/strlib.h>
@@ -203,7 +204,7 @@ zzip_ssize_t zip_write_func (int fd, _zzip_const void* buf, zzip_size_t len)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ôאיכמגאÿ סטסעולא zip-פאיכא
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class ZipFileSystem: public ICustomFileSystem
+class ZipFileSystem: public ICustomFileSystem, public Lockable
 {
   public:
             ZipFileSystem  (const char* path);
@@ -370,13 +371,21 @@ ZipFileSystem::ZipFileSystem (const char* path)
 
 ZipFileSystem::~ZipFileSystem ()
 {
-  for (OpenFileList::iterator i=open_files.begin ();i!=open_files.end ();++i)
+  try
   {
-    zzip_file_close ((*i)->handle);
-    delete *i;
-  }
+    Lock ();
 
-  zzip_dir_close (zip_dir);
+    for (OpenFileList::iterator i=open_files.begin ();i!=open_files.end ();++i)
+    {
+      zzip_file_close ((*i)->handle);
+      delete *i;
+    }
+
+    zzip_dir_close (zip_dir);
+  }
+  catch (...)
+  {
+  }
 }
 
 /*
@@ -385,6 +394,8 @@ ZipFileSystem::~ZipFileSystem ()
 
 ZipFileSystem::file_t ZipFileSystem::FileOpen (const char* file_name,filemode_t mode_flags,size_t)
 {
+  common::Lock lock (*this); 
+
   if ((mode_flags & FileMode_Write) || (mode_flags & FileMode_Resize) || (mode_flags & FileMode_Create))
     throw xtl::format_not_supported_exception ("ZipFileSystem::FileOpen","Unable to open file '%s' in zip-file '%s' with mode='%s'",
           file_name,zip_file_name.c_str (),strfilemode (mode_flags).c_str ());
@@ -424,6 +435,8 @@ ZipFileSystem::file_t ZipFileSystem::FileOpen (const char* file_name,filemode_t 
 
 void ZipFileSystem::FileClose (file_t _file)
 {
+  common::Lock lock (*this);
+
   ZipFile* file = (ZipFile*)_file;
 
   open_files.remove (file);
@@ -435,6 +448,8 @@ void ZipFileSystem::FileClose (file_t _file)
 
 size_t ZipFileSystem::FileRead (file_t _file,void* buf,size_t size)
 {
+  common::Lock lock (*this);
+
   ZipFile* file = (ZipFile*)_file;
 
   size_t read_size = zzip_file_read (file->handle,(char*)buf,size);
@@ -451,6 +466,8 @@ size_t ZipFileSystem::FileWrite (file_t,const void* buf,size_t size)
 
 void ZipFileSystem::FileRewind (file_t _file)
 {
+  common::Lock lock (*this);
+
   ZipFile* file = (ZipFile*)_file;
 
   zzip_rewind (file->handle);
@@ -460,6 +477,8 @@ void ZipFileSystem::FileRewind (file_t _file)
 
 filepos_t ZipFileSystem::FileSeek (file_t _file,filepos_t pos)
 {
+  common::Lock lock (*this);
+
   ZipFile* file = (ZipFile*)_file;
 
   filepos_t new_pos = zzip_seek (file->handle,pos,SEEK_SET);
@@ -471,6 +490,8 @@ filepos_t ZipFileSystem::FileSeek (file_t _file,filepos_t pos)
 
 filepos_t ZipFileSystem::FileTell (file_t _file)
 {
+  common::Lock lock (*this);
+
   ZipFile* file = (ZipFile*)_file;
 
   return zzip_tell (file->handle);
@@ -478,6 +499,8 @@ filepos_t ZipFileSystem::FileTell (file_t _file)
 
 filesize_t ZipFileSystem::FileSize (file_t _file)
 {
+  common::Lock lock (*this);
+
   return ((ZipFile*)_file)->size;
 }
 
@@ -488,6 +511,8 @@ void ZipFileSystem::FileResize (file_t,filesize_t)
 
 bool ZipFileSystem::FileEof (file_t _file)
 {
+  common::Lock lock (*this);
+
   ZipFile* file = (ZipFile*)_file;
 
   return (filesize_t)zzip_tell (file->handle) >= file->size;
@@ -525,6 +550,8 @@ void ZipFileSystem::Mkdir (const char* dir_name)
 
 bool ZipFileSystem::IsFileExist (const char* file_name)
 {
+  common::Lock lock (*this);
+  
   EntryMap::iterator i = entry_map.find (strihash (file_name));
 
   return i != entry_map.end ();
@@ -532,6 +559,8 @@ bool ZipFileSystem::IsFileExist (const char* file_name)
 
 bool ZipFileSystem::GetFileInfo (const char* file_name,FileInfo& info)
 {
+  common::Lock lock (*this);
+  
   EntryMap::iterator i = entry_map.find (strihash (file_name));
 
   if (i == entry_map.end ())
@@ -548,6 +577,8 @@ bool ZipFileSystem::GetFileInfo (const char* file_name,FileInfo& info)
 
 void ZipFileSystem::Search (const char* wc_mask,const FileSearchHandler& find_handler)
 {
+  common::Lock lock (*this);
+
   for (EntryList::iterator i=entries.begin ();i!=entries.end ();++i)
     if (wcimatch (i->name,wc_mask))
       find_handler (i->name,i->info);

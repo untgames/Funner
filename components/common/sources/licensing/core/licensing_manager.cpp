@@ -25,7 +25,7 @@ class LicenseManagerImpl
   public:
     ///Конструктор
     LicenseManagerImpl ()
-      : license_loaded (false)
+      : license_loaded (false), till_time (0)
     {
       allowed_components.Reserve (COMPONENTS_ARRAY_RESERVE_SIZE);
     }
@@ -62,24 +62,31 @@ class LicenseManagerImpl
 
           //чтение периода действия лицензии
 
-        const char *since_date_string = common::get<const char*> (root, "SinceDate"),
-                   *till_date_string  = common::get<const char*> (root, "TillDate"),
+        const char *since_date_string = common::get<const char*> (root, "SinceDate", ""),
+                   *till_date_string  = common::get<const char*> (root, "TillDate", ""),
                    *license_hash      = common::get<const char*> (root, "LicenseHash");
-
-        time_t since_time;
-
-        ParseDate (since_date_string, since_time);
-        ParseDate (till_date_string, till_time);
 
         time_t current_time;
         
         time (&current_time);
 
-        if (difftime (current_time, since_time) < 0)
-          throw xtl::format_operation_exception ("", "License '%s' is not valid yet", license_path);
+        if (xtl::xstrlen (since_date_string))
+        {
+          time_t since_time;
 
-        if (difftime (till_time, current_time) < 0)
-          throw xtl::format_operation_exception ("", "License '%s' has expired", license_path);
+          ParseDate (since_date_string, since_time);
+
+          if (difftime (current_time, since_time) < 0)
+            throw xtl::format_operation_exception ("", "License '%s' is not valid yet", license_path);
+        }
+
+        if (xtl::xstrlen (till_date_string))
+        {
+          ParseDate (till_date_string, till_time);
+
+          if (difftime (till_time, current_time) < 0)
+            throw xtl::format_operation_exception ("", "License '%s' has expired", license_path);
+        }
 
           //чтение произвольных свойств
 
@@ -100,10 +107,10 @@ class LicenseManagerImpl
 
           //проверка корректности содержимого лицензии
 
-        StringArray check_files_list;
+        stl::vector<CheckFile> check_files_list;
 
         for (Parser::NamesakeIterator check_file_iter = root.First ("CheckFiles.File"); check_file_iter; ++check_file_iter)
-          check_files_list.Add (common::get<const char*> (*check_file_iter, "Path"));
+          check_files_list.push_back (CheckFile (common::get<const char*> (*check_file_iter, "Path"), common::get<size_t> (*check_file_iter, "HashSize", 0)));
 
         unsigned char check_string_hash [16];
 
@@ -135,6 +142,9 @@ class LicenseManagerImpl
 
       if (!license_loaded)
         throw xtl::format_operation_exception (METHOD_NAME, "License not loaded");
+
+      if (!till_time)
+        return INT_MAX;
 
       time_t current_time;
 
@@ -273,7 +283,7 @@ class LicenseManagerImpl
 
 #ifdef _MSC_VER
       time_t date = _mkgmtime32 (&tm_date);
-#elif defined (ANDROID)
+#elif defined (ANDROID) || defined (__MINGW32__)
       time_t date = mktime (&tm_date);
 #else
       time_t date = timegm (&tm_date);

@@ -166,7 +166,7 @@ class File
   friend class FileSystem;
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструктры / деструктор
+///Конструкторы / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     File  ();
     File  (const File&);
@@ -575,7 +575,9 @@ class FileSystem
 ///Рассчёт хэш сумм содержимого файла
 ///////////////////////////////////////////////////////////////////////////////////////////////////        
     static void GetFileHash (File& file, FileHash& out_hash_value);
+    static void GetFileHash (File& file, size_t max_hash_size, FileHash& out_hash_value);    
     static void GetFileHash (const char* file_name, FileHash& out_hash_value);
+    static void GetFileHash (const char* file_name, size_t max_hash_size, FileHash& out_hash_value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Информация о файле

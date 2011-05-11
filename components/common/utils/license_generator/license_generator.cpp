@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include <stl/stack>
+#include <stl/vector>
 
 #include <xtl/bind.h>
 #include <xtl/function.h>
@@ -17,9 +18,13 @@
 
 using namespace common;
 
-const char* APPLICATION_NAME = "license-generator";
+const char* APPLICATION_NAME        = "license-generator";
+const char* IGNORED_PROPERTIES []   = { "CheckFiles", "AllowedComponents" };
+const char* UNALLOWED_PROPERTIES [] = { "LicenseHash" };
 
+const size_t IGNORED_PROPERTIES_COUNT   = sizeof (IGNORED_PROPERTIES) / sizeof (*IGNORED_PROPERTIES);
 const size_t HELP_STRING_PREFIX_LENGTH  = 30;
+const size_t UNALLOWED_PROPERTIES_COUNT = sizeof (UNALLOWED_PROPERTIES) / sizeof (*UNALLOWED_PROPERTIES);
 
 struct Params;
 
@@ -33,20 +38,22 @@ struct Option
   const char*                tip;           //подсказка
 };
 
+typedef stl::vector<CheckFile> CheckFileArray;
+
 //параметры запуска
 struct Params
 {
   const Option* options;            //массив опций
   size_t        options_count;      //количество опций
   stl::string   result_license;     //файл генерируемой лицензии
-  stl::string   source_xml;         //исходный xml, который будет преобразован в файл лицензии
   time_t        since_date;         //дата начала действия лицензии
   time_t        till_date;          //дата окончания действия лицензии
   StringArray   allowed_components; //список разрешенных компонентов
-  StringArray   check_files;        //список файлов для хеширования
+  CheckFileArray check_files;        //список файлов для хеширования
   PropertyMap   properties;         //свойства
   bool          force;              //игнорирование ошибок неправильного указания времени
   bool          silent;             //отключение предупреждений
+  bool          unlimited;          //лицензия не ограничена по времени
   bool          print_help;         //печатать ли справку
 };
 
@@ -174,7 +181,10 @@ void command_line_allowed_components (const char* components_list, Params& param
 //установка списка файлов для хеширования
 void command_line_check_files (const char* check_files_list, Params& params)
 {
-  params.check_files += split (check_files_list);
+  common::StringArray strings = split (check_files_list);
+  
+  for (size_t i=0; i<strings.Size (); i++)
+    params.check_files.push_back (CheckFile (strings [i]));
 }
 
 //установка режима игнорирования ошибок
@@ -187,6 +197,12 @@ void command_line_force (const char*, Params& params)
 void command_line_silent (const char*, Params& params)
 {
   params.silent = true;
+}
+
+//установка неограниченной лицензии
+void command_line_unlimited (const char*, Params& params)
+{
+  params.unlimited = true;
 }
 
 //формирование строки из даты
@@ -204,16 +220,26 @@ void validate (Params& params)
 
   if (params.result_license.empty ())
     throw xtl::format_operation_exception (METHOD_NAME, "Result license path not setted");
+
+  if (params.since_date && params.unlimited)
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't set since date for unlimited license");
+
   if (!params.since_date)
     time (&params.since_date);
-  if (!params.till_date)
+
+  if (params.till_date && params.unlimited)
+    throw xtl::format_operation_exception (METHOD_NAME, "Can't set till date for unlimited license");
+
+  if (!params.till_date && !params.unlimited)
     throw xtl::format_operation_exception (METHOD_NAME, "Incomplete license validity period specification, till date not setted");
-  if (!params.force && difftime (params.till_date, params.since_date) < 0)
+
+  if (!params.force && difftime (params.till_date, params.since_date) < 0 && !params.unlimited)
     throw xtl::format_operation_exception (METHOD_NAME, "Till date is earlier than since date");
 
   if (!params.silent && params.allowed_components.IsEmpty ())
     printf ("Warning: allowed components list is empty\n");
-  if (!params.silent && params.check_files.IsEmpty ())
+    
+  if (!params.silent && params.check_files.empty ())
     printf ("Warning: check files list is empty\n");
 
   if (!params.force)
@@ -222,9 +248,46 @@ void validate (Params& params)
 
     time (&current_time);
 
-    if (difftime (params.till_date, current_time) < 0)
+    if (!params.unlimited && difftime (params.till_date, current_time) < 0)
       throw xtl::format_operation_exception (METHOD_NAME, "Till date already passed");
   }
+}
+
+//добавление свойств на основе дерева разбора
+void add_node_properties (Params& params, ParseNode node, const char* base_name)
+{
+  const char* METHOD_NAME = "add_node_property";
+
+  for (size_t i = 0; i < IGNORED_PROPERTIES_COUNT; i++)
+    if (!xtl::xstrcmp (node.Name (), IGNORED_PROPERTIES [i]))
+      return;
+
+  for (size_t i = 0; i < UNALLOWED_PROPERTIES_COUNT; i++)
+    if (!xtl::xstrcmp (node.Name (), UNALLOWED_PROPERTIES [i]))
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't set property '%s'", node.Name ());
+
+  stl::string node_full_name = base_name;
+
+  if (!node_full_name.empty ())
+    node_full_name.append (".");
+
+  node_full_name.append (node.Name ());
+
+  if (node.AttributesCount ())
+  {
+    if (params.properties.IsPresent (node_full_name.c_str ()))
+      throw xtl::format_operation_exception (METHOD_NAME, "Duplicate property '%s'", node_full_name.c_str ());
+
+    stl::string property_value;
+
+    for (size_t i = 0, count = node.AttributesCount (); i < count; i++)
+      property_value += node.Attribute (i);
+
+    params.properties.SetProperty (node_full_name.c_str (), property_value.c_str ());
+  }
+
+  for (ParseNode child = node.First (); child; child = child.Next ())
+    add_node_properties (params, child, node_full_name.c_str ());
 }
 
 typedef xtl::shared_ptr<XmlWriter::Scope> ScopePtr;
@@ -249,13 +312,15 @@ void generate_license (Params& params)
 
   XmlWriter::Scope license_scope (writer, "License");
 
+  writer.WriteAttribute ("LicenseHash", hex_hash_string.c_str ());
+
   for (size_t i = 0, count = params.properties.Size (); i < count; i++)
   {
     StringArray property_name_components = split (params.properties.PropertyName (i), ".");
     ScopeStack  scope_stack;
 
     for (size_t j = 0, components_count = property_name_components.Size (); j < components_count - 1; j++)
-      scope_stack.push (ScopePtr (new XmlWriter::Scope (writer, property_name_components [i])));
+      scope_stack.push (ScopePtr (new XmlWriter::Scope (writer, property_name_components [j])));
 
     writer.WriteAttribute (property_name_components [property_name_components.Size () - 1], params.properties.GetString (i));
 
@@ -263,17 +328,18 @@ void generate_license (Params& params)
       scope_stack.pop ();
   }
 
-  writer.WriteAttribute ("LicenseHash", hex_hash_string.c_str ());
-
-  if (!params.check_files.IsEmpty ())
+  if (!params.check_files.empty ())
   {
     XmlWriter::Scope check_files_scope (writer, "CheckFiles");
 
-    for (size_t i = 0, count = params.check_files.Size (); i < count; i++)
+    for (size_t i = 0, count = params.check_files.size (); i < count; i++)
     {
       XmlWriter::Scope file_scope (writer, "File");
 
-      writer.WriteAttribute ("Path", params.check_files [i]);
+      writer.WriteAttribute ("Path", params.check_files [i].name);
+
+      if (params.check_files [i].max_hash_size)
+        writer.WriteAttribute ("HashSize", params.check_files [i].max_hash_size);
     }
   }
 
@@ -306,6 +372,7 @@ int main (int argc, const char *argv[])
       {xtl::bind (&command_line_till_date,          _1, xtl::ref (params)), "till-date",   't', "date",           "till date"},
       {xtl::bind (&command_line_force,              _1, xtl::ref (params)), "force",       0,   0,                "force (ignore errors)"},
       {xtl::bind (&command_line_silent,             _1, xtl::ref (params)), "silent",      0,   0,                "silent mode"},
+      {xtl::bind (&command_line_unlimited,          _1, xtl::ref (params)), "unlimited",   0,   0,                "unlimited license"},
       {xtl::bind (&command_line_help,               _1, xtl::ref (params)), "help",        '?', 0,                "print help message"},
     };
 
@@ -315,6 +382,7 @@ int main (int argc, const char *argv[])
     params.options_count = options_count;
     params.force         = false;
     params.silent        = false;
+    params.unlimited     = false;
     params.print_help    = false;
     params.since_date    = 0;
     params.till_date     = 0;
@@ -335,22 +403,74 @@ int main (int argc, const char *argv[])
       throw xtl::format_operation_exception ("", "No more than one input file allowed");
 
     if (command_line.ParamsCount ())
-      params.source_xml = command_line.Param (0);
+    {
+      const char* source_xml = command_line.Param (0);
 
-      //проверка корректности ввода
-    validate (params);
+      Parser    p (source_xml, "xml");
+      ParseLog  log = p.Log ();
+      ParseNode root = p.Root ().First ("License");
+
+      if (!root)
+        log.Error (p.Root (), "No root 'License' tag");
+
+      for (size_t i = 0; i < log.MessagesCount (); i++)
+        switch (log.MessageType (i))
+        {
+          case ParseLogMessageType_Error:
+          case ParseLogMessageType_FatalError:
+            throw xtl::format_operation_exception ("", log.Message (i));
+          default:
+            break;
+        }
+
+      const char *since_date_string = common::get<const char*> (root, "SinceDate", ""),
+                 *till_date_string  = common::get<const char*> (root, "TillDate", "");
+
+      if (xtl::xstrlen (since_date_string))
+      {
+        if (params.since_date)
+          throw xtl::format_operation_exception ("", "Since date already setted in source xml");
+
+        command_line_since_date (since_date_string, params);
+      }
+
+      if (xtl::xstrlen (till_date_string))
+      {
+        if (params.till_date)
+          throw xtl::format_operation_exception ("", "Till date already setted in source xml");
+
+        command_line_till_date (till_date_string, params);
+      }
+
+      for (Parser::NamesakeIterator component_iter = root.First ("AllowedComponents.Component"); component_iter; ++component_iter)
+        params.allowed_components.Add (common::get<const char*> (*component_iter, "Wildcard"));
+
+      for (Parser::NamesakeIterator file_iter = root.First ("CheckFiles.File"); file_iter; ++file_iter)
+        params.check_files.push_back (CheckFile (common::get<const char*> (*file_iter, "Path"), common::get<size_t> (*file_iter, "HashSize", 0)));
+
+      for (ParseNode node = root.First (); node; node = node.Next ())
+        add_node_properties (params, node, "");
+    }
 
       //Добавление данных периода действия и набора компонентов в свойства
-    stl::string since_date_string = date_to_string (params.since_date),
-                till_date_string  = date_to_string (params.till_date),
-                allowed_components_string;
+    stl::string allowed_components_string;
 
     for (size_t i = 0, count = params.allowed_components.Size (); i < count; i++)
       allowed_components_string += params.allowed_components [i];
 
-    params.properties.SetProperty ("SinceDate",         since_date_string.c_str ());
-    params.properties.SetProperty ("TillDate",          till_date_string.c_str ());
     params.properties.SetProperty ("AllowedComponents", allowed_components_string.c_str ());
+
+      //проверка корректности ввода
+    validate (params);
+
+    if (!params.unlimited)
+    {
+      stl::string since_date_string = date_to_string (params.since_date),
+                  till_date_string  = date_to_string (params.till_date);
+
+      params.properties.SetProperty ("SinceDate", since_date_string.c_str ());
+      params.properties.SetProperty ("TillDate",  till_date_string.c_str ());
+    }
 
       //Генерация лицензии
     generate_license (params);

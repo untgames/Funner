@@ -1115,19 +1115,26 @@ const char* FileSystem::GetCurrentDir ()
     Получение MD5 хэша файла
 */
 
-static void InternalGetFileHash (File& file,FileHash& hash)
+static void InternalGetFileHash (File& file,size_t max_hash_size,FileHash& hash)
 {
   char       buf [FILE_HASH_BUF_SIZE];
   Md5Context md5;
   size_t     crc32_hash = 0xFFFFFFFF;
+  
+  size_t read_size = 0;
 
-  while (!file.Eof ())
+  while (!file.Eof () && read_size < max_hash_size)
   {
-    size_t size = file.Read (buf,sizeof (buf));
+    size_t available_size = max_hash_size - read_size;
+    
+    available_size = available_size < sizeof (buf) ? available_size : sizeof (buf);
+    
+    size_t size = file.Read (buf,available_size);
 
     md5.Update (buf,size);
 
-    crc32_hash = crc32 (buf,size,crc32_hash);
+    crc32_hash  = crc32 (buf,size,crc32_hash);
+    read_size  += size;
   }
 
   md5.Finish (hash.md5);
@@ -1135,7 +1142,7 @@ static void InternalGetFileHash (File& file,FileHash& hash)
   hash.crc32 = crc32_hash;
 }
 
-void FileSystem::GetFileHash (File& file,FileHash& hash)
+void FileSystem::GetFileHash (File& file,size_t max_hash_size,FileHash& hash)
 {
   if (!file.CanRead ())
     throw xtl::format_not_supported_exception ("common::FileSystem::GetFileHash","Unable to compute FileHash. Reason: file can't be read");
@@ -1149,7 +1156,7 @@ void FileSystem::GetFileHash (File& file,FileHash& hash)
 
     file.Seek (0);
 
-    InternalGetFileHash (file,hash);
+    InternalGetFileHash (file,max_hash_size,hash);
 
     file.Seek (current_position);
   }
@@ -1158,13 +1165,18 @@ void FileSystem::GetFileHash (File& file,FileHash& hash)
     if (!file.CanRewind ())
       throw xtl::format_not_supported_exception ("common::FileSystem::GetFileHash","Can't compute FileHash. Reason: file can't be rewind");
 
-    InternalGetFileHash (file,hash);
+    InternalGetFileHash (file,max_hash_size,hash);
 
     file.Rewind ();
   }
 }
 
-void FileSystem::GetFileHash (const char* file_name,FileHash& hash)
+void FileSystem::GetFileHash (File& file,FileHash& hash)
+{
+  GetFileHash (file,~0u,hash);
+}
+
+void FileSystem::GetFileHash (const char* file_name,size_t max_hash_size,FileHash& hash)
 {
   if (!file_name)
     throw xtl::make_null_argument_exception ("common::FileSystem::GetFileHash","file_name");
@@ -1173,13 +1185,18 @@ void FileSystem::GetFileHash (const char* file_name,FileHash& hash)
   {
     InputFile file (file_name);
 
-    InternalGetFileHash (file,hash);
+    InternalGetFileHash (file,~0u,hash);
   }
   catch (xtl::exception& exception)
   {
     exception.touch ("common::FileSystem::GetFileHash");
     throw;
   }
+}
+
+void FileSystem::GetFileHash (const char* file_name,FileHash& hash)
+{
+  GetFileHash(file_name,~0u,hash);
 }
 
 /*

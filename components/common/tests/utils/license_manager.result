@@ -23,3 +23,7 @@ Loading license 'data/check_files_license.xml'
 Component 'common.zip_file_system' allowed: yes
 Component 'media.video.loaders.theora' allowed: yes
 Component 'media.font.savers.xfont' allowed: no
+Loading license 'data/unlimited_license.xml'
+Component 'common.zip_file_system' allowed: yes
+Component 'media.video.loaders.theora' allowed: yes
+Component 'media.font.savers.xfont' allowed: yes

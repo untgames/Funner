@@ -37,7 +37,7 @@ const char* ACTION_QUEUE_LISTENERS_COMPONENT_MASK = "common.action_queue.*"; //м
 struct ActionImpl: public xtl::reference_counter, public Lockable
 {
   ActionQueue::ActionHandler  action_handler; //обработчик выполнения действия
-  Action::WaitCompleteHandler wait_handler;   //обработчик ожидания выполнения операции  
+  Action::WaitCompleteHandler wait_handler;   //обработчик ожидания выполнения операции
   ActionThread                thread_type;    //тип нити
   Timer                       timer;          //таймер, связанный с действием
   ActionQueue::time_t         next_time;      //время следующего выполнения действия
@@ -570,19 +570,31 @@ void Action::Perform ()
 {
   try
   {
+    xtl::intrusive_ptr<ActionImpl> impl_holder;
+
+    ActionQueue::ActionHandler handler;
+
+    {
+      ActionLock locked_impl (impl);
+
+      if (!impl)
+        return;
+
+      if (impl->is_completed)
+        throw xtl::format_operation_exception ("", "Action already completed");
+
+      if (impl->is_canceled)
+        throw xtl::format_operation_exception ("", "Action already canceled");
+
+      handler = impl->action_handler;
+
+      impl_holder = impl;
+    }
+
+    handler (*this);
+
     ActionLock locked_impl (impl);
     
-    if (!impl)
-      return;
-
-    if (impl->is_completed)
-      throw xtl::format_operation_exception ("", "Action already completed");
-
-    if (impl->is_canceled)
-      throw xtl::format_operation_exception ("", "Action already canceled");
-
-    impl->action_handler (*this);
-
     if (!impl->is_periodic)
       impl->is_completed = true;
   }

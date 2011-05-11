@@ -1,4 +1,5 @@
 #include <time.h>
+#include <stdio.h>
 
 #include <platform/platform.h>
 
@@ -6,7 +7,7 @@ using namespace common;
 
 size_t UnistdPlatform::GetMilliseconds ()
 {
-#if defined (BEAGLEBOARD) || defined (__APPLE__)
+#if defined (BEAGLEBOARD) || defined (__APPLE__) || defined (ANDROID) || defined (MEEGO)
   return DefaultPlatform::GetMilliseconds ();  
 
 #else

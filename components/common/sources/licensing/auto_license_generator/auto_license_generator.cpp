@@ -42,7 +42,7 @@ void load_license ()
   properties.SetProperty ("TillDate", till_date_string.c_str ());
   properties.SetProperty ("AllowedComponents", ALLOWED_COMPONENT);
 
-  calculate_license_hash (StringArray (), properties, license_hash);
+  calculate_license_hash (stl::vector<CheckFile> (), properties, license_hash);
 
   stl::string license_hash_string;
 

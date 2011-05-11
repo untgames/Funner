@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<License SinceDate="2010-08-17" TillDate="2020-07-17" LicenseHash="f6979a9d989e90c05a87bd33fa1fd507">
+<License LicenseHash="011626693bb88a4244e6b56b218e3983" SinceDate="2010-08-16" TillDate="2020-07-16">
   <CheckFiles>
-    <File Path="data/valid_license.xml"/>
+    <File Path="data/valid_license.xml" HashSize="64"/>
     <File Path="data/invalid_license.xml"/>
   </CheckFiles>
   <AllowedComponents>

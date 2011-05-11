@@ -1,8 +1,8 @@
 /*
-    Блокировка в пределах блока    
+    Блокировка в пределах блока
 */
 
-inline Lock::Lock (Lockable& in_lockable)
+inline Lock::Lock (const Lockable& in_lockable)
   : lockable (in_lockable)
 {
   lockable.Lock ();

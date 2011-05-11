@@ -26,20 +26,21 @@ bool property_desc_compare (LicensePropertyDescPtr property1, LicensePropertyDes
 namespace common
 {
 
-void calculate_license_hash (const StringArray& check_files_list, const PropertyMap& properties, unsigned char hash [16])
+void calculate_license_hash (const stl::vector<CheckFile>& check_files_list, const PropertyMap& properties, unsigned char hash [16])
 {
   try
   {
     //проверка корректности содержимого лицензии
     stl::string check_string;
 
-    for (size_t i = 0, count = check_files_list.Size (); i < count; i++)
+    for (stl::vector<CheckFile>::const_iterator iter=check_files_list.begin (), end=check_files_list.end (); iter!=end; ++iter)
     {
       FileHash file_hash;
 
-      FileSystem::GetFileHash (check_files_list [i], file_hash);
+      FileSystem::GetFileHash (iter->name.c_str (), iter->max_hash_size ? iter->max_hash_size : ~0u, file_hash);
 
-      check_string += check_files_list [i];
+      check_string += iter->name;
+      check_string += common::format ("%u", iter->max_hash_size);
 
       check_string.append ((const char*)file_hash.md5, sizeof (file_hash.md5));
     }
