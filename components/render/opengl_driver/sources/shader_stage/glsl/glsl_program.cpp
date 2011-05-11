@@ -60,7 +60,7 @@ GlslProgram::GlslProgram (const ContextManager& manager, size_t shaders_count, I
     stl::string log_buffer;
 
     GetProgramLog (log_buffer);
-    error_log     (log_buffer.c_str ());
+    error_log     (common::format ("linker: %s", log_buffer.c_str ()).c_str ());
 
       //проверка состояния программы
 

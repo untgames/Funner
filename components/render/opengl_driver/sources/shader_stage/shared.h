@@ -10,6 +10,8 @@
 #include <xtl/uninitialized_storage.h>
 #include <xtl/common_exceptions.h>
 
+#include <common/strlib.h>
+
 #include <render/low_level/utils.h>
 
 #include <shared/shader_stage.h>

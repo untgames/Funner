@@ -79,7 +79,8 @@ GlslShader::GlslShader (const ContextManager& manager, GLenum type, const Shader
       if (getted_log_size)
         log_buffer.resize (getted_log_size - 1);
 
-      error_log (log_buffer.c_str ());
+      if (desc.name) error_log (common::format ("%s: %s", desc.name, log_buffer.c_str ()).c_str ());
+      else           error_log (log_buffer.c_str ());
     }
 
       //проверка состояния OpenGL
