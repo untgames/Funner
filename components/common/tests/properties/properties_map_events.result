@@ -1,0 +1,28 @@
+Results of properties_map_events_test:
+set property 'X'
+updated map has 1 properties (hash=d41b705a, layout_hash=db91bc52):
+ #0: name='X', type=string, value='1'
+set property 'Y'
+updated map has 2 properties (hash=a78e4578, layout_hash=2dee8aff):
+ #0: name='X', type=string, value='1'
+ #1: name='Y', type=string, value='3.14'
+set property 'Z'
+updated map has 3 properties (hash=e5aeb685, layout_hash=59761f01):
+ #0: name='X', type=string, value='1'
+ #1: name='Y', type=string, value='3.14'
+ #2: name='Z', type=string, value='hello world'
+remove property 'Y'
+updated map has 2 properties (hash=d7f47097, layout_hash=464f5a08):
+ #0: name='X', type=string, value='1'
+ #1: name='Z', type=string, value='hello world'
+change layout type
+rename property 'Z' to 'NewZ'
+updated map has 2 properties (hash=52dc2498, layout_hash=5426de09):
+ #0: name='X', type=string, value='1'
+ #1: name='NewZ', type=string, value='hello world'
+change property 'X' type
+updated map has 2 properties (hash=eae53dd8, layout_hash=6ce3d31c):
+ #0: name='X', type=float, value='1'
+ #1: name='NewZ', type=string, value='hello world'
+clear properties
+updated map has 0 properties (hash=ffffffff, layout_hash=ffffffff):
