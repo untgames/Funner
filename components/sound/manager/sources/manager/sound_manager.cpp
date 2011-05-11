@@ -45,6 +45,7 @@ SeekMode get_seek_mode (bool looping)
 }
 
 typedef stl::list<SoundDeclarationLibrary> SoundDeclarationLibraryList;
+typedef xtl::com_ptr<ISample>              SamplePtr;
 
 }
 
@@ -59,7 +60,8 @@ struct SoundManagerEmitter
   size_t           play_start_time;              //время начала проигрывания
   bool             is_playing;                   //статус проигрывания
   SoundDeclaration sound_declaration;            //описание звука
-  SoundSample      sound_sample;                 //звуковой сэмпл (используется для определения длительности звука)
+  SamplePtr        sound_sample;                 //сэмпл звука
+  double           duration;                     //длительность звука
   float            sound_declaration_gain;       //громкость, заданная в описании звука (установка громкости производится относительно этого значения)
   bool             sample_chosen;                //эммитер ещё не проигрывался
   Source           source;                       //излучатель звука
@@ -214,7 +216,13 @@ struct SoundManager::Impl : public xtl::trackable
       {
         manager_emitter->sample_index = emitter.SampleIndex ();
 
-        manager_emitter->sound_sample.Load (manager_emitter->sound_declaration.Sample (manager_emitter->sample_index % manager_emitter->sound_declaration.SamplesCount ()));
+        manager_emitter->sound_sample = SamplePtr (device->CreateSample (manager_emitter->sound_declaration.Sample (manager_emitter->sample_index % manager_emitter->sound_declaration.SamplesCount ())), false);
+
+        SampleDesc sample_desc;
+
+        manager_emitter->sound_sample->GetDesc (sample_desc);
+
+        manager_emitter->duration = sample_desc.samples_count / (double)sample_desc.frequency;
 
         manager_emitter->sample_chosen = true;
       }
@@ -231,7 +239,10 @@ struct SoundManager::Impl : public xtl::trackable
           manager_emitter->channel_number = channel_to_use;
         }
         else
+        {
+          log.Printf ("Can't play sound %s, no free channels", manager_emitter->sound_sample->GetName ());
           manager_emitter->channel_number = -1;
+        }
       }
 
       manager_emitter->play_start_time = milliseconds ();
@@ -243,7 +254,7 @@ struct SoundManager::Impl : public xtl::trackable
       if (manager_emitter->channel_number != -1)
       {
         device->Stop (manager_emitter->channel_number);
-        device->SetSample (manager_emitter->channel_number, manager_emitter->sound_sample);
+        device->SetSample (manager_emitter->channel_number, manager_emitter->sound_sample.get ());
         device->SetSource (manager_emitter->channel_number, manager_emitter->source);
         device->Seek (manager_emitter->channel_number, manager_emitter->cur_position, get_seek_mode (manager_emitter->sound_declaration.Looping ()));
         device->Play (manager_emitter->channel_number, manager_emitter->sound_declaration.Looping ());
@@ -275,9 +286,9 @@ struct SoundManager::Impl : public xtl::trackable
       float offset = (milliseconds () - emitter_iter->second->play_start_time) / 1000.f + emitter_iter->second->cur_position;
 
       if (emitter_iter->second->sound_declaration.Looping ())
-        emitter_iter->second->cur_position = fmod (offset, (float)emitter_iter->second->sound_sample.Duration ());
+        emitter_iter->second->cur_position = fmod (offset, (float)emitter_iter->second->duration);
       else
-        emitter_iter->second->cur_position = offset < emitter_iter->second->sound_sample.Duration () ? offset : 0.0f;
+        emitter_iter->second->cur_position = offset < emitter_iter->second->duration ? offset : 0.0f;
 
       StopPlaying (emitter_iter);
     }
@@ -324,8 +335,8 @@ struct SoundManager::Impl : public xtl::trackable
     {
       float offset = (milliseconds () - emitter_iter->second->play_start_time) / 1000.f + emitter_iter->second->cur_position;
 
-      if (emitter_iter->second->sound_declaration.Looping ()) return fmod (offset, (float)emitter_iter->second->sound_sample.Duration ());
-      else                                                    return offset < emitter_iter->second->sound_sample.Duration () ? offset : 0.0f;
+      if (emitter_iter->second->sound_declaration.Looping ()) return fmod (offset, (float)emitter_iter->second->duration);
+      else                                                    return offset < emitter_iter->second->duration ? offset : 0.0f;
     }
     else
       return emitter_iter->second->cur_position;
@@ -338,7 +349,7 @@ struct SoundManager::Impl : public xtl::trackable
     if (emitter_iter == emitters.end ())
       return 0.f;
 
-    return (float)emitter_iter->second->sound_sample.Duration ();
+    return (float)emitter_iter->second->duration;
   }
 
   bool IsLooping (Emitter& emitter) const

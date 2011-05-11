@@ -140,55 +140,70 @@ void OpenALSource::SetSource (const Source& in_source)
    Установка текущего проигрываемого звука
 */
 
-void OpenALSource::SetSample (const media::SoundSample& sample)
+void OpenALSource::SetSample (OpenALSample* sample)
 {
   static const char* METHOD_NAME = "sound::low_level::OpenALSource::SetSample";
 
-  if (!sample.SizeInBytes ())
-  {
-    sound_sample = sample;
+  if (sample == sound_sample)
     return;
-  }
 
-  try
+  if (!sample)
   {
-    if (sample.Frequency () > MAX_SOUND_SAMPLE_RATE)
-      throw xtl::format_not_supported_exception (METHOD_NAME, "Sound sample '%s' has unsupported sample rate=%u. Maximum supported sample rate is %u",
-                         sample.Name (), sample.Frequency (), MAX_SOUND_SAMPLE_RATE);
+    Stop ();
 
-    if (sample.BitsPerSample () != 16)
-      throw xtl::format_not_supported_exception (METHOD_NAME, "Sound sample '%s' has unsupported bits_per_sample=%u",
-                         sample.Name (), sample.BitsPerSample ());
+    sound_sample_decoder = 0;
+    sound_sample         = 0;
+  }
+  else
+  {
+    SampleDesc sample_desc;
 
-    switch (sample.Channels ())
+    sample->GetDesc (sample_desc);
+
+    if (!sample_desc.samples_count)
+      return;
+
+    try
     {
-      case 1:
-      case 2:
-        break;
-      default:
-        throw xtl::format_not_supported_exception (METHOD_NAME, "Sound sample '%s' has unsupported channels_count=%u", sample.Name (), sample.Channels ());
-        break;
+      if (sample_desc.frequency > MAX_SOUND_SAMPLE_RATE)
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Sound sample '%s' has unsupported sample rate=%u. Maximum supported sample rate is %u",
+                           sample->GetName (), sample_desc.frequency, MAX_SOUND_SAMPLE_RATE);
+
+      if (sample_desc.bits_per_sample != 16)
+        throw xtl::format_not_supported_exception (METHOD_NAME, "Sound sample '%s' has unsupported bits_per_sample=%u",
+                           sample->GetName (), sample_desc.bits_per_sample);
+
+      switch (sample_desc.channels)
+      {
+        case 1:
+        case 2:
+          break;
+        default:
+          throw xtl::format_not_supported_exception (METHOD_NAME, "Sound sample '%s' has unsupported channels_count=%u", sample->GetName (), sample_desc.channels);
+          break;
+      }
+
+      sound_sample_decoder = SampleDecoderPtr (sample->CreateDecoder (), false);
+      sound_sample         = sample;
+
+      UpdateSampleNotify ();
     }
-
-    sound_sample = sample;
-
-    UpdateSampleNotify ();
-  }
-  catch (std::exception&)
-  {
-    Stop ();
-    throw;
-  }
-  catch (...)
-  {
-    Stop ();
-    throw;
+    catch (std::exception&)
+    {
+      Stop ();
+      throw;
+    }
+    catch (...)
+    {
+      Stop ();
+      throw;
+    }
   }
 }
 
-const media::SoundSample& OpenALSource::GetSample () const
+OpenALSample* OpenALSource::GetSample () const
 {
-  return sound_sample;
+  return sound_sample.get ();
 }
 
 /*
@@ -206,9 +221,9 @@ size_t OpenALSource::TellInMilliseconds () const
 
 void OpenALSource::Play (bool looping)
 {
-  if (!sound_sample.SizeInBytes ())
+  if (!sound_sample || !sound_sample->SamplesCount ())
   {
-    log.Printf ("Warning: can't play, empty sound sample '%s'", sound_sample.Name ());
+    log.Printf ("Warning: can't play, empty sound sample '%s'", sound_sample->GetName ());
     return;
   }
 
@@ -249,8 +264,11 @@ void OpenALSource::Stop ()
 
 float OpenALSource::Tell () const
 {
+  if (!sound_sample || !sound_sample->SamplesCount ())
+    throw xtl::format_operation_exception ("sound::low_level::openal::OpenALSource::Tell", "Empty sound sample");
+
   float offset   = float (TellInMilliseconds ()) / 1000.f,
-        duration = (float)sound_sample.Duration ();
+        duration = (float)sound_sample->Duration ();
 
   if (is_looped) return fmod (offset, duration);
   else           return offset < duration ? offset : 0.0f;
@@ -258,7 +276,12 @@ float OpenALSource::Tell () const
 
 void OpenALSource::Seek (float offset, SeekMode seek_mode)
 {
-  float duration = (float)sound_sample.Duration ();
+  static const char* METHOD_NAME = "sound::low_level::openal::OpenALSource::Seek";
+
+  if (!sound_sample || !sound_sample->SamplesCount ())
+    throw xtl::format_operation_exception (METHOD_NAME, "Empty sound sample");
+
+  float duration = (float)sound_sample->Duration ();
 
   if (offset < 0) offset = 0.0f;
 
@@ -272,7 +295,7 @@ void OpenALSource::Seek (float offset, SeekMode seek_mode)
         offset = fmod (offset, duration);
         break;
       default:
-        throw xtl::make_argument_exception ("sound::low_level::OpenALDevice::Seek", "seek_mode", seek_mode);
+        throw xtl::make_argument_exception (METHOD_NAME, "seek_mode", seek_mode);
     }
 
   play_time_start  = milliseconds ();
@@ -290,7 +313,7 @@ bool OpenALSource::IsPlaying () const
     return true;
 
   float offset   = float (TellInMilliseconds ()) / 1000.f,
-        duration = (float)sound_sample.Duration ();
+        duration = (float)sound_sample->Duration ();
 
   return offset < duration;
 }
@@ -301,7 +324,10 @@ bool OpenALSource::IsPlaying () const
 
 void OpenALSource::FillBuffer (ALuint al_buffer)
 {
-  size_t max_samples_count       = sound_sample.BytesToSamples (device.GetSampleBufferSize ()),
+  if (!sound_sample)
+    throw xtl::format_operation_exception ("sound::low_level::openal::OpenALSource::FillBuffer", "Can't fill buffer, empty sound sample");
+
+  size_t max_samples_count       = sound_sample->BytesToSamples (device.GetSampleBufferSize ()),
          available_samples_count = max_samples_count;
   char*  buffer                  = (char*)device.GetSampleBuffer ();
 
@@ -309,22 +335,22 @@ void OpenALSource::FillBuffer (ALuint al_buffer)
   {
     while (available_samples_count)
     {
-      if (play_sample_position == sound_sample.SamplesCount ())
+      if (play_sample_position == sound_sample->SamplesCount ())
         play_sample_position = 0;
 
-      size_t samples_count = sound_sample.Read (play_sample_position, available_samples_count, buffer);
+      size_t samples_count = sound_sample_decoder->Read (play_sample_position, available_samples_count, buffer);
 
       if (!samples_count)
         break;
 
       available_samples_count -= samples_count;
-      buffer                  += sound_sample.SamplesToBytes (samples_count);
+      buffer                  += sound_sample->SamplesToBytes (samples_count);
       play_sample_position    += samples_count;
     }
   }
   else
   {
-    size_t samples_count     = sound_sample.Read (play_sample_position, available_samples_count, buffer);
+    size_t samples_count     = sound_sample_decoder->Read (play_sample_position, available_samples_count, buffer);
     available_samples_count -= samples_count;
     play_sample_position    += samples_count;
   }
@@ -334,14 +360,14 @@ void OpenALSource::FillBuffer (ALuint al_buffer)
   if (!readed_samples_count)
     return;
 
-  ALenum format = sound_sample.Channels () == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
+  ALenum format = sound_sample->Channels () == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
 
   OpenALContext& context = device.Context ();
 
   context.MakeCurrent ();
 
-  context.alBufferData (al_buffer, format, device.GetSampleBuffer (), sound_sample.SamplesToBytes (readed_samples_count),
-                        sound_sample.Frequency ());
+  context.alBufferData (al_buffer, format, device.GetSampleBuffer (), sound_sample->SamplesToBytes (readed_samples_count),
+                        sound_sample->Frequency ());
   context.alSourceQueueBuffers (al_source, 1, &al_buffer);
 }
 
@@ -450,7 +476,7 @@ void OpenALSource::BufferUpdate ()
       if (queued_buffers_count)
         context.alSourceUnqueueBuffers (al_source, queued_buffers_count, queued_buffers);
 
-      play_sample_position = sound_sample.SecondsToSamples (Tell ());
+      play_sample_position = sound_sample ? sound_sample->SecondsToSamples (Tell ()) : 0;
 
       if (is_playing)
       {
@@ -458,7 +484,8 @@ void OpenALSource::BufferUpdate ()
         context.alSourcePlay (al_source);
       }
     }
-    else FillBuffers ();
+    else
+      FillBuffers ();
   }
   catch (std::exception& exception)
   {
