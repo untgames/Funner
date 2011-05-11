@@ -79,8 +79,8 @@ class ShaderLibrary
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (const char* message)> LogHandler;
 
-    void Load (const char* file_mask);
-    void Load (const char* file_mask, const LogHandler& log_handler);
+    void Load (const char* file_mask, const char* name_prefix = "");
+    void Load (const char* file_mask, const char* name_prefix, const LogHandler& log_handler);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Ξαμεν

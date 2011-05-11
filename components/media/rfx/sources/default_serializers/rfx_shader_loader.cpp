@@ -27,7 +27,6 @@ class DefaultShaderLoader
       
         FileSystem::LoadTextFile (name, content);
       
-        shader.SetName       (name);
         shader.SetProfile    (profile);
         shader.SetSourceCode (content.c_str (), content.size ());        
       }

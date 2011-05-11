@@ -10,7 +10,7 @@ int main ()
   {
     ShaderLibrary library;
     
-    library.Load (LIBRARY_PATH);
+    library.Load (LIBRARY_PATH, "my.");
     
     for (ShaderLibrary::Iterator iter=library.CreateIterator (); iter; ++iter)
       dump (*iter, library.ItemId (iter));

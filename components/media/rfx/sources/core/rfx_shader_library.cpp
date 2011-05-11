@@ -229,12 +229,15 @@ void ShaderLibrary::Clear ()
     Загрузка
 */
 
-void ShaderLibrary::Load (const char* file_mask, const LogHandler& log_handler)
+void ShaderLibrary::Load (const char* file_mask, const char* name_prefix, const LogHandler& log_handler)
 {
   try
   {
     if (!file_mask)
       throw xtl::make_null_argument_exception ("", "file_mask");
+      
+    if (!name_prefix)
+      throw xtl::make_null_argument_exception ("", "name_prefix");
     
     static ComponentLoader loader ("media.rfx.shader.loaders.*");
     
@@ -250,9 +253,9 @@ void ShaderLibrary::Load (const char* file_mask, const LogHandler& log_handler)
         
         ShaderManager::GetLoader (file_item.name, common::SerializerFindMode_ByName)(file_item.name, shader);
         
-        shader.SetName (common::basename (common::notdir (file_item.name)).c_str ());
+        shader.SetName (file_item.name);
    
-        Attach (shader.Name (), shader);
+        Attach ((name_prefix + common::basename (common::notdir (file_item.name))).c_str (), shader);
       }
       catch (std::exception& e)
       {
@@ -300,9 +303,9 @@ struct DefaultLoadLogger
 
 }
 
-void ShaderLibrary::Load (const char* file_mask)
+void ShaderLibrary::Load (const char* file_mask, const char* name_prefix)
 {
-  Load (file_mask, DefaultLoadLogger ());
+  Load (file_mask, name_prefix, DefaultLoadLogger ());
 }
 
 /*

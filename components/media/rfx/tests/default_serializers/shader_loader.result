@@ -1,6 +1,6 @@
 Results of shader_loader_test:
 shader:
-  id='data/shaders/bumpslc.frag'
+  id='my.bumpslc'
   name='data/shaders/bumpslc.frag'
   profile='glsl.ps'
   source_length=3227
@@ -137,7 +137,7 @@ void main (void)
 }
 
 shader:
-  id='data/shaders/bumpslc.vert'
+  id='my.bumpslc'
   name='data/shaders/bumpslc.vert'
   profile='glsl.vs'
   source_length=1491
@@ -209,7 +209,7 @@ void main(void)
 }                
 
 shader:
-  id='data/shaders/water_shader.ffp'
+  id='my.water_shader'
   name='data/shaders/water_shader.ffp'
   profile='ffp'
   source_length=502
