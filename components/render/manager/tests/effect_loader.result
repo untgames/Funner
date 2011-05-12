@@ -5,7 +5,6 @@ render.manager: ...device manager and swap chain have been successfully created
 render.manager: Initialize render targets for swap chain
 render.manager: ...render targets for swap chain created
 window 784x562 added
-window resize 784x562
 render.manager: Effect blend state 'solid' loaded
 render.manager: Effect blend state 'transparent' loaded
 render.manager: Effect blend state 'additive' loaded

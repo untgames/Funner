@@ -38,7 +38,24 @@ LowLevelInputLayoutPtr InputLayoutManager::CreateInputLayout (const render::low_
 {
   try
   {
-    size_t hash = common::crc32 (&desc, sizeof (desc));
+    size_t hash = common::crc32 (&desc.vertex_attributes [0], sizeof (render::low_level::VertexAttribute) * desc.vertex_attributes_count);
+    
+    struct HashDesc
+    {
+      size_t vertex_attributes_count;
+      int    index_type;
+      size_t index_buffer_offset;
+    };
+    
+    HashDesc hash_desc;
+    
+    memset (&hash_desc, 0, sizeof (hash_desc));
+    
+    hash_desc.vertex_attributes_count = desc.vertex_attributes_count;
+    hash_desc.index_type              = desc.index_type;
+    hash_desc.index_buffer_offset     = desc.index_buffer_offset;
+    
+    hash = common::crc32 (&hash_desc, sizeof (hash_desc), hash);
     
     InputLayoutMap::iterator iter = impl->layouts.find (hash);
     

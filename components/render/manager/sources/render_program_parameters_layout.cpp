@@ -101,12 +101,15 @@ struct ProgramParametersLayout::Impl: public CacheHolder
 
         new_parameters.insert (new_parameters.end (), layout_desc.parameters, layout_desc.parameters + layout_desc.parameters_count);
       }            
+      
+      size_t new_hash = 0xffffffff;
 
       for (int i=0; i<ProgramParametersSlot_Num; i++)
       {
         const common::PropertyLayout& layout = slots [i].layout;
 
         slots [i].layout_hash = layout.Hash ();        
+        new_hash              = common::crc32 (&slots [i].layout_hash, sizeof (size_t), new_hash);
 
         if (!layout.Size ())
           continue;
@@ -161,7 +164,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder
 
         //נאסק¸ע ץ‎רא
 
-      hash = common::crc32 (&new_parameters [0], new_parameters.size () * sizeof (render::low_level::ProgramParameter));
+      hash = new_hash;
     }
     else
     {

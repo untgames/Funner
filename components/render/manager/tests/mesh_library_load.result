@@ -1,5 +1,27 @@
 Results of mesh_library_load_test:
+render.manager: Creating render window
+render.manager: Create device manager (driver='*', adapter='*', init_string='')
+render.manager: ...device manager and swap chain have been successfully created
+render.manager: Initialize render targets for swap chain
+render.manager: ...render targets for swap chain created
 window 784x562 added
-window resize 784x562
+render.manager.debug: Create input layout:
+render.manager.debug: ...index type: InputDataType_UInt
+render.manager.debug: ...index buffer offset: 0
+render.manager.debug: ...4 vertex attributes:
+render.manager.debug: ......semantic=VertexAttributeSemantic_Position, type=float3, slot=0, offset=0, stride=36
+render.manager.debug: ......semantic=VertexAttributeSemantic_Normal, type=float3, slot=0, offset=12, stride=36
+render.manager.debug: ......semantic=VertexAttributeSemantic_Color, type=ubyte4, slot=0, offset=24, stride=36
+render.manager.debug: ......semantic=VertexAttributeSemantic_TexCoord0, type=float2, slot=0, offset=28, stride=36
+render.manager.debug: ...layout created (hash=69c8efc8)
+render.manager.debug: Create input layout:
+render.manager.debug: ...index type: InputDataType_UShort
+render.manager.debug: ...index buffer offset: 0
+render.manager.debug: ...4 vertex attributes:
+render.manager.debug: ......semantic=VertexAttributeSemantic_Position, type=float3, slot=0, offset=0, stride=36
+render.manager.debug: ......semantic=VertexAttributeSemantic_Normal, type=float3, slot=0, offset=12, stride=36
+render.manager.debug: ......semantic=VertexAttributeSemantic_Color, type=ubyte4, slot=0, offset=24, stride=36
+render.manager.debug: ......semantic=VertexAttributeSemantic_TexCoord0, type=float2, slot=0, offset=28, stride=36
+render.manager.debug: ...layout created (hash=afa7e64f)
 Mesh library loaded (1 meshes in primitive 'mesh2')
 window 784x562 removed

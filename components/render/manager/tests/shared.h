@@ -54,7 +54,7 @@ class Test: private xtl::trackable, private TestLogFilter
       , render_window (CreateRenderWindow ())
     {    
       window.SetTitle (title);
-      window.Show ();
+//      window.Show ();
       
       connect_tracker (window.RegisterEventHandler (syslib::WindowEvent_OnClose, xtl::bind (&Test::OnWindowClose, this)));
     }
