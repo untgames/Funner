@@ -41,7 +41,7 @@ struct PropertyLayout::Impl: public xtl::reference_counter, public xtl::trackabl
 ///Конструктор копирования
   Impl (const Impl& impl)
     : properties (impl.properties)
-    , names (impl.names)
+    , names (impl.names.Clone ())
     , buffer_size (impl.buffer_size)
     , hash (0)
     , need_update (true)
