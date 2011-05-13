@@ -40,6 +40,20 @@ void Material::Update (const media::rfx::Material& material)
   impl->Update (material);
 }
 
+/*
+    Управление кэшированием
+*/
+
+void Material::UpdateCache ()
+{
+  impl->UpdateCache ();
+}
+
+void Material::ResetCache ()
+{
+  impl->ResetCache ();
+}
+
 void Material::Swap (Material& material)
 {
   stl::swap (impl, material.impl);

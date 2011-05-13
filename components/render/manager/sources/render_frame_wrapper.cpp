@@ -212,6 +212,20 @@ void Frame::Draw ()
   impl->Draw ();
 }
 
+/*
+    Управление кэшированием
+*/
+
+void Frame::UpdateCache ()
+{
+  impl->UpdateCache ();
+}
+
+void Frame::ResetCache ()
+{
+  impl->ResetCache ();
+}
+
 void Frame::Swap (Frame& frame)
 {
   stl::swap (impl, frame.impl);

@@ -112,6 +112,10 @@ class EntityLodCommonData: public CacheHolder
 
       return state.parameters_layout;
     }
+    
+///Управление кэшированием
+    using CacheHolder::UpdateCache;
+    using CacheHolder::ResetCache;
 
   protected:
     void FlushUnusedMaterials ()
@@ -659,4 +663,18 @@ const RendererOperationList& EntityImpl::RendererOperations (size_t level_of_det
     e.touch ("render::EntityImpl::RendererOperations");
     throw;
   }
+}
+
+/*
+    Управление кэшированием
+*/
+
+void EntityImpl::UpdateCache ()
+{
+  impl->UpdateCache ();
+}
+
+void EntityImpl::ResetCache ()
+{
+  impl->ResetCache ();
 }

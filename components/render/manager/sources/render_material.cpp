@@ -86,10 +86,11 @@ struct MaterialImpl::Impl: public CacheHolder
   PropertyBuffer             properties;           //свойства материала
   ProgramParametersLayoutPtr properties_layout;    //расположение свойств материала
   TexmapArray                texmaps;              //текстурные карты
-  bool                       has_dynamic_textures; //есть ли в материале динамические текстуры
+  bool                       has_dynamic_textures; //есть ли в материале динамические текстуры  
   LowLevelProgramPtr         cached_program;       //закэшированная программа
   LowLevelBufferPtr          cached_properties;    //закэшированный буфер констант
   LowLevelStateBlockPtr      cached_state_block;   //закэшированный блок состояний
+  DebugLog                   debug_log;            //протокол отладочных сообщений
   
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ShadingManagerPtr& in_shading_manager)
@@ -106,6 +107,8 @@ struct MaterialImpl::Impl: public CacheHolder
 ///Работа с кэшем
   void ResetCacheCore ()
   {
+    debug_log.Printf ("Reset cache for material '%s'", id.c_str ());
+    
     cached_program    = LowLevelProgramPtr ();
     cached_properties = LowLevelBufferPtr ();
   }
@@ -114,6 +117,8 @@ struct MaterialImpl::Impl: public CacheHolder
   {
     try
     {
+      debug_log.Printf ("Update cache for material '%s'", id.c_str ());      
+      
       cached_program    = program.Resource ();
       cached_properties = properties.Buffer ();
       
@@ -134,7 +139,7 @@ struct MaterialImpl::Impl: public CacheHolder
         for (size_t i=0, count=stl::min (texmaps.size (), DEVICE_SAMPLER_SLOTS_COUNT); i<count; i++)
         {
           Texmap& texmap = *texmaps [i];
-            
+          
           texmap.UpdateCache ();
 
           if (texmap.cached_device_texture)
@@ -153,6 +158,8 @@ struct MaterialImpl::Impl: public CacheHolder
       }
       
       cached_state_block->Capture ();
+      
+      debug_log.Printf ("...cached updated");
     }
     catch (xtl::exception& e)
     {
@@ -162,6 +169,7 @@ struct MaterialImpl::Impl: public CacheHolder
   }
   
   using CacheHolder::UpdateCache;  
+  using CacheHolder::ResetCache;
 };
 
 /*
@@ -339,7 +347,7 @@ void MaterialImpl::Update (const media::rfx::Material& material)
     impl->cached_state_block   = LowLevelStateBlockPtr ();
     impl->has_dynamic_textures = new_has_dynamic_textures;
     
-    Invalidate ();
+    ResetCache ();
   }
   catch (xtl::exception& e)
   {
@@ -355,4 +363,22 @@ void MaterialImpl::Update (const media::rfx::Material& material)
 ProgramParametersLayoutPtr MaterialImpl::ParametersLayout ()
 {
   return impl->properties_layout;
+}
+
+/*
+    Управление кэшированием
+*/
+
+void MaterialImpl::UpdateCache ()
+{
+  CacheSource::UpdateCache ();
+
+  impl->UpdateCache ();
+}
+
+void MaterialImpl::ResetCache ()
+{
+  CacheSource::ResetCache ();
+
+  impl->ResetCache ();
 }

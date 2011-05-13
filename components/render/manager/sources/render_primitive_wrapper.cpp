@@ -120,6 +120,20 @@ void Primitive::ReserveSprites (size_t sprites_count)
   impl->ReserveSprites (sprites_count);
 }
 
+/*
+    Управление кэшированием
+*/
+
+void Primitive::UpdateCache ()
+{
+  impl->UpdateCache ();
+}
+
+void Primitive::ResetCache ()
+{
+  impl->ResetCache ();
+}
+
 void Primitive::Swap (Primitive& primitive)
 {
   stl::swap (impl, primitive.impl);

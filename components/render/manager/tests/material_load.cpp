@@ -4,7 +4,7 @@ const char* LIBRARY_NAME = "data/test.xmtl";
 
 int main ()
 {
-  printf ("Results of material1_test:\n");
+  printf ("Results of material_load_test:\n");
   
   try
   {

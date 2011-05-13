@@ -67,7 +67,7 @@ template <class Ptr> struct ResourceProxyImpl: public xtl::reference_counter, pu
   {
   }
   
-  using CacheHolder::Invalidate;
+  using CacheHolder::ResetCache;
 };
 
 }
@@ -195,7 +195,7 @@ void ResourceProxy<Ptr>::SetResource (const Pointer& ptr)
   impl->resource   = ptr;
   impl->is_default = !ptr;
   
-  impl->Invalidate ();
+  impl->ResetCache ();
 }
 
 template <class Ptr>

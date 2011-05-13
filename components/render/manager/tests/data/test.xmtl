@@ -29,7 +29,7 @@
   </layouts>
   <texmaps/>
   <materials>
-    <material id="canyon.archway_1" name="archway_1" program="blinn" layout="layout#1">
+    <material id="canyon.archway_1" name="archway_1" program="phong" layout="layout#1">
       <property name="Reflectivity" value="0"/>
       <property name="Transparency" value="1"/>
       <property name="Shininess" value="10"/>
@@ -48,10 +48,10 @@
       <property name="BumpAmount" value="1"/>
       <property name="DiffuseTextureChannel" value="0"/>
       <property name="BumpTextureChannel" value="0"/>
-      <texmap semantic="diffuse" image="pic1.dds"/>
-      <texmap semantic="bump" image="bottom.jpg"/>
+      <texmap semantic="diffuse" image="data/pic1.dds" sampler="repeat"/>
+      <texmap semantic="bump" image="data/bottom.jpg" sampler="repeat"/>
     </material>
-    <material id="canyon.stn_1" name="stn_1" program="blinn" layout="layout#1">
+    <material id="canyon.stn_1" name="stn_1" program="phong" layout="layout#1">
       <property name="Reflectivity" value="0"/>
       <property name="Transparency" value="1"/>
       <property name="Shininess" value="10"/>
@@ -70,10 +70,10 @@
       <property name="BumpAmount" value="1"/>
       <property name="DiffuseTextureChannel" value="0"/>
       <property name="BumpTextureChannel" value="0"/>
-      <texmap semantic="diffuse" image="pic1.dds"/>
-      <texmap semantic="bump" image="pic1.dds"/>
+      <texmap semantic="diffuse" image="data/pic1.dds" sampler="repeat"/>
+      <texmap semantic="bump" image="data/pic1.dds" sampler="repeat"/>
     </material>
-    <material id="canyon.stn_2" name="stn_2" program="blinn" layout="layout#1">
+    <material id="canyon.stn_2" name="stn_2" program="phong" layout="layout#1">
       <property name="Reflectivity" value="0"/>
       <property name="Transparency" value="1"/>
       <property name="Shininess" value="10"/>
@@ -92,10 +92,10 @@
       <property name="BumpAmount" value="1"/>
       <property name="DiffuseTextureChannel" value="0"/>
       <property name="BumpTextureChannel" value="0"/>
-      <texmap semantic="diffuse" image="pic1.dds"/>
-      <texmap semantic="bump" image="bottom.jpg"/>
+      <texmap semantic="diffuse" image="data/pic1.dds" sampler="repeat"/>
+      <texmap semantic="bump" image="data/bottom.jpg" sampler="repeat"/>
     </material>
-    <material id="canyon.Material__195" name="Material__195" program="blinn" layout="layout#1">
+    <material id="canyon.Material__195" name="Material__195" program="phong" layout="layout#1">
       <property name="Reflectivity" value="0"/>
       <property name="Transparency" value="1"/>
       <property name="Shininess" value="10"/>
@@ -114,8 +114,8 @@
       <property name="BumpAmount" value="1"/>
       <property name="DiffuseTextureChannel" value="0"/>
       <property name="BumpTextureChannel" value="0"/>
-      <texmap semantic="diffuse" image="pic1.dds"/>
-      <texmap semantic="bump" image="pic1.dds"/>
+      <texmap semantic="diffuse" image="data/pic1.dds" sampler="repeat"/>
+      <texmap semantic="bump" image="data/pic1.dds" sampler="repeat"/>
     </material>
   </materials>
 </material_library>

@@ -333,7 +333,7 @@ size_t PrimitiveImpl::AddMesh (const media::geometry::Mesh& source, MeshBufferUs
       
     impl->meshes.push_back (mesh);
     
-    Invalidate ();
+    ResetCache ();
     
     return impl->meshes.size () - 1;
   }
@@ -354,14 +354,14 @@ void PrimitiveImpl::RemoveMeshes (size_t first_mesh, size_t meshes_count)
 
   impl->meshes.erase (impl->meshes.begin () + first_mesh, impl->meshes.begin () + first_mesh + meshes_count);
 
-  Invalidate ();  
+  ResetCache ();  
 }
 
 void PrimitiveImpl::RemoveAllMeshes ()
 {
   impl->meshes.clear ();
   
-  Invalidate ();  
+  ResetCache ();  
 }
 
 /*

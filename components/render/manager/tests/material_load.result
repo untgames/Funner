@@ -1,4 +1,4 @@
-Results of material1_test:
+Results of material_load_test:
 render.manager: Creating render window
 render.manager: Create device manager (driver='*', adapter='*', init_string='')
 render.manager: ...device manager and swap chain have been successfully created

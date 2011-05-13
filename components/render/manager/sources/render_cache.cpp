@@ -40,7 +40,7 @@ void CacheHolder::AttachCacheSource (CacheHolder& source)
   {
     source.parent_holders.push_back (this);
 
-    Invalidate ();
+    ResetCache ();
   }
   catch (...)
   {
@@ -86,15 +86,17 @@ bool CacheHolder::IsParentOf (CacheHolder& child)
     Отметка о необходимости обновления кэша источника
 */
 
-void CacheHolder::Invalidate ()
+void CacheHolder::ResetCache ()
 {
   if (need_update)
     return;
     
   need_update = true;
   
+  ResetCacheCore ();
+  
   for (HolderList::iterator iter=parent_holders.begin (), end=parent_holders.end (); iter!=end; ++iter)
-    (*iter)->Invalidate ();
+    (*iter)->ResetCache ();
 }
 
 /*

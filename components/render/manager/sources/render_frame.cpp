@@ -78,7 +78,7 @@ struct EffectHolder: public CacheSource
   }
     
   using CacheHolder::UpdateCache;
-  using CacheHolder::Invalidate;
+  using CacheHolder::ResetCache;
 };
 
 /*
@@ -161,6 +161,7 @@ struct FrameImpl::Impl: public CacheHolder
   }
     
   using CacheHolder::UpdateCache;
+  using CacheHolder::ResetCache;
 };
 
 /*
@@ -503,7 +504,7 @@ void FrameImpl::SetEffect (const char* name)
     
     impl->effect_holder->need_operations_update = true;
     
-    impl->effect_holder->Invalidate ();
+    impl->effect_holder->ResetCache ();
   }
   catch (xtl::exception& e)
   {
@@ -676,4 +677,24 @@ void FrameImpl::Draw (RenderingContext* previous_context)
     e.touch ("render::FrameImpl::Draw");
     throw;
   }
+}
+
+/*
+    Управление кэшированием
+*/
+
+void FrameImpl::UpdateCache ()
+{
+  impl->UpdateCache ();
+  
+  for (EntityArray::iterator iter=impl->entities.begin (), end=impl->entities.end (); iter!=end; ++iter)
+    iter->entity->UpdateCache ();
+}
+
+void FrameImpl::ResetCache ()
+{
+  impl->ResetCache ();
+  
+  for (EntityArray::iterator iter=impl->entities.begin (), end=impl->entities.end (); iter!=end; ++iter)
+    iter->entity->ResetCache ();  
 }

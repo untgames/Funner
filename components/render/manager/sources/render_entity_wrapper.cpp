@@ -119,3 +119,17 @@ void swap (Entity& entity1, Entity& entity2)
 }
 
 }
+
+/*
+    Управление кэшированием
+*/
+
+void Entity::UpdateCache ()
+{
+  impl->UpdateCache ();
+}
+
+void Entity::ResetCache ()
+{
+  impl->ResetCache ();
+}

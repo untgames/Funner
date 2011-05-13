@@ -512,3 +512,17 @@ xtl::connection RenderManagerImpl::RegisterWindowEventHandler (RenderManagerWind
       throw xtl::make_argument_exception ("render::RenderManagerImpl::RegisterWindowEventHandler", "event", event);
   }
 }
+
+/*
+    Управление кэшированием
+*/
+
+void RenderManagerImpl::UpdateCache ()
+{
+  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::UpdateCache");
+}
+
+void RenderManagerImpl::ResetCache ()
+{
+  throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::ResetCache");
+}

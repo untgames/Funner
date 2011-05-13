@@ -229,6 +229,20 @@ void RenderManager::UnloadResource (const media::geometry::MeshLibrary& library)
   impl->UnloadResource (library);
 }
 
+/*
+    Управление кэшированием
+*/
+
+void RenderManager::UpdateCache ()
+{
+  impl->UpdateCache ();
+}
+
+void RenderManager::ResetCache ()
+{
+  impl->ResetCache ();
+}
+
 xtl::connection RenderManager::RegisterWindowEventHandler (RenderManagerWindowEvent event, const WindowEventHandler& handler) const
 {
   return impl->RegisterWindowEventHandler (event, handler);

@@ -67,7 +67,7 @@ void PropertyBuffer::OnPropertiesUpdated ()
 
   impl->need_update = true;
   
-  Invalidate ();
+  ResetCache ();
 }
 
 /*
