@@ -1,0 +1,54 @@
+Results of material_textures_load_test:
+render.manager: Creating render window
+render.manager: Create device manager (driver='*', adapter='*', init_string='')
+render.manager: ...device manager and swap chain have been successfully created
+render.manager: Initialize render targets for swap chain
+render.manager: ...render targets for swap chain created
+window 784x562 added
+render.manager: Loading material library 'data/test.xmtl' with 4 materials
+render.manager: ...loading material 'canyon.archway_1'
+render.manager.debug: Program parameters layout created (layout_id=1)
+render.manager: ...loading material 'canyon.stn_1'
+render.manager.debug: Updating program parameters layout 1 with 12 parameters:
+render.manager.debug: ...slot[3]: hash=a9ba75c0, parameters_count=12
+render.manager.debug: ......name='Reflectivity', type=float, offset=0
+render.manager.debug: ......name='Transparency', type=float, offset=4
+render.manager.debug: ......name='Shininess', type=float, offset=8
+render.manager.debug: ......name='Diffuse', type=vector, offset=12
+render.manager.debug: ......name='Ambient', type=vector, offset=28
+render.manager.debug: ......name='Specular', type=vector, offset=44
+render.manager.debug: ......name='Emission', type=vector, offset=60
+render.manager.debug: ......name='BumpAmount', type=float, offset=76
+render.manager.debug: ......name='DiffuseTextureChannel', type=integer, offset=80
+render.manager.debug: ......name='BumpTextureChannel', type=integer, offset=84
+render.manager.debug: ......name='diffuse', type=integer, offset=88
+render.manager.debug: ......name='bump', type=integer, offset=92
+render.manager.debug: ...program parameters layout updated (hash=8ba000c5)
+render.manager: ...loading material 'canyon.stn_2'
+render.manager: ...loading material 'canyon.Material__195'
+render.manager: Effect blend state 'solid' loaded
+render.manager: Effect blend state 'transparent' loaded
+render.manager: Effect blend state 'additive' loaded
+render.manager: Effect depth-stencil state 'solid' loaded
+render.manager: Effect depth-stencil state 'ztest_without_write' loaded
+render.manager: Effect depth-stencil state 'stencil-test' loaded
+render.manager: Effect rasterizer 'default' loaded
+render.manager: Effect rasterizer 'wireframe' loaded
+render.manager: Effect rasterizer 'overlays' loaded
+render.manager: Effect texture sampler 'default' loaded
+render.manager: Effect texture sampler 'repeat' loaded
+render.manager: Effect shaders library 'data/shaders/*' loaded (6 shaders loaded)
+render.manager: Effect program 'phong' loaded
+render.manager: Effect program 'shadow_map' loaded
+render.manager: Effect program 'helper' loaded
+render.manager: Effect 'main' loaded
+render.manager: Effect 'shadow' loaded
+render.manager: Effect 'lighting' loaded
+render.manager: Loading texture 'data/bottom.jpg'
+render.manager.debug: ...created texture 512x512x1@rgb8
+render.manager: Loading texture 'data/pic1.dds'
+render.manager.debug: ...created texture 1024x1024x1@dxt1
+render.manager.debug: Update cache for material ''
+render.manager.debug: ...cached updated
+All resources have loaded
+window 784x562 removed
