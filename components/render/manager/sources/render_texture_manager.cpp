@@ -47,7 +47,6 @@ struct TextureManager::Impl
   ProxyMap               loaded_textures;       //загруженные текстуры
   DynamicTextureDescList dynamic_texture_descs; //реестр дескрипторов динамических текстур  
   Log                    log;                   //протокол сообщений  
-  DebugLog               debug_log;             //протокол отладочных сообщений
   
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
@@ -252,7 +251,8 @@ void TextureManager::LoadTexture (const char* name)
 
     impl->loaded_textures.insert_pair (name, proxy);
     
-    impl->debug_log.Printf ("...created texture %ux%ux%u@%s", texture->Width (), texture->Height (), texture->Depth (), get_name (texture->Format ()));
+    if (impl->device_manager->Settings ().HasDebugLog ())
+      impl->log.Printf ("...created texture %ux%ux%u@%s", texture->Width (), texture->Height (), texture->Depth (), get_name (texture->Format ()));
   }
   catch (xtl::exception& e)
   {

@@ -229,10 +229,6 @@ void RenderManager::UnloadResource (const media::geometry::MeshLibrary& library)
   impl->UnloadResource (library);
 }
 
-/*
-    Управление кэшированием
-*/
-
 void RenderManager::UpdateCache ()
 {
   impl->UpdateCache ();
@@ -246,6 +242,16 @@ void RenderManager::ResetCache ()
 xtl::connection RenderManager::RegisterWindowEventHandler (RenderManagerWindowEvent event, const WindowEventHandler& handler) const
 {
   return impl->RegisterWindowEventHandler (event, handler);
+}
+
+void RenderManager::SetLogLevel (render::LogLevel level)
+{
+  impl->Settings ().SetLogLevel (level);
+}
+
+LogLevel RenderManager::LogLevel () const
+{
+  return impl->Settings ().LogLevel ();
 }
 
 void RenderManager::Swap (RenderManager& manager)

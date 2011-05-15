@@ -23,9 +23,10 @@ struct WindowImpl::Impl: public xtl::trackable
   size_t                   height;                    //высота окна
   WindowSignal             signals [WindowEvent_Num]; //сигналы окна
   Log                      log;                       //протокол
+  SettingsPtr              settings;                  //настройки рендеринга
   
 ///Конструктор
-  Impl (WindowImpl* in_owner)
+  Impl (WindowImpl* in_owner, const SettingsPtr& in_settings)
     : owner (in_owner)
     , width (0)
     , height (0)
@@ -242,7 +243,7 @@ const char* get_string_property (const common::PropertyMap& properties, const ch
 
 }
 
-WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& window, const common::PropertyMap& properties)
+WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& window, const common::PropertyMap& properties, const SettingsPtr& settings)
 {
   try
   {
@@ -281,7 +282,7 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& 
     
       //создание цепочки обмена
     
-    impl = new Impl (this);
+    impl = new Impl (this, settings);
     
     impl->swap_chain_desc = swap_chain_desc;
     
@@ -314,7 +315,7 @@ WindowImpl::WindowImpl (const DeviceManagerPtr& device_manager, syslib::Window& 
       if (!adapter)
         throw xtl::format_operation_exception ("", "Null adapter after render::low_level::DriverManager::CreateSwapChainAndDevice");
 
-      impl->device_manager = DeviceManagerPtr (new render::DeviceManager (device, driver), false);
+      impl->device_manager = DeviceManagerPtr (new render::DeviceManager (device, driver, settings), false);
       impl->adapter        = impl->swap_chain->GetAdapter ();
       
       log.Printf ("...device manager and swap chain have been successfully created");

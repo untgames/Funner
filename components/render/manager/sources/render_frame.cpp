@@ -42,7 +42,7 @@ struct EffectHolder: public CacheSource
     : device_manager (in_device_manager)
     , effect_manager (in_effect_manager)
     , effect (effect_manager->GetEffectProxy (""))
-    , properties_layout (&device_manager->Device ())
+    , properties_layout (&device_manager->Device (), &device_manager->Settings ())
     , need_operations_update (true)
   {
     effect.AttachCacheHolder (*this);

@@ -63,6 +63,7 @@ struct Texmap: public xtl::reference_counter, public CacheHolder
   }
   
   using CacheHolder::UpdateCache;
+  using CacheHolder::ResetCache;
 };
 
 }
@@ -90,7 +91,7 @@ struct MaterialImpl::Impl: public CacheHolder
   LowLevelProgramPtr         cached_program;       //закэшированная программа
   LowLevelBufferPtr          cached_properties;    //закэшированный буфер констант
   LowLevelStateBlockPtr      cached_state_block;   //закэшированный блок состояний
-  DebugLog                   debug_log;            //протокол отладочных сообщений
+  Log                        log;                  //протокол отладочных сообщений
   
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ShadingManagerPtr& in_shading_manager)
@@ -107,7 +108,8 @@ struct MaterialImpl::Impl: public CacheHolder
 ///Работа с кэшем
   void ResetCacheCore ()
   {
-    debug_log.Printf ("Reset cache for material '%s'", id.c_str ());
+    if (device_manager->Settings ().HasDebugLog ())
+      log.Printf ("Reset cache for material '%s'", id.c_str ());
     
     cached_program    = LowLevelProgramPtr ();
     cached_properties = LowLevelBufferPtr ();
@@ -117,7 +119,10 @@ struct MaterialImpl::Impl: public CacheHolder
   {
     try
     {
-      debug_log.Printf ("Update cache for material '%s'", id.c_str ());      
+      bool has_debug_log = device_manager->Settings ().HasDebugLog ();
+      
+      if (has_debug_log)
+        log.Printf ("Update cache for material '%s'", id.c_str ());      
       
       cached_program    = program.Resource ();
       cached_properties = properties.Buffer ();
@@ -159,7 +164,8 @@ struct MaterialImpl::Impl: public CacheHolder
       
       cached_state_block->Capture ();
       
-      debug_log.Printf ("...cached updated");
+      if (has_debug_log)
+        log.Printf ("...cached updated");
     }
     catch (xtl::exception& e)
     {
@@ -381,4 +387,7 @@ void MaterialImpl::ResetCache ()
   CacheSource::ResetCache ();
 
   impl->ResetCache ();
+  
+  for (TexmapArray::iterator iter=impl->texmaps.begin (), end=impl->texmaps.end (); iter!=end; ++iter)
+    (*iter)->ResetCache ();
 }

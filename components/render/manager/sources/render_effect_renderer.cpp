@@ -37,9 +37,9 @@ struct RenderPass: public xtl::reference_counter
   const RendererOperation* last_operation;        //последн€€ добавленна€ операци€
 
 /// онструктор
-  RenderPass (const LowLevelDevicePtr& device)
+  RenderPass (const DeviceManagerPtr& device_manager)
     : sort_mode (SortMode_Default)
-    , parameters_layout (device)
+    , parameters_layout (&device_manager->Device (), &device_manager->Settings ())
     , viewport_min_depth (0.0f)
     , viewport_max_depth (1.0f)
     , last_operation (0)
@@ -132,7 +132,7 @@ EffectRenderer::EffectRenderer (const EffectPtr& effect, const DeviceManagerPtr&
       
       if (src_pass)
       {
-        RenderPassPtr pass (new RenderPass (&device_manager->Device ()), false);
+        RenderPassPtr pass (new RenderPass (device_manager), false);
         
         for (size_t j=0, count=src_pass->TagsCount (); j<count; j++)
         {

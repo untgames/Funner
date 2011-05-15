@@ -119,6 +119,7 @@ struct MeshPrimitive: public xtl::reference_counter, public CacheHolder
   }
   
   using CacheHolder::UpdateCache;  
+  using CacheHolder::ResetCache;
 };
 
 typedef xtl::intrusive_ptr<MeshPrimitive> MeshPrimitivePtr;
@@ -171,7 +172,8 @@ struct Mesh: public xtl::reference_counter, public MeshCommonData, public CacheH
     }
   }  
   
-  using CacheHolder::UpdateCache;    
+  using CacheHolder::UpdateCache;
+  using CacheHolder::ResetCache;
 };
 
 typedef xtl::intrusive_ptr<Mesh>            MeshPtr;
@@ -492,4 +494,31 @@ RendererPrimitiveGroup* PrimitiveImpl::RendererPrimitiveGroups ()
     return 0;
   
   return &impl->render_groups [0];
+}
+
+/*
+    Управление кэшированием
+*/
+
+void PrimitiveImpl::UpdateCache ()
+{
+  CacheSource::UpdateCache ();
+
+  for (MeshArray::iterator iter=impl->meshes.begin (), end=impl->meshes.end (); iter!=end; ++iter)
+    (*iter)->UpdateCache ();
+}
+
+void PrimitiveImpl::ResetCache ()
+{
+  CacheSource::ResetCache ();
+
+  for (MeshArray::iterator iter=impl->meshes.begin (), end=impl->meshes.end (); iter!=end; ++iter)
+  {
+    Mesh& mesh = **iter;        
+    
+    mesh.ResetCache ();
+    
+    for (MeshPrimitiveArray::iterator iter=mesh.primitives.begin (), end=mesh.primitives.end (); iter!=end; ++iter)
+      (*iter)->ResetCache ();
+  }
 }

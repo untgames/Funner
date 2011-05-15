@@ -17,9 +17,21 @@ struct ProgramParametersManager::Impl: public xtl::trackable
   LowLevelDevicePtr   device;            //устройство визуализации
   LayoutMap           layouts;           //лэйауты параметров различной конфигурации
   CompositeLayoutMap  composite_layouts; //составные лэйауты параметров различной конфигурации
+  SettingsPtr         settings;          //настройки менеджера рендеринга
 
 ///Конструктор
-  Impl (const LowLevelDevicePtr& in_device) : device (in_device) {}
+  Impl (const LowLevelDevicePtr& in_device, const SettingsPtr& in_settings)
+    : device (in_device)
+    , settings (in_settings)
+  {
+    static const char* METHOD_NAME = "render::ProgramParametersManager::Impl";
+    
+    if (!device)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "device");
+      
+    if (!settings)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "settings");    
+  }
 
 ///Деструктор
   ~Impl ()
@@ -47,8 +59,8 @@ struct ProgramParametersManager::Impl: public xtl::trackable
     Конструктор / деструктор
 */
 
-ProgramParametersManager::ProgramParametersManager (const LowLevelDevicePtr& device)
-  : impl (new Impl (device))
+ProgramParametersManager::ProgramParametersManager (const LowLevelDevicePtr& device, const SettingsPtr& settings)
+  : impl (new Impl (device, settings))
 {
 }
 
@@ -70,7 +82,7 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters (ProgramParam
       if (range.first->second->Parameters ().parameters_count == parameters_count)
         return range.first->second;
 
-    ProgramParametersLayoutPtr result_layout (new ProgramParametersLayout (impl->device), false);
+    ProgramParametersLayoutPtr result_layout (new ProgramParametersLayout (impl->device, impl->settings), false);
 
     result_layout->SetSlot (slot, layout);
 
@@ -105,7 +117,7 @@ ProgramParametersLayoutPtr ProgramParametersManager::GetParameters
     if (iter != impl->composite_layouts.end ())
       return iter->second;
 
-    ProgramParametersLayoutPtr result_layout (new ProgramParametersLayout (impl->device), false);
+    ProgramParametersLayoutPtr result_layout (new ProgramParametersLayout (impl->device, impl->settings), false);
 
     if (layout1) result_layout->Attach (*layout1);
     if (layout2) result_layout->Attach (*layout2);

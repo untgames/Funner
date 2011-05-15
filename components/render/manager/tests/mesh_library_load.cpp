@@ -1,7 +1,5 @@
 #include "shared.h"
 
-const char* LIBRARY_NAME = "data/test.xmesh";
-
 int main ()
 {
   printf ("Results of mesh_library_load_test:\n");
@@ -14,9 +12,15 @@ int main ()
 
     RenderManager render_manager = test.RenderManager ();
 
-    render_manager.LoadResource (LIBRARY_NAME);
+    render_manager.LoadResource ("data/test.xmesh");
+    render_manager.LoadResource ("data/test.xmtl");
+    render_manager.LoadResource ("data/render.rfx");    
+    render_manager.LoadResource ("data/bottom.jpg");
+    render_manager.LoadResource ("data/pic1.dds");    
     
     Primitive primitive = render_manager.CreateSharedPrimitive ("mesh2");
+    
+    primitive.UpdateCache ();
     
     printf ("Mesh library loaded (%u meshes in primitive 'mesh2')\n", primitive.MeshesCount ());
   }

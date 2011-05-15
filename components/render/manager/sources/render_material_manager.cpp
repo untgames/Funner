@@ -43,7 +43,6 @@ struct MaterialManager::Impl
   MaterialProxyManager  proxy_manager;    //менеджер прокси объектов
   MaterialLibraryList   loaded_libraries; //список загруженных библиотек
   Log                   log;              //протокол сообщений
-  DebugLog              debug_log;        //протокол отладочных сообщений
   
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ShadingManagerPtr& in_shading_manager)

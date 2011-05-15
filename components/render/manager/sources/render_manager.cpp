@@ -24,6 +24,7 @@ typedef stl::vector<WindowImpl*>                    WindowArray;
 struct RenderManagerImpl::Impl: public xtl::trackable
 {
   RenderManagerImpl*  owner;                                         //владелец
+  SettingsPtr         settings;                                      //настройки рендеринга
   Log                 log;                                           //протокол сообщений
   DeviceManagerPtr    device_manager;                                //менеджер устройства отрисовки
   WindowSignal        window_signals [RenderManagerWindowEvent_Num]; //оконные сигналы
@@ -37,6 +38,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable
 ///Конструктор
   Impl (RenderManagerImpl* in_owner)
     : owner (in_owner)
+    , settings (new render::Settings, false)
   {
     windows.reserve (WINDOW_ARRAY_RESERVE_SIZE);
   }
@@ -214,7 +216,7 @@ WindowPtr RenderManagerImpl::CreateWindow (syslib::Window& sys_window, common::P
 {
   try
   {
-    WindowPtr window (new WindowImpl (impl->device_manager, sys_window, properties), false);
+    WindowPtr window (new WindowImpl (impl->device_manager, sys_window, properties, impl->settings), false);
     
     window->connect_tracker (xtl::bind (&Impl::OnWindowDestroy, &*impl, &*window), *impl);
 
@@ -525,4 +527,13 @@ void RenderManagerImpl::UpdateCache ()
 void RenderManagerImpl::ResetCache ()
 {
   throw xtl::make_not_implemented_exception ("render::RenderManagerImpl::ResetCache");
+}
+
+/*
+    Настройки менеджера рендеринга
+*/
+
+render::Settings& RenderManagerImpl::Settings ()
+{
+  return *impl->settings;
 }

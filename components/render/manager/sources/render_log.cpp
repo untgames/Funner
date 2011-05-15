@@ -9,8 +9,7 @@ namespace
      онстанты
 */
 
-const char* COMMON_LOG_NAME = "render.manager";       //им€ протокола общих сообщений
-const char* DEBUG_LOG_NAME  = "render.manager.debug"; //им€ протокола отладочных сообщений
+const char* LOG_NAME = "render.manager";
 
 }
 
@@ -38,16 +37,9 @@ namespace
     ’ранилище дл€ реализации протокола
 */
 
-struct CommonImplHolder
+struct ImplHolder
 {
-  CommonImplHolder () : impl (new LogImpl (COMMON_LOG_NAME), false) {}
-
-  xtl::intrusive_ptr<LogImpl> impl;
-};
-
-struct DebugImplHolder
-{
-  DebugImplHolder () : impl (new LogImpl (DEBUG_LOG_NAME), false) {}
+  ImplHolder () : impl (new LogImpl (LOG_NAME), false) {}
 
   xtl::intrusive_ptr<LogImpl> impl;
 };
@@ -58,27 +50,11 @@ struct DebugImplHolder
      онструкторы / деструктор / присваивание
 */
 
-Log::Log (LogSeverity severity)
+Log::Log ()
 {
-  switch (severity)
-  {
-    case LogSeverity_Common:
-    {
-      typedef common::Singleton<CommonImplHolder> ImplSingleton;
+  typedef common::Singleton<ImplHolder> ImplSingleton;
 
-      impl = ImplSingleton::Instance ()->impl.get ();
-      break;
-    }
-    case LogSeverity_Debug:
-    {
-      typedef common::Singleton<DebugImplHolder> ImplSingleton;
-
-      impl = ImplSingleton::Instance ()->impl.get ();
-      break;
-    }
-    default:
-      throw xtl::make_argument_exception ("render::Log::Log", "severity", severity);
-  }
+  impl = ImplSingleton::Instance ()->impl.get ();
 
   addref (impl);
 }

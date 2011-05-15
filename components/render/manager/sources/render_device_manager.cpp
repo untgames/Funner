@@ -12,12 +12,14 @@ struct DeviceManager::Impl
   LowLevelDriverPtr                driver;                     //драйвер устройства визуализации
   render::InputLayoutManager       input_layout_manager;       //менеджер лэйаутов геометрии
   render::ProgramParametersManager program_parameters_manager; //менеджер параметров программ шэйдинга
+  SettingsPtr                      settings;                   //настройки менеджера рендеринга
   
-  Impl (const LowLevelDevicePtr& in_device, const LowLevelDriverPtr& in_driver)
+  Impl (const LowLevelDevicePtr& in_device, const LowLevelDriverPtr& in_driver, const SettingsPtr& in_settings)
     : device (in_device)
     , driver (in_driver)
-    , input_layout_manager (in_device)
-    , program_parameters_manager (in_device)
+    , input_layout_manager (in_device, in_settings)
+    , program_parameters_manager (in_device, in_settings)
+    , settings (in_settings)
   {
   }
 };
@@ -26,7 +28,7 @@ struct DeviceManager::Impl
     Конструктор / деструктор
 */
 
-DeviceManager::DeviceManager (const LowLevelDevicePtr& device, const LowLevelDriverPtr& driver)
+DeviceManager::DeviceManager (const LowLevelDevicePtr& device, const LowLevelDriverPtr& driver, const SettingsPtr& settings)
 {
   try
   {
@@ -35,8 +37,11 @@ DeviceManager::DeviceManager (const LowLevelDevicePtr& device, const LowLevelDri
 
     if (!driver)
       throw xtl::make_null_argument_exception ("", "driver");
+      
+    if (!settings)
+      throw xtl::make_null_argument_exception ("", "settings");
 
-    impl = new Impl (device, driver);
+    impl = new Impl (device, driver, settings);
   }
   catch (xtl::exception& e)
   {
@@ -79,4 +84,13 @@ InputLayoutManager& DeviceManager::InputLayoutManager ()
 ProgramParametersManager& DeviceManager::ProgramParametersManager ()
 {
   return impl->program_parameters_manager;
+}
+
+/*
+    Настройки менеджера рендеринга
+*/
+
+Settings& DeviceManager::Settings ()
+{
+  return *impl->settings;
 }

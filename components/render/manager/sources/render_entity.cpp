@@ -27,7 +27,7 @@ class EntityLodCommonData: public CacheHolder
       , device_manager (in_device_manager)
       , texture_manager (in_texture_manager)
       , properties (in_device_manager)
-      , entity_parameters_layout (&in_device_manager->Device ())
+      , entity_parameters_layout (&in_device_manager->Device (), &in_device_manager->Settings ())
     {
       StateBlockMask mask;
       
@@ -171,7 +171,7 @@ class EntityLodCommonData: public CacheHolder
       MaterialState (EntityLodCommonData& in_common_data, MaterialImpl* in_material)
         : common_data (in_common_data)
         , material (in_material)
-        , parameters_layout (new ProgramParametersLayout (&common_data.DeviceManager ()->Device ()), false)
+        , parameters_layout (new ProgramParametersLayout (&common_data.DeviceManager ()->Device (), &common_data.DeviceManager ()->Settings ()), false)
         , state_block_mask_hash (0)
         , dynamic_textures (common_data.TextureManager (), in_material, common_data.Entity ())
       {

@@ -5,23 +5,71 @@ render.manager: ...device manager and swap chain have been successfully created
 render.manager: Initialize render targets for swap chain
 render.manager: ...render targets for swap chain created
 window 784x562 added
-render.manager.debug: Create input layout:
-render.manager.debug: ...index type: InputDataType_UInt
-render.manager.debug: ...index buffer offset: 0
-render.manager.debug: ...4 vertex attributes:
-render.manager.debug: ......semantic=VertexAttributeSemantic_Position, type=float3, slot=0, offset=0, stride=36
-render.manager.debug: ......semantic=VertexAttributeSemantic_Normal, type=float3, slot=0, offset=12, stride=36
-render.manager.debug: ......semantic=VertexAttributeSemantic_Color, type=ubyte4, slot=0, offset=24, stride=36
-render.manager.debug: ......semantic=VertexAttributeSemantic_TexCoord0, type=float2, slot=0, offset=28, stride=36
-render.manager.debug: ...layout created (hash=69c8efc8)
-render.manager.debug: Create input layout:
-render.manager.debug: ...index type: InputDataType_UShort
-render.manager.debug: ...index buffer offset: 0
-render.manager.debug: ...4 vertex attributes:
-render.manager.debug: ......semantic=VertexAttributeSemantic_Position, type=float3, slot=0, offset=0, stride=36
-render.manager.debug: ......semantic=VertexAttributeSemantic_Normal, type=float3, slot=0, offset=12, stride=36
-render.manager.debug: ......semantic=VertexAttributeSemantic_Color, type=ubyte4, slot=0, offset=24, stride=36
-render.manager.debug: ......semantic=VertexAttributeSemantic_TexCoord0, type=float2, slot=0, offset=28, stride=36
-render.manager.debug: ...layout created (hash=afa7e64f)
+render.manager: Create input layout:
+render.manager: ...index type: InputDataType_UInt
+render.manager: ...index buffer offset: 0
+render.manager: ...4 vertex attributes:
+render.manager: ......semantic=VertexAttributeSemantic_Position, type=float3, slot=0, offset=0, stride=36
+render.manager: ......semantic=VertexAttributeSemantic_Normal, type=float3, slot=0, offset=12, stride=36
+render.manager: ......semantic=VertexAttributeSemantic_Color, type=ubyte4, slot=0, offset=24, stride=36
+render.manager: ......semantic=VertexAttributeSemantic_TexCoord0, type=float2, slot=0, offset=28, stride=36
+render.manager: ...layout created (hash=69c8efc8)
+render.manager: Create input layout:
+render.manager: ...index type: InputDataType_UShort
+render.manager: ...index buffer offset: 0
+render.manager: ...4 vertex attributes:
+render.manager: ......semantic=VertexAttributeSemantic_Position, type=float3, slot=0, offset=0, stride=36
+render.manager: ......semantic=VertexAttributeSemantic_Normal, type=float3, slot=0, offset=12, stride=36
+render.manager: ......semantic=VertexAttributeSemantic_Color, type=ubyte4, slot=0, offset=24, stride=36
+render.manager: ......semantic=VertexAttributeSemantic_TexCoord0, type=float2, slot=0, offset=28, stride=36
+render.manager: ...layout created (hash=afa7e64f)
+render.manager: Loading material library 'data/test.xmtl' with 4 materials
+render.manager: ...loading material 'canyon.archway_1'
+render.manager: Program parameters layout created (layout_id=1)
+render.manager: ...loading material 'canyon.stn_1'
+render.manager: Updating program parameters layout 1 with 12 parameters:
+render.manager: ...slot[3]: hash=a9ba75c0, parameters_count=12
+render.manager: ......name='Reflectivity', type=float, offset=0
+render.manager: ......name='Transparency', type=float, offset=4
+render.manager: ......name='Shininess', type=float, offset=8
+render.manager: ......name='Diffuse', type=vector, offset=12
+render.manager: ......name='Ambient', type=vector, offset=28
+render.manager: ......name='Specular', type=vector, offset=44
+render.manager: ......name='Emission', type=vector, offset=60
+render.manager: ......name='BumpAmount', type=float, offset=76
+render.manager: ......name='DiffuseTextureChannel', type=integer, offset=80
+render.manager: ......name='BumpTextureChannel', type=integer, offset=84
+render.manager: ......name='diffuse', type=integer, offset=88
+render.manager: ......name='bump', type=integer, offset=92
+render.manager: ...program parameters layout updated (hash=8ba000c5)
+render.manager: ...loading material 'canyon.stn_2'
+render.manager: ...loading material 'canyon.Material__195'
+render.manager: Effect blend state 'solid' loaded
+render.manager: Effect blend state 'transparent' loaded
+render.manager: Effect blend state 'additive' loaded
+render.manager: Effect depth-stencil state 'solid' loaded
+render.manager: Effect depth-stencil state 'ztest_without_write' loaded
+render.manager: Effect depth-stencil state 'stencil-test' loaded
+render.manager: Effect rasterizer 'default' loaded
+render.manager: Effect rasterizer 'wireframe' loaded
+render.manager: Effect rasterizer 'overlays' loaded
+render.manager: Effect texture sampler 'default' loaded
+render.manager: Effect texture sampler 'repeat' loaded
+render.manager: Effect shaders library 'data/shaders/*' loaded (6 shaders loaded)
+render.manager: Effect program 'phong' loaded
+render.manager: Effect program 'shadow_map' loaded
+render.manager: Effect program 'helper' loaded
+render.manager: Effect 'main' loaded
+render.manager: Effect 'shadow' loaded
+render.manager: Effect 'lighting' loaded
+render.manager: Loading texture 'data/bottom.jpg'
+render.manager: ...created texture 512x512x1@rgb8
+render.manager: Loading texture 'data/pic1.dds'
+render.manager: ...created texture 1024x1024x1@dxt1
+render.manager: Update cache for material ''
+render.manager: ...cached updated
+render.manager: Update cache for material ''
+render.manager: ...cached updated
 Mesh library loaded (1 meshes in primitive 'mesh2')
 window 784x562 removed
+render.manager: Program parameters layout destroyed (layout_id=1)

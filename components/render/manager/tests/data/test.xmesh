@@ -48,8 +48,8 @@
         vb#1
       </vertex_buffers>
       <primitives>
-        <primitive type="triangle_list" material="material1" vertex_buffer="0" first="0" count="1"/>
-        <primitive type="triangle_strip" material="material2" vertex_buffer="0" first="1" count="1"/>
+        <primitive type="triangle_list" material="canyon.stn_1" vertex_buffer="0" first="0" count="1"/>
+        <primitive type="triangle_strip" material="canyon.stn_2" vertex_buffer="0" first="1" count="1"/>
       </primitives>
     </mesh>
     <mesh id="mesh2" name="mesh2">
@@ -57,9 +57,9 @@
         vb#2
       </vertex_buffers>
       <primitives>
-        <primitive type="line_list" material="material1" vertex_buffer="0" first="0" count="1"/>
-        <primitive type="line_strip" material="material2" vertex_buffer="0" first="1" count="2"/>
-        <primitive type="line_strip" material="material2" vertex_buffer="0" first="1" count="0"/>
+        <primitive type="line_list" material="canyon.stn_1" vertex_buffer="0" first="0" count="1"/>
+        <primitive type="line_strip" material="canyon.stn_2" vertex_buffer="0" first="1" count="2"/>
+        <primitive type="line_strip" material="canyon.stn_2" vertex_buffer="0" first="1" count="0"/>
       </primitives>
     </mesh>
   </meshes>

@@ -69,7 +69,12 @@ class RenderManagerImpl: public Object
     typedef RenderManager::WindowEventHandler WindowEventHandler;
 
     xtl::connection RegisterWindowEventHandler (RenderManagerWindowEvent event, const WindowEventHandler& handler) const;
-
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Настройки менеджера рендеринга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    render::Settings& Settings ();
+    
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;

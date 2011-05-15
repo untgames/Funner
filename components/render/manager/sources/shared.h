@@ -49,6 +49,7 @@ class MaterialManager;
 class PrimitiveManager;
 class ProgramParametersLayout;
 class RenderingContext;
+class Settings;
 class ShadingManager;
 class TextureManager;
 class InstantiatedEffect;
@@ -77,6 +78,7 @@ typedef xtl::intrusive_ptr<RectAreaImpl>            RectAreaPtr;
 typedef xtl::intrusive_ptr<RenderManagerImpl>       RenderManagerPtr;
 typedef xtl::intrusive_ptr<RenderTargetImpl>        RenderTargetPtr;
 typedef xtl::intrusive_ptr<RenderTargetDesc>        RenderTargetDescPtr;
+typedef xtl::intrusive_ptr<Settings>                SettingsPtr;
 typedef xtl::intrusive_ptr<ShadingManager>          ShadingManagerPtr;
 typedef xtl::intrusive_ptr<TextureImpl>             TexturePtr;
 typedef xtl::intrusive_ptr<TextureManager>          TextureManagerPtr;
@@ -163,6 +165,7 @@ class Wrappers
 #include "rect_area.h"
 #include "render_target.h"
 #include "rendering_context.h"
+#include "settings.h"
 #include "shading_manager.h"
 #include "texture.h"
 #include "texture_manager.h"
