@@ -1,3 +1,4 @@
+#include <cfloat>
 #include <cstdio>
 
 #include <stl/hash_map>
@@ -10,6 +11,8 @@
 #include <common/file.h>
 #include <common/strlib.h>
 #include <common/xml_writer.h>
+
+#include <bv/axis_aligned_box.h>
 
 #include <media/animation/animation_library.h>
 #include <media/physics/physics_library.h>
@@ -36,7 +39,8 @@ const float EPSILON = 0.001f;
     Типы
 */
 
-typedef stl::hash_map<stl::hash_key<const char*>, stl::string> ImagesMap;
+typedef stl::hash_map<stl::hash_key<const char*>, stl::string>           ImagesMap;
+typedef stl::hash_map<stl::hash_key<const char*>, bound_volumes::aaboxf> BoundVolumesMap;
 
 struct Params;
 
@@ -620,8 +624,10 @@ const char* light_param_name (LightParam param)
 }
 
 //сохранение узла
-void save_node (const Params& params, const Node& node, XmlWriter& writer)
+void save_node (const Params& params, const BoundVolumesMap& meshes_bound_volumes, const Node& node, XmlWriter& writer)
 {
+  static const char* METHOD_NAME = "::save_node";
+
   common::StringArray exclude_nodes_list = common::split (params.exclude_nodes.c_str ());
 
   for (size_t i = 0, count = exclude_nodes_list.Size (); i < count; i++)
@@ -668,9 +674,16 @@ void save_node (const Params& params, const Node& node, XmlWriter& writer)
     if (!params.output_resources_namespace.empty ())
       mesh_name = common::format ("%s.%s", params.output_resources_namespace.c_str (), mesh_name.c_str ());
 
+    BoundVolumesMap::const_iterator mesh_bound_volume_iter = meshes_bound_volumes.find (mesh_name.c_str ());
+
+    if (mesh_bound_volume_iter == meshes_bound_volumes.end ())
+      throw xtl::format_operation_exception (METHOD_NAME, "Can't find bound volume for mesh '%s'", mesh_name.c_str ());
+
     XmlWriter::Scope scope (writer, "mesh");
 
     writer.WriteAttribute ("name", mesh_name.c_str ());
+    writer.WriteAttribute ("bound_box_min", mesh_bound_volume_iter->second.minimum ());
+    writer.WriteAttribute ("bound_box_max", mesh_bound_volume_iter->second.maximum ());
   }
 
   size_t light_index = 0;
@@ -696,7 +709,7 @@ void save_node (const Params& params, const Node& node, XmlWriter& writer)
         light_type = "direct_light";
         break;
       default:
-        throw xtl::format_operation_exception ("::save_node", "Can't save node '%s', unknown light type %d", node.Id (), iter->Type ());
+        throw xtl::format_operation_exception (METHOD_NAME, "Can't save node '%s', unknown light type %d", node.Id (), iter->Type ());
     }
 
     XmlWriter::Scope scope (writer, light_type);
@@ -709,7 +722,7 @@ void save_node (const Params& params, const Node& node, XmlWriter& writer)
   }
 
   for (Node::NodeList::ConstIterator iter = node.Nodes ().CreateIterator (); iter; ++iter)
-    save_node (params, *iter, writer);
+    save_node (params, meshes_bound_volumes, *iter, writer);
 }
 
 //сохранение сцены
@@ -727,8 +740,47 @@ void save_scene (const Params& params, const Model& model)
 
   XmlWriter::Scope scope (writer, "scene");
 
+    //построение ограничивающих объемов для мешей
+  BoundVolumesMap meshes_bound_volumes;
+
+  const MeshLibrary& mesh_library = model.Meshes ();
+
+  for (NodeLibrary::ConstIterator node_iter = model.Nodes ().CreateIterator (); node_iter; ++node_iter)
+  {
+    size_t mesh_index = 0;
+
+    for (Node::MeshList::ConstIterator mesh_iter = node_iter->Meshes ().CreateIterator (); mesh_iter; ++mesh_iter, ++mesh_index)
+    {
+      MeshLibrary::ConstIterator instance_mesh_iter = mesh_library.Find (mesh_iter->Mesh ());
+
+      if (!instance_mesh_iter)
+        throw xtl::format_operation_exception ("::save_scene", "Can't find mesh '%s'", mesh_iter->Mesh ());
+
+      math::vec3f min_extent (FLT_MAX), max_extent (-FLT_MAX);
+
+      for (Mesh::SurfaceList::ConstIterator surface_iter = instance_mesh_iter->Surfaces ().CreateIterator (); surface_iter; ++surface_iter)
+      {
+        const Vertex* vertex = surface_iter->Vertices ();
+
+        for (size_t i = 0, count = surface_iter->VerticesCount (); i < count; i++, vertex++)
+        {
+          min_extent.x = stl::min (min_extent.x, vertex->coord.x);
+          min_extent.y = stl::min (min_extent.y, vertex->coord.y);
+          min_extent.z = stl::min (min_extent.z, vertex->coord.z);
+          max_extent.x = stl::max (max_extent.x, vertex->coord.x);
+          max_extent.y = stl::max (max_extent.y, vertex->coord.y);
+          max_extent.z = stl::max (max_extent.z, vertex->coord.z);
+        }
+      }
+
+      stl::string mesh_id = common::format ("%s.%s.mesh#%u", params.output_resources_namespace.c_str (), node_iter->Id (), mesh_index);
+
+      meshes_bound_volumes.insert_pair (mesh_id.c_str (), bound_volumes::aaboxf (min_extent, max_extent));
+    }
+  }
+
   for (NodeLibrary::ConstIterator i = model.Scenes ().CreateIterator (); i; ++i)
-    save_node (params, *i, writer);
+    save_node (params, meshes_bound_volumes, *i, writer);
 
   if (!params.silent)
     printf ("Ok\n");

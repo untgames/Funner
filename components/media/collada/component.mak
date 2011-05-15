@@ -40,10 +40,10 @@ MEDIA.COLLADA.CONVERTER.TYPE        := application
 MEDIA.COLLADA.CONVERTER.NAME        := collada-converter
 MEDIA.COLLADA.CONVERTER.SOURCE_DIRS := utils/collada_converter
 MEDIA.COLLADA.CONVERTER.IMPORTS     := compile.media.collada compile.media.image compile.media.geometry compile.media.animation \
-                                       compile.media.physics compile.media.rfx link.media.collada.dae link.media.collada.convert \
-                                       link.media.image link.media.geometry.xmesh link.media.geometry.binmesh link.media.rfx \
-                                       link.media.animation.xanim link.media.animation.binanim link.media.physics.xphys \
-                                       link.media.rfx.default_serializers
+                                       compile.media.physics compile.media.rfx compile.math.bound_volumes link.media.collada.dae \
+                                       link.media.collada.convert link.media.image link.media.geometry.xmesh \
+                                       link.media.geometry.binmesh link.media.rfx link.media.animation.xanim \
+                                       link.media.animation.binanim link.media.physics.xphys link.media.rfx.default_serializers
 
 #Цель - collada convert tests
 MEDIA.COLLADA.CONVERTER.TESTS.TYPE               := test-suite

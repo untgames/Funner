@@ -234,13 +234,10 @@ void dump (Surface& surface, int level, Model& model)
     }
   }  
   
-  printf ("z\n");
   for (size_t i = 0; i < surface.InfluenceChannels ().Size (); i++)
   {
     print_space (level);
-    printf ("1\n");
     printf ("influence_channel: '%s'\n", surface.InfluenceChannels ().Name (i));
-    printf ("2\n");
     
     const VertexInfluence* influence = surface.InfluenceChannels ().Data (i);
     
