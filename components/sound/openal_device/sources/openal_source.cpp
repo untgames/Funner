@@ -36,17 +36,23 @@ OpenALSource::OpenALSource (OpenALDevice& in_device)
   alGetError   ();
   alGenSources (1, &al_source);
 
+  OpenALContext& context = device.Context ();
+
   if (alGetError () != AL_NO_ERROR)
     throw xtl::format_exception<OpenALException> ("sound::low_level::OpenALSource::OpenALSource", "No enough sources");
 }
 
 OpenALSource::~OpenALSource ()
 {
+  OpenALContext& context = device.Context ();
+
   Deactivate ();
 
   try
   {
-    device.Context ().MakeCurrent ();
+    OpenALContextManager::Instance context_manager;
+
+    context_manager->SetCurrentContext (device.Context ());
 
     device.Context ().alDeleteSources (1, &al_source);
   }
@@ -364,7 +370,9 @@ void OpenALSource::FillBuffer (ALuint al_buffer)
 
   OpenALContext& context = device.Context ();
 
-  context.MakeCurrent ();
+  OpenALContextManager::Instance context_manager;
+
+  context_manager->SetCurrentContext (context);
 
   context.alBufferData (al_buffer, format, device.GetSampleBuffer (), sound_sample->SamplesToBytes (readed_samples_count),
                         sound_sample->Frequency ());
@@ -379,7 +387,9 @@ void OpenALSource::FillBuffers ()
   ALint          queued_buffers_count = 0, processed_buffers_count = 0;
   OpenALContext& context              = device.Context ();
 
-  context.MakeCurrent ();
+  OpenALContextManager::Instance context_manager;
+
+  context_manager->SetCurrentContext (context);
 
   context.alGetSourcei (al_source, AL_BUFFERS_QUEUED, &queued_buffers_count);
   context.alGetSourcei (al_source, AL_BUFFERS_PROCESSED, &processed_buffers_count);
@@ -421,7 +431,9 @@ void OpenALSource::BufferUpdate ()
 
     int status = AL_STOPPED;
 
-    context.MakeCurrent ();
+    OpenALContextManager::Instance context_manager;
+
+    context_manager->SetCurrentContext (context);
 
     context.alGetSourcei (al_source, AL_SOURCE_STATE, &status);
 
@@ -506,7 +518,9 @@ void OpenALSource::PropertiesUpdate ()
   {
     OpenALContext& context = device.Context ();
 
-    context.MakeCurrent ();
+    OpenALContextManager::Instance context_manager;
+
+    context_manager->SetCurrentContext (context);
 
     context.alSourcefv (al_source, AL_POSITION, &source.position [0]);
     context.alSourcefv (al_source, AL_DIRECTION, &source.direction [0]);
