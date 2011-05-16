@@ -81,6 +81,8 @@ ANDROID_JAR                := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/andro
 DEFAULT_PACKAGE_PREFIX     := com.untgames.
 GDB_SERVER_FLAG_FILE       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/gdb-installed
 GDB_SERVER_FILE            := $(ARM_EABI_DIR)/../gdbserver
+BUSYBOX_FILE               := $(BUILD_DIR)platforms/android/busybox
+BUSYBOX_FLAG_FILE          := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/busybox-installed
 
 export CYGWIN
 
@@ -308,7 +310,7 @@ define process_target.android-jar
 		
 endef
 
-install: $(GDB_SERVER_FLAG_FILE)
+install: $(GDB_SERVER_FLAG_FILE) $(BUSYBOX_FLAG_FILE)
 
 $(GDB_SERVER_FLAG_FILE): $(GDB_SERVER_FILE)
 	@echo Install gdbserver...
@@ -316,3 +318,8 @@ $(GDB_SERVER_FLAG_FILE): $(GDB_SERVER_FILE)
 	@$(ADB) shell /mnt/sdcard/busybox  chmod 777 $(REMOTE_DEBUG_DIR)/$(notdir $(GDB_SERVER_FILE))
 	@touch $@
 
+$(BUSYBOX_FLAG_FILE): $(BUSYBOX_FILE)
+	@echo Install busybox...
+	@$(ADB) push $(BUSYBOX_FILE) \\/mnt/sdcard
+	@$(ADB) shell chmod 777 \\/mnt/sdcard/busybox
+	@touch $@
