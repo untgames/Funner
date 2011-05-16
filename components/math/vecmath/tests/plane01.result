@@ -1,0 +1,6 @@
+Results of plane01_test:
+default int constructor: [0, 0, 1, 0]
+default float constructor: [0.000, 0.000, 1.000, 0.000]
+default double constructor: [0, 0, 1, 0]
+normal d constructor: [1.000, 2.000, 3.000, 4.000]
+constants constructor: [1.000, 2.000, 3.000, 4.000]
