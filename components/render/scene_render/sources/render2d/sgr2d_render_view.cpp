@@ -9,10 +9,19 @@ namespace
 
 const float MINIMAL_NODE_SCALE = 0.00000001f;
 
-bool has_zero_component (const math::vec3f& v, float eps)
+bool has_zero_component_or_nan (const math::vec3f& v, float eps)
 {
   for (size_t i=0; i < 3; i++)
-    if (fabs (v [i]) <= eps)
+    if (v [i] != v [i] || fabs (v [i]) <= eps)
+      return true;
+
+  return false;
+}
+
+bool has_nan (const math::vec3f& v)
+{
+  for (size_t i=0; i < 3; i++)
+    if (v [i] != v [i])
       return true;
 
   return false;
@@ -33,7 +42,7 @@ struct RenderViewVisitor: public xtl::visitor<void, SpriteModel, TextLine, Heigh
 
   void visit (SpriteModel& model)
   {
-    if (has_zero_component (model.WorldScale (), MINIMAL_NODE_SCALE))
+    if (has_zero_component_or_nan (model.WorldScale (), MINIMAL_NODE_SCALE) || has_nan (model.WorldPosition ()))
       return;
 
     Renderable* renderable = render->GetRenderable (&model);
@@ -44,7 +53,7 @@ struct RenderViewVisitor: public xtl::visitor<void, SpriteModel, TextLine, Heigh
 
   void visit (HeightMap& height_map)
   {
-    if (has_zero_component (height_map.WorldScale (), MINIMAL_NODE_SCALE))
+    if (has_zero_component_or_nan (height_map.WorldScale (), MINIMAL_NODE_SCALE) || has_nan (height_map.WorldPosition ()))
       return;
 
     Renderable* renderable = render->GetRenderable (&height_map);
@@ -55,7 +64,7 @@ struct RenderViewVisitor: public xtl::visitor<void, SpriteModel, TextLine, Heigh
   
   void visit (TextLine& text_line)
   {
-    if (has_zero_component (text_line.WorldScale (), MINIMAL_NODE_SCALE))
+    if (has_zero_component_or_nan (text_line.WorldScale (), MINIMAL_NODE_SCALE) || has_nan (text_line.WorldPosition ()))
       return;
 
     Renderable* renderable = render->GetRenderable (&text_line);
