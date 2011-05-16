@@ -7,7 +7,7 @@ float test ()
   math::vec3f v (0.f);
 
   for (size_t i = 1; i < 1000000; i++)
-    v += normalize (math::vec3f (i));
+    v += normalize (math::vec3f ((float)i));
 
   return length (v);
 }
