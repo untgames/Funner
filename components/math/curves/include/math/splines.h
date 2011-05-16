@@ -10,7 +10,7 @@
 #undef   MATH_CURVES_SPLINE_NO_DETAILS
 
 #ifdef _MSC_VER
-  #pragma push_macros
+  #pragma pop_macros
 #endif
 
 namespace math
