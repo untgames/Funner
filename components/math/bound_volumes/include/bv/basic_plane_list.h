@@ -8,6 +8,8 @@
   #include <stl/vector>
   #include <xtl/common_exceptions.h>
   #include <xtl/reference_counter.h>
+  #include <bv/axis_aligned_box.h>
+  #include <bv/sphere.h>
 #endif
 
 #include <math/matrix.h>
@@ -29,10 +31,11 @@ template <class T> class plane_list
     typedef math::plane<T> plane_type;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Конструкторы/копирование
+///Конструкторы / деструктор / копирование
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     plane_list ();
     plane_list (const plane_list&);
+    ~plane_list ();
 
     plane_list& operator = (const plane_list&);
 
@@ -90,7 +93,7 @@ template <class T> class plane_list
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обмен
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void swap (basic_spline&);
+    void swap (plane_list&);
 
   private:
     struct implementation;

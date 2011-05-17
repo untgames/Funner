@@ -2,7 +2,7 @@
 #define BOUND_VOLUMES_PLANE_LIST_HEADER
 
 #ifdef _MSC_VER
-  #pragma push_macros(MATH_BOUND_VOLUMES_PLANE_LIST_NO_DETAILS)
+  #pragma push_macro("MATH_BOUND_VOLUMES_PLANE_LIST_NO_DETAILS")
 #endif
 
 #define  MATH_BOUND_VOLUMES_PLANE_LIST_NO_DETAILS
@@ -10,15 +10,7 @@
 #undef   MATH_BOUND_VOLUMES_PLANE_LIST_NO_DETAILS
 
 #ifdef _MSC_VER
-  #pragma pop_macros
+  #pragma pop_macro("MATH_BOUND_VOLUMES_PLANE_LIST_NO_DETAILS")
 #endif
-
-namespace bound_volumes
-{
-
-template plane_listf;
-template plane_listd;
-
-}
 
 #endif
