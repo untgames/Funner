@@ -97,7 +97,7 @@ struct NullTreeHolder
     static const char* NODE_NAME      = "";
     static size_t      NODE_NAME_SIZE = strlen (NODE_NAME) + 1;
 
-    ParseTreeBuffer buffer (sizeof (ParseNodeImpl) + NODE_NAME_SIZE);
+    ParseTreeBuffer buffer (sizeof (ParseNodeImpl) + get_aligned_size (NODE_NAME_SIZE, ALIGN_SIZE));
 
     ParseNodeImpl* node = reinterpret_cast<ParseNodeImpl*> (buffer.data ());
 
