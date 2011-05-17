@@ -310,11 +310,15 @@ LRESULT CALLBACK WindowMessageHandler (HWND wnd, UINT message, WPARAM wparam, LP
       {
         if (impl->is_cursor_visible)
         {
-          SetCursor (impl->preferred_cursor ? impl->preferred_cursor : impl->default_cursor);
+          HCURSOR required_cursor = impl->preferred_cursor ? impl->preferred_cursor : impl->default_cursor;
+
+          if (required_cursor != GetCursor ())
+            SetCursor (required_cursor);
         }
         else if (!impl->is_cursor_visible)
         {
-          SetCursor (0);
+          if (GetCursor () != 0)
+            SetCursor (0);
         }
 
         return 1;
@@ -1177,7 +1181,12 @@ void Platform::SetCursor (window_t window, cursor_t cursor)
     impl->preferred_cursor = reinterpret_cast<HCURSOR> (cursor);
 
     if (impl->is_cursor_visible)
-      ::SetCursor (impl->preferred_cursor ? impl->preferred_cursor : impl->default_cursor);
+    {
+      HCURSOR required_cursor = impl->preferred_cursor ? impl->preferred_cursor : impl->default_cursor;
+      
+      if (required_cursor != ::GetCursor ())
+        ::SetCursor (required_cursor);
+    }
   }
   catch (xtl::exception& e)
   {
