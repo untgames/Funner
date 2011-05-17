@@ -25,9 +25,11 @@ render.manager: ......semantic=VertexAttributeSemantic_TexCoord0, type=float2, s
 render.manager: ...layout created (hash=afa7e64f)
 render.manager: Loading material library 'data/test.xmtl' with 4 materials
 render.manager: ...loading material 'canyon.archway_1'
-render.manager: Program parameters layout created (layout_id=1)
+render.manager: Material created (id=1)
+render.manager: Program parameters layout created (id=2)
 render.manager: ...loading material 'canyon.stn_1'
-render.manager: Updating program parameters layout 1 with 12 parameters:
+render.manager: Material created (id=3)
+render.manager: Updating program parameters layout with 12 parameters (id=2):
 render.manager: ...slot[3]: hash=a9ba75c0, parameters_count=12
 render.manager: ......name='Reflectivity', type=float, offset=0
 render.manager: ......name='Transparency', type=float, offset=4
@@ -43,7 +45,9 @@ render.manager: ......name='diffuse', type=integer, offset=88
 render.manager: ......name='bump', type=integer, offset=92
 render.manager: ...program parameters layout updated (hash=8ba000c5)
 render.manager: ...loading material 'canyon.stn_2'
+render.manager: Material created (id=4)
 render.manager: ...loading material 'canyon.Material__195'
+render.manager: Material created (id=5)
 render.manager: Effect blend state 'solid' loaded
 render.manager: Effect blend state 'transparent' loaded
 render.manager: Effect blend state 'additive' loaded
@@ -63,13 +67,21 @@ render.manager: Effect 'main' loaded
 render.manager: Effect 'shadow' loaded
 render.manager: Effect 'lighting' loaded
 render.manager: Loading texture 'data/bottom.jpg'
+render.manager: Texture created (id=6)
 render.manager: ...created texture 512x512x1@rgb8
 render.manager: Loading texture 'data/pic1.dds'
+render.manager: Texture created (id=7)
 render.manager: ...created texture 1024x1024x1@dxt1
-render.manager: Update cache for material ''
+render.manager: Update material cache (id=3)
 render.manager: ...cached updated
-render.manager: Update cache for material ''
+render.manager: Update material cache (id=4)
 render.manager: ...cached updated
 Mesh library loaded (1 meshes in primitive 'mesh2')
 window 784x562 removed
-render.manager: Program parameters layout destroyed (layout_id=1)
+render.manager: Material destroyed (id=5)
+render.manager: Material destroyed (id=4)
+render.manager: Material destroyed (id=3)
+render.manager: Material destroyed (id=1)
+render.manager: Program parameters layout destroyed (id=2)
+render.manager: Texture destroyed (id=6)
+render.manager: Texture destroyed (id=7)

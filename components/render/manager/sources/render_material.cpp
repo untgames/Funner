@@ -76,7 +76,7 @@ typedef xtl::intrusive_ptr<Texmap> TexmapPtr;
 typedef stl::vector<TexmapPtr>     TexmapArray;
 typedef stl::vector<size_t>        TagHashArray;
 
-struct MaterialImpl::Impl: public CacheHolder
+struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 {
   DeviceManagerPtr           device_manager;       //менеджер устройства отрисовки
   TextureManagerPtr          texture_manager;      //менеджер текстур
@@ -103,13 +103,23 @@ struct MaterialImpl::Impl: public CacheHolder
     , has_dynamic_textures (false)
   {
     AttachCacheSource (properties);
+    
+    if (device_manager->Settings ().HasDebugLog ())
+      log.Printf ("Material created (id=%u)", Id ());
+  }
+  
+///Деструктор
+  ~Impl ()
+  {
+    if (device_manager->Settings ().HasDebugLog ())
+      log.Printf ("Material destroyed (id=%u)", Id ());
   }
   
 ///Работа с кэшем
   void ResetCacheCore ()
   {
     if (device_manager->Settings ().HasDebugLog ())
-      log.Printf ("Reset cache for material '%s'", id.c_str ());
+      log.Printf ("Reset material cache (id=%u)", Id ());
     
     cached_program    = LowLevelProgramPtr ();
     cached_properties = LowLevelBufferPtr ();
@@ -122,7 +132,7 @@ struct MaterialImpl::Impl: public CacheHolder
       bool has_debug_log = device_manager->Settings ().HasDebugLog ();
       
       if (has_debug_log)
-        log.Printf ("Update cache for material '%s'", id.c_str ());      
+        log.Printf ("Update material cache (id=%u)", Id ());
       
       cached_program    = program.Resource ();
       cached_properties = properties.Buffer ();

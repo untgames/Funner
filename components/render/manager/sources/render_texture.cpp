@@ -45,7 +45,7 @@ render::low_level::PixelFormat get_compressed_pixel_format (const char* name)
     Описание реализации текстуры
 */
 
-struct TextureImpl::Impl
+struct TextureImpl::Impl: public DebugIdHolder
 {
   DeviceManagerPtr               device_manager; //менеджер устройства
   LowLevelTexturePtr             texture;        //текстура
@@ -67,6 +67,15 @@ struct TextureImpl::Impl
     , height (0)
     , depth (0)
   {
+    if (device_manager->Settings ().HasDebugLog ())
+      Log ().Printf  ("Texture created (id=%u)", Id ());
+  }
+  
+///Деструктор
+  ~Impl ()
+  {
+    if (device_manager->Settings ().HasDebugLog ())
+      Log ().Printf  ("Texture destroyed (id=%u)", Id ());
   }
   
 ///Получение цели рендеринга

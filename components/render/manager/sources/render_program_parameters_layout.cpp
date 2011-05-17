@@ -33,7 +33,7 @@ struct Slot
 typedef stl::vector<render::low_level::ProgramParameter> ParameterArray;
 typedef stl::vector<ProgramParametersLayoutPtr>          LayoutArray;
 
-struct ProgramParametersLayout::Impl: public CacheHolder
+struct ProgramParametersLayout::Impl: public CacheHolder, public DebugIdHolder
 {
   render::low_level::ProgramParametersLayoutDesc  desc;                              //описание параметров
   ParameterArray                                  parameters;                        //параметры
@@ -43,7 +43,6 @@ struct ProgramParametersLayout::Impl: public CacheHolder
   bool                                            need_rebuild;                      //необходимо ли обновление возвращаемых структур
   LowLevelDevicePtr                               device;                            //устройство отрисовки
   LowLevelProgramParametersLayoutPtr              device_layout;                     //объект расположени€ параметров устройства отрисовки
-  size_t                                          debug_id;                          //отладочный идентификатор
   SettingsPtr                                     settings;                          //настройки менеджера рендеринга
   Log                                             log;                               //протокол отладочных сообщений
   
@@ -61,12 +60,8 @@ struct ProgramParametersLayout::Impl: public CacheHolder
     if (!settings)
       throw xtl::make_null_argument_exception (METHOD_NAME, "settings");
       
-    static size_t current_debug_id = 0;
-    
-    debug_id = ++current_debug_id;
-    
     if (settings->HasDebugLog ())
-      log.Printf ("Program parameters layout created (layout_id=%u)", debug_id);
+      log.Printf ("Program parameters layout created (id=%u)", Id ());
 
     layouts.reserve (RESERVED_LAYOUTS_COUNT);
   }
@@ -75,7 +70,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder
   ~Impl ()
   {
     if (settings->HasDebugLog ())
-      log.Printf ("Program parameters layout destroyed (layout_id=%u)", debug_id);
+      log.Printf ("Program parameters layout destroyed (id=%u)", Id ());
   }
 
 ///ѕостроение списка параметров
@@ -103,7 +98,7 @@ struct ProgramParametersLayout::Impl: public CacheHolder
     bool has_debug_log = settings->HasDebugLog ();  
     
     if (has_debug_log)
-      log.Printf ("Updating program parameters layout %u with %u parameters:", debug_id, parameters_count);  
+      log.Printf ("Updating program parameters layout with %u parameters (id=%u):", parameters_count, Id ());
       
     ParameterArray new_parameters;
 
@@ -384,7 +379,7 @@ LowLevelProgramParametersLayoutPtr& ProgramParametersLayout::DeviceLayout ()
       return impl->device_layout;
       
     if (impl->settings->HasDebugLog ())
-      impl->log.Printf ("Creating low-level layout for program parameters layout %u", impl->debug_id);
+      impl->log.Printf ("Creating low-level layout for program parameters layout (id=%u)", impl->Id ());
 
     impl->device_layout = LowLevelProgramParametersLayoutPtr (impl->device->CreateProgramParametersLayout (impl->desc), false);                    
       

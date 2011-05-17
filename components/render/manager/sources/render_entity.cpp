@@ -18,7 +18,7 @@ const size_t LODS_RESERVE = 4; //резервируемое количество уровней детализации
 
 class EntityPrimitiveStateMap;
 
-class EntityLodCommonData: public CacheHolder
+class EntityLodCommonData: public CacheHolder, public DebugIdHolder
 {
   public:
 ///Конструктор
@@ -33,9 +33,19 @@ class EntityLodCommonData: public CacheHolder
       
       mask.ss_constant_buffers [ProgramParametersSlot_Entity] = true;
       
-      default_state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);
+      default_state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);            
+      
+      if (device_manager->Settings ().HasDebugLog ())
+        Log ().Printf ("Entity created (id=%u)", Id ());
     }
     
+///Деструктор
+    ~EntityLodCommonData ()
+    {
+      if (device_manager->Settings ().HasDebugLog ())
+        Log ().Printf ("Entity destroyed (id=%u)", Id ());      
+    }
+
 ///Обратная ссылка на объекта
     EntityImpl& Entity () { return entity; }
     
@@ -137,12 +147,17 @@ class EntityLodCommonData: public CacheHolder
 ///Работа с кэшем
     void ResetCacheCore ()
     {
+      if (device_manager->Settings ().HasDebugLog ())
+        Log ().Printf ("Reset entity cache (id=%u)", Id ());      
     }
     
     void UpdateCacheCore ()
     {
       try
       {
+        if (device_manager->Settings ().HasDebugLog ())
+          Log ().Printf ("Update entity cache (id=%u)", Id ());
+        
         FlushUnusedMaterials ();
 
         dynamic_textures.FlushUnusedTextures ();
@@ -159,7 +174,7 @@ class EntityLodCommonData: public CacheHolder
     }    
     
   private:
-    struct MaterialState: public xtl::reference_counter, public CacheHolder
+    struct MaterialState: public xtl::reference_counter, public CacheHolder, public DebugIdHolder
     {
       EntityLodCommonData&          common_data;
       MaterialPtr                   material;
@@ -182,18 +197,32 @@ class EntityLodCommonData: public CacheHolder
         
         AttachCacheSource (common_data.properties);
         AttachCacheSource (dynamic_textures);        
+        
+        if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
+          Log ().Printf ("Entity material instance created (entity_id=%u, id=%u)", common_data.Id (), Id ());
+      }
+      
+      ~MaterialState ()
+      {
+        if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
+          Log ().Printf ("Entity material instance destroyed (entity_id=%u, id=%u)", common_data.Id (), Id ());        
       }
       
       using CacheHolder::UpdateCache;
       
       void ResetCacheCore ()
       {
+        if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
+          Log ().Printf ("Reset entity material instance cache (entity_id=%u, id=%u)", common_data.Id (), Id ());        
       }
       
       void UpdateCacheCore ()
       {
         try
-        {         
+        {
+          if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
+            Log ().Printf ("Update entity material instance cache (entity_id=%u, id=%u)", common_data.Id (), Id ());
+          
           StateBlockMask mask;
           
           mask.ss_constant_buffers [ProgramParametersSlot_Entity] = true;
@@ -254,7 +283,7 @@ class EntityLodCommonData: public CacheHolder
 
 typedef stl::vector<RendererOperation> RendererOperationArray;
 
-struct EntityLod: public xtl::reference_counter, public CacheHolder
+struct EntityLod: public xtl::reference_counter, public CacheHolder, public DebugIdHolder
 {
   EntityLodCommonData&   common_data;           //общие данные для всех уровней детализации
   size_t                 level_of_detail;       //номер уровня детализации
@@ -274,11 +303,24 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder
     primitive.AttachCacheHolder (*this);
     
     memset (&cached_operation_list, 0, sizeof (cached_operation_list));
+
+    if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
+      Log ().Printf ("Entity lod created (entity_id=%u, id=%u)", common_data.Id (), Id ());
+  }
+  
+///Деструктор
+  ~EntityLod ()
+  {
+    if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
+      Log ().Printf ("Entity lod destroyed (entity_id=%u, id=%u)", common_data.Id (), Id ());
   }
   
 ///Обработчики событий кэша
   void ResetCacheCore ()
   {
+    if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
+      Log ().Printf ("Reset entity lod cache (entity_id=%u, id=%u)", common_data.Id (), Id ());
+        
     cached_primitive = PrimitivePtr ();
     
     cached_operations.clear ();
@@ -290,6 +332,9 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder
   {
     try
     {
+      if (common_data.DeviceManager ()->Settings ().HasDebugLog ())
+        Log ().Printf ("Update entity lod cache (entity_id=%u, id=%u)", common_data.Id (), Id ());
+            
       cached_primitive = primitive.Resource ();
 
       if (!cached_primitive)
@@ -347,6 +392,7 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder
   }  
   
   using CacheHolder::UpdateCache;
+  using CacheHolder::ResetCache;  
 };
 
 typedef xtl::intrusive_ptr<EntityLod> EntityLodPtr;
@@ -672,9 +718,15 @@ const RendererOperationList& EntityImpl::RendererOperations (size_t level_of_det
 void EntityImpl::UpdateCache ()
 {
   impl->UpdateCache ();
+  
+  for (EntityLodArray::iterator iter=impl->lods.begin (), end=impl->lods.end (); iter!=end; ++iter)
+    (*iter)->UpdateCache ();
 }
 
 void EntityImpl::ResetCache ()
 {
   impl->ResetCache ();
+  
+  for (EntityLodArray::iterator iter=impl->lods.begin (), end=impl->lods.end (); iter!=end; ++iter)
+    (*iter)->ResetCache ();  
 }
