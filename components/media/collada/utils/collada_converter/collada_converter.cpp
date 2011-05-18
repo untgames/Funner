@@ -756,26 +756,30 @@ void save_scene (const Params& params, const Model& model)
       if (!instance_mesh_iter)
         throw xtl::format_operation_exception ("::save_scene", "Can't find mesh '%s'", mesh_iter->Mesh ());
 
-      math::vec3f min_extent (FLT_MAX), max_extent (-FLT_MAX);
+      bound_volumes::aaboxf bounding_box;
+
+      bool bounding_box_empty = true;
 
       for (Mesh::SurfaceList::ConstIterator surface_iter = instance_mesh_iter->Surfaces ().CreateIterator (); surface_iter; ++surface_iter)
       {
-        const Vertex* vertex = surface_iter->Vertices ();
+        const Vertex* vertices = surface_iter->Vertices ();
+        const size_t* index    = surface_iter->Indices ();
 
-        for (size_t i = 0, count = surface_iter->VerticesCount (); i < count; i++, vertex++)
+        for (size_t i = 0, count = surface_iter->IndicesCount (); i < count; i++, index++)
         {
-          min_extent.x = stl::min (min_extent.x, vertex->coord.x);
-          min_extent.y = stl::min (min_extent.y, vertex->coord.y);
-          min_extent.z = stl::min (min_extent.z, vertex->coord.z);
-          max_extent.x = stl::max (max_extent.x, vertex->coord.x);
-          max_extent.y = stl::max (max_extent.y, vertex->coord.y);
-          max_extent.z = stl::max (max_extent.z, vertex->coord.z);
+          if (bounding_box_empty)
+          {
+            bounding_box.reset (vertices [*index].coord);
+            bounding_box_empty = false;
+          }
+          else
+            bounding_box += vertices [*index].coord;
         }
       }
 
       stl::string mesh_id = common::format ("%s.%s.mesh#%u", params.output_resources_namespace.c_str (), node_iter->Id (), mesh_index);
 
-      meshes_bound_volumes.insert_pair (mesh_id.c_str (), bound_volumes::aaboxf (min_extent, max_extent));
+      meshes_bound_volumes.insert_pair (mesh_id.c_str (), bounding_box);
     }
   }
 
