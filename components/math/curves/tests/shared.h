@@ -75,7 +75,7 @@ void test_spline (const char* message, Time begin, Time end, const Spline spline
   dump (end);
   printf ("):\n");
   
-  for (Time t=begin; t<end+dt; t+=dt)
+  for (Time t = begin; t < end + (dt / 2.f); t += dt)
   {
     typename Spline::value_type value = spline (t);
     

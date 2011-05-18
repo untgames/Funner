@@ -1,0 +1,17 @@
+Results of ortho_frustum_test:
+Frustum planes:
+planes count 6:
+  -1.00 0.00 0.00 10.00
+  1.00 0.00 0.00 10.00
+  0.00 1.00 0.00 10.00
+  0.00 -1.00 0.00 10.00
+  0.00 0.00 -1.00 10.00
+  0.00 0.00 1.00 10.00
+intersects with box1: false
+intersects with box2: true
+intersects with sphere1: false
+intersects with sphere2: true
+contains box1: false
+contains box2: true
+contains sphere1: false
+contains sphere2: true

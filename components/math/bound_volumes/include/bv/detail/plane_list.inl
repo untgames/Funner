@@ -331,17 +331,13 @@ bool equal (const plane_list<T>& p1, const plane_list<T>& p2, const T& eps)
 */
 
 template <class T>
-plane_list<T> make_frustum (const math::matrix<T, 4>& view_projection)
+void add_frustum (const math::matrix<T, 4>& view_projection, plane_list<T>& result)
 {
   static int transm [16] = { 0, 4,  8, 12,
                              1, 5,  9, 13,
                              2, 6, 10, 14,
                              3, 7, 11, 15 };
   float* clip            = (float*)&view_projection;
-
-  plane_list<T> return_value;
-
-  return_value.reserve (6);
 
   math::plane<T> planes [6];
 
@@ -376,9 +372,17 @@ plane_list<T> make_frustum (const math::matrix<T, 4>& view_projection)
   planes [5].d = clip [transm [15]] + clip [transm [14]];
 
   for (size_t i = 0; i < 6; i++)
-   planes [i] = math::normalize (planes [i]);
+   planes [i] = math::normalize (planes [i]);     
 
-  return_value.add (6, planes);
+  result.add (6, planes);
+}
+
+template <class T>
+plane_list<T> make_frustum (const math::matrix<T, 4>& view_projection)
+{
+  plane_list<T> return_value;
+  
+  add_frustum (view_projection, return_value);
 
   return return_value;
 }
