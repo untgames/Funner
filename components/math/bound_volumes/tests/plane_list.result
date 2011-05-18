@@ -24,15 +24,19 @@ clear
 planes count 0:
 intersects with box1: false
 intersects with box2: true
+intersects with box3: true
 intersects with empty box: false
 intersects with sphere1: false
 intersects with sphere2: true
+intersects with sphere3: true
 intersects with empty sphere: false
 contains box1: false
 contains box2: true
+contains box3: true
 contains empty box: false
 contains sphere1: false
 contains sphere2: true
+contains sphere3: true
 contains empty sphere: false
 p1 equal p3: true
 p1 equal p3: false

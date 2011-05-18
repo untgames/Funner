@@ -594,7 +594,7 @@ typename vector<T, Size>::value_type qlen (const vector<T, Size>& v)
 }
 
 template <class T, unsigned int Size>
-T length (const vector<T, Size>& v)
+typename vector<T, Size>::value_type length (const vector<T, Size>& v)
 {
   return sqrt (qlen (v));
 }

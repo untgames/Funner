@@ -254,7 +254,7 @@ bool contains (const plane_list<T>& p, const axis_aligned_box<T>& b, const T& ep
   {
     const math::plane<T>& current_plane = p [i];
 
-    if (-math::distance (current_plane, center) < math::dot (math::abs (current_plane.normal ()), half_size) - eps)
+    if (math::distance (current_plane, center) < math::dot (math::abs (current_plane.normal ()), half_size) - eps)
       return false;
   }
 
@@ -268,7 +268,7 @@ bool contains (const plane_list<T>& p, const sphere<T>& s, const T& eps)
     return false;
 
   for (size_t i = 0, count = p.planes_count (); i < count; i++)
-    if ((math::distance (p [i], s.center ()) + s.radius ()) > eps)
+    if ((math::distance (p [i], s.center ()) - s.radius ()) < -eps)
       return false;
 
   return true;
@@ -287,7 +287,7 @@ bool intersects (const plane_list<T>& p, const axis_aligned_box<T>& b, const T& 
   {
     const math::plane<T>& current_plane = p [i];
 
-    if (math::distance (current_plane, center) > math::dot (math::abs (current_plane.normal ()), half_size) + eps)
+    if (math::distance (current_plane, center) < -math::dot (math::abs (current_plane.normal ()), half_size) - eps)
       return false;
   }
 
@@ -301,7 +301,7 @@ bool intersects (const plane_list<T>& p, const sphere<T>& s, const T& eps)
     return false;
 
   for (size_t i = 0, count = p.planes_count (); i < count; i++)
-    if ((math::distance (p [i], s.center ()) - s.radius ()) > eps)
+    if ((math::distance (p [i], s.center ()) + s.radius ()) < -eps)
       return false;
 
   return true;
@@ -333,5 +333,52 @@ bool equal (const plane_list<T>& p1, const plane_list<T>& p2, const T& eps)
 template <class T>
 plane_list<T> make_frustum (const math::matrix<T, 4>& view_projection)
 {
-  throw xtl::make_not_implemented_exception ("bound_volumes::make_frustum");
+  static int transm [16] = { 0, 4,  8, 12,
+                             1, 5,  9, 13,
+                             2, 6, 10, 14,
+                             3, 7, 11, 15 };
+  float* clip            = (float*)&view_projection;
+
+  plane_list<T> return_value;
+
+  return_value.reserve (6);
+
+  math::plane<T> planes [6];
+
+  planes [0].a = clip [transm [3]]  - clip [transm [0]];
+  planes [0].b = clip [transm [7]]  - clip [transm [4]];
+  planes [0].c = clip [transm [11]] - clip [transm [8]];
+  planes [0].d = clip [transm [15]] - clip [transm [12]];
+
+  planes [1].a = clip [transm [3]]  + clip [transm [0]];
+  planes [1].b = clip [transm [7]]  + clip [transm [4]];
+  planes [1].c = clip [transm [11]] + clip [transm [8]];
+  planes [1].d = clip [transm [15]] + clip [transm [12]];
+
+  planes [2].a = clip [transm [3]]  + clip [transm [1]];
+  planes [2].b = clip [transm [7]]  + clip [transm [5]];
+  planes [2].c = clip [transm [11]] + clip [transm [9]];
+  planes [2].d = clip [transm [15]] + clip [transm [13]];
+
+  planes [3].a = clip [transm [3]]  - clip [transm [1]];
+  planes [3].b = clip [transm [7]]  - clip [transm [5]];
+  planes [3].c = clip [transm [11]] - clip [transm [9]];
+  planes [3].d = clip [transm [15]] - clip [transm [13]];
+
+  planes [4].a = clip [transm [3]]  - clip [transm [2]];
+  planes [4].b = clip [transm [7]]  - clip [transm [6]];
+  planes [4].c = clip [transm [11]] - clip [transm [10]];
+  planes [4].d = clip [transm [15]] - clip [transm [14]];
+
+  planes [5].a = clip [transm [3]]  + clip [transm [2]];
+  planes [5].b = clip [transm [7]]  + clip [transm [6]];
+  planes [5].c = clip [transm [11]] + clip [transm [10]];
+  planes [5].d = clip [transm [15]] + clip [transm [14]];
+
+  for (size_t i = 0; i < 6; i++)
+   planes [i] = math::normalize (planes [i]);
+
+  return_value.add (6, planes);
+
+  return return_value;
 }
