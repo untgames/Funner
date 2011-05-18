@@ -10,10 +10,10 @@ using namespace bound_volumes;
 
 struct Camera::Impl
 {
-  mat4f       proj_matrix;   //матрица проецирования
-  plane_listf frustum;       //пирамида видимости
-  bool        dirty_pm;      //при true матрица проецирования нуждается в перерасчёте
-  bool        dirty_frustum; //при true пирамида видимости нуждается в перерасчёте
+  mat4f       proj_matrix;     //матрица проецирования
+  plane_listf frustum;         //пирамида видимости
+  bool        dirty_pm;        //при true матрица проецирования нуждается в перерасчёте
+  bool        dirty_frustum;   //при true пирамида видимости нуждается в перерасчёте
 };
 
 /*
@@ -25,9 +25,9 @@ Camera::Camera ()
 {
   impl->dirty_pm      = true;
   impl->dirty_frustum = true;
-  
+
   static const size_t FRUSTUM_PLANES_COUNT = 6;
-  
+
   impl->frustum.reserve (FRUSTUM_PLANES_COUNT);
 }
 
@@ -61,9 +61,9 @@ const plane_listf& Camera::Frustum () const
   if (impl->dirty_frustum)
   {
     impl->frustum.clear ();
-    
-    add_frustum (ProjectionMatrix (), impl->frustum);
-    
+
+    add_frustum (ProjectionMatrix () * math::inverse (WorldTM ()), impl->frustum);
+
     impl->dirty_frustum = false;
   }
   
