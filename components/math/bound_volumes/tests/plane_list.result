@@ -23,10 +23,12 @@ planes count 2:
 clear
 planes count 0:
 intersects with box1: false
+swap intersects with box1: false
 intersects with box2: true
 intersects with box3: true
 intersects with empty box: false
 intersects with sphere1: false
+swap intersects with sphere1: false
 intersects with sphere2: true
 intersects with sphere3: true
 intersects with empty sphere: false

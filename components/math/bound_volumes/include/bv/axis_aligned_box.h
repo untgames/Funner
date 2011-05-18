@@ -11,6 +11,7 @@ namespace bound_volumes
 
 //forward declarations
 template <class T> class sphere;
+template <class T> class plane_list;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Угол ограничивающего параллелипиппеда
@@ -141,6 +142,7 @@ template <class T> bool equal (const axis_aligned_box<T>&, const axis_aligned_bo
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> bool intersects (const axis_aligned_box<T>&, const axis_aligned_box<T>&);
 template <class T> bool intersects (const axis_aligned_box<T>&, const sphere<T>&);
+template <class T> bool intersects (const axis_aligned_box<T>&, const plane_list<T>&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Проверка: содержит ли ограничивающий параллелипиппед различные примитивы

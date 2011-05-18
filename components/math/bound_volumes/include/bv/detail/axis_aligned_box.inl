@@ -316,6 +316,12 @@ inline bool intersects (const axis_aligned_box<T>& box, const sphere<T>& sphere)
   return intersects (sphere, box);
 }
 
+template <class T>
+inline bool intersects (const axis_aligned_box<T>& box, const plane_list<T>& plane)
+{
+  return intersects (plane, box);
+}
+
 /*
     ѕроверка: содержит ли ограничивающий параллелипиппед различные примитивы
 */
