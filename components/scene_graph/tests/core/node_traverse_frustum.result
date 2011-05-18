@@ -2,3 +2,5 @@ Results of camera_ortho_test:
 traverse nodes in frustum:
 node 'entity2'
 node 'entity3'
+traverse nodes in frustum after camera move:
+node 'entity3'

@@ -77,7 +77,12 @@ const plane_listf& Camera::Frustum () const
 void Camera::UpdateNotify ()
 {
   impl->dirty_pm      = true;
-  impl->dirty_frustum = true;  
+  impl->dirty_frustum = true;
+}
+
+void Camera::AfterUpdateWorldTransformEvent ()
+{
+  impl->dirty_frustum = true;
 }
 
 /*
