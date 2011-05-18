@@ -113,11 +113,13 @@ inline T axis_aligned_box<T>::radius () const
 template <class T>
 inline bool axis_aligned_box<T>::empty () const
 {
+  size_t counter = 0;
+
   for (size_t i=0; i<3; i++)
     if (min_extent [i] >= max_extent [i])
-      return true;
+      counter++;
 
-  return false;
+  return counter == 3;
 }
 
 /*

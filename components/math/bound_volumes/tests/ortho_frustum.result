@@ -9,6 +9,7 @@ planes count 6:
   0.00 0.00 1.00 10.00
 intersects with box1: false
 intersects with box2: true
+intersects with box3: true
 intersects with sphere1: false
 intersects with sphere2: true
 contains box1: false
