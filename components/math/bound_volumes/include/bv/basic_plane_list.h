@@ -134,6 +134,7 @@ template <class T> bool equal (const plane_list<T>&, const plane_list<T>&, const
 ///Создание по матрице
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 template <class T> plane_list<T> make_frustum (const math::matrix<T, 4>& view_projection);
+template <class T> void          add_frustum  (const math::matrix<T, 4>& view_projection, plane_list<T>& planes);
 
 #ifndef MATH_BOUND_VOLUMES_PLANE_LIST_NO_DETAILS
   #include <bv/detail/plane_list.inl>
