@@ -2,6 +2,7 @@
 #define SCENE_GRAPH_SCENE_HEADER
 
 #include <sg/entity.h>
+#include <bv/plane_list.h>
 
 namespace scene_graph
 {
@@ -55,6 +56,9 @@ class Scene : public xtl::dynamic_cast_root //Убрать в будущем!!!!
     void Traverse  (const bound_volumes::aaboxf&, const TraverseFunction&) const;
     void Traverse  (const bound_volumes::aaboxf&, INodeTraverser&) const;
     void VisitEach (const bound_volumes::aaboxf&, Visitor&) const;
+    void Traverse  (const bound_volumes::plane_listf&, const TraverseFunction&) const;
+    void Traverse  (const bound_volumes::plane_listf&, INodeTraverser&) const;
+    void VisitEach (const bound_volumes::plane_listf&, Visitor&) const;
 
   private:    
 ///////////////////////////////////////////////////////////////////////////////////////////////////

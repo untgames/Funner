@@ -134,10 +134,10 @@ struct VisitorWrapper
 };
 
 //враппер над вызовами функторов с проверкой попадания обьъекта в ограничивающий объём
-template <class Fn>
+template <class Bound, class Fn>
 struct BoundsCheckFunction
 {
-  BoundsCheckFunction (const aaboxf& in_box, Fn& in_fn) : box (in_box), fn (in_fn) {}
+  BoundsCheckFunction (const Bound& in_bound, Fn& in_fn) : bound (in_bound), fn (in_fn) {}
   
   template <class Entity> void operator () (Entity& entity) const
   {
@@ -151,12 +151,12 @@ struct BoundsCheckFunction
 
       //если объект имеет конечные ограничивающие объёмы - проверяем его попадание в заданный объём
 
-    if (intersects (entity.WorldBoundBox (), box))
+    if (intersects (bound, entity.WorldBoundBox ()))
       fn (entity);
   }
 
-  const aaboxf& box;
-  Fn&           fn;
+  const Bound& bound;
+  Fn&          fn;
 };
 
 }
@@ -188,14 +188,14 @@ void Scene::VisitEach (Visitor& visitor) const
 
 void Scene::Traverse (const aaboxf& box, const TraverseFunction& fn) const
 {
-  BoundsCheckFunction<const TraverseFunction> checker (box, fn);
+  BoundsCheckFunction<aaboxf, const TraverseFunction> checker (box, fn);
 
   impl->ForEach (checker);
 }
 
 void Scene::Traverse (const aaboxf& box, INodeTraverser& traverser) const
 {
-  BoundsCheckFunction<INodeTraverser> checker (box, traverser);
+  BoundsCheckFunction<aaboxf, INodeTraverser> checker (box, traverser);
 
   impl->ForEach (checker);
 }
@@ -203,7 +203,29 @@ void Scene::Traverse (const aaboxf& box, INodeTraverser& traverser) const
 void Scene::VisitEach (const aaboxf& box, Visitor& visitor) const
 {
   VisitorWrapper visitor_wrapper (visitor);
-  BoundsCheckFunction<VisitorWrapper> checker (box, visitor_wrapper);
+  BoundsCheckFunction<aaboxf, VisitorWrapper> checker (box, visitor_wrapper);
+
+  const_cast<Impl*> (impl)->ForEach (checker);
+}
+
+void Scene::Traverse (const plane_listf& box, const TraverseFunction& fn) const
+{
+  BoundsCheckFunction<plane_listf, const TraverseFunction> checker (box, fn);
+
+  impl->ForEach (checker);
+}
+
+void Scene::Traverse (const plane_listf& box, INodeTraverser& traverser) const
+{
+  BoundsCheckFunction<plane_listf, INodeTraverser> checker (box, traverser);
+
+  impl->ForEach (checker);
+}
+
+void Scene::VisitEach (const plane_listf& box, Visitor& visitor) const
+{
+  VisitorWrapper visitor_wrapper (visitor);
+  BoundsCheckFunction<plane_listf, VisitorWrapper> checker (box, visitor_wrapper);
 
   const_cast<Impl*> (impl)->ForEach (checker);
 }
