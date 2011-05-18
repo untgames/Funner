@@ -15,6 +15,7 @@ SDKS.FUNNER3D.IMPORTS       := compile.system compile.render.low_level compile.m
                                compile.physics.manager compile.scene_graph.core compile.input.low_level compile.input.manager \
                                compile.input.window_driver compile.math.curves compile.sound.scene_player \
                                compile.script.core compile.network compile.render.debug_render \
+                               compile.math.bound_volumes \
                                link.common link.system link.render.low_level.opengl_driver \
                                link.media.geometry.xmesh link.media.geometry.binmesh link.media.geometry link.media.rfx \
                                link.media.rfx.default_serializers link.media.animation.xanim link.media.animation.binanim \
@@ -25,6 +26,7 @@ SDKS.FUNNER3D.IMPORTS       := compile.system compile.render.low_level compile.m
                                link.input.manager.xkeymap link.input.manager.xkeyreg link.script.lua \
                                link.engine.script_binds.sg link.engine.script_binds.lua_override link.engine.script_binds.math \
                                link.engine.script_binds.common link.network link.render.debug_render \
+                               link.math.bound_volumes \
                                run.extern.devil run.extern.zzip run.sound.low_level.openal_driver
 #                               info.math.bound_volumes info.common info.input.low_level info.input.manager \
 #                               info.math.vecmath info.math.curves info.media.image info.media.animation \
