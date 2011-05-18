@@ -10,6 +10,7 @@
 #include <math/utility.h>
 
 #include <bv/axis_aligned_box.h>
+#include <bv/plane_list.h>
 #include <bv/sphere.h>
 
 using namespace bound_volumes;
@@ -37,6 +38,14 @@ void dump (const spheref& s)
   printf ("center=");
   dump (s.center());
   printf (" radius=%g",s.radius());
+}
+
+void dump (const plane_listf& p)
+{
+  printf ("planes count %u:\n", p.planes_count ());
+
+  for (size_t i = 0, count = p.planes_count (); i < count; i++)
+    printf ("  %.2f %.2f %.2f %.2f\n", p [i].a, p [i].b, p [i].c, p [i].d);
 }
 
 #endif

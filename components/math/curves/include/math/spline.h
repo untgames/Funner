@@ -2,7 +2,7 @@
 #define MATH_CURVES_SPLINES_HEADER
 
 #ifdef _MSC_VER
-  #pragma push_macros(MATH_CURVES_SPLINE_NO_DETAILS)
+  #pragma push_macro("MATH_CURVES_SPLINE_NO_DETAILS")
 #endif
 
 #define  MATH_CURVES_SPLINE_NO_DETAILS
@@ -10,18 +10,7 @@
 #undef   MATH_CURVES_SPLINE_NO_DETAILS
 
 #ifdef _MSC_VER
-  #pragma push_macros
+  #pragma pop_macro("MATH_CURVES_SPLINE_NO_DETAILS")
 #endif
-
-namespace math
-{
-
-template splinef;
-template spline2f;
-template spline3f;
-template spline4f;
-template rotation_splinef;
-
-}
 
 #endif

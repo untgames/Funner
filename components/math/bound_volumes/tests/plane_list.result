@@ -1,0 +1,46 @@
+Results of plane_list_test:
+plane_list created by default constructor
+planes count 0:
+capacity: 0
+capacity: 15
+add 1 - 0
+add 2 - 1
+planes count 5:
+  1.00 2.00 3.00 4.00
+  2.00 3.00 4.00 5.00
+  3.00 4.00 5.00 6.00
+  4.00 5.00 6.00 7.00
+  3.00 4.00 5.00 6.00
+removing 2 items
+planes count 3:
+  1.00 2.00 3.00 4.00
+  4.00 5.00 6.00 7.00
+  3.00 4.00 5.00 6.00
+removing 1 item
+planes count 2:
+  4.00 5.00 6.00 7.00
+  3.00 4.00 5.00 6.00
+clear
+planes count 0:
+intersects with box1: false
+intersects with box2: true
+intersects with box3: true
+intersects with empty box: false
+intersects with sphere1: false
+intersects with sphere2: true
+intersects with sphere3: true
+intersects with empty sphere: false
+contains box1: false
+contains box2: true
+contains box3: true
+contains empty box: false
+contains sphere1: false
+contains sphere2: true
+contains sphere3: true
+contains empty sphere: false
+p1 equal p3: true
+p1 equal p3: false
+p1 == p2: false
+p1 != p2: true
+p1 == p1: true
+p1 != p1: false

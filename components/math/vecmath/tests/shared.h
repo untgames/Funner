@@ -5,11 +5,17 @@
 
 #include <math/angle.h>
 #include <math/matrix.h>
+#include <math/plane.h>
 #include <math/quat.h>
 #include <math/utility.h>
 #include <math/vector.h>
 
 using namespace math;
+
+void dump (int x)
+{
+  printf ("%d", x);
+}
 
 void dump (float x)
 {
@@ -19,6 +25,16 @@ void dump (float x)
     x = 0.0f;
 
   printf ("%.3f", x);
+}
+
+void dump (double x)
+{
+  static const float EPS = 0.001f;
+
+  if (fabs (x) < EPS)
+    x = 0.0f;
+
+  printf ("%.3g", x);
 }
 
 void dump (bool x)
@@ -46,6 +62,22 @@ void dump (const vector<T, Size>& v)
     dump (v [i]);
   }
   
+  printf ("]");
+}
+
+template <class T>
+void dump (const plane<T>& p)
+{
+  printf ("[");
+
+  for (unsigned int i=0; i<4; i++)
+  {
+    if (i)
+      printf (", ");
+
+    dump (p [i]);
+  }
+
   printf ("]");
 }
 
