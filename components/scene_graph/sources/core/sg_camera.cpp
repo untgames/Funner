@@ -2,6 +2,7 @@
 
 using namespace scene_graph;
 using namespace math;
+using namespace bound_volumes;
 
 /*
     ќписание реализации Camera
@@ -9,8 +10,10 @@ using namespace math;
 
 struct Camera::Impl
 {
-  mat4f proj_matrix;  //матрица проецировани€
-  int   dirty_pm;     //при true матрица проецировани€ нуждаетс€ в перерасчЄте
+  mat4f       proj_matrix;   //матрица проецировани€
+  plane_listf frustum;       //пирамида видимости
+  bool        dirty_pm;      //при true матрица проецировани€ нуждаетс€ в перерасчЄте
+  bool        dirty_frustum; //при true пирамида видимости нуждаетс€ в перерасчЄте
 };
 
 /*
@@ -20,8 +23,12 @@ struct Camera::Impl
 Camera::Camera ()
   : impl (new Impl)
 {
-  impl->proj_matrix = 1;
-  impl->dirty_pm    = 1;
+  impl->dirty_pm      = true;
+  impl->dirty_frustum = true;
+  
+  static const size_t FRUSTUM_PLANES_COUNT = 6;
+  
+  impl->frustum.reserve (FRUSTUM_PLANES_COUNT);
 }
 
 Camera::~Camera ()
@@ -38,9 +45,29 @@ const mat4f& Camera::ProjectionMatrix () const
   if (impl->dirty_pm)
   {
     const_cast<Camera&> (*this).ComputeProjectionMatrix (impl->proj_matrix);
-    impl->dirty_pm = 0;
+    
+    impl->dirty_pm = false;
   }
+
   return impl->proj_matrix;
+}
+
+/*
+    ѕолучение пирамиды видимости
+*/
+
+const plane_listf& Camera::Frustum () const
+{
+  if (impl->dirty_frustum)
+  {
+    impl->frustum.clear ();
+    
+    add_frustum (ProjectionMatrix (), impl->frustum);
+    
+    impl->dirty_frustum = false;
+  }
+  
+  return impl->frustum;
 }
 
 /*
@@ -49,7 +76,8 @@ const mat4f& Camera::ProjectionMatrix () const
 
 void Camera::UpdateNotify ()
 {
-  impl->dirty_pm = 1;
+  impl->dirty_pm      = true;
+  impl->dirty_frustum = true;  
 }
 
 /*
