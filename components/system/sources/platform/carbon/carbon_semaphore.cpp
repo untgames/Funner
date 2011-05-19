@@ -36,7 +36,7 @@ void check_multiprocessing_services_error (OSStatus error_code, const char* sour
                                            get_multiprocessing_services_error_name (error_code), error_code);
 }
 
-bool wait_semaphore (Platform::semaphore_t handle, Duration duration, bool waitable = false)
+bool wait_semaphore (syslib::semaphore_t handle, Duration duration, bool waitable = false)
 {
   if (!handle)
     throw xtl::make_null_argument_exception ("", "handle");
@@ -55,7 +55,7 @@ bool wait_semaphore (Platform::semaphore_t handle, Duration duration, bool waita
 }
 
 //создание семафора
-semaphore_t MacOsThreadManager::CreateSemaphore (size_t initial_value)
+syslib::semaphore_t MacOsThreadManager::CreateSemaphore (size_t initial_value)
 {
   try
   {

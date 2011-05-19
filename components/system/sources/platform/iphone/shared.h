@@ -18,7 +18,7 @@
 
 #include <syslib/platform/iphone.h>
 
-#include <platform/platform.h>
+#include <shared/platform.h>
 
 namespace syslib
 {

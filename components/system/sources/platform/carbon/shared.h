@@ -7,7 +7,7 @@
 #include <common/file.h>
 #include <common/log.h>
 
-#include <platform/platform.h>
+#include <shared/platform.h>
 
 #include <syslib/application.h>
 

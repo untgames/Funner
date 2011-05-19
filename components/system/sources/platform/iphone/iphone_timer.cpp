@@ -14,8 +14,6 @@ const char* LOG_NAME = "syslib.IPhoneTimer";
 class IPhoneTimer
 {
   public:
-    typedef Platform::TimerHandler TimerHandler;
-
     IPhoneTimer  (size_t period_in_milliseconds, const TimerHandler& handler, void* user_data);
     ~IPhoneTimer ();
 
