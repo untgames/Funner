@@ -103,8 +103,12 @@ class XlibWindowManager: public DefaultWindowManager
 ///Платформа
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class LinuxPlatform
- : public UnistdPlatform
- , public XlibWindowManager
+ : public XlibWindowManager
+ , public PThreadManager 
+ , public UnistdTimerManager  
+ , public UnistdLibraryManager
+ , public UnistdApplicationManager
+ 
 {
 };
 

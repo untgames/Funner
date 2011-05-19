@@ -416,7 +416,7 @@ typedef common::Singleton<DisplayManagerImpl> DisplayManagerSingleton;
     Описание реализации курсора
 */
 
-struct Platform::cursor_handle
+struct syslib::cursor_handle
 {
   Display* display; //ссылка на соединение с дисплеем
   Cursor   cursor;  //ссылка на X11 курсор
@@ -431,26 +431,26 @@ struct Platform::cursor_handle
     Описание реализации окна
 */
 
-struct Platform::window_handle: public IWindowMessageHandler
+struct syslib::window_handle: public IWindowMessageHandler
 {
-  Display*                       display;               //дисплей для данного окна
-  XWindow                        window;                //дескриптор окна
-  bool                           is_destroyed;          //удалено ли окно
-  bool                           background_state;      //ложное свойство - состояние фона
-  Rect                           window_rect;           //область окна
-  bool                           window_rect_init;      //инициализирована ли область окна
-  Cursor                         invisible_cursor;      //невидимый курсор
-  bool                           is_cursor_visible;     //видим ли курсор  
-  cursor_t                       active_cursor;         //активный курсор окна
-  syslib::Color                  background_color;      //цвет заднего фона
-  MessageQueue&                  message_queue;         //очередь событий
-  Platform::WindowMessageHandler message_handler;       //функция обработки сообщений окна
-  void*                          user_data;             //пользовательские данные для функции обратного вызова
-  bool                           is_multitouch_enabled; //включен ли multi touch
-  Atom                           wm_delete;             //атом свойства WM_DELETE_WINDOW
+  Display*             display;               //дисплей для данного окна
+  XWindow              window;                //дескриптор окна
+  bool                 is_destroyed;          //удалено ли окно
+  bool                 background_state;      //ложное свойство - состояние фона
+  Rect                 window_rect;           //область окна
+  bool                 window_rect_init;      //инициализирована ли область окна
+  Cursor               invisible_cursor;      //невидимый курсор
+  bool                 is_cursor_visible;     //видим ли курсор  
+  cursor_t             active_cursor;         //активный курсор окна
+  syslib::Color        background_color;      //цвет заднего фона
+  MessageQueue&        message_queue;         //очередь событий
+  WindowMessageHandler message_handler;       //функция обработки сообщений окна
+  void*                user_data;             //пользовательские данные для функции обратного вызова
+  bool                 is_multitouch_enabled; //включен ли multi touch
+  Atom                 wm_delete;             //атом свойства WM_DELETE_WINDOW
   
 ///Конструктор
-  window_handle (Platform::WindowMessageHandler in_message_handler, void* in_user_data)
+  window_handle (WindowMessageHandler in_message_handler, void* in_user_data)
     : display (DisplayManagerSingleton::Instance ()->Display ())
     , window (0)
     , is_destroyed (false)
@@ -787,7 +787,7 @@ void WmNoDecorations (Display* display, XWindow window, XWindow parent_window)
 
 }
 
-Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
+window_t XlibWindowManager::CreateWindow (WindowStyle style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
   try
   {
@@ -884,12 +884,12 @@ Platform::window_t Platform::CreateWindow (WindowStyle style, WindowMessageHandl
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::CreateWindow");
+    e.touch ("syslib::XlibWindowManager::CreateWindow");
     throw;  
   }
 }
 
-void Platform::CloseWindow (window_t handle)
+void XlibWindowManager::CloseWindow (window_t handle)
 {
   try
   {
@@ -914,12 +914,12 @@ void Platform::CloseWindow (window_t handle)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::CloseWindow");
+    e.touch ("syslib::XlibWindowManager::CloseWindow");
     throw;  
   }
 }
 
-void Platform::DestroyWindow (window_t handle)
+void XlibWindowManager::DestroyWindow (window_t handle)
 {
   try
   {
@@ -943,7 +943,7 @@ void Platform::DestroyWindow (window_t handle)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::DestroyWindow");
+    e.touch ("syslib::XlibWindowManager::DestroyWindow");
     throw;  
   }
 }
@@ -952,15 +952,15 @@ void Platform::DestroyWindow (window_t handle)
     Получение платформо-зависимого дескриптора окна
 */
 
-const void* Platform::GetNativeWindowHandle (window_t handle)
+const void* XlibWindowManager::GetNativeWindowHandle (window_t handle)
 {
   return reinterpret_cast<const void*> (handle->window);
 }
 
-const void* Platform::GetNativeDisplayHandle (window_t handle)
+const void* XlibWindowManager::GetNativeDisplayHandle (window_t handle)
 {
   if (!handle)
-    throw xtl::make_null_argument_exception ("syslib::X11Platform::GetNativeDisplayHandle", "handle");
+    throw xtl::make_null_argument_exception ("syslib::XlibWindowManager::GetNativeDisplayHandle", "handle");
     
   return handle->display;
 }
@@ -969,7 +969,7 @@ const void* Platform::GetNativeDisplayHandle (window_t handle)
     Заголовок окна
 */
 
-void Platform::SetWindowTitle (window_t handle, const wchar_t* title)
+void XlibWindowManager::SetWindowTitle (window_t handle, const wchar_t* title)
 {
   try
   {
@@ -982,12 +982,12 @@ void Platform::SetWindowTitle (window_t handle, const wchar_t* title)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::SetWindowTitle");
+    e.touch ("syslib::XlibWindowManager::SetWindowTitle");
     throw;  
   }
 }
 
-void Platform::GetWindowTitle (window_t handle, size_t buffer_size_in_chars, wchar_t* buffer)
+void XlibWindowManager::GetWindowTitle (window_t handle, size_t buffer_size_in_chars, wchar_t* buffer)
 {
   try
   {
@@ -1007,7 +1007,7 @@ void Platform::GetWindowTitle (window_t handle, size_t buffer_size_in_chars, wch
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::GetWindowTitle");
+    e.touch ("syslib::XlibWindowManager::GetWindowTitle");
     throw;  
   }
 }
@@ -1016,7 +1016,7 @@ void Platform::GetWindowTitle (window_t handle, size_t buffer_size_in_chars, wch
     Область окна / клиентская область
 */
 
-void Platform::SetWindowRect (window_t handle, const Rect& rect)
+void XlibWindowManager::SetWindowRect (window_t handle, const Rect& rect)
 {
   try
   {
@@ -1039,12 +1039,12 @@ void Platform::SetWindowRect (window_t handle, const Rect& rect)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::SetWindowRect");
+    e.touch ("syslib::XlibWindowManager::SetWindowRect");
     throw;  
   }
 }
 
-void Platform::SetClientRect (window_t handle, const Rect& rect)
+void XlibWindowManager::SetClientRect (window_t handle, const Rect& rect)
 {
   try
   {
@@ -1059,12 +1059,12 @@ void Platform::SetClientRect (window_t handle, const Rect& rect)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::SetClientRect");
+    e.touch ("syslib::XlibWindowManager::SetClientRect");
     throw;  
   }
 }
 
-void Platform::GetWindowRect (window_t handle, Rect& rect)
+void XlibWindowManager::GetWindowRect (window_t handle, Rect& rect)
 {
   try
   {
@@ -1087,12 +1087,12 @@ void Platform::GetWindowRect (window_t handle, Rect& rect)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::GetWindowRect");
+    e.touch ("syslib::XlibWindowManager::GetWindowRect");
     throw;  
   }
 }
 
-void Platform::GetClientRect (window_t handle, Rect& rect)
+void XlibWindowManager::GetClientRect (window_t handle, Rect& rect)
 {
   try
   {        
@@ -1105,7 +1105,7 @@ void Platform::GetClientRect (window_t handle, Rect& rect)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::GetClientRect");
+    e.touch ("syslib::XlibWindowManager::GetClientRect");
     throw;  
   }
 }
@@ -1114,7 +1114,7 @@ void Platform::GetClientRect (window_t handle, Rect& rect)
     Установка флагов окна
 */
 
-void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
+void XlibWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 {
   try
   {
@@ -1171,12 +1171,12 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::SetWindowFlag");
+    e.touch ("syslib::XlibWindowManager::SetWindowFlag");
     throw;  
   }
 }
 
-bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
+bool XlibWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 {
   try
   {
@@ -1226,7 +1226,7 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::GetWindowFlag");
+    e.touch ("syslib::XlibWindowManager::GetWindowFlag");
     throw;  
   }
 }
@@ -1235,7 +1235,7 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
     Установка родительского окна
 */
 
-void Platform::SetParentWindowHandle (window_t child, const void* parent_handle)
+void XlibWindowManager::SetParentWindowHandle (window_t child, const void* parent_handle)
 {
   try
   {
@@ -1258,12 +1258,12 @@ void Platform::SetParentWindowHandle (window_t child, const void* parent_handle)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::SetParentWindow");
+    e.touch ("syslib::XlibWindowManager::SetParentWindow");
     throw;  
   }
 }
 
-const void* Platform::GetParentWindowHandle (window_t child)
+const void* XlibWindowManager::GetParentWindowHandle (window_t child)
 {
   try
   {
@@ -1282,7 +1282,7 @@ const void* Platform::GetParentWindowHandle (window_t child)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::GetParentWindow");
+    e.touch ("syslib::XlibWindowManager::GetParentWindow");
     throw;  
   }
 }
@@ -1291,7 +1291,7 @@ const void* Platform::GetParentWindowHandle (window_t child)
     Обновление окна
 */
 
-void Platform::InvalidateWindow (window_t handle)
+void XlibWindowManager::InvalidateWindow (window_t handle)
 {
   try
   {    
@@ -1303,7 +1303,7 @@ void Platform::InvalidateWindow (window_t handle)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::InvalidateWindow");
+    e.touch ("syslib::XlibWindowManager::InvalidateWindow");
     throw;  
   }
 }
@@ -1312,7 +1312,7 @@ void Platform::InvalidateWindow (window_t handle)
     Положение курсора
 */
 
-void Platform::SetCursorPosition (const Point& position)
+void XlibWindowManager::SetCursorPosition (const Point& position)
 {
   try
   {
@@ -1325,12 +1325,12 @@ void Platform::SetCursorPosition (const Point& position)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::SetCursorPosition(const Point&)");
+    e.touch ("syslib::XlibWindowManager::SetCursorPosition(const Point&)");
     throw;  
   }
 }
 
-syslib::Point Platform::GetCursorPosition ()
+syslib::Point XlibWindowManager::GetCursorPosition ()
 {
   try
   {
@@ -1349,12 +1349,12 @@ syslib::Point Platform::GetCursorPosition ()
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::GetCursorPosition()");
+    e.touch ("syslib::XlibWindowManager::GetCursorPosition()");
     throw;  
   }
 }
 
-void Platform::SetCursorPosition (window_t handle, const Point& client_position)
+void XlibWindowManager::SetCursorPosition (window_t handle, const Point& client_position)
 {
   try
   {
@@ -1368,12 +1368,12 @@ void Platform::SetCursorPosition (window_t handle, const Point& client_position)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::SetCursorPosition(window_t,const Point&)");
+    e.touch ("syslib::XlibWindowManager::SetCursorPosition(window_t,const Point&)");
     throw;  
   }
 }
 
-syslib::Point Platform::GetCursorPosition (window_t handle)
+syslib::Point XlibWindowManager::GetCursorPosition (window_t handle)
 {
   try
   {
@@ -1393,7 +1393,7 @@ syslib::Point Platform::GetCursorPosition (window_t handle)
   }    
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::GetCursorPosition(window_t)");
+    e.touch ("syslib::XlibWindowManager::GetCursorPosition(window_t)");
     throw;  
   }
 }
@@ -1402,7 +1402,7 @@ syslib::Point Platform::GetCursorPosition (window_t handle)
     Видимость курсора
 */
 
-void Platform::SetCursorVisible (window_t handle, bool state)
+void XlibWindowManager::SetCursorVisible (window_t handle, bool state)
 {
   try
   {
@@ -1429,12 +1429,12 @@ void Platform::SetCursorVisible (window_t handle, bool state)
   }    
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::SetCursorVisible");
+    e.touch ("syslib::XlibWindowManager::SetCursorVisible");
     throw;  
   }
 }
 
-bool Platform::GetCursorVisible (window_t handle)
+bool XlibWindowManager::GetCursorVisible (window_t handle)
 {
   try
   {
@@ -1445,7 +1445,7 @@ bool Platform::GetCursorVisible (window_t handle)
   }    
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::GetCursorVisible");
+    e.touch ("syslib::XlibWindowManager::GetCursorVisible");
     throw;  
   }  
 }
@@ -1454,7 +1454,7 @@ bool Platform::GetCursorVisible (window_t handle)
     Изображение курсора
 */
 
-Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x, int hotspot_y)
+cursor_t XlibWindowManager::CreateCursor (const char* file_name, int hotspot_x, int hotspot_y)
 {
   try
   {    
@@ -1510,12 +1510,12 @@ Platform::cursor_t Platform::CreateCursor (const char* file_name, int hotspot_x,
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::X11Platform::CreateCursor");
+    exception.touch ("syslib::XlibWindowManager::CreateCursor");
     throw;
   }
 }
 
-void Platform::DestroyCursor (cursor_t cursor)
+void XlibWindowManager::DestroyCursor (cursor_t cursor)
 {
   try
   {
@@ -1531,12 +1531,12 @@ void Platform::DestroyCursor (cursor_t cursor)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::X11Platform::DestroyCursor");
+    exception.touch ("syslib::XlibWindowManager::DestroyCursor");
     throw;
   }
 }
 
-void Platform::SetCursor (window_t handle, cursor_t cursor)
+void XlibWindowManager::SetCursor (window_t handle, cursor_t cursor)
 {
   try
   {
@@ -1561,7 +1561,7 @@ void Platform::SetCursor (window_t handle, cursor_t cursor)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::SetCursor");
+    e.touch ("syslib::XlibWindowManager::SetCursor");
     throw;
   }
 }
@@ -1570,7 +1570,7 @@ void Platform::SetCursor (window_t handle, cursor_t cursor)
     Цвет фона
 */
 
-void Platform::SetBackgroundColor (window_t handle, const Color& color)
+void XlibWindowManager::SetBackgroundColor (window_t handle, const Color& color)
 {
   try
   {
@@ -1598,12 +1598,12 @@ void Platform::SetBackgroundColor (window_t handle, const Color& color)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::SetBackgroundColor");
+    e.touch ("syslib::XlibWindowManager::SetBackgroundColor");
     throw;
   }
 }
 
-void Platform::SetBackgroundState (window_t handle, bool state)
+void XlibWindowManager::SetBackgroundState (window_t handle, bool state)
 {
   try
   {
@@ -1614,12 +1614,12 @@ void Platform::SetBackgroundState (window_t handle, bool state)
   }  
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::SetBackgroundState");
+    e.touch ("syslib::XlibWindowManager::SetBackgroundState");
     throw;
   }
 }
 
-Color Platform::GetBackgroundColor (window_t handle)
+Color XlibWindowManager::GetBackgroundColor (window_t handle)
 {
   try
   {
@@ -1630,12 +1630,12 @@ Color Platform::GetBackgroundColor (window_t handle)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::GetBackgroundColor");
+    e.touch ("syslib::XlibWindowManager::GetBackgroundColor");
     throw;
   }
 }
 
-bool Platform::GetBackgroundState (window_t handle)
+bool XlibWindowManager::GetBackgroundState (window_t handle)
 {
   try
   {
@@ -1646,7 +1646,7 @@ bool Platform::GetBackgroundState (window_t handle)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::GetBackgroundState");
+    e.touch ("syslib::XlibWindowManager::GetBackgroundState");
     throw;
   }
 }
@@ -1656,9 +1656,9 @@ bool Platform::GetBackgroundState (window_t handle)
 */
 
 //возвращается длина строки без учёта '\0'
-size_t Platform::GetKeyName (ScanCode scan_code, size_t buffer_size, char* buffer)
+size_t XlibWindowManager::GetKeyName (ScanCode scan_code, size_t buffer_size, char* buffer)
 {
-  static const char* METHOD_NAME = "syslib::X11Platform::GetKeyName";
+  static const char* METHOD_NAME = "syslib::XlibWindowManager::GetKeyName";
 
   if (scan_code < 0 || scan_code >= ScanCode_Num)
     throw xtl::make_argument_exception (METHOD_NAME, "scan_code", scan_code);
@@ -1687,7 +1687,7 @@ size_t Platform::GetKeyName (ScanCode scan_code, size_t buffer_size, char* buffe
    Установка/получение multitouch режима
 */
 
-void Platform::SetMultitouchEnabled (window_t window, bool state)
+void XlibWindowManager::SetMultitouchEnabled (window_t window, bool state)
 {
   try
   {
@@ -1698,12 +1698,12 @@ void Platform::SetMultitouchEnabled (window_t window, bool state)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::SetMultitouchEnabled");
+    e.touch ("syslib::XlibWindowManager::SetMultitouchEnabled");
     throw;
   }
 }
 
-bool Platform::IsMultitouchEnabled (window_t window)
+bool XlibWindowManager::IsMultitouchEnabled (window_t window)
 {
   try
   {
@@ -1714,7 +1714,7 @@ bool Platform::IsMultitouchEnabled (window_t window)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::IsMultitouchEnabled");
+    e.touch ("syslib::XlibWindowManager::IsMultitouchEnabled");
     throw;
   }
 }

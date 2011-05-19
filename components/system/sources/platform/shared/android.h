@@ -72,9 +72,9 @@ class AndroidWindowManager: public DefaultWindowManager
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 class AndroidPlatform
  : public AndroidWindowManager
- , public DefaultTimerManager 
- , public UnistdApplicationManager 
  , public PThreadManager 
+ , public UnistdTimerManager 
+ , public UnistdApplicationManager 
  , public UnistdLibraryManager
 
 {

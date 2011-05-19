@@ -31,5 +31,5 @@
 #include <syslib/thread.h>
 #include <syslib/platform/x11.h>
 
-#include <platform/platform.h>
-#include <platform/message_queue.h>
+#include <shared/platform.h>
+#include <shared/message_queue.h>

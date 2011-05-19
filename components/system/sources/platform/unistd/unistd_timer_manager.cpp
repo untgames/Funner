@@ -1,15 +1,25 @@
 #include <ctime>
 
-#include "shared.h"
+#include <xtl/bind.h>
+#include <xtl/common_exceptions.h>
+#include <xtl/function.h>
+
+#include <common/log.h>
+#include <common/singleton.h>
+#include <common/time.h>
+
+#include <syslib/thread.h>
+
+#include <shared/message_queue.h>
+#include <shared/platform.h>
 
 using namespace syslib;
-using namespace syslib::x11;
 
 /*
     Описание таймера
 */
 
-struct Platform::timer_handle
+struct syslib::timer_handle
 {
   size_t       next_raise_time;        //время следующего срабатывания
   size_t       period_in_milliseconds; //период срабатывания
@@ -34,7 +44,7 @@ namespace
     Константы
 */
 
-const char* LOG_NAME = "system.x11"; //имя потока протоколирования
+const char* LOG_NAME = "system.unistd"; //имя потока протоколирования
 
 /*
     Менеджер таймеров
@@ -43,6 +53,8 @@ const char* LOG_NAME = "system.x11"; //имя потока протоколирования
 class TimerManager
 {
   public:
+    typedef syslib::timer_t timer_t;
+  
 ///Конструктор
     TimerManager ()
       : message_queue (*MessageQueueSingleton::Instance ())
@@ -94,16 +106,16 @@ class TimerManager
     }
   
 ///Создание таймера
-    Platform::timer_t CreateTimer (size_t period_in_milliseconds, Platform::TimerHandler handler, void* user_data)
+    timer_t CreateTimer (size_t period_in_milliseconds, TimerHandler handler, void* user_data)
     {
       try
       {
-        stl::auto_ptr<Platform::timer_handle> timer;
+        stl::auto_ptr<timer_handle> timer;
         
         {
           Lock lock (mutex);
 
-          timer = new Platform::timer_handle (period_in_milliseconds, handler, user_data);           
+          timer = new timer_handle (period_in_milliseconds, handler, user_data);           
           
           timers.push_back (timer.get ());
           
@@ -111,8 +123,6 @@ class TimerManager
         }
         
         condition.NotifyOne ();
-        
-        printf ("timer created\n"); fflush (stdout);
         
         return timer.release ();
       }
@@ -124,7 +134,7 @@ class TimerManager
     }
     
 ///Удаление таймера
-    void KillTimer (Platform::timer_t timer)
+    void KillTimer (timer_t timer)
     {
       try
       {
@@ -185,10 +195,10 @@ class TimerManager
 ///Сообщение таймера
     struct Message: public MessageQueue::Message
     {
-      TimerManager&     manager;
-      Platform::timer_t timer;
+      TimerManager& manager;
+      timer_t       timer;
       
-      Message (TimerManager& in_manager, Platform::timer_t in_timer)
+      Message (TimerManager& in_manager, timer_t in_timer)
         : manager (in_manager)
         , timer (in_timer) {}
       
@@ -199,7 +209,7 @@ class TimerManager
     };
     
 ///Диспетчеризация вызова таймера
-    void DispatchTimer (Platform::timer_t timer)
+    void DispatchTimer (timer_t timer)
     {
       Lock lock (mutex);
       
@@ -270,7 +280,7 @@ class TimerManager
         
         for (TimerList::iterator iter=timers.begin (), end=timers.end (); iter!=end; ++iter)
         {
-          Platform::timer_handle& timer = **iter;
+          timer_handle& timer = **iter;
           
           if (timer.next_raise_time > time)
             continue;
@@ -306,7 +316,7 @@ class TimerManager
     }
   
   private:
-    typedef stl::vector<Platform::timer_t> TimerList;
+    typedef stl::vector<timer_t> TimerList;
 
   private:
     MessageQueue& message_queue;   //очередь собщений
@@ -328,7 +338,7 @@ typedef common::Singleton<TimerManager> TimerManagerSingleton;
     Создание / уничтожение таймера
 */
 
-Platform::timer_t Platform::CreateTimer (size_t period_in_milliseconds, TimerHandler handler, void* user_data)
+syslib::timer_t UnistdTimerManager::CreateTimer (size_t period_in_milliseconds, TimerHandler handler, void* user_data)
 {
   try
   {
@@ -338,12 +348,12 @@ Platform::timer_t Platform::CreateTimer (size_t period_in_milliseconds, TimerHan
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::CreateTimer");
+    e.touch ("syslib::UnistdTimerManager::CreateTimer");
     throw;
   }
 }
 
-void Platform::KillTimer (timer_t handle)
+void UnistdTimerManager::KillTimer (timer_t handle)
 {
   try
   {
@@ -353,7 +363,7 @@ void Platform::KillTimer (timer_t handle)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::X11Platform::KillTimer");
+    e.touch ("syslib::UnistdTimerManager::KillTimer");
     throw;
   }
 }
