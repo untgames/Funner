@@ -126,6 +126,21 @@ const void* DefaultWindowManager::GetParentWindowHandle (window_t child)
 }
 
 /*
+   Установка multitouch режима для окна
+*/
+
+void DefaultWindowManager::SetMultitouchEnabled (window_t window, bool enabled)
+{
+  if (enabled)
+    raise ("syslib::DefaultWindowManager::SetMultitouchEnabled");      
+}
+
+bool DefaultWindowManager::IsMultitouchEnabled (window_t window)
+{
+  return false;
+}
+
+/*
     Обновление окна
 */
 
