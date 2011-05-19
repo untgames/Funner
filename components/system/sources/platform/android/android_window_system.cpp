@@ -9,7 +9,7 @@ using namespace syslib::android;
     Окно
 */
 
-struct Platform::window_handle
+struct syslib::window_handle
 {
   global_ref<jobject>  view;                           //android окно
   NativeWindow         window;                         //описание окна
@@ -335,7 +335,7 @@ class JniWindowManager
     }
     
 ///Регистрация дескриптора окна
-    void RegisterWindow (jobject view, Platform::window_t window)
+    void RegisterWindow (jobject view, window_t window)
     {
       if (FindWindow (view))
         throw xtl::format_operation_exception ("syslib::android::JniWindowManager::RegisterWindow", "Window have already registered");
@@ -360,7 +360,7 @@ class JniWindowManager
     }
     
 ///Поиск дескриптора окна
-    Platform::window_t FindWindow (jobject view) const
+    window_t FindWindow (jobject view) const
     {
       if (!view)
         return 0;
@@ -378,9 +378,9 @@ class JniWindowManager
     struct WindowEntry
     {
       global_ref<jobject> view;
-      Platform::window_t  window;
+      window_t  window;
       
-      WindowEntry (jobject in_view, Platform::window_t in_window)
+      WindowEntry (jobject in_view, window_t in_window)
         : view (in_view)
         , window (in_window)
       {
@@ -404,7 +404,7 @@ typedef common::Singleton<JniWindowManager> JniWindowManagerSingleton;
 template <class Fn> class WindowMessage: public MessageQueue::Message
 {
   public:
-    WindowMessage (Platform::window_t in_window, const Fn& in_fn)
+    WindowMessage (window_t in_window, const Fn& in_fn)
       : window (in_window)
       , fn (in_fn) {}
 
@@ -414,7 +414,7 @@ template <class Fn> class WindowMessage: public MessageQueue::Message
     }
 
   private:
-    Platform::window_t window;
+    window_t window;
     Fn                 fn;
 };
 
@@ -422,7 +422,7 @@ template <class Fn> void push_message (jobject view, const Fn& fn)
 {
   try
   {
-    Platform::window_t window = JniWindowManagerSingleton::Instance ()->FindWindow (view);
+    window_t window = JniWindowManagerSingleton::Instance ()->FindWindow (view);
     
     if (!window)
       return;
@@ -437,54 +437,54 @@ template <class Fn> void push_message (jobject view, const Fn& fn)
 
 void on_layout_callback (JNIEnv& env, jobject view, int left, int top, int right, int bottom)
 {
-  push_message (view, xtl::bind (&Platform::window_handle::OnLayoutCallback, _1, left, top, right, bottom));
+  push_message (view, xtl::bind (&window_handle::OnLayoutCallback, _1, left, top, right, bottom));
 }
 
 void on_display_hint_callback (JNIEnv& env, jobject view, int hint)
 {
-  push_message (view, xtl::bind (&Platform::window_handle::OnDisplayHintCallback, _1, hint));
+  push_message (view, xtl::bind (&window_handle::OnDisplayHintCallback, _1, hint));
 }
 
 void on_draw_callback (JNIEnv& env, jobject view)
 {
-  push_message (view, xtl::bind (&Platform::window_handle::OnDrawCallback, _1));
+  push_message (view, xtl::bind (&window_handle::OnDrawCallback, _1));
 }
 
 void on_touch_callback (JNIEnv& env, jobject view, int pointer_id, int action, float x, float y)
 {
-  push_message (view, xtl::bind (&Platform::window_handle::OnTouchCallback, _1, pointer_id, action, x, y));
+  push_message (view, xtl::bind (&window_handle::OnTouchCallback, _1, pointer_id, action, x, y));
 }
 
 void on_doubletap_callback (JNIEnv& env, jobject view, int pointer_id, float x, float y)
 {
-  push_message (view, xtl::bind (&Platform::window_handle::OnDoubletapCallback, _1, pointer_id, x, y));
+  push_message (view, xtl::bind (&window_handle::OnDoubletapCallback, _1, pointer_id, x, y));
 }
 
 void on_trackball_callback (JNIEnv& env, jobject view, int pointer_id, int action, float x, float y)
 {
-  push_message (view, xtl::bind (&Platform::window_handle::OnTrackballCallback, _1, pointer_id, action, x, y));
+  push_message (view, xtl::bind (&window_handle::OnTrackballCallback, _1, pointer_id, action, x, y));
 }
 
 void on_key_callback (JNIEnv& env, jobject view, int key, int action, jboolean is_alt_pressed, jboolean is_shift_pressed, jboolean is_sym_pressed)
 {
-  push_message (view, xtl::bind (&Platform::window_handle::OnKeyCallback, _1, key, action, is_alt_pressed != 0, is_shift_pressed != 0, is_sym_pressed != 0));
+  push_message (view, xtl::bind (&window_handle::OnKeyCallback, _1, key, action, is_alt_pressed != 0, is_shift_pressed != 0, is_sym_pressed != 0));
 }
 
 void on_focus_callback (JNIEnv& env, jobject view, jboolean gained)
 {
-  push_message (view, xtl::bind (&Platform::window_handle::OnFocusCallback, _1, gained != 0));
+  push_message (view, xtl::bind (&window_handle::OnFocusCallback, _1, gained != 0));
 }
 
 void on_surface_created_callback (JNIEnv& env, jobject view)
 {
   try
   {
-    push_message (view, xtl::bind (&Platform::window_handle::OnSurfaceCreatedCallback, _1));
-    push_message (view, xtl::bind (&Platform::window_handle::OnDrawCallback, _1));
+    push_message (view, xtl::bind (&window_handle::OnSurfaceCreatedCallback, _1));
+    push_message (view, xtl::bind (&window_handle::OnDrawCallback, _1));
 
     JniWindowManagerSingleton::Instance instance;
 
-    Platform::window_t window = instance->FindWindow (view);
+    window_t window = instance->FindWindow (view);
 
     if (!window)
       return;    
@@ -498,12 +498,12 @@ void on_surface_created_callback (JNIEnv& env, jobject view)
 
 void on_surface_changed_callback (JNIEnv& env, jobject view, jint format, jint width, jint height)
 {
-  push_message (view, xtl::bind (&Platform::window_handle::OnDrawCallback, _1));    
+  push_message (view, xtl::bind (&window_handle::OnDrawCallback, _1));    
 }
 
 void on_surface_destroyed_callback (JNIEnv& env, jobject view)
 {
-  push_message (view, xtl::bind (&Platform::window_handle::OnSurfaceDestroyedCallback, _1));
+  push_message (view, xtl::bind (&window_handle::OnSurfaceDestroyedCallback, _1));
 }
 
 }
@@ -512,7 +512,7 @@ void on_surface_destroyed_callback (JNIEnv& env, jobject view)
     Создание/закрытие/уничтожение окна
 */
 
-Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
+window_t AndroidWindowManager::CreateWindow (WindowStyle, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
   try
   {
@@ -591,28 +591,28 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::CreateWindow");
+    e.touch ("syslib::AndroidWindowManager::CreateWindow");
     throw;
   }
 }
 
-void Platform::CloseWindow (window_t)
+void AndroidWindowManager::CloseWindow (window_t)
 {
-  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::CloseWindow");
+  throw xtl::make_not_implemented_exception ("syslib::AndroidWindowManager::CloseWindow");
 }
 
-void Platform::DestroyWindow (window_t)
+void AndroidWindowManager::DestroyWindow (window_t)
 {
   //TODO: release window handle
 
-  throw xtl::make_not_implemented_exception ("syslib::AndroidPlatform::DestroyWindow");
+  throw xtl::make_not_implemented_exception ("syslib::AndroidWindowManager::DestroyWindow");
 }
 
 /*
     Получение платформо-зависимого дескриптора окна
 */
 
-const void* Platform::GetNativeWindowHandle (window_t window)
+const void* AndroidWindowManager::GetNativeWindowHandle (window_t window)
 {
   try
   {
@@ -623,12 +623,12 @@ const void* Platform::GetNativeWindowHandle (window_t window)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::GetNativeWindowHandle");
+    e.touch ("syslib::AndroidWindowManager::GetNativeWindowHandle");
     throw;
   }
 }
 
-const void* Platform::GetNativeDisplayHandle (window_t)
+const void* AndroidWindowManager::GetNativeDisplayHandle (window_t)
 {
   return 0;
 }
@@ -637,17 +637,17 @@ const void* Platform::GetNativeDisplayHandle (window_t)
     Заголовок окна
 */
 
-void Platform::SetWindowTitle (window_t, const wchar_t*)
+void AndroidWindowManager::SetWindowTitle (window_t, const wchar_t*)
 {
 }
 
-void Platform::GetWindowTitle (window_t, size_t size, wchar_t* buffer)
+void AndroidWindowManager::GetWindowTitle (window_t, size_t size, wchar_t* buffer)
 {
   if (!size)
     return;
 
   if (!buffer)
-    throw xtl::make_null_argument_exception ("syslib::AndroidPlatform::GetWindowTitle", "buffer");
+    throw xtl::make_null_argument_exception ("syslib::AndroidWindowManager::GetWindowTitle", "buffer");
 
   *buffer = L'\0';
 }
@@ -656,7 +656,7 @@ void Platform::GetWindowTitle (window_t, size_t size, wchar_t* buffer)
     Область окна / клиентская область
 */
 
-void Platform::SetWindowRect (window_t window, const Rect& rect)
+void AndroidWindowManager::SetWindowRect (window_t window, const Rect& rect)
 {
   try
   {
@@ -671,12 +671,12 @@ void Platform::SetWindowRect (window_t window, const Rect& rect)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::SetWindowRect");
+    e.touch ("syslib::AndroidWindowManager::SetWindowRect");
     throw;
   }
 }
 
-void Platform::SetClientRect (window_t window, const Rect& rect)
+void AndroidWindowManager::SetClientRect (window_t window, const Rect& rect)
 {
   try
   {
@@ -684,12 +684,12 @@ void Platform::SetClientRect (window_t window, const Rect& rect)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::SetClientRect");
+    e.touch ("syslib::AndroidWindowManager::SetClientRect");
     throw;
   }
 }
 
-void Platform::GetWindowRect (window_t window, Rect& out_result)
+void AndroidWindowManager::GetWindowRect (window_t window, Rect& out_result)
 {
   try
   {
@@ -709,12 +709,12 @@ void Platform::GetWindowRect (window_t window, Rect& out_result)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::GetWindowRect");
+    e.touch ("syslib::AndroidWindowManager::GetWindowRect");
     throw;
   }
 }
 
-void Platform::GetClientRect (window_t window, Rect& rect)
+void AndroidWindowManager::GetClientRect (window_t window, Rect& rect)
 {
   try
   {
@@ -722,7 +722,7 @@ void Platform::GetClientRect (window_t window, Rect& rect)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::GetClientRect");
+    e.touch ("syslib::AndroidWindowManager::GetClientRect");
     throw;
   }
 }
@@ -731,7 +731,7 @@ void Platform::GetClientRect (window_t window, Rect& rect)
     Установка флагов окна
 */
 
-void Platform::SetWindowFlag (window_t window, WindowFlag flag, bool state)
+void AndroidWindowManager::SetWindowFlag (window_t window, WindowFlag flag, bool state)
 {
   try
   {
@@ -774,12 +774,12 @@ void Platform::SetWindowFlag (window_t window, WindowFlag flag, bool state)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::SetWindowFlag");
+    e.touch ("syslib::AndroidWindowManager::SetWindowFlag");
     throw;
   }
 }
 
-bool Platform::GetWindowFlag (window_t window, WindowFlag flag)
+bool AndroidWindowManager::GetWindowFlag (window_t window, WindowFlag flag)
 {
   try
   {
@@ -804,30 +804,16 @@ bool Platform::GetWindowFlag (window_t window, WindowFlag flag)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::GetWindowFlag");
+    e.touch ("syslib::AndroidWindowManager::GetWindowFlag");
     throw;
   }
-}
-
-/*
-    Установка родительского окна
-*/
-
-void Platform::SetParentWindowHandle (window_t child, const void* parent_handle)
-{
-  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::SetParentWindowHandle", "Parent windows not supported for Android platform");
-}
-
-const void* Platform::GetParentWindowHandle (window_t child)
-{
-  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::GetParentWindowHandle", "Parent windows not supported for Android platform");
 }
 
 /*
     Обновление окна
 */
 
-void Platform::InvalidateWindow (window_t window)
+void AndroidWindowManager::InvalidateWindow (window_t window)
 {
   try
   {
@@ -840,77 +826,16 @@ void Platform::InvalidateWindow (window_t window)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::InvalidateWindow");
+    e.touch ("syslib::AndroidWindowManager::InvalidateWindow");
     throw;
   }
-}
-
-/*
-    Положение курсора
-*/
-
-void Platform::SetCursorPosition (const Point&)
-{
-  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::SetCursorPosition(const Point&)", "No cursor for Android platform");
-}
-
-Point Platform::GetCursorPosition ()
-{
-  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::GetCursorPosition()", "No cursor for Android platform");
-}
-
-void Platform::SetCursorPosition (window_t, const Point& client_position)
-{
-  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::SetCursorPosition(window_t,const Point&)", "No cursor for Android platform");
-}
-
-Point Platform::GetCursorPosition (window_t)
-{
-  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::GetCursorPosition(window_t)", "No cursor for Android platform");
-}
-
-/*
-    Видимость курсора
-*/
-
-void Platform::SetCursorVisible (window_t window, bool state)
-{
-  if (!window)
-    throw xtl::make_null_argument_exception ("syslib::AndroidPlatform::SetCursorVisible", "window");
-
-  if (state)
-    throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::SetCursorVisible", "No cursor for Android platform");
-}
-
-bool Platform::GetCursorVisible (window_t)
-{
-  return false;
-}
-
-/*
-    Изображение курсора
-*/
-
-Platform::cursor_t Platform::CreateCursor (const char*, int, int)
-{
-  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::CreateCursor", "No cursor for Android platform");
-}
-
-void Platform::DestroyCursor (cursor_t)
-{
-  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::DestroyCursor", "No cursor for Android platform");
-}
-
-void Platform::SetCursor (window_t, cursor_t)
-{
-  throw xtl::format_not_supported_exception ("syslib::AndroidPlatform::SetCursor", "No cursor for Android platform");
 }
 
 /*
    Установка multitouch режима для окна
 */
 
-void Platform::SetMultitouchEnabled (window_t window, bool enabled)
+void AndroidWindowManager::SetMultitouchEnabled (window_t window, bool enabled)
 {
   try
   {
@@ -921,12 +846,12 @@ void Platform::SetMultitouchEnabled (window_t window, bool enabled)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::SetMultitouchEnabled");
+    e.touch ("syslib::AndroidWindowManager::SetMultitouchEnabled");
     throw;
   }
 }
 
-bool Platform::IsMultitouchEnabled (window_t window)
+bool AndroidWindowManager::IsMultitouchEnabled (window_t window)
 {
   try
   {
@@ -937,7 +862,7 @@ bool Platform::IsMultitouchEnabled (window_t window)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::IsMultitouchEnabled");
+    e.touch ("syslib::AndroidWindowManager::IsMultitouchEnabled");
     throw;
   }
 }
@@ -946,7 +871,7 @@ bool Platform::IsMultitouchEnabled (window_t window)
     Цвет фона
 */
 
-void Platform::SetBackgroundColor (window_t window, const Color& color)
+void AndroidWindowManager::SetBackgroundColor (window_t window, const Color& color)
 {
   try
   {
@@ -964,12 +889,12 @@ void Platform::SetBackgroundColor (window_t window, const Color& color)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::SetBackgroundColor");
+    e.touch ("syslib::AndroidWindowManager::SetBackgroundColor");
     throw;
   }
 }
 
-void Platform::SetBackgroundState (window_t window, bool state)
+void AndroidWindowManager::SetBackgroundState (window_t window, bool state)
 {
   try
   {
@@ -984,12 +909,12 @@ void Platform::SetBackgroundState (window_t window, bool state)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::SetBackgroundState");
+    e.touch ("syslib::AndroidWindowManager::SetBackgroundState");
     throw;
   }
 }
 
-Color Platform::GetBackgroundColor (window_t window)
+Color AndroidWindowManager::GetBackgroundColor (window_t window)
 {
   try
   {
@@ -1008,12 +933,12 @@ Color Platform::GetBackgroundColor (window_t window)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::GetBackgroundColor");
+    e.touch ("syslib::AndroidWindowManager::GetBackgroundColor");
     throw;
   }
 }
 
-bool Platform::GetBackgroundState (window_t window)
+bool AndroidWindowManager::GetBackgroundState (window_t window)
 {
   try
   {
@@ -1024,7 +949,7 @@ bool Platform::GetBackgroundState (window_t window)
   }
   catch (xtl::exception& e)
   {
-    e.touch ("syslib::AndroidPlatform::GetBackgroundState");
+    e.touch ("syslib::AndroidWindowManager::GetBackgroundState");
     throw;
   }
 }

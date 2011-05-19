@@ -1,4 +1,4 @@
-#include <platform/message_queue.h>
+#include <shared/message_queue.h>
 
 using namespace syslib;
 

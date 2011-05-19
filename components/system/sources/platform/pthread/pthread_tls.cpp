@@ -69,7 +69,7 @@ struct TlsKeyImpl
 
 }
 
-Platform::tls_t Platform::CreateTls (IThreadCleanupCallback* cleanup)
+tls_t PThreadManager::CreateTls (IThreadCleanupCallback* cleanup)
 {
   try
   {
@@ -77,12 +77,12 @@ Platform::tls_t Platform::CreateTls (IThreadCleanupCallback* cleanup)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Platform::CreateTls");
+    exception.touch ("syslib::PThreadManager::CreateTls");
     throw;
   }
 }
 
-void Platform::DestroyTls (tls_t tls)
+void PThreadManager::DestroyTls (tls_t tls)
 {
   try
   {
@@ -100,7 +100,7 @@ void Platform::DestroyTls (tls_t tls)
   }
 }
 
-void Platform::SetTls (tls_t tls, void* data)
+void PThreadManager::SetTls (tls_t tls, void* data)
 {
   try
   {
@@ -113,12 +113,12 @@ void Platform::SetTls (tls_t tls, void* data)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Platform::SetTls");
+    exception.touch ("syslib::PThreadManager::SetTls");
     throw;
   }
 }
 
-void* Platform::GetTls (tls_t tls)
+void* PThreadManager::GetTls (tls_t tls)
 {
   try
   {
@@ -131,7 +131,7 @@ void* Platform::GetTls (tls_t tls)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::Platform::GetTls");
+    exception.touch ("syslib::PThreadManager::GetTls");
     throw;
   }
 }

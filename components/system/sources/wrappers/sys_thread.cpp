@@ -61,12 +61,12 @@ struct Thread::Impl: public IThreadCallback, public xtl::reference_counter, publ
 {
   typedef xtl::lock_ptr<Impl, xtl::intrusive_ptr<Impl> > LockPtr;
 
-  Function           thread_function;  //функция нити
-  Platform::thread_t handle;           //идентификатор нити
-  size_t             id;               //численный идентификатор нити
-  stl::string        name;             //имя нити
-  int                exit_code;        //код выхода нити
-  bool               cancel_requested; //был ли получен запрос на отмену нити
+  Function     thread_function;  //функция нити
+  thread_t     handle;           //идентификатор нити
+  size_t       id;               //численный идентификатор нити
+  stl::string  name;             //имя нити
+  int          exit_code;        //код выхода нити
+  bool         cancel_requested; //был ли получен запрос на отмену нити
 
 ///Конструктор
   Impl (const char* in_name, const Function& in_thread_function)

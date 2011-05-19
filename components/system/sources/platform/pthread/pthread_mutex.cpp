@@ -3,7 +3,7 @@
 using namespace syslib;
 
 //создание исключающего семафора
-Platform::mutex_t Platform::CreateMutex ()
+mutex_t PThreadManager::CreateMutex ()
 {
   try
   {
@@ -31,13 +31,13 @@ Platform::mutex_t Platform::CreateMutex ()
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadsPlatform::CreateMutex");
+    exception.touch ("syslib::PThreadManager::CreateMutex");
     throw;
   }
 }
 
 //удаление исключающего семафора
-void Platform::DestroyMutex (mutex_t handle)
+void PThreadManager::DestroyMutex (mutex_t handle)
 {
   try
   {
@@ -53,13 +53,13 @@ void Platform::DestroyMutex (mutex_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadsPlatform::DestroyMutex");
+    exception.touch ("syslib::PThreadManager::DestroyMutex");
     throw;
   }
 }
 
 //захват исключающего семафора
-void Platform::LockMutex (mutex_t handle)
+void PThreadManager::LockMutex (mutex_t handle)
 {
   try
   {
@@ -73,19 +73,19 @@ void Platform::LockMutex (mutex_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadsPlatform::LockMutex(mutex_t)");
+    exception.touch ("syslib::PThreadManager::LockMutex(mutex_t)");
     throw;
   }
 }
 
 //захват исключающего семафора с указанием максимального времени ожидания
-bool Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
+bool PThreadManager::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
 {
-  throw xtl::make_not_implemented_exception ("syslib::PThreadsPlatform::LockMutex(mutex_t, size_t)");
+  throw xtl::make_not_implemented_exception ("syslib::PThreadManager::LockMutex(mutex_t, size_t)");
 }
 
 //попытка захвата исключающего семафора
-bool Platform::TryLockMutex (mutex_t handle)
+bool PThreadManager::TryLockMutex (mutex_t handle)
 {
   try
   {
@@ -105,13 +105,13 @@ bool Platform::TryLockMutex (mutex_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadsPlatform::TryLockMutex");
+    exception.touch ("syslib::PThreadManager::TryLockMutex");
     throw;
   }
 }
 
 //освобождение исключающего семафора
-void Platform::UnlockMutex (mutex_t handle)
+void PThreadManager::UnlockMutex (mutex_t handle)
 {
   try
   {
@@ -125,7 +125,7 @@ void Platform::UnlockMutex (mutex_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadsPlatform::UnlockMutex");
+    exception.touch ("syslib::PThreadManager::UnlockMutex");
     throw;
   }
 }

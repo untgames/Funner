@@ -33,4 +33,4 @@
 #include <syslib/tls.h>
 #include <syslib/window.h>
 
-#include <platform/platform.h>
+#include <shared/platform.h>

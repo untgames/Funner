@@ -30,7 +30,7 @@ void* thread_run (void* data)
     Создание / удаление нити
 */
 
-Platform::thread_t Platform::CreateThread (IThreadCallback* in_callback)
+thread_t PThreadManager::CreateThread (IThreadCallback* in_callback)
 {
   try
   {
@@ -54,12 +54,12 @@ Platform::thread_t Platform::CreateThread (IThreadCallback* in_callback)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadPlatform::CreateThread");
+    exception.touch ("syslib::PThreadManager::CreateThread");
     throw;
   }
 }
 
-void Platform::DestroyThread (thread_t thread)
+void PThreadManager::DestroyThread (thread_t thread)
 {
   if (!thread)
     return;    
@@ -73,7 +73,7 @@ void Platform::DestroyThread (thread_t thread)
     Ожидание завершения нити
 */
 
-void Platform::JoinThread (thread_t thread)
+void PThreadManager::JoinThread (thread_t thread)
 {
   try
   {
@@ -89,7 +89,7 @@ void Platform::JoinThread (thread_t thread)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadPlatform::JoinThread");
+    exception.touch ("syslib::PThreadManager::JoinThread");
     throw;
   }
 }
@@ -98,12 +98,12 @@ void Platform::JoinThread (thread_t thread)
    Получение идентификатора нити
 */
 
-size_t Platform::GetThreadId (thread_t thread)
+size_t PThreadManager::GetThreadId (thread_t thread)
 {
   return (size_t)*(pthread_t*)thread;
 }
 
-size_t Platform::GetCurrentThreadId ()
+size_t PThreadManager::GetCurrentThreadId ()
 {
   return (size_t)pthread_self ();
 }

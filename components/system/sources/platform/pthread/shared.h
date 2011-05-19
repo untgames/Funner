@@ -15,12 +15,12 @@
 
 #include <syslib/thread.h>
 
-#include <platform/platform.h>
+#include <shared/platform.h>
 
 namespace syslib
 {
 
-struct Platform::mutex_handle
+struct mutex_handle
 {
   pthread_mutex_t mutex;
 };

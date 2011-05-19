@@ -26,8 +26,8 @@
 #include <syslib/thread.h>
 #include <syslib/platform/android.h>
 
-#include <platform/platform.h>
-#include <platform/message_queue.h>
+#include <shared/platform.h>
+#include <shared/message_queue.h>
 
 namespace syslib
 {

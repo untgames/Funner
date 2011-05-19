@@ -2,13 +2,13 @@
 
 using namespace syslib;
 
-struct Platform::condition_handle
+struct syslib::condition_handle
 {
   pthread_cond_t condition;
 };
 
 //создание условия
-Platform::condition_t Platform::CreateCondition ()
+condition_t PThreadManager::CreateCondition ()
 {
   try
   {
@@ -23,13 +23,13 @@ Platform::condition_t Platform::CreateCondition ()
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadsPlatform::CreateCondition");
+    exception.touch ("syslib::PThreadManager::CreateCondition");
     throw;
   }
 }
 
 //удаление условия
-void Platform::DestroyCondition (condition_t handle)
+void PThreadManager::DestroyCondition (condition_t handle)
 {
   try
   {
@@ -45,12 +45,12 @@ void Platform::DestroyCondition (condition_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadsPlatform::DestroyCondition");
+    exception.touch ("syslib::PThreadManager::DestroyCondition");
     throw;
   }
 }
 
-void Platform::WaitCondition (condition_t handle, mutex_t mutex_handle)
+void PThreadManager::WaitCondition (condition_t handle, mutex_t mutex_handle)
 {
   try
   {
@@ -67,12 +67,12 @@ void Platform::WaitCondition (condition_t handle, mutex_t mutex_handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadsPlatform::WaitCondition(condition_t,mutex_t)");
+    exception.touch ("syslib::PThreadManager::WaitCondition(condition_t,mutex_t)");
     throw;
   }
 }
 
-bool Platform::WaitCondition (condition_t handle, mutex_t mutex_handle, size_t wait_in_milliseconds)
+bool PThreadManager::WaitCondition (condition_t handle, mutex_t mutex_handle, size_t wait_in_milliseconds)
 {
   try
   {
@@ -112,12 +112,12 @@ bool Platform::WaitCondition (condition_t handle, mutex_t mutex_handle, size_t w
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadsPlatform::WaitCondition(condition_t,mutex_t,size_t)");
+    exception.touch ("syslib::PThreadManager::WaitCondition(condition_t,mutex_t,size_t)");
     throw;
   }
 }
 
-void Platform::NotifyCondition (condition_t handle, bool broadcast)
+void PThreadManager::NotifyCondition (condition_t handle, bool broadcast)
 {
   try
   {
@@ -141,7 +141,7 @@ void Platform::NotifyCondition (condition_t handle, bool broadcast)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::PThreadsPlatform::WaitCondition(condition_t,size_t)");
+    exception.touch ("syslib::PThreadManager::WaitCondition(condition_t,size_t)");
     throw;
   }
 }

@@ -8,7 +8,7 @@ using namespace syslib;
 
 struct Mutex::Impl
 {
-  Platform::mutex_t handle; //дескриптор исключающего семафора
+  mutex_t handle; //дескриптор исключающего семафора
 
 ///Конструктор
   Impl ()

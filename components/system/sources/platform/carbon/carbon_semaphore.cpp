@@ -2,11 +2,10 @@
 
 using namespace syslib;
 
-struct Platform::semaphore_handle
+struct syslib::semaphore_handle
 {
   MPSemaphoreID semaphore;
 };
-
 
 namespace
 {
@@ -56,7 +55,7 @@ bool wait_semaphore (Platform::semaphore_t handle, Duration duration, bool waita
 }
 
 //создание семафора
-Platform::semaphore_t Platform::CreateSemaphore (size_t initial_value)
+semaphore_t MacOsThreadManager::CreateSemaphore (size_t initial_value)
 {
   try
   {
@@ -69,13 +68,13 @@ Platform::semaphore_t Platform::CreateSemaphore (size_t initial_value)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::CreateSemaphore");
+    exception.touch ("syslib::MacOsThreadManager::CreateSemaphore");
     throw;
   }
 }
 
 //уничтожение семафора
-void Platform::DestroySemaphore (semaphore_t handle)
+void MacOsThreadManager::DestroySemaphore (semaphore_t handle)
 {
   if (!handle || !handle->semaphore)
     return;
@@ -86,7 +85,7 @@ void Platform::DestroySemaphore (semaphore_t handle)
 }
 
 //ожидание следующей задачи
-void Platform::WaitSemaphore (semaphore_t handle)
+void MacOsThreadManager::WaitSemaphore (semaphore_t handle)
 {
   try
   {
@@ -94,13 +93,13 @@ void Platform::WaitSemaphore (semaphore_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::WaitSemaphore (semaphore_t)");
+    exception.touch ("syslib::MacOsThreadManager::WaitSemaphore (semaphore_t)");
     throw;
   }
 }
 
 //ожидание следующей задачи с таймаутом
-bool Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
+bool MacOsThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
   try
   {
@@ -108,13 +107,13 @@ bool Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::WaitSemaphore (semaphore_t, size_t)");
+    exception.touch ("syslib::MacOsThreadManager::WaitSemaphore (semaphore_t, size_t)");
     throw;
   }
 }
 
 //попытка ожидания следующей задачи
-bool Platform::TryWaitSemaphore (semaphore_t handle)
+bool MacOsThreadManager::TryWaitSemaphore (semaphore_t handle)
 {
   try
   {
@@ -134,13 +133,13 @@ bool Platform::TryWaitSemaphore (semaphore_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::TryLockSemaphore");
+    exception.touch ("syslib::MacOsThreadManager::TryLockSemaphore");
     throw;
   }
 }
 
 //посылка следующей задачи
-void Platform::PostSemaphore (semaphore_t handle)
+void MacOsThreadManager::PostSemaphore (semaphore_t handle)
 {
   try
   {
@@ -151,7 +150,7 @@ void Platform::PostSemaphore (semaphore_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::CarbonPlatform::PostSemaphore");
+    exception.touch ("syslib::MacOsThreadManager::PostSemaphore");
     throw;
   }
 }

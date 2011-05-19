@@ -196,7 +196,7 @@ class CarbonApplicationDelegate: public IApplicationDelegate, public xtl::refere
     Создание делегата приложения
 */
 
-IApplicationDelegate* Platform::CreateDefaultApplicationDelegate ()
+IApplicationDelegate* CarbonApplicationManager::CreateDefaultApplicationDelegate ()
 {
   return new CarbonApplicationDelegate;
 }
@@ -205,7 +205,7 @@ IApplicationDelegate* Platform::CreateDefaultApplicationDelegate ()
    Открытие URL во внешнем браузере
 */
 
-void Platform::OpenUrl (const char* url)
+void CarbonApplicationManager::OpenUrl (const char* url)
 {
   NSAutoreleasePool *pool          = [[NSAutoreleasePool alloc] init];
   NSString          *ns_url_string = [NSString stringWithUTF8String:url];

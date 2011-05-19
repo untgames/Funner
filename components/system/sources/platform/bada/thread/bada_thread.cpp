@@ -27,7 +27,7 @@ class ThreadImpl : public Osp::Base::Runtime::Thread
 }
 
 
-struct Platform::thread_handle
+struct syslib::thread_handle
 {
   ThreadImpl* thread;
 
@@ -41,7 +41,7 @@ struct Platform::thread_handle
     Создание / удаление нити
 */
 
-Platform::thread_t Platform::CreateThread (IThreadCallback* in_callback)
+BadaThreadManager::thread_t BadaThreadManager::CreateThread (IThreadCallback* in_callback)
 {
   try
   {
@@ -72,12 +72,12 @@ Platform::thread_t Platform::CreateThread (IThreadCallback* in_callback)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::BadaPlatform::CreateThread");
+    exception.touch ("syslib::BadaThreadManager::CreateThread");
     throw;
   }
 }
 
-void Platform::DestroyThread (thread_t thread)
+void BadaThreadManager::DestroyThread (thread_t thread)
 {
   if (!thread)
     return;
@@ -89,7 +89,7 @@ void Platform::DestroyThread (thread_t thread)
     Ожидание завершения нити
 */
 
-void Platform::JoinThread (thread_t thread)
+void BadaThreadManager::JoinThread (thread_t thread)
 {
   try
   {
@@ -103,7 +103,7 @@ void Platform::JoinThread (thread_t thread)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::BadaPlatform::JoinThread");
+    exception.touch ("syslib::BadaThreadManager::JoinThread");
     throw;
   }
 }
@@ -112,12 +112,12 @@ void Platform::JoinThread (thread_t thread)
    Получение идентификатора нити
 */
 
-size_t Platform::GetThreadId (thread_t thread)
+size_t BadaThreadManager::GetThreadId (thread_t thread)
 {
   return (size_t)thread->thread;
 }
 
-size_t Platform::GetCurrentThreadId ()
+size_t BadaThreadManager::GetCurrentThreadId ()
 {
   return (size_t)Osp::Base::Runtime::Thread::GetCurrentThread ();
 }

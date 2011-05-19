@@ -33,13 +33,13 @@ InterfaceOrientation get_interface_orientation (UIInterfaceOrientation interface
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct WindowImpl
 {
-  void*                          user_data;       //указатель на пользовательские данные
-  Platform::WindowMessageHandler message_handler; //функция обработки сообщений окна
-  Platform::window_t             cocoa_window;    //окно
+  void*                user_data;       //указатель на пользовательские данные
+  WindowMessageHandler message_handler; //функция обработки сообщений окна
+  window_t             cocoa_window;    //окно
 
   //Конструктор/деструктор
-  WindowImpl (Platform::WindowMessageHandler handler, void* in_user_data, void* new_window)
-    : user_data (in_user_data), message_handler (handler), cocoa_window ((Platform::window_t)new_window)
+  WindowImpl (WindowMessageHandler handler, void* in_user_data, void* new_window)
+    : user_data (in_user_data), message_handler (handler), cocoa_window ((window_t)new_window)
     {}
 
   ~WindowImpl ()
@@ -403,9 +403,9 @@ typedef stl::vector <IWindowListener*> ListenerArray;
     Создание/закрытие/уничтожение окна
 */
 
-Platform::window_t Platform::CreateWindow (WindowStyle window_style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
+window_t IPhoneWindowManager::CreateWindow (WindowStyle window_style, WindowMessageHandler handler, const void* parent_handle, const char* init_string, void* user_data)
 {
-  static const char* METHOD_NAME = "syslib::iPhonePlatform::CreateWindow";
+  static const char* METHOD_NAME = "syslib::IPhoneWindowManager::CreateWindow";
 
   if (!is_in_run_loop ())
     throw xtl::format_operation_exception (METHOD_NAME, "Can't create window before entering run loop");
@@ -432,14 +432,14 @@ Platform::window_t Platform::CreateWindow (WindowStyle window_style, WindowMessa
   return (window_t)new_window;
 }
 
-void Platform::CloseWindow (window_t handle)
+void IPhoneWindowManager::CloseWindow (window_t handle)
 {
   WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
 
   window->Notify (WindowEvent_OnClose, [(UIWindowWrapper*)handle getEventContext]);
 }
 
-void Platform::DestroyWindow (window_t handle)
+void IPhoneWindowManager::DestroyWindow (window_t handle)
 {
   WindowImpl* window = ((UIWindowWrapper*)handle).window_impl;
 
@@ -452,12 +452,12 @@ void Platform::DestroyWindow (window_t handle)
     Получение платформо-зависимого дескриптора окна
 */
 
-const void* Platform::GetNativeWindowHandle (window_t handle)
+const void* IPhoneWindowManager::GetNativeWindowHandle (window_t handle)
 {
   return reinterpret_cast<const void*> (handle);
 }
 
-const void* Platform::GetNativeDisplayHandle (window_t)
+const void* IPhoneWindowManager::GetNativeDisplayHandle (window_t)
 {
   return 0;
 }
@@ -466,17 +466,17 @@ const void* Platform::GetNativeDisplayHandle (window_t)
     Заголовок окна
 */
 
-void Platform::SetWindowTitle (window_t, const wchar_t*)
+void IPhoneWindowManager::SetWindowTitle (window_t, const wchar_t*)
 {
 }
 
-void Platform::GetWindowTitle (window_t, size_t size, wchar_t* buffer)
+void IPhoneWindowManager::GetWindowTitle (window_t, size_t size, wchar_t* buffer)
 {
   if (!size)
     return;
 
   if (!buffer)
-    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::GetWindowTitle", "buffer");
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetWindowTitle", "buffer");
 
   *buffer = L'\0';
 }
@@ -485,10 +485,10 @@ void Platform::GetWindowTitle (window_t, size_t size, wchar_t* buffer)
     Область окна / клиентская область
 */
 
-void Platform::SetWindowRect (window_t window, const Rect& rect)
+void IPhoneWindowManager::SetWindowRect (window_t window, const Rect& rect)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::SetWindowRect", "window");
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetWindowRect", "window");
 
   UIWindowWrapper* wnd = (UIWindowWrapper*)window;
 
@@ -534,15 +534,15 @@ void Platform::SetWindowRect (window_t window, const Rect& rect)
   window_impl->Notify (WindowEvent_OnSize, dummy_context);
 }
 
-void Platform::SetClientRect (window_t handle, const Rect& rect)
+void IPhoneWindowManager::SetClientRect (window_t handle, const Rect& rect)
 {
   SetWindowRect (handle, rect);
 }
 
-void Platform::GetWindowRect (window_t window, Rect& rect)
+void IPhoneWindowManager::GetWindowRect (window_t window, Rect& rect)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::GetWindowRect", "window");
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetWindowRect", "window");
 
   UIWindow               *wnd           = (UIWindow*)window;
   UIInterfaceOrientation ui_orientation = wnd.rootViewController.interfaceOrientation;
@@ -578,7 +578,7 @@ void Platform::GetWindowRect (window_t window, Rect& rect)
   }
 }
 
-void Platform::GetClientRect (window_t handle, Rect& target_rect)
+void IPhoneWindowManager::GetClientRect (window_t handle, Rect& target_rect)
 {
   GetWindowRect (handle, target_rect);
 }
@@ -587,7 +587,7 @@ void Platform::GetClientRect (window_t handle, Rect& target_rect)
     Установка флагов окна
 */
 
-void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
+void IPhoneWindowManager::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
 {
   if (state == GetWindowFlag (handle, flag))
     return;
@@ -655,12 +655,12 @@ void Platform::SetWindowFlag (window_t handle, WindowFlag flag, bool state)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::iPhonePlatform::SetWindowFlag");
+    exception.touch ("syslib::IPhoneWindowManager::SetWindowFlag");
     throw;
   }
 }
 
-bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
+bool IPhoneWindowManager::GetWindowFlag (window_t handle, WindowFlag flag)
 {
   UIWindow* wnd = (UIWindow*)handle;
 
@@ -684,108 +684,36 @@ bool Platform::GetWindowFlag (window_t handle, WindowFlag flag)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::iPhonePlatform::GetWindowFlag");
+    exception.touch ("syslib::IPhoneWindowManager::GetWindowFlag");
     throw;
   }
-}
-
-/*
-    Установка родительского окна
-*/
-
-void Platform::SetParentWindowHandle (window_t, const void*)
-{
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetParentWindowHandle", "Parent windows not supported for iPhone platform");
-}
-
-const void* Platform::GetParentWindowHandle (window_t child)
-{
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::GetParentWindowHandle", "Parent windows not supported for iPhone platform");
 }
 
 /*
     Обновление окна
 */
 
-void Platform::InvalidateWindow (window_t handle)
+void IPhoneWindowManager::InvalidateWindow (window_t handle)
 {
   [((UIWindowWrapper*)handle).rootViewController.view setNeedsDisplay];
-}
-
-/*
-    Положение курсора
-*/
-
-void Platform::SetCursorPosition (const Point&)
-{
-  //ignore
-}
-
-syslib::Point Platform::GetCursorPosition ()
-{
-  return syslib::Point ();
-}
-
-void Platform::SetCursorPosition (window_t, const Point& client_position)
-{
-  //ignore
-}
-
-syslib::Point Platform::GetCursorPosition (window_t)
-{
-  return syslib::Point ();
-}
-
-/*
-    Видимость курсора
-*/
-
-void Platform::SetCursorVisible (window_t, bool state)
-{
-  if (state)
-    throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::SetCursorVisible", "No cursor for iPhone platform");
-}
-
-bool Platform::GetCursorVisible (window_t)
-{
-  return false;
-}
-
-/*
-    Изображение курсора
-*/
-
-Platform::cursor_t Platform::CreateCursor (const char*, int, int)
-{
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::CreateCursor", "No cursor for iPhone platform");
-}
-
-void Platform::DestroyCursor (cursor_t)
-{
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::DestroyCursor", "No cursor for iPhone platform");
-}
-
-void Platform::SetCursor (window_t, cursor_t)
-{
-  throw xtl::format_not_supported_exception ("syslib::iPhonePlatform::CreateCursor", "No cursor for iPhone platform");
 }
 
 /*
    Установка multitouch режима для окна
 */
 
-void Platform::SetMultitouchEnabled (window_t window, bool enabled)
+void IPhoneWindowManager::SetMultitouchEnabled (window_t window, bool enabled)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::SetMultitouchEnabled", "window");
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetMultitouchEnabled", "window");
 
   ((UIWindowWrapper*)window).rootViewController.view.multipleTouchEnabled = enabled;
 }
 
-bool Platform::IsMultitouchEnabled (window_t window)
+bool IPhoneWindowManager::IsMultitouchEnabled (window_t window)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::IsMultitouchEnabled", "window");
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::IsMultitouchEnabled", "window");
 
   return ((UIWindowWrapper*)window).rootViewController.view.multipleTouchEnabled;
 }
@@ -794,10 +722,10 @@ bool Platform::IsMultitouchEnabled (window_t window)
    Цвет фона
 */
 
-void Platform::SetBackgroundColor (window_t window, const Color& color)
+void IPhoneWindowManager::SetBackgroundColor (window_t window, const Color& color)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::SetBackgroundColor", "window");
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetBackgroundColor", "window");
 
   UIWindow*      wnd  = (UIWindow*)window;
   UIViewWrapper* view = (UIViewWrapper*)wnd.rootViewController.view;
@@ -813,10 +741,10 @@ void Platform::SetBackgroundColor (window_t window, const Color& color)
   [background_color release];
 }
 
-void Platform::SetBackgroundState (window_t window, bool state)
+void IPhoneWindowManager::SetBackgroundState (window_t window, bool state)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::SetBackgroundState", "window");
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::SetBackgroundState", "window");
 
   UIWindow*      wnd  = (UIWindow*)window;
   UIViewWrapper* view = (UIViewWrapper*)wnd.rootViewController.view;
@@ -826,10 +754,10 @@ void Platform::SetBackgroundState (window_t window, bool state)
   view.background_state           = state;
 }
 
-Color Platform::GetBackgroundColor (window_t window)
+Color IPhoneWindowManager::GetBackgroundColor (window_t window)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::GetBackgroundColor", "window");
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetBackgroundColor", "window");
 
   UIWindow*      wnd  = (UIWindow*)window;
   UIViewWrapper *view = (UIViewWrapper*)wnd.rootViewController.view;
@@ -837,10 +765,10 @@ Color Platform::GetBackgroundColor (window_t window)
   return view.ui_background_color ? view.background_color : Color ();
 }
 
-bool Platform::GetBackgroundState (window_t window)
+bool IPhoneWindowManager::GetBackgroundState (window_t window)
 {
   if (!window)
-    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::GetBackgroundState", "window");
+    throw xtl::make_null_argument_exception ("syslib::IPhoneWindowManager::GetBackgroundState", "window");
 
   return ((UIViewWrapper*)((UIWindow*)window).rootViewController.view).background_state;
 }

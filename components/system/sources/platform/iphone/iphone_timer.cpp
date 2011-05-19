@@ -83,15 +83,15 @@ void IPhoneTimer::TimerProc (CFRunLoopTimerRef in_timer, void* user_data)
     Создание / уничтожение таймера
 */
 
-Platform::timer_t Platform::CreateTimer (size_t period_in_milliseconds, TimerHandler handler, void* user_data)
+timer_t IPhoneTimerManager::CreateTimer (size_t period_in_milliseconds, TimerHandler handler, void* user_data)
 {
   return (timer_t)new IPhoneTimer (period_in_milliseconds, handler, user_data);
 }
 
-void Platform::KillTimer (timer_t handle)
+void IPhoneTimerManager::KillTimer (timer_t handle)
 {
   if (!handle)
-    throw xtl::make_null_argument_exception ("syslib::iPhonePlatform::KillTimer", "handle");
+    throw xtl::make_null_argument_exception ("syslib::IPhoneTimerManager::KillTimer", "handle");
 
   IPhoneTimer* timer = (IPhoneTimer*)handle;
 

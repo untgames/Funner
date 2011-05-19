@@ -3,13 +3,13 @@
 using namespace syslib;
 using namespace syslib::bada;
 
-struct Platform::mutex_handle
+struct syslib::mutex_handle
 {
   Osp::Base::Runtime::Mutex mutex;
 };
 
 //создание исключающего семафора
-Platform::mutex_t Platform::CreateMutex ()
+mutex_t BadaThreadManager::CreateMutex ()
 {
   try
   {
@@ -24,13 +24,13 @@ Platform::mutex_t Platform::CreateMutex ()
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::BadaPlatform::CreateMutex");
+    exception.touch ("syslib::BadaThreadManager::CreateMutex");
     throw;
   }
 }
 
 //удаление исключающего семафора
-void Platform::DestroyMutex (mutex_t handle)
+void BadaThreadManager::DestroyMutex (mutex_t handle)
 {
   if (!handle)
     return;
@@ -39,13 +39,13 @@ void Platform::DestroyMutex (mutex_t handle)
 }
 
 //захват исключающего семафора
-void Platform::LockMutex (mutex_t handle)
+void BadaThreadManager::LockMutex (mutex_t handle)
 {
   LockMutex (handle, INFINITE);
 }
 
 //захват исключающего семафора с указанием максимального времени ожидания
-bool Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
+bool BadaThreadManager::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
 {
   try
   {
@@ -61,13 +61,13 @@ bool Platform::LockMutex (mutex_t handle, size_t wait_in_milliseconds)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::BadaPlatform::LockMutex(mutex_t, size_t)");
+    exception.touch ("syslib::BadaThreadManager::LockMutex(mutex_t, size_t)");
     throw;
   }
 }
 
 //попытка захвата исключающего семафора
-bool Platform::TryLockMutex (mutex_t handle)
+bool BadaThreadManager::TryLockMutex (mutex_t handle)
 {
   try
   {
@@ -87,13 +87,13 @@ bool Platform::TryLockMutex (mutex_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::BadaPlatform::TryLockMutex");
+    exception.touch ("syslib::BadaThreadManager::TryLockMutex");
     throw;
   }
 }
 
 //освобождение исключающего семафора
-void Platform::UnlockMutex (mutex_t handle)
+void BadaThreadManager::UnlockMutex (mutex_t handle)
 {
   try
   {
@@ -107,7 +107,7 @@ void Platform::UnlockMutex (mutex_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::BadaPlatform::UnlockMutex");
+    exception.touch ("syslib::BadaThreadManager::UnlockMutex");
     throw;
   }
 }

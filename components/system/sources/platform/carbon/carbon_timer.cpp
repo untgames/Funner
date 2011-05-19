@@ -14,8 +14,6 @@ const char* LOG_NAME = "syslib.CarbonTimer";
 class CarbonTimer
 {
   public:
-    typedef Platform::TimerHandler TimerHandler;
-
     CarbonTimer  (size_t period_in_milliseconds, const TimerHandler& handler, void* user_data);
     ~CarbonTimer ();
 
@@ -99,15 +97,15 @@ void CarbonTimer::TimerProc (EventLoopTimerRef in_timer, void* user_data)
     Создание / уничтожение таймера
 */
 
-Platform::timer_t Platform::CreateTimer (size_t period_in_milliseconds, TimerHandler handler, void* user_data)
+timer_t CarbonTimerManager::CreateTimer (size_t period_in_milliseconds, TimerHandler handler, void* user_data)
 {
   return (timer_t)new CarbonTimer (period_in_milliseconds, handler, user_data);
 }
 
-void Platform::KillTimer (timer_t handle)
+void CarbonTimerManager::KillTimer (timer_t handle)
 {
   if (!handle)
-    throw xtl::make_null_argument_exception ("syslib::CarbonPlatform::KillTimer", "handle");
+    throw xtl::make_null_argument_exception ("syslib::CarbonTimerManager::KillTimer", "handle");
 
   CarbonTimer* timer = (CarbonTimer*)handle;
 

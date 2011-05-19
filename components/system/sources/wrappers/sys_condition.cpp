@@ -8,7 +8,7 @@ using namespace syslib;
 
 struct Condition::Impl
 {
-  Platform::condition_t condition;
+  condition_t condition;
 
 ///Конструктор
   Impl ()
@@ -89,7 +89,7 @@ void Condition::Wait (Mutex& lock)
 {
   try
   {
-    Platform::WaitCondition (impl->condition, reinterpret_cast<Platform::mutex_t> (lock.Handle ()));
+    Platform::WaitCondition (impl->condition, reinterpret_cast<mutex_t> (lock.Handle ()));
   }
   catch (xtl::exception& exception)
   {
@@ -102,7 +102,7 @@ void Condition::Wait (Mutex& lock, size_t wait_in_milliseconds)
 {
   try
   {
-    if (!Platform::WaitCondition (impl->condition, reinterpret_cast<Platform::mutex_t> (lock.Handle ()), wait_in_milliseconds))
+    if (!Platform::WaitCondition (impl->condition, reinterpret_cast<mutex_t> (lock.Handle ()), wait_in_milliseconds))
       throw xtl::format_operation_exception ("", "Condition wait timeout");
   }
   catch (xtl::exception& exception)
@@ -116,7 +116,7 @@ bool Condition::TryWait (Mutex& lock)
 {
   try
   {
-    return Platform::WaitCondition (impl->condition, reinterpret_cast<Platform::mutex_t> (lock.Handle ()), 0);
+    return Platform::WaitCondition (impl->condition, reinterpret_cast<mutex_t> (lock.Handle ()), 0);
   }
   catch (xtl::exception& exception)
   {
@@ -129,7 +129,7 @@ bool Condition::TryWait (Mutex& lock, size_t wait_in_milliseconds)
 {
   try
   {
-    return Platform::WaitCondition (impl->condition, reinterpret_cast<Platform::mutex_t> (lock.Handle ()), wait_in_milliseconds);
+    return Platform::WaitCondition (impl->condition, reinterpret_cast<mutex_t> (lock.Handle ()), wait_in_milliseconds);
   }
   catch (xtl::exception& exception)
   {

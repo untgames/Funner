@@ -268,7 +268,7 @@ void ApplicationManager::DetachApplicationListener (syslib::iphone::IApplication
     Создание делегата приложения
 */
 
-IApplicationDelegate* Platform::CreateDefaultApplicationDelegate ()
+IApplicationDelegate* IPhoneApplicationManager::CreateDefaultApplicationDelegate ()
 {
   return new ApplicationDelegateImpl;
 }
@@ -277,7 +277,7 @@ IApplicationDelegate* Platform::CreateDefaultApplicationDelegate ()
    Открытие URL во внешнем браузере
 */
 
-void Platform::OpenUrl (const char* url)
+void IPhoneApplicationManager::OpenUrl (const char* url)
 {
   NSAutoreleasePool *pool          = [[NSAutoreleasePool alloc] init];
   NSString          *ns_url_string = [NSString stringWithUTF8String:url];

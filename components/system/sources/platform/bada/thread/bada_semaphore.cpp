@@ -3,13 +3,13 @@
 using namespace syslib;
 using namespace syslib::bada;
 
-struct Platform::semaphore_handle
+struct syslib::semaphore_handle
 {
   Osp::Base::Runtime::Semaphore semaphore;
 };
 
 //создание семафора
-Platform::semaphore_t Platform::CreateSemaphore (size_t initial_value)
+semaphore_t BadaThreadManager::CreateSemaphore (size_t initial_value)
 {
   try
   {
@@ -27,13 +27,13 @@ Platform::semaphore_t Platform::CreateSemaphore (size_t initial_value)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::BadaPlatform::CreateSemaphore");
+    exception.touch ("syslib::BadaThreadManager::CreateSemaphore");
     throw;
   }
 }
 
 //уничтожение семафора
-void Platform::DestroySemaphore (semaphore_t handle)
+void BadaThreadManager::DestroySemaphore (semaphore_t handle)
 {
   if (!handle)
     return;
@@ -42,13 +42,13 @@ void Platform::DestroySemaphore (semaphore_t handle)
 }
 
 //ожидание следующей задачи
-void Platform::WaitSemaphore (semaphore_t handle)
+void BadaThreadManager::WaitSemaphore (semaphore_t handle)
 {
   WaitSemaphore (handle, INFINITE);
 }
 
 //ожидание следующей задачи с таймаутом
-bool Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
+bool BadaThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
   try
   {
@@ -64,13 +64,13 @@ bool Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::BadaPlatform::WaitSemaphore (semaphore_t, size_t)");
+    exception.touch ("syslib::BadaThreadManager::WaitSemaphore (semaphore_t, size_t)");
     throw;
   }
 }
 
 //попытка ожидания следующей задачи
-bool Platform::TryWaitSemaphore (semaphore_t handle)
+bool BadaThreadManager::TryWaitSemaphore (semaphore_t handle)
 {
   try
   {
@@ -90,13 +90,13 @@ bool Platform::TryWaitSemaphore (semaphore_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::BadaPlatform::TryLockSemaphore");
+    exception.touch ("syslib::BadaThreadManager::TryLockSemaphore");
     throw;
   }
 }
 
 //посылка следующей задачи
-void Platform::PostSemaphore (semaphore_t handle)
+void BadaThreadManager::PostSemaphore (semaphore_t handle)
 {
   try
   {
@@ -110,7 +110,7 @@ void Platform::PostSemaphore (semaphore_t handle)
   }
   catch (xtl::exception& exception)
   {
-    exception.touch ("syslib::BadaPlatform::PostSemaphore");
+    exception.touch ("syslib::BadaThreadManager::PostSemaphore");
     throw;
   }
 }

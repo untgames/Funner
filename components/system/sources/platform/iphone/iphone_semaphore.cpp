@@ -3,37 +3,37 @@
 using namespace syslib;
 
 //создание семафора
-Platform::semaphore_t Platform::CreateSemaphore (size_t initial_value)
+semaphore_t IPhoneThreadManager::CreateSemaphore (size_t initial_value)
 {
-  throw xtl::make_not_implemented_exception ("syslib::iPhonePlatform::CreateSemaphore");
+  throw xtl::make_not_implemented_exception ("syslib::IPhoneThreadManager::CreateSemaphore");
 }
 
 //уничтожение семафора
-void Platform::DestroySemaphore (semaphore_t handle)
+void IPhoneThreadManager::DestroySemaphore (semaphore_t handle)
 {
-  throw xtl::make_not_implemented_exception ("syslib::iPhonePlatform::DestroySemaphore");
+  throw xtl::make_not_implemented_exception ("syslib::IPhoneThreadManager::DestroySemaphore");
 }
 
 //ожидание следующей задачи
-void Platform::WaitSemaphore (semaphore_t handle)
+void IPhoneThreadManager::WaitSemaphore (semaphore_t handle)
 {
-  throw xtl::make_not_implemented_exception ("syslib::iPhonePlatform::WaitSemaphore (semaphore_t)");
+  throw xtl::make_not_implemented_exception ("syslib::IPhoneThreadManager::WaitSemaphore (semaphore_t)");
 }
 
 //ожидание следующей задачи с таймаутом
-bool Platform::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
+bool IPhoneThreadManager::WaitSemaphore (semaphore_t handle, size_t wait_in_milliseconds)
 {
-  throw xtl::make_not_implemented_exception ("syslib::iPhonePlatform::WaitSemaphore (semaphore_t, size_t)");
+  throw xtl::make_not_implemented_exception ("syslib::IPhoneThreadManager::WaitSemaphore (semaphore_t, size_t)");
 }
 
 //попытка ожидания следующей задачи
-bool Platform::TryWaitSemaphore (semaphore_t handle)
+bool IPhoneThreadManager::TryWaitSemaphore (semaphore_t handle)
 {
-  throw xtl::make_not_implemented_exception ("syslib::iPhonePlatform::TryWaitSemaphore");
+  throw xtl::make_not_implemented_exception ("syslib::IPhoneThreadManager::TryWaitSemaphore");
 }
 
 //посылка следующей задачи
-void Platform::PostSemaphore (semaphore_t handle)
+void IPhoneThreadManager::PostSemaphore (semaphore_t handle)
 {
-  throw xtl::make_not_implemented_exception ("syslib::iPhonePlatform::PostSemaphore");
+  throw xtl::make_not_implemented_exception ("syslib::IPhoneThreadManager::PostSemaphore");
 }

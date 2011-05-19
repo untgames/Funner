@@ -50,7 +50,7 @@ struct Window::Impl: public xtl::trackable
         style         = in_style;
         parent_handle = parent;
         
-        Platform::window_t new_handle = Platform::CreateWindow (style, &MessageHandler, parent, init_string.c_str (), this);
+        window_t new_handle = Platform::CreateWindow (style, &MessageHandler, parent, init_string.c_str (), this);
 
         SetHandle (new_handle);
 
@@ -91,9 +91,9 @@ struct Window::Impl: public xtl::trackable
     WindowStyle Style () const { return style; }
 
 ///Низкоуровневый дескриптор окна
-    Platform::window_t Handle () const { return handle; }
+    window_t Handle () const { return handle; }
 
-    Platform::window_t CheckedHandle () const
+    window_t CheckedHandle () const
     {
       if (!handle)
         throw xtl::message_exception<ClosedWindowException> ("syslib::Window::Impl::CheckedHandle", "Closed window exception");
@@ -105,7 +105,7 @@ struct Window::Impl: public xtl::trackable
     WindowCursor& Cursor () { return cursor; }
 
 ///Установка низкоуровневого дескриптора окна
-    void SetHandle (Platform::window_t new_handle)
+    void SetHandle (window_t new_handle)
     {
       if (handle == new_handle)
         return;
@@ -273,7 +273,7 @@ struct Window::Impl: public xtl::trackable
 
   private:
 ///Обработчик событий окна
-    static void MessageHandler (Platform::window_t wnd, WindowEvent event, const WindowEventContext& context, void* user_data)
+    static void MessageHandler (window_t wnd, WindowEvent event, const WindowEventContext& context, void* user_data)
     {
       Impl* impl = reinterpret_cast<Impl*> (user_data);
       
@@ -320,7 +320,7 @@ struct Window::Impl: public xtl::trackable
 
   private:
     Window*               window;                             //указатель на владельца
-    Platform::window_t    handle;                             //низкоуровневый дескриптор окна
+    window_t              handle;                             //низкоуровневый дескриптор окна
     const void*           parent_handle;                      //низкоуровневый дескриптор родительского окна
     WindowStyle           style;                              //стиль окна
     stl::string           init_string;                        //строка инициализации окна
@@ -936,7 +936,7 @@ void Window::SetCursor (const WindowCursor& cursor)
 {
   try
   {
-    Platform::SetCursor (impl->CheckedHandle (), (Platform::cursor_t)cursor.Handle ());
+    Platform::SetCursor (impl->CheckedHandle (), (cursor_t)cursor.Handle ());
     
     impl->Cursor () = cursor;
   }
