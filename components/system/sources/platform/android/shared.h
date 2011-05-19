@@ -92,7 +92,7 @@ template <class T> class global_ref: public xtl::intrusive_ptr<typename xtl::typ
 };
 
 /*
-    Поиск методов
+    Поиск методов и полей
 */
 
 inline jmethodID find_static_method (JNIEnv* env, jclass class_, const char* name, const char* signature)
@@ -112,6 +112,16 @@ inline jmethodID find_method (JNIEnv* env, jclass class_, const char* name, cons
   if (!result)
     throw xtl::format_operation_exception ("JNIEnv::GetMethodID", "Method '%s %s' not found", name, signature);
     
+  return result;
+}
+
+inline jfieldID find_field (JNIEnv* env, jclass class_, const char* name, const char* type)
+{
+  jfieldID result = env->GetFieldID (class_, name, type);
+  
+  if (!result)
+    throw xtl::format_operation_exception ("JNIEnv::GetFieldID", "Field '%s %s' not found", type, name);
+
   return result;
 }
 

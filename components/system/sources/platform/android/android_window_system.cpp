@@ -12,7 +12,7 @@ using namespace syslib::android;
 struct Platform::window_handle
 {
   global_ref<jobject>  view;                           //android окно
-  ANativeWindow*       native_handle;                  //native android window hanle
+  NativeWindow         window;                         //описание окна
   WindowMessageHandler message_handler;                //обработчик сообщений
   void*                user_data;                      //пользовательские данные окна
   unsigned int         background_color;               //цвет заднего плана
@@ -31,26 +31,30 @@ struct Platform::window_handle
   jmethodID            post_invalidate_method;         //метод оповещения о необходимости перерисовки окна
   jmethodID            bring_to_front_method;          //метод перемещения окна на передний план
   bool                 is_multitouch_enabled;          //включен ли multitouch
+  volatile bool        is_native_handle_received;      //получен ли android window handle
   
 ///Конструктор
   window_handle ()
-    : native_handle (0)
-    , message_handler (0)
+    : message_handler (0)
     , user_data (0)
     , background_color (0)
     , background_state (0)
     , is_multitouch_enabled (false)
+    , is_native_handle_received (false)
   {
+    window.native_window = 0;
+    window.view          = 0;
+    
     MessageQueueSingleton::Instance ()->RegisterHandler (this);
-  }  
+  }
 
 ///Деструктор
   ~window_handle ()
   {
     MessageQueueSingleton::Instance ()->UnregisterHandler (this);
     
-    if (native_handle)
-      ANativeWindow_release (native_handle);
+    if (window.native_window)
+      ANativeWindow_release (window.native_window);
   }
  
   void Notify (WindowEvent event, const WindowEventContext& context)
@@ -243,9 +247,6 @@ struct Platform::window_handle
 
   void OnSurfaceCreatedCallback ()
   {
-    if (native_handle)
-      return; //блокировка повторной инициализации поверхности
-      
       //получение поверхности
       
     local_ref<jobject> surface = check_errors (get_env ().CallObjectMethod (view.get (), get_surface_method));
@@ -255,7 +256,7 @@ struct Platform::window_handle
 
       //получение дескриптора окна
 
-    native_handle = ANativeWindow_fromSurface (&get_env (), surface.get ());
+    window.native_window = ANativeWindow_fromSurface (&get_env (), surface.get ());
     
       //оповещение об изменении дескриптора
     
@@ -263,27 +264,27 @@ struct Platform::window_handle
 
     memset (&context, 0, sizeof (context));    
     
-    context.handle = native_handle;
+    context.handle = &window;
     
     Notify (WindowEvent_OnChangeHandle, context);    
   }
 
   void OnSurfaceDestroyedCallback ()
   {
-    if (!native_handle)
+    if (!window.native_window)
       return;
     
-    ANativeWindow_release (native_handle);
+    ANativeWindow_release (window.native_window);
     
-    native_handle = 0;
-    
+    window.native_window = 0;
+
       //оповещение об изменении дескриптора
-    
+
     WindowEventContext context;
 
     memset (&context, 0, sizeof (context));    
-    
-    Notify (WindowEvent_OnChangeHandle, context);    
+
+    Notify (WindowEvent_OnChangeHandle, context);
   }  
 };
 
@@ -476,8 +477,28 @@ void on_focus_callback (JNIEnv& env, jobject view, jboolean gained)
 
 void on_surface_created_callback (JNIEnv& env, jobject view)
 {
-  push_message (view, xtl::bind (&Platform::window_handle::OnSurfaceCreatedCallback, _1));
-  push_message (view, xtl::bind (&Platform::window_handle::OnDrawCallback, _1));
+  try
+  {
+    push_message (view, xtl::bind (&Platform::window_handle::OnSurfaceCreatedCallback, _1));
+    push_message (view, xtl::bind (&Platform::window_handle::OnDrawCallback, _1));
+
+    JniWindowManagerSingleton::Instance instance;
+
+    Platform::window_t window = instance->FindWindow (view);
+
+    if (!window)
+      return;    
+
+    window->is_native_handle_received = true;
+  }
+  catch (...)
+  {
+  }
+}
+
+void on_surface_changed_callback (JNIEnv& env, jobject view, jint format, jint width, jint height)
+{
+  push_message (view, xtl::bind (&Platform::window_handle::OnDrawCallback, _1));    
 }
 
 void on_surface_destroyed_callback (JNIEnv& env, jobject view)
@@ -511,7 +532,7 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
     local_ref<jclass> view_class = env.GetObjectClass (window->view.get ());
         
     if (!view_class)
-      throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed");
+      throw xtl::format_operation_exception ("", "JNIEnv::GetObjectClass failed (for View)");      
       
     window->get_left_method             = find_method (&env, view_class.get (), "getLeftThreadSafe", "()I");
     window->get_top_method              = find_method (&env, view_class.get (), "getTopThreadSafe", "()I");
@@ -525,14 +546,14 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
     window->set_background_color_method = find_method (&env, view_class.get (), "setBackgroundColorThreadSafe", "(I)V");
     window->maximize_method             = find_method (&env, view_class.get (), "maximizeThreadSafe", "()V");
     window->get_surface_method          = find_method (&env, view_class.get (), "getSurfaceThreadSafe", "()Landroid/view/Surface;");
-    window->post_invalidate_method      = find_method (&env, view_class.get (), "postInvalidate", "()V");        
+    window->post_invalidate_method      = find_method (&env, view_class.get (), "postInvalidate", "()V");
     
       //получение дескриптора поверхности
     
     local_ref<jobject> surface = check_errors (env.CallObjectMethod (window->view.get (), window->get_surface_method));
     
     if (!surface)
-      throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");
+      throw xtl::format_operation_exception ("", "EngineView::getSurfaceThreadSafe failed");      
       
       //регистрация обработчика окна
     
@@ -541,13 +562,19 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
     try
     {
         //ожидание создания поверхности
-      
+              
       for (;;)
       {
-        window->native_handle = ANativeWindow_fromSurface (&env, surface.get ());
-        
-        if (window->native_handle)
+        if (window->is_native_handle_received)
+        {        
+          window->window.native_window = ANativeWindow_fromSurface (&env, surface.get ());        
+          window->window.view          = window->view.get ();
+
+          if (!window->native_window)
+            throw xtl::format_operation_exception ("", "::ANativeWindow_fromSurface failed");
+
           break;
+        }
         
         static const size_t WAIT_TIME_IN_MICROSECONDS = 100*1000; //100 milliseconds
         
@@ -592,7 +619,7 @@ const void* Platform::GetNativeWindowHandle (window_t window)
     if (!window)
       throw xtl::make_null_argument_exception ("", "window");
       
-    return window->native_handle;
+    return &window->window;
   }
   catch (xtl::exception& e)
   {
@@ -1032,6 +1059,7 @@ void register_window_callbacks (JNIEnv* env)
       {"onFocusCallback", "(Z)V", (void*)&on_focus_callback},
       {"onSurfaceCreatedCallback", "()V", (void*)&on_surface_created_callback},
       {"onSurfaceDestroyedCallback", "()V", (void*)&on_surface_destroyed_callback},
+      {"onSurfaceChangedCallback", "(III)V", (void*)&on_surface_changed_callback},
     };
     
     static const size_t methods_count = sizeof (methods) / sizeof (*methods);

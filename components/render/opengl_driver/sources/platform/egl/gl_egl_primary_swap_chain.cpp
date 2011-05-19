@@ -77,12 +77,12 @@ struct PrimarySwapChain::Impl
       *attr++ = EGL_SURFACE_TYPE;
       *attr++ = EGL_WINDOW_BIT;
       *attr++ = EGL_NONE;      
-
+      
       EGLint configs_count = 0;
 
       if (!eglChooseConfig (egl_display, config_attributes, &egl_config, 1, &configs_count))
         raise_error ("::eglChooseConfig");
-
+        
       if (!configs_count)
         throw xtl::format_operation_exception ("", "Bad EGL configuration (RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
           in_desc.frame_buffer.color_bits, in_desc.frame_buffer.alpha_bits, in_desc.frame_buffer.depth_bits,
@@ -90,21 +90,25 @@ struct PrimarySwapChain::Impl
           
       EGLint format = 0;
           
-      eglGetConfigAttrib (egl_display, egl_config, EGL_NATIVE_VISUAL_ID, &format);          
+      eglGetConfigAttrib (egl_display, egl_config, EGL_NATIVE_VISUAL_ID, &format);                
         
       log.Printf ("...choose configuration #%u (VisualId: %d, RGB/A: %u/%u, D/S: %u/%u, Samples: %u)",
         egl_config, format, in_desc.frame_buffer.color_bits, in_desc.frame_buffer.alpha_bits, in_desc.frame_buffer.depth_bits,
         in_desc.frame_buffer.stencil_bits, in_desc.samples_count);
         
+      log.Printf ("...create window surface");              
+        
 #ifdef ANDROID
-      ANativeWindow_setBuffersGeometry ((NativeWindowType)output->GetWindowHandle (), 0, 0, format);
-#endif
-        
-      log.Printf ("...create window surface");
-        
+
+      egl_surface = eglCreateWindowSurfaceAndroid (egl_display, egl_config, output->GetWindowHandle (), format);  
+      
+#else
+
         //создание поверхности отрисовки
 
       egl_surface = eglCreateWindowSurface (egl_display, egl_config, (NativeWindowType)output->GetWindowHandle (), 0);
+      
+#endif      
       
       if (!egl_surface)
         raise_error ("::eglCreateWindowSurface");
@@ -273,7 +277,7 @@ void PrimarySwapChain::Present ()
     DisplayLock lock (impl->output->GetDisplay ());        
     
     if (!eglSwapBuffers (impl->egl_display, impl->egl_surface))
-      raise_error ("::eglSwapBuffers");
+      raise_error ("::eglSwapBuffers");            
   }
   catch (xtl::exception& exception)
   {

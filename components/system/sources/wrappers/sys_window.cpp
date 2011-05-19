@@ -110,7 +110,7 @@ struct Window::Impl: public xtl::trackable
       if (handle == new_handle)
         return;
 
-      handle = new_handle;
+      handle = new_handle;      
 
       Notify (WindowEvent_OnChangeHandle);
     }
@@ -266,7 +266,7 @@ struct Window::Impl: public xtl::trackable
 
       memset (&context, 0, sizeof (context));
 
-      context.handle = handle;
+      context.handle = Platform::GetNativeWindowHandle (handle);
 
       Notify (event, context);    
     }
@@ -297,9 +297,6 @@ struct Window::Impl: public xtl::trackable
 
             break;
           }
-          case WindowEvent_OnChangeHandle:  //изменение дескриптора окна, фактически создание окна
-            impl->SetHandle ((Platform::window_t)context.handle);
-            break;
           case WindowEvent_OnDestroy: //окно уничтожено
             impl->SetHandle (0);
             break;

@@ -17,7 +17,7 @@ import java.io.*;
 public class EngineView extends SurfaceView implements SurfaceHolder.Callback 
 {
   private GestureDetector gesture_detector;
-	
+    
   class DoubletapListener extends GestureDetector.SimpleOnGestureListener
   {
     private EngineView engine_view;
@@ -27,13 +27,13 @@ public class EngineView extends SurfaceView implements SurfaceHolder.Callback
       engine_view = in_engine_view;
     }
     
-  	@Override
-  	public boolean onDoubleTap (MotionEvent event)
-  	{
-  	  engine_view.onDoubletapCallback (event.getPointerId (0), event.getX (), event.getY ()); 
-  	    
-  	  return true;
-  	}
+    @Override
+    public boolean onDoubleTap (MotionEvent event)
+    {
+      engine_view.onDoubletapCallback (event.getPointerId (0), event.getX (), event.getY ()); 
+        
+      return true;
+    }
   }
   
   public EngineView (Context context)
@@ -201,6 +201,7 @@ public class EngineView extends SurfaceView implements SurfaceHolder.Callback
   private native void onKeyCallback              (int keycode, int action, boolean alt_pressed, boolean shift_pressed, boolean is_sym_pressed);
   private native void onFocusCallback            (boolean focusGained);
   private native void onSurfaceCreatedCallback   ();
+  private native void onSurfaceChangedCallback   (int format, int width, int height);  
   private native void onSurfaceDestroyedCallback ();
   
   @Override
@@ -288,7 +289,8 @@ public class EngineView extends SurfaceView implements SurfaceHolder.Callback
   
   public void surfaceChanged (SurfaceHolder holder, int format, int width, int height)
   {
-  }
+    onSurfaceChangedCallback (format, width, height);
+  }  
 
   public void surfaceCreated (SurfaceHolder holder)
   {

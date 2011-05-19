@@ -17,18 +17,18 @@ RENDER.OPENGL_DRIVER.SOURCES.INCLUDE_DIRS           := sources
 RENDER.OPENGL_DRIVER.SOURCES.macosx.COMPILER_CFLAGS := -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/ApplicationServices.framework/Frameworks/CoreGraphics.framework/Headers/ \
                                                        -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/IOKit.framework/Headers/graphics/ \
                                                        -I$(MACOSX_SDK_PATH)/System/Library/Frameworks/AGL.framework/Headers/
-RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            := sources/common \
-                                                       sources/driver \
-                                                       sources/render_target_manager \
-                                                       sources/render_target_manager/fbo_manager \
-                                                       sources/input_stage \
-                                                       sources/texture_manager \
-                                                       sources/texture_manager/nv_dxt \
-                                                       sources/shader_stage \
-                                                       sources/shader_stage/ffp \
-                                                       sources/output_stage \
-                                                       sources/query_manager \
-                                                       sources/render_target_manager/swap_chain_manager
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/common
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/driver
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/render_target_manager
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/render_target_manager/fbo_manager
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/input_stage
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/texture_manager
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/texture_manager/nv_dxt
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/shader_stage
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/shader_stage/ffp
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/output_stage
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/query_manager
+RENDER.OPENGL_DRIVER.SOURCES.SOURCE_DIRS            += sources/render_target_manager/swap_chain_manager
 RENDER.OPENGL_DRIVER.SOURCES.IMPORTS                := compile.render.low_level compile.common compile.system
 RENDER.OPENGL_DRIVER.SOURCES.msvc.COMPILER_CFLAGS   := -wd4355
 RENDER.OPENGL_DRIVER.SOURCES.gles.COMPILER_DEFINES  := OPENGL_ES_SUPPORT
@@ -38,6 +38,7 @@ RENDER.OPENGL_DRIVER.SOURCES.beagleboard.IMPORTS    := compile.extern.beagleboar
 RENDER.OPENGL_DRIVER.SOURCES.meego.IMPORTS          := compile.extern.meego
 RENDER.OPENGL_DRIVER.SOURCES.egl.SOURCE_DIRS        := sources/platform/egl
 RENDER.OPENGL_DRIVER.SOURCES.glx.SOURCE_DIRS        := sources/platform/glx
+RENDER.OPENGL_DRIVER.SOURCES.android.SOURCE_DIRS    := sources/platform/egl/android
 
 ifeq (,$(filter gles,$(PROFILES)))
 

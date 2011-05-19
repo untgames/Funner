@@ -81,6 +81,7 @@ ANDROID_JAR                := $(ANDROID_SDK)/platforms/$(ANDROID_PLATFORM)/andro
 DEFAULT_PACKAGE_PREFIX     := com.untgames.
 GDB_SERVER_FLAG_FILE       := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/gdb-installed
 GDB_SERVER_FILE            := $(ARM_EABI_DIR)/../gdbserver
+GDB_CLIENT                 := $(GCC_TOOLS_DIR)/arm-linux-androideabi-gdb
 BUSYBOX_FILE               := $(BUILD_DIR)platforms/android/busybox
 BUSYBOX_FLAG_FILE          := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/busybox-installed
 
@@ -139,13 +140,14 @@ define tools.run.android_package
  export DLLS="$(foreach path,$4,$$(export SUBST_DLLS=$$(cd $(dir $(path)) && pwd)/$(notdir $(path)) && echo $(REMOTE_DEBUG_DIR)/$${SUBST_DLLS/#$$ROOT_SUBSTRING/}))" && \
  export DLLS=$${DLLS/\ /:} && \
  export SUBST_CMD_STRING=$$(cd $(dir $(firstword $1)) && pwd)/$(notdir $(firstword $1)) && export SUBST_COMMAND=$(REMOTE_DEBUG_DIR)/$${SUBST_CMD_STRING/#$$ROOT_SUBSTRING/} && \
+ export OLD_APP_PID=`$(ADB) shell ps | grep $(DEFAULT_PACKAGE_PREFIX)funner.application | awk '{print $$2}'` && \
+ $(ADB) shell "kill $$OLD_APP_PID" && \
  $(ADB) shell logcat -c && \
  $(ADB) shell "mount -o remount,rw -t vfat /dev/block//vold/179:0 /mnt/sdcard && /mnt/sdcard/busybox mkdir -p $$(echo $$SUBST_DIR_RESULT) && cd $$(echo $$SUBST_DIR_RESULT) && am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)funner.application/.EngineActivity -e 'program' '$$(echo $$SUBST_COMMAND)' -e 'workdir' '$$SUBST_DIR_RESULT' -e 'libraries' '$$DLLS' -e 'args' '$(subst $(firstword $1),,$1)'" | sed "s/.$$//" && \
  sleep 1 && \
- $(ADB) shell "\\/mnt/sdcard/busybox/sh -c 'while ps | \\/mnt/sdcard/busybox/grep $(DEFAULT_PACKAGE_PREFIX)funner.application; do sleep 1; done'" > nul && \
- $(ADB) logcat -s -d -v raw System.out:I -v raw stdout:I
+ ( $(ADB) logcat -s -v raw System.out:I -v raw stdout:I & ) && \
+ while $(ADB) shell ps | grep $(DEFAULT_PACKAGE_PREFIX)funner.application; do sleep 1; done > nul
 endef
-# $(ADB) logcat 
 
 ###################################################################################################
 #—борка пакетов
@@ -265,10 +267,10 @@ endif
   .PHONY: RUN.$1
   
   RUN.$1: INSTALL.$1
-		@$(ADB) shell logcat -c		
+		@$(ADB) shell logcat -c				
 		@$(ADB) shell am start -a android.intent.action.VIEW -c android.intent.category.LAUNCHER -n $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME)/.EngineActivity -e "program" "value"
 		@sleep 1
-		@$(ADB) shell "\\/mnt/sdcard/busybox/sh -c 'while ps | \\/mnt/sdcard/busybox/grep $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME); do sleep 1; done'" > nul
+		@$(ADB) shell "//mnt/sdcard/busybox/sh -c 'while ps | //mnt/sdcard/busybox/grep $(DEFAULT_PACKAGE_PREFIX)$$($1.NAME); do sleep 1; done'" > nul
 		@$(ADB) logcat -s -d -v raw System.out:I -v raw stdout:I
 #		@$(ADB) shell setprop log.redirect-stdio true
 
@@ -320,6 +322,6 @@ $(GDB_SERVER_FLAG_FILE): $(GDB_SERVER_FILE)
 
 $(BUSYBOX_FLAG_FILE): $(BUSYBOX_FILE)
 	@echo Install busybox...
-	@$(ADB) push $(BUSYBOX_FILE) \\/mnt/sdcard
-	@$(ADB) shell chmod 777 \\/mnt/sdcard/busybox
+	@$(ADB) push $(BUSYBOX_FILE) //mnt/sdcard
+	@$(ADB) shell chmod 777 //mnt/sdcard/busybox
 	@touch $@
