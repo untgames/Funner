@@ -42,7 +42,7 @@ DLL_SUFFIX              := .dll
 DLL_LIB_SUFFIX          := .lib
 DLL_PREFIX              :=
 PROFILES                += msvc wince win32 has_windows arm
-COMMON_LINK_FLAGS       +=
+COMMON_LINK_FLAGS       += -entry:mainACRTStartup -subsystem:windowsce
 
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
