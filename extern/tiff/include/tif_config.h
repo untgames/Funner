@@ -1,3 +1,52 @@
+#ifdef _WIN32_WCE
+
+/* Define to 1 if you have the <assert.h> header file. */
+#define HAVE_ASSERT_H 1
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#define  HAVE_FCNTL_H 1
+
+/* Define as 0 or 1 according to the floating point format suported by the
+   machine */
+#define HAVE_IEEEFP 1
+
+/* Define to 1 if you have the `jbg_newlen' function. */
+#define HAVE_JBG_NEWLEN 1
+
+/* Define to 1 if you have the <string.h> header file. */
+#define HAVE_STRING_H 1
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <io.h> header file. */
+#define HAVE_IO_H 1
+
+/* Define to 1 if you have the <search.h> header file. */
+#define HAVE_SEARCH_H 1
+
+/* Define to 1 if you have the `setmode' function. */
+#define HAVE_SETMODE 1
+
+/* Define to 1 if you have the `bsearch' function. */
+#define HAVE_BSEARCH 1
+#define bsearch wceex_bsearch
+
+/* Define to 1 if you have the `lfind' function. */
+#define HAVE_LFIND 1
+#define lfind wceex_lfind
+
+/* The size of a `int', as computed by sizeof. */
+#define SIZEOF_INT 4
+
+/* The size of a `long', as computed by sizeof. */
+#define SIZEOF_LONG 4
+
+/* Set the native cpu bit order */
+#define HOST_FILLORDER FILLORDER_LSB2MSB
+
+#else
+
 /* Define to 1 if you have the <assert.h> header file. */
 #define HAVE_ASSERT_H 1
 
@@ -14,6 +63,17 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
 
+/* The size of a `int', as computed by sizeof. */
+#define SIZEOF_INT 4
+
+/* The size of a `long', as computed by sizeof. */
+#define SIZEOF_LONG 4
+
+/* Set the native cpu bit order */
+#define HOST_FILLORDER FILLORDER_LSB2MSB
+
+#endif
+
 /* Define to 1 if you have the <io.h> header file. */
 #if defined (MSC_VER) || defined (__CYGWIN__)
   #define HAVE_IO_H 1
@@ -23,15 +83,6 @@
 #ifndef ANDROID
   #define HAVE_SEARCH_H 1
 #endif
-
-/* The size of a `int', as computed by sizeof. */
-#define SIZEOF_INT 4
-
-/* The size of a `long', as computed by sizeof. */
-#define SIZEOF_LONG 4
-
-/* Set the native cpu bit order */
-#define HOST_FILLORDER FILLORDER_LSB2MSB
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */
@@ -59,7 +110,7 @@ static int _wopen (const void* name, int mode, ...)
 
 #endif
 
-#if defined (_WIN32)
+#if defined (_WIN32) && !defined(lfind)
   #define lfind _lfind
 #endif
 
@@ -72,3 +123,5 @@ void * lfind (const void *key, const void *base, unsigned int *num, unsigned int
 #ifdef BADA_SIMULATOR
   #undef __WIN32__
 #endif
+
+#include <tiffconf.h>

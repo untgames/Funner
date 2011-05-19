@@ -1,4 +1,4 @@
-/* $Id: tiff.h,v 1.42 2005/12/23 15:10:45 dron Exp $ */
+/* $Id: tiff.h,v 1.43.2.1 2010-06-08 18:50:43 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -43,7 +43,7 @@
  *    (http://partners.adobe.com/asn/developer/PDFS/TN/TIFF6.pdf)
  *
  * For Big TIFF design notes see the following link
- *    http://gdal.maptools.org/twiki/bin/view/libtiff/BigTIFFDesign
+ *    http://www.remotesensing.org/libtiff/bigtiffdesign.html
  */
 #define	TIFF_VERSION	        42
 #define TIFF_BIGTIFF_VERSION    43
@@ -645,3 +645,10 @@ typedef	enum {
 #endif /* _TIFF_ */
 
 /* vim: set ts=8 sts=8 sw=8 noet: */
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */
