@@ -567,10 +567,10 @@ Platform::window_t Platform::CreateWindow (WindowStyle, WindowMessageHandler han
       {
         if (window->is_native_handle_received)
         {        
-          window->window.native_window = ANativeWindow_fromSurface (&env, surface.get ());        
+          window->window.native_window = ANativeWindow_fromSurface (&env, surface.get ());
           window->window.view          = window->view.get ();
 
-          if (!window->native_window)
+          if (!window->window.native_window)
             throw xtl::format_operation_exception ("", "::ANativeWindow_fromSurface failed");
 
           break;
