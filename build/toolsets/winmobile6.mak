@@ -42,7 +42,7 @@ DLL_SUFFIX              := .dll
 DLL_LIB_SUFFIX          := .lib
 DLL_PREFIX              :=
 PROFILES                += msvc wince win32 has_windows arm
-COMMON_LINK_FLAGS       += -entry:mainACRTStartup -subsystem:windowsce
+COMMON_LINK_FLAGS       += -subsystem:windowsce
 
 ###################################################################################################
 #Конфигурация переменных расположения библиотек
@@ -75,7 +75,7 @@ endef
 #список подключаемых символов линковки, флаги линковки, def файл)
 ###################################################################################################
 define tools.link
-export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2 $(COMMON_LINK_FLAGS) $(if $(map),-MAP:$(basename $1).map -MAPINFO:EXPORTS) $(if $6,-DEF:"$6")
+export PATH="$(MSVS_COMMON_PATH);$$PATH" && "$(MSVC_BIN_PATH)/link" -nologo -out:"$1" $(if $(filter %.dll,$1),-dll,-entry:mainACRTStartup) $(patsubst %,-libpath:"%",$3) $(patsubst %,-include:"_%",$4) $5 $2 $(COMMON_LINK_FLAGS) $(if $(map),-MAP:$(basename $1).map -MAPINFO:EXPORTS) $(if $6,-DEF:"$6")
 endef
 
 ###################################################################################################
