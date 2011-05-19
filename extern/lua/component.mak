@@ -1,7 +1,11 @@
 ###################################################################################################
 #Список целей
 ###################################################################################################
-TARGETS := EXTERN.LUALIB EXTERN.LUA_UTILS EXTERN.LUA_TESTS
+TARGETS := EXTERN.LUALIB
+
+ifeq (,$(filter wince,$(PROFILES)))
+TARGETS += EXTERN.LUA_UTILS EXTERN.LUA_TESTS
+endif
 
 #Цель №1 - LUALIB
 EXTERN.LUALIB.TYPE                 := static-lib        #Тип цели
@@ -13,6 +17,7 @@ EXTERN.LUALIB.LIBS                 :=                   #Список используемых при
 EXTERN.LUALIB.msvc.COMPILER_CFLAGS := -TP               #Флаги сборки (зависят от конфигурации)
 EXTERN.LUALIB.g++.COMPILER_CFLAGS  := -x c++
 EXTERN.LUALIB.android.COMPILER_CFLAGS := -include android_lconv_wrapper.h
+EXTERN.LUALIB.wince.COMPILER_CFLAGS   := -FIwince_wrapper.h -DLUA_ANSI
 
 #Цель №2 - LUA_UTILS
 EXTERN.LUA_UTILS.TYPE                 := test-suite     	 #Тип цели

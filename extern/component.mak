@@ -31,3 +31,7 @@ endif
 ifneq (,$(filter bada,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENT_DIRS := bada $(FUNNER_EXTERN_LIBS.COMPONENT_DIRS)
 endif
+
+ifneq (,$(filter wince,$(PROFILES)))
+  FUNNER_EXTERN_LIBS.COMPONENT_DIRS := wcecompat $(FUNNER_EXTERN_LIBS.COMPONENT_DIRS)
+endif

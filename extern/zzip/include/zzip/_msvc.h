@@ -14,8 +14,12 @@
 /* #undef HAVE_BYTESWAP_H */
 
 /* Define to 1 if you have the <direct.h> header file. */
+#ifndef _WIN32_WCE
+
 #ifndef ZZIP_HAVE_DIRECT_H 
 #define ZZIP_HAVE_DIRECT_H  1 
+#endif
+
 #endif
 
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
@@ -97,8 +101,13 @@
 /* #undef HAVE_UNISTD_H */
 
 /* Define to 1 if you have the <winbase.h> header file. */
+
+#ifndef _WIN32_WCE
+
 #ifndef ZZIP_HAVE_WINBASE_H 
 #define ZZIP_HAVE_WINBASE_H  1  /* hmm, is that win32 ? */ 
+#endif
+
 #endif
 
 /* Define to 1 if you have the <windows.h> header file. */
@@ -224,6 +233,6 @@
 #ifndef _zzip_ssize_t 
 #define _zzip_ssize_t  int 
 #endif
- 
+
 /* once: _ZZIP__MSVC_H */
 #endif
