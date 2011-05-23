@@ -986,13 +986,13 @@ void register_window_callbacks (JNIEnv* env)
       {"onSurfaceDestroyedCallback", "()V", (void*)&on_surface_destroyed_callback},
       {"onSurfaceChangedCallback", "(III)V", (void*)&on_surface_changed_callback},
     };
-    
+
     static const size_t methods_count = sizeof (methods) / sizeof (*methods);
 
     jint status = env->RegisterNatives (view_class, methods, methods_count);
 
     if (status)
-      throw xtl::format_operation_exception ("", "Can't register natives (staus=%d)", status);
+      throw xtl::format_operation_exception ("", "Can't register natives (status=%d)", status);
   }
   catch (xtl::exception& e)
   {
