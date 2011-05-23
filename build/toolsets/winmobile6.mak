@@ -8,13 +8,13 @@
 ifneq (,$(VS90COMNTOOLS))
   MSVC_PATH         ?= $(VS90COMNTOOLS)../../vc/ce
   MSVS_COMMON_PATH  ?= $(VS90COMNTOOLS)../../Common7/Ide
-  PROFILES          += vc9 haswchar
+  PROFILES          += vc9
 endif
 
 ifneq (,$(VS80COMNTOOLS))
   MSVC_PATH         ?= $(VS80COMNTOOLS)../../vc/ce
   MSVS_COMMON_PATH  ?= $(VS80COMNTOOLS)../../Common7/Ide
-  PROFILES          += vc8 haswchar
+  PROFILES          += vc8
 endif
 
 ifeq (,$(MSVS_COMMON_PATH))
