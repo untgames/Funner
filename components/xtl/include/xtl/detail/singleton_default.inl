@@ -55,7 +55,7 @@ template <class T> struct singleton_default_instance<T, false>
       initializer () : instance (new (&buffer) T) {}
     }
 #ifdef ARM
-#ifdef __GNU_C__
+#ifdef __GNUC__
     __attribute__ ((aligned (8)))
 #elif defined (_MSC_VER)
     __declspec(align(32))
