@@ -53,7 +53,7 @@ extern "C" {
 #ifndef WCHAR_MIN
 #define WCHAR_MIN       0
 #endif /* WCHAR_MIN */
-	
+  
 #ifndef WCHAR_MAX
 #define WCHAR_MAX       ((wchar_t)-1)
 #endif /* WCHAR_MAX */
@@ -75,6 +75,12 @@ _CRTIMP int __cdecl wctob(wint_t);
 */
 
 #ifdef  __cplusplus
+
+#ifndef _FILE_DEFINED
+typedef unsigned char FILE;
+#define _FILE_DEFINED
+#endif
+
 inline int fwide(FILE *, int _M)
         {return (_M); }
 inline int mbsinit(const mbstate_t *)
