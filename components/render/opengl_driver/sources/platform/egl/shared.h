@@ -19,6 +19,7 @@
 
 #ifdef ANDROID
   #include <jni.h>
+  #include <dlfcn.h>
   
   #include <xtl/type_traits>  
   
