@@ -1,0 +1,13 @@
+#ifndef WCECOMPAT_TYPEINFO_WRAPPER_HEADER
+#define WCECOMPAT_TYPEINFO_WRAPPER_HEADER
+
+#include <../armv4i/typeinfo>
+
+namespace std
+{
+
+using ::type_info;
+
+}
+
+#endif
