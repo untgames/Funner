@@ -5,5 +5,5 @@ ifeq (,$(filter iphone,$(PROFILES))$(filter android,$(PROFILES))$(filter beagleb
 endif
 
 ifneq (,$(filter bada,$(PROFILES)))
-  COMPONENT_DIRS += bada_addons
+  COMPONENT_DIRS += bada
 endif
