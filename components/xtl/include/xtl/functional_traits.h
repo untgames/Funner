@@ -506,7 +506,7 @@ struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Ar
 template <class T,class Arg1, class Arg2, class Arg3, class Arg4, class Arg5, class Arg6, class Arg7, class Arg8, class Arg9, class Ret>
 struct functional_traits<Ret (T::*)(Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9, ...) const volatile>: public eclipsis_functional_traits<memfun_arguments_traits<9, const volatile T, Ret, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, Arg8, Arg9> > { };
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || defined(_WIN32_WCE)
 
 /*
     Специализации для указателей на функцию
