@@ -1,5 +1,5 @@
 #if defined (_MSC_VER) || defined (WIN32) || defined (_WIN32) || defined (__WIN32__)
-  #ifdef _MSC_VER
+  #if defined(_MSC_VER) && !defined(_WIN32_WCE)
 
     extern "C" long __cdecl _InterlockedIncrement       (volatile long*);
     extern "C" long __cdecl _InterlockedDecrement       (volatile long*);

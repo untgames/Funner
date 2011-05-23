@@ -1,11 +1,11 @@
 #ifndef XTL_TOKEN_PARSER_HEADER
 #define XTL_TOKEN_PARSER_HEADER
 
+#include <string.h>
 #include <wchar.h> //cwchar имеет проблемы компиляции на mingw 3.4.5
 
 #include <cctype>
 #include <cstdlib>
-#include <cstring>
 
 #include <typeinfo>
 #include <exception>
@@ -48,20 +48,23 @@ namespace io
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Разбор базовых типов из строки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-bool read (const char*    string, bool& result_value);
-bool read (const char*    string, char& result_value);
-bool read (const char*    string, signed char& result_value);
-bool read (const char*    string, unsigned char& result_value);
-bool read (const char*    string, wchar_t& result_value);
-bool read (const char*    string, short& result_value);
-bool read (const char*    string, unsigned short& result_value);
-bool read (const char*    string, int& result_value);
-bool read (const char*    string, unsigned int& result_value);
-bool read (const char*    string, long& result_value);
-bool read (const char*    string, unsigned long& result_value);
-bool read (const char*    string, float& result_value);
-bool read (const char*    string, double& result_value);
-bool read (const char*    string, long double& result_value);
+bool read (const char* string, bool& result_value);
+bool read (const char* string, char& result_value);
+bool read (const char* string, signed char& result_value);
+bool read (const char* string, unsigned char& result_value);
+bool read (const char* string, wchar_t& result_value);
+bool read (const char* string, short& result_value);
+bool read (const char* string, unsigned short& result_value);
+bool read (const char* string, int& result_value);
+bool read (const char* string, unsigned int& result_value);
+bool read (const char* string, long& result_value);
+bool read (const char* string, unsigned long& result_value);
+bool read (const char* string, float& result_value);
+bool read (const char* string, double& result_value);
+bool read (const char* string, long double& result_value);
+
+#ifndef XTL_NO_WCHAR
+
 bool read (const wchar_t* string, bool& result_value);
 bool read (const wchar_t* string, wchar_t& result_value);
 bool read (const wchar_t* string, char& result_value);
@@ -76,6 +79,8 @@ bool read (const wchar_t* string, unsigned long& result_value);
 bool read (const wchar_t* string, float& result_value);
 bool read (const wchar_t* string, double& result_value);
 bool read (const wchar_t* string, long double& result_value);
+
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Чтение токенов с приведением типов

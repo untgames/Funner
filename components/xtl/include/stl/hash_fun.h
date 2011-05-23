@@ -1,6 +1,7 @@
 #ifndef __MYSTL__HASH_FUN__
 #define __MYSTL__HASH_FUN__
 
+#include <string.h>
 #include <wchar.h> //cwchar имеет проблемы компил€ции на mingw 3.4.5
 
 #include <stl/config.h>

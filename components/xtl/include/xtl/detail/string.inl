@@ -103,10 +103,39 @@ inline int xsnprintf (char* buffer, size_t count, const char* format, ...)
 
 #ifdef _MSC_VER
 
+#ifdef _WIN32_WCE
+
+inline int _try_vscprintf (const char* format, va_list list, size_t size)
+{
+  char* buffer = (char*)_alloca (size);
+  
+  return xvsnprintf (buffer, size, format, list);
+}
+
+inline int _vscprintf (const char* format, va_list list)
+{
+  if (!format)
+    return 0;
+    
+  size_t size = 1024;
+    
+  for (;;)
+  {
+    int result = _try_vscprintf (format, list, size);
+    
+    if (result != -1)
+      return result;
+      
+    size *= 2;
+  }
+}
+
+#endif
+
 inline int xvsnprintf (char* buffer, size_t count, const char* format, va_list list)
 {
   if (!buffer || !count)
-    return count ? -1 : ::_vscprintf (format, list);
+    return count ? -1 : _vscprintf (format, list);
 
   int ret = ::_vsnprintf (buffer, count-1, format, list);
 
