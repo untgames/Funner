@@ -7,6 +7,10 @@
   #include <xmmintrin.h>
 #endif
 
+#ifdef _WIN32_WCE
+  #include <stdlib.h>
+#endif
+
 #ifdef _MSC_VER
   #pragma pack (push, 1)
 #endif
