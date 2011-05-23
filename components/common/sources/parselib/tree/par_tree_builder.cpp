@@ -241,7 +241,7 @@ void ParseTreeBuilder::SetSource (const char* name)
 
   size_t size   = strlen (name) + 1,
          offset = impl->front_offset - impl->buffer.data ();
-  char*  dst    = impl->AllocFront (size);
+  char*  dst    = impl->AllocFront (get_aligned_size (size, ALIGN_SIZE));
 
   strcpy (dst, name);
 
