@@ -18,6 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#define rewind(file) fseek(file, 0L, SEEK_SET )
 
 #ifndef __wcecompat__STDIO_H__
 #define __wcecompat__STDIO_H__
