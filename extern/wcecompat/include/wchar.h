@@ -67,12 +67,22 @@ struct tm;
 _CRTIMP wint_t __cdecl btowc(int);
 _CRTIMP size_t __cdecl mbrlen(const char *, size_t, mbstate_t *);
 _CRTIMP size_t __cdecl mbrtowc(wchar_t *, const char *, size_t, mbstate_t *);
-_CRTIMP size_t __cdecl mbsrtowcs(wchar_t *, const char **, size_t, mbstate_t *);
-
-_CRTIMP size_t __cdecl wcrtomb(char *, wchar_t, mbstate_t *);
-_CRTIMP size_t __cdecl wcsrtombs(char *, const wchar_t **, size_t, mbstate_t *);
-_CRTIMP int __cdecl wctob(wint_t);
 */
+
+_CRTIMP size_t __cdecl mbsrtowcs(wchar_t *wcstr, const char **mbstr, size_t count, mbstate_t *mbstate)
+{
+   return mbstowcs(wcstr,*mbstr,count);
+}
+
+//_CRTIMP size_t __cdecl wcrtomb(char *, wchar_t, mbstate_t *);
+
+_CRTIMP size_t __cdecl wcsrtombs(char *mbstr, const wchar_t **wcstr, size_t count, mbstate_t *mbstate)
+{
+   return wcstombs(mbstr,*wcstr,count);
+}
+
+//_CRTIMP int __cdecl wctob(wint_t);
+
 
 #ifdef  __cplusplus
 

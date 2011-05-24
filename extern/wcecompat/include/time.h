@@ -18,6 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <..\armv4i\time.h>
 
 #ifndef __wcecompat__TIME_H__
 #define __wcecompat__TIME_H__
