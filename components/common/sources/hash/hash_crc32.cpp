@@ -1,5 +1,7 @@
-#include <common/hash.h>
 #include <ctype.h>
+#include <stdlib.h>
+
+#include <common/hash.h>
 
 namespace common
 {
