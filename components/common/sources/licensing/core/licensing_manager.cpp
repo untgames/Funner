@@ -1,5 +1,9 @@
 #include "license_manager_shared.h"
 
+#ifdef _MSC_VER
+   #include <time.h>
+#endif
+
 using namespace common;
 
 namespace
@@ -281,10 +285,11 @@ class LicenseManagerImpl
       tm_date.tm_mon  = atoi (date_string + 5) - 1;
       tm_date.tm_year = atoi (date_string) - 1900;
 
-#ifdef _MSC_VER
-      time_t date = _mkgmtime32 (&tm_date);
-#elif defined (ANDROID) || defined (__MINGW32__)
+
+#if defined (ANDROID) || defined (__MINGW32__) || defined (WINCE)
       time_t date = mktime (&tm_date);
+#elif defined (_MSC_VER)
+      time_t date = _mkgmtime32 (&tm_date);
 #else
       time_t date = timegm (&tm_date);
 #endif
