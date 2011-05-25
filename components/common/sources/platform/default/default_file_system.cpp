@@ -1,4 +1,5 @@
 #include "shared.h"
+#include <stdio.h>
 
 using namespace common;
 using namespace stl;
@@ -169,7 +170,7 @@ filesize_t StdioFileSystem::FileSize (file_t file)
 
 void StdioFileSystem::FileResize (file_t file,filesize_t new_size)
 {
-#ifdef _WIN32
+#if (defined(_WIN32))&&(!defined(WINCE))
   if (chsize (fileno ((FILE*)file),new_size) == -1)
   {
     switch (errno)
