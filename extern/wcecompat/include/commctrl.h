@@ -17,7 +17,6 @@
 *                                                                             *
 \*****************************************************************************/
 
-
 #ifndef _INC_COMMCTRL
 #define _INC_COMMCTRL
 
@@ -680,6 +679,19 @@ typedef struct _HD_ITEMW
 #define HD_LAYOUT  HDLAYOUT
 #else
 #define HDLAYOUT   HD_LAYOUT
+#endif
+
+#if !defined(tagWINDOWPOS)
+typedef struct tagWINDOWPOS 
+{
+    HWND    hwnd;
+    HWND    hwndInsertAfter;
+    int     x;
+    int     y;
+    int     cx;
+    int     cy;
+    UINT    flags;
+} WINDOWPOS, *LPWINDOWPOS, *PWINDOWPOS;
 #endif
 
 typedef struct _HD_LAYOUT
