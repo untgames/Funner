@@ -14,6 +14,7 @@ XTL.STL.TESTS.COMPILER_CFLAGS    :=
 XTL.STL.TESTS.COMPILER_DEFINES   := __MYSTL_STANDALONE__
 XTL.STL.TESTS.DOCUMENTATION_DIRS := include
 XTL.STL.TESTS.bada.IMPORTS       := compile.extern.bada
+XTL.STL.TESTS.wince.IMPORTS      := link.extern.wcecompat
 
 #Цель №2 - TR1 tests
 XTL.TR1.TESTS.TYPE                        := test-suite

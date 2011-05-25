@@ -15,14 +15,31 @@
 *                                                                             *
 \*****************************************************************************/
 
+#include <windef.h>
 #include <windows.h>
 
 #ifndef _INC_SHELLAPI
 #define _INC_SHELLAPI
 
-BOOL WINAPI SHGetSpecialFolderPath(HWND hwndOwner, LPTSTR lpszPath,    
-                                      int nFolder, BOOL fCreate );
-
+typedef struct _SHELLEXECUTEINFO
+{
+        DWORD cbSize;
+        ULONG fMask;
+        HWND hwnd;
+        LPCTSTR lpVerb;
+        LPCTSTR lpFile;
+        LPCTSTR lpParameters;
+        LPCTSTR lpDirectory;
+        int nShow;
+        HINSTANCE hInstApp;
+        // Optional fields
+        LPVOID lpIDList;
+        LPCTSTR lpClass;
+        HKEY hkeyClass;
+        DWORD dwHotKey;
+        HANDLE hIcon;
+        HANDLE hProcess;
+} SHELLEXECUTEINFO, FAR *LPSHELLEXECUTEINFO;
 
 //
 // Define API decoration for direct importing of DLL references.
@@ -35,6 +52,11 @@ BOOL WINAPI SHGetSpecialFolderPath(HWND hwndOwner, LPTSTR lpszPath,
 #endif
 #endif // WINSHELLAPI
 
+BOOL WINAPI ShellExecuteEx(LPSHELLEXECUTEINFO lpExecInfo);
+
+BOOL WINAPI SHGetSpecialFolderPath(HWND hwndOwner, LPTSTR lpszPath,    
+                                      int nFolder, BOOL fCreate );
+int system(const char *command);
 
 #include <pshpack1.h>
 

@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <shellapi.h>
+
 using namespace common;
 
 void remove_all ()
