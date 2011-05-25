@@ -209,6 +209,22 @@ class MeshInputBuilder
     Вершинный буфер меша
 */
 
+struct VertexKey
+{
+  size_t* inputs;
+  size_t  inputs_count;
+  
+  VertexKey (size_t* in_inputs, size_t in_inputs_count) : inputs (in_inputs), inputs_count (in_inputs_count) {}
+  
+  bool operator == (const VertexKey& key) const { return inputs_count == key.inputs_count && memcmp (inputs, key.inputs, inputs_count * sizeof (size_t)) == 0; }
+  bool operator != (const VertexKey& key) const { return !(*this == key); }
+};
+
+size_t hash (const VertexKey& key)
+{
+  return common::crc32 (key.inputs, sizeof (size_t) * key.inputs_count);
+}
+
 class MeshVertexBuffer
 {
   public:
@@ -223,13 +239,11 @@ class MeshVertexBuffer
 ///Добавление вершины
     size_t AddVertex (size_t* inputs)
     {
-        //определение хэша вершины по набору индексов входных каналов данных (номер в буфере позиций, номер в буфере нормалей, ...)
-
-      size_t vertex_hash = GetVertexHash (inputs);
-
+      VertexKey key (inputs, inputs_count);
+      
         //проверка: существует ли такая вершина в буфере вершин
 
-      VertexBufferMap::iterator search_iter = vertices_map.find (vertex_hash);
+      VertexBufferMap::iterator search_iter = vertices_map.find (key);
 
       if (search_iter != vertices_map.end ())
         return search_iter->second;
@@ -242,7 +256,7 @@ class MeshVertexBuffer
 
       try
       {
-        vertices_map [vertex_hash] = vertex_index;
+        vertices_map [key] = vertex_index;
 
         return vertex_index;
       }
@@ -260,14 +274,8 @@ class MeshVertexBuffer
     size_t** GetVertices () { return &vertices [0]; }
 
   private:
-    size_t GetVertexHash (const size_t* inputs)
-    {
-      return common::crc32 (inputs, sizeof (size_t) * inputs_count);
-    }
-  
-  private:
-    typedef stl::hash_map<size_t, size_t> VertexBufferMap;
-    typedef stl::vector<size_t*>          VertexBuffer;  
+    typedef stl::hash_map<VertexKey, size_t> VertexBufferMap;
+    typedef stl::vector<size_t*>             VertexBuffer;  
     
     VertexBuffer    vertices;
     VertexBufferMap vertices_map;
