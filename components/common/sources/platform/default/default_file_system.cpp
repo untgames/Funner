@@ -287,7 +287,7 @@ bool StdioFileSystem::GetFileInfo (const char* file_name,FileInfo& info)
     Поиск файлов
 */
 
-#ifdef _WIN32
+#if (defined(_WIN32))&&(!defined(WINCE))
 
 void StdioFileSystem::Search (const char* mask,const FileSearchHandler& insert_handler)
 {
