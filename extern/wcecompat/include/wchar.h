@@ -69,14 +69,14 @@ _CRTIMP size_t __cdecl mbrlen(const char *, size_t, mbstate_t *);
 _CRTIMP size_t __cdecl mbrtowc(wchar_t *, const char *, size_t, mbstate_t *);
 */
 
-_CRTIMP size_t __cdecl mbsrtowcs(wchar_t *wcstr, const char **mbstr, size_t count, mbstate_t *mbstate)
+inline _CRTIMP size_t __cdecl mbsrtowcs(wchar_t *wcstr, const char **mbstr, size_t count, mbstate_t *mbstate)
 {
    return mbstowcs(wcstr,*mbstr,count);
 }
 
 //_CRTIMP size_t __cdecl wcrtomb(char *, wchar_t, mbstate_t *);
 
-_CRTIMP size_t __cdecl wcsrtombs(char *mbstr, const wchar_t **wcstr, size_t count, mbstate_t *mbstate)
+inline _CRTIMP size_t __cdecl wcsrtombs(char *mbstr, const wchar_t **wcstr, size_t count, mbstate_t *mbstate)
 {
    return wcstombs(mbstr,*wcstr,count);
 }
