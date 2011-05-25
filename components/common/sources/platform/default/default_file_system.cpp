@@ -241,7 +241,7 @@ void StdioFileSystem::Rename (const char* file_name,const char* new_name)
 
 void StdioFileSystem::Mkdir (const char* dir_name)
 {
-#ifdef _WIN32
+#if (defined(_WIN32))&&(!defined(WINCE))
   if (mkdir (dir_name))
   {
     switch (errno)
