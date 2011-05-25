@@ -15,8 +15,13 @@
 *                                                                             *
 \*****************************************************************************/
 
+#include <windows.h>
+
 #ifndef _INC_SHELLAPI
 #define _INC_SHELLAPI
+
+BOOL WINAPI SHGetSpecialFolderPath(HWND hwndOwner, LPTSTR lpszPath,    
+                                      int nFolder, BOOL fCreate );
 
 
 //
