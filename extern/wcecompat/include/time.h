@@ -18,12 +18,12 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <..\armv4i\time.h>
-
 #ifndef __wcecompat__TIME_H__
 #define __wcecompat__TIME_H__
 
 #include <stdlib.h>		// time_t defined there
+
+_CRTIMP char * __cdecl ctime(const time_t *);
 
 extern size_t wcsftime(wchar_t *, size_t, const char *,const struct tm *);
 
