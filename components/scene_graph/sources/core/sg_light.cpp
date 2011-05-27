@@ -11,6 +11,7 @@ struct Light::Impl
 {
   vec3f color;         //цвет света
   vec3f attenuation;   //коэффициенты затухания (x - constant, y - linear, z - quadratic)
+  float intensity;     //интенсивность источника света
   float range;         //расстояние действия света
 };
 
@@ -23,6 +24,7 @@ Light::Light ()
 {
   impl->color       = math::vec3f (1.0f);
   impl->attenuation = 0;
+  impl->intensity   = 1.0f;
   impl->range       = DEFAULT_LIGHT_RANGE;
 }
 
@@ -43,6 +45,20 @@ void Light::SetLightColor (const math::vec3f& color)
 const math::vec3f& Light::LightColor () const
 {
   return impl->color;
+}
+
+/*
+    Интенсивность источника света
+*/
+
+void Light::SetIntensity (float value)
+{
+  impl->intensity = value;
+}
+
+float Light::Intensity () const
+{
+  return impl->intensity;
 }
 
 /*

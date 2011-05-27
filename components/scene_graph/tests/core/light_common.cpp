@@ -26,10 +26,13 @@ int main ()
   
   PointLight::Pointer light (PointLight::Create ());
 
-  light->SetLightColor (vec3f (0.f, 0.4f, 0.17f));
+  light->SetLightColor (vec3f (0.f, 0.4f, 0.17f));  
   printf ("Light color: ");  
   dump (light->LightColor ());
   printf ("\n");
+  
+  light->SetIntensity (0.5f);  
+  printf ("Light intensity: %.2f\n", light->Intensity ());  
 
   light->SetAttenuation (vec3f (0.f, 1.4f, -2.f));
   printf ("Light attenuation: ");  
