@@ -87,7 +87,7 @@ Shape* Driver::CreatePlaneShape (const math::vec3f& normal, float d)
   return new Shape (new btStaticPlaneShape (plane_normal, d));
 }
 
-Shape* Driver::CreateConvexShape (size_t vertices_count, math::vec3f* vertices)
+Shape* Driver::CreateConvexShape (size_t vertices_count, const math::vec3f* vertices)
 {
   static const char* METHOD_NAME = "physics::low_level::bullet::Driver::CreateConvexShape";
 
@@ -99,8 +99,8 @@ Shape* Driver::CreateConvexShape (size_t vertices_count, math::vec3f* vertices)
 
   xtl::uninitialized_storage<btScalar> bullet_vertices (vertices_count * 3);
 
-  math::vec3f* current_vertex        = vertices;
-  btScalar*    current_bullet_vertex = bullet_vertices.data ();
+  const math::vec3f* current_vertex        = vertices;
+  btScalar*          current_bullet_vertex = bullet_vertices.data ();
 
   for (size_t i = 0; i < vertices_count; i++, current_vertex++, current_bullet_vertex += 3)
   {
@@ -112,7 +112,7 @@ Shape* Driver::CreateConvexShape (size_t vertices_count, math::vec3f* vertices)
   return new Shape (new btConvexHullShape (bullet_vertices.data (), vertices_count, 3 * sizeof (float)));
 }
 
-Shape* Driver::CreateTriangleMeshShape (size_t vertices_count, math::vec3f* vertices, size_t triangles_count, size_t* triangles)
+Shape* Driver::CreateTriangleMeshShape (size_t vertices_count, const math::vec3f* vertices, size_t triangles_count, size_t* triangles)
 {
   static const char* METHOD_NAME = "physics::low_level::bullet::Driver::CreateTriangleMeshShape";
 
@@ -133,7 +133,7 @@ Shape* Driver::CreateTriangleMeshShape (size_t vertices_count, math::vec3f* vert
   triangle_mesh->preallocateIndices  (triangles_count * 3);
   triangle_mesh->preallocateVertices (vertices_count);
 
-  math::vec3f* current_vertex = vertices;
+  const math::vec3f* current_vertex = vertices;
 
   for (size_t i = 0; i < vertices_count; i++, current_vertex++)
     triangle_mesh->findOrAddVertex (btVector3 (current_vertex->x, current_vertex->y, current_vertex->z), false);

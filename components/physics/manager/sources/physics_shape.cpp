@@ -182,15 +182,30 @@ Shape ShapeImplProvider::CreateShapeCore (physics::low_level::IDriver* driver, c
     }
     case media::physics::ShapeType_TriangleMesh:
     {
-      if (!math::equal (scale, math::vec3f (1.f), SCALE_EQUAL_EPS))
-        throw xtl::format_operation_exception (METHOD_NAME, "Can't create scaled mesh shape");
-
       media::physics::shapes::TriangleMesh shape_data = shape.Data<media::physics::shapes::TriangleMesh> ();
 
+      const math::vec3f* vertices = shape_data.Vertices ();
+
+      xtl::uninitialized_storage<math::vec3f> scaled_vertices;
+
+      size_t vertices_count = shape_data.VerticesCount ();
+
+      if (!math::equal (scale, math::vec3f (1.f), SCALE_EQUAL_EPS))
+      {
+        scaled_vertices.resize (vertices_count);
+
+        math::vec3f* current_vertex = scaled_vertices.data ();
+
+        for (size_t i = 0; i < vertices_count; i++, current_vertex++)
+          *current_vertex = vertices [i] * scale;
+
+        vertices = scaled_vertices.data ();
+      }
+
       if (shape_data.IsConvex ())
-        return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateConvexShape (shape_data.VerticesCount (), shape_data.Vertices ()), false));
+        return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateConvexShape (vertices_count, vertices), false));
       else
-        return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateTriangleMeshShape (shape_data.VerticesCount (), shape_data.Vertices (),
+        return ShapeImplProvider::CreateShape (ShapePtr (driver->CreateTriangleMeshShape (vertices_count, vertices,
                                                                                           shape_data.TrianglesCount (), shape_data.Triangles () [0]), false));
     }
     case media::physics::ShapeType_Compound:

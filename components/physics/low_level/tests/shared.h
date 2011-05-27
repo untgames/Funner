@@ -146,12 +146,12 @@ class TestDriver: public IDriver, public Object
       throw xtl::make_not_implemented_exception ("TestDriver::CreatePlaneShape");
     }
 
-    IShape* CreateConvexShape (size_t vertices_count, math::vec3f* vertices)
+    IShape* CreateConvexShape (size_t vertices_count, const math::vec3f* vertices)
     {
       throw xtl::make_not_implemented_exception ("TestDriver::CreateConvexShape");
     }
 
-    IShape* CreateTriangleMeshShape (size_t vertices_count, math::vec3f* vertices, size_t triangles_count, size_t* triangles)
+    IShape* CreateTriangleMeshShape (size_t vertices_count, const math::vec3f* vertices, size_t triangles_count, size_t* triangles)
     {
       throw xtl::make_not_implemented_exception ("TestDriver::CreateTriangleShape");
     }

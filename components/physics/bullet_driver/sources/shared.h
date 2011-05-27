@@ -403,8 +403,8 @@ class Driver : public IDriver, public Object
     Shape* CreateSphereShape       (float radius);
     Shape* CreateCapsuleShape      (float radius, float height);
     Shape* CreatePlaneShape        (const math::vec3f& normal, float d);
-    Shape* CreateConvexShape       (size_t vertices_count, math::vec3f* vertices);
-    Shape* CreateTriangleMeshShape (size_t vertices_count, math::vec3f* vertices, size_t triangles_count, size_t* triangles);
+    Shape* CreateConvexShape       (size_t vertices_count, const math::vec3f* vertices);
+    Shape* CreateTriangleMeshShape (size_t vertices_count, const math::vec3f* vertices, size_t triangles_count, size_t* triangles);
     Shape* CreateCompoundShape     (size_t shapes_count, IShape** shapes, Transform* local_transforms);
 
   private:

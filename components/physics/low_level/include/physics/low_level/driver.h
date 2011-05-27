@@ -46,8 +46,8 @@ class IDriver : virtual public IObject
     virtual IShape* CreateSphereShape       (float radius) = 0;
     virtual IShape* CreateCapsuleShape      (float radius, float height) = 0;
     virtual IShape* CreatePlaneShape        (const math::vec3f& normal, float d) = 0;
-    virtual IShape* CreateConvexShape       (size_t vertices_count, math::vec3f* vertices) = 0;
-    virtual IShape* CreateTriangleMeshShape (size_t vertices_count, math::vec3f* vertices, size_t triangles_count, size_t* triangles) = 0;
+    virtual IShape* CreateConvexShape       (size_t vertices_count, const math::vec3f* vertices) = 0;
+    virtual IShape* CreateTriangleMeshShape (size_t vertices_count, const math::vec3f* vertices, size_t triangles_count, size_t* triangles) = 0;
     virtual IShape* CreateCompoundShape     (size_t shapes_count, IShape** shapes, Transform* local_transforms) = 0;
 };
 
