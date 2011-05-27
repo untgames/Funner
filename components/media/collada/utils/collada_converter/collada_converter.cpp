@@ -715,6 +715,7 @@ void save_node (const Params& params, const BoundVolumesMap& meshes_bound_volume
     XmlWriter::Scope scope (writer, light_type);
 
     writer.WriteAttribute ("name", light_name.c_str ());
+    writer.WriteAttribute ("intensity", iter->Intensity ());    
     writer.WriteAttribute ("color", iter->Color ());
 
     for (size_t i = 0; i < LightParam_Num; i++)
