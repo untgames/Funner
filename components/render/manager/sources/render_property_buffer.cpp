@@ -1,5 +1,7 @@
 #include "shared.h"
 
+//TODO: неверно сделана логика обновления. константный буфер сейчас пересоздается при любом изменении свойств. нужно анализировать propertylayout hash
+
 using namespace render;
 using namespace common;
 
