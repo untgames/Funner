@@ -2,7 +2,6 @@
 //TODO: templates for all states/program/frames/passes (general implementation)
 //TODO: program states
 //TODO: add viewport depth range
-//TODO: add frame demultiplexor
 //TODO: constant params requirements (constant buffers description)
 //TODO: temporary render targets
 
@@ -147,6 +146,18 @@ program "phong"
   profile "glsl"            //shading profile
   shader  "phong" "glsl.vs" //reference to shader source. TODO: add compile options
   shader  "phong" "glsl.ps" //reference to shader source
+
+//  shader "phong" "glsl.vs" "glsl.ps" //reference to shader source
+//  constant "DirectLightsCount"
+
+  texmap "diffuse"
+  texmap "specular"  2
+  texmap "ambient"   1
+  texmap "emission"  1
+  texmap "shadow01"
+  texmap "shadow02"
+  texmap "shadow03"
+  texmap "shadow04"
 }
 
 //shading instance for rendering shadow maps
