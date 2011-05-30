@@ -24,8 +24,8 @@
 #define DO 253
 #define DONT 254
 
-extern _TCHAR *exeToStart;
-extern _TCHAR *logToStart;
+_TCHAR *exeToStart;
+_TCHAR *logToStart;
 
 int  InitConsole();
 DWORD WINAPI Session(LPVOID sr);
@@ -49,7 +49,7 @@ DWORD WINAPI EndSess(LPVOID sr)
 
 DWORD WINAPI Session(LPVOID sr)
 {    
-	int err;
+  int err;
     SOCKET sendrecv = *((SOCKET*)sr);
 
 //    if (login(sendrecv))
@@ -62,7 +62,7 @@ DWORD WINAPI Session(LPVOID sr)
         memset(( void *) &si, 0, sizeof (si));
         memset(( void *) &pi, 0, sizeof (pi));
 
-		sa.nLength              = sizeof (SECURITY_ATTRIBUTES);
+    sa.nLength              = sizeof (SECURITY_ATTRIBUTES);
         sa.bInheritHandle       = TRUE;
         sa.lpSecurityDescriptor = NULL;
 
@@ -74,56 +74,56 @@ DWORD WINAPI Session(LPVOID sr)
         si.hStdOutput  = ( void  *)sendrecv;
         si.hStdError   = ( void  *)sendrecv;
 
-	 	LPTSTR szCmdline = _tcsdup(TEXT("C:\\Windows\\System32\\cmd.exe"));
+    LPTSTR szCmdline = _tcsdup(TEXT("C:\\Windows\\System32\\cmd.exe"));
 
-		//Пропустить настройки
-		unsigned char c[100];
-		int count=99;
-		while(count>1)
-		{
-			count=recv(sendrecv,(char*)(&c), 100,0 );
-			if(count<100)
-				count=0;
-		}
+    //Пропустить настройки
+    unsigned char c[100];
+    int count=99;
+    while(count>1)
+    {
+      count=recv(sendrecv,(char*)(&c), 100,0 );
+      if(count<100)
+        count=0;
+    }
 
-//		send(sendrecv,"-------Hello world---------",15,NULL);
+//    send(sendrecv,"-------Hello world---------",15,NULL);
 
-		DeleteFile(logToStart);
-	    SetStdioPathW(1, logToStart);
-		SetStdioPathW(2, logToStart);
+    DeleteFile(logToStart);
+      SetStdioPathW(1, logToStart);
+    SetStdioPathW(2, logToStart);
 
-		PROCESS_INFORMATION processInformation;
-		STARTUPINFO startupInfo;
-		memset(&processInformation, 0, sizeof(processInformation));
-		memset(&startupInfo, 0, sizeof(startupInfo));
-		startupInfo.cb = sizeof(startupInfo);
+    PROCESS_INFORMATION processInformation;
+    STARTUPINFO startupInfo;
+    memset(&processInformation, 0, sizeof(processInformation));
+    memset(&startupInfo, 0, sizeof(startupInfo));
+    startupInfo.cb = sizeof(startupInfo);
 
-		BOOL res=CreateProcessW(exeToStart,exeToStart,    
-			NULL,                 // Дескриптор процесса не наследуемый.
-			NULL,                 // Дескриптор потока не наследуемый.
-			FALSE,                // Установим наследование дескриптора в FALSE.
-			0,                    // Флажков создания нет.
-			NULL,                 // Используйте блок конфигурации родителя.
-			NULL,                 // Используйте стартовый каталог родителя.
-			&startupInfo,                  // Указатель на структуру STARTUPINFO.
-			&processInformation ) ;               // Указатель на структуру PROCESS_INFORMATION.
+    BOOL res=CreateProcessW(exeToStart,exeToStart,    
+      NULL,                 // Дескриптор процесса не наследуемый.
+      NULL,                 // Дескриптор потока не наследуемый.
+      FALSE,                // Установим наследование дескриптора в FALSE.
+      0,                    // Флажков создания нет.
+      NULL,                 // Используйте блок конфигурации родителя.
+      NULL,                 // Используйте стартовый каталог родителя.
+      &startupInfo,                  // Указатель на структуру STARTUPINFO.
+      &processInformation ) ;               // Указатель на структуру PROCESS_INFORMATION.
 
-		HANDLE file=CreateFile(logToStart,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_ALWAYS,NULL,NULL);
-		while(1)
-		{
-			char buf[100];
-			DWORD bytesRead;
+    HANDLE file=CreateFile(logToStart,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_ALWAYS,NULL,NULL);
+    while(1)
+    {
+      char buf[100];
+      DWORD bytesRead;
 
-			DWORD res=WaitForSingleObject((HANDLE)processInformation.dwProcessId,100);
-			ReadFile(file,buf,sizeof(buf),&bytesRead,NULL);
-			while(bytesRead!=0)
-			{
-				send(sendrecv,buf,bytesRead,NULL);
-				ReadFile(file,buf,sizeof(buf),&bytesRead,NULL);
-			}
-			if(res!=WAIT_TIMEOUT)
-				exit(0);
-		}
+      DWORD res=WaitForSingleObject((HANDLE)processInformation.dwProcessId,100);
+      ReadFile(file,buf,sizeof(buf),&bytesRead,NULL);
+      while(bytesRead!=0)
+      {
+        send(sendrecv,buf,bytesRead,NULL);
+        ReadFile(file,buf,sizeof(buf),&bytesRead,NULL);
+      }
+      if(res!=WAIT_TIMEOUT)
+        exit(0);
+    }
     }   
     return 0 ;
 };
@@ -173,14 +173,23 @@ int  InitConsole()
 {
     HANDLE hevt = CreateEvent(NULL, FALSE, FALSE, TEXT( "console_already_inited" ));
     DWORD dwThread;
-	int err;
+  int err;
     if  (GetLastError() != ERROR_ALREADY_EXISTS) 
     {
-	    HINSTANCE dllInst=LoadLibraryW(L"Coredll.dll");
-		SetStdioPathW=(SetStdioPathWFunc)GetProcAddress(dllInst,L"SetStdioPathW");
+      HINSTANCE dllInst=LoadLibraryW(L"Coredll.dll");
+    SetStdioPathW=(SetStdioPathWFunc)GetProcAddress(dllInst,L"SetStdioPathW");
         CreateThread(NULL, 0,Service,&hevt,0 ,&dwThread); 
-		err=GetLastError();
+    err=GetLastError();
     } 
     else return -1 ;     
     return 0 ;
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+  exeToStart=argv[1];
+  logToStart=argv[2];
+  InitConsole();
+  while(1);
+  return 0;
 }
