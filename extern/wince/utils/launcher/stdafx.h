@@ -1,8 +1,3 @@
-// stdafx.h : include file for standard system include files,
-// or project specific include files that are used frequently, but
-// are changed infrequently
-//
-
 #pragma once
 
 #pragma comment(linker, "/nodefaultlib:libc.lib")
@@ -25,8 +20,6 @@
 #include <aygshell.h>
 #pragma comment(lib, "aygshell.lib") 
 
-
-
 #include <stdio.h>
 #include <tchar.h>
 
@@ -41,16 +34,14 @@
 #endif
 
 #if _WIN32_WCE < 0x500 && ( defined(WIN32_PLATFORM_PSPC) || defined(WIN32_PLATFORM_WFSP) )
-	#pragma comment(lib, "ccrtrtti.lib")
-	#ifdef _X86_	
-		#if defined(_DEBUG)
-			#pragma comment(lib, "libcmtx86d.lib")
-		#else
-			#pragma comment(lib, "libcmtx86.lib")
-		#endif
-	#endif
+  #pragma comment(lib, "ccrtrtti.lib")
+  #ifdef _X86_  
+    #if defined(_DEBUG)
+      #pragma comment(lib, "libcmtx86d.lib")
+    #else
+      #pragma comment(lib, "libcmtx86.lib")
+    #endif
+  #endif
 #endif
 
 #include <altcecrt.h>
-
-// TODO: reference additional headers your program requires here
