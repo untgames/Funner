@@ -84,7 +84,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
           throw xtl::make_null_argument_exception ("", "file");
           
         Lock lock (*file);
-          
+
         FinishSend (*file);
         
         if (!file->response_file.IsClosed ())
@@ -160,7 +160,7 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
           
         if (file->end_of_request)
           throw xtl::format_operation_exception ("", "Can't send data after finish of send request");
-          
+                    
         return file->request_file.Write (buf, size);
       }
       catch (xtl::exception& e)
@@ -393,19 +393,21 @@ class UrlCustomFileSystem: public ICustomFileSystem, public xtl::reference_count
         
         if (file.is_post)
         {        
+          file.request_file.Rewind ();
+
           for (;;)
           {
             size_t size = file.request_file.Read (buffer.data (), buffer.size ());
-            
+
             if (!size)
               break;
-              
-            size_t send_size = connection.Send (buffer.data (), buffer.size ());
-            
+
+            size_t send_size = connection.Send (buffer.data (), size);
+
             if (send_size != size)
               throw xtl::format_operation_exception ("", "Can't send data %u bytes for URL query '%s'", size, file.url.c_str ());
           }
-          
+
           connection.CloseSend ();
         }
 

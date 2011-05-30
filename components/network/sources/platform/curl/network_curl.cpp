@@ -106,9 +106,9 @@ class CurlStream: public IUrlStream
     {
       if (&*thread)
         thread->Join ();
-        
+
       mutex.Lock ();
-      
+
       if (stream)
         curl_easy_cleanup (stream);
     }
@@ -119,7 +119,7 @@ class CurlStream: public IUrlStream
       syslib::Lock lock (mutex);
       
       WaitHeaders ();
-      
+
       return content_length;
     }
     
@@ -128,7 +128,7 @@ class CurlStream: public IUrlStream
       syslib::Lock lock (mutex);      
       
       WaitHeaders ();
-      
+
       return content_encoding.c_str ();
     }
     
@@ -137,7 +137,7 @@ class CurlStream: public IUrlStream
       syslib::Lock lock (mutex);
       
       WaitHeaders ();
-      
+
       return content_type.c_str ();
     }
     
@@ -192,7 +192,7 @@ class CurlStream: public IUrlStream
               
               if (properties.IsPresent ("send_size"))
               {
-                check_code (curl_easy_setopt (stream, CURLOPT_POSTFIELDSIZE, static_cast<size_t> (properties.GetInteger ("send_size"))), "::curl_easy_setopt(CURLOPT_POSTFIELDSIZE_LARGE)");
+                check_code (curl_easy_setopt (stream, CURLOPT_POSTFIELDSIZE, static_cast<size_t> (properties.GetInteger ("send_size"))), "::curl_easy_setopt(CURLOPT_POSTFIELDSIZE)");
                 
                 post_chunk = curl_slist_append (post_chunk, "Expect:");
                 
@@ -213,7 +213,7 @@ class CurlStream: public IUrlStream
           }
 
             //запуск соединения
-          
+
           check_code (curl_easy_perform (stream), "::curl_perform");
 
           if (post_chunk)
@@ -255,7 +255,7 @@ class CurlStream: public IUrlStream
       try
       {
         syslib::Lock lock (mutex);
-        
+
         stl::string str = GetDebugMessage (reinterpret_cast<char*> (ptr), size);
         
         if (common::wcimatch (str.c_str (), "Content-Type:*"))
@@ -283,7 +283,7 @@ class CurlStream: public IUrlStream
             
           content_length = atoi (tokens [1]);
         }
-        
+
         return size;
       }
       catch (std::exception& e)
@@ -313,10 +313,11 @@ class CurlStream: public IUrlStream
       {
         {
           syslib::Lock lock (mutex);
-          
+
           if (!headers_received)
           {
             headers_received = true;
+
             headers_condition.NotifyAll ();
           }
         }
@@ -350,7 +351,9 @@ class CurlStream: public IUrlStream
     {
       try
       {
-        return listener.ReadSendData (buffer, size);
+        size_t result = listener.ReadSendData (buffer, size);;
+        
+        return result;
       }
       catch (std::exception& e)
       {
@@ -369,7 +372,7 @@ class CurlStream: public IUrlStream
     {
       if (!userdata)
         return 0;
-        
+
       reinterpret_cast<CurlStream*> (userdata)->DebugLog (type, data, size);
       
       return 0;
