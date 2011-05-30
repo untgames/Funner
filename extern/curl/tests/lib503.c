@@ -1,13 +1,24 @@
-/*****************************************************************************
+/***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
  *                             / __| | | | |_) | |
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * $Id: lib503.c,v 1.19 2008-09-20 04:26:56 yangtse Exp $
- */
-
+ * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ *
+ * This software is licensed as described in the file COPYING, which
+ * you should have received as part of this distribution. The terms
+ * are also available at http://curl.haxx.se/docs/copyright.html.
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ***************************************************************************/
 #include "test.h"
 
 #include <sys/types.h>
@@ -29,7 +40,7 @@
 int test(char *URL)
 {
   CURL *c;
-  CURLM *m;
+  CURLM *m = NULL;
   int res = 0;
   int running;
   char done = FALSE;
@@ -49,12 +60,12 @@ int test(char *URL)
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl_easy_setopt(c, CURLOPT_PROXY, libtest_arg2); /* set in first.c */
-  curl_easy_setopt(c, CURLOPT_URL, URL);
-  curl_easy_setopt(c, CURLOPT_USERPWD, "test:ing");
-  curl_easy_setopt(c, CURLOPT_PROXYUSERPWD, "test:ing");
-  curl_easy_setopt(c, CURLOPT_HTTPPROXYTUNNEL, 1L);
-  curl_easy_setopt(c, CURLOPT_HEADER, 1L);
+  test_setopt(c, CURLOPT_PROXY, libtest_arg2); /* set in first.c */
+  test_setopt(c, CURLOPT_URL, URL);
+  test_setopt(c, CURLOPT_USERPWD, "test:ing");
+  test_setopt(c, CURLOPT_PROXYUSERPWD, "test:ing");
+  test_setopt(c, CURLOPT_HTTPPROXYTUNNEL, 1L);
+  test_setopt(c, CURLOPT_HEADER, 1L);
 
   if ((m = curl_multi_init()) == NULL) {
     fprintf(stderr, "curl_multi_init() failed\n");
@@ -139,9 +150,13 @@ int test(char *URL)
     res = TEST_ERR_RUNS_FOREVER;
   }
 
-  curl_multi_remove_handle(m, c);
+test_cleanup:
+
+  if(m) {
+    curl_multi_remove_handle(m, c);
+    curl_multi_cleanup(m);
+  }
   curl_easy_cleanup(c);
-  curl_multi_cleanup(m);
   curl_global_cleanup();
 
   return res;

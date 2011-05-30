@@ -1,13 +1,26 @@
-/*****************************************************************************
+/***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
  *                             / __| | | | |_) | |
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * $Id: lib555.c,v 1.5 2009-05-08 02:14:50 yangtse Exp $
+ * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
- * This test case is supposed to be identical to 547 except that this uses the
+ * This software is licensed as described in the file COPYING, which
+ * you should have received as part of this distribution. The terms
+ * are also available at http://curl.haxx.se/docs/copyright.html.
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ***************************************************************************/
+
+/* This test case is supposed to be identical to 547 except that this uses the
  * multi interface and 547 is easy interface.
  *
  * argv1 = URL
@@ -64,7 +77,7 @@ int test(char *URL)
   int res;
   CURL *curl;
   int counter=0;
-  CURLM *m;
+  CURLM *m = NULL;
   int running=1;
   struct timeval mp_start;
   char mp_timedout = FALSE;
@@ -80,26 +93,26 @@ int test(char *URL)
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl_easy_setopt(curl, CURLOPT_URL, URL);
-  curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-  curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+  test_setopt(curl, CURLOPT_URL, URL);
+  test_setopt(curl, CURLOPT_VERBOSE, 1L);
+  test_setopt(curl, CURLOPT_HEADER, 1L);
 
   /* read the POST data from a callback */
-  curl_easy_setopt(curl, CURLOPT_IOCTLFUNCTION, ioctlcallback);
-  curl_easy_setopt(curl, CURLOPT_IOCTLDATA, &counter);
-  curl_easy_setopt(curl, CURLOPT_READFUNCTION, readcallback);
-  curl_easy_setopt(curl, CURLOPT_READDATA, &counter);
+  test_setopt(curl, CURLOPT_IOCTLFUNCTION, ioctlcallback);
+  test_setopt(curl, CURLOPT_IOCTLDATA, &counter);
+  test_setopt(curl, CURLOPT_READFUNCTION, readcallback);
+  test_setopt(curl, CURLOPT_READDATA, &counter);
   /* We CANNOT do the POST fine without setting the size (or choose chunked)! */
-  curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(UPLOADTHIS));
+  test_setopt(curl, CURLOPT_POSTFIELDSIZE, strlen(UPLOADTHIS));
 
-  curl_easy_setopt(curl, CURLOPT_POST, 1L);
+  test_setopt(curl, CURLOPT_POST, 1L);
 #ifdef CURL_DOES_CONVERSIONS
   /* Convert the POST data to ASCII. */
-  curl_easy_setopt(curl, CURLOPT_TRANSFERTEXT, 1L);
+  test_setopt(curl, CURLOPT_TRANSFERTEXT, 1L);
 #endif
-  curl_easy_setopt(curl, CURLOPT_PROXY, libtest_arg2);
-  curl_easy_setopt(curl, CURLOPT_PROXYUSERPWD, libtest_arg3);
-  curl_easy_setopt(curl, CURLOPT_PROXYAUTH,
+  test_setopt(curl, CURLOPT_PROXY, libtest_arg2);
+  test_setopt(curl, CURLOPT_PROXYUSERPWD, libtest_arg3);
+  test_setopt(curl, CURLOPT_PROXYAUTH,
                    (long) (CURLAUTH_NTLM | CURLAUTH_DIGEST | CURLAUTH_BASIC) );
 
   if ((m = curl_multi_init()) == NULL) {
@@ -144,10 +157,13 @@ int test(char *URL)
     res = TEST_ERR_RUNS_FOREVER;
   }
 
-  curl_multi_remove_handle(m, curl);
-  curl_easy_cleanup(curl);
-  curl_multi_cleanup(m);
+test_cleanup:
 
+  if(m) {
+    curl_multi_remove_handle(m, curl);
+    curl_multi_cleanup(m);
+  }
+  curl_easy_cleanup(curl);
   curl_global_cleanup();
 
   return res;

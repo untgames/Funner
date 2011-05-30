@@ -1,13 +1,24 @@
-/*****************************************************************************
+/***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
  *                             / __| | | | |_) | |
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * $Id: lib560.c,v 1.2 2008-11-12 22:26:06 danf Exp $
+ * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
- */
+ * This software is licensed as described in the file COPYING, which
+ * you should have received as part of this distribution. The terms
+ * are also available at http://curl.haxx.se/docs/copyright.html.
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ***************************************************************************/
 #include "test.h"
 
 /*
@@ -23,7 +34,9 @@
 int test(char *URL)
 {
   CURL *http_handle;
-  CURLM *multi_handle;
+  CURLM *multi_handle = NULL;
+  CURLMcode code;
+  int res;
 
   int still_running; /* keep number of running handles */
 
@@ -32,10 +45,10 @@ int test(char *URL)
     return TEST_ERR_MAJOR_BAD;
 
   /* set options */
-  curl_easy_setopt(http_handle, CURLOPT_URL, URL);
-  curl_easy_setopt(http_handle, CURLOPT_HEADER, 1L);
-  curl_easy_setopt(http_handle, CURLOPT_SSL_VERIFYPEER, 0L);
-  curl_easy_setopt(http_handle, CURLOPT_SSL_VERIFYHOST, 0L);
+  test_setopt(http_handle, CURLOPT_URL, URL);
+  test_setopt(http_handle, CURLOPT_HEADER, 1L);
+  test_setopt(http_handle, CURLOPT_SSL_VERIFYPEER, 0L);
+  test_setopt(http_handle, CURLOPT_SSL_VERIFYHOST, 0L);
 
   /* init a multi stack */
   multi_handle = curl_multi_init();
@@ -48,8 +61,9 @@ int test(char *URL)
   curl_multi_add_handle(multi_handle, http_handle);
 
   /* we start some action by calling perform right away */
-  while(CURLM_CALL_MULTI_PERFORM ==
-        curl_multi_perform(multi_handle, &still_running));
+  do {
+    code = curl_multi_perform(multi_handle, &still_running);
+  } while(code == CURLM_CALL_MULTI_PERFORM);
 
   while(still_running) {
     struct timeval timeout;
@@ -84,15 +98,20 @@ int test(char *URL)
     case 0:
     default:
       /* timeout or readable/writable sockets */
-      while(CURLM_CALL_MULTI_PERFORM ==
-            curl_multi_perform(multi_handle, &still_running));
+      do {
+        code = curl_multi_perform(multi_handle, &still_running);
+      } while(code == CURLM_CALL_MULTI_PERFORM);
       break;
     }
   }
 
-  curl_multi_cleanup(multi_handle);
+test_cleanup:
+
+  if(multi_handle)
+    curl_multi_cleanup(multi_handle);
 
   curl_easy_cleanup(http_handle);
+  curl_global_cleanup();
 
-  return 0;
+  return res;
 }

@@ -1,13 +1,24 @@
-/*****************************************************************************
+/***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
  *                             / __| | | | |_) | |
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * $Id: lib537.c,v 1.21 2008-09-20 04:26:57 yangtse Exp $
- */
-
+ * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ *
+ * This software is licensed as described in the file COPYING, which
+ * you should have received as part of this distribution. The terms
+ * are also available at http://curl.haxx.se/docs/copyright.html.
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ***************************************************************************/
 #include "test.h"
 
 #ifdef HAVE_SYS_TYPES_H
@@ -204,7 +215,7 @@ static int rlimit(int keep_open)
   /*
    * test 537 is all about testing libcurl functionality
    * when the system has nearly exhausted the number of
-   * available file descriptors. Test 537 will try to run 
+   * available file descriptors. Test 537 will try to run
    * with a very small number of file descriptors available.
    * This implies that any file descriptor which is open
    * when the test runs will have a number in the high range
@@ -323,8 +334,8 @@ static int rlimit(int keep_open)
 
   /* create a bunch of file descriptors */
 
-  for (num_open.rlim_cur = 1; 
-       num_open.rlim_cur < num_open.rlim_max; 
+  for (num_open.rlim_cur = 1;
+       num_open.rlim_cur < num_open.rlim_max;
        num_open.rlim_cur++) {
 
     fd[num_open.rlim_cur] = dup(fd[0]);
@@ -471,7 +482,7 @@ int test(char *URL)
     return TEST_ERR_MAJOR_BAD;
   }
 
-  /* run the test with the bunch of open file descriptors 
+  /* run the test with the bunch of open file descriptors
      and close them all once the test is over */
 
   if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK) {
@@ -487,10 +498,12 @@ int test(char *URL)
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl_easy_setopt(curl, CURLOPT_URL, URL);
-  curl_easy_setopt(curl, CURLOPT_HEADER, 1L);
+  test_setopt(curl, CURLOPT_URL, URL);
+  test_setopt(curl, CURLOPT_HEADER, 1L);
 
   res = curl_easy_perform(curl);
+
+test_cleanup:
 
   close_file_descriptors();
   curl_easy_cleanup(curl);

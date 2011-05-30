@@ -1,13 +1,24 @@
-/*****************************************************************************
+/***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
  *                             / __| | | | |_) | |
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * $Id: lib556.c,v 1.7 2009-05-08 02:14:50 yangtse Exp $
- */
-
+ * Copyright (C) 1998 - 2011, Daniel Stenberg, <daniel@haxx.se>, et al.
+ *
+ * This software is licensed as described in the file COPYING, which
+ * you should have received as part of this distribution. The terms
+ * are also available at http://curl.haxx.se/docs/copyright.html.
+ *
+ * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+ * copies of the Software, and permit persons to whom the Software is
+ * furnished to do so, under the terms of the COPYING file.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ***************************************************************************/
 #include "test.h"
 
 #include "memdebug.h"
@@ -39,14 +50,14 @@ int test(char *URL)
     return TEST_ERR_MAJOR_BAD;
   }
 
-  curl_easy_setopt(curl, CURLOPT_URL, URL);
-  curl_easy_setopt(curl, CURLOPT_CONNECT_ONLY, 1L);
+  test_setopt(curl, CURLOPT_URL, URL);
+  test_setopt(curl, CURLOPT_CONNECT_ONLY, 1L);
 
   res = curl_easy_perform(curl);
 
   if(!res) {
     /* we are connected, now get a HTTP document the raw way */
-    const char *request = 
+    const char *request =
 #ifdef CURL_DOES_CONVERSIONS
       /* ASCII representation with escape sequences for non-ASCII platforms */
       "\x47\x45\x54\x20\x2f\x35\x35\x36\x20\x48\x54\x54\x50\x2f\x31\x2e"
@@ -82,6 +93,7 @@ int test(char *URL)
     }
   }
 
+test_cleanup:
 
   curl_easy_cleanup(curl);
   curl_global_cleanup();
