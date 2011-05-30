@@ -23,6 +23,22 @@ function test_files()
   end
 end
 
+function test_post()
+  print "Post test"
+
+  local FILE_NAME = "http://www.google.com" 
+
+  local data = Common.File.PostString (FILE_NAME, "post_string")
+
+--  print ("File data: '" .. data .. "'")
+  if data ~= "" then print ("Data has received") end
+end
+
+function test ()
+  test_post ()
+end
+
 function test ()
   test_files ()
+  test_post ()
 end

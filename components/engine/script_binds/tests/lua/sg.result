@@ -85,6 +85,7 @@ Node 'Node1' event 'BeforeSceneDetach'
 Node 'Node1' event 'AfterSceneChange'
 Node 'Node1' event 'BeforeUnbind'
 Node 'Node2.Node1' subtree event 'BeforeUnbind'
+Node 'Node1' event 'AfterUpdate'
 Node 'Node1' event 'BeforeDestroy'
 Node 'Node1' event 'AfterDestroy'
 result: string='hello' int=1 float=3.140 vec=[1.000 2.000 3.000 4.000] det(matrix)=81.000
@@ -168,7 +169,7 @@ Bottom = -10
 ZNear  = 10
 ZFar   = 1000
 Common light test (point light)
-LightColor = 0 0 0
+LightColor = 1 1 1
 Attenuation = 0 0 0
 Range = 1000000000
 LightColor = 1 0 0

@@ -22,5 +22,5 @@ ENGINE.SCRIPT_BINDS.TESTS.IMPORTS	  	:= compile.script.core compile.math.vecmath
                                          link.engine.script_binds.render link.engine.script_binds.common link.engine.script_binds.system \
                                          link.engine.script_binds.engine link.engine.script_binds.input \
                                          link.engine.script_binds.lua_override link.engine.script_binds.rms \
-                                         link.engine.script_binds.media.players
+                                         link.engine.script_binds.media.players link.network
                                               
