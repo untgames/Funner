@@ -236,7 +236,7 @@ void Output::GetGammaRamp (Color3f table [256])
   CGGammaValue green_table[256];
   CGGammaValue blue_table[256];
 
-  CGTableCount copied_count;
+  uint32_t copied_count;
 
   check_quartz_error (CGGetDisplayTransferByTable (impl->display_id, 256, red_table, green_table, blue_table, &copied_count),
                       METHOD_NAME, "Can't get gamma ramp, ::CGGetDisplayTransferByTable error");
