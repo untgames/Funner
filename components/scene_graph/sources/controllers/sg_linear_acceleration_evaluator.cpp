@@ -6,9 +6,7 @@ using namespace scene_graph::controllers;
 namespace
 {
 
-const float ACCELERATION_EPS = 0.01f;
-const float EPS              = 0.001f;
-const float SPEED_EQUAL_EPS  = 0.01f;
+const float EPS = 0.0001f;
 
 }
 
@@ -47,11 +45,11 @@ struct LinearAccelerationEvaluator::Impl: public xtl::reference_counter
     else
       desired_speed_module = max_speed * (distance_length / braking_distance);
 
-    math::vec3f normalized_current_speed = current_speed_module ? math::normalize (current_speed) : 0.f;
+    math::vec3f normalized_current_speed = current_speed_module > EPS ? math::normalize (current_speed) : 0.f;
 
-    if (!distance_length)  //торможение
+    if (distance_length < EPS)  //торможение
     {
-      if (!current_speed_module)
+      if (current_speed_module < EPS)
         return_acceleration = 0.f;
       else
         return_acceleration = -normalized_current_speed * (current_speed_module > deceleration * dt ? deceleration : current_speed_module / dt);
@@ -62,7 +60,7 @@ struct LinearAccelerationEvaluator::Impl: public xtl::reference_counter
 
       return_acceleration = math::equal (normalized_distance, normalized_current_speed, EPS) ? normalized_distance : math::normalize (normalized_distance - normalized_current_speed);
 
-      bool accelerating = desired_speed_module >= (current_speed_module + SPEED_EQUAL_EPS);
+      bool accelerating = desired_speed_module >= (current_speed_module + EPS);
 
       if (accelerating)
         return_acceleration *= acceleration;
@@ -111,7 +109,7 @@ const math::vec3f& LinearAccelerationEvaluator::operator () (const math::vec3f& 
 
 void LinearAccelerationEvaluator::SetAcceleration (float acceleration)
 {
-  if (acceleration < ACCELERATION_EPS)
+  if (acceleration < EPS)
     throw xtl::make_argument_exception ("scene_graph::controllers::LinearAccelerationEvaluator::SetAcceleration", "acceleration", acceleration, "Too low acceleration");
 
   impl->acceleration = acceleration;
@@ -128,7 +126,7 @@ float LinearAccelerationEvaluator::Acceleration () const
 
 void LinearAccelerationEvaluator::SetDeceleration (float deceleration)
 {
-  if (deceleration < ACCELERATION_EPS)
+  if (deceleration < EPS)
     throw xtl::make_argument_exception ("scene_graph::controllers::LinearAccelerationEvaluator::SetDeceleration", "deceleration", deceleration, "Too low deceleration");
 
   impl->deceleration = deceleration;

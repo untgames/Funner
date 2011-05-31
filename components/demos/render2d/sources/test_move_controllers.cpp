@@ -44,9 +44,9 @@ struct Test
 
     LinearAccelerationEvaluator look_acceleration;
 
-    look_acceleration.SetAcceleration (0.8);
-    look_acceleration.SetDeceleration (0.8);
-    look_acceleration.SetMaxSpeed (0.8);
+    look_acceleration.SetAcceleration (20);
+    look_acceleration.SetDeceleration (20);
+    look_acceleration.SetMaxSpeed (57);
 
     look_to->SetAccelerationHandler (look_acceleration);
 

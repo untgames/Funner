@@ -6,7 +6,7 @@ using namespace scene_graph::controllers;
 namespace
 {
 
-const float EPS = 0.001f;
+const float EPS = 0.0001f;
 
 }
 
@@ -112,22 +112,27 @@ void LookToNodePoint::Update (float dt)
   if (!impl->acceleration_function)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't look to node, empty acceleration function");
 
-  math::vec3f acceleration;
+  math::vec3f current_position (impl->node->Ort (impl->look_axis, NodeTransformSpace_World)), acceleration;
+
+  static const math::vec3f zero_vec (0.f);
 
   if (impl->target_node)
   {
     math::vec3f desired_direction = impl->target_node->WorldTM () * impl->target_point - impl->node->WorldTM () * impl->node->PivotPosition ();
 
-    desired_direction = math::length (desired_direction) ? math::normalize (desired_direction) : 0.f;
+    desired_direction = math::equal (desired_direction, zero_vec, EPS) ? 0.f : math::normalize (desired_direction);
 
-    acceleration = impl->acceleration_function (impl->current_speed, desired_direction, dt);
+    acceleration = impl->acceleration_function (impl->current_speed, desired_direction - current_position, dt);
   }
   else
     acceleration = impl->acceleration_function (impl->current_speed, 0, dt);
 
-  impl->node->LookTo (impl->node->WorldPosition () + impl->current_speed * dt + acceleration * dt * dt / 2.f, impl->look_axis, impl->rotation_axis, NodeTransformSpace_World);
-
   impl->current_speed += acceleration * dt;
 
-  impl->current_speed = math::length (impl->current_speed) ? math::normalize (impl->current_speed) : 0.f;
+  math::vec3f new_direction = current_position + impl->current_speed * dt;
+
+  if (!math::equal (new_direction, zero_vec, EPS))
+    new_direction = math::normalize (new_direction);
+
+  impl->node->LookTo (impl->node->WorldPosition () + new_direction, impl->look_axis, impl->rotation_axis, NodeTransformSpace_World);
 }
