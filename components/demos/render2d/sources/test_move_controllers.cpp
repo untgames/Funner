@@ -2,7 +2,8 @@
 
 const char*  SPRITE_MATERIAL = "sprite_material";
 
-const float ROTATION_SPEED = 3.14f / 4.f;
+const float ROTATION_SPEED = M_PI / 4;
+const float STOP_TIME      = 30.f;
 
 struct Test
 {
@@ -15,9 +16,11 @@ struct Test
   float                    current_angle;
   float                    sprite_position_radius;
   MoveToNodePoint::Pointer mover;
+  LookToNodePoint::Pointer look_to;
+  float                    duration;
 
   Test ()
-    : current_angle (0), sprite_position_radius (8)
+    : current_angle (0), sprite_position_radius (8), duration (0)
   {
     sprite1 = CreateSprite ();
     sprite2 = CreateSprite ();
@@ -27,15 +30,27 @@ struct Test
 
     mover = MoveToNodePoint::Create (*sprite2);
 
-    LinearAccelerationEvaluator acceleration;
+    LinearAccelerationEvaluator move_acceleration;
 
-    acceleration.SetAcceleration (10);
-    acceleration.SetDeceleration (10);
-    acceleration.SetMaxSpeed (5);
+    move_acceleration.SetAcceleration (15);
+    move_acceleration.SetDeceleration (15);
+    move_acceleration.SetMaxSpeed (5);
 
-    mover->SetAccelerationHandler (acceleration);
+    mover->SetAccelerationHandler (move_acceleration);
 
     mover->Start (sprite1, 0.f);
+
+    look_to = LookToNodePoint::Create (*sprite2);
+
+    LinearAccelerationEvaluator look_acceleration;
+
+    look_acceleration.SetAcceleration (0.8);
+    look_acceleration.SetDeceleration (0.8);
+    look_acceleration.SetMaxSpeed (0.8);
+
+    look_to->SetAccelerationHandler (look_acceleration);
+
+    look_to->Start (sprite1, 0.f, NodeOrt_Y, NodeOrt_Z);
 
       //создание сцены
     camera = OrthoCamera::Create ();
@@ -100,6 +115,14 @@ struct Test
       size_t current_time = common::milliseconds ();
 
       float dt = (current_time - last_update_time) / 1000.f;
+
+      duration += dt;
+
+      if (duration > STOP_TIME)
+      {
+        mover->Stop ();
+        look_to->Stop ();
+      }
 
       current_angle += ROTATION_SPEED * dt;
 

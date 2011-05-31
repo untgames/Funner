@@ -26,7 +26,7 @@ class AlignWithNode: public Controller
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка/получение функции рассчета углового ускорения узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<float (float current_velocity, float distance, float dt)> AccelerationFunction;
+    typedef xtl::function<const math::vec3f& (const math::vec3f& current_velocity, const math::vec3f& distance, const math::vec3f& dt)> AccelerationFunction;
 
     void                        SetAccelerationHandler (const AccelerationFunction& acceleration_function);
     const AccelerationFunction& AccelerationHandler    () const;

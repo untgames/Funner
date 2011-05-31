@@ -6,9 +6,9 @@ using namespace scene_graph::controllers;
 namespace
 {
 
-const float ACCELERATION_EPS = 0.1f;
-const float EPS              = 0.01f;
-const float SPEED_EQUAL_EPS  = 0.1f;
+const float ACCELERATION_EPS = 0.01f;
+const float EPS              = 0.001f;
+const float SPEED_EQUAL_EPS  = 0.01f;
 
 }
 
@@ -47,7 +47,7 @@ struct LinearAccelerationEvaluator::Impl: public xtl::reference_counter
     else
       desired_speed_module = max_speed * (distance_length / braking_distance);
 
-    math::vec3f normalized_current_speed = math::normalize (current_speed);
+    math::vec3f normalized_current_speed = current_speed_module ? math::normalize (current_speed) : 0.f;
 
     if (!distance_length)  //торможение
     {

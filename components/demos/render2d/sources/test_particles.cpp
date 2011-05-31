@@ -1,7 +1,7 @@
 #include "shared.h"
 
 const size_t PARTICLES_COUNT = 100;
-char* PARTICLES_FILE_NAME = "media/explode.wxf";
+const char* PARTICLES_FILE_NAME = "media/explode.wxf";
 
 typedef stl::vector<math::vec3f> ParticleArray;
 

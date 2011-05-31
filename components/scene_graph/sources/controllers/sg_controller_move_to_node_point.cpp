@@ -20,7 +20,7 @@ struct MoveToNodePoint::Impl
   Impl (Node& in_node)
     : node (&in_node)
     , current_speed (0.f)
-    , transform_space (NodeTransformSpace_Local)
+    , transform_space (NodeTransformSpace_World)
   {
     scene_attach_connection = node->RegisterEventHandler (NodeEvent_AfterSceneAttach, xtl::bind (&MoveToNodePoint::Impl::OnSceneAttach, this));
   }
@@ -125,22 +125,21 @@ void MoveToNodePoint::Update (float dt)
   if (!impl->acceleration_function)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't move node, empty acceleration function");
 
-  math::vec3f current_position = impl->node->Position (),
-              acceleration;
+  math::vec3f acceleration;
 
   if (impl->target_node)
   {
-    math::vec3f move_direction = (impl->target_node->WorldPosition () + impl->target_node->WorldTM () * impl->target_point) - impl->node->WorldPosition ();
+    math::vec3f move_direction = impl->target_node->WorldTM () * impl->target_point - impl->node->WorldPosition ();
 
     if (impl->transform_space == NodeTransformSpace_Local)
-      move_direction = math::inverse (impl->node->WorldTM ()) * move_direction;
+      move_direction = math::inverse (impl->node->WorldTM ()) * math::vec4f (move_direction.x, move_direction.y, move_direction.z, 0.f);
 
     acceleration = impl->acceleration_function (impl->current_speed, move_direction, dt);
   }
   else
     acceleration = impl->acceleration_function (impl->current_speed, 0, dt);
 
-  impl->node->Translate (impl->current_speed * dt + acceleration * dt * dt / 2.f, impl->transform_space);
+  impl->node->SetWorldPosition (impl->node->WorldPosition () + impl->current_speed * dt + acceleration * dt * dt / 2.f);
 
   impl->current_speed += acceleration * dt;
 }
