@@ -139,7 +139,7 @@ void MoveToNodePoint::Update (float dt)
   else
     acceleration = impl->acceleration_function (impl->current_speed, 0, dt);
 
-  impl->current_speed += acceleration * dt;
+  impl->node->SetWorldPosition (impl->node->WorldPosition () + impl->current_speed * dt + acceleration * dt * dt / 2.f);
 
-  impl->node->SetWorldPosition (impl->node->WorldPosition () + impl->current_speed * dt);
+  impl->current_speed += acceleration * dt;
 }
