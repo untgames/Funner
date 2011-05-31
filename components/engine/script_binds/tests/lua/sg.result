@@ -229,3 +229,9 @@ Color = 0.4 0.3 0.2 0.1
 Color = 0.1 0.2 0.3 0.1
 Horizontal aligment = Right/Bottom vertical aligment = Center
 Horizontal aligment = BaseLine vertical aligment = BaseLine
+MoveToNodePoint controller test
+node1 position is 0.250000 0.000000 0.000000, node2 position is 0.250000 0.250000 0.000000
+node1 position is 0.500000 0.000000 0.000000, node2 position is 0.500000 0.500000 0.000000
+LookToNodePoint controller test
+node1 orientation is 0.000000 0.186730 0.000000 0.982411
+node1 orientation is 0.000000 0.233282 0.000000 0.972409

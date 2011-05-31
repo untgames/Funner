@@ -679,6 +679,57 @@ function test_text_line ()
   print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
 end
 
+function test_move_to_node_point_controller ()
+  print ("MoveToNodePoint controller test")
+
+  local scene = Scene.Scene.Create ()
+  local node1 = Scene.Node.Create ()
+  local node2 = Scene.Node.Create ()
+  
+  node1:BindToScene (scene)
+  node2:BindToParent (node1)
+  
+  local mover1 = Scene.Controllers.MoveToNodePoint.Create (node1, 1, 1, 0.5)
+  local mover2 = Scene.Controllers.MoveToNodePoint.Create (node2, 1, 1, 0.5)
+  
+  mover1:Start (scene.Root, vec3 (10, 0, 0))
+  mover2:Start (node1, vec3 (0, 10, 0))
+  
+  scene.Root:Update (1)
+
+  print (string.format ("node1 position is %f %f %f, node2 position is %f %f %f", node1.WorldPosition.x, node1.WorldPosition.y, node1.WorldPosition.z, node2.WorldPosition.x, node2.WorldPosition.y, node2.WorldPosition.z))
+  
+  mover1:Stop ()
+  mover2:Stop ()
+  
+  scene.Root:Update (1)
+
+  print (string.format ("node1 position is %f %f %f, node2 position is %f %f %f", node1.WorldPosition.x, node1.WorldPosition.y, node1.WorldPosition.z, node2.WorldPosition.x, node2.WorldPosition.y, node2.WorldPosition.z))
+end
+
+function test_look_to_node_point_controller ()
+  print ("LookToNodePoint controller test")
+
+  local scene = Scene.Scene.Create ()
+  local node1 = Scene.Node.Create ()
+  
+  node1:BindToScene (scene)
+  
+  local mover1 = Scene.Controllers.LookToNodePoint.Create (node1, 10, 10, 5)
+  
+  mover1:Start (scene.Root, vec3 (10, 0, 0), Scene.NodeOrt.Z, Scene.NodeOrt.Y)
+  
+  scene.Root:Update (0.2)
+
+  print (string.format ("node1 orientation is %f %f %f %f", node1.WorldOrientation.x, node1.WorldOrientation.y, node1.WorldOrientation.z, node1.WorldOrientation.w))
+  
+  mover1:Stop ()
+  
+  scene.Root:Update (0.1)
+
+  print (string.format ("node1 orientation is %f %f %f %f", node1.WorldOrientation.x, node1.WorldOrientation.y, node1.WorldOrientation.z, node1.WorldOrientation.w))
+end
+
 function test ()
   test_node ()    
   
@@ -715,4 +766,7 @@ function test ()
   test_scene ()
 
   test_text_line ()
+
+  test_move_to_node_point_controller ()
+  test_look_to_node_point_controller ()
 end
