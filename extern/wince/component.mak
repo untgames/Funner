@@ -7,5 +7,5 @@ TARGETS := EXTERN.WINCE.LAUNCHER
 EXTERN.WINCE.LAUNCHER.TYPE            := application
 EXTERN.WINCE.LAUNCHER.NAME            := wince-launcher
 EXTERN.WINCE.LAUNCHER.SOURCE_DIRS     := utils/launcher
-EXTERN.WINCE.LAUNCHER.LIBS            := ws2
-EXTERN.WINCE.LAUNCHER.IMPORTS         := compile.extern.wcecompat
+EXTERN.WINCE.LAUNCHER.LIBS            := ws2 
+EXTERN.WINCE.LAUNCHER.LINK_FLAGS      := -entry:mainWCRTStartup
