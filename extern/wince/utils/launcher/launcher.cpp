@@ -22,6 +22,7 @@ enum ProtocolMsgId
 };
 
 typedef BOOL (WINAPI *SetStdioPathWFunc)(DWORD id,PWSTR pwszPath);
+typedef BOOL (WINAPI *SetCurrentDirWFunc)(PWSTR pwszPath);
 
 /*
     Функции
@@ -64,7 +65,8 @@ void sock_printf (int socket, const char* format, ...)
 int wmain (int argc, wchar_t* argv [])
 {
     //проверка повторного запуска
-    
+  printf("launch app\n");fflush(stdout);
+  
   HANDLE duplicate_launch_event = CreateEventW (0, FALSE, FALSE, L"console_already_initialized");
   
   if (GetLastError() == ERROR_ALREADY_EXISTS)
@@ -75,9 +77,9 @@ int wmain (int argc, wchar_t* argv [])
 
     //разбор параметров командной строки
     
-  if (argc < 3)
+  if (argc < 4)
   {
-    printf ("Usage: launcher <exe_to_start> <log_to_start>\n");
+    printf ("Usage: launcher <exe_to_start> <log_to_start> <current_dir>\n");
     
     CloseHandle (duplicate_launch_event);
     
@@ -86,22 +88,23 @@ int wmain (int argc, wchar_t* argv [])
 
   wchar_t* exe_to_start = argv [1];
   wchar_t* log_to_start = argv [2];
-  
+  wchar_t* current_dir  = argv [3];
+
     //инициализация telnet
     
   HINSTANCE core_dll = LoadLibraryW (L"Coredll.dll");
-  
+ 
   if (!core_dll)
   {
     printf ("Coredll not found\n");
     
     CloseHandle (duplicate_launch_event);    
-    
-    return -1;
+        return -1;
   }
   
-  SetStdioPathWFunc SetStdioPathW = (SetStdioPathWFunc)GetProcAddress (core_dll, L"SetStdioPathW");    
-  
+  SetStdioPathWFunc  SetStdioPathW        = (SetStdioPathWFunc)GetProcAddress (core_dll, L"SetStdioPathW");    
+  SetCurrentDirWFunc SetCurrentDirectoryW = (SetCurrentDirWFunc)GetProcAddress (core_dll, L"SetCurrentDirectoryW");
+
   if (!SetStdioPathW)
   {
     printf ("No 'SetStdioPathW' entry in 'coredll.dll' found\n");
@@ -111,7 +114,27 @@ int wmain (int argc, wchar_t* argv [])
 
     return -1;
   }
+
+  if (!SetCurrentDirectoryW)
+  {
+    printf ("No 'SetCurrentDirW' entry in 'coredll.dll' found\n");
+
+    CloseHandle (core_dll);
+    CloseHandle (duplicate_launch_event);
+
+    return -1;
+  }
   
+    //установка текущей директории
+  if (!SetCurrentDirectoryW (current_dir))
+  {
+    printf ("Can't set current dirrectory to '%S'\n", current_dir);
+    
+    CloseHandle (duplicate_launch_event);
+    
+    return -1;
+  }
+
     //перенаправление ввода / вывода
 
   DeleteFileW (log_to_start);
@@ -220,7 +243,7 @@ int wmain (int argc, wchar_t* argv [])
   timeout.tv_sec  = 0;
   timeout.tv_usec = 0;
   
-  if (int result = setsockopt (sendrecv_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof (timeout)))
+/*  if (int result = setsockopt (sendrecv_socket, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof (timeout)))
   {
     sock_printf (sendrecv_socket, "Socket setsockopt failed with code %d\n", result);
     
@@ -231,7 +254,7 @@ int wmain (int argc, wchar_t* argv [])
     CloseHandle (duplicate_launch_event);
     
     return -1;
-  }
+  }*/
   
     //пропуск настроек (сделать поддержку сессии)
   
@@ -241,7 +264,10 @@ int wmain (int argc, wchar_t* argv [])
   {
     int read_count = recv (sendrecv_socket, skip_buffer, 100, 0);
     
-    if (read_count <= 0)
+//    if (read_count <= 0)
+//      break;
+
+    if (read_count < 100)
       break;
   }  
   

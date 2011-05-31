@@ -35,9 +35,11 @@ MSVS_COMMON_PATH   := $(call convert_path,$(MSVS_COMMON_PATH))
 COMMON_CFLAGS      += -W3 -Ox -wd4996 -nologo -FC -D "_WIN32_WCE=0x502" -D "UNDER_CE" -D "WIN32_PLATFORM_PSPC" -D "WINCE" -D "ARM" -D "_ARM_" -D "POCKETPC2003_UI_MODEL"
 COMMON_LINK_FLAGS  += -NODEFAULTLIB:oldnames.lib coredll.lib corelibc.lib
 CPU_ARCH           := armv4i
-REMOTE_INSTALL_DIR := dev:\\funner
+REMOTE_INSTALL_DIR := \\funner
 WINCE_POWERTOYS    := $(call convert_path,$(WINCE_POWERTOYS))
 CECOPY             := $(WINCE_POWERTOYS)/CEcopy/cecopy
+RAPISTART          := $(WINCE_POWERTOYS)/RAPI_Start/rapistart
+WINCE_LAUNCHER     := $(REMOTE_INSTALL_DIR)/dist/winmobile6/bin/wince-launcher.exe
 
 ###################################################################################################
 #Константы
@@ -95,12 +97,16 @@ endef
 #Копирование файла на устройство (имя локальных файлов, имя удалённого каталога)
 define tools.install
   export SUBST_STRING=$$(cd $2 && pwd) SUBST_SUBSTRING=$$(cd $(ROOT) && pwd)/ && export SUBST_RESULT=$${SUBST_STRING/#$$SUBST_SUBSTRING/} && \
-  for file in $(subst /,\\,$1); do "$(CECOPY)" //s //is $$file $(REMOTE_INSTALL_DIR)\\$$(echo $$SUBST_RESULT | sed 's/\//\\/g')\\$$(basename $$file); done
+  for file in $(subst /,\\,$1); do "$(CECOPY)" //s //is $$file dev:$(REMOTE_INSTALL_DIR)\\$$(echo $$SUBST_RESULT | sed 's/\//\\/g')\\$$(basename $$file); done
 endef
 
 ###################################################################################################
 #Выполнение команды (команда, каталог запуска, дополнительные пути поиска библиотек и приложений)
 ###################################################################################################
 define tools.run
-$(call prepare_to_execute,$2,$3) && chmod u+x "$(CURDIR)/$(firstword $1)" && "$(CURDIR)/$(firstword $1)"
+   "$(RAPISTART)" $(subst /,\\,$(WINCE_LAUNCHER)) "$(subst /,\\,$(strip $1))" "$(subst /,\\,$(strip $1).stdout)" "$(REMOTE_INSTALL_DIR)\\$(subst /,\\,$(patsubst ./%,%,$2))" && \
+   plink -P 1663 -telnet $(WINMOBILE_HOST)
 endef
+
+
+#$(call prepare_to_execute,$2,$3) && chmod u+x "$(CURDIR)/$(firstword $1)" && "$(CURDIR)/$(firstword $1)"
