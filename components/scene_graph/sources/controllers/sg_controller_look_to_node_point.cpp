@@ -27,6 +27,8 @@ struct LookToNodePoint::Impl
 
   Impl (Node& in_node)
     : node (&in_node)
+    , look_axis (NodeOrt_Z)
+    , rotation_axis (NodeOrt_Y)
     , current_speed (0.f)
   {
     scene_attach_connection = node->RegisterEventHandler (NodeEvent_AfterSceneAttach, xtl::bind (&LookToNodePoint::Impl::OnSceneAttach, this));
