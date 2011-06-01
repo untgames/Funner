@@ -13,6 +13,9 @@
 #include <xtl/signal.h>
 
 #include <common/component.h>
+#include <common/log.h>
+
+#include <render/debug_render.h>
 
 #include <physics/low_level/common.h>
 #include <physics/low_level/driver.h>
@@ -43,6 +46,7 @@
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <LinearMath/btDefaultMotionState.h>
+#include <LinearMath/btIDebugDraw.h>
 
 #ifdef _MSC_VER
   #pragma warning (disable : 4250) //'class1' : inherits 'class2::member' via dominance
@@ -95,7 +99,7 @@ class Shape : public IShape, public Object
 ///Толщина полей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     float Margin    ();
-    void  GetMargin (float value);
+    void  SetMargin (float value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение bullet тела
@@ -344,11 +348,17 @@ class Scene : public IScene, public Object
 ///Фильтрация столкновений объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetCollisionFilter (size_t group1, size_t group2, bool collides, const BroadphaseCollisionFilter& filter);
+    void SetDefaultCollisionFilter (const BroadphaseCollisionFilter& filter);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Обработка столкновений объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::connection RegisterCollisionCallback (CollisionEventType event_type, const CollisionCallback& callback_handler);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Отладочная отрисовка
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Draw (render::debug::PrimitiveRender&);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Оповещение о коллизии
@@ -382,14 +392,19 @@ class Driver : public IDriver, public Object
     Scene* CreateScene ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание материала
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Material* CreateMaterial ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Создание геометрических тел
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     Shape* CreateBoxShape          (const math::vec3f& half_dimensions);
     Shape* CreateSphereShape       (float radius);
     Shape* CreateCapsuleShape      (float radius, float height);
     Shape* CreatePlaneShape        (const math::vec3f& normal, float d);
-    Shape* CreateConvexShape       (size_t vertices_count, math::vec3f* vertices);
-    Shape* CreateTriangleMeshShape (size_t vertices_count, math::vec3f* vertices, size_t triangles_count, size_t* triangles);
+    Shape* CreateConvexShape       (size_t vertices_count, const math::vec3f* vertices);
+    Shape* CreateTriangleMeshShape (size_t vertices_count, const math::vec3f* vertices, size_t triangles_count, size_t* triangles);
     Shape* CreateCompoundShape     (size_t shapes_count, IShape** shapes, Transform* local_transforms);
 
   private:

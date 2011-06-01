@@ -1,6 +1,11 @@
 #include "shared.h"
 
-const size_t BODIES_COUNT = 5;
+bool default_filter (IRigidBody* body1, IRigidBody* body2)
+{
+  printf ("default filter called for bodies from group %u and %u\n", body1->CollisionGroup (), body2->CollisionGroup ());
+
+  return true;
+}
 
 bool false_filter (IRigidBody* body1, IRigidBody* body2)
 {
@@ -35,7 +40,12 @@ void collision_event_handler (const CollisionEvent& event)
       printf ("Unknown\n");
   }
 
-  printf ("  position is %.2f %.2f %.2f\n", event.point.x, event.point.y, event.point.z);
+  math::vec3f point = event.point;
+
+  for (size_t i = 0; i < 3; i++)
+    convert_float (point [i], 1000);
+
+  printf ("  position is %.2f %.2f %.2f\n", point.x, point.y, point.z);
 }
 
 int main ()
@@ -51,6 +61,8 @@ int main ()
 
     ScenePtr scene (bullet_driver->CreateScene (), false);
 
+    scene->SetDefaultCollisionFilter (&default_filter);
+
     xtl::connection collision_begin_connection   = scene->RegisterCollisionCallback (CollisionEventType_Begin, &collision_event_handler),
                     collision_process_connection = scene->RegisterCollisionCallback (CollisionEventType_Process, &collision_event_handler),
                     collision_end_connection     = scene->RegisterCollisionCallback (CollisionEventType_End, &collision_event_handler);
@@ -63,17 +75,20 @@ int main ()
 
     ShapePtr sphere_shape (bullet_driver->CreateSphereShape (1.f), false);
 
-    RigidBodyPtr falling_bodies [BODIES_COUNT] = { RigidBodyPtr (scene->CreateRigidBody (sphere_shape.get (), 1), false),
-                                                   RigidBodyPtr (scene->CreateRigidBody (sphere_shape.get (), 1), false),
-                                                   RigidBodyPtr (scene->CreateRigidBody (sphere_shape.get (), 1), false),
-                                                   RigidBodyPtr (scene->CreateRigidBody (sphere_shape.get (), 1), false),
-                                                   RigidBodyPtr (scene->CreateRigidBody (sphere_shape.get (), 1), false) };
+    RigidBodyPtr falling_bodies [] = { RigidBodyPtr (scene->CreateRigidBody (sphere_shape.get (), 1), false),
+                                       RigidBodyPtr (scene->CreateRigidBody (sphere_shape.get (), 1), false),
+                                       RigidBodyPtr (scene->CreateRigidBody (sphere_shape.get (), 1), false),
+                                       RigidBodyPtr (scene->CreateRigidBody (sphere_shape.get (), 1), false),
+                                       RigidBodyPtr (scene->CreateRigidBody (sphere_shape.get (), 1), false),
+                                       RigidBodyPtr (scene->CreateRigidBody (sphere_shape.get (), 1), false) };
+
+    size_t bodies_count = sizeof (falling_bodies) / sizeof (falling_bodies [0]);
 
     Transform body_transform;
 
     body_transform.position.y = 5;
 
-    for (size_t i = 0; i < BODIES_COUNT; i++)
+    for (size_t i = 0; i < bodies_count; i++)
     {
       body_transform.position.x = -30.f + 3.f * i;
 
@@ -99,7 +114,7 @@ int main ()
     printf ("ground plane state:\n");
     dump_body_position (ground_plane.get ());
 
-    for (size_t i = 0; i < BODIES_COUNT; i++)
+    for (size_t i = 0; i < bodies_count; i++)
     {
       printf ("falling body %u state:\n", i);
       dump_body_position (falling_bodies [i].get ());
@@ -112,7 +127,7 @@ int main ()
 
     body_transform.position.y = 5;
 
-    for (size_t i = 0; i < BODIES_COUNT; i++)
+    for (size_t i = 0; i < bodies_count; i++)
     {
       body_transform.position.x = -30.f + 3.f * i;
 
@@ -127,7 +142,7 @@ int main ()
     printf ("ground plane state:\n");
     dump_body_position (ground_plane.get ());
 
-    for (size_t i = 0; i < BODIES_COUNT; i++)
+    for (size_t i = 0; i < bodies_count; i++)
     {
       printf ("falling body %u state:\n", i);
       dump_body_position (falling_bodies [i].get ());

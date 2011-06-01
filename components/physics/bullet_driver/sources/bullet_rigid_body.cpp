@@ -186,6 +186,7 @@ void RigidBody::AddForce (const math::vec3f& force, const math::vec3f& relative_
   bullet_vector_from_vector (force, bullet_force);
   bullet_vector_from_vector (relative_position, bullet_relative_position);
 
+  impl->body->activate (true);
   impl->body->applyForce (bullet_force, bullet_relative_position);
 }
 
@@ -196,6 +197,7 @@ void RigidBody::AddImpulse (const math::vec3f& impulse, const math::vec3f& relat
   bullet_vector_from_vector (impulse, bullet_impulse);
   bullet_vector_from_vector (relative_position, bullet_relative_position);
 
+  impl->body->activate (true);
   impl->body->applyImpulse (bullet_impulse, bullet_relative_position);
 }
 
@@ -205,6 +207,7 @@ void RigidBody::AddTorque (const math::vec3f& torque)
 
   bullet_vector_from_vector (torque, bullet_torque);
 
+  impl->body->activate (true);
   impl->body->applyTorque (bullet_torque);
 }
 

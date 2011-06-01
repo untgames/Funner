@@ -10,7 +10,6 @@
 #include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 
-#include <physics/low_level/debug_renderable.h>
 #include <physics/low_level/driver.h>
 #include <physics/low_level/joints.h>
 #include <physics/low_level/material.h>
@@ -18,14 +17,25 @@
 #include <physics/low_level/scene.h>
 #include <physics/low_level/shape.h>
 
+#include <render/debug_render.h>
+
 using namespace physics::low_level;
 
 const char* DRIVER_NAME = "Bullet";
 
 typedef xtl::com_ptr<IJoint>     JointPtr;
+typedef xtl::com_ptr<IMaterial>  MaterialPtr;
 typedef xtl::com_ptr<IRigidBody> RigidBodyPtr;
 typedef xtl::com_ptr<IScene>     ScenePtr;
 typedef xtl::com_ptr<IShape>     ShapePtr;
+
+void convert_float (float& value, int rounding)
+{
+  value = ceil ((float)(int)(value * rounding)) / (float)rounding;
+
+  if (fabs (value) < 0.01f)
+    value = 0.f;
+}
 
 void dump_body_position (IRigidBody* body)
 {
@@ -33,13 +43,19 @@ void dump_body_position (IRigidBody* body)
 
   printf ("Body world transform:\n");
 
-  const math::vec3f& world_position = body_transform.position;
+  math::vec3f world_position = body_transform.position;
 
-  printf ("  position = %.2f; %.2f; %.2f\n", world_position.x, world_position.y, world_position.z);
+  for (size_t i = 0; i < 3; i++)
+    convert_float (world_position [i], 1);
 
-  const math::quatf& world_orientation = body_transform.orientation;
+  printf ("  position = %.0f; %.0f; %.0f\n", world_position.x, world_position.y, world_position.z);
 
-  printf ("  orientation = %.2f; %.2f; %.2f; %.2f\n", world_orientation.x, world_orientation.y, world_orientation.z, world_orientation.w);
+  math::quatf world_orientation = body_transform.orientation;
+
+  for (size_t i = 0; i < 4; i++)
+    convert_float (world_orientation [i], 10);
+
+  printf ("  orientation = %.1f; %.1f; %.1f; %.1f\n", world_orientation.x, world_orientation.y, world_orientation.z, world_orientation.w);
 }
 
 #endif
