@@ -1,0 +1,25 @@
+Results of rigid_body_test:
+Body 'default body':
+  mass                       0.00
+  mass space inertia tensor  [0.00 0.00 0.00]
+  flags                      00000000
+  shape                      ''
+  material                   ''
+Body 'default body':
+  mass                       0.00
+  mass space inertia tensor  [0.00 0.00 0.00]
+  flags                      00000000
+  shape                      ''
+  material                   ''
+Body 'modified body':
+  mass                       10.00
+  mass space inertia tensor  [5.00 6.00 7.00]
+  flags                      00000038
+  shape                      'body shape'
+  material                   'body material'
+Body 'modified body':
+  mass                       10.00
+  mass space inertia tensor  [5.00 6.00 7.00]
+  flags                      00000038
+  shape                      'body shape'
+  material                   'body material'

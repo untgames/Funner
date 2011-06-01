@@ -1,0 +1,44 @@
+Results of xphys_loader_test:
+<?xml version="1.0" encoding="utf-8"?>
+<physics_library>
+  <materials>
+    <material name="Ship" linear_damping="0.500" angular_damping="0.900" friction="5.000" anisotropic_friction="0.100 0.200 0.300" restitution="0.700"/>
+    <material name="Default" linear_damping="0.000" angular_damping="0.000" friction="0.500" anisotropic_friction="1.000 1.000 1.000" restitution="0.000"/>
+  </materials>
+  <triangle_meshes>
+    <triangle_mesh name="ConvexMesh" is_convex="1">
+      <vertices count="4">
+        0.000 0.000 0.000 1.000 2.000 3.000 2.000 4.000 6.000 3.000 6.000 9.000
+      </vertices>
+    </triangle_mesh>
+    <triangle_mesh name="TriangleMesh" is_convex="0">
+      <vertices count="4">
+        0.000 0.000 0.000 1.000 2.000 3.000 2.000 4.000 6.000 3.000 6.000 9.000
+      </vertices>
+      <triangle_indices count="2">
+        0 1 2 2 3 4
+      </triangle_indices>
+    </triangle_mesh>
+  </triangle_meshes>
+  <shapes>
+    <shape name="BigShipShape" margin="0.000" type="box" half_dimensions="150.000 100.500 800.000"/>
+    <shape name="MeteoritesShape" margin="5.100" type="sphere" radius="10.100"/>
+    <shape name="Meteorites2Shape" margin="0.000" type="capsule" radius="2.100" height="1.100"/>
+    <shape name="PlaneShape" margin="0.000" type="plane" normal="0.000 1.000 0.000" d="7.500"/>
+    <shape name="ConvexShape" margin="2.000" type="triangle_mesh" mesh_name="ConvexMesh"/>
+    <shape name="TriangleMeshShape" margin="0.000" type="triangle_mesh" mesh_name="TriangleMesh"/>
+    <shape name="CompoundShape" margin="0.000" type="compound">
+      <shape_instance name="BigShipShape" position="0 0 0" orientation="0 0 0 1"/>
+      <shape_instance name="MeteoritesShape" position="100 10 20" orientation="0 0 0 1"/>
+      <shape_instance name="Meteorites2Shape" position="-100 10 20" orientation="0.5 10 15 5"/>
+      <shape_instance name="ConvexShape" position="10 100.5 30" orientation="0 0.710185 0 0.704015"/>
+    </shape>
+  </shapes>
+  <rigid_bodies>
+    <rigid_body name="BigShip" mass="0.000" mass_space_inertia_tensor="0.000 0.000 0.000" shape="BigShipShape" material="Ship" frozen_position_x="1" frozen_position_y="1" frozen_rotation="1"/>
+    <rigid_body name="CompoundBody" mass="0.010" mass_space_inertia_tensor="0.000 0.000 0.000" shape="CompoundShape" material=""/>
+    <rigid_body name="TriangleMeshBody" mass="0.000" mass_space_inertia_tensor="0.100 0.200 0.300" shape="TriangleMeshShape" material="Default"/>
+    <rigid_body name="BigShip2" mass="0.000" mass_space_inertia_tensor="0.000 0.000 0.000" shape="BigShipShape" material="" frozen_position="1" frozen_rotation_x="1" frozen_rotation_y="1"/>
+    <rigid_body name="KinematicBody" mass="0.000" mass_space_inertia_tensor="0.000 0.000 0.000" shape="ConvexShape" material="" kinematic="1"/>
+  </rigid_bodies>
+</physics_library>

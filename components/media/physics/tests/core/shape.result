@@ -1,0 +1,133 @@
+Results of shape_test:
+Shape 'default box shape':
+  Margin = 0.000000
+  Type = 'Box'
+  half dimensions [1.00 1.00 1.00]
+Shape 'default box shape':
+  Margin = 0.000000
+  Type = 'Box'
+  half dimensions [1.00 1.00 1.00]
+Shape 'box shape':
+  Margin = 0.100000
+  Type = 'Box'
+  half dimensions [2.00 3.00 4.00]
+Shape 'box shape':
+  Margin = 0.100000
+  Type = 'Box'
+  half dimensions [2.00 3.00 4.00]
+Shape 'default sphere shape':
+  Margin = 0.100000
+  Type = 'Sphere'
+  radius 1.00
+Shape 'default sphere shape':
+  Margin = 0.100000
+  Type = 'Sphere'
+  radius 1.00
+Shape 'sphere shape':
+  Margin = 0.100000
+  Type = 'Sphere'
+  radius 2.00
+Shape 'sphere shape':
+  Margin = 0.100000
+  Type = 'Sphere'
+  radius 2.00
+Shape 'default capsule shape':
+  Margin = 0.100000
+  Type = 'Capsule'
+  radius 1.00 height 1.00
+Shape 'default capsule shape':
+  Margin = 0.100000
+  Type = 'Capsule'
+  radius 1.00 height 1.00
+Shape 'capsule shape':
+  Margin = 0.100000
+  Type = 'Capsule'
+  radius 2.00 height 3.00
+Shape 'capsule shape':
+  Margin = 0.100000
+  Type = 'Capsule'
+  radius 2.00 height 3.00
+Shape 'default plane shape':
+  Margin = 0.100000
+  Type = 'Plane'
+  normal [0.00 1.00 0.00] d = 0.00
+Shape 'default plane shape':
+  Margin = 0.100000
+  Type = 'Plane'
+  normal [0.00 1.00 0.00] d = 0.00
+Shape 'plane shape':
+  Margin = 0.100000
+  Type = 'Plane'
+  normal [0.10 0.20 0.30] d = 10.00
+Shape 'plane shape':
+  Margin = 0.100000
+  Type = 'Plane'
+  normal [0.10 0.20 0.30] d = 10.00
+Shape 'default triangle mesh shape':
+  Margin = 0.100000
+  Type = 'TriangleMesh'
+  mesh name is ''
+  is convex = y
+  vertices count = 0
+  triangles count = 0
+Shape 'default triangle mesh shape':
+  Margin = 0.100000
+  Type = 'TriangleMesh'
+  mesh name is ''
+  is convex = y
+  vertices count = 0
+  triangles count = 0
+Shape 'triangle mesh shape':
+  Margin = 0.100000
+  Type = 'TriangleMesh'
+  mesh name is 'mesh'
+  is convex = n
+  vertices count = 4
+  vertices:
+    [0.00 0.00 0.00]
+    [1.00 1.00 1.00]
+    [2.00 2.00 2.00]
+    [3.00 3.00 3.00]
+  triangles count = 2
+  triangles:
+    0 1 2
+    3 2 1
+Shape 'triangle mesh shape':
+  Margin = 0.100000
+  Type = 'TriangleMesh'
+  mesh name is 'mesh'
+  is convex = n
+  vertices count = 4
+  vertices:
+    [0.00 0.00 0.00]
+    [1.00 1.00 1.00]
+    [2.00 2.00 2.00]
+    [3.00 3.00 3.00]
+  triangles count = 2
+  triangles:
+    0 1 2
+    3 2 1
+Shape 'default compound shape':
+  Margin = 0.100000
+  Type = 'Compound'
+  shapes count = 0
+Shape 'default compound shape':
+  Margin = 0.100000
+  Type = 'Compound'
+  shapes count = 0
+Shape 'compound shape':
+  Margin = 0.100000
+  Type = 'Compound'
+  shapes count = 3
+  shapes:
+    name 'shape1' position [1.00 1.00 1.00] orientation [0.10 0.20 0.30 0.40]
+    name 'shape3' position [0.00 0.00 0.00] orientation [0.00 0.00 0.00 1.00]
+    name 'shape2' position [3.00 3.00 3.00] orientation [0.30 0.40 0.50 0.60]
+Shape 'compound shape':
+  Margin = 0.100000
+  Type = 'Compound'
+  shapes count = 3
+  shapes:
+    name 'shape1' position [1.00 1.00 1.00] orientation [0.10 0.20 0.30 0.40]
+    name 'shape3' position [0.00 0.00 0.00] orientation [0.00 0.00 0.00 1.00]
+    name 'shape2' position [3.00 3.00 3.00] orientation [0.30 0.40 0.50 0.60]
