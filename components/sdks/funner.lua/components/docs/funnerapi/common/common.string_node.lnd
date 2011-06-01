@@ -182,13 +182,35 @@ RemoveAllChildren ()
 /*
    Function: LoadXml
  
+   Возвращает корневой узел XML из строки или файла
+ 
+   Параметры:
+     param - имя загружаемого XML файла либо строка с XML содержимым (определяется автоматически)
+ */
+
+LoadXml (зфкфь)
+
+/*
+   Function: LoadXmlFromFile
+ 
    Возвращает корневой узел загруженного из xml-файла дерева.
  
    Параметры:
      filename - имя загружаемого XML файла
  */
 
-LoadXml (filename)
+LoadXmlFromFile (filename)
+
+/*
+   Function: LoadXmlFromString
+ 
+   Возвращает корневой узел загруженного из xml-строки дерева.
+ 
+   Параметры:
+     string - строка с XML содержимым
+ */
+
+LoadXmlFromString (string)
 
 /*
    Function: SaveXml

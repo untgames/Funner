@@ -24,6 +24,22 @@
 LoadString (file_name)
 
 /*
+   Function: PostString
+ 
+   Посылка содержимого content по указанной URL и возвращение результата в виде строки.
+   Используется для выполнения HTTP POST запросов.
+  
+   Параметры:
+ 
+   url     - URL ресурса
+   content - содержимое, отсылаемое на сервер
+ 
+   Возвращает:
+     string
+ */
+PostString (url, content)
+
+/*
    Function: LoadStringFilterOut
  
    Загрузка строк с фильтрацией.
