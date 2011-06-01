@@ -934,7 +934,7 @@ void export_data (Params& params)
     //проверка корректности имени слоя
     for (const char* symbol = name.c_str (); *symbol; symbol++)
     {
-      static const char* allowed_symbols = "_.- ";
+      static const char* allowed_symbols = "_.- $%!@#^()[],~";
 
       if (!isalnum (*symbol) && !strchr (allowed_symbols, *symbol))
         throw xtl::format_operation_exception ("export_data", "Unallowed symbol '%c' in layer '%s'", *symbol, name.c_str ());
