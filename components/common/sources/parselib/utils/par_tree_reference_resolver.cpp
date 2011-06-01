@@ -42,7 +42,7 @@ struct ParseResolver
           if (!end)
             end = source_iter + strlen (source_iter) - 1;
           
-          destination_attribute.append (source_iter, end + 1);
+          destination_attribute.append (source_iter + 1, end + 1);
 
           source_iter = strchr (end + 1, '{');
           
