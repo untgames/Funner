@@ -1,1 +1,1 @@
-COMPONENT_DIRS := extern components
+COMPONENT_DIRS := components
