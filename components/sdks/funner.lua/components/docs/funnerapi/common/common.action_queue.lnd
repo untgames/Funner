@@ -1,0 +1,193 @@
+/*
+   Class: Common.ActionQueue
+ 
+   Очередь действий. Предназначена для вызова некоторого обработчика с заданной периодичностью.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание очереди действий.
+ */
+Create ()
+
+/*
+   Function: CreateEventHandler
+ 
+   Создание обработчика событий очереди действий. Обработчику при вызове передается время в секундах, прошедшее с прошлого его вызова либо с момента регистрации обработчика (при первом вызове).
+
+   Параметры:
+     event_handler_name - имя обработчика событий
+
+   Возвращает:
+     <Common.Connection>  
+ */  
+CreateEventHandler (event_handler_name)
+  
+/*
+   Function: RegisterEventHandler
+ 
+   Регистрация обработчика.
+
+   Параметры:
+     fire_delay - время в секундах, через которое обработчик будет вызван первый раз
+     period     - время между двумя вызовами обработчика (в секундах)
+     handler    - обработчик
+ */
+RegisterEventHandler (fire_delay, period, handler)
+  
+/*
+   Function: RegisterEventHandler (handler)
+ 
+   Регистрация обработчика, вызываемого настолько часто, насколько возможно.
+
+   Параметры:
+     handler - обработчик
+ */
+RegisterEventHandler (handler)
+
+/*
+   Function: Pause
+ 
+   Пауза всех обработчиков.
+ */
+Pause ()
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Paused
+ 
+   Находится ли очередь событий в режиме паузы.
+ 
+   Доступ:
+ 
+     Получение/установка.
+ */
+Paused
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  local five_time_no_delay_handler_counter = 0
+
+  function five_time_no_delay_handler (dt)
+    print ("five_time_no_delay_handler called with dt=" .. string.format ("%1.1f", dt) .. " timer=" .. string.format ("%1.1f", timer.SecondsEllapsed) 
+      .. " paused=" .. tostring (timer.Paused))
+
+    five_time_no_delay_handler_counter = five_time_no_delay_handler_counter + 1
+    
+    if (five_time_no_delay_handler_counter == 2) then
+      timer.Paused = true
+      print ("timer paused with time=" .. string.format ("%1.1f", timer.SecondsEllapsed))
+    end
+    
+    if (five_time_no_delay_handler_counter == 4) then    
+      timer.Paused = false
+      print ("timer resumed with time=" .. string.format ("%1.1f", timer.SecondsEllapsed))    
+    end
+    
+    if (five_time_no_delay_handler_counter == 5) then  
+      five_time_no_delay_handler_connection:Disconnect ()
+      timer:Reset ()
+    end  
+  end
+
+  function delayed_handler (dt)
+    print ("delayed_handler called with dt=" .. string.format ("%1.1f", dt) .. " timer =" .. string.format ("%1.1f", timer.SecondsEllapsed))
+  end
+
+  function instant_handler (dt)
+    print ("instant_handler called with dt=" ..dt)
+  end  
+
+  function exit_handler (dt)
+    print ("exit_handler called with dt=" .. string.format ("%1.0f", dt) .. " timer=" .. string.format ("%1.1f", timer.SecondsEllapsed))
+    System.Application.Exit (0)
+  end
+
+  function registered_in_pause_handler (dt)
+    print ("registered_in_pause_handler called with dt=" .. string.format ("%1.1f", dt) .. " timer =" .. string.format ("%1.1f", timer.SecondsEllapsed))
+  end
+
+  function action_queue_pause_handler (dt)
+    if action_queue.Paused then
+      print ("action_queue_pause_handler resumed action_queue with dt=" .. string.format ("%1.1f", dt) .. " timer=" .. string.format ("%1.1f", timer.SecondsEllapsed))
+    
+      action_queue:Resume ()
+      action_queue_pause_handler_connection:Disconnect ()
+    else  
+      print ("action_queue_pause_handler paused action_queue with dt=" .. string.format ("%1.1f", dt) .. " timer=" .. string.format ("%1.1f", timer.SecondsEllapsed))
+    
+      action_queue:Pause ()
+      action_queue_paused = true
+      action_queue:RegisterEventHandler (0, 0.3, Common.ActionQueue.CreateEventHandler ("registered_in_pause_handler"))  
+    end  
+  end
+
+  function test ()
+    timer = Common.Timer.Create ()
+
+    action_queue = Common.ActionQueue.Create ()
+    
+    five_time_no_delay_handler_connection = action_queue:RegisterEventHandler (0, 0.2, Common.ActionQueue.CreateEventHandler (five_time_no_delay_handler))
+    action_queue:RegisterEventHandler (0.5, 0.2, Common.ActionQueue.CreateEventHandler ("delayed_handler"))
+  --  action_queue:RegisterEventHandler (Common.ActionQueue.CreateEventHandler ("instant_handler"))  
+    action_queue:RegisterEventHandler (3, 1, Common.ActionQueue.CreateEventHandler ("exit_handler"))  
+    
+    print ("action_queue paused = " .. tostring (action_queue.Paused))
+    
+    local action_queue2 = Common.ActionQueue.Create ()
+    
+    action_queue_pause_handler_connection = action_queue2:RegisterEventHandler (2.6, 1, Common.ActionQueue.CreateEventHandler ("action_queue_pause_handler"))  
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Results of common_action_queue test:
+  Test library:
+  action_queue paused = false
+  five_time_no_delay_handler called with dt=0.0 timer=0.0 paused=false
+  five_time_no_delay_handler called with dt=0.2 timer=0.2 paused=false
+  timer paused with time=0.2
+  five_time_no_delay_handler called with dt=0.2 timer=0.2 paused=true
+  delayed_handler called with dt=0.5 timer =0.2
+  five_time_no_delay_handler called with dt=0.2 timer=0.2 paused=true
+  timer resumed with time=0.2
+  delayed_handler called with dt=0.2 timer =0.3
+  five_time_no_delay_handler called with dt=0.2 timer=0.4 paused=false
+  delayed_handler called with dt=0.2 timer =0.1
+  delayed_handler called with dt=0.2 timer =0.3
+  delayed_handler called with dt=0.2 timer =0.5
+  delayed_handler called with dt=0.2 timer =0.7
+  delayed_handler called with dt=0.2 timer =0.9
+  delayed_handler called with dt=0.2 timer =1.1
+  delayed_handler called with dt=0.2 timer =1.3
+  delayed_handler called with dt=0.2 timer =1.5
+  delayed_handler called with dt=0.2 timer =1.7
+  action_queue_pause_handler paused action_queue with dt=2.6 timer=1.8
+  action_queue_pause_handler resumed action_queue with dt=1.0 timer=2.8
+  registered_in_pause_handler called with dt=0.0 timer =2.8
+  delayed_handler called with dt=0.2 timer =2.9
+  registered_in_pause_handler called with dt=0.3 timer =3.1
+  delayed_handler called with dt=0.2 timer =3.1
+  exit_handler called with dt=3 timer=3.2
+  (end code)
+*/

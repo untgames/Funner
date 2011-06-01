@@ -1,0 +1,230 @@
+/*
+   Class: Media.Playlist
+ 
+   Список воспроизведения.
+ */
+
+/*
+   Group: Функции
+ */
+
+/*
+   Function: Create
+ 
+   Создание списка воспроизведения.
+ */
+Create ()
+
+/*
+   Function: AddSource
+ 
+   Добавление элемента в список.
+
+   Параметры:
+     name - имя элемента
+ */
+AddSource (string name)
+
+/*
+   Function: Clear
+ 
+   Очистка списка.
+ */
+Clear ()
+
+/*
+   Function: Clone
+ 
+   Создание копии списка.
+
+   Возвращает:
+     <Media.Playlist>
+ */
+Clone ()
+
+/*
+   Function: Item
+ 
+   Получение имени элемента по индексу.
+
+   Параметры:
+     index - индекс
+
+   Возвращает:
+     string
+ */
+Item (number index)
+
+/*
+   Function: Item
+ 
+   Удаление всех элементов с именем name.
+
+   Параметры:
+     name - имя элемента
+ */
+RemoveSource (string name)
+
+/*
+   Function: Item
+ 
+   Удаление элемента по индексу.
+
+   Параметры:
+     index - индекс
+ */
+RemoveSource (number index)
+
+/*
+   Function: Item
+ 
+   Резервирование памяти под указанное количество элементов.
+
+   Параметры:
+     size - количество элементов
+ */
+Reserve (number size)
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Capacity
+ 
+   Получение количества элементов, под которое зарезервирована память (при превышении размера списка этого количества, 
+   будет происходить перевыделение памяти).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Capacity
+
+/*
+   Property: Empty
+ 
+   Проверка пуст ли список.
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение.
+ */
+Empty
+
+/*
+   Property: Size
+ 
+   Количество элементов в списке.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Size
+
+/*
+   Property: Id
+ 
+   Идентификатор списка (использовать для сравнения двух списков).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Id
+
+/*
+   Group: Примеры
+ */
+
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function dump_playlist (name, playlist)
+    local playlist_content = ""
+    
+    for i = 0, playlist.Size - 1, 1 do
+      if (i > 0) then
+        playlist_content = playlist_content .. ",  "
+      end
+      
+      playlist_content = playlist_content .. playlist:Item (i)
+    end 
+    
+    print (name .. " = {" .. playlist_content .. "}")
+  end
+
+  function test_playlist () 
+    print ("Playlist test")
+    
+    local list1 = Media.Playlist.Create ()
+    
+    dump_playlist ("list1_default", list1)
+
+    print ("list1 empty: " .. tostring (list1.Empty))
+      
+    list1:AddSource ("source1")
+    local remove_index = list1:AddSource ("source2")
+    list1:AddSource ("source3")
+      
+    dump_playlist ("list1_after_add", list1)
+    print ("list1 empty: " .. tostring (list1.Empty))    
+      
+    list1:RemoveSource (remove_index)
+      
+    dump_playlist ("list1_after_remove", list1)
+      
+    local list2 = list1
+    local list3 = list1:Clone ()
+      
+    dump_playlist ("list2_copy", list2)
+      
+    list1:RemoveSource (0)
+      
+    dump_playlist ("list2_after_list1_remove", list2)
+    dump_playlist ("list3_after_list1_remove", list3)
+      
+    list1:AddSource ("source4")
+    list1:AddSource ("source4")
+    list1:AddSource ("source5")    
+    list1:AddSource ("source4")    
+      
+    dump_playlist ("list1_with_duplicates", list1)
+      
+    list1:RemoveSource ("source4")
+      
+    dump_playlist ("list1_after_remove_duplicates", list1)
+  end
+  (end code)
+ */
+
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Playlist test
+  list1_default = {}
+  list1 empty: true
+  list1_after_add = {source1,  source2,  source3}
+  list1 empty: false
+  list1_after_remove = {source1,  source3}
+  list2_copy = {source1,  source3}
+  list2_after_list1_remove = {source3}
+  list3_after_list1_remove = {source1,  source3}
+  list1_with_duplicates = {source3,  source4,  source4,  source5,  source4}
+  list1_after_remove_duplicates = {source3,  source5}
+  (end code)
+ */
+

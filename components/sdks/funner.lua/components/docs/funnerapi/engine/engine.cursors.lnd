@@ -1,0 +1,105 @@
+/*
+   Class: Engine.Cursors
+ 
+   Курсоры.
+ */
+
+/*
+   Group: Функции
+ */
+
+/*
+   Function: Register
+ 
+   Регистрация новой привязки с указанием имени.
+
+   Параметры:
+     name       - имя привязки
+     attachment - связываемый элемент
+ */
+Register (string name, Input.Cursor attachment)
+
+/*
+   Function: Unregister
+ 
+   Удаление привязки с укзаанием имени.
+
+   Параметры:
+     name - имя привязки
+ */
+Unregister (string name)
+
+/*
+   Function: IsPresent
+ 
+   Проверка, зарегестрированна ли привязка с указанным именем.
+
+   Параметры:
+     name - имя привязки
+ */
+IsPresent (string name)
+
+/*
+   Function: Get
+ 
+   Получение привязки, зарегестрированной под указанным именем.
+   Если такой привязки нет, произойдет выброс исключения.
+
+   Параметры:
+     name - имя привязки
+ */
+Get (string name)
+
+/*
+   Function: Find
+ 
+   Поиск привязки, зарегестрированной под указанным именем.
+   Если такой привязки нет, возвращается 0.
+
+   Параметры:
+     name - имя привязки
+ */
+Find (string name)
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test ()
+    local cursor = Input.Cursor.Create ()
+
+    Engine.Cursors.Register ("Cursor1", cursor)
+    
+    local result = Engine.Cursors.Get ("Cursor1")
+    
+    result:Hide ()
+
+    local result = Engine.Cursors.Find ("Cursor1")
+
+    if result ~= nil then result:Show () else print ("Cursor1 is nil") end
+
+    local result = Engine.Cursors.Find ("Cursor2")
+
+    if result == nil then print ("Cursor 2 is nil") end
+    
+    if Engine.Cursors.IsPresent ("Cursor1") then print ("Cursor1 is present") else print ("Cursor1 isn't present") end
+    if Engine.Cursors.IsPresent ("Cursor2") then print ("Cursor2 is present") else print ("Cursor2 isn't present") end  
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Results of engine_test:
+  Test library:
+  Cursor 2 is nil
+  Cursor1 is present
+  Cursor2 isn't present
+  (end code)
+*/

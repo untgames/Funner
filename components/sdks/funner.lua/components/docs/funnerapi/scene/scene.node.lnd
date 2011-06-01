@@ -1,0 +1,1877 @@
+/*
+   Class: Scene.Node
+ 
+   Узел сцены.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание узла.
+
+   Возвращает:
+     <Scene.Node>
+ */
+Create ()
+
+/*
+   Function: SetPosition
+ 
+   Перенос узла в точку с координатами (x;y;z).
+
+   Параметры:
+     x - абсцисса
+     y - ордината
+     z - аппликата
+ */
+SetPosition (number x, number y, number z)
+
+/*
+   Function: ResetPosition
+ 
+   Перенос узла в начало координат.
+ */
+ResetPosition ()
+
+/*
+   Function: SetPivotPosition
+ 
+   Задание центра поворота в системе координат родителя.
+
+   Параметры:
+     x - абсцисса
+     y - ордината
+     z - аппликата
+ */
+SetPivotPosition (number x, number y, number z)
+
+/*
+   Function: ResetPivotPosition
+ 
+   Сброс центра поворота.
+ */
+ResetPivotPosition ()
+
+/*
+   Function: SetOrientation
+ 
+   Установка ориентации (повёрнуто на angle вокруг вектора x.y.z).
+
+   Параметры:
+     angle_in_degrees - угол в градусах
+     x                - абсцисса
+     y 	              - ордината
+     z                - аппликата
+ */
+SetOrientation (number angle_in_degrees, number x, number y, number z)
+
+/*
+   Function: SetEulerOrientation
+ 
+   Установка ориентации.
+
+   Параметры:
+     pitch_in_degrees - тангаж
+     yaw_in_degrees   - крен
+     roll_in_degrees  - рыскание
+ */
+SetEulerOrientation (number pitch_in_degrees, number yaw_in_degrees, number roll_in_degrees)
+
+/*
+   Function: ResetOrientation
+ 
+   Установка ориентации, соответствующей кватерниону (0, 0, 0, 1).
+ */
+ResetOrientation ()
+
+/*
+   Function: SetScale
+ 
+   Установка масштабирования.
+
+   Параметры:
+     x - масштаб по оси OX
+     y - масштаб по оси OY
+     z - масштаб по оси OZ
+ */
+SetScale (number x, number y, number z)
+
+/*
+   Function: ResetScale
+ 
+   Установка масштабирования (1, 1, 1)
+ */
+ResetScale ()
+
+/*
+   Function: LookTo
+ 
+   Изменение ориентации узла таким образом, что после вызова метода точка target окажется на оси Oz узла. 
+
+   Параметры:
+     target               - координаты точки
+     up                   - вектор "вверх" не должен быть параллелен результирующему вектору OZ
+     node_transform_space - определяет в какой системе координат указаны коордианты target и up
+ */
+LookTo (Math.Vector3 target, Math.Vector3 up, Scene.NodeTransformSpace node_transform_space)
+
+/*
+   Function: LookTo
+ 
+   Ориентация узла таким образом, что ось invariant_axis остаётся неизменной, а ось direction_axis показывает какую ось необходимо направить на точку target, находящуюся в node_transform_space.
+   Учитывая инвариантность оси invariant_axis действительная ось направления является проекцией вектора направления на target на плоскость, образованную вектором направления на target и вектором invariant_axis.
+
+   Параметры:
+     target               - координаты точки
+     direction_axis       - ось
+     invariant_axis       - ось
+     node_transform_space - определяет в какой системе координат указаны коордианты target
+ */
+LookTo (Math.Vector3 target, Scene.NodeOrt direction_axis, Scene.NodeOrt invariant_axis, Scene.NodeTransformSpace node_transform_space)
+
+/*
+   Function: BindToParent
+ 
+   Делает данный узел потомком узла parent_node с режимом присоединения node_bind_mode и пространством преобразований узла node_transform_space.
+
+   Параметры:
+     parent_node          - узел сцены
+     node_bind_mode	  - режим присоединения
+     node_transform_space - пространство преобразований
+ */
+BindToParent (Scene.Node parent_node, Scene.NodeBindMode node_bind_mode, Scene.NodeTransformSpace node_transform_space)
+
+/*
+   Function: BindToParent
+ 
+   Аналогично предыдущей функции, node_transform_space = Scene.NodeTransformSpace.Local.
+
+   Параметры:
+     parent_node    - узел сцены
+     node_bind_mode - режим присоединения
+ */
+BindToParent (Scene.Node parent_node, Scene.NodeBindMode node_bind_mode)
+
+/*
+   Function: BindToParent
+ 
+   Аналогично предыдущей функции, node_bind_mode = Scene.NodeBindMode.Default.
+
+   Параметры:
+     parent_node - узел сцены
+ */
+BindToParent (node parent_node)
+
+/*
+   Function: BindToScene
+ 
+   Делает данный узел потомком корневого узла сцены bind_scene с режимом присоединения node_bind_mode и пространством преобразований узла node_transform_space.
+
+   Параметры:
+     bind_scene           - сцена
+     node_bind_mode	  - режим присоединения
+     node_transform_space - пространство преобразований
+ */
+BindToScene (Scene.Scene bind_scene, Scene.NodeBindMode node_bind_mode, Scene.NodeTransformSpace node_transform_space)
+
+/*
+   Function: BindToScene
+ 
+   Аналогично предыдущей функции, node_transform_space = Scene.NodeTransformSpace.Local.
+
+   Параметры:
+     bind_scene     - сцена
+     node_bind_mode - режим присоединения
+ */
+BindToScene (Scene.Scene bind_scene, Scene.NodeBindMode node_bind_mode)
+
+/*
+   Function: BindToScene
+ 
+   Аналогично предыдущей функции, node_bind_mode = Scene.NodeBindMode.Default.
+
+   Параметры:
+     bind_scene - сцена
+ */
+BindToScene (Scene.Scene bind_scene)
+
+/*
+   Function: Unbind
+ 
+   Отсоединение узла от родителя.
+ */
+Unbind ()
+
+/*
+   Function: Unbind
+ 
+   Отсоединение от родителя, с указанием, какие координаты не изменять, локальные или мировые.
+
+   Параметры:
+     node_transform_space - пространство преобразований
+ */
+Unbind (Scene.NodeTransformSpace node_transform_space)
+
+/*
+   Function: UnbindChild
+ 
+   Отсоединение потомка с именем child_name.
+
+   Параметры:
+     child_name - имя узла
+     node_transform_space - пространство преобразований
+ */
+UnbindChild (string child_name, Scene.NodeTransformSpace node_transform_space) 
+
+/*
+   Function: UnbindChild
+ 
+   Аналогично предыдущей функции, node_transform_space = Scene.NodeTransformSpace.Local.
+
+   Параметры:
+     child_name - имя узла
+     node_transform_space - пространство преобразований
+ */
+UnbindChild (string child_name) 
+
+/*
+   Function: UnbindChild
+ 
+   Отсоединение потомка с именем child_name с указанием режима поиска узла.
+
+   Параметры:
+     child_name           - имя узла
+     node_search_mode     - режим поиска узла
+     node_transform_space - пространство преобразований
+ */
+UnbindChild (string child_name, Scene.NodeSearchMode node_search_mode, Scene.NodeTransformSpace node_transform_space)
+
+/*
+   Function: UnbindChild
+ 
+   Аналогично предыдущей функции, node_transform_space = Scene.NodeTransformSpace.Local.
+
+   Параметры:
+     child_name           - имя узла
+     node_search_mode     - режим поиска узла
+ */
+UnbindChild (string child_name, Scene.NodeSearchMode node_search_mode)
+
+/*
+   Function: UnbindAllChildren
+ 
+   Отсоединение всех потомков.
+ */
+UnbindAllChildren ()
+
+/*
+   Function: FindChild
+ 
+   Возвращает потомка с именем child_name.
+
+   Параметры:
+     child_name           - имя узла
+     node_search_mode     - режим поиска узла
+ */
+FindChild (string child_name, Scene.NodeSearchMode node_search_mode)
+
+/*
+   Function: FindChild
+ 
+   Аналогично предыдущей функции, node_search_mode = Scene.NodeSearchMode.Default.
+
+   Параметры:
+     child_name - имя узла
+ */
+FindChild (string child_name, Scene.NodeSearchMode node_search_mode)
+
+/*
+   Function: FindChild
+ 
+   Возвращает матрицу преобразования узла в системе координат данного узла.
+
+   Параметры:
+     object - узел сцены
+
+   Возвращает:
+     <Math.Matrix4>
+ */
+ObjectTM (Scene.Node object)
+
+/*
+   Function: Translate
+ 
+   Перенос узла на вектор с указанием пространства преобразований узла.
+
+   Параметры:
+     vector               - вектор
+     node_transform_space - пространство преобразований
+ */
+Translate (Math.Vector3 vector, Scene.NodeTransformSpace node_transform_space)
+
+/*
+   Function: Translate
+ 
+   Аналогично предыдущей функции, node_transform_space = Scene.NodeTransformSpace.Local.
+
+   Параметры:
+     vector - вектор
+ */
+Translate (Math.Vector3 vector)
+
+/*
+   Function: Translate
+ 
+   Перенос узла на вектор с указанием пространства преобразований узла.
+
+   Параметры:
+     offset_x             - x-координата
+     offset_y             - y-координата
+     offset_z             - z-координата
+     node_transform_space - пространство преобразований
+ */
+Translate (offset_x, offset_y, offset_z, Scene.NodeTransformSpace node_transform_space)
+
+/*
+   Function: Translate
+ 
+   Аналогично предыдущей функции, node_transform_space = Scene.NodeTransformSpace.Local.
+
+   Параметры:
+     offset_x - x-координата
+     offset_y - y-координата
+     offset_z - z-координата
+ */
+Translate (number offset_x, number offset_y, number offset_z)
+
+/*
+   Function: Rotate
+ 
+   Поворот на кватернион с указанием пространства преобразований узла.
+
+   Параметры:
+     quaternion           - кватернион
+     node_transform_space - пространство преобразований
+ */
+Rotate (Math.Quaternion quaternion, Scene.NodeTransformSpace node_transform_space)
+
+/*
+   Function: Rotate
+ 
+   Аналогично предыдущей функции, node_transform_space = Scene.NodeTransformSpace.Local.
+
+   Параметры:
+     quaternion - кватернион
+ */
+Rotate (Math.Quaternion quaternion)
+
+/*
+   Function: Rotate
+ 
+   Поворот на угол относительно вектора с указанием пространства преобразований узла.
+
+   Параметры:
+     angle_in_degrees     - угол в градусах
+     x                    - x-координата
+     y                    - y-координата
+     z                    - z-координата
+     node_transform_space - пространство преобразований
+ */
+Rotate (number angle_in_degrees, number x, number y, number z, Scene.NodeTransformSpace node_transform_space)
+
+/*
+   Function: Rotate
+ 
+   Аналогично предыдущей функции, node_transform_space = Scene.NodeTransformSpace.Local.
+
+   Параметры:
+     angle_in_degrees     - угол в градусах
+     x                    - x-координата
+     y                    - y-координата
+     z                    - z-координата
+ */
+Rotate (number angle_in_degrees, number x, number y, number z)
+
+/*
+   Function: Rotate
+ 
+   Аналогично предыдущей функции, node_transform_space = Scene.NodeTransformSpace.Local.
+
+   Параметры:
+     pitch_in_degrees - тангаж
+     yaw_in_degrees   - крен
+     roll_in_degrees  - рыскание
+ */
+Rotate (number pitch_in_degrees, number yaw_in_degrees, number roll_in_degrees)
+
+/*
+   Function: Rescale
+ 
+   Масштабирование узла на вектор относительно текущего масштаба.
+
+   Параметры:
+     vector - вектор
+ */
+Rescale (Math.Vector3 vector)
+
+/*
+   Function: Rescale
+ 
+   Масштабирование узла на вектор (x, y, z).
+
+   Параметры:
+     x - x-координата
+     y - y-координата
+     z - z-координата
+ */
+Rescale (number x, number y, number z)
+
+/*
+   Function: BeginUpdate
+ 
+   Начало транзакции обновления. Во время транзакции оповещения не посылаются их обработчикам, а аккумулируются и 
+   посылаются при завершении транзакции.
+ */
+BeginUpdate ()
+
+/*
+   Function: EndUpdate
+ 
+   Завершение транзакции обновления.
+ */
+EndUpdate ()
+
+/*
+   Function: CreateEventHandler
+ 
+   Создание обработчика событий узла сцены. В функцию будут переданы параметры node и event. node - указывает на узел,
+   в котором произошло событие, event - указывает целочисленный идентификатор события (см. Scene.NodeEvent).
+
+   Параметры:
+     function_name - имя функции lua, которая будет вызвана при наступлении события
+ */
+CreateEventHandler (string function_name)
+
+/*
+   Function: RegisterEventHandler
+ 
+   Регистрация обработчика событий узла.
+
+   Параметры:
+     event   - идентификатор события
+     handler - результат выполнения функции Scene.Node.EventHandler
+ */
+RegisterEventHandler (Scene.NodeEvent event, Common.Callback handler)
+
+/*
+   Function: CreateSubTreeEventHandler
+ 
+   Создание обработчика событий потомков узла сцены. В функцию будут переданы параметры node, child и event. 
+   node - указывает на родительский узел, у потомка которого произошло событие, child - на узел, в котором 
+   произошло событие, event - указывает целочисленный идентификатор события (см. Scene.NodeSubTreeEvent).
+
+   Параметры:
+     function_name - имя функции lua, которая будет вызвана при наступлении события
+ */
+CreateSubTreeEventHandler (string function_name)
+
+/*
+   Function: CreateSubTreeEventHandler
+ 
+   Регистрация обработчика событий потомков узла.
+
+   Параметры:
+     event   - идентификатор события
+     handler - результат выполнения функции Scene.Node.CreateSubTreeEventHandler
+ */
+RegisterSubTreeEventHandler (Scene.NodeEvent event, Common.Callback handler)
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Name
+ 
+   Имя узла.
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение/установка.
+ */
+Name
+
+/*
+   Property: Position
+ 
+   Положение.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение/установка.
+ */
+Position
+
+/*
+   Property: PivotPosition
+ 
+   Центр поворота в системе координат родителя.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение/установка.
+ */
+PivotPosition
+
+/*
+   Property: OrientationPivotEnabled
+ 
+   Включён ли режим поворотов относительно центра узла.
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение/установка.
+ */
+OrientationPivotEnabled
+
+/*
+   Property: ScalePivotEnabled
+ 
+   Включён ли режим масштабирования относительно центра узла.
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение/установка.
+ */
+ScalePivotEnabled
+
+/*
+   Property: Orientation
+ 
+   Ориентация.
+
+   Тип:
+     <Math.Quaternion>
+ 
+   Доступ:
+     Получение/установка.
+ */
+Orientation
+
+/*
+   Property: Scale
+ 
+   Масштабирование.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение/установка.
+ */
+Scale
+
+/*
+   Property: OrientationInherit
+ 
+   Флаг наследования родительской ориентации.
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение/установка.
+ */
+OrientationInherit
+
+/*
+   Property: ScaleInherit
+ 
+   Флаг наследования родительского масштаба.
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение/установка.
+ */
+ScaleInherit
+
+/*
+   Property: Id
+ 
+   Уникальный идентификатор узла.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Id
+
+/*
+   Property: PivotEnabled
+ 
+   Используется ли центр узла.
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение.
+ */
+PivotEnabled
+
+/*
+   Property: WorldPosition
+ 
+   Положение в глобальной системе координат.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение.
+ */
+WorldPosition
+
+/*
+   Property: WorldOrientation
+ 
+   Ориентация в глобальной системе координат.
+
+   Тип:
+     <Math.Quaternion>
+ 
+   Доступ:
+     Получение.
+ */
+WorldOrientation
+
+/*
+   Property: WorldScale
+ 
+   Масштаб в глобальной системе координат.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение.
+ */
+WorldScale
+
+/*
+   Property: LocalTM
+ 
+   Локальная матрица узла.
+
+   Тип:
+     <Math.Matrix4>
+ 
+   Доступ:
+     Получение.
+ */
+LocalTM
+
+/*
+   Property: WorldTM
+ 
+   Глобальная матрица узла.
+
+   Тип:
+     <Math.Matrix4>
+ 
+   Доступ:
+     Получение.
+ */
+WorldTM
+
+/*
+   Property: ParentTM
+ 
+   Матрица узла в системе координат родителя.
+
+   Тип:
+     <Math.Matrix4>
+ 
+   Доступ:
+     Получение.
+ */
+ParentTM
+
+/*
+   Property: IsInUpdateTransaction
+ 
+   Проверка, учавствует ли узел в процессе транзакции обновления.
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение.
+ */
+IsInUpdateTransaction
+
+/*
+   Property: LocalOrtX
+ 
+   Ось OX в системе координат узла.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение.
+ */
+LocalOrtX
+
+/*
+   Property: LocalOrtY
+ 
+   Ось OY в системе координат узла.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение.
+ */
+LocalOrtY
+
+/*
+   Property: LocalOrtZ
+ 
+   Ось OZ в системе координат узла.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение.
+ */
+LocalOrtZ
+
+/*
+   Property: WorldOrtX
+ 
+   Ось OX в глобальной системе координат.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение.
+ */
+WorldOrtX
+
+/*
+   Property: WorldOrtY
+ 
+   Ось OY в глобальной системе координат.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение.
+ */
+WorldOrtY
+
+/*
+   Property: WorldOrtZ
+ 
+   Ось OZ в глобальной системе координат.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение.
+ */
+WorldOrtZ
+
+/*
+   Property: ParentOrtX
+ 
+   Ось OX в системе координат родителя.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение.
+ */
+ParentOrtX
+
+/*
+   Property: ParentOrtY
+ 
+   Ось OY в системе координат родителя.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение.
+ */
+ParentOrtY
+
+/*
+   Property: ParentOrtZ
+ 
+   Ось OZ в системе координат родителя.
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение.
+ */
+ParentOrtZ
+
+/*
+   Property: Parent
+ 
+   Родительский узел.
+
+   Тип:
+     <Scene.Node>
+ 
+   Доступ:
+     Получение.
+ */
+Parent
+
+/*
+   Property: FirstChild
+ 
+   Первый потомок.
+
+   Тип:
+     <Scene.Node>
+ 
+   Доступ:
+     Получение.
+ */
+FirstChild
+
+/*
+   Property: LastChild
+ 
+   Последний потомок.
+
+   Тип:
+     <Scene.Node>
+ 
+   Доступ:
+     Получение.
+ */
+LastChild
+
+/*
+   Property: PrevChild
+ 
+   Предыдущий узел, относительно данного, на данном уровне иерархии.
+
+   Тип:
+     <Scene.Node>
+ 
+   Доступ:
+     Получение.
+ */
+PrevChild
+
+/*
+   Property: NextChild
+ 
+   Следующий узел, относительно данного, на данном уровне иерархии.
+
+   Тип:
+     <Scene.Node>
+ 
+   Доступ:
+     Получение.
+ */
+NextChild
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test_scene ()
+    print ("Scene test")
+
+    local scene = Scene.Scene.Create ()
+
+    print ("Name = " .. scene.Name)
+    print ("Entities count = " .. scene.EntitiesCount)
+
+    scene.Name = "scene1"
+
+    local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
+
+    sound_emitter1:BindToScene (scene)
+
+    print ("Name = " .. scene.Name)
+    print ("Entities count = " .. scene.EntitiesCount)
+
+    sound_emitter1:BindToParent (scene.Root)
+
+    print ("Entities count = " .. scene.EntitiesCount)
+  end
+
+  function print_childs (parent_node)
+    local child_node = parent_node.FirstChild
+    while (child_node) do
+      print ("Child name - " .. child_node.Name) 
+      child_node = child_node.NextChild
+    end
+  end
+
+  function test_node_bind ()
+    print ("Node bind test")
+
+    local node1 = Scene.Node.Create ()
+    local node2 = Scene.Node.Create ()
+    local node3 = Scene.Node.Create ()
+
+    node1.Name = "node1"
+    node2.Name = "node2"
+    node3.Name = "node3"
+
+    local node4 = node2.Parent
+    
+    node1:BindToParent (node3, Scene.NodeBindMode.AddRef, Scene.NodeTransformSpace.Parent)
+    node2:BindToParent (node3)
+
+    node4 = node3:FindChild ("node2")
+
+    print ("node3 child name = " .. node4.Name)
+
+    print_childs (node3)
+      
+    node1:Unbind (Scene.NodeTransformSpace.Parent)
+
+    print ("Unbind node1 test")
+    print_childs (node3)
+      
+    node3:UnbindAllChildren ()
+
+    print ("Unbind all test")
+    print_childs (node3)
+      
+    node1:BindToParent (node3)
+    node2:BindToParent (node3)
+
+    print ("Unbind node2 by name test")
+
+    node3:UnbindChild ("node2")
+
+    print_childs (node3)
+  end
+
+  function test_node ()
+    print ("Node test")
+
+    local node1 = Scene.Node.Create ()
+
+    print ("Name = " .. node1.Name)
+    print ("Position = " .. tostring (node1.Position))
+    print ("WorldPosition = " .. tostring (node1.WorldPosition))
+    print ("Orientation = " .. tostring (node1.Orientation))
+    print ("WorldOrientation = " .. tostring (node1.WorldOrientation))
+    print ("Scale = " .. tostring (node1.Scale))
+    print ("WorldScale = " .. tostring (node1.WorldScale))
+    print ("OrientationInherit = " .. tostring (node1.OrientationInherit))
+    print ("ScaleInherit = " .. tostring (node1.ScaleInherit))
+    print ("LocalTM = " .. tostring (node1.LocalTM))
+    print ("WorldTM = " .. tostring (node1.WorldTM))
+    print ("ParentTM = " .. tostring (node1.ParentTM))
+    print ("LocalOrtX = " .. tostring (node1.LocalOrtX))
+    print ("LocalOrtY = " .. tostring (node1.LocalOrtY))
+    print ("LocalOrtZ = " .. tostring (node1.LocalOrtZ))
+    print ("WorldOrtX = " .. tostring (node1.WorldOrtX))
+    print ("WorldOrtY = " .. tostring (node1.WorldOrtY))
+    print ("WorldOrtZ = " .. tostring (node1.WorldOrtZ))
+    print ("ParentOrtX = " .. tostring (node1.ParentOrtX))
+    print ("ParentOrtY = " .. tostring (node1.ParentOrtY))
+    print ("ParentOrtZ = " .. tostring (node1.ParentOrtZ))
+
+    node1.Name = "node1"
+    node1.Position = vec3 (10, 10, 10)
+    node1.Orientation = quat (34, 10, 15, 0)
+    node1.Scale = vec3 (100, 0, 0)
+    node1.OrientationInherit = false
+    node1.ScaleInherit = false
+
+    print ("Name = " .. node1.Name)
+    print ("Position = " .. tostring (node1.Position))
+    print ("WorldPosition = " .. tostring (node1.WorldPosition))
+    print ("Orientation = " .. tostring (node1.Orientation))
+    print ("WorldOrientation = " .. tostring (node1.WorldOrientation))
+    print ("Scale = " .. tostring (node1.Scale))
+    print ("WorldScale = " .. tostring (node1.WorldScale))
+    print ("OrientationInherit = " .. tostring (node1.OrientationInherit))
+    print ("ScaleInherit = " .. tostring (node1.ScaleInherit))
+    print ("LocalTM = " .. tostring (node1.LocalTM))
+    print ("WorldTM = " .. tostring (node1.WorldTM))
+    print ("ParentTM = " .. tostring (node1.ParentTM))
+
+    node1:SetPosition (1.4, 5, 6.779)
+    print ("Position = " .. tostring (node1.Position))
+
+    node1:ResetPosition ()
+    print ("Reset position = " .. tostring (node1.Position))
+
+    node1:Translate (4, 5, 6)
+    print ("Translate position = " .. tostring (node1.Position))
+
+    node1:SetOrientation (41, 15.4, 48, 34)
+    print ("Orientation = " .. tostring (node1.Orientation))
+
+    node1:SetEulerOrientation (49, 1.4, 27)
+    print ("Orientation = " .. tostring (node1.Orientation))
+
+    node1:ResetOrientation ()
+    print ("Reset orientation = " .. tostring (node1.Orientation))
+
+    node1:Rotate (15, 30, 45)
+    print ("Roatate orientation = " .. tostring (node1.Orientation))
+
+    node1:SetScale (15, 16.4, 17)
+    print ("Scale = " .. tostring (node1.Scale))
+
+    node1:Rescale (vec3 (10, 1, 1))
+    print ("Rescale = " .. tostring (node1.Scale))
+
+    print ("ObjectTM = " .. tostring (node1:ObjectTM (node1)))
+
+    node1:ResetScale ()
+    print ("Scale = " .. tostring (node1.Scale))
+
+    local parent = Scene.Node.Create ()  
+    local node2 = Scene.Node.Create ()
+
+    node2:LookTo (vec3 (0, 2, 0), Scene.NodeOrt.Z, Scene.NodeOrt.X, Scene.NodeTransformSpace.World)
+
+    print ("WorldOrtX = " .. tostring (node2.WorldOrtX))
+    print ("WorldOrtY = " .. tostring (node2.WorldOrtY))
+    print ("WorldOrtZ = " .. tostring (node2.WorldOrtZ))
+
+    test_node_bind ()
+
+    print ("IsInUpdateTransaction = " .. tostring (node1.IsInUpdateTransaction))
+
+    node1:BeginUpdate ()
+
+    print ("IsInUpdateTransaction = " .. tostring (node1.IsInUpdateTransaction))
+
+    node1:EndUpdate ()
+
+    print ("IsInUpdateTransaction = " .. tostring (node1.IsInUpdateTransaction))
+  end
+
+  function test_node_pivot ()
+    print ("Node pivot test")
+    
+    local node = Scene.Node.Create ()
+    local parent = Scene.Node.Create ()
+    
+    parent:SetEulerOrientation (0, 0, 90)
+    parent:SetPivotPosition (1, 0, 0)
+    node:SetPosition (2, 0, 0)
+    node:SetEulerOrientation (0, 0, 90)
+    
+    node:BindToParent (parent)
+    
+    print (string.format ("parent position: local=[%s] world=[%s]", tostring (parent.Position), tostring (parent.WorldPosition)))
+    print (string.format ("node position: local=[%s] world=[%s]", tostring (node.Position), tostring (node.WorldPosition)))
+    
+    local test = node.WorldTM * vec3 (2, 0, 0)
+    
+    print (string.format ("test point: [%s]", tostring (test)))
+    
+    local saved_position = node.Position
+    
+    node:Translate (0, -2, 0, Scene.NodeTransformSpace.Local)
+    
+    print (string.format ("test local translate: local=[%s] world=[%s]", tostring (node.Position), tostring (node.WorldPosition)))
+    
+    node.Position = saved_position
+    
+    node:Translate (0, -2, 0, Scene.NodeTransformSpace.Parent)
+    
+    print (string.format ("test parent translate: local=[%s] world=[%s]", tostring (node.Position), tostring (node.WorldPosition)))
+    
+    node.Position = saved_position
+
+    node:Translate (0, -2, 0, Scene.NodeTransformSpace.World)
+    
+    print (string.format ("test world translate: local=[%s] world=[%s]", tostring (node.Position), tostring (node.WorldPosition)))
+    
+    print ("create sub child")
+    
+    local child = Scene.Node.Create ()
+    
+    child:BindToParent (node)
+   
+    node:SetPosition (2, 0, 0)
+    node:SetScale (2, 2, 1)
+    
+    node.PivotPosition = vec3 (1, 0, 0)
+    
+    child:SetPosition    (-1, -1, 0)
+    child:SetPivotPosition (-1, 0, 0)
+    child:SetEulerOrientation (0, 0, 90)
+
+    print (string.format ("test node position: local=[%s] world=[%s]", tostring (node.Position), tostring (node.WorldPosition)))
+    print (string.format ("test child position: local=[%s] world=[%s]", tostring (child.Position), tostring (child.WorldPosition)))
+    
+    test = child.WorldTM * vec3 (1, 1, 0)
+    
+    print (string.format ("test point: [%s]", tostring (test)))
+  end
+
+  function node_event_handler (node, event)
+    local name = ""  
+    
+    if     event == Scene.NodeEvent.AfterUpdate       then name = "AfterUpdate"
+    elseif event == Scene.NodeEvent.BeforeDestroy     then name = "BeforeDestroy"
+    elseif event == Scene.NodeEvent.AfterDestroy      then name = "AfterDestroy"
+    elseif event == Scene.NodeEvent.AfterBind         then name = "AfterBind"
+    elseif event == Scene.NodeEvent.BeforeUnbind      then name = "BeforeUnbind"  
+    elseif event == Scene.NodeEvent.AfterSceneAttach  then name = "AfterSceneAttach"
+    elseif event == Scene.NodeEvent.BeforeSceneDetach then name = "BeforeSceneDetach"
+    elseif event == Scene.NodeEvent.AfterSceneChange  then name = "AfterSceneChange"
+    end  
+
+    print ("Node '" .. tostring (node.Name) .. "' event '" .. name .. "'")
+  end
+
+  function node_subtree_event_handler (node, child, event)
+    local name = ""  
+    
+    if     event == Scene.NodeSubTreeEvent.AfterBind    then name = "AfterBind"
+    elseif event == Scene.NodeSubTreeEvent.BeforeUnbind then name = "BeforeUnbind"
+    end  
+
+    print ("Node '" .. tostring (node.Name) .. "." .. tostring (child.Name) .. "' subtree event '" .. name .. "'")
+  end
+
+  function test_events ()
+    print ("Node events test")
+    
+    local handler1 = Scene.Node.CreateEventHandler ("node_event_handler")
+    local handler2 = Scene.Node.CreateSubTreeEventHandler ("node_subtree_event_handler")
+    local node1    = Scene.Node.Create ()
+    local node2    = Scene.Node.Create ()
+    local scene    = Scene.Scene.Create ()
+    
+    node1.Name = "Node1"
+    node2.Name = "Node2"
+
+    node1:RegisterEventHandler (Scene.NodeEvent.AfterUpdate, handler1)
+    node1:RegisterEventHandler (Scene.NodeEvent.BeforeDestroy, handler1)
+    node1:RegisterEventHandler (Scene.NodeEvent.AfterDestroy, handler1)
+    node1:RegisterEventHandler (Scene.NodeEvent.AfterBind, handler1)
+    node1:RegisterEventHandler (Scene.NodeEvent.BeforeUnbind, handler1)
+    node1:RegisterEventHandler (Scene.NodeEvent.AfterSceneAttach, handler1)
+    node1:RegisterEventHandler (Scene.NodeEvent.BeforeSceneDetach, handler1)
+    node1:RegisterEventHandler (Scene.NodeEvent.AfterSceneChange, handler1)
+    node2:RegisterSubTreeEventHandler (Scene.NodeSubTreeEvent.AfterBind, handler2)
+    node2:RegisterSubTreeEventHandler (Scene.NodeSubTreeEvent.BeforeUnbind, handler2)
+
+    node1:BindToScene (scene)
+    node2:BindToScene (scene)
+    node1:BindToParent (node2)
+    
+    node1.Position = vec3 (1, 2, 3)
+    
+    node1 = nil
+    node2 = nil
+    scene = nil
+    
+    collectgarbage ("collect")
+  end
+
+  function test_node_properties ()
+    local node       = Scene.Node.Create ()
+    local properties = Scene.NodeProperties.Create ()
+    
+    node.Properties = properties
+
+    node.Properties:SetString ("String", "hello")  
+    node.Properties:SetInteger ("Integer", 1)
+    node.Properties:SetFloat ("Float", 3.14)
+    node.Properties:SetVector ("Vector", vec4 (1, 2, 3, 4))
+    node.Properties:SetMatrix ("Matrix", mat4 (3))
+    
+    local string_result = node.Properties:GetString ("String")
+    local int_result    = node.Properties:GetInteger ("Integer")
+    local float_result  = node.Properties:GetFloat ("Float")
+    local vec_result    = node.Properties:GetVector ("Vector")
+    local matrix_result = node.Properties:GetMatrix ("Matrix")
+
+    print (string.format ("result: string='%s' int=%d float=%.3f vec=[%.3f %.3f %.3f %.3f] det(matrix)=%.3f",
+      string_result, int_result, float_result, vec_result.x, vec_result.y, vec_result.z, vec_result.w, matrix_result:det ()))
+
+    node.Properties:Remove ("Float")
+
+    print ("is_present(Float)=" .. tostring (node.Properties:IsPresent ("Float")))
+    print ("is_present(String)=" .. tostring (node.Properties:IsPresent ("String")))
+    
+    print (string.format ("node has %u properties", node.Properties.Size))
+    
+    for i=0,node.Properties.Size-1 do
+      print (string.format ("  #%d: name='%s' type=%d", i, node.Properties:GetPropertyName (i), node.Properties:GetPropertyType (i)))
+    end
+  end
+
+  function print_node_array (title, array)
+    print (title .. " (array has " .. tostring (array.Size) .. " items):")
+
+    for i=0,array.Size-1,1 do
+      print ("  " .. array:Item (i).Name)
+    end
+  end
+
+  function test_node_array (link_mode)
+    if link_mode == Scene.NodeArrayLinkMode.AddRef  then print ("NodeArray addref test") end
+    if link_mode == Scene.NodeArrayLinkMode.WeakRef then print ("NodeArray weak-ref test") end
+
+    local node1 = Scene.Node.Create ()
+    local node2 = Scene.Node.Create ()
+    local node3 = Scene.Node.Create ()
+    
+    node1.Name = "node1"
+    node2.Name = "node2"
+    node3.Name = "node3"
+    
+    local array = Scene.NodeArray.Create (link_mode)
+    local index = array:Add (node1)
+
+    array:Add (node2)
+    array:Add (node3)
+    
+    print_node_array ("after insert", array)
+    
+    node2 = nil
+    
+    collectgarbage ("collect")
+    
+    print_node_array ("after node2 destroy", array)
+     
+    array:Remove (index)
+    
+    print_node_array ("after remove node by index", array)
+
+    array:Remove (node3)
+
+    print_node_array ("after remove by value", array)
+  end
+
+  function test_entity ()
+    print ("Entity test")
+
+    local aabox1 = AABB ()
+    local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
+
+    print ("IsInfiniteBounds = " .. tostring (sound_emitter1.InfiniteBounds))
+    print ("WireColor = " .. tostring (sound_emitter1.WireColor))
+
+    sound_emitter1.WireColor = vec3 (1, 0, 0)
+
+    print ("WireColor = " .. tostring (sound_emitter1.WireColor))
+
+    sound_emitter1:SetWireColor (0, 0, 1)
+
+    print ("WireColor = " .. tostring (sound_emitter1.WireColor))
+
+    aabox1 = sound_emitter1.BoundBox
+
+    print ("local bb minimum = " .. tostring (aabox1.Minimum))
+    print ("local bb maximum = " .. tostring (aabox1.Maximum))
+
+    aabox1 = sound_emitter1.WorldBoundBox
+
+    print ("world bb minimum = " .. tostring (aabox1.Minimum))
+    print ("world bb maximum = " .. tostring (aabox1.Maximum))
+
+    aabox1 = sound_emitter1.ChildrenBoundBox
+
+    print ("children bb minimum = " .. tostring (aabox1.Minimum))
+    print ("children bb maximum = " .. tostring (aabox1.Maximum))
+
+    aabox1 = sound_emitter1.FullBoundBox
+
+    print ("full bb minimum = " .. tostring (aabox1.Minimum))
+    print ("full bb maximum = " .. tostring (aabox1.Maximum))
+
+    aabox1 = sound_emitter1.WorldChildrenBoundBox
+
+    print ("world children bb minimum = " .. tostring (aabox1.Minimum))
+    print ("world children bb maximum = " .. tostring (aabox1.Maximum))
+
+    aabox1 = sound_emitter1.WorldFullBoundBox
+
+    print ("world full bb minimum = " .. tostring (aabox1.Minimum))
+    print ("world full bb maximum = " .. tostring (aabox1.Maximum))
+  end
+
+  function print_intersections (entity)
+    local intersections = entity:GetIntersections ()
+    
+    print (entity.Name .. " has " .. tostring (intersections.Size) .. " intersections:")
+    
+    for i=0,intersections.Size-1,1 do
+      print ("  " .. intersections:Item (i).Name)
+    end
+  end
+
+  function test_intersections ()
+    print ("Intersections test")
+    
+    local scene   = Scene.Scene.Create ()
+    local entity1 = Scene.Helpers.Box.Create ()
+    local entity2 = Scene.Helpers.Box.Create ()
+    local entity3 = Scene.Helpers.Box.Create ()
+
+    entity1.Name = "entity1"
+    entity2.Name = "entity2"
+    entity3.Name = "entity3"
+    
+    local bb = AABB (-1, -1, -1, 1, 1, 1)
+
+    entity1.BoundBox = AABB (-1, -1, -1, 1, 1, 1)
+    entity2.BoundBox = AABB (0.1, 0.1, -1, 1, 1, 1)
+    entity3.BoundBox = AABB (-1, -1, -1, -0, -0.1, 1)  
+
+    entity1:BindToScene (scene)
+    entity2:BindToScene (scene)
+    entity3:BindToScene (scene)
+
+    print_intersections (entity1)
+    print_intersections (entity2)
+    print_intersections (entity3)
+  end
+
+  function test_perspective_camera ()
+    print ("Perspective camera test")
+
+    local camera1 = Scene.PerspectiveCamera.Create ()
+
+    print ("FovX  = " .. camera1.FovX)
+    print ("FovY  = " .. camera1.FovY)
+    print ("ZNear = " .. camera1.ZNear)
+    print ("ZFar  = " .. camera1.ZFar)
+    camera1.FovX  = 36
+    camera1.FovY  = 20
+    camera1.ZNear = 10
+    camera1.ZFar  = 1000
+    print ("FovX = " .. camera1.FovX)
+    print ("FovY  = " .. camera1.FovY)
+    print ("ZNear = " .. camera1.ZNear)
+    print ("ZFar  = " .. camera1.ZFar)
+  end
+
+  function test_ortho_camera ()
+    print ("Ortho camera test")
+
+    local camera1 = Scene.OrthoCamera.Create ()
+
+    print ("Left   = " .. camera1.Left)
+    print ("Right  = " .. camera1.Right)
+    print ("Top    = " .. camera1.Top)
+    print ("Bottom = " .. camera1.Bottom)
+    print ("ZNear  = " .. camera1.ZNear)
+    print ("ZFar   = " .. camera1.ZFar)
+    camera1.Left   = -18
+    camera1.Right  = 18
+    camera1.Top    = 10
+    camera1.Bottom = -10
+    camera1.ZNear  = 10
+    camera1.ZFar   = 1000
+    print ("Left   = " .. camera1.Left)
+    print ("Right  = " .. camera1.Right)
+    print ("Top    = " .. camera1.Top)
+    print ("Bottom = " .. camera1.Bottom)
+    print ("ZNear  = " .. camera1.ZNear)
+    print ("ZFar   = " .. camera1.ZFar)
+  end
+
+  function test_light ()
+    print ("Common light test (point light)")
+
+    local light1 = Scene.PointLight.Create ()
+
+    print ("LightColor = " .. tostring (light1.LightColor))
+    print ("Attenuation = " .. tostring (light1.Attenuation))
+    print ("Range = " .. light1.Range)
+
+    light1.LightColor  = vec3 (1, 0, 0)
+    light1.Attenuation = vec3 (1, 1, 0)
+    light1.Range       = 579
+
+    print ("LightColor = " .. tostring (light1.LightColor))
+    print ("Attenuation = " .. tostring (light1.Attenuation))
+    print ("Range = " .. light1.Range)
+  end
+
+  function test_direct_light ()
+    print ("Direct light test")
+
+    local light1 = Scene.DirectLight.Create ()
+
+    print ("Radius = " .. light1.Radius)
+
+    light1.Radius = 763
+
+    print ("Radius = " .. light1.Radius)
+  end
+
+  function test_spot_light ()
+    print ("Spot light test")
+
+    local light1 = Scene.SpotLight.Create ()
+
+    print ("Name = " .. light1.Name)
+    print ("Angle = " .. light1.Angle)
+    print ("Exponent = " .. light1.Exponent)
+
+    light1.Angle = 75
+    light1.Exponent = 0.7
+    light1.Name = "light1"
+
+    print ("Name = " .. light1.Name)
+    print ("Angle = " .. light1.Angle)
+    print ("Exponent = " .. light1.Exponent)
+  end
+
+  function test_box_helper ()
+    print ("BoxHelper test")
+
+    local helper1 = Scene.Helpers.Box.Create ()
+  end
+
+  function test_listener ()
+    print ("Listener test")
+
+    local listener1 = Scene.Listener.Create ()
+
+    print ("Gain = " .. listener1.Gain)
+
+    listener1.Gain = 0.75
+
+    print ("Gain = " .. listener1.Gain)
+  end
+
+  function test_sound_emitter ()
+    print ("SoundEmitter test")
+
+    local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
+
+    print ("Gain = " .. sound_emitter1.Gain)
+
+    sound_emitter1.Gain = 0.7
+    
+    print ("Gain = " .. sound_emitter1.Gain)
+
+    sound_emitter1:Play ()
+    sound_emitter1:Stop ()
+
+    print ("SoundEmitter sound declaration name = " .. sound_emitter1.SoundDeclarationName)
+  end
+
+  function test_sprite ()
+    print ("Sprite test")
+
+    local sprite1 = Scene.Sprite.Create ()
+
+    print ("Color = " .. tostring (sprite1.Color))
+    print ("Material name = " .. sprite1.Material)
+
+    sprite1.Material = "SettedMaterial"
+    sprite1.Alpha    = 0.8
+    sprite1.Frame    = 9
+    sprite1.AlphaReference = 0.4
+
+    print ("Alpha value = " .. sprite1.Alpha)
+    print ("Alpha reference = " .. sprite1.AlphaReference)
+    print ("Material name = " .. sprite1.Material)
+    print ("Frame number = " .. sprite1.Frame)
+     
+    sprite1.Color    = vec4 (1, 0, 0, 0.7)
+
+    print ("Color = " .. tostring (sprite1.Color))
+
+    sprite1:SetColor (0, 0, 1, 0.3)
+
+    print ("Color = " .. tostring (sprite1.Color))
+
+    sprite1:SetColor (0, 1, 0)
+
+    print ("Color = " .. tostring (sprite1.Color))
+    
+  end
+
+  function test_visual_model ()
+    print ("VisualModel test")
+
+    local visual_model1 = Scene.VisualModel.Create ()
+
+    print ("Mesh name = " .. visual_model1.MeshName)
+
+    visual_model1.MeshName = "mesh.xmesh"
+
+    print ("Mesh name = " .. visual_model1.MeshName)
+  end
+
+  function get_name (alignment)
+    if (alignment == Scene.TextLineAlignment.Center)   then return "Center"       end
+    if (alignment == Scene.TextLineAlignment.Left)     then return "Left/Top"     end
+    if (alignment == Scene.TextLineAlignment.Right)    then return "Right/Bottom" end
+    if (alignment == Scene.TextLineAlignment.BaseLine) then return "BaseLine"     end
+    return "Invalid"
+  end
+
+  function test_text_line ()
+    print ("TextLine test")
+
+    local text_line1 = Scene.TextLine.Create ()
+
+    print ("Text = " .. text_line1.Text)
+    print ("TextUnicode = " .. tostring (text_line1.TextUnicode))
+    print ("Font = " .. text_line1.Font)
+    print ("Color = " .. tostring (text_line1.Color))
+    print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+
+    text_line1.Text                = "text"
+    text_line1.Font                = "font"
+    text_line1.Color               = vec4 (0.1, 0.2, 0.3, 0.4)
+    text_line1.HorizontalAlignment = Scene.TextLineAlignment.Center
+    text_line1.VerticalAlignment   = Scene.TextLineAlignment.Bottom
+
+    print ("Text = " .. text_line1.Text)
+    print ("TextUnicode = " .. tostring (text_line1.TextUnicode))
+    print ("Font = " .. text_line1.Font)
+    print ("Color = " .. tostring (text_line1.Color))
+    print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+
+    text_line1.Text = "Non-unicode text"
+
+    print ("Text = " .. text_line1.Text)
+    print ("TextUnicode = " .. tostring (text_line1.TextUnicode))
+
+    text_line1:SetColor (0.4, 0.3, 0.2, 0.1)
+
+    print ("Color = " .. tostring (text_line1.Color))
+
+    text_line1:SetColor (0.1, 0.2, 0.3)
+
+    print ("Color = " .. tostring (text_line1.Color))
+
+    text_line1:SetAlignment (Scene.TextLineAlignment.Right, Scene.TextLineAlignment.Center)
+
+    print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+
+    text_line1:SetAlignment (Scene.TextLineAlignment.BaseLine, Scene.TextLineAlignment.BaseLine)
+
+    print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+  end
+
+  function test ()
+    test_node ()    
+    
+    test_node_pivot ()
+    
+    test_events ()
+    
+    test_node_properties ()
+    
+    test_node_array (Scene.NodeArrayLinkMode.AddRef)
+    test_node_array (Scene.NodeArrayLinkMode.WeakRef)
+
+    test_entity ()
+    
+    test_intersections ()
+    
+    test_perspective_camera ()
+    test_ortho_camera ()
+
+    test_light ()
+    test_direct_light ()
+    test_spot_light ()
+
+    test_box_helper ()
+
+    test_listener ()
+
+    test_sound_emitter ()
+
+    test_visual_model ()
+
+    test_sprite ()
+
+    test_scene ()
+
+    test_text_line ()
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Node test
+  Name = 
+  Position = 0 0 0
+  WorldPosition = 0 0 0
+  Orientation = 0 0 0 1
+  WorldOrientation = 0 0 0 1
+  Scale = 1 1 1
+  WorldScale = 1 1 1
+  OrientationInherit = true
+  ScaleInherit = true
+  LocalTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+  WorldTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+  ParentTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+  LocalOrtX = 1 0 0
+  LocalOrtY = 0 1 0
+  LocalOrtZ = 0 0 1
+  WorldOrtX = 1 0 0
+  WorldOrtY = 0 1 0
+  WorldOrtZ = 0 0 1
+  ParentOrtX = 1 0 0
+  ParentOrtY = 0 1 0
+  ParentOrtZ = 0 0 1
+  Name = node1
+  Position = 10 10 10
+  WorldPosition = 10 10 10
+  Orientation = 34 10 15 0
+  WorldOrientation = 34 10 15 0
+  Scale = 100 0 0
+  WorldScale = 100 0 0
+  OrientationInherit = false
+  ScaleInherit = false
+  LocalTM = 56.1107 0 0 10 45.9149 0 0 10 68.8724 0 0 10 0 0 0 1
+  WorldTM = 56.1107 0 0 10 45.9149 0 0 10 68.8724 0 0 10 0 0 0 1
+  ParentTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+  Position = 1.4 5 6.779
+  Reset position = 0 0 0
+  Translate position = 4 5 6
+  Orientation = 0.0886976 0.27646 0.195826 0.936672
+  Orientation = 0.40061 0.107611 0.207484 0.885936
+  Reset orientation = 0 0 0 1
+  Roatate orientation = 0.018283 0.28532 0.33527 0.897693
+  Scale = 15 16.4 17
+  Rescale = 150 16.4 17
+  ObjectTM = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+  Scale = 1 1 1
+  WorldOrtX = 1 0 0
+  WorldOrtY = 0 0 -1
+  WorldOrtZ = 0 1 0
+  Node bind test
+  node3 child name = node2
+  Child name - node1
+  Child name - node2
+  Unbind node1 test
+  Child name - node2
+  Unbind all test
+  Unbind node2 by name test
+  Child name - node1
+  IsInUpdateTransaction = false
+  IsInUpdateTransaction = true
+  IsInUpdateTransaction = false
+  Node pivot test
+  parent position: local=[0 0 0] world=[0 0 0]
+  node position: local=[2 0 0] world=[1 1 0]
+  test point: [-1 1 0]
+  test local translate: local=[4 0 0] world=[1 3 0]
+  test parent translate: local=[2 -2 0] world=[3 1 0]
+  test world translate: local=[0 0 0] world=[1 -1 0]
+  create sub child
+  test node position: local=[2 0 0] world=[1 1 0]
+  test child position: local=[-1 -1 0] world=[5 4 0]
+  test point: [9 0 0]
+  Node events test
+  Node 'Node1' event 'AfterSceneAttach'
+  Node 'Node1' event 'AfterSceneChange'
+  Node 'Node1' event 'AfterBind'
+  Node 'Node1' event 'AfterUpdate'
+  Node 'Node1' event 'BeforeUnbind'
+  Node 'Node1' event 'AfterBind'
+  Node 'Node1' event 'AfterUpdate'
+  Node 'Node2.Node1' subtree event 'AfterBind'
+  Node 'Node1' event 'AfterUpdate'
+  Node 'Node1' event 'BeforeSceneDetach'
+  Node 'Node1' event 'AfterSceneChange'
+  Node 'Node1' event 'BeforeUnbind'
+  Node 'Node2.Node1' subtree event 'BeforeUnbind'
+  Node 'Node1' event 'BeforeDestroy'
+  Node 'Node1' event 'AfterDestroy'
+  result: string='hello' int=1 float=3.140 vec=[1.000 2.000 3.000 4.000] det(matrix)=81.000
+  is_present(Float)=false
+  is_present(String)=true
+  node has 4 properties
+    #0: name='String' type=0
+    #1: name='Integer' type=1
+    #2: name='Vector' type=3
+    #3: name='Matrix' type=4
+  NodeArray addref test
+  after insert (array has 3 items):
+    node1
+    node2
+    node3
+  after node2 destroy (array has 3 items):
+    node1
+    node2
+    node3
+  after remove node by index (array has 2 items):
+    node2
+    node3
+  after remove by value (array has 1 items):
+    node2
+  NodeArray weak-ref test
+  after insert (array has 3 items):
+    node1
+    node2
+    node3
+  after node2 destroy (array has 2 items):
+    node1
+    node3
+  after remove node by index (array has 1 items):
+    node3
+  after remove by value (array has 0 items):
+  Entity test
+  IsInfiniteBounds = true
+  WireColor = 0 0 0
+  WireColor = 1 0 0
+  WireColor = 0 0 1
+  local bb minimum = -1e+008 -1e+008 -1e+008
+  local bb maximum = 1e+008 1e+008 1e+008
+  world bb minimum = -1e+008 -1e+008 -1e+008
+  world bb maximum = 1e+008 1e+008 1e+008
+  children bb minimum = -1e+008 -1e+008 -1e+008
+  children bb maximum = 1e+008 1e+008 1e+008
+  full bb minimum = -1e+008 -1e+008 -1e+008
+  full bb maximum = 1e+008 1e+008 1e+008
+  world children bb minimum = -1e+008 -1e+008 -1e+008
+  world children bb maximum = 1e+008 1e+008 1e+008
+  world full bb minimum = -1e+008 -1e+008 -1e+008
+  world full bb maximum = 1e+008 1e+008 1e+008
+  Intersections test
+  entity1 has 2 intersections:
+    entity2
+    entity3
+  entity2 has 1 intersections:
+    entity1
+  entity3 has 1 intersections:
+    entity1
+  Perspective camera test
+  FovX  = 0.99999994039536
+  FovY  = 0.99999994039536
+  ZNear = 0
+  ZFar  = 1
+  FovX = 36
+  FovY  = 19.999998092651
+  ZNear = 10
+  ZFar  = 1000
+  Ortho camera test
+  Left   = 0
+  Right  = 1
+  Top    = 1
+  Bottom = 0
+  ZNear  = 0
+  ZFar   = 1
+  Left   = -18
+  Right  = 18
+  Top    = 10
+  Bottom = -10
+  ZNear  = 10
+  ZFar   = 1000
+  Common light test (point light)
+  LightColor = 0 0 0
+  Attenuation = 0 0 0
+  Range = 1000000000
+  LightColor = 1 0 0
+  Attenuation = 1 1 0
+  Range = 579
+  Direct light test
+  Radius = 1000000000
+  Radius = 763
+  Spot light test
+  Name = 
+  Angle = 0
+  Exponent = 0
+  Name = light1
+  Angle = 74.999992370605
+  Exponent = 0.69999998807907
+  BoxHelper test
+  Listener test
+  Gain = 1
+  Gain = 0.75
+  SoundEmitter test
+  Gain = 1
+  Gain = 0.69999998807907
+  SoundEmitter sound declaration name = sound.snddecl
+  VisualModel test
+  Mesh name = 
+  Mesh name = mesh.xmesh
+  Sprite test
+  Color = 1 1 1 1
+  Material name = 
+  Alpha value = 0.80000001192093
+  Alpha reference = 0.40000000596046
+  Material name = SettedMaterial
+  Frame number = 9
+  Color = 1 0 0 0.7
+  Color = 0 0 1 0.3
+  Color = 0 1 0 0.3
+  Scene test
+  Name = 
+  Entities count = 0
+  Name = scene1
+  Entities count = 1
+  Entities count = 1
+  TextLine test
+  Text = 
+  TextUnicode = 
+  Font = 
+  Color = 1 1 1 1
+  Horizontal aligment = Left/Top vertical aligment = Left/Top
+  Text = text
+  TextUnicode = text
+  Font = font
+  Color = 0.1 0.2 0.3 0.4
+  Horizontal aligment = Center vertical aligment = Right/Bottom
+  Text = Non-unicode text
+  TextUnicode = Non-unicode text
+  Color = 0.4 0.3 0.2 0.1
+  Color = 0.1 0.2 0.3 0.1
+  Horizontal aligment = Right/Bottom vertical aligment = Center
+  Horizontal aligment = BaseLine vertical aligment = BaseLine
+  (end code)
+*/

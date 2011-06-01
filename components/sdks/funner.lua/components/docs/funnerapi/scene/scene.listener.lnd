@@ -1,0 +1,75 @@
+/*
+   Class: Scene.Listener
+ 
+   Слушатель. Прослушивает звуки от источников. Обязательно должен быть зарегистрирован в файле конфигурации 
+   (подсистема проигрывания звуков сцены).
+
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание слушателя.
+
+   Возвращает:
+     <Scene.Listener>
+ */
+Create ()
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Gain
+ 
+   Громкость воспроизведения.
+
+   Диапазон:
+     0..1
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Gain
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test_listener ()
+    print ("Listener test")
+
+    local listener1 = Scene.Listener.Create ()
+
+    print ("Gain = " .. listener1.Gain)
+
+    listener1.Gain = 0.75
+
+    print ("Gain = " .. listener1.Gain)
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Listener test
+  Gain = 1
+  Gain = 0.75
+  (end code)
+*/

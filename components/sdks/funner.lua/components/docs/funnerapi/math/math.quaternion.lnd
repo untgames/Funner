@@ -1,0 +1,320 @@
+/*
+   Class: Math.Quaternion
+ 
+   Кватернион.
+ */
+
+/*
+   Group: Функции
+ */
+
+/*
+   Function: quat
+ 
+   Создание кватерниона, все компоненты которого равны.
+  
+   Параметры:
+ 
+     value - значение компонентов кватерниона
+ 
+   Возвращает:
+     <Quaternion>
+ */
+quat (number value)
+
+/*
+   Function: quat (x,y,z,w)
+ 
+   Создание кватерниона с указанием всех компонентов.
+  
+   Параметры:
+ 
+     value_x - x-компонент
+     value_y - y-компонент
+     value_z - z-компонент
+     value_w - w-компонент
+ 
+   Возвращает:
+     <Quaternion>
+ */
+quat (number value_x, number value_y, number value_z, number value_w)
+
+/*
+   Function: normalize
+ 
+   Нормированние кватерниона.
+ 
+   Возвращает:
+     <Quaternion>
+ */
+normalize ()
+
+/*
+   Function: inner
+ 
+   Cкалярное произведение кватернионов. Покомпонентное умножение данного кватерниона на another_quat.
+ 
+   Параметры:
+ 
+     another_quat - кватернион
+ 
+   Возвращает:
+     <Quaternion>
+ */
+inner (Quaternion another_quat)
+
+/*
+   Function: set
+ 
+   Установка значения компонента.
+ 
+   Параметры:
+ 
+     index - значение от 0 до 3
+     value - значение
+ */
+set (number index, number value)
+
+/*
+   Function: get
+ 
+   Получение значения компонента.
+ 
+   Параметры:
+ 
+     index - значение от 0 до 3
+ */
+get (number index)
+
+/*
+   Group: Операторы
+ */
+
+/*
+   Operator: operator- (Quaternion)
+ 
+   Унарный минус. Возвращает кватернион, все компоненты которого равны компонентам quaternion умноженным на -1.
+ 
+   Параметры:
+ 
+     quaternion - кватернион
+ 
+   Возвращает:
+     <Quaternion>
+ */
+operator- (Quaternion quaternion) 
+
+/*
+   Operator: operator- (Quaternion, Quaternion)
+ 
+   Разность кватернионов. Возвращает кватернион, являющийся разностью left и right.
+ 
+   Параметры:
+ 
+     left  - кватернион
+     right - кватернион
+ 
+   Возвращает:
+     <Quaternion>
+ */
+operator- (Quaternion left, Quaternion right) 
+
+/*
+   Operator: operator* (Quaternion, Quaternion)
+ 
+   Произведение кватернионов. Возвращает кватернион, являющийся произведением left * right.
+ 
+   Параметры:
+ 
+     left  - кватернион
+     right - кватернион
+ 
+   Возвращает:
+     <Quaternion>
+ */
+
+operator* (Quaternion left, Quaternion right) 
+
+/*
+   Operator: oeprator* (Quaternion, number)
+ 
+   Произведение кватерниона на скаляр. Возвращает кватернион, являющийся произведением left на скаляр right.
+ 
+   Параметры:
+ 
+     left  - кватернион
+     right - скаляр
+ 
+   Возвращает:
+     <Quaternion>
+ */
+operator* (Quaternion left, number right) 
+
+/*
+   Operator: operator* (number, Quaternion)
+ 
+   Произведение скаляра на кватернион. Возвращает кватернион, являющийся произведением скаляра left на кватернион right.
+ 
+   Параметры:
+ 
+     left  - скаляр
+     right - кватернион
+ 
+   Возвращает:
+     <Quaternion>
+ */
+operator* (number left, Quaternion right)
+
+/*
+   Operator: operator[]
+ 
+   Доступ к компоненту кватерниона.
+ 
+   Параметры:
+ 
+     index - значение от 0 до 3
+ 
+   Возвращает:
+     number - значение компонента [index]
+ */
+operator[] (number index)
+
+/*
+   Group: Поля
+ */
+
+/*
+   Property: x
+ 
+   Нулевой компонент кватерниона.
+ 
+   Доуступ:
+ 
+     Получение/установка.
+ */
+
+/*
+   Property: y
+ 
+   Первый компонент кватерниона.
+ 
+   Доуступ:
+ 
+     Получение/установка.
+ */
+
+/*
+   Property: z
+ 
+   Второй компонент кватерниона.
+ 
+   Доуступ:
+
+     Получение/установка.
+ */
+
+/*
+   Property: w
+ 
+   Третий компонент кватерниона.
+ 
+   Доуступ:
+ 
+     Получение/установка.
+ */
+
+/*
+   Group: Примеры
+ */
+
+/*
+  Topic: Пример кода
+ 
+   (start code) 
+   function test_quat (q)
+     print ("Input: " .. tostring (q))
+ 
+     local q1 = q
+ 
+     q1:set (1, 2)
+ 
+     print ("After q1:set(1,2): " .. tostring (q1))
+ 
+     for i=0,3 do
+       print ("      q:get(" .. i .. "): " .. q:get (i))
+     end
+ 
+     for i=0,3 do
+       print ("      q [" .. i .. "]: " .. q [i])
+     end
+ 
+     print ("      q.x:" .. q.x)
+     print ("      q.y:" .. q.y)
+     print ("      q.z:" .. q.z)
+     print ("      q.w:" .. q.w)
+     
+     print ("Test q.{x,y,z,w}={5,6,7,8}:")
+ 
+     q.x = 5
+     q.y = 6
+     q.z = 7
+     q.w = 8
+     
+     for i=0,3 do
+         print (" q["..i.."]:"..tostring(q[i]))
+     end
+     
+     local q2 = quat (8, 9, 10, 11)
+     
+     print ("Test q2=quat(8,9,10,11): " .. tostring (q2))
+     print ("Test quat(1): " .. tostring (quat (1)))
+ 
+     print ("Test -q2: " .. tostring (-q2))
+     
+     print ("Test q+q2:"..tostring(q+q2))
+     
+     print ("Test q-q2:"..tostring(q-q2))
+     
+     print ("Test q2*q2:"..tostring(q2*q2))
+ 
+     print ("Test q2:normalize(): "..tostring(q2:normalize()))
+     
+     print ("Test q2:inner(q): "..tostring(q2:inner(q)))
+   end
+   (end code)
+ */
+
+/*
+  Topic: Результат
+ 
+   (start code) 
+   Test quatf library:
+   Input: 1 1 1 1
+   After q1:set(1,2): 1 2 1 1
+         q:get(0): 1
+         q:get(1): 2
+         q:get(2): 1
+         q:get(3): 1
+         q [0]: 1
+         q [1]: 2
+         q [2]: 1
+         q [3]: 1
+         q.x:1
+         q.y:2
+         q.z:1
+         q.w:1
+   Test q.{x,y,z,w}={5,6,7,8}:
+    q[0]:5
+    q[1]:6
+    q[2]:7
+    q[3]:8
+   Test q2=quat(8,9,10,11): 8 9 10 11
+   Test quat(1): 1 1 1 1
+   Test -q2: -8 -9 -10 -11
+   Test q+q2:13 15 17 19
+   Test q-q2:-3 -3 -3 -3
+   Test q2*q2:176 198 220 -124
+   Test q2:normalize(): 0.418166697025 0.470437526703 0.52270835638 0.574979186058
+   Test q2:inner(q): 252
+   (end code)
+ */

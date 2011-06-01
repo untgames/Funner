@@ -1,0 +1,118 @@
+/*
+   Class: Render.Rect
+ 
+   Прямоугольная область.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание прямоугольной области.
+ */
+Create ()
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Left
+ 
+   Левая граница.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Left
+
+/*
+   Property: Top
+ 
+   Верхняя граница.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Top
+
+/*
+   Property: Width
+ 
+   Ширина.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Width
+
+/*
+   Property: Height
+ 
+   Высота.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Height
+
+/*
+   Property: Right
+ 
+   Правая граница.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Right
+
+/*
+   Property: Bottom
+ 
+   Нижняя граница.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Bottom
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  (end code)
+*/

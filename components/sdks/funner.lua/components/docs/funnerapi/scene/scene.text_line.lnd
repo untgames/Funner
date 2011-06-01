@@ -1,0 +1,261 @@
+/*
+   Class: Scene.TextLine
+ 
+   Линия текста.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание линии текста.
+
+   Возвращает:
+     <Scene.TextLine>
+ */
+Create ()
+
+/*
+   Function: SetColor
+ 
+   Установка цвета и прозрачности.
+
+   Параметры:
+     r - red-компонента
+     g - green-компонента
+     b - blue-компонента
+     a - прозрачность
+ */
+SetColor (number r, number g, number b, number a)
+
+/*
+   Function: SetColor
+ 
+   Установка цвета и прозрачности.
+
+   Параметры:
+     r - red-компонента
+     g - green-компонента
+     b - blue-компонента
+ */
+SetColor (number r, number g, number b)
+
+/*
+   Function: SetCharsColorFactors
+ 
+   Установка множителя цвета count символов начиная с first.
+
+   Параметры:
+     first - начальная позиция
+     count - количество символов
+     color - множитель
+ */
+SetCharsColorFactors (number first, number count, number color) 
+
+/*
+   Function: CharColor
+ 
+   Получение цвета символа по индексу.
+
+   Параметры:
+     index - позиция символа
+ */
+CharColor (number index)
+
+/*
+   Function: SetAlignment
+ 
+   Установка выравнивания текста относительно положения узла.
+
+   Параметры:
+     horizontal_alignment - выравнивание по горизонтали
+     vertical_alignment   - выравнивание по вертикали
+ */
+SetAlignment (Scene.TextLineAlignment horizontal_alignment, Scene.TextLineAlignment vertical_alignment)
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Color
+ 
+   Цвет.
+
+   Тип:
+     <Math.Vector4>
+ 
+   Доступ:
+     Получение/установка.
+ */
+Color
+
+/*
+   Property: Text
+ 
+   Текстовая строка.
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение/установка.
+ */
+Text
+
+/*
+   Property: TextUnicode
+ 
+   Текстовая строка в Unicode формате.
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение/установка.
+ */
+TextUnicode
+
+/*
+   Property: Font
+ 
+   Имя шрифта.
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение/установка.
+ */
+Font
+
+/*
+   Property: HorizontalAlignment
+ 
+   Выравнивание по горизонтали.
+
+   Тип:
+     <Scene.TextLineAlignment>
+ 
+   Доступ:
+     Получение/установка.
+ */
+HorizontalAlignment
+
+/*
+   Property: VeticalAlignment
+ 
+   Выравнивание по вертикали.
+
+   Тип:
+     <Scene.TextLineAlignment>
+ 
+   Доступ:
+     Получение/установка.
+ */
+VeticalAlignment
+
+/*
+   Property: TextLength
+ 
+   Длина текстовой строки.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+TextLength
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function get_name (alignment)
+    if (alignment == Scene.TextLineAlignment.Center)   then return "Center"       end
+    if (alignment == Scene.TextLineAlignment.Left)     then return "Left/Top"     end
+    if (alignment == Scene.TextLineAlignment.Right)    then return "Right/Bottom" end
+    if (alignment == Scene.TextLineAlignment.BaseLine) then return "BaseLine"     end
+    return "Invalid"
+  end
+
+  function test_text_line ()
+    print ("TextLine test")
+
+    local text_line1 = Scene.TextLine.Create ()
+
+    print ("Text = " .. text_line1.Text)
+    print ("TextUnicode = " .. tostring (text_line1.TextUnicode))
+    print ("Font = " .. text_line1.Font)
+    print ("Color = " .. tostring (text_line1.Color))
+    print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+
+    text_line1.Text                = "text"
+    text_line1.Font                = "font"
+    text_line1.Color               = vec4 (0.1, 0.2, 0.3, 0.4)
+    text_line1.HorizontalAlignment = Scene.TextLineAlignment.Center
+    text_line1.VerticalAlignment   = Scene.TextLineAlignment.Bottom
+
+    print ("Text = " .. text_line1.Text)
+    print ("TextUnicode = " .. tostring (text_line1.TextUnicode))
+    print ("Font = " .. text_line1.Font)
+    print ("Color = " .. tostring (text_line1.Color))
+    print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+
+    text_line1.Text = "Non-unicode text"
+
+    print ("Text = " .. text_line1.Text)
+    print ("TextUnicode = " .. tostring (text_line1.TextUnicode))
+
+    text_line1:SetColor (0.4, 0.3, 0.2, 0.1)
+
+    print ("Color = " .. tostring (text_line1.Color))
+
+    text_line1:SetColor (0.1, 0.2, 0.3)
+
+    print ("Color = " .. tostring (text_line1.Color))
+
+    text_line1:SetAlignment (Scene.TextLineAlignment.Right, Scene.TextLineAlignment.Center)
+
+    print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+
+    text_line1:SetAlignment (Scene.TextLineAlignment.BaseLine, Scene.TextLineAlignment.BaseLine)
+
+    print ("Horizontal aligment = " .. get_name (text_line1.HorizontalAlignment) .. " vertical aligment = " .. get_name (text_line1.VerticalAlignment))
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  TextLine test
+  Text = 
+  TextUnicode = 
+  Font = 
+  Color = 1 1 1 1
+  Horizontal aligment = Left/Top vertical aligment = Left/Top
+  Text = text
+  TextUnicode = text
+  Font = font
+  Color = 0.1 0.2 0.3 0.4
+  Horizontal aligment = Center vertical aligment = Right/Bottom
+  Text = Non-unicode text
+  TextUnicode = Non-unicode text
+  Color = 0.4 0.3 0.2 0.1
+  Color = 0.1 0.2 0.3 0.1
+  Horizontal aligment = Right/Bottom vertical aligment = Center
+  Horizontal aligment = BaseLine vertical aligment = BaseLine
+  (end code)
+*/

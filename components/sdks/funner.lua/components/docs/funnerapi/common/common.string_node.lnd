@@ -1,0 +1,609 @@
+/*
+   Class: Common.StringNode
+ 
+   Используется для работы с деревьями строк.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание узла дерева.
+  
+   Возвращает:
+     <Common.StringNode>
+ */
+
+Create ()
+
+/*
+   Function: Clone
+ 
+   Создание копии узла, содержащей также и копии всех дочерних узлов.
+   При простом копировании создаётся ссылка.
+  
+   Возвращает:
+     <Common.StringNode>
+ */
+
+Clone ()
+
+/*
+   Function: Attribute
+ 
+   Получение значения атрибута по индексу.
+ 
+   Параметры:
+     index - индекс атрубита
+ 
+   Возвращает:
+     string
+ */
+
+Attribute (index)
+
+/*
+   Function: ReserveAttributes
+ 
+   Резервирование памяти под атрибуты.
+ 
+   Параметры:
+     count - количество резервируемых атрибутов
+ */
+
+ReserveAttributes (count)
+
+/*
+   Function: SetAttribute
+ 
+   Установка атрибута по индексу.
+ 
+   Параметры:
+     index - индекс атрибута
+     value - строковое значение атрибута
+ */
+
+SetAttribute (index, value)
+
+/*
+   Function: AddAttribute (value)
+ 
+   Добавление атрибута последним в массив атрибутов.
+ 
+   Параметры:
+     value - значение нового атрибута
+ 
+   Возвращает:
+     number
+ */
+
+AddAttribute (value)
+
+/*
+   Function: AddAttribute (index, value)
+ 
+   Добавление атрибута со значением value в положение index. Атрибуты с индексом index и больше сдвигаются.
+ 
+   Параметры:
+     index - индекс атрибута
+     value - строковое значение атрибута
+ */
+
+AddAttribute (index, value)
+
+/*
+   Function: RemoveAttribute
+ 
+   Удаление атрибута по индексу.
+ 
+   Параметры:
+     index - индекс атрибута
+ */
+
+RemoveAttribute (index)
+
+/*
+   Function: RemoveAllAttributes
+ 
+   Удаление всех атрибутов.
+ */
+
+RemoveAllAttributes ()
+
+/*
+   Function: Child
+ 
+   Получение дочернего узла по индексу.
+ 
+   Параметры:
+     index - индекс узла
+ 
+   Возвращает:
+     <Common.StringNode>
+ */
+
+Child (index)
+
+/*
+   Function: ReserveChildren
+ 
+   Резервирование памяти под count потомков.
+ 
+   Параметры:
+     count - количество потомков
+ */
+
+ReserveChildren (count)
+
+/*
+   Function: AddChild (child_node)
+ 
+   Добавление дочернего узла child_node последним в массив дочерних узлов.
+ 
+   Параметры:
+     child_node - узел <Common.StringNode>
+ */
+
+AddChild (child_node)
+
+/*
+   Function: AddChild (index, child_node)
+ 
+   Добавление дочернего узла child_node в положение index. Дочерние узлы с индексом index и больше сдвигаются.
+ 
+   Параметры:
+     index - индекс дочернего узла
+     child_node - узел <Common.StringNode>
+ */
+
+AddChild (index, child_node)
+
+/*
+   Function: RemoveChild
+ 
+   Удаление дочернего узла.
+ 
+   Параметры:
+     index - индекс дочернего узла
+ */
+RemoveChild (index)
+
+/*
+   Function: RemoveAllChildren
+ 
+   Удаление всех дочерних узлов.
+ */
+RemoveAllChildren ()
+
+/*
+   Function: LoadXml
+ 
+   Возвращает корневой узел загруженного из xml-файла дерева.
+ 
+   Параметры:
+     filename - имя загружаемого XML файла
+ */
+
+LoadXml (filename)
+
+/*
+   Function: SaveXml
+ 
+   Сохраняет дерево в xml-файл.
+ 
+   Параметры:
+     filename - имя сохраняемого XML файла
+ */
+
+SaveXml (filename)
+
+/*
+   Function: Find (name)
+ 
+   Поиск узла с именем name в узле start_node и его дочерних узлах.
+ 
+   Параметры:
+     name - имя узла
+ 
+   Возвращает:
+     <Common.StringNode> в случае, если узел найден, либо null если узел с указанным именем отсутствует.
+ */
+
+Find (name)
+
+/*
+   Function: Find (name, value)
+ 
+   Поиск узла с именем name и значением нулевого атрибута value в дочерних узлах.
+ 
+   Параметры:
+     name - имя узла
+     value - значение нулевого атрибута узла для поиска
+ 
+   Возвращает:
+     <Common.StringNode> в случае, если узел найден, либо null если узел с указанным именем отсутствует.
+ */
+
+Find (name, value)
+
+/*
+   Function: Get (name)
+ 
+   Возвращение значения нулевого атрибута узла с именем name.
+ 
+   Параметры:
+     name - имя узла
+ 
+   Возвращает:
+     Если у узла есть потомок с именем name и у него есть нулевой атрибут, возвращается его нулевой атрибут. Иначе выбрасывается исключение.
+ */
+
+Get (name)
+
+/*
+   Function: Get (name,default_value)
+ 
+   Возвращение значения нулевого атрибута узла с именем name.
+ 
+   Параметры:
+     name - имя узла
+ 
+   Возвращает:
+     Если у узла есть потомок с именем name и у него есть нулевой атрибут, возвращается его нулевой атрибут. Иначе возвращается default_value.
+ */
+
+Get (name, default_value)
+
+/*
+   Function: Set
+ 
+   Установка значения узла.
+ 
+   Параметры:
+     name - имя узла
+     value - значение узла
+ 
+   Возвращает:
+     Если у узла есть потомок с именем name и у него есть нулевой атрибут, то его нулевой атрибут устанавливается в значение value. Иначе происходит его создание.
+ */
+
+Set (name, value)
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Name
+ 
+   Имя узла.
+ 
+   Доступ:
+ 
+     Получение/установка.
+ */
+
+Name
+
+/*
+   Property: AttributesCount
+ 
+   Количество атрибутов.
+ 
+   Доступ:
+ 
+     Получение.
+ */
+
+AttributesCount
+
+/*
+   Property: AttributesCapacity
+ 
+   Размер зарезервированного под атрибуты места.
+ 
+   Примечание:
+     Перераспределение памяти не возникнет при добавлении новых атрибутов пока количество атрибутов меньше этого значения.
+ 
+   Доступ:
+ 
+     Получение.
+ */
+
+AttributesCapacity
+
+/*
+   Property: ChildrenCount
+ 
+   Количество дочерних узлов.
+ 
+   Доступ:
+ 
+     Получение.
+ */
+
+ChildrenCount
+
+/*
+   Property: ChildrenCapacity
+ 
+   Размер места, зарезервированного для дочерних узлов.
+ 
+   Примечание:
+     Перераспределение памяти не возникнет при добавлении новых потомков пока количество потомков меньше этого значения.
+ 
+   Доступ:
+ 
+     Получение.
+ */
+
+ChildrenCapacity
+
+/*
+   Group: Примеры
+ 
+ */
+
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function clone_test ()
+    local node1 = Common.StringNode.Create ()
+
+    node1:AddAttribute ("First attribute value")
+
+    local child = Common.StringNode.Create ()
+
+    child.Name = "Child Node"
+
+    node1:AddChild (child)
+
+    local node2 = node1:Clone ()
+
+    print ("Node 1 attributes сount: " .. tostring (node1.AttributesCount))
+    print ("Node 2 attributes сount: " .. tostring (node2.AttributesCount))
+    print ("Node 1 children count: " .. tostring (node1.ChildrenCount))
+    print ("Node 2 children count: " .. tostring (node2.ChildrenCount))
+
+    node1:RemoveAllAttributes ()
+    node1:RemoveAllChildren ()
+
+    print ("Node 1 attributes сount: " .. tostring (node1.AttributesCount))
+    print ("Node 2 attributes сount: " .. tostring (node2.AttributesCount))
+    print ("Node 1 children count: " .. tostring (node1.ChildrenCount))
+    print ("Node 2 children count: " .. tostring (node2.ChildrenCount))
+  end
+
+  function print_node (node, indent)
+    Utils.PrintIndent (indent)
+    print ("Node '" .. node.Name .. "'")
+    Utils.PrintIndent (indent)
+    print ("Attributes:")
+
+    for current_attribute = 0, node.AttributesCount - 1, 1 do
+      Utils.PrintIndent (indent)
+      print (current_attribute .. " = " .. node:Attribute (current_attribute))
+    end
+
+    Utils.PrintIndent (indent)
+    print ("End of attributes")
+    Utils.PrintIndent (indent)
+    print ("Children")
+
+    for current_child = 0, node.ChildrenCount - 1, 1 do
+      print_node (node:Child (current_child), indent + 4)
+    end
+
+    Utils.PrintIndent (indent)
+    print ("End of children")
+  end
+
+  function xml_test ()
+    local node = Common.StringNode.LoadXml ("data/string_tree.xml")
+    print_node (node, 0)
+    node:SaveXml ("/io/stdout")
+  end
+
+  function test ()
+    local node = Common.StringNode.Create ()
+
+    print ("Name: '" .. node.Name .. "'")
+    print ("Attributes сount: " .. node.AttributesCount)
+    print ("Children count: " .. node.ChildrenCount)
+    print ("Attributes capacity: " .. node.AttributesCapacity)
+    print ("Children capacity: " .. node.ChildrenCapacity)
+
+    node.Name = "Node"
+    node:ReserveAttributes (4)
+    node:ReserveChildren (4)
+    
+    print ("Added attribute " .. node:AddAttribute ("First attribute value"))
+    print ("Added attribute " .. node:AddAttribute ("Second attribute value"))
+    print ("Second attribute value is " .. node:Attribute (1))
+    print ("Attributes capacity: " .. node.AttributesCapacity)
+    print ("Children capacity: " .. node.ChildrenCapacity)
+
+    node:SetAttribute (1, "New second attribute value")
+
+    print ("Second attribute value is " .. node:Attribute (1))
+
+    local child = Common.StringNode.Create ()
+
+    child.Name = "Child Node"
+
+    node:AddChild (child)
+
+    print ("Name: '" .. node.Name .. "'")
+    print ("Attributes сount: " .. node.AttributesCount)
+    print ("Children count: " .. node.ChildrenCount)
+
+    print ("First child name is " .. node:Child (0).Name)
+
+    node:AddAttribute (0, "New first attribute value")
+
+    print ("Attributes сount: " .. node.AttributesCount)
+    print ("First attribute value is " .. node:Attribute (0))
+    print ("Second attribute value is " .. node:Attribute (1))
+
+    node:RemoveAttribute (1)
+
+    print ("Attributes сount: " .. node.AttributesCount)
+
+    node:RemoveAllAttributes ()
+
+    print ("Attributes сount: " .. node.AttributesCount)
+
+    local child2 = Common.StringNode.Create ()
+
+    child2.Name = "Child2 Node"
+
+    child2:AddAttribute ("child2 attribute0")
+
+    node:AddChild (0, child2)
+    child:AddChild (0, child2)
+
+    print ("First child name is " .. node:Child (0).Name)
+    print ("Children count: " .. node.ChildrenCount)
+
+    local find_node = node:Find ("Child2 Node")
+
+    if (not (find_node)) then
+      print ("Node 'Child2 Node' not found")
+    else
+      print ("Node 'Child2 Node' found")
+    end
+
+    find_node = node:Find ("Child22 Node")
+
+    if (not (find_node)) then
+      print ("Node 'Child22 Node' not found")
+    else
+      print ("Node 'Child22 Node' found")
+    end
+
+    print ("Node.Child2 Node = " .. node:Get ("Child Node.Child2 Node"))
+    print ("Node.Child2 Node = " .. node:Get ("Child Node.Child22 Node", "default value"))
+
+    node:Set ("Child Node.Child2 Node", "new child2 attribute0")
+
+    print ("Child2 attribute0 = " .. child2:Attribute (0))
+
+    node:RemoveChild (1)
+
+    print ("Children count: " .. node.ChildrenCount)
+
+    node:RemoveAllChildren ()
+
+    print ("Children count: " .. node.ChildrenCount)
+
+    clone_test ()
+
+    xml_test ()
+  end
+  (end code)
+ */
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Results of common_string_tree_test:
+  Test library:
+  Name: ''
+  Attributes сount: 0
+  Children count: 0
+  Attributes capacity: 0
+  Children capacity: 0
+  Added attribute 0
+  Added attribute 1
+  Second attribute value is Second attribute value
+  Attributes capacity: 4
+  Children capacity: 4
+  Second attribute value is New second attribute value
+  Name: 'Node'
+  Attributes сount: 2
+  Children count: 1
+  First child name is Child Node
+  Attributes сount: 3
+  First attribute value is New first attribute value
+  Second attribute value is First attribute value
+  Attributes сount: 2
+  Attributes сount: 0
+  First child name is Child2 Node
+  Children count: 2
+  Node 'Child2 Node' found
+  Node 'Child22 Node' not found
+  Node.Child2 Node = child2 attribute0
+  Node.Child2 Node = default value
+  Child2 attribute0 = new child2 attribute0
+  Children count: 1
+  Children count: 0
+  Node 1 attributes сount: 1
+  Node 2 attributes сount: 1
+  Node 1 children count: 1
+  Node 2 children count: 1
+  Node 1 attributes сount: 0
+  Node 2 attributes сount: 1
+  Node 1 children count: 0
+  Node 2 children count: 1
+  Node 'RootNode'
+  Attributes:
+  End of attributes
+  Children
+      Node 'Name'
+      Attributes:
+      0 = Root Node Name
+      End of attributes
+      Children
+      End of children
+      Node 'Property1'
+      Attributes:
+      0 = Property1
+      End of attributes
+      Children
+      End of children
+      Node 'ChildLevelOne'
+      Attributes:
+      End of attributes
+      Children
+          Node 'Array'
+          Attributes:
+          0 = 0
+          1 = 1
+          2 = 2
+          3 = 3
+          4 = 4
+          5 = 5
+          End of attributes
+          Children
+          End of children
+          Node 'ChildLevelTwo'
+          Attributes:
+          0 = Attribute1
+          1 = Attribute2
+          2 = Attribute3
+          End of attributes
+          Children
+          End of children
+      End of children
+  End of children
+  <?xml version="1.0" encoding="utf-8"?>
+  <RootNode Name="Root Node Name" Property1="Property1">
+    <ChildLevelOne>
+      <Array>
+        0 1 2 3 4 5
+      </Array>
+      <ChildLevelTwo>
+        Attribute1 Attribute2 Attribute3
+      </ChildLevelTwo>
+    </ChildLevelOne>
+  </RootNode>
+  (end code)
+
+ */

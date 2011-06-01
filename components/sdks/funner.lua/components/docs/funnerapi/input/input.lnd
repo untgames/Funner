@@ -1,0 +1,47 @@
+/*
+   Class: Input
+ 
+   Система ввода.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: CreateEventHandler
+ 
+   Создание обработчика событий ввода.
+
+   Параметры:
+     function_name - имя обработчика событий
+
+   Возвращает:
+     <Common.Connection>  
+ */  
+CreateEventHandler (string function_name)
+  
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function input_handler (event)
+  end
+
+  function test ()
+    local handler = Input.CreateEventHandler ("input_handler")
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  (end code)
+*/

@@ -1,0 +1,79 @@
+/*
+   Class: Engine.Screens
+ 
+   Экраны.
+ */
+
+/*
+   Group: Функции
+ */
+
+/*
+   Function: Register
+ 
+   Регистрация новой привязки с указанием имени.
+
+   Параметры:
+     name       - имя привязки
+     attachment - связываемый элемент
+ */
+Register (string name, Render.Screen attachment)
+
+/*
+   Function: Unregister
+ 
+   Удаление привязки с укзаанием имени.
+
+   Параметры:
+     name - имя привязки
+ */
+Unregister (string name)
+
+/*
+   Function: IsPresent
+ 
+   Проверка, зарегестрированна ли привязка с указанным именем.
+
+   Параметры:
+     name - имя привязки
+ */
+IsPresent (string name)
+
+/*
+   Function: Get
+ 
+   Получение привязки, зарегестрированной под указанным именем.
+   Если такой привязки нет, произойдет выброс исключения.
+
+   Параметры:
+     name - имя привязки
+ */
+Get (string name)
+
+/*
+   Function: Find
+ 
+   Поиск привязки, зарегестрированной под указанным именем.
+   Если такой привязки нет, возвращается 0.
+
+   Параметры:
+     name - имя привязки
+ */
+Find (string name)
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  (end code)

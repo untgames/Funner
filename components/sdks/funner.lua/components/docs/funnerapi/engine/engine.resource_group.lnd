@@ -1,0 +1,208 @@
+/*
+   Class: Engine.ResourceManager.Group
+ 
+   Группа ресурсов. Предназначена для формирования списка ресурсов.
+ */
+
+/*
+   Group: Функции
+ */
+
+/*
+   Function: Create
+ 
+   Создание пустой группы.
+ */
+Create ()
+
+/*
+   Function: Create
+ 
+   Создание группы по маске имён ресурсов.
+
+   Параметры:
+     file_mask - маска имен ресурсов
+ */
+Create (string file_mask)
+
+/*
+   Function: Item
+ 
+   Получение имени ресурса по индексу.
+
+   Параметры:
+     index - индекс
+
+   Возвращает:
+     string
+ */
+Item (number index)
+
+/*
+   Function: Clear
+ 
+   Очистка группы.
+ */
+Clear ()
+
+/*
+   Function: Add
+ 
+   Добавление имени ресурса в группу.
+
+   Параметры:
+     file_name - имя ресурса
+ */
+Add (string file_name)
+
+/*
+   Function: Add
+ 
+   Добавление в группу всех ресурсов другой группы.
+
+   Параметры:
+     group - группа ресурсов
+ */
+Add (Engine.ResourceManager.Group group)
+
+/*
+   Function: Remove
+ 
+   Удаление имени ресурса из группы.
+
+   Параметры:
+     file_name - имя ресурса
+ */
+Remove (string file_name)
+
+/*
+   Function: Remove
+ 
+   Удаление из группы всех ресурсов, корые имеют одинаковые имена с ресурсами из другой группы.
+
+   Параметры:
+     group - группа ресурсов
+ */
+Remove (Engine.ResourceManager.Group group)
+
+/*
+   Function: AddFileGroup
+ 
+   Добавление ресурсов по маске.
+
+   Параметры:
+     file_mask - маска имен ресурсов
+ */
+AddFileGroup (string file_mask)
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Empty
+ 
+   Проверка на пустоту.
+ 
+   Доступ:
+     Получение.
+ */
+Empty
+
+/*
+   Property: Size
+ 
+   Получение количества ресурсов.
+ 
+   Доступ:
+     Получение.
+ */
+Size
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test () 
+    local binding1 = Engine.ResourceManager.CreateFileGroupBinding ("*")
+    
+    binding1:Prefetch ()
+    binding1:Load ()
+    binding1:Unload ()
+    
+    local group1 = Engine.ResourceManager.Group.Create ()
+    
+    print ("Is group empty = " .. tostring (group1.Empty))
+    print ("Group size = " .. tostring (group1.Size))
+    
+    group1:Add ("data/media_rms.lua")
+    
+    print ("Is group empty = " .. tostring (group1.Empty))
+    print ("Group size = " .. tostring (group1.Size))
+
+    local group2 = Engine.ResourceManager.Group.Create ("data/bv.*")
+
+    print ("Is group2 empty = " .. tostring (group2.Empty))
+    print ("Group2 size = " .. tostring (group2.Size))
+
+    group1:Add (group2)
+    
+    print ("Is group empty = " .. tostring (group1.Empty))
+    print ("Group size = " .. tostring (group1.Size))
+    print ("Item 1 = " .. group1:Item (1))
+
+    group1:Remove (group2)
+
+    print ("Is group empty = " .. tostring (group1.Empty))
+    print ("Group size = " .. tostring (group1.Size))
+
+    group1:Remove ("data/media_rms.lua")
+
+    print ("Is group empty = " .. tostring (group1.Empty))
+    print ("Group size = " .. tostring (group1.Size))
+
+    group1:AddFileGroup ("data/media_rms.lua")
+
+    print ("Is group empty = " .. tostring (group1.Empty))
+    print ("Group size = " .. tostring (group1.Size))
+
+    group1:Clear ()
+    
+    print ("Is group empty = " .. tostring (group1.Empty))
+    print ("Group size = " .. tostring (group1.Size))
+
+    local binding2 = Engine.ResourceManager.CreateBinding (group1)
+    
+    Engine.ResourceManager.FlushUnusedResources ()
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Is group empty = true
+  Group size = 0
+  Is group empty = false
+  Group size = 1
+  Is group2 empty = false
+  Group2 size = 1
+  Is group empty = false
+  Group size = 2
+  Item 1 = data/bv.lua
+  Is group empty = false
+  Group size = 1
+  Is group empty = true
+  Group size = 0
+  Is group empty = false
+  Group size = 1
+  Is group empty = true
+  Group size = 0
+  (end code)
+*/

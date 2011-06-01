@@ -1,0 +1,237 @@
+Format: 1.5
+
+
+# You can add a title and sub-title to your menu like this:
+Title: Funner API
+SubTitle: Существующие расширения Lua для Funner Engine
+
+# You can add a footer to your documentation like this:
+# Footer: [text]
+# If you want to add a copyright notice, this would be the place to do it.
+
+# You can add a timestamp to your documentation like one of these:
+# Timestamp: Generated on month day, year
+# Timestamp: Updated mm/dd/yyyy
+# Timestamp: Last updated mon day
+#
+#   m     - One or two digit month.  January is "1"
+#   mm    - Always two digit month.  January is "01"
+#   mon   - Short month word.  January is "Jan"
+#   month - Long month word.  January is "January"
+#   d     - One or two digit day.  1 is "1"
+#   dd    - Always two digit day.  1 is "01"
+#   day   - Day with letter extension.  1 is "1st"
+#   yy    - Two digit year.  2006 is "06"
+#   yyyy  - Four digit year.  2006 is "2006"
+#   year  - Four digit year.  2006 is "2006"
+
+
+# --------------------------------------------------------------------------
+# 
+# Cut and paste the lines below to change the order in which your files
+# appear on the menu.  Don't worry about adding or removing files, Natural
+# Docs will take care of that.
+# 
+# You can further organize the menu by grouping the entries.  Add a
+# "Group: [name] {" line to start a group, and add a "}" to end it.
+# 
+# You can add text and web links to the menu by adding "Text: [text]" and
+# "Link: [name] ([URL])" lines, respectively.
+# 
+# The formatting and comments are auto-generated, so don't worry about
+# neatness when editing the file.  Natural Docs will clean it up the next
+# time it is run.  When working with groups, just deal with the braces and
+# forget about the indentation and comments.
+# 
+# --------------------------------------------------------------------------
+
+
+File: Funner Lua API  (funnerapi.txt)
+
+Group: Библиотека общего назначения  {
+
+   File: File  (common/common.file.lnd)
+   File: StringNode  (common/common.string_node.lnd)
+   File: Connection  (common/common.connection.lnd)
+   File: ActionQueue  (common/common.action_queue.lnd)
+   File: Timer  (common/common.timer.lnd)
+   File: Callback  (common/common.callback.txt)
+   }  # Group: Библиотека общего назначения
+
+Group: Ограничивающие объёмы  {
+
+   File: AxisAlignedBox  (no auto-title, bound_volumes/bound_volumes.axis_aligned_box.lnd)
+
+   Group: Перечисления  {
+
+      File: Corner  (no auto-title, bound_volumes/bound_volumes.corner.lnd)
+      }  # Group: Перечисления
+
+   }  # Group: Ограничивающие объёмы
+
+Group: Математическая библиотека  {
+
+   Group: Векторы  {
+
+      File: Vector2  (math/math.vector2.lnd)
+      File: Vector3  (math/math.vector3.lnd)
+      File: Vector4  (math/math.vector4.lnd)
+      }  # Group: Векторы
+
+   Group: Матрицы  {
+
+      File: Matrix2  (math/math.matrix2.lnd)
+      File: Matrix3  (math/math.matrix3.lnd)
+      File: Matrix4  (math/math.matrix4.lnd)
+      }  # Group: Матрицы
+
+   Group: Кватернионы  {
+
+      File: Quaternion  (math/math.quaternion.lnd)
+      }  # Group: Кватернионы
+
+   }  # Group: Математическая библиотека
+
+Group: Граф сцены  {
+
+   Group: Сцена  {
+
+      File: Scene  (scene/scene.scene.lnd)
+      }  # Group: Сцена
+
+   Group: Узел  {
+
+      File: Node  (scene/scene.node.lnd)
+      }  # Group: Узел
+
+   Group: Массив узлов  {
+
+      File: NodeArray  (scene/scene.node_array.lnd)
+      }  # Group: Массив узлов
+
+   Group: Сущность  {
+
+      File: Entity  (scene/scene.entity.lnd)
+
+      Group: Источник света  {
+
+         File: Light  (scene/scene.light.lnd)
+         File: DirectLight  (scene/scene.direct_light.lnd)
+         File: PointLight  (scene/scene.point_light.lnd)
+         File: SpotLight  (scene/scene.spot_light.lnd)
+         }  # Group: Источник света
+
+      Group: Спрайт  {
+
+         File: Sprite  (scene/scene.sprite.lnd)
+         }  # Group: Спрайт
+
+      Group: Линия текста  {
+
+         File: TextLine  (scene/scene.text_line.lnd)
+         }  # Group: Линия текста
+
+      Group: Отображаемая модель  {
+
+         File: VisualModel  (scene/scene.visual_model.lnd)
+         }  # Group: Отображаемая модель
+
+      Group: Вспомогательные объекты  {
+
+         File: Box  (no auto-title, scene/scene.helpers.box.lnd)
+         }  # Group: Вспомогательные объекты
+
+      Group: Камеры  {
+
+         File: OrthoCamera  (scene/scene.ortho_camera.lnd)
+         File: PerspectiveCamera  (scene/scene.perspective_camera.lnd)
+         }  # Group: Камеры
+
+      Group: Звук  {
+
+         File: Listener  (scene/scene.listener.lnd)
+         File: SoundEmitter  (scene/scene.sound_emitter.lnd)
+         }  # Group: Звук
+
+      }  # Group: Сущность
+
+   Group: Перечисления  {
+
+      File: NodeArrayLinkMode  (scene/scene.node_array_link_mode.lnd)
+      File: NodeBindMode  (scene/scene.node_bind_mode.lnd)
+      File: NodeEvent  (scene/scene.node_event.lnd)
+      File: NodeOrt  (scene/scene.node_ort.lnd)
+      File: NodeSearchMode  (scene/scene.node_search_mode.lnd)
+      File: NodeSubTreeEvent  (scene/scene.node_sub_tree_event.lnd)
+      File: NodeTransformSpace  (scene/scene.node_transform_space.lnd)
+      File: TextLineAlignment  (scene/scene.text_line_alignment.lnd)
+      }  # Group: Перечисления
+
+   }  # Group: Граф сцены
+
+Group: Рендер  {
+
+   File: Rect  (render/render.rect.lnd)
+   File: Screen  (render/render.screen.lnd)
+   File: Viewport  (render/render.viewport.lnd)
+   }  # Group: Рендер
+
+Group: Системная библиотека  {
+
+   File: Application  (system/system.application.lnd)
+   File: ApplicationEvent  (system/system.application_event.lnd)
+   }  # Group: Системная библиотека
+
+Group: Движок  {
+
+   Group: Точки привязки  {
+
+      File: Screens  (engine/engine.screens.lnd)
+      File: Listeners  (engine/engine.listeners.lnd)
+      File: InputEventHandlers  (engine/engine.input_event_handlers.lnd)
+      File: Cursors  (engine/engine.cursors.lnd)
+      File: ResourceManagers  (engine/engine.resource_managers.lnd)
+      }  # Group: Точки привязки
+
+   Group: Управление ресурсами  {
+
+      File: ResourceManager  (engine/engine.resource_manager.lnd)
+      File: ResourceManager.Binding  (engine/engine.resource_binding.lnd)
+      File: ResourceManager.Group  (engine/engine.resource_group.lnd)
+      }  # Group: Управление ресурсами
+
+   Group: Менеджер подсистем  {
+
+      File: SubsystemManager  (engine/engine.subsystem_manager.lnd)
+      }  # Group: Менеджер подсистем
+
+   }  # Group: Движок
+
+Group: Система ввода  {
+
+   File: Input  (input/input.lnd)
+   File: Основные события системы ввода  (input/input.events.txt)
+   }  # Group: Система ввода
+
+Group: Проигрывание медиа  {
+
+   File: MediaPlayer  (media/media.media_player.lnd)
+   File: Playlist  (media/media.playlist.lnd)
+
+   Group: Перечисления  {
+
+      File: MediaPlayerEvent  (media/media.media_player_event.lnd)
+      File: MediaPlayerRepeatMode  (media/media.media_player_repeat_mode.lnd)
+      File: MediaPlayerState  (media/media.media_player_state.lnd)
+      }  # Group: Перечисления
+
+   }  # Group: Проигрывание медиа
+
+Group: Index  {
+
+   Index: Everything
+   Class Index: Classes
+   Function Index: Functions
+   Property Index: Properties
+   }  # Group: Index
+

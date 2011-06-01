@@ -1,0 +1,121 @@
+/*
+   Class: Engine.SubsystemManager
+ 
+   Менеджер подсистем. Предназначен для запуска/остановки/перезапуска подсистем.
+ */
+
+/*
+   Group: Функции
+ */
+
+/*
+   Function: Start
+ 
+   Запуск подсистем из файла по маске.
+
+   Параметры:
+     config_file_name    - имя файла конфигурации
+     subsystem_name_mask - маска имени подсистемы
+ */
+Start (string config_file_name, string subsystem_name_mask) 
+
+/*
+   Function: Restart
+ 
+   Перезапуск подсистем по маске с чтением конфигурации из файла.
+
+   Параметры:
+     config_file_name    - имя файла конфигурации
+     subsystem_name_mask - маска имени подсистемы
+ */
+Restart (string config_file_name, string subsystem_name_mask) 
+
+/*
+   Function: Remove
+ 
+   Остановка подсистем по маске.
+
+   Параметры:
+     subsystem_name_mask - маска имени подсистемы
+ */
+Remove (string subsystem_name_mask) 
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  local CONFIG_FILE_NAME = "data/config.xml"
+
+  function test ()
+    local subsystem_manager = Engine.SubsystemManager
+    
+    print ("Removing subsystems of group 1")
+    subsystem_manager:Remove ("Group1*")
+    print ("Subsystems removed")
+    
+    print ("Restarting subsystems of group2")
+    subsystem_manager:Restart (CONFIG_FILE_NAME, "Group2*")
+    print ("Subsystems restarted")
+    
+    print ("Starting subsystems of group1")
+    subsystem_manager:Start (CONFIG_FILE_NAME, "Group1*")
+    print ("Subsystems restarted")
+
+    print ("Restarting subsystems of group1 and group2")
+    subsystem_manager:Restart (CONFIG_FILE_NAME, "Group*")
+    print ("Subsystems restarted")  
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Results of engine_subsystem_manager_test:
+  Subsystem1::Subsystem1
+  Subsystem2::Subsystem2
+  Subsystem3::Subsystem3
+  Removing subsystems of group 1
+  Subsystem3::~Subsystem3
+  Subsystem1::~Subsystem1
+  Subsystems removed
+  Restarting subsystems of group2
+  Subsystem2::~Subsystem2
+  Subsystem2::Subsystem2
+  Subsystems restarted
+  Starting subsystems of group1
+  Subsystem1::Subsystem1
+  Subsystem3::Subsystem3
+  Subsystems restarted
+  Restarting subsystems of group1 and group2
+  Subsystem3::~Subsystem3
+  Subsystem1::~Subsystem1
+  Subsystem2::~Subsystem2
+  Subsystem1::Subsystem1
+  Subsystem2::Subsystem2
+  Subsystem3::Subsystem3
+  Subsystems restarted
+  Subsystem3::~Subsystem3
+  Subsystem2::~Subsystem2
+  Subsystem1::~Subsystem1
+  (end code)
+*/
+
+/*
+  Topic: Файл config.xml
+ 
+  (start code) 
+   <?xml version="1.0" encoding = "windows-1251"?>
+   <Configuration>
+     <Group1_Subsystem1/>
+     <Group2_Subsystem1/>
+     <Group1_Subsystem2/>
+     <Shell Interpreter="lua" Sources="data/engine_subsystem_manager.lua" Libraries="Engine" Execute="test()"/>
+   </Configuration>
+  (end code)
+*/

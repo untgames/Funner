@@ -1,0 +1,118 @@
+/*
+   Class: Scene.PerspectiveCamera
+ 
+   Перспективная камера. Располагается в какой-либо сцене и служит связующим звеном между сценой и областью вывода.
+     
+ */
+
+/*
+   Function: Create
+ 
+   Создание перспективной камеры.
+
+   Возвращает:
+     <Scene.PerspectiveCamera>
+ */
+Create ()
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: FovX
+ 
+   Угол обзора по горизонтали.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+FovX
+
+/*
+   Property: FovY
+ 
+   Угол обзора по вертикали.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+FovY
+
+/*
+   Property: ZNear
+ 
+   Ближняя плоскость отсечения.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+ZNear
+
+/*
+   Property: ZFar
+ 
+   Ближняя плоскость отсечения.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+ZFar
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test_perspective_camera ()
+    print ("Perspective camera test")
+
+    local camera1 = Scene.PerspectiveCamera.Create ()
+
+    print ("FovX  = " .. camera1.FovX)
+    print ("FovY  = " .. camera1.FovY)
+    print ("ZNear = " .. camera1.ZNear)
+    print ("ZFar  = " .. camera1.ZFar)
+    camera1.FovX  = 36
+    camera1.FovY  = 20
+    camera1.ZNear = 10
+    camera1.ZFar  = 1000
+    print ("FovX = " .. camera1.FovX)
+    print ("FovY  = " .. camera1.FovY)
+    print ("ZNear = " .. camera1.ZNear)
+    print ("ZFar  = " .. camera1.ZFar)
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Perspective camera test
+  FovX  = 1
+  FovY  = 1
+  ZNear = 0
+  ZFar  = 1
+  FovX = 36
+  FovY  = 20
+  ZNear = 10
+  ZFar  = 1000
+  (end code)
+*/

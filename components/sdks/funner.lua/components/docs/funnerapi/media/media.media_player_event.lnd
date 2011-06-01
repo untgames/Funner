@@ -1,0 +1,101 @@
+/*
+   Class: Media.MediaPlayerEvent
+ 
+   Возможные события медиапроигрывателя.
+ */
+
+/*
+   Group: Значения
+ 
+ */
+
+/*
+   Property: OnChangeName
+ 
+   Изменено имя проигрывателя.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+OnChangeName
+
+/*
+   Property: OnChangeTarget
+ 
+   Изменена цель проигрывания.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+OnChangeTarget
+
+/*
+   Property: OnChangePlaylist
+ 
+   Изменён список воспроизведения.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+OnChangePlaylist
+
+/*
+   Property: OnChangeTrack
+ 
+   Переключен трек.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+OnChangeTrack
+
+/*
+   Property: OnChangePlayback
+ 
+   Изменено состояние проигрывателя (play / pause / stop).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+OnChangePlayback
+
+/*
+   Property: OnChangeVolume
+ 
+   Изменена громкость.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+OnChangeVolume
+
+/*
+   Property: OnChangeRepeatMode
+ 
+   Изменен режим повтора песен.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+OnChangeRepeatMode

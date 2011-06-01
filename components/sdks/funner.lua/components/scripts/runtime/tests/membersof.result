@@ -1,0 +1,8 @@
+Results of membersof_test:
+Members of ClassB instance:
+  Bar - function
+  Baz - function
+  set_A - function
+  get_A - function
+  Create - function
+  Foo - function

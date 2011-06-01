@@ -1,0 +1,146 @@
+/*
+   Class: Common.File
+ 
+   Используется для работы с файлами.
+ */
+
+/*
+   Group: Функции
+ */
+
+/*
+   Function: LoadString
+ 
+   Загрузка содержимого файла в виде строки.
+   Метод принимает строку, содержащую относительный путь к файлу, а возвращает строку с содержимым файла.
+  
+   Параметры:
+ 
+   file_name - имя загружаемого файла
+ 
+   Возвращает:
+     string
+ */
+LoadString (file_name)
+
+/*
+   Function: LoadStringFilterOut
+ 
+   Загрузка строк с фильтрацией.
+   При загрузке строк можно указать символы, которые будут выброшены после загрузки из файла. Например, можно удалить символы перевода конца строки.
+  
+   Параметры:
+ 
+   file_name - имя загружаемого файла
+   filter    - cтрока с фильтруемыми символами
+ 
+   Возвращает:
+     string
+ */
+LoadStringFilterOut (file_name, filter)
+
+/*
+   Function: IsFileExist
+ 
+   Проверка существования файла.
+   Для проверки существования файла необходимо использовать метод *Common.File.!IsFileExist (string file_name)*.
+  
+   Параметры:
+ 
+   file_name - путь к файлу
+ 
+   Возвращает:
+     bool
+ */
+IsFileExist (string file_name)
+  
+/*
+   Group: Примеры
+ */
+
+/*
+  Topic: Пример LoadString
+ 
+   (start code) 
+   function test_files()
+     local data = Common.File.LoadString ('data/text_file.txt')
+ 
+     print ("File data: '" .. data .. "'")
+   end
+ 
+   function test ()
+     test_files ()
+   end
+   (end code)
+ */
+
+/*
+  Topic: Результат
+ 
+   (start code) 
+   File data: 'Hello world!'
+   (end)
+ */
+
+/*
+  Topic: Пример LoadStringFilterOut
+ 
+   (start code) 
+   function test ()
+     local data = Common.File.LoadStringFilterOut ("data/text_file1.txt", "\n\r")
+ 
+     print ("Filtered file data: '" .. data .. "'")
+   end
+   (end code)
+ */
+
+/*
+  Topic: Результат
+ 
+   (start code) 
+   Содержимое файла data/text_file1.txt:
+   (start code)
+   Hello world!
+   Hello world!
+   Hello world!
+ 
+   (end)
+ 
+   Результат:
+ 
+   (start code)
+   Filtered file data: 'Hello world!Hello world!Hello world!'
+   (end)
+ */
+
+/*
+  Topic: Пример IsFileExist
+ 
+   (start code) 
+   local EXISTING_FILE     = "data/text_file.txt" 
+   local NOT_EXISTING_FILE = "data/not_existing_file.txt" 
+ 
+   function test_files()
+     if Common.File.IsFileExist (EXISTING_FILE) then
+       print ("File '" .. EXISTING_FILE .. "' exist")
+     else
+       print ("File '" .. EXISTING_FILE .. "' not exist")
+     end
+     
+     if Common.File.IsFileExist (NOT_EXISTING_FILE) then
+       print ("File '" .. NOT_EXISTING_FILE .. "' exist")
+     else
+       print ("File '" .. NOT_EXISTING_FILE .. "' not exist")
+     end
+   end
+   (end)
+ */
+
+/*
+  Topic: Результат
+ 
+   (start code) 
+   File 'data/text_file.txt' exist
+   File 'data/not_existing_file.txt' not exist
+   (end)
+ */

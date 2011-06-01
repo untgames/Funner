@@ -1,0 +1,102 @@
+/*
+   Class: Scene.Helpers.Box
+ 
+   Вспомогательный параллелепиппед.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание параллелепипеда.
+
+   Возвращает:
+     <Scene.Helpers.Box>
+ */
+Create ()
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: BoundBox
+ 
+   Ограничивающий параллелепиппед.
+
+   Тип:
+     <BoundVolumes.AxisAlignedBox>
+ 
+   Доступ:
+     Получение/установка.
+ */
+BoundBox
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function print_intersections (entity)
+    local intersections = entity:GetIntersections ()
+    
+    print (entity.Name .. " has " .. tostring (intersections.Size) .. " intersections:")
+    
+    for i=0,intersections.Size-1,1 do
+      print ("  " .. intersections:Item (i).Name)
+    end
+  end
+
+  function test_intersections ()
+    print ("Intersections test")
+    
+    local scene   = Scene.Scene.Create ()
+    local entity1 = Scene.Helpers.Box.Create ()
+    local entity2 = Scene.Helpers.Box.Create ()
+    local entity3 = Scene.Helpers.Box.Create ()
+
+    entity1.Name = "entity1"
+    entity2.Name = "entity2"
+    entity3.Name = "entity3"
+    
+    local bb = AABB (-1, -1, -1, 1, 1, 1)
+
+    entity1.BoundBox = AABB (-1, -1, -1, 1, 1, 1)
+    entity2.BoundBox = AABB (0.1, 0.1, -1, 1, 1, 1)
+    entity3.BoundBox = AABB (-1, -1, -1, -0, -0.1, 1)  
+
+    entity1:BindToScene (scene)
+    entity2:BindToScene (scene)
+    entity3:BindToScene (scene)
+
+    print_intersections (entity1)
+    print_intersections (entity2)
+    print_intersections (entity3)
+  end
+
+  test_intersections ()
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Intersections test
+  entity1 has 2 intersections:
+    entity2
+    entity3
+  entity2 has 1 intersections:
+    entity1
+  entity3 has 1 intersections:
+    entity1
+  (end code)
+*/

@@ -1,0 +1,120 @@
+/*
+   Class: System.Application
+ 
+   Управление приложением.
+ */
+
+/*
+   Group: Функции
+ */
+
+/*
+   Function: Exit
+ 
+   Завершение приложения с возвращением кода состояния.
+  
+   Параметры:
+ 
+     code - код состояния
+ */
+Exit (number code)
+
+/*
+   Function: Sleep
+ 
+   Приостановка выполнения приложения.
+  
+   Параметры:
+ 
+     time - пауза в миллисекундах
+ */
+Sleep (number time)
+
+/*
+   Function: CreateEventHandler
+ 
+   Создание обработчика событий приложения.
+  
+   Параметры:
+ 
+     function_name - имя функции lua, которая будет вызвана в случае наступления событий приложения. В функцию не передаются параметры.
+ */
+CreateEventHandler (function_name)
+
+/*
+   Function: RegisterEventHandler
+ 
+   Регистрация обработчика событий приложения.
+  
+   Параметры:
+ 
+     event   - идентификатор событий приложения (см. <System.ApplicationEvent>)
+     handler - результат работы функции CreateEventHandler
+
+   Возвращает:
+     <Common.Connection>
+ */
+RegisterEventHandler (System.ApplicationEvent event, Common.Connection handler)
+
+/*
+   Group: Примеры
+ */
+
+/*
+  Topic: Пример кода
+ 
+   (start code) 
+    count = 0
+
+    function idle1 ()
+      print ("idle1")
+
+      count = count + 1  
+
+      if count == 3 then
+        print ("connection blocked")  
+        connection:Block ()
+      end
+      
+      if count == 4 then
+        print ("exit")
+        System.Application.Exit (0)
+      end
+    end
+
+    function idle2 ()
+      print ("idle1: blocked=" .. tostring (connection.Blocked))
+
+      if connection.Blocked then
+        print ("connection unblocked")
+        connection:Unblock ()
+      end
+    end
+
+    connection = System.Application.RegisterEventHandler (System.ApplicationEvent.OnIdle, 
+                                                          System.Application.CreateEventHandler ("idle1"))
+
+    System.Application.RegisterEventHandler (System.ApplicationEvent.OnIdle, 
+                                             System.Application.CreateEventHandler ("idle2")) 
+   (end code)
+ */
+
+/*
+  Topic: Результат
+ 
+   (start code) 
+   Results of syslib_test:
+   Test library:
+   idle1
+   idle2: blocked=false
+   idle1
+   idle2: blocked=false
+   idle1
+   connection blocked
+   idle2: blocked=true
+   connection unblocked
+   idle1
+   exit
+   idle2: blocked=false
+   (end code)
+ */

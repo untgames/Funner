@@ -1,0 +1,260 @@
+/*
+   Class: Scene.Entity
+ 
+   Сущность сцены.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: SetWireColor
+ 
+   Установка цвета проволочного представления объекта.
+
+   Параметры:
+     r - red-компонента
+     g - green-компонента
+     b - blue-компонента
+ */
+SetWireColor (number r, number g, number b) 
+
+/*
+   Function: GetIntersections
+ 
+   Возвращает массив объектов, которые пересекаются с данным entity.
+
+   Возвращает:
+     <Scene.NodeArray>
+ */
+GetIntersections ()
+
+/*
+   Function: GetIntersections
+ 
+   Аналогична указанной выше функции, но результат возвращает через параметр array (массив перед заполнением очищается).
+
+   Параметры:
+     array - массив узлов
+ */
+GetIntersections (Scene.NodeArray array)
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: WireColor
+ 
+   Цвет проволочного представления объекта (компоненты вектора лежат в диапазоне от 0 до 1).
+
+   Тип:
+     <Math.Vector3>
+ 
+   Доступ:
+     Получение/установка.
+ */
+WireColor
+
+/*
+   Property: BoundBox
+ 
+   Ограничивающий объём узла в локальной системе координат.
+ 
+   Доступ:
+     Получение.
+ */
+BoundBox
+
+/*
+   Property: WorldBoundBox
+ 
+   Ограничивающий объём узла в мировой системе координат.
+ 
+   Доступ:
+     Получение.
+ */
+WorldBoundBox
+
+/*
+   Property: InfiniteBounds
+ 
+   Проверка являются ли ограничивающие объёмы узла бесконечными.
+ 
+   Доступ:
+     Получение.
+ */
+InfiniteBounds
+
+/*
+   Property: ChildrenBoundBox
+ 
+   Ограничивающий объём потомков всех уровней в локальной системе координат узла.
+ 
+   Доступ:
+     Получение.
+ */
+ChildrenBoundBox
+
+/*
+   Property: FullBoundBox
+ 
+   Полный ограничивающий объём узла с потомками в локальной системе координат узла.
+ 
+   Доступ:
+     Получение.
+ */
+FullBoundBox
+
+/*
+   Property: WorldChildrenBoundBox
+ 
+   Ограничивающий объём потомков всех уровней в мировой системе координат.
+ 
+   Доступ:
+     Получение.
+ */
+WorldChildrenBoundBox
+
+/*
+   Property: WorldFullBoundBox
+ 
+   Полный ограничивающий объём узла с потомками в мировой системе координат.
+ 
+   Доступ:
+     Получение.
+ */
+WorldFullBoundBox
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test_entity ()
+    print ("Entity test")
+
+    local aabox1 = AABB ()
+    local sound_emitter1 = Scene.SoundEmitter.Create ("sound.snddecl")
+
+    print ("IsInfiniteBounds = " .. tostring (sound_emitter1.InfiniteBounds))
+    print ("WireColor = " .. tostring (sound_emitter1.WireColor))
+
+    sound_emitter1.WireColor = vec3 (1, 0, 0)
+
+    print ("WireColor = " .. tostring (sound_emitter1.WireColor))
+
+    sound_emitter1:SetWireColor (0, 0, 1)
+
+    print ("WireColor = " .. tostring (sound_emitter1.WireColor))
+
+    aabox1 = sound_emitter1.BoundBox
+
+    print ("local bb minimum = " .. tostring (aabox1.Minimum))
+    print ("local bb maximum = " .. tostring (aabox1.Maximum))
+
+    aabox1 = sound_emitter1.WorldBoundBox
+
+    print ("world bb minimum = " .. tostring (aabox1.Minimum))
+    print ("world bb maximum = " .. tostring (aabox1.Maximum))
+
+    aabox1 = sound_emitter1.ChildrenBoundBox
+
+    print ("children bb minimum = " .. tostring (aabox1.Minimum))
+    print ("children bb maximum = " .. tostring (aabox1.Maximum))
+
+    aabox1 = sound_emitter1.FullBoundBox
+
+    print ("full bb minimum = " .. tostring (aabox1.Minimum))
+    print ("full bb maximum = " .. tostring (aabox1.Maximum))
+
+    aabox1 = sound_emitter1.WorldChildrenBoundBox
+
+    print ("world children bb minimum = " .. tostring (aabox1.Minimum))
+    print ("world children bb maximum = " .. tostring (aabox1.Maximum))
+
+    aabox1 = sound_emitter1.WorldFullBoundBox
+
+    print ("world full bb minimum = " .. tostring (aabox1.Minimum))
+    print ("world full bb maximum = " .. tostring (aabox1.Maximum))
+  end
+
+  function print_intersections (entity)
+    local intersections = entity:GetIntersections ()
+    
+    print (entity.Name .. " has " .. tostring (intersections.Size) .. " intersections:")
+    
+    for i=0,intersections.Size-1,1 do
+      print ("  " .. intersections:Item (i).Name)
+    end
+  end
+
+  function test_intersections ()
+    print ("Intersections test")
+    
+    local scene   = Scene.Scene.Create ()
+    local entity1 = Scene.Helpers.Box.Create ()
+    local entity2 = Scene.Helpers.Box.Create ()
+    local entity3 = Scene.Helpers.Box.Create ()
+
+    entity1.Name = "entity1"
+    entity2.Name = "entity2"
+    entity3.Name = "entity3"
+    
+    local bb = AABB (-1, -1, -1, 1, 1, 1)
+
+    entity1.BoundBox = AABB (-1, -1, -1, 1, 1, 1)
+    entity2.BoundBox = AABB (0.1, 0.1, -1, 1, 1, 1)
+    entity3.BoundBox = AABB (-1, -1, -1, -0, -0.1, 1)  
+
+    entity1:BindToScene (scene)
+    entity2:BindToScene (scene)
+    entity3:BindToScene (scene)
+
+    print_intersections (entity1)
+    print_intersections (entity2)
+    print_intersections (entity3)
+  end
+
+  test_entity ()
+  est_intersections ()
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Entity test
+  IsInfiniteBounds = true
+  WireColor = 0 0 0
+  WireColor = 1 0 0
+  WireColor = 0 0 1
+  local bb minimum = -1e+008 -1e+008 -1e+008
+  local bb maximum = 1e+008 1e+008 1e+008
+  world bb minimum = -1e+008 -1e+008 -1e+008
+  world bb maximum = 1e+008 1e+008 1e+008
+  children bb minimum = -1e+008 -1e+008 -1e+008
+  children bb maximum = 1e+008 1e+008 1e+008
+  full bb minimum = -1e+008 -1e+008 -1e+008
+  full bb maximum = 1e+008 1e+008 1e+008
+  world children bb minimum = -1e+008 -1e+008 -1e+008
+  world children bb maximum = 1e+008 1e+008 1e+008
+  world full bb minimum = -1e+008 -1e+008 -1e+008
+  world full bb maximum = 1e+008 1e+008 1e+008
+  Intersections test
+  entity1 has 2 intersections:
+    entity2
+    entity3
+  entity2 has 1 intersections:
+    entity1
+  entity3 has 1 intersections:
+    entity1
+  (end code)
+*/

@@ -1,0 +1,67 @@
+/*
+   Class: Scene.VisualModel
+ 
+   Отображаемая модель.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание отображаемой модели.
+ */
+Create ()
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: MeshName
+ 
+   Имя геометрической модели.
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение.
+ */
+MeshName
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function test_visual_model ()
+    print ("VisualModel test")
+
+    local visual_model1 = Scene.VisualModel.Create ()
+
+    print ("Mesh name = " .. visual_model1.MeshName)
+
+    visual_model1.MeshName = "mesh.xmesh"
+
+    print ("Mesh name = " .. visual_model1.MeshName)
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  VisualModel test
+  Mesh name =
+  Mesh name = mesh.xmesh
+  (end code)
+*/

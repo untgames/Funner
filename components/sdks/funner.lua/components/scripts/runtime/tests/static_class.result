@@ -1,0 +1,5 @@
+Results of static_class_test:
+MyClass.Foo
+MyClass.Bar
+SetProperty('A', '1')
+GetProperty('A')

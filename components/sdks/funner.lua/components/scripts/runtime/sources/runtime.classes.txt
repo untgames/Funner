@@ -1,0 +1,157 @@
+Package: Runtime.Classes
+  Работа с классами в Lua.
+  
+Functions:
+
+Function: class(name, class_table)
+  Создание класса.
+  
+Parameters:
+  name - Имя класса.
+  class_table - Таблица членов класса.
+  
+Returns:
+  Обёртка для работы с классами.
+  
+Example:
+(start code)
+print ("Results of class_instance_test:")
+
+require "com.untgames.runtime"
+
+local function CreateMyClass ()
+  local function Foo ()
+    print ("MyClass.Foo")
+  end
+  
+  local function Bar ()
+    print ("MyClass.Bar")
+  end
+  
+  local function SetProperty (name, value)
+    print (string.format ("SetProperty('%s', '%s')", name, value))
+  end
+  
+  local function GetProperty (name)
+    print (string.format ("GetProperty('%s')", name))
+  end
+  
+  local function Create ()
+    local function Baz ()
+      print ("MyClass.Baz")
+    end
+
+    return class { Baz = Baz }
+  end
+
+  return class "MyClass" { Foo = Foo, Bar = Bar, set_A = SetProperty, get_A = GetProperty, Create = constructor (Create)}
+end
+
+local MyClass = CreateMyClass ()
+
+local instance = MyClass.Create ()
+
+instance.Foo ()
+instance.Bar ()
+instance.Baz ()
+
+instance.A = 1
+
+local x = instance.A
+
+print (string.format ("Instance name: '%s'", tostring (instance)))
+(end code)
+
+Function: class(class_table)
+  Создание класса.  
+
+Parameters:
+  class_table - Таблица членов класса.
+  
+Returns:
+  Обёртка для работы с классами.
+
+See also:
+  <class(name, class_table)>
+
+Function: extend(...)
+  Перечисление списка наследования для класса.
+  
+Example:
+(start code)
+print ("Results of extend_test:")
+
+require "com.untgames.runtime"
+
+local function CreateClassA ()
+  local function Foo ()
+    print ("ClassA.Foo")
+  end  
+  
+  local function SetProperty (name, value)
+    print (string.format ("SetProperty('%s', '%s')", name, value))
+  end
+  
+  local function GetProperty (name)
+    print (string.format ("GetProperty('%s')", name))
+  end
+  
+  local function Create ()
+    local function Baz ()
+      print ("ClassA.Baz")
+    end
+
+    return class { Baz = Baz }
+  end
+
+  return class "ClassA" { Foo = Foo, set_A = SetProperty, get_A = GetProperty, Create = constructor (Create)}
+end
+
+local ClassA = CreateClassA ()
+
+local function CreateClassB ()
+  local function Bar ()
+    print ("ClassB.Bar")
+  end    
+  
+  local function Create ()
+    local function Foo ()
+      print ("ClassB.Foo")
+    end
+
+    return class { extend (ClassA.Create ()), Foo = Foo }
+  end
+
+  return class "ClassB" { extend (ClassA), Bar = Bar, Create = constructor (Create)}
+end
+
+local ClassB = CreateClassB ()
+
+local instance = ClassB.Create ()
+
+instance.Foo ()
+instance.Bar ()
+instance.Baz ()
+
+instance.A = 1
+
+local x = instance.A
+
+print (string.format ("Instance name: '%s'", tostring (instance)))
+(end code)
+
+Function: constructor(fn)
+  Помечает функцию fn как конструктор класса.
+  
+Parameters:
+  fn - Функция, создающая экземпляр класса.
+  
+Returns:
+  Функция-конструктор.
+  
+Remarks:
+  Создаёт обёртку, которая добавляет в список  наследования  класса  все  члены
+  класса, которому принадлежит конструктор.
+
+Example:
+  см. пример для <class(name, class_table)>

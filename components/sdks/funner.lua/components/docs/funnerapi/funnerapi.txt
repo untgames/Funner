@@ -1,0 +1,95 @@
+Title: Funner Lua API
+  Существующие расширения Lua для Funner Engine
+
+Section: Common
+  Библиотека общего назначения.
+  Включает следующие компоненты:
+
+  1. Работа с файлами                    - <Common.File>
+  2. Работа с деревьями строк            - <Common.StringNode>
+  3. Работа с соединениями               - <Common.Connection>
+  4. Работа с очередями действий         - <Common.ActionQueue>
+  5. Работа с таймерами                  - <Common.Timer>
+  6. Работа с функциями обратного вызова - <Common.Callback>
+
+Section: BoundVolumes
+  Ограничивающие объёмы.
+  Включает следующие компоненты:
+  
+  1. Ограничивающий объём в форме прямоугольного параллелепипеда - <BoundVolumes.AxisAlignedBox>.
+    
+Section: Math
+  Математическая библиотека.
+  Включает следующие компоненты:
+
+  1. Векторы     - <Math.Vector2>, <Math.Vector3>, <Math.Vector4>
+  2. Матрицы     - <Math.Matrix2>, <Math.Matrix3>, <Math.Matrix4>
+  3. Кватернионы - <Math.Quaternion>
+
+Section: Scene
+  Граф сцены. Данный компонент представляет собой дерево, узлы которого являются объектами сцены, организованные в своеобразную 
+  иерархию. Эти узлы могут быть реальными физическими объектами, или просто "абстрактными" объектами. Граф сцены может быть
+  использован во многих ситуациях, в зависимости от того, как вы расположите узлы в схеме. 
+  
+  Включает следующие компоненты:
+  
+  1. Сцена                            - <Scene.Scene>
+  2. Узел                             - <Scene.Node>
+  3. Сущность                         - <Scene.Entity>
+  4. Источник света                   - <Scene.Light>
+  5. Направленный источник света      - <Scene.DirectLight>
+  6. Точечный источник света          - <Scene.PointLight>
+  7. Конический источник света        - <Scene.SpotLight>
+  8. Спрайт                           - <Scene.Sprite>
+  9. Линия текста                     - <Scene.TextLine>
+  10. Отображаемая модель             - <Scene.VisualModel>
+  11. Вспомогательный параллелепиппед - <Scene.Helpers.Box>
+  12. Ортографическая камера          - <Scene.OrthoCamera>
+  13. Перспективная камера            - <Scene.PerspectiveCamera>
+  15. Слушатель                       - <Scene.Listener>
+  16. Источник звука                  - <Scene.SoundEmitter>
+  17. Массив узлов                    - <Scene.NodeArray>
+
+Section: Render
+  Рендер. Этот компонент предназначен для визуализации игрового пространства.
+  Включает следующие компоненты:
+  
+  1. Вьюпорты              - <Render.Viewport>
+  2. Прямоугольные области - <Render.Rect>
+  3. Экраны                - <Render.Screen>
+
+Section: System
+  Системная библиотека.
+  Включает следующие компоненты:
+  
+  1. Приложение - <System.Application>
+
+Section: Engine
+  Движок. Центральный программный компонент, который управляет всеми сущностями в игре.
+  Содержит следующие точки привязки:
+  
+  1. Экраны                    - <Engine.Screens>
+  2. Cлушатели                 - <Engine.Listeners>
+  3. Обработчики событий ввода - <Engine.InputEventHandlers>
+  4. Курсоры                   - <Engine.Cursors>
+  5. Менеджеры ресурсов        - <Engine.ResourceManagers>
+
+Section: Input
+  Система ввода.
+
+Section: ResourceManager
+  Управление ресурсами.
+  Включает следующие компоненты:
+  
+  1. Менеджер ресурсов - <Engine.ResourceManager>
+  2. Связывание        - <Engine.ResourceManager.Binding>
+  3. Группа ресурсов   - <Engine.ResourceManager.Group>
+
+Section: Media
+  Проигрывание медиа.
+  Включает следующие компоненты:
+  
+  1. Проигрыватель медиа    - <Media.MediaPlayer>
+  2. Список воспроизведения - <Media.Playlist>
+  
+

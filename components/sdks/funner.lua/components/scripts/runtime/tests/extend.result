@@ -1,0 +1,7 @@
+Results of extend_test:
+ClassB.Foo
+ClassB.Bar
+ClassA.Baz
+SetProperty('A', '1')
+GetProperty('A')
+Instance name: 'ClassB'

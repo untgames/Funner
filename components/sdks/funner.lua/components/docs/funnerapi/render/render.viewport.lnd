@@ -1,0 +1,399 @@
+/*
+   Class: Render.Viewport
+ 
+   Область вывода (вьюпорт). Присоединяется к экрану. Во вьюпорт происходит рендеринг сцены с помощью камеры.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание вьюпорта.
+ */
+Create ()
+
+/*
+   Function: SetArea
+ 
+   Установка границ области вывода. Координаты - в процентах от экрана, например: (0, 0, 100, 100).
+
+   Параметры:
+     left   - левая граница
+     top    - верхняя граница
+     width  - ширина
+     height - высота
+ */
+SetArea (number left, number top, number width, number height) 
+
+/*
+   Function: SetOrigin
+ 
+   Установка координат левого верхнего угла (для перемещения вьюпорта по экрану).
+
+   Параметры:
+     left - левая граница
+     top  - верхняя граница
+ */
+SetOrigin (number left, number top) 
+
+/*
+   Function: SetSize
+ 
+   Установка ширины и высоты.
+
+   Параметры:
+     width  - ширина
+     height - высота
+ */
+SetSize (number width, number height) 
+
+/*
+   Function: Activate
+ 
+   Активация области вывода.
+ */
+Activate ()
+
+/*
+   Function: Deactivate
+ 
+   Деактивация области вывода (неакивные области не участвуют в отрисовке).
+ */
+Deactivate ()
+
+/*
+   Function: SetBackgroundColor 
+ 
+   Установка цвета фона с указанием альфы.
+
+   Параметры:
+     r - red-компонента
+     g - green-компонента
+     b - blue-компонента
+     a - прозрачность
+ */
+SetBackgroundColor (number r, number g, number b, number a)
+
+/*
+   Function: SetBackgroundColor 
+ 
+   Установка цвета фона с альфой равной нулю.
+
+   Параметры:
+     r - red-компонента
+     g - green-компонента
+     b - blue-компонента
+ */
+SetBackgroundColor (number r, number g, number b)
+
+/*
+   Function: EnableBackground
+ 
+   Включение очистки области вывода при каждой перерисовке.
+ */
+EnableBackground ()
+
+/*
+   Function: DisableBackground
+ 
+   Отключение очистки области вывода при каждой перерисовке.
+ */
+DisableBackground ()
+
+/*
+   Function: SetProperty 
+ 
+   Установка свойства (для привязки дополнительных данных к вьюпорту).
+
+   Параметры:
+     name  - имя свойства
+     value - значение
+ */
+SetProperty (string name, string value)
+
+/*
+   Function: GetProperty
+ 
+   Получение свойства.
+
+   Параметры:
+     name - имя свойства
+
+   Возвращает:
+     string
+ */
+GetProperty (string name)
+
+/*
+   Function: HasProperty
+ 
+   Проверка, есть ли свойство.
+
+   Параметры:
+     name - имя свойства
+
+   Возвращает:
+     bool
+ */
+HasProperty (string name)
+
+/*
+   Function: RemoveProperty
+ 
+   Удаление свойства.
+
+   Параметры:
+     name - имя свойства
+ */
+RemoveProperty (string name)
+
+/*
+   Function: RemoveAllProperties
+ 
+   Удаление всех свойств.
+ */
+RemoveAllProperties ()
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Id
+ 
+   Идентификатор области вывода (для сравнения двух вьюпортов).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Id
+
+/*
+   Property: Name
+ 
+   Имя вьюпорта.
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение/установка.
+ */
+Name
+
+/*
+   Property: RenderPath
+ 
+   Имя рендера (например, Render2d).
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение/установка.
+ */
+RenderPath
+
+/*
+   Property: ZOrder
+ 
+   Управление порядком отрисовки областей вывода, отрисовка от наименьших номеров по увеличению номера, 
+   разрешены отрицательные значения.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+ZOrder
+
+/*
+   Property: Camera
+ 
+   Камера, связанная с областью вывода.
+
+   Тип:
+     <Scene.OrthoCamera>
+     <Scene.PerspectiveCamera>
+ 
+   Доступ:
+     Получение/установка.
+ */
+Camera
+
+/*
+   Property: Active
+ 
+   Управление активностью области вывода (неакивные области не участвуют в отрисовке).
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение/установка.
+ */
+Active
+
+/*
+   Property: BackgroundColor
+ 
+   Цвет фона.
+
+   Тип:
+     <Math.Vector4>
+ 
+   Доступ:
+     Получение/установка.
+ */
+BackgroundColor
+
+/*
+   Property: BackgroundState
+ 
+   Нужно ли очищать область вывода при каждой перерисовке. Еесли область вывода не очищается, то вьюпорт прозрачный 
+   в тех местах, где в нем ничего не нарисовано.
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение/установка.
+ */
+BackgroundState
+
+/*
+   Property: Area
+ 
+   Границы области вывода.
+
+   Тип:
+     <Render.Rect>
+ 
+   Доступ:
+     Получение/установка.
+ */
+Area
+
+/*
+   Group: Примеры
+ 
+ */
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function viewport_test ()
+    print ("Viewport test")
+
+    local viewport1 = Render.Viewport.Create ()
+
+    print ("Name = " .. viewport1.Name)
+    print ("RenderPath = " .. viewport1.RenderPath)
+    print ("ZOrder = " .. viewport1.ZOrder)
+    print ("Camera = " .. tostring (viewport1.Camera))
+    print ("IsActive = " .. tostring (viewport1.Active))
+    print ("BackgroundColor = " .. tostring (viewport1.BackgroundColor))
+    print ("BackgroundState = " .. tostring (viewport1.BackgroundState))
+  --  print ("Id = " .. tostring (viewport1.Id))
+    print ("HasProperty 'property1' = " .. tostring (viewport1:HasProperty ("property1")))
+
+    local camera1 = Scene.OrthoCamera.Create ()
+
+    camera1.Name = "camera1"
+
+    viewport1.Name = "viewport1"
+    viewport1.RenderPath = "Render2D"
+    viewport1.ZOrder = 1
+    viewport1.Camera = camera1
+    viewport1.Active = 1
+    viewport1.BackgroundColor = vec4 (0.1, 0.2, 0.3, 0.4)
+
+    viewport1:SetProperty ("property1", "value_of_property1")
+
+    print ("Name = " .. viewport1.Name)
+    print ("RenderPath = " .. viewport1.RenderPath)
+    print ("ZOrder = " .. viewport1.ZOrder)
+    print ("Camera = " .. tostring (viewport1.Camera.Name))
+    print ("IsActive = " .. tostring (viewport1.Active))
+    print ("BackgroundColor = " .. tostring (viewport1.BackgroundColor))
+    print ("BackgroundState = " .. tostring (viewport1.BackgroundState))
+    print ("HasProperty 'property1' = " .. tostring (viewport1:HasProperty ("property1")))
+    print ("Property 'property1' = " .. tostring (viewport1:GetProperty ("property1")))
+
+    viewport1:SetArea (0, 0, 100, 100)
+    viewport1:SetOrigin (0, 0)
+    viewport1:SetSize (100, 100)
+    
+    print ("Area = (" .. tostring (viewport1.Area.Left) .. ", " .. tostring (viewport1.Area.Top) .. ", " .. tostring (viewport1.Area.Width) .. ", " .. tostring (viewport1.Area.Height) .. ")")
+    print ("Right = " .. tostring (viewport1.Area.Right) .. ", Bottom = " .. tostring (viewport1.Area.Bottom))
+
+    viewport1:Deactivate ()
+    print ("IsActive = " .. tostring (viewport1.Active))
+    viewport1:Activate ()
+    print ("IsActive = " .. tostring (viewport1.Active))
+
+    viewport1:SetBackgroundColor (0.4, 0.3, 0.2, 0.1)
+    print ("BackgroundColor = " .. tostring (viewport1.BackgroundColor))
+
+    viewport1:SetBackgroundColor (0.4, 0.3, 0.2)
+    print ("BackgroundColor = " .. tostring (viewport1.BackgroundColor))
+
+    viewport1:EnableBackground ()
+    print ("BackgroundState = " .. tostring (viewport1.BackgroundState))
+    viewport1:DisableBackground ()
+    print ("BackgroundState = " .. tostring (viewport1.BackgroundState))
+
+    viewport1:RemoveProperty ("property1")
+    print ("HasProperty 'property1' = " .. tostring (viewport1:HasProperty ("property1")))
+    viewport1:SetProperty ("property1", "value_of_property1")
+    print ("HasProperty 'property1' = " .. tostring (viewport1:HasProperty ("property1")))
+    viewport1:RemoveAllProperties ()
+    print ("HasProperty 'property1' = " .. tostring (viewport1:HasProperty ("property1")))
+  end
+  (end code)
+*/
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  Viewport test
+  Name = 
+  RenderPath = 
+  ZOrder = 2147483647
+  Camera = nil
+  IsActive = true
+  BackgroundColor = 0 0 0 0
+  BackgroundState = false
+  HasProperty 'property1' = false
+  Name = viewport1
+  RenderPath = Render2D
+  ZOrder = 1
+  Camera = camera1
+  IsActive = true
+  BackgroundColor = 0.1 0.2 0.3 0.4
+  BackgroundState = false
+  HasProperty 'property1' = true
+  Property 'property1' = value_of_property1
+  Area = (0, 0, 100, 100)
+  Right = 100, Bottom = 100
+  IsActive = false
+  IsActive = true
+  BackgroundColor = 0.4 0.3 0.2 0.1
+  BackgroundColor = 0.4 0.3 0.2 0
+  BackgroundState = true
+  BackgroundState = false
+  HasProperty 'property1' = false
+  HasProperty 'property1' = true
+  HasProperty 'property1' = false
+  (end code)
+*/

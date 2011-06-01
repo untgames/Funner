@@ -1,0 +1,151 @@
+/*
+   Class: Common.Timer
+ 
+   Предназначен для замера прошедшего времени. Отсчет времени ведется с момента создания таймера либо с момента вызова метода <Reset>.
+ */
+
+/*
+   Group: Функции
+ 
+ */
+
+/*
+   Function: Create
+ 
+   Создание таймера.
+ 
+ */
+Create ()
+
+/*
+   Function: Reset
+ 
+   Сброс таймера.
+ */
+Reset ()
+
+/*
+   Function: Pause
+ 
+   Пауза таймера.
+ */
+Pause ()
+
+/*
+   Function: Resume
+ 
+   Возобновление работы таймера после паузы.
+ */
+Resume ()
+
+/*
+   Group: Поля
+ */
+
+/*
+   Property: SecondsEllapsed
+ 
+   Время, прошедшее с момента создания таймера либо с момента вызова метода <Reset>.
+ 
+   Доступ:
+ 
+     Получение.
+ */
+SecondsEllapsed
+
+/*
+   Property: Paused
+ 
+   Находится ли таймер в режиме паузы.
+ 
+   Доступ:
+ 
+     Получение/Установка.
+ */
+Paused
+
+/*
+   Group: Примеры
+ */
+
+/*
+  Topic: Пример кода
+ 
+   (start code) 
+   five_time_no_delay_handler_counter = 0
+ 
+   function five_time_no_delay_handler (dt)
+     print ("five_time_no_delay_handler called with dt=" .. tostring (dt) .. " timer=" .. tostring (timer.SecondsEllapsed) 
+       .. " paused=" .. tostring (timer.Paused))
+ 
+     five_time_no_delay_handler_counter = five_time_no_delay_handler_counter + 1
+     
+     if (five_time_no_delay_handler_counter == 2) then
+       timer.Paused = true
+       print ("timer paused with time=" .. tostring (timer.SecondsEllapsed))
+     end
+     
+     if (five_time_no_delay_handler_counter == 4) then    
+       timer.Paused = false
+       print ("timer resumed with time=" .. tostring (timer.SecondsEllapsed))    
+    end
+     
+     if (five_time_no_delay_handler_counter == 5) then  
+       five_time_no_delay_handler_connection:Disconnect ()
+       timer:Reset ()
+     end  
+   end
+ 
+   function delayed_handler (dt)
+     print ("delayed_handler called with dt=" .. dt)
+   end
+ 
+   function instant_handler (dt)
+     print ("instant_handler called with dt=" ..dt)
+   end  
+ 
+   function exit_handler (dt)
+     print ("exit_handler called with dt=" .. dt .. " timer=" .. timer.SecondsEllapsed)
+     System.Application.Exit (0)
+   end
+ 
+   function test ()
+     timer = Common.Timer.Create ()
+ 
+     local action_queue = Common.ActionQueue.Create ()
+     
+     five_time_no_delay_handler_connection = action_queue:RegisterEventHandler (0, 0.2, Common.ActionQueue.CreateEventHandler (five_time_no_delay_handler))
+     action_queue:RegisterEventHandler (0.5, 0.2, Common.ActionQueue.CreateEventHandler ("delayed_handler"))
+   --  action_queue:RegisterEventHandler (Common.ActionQueue.CreateEventHandler ("instant_handler"))  
+     action_queue:RegisterEventHandler (3, 1, Common.ActionQueue.CreateEventHandler ("exit_handler"))  
+   end
+   (end code)
+ */
+
+/*
+  Topic: Результат
+ 
+   (start code) 
+   five_time_no_delay_handler called with dt=0 timer=0 paused=false
+   five_time_no_delay_handler called with dt=0.20000000298023 timer=0.20000000298023 paused=false
+   timer paused with time=0.20000000298023
+   five_time_no_delay_handler called with dt=0.20000000298023 timer=0.20000000298023 paused=true
+   delayed_handler called with dt=0.5
+   five_time_no_delay_handler called with dt=0.20000000298023 timer=0.20000000298023 paused=true
+   timer resumed with time=0.20000000298023
+   delayed_handler called with dt=0.20000000298023
+   five_time_no_delay_handler called with dt=0.20000000298023 timer=0.40000000596046 paused=false
+   delayed_handler called with dt=0.20000000298023
+   delayed_handler called with dt=0.20000000298023
+   delayed_handler called with dt=0.20000000298023
+   delayed_handler called with dt=0.20000000298023
+   delayed_handler called with dt=0.20000000298023
+   delayed_handler called with dt=0.20000000298023
+   delayed_handler called with dt=0.20000000298023
+   delayed_handler called with dt=0.20000000298023
+   delayed_handler called with dt=0.20000000298023
+   delayed_handler called with dt=0.20000000298023
+   delayed_handler called with dt=0.20000000298023
+   exit_handler called with dt=3 timer=2.2000000476837
+   (end code)
+ */

@@ -1,0 +1,457 @@
+/*
+   Class: Media.MediaPlayer 
+ 
+   Проигрыватель медиа.
+ */
+
+/*
+   Group: Функции
+ */
+
+/*
+   Function: Create
+ 
+   Создание проигрывателя.
+ */
+Create ()
+
+/*
+   Function: Create
+ 
+   Создание проигрывателя с указанием цели воспроизведения.
+
+   Параметры:
+     target - цель воспроизведения
+
+   Возможные значения цели для всех платформ:
+     "null" - проигрыватель присылающий сообщение stop сразу после вызова play.
+
+   Возможные значения цели для платформы iPhone:   
+     "music" - аудиофайлы (поддерживаются форматы PCM (wav), MP3, ALAC (m4a), AAC, AMR, iLBC, IMA4, ч-law, a-law). 
+     "video" - видеофайлы (поддерживаются форматы - mov, mp4, mpv, 3gp, m4v). Использует интерфейс проигрывателя по умолчанию (аналог "video.all_controls") 
+     "video.no_controls" - проигрыватель видео без элементов управления.
+     "video.volume_controls" - проигрыватель видео, позволяющий изменять громкость во время воспроизведения (не использовать с видео без звука, так как появляется пустая кнопка).
+     "video.all_controls" - проигрыватель видео с возможностью паузы/перемотки.
+ */
+Create (string target)
+
+/*
+   Function: Create
+ 
+   Создание проигрывателя с указанием цели воспроизведения и имени ресурса.
+
+   Параметры:
+     target - цель воспроизведения
+     stream - имя ресурса
+ */
+Create (string target, string stream)
+
+/*
+   Function: Create
+ 
+   Создание проигрывателя с указанием цели воспроизведения и списка воспроизведения.
+
+   Параметры:
+     target   - цель воспроизведения
+     playlist - список воспроизведения
+ */
+Create (string target, Media.Playlist playlist)
+
+/*
+   Function: Close
+ 
+   Закрытие ассоциированных потоков.
+ */
+Close ()
+
+/*
+   Function: Duration
+ 
+   Получение длительности трека по индексу.
+
+   Параметры:
+     track - индекс трека
+
+   Возвращает:
+     number
+ */
+Duration (number track)
+
+/*
+   Function: NextTrack
+ 
+   Переключение на следующий трек.
+ */
+NextTrack ()
+
+/*
+   Function: PrevTrack
+ 
+   Переключение на предыдущий трек.
+ */
+PrevTrack ()
+
+/*
+   Function: Open
+ 
+   Открытие ресурса по имени.
+
+   Параметры:
+     stream - имя ресурса
+ */
+Open (string stream)
+
+/*
+   Function: Open
+ 
+   Открытие списка воспроизведения.
+
+   Параметры:
+     playlist - список воспроизведения
+ */
+Open (Media.Playlist playlist)
+
+/*
+   Function: Pause
+ 
+   Поставить на паузу.
+ */
+Pause ()
+
+/*
+   Function: Play
+ 
+   Начать воспроизведение.
+ */
+Play ()
+
+/*
+   Function: Stop
+ 
+   Остановка воспроизведения.
+ */
+Stop ()
+
+/*
+   Function: Source
+ 
+   Получение имени ресурса по индексу.
+
+   Параметры:
+     track - индекс трека
+
+   Возвращает:
+     string
+ */
+Source (number track)
+
+/*
+   Function: CreateEventHandler
+ 
+   Создание обработчика событий проигрывателя.   
+
+   Параметры:
+     function_name - имя функции lua, которая будет вызвана при наступлении события. В функцию будет передан параметр event - указывает целочисленный идентификатор события.
+
+   Возвращает:
+     <Common.Connection>  
+ */  
+CreateEventHandler (function_name)
+  
+/*
+   Function: RegisterEventHandler
+ 
+   Регистрация обработчика событий проигрывателя.
+
+   Параметры:
+     event   - идентификатор события
+     handler - обработчик
+ */
+RegisterEventHandler (Media.MediaPlayerEvent event, Common.Connection handler)
+
+/*
+   Group: Поля
+ 
+ */
+
+/*
+   Property: Mute
+ 
+   Включение/отключение звука.
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение/установка.
+ */
+Mute
+
+/*
+   Property: Name
+ 
+   Имя проигрывателя.
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение/установка.
+ */
+Name
+
+/*
+   Property: Position
+ 
+   Позиция проигрывания (от 0 до 1). 
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Position
+
+/*
+   Property: RepeatMode
+ 
+   Режим проигрывания.
+
+   Тип:
+     <Media.MediaPlayerRepeatMode>
+ 
+   Доступ:
+     Получение/установка.
+ */
+RepeatMode
+
+/*
+   Property: Target
+ 
+   Цель воспроизведения.
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение/установка.
+ */
+Target
+
+/*
+   Property: Track
+ 
+   Номер текущего трека.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Track
+
+/*
+   Property: Volume
+ 
+   Громкость (от 0 до 1).
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение/установка.
+ */
+Volume
+
+/*
+   Property: Duration
+ 
+   Длительность текущего трека.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+Duration
+
+/*
+   Property: IsPaused
+ 
+   Находится ли проигрыватель в состоянии паузы.
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение.
+ */
+IsPaused
+
+/*
+   Property: IsPlaying
+ 
+   Находится ли проигрыватель в состоянии проигрывания.
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение.
+ */
+IsPlaying
+
+/*
+   Property: IsStopped
+ 
+   Остановлен ли проигрыватель.
+
+   Тип:
+     bool
+ 
+   Доступ:
+     Получение.
+ */
+IsStopped
+
+/*
+   Property: Playlist
+ 
+   Cписок воспроизведения.
+
+   Тип:
+     <Media.Playlist>
+ 
+   Доступ:
+     Получение.
+ */
+Playlist
+
+/*
+   Property: Source
+ 
+   Имя ресурса текущего трека.
+
+   Тип:
+     string
+ 
+   Доступ:
+     Получение.
+ */
+Source
+
+/*
+   Property: State
+ 
+   Состояние проигрывателя.
+
+   Тип:
+     <Media.MediaPlayerState>
+ 
+   Доступ:
+     Получение.
+ */
+State
+
+/*
+   Property: TracksCount
+ 
+   Количество ассоциированных треков.
+
+   Тип:
+     number
+ 
+   Доступ:
+     Получение.
+ */
+TracksCount
+
+/*
+   Group: Примеры
+ */
+
+/*
+  Topic: Пример кода
+ 
+  (start code) 
+  function get_event_name (event)
+    if (event == Media.MediaPlayerEvent.OnChangeName)       then return "Media.MediaPlayerEvent.OnChangeName"       end
+    if (event == Media.MediaPlayerEvent.OnChangeTarget)     then return "Media.MediaPlayerEvent.OnChangeTarget"     end
+    if (event == Media.MediaPlayerEvent.OnChangePlaylist)   then return "Media.MediaPlayerEvent.OnChangePlaylist"   end
+    if (event == Media.MediaPlayerEvent.OnChangeTrack)      then return "Media.MediaPlayerEvent.OnChangeTrack"      end
+    if (event == Media.MediaPlayerEvent.OnChangePlayback)   then return "Media.MediaPlayerEvent.OnChangePlayback"   end
+    if (event == Media.MediaPlayerEvent.OnChangeVolume)     then return "Media.MediaPlayerEvent.OnChangeVolume"     end
+    if (event == Media.MediaPlayerEvent.OnChangeRepeatMode) then return "Media.MediaPlayerEvent.OnChangeRepeatMode" end
+  end
+
+  function media_player_event_handler (event)
+    print ("New event: " .. get_event_name (event))
+  end
+
+  function test_media_player () 
+    print ("MediaPlayer test")
+    
+    local player = Media.MediaPlayer.Create ()
+    
+    local handler = Media.MediaPlayer.CreateEventHandler ("media_player_event_handler") 
+      
+    player:RegisterEventHandler (Media.MediaPlayerEvent.OnChangeName,       handler)
+    player:RegisterEventHandler (Media.MediaPlayerEvent.OnChangeTarget,     handler)
+    player:RegisterEventHandler (Media.MediaPlayerEvent.OnChangePlaylist,   handler)
+    player:RegisterEventHandler (Media.MediaPlayerEvent.OnChangeTrack,      handler)
+    player:RegisterEventHandler (Media.MediaPlayerEvent.OnChangePlayback,   handler)
+    player:RegisterEventHandler (Media.MediaPlayerEvent.OnChangeVolume,     handler)
+    player:RegisterEventHandler (Media.MediaPlayerEvent.OnChangeRepeatMode, handler)
+
+    player.Name = "player"
+      
+    print ("Tracks count: " .. player.TracksCount)
+      
+    player.RepeatMode = MediaPlayerRepeatMode_Last
+      
+    player.RepeatMode = MediaPlayerRepeatMode_All
+      
+    print ("Change mute")
+      
+    player.Mute = true
+      
+    print ("volume=" .. player.Volume .. " mute=" .. tostring (player.Mute))
+      
+    player.Mute = false
+      
+    print ("volume=" .. player.Volume .. " mute=" .. tostring (player.Mute))
+      
+    print ("Dynamic change volume")
+      
+    for i = 0, 4, 1 do
+      player.Volume = 1 / 5 * i
+    end
+  end
+  (end code)
+ */
+
+/*
+  Topic: Результат
+ 
+  (start code) 
+  MediaPlayer test
+  New event: Media.MediaPlayerEvent.OnChangeName
+  Tracks count: 0
+  New event: Media.MediaPlayerEvent.OnChangeRepeatMode
+  New event: Media.MediaPlayerEvent.OnChangeRepeatMode
+  Change mute
+  New event: Media.MediaPlayerEvent.OnChangeVolume
+  volume=0 mute=true
+  New event: Media.MediaPlayerEvent.OnChangeVolume
+  volume=1 mute=false
+  Dynamic change volume
+  New event: Media.MediaPlayerEvent.OnChangeVolume
+  New event: Media.MediaPlayerEvent.OnChangeVolume
+  New event: Media.MediaPlayerEvent.OnChangeVolume
+  New event: Media.MediaPlayerEvent.OnChangeVolume
+  New event: Media.MediaPlayerEvent.OnChangeVolume
+  (end code)
+ */
