@@ -118,7 +118,7 @@ inline T* ResourceLibrary<T>::Find (const char* name)
 */
 
 template <class T>
-inline void ResourceLibrary<T>::Insert (const char* name, Item& item)
+inline void ResourceLibrary<T>::Insert (const char* name, const Item& item)
 {
   if (!name)
     throw xtl::make_null_argument_exception ("media::ResourceLibrary::Insert", "name");
