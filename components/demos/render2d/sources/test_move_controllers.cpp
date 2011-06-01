@@ -9,12 +9,16 @@ struct Test
 {
   TestApplication          application;
   Sprite::Pointer          sprite1;
+  Sprite::Pointer          sprite1_child1;
+  Sprite::Pointer          sprite1_child2;
   Sprite::Pointer          sprite2;
   OrthoCamera::Pointer     camera;
   Scene                    scene;
   Screen                   screen;
   float                    current_angle;
   float                    sprite_position_radius;
+  AlignWithNode::Pointer   aligner1;
+  AlignWithNode::Pointer   aligner2;
   MoveToNodePoint::Pointer mover;
   LookToNodePoint::Pointer look_to;
   float                    duration;
@@ -24,6 +28,18 @@ struct Test
   {
     sprite1 = CreateSprite ();
     sprite2 = CreateSprite ();
+
+    sprite1_child1 = CreateSprite ();
+    sprite1_child2 = CreateSprite ();
+
+    sprite1_child1->SetOrientationInherit (false);
+    sprite1_child2->SetOrientationInherit (false);
+
+    sprite1_child1->BindToParent (*sprite2);
+    sprite1_child2->BindToParent (*sprite2);
+
+    sprite1_child1->SetPosition (-1, -1, 0);
+    sprite1_child2->SetPosition (1, -1, 0);
 
     sprite1->SetColor (1.f, 1.f, 0.f, 1.f);
     sprite2->SetColor (1.f, 0.f, 1.f, 1.f);
@@ -51,6 +67,21 @@ struct Test
     look_to->SetAccelerationHandler (look_acceleration);
 
     look_to->Start (sprite1, 0.f, NodeOrt_Y, NodeOrt_Z);
+
+    aligner1 = AlignWithNode::Create (*sprite1_child1);
+    aligner2 = AlignWithNode::Create (*sprite1_child2);
+
+    LinearAccelerationEvaluator align_acceleration;
+
+    align_acceleration.SetAcceleration (10);
+    align_acceleration.SetDeceleration (10);
+    align_acceleration.SetMaxSpeed (27);
+
+    aligner1->SetAccelerationHandler (align_acceleration);
+    aligner2->SetAccelerationHandler (align_acceleration);
+
+    aligner1->Start (sprite2, NodeOrt_Y, NodeOrt_Y, NodeOrt_Z);
+    aligner2->Start (sprite2, NodeOrt_Y, NodeOrt_Y, NodeOrt_Z);
 
       //создание сцены
     camera = OrthoCamera::Create ();

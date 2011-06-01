@@ -3,6 +3,7 @@
 namespace
 {
 
+const char* SCENE_CONTROLLER_ALIGN_WITH_NODE_LIBRARY    = "Scene.Controllers.AlignWithNode";
 const char* SCENE_CONTROLLER_LOOK_TO_NODE_POINT_LIBRARY = "Scene.Controllers.LookToNodePoint";
 const char* SCENE_CONTROLLER_MOVE_TO_NODE_POINT_LIBRARY = "Scene.Controllers.MoveToNodePoint";
 const char* SCENE_CONTROLLER_WATER_LIBRARY              = "Scene.Controllers.Water";
@@ -105,6 +106,33 @@ void bind_controller_look_to_node_point_library (Environment& environment)
     //регистрация типа данных
 
   environment.RegisterType<LookToNodePoint> (SCENE_CONTROLLER_LOOK_TO_NODE_POINT_LIBRARY);
+}
+
+/*
+    Регистрация библиотеки работы с контроллером выравнивания
+*/
+
+void bind_controller_align_with_node_library (Environment& environment)
+{
+  InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_ALIGN_WITH_NODE_LIBRARY);
+
+    //наследование
+
+  lib.Register (environment, SCENE_CONTROLLER_LIBRARY);
+
+    //регистрация функций создания
+
+  lib.Register ("Create", make_invoker (&AlignWithNode::Create));
+
+    //регистрация операций
+
+  lib.Register ("set_AccelerationHandler", make_invoker<void (AlignWithNode::*) (const LinearAccelerationEvaluator&)> (&AlignWithNode::SetAccelerationHandler));
+  lib.Register ("Start",                   make_invoker<void (AlignWithNode::*) (Node::Pointer node, NodeOrt, NodeOrt, NodeOrt)> (&AlignWithNode::Start));
+  lib.Register ("Stop",                    make_invoker (&AlignWithNode::Stop));
+
+    //регистрация типа данных
+
+  environment.RegisterType<AlignWithNode> (SCENE_CONTROLLER_ALIGN_WITH_NODE_LIBRARY);
 }
 
 }

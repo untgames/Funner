@@ -126,18 +126,18 @@ IsInfiniteBounds = true
 WireColor = 0 0 0
 WireColor = 1 0 0
 WireColor = 0 0 1
-local bb minimum = -1e+008 -1e+008 -1e+008
-local bb maximum = 1e+008 1e+008 1e+008
-world bb minimum = -1e+008 -1e+008 -1e+008
-world bb maximum = 1e+008 1e+008 1e+008
-children bb minimum = -1e+008 -1e+008 -1e+008
-children bb maximum = 1e+008 1e+008 1e+008
-full bb minimum = -1e+008 -1e+008 -1e+008
-full bb maximum = 1e+008 1e+008 1e+008
-world children bb minimum = -1e+008 -1e+008 -1e+008
-world children bb maximum = 1e+008 1e+008 1e+008
-world full bb minimum = -1e+008 -1e+008 -1e+008
-world full bb maximum = 1e+008 1e+008 1e+008
+local bb minimum = -1e+08 -1e+08 -1e+08
+local bb maximum = 1e+08 1e+08 1e+08
+world bb minimum = -1e+08 -1e+08 -1e+08
+world bb maximum = 1e+08 1e+08 1e+08
+children bb minimum = -1e+08 -1e+08 -1e+08
+children bb maximum = 1e+08 1e+08 1e+08
+full bb minimum = -1e+08 -1e+08 -1e+08
+full bb maximum = 1e+08 1e+08 1e+08
+world children bb minimum = -1e+08 -1e+08 -1e+08
+world children bb maximum = 1e+08 1e+08 1e+08
+world full bb minimum = -1e+08 -1e+08 -1e+08
+world full bb maximum = 1e+08 1e+08 1e+08
 Intersections test
 entity1 has 2 intersections:
   entity2
@@ -229,9 +229,12 @@ Color = 0.4 0.3 0.2 0.1
 Color = 0.1 0.2 0.3 0.1
 Horizontal aligment = Right/Bottom vertical aligment = Center
 Horizontal aligment = BaseLine vertical aligment = BaseLine
-MoveToNodePoint controller test
-node1 position is 0.250000 0.000000 0.000000, node2 position is 0.250000 0.250000 0.000000
-node1 position is 0.500000 0.000000 0.000000, node2 position is 0.500000 0.500000 0.000000
 LookToNodePoint controller test
 node1 orientation is 0.000000 0.186730 0.000000 0.982411
 node1 orientation is 0.000000 0.233282 0.000000 0.972409
+MoveToNodePoint controller test
+node1 position is 0.250000 0.000000 0.000000, node2 position is 0.250000 0.250000 0.000000
+node1 position is 0.500000 0.000000 0.000000, node2 position is 0.500000 0.500000 0.000000
+AlignWithNode controller test
+node2 orientation is 0.186730 0.000000 0.000000 0.982411
+node2 orientation is 0.186730 0.000000 0.000000 0.982411

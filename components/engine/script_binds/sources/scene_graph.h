@@ -17,6 +17,7 @@
 #include <sg/visual_model.h>
 
 #include <sg/controllers/acceleration_evaluators.h>
+#include <sg/controllers/align_with_node.h>
 #include <sg/controllers/look_to_node_point.h>
 #include <sg/controllers/move_to_node_point.h>
 #include <sg/controllers/water.h>
@@ -133,6 +134,7 @@ void bind_height_map_library                    (script::Environment&);
 void bind_controller_water_library              (script::Environment&);
 void bind_controller_move_to_node_point_library (script::Environment&);
 void bind_controller_look_to_node_point_library (script::Environment&);
+void bind_controller_align_with_node_library    (script::Environment&);
 void bind_linear_acceleration_evaluator_library (script::Environment&);
 
 }

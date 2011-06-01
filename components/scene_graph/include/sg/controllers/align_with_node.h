@@ -26,7 +26,7 @@ class AlignWithNode: public Controller
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Установка/получение функции рассчета углового ускорения узла
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<const math::vec3f& (const math::vec3f& current_velocity, const math::vec3f& distance, const math::vec3f& dt)> AccelerationFunction;
+    typedef xtl::function<const math::vec3f& (const math::vec3f& current_velocity, const math::vec3f& distance, float dt)> AccelerationFunction;
 
     void                        SetAccelerationHandler (const AccelerationFunction& acceleration_function);
     const AccelerationFunction& AccelerationHandler    () const;
@@ -35,7 +35,7 @@ class AlignWithNode: public Controller
 ///Запуск выравнивания (ось target_node_axis в системе координат target_node, node_axis в системе
 ///координат узла контроллера)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Start (Node::ConstPointer target_node, const math::vec3f& target_node_axis, const math::vec3f& node_axis);
+    void Start (Node::ConstPointer target_node, NodeOrt target_node_axis, NodeOrt node_axis, NodeOrt node_rotation_axis);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Остановка выравнивания

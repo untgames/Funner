@@ -747,6 +747,41 @@ function test_look_to_node_point_controller ()
   print (string.format ("node1 orientation is %f %f %f %f", node1.WorldOrientation.x, node1.WorldOrientation.y, node1.WorldOrientation.z, node1.WorldOrientation.w))
 end
 
+function test_align_with_node_controller ()
+  print ("AlignWithNode controller test")
+
+  local scene = Scene.Scene.Create ()
+  local node1 = Scene.Node.Create ()
+  local node2 = Scene.Node.Create ()
+  
+  node1:BindToScene (scene)
+  node2:BindToScene (scene)
+  
+  local mover1 = Scene.Controllers.AlignWithNode.Create (node2)
+
+  local evaluator = Scene.AccelerationEvaluators.Linear.Create ()
+  
+  evaluator.Acceleration = 10
+  evaluator.Deceleration = 10
+  evaluator.MaxSpeed     = 5
+  
+  mover1.AccelerationHandler = evaluator
+  
+  mover1:Start (node1, Scene.NodeOrt.Z, Scene.NodeOrt.Z, Scene.NodeOrt.X)
+  
+  node1:SetEulerOrientation (90, 0, 0, Scene.NodeTransformSpace.World)
+  
+  scene.Root:Update (0.2)
+
+  print (string.format ("node2 orientation is %f %f %f %f", node2.WorldOrientation.x, node2.WorldOrientation.y, node2.WorldOrientation.z, node2.WorldOrientation.w))
+  
+  mover1:Stop ()
+  
+  scene.Root:Update (0.1)
+
+  print (string.format ("node2 orientation is %f %f %f %f", node2.WorldOrientation.x, node2.WorldOrientation.y, node2.WorldOrientation.z, node2.WorldOrientation.w))
+end
+
 function test ()
   test_node ()    
   
@@ -784,6 +819,7 @@ function test ()
 
   test_text_line ()
 
-  test_move_to_node_point_controller ()
   test_look_to_node_point_controller ()
+  test_move_to_node_point_controller ()
+  test_align_with_node_controller ()
 end
