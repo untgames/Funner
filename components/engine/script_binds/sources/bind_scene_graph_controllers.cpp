@@ -55,21 +55,6 @@ void bind_controller_water_library (Environment& environment)
     –егистраци€ библиотеки работы с контроллером передвижени€
 */
 
-MoveToNodePoint::Pointer create_move_to_node_point_controller (Node& node, float acceleration, float deceleration, float max_speed)
-{
-  MoveToNodePoint::Pointer return_value = MoveToNodePoint::Create (node);
-
-  LinearAccelerationEvaluator move_acceleration;
-
-  move_acceleration.SetAcceleration (acceleration);
-  move_acceleration.SetDeceleration (deceleration);
-  move_acceleration.SetMaxSpeed (max_speed);
-
-  return_value->SetAccelerationHandler (move_acceleration);
-
-  return return_value;
-}
-
 void bind_controller_move_to_node_point_library (Environment& environment)
 {
   InvokerRegistry lib = environment.CreateLibrary (SCENE_CONTROLLER_MOVE_TO_NODE_POINT_LIBRARY);
@@ -80,14 +65,15 @@ void bind_controller_move_to_node_point_library (Environment& environment)
 
     //регистраци€ функций создани€
 
-  lib.Register ("Create", make_invoker (&create_move_to_node_point_controller));
+  lib.Register ("Create", make_invoker (&MoveToNodePoint::Create));
 
     //регистраци€ операций
 
-  lib.Register ("set_TransformSpace", make_invoker (&MoveToNodePoint::SetTransformSpace));
-  lib.Register ("get_TransformSpace", make_invoker (&MoveToNodePoint::TransformSpace));
-  lib.Register ("Start",              make_invoker<void (MoveToNodePoint::*) (Node::Pointer node, const math::vec3f&)> (&MoveToNodePoint::Start));
-  lib.Register ("Stop",               make_invoker (&MoveToNodePoint::Stop));
+  lib.Register ("set_AccelerationHandler", make_invoker<void (MoveToNodePoint::*) (const LinearAccelerationEvaluator&)> (&MoveToNodePoint::SetAccelerationHandler));
+  lib.Register ("set_TransformSpace",      make_invoker (&MoveToNodePoint::SetTransformSpace));
+  lib.Register ("get_TransformSpace",      make_invoker (&MoveToNodePoint::TransformSpace));
+  lib.Register ("Start",                   make_invoker<void (MoveToNodePoint::*) (Node::Pointer node, const math::vec3f&)> (&MoveToNodePoint::Start));
+  lib.Register ("Stop",                    make_invoker (&MoveToNodePoint::Stop));
 
     //регистраци€ типа данных
 
@@ -97,21 +83,6 @@ void bind_controller_move_to_node_point_library (Environment& environment)
 /*
     –егистраци€ библиотеки работы с контроллером слежени€
 */
-
-LookToNodePoint::Pointer create_look_to_node_point_controller (Node& node, float acceleration, float deceleration, float max_speed)
-{
-  LookToNodePoint::Pointer return_value = LookToNodePoint::Create (node);
-
-  LinearAccelerationEvaluator move_acceleration;
-
-  move_acceleration.SetAcceleration (acceleration);
-  move_acceleration.SetDeceleration (deceleration);
-  move_acceleration.SetMaxSpeed (max_speed);
-
-  return_value->SetAccelerationHandler (move_acceleration);
-
-  return return_value;
-}
 
 void bind_controller_look_to_node_point_library (Environment& environment)
 {
@@ -123,12 +94,13 @@ void bind_controller_look_to_node_point_library (Environment& environment)
 
     //регистраци€ функций создани€
 
-  lib.Register ("Create", make_invoker (&create_look_to_node_point_controller));
+  lib.Register ("Create", make_invoker (&LookToNodePoint::Create));
 
     //регистраци€ операций
 
-  lib.Register ("Start", make_invoker<void (LookToNodePoint::*) (Node::Pointer node, const math::vec3f&, NodeOrt, NodeOrt)> (&LookToNodePoint::Start));
-  lib.Register ("Stop",  make_invoker (&LookToNodePoint::Stop));
+  lib.Register ("set_AccelerationHandler", make_invoker<void (LookToNodePoint::*) (const LinearAccelerationEvaluator&)> (&LookToNodePoint::SetAccelerationHandler));
+  lib.Register ("Start",                   make_invoker<void (LookToNodePoint::*) (Node::Pointer node, const math::vec3f&, NodeOrt, NodeOrt)> (&LookToNodePoint::Start));
+  lib.Register ("Stop",                    make_invoker (&LookToNodePoint::Stop));
 
     //регистраци€ типа данных
 

@@ -133,6 +133,7 @@ void bind_height_map_library                    (script::Environment&);
 void bind_controller_water_library              (script::Environment&);
 void bind_controller_move_to_node_point_library (script::Environment&);
 void bind_controller_look_to_node_point_library (script::Environment&);
+void bind_linear_acceleration_evaluator_library (script::Environment&);
 
 }
 

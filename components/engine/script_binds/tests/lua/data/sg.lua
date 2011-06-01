@@ -689,8 +689,17 @@ function test_move_to_node_point_controller ()
   node1:BindToScene (scene)
   node2:BindToParent (node1)
   
-  local mover1 = Scene.Controllers.MoveToNodePoint.Create (node1, 1, 1, 0.5)
-  local mover2 = Scene.Controllers.MoveToNodePoint.Create (node2, 1, 1, 0.5)
+  local mover1 = Scene.Controllers.MoveToNodePoint.Create (node1)
+  local mover2 = Scene.Controllers.MoveToNodePoint.Create (node2)
+
+  local evaluator = Scene.AccelerationEvaluators.Linear.Create ()
+  
+  evaluator.Acceleration = 1
+  evaluator.Deceleration = 1
+  evaluator.MaxSpeed     = 0.5
+  
+  mover1.AccelerationHandler = evaluator
+  mover2.AccelerationHandler = evaluator
   
   mover1:Start (scene.Root, vec3 (10, 0, 0))
   mover2:Start (node1, vec3 (0, 10, 0))
@@ -715,7 +724,15 @@ function test_look_to_node_point_controller ()
   
   node1:BindToScene (scene)
   
-  local mover1 = Scene.Controllers.LookToNodePoint.Create (node1, 10, 10, 5)
+  local mover1 = Scene.Controllers.LookToNodePoint.Create (node1)
+
+  local evaluator = Scene.AccelerationEvaluators.Linear.Create ()
+  
+  evaluator.Acceleration = 10
+  evaluator.Deceleration = 10
+  evaluator.MaxSpeed     = 5
+  
+  mover1.AccelerationHandler = evaluator
   
   mover1:Start (scene.Root, vec3 (10, 0, 0), Scene.NodeOrt.Z, Scene.NodeOrt.Y)
   

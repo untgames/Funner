@@ -81,6 +81,7 @@ void bind_scene_graph_library (Environment& environment)
   bind_controller_water_library              (environment);
   bind_controller_move_to_node_point_library (environment);
   bind_controller_look_to_node_point_library (environment);
+  bind_linear_acceleration_evaluator_library (environment);
 }
 
 /*
