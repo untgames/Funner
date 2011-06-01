@@ -1,0 +1,48 @@
+Results of apply_forces_test:
+ground plane state:
+Body world transform:
+  position = 0; -2; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling body state:
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+Simulating one second
+ground plane state:
+Body world transform:
+  position = 0; -2; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling body state:
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+Simulating one second after apply light force
+falling body state:
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+Simulating one second after apply big force
+falling body state:
+Body world transform:
+  position = 0; 1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+Simulating two seconds
+falling body state:
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+Simulating one second after apply light impulse
+falling body state:
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+Simulating one second
+falling body state:
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+Simulating one second after apply light torque
+falling body state:
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.9; 0.0; 0.2

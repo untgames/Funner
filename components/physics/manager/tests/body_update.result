@@ -1,0 +1,197 @@
+Results of body_update_test:
+Initial falling body state:
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+Initial static body state:
+Body world transform:
+  position = -10; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -1; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -2; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -2; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -2; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -2; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -2; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -2; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -2; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -2; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -2; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+falling_body body updated
+Body world transform:
+  position = 0; -3; 0
+  orientation = 0.0; 0.0; 0.0; 1.0

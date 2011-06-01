@@ -1,0 +1,77 @@
+Results of fall_test:
+Manager description = 'physics::low_level::bullet::Driver'
+Default scene gravity = 0.00; -9.80; 0.00 
+Default scene simulation step = 0.017
+Initial static body state:
+  mass = 0.00
+  linear sleeping threshold = 0.80
+  angular sleeping threshold = 1.00
+  ccd motion threshold = 0.00
+  collision group = ''
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+Initial light falling body state:
+  mass = 1.00
+  linear sleeping threshold = 0.80
+  angular sleeping threshold = 1.00
+  ccd motion threshold = 0.00
+Body world transform:
+  position = -5; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+Initial heavy falling body state:
+  mass = 5.00
+Body world transform:
+  position = 5; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+Simulating one second
+static body state:
+  mass = 0.00
+Body world transform:
+  position = 0; 0; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+light falling body state:
+  mass = 1.00
+Body world transform:
+  position = -23; -4; 0
+  orientation = 0.0; 0.0; 0.0; 0.9
+heavy falling body state:
+  mass = 5.00
+Body world transform:
+  position = 5; -4; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+ground plane state:
+  mass = 0.00
+Body world transform:
+  position = 0; -15; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+Simulating one second
+ground plane state:
+Body world transform:
+  position = 0; -15; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+light falling body state:
+Body world transform:
+  position = -42; -14; 0
+  orientation = 0.0; 0.0; 0.6; 0.7
+scaled falling body state:
+Body world transform:
+  position = -31; -13; 0
+  orientation = 0.0; 0.0; 0.9; 0.4
+heavy falling body state:
+Body world transform:
+  position = 5; -14; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
+Simulating one second after deleting ground
+light falling body state:
+Body world transform:
+  position = -58; -18; 0
+  orientation = 0.0; 0.0; 0.0; 0.9
+scaled falling body state:
+Body world transform:
+  position = -43; -17; 0
+  orientation = 0.0; 0.0; 0.8; 0.4
+heavy falling body state:
+Body world transform:
+  position = 5; -18; 0
+  orientation = 0.0; 0.0; 0.0; 1.0
