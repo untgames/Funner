@@ -1,6 +1,6 @@
 /*
 ** LuaJIT VM builder: Assembler source code emitter.
-** Copyright (C) 2005-2010 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2011 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #include "buildvm.h"
@@ -8,6 +8,7 @@
 
 /* ------------------------------------------------------------------------ */
 
+#if LJ_TARGET_X86ORX64
 /* Emit bytes piecewise as assembler text. */
 static void emit_asm_bytes(BuildCtx *ctx, uint8_t *p, int n)
 {
@@ -72,6 +73,63 @@ err:
   emit_asm_bytes(ctx, cp, n);
   fprintf(ctx->fp, "\t%s %s\n", opname, sym);
 }
+#else
+/* Emit words piecewise as assembler text. */
+static void emit_asm_words(BuildCtx *ctx, uint8_t *p, int n)
+{
+  int i;
+  for (i = 0; i < n; i += 4) {
+    if ((i & 15) == 0)
+      fprintf(ctx->fp, "\t.long 0x%08x", *(uint32_t *)(p+i));
+    else
+      fprintf(ctx->fp, ",0x%08x", *(uint32_t *)(p+i));
+    if ((i & 15) == 12) putc('\n', ctx->fp);
+  }
+  if ((n & 15) != 0) putc('\n', ctx->fp);
+}
+
+/* Emit relocation as part of an instruction. */
+static void emit_asm_wordreloc(BuildCtx *ctx, uint8_t *p, int n,
+			       const char *sym)
+{
+  uint32_t ins;
+  emit_asm_words(ctx, p, n-4);
+  ins = *(uint32_t *)(p+n-4);
+#if LJ_TARGET_ARM
+  if ((ins & 0xff000000u) == 0xfa000000u) {
+    fprintf(ctx->fp, "\tblx %s\n", sym);
+  } else if ((ins & 0x0e000000u) == 0x0a000000u) {
+    fprintf(ctx->fp, "\t%s%.2s %s\n", (ins & 0x01000000u) ? "bl" : "b",
+	    "eqnecsccmiplvsvchilsgeltgtle" + 2*(ins >> 28), sym);
+  } else {
+    fprintf(stderr,
+	    "Error: unsupported opcode %08x for %s symbol relocation.\n",
+	    ins, sym);
+    exit(1);
+  }
+#elif LJ_TARGET_PPC
+  if ((ins >> 26) == 16) {
+    fprintf(ctx->fp, "\t%s %d, %d, %s\n",
+	    (ins & 1) ? "bcl" : "bc", (ins >> 21) & 31, (ins >> 16) & 31, sym);
+  } else if ((ins >> 26) == 18) {
+    fprintf(ctx->fp, "\t%s %s\n", (ins & 1) ? "bl" : "b", sym);
+  } else {
+    fprintf(stderr,
+	    "Error: unsupported opcode %08x for %s symbol relocation.\n",
+	    ins, sym);
+    exit(1);
+  }
+#else
+#error "missing relocation support for this architecture"
+#endif
+}
+#endif
+
+#if LJ_TARGET_ARM
+#define ELFASM_PX	"%%"
+#else
+#define ELFASM_PX	"@"
+#endif
 
 /* Emit an assembler label. */
 static void emit_asm_label(BuildCtx *ctx, const char *name, int size, int isfunc)
@@ -81,7 +139,7 @@ static void emit_asm_label(BuildCtx *ctx, const char *name, int size, int isfunc
     fprintf(ctx->fp,
       "\n\t.globl %s\n"
       "\t.hidden %s\n"
-      "\t.type %s, @%s\n"
+      "\t.type %s, " ELFASM_PX "%s\n"
       "\t.size %s, %d\n"
       "%s:\n",
       name, name, name, isfunc ? "function" : "object", name, size, name);
@@ -123,80 +181,55 @@ static void emit_asm_align(BuildCtx *ctx, int bits)
 /* Emit assembler source code. */
 void emit_asm(BuildCtx *ctx)
 {
-  char name[80];
-  int32_t prev;
-  int i, pi, rel;
-#if LJ_64
-  const char *symprefix = ctx->mode == BUILD_machasm ? "_" : "";
-  int keepfc = 0;
-#else
-  const char *symprefix = ctx->mode != BUILD_elfasm ? "_" : "";
-  /* Keep fastcall suffix for COFF on WIN32. */
-  int keepfc = (ctx->mode == BUILD_coffasm);
-#endif
+  int i, rel;
 
   fprintf(ctx->fp, "\t.file \"buildvm_%s.dasc\"\n", ctx->dasm_arch);
   fprintf(ctx->fp, "\t.text\n");
   emit_asm_align(ctx, 4);
 
-  sprintf(name, "%s" LABEL_ASM_BEGIN, symprefix);
-  emit_asm_label(ctx, name, 0, 0);
+  emit_asm_label(ctx, ctx->beginsym, 0, 0);
   if (ctx->mode != BUILD_machasm)
     fprintf(ctx->fp, ".Lbegin:\n");
 
-  i = 0;
-  do {
-    pi = ctx->perm[i++];
-    prev = ctx->sym_ofs[pi];
-  } while (prev < 0);  /* Skip the _Z symbols. */
-
-  for (rel = 0; i <= ctx->nsym; i++) {
-    int ni = ctx->perm[i];
-    int32_t next = ctx->sym_ofs[ni];
-    int size = (int)(next - prev);
-    int32_t stop = next;
-    if (pi >= ctx->npc) {
-      char *p;
-      sprintf(name, "%s" LABEL_PREFIX "%s", symprefix,
-	      ctx->globnames[pi-ctx->npc]);
-      p = strchr(name, '@');
-      if (p) { if (keepfc) name[0] = '@'; else *p = '\0'; }
-      emit_asm_label(ctx, name, size, 1);
-#if LJ_HASJIT
-    } else {
-#else
-    } else if (!(pi == BC_JFORI || pi == BC_JFORL || pi == BC_JITERL ||
-		 pi == BC_JLOOP || pi == BC_IFORL || pi == BC_IITERL ||
-		 pi == BC_ILOOP)) {
-#endif
-      sprintf(name, "%s" LABEL_PREFIX_BC "%s", symprefix, bc_names[pi]);
-      emit_asm_label(ctx, name, size, 1);
-    }
-    while (rel < ctx->nreloc && ctx->reloc[rel].ofs < stop) {
+  for (i = rel = 0; i < ctx->nsym; i++) {
+    int32_t ofs = ctx->sym[i].ofs;
+    int32_t next = ctx->sym[i+1].ofs;
+    emit_asm_label(ctx, ctx->sym[i].name, next - ofs, 1);
+    while (rel < ctx->nreloc && ctx->reloc[rel].ofs <= next) {
       BuildReloc *r = &ctx->reloc[rel];
-      int n = r->ofs - prev;
-      char *p;
-      sprintf(name, "%s%s", symprefix, ctx->extnames[r->sym]);
-      p = strchr(name, '@');
-      if (p) { if (keepfc) name[0] = '@'; else *p = '\0'; }
+      int n = r->ofs - ofs;
+#if LJ_TARGET_X86ORX64
       if (ctx->mode == BUILD_machasm && r->type != 0) {
-	emit_asm_reloc_mach(ctx, ctx->code+prev, n, name);
+	emit_asm_reloc_mach(ctx, ctx->code+ofs, n, ctx->relocsym[r->sym]);
       } else {
-	emit_asm_bytes(ctx, ctx->code+prev, n);
-	emit_asm_reloc(ctx, r->type, name);
+	emit_asm_bytes(ctx, ctx->code+ofs, n);
+	emit_asm_reloc(ctx, r->type, ctx->relocsym[r->sym]);
       }
-      prev += n+4;
+      ofs += n+4;
+#else
+      emit_asm_wordreloc(ctx, ctx->code+ofs, n, ctx->relocsym[r->sym]);
+      ofs += n;
+#endif
       rel++;
     }
-    emit_asm_bytes(ctx, ctx->code+prev, stop-prev);
-    prev = next;
-    pi = ni;
+#if LJ_TARGET_X86ORX64
+    emit_asm_bytes(ctx, ctx->code+ofs, next-ofs);
+#else
+    emit_asm_words(ctx, ctx->code+ofs, next-ofs);
+#endif
   }
 
   fprintf(ctx->fp, "\n");
   switch (ctx->mode) {
   case BUILD_elfasm:
-    fprintf(ctx->fp, "\t.section .note.GNU-stack,\"\",@progbits\n");
+    fprintf(ctx->fp, "\t.section .note.GNU-stack,\"\"," ELFASM_PX "progbits\n");
+#if LJ_TARGET_PPCSPE
+    /* Soft-float ABI + SPE. */
+    fprintf(ctx->fp, "\t.gnu_attribute 4, 2\n\t.gnu_attribute 8, 3\n");
+#elif LJ_TARGET_PPC
+    /* Hard-float ABI. */
+    fprintf(ctx->fp, "\t.gnu_attribute 4, 1\n");
+#endif
     /* fallthrough */
   case BUILD_coffasm:
     fprintf(ctx->fp, "\t.ident \"%s\"\n", ctx->dasm_ident);

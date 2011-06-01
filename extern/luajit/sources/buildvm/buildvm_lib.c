@@ -1,12 +1,11 @@
 /*
 ** LuaJIT VM builder: library definition compiler.
-** Copyright (C) 2005-2010 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2011 Mike Pall. See Copyright Notice in luajit.h
 */
 
+#include "buildvm.h"
 #include "lj_obj.h"
 #include "lj_lib.h"
-
-#include "buildvm.h"
 
 /* Context for library definitions. */
 static uint8_t obuf[8192];
@@ -23,7 +22,7 @@ enum {
   REGFUNC_NOREGUV
 };
 
-static void libdef_name(char *p, int kind)
+static void libdef_name(const char *p, int kind)
 {
   size_t n = strlen(p);
   if (kind != LIBINIT_STRING) {
@@ -198,7 +197,7 @@ static void memcpy_endian(void *dst, void *src, size_t n)
   } else {
     size_t i;
     for (i = 0; i < n; i++)
-      ((uint8_t *)dst)[i] = ((uint8_t *)src)[n-i];
+      ((uint8_t *)dst)[i] = ((uint8_t *)src)[n-i-1];
   }
 }
 

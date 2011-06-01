@@ -12,9 +12,9 @@ ifeq (,$(filter iphone,$(PROFILES))$(filter beagleboard,$(PROFILES))$(filter and
   FUNNER_EXTERN_LIBS.COMPONENTS += curl
 endif
 
-ifneq (,$(filter win32,$(PROFILES)))
-  FUNNER_EXTERN_LIBS.COMPONENTS += luajit
-endif
+#ifneq (,$(filter win32,$(PROFILES)))
+#  FUNNER_EXTERN_LIBS.COMPONENTS += luajit
+#endif
 
 ifneq (,$(filter linux,$(PROFILES)))
   FUNNER_EXTERN_LIBS.COMPONENTS += openalsdk

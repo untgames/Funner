@@ -1,6 +1,6 @@
 /*
 ** LuaJIT VM builder.
-** Copyright (C) 2005-2010 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2011 Mike Pall. See Copyright Notice in luajit.h
 **
 ** This is a tool to build the hand-tuned assembler code required for
 ** LuaJIT's bytecode interpreter. It supports a variety of output formats
@@ -14,23 +14,22 @@
 ** It's a one-shot tool -- any effort fixing this would be wasted.
 */
 
-#include "lua.h"
-#include "luajit.h"
-
-#ifdef LUA_USE_WIN
-#include <fcntl.h>
-#include <io.h>
-#endif
-
+#include "buildvm.h"
 #include "lj_obj.h"
 #include "lj_gc.h"
 #include "lj_bc.h"
 #include "lj_ir.h"
 #include "lj_frame.h"
 #include "lj_dispatch.h"
-#include "lj_target.h"
+#if LJ_HASFFI
+#include "lj_ccall.h"
+#endif
+#include "luajit.h"
 
-#include "buildvm.h"
+#if defined(_WIN32)
+#include <fcntl.h>
+#include <io.h>
+#endif
 
 /* ------------------------------------------------------------------------ */
 
@@ -38,24 +37,11 @@
 #define Dst		ctx
 #define Dst_DECL	BuildCtx *ctx
 #define Dst_REF		(ctx->D)
+#define DASM_CHECKS	1
 
 #include "../dynasm/dasm_proto.h"
 
 /* Glue macros for DynASM. */
-#define DASM_M_GROW(ctx, t, p, sz, need) \
-  do { \
-    size_t _sz = (sz), _need = (need); \
-    if (_sz < _need) { \
-      if (_sz < 16) _sz = 16; \
-      while (_sz < _need) _sz += _sz; \
-      (p) = (t *)realloc((p), _sz); \
-      if ((p) == NULL) exit(1); \
-      (sz) = _sz; \
-    } \
-  } while(0)
-
-#define DASM_M_FREE(ctx, p, sz)	free(p)
-
 static int collect_reloc(BuildCtx *ctx, uint8_t *addr, int idx, int type);
 
 #define DASM_EXTERN(ctx, addr, idx, type) \
@@ -67,15 +53,22 @@ static int collect_reloc(BuildCtx *ctx, uint8_t *addr, int idx, int type);
 #define DASM_ALIGNED_WRITES	1
 
 /* Embed architecture-specific DynASM encoder and backend. */
-#if LJ_TARGET_X86ORX64
+#if LJ_TARGET_X86
 #include "../dynasm/dasm_x86.h"
-#if LJ_32
 #include "buildvm_x86.h"
-#elif defined(_WIN64)
+#elif LJ_TARGET_X64
+#include "../dynasm/dasm_x86.h"
+#if LJ_ABI_WIN
 #include "buildvm_x64win.h"
 #else
 #include "buildvm_x64.h"
 #endif
+#elif LJ_TARGET_ARM
+#include "../dynasm/dasm_arm.h"
+#include "buildvm_arm.h"
+#elif LJ_TARGET_PPCSPE
+#include "../dynasm/dasm_ppc.h"
+#include "buildvm_ppcspe.h"
 #else
 #error "No support for this architecture (yet)"
 #endif
@@ -101,6 +94,33 @@ static void emit_raw(BuildCtx *ctx)
 
 /* -- Build machine code -------------------------------------------------- */
 
+static const char *sym_decorate(BuildCtx *ctx,
+				const char *prefix, const char *suffix)
+{
+  char name[256];
+  char *p;
+#if LJ_64
+  const char *symprefix = ctx->mode == BUILD_machasm ? "_" : "";
+#else
+  const char *symprefix = ctx->mode != BUILD_elfasm ? "_" : "";
+#endif
+  sprintf(name, "%s%s%s", symprefix, prefix, suffix);
+  p = strchr(name, '@');
+  if (p) {
+    if (!LJ_64 && (ctx->mode == BUILD_coffasm || ctx->mode == BUILD_peobj))
+      name[0] = '@';
+    else
+      *p = '\0';
+  }
+  p = (char *)malloc(strlen(name)+1);  /* MSVC doesn't like strdup. */
+  strcpy(p, name);
+  return p;
+}
+
+#define NRELOCSYM	(sizeof(extnames)/sizeof(extnames[0])-1)
+
+static int relocmap[NRELOCSYM];
+
 /* Collect external relocations. */
 static int collect_reloc(BuildCtx *ctx, uint8_t *addr, int idx, int type)
 {
@@ -108,32 +128,38 @@ static int collect_reloc(BuildCtx *ctx, uint8_t *addr, int idx, int type)
     fprintf(stderr, "Error: too many relocations, increase BUILD_MAX_RELOC.\n");
     exit(1);
   }
+  if (relocmap[idx] < 0) {
+    relocmap[idx] = ctx->nrelocsym;
+    ctx->relocsym[ctx->nrelocsym] = sym_decorate(ctx, "", extnames[idx]);
+    ctx->nrelocsym++;
+  }
   ctx->reloc[ctx->nreloc].ofs = (int32_t)(addr - ctx->code);
-  ctx->reloc[ctx->nreloc].sym = idx;
+  ctx->reloc[ctx->nreloc].sym = relocmap[idx];
   ctx->reloc[ctx->nreloc].type = type;
   ctx->nreloc++;
   return 0;  /* Encode symbol offset of 0. */
 }
 
 /* Naive insertion sort. Performance doesn't matter here. */
-static void perm_insert(int *perm, int32_t *ofs, int i)
+static void sym_insert(BuildCtx *ctx, int32_t ofs,
+		       const char *prefix, const char *suffix)
 {
-  perm[i] = i;
+  ptrdiff_t i = ctx->nsym++;
   while (i > 0) {
-    int a = perm[i-1];
-    int b = perm[i];
-    if (ofs[a] <= ofs[b]) break;
-    perm[i] = a;
-    perm[i-1] = b;
+    if (ctx->sym[i-1].ofs <= ofs)
+      break;
+    ctx->sym[i] = ctx->sym[i-1];
     i--;
   }
+  ctx->sym[i].ofs = ofs;
+  ctx->sym[i].name = sym_decorate(ctx, prefix, suffix);
 }
 
 /* Build the machine code. */
 static int build_code(BuildCtx *ctx)
 {
   int status;
-  int i, j;
+  int i;
 
   /* Initialize DynASM structures. */
   ctx->nglob = GLOB__MAX;
@@ -141,8 +167,10 @@ static int build_code(BuildCtx *ctx)
   memset(ctx->glob, 0, ctx->nglob*sizeof(void *));
   ctx->nreloc = 0;
 
-  ctx->extnames = extnames;
   ctx->globnames = globnames;
+  ctx->relocsym = (const char **)malloc(NRELOCSYM*sizeof(const char *));
+  ctx->nrelocsym = 0;
+  for (i = 0; i < (int)NRELOCSYM; i++) relocmap[i] = -1;
 
   ctx->dasm_ident = DASM_IDENT;
   ctx->dasm_arch = DASM_ARCH;
@@ -155,42 +183,46 @@ static int build_code(BuildCtx *ctx)
   ctx->npc = build_backend(ctx);
 
   /* Finalize the code. */
-  (void)dasm_checkstep(Dst, DASM_SECTION_CODE);
+  (void)dasm_checkstep(Dst, -1);
   if ((status = dasm_link(Dst, &ctx->codesz))) return status;
   ctx->code = (uint8_t *)malloc(ctx->codesz);
   if ((status = dasm_encode(Dst, (void *)ctx->code))) return status;
 
-  /* Allocate the symbol offset and permutation tables. */
-  ctx->nsym = ctx->npc + ctx->nglob;
-  ctx->perm = (int *)malloc((ctx->nsym+1)*sizeof(int *));
-  ctx->sym_ofs = (int32_t *)malloc((ctx->nsym+1)*sizeof(int32_t));
+  /* Allocate symbol table and bytecode offsets. */
+  ctx->beginsym = sym_decorate(ctx, "", LABEL_PREFIX "vm_asm_begin");
+  ctx->sym = (BuildSym *)malloc((ctx->npc+ctx->nglob+1)*sizeof(BuildSym));
+  ctx->nsym = 0;
+  ctx->bc_ofs = (int32_t *)malloc(ctx->npc*sizeof(int32_t));
 
   /* Collect the opcodes (PC labels). */
   for (i = 0; i < ctx->npc; i++) {
-    int32_t n = dasm_getpclabel(Dst, i);
-    if (n < 0) return 0x22000000|i;
-    ctx->sym_ofs[i] = n;
-    perm_insert(ctx->perm, ctx->sym_ofs, i);
+    int32_t ofs = dasm_getpclabel(Dst, i);
+    if (ofs < 0) return 0x22000000|i;
+    ctx->bc_ofs[i] = ofs;
+    if ((LJ_HASJIT ||
+	 !(i == BC_JFORI || i == BC_JFORL || i == BC_JITERL || i == BC_JLOOP ||
+	   i == BC_IFORL || i == BC_IITERL || i == BC_ILOOP)) &&
+	(LJ_HASFFI || i != BC_KCDATA))
+      sym_insert(ctx, ofs, LABEL_PREFIX_BC, bc_names[i]);
   }
 
   /* Collect the globals (named labels). */
-  for (j = 0; j < ctx->nglob; j++, i++) {
-    const char *gl = globnames[j];
+  for (i = 0; i < ctx->nglob; i++) {
+    const char *gl = globnames[i];
     int len = (int)strlen(gl);
-    if (!ctx->glob[j]) {
+    if (!ctx->glob[i]) {
       fprintf(stderr, "Error: undefined global %s\n", gl);
       exit(2);
     }
-    if (len >= 2 && gl[len-2] == '_' && gl[len-1] == 'Z')
-      ctx->sym_ofs[i] = -1;  /* Skip the _Z symbols. */
-    else
-      ctx->sym_ofs[i] = (int32_t)((uint8_t *)(ctx->glob[j]) - ctx->code);
-    perm_insert(ctx->perm, ctx->sym_ofs, i);
+    /* Skip the _Z symbols. */
+    if (!(len >= 2 && gl[len-2] == '_' && gl[len-1] == 'Z'))
+      sym_insert(ctx, (int32_t)((uint8_t *)(ctx->glob[i]) - ctx->code),
+		 LABEL_PREFIX, globnames[i]);
   }
 
   /* Close the address range. */
-  ctx->sym_ofs[i] = (int32_t)ctx->codesz;
-  perm_insert(ctx->perm, ctx->sym_ofs, i);
+  sym_insert(ctx, (int32_t)ctx->codesz, "", "");
+  ctx->nsym--;
 
   dasm_free(Dst);
 
@@ -210,6 +242,13 @@ const char *const ir_names[] = {
 #define IRNAME(name, m, m1, m2)	#name,
 IRDEF(IRNAME)
 #undef IRNAME
+  NULL
+};
+
+const char *const irt_names[] = {
+#define IRTNAME(name)	#name,
+IRTDEF(IRTNAME)
+#undef IRTNAME
   NULL
 };
 
@@ -260,7 +299,7 @@ static void emit_bcdef(BuildCtx *ctx)
   for (i = 0; i < ctx->npc; i++) {
     if (i != 0)
       fprintf(ctx->fp, ",\n");
-    fprintf(ctx->fp, "%d", ctx->sym_ofs[i]);
+    fprintf(ctx->fp, "%d", ctx->bc_ofs[i]);
   }
 }
 
@@ -384,6 +423,12 @@ int main(int argc, char **argv)
   BuildCtx *ctx = &ctx_;
   int status, binmode;
 
+  if (sizeof(void *) != 4*LJ_32+8*LJ_64) {
+    fprintf(stderr,"Error: pointer size mismatch in cross-build.\n");
+    fprintf(stderr,"Try: make HOST_CC=\"gcc -m32\" CROSS=... TARGET=...\n\n");
+    return 1;
+  }
+
   UNUSED(argc);
   parseargs(ctx, argv);
 
@@ -393,9 +438,7 @@ int main(int argc, char **argv)
   }
 
   switch (ctx->mode) {
-#if LJ_TARGET_X86ORX64
   case BUILD_peobj:
-#endif
   case BUILD_raw:
     binmode = 1;
     break;
@@ -406,7 +449,7 @@ int main(int argc, char **argv)
 
   if (ctx->outname[0] == '-' && ctx->outname[1] == '\0') {
     ctx->fp = stdout;
-#ifdef LUA_USE_WIN
+#if defined(_WIN32)
     if (binmode)
       _setmode(_fileno(stdout), _O_BINARY);  /* Yuck. */
 #endif
@@ -423,11 +466,9 @@ int main(int argc, char **argv)
     emit_asm(ctx);
     emit_asm_debug(ctx);
     break;
-#if LJ_TARGET_X86ORX64
   case BUILD_peobj:
     emit_peobj(ctx);
     break;
-#endif
   case BUILD_raw:
     emit_raw(ctx);
     break;

@@ -1,6 +1,6 @@
 /*
 ** Bytecode instruction format.
-** Copyright (C) 2005-2010 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2011 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #ifndef _LJ_BC_H
@@ -31,30 +31,29 @@
 #define NO_JMP		(~(BCPos)0)
 
 /* Macros to get instruction fields. */
-#define bc_op(i)	(cast(BCOp, (i)&0xff))
-#define bc_a(i)		(cast(BCReg, ((i)>>8)&0xff))
-#define bc_b(i)		(cast(BCReg, (i)>>24))
-#define bc_c(i)		(cast(BCReg, ((i)>>16)&0xff))
-#define bc_d(i)		(cast(BCReg, (i)>>16))
+#define bc_op(i)	((BCOp)((i)&0xff))
+#define bc_a(i)		((BCReg)(((i)>>8)&0xff))
+#define bc_b(i)		((BCReg)((i)>>24))
+#define bc_c(i)		((BCReg)(((i)>>16)&0xff))
+#define bc_d(i)		((BCReg)((i)>>16))
 #define bc_j(i)		((ptrdiff_t)bc_d(i)-BCBIAS_J)
 
 /* Macros to set instruction fields. */
 #define setbc_byte(p, x, ofs) \
-  ((uint8_t *)(p))[LJ_ENDIAN_SELECT(ofs, 3-ofs)] = cast_byte(x)
+  ((uint8_t *)(p))[LJ_ENDIAN_SELECT(ofs, 3-ofs)] = (uint8_t)(x)
 #define setbc_op(p, x)	setbc_byte(p, (x), 0)
 #define setbc_a(p, x)	setbc_byte(p, (x), 1)
 #define setbc_b(p, x)	setbc_byte(p, (x), 3)
 #define setbc_c(p, x)	setbc_byte(p, (x), 2)
 #define setbc_d(p, x) \
-  ((uint16_t *)(p))[LJ_ENDIAN_SELECT(1, 0)] = cast(uint16_t, (x))
+  ((uint16_t *)(p))[LJ_ENDIAN_SELECT(1, 0)] = (uint16_t)(x)
 #define setbc_j(p, x)	setbc_d(p, (BCPos)((int32_t)(x)+BCBIAS_J))
 
 /* Macros to compose instructions. */
 #define BCINS_ABC(o, a, b, c) \
-  (cast(BCIns, o)|(cast(BCIns, a)<<8)|\
-  (cast(BCIns, b)<<24)|(cast(BCIns, c)<<16))
+  (((BCIns)(o))|((BCIns)(a)<<8)|((BCIns)(b)<<24)|((BCIns)(c)<<16))
 #define BCINS_AD(o, a, d) \
-  (cast(BCIns, o)|(cast(BCIns, a)<<8)|(cast(BCIns, d)<<16))
+  (((BCIns)(o))|((BCIns)(a)<<8)|((BCIns)(d)<<16))
 #define BCINS_AJ(o, a, j)	BCINS_AD(o, a, (BCPos)((int32_t)(j)+BCBIAS_J))
 
 /* Bytecode instruction definition. Order matters, see below.
@@ -121,6 +120,7 @@
   \
   /* Constant ops. */ \
   _(KSTR,	dst,	___,	str,	___) \
+  _(KCDATA,	dst,	___,	cdata,	___) \
   _(KSHORT,	dst,	___,	lits,	___) \
   _(KNUM,	dst,	___,	num,	___) \
   _(KPRI,	dst,	___,	pri,	___) \
@@ -154,7 +154,9 @@
   _(CALLMT,	base,	___,	lit,	call) \
   _(CALLT,	base,	___,	lit,	call) \
   _(ITERC,	base,	lit,	lit,	call) \
+  _(ITERN,	base,	lit,	lit,	call) \
   _(VARG,	base,	lit,	lit,	___) \
+  _(ISNEXT,	base,	___,	jump,	___) \
   \
   /* Returns. */ \
   _(RETM,	base,	___,	lit,	___) \
@@ -187,8 +189,8 @@
   _(FUNCV,	rbase,	___,	___,	___) \
   _(IFUNCV,	rbase,	___,	___,	___) \
   _(JFUNCV,	rbase,	___,	lit,	___) \
-  _(FUNCC,	___,	___,	___,	___) \
-  _(FUNCCW,	___,	___,	___,	___)
+  _(FUNCC,	rbase,	___,	___,	___) \
+  _(FUNCCW,	rbase,	___,	___,	___)
 
 /* Bytecode opcode numbers. */
 typedef enum {
@@ -221,6 +223,9 @@ LJ_STATIC_ASSERT((int)BC_FUNCF + 2 == (int)BC_JFUNCF);
 LJ_STATIC_ASSERT((int)BC_FUNCV + 1 == (int)BC_IFUNCV);
 LJ_STATIC_ASSERT((int)BC_FUNCV + 2 == (int)BC_JFUNCV);
 
+/* This solves a circular dependency problem, change as needed. */
+#define FF_next_N	15
+
 /* Stack slots used by FORI/FORL, relative to operand A. */
 enum {
   FORL_IDX, FORL_STOP, FORL_STEP, FORL_EXT
@@ -229,17 +234,17 @@ enum {
 /* Bytecode operand modes. ORDER BCMode */
 typedef enum {
   BCMnone, BCMdst, BCMbase, BCMvar, BCMrbase, BCMuv,  /* Mode A must be <= 7 */
-  BCMlit, BCMlits, BCMpri, BCMnum, BCMstr, BCMtab, BCMfunc, BCMjump,
+  BCMlit, BCMlits, BCMpri, BCMnum, BCMstr, BCMtab, BCMfunc, BCMjump, BCMcdata,
   BCM_max
 } BCMode;
 #define BCM___		BCMnone
 
-#define bcmode_a(op)	(cast(BCMode, lj_bc_mode[op] & 7))
-#define bcmode_b(op)	(cast(BCMode, (lj_bc_mode[op]>>3) & 15))
-#define bcmode_c(op)	(cast(BCMode, (lj_bc_mode[op]>>7) & 15))
+#define bcmode_a(op)	((BCMode)(lj_bc_mode[op] & 7))
+#define bcmode_b(op)	((BCMode)((lj_bc_mode[op]>>3) & 15))
+#define bcmode_c(op)	((BCMode)((lj_bc_mode[op]>>7) & 15))
 #define bcmode_d(op)	bcmode_c(op)
 #define bcmode_hasd(op)	((lj_bc_mode[op] & (15<<3)) == (BCMnone<<3))
-#define bcmode_mm(op)	(cast(MMS, lj_bc_mode[op]>>11))
+#define bcmode_mm(op)	((MMS)(lj_bc_mode[op]>>11))
 
 #define BCMODE(name, ma, mb, mc, mm) \
   (BCM##ma|(BCM##mb<<3)|(BCM##mc<<7)|(MM_##mm<<11)),

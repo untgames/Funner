@@ -1,6 +1,6 @@
 /*
 ** Table handling.
-** Copyright (C) 2005-2010 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2011 Mike Pall. See Copyright Notice in luajit.h
 **
 ** Major portions taken verbatim or adapted from the Lua interpreter.
 ** Copyright (C) 1994-2008 Lua.org, PUC-Rio. See Copyright Notice in lua.h
@@ -17,26 +17,24 @@
 /* -- Object hashing ------------------------------------------------------ */
 
 /* Hash values are masked with the table hash mask and used as an index. */
-#define hashmask(t, x)		(&noderef(t->node)[(x) & t->hmask])
+static LJ_AINLINE Node *hashmask(const GCtab *t, uint32_t hash)
+{
+  Node *n = noderef(t->node);
+  return &n[hash & t->hmask];
+}
 
 /* String hashes are precomputed when they are interned. */
 #define hashstr(t, s)		hashmask(t, (s)->hash)
 
-#define hashnum(t, o)		hashrot(t, (o)->u32.lo, ((o)->u32.hi << 1))
-#define hashgcref(t, r)		hashrot(t, gcrefu(r), gcrefu(r)-0x04c11db7)
-
-/* Scramble the bits of numbers and pointers. */
-static LJ_AINLINE Node *hashrot(const GCtab *t, uint32_t lo, uint32_t hi)
-{
-  lo ^= hi; hi = lj_rol(hi, 14);
-  lo -= hi; hi = lj_rol(hi, 5);
-  hi ^= lo; hi -= lj_rol(lo, 27);
-  return hashmask(t, hi);
-}
+#define hashlohi(t, lo, hi)	hashmask((t), hashrot((lo), (hi)))
+#define hashnum(t, o)		hashlohi((t), (o)->u32.lo, ((o)->u32.hi << 1))
+#define hashptr(t, p)		hashlohi((t), u32ptr(p), u32ptr(p) + HASH_BIAS)
+#define hashgcref(t, r)		hashlohi((t), gcrefu(r), gcrefu(r) + HASH_BIAS)
 
 /* Hash an arbitrary key and return its anchor position in the hash table. */
 static Node *hashkey(const GCtab *t, cTValue *key)
 {
+  lua_assert(!tvisint(key));
   if (tvisstr(key))
     return hashstr(t, strV(key));
   else if (tvisnum(key))
@@ -99,11 +97,11 @@ static GCtab *newtab(lua_State *L, uint32_t asize, uint32_t hbits)
 {
   GCtab *t;
   /* First try to colocate the array part. */
-  if (LJ_MAX_COLOSIZE && asize > 0 && asize <= LJ_MAX_COLOSIZE) {
+  if (LJ_MAX_COLOSIZE != 0 && asize > 0 && asize <= LJ_MAX_COLOSIZE) {
     lua_assert((sizeof(GCtab) & 7) == 0);
     t = (GCtab *)lj_mem_newgco(L, sizetabcolo(asize));
     t->gct = ~LJ_TTAB;
-    t->nomm = cast_byte(~0);
+    t->nomm = (uint8_t)~0;
     t->colo = (int8_t)asize;
     setmref(t->array, (TValue *)((char *)t + sizeof(GCtab)));
     setgcrefnull(t->metatable);
@@ -113,7 +111,7 @@ static GCtab *newtab(lua_State *L, uint32_t asize, uint32_t hbits)
   } else {  /* Otherwise separately allocate the array part. */
     t = lj_mem_newobj(L, GCtab);
     t->gct = ~LJ_TTAB;
-    t->nomm = cast_byte(~0);
+    t->nomm = (uint8_t)~0;
     t->colo = 0;
     setmref(t->array, NULL);
     setgcrefnull(t->metatable);
@@ -192,7 +190,7 @@ GCtab * LJ_FASTCALL lj_tab_dup(lua_State *L, const GCtab *kt)
       Node *kn = &knode[i];
       Node *n = &node[i];
       Node *next = nextnode(kn);
-      /* Don't use copyTV here, since it asserts on a copy of a DEADKEY. */
+      /* Don't use copyTV here, since it asserts on a copy of a dead key. */
       n->val = kn->val; n->key = kn->key;
       setmref(n->next, next == NULL? next : (Node *)((char *)next + d));
     }
@@ -205,9 +203,9 @@ void LJ_FASTCALL lj_tab_free(global_State *g, GCtab *t)
 {
   if (t->hmask > 0)
     lj_mem_freevec(g, noderef(t->node), t->hmask+1, Node);
-  if (t->asize > 0 && LJ_MAX_COLOSIZE && t->colo <= 0)
+  if (t->asize > 0 && LJ_MAX_COLOSIZE != 0 && t->colo <= 0)
     lj_mem_freevec(g, tvref(t->array), t->asize, TValue);
-  if (LJ_MAX_COLOSIZE && t->colo)
+  if (LJ_MAX_COLOSIZE != 0 && t->colo)
     lj_mem_free(g, t, sizetabcolo((uint32_t)t->colo & 0x7f));
   else
     lj_mem_freet(g, t);
@@ -226,7 +224,7 @@ static void resizetab(lua_State *L, GCtab *t, uint32_t asize, uint32_t hbits)
     uint32_t i;
     if (asize > LJ_MAX_ASIZE)
       lj_err_msg(L, LJ_ERR_TABOV);
-    if (LJ_MAX_COLOSIZE && t->colo > 0) {
+    if (LJ_MAX_COLOSIZE != 0 && t->colo > 0) {
       /* A colocated array must be separated and copied. */
       TValue *oarray = tvref(t->array);
       array = lj_mem_newvec(L, asize, TValue);
@@ -259,7 +257,7 @@ static void resizetab(lua_State *L, GCtab *t, uint32_t asize, uint32_t hbits)
       if (!tvisnil(&array[i]))
 	copyTV(L, lj_tab_setinth(L, t, (int32_t)i), &array[i]);
     /* Physically shrink only separated arrays. */
-    if (LJ_MAX_COLOSIZE && t->colo <= 0)
+    if (LJ_MAX_COLOSIZE != 0 && t->colo <= 0)
       setmref(t->array, lj_mem_realloc(L, array,
 	      oldasize*sizeof(TValue), asize*sizeof(TValue)));
   }
@@ -278,10 +276,11 @@ static void resizetab(lua_State *L, GCtab *t, uint32_t asize, uint32_t hbits)
 
 static uint32_t countint(cTValue *key, uint32_t *bins)
 {
+  lua_assert(!tvisint(key));
   if (tvisnum(key)) {
     lua_Number nk = numV(key);
     int32_t k = lj_num2int(nk);
-    if ((uint32_t)k < LJ_MAX_ASIZE && nk == cast_num(k)) {
+    if ((uint32_t)k < LJ_MAX_ASIZE && nk == (lua_Number)k) {
       bins[(k > 2 ? lj_fls((uint32_t)(k-1)) : 0)]++;
       return 1;
     }
@@ -363,7 +362,7 @@ cTValue * LJ_FASTCALL lj_tab_getinth(GCtab *t, int32_t key)
 {
   TValue k;
   Node *n;
-  k.n = cast_num(key);
+  k.n = (lua_Number)key;
   n = hashnum(t, &k);
   do {
     if (tvisnum(&n->key) && n->key.n == k.n)
@@ -388,10 +387,14 @@ cTValue *lj_tab_get(lua_State *L, GCtab *t, cTValue *key)
     cTValue *tv = lj_tab_getstr(t, strV(key));
     if (tv)
       return tv;
+  } else if (tvisint(key)) {
+    cTValue *tv = lj_tab_getint(t, intV(key));
+    if (tv)
+      return tv;
   } else if (tvisnum(key)) {
     lua_Number nk = numV(key);
     int32_t k = lj_num2int(nk);
-    if (nk == cast_num(k)) {
+    if (nk == (lua_Number)k) {
       cTValue *tv = lj_tab_getint(t, k);
       if (tv)
 	return tv;
@@ -439,6 +442,18 @@ TValue *lj_tab_newkey(lua_State *L, GCtab *t, cTValue *key)
       freenode->next = n->next;
       setmref(n->next, NULL);
       setnilV(&n->val);
+      /* Rechain pseudo-resurrected string keys with colliding hashes. */
+      while (nextnode(freenode)) {
+	Node *nn = nextnode(freenode);
+	if (tvisstr(&nn->key) && !tvisnil(&nn->val) &&
+	    hashstr(t, strV(&nn->key)) == n) {
+	  freenode->next = nn->next;
+	  nn->next = n->next;
+	  setmref(n->next, nn);
+	} else {
+	  freenode = nn;
+	}
+      }
     } else {  /* Otherwise use free node. */
       setmrefr(freenode->next, n->next);  /* Insert into chain. */
       setmref(n->next, freenode);
@@ -448,7 +463,7 @@ TValue *lj_tab_newkey(lua_State *L, GCtab *t, cTValue *key)
   n->key.u64 = key->u64;
   if (LJ_UNLIKELY(tvismzero(&n->key)))
     n->key.u64 = 0;
-  lj_gc_barriert(L, t, key);
+  lj_gc_anybarriert(L, t);
   lua_assert(tvisnil(&n->val));
   return &n->val;
 }
@@ -457,7 +472,7 @@ TValue *lj_tab_setinth(lua_State *L, GCtab *t, int32_t key)
 {
   TValue k;
   Node *n;
-  k.n = cast_num(key);
+  k.n = (lua_Number)key;
   n = hashnum(t, &k);
   do {
     if (tvisnum(&n->key) && n->key.n == k.n)
@@ -484,10 +499,12 @@ TValue *lj_tab_set(lua_State *L, GCtab *t, cTValue *key)
   t->nomm = 0;  /* Invalidate negative metamethod cache. */
   if (tvisstr(key)) {
     return lj_tab_setstr(L, t, strV(key));
+  } else if (tvisint(key)) {
+    return lj_tab_setint(L, t, intV(key));
   } else if (tvisnum(key)) {
     lua_Number nk = numV(key);
     int32_t k = lj_num2int(nk);
-    if (nk == cast_num(k))
+    if (nk == (lua_Number)k)
       return lj_tab_setint(L, t, k);
     if (tvisnan(key))
       lj_err_msg(L, LJ_ERR_NANIDX);
@@ -508,18 +525,23 @@ TValue *lj_tab_set(lua_State *L, GCtab *t, cTValue *key)
 /* Get the traversal index of a key. */
 static uint32_t keyindex(lua_State *L, GCtab *t, cTValue *key)
 {
-  if (tvisnum(key)) {
+  TValue tmp;
+  if (tvisint(key)) {
+    int32_t k = intV(key);
+    if ((uint32_t)k < t->asize)
+      return (uint32_t)k;  /* Array key indexes: [0..t->asize-1] */
+    setnumV(&tmp, (lua_Number)k);
+    key = &tmp;
+  } else if (tvisnum(key)) {
     lua_Number nk = numV(key);
     int32_t k = lj_num2int(nk);
-    if ((uint32_t)k < t->asize && nk == cast_num(k))
+    if ((uint32_t)k < t->asize && nk == (lua_Number)k)
       return (uint32_t)k;  /* Array key indexes: [0..t->asize-1] */
   }
   if (!tvisnil(key)) {
     Node *n = hashkey(t, key);
     do {
-      if (lj_obj_equal(&n->key, key) ||
-	  (itype(&n->key) == LJ_TDEADKEY && tvisgcv(key) &&
-	   gcV(&n->key) == gcV(key)))
+      if (lj_obj_equal(&n->key, key))
 	return t->asize + (uint32_t)(n - noderef(t->node));
 	/* Hash key indexes: [t->asize..t->asize+t->nmask] */
     } while ((n = nextnode(n)));
@@ -558,20 +580,20 @@ static MSize unbound_search(GCtab *t, MSize j)
   MSize i = j;  /* i is zero or a present index */
   j++;
   /* find `i' and `j' such that i is present and j is not */
-  while ((tv = lj_tab_getint(t, cast(int32_t, j))) && !tvisnil(tv)) {
+  while ((tv = lj_tab_getint(t, (int32_t)j)) && !tvisnil(tv)) {
     i = j;
     j *= 2;
     if (j > (MSize)(INT_MAX-2)) {  /* overflow? */
       /* table was built with bad purposes: resort to linear search */
       i = 1;
-      while ((tv = lj_tab_getint(t, cast(int32_t, i))) && !tvisnil(tv)) i++;
+      while ((tv = lj_tab_getint(t, (int32_t)i)) && !tvisnil(tv)) i++;
       return i - 1;
     }
   }
   /* now do a binary search between them */
   while (j - i > 1) {
     MSize m = (i+j)/2;
-    cTValue *tvb = lj_tab_getint(t, cast(int32_t, m));
+    cTValue *tvb = lj_tab_getint(t, (int32_t)m);
     if (tvb && !tvisnil(tvb)) i = m; else j = m;
   }
   return i;

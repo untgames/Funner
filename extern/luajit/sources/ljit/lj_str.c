@@ -1,6 +1,6 @@
 /*
 ** String handling.
-** Copyright (C) 2005-2010 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2011 Mike Pall. See Copyright Notice in luajit.h
 **
 ** Portions taken verbatim or adapted from the Lua interpreter.
 ** Copyright (C) 1994-2008 Lua.org, PUC-Rio. See Copyright Notice in lua.h
@@ -16,7 +16,7 @@
 #include "lj_err.h"
 #include "lj_str.h"
 #include "lj_state.h"
-#include "lj_ctype.h"
+#include "lj_char.h"
 
 /* -- String interning ---------------------------------------------------- */
 
@@ -29,7 +29,7 @@ int32_t LJ_FASTCALL lj_str_cmp(GCstr *a, GCstr *b)
     uint32_t va = *(const uint32_t *)(strdata(a)+i);
     uint32_t vb = *(const uint32_t *)(strdata(b)+i);
     if (va != vb) {
-#if LJ_ARCH_ENDIAN == LUAJIT_LE
+#if LJ_LE
       va = lj_bswap(va); vb = lj_bswap(vb);
 #endif
       i -= n;
@@ -41,6 +41,39 @@ int32_t LJ_FASTCALL lj_str_cmp(GCstr *a, GCstr *b)
     }
   }
   return (int32_t)(a->len - b->len);
+}
+
+typedef union
+#ifdef __GNUC__
+__attribute__((packed))
+#endif
+Unaligned32 { uint32_t u; uint8_t b[4]; } Unaligned32;
+
+/* Unaligned read of uint32_t. */
+static LJ_AINLINE uint32_t str_getu32(const void *p)
+{
+  return ((const Unaligned32 *)p)->u;
+}
+
+/* Fast string data comparison. Caveat: unaligned access to 1st string! */
+static LJ_AINLINE int str_fastcmp(const char *a, const char *b, MSize len)
+{
+  MSize i = 0;
+  lua_assert(len > 0);
+  lua_assert((((uintptr_t)a + len) & (LJ_PAGESIZE-1)) <= LJ_PAGESIZE-4);
+  do {  /* Note: innocuous access up to end of string + 3. */
+    uint32_t v = str_getu32(a+i) ^ *(const uint32_t *)(b+i);
+    if (v) {
+      i -= len;
+#if LJ_LE
+      return (int32_t)i >= -3 ? (v << (32+(i<<3))) : 1;
+#else
+      return (int32_t)i >= -3 ? (v >> (32+(i<<3))) : 1;
+#endif
+    }
+    i += 4;
+  } while (i < len);
+  return 0;
 }
 
 /* Resize the string hash table (grow and shrink). */
@@ -76,20 +109,49 @@ GCstr *lj_str_new(lua_State *L, const char *str, size_t lenx)
   GCstr *s;
   GCobj *o;
   MSize len = (MSize)lenx;
-  MSize h = len;
-  MSize step = (len>>5)+1;  /* Partial hash. */
-  MSize l1;
+  MSize a, b, h = len;
   if (lenx >= LJ_MAX_STR)
     lj_err_msg(L, LJ_ERR_STROV);
-  for (l1 = len; l1 >= step; l1 -= step)  /* Compute string hash. */
-    h = h ^ ((h<<5)+(h>>2)+cast(unsigned char, str[l1-1]));
-  /* Check if the string has already been interned. */
   g = G(L);
-  for (o = gcref(g->strhash[h & g->strmask]); o != NULL; o = gcnext(o)) {
-    GCstr *tso = gco2str(o);
-    if (tso->len == len && (memcmp(str, strdata(tso), len) == 0)) {
-      if (isdead(g, o)) flipwhite(o);  /* Resurrect if dead. */
-      return tso;  /* Return existing string. */
+  /* Compute string hash. Constants taken from lookup3 hash by Bob Jenkins. */
+  if (len >= 4) {  /* Caveat: unaligned access! */
+    a = str_getu32(str);
+    h ^= str_getu32(str+len-4);
+    b = str_getu32(str+(len>>1)-2);
+    h ^= b; h -= lj_rol(b, 14);
+    b += str_getu32(str+(len>>2)-1);
+  } else if (len > 0) {
+    a = *(const uint8_t *)str;
+    h ^= *(const uint8_t *)(str+len-1);
+    b = *(const uint8_t *)(str+(len>>1));
+    h ^= b; h -= lj_rol(b, 14);
+  } else {
+    return &g->strempty;
+  }
+  a ^= h; a -= lj_rol(h, 11);
+  b ^= a; b -= lj_rol(a, 25);
+  h ^= b; h -= lj_rol(b, 16);
+  /* Check if the string has already been interned. */
+  o = gcref(g->strhash[h & g->strmask]);
+  if (LJ_LIKELY((((uintptr_t)str + len) & (LJ_PAGESIZE-1)) <= LJ_PAGESIZE-4)) {
+    while (o != NULL) {
+      GCstr *sx = gco2str(o);
+      if (sx->len == len && str_fastcmp(str, strdata(sx), len) == 0) {
+	/* Resurrect if dead. Can only happen with fixstring() (keywords). */
+	if (isdead(g, o)) flipwhite(o);
+	return sx;  /* Return existing string. */
+      }
+      o = gcnext(o);
+    }
+  } else {  /* Slow path: end of string is too close to a page boundary. */
+    while (o != NULL) {
+      GCstr *sx = gco2str(o);
+      if (sx->len == len && memcmp(str, strdata(sx), len) == 0) {
+	/* Resurrect if dead. Can only happen with fixstring() (keywords). */
+	if (isdead(g, o)) flipwhite(o);
+	return sx;  /* Return existing string. */
+      }
+      o = gcnext(o);
     }
   }
   /* Nope, create a new string. */
@@ -122,35 +184,61 @@ void LJ_FASTCALL lj_str_free(global_State *g, GCstr *s)
 /* Convert string object to number. */
 int LJ_FASTCALL lj_str_tonum(GCstr *str, TValue *n)
 {
+  int ok = lj_str_numconv(strdata(str), n);
+  if (ok && tvisint(n))
+    setnumV(n, (lua_Number)intV(n));
+  return ok;
+}
+
+int LJ_FASTCALL lj_str_tonumber(GCstr *str, TValue *n)
+{
   return lj_str_numconv(strdata(str), n);
 }
 
 /* Convert string to number. */
 int LJ_FASTCALL lj_str_numconv(const char *s, TValue *n)
 {
+#if LJ_DUALNUM
+  int sign = 1;
+#else
   lua_Number sign = 1;
+#endif
   const uint8_t *p = (const uint8_t *)s;
-  while (lj_ctype_isspace(*p)) p++;
+  while (lj_char_isspace(*p)) p++;
   if (*p == '-') { p++; sign = -1; } else if (*p == '+') { p++; }
   if ((uint32_t)(*p - '0') < 10) {
     uint32_t k = (uint32_t)(*p++ - '0');
     if (k == 0 && ((*p & ~0x20) == 'X')) {
       p++;
-      while (lj_ctype_isxdigit(*p)) {
-	if (k >= 0x10000000) goto parsedbl;
+      if (!lj_char_isxdigit(*p))
+	return 0;  /* Don't accept '0x' without hex digits. */
+      do {
+	if (k >= 0x10000000u) goto parsedbl;
 	k = (k << 4) + (*p & 15u);
-	if (!lj_ctype_isdigit(*p)) k += 9;
+	if (!lj_char_isdigit(*p)) k += 9;
 	p++;
-      }
+      } while (lj_char_isxdigit(*p));
     } else {
       while ((uint32_t)(*p - '0') < 10) {
-	if (k >= 0x19999999) goto parsedbl;
+	if (LJ_UNLIKELY(k >= 429496729) && (k != 429496729 || *p > '5'))
+	  goto parsedbl;
 	k = k * 10u + (uint32_t)(*p++ - '0');
       }
     }
-    while (LJ_UNLIKELY(lj_ctype_isspace(*p))) p++;
+    while (LJ_UNLIKELY(lj_char_isspace(*p))) p++;
     if (LJ_LIKELY(*p == '\0')) {
-      setnumV(n, sign * cast_num(k));
+#if LJ_DUALNUM
+      if (sign == 1) {
+	if (k < 0x80000000u) {
+	  setintV(n, (int32_t)k);
+	  return 1;
+	}
+      } else if (k <= 0x80000000u) {
+	setintV(n, -(int32_t)k);
+	return 1;
+      }
+#endif
+      setnumV(n, sign * (lua_Number)k);
       return 1;
     }
   }
@@ -159,10 +247,10 @@ parsedbl:
     TValue tv;
     char *endptr;
     setnumV(&tv, lua_str2number(s, &endptr));
-    if (endptr == s) return 0;  /* conversion failed */
+    if (endptr == s) return 0;  /* Conversion failed. */
     if (LJ_UNLIKELY(*endptr != '\0')) {
-      while (lj_ctype_isspace((uint8_t)*endptr)) endptr++;
-      if (*endptr != '\0') return 0;  /* invalid trailing characters? */
+      while (lj_char_isspace((uint8_t)*endptr)) endptr++;
+      if (*endptr != '\0') return 0;  /* Invalid trailing characters? */
     }
     if (LJ_LIKELY(!tvisnan(&tv)))
       setnumV(n, numV(&tv));
@@ -172,27 +260,51 @@ parsedbl:
   }
 }
 
+/* Print number to buffer. Canonicalizes non-finite values. */
+size_t LJ_FASTCALL lj_str_bufnum(char *s, cTValue *o)
+{
+  if (LJ_LIKELY((o->u32.hi << 1) < 0xffe00000)) {  /* Finite? */
+    lua_Number n = o->n;
+    return (size_t)lua_number2str(s, n);
+  } else if (((o->u32.hi & 0x000fffff) | o->u32.lo) != 0) {
+    s[0] = 'n'; s[1] = 'a'; s[2] = 'n'; return 3;
+  } else if ((o->u32.hi & 0x80000000) == 0) {
+    s[0] = 'i'; s[1] = 'n'; s[2] = 'f'; return 3;
+  } else {
+    s[0] = '-'; s[1] = 'i'; s[2] = 'n'; s[3] = 'f'; return 4;
+  }
+}
+
+/* Print integer to buffer. Returns pointer to start. */
+char * LJ_FASTCALL lj_str_bufint(char *p, int32_t k)
+{
+  uint32_t u = (uint32_t)(k < 0 ? -k : k);
+  p += 1+10;
+  do { *--p = (char)('0' + u % 10); } while (u /= 10);
+  if (k < 0) *--p = '-';
+  return p;
+}
+
 /* Convert number to string. */
 GCstr * LJ_FASTCALL lj_str_fromnum(lua_State *L, const lua_Number *np)
 {
-  char s[LUAI_MAXNUMBER2STR];
-  lua_Number n = *np;
-  size_t len = (size_t)lua_number2str(s, n);
-  return lj_str_new(L, s, len);
+  char buf[LJ_STR_NUMBUF];
+  size_t len = lj_str_bufnum(buf, (TValue *)np);
+  return lj_str_new(L, buf, len);
 }
 
-#if LJ_HASJIT
 /* Convert integer to string. */
 GCstr * LJ_FASTCALL lj_str_fromint(lua_State *L, int32_t k)
 {
   char s[1+10];
-  char *p = s+sizeof(s);
-  uint32_t i = (uint32_t)(k < 0 ? -k : k);
-  do { *--p = (char)('0' + i % 10); } while (i /= 10);
-  if (k < 0) *--p = '-';
+  char *p = lj_str_bufint(s, k);
   return lj_str_new(L, p, (size_t)(s+sizeof(s)-p));
 }
-#endif
+
+GCstr * LJ_FASTCALL lj_str_fromnumber(lua_State *L, cTValue *o)
+{
+  return tvisint(o) ? lj_str_fromint(L, intV(o)) : lj_str_fromnum(L, &o->n);
+}
 
 /* -- String formatting --------------------------------------------------- */
 
@@ -216,7 +328,7 @@ static void addchar(lua_State *L, SBuf *sb, int c)
     MSize sz = sb->sz * 2;
     lj_str_resizebuf(L, sb, sz);
   }
-  sb->buf[sb->n++] = cast(char, c);
+  sb->buf[sb->n++] = (char)c;
 }
 
 /* Push formatted message as a string object to Lua stack. va_list variant. */
@@ -241,36 +353,34 @@ const char *lj_str_pushvf(lua_State *L, const char *fmt, va_list argp)
       addchar(L, sb, va_arg(argp, int));
       break;
     case 'd': {
-      char buff[1+10];
-      char *p = buff+sizeof(buff);
-      int32_t k = va_arg(argp, int32_t);
-      uint32_t i = (uint32_t)(k < 0 ? -k : k);
-      do { *--p = (char)('0' + i % 10); } while (i /= 10);
-      if (k < 0) *--p = '-';
-      addstr(L, sb, p, (MSize)(buff+sizeof(buff)-p));
+      char buf[LJ_STR_INTBUF];
+      char *p = lj_str_bufint(buf, va_arg(argp, int32_t));
+      addstr(L, sb, p, (MSize)(buf+LJ_STR_INTBUF-p));
       break;
       }
     case 'f': {
-      char buff[LUAI_MAXNUMBER2STR];
-      lua_Number n = cast_num(va_arg(argp, LUAI_UACNUMBER));
-      MSize len = (MSize)lua_number2str(buff, n);
-      addstr(L, sb, buff, len);
+      char buf[LJ_STR_NUMBUF];
+      TValue tv;
+      MSize len;
+      tv.n = (lua_Number)(va_arg(argp, LUAI_UACNUMBER));
+      len = (MSize)lj_str_bufnum(buf, &tv);
+      addstr(L, sb, buf, len);
       break;
       }
     case 'p': {
 #define FMTP_CHARS	(2*sizeof(ptrdiff_t))
-      char buff[2+FMTP_CHARS];
+      char buf[2+FMTP_CHARS];
       ptrdiff_t p = (ptrdiff_t)(va_arg(argp, void *));
       ptrdiff_t i, lasti = 2+FMTP_CHARS;
 #if LJ_64
       if ((p >> 32) == 0)  /* Shorten output for true 32 bit pointers. */
 	lasti = 2+2*4;
 #endif
-      buff[0] = '0';
-      buff[1] = 'x';
+      buf[0] = '0';
+      buf[1] = 'x';
       for (i = lasti-1; i >= 2; i--, p >>= 4)
-	buff[i] = "0123456789abcdef"[(p & 15)];
-      addstr(L, sb, buff, (MSize)lasti);
+	buf[i] = "0123456789abcdef"[(p & 15)];
+      addstr(L, sb, buf, (MSize)lasti);
       break;
       }
     case '%':

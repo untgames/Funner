@@ -1,6 +1,6 @@
 /*
 ** Common definitions for the JIT compiler.
-** Copyright (C) 2005-2010 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2011 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #ifndef _LJ_JIT_H
@@ -14,17 +14,18 @@
 
 /* CPU-specific JIT engine flags. */
 #if LJ_TARGET_X86ORX64
-#define JIT_F_CMOV		0x00000100
-#define JIT_F_SSE2		0x00000200
-#define JIT_F_SSE4_1		0x00000400
-#define JIT_F_P4		0x00000800
-#define JIT_F_PREFER_IMUL	0x00001000
-#define JIT_F_SPLIT_XMM		0x00002000
-#define JIT_F_LEA_AGU		0x00004000
+#define JIT_F_CMOV		0x00000010
+#define JIT_F_SSE2		0x00000020
+#define JIT_F_SSE3		0x00000040
+#define JIT_F_SSE4_1		0x00000080
+#define JIT_F_P4		0x00000100
+#define JIT_F_PREFER_IMUL	0x00000200
+#define JIT_F_SPLIT_XMM		0x00000400
+#define JIT_F_LEA_AGU		0x00000800
 
 /* Names for the CPU-specific flags. Must match the order above. */
 #define JIT_F_CPU_FIRST		JIT_F_CMOV
-#define JIT_F_CPUSTRING		"\4CMOV\4SSE2\6SSE4.1\2P4\3AMD\2K8\4ATOM"
+#define JIT_F_CPUSTRING		"\4CMOV\4SSE2\4SSE3\6SSE4.1\2P4\3AMD\2K8\4ATOM"
 #else
 #error "Missing CPU-specific JIT engine flags"
 #endif
@@ -55,7 +56,7 @@
   (JIT_F_OPT_2|JIT_F_OPT_FWD|JIT_F_OPT_DSE|JIT_F_OPT_ABC|JIT_F_OPT_FUSE)
 #define JIT_F_OPT_DEFAULT	JIT_F_OPT_3
 
-#if defined(LUA_USE_WIN) || LJ_64
+#if LJ_TARGET_WINDOWS || LJ_64
 /* See: http://blogs.msdn.com/oldnewthing/archive/2003/10/08/55239.aspx */
 #define JIT_P_sizemcode_DEFAULT		64
 #else
@@ -66,17 +67,17 @@
 /* Optimization parameters and their defaults. Length is a char in octal! */
 #define JIT_PARAMDEF(_) \
   _(\010, maxtrace,	1000)	/* Max. # of traces in cache. */ \
-  _(\011, maxrecord,	2000)	/* Max. # of recorded IR instructions. */ \
+  _(\011, maxrecord,	4000)	/* Max. # of recorded IR instructions. */ \
   _(\012, maxirconst,	500)	/* Max. # of IR constants of a trace. */ \
   _(\007, maxside,	100)	/* Max. # of side traces of a root trace. */ \
-  _(\007, maxsnap,	100)	/* Max. # of snapshots for a trace. */ \
+  _(\007, maxsnap,	500)	/* Max. # of snapshots for a trace. */ \
   \
   _(\007, hotloop,	56)	/* # of iter. to detect a hot loop/call. */ \
   _(\007, hotexit,	10)	/* # of taken exits to start a side trace. */ \
   _(\007, tryside,	4)	/* # of attempts to compile a side trace. */ \
   \
   _(\012, instunroll,	4)	/* Max. unroll for instable loops. */ \
-  _(\012, loopunroll,	7)	/* Max. unroll for loop ops in side traces. */ \
+  _(\012, loopunroll,	15)	/* Max. unroll for loop ops in side traces. */ \
   _(\012, callunroll,	3)	/* Max. unroll for recursive calls. */ \
   _(\011, recunroll,	2)	/* Min. unroll for true recursion. */ \
   \
@@ -104,8 +105,17 @@ typedef enum {
   LJ_TRACE_START,	/* New trace started. */
   LJ_TRACE_END,		/* End of trace. */
   LJ_TRACE_ASM,		/* Assemble trace. */
-  LJ_TRACE_ERR,		/* Trace aborted with error. */
+  LJ_TRACE_ERR		/* Trace aborted with error. */
 } TraceState;
+
+/* Post-processing action. */
+typedef enum {
+  LJ_POST_NONE,		/* No action. */
+  LJ_POST_FIXCOMP,	/* Fixup comparison and emit pending guard. */
+  LJ_POST_FIXGUARD,	/* Fixup and emit pending guard. */
+  LJ_POST_FIXBOOL,	/* Fixup boolean result. */
+  LJ_POST_FFRETRY	/* Suppress recording of retried fast functions. */
+} PostProc;
 
 /* Machine code type. */
 typedef uint8_t MCode;
@@ -140,7 +150,7 @@ LJ_STATIC_ASSERT(SNAP_CONT == TREF_CONT);
 #define snap_slot(sn)		((BCReg)((sn) >> 24))
 #define snap_isframe(sn)	((sn) & SNAP_FRAME)
 #define snap_pc(sn)		((const BCIns *)(uintptr_t)(sn))
-#define snap_setref(sn, ref)	(((sn) & 0xffff0000) | (ref))
+#define snap_setref(sn, ref)	(((sn) & (0xffff0000&~SNAP_NORESTORE)) | (ref))
 
 /* Snapshot and exit numbers. */
 typedef uint32_t SnapNo;
@@ -152,34 +162,43 @@ typedef uint16_t TraceNo1;	/* Stored trace number. */
 
 #define TRACE_INTERP	0	/* Fallback to interpreter. */
 
-/* Trace anchor. */
-typedef struct Trace {
-  IRIns *ir;		/* IR instructions/constants. Biased with REF_BIAS. */
+/* Trace object. */
+typedef struct GCtrace {
+  GCHeader;
+  uint8_t topslot;	/* Top stack slot already checked to be allocated. */
+  uint8_t unused1;
   IRRef nins;		/* Next IR instruction. Biased with REF_BIAS. */
+  GCRef gclist;
+  IRIns *ir;		/* IR instructions/constants. Biased with REF_BIAS. */
   IRRef nk;		/* Lowest IR constant. Biased with REF_BIAS. */
-  SnapShot *snap;	/* Snapshot array. */
-  SnapEntry *snapmap;	/* Snapshot map. */
   uint16_t nsnap;	/* Number of snapshots. */
   uint16_t nsnapmap;	/* Number of snapshot map elements. */
+  SnapShot *snap;	/* Snapshot array. */
+  SnapEntry *snapmap;	/* Snapshot map. */
   GCRef startpt;	/* Starting prototype. */
+  MRef startpc;		/* Bytecode PC of starting instruction. */
   BCIns startins;	/* Original bytecode of starting instruction. */
-  MCode *mcode;		/* Start of machine code. */
   MSize szmcode;	/* Size of machine code. */
+  MCode *mcode;		/* Start of machine code. */
   MSize mcloop;		/* Offset of loop start in machine code. */
+  uint16_t nchild;	/* Number of child traces (root trace only). */
+  uint16_t spadjust;	/* Stack pointer adjustment (offset in bytes). */
+  TraceNo1 traceno;	/* Trace number. */
   TraceNo1 link;	/* Linked trace (or self for loops). */
   TraceNo1 root;	/* Root trace of side trace (or 0 for root traces). */
   TraceNo1 nextroot;	/* Next root trace for same prototype. */
   TraceNo1 nextside;	/* Next side trace of same root trace. */
-  uint16_t nchild;	/* Number of child traces (root trace only). */
-  uint16_t spadjust;	/* Stack pointer adjustment (offset in bytes). */
-  uint8_t topslot;	/* Top stack slot already checked to be allocated. */
-  uint8_t unused1;
-  uint8_t unused2;
-  uint8_t unused3;
+  uint16_t unused2;
 #ifdef LUAJIT_USE_GDBJIT
   void *gdbjit_entry;	/* GDB JIT entry. */
 #endif
-} Trace;
+} GCtrace;
+
+#define gco2trace(o)	check_exp((o)->gch.gct == ~LJ_TTRACE, (GCtrace *)(o))
+#define traceref(J, n) \
+  check_exp((n)>0 && (MSize)(n)<J->sizetrace, (GCtrace *)gcref(J->trace[(n)]))
+
+LJ_STATIC_ASSERT(offsetof(GChead, gclist) == offsetof(GCtrace, gclist));
 
 /* Round-robin penalty cache for bytecodes leading to aborted traces. */
 typedef struct HotPenalty {
@@ -197,7 +216,7 @@ typedef struct HotPenalty {
 typedef struct BPropEntry {
   IRRef1 key;		/* Key: original reference. */
   IRRef1 val;		/* Value: reference after conversion. */
-  IRRef mode;		/* Mode for this entry (currently IRTOINT_*). */
+  IRRef mode;		/* Mode for this entry (currently IRCONV_*). */
 } BPropEntry;
 
 /* Number of slots for the backpropagation cache. Must be a power of 2. */
@@ -210,7 +229,7 @@ typedef struct ScEvEntry {
   IRRef1 stop;		/* Constant stop reference. */
   IRRef1 step;		/* Constant step reference. */
   IRType1 t;		/* Scalar type. */
-  uint8_t dir;		/* Direction. 0: +, 1: -. */
+  uint8_t dir;		/* Direction. 1: +, 0: -. */
 } ScEvEntry;
 
 /* 128 bit SIMD constants. */
@@ -224,6 +243,15 @@ enum {
 #define LJ_KSIMD(J, n) \
   ((TValue *)(((intptr_t)&J->ksimd[2*(n)] + 15) & ~(intptr_t)15))
 
+/* Set/reset flag to activate the SPLIT pass for the current trace. */
+#if LJ_32 && LJ_HASFFI
+#define lj_needsplit(J)		(J->needsplit = 1)
+#define lj_resetsplit(J)	(J->needsplit = 0)
+#else
+#define lj_needsplit(J)		UNUSED(J)
+#define lj_resetsplit(J)	UNUSED(J)
+#endif
+
 /* Fold state is used to fold instructions on-the-fly. */
 typedef struct FoldState {
   IRIns ins;		/* Currently emitted instruction. */
@@ -233,7 +261,7 @@ typedef struct FoldState {
 
 /* JIT compiler state. */
 typedef struct jit_State {
-  Trace cur;		/* Current trace. */
+  GCtrace cur;		/* Current trace. */
 
   lua_State *L;		/* Current Lua state. */
   const BCIns *pc;	/* Current PC. */
@@ -248,7 +276,7 @@ typedef struct jit_State {
   uint8_t mergesnap;	/* Allowed to merge with next snapshot. */
   uint8_t needsnap;	/* Need snapshot before recording next bytecode. */
   IRType1 guardemit;	/* Accumulated IRT_GUARD for emitted instructions. */
-  uint8_t unused1;
+  uint8_t bcskip;	/* Number of bytecode instructions to skip. */
 
   FoldState fold;	/* Fold state. */
 
@@ -263,7 +291,7 @@ typedef struct jit_State {
   int32_t framedepth;	/* Current frame depth. */
   int32_t retdepth;	/* Return frame depth (count of RETF). */
 
-  MRef knum;		/* Pointer to chained array of KNUM constants. */
+  MRef k64;		/* Pointer to chained array of 64 bit constants. */
   TValue ksimd[LJ_KSIMD__MAX*2+1];  /* 16 byte aligned SIMD constants. */
 
   IRIns *irbuf;		/* Temp. IR instruction buffer. Biased with REF_BIAS. */
@@ -276,8 +304,12 @@ typedef struct jit_State {
   SnapEntry *snapmapbuf;  /* Temp. snapshot map buffer. */
   MSize sizesnapmap;	/* Size of temp. snapshot map buffer. */
 
-  TraceNo curtrace;	/* Current trace number (if not 0). Kept in J->cur. */
-  Trace **trace;	/* Array of traces. */
+  PostProc postproc;	/* Required post-processing after execution. */
+#if LJ_32 && LJ_HASFFI
+  int needsplit;	/* Need SPLIT pass. */
+#endif
+
+  GCRef *trace;		/* Array of traces. */
   TraceNo freetrace;	/* Start of scan for next free trace. */
   MSize sizetrace;	/* Size of trace array. */
 

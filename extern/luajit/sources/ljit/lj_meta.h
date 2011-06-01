@@ -1,6 +1,6 @@
 /*
 ** Metamethod handling.
-** Copyright (C) 2005-2010 Mike Pall. See Copyright Notice in luajit.h
+** Copyright (C) 2005-2011 Mike Pall. See Copyright Notice in luajit.h
 */
 
 #ifndef _LJ_META_H
@@ -12,10 +12,11 @@
 LJ_FUNC void lj_meta_init(lua_State *L);
 LJ_FUNC cTValue *lj_meta_cache(GCtab *mt, MMS mm, GCstr *name);
 LJ_FUNC cTValue *lj_meta_lookup(lua_State *L, cTValue *o, MMS mm);
+LJ_FUNC int lj_meta_tailcall(lua_State *L, cTValue *tv);
 
 #define lj_meta_fastg(g, mt, mm) \
   ((mt) == NULL ? NULL : ((mt)->nomm & (1u<<(mm))) ? NULL : \
-   lj_meta_cache(mt, mm, strref((g)->mmname[mm])))
+   lj_meta_cache(mt, mm, mmname_str(g, mm)))
 #define lj_meta_fast(L, mt, mm)	lj_meta_fastg(G(L), mt, mm)
 
 /* C helpers for some instructions, called from assembler VM. */
@@ -26,8 +27,9 @@ LJ_FUNCA TValue *lj_meta_arith(lua_State *L, TValue *ra, cTValue *rb,
 LJ_FUNCA TValue *lj_meta_cat(lua_State *L, TValue *top, int left);
 LJ_FUNCA TValue * LJ_FASTCALL lj_meta_len(lua_State *L, cTValue *o);
 LJ_FUNCA TValue *lj_meta_equal(lua_State *L, GCobj *o1, GCobj *o2, int ne);
+LJ_FUNCA TValue * LJ_FASTCALL lj_meta_equal_cd(lua_State *L, BCIns ins);
 LJ_FUNCA TValue *lj_meta_comp(lua_State *L, cTValue *o1, cTValue *o2, int op);
 LJ_FUNCA void lj_meta_call(lua_State *L, TValue *func, TValue *top);
-LJ_FUNCA void LJ_FASTCALL lj_meta_for(lua_State *L, TValue *base);
+LJ_FUNCA void LJ_FASTCALL lj_meta_for(lua_State *L, TValue *o);
 
 #endif
