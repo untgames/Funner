@@ -7,11 +7,19 @@ ROOT := $(patsubst %/,%,$(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 #Проверка наличия makefile на папку выше
 ###################################################################################################
 ifneq (,$(wildcard ../$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
+  ifeq (,$(BUILD_SCRIPT))
+    BUILD_SCRIPT := $(ROOT)/build/scripts/make-main-internal.mak
+  endif
+
   include ../$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
 else
+
+  ifeq (,$(BUILD_SCRIPT))
+    BUILD_SCRIPT := $(ROOT)/build/scripts/make-main.mak
+  endif
 
 ###################################################################################################
 #Подключение скрипта сборки
 ###################################################################################################
-  include $(ROOT)/build/scripts/make-main.mak
+  include $(BUILD_SCRIPT)
 endif

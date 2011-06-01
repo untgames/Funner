@@ -24,3 +24,5 @@ MEEGO_PORT      := 22
 MEEGO_DISPLAY   := :0.0
 
 WINMOBILE_HOST  := 10.1.0.34
+
+PROFILE := windows

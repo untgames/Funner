@@ -28,10 +28,10 @@ USER       ?= $(USERNAME)
 -include $(ROOT)/$(USER).settings.mak
 
 ###################################################################################################
-#Проверка наличия переменной FUNNER_TOOLCHAIN
+#Проверка наличия переменной FUNNER_SDK
 ###################################################################################################
-ifeq (,$(FUNNER_TOOLCHAIN))
-  $(error Funner platform not defined. Please set FUNNER_TOOLCHAIN variable)
+ifeq (,$(FUNNER_SDK))
+  $(error Funner SDK not defined. Please set FUNNER_SDK variable)
 endif
 
 ###################################################################################################
@@ -52,11 +52,11 @@ DIST_DIR                                := $(ROOT)/$(DIST_DIR_SHORT_NAME)/$(CURR
 DIST_LUA_MODULES_DIR                    := $(DIST_DIR)/scripts
 DIST_BIN_DIR                            := $(DIST_DIR)/bin
 DIST_INFO_DIR                           := $(DIST_DIR)/info
-ROOT_TMP_DIR                            := $(ROOT)/$(TMP_DIR_SHORT_NAME)/$(CURRENT_PROFILE)
+ROOT_TMP_DIR                            := $(ROOT)/$(TMP_DIR_SHORT_NAME)/scriptapi.$(CURRENT_PROFILE)
 TMP_DIRS                                := $(ROOT_TMP_DIR)
 DIST_DIRS                               :=
 DIRS                                     = $(TMP_DIRS) $(DIST_DIRS)
-TOOLS_DIR                               := $(BUILD_DIR)../tools/$(FUNNER_TOOLCHAIN)
+TOOLS_DIR                               := $(FUNNER_SDK)/bin
 EMPTY                                   := 
 SPACE                                   := $(EMPTY) $(EMPTY)
 COMMA                                   := ,
