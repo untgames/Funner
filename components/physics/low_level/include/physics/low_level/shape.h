@@ -19,7 +19,7 @@ class IShape : virtual public IObject
 ///Толщина полей
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     virtual float Margin    () = 0;
-    virtual void  GetMargin (float value) = 0;
+    virtual void  SetMargin (float value) = 0;
 };
 
 }

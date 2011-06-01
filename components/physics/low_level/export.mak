@@ -5,3 +5,5 @@ export.compile.physics.low_level.IMPORTS      := compile.xtl compile.math.vecmat
 # Link exports
 export.link.physics.low_level.LIBS    := funner.physics.low_level
 export.link.physics.low_level.IMPORTS := link.common
+
+export.info.physics.low_level.CHMS := funner.physics.low_level
