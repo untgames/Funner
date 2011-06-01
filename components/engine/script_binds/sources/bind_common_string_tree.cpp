@@ -251,6 +251,19 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
 
       if (!file_name)
         throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
+        
+      if (strstr (file_name, "<?xml"))
+        return LoadXmlFromString (file_name);
+
+      return LoadXmlFromFile (file_name);
+    }
+    
+    static Pointer LoadXmlFromFile (const char* file_name)
+    {
+      static const char* METHOD_NAME = "script::binds::StringNode::LoadXmlFromFile";
+
+      if (!file_name)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");        
 
       Pointer return_value (new StringNode, false);
 
@@ -276,7 +289,40 @@ class StringNode: public xtl::reference_counter, public xtl::dynamic_cast_root
       ProcessNode (return_value, iter);
 
       return return_value;
-    }
+    }    
+    
+    static Pointer LoadXmlFromString (const char* string)
+    {
+      static const char* METHOD_NAME = "script::binds::StringNode::LoadXmlFromString";
+
+      if (!string)
+        throw xtl::make_null_argument_exception (METHOD_NAME, "file_name");
+
+      Pointer return_value (new StringNode, false);
+
+      Parser parser (string);      
+      ParseLog parse_log = parser.Log ();
+
+      for (size_t i = 0; i < parse_log.MessagesCount (); i++)
+        switch (parse_log.MessageType (i))
+        {
+          case ParseLogMessageType_Error:
+          case ParseLogMessageType_FatalError:
+            get_log ().Printf ("Parser error: '%s'", parse_log.Message (i));
+            break;
+          default:
+            break;
+        }
+
+      ParseNode iter = parser.Root ().First ();
+
+      if (!iter)
+        throw xtl::format_operation_exception (METHOD_NAME, "There is no root node in string '%s'", string);
+
+      ProcessNode (return_value, iter);
+
+      return return_value;
+    }    
 
     void SaveXml (const char* file_name)
     {
@@ -583,6 +629,8 @@ void bind_common_string_tree (Environment& environment)
 
   lib.Register ("RemoveAllChildren",   make_invoker (&StringNode::RemoveAllChildren));
   lib.Register ("LoadXml",             make_invoker (&StringNode::LoadXml));
+  lib.Register ("LoadXmlFromString",   make_invoker (&StringNode::LoadXmlFromString));
+  lib.Register ("LoadXmlFromString",   make_invoker (&StringNode::LoadXmlFromFile));
   lib.Register ("SaveXml",             make_invoker (&StringNode::SaveXml));
   lib.Register ("Find",                make_invoker (
                                                      make_invoker ((StringNode::Pointer (*)(StringNode&, const char*, const char*))&find),
