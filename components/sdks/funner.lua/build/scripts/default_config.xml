@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding = "windows-1251"?>
-<Configuration>
+<Configuration LicenseFile="funner.xml">
+  <Log>
+    <File Filters="engine.lua" FileName="/io/stdout">
+      <OutputFormat Replacement="{{message}">
+        <Filter Wildcard="*"/>
+      </OutputFormat>
+    </File>
+  </Log>
   <Shell Interpreter="lua" Libraries="*"/>
 </Configuration>
