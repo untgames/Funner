@@ -48,11 +48,11 @@ AVAILABLE_PROFILES                      := $(patsubst $(PROFILES_DIR)/%.mak,%,$(
 EXPORT_VAR_PREFIX                       := export
 CURRENT_PROFILE                         := $(PROFILE)
 PROFILE_FILE                            := $(PROFILES_DIR)/$(CURRENT_PROFILE).mak
-DIST_DIR                                := $(ROOT)/$(DIST_DIR_SHORT_NAME)/$(CURRENT_PROFILE)
+DIST_DIR                                := $(ROOT)/$(DIST_DIR_SHORT_NAME)/lua.$(CURRENT_PROFILE)
 DIST_LUA_MODULES_DIR                    := $(DIST_DIR)/scripts
 DIST_BIN_DIR                            := $(DIST_DIR)/bin
 DIST_INFO_DIR                           := $(DIST_DIR)/info
-ROOT_TMP_DIR                            := $(ROOT)/$(TMP_DIR_SHORT_NAME)/scriptapi.$(CURRENT_PROFILE)
+ROOT_TMP_DIR                            := $(ROOT)/$(TMP_DIR_SHORT_NAME)/lua.$(CURRENT_PROFILE)
 TMP_DIRS                                := $(ROOT_TMP_DIR)
 DIST_DIRS                               :=
 DIRS                                     = $(TMP_DIRS) $(DIST_DIRS)
@@ -411,7 +411,7 @@ endif
 else
 
   INFO.$1:
-		@echo No NaturalDocs found (set NATURAL_DOCS_HOME variable)...
+		@echo "No NaturalDocs found (set NATURAL_DOCS_HOME variable)..."
 		@exit 1
 
 endif

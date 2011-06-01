@@ -1,7 +1,8 @@
-MINGW_DIR     := D:/studio/dev/mingw/4.3.0
-DOXYGEN_DIR   := D:/studio/dev/doxygen
-HHC_DIR       := C:/Program Files/HTML Help Workshop
-BADA_SDK_HOME := D:/studio/dev/bada/sdk/1.0.0b3
+MINGW_DIR         := D:/studio/dev/mingw/4.3.0
+DOXYGEN_DIR       := D:/studio/dev/doxygen
+HHC_DIR           := C:/Program Files/HTML Help Workshop
+BADA_SDK_HOME     := D:/studio/dev/bada/sdk/1.0.0b3
+NATURAL_DOCS_HOME := D:/studio/dev/natural_docs
 
 BEAGLE_BOARD_HOST      := 10.1.0.14
 BEAGLE_BOARD_USER      := ubuntu
