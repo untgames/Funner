@@ -3,7 +3,7 @@
 ###################################################################################################
 TARGETS := EXTERN.LUAJIT_BUILDVM EXTERN.LUAJIT_LIB EXTERN.LUAJIT_UTILITY EXTERN.LUAJIT_TESTS
 
-LUAJIT_BUILD_INTERNALS_DIR := ../../$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/EXTERN.LUAJIT_BUILDVM/build-internals
+LUAJIT_BUILD_INTERNALS_DIR := $(COMPONENT_DIR)../../$(TMP_DIR_SHORT_NAME)/$(CURRENT_TOOLSET)/EXTERN.LUAJIT_BUILDVM/build-internals
 
 #Öåëü ¹1 - build vm
 EXTERN.LUAJIT_BUILDVM.TYPE                := application
@@ -18,16 +18,17 @@ EXTERN.LUAJIT_LIB.TYPE                   := static-lib
 EXTERN.LUAJIT_LIB.NAME                   := funner.extern.luajit
 EXTERN.LUAJIT_LIB.SOURCE_DIRS            := sources/ljit
 EXTERN.LUAJIT_LIB.INCLUDE_DIRS           := include $(LUAJIT_BUILD_INTERNALS_DIR)
+EXTERN.LUAJIT_LIB.IMPORTS                := compile.extern.libffi
 EXTERN.LUAJIT_LIB.g++.COMPILER_CFLAGS    := -fomit-frame-pointer -D_FILE_OFFSET_BITS=64 -U_FORTIFY_SOURCE -fno-stack-protector -funwind-tables
 EXTERN.LUAJIT_LIB.g++x86.COMPILER_CFLAGS := -march=i686
 EXTERN.LUAJIT_LIB.msvc.OBJECT_FILES      := $(LUAJIT_BUILD_INTERNALS_DIR)/lj_vm.obj
 #EXTERN.LUAJIT_LIB.msvc.COMPILER_DEFINES  := LJ_UNWIND_EXT=1
-EXTERN.LUAJIT_LIB.mingw.COMPILER_DEFINES  := LUAJIT_UNWIND_EXTERNAL
+#EXTERN.LUAJIT_LIB.mingw.COMPILER_DEFINES  := LUAJIT_UNWIND_EXTERNAL
 
 #Öåëü ¹3 - build luajit
 EXTERN.LUAJIT_UTILITY.TYPE                   := test-suite
 EXTERN.LUAJIT_UTILITY.SOURCE_DIRS            := utils
-EXTERN.LUAJIT_UTILITY.INCLUDE_DIRS           := include
+EXTERN.LUAJIT_UTILITY.INCLUDE_DIRS           := include sources/ljit
 EXTERN.LUAJIT_UTILITY.LIBS                   := funner.extern.luajit
 EXTERN.LUAJIT_UTILITY.g++.COMPILER_CFLAGS    := -fomit-frame-pointer -D_FILE_OFFSET_BITS=64 -U_FORTIFY_SOURCE -fno-stack-protector
 EXTERN.LUAJIT_UTILITY.g++x86.COMPILER_CFLAGS := -march=i686
