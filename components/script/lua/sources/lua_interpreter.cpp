@@ -86,7 +86,7 @@ Interpreter::Interpreter (const script::Environment& in_environment)
 
   luaL_newmetatable (state, VARIANT_DEFAULT_TYPE_NAME);
 
-#ifdef LUAJIT    
+#if defined (LUAJIT) && defined (_WIN32)
     //restore default float precision for luajit
 
   _clearfp   ();
