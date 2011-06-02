@@ -115,9 +115,9 @@ void AlignWithNode::Update (float dt)
   if (!impl->acceleration_function)
     throw xtl::format_operation_exception (METHOD_NAME, "Can't align with node, empty acceleration function");
 
-  math::vec3f current_position = impl->node->Ort (impl->node_axis, NodeTransformSpace_World),
-             desired_direction = impl->target_node->Ort (impl->target_node_axis, NodeTransformSpace_World),
-             acceleration      = impl->acceleration_function (impl->current_speed, desired_direction - current_position, dt);
+  math::vec3f current_position  = impl->node->Ort (impl->node_axis, NodeTransformSpace_World),
+              desired_direction = impl->target_node->Ort (impl->target_node_axis, NodeTransformSpace_World),
+              acceleration      = impl->acceleration_function (impl->current_speed, desired_direction - current_position, dt);
 
   impl->current_speed += acceleration * dt;
 
