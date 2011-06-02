@@ -7,6 +7,7 @@ IPHONEOS_DEPLOYMENT_TARGET := 3.0
 export IPHONEOS_DEPLOYMENT_TARGET
 
 REMOTE_DEBUG_DIR  ?= //private/var/work/funner
+PROFILES          += arm
 COMMON_CFLAGS     += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET) -DARM #-gdwarf-2 -fobjc-call-cxx-cdtors  #флаг fobjc-call-cxx-cdtors необходим для использования с++ классов в objective-c классах в gcc версий до 4,2; gdwarf-2 - для профилирования
 COMMON_LINK_FLAGS += -miphoneos-version-min=$(IPHONEOS_DEPLOYMENT_TARGET)
 COMPILER_GCC      := /Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/gcc-4.2

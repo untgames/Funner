@@ -6,6 +6,7 @@ EXTERN.LIBFFI.SOURCES.TYPE            := static-lib
 EXTERN.LIBFFI.SOURCES.NAME            := funner.extern.libffi
 EXTERN.LIBFFI.SOURCES.SOURCE_DIRS     := sources
 EXTERN.LIBFFI.SOURCES.x86.SOURCE_DIRS := sources/x86
+EXTERN.LIBFFI.SOURCES.arm.SOURCE_DIRS := sources/arm
 EXTERN.LIBFFI.SOURCES.IMPORTS         := compile.extern.libffi
 
 #÷ель - —борка тестов FFI
