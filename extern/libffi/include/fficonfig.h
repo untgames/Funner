@@ -56,7 +56,7 @@
 /* #undef HAVE_HIDDEN_VISIBILITY_ATTRIBUTE */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H 1
+//#define HAVE_INTTYPES_H 1
 
 /* Define if you have the long double type and it is bigger than a double */
 #define HAVE_LONG_DOUBLE 1
