@@ -34,10 +34,10 @@
 /* ------------------------------------------------------------------------ */
 
 /* DynASM glue definitions. */
-#define Dst		ctx
-#define Dst_DECL	BuildCtx *ctx
-#define Dst_REF		(ctx->D)
-#define DASM_CHECKS	1
+#define Dst   ctx
+#define Dst_DECL  BuildCtx *ctx
+#define Dst_REF   (ctx->D)
+#define DASM_CHECKS 1
 
 #include "../dynasm/dasm_proto.h"
 
@@ -50,7 +50,7 @@ static int collect_reloc(BuildCtx *ctx, uint8_t *addr, int idx, int type);
 /* ------------------------------------------------------------------------ */
 
 /* Avoid trouble if cross-compiling for an x86 target. Speed doesn't matter. */
-#define DASM_ALIGNED_WRITES	1
+#define DASM_ALIGNED_WRITES 1
 
 /* Embed architecture-specific DynASM encoder and backend. */
 #if LJ_TARGET_X86
@@ -79,7 +79,7 @@ void owrite(BuildCtx *ctx, const void *ptr, size_t sz)
 {
   if (fwrite(ptr, 1, sz, ctx->fp) != sz) {
     fprintf(stderr, "Error: cannot write to output file: %s\n",
-	    strerror(errno));
+      strerror(errno));
     exit(1);
   }
 }
@@ -95,7 +95,7 @@ static void emit_raw(BuildCtx *ctx)
 /* -- Build machine code -------------------------------------------------- */
 
 static const char *sym_decorate(BuildCtx *ctx,
-				const char *prefix, const char *suffix)
+        const char *prefix, const char *suffix)
 {
   char name[256];
   char *p;
@@ -117,7 +117,7 @@ static const char *sym_decorate(BuildCtx *ctx,
   return p;
 }
 
-#define NRELOCSYM	(sizeof(extnames)/sizeof(extnames[0])-1)
+#define NRELOCSYM (sizeof(extnames)/sizeof(extnames[0])-1)
 
 static int relocmap[NRELOCSYM];
 
@@ -142,7 +142,7 @@ static int collect_reloc(BuildCtx *ctx, uint8_t *addr, int idx, int type)
 
 /* Naive insertion sort. Performance doesn't matter here. */
 static void sym_insert(BuildCtx *ctx, int32_t ofs,
-		       const char *prefix, const char *suffix)
+           const char *prefix, const char *suffix)
 {
   ptrdiff_t i = ctx->nsym++;
   while (i > 0) {
@@ -200,9 +200,9 @@ static int build_code(BuildCtx *ctx)
     if (ofs < 0) return 0x22000000|i;
     ctx->bc_ofs[i] = ofs;
     if ((LJ_HASJIT ||
-	 !(i == BC_JFORI || i == BC_JFORL || i == BC_JITERL || i == BC_JLOOP ||
-	   i == BC_IFORL || i == BC_IITERL || i == BC_ILOOP)) &&
-	(LJ_HASFFI || i != BC_KCDATA))
+   !(i == BC_JFORI || i == BC_JFORL || i == BC_JITERL || i == BC_JLOOP ||
+     i == BC_IFORL || i == BC_IITERL || i == BC_ILOOP)) &&
+  (LJ_HASFFI || i != BC_KCDATA))
       sym_insert(ctx, ofs, LABEL_PREFIX_BC, bc_names[i]);
   }
 
@@ -217,7 +217,7 @@ static int build_code(BuildCtx *ctx)
     /* Skip the _Z symbols. */
     if (!(len >= 2 && gl[len-2] == '_' && gl[len-1] == 'Z'))
       sym_insert(ctx, (int32_t)((uint8_t *)(ctx->glob[i]) - ctx->code),
-		 LABEL_PREFIX, globnames[i]);
+     LABEL_PREFIX, globnames[i]);
   }
 
   /* Close the address range. */
@@ -239,42 +239,42 @@ BCDEF(BCNAME)
 };
 
 const char *const ir_names[] = {
-#define IRNAME(name, m, m1, m2)	#name,
+#define IRNAME(name, m, m1, m2) #name,
 IRDEF(IRNAME)
 #undef IRNAME
   NULL
 };
 
 const char *const irt_names[] = {
-#define IRTNAME(name)	#name,
+#define IRTNAME(name) #name,
 IRTDEF(IRTNAME)
 #undef IRTNAME
   NULL
 };
 
 const char *const irfpm_names[] = {
-#define FPMNAME(name)		#name,
+#define FPMNAME(name)   #name,
 IRFPMDEF(FPMNAME)
 #undef FPMNAME
   NULL
 };
 
 const char *const irfield_names[] = {
-#define FLNAME(name, ofs)	#name,
+#define FLNAME(name, ofs) #name,
 IRFLDEF(FLNAME)
 #undef FLNAME
   NULL
 };
 
 const char *const ircall_names[] = {
-#define IRCALLNAME(name, nargs, kind, type, flags)	#name,
+#define IRCALLNAME(name, nargs, kind, type, flags)  #name,
 IRCALLDEF(IRCALLNAME)
 #undef IRCALLNAME
   NULL
 };
 
 static const char *const trace_errors[] = {
-#define TREDEF(name, msg)	msg,
+#define TREDEF(name, msg) msg,
 #include "lj_traceerr.h"
   NULL
 };
@@ -349,7 +349,7 @@ static void emit_vmdef(BuildCtx *ctx)
 
 /* Build mode names. */
 static const char *const modenames[] = {
-#define BUILDNAME(name)		#name,
+#define BUILDNAME(name)   #name,
 BUILDDEF(BUILDNAME)
 #undef BUILDNAME
   NULL
@@ -455,7 +455,7 @@ int main(int argc, char **argv)
 #endif
   } else if (!(ctx->fp = fopen(ctx->outname, binmode ? "wb" : "w"))) {
     fprintf(stderr, "Error: cannot open output file '%s': %s\n",
-	    ctx->outname, strerror(errno));
+      ctx->outname, strerror(errno));
     exit(1);
   }
 
@@ -495,7 +495,7 @@ int main(int argc, char **argv)
   fflush(ctx->fp);
   if (ferror(ctx->fp)) {
     fprintf(stderr, "Error: cannot write to output file: %s\n",
-	    strerror(errno));
+      strerror(errno));
     exit(1);
   }
   fclose(ctx->fp);
