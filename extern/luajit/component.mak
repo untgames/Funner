@@ -44,8 +44,10 @@ LUAJIT_GENERATED_FILES := lj_bcdef.h lj_ffdef.h lj_folddef.h lj_recdef.h lj_libd
 
 ifeq (msvc,$(CURRENT_TOOLSET))
 LUAJIT_GENERATED_FILES += lj_vm.obj
+LUAJIT_OBJ_FILE_FORMAT := coffasm
 else
 LUAJIT_GENERATED_FILES += lj_vm.s
+LUAJIT_OBJ_FILE_FORMAT := machasm
 endif
 
 LUAJIT_GENERATED_FILES := $(LUAJIT_GENERATED_FILES:%=$(LUAJIT_BUILD_INTERNALS_DIR)/%)
@@ -54,20 +56,20 @@ $(LUAJIT_SOURCES): $(LUAJIT_GENERATED_FILES)
 
 $(LUAJIT_BUILD_INTERNALS_DIR)/lj_vm.obj:
 	@echo Generate $(notdir $@)...
-	@$(COMPONENT_DIR)$(LUAJIT_BUILD_INTERNALS_DIR)/buildvm -m peobj -o $@
+	@$(LUAJIT_BUILD_INTERNALS_DIR)/buildvm -m $(LUAJIT_OBJ_FILE_FORMAT) -o $@
 	
 $(LUAJIT_BUILD_INTERNALS_DIR)/lj_vm.s:
 	@echo Generate $(notdir $@)...
-	@$(COMPONENT_DIR)$(LUAJIT_BUILD_INTERNALS_DIR)/buildvm -m coffasm -o $@
+	@$(LUAJIT_BUILD_INTERNALS_DIR)/buildvm -m $(LUAJIT_OBJ_FILE_FORMAT) -o $@
 
 $(LUAJIT_BUILD_INTERNALS_DIR)/lj_%.h:
 	@echo Generate $(notdir $@)...
-	@$(COMPONENT_DIR)$(LUAJIT_BUILD_INTERNALS_DIR)/buildvm -m $(patsubst $(LUAJIT_BUILD_INTERNALS_DIR)/lj_%.h,%,$@) -o $@ $(addprefix $(COMPONENT_DIR)sources/ljit/,lib_base.c lib_math.c lib_bit.c lib_string.c lib_table.c lib_io.c lib_os.c lib_package.c lib_debug.c lib_jit.c)
+	@$(LUAJIT_BUILD_INTERNALS_DIR)/buildvm -m $(patsubst lj_%,%,$(notdir $(basename $@))) -o $@ $(addprefix $(COMPONENT_DIR)sources/ljit/,lib_base.c lib_math.c lib_bit.c lib_string.c lib_table.c lib_io.c lib_os.c lib_package.c lib_debug.c lib_jit.c lib_ffi.c)
 	
 $(LUAJIT_BUILD_INTERNALS_DIR)/lj_folddef.h:
 	@echo Generate $(notdir $@)...
-	@$(COMPONENT_DIR)$(LUAJIT_BUILD_INTERNALS_DIR)/buildvm -m folddef -o $@ $(COMPONENT_DIR)sources/ljit/lj_opt_fold.c
+	@$(LUAJIT_BUILD_INTERNALS_DIR)/buildvm -m folddef -o $@ $(COMPONENT_DIR)sources/ljit/lj_opt_fold.c
 
 $(LUAJIT_BUILD_INTERNALS_DIR)/vmdef.lua:
 	@echo Generate $(notdir $@)...
-	@$(COMPONENT_DIR)$(LUAJIT_BUILD_INTERNALS_DIR)/buildvm -m vmdef -o $@ $(addprefix $(COMPONENT_DIR)sources/ljit/,lib_base.c lib_math.c lib_bit.c lib_string.c lib_table.c lib_io.c lib_os.c lib_package.c lib_debug.c lib_jit.c)
+	@$(LUAJIT_BUILD_INTERNALS_DIR)/buildvm -m vmdef -o $@ $(addprefix $(COMPONENT_DIR)sources/ljit/,lib_base.c lib_math.c lib_bit.c lib_string.c lib_table.c lib_io.c lib_os.c lib_package.c lib_debug.c lib_jit.c)
