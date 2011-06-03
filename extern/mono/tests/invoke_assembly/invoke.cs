@@ -1,4 +1,8 @@
 using System;
+using System.Runtime.InteropServices;
+
+//[DllImport ("__Internal", EntryPoint="DoSomething")]
+//static extern void DoSomething ();
 
 namespace Embed {
         class MyType {
@@ -46,5 +50,6 @@ namespace Embed {
                         /* we do nothing here... */
                 }
         }
+        
 }
 

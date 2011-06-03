@@ -5,6 +5,7 @@
 #include <mono/metadata/debug-helpers.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 
 #ifndef FALSE
 #define FALSE 0
@@ -19,7 +20,43 @@
  * Run with:
  *      ./test-invoke invoke.exe
  */
+ 
+void DoSomething ()
+{
+   /* ... */
+}
+ 
+static void 
+test1 (MonoObject *obj)
+{
+  MonoMethodDesc *mdesc;
+  MonoMethod     *method;
+  clock_t        start_time, end_time;
+  double         elapsed_time;
+  size_t         i;
 
+  const size_t invokes_count = 1000;
+
+  mdesc = mono_method_desc_new ("method", FALSE);
+
+  method = mono_method_desc_search_in_class (mdesc, mono_get_object_class ());
+/*
+  start_time = clock ();
+  
+  for (i=0; i<invokes_count; i++)
+  {
+    mono_runtime_invoke (method, obj, NULL, NULL);
+  }
+
+  end_time = clock ();
+
+  elapsed_time = (end_time - start_time) / CLOCKS_PER_SEC;
+
+  printf ("%u invokes of 'method' in %f sec.\n", invokes_count, elapsed_time); fflush (stdout);
+*/  
+  mono_method_desc_free (mdesc);
+}
+ 
 static void
 access_valuetype_field (MonoObject *obj)
 {
@@ -280,19 +317,18 @@ create_object (MonoDomain *domain, MonoImage *image)
                 fprintf (stderr, "Can't find MyType in assembly %s\n", mono_image_get_filename (image));
                 exit (1);
         }
-
+        
         obj = mono_object_new (domain, klass);
         /* mono_object_new () only allocates the storage: 
          * it doesn't run any constructor. Tell the runtime to run
          * the default argumentless constructor.
          */
         mono_runtime_object_init (obj);
-
         access_valuetype_field (obj);
         access_reference_field (obj);
-
         call_methods (obj);
         more_methods (domain);
+        test1 (obj);
 }
 
 static void main_function (MonoDomain *domain, const char *file, int argc, char **argv)
@@ -304,6 +340,7 @@ static void main_function (MonoDomain *domain, const char *file, int argc, char 
          * we'd use mono_image_load (), instead and we'd get a MonoImage*.
          */
         assembly = mono_domain_assembly_open (domain, file);
+        
         if (!assembly)
                 exit (2);
         /*
@@ -338,8 +375,9 @@ main (int argc, char* argv[]) {
         main_function (domain, file, argc - 1, argv + 1);
 
         retval = mono_environment_exitcode_get ();
-        
+
         mono_jit_cleanup (domain);
+
         return retval;
 }
 

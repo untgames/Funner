@@ -1,5 +1,5 @@
 # Compile exports
-export.compile.extern.lua.INCLUDE_DIRS := include
+export.compile.extern.mono.INCLUDE_DIRS := sources
 
 # Link exports
-export.link.extern.lua.LIBS := funner.extern.lua
+export.link.extern.mono.LIBS := funner.extern.mono
