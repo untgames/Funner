@@ -1,13 +1,13 @@
 using System;
 using System.Runtime.InteropServices;
 
-//[DllImport ("__Internal", EntryPoint="DoSomething")]
-//static extern void DoSomething ();
-
 namespace Embed {
         class MyType {
                 int val = 5;
                 string str = "hello";
+                
+                [DllImport ("__Internal", EntryPoint="DoSomething")]
+                static extern void DoSomething ();                
 
                 MyType () {
                         Console.WriteLine ("In ctor val is: {0}", val);
@@ -24,7 +24,7 @@ namespace Embed {
                 }
                 
                 void doSomethingInCSharp () {
-
+                     DoSomething ();
                 }
 
                 int Value {

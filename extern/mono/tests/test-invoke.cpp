@@ -20,10 +20,15 @@
  * Run with:
  *      ./test-invoke invoke.exe
  */
- 
-void DoSomething ()
+
+extern "C" 
 {
-   /* ... */
+
+__declspec(dllexport) void DoSomething ()
+{
+//  printf ("???\n"); fflush (stdout);
+}
+
 }
 
 MonoMethod* get_method_by_name (MonoObject *obj, const char* name)
@@ -44,7 +49,7 @@ MonoMethod* get_method_by_name (MonoObject *obj, const char* name)
 static void 
 test1 (MonoObject *obj)
 {
-  const long invokes_count = 1000 * 1000 * 10;
+  const long invokes_count = 1000 * 1000 * 100;
 
   MonoMethod *method = get_method_by_name (obj, "doSomethingInCSharp");
   
@@ -57,9 +62,9 @@ test1 (MonoObject *obj)
 
   clock_t end_time = clock ();
 
-  double elapsed_time = (end_time - start_time) / CLOCKS_PER_SEC;
+  double elapsed_time = double (end_time - start_time) / CLOCKS_PER_SEC;
 
-  printf ("%u invokes of 'method' in %f sec.\n", invokes_count, elapsed_time); fflush (stdout);
+  printf ("%u invokes of 'method' in %f sec. In second: %.3fM\n", invokes_count, elapsed_time, invokes_count / elapsed_time / 1.e6f); fflush (stdout);
 
 }
  
