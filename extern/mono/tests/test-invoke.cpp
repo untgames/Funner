@@ -25,36 +25,42 @@ void DoSomething ()
 {
    /* ... */
 }
+
+MonoMethod* getMethodByName (MonoObject *obj, const char* name)
+{
+  MonoClass *klass = mono_object_get_class (obj);;
+  MonoMethod *method = NULL;
+  void *iter = NULL;
+  
+  while ((method = mono_class_get_methods (klass, &iter)))
+  {
+    if (strcmp (mono_method_get_name (method), name) == 0)
+      return method;
+  }
+  
+  return NULL;
+}
  
 static void 
 test1 (MonoObject *obj)
 {
-  MonoMethodDesc *mdesc;
-  MonoMethod     *method;
-  clock_t        start_time, end_time;
-  double         elapsed_time;
-  size_t         i;
-
   const size_t invokes_count = 1000;
 
-  mdesc = mono_method_desc_new ("method", FALSE);
-
-  method = mono_method_desc_search_in_class (mdesc, mono_get_object_class ());
-/*
-  start_time = clock ();
+  MonoMethod *method = getMethodByName (obj, "method");
   
-  for (i=0; i<invokes_count; i++)
+  clock_t start_time = clock ();
+  
+  for (int i=0; i<invokes_count; i++)
   {
     mono_runtime_invoke (method, obj, NULL, NULL);
   }
 
-  end_time = clock ();
+  clock_t end_time = clock ();
 
-  elapsed_time = (end_time - start_time) / CLOCKS_PER_SEC;
+  double elapsed_time = (end_time - start_time) / CLOCKS_PER_SEC;
 
   printf ("%u invokes of 'method' in %f sec.\n", invokes_count, elapsed_time); fflush (stdout);
-*/  
-  mono_method_desc_free (mdesc);
+
 }
  
 static void
@@ -271,7 +277,7 @@ more_methods (MonoDomain *domain)
         val = 25;
         klass = mono_get_int32_class ();
         obj = mono_value_box (domain, klass, &val);
-
+        
         /* A different way to search for a method */
         mdesc = mono_method_desc_new (":ToString()", FALSE);
         vtmethod = mono_method_desc_search_in_class (mdesc, klass);
@@ -323,12 +329,19 @@ create_object (MonoDomain *domain, MonoImage *image)
          * it doesn't run any constructor. Tell the runtime to run
          * the default argumentless constructor.
          */
+        printf ("---------------------------------------------\n");
         mono_runtime_object_init (obj);
+        printf ("---------------------------------------------\n");
         access_valuetype_field (obj);
+        printf ("---------------------------------------------\n");
         access_reference_field (obj);
+        printf ("---------------------------------------------\n");
         call_methods (obj);
+        printf ("---------------------------------------------\n");
         more_methods (domain);
+        printf ("---------------------------------------------Test1:\n");
         test1 (obj);
+        printf ("---------------------------------------------\n");
 }
 
 static void main_function (MonoDomain *domain, const char *file, int argc, char **argv)
