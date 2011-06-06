@@ -22,6 +22,10 @@ namespace Embed {
                         Console.WriteLine ("In method val is {0}", val);
                         Console.WriteLine ("In method str is: {0}", str);
                 }
+                
+                void doSomethingInCSharp () {
+
+                }
 
                 int Value {
                         get {

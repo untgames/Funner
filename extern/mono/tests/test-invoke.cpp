@@ -26,7 +26,7 @@ void DoSomething ()
    /* ... */
 }
 
-MonoMethod* getMethodByName (MonoObject *obj, const char* name)
+MonoMethod* get_method_by_name (MonoObject *obj, const char* name)
 {
   MonoClass *klass = mono_object_get_class (obj);;
   MonoMethod *method = NULL;
@@ -44,13 +44,13 @@ MonoMethod* getMethodByName (MonoObject *obj, const char* name)
 static void 
 test1 (MonoObject *obj)
 {
-  const size_t invokes_count = 1000;
+  const long invokes_count = 1000 * 1000 * 10;
 
-  MonoMethod *method = getMethodByName (obj, "method");
+  MonoMethod *method = get_method_by_name (obj, "doSomethingInCSharp");
   
   clock_t start_time = clock ();
   
-  for (int i=0; i<invokes_count; i++)
+  for (long i=0; i<invokes_count; i++)
   {
     mono_runtime_invoke (method, obj, NULL, NULL);
   }
@@ -331,15 +331,15 @@ create_object (MonoDomain *domain, MonoImage *image)
          */
         printf ("---------------------------------------------\n");
         mono_runtime_object_init (obj);
+//        printf ("---------------------------------------------\n");
+//        access_valuetype_field (obj);
+//        printf ("---------------------------------------------\n");
+//        access_reference_field (obj);
+//        printf ("---------------------------------------------\n");
+//        call_methods (obj);
+//        printf ("---------------------------------------------\n");
+//        more_methods (domain);
         printf ("---------------------------------------------\n");
-        access_valuetype_field (obj);
-        printf ("---------------------------------------------\n");
-        access_reference_field (obj);
-        printf ("---------------------------------------------\n");
-        call_methods (obj);
-        printf ("---------------------------------------------\n");
-        more_methods (domain);
-        printf ("---------------------------------------------Test1:\n");
         test1 (obj);
         printf ("---------------------------------------------\n");
 }
