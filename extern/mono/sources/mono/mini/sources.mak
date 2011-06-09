@@ -34,6 +34,7 @@ SOURCE_FILES += trace.c
 SOURCE_FILES += unwind.c
 SOURCE_FILES += wapihandles.c
 SOURCE_FILES += xdebug.c
+SOURCE_FILES += tasklets.c
 
 SOURCE_FILES += mini-x86.c
 SOURCE_FILES += tramp-x86.c

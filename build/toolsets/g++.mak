@@ -43,12 +43,16 @@ define tools.link.dll
 -shared -Wl,--out-implib,$(dir $1)$(LIB_PREFIX)$(notdir $(basename $1))$(LIB_SUFFIX)
 endef
 
+define tools.link.deffile
+-Wl,--output-def,$1
+endef
+
 ###################################################################################################
 #Линковка файлов (имя выходного файла, список файлов, список каталогов со статическими библиотеками,
-#список подключаемых символов линковки, флаги линковки, файл ошибок)
+#список подключаемых символов линковки, флаги линковки, def-файл, файл ошибок)
 ###################################################################################################
 define tools.g++.link
-$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(patsubst lib%.a,-l%,$(filter lib%.a,$(filter-out $(EXCLUDE_LIBS:%=lib%.a),$2)) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) $(if $6, 2> $6) && chmod u+x "$1"
+$(LINKER_GCC) -o "$1" $(if $(filter %$(DLL_SUFFIX),$1),$(call tools.link.dll,$1)) $(filter-out lib%.a,$2) $(foreach dir,$3,-L$(dir)) $(patsubst lib%.a,-l%,$(filter lib%.a,$(filter-out $(EXCLUDE_LIBS:%=lib%.a),$2)) $(DEFAULT_LIBS) $(COMMON_LINK_FLAGS) $5 $(patsubst %,-u _%,$4)) $(if $6,$(call tools.link.deffile,$6)) $(if $7, 2> $7) && chmod u+x "$1"
 endef
 
 ###################################################################################################
