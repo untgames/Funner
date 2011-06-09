@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <string>
+
 #ifndef FALSE
 #define FALSE 0
 #endif
@@ -371,31 +373,18 @@ static void main_function (MonoDomain *domain, const char *file, int argc, char 
         create_object (domain, mono_assembly_get_image (assembly));
 }
 
-int 
-main (int argc, char* argv[]) {
-        MonoDomain *domain;
-        const char *file;
-        int retval;
-/*        
-        if (argc < 2){
-                fprintf (stderr, "Please provide an assembly to load\n");
-                return 1;
-        }
-//        file = argv [1];
-*/
-        file = "../../../dist/msvc/bin/funner.extern.mono-test-invoke.dll";
-        /*
-         * mono_jit_init() creates a domain: each assembly is
-         * loaded and run in a MonoDomain.
-         */
-        domain = mono_jit_init (file);
+int main (int argc, char* argv[])
+{
+        const char* dir_name = getenv ("BIN_DIR");
+        std::string file     = dir_name ? std::string (dir_name) + "/funner.extern.mono-test-invoke.dll" : std::string ("funner.extern.mono-test-invoke.dll");
 
-        main_function (domain, file, argc - 1, argv + 1);
+        MonoDomain *domain = mono_jit_init (file.c_str ());
 
-        retval = mono_environment_exitcode_get ();
+        main_function (domain, file.c_str (), argc - 1, argv + 1);
+
+        int retval = mono_environment_exitcode_get ();
 
         mono_jit_cleanup (domain);
 
         return retval;
 }
-

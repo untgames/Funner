@@ -1,1 +1,0 @@
-cp invoke.dll ../../../../dist/msvc/bin/funner.extern.mono-test-invoke.dll

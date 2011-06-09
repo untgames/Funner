@@ -66,8 +66,8 @@ EXE_SUFFIX     := .exe
 DLL_SUFFIX     := .dll
 DLL_LIB_SUFFIX := .lib
 DLL_PREFIX     :=
-PROFILES   += msvc win32 has_windows x86 vcx86
-COMMON_LINK_FLAGS += -stack:128000 /MACHINE:X86
+PROFILES                += msvc win32 has_windows x86 vcx86 x86_win32
+COMMON_LINK_FLAGS       += -stack:128000 /MACHINE:X86
 SOURCE_PROCESS_MACROSES += process_idl process_rc
 
 ###################################################################################################
@@ -215,3 +215,5 @@ define process_target.cs-application
     run: RUN.$1
   endif  
 endef
+
+include $(TOOLSETS_DIR)/common/mono.mak

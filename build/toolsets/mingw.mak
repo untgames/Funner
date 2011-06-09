@@ -10,7 +10,7 @@ CYGHOME := /$(subst :,,$(call convert_path,$(MINGW)))
 ###################################################################################################
 #Константы
 ###################################################################################################
-PROFILES          += mingw win32 has_windows haswchar x86 g++x86
+PROFILES          += mingw win32 has_windows haswchar x86 g++x86 x86_win32
 MINGW             := $(call convert_path,$(MINGW))
 MINGW_BIN         := $(MINGW)/bin
 COMPILER_GCC      := $(MINGW_BIN)/gcc.exe

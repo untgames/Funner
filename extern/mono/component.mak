@@ -55,7 +55,7 @@ EXTERN.MONO.LIBMONO.win32.LIBS             := version ws2_32 psapi winmm mswsock
 EXTERN.MONO.LIBMONO.msvc.COMPILER_CFLAGS   := -wd4018 -wd4244 -wd4996 -wd4005 -wd4101 -wd4133 -wd4146 -wd4047 -wd4024 -wd4098 -wd4013 -wd4716 -wd4715
 
 #Цель - MONO_CS_INVOKE
-EXTERN.MONO_CS_INVOKE.TYPE              := cs-dynamic-lib
+EXTERN.MONO_CS_INVOKE.TYPE              := mono-cs-dynamic-lib
 EXTERN.MONO_CS_INVOKE.NAME              := funner.extern.mono-test-invoke
 EXTERN.MONO_CS_INVOKE.SOURCE_DIRS       := tests/invoke_assembly
 
