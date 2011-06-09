@@ -15,21 +15,21 @@
 
 # include "private/gc_priv.h"
 
-/* This is debugging code intended to verify the results of dirty bit	*/
-/* computations. Works only in a single threaded environment.		*/
-/* We assume that stubborn objects are changed only when they are 	*/
-/* enabled for writing.  (Certain kinds of writing are actually		*/
-/* safe under other conditions.)					*/
+/* This is debugging code intended to verify the results of dirty bit */
+/* computations. Works only in a single threaded environment.   */
+/* We assume that stubborn objects are changed only when they are   */
+/* enabled for writing.  (Certain kinds of writing are actually   */
+/* safe under other conditions.)          */
 # define NSUMS 10000
 
 # define OFFSET 0x10000
 
 typedef struct {
-	GC_bool new_valid;
-	word old_sum;
-	word new_sum;
-	struct hblk * block;	/* Block to which this refers + OFFSET  */
-				/* to hide it from collector.		*/
+  GC_bool new_valid;
+  word old_sum;
+  word new_sum;
+  struct hblk * block;  /* Block to which this refers + OFFSET  */
+        /* to hide it from collector.   */
 } page_entry;
 
 page_entry GC_sums [NSUMS];
@@ -48,8 +48,8 @@ struct hblk *h;
 }
 
 # ifdef STUBBORN_ALLOC
-/* Check whether a stubborn object from the given block appears on	*/
-/* the appropriate free list.						*/
+/* Check whether a stubborn object from the given block appears on  */
+/* the appropriate free list.           */
 GC_bool GC_on_free_list(h)
 struct hblk *h;
 {
@@ -84,35 +84,35 @@ int index;
 #   if !defined(MSWIN32) && !defined(MSWINCE)
         if (pe -> new_sum != 0x80000000 && !GC_page_was_ever_dirty(h)) {
             GC_printf1("GC_page_was_ever_dirty(0x%lx) is wrong\n",
-        	       (unsigned long)h);
+                 (unsigned long)h);
         }
 #   endif
     if (GC_page_was_dirty(h)) {
-    	GC_n_dirty++;
+      GC_n_dirty++;
     } else {
-    	GC_n_clean++;
+      GC_n_clean++;
     }
     b = h;
     while (IS_FORWARDING_ADDR_OR_NIL(hhdr) && hhdr != 0) {
-	b -= (word)hhdr;
-	hhdr = HDR(b);
+  b -= (word)hhdr;
+  hhdr = HDR(b);
     }
     if (pe -> new_valid
-	&& hhdr != 0 && hhdr -> hb_descr != 0 /* may contain pointers */
-	&& pe -> old_sum != pe -> new_sum) {
-    	if (!GC_page_was_dirty(h) || !GC_page_was_ever_dirty(h)) {
-    	    /* Set breakpoint here */GC_n_dirty_errors++;
-    	}
-#	ifdef STUBBORN_ALLOC
-    	  if ( hhdr -> hb_map != GC_invalid_map
-    	    && hhdr -> hb_obj_kind == STUBBORN
-    	    && !GC_page_was_changed(h)
-    	    && !GC_on_free_list(h)) {
-    	    /* if GC_on_free_list(h) then reclaim may have touched it	*/
-    	    /* without any allocations taking place.			*/
-    	    /* Set breakpoint here */GC_n_changed_errors++;
-    	  }
-#	endif
+  && hhdr != 0 && hhdr -> hb_descr != 0 /* may contain pointers */
+  && pe -> old_sum != pe -> new_sum) {
+      if (!GC_page_was_dirty(h) || !GC_page_was_ever_dirty(h)) {
+          /* Set breakpoint here */GC_n_dirty_errors++;
+      }
+# ifdef STUBBORN_ALLOC
+        if ( hhdr -> hb_map != GC_invalid_map
+          && hhdr -> hb_obj_kind == STUBBORN
+          && !GC_page_was_changed(h)
+          && !GC_on_free_list(h)) {
+          /* if GC_on_free_list(h) then reclaim may have touched it */
+          /* without any allocations taking place.      */
+          /* Set breakpoint here */GC_n_changed_errors++;
+        }
+# endif
     }
     pe -> new_valid = TRUE;
     pe -> block = h + OFFSET;
@@ -139,10 +139,10 @@ void GC_check_blocks()
     GC_bytes_in_used_blocks = 0;
     GC_apply_to_all_blocks(GC_add_block, (word)0);
     GC_printf2("GC_bytes_in_used_blocks = %ld, bytes_in_free_blocks = %ld ",
-    		GC_bytes_in_used_blocks, bytes_in_free_blocks);
+        GC_bytes_in_used_blocks, bytes_in_free_blocks);
     GC_printf1("GC_heapsize = %ld\n", GC_heapsize);
     if (GC_bytes_in_used_blocks + bytes_in_free_blocks != GC_heapsize) {
-    	GC_printf0("LOST SOME BLOCKS!!\n");
+      GC_printf0("LOST SOME BLOCKS!!\n");
     }
 }
 
@@ -163,7 +163,7 @@ void GC_check_dirty()
     
     index = 0;
     for (i = 0; i < GC_n_heap_sects; i++) {
-    	start = GC_heap_sects[i].hs_start;
+      start = GC_heap_sects[i].hs_start;
         for (h = (struct hblk *)start;
              h < (struct hblk *)(start + GC_heap_sects[i].hs_bytes);
              h++) {
@@ -174,26 +174,26 @@ void GC_check_dirty()
     }
 out:
     GC_printf2("Checked %lu clean and %lu dirty pages\n",
-    	      (unsigned long) GC_n_clean, (unsigned long) GC_n_dirty);
+            (unsigned long) GC_n_clean, (unsigned long) GC_n_dirty);
     if (GC_n_dirty_errors > 0) {
         GC_printf1("Found %lu dirty bit errors\n",
-        	   (unsigned long)GC_n_dirty_errors);
+             (unsigned long)GC_n_dirty_errors);
     }
     if (GC_n_changed_errors > 0) {
-    	GC_printf1("Found %lu changed bit errors\n",
-        	   (unsigned long)GC_n_changed_errors);
-	GC_printf0("These may be benign (provoked by nonpointer changes)\n");
-#	ifdef THREADS
-	    GC_printf0(
-	    "Also expect 1 per thread currently allocating a stubborn obj.\n");
-#	endif
+      GC_printf1("Found %lu changed bit errors\n",
+             (unsigned long)GC_n_changed_errors);
+  GC_printf0("These may be benign (provoked by nonpointer changes)\n");
+# ifdef THREADS
+      GC_printf0(
+      "Also expect 1 per thread currently allocating a stubborn obj.\n");
+# endif
     }
 }
 
 # else
 
 extern int GC_quiet;
-	/* ANSI C doesn't allow translation units to be empty.	*/
-	/* So we guarantee this one is nonempty.		*/
+  /* ANSI C doesn't allow translation units to be empty.  */
+  /* So we guarantee this one is nonempty.    */
 
 # endif /* CHECKSUMS */
