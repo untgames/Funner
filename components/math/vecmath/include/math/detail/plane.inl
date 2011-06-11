@@ -57,7 +57,7 @@ template <class T>
 bool plane<T>::operator == (const plane& p) const
 {
   for (unsigned int i = 0; i < 4; i++)
-    if ((*this)[i] != v [i])
+    if ((*this)[i] != p [i])
       return false;
 
   return true;
@@ -114,7 +114,7 @@ typename plane<T>::value_type distance (const plane<T>& p, const vector<T, 3>& p
 */
 
 template <class T>
-typename vector<T, 3> project (const plane<T>& p, const vector<T, 3>& v)
+vector<T, 3> project (const plane<T>& p, const vector<T, 3>& v)
 {
   const vector<T, 3>& normal = p.normal ();
 
