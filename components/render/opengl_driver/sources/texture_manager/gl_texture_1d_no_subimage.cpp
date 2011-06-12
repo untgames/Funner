@@ -11,74 +11,8 @@ using namespace render::low_level::opengl;
 */
 
 Texture1DNoSubimage::Texture1DNoSubimage (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
-  : Texture (manager, tex_desc, GL_TEXTURE_1D, get_mips_count (tex_desc.width))
+  : Texture1D (manager, tex_desc, data)
 {
-  const char* METHOD_NAME = "render::low_level::opengl::Texture1DNoSubimage::Texture1DNoSubimage";
-
-    //установка текстуры в контекст OpenGL
-
-  Bind ();
-
-    //проверка корректности формата создаваемой текстуры
-    
-  switch (GetFormat ())
-  {
-    case PixelFormat_L8:
-    case PixelFormat_A8:
-    case PixelFormat_LA8:
-    case PixelFormat_RGB8:
-    case PixelFormat_RGBA8:
-      break;
-    case PixelFormat_DXT1:
-    case PixelFormat_DXT3:
-    case PixelFormat_DXT5:
-    case PixelFormat_RGB_PVRTC2:
-    case PixelFormat_RGB_PVRTC4:
-    case PixelFormat_RGBA_PVRTC2:
-    case PixelFormat_RGBA_PVRTC4:
-      throw xtl::format_not_supported_exception (METHOD_NAME, "Compressed 1D textures not supported (desc.format=%s)", get_name (GetFormat ()));
-    case PixelFormat_D16:
-    case PixelFormat_D24X8:
-    case PixelFormat_D24S8:
-    case PixelFormat_S8:    
-      throw xtl::format_not_supported_exception (METHOD_NAME, "Depth-stencil 1D textures not supported (desc.format=%s)", get_name (GetFormat ()));
-    default:
-      throw xtl::make_argument_exception (METHOD_NAME, "desc.format", GetFormat ());
-  }  
-    
-    //преобразование формата пикселей
-
-  if (is_compressed (tex_desc.format))
-    throw xtl::format_not_supported_exception (METHOD_NAME, "1D texture can't be compressed");
-
-  gl_internal_format = get_gl_internal_format (GetFormat ());
-
-    //создание mip-уровней
-  
-  if (data)
-  {
-    TextureDataSelector data_selector (tex_desc, data);
-
-    GLenum gl_format = get_gl_format (tex_desc.format),
-           gl_type   = get_gl_type (tex_desc.format);
-
-    for (size_t i=0; i<GetMipsCount (); i++)
-    {
-      size_t level_width = tex_desc.width >> i;
-
-      TextureLevelData level_data;
-
-      data_selector.GetLevelData (level_width, 1, 1, level_data);
-
-      glTexImage1D (GL_TEXTURE_1D, i, gl_internal_format, level_width, 0, gl_format, gl_type, level_data.data);
-
-      data_selector.Next ();
-    }
-  }
-
-    //проверка ошибок
-
-  CheckErrors (METHOD_NAME);
 }
 
 /*

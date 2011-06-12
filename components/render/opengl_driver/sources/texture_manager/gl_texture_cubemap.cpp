@@ -77,8 +77,17 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
   bool                is_compressed_data = is_compressed (tex_desc.format);
 
   PFNGLCOMPRESSEDTEXIMAGE2DPROC glCompressedTexImage2D_fn = GetCaps ().glCompressedTexImage2D_fn;
+  
+  xtl::uninitialized_storage<char> unpacked_buffer;      
+  
+  if (is_compressed_data && data && !GetCaps ().has_ext_texture_compression_s3tc)
+  {
+    unpacked_buffer.resize (get_uncompressed_image_size (tex_desc.width, tex_desc.height, tex_desc.format));  
+  }
 
-  for (size_t i=0; i<GetMipsCount (); i++)
+  size_t mips_count = GetMipsCount ();  
+
+  for (size_t i=0; i<mips_count; i++)
   {
     MipLevelDesc level_desc;
 
@@ -88,14 +97,23 @@ TextureCubemap::TextureCubemap  (const ContextManager& manager, const TextureDes
     {
       TextureLevelData level_data;
 
-      if (data_selector.GetLevelData (level_desc.width, level_desc.height, 1, level_data) && is_compressed_data)
+      if (data_selector.GetLevelData (level_desc.width, level_desc.height, 1, level_data) && glCompressedTexImage2D_fn && is_compressed_data)
       {
-        glCompressedTexImage2D_fn (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, gl_internal_format, level_desc.width, level_desc.height, 0, level_data.size, level_data.data);
+        glCompressedTexImage2D_fn (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, gl_internal_format, level_desc.width, level_desc.height, 0, level_data.size, level_data.data);        
       }
       else
       {
-        glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, gl_internal_format, level_desc.width, level_desc.height, 0, gl_uncompressed_format, gl_uncompressed_type, level_data.data);
-      }
+        if (is_compressed_data && level_data.data)
+        {
+          unpack_dxt (tex_desc.format, level_desc.width, level_desc.height, level_data.data, unpacked_buffer.data ());
+
+          glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, gl_internal_format, level_desc.width, level_desc.height, 0, gl_uncompressed_format, gl_uncompressed_type, unpacked_buffer.data ());
+        }
+        else
+        {
+          glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, gl_internal_format, level_desc.width, level_desc.height, 0, gl_uncompressed_format, gl_uncompressed_type, level_data.data);
+        }      
+      }            
 
       data_selector.Next ();
     }
