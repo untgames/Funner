@@ -38,8 +38,8 @@ Body world transform:
   orientation = 0.0; 0.0; 0.0; 1.0
 sphere body state:
 Body world transform:
-  position = -13; -14; 6
-  orientation = 0.5; 0.5; 0.5; -0.1
+  position = -13; -14; 7
+  orientation = -0.4; -0.4; -0.4; 0.5
 capsule body state:
 Body world transform:
   position = -4; -13; 0
