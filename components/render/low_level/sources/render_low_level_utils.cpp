@@ -442,6 +442,7 @@ size_t get_texel_size (PixelFormat format)
 size_t get_image_size (size_t width, size_t height, size_t depth, PixelFormat format)
 {
   static const size_t DXT_BLOCK_SIZE = 16;
+  static const size_t DXT_EDGE_SIZE  = 4;  
 
   switch (format)
   {
@@ -454,9 +455,9 @@ size_t get_image_size (size_t width, size_t height, size_t depth, PixelFormat fo
     case PixelFormat_RGBA8:
     case PixelFormat_D24X8:
     case PixelFormat_D24S8:        return width * height * depth * get_texel_size (format);
-    case PixelFormat_DXT1:         return width * height * depth * 8 / DXT_BLOCK_SIZE;
-    case PixelFormat_DXT3:         return width * height * depth * 16 / DXT_BLOCK_SIZE;
-    case PixelFormat_DXT5:         return width * height * depth * 16 / DXT_BLOCK_SIZE;     
+    case PixelFormat_DXT1:         return stl::max (width, DXT_EDGE_SIZE) * stl::max (height, DXT_EDGE_SIZE) * depth * 8 / DXT_BLOCK_SIZE;
+    case PixelFormat_DXT3:         return stl::max (width, DXT_EDGE_SIZE) * stl::max (height, DXT_EDGE_SIZE) * depth * 16 / DXT_BLOCK_SIZE;
+    case PixelFormat_DXT5:         return stl::max (width, DXT_EDGE_SIZE) * stl::max (height, DXT_EDGE_SIZE) * depth * 16 / DXT_BLOCK_SIZE;
     case PixelFormat_RGB_PVRTC2:
     case PixelFormat_RGBA_PVRTC2:
       if (width < 16) width  = 16;

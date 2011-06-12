@@ -36,7 +36,7 @@ int main ()
   
   try
   {
-    Test test (L"OpenGL device test window (draw_indexed_textured)", &redraw);
+    Test test (L"OpenGL device test window (draw_indexed_textured)", &redraw, "*", "disable=*");
 
     test.window.Show ();
    

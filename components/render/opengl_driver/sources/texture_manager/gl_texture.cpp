@@ -48,18 +48,6 @@ Texture::Texture
         throw xtl::format_operation_exception (METHOD_NAME, "Auto-generate mipmaps incompatible with compressed textures (desc.format=%s)",
           get_name (desc.format));
 
-        //проверка корректности начальных размеров
-
-      mips_count = get_mips_count (desc.width < desc.height ? desc.width : desc.height);  //необходимо разобраться как задаются мип-уровни для уровней с размером стороны меньше 4 пикселов
-
-      if (mips_count < 3)
-      {
-        if (desc.width % 4)  throw xtl::make_argument_exception (METHOD_NAME, "desc.width", desc.width, "Reason: width is not multiple of 4");
-        if (desc.height % 4) throw xtl::make_argument_exception (METHOD_NAME, "desc.height", desc.height, "Reason: height is not multiple of 4");
-      }
-
-      mips_count -= 2;
-
       break;
     case PixelFormat_RGB_PVRTC2:
     case PixelFormat_RGB_PVRTC4:
@@ -244,25 +232,8 @@ void Texture::GetMipLevelDesc (size_t mip_level, MipLevelDesc& out_desc)
   size_t level_width  = desc.width >> mip_level,
          level_height = desc.height >> mip_level;
   
-  switch (desc.format)
-  {
-    case PixelFormat_DXT1:
-    case PixelFormat_DXT3:
-    case PixelFormat_DXT5:
-         //выравнивание размеров уровня по ближайшему снизу числу, делящемуся на 4
-
-      level_width  &= ~3;
-      level_height &= ~3;
-
-      if (!level_width)  level_width  = 4;
-      if (!level_height) level_height = 4;
-
-      break;
-    default:
-      if (!level_width)  level_width  = 1;
-      if (!level_height) level_height = 1;
-      break;
-  }
+  if (!level_width)  level_width  = 1;
+  if (!level_height) level_height = 1;
 
   out_desc.width  = level_width;
   out_desc.height = level_height;
@@ -470,8 +441,11 @@ void Texture::SetData
       case PixelFormat_DXT3:
       case PixelFormat_DXT5:
       {
-        if ((x % DXT_EDGE_SIZE) || (y % DXT_EDGE_SIZE))          throw xtl::format_not_supported_exception (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
-        if ((width % DXT_EDGE_SIZE) || (height % DXT_EDGE_SIZE)) throw xtl::format_not_supported_exception (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);    
+        if ((x % DXT_EDGE_SIZE) || (y % DXT_EDGE_SIZE))
+          throw xtl::format_not_supported_exception (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
+
+        if (width % DXT_EDGE_SIZE == 3 || height % DXT_EDGE_SIZE == 3)
+          throw xtl::format_not_supported_exception (METHOD_NAME, "Wrong block size (%u, %u) of compressed texture", width, height);
 
           //копирование сжатого образа
 
@@ -707,18 +681,18 @@ void Texture::GetData
 
           if (x % DXT_EDGE_SIZE || y % DXT_EDGE_SIZE)
             throw xtl::format_not_supported_exception (METHOD_NAME, "Offset (%u, %u) in compressed texture must be a multiple of 4", x, y);
-
-          if (width % DXT_EDGE_SIZE || height % DXT_EDGE_SIZE)
-            throw xtl::format_not_supported_exception (METHOD_NAME, "Block size (%u, %u) in compressed texture must be a multiple of 4.", width, height);
+            
+          if (width % DXT_EDGE_SIZE == 3 || height % DXT_EDGE_SIZE == 3)
+            throw xtl::format_not_supported_exception (METHOD_NAME, "Wrong block size (%u, %u) of compressed texture", width, height);
 
             //переход к размерности блока в DXT
 
           x                /= DXT_EDGE_SIZE;
           y                /= DXT_EDGE_SIZE;
-          width            /= DXT_EDGE_SIZE;
-          height           /= DXT_EDGE_SIZE;
-          unclamped_width  /= DXT_EDGE_SIZE;
-          unclamped_height /= DXT_EDGE_SIZE;
+          width             = stl::max (width / DXT_EDGE_SIZE, DXT_EDGE_SIZE);
+          height            = stl::max (height / DXT_EDGE_SIZE, DXT_EDGE_SIZE);
+          unclamped_width   = stl::max (unclamped_width / DXT_EDGE_SIZE, DXT_EDGE_SIZE);
+          unclamped_height  = stl::max (unclamped_height / DXT_EDGE_SIZE, DXT_EDGE_SIZE);
 
             //копирование полного образа во временный буфер
 
@@ -731,7 +705,7 @@ void Texture::GetData
 
             //копирование части образа в пользовательский буфер
 
-          size_t src_line_size    = level_desc.width / DXT_EDGE_SIZE * quad_size,
+          size_t src_line_size    = stl::max (level_desc.width / DXT_EDGE_SIZE, DXT_EDGE_SIZE) * quad_size,
                  src_start_offset = layer_desc.new_index * layer_size + y * src_line_size + x * quad_size,
                  block_size       = width * quad_size,
                  dst_line_size    = unclamped_width * quad_size;
