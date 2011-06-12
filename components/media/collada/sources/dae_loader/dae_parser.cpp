@@ -98,9 +98,24 @@ void DaeParser::ParseRoot (Parser::Iterator iter)
     iter->Log ().Warning (*iter, "Currently supported Collada version - %s, document uses other version (%s), "
       "some features may be not fully supported or unsupported", SUPPORTED_VERSION, version);
 
-    //чтение имени инструмента создания файла
+    //чтение параметров создания файла
+  common::ParseNode asset_node = iter->First ("asset");
 
-  common::ParseNode authoring_tool_node = iter->First ("asset.contributor.authoring_tool.#text");
+  if (!asset_node)
+    raise_parser_exception (*iter, "Wrong file format. No 'asset' tag");
+
+  unit_of_measure = get<float> (asset_node, "unit.meter", 1.f);
+
+  const char* up_axis_name = get<const char*> (asset_node, "up_axis.#text", "Y_UP");
+
+  if (!xtl::xstrcmp (up_axis_name, "Y_UP"))
+    up_axis = Axis_Y;
+  else if (!xtl::xstrcmp (up_axis_name, "Z_UP"))
+    up_axis = Axis_Z;
+  else
+    raise_parser_exception (asset_node, "Unsupported up axis value '%s'", up_axis_name);
+
+  common::ParseNode authoring_tool_node = asset_node.First ("contributor.authoring_tool.#text");
 
   if (authoring_tool_node)
   {

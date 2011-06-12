@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset/>
   <library_visual_scenes>
     <visual_scene id="MaxScene">
       <node id="node-Line01" name="Line01">

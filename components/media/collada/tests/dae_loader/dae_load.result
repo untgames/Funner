@@ -13169,7 +13169,7 @@ Model 'data/ape.dae'
     Node 'Ape.max'
       sid: ''
       name: 'Ape.max'
-      transform: [ [ +1.000 +0.000 +0.000 +0.000 ] [ +0.000 +1.000 +0.000 +0.000 ] [ +0.000 +0.000 +1.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+      transform: [ [ +0.025 +0.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.025 +0.000 ] [ +0.000 -0.025 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
       Collection 'instance_meshes' (0 items)
       Collection 'instance_controllers' (0 items)
       Collection 'lights' (0 items)

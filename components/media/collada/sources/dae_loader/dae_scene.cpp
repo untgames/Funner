@@ -39,13 +39,15 @@ void DaeParser::ParseVisualScene (Parser::Iterator iter)
   
   scene.SetId (id);  
 
-  if (common::wcmatch (authoring_tool.c_str (), "OpenCOLLADA for 3ds Max*"))
+  if (up_axis == Axis_Z)
   {
     float z_to_y_transform_matrix [] = { 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, -1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 1.f };
 
     scene.SetTransform (math::mat4f (z_to_y_transform_matrix));
   }
   
+  scene.SetTransform (math::scale (math::vec3f (unit_of_measure)) * scene.Transform ());
+
   if (*name)
     scene.SetName (name);
   
