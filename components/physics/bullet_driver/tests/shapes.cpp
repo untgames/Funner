@@ -89,9 +89,9 @@ int main ()
     dump_body_position (compound_body.get ());
 
     for (size_t i = 0; i < 10; i++)
-      scene->PerformSimulation (1.f);
+      scene->PerformSimulation (0.5f);
 
-    printf ("Simulating ten seconds\n");
+    printf ("Simulating five seconds\n");
 
     printf ("plane body state:\n");
     dump_body_position (plane_body.get ());
