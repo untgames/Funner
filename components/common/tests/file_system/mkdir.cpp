@@ -1,7 +1,8 @@
-#include <common/file.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <common/file.h>
 
 using namespace common;
 
@@ -18,6 +19,7 @@ int main ()
   {
     remove_all ();
     
+    FileSystem::Mkdir ("results/data/");
     FileSystem::Mkdir ("results/a/b/c/d");
     
     printf ("isdir: %s\n", FileSystem::IsDir ("results/a/b/c/d") ? "true" : "false");

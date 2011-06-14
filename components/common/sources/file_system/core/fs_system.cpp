@@ -903,6 +903,9 @@ void FileSystemImpl::Mkdir (const char* src_dir_name)
   {
     ICustomFileSystemPtr file_system = FindFileSystem (src_dir_name,dir_name);
     
+    if (!dir_name.empty () && dir_name [dir_name.size () - 1] == '/')
+      dir_name.pop_back ();
+
     MkdirRecursive (*file_system, dir_name.c_str ());
   }
   catch (xtl::exception& exception)
