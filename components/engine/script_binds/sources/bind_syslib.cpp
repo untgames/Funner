@@ -133,6 +133,9 @@ void bind_window_library (Environment& environment)
   lib.Register ("set_Focus",        make_invoker (&syslib::Window::SetFocus));  
   lib.Register ("Maximize",         make_invoker (&syslib::Window::Maximize));
   lib.Register ("Minimize",         make_invoker (&syslib::Window::Minimize));
+  lib.Register ("Close",            make_invoker (&syslib::Window::Close));
+  lib.Register ("CancelClose",      make_invoker (&syslib::Window::CancelClose));
+  lib.Register ("ForceClose",       make_invoker (&syslib::Window::ForceClose));
   
   environment.RegisterType<Window> (WINDOW_LIBRARY);
 }
