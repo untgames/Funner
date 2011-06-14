@@ -40,7 +40,7 @@ int main ()
     ShapePtr compound_shape (bullet_driver->CreateCompoundShape (compounding_shapes_count, compounding_shapes, compounding_shapes_transforms));
 
     RigidBodyPtr box_body           (scene->CreateRigidBody (box_shape.get (), 1),           false),
-                 sphere_body        (scene->CreateRigidBody (sphere_shape.get (), 1),        false),
+                 sphere_body        (scene->CreateRigidBody (sphere_shape.get (), 2),        false),
                  capsule_body       (scene->CreateRigidBody (capsule_shape.get (), 1),       false),
                  plane_body         (scene->CreateRigidBody (plane_shape.get (), 0),         false),
                  convex_body        (scene->CreateRigidBody (convex_shape.get (), 1),        false),
@@ -89,7 +89,7 @@ int main ()
     dump_body_position (compound_body.get ());
 
     for (size_t i = 0; i < 10; i++)
-      scene->PerformSimulation (0.5f);
+      scene->PerformSimulation (0.2f);
 
     printf ("Simulating five seconds\n");
 
