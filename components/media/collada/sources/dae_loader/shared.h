@@ -161,7 +161,6 @@ class DaeParser
     Model&                model;               //загружаемая модель
     Parser                parser;              //парсер
     stl::string           authoring_tool;      //инструмент с помощью которого создавался COLLADA-файл
-    float                 unit_of_measure;     //значение единицы величины по отношению к метру
     Axis                  up_axis;             //какая из осей направлена вверх
     VertexIndexMaps       vertex_index_maps;   //карты вершинных индексов
     AnimationSemanticsMap animation_semantics; //найденные возможные семантики анимаций

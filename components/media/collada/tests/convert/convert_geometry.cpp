@@ -13,7 +13,7 @@ void print (const char* message)
 int main ()
 {
   printf ("Results of collada_import_test:\n");
-  
+
   try
   {
     printf ("Load collada model '%s'\n", COLLADA_FILE_NAME);

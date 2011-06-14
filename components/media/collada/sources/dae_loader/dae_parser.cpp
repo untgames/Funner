@@ -104,7 +104,7 @@ void DaeParser::ParseRoot (Parser::Iterator iter)
   if (!asset_node)
     raise_parser_exception (*iter, "Wrong file format. No 'asset' tag");
 
-  unit_of_measure = get<float> (asset_node, "unit.meter", 1.f);
+  model.SetUnitOfMeasure (get<float> (asset_node, "unit.meter", 1.f));
 
   const char* up_axis_name = get<const char*> (asset_node, "up_axis.#text", "Y_UP");
 

@@ -14,6 +14,8 @@
 
 #include <bv/axis_aligned_box.h>
 
+#include <math/utility.h>
+
 #include <media/animation/animation_library.h>
 #include <media/physics/physics_library.h>
 #include <media/rfx/material_library.h>
@@ -77,6 +79,7 @@ struct Params
   stl::string   exclude_nodes;                //неэкспортируемые узлы сцены
   stl::string   merge_animation;              //имя анимации в которую должны быть вклеены все остальные анимации
   size_t        max_texture_size;             //максимальный размер текстуры
+  bool          convert_to_meters;            //нужно ли переводить единицы измерения в метры
   bool          fix_zero_tangents;            //нужно ли генерировать вместо нулевых касательных произвольные
   bool          pot;                          //нужно ли масштабировать текстуры до ближайшей степени двойки
   bool          silent;                       //минимальное число сообщений
@@ -227,6 +230,12 @@ void command_line_merge_animation (const char* string, Params& params)
   params.merge_animation = string;
 }
 
+//установка необходимости не корректировать единицы длины
+void command_line_dont_convert_to_meters (const char*, Params& params)
+{
+  params.convert_to_meters = false;
+}
+
 //установка необходимости масштабировать текстуры до ближайшей степени двойки
 void command_line_fix_zero_tangents (const char*, Params& params)
 {
@@ -285,6 +294,7 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_exclude_nodes,                "exclude-nodes",            0, "wildcards", "exclude selected nodes from export"},
     {command_line_merge_animation,              "merge-animation",          0, "string",    "merge all animations in one with given name"},
     {command_line_remove_unused_resources,      "remove-unused",            0, 0,           "remove unused resources from export"},
+    {command_line_dont_convert_to_meters,       "dont-convert-to-meters",   0, 0,           "dont scale scene to match units with meters"},
     {command_line_silent,                       "silent",                 's', 0,           "quiet mode"},
     {command_line_help,                         "help",                   '?', 0,           "print help message"},
   };
@@ -785,7 +795,14 @@ void save_scene (const Params& params, const Model& model)
   }
 
   for (NodeLibrary::ConstIterator i = model.Scenes ().CreateIterator (); i; ++i)
-    save_node (params, meshes_bound_volumes, *i, writer);
+  {
+    Node scene_node (i->Clone ());
+
+    if (params.convert_to_meters)
+      scene_node.SetTransform (math::scale (math::vec3f (model.UnitOfMeasure ())) * scene_node.Transform ());
+
+    save_node (params, meshes_bound_volumes, scene_node, writer);
+  }
 
   if (!params.silent)
     printf ("Ok\n");
@@ -1151,6 +1168,7 @@ int main (int argc, const char *argv[])
 
     params.options                 = 0;
     params.options_count           = 0;
+    params.convert_to_meters       = true;
     params.silent                  = false;
     params.remove_unused_resources = false;
     params.print_help              = false;

@@ -640,6 +640,7 @@ int main ()
       printf ("Model '%s'\n", file_names [i]);
       print_space (1);
       printf ("Active scene: '%s'\n", model.ActiveSceneName ());
+      printf ("Unit of measure: %.4f\n", model.UnitOfMeasure ());
 
       dump ("library_images", model.Images (), 1, model);
       dump ("library_effects", model.Effects (), 1, model);

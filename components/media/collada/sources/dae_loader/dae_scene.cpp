@@ -46,8 +46,6 @@ void DaeParser::ParseVisualScene (Parser::Iterator iter)
     scene.SetTransform (math::mat4f (z_to_y_transform_matrix));
   }
   
-  scene.SetTransform (math::scale (math::vec3f (unit_of_measure)) * scene.Transform ());
-
   if (*name)
     scene.SetName (name);
   

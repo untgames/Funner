@@ -375,6 +375,7 @@ data/ape.dae(11262): error: node 'animation': Incorrect 'animation' tag, must co
 ---  Collada model dump ---
 Model 'data/ape.dae'
   Active scene: 'Ape.max'
+Unit of measure: 0.0254
   Library 'library_images' (3 items)
     Image 'file21', path = 'file:///C:/shatle/New_Project/sourceimages/VANCONTA.JPG'
     Image 'file3', path = 'file:///C:/shatle/New_Project/sourceimages/VANENGFL.JPG'
@@ -13169,7 +13170,7 @@ Model 'data/ape.dae'
     Node 'Ape.max'
       sid: ''
       name: 'Ape.max'
-      transform: [ [ +0.025 +0.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.025 +0.000 ] [ +0.000 -0.025 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
+      transform: [ [ +1.000 +0.000 +0.000 +0.000 ] [ +0.000 +0.000 +1.000 +0.000 ] [ +0.000 -1.000 +0.000 +0.000 ] [ +0.000 +0.000 +0.000 +1.000 ] ]
       Collection 'instance_meshes' (0 items)
       Collection 'instance_controllers' (0 items)
       Collection 'lights' (0 items)
@@ -15402,6 +15403,7 @@ Model 'data/ape.dae'
 ---  Collada model dump ---
 Model 'data/user_properties.dae'
   Active scene: 'MaxScene'
+Unit of measure: 1.0000
   Library 'library_images' (0 items)
   Library 'library_effects' (0 items)
   Library 'library_materials' (0 items)
