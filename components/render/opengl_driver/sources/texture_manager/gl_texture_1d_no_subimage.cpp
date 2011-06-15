@@ -13,7 +13,7 @@ using namespace render::low_level::opengl;
 Texture1DNoSubimage::Texture1DNoSubimage (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
   : Texture1D (manager, tex_desc, data, true)
 {
-  gl_internal_format = get_gl_internal_format (GetFormat ());
+  gl_internal_format = GetCaps ().has_ext_texture_compression_s3tc ? get_gl_internal_format (GetFormat ()) : get_uncompressed_gl_internal_format (GetFormat ());  
 }
 
 /*
