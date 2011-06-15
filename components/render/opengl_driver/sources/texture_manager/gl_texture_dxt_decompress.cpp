@@ -35,7 +35,7 @@ void unpack (const Color32& src_color, rgba8_t& dst_color)
   dst_color.red   = src_color.b;
   dst_color.green = src_color.g;
   dst_color.blue  = src_color.r;
-  dst_color.alpha = src_color.a;
+  dst_color.alpha = src_color.a;  
 }
 
 template <class Block, class Pixel>

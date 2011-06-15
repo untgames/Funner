@@ -417,6 +417,21 @@ class ExtensionMap
     Map map;
 };
 
+/*
+    Список псевдо-расширений (багов)
+*/
+
+class BugExtensionSet: public render::low_level::opengl::ExtensionSet
+{
+  public:
+    BugExtensionSet ()
+    {
+      for (size_t i=0; i<EXTENSIONS_COUNT; i++)
+        if (strstr (extensions [i], "GLBUG_") == extensions [i])
+          Set (i, true);
+    }
+};
+
 }
 
 namespace render
@@ -613,6 +628,12 @@ ExtensionSet& ExtensionSet::operator &= (const ExtensionSet& set)
   impl->flags &= set.impl->flags;
   
   return *this;
+}
+
+//получение списка псевдо-расширений (багов)
+const ExtensionSet& ExtensionSet::BugExtensions ()
+{
+  return *Singleton<::BugExtensionSet>::Instance ();
 }
 
 //обмен

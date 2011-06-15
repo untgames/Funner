@@ -10,7 +10,7 @@ using namespace render::low_level::opengl;
 */
 
 Texture2DNoSubimage::Texture2DNoSubimage  (const ContextManager& manager, const TextureDesc& tex_desc, const TextureData* data)
-  : Texture2D (manager, tex_desc, data)
+  : Texture2D (manager, tex_desc, data, true)
 {
 }
 
