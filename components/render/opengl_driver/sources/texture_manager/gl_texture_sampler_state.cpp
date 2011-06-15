@@ -191,8 +191,6 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   
   if (IsSupported (BUG_texture_no_mipmap))
   {
-   printf ("??????????????????????\n"); fflush (stdout);    
-    
     switch (in_desc.min_filter)
     {
       case TexMinFilter_Point:
@@ -208,8 +206,6 @@ void SamplerState::SetDesc (const SamplerDesc& in_desc)
   }
   else
   {
-printf ("------------------??????????????????????\n"); fflush (stdout);    
-    
     switch (in_desc.min_filter)
     {
       case TexMinFilter_Point:           gl_min_filter = GL_NEAREST; break;

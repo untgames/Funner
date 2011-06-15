@@ -59,7 +59,7 @@ Texture2D::Texture2D (const ContextManager& manager, const TextureDesc& tex_desc
 #endif
 
   if (data || !ignore_null_data)
-  {
+  {    
       //настройка расположения данных в буфере    
 
     glPixelStorei (GL_UNPACK_ALIGNMENT,   1); //выравнивание начала строк
