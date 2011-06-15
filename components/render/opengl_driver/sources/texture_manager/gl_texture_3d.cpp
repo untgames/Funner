@@ -70,8 +70,16 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
   if (!width)
     throw xtl::format_not_supported_exception (METHOD_NAME, "Can't create 3d texture %ux%ux%u@%s (proxy texture fail)", 
       tex_desc.width, tex_desc.height, tex_desc.layers, get_name (tex_desc.format));
+      
+    //настройка расположения данных в буфере    
 
-    //создание mip-уровней
+  glPixelStorei (GL_UNPACK_ALIGNMENT,   1);    //выравнивание начала строк
+  glPixelStorei (GL_UNPACK_SKIP_ROWS,   0);    //количество пропускаемых строк
+  glPixelStorei (GL_UNPACK_SKIP_PIXELS, 0);    //количество пропускаемых пикселей
+  glPixelStorei (GL_PACK_SKIP_IMAGES_EXT,  0); //количество пропускаемых слоев
+  glPixelStorei (GL_PACK_IMAGE_HEIGHT_EXT, 0); //высота слоя в пикселях  
+
+    //создание mip-уровней        
 
   TextureDataSelector data_selector (tex_desc, data);
 
@@ -82,6 +90,8 @@ Texture3D::Texture3D  (const ContextManager& manager, const TextureDesc& tex_des
     MipLevelDesc level_desc;
 
     GetMipLevelDesc (mip_level, level_desc);    
+    
+    glPixelStorei (GL_UNPACK_ROW_LENGTH, level_desc.width); //длина строки в пикселях (для данного mip-уровня)
     
     TextureLevelData level_data;
     
