@@ -32,8 +32,8 @@ class ItemsSelector
           //создание новой модели
 
         target_model.Rename (source_model.Name ());
-
         target_model.SetActiveSceneName (source_model.ActiveSceneName ());
+        target_model.SetUnitOfMeasure (source_model.UnitOfMeasure ());
 
           //выбор объектов, входящих в активную сцену
 
