@@ -16,5 +16,6 @@ psd-exporter [<OPTIONS>] <SOURCE> ...
     --blur-passes-count=<value> number of blur passes (used in zero alpha fixup)
     --max-image-size=<value>   max output image size (image with greater size will be rescaled)
     --trim-names               trim spaces in all layers names
-    --zcolor=<value>           z-color for alpha replacement (red green blue)
+    --zcolor-min=<value>       z-color minimal value for alpha replacement (red green blue)
+    --zcolor-max=<value>       z-color maximum value for alpha replacement (red green blue)
     --zalpha=<value>           z-alpha: replacement value for z-color pixels

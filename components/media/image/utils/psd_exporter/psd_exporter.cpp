@@ -91,7 +91,8 @@ struct Params
   size_t        zero_alpha_fix_value;      //коэффициент определения необходимости исправления цвета прозрачного пикселя
   size_t        blur_passes_count;         //количество проходов, используемое при блюре
   size_t        max_image_size;            //максимальный размер выходного изображения  
-  bgra_t        zcolor;                    //z-цвет, заменяемый на прозрачный
+  bgra_t        zcolor_min;                //минимальный z-цвет, заменяемый на прозрачный
+  bgra_t        zcolor_max;                //минимальный z-цвет, заменяемый на прозрачный
   bool          silent;                    //минимальное число сообщений
   bool          print_help;                //нужно ли печатать сообщение помощи
   bool          need_layout;               //нужно генерировать файл разметки
@@ -101,6 +102,8 @@ struct Params
   bool          need_replace_zcolor;       //нужно заменять Z-цвет
   bool          need_trim_name_spaces;     //нужно ли отсекать пробелы в именах
   bool          need_fix_zero_alpha_color; //нужно исправлять ошибку с цветом нулевой альфы
+  bool          has_zcolor_min;            //минимальный z-цвет установлен
+  bool          has_zcolor_max;            //максимальный z-цвет установлен
 };
 
 //прямоугольная область
@@ -226,23 +229,44 @@ void command_line_blur_passes_count (const char* value, Params& params)
 }
 
 //установка значения z-цвета
-void command_line_zcolor (const char* value, Params& params)
+void command_line_zcolor_min (const char* value, Params& params)
 {
   common::StringArray tokens = common::split (value, " ");
   
   if (tokens.Size () != 3)
     error ("ZColor must contains 3 values from 0 to 255");
     
-  params.zcolor.red          = (size_t)atoi (tokens [0]);
-  params.zcolor.green        = (size_t)atoi (tokens [1]);
-  params.zcolor.blue         = (size_t)atoi (tokens [2]);
+  params.zcolor_min.red      = (size_t)atoi (tokens [0]);
+  params.zcolor_min.green    = (size_t)atoi (tokens [1]);
+  params.zcolor_min.blue     = (size_t)atoi (tokens [2]);
   params.need_replace_zcolor = true;
+  params.has_zcolor_min      = true;
+  
+  if (!params.has_zcolor_max)
+    params.zcolor_max = params.zcolor_min;
+}
+
+void command_line_zcolor_max (const char* value, Params& params)
+{
+  common::StringArray tokens = common::split (value, " ");
+  
+  if (tokens.Size () != 3)
+    error ("ZColor must contains 3 values from 0 to 255");
+    
+  params.zcolor_max.red      = (size_t)atoi (tokens [0]);
+  params.zcolor_max.green    = (size_t)atoi (tokens [1]);
+  params.zcolor_max.blue     = (size_t)atoi (tokens [2]);
+  params.need_replace_zcolor = true;
+  params.has_zcolor_max      = true;
+
+  if (!params.has_zcolor_min)
+    params.zcolor_min = params.zcolor_max;
 }
 
 //установка заменяемого значения прозрачности для z-цвета
 void command_line_zalpha (const char* value, Params& params)
 {
-  params.zcolor.alpha        = (size_t)atoi (value);
+  params.zcolor_min.alpha    = (size_t)atoi (value);
   params.need_replace_zcolor = true; 
 }
 
@@ -265,7 +289,8 @@ void command_line_parse (int argc, const char* argv [], Params& params)
     {command_line_blur_passes_count,        "blur-passes-count", 0,     "value", "number of blur passes (used in zero alpha fixup)"},
     {command_line_max_image_size,           "max-image-size",    0,     "value", "max output image size (image with greater size will be rescaled)"},
     {command_line_trim_name_spaces,         "trim-names",        0,           0, "trim spaces in all layers names"},    
-    {command_line_zcolor,                   "zcolor",            0,     "value", "z-color for alpha replacement (red green blue)"},
+    {command_line_zcolor_min,               "zcolor-min",        0,     "value", "z-color minimal value for alpha replacement (red green blue)"},
+    {command_line_zcolor_max,               "zcolor-max",        0,     "value", "z-color maximum value for alpha replacement (red green blue)"},    
     {command_line_zalpha,                   "zalpha",            0,     "value", "z-alpha: replacement value for z-color pixels"},
   };
   
@@ -585,7 +610,7 @@ void crop_by_alpha (size_t width, size_t height, const psd_argb_color* image, si
 }
 
 //замена z-цвета
-void zcolor_correction (const bgra_t& zcolor, size_t width, size_t height, psd_argb_color* image)
+void zcolor_correction (const bgra_t& zcolor_min, const bgra_t& zcolor_max, size_t width, size_t height, psd_argb_color* image)
 {
   for (int y=0; y<(int)height; y++)
   {
@@ -593,10 +618,13 @@ void zcolor_correction (const bgra_t& zcolor, size_t width, size_t height, psd_a
 
     for (int x=0; x<(int)width; x++, data++)
     {
-      if (zcolor.red != data->red || zcolor.green != data->green || zcolor.blue != data->blue)
+      if (zcolor_min.red > data->red || zcolor_min.green > data->green || zcolor_min.blue > data->blue)
         continue;
         
-      data->alpha = zcolor.alpha;
+      if (zcolor_max.red < data->red || zcolor_max.green < data->green || zcolor_max.blue < data->blue)
+        continue;        
+        
+      data->alpha = zcolor_min.alpha;
     }
   }
 }
@@ -943,7 +971,7 @@ void export_data (Params& params)
     //коррекция z-цвета
     
     if (params.need_replace_zcolor)
-      zcolor_correction (params.zcolor, layer.width, layer.height, layer.image_data);
+      zcolor_correction (params.zcolor_min, params.zcolor_max, layer.width, layer.height, layer.image_data);
 
     Rect rect = {0, 0, 0, 0};           
     
@@ -1153,7 +1181,8 @@ int main (int argc, const char* argv [])
     params.crop_alpha                = 0;
     params.zero_alpha_fix_value      = 0;
     params.blur_passes_count         = DEFAULT_BLUR_PASSES_COUNT;
-    params.zcolor                    = default_zcolor;
+    params.zcolor_min                = default_zcolor;
+    params.zcolor_max                = default_zcolor;    
     params.max_image_size            = 0;
     params.print_help                = false;
     params.silent                    = false;
@@ -1164,6 +1193,8 @@ int main (int argc, const char* argv [])
     params.need_trim_name_spaces     = false;
     params.need_fix_zero_alpha_color = false;
     params.need_replace_zcolor       = false;
+    params.has_zcolor_min            = false;
+    params.has_zcolor_max            = false;
 
       //разбор командной строки
 
