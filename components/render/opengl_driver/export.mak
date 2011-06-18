@@ -7,13 +7,14 @@ export.link.render.low_level.opengl_driver.macosx.LINK_FLAGS   := -framework IOK
 export.link.render.low_level.opengl_driver.iphone.LINK_FLAGS   := -framework OpenGLES
 export.link.render.low_level.opengl_driver.bada.LIBS           := FGraphicsEgl FGraphicsOpengl
 #export.link.render.low_level.opengl_driver.linux.LIBS         := Xrandr Xxf86vm
+export.link.render.low_level.opengl_driver.linux.IMPORTS       := link.system
 export.link.render.low_level.opengl_driver.beagleboard.IMPORTS := link.extern.beagleboard
 export.link.render.low_level.opengl_driver.meego_ia32.IMPORTS  := link.extern.meego_ia32
 export.link.render.low_level.opengl_driver.beagleboard.LIBS    := EGL GLES_CM srv_um IMGegl
 export.link.render.low_level.opengl_driver.android.LIBS        := EGL GLESv1_CM
 
 ifneq (meego-ia32,$(TOOLSET))
-export.link.render.low_level.opengl_driver.linux.LIBS := Xrandr Xxf86vm
+#export.link.render.low_level.opengl_driver.linux.LIBS := Xrandr Xxf86vm
 endif
 
 #Run exports (don't remove - used for common imports at run target)
