@@ -21,6 +21,7 @@
 #include <network/inet_address.h>
 #include <network/url_connection.h>
 #include <network/socket.h>
+#include <network/tcp_client.h>
 
 using namespace network;
 
