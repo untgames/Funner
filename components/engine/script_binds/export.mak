@@ -47,3 +47,7 @@ export.link.engine.script_binds.sg.IMPORTS       := link.engine.script_binds lin
 # Link system exports
 export.link.engine.script_binds.system.LINK_INCLUDES := SystemScriptBind
 export.link.engine.script_binds.system.IMPORTS       := link.engine.script_binds link.system
+
+# Link system exports
+export.link.engine.script_binds.network.LINK_INCLUDES := NetworkScriptBind
+export.link.engine.script_binds.network.IMPORTS       := link.engine.script_binds link.network
