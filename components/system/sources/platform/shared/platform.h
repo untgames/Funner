@@ -34,6 +34,8 @@ namespace syslib
   typedef LinuxPlatform Platform;
 #elif defined MEEGO
   typedef LinuxPlatform Platform;  
+#elif defined LINUX
+  typedef LinuxPlatform Platform;  
 #elif defined __GNUC__
   typedef UnistdPlatform Platform;
 #else
