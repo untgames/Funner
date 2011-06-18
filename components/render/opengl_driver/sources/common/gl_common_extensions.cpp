@@ -633,7 +633,7 @@ ExtensionSet& ExtensionSet::operator &= (const ExtensionSet& set)
 //получение списка псевдо-расширений (багов)
 const ExtensionSet& ExtensionSet::BugExtensions ()
 {
-  return *Singleton<::BugExtensionSet>::Instance ();
+  return *Singleton<BugExtensionSet>::Instance ();
 }
 
 //обмен
