@@ -42,7 +42,7 @@ struct Output::Impl
     
     int event_base = 0, error_base = 0;
 
-    if (!XRRQueryExtension (display, &event_base, &error_base))
+/*    if (!XRRQueryExtension (display, &event_base, &error_base))
       throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::Impl::Impl", "RandR extension missing");      
 
     int sizes_count = 0, depths_count = 0;
@@ -85,7 +85,7 @@ struct Output::Impl
           modes.push_back (mode_desc);
         }
       }
-    }
+    }*/
 #endif    
   }
   
@@ -259,7 +259,7 @@ void Output::SetCurrentMode (const OutputModeDesc& mode_desc)
   // если установка завершилась с ошибкой, то выбрасываем исключение
 
   if (status < Success)
-    throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::SetModeDesc", "XRRSetScreenConfigAndRate failed");
+    throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::SetModeDesc", "XRRSetScreenConfigAndRate failed");*/
 #else
   throw xtl::format_operation_exception ("render::low_level::opengl::glx::Output::SetModeDesc", "Mode changes not supported (no Xrandr)");
 #endif
@@ -280,6 +280,7 @@ void Output::RestoreDefaultMode ()
 
 void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 {
+/*
   // блокировка дисплея
 
   DisplayLock lock (impl->display);                                               
@@ -294,7 +295,7 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
   Window                  root = RootWindow (impl->display, impl->screen_number);
   XRRScreenConfiguration* conf = XRRGetScreenInfo (impl->display, root);
   
-  mode_desc.refresh_rate = XRRConfigCurrentRate (conf);
+  mode_desc.refresh_rate = XRRConfigCurrentRate (conf);*/
 #else
   mode_desc.refresh_rate = 0;
 #endif
@@ -307,7 +308,6 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 void Output::SetGammaRamp (const Color3f table [GAMMA_RAMP_SIZE])
 {
 #ifdef HAS_X86VMODE
-  int event_base;
   int error_base;
   
   // запрос расширения XF86VidMode
@@ -331,7 +331,7 @@ void Output::SetGammaRamp (const Color3f table [GAMMA_RAMP_SIZE])
   
   // установка гаммы
 
-  XF86VidModeSetGammaRamp (impl->display, impl->screen_number, GAMMA_RAMP_SIZE, &red[0], &green[0], &blue[0]);
+  XF86VidModeSetGammaRamp (impl->display, impl->screen_number, GAMMA_RAMP_SIZE, &red[0], &green[0], &blue[0]);*/
 #else
   throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::SetGammaRamp", "Gamma ramp not supported (X86VMode not supported)");
 #endif
@@ -381,7 +381,7 @@ void Output::GetGammaRamp (Color3f table [GAMMA_RAMP_SIZE])
     table [i].red   = red   [i] / 65535.f;
     table [i].green = green [i] / 65535.f;
     table [i].blue  = blue  [i] / 65535.f;
-  }
+  }*/
 #else
   throw xtl::format_not_supported_exception ("render::low_level::opengl::glx::Output::GetGammaRamp", "Gamma ramp not supported (X86VMode not supported)");
 #endif
