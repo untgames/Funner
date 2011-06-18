@@ -11,13 +11,13 @@ using namespace std;
 namespace {
 
     // Get approximate luminance.
-    inline static uint colorLuminance(Color32 c)
+    inline static nv::uint colorLuminance(Color32 c)
     {
         return c.r + c.g + c.b;
     }
 
     // Get the euclidean distance between the given colors.
-    inline static uint colorDistance(Color32 c0, Color32 c1)
+    inline static nv::uint colorDistance(Color32 c0, Color32 c1)
     {
         return (c0.r - c1.r) * (c0.r - c1.r) + (c0.g - c1.g) * (c0.g - c1.g) + (c0.b - c1.b) * (c0.b - c1.b);
     }
@@ -106,7 +106,7 @@ void ColorBlock::init(uint w, uint h, const float * data, uint x, uint y)
     }
 }
 
-static inline uint8 component(Color32 c, uint i)
+static inline uint8 component(Color32 c, nv::uint i)
 {
     if (i == 0) return c.r;
     if (i == 1) return c.g;
