@@ -280,7 +280,6 @@ void Output::RestoreDefaultMode ()
 
 void Output::GetCurrentMode (OutputModeDesc& mode_desc)
 {
-/*
   // блокировка дисплея
 
   DisplayLock lock (impl->display);                                               
@@ -295,7 +294,7 @@ void Output::GetCurrentMode (OutputModeDesc& mode_desc)
   Window                  root = RootWindow (impl->display, impl->screen_number);
   XRRScreenConfiguration* conf = XRRGetScreenInfo (impl->display, root);
   
-  mode_desc.refresh_rate = XRRConfigCurrentRate (conf);*/
+  mode_desc.refresh_rate = XRRConfigCurrentRate (conf);
 #else
   mode_desc.refresh_rate = 0;
 #endif
