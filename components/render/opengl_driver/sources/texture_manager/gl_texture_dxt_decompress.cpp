@@ -44,7 +44,7 @@ void unpack (size_t width, size_t height, const Block* dxt_data, Pixel* unpacked
   ColorBlock color_block;
   Block*     dxt_data_pointer = (Block*)dxt_data;
   
-  size_t columns = stl::min (width, 4u), rows= stl::min (height, 4u);
+  size_t columns = stl::min (width, (size_t)4), rows= stl::min (height, (size_t)4);
 
   for (size_t i = 0; i < height; i += 4)
     for (size_t j = 0; j < width; j += 4, dxt_data_pointer++)
