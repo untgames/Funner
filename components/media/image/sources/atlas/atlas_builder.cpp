@@ -271,22 +271,12 @@ struct AtlasBuilder::Impl
           delete image;
         }
 
-        void AddRef ()
-        {
-          addref (this);
-        }
-
-        void Release ()
-        {
-          release (this);
-        }
-
       private:
         ImageHolder (const ImageHolder&); //no impl
         ImageHolder& operator = (const ImageHolder&); //no impl
     };
 
-    typedef xtl::com_ptr<ImageHolder> ImageHolderPtr;
+    typedef xtl::intrusive_ptr<ImageHolder> ImageHolderPtr;
 
     struct ImageDesc
     {

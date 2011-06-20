@@ -8,12 +8,18 @@
 #include <stl/list>
 #include <stl/vector>
 
+#include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
+#include <xtl/function.h>
+#include <xtl/ref.h>
 
+#include <common/command_line.h>
 #include <common/strlib.h>
 
 #include <media/image.h>
 #include <media/atlas_builder.h>
+
+using namespace common;
 
 /*
      онстанты
@@ -47,19 +53,15 @@ void error (const char* format, ...)
 
 struct Params;
 
-typedef void (*ProcessOption)(const char* arg, Params& params);
-
 //опци€
 struct Option
 {
-  ProcessOption process;       //функци€-обработчик опции
-  const char*   name;          //им€ команды
-  char          short_name;    //короткое им€
-  const char*   argument_name; //им€ аргумента
-  const char*   tip;           //подсказка
+  CommandLine::SwitchHandler handler;       //обработчик ключа
+  const char*                name;          //им€ команды
+  char                       short_name;    //короткое им€
+  const char*                argument_name; //им€ аргумента
+  const char*                tip;           //подсказка
 };
-
-typedef stl::vector<const char*> StringArray;
 
 //параметры запуска
 struct Params
@@ -72,7 +74,7 @@ struct Params
   stl::string   layout_file_name;         //им€ файла разметки
   stl::string   isolated_images_wildcard; //маска имЄн изолированных изображений не вход€щих в общий атлас
   size_t        max_image_size;           //максимальный размер одного изображени€
-  size_t        margin;            //отступ между картинками в атласе  
+  size_t        margin;                   //отступ между картинками в атласе
   bool          silent;                   //минимальное число сообщений
   bool          print_help;               //нужно ли печатать сообщение помощи
   bool          need_layout;              //нужно генерировать файл разметки
@@ -80,7 +82,8 @@ struct Params
   bool          invert_x;                 //инвертирование координаты X тайлов
   bool          invert_y;                 //инвертирование координаты Y тайлов
   bool          swap_axises;              //обмен осей местами
-  bool          square_axises;          //квадратные текстуры
+  bool          square_axises;            //квадратные текстуры
+  bool          dont_store_images;        //не хранить все картинки в пам€ти
 };
 
 //получение подсказки по программе
@@ -182,198 +185,16 @@ void command_line_square_axises (const char*, Params& params)
   params.square_axises = true;
 }
 
+//установка параметра хранени€ картинок в пам€ти
+void command_line_dont_store_images (const char*, Params& params)
+{
+  params.dont_store_images = true;
+}
+
 //установка маски изолированных изображений
 void command_line_isolated_images (const char* string, Params& params)
 {
   params.isolated_images_wildcard = string;
-}
-
-//разбор командной строки
-void command_line_parse (int argc, const char* argv [], Params& params)
-{
-  static Option options [] = {
-    {command_line_help,                "help",            '?',        0, "print help message"},
-    {command_line_silent,              "silent",          's',        0, "quiet mode"},
-    {command_line_result_atlas,        "atlas",           'o',   "file", "set output atlas file format"},
-    {command_line_result_layout_atlas, "layout-atlas",    0,     "file", "set output atlas file format that used in layout"},
-    {command_line_result_layout,       "layout",          'l',   "file", "set output layout file"},
-    {command_line_max_image_size,      "max-image-size",  0,     "size", "set maximum atlas image side size"},
-    {command_line_margin,              "margin",          0,     "size", "set margin beetween images in atlas"},    
-    {command_line_no_layout,           "no-layout",       0,          0, "don't generate layout file"},
-    {command_line_pot,                 "pot",             0,          0, "resize atlas texture to nearest greater power of two sizes"},
-    {command_line_invert_x,            "invert-x",        0,          0, "invert X coordinate in layout of tiles"},
-    {command_line_invert_y,            "invert-y",        0,          0, "invert Y coordinate in layout of tiles"},
-    {command_line_swap_axises,         "swap-axises",     0,          0, "swap axises at layout tiles"},
-    {command_line_isolated_images,     "isolated-images", 0, "wildcard", "set wildcard for standalone images which will be isolate from general atlases"},
-    {command_line_square_axises,       "square",          0,          0, "square axises"},    
-  };
-  
-  static const size_t options_count = sizeof (options) / sizeof (*options);
-  
-  params.options       = options;
-  params.options_count = options_count;
-
-    //разбор командной строки
-     
-  for (int i=1; i<argc; i++)
-  {
-    const char* arg = argv [i];    
-    
-    static const char*  LONG_OPTION_NAME_PREFIX        = "--";
-    static const size_t LONG_OPTION_NAME_PREFIX_LENGTH = strlen (LONG_OPTION_NAME_PREFIX);
-
-    bool long_option  = !strncmp (LONG_OPTION_NAME_PREFIX, arg, LONG_OPTION_NAME_PREFIX_LENGTH);
-    bool short_option = !long_option && *arg == '-' && arg [1];    
-    
-    if (!long_option && !short_option)
-    {
-      params.sources.push_back (arg);
-      
-      continue;
-    }
-
-    stl::string   option_name;
-    stl::string   option_argument;      
-    const Option* option = 0;
-    
-      //разбор длинных опций
-    
-    if (long_option)
-    {
-      arg += LONG_OPTION_NAME_PREFIX_LENGTH;
-      
-      const char* end_option_name = strchr (arg, '=');        
-      
-      if (end_option_name)
-      {
-        option_name.assign (arg, end_option_name);
-
-        arg = end_option_name + 1;
-      }
-      else
-      {
-        option_name  = arg;          
-        arg         += strlen (arg);
-      }
-      
-      for (size_t j=0; j<options_count; j++)
-      {
-        const Option& test_option        = options [j];
-        size_t        test_option_length = strlen (test_option.name);
-
-        if (!strncmp (test_option.name, option_name.c_str (), test_option_length))
-        {
-          option = &test_option;
-          break;
-        }
-      }
-      
-      if (!option)
-      {
-        error ("wrong option '--%s'", option_name.c_str ());
-        
-        return;
-      }
-      
-      option_name = LONG_OPTION_NAME_PREFIX + option_name;
-    }
-
-      //разбор коротких опций
-
-    if (short_option)
-    {
-      arg++;
-      
-      if (arg [1])
-      {
-        error ("wrong option '-%c'", *arg);
-        
-        return;
-      }        
-
-      for (size_t j=0; j<options_count; j++)
-      {
-        if (*arg == options [j].short_name)
-        {
-          option = &options [j];
-          
-          break;
-        }
-      }
-      
-      if (!option)
-      {
-        error ("wrong option '-%c'", *arg);
-        
-        return;
-      }
-
-      option_name = common::format ("-%c", *arg);      
-      
-      if (option->argument_name)
-      {
-        i++;
-
-        if (i >= argc)
-        {
-          error ("option '-%c' require argument", *arg);
-          
-          return;
-        }                
-        
-        arg = argv [i];
-      }            
-    }
-            
-      //получение аргумента
-      
-    for (;*arg; arg++)
-    {
-      switch (*arg)
-      {
-        case '\'':
-        case '"':
-        {
-          const char* end = strchr (arg + 1, *arg);
-          
-          if (end)
-          {
-            option_argument.append (arg + 1, end);
-            
-            arg = end;
-          }
-          else
-          {
-            error ("unquoted string at parse option '%s'", option_name.c_str ());
-            
-            return;
-          }
-
-          break;
-        }
-        default:
-          option_argument.push_back (*arg);
-          break;
-      }
-    }    
-    
-    if (option->argument_name && option_argument.empty ())
-    {
-      error ("option '%s' require argument", option_name.c_str ());
-      
-      return;
-    }
-    
-    if (!option->argument_name && !option_argument.empty ())
-    {
-      error ("option '%s' has not arguments", option_name.c_str ());
-      
-      return;
-    }
-    
-    if (option->process)
-      option->process (option_argument.c_str (), params);
-  }
 }
 
 //проверка корректности ввода
@@ -388,7 +209,7 @@ void validate (Params& params)
   if (params.layout_file_name.empty ())
     params.layout_file_name = DEFAULT_LAYOUT_FILE_NAME;
 
-  if (params.sources.empty ())
+  if (params.sources.IsEmpty ())
   {
     printf ("atlas-builder [<OPTIONS>] <SOURCE> ...\n  use: atlas-builder --help\n");
     error ("no input files");
@@ -409,8 +230,9 @@ void build (Params& params)
       //загрузка картинок
     stl::hash_map<stl::hash_key<const char*>, media::Image> images;
 
-    for (size_t i = 0, count = params.sources.size (); i < count; i++)
-      images.insert_pair (params.sources [i], media::Image (params.sources [i]));
+    if (!params.dont_store_images)
+      for (size_t i = 0, count = params.sources.Size (); i < count; i++)
+        images.insert_pair (params.sources [i], media::Image (params.sources [i]));
 
       //конфигурирование построител€ атласа
 
@@ -427,7 +249,7 @@ void build (Params& params)
       
     stl::hash_set<stl::hash_key<const char*> > is_isolated_image;      
 
-    for (size_t i=0, count=sources_to_process.size (); i<count; i++)
+    for (size_t i=0, count=sources_to_process.Size (); i<count; i++)
     {
       const char* source       = sources_to_process [i];      
       bool        need_isolate = false;
@@ -457,19 +279,19 @@ void build (Params& params)
     if (params.swap_axises)      pack_flags |= media::AtlasPackFlag_SwapAxises;      
     if (params.square_axises)    pack_flags |= media::AtlasPackFlag_SquareAxises;
       
-    while (!sources_to_process.empty ())
+    while (!sources_to_process.IsEmpty ())
     {
       if (!params.silent)
         printf ("Build atlas ");
 
       builder.Reset ();
 
-      typedef stl::pair<const char*, size_t> SourceDescPair;
-      typedef stl::list<SourceDescPair>      ProcessedSourcesList;
+      typedef stl::pair<media::Image, size_t> SourceDescPair;
+      typedef stl::list<SourceDescPair>       ProcessedSourcesList;
 
       ProcessedSourcesList processed_sources;
 
-      for (size_t i = 0, count = sources_to_process.size (); i < count; i++)
+      for (size_t i = 0, count = sources_to_process.Size (); i < count; i++)
       {
         const char* source      = sources_to_process [i];
         bool        is_isolated = is_isolated_image.find (source) != is_isolated_image.end ();
@@ -481,7 +303,10 @@ void build (Params& params)
 
         try
         {
-          builder.Insert (images [source], media::AtlasBuilderInsertMode_Reference);
+          if (params.dont_store_images)
+            builder.Insert (source);
+          else
+            builder.Insert (images [source], media::AtlasBuilderInsertMode_Reference);
         }
         catch (...)
         {
@@ -510,11 +335,14 @@ void build (Params& params)
           builder.Reset ();
 
           for (ProcessedSourcesList::iterator iter = processed_sources.begin (), end = processed_sources.end (); iter != end; ++iter)
-            builder.Insert (images [iter->first], media::AtlasBuilderInsertMode_Reference);
+            builder.Insert (iter->first, media::AtlasBuilderInsertMode_Reference);
         }
         else
         {
-          processed_sources.push_back (SourceDescPair (sources_to_process [i], i));
+          if (params.dont_store_images)
+            processed_sources.push_back (SourceDescPair (media::Image (sources_to_process [i]), i));
+          else
+            processed_sources.push_back (SourceDescPair (images [sources_to_process [i]], i));
           
           if (is_isolated)
             break; //если изолированное изображение может быть добавлено - кладЄм его в атлас одно
@@ -529,7 +357,7 @@ void build (Params& params)
 
       stl::string atlas_file_name, layout_atlas_file_name;
 
-      if (atlas_index || processed_sources.size () != params.sources.size ())
+      if (atlas_index || processed_sources.size () != params.sources.Size ())
       {
         stl::string atlas_file_format, layout_atlas_file_format;
         
@@ -591,7 +419,7 @@ void build (Params& params)
       }
 
       for (ProcessedSourcesList::reverse_iterator iter = processed_sources.rbegin (), end = processed_sources.rend (); iter != end; ++iter)
-        sources_to_process.erase (sources_to_process.begin () + iter->second);
+        sources_to_process.Remove (iter->second);
 
       atlas_index++;
     }
@@ -625,12 +453,32 @@ void build (Params& params)
 
 int main (int argc, const char* argv [])
 {  
+  Params params;
+
+  static Option options [] = {
+    {xtl::bind (&command_line_help,                _1, xtl::ref (params)), "help",              '?',        0, "print help message"},
+    {xtl::bind (&command_line_silent,              _1, xtl::ref (params)), "silent",            's',        0, "quiet mode"},
+    {xtl::bind (&command_line_result_atlas,        _1, xtl::ref (params)), "atlas",             'o',   "file", "set output atlas file format"},
+    {xtl::bind (&command_line_result_layout_atlas, _1, xtl::ref (params)), "layout-atlas",      0,     "file", "set output atlas file format that used in layout"},
+    {xtl::bind (&command_line_result_layout,       _1, xtl::ref (params)), "layout",            'l',   "file", "set output layout file"},
+    {xtl::bind (&command_line_max_image_size,      _1, xtl::ref (params)), "max-image-size",    0,     "size", "set maximum atlas image side size"},
+    {xtl::bind (&command_line_margin,              _1, xtl::ref (params)), "margin",            0,     "size", "set margin beetween images in atlas"},
+    {xtl::bind (&command_line_no_layout,           _1, xtl::ref (params)), "no-layout",         0,          0, "don't generate layout file"},
+    {xtl::bind (&command_line_pot,                 _1, xtl::ref (params)), "pot",               0,          0, "resize atlas texture to nearest greater power of two sizes"},
+    {xtl::bind (&command_line_invert_x,            _1, xtl::ref (params)), "invert-x",          0,          0, "invert X coordinate in layout of tiles"},
+    {xtl::bind (&command_line_invert_y,            _1, xtl::ref (params)), "invert-y",          0,          0, "invert Y coordinate in layout of tiles"},
+    {xtl::bind (&command_line_swap_axises,         _1, xtl::ref (params)), "swap-axises",       0,          0, "swap axises at layout tiles"},
+    {xtl::bind (&command_line_isolated_images,     _1, xtl::ref (params)), "isolated-images",   0, "wildcard", "set wildcard for standalone images which will be isolate from general atlases"},
+    {xtl::bind (&command_line_square_axises,       _1, xtl::ref (params)), "square",            0,          0, "square axises"},
+    {xtl::bind (&command_line_dont_store_images,   _1, xtl::ref (params)), "dont-store-images", 0,          0, "dont store all images in memory"},
+  };
+
+  static const size_t options_count = sizeof (options) / sizeof (*options);
+
     //инициализаци€
 
-  Params params;
-  
-  params.options           = 0;
-  params.options_count     = 0;
+  params.options           = options;
+  params.options_count     = options_count;
   params.atlas_file_format = DEFAULT_ATLAS_FILE_NAME;
   params.max_image_size    = -1;
   params.margin            = 0;
@@ -642,16 +490,24 @@ int main (int argc, const char* argv [])
   params.invert_y          = false;
   params.swap_axises       = false;
   params.square_axises     = false;
+  params.dont_store_images = false;
+
+  CommandLine command_line;
+
+  for (size_t i = 0; i < params.options_count; i++)
+    command_line.SetSwitchHandler (options [i].name, options [i].short_name, options [i].argument_name, options [i].handler);
 
     //разбор командной строки
-
-  command_line_parse (argc, argv, params);
+  command_line.Process (argc, argv);
   
     // --help только печатает сообщение помощи
   
   if (params.print_help)
     return 0;
-    
+
+  for (size_t i = 0, count = command_line.ParamsCount (); i < count; i++)
+    params.sources.Add (command_line.Param (i));
+
     //проверка корректности ввода
 
   validate (params);
