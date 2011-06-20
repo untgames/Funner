@@ -82,6 +82,13 @@ int main ()
     printf ("Simulating one second after apply light torque\n");
     printf ("falling body state:\n");
     dump_body_position (falling_body);
+
+    falling_body.AddTorqueImpulse (force);
+
+    scene.PerformSimulation (1.f);
+    printf ("Simulating one second after apply light torque impulse\n");
+    printf ("falling body state:\n");
+    dump_body_position (falling_body);
   }
   catch (std::exception& exception)
   {

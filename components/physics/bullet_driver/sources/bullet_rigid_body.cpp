@@ -211,6 +211,16 @@ void RigidBody::AddTorque (const math::vec3f& torque)
   impl->body->applyTorque (bullet_torque);
 }
 
+void RigidBody::AddTorqueImpulse (const math::vec3f& torque)
+{
+  btVector3 bullet_torque;
+
+  bullet_vector_from_vector (torque, bullet_torque);
+
+  impl->body->activate (true);
+  impl->body->applyTorqueImpulse (bullet_torque);
+}
+
 /*
    Управление линейной/угловой скоростями
 */

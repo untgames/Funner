@@ -203,9 +203,10 @@ class RigidBody : public IRigidBody, public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Приложение силы/импульса/вращения
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void AddForce   (const math::vec3f& force,   const math::vec3f& relative_position);
-    void AddImpulse (const math::vec3f& impulse, const math::vec3f& relative_position);
-    void AddTorque  (const math::vec3f& torque);
+    void AddForce         (const math::vec3f& force,   const math::vec3f& relative_position);
+    void AddImpulse       (const math::vec3f& impulse, const math::vec3f& relative_position);
+    void AddTorque        (const math::vec3f& torque);
+    void AddTorqueImpulse (const math::vec3f& torque);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление линейной/угловой скоростями
