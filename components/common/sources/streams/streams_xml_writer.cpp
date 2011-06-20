@@ -27,6 +27,7 @@ struct XmlWriter::Impl
   size_t           node_indent;    //отступ между узлами
   NodeStack        node_stack;     //стек имён узлов
   WriterState      state;          //состояние записи
+  stl::string      escaped_string; //строка с результатом замены специальных символов
   
   Impl (const WriteFunction& writer, size_t in_node_indent) :
        stream (writer), node_indent (in_node_indent), state (WriterState_DocumentStart) {}
@@ -323,4 +324,72 @@ void XmlWriter::CheckEndOfDocument (const char* source)
 {
   if (impl->state == WriterState_DocumentEnd)
     RaiseEndOfDocument (source);
+}
+
+/*
+    Маскирование символов
+*/
+
+const char* XmlWriter::EscapeStringSymbols (const char* value)
+{
+  struct Marker
+  {
+    char        marker;
+    const char* replacement;
+  };
+
+  static Marker       markers []    = {{'<', "&lt;"}, {'>', "&gt;"}, {'&', "&amp;"}, {'"', "&quot;"}};
+  static const size_t markers_count = sizeof markers / sizeof *markers;
+
+  size_t result_length = 0;
+
+  for (const char* current_symbol = value; *current_symbol; current_symbol++)
+  {
+    const Marker* m       = markers;
+    bool          escaped = false;
+
+    for (size_t i = 0; i < markers_count; i++, m++)
+    {
+      if (*current_symbol == m->marker)
+      {
+        escaped = true;
+
+        for (const char* replacement = m->replacement; *replacement; replacement++)
+          result_length++;
+
+        break;
+      }
+    }
+
+    if (!escaped)
+      result_length++;
+  }
+
+  impl->escaped_string.resize (result_length);
+
+  size_t write_position = 0;
+
+  for (const char* current_symbol = value; *current_symbol; current_symbol++)
+  {
+    const Marker* m       = markers;
+    bool          escaped = false;
+
+    for (size_t i = 0; i < markers_count; i++, m++)
+    {
+      if (*current_symbol == m->marker)
+      {
+        escaped = true;
+
+        for (const char* replacement = m->replacement; *replacement; replacement++)
+          impl->escaped_string [write_position++] = *replacement;
+
+        break;
+      }
+    }
+
+    if (!escaped)
+      impl->escaped_string [write_position++] = *current_symbol;
+  }
+
+  return impl->escaped_string.c_str ();
 }

@@ -28,7 +28,7 @@ inline void XmlWriter::WriteXmlTextData (const T& value, const char* format)
 
 inline void XmlWriter::WriteXmlTextData (const char* value)
 {
-  write (Stream (), value);
+  write (Stream (), EscapeStringSymbols (value));
 }
 
 inline void XmlWriter::WriteXmlTextData (const char* value, const char* format)
@@ -60,6 +60,22 @@ inline void XmlWriter::WriteAttribute (const char* name, const T& value)
   try
   {
     xml_write    (Stream (), value);
+    EndAttribute ();
+  }
+  catch (...)
+  {
+    EndAttribute ();
+    throw;
+  }
+}
+
+inline void XmlWriter::WriteAttribute (const char* name, const char* value)
+{
+  BeginAttribute (name);
+
+  try
+  {
+    xml_write    (Stream (), EscapeStringSymbols (value));
     EndAttribute ();
   }
   catch (...)
