@@ -167,7 +167,7 @@ void XmlLexer::ReadSymbolReference (char* write_position)
       char        replacement;
     };
 
-    static Marker       markers []    = {{"lt;", '<'}, {"gt;", '>'}, {"amp;", '&'}, {"aposition;", '\''}, {"quot;", '"'}};
+    static Marker       markers []    = {{"lt;", '<'}, {"gt;", '>'}, {"amp;", '&'}, {"quot;", '"'}};
     static const size_t markers_count = sizeof markers / sizeof *markers;
 
     const Marker* m = markers;
