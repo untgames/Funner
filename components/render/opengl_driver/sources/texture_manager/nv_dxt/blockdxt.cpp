@@ -26,29 +26,6 @@
 
 using namespace nv;
 
-#if defined ( __LP64__ ) || defined ( __powerpc64__ ) || defined POSH_CPU_SPARC64
-#  define POSH_64BIT_INTEGER 1
-typedef long posh_i64_t;
-typedef unsigned long posh_u64_t;
-#  define POSH_I64( x ) ((posh_i64_t)x)
-#  define POSH_U64( x ) ((posh_u64_t)x)
-#  define POSH_I64_PRINTF_PREFIX "l"
-#elif defined _MSC_VER || defined __BORLANDC__ || defined __WATCOMC__ || ( defined __alpha && defined __DECC )
-#  define POSH_64BIT_INTEGER 1
-typedef __int64 posh_i64_t;
-typedef unsigned __int64 posh_u64_t;
-#  define POSH_I64( x ) ((posh_i64_t)x)
-#  define POSH_U64( x ) ((posh_u64_t)x)
-#  define POSH_I64_PRINTF_PREFIX "I64"
-#elif defined __GNUC__ || defined __MWERKS__ || defined __SUNPRO_C || defined __SUNPRO_CC || defined __APPLE_CC__ || defined POSH_OS_IRIX || defined _LONG_LONG || defined _CRAYC
-#  define POSH_64BIT_INTEGER 1
-typedef long long posh_i64_t;
-typedef unsigned long long posh_u64_t;
-#  define POSH_U64( x ) ((posh_u64_t)(x##LL))
-#  define POSH_I64( x ) ((posh_i64_t)(x##LL))
-#  define POSH_I64_PRINTF_PREFIX "ll"
-#endif
-
 namespace
 {
 
@@ -449,6 +426,11 @@ void AlphaBlockDXT5::decodeBlock(ColorBlock * block, bool d3d9/*= false*/) const
     }
 }
 
+inline uint64 POSH_U64 (uint64 x)
+{
+  return x;
+}
+
 void AlphaBlockDXT5::flip4()
 {
     uint64 * b = (uint64 *)this;
@@ -456,9 +438,9 @@ void AlphaBlockDXT5::flip4()
     // @@ The masks might have to be byte swapped.
     uint64 tmp = (*b & POSH_U64(0x000000000000FFFF));
     tmp |= (*b & POSH_U64(0x000000000FFF0000)) << 36;
-    tmp |= (*b & POSH_U64(0x000000FFF0000000)) << 12;
-    tmp |= (*b & POSH_U64(0x000FFF0000000000)) >> 12;
-    tmp |= (*b & POSH_U64(0xFFF0000000000000)) >> 36;
+    tmp |= (*b & POSH_U64(0x000000FFF0000000LL)) << 12;
+    tmp |= (*b & POSH_U64(0x000FFF0000000000LL)) >> 12;
+    tmp |= (*b & POSH_U64(0xFFF0000000000000LL)) >> 36;
 
     *b = tmp;
 }
