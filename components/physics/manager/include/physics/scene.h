@@ -20,6 +20,18 @@ class PrimitiveRender;
 namespace physics
 {
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Режим ray-test
+///////////////////////////////////////////////////////////////////////////////////////////////////
+enum RayTestMode
+{
+  RayTestMode_Closest,    //ближайшее пересечение
+  RayTestMode_Farthest,   //самое дальнее пересечение
+  RayTestMode_All,        //все пересечения
+
+  RayTestMode_Num
+};
+
 ///implementation forwards
 class SceneImplProvider;
 
@@ -92,7 +104,15 @@ class Scene
 ///Обработка столкновений объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::connection RegisterCollisionCallback (const char* group1_mask, const char* group2_mask, CollisionEventType event_type, const CollisionCallback& callback_handler); 
-    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Трассировка луча, порядок вызова не соответствует удаленности объекта
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (RigidBody& body, const math::vec3f& position, const math::vec3f& normal)> RayTestCallback;
+
+    void RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, RayTestMode mode, const RayTestCallback& callback_handler);
+    void RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, size_t groups_count, const char** groups_masks, RayTestMode mode, const RayTestCallback& callback_handler);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отладочная отрисовка
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -110,6 +110,114 @@ struct CollisionFilterDesc
     {}
 };
 
+// ласс обрабатывающий результаты трассировки луча
+class BulletRayTestCallback : public btCollisionWorld::RayResultCallback
+{
+  public:
+    // онструктор
+    BulletRayTestCallback (const math::vec3f& in_ray_origin, const math::vec3f& in_ray_end, RayTestMode in_mode, const physics::low_level::IScene::RayTestCallback& in_callback)
+      : callback (in_callback)
+      , ray_origin (in_ray_origin)
+      , ray_end (in_ray_end)
+      , mode (in_mode)
+      , farthest_hit_fraction (0.f)
+      , collision_groups_count (0)
+      , result_body (0)
+      {}
+
+    //¬ызов callback если было обнаружено пересечение
+    void NotifyCallback ()
+    {
+      if (!result_body)
+        return;
+
+      callback (result_body, result_position, result_normal);
+    }
+
+    //”становка групп коллизии дл€ фильтрации
+    void SetCollisionGroups (size_t count, const size_t* groups)
+    {
+      collision_groups_count = count;
+      collision_groups       = groups;
+    }
+
+    //ѕроверка нужно ли тестировать пересечение
+    bool needsCollision (btBroadphaseProxy* proxy) const
+    {
+      if (!collision_groups_count)
+        return true;
+
+      RigidBody *body = ((RigidBodyInfo*)((btCollisionObject*)proxy->m_clientObject)->getUserPointer ())->body;
+
+      size_t group = body->CollisionGroup ();
+
+      for (size_t i = 0; i < collision_groups_count; i++)
+        if (group == collision_groups [i])
+          return true;
+
+      return false;
+    }
+
+    //ќбнаружено пересечение
+    btScalar addSingleResult (btCollisionWorld::LocalRayResult& ray_result, bool normal_in_world_space)
+    {
+      bool update_result = true;
+
+      switch (mode)
+      {
+        case RayTestMode_Closest:
+          m_closestHitFraction = ray_result.m_hitFraction;
+          break;
+        case RayTestMode_Farthest:
+          if (ray_result.m_hitFraction > farthest_hit_fraction)
+            farthest_hit_fraction = ray_result.m_hitFraction;
+          else
+            update_result = false;
+          break;
+        default:
+          break;
+      }
+
+      if (update_result)
+      {
+        btCollisionObject* collision_object = ray_result.m_collisionObject;
+
+        RigidBody *body = ((RigidBodyInfo*)collision_object->getUserPointer ())->body;
+
+        result_body     = body;
+        result_position = (1 - ray_result.m_hitFraction) * ray_origin + ray_result.m_hitFraction * ray_end;
+
+        if (normal_in_world_space)
+        {
+          vector_from_bullet_vector (ray_result.m_hitNormalLocal, result_normal);
+        }
+        else
+        {
+          ///need to transform normal into worldspace
+          vector_from_bullet_vector (collision_object->getWorldTransform ().getBasis () * ray_result.m_hitNormalLocal, result_normal);
+        }
+
+        if (mode == RayTestMode_All)
+          callback (body, result_position, result_normal);
+      }
+
+      return m_closestHitFraction;
+    }
+
+  private:
+    const IScene::RayTestCallback& callback;                //колбек
+    math::vec3f                    ray_origin;              //точка начала луча
+    math::vec3f                    ray_end;                 //точка конца луча
+    RayTestMode                    mode;                    //режим тестировани€
+    float                          farthest_hit_fraction;   //самое дальнее пересечение
+    size_t                         collision_groups_count;  //количество груп коллизии
+    const size_t*                  collision_groups;        //группы коллизии, с которыми провер€етс€ пересечение луча
+    RigidBody*                     result_body;             //пересеченное тело
+    math::vec3f                    result_position;         //точка пересечени€
+    math::vec3f                    result_normal;           //нормаль в точке пересечени€
+};
+
+// ласс реализующий отладочную отрисовку
 class DebugDrawer : public btIDebugDraw
 {
   public:
@@ -500,6 +608,51 @@ xtl::connection Scene::RegisterCollisionCallback (CollisionEventType event_type,
     throw xtl::make_argument_exception ("physics::low_level::bullet_driver::Scene::RegisterCollisionCallback", "event_type", event_type);
 
   return impl->collision_signals [event_type].connect (callback_handler);
+}
+
+/*
+   “рассировка луча, если коллбек возвращает true - поиск пересечений продолжаетс€
+*/
+
+void Scene::RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, RayTestMode mode, const RayTestCallback& callback_handler)
+{
+  if (mode < 0 || mode >= RayTestMode_Num)
+    throw xtl::make_argument_exception ("physics::low_level::bullet_driver::Scene::RayTest (const math::vec3f&, const math::vec3f&, RayTestMode, const RayTestCallback&)", "mode", mode);
+
+  btVector3 bullet_origin (ray_origin.x, ray_origin.y, ray_origin.z), bullet_direction (ray_end.x, ray_end.y, ray_end.z);
+
+  BulletRayTestCallback callback (ray_origin, ray_end, mode, callback_handler);
+
+  impl->dynamics_world->rayTest (bullet_origin, bullet_direction, callback);
+
+  if (mode != RayTestMode_All)
+    callback.NotifyCallback ();
+}
+
+void Scene::RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, size_t collision_groups_count,
+                     const size_t* collision_groups, RayTestMode mode, const RayTestCallback& callback_handler)
+{
+  static const char* METHOD_NAME = "physics::low_level::bullet_driver::Scene::RayTest (const math::vec3f&, const math::vec3f&, size_t, size_t*, RayTestMode, const RayTestCallback&)";
+
+  if (!collision_groups_count)
+    return;
+
+  if (!collision_groups)
+    throw xtl::make_null_argument_exception (METHOD_NAME, "collision_groups");
+
+  if (mode < 0 || mode >= RayTestMode_Num)
+    throw xtl::make_argument_exception (METHOD_NAME, "mode", mode);
+
+  btVector3 bullet_origin (ray_origin.x, ray_origin.y, ray_origin.z), bullet_direction (ray_end.x, ray_end.y, ray_end.z);
+
+  BulletRayTestCallback callback (ray_origin, ray_end, mode, callback_handler);
+
+  callback.SetCollisionGroups (collision_groups_count, collision_groups);
+
+  impl->dynamics_world->rayTest (bullet_origin, bullet_direction, callback);
+
+  if (mode != RayTestMode_All)
+    callback.NotifyCallback ();
 }
 
 /*

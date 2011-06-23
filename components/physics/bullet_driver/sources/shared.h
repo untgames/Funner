@@ -29,6 +29,7 @@
 #include <BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
 #include <BulletCollision/CollisionDispatch/btCollisionDispatcher.h>
+#include <BulletCollision/CollisionDispatch/btCollisionWorld.h>
 #include <BulletCollision/CollisionShapes/btBoxShape.h>
 #include <BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h>
 #include <BulletCollision/CollisionShapes/btCapsuleShape.h>
@@ -355,6 +356,13 @@ class Scene : public IScene, public Object
 ///Обработка столкновений объектов
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     xtl::connection RegisterCollisionCallback (CollisionEventType event_type, const CollisionCallback& callback_handler);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Трассировка луча, если коллбек возвращает true - поиск пересечений продолжается
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, RayTestMode mode, const RayTestCallback& callback_handler);
+    void RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, size_t collision_groups_count,
+                  const size_t* collision_groups, RayTestMode mode, const RayTestCallback& callback_handler);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Отладочная отрисовка

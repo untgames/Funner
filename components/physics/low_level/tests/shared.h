@@ -93,6 +93,18 @@ class TestScene : public IScene, public Object
       throw xtl::make_not_implemented_exception ("TestScene::RegisterCallback");
     }
 
+    ///Трассировка луча, порядок вызова не соответствует удаленности объекта
+    void RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, RayTestMode mode, const RayTestCallback& callback_handler)
+    {
+      throw xtl::make_not_implemented_exception ("TestScene::RayTest");
+    }
+
+    void RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, size_t collision_groups_count,
+                  const size_t* collision_groups, RayTestMode mode, const RayTestCallback& callback_handler)
+    {
+      throw xtl::make_not_implemented_exception ("TestScene::RayTest");
+    }
+
     ///Отладочная отрисовка
     void Draw (render::debug::PrimitiveRender&)
     {

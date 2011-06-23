@@ -486,10 +486,7 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
     collision_filters.clear ();
   }
 
-  /*
-     Обработка столкновений объектов
-  */
-
+  ///Обработка столкновений объектов
   physics::low_level::CollisionEventType ConvertCollisionEventType (physics::CollisionEventType type)
   {
     switch (type)
@@ -574,6 +571,72 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
               body2 = RigidBodyImplProvider::CreateRigidBody (body2_impl);
 
     handler->OnCollision (event, body1, body2);
+  }
+
+  ///Трассировка луча, порядок вызова не соответствует удаленности объекта
+  physics::low_level::RayTestMode ConvertRayTestMode (RayTestMode mode)
+  {
+    switch (mode)
+    {
+      case RayTestMode_Closest:  return physics::low_level::RayTestMode_Closest;
+      case RayTestMode_Farthest: return physics::low_level::RayTestMode_Farthest;
+      case RayTestMode_All:      return physics::low_level::RayTestMode_All;
+      default:
+        throw xtl::make_argument_exception ("physics::Scene::Impl::GetLowLevelRayTestMode", "mode", mode);
+    }
+  }
+
+  void RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, RayTestMode mode, const RayTestCallback& callback)
+  {
+    static const char* METHOD_NAME = "physics::Scene::RayTest (const math::vec3f&, const math::vec3f&, RayTestMode, const RayTestCallback&)";
+
+    scene->RayTest (ray_origin, ray_end, ConvertRayTestMode (mode), xtl::bind (&Scene::Impl::RayTestCallbackHandler, this, _1, _2, _3, callback));
+  }
+
+  void RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, size_t groups_count, const char** groups_masks, RayTestMode mode, const RayTestCallback& callback)
+  {
+    static const char* METHOD_NAME = "physics::Scene::RayTest (const math::vec3f&, const math::vec3f&, size_t, const char**, RayTestMode, const RayTestCallback&)";
+
+    if (!groups_count)
+      return;
+
+    if (!groups_masks)
+      throw xtl::make_null_argument_exception (METHOD_NAME, "groups_masks");
+
+    typedef stl::hash_set<size_t> IdSet;
+
+    IdSet groups_set;
+
+    for (size_t i = 0; i < groups_count; i++)
+    {
+      const char* group_mask = groups_masks [i];
+
+      if (!group_mask)
+        throw xtl::make_null_argument_exception (METHOD_NAME, common::format ("groups_masks [%u]", i).c_str ());
+
+      for (CollisionGroupsMap::iterator iter = collision_groups.begin (), end = collision_groups.end (); iter != end; ++iter)
+        if (common::wcmatch (iter->second.name.c_str (), group_mask))
+          groups_set.insert (iter->second.id);
+    }
+
+    xtl::uninitialized_storage<size_t> groups (groups_set.size ());
+
+    size_t *current_group = groups.data ();
+
+    for (IdSet::iterator iter = groups_set.begin (), end = groups_set.end (); iter != end; ++iter, current_group++)
+      *current_group = *iter;
+
+    scene->RayTest (ray_origin, ray_end, groups.size (), groups.data (), ConvertRayTestMode (mode), xtl::bind (&Scene::Impl::RayTestCallbackHandler, this, _1, _2, _3, callback));
+  }
+
+  void RayTestCallbackHandler (physics::low_level::IRigidBody* body, const math::vec3f& position, const math::vec3f& normal, const RayTestCallback& callback)
+  {
+    RigidBodyImpl *body_impl = FindRigidBodyImpl (body);
+
+    if (!body_impl)
+      throw xtl::format_operation_exception ("physics::Scene::Impl::RayTestCallbackHandler", "Can't find body");
+
+    callback (RigidBodyImplProvider::CreateRigidBody (body_impl), position, normal);
   }
 };
 
@@ -717,6 +780,20 @@ void Scene::RemoveAllCollisionFilters ()
 xtl::connection Scene::RegisterCollisionCallback (const char* group1_mask, const char* group2_mask, CollisionEventType event_type, const CollisionCallback& callback_handler)
 {
   return impl->RegisterCollisionCallback (group1_mask, group2_mask, event_type, callback_handler);
+}
+
+/*
+   Трассировка луча, порядок вызова не соответствует удаленности объекта
+*/
+
+void Scene::RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, RayTestMode mode, const RayTestCallback& callback_handler)
+{
+  impl->RayTest (ray_origin, ray_end, mode, callback_handler);
+}
+
+void Scene::RayTest (const math::vec3f& ray_origin, const math::vec3f& ray_end, size_t groups_count, const char** groups_masks, RayTestMode mode, const RayTestCallback& callback_handler)
+{
+  impl->RayTest (ray_origin, ray_end, groups_count, groups_masks, mode, callback_handler);
 }
 
 /*

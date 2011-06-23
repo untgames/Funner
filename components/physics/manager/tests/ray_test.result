@@ -1,0 +1,27 @@
+Results of ray_test test:
+Test very short ray
+Test short ray
+ray collided with body at 0.00 0.00 0.00, point 0.00 -1.00 0.00, normal 0.00 -1.00 0.00
+Test long ray
+ray collided with body at 0.00 4.00 0.00, point 0.00 3.00 0.00, normal 0.00 -1.00 0.00
+ray collided with body at 0.00 2.00 0.00, point 0.00 1.00 0.00, normal 0.00 -1.00 0.00
+ray collided with body at 0.00 0.00 0.00, point 0.00 -1.00 0.00, normal 0.00 -1.00 0.00
+Test side ray
+ray collided with body at 0.00 4.00 0.00, point 0.42 3.09 0.00, normal 0.40 -0.91 0.00
+ray collided with body at 0.00 2.00 0.00, point 0.25 1.03 0.00, normal 0.26 -0.97 0.00
+ray collided with body at 0.00 0.00 0.00, point 0.08 -1.00 0.00, normal 0.03 -1.00 0.00
+Test side ray 2
+ray collided with body at 2.00 0.00 0.00, point 1.29 -0.71 0.00, normal -0.71 -0.71 0.00
+Test long ray with empty filter
+Test long ray with one group filter
+ray collided with body at 0.00 0.00 0.00, point 0.00 -1.00 0.00, normal 0.00 -1.00 0.00
+Test long ray with two groups filter
+ray collided with body at 0.00 4.00 0.00, point 0.00 3.00 0.00, normal 0.00 -1.00 0.00
+ray collided with body at 0.00 2.00 0.00, point 0.00 1.00 0.00, normal 0.00 -1.00 0.00
+Test long ray with wildcard groups filter
+ray collided with body at 0.00 2.00 0.00, point 0.00 1.00 0.00, normal 0.00 -1.00 0.00
+ray collided with body at 0.00 0.00 0.00, point 0.00 -1.00 0.00, normal 0.00 -1.00 0.00
+Test closest long ray
+ray collided with body at 0.00 0.00 0.00, point 0.00 -1.00 0.00, normal 0.00 -1.00 0.00
+Test farthest long ray
+ray collided with body at 0.00 4.00 0.00, point 0.00 3.00 0.00, normal 0.00 -1.00 0.00
