@@ -165,7 +165,7 @@ class BulletRayTestCallback : public btCollisionWorld::RayResultCallback
 
       switch (mode)
       {
-        case RayTestMode_Closest:
+        case RayTestMode_Nearest:
           m_closestHitFraction = ray_result.m_hitFraction;
           break;
         case RayTestMode_Farthest:

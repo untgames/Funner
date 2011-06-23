@@ -76,7 +76,7 @@ int main ()
     scene.RayTest (math::vec3f (0.f, -2.f, 0.f), math::vec3f (0.f, 10.f, 0.f), sizeof (filter_groups2) / sizeof (*filter_groups2), filter_groups2, RayTestMode_All, ray_test_callback);
 
     printf ("Test closest long ray\n");
-    scene.RayTest (math::vec3f (0.f, -2.f, 0.f), math::vec3f (0.f, 10.f, 0.f), RayTestMode_Closest, ray_test_callback);
+    scene.RayTest (math::vec3f (0.f, -2.f, 0.f), math::vec3f (0.f, 10.f, 0.f), RayTestMode_Nearest, ray_test_callback);
 
     printf ("Test farthest long ray\n");
     scene.RayTest (math::vec3f (0.f, -2.f, 0.f), math::vec3f (0.f, 10.f, 0.f), RayTestMode_Farthest, ray_test_callback);

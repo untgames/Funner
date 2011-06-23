@@ -578,7 +578,7 @@ struct Scene::Impl : public xtl::reference_counter, public xtl::trackable
   {
     switch (mode)
     {
-      case RayTestMode_Closest:  return physics::low_level::RayTestMode_Closest;
+      case RayTestMode_Nearest:  return physics::low_level::RayTestMode_Nearest;
       case RayTestMode_Farthest: return physics::low_level::RayTestMode_Farthest;
       case RayTestMode_All:      return physics::low_level::RayTestMode_All;
       default:

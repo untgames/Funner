@@ -48,7 +48,7 @@ enum CollisionEventType
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum RayTestMode
 {
-  RayTestMode_Closest,    //ближайшее пересечение
+  RayTestMode_Nearest,    //ближайшее пересечение
   RayTestMode_Farthest,   //самое дальнее пересечение
   RayTestMode_All,        //все пересечения
 
