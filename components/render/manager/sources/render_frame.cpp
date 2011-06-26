@@ -117,7 +117,9 @@ struct FrameImpl::Impl: public CacheHolder
   PropertyCache               entities_properties;    //динамические свойства объектов
   RenderTargetDescMap         render_targets;         //целевые буферы отрисовки
   TextureMap                  textures;               //локальные текстуры фрейма
-  bool                        scissor_state;          //включено ли отсечение
+  math::mat4f                 view_tm;                //матрица вида
+  math::mat4f                 projection_tm;          //матрица проецирования
+  bool                        scissor_state;          //включено ли отсечение  
   size_t                      clear_flags;            //флаги очистки
   math::vec4f                 clear_color;            //цвет очистки фона
   float                       clear_depth_value;      //значение буфера глубины после очистки
@@ -560,6 +562,30 @@ void FrameImpl::SetProperties (const common::PropertyMap& properties)
 const common::PropertyMap& FrameImpl::Properties ()
 {
   return impl->properties.Properties ();
+}
+
+/*
+    Матрицы преобразований
+*/
+
+void FrameImpl::SetViewMatrix (const math::mat4f& matrix)
+{
+  impl->view_tm = matrix;
+}
+
+void FrameImpl::SetProjectionMatrix (const math::mat4f& matrix)
+{
+  impl->projection_tm = matrix;
+}
+
+const math::mat4f& FrameImpl::ViewMatrix ()
+{
+  return impl->view_tm;
+}
+
+const math::mat4f& FrameImpl::ProjectionMatrix ()
+{
+  return impl->projection_tm;
 }
 
 /*

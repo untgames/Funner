@@ -146,9 +146,9 @@ program "phong"
   profile "glsl"            //shading profile
   shader  "phong" "glsl.vs" //reference to shader source. TODO: add compile options
   shader  "phong" "glsl.ps" //reference to shader source
+  defines "PointLightCount DirectLightCount SpotLightCount"
 
 //  shader "phong" "glsl.vs" "glsl.ps" //reference to shader source
-//  constant "DirectLightsCount"
 
   texmap "diffuse"
   texmap "specular"  2
@@ -158,6 +158,8 @@ program "phong"
   texmap "shadow02"
   texmap "shadow03"
   texmap "shadow04"
+
+//  dynamic_property "ModelViewProjection" "ModelMatrix * ViewMatrix * ProjectionMatrix"
 }
 
 //shading instance for rendering shadow maps

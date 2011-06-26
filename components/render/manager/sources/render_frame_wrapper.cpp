@@ -25,6 +25,26 @@ Frame& Frame::operator = (const Frame& frame)
   return *this;
 }
 
+void Frame::SetViewMatrix (const math::mat4f& matrix)
+{
+  impl->SetViewMatrix (matrix);
+}
+
+void Frame::SetProjectionMatrix (const math::mat4f& matrix)
+{
+  impl->SetProjectionMatrix (matrix);
+}
+
+const math::mat4f& Frame::ViewMatrix () const
+{
+  return impl->ViewMatrix ();
+}
+
+const math::mat4f& Frame::ProjectionMatrix () const
+{
+  return impl->ProjectionMatrix ();
+}
+
 void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target)
 {
   impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target));
