@@ -5,6 +5,7 @@ using namespace render::low_level;
 
 //TODO: update entity dynamic textures
 //TODO: detect entity LOD
+//TODO: add mvp matrix processing to AddEntity
 
 namespace
 {
@@ -117,8 +118,6 @@ struct FrameImpl::Impl: public CacheHolder
   PropertyCache               entities_properties;    //динамические свойства объектов
   RenderTargetDescMap         render_targets;         //целевые буферы отрисовки
   TextureMap                  textures;               //локальные текстуры фрейма
-  math::mat4f                 view_tm;                //матрица вида
-  math::mat4f                 projection_tm;          //матрица проецирования
   bool                        scissor_state;          //включено ли отсечение  
   size_t                      clear_flags;            //флаги очистки
   math::vec4f                 clear_color;            //цвет очистки фона
@@ -565,30 +564,6 @@ const common::PropertyMap& FrameImpl::Properties ()
 }
 
 /*
-    Матрицы преобразований
-*/
-
-void FrameImpl::SetViewMatrix (const math::mat4f& matrix)
-{
-  impl->view_tm = matrix;
-}
-
-void FrameImpl::SetProjectionMatrix (const math::mat4f& matrix)
-{
-  impl->projection_tm = matrix;
-}
-
-const math::mat4f& FrameImpl::ViewMatrix ()
-{
-  return impl->view_tm;
-}
-
-const math::mat4f& FrameImpl::ProjectionMatrix ()
-{
-  return impl->projection_tm;
-}
-
-/*
     Список отрисовки
 */
 
@@ -604,8 +579,9 @@ void FrameImpl::AddEntity (const EntityPtr& entity)
   impl->effect_holder->need_operations_update = true;
 }
 
-void FrameImpl::AddEntity (const EntityPtr& entity, const common::PropertyMap& properties)
+void FrameImpl::AddEntity (const EntityPtr& entity, const common::PropertyMap& properties, const math::mat4f& mvp_matrix)
 {
+  //TODO: add mvp matrix processing
   try
   {
     LowLevelBufferPtr          properties_buffer = 0;
@@ -622,6 +598,11 @@ void FrameImpl::AddEntity (const EntityPtr& entity, const common::PropertyMap& p
     e.touch ("render::FrameImpl::AddEntity(const EntityPtr&,const common::PropertyMap&)");
     throw;
   }
+}
+
+void FrameImpl::AddEntity (const EntityPtr& entity, const EntityDrawHandler& handler)
+{
+  throw xtl::make_not_implemented_exception ("render::FrameImpl::AddEntity");
 }
 
 void FrameImpl::RemoveAllEntities ()
@@ -683,7 +664,7 @@ void FrameImpl::Draw (RenderingContext* previous_context)
         if (!desc.entity->LodsCount ())
           continue;
           
-        size_t lod = 0;
+        size_t lod = 0; //TODO: lod detection
 
         renderer.AddOperations (desc.entity->RendererOperations (lod, true), desc.property_buffer.get (), desc.layout.get ());
       }

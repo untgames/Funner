@@ -25,26 +25,6 @@ Frame& Frame::operator = (const Frame& frame)
   return *this;
 }
 
-void Frame::SetViewMatrix (const math::mat4f& matrix)
-{
-  impl->SetViewMatrix (matrix);
-}
-
-void Frame::SetProjectionMatrix (const math::mat4f& matrix)
-{
-  impl->SetProjectionMatrix (matrix);
-}
-
-const math::mat4f& Frame::ViewMatrix () const
-{
-  return impl->ViewMatrix ();
-}
-
-const math::mat4f& Frame::ProjectionMatrix () const
-{
-  return impl->ProjectionMatrix ();
-}
-
 void Frame::SetRenderTarget (const char* name, const render::RenderTarget& target)
 {
   impl->SetRenderTarget (name, Wrappers::Unwrap<RenderTargetImpl> (target));
@@ -196,9 +176,14 @@ void Frame::AddEntity (const Entity& entity)
   impl->AddEntity (Wrappers::Unwrap<EntityImpl> (entity));
 }
 
-void Frame::AddEntity (const Entity& entity, const common::PropertyMap& properties)
+void Frame::AddEntity (const Entity& entity, const common::PropertyMap& properties, const math::mat4f& mvp_matrix)
 {
-  impl->AddEntity (Wrappers::Unwrap<EntityImpl> (entity), properties);
+  impl->AddEntity (Wrappers::Unwrap<EntityImpl> (entity), properties, mvp_matrix);
+}
+
+void Frame::AddEntity (const Entity& entity, const EntityDrawHandler& handler)
+{
+  impl->AddEntity (Wrappers::Unwrap<EntityImpl> (entity), handler);
 }
 
 void Frame::RemoveAllEntities ()

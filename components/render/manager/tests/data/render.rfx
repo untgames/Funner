@@ -158,8 +158,6 @@ program "phong"
   texmap "shadow02"
   texmap "shadow03"
   texmap "shadow04"
-
-//  dynamic_property "ModelViewProjection" "ModelMatrix * ViewMatrix * ProjectionMatrix"
 }
 
 //shading instance for rendering shadow maps

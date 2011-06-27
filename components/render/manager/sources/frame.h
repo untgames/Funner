@@ -28,14 +28,6 @@ class FrameImpl: public Object
     ~FrameImpl ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-///Матрицы преобразований
-///////////////////////////////////////////////////////////////////////////////////////////////////
-     void               SetViewMatrix       (const math::mat4f& matrix);
-     void               SetProjectionMatrix (const math::mat4f& matrix);
-     const math::mat4f& ViewMatrix          ();
-     const math::mat4f& ProjectionMatrix    ();
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Регистрация целевых буферов отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void SetRenderTarget        (const char* name, const RenderTargetPtr& target);
@@ -115,9 +107,12 @@ class FrameImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Список отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef Frame::EntityDrawHandler EntityDrawHandler;
+
     size_t EntitiesCount     ();
     void   AddEntity         (const EntityPtr& entity);
-    void   AddEntity         (const EntityPtr& entity, const common::PropertyMap& properties);
+    void   AddEntity         (const EntityPtr& entity, const common::PropertyMap& properties, const math::mat4f& mvp_matrix);
+    void   AddEntity         (const EntityPtr& entity, const EntityDrawHandler& handler);
     void   RemoveAllEntities ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

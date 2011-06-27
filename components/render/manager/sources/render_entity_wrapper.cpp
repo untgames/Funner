@@ -35,16 +35,6 @@ const common::PropertyMap& Entity::Properties () const
   return impl->Properties ();
 }
 
-void Entity::SetTransformation (const math::mat4f& tm)
-{
-  impl->SetTransformation (tm);
-}
-
-const math::mat4f& Entity::Transformation () const
-{
-  return impl->Transformation ();
-}
-
 void Entity::SetJointsCount (size_t count)
 {
   impl->SetJointsCount (count);

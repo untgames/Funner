@@ -39,7 +39,7 @@ typedef stl::vector<size_t> TagHashArray;
 struct Effect::Impl
 {
   common::StringArray  tags;       //тэги прохода
-  TagHashArray         tag_hashes; //хэши тэгов  
+  TagHashArray         tag_hashes; //хэши тэгов
   EffectOperationArray operations; //операции рендеринга
   
   Impl ()

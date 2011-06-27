@@ -428,7 +428,6 @@ struct EntityLodLess
 
 struct EntityImpl::Impl: public EntityLodCommonData
 {
-  math::mat4f         transformation;    //матрица преобразований
   EntityLodArray      lods;              //уровни детализации
   bool                need_resort;       //уровни детализации требуют пересортировки
   PrimitiveManagerPtr primitive_manager; //менеджер примитивов
@@ -525,20 +524,6 @@ void EntityImpl::SetProperties (const common::PropertyMap& properties)
 const common::PropertyMap& EntityImpl::Properties ()
 {
   return impl->Properties ().Properties ();
-}
-
-/*
-    Матрица преобразований
-*/
-
-void EntityImpl::SetTransformation (const math::mat4f& tm)
-{
-  impl->transformation = tm;
-}
-
-const math::mat4f& EntityImpl::Transformation ()
-{
-  return impl->transformation;
 }
 
 /*
