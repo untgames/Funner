@@ -9,7 +9,7 @@
 using namespace engine;
 
 //точка входа
-int main (int argc, const char* argv [])
+int main (int argc, const char* argv [], const char* env [])
 {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 
@@ -40,7 +40,7 @@ int main (int argc, const char* argv [])
       return 1;
   }
 
-  if (!funner->ParseCommandLine (argc, argv))
+  if (!funner->ParseCommandLine (argc, argv, env))
       return 1;
 
   funner->Run ();

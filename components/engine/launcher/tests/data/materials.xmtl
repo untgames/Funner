@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<material_library>
+  <material id="material1">
+    <sprite_profile image="data/sky.jpg" blend_mode="translucent"/>
+  </material>  
+</material_library>

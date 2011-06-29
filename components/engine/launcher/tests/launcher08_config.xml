@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding = "windows-1251"?>
+<Configuration LicenseFile="launcher08.license">
+  <Log>
+    <Console Filters="*"/>  
+  </Log>
+  <WindowManager ResourceServer="WindowManager">
+    <Window
+      Id         = "MainWindow"
+      Style      = "Overlapped"
+      Title      = "Test window"  
+      Width      = "400"
+      Height     = "300"
+      XPosition  = "100"
+      YPosition  = "100"      
+      Visible    = "1"
+      CursorVisible = "1"      
+    />  
+  </WindowManager>
+  <WindowRenderer Id="MyRenderer" AdapterMask="*" DriverMask="*" InitString="GL_SGIS_texture_lod=0 GL_ARB_texture_non_power_of_two=0 max_texture_size=1024">
+    <FrameBuffer
+      Window       = "MainWindow"
+      ColorBits    = "32"
+      AlphaBits    = "0"
+      DepthBits    = "24"
+      StencilBits  = "0"
+      FullScreen   = "0"
+      BuffersCount = "2"
+      SwapMethod   = "Discard"
+      SamplesCount = "0"
+      VSync        = "1"
+    />
+  </WindowRenderer>
+  <SceneRender
+    DriverMask     = "*"
+    RendererMask   = "MyRenderer"
+    Log            = "render.scene_render"
+    >
+    <RenderTarget 
+      Screen     = "Screen1"
+      IdleRender = "0"
+      />
+  </SceneRender>
+  <WindowInputDriver>
+    <Device Id="MainWindowDevice" Window="MainWindow"/>
+  </WindowInputDriver>
+  <InputManager TranslationMapRegistry = "data/input.xkeyreg"/>
+  <Shell Interpreter="lua" Libraries="*"/>  
+</Configuration>
