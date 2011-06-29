@@ -1,6 +1,8 @@
 #include <cstdio>
 #include <cmath>
 
+#include <stl/string>
+
 #include <xtl/signal.h>
 #include <xtl/bind.h>
 #include <xtl/ref.h>

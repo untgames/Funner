@@ -97,3 +97,17 @@ void DefaultApplicationManager::OpenUrl (const char* url)
 {
   throw xtl::format_not_supported_exception ("syslib::DefaultApplicationManager::OpenUrl", "No OpenURL support for this platform");
 }
+
+/*
+    Получение значения переменной среды
+*/
+
+stl::string DefaultApplicationManager::GetEnvironmentVariable (const char* name)
+{
+  const char* result = getenv (name);
+  
+  if (!result)
+    throw xtl::format_operation_exception ("syslib::DefaultApplicationManager::GetEnvironmentVariable", "Environment variable '%s' not found");
+
+  return result;
+}

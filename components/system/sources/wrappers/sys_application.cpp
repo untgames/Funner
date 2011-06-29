@@ -397,3 +397,19 @@ void Application::OpenUrl (const char* url)
     throw;
   }
 }
+
+stl::string Application::GetEnvironmentVariable (const char* name)
+{
+  try
+  {
+    if (!name)
+      throw xtl::make_null_argument_exception ("", "name");
+      
+    return Platform::GetEnvironmentVariable (name);
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Application::GetEnvironmentVariable");
+    throw;
+  }  
+}

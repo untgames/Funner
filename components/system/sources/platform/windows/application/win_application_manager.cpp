@@ -238,3 +238,48 @@ void WindowsApplicationManager::OpenUrl (const char* url)
     throw;
   }
 }
+
+
+/*
+    Получение значения переменной среды
+*/
+
+#undef GetEnvironmentVariable
+
+stl::string WindowsApplicationManager::GetEnvironmentVariable (const char* name)
+{
+  try
+  {
+    static const int VALUE_BUFFER_SIZE = 8;
+    
+    stl::string result;
+    
+    result.fast_resize (VALUE_BUFFER_SIZE);
+    
+    DWORD result_size = ::GetEnvironmentVariableA (name, &result [0], result.size () + 1);
+    
+    if (result_size > 0 && result_size <= result.size ())
+    {
+      result.fast_resize (result_size);
+      
+      return result;
+    }
+    
+    if (!result_size)
+      raise_error ("::GetEnvironmentVariableA");
+      
+    result.fast_resize (result_size - 1);
+    
+    result_size = ::GetEnvironmentVariableA (name, &result [0], result.size () + 1);
+    
+    if (result_size > 0 && result_size == result.size ())
+      return result;
+      
+    throw xtl::format_operation_exception ("", "::GetEnvironmentVariableA failed twice");
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("syslib::WindowsApplicationManager::GetEnvironmentVariable");
+    throw;
+  }  
+}
