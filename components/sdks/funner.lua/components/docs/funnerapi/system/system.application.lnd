@@ -31,6 +31,33 @@ Exit (number code)
 Sleep (number time)
 
 /*
+   Function: OpenUrl
+
+   Открытие в браузере указанного ресурса
+
+   Параметры:
+
+     url - ссылка на ресурс
+*/
+
+OpenUrl (string url)
+
+/*
+   Function: GetEnvironmentVariable
+
+   Получение значения системной переменной окружения
+
+   Параметры:
+
+     name - имя переменной
+
+   Возвращает:
+     string
+*/
+
+GetEnvironmentVariable (string name)
+
+/*
    Function: CreateEventHandler
  
    Создание обработчика событий приложения.
