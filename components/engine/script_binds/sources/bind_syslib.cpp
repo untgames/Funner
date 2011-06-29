@@ -37,11 +37,12 @@ void bind_application_library (Environment& environment)
 
     //регистрация операций
 
-  lib.Register ("Exit",                 make_invoker (&syslib::Application::Exit));
-  lib.Register ("Sleep",                make_invoker (&syslib::Application::Sleep));
-  lib.Register ("OpenUrl",              make_invoker (&syslib::Application::OpenUrl));
-  lib.Register ("CreateEventHandler",   make_callback_invoker<syslib::Application::EventHandler::signature_type> ());
-  lib.Register ("RegisterEventHandler", make_invoker (&syslib::Application::RegisterEventHandler));
+  lib.Register ("Exit",                   make_invoker (&syslib::Application::Exit));
+  lib.Register ("Sleep",                  make_invoker (&syslib::Application::Sleep));
+  lib.Register ("OpenUrl",                make_invoker (&syslib::Application::OpenUrl));
+  lib.Register ("GetEnvironmentVariable", make_invoker (&syslib::Application::GetEnvironmentVariable));
+  lib.Register ("CreateEventHandler",     make_callback_invoker<syslib::Application::EventHandler::signature_type> ());
+  lib.Register ("RegisterEventHandler",   make_invoker (&syslib::Application::RegisterEventHandler));
 }
 
 void set_window_x (Window& window, int x)
