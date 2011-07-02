@@ -1,0 +1,7 @@
+Results of interlacer_test02:
+interlacer [<OPTIONS>] <SOURCE> ...
+  OPTIONS:
+    --help, -?                 print help message
+    --silent, -s               quiet mode
+    --output=<wildcard>, -o <wildcard> output file name format
+successfull!
