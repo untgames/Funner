@@ -194,6 +194,7 @@ class DebugIdHolder: public xtl::noncopyable
 #include "render_target.h"
 #include "rendering_context.h"
 #include "settings.h"
+#include "shader_defines.h"
 #include "shading_manager.h"
 #include "texture.h"
 #include "texture_manager.h"
