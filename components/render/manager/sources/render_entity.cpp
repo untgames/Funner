@@ -123,6 +123,9 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
       return state.parameters_layout;
     }
     
+///Кэш опций шейдера
+    ShaderOptionsCache& ShaderOptions () { return shader_options_cache; }
+    
 ///Управление кэшированием
     using CacheHolder::UpdateCache;
     using CacheHolder::ResetCache;
@@ -269,11 +272,12 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
   private:  
     EntityImpl&                 entity;                   //обратная ссылка на объект
     DeviceManagerPtr            device_manager;           //менеджер устройства отрисовки
-    TextureManagerPtr           texture_manager;          //менеджер текстур
+    TextureManagerPtr           texture_manager;          //менеджер текстур    
     PropertyBuffer              properties;               //свойства рендеринга
     ProgramParametersLayout     entity_parameters_layout; //объект расположения свойств
     StateMap                    states;                   //карта состояний
     DynamicTextureEntityStorage dynamic_textures;         //хранилище динамических текстур объекта рендеринга
+    ShaderOptionsCache          shader_options_cache;     //кэш опций шейдера
     LowLevelStateBlockPtr       default_state_block;      //блок состояний по умолчанию
 };
 
@@ -530,14 +534,22 @@ const common::PropertyMap& EntityImpl::Properties ()
     Макро-определения шейдера
 */
 
-void EntityImpl::SetShaderOptions (const common::PropertyMap&)
+void EntityImpl::SetShaderOptions (const common::PropertyMap& properties)
 {
-  throw xtl::make_not_implemented_exception ("render::EntityImpl::SetShaderOptions");
+  try
+  {
+    impl->ShaderOptions ().SetProperties (properties);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::EntityImpl::SetShaderOptions");
+    throw;
+  }
 }
 
 const common::PropertyMap& EntityImpl::ShaderOptions () const
 {
-  throw xtl::make_not_implemented_exception ("render::EntityImpl::ShaderOptions");
+  return impl->ShaderOptions ().Properties ();
 }
 
 /*
