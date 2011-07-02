@@ -81,11 +81,41 @@ typedef xtl::intrusive_ptr<ShaderOptionsBuilder> ShaderOptionsBuilderPtr;
 
 typedef stl::hash_multimap<size_t, ShaderOptionsBuilderPtr> ShaderOptionsBuilderMap;
 
-struct ShaderOptionsLayout::Impl
+struct ShaderOptionsLayout::Impl: public xtl::trackable
 {
-  common::StringArray     defines;      //список названий макро-определений
-  ShaderOptionsBuilderMap builders;     //генераторы опций шейдера
-  stl::string             value_buffer; //временный буфер для формирования опций
+  common::StringArray     defines;         //список названий макро-определений
+  ShaderOptionsBuilderMap builders;        //генераторы опций шейдера
+  stl::string             value_buffer;    //временный буфер для формирования опций
+  ShaderOptions           default_options; //опции по умолчанию
+  bool                    need_flush;      //кэш требуется сбросить
+  
+///Конструктор
+  Impl ()
+    : need_flush (false)
+  {
+  }
+  
+///Сброс кэша
+  void FlushCache ()
+  {
+    builders.clear ();
+    
+    default_options.options.clear ();
+    
+    const char** define_names = defines.Data ();
+
+    for (size_t i=0, count=defines.Size (); i<count; i++)
+    {
+      if (i)
+        default_options.options += ' ';
+      
+      default_options.options += define_names [i];
+    }
+    
+    default_options.options_hash = common::strhash (default_options.options.c_str ());
+    
+    need_flush = false;
+  }
 };
 
 /*
@@ -126,7 +156,8 @@ const char* ShaderOptionsLayout::Item (size_t index)
 
 void ShaderOptionsLayout::Add (const char* name)
 {
-  impl->defines += name;
+  impl->defines    += name;
+  impl->need_flush  = true;
 }
 
 void ShaderOptionsLayout::Remove (const char* name)
@@ -143,12 +174,16 @@ void ShaderOptionsLayout::Remove (const char* name)
       
       i--;
       count--;
+      
+      impl->need_flush = true;
     }
 }
 
 void ShaderOptionsLayout::Clear ()
 {
   impl->defines.Clear ();
+
+  impl->need_flush = true;
 }
 
 /*
@@ -159,6 +194,9 @@ void ShaderOptionsLayout::GetShaderOptions (const common::PropertyMap& defines, 
 {
   try
   {
+    if (impl->need_flush)
+      impl->FlushCache ();
+    
     size_t hash = defines.Layout ().Hash ();
     
     ShaderOptionsBuilderMap::iterator iter = impl->builders.find (hash);
@@ -180,4 +218,49 @@ void ShaderOptionsLayout::GetShaderOptions (const common::PropertyMap& defines, 
     e.touch ("render::ShaderOptionsLayout::GetShaderOptions");
     throw;
   }
+}
+
+const ShaderOptions& ShaderOptionsLayout::GetDefaultShaderOptions ()
+{
+  try
+  {
+    if (impl->need_flush)
+      impl->FlushCache ();
+      
+    return impl->default_options;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::ShaderOptionsLayout::GetDefaultShaderOptions");
+    throw;
+  }
+}
+
+/*
+    Хэш
+*/
+
+size_t ShaderOptionsLayout::Hash ()
+{
+  try
+  {
+    if (impl->need_flush)
+      impl->FlushCache ();
+    
+    return impl->default_options.options_hash;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::ShaderOptionsLayout::Hash");
+    throw;
+  }
+}
+
+/*
+    Получение объекта оповещения об удалении
+*/
+
+xtl::trackable& ShaderOptionsLayout::GetTrackable ()
+{
+  return *impl;
 }
