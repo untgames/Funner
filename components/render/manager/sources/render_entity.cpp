@@ -527,6 +527,20 @@ const common::PropertyMap& EntityImpl::Properties ()
 }
 
 /*
+    Макро-определения шейдера
+*/
+
+void EntityImpl::SetShaderDefines (const common::PropertyMap&)
+{
+  throw xtl::make_not_implemented_exception ("render::EntityImpl::SetShaderDefines");
+}
+
+const common::PropertyMap& EntityImpl::ShaderDefines () const
+{
+  throw xtl::make_not_implemented_exception ("render::EntityImpl::ShaderDefines");
+}
+
+/*
     Работа с костями (для скиннинга)
       преобразования умножаются на матрицу EntityImpl::Transformation в случае если она не единична    
 */

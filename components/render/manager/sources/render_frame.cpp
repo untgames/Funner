@@ -564,6 +564,20 @@ const common::PropertyMap& FrameImpl::Properties ()
 }
 
 /*
+    Макро-определения шейдера
+*/
+
+void FrameImpl::SetShaderDefines (const common::PropertyMap&)
+{
+  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetShaderDefines");
+}
+
+const common::PropertyMap& FrameImpl::ShaderDefines () const
+{
+  throw xtl::make_not_implemented_exception ("render::FrameImpl::ShaderDefines");
+}
+
+/*
     Список отрисовки
 */
 

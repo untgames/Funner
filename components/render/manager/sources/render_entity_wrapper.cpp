@@ -35,6 +35,16 @@ const common::PropertyMap& Entity::Properties () const
   return impl->Properties ();
 }
 
+void Entity::SetShaderDefines (const common::PropertyMap& defines)
+{
+  impl->SetShaderDefines (defines);
+}
+
+const common::PropertyMap& Entity::ShaderDefines () const
+{
+  return impl->ShaderDefines ();
+}
+
 void Entity::SetJointsCount (size_t count)
 {
   impl->SetJointsCount (count);
@@ -109,10 +119,6 @@ void swap (Entity& entity1, Entity& entity2)
 }
 
 }
-
-/*
-    Управление кэшированием
-*/
 
 void Entity::UpdateCache ()
 {
