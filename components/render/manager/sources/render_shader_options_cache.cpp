@@ -118,7 +118,7 @@ const ShaderOptions& ShaderOptionsCache::GetShaderOptions (ShaderOptionsLayout& 
   {
       //обработка частного случая - отсутствия свойств
       
-    if (impl->properties.Size () == 0)
+    if (impl->properties.Size () == 0 || layout.Size () == 0)
       return layout.GetDefaultShaderOptions ();
     
       //обновление флагов кэширования
