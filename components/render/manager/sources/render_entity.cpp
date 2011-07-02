@@ -530,14 +530,14 @@ const common::PropertyMap& EntityImpl::Properties ()
     Макро-определения шейдера
 */
 
-void EntityImpl::SetShaderDefines (const common::PropertyMap&)
+void EntityImpl::SetShaderOptions (const common::PropertyMap&)
 {
-  throw xtl::make_not_implemented_exception ("render::EntityImpl::SetShaderDefines");
+  throw xtl::make_not_implemented_exception ("render::EntityImpl::SetShaderOptions");
 }
 
-const common::PropertyMap& EntityImpl::ShaderDefines () const
+const common::PropertyMap& EntityImpl::ShaderOptions () const
 {
-  throw xtl::make_not_implemented_exception ("render::EntityImpl::ShaderDefines");
+  throw xtl::make_not_implemented_exception ("render::EntityImpl::ShaderOptions");
 }
 
 /*

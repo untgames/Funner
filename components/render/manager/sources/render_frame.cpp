@@ -567,14 +567,14 @@ const common::PropertyMap& FrameImpl::Properties ()
     Макро-определения шейдера
 */
 
-void FrameImpl::SetShaderDefines (const common::PropertyMap&)
+void FrameImpl::SetShaderOptions (const common::PropertyMap&)
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetShaderDefines");
+  throw xtl::make_not_implemented_exception ("render::FrameImpl::SetShaderOptions");
 }
 
-const common::PropertyMap& FrameImpl::ShaderDefines () const
+const common::PropertyMap& FrameImpl::ShaderOptions () const
 {
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::ShaderDefines");
+  throw xtl::make_not_implemented_exception ("render::FrameImpl::ShaderOptions");
 }
 
 /*

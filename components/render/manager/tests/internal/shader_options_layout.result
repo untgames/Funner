@@ -1,4 +1,4 @@
-Results of shader_define_list_test:
+Results of shader_options_layout_test:
 Options: 'DefineA=1 DefineB DefineC=test' (hash=2156d653)
 Options: 'DefineA DefineB=3.14 DefineC=1 2 3 4' (hash=0e55fc72)
 Options: 'DefineA=2 DefineB DefineC=test2' (hash=4c713e25)

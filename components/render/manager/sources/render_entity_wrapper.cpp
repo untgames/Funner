@@ -35,14 +35,14 @@ const common::PropertyMap& Entity::Properties () const
   return impl->Properties ();
 }
 
-void Entity::SetShaderDefines (const common::PropertyMap& defines)
+void Entity::SetShaderOptions (const common::PropertyMap& defines)
 {
-  impl->SetShaderDefines (defines);
+  impl->SetShaderOptions (defines);
 }
 
-const common::PropertyMap& Entity::ShaderDefines () const
+const common::PropertyMap& Entity::ShaderOptions () const
 {
-  return impl->ShaderDefines ();
+  return impl->ShaderOptions ();
 }
 
 void Entity::SetJointsCount (size_t count)

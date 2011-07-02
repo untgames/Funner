@@ -2,11 +2,11 @@
 
 int main ()
 {
-  printf ("Results of shader_define_list_test:\n");
+  printf ("Results of shader_options_layout_test:\n");
   
   try
   {
-    ShaderDefineList list;
+    ShaderOptionsLayout list;
     
     list.Add ("DefineA");
     list.Add ("DefineB");    

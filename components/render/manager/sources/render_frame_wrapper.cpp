@@ -166,14 +166,14 @@ const common::PropertyMap& Frame::Properties () const
   return impl->Properties ();
 }
 
-void Frame::SetShaderDefines (const common::PropertyMap& defines)
+void Frame::SetShaderOptions (const common::PropertyMap& defines)
 {
-  impl->SetShaderDefines (defines);
+  impl->SetShaderOptions (defines);
 }
 
-const common::PropertyMap& Frame::ShaderDefines () const
+const common::PropertyMap& Frame::ShaderOptions () const
 {
-  return impl->ShaderDefines ();
+  return impl->ShaderOptions ();
 }
 
 size_t Frame::EntitiesCount () const

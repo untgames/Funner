@@ -81,7 +81,7 @@ typedef xtl::intrusive_ptr<ShaderOptionsBuilder> ShaderOptionsBuilderPtr;
 
 typedef stl::hash_multimap<size_t, ShaderOptionsBuilderPtr> ShaderOptionsBuilderMap;
 
-struct ShaderDefineList::Impl
+struct ShaderOptionsLayout::Impl
 {
   common::StringArray     defines;      //список названий макро-определений
   ShaderOptionsBuilderMap builders;     //генераторы опций шейдера
@@ -92,12 +92,12 @@ struct ShaderDefineList::Impl
     Конструктор / деструктор
 */
 
-ShaderDefineList::ShaderDefineList ()
+ShaderOptionsLayout::ShaderOptionsLayout ()
   : impl (new Impl)
 {
 }
 
-ShaderDefineList::~ShaderDefineList ()
+ShaderOptionsLayout::~ShaderOptionsLayout ()
 {
 }
 
@@ -105,7 +105,7 @@ ShaderDefineList::~ShaderDefineList ()
     Количество закэшированных генераторов опций
 */
 
-size_t ShaderDefineList::CachedShaderBuildersCount ()
+size_t ShaderOptionsLayout::CachedShaderBuildersCount ()
 {
   return impl->builders.size ();
 }
@@ -114,22 +114,22 @@ size_t ShaderDefineList::CachedShaderBuildersCount ()
     Макро-определения
 */
 
-size_t ShaderDefineList::Size ()
+size_t ShaderOptionsLayout::Size ()
 {
   return impl->defines.Size ();
 }
 
-const char* ShaderDefineList::Item (size_t index)
+const char* ShaderOptionsLayout::Item (size_t index)
 {
   return impl->defines [index];
 }
 
-void ShaderDefineList::Add (const char* name)
+void ShaderOptionsLayout::Add (const char* name)
 {
   impl->defines += name;
 }
 
-void ShaderDefineList::Remove (const char* name)
+void ShaderOptionsLayout::Remove (const char* name)
 {
   if (!name)
     return;
@@ -146,7 +146,7 @@ void ShaderDefineList::Remove (const char* name)
     }
 }
 
-void ShaderDefineList::Clear ()
+void ShaderOptionsLayout::Clear ()
 {
   impl->defines.Clear ();
 }
@@ -155,7 +155,7 @@ void ShaderDefineList::Clear ()
     Получение опций шейдера
 */
 
-void ShaderDefineList::GetShaderOptions (const common::PropertyMap& defines, ShaderOptions& out_options)
+void ShaderOptionsLayout::GetShaderOptions (const common::PropertyMap& defines, ShaderOptions& out_options)
 {
   try
   {
@@ -177,7 +177,7 @@ void ShaderDefineList::GetShaderOptions (const common::PropertyMap& defines, Sha
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::ShaderDefineList::GetShaderOptions");
+    e.touch ("render::ShaderOptionsLayout::GetShaderOptions");
     throw;
   }
 }
