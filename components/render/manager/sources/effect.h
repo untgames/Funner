@@ -158,8 +158,9 @@ class EffectRenderer: public Object
 ///ƒобавление операций в список отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void AddOperations (const RendererOperationList& operations,
+                        const math::mat4f&           mvp_matrix,
                         render::low_level::IBuffer*  property_buffer = 0,
-                        ProgramParametersLayout*     property_layou = 0);
+                        ProgramParametersLayout*     property_layour= 0);
     void AddOperations (FrameImpl& frame);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

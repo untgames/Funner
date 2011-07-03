@@ -188,6 +188,7 @@ EffectRenderer::~EffectRenderer ()
 
 void EffectRenderer::AddOperations
  (const RendererOperationList& operations_desc,
+  const math::mat4f&           mvp_matrix,
   render::low_level::IBuffer*  property_buffer,
   ProgramParametersLayout*     property_layout)
 {

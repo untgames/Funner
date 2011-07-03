@@ -3,10 +3,6 @@
 using namespace render;
 using namespace render::low_level;
 
-//TODO: update entity dynamic textures
-//TODO: detect entity LOD
-//TODO: add mvp matrix processing to AddEntity
-
 namespace
 {
 
@@ -36,7 +32,6 @@ struct EffectHolder: public CacheSource
   EffectRendererPtr        effect_renderer;        //рендер эффекта
   EffectPtr                cached_effect;          //закэшированный эффект
   ProgramParametersLayout  properties_layout;      //расположение свойств
-  bool                     need_operations_update; //нужно ли обновлять список операций рендеринга
   
 ///Конструктор
   EffectHolder (const EffectManagerPtr& in_effect_manager, const DeviceManagerPtr& in_device_manager)
@@ -44,7 +39,6 @@ struct EffectHolder: public CacheSource
     , effect_manager (in_effect_manager)
     , effect (effect_manager->GetEffectProxy (""))
     , properties_layout (&device_manager->Device (), &device_manager->Settings ())
-    , need_operations_update (true)
   {
     effect.AttachCacheHolder (*this);
   }
@@ -53,9 +47,7 @@ struct EffectHolder: public CacheSource
   void ResetCacheCore ()
   {
     cached_effect   = EffectPtr ();
-    effect_renderer = EffectRendererPtr ();
-    
-    need_operations_update = true;
+    effect_renderer = EffectRendererPtr ();    
   }
 
   void UpdateCacheCore ()
@@ -67,9 +59,7 @@ struct EffectHolder: public CacheSource
       if (!cached_effect)
         return;
         
-      effect_renderer = EffectRendererPtr (new render::EffectRenderer (cached_effect, device_manager, &properties_layout), false);
-      
-      need_operations_update = true;
+      effect_renderer = EffectRendererPtr (new render::EffectRenderer (cached_effect, device_manager, &properties_layout), false);      
     }
     catch (xtl::exception& e)
     {
@@ -92,10 +82,8 @@ struct EntityDesc
   LowLevelBufferPtr          property_buffer; //буфер динамических свойств объекта
   ProgramParametersLayoutPtr layout;          //расположение динамических свойств объекта
   
-  EntityDesc (const EntityPtr& in_entity, const LowLevelBufferPtr& in_buffer = LowLevelBufferPtr (), ProgramParametersLayoutPtr in_layout = ProgramParametersLayoutPtr ())
+  EntityDesc (const EntityPtr& in_entity)
     : entity (in_entity)
-    , property_buffer (in_buffer)
-    , layout (in_layout)
   {
   }
 };
@@ -111,20 +99,22 @@ typedef stl::vector<EntityDesc> EntityArray;
 
 struct FrameImpl::Impl: public CacheHolder
 {
-  stl::auto_ptr<EffectHolder> effect_holder;          //хранилище эффекта
-  EntityArray                 entities;               //список объектов, отображаемых в кадре
-  FrameArray                  frames;                 //список вложенных кадров
-  PropertyBuffer              properties;             //свойства кадра
-  PropertyCache               entities_properties;    //динамические свойства объектов
-  ShaderOptionsCache          shader_options_cache;   //кэш опций шейдера
-  RenderTargetDescMap         render_targets;         //целевые буферы отрисовки
-  TextureMap                  textures;               //локальные текстуры фрейма
-  bool                        scissor_state;          //включено ли отсечение  
-  size_t                      clear_flags;            //флаги очистки
-  math::vec4f                 clear_color;            //цвет очистки фона
-  float                       clear_depth_value;      //значение буфера глубины после очистки
-  unsigned char               clear_stencil_index;    //значение буфера трафарета после очистки
-  LowLevelBufferPtr           cached_properties;      //закэшированные свойства
+  stl::auto_ptr<EffectHolder> effect_holder;           //хранилище эффекта
+  EntityArray                 entities;                //список объектов, отображаемых в кадре
+  FrameArray                  frames;                  //список вложенных кадров
+  PropertyBuffer              properties;              //свойства кадра
+  PropertyCache               entities_properties;     //динамические свойства объектов
+  ShaderOptionsCache          shader_options_cache;    //кэш опций шейдера
+  RenderTargetDescMap         render_targets;          //целевые буферы отрисовки
+  TextureMap                  textures;                //локальные текстуры фрейма
+  bool                        scissor_state;           //включено ли отсечение  
+  size_t                      clear_flags;             //флаги очистки
+  math::vec4f                 clear_color;             //цвет очистки фона
+  float                       clear_depth_value;       //значение буфера глубины после очистки
+  unsigned char               clear_stencil_index;     //значение буфера трафарета после очистки
+  LowLevelBufferPtr           cached_properties;       //закэшированные свойства
+  EntityDrawFunction          entity_draw_handler;     //обработчик рисования объектов
+  EntityDrawParams            entity_draw_params;      //параметры рисования объектов (кэш)
 
 ///Конструктор
   Impl (const DeviceManagerPtr& device_manager, const EffectManagerPtr& effect_manager)
@@ -141,6 +131,12 @@ struct FrameImpl::Impl: public CacheHolder
     
     entities.reserve (RESERVED_ENTITIES_COUNT);
     frames.reserve (RESERVED_FRAMES_COUNT);
+  }
+  
+///Получение номера уровня детализации по расстоянию
+  size_t GetLod (double distance)
+  {
+    return size_t (log (distance));
   }
   
 ///Работа с кэшем
@@ -502,9 +498,7 @@ void FrameImpl::SetEffect (const char* name)
     if (!name)
       throw xtl::make_null_argument_exception ("", "name");
     
-    impl->effect_holder->effect = impl->effect_holder->effect_manager->GetEffectProxy (name);
-    
-    impl->effect_holder->need_operations_update = true;
+    impl->effect_holder->effect = impl->effect_holder->effect_manager->GetEffectProxy (name);    
     
     impl->effect_holder->ResetCache ();
   }
@@ -581,7 +575,7 @@ void FrameImpl::SetShaderOptions (const common::PropertyMap& properties)
   }
 }
 
-const common::PropertyMap& FrameImpl::ShaderOptions () const
+const common::PropertyMap& FrameImpl::ShaderOptions ()
 {
   return impl->shader_options_cache.Properties ();
 }
@@ -597,43 +591,13 @@ size_t FrameImpl::EntitiesCount ()
 
 void FrameImpl::AddEntity (const EntityPtr& entity)
 {
-  impl->entities.push_back (EntityDesc (entity));
-  
-  impl->effect_holder->need_operations_update = true;
-}
-
-void FrameImpl::AddEntity (const EntityPtr& entity, const common::PropertyMap& properties, const math::mat4f& mvp_matrix)
-{
-  //TODO: add mvp matrix processing
-  try
-  {
-    LowLevelBufferPtr          properties_buffer = 0;
-    ProgramParametersLayoutPtr properties_layout = 0;
-    
-    impl->entities_properties.Convert (properties, properties_buffer, properties_layout);
-    
-    impl->entities.push_back (EntityDesc (entity, properties_buffer, properties_layout));
-  
-    impl->effect_holder->need_operations_update = true;
-  }
-  catch (xtl::exception& e)
-  {
-    e.touch ("render::FrameImpl::AddEntity(const EntityPtr&,const common::PropertyMap&)");
-    throw;
-  }
-}
-
-void FrameImpl::AddEntity (const EntityPtr& entity, const EntityDrawHandler& handler)
-{
-  throw xtl::make_not_implemented_exception ("render::FrameImpl::AddEntity");
+  impl->entities.push_back (EntityDesc (entity));  
 }
 
 void FrameImpl::RemoveAllEntities ()
 {
   impl->entities.clear ();
-  impl->entities_properties.Flush ();
-  
-  impl->effect_holder->need_operations_update = true;
+  impl->entities_properties.Flush ();  
 }
 
 /*
@@ -647,16 +611,88 @@ size_t FrameImpl::FramesCount ()
 
 void FrameImpl::AddFrame (const FramePtr& frame)
 {
-  impl->frames.push_back (frame);
-  
-  impl->effect_holder->need_operations_update = true;
+  impl->frames.push_back (frame);  
 }
 
 void FrameImpl::RemoveAllFrames ()
 {
-  impl->frames.clear ();
+  impl->frames.clear ();  
+}
+
+/*
+    Установка пользовательского обработчика рисования объектов
+*/
+
+void FrameImpl::SetEntityDrawHandler (const EntityDrawFunction& handler)
+{
+  impl->entity_draw_handler = handler;
+}
+
+const Frame::EntityDrawFunction& FrameImpl::EntityDrawHandler ()
+{
+  return impl->entity_draw_handler;
+}
+
+/*
+    Подготовка к отрисовке кадра
+*/
+
+void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
+{
+    //построение списка операций
+    
+  render::EffectRenderer& renderer                = *impl->effect_holder->effect_renderer;    
+  Frame                   frame                   = Wrappers::Wrap<Frame> (this);
+  bool                    has_entity_draw_handler = entity_draw_handler;
+  EntityDrawParams&       entity_draw_params      = impl->entity_draw_params;
+  PropertyCache&          entities_properties     = impl->entities_properties;
   
-  impl->effect_holder->need_operations_update = true;
+  renderer.RemoveAllOperations ();
+  
+  entity_draw_params.mvp_matrix = math::mat4f (1.0f);
+  
+  for (EntityArray::iterator iter=impl->entities.begin (), end=impl->entities.end (); iter!=end; ++iter)
+  {
+    EntityDesc& desc = *iter;
+    
+      //пропуск рисования пустых объектов
+    
+    if (!desc.entity->LodsCount ())
+      continue;
+      
+      //обновление динамических текстур
+      
+    DynamicTextureEntityStorage& dynamic_textures = desc.entity->DynamicTextureStorage ();
+    
+    dynamic_textures.Update (this);
+      
+      //вызов обработчика      
+
+    size_t lod = 0;
+      
+    if (has_entity_draw_handler)
+    {
+      entity_draw_handler (frame, Wrappers::Wrap<Entity> (desc.entity), entity_draw_params);
+      
+        //заполнение константного буфера соответствующего паре frame-entity
+      
+      entities_properties.Convert (entity_draw_params.properties, desc.property_buffer, desc.layout);
+      
+        //расчёт расстояния от z-near до объекта        
+        
+      math::vec4f mvp_lod_point = entity_draw_params.mvp_matrix * math::vec4f (desc.entity->LodPoint (), 1.0f); 
+      double      distance      = stl::min (stl::max (mvp_lod_point.z / mvp_lod_point.w, 1.0f), 0.0f);
+
+      lod = impl->GetLod (distance * ~0u);
+    }    
+
+    renderer.AddOperations (desc.entity->RendererOperations (lod, true), entity_draw_params.mvp_matrix, desc.property_buffer.get (), desc.layout.get ());
+  }
+  
+  for (FrameArray::iterator iter=impl->frames.begin (), end=impl->frames.end (); iter!=end; ++iter)
+  {
+    renderer.AddOperations (**iter);
+  }
 }
 
 /*
@@ -670,34 +706,12 @@ void FrameImpl::Draw (RenderingContext* previous_context)
     RenderingContext context (*this, previous_context);
     
     if (!impl->effect_holder->effect_renderer)
-      throw xtl::format_operation_exception ("", "No effect assigned");            
+      throw xtl::format_operation_exception ("", "No effect assigned");
       
       //построение списка операций
       
-    if (impl->effect_holder->need_operations_update)
-    {
-      render::EffectRenderer& renderer = *impl->effect_holder->effect_renderer;
+    Prerender (impl->entity_draw_handler);
       
-      renderer.RemoveAllOperations ();
-      
-      for (EntityArray::iterator iter=impl->entities.begin (), end=impl->entities.end (); iter!=end; ++iter)
-      {
-        EntityDesc& desc = *iter;
-        
-        if (!desc.entity->LodsCount ())
-          continue;
-          
-        size_t lod = 0; //TODO: lod detection
-
-        renderer.AddOperations (desc.entity->RendererOperations (lod, true), desc.property_buffer.get (), desc.layout.get ());
-      }
-      
-      for (FrameArray::iterator iter=impl->frames.begin (), end=impl->frames.end (); iter!=end; ++iter)
-      {
-        renderer.AddOperations (**iter);
-      }
-    }      
-
       //выполнение операций рендеринга
 
     impl->effect_holder->effect_renderer->ExecuteOperations (context);

@@ -186,16 +186,6 @@ void Frame::AddEntity (const Entity& entity)
   impl->AddEntity (Wrappers::Unwrap<EntityImpl> (entity));
 }
 
-void Frame::AddEntity (const Entity& entity, const common::PropertyMap& properties, const math::mat4f& mvp_matrix)
-{
-  impl->AddEntity (Wrappers::Unwrap<EntityImpl> (entity), properties, mvp_matrix);
-}
-
-void Frame::AddEntity (const Entity& entity, const EntityDrawHandler& handler)
-{
-  impl->AddEntity (Wrappers::Unwrap<EntityImpl> (entity), handler);
-}
-
 void Frame::RemoveAllEntities ()
 {
   impl->RemoveAllEntities ();
@@ -220,6 +210,16 @@ void Frame::RemoveAllFramesAndEntities ()
 {
   impl->RemoveAllFrames ();
   impl->RemoveAllEntities ();
+}
+
+void Frame::SetEntityDrawHandler (const EntityDrawFunction& handler)
+{
+  impl->SetEntityDrawHandler (handler);
+}
+
+const Frame::EntityDrawFunction& Frame::EntityDrawHandler () const
+{
+  return impl->EntityDrawHandler ();
 }
 
 void Frame::Draw ()

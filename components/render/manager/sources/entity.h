@@ -9,6 +9,7 @@ struct RendererOperation
   render::low_level::IStateBlock* state_block;                    //блок состояний объекта
   ProgramParametersLayout*        entity_parameters_layout;       //расположение параметров объекта
   ProgramParametersLayout*        frame_entity_parameters_layout; //расположение параметров пары фрейм-объект
+  size_t                          eye_distance;                   //расстояние от z-near
   const RendererPrimitive*        primitive;                      //примитив
 };
 
@@ -75,6 +76,12 @@ class EntityImpl: public Object
     bool         HasPrimitive        (size_t level_of_detail);
     void         ResetAllPrimitives  ();
     
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Точка в локальной системе координат объекта для расчёта удаленности от камеры
+///////////////////////////////////////////////////////////////////////////////////////////////////
+   void               SetLodPoint (const math::vec3f&);
+   const math::vec3f& LodPoint    ();
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение операций рендеринга
 ///////////////////////////////////////////////////////////////////////////////////////////////////

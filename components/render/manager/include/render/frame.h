@@ -78,10 +78,8 @@ void swap (RectArea&, RectArea&);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct EntityDrawParams
 {
-  common::PropertyMap& properties; //свойства пары фрейм-объект
-  math::mat4f&         mvp_matrix; //матрица model-view-projection
-  
-  EntityDrawParams (common::PropertyMap& in_properties, math::mat4f& in_mvp_matrix) : properties (in_properties), mvp_matrix (in_mvp_matrix) {}
+  common::PropertyMap properties; //свойства пары фрейм-объект
+  math::mat4f         mvp_matrix; //матрица model-view-projection
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,12 +174,8 @@ class Frame
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Список отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef xtl::function<void (Frame& frame, Entity& entity, EntityDrawParams& out_params)> EntityDrawHandler;
-
     size_t EntitiesCount     () const;
     void   AddEntity         (const Entity& entity);
-    void   AddEntity         (const Entity& entity, const common::PropertyMap& properties, const math::mat4f& mvp_matrix = math::mat4f (1.0f));
-    void   AddEntity         (const Entity& entity, const EntityDrawHandler& handler);
     void   RemoveAllEntities ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,6 +189,14 @@ class Frame
 ///Удаление всех объектов из кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void RemoveAllFramesAndEntities ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Пользовательский обработчик отрисовки объектов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef xtl::function<void (Frame& frame, Entity& entity, EntityDrawParams& out_params)> EntityDrawFunction;
+
+    void                      SetEntityDrawHandler (const EntityDrawFunction& handler);
+    const EntityDrawFunction& EntityDrawHandler    () const;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование кадра

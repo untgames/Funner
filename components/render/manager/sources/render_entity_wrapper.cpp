@@ -105,6 +105,16 @@ void Entity::ResetAllPrimitives ()
   impl->ResetAllPrimitives ();
 }
 
+void Entity::SetLodPoint (const math::vec3f& p)
+{
+  impl->SetLodPoint (p);
+}
+
+const math::vec3f& Entity::LodPoint () const
+{
+  return impl->LodPoint ();
+}
+
 void Entity::Swap (Entity& entity)
 {
   stl::swap (impl, entity.impl);

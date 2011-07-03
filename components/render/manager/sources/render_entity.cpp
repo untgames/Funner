@@ -435,6 +435,7 @@ struct EntityImpl::Impl: public EntityLodCommonData
   EntityLodArray      lods;              //уровни детализации
   bool                need_resort;       //уровни детализации требуют пересортировки
   PrimitiveManagerPtr primitive_manager; //менеджер примитивов
+  math::vec3f         lod_point;         //точка расчёта lod-уровня
 
 ///Конструктор
   Impl (EntityImpl& owner, const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const PrimitiveManagerPtr& in_primitive_manager)
@@ -696,6 +697,20 @@ void EntityImpl::ResetAllPrimitives ()
   impl->lods.clear ();
 
   impl->need_resort = false;
+}
+
+/*
+    Точка в локальной системе координат объекта для расчёта удаленности от камеры
+*/
+
+void EntityImpl::SetLodPoint (const math::vec3f& p)
+{
+  impl->lod_point = p;
+}
+
+const math::vec3f& EntityImpl::LodPoint ()
+{
+  return impl->lod_point;
 }
 
 /*

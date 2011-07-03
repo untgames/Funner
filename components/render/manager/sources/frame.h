@@ -108,17 +108,13 @@ class FrameImpl: public Object
 ///Макро-определения шейдера
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void                       SetShaderOptions (const common::PropertyMap&);
-    const common::PropertyMap& ShaderOptions    () const;    
+    const common::PropertyMap& ShaderOptions    ();    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Список отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    typedef Frame::EntityDrawHandler EntityDrawHandler;
-
     size_t EntitiesCount     ();
     void   AddEntity         (const EntityPtr& entity);
-    void   AddEntity         (const EntityPtr& entity, const common::PropertyMap& properties, const math::mat4f& mvp_matrix);
-    void   AddEntity         (const EntityPtr& entity, const EntityDrawHandler& handler);
     void   RemoveAllEntities ();
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,11 +123,20 @@ class FrameImpl: public Object
     size_t FramesCount     ();
     void   AddFrame        (const FramePtr& frame);
     void   RemoveAllFrames ();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Пользовательский обработчик отрисовки объектов
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    typedef Frame::EntityDrawFunction EntityDrawFunction;    
+
+    void                      SetEntityDrawHandler (const EntityDrawFunction& handler);
+    const EntityDrawFunction& EntityDrawHandler    ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Рисование кадра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Draw (RenderingContext* previous = 0);
+    void Prerender (EntityDrawFunction handler); //без ссылки: на случай попытки обновления обработчика во время обхода
+    void Draw      (RenderingContext* previous = 0);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Управление кэшированием
