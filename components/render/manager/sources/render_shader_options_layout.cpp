@@ -137,6 +137,9 @@ ShaderOptionsLayout::~ShaderOptionsLayout ()
 
 size_t ShaderOptionsLayout::CachedShaderBuildersCount ()
 {
+  if (impl->need_flush)
+    impl->FlushCache ();
+
   return impl->builders.size ();
 }
 
