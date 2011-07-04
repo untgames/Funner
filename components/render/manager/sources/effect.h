@@ -3,6 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 enum SortMode
 {
+  SortMode_None,        //без сортировки
   SortMode_FrontToBack, //сортировать от ближнего примитива к дальнему
   SortMode_BackToFront, //сортировать от дальнего примитива к ближнему
   SortMode_StateSwitch, //группировать примитивы с целью сокращения количества переключений состояний
@@ -158,6 +159,7 @@ class EffectRenderer: public Object
 ///Добавление операций в список отрисовки
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     void AddOperations (const RendererOperationList& operations,
+                        size_t                       eye_distance,
                         const math::mat4f&           mvp_matrix,
                         render::low_level::IBuffer*  property_buffer = 0,
                         ProgramParametersLayout*     property_layour= 0);

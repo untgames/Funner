@@ -8,8 +8,6 @@ struct RendererOperation
   EntityImpl*                     entity;                         //объект
   render::low_level::IStateBlock* state_block;                    //блок состояний объекта
   ProgramParametersLayout*        entity_parameters_layout;       //расположение параметров объекта
-  ProgramParametersLayout*        frame_entity_parameters_layout; //расположение параметров пары фрейм-объект
-  size_t                          eye_distance;                   //расстояние от z-near
   const RendererPrimitive*        primitive;                      //примитив
 };
 

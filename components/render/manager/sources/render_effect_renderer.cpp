@@ -19,8 +19,76 @@ const size_t RESERVE_FRAME_ARRAY     = 32;  //резервируемое число вложенных фрей
     Вспомогательные структуры
 */
 
-typedef stl::vector<RendererOperation*> OperationPtrArray;
-typedef stl::vector<RendererOperation>  OperationArray;
+//Операция прохода
+struct PassOperation: public RendererOperation
+{
+  ProgramParametersLayout*     frame_entity_parameters_layout; //расположение параметров пары фрейм-объект
+  render::low_level::IBuffer*  frame_entity_parameters_buffer; //буфер параметров пары фрейм-объект
+  size_t                       eye_distance;                   //расстояние от z-near
+  
+///Конструктор
+  PassOperation (const RendererOperation&    base,
+                 ProgramParametersLayout*    in_frame_entity_parameters_layout,
+                 render::low_level::IBuffer* in_frame_entity_parameters_buffer,
+                 size_t                      in_eye_distance)
+    : RendererOperation (base)
+    , frame_entity_parameters_layout (in_frame_entity_parameters_layout)
+    , frame_entity_parameters_buffer (in_frame_entity_parameters_buffer)
+    , eye_distance (in_eye_distance)
+  {
+  }
+};
+
+typedef stl::vector<PassOperation*> OperationPtrArray;
+typedef stl::vector<PassOperation>  OperationArray;
+
+///Компаратор от наиболее близкого объекта к наиболее удаленному
+struct FrontToBackComparator
+{
+  bool operator () (const PassOperation* op1, const PassOperation* op2) const
+  {
+    return op1->eye_distance < op2->eye_distance;
+  }
+};
+
+///Компаратор от наиболее удаленного объекта к наиболее близкому
+struct BackToFrontComparator
+{
+  bool operator () (const PassOperation* op1, const PassOperation* op2) const
+  {
+    return op1->eye_distance > op2->eye_distance;
+  }
+};
+
+///Компаратор по кэшированию состояний
+struct StateSwitchComparator
+{
+  template <class T> bool compare (const T* obj1, const T* obj2, bool& result) const
+  {
+    if (obj1 == obj2)
+      return false;
+      
+    result = obj1 < obj2;
+    
+    return true;
+  }
+
+  bool operator () (const PassOperation* op1, const PassOperation* op2) const
+  {
+    bool result = false;
+          
+    if (compare (op1->primitive, op2->primitive, result))
+      return result;    
+      
+    if (compare (op1->primitive->material, op2->primitive->material, result))
+      return result;
+
+    if (compare (op1->entity, op2->entity, result))
+      return result;    
+
+    return false;    
+  }
+};
 
 ///Проход рендеринга
 struct RenderPass: public xtl::reference_counter
@@ -46,6 +114,31 @@ struct RenderPass: public xtl::reference_counter
   {
     operations.reserve (RESERVE_OPERATION_ARRAY);
     operation_ptrs.reserve (operations.size ());
+  }
+  
+///Сортировка
+  void Sort ()
+  {
+    switch (sort_mode)
+    {
+      case SortMode_FrontToBack:
+        Sort (FrontToBackComparator ());
+        break;
+      case SortMode_BackToFront:
+        Sort (BackToFrontComparator ());      
+        break;
+      case SortMode_StateSwitch:
+        Sort (StateSwitchComparator ());      
+        break;
+      default:
+      case SortMode_None:
+        break;        
+    }
+  }
+  
+  template <class Compare> void Sort (Compare fn)
+  {
+    stl::sort (operation_ptrs.begin (), operation_ptrs.end (), fn);
   }
 };
 
@@ -188,12 +281,11 @@ EffectRenderer::~EffectRenderer ()
 
 void EffectRenderer::AddOperations
  (const RendererOperationList& operations_desc,
+  size_t                       eye_distance,
   const math::mat4f&           mvp_matrix,
   render::low_level::IBuffer*  property_buffer,
   ProgramParametersLayout*     property_layout)
 {
-    //TODO: work with properties
-
   static const char* METHOD_NAME = "render::EffectRenderer::AddOperations(const RendererOperationList&)";
 
   if (!operations_desc.operations && operations_desc.operations_count)
@@ -219,12 +311,10 @@ void EffectRenderer::AddOperations
         if (pass.last_operation == operation)
           continue;
 
-        pass.operations.push_back (*operation);
+        pass.operations.push_back (PassOperation (*operation, property_layout, property_buffer, eye_distance));
 
-        RendererOperation& result_operation = pass.operations.back ();
-
-        result_operation.frame_entity_parameters_layout = property_layout;
-
+        PassOperation& result_operation = pass.operations.back ();
+        
         pass.operation_ptrs.push_back (&result_operation);
 
         pass.last_operation = operation;
@@ -317,8 +407,8 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
           pass.state_block->Apply ();
           
           //сортировка операций
-
-//  SortMode                 sort_mode;             //режим сортировки          
+          
+        pass.Sort ();
 
           //установка целевых буферов отрисовки
           
@@ -435,7 +525,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
 
         for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end; ++iter)
         {
-          const RendererOperation& operation = **iter;
+          const PassOperation&     operation = **iter;
           const RendererPrimitive& primitive = *operation.primitive;
           
             //применение состояния операции

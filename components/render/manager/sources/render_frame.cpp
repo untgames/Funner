@@ -668,7 +668,7 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
       
       //вызов обработчика      
 
-    size_t lod = 0;
+    size_t eye_distance = 0, lod = 0;
       
     if (has_entity_draw_handler)
     {
@@ -681,12 +681,13 @@ void FrameImpl::Prerender (EntityDrawFunction entity_draw_handler)
         //расчёт расстояния от z-near до объекта        
         
       math::vec4f mvp_lod_point = entity_draw_params.mvp_matrix * math::vec4f (desc.entity->LodPoint (), 1.0f); 
-      double      distance      = stl::min (stl::max (mvp_lod_point.z / mvp_lod_point.w, 1.0f), 0.0f);
-
-      lod = impl->GetLod (distance * ~0u);
+      double      distance      = stl::min (stl::max (mvp_lod_point.z / mvp_lod_point.w, 1.0f), 0.0f) * ~0u;
+      
+      eye_distance = size_t (distance);
+      lod          = impl->GetLod (distance);
     }    
 
-    renderer.AddOperations (desc.entity->RendererOperations (lod, true), entity_draw_params.mvp_matrix, desc.property_buffer.get (), desc.layout.get ());
+    renderer.AddOperations (desc.entity->RendererOperations (lod, true), eye_distance, entity_draw_params.mvp_matrix, desc.property_buffer.get (), desc.layout.get ());
   }
   
   for (FrameArray::iterator iter=impl->frames.begin (), end=impl->frames.end (); iter!=end; ++iter)

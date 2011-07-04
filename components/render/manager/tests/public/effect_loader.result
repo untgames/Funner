@@ -23,17 +23,5 @@ render.manager: Effect program 'helper' loaded
 render.manager: Effect 'main' loaded
 render.manager: Effect 'shadow' loaded
 render.manager: Effect 'lighting' loaded
-render.manager: data/shaders/phong.vert: Vertex shader was successfully compiled to run on hardware.
-render.manager: data/shaders/phong.frag: Fragment shader was successfully compiled to run on hardware.
-render.manager: glsl.phong: Fragment shader(s) linked, vertex shader(s) linked. 
-
-render.manager: data/shaders/shadow.vert: Vertex shader was successfully compiled to run on hardware.
-render.manager: data/shaders/shadow.frag: Fragment shader was successfully compiled to run on hardware.
-render.manager: glsl.shadow_map: Fragment shader(s) linked, vertex shader(s) linked. 
-
-render.manager: data/shaders/debug.vert: Vertex shader was successfully compiled to run on hardware.
-render.manager: data/shaders/debug.frag: Fragment shader was successfully compiled to run on hardware.
-render.manager: glsl.helper: Fragment shader(s) linked, vertex shader(s) linked. 
-
 Effects loaded
 window 784x562 removed

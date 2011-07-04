@@ -505,7 +505,9 @@ class EffectLoader
           //отсечение стандартных сообщений об отсутствии ошибок
           
         static const char* IGNORE_MESSAGES [] = {
-          "*: No errors."
+          "*: No errors.",
+          "Fragment shader(s) linked, vertex shader(s) linked*",
+          "*shader was successfully compiled to run on hardware."
         };
         
         static const size_t IGNORE_MESSAGES_COUNT = sizeof (IGNORE_MESSAGES) / sizeof (*IGNORE_MESSAGES);
@@ -632,6 +634,7 @@ class EffectLoader
       if (!xtl::xstrcmp (value, "states"))        return SortMode_StateSwitch;
       if (!xtl::xstrcmp (value, "back_to_front")) return SortMode_BackToFront;
       if (!xtl::xstrcmp (value, "front_to_back")) return SortMode_FrontToBack;
+      if (!xtl::xstrcmp (value, "none"))          return SortMode_None;
       
       raise_parser_exception (node, "Unexpected sort mode '%s'", value);
       
