@@ -88,4 +88,3 @@ class ShaderOptionsCache: public Object
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
-

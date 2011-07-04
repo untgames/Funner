@@ -4,8 +4,8 @@
 struct TexmapDesc
 {
   size_t      channel;    //номер текстурного канала
-  const char* semantic;   //им€ семантики в media::rfx::Texmap
-  const char* param_name; //им€ параметра в шейдере
+  stl::string semantic;   //им€ семантики в media::rfx::Texmap
+  stl::string param_name; //им€ параметра в шейдере
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,17 +21,38 @@ class Program: public Object, public CacheSource
     ~Program ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+///Ўейдеры программы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    void Attach           (const media::rfx::Shader&);
+    void Detach           (const media::rfx::Shader&);
+    void DetachAllShaders ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
 ///ќтображение семантики текстурной карты на номер канала и им€ параметра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t            TexmapsCount     ();
     const TexmapDesc* Texmaps          ();
     const TexmapDesc& Texmap           (size_t index);
     void              SetTexmap        (size_t index, size_t channel, const char* semantic, const char* param_name);
+    size_t            AddTexmap        (size_t channel, const char* semantic, const char* param_name);    
     void              RemoveTexmap     (size_t index);
     void              RemoveAllTexmaps ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕолучение производной программы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    Program& DerivedProgram (const ShaderOptions&);
+    Program& DerivedProgram (const ShaderOptionsCache&);
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///ѕолучение низкоуровневой программы шейдинга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    const LowLevelProgramPtr& LowLevelProgram (render::low_level::IDevice&);
+    
+  private:
+    Program (Program& parent, const ShaderOptions&);
 
   private:
     struct Impl;
     stl::auto_ptr<Impl> impl;
 };
-

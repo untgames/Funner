@@ -47,14 +47,17 @@ class EffectPass;
 class EffectRenderer;
 class MaterialManager;
 class PrimitiveManager;
+class Program;
 class ProgramParametersLayout;
 class RenderingContext;
 class Settings;
+class ShaderOptionsCache;
 class ShadingManager;
 class TextureManager;
 class InstantiatedEffect;
 struct RendererOperationList;
 struct RenderTargetDesc;
+struct ShaderOptions;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Указатели на объекты рендера среднего уровня
@@ -73,6 +76,7 @@ typedef xtl::intrusive_ptr<MaterialManager>         MaterialManagerPtr;
 typedef xtl::intrusive_ptr<PrimitiveImpl>           PrimitivePtr;
 typedef xtl::intrusive_ptr<PrimitiveBuffersImpl>    PrimitiveBuffersPtr;
 typedef xtl::intrusive_ptr<PrimitiveManager>        PrimitiveManagerPtr;
+typedef xtl::intrusive_ptr<Program>                 ProgramPtr;
 typedef xtl::intrusive_ptr<ProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::intrusive_ptr<RectAreaImpl>            RectAreaPtr;
 typedef xtl::intrusive_ptr<RenderManagerImpl>       RenderManagerPtr;
@@ -188,6 +192,7 @@ class DebugIdHolder: public xtl::noncopyable
 #include "primitive.h"
 #include "primitive_buffers.h"
 #include "primitive_manager.h"
+#include "program.h"
 #include "property_buffer.h"
 #include "property_cache.h"
 #include "rect_area.h"
