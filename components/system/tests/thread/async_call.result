@@ -1,0 +1,4 @@
+Results of action_queue_thread_wrapper_result:
+action executed in thread not creator
+result is 'Hello world'
+callback executed in thread creator

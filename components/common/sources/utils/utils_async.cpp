@@ -3,12 +3,15 @@
 #include <xtl/bind.h>
 #include <xtl/common_exceptions.h>
 #include <xtl/function.h>
+#include <xtl/intrusive_ptr.h>
 #include <xtl/reference_counter.h>
 #include <xtl/string_buffer.h>
 
 #include <common/action_queue.h>
 #include <common/async.h>
 #include <common/lockable.h>
+
+#include <platform/platform.h>
 
 using namespace common;
 
@@ -59,6 +62,48 @@ struct AsyncResult::Impl: public xtl::reference_counter, public Lockable
     AddToQueue ();
   }
   
+  struct ThreadCallback
+  {
+    CallbackHandler handler;
+    ActionThread    thread_type;
+    size_t          thread_id;    
+    
+    ThreadCallback (ActionThread in_thread_type, const CallbackHandler& in_handler)
+      : handler (in_handler)
+      , thread_type (in_thread_type)
+      , thread_id (Platform::GetCurrentThreadId ())
+    {
+    }
+    
+    void operator () (AsyncResult& result)
+    {
+      switch (thread_type)
+      {
+        case ActionThread_Main:
+        case ActionThread_Background:        
+          ActionQueue::PushAction (xtl::bind (handler, result), thread_type);
+          break;
+        case ActionThread_Current:
+          ActionQueue::PushAction (xtl::bind (handler, result), thread_id);
+          break;
+        default:
+          throw xtl::format_operation_exception ("common::AsyncResult::ThreadCallback::operator()", "Bad ActionThread %d", thread_type);
+      }      
+    }
+  };
+  
+  Impl (detail::IAsyncAction* action, ActionThread thread, const CallbackHandler& in_callback)
+    : async_action (action)
+    , result (0)
+    , callback (ThreadCallback (thread, in_callback))
+    , completed (false)
+  {
+    if (!action)
+      throw xtl::make_null_argument_exception ("common::AsyncResult::Impl", "action");
+      
+    AddToQueue ();
+  }  
+  
   ~Impl ()
   {
     try
@@ -77,11 +122,13 @@ struct AsyncResult::Impl: public xtl::reference_counter, public Lockable
   
   void AddToQueue ()
   {
-    action = ActionQueue::PushAction (xtl::bind (&Impl::Perform, this), ActionThread_Current);
+    action = ActionQueue::PushAction (xtl::bind (&Impl::Perform, xtl::intrusive_ptr<Impl> (this)), ActionThread_Background);
   }
   
   void Perform ()
   {
+    xtl::intrusive_ptr<Impl> hold_this = this;    
+    
     detail::IAsyncResult* tmp_result     = 0;
     bool                  tmp_completed  = false;
     
@@ -92,10 +139,12 @@ struct AsyncResult::Impl: public xtl::reference_counter, public Lockable
     }
     catch (...)
     {
-    }
+    }        
+    
+    action = Action ();
     
     CallbackHandler tmp_callback;
-    
+
     {
       common::Lock lock (*this);
       
@@ -105,7 +154,7 @@ struct AsyncResult::Impl: public xtl::reference_counter, public Lockable
       
       async_action.reset ();
       callback.clear ();      
-    }        
+    }            
 
     if (tmp_callback)
     {
@@ -150,6 +199,11 @@ AsyncResult::AsyncResult (detail::IAsyncAction* action)
 
 AsyncResult::AsyncResult (detail::IAsyncAction* action, const CallbackHandler& callback)
   : impl (new Impl (action, callback))
+{
+}
+
+AsyncResult::AsyncResult (detail::IAsyncAction* action, ActionThread thread, const CallbackHandler& callback)
+  : impl (new Impl (action, thread, callback))
 {
 }
 

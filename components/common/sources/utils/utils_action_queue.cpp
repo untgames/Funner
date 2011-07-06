@@ -638,7 +638,7 @@ bool Action::IsCompleted () const
 {
   ActionLock locked_impl (impl);
 
-  return impl ? impl->is_completed : false;
+  return impl ? impl->is_completed : true;
 }
 
 bool Action::IsCanceled () const
@@ -655,7 +655,7 @@ bool Action::Wait (size_t milliseconds)
     ActionLock locked_impl (impl);
     
     if (!impl)
-      throw xtl::format_operation_exception ("", "Can't wait for empty action is empty");
+      return true;
 
     return impl->wait_handler (*this, milliseconds);
   }
