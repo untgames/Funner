@@ -7,6 +7,7 @@
 #include <xtl/lock_ptr.h>
 #include <xtl/reference_counter.h>
 #include <xtl/signal.h>
+#include <xtl/trackable_ptr.h>
 
 #include <common/action_queue.h>
 #include <common/component.h>
@@ -188,15 +189,18 @@ class ThreadActionQueue: public xtl::reference_counter
     ActionList actions;
 };
 
+typedef xtl::intrusive_ptr<ThreadActionQueue> ThreadActionQueuePtr;
+
 /*
     Реализация очереди действий
 */
 
-class ActionQueueImpl
+class ActionQueueImpl: public xtl::trackable
 {
   public:
-    typedef ActionQueue::time_t        time_t;
-    typedef ActionQueue::ActionHandler ActionHandler;
+    typedef ActionQueue::time_t          time_t;
+    typedef ActionQueue::ActionHandler   ActionHandler;
+    typedef ActionQueue::CallbackHandler CallbackHandler;
     
 ///Конструктор
     ActionQueueImpl ()
@@ -210,32 +214,77 @@ class ActionQueueImpl
     {
       try
       {
+        switch (thread)
+        {
+          case ActionThread_Current:
+          case ActionThread_Main:
+          case ActionThread_Background:
+            break;
+          default:
+            throw xtl::make_argument_exception ("", "thread", thread);
+        }
+
         ActionPtr action (new ActionImpl (action_handler, thread, is_periodic, timer, delay, period, default_wait_handler), false);
 
         ThreadActionQueue& queue = GetQueue (thread);
-
-        queue.PushAction (action);
-
-        Action result = action->GetWrapper ();
-
-        try
-        {
-          static common::ComponentLoader loader (ACTION_QUEUE_LISTENERS_COMPONENT_MASK);
-          
-          signals [ActionQueueEvent_OnPushAction] (thread, result);
-        }
-        catch (...)
-        {
-          //подавление всех исключений
-        }
-
-        return result;
+        
+        return PushAction (action, queue);
       }
       catch (xtl::exception& e)
       {
-        e.touch ("common::ActionQueue::PushAction");
+        e.touch ("common::ActionQueue::PushAction(const ActionHandler&,ActionThread,bool,time_t,time_t,Timer&)");
         throw;
       }
+    }
+    
+///Создание диспетчера функции обратного вызова в указанной нити
+    struct ThreadCallbackWrapper
+    {
+      ActionPtr                            action;
+      ThreadActionQueue&                   thread_queue;
+      xtl::trackable_ptr<ActionQueueImpl>  action_queue;
+      
+      ThreadCallbackWrapper (ActionQueueImpl& in_action_queue, const ActionPtr& in_action, ThreadActionQueue& in_thread_queue)
+        : action (in_action)
+        , thread_queue (in_thread_queue)
+        , action_queue (&in_action_queue)
+      {
+      }
+      
+      void operator () () const
+      {
+        if (!action_queue)
+          return;
+
+        action_queue->PushAction (action, thread_queue);
+      }
+    };    
+
+    CallbackHandler CreateCallbackWrapper (ActionThread thread, const CallbackHandler& callback_handler)
+    {
+      try
+      {
+        switch (thread)
+        {
+          case ActionThread_Current:
+          case ActionThread_Main:
+          case ActionThread_Background:
+            break;
+          default:
+            throw xtl::make_argument_exception ("", "thread", thread);
+        }
+
+        ActionPtr action (new ActionImpl (xtl::bind (callback_handler), ActionThread_Current, false, DefaultTimer (), 0, 0, default_wait_handler), false);
+
+        ThreadActionQueue& queue = GetQueue (thread);
+
+        return ThreadCallbackWrapper (*this, action, queue);
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("common::ActionQueue::Impl::CreateCallbackWrapper");
+        throw;
+      }      
     }
 
 ///Размер очереди
@@ -250,25 +299,34 @@ class ActionQueueImpl
           case ActionThread_Background:
             return background_queue.Size ();
           case ActionThread_Current:
-          {        
-            Platform::threadid_t thread_id = Platform::GetCurrentThreadId ();
-
-            ThreadActionQueueMap::iterator iter = thread_queues.find (thread_id);
-
-            if (iter == thread_queues.end ())
-              return 0;
-
-            ThreadActionQueuePtr queue = iter->second;
-
-            return queue->Size ();
-          }
+            return ActionsCount (Platform::GetCurrentThreadId ());
           default:
             throw xtl::make_argument_exception ("", "thread", thread);
         }
       }
       catch (xtl::exception& e)
       {
-        e.touch ("common::ActionQueue::QueueActionsCount");
+        e.touch ("common::ActionQueue::ActionsCount(ActionThread)");
+        throw;
+      }
+    }
+    
+    size_t ActionsCount (size_t thread_id)
+    {
+      try
+      {
+        ThreadActionQueueMap::iterator iter = thread_queues.find (thread_id);
+
+        if (iter == thread_queues.end ())
+          return 0;
+
+        ThreadActionQueuePtr queue = iter->second;
+
+        return queue->Size ();
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("common::ActionQueue::ActionsCount(size_t)");
         throw;
       }
     }
@@ -350,6 +408,35 @@ class ActionQueueImpl
     Timer& DefaultTimer () { return default_timer; }    
 
   private:
+///Помещение действия в очередь
+    Action PushAction (const ActionPtr& action, ThreadActionQueue& queue)
+    {
+      try
+      {
+        queue.PushAction (action);
+
+        Action result = action->GetWrapper ();
+
+        try
+        {
+          static common::ComponentLoader loader (ACTION_QUEUE_LISTENERS_COMPONENT_MASK);
+          
+          signals [ActionQueueEvent_OnPushAction] (action->thread_type, result);
+        }
+        catch (...)
+        {
+          //подавление всех исключений
+        }
+
+        return result;
+      }
+      catch (xtl::exception& e)
+      {
+        e.touch ("common::ActionQueue::PushAction");
+        throw;
+      }
+    }  
+  
 ///Получение очереди нити
     ThreadActionQueue& GetQueue (ActionThread thread)
     {
@@ -400,7 +487,6 @@ class ActionQueueImpl
     }
 
   private:
-    typedef xtl::intrusive_ptr<ThreadActionQueue>                     ThreadActionQueuePtr;
     typedef stl::hash_map<Platform::threadid_t, ThreadActionQueuePtr> ThreadActionQueueMap;
     typedef xtl::signal<void (ActionThread, Action&)>                 Signal;
 
@@ -464,6 +550,11 @@ size_t ActionQueue::ActionsCount (ActionThread thread)
   return ActionQueueSingleton::Instance ()->ActionsCount (thread);
 }
 
+size_t ActionQueue::ActionsCount (size_t thread_id)
+{
+  return ActionQueueSingleton::Instance ()->ActionsCount (thread_id);
+}
+
 Action ActionQueue::PopAction (ActionThread thread)
 {
   return ActionQueueSingleton::Instance ()->PopAction (thread);
@@ -519,7 +610,7 @@ Action& Action::operator = (const Action& action)
   return *this;
 }
 
-size_t Action::CreaterThreadId () const
+size_t Action::CreatorThreadId () const
 {
   return impl ? impl->thread_id : 0;
 }
@@ -656,6 +747,23 @@ namespace common
 void swap (Action& action1, Action& action2)
 {
   action1.Swap (action2);
+}
+
+/*
+    Создание диспетчера функции обратного вызова в указанной нити
+*/
+
+ActionQueue::CallbackHandler make_callback_wrapper (ActionThread thread, const ActionQueue::CallbackHandler& handler)
+{
+  try
+  {
+    return ActionQueueSingleton::Instance ()->CreateCallbackWrapper (thread, handler);
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("common::make_callback_wrapper");
+    throw;
+  }
 }
 
 }

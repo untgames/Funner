@@ -180,7 +180,7 @@ class BackgroundThread: public xtl::reference_counter
       }      
 
       return 0;
-    }
+    }    
 
   private:
     Log           log;

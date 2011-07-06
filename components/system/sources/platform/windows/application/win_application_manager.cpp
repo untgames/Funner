@@ -41,9 +41,7 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
           if (!idle_enabled)
           {
             if (IsMessageQueueEmpty () && !is_exited)
-            {
               WaitMessage ();
-            }
           }
           else
           {
@@ -73,8 +71,8 @@ class Win32ApplicationDelegate: public IApplicationDelegate, public xtl::referen
       
       if (state)
       {
-        if (!::PostMessage (0, wake_up_message, 0, 0))
-          raise_error ("::PostMessage");
+        if (!::PostThreadMessage (main_thread_id ? main_thread_id : GetCurrentThreadId (), wake_up_message, 0, 0))
+          raise_error ("::PostThreadMessage");
       }
     }
 

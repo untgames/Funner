@@ -56,7 +56,7 @@ class Action
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///В какой нити создано действие / какой из нитей принадлежит событие
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    size_t       CreaterThreadId () const;
+    size_t       CreatorThreadId () const;
     ActionThread ThreadType      () const;
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,7 +108,7 @@ class ActionQueue
   public:
     typedef Timer::time_t                  time_t;  
     typedef xtl::function<void (Action&)>  ActionHandler;
-    typedef xtl::function<void ()>         CallbackHandler;
+    typedef xtl::function<void ()>         CallbackHandler;    
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Постановка действия в очередь
@@ -118,12 +118,13 @@ class ActionQueue
     static Action PushAction (const ActionHandler& action, ActionThread thread, time_t delay, Timer& timer);
     static Action PushAction (const ActionHandler& action, ActionThread thread, time_t delay, time_t period, Timer& timer);
     static Action PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread = ActionThread_Current, time_t delay = 0.0);
-    static Action PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread, time_t delay, Timer& timer);
+    static Action PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread, time_t delay, Timer& timer);     
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Получение действий из очереди
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     static size_t ActionsCount (ActionThread thread);
+    static size_t ActionsCount (size_t threadId);
     static Action PopAction    (ActionThread thread);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,8 +137,13 @@ class ActionQueue
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     typedef xtl::function<void (ActionThread thread, Action& action)> EventHandler;
 
-    static xtl::connection RegisterEventHandler (ActionQueueEvent event, const EventHandler& handler);
+    static xtl::connection RegisterEventHandler (ActionQueueEvent event, const EventHandler& handler);        
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Создание диспетчера функции обратного вызова в указанной нити
+///////////////////////////////////////////////////////////////////////////////////////////////////
+ActionQueue::CallbackHandler make_callback_wrapper (ActionThread thread, const ActionQueue::CallbackHandler& handler);
 
 }
 

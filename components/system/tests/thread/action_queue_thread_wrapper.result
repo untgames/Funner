@@ -1,0 +1,5 @@
+Results of action_queue_thread_wrapper_result:
+[00000000] action 1 executed in thread not creator
+[00000000] callback 1 executed in thread not creator
+[00000000] action 2 executed in thread not creator
+[00000000] callback 2 executed in thread creator

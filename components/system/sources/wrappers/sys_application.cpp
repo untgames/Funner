@@ -20,6 +20,7 @@ class ApplicationImpl: private IApplicationListener
       message_loop_count = false;
       is_exit_detected   = false;
       on_push_action     = ActionQueue::RegisterEventHandler (ActionQueueEvent_OnPushAction, xtl::bind (&ApplicationImpl::OnPushAction, this, _1, _2));
+      main_thread_id     = Platform::GetCurrentThreadId ();
     }      
     
 ///Работа с делегатами
@@ -193,14 +194,14 @@ class ApplicationImpl: private IApplicationListener
 ///Включен ли Idle режим?
     bool IsIdleEnabled ()
     {
-      return !signals [ApplicationEvent_OnIdle].empty () || ActionQueue::ActionsCount (ActionThread_Main) != 0 || ActionQueue::ActionsCount (ActionThread_Current) != 0;
+      return !signals [ApplicationEvent_OnIdle].empty () || ActionQueue::ActionsCount (ActionThread_Main) != 0 || ActionQueue::ActionsCount (main_thread_id) != 0;
     }
 
 ///Обновление idle-режима
     void UpdateIdleState ()
     {
       try
-      {
+      {       
         if (current_delegate)
           current_delegate->SetIdleState (IsIdleEnabled ());
       }
@@ -261,10 +262,12 @@ class ApplicationImpl: private IApplicationListener
 ///Событие добавлено в очередь событий
     void OnPushAction (ActionThread thread, Action& action)
     {
+      //TODO: synchronization for UpdateIdleState
+
       switch (thread)
       {
         case ActionThread_Current:
-          if (action.CreaterThreadId () != Platform::GetCurrentThreadId ())
+          if (action.CreatorThreadId () != main_thread_id)
             return;        
         case ActionThread_Main:
         {
@@ -290,6 +293,7 @@ class ApplicationImpl: private IApplicationListener
     bool                 is_exit_detected;               //получен сигнал завершения приложения
     size_t               message_loop_count;             //количество вхождений в обработчик очереди сообщений
     xtl::auto_connection on_push_action;                 //в очередь добавлено действие
+    size_t               main_thread_id;                 //идентификатор главной нити
 };
 
 typedef Singleton<ApplicationImpl> ApplicationSingleton;

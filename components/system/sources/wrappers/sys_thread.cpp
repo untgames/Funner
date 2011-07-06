@@ -250,6 +250,19 @@ Thread& Thread::GetCurrent ()
   }
 }
 
+Thread::threadid_t Thread::GetCurrentThreadId ()
+{
+  try
+  {
+    return Platform::GetCurrentThreadId ();
+  }
+  catch (xtl::exception& exception)
+  {
+    exception.touch ("syslib::Thread::GetCurrentThreadId");
+    throw;
+  }
+}
+
 /*
    Установка точки отмена нити
 */
