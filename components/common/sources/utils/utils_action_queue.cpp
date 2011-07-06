@@ -35,18 +35,22 @@ const char* ACTION_QUEUE_LISTENERS_COMPONENT_MASK = "common.action_queue.*"; //м
     Реализация действия
 */
 
+struct ActionImpl;
+
+typedef xtl::lock_ptr<ActionImpl, xtl::intrusive_ptr<ActionImpl> > ActionLock;
+
 struct ActionImpl: public xtl::reference_counter, public Lockable
 {
-  ActionQueue::ActionHandler  action_handler; //обработчик выполнения действия
-  Action::WaitCompleteHandler wait_handler;   //обработчик ожидания выполнения операции
-  ActionThread                thread_type;    //тип нити
-  Timer                       timer;          //таймер, связанный с действием
-  ActionQueue::time_t         next_time;      //время следующего выполнения действия
-  ActionQueue::time_t         period;         //период выполнения действия
-  size_t                      thread_id;      //идентификатор нити, в которой создано действие
-  bool                        is_periodic;    //является ли действие периодическим
-  bool                        is_completed;   //завершено ли действие
-  bool                        is_canceled;    //действие отменено
+  ActionQueue::ActionHandler     action_handler;  //обработчик выполнения действия
+  Action::WaitCompleteHandler    wait_handler;    //обработчик ожидания выполнения операции
+  ActionThread                   thread_type;     //тип нити
+  Timer                          timer;           //таймер, связанный с действием
+  ActionQueue::time_t            next_time;       //время следующего выполнения действия
+  ActionQueue::time_t            period;          //период выполнения действия
+  size_t                         thread_id;       //идентификатор нити, в которой создано действие
+  bool                           is_periodic;     //является ли действие периодическим
+  bool                           is_completed;    //завершено ли действие
+  bool                           is_canceled;     //действие отменено
 
   ActionImpl (const ActionQueue::ActionHandler& in_handler, ActionThread in_thread_type, bool in_is_periodic, Timer& in_timer, ActionQueue::time_t delay, ActionQueue::time_t in_period, const Action::WaitCompleteHandler& in_wait_handler)
     : action_handler (in_handler)
@@ -63,6 +67,8 @@ struct ActionImpl: public xtl::reference_counter, public Lockable
   }
   
   Action GetWrapper () { return Action (this); }
+  
+  static xtl::intrusive_ptr<ActionImpl> GetImpl (Action& action) { return action.impl; }
 };
 
 typedef xtl::intrusive_ptr<ActionImpl> ActionPtr;
@@ -95,8 +101,6 @@ class ActionWithCallback
     ActionQueue::ActionHandler   action;
     ActionQueue::CallbackHandler complete_callback;
 };
-
-typedef xtl::lock_ptr<ActionImpl, xtl::intrusive_ptr<ActionImpl> > ActionLock;
 
 /*
     Очередь нити
@@ -195,7 +199,7 @@ typedef xtl::intrusive_ptr<ThreadActionQueue> ThreadActionQueuePtr;
     Реализация очереди действий
 */
 
-class ActionQueueImpl: public xtl::trackable
+class ActionQueueImpl
 {
   public:
     typedef ActionQueue::time_t          time_t;
@@ -237,55 +241,24 @@ class ActionQueueImpl: public xtl::trackable
       }
     }
     
-///Создание диспетчера функции обратного вызова в указанной нити
-    struct ThreadCallbackWrapper
-    {
-      ActionPtr                            action;
-      ThreadActionQueue&                   thread_queue;
-      xtl::trackable_ptr<ActionQueueImpl>  action_queue;
-      
-      ThreadCallbackWrapper (ActionQueueImpl& in_action_queue, const ActionPtr& in_action, ThreadActionQueue& in_thread_queue)
-        : action (in_action)
-        , thread_queue (in_thread_queue)
-        , action_queue (&in_action_queue)
-      {
-      }
-      
-      void operator () () const
-      {
-        if (!action_queue)
-          return;
-
-        action_queue->PushAction (action, thread_queue);
-      }
-    };    
-
-    CallbackHandler CreateCallbackWrapper (ActionThread thread, const CallbackHandler& callback_handler)
+    Action PushAction (const ActionHandler& action_handler, size_t thread_id, bool is_periodic, time_t delay, time_t period, Timer& timer)
     {
       try
       {
-        switch (thread)
-        {
-          case ActionThread_Current:
-          case ActionThread_Main:
-          case ActionThread_Background:
-            break;
-          default:
-            throw xtl::make_argument_exception ("", "thread", thread);
-        }
-
-        ActionPtr action (new ActionImpl (xtl::bind (callback_handler), ActionThread_Current, false, DefaultTimer (), 0, 0, default_wait_handler), false);
-
-        ThreadActionQueue& queue = GetQueue (thread);
-
-        return ThreadCallbackWrapper (*this, action, queue);
+        ThreadActionQueue& queue = GetQueue (ActionThread_Current, thread_id);        
+        
+        ActionPtr action (new ActionImpl (action_handler, ActionThread_Current, is_periodic, timer, delay, period, default_wait_handler), false);
+        
+        action->thread_id = thread_id;
+        
+        return PushAction (action, queue);
       }
       catch (xtl::exception& e)
       {
-        e.touch ("common::ActionQueue::Impl::CreateCallbackWrapper");
+        e.touch ("common::ActionQueue::PushAction(const ActionHandler&,size_t,bool,time_t,time_t,Timer&)");
         throw;
-      }      
-    }
+      }
+    }    
 
 ///Размер очереди
     size_t ActionsCount (ActionThread thread)
@@ -438,7 +411,7 @@ class ActionQueueImpl: public xtl::trackable
     }  
   
 ///Получение очереди нити
-    ThreadActionQueue& GetQueue (ActionThread thread)
+    ThreadActionQueue& GetQueue (ActionThread thread, size_t thread_id = Platform::GetCurrentThreadId ())
     {
       switch (thread)
       {
@@ -448,8 +421,6 @@ class ActionQueueImpl: public xtl::trackable
           return background_queue;
         case ActionThread_Current:
         {
-          Platform::threadid_t thread_id = Platform::GetCurrentThreadId ();
-          
           ThreadActionQueueMap::iterator iter = thread_queues.find (thread_id);
           
           if (iter != thread_queues.end ())
@@ -543,6 +514,44 @@ Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandl
 Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, ActionThread thread, time_t delay, Timer& timer)
 {
   return PushAction (ActionWithCallback (action, complete_callback), thread, delay, timer);
+}
+
+Action ActionQueue::PushAction (const ActionHandler& action, size_t thread_id, time_t delay)
+{
+  ActionQueueSingleton::Instance queue;
+
+  return queue->PushAction (action, thread_id, false, delay, 0.0, queue->DefaultTimer ());
+}
+
+Action ActionQueue::PushAction (const ActionHandler& action, size_t thread_id, time_t delay, time_t period)
+{
+  ActionQueueSingleton::Instance queue;
+
+  return queue->PushAction (action, thread_id, true, delay, period, queue->DefaultTimer ());
+}
+
+Action ActionQueue::PushAction (const ActionHandler& action, size_t thread_id, time_t delay, Timer& timer)
+{
+  ActionQueueSingleton::Instance queue;
+
+  return queue->PushAction (action, thread_id, false, delay, 0.0, timer);
+}
+
+Action ActionQueue::PushAction (const ActionHandler& action, size_t thread_id, time_t delay, time_t period, Timer& timer)
+{
+  ActionQueueSingleton::Instance queue;
+
+  return queue->PushAction (action, thread_id, true, delay, period, timer);
+}
+
+Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, size_t thread_id, time_t delay)
+{
+  return PushAction (ActionWithCallback (action, complete_callback), thread_id, delay);
+}
+
+Action ActionQueue::PushAction (const ActionHandler& action, const CallbackHandler& complete_callback, size_t thread_id, time_t delay, Timer& timer)
+{
+  return PushAction (ActionWithCallback (action, complete_callback), thread_id, delay, timer);
 }
 
 size_t ActionQueue::ActionsCount (ActionThread thread)
@@ -663,7 +672,7 @@ void Action::Perform ()
   {
     xtl::intrusive_ptr<ActionImpl> impl_holder;
 
-    ActionQueue::ActionHandler handler;
+    ActionQueue::ActionHandler handler;    
 
     {
       ActionLock locked_impl (impl);
@@ -677,8 +686,7 @@ void Action::Perform ()
       if (impl->is_canceled)
         throw xtl::format_operation_exception ("", "Action already canceled");
 
-      handler = impl->action_handler;
-
+      handler     = impl->action_handler;
       impl_holder = impl;
     }
 
@@ -753,11 +761,58 @@ void swap (Action& action1, Action& action2)
     Создание диспетчера функции обратного вызова в указанной нити
 */
 
+namespace
+{
+
+struct ThreadCallbackWrapper
+{
+  ActionQueue::ActionHandler callback_handler;
+  ActionThread               thread_type;
+  size_t                     thread_id;
+  
+  ThreadCallbackWrapper (const ActionQueue::CallbackHandler& in_callback_handler, ActionThread in_thread_type)
+    : callback_handler (xtl::bind (in_callback_handler))
+    , thread_type (in_thread_type)
+    , thread_id (Platform::GetCurrentThreadId ())
+  {
+  }
+  
+  void operator () ()
+  {
+    ActionQueueSingleton::Instance queue;
+    
+    switch (thread_type)
+    {
+      case ActionThread_Main:
+      case ActionThread_Background:        
+        queue->PushAction (callback_handler, thread_type, false, 0, 0, queue->DefaultTimer ());
+        break;
+      case ActionThread_Current:
+        queue->PushAction (callback_handler, thread_id, false, 0, 0, queue->DefaultTimer ());
+        break;
+      default:
+        throw xtl::format_operation_exception ("common::ThreadCallbackWrapper::operator()", "Bad ActionThread %d", thread_type);
+    }
+  }
+};
+
+}
+
 ActionQueue::CallbackHandler make_callback_wrapper (ActionThread thread, const ActionQueue::CallbackHandler& handler)
 {
   try
   {
-    return ActionQueueSingleton::Instance ()->CreateCallbackWrapper (thread, handler);
+    switch (thread)
+    {
+      case ActionThread_Current:
+      case ActionThread_Main:
+      case ActionThread_Background:
+        break;
+      default:
+        throw xtl::make_argument_exception ("", "thread", thread);
+    }
+    
+    return ThreadCallbackWrapper (handler, thread);
   }
   catch (xtl::exception& e)
   {
