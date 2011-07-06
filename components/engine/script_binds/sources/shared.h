@@ -14,6 +14,7 @@
 
 #include <bv/axis_aligned_box.h>
 
+#include <common/async.h>
 #include <common/component.h>
 #include <common/console.h>
 #include <common/file.h>
@@ -38,6 +39,7 @@ void bind_common_string_tree   (script::Environment&);
 void bind_common_signals       (script::Environment&);
 void bind_common_action_queue  (script::Environment&);
 void bind_common_timer         (script::Environment&);
+void bind_common_async_library (script::Environment&);
 void bind_math_splines_library (script::Environment&);
 
 }

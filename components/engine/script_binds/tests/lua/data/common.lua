@@ -35,10 +35,6 @@ function test_post()
 end
 
 function test ()
-  test_post ()
-end
-
-function test ()
   test_files ()
   test_post ()
 end
