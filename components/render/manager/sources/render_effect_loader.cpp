@@ -493,48 +493,6 @@ class EffectLoader
       bool       node_printed;
     };
     
-    struct ShaderCompilerLog
-    {
-      ShaderCompilerLog (const char* in_program_name, ParseNode& in_node, ParseLog& in_log)
-        : program_name (in_program_name)
-        , node (in_node)
-        , log (in_log) {}
-      
-      void operator () (const char* message)
-      {
-          //отсечение стандартных сообщений об отсутствии ошибок
-          
-        static const char* IGNORE_MESSAGES [] = {
-          "*: No errors.",
-          "Fragment shader(s) linked, vertex shader(s) linked*",
-          "*shader was successfully compiled to run on hardware."
-        };
-        
-        static const size_t IGNORE_MESSAGES_COUNT = sizeof (IGNORE_MESSAGES) / sizeof (*IGNORE_MESSAGES);
-        
-        for (size_t i=0; i<IGNORE_MESSAGES_COUNT; i++)
-          if (common::wcimatch (message, IGNORE_MESSAGES [i]))
-            return;
-          
-          //вывод сообщения
-        
-        static const char* LINKER_PREFIX        = "linker: ";
-        static size_t      LINKER_PREFIX_LENGTH = strlen (LINKER_PREFIX);
-        
-        if (wcimatch (message, "linker:*"))
-        {
-          log.Printf (ParseLogMessageType_Warning, "%s: %s", program_name, message + LINKER_PREFIX_LENGTH);
-          return;
-        }
-        
-        log.Printf (ParseLogMessageType_Warning, "%s", message);
-      }
-      
-      const char* program_name;
-      ParseNode&  node;
-      ParseLog&   log;
-    };    
-    
 ///Разбор библиотеки шейдеров
     void ParseShaderLibrary (Parser::Iterator iter)
     {
@@ -549,48 +507,51 @@ class EffectLoader
     void ParseProgram (Parser::Iterator iter)
     {
       const char* id      = get<const char*> (*iter, "");
+      const char* defines = get<const char*> (*iter, "defines", "");      
       const char* options = get<const char*> (*iter, "options", "");
-      const char* profile = get<const char*> (*iter, "profile");
       
-      static const size_t SHADERS_RESERVE_COUNT = 4;
-
-      stl::vector<ShaderDesc> shaders;
+      ProgramPtr program (new Program (device_manager, id, defines, options), false);
       
-      shaders.reserve (SHADERS_RESERVE_COUNT);
-
       for (Parser::NamesakeIterator shader_iter=iter->First ("shader"); shader_iter; ++shader_iter)
       {
-        ShaderDesc desc;
-        
-        memset (&desc, 0, sizeof (desc));
-        
         Parser::AttributeIterator params_iter = make_attribute_iterator (*shader_iter);
         
         const char* shader_name = *params_iter; ++params_iter;
-        
-        desc.profile = *params_iter; ++params_iter;
-        
-        media::rfx::Shader* shader = library.Shaders ().Find (shader_name, desc.profile);
-        
-        if (!shader)
-          raise_parser_exception (*shader_iter, "Shader '%s' for profile '%s' not found", shader_name, desc.profile);
 
-        desc.name             = shader->Name ();  
-        desc.source_code_size = shader->SourceCodeSize ();
-        desc.source_code      = shader->SourceCode ();
-        desc.options          = options;
-        
-        shaders.push_back (desc);
+        for (;params_iter; ++params_iter)
+        {
+          const char* profile = *params_iter;
+          
+          media::rfx::Shader* shader = library.Shaders ().Find (shader_name, profile);
+          
+          if (!shader)
+            raise_parser_exception (*shader_iter, "Shader '%s' for profile '%s' not found", shader_name, profile);
+            
+          program->Attach (*shader);
+        }
       }
 
-      if (shaders.empty ())
+      if (!program->ShadersCount ())
         raise_parser_exception (*iter, "No shaders found for shading");
+        
+      size_t channel = 0;
+        
+      for (Parser::Iterator texmap_iter=iter->First (); texmap_iter; ++texmap_iter, ++channel)
+      {
+        if (strcmp (texmap_iter->Name (), "texmap") && strcmp (texmap_iter->Name (), "framemap"))
+          continue;
+          
+        Parser::AttributeIterator params_iter = make_attribute_iterator (*texmap_iter);
+        
+        const char* semantic    = *params_iter; ++params_iter;
+        const char* param_name  = *params_iter; ++params_iter;
+        bool        is_framemap = strcmp (texmap_iter->Name (), "framemap") == 0;
+        
+        program->AddTexmap (channel, semantic, param_name, is_framemap);
+      }        
 
       try
-      {
-        LowLevelProgramPtr program (device_manager->Device ().CreateProgram (shaders.size (), &shaders [0], ShaderCompilerLog (common::format ("%s.%s", profile, id).c_str (),
-          *iter, parser.Log ())), false);
-      
+      {      
         library.Programs ().Add (id, program);
         
         log.Printf ("Effect program '%s' loaded", id);        

@@ -6,7 +6,7 @@ using namespace render;
     Описание реализации менеджера шейдинга
 */
 
-struct ShadingManager::Impl
+struct ProgramManager::Impl
 {
   ProgramProxyManager program_proxy_manager; //менеджер прокси программ
 };
@@ -15,12 +15,12 @@ struct ShadingManager::Impl
     Конструктор / деструктор
 */
 
-ShadingManager::ShadingManager ()
+ProgramManager::ProgramManager ()
   : impl (new Impl)
 {
 }
 
-ShadingManager::~ShadingManager ()
+ProgramManager::~ProgramManager ()
 {
 }
 
@@ -28,7 +28,7 @@ ShadingManager::~ShadingManager ()
     Получение прокси
 */
 
-ProgramProxy ShadingManager::GetProgramProxy (const char* name)
+ProgramProxy ProgramManager::GetProgramProxy (const char* name)
 {
   return impl->program_proxy_manager.GetProxy (name);
 }
@@ -37,7 +37,7 @@ ProgramProxy ShadingManager::GetProgramProxy (const char* name)
     Поиск загруженной программы
 */
 
-LowLevelProgramPtr ShadingManager::FindProgram (const char* name)
+ProgramPtr ProgramManager::FindProgram (const char* name)
 {
   return impl->program_proxy_manager.FindResource (name);
 }
@@ -46,12 +46,12 @@ LowLevelProgramPtr ShadingManager::FindProgram (const char* name)
     Установка программы по умолчанию
 */
 
-void ShadingManager::SetDefaultProgram (const LowLevelProgramPtr& program)
+void ProgramManager::SetDefaultProgram (const ProgramPtr& program)
 {
   impl->program_proxy_manager.SetDefaultResource (program);
 }
 
-LowLevelProgramPtr ShadingManager::DefaultProgram ()
+ProgramPtr ProgramManager::DefaultProgram ()
 {
   return impl->program_proxy_manager.DefaultResource ();
 }

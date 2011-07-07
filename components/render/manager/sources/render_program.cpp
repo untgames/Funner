@@ -16,13 +16,91 @@ typedef stl::vector<TexmapDesc>         TexmapDescArray;
 
 struct ProgramCommonData: public xtl::reference_counter
 {
-  stl::string         name;                   //имя программы
-  ShaderArray         shaders;                //шейдеры
-  TexmapDescArray     texmaps;                //текстурные карты  
-  stl::string         static_options;         //статические опции компиляции шейдеров
-  stl::string         dynamic_options;        //имена динамических опций
-  ShaderOptionsLayout dynamic_options_layout; //расположение динамических опций
-  Log                 log;                    //протокол
+  DeviceManagerPtr           device_manager;         //менеджер устройства отрисовки
+  stl::string                name;                   //имя программы
+  ShaderArray                shaders;                //шейдеры
+  TexmapDescArray            texmaps;                //текстурные карты
+  stl::string                static_options;         //статические опции компиляции шейдеров
+  stl::string                dynamic_options;        //имена динамических опций
+  ShaderOptionsLayout        dynamic_options_layout; //расположение динамических опций
+  Log                        log;                    //протокол
+  bool                       need_update;            //необходимо обновление внутрених данных
+  bool                       has_framemaps;          //программа ссылается на контекстные карты кадра
+  ProgramParametersLayoutPtr parameters_layout;      //расположение параметров программы
+  PropertyBuffer             properties;             //свойства программы
+  LowLevelStateBlockPtr      state_block;            //блок данных параметров
+  
+///Конструктор
+  ProgramCommonData (const DeviceManagerPtr& in_device_manager)
+    : device_manager (in_device_manager)
+    , need_update (true)
+    , has_framemaps (false)
+    , properties (in_device_manager)
+  {
+    try
+    {
+      if (!device_manager)
+        throw xtl::make_null_argument_exception ("", "device_manager");
+        
+      render::low_level::StateBlockMask mask;
+        
+      mask.ss_constant_buffers [ProgramParametersSlot_Program] = true;
+        
+      state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::ProgramCommonData::ProgramCommonData");
+      throw;
+    }
+  }
+  
+///Обновление текстурных карт
+  void Update ()
+  {
+    try
+    {
+      if (!need_update)
+        return;
+        
+      has_framemaps = false;
+        
+      for (TexmapDescArray::iterator iter=texmaps.begin (), end=texmaps.end (); iter!=end; ++iter)
+        if (iter->is_framemap)
+        {
+          has_framemaps = true;
+          break;
+        }
+        
+      common::PropertyMap new_properties;
+      
+      size_t channel = 0;
+      
+      for (TexmapDescArray::iterator iter=texmaps.begin (), end=texmaps.end (); iter!=end; ++iter)
+      {
+        TexmapDesc& desc = *iter;        
+        
+        new_properties.SetProperty (desc.param_name.c_str (), (int)desc.channel);
+      }
+      
+      ProgramParametersLayoutPtr new_layout = device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_Program, new_properties.Layout ());
+      
+      properties.SetProperties (new_properties);
+      
+      device_manager->Device ().SSSetConstantBuffer (ProgramParametersSlot_Program, properties.Buffer ().get ());
+      
+      state_block->Capture ();
+      
+      parameters_layout = new_layout;
+        
+      need_update = false;
+    }
+    catch (xtl::exception& e)
+    {
+      e.touch ("render::ProgramCommonData::Update");
+      throw;
+    }
+  }
 };
 
 typedef xtl::intrusive_ptr<ProgramCommonData> ProgramCommonDataPtr;
@@ -43,8 +121,8 @@ struct Program::Impl
   LowLevelProgramPtr   low_level_program;     //низкоуровневая программа
   
 ///Конструктор
-  Impl (const char* name, const char* static_options, const char* dynamic_options)
-    : common_data (new ProgramCommonData, false)
+  Impl (const DeviceManagerPtr& device_manager, const char* name, const char* static_options, const char* dynamic_options)
+    : common_data (new ProgramCommonData (device_manager), false)
   {
     try
     {
@@ -89,8 +167,8 @@ struct Program::Impl
     Конструкторы / деструктор
 */
 
-Program::Program (const char* name, const char* static_options, const char* dynamic_options)
-  : impl (new Impl (name, static_options, dynamic_options))
+Program::Program (const DeviceManagerPtr& device_manager, const char* name, const char* static_options, const char* dynamic_options)
+  : impl (new Impl (device_manager, name, static_options, dynamic_options))
 {
 }
 
@@ -134,6 +212,11 @@ void Program::DetachAllShaders ()
   impl->common_data->shaders.clear ();
 }
 
+size_t Program::ShadersCount ()
+{
+  return impl->common_data->shaders.size ();
+}
+
 /*
     Опции данной программы
 */
@@ -157,6 +240,24 @@ size_t Program::TexmapsCount ()
   return impl->common_data->texmaps.size ();
 }
 
+bool Program::HasFramemaps ()
+{
+  try
+  { 
+    if (!impl->common_data->need_update)
+      return impl->common_data->has_framemaps;
+    
+    impl->common_data->Update ();
+  
+    return impl->common_data->has_framemaps;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::Program::HasFramemaps");
+    throw;
+  }
+}
+
 const TexmapDesc* Program::Texmaps ()
 {
   if (impl->common_data->texmaps.empty ())
@@ -173,7 +274,7 @@ const TexmapDesc& Program::Texmap (size_t index)
   return impl->common_data->texmaps [index];
 }
 
-void Program::SetTexmap (size_t index, size_t channel, const char* semantic, const char* param_name)
+void Program::SetTexmap (size_t index, size_t channel, const char* semantic, const char* param_name, bool is_framemap)
 {
   static const char* METHOD_NAME = "render::Program::SetTexmap";
 
@@ -188,9 +289,33 @@ void Program::SetTexmap (size_t index, size_t channel, const char* semantic, con
     
   TexmapDesc& desc = impl->common_data->texmaps [index];
   
-  desc.channel    = channel;
-  desc.semantic   = semantic;
-  desc.param_name = param_name;
+  desc.channel     = channel;
+  desc.semantic    = semantic;
+  desc.param_name  = param_name;
+  desc.is_framemap = is_framemap;
+  
+  impl->common_data->need_update = true;
+}
+
+size_t Program::AddTexmap (size_t channel, const char* semantic, const char* param_name, bool is_framemap)
+{
+  static const char* METHOD_NAME = "render::Program::SetTexmap";
+  
+  impl->common_data->texmaps.push_back ();
+  
+  size_t index = impl->common_data->texmaps.size () - 1;
+  
+  try
+  {
+    SetTexmap (index, channel, semantic, param_name, is_framemap);
+    
+    return index;
+  }
+  catch (...)
+  {
+    impl->common_data->texmaps.pop_back ();
+    throw;
+  }
 }
 
 void Program::RemoveTexmap (size_t index)
@@ -199,11 +324,15 @@ void Program::RemoveTexmap (size_t index)
     return;
 
   impl->common_data->texmaps.erase (impl->common_data->texmaps.begin () + index);
+  
+  impl->common_data->need_update = true;  
 }
 
 void Program::RemoveAllTexmaps ()
 {
   impl->common_data->texmaps.clear ();
+  
+  impl->common_data->need_update = true;  
 }
 
 /*
@@ -344,6 +473,50 @@ const LowLevelProgramPtr& Program::LowLevelProgram (render::low_level::IDevice& 
   catch (xtl::exception& e)
   {
     e.touch ("render::Program::LowLevelProgram");
+    throw;
+  }
+}
+
+/*
+    Блок состояний материала
+*/
+
+LowLevelStateBlockPtr Program::StateBlock ()
+{
+  try
+  { 
+    if (!impl->common_data->need_update)
+      return impl->common_data->state_block;
+    
+    impl->common_data->Update ();
+  
+    return impl->common_data->state_block;    
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::Program::StateBlock");
+    throw;
+  }
+}
+
+/*
+    Получение объекта расположения параметров программы шейдинга
+*/
+
+ProgramParametersLayoutPtr Program::ParametersLayout ()
+{
+  try
+  { 
+    if (!impl->common_data->need_update)
+      return impl->common_data->parameters_layout;
+    
+    impl->common_data->Update ();
+    
+    return impl->common_data->parameters_layout;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::Program::ParametersLayout");
     throw;
   }
 }

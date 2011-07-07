@@ -48,11 +48,11 @@ class EffectRenderer;
 class MaterialManager;
 class PrimitiveManager;
 class Program;
+class ProgramManager;
 class ProgramParametersLayout;
 class RenderingContext;
 class Settings;
 class ShaderOptionsCache;
-class ShadingManager;
 class TextureManager;
 class InstantiatedEffect;
 struct RendererOperationList;
@@ -77,13 +77,13 @@ typedef xtl::intrusive_ptr<PrimitiveImpl>           PrimitivePtr;
 typedef xtl::intrusive_ptr<PrimitiveBuffersImpl>    PrimitiveBuffersPtr;
 typedef xtl::intrusive_ptr<PrimitiveManager>        PrimitiveManagerPtr;
 typedef xtl::intrusive_ptr<Program>                 ProgramPtr;
+typedef xtl::intrusive_ptr<ProgramManager>          ProgramManagerPtr;
 typedef xtl::intrusive_ptr<ProgramParametersLayout> ProgramParametersLayoutPtr;
 typedef xtl::intrusive_ptr<RectAreaImpl>            RectAreaPtr;
 typedef xtl::intrusive_ptr<RenderManagerImpl>       RenderManagerPtr;
 typedef xtl::intrusive_ptr<RenderTargetImpl>        RenderTargetPtr;
 typedef xtl::intrusive_ptr<RenderTargetDesc>        RenderTargetDescPtr;
 typedef xtl::intrusive_ptr<Settings>                SettingsPtr;
-typedef xtl::intrusive_ptr<ShadingManager>          ShadingManagerPtr;
 typedef xtl::intrusive_ptr<TextureImpl>             TexturePtr;
 typedef xtl::intrusive_ptr<TextureManager>          TextureManagerPtr;
 typedef xtl::intrusive_ptr<WindowImpl>              WindowPtr;
@@ -193,6 +193,7 @@ class DebugIdHolder: public xtl::noncopyable
 #include "primitive_buffers.h"
 #include "primitive_manager.h"
 #include "program.h"
+#include "program_manager.h"
 #include "property_buffer.h"
 #include "property_cache.h"
 #include "rect_area.h"
@@ -200,7 +201,6 @@ class DebugIdHolder: public xtl::noncopyable
 #include "rendering_context.h"
 #include "settings.h"
 #include "shader_options.h"
-#include "shading_manager.h"
 #include "texture.h"
 #include "texture_manager.h"
 #include "window.h"

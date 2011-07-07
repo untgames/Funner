@@ -1,6 +1,5 @@
 //TODO: techniques / condition passes/subframes
 //TODO: templates for all states/program/frames/passes (general implementation)
-//TODO: program states
 //TODO: add viewport depth range
 //TODO: constant params requirements (constant buffers description)
 //TODO: temporary render targets
@@ -143,37 +142,27 @@ sampler "repeat"
 //program instance for phong program, specified by (material, entity, frame)
 program "phong"
 {
-  profile "glsl"            //shading profile
-  shader  "phong" "glsl.vs" //reference to shader source. TODO: add compile options
-  shader  "phong" "glsl.ps" //reference to shader source
-  defines "PointLightCount DirectLightCount SpotLightCount"
+  defines "SpecularMultiplier=0.8"
+  options "PointLightCount DirectLightCount SpotLightCount"
+  shader "phong" "glsl.vs" "glsl.ps" //reference to shader source
 
-//  shader "phong" "glsl.vs" "glsl.ps" //reference to shader source
-
-  texmap "diffuse"
-  texmap "specular"  2
-  texmap "ambient"   1
-  texmap "emission"  1
-  texmap "shadow01"
-  texmap "shadow02"
-  texmap "shadow03"
-  texmap "shadow04"
+  texmap   "diffuse"  "DiffuseTexture"
+  texmap   "specular" "SpecularTexture"
+  texmap   "ambient"  "AmbientTexture"
+  texmap   "emission" "EmissionTexture"
+  framemap "shadow"   "ShadowTexture"
 }
 
 //shading instance for rendering shadow maps
 program "shadow_map"
 {
-  profile "glsl"             //shading profile
-  shader  "shadow" "glsl.vs" //reference to shader source. TODO: add compile options
-  shader  "shadow" "glsl.ps" //reference to shader source
+  shader  "shadow" "glsl.vs" "glsl.ps"
 }
 
 //shading instance for rendering helper geometry
 program "helper"
 {
-  profile "glsl"            //shading profile
-  shader  "debug" "glsl.vs" //reference to shader source. TODO: add compile options
-  shader  "debug" "glsl.ps" //reference to shader source
+  shader  "debug" "glsl.vs" "glsl.ps" //reference to shader source
 }
 
 //description of effects rendering
@@ -266,6 +255,7 @@ effect "lighting"
     blend_state           "solid"                       //use blend stage settings for solid geometry
     depth_stencil_state   "solid"                       //use depth stencil stage settings for solid geometry
     rasterizer_state      "default"                     //use default rasterizer
+    texmap                "shadow" "default"            //define texture for framemap "shadow" with "default" sampler
   }
   
   //render transparent geometry
@@ -278,5 +268,6 @@ effect "lighting"
     blend_state           "transparent"                 //use blend stage settings for transaparent geometry
     depth_stencil_state   "ztest_without_write"         //use depth stencil stage settings for transaparent geometry
     rasterizer_state      "default"                     //use default rasterizer
+    texmap                "shadow" "default"            //define texture for framemap "shadow" with "default" sampler
   }
 }

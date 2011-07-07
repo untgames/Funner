@@ -7,6 +7,7 @@ enum ProgramParametersSlot
   ProgramParametersSlot_FrameEntity,
   ProgramParametersSlot_Entity,
   ProgramParametersSlot_Material,
+  ProgramParametersSlot_Program,
   
   ProgramParametersSlot_Num
 };

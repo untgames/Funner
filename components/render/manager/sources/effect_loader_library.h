@@ -60,7 +60,7 @@ class EffectLoaderLibrary: public xtl::noncopyable
     typedef Library<LowLevelBlendStatePtr>         BlendStateLibrary;
     typedef Library<LowLevelDepthStencilStatePtr>  DepthStencilStateLibrary;
     typedef Library<LowLevelSamplerStatePtr>       SamplerStateLibrary;
-    typedef Library<LowLevelProgramPtr>            ProgramLibrary;
+    typedef Library<ProgramPtr>                    ProgramLibrary;
     typedef Library<EffectPassPtr>                 EffectPassLibrary;
     typedef Library<EffectPtr>                     EffectLibrary;
     

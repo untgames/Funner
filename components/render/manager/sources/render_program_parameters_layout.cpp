@@ -327,19 +327,27 @@ void ProgramParametersLayout::ResetAllSlots ()
 
 void ProgramParametersLayout::Attach (const ProgramParametersLayout& layout)
 {
-  impl->AttachCacheSource (*layout.impl);
-
   try
   {
-    impl->layouts.push_back (&const_cast<ProgramParametersLayout&> (layout));
+    impl->AttachCacheSource (*layout.impl);
+
+    try
+    {
+      impl->layouts.push_back (&const_cast<ProgramParametersLayout&> (layout));
+    }
+    catch (...)
+    {
+      impl->DetachCacheSource (*layout.impl);
+      throw;
+    }
+    
+    impl->need_rebuild = true;
   }
-  catch (...)
+  catch (xtl::exception& e)
   {
-    impl->DetachCacheSource (*layout.impl);
+    e.touch ("render::ProgramParametersLayout::Attach");
     throw;
   }
-  
-  impl->need_rebuild = true;
 }
 
 void ProgramParametersLayout::Detach (const ProgramParametersLayout& layout)

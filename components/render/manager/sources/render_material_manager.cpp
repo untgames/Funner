@@ -39,16 +39,16 @@ struct MaterialManager::Impl
 {
   DeviceManagerPtr      device_manager;   //менеджер устройства отрисовки
   TextureManagerPtr     texture_manager;  //менеджер текстур
-  ShadingManagerPtr     shading_manager;  //менеджер шэйдинга
+  ProgramManagerPtr     program_manager;  //менеджер программ
   MaterialProxyManager  proxy_manager;    //менеджер прокси объектов
   MaterialLibraryList   loaded_libraries; //список загруженных библиотек
   Log                   log;              //протокол сообщений
   
 ///Конструктор
-  Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ShadingManagerPtr& in_shading_manager)
+  Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ProgramManagerPtr& in_program_manager)
     : device_manager (in_device_manager)
     , texture_manager (in_texture_manager)
-    , shading_manager (in_shading_manager)
+    , program_manager (in_program_manager)
   {
   }
   
@@ -84,7 +84,7 @@ struct MaterialManager::Impl
         
         log.Printf ("...loading material '%s'", id);
         
-        MaterialPtr material (new MaterialImpl (device_manager, texture_manager, shading_manager), false);
+        MaterialPtr material (new MaterialImpl (device_manager, texture_manager, program_manager), false);
 
         material->Update (*iter);
 
@@ -131,8 +131,8 @@ struct MaterialManager::Impl
     Конструктор / деструктор
 */
 
-MaterialManager::MaterialManager (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ShadingManagerPtr& shading_manager)
-  : impl (new Impl (device_manager, texture_manager, shading_manager))
+MaterialManager::MaterialManager (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ProgramManagerPtr& program_manager)
+  : impl (new Impl (device_manager, texture_manager, program_manager))
 {
 }
 
@@ -148,7 +148,7 @@ MaterialPtr MaterialManager::CreateMaterial ()
 {
   try
   {
-    return MaterialPtr (new MaterialImpl (impl->device_manager, impl->texture_manager, impl->shading_manager), false);
+    return MaterialPtr (new MaterialImpl (impl->device_manager, impl->texture_manager, impl->program_manager), false);
   }
   catch (xtl::exception& e)
   {

@@ -31,7 +31,7 @@ struct RenderManagerImpl::Impl: public xtl::trackable
   WindowArray         windows;                                       //окна
   TextureManagerPtr   textures;                                      //текстуры
   PrimitiveManagerPtr primitives;                                    //примитивы
-  ShadingManagerPtr   shading;                                       //менеджер шэйдина
+  ProgramManagerPtr   programs;                                      //программы
   MaterialManagerPtr  materials;                                     //материалы
   EffectManagerPtr    effects;                                       //эффекты
 
@@ -144,18 +144,18 @@ TextureManager& RenderManagerImpl::TextureManager ()
   }
 }
 
-ShadingManager& RenderManagerImpl::ShadingManager ()
+ProgramManager& RenderManagerImpl::ProgramManager ()
 {
   try
   {
-    if (!impl->shading)
-      impl->shading = ShadingManagerPtr (new render::ShadingManager (), false);
+    if (!impl->programs)
+      impl->programs = ProgramManagerPtr (new render::ProgramManager (), false);
 
-    return *impl->shading;
+    return *impl->programs;
   }
   catch (xtl::exception& e)
   {
-    e.touch ("render::RenderManagerImpl::ShadingManager");
+    e.touch ("render::RenderManagerImpl::ProgramManager");
     throw;
   }
 }
@@ -165,7 +165,7 @@ MaterialManager& RenderManagerImpl::MaterialManager ()
   try
   {
     if (!impl->materials)
-      impl->materials = MaterialManagerPtr (new render::MaterialManager (&impl->DeviceManager (), &TextureManager (), &ShadingManager ()), false);
+      impl->materials = MaterialManagerPtr (new render::MaterialManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager ()), false);
 
     return *impl->materials;
   }
@@ -197,7 +197,7 @@ EffectManager& RenderManagerImpl::EffectManager ()
   try
   {
     if (!impl->effects)
-      impl->effects = EffectManagerPtr (new render::EffectManager (&impl->DeviceManager (), &TextureManager (), &ShadingManager ()), false);
+      impl->effects = EffectManagerPtr (new render::EffectManager (&impl->DeviceManager (), &TextureManager (), &ProgramManager ()), false);
 
     return *impl->effects;
   }

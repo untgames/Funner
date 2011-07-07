@@ -3,29 +3,31 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 struct TexmapDesc
 {
-  size_t      channel;    //номер текстурного канала
-  stl::string semantic;   //имя семантики в media::rfx::Texmap
-  stl::string param_name; //имя параметра в шейдере
+  size_t      channel;     //номер текстурного канала
+  stl::string semantic;    //имя семантики в media::rfx::Texmap
+  stl::string param_name;  //имя параметра в шейдере
+  bool        is_framemap; //является ли текстурная карта контекстной картой кадра
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Программа шейдинга
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-class Program: public Object, public CacheSource
+class Program: public Object
 {
   public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Конструктор / деструктор
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    Program  (const char* name, const char* static_options, const char* dynamic_options);
+    Program  (const DeviceManagerPtr& device_manager, const char* name, const char* static_options, const char* dynamic_options);
     ~Program ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Шейдеры данной программы
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-    void Attach           (const media::rfx::Shader&);
-    void Detach           (const media::rfx::Shader&);
-    void DetachAllShaders ();
+    void   Attach           (const media::rfx::Shader&);
+    void   Detach           (const media::rfx::Shader&);
+    void   DetachAllShaders ();
+    size_t ShadersCount     ();
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///Опции данной программы
@@ -37,10 +39,11 @@ class Program: public Object, public CacheSource
 ///Отображение семантики текстурной карты на номер канала и имя параметра
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     size_t            TexmapsCount     ();
+    bool              HasFramemaps     ();
     const TexmapDesc* Texmaps          ();
     const TexmapDesc& Texmap           (size_t index);
-    void              SetTexmap        (size_t index, size_t channel, const char* semantic, const char* param_name);
-    size_t            AddTexmap        (size_t channel, const char* semantic, const char* param_name);    
+    void              SetTexmap        (size_t index, size_t channel, const char* semantic, const char* param_name, bool is_framemap = false);
+    size_t            AddTexmap        (size_t channel, const char* semantic, const char* param_name, bool is_framemap = false);
     void              RemoveTexmap     (size_t index);
     void              RemoveAllTexmaps ();
     
@@ -55,6 +58,16 @@ class Program: public Object, public CacheSource
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     const LowLevelProgramPtr& LowLevelProgram (render::low_level::IDevice&);
     
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Блок состояний программы
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    LowLevelStateBlockPtr StateBlock ();
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///Получение объекта расположения параметров программы шейдинга
+///////////////////////////////////////////////////////////////////////////////////////////////////
+    ProgramParametersLayoutPtr ParametersLayout ();
+
   private:
     Program (Program& parent, const ShaderOptions&);
 

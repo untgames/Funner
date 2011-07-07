@@ -37,7 +37,7 @@ class RenderManagerImpl: public Object
 ///////////////////////////////////////////////////////////////////////////////////////////////////
     render::TextureManager&   TextureManager   ();
     render::PrimitiveManager& PrimitiveManager ();
-    render::ShadingManager&   ShadingManager   ();
+    render::ProgramManager&   ProgramManager   ();
     render::MaterialManager&  MaterialManager  ();
     render::EffectManager&    EffectManager    ();
 

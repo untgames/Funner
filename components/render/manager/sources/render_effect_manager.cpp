@@ -34,9 +34,9 @@ struct EffectLibraryEntry: public xtl::reference_counter
     effects.push_back (proxy);
   }
   
-  void AddProgram (const char* id, const LowLevelProgramPtr& program, const ShadingManagerPtr& shading_manager)
+  void AddProgram (const char* id, const ProgramPtr& program, const ProgramManagerPtr& program_manager)
   {
-    ProgramProxy proxy = shading_manager->GetProgramProxy (id);
+    ProgramProxy proxy = program_manager->GetProgramProxy (id);
     
     proxy.SetResource (program);
     
@@ -75,15 +75,15 @@ struct EffectManager::Impl
 {
   DeviceManagerPtr    device_manager;   //менеджер устройства отрисовки
   TextureManagerPtr   texture_manager;  //менеджер текстур
-  ShadingManagerPtr   shading_manager;  //менеджер шейдинга
+  ProgramManagerPtr   program_manager;  //менеджер программ
   EffectProxyManager  proxy_manager;    //менеджер прокси эффектов
   EffectLibraryList   loaded_libraries; //список загруженных библиотек
 
 ///Конструктор
-  Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ShadingManagerPtr& in_shading_manager)
+  Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ProgramManagerPtr& in_program_manager)
     : device_manager (in_device_manager)
     , texture_manager (in_texture_manager)
-    , shading_manager (in_shading_manager)
+    , program_manager (in_program_manager)
   {
     if (!device_manager)
       throw xtl::make_null_argument_exception ("", "device_manager");
@@ -91,8 +91,8 @@ struct EffectManager::Impl
     if (!texture_manager)
       throw xtl::make_null_argument_exception ("", "texture_manager");
       
-    if (!shading_manager)
-      throw xtl::make_null_argument_exception ("", "shading_manager");
+    if (!program_manager)
+      throw xtl::make_null_argument_exception ("", "program_manager");
   }
 };
 
@@ -100,11 +100,11 @@ struct EffectManager::Impl
     Конструктор / деструктор
 */
 
-EffectManager::EffectManager (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ShadingManagerPtr& shading_manager)
+EffectManager::EffectManager (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ProgramManagerPtr& program_manager)
 {
   try
   {
-    impl = new Impl (device_manager, texture_manager, shading_manager);
+    impl = new Impl (device_manager, texture_manager, program_manager);
   }
   catch (xtl::exception& e)
   {
@@ -158,7 +158,7 @@ void EffectManager::LoadEffectLibrary (const char* name)
     entry->resource_name = name;
 
     library.Effects ().ForEach       (xtl::bind (&EffectLibraryEntry::AddEffect, &*entry, _1, _2, xtl::ref (impl->proxy_manager)));
-    library.Programs ().ForEach      (xtl::bind (&EffectLibraryEntry::AddProgram, &*entry, _1, _2, xtl::ref (impl->shading_manager)));
+    library.Programs ().ForEach      (xtl::bind (&EffectLibraryEntry::AddProgram, &*entry, _1, _2, xtl::ref (impl->program_manager)));
     library.SamplerStates ().ForEach (xtl::bind (&EffectLibraryEntry::AddSampler, &*entry, _1, _2, xtl::ref (impl->texture_manager)));
 
       //регистрация библиотеки

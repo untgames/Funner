@@ -11,8 +11,8 @@ render.manager: Material created (id=1)
 render.manager: Program parameters layout created (id=2)
 render.manager: ...loading material 'canyon.stn_1'
 render.manager: Material created (id=3)
-render.manager: Updating program parameters layout with 12 parameters (id=2):
-render.manager: ...slot[3]: hash=a9ba75c0, parameters_count=12
+render.manager: Updating program parameters layout with 10 parameters (id=2):
+render.manager: ...slot[3]: hash=8f1555f7, parameters_count=10
 render.manager: ......name='Reflectivity', type=float, offset=0
 render.manager: ......name='Transparency', type=float, offset=4
 render.manager: ......name='Shininess', type=float, offset=8
@@ -23,9 +23,7 @@ render.manager: ......name='Emission', type=vector, offset=60
 render.manager: ......name='BumpAmount', type=float, offset=76
 render.manager: ......name='DiffuseTextureChannel', type=integer, offset=80
 render.manager: ......name='BumpTextureChannel', type=integer, offset=84
-render.manager: ......name='diffuse', type=integer, offset=88
-render.manager: ......name='bump', type=integer, offset=92
-render.manager: ...program parameters layout updated (hash=8ba000c5)
+render.manager: ...program parameters layout updated (hash=ad3bc2f1)
 render.manager: ...loading material 'canyon.stn_2'
 render.manager: Material created (id=4)
 render.manager: ...loading material 'canyon.Material__195'

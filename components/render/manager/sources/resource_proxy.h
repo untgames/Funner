@@ -95,7 +95,7 @@ typedef ResourceProxy<TexturePtr>              TextureProxy;
 typedef ResourceProxy<LowLevelSamplerStatePtr> SamplerProxy;
 typedef ResourceProxy<PrimitivePtr>            PrimitiveProxy;
 typedef ResourceProxy<MaterialPtr>             MaterialProxy;
-typedef ResourceProxy<LowLevelProgramPtr>      ProgramProxy;
+typedef ResourceProxy<ProgramPtr>              ProgramProxy;
 typedef ResourceProxy<EffectPtr>               EffectProxy;
 typedef TextureProxy::Manager                  TextureProxyManager;
 typedef SamplerProxy::Manager                  SamplerProxyManager;

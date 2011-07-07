@@ -78,27 +78,28 @@ typedef stl::vector<size_t>        TagHashArray;
 
 struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
 {
-  DeviceManagerPtr           device_manager;       //менеджер устройства отрисовки
-  TextureManagerPtr          texture_manager;      //менеджер текстур
-  ShadingManagerPtr          shading_manager;      //менеджер шэйдинга
-  stl::string                id;                   //идентификатор материала
-  TagHashArray               tags;                 //тэги материала
-  ProgramProxy               program;              //прокси программы
-  PropertyBuffer             properties;           //свойства материала
-  ProgramParametersLayoutPtr properties_layout;    //расположение свойств материала
-  TexmapArray                texmaps;              //текстурные карты
-  bool                       has_dynamic_textures; //есть ли в материале динамические текстуры  
-  LowLevelProgramPtr         cached_program;       //закэшированная программа
-  LowLevelBufferPtr          cached_properties;    //закэшированный буфер констант
-  LowLevelStateBlockPtr      cached_state_block;   //закэшированный блок состояний
-  Log                        log;                  //протокол отладочных сообщений
+  DeviceManagerPtr           device_manager;             //менеджер устройства отрисовки
+  TextureManagerPtr          texture_manager;            //менеджер текстур
+  ProgramManagerPtr          program_manager;            //менеджер программ
+  stl::string                id;                         //идентификатор материала
+  TagHashArray               tags;                       //тэги материала
+  ProgramProxy               program;                    //прокси программы
+  PropertyBuffer             properties;                 //свойства материала
+  ProgramParametersLayoutPtr material_properties_layout; //расположение свойств материала
+  TexmapArray                texmaps;                    //текстурные карты
+  bool                       has_dynamic_textures;       //есть ли в материале динамические текстуры  
+  ProgramPtr                 cached_program;             //закэшированная программа
+  LowLevelBufferPtr          cached_properties;          //закэшированный буфер констант
+  LowLevelStateBlockPtr      cached_state_block;         //закэшированный блок состояний
+  ProgramParametersLayoutPtr cached_properties_layout;   //расположение свойств материала и программы  
+  Log                        log;                        //протокол отладочных сообщений
   
 ///Конструктор
-  Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ShadingManagerPtr& in_shading_manager)
+  Impl (const DeviceManagerPtr& in_device_manager, const TextureManagerPtr& in_texture_manager, const ProgramManagerPtr& in_program_manager)
     : device_manager (in_device_manager)
     , texture_manager (in_texture_manager)
-    , shading_manager (in_shading_manager)
-    , program (shading_manager->GetProgramProxy (DEFAULT_PROGRAM_NAME))
+    , program_manager (in_program_manager)
+    , program (program_manager->GetProgramProxy (DEFAULT_PROGRAM_NAME))
     , properties (in_device_manager)
     , has_dynamic_textures (false)
   {
@@ -120,9 +121,10 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
   {
     if (device_manager->Settings ().HasDebugLog ())
       log.Printf ("Reset material cache (id=%u)", Id ());
-    
-    cached_program    = LowLevelProgramPtr ();
-    cached_properties = LowLevelBufferPtr ();
+
+    cached_properties_layout = ProgramParametersLayoutPtr ();
+    cached_program           = ProgramPtr ();
+    cached_properties        = LowLevelBufferPtr ();
   }
   
   void UpdateCacheCore ()
@@ -133,21 +135,32 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
       
       if (has_debug_log)
         log.Printf ("Update material cache (id=%u)", Id ());
-      
+                
       cached_program    = program.Resource ();
       cached_properties = properties.Buffer ();
       
+      if (cached_program)
+        cached_properties_layout = device_manager->ProgramParametersManager ().GetParameters (&*material_properties_layout, &*cached_program->ParametersLayout (), 0);
+      
       render::low_level::IDevice& device = device_manager->Device ();
-      
-      device.SSSetProgram (cached_program.get ());
+
       device.SSSetConstantBuffer (ProgramParametersSlot_Material, cached_properties.get ());
-      
+      device.SSSetConstantBuffer (ProgramParametersSlot_Program, 0);
+
+      if (cached_program)
+      {
+        LowLevelStateBlockPtr program_state_block = cached_program->StateBlock ();
+
+        if (program_state_block)
+          program_state_block->Apply ();
+      }            
+
       if (!cached_state_block)
       {
         StateBlockMask mask;
         
-        mask.ss_program                                           = true;
         mask.ss_constant_buffers [ProgramParametersSlot_Material] = true;
+        mask.ss_constant_buffers [ProgramParametersSlot_Program]  = true;
         
         cached_state_block = LowLevelStateBlockPtr (device_manager->Device ().CreateStateBlock (mask), false);        
         
@@ -171,9 +184,9 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
           
         cached_state_block = LowLevelStateBlockPtr (device.CreateStateBlock (mask), false);
       }
-      
+
       cached_state_block->Capture ();
-      
+
       if (has_debug_log)
         log.Printf ("...cached updated");
     }
@@ -192,8 +205,8 @@ struct MaterialImpl::Impl: public CacheHolder, public DebugIdHolder
     Конструктор / деструктор
 */
 
-MaterialImpl::MaterialImpl (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ShadingManagerPtr& shading_manager)
-  : impl (new Impl (device_manager, texture_manager, shading_manager))
+MaterialImpl::MaterialImpl (const DeviceManagerPtr& device_manager, const TextureManagerPtr& texture_manager, const ProgramManagerPtr& program_manager)
+  : impl (new Impl (device_manager, texture_manager, program_manager))
 {
   AttachCacheSource (*impl);
 }
@@ -249,6 +262,15 @@ LowLevelStateBlockPtr MaterialImpl::StateBlock ()
   impl->UpdateCache ();
   
   return impl->cached_state_block;
+}
+
+/*
+    Программа шейдинга
+*/
+
+ProgramPtr MaterialImpl::Program ()
+{
+  return impl->cached_program;
 }
 
 /*
@@ -321,7 +343,8 @@ void MaterialImpl::Update (const media::rfx::Material& material)
 {
   try
   {
-    common::PropertyMap new_properties = material.Properties ().Clone ();
+    common::PropertyMap new_properties = material.Properties ();
+    ProgramProxy        new_program    = impl->program_manager->GetProgramProxy (material.Program ());    
     
     TexmapArray new_texmaps;
 
@@ -342,12 +365,9 @@ void MaterialImpl::Update (const media::rfx::Material& material)
         impl->texture_manager->GetSamplerProxy (texmap.Sampler ()), is_dynamic_image), false);
 
       new_texmaps.push_back (new_texmap);
-      
-      new_properties.SetProperty (texmap.Semantic (), (int)i); //установка номера канала текстурирования
     }
 
-    ProgramProxy               new_program = impl->shading_manager->GetProgramProxy (material.Program ());
-    ProgramParametersLayoutPtr new_layout  = impl->device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_Material, new_properties.Layout ());
+    ProgramParametersLayoutPtr new_layout = impl->device_manager->ProgramParametersManager ().GetParameters (ProgramParametersSlot_Material, new_properties.Layout ());
 
     new_program.AttachCacheHolder (*impl);
 
@@ -359,9 +379,9 @@ void MaterialImpl::Update (const media::rfx::Material& material)
 
     impl->texmaps.swap (new_texmaps);
 
-    impl->properties_layout    = new_layout;
-    impl->cached_state_block   = LowLevelStateBlockPtr ();
-    impl->has_dynamic_textures = new_has_dynamic_textures;
+    impl->material_properties_layout = new_layout;
+    impl->cached_state_block         = LowLevelStateBlockPtr ();
+    impl->has_dynamic_textures       = new_has_dynamic_textures;
     
     ResetCache ();
   }
@@ -378,7 +398,17 @@ void MaterialImpl::Update (const media::rfx::Material& material)
 
 ProgramParametersLayoutPtr MaterialImpl::ParametersLayout ()
 {
-  return impl->properties_layout;
+  try
+  {
+    impl->UpdateCache ();
+    
+    return impl->cached_properties_layout;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::MaterialImpl::ParametersLayout");
+    throw;
+  }
 }
 
 /*

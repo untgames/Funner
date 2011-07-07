@@ -126,7 +126,7 @@ template class EffectLoaderLibrary::Library<LowLevelRasterizerStatePtr>;
 template class EffectLoaderLibrary::Library<LowLevelBlendStatePtr>;
 template class EffectLoaderLibrary::Library<LowLevelDepthStencilStatePtr>;
 template class EffectLoaderLibrary::Library<LowLevelSamplerStatePtr>;
-template class EffectLoaderLibrary::Library<LowLevelProgramPtr>;
+template class EffectLoaderLibrary::Library<ProgramPtr>;
 template class EffectLoaderLibrary::Library<EffectPassPtr>;
 template class EffectLoaderLibrary::Library<EffectPtr>;
 
