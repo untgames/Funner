@@ -9,6 +9,7 @@ struct RendererOperation
   render::low_level::IStateBlock* state_block;                    //блок состояний объекта
   ProgramParametersLayout*        entity_parameters_layout;       //расположение параметров объекта
   const RendererPrimitive*        primitive;                      //примитив
+  ShaderOptionsCache*             shader_options_cache;           //кэш опций шейдера
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

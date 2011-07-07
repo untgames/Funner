@@ -124,7 +124,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     }
     
 ///Кэш опций шейдера
-    ShaderOptionsCache& ShaderOptions () { return shader_options_cache; }
+    render::ShaderOptionsCache& ShaderOptionsCache () { return shader_options_cache; }
     
 ///Управление кэшированием
     using CacheHolder::UpdateCache;
@@ -277,7 +277,7 @@ class EntityLodCommonData: public CacheHolder, public DebugIdHolder
     ProgramParametersLayout     entity_parameters_layout; //объект расположения свойств
     StateMap                    states;                   //карта состояний
     DynamicTextureEntityStorage dynamic_textures;         //хранилище динамических текстур объекта рендеринга
-    ShaderOptionsCache          shader_options_cache;     //кэш опций шейдера
+    render::ShaderOptionsCache  shader_options_cache;     //кэш опций шейдера
     LowLevelStateBlockPtr       default_state_block;      //блок состояний по умолчанию
 };
 
@@ -380,6 +380,7 @@ struct EntityLod: public xtl::reference_counter, public CacheHolder, public Debu
 
           operation.state_block              = common_data.GetStateBlock (material).get ();
           operation.entity_parameters_layout = common_data.GetProgramParametersLayout (material).get ();
+          operation.shader_options_cache     = &ShaderOptionsCache ();
 
           cached_operations.push_back (operation);
         }
@@ -539,7 +540,7 @@ void EntityImpl::SetShaderOptions (const common::PropertyMap& properties)
 {
   try
   {
-    impl->ShaderOptions ().SetProperties (properties);
+    impl->ShaderOptionsCache ().SetProperties (properties);
   }
   catch (xtl::exception& e)
   {
@@ -550,7 +551,7 @@ void EntityImpl::SetShaderOptions (const common::PropertyMap& properties)
 
 const common::PropertyMap& EntityImpl::ShaderOptions () const
 {
-  return impl->ShaderOptions ().Properties ();
+  return impl->ShaderOptionsCache ().Properties ();
 }
 
 /*

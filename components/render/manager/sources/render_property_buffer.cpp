@@ -1,9 +1,13 @@
 #include "shared.h"
 
-//TODO: неверно сделана логика обновления. константный буфер сейчас пересоздается при любом изменении свойств. нужно анализировать propertylayout hash
-
 using namespace render;
 using namespace common;
+
+/*
+    Константы
+*/
+
+const size_t MIN_BUFFER_SIZE = 16; //минимальный размер буфера констант
 
 /*
     Описание реализации буфера свойств
@@ -11,16 +15,18 @@ using namespace common;
 
 struct PropertyBuffer::Impl
 {
-  DeviceManagerPtr     device_manager;    //менеджер устройства отрисовки
-  LowLevelBufferPtr    buffer;            //константный буфер
-  common::PropertyMap  properties;        //исходные свойства
-  xtl::auto_connection update_connection; //соединение обновления свойств
-  bool                 need_update;       //флаг необходимости обновления буфера
+  DeviceManagerPtr     device_manager;     //менеджер устройства отрисовки
+  LowLevelBufferPtr    buffer;             //константный буфер
+  common::PropertyMap  properties;         //исходные свойства
+  xtl::auto_connection update_connection;  //соединение обновления свойств
+  bool                 need_update;        //флаг необходимости обновления буфера
+  size_t               cached_buffer_size; //закэшированный размер буфера
 
 ///Конструктор
   Impl (const DeviceManagerPtr& in_device_manager)
     : device_manager (in_device_manager)
     , need_update (true)
+    , cached_buffer_size (0)
   {
   }
   
@@ -66,10 +72,13 @@ void PropertyBuffer::OnPropertiesUpdated ()
 {
   if (impl->need_update)
     return;      
-
-  impl->need_update = true;
+    
+  impl->need_update = true;    
+    
+  bool need_recreate_buffer = impl->properties.BufferSize () > impl->cached_buffer_size;
   
-  ResetCache ();
+  if (need_recreate_buffer)
+    ResetCache ();
 }
 
 /*
@@ -83,20 +92,31 @@ const LowLevelBufferPtr& PropertyBuffer::Buffer ()
     if (!impl->need_update)
       return impl->buffer;
 
-    UpdateCache ();            
+    UpdateCache ();
+    
+    size_t buffer_size = impl->properties.BufferSize ();
+    
+    bool need_recreate_buffer = !impl->buffer || buffer_size > impl->cached_buffer_size;
+    
+    if (need_recreate_buffer)
+    {
+        //создание нового буфера
+        
+      render::low_level::BufferDesc desc;
 
-      //создание нового буфера
+      memset (&desc, 0, sizeof (desc));
       
-    render::low_level::BufferDesc desc;
-
-    memset (&desc, 0, sizeof (desc));
+      desc.size         = stl::max (buffer_size, MIN_BUFFER_SIZE);
+      desc.usage_mode   = render::low_level::UsageMode_Default;
+      desc.bind_flags   = render::low_level::BindFlag_ConstantBuffer;
+      desc.access_flags = render::low_level::AccessFlag_ReadWrite;
+      
+      impl->buffer             = LowLevelBufferPtr (impl->device_manager->Device ().CreateBuffer (desc), false);
+      impl->cached_buffer_size = desc.size;
+    }
     
-    desc.size         = impl->properties.Layout ().BufferSize ();
-    desc.usage_mode   = render::low_level::UsageMode_Default;
-    desc.bind_flags   = render::low_level::BindFlag_ConstantBuffer;
-    desc.access_flags = render::low_level::AccessFlag_ReadWrite;
+    impl->buffer->SetData (0, buffer_size, impl->properties.BufferData ());
     
-    impl->buffer      = LowLevelBufferPtr (impl->device_manager->Device ().CreateBuffer (desc), false);
     impl->need_update = false;
     
     return impl->buffer;

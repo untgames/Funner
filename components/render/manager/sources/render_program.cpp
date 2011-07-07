@@ -105,6 +105,36 @@ struct ProgramCommonData: public xtl::reference_counter
 
 typedef xtl::intrusive_ptr<ProgramCommonData> ProgramCommonDataPtr;
 
+/*
+    Программа соответствующая паре кэшей
+*/
+
+struct OptionsCacheCombinationKey
+{
+  size_t hash1, hash2;
+  
+  OptionsCacheCombinationKey (size_t in_hash1, size_t in_hash2) : hash1 (in_hash1), hash2 (in_hash2) {}
+  
+  bool operator == (const OptionsCacheCombinationKey& key) const
+  {
+    return hash1 == key.hash1 && hash2 == key.hash2;
+  }
+};
+
+struct OptionsCacheCombinationValue: public xtl::reference_counter
+{
+  ShaderOptions options;
+  ProgramPtr    program;
+};
+
+size_t hash (const OptionsCacheCombinationKey& key)
+{
+  return key.hash1 * key.hash2;
+}
+
+typedef xtl::intrusive_ptr<OptionsCacheCombinationValue>                           OptionsCacheCombinationValuePtr;
+typedef stl::hash_map<OptionsCacheCombinationKey, OptionsCacheCombinationValuePtr> OptionsCacheCombinationMap;
+
 }
 
 /*
@@ -115,10 +145,11 @@ typedef stl::hash_map<size_t, ProgramPtr> ProgramMap;
 
 struct Program::Impl
 {
-  ProgramCommonDataPtr common_data;           //общие данные программы
-  ShaderOptions        options;               //опции данного экземпляра программы
-  ProgramMap           derived_programs;      //производные программы  
-  LowLevelProgramPtr   low_level_program;     //низкоуровневая программа
+  ProgramCommonDataPtr        common_data;               //общие данные программы
+  ShaderOptions               options;                   //опции данного экземпляра программы
+  ProgramMap                  derived_programs;          //производные программы  
+  OptionsCacheCombinationMap  options_cache_combinations; //комбинации кэшей опций
+  LowLevelProgramPtr          low_level_program;         //низкоуровневая программа
   
 ///Конструктор
   Impl (const DeviceManagerPtr& device_manager, const char* name, const char* static_options, const char* dynamic_options)
@@ -379,6 +410,57 @@ Program& Program::DerivedProgram (ShaderOptionsCache& cache)
   }
 }
 
+Program& Program::DerivedProgram (ShaderOptionsCache& cache1, ShaderOptionsCache& cache2)
+{
+  try
+  {
+    size_t options_count1 = cache1.Properties ().Size (),
+           options_count2 = cache2.Properties ().Size ();
+           
+      //обработка частных случаев
+    
+    if (!options_count1 && options_count2)
+      return *this;
+      
+    if (!options_count1)
+      return DerivedProgram (cache2);
+      
+    if (!options_count2)
+      return DerivedProgram (cache1);
+      
+      //обработка общего случая
+      
+    const ShaderOptions& options1 = cache1.GetShaderOptions (impl->common_data->dynamic_options_layout);
+    const ShaderOptions& options2 = cache2.GetShaderOptions (impl->common_data->dynamic_options_layout);    
+    
+    OptionsCacheCombinationKey key (options1.options_hash, options2.options_hash);
+    
+    OptionsCacheCombinationMap::iterator iter = impl->options_cache_combinations.find (key);
+    
+    if (iter != impl->options_cache_combinations.end ())
+      return *iter->second->program;
+    
+    ShaderOptions derived_options;
+    
+    derived_options.options      = options1.options + " " + options2.options;
+    derived_options.options_hash = common::strhash (derived_options.options.c_str ());
+    
+    OptionsCacheCombinationValuePtr value (new OptionsCacheCombinationValue, false);
+    
+    value->options = derived_options;
+    value->program = &DerivedProgram (derived_options);
+    
+    impl->options_cache_combinations.insert_pair (key, value);
+    
+    return *value->program;
+  }
+  catch (xtl::exception& e)
+  {
+    e.touch ("render::Program::DerivedProgramShaderOptionsCache&,ShaderOptionsCache&)");
+    throw;
+  }
+}
+
 /*
     Получение низкоуровневой программы шейдинга
 */
@@ -428,12 +510,14 @@ struct ShaderCompilerLog
 
 }
 
-const LowLevelProgramPtr& Program::LowLevelProgram (render::low_level::IDevice& device)
+const LowLevelProgramPtr& Program::LowLevelProgram ()
 {
   try
   {
     if (impl->low_level_program)
       return impl->low_level_program;
+      
+    render::low_level::IDevice& device = impl->common_data->device_manager->Device ();
       
     stl::string options = impl->common_data->static_options + " " + impl->options.options;
       

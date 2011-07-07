@@ -104,7 +104,7 @@ struct FrameImpl::Impl: public CacheHolder
   FrameArray                  frames;                  //список вложенных кадров
   PropertyBuffer              properties;              //свойства кадра
   PropertyCache               entities_properties;     //динамические свойства объектов
-  ShaderOptionsCache          shader_options_cache;    //кэш опций шейдера
+  render::ShaderOptionsCache  shader_options_cache;    //кэш опций шейдера
   RenderTargetDescMap         render_targets;          //целевые буферы отрисовки
   TextureMap                  textures;                //локальные текстуры фрейма
   bool                        scissor_state;           //включено ли отсечение  
@@ -578,6 +578,11 @@ void FrameImpl::SetShaderOptions (const common::PropertyMap& properties)
 const common::PropertyMap& FrameImpl::ShaderOptions ()
 {
   return impl->shader_options_cache.Properties ();
+}
+
+ShaderOptionsCache& FrameImpl::ShaderOptionsCache ()
+{
+  return impl->shader_options_cache;
 }
 
 /*

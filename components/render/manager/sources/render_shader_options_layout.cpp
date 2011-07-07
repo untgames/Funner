@@ -35,8 +35,10 @@ struct ShaderOptionsBuilder: public xtl::reference_counter
     {
       OptionDesc option = {define_names [i], layout.IndexOf (define_names [i])};
       
-      if (option.index != -1)
-        option.type = layout.PropertyType (option.index);
+      if (option.index == -1)
+        continue;
+
+      option.type = layout.PropertyType (option.index);
       
       option_descs.push_back (option);
     }

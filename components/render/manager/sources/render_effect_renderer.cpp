@@ -4,6 +4,7 @@ using namespace render;
 
 //TODO: check scissor enabled???
 //TODO: set local textures
+//TODOL ExecuteOperations refactoring
 
 namespace
 {
@@ -392,6 +393,7 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
   {
     render::low_level::IDevice& device                     = impl->device_manager->Device ();
     ProgramParametersManager&   program_parameters_manager = impl->device_manager->ProgramParametersManager ();
+    ShaderOptionsCache&         frame_shader_options_cache = context.ShaderOptionsCache ();
 
     for (RenderEffectOperationArray::iterator iter=impl->operations.begin (), end=impl->operations.end (); iter!=end; ++iter)
     {
@@ -516,24 +518,51 @@ void EffectRenderer::ExecuteOperations (RenderingContext& context)
         }
         
         //TODO: check scissor enabled???
-        
-          //установка локальных текстур
-          
-        ///???
-                
+                        
           //выполнение операций
 
         for (OperationPtrArray::iterator iter=pass.operation_ptrs.begin (), end=pass.operation_ptrs.end (); iter!=end; ++iter)
         {
-          const PassOperation&     operation = **iter;
-          const RendererPrimitive& primitive = *operation.primitive;
+          const PassOperation&     operation                   = **iter;
+          const RendererPrimitive& primitive                   = *operation.primitive;
+          ShaderOptionsCache&      entity_shader_options_cache = *operation.shader_options_cache;
+          
+            //поиск программы (TODO: кэширование поиска по адресам кэшей, FIFO)
+            
+          Program* program = &*primitive.material->Program ();
+          
+          if (!program)
+            continue;
+            
+          program = &program->DerivedProgram (frame_shader_options_cache, entity_shader_options_cache);
+          
+          device.SSSetProgram (program->LowLevelProgram ().get ());
           
             //применение состояния операции
 
           operation.state_block->Apply ();
+                    
+            //установка локальных текстур
           
+          if (program->HasFramemaps ())
+          {
+            const TexmapDesc* texmaps = program->Texmaps ();
+            
+            for (size_t i=0, count=program->TexmapsCount (); i<count; i++)
+            {
+              const TexmapDesc& texmap = texmaps [i];
+              
+              if (!texmap.is_framemap)
+                continue;
+                              
+               ///???????????????            
+             
+              //device.SSSetTexture (texmap.channel, ???????);
+            }
+          }
+                    
             //установка расположения параметров
-            //TODO: кэшировать по entity
+            //TODO: кэшировать по entity (FIFO)
 
           ProgramParametersLayoutPtr program_parameters_layout = program_parameters_manager.GetParameters (&pass.parameters_layout, operation.entity_parameters_layout, operation.frame_entity_parameters_layout);
 
